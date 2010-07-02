@@ -7,6 +7,7 @@ import jadex.commons.IFuture;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.service.IServiceContainer;
+import jadex.service.library.ILibraryService;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -28,30 +29,37 @@ public class SComponentFactory
 	 * @return The loaded model.
 	 */
 //	public static ILoadableComponentModel loadModel(IServiceContainer container, String model)
-	public static IFuture loadModel(final IServiceContainer container, final String model, final ClassLoader classloader)
+	public static IFuture loadModel(final IServiceContainer container, final String model)
 	{
 		final Future ret = new Future();
 		
-		container.getServices(IComponentFactory.class).addResultListener(new DefaultResultListener()
+		container.getService(ILibraryService.class).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
-				Collection facts = (Collection)result;
-
-				ILoadableComponentModel res = null;
-				if(facts != null)
+				final ILibraryService ls = (ILibraryService)result;
+				
+				container.getServices(IComponentFactory.class).addResultListener(new DefaultResultListener()
 				{
-					for(Iterator it = facts.iterator(); it.hasNext() && res == null;)
+					public void resultAvailable(Object source, Object result)
 					{
-						IComponentFactory fac = (IComponentFactory)it.next();
-						if(fac.isLoadable(model, null, classloader))
-							res = fac.loadModel(model, null, classloader);
+						Collection facts = (Collection)result;
+		
+						ILoadableComponentModel res = null;
+						if(facts != null)
+						{
+							for(Iterator it = facts.iterator(); it.hasNext() && res == null;)
+							{
+								IComponentFactory fac = (IComponentFactory)it.next();
+								if(fac.isLoadable(model, null, ls.getClassLoader()))
+									res = fac.loadModel(model, null, ls.getClassLoader());
+							}
+						}
+						ret.setResult(res);
 					}
-				}
-				ret.setResult(res);
+				});
 			}
 		});
-
 		return ret;
 	}
 
@@ -61,26 +69,34 @@ public class SComponentFactory
 	 * @param model The model.
 	 * @return True, if model can be loaded.
 	 */
-	public static IFuture isLoadable(IServiceContainer container, final String model, final ClassLoader classloader)
+	public static IFuture isLoadable(final IServiceContainer container, final String model)
 	{
 		final Future ret = new Future();
 		
-		container.getServices(IComponentFactory.class).addResultListener(new DefaultResultListener()
+		container.getService(ILibraryService.class).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
-				Collection facts = (Collection)result;
-				boolean res = false;
-		
-				if(facts != null)
+				final ILibraryService ls = (ILibraryService)result;
+				
+				container.getServices(IComponentFactory.class).addResultListener(new DefaultResultListener()
 				{
-					for(Iterator it = facts.iterator(); !res && it.hasNext();)
+					public void resultAvailable(Object source, Object result)
 					{
-						IComponentFactory fac = (IComponentFactory)it.next();
-						res = fac.isLoadable(model, null, classloader);
+						Collection facts = (Collection)result;
+						boolean res = false;
+				
+						if(facts != null)
+						{
+							for(Iterator it = facts.iterator(); !res && it.hasNext();)
+							{
+								IComponentFactory fac = (IComponentFactory)it.next();
+								res = fac.isLoadable(model, null, ls.getClassLoader());
+							}
+						}
+						ret.setResult(res? Boolean.TRUE: Boolean.FALSE);
 					}
-				}
-				ret.setResult(res? Boolean.TRUE: Boolean.FALSE);
+				});
 			}
 		});
 
@@ -109,26 +125,34 @@ public class SComponentFactory
 	 * @param model The model.
 	 * @return True, if startable (and should therefore also be loadable).
 	 */
-	public static IFuture isStartable(IServiceContainer container, final String model, final ClassLoader classloader)
+	public static IFuture isStartable(final IServiceContainer container, final String model)
 	{
 		final Future ret = new Future();
 		
-		container.getServices(IComponentFactory.class).addResultListener(new DefaultResultListener()
+		container.getService(ILibraryService.class).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
-				Collection facts = (Collection)result;
-				boolean res = false;
-		
-				if(facts != null)
+				final ILibraryService ls = (ILibraryService)result;
+				
+				container.getServices(IComponentFactory.class).addResultListener(new DefaultResultListener()
 				{
-					for(Iterator it = facts.iterator(); !res && it.hasNext();)
+					public void resultAvailable(Object source, Object result)
 					{
-						IComponentFactory fac = (IComponentFactory)it.next();
-						res = fac.isStartable(model, null, classloader);
+						Collection facts = (Collection)result;
+						boolean res = false;
+				
+						if(facts != null)
+						{
+							for(Iterator it = facts.iterator(); !res && it.hasNext();)
+							{
+								IComponentFactory fac = (IComponentFactory)it.next();
+								res = fac.isStartable(model, null, ls.getClassLoader());
+							}
+						}
+						ret.setResult(res? Boolean.TRUE: Boolean.FALSE);
 					}
-				}
-				ret.setResult(res? Boolean.TRUE: Boolean.FALSE);
+				});
 			}
 		});
 
@@ -224,25 +248,33 @@ public class SComponentFactory
 	/**
 	 * Get the file type of a model.
 	 */
-	public static IFuture getFileType(IServiceContainer container, final String model, final ClassLoader classloader)
+	public static IFuture getFileType(final IServiceContainer container, final String model)
 	{
 		final Future ret = new Future();
 		
-		container.getServices(IComponentFactory.class).addResultListener(new DefaultResultListener()
+		container.getService(ILibraryService.class).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
-				Collection facts = (Collection)result;
-				String res = null;
-				if(facts != null)
+				final ILibraryService ls = (ILibraryService)result;
+				
+				container.getServices(IComponentFactory.class).addResultListener(new DefaultResultListener()
 				{
-					for(Iterator it = facts.iterator(); it.hasNext() && res == null;)
+					public void resultAvailable(Object source, Object result)
 					{
-						IComponentFactory fac = (IComponentFactory)it.next();
-						res = fac.getComponentType(model, null, classloader);
+						Collection facts = (Collection)result;
+						String res = null;
+						if(facts != null)
+						{
+							for(Iterator it = facts.iterator(); it.hasNext() && res == null;)
+							{
+								IComponentFactory fac = (IComponentFactory)it.next();
+								res = fac.getComponentType(model, null, ls.getClassLoader());
+							}
+						}
+						ret.setResult(res);
 					}
-				}
-				ret.setResult(res);
+				});
 			}
 		});
 		

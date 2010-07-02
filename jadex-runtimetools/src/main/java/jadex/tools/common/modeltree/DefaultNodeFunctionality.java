@@ -177,6 +177,8 @@ public class	DefaultNodeFunctionality
 				
 //				IAgentFactory agfac = jcc.getAgent().getPlatform().getAgentFactory();
 //				String	type = agfac.getFileType(fn.getFile().getAbsolutePath());
+				
+				// todo: todo: replace null with classloader
 				String type = (String)SComponentFactory.getFileType(jcc.getServiceContainer(), fn.getFile().getAbsolutePath()).get(new ThreadSuspendable());
 				if(type!=null)
 					icon = (Icon)SComponentFactory.getFileTypeIcon(jcc.getServiceContainer(), type).get(new ThreadSuspendable());
@@ -184,6 +186,8 @@ public class	DefaultNodeFunctionality
 				if(icon==null)
 				{
 //					IApplicationFactory apfac = jcc.getAgent().getPlatform().getApplicationFactory();
+					
+					// todo: todo: replace null with classloader
 					type = (String)SComponentFactory.getFileType(jcc.getServiceContainer(), fn.getFile().getAbsolutePath()).get(new ThreadSuspendable());
 					if(type!=null)
 						icon = (Icon)SComponentFactory.getFileTypeIcon(jcc.getServiceContainer(), type).get(new ThreadSuspendable());

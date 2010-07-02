@@ -139,7 +139,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 		*/
 			
 		// Load the model with fitting factory.
-		container.getServices(ILibraryService.class).addResultListener(new DefaultResultListener()
+		container.getService(ILibraryService.class).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
