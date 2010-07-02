@@ -32,9 +32,9 @@ public class BpmnModelLoader extends AbstractModelLoader
 	 *  @param name	The filename or logical name (resolved via imports and extensions).
 	 *  @param imports	The imports, if any.
 	 */
-	public MBpmnModel	loadBpmnModel(String name, String[] imports) throws Exception
+	public MBpmnModel	loadBpmnModel(String name, String[] imports, ClassLoader classloader) throws Exception
 	{
-		return (MBpmnModel)loadModel(name, FILE_EXTENSION_BPMN, imports);
+		return (MBpmnModel)loadModel(name, FILE_EXTENSION_BPMN, imports, classloader);
 	}
 	
 	//-------- AbstractModelLoader methods --------
@@ -44,7 +44,7 @@ public class BpmnModelLoader extends AbstractModelLoader
 	 *  @param name	The original name (i.e. not filename).
 	 *  @param info	The resource info.
 	 */
-	protected ICacheableModel doLoadModel(String name, ResourceInfo info) throws Exception
+	protected ICacheableModel doLoadModel(String name, ResourceInfo info, ClassLoader classloader) throws Exception
 	{
 		return (ICacheableModel)BpmnXMLReader.read(info, classloader);
 	}

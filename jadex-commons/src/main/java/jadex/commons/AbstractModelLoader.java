@@ -18,7 +18,7 @@ public abstract class AbstractModelLoader
 	protected Map modelcache;
 	
 	/** The class loader. */
-	protected ClassLoader classloader;
+//	protected ClassLoader classloader;
 	
 	//-------- constructors --------
 	
@@ -39,7 +39,7 @@ public abstract class AbstractModelLoader
 	 *  @param name	The original name (i.e. not filename).
 	 *  @param info	The resource info.
 	 */
-	protected abstract ICacheableModel	doLoadModel(String name, ResourceInfo info) throws Exception;
+	protected abstract ICacheableModel	doLoadModel(String name, ResourceInfo info, ClassLoader classloader) throws Exception;
 	
 	/**
 	 *  Find the file for a given name using any supported extension.
@@ -48,9 +48,9 @@ public abstract class AbstractModelLoader
 	 *  @return The resource info identifying the file.
 	 *  @throws	Exception when the file could not be found.
 	 */
-	protected ResourceInfo	getResourceInfo(String name, String[] imports) throws Exception
+	protected ResourceInfo	getResourceInfo(String name, String[] imports, ClassLoader classloader) throws Exception
 	{
-		ResourceInfo ret = getResourceInfo0(name, imports);
+		ResourceInfo ret = getResourceInfo0(name, imports, classloader);
 
 		if(ret==null || ret.getInputStream()==null)
 			throw new IOException("File "+name+" not found in imports: "+SUtil.arrayToString(imports));
@@ -64,7 +64,7 @@ public abstract class AbstractModelLoader
 	 *  @param imports	The imports, if any.
 	 *  @return The resource info identifying the file or null.
 	 */
-	protected ResourceInfo getResourceInfo0(String name, String[] imports)
+	protected ResourceInfo getResourceInfo0(String name, String[] imports, ClassLoader classloader)
 	{
 		// Try to find directly as absolute path.
 		ResourceInfo ret = SUtil.getResourceInfo0(name, classloader);
@@ -103,7 +103,7 @@ public abstract class AbstractModelLoader
 	 *  @param imports	The imports, if any.
 	 *  @return The resource info identifying the file.
 	 */
-	protected ResourceInfo	getResourceInfo(String name, String extension, String[] imports) throws Exception
+	protected ResourceInfo	getResourceInfo(String name, String extension, String[] imports, ClassLoader classloader) throws Exception
 	{
 		// Try to find directly as absolute path.
 		String resstr = name;
@@ -150,13 +150,13 @@ public abstract class AbstractModelLoader
 	/**
 	 *  Set the class loader.
 	 *  @param classloader The class loader.
-	 */
+	 * /
 	public synchronized void setClassLoader(ClassLoader classloader)
 	{
 //		System.out.println("Classloader set: "+this+" "+classloader);
 		this.classloader = classloader;
 		modelcache.clear();
-	}
+	}*/
 
 	//-------- methods --------
 
@@ -165,9 +165,9 @@ public abstract class AbstractModelLoader
 	 *  @param name	The name of the model (file name or logical name).
 	 *  @param imports	The imports to use when resolving logical names.
 	 */
-	public synchronized ICacheableModel	loadModel(String name, String[] imports) throws Exception
+	public synchronized ICacheableModel	loadModel(String name, String[] imports, ClassLoader classloader) throws Exception
 	{
-		return loadModel(name, null, imports);
+		return loadModel(name, null, imports, classloader);
 	}
 
 	/**
@@ -176,7 +176,7 @@ public abstract class AbstractModelLoader
 	 *  @param extension	The specific extension to look for.
 	 *  @param imports	The imports to use when resolving logical names.
 	 */
-	public synchronized ICacheableModel	loadModel(String name, String extension, String[] imports) throws Exception
+	public synchronized ICacheableModel	loadModel(String name, String extension, String[] imports, ClassLoader classloader) throws Exception
 	{
 //		System.out.println("filename: "+name);
 		
@@ -196,7 +196,7 @@ public abstract class AbstractModelLoader
 			// If model is in cache, check at most every second if file on disc is newer.
 			if(cached!=null && cached.getLastChecked()+1000<System.currentTimeMillis())
 			{
-				info	= extension!=null ? getResourceInfo(name, extension, imports) : getResourceInfo(name, imports);
+				info	= extension!=null ? getResourceInfo(name, extension, imports, classloader) : getResourceInfo(name, imports, classloader);
 				if(cached.getLastModified()<info.getLastModified())
 				{
 					cached	= null;
@@ -214,7 +214,7 @@ public abstract class AbstractModelLoader
 			// Lookup cache by resolved filename.
 //			synchronized(modelcache)
 //			{
-				info	= extension!=null ? getResourceInfo(name, extension, imports) : getResourceInfo(name, imports);
+				info	= extension!=null ? getResourceInfo(name, extension, imports, classloader) : getResourceInfo(name, imports, classloader);
 				cached	= (ICacheableModel)modelcache.get(info.getFilename());
 				if(cached!=null)
 				{
@@ -238,7 +238,7 @@ public abstract class AbstractModelLoader
 		{
 			try
 			{
-				cached	= doLoadModel(name, info);
+				cached	= doLoadModel(name, info, classloader);
 	
 				// Store by filename also, to avoid reloading with different imports.
 				modelcache.put(info.getFilename(), cached);

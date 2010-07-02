@@ -95,9 +95,9 @@ public class OAVBDIModelLoader	extends AbstractModelLoader
 	 *  @param name	The filename or logical name (resolved via imports and extensions).
 	 *  @param imports	The imports, if any.
 	 */
-	public OAVAgentModel	loadAgentModel(String name, String[] imports) throws Exception
+	public OAVAgentModel	loadAgentModel(String name, String[] imports, ClassLoader classloader) throws Exception
 	{
-		return (OAVAgentModel)loadModel(name, FILE_EXTENSION_AGENT, imports);
+		return (OAVAgentModel)loadModel(name, FILE_EXTENSION_AGENT, imports, classloader);
 	}
 
 	/**
@@ -105,9 +105,9 @@ public class OAVBDIModelLoader	extends AbstractModelLoader
 	 *  @param name	The filename or logical name (resolved via imports and extensions).
 	 *  @param imports	The imports, if any.
 	 */
-	public OAVCapabilityModel	loadCapabilityModel(String name, String[] imports) throws Exception
+	public OAVCapabilityModel	loadCapabilityModel(String name, String[] imports, ClassLoader classloader) throws Exception
 	{
-		return (OAVCapabilityModel)loadModel(name, FILE_EXTENSION_CAPABILITY, imports);
+		return (OAVCapabilityModel)loadModel(name, FILE_EXTENSION_CAPABILITY, imports, classloader);
 	}
 
 	//-------- AbstractModelLoader methods --------
@@ -117,7 +117,7 @@ public class OAVBDIModelLoader	extends AbstractModelLoader
 	 *  @param name	The original name (i.e. not filename).
 	 *  @param info	The resource info.
 	 */
-	protected ICacheableModel	doLoadModel(String name, ResourceInfo info) throws Exception
+	protected ICacheableModel	doLoadModel(String name, ResourceInfo info, ClassLoader classloader) throws Exception
 	{
 		OAVCapabilityModel	ret;
 
@@ -197,7 +197,7 @@ public class OAVBDIModelLoader	extends AbstractModelLoader
 			{
 				Object mcaparef = it.next();
 				String	file	= (String)state.getAttributeValue(mcaparef, OAVBDIMetaModel.capabilityref_has_file);
-				OAVCapabilityModel	cmodel	= loadCapabilityModel(file, imports);
+				OAVCapabilityModel	cmodel	= loadCapabilityModel(file, imports, model.getClassLoader());
 				model.addSubcapabilityModel(cmodel);
 				if(!cmodel.getReport().isEmpty())
 				{

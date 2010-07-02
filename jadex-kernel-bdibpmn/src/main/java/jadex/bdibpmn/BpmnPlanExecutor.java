@@ -42,27 +42,27 @@ public class BpmnPlanExecutor implements IPlanExecutor, Serializable
 	public BpmnPlanExecutor(IServiceContainer container)
 	{
 		this.loader = new BpmnModelLoader();
-		container.getService(ILibraryService.class).addResultListener(new DefaultResultListener()
-		{
-			public void resultAvailable(Object source, Object result)
-			{
-				final ILibraryService libservice = (ILibraryService)result;
-				loader.setClassLoader(libservice.getClassLoader());
-				ILibraryServiceListener lsl = new ILibraryServiceListener()
-				{
-					public void urlAdded(URL url)
-					{
-						loader.setClassLoader(libservice.getClassLoader());
-					}
-					
-					public void urlRemoved(URL url)
-					{
-						loader.setClassLoader(libservice.getClassLoader());
-					}
-				};
-				libservice.addLibraryServiceListener(lsl);
-			}
-		});
+//		container.getService(ILibraryService.class).addResultListener(new DefaultResultListener()
+//		{
+//			public void resultAvailable(Object source, Object result)
+//			{
+//				final ILibraryService libservice = (ILibraryService)result;
+//				loader.setClassLoader(libservice.getClassLoader());
+//				ILibraryServiceListener lsl = new ILibraryServiceListener()
+//				{
+//					public void urlAdded(URL url)
+//					{
+//						loader.setClassLoader(libservice.getClassLoader());
+//					}
+//					
+//					public void urlRemoved(URL url)
+//					{
+//						loader.setClassLoader(libservice.getClassLoader());
+//					}
+//				};
+//				libservice.addLibraryServiceListener(lsl);
+//			}
+//		});
 	}
 
 	//-------- IPlanExecutor interface --------
@@ -82,7 +82,7 @@ public class BpmnPlanExecutor implements IPlanExecutor, Serializable
 		Object	mcapa	= interpreter.getState().getAttributeValue(rcapability, OAVBDIRuntimeModel.element_has_model);
 		String[] imports	= OAVBDIMetaModel.getImports(interpreter.getState(), mcapa);
 		
-		MBpmnModel bodymodel = loader.loadBpmnModel(impl, imports); 
+		MBpmnModel bodymodel = loader.loadBpmnModel(impl, imports, interpreter.getClassLoader()); 
 
 		if(bodymodel==null)
 		{

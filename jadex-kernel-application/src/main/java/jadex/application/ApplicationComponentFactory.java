@@ -80,13 +80,13 @@ public class ApplicationComponentFactory	implements IComponentFactory, IService
 	//-------- attributes --------
 	
 	/** The platform. */
-	protected IServiceContainer container;
+//	protected IServiceContainer container;
 	
 	/** The xml reader. */
 	protected Reader reader;
 	
 	/** The library service. */
-	protected ILibraryService libservice;
+//	protected ILibraryService libservice;
 	
 	//-------- constructors --------
 	
@@ -95,9 +95,9 @@ public class ApplicationComponentFactory	implements IComponentFactory, IService
 	 *  @param platform	The agent platform.
 	 *  @param mappings	The XML reader mappings of supported spaces (if any).
 	 */
-	public ApplicationComponentFactory(final IServiceContainer container, Set[] mappings)// Set[] linkinfos)
+	public ApplicationComponentFactory(Set[] mappings)// Set[] linkinfos)
 	{
-		this.container = container;
+//		this.container = container;
 		
 		Set types = new HashSet();
 		
@@ -193,18 +193,18 @@ public class ApplicationComponentFactory	implements IComponentFactory, IService
 	public IFuture	startService()
 	{
 		final Future	ret = new Future(); 
-		container.getService(ILibraryService.class).addResultListener(new IResultListener()
-		{
-			public void resultAvailable(Object source, Object result)
-			{
-				libservice = (ILibraryService)result;
-				ret.setResult(null);
-			}
-			public void exceptionOccurred(Object source, Exception exception)
-			{
-				ret.setException(exception);
-			}
-		});
+//		container.getService(ILibraryService.class).addResultListener(new IResultListener()
+//		{
+//			public void resultAvailable(Object source, Object result)
+//			{
+//				libservice = (ILibraryService)result;
+//				ret.setResult(null);
+//			}
+//			public void exceptionOccurred(Object source, Exception exception)
+//			{
+//				ret.setException(exception);
+//			}
+//		});
 		return ret;
 	}
 	
@@ -266,7 +266,7 @@ public class ApplicationComponentFactory	implements IComponentFactory, IService
 	 *  @param The imports (if any).
 	 *  @return The loaded model.
 	 */
-	public ILoadableComponentModel loadModel(String model, String[] imports)
+	public ILoadableComponentModel loadModel(String model, String[] imports, ClassLoader classloader)
 	{
 		ILoadableComponentModel ret = null;
 		
@@ -277,10 +277,10 @@ public class ApplicationComponentFactory	implements IComponentFactory, IService
 			try
 			{
 //				ClassLoader cl = ((ILibraryService)container.getService(ILibraryService.class)).getClassLoader();
-				ClassLoader cl = libservice.getClassLoader();
-				rinfo	= getResourceInfo(model, FILE_EXTENSION_APPLICATION, imports, cl);
-				apptype = (MApplicationType)reader.read(rinfo.getInputStream(), cl, null);
-				ret = new ApplicationModel(apptype, rinfo.getFilename(), cl);
+//				ClassLoader cl = libservice.getClassLoader();
+				rinfo	= getResourceInfo(model, FILE_EXTENSION_APPLICATION, imports, classloader);
+				apptype = (MApplicationType)reader.read(rinfo.getInputStream(), classloader, null);
+				ret = new ApplicationModel(apptype, rinfo.getFilename(), classloader);
 //				System.out.println("Loaded application type: "+apptype);
 			
 			}
@@ -305,7 +305,7 @@ public class ApplicationComponentFactory	implements IComponentFactory, IService
 	 *  @param The imports (if any).
 	 *  @return True, if model can be loaded.
 	 */
-	public boolean isLoadable(String model, String[] imports)
+	public boolean isLoadable(String model, String[] imports, ClassLoader classloader)
 	{
 		return model.endsWith(FILE_EXTENSION_APPLICATION);
 	}
@@ -316,7 +316,7 @@ public class ApplicationComponentFactory	implements IComponentFactory, IService
 	 *  @param The imports (if any).
 	 *  @return True, if startable (and loadable).
 	 */
-	public boolean isStartable(String model, String[] imports)
+	public boolean isStartable(String model, String[] imports, ClassLoader classloader)
 	{
 		return model.endsWith(FILE_EXTENSION_APPLICATION);
 	}
@@ -342,7 +342,7 @@ public class ApplicationComponentFactory	implements IComponentFactory, IService
 	 *  @param model The model (e.g. file name).
 	 *  @param The imports (if any).
 	 */
-	public String getComponentType(String model, String[] imports)
+	public String getComponentType(String model, String[] imports, ClassLoader classloader)
 	{
 		return model.toLowerCase().endsWith(FILE_EXTENSION_APPLICATION)? FILETYPE_APPLICATION: null;
 	}

@@ -11,7 +11,7 @@
 	<properties type="platform_standalone">
 		<properties type="services">
 			<property type="jadex.bridge.IComponentFactory" name="application_factory">
-				new jadex.application.ApplicationComponentFactory($platform,
+				new jadex.application.ApplicationComponentFactory(
 					new java.util.Set[]
 					{
 						jadex.application.space.envsupport.MEnvSpaceType.getXMLMapping(),

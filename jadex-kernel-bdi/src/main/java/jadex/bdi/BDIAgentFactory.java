@@ -99,34 +99,34 @@ public class BDIAgentFactory implements IComponentFactory, IService
 	{
 		if(libservice==null)
 		{
-			final Future	ret	= new Future();
-			container.getService(ILibraryService.class).addResultListener(new IResultListener()
-			{
-				public void resultAvailable(Object source, Object result)
-				{
-					libservice = (ILibraryService)result;
-					loader.setClassLoader(libservice.getClassLoader());
-					ILibraryServiceListener lsl = new ILibraryServiceListener()
-					{
-						public void urlAdded(URL url)
-						{
-							loader.setClassLoader(libservice.getClassLoader());
-						}
-						
-						public void urlRemoved(URL url)
-						{
-							loader.setClassLoader(libservice.getClassLoader());
-						}
-					};
-					libservice.addLibraryServiceListener(lsl);
-					ret.setResult(null);
-				}
-				
-				public void exceptionOccurred(Object source, Exception exception)
-				{
-					ret.setException(exception);
-				}
-			});
+			final Future	ret	= new Future(null);
+//			container.getService(ILibraryService.class).addResultListener(new IResultListener()
+//			{
+//				public void resultAvailable(Object source, Object result)
+//				{
+//					libservice = (ILibraryService)result;
+//					loader.setClassLoader(libservice.getClassLoader());
+//					ILibraryServiceListener lsl = new ILibraryServiceListener()
+//					{
+//						public void urlAdded(URL url)
+//						{
+//							loader.setClassLoader(libservice.getClassLoader());
+//						}
+//						
+//						public void urlRemoved(URL url)
+//						{
+//							loader.setClassLoader(libservice.getClassLoader());
+//						}
+//					};
+//					libservice.addLibraryServiceListener(lsl);
+//					ret.setResult(null);
+//				}
+//				
+//				public void exceptionOccurred(Object source, Exception exception)
+//				{
+//					ret.setException(exception);
+//				}
+//			});
 			return ret;
 		}
 		else
@@ -168,14 +168,14 @@ public class BDIAgentFactory implements IComponentFactory, IService
 	 *  @param The imports (if any).
 	 *  @return The loaded model.
 	 */
-	public ILoadableComponentModel loadModel(String filename, String[] imports)
+	public ILoadableComponentModel loadModel(String filename, String[] imports, ClassLoader classloader)
 	{
 //		init();
 		
 		try
 		{
 //			System.out.println("loading bdi: "+filename);
-			OAVCapabilityModel loaded = (OAVCapabilityModel)loader.loadModel(filename, imports);
+			OAVCapabilityModel loaded = (OAVCapabilityModel)loader.loadModel(filename, imports, classloader);
 			return loaded;
 		}
 		catch(Exception e)
@@ -191,7 +191,7 @@ public class BDIAgentFactory implements IComponentFactory, IService
 	 *  @param The imports (if any).
 	 *  @return True, if model can be loaded.
 	 */
-	public boolean isLoadable(String model, String[] imports)
+	public boolean isLoadable(String model, String[] imports, ClassLoader classloader)
 	{
 //		init();
 
@@ -213,7 +213,7 @@ public class BDIAgentFactory implements IComponentFactory, IService
 	 *  @param The imports (if any).
 	 *  @return True, if startable (and loadable).
 	 */
-	public boolean isStartable(String model, String[] imports)
+	public boolean isStartable(String model, String[] imports, ClassLoader classloader)
 	{
 		return model!=null && model.toLowerCase().endsWith(".agent.xml");
 //		return SXML.isAgentFilename(model);
@@ -242,7 +242,7 @@ public class BDIAgentFactory implements IComponentFactory, IService
 	 *  @param model The model (e.g. file name).
 	 *  @param The imports (if any).
 	 */
-	public String getComponentType(String model, String[] imports)
+	public String getComponentType(String model, String[] imports, ClassLoader classloader)
 	{
 		return model.toLowerCase().endsWith(".agent.xml") ? FILETYPE_BDIAGENT
 			: model.toLowerCase().endsWith(".capability.xml") ? FILETYPE_BDICAPABILITY

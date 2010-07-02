@@ -69,6 +69,7 @@ public class GpmnXMLReader2
 		MGpmnModel ret = (MGpmnModel)reader.read(rinfo.getInputStream(), classloader, null);
 		ret.setFilename(rinfo.getFilename());
 		ret.setLastModified(rinfo.getLastModified());
+		ret.setClassloader(classloader);
 		String name = new File(rinfo.getFilename()).getName();
 		name = name.substring(0, name.length()-5);
 		ret.setName(name);

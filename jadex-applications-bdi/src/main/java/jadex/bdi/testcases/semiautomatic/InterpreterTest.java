@@ -59,7 +59,7 @@ public class InterpreterTest
 				jadex.commons.concurrent.ThreadPoolFactory.createThreadPool()));
 			
 			OAVBDIModelLoader loader = new OAVBDIModelLoader();
-			OAVAgentModel loaded = loader.loadAgentModel(model, null);
+			OAVAgentModel loaded = loader.loadAgentModel(model, null, null);
 	
 			// Initialize agent interpreter.
 			final IClockService clock = new ClockService(new SystemClock("system", 1, ThreadPoolFactory.createThreadPool()));

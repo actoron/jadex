@@ -28,7 +28,7 @@ public class SComponentFactory
 	 * @return The loaded model.
 	 */
 //	public static ILoadableComponentModel loadModel(IServiceContainer container, String model)
-	public static IFuture loadModel(final IServiceContainer container, final String model)
+	public static IFuture loadModel(final IServiceContainer container, final String model, final ClassLoader classloader)
 	{
 		final Future ret = new Future();
 		
@@ -44,8 +44,8 @@ public class SComponentFactory
 					for(Iterator it = facts.iterator(); it.hasNext() && res == null;)
 					{
 						IComponentFactory fac = (IComponentFactory)it.next();
-						if(fac.isLoadable(model, null))
-							res = fac.loadModel(model, null);
+						if(fac.isLoadable(model, null, classloader))
+							res = fac.loadModel(model, null, classloader);
 					}
 				}
 				ret.setResult(res);
@@ -61,7 +61,7 @@ public class SComponentFactory
 	 * @param model The model.
 	 * @return True, if model can be loaded.
 	 */
-	public static IFuture isLoadable(IServiceContainer container, final String model)
+	public static IFuture isLoadable(IServiceContainer container, final String model, final ClassLoader classloader)
 	{
 		final Future ret = new Future();
 		
@@ -77,7 +77,7 @@ public class SComponentFactory
 					for(Iterator it = facts.iterator(); !res && it.hasNext();)
 					{
 						IComponentFactory fac = (IComponentFactory)it.next();
-						res = fac.isLoadable(model, null);
+						res = fac.isLoadable(model, null, classloader);
 					}
 				}
 				ret.setResult(res? Boolean.TRUE: Boolean.FALSE);
@@ -109,7 +109,7 @@ public class SComponentFactory
 	 * @param model The model.
 	 * @return True, if startable (and should therefore also be loadable).
 	 */
-	public static IFuture isStartable(IServiceContainer container, final String model)
+	public static IFuture isStartable(IServiceContainer container, final String model, final ClassLoader classloader)
 	{
 		final Future ret = new Future();
 		
@@ -125,7 +125,7 @@ public class SComponentFactory
 					for(Iterator it = facts.iterator(); !res && it.hasNext();)
 					{
 						IComponentFactory fac = (IComponentFactory)it.next();
-						res = fac.isStartable(model, null);
+						res = fac.isStartable(model, null, classloader);
 					}
 				}
 				ret.setResult(res? Boolean.TRUE: Boolean.FALSE);
@@ -224,7 +224,7 @@ public class SComponentFactory
 	/**
 	 * Get the file type of a model.
 	 */
-	public static IFuture getFileType(IServiceContainer container, final String model)
+	public static IFuture getFileType(IServiceContainer container, final String model, final ClassLoader classloader)
 	{
 		final Future ret = new Future();
 		
@@ -239,7 +239,7 @@ public class SComponentFactory
 					for(Iterator it = facts.iterator(); it.hasNext() && res == null;)
 					{
 						IComponentFactory fac = (IComponentFactory)it.next();
-						res = fac.getComponentType(model, null);
+						res = fac.getComponentType(model, null, classloader);
 					}
 				}
 				ret.setResult(res);

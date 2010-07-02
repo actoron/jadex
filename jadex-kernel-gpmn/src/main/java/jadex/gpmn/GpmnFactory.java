@@ -68,7 +68,7 @@ public class GpmnFactory implements IComponentFactory, IService
 	protected Map properties;
 	
 	/** The library service. */
-	protected ILibraryService libservice;
+//	protected ILibraryService libservice;
 	
 	//-------- constructors --------
 	
@@ -141,36 +141,36 @@ public class GpmnFactory implements IComponentFactory, IService
 //		long startup = System.currentTimeMillis() - starttime;
 //		((Platform)container).getLogger().info("Platform startup time: " + startup + " ms.");
 		
-		final Future	ret	= new Future();
+		final Future	ret	= new Future(null);
 		
-		container.getService(ILibraryService.class).addResultListener(new IResultListener()
-		{
-			public void resultAvailable(Object source, Object result)
-			{
-				libservice = (ILibraryService)result;
-				loader.setClassLoader(libservice.getClassLoader());
-				ILibraryServiceListener lsl = new ILibraryServiceListener()
-				{
-					public void urlAdded(URL url)
-					{
-						loader.setClassLoader(libservice.getClassLoader());
-					}
-					
-					public void urlRemoved(URL url)
-					{
-						loader.setClassLoader(libservice.getClassLoader());
-					}
-				};
-				libservice.addLibraryServiceListener(lsl);
-				
-				ret.setResult(null);
-			}
-			
-			public void exceptionOccurred(Object source, Exception exception)
-			{
-				ret.setException(exception);
-			}
-		});
+//		container.getService(ILibraryService.class).addResultListener(new IResultListener()
+//		{
+//			public void resultAvailable(Object source, Object result)
+//			{
+//				libservice = (ILibraryService)result;
+//				loader.setClassLoader(libservice.getClassLoader());
+//				ILibraryServiceListener lsl = new ILibraryServiceListener()
+//				{
+//					public void urlAdded(URL url)
+//					{
+//						loader.setClassLoader(libservice.getClassLoader());
+//					}
+//					
+//					public void urlRemoved(URL url)
+//					{
+//						loader.setClassLoader(libservice.getClassLoader());
+//					}
+//				};
+//				libservice.addLibraryServiceListener(lsl);
+//				
+//				ret.setResult(null);
+//			}
+//			
+//			public void exceptionOccurred(Object source, Exception exception)
+//			{
+//				ret.setException(exception);
+//			}
+//		});
 		
 		return ret;
 	}
@@ -190,26 +190,26 @@ public class GpmnFactory implements IComponentFactory, IService
 	 *  @param The imports (if any).
 	 *  @return The loaded model.
 	 */
-	public ILoadableComponentModel loadModel(String model, String[] imports)
+	public ILoadableComponentModel loadModel(String model, String[] imports, ClassLoader classloader)
 	{
 		// Todo: support imports for GPMN models (-> use abstract model loader). 
 		ILoadableComponentModel ret = null;
 		try
 		{
 //			ILibraryService libservice = (ILibraryService)container.getService(ILibraryService.class);
-			ClassLoader	cl = libservice.getClassLoader();
-			ResourceInfo rinfo = SUtil.getResourceInfo0(model, cl);
+//			ClassLoader	cl = libservice.getClassLoader();
+			ResourceInfo rinfo = SUtil.getResourceInfo0(model, classloader);
 			BufferedReader br = new BufferedReader(new InputStreamReader(rinfo.getInputStream()));
 			br.readLine();
 			if (br.readLine().contains("version=\"2.0\""))
 			{
-				ret = GpmnXMLReader2.read(model, cl, null);
-				((jadex.gpmn.model2.MGpmnModel) ret).setClassloader(cl);
+				ret = GpmnXMLReader2.read(model, classloader, null);
+				((jadex.gpmn.model2.MGpmnModel) ret).setClassloader(classloader);
 			}
 			else
 			{
-				ret = GpmnXMLReader.read(model, cl, null);
-				((jadex.gpmn.model.MGpmnModel) ret).setClassloader(cl);
+				ret = GpmnXMLReader.read(model, classloader, null);
+				((jadex.gpmn.model.MGpmnModel) ret).setClassloader(classloader);
 			}
 			
 		}
@@ -254,7 +254,7 @@ public class GpmnFactory implements IComponentFactory, IService
 	 *  @param The imports (if any).
 	 *  @return True, if model can be loaded.
 	 */
-	public boolean isLoadable(String model, String[] imports)
+	public boolean isLoadable(String model, String[] imports, ClassLoader classloader)
 	{
 		return model.endsWith(".gpmn");
 	}
@@ -265,7 +265,7 @@ public class GpmnFactory implements IComponentFactory, IService
 	 *  @param The imports (if any).
 	 *  @return True, if startable (and loadable).
 	 */
-	public boolean isStartable(String model, String[] imports)
+	public boolean isStartable(String model, String[] imports, ClassLoader classloader)
 	{
 		return model.endsWith(".gpmn");
 	}
@@ -291,7 +291,7 @@ public class GpmnFactory implements IComponentFactory, IService
 	 *  @param model The model (e.g. file name).
 	 *  @param The imports (if any).
 	 */
-	public String getComponentType(String model, String[] imports)
+	public String getComponentType(String model, String[] imports, ClassLoader classloader)
 	{
 		return model.toLowerCase().endsWith(".gpmn") ? FILETYPE_GPMNPROCESS: null;
 	}
@@ -312,9 +312,9 @@ public class GpmnFactory implements IComponentFactory, IService
 		//MGpmnModel gmodel = (MGpmnModel)model;
 		OAVAgentModel amodel = null;
 		if (model instanceof jadex.gpmn.model2.MGpmnModel)
-			amodel	= converter.convertGpmnModelToBDIAgents((jadex.gpmn.model2.MGpmnModel)model, libservice.getClassLoader());
+			amodel	= converter.convertGpmnModelToBDIAgents((jadex.gpmn.model2.MGpmnModel)model, model.getClassLoader());
 		else
-			amodel	= legacyconverter.convertGpmnModelToBDIAgents((jadex.gpmn.model.MGpmnModel)model, libservice.getClassLoader());
+			amodel	= legacyconverter.convertGpmnModelToBDIAgents((jadex.gpmn.model.MGpmnModel)model, model.getClassLoader());
 
 		return factory.createComponentInstance(adapter, amodel, config, arguments, parent);
 		

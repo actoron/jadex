@@ -46,7 +46,7 @@ public class MicroAgentFactory implements IComponentFactory, IService
 	protected Map properties;
 	
 	/** The library service. */
-	protected ILibraryService libservice;
+//	protected ILibraryService libservice;
 	
 	//-------- constructors --------
 	
@@ -66,20 +66,20 @@ public class MicroAgentFactory implements IComponentFactory, IService
 	 */
 	public IFuture	startService()
 	{
-		final Future	ret	= new Future();
-		container.getService(ILibraryService.class).addResultListener(new IResultListener()
-		{
-			public void resultAvailable(Object source, Object result)
-			{
-				libservice = (ILibraryService)result;
-				ret.setResult(null);
-			}
-			
-			public void exceptionOccurred(Object source, Exception exception)
-			{
-				ret.setException(exception);
-			}
-		});
+		final Future	ret	= new Future(null);
+//		container.getService(ILibraryService.class).addResultListener(new IResultListener()
+//		{
+//			public void resultAvailable(Object source, Object result)
+//			{
+//				libservice = (ILibraryService)result;
+//				ret.setResult(null);
+//			}
+//			
+//			public void exceptionOccurred(Object source, Exception exception)
+//			{
+//				ret.setException(exception);
+//			}
+//		});
 		return ret;
 	}
 	
@@ -100,7 +100,7 @@ public class MicroAgentFactory implements IComponentFactory, IService
 	 *  @param The imports (if any).
 	 *  @return The loaded model.
 	 */
-	public ILoadableComponentModel loadModel(String model, String[] imports)
+	public ILoadableComponentModel loadModel(String model, String[] imports, ClassLoader classloader)
 	{
 //		System.out.println("loading micro: "+model);
 		ILoadableComponentModel ret = null;
@@ -113,19 +113,19 @@ public class MicroAgentFactory implements IComponentFactory, IService
 		clname = clname.replace('\\', '.');
 		clname = clname.replace('/', '.');
 		
-		ClassLoader	cl	= libservice.getClassLoader();
-		Class cma = SReflect.findClass0(clname, imports, cl);
+//		ClassLoader	cl	= libservice.getClassLoader();
+		Class cma = SReflect.findClass0(clname, imports, classloader);
 //		System.out.println(clname+" "+cma+" "+ret);
 		int idx;
 		while(cma==null && (idx=clname.indexOf('.'))!=-1)
 		{
 			clname	= clname.substring(idx+1);
-			cma = SReflect.findClass0(clname, imports, cl);
+			cma = SReflect.findClass0(clname, imports, classloader);
 //			System.out.println(clname+" "+cma+" "+ret);
 		}
 		if(cma==null)// || !cma.isAssignableFrom(IMicroAgent.class))
 			throw new RuntimeException("No micro agent file: "+model);
-		ret = new MicroAgentModel(cma, model, cl);
+		ret = new MicroAgentModel(cma, model, classloader);
 		return ret;
 	}
 	
@@ -135,7 +135,7 @@ public class MicroAgentFactory implements IComponentFactory, IService
 	 *  @param The imports (if any).
 	 *  @return True, if model can be loaded.
 	 */
-	public boolean isLoadable(String model, String[] imports)
+	public boolean isLoadable(String model, String[] imports, ClassLoader classloader)
 	{
 		boolean ret = model.toLowerCase().endsWith("agent.class");
 //		if(model.toLowerCase().endsWith("Agent.class"))
@@ -155,9 +155,9 @@ public class MicroAgentFactory implements IComponentFactory, IService
 	 *  @param The imports (if any).
 	 *  @return True, if startable (and loadable).
 	 */
-	public boolean isStartable(String model, String[] imports)
+	public boolean isStartable(String model, String[] imports, ClassLoader classloader)
 	{
-		return isLoadable(model, imports);
+		return isLoadable(model, imports, classloader);
 	}
 
 	/**
@@ -181,7 +181,7 @@ public class MicroAgentFactory implements IComponentFactory, IService
 	 *  @param model The model (e.g. file name).
 	 *  @param The imports (if any).
 	 */
-	public String getComponentType(String model, String[] imports)
+	public String getComponentType(String model, String[] imports, ClassLoader classloader)
 	{
 		return model.toLowerCase().endsWith("agent.class") ? FILETYPE_MICROAGENT
 			: null;

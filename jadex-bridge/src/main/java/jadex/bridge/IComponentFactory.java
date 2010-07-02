@@ -19,7 +19,7 @@ public interface IComponentFactory
 	 *  @param The imports (if any).
 	 *  @return The loaded model.
 	 */
-	public ILoadableComponentModel loadModel(String model, String[] imports);
+	public ILoadableComponentModel loadModel(String model, String[] imports, ClassLoader classloader);
 
 	/**
 	 *  Test if a model can be loaded by the factory.
@@ -27,7 +27,7 @@ public interface IComponentFactory
 	 *  @param The imports (if any).
 	 *  @return True, if model can be loaded.
 	 */
-	public boolean isLoadable(String model, String[] imports);
+	public boolean isLoadable(String model, String[] imports, ClassLoader classloader);
 	
 	/**
 	 *  Test if a model is startable (e.g. an component).
@@ -35,14 +35,14 @@ public interface IComponentFactory
 	 *  @param The imports (if any).
 	 *  @return True, if startable (and loadable).
 	 */
-	public boolean isStartable(String model, String[] imports);
+	public boolean isStartable(String model, String[] imports, ClassLoader classloader);
 
 	/**
 	 *  Get the component type of a model.
 	 *  @param model The model (e.g. file name).
 	 *  @param The imports (if any).
 	 */
-	public String getComponentType(String model, String[] imports);
+	public String getComponentType(String model, String[] imports, ClassLoader classloader);
 
 	/**
 	 *  Get the names of component types supported by this factory.

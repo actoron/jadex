@@ -290,13 +290,13 @@ public class Application implements IApplication, IComponentInstance
 						for(Iterator it=facts.iterator(); factory==null && it.hasNext(); )
 						{
 							IComponentFactory	cf	= (IComponentFactory)it.next();
-							if(cf.isLoadable(atype.getFilename(), Application.this.model.getApplicationType().getAllImports()))
+							if(cf.isLoadable(atype.getFilename(), Application.this.model.getApplicationType().getAllImports(), model.getClassLoader()))
 							{
 								factory	= cf;
 							}
 						}
 					}
-					ILoadableComponentModel amodel = factory.loadModel(atype.getFilename(), Application.this.model.getApplicationType().getAllImports());
+					ILoadableComponentModel amodel = factory.loadModel(atype.getFilename(), Application.this.model.getApplicationType().getAllImports(), model.getClassLoader());
 					
 					if(SUtil.equals(amodel.getPackage(), model.getPackage()) && amodel.getName().equals(model.getName()))
 //					if(amodel.getFilename().equals(model.getFilename()))

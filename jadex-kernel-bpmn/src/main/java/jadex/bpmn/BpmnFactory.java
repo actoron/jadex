@@ -10,13 +10,9 @@ import jadex.bridge.ILoadableComponentModel;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.SGUI;
-import jadex.commons.concurrent.IResultListener;
 import jadex.service.IService;
 import jadex.service.IServiceContainer;
-import jadex.service.library.ILibraryService;
-import jadex.service.library.ILibraryServiceListener;
 
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -56,7 +52,7 @@ public class BpmnFactory implements IComponentFactory, IService
 	protected Map properties;
 	
 	/** The library service. */
-	protected ILibraryService libservice;
+//	protected ILibraryService libservice;
 	
 	//-------- constructors --------
 	
@@ -78,35 +74,35 @@ public class BpmnFactory implements IComponentFactory, IService
 	 */
 	public IFuture	startService()
 	{
-		final Future	ret	= new Future();
+		final Future ret = new Future(null);
 		
-		container.getService(ILibraryService.class).addResultListener(new IResultListener()
-		{
-			public void resultAvailable(Object source, Object result)
-			{
-				libservice = (ILibraryService)result;
-				loader.setClassLoader(libservice.getClassLoader());
-				ILibraryServiceListener lsl = new ILibraryServiceListener()
-				{
-					public void urlAdded(URL url)
-					{
-						loader.setClassLoader(libservice.getClassLoader());
-					}
-					
-					public void urlRemoved(URL url)
-					{
-						loader.setClassLoader(libservice.getClassLoader());
-					}
-				};
-				libservice.addLibraryServiceListener(lsl);
-				ret.setResult(null);
-			}
-			
-			public void exceptionOccurred(Object source, Exception exception)
-			{
-				ret.setException(exception);
-			}
-		});
+//		container.getService(ILibraryService.class).addResultListener(new IResultListener()
+//		{
+//			public void resultAvailable(Object source, Object result)
+//			{
+//				libservice = (ILibraryService)result;
+//				loader.setClassLoader(libservice.getClassLoader());
+//				ILibraryServiceListener lsl = new ILibraryServiceListener()
+//				{
+//					public void urlAdded(URL url)
+//					{
+//						loader.setClassLoader(libservice.getClassLoader());
+//					}
+//					
+//					public void urlRemoved(URL url)
+//					{
+//						loader.setClassLoader(libservice.getClassLoader());
+//					}
+//				};
+//				libservice.addLibraryServiceListener(lsl);
+//				ret.setResult(null);
+//			}
+//			
+//			public void exceptionOccurred(Object source, Exception exception)
+//			{
+//				ret.setException(exception);
+//			}
+//		});
 		return ret;
 	}
 	
@@ -125,15 +121,15 @@ public class BpmnFactory implements IComponentFactory, IService
 	 *  @param The imports (if any).
 	 *  @return The loaded model.
 	 */
-	public ILoadableComponentModel loadModel(String model, String[] imports)
+	public ILoadableComponentModel loadModel(String model, String[] imports, ClassLoader classloader)
 	{
 		MBpmnModel ret = null;
 //		System.out.println("filename: "+filename);
 		try
 		{
-			ret = loader.loadBpmnModel(model, imports);
-			ClassLoader	cl = libservice.getClassLoader();
-			ret.setClassloader(cl);
+			ret = loader.loadBpmnModel(model, imports, classloader);
+//			ClassLoader	cl = libservice.getClassLoader();
+//			ret.setClassloader(cl);
 		}
 		catch(Exception e)
 		{
@@ -191,7 +187,7 @@ public class BpmnFactory implements IComponentFactory, IService
 	 *  @param The imports (if any).
 	 *  @return True, if model can be loaded.
 	 */
-	public boolean isLoadable(String model, String[] imports)
+	public boolean isLoadable(String model, String[] imports, ClassLoader classloader)
 	{
 		return model.endsWith(".bpmn");
 	}
@@ -202,7 +198,7 @@ public class BpmnFactory implements IComponentFactory, IService
 	 *  @param The imports (if any).
 	 *  @return True, if startable (and loadable).
 	 */
-	public boolean isStartable(String model, String[] imports)
+	public boolean isStartable(String model, String[] imports, ClassLoader classloader)
 	{
 		return model.endsWith(".bpmn");
 	}
@@ -228,7 +224,7 @@ public class BpmnFactory implements IComponentFactory, IService
 	 *  @param model The model (e.g. file name).
 	 *  @param The imports (if any).
 	 */
-	public String getComponentType(String model, String[] imports)
+	public String getComponentType(String model, String[] imports, ClassLoader classloader)
 	{
 		return model.toLowerCase().endsWith(".bpmn") ? FILETYPE_BPMNPROCESS: null;
 	}

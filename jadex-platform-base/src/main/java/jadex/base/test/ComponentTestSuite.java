@@ -98,7 +98,7 @@ public class ComponentTestSuite extends TestSuite
 				{
 					public void resultAvailable(Object source, Object result)
 					{
-						ILibraryService	libsrv	= (ILibraryService)result;
+						final ILibraryService libsrv	= (ILibraryService)result;
 						try
 						{
 							URL url = root.toURI().toURL();
@@ -133,13 +133,13 @@ public class ComponentTestSuite extends TestSuite
 								else
 								{
 									final String fabspath = abspath;
-									SComponentFactory.isLoadable(platform,  abspath).addResultListener(new DefaultResultListener()
+									SComponentFactory.isLoadable(platform,  abspath, libsrv.getClassLoader()).addResultListener(new DefaultResultListener()
 									{
 										public void resultAvailable(Object source, Object result)
 										{
 											if(((Boolean)result).booleanValue())
 											{
-												SComponentFactory.loadModel(platform, fabspath).addResultListener(new DefaultResultListener()
+												SComponentFactory.loadModel(platform, fabspath, libsrv.getClassLoader()).addResultListener(new DefaultResultListener()
 												{
 													public void resultAvailable(Object source, Object result)
 													{
