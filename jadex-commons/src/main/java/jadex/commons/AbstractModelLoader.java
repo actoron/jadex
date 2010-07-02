@@ -182,11 +182,12 @@ public abstract class AbstractModelLoader
 		
 		// Lookup cache by name/extension/imports
 		ICacheableModel cached = null;
-		Object[] keys	= imports!=null? new Object[imports.length+2]: new Object[2];
+		Object[] keys	= imports!=null? new Object[imports.length+3]: new Object[3];
 		keys[0]	= name;
 		keys[1]	= extension;
+		keys[2] = classloader;
 		if(imports!=null)
-			System.arraycopy(imports, 0, keys, 2, imports.length);
+			System.arraycopy(imports, 0, keys, 3, imports.length);
 		Tuple	keytuple	= new Tuple(keys);
 		
 		ResourceInfo	info	= null;
