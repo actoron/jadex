@@ -7,14 +7,14 @@ import jadex.bridge.ILoadableComponentModel;
 import jadex.bridge.MessageType;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
-import jadex.service.BasicServiceProvider;
+import jadex.service.BasicServiceContainer;
 
 import java.util.Map;
 
 /**
  * External access interface.
  */
-public class ExternalAccess extends BasicServiceProvider implements IMicroExternalAccess 
+public class ExternalAccess extends BasicServiceContainer implements IMicroExternalAccess 
 {
 	// -------- attributes --------
 

@@ -3,7 +3,7 @@ package jadex.service;
 import jadex.commons.IFuture;
 
 /**
- *  Interface for a service container. Allows
+ *  Internal interface for a service container. Allows
  *  fetching service per type (and name). 
  */
 public interface IServiceContainer extends IServiceProvider

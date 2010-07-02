@@ -423,6 +423,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 				}
 				catch(Exception e)
 				{
+					e.printStackTrace();
 					fatalError(e);
 				}
 			}

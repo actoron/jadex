@@ -248,8 +248,7 @@ public class ApplicationComponentFactory	implements IComponentFactory, IService
 		}
 		
 		if(app==null)
-			throw new RuntimeException("Could not find application name: "+config);
-
+			app = new MApplicationInstance("default");
 
 		// Create context for application.
 		context	= new Application((ApplicationModel)model, app, adapter, parent, arguments);

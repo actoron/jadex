@@ -5,6 +5,7 @@ import jadex.application.model.MApplicationInstance;
 import jadex.application.model.MApplicationType;
 import jadex.application.model.MComponentInstance;
 import jadex.application.model.MComponentType;
+import jadex.application.model.MExpressionType;
 import jadex.application.model.MSpaceInstance;
 import jadex.application.runtime.IApplication;
 import jadex.application.runtime.ISpace;
@@ -25,6 +26,8 @@ import jadex.commons.SUtil;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.javaparser.SimpleValueFetcher;
+import jadex.service.BasicServiceContainer;
+import jadex.service.IService;
 import jadex.service.IServiceContainer;
 import jadex.service.clock.IClockService;
 import jadex.service.library.ILibraryService;
@@ -80,6 +83,9 @@ public class Application implements IApplication, IComponentInstance
 	
 	/** The children cnt (without daemons). */
 	protected int children;
+	
+	/** The own service container. */
+	protected BasicServiceContainer mycontainer;
 
 	//-------- constructors --------
 	
@@ -94,6 +100,7 @@ public class Application implements IApplication, IComponentInstance
 		this.parent = parent;
 		this.arguments = arguments==null ? new HashMap() : arguments;
 		this.results = new HashMap();
+		this.mycontainer = new BasicServiceContainer();
 		
 		// Init the arguments with default values.
 		String configname = config!=null? config.getName(): null;
@@ -719,6 +726,19 @@ public class Application implements IApplication, IComponentInstance
 					// todo: hack remove clock somehow (problem services are behind future in xml)
 					fetcher.setValue("$clock", clock);
 
+					// Init service container and init service.
+					// Create the services.
+					List services = model.getApplicationType().getServices();
+					if(services!=null)
+					{
+						for(int i=0; i<services.size(); i++)
+						{
+							MExpressionType exp = (MExpressionType)services.get(i);
+							IService service = (IService)exp.getParsedValue().getValue(fetcher);
+							mycontainer.addService(exp.getClazz(), exp.getName(), service);
+						}
+					}
+					
 					// Create spaces for context.
 					List spaces = config.getMSpaceInstances();
 					if(spaces!=null)

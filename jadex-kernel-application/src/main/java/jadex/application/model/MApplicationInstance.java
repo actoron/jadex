@@ -29,6 +29,15 @@ public class MApplicationInstance
 	 */
 	public MApplicationInstance()
 	{
+		this(null);
+	}
+	
+	/**
+	 *  Create a new application.
+	 */
+	public MApplicationInstance(String name)
+	{
+		this.name = name;
 		this.spaces = new ArrayList();
 		this.components = new ArrayList();
 		this.arguments = new ArrayList();

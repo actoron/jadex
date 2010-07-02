@@ -105,6 +105,9 @@ public class Platform extends AbstractPlatform
 
 	/** The configuration. */
 	protected Properties[] configurations;
+	
+	/** The auto shutdown flag. */
+	protected boolean autoshutdown;
 
 	//-------- constructors --------
 
@@ -176,6 +179,7 @@ public class Platform extends AbstractPlatform
 		//    	Configuration.getConfiguration().setProperty(Configuration.STARTTIME, ""+starttime);
 
 		this.configurations = configurations;
+		this.autoshutdown = Properties.getBooleanProperty(configurations, AUTOSHUTDOWN);
 		
 //		this.services = new LinkedHashMap();
 //		this.messagetypes = new LinkedHashMap();
@@ -221,8 +225,6 @@ public class Platform extends AbstractPlatform
 	 */
 	public IFuture start()
 	{
-		
-		
 		// Start the services. ??? why not call super?
 	
 		if(services!=null)
@@ -373,7 +375,8 @@ public class Platform extends AbstractPlatform
 	public boolean isAutoShutdown()
 	{
 //		System.out.println("test: "+Properties.getBooleanProperty(configurations, AUTOSHUTDOWN));
-		return Properties.getBooleanProperty(configurations, AUTOSHUTDOWN);
+//		return Properties.getBooleanProperty(configurations, AUTOSHUTDOWN);
+		return autoshutdown;
 	}
 }
 

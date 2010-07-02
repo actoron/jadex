@@ -26,7 +26,7 @@ public class HierarchicalServiceContainer extends BasicServiceContainer
 	protected IServiceContainer parent;
 	
 	/**
-	 *  Create a new property service container.
+	 *  Create a new service container.
 	 */
 	public void init(IServiceContainer parent)
 	{

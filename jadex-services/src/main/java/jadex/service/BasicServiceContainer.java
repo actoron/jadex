@@ -2,8 +2,13 @@ package jadex.service;
 
 import jadex.commons.Future;
 import jadex.commons.IFuture;
+import jadex.commons.Properties;
+import jadex.commons.Property;
+import jadex.commons.SReflect;
 import jadex.commons.concurrent.CounterListener;
 import jadex.commons.concurrent.DefaultResultListener;
+import jadex.javaparser.IValueFetcher;
+import jadex.javaparser.SJavaParser;
 
 import java.util.Iterator;
 import java.util.Map;
