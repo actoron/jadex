@@ -33,9 +33,9 @@
 			new ThreadPoolService(new ThreadPool(new DefaultThreadPoolStrategy(0, 20, 30000)))
 		</service>
 		<service name="cms_service" class="IComponentManagementService">
-			new ComponentManagementService($platform, $platform.isAutoShutdown())
+			new ComponentManagementService($platform, true)//$platform.isAutoShutdown())
 		</service>
-		<service name="df_service" class="ILibraryService">
+		<service name="df_service" class="IDF">
 			new DirectoryFacilitatorService($platform)
 		</service>
 		<service name="message_service" class="IMessageService">

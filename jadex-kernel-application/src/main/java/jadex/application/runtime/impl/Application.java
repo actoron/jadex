@@ -21,6 +21,8 @@ import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.ILoadableComponentModel;
 import jadex.bridge.IMessageAdapter;
+import jadex.commons.Future;
+import jadex.commons.IFuture;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.DefaultResultListener;
@@ -29,7 +31,7 @@ import jadex.javaparser.SimpleValueFetcher;
 import jadex.service.BasicServiceContainer;
 import jadex.service.IService;
 import jadex.service.IServiceContainer;
-import jadex.service.clock.IClockService;
+import jadex.service.IServiceProvider;
 import jadex.service.library.ILibraryService;
 
 import java.util.Collection;
@@ -711,20 +713,21 @@ public class Application implements IApplication, IComponentInstance
 	{
 		if(!initstarted)
 		{
+			// todo: set inited = true after all has been done
 			initstarted = true;
 			
-			adapter.getServiceContainer().getService(IClockService.class).addResultListener(createResultListener(new DefaultResultListener()
-			{
-				public void resultAvailable(Object source, Object result)
-				{
-					IClockService clock = (IClockService)result;
+//			adapter.getServiceContainer().getService(IClockService.class).addResultListener(createResultListener(new DefaultResultListener()
+//			{
+//				public void resultAvailable(Object source, Object result)
+//				{
+//					IClockService clock = (IClockService)result;
 					
 					final SimpleValueFetcher fetcher = new SimpleValueFetcher();
 					fetcher.setValue("$platform", getServiceContainer());
 					fetcher.setValue("$args", getArguments());
 					fetcher.setValue("$results", getResults());
 					// todo: hack remove clock somehow (problem services are behind future in xml)
-					fetcher.setValue("$clock", clock);
+//					fetcher.setValue("$clock", clock);
 
 					// Init service container and init service.
 					// Create the services.
@@ -738,70 +741,76 @@ public class Application implements IApplication, IComponentInstance
 							mycontainer.addService(exp.getClazz(), exp.getName(), service);
 						}
 					}
-					
-					// Create spaces for context.
-					List spaces = config.getMSpaceInstances();
-					if(spaces!=null)
-					{
-						for(int i=0; i<spaces.size(); i++)
-						{
-							MSpaceInstance si = (MSpaceInstance)spaces.get(i);
-							try
-							{
-								ISpace space = (ISpace)si.getClazz().newInstance();
-								addSpace(si.getName(), space);
-								space.initSpace(Application.this, si, fetcher);
-							}
-							catch(Exception e)
-							{
-								System.out.println("Exception while creating space: "+si.getName());
-								e.printStackTrace();
-							}
-						}
-					}
-
-					final List components = config.getMComponentInstances();
-					adapter.getServiceContainer().getService(ILibraryService.class).addResultListener(createResultListener(new DefaultResultListener()
+					mycontainer.start().addResultListener(new ComponentResultListener(new DefaultResultListener()
 					{
 						public void resultAvailable(Object source, Object result)
 						{
-							final ILibraryService ls = (ILibraryService)result;
-							final ClassLoader cl = ls.getClassLoader();
-							adapter.getServiceContainer().getService(IComponentManagementService.class).addResultListener(createResultListener(new DefaultResultListener()
+							// Create spaces for context.
+							List spaces = config.getMSpaceInstances();
+							if(spaces!=null)
+							{
+								for(int i=0; i<spaces.size(); i++)
+								{
+									MSpaceInstance si = (MSpaceInstance)spaces.get(i);
+									try
+									{
+										ISpace space = (ISpace)si.getClazz().newInstance();
+										addSpace(si.getName(), space);
+										space.initSpace(Application.this, si, fetcher);
+									}
+									catch(Exception e)
+									{
+										System.out.println("Exception while creating space: "+si.getName());
+										e.printStackTrace();
+									}
+								}
+							}
+
+							final List components = config.getMComponentInstances();
+							adapter.getServiceContainer().getService(ILibraryService.class).addResultListener(createResultListener(new DefaultResultListener()
 							{
 								public void resultAvailable(Object source, Object result)
 								{
-									final IComponentManagementService	ces	= (IComponentManagementService)result;
-									
-									for(int i=0; i<components.size(); i++)
+									final ILibraryService ls = (ILibraryService)result;
+									final ClassLoader cl = ls.getClassLoader();
+									adapter.getServiceContainer().getService(IComponentManagementService.class).addResultListener(createResultListener(new DefaultResultListener()
 									{
-										final MComponentInstance component = (MComponentInstance)components.get(i);
-										
-							//			System.out.println("Create: "+component.getName()+" "+component.getTypeName()+" "+component.getConfiguration());
-										int num = component.getNumber(Application.this, cl, fetcher);
-										for(int j=0; j<num; j++)
+										public void resultAvailable(Object source, Object result)
 										{
-				//							IComponentManagementService	ces	= (IComponentManagementService)adapter.getServiceContainer().getService(IComponentManagementService.class);
-											ces.createComponent(component.getName(), component.getType(model.getApplicationType()).getFilename(),
-												new CreationInfo(component.getConfiguration(), component.getArguments(Application.this, cl, fetcher), adapter.getComponentIdentifier(),
-													component.isSuspended(), component.isMaster(), component.isDaemon(), model.getApplicationType().getAllImports()), null);					
-							//				context.createComponent(component.getName(), component.getTypeName(),
-							//					component.getConfiguration(), component.getArguments(container, apptype, cl), component.isStart(), component.isMaster(),
-							//					DefaultResultListener.getInstance(), null);	
+											final IComponentManagementService	ces	= (IComponentManagementService)result;
+											
+											for(int i=0; i<components.size(); i++)
+											{
+												final MComponentInstance component = (MComponentInstance)components.get(i);
+												
+									//			System.out.println("Create: "+component.getName()+" "+component.getTypeName()+" "+component.getConfiguration());
+												int num = component.getNumber(Application.this, cl, fetcher);
+												for(int j=0; j<num; j++)
+												{
+						//							IComponentManagementService	ces	= (IComponentManagementService)adapter.getServiceContainer().getService(IComponentManagementService.class);
+													ces.createComponent(component.getName(), component.getType(model.getApplicationType()).getFilename(),
+														new CreationInfo(component.getConfiguration(), component.getArguments(Application.this, cl, fetcher), adapter.getComponentIdentifier(),
+															component.isSuspended(), component.isMaster(), component.isDaemon(), model.getApplicationType().getAllImports()), null);					
+									//				context.createComponent(component.getName(), component.getTypeName(),
+									//					component.getConfiguration(), component.getArguments(container, apptype, cl), component.isStart(), component.isMaster(),
+									//					DefaultResultListener.getInstance(), null);	
+												}
+											}
 										}
-									}
+									}));
 								}
 							}));
 						}
-					}));
-				}
-			}));
+					}, adapter));
+//				}
+//			}));
 		}
 		// todo: is this necessary? can we ensure that this is not called?
 //		else
 //		{
 //			throw new UnsupportedOperationException();
 //		}
+					
 		return false;
 	}
 
@@ -826,11 +835,10 @@ public class Application implements IApplication, IComponentInstance
 	 *  Can be called concurrently (also during executeAction()).
 	 *  @param listener	When cleanup of the component is finished, the listener must be notified.
 	 */
-	public void killComponent(IResultListener listener)
+	public IFuture killComponent()
 	{
+		return new Future(null);
 		// Todo: application cleanup?
-		if(listener!=null)
-			listener.resultAvailable(this, listener);
 	}
 	
 	/**
@@ -841,9 +849,9 @@ public class Application implements IApplication, IComponentInstance
 	 *  and has to be casted to its corresponding incarnation.
 	 *  @param listener	External access is delivered via result listener.
 	 */
-	public void getExternalAccess(IResultListener listener)
+	public IFuture getExternalAccess()
 	{
-		listener.resultAvailable(this, new ExternalAccess(this));
+		return new Future(new ExternalAccess(this));
 	}
 
 	/**
@@ -934,5 +942,14 @@ public class Application implements IApplication, IComponentInstance
 	public IResultListener createResultListener(IResultListener listener)
 	{
 		return new ComponentResultListener(listener, adapter);
+	}
+	
+	/**
+	 *  Get the service provider.
+	 *  @return The service provider.
+	 */
+	public IServiceContainer internalGetServiceContainer()
+	{
+		return mycontainer;
 	}
 }

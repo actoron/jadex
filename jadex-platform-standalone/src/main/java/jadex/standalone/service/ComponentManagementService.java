@@ -244,7 +244,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 		//					final IResultListener	rl	= listener;
 							final IComponentFactory	cf	= factory;
 							final StandaloneComponentAdapter	fpad	= pad;
-							pad.getComponentInstance().getExternalAccess(new IResultListener()
+							pad.getComponentInstance().getExternalAccess().addResultListener(new IResultListener()
 							{
 								public void resultAvailable(Object source, Object result)
 								{
@@ -829,7 +829,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 		}
 		else
 		{
-			adapter.getComponentInstance().getExternalAccess(new IResultListener()
+			adapter.getComponentInstance().getExternalAccess().addResultListener(new IResultListener()
 			{
 				public void resultAvailable(Object source, Object result)
 				{

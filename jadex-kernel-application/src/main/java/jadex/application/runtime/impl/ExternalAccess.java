@@ -7,12 +7,11 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.ILoadableComponentModel;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
-import jadex.service.BasicServiceProvider;
 
 /**
  *  External access for applications.
  */
-public class ExternalAccess extends BasicServiceProvider implements IApplicationExternalAccess
+public class ExternalAccess implements IApplicationExternalAccess
 {
 	//-------- attributes --------
 
@@ -21,7 +20,7 @@ public class ExternalAccess extends BasicServiceProvider implements IApplication
 
 	/** The agent adapter. */
 	protected IComponentAdapter adapter;
-
+	
 	// -------- constructors --------
 
 	/**
@@ -86,4 +85,112 @@ public class ExternalAccess extends BasicServiceProvider implements IApplication
 	{
 		return application.getParent();
 	}
+	
+	/**
+	 *  Get the first declared service of a given type.
+	 *  @param type The type.
+	 *  @return The corresponding service.
+	 */
+	public IFuture getService(final Class type)
+	{
+		final Future ret = new Future();
+		
+		if(adapter.isExternalThread())
+		{
+			adapter.invokeLater(new Runnable() 
+			{
+				public void run() 
+				{
+					ret.setResult(application.getServiceContainer().getService(type));
+				}
+			});
+		}
+		else
+		{
+			ret.setResult(application.getServiceContainer().getService(type));
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Get a service.
+	 *  @param type The class.
+	 *  @return The corresponding services.
+	 */
+	public IFuture getServices(final Class type)
+	{
+		final Future ret = new Future();
+		
+		if(adapter.isExternalThread())
+		{
+			adapter.invokeLater(new Runnable() 
+			{
+				public void run() 
+				{
+					ret.setResult(application.getServiceContainer().getServices(type));
+				}
+			});
+		}
+		else
+		{
+			ret.setResult(application.getServiceContainer().getServices(type));
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Get a service.
+	 *  @param name The name.
+	 *  @return The corresponding service.
+	 */
+	public IFuture getService(final Class type, final String name)
+	{
+		final Future ret = new Future();
+		
+		if(adapter.isExternalThread())
+		{
+			adapter.invokeLater(new Runnable() 
+			{
+				public void run() 
+				{
+					ret.setResult(application.getServiceContainer().getService(type, name));
+				}
+			});
+		}
+		else
+		{
+			ret.setResult(application.getServiceContainer().getService(type, name));
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Get the available service types.
+	 *  @return The service types.
+	 */
+	public IFuture getServicesTypes()
+	{
+		final Future ret = new Future();
+		
+		if(adapter.isExternalThread())
+		{
+			adapter.invokeLater(new Runnable() 
+			{
+				public void run() 
+				{
+					ret.setResult(application.getServiceContainer().getServicesTypes());
+				}
+			});
+		}
+		else
+		{
+			ret.setResult(application.getServiceContainer().getServicesTypes());
+		}
+		
+		return ret;
+	}
+
 }

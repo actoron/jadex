@@ -29,7 +29,6 @@ import jadex.commons.collection.LRU;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.DelegationResultListener;
-import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.ISynchronizator;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
@@ -401,14 +400,15 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 	/**
 	 *  Request agent to kill itself.
 	 */
-	public void killComponent(final IResultListener listener)
+	public IFuture killComponent()
 	{
+		final Future ret = new Future();
+		
 		getAgentAdapter().invokeLater(new Runnable()
 		{
 			public void run()
 			{
-				if(listener!=null)
-					state.addAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_killlisteners, listener);
+				state.addAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_killlisteners, new DelegationResultListener(ret));
 				Object cs = state.getAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state);
 				if(OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_CREATING.equals(cs) 
 					|| OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_ALIVE.equals(cs))
@@ -417,6 +417,8 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 				}
 			}
 		});
+		
+		return ret;
 	}
 	
 	/**
@@ -425,27 +427,28 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 	 *  and has to be casted to its corresponding incarnation.
 	 *  @param listener	When cleanup of the agent is finished, the listener must be notified.
 	 */
-	public void getExternalAccess(final IResultListener listener)
+	public IFuture getExternalAccess()
 	{
+		final Future ret = new Future();
+		
 		getAgentAdapter().invokeLater(new Runnable()
 		{
 			public void run()
 			{
-				if(listener!=null)
+				if(OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_CREATING.equals(state.getAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state)))
 				{
-					if(OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_CREATING.equals(state.getAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state)))
-					{
-						if(eal==null)
-							eal	= new HashSet();
-						eal.add(listener);
-					}
-					else
-					{
-						listener.resultAvailable(getAgentAdapter().getComponentIdentifier(), new ExternalAccessFlyweight(state, ragent));
-					}
+					if(eal==null)
+						eal	= new HashSet();
+					eal.add(new DelegationResultListener(ret));
+				}
+				else
+				{
+					ret.setResult(new ExternalAccessFlyweight(state, ragent));
 				}
 			}
 		});
+		
+		return ret;
 	}
 
 	/**

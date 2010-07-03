@@ -29,8 +29,10 @@ import jadex.bridge.IMessageAdapter;
 import jadex.bridge.IMessageService;
 import jadex.bridge.MessageType;
 import jadex.commons.ChangeEvent;
+import jadex.commons.Future;
 import jadex.commons.IChangeListener;
 import jadex.commons.IFilter;
+import jadex.commons.IFuture;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.javaparser.IParsedExpression;
@@ -370,8 +372,9 @@ public class BpmnInterpreter implements IComponentInstance
 	 *  Can be called concurrently (also during executeAction()).
 	 *  @param listener	When cleanup of the agent is finished, the listener must be notified.
 	 */
-	public void killComponent(final IResultListener listener)
+	public IFuture killComponent()
 	{
+		final Future ret = new Future();
 		// Todo: cleanup required???
 		
 		adapter.invokeLater(new Runnable()
@@ -403,7 +406,8 @@ public class BpmnInterpreter implements IComponentInstance
 								getActivityHandler(pt.getActivity()).cancel(pt.getActivity(), BpmnInterpreter.this, pt);
 //								System.out.println("Cancelling: "+pt.getActivity()+" "+pt.getId());
 							}
-							listener.resultAvailable(BpmnInterpreter.this, adapter.getComponentIdentifier());
+							ret.setResult(adapter.getComponentIdentifier());
+//							listener.resultAvailable(BpmnInterpreter.this, adapter.getComponentIdentifier());
 //						}
 //					});
 //					
@@ -411,6 +415,8 @@ public class BpmnInterpreter implements IComponentInstance
 //				}
 			}
 		});
+		
+		return ret;
 	}
 	
 	/**
@@ -421,17 +427,19 @@ public class BpmnInterpreter implements IComponentInstance
 	 *  and has to be casted to its corresponding incarnation.
 	 *  @param listener	External access is delivered via result listener.
 	 */
-	public void getExternalAccess(final IResultListener listener)
+	public IFuture getExternalAccess()
 	{
+		final Future ret = new Future();
+		
 		adapter.invokeLater(new Runnable()
 		{
 			public void run()
 			{
-				// todo: develop external access
-				// Hack!!! Shouldn't return instance directly.
-				listener.resultAvailable(BpmnInterpreter.this, new ExternalAccess(BpmnInterpreter.this));
+				ret.setResult(new ExternalAccess(BpmnInterpreter.this));
 			}
 		});
+		
+		return ret;
 	}
 	
 	/**

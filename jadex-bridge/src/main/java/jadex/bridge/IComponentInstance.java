@@ -1,8 +1,8 @@
 package jadex.bridge;
 
-import java.util.Map;
+import jadex.commons.IFuture;
 
-import jadex.commons.concurrent.IResultListener;
+import java.util.Map;
 
 /**
  *  Component interface to be used (invoked) by platform (adapters).
@@ -61,9 +61,9 @@ public interface IComponentInstance
 	 *  The component might perform arbitrary cleanup activities during which executeAction()
 	 *  will still be called as usual.
 	 *  Can be called concurrently (also during executeAction()).
-	 *  @param listener	When cleanup of the component is finished, the listener must be notified.
+	 *  @return When cleanup of the component is finished, the listener must be notified.
 	 */
-	public void killComponent(IResultListener listener);
+	public IFuture killComponent();
 	
 	/**
 	 *  Can be called concurrently (also during executeAction()).
@@ -72,9 +72,9 @@ public interface IComponentInstance
 	 *  External access objects must implement the IExternalAccess interface. 
 	 *  The specific external access interface is kernel specific
 	 *  and has to be casted to its corresponding incarnation.
-	 *  @param listener	External access is delivered via result listener.
+	 *  @return External access is delivered via future.
 	 */
-	public void getExternalAccess(IResultListener listener);
+	public IFuture getExternalAccess();
 
 	/**
 	 *  Get the class loader of the component.

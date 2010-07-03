@@ -1,7 +1,6 @@
 package jadex.bdibpmn;
 
 import jadex.bdi.model.OAVBDIMetaModel;
-import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBeliefbase;
 import jadex.bdi.runtime.ICapability;
 import jadex.bdi.runtime.IElement;
@@ -37,7 +36,6 @@ import jadex.bdi.runtime.impl.flyweights.ParameterSetFlyweight;
 import jadex.bdi.runtime.impl.flyweights.PlanFlyweight;
 import jadex.bdi.runtime.impl.flyweights.PlanbaseFlyweight;
 import jadex.bdi.runtime.impl.flyweights.PropertybaseFlyweight;
-import jadex.bdi.runtime.impl.flyweights.WaitAbstractionFlyweight;
 import jadex.bdi.runtime.impl.flyweights.WaitqueueFlyweight;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.GoalLifecycleRules;
@@ -57,6 +55,8 @@ import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ProcessThread;
 import jadex.bpmn.runtime.handler.AbstractEventIntermediateTimerActivityHandler;
 import jadex.bridge.IComponentIdentifier;
+import jadex.commons.Future;
+import jadex.commons.IFuture;
 import jadex.javaparser.IExpressionParser;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
@@ -853,9 +853,9 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 	 *  Get the scope.
 	 *  @return The scope.
 	 */
-	public IBDIExternalAccess getExternalAccess()
+	public IFuture getExternalAccess()
 	{
-		return new ExternalAccessFlyweight(state, rcapa);
+		return new Future(new ExternalAccessFlyweight(state, rcapa));
 	}
 
 	//-------- expressionbase shortcut methods --------

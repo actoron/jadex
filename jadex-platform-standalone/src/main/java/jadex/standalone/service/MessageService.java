@@ -21,6 +21,7 @@ import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IExecutable;
 import jadex.commons.concurrent.IResultListener;
 import jadex.service.IService;
+import jadex.service.IServiceContainer;
 import jadex.service.clock.IClockService;
 import jadex.service.execution.IExecutionService;
 import jadex.standalone.StandaloneComponentAdapter;
@@ -58,8 +59,9 @@ public class MessageService implements IMessageService, IService
 	
 	//-------- attributes --------
 
-	/** The ams. */
-	protected AbstractPlatform platform;
+	/** The container. */
+//	protected AbstractPlatform platform;
+    protected IServiceContainer container;
 
 	/** The transports. */
 	protected List transports;
@@ -91,9 +93,9 @@ public class MessageService implements IMessageService, IService
 	 *  Constructor for Outbox.
 	 *  @param platform
 	 */
-	public MessageService(AbstractPlatform platform, ITransport[] transports, MessageType[] messagetypes)
+	public MessageService(IServiceContainer container, ITransport[] transports, MessageType[] messagetypes)
 	{
-		this.platform = platform;
+		this.container = container;
 		this.transports = SCollection.createArrayList();
 		for(int i=0; i<transports.length; i++)
 			this.transports.add(transports[i]);
@@ -137,7 +139,7 @@ public class MessageService implements IMessageService, IService
 		Object senddate = msgcopy.get(sd);
 		if(senddate==null)
 		{
-			platform.getService(IClockService.class).addResultListener(new DefaultResultListener()
+			container.getService(IClockService.class).addResultListener(new DefaultResultListener()
 			{
 				public void resultAvailable(Object source, Object result)
 				{
@@ -407,11 +409,11 @@ public class MessageService implements IMessageService, IService
 		}
 		else
 		{
-			platform.getService(IClockService.class).addResultListener(new IResultListener()
+			container.getService(IClockService.class).addResultListener(new IResultListener()
 			{
 				public void resultAvailable(Object source, Object result)
 				{
-					clockservice	= (IClockService)result;
+					clockservice = (IClockService)result;
 					ret.setResult(null);
 				}
 				
@@ -515,7 +517,7 @@ public class MessageService implements IMessageService, IService
 		final MessageType	messagetype	= getMessageType(type);
 		final Map	decoded	= new HashMap();	// Decoded messages cached by class loader to avoid decoding the same message more than once, when the same class loader is used.
 		
-		platform.getService(IComponentManagementService.class).addResultListener(new DefaultResultListener()
+		container.getService(IComponentManagementService.class).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
@@ -636,7 +638,7 @@ public class MessageService implements IMessageService, IService
 		public synchronized void addMessage(Map message, String type, IComponentIdentifier[] receivers)
 		{
 			messages.add(new Object[]{message, type, receivers});
-			platform.getService(IExecutionService.class).addResultListener(new DefaultResultListener()
+			container.getService(IExecutionService.class).addResultListener(new DefaultResultListener()
 			{
 				public void resultAvailable(Object source, Object result)
 				{
@@ -687,7 +689,7 @@ public class MessageService implements IMessageService, IService
 		public synchronized void addMessage(Map message, String type, IComponentIdentifier[] receivers)
 		{
 			messages.add(new Object[]{message, type, receivers});
-			platform.getService(IExecutionService.class).addResultListener(new DefaultResultListener()
+			container.getService(IExecutionService.class).addResultListener(new DefaultResultListener()
 			{
 				public void resultAvailable(Object source, Object result)
 				{

@@ -1,8 +1,8 @@
 package jadex.commons;
 
+import jadex.commons.collection.LRU;
+
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  *  Loader for managing models, loaded from disc and kept in cache.
@@ -15,10 +15,7 @@ public abstract class AbstractModelLoader
 	protected String[]	extensions;
 	
 	/** The model cache (filename -> loaded model). */
-	protected Map modelcache;
-	
-	/** The class loader. */
-//	protected ClassLoader classloader;
+	protected LRU modelcache;
 	
 	//-------- constructors --------
 	
@@ -28,8 +25,17 @@ public abstract class AbstractModelLoader
 	 */
 	public AbstractModelLoader(String[] extensions)
 	{
+		this(extensions, 200);
+	}
+	
+	/**
+	 *  Create a model loader.
+	 *  @param extensions	The supported file extensions by order of importance.
+	 */
+	public AbstractModelLoader(String[] extensions, int cachesize)
+	{
 		this.extensions	= extensions;
-		this.modelcache	= new HashMap();
+		this.modelcache	= new LRU(cachesize);
 	}
 
 	//-------- helper methods --------

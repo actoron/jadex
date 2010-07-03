@@ -11,7 +11,9 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.ILoadableComponentModel;
 import jadex.bridge.IMessageAdapter;
 import jadex.commons.ChangeEvent;
+import jadex.commons.Future;
 import jadex.commons.IChangeListener;
+import jadex.commons.IFuture;
 import jadex.commons.concurrent.IResultListener;
 
 import java.util.ArrayList;
@@ -207,8 +209,10 @@ public class MicroAgentInterpreter implements IComponentInstance
 	 *  Can be called concurrently (also during executeAction()).
 	 *  @param listener	When cleanup of the agent is finished, the listener must be notified.
 	 */
-	public void killComponent(final IResultListener listener)
+	public IFuture killComponent()
 	{
+		final Future ret = new Future();
+		
 		getAgentAdapter().invokeLater(new Runnable()
 		{
 			public void run()
@@ -227,7 +231,7 @@ public class MicroAgentInterpreter implements IComponentInstance
 							}
 							microagent.agentKilled();
 							IComponentIdentifier cid = adapter.getComponentIdentifier();
-							listener.resultAvailable(cid, cid);
+							ret.setResult(cid);
 //						}
 //					});
 //					
@@ -240,6 +244,8 @@ public class MicroAgentInterpreter implements IComponentInstance
 				return "microagent.agentKilled()_#"+this.hashCode();
 			}
 		});
+		
+		return ret;
 	}
 	
 	/**
@@ -250,14 +256,16 @@ public class MicroAgentInterpreter implements IComponentInstance
 	 *  and has to be casted to its corresponding incarnation.
 	 *  @param listener	External access is delivered via result listener.
 	 */
-	public void getExternalAccess(final IResultListener listener)
+	public IFuture getExternalAccess()
 	{
+		final Future ret = new Future();
+		
 		getAgentAdapter().invokeLater(new Runnable()
 		{
 			public void run()
 			{
 				Object exta = microagent.getExternalAccess();
-				listener.resultAvailable(getAgentAdapter().getComponentIdentifier(), exta);
+				ret.setResult(exta);
 			}
 			
 			public String toString()
@@ -265,6 +273,8 @@ public class MicroAgentInterpreter implements IComponentInstance
 				return "microagent.getExternalAccess()_#"+this.hashCode();
 			}
 		});
+		
+		return ret;
 	}
 	
 	/**
