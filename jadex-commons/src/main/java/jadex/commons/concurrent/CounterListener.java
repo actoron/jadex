@@ -39,8 +39,10 @@ public class CounterListener implements IResultListener
 	 */
 	public synchronized void resultAvailable(Object source, Object result)
 	{
+//		System.out.println("here: "+cnt+" "+num);
 		if(++cnt==num)
 		{
+//			System.out.println("!!!");
 			// todo: what about aggregated result?
 			listener.resultAvailable(source, result);
 		}

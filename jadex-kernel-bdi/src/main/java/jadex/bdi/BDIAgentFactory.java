@@ -80,7 +80,7 @@ public class BDIAgentFactory implements IComponentFactory, IService
 	 */
 	public IFuture	startService()
 	{
-		return init();
+		return new Future(null);
 	}
 	
 	/**
@@ -90,49 +90,6 @@ public class BDIAgentFactory implements IComponentFactory, IService
 	public IFuture	shutdownService()
 	{
 		return new Future(null);
-	}
-	
-	/**
-	 *  Init the factory.
-	 */
-	protected IFuture init()
-	{
-		if(libservice==null)
-		{
-			final Future	ret	= new Future(null);
-//			container.getService(ILibraryService.class).addResultListener(new IResultListener()
-//			{
-//				public void resultAvailable(Object source, Object result)
-//				{
-//					libservice = (ILibraryService)result;
-//					loader.setClassLoader(libservice.getClassLoader());
-//					ILibraryServiceListener lsl = new ILibraryServiceListener()
-//					{
-//						public void urlAdded(URL url)
-//						{
-//							loader.setClassLoader(libservice.getClassLoader());
-//						}
-//						
-//						public void urlRemoved(URL url)
-//						{
-//							loader.setClassLoader(libservice.getClassLoader());
-//						}
-//					};
-//					libservice.addLibraryServiceListener(lsl);
-//					ret.setResult(null);
-//				}
-//				
-//				public void exceptionOccurred(Object source, Exception exception)
-//				{
-//					ret.setException(exception);
-//				}
-//			});
-			return ret;
-		}
-		else
-		{
-			return null;
-		}
 	}
 	
 	//-------- IAgentFactory interface --------

@@ -170,7 +170,8 @@ class DummyAdapter implements IComponentAdapter
 	 */
 	public void invokeLater(Runnable action)
 	{
-		
+		System.out.println("invokeLater: "+action);
+		action.run();
 	}
 	
 	/**

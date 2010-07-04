@@ -192,7 +192,7 @@ public class ApplicationComponentFactory	implements IComponentFactory, IService
 	 */
 	public IFuture	startService()
 	{
-		final Future	ret = new Future(); 
+		final Future	ret = new Future(null); 
 //		container.getService(ILibraryService.class).addResultListener(new IResultListener()
 //		{
 //			public void resultAvailable(Object source, Object result)

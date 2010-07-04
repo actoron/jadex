@@ -23,7 +23,17 @@
 		<import>jadex.standalone.transport.localmtp.*</import>
 		<import>jadex.standalone.transport.tcpmtp.*</import>
 		<import>jadex.standalone.transport.niotcpmtp.*</import>
+		<import>jadex.application.*</import>
+		<import>java.util.*</import>
 	</imports>
+	
+	<componenttypes>
+		<componenttype filename="jadex/micro/KernelMicro.application.xml" name="kernel_micro"/>
+		<componenttype filename="jadex/micro/KernelBDI.application.xml" name="kernel_bdi"/>
+		<!--  <componenttype filename="jadex/micro/KernelBPMN.application.xml" name="kernel_bpmn"/>-->
+
+		<componenttype filename="jadex/tools/jcc/JCC.agent.xml" name="jcc"/>
+	</componenttypes>
 	
 	<services>
 		<service name="library_service" class="ILibraryService">
@@ -61,7 +71,28 @@
 		<service name="execution_service" class="IExecutionService">
 			new AsyncExecutionService($platform.getService(ThreadPoolService.class).get(new ThreadSuspendable()))
 		</service>
+		
+		<service name="application_factory" class="jadex.bridge.IComponentFactory" >
+			new ApplicationComponentFactory(
+				new Set[]
+				{
+					jadex.application.space.envsupport.MEnvSpaceType.getXMLMapping(),
+					jadex.application.space.agr.MAGRSpaceType.getXMLMapping()
+				}
+			)		
+		</service>
 	</services>
+	
+	<applications>
+		<application name="all_kernels">
+			<components>
+				<component type="kernel_micro"/>
+				<component type="kernel_bdi"/>
+				
+				<component type="jcc"/>
+			</components>
+		</application>
+	</applications>
 	
 	<!-- 
 	<properties type="platform_standalone" name="lars">

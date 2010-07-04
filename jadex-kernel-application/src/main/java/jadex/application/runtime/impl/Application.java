@@ -746,6 +746,7 @@ public class Application implements IApplication, IComponentInstance
 						public void resultAvailable(Object source, Object result)
 						{
 							// Create spaces for context.
+							System.out.println("start finished");
 							List spaces = config.getMSpaceInstances();
 							if(spaces!=null)
 							{
@@ -783,17 +784,13 @@ public class Application implements IApplication, IComponentInstance
 											{
 												final MComponentInstance component = (MComponentInstance)components.get(i);
 												
-									//			System.out.println("Create: "+component.getName()+" "+component.getTypeName()+" "+component.getConfiguration());
+												System.out.println("Create: "+component.getName()+" "+component.getTypeName()+" "+component.getConfiguration());
 												int num = component.getNumber(Application.this, cl, fetcher);
 												for(int j=0; j<num; j++)
 												{
-						//							IComponentManagementService	ces	= (IComponentManagementService)adapter.getServiceContainer().getService(IComponentManagementService.class);
 													ces.createComponent(component.getName(), component.getType(model.getApplicationType()).getFilename(),
 														new CreationInfo(component.getConfiguration(), component.getArguments(Application.this, cl, fetcher), adapter.getComponentIdentifier(),
-															component.isSuspended(), component.isMaster(), component.isDaemon(), model.getApplicationType().getAllImports()), null);					
-									//				context.createComponent(component.getName(), component.getTypeName(),
-									//					component.getConfiguration(), component.getArguments(container, apptype, cl), component.isStart(), component.isMaster(),
-									//					DefaultResultListener.getInstance(), null);	
+														component.isSuspended(), component.isMaster(), component.isDaemon(), model.getApplicationType().getAllImports()), null);					
 												}
 											}
 										}

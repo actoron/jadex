@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  BDI kernel application.
+-->
+<applicationtype xmlns="http://jadex.sourceforge.net/jadex-application"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-application
+						http://jadex.sourceforge.net/jadex-application-2.0.xsd"
+	name="kernel_bdi" package="jadex.bdi">
+	
+	<imports>
+		<import>jadex.commons.*</import>
+		<import>jadex.bridge.*</import>
+	</imports>
+	
+	<services>
+		<service name="bdi_factory" type="jadex.bridge.IComponentFactory" >
+			new jadex.bdi.BDIAgentFactory(
+				jadex.commons.SUtil.createHashMap(
+				new String[]
+				{
+					"messagetype_fipa", 
+					"planexecutor_standard", 
+					"standard.timeout", 
+					"microplansteps",
+					//"planexecutor_bpmn",
+					"debugger.panels"
+				},
+				new Object[]
+				{
+					new jadex.base.fipa.FIPAMessageType(), 
+					new jadex.bdi.runtime.impl.JavaStandardPlanExecutor(
+						$platform.getService(jadex.service.threadpool.ThreadPoolService.class).get(new jadex.commons.ThreadSuspendable())),
+					new java.lang.Long(10000),
+					Boolean.TRUE,
+					"jadex.tools.debugger.bdi.BDIAgentInspectorDebuggerPanel, jadex.tools.debugger.bdi.BDIAgentRuleEngineDebuggerPanel"
+				}
+			), $platform)
+		</service>
+	</services>
+</applicationtype>
