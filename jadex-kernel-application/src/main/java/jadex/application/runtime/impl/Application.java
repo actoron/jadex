@@ -787,7 +787,7 @@ public class Application implements IApplication, IComponentInstance
 						public void resultAvailable(Object source, Object result)
 						{
 							// Create spaces for context.
-							System.out.println("start finished");
+							System.out.println("start finished: "+getComponentIdentifier());
 							List spaces = config.getMSpaceInstances();
 							if(spaces!=null)
 							{

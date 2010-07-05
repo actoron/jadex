@@ -326,6 +326,7 @@ public abstract class NestedServiceContainer extends BasicServiceContainer
 				final List children = (List)result;
 				if(children!=null)
 				{
+					System.out.println("searching children: "+children);
 					final int[] cnt = new int[]{0};
 					for(int i=0; i<children.size(); i++)
 					{
@@ -386,7 +387,7 @@ public abstract class NestedServiceContainer extends BasicServiceContainer
 	 */
 	protected void checkAndSetResults(boolean[] results, Future ret, Object result, Exception exception)
 	{
-		System.out.println("res: "+results[0]+results[1]+results[2]);
+//		System.out.println("res: "+results[0]+results[1]+results[2]);
 		if(exception!=null)
 		{
 			ret.setException(exception);
