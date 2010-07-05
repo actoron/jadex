@@ -1,8 +1,8 @@
 package jadex.simulation.client;
 
 import jadex.application.runtime.IApplicationExternalAccess;
+import jadex.application.space.envsupport.environment.AbstractEnvironmentSpace;
 import jadex.application.space.envsupport.environment.space2d.ContinuousSpace2D;
-import jadex.base.ISimulationService;
 import jadex.base.fipa.IDF;
 import jadex.base.fipa.IDFComponentDescription;
 import jadex.base.fipa.IDFServiceDescription;
@@ -17,19 +17,22 @@ import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.IFuture;
 import jadex.rules.state.IOAVState;
-import jadex.service.IServiceContainer;
 import jadex.service.clock.IClockService;
 import jadex.simulation.helper.AgentMethods;
 import jadex.simulation.helper.Constants;
 import jadex.simulation.helper.EvaluateExpression;
 import jadex.simulation.helper.TimeConverter;
+import jadex.simulation.model.ObservedEvent;
 import jadex.simulation.model.SimulationConfiguration;
 import jadex.simulation.model.TargetFunction;
 import jadex.simulation.model.Time;
 
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class RuntimeManagerPlan extends Plan {
 
@@ -56,16 +59,17 @@ public class RuntimeManagerPlan extends Plan {
 		// boolean targetCondition = false;
 		// startApp();
 
-		// Init Arguments like StartTime
 
-		// TEST
-		ContinuousSpace2D spaceTMP = (ContinuousSpace2D) ((IApplicationExternalAccess) getScope().getParent()).getSpace("my2dspace");
-		IServiceContainer exeservice = spaceTMP.getContext().getServiceContainer();
+
+		// Get Space
+		AbstractEnvironmentSpace space = (AbstractEnvironmentSpace) ((IApplicationExternalAccess) getScope().getParent()).getSpace("my2dspace");
+//		IServiceContainer exeservice = spaceTMP.getContext().getServiceContainer(); 
 		// DeltaTimeExecutor4Simulation exeservice =
 		// (DeltaTimeExecutor4Simulation)
 		// spaceTMP.getContext().getServiceContainer().getService(DeltaTimeExecutor4Simulation.class);
 		// System.out.println(exeservice.getName());
 
+		// Init Arguments like StartTime
 		init();
 
 		// Determine terminate condition
@@ -99,7 +103,7 @@ public class RuntimeManagerPlan extends Plan {
 			while (true) {
 				waitFor(1000);
 
-				ContinuousSpace2D space = (ContinuousSpace2D) ((IApplicationExternalAccess) getScope().getParent()).getSpace("my2dspace");
+//				ContinuousSpace2D space = (ContinuousSpace2D) ((IApplicationExternalAccess) getScope().getParent()).getSpace("my2dspace");
 
 				// Hack: Works right now only for single objects but not for all
 				// of that type...
@@ -141,10 +145,15 @@ public class RuntimeManagerPlan extends Plan {
 			System.err.println("#RunTimeManagerPlan# Terminate Condition missing " + simConf);
 		}
 
+		//Get Observed Events from space
+//		IServiceContainer container = getExternalAccess().getServiceContainer();
+//		DeltaTimeExecutor4Simulation simServ = (DeltaTimeExecutor4Simulation) container.getService(DeltaTimeExecutor4Simulation.class);
+//		ConcurrentHashMap<Long, ArrayList<ObservedEvent>> results = simServ.getAllObservedValues();
+		ConcurrentHashMap<Long, ArrayList<ObservedEvent>> results = (ConcurrentHashMap<Long, ArrayList<ObservedEvent>> ) space.getProperty("observedEvents");		
 
 		// Stop Siumlation when target condition true.
-		IServiceContainer container = getExternalAccess().getServiceContainer();
-		ISimulationService simServ = (ISimulationService) container.getService(ISimulationService.class);
+//		IServiceContainer container = getExternalAccess().getServiceContainer();
+//		ISimulationService simServ = (ISimulationService) container.getService(ISimulationService.class);
 		// waitFor(5000);
 		// simServ.pause();
 
@@ -153,24 +162,24 @@ public class RuntimeManagerPlan extends Plan {
 		// simServ.start();
 		// exeServ.start();
 
-		sendResult();
+		sendResult(results);
 		// simServ.start();
 		// waitFor(2000);
 		// simServ.shutdown(null);
 		System.out.println("Trying to kill component....");
 		// getExternalAccess().killAgent();
-		IComponentManagementService ces = (IComponentManagementService) spaceTMP.getContext().getServiceContainer().getService(IComponentManagementService.class);
-		ces.destroyComponent(spaceTMP.getContext().getComponentIdentifier());
+		IComponentManagementService ces = (IComponentManagementService) space.getContext().getServiceContainer().getService(IComponentManagementService.class);
+		ces.destroyComponent(space.getContext().getComponentIdentifier());
 		// getExternalAccess().getApplicationContext().killComponent(null);
 
 	}
 
-	private void sendResult() {
+	private void sendResult(ConcurrentHashMap<Long, ArrayList<ObservedEvent>> observedEvents) {
 		Map facts = (Map) getBeliefbase().getBelief("simulationFacts").getFact();
 		facts.put(Constants.EXPERIMENT_END_TIME, new Long(getCurrentTime()));
 
 		// Get the map of observed events from the beliefbase
-		HashMap observedEvents = (HashMap) getBeliefbase().getBelief(Constants.OBSERVED_EVENTS_MAP).getFact();
+//		HashMap observedEvents = (HashMap) getBeliefbase().getBelief(Constants.OBSERVED_EVENTS_MAP).getFact();
 		facts.put(Constants.OBSERVED_EVENTS_MAP, observedEvents);
 
 		IComponentIdentifier[] receivers = new IComponentIdentifier[1];
@@ -223,11 +232,13 @@ public class RuntimeManagerPlan extends Plan {
 	private void init() {
 
 		IClockService clockservice = (IClockService) getScope().getServiceContainer().getService(IClockService.class);
+		long startTime = clockservice.getTime();
 		Map facts = (Map) getBeliefbase().getBelief("simulationFacts").getFact();
-		facts.put(Constants.EXPERIMENT_START_TIME, new Long(clockservice.getTime()));
-		getBeliefbase().getBelief("simulationFacts").setFact(facts);
+		facts.put(Constants.EXPERIMENT_START_TIME, new Long(startTime));
+		getBeliefbase().getBelief("simulationFacts").setFact(facts);		
 		// Hack: Synchronize start time!
-		((ContinuousSpace2D) ((IApplicationExternalAccess) getScope().getParent()).getSpace("my2dspace")).getSpaceObjectsByType("homebase")[0].setProperty("start_time", clockservice.getTime());
+		System.out.println("-->StartTime at Client: " + startTime );
+		((ContinuousSpace2D) ((IApplicationExternalAccess) getScope().getParent()).getSpace("my2dspace")).getSpaceObjectsByType("homebase")[0].setProperty("start_time", startTime);
 
 	}
 
