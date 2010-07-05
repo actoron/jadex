@@ -5,6 +5,7 @@ import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.IFuture;
 import jadex.service.IServiceContainer;
+import jadex.service.IServiceProvider;
 
 
 /**
@@ -19,7 +20,7 @@ public class CMSLocalDestroyComponentPlan extends Plan
 	{	
 		IComponentIdentifier cid = (IComponentIdentifier)getParameter("componentidentifier").getValue();
 
-		final IServiceContainer plat	= getScope().getServiceContainer();
+		final IServiceProvider plat	= getScope().getServiceProvider();
 		try
 		{
 			IFuture ret = ((IComponentManagementService)plat.getService(IComponentManagementService.class).get(this)).destroyComponent(cid);

@@ -14,7 +14,7 @@
 	</imports>
 	
 	<services>
-		<service name="bdi_factory" type="jadex.bridge.IComponentFactory" >
+		<service name="bdi_factory" class="jadex.bridge.IComponentFactory">
 			new jadex.bdi.BDIAgentFactory(
 				jadex.commons.SUtil.createHashMap(
 				new String[]

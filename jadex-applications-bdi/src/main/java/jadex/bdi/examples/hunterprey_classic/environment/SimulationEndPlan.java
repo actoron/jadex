@@ -36,7 +36,7 @@ public class SimulationEndPlan extends Plan {
 		
 //		// kill via gui		
 
-		IComponentManagementService	ces	= (IComponentManagementService)getScope().getServiceContainer().getService(IComponentManagementService.class);
+		IComponentManagementService	ces	= (IComponentManagementService)getScope().getServiceProvider().getService(IComponentManagementService.class);
 		ces.destroyComponent(getScope().getParent().getComponentIdentifier());
 	}
 }

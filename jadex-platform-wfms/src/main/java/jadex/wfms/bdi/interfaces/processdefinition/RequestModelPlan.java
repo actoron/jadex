@@ -42,13 +42,13 @@ public class RequestModelPlan extends AbstractWfmsPlan
 					if (rqm.getModelName().endsWith(".bpmn"))
 					{
 						BpmnModelLoader bpmnLoader = new BpmnModelLoader();
-						bpmnLoader.setClassLoader(((ILibraryService)getScope().getServiceContainer().getService(ILibraryService.class)).getClassLoader());
+						bpmnLoader.setClassLoader(((ILibraryService)getScope().getServiceProvider().getService(ILibraryService.class)).getClassLoader());
 						model = bpmnLoader.loadBpmnModel(rqm.getModelName(), new String[0]);
 					}
 					else
 					{
 						GpmnModelLoader gpmnLoader = new GpmnModelLoader();
-						gpmnLoader.setClassLoader(((ILibraryService)getScope().getServiceContainer().getService(ILibraryService.class)).getClassLoader());
+						gpmnLoader.setClassLoader(((ILibraryService)getScope().getServiceProvider().getService(ILibraryService.class)).getClassLoader());
 						model = gpmnLoader.loadGpmnModel(rqm.getModelName(), new String[0]);
 					}
 				}
@@ -58,7 +58,7 @@ public class RequestModelPlan extends AbstractWfmsPlan
 				}
 			}
 			else
-				model = ((IProcessDefinitionService) getScope().getServiceContainer().getService(IProcessDefinitionService.class)).getProcessModel(proxy, rqm.getModelName());
+				model = ((IProcessDefinitionService) getScope().getServiceProvider().getService(IProcessDefinitionService.class)).getProcessModel(proxy, rqm.getModelName());
 			File modelFile = new File(model.getFilename());
 			byte[] content;
 			try

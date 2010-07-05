@@ -450,7 +450,7 @@ public class DFBrowserPlugin extends AbstractJCCPlugin
 		
 		if(getSelectedDF() != null)
 		{
-			IServiceContainer sc = (IServiceContainer)((AgentControlCenter)getJCC()).getAgent().getServiceContainer();
+			IServiceContainer sc = (IServiceContainer)((AgentControlCenter)getJCC()).getAgent().getServiceProvider();
 			sc.getService(IDF.class).addResultListener(new SwingDefaultResultListener()
 			{
 				public void customResultAvailable(Object source, Object result)

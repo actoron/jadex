@@ -209,7 +209,7 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 		if(duration==EventIntermediateTimerActivityHandler.TICK_TIMER)
 			throw new UnsupportedOperationException("Tick timers for bdi-bpmn have to be implemented.");
 		
-		IClockService clock = (IClockService)interpreter.getAgentAdapter().getServiceContainer().getService(IClockService.class);
+		IClockService clock = (IClockService)interpreter.getAgentAdapter().getServiceProvider().getService(IClockService.class);
 		Long ret = new Long(clock.getTime()+duration);
 		waittimes.put(thread, ret);
 	}
@@ -233,7 +233,7 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 	{
 		if(waittimes!=null)
 		{
-			IClockService clock = (IClockService)interpreter.getAgentAdapter().getServiceContainer().getService(IClockService.class);
+			IClockService clock = (IClockService)interpreter.getAgentAdapter().getServiceProvider().getService(IClockService.class);
 			
 			for(Iterator it=waittimes.keySet().iterator(); it.hasNext(); )
 			{
@@ -283,7 +283,7 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 			String pool	= getPool(getLastState());
 			if(!POOL_UNDEFINED.equals(pool))
 			{
-				IClockService	clock	= (IClockService)interpreter.getAgentAdapter().getServiceContainer().getService(IClockService.class);
+				IClockService	clock	= (IClockService)interpreter.getAgentAdapter().getServiceProvider().getService(IClockService.class);
 				for(Iterator it=waittimes.keySet().iterator(); it.hasNext(); )
 				{
 					ProcessThread	thread	= (ProcessThread) it.next();
@@ -744,7 +744,7 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 	 */
 	public IClockService getClock()
 	{
-		return (IClockService)interpreter.getAgentAdapter().getServiceContainer().getService(IClockService.class);
+		return (IClockService)interpreter.getAgentAdapter().getServiceProvider().getService(IClockService.class);
 	}
 
 	/**

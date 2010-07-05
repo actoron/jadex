@@ -1,6 +1,6 @@
 package jadex.bridge;
 
-import jadex.service.IServiceContainer;
+import jadex.service.IServiceProvider;
 
 import java.util.logging.Logger;
 
@@ -52,7 +52,7 @@ public interface IComponentAdapter
 	 *  Get the component platform.
 	 *  @return The component platform.
 	 */
-	public IServiceContainer getServiceContainer()	throws ComponentTerminatedException;
+	public IServiceProvider getServiceProvider()	throws ComponentTerminatedException;
 
 	/**
 	 *  Return the native component-identifier that allows to send

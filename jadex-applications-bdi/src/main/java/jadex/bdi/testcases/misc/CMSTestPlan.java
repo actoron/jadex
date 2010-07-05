@@ -25,7 +25,7 @@ public class CMSTestPlan extends Plan
 	{
 		int num=1;
 		num = performTests(num, null); // test locally
-		IComponentManagementService ces = (IComponentManagementService)getScope().getServiceContainer().getService(IComponentManagementService.class);
+		IComponentManagementService ces = (IComponentManagementService)getScope().getServiceProvider().getService(IComponentManagementService.class);
 		IComponentIdentifier aa = ces.createComponentIdentifier(SFipa.CMS_COMPONENT, true, null);
 		performTests(num, aa); // test remotely
 	}
@@ -50,7 +50,7 @@ public class CMSTestPlan extends Plan
 		// Try to search the CMS.
 		TestReport tr = new TestReport("#"+num++, "Searching for all agents");
 		getLogger().info("\nSearching for all agents.");
-		IComponentManagementService amsservice = (IComponentManagementService)getScope().getServiceContainer().getService(IComponentManagementService.class);
+		IComponentManagementService amsservice = (IComponentManagementService)getScope().getServiceProvider().getService(IComponentManagementService.class);
 		IComponentDescription desc = amsservice.createComponentDescription(null, null, null, null, null);
 		ISearchConstraints constraints = amsservice.createSearchConstraints(-1, 0);
 		

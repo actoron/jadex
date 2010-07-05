@@ -18,7 +18,7 @@ public class RequestDeAuthPlan extends Plan
 		Map heartbeatTimers = (Map) getBeliefbase().getBelief("heartbeat_timers").getFact();
 		heartbeatTimers.remove(getParameter("initiator").getValue());
 		
-		IClientService cs = (IClientService) getScope().getServiceContainer().getService(IClientService.class);
+		IClientService cs = (IClientService) getScope().getServiceProvider().getService(IClientService.class);
 		cs.deauthenticate(proxy);
 		
 		Done done = new Done();

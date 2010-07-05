@@ -1,6 +1,7 @@
 package jadex.bdi.planlib.cms;
 
 import jadex.bdi.runtime.Plan;
+import jadex.service.IServiceContainer;
 
 /**
  *  Shutdown the platform.
@@ -13,6 +14,7 @@ public class CMSLocalShutdownPlatformPlan extends Plan
 	 */
 	public void body()
 	{
-		getScope().getServiceContainer().shutdown().get(this);
+		// todo: hack fix me
+		((IServiceContainer)getScope().getServiceProvider()).shutdown().get(this);
 	}
 }

@@ -33,7 +33,7 @@ public class WorkitemTask implements ITask
 	 */
 	public void execute(ITaskContext context, BpmnInterpreter process, IResultListener listener)
 	{
-		IServiceContainer wfms = (IServiceContainer) process.getComponentAdapter().getServiceContainer(); 
+		IServiceContainer wfms = (IServiceContainer) process.getComponentAdapter().getServiceProvider(); 
 		IWfmsClientService wiq = (IWfmsClientService) wfms.getService(IWfmsClientService.class);
 		wiq.queueWorkitem(createWorkitem(Workitem.GENERIC_WORKITEM_TYPE, context), createRedirListener(context, listener));
 	}

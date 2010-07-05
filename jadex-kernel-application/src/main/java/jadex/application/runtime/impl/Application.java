@@ -127,6 +127,24 @@ public class Application implements IApplication, IComponentInstance
 				this.results.put(res[i].getName(), res[i].getDefaultValue(configname));
 			}
 		}
+		
+
+		// Create the services
+//		final SimpleValueFetcher fetcher = new SimpleValueFetcher();
+//		fetcher.setValue("$platform", getServiceProvider());
+//		fetcher.setValue("$args", getArguments());
+//		fetcher.setValue("$results", getResults());
+//		fetcher.setValue("$component", this);
+//		List services = model.getApplicationType().getServices();
+//		if(services!=null)
+//		{
+//			for(int i=0; i<services.size(); i++)
+//			{
+//				MExpressionType exp = (MExpressionType)services.get(i);
+//				IService service = (IService)exp.getParsedValue().getValue(fetcher);
+//				mycontainer.addService(exp.getClazz(), exp.getName(), service);
+//			}
+//		}
 	}
 
 	//-------- space handling --------
@@ -270,7 +288,7 @@ public class Application implements IApplication, IComponentInstance
 	{
 		// Checks if loaded model is defined in the application component types
 		
-		adapter.getServiceContainer().getServices(IComponentFactory.class).addResultListener(new DefaultResultListener()
+		adapter.getServiceProvider().getServices(IComponentFactory.class).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
@@ -391,7 +409,7 @@ public class Application implements IApplication, IComponentInstance
 	 */
 	public void killApplication()
 	{
-		((IComponentManagementService)getComponentAdapter().getServiceContainer()
+		((IComponentManagementService)getComponentAdapter().getServiceProvider()
 			.getService(IComponentManagementService.class))
 			.destroyComponent(getComponentAdapter().getComponentIdentifier());
 	}
@@ -513,11 +531,11 @@ public class Application implements IApplication, IComponentInstance
 	}
 	
 	/**
-	 *  Get the service container.
+	 *  Get the service provider.
 	 */
-	public IServiceContainer getServiceContainer()
+	public IServiceProvider getServiceProvider()
 	{
-		return adapter.getServiceContainer();
+		return adapter.getServiceProvider();
 	}
 	
 	/**
@@ -723,9 +741,10 @@ public class Application implements IApplication, IComponentInstance
 //					IClockService clock = (IClockService)result;
 					
 					final SimpleValueFetcher fetcher = new SimpleValueFetcher();
-					fetcher.setValue("$platform", getServiceContainer());
+					fetcher.setValue("$platform", getServiceProvider());
 					fetcher.setValue("$args", getArguments());
 					fetcher.setValue("$results", getResults());
+					fetcher.setValue("$component", this);
 					// todo: hack remove clock somehow (problem services are behind future in xml)
 //					fetcher.setValue("$clock", clock);
 
@@ -768,13 +787,13 @@ public class Application implements IApplication, IComponentInstance
 							}
 
 							final List components = config.getMComponentInstances();
-							adapter.getServiceContainer().getService(ILibraryService.class).addResultListener(createResultListener(new DefaultResultListener()
+							adapter.getServiceProvider().getService(ILibraryService.class).addResultListener(createResultListener(new DefaultResultListener()
 							{
 								public void resultAvailable(Object source, Object result)
 								{
 									final ILibraryService ls = (ILibraryService)result;
 									final ClassLoader cl = ls.getClassLoader();
-									adapter.getServiceContainer().getService(IComponentManagementService.class).addResultListener(createResultListener(new DefaultResultListener()
+									adapter.getServiceProvider().getService(IComponentManagementService.class).addResultListener(createResultListener(new DefaultResultListener()
 									{
 										public void resultAvailable(Object source, Object result)
 										{

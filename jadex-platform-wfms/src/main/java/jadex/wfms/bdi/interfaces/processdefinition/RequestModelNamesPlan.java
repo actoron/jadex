@@ -28,7 +28,7 @@ public class RequestModelNamesPlan extends AbstractWfmsPlan
 		IClient proxy = ((RequestProxy) ((Done) acqProxy.getParameter("result").getValue()).getAction()).getClientProxy();
 		try
 		{
-			IProcessDefinitionService pd = (IProcessDefinitionService) getScope().getServiceContainer().getService(IProcessDefinitionService.class);
+			IProcessDefinitionService pd = (IProcessDefinitionService) getScope().getServiceProvider().getService(IProcessDefinitionService.class);
 			Set processModelNames = pd.getProcessModelNames(proxy);
 			
 			RequestModelNames rqmn = (RequestModelNames) getParameter("action").getValue();

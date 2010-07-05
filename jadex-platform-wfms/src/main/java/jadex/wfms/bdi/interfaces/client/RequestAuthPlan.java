@@ -20,7 +20,7 @@ public class RequestAuthPlan extends Plan
 		
 		ComponentClientProxy proxy = new ComponentClientProxy(ra.getUserName(), (IComponentIdentifier) getParameter("initiator").getValue());
 		
-		IClientService cs = (IClientService) getScope().getServiceContainer().getService(IClientService.class);
+		IClientService cs = (IClientService) getScope().getServiceProvider().getService(IClientService.class);
 		if (cs.authenticate(proxy))
 		{
 			Map clientProxies = (Map) getBeliefbase().getBelief("client_proxies").getFact();

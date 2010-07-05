@@ -101,13 +101,13 @@ public class ExternalAccess implements IApplicationExternalAccess
 			{
 				public void run() 
 				{
-					ret.setResult(application.getServiceContainer().getService(type));
+					ret.setResult(application.getServiceProvider().getService(type));
 				}
 			});
 		}
 		else
 		{
-			ret.setResult(application.getServiceContainer().getService(type));
+			ret.setResult(application.getServiceProvider().getService(type));
 		}
 		
 		return ret;
@@ -128,13 +128,13 @@ public class ExternalAccess implements IApplicationExternalAccess
 			{
 				public void run() 
 				{
-					ret.setResult(application.getServiceContainer().getServices(type));
+					ret.setResult(application.getServiceProvider().getServices(type));
 				}
 			});
 		}
 		else
 		{
-			ret.setResult(application.getServiceContainer().getServices(type));
+			ret.setResult(application.getServiceProvider().getServices(type));
 		}
 		
 		return ret;
@@ -155,13 +155,13 @@ public class ExternalAccess implements IApplicationExternalAccess
 			{
 				public void run() 
 				{
-					ret.setResult(application.getServiceContainer().getService(type, name));
+					ret.setResult(application.getServiceProvider().getService(type, name));
 				}
 			});
 		}
 		else
 		{
-			ret.setResult(application.getServiceContainer().getService(type, name));
+			ret.setResult(application.getServiceProvider().getService(type, name));
 		}
 		
 		return ret;
@@ -181,13 +181,13 @@ public class ExternalAccess implements IApplicationExternalAccess
 			{
 				public void run() 
 				{
-					ret.setResult(application.getServiceContainer().getServicesTypes());
+					ret.setResult(application.getServiceProvider().getServicesTypes());
 				}
 			});
 		}
 		else
 		{
-			ret.setResult(application.getServiceContainer().getServicesTypes());
+			ret.setResult(application.getServiceProvider().getServicesTypes());
 		}
 		
 		return ret;

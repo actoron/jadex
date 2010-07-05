@@ -120,7 +120,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 		dealerpan = new JPanel();
 		dealerpan.setBorder(BorderFactory.createTitledBorder(" Dealer "));
 		dealerpan.setBackground(Color.WHITE);
-		access.getServiceContainer().getService(IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
+		access.getServiceProvider().getService(IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
 		{
 			public void customResultAvailable(Object source, Object result)
 			{
@@ -135,7 +135,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 		{
 			public void actionPerformed(ActionEvent ae)
 			{
-				access.getServiceContainer().getService(IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
+				access.getServiceProvider().getService(IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
 				{
 					public void customResultAvailable(Object source, Object result)
 					{
@@ -310,7 +310,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 		{
 			if(n==JOptionPane.YES_OPTION)
 			{
-				final IComponentManagementService	ces	= (IComponentManagementService)agent.getServiceContainer().getService(IComponentManagementService.class);
+				final IComponentManagementService	ces	= (IComponentManagementService)agent.getServiceProvider().getService(IComponentManagementService.class);
 				IFuture ret = ces.getComponentDescription(dealeraid);
 				ret.addResultListener(new IResultListener()
 				{

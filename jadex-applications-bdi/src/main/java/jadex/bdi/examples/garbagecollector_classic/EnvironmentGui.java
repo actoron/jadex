@@ -67,7 +67,7 @@ public class EnvironmentGui	extends JFrame
 										try
 										{
 											IEAGoal kill = (IEAGoal)result;
-											IComponentManagementService ces = (IComponentManagementService)agent.getServiceContainer().getService(IComponentManagementService.class);
+											IComponentManagementService ces = (IComponentManagementService)agent.getServiceProvider().getService(IComponentManagementService.class);
 											kill.setParameterValue("componentidentifier", ces.createComponentIdentifier(wobs[num].getName(), true, null));
 											agent.dispatchTopLevelGoalAndWait(kill);
 										}

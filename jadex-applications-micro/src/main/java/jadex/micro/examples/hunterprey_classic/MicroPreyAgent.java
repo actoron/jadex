@@ -134,7 +134,7 @@ public class MicroPreyAgent extends MicroAgent
 	protected void register()
 	{
 		// Create a service description to search for.
-		IDF df = (IDF)getServiceContainer().getService(IDF.class);
+		IDF df = (IDF)getServiceProvider().getService(IDF.class);
 		IDFServiceDescription sd = df.createDFServiceDescription(null, "hunter-prey environment", null);
 		IDFComponentDescription ad = df.createDFComponentDescription(null, sd);
 		ISearchConstraints	cons = df.createSearchConstraints(-1, 0);

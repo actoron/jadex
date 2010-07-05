@@ -5,6 +5,7 @@ import jadex.bridge.IComponentFactory;
 import jadex.commons.SGUI;
 import jadex.commons.ThreadSuspendable;
 import jadex.service.IServiceContainer;
+import jadex.service.IServiceProvider;
 import jadex.tools.common.jtreetable.DefaultTreeTableNode;
 import jadex.tools.common.jtreetable.TreeTableNodeType;
 
@@ -31,7 +32,7 @@ public class ComponentTreeTableNodeType extends TreeTableNodeType
 	//-------- attributes --------
 	
 	/** The service container. */
-	protected IServiceContainer	container;
+	protected IServiceProvider provider;
 	
 	//-------- constructors --------
 	
@@ -39,10 +40,10 @@ public class ComponentTreeTableNodeType extends TreeTableNodeType
 	 *  Create a component tree table node type.
 	 *  @param container	The service container.
 	 */
-	public ComponentTreeTableNodeType(IServiceContainer container)
+	public ComponentTreeTableNodeType(IServiceProvider container)
 	{
 		super(ComponentTreeTable.NODE_COMPONENT, new Icon[0], new String[]{"name", "address"}, new String[]{"Name", "Address"});
-		this.container	= container;
+		this.provider	= container;
 	}
 
 	//-------- overridings --------
@@ -58,7 +59,7 @@ public class ComponentTreeTableNodeType extends TreeTableNodeType
 		String type	= ad.getType();
 		if(type!=null)
 		{
-			Collection coll = (Collection)container.getServices(IComponentFactory.class).get(new ThreadSuspendable());
+			Collection coll = (Collection)provider.getServices(IComponentFactory.class).get(new ThreadSuspendable());
 			Iterator factories	= coll.iterator();
 			while(ret==null && factories.hasNext())
 				ret	= ((IComponentFactory)factories.next()).getComponentTypeIcon(type);

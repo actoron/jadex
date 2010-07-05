@@ -2,7 +2,7 @@ package jadex.bdi.runtime;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
-import jadex.service.IServiceContainer;
+import jadex.service.IServiceProvider;
 
 import java.util.logging.Logger;
 
@@ -108,7 +108,7 @@ public interface ICapability	extends IElement
 	 *  Get the container
 	 *  @return The container.
 	 */
-	public IServiceContainer getServiceContainer();
+	public IServiceProvider getServiceProvider();
 	
 	/**
 	 *  Get the current time.

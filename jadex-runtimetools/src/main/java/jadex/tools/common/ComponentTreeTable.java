@@ -9,6 +9,7 @@ import jadex.commons.collection.SCollection;
 import jadex.commons.jtable.ResizeableTableHeader;
 import jadex.commons.jtable.VisibilityTableColumnModel;
 import jadex.service.IServiceContainer;
+import jadex.service.IServiceProvider;
 import jadex.tools.common.jtreetable.DefaultTreeTableCellRenderer;
 import jadex.tools.common.jtreetable.DefaultTreeTableModel;
 import jadex.tools.common.jtreetable.DefaultTreeTableNode;
@@ -75,7 +76,7 @@ public class ComponentTreeTable extends JScrollPane
 	/**
 	 *  Open the gui.
 	 */
-	public ComponentTreeTable(IServiceContainer container)
+	public ComponentTreeTable(IServiceProvider container)
 	{
 		// Initialize default node types (may be overriden from outside).
 		this.nodetypes = new HashMap();
@@ -93,7 +94,8 @@ public class ComponentTreeTable extends JScrollPane
 		//renderer.setFont(font);
 
 		// Setup tree table component.
-		this.platform = new DefaultTreeTableNode(getNodeType(NODE_CONTAINER), container.getName());
+		// hack: todo
+		this.platform = new DefaultTreeTableNode(getNodeType(NODE_CONTAINER), ((IServiceContainer)container).getName());
 		this.treetable = new JTreeTable(new DefaultTreeTableModel(platform, getNodeType(NODE_COMPONENT).getColumnNames()));
 		//treetable.setFont(font);
 		//treetable.setRowHeight(treetable.getFontMetrics(font).getHeight());

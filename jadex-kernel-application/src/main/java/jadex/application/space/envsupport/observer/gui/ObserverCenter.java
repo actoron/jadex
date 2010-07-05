@@ -639,18 +639,18 @@ public class ObserverCenter
 			if(delay==-1)
 			{
 				vptimer.stop();
-				IClockService	clock	= (IClockService)space.getContext().getServiceContainer().getService(IClockService.class);
+				IClockService	clock	= (IClockService)space.getContext().getServiceProvider().getService(IClockService.class);
 				clock.addChangeListener(clocklistener);
 			}
 			else if(delay==0)
 			{
 				vptimer.stop();
-				IClockService	clock	= (IClockService)space.getContext().getServiceContainer().getService(IClockService.class);
+				IClockService	clock	= (IClockService)space.getContext().getServiceProvider().getService(IClockService.class);
 				clock.removeChangeListener(clocklistener);
 			}
 			else
 			{
-				IClockService	clock	= (IClockService)space.getContext().getServiceContainer().getService(IClockService.class);
+				IClockService	clock	= (IClockService)space.getContext().getServiceProvider().getService(IClockService.class);
 				clock.removeChangeListener(clocklistener);
 				vptimer.setDelay(delay);
 				vptimer.start();
@@ -674,7 +674,7 @@ public class ObserverCenter
 			if(killonexit)
 			{
 				IComponentManagementService	ces	= (IComponentManagementService)space.getContext()
-					.getServiceContainer().getService(IComponentManagementService.class);
+					.getServiceProvider().getService(IComponentManagementService.class);
 				ces.destroyComponent(space.getContext().getComponentIdentifier());
 			}
 		}

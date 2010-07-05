@@ -85,7 +85,7 @@ public class CMSLocalUpdateComponentsPlan extends Plan
 				}
 			};
 			
-			IComponentManagementService	ces	= (IComponentManagementService)getScope().getServiceContainer().getService(IComponentManagementService.class).get(this);
+			IComponentManagementService	ces	= (IComponentManagementService)getScope().getServiceProvider().getService(IComponentManagementService.class).get(this);
 			ces.addComponentListener(null, listener);
 			
 			IFuture fut = ces.getComponentDescriptions();
@@ -99,7 +99,7 @@ public class CMSLocalUpdateComponentsPlan extends Plan
 	
 	public void aborted()
 	{
-		IComponentManagementService	ces	= (IComponentManagementService)getScope().getServiceContainer().getService(IComponentManagementService.class).get(this);
+		IComponentManagementService	ces	= (IComponentManagementService)getScope().getServiceProvider().getService(IComponentManagementService.class).get(this);
 		ces.removeComponentListener(null, listener);
 	}
 }

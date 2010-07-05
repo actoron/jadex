@@ -82,7 +82,7 @@ public class InitMapProcess extends SimplePropertyObject implements ISpaceProces
 		
 		try
 		{
-			ILibraryService ls = (ILibraryService)space.getContext().getServiceContainer().getService(ILibraryService.class);
+			ILibraryService ls = (ILibraryService)space.getContext().getServiceProvider().getService(ILibraryService.class);
 			String mapfile = (String)getProperty("mapfile");
 			InputStream is = SUtil.getResource(mapfile, ls.getClassLoader());
 			BufferedReader br = new BufferedReader(new InputStreamReader(is));

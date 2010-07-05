@@ -86,7 +86,7 @@ public class DefaultBDIVisionProcessor extends SimplePropertyObject implements I
 		
 		if(invoke)
 		{
-			IComponentManagementService ces = (IComponentManagementService)space.getContext().getServiceContainer().getService(IComponentManagementService.class);
+			IComponentManagementService ces = (IComponentManagementService)space.getContext().getServiceProvider().getService(IComponentManagementService.class);
 			IFuture fut = ces.getExternalAccess(agent);
 			fut.addResultListener(new IResultListener()
 			{

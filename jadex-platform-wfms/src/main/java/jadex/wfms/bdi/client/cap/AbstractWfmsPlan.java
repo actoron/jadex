@@ -11,7 +11,7 @@ public abstract class AbstractWfmsPlan extends Plan
 {
 	protected IComponentIdentifier getClientInterface()
 	{
-		IDF df = (IDF) getScope().getServiceContainer().getService(IDF.class);
+		IDF df = (IDF) getScope().getServiceProvider().getService(IDF.class);
 		IDFComponentDescription adesc = df.createDFComponentDescription(null, df.createDFServiceDescription(SWfms.SERVICE_NAME_CLIENT_INTERFACE, SWfms.SERVICE_TYPE_EXTERNAL, null));
 		
 		return getWfmsService(adesc);
@@ -19,7 +19,7 @@ public abstract class AbstractWfmsPlan extends Plan
 	
 	protected IComponentIdentifier getPdInterface()
 	{
-		IDF df = (IDF) getScope().getServiceContainer().getService(IDF.class);
+		IDF df = (IDF) getScope().getServiceProvider().getService(IDF.class);
 		IDFComponentDescription adesc = df.createDFComponentDescription(null, df.createDFServiceDescription(SWfms.SERVICE_NAME_PD_INTERFACE, SWfms.SERVICE_TYPE_EXTERNAL, null));
 		
 		return getWfmsService(adesc);
@@ -27,7 +27,7 @@ public abstract class AbstractWfmsPlan extends Plan
 	
 	protected IComponentIdentifier getAdminInterface()
 	{
-		IDF df = (IDF) getScope().getServiceContainer().getService(IDF.class);
+		IDF df = (IDF) getScope().getServiceProvider().getService(IDF.class);
 		IDFComponentDescription adesc = df.createDFComponentDescription(null, df.createDFServiceDescription(SWfms.SERVICE_NAME_ADMIN_INTERFACE, SWfms.SERVICE_TYPE_EXTERNAL, null));
 		
 		return getWfmsService(adesc);

@@ -3,13 +3,13 @@ package jadex.application.space.envsupport.environment;
 import jadex.application.space.envsupport.dataview.IDataView;
 import jadex.application.space.envsupport.evaluation.ITableDataConsumer;
 import jadex.bridge.IComponentDescription;
-import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentListener;
+import jadex.bridge.IComponentManagementService;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IChangeListener;
 import jadex.commons.SimplePropertyObject;
 import jadex.commons.concurrent.IExecutable;
-import jadex.service.IServiceContainer;
+import jadex.service.*;
 import jadex.service.clock.IClockService;
 import jadex.service.clock.ITimedObject;
 import jadex.service.clock.ITimer;
@@ -30,7 +30,7 @@ public class DeltaTimeExecutor extends SimplePropertyObject implements ISpaceExe
 	protected long timestamp;
 	
 	/** The platform. */
-	protected IServiceContainer container;
+	protected IServiceProvider container;
 	
 	/** The clock listener. */
 	protected IChangeListener clocklistener;
@@ -74,7 +74,7 @@ public class DeltaTimeExecutor extends SimplePropertyObject implements ISpaceExe
 
 		final AbstractEnvironmentSpace space = (AbstractEnvironmentSpace)getProperty("space");
 		final boolean tick = getProperty("tick")!=null && ((Boolean)getProperty("tick")).booleanValue();
-		this.container	= space.getContext().getServiceContainer();
+		this.container	= space.getContext().getServiceProvider();
 		final IClockService clockservice = (IClockService)container.getService(IClockService.class);
 		final IExecutionService exeservice = (IExecutionService)container.getService(IExecutionService.class);
 				

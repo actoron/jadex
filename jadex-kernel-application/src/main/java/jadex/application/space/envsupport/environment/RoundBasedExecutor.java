@@ -4,13 +4,13 @@ import jadex.application.space.envsupport.dataview.IDataView;
 import jadex.application.space.envsupport.environment.ComponentActionList.ActionEntry;
 import jadex.application.space.envsupport.evaluation.ITableDataConsumer;
 import jadex.bridge.IComponentDescription;
-import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentListener;
+import jadex.bridge.IComponentManagementService;
 import jadex.commons.ICommand;
 import jadex.commons.SimplePropertyObject;
 import jadex.commons.concurrent.IExecutable;
-import jadex.service.IServiceContainer;
+import jadex.service.IServiceProvider;
 import jadex.service.clock.IClockService;
 import jadex.service.clock.ITimedObject;
 import jadex.service.clock.ITimer;
@@ -86,9 +86,9 @@ public class RoundBasedExecutor extends SimplePropertyObject implements ISpaceEx
 	public void start()
 	{
 		final AbstractEnvironmentSpace space = (AbstractEnvironmentSpace)getProperty("space");
-		IServiceContainer container	= space.getContext().getServiceContainer();
-		final IClockService clockservice = (IClockService)container.getService(IClockService.class);
-		final IExecutionService exeservice = (IExecutionService)container.getService(IExecutionService.class);
+		IServiceProvider provider	= space.getContext().getServiceProvider();
+		final IClockService clockservice = (IClockService)provider.getService(IClockService.class);
+		final IExecutionService exeservice = (IExecutionService)provider.getService(IExecutionService.class);
 
 		Comparator comp = (Comparator)getProperty("comparator");
 		if(comp!=null)
@@ -214,7 +214,7 @@ public class RoundBasedExecutor extends SimplePropertyObject implements ISpaceEx
 		});
 		
 		// Add the executor as context listener on the application.
-		IComponentManagementService	ces	= (IComponentManagementService)container.getService(IComponentManagementService.class);
+		IComponentManagementService	ces	= (IComponentManagementService)provider.getService(IComponentManagementService.class);
 		ces.addComponentListener(space.getContext().getComponentIdentifier(), new IComponentListener()
 		{
 			

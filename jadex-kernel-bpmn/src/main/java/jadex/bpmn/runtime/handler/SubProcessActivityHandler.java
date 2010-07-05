@@ -135,7 +135,7 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 			}
 
 			IComponentManagementService cms = (IComponentManagementService)instance.getComponentAdapter()
-				.getServiceContainer().getService(IComponentManagementService.class);
+				.getServiceProvider().getService(IComponentManagementService.class);
 			
 			thread.setWaiting(true);
 			IFuture ret = cms.createComponent(null, file,

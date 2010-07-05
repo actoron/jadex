@@ -21,7 +21,7 @@ public class DFRemoteDeregisterPlan extends Plan
 		IDFComponentDescription desc = (IDFComponentDescription)getParameter("description").getValue();
 		if(desc==null || desc.getName()==null)
 		{
-			IDF df = (IDF)getScope().getServiceContainer().getService(IDF.class);
+			IDF df = (IDF)getScope().getServiceProvider().getService(IDF.class);
 			desc = df.createDFComponentDescription(getScope().getComponentIdentifier(), null);
 		}
 

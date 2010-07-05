@@ -4,6 +4,7 @@ import jadex.base.fipa.CMSComponentDescription;
 import jadex.base.fipa.ComponentIdentifier;
 import jadex.base.fipa.SearchConstraints;
 import jadex.bridge.CreationInfo;
+import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentFactory;
 import jadex.bridge.IComponentIdentifier;
@@ -88,13 +89,25 @@ public class ComponentManagementService implements IComponentManagementService, 
 	/** The message service (cached to avoid using futures). */
 	protected IMessageService	msgservice;
 	
+	
+	protected IComponentAdapter root;
+	
     //-------- constructors --------
 
-    /**
+	 /**
      *  Create a new component execution service.#
      *  @param container	The service container.
      */
     public ComponentManagementService(IServiceContainer container, boolean autoshutdown)
+	{
+    	this(container, autoshutdown, null);
+	}
+	
+    /**
+     *  Create a new component execution service.#
+     *  @param container	The service container.
+     */
+    public ComponentManagementService(IServiceContainer container, boolean autoshutdown, IComponentAdapter root)
 	{
 		this.container = container;
 		this.autoshutdown = autoshutdown;
@@ -105,6 +118,8 @@ public class ComponentManagementService implements IComponentManagementService, 
 		this.logger = Logger.getLogger(container.getName()+".cms");
 		this.listeners = SCollection.createMultiCollection();
 		this.killresultlisteners = Collections.synchronizedMap(SCollection.createHashMap());
+		
+		this.root = root;
     }
     
     //-------- IComponentManagementService interface --------
@@ -1157,6 +1172,21 @@ public class ComponentManagementService implements IComponentManagementService, 
 	public IFuture	startService()
 	{
 		final Future	ret	= new Future();
+		
+		// add root adapter and register root component
+		if(root!=null)
+		{
+			synchronized(adapters)
+			{
+				synchronized(descs)
+				{
+					adapters.put(root.getComponentIdentifier(), root);
+					IComponentDescription desc = createComponentDescription(root.getComponentIdentifier(), null, null, null, null);
+					descs.put(root.getComponentIdentifier(), desc);
+				}
+			}
+		}
+		
 		final boolean[]	services	= new boolean[2];
 		container.getService(IExecutionService.class).addResultListener(new DefaultResultListener()
 		{

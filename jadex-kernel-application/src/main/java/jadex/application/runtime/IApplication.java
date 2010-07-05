@@ -2,7 +2,7 @@ package jadex.application.runtime;
 
 import jadex.application.model.MApplicationType;
 import jadex.bridge.IComponentIdentifier;
-import jadex.service.IServiceContainer;
+import jadex.service.IServiceProvider;
 
 import java.util.Map;
 
@@ -23,7 +23,7 @@ public interface IApplication
 	 *  Get the service container.
 	 *  @return The service container.
 	 */
-	public IServiceContainer	getServiceContainer();
+	public IServiceProvider	getServiceProvider();
 
 	/**
 	 *  Get the logical component type for a given component id.

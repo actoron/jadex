@@ -19,14 +19,14 @@ public class BuyItemPlan extends Plan
 	 */
 	public void body()
 	{
-		IDF df = (IDF)getScope().getServiceContainer().getService(IDF.class);
+		IDF df = (IDF)getScope().getServiceProvider().getService(IDF.class);
 		IDFServiceDescription sd = df.createDFServiceDescription(null, "shop", null);
 		IDFComponentDescription cd = df.createDFComponentDescription(null, sd);
 		IDFComponentDescription[] ret = (IDFComponentDescription[])df.search(cd, null).get(this);
 		
 		if(ret.length>0)
 		{
-			IComponentManagementService cms = (IComponentManagementService)getScope().getServiceContainer().getService(IComponentManagementService.class);
+			IComponentManagementService cms = (IComponentManagementService)getScope().getServiceProvider().getService(IComponentManagementService.class);
 			IComponentIdentifier cid = ret[0].getName();
 			IExternalAccess exa = (IExternalAccess)cms.getExternalAccess(cid).get(this);
 			IShop shop = (IShop)exa.getService(IShop.class);

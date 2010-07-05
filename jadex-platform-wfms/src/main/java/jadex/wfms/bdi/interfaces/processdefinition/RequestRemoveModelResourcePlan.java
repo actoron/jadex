@@ -22,7 +22,7 @@ public class RequestRemoveModelResourcePlan extends AbstractWfmsPlan
 		IClient proxy = ((RequestProxy) ((Done) acqProxy.getParameter("result").getValue()).getAction()).getClientProxy();
 		try
 		{
-			IProcessDefinitionService pd = (IProcessDefinitionService) getScope().getServiceContainer().getService(IProcessDefinitionService.class);
+			IProcessDefinitionService pd = (IProcessDefinitionService) getScope().getServiceProvider().getService(IProcessDefinitionService.class);
 			RequestRemoveModelResource rrmr = (RequestRemoveModelResource) getParameter("action").getValue();
 			pd.removeProcessResource(proxy, rrmr.getUrl());
 			

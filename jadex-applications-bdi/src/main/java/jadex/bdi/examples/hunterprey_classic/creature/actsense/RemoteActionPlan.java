@@ -61,7 +61,7 @@ public abstract class RemoteActionPlan extends Plan
 
 		if(res==null)
 		{
-			IDF df = (IDF)getScope().getServiceContainer().getService(IDF.class);
+			IDF df = (IDF)getScope().getServiceProvider().getService(IDF.class);
 			IDFServiceDescription sd = df.createDFServiceDescription(null, "hunter-prey environment", null);
 			IDFComponentDescription ad = df.createDFComponentDescription(null, sd);
 			ISearchConstraints	cons = df.createSearchConstraints(-1, 0);

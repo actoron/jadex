@@ -29,7 +29,7 @@ public class StartActivitySubscriptionPlan extends Plan
 			fail();
 		
 		final IBDIExternalAccess agent = getExternalAccess();
-		IClientService cs = (IClientService) getScope().getServiceContainer().getService(IClientService.class);
+		IClientService cs = (IClientService) getScope().getServiceProvider().getService(IClientService.class);
 		IActivityListener listener = new IActivityListener()
 		{
 			public void activityAdded(ActivityEvent event)

@@ -1,21 +1,20 @@
 package jadex.application.bootstrap;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.logging.Logger;
-
 import jadex.application.ApplicationComponentFactory;
 import jadex.application.runtime.impl.Application;
-import jadex.application.runtime.impl.ExternalAccess;
+import jadex.base.fipa.CMSComponentDescription;
+import jadex.base.fipa.ComponentIdentifier;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentAdapter;
-import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentFactory;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.ILoadableComponentModel;
-import jadex.commons.SUtil;
 import jadex.service.IServiceContainer;
+import jadex.service.IServiceProvider;
+import jadex.standalone.StandaloneComponentAdapter;
+
+import java.util.logging.Logger;
 
 /**
  *  Starter class for  
@@ -64,32 +63,36 @@ public class Starter
 		IComponentFactory fac = new ApplicationComponentFactory(null);
 		ILoadableComponentModel model = fac.loadModel("jadex/application/bootstrap/Platform.application.xml", null, null);
 		System.out.println("Model: "+model);
-		DummyAdapter da = new DummyAdapter(new IComponentIdentifier()
-		{
-			public String getPlatformName()
-			{
-				return "horst";
-			}
-			
-			public String getName()
-			{
-				return "root@horst";
-			}
-			
-			public String getLocalName()
-			{
-				return "root";
-			}
-			
-			public String[] getAddresses()
-			{
-				return SUtil.EMPTY_STRING_ARRAY;
-			}
-		});
-		
-		IComponentInstance instance = fac.createComponentInstance(da, model, null, null, null);
-
-		da.setComponent(instance, model, ((Application)instance).internalGetServiceContainer());
+//		DummyAdapter da = new DummyAdapter(new IComponentIdentifier()
+//		{
+//			public String getPlatformName()
+//			{
+//				return "horst";
+//			}
+//			
+//			public String getName()
+//			{
+//				return "root@horst";
+//			}
+//			
+//			public String getLocalName()
+//			{
+//				return "root";
+//			}
+//			
+//			public String[] getAddresses()
+//			{
+//				return SUtil.EMPTY_STRING_ARRAY;
+//			}
+//		});
+		IComponentIdentifier cid = new ComponentIdentifier("root@platform");
+		CMSComponentDescription desc = new CMSComponentDescription(cid, null, null, false, false);
+		StandaloneComponentAdapter adapter = new StandaloneComponentAdapter(null, desc);
+		IComponentInstance instance = fac.createComponentInstance(adapter, model, null, null, null);
+		IServiceContainer sc = ((Application)instance).internalGetServiceContainer();
+		adapter.setComponent(instance, model);
+		adapter.setContainer(sc);
+//		IApplicationExternalAccess ea = new ExternalAccess((Application)instance);
 		System.out.println("Instance: "+instance);
 		
 		while(instance.executeStep())
@@ -111,7 +114,7 @@ class DummyAdapter implements IComponentAdapter
 	//-------- attributes --------
 
 	/** The container. */
-	protected transient IServiceContainer container;
+	protected transient IServiceProvider provider;
 
 	/** The component identifier. */
 	protected IComponentIdentifier cid;
@@ -137,11 +140,11 @@ class DummyAdapter implements IComponentAdapter
 	 *  Set the component.
 	 *  @param component The component to set.
 	 */
-	public void setComponent(IComponentInstance component, ILoadableComponentModel model, IServiceContainer container)
+	public void setComponent(IComponentInstance component, ILoadableComponentModel model, IServiceProvider provider)
 	{
 		this.component = component;
 		this.model = model;
-		this.container = container;
+		this.provider = provider;
 	}	
 	
 	/**
@@ -194,9 +197,9 @@ class DummyAdapter implements IComponentAdapter
 	 *  Get the component platform.
 	 *  @return The component platform.
 	 */
-	public IServiceContainer getServiceContainer()	throws ComponentTerminatedException
+	public IServiceProvider getServiceProvider()	throws ComponentTerminatedException
 	{
-		return container;
+		return provider;
 	}
 
 	/**

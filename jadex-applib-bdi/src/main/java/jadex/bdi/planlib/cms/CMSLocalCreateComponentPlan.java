@@ -6,6 +6,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.commons.IFuture;
 import jadex.service.IServiceContainer;
+import jadex.service.IServiceProvider;
 
 import java.util.Map;
 
@@ -26,7 +27,7 @@ public class CMSLocalCreateComponentPlan extends Plan
 		Map	args	= (Map)getParameter("arguments").getValue();
 		boolean	suspend	= ((Boolean)getParameter("suspend").getValue()).booleanValue();
 		boolean	master	= ((Boolean)getParameter("master").getValue()).booleanValue();
-		IServiceContainer plat	= getScope().getServiceContainer();
+		IServiceProvider plat	= getScope().getServiceProvider();
 		IComponentIdentifier	parent	= (IComponentIdentifier)getParameter("parent").getValue();
 
 		try

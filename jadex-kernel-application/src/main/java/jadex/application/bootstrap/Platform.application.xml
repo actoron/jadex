@@ -29,7 +29,7 @@
 	
 	<componenttypes>
 		<componenttype filename="jadex/micro/KernelMicro.application.xml" name="kernel_micro"/>
-		<componenttype filename="jadex/micro/KernelBDI.application.xml" name="kernel_bdi"/>
+		<componenttype filename="jadex/bdi/KernelBDI.application.xml" name="kernel_bdi"/>
 		<!--  <componenttype filename="jadex/micro/KernelBPMN.application.xml" name="kernel_bpmn"/>-->
 
 		<componenttype filename="jadex/tools/jcc/JCC.agent.xml" name="jcc"/>
@@ -43,7 +43,7 @@
 			new ThreadPoolService(new ThreadPool(new DefaultThreadPoolStrategy(0, 20, 30000)))
 		</service>
 		<service name="cms_service" class="IComponentManagementService">
-			new ComponentManagementService($platform, true)//$platform.isAutoShutdown())
+			new ComponentManagementService($platform, true, $component.getComponentAdapter())//$platform.isAutoShutdown())
 		</service>
 		<service name="df_service" class="IDF">
 			new DirectoryFacilitatorService($platform)

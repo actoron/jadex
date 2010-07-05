@@ -80,7 +80,7 @@ public class CreateCollectionTruckProcess extends SimplePropertyObject implement
 				Map params = new HashMap();
 				params.put("wastebins", todo.toArray());
 				ongoing.addAll(todo);
-				IComponentManagementService	ces	= (IComponentManagementService)app.getServiceContainer().getService(IComponentManagementService.class);
+				IComponentManagementService	ces	= (IComponentManagementService)app.getServiceProvider().getService(IComponentManagementService.class);
 				
 				IFuture ret = ces.createComponent(null, app.getComponentFilename("Truck"),
 					new CreationInfo(null, params, app.getComponentIdentifier(), false, false, false, app.getAllImports()), null);
@@ -93,7 +93,7 @@ public class CreateCollectionTruckProcess extends SimplePropertyObject implement
 					public void resultAvailable(Object source, Object result)
 					{
 						IComponentIdentifier truck = (IComponentIdentifier)result;
-						IComponentManagementService ces = (IComponentManagementService)app.getServiceContainer()
+						IComponentManagementService ces = (IComponentManagementService)app.getServiceProvider()
 							.getService(IComponentManagementService.class);
 						IFuture ret = ces.getExternalAccess(truck);
 						ret.addResultListener(new IResultListener()

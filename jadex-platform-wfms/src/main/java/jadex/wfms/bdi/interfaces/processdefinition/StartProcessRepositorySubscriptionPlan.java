@@ -41,7 +41,7 @@ public class StartProcessRepositorySubscriptionPlan extends AbstractWfmsPlan
 			fail();
 		
 		final IBDIExternalAccess agent = getExternalAccess();
-		IProcessDefinitionService pds = (IProcessDefinitionService) getScope().getServiceContainer().getService(IProcessDefinitionService.class);
+		IProcessDefinitionService pds = (IProcessDefinitionService) getScope().getServiceProvider().getService(IProcessDefinitionService.class);
 		IProcessRepositoryListener listener = new IProcessRepositoryListener()
 		{
 			public void processModelAdded(ProcessRepositoryEvent event)

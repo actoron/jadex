@@ -28,7 +28,7 @@ public class StartWorkitemSubscriptionPlan extends Plan
 			fail();
 		
 		final IBDIExternalAccess agent = getExternalAccess();
-		IClientService cs = (IClientService) getScope().getServiceContainer().getService(IClientService.class);
+		IClientService cs = (IClientService) getScope().getServiceProvider().getService(IClientService.class);
 		IWorkitemListener listener = new IWorkitemListener()
 		{
 			public void workitemRemoved(WorkitemEvent event)

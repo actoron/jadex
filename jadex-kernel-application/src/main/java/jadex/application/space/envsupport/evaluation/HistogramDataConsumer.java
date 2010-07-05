@@ -102,7 +102,7 @@ public class HistogramDataConsumer extends AbstractChartDataConsumer
 			try
 			{
 				IApplication app = getSpace().getContext();
-				ClassLoader cl = ((ILibraryService)app.getServiceContainer().getService(ILibraryService.class)).getClassLoader();
+				ClassLoader cl = ((ILibraryService)app.getServiceProvider().getService(ILibraryService.class)).getClassLoader();
 				ResourceInfo rinfo = getResourceInfo(bgimagefn, app.getApplicationType().getAllImports(), cl);
 				Image image = ImageIO.read(rinfo.getInputStream());
 				rinfo.getInputStream().close();

@@ -18,7 +18,7 @@ public class RequestProcessStartPlan extends Plan
 		Map clientProxies = (Map) getBeliefbase().getBelief("client_proxies").getFact();
 		IClient proxy = (IClient) clientProxies.get(getParameter("initiator").getValue());
 		
-		IClientService cs = (IClientService) getScope().getServiceContainer().getService(IClientService.class);
+		IClientService cs = (IClientService) getScope().getServiceProvider().getService(IClientService.class);
 		
 		try
 		{

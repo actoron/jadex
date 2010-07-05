@@ -821,7 +821,7 @@ public class FipaConversationPanel extends JSplitPane
 	{
 		final Future ret = new Future();
 		
-		agent.getServiceContainer().getService(ILibraryService.class).addResultListener(new DefaultResultListener()
+		agent.getServiceProvider().getService(ILibraryService.class).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
@@ -928,7 +928,7 @@ public class FipaConversationPanel extends JSplitPane
 					
 					if(last)
 					{
-						agent.getServiceContainer().getService(ILibraryService.class).addResultListener(new DefaultResultListener()
+						agent.getServiceProvider().getService(ILibraryService.class).addResultListener(new DefaultResultListener()
 						{
 							public void resultAvailable(Object source, Object result)
 							{

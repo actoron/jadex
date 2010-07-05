@@ -52,7 +52,7 @@ public class DFTestAgent extends MicroAgent
 		setResultValue("testresults", new Testcase(reports.size(), (TestReport[])reports.toArray(new TestReport[reports.size()])));
 
 		// Deregister agent.
-		IDF df = (IDF)getServiceContainer().getService(IDF.class);
+		IDF df = (IDF)getServiceProvider().getService(IDF.class);
 		IDFComponentDescription ad = df.createDFComponentDescription(getComponentIdentifier(), null);
 		df.deregister(ad);
 	}
@@ -65,7 +65,7 @@ public class DFTestAgent extends MicroAgent
 		final TestReport	tr	= new TestReport("#1", "Test DF registration.");
 		reports.add(tr);
 
-		IDF df = (IDF)getServiceContainer().getService(IDF.class);
+		IDF df = (IDF)getServiceProvider().getService(IDF.class);
 		IDFServiceDescription sd = df.createDFServiceDescription(null, "testType", null);
 		IDFComponentDescription ad = df.createDFComponentDescription(getComponentIdentifier(), sd);
 
@@ -97,7 +97,7 @@ public class DFTestAgent extends MicroAgent
 		reports.add(tr);
 
 		// Create a service description to search for.
-		IDF df = (IDF)getServiceContainer().getService(IDF.class);
+		IDF df = (IDF)getServiceProvider().getService(IDF.class);
 		IDFServiceDescription sd = df.createDFServiceDescription(null, "testType", null);
 		IDFComponentDescription ad = df.createDFComponentDescription(null, sd);
 		ISearchConstraints	cons = df.createSearchConstraints(-1, 0);

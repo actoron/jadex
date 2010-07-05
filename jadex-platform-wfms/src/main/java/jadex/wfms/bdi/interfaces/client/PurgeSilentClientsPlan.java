@@ -19,7 +19,7 @@ public class PurgeSilentClientsPlan extends Plan
 		
 		Map heartbeatTimers = (Map) getBeliefbase().getBelief("heartbeat_timers").getFact();
 		Map clientProxies = (Map) getBeliefbase().getBelief("client_proxies").getFact();
-		IClientService cs = (IClientService) getScope().getServiceContainer().getService(IClientService.class);
+		IClientService cs = (IClientService) getScope().getServiceProvider().getService(IClientService.class);
 		
 		long clientTimeout = ((Long) getBeliefbase().getBelief("client_timeout").getFact()).longValue();
 		

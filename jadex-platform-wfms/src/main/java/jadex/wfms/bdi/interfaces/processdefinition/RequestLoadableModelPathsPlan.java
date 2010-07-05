@@ -23,7 +23,7 @@ public class RequestLoadableModelPathsPlan extends AbstractWfmsPlan
 		IClient proxy = ((RequestProxy) ((Done) acqProxy.getParameter("result").getValue()).getAction()).getClientProxy();
 		try
 		{
-			IProcessDefinitionService pd = (IProcessDefinitionService) getScope().getServiceContainer().getService(IProcessDefinitionService.class);
+			IProcessDefinitionService pd = (IProcessDefinitionService) getScope().getServiceProvider().getService(IProcessDefinitionService.class);
 			Set processModelPaths= pd.getLoadableModelPaths(proxy);
 			
 			RequestLoadableModelPaths rqlmp = (RequestLoadableModelPaths) getParameter("action").getValue();

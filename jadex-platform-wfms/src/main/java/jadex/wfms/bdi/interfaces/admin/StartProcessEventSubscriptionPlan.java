@@ -25,7 +25,7 @@ public class StartProcessEventSubscriptionPlan extends AbstractWfmsPlan
 		IClient proxy = ((RequestProxy) ((Done) acqProxy.getParameter("result").getValue()).getAction()).getClientProxy();
 		
 		final IBDIExternalAccess agent = getExternalAccess();
-		IAdministrationService as = (IAdministrationService) getScope().getServiceContainer().getService(IAdministrationService.class);
+		IAdministrationService as = (IAdministrationService) getScope().getServiceProvider().getService(IAdministrationService.class);
 		IProcessListener listener = new IProcessListener()
 		{
 			public void processFinished(ProcessEvent event)

@@ -353,7 +353,7 @@ public class AlarmSettingsDialog extends JDialog
 		if(alarm==null)
 		{
 			alarm = new Alarm();
-			IClockService cs = (IClockService)agent.getServiceContainer().getService(IClockService.class);
+			IClockService cs = (IClockService)agent.getServiceProvider().getService(IClockService.class);
 			alarm.setTime(new Time(new Date(cs.getTime())));
 //			alarm.setClock((IClockService)agent.getServiceContainer().getService(IClockService.class));
 		}

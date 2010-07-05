@@ -17,6 +17,7 @@ import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IExecutable;
 import jadex.commons.concurrent.IResultListener;
 import jadex.service.IServiceContainer;
+import jadex.service.IServiceProvider;
 import jadex.service.execution.IExecutionService;
 import jadex.standalone.service.ComponentManagementService;
 
@@ -46,7 +47,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	//-------- attributes --------
 
 	/** The container. */
-	protected transient IServiceContainer container;
+	protected transient IServiceProvider container;
 
 	/** The component identifier. */
 	protected IComponentIdentifier cid;
@@ -100,7 +101,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	 *  Create a new component adapter.
 	 *  Uses the thread pool for executing the component.
 	 */
-	public StandaloneComponentAdapter(IServiceContainer container, IComponentDescription desc)
+	public StandaloneComponentAdapter(IServiceProvider container, IComponentDescription desc)
 	{
 		this.container = container;
 		this.desc	= desc;
@@ -117,6 +118,14 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 		this.component = component;
 		this.model = model;
 	}	
+	
+	/**
+	 * 
+	 */
+	public void setContainer(IServiceContainer container)
+	{
+		this.container = container;
+	}
 	
 	//-------- IComponentAdapter methods --------
 
@@ -188,7 +197,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	 *  Get the container.
 	 *  @return The container of this component.
 	 */
-	public IServiceContainer getServiceContainer()
+	public IServiceProvider getServiceProvider()
 	{
 		return container;
 	}

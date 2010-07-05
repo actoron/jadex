@@ -17,6 +17,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.rules.state.IOAVState;
 import jadex.service.IServiceContainer;
+import jadex.service.IServiceProvider;
 
 import java.util.logging.Logger;
 
@@ -361,7 +362,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	 *  Get the agent platform
 	 *  @return The agent platform.
 	 */
-	public IServiceContainer getServiceContainer()
+	public IServiceProvider getServiceProvider()
 	{
 		if(getInterpreter().isExternalThread())
 		{
@@ -369,14 +370,14 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 			{
 				public void run()
 				{
-					object = adapter.getServiceContainer();
+					object = adapter.getServiceProvider();
 				}
 			};
 			return (IServiceContainer)invoc.object;
 		}
 		else
 		{
-			return adapter.getServiceContainer();
+			return adapter.getServiceProvider();
 		}
 	}
 	

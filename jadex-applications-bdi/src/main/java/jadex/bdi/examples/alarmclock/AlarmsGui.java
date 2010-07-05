@@ -76,7 +76,7 @@ public class AlarmsGui extends JFrame
 		tadata.setColumnClass(Boolean.class, 2);
 		tadata.setColumnEditable(true, 2);
 		
-		agent.getServiceContainer().getService(IClockService.class).addResultListener(new SwingDefaultResultListener()
+		agent.getServiceProvider().getService(IClockService.class).addResultListener(new SwingDefaultResultListener()
 		{
 			public void customResultAvailable(Object source, Object result)
 			{

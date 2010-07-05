@@ -16,7 +16,7 @@ public class DFLocalDeregisterPlan extends Plan
 	 */
 	public void body()
 	{
-		IDF	dfservice	= (IDF)getScope().getServiceContainer().getService(IDF.class).get(this);
+		IDF	dfservice	= (IDF)getScope().getServiceProvider().getService(IDF.class).get(this);
 		
 		// In case of a remote request the agent description is already
 		// set via the remote deregister plan.

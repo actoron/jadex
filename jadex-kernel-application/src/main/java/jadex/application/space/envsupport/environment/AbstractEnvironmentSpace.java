@@ -386,7 +386,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 				if(owner==null)
 					throw new RuntimeException("Attribute 'owner' required for avatar: "+mobj);
 				IComponentIdentifier	ownerid	= null;
-				IComponentManagementService ces = ((IComponentManagementService)context.getServiceContainer().getService(IComponentManagementService.class));
+				IComponentManagementService ces = ((IComponentManagementService)context.getServiceProvider().getService(IComponentManagementService.class));
 				if(owner.indexOf("@")!=-1)
 					ownerid	= ces.createComponentIdentifier((String)owner, false);
 				else
@@ -552,14 +552,14 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 					}
 				}
 				
-				context.getServiceContainer().getService(ILibraryService.class).addResultListener(new DefaultResultListener()
+				context.getServiceProvider().getService(ILibraryService.class).addResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object source, Object result)
 					{
 						final ObserverCenter oc = new ObserverCenter(title, AbstractEnvironmentSpace.this, (ILibraryService)result, plugins,
 								killonexit!=null ? killonexit.booleanValue() : true);
 										
-						context.getServiceContainer().getService(IComponentManagementService.class).addResultListener(new DefaultResultListener()
+						context.getServiceProvider().getService(IComponentManagementService.class).addResultListener(new DefaultResultListener()
 						{
 							public void resultAvailable(Object source, Object result)
 							{
@@ -981,7 +981,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 						{
 						}
 					};
-					IComponentManagementService cms = (IComponentManagementService)getContext().getServiceContainer().getService(IComponentManagementService.class);
+					IComponentManagementService cms = (IComponentManagementService)getContext().getServiceProvider().getService(IComponentManagementService.class);
 					IComponentIdentifier cid = cms.generateComponentIdentifier(typename);
 					setOwner(fid, cid);
 					IFuture fut = cms.createComponent(cid.getLocalName(), getContext().getComponentFilename(componenttype),
@@ -1091,7 +1091,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 				AvatarMapping mapping = getAvatarMapping(componenttype, objecttype);
 				if(mapping.isKillComponent())
 				{
-					IComponentManagementService ces = (IComponentManagementService)getContext().getServiceContainer().getService(IComponentManagementService.class);
+					IComponentManagementService ces = (IComponentManagementService)getContext().getServiceProvider().getService(IComponentManagementService.class);
 					ces.destroyComponent(component);
 				}
 			}

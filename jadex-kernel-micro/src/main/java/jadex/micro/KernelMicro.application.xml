@@ -14,7 +14,7 @@
 	</imports>
 	
 	<services>
-		<service name="component_factory" class="IComponentFactory">
+		<service name="mirco_factory" class="IComponentFactory">
 			new MicroAgentFactory($platform, SUtil.createHashMap(
 				new String[]
 				{

@@ -59,7 +59,7 @@ public abstract class RemoteActionPlan extends Plan
 
 		if(res==null)
 		{
-			IDF df = (IDF)getScope().getServiceContainer().getService(IDF.class);
+			IDF df = (IDF)getScope().getServiceProvider().getService(IDF.class);
 			IDFServiceDescription sd = df.createDFServiceDescription(null, "dispatch vision", null);
 			IDFComponentDescription ad = df.createDFComponentDescription(null, sd);
 				

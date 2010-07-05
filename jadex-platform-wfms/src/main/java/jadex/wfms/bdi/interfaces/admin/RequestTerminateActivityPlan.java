@@ -25,7 +25,7 @@ public class RequestTerminateActivityPlan extends AbstractWfmsPlan
 		try
 		{
 			RequestTerminateActivity rta = (RequestTerminateActivity) getParameter("action").getValue();
-			IAdministrationService as = (IAdministrationService) getScope().getServiceContainer().getService(IAdministrationService.class);
+			IAdministrationService as = (IAdministrationService) getScope().getServiceProvider().getService(IAdministrationService.class);
 			as.terminateActivity(proxy, rta.getActivity());
 			
 			rta.setActivity(null);

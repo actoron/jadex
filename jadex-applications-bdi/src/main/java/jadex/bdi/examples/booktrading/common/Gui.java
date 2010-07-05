@@ -320,7 +320,7 @@ public class Gui extends JFrame
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				while(dia.requestInput(((IClockService)agent.getServiceContainer().getService(IClockService.class)).getTime()))
+				while(dia.requestInput(((IClockService)agent.getServiceProvider().getService(IClockService.class)).getTime()))
 				{
 					try
 					{
@@ -329,7 +329,7 @@ public class Gui extends JFrame
 						int start = Integer.parseInt(dia.start.getText());
 						Date deadline = dformat.parse(dia.deadline.getText());
 						final Order order = new Order(title, deadline, start, limit, buy, 
-							(IClockService)agent.getServiceContainer().getService(IClockService.class));
+							(IClockService)agent.getServiceProvider().getService(IClockService.class));
 						
 						agent.createGoal(goalname).addResultListener(new DefaultResultListener()
 						{
@@ -404,7 +404,7 @@ public class Gui extends JFrame
 					edit_dialog.start.setText(Integer.toString(order.getStartPrice()));
 					edit_dialog.deadline.setText(dformat.format(order.getDeadline()));
 
-					while(edit_dialog.requestInput(((IClockService)agent.getServiceContainer().getService(IClockService.class)).getTime()))
+					while(edit_dialog.requestInput(((IClockService)agent.getServiceProvider().getService(IClockService.class)).getTime()))
 					{
 						try
 						{
@@ -565,7 +565,7 @@ public class Gui extends JFrame
 
 			// Add some default entry for easy testing of the gui.
 			// This order are not added to the agent (see manager.agent.xml).
-			agent.getServiceContainer().getService(IClockService.class).addResultListener(new SwingDefaultResultListener()
+			agent.getServiceProvider().getService(IClockService.class).addResultListener(new SwingDefaultResultListener()
 			{
 				
 				public void customResultAvailable(Object source, Object result)

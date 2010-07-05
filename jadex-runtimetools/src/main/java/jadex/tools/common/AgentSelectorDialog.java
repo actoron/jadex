@@ -192,7 +192,7 @@ public class AgentSelectorDialog
 		// Todo: fetch agent lists from added remote platforms.
 		
 		// todo: show errors in option panel
-		agent.getServiceContainer().getService(IComponentManagementService.class).addResultListener(new DefaultResultListener()
+		agent.getServiceProvider().getService(IComponentManagementService.class).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
@@ -273,7 +273,7 @@ public class AgentSelectorDialog
 	 */
 	protected void refreshSelectedTree()
 	{
-		agent.getServiceContainer().getService(IComponentManagementService.class).addResultListener(new DefaultResultListener()
+		agent.getServiceProvider().getService(IComponentManagementService.class).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
@@ -400,10 +400,10 @@ public class AgentSelectorDialog
 		removeall.setEnabled(sellist.size()>0);
 		ok.setEnabled(!singleselection || sellist.size()>0);
 		
-		this.tree = new ComponentTreeTable(agent.getServiceContainer());
+		this.tree = new ComponentTreeTable(agent.getServiceProvider());
 		this.tree.setPreferredSize(new Dimension(200, 100));
 		tree.getTreetable().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		this.seltree = new ComponentTreeTable(agent.getServiceContainer());
+		this.seltree = new ComponentTreeTable(agent.getServiceProvider());
 		this.seltree.setPreferredSize(new Dimension(200, 100));
 		seltree.getTreetable().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		seltree.getTreetable().getTree().setRootVisible(false);	// Don't show platform node.
@@ -486,7 +486,7 @@ public class AgentSelectorDialog
 						if(val instanceof IComponentDescription)
 						{
 							// Use clone to keep original aid unchanged.
-							agent.getServiceContainer().getService(IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
+							agent.getServiceProvider().getService(IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
 							{
 								public void customResultAvailable(Object source, Object result)
 								{
@@ -533,7 +533,7 @@ public class AgentSelectorDialog
 					final Object val = ((DefaultTreeTableNode)tree.getTreetable().getTree().getPathForRow(tree.getTreetable().getSelectionModel().getMinSelectionIndex()).getLastPathComponent()).getUserObject();
 					if(val instanceof IComponentDescription)
 					{
-						agent.getServiceContainer().getService(IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
+						agent.getServiceProvider().getService(IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
 						{
 							public void customResultAvailable(Object source, Object result)
 							{
@@ -550,7 +550,7 @@ public class AgentSelectorDialog
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				agent.getServiceContainer().getService(IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
+				agent.getServiceProvider().getService(IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
 				{
 					public void customResultAvailable(Object source, Object result)
 					{

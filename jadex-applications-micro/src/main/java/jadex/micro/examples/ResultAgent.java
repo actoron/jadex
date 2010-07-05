@@ -29,7 +29,7 @@ public class ResultAgent extends MicroAgent
 		{
 			setResultValue("result", "not last: "+getAgentName()+": "+Math.random());
 			
-			IComponentManagementService ces = (IComponentManagementService)getServiceContainer()
+			IComponentManagementService ces = (IComponentManagementService)getServiceProvider()
 				.getService(IComponentManagementService.class);
 			
 			ces.createComponent(null, getClass().getName()+".class", new CreationInfo(getComponentIdentifier()), createResultListener(new IResultListener()

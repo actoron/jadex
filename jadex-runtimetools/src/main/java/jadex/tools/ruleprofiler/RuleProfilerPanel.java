@@ -75,7 +75,7 @@ public class RuleProfilerPanel	extends JPanel
 		this.agent	= agent;
 		this.observed	= observed;
 
-		agent.getServiceContainer().getService(IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
+		agent.getServiceProvider().getService(IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
 		{
 			public void customResultAvailable(Object source, Object result)
 			{

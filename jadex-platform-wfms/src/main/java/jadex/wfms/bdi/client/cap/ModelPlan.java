@@ -42,14 +42,14 @@ public class ModelPlan extends AbstractWfmsPlan
 				if (reqM.getFileName().endsWith(".bpmn"))
 				{
 					BpmnModelLoader ml = new BpmnModelLoader();
-					ml.setClassLoader(((ILibraryService) getScope().getServiceContainer().getService(ILibraryService.class)).getClassLoader());
+					ml.setClassLoader(((ILibraryService) getScope().getServiceProvider().getService(ILibraryService.class)).getClassLoader());
 					model = ml.loadBpmnModel(tmpFile.getAbsolutePath(), new String[0]);
 					((MBpmnModel) model).setName(reqM.getFileName().substring(0, reqM.getFileName().length() - 5));
 				}
 				else
 				{
 					GpmnModelLoader ml = new GpmnModelLoader();
-					ml.setClassLoader(((ILibraryService) getScope().getServiceContainer().getService(ILibraryService.class)).getClassLoader());
+					ml.setClassLoader(((ILibraryService) getScope().getServiceProvider().getService(ILibraryService.class)).getClassLoader());
 					model = ml.loadGpmnModel(tmpFile.getAbsolutePath(), new String[0]);
 				}
 				tmpFile.delete();

@@ -7,7 +7,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IMessageService;
 import jadex.bridge.MessageType;
 import jadex.commons.concurrent.IResultListener;
-import jadex.service.IServiceContainer;
+import jadex.service.IServiceProvider;
 import jadex.service.clock.IClockService;
 import jadex.service.clock.ITimedObject;
 import jadex.service.clock.ITimer;
@@ -131,9 +131,9 @@ public abstract class MicroAgent implements IMicroAgent
 	 *  Get the agent platform.
 	 *  @return The agent platform. 
 	 */
-	public IServiceContainer getServiceContainer()
+	public IServiceProvider getServiceProvider()
 	{
-		return interpreter.getAgentAdapter().getServiceContainer();
+		return interpreter.getAgentAdapter().getServiceProvider();
 	}
 	
 	/**
@@ -189,7 +189,7 @@ public abstract class MicroAgent implements IMicroAgent
 	 */
 	public long getTime()
 	{
-		return ((IClockService)getServiceContainer().getService(IClockService.class)).getTime();
+		return ((IClockService)getServiceProvider().getService(IClockService.class)).getTime();
 	}
 	
 	/**
@@ -201,7 +201,7 @@ public abstract class MicroAgent implements IMicroAgent
 	{
 		if(timer!=null)
 			throw new RuntimeException("timer should be null");
-		this.timer = ((IClockService)getServiceContainer().getService(IClockService.class)).createTimer(time, new ITimedObject()
+		this.timer = ((IClockService)getServiceProvider().getService(IClockService.class)).createTimer(time, new ITimedObject()
 		{
 			public void timeEventOccurred(long currenttime)
 			{
@@ -230,7 +230,7 @@ public abstract class MicroAgent implements IMicroAgent
 	{
 		if(timer!=null)
 			throw new RuntimeException("timer should be null");
-		this.timer = ((IClockService)getServiceContainer().getService(IClockService.class)).createTickTimer(new ITimedObject()
+		this.timer = ((IClockService)getServiceProvider().getService(IClockService.class)).createTickTimer(new ITimedObject()
 		{
 			public void timeEventOccurred(final long currenttime)
 			{
@@ -265,7 +265,7 @@ public abstract class MicroAgent implements IMicroAgent
 	 */
 	public void killAgent()
 	{
-		((IComponentManagementService)interpreter.getAgentAdapter().getServiceContainer()
+		((IComponentManagementService)interpreter.getAgentAdapter().getServiceProvider()
 			.getService(IComponentManagementService.class))
 			.destroyComponent(interpreter.getAgentAdapter().getComponentIdentifier());
 	}
@@ -277,7 +277,7 @@ public abstract class MicroAgent implements IMicroAgent
 	 */
 	public void sendMessage(Map me, MessageType mt)
 	{
-		((IMessageService)getServiceContainer().getService(IMessageService.class)).
+		((IMessageService)getServiceProvider().getService(IMessageService.class)).
 			sendMessage(me, mt, interpreter.getAgentAdapter(), interpreter.getAgentModel().getClassLoader());
 //			sendMessage(me, mt, getComponentIdentifier(), interpreter.getAgentModel().getClassLoader());
 	}
@@ -315,7 +315,7 @@ public abstract class MicroAgent implements IMicroAgent
 	 */
 	public IComponentIdentifier createComponentIdentifier(final String name, final boolean local, final String[] addresses)
 	{
-		IComponentManagementService cms = (IComponentManagementService)interpreter.getAgentAdapter().getServiceContainer().getService(IComponentManagementService.class);	
+		IComponentManagementService cms = (IComponentManagementService)interpreter.getAgentAdapter().getServiceProvider().getService(IComponentManagementService.class);	
 		return cms.createComponentIdentifier(name, local, addresses);
 	}
 	
@@ -326,7 +326,7 @@ public abstract class MicroAgent implements IMicroAgent
 	 */
 	public Map createReply(Map msg, MessageType mt)
 	{
-		IMessageService ms = (IMessageService)interpreter.getAgentAdapter().getServiceContainer().getService(IMessageService.class);	
+		IMessageService ms = (IMessageService)interpreter.getAgentAdapter().getServiceProvider().getService(IMessageService.class);	
 		return ms.createReply(msg, mt);
 	}
 	

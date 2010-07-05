@@ -26,7 +26,7 @@ public class RequestAddModelResourcePlan extends AbstractWfmsPlan
 		IClient proxy = ((RequestProxy) ((Done) acqProxy.getParameter("result").getValue()).getAction()).getClientProxy();
 		try
 		{
-			IProcessDefinitionService pd = (IProcessDefinitionService) getScope().getServiceContainer().getService(IProcessDefinitionService.class);
+			IProcessDefinitionService pd = (IProcessDefinitionService) getScope().getServiceProvider().getService(IProcessDefinitionService.class);
 			RequestAddModelResource ramr = (RequestAddModelResource) getParameter("action").getValue();
 			File resourceFile = File.createTempFile(ramr.getResourceName().substring(0, ramr.getResourceName().length() - 4), ".jar");
 			byte[] resource = ramr.decodeResource();

@@ -240,8 +240,8 @@ public class BpmnInterpreter implements IComponentInstance
 		}
 		
 		// Initialize context variables.
-		variables.put("$platform", getComponentAdapter().getServiceContainer());
-		variables.put("$clock", getComponentAdapter().getServiceContainer().getService(IClockService.class));
+		variables.put("$platform", getComponentAdapter().getServiceProvider());
+		variables.put("$clock", getComponentAdapter().getServiceProvider().getService(IClockService.class));
 		variables.put("$interpreter", this);
 		
 		Set	vars	= model.getContextVariables();
@@ -303,7 +303,7 @@ public class BpmnInterpreter implements IComponentInstance
 			if(!finishing && isFinished(pool, lane))
 			{
 				finishing = true;
-				adapter.getServiceContainer().getService(IComponentManagementService.class).addResultListener(new DefaultResultListener()
+				adapter.getServiceProvider().getService(IComponentManagementService.class).addResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object source, Object result)
 					{
@@ -1127,7 +1127,7 @@ public class BpmnInterpreter implements IComponentInstance
 	 */
 	public IComponentIdentifier createComponentIdentifier(String name, boolean local, String[] addresses)
 	{
-		IComponentManagementService cms = (IComponentManagementService)adapter.getServiceContainer().getService(IComponentManagementService.class);
+		IComponentManagementService cms = (IComponentManagementService)adapter.getServiceProvider().getService(IComponentManagementService.class);
 		return cms.createComponentIdentifier(name, local, addresses);
 	}
 	
@@ -1148,7 +1148,7 @@ public class BpmnInterpreter implements IComponentInstance
 	 */
 	public Map createReply(Map msg, MessageType mt)
 	{
-		IMessageService ms = (IMessageService)getComponentAdapter().getServiceContainer().getService(IMessageService.class);	
+		IMessageService ms = (IMessageService)getComponentAdapter().getServiceProvider().getService(IMessageService.class);	
 		return ms.createReply(msg, mt);
 	}
 	

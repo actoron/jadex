@@ -26,7 +26,7 @@ public class DFLocalRegisterPlan extends Plan
 		// When AID is ommited, enter self. Hack???
 		if(desc.getName()==null || lt!=null)
 		{
-			IDF	dfservice	= (IDF)getScope().getServiceContainer().getService(IDF.class).get(this);
+			IDF	dfservice	= (IDF)getScope().getServiceProvider().getService(IDF.class).get(this);
 			IComponentIdentifier	bid	= desc.getName()!=null ? desc.getName() : getScope().getComponentIdentifier();
 			Date	leasetime	= lt==null ? desc.getLeaseTime() : new Date(getTime()+lt.longValue());
 			desc	= dfservice.createDFComponentDescription(bid, desc.getServices(), desc.getLanguages(), desc.getOntologies(), desc.getProtocols(), leasetime);
@@ -34,7 +34,7 @@ public class DFLocalRegisterPlan extends Plan
 
 		getLogger().info("Trying to register: "+desc);
 
-		IFuture ret = ((IDF)getScope().getServiceContainer().getService(IDF.class).get(this)).register(desc);
+		IFuture ret = ((IDF)getScope().getServiceProvider().getService(IDF.class).get(this)).register(desc);
 		// todo: supply return value or throw exception?
 		desc = (IDFComponentDescription)ret.get(this);
 

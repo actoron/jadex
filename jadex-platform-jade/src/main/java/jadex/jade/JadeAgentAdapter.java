@@ -20,7 +20,7 @@ import jadex.commons.ICommand;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.IResultListener;
 import jadex.jade.service.ComponentManagementService;
-import jadex.service.IServiceContainer;
+import jadex.service.IServiceProvider;
 import jadex.service.clock.IClockService;
 
 import java.io.IOException;
@@ -386,7 +386,7 @@ public class JadeAgentAdapter extends Agent implements IComponentAdapter, Serial
 	 *  Get the platform.
 	 *  @return the platform of this agent
 	 */
-	public IServiceContainer getServiceContainer()
+	public IServiceProvider getServiceProvider()
 	{
 		if(IComponentDescription.STATE_TERMINATED.equals(state))
 			throw new ComponentTerminatedException(getComponentIdentifier().getName());

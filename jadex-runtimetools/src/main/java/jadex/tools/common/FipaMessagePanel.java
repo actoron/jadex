@@ -302,7 +302,7 @@ public class FipaMessagePanel extends JPanel
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				agent.getServiceContainer().getService(IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
+				agent.getServiceProvider().getService(IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
 				{
 					public void customResultAvailable(Object source, Object result)
 					{
@@ -329,7 +329,7 @@ public class FipaMessagePanel extends JPanel
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				agent.getServiceContainer().getService(IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
+				agent.getServiceProvider().getService(IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
 				{
 					public void customResultAvailable(Object source, Object result)
 					{
@@ -356,7 +356,7 @@ public class FipaMessagePanel extends JPanel
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				agent.getServiceContainer().getService(IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
+				agent.getServiceProvider().getService(IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
 				{
 					public void customResultAvailable(Object source, Object result)
 					{
