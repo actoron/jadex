@@ -15,7 +15,6 @@
 		<import>jadex.base.envsupport.environment.space2d.*</import>
 		<import>jadex.base.envsupport.environment.*</import>
 		<import>jadex.base.envsupport.math.*</import>
-		<!-- <import>jadex.commons.*</import> -->
 		<import>jadex.base.fipa.*</import>
 		<import>java.util.Map</import>
 		<import>java.util.HashMap</import>
@@ -82,8 +81,8 @@
 		-->
 		<belief name="simulationDescriptionFile" class="String"/>			
 
-		<!--  The parsed simulation configuration xml file. -->
-		<belief name="tmpGUI" class="ControlCenter" />
+		<!--  Reference to the GUI. -->
+		<!-- <belief name="tmpGUI" class="ControlCenter" /> -->
 
 		<!-- TMP: Counter used for MemoryLogger -->
 		<belief name="memoryLoggerCounter" class="int">

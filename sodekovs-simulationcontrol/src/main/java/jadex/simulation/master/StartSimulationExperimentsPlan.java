@@ -1,23 +1,36 @@
 package jadex.simulation.master;
 
+import jadex.application.runtime.IApplicationExternalAccess;
+import jadex.application.space.envsupport.MEnvSpaceInstance;
+import jadex.application.space.envsupport.environment.AbstractEnvironmentSpace;
+import jadex.application.space.envsupport.evaluation.DefaultDataProvider;
+import jadex.application.space.envsupport.evaluation.IObjectSource;
+import jadex.application.space.envsupport.evaluation.ITableDataConsumer;
+import jadex.application.space.envsupport.evaluation.ITableDataProvider;
+import jadex.application.space.envsupport.evaluation.SpaceObjectSource;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
-import jadex.commons.concurrent.IResultListener;
-import jadex.service.clock.IClockService;
-import jadex.simulation.controlcenter.ControlCenter;
+import jadex.commons.IFuture;
+import jadex.javaparser.IExpressionParser;
+import jadex.javaparser.IParsedExpression;
+import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 import jadex.simulation.helper.Constants;
+import jadex.simulation.model.Data;
+import jadex.simulation.model.Dataprovider;
 import jadex.simulation.model.ObservedEvent;
 import jadex.simulation.model.Optimization;
 import jadex.simulation.model.SimulationConfiguration;
+import jadex.simulation.model.Source;
 import jadex.simulation.model.result.ExperimentResult;
 import jadex.simulation.model.result.IntermediateResult;
 import jadex.simulation.model.result.RowResult;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class StartSimulationExperimentsPlan extends Plan {
@@ -66,8 +79,9 @@ public class StartSimulationExperimentsPlan extends Plan {
 		}
 
 		// update GUI: create new panel/table for new ensemble
-		ControlCenter gui = (ControlCenter) getBeliefbase().getBelief("tmpGUI").getFact();
-		gui.createNewEnsembleTable(rowCounter);
+		// ControlCenter gui = (ControlCenter)
+		// getBeliefbase().getBelief("tmpGUI").getFact();
+		// gui.createNewEnsembleTable(rowCounter);
 
 		for (long i = 0; i < experimentsPerRowToMake; i++) {
 
@@ -93,7 +107,7 @@ public class StartSimulationExperimentsPlan extends Plan {
 			expInRow++;
 
 			// update static part of control center
-			gui.updateStaticTable(rowCounter, expInRow);
+			// gui.updateStaticTable(rowCounter, expInRow);
 
 			waitForInternalEvent("triggerNewExperiment");
 			System.out.println("#StartSimulationExpPlan# Received Results of Client!!!!");
@@ -186,9 +200,12 @@ public class StartSimulationExperimentsPlan extends Plan {
 		try {
 			IComponentManagementService executionService = (IComponentManagementService) getScope().getServiceContainer().getService(IComponentManagementService.class);
 
-			// executionService.createComponent(appName, fileName, configName,
-			// args, false, null, null, null, false);
-			executionService.createComponent(appName, fileName, new CreationInfo(configName, args, null, false, false), null);
+			// create application in order to add additional components to
+			// application
+			IFuture fut = executionService.createComponent(appName, fileName, new CreationInfo(configName, args, null, false, false), null);
+			IComponentIdentifier comp = (IComponentIdentifier) fut.get(this);
+			// add data consumer and provider
+			addDataConsumerAndProvider(comp, executionService, (SimulationConfiguration) ((Map) args.get(Constants.SIMULATION_FACTS_FOR_CLIENT)).get(Constants.SIMULATION_FACTS_FOR_CLIENT));
 
 		} catch (Exception e) {
 			// JOptionPane.showMessageDialog(SGUI.getWindowParent(StarterPanel.this),
@@ -218,16 +235,16 @@ public class StartSimulationExperimentsPlan extends Plan {
 				int step = opt.getParameterSweeping().getConfiguration().getStep();
 				int currentVal = opt.getParameterSweeping().getCurrentValue();
 				val = currentVal + step;
-				
+
 			}
 			// iterate through list of parameters
 		} else if (opt.getParameterSweeping().getType().equalsIgnoreCase(Constants.OPTIMIZATION_TYPE_LIST)) {
 			if (opt.getParameterSweeping().getParameterSweepCounter() == 0) {
 				val = Integer.valueOf(opt.getParameterSweeping().getConfiguration().getValuesAsList().get(0));
-				
+
 			} else {
 				val = Integer.valueOf(opt.getParameterSweeping().getConfiguration().getValuesAsList().get(opt.getParameterSweeping().getParameterSweepCounter()));
-				
+
 			}
 		} else {
 			System.err.println("#StartSimulationExperiment# Error on identifying type for sweeping parameter(s): " + opt.getParameterSweeping().getType());
@@ -239,5 +256,104 @@ public class StartSimulationExperimentsPlan extends Plan {
 
 		// parametrize application-xml
 		args.put(parameterName, new Integer(val));
+	}
+
+	private void addDataConsumerAndProvider(IComponentIdentifier comp, IComponentManagementService executionService, SimulationConfiguration simConf) {
+		IFuture fut = executionService.getExternalAccess(comp);
+		IApplicationExternalAccess exta = (IApplicationExternalAccess) fut.get(this);
+//		AbstractEnvironmentSpace space = (AbstractEnvironmentSpace) exta.getSpace("my2dspace");
+
+		
+		
+		// Hack: Make sure space has been initialized...
+		int counterTmp = 0;
+		executionService.suspendComponent(comp);
+		
+		while (exta.getSpace("my2dspace") == null) {
+			counterTmp++;
+			waitFor(250);			
+		}		
+		executionService.resumeComponent(comp);
+		
+		AbstractEnvironmentSpace space = (AbstractEnvironmentSpace) exta.getSpace("my2dspace");
+		IExpressionParser parser = new JavaCCExpressionParser();
+
+		// add new data provider
+		List<Dataprovider> providers = simConf.getDataproviderList();
+		// List tmp = si.getPropertyList("dataproviders");
+
+		// if(providers==null && tmp!=null)
+		// providers = tmp;
+		// else if(providers!=null && tmp!=null)
+		// providers.addAll(tmp);
+
+		// System.out.println("data providers: "+providers);
+		if (providers != null) {
+			// iteration through all dataprovider
+			for (int i = 0; i < providers.size(); i++) {
+				// Map dcol = (Map)providers.get(i);
+
+				List<Source> sources = providers.get(i).getSourceList();
+				IObjectSource[] provs = new IObjectSource[sources.size()];
+				for (int j = 0; j < sources.size(); j++) {
+					Source source = sources.get(j);
+					String varname = source.getName() != null ? source.getName() : "$object";
+					String objecttype = source.getObjecttype();
+					boolean aggregate = source.isAggregate();
+					IParsedExpression dataexp = getParsedExpression(source.getValue(), parser);
+					IParsedExpression includeexp = getParsedExpression(source.getIncludecondition(), parser);// 
+					provs[j] = new SpaceObjectSource(varname, space, objecttype, aggregate, dataexp, includeexp);
+				}
+
+				String tablename = providers.get(i).getName();
+				List<Data> subdatas = providers.get(i).getDataList();
+				String[] columnnames = new String[subdatas.size()];
+				IParsedExpression[] exps = new IParsedExpression[subdatas.size()];
+				for (int j = 0; j < subdatas.size(); j++) {
+					Data subdata = subdatas.get(j);
+					columnnames[j] = subdata.getName();
+					exps[j] = getParsedExpression(subdata.getValue(), parser);
+				}
+
+				ITableDataProvider tprov = new DefaultDataProvider(space, provs, tablename, columnnames, exps);
+				space.addDataProvider(tablename, tprov);
+			}
+		}
+		
+		// Create the data consumers.
+		List consumers = mspacetype.getPropertyList("dataconsumers");
+		tmp = si.getPropertyList("dataconsumers");
+		
+		if(consumers==null && tmp!=null)
+			consumers = tmp;
+		else if(consumers!=null && tmp!=null)
+			consumers.addAll(tmp);
+		
+//		System.out.println("data consumers: "+consumers);
+		if(consumers!=null)
+		{
+			for(int i=0; i<consumers.size(); i++)
+			{
+				Map dcon = (Map)consumers.get(i);
+				String name = (String)MEnvSpaceInstance.getProperty(dcon, "name");
+				Class clazz = (Class)MEnvSpaceInstance.getProperty(dcon, "class");
+				ITableDataConsumer con = (ITableDataConsumer)clazz.newInstance();
+				MEnvSpaceInstance.setProperties(con, (List)dcon.get("properties"), fetcher);
+				con.setProperty("envspace", this);
+				this.addDataConsumer(name, con);
+			}
+		}
+System.out.println("nnnnnnnnnnneded iterations: " + counterTmp);
+	}
+
+	/**
+	 * Helper method to convert string into parsed expression
+	 * 
+	 * @param expression
+	 * @param parser
+	 * @return
+	 */
+	private IParsedExpression getParsedExpression(String expression, IExpressionParser parser) {
+		return expression == null ? null : parser.parseExpression(expression, null, null, null);
 	}
 }

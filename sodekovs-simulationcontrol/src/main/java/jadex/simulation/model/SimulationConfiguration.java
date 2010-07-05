@@ -28,6 +28,9 @@ public class SimulationConfiguration {
 	/* List of observers*/
 	private ArrayList<Observer> observerList;
 	
+	/* List of dataproviders*/
+	private ArrayList<Dataprovider> dataproviderList ;
+	
 	/* Contains run configuration*/
 	private RunConfiguration runConfiguration;
 	
@@ -65,7 +68,17 @@ public class SimulationConfiguration {
 	public void setObserverList(ArrayList<Observer> observerList) {
 		this.observerList = observerList;
 	}
+	
+	@XmlElementWrapper(name="Dataproviders")
+	@XmlElement(name="Dataprovider")
+	public ArrayList<Dataprovider> getDataproviderList() {
+		return dataproviderList;
+	}
 
+	public void setDataproviderList(ArrayList<Dataprovider> dataproviderList) {
+		this.dataproviderList = dataproviderList;
+	}
+	
 	@XmlElement(name="RunConfiguration")
 	public RunConfiguration getRunConfiguration() {
 		return runConfiguration;

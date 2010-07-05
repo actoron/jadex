@@ -2,7 +2,11 @@ package jadex.simulation.master;
 
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
-import jadex.simulation.controlcenter.ControlCenter;
+import jadex.bridge.CreationInfo;
+import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentManagementService;
+import jadex.commons.IFuture;
+import jadex.commons.collection.SCollection;
 import jadex.simulation.helper.Constants;
 import jadex.simulation.helper.TimeConverter;
 import jadex.simulation.helper.XMLHandler;
@@ -11,6 +15,7 @@ import jadex.simulation.model.StartTime;
 import jadex.simulation.model.result.IntermediateResult;
 
 import java.util.HashMap;
+import java.util.Map;
 
 public class InitSimulationPlan extends Plan{
 
@@ -18,7 +23,17 @@ public class InitSimulationPlan extends Plan{
 		System.out.println("#InitSim# Init Master Simulation Agent with configuration file: " + (String) getBeliefbase().getBelief("simulationDescriptionFile").getFact());		
 		String simulationDescription = (String) getBeliefbase().getBelief("simulationDescriptionFile").getFact();
 		SimulationConfiguration simConf = (SimulationConfiguration) XMLHandler.parseXML(simulationDescription, SimulationConfiguration.class);
-		System.out.println("value: " + TimeConverter.longTime2DateString(System.currentTimeMillis()));
+		
+		//Start Simulation Control Center
+		IComponentManagementService ces = (IComponentManagementService)getScope().getServiceContainer().getService(IComponentManagementService.class);
+		Map args = SCollection.createHashMap();
+		args.put("simulationConf", simConf);		
+		IFuture ret = ces.createComponent(null, "/jadex/simulation/controlcenter/ControlCenter.agent.xml", new CreationInfo(args), null);
+		IComponentIdentifier aid = (IComponentIdentifier)ret.get(this);
+		
+//		IFuture ret = ces.createComponent(name, "/jadex/bdi/benchmarks/AgentCreation.agent.xml", new CreationInfo(args), null);
+		
+		
 		//Postpone start of simulation?
 		if(simConf.getRunConfiguration().getGeneral().getStartTime() != null){
 			StartTime sTime = simConf.getRunConfiguration().getGeneral().getStartTime();
@@ -27,7 +42,7 @@ public class InitSimulationPlan extends Plan{
 				waitFor(Long.valueOf(sTime.getValue()));
 			}else if(sTime.getType().equalsIgnoreCase(Constants.ABSOLUTE_TIME_EXPRESSION)){
 				long absoluteStartTime = TimeConverter.dateString2LongTime(sTime.getValue());
-				System.out.println("#InitSim# Start of simulation postponed till: " + TimeConverter.longTime2DateString(absoluteStartTime - System.currentTimeMillis()) + " due absolute start time condition.");
+				System.out.println("#InitSim# Start of simulation postponed till: " + TimeConverter.longTime2DateString(absoluteStartTime) + " due absolute start time condition.");
 				waitFor(absoluteStartTime - System.currentTimeMillis());
 			}
 		}
@@ -46,8 +61,8 @@ public class InitSimulationPlan extends Plan{
 //		ca.getParameter("arguments").setValue(args);
 //		dispatchTopLevelGoal(ca);				
 		
-		ControlCenter tmpGui = new ControlCenter(this.getExternalAccess());
-		getBeliefbase().getBelief("tmpGUI").setFact(tmpGui);
+//		ControlCenter tmpGui = new ControlCenter(this.getExternalAccess());
+//		getBeliefbase().getBelief("tmpGUI").setFact(tmpGui);
 	}
 
 	/**
