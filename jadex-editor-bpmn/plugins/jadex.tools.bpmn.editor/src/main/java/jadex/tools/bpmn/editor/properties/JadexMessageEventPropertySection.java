@@ -1,5 +1,8 @@
 package jadex.tools.bpmn.editor.properties;
 
+import jadex.tools.bpmn.editor.properties.template.AbstractBpmnPropertySection;
+import jadex.tools.bpmn.editor.properties.template.JadexBpmnPropertiesUtil;
+
 import org.eclipse.emf.ecore.EAnnotation;
 import org.eclipse.emf.ecore.EModelElement;
 import org.eclipse.emf.ecore.util.EcoreUtil;
@@ -131,7 +134,7 @@ public class JadexMessageEventPropertySection extends AbstractBpmnPropertySectio
 		super.setInput(part, selection);
 		if (modelElement != null)
 		{
-			EAnnotation ea = modelElement.getEAnnotation(util.containerEAnnotationName);
+			EAnnotation ea = modelElement.getEAnnotation(util.getContainerEAnnotationName());
 			if (ea != null)
 			{
 				String tmpValue;

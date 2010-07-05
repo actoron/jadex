@@ -1,6 +1,7 @@
-package jadex.tools.bpmn.editor.properties;
+package jadex.tools.bpmn.editor.properties.decorator;
 
 import jadex.tools.bpmn.diagram.Messages;
+import jadex.tools.bpmn.editor.properties.template.JadexBpmnPropertiesUtil;
 
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.Label;

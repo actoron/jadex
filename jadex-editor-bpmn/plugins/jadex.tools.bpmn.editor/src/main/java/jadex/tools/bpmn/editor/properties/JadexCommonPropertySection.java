@@ -4,6 +4,8 @@
 package jadex.tools.bpmn.editor.properties;
 
 import jadex.tools.bpmn.diagram.Messages;
+import jadex.tools.bpmn.editor.properties.template.AbstractBpmnPropertySection;
+import jadex.tools.bpmn.editor.properties.template.JadexBpmnPropertiesUtil;
 
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;

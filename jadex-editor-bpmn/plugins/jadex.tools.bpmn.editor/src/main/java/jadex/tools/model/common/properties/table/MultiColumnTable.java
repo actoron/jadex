@@ -3,7 +3,7 @@
  */
 package jadex.tools.model.common.properties.table;
 
-import jadex.tools.bpmn.editor.properties.AbstractBpmnPropertySection;
+import jadex.tools.bpmn.editor.properties.template.AbstractBpmnPropertySection;
 
 import java.util.ArrayList;
 import java.util.Iterator;

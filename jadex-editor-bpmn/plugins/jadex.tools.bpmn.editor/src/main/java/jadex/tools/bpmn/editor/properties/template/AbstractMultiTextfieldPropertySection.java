@@ -1,7 +1,7 @@
 /**
  * 
  */
-package jadex.tools.bpmn.editor.properties;
+package jadex.tools.bpmn.editor.properties.template;
 
 import org.eclipse.emf.ecore.EAnnotation;
 import org.eclipse.jface.viewers.ISelection;

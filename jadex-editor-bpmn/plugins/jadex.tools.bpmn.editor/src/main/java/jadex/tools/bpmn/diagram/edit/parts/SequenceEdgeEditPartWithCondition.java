@@ -3,8 +3,8 @@
  */
 package jadex.tools.bpmn.diagram.edit.parts;
 
-import jadex.tools.bpmn.editor.properties.JadexBpmnPropertiesUtil;
 import jadex.tools.bpmn.editor.properties.JadexSequencePropertiesSection;
+import jadex.tools.bpmn.editor.properties.template.JadexBpmnPropertiesUtil;
 
 import org.eclipse.draw2d.ColorConstants;
 import org.eclipse.draw2d.Connection;

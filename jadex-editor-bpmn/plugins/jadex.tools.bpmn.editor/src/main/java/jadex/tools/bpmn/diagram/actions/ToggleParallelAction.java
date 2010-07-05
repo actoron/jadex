@@ -3,7 +3,7 @@
  */
 package jadex.tools.bpmn.diagram.actions;
 
-import jadex.tools.bpmn.editor.properties.JadexBpmnPropertiesUtil;
+import jadex.tools.bpmn.editor.properties.template.JadexBpmnPropertiesUtil;
 import jadex.tools.model.common.properties.ModifyEObjectCommand;
 
 import org.eclipse.core.runtime.IAdaptable;

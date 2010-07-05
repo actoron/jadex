@@ -1,5 +1,8 @@
 package jadex.tools.bpmn.editor.properties;
 
+import jadex.tools.bpmn.editor.properties.template.AbstractComboPropertySection;
+import jadex.tools.bpmn.editor.properties.template.JadexBpmnPropertiesUtil;
+
 /**
  * This is only a temp solution until the abstract 
  * checkbox section is ready to use

@@ -29,7 +29,7 @@
         point="org.eclipse.ui.views.properties.tabbed.propertyContributor">
      <propertyContributor
            contributorId="jadex.tools.bpmn.editor.JadexBpmnEditorID"
-           typeMapper="jadex.tools.bpmn.editor.properties.EModelTypeMapper">
+           typeMapper="jadex.tools.bpmn.editor.properties.template.EModelTypeMapper">
         <propertyCategory category="Jadex"/>
      </propertyContributor>
   	</extension>

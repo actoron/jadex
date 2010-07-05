@@ -1,7 +1,7 @@
 /**
  * 
  */
-package jadex.tools.bpmn.editor.properties;
+package jadex.tools.bpmn.editor.properties.template;
 
 import jadex.tools.model.common.properties.table.MultiColumnTable.MultiColumnTableRow;
 
@@ -28,22 +28,22 @@ public abstract class AbstractParameterTablePropertySection extends
 	// ---- constants ----
 	
 	/** the name column label */
-	protected final static String NAME_COLUMN = "Name"; //$NON-NLS-1$
+	public final static String NAME_COLUMN = "Name"; //$NON-NLS-1$
 	
 	/** the type column label */
-	protected final static String TYPE_COLUMN = "Type"; //$NON-NLS-1$
+	public final static String TYPE_COLUMN = "Type"; //$NON-NLS-1$
 	
 	/** the value column label */
-	protected final static String VALUE_COLUMN = "Value"; //$NON-NLS-1$
+	public final static String VALUE_COLUMN = "Value"; //$NON-NLS-1$
 	
 	/** the direction column label */
-	protected final static String DIRECTION_COLUMN = "Direction"; //$NON-NLS-1$
+	public final static String DIRECTION_COLUMN = "Direction"; //$NON-NLS-1$
 	
 	/**  parameter direction values */
-	protected final static String[] DIRECTION_VALUES = new String[] {"inout", "in", "out"}; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	public final static String[] DIRECTION_VALUES = new String[] {"inout", "in", "out"}; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	
 	/** default parameter direction */
-	protected final static String DEFAULT_DIRECTION = "inout"; //$NON-NLS-1$
+	public final static String DEFAULT_DIRECTION = "inout"; //$NON-NLS-1$
 	
 	
 	// ---- defaults ----
@@ -155,7 +155,7 @@ public abstract class AbstractParameterTablePropertySection extends
 	 * @param columnName
 	 * @return
 	 */
-	protected static int getDefaultIndexForColumn(String columnName)
+	public static int getDefaultIndexForColumn(String columnName)
 	{
 		for (int index = 0; index < DEFAULT_PARAMTER_COLUMN_NAMES.length; index++)
 		{

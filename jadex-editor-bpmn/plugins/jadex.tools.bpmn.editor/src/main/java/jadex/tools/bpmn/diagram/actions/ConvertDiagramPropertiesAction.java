@@ -3,16 +3,16 @@
  */
 package jadex.tools.bpmn.diagram.actions;
 
-import jadex.tools.bpmn.editor.properties.AbstractBpmnMultiColumnTablePropertySection;
-import jadex.tools.bpmn.editor.properties.AbstractParameterTablePropertySection;
 import jadex.tools.bpmn.editor.properties.JadexBpmnDiagramImportsSection;
 import jadex.tools.bpmn.editor.properties.JadexBpmnDiagramParameterSection;
 import jadex.tools.bpmn.editor.properties.JadexBpmnDiagramPropertiesSection;
 import jadex.tools.bpmn.editor.properties.JadexBpmnDiagramPropertiesTableSection;
-import jadex.tools.bpmn.editor.properties.JadexBpmnPropertiesUtil;
 import jadex.tools.bpmn.editor.properties.JadexCommonParameterSection;
 import jadex.tools.bpmn.editor.properties.JadexIntermediateEventsParameterSection;
 import jadex.tools.bpmn.editor.properties.JadexSequenceMappingSection;
+import jadex.tools.bpmn.editor.properties.template.AbstractBpmnMultiColumnTablePropertySection;
+import jadex.tools.bpmn.editor.properties.template.AbstractParameterTablePropertySection;
+import jadex.tools.bpmn.editor.properties.template.JadexBpmnPropertiesUtil;
 
 import java.util.ArrayList;
 import java.util.List;

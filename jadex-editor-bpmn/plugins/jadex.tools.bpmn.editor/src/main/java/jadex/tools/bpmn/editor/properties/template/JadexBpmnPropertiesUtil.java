@@ -1,4 +1,4 @@
-package jadex.tools.bpmn.editor.properties;
+package jadex.tools.bpmn.editor.properties.template;
 
 import jadex.tools.bpmn.diagram.Messages;
 import jadex.tools.bpmn.editor.JadexBpmnPlugin;
@@ -109,7 +109,7 @@ public class JadexBpmnPropertiesUtil
 	 * @param containerEAnnotationName
 	 * @param annotationDetailName
 	 */
-	protected JadexBpmnPropertiesUtil(String containerEAnnotationName,
+	public JadexBpmnPropertiesUtil(String containerEAnnotationName,
 			String annotationDetailName, AbstractCommonPropertySection section)
 	{
 		super();
@@ -149,14 +149,57 @@ public class JadexBpmnPropertiesUtil
 		return success;
 	}
 	
-	// ---- static methods ----
+	public EAnnotation getJadexEAnnotation()
+	{
+		EModelElement modelElement = section.getEModelElement();
+		if(modelElement == null)
+		{
+			return null;
+		}
+		
+		EAnnotation annotation = modelElement.getEAnnotation(containerEAnnotationName);
+		if (annotation != null)
+		{
+			return annotation;
+		}
+		
+		return null;
+	}
 	
+	public String getJadexEAnnotationDetail(String detailID)
+	{
+		EAnnotation annotation = getJadexEAnnotation();
+		if (annotation != null)
+		{
+			return annotation.getDetails().get(detailID);
+		}
+		return null;
+	}
+	
+	/**
+	 * @return the containerEAnnotationName
+	 */
+	public String getContainerEAnnotationName()
+	{
+		return containerEAnnotationName;
+	}
+
+	/**
+	 * @return the annotationDetailName
+	 */
+	public String getAnnotationDetailName()
+	{
+		return annotationDetailName;
+	}
+	
+	// ---- static methods ----
+
 	/**
 	 * Create the annotation identifier from util values
 	 * 
 	 * @return
 	 */
-	protected static String getTableAnnotationIdentifier(String annotationID, String detailID)
+	public static String getTableAnnotationIdentifier(String annotationID, String detailID)
 	{
 		return annotationID
 				+ JADEX_COMBINED_KEY_DELIMITER

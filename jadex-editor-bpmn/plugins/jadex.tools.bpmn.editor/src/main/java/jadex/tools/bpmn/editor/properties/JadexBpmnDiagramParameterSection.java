@@ -3,6 +3,8 @@
  */
 package jadex.tools.bpmn.editor.properties;
 
+import jadex.tools.bpmn.editor.properties.template.AbstractBpmnMultiColumnTablePropertySection;
+import jadex.tools.bpmn.editor.properties.template.JadexBpmnPropertiesUtil;
 import jadex.tools.model.common.properties.table.MultiColumnTable.MultiColumnTableRow;
 
 import org.eclipse.jface.viewers.CellEditor;

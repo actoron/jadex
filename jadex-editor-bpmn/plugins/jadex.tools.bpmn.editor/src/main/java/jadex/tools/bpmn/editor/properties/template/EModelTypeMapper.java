@@ -1,7 +1,7 @@
 /**
  * 
  */
-package jadex.tools.bpmn.editor.properties;
+package jadex.tools.bpmn.editor.properties.template;
 
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.gmf.runtime.diagram.ui.editparts.IGraphicalEditPart;

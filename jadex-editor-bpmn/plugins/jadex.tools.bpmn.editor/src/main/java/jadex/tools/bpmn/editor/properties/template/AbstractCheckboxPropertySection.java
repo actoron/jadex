@@ -1,21 +1,11 @@
 /**
  * 
  */
-package jadex.tools.bpmn.editor.properties;
+package jadex.tools.bpmn.editor.properties.template;
 
-import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.emf.ecore.EAnnotation;
-import org.eclipse.gmf.runtime.common.core.command.CommandResult;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.stp.bpmn.diagram.part.BpmnDiagramEditorPlugin;
-import org.eclipse.stp.bpmn.properties.ModifyBpmnEAnnotationCommand;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
@@ -30,7 +20,8 @@ import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 
 /**
  * @author Claas Altschaffel
- * 
+ * @deprecated currently not usable
+ * @TODO: implement!
  */
 public abstract class AbstractCheckboxPropertySection extends
 		AbstractBpmnPropertySection

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package jadex.tools.bpmn.editor.properties;
+package jadex.tools.bpmn.editor.properties.template;
 
 import jadex.tools.model.common.properties.AbstractCommonPropertySection;
 

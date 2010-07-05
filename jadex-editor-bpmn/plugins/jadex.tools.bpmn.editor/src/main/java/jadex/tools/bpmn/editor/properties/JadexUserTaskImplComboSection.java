@@ -3,6 +3,9 @@
  */
 package jadex.tools.bpmn.editor.properties;
 
+import jadex.tools.bpmn.editor.properties.template.AbstractComboPropertySection;
+import jadex.tools.bpmn.editor.properties.template.AbstractParameterTablePropertySection;
+import jadex.tools.bpmn.editor.properties.template.JadexBpmnPropertiesUtil;
 import jadex.tools.bpmn.runtime.task.IRuntimeTaskProvider;
 import jadex.tools.bpmn.runtime.task.ParameterMetaInfo;
 import jadex.tools.bpmn.runtime.task.StaticJadexRuntimeTaskProvider;
@@ -80,7 +83,7 @@ public class JadexUserTaskImplComboSection extends
 
 	
 	/**
-	 * @see jadex.tools.bpmn.editor.properties.AbstractComboPropertySection#getComboItems()
+	 * @see jadex.tools.bpmn.editor.properties.template.AbstractComboPropertySection#getComboItems()
 	 */
 	@Override
 	protected String[] getComboItems()
