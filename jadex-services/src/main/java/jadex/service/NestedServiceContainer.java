@@ -32,7 +32,7 @@ public abstract class NestedServiceContainer extends BasicServiceContainer
 	 */
 	public NestedServiceContainer()
 	{
-		this(true, false);
+		this(true, true);
 	}
 	
 	/**

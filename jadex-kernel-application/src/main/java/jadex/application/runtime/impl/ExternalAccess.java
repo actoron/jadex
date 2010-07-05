@@ -1,11 +1,6 @@
 package jadex.application.runtime.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
 import jadex.application.runtime.IApplicationExternalAccess;
-import jadex.bridge.ComponentResultListener;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
@@ -14,9 +9,13 @@ import jadex.bridge.ILoadableComponentModel;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.concurrent.DefaultResultListener;
+import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
-import jadex.service.IServiceContainer;
 import jadex.service.IServiceProvider;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 /**
  *  External access for applications.
@@ -153,25 +152,13 @@ public class ExternalAccess implements IApplicationExternalAccess
 			{
 				public void run() 
 				{
-					application.getServiceProvider().getService(type).addResultListener(new DefaultResultListener()
-					{
-						public void resultAvailable(Object source, Object result)
-						{
-							ret.setResult(result);
-						}
-					});
+					application.getServiceProvider().getService(type).addResultListener(new DelegationResultListener(ret));
 				}
 			});
 		}
 		else
 		{
-			application.getServiceProvider().getService(type).addResultListener(new DefaultResultListener()
-			{
-				public void resultAvailable(Object source, Object result)
-				{
-					ret.setResult(result);
-				}
-			});
+			application.getServiceProvider().getService(type).addResultListener(new DelegationResultListener(ret));
 		}
 		
 		return ret;
@@ -192,13 +179,13 @@ public class ExternalAccess implements IApplicationExternalAccess
 			{
 				public void run() 
 				{
-					ret.setResult(application.getServiceProvider().getServices(type));
+					application.getServiceProvider().getServices(type).addResultListener(new DelegationResultListener(ret));
 				}
 			});
 		}
 		else
 		{
-			ret.setResult(application.getServiceProvider().getServices(type));
+			application.getServiceProvider().getServices(type).addResultListener(new DelegationResultListener(ret));
 		}
 		
 		return ret;
@@ -245,13 +232,13 @@ public class ExternalAccess implements IApplicationExternalAccess
 			{
 				public void run() 
 				{
-					ret.setResult(application.getServiceProvider().getServicesTypes());
+					application.getServiceProvider().getServicesTypes().addResultListener(new DelegationResultListener(ret));
 				}
 			});
 		}
 		else
 		{
-			ret.setResult(application.getServiceProvider().getServicesTypes());
+			application.getServiceProvider().getServicesTypes().addResultListener(new DelegationResultListener(ret));
 		}
 		
 		return ret;
@@ -272,13 +259,13 @@ public class ExternalAccess implements IApplicationExternalAccess
 			{
 				public void run() 
 				{
-					ret.setResult(application.getServiceProvider().getServiceOfType(type, visited));
+					application.getServiceProvider().getServiceOfType(type, visited).addResultListener(new DelegationResultListener(ret));
 				}
 			});
 		}
 		else
 		{
-			ret.setResult(application.getServiceProvider().getServiceOfType(type, visited));
+			application.getServiceProvider().getServiceOfType(type, visited).addResultListener(new DelegationResultListener(ret));
 		}
 		
 		return ret;
@@ -299,13 +286,13 @@ public class ExternalAccess implements IApplicationExternalAccess
 			{
 				public void run() 
 				{
-					ret.setResult(application.getServiceProvider().getServicesOfType(type, visited));
+					application.getServiceProvider().getServicesOfType(type, visited).addResultListener(new DelegationResultListener(ret));
 				}
 			});
 		}
 		else
 		{
-			ret.setResult(application.getServiceProvider().getServicesOfType(type, visited));
+			application.getServiceProvider().getServicesOfType(type, visited).addResultListener(new DelegationResultListener(ret));
 		}
 		
 		return ret;
