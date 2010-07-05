@@ -3,7 +3,6 @@
  */
 package jadex.tools.bpmn.editor.properties.template;
 
-import org.eclipse.emf.ecore.EAnnotation;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -13,45 +12,42 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 
-
 /**
  * @author Claas Altschaffel
- * @deprecated currently not usable
- * @TODO: implement!
  */
 public abstract class AbstractCheckboxPropertySection extends
 		AbstractBpmnPropertySection
 {
 	// ---- constants ----
-	
+
 	protected static final String DEFAULT_NAME = new String("Default_1");
-	
+
 	// ---- attributes ----
 
 	private String checkboxLabel;
 	
-	private Text[] textFields;
-	
+	private Button checkbox;
+
 	// ---- constructor ----
-	
+
 	/**
 	 * Default Constructor
 	 * 
 	 * @param textFieldNames
 	 * @param textFields
 	 */
-	protected AbstractCheckboxPropertySection(
-			String containerEAnnotationName,
-			String checkboxLabel)
+	protected AbstractCheckboxPropertySection(String containerEAnnotationName,
+			String eAnnotationDetailId, String checkboxLabel)
 	{
-		super(containerEAnnotationName, checkboxLabel);
-		this.checkboxLabel = checkboxLabel != null ? checkboxLabel : DEFAULT_NAME;
+		super(containerEAnnotationName,
+				eAnnotationDetailId != null ? eAnnotationDetailId
+						: checkboxLabel);
+		this.checkboxLabel = checkboxLabel != null ? checkboxLabel
+				: DEFAULT_NAME;
 	}
-
 
 	// ---- methods ----
 
@@ -63,44 +59,48 @@ public abstract class AbstractCheckboxPropertySection extends
 			TabbedPropertySheetPage aTabbedPropertySheetPage)
 	{
 		super.createControls(parent, aTabbedPropertySheetPage);
-		
+
 		GridLayout sectionLayout = new GridLayout(2, true);
 		sectionComposite.setLayout(sectionLayout);
-		
+
 		GridData labelGridData = new GridData();
 		labelGridData.minimumWidth = 60;
 		labelGridData.widthHint = 60;
-		
+
 		GridData checkboxGridData = new GridData();
 		checkboxGridData.minimumWidth = 50;
 		checkboxGridData.widthHint = 50;
 
-			
-			
-			Label cLabel = getWidgetFactory().createLabel(sectionComposite, checkboxLabel+":"); // 
-			Button button = getWidgetFactory().createButton(sectionComposite, "", SWT.CHECK);
-			
-			button.addSelectionListener(new SelectionAdapter()
+		Label cLabel = getWidgetFactory().createLabel(sectionComposite,
+				checkboxLabel + ":");
+		addDisposable(cLabel);
+		
+		Button button = getWidgetFactory().createButton(sectionComposite, null,
+				SWT.CHECK);
+		addDisposable(button);
+
+		button.addSelectionListener(new SelectionAdapter()
+		{
+			/**
+			 * Add a ContextElement to the Context and refresh the view
+			 * 
+			 * @generated NOT
+			 */
+			@Override
+			public void widgetSelected(SelectionEvent e)
 			{
-				/** 
-				 * Add a ContextElement to the Context and refresh the view
-				 * @generated NOT 
-				 */
-				@Override
-				public void widgetSelected(SelectionEvent e)
-				{
-//					((Button) e.getSource()).
-//					updateJadexEAnnotation(util.annotationDetailName, );
-					
-				}
-			});
-			
-			cLabel.setLayoutData(labelGridData);
-			button.setLayoutData(checkboxGridData);
-		}
+				boolean state = ((Button) e.getSource()).getSelection();
+				updateJadexEAnnotation(util.annotationDetailName, String
+						.valueOf(state));
+			}
+		});
 
+		cLabel.setLayoutData(labelGridData);
+		button.setLayoutData(checkboxGridData);
+		
+		checkbox = button;
+	}
 
-	
 	/**
 	 * Manages the input.
 	 */
@@ -110,39 +110,16 @@ public abstract class AbstractCheckboxPropertySection extends
 		super.setInput(part, selection);
 		if (modelElement != null)
 		{
-			EAnnotation ea = modelElement.getEAnnotation(util.containerEAnnotationName);
-			if (ea != null)
-			{
-//				for (int i = 0; i < textFieldNames.length; i++)
-//				{
-//					String tmpName = textFieldNames[i];
-//					Text tmpField = textFields[i];
-//					String tmpValue = (String) ea.getDetails().get(tmpName);
-//					tmpField.setText(tmpValue != null ? tmpValue : "");
-//					tmpField.setEnabled(true);
-//				}
-			}
-			else
-			{
-//				for (int i = 0; i < textFieldNames.length; i++)
-//				{
-//					textFields[i].setText("");
-//					textFields[i].setEnabled(true);
-//				}
-			}
-
-			return;
+			String value = util.getJadexEAnnotationDetail(util.getAnnotationDetailName());
+			checkbox.setSelection(value != null && Boolean.valueOf(value));
+			checkbox.setEnabled(true);
 		}
-		
-		// fall through
-//		for (int i = 0; i < textFieldNames.length; i++)
-//		{
-//			Text tmpField = textFields[i];
-//			tmpField.setEnabled(false);
-//		}
-		
-		
-	}
+		else 
+		{
+			checkbox.setSelection(false);
+			checkbox.setEnabled(false);
+		}
 
+	}
 
 }

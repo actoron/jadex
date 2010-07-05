@@ -481,9 +481,6 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 		 */
 		public Object[] getElements(Object inputElement)
 		{
-			if (util.annotationDetailName.equals("parameters"))
-				System.out.println("STOP");
-			
 			checkAnnotationConversion();
 			
 			if (inputElement instanceof EModelElement)

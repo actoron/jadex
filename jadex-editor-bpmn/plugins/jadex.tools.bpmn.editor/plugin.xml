@@ -102,12 +102,12 @@
      </propertySections>
    </extension>
    
-   <!-- the jadex sub process file property section -->
+   <!-- the jadex sub process parallel property section -->
 	<extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
      <propertySections contributorId="jadex.tools.bpmn.editor.JadexBpmnEditorID">
         <propertySection
-              class="jadex.tools.bpmn.editor.properties.JadexSubProcessParallelSectionTEMP"
-              id="jadex.tools.bpmn.editor.properties.JadexSubProcessParallelSectionTEMP"
+              class="jadex.tools.bpmn.editor.properties.JadexSubProcessParallelSection"
+              id="jadex.tools.bpmn.editor.properties.JadexSubProcessParallelSection"
               tab="Jadex"
               afterSection="jadex.tools.bpmn.editor.properties.JadexSubProcessPropertySection">
            <input type="org.eclipse.stp.bpmn.SubProcess"/>
@@ -122,7 +122,7 @@
               class="jadex.tools.bpmn.editor.properties.JadexSubProcessItemsPropertySection"
               id="jadex.tools.bpmn.editor.properties.JadexSubProcessItemsPropertySection"
               tab="Jadex"
-              afterSection="jadex.tools.bpmn.editor.properties.JadexSubProcessParallelSectionTEMP">
+              afterSection="jadex.tools.bpmn.editor.properties.JadexSubProcessParallelSection">
            <input type="org.eclipse.stp.bpmn.SubProcess"/>
         </propertySection>
      </propertySections>
@@ -539,7 +539,8 @@
 	  <objectContribution
 	    adaptable="false"
 	    id="jadex.tools.bpmn.diagram.ui.objectContribution.BpmnDiagramEditPart1"
-	    objectClass="org.eclipse.stp.bpmn.diagram.edit.parts.BpmnDiagramEditPart">
+	    objectClass="org.eclipse.gef.EditPart">
+	    <!-- objectClass="org.eclipse.stp.bpmn.diagram.edit.parts.BpmnDiagramEditPart"> -->
 		 <!--
 		 <menu 
 		    id="BPMN" 
