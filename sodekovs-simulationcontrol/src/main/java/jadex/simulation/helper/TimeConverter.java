@@ -26,7 +26,7 @@ public class TimeConverter {
 	public static long dateString2LongTime(String timeString){
 		Date date = new Date();
 		// Festlegung des Formats:
-		SimpleDateFormat df = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss Z" );
+		SimpleDateFormat df = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss" );
 		df.setTimeZone( TimeZone.getTimeZone( "Europe/Berlin" ) );		
 
 		// Einlesen vom String:
@@ -38,7 +38,7 @@ public class TimeConverter {
 			System.err.println("#TimeConverter# Could not convert Time String into long: " + timeString);
 			return -1;
 		}	
-		System.out.println("--> " + date.toGMTString());
+		System.out.println("--> " + date.toLocaleString());
 		return date.getTime();
 	}
 }
