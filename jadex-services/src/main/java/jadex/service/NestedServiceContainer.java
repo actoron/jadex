@@ -84,7 +84,6 @@ public abstract class NestedServiceContainer extends BasicServiceContainer
 		
 		final Future ret = new Future();
 		final boolean[] results = new boolean[3];
-		final IService res = null;
 		
 		super.getServiceOfType(type, visited).addResultListener(new IResultListener()
 		{
@@ -187,7 +186,7 @@ public abstract class NestedServiceContainer extends BasicServiceContainer
 								public void resultAvailable(Object source, Object result)
 								{
 									cnt[0]=cnt[0]+1;
-									if(cnt[0]==children.size()-1)
+									if(cnt[0]==children.size())
 									{
 										results[2] = true;
 									}
@@ -203,7 +202,7 @@ public abstract class NestedServiceContainer extends BasicServiceContainer
 						else
 						{
 							cnt[0]=cnt[0]+1;
-							if(cnt[0]==children.size()-1)
+							if(cnt[0]==children.size())
 							{
 								results[2] = true;
 								checkAndSetResult(results, ret, null, null);
@@ -340,7 +339,7 @@ public abstract class NestedServiceContainer extends BasicServiceContainer
 									coll.addAll((Collection)result);
 									
 									cnt[0]=cnt[0]+1;
-									if(cnt[0]==children.size()-1)
+									if(cnt[0]==children.size())
 									{
 										results[2] = true;
 										checkAndSetResults(results, ret, coll, null);
@@ -357,7 +356,7 @@ public abstract class NestedServiceContainer extends BasicServiceContainer
 						else
 						{
 							cnt[0]=cnt[0]+1;
-							if(cnt[0]==children.size()-1)
+							if(cnt[0]==children.size())
 							{
 								results[2] = true;
 								checkAndSetResults(results, ret, coll, null);
