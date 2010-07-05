@@ -262,7 +262,7 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 		
 		// Get the services.
 		final boolean services[]	= new boolean[3];
-		adapter.getServiceProvider().getService(IClockService.class).addResultListener(new DefaultResultListener()
+		adapter.getRootServiceProvider().getService(IClockService.class).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
@@ -277,7 +277,7 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 					BDIInterpreter.this.state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state,OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_CREATING);
 			}
 		});
-		adapter.getServiceProvider().getService(IComponentManagementService.class).addResultListener(new DefaultResultListener()
+		adapter.getRootServiceProvider().getService(IComponentManagementService.class).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
@@ -292,7 +292,7 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 					BDIInterpreter.this.state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state,OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_CREATING);
 			}
 		});
-		adapter.getServiceProvider().getService(IMessageService.class).addResultListener(new DefaultResultListener()
+		adapter.getRootServiceProvider().getService(IMessageService.class).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
@@ -792,7 +792,7 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 	{
 		final Future ret = new Future();
 		
-		adapter.getServiceProvider().getService(IComponentManagementService.class).addResultListener(new DefaultResultListener()
+		adapter.getRootServiceProvider().getService(IComponentManagementService.class).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{

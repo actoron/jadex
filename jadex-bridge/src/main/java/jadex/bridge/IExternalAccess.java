@@ -1,5 +1,6 @@
 package jadex.bridge;
 
+import jadex.commons.IFuture;
 import jadex.service.IServiceProvider;
 
 /**
@@ -25,4 +26,11 @@ public interface IExternalAccess extends IServiceProvider
 	 *  @return The parent.
 	 */
 	public IExternalAccess getParent();
+	
+	/**
+	 *  Get the children (if any).
+	 *  @return The children.
+	 */
+	public IFuture getChildren();
+	
 }

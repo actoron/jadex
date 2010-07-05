@@ -18,7 +18,7 @@ public class DestroyComponentTask implements ITask
 	 */
 	public void execute(ITaskContext context, BpmnInterpreter instance, final IResultListener listener)
 	{
-		IComponentManagementService ces = (IComponentManagementService)instance.getComponentAdapter().getServiceProvider().getService(IComponentManagementService.class);
+		IComponentManagementService ces = (IComponentManagementService)instance.getComponentAdapter().getRootServiceProvider().getService(IComponentManagementService.class);
 		final IResultListener resultlistener = (IResultListener)context.getParameterValue("resultlistener");
 		final boolean wait = context.getParameterValue("wait")!=null? ((Boolean)context.getParameterValue("wait")).booleanValue(): false;
 		

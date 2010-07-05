@@ -83,7 +83,7 @@ public class InterpreterTest
 					throw new UnsupportedOperationException();
 				}
 				
-				public IServiceProvider getServiceProvider()
+				public IServiceProvider getRootServiceProvider()
 				{
 					return container;
 				}

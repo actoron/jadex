@@ -1,5 +1,7 @@
 package jadex.service;
 
+import java.util.Set;
+
 import jadex.commons.IFuture;
 
 /**
@@ -12,15 +14,13 @@ public interface IServiceProvider
 	 *  @param type The type.
 	 *  @return The corresponding service.
 	 */
-//	public Object getService(Class type);
 	public IFuture getService(Class type);
 	
 	/**
-	 *  Get a service.
+	 *  Get all services of a typ.
 	 *  @param type The class.
 	 *  @return The corresponding services.
 	 */
-//	public Collection getServices(Class type);
 	public IFuture getServices(Class type);
 	
 	/**
@@ -29,12 +29,25 @@ public interface IServiceProvider
 	 *  @return The corresponding service.
 	 */
 //	public Object getService(Class type, String name);
-	public IFuture getService(Class type, String name);
+//	public IFuture getService(Class type, String name);
 	
 	/**
 	 *  Get the available service types.
 	 *  @return The service types.
 	 */
-//	public Class[] getServicesTypes();
 	public IFuture getServicesTypes();
+	
+	// todo: remove me?
+	/**
+	 *  Get all services for a type.
+	 *  @param type The type.
+	 */
+	public IFuture getServicesOfType(final Class type, final Set visited);
+	
+	// todo: remove me?
+	/**
+	 *  Get service for a type.
+	 *  @param type The type.
+	 */
+	public IFuture getServiceOfType(final Class type, final Set visited);
 }

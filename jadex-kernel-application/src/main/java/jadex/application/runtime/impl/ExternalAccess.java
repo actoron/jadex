@@ -1,12 +1,22 @@
 package jadex.application.runtime.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
 import jadex.application.runtime.IApplicationExternalAccess;
+import jadex.bridge.ComponentResultListener;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.ILoadableComponentModel;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
+import jadex.commons.concurrent.DefaultResultListener;
+import jadex.commons.concurrent.IResultListener;
+import jadex.service.IServiceContainer;
+import jadex.service.IServiceProvider;
 
 /**
  *  External access for applications.
@@ -87,6 +97,48 @@ public class ExternalAccess implements IApplicationExternalAccess
 	}
 	
 	/**
+	 *  Get the children (if any).
+	 *  @return The children.
+	 */
+	public IFuture getChildren()
+	{
+		final Future ret = new Future();
+		
+		getService(IComponentManagementService.class).addResultListener(new DefaultResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				IComponentManagementService cms = (IComponentManagementService)result;
+				final IComponentIdentifier[] childs = cms.getChildren(getComponentIdentifier());
+				final List res = new ArrayList();
+				
+				for(int i=0; i<childs.length; i++)
+				{
+					final int cnt = i;
+					cms.getExternalAccess(childs[i]).addResultListener(new IResultListener()
+					{
+						public void resultAvailable(Object source, Object result)
+						{
+							res.add(result);
+							if(cnt==childs.length-1)
+								ret.setResult(res);
+						}
+						
+						public void exceptionOccurred(Object source, Exception exception)
+						{
+							ret.setException(exception);
+						}
+					});
+				}
+				if(childs.length==0)
+					ret.setResult(null);
+			}
+		});
+		
+		return ret;
+	}
+	
+	/**
 	 *  Get the first declared service of a given type.
 	 *  @param type The type.
 	 *  @return The corresponding service.
@@ -101,13 +153,25 @@ public class ExternalAccess implements IApplicationExternalAccess
 			{
 				public void run() 
 				{
-					ret.setResult(application.getServiceProvider().getService(type));
+					application.getServiceProvider().getService(type).addResultListener(new DefaultResultListener()
+					{
+						public void resultAvailable(Object source, Object result)
+						{
+							ret.setResult(result);
+						}
+					});
 				}
 			});
 		}
 		else
 		{
-			ret.setResult(application.getServiceProvider().getService(type));
+			application.getServiceProvider().getService(type).addResultListener(new DefaultResultListener()
+			{
+				public void resultAvailable(Object source, Object result)
+				{
+					ret.setResult(result);
+				}
+			});
 		}
 		
 		return ret;
@@ -144,7 +208,7 @@ public class ExternalAccess implements IApplicationExternalAccess
 	 *  Get a service.
 	 *  @param name The name.
 	 *  @return The corresponding service.
-	 */
+	 * /
 	public IFuture getService(final Class type, final String name)
 	{
 		final Future ret = new Future();
@@ -165,7 +229,7 @@ public class ExternalAccess implements IApplicationExternalAccess
 		}
 		
 		return ret;
-	}
+	}*/
 	
 	/**
 	 *  Get the available service types.
@@ -191,6 +255,68 @@ public class ExternalAccess implements IApplicationExternalAccess
 		}
 		
 		return ret;
+	}
+	
+	// todo: remove me?
+	/**
+	 *  Get all services for a type.
+	 *  @param type The type.
+	 */
+	public IFuture getServiceOfType(final Class type, final Set visited)
+	{
+		final Future ret = new Future();
+		
+		if(adapter.isExternalThread())
+		{
+			adapter.invokeLater(new Runnable() 
+			{
+				public void run() 
+				{
+					ret.setResult(application.getServiceProvider().getServiceOfType(type, visited));
+				}
+			});
+		}
+		else
+		{
+			ret.setResult(application.getServiceProvider().getServiceOfType(type, visited));
+		}
+		
+		return ret;
+	}
+	
+	// todo: remove me?
+	/**
+	 *  Get all services for a type.
+	 *  @param type The type.
+	 */
+	public IFuture getServicesOfType(final Class type, final Set visited)
+	{
+		final Future ret = new Future();
+		
+		if(adapter.isExternalThread())
+		{
+			adapter.invokeLater(new Runnable() 
+			{
+				public void run() 
+				{
+					ret.setResult(application.getServiceProvider().getServicesOfType(type, visited));
+				}
+			});
+		}
+		else
+		{
+			ret.setResult(application.getServiceProvider().getServicesOfType(type, visited));
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Get the application component.
+	 */
+	public IServiceProvider getServiceProvider()
+	{
+		return application.getServiceProvider();
 	}
 
 }

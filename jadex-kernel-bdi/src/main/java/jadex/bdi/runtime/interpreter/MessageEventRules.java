@@ -717,7 +717,7 @@ public class MessageEventRules
 				final IMessageAdapter msg = new DefaultMessageAdapter(message, mtype);
 				
 				final BDIInterpreter interpreter = BDIInterpreter.getInterpreter(state);
-				interpreter.getAgentAdapter().getServiceProvider().getService(IMessageService.class)
+				interpreter.getAgentAdapter().getRootServiceProvider().getService(IMessageService.class)
 					.addResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object source, Object result)

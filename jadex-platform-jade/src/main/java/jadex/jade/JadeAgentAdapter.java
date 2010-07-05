@@ -386,7 +386,7 @@ public class JadeAgentAdapter extends Agent implements IComponentAdapter, Serial
 	 *  Get the platform.
 	 *  @return the platform of this agent
 	 */
-	public IServiceProvider getServiceProvider()
+	public IServiceProvider getRootServiceProvider()
 	{
 		if(IComponentDescription.STATE_TERMINATED.equals(state))
 			throw new ComponentTerminatedException(getComponentIdentifier().getName());

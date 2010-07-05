@@ -14,16 +14,22 @@ import jadex.bdi.runtime.interpreter.InternalEventRules;
 import jadex.bdi.runtime.interpreter.MessageEventRules;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bdi.runtime.interpreter.PlanRules;
+import jadex.bridge.ComponentResultListener;
+import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentManagementService;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.ILoadableComponentModel;
 import jadex.bridge.InterpreterTimedObject;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
+import jadex.commons.concurrent.DefaultResultListener;
 import jadex.rules.state.IOAVState;
 import jadex.service.IServiceProvider;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 /**
  *  External access interface.
@@ -1223,7 +1229,7 @@ public class ExternalAccessFlyweight extends EACapabilityFlyweight implements IB
 	 *  Get a service.
 	 *  @param name The name.
 	 *  @return The corresponding service.
-	 */
+	 * /
 	public IFuture getService(final Class type, final String name)
 	{
 		if(getInterpreter().isExternalThread())
@@ -1243,7 +1249,7 @@ public class ExternalAccessFlyweight extends EACapabilityFlyweight implements IB
 			IServiceProvider sp = (IServiceProvider)getState().getAttributeValue(getScope(), OAVBDIRuntimeModel.capability_has_abstractsources);
 			return sp.getService(type, name);
 		}
-	}
+	}*/
 	
 	/**
 	 *  Get the available service types.
@@ -1268,5 +1274,90 @@ public class ExternalAccessFlyweight extends EACapabilityFlyweight implements IB
 			IServiceProvider sp = (IServiceProvider)getState().getAttributeValue(getScope(), OAVBDIRuntimeModel.capability_has_abstractsources);
 			return sp.getServicesTypes();
 		}
+	}
+	
+	/**
+	 *  Get the children (if any).
+	 *  @return The children.
+	 */
+	public IFuture getChildren()
+	{
+		final Future ret = new Future();
+		
+		getService(IComponentManagementService.class).addResultListener(new ComponentResultListener(new DefaultResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				IComponentManagementService cms = (IComponentManagementService)result;
+				IComponentIdentifier[] childs = cms.getChildren(getComponentIdentifier());
+				List res = new ArrayList();
+				for(int i=0; i<childs.length; i++)
+				{
+					IExternalAccess ex = (IExternalAccess)cms.getExternalAccess(childs[i]);
+					res.add(ex);
+				}
+				ret.setResult(res);
+			}
+		}, adapter));
+		
+		return ret;
+	}
+	
+	// todo: remove me?
+	/**
+	 *  Get all services for a type.
+	 *  @param type The type.
+	 */
+	public IFuture getServiceOfType(final Class type, final Set visited)
+	{
+		final Future ret = new Future();
+		
+		if(adapter.isExternalThread())
+		{
+			adapter.invokeLater(new Runnable() 
+			{
+				public void run() 
+				{
+					IServiceProvider sp = (IServiceProvider)getState().getAttributeValue(getScope(), OAVBDIRuntimeModel.capability_has_abstractsources);
+					ret.setResult(sp.getServiceOfType(type, visited));
+				}
+			});
+		}
+		else
+		{
+			IServiceProvider sp = (IServiceProvider)getState().getAttributeValue(getScope(), OAVBDIRuntimeModel.capability_has_abstractsources);
+			ret.setResult(sp.getServiceOfType(type, visited));
+		}
+		
+		return ret;
+	}
+	
+	// todo: remove me?
+	/**
+	 *  Get all services for a type.
+	 *  @param type The type.
+	 */
+	public IFuture getServicesOfType(final Class type, final Set visited)
+	{
+		final Future ret = new Future();
+		
+		if(adapter.isExternalThread())
+		{
+			adapter.invokeLater(new Runnable() 
+			{
+				public void run() 
+				{
+					IServiceProvider sp = (IServiceProvider)getState().getAttributeValue(getScope(), OAVBDIRuntimeModel.capability_has_abstractsources);
+					ret.setResult(sp.getServicesOfType(type, visited));
+				}
+			});
+		}
+		else
+		{
+			IServiceProvider sp = (IServiceProvider)getState().getAttributeValue(getScope(), OAVBDIRuntimeModel.capability_has_abstractsources);
+			ret.setResult(sp.getServicesOfType(type, visited));
+		}
+		
+		return ret;
 	}
 }

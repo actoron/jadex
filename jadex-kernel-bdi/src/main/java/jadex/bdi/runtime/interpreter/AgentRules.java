@@ -7,9 +7,12 @@ import jadex.bdi.runtime.impl.flyweights.ParameterFlyweight;
 import jadex.bridge.CheckedAction;
 import jadex.bridge.IArgument;
 import jadex.bridge.InterpreterTimedObject;
+import jadex.commons.Future;
+import jadex.commons.IFuture;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.collection.SCollection;
+import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.IValueFetcher;
@@ -27,7 +30,7 @@ import jadex.rules.rulesystem.rules.Variable;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVAttributeType;
 import jadex.rules.state.OAVObjectType;
-import jadex.service.BasicServiceProvider;
+import jadex.service.NestedServiceContainer;
 import jadex.service.clock.ITimedObject;
 import jadex.service.clock.ITimer;
 
@@ -1010,7 +1013,29 @@ public class AgentRules
 		Collection	mservices = state.getAttributeValues(mcapa, OAVBDIMetaModel.capability_has_services);
 		if(mservices!=null)
 		{
-			BasicServiceProvider sp = new BasicServiceProvider();
+			NestedServiceContainer sp = new NestedServiceContainer()
+			{
+				public IFuture getParent()
+				{
+					final Future ret = new Future();
+					ret.setResult(BDIInterpreter.getInterpreter(state).getParent());
+					return ret;
+				}
+				
+				public IFuture getChildren()
+				{
+					final Future ret = new Future();
+					
+					new ExternalAccessFlyweight(state, rcapa).getChildren().addResultListener(new DefaultResultListener()
+					{
+						public void resultAvailable(Object source, Object result)
+						{
+							ret.setResult(result);
+						}
+					});
+					return ret;
+				}
+			};
 			state.setAttributeValue(rcapa, OAVBDIRuntimeModel.capability_has_serviceprovider, sp);
 			for(Iterator it=mservices.iterator(); it.hasNext(); )
 			{
@@ -1018,7 +1043,8 @@ public class AgentRules
 				String name = (String)state.getAttributeValue(mexp, OAVBDIMetaModel.modelelement_has_name);
 				Object val = evaluateExpression(state, mexp, new OAVBDIFetcher(state, rcapa));
 				Class type = (Class)state.getAttributeValue(mexp, OAVBDIMetaModel.expression_has_class);
-				sp.addService(type, name, val);
+//				sp.addService(type, name, val);
+				sp.addService(type, val);
 				System.out.println("Service: "+name+" "+val+" "+type);
 			}
 		}

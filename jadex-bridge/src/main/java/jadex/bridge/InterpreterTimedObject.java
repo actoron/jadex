@@ -37,7 +37,7 @@ public class InterpreterTimedObject implements ITimedObject
 	 */
 	public void timeEventOccurred(long currenttime)
 	{
-		adapter.getServiceProvider().getService(IComponentManagementService.class).addResultListener(new DefaultResultListener()
+		adapter.getRootServiceProvider().getService(IComponentManagementService.class).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{

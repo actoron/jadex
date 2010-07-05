@@ -197,7 +197,7 @@ class DummyAdapter implements IComponentAdapter
 	 *  Get the component platform.
 	 *  @return The component platform.
 	 */
-	public IServiceProvider getServiceProvider()	throws ComponentTerminatedException
+	public IServiceProvider getRootServiceProvider()	throws ComponentTerminatedException
 	{
 		return provider;
 	}

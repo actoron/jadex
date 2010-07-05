@@ -28,10 +28,10 @@ import jadex.commons.SUtil;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.javaparser.SimpleValueFetcher;
-import jadex.service.BasicServiceContainer;
 import jadex.service.IService;
 import jadex.service.IServiceContainer;
 import jadex.service.IServiceProvider;
+import jadex.service.NestedServiceContainer;
 import jadex.service.library.ILibraryService;
 
 import java.util.Collection;
@@ -87,14 +87,14 @@ public class Application implements IApplication, IComponentInstance
 	protected int children;
 	
 	/** The own service container. */
-	protected BasicServiceContainer mycontainer;
+	protected NestedServiceContainer mycontainer;
 
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new context.
 	 */
-	public Application(ApplicationModel model, MApplicationInstance config, IComponentAdapter adapter, IExternalAccess parent, Map arguments)
+	public Application(ApplicationModel model, MApplicationInstance config, final IComponentAdapter adapter, final IExternalAccess parent, Map arguments)
 	{
 		this.config	= config;
 		this.adapter = adapter;
@@ -102,7 +102,28 @@ public class Application implements IApplication, IComponentInstance
 		this.parent = parent;
 		this.arguments = arguments==null ? new HashMap() : arguments;
 		this.results = new HashMap();
-		this.mycontainer = new BasicServiceContainer();
+		this.mycontainer = new NestedServiceContainer()
+		{
+			public IFuture getParent()
+			{
+				final Future ret = new Future();
+				ret.setResult(parent==null? null: parent);
+				return ret;
+			}
+			
+			public IFuture getChildren()
+			{
+				final Future ret = new Future();
+				new ExternalAccess(Application.this).getChildren().addResultListener(new DefaultResultListener()
+				{
+					public void resultAvailable(Object source, Object result)
+					{
+						ret.setResult(result);
+					}
+				});
+				return ret;
+			}
+		};
 		
 		// Init the arguments with default values.
 		String configname = config!=null? config.getName(): null;
@@ -288,7 +309,7 @@ public class Application implements IApplication, IComponentInstance
 	{
 		// Checks if loaded model is defined in the application component types
 		
-		adapter.getServiceProvider().getServices(IComponentFactory.class).addResultListener(new DefaultResultListener()
+		adapter.getRootServiceProvider().getServices(IComponentFactory.class).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
@@ -409,7 +430,7 @@ public class Application implements IApplication, IComponentInstance
 	 */
 	public void killApplication()
 	{
-		((IComponentManagementService)getComponentAdapter().getServiceProvider()
+		((IComponentManagementService)getComponentAdapter().getRootServiceProvider()
 			.getService(IComponentManagementService.class))
 			.destroyComponent(getComponentAdapter().getComponentIdentifier());
 	}
@@ -535,7 +556,7 @@ public class Application implements IApplication, IComponentInstance
 	 */
 	public IServiceProvider getServiceProvider()
 	{
-		return adapter.getServiceProvider();
+		return adapter.getRootServiceProvider();
 	}
 	
 	/**
@@ -757,7 +778,8 @@ public class Application implements IApplication, IComponentInstance
 						{
 							MExpressionType exp = (MExpressionType)services.get(i);
 							IService service = (IService)exp.getParsedValue().getValue(fetcher);
-							mycontainer.addService(exp.getClazz(), exp.getName(), service);
+//							mycontainer.addService(exp.getClazz(), exp.getName(), service);
+							mycontainer.addService(exp.getClazz(), service);
 						}
 					}
 					mycontainer.start().addResultListener(new ComponentResultListener(new DefaultResultListener()
@@ -787,13 +809,13 @@ public class Application implements IApplication, IComponentInstance
 							}
 
 							final List components = config.getMComponentInstances();
-							adapter.getServiceProvider().getService(ILibraryService.class).addResultListener(createResultListener(new DefaultResultListener()
+							adapter.getRootServiceProvider().getService(ILibraryService.class).addResultListener(createResultListener(new DefaultResultListener()
 							{
 								public void resultAvailable(Object source, Object result)
 								{
 									final ILibraryService ls = (ILibraryService)result;
 									final ClassLoader cl = ls.getClassLoader();
-									adapter.getServiceProvider().getService(IComponentManagementService.class).addResultListener(createResultListener(new DefaultResultListener()
+									adapter.getRootServiceProvider().getService(IComponentManagementService.class).addResultListener(createResultListener(new DefaultResultListener()
 									{
 										public void resultAvailable(Object source, Object result)
 										{

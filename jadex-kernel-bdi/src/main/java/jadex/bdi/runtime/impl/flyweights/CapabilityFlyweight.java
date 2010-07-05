@@ -370,14 +370,14 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 			{
 				public void run()
 				{
-					object = adapter.getServiceProvider();
+					object = adapter.getRootServiceProvider();
 				}
 			};
 			return (IServiceContainer)invoc.object;
 		}
 		else
 		{
-			return adapter.getServiceProvider();
+			return adapter.getRootServiceProvider();
 		}
 	}
 	

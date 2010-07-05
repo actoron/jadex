@@ -197,7 +197,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	 *  Get the container.
 	 *  @return The container of this component.
 	 */
-	public IServiceProvider getServiceProvider()
+	public IServiceProvider getRootServiceProvider()
 	{
 		return container;
 	}
