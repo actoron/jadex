@@ -54,7 +54,7 @@ public class BasicServiceContainer implements  IServiceProvider, IServiceContain
 	{
 		final Future ret = new Future();
 		
-		getServicesOfType(type, new HashSet()).addResultListener(new DefaultResultListener()
+		getServicesOfType(type, Collections.synchronizedSet(new HashSet())).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
@@ -95,7 +95,7 @@ public class BasicServiceContainer implements  IServiceProvider, IServiceContain
 	{
 		final Future ret = new Future();
 		
-		getServiceOfType(type, new HashSet()).addResultListener(new IResultListener()
+		getServiceOfType(type, Collections.synchronizedSet(new HashSet())).addResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
