@@ -30,16 +30,17 @@ public abstract class NestedServiceContainer extends BasicServiceContainer
 	/**
 	 *  Create a new container.
 	 */
-	public NestedServiceContainer()
+	public NestedServiceContainer(String name)
 	{
-		this(true, true);
+		this(name, true, true);
 	}
 	
 	/**
 	 *  Create a new container.
 	 */
-	public NestedServiceContainer(boolean search_up, boolean search_down)
+	public NestedServiceContainer(String name, boolean search_up, boolean search_down)
 	{
+		super(name);
 		this.search_up = search_up;
 		this.search_down = search_down;
 	}
@@ -326,17 +327,18 @@ public abstract class NestedServiceContainer extends BasicServiceContainer
 				final List children = (List)result;
 				if(children!=null)
 				{
-					System.out.println("searching children: "+children);
 					final int[] cnt = new int[]{0};
 					for(int i=0; i<children.size(); i++)
 					{
 						IServiceProvider child = (IServiceProvider)children.get(i);
+						System.out.println("searching child: "+child);
 						if(searchNode(NestedServiceContainer.this, child, false, visited))
 						{
 							child.getServicesOfType(type, visited).addResultListener(new IResultListener()
 							{
 								public void resultAvailable(Object source, Object result)
 								{
+									System.out.println("child search completeted: "+result);
 									coll.addAll((Collection)result);
 									
 									cnt[0]=cnt[0]+1;
@@ -414,5 +416,14 @@ public abstract class NestedServiceContainer extends BasicServiceContainer
 		}
 		
 		return ret;
+	}
+
+	/**
+	 *  Get the string representation.
+	 *  @return The string representation.
+	 */
+	public String toString()
+	{
+		return "NestedServiceContainer(name="+getName()+")";
 	}
 }

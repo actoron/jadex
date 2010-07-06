@@ -1,6 +1,7 @@
 package jadex.bridge;
 
 import jadex.commons.concurrent.DefaultResultListener;
+import jadex.service.IServiceProvider;
 import jadex.service.clock.ITimedObject;
 
 /**
@@ -12,6 +13,9 @@ public class InterpreterTimedObject implements ITimedObject
 	//-------- attributes --------
 		
 	/** The component adapter. */
+	protected IServiceProvider provider;
+	
+	/** The component adapter. */
 	protected IComponentAdapter adapter;
 	
 	/** The runnable. */
@@ -22,8 +26,9 @@ public class InterpreterTimedObject implements ITimedObject
 	/**
 	 *  Create a new timed object.
 	 */
-	public InterpreterTimedObject(IComponentAdapter adapter, CheckedAction runnable)
+	public InterpreterTimedObject(IServiceProvider provider, IComponentAdapter adapter, CheckedAction runnable)
 	{
+		this.provider = provider;
 		this.adapter = adapter;
 		this.action = runnable;
 	}
@@ -37,7 +42,7 @@ public class InterpreterTimedObject implements ITimedObject
 	 */
 	public void timeEventOccurred(long currenttime)
 	{
-		adapter.getRootServiceProvider().getService(IComponentManagementService.class).addResultListener(new DefaultResultListener()
+		provider.getService(IComponentManagementService.class).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{

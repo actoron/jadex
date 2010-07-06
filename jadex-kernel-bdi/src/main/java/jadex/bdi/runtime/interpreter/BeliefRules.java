@@ -383,7 +383,7 @@ public class BeliefRules
 				final ITimedObject[]	to	= new ITimedObject[1];
 				final OAVBDIFetcher fet = new OAVBDIFetcher(state, rcapa);
 				
-				to[0] = new InterpreterTimedObject(BDIInterpreter.getInterpreter(state).getAgentAdapter(), new CheckedAction()
+				to[0] = new InterpreterTimedObject(BDIInterpreter.getInterpreter(state).getServiceProvider(rcapa), BDIInterpreter.getInterpreter(state).getAgentAdapter(), new CheckedAction()
 				{
 					public boolean isValid()
 					{
@@ -456,7 +456,7 @@ public class BeliefRules
 				final ITimedObject[]	to	= new ITimedObject[1];
 				final OAVBDIFetcher fet = new OAVBDIFetcher(state, rcapa);
 				
-				to[0] = new InterpreterTimedObject(BDIInterpreter.getInterpreter(state).getAgentAdapter(), new CheckedAction()
+				to[0] = new InterpreterTimedObject(BDIInterpreter.getInterpreter(state).getServiceProvider(rcapa), BDIInterpreter.getInterpreter(state).getAgentAdapter(), new CheckedAction()
 				{
 					public boolean isValid()
 					{

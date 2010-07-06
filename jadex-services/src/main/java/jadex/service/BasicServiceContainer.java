@@ -38,6 +38,16 @@ public class BasicServiceContainer implements  IServiceProvider, IServiceContain
 	/** The platform name. */
 	protected String name;
 
+	//-------- aconstructors --------
+
+	/**
+	 *  Create a new service container.
+	 */
+	public BasicServiceContainer(String name)
+	{
+		this.name = name;
+	}
+	
 	//-------- interface methods --------
 	
 	/**
@@ -80,6 +90,7 @@ public class BasicServiceContainer implements  IServiceProvider, IServiceContain
 		return ret;
 	}*/
 
+	
 	/**
 	 *  Get the first declared platform service of a given type.
 	 *  @param type The type.

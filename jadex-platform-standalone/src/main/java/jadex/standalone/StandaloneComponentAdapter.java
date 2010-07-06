@@ -46,9 +46,6 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 {
 	//-------- attributes --------
 
-	/** The container. */
-	protected transient IServiceProvider container;
-
 	/** The component identifier. */
 	protected IComponentIdentifier cid;
 
@@ -101,9 +98,8 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	 *  Create a new component adapter.
 	 *  Uses the thread pool for executing the component.
 	 */
-	public StandaloneComponentAdapter(IServiceProvider container, IComponentDescription desc)
+	public StandaloneComponentAdapter(IComponentDescription desc)
 	{
-		this.container = container;
 		this.desc	= desc;
 		this.cid	= desc.getName();
 		this.ext_entries = Collections.synchronizedList(new ArrayList());
@@ -118,14 +114,6 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 		this.component = component;
 		this.model = model;
 	}	
-	
-	/**
-	 * 
-	 */
-	public void setContainer(IServiceContainer container)
-	{
-		this.container = container;
-	}
 	
 	//-------- IComponentAdapter methods --------
 
@@ -142,7 +130,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	 */
 	public void wakeup()
 	{
-//		System.err.println("wakeup: "+getComponentIdentifier());
+		System.err.println("wakeup: "+getComponentIdentifier());
 //		Thread.dumpStack();
 		
 		// todo: check this assert meaning!
@@ -156,7 +144,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 		// Change back to suspended, when previously waiting.
 		if(IComponentDescription.STATE_WAITING.equals(desc.getState()))
 		{
-			container.getService(IComponentManagementService.class).addResultListener(new DefaultResultListener()
+			component.getServiceProvider().getService(IComponentManagementService.class).addResultListener(new DefaultResultListener()
 			{
 				public void resultAvailable(Object source, Object result)
 				{
@@ -171,7 +159,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 			|| IComponentDescription.STATE_SUSPENDED.equals(desc.getState()))	// Hack!!! external entries must also be executed in suspended state.
 		{
 			//System.out.println("wakeup called: "+state);
-			container.getService(IExecutionService.class).addResultListener(new DefaultResultListener()
+			component.getServiceProvider().getService(IExecutionService.class).addResultListener(new DefaultResultListener()
 			{
 				public void resultAvailable(Object source, Object result)
 				{
@@ -191,15 +179,6 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 		// todo: remove cast, HACK!!!
 		// todo: add transport addresses for multi-platform communication.
 		return (IComponentIdentifier)((ComponentIdentifier)cid).clone();
-	}
-	
-	/**
-	 *  Get the container.
-	 *  @return The container of this component.
-	 */
-	public IServiceProvider getRootServiceProvider()
-	{
-		return container;
 	}
 	
 	/**
@@ -377,6 +356,10 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	 */
 	public boolean	execute()
 	{
+		System.out.println("Execute: "+cid.getName());
+		if(cid.getName().indexOf("kernel_micro")!=-1)
+			System.out.println("here");
+		
 		if(IComponentDescription.STATE_TERMINATED.equals(desc.getState()) || fatalerror)
 			throw new ComponentTerminatedException(cid.getName());
 
@@ -443,7 +426,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 		{
 			if(component.isAtBreakpoint(desc.getBreakpoints()))
 			{
-				container.getService(IComponentManagementService.class).addResultListener(new DefaultResultListener()
+				component.getServiceProvider().getService(IComponentManagementService.class).addResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object source, Object result)
 					{
@@ -461,7 +444,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 			// Set state to waiting before step. (may be reset by wakup() call in step)
 			if(dostep && IComponentDescription.STATE_SUSPENDED.equals(desc.getState()))
 			{
-				container.getService(IComponentManagementService.class).addResultListener(new DefaultResultListener()
+				component.getServiceProvider().getService(IComponentManagementService.class).addResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object source, Object result)
 					{
@@ -485,7 +468,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 				// Set back to suspended if components is still waiting but wants to execute again.
 				if(again && IComponentDescription.STATE_WAITING.equals(desc.getState()))
 				{
-					container.getService(IComponentManagementService.class).addResultListener(new DefaultResultListener()
+					component.getServiceProvider().getService(IComponentManagementService.class).addResultListener(new DefaultResultListener()
 					{
 						public void resultAvailable(Object source, Object result)
 						{
@@ -504,7 +487,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 		{
 			if(component.isAtBreakpoint(desc.getBreakpoints()))
 			{
-				container.getService(IComponentManagementService.class).addResultListener(new DefaultResultListener()
+				component.getServiceProvider().getService(IComponentManagementService.class).addResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object source, Object result)
 					{
@@ -535,7 +518,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 		getLogger().severe("Fatal error, component '"+cid+"' will be removed.");
 			
 		// Remove component from platform.
-		container.getService(IComponentManagementService.class).addResultListener(new DefaultResultListener()
+		component.getServiceProvider().getService(IComponentManagementService.class).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{

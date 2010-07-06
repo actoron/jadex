@@ -1011,18 +1011,19 @@ public class ExternalAccessFlyweight extends EACapabilityFlyweight implements IB
 				WakeupAction wakeup = new WakeupAction(getState(), getScope(), wa, ea, ExternalAccessFlyweight.this, observedobjects, future);
 				getState().setAttributeValue(ea, OAVBDIRuntimeModel.externalaccess_has_wakeupaction, wakeup);
 
+				IServiceProvider sp = (IServiceProvider)getState().getAttributeValue(getScope(), OAVBDIRuntimeModel.capability_has_serviceprovider);
 				if(timeout>-1)
 				{
 //					final long start = System.currentTimeMillis(); 
 					
 //					System.out.println("Timer created: "+start);
 					getState().setAttributeValue(ea, OAVBDIRuntimeModel.externalaccess_has_timer,
-						getInterpreter().getClockService().createTimer(timeout, new InterpreterTimedObject(getInterpreter().getAgentAdapter(), wakeup)));
+						getInterpreter().getClockService().createTimer(timeout, new InterpreterTimedObject(sp, getInterpreter().getAgentAdapter(), wakeup)));
 				}
 				else if(timeout==PlanRules.TICK_TIMER)
 				{
 					getState().setAttributeValue(ea, OAVBDIRuntimeModel.externalaccess_has_timer,
-						getInterpreter().getClockService().createTickTimer(new InterpreterTimedObject(getInterpreter().getAgentAdapter(), wakeup)));
+						getInterpreter().getClockService().createTickTimer(new InterpreterTimedObject(sp, getInterpreter().getAgentAdapter(), wakeup)));
 				}				
 			}
 		});

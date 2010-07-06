@@ -245,7 +245,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 								}
 							}
 		
-							adapter = new StandaloneComponentAdapter(container, ad);
+							adapter = new StandaloneComponentAdapter(ad);
 							adapters.put(cid, adapter);
 		
 							if(cinfo.getParent()!=null)

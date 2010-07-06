@@ -87,18 +87,14 @@ public class Starter
 //		});
 		IComponentIdentifier cid = new ComponentIdentifier("root@platform");
 		CMSComponentDescription desc = new CMSComponentDescription(cid, null, null, false, false);
-		StandaloneComponentAdapter adapter = new StandaloneComponentAdapter(null, desc);
+		StandaloneComponentAdapter adapter = new StandaloneComponentAdapter(desc);
 		IComponentInstance instance = fac.createComponentInstance(adapter, model, null, null, null);
-		IServiceContainer sc = ((Application)instance).internalGetServiceContainer();
 		adapter.setComponent(instance, model);
-		adapter.setContainer(sc);
 //		IApplicationExternalAccess ea = new ExternalAccess((Application)instance);
 		System.out.println("Instance: "+instance);
 		
-		while(instance.executeStep())
-		{
-			System.out.println("executing step");
-		}
+		// Initiate first step of root component (i.e. platform).
+		instance.executeStep();
 		
 		long startup = System.currentTimeMillis() - starttime;
 		System.out.println("Platform startup time: " + startup + " ms.");
@@ -106,117 +102,3 @@ public class Starter
 	}
 }
 
-/**
- * 
- */
-class DummyAdapter implements IComponentAdapter
-{
-	//-------- attributes --------
-
-	/** The container. */
-	protected transient IServiceProvider provider;
-
-	/** The component identifier. */
-	protected IComponentIdentifier cid;
-
-	/** The component instance. */
-	protected IComponentInstance component;
-	
-	/** The component model. */
-	protected ILoadableComponentModel model;
-
-	//-------- constructors --------
-
-	/**
-	 *  Create a new component adapter.
-	 *  Uses the thread pool for executing the component.
-	 */
-	public DummyAdapter(IComponentIdentifier cid)
-	{
-		this.cid = cid;
-	}
-	
-	/**
-	 *  Set the component.
-	 *  @param component The component to set.
-	 */
-	public void setComponent(IComponentInstance component, ILoadableComponentModel model, IServiceProvider provider)
-	{
-		this.component = component;
-		this.model = model;
-		this.provider = provider;
-	}	
-	
-	/**
-	 *  Called by the component when it probably awoke from an idle state.
-	 *  The platform has to make sure that the component will be executed
-	 *  again from now on.
-	 *  Note, this method can be called also from external threads
-	 *  (e.g. property changes). Therefore, on the calling thread
-	 *  no component related actions must be executed (use some kind
-	 *  of wake-up mechanism).
-	 *  Also proper synchronization has to be made sure, as this method
-	 *  can be called concurrently from different threads.
-	 */
-	public void	wakeup() throws ComponentTerminatedException
-	{
-		
-	}
-	
-	/**
-	 *  Execute an action on the component thread.
-	 *  May be safely called from any (internal or external) thread.
-	 *  The contract of this method is as follows:
-	 *  The component adapter ensures the execution of the external action, otherwise
-	 *  the method will throw a terminated exception.
-	 *  @param action The action to be executed on the component thread.
-	 */
-	public void invokeLater(Runnable action)
-	{
-		System.out.println("invokeLater: "+action);
-		action.run();
-	}
-	
-	/**
-	 *  Check if the external thread is accessing.
-	 *  @return True, if called from an external (i.e. non-synchronized) thread.
-	 */
-	public boolean isExternalThread()
-	{
-		return false;
-	}
-
-	/**
-	 *  Cause termination of the component.
-	 *  IKernelComponent.killComponent(IResultListener) will be
-	 *  called in turn.
-	 * /
-	public void killComponent()	throws ComponentTerminatedException;*/
-
-	/**
-	 *  Get the component platform.
-	 *  @return The component platform.
-	 */
-	public IServiceProvider getRootServiceProvider()	throws ComponentTerminatedException
-	{
-		return provider;
-	}
-
-	/**
-	 *  Return the native component-identifier that allows to send
-	 *  messages to this component.
-	 */
-	public IComponentIdentifier getComponentIdentifier() throws ComponentTerminatedException
-	{
-		return cid;
-	}
-	
-	/**
-	 *  Get the component logger.
-	 *  @return The logger.
-	 */
-	public Logger getLogger()
-	{
-		return Logger.getAnonymousLogger();
-	}
-}

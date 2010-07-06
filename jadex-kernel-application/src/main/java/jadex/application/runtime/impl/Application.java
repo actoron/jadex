@@ -25,6 +25,7 @@ import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
+import jadex.commons.ThreadSuspendable;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.javaparser.SimpleValueFetcher;
@@ -102,7 +103,7 @@ public class Application implements IApplication, IComponentInstance
 		this.parent = parent;
 		this.arguments = arguments==null ? new HashMap() : arguments;
 		this.results = new HashMap();
-		this.mycontainer = new NestedServiceContainer()
+		this.mycontainer = new NestedServiceContainer(adapter.getComponentIdentifier().getLocalName())
 		{
 			public IFuture getParent()
 			{
@@ -309,7 +310,7 @@ public class Application implements IApplication, IComponentInstance
 	{
 		// Checks if loaded model is defined in the application component types
 		
-		adapter.getRootServiceProvider().getServices(IComponentFactory.class).addResultListener(new DefaultResultListener()
+		getServiceProvider().getServices(IComponentFactory.class).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
@@ -430,7 +431,7 @@ public class Application implements IApplication, IComponentInstance
 	 */
 	public void killApplication()
 	{
-		((IComponentManagementService)getComponentAdapter().getRootServiceProvider()
+		((IComponentManagementService)getServiceProvider()
 			.getService(IComponentManagementService.class))
 			.destroyComponent(getComponentAdapter().getComponentIdentifier());
 	}
@@ -556,7 +557,7 @@ public class Application implements IApplication, IComponentInstance
 	 */
 	public IServiceProvider getServiceProvider()
 	{
-		return adapter.getRootServiceProvider();
+		return mycontainer;
 	}
 	
 	/**
@@ -787,7 +788,7 @@ public class Application implements IApplication, IComponentInstance
 						public void resultAvailable(Object source, Object result)
 						{
 							// Create spaces for context.
-							System.out.println("start finished: "+getComponentIdentifier());
+							System.out.println("comp services start finished: "+getComponentIdentifier());
 							List spaces = config.getMSpaceInstances();
 							if(spaces!=null)
 							{
@@ -809,13 +810,13 @@ public class Application implements IApplication, IComponentInstance
 							}
 
 							final List components = config.getMComponentInstances();
-							adapter.getRootServiceProvider().getService(ILibraryService.class).addResultListener(createResultListener(new DefaultResultListener()
+							getServiceProvider().getService(ILibraryService.class).addResultListener(createResultListener(new DefaultResultListener()
 							{
 								public void resultAvailable(Object source, Object result)
 								{
 									final ILibraryService ls = (ILibraryService)result;
 									final ClassLoader cl = ls.getClassLoader();
-									adapter.getRootServiceProvider().getService(IComponentManagementService.class).addResultListener(createResultListener(new DefaultResultListener()
+									getServiceProvider().getService(IComponentManagementService.class).addResultListener(createResultListener(new DefaultResultListener()
 									{
 										public void resultAvailable(Object source, Object result)
 										{
@@ -824,14 +825,14 @@ public class Application implements IApplication, IComponentInstance
 											for(int i=0; i<components.size(); i++)
 											{
 												final MComponentInstance component = (MComponentInstance)components.get(i);
-												
-												System.out.println("Create: "+component.getName()+" "+component.getTypeName()+" "+component.getConfiguration());
+												System.out.println("Create: "+component.getName()+" "+component.getTypeName()+" "+component.getConfiguration()+" "+Thread.currentThread());
 												int num = component.getNumber(Application.this, cl, fetcher);
 												for(int j=0; j<num; j++)
 												{
-													ces.createComponent(component.getName(), component.getType(model.getApplicationType()).getFilename(),
+													IFuture ret = ces.createComponent(component.getName(), component.getType(model.getApplicationType()).getFilename(),
 														new CreationInfo(component.getConfiguration(), component.getArguments(Application.this, cl, fetcher), adapter.getComponentIdentifier(),
 														component.isSuspended(), component.isMaster(), component.isDaemon(), model.getApplicationType().getAllImports()), null);					
+													System.out.println("Create finished: "+ret.get(new ThreadSuspendable()));
 												}
 											}
 										}
@@ -990,4 +991,6 @@ public class Application implements IApplication, IComponentInstance
 	{
 		return mycontainer;
 	}
+	
+	
 }

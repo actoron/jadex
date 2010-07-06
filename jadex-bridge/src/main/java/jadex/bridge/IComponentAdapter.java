@@ -51,8 +51,8 @@ public interface IComponentAdapter
 	/**
 	 *  Get the component platform.
 	 *  @return The component platform.
-	 */
-	public IServiceProvider getRootServiceProvider()	throws ComponentTerminatedException;
+	 * /
+	public IServiceProvider getRootServiceProvider()	throws ComponentTerminatedException;*/
 
 	/**
 	 *  Return the native component-identifier that allows to send

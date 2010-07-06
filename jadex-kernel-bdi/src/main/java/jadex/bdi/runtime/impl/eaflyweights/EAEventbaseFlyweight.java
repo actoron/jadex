@@ -12,11 +12,13 @@ import jadex.bdi.runtime.interpreter.AgentRules;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.InternalEventRules;
 import jadex.bdi.runtime.interpreter.MessageEventRules;
+import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bridge.IComponentManagementService;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.Tuple;
 import jadex.rules.state.IOAVState;
+import jadex.service.IServiceProvider;
 
 import java.util.Map;
 
@@ -481,14 +483,16 @@ public class EAEventbaseFlyweight extends ElementFlyweight implements IEAEventba
 			{
 				public void run()
 				{
-					IComponentManagementService cms = (IComponentManagementService)getInterpreter().getAgentAdapter().getRootServiceProvider().getService(IComponentManagementService.class);	
+					IServiceProvider sp = (IServiceProvider)getState().getAttributeValue(getScope(), OAVBDIRuntimeModel.capability_has_serviceprovider);
+					IComponentManagementService cms = (IComponentManagementService)sp.getService(IComponentManagementService.class);	
 					ret.setResult(cms.createComponentIdentifier(name, local, addresses));
 				}
 			});
 		}
 		else
 		{
-			IComponentManagementService cms = (IComponentManagementService)getInterpreter().getAgentAdapter().getRootServiceProvider().getService(IComponentManagementService.class);	
+			IServiceProvider sp = (IServiceProvider)getState().getAttributeValue(getScope(), OAVBDIRuntimeModel.capability_has_serviceprovider);
+			IComponentManagementService cms = (IComponentManagementService)sp.getService(IComponentManagementService.class);	
 			ret.setResult(cms.createComponentIdentifier(name, local, addresses));
 		}
 		

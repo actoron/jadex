@@ -1010,10 +1010,12 @@ public class AgentRules
 		}
 		
 		// Initialize services.
+		
+		// todo: connect services of capabilities, name them accordingly
 		Collection	mservices = state.getAttributeValues(mcapa, OAVBDIMetaModel.capability_has_services);
 		if(mservices!=null)
 		{
-			NestedServiceContainer sp = new NestedServiceContainer()
+			NestedServiceContainer sp = new NestedServiceContainer(BDIInterpreter.getInterpreter(state).getAgentAdapter().getComponentIdentifier().getLocalName())
 			{
 				public IFuture getParent()
 				{
@@ -1530,7 +1532,7 @@ public class AgentRules
 		{
 			final ITimedObject[]	to	= new ITimedObject[1];
 			final OAVBDIFetcher fet = new OAVBDIFetcher(state, rcapa);
-			to[0] = new InterpreterTimedObject(BDIInterpreter.getInterpreter(state).getAgentAdapter(), new CheckedAction()
+			to[0] = new InterpreterTimedObject(BDIInterpreter.getInterpreter(state).getServiceProvider(rcapa), BDIInterpreter.getInterpreter(state).getAgentAdapter(), new CheckedAction()
 			{
 				public void run()
 				{
@@ -1745,7 +1747,7 @@ public class AgentRules
 			final ITimedObject[]	to	= new ITimedObject[1];
 			
 			final OAVBDIFetcher fet = new OAVBDIFetcher(state, rcapa);
-			to[0]	= new InterpreterTimedObject(BDIInterpreter.getInterpreter(state).getAgentAdapter(), new CheckedAction()
+			to[0]	= new InterpreterTimedObject(BDIInterpreter.getInterpreter(state).getServiceProvider(rcapa), BDIInterpreter.getInterpreter(state).getAgentAdapter(), new CheckedAction()
 			{
 				public void run()
 				{
@@ -3033,7 +3035,8 @@ public class AgentRules
 		long tt = prop!=null? prop.longValue(): 10000;
 		
 		// changed *.class to *.TYPE due to javaflow bug
-		state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_timer, interpreter.getClockService().createTimer(tt, new InterpreterTimedObject(BDIInterpreter.getInterpreter(state).getAgentAdapter(), new CheckedAction()
+		state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_timer, interpreter.getClockService().createTimer(tt, 
+			new InterpreterTimedObject(BDIInterpreter.getInterpreter(state).getServiceProvider(), BDIInterpreter.getInterpreter(state).getAgentAdapter(), new CheckedAction()
 			{
 				public boolean isValid()
 				{

@@ -41,6 +41,7 @@ import jadex.rules.rulesystem.Rulebase;
 import jadex.rules.rulesystem.rules.Rule;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.IProfiler;
+import jadex.service.IServiceProvider;
 import jadex.service.clock.IClockService;
 
 import java.io.IOException;
@@ -262,7 +263,7 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 		
 		// Get the services.
 		final boolean services[]	= new boolean[3];
-		adapter.getRootServiceProvider().getService(IClockService.class).addResultListener(new DefaultResultListener()
+		getServiceProvider().getService(IClockService.class).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
@@ -277,7 +278,7 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 					BDIInterpreter.this.state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state,OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_CREATING);
 			}
 		});
-		adapter.getRootServiceProvider().getService(IComponentManagementService.class).addResultListener(new DefaultResultListener()
+		getServiceProvider().getService(IComponentManagementService.class).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
@@ -292,7 +293,7 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 					BDIInterpreter.this.state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state,OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_CREATING);
 			}
 		});
-		adapter.getRootServiceProvider().getService(IMessageService.class).addResultListener(new DefaultResultListener()
+		getServiceProvider(getAgent()).getService(IMessageService.class).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
@@ -792,7 +793,7 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 	{
 		final Future ret = new Future();
 		
-		adapter.getRootServiceProvider().getService(IComponentManagementService.class).addResultListener(new DefaultResultListener()
+		getServiceProvider().getService(IComponentManagementService.class).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
@@ -1171,6 +1172,22 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 	public IExternalAccess getParent()
 	{
 		return parent;
+	}
+	
+	/** 
+	 *  Get the service provider.
+	 */
+	public IServiceProvider getServiceProvider()
+	{
+		return getServiceProvider(getAgent());
+	}
+	
+	/** 
+	 *  Get the service provider.
+	 */
+	public IServiceProvider getServiceProvider(Object scope)
+	{
+		return (IServiceProvider)getState().getAttributeValue(scope, OAVBDIRuntimeModel.capability_has_serviceprovider);
 	}
 	
 	//-------- helper methods --------

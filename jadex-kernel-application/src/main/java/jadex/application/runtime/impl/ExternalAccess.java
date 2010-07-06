@@ -30,6 +30,9 @@ public class ExternalAccess implements IApplicationExternalAccess
 	/** The agent adapter. */
 	protected IComponentAdapter adapter;
 	
+	/** The toString value. */
+	protected String tostring;
+	
 	// -------- constructors --------
 
 	/**
@@ -39,6 +42,7 @@ public class ExternalAccess implements IApplicationExternalAccess
 	{
 		this.application = application;
 		this.adapter = application.getComponentAdapter();
+		this.tostring = application.getComponentIdentifier().getLocalName();
 	}
 
 	//-------- methods --------
@@ -304,6 +308,14 @@ public class ExternalAccess implements IApplicationExternalAccess
 	public IServiceProvider getServiceProvider()
 	{
 		return application.getServiceProvider();
+	}
+
+	/**
+	 *  Get the string representation.
+	 */
+	public String toString()
+	{
+		return "ExternalAccess(comp=" + tostring + ")";
 	}
 
 }

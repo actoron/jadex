@@ -81,7 +81,7 @@ public abstract class EACapabilityFlyweight extends ElementFlyweight implements 
 		this.expressionbase	= EAExpressionbaseFlyweight.getExpressionbaseFlyweight(getState(), getScope());
 		this.logger	= BDIInterpreter.getInterpreter(getState()).getLogger(getScope());
 		this.cid	= adapter.getComponentIdentifier();
-		this.provider = adapter.getRootServiceProvider();
+		this.provider = (IServiceProvider)state.getAttributeValue(scope, OAVBDIRuntimeModel.capability_has_serviceprovider);
 	}
 	
 	//-------- methods concerning beliefs --------
