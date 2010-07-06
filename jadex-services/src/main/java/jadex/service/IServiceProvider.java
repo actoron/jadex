@@ -50,7 +50,8 @@ public interface IServiceProvider
 	 *  @param type The type.
 	 */
 	public IFuture getServiceOfType(final Class type, final Set visited);
-	
+		
+	// todo: remove me?
 	/**
 	 *  Get the name of the provider.
 	 *  @return The name of this provider.

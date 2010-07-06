@@ -1361,4 +1361,14 @@ public class ExternalAccessFlyweight extends EACapabilityFlyweight implements IB
 		
 		return ret;
 	}
+
+	// todo: remove me?
+	/**
+	 *  Get the name of the provider.
+	 *  @return The name of this provider.
+	 */
+	public String getName()
+	{
+		return getComponentName();
+	}
 }
