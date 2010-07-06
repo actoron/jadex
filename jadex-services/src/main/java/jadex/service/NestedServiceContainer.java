@@ -2,6 +2,7 @@ package jadex.service;
 
 import jadex.commons.Future;
 import jadex.commons.IFuture;
+import jadex.commons.SUtil;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
 
@@ -115,10 +116,12 @@ public abstract class NestedServiceContainer extends BasicServiceContainer
 	 */
 	protected void checkParent(final Class type, final Set visited, final Future ret, final boolean[] results)
 	{
+//		System.out.println("Check parent: "+type+", "+visited+", "+SUtil.arrayToString(results));
 		getParent().addResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
+//				System.out.println("Check parent1: "+result);
 				IServiceProvider parent = (IServiceProvider)result;
 				if(parent!=null && searchNode(NestedServiceContainer.this, parent, true, visited))
 				{
@@ -155,6 +158,7 @@ public abstract class NestedServiceContainer extends BasicServiceContainer
 			
 			public void exceptionOccurred(Object source, Exception exception)
 			{
+//				System.out.println("Check parent2: "+exception);
 				results[1] = true;
 				if(!checkAndSetResult(results, ret, null, exception))
 				{
@@ -260,7 +264,7 @@ public abstract class NestedServiceContainer extends BasicServiceContainer
 	 */
 	public IFuture getServicesOfType(final Class type, final Set visited)
 	{
-		System.out.println("search: "+this+" "+type+" "+visited);
+		System.out.println("search services: "+this+" "+type+" "+visited);
 		
 		final Future ret = new Future();
 		final boolean[] results = new boolean[3];
@@ -327,7 +331,7 @@ public abstract class NestedServiceContainer extends BasicServiceContainer
 			public void resultAvailable(Object source, Object result)
 			{
 				final List children = (List)result;
-				System.out.println("found children (b): "+getName()+" "+children);
+				System.out.println("found children (b): "+type+", "+getName()+" "+children);
 				if(children!=null)
 				{
 					final int[] cnt = new int[]{0};

@@ -9,10 +9,8 @@ import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.SGUI;
 import jadex.commons.SReflect;
-import jadex.commons.concurrent.IResultListener;
 import jadex.service.IService;
 import jadex.service.IServiceContainer;
-import jadex.service.library.ILibraryService;
 
 import java.util.Map;
 
@@ -67,19 +65,7 @@ public class MicroAgentFactory implements IComponentFactory, IService
 	public IFuture	startService()
 	{
 		final Future	ret	= new Future(null);
-//		container.getService(ILibraryService.class).addResultListener(new IResultListener()
-//		{
-//			public void resultAvailable(Object source, Object result)
-//			{
-//				libservice = (ILibraryService)result;
-//				ret.setResult(null);
-//			}
-//			
-//			public void exceptionOccurred(Object source, Exception exception)
-//			{
-//				ret.setException(exception);
-//			}
-//		});
+
 		return ret;
 	}
 	

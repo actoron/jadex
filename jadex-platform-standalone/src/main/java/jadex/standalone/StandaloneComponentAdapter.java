@@ -130,7 +130,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	 */
 	public void wakeup()
 	{
-		System.err.println("wakeup: "+getComponentIdentifier());
+//		System.err.println("wakeup: "+getComponentIdentifier());
 //		Thread.dumpStack();
 		
 		// todo: check this assert meaning!
@@ -356,11 +356,11 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	 */
 	public boolean	execute()
 	{
-		System.out.println("Execute: "+cid.getName());
-		if(cid.getName().indexOf("platform")!=-1)
-			System.out.println("platform start");
-		if(cid.getName().indexOf("kernel_micro")!=-1)
-			System.out.println("micro start");
+//		System.out.println("Execute: "+cid.getName());
+//		if(cid.getName().indexOf("platform")!=-1)
+//			System.out.println("platform start");
+//		if(cid.getName().indexOf("kernel_micro")!=-1)
+//			System.out.println("micro start");
 		
 		if(IComponentDescription.STATE_TERMINATED.equals(desc.getState()) || fatalerror)
 			throw new ComponentTerminatedException(cid.getName());
@@ -503,7 +503,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 		componentthread.setContextClassLoader(cl);
 		this.componentthread = null;
 		
-		System.out.println("end: "+getComponentIdentifier());
+//		System.out.println("end: "+getComponentIdentifier());
 		
 		return again || extexecuted;
 	}

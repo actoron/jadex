@@ -25,7 +25,6 @@ import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
-import jadex.commons.ThreadSuspendable;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.javaparser.SimpleValueFetcher;
@@ -822,20 +821,7 @@ public class Application implements IApplication, IComponentInstance
 										public void resultAvailable(Object source, Object result)
 										{
 											final IComponentManagementService	ces	= (IComponentManagementService)result;
-											
-											for(int i=0; i<components.size(); i++)
-											{
-												final MComponentInstance component = (MComponentInstance)components.get(i);
-												System.out.println("Create: "+component.getName()+" "+component.getTypeName()+" "+component.getConfiguration()+" "+Thread.currentThread());
-												int num = component.getNumber(Application.this, cl, fetcher);
-												for(int j=0; j<num; j++)
-												{
-													IFuture ret = ces.createComponent(component.getName(), component.getType(model.getApplicationType()).getFilename(),
-														new CreationInfo(component.getConfiguration(), component.getArguments(Application.this, cl, fetcher), adapter.getComponentIdentifier(),
-														component.isSuspended(), component.isMaster(), component.isDaemon(), model.getApplicationType().getAllImports()), null);					
-//													System.out.println("Create finished: "+ret.get(new ThreadSuspendable()));
-												}
-											}
+											createComponent(fetcher, components, cl, ces, 0);
 										}
 									}));
 								}
@@ -992,6 +978,33 @@ public class Application implements IApplication, IComponentInstance
 	{
 		return mycontainer;
 	}
-	
-	
+
+	protected void createComponent(final SimpleValueFetcher fetcher, final List components, final ClassLoader cl, final IComponentManagementService ces, final int i)
+	{
+		if(i<components.size())
+		{
+			final MComponentInstance component = (MComponentInstance)components.get(i);
+			System.out.println("Create: "+component.getName()+" "+component.getTypeName()+" "+component.getConfiguration()+" "+Thread.currentThread());
+			int num = component.getNumber(Application.this, cl, fetcher);
+			for(int j=0; j<num; j++)
+			{
+				IFuture ret = ces.createComponent(component.getName(), component.getType(model.getApplicationType()).getFilename(),
+					new CreationInfo(component.getConfiguration(), component.getArguments(Application.this, cl, fetcher), adapter.getComponentIdentifier(),
+					component.isSuspended(), component.isMaster(), component.isDaemon(), model.getApplicationType().getAllImports()), null);
+				ret.addResultListener(createResultListener(new IResultListener()
+				{
+					public void resultAvailable(Object source, Object result)
+					{
+						System.out.println("Create finished: "+component.getName()+" "+component.getTypeName()+" "+component.getConfiguration()+" "+Thread.currentThread());
+						createComponent(fetcher, components, cl, ces, i+1);
+					}
+					
+					public void exceptionOccurred(Object source, Exception exception)
+					{
+						exception.printStackTrace();
+					}
+				}));
+			}
+		}
+	}
 }

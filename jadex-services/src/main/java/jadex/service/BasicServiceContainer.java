@@ -2,14 +2,9 @@ package jadex.service;
 
 import jadex.commons.Future;
 import jadex.commons.IFuture;
-import jadex.commons.Properties;
-import jadex.commons.Property;
-import jadex.commons.SReflect;
 import jadex.commons.concurrent.CounterListener;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
-import jadex.javaparser.IValueFetcher;
-import jadex.javaparser.SJavaParser;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -139,8 +134,6 @@ public class BasicServiceContainer implements  IServiceProvider, IServiceContain
 //	public void addService(Class type, String name, Object service)
 	public void addService(Class type, Object service)
 	{
-		final Future ret = new Future();
-		
 //		System.out.println("Adding service: " + name + " " + type + " " + service);
 		Collection tmp = services!=null? (Collection)services.get(type): null;
 		if(tmp == null)

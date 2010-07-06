@@ -259,6 +259,7 @@ public class ExternalAccess implements IApplicationExternalAccess
 	 */
 	public IFuture getServiceOfType(final Class type, final Set visited)
 	{
+//		System.out.println("gSoT: "+application+", "+type+", "+visited);
 		final Future ret = new Future();
 		
 		if(adapter.isExternalThread())
@@ -267,12 +268,14 @@ public class ExternalAccess implements IApplicationExternalAccess
 			{
 				public void run() 
 				{
+//					System.out.println("gSoT.iL: "+application+", "+type+", "+visited);
 					application.getServiceProvider().getServiceOfType(type, visited).addResultListener(new DelegationResultListener(ret));
 				}
 			});
 		}
 		else
 		{
+//			System.out.println("gSoT.d: "+application+", "+type+", "+visited);
 			application.getServiceProvider().getServiceOfType(type, visited).addResultListener(new DelegationResultListener(ret));
 		}
 		
