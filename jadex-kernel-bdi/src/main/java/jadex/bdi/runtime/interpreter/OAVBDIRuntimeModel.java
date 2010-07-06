@@ -252,6 +252,10 @@ public class OAVBDIRuntimeModel
 	// todo: hack remove somehow (e.g. rule priorities / ruleflow processing?!)
 //	public static OAVAttributeType agent_has_eventprocessing;
 	
+	/** The agent has a service provider. */
+	public static OAVAttributeType agent_has_serviceprovider;
+
+	
 	//-------- capability --------
 	
 	/** The capability type. */
@@ -309,10 +313,7 @@ public class OAVBDIRuntimeModel
 		
 	/** The capability has assigntosources (sources for abstract elements, assigned on init). */
 	public static OAVAttributeType capability_has_abstractsources;
-		
-	/** The capability has a service provider. */
-	public static OAVAttributeType capability_has_serviceprovider;
-	
+			
 	//-------- capability reference --------
 	
 	/** The capability reference type. */
@@ -929,7 +930,6 @@ public class OAVBDIRuntimeModel
 		capability_has_precandidates = capability_type.createAttributeType("capability_has_precandidates", precandidatelist_type, OAVAttributeType.MAP, null, precandidatelist_has_processableelement);
 		capability_has_abstractsources = capability_type.createAttributeType("capability_has_abstractsources", abstractsource_type, OAVAttributeType.MAP, null, abstractsource_has_abstract);
 		capability_has_properties = capability_type.createAttributeType("capability_has_properties", parameter_type, OAVAttributeType.MAP, null, parameter_has_name);
-		capability_has_serviceprovider = capability_type.createAttributeType("capability_has_serviceprovider", java_serviceprovider_type, OAVAttributeType.NONE);
 		
 		// agent
 		agent_has_name = agent_type.createAttributeType("agent_has_name", OAVJavaType.java_string_type);
@@ -938,6 +938,8 @@ public class OAVBDIRuntimeModel
 		// todo: use IMessageAdapter?
 		agent_has_inbox = agent_type.createAttributeType("agent_has_inbox", java_imessageadapter_type, OAVAttributeType.LIST, null);
 //		agent_has_actions = agent_type.createAttributeType("agent_has_actions", java_runnable_type, OAVAttributeType.LIST, null);
+		agent_has_serviceprovider = agent_type.createAttributeType("agent_has_serviceprovider", java_serviceprovider_type, OAVAttributeType.NONE);
+
 		java_map_type = createJavaType(Map.class, OAVJavaType.KIND_OBJECT);
 		
 		agent_has_arguments = agent_type.createAttributeType("agent_has_arguments", java_map_type);

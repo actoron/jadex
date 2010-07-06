@@ -361,6 +361,8 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 //			System.out.println("platform start");
 //		if(cid.getName().indexOf("kernel_micro")!=-1)
 //			System.out.println("micro start");
+//		else if(cid.getName().indexOf("bdi")!=-1)
+//			System.out.println("bdi start");
 		
 		if(IComponentDescription.STATE_TERMINATED.equals(desc.getState()) || fatalerror)
 			throw new ComponentTerminatedException(cid.getName());

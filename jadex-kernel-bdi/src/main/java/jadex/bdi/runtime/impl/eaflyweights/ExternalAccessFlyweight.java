@@ -1011,19 +1011,18 @@ public class ExternalAccessFlyweight extends EACapabilityFlyweight implements IB
 				WakeupAction wakeup = new WakeupAction(getState(), getScope(), wa, ea, ExternalAccessFlyweight.this, observedobjects, future);
 				getState().setAttributeValue(ea, OAVBDIRuntimeModel.externalaccess_has_wakeupaction, wakeup);
 
-				IServiceProvider sp = (IServiceProvider)getState().getAttributeValue(getScope(), OAVBDIRuntimeModel.capability_has_serviceprovider);
 				if(timeout>-1)
 				{
 //					final long start = System.currentTimeMillis(); 
 					
 //					System.out.println("Timer created: "+start);
 					getState().setAttributeValue(ea, OAVBDIRuntimeModel.externalaccess_has_timer,
-						getInterpreter().getClockService().createTimer(timeout, new InterpreterTimedObject(sp, getInterpreter().getAgentAdapter(), wakeup)));
+						getInterpreter().getClockService().createTimer(timeout, new InterpreterTimedObject(getInterpreter().getServiceProvider(), getInterpreter().getAgentAdapter(), wakeup)));
 				}
 				else if(timeout==PlanRules.TICK_TIMER)
 				{
 					getState().setAttributeValue(ea, OAVBDIRuntimeModel.externalaccess_has_timer,
-						getInterpreter().getClockService().createTickTimer(new InterpreterTimedObject(sp, getInterpreter().getAgentAdapter(), wakeup)));
+						getInterpreter().getClockService().createTickTimer(new InterpreterTimedObject(getInterpreter().getServiceProvider(), getInterpreter().getAgentAdapter(), wakeup)));
 				}				
 			}
 		});
@@ -1158,16 +1157,14 @@ public class ExternalAccessFlyweight extends EACapabilityFlyweight implements IB
 			{
 				public void run()
 				{
-					IServiceProvider sp = (IServiceProvider)getState().getAttributeValue(getScope(), OAVBDIRuntimeModel.capability_has_serviceprovider);
-					object = sp.getService(type);
+					object = getInterpreter().getServiceProvider().getService(type);
 				}
 			};
 			return (IFuture)invoc.object;
 		}
 		else
 		{
-			IServiceProvider sp = (IServiceProvider)getState().getAttributeValue(getScope(), OAVBDIRuntimeModel.capability_has_serviceprovider);
-			return sp.getService(type);
+			return getInterpreter().getServiceProvider().getService(type);
 		}
 	}
 	

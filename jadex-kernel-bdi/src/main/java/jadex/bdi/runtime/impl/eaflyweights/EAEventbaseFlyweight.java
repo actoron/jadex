@@ -483,16 +483,15 @@ public class EAEventbaseFlyweight extends ElementFlyweight implements IEAEventba
 			{
 				public void run()
 				{
-					IServiceProvider sp = (IServiceProvider)getState().getAttributeValue(getScope(), OAVBDIRuntimeModel.capability_has_serviceprovider);
-					IComponentManagementService cms = (IComponentManagementService)sp.getService(IComponentManagementService.class);	
+					IComponentManagementService cms = (IComponentManagementService)getInterpreter().getServiceProvider().getService(IComponentManagementService.class);	
 					ret.setResult(cms.createComponentIdentifier(name, local, addresses));
 				}
 			});
 		}
 		else
 		{
-			IServiceProvider sp = (IServiceProvider)getState().getAttributeValue(getScope(), OAVBDIRuntimeModel.capability_has_serviceprovider);
-			IComponentManagementService cms = (IComponentManagementService)sp.getService(IComponentManagementService.class);	
+			
+			IComponentManagementService cms = (IComponentManagementService)getInterpreter().getServiceProvider().getService(IComponentManagementService.class);	
 			ret.setResult(cms.createComponentIdentifier(name, local, addresses));
 		}
 		

@@ -42,6 +42,7 @@ import jadex.rules.rulesystem.rules.Rule;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.IProfiler;
 import jadex.service.IServiceProvider;
+import jadex.service.NestedServiceContainer;
 import jadex.service.clock.IClockService;
 
 import java.io.IOException;
@@ -180,7 +181,7 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 	 *  @param config	The name of the configuration (or null for default configuration) 
 	 *  @param arguments	The arguments for the agent as name/value pairs.
 	 */
-	public BDIInterpreter(IComponentAdapter adapter, IOAVState state, OAVAgentModel model, 
+	public BDIInterpreter(IComponentAdapter adapter, final IOAVState state, OAVAgentModel model, 
 		String config, Map arguments, IExternalAccess parent, Map kernelprops)
 	{	
 		this.adapter = adapter;
@@ -261,6 +262,32 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 				this.microplansteps = mps.booleanValue();
 		}
 		
+		// Create the service provider
+		NestedServiceContainer sp = new NestedServiceContainer(BDIInterpreter.getInterpreter(state).getAgentAdapter().getComponentIdentifier().getLocalName())
+		{
+			public IFuture getParent()
+			{
+				final Future ret = new Future();
+				ret.setResult(BDIInterpreter.getInterpreter(state).getParent());
+				return ret;
+			}
+			
+			public IFuture getChildren()
+			{
+				final Future ret = new Future();
+				
+				new ExternalAccessFlyweight(state, ragent).getChildren().addResultListener(new DefaultResultListener()
+				{
+					public void resultAvailable(Object source, Object result)
+					{
+						ret.setResult(result);
+					}
+				});
+				return ret;
+			}
+		};
+		state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_serviceprovider, sp);
+		
 		// Get the services.
 		final boolean services[]	= new boolean[3];
 		getServiceProvider().getService(IClockService.class).addResultListener(new DefaultResultListener()
@@ -293,7 +320,7 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 					BDIInterpreter.this.state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state,OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_CREATING);
 			}
 		});
-		getServiceProvider(getAgent()).getService(IMessageService.class).addResultListener(new DefaultResultListener()
+		getServiceProvider().getService(IMessageService.class).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
@@ -1179,15 +1206,7 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 	 */
 	public IServiceProvider getServiceProvider()
 	{
-		return getServiceProvider(getAgent());
-	}
-	
-	/** 
-	 *  Get the service provider.
-	 */
-	public IServiceProvider getServiceProvider(Object scope)
-	{
-		return (IServiceProvider)getState().getAttributeValue(scope, OAVBDIRuntimeModel.capability_has_serviceprovider);
+		return (IServiceProvider)getState().getAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_serviceprovider);
 	}
 	
 	//-------- helper methods --------

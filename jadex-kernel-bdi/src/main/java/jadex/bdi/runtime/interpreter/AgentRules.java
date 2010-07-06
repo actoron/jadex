@@ -30,6 +30,7 @@ import jadex.rules.rulesystem.rules.Variable;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVAttributeType;
 import jadex.rules.state.OAVObjectType;
+import jadex.service.BasicServiceContainer;
 import jadex.service.NestedServiceContainer;
 import jadex.service.clock.ITimedObject;
 import jadex.service.clock.ITimer;
@@ -1015,30 +1016,6 @@ public class AgentRules
 		Collection	mservices = state.getAttributeValues(mcapa, OAVBDIMetaModel.capability_has_services);
 		if(mservices!=null)
 		{
-			NestedServiceContainer sp = new NestedServiceContainer(BDIInterpreter.getInterpreter(state).getAgentAdapter().getComponentIdentifier().getLocalName())
-			{
-				public IFuture getParent()
-				{
-					final Future ret = new Future();
-					ret.setResult(BDIInterpreter.getInterpreter(state).getParent());
-					return ret;
-				}
-				
-				public IFuture getChildren()
-				{
-					final Future ret = new Future();
-					
-					new ExternalAccessFlyweight(state, rcapa).getChildren().addResultListener(new DefaultResultListener()
-					{
-						public void resultAvailable(Object source, Object result)
-						{
-							ret.setResult(result);
-						}
-					});
-					return ret;
-				}
-			};
-			state.setAttributeValue(rcapa, OAVBDIRuntimeModel.capability_has_serviceprovider, sp);
 			for(Iterator it=mservices.iterator(); it.hasNext(); )
 			{
 				Object mexp = it.next();
@@ -1046,7 +1023,8 @@ public class AgentRules
 				Object val = evaluateExpression(state, mexp, new OAVBDIFetcher(state, rcapa));
 				Class type = (Class)state.getAttributeValue(mexp, OAVBDIMetaModel.expression_has_class);
 //				sp.addService(type, name, val);
-				sp.addService(type, val);
+				// cast hack?!
+				((BasicServiceContainer)BDIInterpreter.getInterpreter(state).getServiceProvider()).addService(type, val);
 				System.out.println("Service: "+name+" "+val+" "+type);
 			}
 		}
@@ -1532,7 +1510,7 @@ public class AgentRules
 		{
 			final ITimedObject[]	to	= new ITimedObject[1];
 			final OAVBDIFetcher fet = new OAVBDIFetcher(state, rcapa);
-			to[0] = new InterpreterTimedObject(BDIInterpreter.getInterpreter(state).getServiceProvider(rcapa), BDIInterpreter.getInterpreter(state).getAgentAdapter(), new CheckedAction()
+			to[0] = new InterpreterTimedObject(BDIInterpreter.getInterpreter(state).getServiceProvider(), BDIInterpreter.getInterpreter(state).getAgentAdapter(), new CheckedAction()
 			{
 				public void run()
 				{
@@ -1747,7 +1725,7 @@ public class AgentRules
 			final ITimedObject[]	to	= new ITimedObject[1];
 			
 			final OAVBDIFetcher fet = new OAVBDIFetcher(state, rcapa);
-			to[0]	= new InterpreterTimedObject(BDIInterpreter.getInterpreter(state).getServiceProvider(rcapa), BDIInterpreter.getInterpreter(state).getAgentAdapter(), new CheckedAction()
+			to[0]	= new InterpreterTimedObject(BDIInterpreter.getInterpreter(state).getServiceProvider(), BDIInterpreter.getInterpreter(state).getAgentAdapter(), new CheckedAction()
 			{
 				public void run()
 				{
