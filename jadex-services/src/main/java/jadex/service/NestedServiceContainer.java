@@ -2,7 +2,6 @@ package jadex.service;
 
 import jadex.commons.Future;
 import jadex.commons.IFuture;
-import jadex.commons.SUtil;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
 
@@ -264,7 +263,7 @@ public abstract class NestedServiceContainer extends BasicServiceContainer
 	 */
 	public IFuture getServicesOfType(final Class type, final Set visited)
 	{
-		System.out.println("search services: "+this+" "+type+" "+visited);
+//		System.out.println("search services: "+this+" "+type+" "+visited);
 		
 		final Future ret = new Future();
 		final boolean[] results = new boolean[3];
@@ -325,28 +324,28 @@ public abstract class NestedServiceContainer extends BasicServiceContainer
 			}
 		});
 		
-		System.out.println("search children (b): "+getName()+", "+type+", "+visited);
+//		System.out.println("search children (b): "+getName()+", "+type+", "+visited);
 		getChildren().addResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
 				final List children = (List)result;
-				System.out.println("found children (b): "+type+", "+getName()+" "+children);
+//				System.out.println("found children (b): "+type+", "+getName()+" "+children);
 				if(children!=null && !children.isEmpty())
 				{
 					final int[] cnt = new int[]{0};
 					for(int i=0; i<children.size(); i++)
 					{
 						final IServiceProvider child = (IServiceProvider)children.get(i);
-						if(child.getName().indexOf("bdi")!=-1)
-							System.out.println("searching child: "+child);
+//						if(child.getName().indexOf("bdi")!=-1)
+//							System.out.println("searching child: "+child);
 						if(searchNode(NestedServiceContainer.this, child, false, visited))
 						{
 							child.getServicesOfType(type, visited).addResultListener(new IResultListener()
 							{
 								public void resultAvailable(Object source, Object result)
 								{
-									System.out.println("child search completed: "+child+", "+result);
+//									System.out.println("child search completed: "+child+", "+result);
 									if(result!=null)
 										coll.addAll((Collection)result);
 									
@@ -405,7 +404,7 @@ public abstract class NestedServiceContainer extends BasicServiceContainer
 		}
 		else if(results[0] && results[1] && results[2])
 		{
-			System.out.println("search result is: "+result);
+//			System.out.println("search result is: "+result);
 			ret.setResult(result);
 		}
 	}

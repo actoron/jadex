@@ -1,10 +1,12 @@
 package jadex.micro.benchmarks;
 
+import jadex.bridge.ComponentResultListener;
 import jadex.bridge.CreationInfo;
 import jadex.bridge.IArgument;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.commons.IFuture;
+import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.micro.MicroAgent;
 import jadex.micro.MicroAgentMetaInfo;
@@ -30,21 +32,40 @@ public class AgentCreationAgent extends MicroAgent
 	 */
 	public void executeBody()
 	{
-		Map args = getArguments();	
-		if(args==null)
-			args = new HashMap();
+		Map arguments = getArguments();	
+		if(arguments==null)
+			arguments = new HashMap();
+		final Map args = arguments;	
 		
 		if(args.get("num")==null)
 		{
-			args.put("num", new Integer(1));
-//				args.put("max", new Integer(100000));
-			Long startmem = new Long(Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory());
-			Long starttime = new Long(((IClockService)getServiceProvider().getService(IClockService.class)).getTime());
-			args.put("startmem", startmem);
-			args.put("starttime", starttime);
+			getServiceProvider().getService(IClockService.class).addResultListener(new ComponentResultListener(new DefaultResultListener()
+			{
+				public void resultAvailable(Object source, Object result)
+				{
+					args.put("num", new Integer(1));
+//					args.put("max", new Integer(100000));
+					Long startmem = new Long(Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory());
+					Long starttime = new Long(((IClockService)result).getTime());
+					args.put("startmem", startmem);
+					args.put("starttime", starttime);
+					
+					step1(args);
+				}
+			}, getAgentAdapter()));
 		}
-		
-		int num = ((Integer)args.get("num")).intValue();
+		else
+		{
+			step1(args);
+		}
+	}
+
+	/**
+	 *  Execute the first step.
+	 */
+	protected void step1(final Map args)
+	{
+		final int num = ((Integer)args.get("num")).intValue();
 		int max = ((Integer)args.get("max")).intValue();
 		
 		System.out.println("Created peer: "+num);
@@ -54,8 +75,13 @@ public class AgentCreationAgent extends MicroAgent
 			args.put("num", new Integer(num+1));
 //				System.out.println("Args: "+num+" "+args);
 
-			final IComponentManagementService ces = (IComponentManagementService)getServiceProvider().getService(IComponentManagementService.class);
-			ces.createComponent(createPeerName(num+1), getClass().getName()+".class", new CreationInfo(args), null);		
+			getServiceProvider().getService(IComponentManagementService.class).addResultListener(new ComponentResultListener(new DefaultResultListener()
+			{
+				public void resultAvailable(Object source, Object result)
+				{
+					((IComponentManagementService)result).createComponent(createPeerName(num+1), AgentCreationAgent.this.getClass().getName()+".class", new CreationInfo(args), null);		
+				}
+			}, getAgentAdapter()));
 		}
 		else
 		{
@@ -76,7 +102,7 @@ public class AgentCreationAgent extends MicroAgent
 			deletePeers(max-1, getTime(), dur, pera, omem, upera);
 		}
 	}
-	
+
 	/**
 	 *  Create a name for a peer with a given number.
 	 */
