@@ -357,8 +357,10 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	public boolean	execute()
 	{
 		System.out.println("Execute: "+cid.getName());
+		if(cid.getName().indexOf("platform")!=-1)
+			System.out.println("platform start");
 		if(cid.getName().indexOf("kernel_micro")!=-1)
-			System.out.println("here");
+			System.out.println("micro start");
 		
 		if(IComponentDescription.STATE_TERMINATED.equals(desc.getState()) || fatalerror)
 			throw new ComponentTerminatedException(cid.getName());
@@ -500,6 +502,8 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 		// Reset execution thread.
 		componentthread.setContextClassLoader(cl);
 		this.componentthread = null;
+		
+		System.out.println("end: "+getComponentIdentifier());
 		
 		return again || extexecuted;
 	}

@@ -174,6 +174,7 @@ public abstract class NestedServiceContainer extends BasicServiceContainer
 			public void resultAvailable(Object source, Object result)
 			{
 				final List children = (List)result;
+				System.out.println("found children (a): "+children);
 				if(children!=null)
 				{
 					final int[] cnt = new int[]{0};
@@ -320,11 +321,13 @@ public abstract class NestedServiceContainer extends BasicServiceContainer
 			}
 		});
 		
+		System.out.println("search children (b): "+getName());
 		getChildren().addResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
 				final List children = (List)result;
+				System.out.println("found children (b): "+getName()+" "+children);
 				if(children!=null)
 				{
 					final int[] cnt = new int[]{0};

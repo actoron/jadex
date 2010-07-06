@@ -833,7 +833,7 @@ public class Application implements IApplication, IComponentInstance
 													IFuture ret = ces.createComponent(component.getName(), component.getType(model.getApplicationType()).getFilename(),
 														new CreationInfo(component.getConfiguration(), component.getArguments(Application.this, cl, fetcher), adapter.getComponentIdentifier(),
 														component.isSuspended(), component.isMaster(), component.isDaemon(), model.getApplicationType().getAllImports()), null);					
-													System.out.println("Create finished: "+ret.get(new ThreadSuspendable()));
+//													System.out.println("Create finished: "+ret.get(new ThreadSuspendable()));
 												}
 											}
 										}
