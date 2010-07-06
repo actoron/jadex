@@ -286,6 +286,7 @@ public class ExternalAccess implements IApplicationExternalAccess
 	 */
 	public IFuture getServicesOfType(final Class type, final Set visited)
 	{
+//		final Exception e = new Exception();
 		final Future ret = new Future();
 		
 		if(adapter.isExternalThread())
@@ -294,6 +295,7 @@ public class ExternalAccess implements IApplicationExternalAccess
 			{
 				public void run() 
 				{
+//					e.printStackTrace();
 					application.getServiceProvider().getServicesOfType(type, visited).addResultListener(new DelegationResultListener(ret));
 				}
 			});

@@ -331,7 +331,7 @@ public abstract class NestedServiceContainer extends BasicServiceContainer
 					for(int i=0; i<children.size(); i++)
 					{
 						IServiceProvider child = (IServiceProvider)children.get(i);
-						System.out.println("searching child: "+child);
+						System.err.println("searching child: "+child);
 						if(searchNode(NestedServiceContainer.this, child, false, visited))
 						{
 							child.getServicesOfType(type, visited).addResultListener(new IResultListener()
