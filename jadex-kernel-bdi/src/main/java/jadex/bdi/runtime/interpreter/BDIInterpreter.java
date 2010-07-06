@@ -269,7 +269,7 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 		}
 		
 		// Create the service provider
-		this.provider = new NestedServiceContainer(BDIInterpreter.getInterpreter(state).getAgentAdapter().getComponentIdentifier().getLocalName())
+		this.provider = new NestedServiceContainer(adapter.getComponentIdentifier().getLocalName())
 		{
 			public IFuture getParent()
 			{
@@ -282,7 +282,7 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 			{
 				final Future ret = new Future();
 				
-				getChildren().addResultListener(new DefaultResultListener()
+				BDIInterpreter.this.getChildren().addResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object source, Object result)
 					{

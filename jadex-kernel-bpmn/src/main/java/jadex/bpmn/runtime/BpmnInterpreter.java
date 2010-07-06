@@ -16,6 +16,7 @@ import jadex.bpmn.runtime.handler.GatewayParallelActivityHandler;
 import jadex.bpmn.runtime.handler.GatewayXORActivityHandler;
 import jadex.bpmn.runtime.handler.SubProcessActivityHandler;
 import jadex.bpmn.runtime.handler.TaskActivityHandler;
+import jadex.bridge.ComponentResultListener;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IArgument;
 import jadex.bridge.IComponentAdapter;
@@ -34,10 +35,11 @@ import jadex.commons.IChangeListener;
 import jadex.commons.IFilter;
 import jadex.commons.IFuture;
 import jadex.commons.concurrent.DefaultResultListener;
-import jadex.commons.concurrent.IResultListener;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.IValueFetcher;
 import jadex.service.IServiceContainer;
+import jadex.service.IServiceProvider;
+import jadex.service.NestedServiceContainer;
 import jadex.service.clock.IClockService;
 
 import java.lang.reflect.Array;
@@ -193,7 +195,7 @@ public class BpmnInterpreter implements IComponentInstance
 	 *  @param adapter The adapter.
 	 */
 	public BpmnInterpreter(IComponentAdapter adapter, MBpmnModel model, Map arguments, 
-		String config, IExternalAccess parent, Map activityhandlers, Map stephandlers, IValueFetcher fetcher)
+		String config, final IExternalAccess parent, Map activityhandlers, Map stephandlers, IValueFetcher fetcher)
 	{
 		this.adapter = adapter;
 		this.model = model;
@@ -244,8 +246,8 @@ public class BpmnInterpreter implements IComponentInstance
 		}
 		
 		// Initialize context variables.
-		variables.put("$platform", getComponentAdapter().getRootServiceProvider());
-		variables.put("$clock", getComponentAdapter().getRootServiceProvider().getService(IClockService.class));
+		variables.put("$platform", getServiceProvider());
+		variables.put("$clock", getServiceProvider().getService(IClockService.class));
 		variables.put("$interpreter", this);
 		
 		Set	vars	= model.getContextVariables();
@@ -271,6 +273,32 @@ public class BpmnInterpreter implements IComponentInstance
 			}
 		}
 				
+		// Create the service provider
+		this.provider = new NestedServiceContainer(adapter.getComponentIdentifier().getLocalName())
+		{
+			public IFuture getParent()
+			{
+				final Future ret = new Future();
+				ret.setResult(parent);
+				return ret;
+			}
+			
+			public IFuture getChildren()
+			{
+				final Future ret = new Future();
+				
+				BpmnInterpreter.this.getChildren().addResultListener(new DefaultResultListener()
+				{
+					public void resultAvailable(Object source, Object result)
+					{
+						ret.setResult(result);
+					}
+				});
+				return ret;
+			}
+		};
+		// todo: load services and start provider!
+		
 		// Create initial thread(s). 
 		List	startevents	= model.getStartActivities();
 		for(int i=0; startevents!=null && i<startevents.size(); i++)
@@ -307,7 +335,7 @@ public class BpmnInterpreter implements IComponentInstance
 			if(!finishing && isFinished(pool, lane))
 			{
 				finishing = true;
-				adapter.getRootServiceProvider().getService(IComponentManagementService.class).addResultListener(new DefaultResultListener()
+				getServiceProvider().getService(IComponentManagementService.class).addResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object source, Object result)
 					{
@@ -678,16 +706,51 @@ public class BpmnInterpreter implements IComponentInstance
 	{
 		return parent;
 	}
+	
+	/** 
+	 *  Get the service provider.
+	 */
+	public IServiceProvider getServiceProvider()
+	{
+		return provider;
+	}
 
 	/**
 	 *  Create a result listener which is called on agent thread.
 	 *  @param The original listener to be called.
 	 *  @return The listener.
-	 */
+	 * /
 	public IResultListener createResultListener(IResultListener listener)
 	{
 		throw new UnsupportedOperationException();
 //		return new MicroListener(listener);
+	}*/
+	
+	/**
+	 *  Get the children (if any).
+	 *  @return The children.
+	 */
+	public IFuture getChildren()
+	{
+		final Future ret = new Future();
+		
+		getServiceProvider().getService(IComponentManagementService.class).addResultListener(new ComponentResultListener(new DefaultResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				IComponentManagementService cms = (IComponentManagementService)result;
+				IComponentIdentifier[] childs = cms.getChildren(adapter.getComponentIdentifier());
+				List res = new ArrayList();
+				for(int i=0; i<childs.length; i++)
+				{
+					IExternalAccess ex = (IExternalAccess)cms.getExternalAccess(childs[i]);
+					res.add(ex);
+				}
+				ret.setResult(res);
+			}
+		}, adapter));
+		
+		return ret;
 	}
 	
 	/**
@@ -1131,7 +1194,7 @@ public class BpmnInterpreter implements IComponentInstance
 	 */
 	public IComponentIdentifier createComponentIdentifier(String name, boolean local, String[] addresses)
 	{
-		IComponentManagementService cms = (IComponentManagementService)adapter.getRootServiceProvider().getService(IComponentManagementService.class);
+		IComponentManagementService cms = (IComponentManagementService)getServiceProvider().getService(IComponentManagementService.class);
 		return cms.createComponentIdentifier(name, local, addresses);
 	}
 	
@@ -1152,7 +1215,7 @@ public class BpmnInterpreter implements IComponentInstance
 	 */
 	public Map createReply(Map msg, MessageType mt)
 	{
-		IMessageService ms = (IMessageService)getComponentAdapter().getRootServiceProvider().getService(IMessageService.class);	
+		IMessageService ms = (IMessageService)getServiceProvider().getService(IMessageService.class);	
 		return ms.createReply(msg, mt);
 	}
 	

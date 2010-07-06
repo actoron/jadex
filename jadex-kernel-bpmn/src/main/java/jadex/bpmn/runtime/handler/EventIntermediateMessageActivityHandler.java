@@ -68,7 +68,7 @@ public class EventIntermediateMessageActivityHandler	extends DefaultActivityHand
 	 */
 	protected void sendMessage(final MActivity activity, final BpmnInterpreter instance, final ProcessThread thread)
 	{
-		instance.getComponentAdapter().getRootServiceProvider().getService(IMessageService.class)
+		instance.getServiceProvider().getService(IMessageService.class)
 			.addResultListener(new ComponentResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)

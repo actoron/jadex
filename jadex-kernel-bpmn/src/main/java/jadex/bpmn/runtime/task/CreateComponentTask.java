@@ -41,7 +41,7 @@ public class CreateComponentTask implements ITask
 	 */
 	public void execute(final ITaskContext context, final BpmnInterpreter instance, final IResultListener listener)
 	{
-		instance.getComponentAdapter().getRootServiceProvider().getService(IComponentManagementService.class).addResultListener(new ComponentResultListener(new IResultListener()
+		instance.getServiceProvider().getService(IComponentManagementService.class).addResultListener(new ComponentResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
