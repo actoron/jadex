@@ -198,7 +198,6 @@ public class BasicServiceContainer implements  IServiceProvider, IServiceContain
 		
 		if((visited==null || !visited.contains(getName())) && services!=null)
 		{
-			visited.add(getName());
 			Collection sers = (Collection)services.get(type);
 			ret.setResult(sers!=null && sers.size()>0? sers.iterator().next(): null);
 		}
@@ -206,7 +205,12 @@ public class BasicServiceContainer implements  IServiceProvider, IServiceContain
 		{
 			ret.setResult(null);
 		}
-		
+
+		if(visited!=null && !visited.contains(getName()))
+		{
+			visited.add(getName());
+		}
+
 		return ret;
 	}
 	
@@ -220,14 +224,18 @@ public class BasicServiceContainer implements  IServiceProvider, IServiceContain
 		
 		if((visited==null || !visited.contains(getName())) && services!=null)
 		{
-			visited.add(getName());
 			ret.setResult(services.get(type));
 		}
 		else
 		{
 			ret.setResult(null);
 		}
-		
+
+		if(visited!=null && !visited.contains(getName()))
+		{
+			visited.add(getName());
+		}
+
 		return ret;
 	}
 	

@@ -337,7 +337,7 @@ public abstract class NestedServiceContainer extends BasicServiceContainer
 					final int[] cnt = new int[]{0};
 					for(int i=0; i<children.size(); i++)
 					{
-						IServiceProvider child = (IServiceProvider)children.get(i);
+						final IServiceProvider child = (IServiceProvider)children.get(i);
 						if(child.getName().indexOf("bdi")!=-1)
 							System.out.println("searching child: "+child);
 						if(searchNode(NestedServiceContainer.this, child, false, visited))
@@ -346,7 +346,7 @@ public abstract class NestedServiceContainer extends BasicServiceContainer
 							{
 								public void resultAvailable(Object source, Object result)
 								{
-									System.out.println("child search completeted: "+result);
+									System.out.println("child search completed: "+child+", "+result);
 									if(result!=null)
 										coll.addAll((Collection)result);
 									

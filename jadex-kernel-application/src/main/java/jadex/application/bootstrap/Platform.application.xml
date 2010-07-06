@@ -33,11 +33,14 @@
 		<!--  <componenttype filename="jadex/micro/KernelBPMN.application.xml" name="kernel_bpmn"/>-->
 
 		<componenttype filename="jadex/tools/jcc/JCC.agent.xml" name="jcc"/>
+		<componenttype filename="jadex/bdi/benchmarks/AgentCreation.agent.xml" name="CreationBDI"/>
+		<componenttype filename="jadex/micro/benchmarks/AgentCreationAgent.class" name="CreationMicro"/>
 	</componenttypes>
 	
 	<services>
 		<service name="library_service" class="ILibraryService">
-			new LibraryService()
+			//new LibraryService()
+			new LibraryService(new Object[]{"../jadex-applications-bdi/target/classes", "../jadex-applications-micro/target/classes"})
 		</service>
 		<service name="threadpool_service" class="ThreadPoolService">
 			new ThreadPoolService(new ThreadPool(new DefaultThreadPoolStrategy(0, 20, 30000)))
@@ -88,8 +91,10 @@
 			<components>
 				<component type="kernel_micro"/>
 				<component type="kernel_bdi"/>
-				
+	
 				<component type="jcc"/>
+				<!--<component type="CreationBDI"/>-->
+				<!--<component type="CreationMicro"/>-->
 			</components>
 		</application>
 	</applications>
