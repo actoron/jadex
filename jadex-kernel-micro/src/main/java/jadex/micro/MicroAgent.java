@@ -128,12 +128,12 @@ public abstract class MicroAgent implements IMicroAgent
 	}
 	
 	/**
-	 *  Get the agent platform.
-	 *  @return The agent platform. 
+	 *  Get the component service provider.
+	 *  @return The component service provider. 
 	 */
 	public IServiceProvider getServiceProvider()
 	{
-		return interpreter.getAgentAdapter().getRootServiceProvider();
+		return interpreter.getServiceProvider();
 	}
 	
 	/**
@@ -265,7 +265,7 @@ public abstract class MicroAgent implements IMicroAgent
 	 */
 	public void killAgent()
 	{
-		((IComponentManagementService)interpreter.getAgentAdapter().getRootServiceProvider()
+		((IComponentManagementService)interpreter.getServiceProvider()
 			.getService(IComponentManagementService.class))
 			.destroyComponent(interpreter.getAgentAdapter().getComponentIdentifier());
 	}
@@ -315,7 +315,7 @@ public abstract class MicroAgent implements IMicroAgent
 	 */
 	public IComponentIdentifier createComponentIdentifier(final String name, final boolean local, final String[] addresses)
 	{
-		IComponentManagementService cms = (IComponentManagementService)interpreter.getAgentAdapter().getRootServiceProvider().getService(IComponentManagementService.class);	
+		IComponentManagementService cms = (IComponentManagementService)interpreter.getServiceProvider().getService(IComponentManagementService.class);	
 		return cms.createComponentIdentifier(name, local, addresses);
 	}
 	
@@ -326,7 +326,7 @@ public abstract class MicroAgent implements IMicroAgent
 	 */
 	public Map createReply(Map msg, MessageType mt)
 	{
-		IMessageService ms = (IMessageService)interpreter.getAgentAdapter().getRootServiceProvider().getService(IMessageService.class);	
+		IMessageService ms = (IMessageService)interpreter.getServiceProvider().getService(IMessageService.class);	
 		return ms.createReply(msg, mt);
 	}
 	

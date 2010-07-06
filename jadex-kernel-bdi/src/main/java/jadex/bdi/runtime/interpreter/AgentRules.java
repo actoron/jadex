@@ -7,12 +7,9 @@ import jadex.bdi.runtime.impl.flyweights.ParameterFlyweight;
 import jadex.bridge.CheckedAction;
 import jadex.bridge.IArgument;
 import jadex.bridge.InterpreterTimedObject;
-import jadex.commons.Future;
-import jadex.commons.IFuture;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.collection.SCollection;
-import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.IValueFetcher;
@@ -30,8 +27,7 @@ import jadex.rules.rulesystem.rules.Variable;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVAttributeType;
 import jadex.rules.state.OAVObjectType;
-import jadex.service.BasicServiceContainer;
-import jadex.service.NestedServiceContainer;
+import jadex.service.IServiceContainer;
 import jadex.service.clock.ITimedObject;
 import jadex.service.clock.ITimer;
 
@@ -1024,7 +1020,7 @@ public class AgentRules
 				Class type = (Class)state.getAttributeValue(mexp, OAVBDIMetaModel.expression_has_class);
 //				sp.addService(type, name, val);
 				// cast hack?!
-				((BasicServiceContainer)BDIInterpreter.getInterpreter(state).getServiceProvider()).addService(type, val);
+				((IServiceContainer)BDIInterpreter.getInterpreter(state).getServiceProvider()).addService(type, val);
 				System.out.println("Service: "+name+" "+val+" "+type);
 			}
 		}

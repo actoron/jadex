@@ -3,18 +3,13 @@ package jadex.application.runtime.impl;
 import jadex.application.runtime.IApplicationExternalAccess;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.ILoadableComponentModel;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
-import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.DelegationResultListener;
-import jadex.commons.concurrent.IResultListener;
 import jadex.service.IServiceProvider;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -33,6 +28,9 @@ public class ExternalAccess implements IApplicationExternalAccess
 	/** The toString value. */
 	protected String tostring;
 	
+	/** The provider. */
+	protected IServiceProvider provider;
+	
 	/** The provider name. */
 	protected String providername;
 	
@@ -46,6 +44,7 @@ public class ExternalAccess implements IApplicationExternalAccess
 		this.application = application;
 		this.adapter = application.getComponentAdapter();
 		this.tostring = application.getComponentIdentifier().getLocalName();
+		this.provider = application.getServiceProvider();
 		this.providername = application.getServiceProvider().getName();
 	}
 
@@ -109,40 +108,7 @@ public class ExternalAccess implements IApplicationExternalAccess
 	 */
 	public IFuture getChildren()
 	{
-		final Future ret = new Future();
-		
-		getService(IComponentManagementService.class).addResultListener(new DefaultResultListener()
-		{
-			public void resultAvailable(Object source, Object result)
-			{
-				IComponentManagementService cms = (IComponentManagementService)result;
-				final IComponentIdentifier[] childs = cms.getChildren(getComponentIdentifier());
-				final List res = new ArrayList();
-				
-				for(int i=0; i<childs.length; i++)
-				{
-					final int cnt = i;
-					cms.getExternalAccess(childs[i]).addResultListener(new IResultListener()
-					{
-						public void resultAvailable(Object source, Object result)
-						{
-							res.add(result);
-							if(cnt==childs.length-1)
-								ret.setResult(res);
-						}
-						
-						public void exceptionOccurred(Object source, Exception exception)
-						{
-							ret.setException(exception);
-						}
-					});
-				}
-				if(childs.length==0)
-					ret.setResult(null);
-			}
-		});
-		
-		return ret;
+		return application.getChildren();
 	}
 	
 	/**
@@ -325,7 +291,7 @@ public class ExternalAccess implements IApplicationExternalAccess
 	 */
 	public IServiceProvider getServiceProvider()
 	{
-		return application.getServiceProvider();
+		return provider;
 	}
 
 	/**

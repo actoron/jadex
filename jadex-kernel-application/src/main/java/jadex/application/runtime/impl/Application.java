@@ -34,6 +34,7 @@ import jadex.service.IServiceProvider;
 import jadex.service.NestedServiceContainer;
 import jadex.service.library.ILibraryService;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -86,8 +87,8 @@ public class Application implements IApplication, IComponentInstance
 	/** The children cnt (without daemons). */
 	protected int children;
 	
-	/** The own service container. */
-	protected NestedServiceContainer mycontainer;
+	/** The own service provider. */
+	protected IServiceContainer provider;
 
 	//-------- constructors --------
 	
@@ -102,7 +103,7 @@ public class Application implements IApplication, IComponentInstance
 		this.parent = parent;
 		this.arguments = arguments==null ? new HashMap() : arguments;
 		this.results = new HashMap();
-		this.mycontainer = new NestedServiceContainer(adapter.getComponentIdentifier().getLocalName())
+		this.provider = new NestedServiceContainer(adapter.getComponentIdentifier().getLocalName())
 		{
 			public IFuture getParent()
 			{
@@ -164,7 +165,7 @@ public class Application implements IApplication, IComponentInstance
 				MExpressionType exp = (MExpressionType)services.get(i);
 				IService service = (IService)exp.getParsedValue().getValue(fetcher);
 //				mycontainer.addService(exp.getClazz(), exp.getName(), service);
-				mycontainer.addService(exp.getClazz(), service);
+				provider.addService(exp.getClazz(), service);
 			}
 		}
 	}
@@ -557,7 +558,7 @@ public class Application implements IApplication, IComponentInstance
 	 */
 	public IServiceProvider getServiceProvider()
 	{
-		return mycontainer;
+		return provider;
 	}
 	
 	/**
@@ -783,7 +784,7 @@ public class Application implements IApplication, IComponentInstance
 //							mycontainer.addService(exp.getClazz(), service);
 //						}
 //					}
-					mycontainer.start().addResultListener(new ComponentResultListener(new DefaultResultListener()
+					provider.start().addResultListener(new ComponentResultListener(new DefaultResultListener()
 					{
 						public void resultAvailable(Object source, Object result)
 						{
@@ -961,6 +962,48 @@ public class Application implements IApplication, IComponentInstance
 	}
 	
 	/**
+	 *  Get the children (if any).
+	 *  @return The children.
+	 */
+	public IFuture getChildren()
+	{
+		final Future ret = new Future();
+		
+		provider.getService(IComponentManagementService.class).addResultListener(new DefaultResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				IComponentManagementService cms = (IComponentManagementService)result;
+				final IComponentIdentifier[] childs = cms.getChildren(getComponentIdentifier());
+				final List res = new ArrayList();
+				
+				for(int i=0; i<childs.length; i++)
+				{
+					final int cnt = i;
+					cms.getExternalAccess(childs[i]).addResultListener(new IResultListener()
+					{
+						public void resultAvailable(Object source, Object result)
+						{
+							res.add(result);
+							if(cnt==childs.length-1)
+								ret.setResult(res);
+						}
+						
+						public void exceptionOccurred(Object source, Exception exception)
+						{
+							ret.setException(exception);
+						}
+					});
+				}
+				if(childs.length==0)
+					ret.setResult(null);
+			}
+		});
+		
+		return ret;
+	}
+	
+	/**
 	 *  Create a result listener which is executed as an agent step.
 	 *  @param The original listener to be called.
 	 *  @return The listener.
@@ -968,15 +1011,6 @@ public class Application implements IApplication, IComponentInstance
 	public IResultListener createResultListener(IResultListener listener)
 	{
 		return new ComponentResultListener(listener, adapter);
-	}
-	
-	/**
-	 *  Get the service provider.
-	 *  @return The service provider.
-	 */
-	public IServiceContainer internalGetServiceContainer()
-	{
-		return mycontainer;
 	}
 
 	protected void createComponent(final SimpleValueFetcher fetcher, final List components, final ClassLoader cl, final IComponentManagementService ces, final int i)

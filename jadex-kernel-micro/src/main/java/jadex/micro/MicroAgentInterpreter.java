@@ -7,6 +7,7 @@ import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
+import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.ILoadableComponentModel;
 import jadex.bridge.IMessageAdapter;
@@ -14,7 +15,11 @@ import jadex.commons.ChangeEvent;
 import jadex.commons.Future;
 import jadex.commons.IChangeListener;
 import jadex.commons.IFuture;
+import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
+import jadex.service.IServiceContainer;
+import jadex.service.IServiceProvider;
+import jadex.service.NestedServiceContainer;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -38,6 +43,9 @@ public class MicroAgentInterpreter implements IComponentInstance
 	
 	/** The micro agent. */
 	protected MicroAgent microagent;
+	
+	/** The service provider. */
+	protected IServiceContainer provider;
 	
 	/** The configuration. */
 	protected String config;
@@ -71,7 +79,7 @@ public class MicroAgentInterpreter implements IComponentInstance
 	 *  @param adapter The adapter.
 	 *  @param microagent The microagent.
 	 */
-	public MicroAgentInterpreter(IComponentAdapter adapter, MicroAgentModel model, Map arguments, String config, IExternalAccess parent)
+	public MicroAgentInterpreter(IComponentAdapter adapter, MicroAgentModel model, Map arguments, String config, final IExternalAccess parent)
 	{
 		this.adapter = adapter;
 		this.model = model;
@@ -111,6 +119,31 @@ public class MicroAgentInterpreter implements IComponentInstance
 				this.results.put(res[i].getName(), res[i].getDefaultValue(config));
 			}
 		}
+		
+		this.provider = new NestedServiceContainer(adapter.getComponentIdentifier().getLocalName())
+		{
+			public IFuture getParent()
+			{
+				final Future ret = new Future();
+				ret.setResult(parent);
+				return ret;
+			}
+			
+			public IFuture getChildren()
+			{
+				final Future ret = new Future();
+				
+				// todo: check if own component thread?!
+				microagent.getExternalAccess().getChildren().addResultListener(new DefaultResultListener()
+				{
+					public void resultAvailable(Object source, Object result)
+					{
+						ret.setResult(result);
+					}
+				});
+				return ret;
+			}
+		};
 		
 		// Schedule initial step.
 		addStep(new Runnable()
@@ -587,6 +620,48 @@ public class MicroAgentInterpreter implements IComponentInstance
 	{
 		return parent;
 	}
+	
+	/**
+	 *  Get the children (if any).
+	 *  @return The children.
+	 */
+	public IFuture getChildren()
+	{
+		final Future ret = new Future();
+		
+		provider.getService(IComponentManagementService.class).addResultListener(new DefaultResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				IComponentManagementService cms = (IComponentManagementService)result;
+				final IComponentIdentifier[] childs = cms.getChildren(adapter.getComponentIdentifier());
+				final List res = new ArrayList();
+				
+				for(int i=0; i<childs.length; i++)
+				{
+					final int cnt = i;
+					cms.getExternalAccess(childs[i]).addResultListener(new IResultListener()
+					{
+						public void resultAvailable(Object source, Object result)
+						{
+							res.add(result);
+							if(cnt==childs.length-1)
+								ret.setResult(res);
+						}
+						
+						public void exceptionOccurred(Object source, Exception exception)
+						{
+							ret.setException(exception);
+						}
+					});
+				}
+				if(childs.length==0)
+					ret.setResult(null);
+			}
+		});
+		
+		return ret;
+	}
 
 	/**
 	 *  Get the configuration.
@@ -595,6 +670,14 @@ public class MicroAgentInterpreter implements IComponentInstance
 	public String getConfiguration()
 	{
 		return this.config;
+	}
+	
+	/**
+	 *  Get the service provider.
+	 */
+	public IServiceProvider getServiceProvider()
+	{
+		return provider;
 	}
 
 	/**

@@ -9,17 +9,25 @@ import jadex.bridge.ILoadableComponentModel;
 import jadex.bridge.MessageType;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
+<<<<<<< .mine
 import jadex.commons.concurrent.DefaultResultListener;
+import jadex.commons.concurrent.DelegationResultListener;
+import jadex.commons.concurrent.IResultListener;
+=======
+import jadex.commons.concurrent.DefaultResultListener;
+>>>>>>> .r2090
 import jadex.service.BasicServiceContainer;
+import jadex.service.IServiceProvider;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * External access interface.
  */
-public class ExternalAccess extends BasicServiceContainer implements IMicroExternalAccess 
+public class ExternalAccess implements IMicroExternalAccess 
 {
 	// -------- attributes --------
 
@@ -31,6 +39,12 @@ public class ExternalAccess extends BasicServiceContainer implements IMicroExter
 	
 	/** The agent adapter. */
 	protected IComponentAdapter adapter;
+	
+	/** The provider. */
+	protected IServiceProvider provider;
+	
+	/** The provider name. */
+	protected String providername;
 
 	// -------- constructors --------
 
@@ -43,6 +57,7 @@ public class ExternalAccess extends BasicServiceContainer implements IMicroExter
 		this.agent = agent;
 		this.interpreter = interpreter;
 		this.adapter = interpreter.getAgentAdapter();
+		this.provider = interpreter.getServiceProvider();
 	}
 
 	// -------- eventbase shortcut methods --------
@@ -118,6 +133,15 @@ public class ExternalAccess extends BasicServiceContainer implements IMicroExter
 	{
 		return interpreter.getParent();
 	}
+	
+	/**
+	 *  Get the children (if any).
+	 *  @return The children.
+	 */
+	public IFuture getChildren()
+	{
+		return interpreter.getChildren();
+	}
 
 	/**
 	 *  Get the interpreter.
@@ -127,13 +151,34 @@ public class ExternalAccess extends BasicServiceContainer implements IMicroExter
 	{
 		return this.interpreter;
 	}
-
+	
 	/**
-	 *  Get the children (if any).
-	 *  @return The children.
+	 *  Get the first declared service of a given type.
+	 *  @param type The type.
+	 *  @return The corresponding service.
 	 */
-	public IFuture getChildren()
+	public IFuture getService(final Class type)
 	{
+<<<<<<< .mine
+		final Future ret = new Future();
+		
+		if(adapter.isExternalThread())
+		{
+			adapter.invokeLater(new Runnable() 
+			{
+				public void run() 
+				{
+					provider.getService(type).addResultListener(new DelegationResultListener(ret));
+				}
+			});
+		}
+		else
+		{
+			provider.getService(type).addResultListener(new DelegationResultListener(ret));
+		}
+		
+		return ret;
+=======
 		final Future ret = new Future();
 		
 		getService(IComponentManagementService.class).addResultListener(new ComponentResultListener(new DefaultResultListener()
@@ -153,5 +198,163 @@ public class ExternalAccess extends BasicServiceContainer implements IMicroExter
 		}, adapter));
 		
 		return ret;
+>>>>>>> .r2090
 	}
+	
+	/**
+	 *  Get a service.
+	 *  @param type The class.
+	 *  @return The corresponding services.
+	 */
+	public IFuture getServices(final Class type)
+	{
+		final Future ret = new Future();
+		
+		if(adapter.isExternalThread())
+		{
+			adapter.invokeLater(new Runnable() 
+			{
+				public void run() 
+				{
+					provider.getServices(type).addResultListener(new DelegationResultListener(ret));
+				}
+			});
+		}
+		else
+		{
+			provider.getServices(type).addResultListener(new DelegationResultListener(ret));
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Get a service.
+	 *  @param name The name.
+	 *  @return The corresponding service.
+	 * /
+	public IFuture getService(final Class type, final String name)
+	{
+		final Future ret = new Future();
+		
+		if(adapter.isExternalThread())
+		{
+			adapter.invokeLater(new Runnable() 
+			{
+				public void run() 
+				{
+					ret.setResult(application.getServiceProvider().getService(type, name));
+				}
+			});
+		}
+		else
+		{
+			ret.setResult(application.getServiceProvider().getService(type, name));
+		}
+		
+		return ret;
+	}*/
+	
+	/**
+	 *  Get the available service types.
+	 *  @return The service types.
+	 */
+	public IFuture getServicesTypes()
+	{
+		final Future ret = new Future();
+		
+		if(adapter.isExternalThread())
+		{
+			adapter.invokeLater(new Runnable() 
+			{
+				public void run() 
+				{
+					provider.getServicesTypes().addResultListener(new DelegationResultListener(ret));
+				}
+			});
+		}
+		else
+		{
+			provider.getServicesTypes().addResultListener(new DelegationResultListener(ret));
+		}
+		
+		return ret;
+	}
+	
+	// todo: remove me?
+	/**
+	 *  Get all services for a type.
+	 *  @param type The type.
+	 */
+	public IFuture getServiceOfType(final Class type, final Set visited)
+	{
+//		System.out.println("gSoT: "+application+", "+type+", "+visited);
+		final Future ret = new Future();
+		
+		if(adapter.isExternalThread())
+		{
+			adapter.invokeLater(new Runnable() 
+			{
+				public void run() 
+				{
+//					System.out.println("gSoT.iL: "+application+", "+type+", "+visited);
+					provider.getServiceOfType(type, visited).addResultListener(new DelegationResultListener(ret));
+				}
+			});
+		}
+		else
+		{
+//			System.out.println("gSoT.d: "+application+", "+type+", "+visited);
+			provider.getServiceOfType(type, visited).addResultListener(new DelegationResultListener(ret));
+		}
+		
+		return ret;
+	}
+	
+	// todo: remove me?
+	/**
+	 *  Get all services for a type.
+	 *  @param type The type.
+	 */
+	public IFuture getServicesOfType(final Class type, final Set visited)
+	{
+//		final Exception e = new Exception();
+		final Future ret = new Future();
+		
+		if(adapter.isExternalThread())
+		{
+			adapter.invokeLater(new Runnable() 
+			{
+				public void run() 
+				{
+//					e.printStackTrace();
+					provider.getServicesOfType(type, visited).addResultListener(new DelegationResultListener(ret));
+				}
+			});
+		}
+		else
+		{
+			provider.getServicesOfType(type, visited).addResultListener(new DelegationResultListener(ret));
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Get the service provider name.
+	 *  @return The name.
+	 */
+	public String getName()
+	{
+		return providername;
+	}
+	
+	/**
+	 *  Get the application component.
+	 */
+	public IServiceProvider getServiceProvider()
+	{
+		return provider;
+	}
+
 }

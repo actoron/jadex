@@ -14,6 +14,22 @@ public interface IServiceContainer extends IServiceProvider
 	 */
 	public String getName();
 	
+	/**
+	 *  Add a service to the platform.
+	 *  If under the same name and type a service was contained,
+	 *  the old one is removed and shutdowned.
+	 *  @param name The name.
+	 *  @param service The service.
+	 */
+	public void addService(Class type, Object service);
+
+	/**
+	 *  Removes a service from the platform (shutdowns also the service).
+	 *  @param name The name.
+	 *  @param service The service.
+	 */
+	public void removeService(Class type, Object service);
+	
 	//-------- internal methods --------
 	
 	/**
