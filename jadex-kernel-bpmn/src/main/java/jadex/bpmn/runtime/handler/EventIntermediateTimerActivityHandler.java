@@ -30,7 +30,7 @@ public class EventIntermediateTimerActivityHandler extends	AbstractEventIntermed
 	public void	doWait(final MActivity activity, final BpmnInterpreter instance, final ProcessThread thread, final long duration)
 	{
 		final Future	wifuture	= new Future(); 
-		instance.getComponentAdapter().getRootServiceProvider().getService(IClockService.class)
+		instance.getServiceProvider().getService(IClockService.class)
 			.addResultListener(new ComponentResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
@@ -46,11 +46,11 @@ public class EventIntermediateTimerActivityHandler extends	AbstractEventIntermed
 				Object waitinfo; 
 				if(duration==TICK_TIMER)
 				{
-					waitinfo = ((IClockService)result).createTickTimer(new InterpreterTimedObject(instance.getComponentAdapter(), ta));
+					waitinfo = ((IClockService)result).createTickTimer(new InterpreterTimedObject(instance.getServiceProvider(), instance.getComponentAdapter(), ta));
 				}
 				else
 				{
-					waitinfo = ((IClockService)result).createTimer(duration, new InterpreterTimedObject(instance.getComponentAdapter(), ta));
+					waitinfo = ((IClockService)result).createTimer(duration, new InterpreterTimedObject(instance.getServiceProvider(), instance.getComponentAdapter(), ta));
 				}
 				wifuture.setResult(waitinfo);
 			}

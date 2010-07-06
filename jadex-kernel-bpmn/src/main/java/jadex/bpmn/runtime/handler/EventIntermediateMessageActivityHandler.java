@@ -74,7 +74,7 @@ public class EventIntermediateMessageActivityHandler	extends DefaultActivityHand
 			public void resultAvailable(Object source, Object result)
 			{
 				final IMessageService	ms	= (IMessageService)result;
-				instance.getComponentAdapter().getRootServiceProvider().getService(IComponentManagementService.class)
+				instance.getServiceProvider().getService(IComponentManagementService.class)
 					.addResultListener(new ComponentResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object source, Object result)
