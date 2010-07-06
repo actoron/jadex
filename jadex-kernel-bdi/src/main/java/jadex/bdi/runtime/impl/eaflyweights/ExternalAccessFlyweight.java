@@ -1245,25 +1245,7 @@ public class ExternalAccessFlyweight extends EACapabilityFlyweight implements IB
 	 */
 	public IFuture getChildren()
 	{
-		final Future ret = new Future();
-		
-		getService(IComponentManagementService.class).addResultListener(new ComponentResultListener(new DefaultResultListener()
-		{
-			public void resultAvailable(Object source, Object result)
-			{
-				IComponentManagementService cms = (IComponentManagementService)result;
-				IComponentIdentifier[] childs = cms.getChildren(getComponentIdentifier());
-				List res = new ArrayList();
-				for(int i=0; i<childs.length; i++)
-				{
-					IExternalAccess ex = (IExternalAccess)cms.getExternalAccess(childs[i]);
-					res.add(ex);
-				}
-				ret.setResult(res);
-			}
-		}, adapter));
-		
-		return ret;
+		return getInterpreter().getChildren();
 	}
 	
 	// todo: remove me?

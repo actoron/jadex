@@ -253,7 +253,7 @@ public class OAVBDIRuntimeModel
 //	public static OAVAttributeType agent_has_eventprocessing;
 	
 	/** The agent has a service provider. */
-	public static OAVAttributeType agent_has_serviceprovider;
+//	public static OAVAttributeType agent_has_serviceprovider;
 
 	
 	//-------- capability --------
@@ -938,7 +938,7 @@ public class OAVBDIRuntimeModel
 		// todo: use IMessageAdapter?
 		agent_has_inbox = agent_type.createAttributeType("agent_has_inbox", java_imessageadapter_type, OAVAttributeType.LIST, null);
 //		agent_has_actions = agent_type.createAttributeType("agent_has_actions", java_runnable_type, OAVAttributeType.LIST, null);
-		agent_has_serviceprovider = agent_type.createAttributeType("agent_has_serviceprovider", java_serviceprovider_type, OAVAttributeType.NONE);
+//		agent_has_serviceprovider = agent_type.createAttributeType("agent_has_serviceprovider", java_serviceprovider_type, OAVAttributeType.NONE);
 
 		java_map_type = createJavaType(Map.class, OAVJavaType.KIND_OBJECT);
 		

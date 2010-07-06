@@ -145,6 +145,8 @@ public class MicroAgentInterpreter implements IComponentInstance
 			}
 		};
 		
+		// todo: load the serices and then start the provider!
+		
 		// Schedule initial step.
 		addStep(new Runnable()
 		{

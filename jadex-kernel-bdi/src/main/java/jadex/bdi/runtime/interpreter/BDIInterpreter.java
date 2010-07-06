@@ -14,9 +14,11 @@ import jadex.bdi.runtime.IPlanExecutor;
 import jadex.bdi.runtime.IPlanbase;
 import jadex.bdi.runtime.IPropertybase;
 import jadex.bdi.runtime.impl.eaflyweights.ExternalAccessFlyweight;
+import jadex.bridge.ComponentResultListener;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentDescription;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
@@ -41,6 +43,7 @@ import jadex.rules.rulesystem.Rulebase;
 import jadex.rules.rulesystem.rules.Rule;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.IProfiler;
+import jadex.service.IServiceContainer;
 import jadex.service.IServiceProvider;
 import jadex.service.NestedServiceContainer;
 import jadex.service.clock.IClockService;
@@ -104,6 +107,9 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 	protected Map kernelprops;
 	
 	//-------- recreate on init (no state) --------
+	
+	/** The service provider. */
+	protected IServiceContainer provider;
 	
 	/** The event reificator creates changeevent objects for relevant state changes. */
 	protected EventReificator reificator;
@@ -263,7 +269,7 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 		}
 		
 		// Create the service provider
-		NestedServiceContainer sp = new NestedServiceContainer(BDIInterpreter.getInterpreter(state).getAgentAdapter().getComponentIdentifier().getLocalName())
+		this.provider = new NestedServiceContainer(BDIInterpreter.getInterpreter(state).getAgentAdapter().getComponentIdentifier().getLocalName())
 		{
 			public IFuture getParent()
 			{
@@ -286,7 +292,6 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 				return ret;
 			}
 		};
-		state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_serviceprovider, sp);
 		
 		// Get the services.
 		final boolean services[]	= new boolean[3];
@@ -1201,12 +1206,39 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 		return parent;
 	}
 	
+	/**
+	 *  Get the children (if any).
+	 *  @return The children.
+	 */
+	public IFuture getChildren()
+	{
+		final Future ret = new Future();
+		
+		getServiceProvider().getService(IComponentManagementService.class).addResultListener(new ComponentResultListener(new DefaultResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				IComponentManagementService cms = (IComponentManagementService)result;
+				IComponentIdentifier[] childs = cms.getChildren(adapter.getComponentIdentifier());
+				List res = new ArrayList();
+				for(int i=0; i<childs.length; i++)
+				{
+					IExternalAccess ex = (IExternalAccess)cms.getExternalAccess(childs[i]);
+					res.add(ex);
+				}
+				ret.setResult(res);
+			}
+		}, adapter));
+		
+		return ret;
+	}
+	
 	/** 
 	 *  Get the service provider.
 	 */
 	public IServiceProvider getServiceProvider()
 	{
-		return (IServiceProvider)getState().getAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_serviceprovider);
+		return provider;
 	}
 	
 	//-------- helper methods --------

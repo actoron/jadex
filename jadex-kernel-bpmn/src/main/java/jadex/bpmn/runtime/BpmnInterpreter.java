@@ -37,6 +37,7 @@ import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.IValueFetcher;
+import jadex.service.IServiceContainer;
 import jadex.service.clock.IClockService;
 
 import java.lang.reflect.Array;
@@ -127,6 +128,9 @@ public class BpmnInterpreter implements IComponentInstance
 	
 	/** The micro agent model. */
 	protected MBpmnModel model;
+	
+	/** The service provider. */
+	protected IServiceContainer provider;
 	
 	/** The configuration. */
 	protected String config;
