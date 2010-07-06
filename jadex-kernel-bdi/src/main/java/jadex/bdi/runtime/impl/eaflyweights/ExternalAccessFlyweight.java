@@ -23,8 +23,8 @@ import jadex.bridge.InterpreterTimedObject;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.concurrent.DefaultResultListener;
+import jadex.commons.concurrent.DelegationResultListener;
 import jadex.rules.state.IOAVState;
-import jadex.service.IServiceProvider;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -1169,35 +1169,6 @@ public class ExternalAccessFlyweight extends EACapabilityFlyweight implements IB
 	}
 	
 	/**
-	 *  Get the first declared service of a given type.
-	 *  @param type The type.
-	 *  @return The corresponding service.
-	 * /
-	public IFuture getService(final Class type)
-	{
-		final Future ret = new Future();
-		
-		if(!getInterpreter().isPlanThread())
-		{
-			getInterpreter().getAgentAdapter().invokeLater(new Runnable() 
-			{
-				public void run() 
-				{
-					IServiceProvider sp = (IServiceProvider)getState().getAttributeValue(getScope(), OAVBDIRuntimeModel.capability_has_serviceprovider);
-					ret.setResult(sp.getService(type));
-				}
-			});
-		}
-		else
-		{
-			IServiceProvider sp = (IServiceProvider)getState().getAttributeValue(getScope(), OAVBDIRuntimeModel.capability_has_serviceprovider);
-			ret.setResult(sp.getService(type));
-		}
-		
-		return ret;
-	}*/
-	
-	/**
 	 *  Get a service.
 	 *  @param type The class.
 	 *  @return The corresponding services.
@@ -1210,16 +1181,14 @@ public class ExternalAccessFlyweight extends EACapabilityFlyweight implements IB
 			{
 				public void run()
 				{
-					IServiceProvider sp = (IServiceProvider)getState().getAttributeValue(object, OAVBDIRuntimeModel.capability_has_abstractsources);
-					object = sp.getServices(type);
+					object = getInterpreter().getServiceProvider().getServices(type);
 				}
 			};
 			return (IFuture)invoc.object;
 		}
 		else
 		{
-			IServiceProvider sp = (IServiceProvider)getState().getAttributeValue(getScope(), OAVBDIRuntimeModel.capability_has_abstractsources);
-			return sp.getServices(type);
+			return getInterpreter().getServiceProvider().getServices(type);
 		}
 	}
 	
@@ -1236,16 +1205,14 @@ public class ExternalAccessFlyweight extends EACapabilityFlyweight implements IB
 			{
 				public void run()
 				{
-					IServiceProvider sp = (IServiceProvider)getState().getAttributeValue(getScope(), OAVBDIRuntimeModel.capability_has_abstractsources);
-					object = sp.getService(type, name);
+					object = getInterpreter().getServiceProvider().getService(type, name);
 				}
 			};
 			return (IFuture)invoc.object;
 		}
 		else
 		{
-			IServiceProvider sp = (IServiceProvider)getState().getAttributeValue(getScope(), OAVBDIRuntimeModel.capability_has_abstractsources);
-			return sp.getService(type, name);
+			return getInterpreter().getServiceProvider().getService(type, name);
 		}
 	}*/
 	
@@ -1261,16 +1228,14 @@ public class ExternalAccessFlyweight extends EACapabilityFlyweight implements IB
 			{
 				public void run()
 				{
-					IServiceProvider sp = (IServiceProvider)getState().getAttributeValue(getScope(), OAVBDIRuntimeModel.capability_has_abstractsources);
-					object = sp.getServicesTypes();
+					object = getInterpreter().getServiceProvider().getServicesTypes();
 				}
 			};
 			return (IFuture)invoc.object;
 		}
 		else
 		{
-			IServiceProvider sp = (IServiceProvider)getState().getAttributeValue(getScope(), OAVBDIRuntimeModel.capability_has_abstractsources);
-			return sp.getServicesTypes();
+			return getInterpreter().getServiceProvider().getServicesTypes();
 		}
 	}
 	
@@ -1316,15 +1281,13 @@ public class ExternalAccessFlyweight extends EACapabilityFlyweight implements IB
 			{
 				public void run() 
 				{
-					IServiceProvider sp = (IServiceProvider)getState().getAttributeValue(getScope(), OAVBDIRuntimeModel.capability_has_abstractsources);
-					ret.setResult(sp.getServiceOfType(type, visited));
+					getInterpreter().getServiceProvider().getServiceOfType(type, visited).addResultListener(new DelegationResultListener(ret));
 				}
 			});
 		}
 		else
 		{
-			IServiceProvider sp = (IServiceProvider)getState().getAttributeValue(getScope(), OAVBDIRuntimeModel.capability_has_abstractsources);
-			ret.setResult(sp.getServiceOfType(type, visited));
+			getInterpreter().getServiceProvider().getServiceOfType(type, visited).addResultListener(new DelegationResultListener(ret));
 		}
 		
 		return ret;
@@ -1345,15 +1308,13 @@ public class ExternalAccessFlyweight extends EACapabilityFlyweight implements IB
 			{
 				public void run() 
 				{
-					IServiceProvider sp = (IServiceProvider)getState().getAttributeValue(getScope(), OAVBDIRuntimeModel.capability_has_abstractsources);
-					ret.setResult(sp.getServicesOfType(type, visited));
+					getInterpreter().getServiceProvider().getServicesOfType(type, visited).addResultListener(new DelegationResultListener(ret));
 				}
 			});
 		}
 		else
 		{
-			IServiceProvider sp = (IServiceProvider)getState().getAttributeValue(getScope(), OAVBDIRuntimeModel.capability_has_abstractsources);
-			ret.setResult(sp.getServicesOfType(type, visited));
+			getInterpreter().getServiceProvider().getServicesOfType(type, visited).addResultListener(new DelegationResultListener(ret));
 		}
 		
 		return ret;

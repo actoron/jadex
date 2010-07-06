@@ -121,4 +121,13 @@ public class ExternalAccess extends BasicServiceContainer implements IMicroExter
 	{
 		return this.interpreter;
 	}
+
+	/**
+	 *  Get the children (if any).
+	 *  @return The children.
+	 */
+	public IFuture getChildren()
+	{
+		return null;
+	}
 }
