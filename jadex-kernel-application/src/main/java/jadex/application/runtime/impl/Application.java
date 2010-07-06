@@ -152,21 +152,22 @@ public class Application implements IApplication, IComponentInstance
 		
 
 		// Create the services
-//		final SimpleValueFetcher fetcher = new SimpleValueFetcher();
-//		fetcher.setValue("$platform", getServiceProvider());
-//		fetcher.setValue("$args", getArguments());
-//		fetcher.setValue("$results", getResults());
-//		fetcher.setValue("$component", this);
-//		List services = model.getApplicationType().getServices();
-//		if(services!=null)
-//		{
-//			for(int i=0; i<services.size(); i++)
-//			{
-//				MExpressionType exp = (MExpressionType)services.get(i);
-//				IService service = (IService)exp.getParsedValue().getValue(fetcher);
+		final SimpleValueFetcher fetcher = new SimpleValueFetcher();
+		fetcher.setValue("$platform", getServiceProvider());
+		fetcher.setValue("$args", getArguments());
+		fetcher.setValue("$results", getResults());
+		fetcher.setValue("$component", this);
+		List services = model.getApplicationType().getServices();
+		if(services!=null)
+		{
+			for(int i=0; i<services.size(); i++)
+			{
+				MExpressionType exp = (MExpressionType)services.get(i);
+				IService service = (IService)exp.getParsedValue().getValue(fetcher);
 //				mycontainer.addService(exp.getClazz(), exp.getName(), service);
-//			}
-//		}
+				mycontainer.addService(exp.getClazz(), service);
+			}
+		}
 	}
 
 	//-------- space handling --------
@@ -772,17 +773,17 @@ public class Application implements IApplication, IComponentInstance
 
 					// Init service container and init service.
 					// Create the services.
-					List services = model.getApplicationType().getServices();
-					if(services!=null)
-					{
-						for(int i=0; i<services.size(); i++)
-						{
-							MExpressionType exp = (MExpressionType)services.get(i);
-							IService service = (IService)exp.getParsedValue().getValue(fetcher);
-//							mycontainer.addService(exp.getClazz(), exp.getName(), service);
-							mycontainer.addService(exp.getClazz(), service);
-						}
-					}
+//					List services = model.getApplicationType().getServices();
+//					if(services!=null)
+//					{
+//						for(int i=0; i<services.size(); i++)
+//						{
+//							MExpressionType exp = (MExpressionType)services.get(i);
+//							IService service = (IService)exp.getParsedValue().getValue(fetcher);
+////							mycontainer.addService(exp.getClazz(), exp.getName(), service);
+//							mycontainer.addService(exp.getClazz(), service);
+//						}
+//					}
 					mycontainer.start().addResultListener(new ComponentResultListener(new DefaultResultListener()
 					{
 						public void resultAvailable(Object source, Object result)

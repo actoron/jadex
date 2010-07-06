@@ -296,7 +296,7 @@ public abstract class NestedServiceContainer extends BasicServiceContainer
 						public void resultAvailable(Object source, Object result)
 						{
 							Collection tmp = (Collection)result;
-							if(coll!=null)
+							if(tmp!=null)
 							{
 								coll.addAll(tmp);
 							}
@@ -339,7 +339,8 @@ public abstract class NestedServiceContainer extends BasicServiceContainer
 								public void resultAvailable(Object source, Object result)
 								{
 									System.out.println("child search completeted: "+result);
-									coll.addAll((Collection)result);
+									if(result!=null)
+										coll.addAll((Collection)result);
 									
 									cnt[0]=cnt[0]+1;
 									if(cnt[0]==children.size())
@@ -396,6 +397,7 @@ public abstract class NestedServiceContainer extends BasicServiceContainer
 		}
 		else if(results[0] && results[1] && results[2])
 		{
+			System.out.println("search result is: "+result);
 			ret.setResult(result);
 		}
 	}
@@ -407,7 +409,7 @@ public abstract class NestedServiceContainer extends BasicServiceContainer
 	public synchronized boolean searchNode(IServiceProvider source, IServiceProvider target, boolean up, Set visited)
 	{
 		boolean ret = false;
-		if(!visited.contains(target))
+		if(!visited.contains(target.getName()))
 		{
 			if(up && search_up || !up && search_down)
 			{

@@ -33,6 +33,9 @@ public class ExternalAccess implements IApplicationExternalAccess
 	/** The toString value. */
 	protected String tostring;
 	
+	/** The provider name. */
+	protected String providername;
+	
 	// -------- constructors --------
 
 	/**
@@ -43,6 +46,7 @@ public class ExternalAccess implements IApplicationExternalAccess
 		this.application = application;
 		this.adapter = application.getComponentAdapter();
 		this.tostring = application.getComponentIdentifier().getLocalName();
+		this.providername = application.getServiceProvider().getName();
 	}
 
 	//-------- methods --------
@@ -300,6 +304,15 @@ public class ExternalAccess implements IApplicationExternalAccess
 		}
 		
 		return ret;
+	}
+	
+	/**
+	 *  Get the service provider name.
+	 *  @return The name.
+	 */
+	public String getName()
+	{
+		return providername;
 	}
 	
 	/**

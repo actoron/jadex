@@ -203,9 +203,9 @@ public class BasicServiceContainer implements  IServiceProvider, IServiceContain
 	{
 		Future ret = new Future();
 		
-		if((visited==null || !visited.contains(this)) && services!=null)
+		if((visited==null || !visited.contains(getName())) && services!=null)
 		{
-			visited.add(this);
+			visited.add(getName());
 			Collection sers = (Collection)services.get(type);
 			ret.setResult(sers!=null && sers.size()>0? sers.iterator().next(): null);
 		}
@@ -225,9 +225,9 @@ public class BasicServiceContainer implements  IServiceProvider, IServiceContain
 	{
 		Future ret = new Future();
 		
-		if((visited==null || !visited.contains(this)) && services!=null)
+		if((visited==null || !visited.contains(getName())) && services!=null)
 		{
-			visited.add(this);
+			visited.add(getName());
 			ret.setResult(services.get(type));
 		}
 		else
@@ -337,16 +337,5 @@ public class BasicServiceContainer implements  IServiceProvider, IServiceContain
 		}
 		
 		return ret;
-	}
-	
-	//-------- methods --------
-	
-	/**
-	 *  Set the name.
-	 *  @param name The name to set.
-	 */
-	public void setName(String name)
-	{
-		this.name = name;
 	}
 }

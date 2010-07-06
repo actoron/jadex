@@ -9,8 +9,8 @@ import jadex.commons.IFuture;
 public interface IServiceContainer extends IServiceProvider
 {
 	/**
-	 *  Get the name of the container
-	 *  @return The name of this container.
+	 *  Get the name of the provider.
+	 *  @return The name of this provider.
 	 */
 	public String getName();
 	
