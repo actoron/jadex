@@ -340,8 +340,8 @@
 				<initialgoal ref="dfcap.df_keep_registered">
 					<parameter ref="description">
 						<value>
-							((IDF)$scope.getServiceContainer().getService(IDF.class))
-							.createDFComponentDescription(null, ((IDF)$scope.getServiceContainer().getService(IDF.class))
+							((IDF)$scope.getServiceProvider().getService(IDF.class))
+							.createDFComponentDescription(null, ((IDF)$scope.getServiceProvider().getService(IDF.class))
 							.createDFServiceDescription(SWfms.SERVICE_NAME_CLIENT_INTERFACE, SWfms.SERVICE_TYPE_EXTERNAL, ""))	
 						</value>
 					</parameter>

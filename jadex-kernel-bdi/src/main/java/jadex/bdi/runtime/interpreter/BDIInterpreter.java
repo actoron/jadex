@@ -182,7 +182,7 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 	 *  @param arguments	The arguments for the agent as name/value pairs.
 	 */
 	public BDIInterpreter(IComponentAdapter adapter, final IOAVState state, OAVAgentModel model, 
-		String config, Map arguments, IExternalAccess parent, Map kernelprops)
+		String config, Map arguments, final IExternalAccess parent, Map kernelprops)
 	{	
 		this.adapter = adapter;
 		this.state = state;
@@ -268,7 +268,7 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 			public IFuture getParent()
 			{
 				final Future ret = new Future();
-				ret.setResult(BDIInterpreter.getInterpreter(state).getParent());
+				ret.setResult(parent);
 				return ret;
 			}
 			

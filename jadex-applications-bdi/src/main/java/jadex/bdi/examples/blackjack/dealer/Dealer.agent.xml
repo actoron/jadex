@@ -415,8 +415,8 @@
 							     the dealers is registered at the directory facilitator.
 							     Note, that the dealer only offers one service, that is 'dealing'
 							     (see service description below).	-->
-							((IDF)$scope.getServiceContainer().getService(IDF.class))
-								.createDFComponentDescription(null, ((IDF)$scope.getServiceContainer().getService(IDF.class))
+							((IDF)$scope.getServiceProvider().getService(IDF.class))
+								.createDFComponentDescription(null, ((IDF)$scope.getServiceProvider().getService(IDF.class))
 								.createDFServiceDescription("dealing", "blackjack", "University of Hamburg"))
 	
 						</value>

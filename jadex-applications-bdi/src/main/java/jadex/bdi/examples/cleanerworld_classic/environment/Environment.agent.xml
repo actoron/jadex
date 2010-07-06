@@ -145,8 +145,8 @@
 					</parameter>
 -->					<parameter ref="description">
 						<value>
-							((IDF)$scope.getServiceContainer().getService(IDF.class))
-								.createDFComponentDescription(null, ((IDF)$scope.getServiceContainer().getService(IDF.class))
+							((IDF)$scope.getServiceProvider().getService(IDF.class))
+								.createDFComponentDescription(null, ((IDF)$scope.getServiceProvider().getService(IDF.class))
 									.createDFServiceDescription("dispatch vision", "dispatch vision", "University of Hamburg"))
 						</value>
 					</parameter>

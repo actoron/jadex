@@ -169,7 +169,7 @@
 				<initialgoal ref="purchase_book">
 					<parameter ref="order">
 						<value>new Order("All about agents", new java.util.Date($scope.getTime()+60000),
-							75, 110, true, (IClockService)$scope.getServiceContainer().getService(IClockService.class))</value>
+							75, 110, true, (IClockService)$scope.getServiceProvider().getService(IClockService.class))</value>
 					</parameter>
 				</initialgoal>
 			</goals> -->

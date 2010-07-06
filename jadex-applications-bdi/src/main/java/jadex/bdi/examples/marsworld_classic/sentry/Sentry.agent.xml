@@ -175,8 +175,8 @@
 				<initialgoal ref="dfcap.df_register">
 					<parameter ref="description">
 						<value>
-							((IDF)$scope.getServiceContainer().getService(IDF.class))
-								.createDFComponentDescription(null, ((IDF)$scope.getServiceContainer().getService(IDF.class))
+							((IDF)$scope.getServiceProvider().getService(IDF.class))
+								.createDFComponentDescription(null, ((IDF)$scope.getServiceProvider().getService(IDF.class))
 									.createDFServiceDescription("service_sentry", "service_sentry", "University of Hamburg"))
 						</value>
 					</parameter>

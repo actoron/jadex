@@ -52,14 +52,14 @@
 				<initialgoal name="initial_keep" ref="dfcap.df_keep_registered">
 					<parameter ref="description">
 						<value>
-							((IDF)$scope.getServiceContainer().getService(IDF.class))
+							((IDF)$scope.getServiceProvider().getService(IDF.class))
 								.createDFComponentDescription(null, new IDFServiceDescription[]
 								{
-									((IDF)$scope.getServiceContainer().getService(IDF.class))
+									((IDF)$scope.getServiceProvider().getService(IDF.class))
 										.createDFServiceDescription("service_a", "a", "a"),
-									((IDF)$scope.getServiceContainer().getService(IDF.class))
+									((IDF)$scope.getServiceProvider().getService(IDF.class))
 										.createDFServiceDescription("service_b", "b", "b"),
-									((IDF)$scope.getServiceContainer().getService(IDF.class))
+									((IDF)$scope.getServiceProvider().getService(IDF.class))
 										.createDFServiceDescription("service_c", "c", "c")
 								}, null, null, null, null)
 						</value>
