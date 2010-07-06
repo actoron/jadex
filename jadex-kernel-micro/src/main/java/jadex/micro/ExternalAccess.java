@@ -1,14 +1,19 @@
 package jadex.micro;
 
+import jadex.bridge.ComponentResultListener;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.ILoadableComponentModel;
 import jadex.bridge.MessageType;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
+import jadex.commons.concurrent.DefaultResultListener;
 import jadex.service.BasicServiceContainer;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -34,6 +39,7 @@ public class ExternalAccess extends BasicServiceContainer implements IMicroExter
 	 */
 	public ExternalAccess(MicroAgent agent, MicroAgentInterpreter interpreter)
 	{
+		super(interpreter.getAgentAdapter().getComponentIdentifier().getLocalName());
 		this.agent = agent;
 		this.interpreter = interpreter;
 		this.adapter = interpreter.getAgentAdapter();
@@ -128,6 +134,24 @@ public class ExternalAccess extends BasicServiceContainer implements IMicroExter
 	 */
 	public IFuture getChildren()
 	{
-		return null;
+		final Future ret = new Future();
+		
+		getService(IComponentManagementService.class).addResultListener(new ComponentResultListener(new DefaultResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				IComponentManagementService cms = (IComponentManagementService)result;
+				IComponentIdentifier[] childs = cms.getChildren(getComponentIdentifier());
+				List res = new ArrayList();
+				for(int i=0; i<childs.length; i++)
+				{
+					IExternalAccess ex = (IExternalAccess)cms.getExternalAccess(childs[i]);
+					res.add(ex);
+				}
+				ret.setResult(res);
+			}
+		}, adapter));
+		
+		return ret;
 	}
 }
