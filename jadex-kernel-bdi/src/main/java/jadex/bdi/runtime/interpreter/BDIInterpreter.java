@@ -282,7 +282,7 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 			{
 				final Future ret = new Future();
 				
-				new ExternalAccessFlyweight(state, ragent).getChildren().addResultListener(new DefaultResultListener()
+				getChildren().addResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object source, Object result)
 					{
