@@ -1,26 +1,15 @@
 package jadex.micro;
 
-import jadex.bridge.ComponentResultListener;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.ILoadableComponentModel;
 import jadex.bridge.MessageType;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
-<<<<<<< .mine
-import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.DelegationResultListener;
-import jadex.commons.concurrent.IResultListener;
-=======
-import jadex.commons.concurrent.DefaultResultListener;
->>>>>>> .r2090
-import jadex.service.BasicServiceContainer;
 import jadex.service.IServiceProvider;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -53,7 +42,6 @@ public class ExternalAccess implements IMicroExternalAccess
 	 */
 	public ExternalAccess(MicroAgent agent, MicroAgentInterpreter interpreter)
 	{
-		super(interpreter.getAgentAdapter().getComponentIdentifier().getLocalName());
 		this.agent = agent;
 		this.interpreter = interpreter;
 		this.adapter = interpreter.getAgentAdapter();
@@ -159,7 +147,6 @@ public class ExternalAccess implements IMicroExternalAccess
 	 */
 	public IFuture getService(final Class type)
 	{
-<<<<<<< .mine
 		final Future ret = new Future();
 		
 		if(adapter.isExternalThread())
@@ -178,27 +165,6 @@ public class ExternalAccess implements IMicroExternalAccess
 		}
 		
 		return ret;
-=======
-		final Future ret = new Future();
-		
-		getService(IComponentManagementService.class).addResultListener(new ComponentResultListener(new DefaultResultListener()
-		{
-			public void resultAvailable(Object source, Object result)
-			{
-				IComponentManagementService cms = (IComponentManagementService)result;
-				IComponentIdentifier[] childs = cms.getChildren(getComponentIdentifier());
-				List res = new ArrayList();
-				for(int i=0; i<childs.length; i++)
-				{
-					IExternalAccess ex = (IExternalAccess)cms.getExternalAccess(childs[i]);
-					res.add(ex);
-				}
-				ret.setResult(res);
-			}
-		}, adapter));
-		
-		return ret;
->>>>>>> .r2090
 	}
 	
 	/**
