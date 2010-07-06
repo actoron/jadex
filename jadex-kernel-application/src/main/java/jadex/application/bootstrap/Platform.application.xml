@@ -92,9 +92,9 @@
 				<component type="kernel_micro"/>
 				<component type="kernel_bdi"/>
 	
-				<!--<component type="jcc"/>-->
+				<component type="jcc"/>
 				<!--<component type="CreationBDI"/>-->
-				<component type="CreationMicro"/>
+				<!--<component type="CreationMicro"/>-->
 			</components>
 		</application>
 	</applications>
