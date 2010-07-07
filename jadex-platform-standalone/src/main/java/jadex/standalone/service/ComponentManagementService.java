@@ -219,6 +219,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 								}
 						
 								ad	= new CMSComponentDescription(cid, type, getParent(cinfo), cinfo.isMaster(), cinfo.isDaemon());
+//								System.out.println("created: "+ad);
 								
 								// Increase daemon cnt
 								if(cinfo.isDaemon())

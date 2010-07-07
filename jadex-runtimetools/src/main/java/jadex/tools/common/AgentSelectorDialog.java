@@ -400,10 +400,10 @@ public class AgentSelectorDialog
 		removeall.setEnabled(sellist.size()>0);
 		ok.setEnabled(!singleselection || sellist.size()>0);
 		
-		this.tree = new ComponentTreeTable(agent.getServiceProvider());
+		this.tree = new ComponentTreeTable(agent);
 		this.tree.setPreferredSize(new Dimension(200, 100));
 		tree.getTreetable().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		this.seltree = new ComponentTreeTable(agent.getServiceProvider());
+		this.seltree = new ComponentTreeTable(agent);
 		this.seltree.setPreferredSize(new Dimension(200, 100));
 		seltree.getTreetable().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		seltree.getTreetable().getTree().setRootVisible(false);	// Don't show platform node.

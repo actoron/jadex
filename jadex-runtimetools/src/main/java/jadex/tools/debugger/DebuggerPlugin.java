@@ -15,6 +15,7 @@ import jadex.tools.common.GuiProperties;
 import jadex.tools.common.ObjectCardLayout;
 import jadex.tools.common.jtreetable.DefaultTreeTableNode;
 import jadex.tools.common.plugin.AbstractJCCPlugin;
+import jadex.tools.jcc.AgentControlCenter;
 
 import java.awt.Cursor;
 import java.awt.Dimension;
@@ -164,7 +165,7 @@ public class DebuggerPlugin extends AbstractJCCPlugin
 		this.split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true);
 		split.setOneTouchExpandable(true);
 
-		components = new ComponentTreeTable(getJCC().getServiceContainer());
+		components = new ComponentTreeTable(((AgentControlCenter)getJCC()).getAgent());
 		components.setMinimumSize(new Dimension(0, 0));
 		split.add(components);
 		components.getTreetable().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);

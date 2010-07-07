@@ -40,10 +40,10 @@ public class ComponentTreeTableNodeType extends TreeTableNodeType
 	 *  Create a component tree table node type.
 	 *  @param container	The service container.
 	 */
-	public ComponentTreeTableNodeType(IServiceProvider container)
+	public ComponentTreeTableNodeType(IServiceProvider provider)
 	{
 		super(ComponentTreeTable.NODE_COMPONENT, new Icon[0], new String[]{"name", "address"}, new String[]{"Name", "Address"});
-		this.provider	= container;
+		this.provider	= provider;
 	}
 
 	//-------- overridings --------

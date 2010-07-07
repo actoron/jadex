@@ -1311,4 +1311,60 @@ public class ExternalAccessFlyweight extends EACapabilityFlyweight implements IB
 	{
 		return getComponentName();
 	}
+	
+	/**
+	 *  Add a service to the platform.
+	 *  If under the same name and type a service was contained,
+	 *  the old one is removed and shutdowned.
+	 *  @param name The name.
+	 *  @param service The service.
+	 */
+	public IFuture addService(final Class type, final Object service)
+	{
+		final Future ret = new Future();
+		
+		if(adapter.isExternalThread())
+		{
+			adapter.invokeLater(new Runnable() 
+			{
+				public void run() 
+				{
+					getInterpreter().getServiceProvider().addService(type, service).addResultListener(new DelegationResultListener(ret));
+				}
+			});
+		}
+		else
+		{
+			getInterpreter().getServiceProvider().addService(type, service).addResultListener(new DelegationResultListener(ret));
+		}
+		
+		return ret;
+	}
+
+	/**
+	 *  Removes a service from the platform (shutdowns also the service).
+	 *  @param name The name.
+	 *  @param service The service.
+	 */
+	public IFuture removeService(final Class type, final Object service)
+	{
+		final Future ret = new Future();
+		
+		if(adapter.isExternalThread())
+		{
+			adapter.invokeLater(new Runnable() 
+			{
+				public void run() 
+				{
+					getInterpreter().getServiceProvider().removeService(type, service).addResultListener(new DelegationResultListener(ret));
+				}
+			});
+		}
+		else
+		{
+			getInterpreter().getServiceProvider().removeService(type, service).addResultListener(new DelegationResultListener(ret));
+		}
+		
+		return ret;
+	}
 }

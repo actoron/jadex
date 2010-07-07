@@ -126,14 +126,17 @@ public class BasicServiceContainer implements  IServiceProvider, IServiceContain
 	
 	/**
 	 *  Add a service to the platform.
+	 *  Does NOT start the service automatically.
 	 *  If under the same name and type a service was contained,
 	 *  the old one is removed and shutdowned.
 	 *  @param name The name.
 	 *  @param service The service.
 	 */
 //	public void addService(Class type, String name, Object service)
-	public void addService(Class type, Object service)
+	public IFuture addService(Class type, Object service)
 	{
+		final Future ret = new Future();
+		
 //		System.out.println("Adding service: " + name + " " + type + " " + service);
 		Collection tmp = services!=null? (Collection)services.get(type): null;
 		if(tmp == null)
@@ -144,6 +147,9 @@ public class BasicServiceContainer implements  IServiceProvider, IServiceContain
 			services.put(type, tmp);
 		}
 		tmp.add(service);
+		
+		ret.setResult(null);
+		return ret;
 	}
 
 	/**
@@ -151,8 +157,10 @@ public class BasicServiceContainer implements  IServiceProvider, IServiceContain
 	 *  @param name The name.
 	 *  @param service The service.
 	 */
-	public void removeService(Class type, Object service)
+	public IFuture removeService(Class type, Object service)
 	{
+		final Future ret = new Future();
+		
 		//		System.out.println("Removing service: " + type + " " + service);
 		Collection tmp = services!=null? (Collection)services.get(type): null;
 		if(tmp == null || (service != null && !tmp.contains(service)))
@@ -181,11 +189,15 @@ public class BasicServiceContainer implements  IServiceProvider, IServiceContain
 			}
 		}
 
-		if(!removed)
-			throw new RuntimeException("Service not found: " + service);
-
 		if(tmp.size() == 0)
 			services.remove(type);
+		
+		if(!removed)
+			ret.setException(new RuntimeException("Service not found: " + service));
+		else
+			ret.setResult(null);
+		
+		return ret;
 	}
 	
 	/**
@@ -339,4 +351,5 @@ public class BasicServiceContainer implements  IServiceProvider, IServiceContain
 		
 		return ret;
 	}
+	
 }

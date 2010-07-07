@@ -1,6 +1,7 @@
 package jadex.tools.common;
 
 import jadex.bridge.IComponentDescription;
+import jadex.bridge.IExternalAccess;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SGUI;
@@ -76,12 +77,16 @@ public class ComponentTreeTable extends JScrollPane
 	/**
 	 *  Open the gui.
 	 */
-	public ComponentTreeTable(IServiceProvider container)
+	public ComponentTreeTable(IExternalAccess component)//IServiceProvider container)
 	{
+		IExternalAccess root = component;
+		while(root.getParent()!=null)
+			root = root.getParent();
+		
 		// Initialize default node types (may be overriden from outside).
 		this.nodetypes = new HashMap();
 		addNodeType(new TreeTableNodeType(NODE_CONTAINER, new Icon[]{icons.getIcon(NODE_CONTAINER)}, new String[]{"name"}, new String[]{"Name"}));
-		addNodeType(new ComponentTreeTableNodeType(container));
+		addNodeType(new ComponentTreeTableNodeType(root));
 
 		this.nodes = new HashMap();
 		this.getViewport().setBackground(UIManager.getColor("List.background"));
@@ -95,7 +100,8 @@ public class ComponentTreeTable extends JScrollPane
 
 		// Setup tree table component.
 		// hack: todo
-		this.platform = new DefaultTreeTableNode(getNodeType(NODE_CONTAINER), ((IServiceContainer)container).getName());
+		this.platform = new DefaultTreeTableNode(getNodeType(NODE_CONTAINER), root.getComponentIdentifier());
+		nodes.put(root.getComponentIdentifier(), platform);
 		this.treetable = new JTreeTable(new DefaultTreeTableModel(platform, getNodeType(NODE_COMPONENT).getColumnNames()));
 		//treetable.setFont(font);
 		//treetable.setRowHeight(treetable.getFontMetrics(font).getHeight());
@@ -146,25 +152,28 @@ public class ComponentTreeTable extends JScrollPane
 	 */
 	public void addComponent(IComponentDescription desc)
 	{
-		DefaultTreeTableNode parent	= (DefaultTreeTableNode)(desc.getParent()!=null ? nodes.get(desc.getParent()) : platform);
+		DefaultTreeTableNode parent	= (DefaultTreeTableNode)(desc.getParent()!=null ? nodes.get(desc.getParent()) : null);
 		
-		Map values = new HashMap();
-		values.put("name", desc.getName().getName());
-		values.put("type", desc.getType());
-		values.put("state", desc.getState());
-		//		values.put("ownership", description.getOwnership());
-		String[] addresses = desc.getName().getAddresses();
-		if(addresses.length > 0)
-			values.put("address", addresses[0]);
-	
-		DefaultTreeTableNode	node	= new DefaultTreeTableNode(getNodeType(NODE_COMPONENT), desc, values);
-		nodes.put(desc.getName(), node);
-		parent.add(node);
-
-		// Expand node on first add. (hack???)
-		if(parent.getChildCount() == 1)
+		if(parent!=null)
 		{
-			this.treetable.getTree().expandPath(new TreePath(parent.getPath()));
+			Map values = new HashMap();
+			values.put("name", desc.getName().getName());
+			values.put("type", desc.getType());
+			values.put("state", desc.getState());
+			//		values.put("ownership", description.getOwnership());
+			String[] addresses = desc.getName().getAddresses();
+			if(addresses.length > 0)
+				values.put("address", addresses[0]);
+		
+			DefaultTreeTableNode	node	= new DefaultTreeTableNode(getNodeType(NODE_COMPONENT), desc, values);
+			nodes.put(desc.getName(), node);
+			parent.add(node);
+	
+			// Expand node on first add. (hack???)
+			if(parent.getChildCount() == 1)
+			{
+				this.treetable.getTree().expandPath(new TreePath(parent.getPath()));
+			}
 		}
 	}
 	

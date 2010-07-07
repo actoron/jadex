@@ -276,7 +276,7 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 	 */
 	public String toString()
 	{
-		return "CESComponentDescription(name=" + getName() + ", state=" + getState() + ", ownership=" + getOwnership() + ")";
+		return "CMSComponentDescription(name=" + getName() + ", state=" + getState() + ", ownership=" + getOwnership() + ", parent=" + getParent() + ")";
 	}
 
 	/**

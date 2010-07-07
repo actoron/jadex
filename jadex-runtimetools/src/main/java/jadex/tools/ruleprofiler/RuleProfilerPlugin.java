@@ -134,7 +134,7 @@ public class RuleProfilerPlugin extends AbstractJCCPlugin	implements IComponentL
 		this.split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true);
 		split.setOneTouchExpandable(true);
 
-		agents = new ComponentTreeTable(((IServiceContainer)getJCC().getServiceContainer()));
+		agents = new ComponentTreeTable(((AgentControlCenter)getJCC()).getAgent());
 		agents.setMinimumSize(new Dimension(0, 0));
 		split.add(agents);
 		agents.getTreetable().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);

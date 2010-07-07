@@ -246,6 +246,62 @@ public class ExternalAccess implements IExternalAccess
 	}
 	
 	/**
+	 *  Add a service to the platform.
+	 *  If under the same name and type a service was contained,
+	 *  the old one is removed and shutdowned.
+	 *  @param name The name.
+	 *  @param service The service.
+	 */
+	public IFuture addService(final Class type, final Object service)
+	{
+		final Future ret = new Future();
+		
+		if(adapter.isExternalThread())
+		{
+			adapter.invokeLater(new Runnable() 
+			{
+				public void run() 
+				{
+					provider.addService(type, service).addResultListener(new DelegationResultListener(ret));
+				}
+			});
+		}
+		else
+		{
+			provider.addService(type, service).addResultListener(new DelegationResultListener(ret));
+		}
+		
+		return ret;
+	}
+
+	/**
+	 *  Removes a service from the platform (shutdowns also the service).
+	 *  @param name The name.
+	 *  @param service The service.
+	 */
+	public IFuture removeService(final Class type, final Object service)
+	{
+		final Future ret = new Future();
+		
+		if(adapter.isExternalThread())
+		{
+			adapter.invokeLater(new Runnable() 
+			{
+				public void run() 
+				{
+					provider.removeService(type, service).addResultListener(new DelegationResultListener(ret));
+				}
+			});
+		}
+		else
+		{
+			provider.removeService(type, service).addResultListener(new DelegationResultListener(ret));
+		}
+		
+		return ret;
+	}
+	
+	/**
 	 *  Get the service provider name.
 	 *  @return The name.
 	 */

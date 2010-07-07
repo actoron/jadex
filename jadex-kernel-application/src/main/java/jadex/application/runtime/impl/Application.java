@@ -27,6 +27,7 @@ import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
+import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.javaparser.SimpleValueFetcher;
 import jadex.service.IService;
 import jadex.service.IServiceContainer;
@@ -436,9 +437,14 @@ public class Application implements IApplication, IComponentInstance
 	 */
 	public void killApplication()
 	{
-		((IComponentManagementService)getServiceProvider()
-			.getService(IComponentManagementService.class))
-			.destroyComponent(getComponentAdapter().getComponentIdentifier());
+		getServiceProvider().getService(IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
+		{
+			public void customResultAvailable(Object source, Object result)
+			{
+				IComponentManagementService cms =(IComponentManagementService)result;
+				cms.destroyComponent(getComponentAdapter().getComponentIdentifier());
+			}
+		});
 	}
 	
 	
