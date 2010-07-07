@@ -33,4 +33,8 @@ public interface IExternalAccess extends IServiceProvider
 	 */
 	public IFuture getChildren();
 	
+	/**
+	 *  Kill the component.
+	 */
+	public IFuture killComponent();
 }

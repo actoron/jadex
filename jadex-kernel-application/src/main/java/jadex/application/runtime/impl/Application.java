@@ -26,6 +26,7 @@ import jadex.commons.IFuture;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.DefaultResultListener;
+import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.javaparser.SimpleValueFetcher;
@@ -872,10 +873,28 @@ public class Application implements IApplication, IComponentInstance
 	 *  Can be called concurrently (also during executeAction()).
 	 *  @param listener	When cleanup of the component is finished, the listener must be notified.
 	 */
+	public IFuture cleanupComponent()
+	{
+		return provider.shutdown();
+	}
+	
+	/**
+	 *  Kill the component.
+	 */
 	public IFuture killComponent()
 	{
-		return new Future(null);
-		// Todo: application cleanup?
+		final Future ret = new Future();
+		
+		getServiceProvider().getService(IComponentManagementService.class).addResultListener(new DefaultResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				((IComponentManagementService)result).destroyComponent(adapter.getComponentIdentifier())
+					.addResultListener(new DelegationResultListener(ret));
+			}
+		});
+		
+		return ret;
 	}
 	
 	/**

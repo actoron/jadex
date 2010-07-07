@@ -16,6 +16,7 @@ import jadex.commons.Future;
 import jadex.commons.IChangeListener;
 import jadex.commons.IFuture;
 import jadex.commons.concurrent.DefaultResultListener;
+import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.service.IServiceContainer;
 import jadex.service.IServiceProvider;
@@ -244,7 +245,7 @@ public class MicroAgentInterpreter implements IComponentInstance
 	 *  Can be called concurrently (also during executeAction()).
 	 *  @param listener	When cleanup of the agent is finished, the listener must be notified.
 	 */
-	public IFuture killComponent()
+	public IFuture cleanupComponent()
 	{
 		final Future ret = new Future();
 		
@@ -252,31 +253,39 @@ public class MicroAgentInterpreter implements IComponentInstance
 		{
 			public void run()
 			{	
-//				// must synchronize to avoid other thread calling invokeLater at the same time
-//				synchronized(ext_entries)
-//				{
-//					getAgentAdapter().invokeLater(new Runnable()
-//					{
-//						public void run()
-//						{
-							if(microagent.timer!=null)
-							{
-								microagent.timer.cancel();
-								microagent.timer = null;
-							}
-							microagent.agentKilled();
-							IComponentIdentifier cid = adapter.getComponentIdentifier();
-							ret.setResult(cid);
-//						}
-//					});
-//					
-//					ext_forbidden = true;
-//				}
+				if(microagent.timer!=null)
+				{
+					microagent.timer.cancel();
+					microagent.timer = null;
+				}
+				microagent.agentKilled();
+				provider.shutdown();
+				IComponentIdentifier cid = adapter.getComponentIdentifier();
+				ret.setResult(cid);
 			}
 			
 			public String toString()
 			{
 				return "microagent.agentKilled()_#"+this.hashCode();
+			}
+		});
+		
+		return ret;
+	}
+	
+	/**
+	 *  Kill the component.
+	 */
+	public IFuture killComponent()
+	{
+		final Future ret = new Future();
+		
+		getServiceProvider().getService(IComponentManagementService.class).addResultListener(new DefaultResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				((IComponentManagementService)result).destroyComponent(adapter.getComponentIdentifier())
+					.addResultListener(new DelegationResultListener(ret));
 			}
 		});
 		

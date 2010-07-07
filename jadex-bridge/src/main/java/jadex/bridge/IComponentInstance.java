@@ -58,13 +58,13 @@ public interface IComponentInstance
 	/**
 	 *  Can be called concurrently (also during executeAction()).
 	 *   
-	 *  Request component to kill itself.
+	 *  Request component to cleanup itself after kill.
 	 *  The component might perform arbitrary cleanup activities during which executeAction()
 	 *  will still be called as usual.
 	 *  Can be called concurrently (also during executeAction()).
-	 *  @return When cleanup of the component is finished, the listener must be notified.
+	 *  @return When cleanup of the component is finished, the future is notified.
 	 */
-	public IFuture killComponent();
+	public IFuture cleanupComponent();
 	
 	/**
 	 *  Can be called concurrently (also during executeAction()).

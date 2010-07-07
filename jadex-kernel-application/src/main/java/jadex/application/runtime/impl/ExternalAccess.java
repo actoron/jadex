@@ -352,6 +352,31 @@ public class ExternalAccess implements IApplicationExternalAccess
 	}
 
 	/**
+	 *  Kill the component.
+	 */
+	public IFuture killComponent()
+	{
+		final Future ret = new Future();
+		
+		if(adapter.isExternalThread())
+		{
+			adapter.invokeLater(new Runnable() 
+			{
+				public void run() 
+				{
+					application.killComponent().addResultListener(new DelegationResultListener(ret));
+				}
+			});
+		}
+		else
+		{
+			application.killComponent().addResultListener(new DelegationResultListener(ret));
+		}
+		
+		return ret;
+	}
+	
+	/**
 	 *  Get the string representation.
 	 */
 	public String toString()

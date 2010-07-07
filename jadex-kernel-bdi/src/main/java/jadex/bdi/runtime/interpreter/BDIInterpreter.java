@@ -433,7 +433,7 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 	/**
 	 *  Request agent to kill itself.
 	 */
-	public IFuture killComponent()
+	public IFuture cleanupComponent()
 	{
 		final Future ret = new Future();
 		
@@ -513,6 +513,9 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 	{
 //		System.err.println("Cleanup: "+state);
 
+		// Shutdown service provider.
+		provider.shutdown();
+		
 		BDIInterpreter.interpreters.remove(state);
 		
 		for(Iterator it=externalthreads.iterator(); it.hasNext(); )

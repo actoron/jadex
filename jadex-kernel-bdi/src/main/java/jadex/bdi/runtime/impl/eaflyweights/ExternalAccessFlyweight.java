@@ -1367,4 +1367,12 @@ public class ExternalAccessFlyweight extends EACapabilityFlyweight implements IB
 		
 		return ret;
 	}
+	
+	/**
+	 *  Kill the component.
+	 */
+	public IFuture killComponent()
+	{
+		return killAgent();
+	}
 }

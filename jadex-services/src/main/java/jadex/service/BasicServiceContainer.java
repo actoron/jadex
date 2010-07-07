@@ -4,6 +4,7 @@ import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.concurrent.CounterListener;
 import jadex.commons.concurrent.DefaultResultListener;
+import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
 
 import java.util.ArrayList;
@@ -12,6 +13,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -143,7 +146,7 @@ public class BasicServiceContainer implements  IServiceProvider, IServiceContain
 		{
 			tmp = new ArrayList();
 			if(services==null)
-				services = new HashMap();
+				services = new LinkedHashMap();
 			services.put(type, tmp);
 		}
 		tmp.add(service);
@@ -318,30 +321,69 @@ public class BasicServiceContainer implements  IServiceProvider, IServiceContain
 	 */
 	public IFuture shutdown()
 	{
+		Thread.dumpStack();
+		System.out.println("shutdown called: "+getName());
 		final Future ret = new Future();
 		
 		// Stop the services.
 		if(services!=null && services.size()>0)
 		{
-			CounterListener lis = new CounterListener(services.size(), new DefaultResultListener()
+			Object[] sers = services.values().toArray();
+			
+			List allservices = new ArrayList();
+			for(Iterator it=services.values().iterator(); it.hasNext(); )
 			{
-				public void resultAvailable(Object source, Object result)
-				{
-					ret.setResult(null);
-				}
-			});
-			for(Iterator it = services.keySet().iterator(); it.hasNext();)
-			{
-				Object key = it.next();
-				Collection tmp = (Collection)services.get(key);
+				Collection tmp = (Collection)it.next();
 				if(tmp != null)
 				{
 					for(Iterator it2 = tmp.iterator(); it2.hasNext();)
 					{
-						IService service = (IService)it2.next();
-						service.shutdownService().addResultListener(lis);
+						allservices.add(it2.next());
 					}
 				}
+			}
+			
+			System.out.println("here: "+allservices);
+			shutdownServices(allservices, allservices.size()-1).addResultListener(new DelegationResultListener(ret));
+		}
+		else
+		{
+			ret.setResult(null);
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	protected IFuture shutdownServices(final List sers, final int i)
+	{
+		final Future ret = new Future();
+		
+		if(i>=0)
+		{
+			if(sers.get(i) instanceof IService)
+			{
+				System.out.println("shutdown: "+i+" "+sers.get(i));
+				
+				((IService)sers.get(i)).shutdownService().addResultListener(new IResultListener()
+				{
+					public void resultAvailable(Object source, Object result)
+					{
+						System.out.println("shutdown finished: "+i+" "+sers.get(i));
+						shutdownServices(sers, i-1).addResultListener(new DelegationResultListener(ret));
+					}
+					
+					public void exceptionOccurred(Object source, Exception exception)
+					{
+						shutdownServices(sers, i-1).addResultListener(new DelegationResultListener(ret));
+					}
+				});
+			}
+			else
+			{
+				shutdownServices(sers, i-1).addResultListener(new DelegationResultListener(ret));
 			}
 		}
 		else

@@ -19,15 +19,21 @@ import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.collection.SCollection;
+import jadex.commons.concurrent.CounterListener;
 import jadex.commons.concurrent.DefaultResultListener;
+import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.service.IService;
 import jadex.service.IServiceContainer;
+import jadex.service.clock.IClockService;
+import jadex.service.clock.ITimedObject;
+import jadex.service.clock.ITimer;
 import jadex.service.execution.IExecutionService;
 import jadex.service.library.ILibraryService;
 import jadex.standalone.StandaloneComponentAdapter;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -349,58 +355,100 @@ public class ComponentManagementService implements IComponentManagementService, 
 	 *  Destroy (forcefully terminate) an component on the platform.
 	 *  @param cid	The component to destroy.
 	 */
-	public IFuture destroyComponent(IComponentIdentifier cid)
+	public IFuture destroyComponent(final IComponentIdentifier cid)
 	{
-		Future ret = new Future();
+		final Future ret = new Future();
 		
-		CMSComponentDescription	desc;
 		synchronized(adapters)
 		{
 			synchronized(descs)
 			{
 				// Kill subcomponents
-//				Object[] achildren	= children.getCollection(cid).toArray();	// Use copy as children may change on destroy.
-				desc = (CMSComponentDescription)descs.get(cid);
+				final CMSComponentDescription	desc = (CMSComponentDescription)descs.get(cid);
 				if(desc==null)
 				{
 					ret.setException(new RuntimeException("Component "+cid+" does not exist."));
 					return ret;
 				}
 				IComponentIdentifier[] achildren = desc.getChildren();
-				for(int i=0; i<achildren.length; i++)
-				{
-					destroyComponent(achildren[i]);	// todo: cascading delete with wait.
-				}
 				
-//				System.out.println("killing: "+cid);
-				
-				StandaloneComponentAdapter component = (StandaloneComponentAdapter)adapters.get(cid);
-				if(component==null)
+				destroyComponentLoop(cid, achildren, 0).addResultListener(new IResultListener()
 				{
-					ret.setException(new RuntimeException("Component "+cid+" does not exist."));
-					return ret;
-				}
-				
-				// todo: does not work always!!! A search could be issued before components had enough time to kill itself!
-				// todo: killcomponent should only be called once for each component?
-				if(desc!=null)
-				{
-					if(!ccs.containsKey(cid))
+					public void resultAvailable(Object source, Object result)
 					{
-						CleanupCommand	cc	= new CleanupCommand(cid);
-						ccs.put(cid, cc);
-						cc.addKillFuture(ret);
-						component.killComponent(cc);						
+						System.out.println("killing: "+cid);
+						
+						StandaloneComponentAdapter component = (StandaloneComponentAdapter)adapters.get(cid);
+						if(component==null)
+						{
+							ret.setException(new RuntimeException("Component "+cid+" does not exist."));
+							return;
+						}
+						
+						// todo: does not work always!!! A search could be issued before components had enough time to kill itself!
+						// todo: killcomponent should only be called once for each component?
+						if(desc!=null)
+						{
+							if(!ccs.containsKey(cid))
+							{
+								CleanupCommand	cc	= new CleanupCommand(cid);
+								ccs.put(cid, cc);
+								cc.addKillFuture(ret);
+								component.killComponent(cc);						
+							}
+							else
+							{
+								CleanupCommand	cc	= (CleanupCommand)ccs.get(cid);
+								if(cc==null)
+									ret.setException(new RuntimeException("No cleanup command for component "+cid+": "+desc.getState()));
+								cc.addKillFuture(ret);
+							}
+						}
+					}
+					
+					public void exceptionOccurred(Object source, Exception exception)
+					{
+						ret.setException(exception);
+					}
+				});
+			}
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Loop for destroying subcomponents.
+	 */
+	protected IFuture destroyComponentLoop(final IComponentIdentifier cid, final IComponentIdentifier[] achildren, final int i)
+	{
+		final Future ret = new Future();
+		
+		if(achildren.length>0)
+		{
+			destroyComponent(achildren[i]).addResultListener(new IResultListener()
+			{
+				public void resultAvailable(Object source, Object result)
+				{
+					if(i+1<achildren.length)
+					{
+						destroyComponentLoop(cid, achildren, i+1).addResultListener(new DelegationResultListener(ret));
 					}
 					else
 					{
-						CleanupCommand	cc	= (CleanupCommand)ccs.get(cid);
-						if(cc==null)
-							ret.setException(new RuntimeException("No cleanup command for component "+cid+": "+desc.getState()));
-						cc.addKillFuture(ret);
+						ret.setResult(null);
 					}
 				}
-			}
+				
+				public void exceptionOccurred(Object source, Exception exception)
+				{
+					ret.setException(exception);
+				}
+			});
+		}
+		else
+		{
+			ret.setResult(null);
 		}
 		
 		return ret;
@@ -781,8 +829,8 @@ public class ComponentManagementService implements IComponentManagementService, 
 			}
 			
 			// Shudown platform when last (non-daemon) component was destroyed
-			if(shutdown)
-				container.shutdown();
+//			if(shutdown)
+//				container.shutdown();
 		}
 		
 		public void exceptionOccurred(Object source, Exception exception)
@@ -1239,8 +1287,159 @@ public class ComponentManagementService implements IComponentManagementService, 
 	 */
 	public IFuture	shutdownService()
 	{
-		// Todo: destroy running components.
-		return new Future(null);	// Already done.
+		return new Future(null);
+
+		/*final Future ret = new Future();
+		final  long shutdowntime = 10000; // todo: shutdowntime and MAX_SHUTDOWM_TIME
+		
+		// Step 1: Find existing components.
+		getComponentDescriptions().addResultListener(new IResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				// Step 2: Kill existing components excepts daemons.
+				final List comps = new ArrayList(Arrays.asList((IComponentDescription[])result));
+				for(int i=comps.size()-1; i>-1; i--)
+				{
+					if(((CMSComponentDescription)comps.get(i)).isDaemon())
+						comps.remove(i);
+				}
+				
+				killComponents(comps, shutdowntime, new IResultListener()
+				{
+					public void resultAvailable(Object source, Object result)
+					{
+						// Step 3: Find remaining components.
+						getComponentDescriptions().addResultListener(new IResultListener()
+						{
+							public void resultAvailable(Object source, Object result)
+							{
+								// Step 4: Kill remaining components.
+								killComponents(Arrays.asList((IComponentDescription[])result), shutdowntime, new DelegationResultListener(ret));
+							}
+
+							public void exceptionOccurred(Object source, Exception exception)
+							{
+								ret.setException(exception);
+							}
+						});		
+					}
+					
+					public void exceptionOccurred(Object source, Exception exception)
+					{
+						ret.setException(exception);
+					}
+				});
+			}
+
+			public void exceptionOccurred(Object source, Exception exception)
+			{
+				ret.setException(exception);
+			}
+		});
+		
+		return ret;*/
+	}
+	
+	/**
+	 *  Kill the given components within the specified timeout.
+	 *  @param comps	The component ids.
+	 *  @param timeout	The time after which to inform the listener anyways.
+	 *  @param listener	The result listener.
+	 */
+	protected void killComponents(final List comps, final long timeout, final IResultListener listener)
+	{
+		if(comps.isEmpty())
+			listener.resultAvailable(this, null);
+		System.out.println("killcomps: "+comps);
+		
+		container.getService(IClockService.class).addResultListener(new IResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				// Timer entry to notify lister after timeout.
+				final	boolean	notified[]	= new boolean[1];
+				final ITimer killtimer	= ((IClockService)result).createTimer(timeout, new ITimedObject()
+				{
+					public void timeEventOccurred(long currenttime)
+					{
+						boolean	notify	= false;
+						synchronized(notified)
+						{
+							if(!notified[0])
+							{
+								notify	= true;
+								notified[0]	= true;
+							}
+						}
+						if(notify)
+						{
+							listener.resultAvailable(this, null);
+						}
+					}
+				});
+				
+				// Kill the given components.
+				final IResultListener	rl	= new IResultListener()
+				{
+					int cnt	= 0;
+					public void resultAvailable(Object source, Object result)
+					{
+						testFinished();
+					}
+					public void exceptionOccurred(Object source, Exception exception)
+					{
+						testFinished();
+					}
+					protected synchronized void testFinished()
+					{
+						cnt++;
+//						System.out.println("here: "+cnt+" "+comps.size());
+						if(cnt==comps.size())
+						{
+							killtimer.cancel();
+							boolean	notify	= false;
+							synchronized(notified)
+							{
+								if(!notified[0])
+								{
+									notify	= true;
+									notified[0]	= true;
+								}
+							}
+							if(notify)
+							{
+								listener.resultAvailable(this, null);
+							}
+						}
+					}
+				};
+				
+				container.getService(IComponentManagementService.class).addResultListener(new IResultListener()
+				{
+					public void resultAvailable(Object source, Object result)
+					{
+						IComponentManagementService	ces	= (IComponentManagementService)result;
+						for(int i=0; i < comps.size(); i++)
+						{
+							System.out.println("Killing component: "+comps.get(i));
+							CMSComponentDescription desc = (CMSComponentDescription)comps.get(i);
+							ces.destroyComponent(desc.getName()).addResultListener(rl);
+						}
+					}
+					
+					public void exceptionOccurred(Object source, Exception exception)
+					{
+						listener.exceptionOccurred(source, exception);
+					}
+				});
+			}
+			
+			public void exceptionOccurred(Object source, Exception exception)
+			{
+				listener.exceptionOccurred(source, exception);
+			}
+		});
 	}
 	
 	//-------- service handling --------

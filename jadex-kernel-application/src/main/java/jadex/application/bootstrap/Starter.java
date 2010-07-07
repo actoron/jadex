@@ -31,31 +31,6 @@ public class Starter
 		// Absolute start time (for testing and benchmarking).
 		long starttime = System.currentTimeMillis();
 		
-		// Initialize platform configuration from args.
-//		String[] conffiles;
-//		if(args.length>0 && args[0].equals("-"+CONFIGURATION))
-//		{
-//			conffiles = new String[args.length-1];
-//			System.arraycopy(args, 1, conffiles, 0, args.length-1);
-//		}
-//		else if(args.length>0)
-//		{
-//			conffiles = args;
-//		}
-//		else
-//		{
-//			conffiles = new String[]
-//			{
-//				FALLBACK_SERVICES_CONFIGURATION,
-//				FALLBACK_STANDARDCOMPONENTS_CONFIGURATION,
-//				FALLBACK_APPLICATION_CONFIGURATION,
-//				FALLBACK_BDI_CONFIGURATION,
-//				FALLBACK_MICRO_CONFIGURATION,
-//				FALLBACK_BPMN_CONFIGURATION,
-//				FALLBACK_BDIBPMN_CONFIGURATION
-//			};
-//		}
-		
 		// Create an instance of the platform.
 		// Hack as long as no loader is present.
 		ClassLoader cl = Starter.class.getClassLoader();

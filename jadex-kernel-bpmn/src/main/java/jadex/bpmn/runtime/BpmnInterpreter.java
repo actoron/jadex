@@ -35,6 +35,7 @@ import jadex.commons.IChangeListener;
 import jadex.commons.IFilter;
 import jadex.commons.IFuture;
 import jadex.commons.concurrent.DefaultResultListener;
+import jadex.commons.concurrent.DelegationResultListener;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.IValueFetcher;
 import jadex.service.IServiceContainer;
@@ -404,7 +405,7 @@ public class BpmnInterpreter implements IComponentInstance
 	 *  Can be called concurrently (also during executeAction()).
 	 *  @param listener	When cleanup of the agent is finished, the listener must be notified.
 	 */
-	public IFuture killComponent()
+	public IFuture cleanupComponent()
 	{
 		final Future ret = new Future();
 		// Todo: cleanup required???
@@ -413,38 +414,33 @@ public class BpmnInterpreter implements IComponentInstance
 		{
 			public void run()
 			{	
-//				// must synchronize to avoid other thread calling invokeLater at the same time
-//				synchronized(ext_entries)
-//				{
-//					adapter.invokeLater(new Runnable()
-//					{
-//						public void run()
-//						{
-////							if(microagent.timer!=null)
-////							{
-////								microagent.timer.cancel();
-////								microagent.timer = null;
-////							}
-////							microagent.agentKilled();
-//							
-//							// todo: initiate kill process?!
-//							
-////							System.out.println("CC: "+adapter);
-				
-							// Call cancel on all running threads.
-							for(Iterator it= getThreadContext().getAllThreads().iterator(); it.hasNext(); )
-							{
-								ProcessThread pt = (ProcessThread)it.next();
-								getActivityHandler(pt.getActivity()).cancel(pt.getActivity(), BpmnInterpreter.this, pt);
-//								System.out.println("Cancelling: "+pt.getActivity()+" "+pt.getId());
-							}
-							ret.setResult(adapter.getComponentIdentifier());
-//							listener.resultAvailable(BpmnInterpreter.this, adapter.getComponentIdentifier());
-//						}
-//					});
-//					
-//					ext_forbidden = true;
-//				}
+				// Call cancel on all running threads.
+				for(Iterator it= getThreadContext().getAllThreads().iterator(); it.hasNext(); )
+				{
+					ProcessThread pt = (ProcessThread)it.next();
+					getActivityHandler(pt.getActivity()).cancel(pt.getActivity(), BpmnInterpreter.this, pt);
+//					System.out.println("Cancelling: "+pt.getActivity()+" "+pt.getId());
+				}
+				ret.setResult(adapter.getComponentIdentifier());
+			}
+		});
+		
+		return ret;
+	}
+	
+	/**
+	 *  Kill the component.
+	 */
+	public IFuture killComponent()
+	{
+		final Future ret = new Future();
+		
+		getServiceProvider().getService(IComponentManagementService.class).addResultListener(new DefaultResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				((IComponentManagementService)result).destroyComponent(adapter.getComponentIdentifier())
+					.addResultListener(new DelegationResultListener(ret));
 			}
 		});
 		

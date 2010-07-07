@@ -297,6 +297,7 @@ public abstract class EACapabilityFlyweight extends ElementFlyweight implements 
 		return ret;
 	}
 	
+	// todo: remove, duplicate method since killComponent is in external access
 	/**
 	 *  Kill the agent.
 	 */

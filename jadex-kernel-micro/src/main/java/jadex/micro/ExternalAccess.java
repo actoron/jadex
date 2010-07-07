@@ -379,4 +379,28 @@ public class ExternalAccess implements IMicroExternalAccess
 		return provider;
 	}
 
+	/**
+	 *  Kill the component.
+	 */
+	public IFuture killComponent()
+	{
+		final Future ret = new Future();
+		
+		if(adapter.isExternalThread())
+		{
+			adapter.invokeLater(new Runnable() 
+			{
+				public void run() 
+				{
+					interpreter.cleanupComponent().addResultListener(new DelegationResultListener(ret));
+				}
+			});
+		}
+		else
+		{
+			interpreter.cleanupComponent().addResultListener(new DelegationResultListener(ret));
+		}
+		
+		return ret;
+	}
 }

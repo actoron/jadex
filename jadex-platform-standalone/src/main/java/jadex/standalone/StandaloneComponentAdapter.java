@@ -306,7 +306,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 
 		if(!fatalerror)
 		{
-			component.killComponent().addResultListener(new IResultListener()
+			component.cleanupComponent().addResultListener(new IResultListener()
 			{
 				public void resultAvailable(Object source, Object result)
 				{

@@ -6,6 +6,7 @@ import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentManagementService;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.ILoadableComponentModel;
 import jadex.commons.IFuture;
 import jadex.commons.Properties;
@@ -711,12 +712,18 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 	{
 		public void actionPerformed(ActionEvent e)
 		{
-			getJCC().getServiceContainer().shutdown().addResultListener(new SwingDefaultResultListener(spanel)
-			{
-				public void customResultAvailable(Object source, Object result)
-				{
-				}
-			});
+			IExternalAccess root = ((AgentControlCenter)getJCC()).getAgent();
+			while(root.getParent()!=null)
+				root = root.getParent();
+			
+			root.killComponent();
+				
+//			getJCC().getServiceContainer().shutdown().addResultListener(new SwingDefaultResultListener(spanel)
+//			{
+//				public void customResultAvailable(Object source, Object result)
+//				{
+//				}
+//			});
 		}
 	};
 
