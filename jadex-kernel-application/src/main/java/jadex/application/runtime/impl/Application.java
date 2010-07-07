@@ -354,30 +354,34 @@ public class Application implements IApplication, IComponentInstance
 						found	= true;
 					}
 				}
-				if(!found)
+				if(found)
 				{
+					ISpace[]	aspaces	= null;
+					synchronized(this)
+					{
+						if(spaces!=null)
+						{
+							aspaces	= (ISpace[])spaces.values().toArray(new ISpace[spaces.size()]);
+						}
+					}
+	
+					if(aspaces!=null)
+					{
+						for(int i=0; i<aspaces.length; i++)
+						{
+							aspaces[i].componentAdded(comp, type);
+						}
+					}
+					
+					if(!desc.isDaemon())
+						children++;
+				}
+				else if(parent!=null)
+				{
+					// Hack?
+					// Root application, i.e. platform does not need to declare all known child types 
 					throw new RuntimeException("Unsupported component for application: "+model.getFilename());
 				}
-				
-				ISpace[]	aspaces	= null;
-				synchronized(this)
-				{
-					if(spaces!=null)
-					{
-						aspaces	= (ISpace[])spaces.values().toArray(new ISpace[spaces.size()]);
-					}
-				}
-
-				if(aspaces!=null)
-				{
-					for(int i=0; i<aspaces.length; i++)
-					{
-						aspaces[i].componentAdded(comp, type);
-					}
-				}
-				
-				if(!desc.isDaemon())
-					children++;
 			}
 		});
 	
@@ -789,7 +793,7 @@ public class Application implements IApplication, IComponentInstance
 						public void resultAvailable(Object source, Object result)
 						{
 							// Create spaces for context.
-							System.out.println("comp services start finished: "+getComponentIdentifier());
+//							System.out.println("comp services start finished: "+getComponentIdentifier());
 							List spaces = config.getMSpaceInstances();
 							if(spaces!=null)
 							{
@@ -1018,7 +1022,7 @@ public class Application implements IApplication, IComponentInstance
 		if(i<components.size())
 		{
 			final MComponentInstance component = (MComponentInstance)components.get(i);
-			System.out.println("Create: "+component.getName()+" "+component.getTypeName()+" "+component.getConfiguration()+" "+Thread.currentThread());
+//			System.out.println("Create: "+component.getName()+" "+component.getTypeName()+" "+component.getConfiguration()+" "+Thread.currentThread());
 			int num = component.getNumber(Application.this, cl, fetcher);
 			for(int j=0; j<num; j++)
 			{
@@ -1029,7 +1033,7 @@ public class Application implements IApplication, IComponentInstance
 				{
 					public void resultAvailable(Object source, Object result)
 					{
-						System.out.println("Create finished: "+component.getName()+" "+component.getTypeName()+" "+component.getConfiguration()+" "+Thread.currentThread());
+//						System.out.println("Create finished: "+component.getName()+" "+component.getTypeName()+" "+component.getConfiguration()+" "+Thread.currentThread());
 						createComponent(fetcher, components, cl, ces, i+1);
 					}
 					

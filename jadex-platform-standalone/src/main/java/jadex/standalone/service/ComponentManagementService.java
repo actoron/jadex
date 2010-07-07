@@ -218,13 +218,13 @@ public class ComponentManagementService implements IComponentManagementService, 
 									});
 								}
 						
-								ad	= new CMSComponentDescription(cid, type, cinfo.getParent(), cinfo.isMaster(), cinfo.isDaemon());
+								ad	= new CMSComponentDescription(cid, type, getParent(cinfo), cinfo.isMaster(), cinfo.isDaemon());
 								
 								// Increase daemon cnt
 								if(cinfo.isDaemon())
 									daemons++;
 								
-								CMSComponentDescription padesc = (CMSComponentDescription)descs.get(cinfo.getParent());
+								CMSComponentDescription padesc = (CMSComponentDescription)descs.get(getParent(cinfo));
 								
 								// Suspend when set to suspend or when parent is also suspended or when specified in model.
 								Object	debugging 	= lmodel.getProperties().get("debugging");
@@ -238,7 +238,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 									ad.setState(IComponentDescription.STATE_ACTIVE);
 								}
 								descs.put(cid, ad);
-								if(cinfo.getParent()!=null)
+//								if(getParent(cinfo)!=null)
 								{
 		//							children.put(parent, cid);
 									padesc.addChild(cid);
@@ -248,9 +248,9 @@ public class ComponentManagementService implements IComponentManagementService, 
 							adapter = new StandaloneComponentAdapter(ad);
 							adapters.put(cid, adapter);
 		
-							if(cinfo.getParent()!=null)
+//							if(cinfo.getParent()!=null)
 							{
-								pad	= (StandaloneComponentAdapter)adapters.get(cinfo.getParent());
+								pad	= (StandaloneComponentAdapter)adapters.get(getParent(cinfo));
 							}
 						}
 		
@@ -862,6 +862,17 @@ public class ComponentManagementService implements IComponentManagementService, 
 	}
 	
 	//-------- parent/child component accessors --------
+	
+	/**
+	 *  Get the parent component of a component.
+	 *  @param cid The component identifier.
+	 *  @return The parent component identifier.
+	 */
+	public IComponentIdentifier getParent(CreationInfo ci)
+	{
+		IComponentIdentifier rt = root.getComponentIdentifier();
+		return ci==null? rt: ci.getParent()==null? rt: ci.getParent(); 
+	}
 	
 	/**
 	 *  Get the parent component of a component.

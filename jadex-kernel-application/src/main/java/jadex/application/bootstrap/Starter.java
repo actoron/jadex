@@ -62,36 +62,15 @@ public class Starter
 
 		IComponentFactory fac = new ApplicationComponentFactory(null);
 		ILoadableComponentModel model = fac.loadModel("jadex/application/bootstrap/Platform.application.xml", null, null);
-		System.out.println("Model: "+model);
-//		DummyAdapter da = new DummyAdapter(new IComponentIdentifier()
-//		{
-//			public String getPlatformName()
-//			{
-//				return "horst";
-//			}
-//			
-//			public String getName()
-//			{
-//				return "root@horst";
-//			}
-//			
-//			public String getLocalName()
-//			{
-//				return "root";
-//			}
-//			
-//			public String[] getAddresses()
-//			{
-//				return SUtil.EMPTY_STRING_ARRAY;
-//			}
-//		});
+//		System.out.println("Model: "+model);
 		IComponentIdentifier cid = new ComponentIdentifier("root@platform");
+		
 		CMSComponentDescription desc = new CMSComponentDescription(cid, null, null, false, false);
 		StandaloneComponentAdapter adapter = new StandaloneComponentAdapter(desc);
 		IComponentInstance instance = fac.createComponentInstance(adapter, model, null, null, null);
 		adapter.setComponent(instance, model);
 //		IApplicationExternalAccess ea = new ExternalAccess((Application)instance);
-		System.out.println("Instance: "+instance);
+//		System.out.println("Instance: "+instance);
 		
 		// Initiate first step of root component (i.e. platform).
 		instance.executeStep();
