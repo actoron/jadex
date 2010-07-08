@@ -21,6 +21,9 @@
 		<import>jadex.application.runtime.*</import>
 		<import>deco4mas.examples.agentNegotiation.decoMAS.*</import>
 		<import>deco4mas.examples.agentNegotiation.decoMAS.dataObjects.*</import>
+		<import>deco4mas.examples.agentNegotiation.sa.masterSa.*</import>
+		<import>deco4mas.examples.agentNegotiation.sa.application.*</import>
+		<import>deco4mas.examples.agentNegotiation.sa.coordination.*</import>
 		<import>deco4mas.coordinate.environment.*</import>
 		<import>deco4mas.coordinate.*</import>
 		<import>jadex.commons.IFilter</import>
@@ -132,6 +135,12 @@
 			<parameter name="task" class="String"></parameter>
 			<parameter name="proposal" class="ServiceProposal"></parameter>
 		</internalevent>
+		
+		<internalevent name="executionOccur">
+			<parameter name="execution" class="Execution"></parameter>
+			<parameter name="task" class="String"></parameter>
+		</internalevent>
+		
 		<internalevent name="rewardReply">
 			<parameter name="reward" class="Reward"></parameter>
 			<parameter name="task" class="String"></parameter>

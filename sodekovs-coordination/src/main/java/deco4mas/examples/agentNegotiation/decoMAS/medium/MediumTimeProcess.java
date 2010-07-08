@@ -5,6 +5,7 @@ import jadex.application.space.envsupport.environment.ISpaceProcess;
 import jadex.commons.SimplePropertyObject;
 import jadex.service.clock.IClockService;
 import deco4mas.coordinate.environment.CoordinationSpace;
+import deco4mas.mechanism.ICoordinationMechanism;
 
 /**
  * Process for check up deadline at medium
@@ -52,8 +53,14 @@ public class MediumTimeProcess extends SimplePropertyObject implements ISpacePro
 		CoordinationSpace env = (CoordinationSpace) space;
 		if (env.activeCoordinationMechanisms.size() > 0)
 		{
-			NegSpaceMechanism mechanism = (NegSpaceMechanism) env.activeCoordinationMechanisms.get(0);
-			mechanism.nextTick();
+			for (ICoordinationMechanism coordMechanism : env.activeCoordinationMechanisms)
+			{
+				if (coordMechanism.getRealisationName().equals("by_neg"))
+				{
+					NegSpaceMechanism mechanism = (NegSpaceMechanism) coordMechanism;
+					mechanism.nextTick();
+				}
+			}
 		}
 	}
 }

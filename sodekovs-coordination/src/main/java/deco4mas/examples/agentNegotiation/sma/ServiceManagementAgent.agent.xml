@@ -8,76 +8,72 @@
 	                    http://jadex.sourceforge.net/jadex-bdi-2.0.xsd"
 	name="ServiceManagementAgent" package="deco4mas.examples.agentNegotiation.sma">
 	<imports>
-		<import>jadex.adapter.base.contextservice.*</import>
-		<import>jadex.adapter.base.appdescriptor.*</import>
-		<import>jadex.application.space.envsupport.environment.space2d.*
-		</import>
-		<import>jadex.application.space.envsupport.environment.*</import>
-		<import>jadex.application.space.envsupport.math.*</import>
-		<import>jadex.application.runtime.*</import>
-		<import>jadex.base.fipa.*</import>
-		<import>jadex.bdi.planlib.protocols.*</import>
 		<import>jadex.bridge.IComponentIdentifier</import>
-		<import>deco4mas.examples.agentNegotiation.decoMAS.*</import>
-		<import>deco4mas.examples.agentNegotiation.decoMAS.medium.*</import>
-		<import>deco4mas.examples.agentNegotiation.decoMAS.dataObjects.*
-		</import>
-		<import>deco4mas.examples.agentNegotiation.sma.behaviour.*
-		</import>
-		<import>deco4mas.examples.agentNegotiation.sma.negotiationStrategy.*
-		</import>
-		<import>deco4mas.examples.agentNegotiation.sma.negotiationStrategy.history.*
-		</import>
-		<import>deco4mas.examples.agentNegotiation.sma.workflow.implementation.*
-		</import>
-		<import>deco4mas.examples.agentNegotiation.sma.workflow.management.*
-		</import>
-		<import>deco4mas.coordinate.environment.*</import>
-		<import>deco4mas.coordinate.*</import>
+		<import>jadex.base.fipa.*</import>
+
+		<import>jadex.bdi.planlib.protocols.*</import>
 		<import>jadex.commons.IFilter</import>
+		<import>jadex.application.runtime.*</import>
+		
+		<import>deco4mas.coordinate.environment.*</import>
+		<import>deco4mas.examples.agentNegotiation.sma.application.*
+		</import>
+		<import>deco4mas.examples.agentNegotiation.sma.application.workflow.management.*
+		</import>
+		<import>deco4mas.examples.agentNegotiation.sma.coordination.capability.serviceOfferer.*
+		</import>
+		<import>deco4mas.examples.agentNegotiation.sma.coordination.capability.trustOwner.*
+		</import>
+		<import>deco4mas.examples.agentNegotiation.sma.coordination.negotiationStrategy.*
+		</import>
 	</imports>
 
 	<capabilities>
 		<capability name="reqcap"
 			file="jadex.bdi.planlib.protocols.request.Request" />
+		<capability name="socap"
+			file="deco4mas.examples.agentNegotiation.sma.coordination.capability.serviceOfferer.ServiceOfferer" />
+		<capability name="tocap"
+			file="deco4mas.examples.agentNegotiation.sma.coordination.capability.trustOwner.TrustOwner" />
 	</capabilities>
 
 	<beliefs>
-		<belief name="history" class="ServiceAgentHistory">
-			<!--
-				<fact>new ServiceAgentHistory($scope.getComponentIdentifier(),
-				$beliefbase.startTime)</fact>
-			-->
-		</belief>
-		<belief name="trustFunction" class="HistorytimeTrustFunction"></belief>
-
-		<belief name="executionPhase" class="boolean">
-			<fact>false</fact>
+		<!--    CoordSpaceref     -->
+		<belief name="env" class="CoordinationSpace">
+			<fact>(CoordinationSpace)((IApplicationExternalAccess)$scope.getParent()).getSpace("mycoordspace")
+			</fact>
 		</belief>
 
-		<!--	needed services for current workflow	-->
-		<beliefset name="neededServices" class="NeededService"></beliefset>
+		<belief name="myself" class="IComponentIdentifier">
+			<fact>$scope.getComponentIdentifier()</fact>
+		</belief>
+
+		<!-- required services for current workflow	-->
+		<beliefset name="requiredServices" class="RequiredService"></beliefset>
+
+		<!--		required services in sma	-->
+		<!--	<beliefsetref name="requiredServices">-->
+		<!--		<concrete ref="socap.requiredServices" />-->
+		<!--	</beliefsetref>-->
 
 		<!--	workflow	-->
 		<belief name="workflow" class="IComponentIdentifier" />
 		<belief name="workflowName" class="String" exported="true"></belief>
 
+		<!--	utility function of sma	-->
+		<belief name="utilityFunction" class="IUtilityFunction">
+			<assignto ref="socap.utilityFunction" />
+			<assignto ref="tocap.utilityFunction" />
+
+		</belief>
+
 		<!--	statistik	-->
-		<belief name="statNegtime" class="Long" />
-		<belief name="statExetime" class="Long" />
-
-		<!--    decoMAS     -->
-		<belief name="env" class="CoordinationSpace">
-			<fact>(CoordinationSpace)((IApplicationExternalAccess)$scope.getParent()).getSpace("mycoordspace")
-			</fact>
+		<belief name="statNegtime" class="Long">
+			<fact>0l</fact>
 		</belief>
-		<belief name="myself" class="ISpaceObject" exported="true">
-			<fact>$beliefbase.env.getAvatar($scope.getComponentIdentifier())
-			</fact>
+		<belief name="statExetime" class="Long">
+			<fact>0l</fact>
 		</belief>
-
-		<!--	ServiceTypes in MAS	-->
-		<beliefset name="services" class="ServiceType" exported="true" />
 	</beliefs>
 
 	<goals>
@@ -94,19 +90,9 @@
 			<parameter name="workflow" class="IComponentIdentifier"></parameter>
 		</achievegoal>
 
-		<!-- start negotiation for all needed services-->
-		<achievegoal name="startNegotiation"></achievegoal>
-
-		<!-- assign a Sa for this needed services-->
-		<achievegoal name="assignSa">
-			<parameter name="service" class="NeededService"></parameter>
-		</achievegoal>
-
-		<!--start workflow-->
+		<!--(re)start workflow-->
 		<achievegoal name="startWorkflow"></achievegoal>
-
 		<achievegoal name="restartWorkflow"></achievegoal>
-
 	</goals>
 
 	<plans>
@@ -143,7 +129,6 @@
 			<trigger>
 				<goal ref="preInstantiateWorkflow"></goal>
 			</trigger>
-			<precondition>!$beliefbase.executionPhase</precondition>
 		</plan>
 
 		<!-- define necessary offers for workflow -->
@@ -152,31 +137,6 @@
 			<trigger>
 				<goal ref="defineOffers"></goal>
 			</trigger>
-			<precondition>!$beliefbase.executionPhase</precondition>
-		</plan>
-
-		<!-- start negotiation for all needed services -->
-		<plan name="startNegotiation">
-			<body class="StartNegotiationPlan"></body>
-			<trigger>
-				<goal ref="startNegotiation"></goal>
-			</trigger>
-		</plan>
-
-		<!-- start one single assign-->
-		<plan name="assignSa">
-			<body class="AssignSaPlan"></body>
-			<trigger>
-				<goal ref="assignSa"></goal>
-			</trigger>
-		</plan>
-		
-		<plan name="assignSaReply">
-			<body class="AssignSaReplyPlan">
-			</body>
-			<trigger>
-				<internalevent ref="assignSaReply"></internalevent>
-			</trigger>
 		</plan>
 
 		<!-- execution phase decision-->
@@ -184,9 +144,8 @@
 			<body class="TestExecuteWorkflowPlan">
 			</body>
 			<trigger>
-				<internalevent ref="serviceFound"></internalevent>
+				<internalevent ref="serviceSatisfied"></internalevent>
 			</trigger>
-			<precondition>!$beliefbase.executionPhase</precondition>
 		</plan>
 
 		<!--start workflow-->
@@ -197,7 +156,7 @@
 			</trigger>
 		</plan>
 
-		<!--Test if workflow should reinit-->
+		<!--Test if workflow should restartet-->
 		<plan name="restartWorkflow">
 			<body class="RestartWorkflowPlan">
 			</body>
@@ -208,34 +167,26 @@
 	</plans>
 
 	<events>
+		<!--  events for deco capability	-->
+		<internaleventref name="searchSa">
+			<concrete ref="socap.searchSa" />
+		</internaleventref>
+		<internaleventref name="foundSa">
+			<concrete ref="socap.foundSa" />
+		</internaleventref>
+		<internaleventref name="trustEvent">
+			<concrete ref="tocap.trustEvent" />
+		</internaleventref>
+		<internaleventref name="serviceSatisfied">
+			<concrete ref="socap.serviceSatisfied" />
+		</internaleventref>
+		<internaleventref name="requiredServices">
+			<concrete ref="socap.requiredServices" />
+		</internaleventref>
+
 		<!--	workflow is executed	-->
 		<internalevent name="workflowExecuted"></internalevent>
-
-		<!-- execution phase decision-->
-		<internalevent name="serviceFound"></internalevent>
-
-		<!-- deco -->
-		<internalevent name="assignSa">
-			<parameter name="request" class="AssignRequest"></parameter>
-			<parameter name="task" class="String"></parameter>
-		</internalevent>
-		<internalevent name="assignSaReply">
-			<parameter name="reply" class="AssignReply"></parameter>
-		</internalevent>
-		
-		<messageevent name="informMessage" direction="send"
-			type="fipa">
-			<parameter name="performative" class="String" direction="fixed">
-				<value>SFipa.INFORM</value>
-			</parameter>
-		</messageevent>
 	</events>
-
-	<!--	<expressions>-->
-	<!--		<condition name="currentSaPresent" language="jcl">-->
-	<!--			$beliefbase.currentSa!=null-->
-	<!--			</condition>-->
-	<!--	</expressions>-->
 
 	<configurations>
 		<configuration name="default">
@@ -245,6 +196,11 @@
 				</initialbelief>
 				<initialbelief ref="reqcap.timeout">
 					<fact>2000L</fact>
+				</initialbelief>
+				<initialbelief ref="utilityFunction">
+					<fact>new
+						WeightFactorUtilityFunction($scope.getComponentIdentifier())
+					</fact>
 				</initialbelief>
 			</beliefs>
 			<plans>

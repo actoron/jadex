@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+	<!--
+		The ServiceOffererr capability encapsulate requirements to find a
+		required services through a coordination medium
+	-->
+<capability xmlns="http://jadex.sourceforge.net/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-bdi
+	                    http://jadex.sourceforge.net/jadex-bdi-2.0.xsd"
+	package="deco4mas.examples.agentNegotiation.sma.coordination.capability.trustOwner"
+	name="TrustOwner">
+
+	<imports>
+		<import>jadex.base.fipa.*</import>
+		<import>jadex.application.runtime.*</import>
+		<import>jadex.bridge.IComponentIdentifier</import>
+
+		<import>deco4mas.coordinate.environment.*</import>
+		<import>deco4mas.examples.agentNegotiation.decoMAS.dataObjects.*
+		</import>
+		<import>deco4mas.examples.agentNegotiation.sma.coordination.negotiationStrategy.*
+		</import>
+		<import>deco4mas.examples.agentNegotiation.sma.application.workflow.management.*
+		</import>
+	</imports>
+
+	<beliefs>
+		<!--utility function-->
+		<beliefref name="utilityFunction">
+			<abstract />
+		</beliefref>
+
+		<!-- History of trust events -->
+		<belief name="history" class="ServiceAgentHistory"></belief>
+	</beliefs>
+
+	<plans>
+		<!--adpat the trust with the event-->
+		<plan name="trustAdapt">
+			<body class="TrustAdaptPlan">
+			</body>
+			<trigger>
+				<internalevent ref="trustEvent"></internalevent>
+			</trigger>
+		</plan>
+		<!-- init history and trust function-->
+		<plan name="initAgent">
+			<body class="InitAgentPlan">
+			</body>
+		</plan>
+	</plans>
+
+	<events>
+		<internalevent name="trustEvent">
+			<parameter name="execution" class="Execution"></parameter>
+		</internalevent>
+	</events>
+
+	<configurations>
+		<configuration name="default">
+			<plans>
+				<initialplan ref="initAgent"></initialplan>
+			</plans>
+		</configuration>
+	</configurations>
+
+
+</capability>

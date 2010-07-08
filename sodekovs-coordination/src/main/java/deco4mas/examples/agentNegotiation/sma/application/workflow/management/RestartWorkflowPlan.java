@@ -1,0 +1,55 @@
+package deco4mas.examples.agentNegotiation.sma.application.workflow.management;
+
+import jadex.bdi.runtime.IGoal;
+import jadex.bdi.runtime.Plan;
+import java.util.logging.Logger;
+import deco4mas.examples.agentNegotiation.evaluate.AgentLogger;
+import deco4mas.examples.agentNegotiation.evaluate.ClockTime;
+import deco4mas.examples.agentNegotiation.evaluate.ValueLogger;
+import deco4mas.examples.agentNegotiation.sma.application.RequiredService;
+
+/**
+ * Creates a workflow
+ */
+public class RestartWorkflowPlan extends Plan
+{
+	public void body()
+	{
+		try
+		{
+			// LOG
+			final Logger smaLogger = AgentLogger.getTimeEvent(this.getComponentName());
+			Long startTime = ClockTime.getStartTime(getClock());
+
+			// restart until 300000 ZE (~msec)
+			if ((getTime() - startTime) <= 300000)
+			{
+				// LOG
+				smaLogger.info("start new workflow");
+				RequiredService[] services = (RequiredService[]) getBeliefbase().getBeliefSet("requiredServices").getFacts();
+				for (RequiredService service : services)
+				{
+					synchronized (service.getMonitor())
+						{
+							service.remove();
+							getBeliefbase().getBeliefSet("requiredServices").removeFact(service);
+						}
+				}
+				getBeliefbase().getBelief("workflow").setFact(null);
+//				getBeliefbase().getBelief("executionPhase").setFact(new Boolean(false));
+
+				// restart
+				IGoal restart = createGoal("preInstantiateWorkflow");
+				dispatchTopLevelGoal(restart);
+				System.gc();
+			} else
+			{
+				ValueLogger.log();
+			}
+		} catch (Exception e)
+		{
+			e.printStackTrace();
+			fail(e);
+		}
+	}
+}

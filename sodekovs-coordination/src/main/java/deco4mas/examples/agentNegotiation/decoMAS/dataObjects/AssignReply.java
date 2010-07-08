@@ -7,12 +7,14 @@ public class AssignReply
 	private IComponentIdentifier initiator;
 	private ServiceType serviceType;
 	private IComponentIdentifier chosenOne;
+	private Integer id;
 
-	public AssignReply(IComponentIdentifier initiator, ServiceType serviceType2, IComponentIdentifier chosenOne)
+	public AssignReply(IComponentIdentifier initiator, ServiceType serviceType, IComponentIdentifier chosenOne, Integer id)
 	{
 		this.initiator = initiator;
-		this.serviceType = serviceType2;
+		this.serviceType = serviceType;
 		this.chosenOne = chosenOne;
+		this.id = id;
 	}
 
 	public IComponentIdentifier getInitiator()
@@ -28,6 +30,11 @@ public class AssignReply
 	public IComponentIdentifier getChosenOne()
 	{
 		return chosenOne;
+	}
+
+	public Integer getId()
+	{
+		return id;
 	}
 
 }

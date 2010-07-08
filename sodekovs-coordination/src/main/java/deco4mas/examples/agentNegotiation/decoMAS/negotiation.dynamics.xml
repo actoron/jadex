@@ -2,26 +2,40 @@
 <MASDynamic name="negotiation">
 	<system_properties>
 		<role_occupations>
-			<role_occupation name="ServiceManagementAgent"
-				multiple="true">
+			<role_occupation name="ServiceOfferer" multiple="true">
 				<agent id="ServiceManagementAgent">
 					<elements>
-						<element id="assignSa" type="INTERNAL_EVENT" />
-						<element id="assignSaReply" type="INTERNAL_EVENT" />
-						<element id="reward" type="INTERNAL_EVENT" />
+						<element id="requiredServices" type="BDI_BELIEFSET" />
+						<element id="beliefChanged" type="INTERNAL_EVENT" />
+						<element id="searchSa" type="INTERNAL_EVENT" />
+						<element id="foundSa" type="INTERNAL_EVENT" />
 					</elements>
 				</agent>
 			</role_occupation>
-			<role_occupation name="ServiceAgent" multiple="true">
+			<role_occupation name="ServiceSupplier" multiple="true">
 				<agent id="ServiceAgent">
 					<elements>
 						<element id="makeProposal" type="INTERNAL_EVENT" />
 						<element id="offer" type="BDI_GOAL" />
 						<element id="reward" type="BDI_GOAL" />
+						<element id="rewardReply" type="INTERNAL_EVENT" />
 					</elements>
 				</agent>
 			</role_occupation>
-
+			<role_occupation name="TrustOwner" multiple="true">
+				<agent id="ServiceManagementAgent">
+					<elements>
+						<element id="trustEvent" type="INTERNAL_EVENT" />
+					</elements>
+				</agent>
+			</role_occupation>
+			<role_occupation name="TrustSubject" multiple="true">
+				<agent id="ServiceAgent">
+					<elements>
+						<element id="executionOccur" type="INTERNAL_EVENT" />
+					</elements>
+				</agent>
+			</role_occupation>
 		</role_occupations>
 	</system_properties>
 
@@ -37,13 +51,54 @@
 					<to>ServiceAgent</to>
 				</tos>
 			</deco_link>
+			<deco_link realization="by_trust" type="POSITIVE" name="trust">
+				<froms>
+					<from>ServiceAgent</from>
+				</froms>
+				<tos>
+					<to>ServiceManagementAgent</to>
+				</tos>
+			</deco_link>
 		</deco_links>
+		<direct_links>
+			<direct_link realization="by_directInternalEvent" type="POSITIVE" name="direct">
+				<froms>
+					<from>ServiceManagementAgent</from>
+				</froms>
+				<tos>
+					<to>ServiceManagementAgent</to>
+				</tos>
+			</direct_link>
+		</direct_links>
+		<direct_link_configurations>
+			<direct_link_configuration id="by_directInternalEvent">
+				<from>
+					<agent_element element="requiredServices" agent_id="ServiceManagementAgent"
+						type="BDI_BELIEFSET">
+<!--						<parameter_mappings>-->
+<!--						<mapping class="RequiredService" ref="service" data="content"-->
+<!--								name="requiredServices" type="BDI_BELIEF"/>-->
+<!--						</parameter_mappings>-->
+					</agent_element>
+				</from>
+				<configuration></configuration>
+				<to>
+					<agent_element element="requiredServices" agent_id="ServiceManagementAgent"
+						type="INTERNAL_EVENT">
+						<parameter_mappings>
+							<mapping class="RequiredService" ref="value"
+								name="service" />
+						</parameter_mappings>
+					</agent_element>
+				</to>
+			</direct_link_configuration>
+		</direct_link_configurations>
 
 		<!-- The detailed configuration of interdependency enactment. -->
 		<deco-link-realizations>
 			<realization id="by_neg">
 				<from>
-					<agent_element element="assignSa" agent_id="ServiceManagementAgent"
+					<agent_element element="searchSa" agent_id="ServiceManagementAgent"
 						type="INTERNAL_EVENT">
 						<parameter_mappings>
 							<mapping class="String" ref="task" name="task" />
@@ -69,7 +124,7 @@
 					agent_type="JADEX">
 				</mechanism_configuration>
 				<to>
-					<agent_element element="assignSaReply" agent_id="ServiceManagementAgent"
+					<agent_element element="foundSa" agent_id="ServiceManagementAgent"
 						type="INTERNAL_EVENT">
 						<parameter_mappings>
 							<mapping class="AssignReply" ref="reply" name="reply" />
@@ -87,6 +142,28 @@
 						<parameter_mappings>
 							<mapping class="Reward" ref="reward" name="reward">
 							</mapping>
+						</parameter_mappings>
+					</agent_element>
+				</to>
+			</realization>
+			<realization id="by_trust">
+				<from>
+					<agent_element element="executionOccur" agent_id="ServiceAgent"
+						type="INTERNAL_EVENT">
+						<parameter_mappings>
+							<mapping class="String" ref="task" name="task" />
+							<mapping class="Execution" ref="execution" name="execution" />
+						</parameter_mappings>
+					</agent_element>
+				</from>
+				<mechanism_configuration mechanism_id="trust"
+					agent_type="JADEX">
+				</mechanism_configuration>
+				<to>
+					<agent_element element="trustEvent" agent_id="ServiceManagementAgent"
+						type="INTERNAL_EVENT">
+						<parameter_mappings>
+							<mapping class="Execution" ref="execution" name="execution" />
 						</parameter_mappings>
 					</agent_element>
 				</to>

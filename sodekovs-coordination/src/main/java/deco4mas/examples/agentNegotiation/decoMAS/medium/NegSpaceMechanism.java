@@ -27,6 +27,8 @@ public class NegSpaceMechanism extends ICoordinationMechanism
 {
 	private Logger mediumLogger = AgentLogger.getTimeEvent("NegSpaceMedium");
 
+	private String realisationName = "by_neg";
+
 	/** name for the medium */
 	public static String NAME = "by_neg";
 
@@ -53,12 +55,19 @@ public class NegSpaceMechanism extends ICoordinationMechanism
 		{
 			CoordinationInformation ci = (CoordinationInformation) obj;
 			String task = (String) ((Map) ci.getValueByName("parameterDataMapping")).get("task");
-			if (task.equals("assignSaRequest"))
-				assignSa(ci);
-			if (task.equals("proposal"))
-				proposalReceived(ci);
-			if (task.equals("replyReward"))
-				replyReward(ci);
+			if (task != null)
+			{
+				if (task.equals("searchSa"))
+					assignSa(ci);
+				if (task.equals("proposal"))
+					proposalReceived(ci);
+				if (task.equals("replyReward"))
+					replyReward(ci);
+			} else
+			{
+				((CoordinationSpace) space).publishCoordinationEvent(obj);
+			}
+
 		}
 
 	}
@@ -84,7 +93,14 @@ public class NegSpaceMechanism extends ICoordinationMechanism
 	 */
 	public void nextTick()
 	{
-		for (AgentNegotiation negotiation : negotiations.values())
+		HashMap<Integer, AgentNegotiation> copy = new HashMap<Integer, AgentNegotiation>(negotiations); // we
+																										// use
+																										// copy
+																										// because
+																										// of
+																										// some
+																										// java.util.ConcurrentModificationException
+		for (AgentNegotiation negotiation : copy.values())
 		{
 			if (negotiation.getPhaseEnd() < clock.getTime() && !negotiation.getState().equals(AgentNegotiation.FINAL_PHASE))
 			{
@@ -141,26 +157,27 @@ public class NegSpaceMechanism extends ICoordinationMechanism
 	 */
 	private void assignSa(CoordinationInformation ci)
 	{
-		synchronized (id)
+		// synchronized (id)
+		// {
+		// get Reqeust
+		AssignRequest request = (AssignRequest) ((Map) ci.getValueByName("parameterDataMapping")).get("request");
+		if (request.getMedium().equals(NAME))
 		{
-			// get Reqeust
-			AssignRequest request = (AssignRequest) ((Map) ci.getValueByName("parameterDataMapping")).get("request");
-			if (request.getMedium().equals(NAME))
-			{
-				System.out.println("#perceiveCoordinationEvent " + (String) ((Map) ci.getValueByName("parameterDataMapping")).get("task")
-					+ " for " + request.getServiceType().getName());
-				mediumLogger.info("request(" + id + ") for assign sa by" + request.getOwner().getLocalName());
+			System.out.println("#perceiveCoordinationEvent " + (String) ((Map) ci.getValueByName("parameterDataMapping")).get("task")
+				+ " for " + request.getServiceType().getName());
+			mediumLogger.info("request(" + request.getId() + ") for assign sa by" + request.getOwner().getLocalName());
 
-				// create agentNegotiation
-				AgentNegotiation negotiation = new AgentNegotiation(id, request.getOwner(), request.getServiceType(), request
-					.getUtilityFunction(), request.getSelector(), (Long) request.get("deadline"));
-				negotiation.setState(AgentNegotiation.EXPLORATORY_PHASE, clock.getTime() + negotiation.getDeadline());
-				negotiations.put(id, negotiation);
-				id++;
+			// create agentNegotiation
+			// TODO Real ID
+			AgentNegotiation negotiation = new AgentNegotiation(request.getId(), request.getOwner(), request.getServiceType(), request
+				.getUtilityFunction(), request.getSelector(), (Long) request.get("deadline"));
+			negotiation.setState(AgentNegotiation.EXPLORATORY_PHASE, clock.getTime() + negotiation.getDeadline());
+			negotiations.put(request.getId(), negotiation);
+			// id++;
 
-				publishOffer(negotiation);
-			}
+			publishOffer(negotiation);
 		}
+		// }
 	}
 
 	/**
@@ -259,20 +276,22 @@ public class NegSpaceMechanism extends ICoordinationMechanism
 		CoordinationInfo coordInfo = new CoordinationInfo();
 
 		HashMap<String, Object> parameterDataMappings = new HashMap<String, Object>();
-		AssignReply reply = new AssignReply(negotiation.getOwner(), negotiation.getServiceType(), negotiation.getSelected());
+		AssignReply reply = new AssignReply(negotiation.getOwner(), negotiation.getServiceType(), negotiation.getSelected(), negotiation
+			.getId());
 		parameterDataMappings.put("reply", reply);
 
 		coordInfo.setName("Reply-" + negotiation.getServiceType().getName() + "@" + clock.getTime());
 		coordInfo.setType(CoordinationSpaceObject.COORDINATION_INFORMATION_TYPE);
 		coordInfo.addValue(Constants.PARAMETER_DATA_MAPPING, parameterDataMappings);
 		coordInfo.addValue(CoordinationSpaceObject.AGENT_ARCHITECTURE, "BDI");
-		coordInfo.addValue(CoordinationInfo.AGENT_ELEMENT_NAME, "assignSaReply");
+		coordInfo.addValue(CoordinationInfo.AGENT_ELEMENT_NAME, "foundSa");
 		coordInfo.addValue(CoordinationInfo.AGENT_ELEMENT_TYPE, "INTERNAL_EVENT");
 		coordInfo.addValue(Constants.DML_REALIZATION_NAME, "by_neg");
 
 		// publish
 		System.out.println("#publish assignSaReply for " + negotiation.getServiceType().getName());
 		env.publishCoordinationEvent(coordInfo);
+		negotiations.remove(negotiation);
 	}
 
 	/**
@@ -295,6 +314,11 @@ public class NegSpaceMechanism extends ICoordinationMechanism
 
 	public void restart()
 	{
+	}
+
+	public String getRealisationName()
+	{
+		return realisationName;
 	}
 
 }

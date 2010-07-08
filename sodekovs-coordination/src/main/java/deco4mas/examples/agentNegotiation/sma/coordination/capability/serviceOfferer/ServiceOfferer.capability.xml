@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+	<!--
+		The ServiceOffererr capability encapsulate requirements to find a
+		required services through a coordination medium
+	-->
+<capability xmlns="http://jadex.sourceforge.net/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-bdi
+	                    http://jadex.sourceforge.net/jadex-bdi-2.0.xsd"
+	package="deco4mas.examples.agentNegotiation.sma.coordination.capability.serviceOfferer"
+	name="ServiceOfferer">
+
+	<imports>
+		<import>jadex.base.fipa.*</import>
+		<import>jadex.application.runtime.*</import>
+		<import>jadex.bridge.IComponentIdentifier</import>
+
+		<import>deco4mas.coordinate.environment.*</import>
+		<import>deco4mas.examples.agentNegotiation.decoMAS.dataObjects.*
+		</import>
+		<import>deco4mas.examples.agentNegotiation.sma.coordination.negotiationStrategy.*
+		</import>
+		<!--
+			<import>deco4mas.examples.agentNegotiation.sma.application.workflow.management.*
+		-->
+		<!--		</import>-->
+		<import>deco4mas.examples.agentNegotiation.sma.application.*</import>
+	</imports>
+
+	<beliefs>
+		<!--utility function-->
+		<beliefref name="utilityFunction">
+			<abstract />
+		</beliefref>
+	</beliefs>
+
+	<goals>
+		<!-- assign a Sa for this services-->
+		<achievegoal name="searchSa">
+			<parameter name="service" class="RequiredService"></parameter>
+		</achievegoal>
+	</goals>
+
+	<plans>
+		<plan name="NegotiationRequiredCheck">
+			<body class="NegotiationRequiredCheckPlan"></body>
+			<trigger>
+				<internalevent ref="requiredServices"></internalevent>
+			</trigger>
+		</plan>
+
+		<!-- start one single search request-->
+		<plan name="searchSa">
+			<body class="SearchSaPlan"></body>
+			<trigger>
+				<goal ref="searchSa"></goal>
+			</trigger>
+		</plan>
+
+		<!-- Reply from medium	-->
+		<plan name="foundSa">
+			<body class="FoundSaPlan">
+			</body>
+			<trigger>
+				<internalevent ref="foundSa"></internalevent>
+			</trigger>
+		</plan>
+	</plans>
+
+	<events>
+		<internalevent name="searchSa">
+			<parameter name="request" class="AssignRequest"></parameter>
+			<parameter name="task" class="String"></parameter>
+		</internalevent>
+		<internalevent name="foundSa">
+			<parameter name="reply" class="AssignReply"></parameter>
+		</internalevent>
+
+
+		<internalevent name="serviceSatisfied">
+			<parameter name="id" class="Integer"></parameter>
+			<parameter name="sa" class="IComponentIdentifier"></parameter>
+		</internalevent>
+
+		<internalevent name="requiredServices">
+			<parameter name="service" class="RequiredService"></parameter>
+		</internalevent>
+
+		<messageevent name="informMessage" direction="send" type="fipa">
+			<parameter name="performative" class="String" direction="fixed">
+				<value>SFipa.INFORM</value>
+			</parameter>
+		</messageevent>
+	</events>
+</capability>

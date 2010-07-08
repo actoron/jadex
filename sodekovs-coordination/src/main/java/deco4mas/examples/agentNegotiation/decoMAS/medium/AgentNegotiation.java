@@ -6,9 +6,9 @@ import java.util.Set;
 import java.util.SortedMap;
 import deco4mas.examples.agentNegotiation.decoMAS.dataObjects.ServiceProposal;
 import deco4mas.examples.agentNegotiation.decoMAS.dataObjects.ServiceType;
-import deco4mas.examples.agentNegotiation.sma.negotiationStrategy.ISelectionStrategy;
-import deco4mas.examples.agentNegotiation.sma.negotiationStrategy.IUtilityFunction;
-import deco4mas.examples.agentNegotiation.sma.negotiationStrategy.WeightFactorUtilityFunction;
+import deco4mas.examples.agentNegotiation.sma.coordination.negotiationStrategy.ISelectionStrategy;
+import deco4mas.examples.agentNegotiation.sma.coordination.negotiationStrategy.IUtilityFunction;
+import deco4mas.examples.agentNegotiation.sma.coordination.negotiationStrategy.WeightFactorUtilityFunction;
 
 public class AgentNegotiation
 {

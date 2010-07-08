@@ -97,6 +97,43 @@ public class AgentLogger
 		return agentLogger;
 	}
 
+	public synchronized static Logger getDataTable(String name)
+	{
+		Logger agentLogger;
+
+		if (!loggers.containsKey(name))
+		{
+			agentLogger = Logger.getLogger(name);
+			FileHandler fh = null;
+
+			try
+			{
+				String dir = System.getProperty("user.home") + "\\agentLogs\\plotLogs";
+				File f = new File(dir);
+				if (!f.isDirectory())
+					f.mkdir();
+				fh = new FileHandler("%h/agentLogs/plotLogs/" + name + ".log", false);
+			} catch (Exception e)
+			{
+				e.printStackTrace();
+			}
+			fh.setFormatter(new EventFormatter());
+			agentLogger.addHandler(fh);
+			agentLogger.setLevel(Level.ALL);
+			agentLogger.setUseParentHandlers(false);
+			loggers.put(name, agentLogger);
+		} else
+		{
+			agentLogger = loggers.get(name);
+		}
+		if (!log)
+		{
+			agentLogger.setLevel(Level.OFF);
+		}
+
+		return agentLogger;
+	}
+
 	public static void addSa(String sa)
 	{
 		saOrder.add(sa);

@@ -1,6 +1,5 @@
 package deco4mas.examples.agentNegotiation.evaluate;
 
-import jadex.bridge.IComponentIdentifier;
 import java.util.logging.Formatter;
 import java.util.logging.LogRecord;
 
@@ -14,8 +13,8 @@ public class TimeDiffEventForSaFormatter extends Formatter
 			Object[] param = record.getParameters();
 			Long startTime = (Long) param[0];
 			Long time = (Long) param[1];
-			IComponentIdentifier sa = (IComponentIdentifier) param[2];
-			Integer number = AgentLogger.getNumber(sa.getLocalName());
+			String sa = (String) param[2];
+			Integer number = AgentLogger.getNumber(sa);
 			if (param.length > 3)
 			{
 				number = (Integer) param[3];
@@ -32,10 +31,10 @@ public class TimeDiffEventForSaFormatter extends Formatter
 
 			if (record.getMessage().equals(""))
 			{
-				buf.append(dbtv.toString() + " " + AgentLogger.getNumber(sa.getLocalName()) + " " + sa.getLocalName());
+				buf.append(dbtv.toString() + " " + AgentLogger.getNumber(sa) + " " + sa);
 			} else
 			{
-				buf.append(dbtv.toString() + " " + record.getMessage() + " " + sa.getLocalName());
+				buf.append(dbtv.toString() + " " + record.getMessage() + " " + sa);
 			}
 			buf.append("\n");
 			return buf.toString();
