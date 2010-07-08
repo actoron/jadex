@@ -67,208 +67,51 @@ public abstract class NestedServiceContainer extends BasicServiceContainer
 	 *  Get the available service types.
 	 *  @return The service types.
 	 */
-	public IFuture getServicesTypes()
+	public IFuture getServicesTypes(IVisitDecider decider)
 	{
-		// todo:
-		throw new UnsupportedOperationException();
-		
-//		Future ret = new Future();
-//		ret.setResult(services==null? new Class[0]: (Class[])services.keySet().toArray(new Class[services.size()]));
-//		return ret;
-	}
-	
-	/**
-	 *  Get a service map for a type.
-	 *  @param type The type.
-	 */
-	public IFuture getServiceOfType(final Class type, final Set visited)
-	{
-//		System.out.println("search 1: "+this+" "+type+" "+visited);
-		
-		final Future ret = new Future();
-		final boolean[] results = new boolean[3];
-		
-		super.getServiceOfType(type, visited).addResultListener(new IResultListener()
-		{
-			public void resultAvailable(Object source, Object result)
-			{
-				results[0] = true;
-				if(!checkAndSetResult(results, ret, result, null))
-				{
-					checkParent(type, visited, ret, results);
-				}
-			}
-			
-			public void exceptionOccurred(Object source, Exception exception)
-			{
-				results[0] = true;
-				if(!checkAndSetResult(results, ret, null, exception))
-				{
-					checkParent(type, visited, ret, results);
-				}
-			}
-		});
-		
-		return ret;
-	}
-	
-	/**
-	 *  Check parent for locating a service.
-	 */
-	protected void checkParent(final Class type, final Set visited, final Future ret, final boolean[] results)
-	{
-//		System.out.println("Check parent: "+type+", "+visited+", "+SUtil.arrayToString(results));
-		getParent().addResultListener(new IResultListener()
-		{
-			public void resultAvailable(Object source, Object result)
-			{
-//				System.out.println("Check parent1: "+result);
-				IServiceProvider parent = (IServiceProvider)result;
-				if(parent!=null && searchNode(NestedServiceContainer.this, parent, true, visited))
-				{
-					parent.getServiceOfType(type, visited).addResultListener(new IResultListener()
-					{
-						public void resultAvailable(Object source, Object result)
-						{
-							results[1] = true;
-							if(!checkAndSetResult(results, ret, result, null))
-							{
-								checkChildren(type, visited, ret, results);
-							}
-						}
-						
-						public void exceptionOccurred(Object source, Exception exception)
-						{
-							results[1] = true;
-							if(!checkAndSetResult(results, ret, null, exception))
-							{
-								checkChildren(type, visited, ret, results);
-							}
-						}
-					});
-				}
-				else
-				{
-					results[1] = true;
-					if(!checkAndSetResult(results, ret, null, null))
-					{
-						checkChildren(type, visited, ret, results);
-					}
-				}
-			}
-			
-			public void exceptionOccurred(Object source, Exception exception)
-			{
-//				System.out.println("Check parent2: "+exception);
-				results[1] = true;
-				if(!checkAndSetResult(results, ret, null, exception))
-				{
-					checkChildren(type, visited, ret, results);
-				}
-			}
-		});
-	}
-	
-	/**
-	 *  Check the children for locating a service.
-	 */
-	protected void checkChildren(final Class type, final Set visited, final Future ret, final boolean[] results)
-	{
-		getChildren().addResultListener(new IResultListener()
-		{
-			public void resultAvailable(Object source, Object result)
-			{
-				final List children = (List)result;
-//				System.out.println("found children (a): "+children);
-				if(children!=null)
-				{
-					CounterResultListener cl = new CounterResultListener(children.size())
-					{
-						public void finalResultAvailable(Object source, Object result)
-						{
-							results[2] = true;
-							checkAndSetResult(results, ret, result, null);
-						}
-						
-						public void intermediateResultAvailable(Object source, Object result)
-						{
-							checkAndSetResult(results, ret, result, null);
-						}
-						
-						public void exceptionOccurred(Object source, Exception exception)
-						{
-							checkAndSetResult(results, ret, null, exception);
-						}
-					};
-					
-					for(int i=0; i<children.size(); i++)
-					{
-						IServiceProvider child = (IServiceProvider)children.get(i);
-						if(searchNode(NestedServiceContainer.this, child, false, visited))
-						{
-							child.getServiceOfType(type, visited).addResultListener(cl);
-						}
-						else
-						{
-							cl.resultAvailable(null, null);
-						}
-					}
-				}
-				else
-				{
-					results[2] = true;
-					checkAndSetResult(results, ret, null, null);
-				}
-			}
-			
-			public void exceptionOccurred(Object source, Exception exception)
-			{
-				results[2] = true;
-				checkAndSetResult(results, ret, null, exception);
-			}
-		});	
-	}
-	
-	/**
-	 *  Check if the last result is available and then set it on future.
-	 */
-	protected boolean checkAndSetResult(boolean[] results, Future ret, Object result, Exception exception)
-	{
-		boolean finished = false;
-		
-//		System.out.println("res: "+results[0]+results[1]+results[2]);
-		if(result!=null)
-		{
-			ret.setResult(result);
-			finished = true;
-		}
-		else if(exception!=null)
-		{
-			ret.setException(exception);
-			finished = true;
-		}
-		else if(results[0] && results[1] && results[2])
-		{
-			ret.setResult(null);
-			finished = true;
-		}
-		
-		return finished;
-	}
-	
-	/**
-	 *  Get a service map for a type.
-	 *  @param type The type.
-	 */
-	public IFuture getServicesOfType(final Class type, final Set visited)
-	{
-//		System.out.println("search services: "+this+" "+type+" "+visited);
+		System.out.println("search services: "+this+" "+decider);
 		
 		final Future ret = new Future();
 		final boolean[] results = new boolean[3];
 		final Collection coll = Collections.synchronizedList(new LinkedList());
 		
-		super.getServicesOfType(type, visited).addResultListener(new IResultListener()
+		super.getServicesTypes(decider).addResultListener(new IResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				if(result!=null)
+				{
+					coll.addAll((Collection)result);
+				}
+				results[0] = true;
+				checkAndSetResults(results, ret, coll, null);
+			}
+			
+			public void exceptionOccurred(Object source, Exception exception)
+			{
+				results[0] = true;
+				checkAndSetResults(results, ret, null, exception);
+			}
+		});
+		
+		// todo: parent and children
+		
+		return ret;
+	}
+	
+	/**
+	 *  Get a services for a type.
+	 *  @param type The type.
+	 */
+	public IFuture getServices(final Class type, final IVisitDecider decider)
+	{
+		System.out.println("search services: "+this+" "+type+" "+decider);
+		
+		final Future ret = new Future();
+		final boolean[] results = new boolean[3];
+		final Collection coll = Collections.synchronizedList(new LinkedList());
+		
+		super.getServices(type, decider).addResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
@@ -292,9 +135,9 @@ public abstract class NestedServiceContainer extends BasicServiceContainer
 			public void resultAvailable(Object source, Object result)
 			{
 				IServiceProvider parent = (IServiceProvider)result;
-				if(parent!=null && searchNode(NestedServiceContainer.this, parent, true, visited))
+				if(parent!=null && decider.searchNode(NestedServiceContainer.this, parent, true))
 				{
-					parent.getServicesOfType(type, visited).addResultListener(new DefaultResultListener()
+					parent.getServices(type, decider).addResultListener(new DefaultResultListener()
 					{
 						public void resultAvailable(Object source, Object result)
 						{
@@ -338,9 +181,9 @@ public abstract class NestedServiceContainer extends BasicServiceContainer
 						final IServiceProvider child = (IServiceProvider)children.get(i);
 //						if(child.getName().indexOf("bdi")!=-1)
 //							System.out.println("searching child: "+child);
-						if(searchNode(NestedServiceContainer.this, child, false, visited))
+						if(decider.searchNode(NestedServiceContainer.this, child, false))
 						{
-							child.getServicesOfType(type, visited).addResultListener(new IResultListener()
+							child.getServices(type, decider).addResultListener(new IResultListener()
 							{
 								public void resultAvailable(Object source, Object result)
 								{
@@ -407,25 +250,186 @@ public abstract class NestedServiceContainer extends BasicServiceContainer
 			ret.setResult(result);
 		}
 	}
-
+		
 	/**
-	 *  Test if a specific node should be searched.
-	 *  Simple default logic that allows search in unknown nodes in allows directios.
+	 *  Get a service for a type.
+	 *  @param type The type.
 	 */
-	public synchronized boolean searchNode(IServiceProvider source, IServiceProvider target, boolean up, Set visited)
+	public IFuture getService(final Class type, final IVisitDecider decider)
 	{
-		boolean ret = false;
-		if(!visited.contains(target.getName()))
+//		System.out.println("search 1: "+this+" "+type+" "+visited);
+		
+		final Future ret = new Future();
+		final boolean[] results = new boolean[3];
+		
+		super.getService(type, decider).addResultListener(new IResultListener()
 		{
-			if(up && search_up || !up && search_down)
+			public void resultAvailable(Object source, Object result)
 			{
-				ret = true;
+				results[0] = true;
+				if(!checkAndSetResult(results, ret, result, null))
+				{
+					checkParent(type, decider, ret, results);
+				}
 			}
-		}
+			
+			public void exceptionOccurred(Object source, Exception exception)
+			{
+				results[0] = true;
+				if(!checkAndSetResult(results, ret, null, exception))
+				{
+					checkParent(type, decider, ret, results);
+				}
+			}
+		});
 		
 		return ret;
 	}
-
+	
+	/**
+	 *  Check parent for locating a service.
+	 */
+	protected void checkParent(final Class type, final IVisitDecider decider, final Future ret, final boolean[] results)
+	{
+//		System.out.println("Check parent: "+type+", "+visited+", "+SUtil.arrayToString(results));
+		getParent().addResultListener(new IResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+//				System.out.println("Check parent1: "+result);
+				IServiceProvider parent = (IServiceProvider)result;
+				if(parent!=null && decider.searchNode(NestedServiceContainer.this, parent, true))
+				{
+					parent.getService(type, decider).addResultListener(new IResultListener()
+					{
+						public void resultAvailable(Object source, Object result)
+						{
+							results[1] = true;
+							if(!checkAndSetResult(results, ret, result, null))
+							{
+								checkChildren(type, decider, ret, results);
+							}
+						}
+						
+						public void exceptionOccurred(Object source, Exception exception)
+						{
+							results[1] = true;
+							if(!checkAndSetResult(results, ret, null, exception))
+							{
+								checkChildren(type, decider, ret, results);
+							}
+						}
+					});
+				}
+				else
+				{
+					results[1] = true;
+					if(!checkAndSetResult(results, ret, null, null))
+					{
+						checkChildren(type, decider, ret, results);
+					}
+				}
+			}
+			
+			public void exceptionOccurred(Object source, Exception exception)
+			{
+//				System.out.println("Check parent2: "+exception);
+				results[1] = true;
+				if(!checkAndSetResult(results, ret, null, exception))
+				{
+					checkChildren(type, decider, ret, results);
+				}
+			}
+		});
+	}
+	
+	/**
+	 *  Check the children for locating a service.
+	 */
+	protected void checkChildren(final Class type, final IVisitDecider decider, final Future ret, final boolean[] results)
+	{
+		getChildren().addResultListener(new IResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				final List children = (List)result;
+//				System.out.println("found children (a): "+children);
+				if(children!=null)
+				{
+					CounterResultListener cl = new CounterResultListener(children.size())
+					{
+						public void finalResultAvailable(Object source, Object result)
+						{
+							results[2] = true;
+							checkAndSetResult(results, ret, result, null);
+						}
+						
+						public void intermediateResultAvailable(Object source, Object result)
+						{
+							checkAndSetResult(results, ret, result, null);
+						}
+						
+						public void exceptionOccurred(Object source, Exception exception)
+						{
+							checkAndSetResult(results, ret, null, exception);
+						}
+					};
+					
+					for(int i=0; i<children.size(); i++)
+					{
+						IServiceProvider child = (IServiceProvider)children.get(i);
+						if(decider.searchNode(NestedServiceContainer.this, child, false))
+						{
+							child.getService(type, decider).addResultListener(cl);
+						}
+						else
+						{
+							cl.resultAvailable(null, null);
+						}
+					}
+				}
+				else
+				{
+					results[2] = true;
+					checkAndSetResult(results, ret, null, null);
+				}
+			}
+			
+			public void exceptionOccurred(Object source, Exception exception)
+			{
+				results[2] = true;
+				checkAndSetResult(results, ret, null, exception);
+			}
+		});	
+	}
+	
+	/**
+	 *  Check if the last result is available and then set it on future.
+	 */
+	protected boolean checkAndSetResult(boolean[] results, Future ret, Object result, Exception exception)
+	{
+		boolean finished = false;
+		
+//		System.out.println("res: "+results[0]+results[1]+results[2]);
+		if(result!=null)
+		{
+			ret.setResult(result);
+			finished = true;
+		}
+		else if(exception!=null)
+		{
+			ret.setException(exception);
+			finished = true;
+		}
+		else if(results[0] && results[1] && results[2])
+		{
+			ret.setResult(null);
+			finished = true;
+		}
+		
+		return finished;
+	}
+	
 	/**
 	 *  Get the string representation.
 	 *  @return The string representation.

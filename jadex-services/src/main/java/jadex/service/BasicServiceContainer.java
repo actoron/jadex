@@ -3,15 +3,12 @@ package jadex.service;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.concurrent.CounterResultListener;
-import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -53,17 +50,19 @@ public class BasicServiceContainer implements  IServiceProvider, IServiceContain
 	 *  @param type The class.
 	 *  @return The corresponding platform services.
 	 */
-	public IFuture getServices(Class type)
+	public IFuture getServices(Class type, IVisitDecider decider)
 	{
-		final Future ret = new Future();
+		Future ret = new Future();
 		
-		getServicesOfType(type, Collections.synchronizedSet(new HashSet())).addResultListener(new DefaultResultListener()
+		if(decider.searchNode(null, this, false) && services!=null)
 		{
-			public void resultAvailable(Object source, Object result)
-			{
-				ret.setResult(result==null? Collections.EMPTY_SET: result);
-			}
-		});
+			Collection sers = (Collection)services.get(type);
+			ret.setResult(sers==null? Collections.EMPTY_SET: sers);
+		}
+		else
+		{
+			ret.setResult(null);
+		}
 
 		return ret;
 	}
@@ -94,23 +93,20 @@ public class BasicServiceContainer implements  IServiceProvider, IServiceContain
 	 *  @param type The type.
 	 *  @return The corresponding platform service.
 	 */
-	public IFuture getService(Class type)
+	public IFuture getService(Class type,  IVisitDecider decider)
 	{
-		final Future ret = new Future();
+		Future ret = new Future();
 		
-		getServiceOfType(type, Collections.synchronizedSet(new HashSet())).addResultListener(new IResultListener()
+		if(decider.searchNode(null, this, false) && services!=null)
 		{
-			public void resultAvailable(Object source, Object result)
-			{
-				ret.setResult(result);
-			}
-			
-			public void exceptionOccurred(Object source, Exception exception)
-			{
-				ret.setException(exception);
-			}
-		});
-		
+			Collection sers = (Collection)services.get(type);
+			ret.setResult(sers!=null && sers.size()>0? sers.iterator().next(): null);
+		}
+		else
+		{
+			ret.setResult(null);
+		}
+
 		return ret;
 	}
 	
@@ -118,10 +114,13 @@ public class BasicServiceContainer implements  IServiceProvider, IServiceContain
 	 *  Get the available service types.
 	 *  @return The service types.
 	 */
-	public IFuture getServicesTypes()
+	public IFuture getServicesTypes(IVisitDecider decider)
 	{
 		Future ret = new Future();
-		ret.setResult(services==null? new Class[0]: (Class[])services.keySet().toArray(new Class[services.size()]));
+		
+		ret.setResult(decider.searchNode(null, this, false) && services!=null? new Class[0]: 
+			(Class[])services.keySet().toArray(new Class[services.size()]));
+		
 		return ret;
 	}
 	
@@ -135,7 +134,6 @@ public class BasicServiceContainer implements  IServiceProvider, IServiceContain
 	 *  @param name The name.
 	 *  @param service The service.
 	 */
-//	public void addService(Class type, String name, Object service)
 	public IFuture addService(Class type, Object service)
 	{
 		final Future ret = new Future();
@@ -255,16 +253,6 @@ public class BasicServiceContainer implements  IServiceProvider, IServiceContain
 	}
 	
 	//-------- internal methods --------
-	
-	/**
-	 *  Get a service map for a type.
-	 *  @param type The type.
-	 * /
-	protected Map getServiceMap(Class type)
-	{
-		return services==null? null: (Map)services.get(type);
-	}*/
-	
 	
 	/**
 	 *  Get the name of the platform

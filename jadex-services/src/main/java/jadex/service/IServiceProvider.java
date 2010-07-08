@@ -1,8 +1,8 @@
 package jadex.service;
 
-import java.util.Set;
-
 import jadex.commons.IFuture;
+
+import java.util.Set;
 
 /**
  *  Interface for service providers.
@@ -14,14 +14,14 @@ public interface IServiceProvider
 	 *  @param type The type.
 	 *  @return The corresponding service.
 	 */
-	public IFuture getService(Class type);
+	public IFuture getService(Class type, IVisitDecider decider);
 	
 	/**
 	 *  Get all services of a typ.
 	 *  @param type The class.
 	 *  @return The corresponding services.
 	 */
-	public IFuture getServices(Class type);
+	public IFuture getServices(Class type,  IVisitDecider decider);
 	
 	/**
 	 *  Get a service.
@@ -35,7 +35,7 @@ public interface IServiceProvider
 	 *  Get the available service types.
 	 *  @return The service types.
 	 */
-	public IFuture getServicesTypes();
+	public IFuture getServicesTypes(IVisitDecider decider);
 	
 	/**
 	 *  Add a service to the platform.
