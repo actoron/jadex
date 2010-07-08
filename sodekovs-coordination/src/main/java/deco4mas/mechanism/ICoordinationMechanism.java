@@ -29,6 +29,8 @@ public abstract class ICoordinationMechanism {
 	
 	public abstract void suspend();
 	
+	public abstract String getRealisationName();
+	
 	
 	/**
 	 * Used to consume and pass Coordination Events, that are produced by the Agent State

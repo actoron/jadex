@@ -7,11 +7,23 @@ import jadex.application.runtime.ISpace;
 import jadex.application.space.envsupport.environment.AbstractEnvironmentSpace;
 import jadex.application.space.envsupport.environment.IEnvironmentSpace;
 import jadex.application.space.envsupport.environment.ISpaceObject;
+import jadex.bdi.model.OAVBDIMetaModel;
+import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBelief;
+import jadex.bdi.runtime.IBeliefListener;
 import jadex.bdi.runtime.IBeliefSet;
+import jadex.bdi.runtime.IBeliefbase;
+import jadex.bdi.runtime.IEventbase;
 import jadex.bdi.runtime.IGoal;
+import jadex.bdi.runtime.IGoalbase;
 import jadex.bdi.runtime.IInternalEvent;
+import jadex.bdi.runtime.impl.BeliefbaseFlyweight;
+import jadex.bdi.runtime.impl.EventbaseFlyweight;
+import jadex.bdi.runtime.impl.ExternalAccessFlyweight;
+import jadex.bdi.runtime.impl.GoalbaseFlyweight;
+import jadex.bdi.runtime.interpreter.AgentRules;
+import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.commons.IFuture;
@@ -21,6 +33,7 @@ import jadex.commons.concurrent.IResultListener;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.IValueFetcher;
 import jadex.javaparser.SimpleValueFetcher;
+import jadex.rules.state.IOAVState;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -29,6 +42,7 @@ import deco.lang.dynamics.AgentElementType;
 import deco.lang.dynamics.mechanism.AgentElement;
 import deco4mas.annotation.agent.ParameterMapping;
 import deco4mas.annotation.agent.CoordinationAnnotation.CoordinationType;
+import deco4mas.coordinate.CoordinationInformation;
 import deco4mas.coordinate.DecentralCoordinationInformation;
 import deco4mas.helper.Constants;
 import deco4mas.mechanism.CoordinationInfo;
@@ -214,7 +228,7 @@ public class BDICoordinationInformationInterpreter extends SimplePropertyObject 
 												{
 													Object[] agentData = agentDataIterator.next();
 													
-													DecentralCoordinationInformation dci = (DecentralCoordinationInformation) agentData[0];
+													CoordinationInformation dci = (CoordinationInformation) agentData[0];
 													AgentElement ae = (AgentElement) agentData[1];
 													if (CheckRole.checkForPerceive(dci.getRef(), exta))
 													{ // check role
@@ -296,10 +310,21 @@ public class BDICoordinationInformationInterpreter extends SimplePropertyObject 
 																		// belset
 																		// =
 																		// exta.getBeliefbase().getBeliefSet(metainfos[i][1]);
-																		IBeliefSet belset = exta.getBeliefbase().getBeliefSet(elementId);
-																		// belset.addFact(percept);
-																		belset.addFact(coordinationSpaceObj.getProperty(Constants.VALUE)
-																			.toString());
+																		ExternalAccessFlyweight extaFly = (ExternalAccessFlyweight) exta;
+																		IOAVState state = extaFly.getState();
+																		Object[] scope = AgentRules.resolveCapability(elementId, OAVBDIMetaModel.internalevent_type, extaFly.getScope(), state);
+																		Object mscope = state.getAttributeValue(scope[1], OAVBDIRuntimeModel.element_has_model);
+																		if (state.containsKey(mscope, OAVBDIMetaModel.capability_has_beliefsets, scope[0]))
+																		{
+																			IBeliefbase base = BeliefbaseFlyweight.getBeliefbaseFlyweight(state, scope[1]);
+																			IBeliefSet belset = base.getBeliefSet(elementId);
+																			belset.addFact(coordinationSpaceObj.getProperty(Constants.VALUE)
+																				.toString());
+																			
+																		} else
+																		{
+																			throw new RuntimeException("No such belief: " + scope[0] + " in " + scope[1]);
+																		}
 																		System.out.println("#BDICoordInfInterpreter# Added "
 																			+ coordinationSpaceObj.getProperty(Constants.VALUE).toString()
 																			+ " to BELIEF_SET: " + elementId + " for "
@@ -342,9 +367,21 @@ public class BDICoordinationInformationInterpreter extends SimplePropertyObject 
 																				+ elementId);
 																	} else
 																	{
-																		IBelief bel = exta.getBeliefbase().getBelief(elementId);
-																		bel.setFact(coordinationSpaceObj.getProperty(Constants.VALUE)
-																			.toString());
+																		ExternalAccessFlyweight extaFly = (ExternalAccessFlyweight) exta;
+																		IOAVState state = extaFly.getState();
+																		Object[] scope = AgentRules.resolveCapability(elementId, OAVBDIMetaModel.internalevent_type, extaFly.getScope(), state);
+																		Object mscope = state.getAttributeValue(scope[1], OAVBDIRuntimeModel.element_has_model);
+																		if (state.containsKey(mscope, OAVBDIMetaModel.capability_has_beliefs, scope[0]))
+																		{
+																			IBeliefbase base = BeliefbaseFlyweight.getBeliefbaseFlyweight(state, scope[1]);
+																			IBelief bel = base.getBelief(elementId);
+																			bel.setFact(coordinationSpaceObj.getProperty(Constants.VALUE)
+																				.toString());
+																			
+																		} else
+																		{
+																			throw new RuntimeException("No such belief: " + scope[0] + " in " + scope[1]);
+																		}
 																		System.out.println("#BDICoordInfInterpreter# Added "
 																			+ coordinationSpaceObj.getProperty(Constants.VALUE).toString()
 																			+ " to BELIEF : " + elementId + " for " + exta.getAgentName());
@@ -381,24 +418,26 @@ public class BDICoordinationInformationInterpreter extends SimplePropertyObject 
 																				+ elementId + " for " + exta.getAgentName());
 																	} else
 																	{
-																		IGoal g = exta.getGoalbase().createGoal(elementId);
-																		// TODO:
-																		// Implement
-																		// the
-																		// add
-																		// parameters:
-																		// add
-																		// parameters:
-																		for (ParameterMapping pm : ae.getParameter_mappings())
+																		ExternalAccessFlyweight extaFly = (ExternalAccessFlyweight) exta;
+																		IOAVState state = extaFly.getState();
+																		Object[] scope = AgentRules.resolveCapability(elementId, OAVBDIMetaModel.internalevent_type, extaFly.getScope(), state);
+																		Object mscope = state.getAttributeValue(scope[1], OAVBDIRuntimeModel.element_has_model);
+																		if (state.containsKey(mscope, OAVBDIMetaModel.capability_has_goals, scope[0]))
 																		{
-																			g.getParameter(pm.getLocalName()).setValue(
-																				receivedParamDataMappings.get(pm.getRef()));
+																			IGoalbase base = GoalbaseFlyweight.getGoalbaseFlyweight(state, scope[1]);
+																			IGoal g = base.createGoal(elementId);
+																			for (ParameterMapping pm : ae.getParameter_mappings())
+																			{
+																				g.getParameter(pm.getLocalName()).setValue(
+																					receivedParamDataMappings.get(pm.getRef()));
+																			}
+																			base.dispatchTopLevelGoal(g);
+																			
+																		} else
+																		{
+																			throw new RuntimeException("No such belief: " + scope[0] + " in " + scope[1]);
 																		}
-																		exta.getGoalbase().dispatchTopLevelGoal(g);
-																		System.out.println("#BDICoordInfInterpreter# Dispatched new GOAL: "
-																			+ elementId + " for " + exta.getAgentName());
 																	}
-
 																} else if (elementType.equals(AgentElementType.BDI_PLAN.toString()))
 																{
 																	System.out
@@ -505,16 +544,27 @@ public class BDICoordinationInformationInterpreter extends SimplePropertyObject 
 																		// incident.
 																	} else
 																	{
-																		IInternalEvent ie = exta.getEventbase().createInternalEvent(
-																			elementId);
-																		// add
-																		// parameters:
-																		for (ParameterMapping pm : ae.getParameter_mappings())
+																		ExternalAccessFlyweight extaFly = (ExternalAccessFlyweight) exta;
+																		IOAVState state = extaFly.getState();
+																		Object[] scope = AgentRules.resolveCapability(elementId, OAVBDIMetaModel.internalevent_type, extaFly.getScope(), state);
+																		Object mscope = state.getAttributeValue(scope[1], OAVBDIRuntimeModel.element_has_model);
+																		if (state.containsKey(mscope, OAVBDIMetaModel.capability_has_internalevents, scope[0]))
 																		{
-																			ie.getParameter(pm.getLocalName()).setValue(
-																				receivedParamDataMappings.get(pm.getRef()));
+																			IEventbase base = EventbaseFlyweight.getEventbaseFlyweight(state, scope[1]);
+																			IInternalEvent ie = base.createInternalEvent(
+																				elementId);
+																			for (ParameterMapping pm : ae.getParameter_mappings())
+																			{
+																				ie.getParameter(pm.getLocalName()).setValue(
+																					receivedParamDataMappings.get(pm.getRef()));
+																			}
+																			base.dispatchInternalEvent(ie);
+																			
+																		} else
+																		{
+																			throw new RuntimeException("No such belief: " + scope[0] + " in " + scope[1]);
 																		}
-																		exta.getEventbase().dispatchInternalEvent(ie);
+																		
 																		System.out
 																			.println("#BDICoordInfInterpreter# Dispatched new InternalEvent: "
 																				+ elementId + " for " + exta.getAgentName());

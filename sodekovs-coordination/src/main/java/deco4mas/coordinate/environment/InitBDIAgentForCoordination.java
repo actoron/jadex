@@ -8,7 +8,6 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.commons.IFuture;
 import jadex.commons.concurrent.IResultListener;
-import jadex.xml.IContext;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -17,7 +16,9 @@ import deco.lang.dynamics.AgentElementType;
 import deco.lang.dynamics.MASDynamics;
 import deco.lang.dynamics.mechanism.AgentElement;
 import deco.lang.dynamics.mechanism.DecentralizedCausality;
+import deco.lang.dynamics.mechanism.DirectCausality;
 import deco4mas.coordinate.DecentralCoordinationInformation;
+import deco4mas.coordinate.DirectCoordinationInformation;
 import deco4mas.coordinate.ProcessMASDynamics;
 import deco4mas.coordinate.interpreter.agent_state.BDIBehaviorObservationComponent;
 import deco4mas.helper.Constants;
@@ -92,7 +93,7 @@ public class InitBDIAgentForCoordination
 					initListener(ae, dci.getDml().getRealization());
 
 					// updateMappings(ae, dci.getRef(), "PUBLISH");
-					updateMappings(ae, dci, Constants.PUBLISH);
+					updateMappingsDecentral(ae, dci, Constants.PUBLISH);
 					// behObserver.setDecentralCoordInfoMapping(dci);
 					numberOfPublishPercepts++;
 				}
@@ -107,7 +108,41 @@ public class InitBDIAgentForCoordination
 			{
 				if (ae.getAgent_id().equals(agentType))
 				{
-					updateMappings(ae, dci, Constants.PERCEIVE);
+					updateMappingsDecentral(ae, dci, Constants.PERCEIVE);
+					// behObserver.setDecentralCoordInfoMapping(dci);
+					numberOfPerceivePercepts++;
+				}
+			}
+		}
+
+		// init the direct publications
+		for (DirectCoordinationInformation dci : processMASDynamics.getDirectPublications())
+		{
+			DirectCausality causality = masDyn.getCausalities().getDirectCMRealizationByName(dci.getDirectLink().getRealization());
+			for (AgentElement ae : causality.getFrom_agents())
+			{
+				if (ae.getAgent_id().equals(agentType))
+				{
+					// initListener(ae, causality.getTo_agents());
+					initListener(ae, dci.getDirectLink().getRealization());
+
+					// updateMappings(ae, dci.getRef(), "PUBLISH");
+					updateMappingsDirect(ae, dci, Constants.PUBLISH);
+					// behObserver.setDecentralCoordInfoMapping(dci);
+					numberOfPublishPercepts++;
+				}
+			}
+		}
+
+		// init perceptions.....
+		for (DirectCoordinationInformation dci : processMASDynamics.getDirectPerceptions())
+		{
+			DirectCausality causality = masDyn.getCausalities().getDirectCMRealizationByName(dci.getDirectLink().getRealization());
+			for (AgentElement ae : causality.getTo_agents())
+			{
+				if (ae.getAgent_id().equals(agentType))
+				{
+					updateMappingsDirect(ae, dci, Constants.PERCEIVE);
 					// behObserver.setDecentralCoordInfoMapping(dci);
 					numberOfPerceivePercepts++;
 				}
@@ -170,14 +205,14 @@ public class InitBDIAgentForCoordination
 	/**
 	 * Updates all the necessary mappings for "PUBLISH" or "PERCEIVE": 1) the
 	 * Role Mappings for this Agent. Means: Which event belongs to which role 2)
-	 * the parameter and data mappings
+	 * the parameter and data mappings Decentral
 	 * 
 	 * @param ae
 	 * @param agentReference
 	 */
 	// private void updateMappings(AgentElement ae, AgentReference
 	// agentReference, String perceptType) {
-	private void updateMappings(AgentElement ae, DecentralCoordinationInformation dci, String perceptType)
+	private void updateMappingsDecentral(AgentElement ae, DecentralCoordinationInformation dci, String perceptType)
 	{
 		if (perceptType.equals(Constants.PUBLISH))
 		{
@@ -188,13 +223,48 @@ public class InitBDIAgentForCoordination
 				perceptType + "::" + dci.getDml().getRealization() + "::" + ae.getElement_id() + "::" + ae.getAgentElementType(), ae);
 		} else
 		{
-			//System.out.println(ae.getElement_id());
-			//Add support for more perceive per role CH
+			// System.out.println(ae.getElement_id());
+			// Add support for more perceive per role CH
 			if (!behObserver.getRoleDefinitionsForPerceive().containsKey(dci.getDml().getRealization()))
 			{
 				behObserver.getRoleDefinitionsForPerceive().put(dci.getDml().getRealization(), new HashSet<Object[]>());
 			}
 			Set<Object[]> dciSet = behObserver.getRoleDefinitionsForPerceive().get(dci.getDml().getRealization());
+			dciSet.add((Object[]) new Object[] { dci, ae });
+		}
+	}
+
+	/**
+	 * Updates all the necessary mappings for "PUBLISH" or "PERCEIVE": 1) the
+	 * Role Mappings for this Agent. Means: Which event belongs to which role 2)
+	 * the parameter and data mappings Direct
+	 * 
+	 * @param ae
+	 * @param agentReference
+	 */
+	// private void updateMappings(AgentElement ae, AgentReference
+	// agentReference, String perceptType) {
+	private void updateMappingsDirect(AgentElement ae, DirectCoordinationInformation dci, String perceptType)
+	{
+		if (perceptType.equals(Constants.PUBLISH))
+		{
+			behObserver.getRoleDefinitionsForPublish().put(
+				perceptType + "::" + dci.getDirectLink().getRealization() + "::" + ae.getElement_id() + "::" + ae.getAgentElementType(),
+				dci.getRef());
+			behObserver
+				.getParameterAndDataMappings()
+				.put(
+					perceptType + "::" + dci.getDirectLink().getRealization() + "::" + ae.getElement_id() + "::" + ae.getAgentElementType(),
+					ae);
+		} else
+		{
+			// System.out.println(ae.getElement_id());
+			// Add support for more perceive per role CH
+			if (!behObserver.getRoleDefinitionsForPerceive().containsKey(dci.getDirectLink().getRealization()))
+			{
+				behObserver.getRoleDefinitionsForPerceive().put(dci.getDirectLink().getRealization(), new HashSet<Object[]>());
+			}
+			Set<Object[]> dciSet = behObserver.getRoleDefinitionsForPerceive().get(dci.getDirectLink().getRealization());
 			dciSet.add((Object[]) new Object[] { dci, ae });
 		}
 	}

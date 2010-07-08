@@ -7,7 +7,6 @@ import jadex.application.space.envsupport.environment.IEnvironmentSpace;
 import jadex.application.space.envsupport.environment.IPerceptGenerator;
 import jadex.application.space.envsupport.environment.IPerceptProcessor;
 import jadex.application.space.envsupport.environment.PerceptType;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -15,15 +14,18 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
-
 import javax.xml.bind.JAXBException;
-
 import deco.lang.dynamics.MASDynamics;
+import deco.lang.dynamics.causalities.DecentralMechanismLink;
+import deco.lang.dynamics.causalities.DirectLink;
 import deco.lang.dynamics.mechanism.AgentElement;
 import deco.lang.dynamics.mechanism.DecentralizedCausality;
 import deco4mas.coordinate.interpreter.coordination_information.BDICoordinationInformationInterpreter;
 import deco4mas.coordinate.interpreter.coordination_information.DefaultCoordinationEventGenerator;
-import deco4mas.examples.agentNegotiation.deco.negMedium.NegSpaceMechanism;
+import deco4mas.examples.agentNegotiation.decoMAS.medium.DirectInternalEventMechanism;
+import deco4mas.examples.agentNegotiation.decoMAS.medium.NegSpaceMechanism;
+import deco4mas.examples.agentNegotiation.decoMAS.medium.TrustSpaceMechanism;
+import deco4mas.mechanism.ICoordinationMechanism;
 import deco4mas.mechanism.v2.tspaces.TSpacesMechanism;
 
 /**
@@ -124,13 +126,7 @@ public class InitDeco4mas {
 		
 		// ------ INIT COORDINATION MEDIA! -----------//
 
-		// TODO: Init media according to the deco4Mas file!
-//		TSpacesMechanism coordMechanism = new TSpacesMechanism((CoordinationSpace) space);
-//		coordMechanism.start();
-		NegSpaceMechanism coordMechanism = new NegSpaceMechanism((CoordinationSpace) space);
 		
-
-		((CoordinationSpace) space).activeCoordinationMechanisms.add(coordMechanism);
 
 		// Process deco4MAS-File:
 		try {
@@ -147,6 +143,23 @@ public class InitDeco4mas {
 			System.out.println("\t file: " + masFileName + " could not be processed...");
 			e.printStackTrace();
 		}
+		
+		// TODO: Init media according to the deco4Mas file!
+//		TSpacesMechanism coordMechanism = new TSpacesMechanism((CoordinationSpace) space);
+//		coordMechanism.start();
+		for (DecentralMechanismLink dml : masDyn.getCausalities().getDml())
+		{
+			((CoordinationSpace) space).activeCoordinationMechanisms.add(getMechanism(dml.getRealization()));
+		}
+		
+		for (DirectLink dml : masDyn.getCausalities().getDirectLinks())
+		{
+			((CoordinationSpace) space).activeCoordinationMechanisms.add(getMechanism(dml.getRealization()));
+		}
+//		NegSpaceMechanism coordMechanism = new NegSpaceMechanism((CoordinationSpace) space);
+//		((CoordinationSpace) space).activeCoordinationMechanisms.add(coordMechanism);
+
+		
 		
 		// these lists contain a list of agent names and each list has a unique set of agent names itself.
 		ArrayList<String> allReferencedAgentTypesList = new ArrayList<String>();
@@ -375,6 +388,17 @@ public class InitDeco4mas {
 				}
 			}
 		}
+	}
+	
+	//TODO make it better
+	private ICoordinationMechanism getMechanism(String realisation)
+	{
+		ICoordinationMechanism result = null;
+		if (realisation.equals("by_tuple")) return new TSpacesMechanism((CoordinationSpace) space);
+		else if (realisation.equals("by_neg")) return new NegSpaceMechanism((CoordinationSpace) space);
+		else if (realisation.equals("by_trust")) return new TrustSpaceMechanism((CoordinationSpace) space);
+		else if (realisation.equals("by_directInternalEvent")) return new DirectInternalEventMechanism((CoordinationSpace) space);
+		return result;
 	}
 
 }

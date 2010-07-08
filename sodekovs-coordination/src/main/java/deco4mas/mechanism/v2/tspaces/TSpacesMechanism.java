@@ -15,6 +15,7 @@ import deco4mas.mechanism.ICoordinationMechanism;
 public class TSpacesMechanism extends ICoordinationMechanism {
 
 	private TSpacesClient tsClient;
+	private String realisationName = "by_tuple";
 
 	public TSpacesMechanism(CoordinationSpace space) {
 		super(space);
@@ -51,5 +52,11 @@ public class TSpacesMechanism extends ICoordinationMechanism {
 		} else {
 			tsClient.publish((ISpaceObject) obj);
 		}
+	}
+	
+	@Override
+	public String getRealisationName()
+	{
+		return realisationName ;
 	}
 }
