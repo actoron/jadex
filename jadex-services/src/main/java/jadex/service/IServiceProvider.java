@@ -14,7 +14,6 @@ public interface IServiceProvider
 	 */
 	public IFuture	getServices(ISearchManager manager, IVisitDecider visit, IResultSelector result);
 	
-	
 	/**
 	 *  Get the parent service container.
 	 *  @return The parent container.

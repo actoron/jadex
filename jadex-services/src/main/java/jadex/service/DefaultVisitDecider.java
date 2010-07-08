@@ -1,5 +1,6 @@
 package jadex.service;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -14,31 +15,28 @@ public class DefaultVisitDecider implements IVisitDecider
 	
 	/** The set of visited nodes. */
 	protected Set visited;
-	
-	/** Flag if search upwards is ok. */
-	protected boolean up;
-	
-	/** Flag if search downwards is ok. */
-	protected boolean down;
+
+	/** A flag that indicates if node should not be searched when one result is already available. */
+	protected boolean abort;
 	
 	//-------- constructors --------
 
 	/**
 	 *  Create a new visit decider.
+	 *  Abort on first service found is true.
 	 */
 	public DefaultVisitDecider()
 	{
-		this(true, true);
+		this(true);
 	}
 	
 	/**
 	 *  Create a new visit decider.
 	 */
-	public DefaultVisitDecider(boolean up, boolean down)
+	public DefaultVisitDecider(boolean abort)
 	{
 		this.visited = new HashSet();
-		this.up = up;
-		this.down = down;
+		this.abort = abort;
 	}
 	
 	//-------- methods --------
@@ -47,19 +45,16 @@ public class DefaultVisitDecider implements IVisitDecider
 	 *  Test if a specific node should be searched.
 	 *  @param source The source data provider.
 	 *  @param target The target data provider.
-	 *  @param up A flag indicating the search direction.
+	 *  @param results The preliminary results.
 	 */
-	public synchronized boolean searchNode(IServiceProvider source, IServiceProvider target, boolean up)
+	public synchronized boolean searchNode(IServiceProvider source, IServiceProvider target, Collection results)
 	{
-		boolean ret = false;
+		boolean ret = !(abort && results.size()>0);
 		
-		if(!visited.contains(target.getName()))
+		if(ret && !visited.contains(target.getId()))
 		{
-			if(up && this.up || !up && this.down)
-			{
-				visited.add(target);
-				ret = true;
-			}
+			visited.add(target);
+			ret = true;
 		}
 		
 		return ret;
