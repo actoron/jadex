@@ -77,7 +77,7 @@ public class AsyncExecutionService	implements IExecutionService, IService
 	{	
 		//System.out.println("execute called: "+task);
 		if(shutdown)
-			throw new RuntimeException("Shutting down.");
+			throw new RuntimeException("Shutting down: "+task);
 		
 		Executor exe = (Executor)executors.get(task);
 

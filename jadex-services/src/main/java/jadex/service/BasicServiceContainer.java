@@ -321,8 +321,8 @@ public class BasicServiceContainer implements  IServiceProvider, IServiceContain
 	 */
 	public IFuture shutdown()
 	{
-		Thread.dumpStack();
-		System.out.println("shutdown called: "+getName());
+//		Thread.dumpStack();
+//		System.out.println("shutdown called: "+getName());
 		final Future ret = new Future();
 		
 		// Stop the services.
@@ -343,7 +343,7 @@ public class BasicServiceContainer implements  IServiceProvider, IServiceContain
 				}
 			}
 			
-			System.out.println("here: "+allservices);
+//			System.out.println("all services: "+allservices);
 			shutdownServices(allservices, allservices.size()-1).addResultListener(new DelegationResultListener(ret));
 		}
 		else
@@ -355,7 +355,7 @@ public class BasicServiceContainer implements  IServiceProvider, IServiceContain
 	}
 	
 	/**
-	 * 
+	 *  Shutdown services loop.
 	 */
 	protected IFuture shutdownServices(final List sers, final int i)
 	{
@@ -365,13 +365,13 @@ public class BasicServiceContainer implements  IServiceProvider, IServiceContain
 		{
 			if(sers.get(i) instanceof IService)
 			{
-				System.out.println("shutdown: "+i+" "+sers.get(i));
+//				System.out.println("shutdown: "+i+" "+sers.get(i));
 				
 				((IService)sers.get(i)).shutdownService().addResultListener(new IResultListener()
 				{
 					public void resultAvailable(Object source, Object result)
 					{
-						System.out.println("shutdown finished: "+i+" "+sers.get(i));
+//						System.out.println("shutdown finished: "+i+" "+sers.get(i));
 						shutdownServices(sers, i-1).addResultListener(new DelegationResultListener(ret));
 					}
 					

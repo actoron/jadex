@@ -712,7 +712,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 		
 		public void resultAvailable(Object source, Object result)
 		{
-//			System.out.println("CleanupCommand: "+result);
+			System.out.println("CleanupCommand: "+result);
 			IComponentDescription ad = (IComponentDescription)descs.get(cid);
 			Map results = null;
 			StandaloneComponentAdapter adapter;
@@ -739,12 +739,12 @@ public class ComponentManagementService implements IComponentManagementService, 
 					
 					ccs.remove(cid);
 					
-					// Stop execution of component.
-					exeservice.cancel(adapter, null);
-					
 					// Deregister destroyed component at parent.
 					if(desc.getParent()!=null)
 					{
+						// Stop execution of component. When root component services are already shutdowned.
+						exeservice.cancel(adapter, null);
+						
 //						children.remove(desc.getParent(), desc.getName());
 						CMSComponentDescription padesc = (CMSComponentDescription)descs.get(desc.getParent());
 						if(padesc!=null)
