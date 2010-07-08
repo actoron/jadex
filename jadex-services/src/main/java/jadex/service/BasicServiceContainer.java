@@ -2,7 +2,7 @@ package jadex.service;
 
 import jadex.commons.Future;
 import jadex.commons.IFuture;
-import jadex.commons.concurrent.CounterListener;
+import jadex.commons.concurrent.CounterResultListener;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
@@ -286,13 +286,18 @@ public class BasicServiceContainer implements  IServiceProvider, IServiceContain
 		if(services!=null && services.size()>0)
 		{
 			// Start notifies the future when all services have been started.
-			CounterListener lis = new CounterListener(services.size(), new DefaultResultListener()
+			CounterResultListener lis = new CounterResultListener(services.size())
 			{
-				public void resultAvailable(Object source, Object result)
+				public void finalResultAvailable(Object source, Object result)
 				{
 					ret.setResult(null);
 				}
-			});
+				
+				public void exceptionOccurred(Object source, Exception exception)
+				{
+					ret.setException(exception);
+				}
+			};
 			for(Iterator it=services.keySet().iterator(); it.hasNext(); )
 			{
 				Object key = it.next();

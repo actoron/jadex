@@ -2,7 +2,7 @@ package jadex.service;
 
 import jadex.commons.Future;
 import jadex.commons.IFuture;
-import jadex.commons.SUtil;
+import jadex.commons.concurrent.CounterResultListener;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
 
@@ -14,7 +14,8 @@ import java.util.Set;
 
 
 /**
- * 
+ *  The nested service contained supports searching up and downwards
+ *  parent and child containers.
  */
 public abstract class NestedServiceContainer extends BasicServiceContainer
 {
@@ -112,7 +113,7 @@ public abstract class NestedServiceContainer extends BasicServiceContainer
 	}
 	
 	/**
-	 * 
+	 *  Check parent for locating a service.
 	 */
 	protected void checkParent(final Class type, final Set visited, final Future ret, final boolean[] results)
 	{
@@ -169,7 +170,7 @@ public abstract class NestedServiceContainer extends BasicServiceContainer
 	}
 	
 	/**
-	 * 
+	 *  Check the children for locating a service.
 	 */
 	protected void checkChildren(final Class type, final Set visited, final Future ret, final boolean[] results)
 	{
@@ -178,41 +179,38 @@ public abstract class NestedServiceContainer extends BasicServiceContainer
 			public void resultAvailable(Object source, Object result)
 			{
 				final List children = (List)result;
-				System.out.println("found children (a): "+children);
+//				System.out.println("found children (a): "+children);
 				if(children!=null)
 				{
-					final int[] cnt = new int[]{0};
+					CounterResultListener cl = new CounterResultListener(children.size())
+					{
+						public void finalResultAvailable(Object source, Object result)
+						{
+							results[2] = true;
+							checkAndSetResult(results, ret, result, null);
+						}
+						
+						public void intermediateResultAvailable(Object source, Object result)
+						{
+							checkAndSetResult(results, ret, result, null);
+						}
+						
+						public void exceptionOccurred(Object source, Exception exception)
+						{
+							checkAndSetResult(results, ret, null, exception);
+						}
+					};
+					
 					for(int i=0; i<children.size(); i++)
 					{
 						IServiceProvider child = (IServiceProvider)children.get(i);
 						if(searchNode(NestedServiceContainer.this, child, false, visited))
 						{
-							child.getServiceOfType(type, visited).addResultListener(new IResultListener()
-							{
-								public void resultAvailable(Object source, Object result)
-								{
-									cnt[0]=cnt[0]+1;
-									if(cnt[0]==children.size())
-									{
-										results[2] = true;
-									}
-									checkAndSetResult(results, ret, result, null);
-								}
-								
-								public void exceptionOccurred(Object source, Exception exception)
-								{
-									checkAndSetResult(results, ret, null, exception);
-								}
-							});
+							child.getServiceOfType(type, visited).addResultListener(cl);
 						}
 						else
 						{
-							cnt[0]=cnt[0]+1;
-							if(cnt[0]==children.size())
-							{
-								results[2] = true;
-								checkAndSetResult(results, ret, null, null);
-							}
+							cl.resultAvailable(null, null);
 						}
 					}
 				}

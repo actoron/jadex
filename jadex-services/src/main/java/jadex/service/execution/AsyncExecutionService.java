@@ -4,7 +4,7 @@ import jadex.commons.Future;
 import jadex.commons.ICommand;
 import jadex.commons.IFuture;
 import jadex.commons.collection.SCollection;
-import jadex.commons.concurrent.CounterListener;
+import jadex.commons.concurrent.CounterResultListener;
 import jadex.commons.concurrent.Executor;
 import jadex.commons.concurrent.IExecutable;
 import jadex.commons.concurrent.IResultListener;
@@ -251,9 +251,9 @@ public class AsyncExecutionService	implements IExecutionService, IService
 		if(keys.length>0)
 		{
 			// One listener counts until all executors have shutdowned.
-			IResultListener lis = new CounterListener(keys.length, new IResultListener()
+			IResultListener lis = new CounterResultListener(keys.length)
 			{
-				public void resultAvailable(Object source, Object result)
+				public void finalResultAvailable(Object source, Object result)
 				{
 					ret.setResult(result);
 				}
@@ -262,7 +262,7 @@ public class AsyncExecutionService	implements IExecutionService, IService
 				{
 					ret.setException(exception);
 				}
-			});
+			};
 			
 			for(int i=0; i<keys.length; i++)
 			{
