@@ -6,7 +6,7 @@ import java.util.Map;
 /**
  *  Select services to be returned as result of service search.
  */
-public interface IResultDecider
+public interface IResultSelector
 {
 	/**
 	 *  Called for each searched service provider node.
