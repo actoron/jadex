@@ -15,9 +15,6 @@ public abstract class CounterResultListener implements IResultListener
 	/** The number of received callbacks. */
 	protected int cnt;
 	
-	/** Boolean indicating if an exception occurred. */
-	protected Exception exception;
-	
 	//-------- constructors --------
 	
 	/**

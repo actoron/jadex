@@ -3,6 +3,7 @@ package jadex.application.runtime.impl;
 import jadex.application.model.ApplicationModel;
 import jadex.application.model.MApplicationInstance;
 import jadex.application.model.MApplicationType;
+import jadex.application.model.MArgument;
 import jadex.application.model.MComponentInstance;
 import jadex.application.model.MComponentType;
 import jadex.application.model.MExpressionType;
@@ -25,18 +26,20 @@ import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
+import jadex.commons.concurrent.CollectionResultListener;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
+import jadex.javaparser.IValueFetcher;
 import jadex.javaparser.SimpleValueFetcher;
+import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 import jadex.service.IService;
 import jadex.service.IServiceContainer;
 import jadex.service.IServiceProvider;
 import jadex.service.NestedServiceContainer;
 import jadex.service.library.ILibraryService;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -1003,29 +1006,13 @@ public class Application implements IApplication, IComponentInstance
 			public void resultAvailable(Object source, Object result)
 			{
 				IComponentManagementService cms = (IComponentManagementService)result;
-				final IComponentIdentifier[] childs = cms.getChildren(getComponentIdentifier());
-				final List res = new ArrayList();
+				IComponentIdentifier[] childs = cms.getChildren(getComponentIdentifier());
 				
-				for(int i=0; i<childs.length; i++)
+				IResultListener	crl	= new CollectionResultListener(childs.length, new DelegationResultListener(ret));
+				for(int i=0; !ret.isDone() && i<childs.length; i++)
 				{
-					final int cnt = i;
-					cms.getExternalAccess(childs[i]).addResultListener(new IResultListener()
-					{
-						public void resultAvailable(Object source, Object result)
-						{
-							res.add(result);
-							if(cnt==childs.length-1)
-								ret.setResult(res);
-						}
-						
-						public void exceptionOccurred(Object source, Exception exception)
-						{
-							ret.setException(exception);
-						}
-					});
+					cms.getExternalAccess(childs[i]).addResultListener(crl);
 				}
-				if(childs.length==0)
-					ret.setResult(null);
 			}
 		});
 		
@@ -1048,11 +1035,11 @@ public class Application implements IApplication, IComponentInstance
 		{
 			final MComponentInstance component = (MComponentInstance)components.get(i);
 //			System.out.println("Create: "+component.getName()+" "+component.getTypeName()+" "+component.getConfiguration()+" "+Thread.currentThread());
-			int num = component.getNumber(Application.this, cl, fetcher);
+			int num = getNumber(component, cl, fetcher);
 			for(int j=0; j<num; j++)
 			{
 				IFuture ret = ces.createComponent(component.getName(), component.getType(model.getApplicationType()).getFilename(),
-					new CreationInfo(component.getConfiguration(), component.getArguments(Application.this, cl, fetcher), adapter.getComponentIdentifier(),
+					new CreationInfo(component.getConfiguration(), getArguments(component, cl, fetcher), adapter.getComponentIdentifier(),
 					component.isSuspended(), component.isMaster(), component.isDaemon(), model.getApplicationType().getAllImports()), null);
 				ret.addResultListener(createResultListener(new IResultListener()
 				{
@@ -1069,5 +1056,59 @@ public class Application implements IApplication, IComponentInstance
 				}));
 			}
 		}
+	}
+
+	/**
+	 *  Get the arguments.
+	 *  @return The arguments as a map of name-value pairs.
+	 */
+	public Map getArguments(MComponentInstance component, ClassLoader classloader, IValueFetcher fetcher)
+	{
+		Map ret = null;		
+		List	arguments	= component.getMArguments();
+
+		if(arguments!=null && !arguments.isEmpty())
+		{
+			ret = new HashMap();
+
+//			SimpleValueFetcher fetcher = new SimpleValueFetcher();
+//			fetcher.setValue("$platform", context.getServiceContainer());
+//			fetcher.setValue("$args", context.getArguments());
+//			fetcher.setValue("$results", context.getResults());
+//			fetcher.setValue("$clock", clock);
+
+			JavaCCExpressionParser	parser = new JavaCCExpressionParser();
+			String[] imports = getApplicationType().getAllImports();
+			for(int i=0; i<arguments.size(); i++)
+			{
+				MArgument p = (MArgument)arguments.get(i);
+				String valtext = p.getValue();
+				
+				Object val = parser.parseExpression(valtext, imports, null, classloader).getValue(fetcher);
+				ret.put(p.getName(), val);
+			}
+		}
+		
+		return ret;
+	}
+	/**
+	 *  Get the number of components to start.
+	 *  @return The number.
+	 */
+	// todo: hack, remove clock somehow
+	public int getNumber(MComponentInstance component, ClassLoader classloader, IValueFetcher fetcher)
+	{
+//		SimpleValueFetcher fetcher = new SimpleValueFetcher();
+//		fetcher.setValue("$platform", context.getServiceContainer());
+//		fetcher.setValue("$args", context.getArguments());
+//		fetcher.setValue("$results", context.getResults());
+//		fetcher.setValue("$clock", clock);
+
+		String[] imports = getApplicationType().getAllImports();
+		JavaCCExpressionParser	parser = new JavaCCExpressionParser();
+			
+		Object val = component.getNumberText()!=null? parser.parseExpression(component.getNumberText(), imports, null, classloader).getValue(fetcher): null;
+		
+		return val instanceof Integer? ((Integer)val).intValue(): 1;
 	}
 }

@@ -29,8 +29,10 @@ import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.collection.LRU;
 import jadex.commons.collection.SCollection;
+import jadex.commons.concurrent.CollectionResultListener;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.DelegationResultListener;
+import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.ISynchronizator;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
@@ -1222,14 +1224,13 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 			public void resultAvailable(Object source, Object result)
 			{
 				IComponentManagementService cms = (IComponentManagementService)result;
-				IComponentIdentifier[] childs = cms.getChildren(adapter.getComponentIdentifier());
-				List res = new ArrayList();
-				for(int i=0; i<childs.length; i++)
+				IComponentIdentifier[] childs = cms.getChildren(getAgentAdapter().getComponentIdentifier());
+				
+				IResultListener	crl	= new CollectionResultListener(childs.length, new DelegationResultListener(ret));
+				for(int i=0; !ret.isDone() && i<childs.length; i++)
 				{
-					IExternalAccess ex = (IExternalAccess)cms.getExternalAccess(childs[i]);
-					res.add(ex);
+					cms.getExternalAccess(childs[i]).addResultListener(crl);
 				}
-				ret.setResult(res);
 			}
 		}, adapter));
 		

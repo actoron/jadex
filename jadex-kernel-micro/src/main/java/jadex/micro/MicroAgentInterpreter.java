@@ -15,6 +15,7 @@ import jadex.commons.ChangeEvent;
 import jadex.commons.Future;
 import jadex.commons.IChangeListener;
 import jadex.commons.IFuture;
+import jadex.commons.concurrent.CollectionResultListener;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
@@ -645,29 +646,13 @@ public class MicroAgentInterpreter implements IComponentInstance
 			public void resultAvailable(Object source, Object result)
 			{
 				IComponentManagementService cms = (IComponentManagementService)result;
-				final IComponentIdentifier[] childs = cms.getChildren(adapter.getComponentIdentifier());
-				final List res = new ArrayList();
+				IComponentIdentifier[] childs = cms.getChildren(getAgentAdapter().getComponentIdentifier());
 				
-				for(int i=0; i<childs.length; i++)
+				IResultListener	crl	= new CollectionResultListener(childs.length, new DelegationResultListener(ret));
+				for(int i=0; !ret.isDone() && i<childs.length; i++)
 				{
-					final int cnt = i;
-					cms.getExternalAccess(childs[i]).addResultListener(new IResultListener()
-					{
-						public void resultAvailable(Object source, Object result)
-						{
-							res.add(result);
-							if(cnt==childs.length-1)
-								ret.setResult(res);
-						}
-						
-						public void exceptionOccurred(Object source, Exception exception)
-						{
-							ret.setException(exception);
-						}
-					});
+					cms.getExternalAccess(childs[i]).addResultListener(crl);
 				}
-				if(childs.length==0)
-					ret.setResult(null);
 			}
 		});
 		

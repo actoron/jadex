@@ -10,7 +10,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 
 /**
@@ -429,7 +428,7 @@ public abstract class NestedServiceContainer extends BasicServiceContainer
 		
 		return finished;
 	}
-	
+
 	/**
 	 *  Get the string representation.
 	 *  @return The string representation.

@@ -1,13 +1,7 @@
 package jadex.application.model;
 
-import jadex.application.runtime.IApplication;
-import jadex.javaparser.IValueFetcher;
-import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
-
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  *  Component instance representation. 
@@ -43,9 +37,6 @@ public class MComponentInstance
 	
 	/** The list of contained arguments. */
 	protected List arguments;
-	
-	/** The argument parser. */
-	protected JavaCCExpressionParser parser;
 	
 	//-------- constructors --------
 	
@@ -208,28 +199,6 @@ public class MComponentInstance
 	/**
 	 *  Get the number of components to start.
 	 *  @return The number.
-	 */
-	// todo: hack, remove clock somehow
-	public int getNumber(IApplication context, ClassLoader classloader, IValueFetcher fetcher)
-	{
-//		SimpleValueFetcher fetcher = new SimpleValueFetcher();
-//		fetcher.setValue("$platform", context.getServiceContainer());
-//		fetcher.setValue("$args", context.getArguments());
-//		fetcher.setValue("$results", context.getResults());
-//		fetcher.setValue("$clock", clock);
-
-		String[] imports = context.getApplicationType().getAllImports();
-		if(parser==null)
-			parser = new JavaCCExpressionParser();
-			
-		Object val = numbertext!=null? parser.parseExpression(numbertext, imports, null, classloader).getValue(fetcher): null;
-		
-		return val instanceof Integer? ((Integer)val).intValue(): 1;
-	}
-	
-	/**
-	 *  Get the number of components to start.
-	 *  @return The number.
 	 * /
 	public int getNumber()
 	{
@@ -261,42 +230,6 @@ public class MComponentInstance
 	public List getMArguments()
 	{
 		return this.arguments;
-	}
-	
-	/**
-	 *  Get the arguments.
-	 *  @return The arguments as a map of name-value pairs.
-	 */
-	// todo: hack, remove clock somehow
-	public Map getArguments(IApplication context, ClassLoader classloader, IValueFetcher fetcher)
-	{
-		Map ret = null;
-
-		if(arguments!=null)
-		{
-			ret = new HashMap();
-
-//			SimpleValueFetcher fetcher = new SimpleValueFetcher();
-//			fetcher.setValue("$platform", context.getServiceContainer());
-//			fetcher.setValue("$args", context.getArguments());
-//			fetcher.setValue("$results", context.getResults());
-//			fetcher.setValue("$clock", clock);
-
-			String[] imports = context.getApplicationType().getAllImports();
-			for(int i=0; i<arguments.size(); i++)
-			{
-				MArgument p = (MArgument)arguments.get(i);
-				String valtext = p.getValue();
-				
-				if(parser==null)
-					parser = new JavaCCExpressionParser();
-				
-				Object val = parser.parseExpression(valtext, imports, null, classloader).getValue(fetcher);
-				ret.put(p.getName(), val);
-			}
-		}
-		
-		return ret;
 	}
 	
 	/**

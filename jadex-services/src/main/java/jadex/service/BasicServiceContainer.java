@@ -33,7 +33,7 @@ public class BasicServiceContainer implements  IServiceProvider, IServiceContain
 	/** The platform name. */
 	protected String name;
 
-	//-------- aconstructors --------
+	//-------- constructors --------
 
 	/**
 	 *  Create a new service container.
@@ -321,19 +321,10 @@ public class BasicServiceContainer implements  IServiceProvider, IServiceContain
 		// Stop the services.
 		if(services!=null && services.size()>0)
 		{
-			Object[] sers = services.values().toArray();
-			
 			List allservices = new ArrayList();
 			for(Iterator it=services.values().iterator(); it.hasNext(); )
 			{
-				Collection tmp = (Collection)it.next();
-				if(tmp != null)
-				{
-					for(Iterator it2 = tmp.iterator(); it2.hasNext();)
-					{
-						allservices.add(it2.next());
-					}
-				}
+				allservices.addAll((Collection)it.next());
 			}
 			
 //			System.out.println("all services: "+allservices);

@@ -17,6 +17,17 @@ import java.util.Map;
  */
 public class Future implements IFuture
 {
+	//-------- constants --------
+	
+	/** A caller is queued for suspension. */
+	protected final String	CALLER_QUEUED	= "queued";
+	
+	/** A caller is resumed. */
+	protected final String	CALLER_RESUMED	= "resumed";
+	
+	/** A caller is suspended. */
+	protected final String	CALLER_SUSPENDED	= "suspended";
+	
 	//-------- attributes --------
 	
 	/** The result. */
@@ -92,7 +103,7 @@ public class Future implements IFuture
 	//        		caller = new ThreadSuspendable(this);
 	     
 //	    	   	System.out.println(this+" suspend: "+caller);
-	    	   	callers.put(caller, Boolean.FALSE);
+	    	   	callers.put(caller, CALLER_QUEUED);
 	    	   	suspend = true;
 	    	}
     	}
@@ -102,13 +113,15 @@ public class Future implements IFuture
     	{
     		if(suspend)
     		{
-    			boolean resumed = ((Boolean)callers.get(caller)).booleanValue();
-    			if(!resumed)
+    			Object	state	= callers.get(caller);
+    			if(CALLER_QUEUED.equals(state))
     			{
+    	    	   	callers.put(caller, CALLER_SUSPENDED);
 //    				System.out.println(this+" caller suspending: "+caller+" "+mon);
     				caller.suspend(timeout);
 //    				System.out.println(this+" caller awoke: "+caller+" "+mon);
     			}
+    			// else already resumed.
     		}
     	}
     	
@@ -130,14 +143,17 @@ public class Future implements IFuture
      *  Listener notifications occur on calling thread of this method.
      *  @param exception The exception.
      */
-    public synchronized void setException(Exception exception)
+    public void	setException(Exception exception)
     {
-    	if(resultavailable)
-    		throw new RuntimeException();
-    	
-//    	System.out.println(this+" setResult: "+result);
-    	this.exception = exception;
-    	resultavailable = true;
+    	synchronized(this)
+		{
+        	if(resultavailable)
+        		throw new RuntimeException();
+        	
+//        	System.out.println(this+" setResult: "+result);
+        	this.exception = exception;
+        	resultavailable = true;			
+		}
     	
     	resume();
     }
@@ -147,14 +163,17 @@ public class Future implements IFuture
      *  Listener notifications occur on calling thread of this method.
      *  @param result The result.
      */
-    public synchronized void setResult(Object result)
+    public void	setResult(Object result)
     {
-    	if(resultavailable)
-    		throw new RuntimeException();
-    	
-//    	System.out.println(this+" setResult: "+result);
-    	this.result = result;
-    	resultavailable = true;
+    	synchronized(this)
+		{
+        	if(resultavailable)
+        		throw new RuntimeException();
+        	
+//        	System.out.println(this+" setResult: "+result);
+        	this.result = result;
+        	resultavailable = true;			
+		}
     	
     	resume();
     }
@@ -164,17 +183,26 @@ public class Future implements IFuture
 	 */
 	protected void resume()
 	{
-		for(Iterator it=callers.keySet().iterator(); it.hasNext(); )
-    	{
-    		ISuspendable caller = (ISuspendable)it.next();
-    		Object mon = caller.getMonitor()!=null? caller.getMonitor(): caller;
-//    		System.out.println(this+" resume: "+caller+" "+mon);
-    		synchronized(mon)
-			{
-    			callers.put(caller, Boolean.TRUE);
-    			caller.resume();
-			}
-    	}
+		synchronized(this)
+		{
+			for(Iterator it=callers.keySet().iterator(); it.hasNext(); )
+	    	{
+	    		ISuspendable caller = (ISuspendable)it.next();
+	    		Object mon = caller.getMonitor()!=null? caller.getMonitor(): caller;
+	//    		System.out.println(this+" resume: "+caller+" "+mon);
+	    		synchronized(mon)
+				{
+	    			Object	state	= callers.get(caller);
+	    			if(CALLER_SUSPENDED.equals(state))
+	    			{
+	    				// Only reactivate thread when previously suspended.
+	    				caller.resume();
+	    			}
+	    			callers.put(caller, CALLER_RESUMED);
+				}
+	    	}
+		}
+		
     	for(int i=0; i<listeners.size(); i++)
     	{
     		notifyListener((IResultListener)listeners.get(i));

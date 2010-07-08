@@ -19,7 +19,6 @@ import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.collection.SCollection;
-import jadex.commons.concurrent.CounterResultListener;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
@@ -33,7 +32,6 @@ import jadex.service.library.ILibraryService;
 import jadex.standalone.StandaloneComponentAdapter;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -718,7 +716,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 			StandaloneComponentAdapter adapter;
 			StandaloneComponentAdapter pad = null;
 			CMSComponentDescription desc;
-			boolean shutdown = false;
+//			boolean shutdown = false;
 			synchronized(adapters)
 			{
 				synchronized(descs)
@@ -734,8 +732,8 @@ public class ComponentManagementService implements IComponentManagementService, 
 					desc.setState(IComponentDescription.STATE_TERMINATED);
 					if(desc.isDaemon())
 						daemons--;
-					if((autoshutdown && adapters.size()-daemons==0) || desc.isMaster())
-						shutdown = true;
+//					if((autoshutdown && adapters.size()-daemons==0) || desc.isMaster())
+//						shutdown = true;
 					
 					ccs.remove(cid);
 					

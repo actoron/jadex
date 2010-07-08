@@ -1,20 +1,13 @@
 package jadex.application.bootstrap;
 
 import jadex.application.ApplicationComponentFactory;
-import jadex.application.runtime.impl.Application;
 import jadex.base.fipa.CMSComponentDescription;
 import jadex.base.fipa.ComponentIdentifier;
-import jadex.bridge.ComponentTerminatedException;
-import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentFactory;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.ILoadableComponentModel;
-import jadex.service.IServiceContainer;
-import jadex.service.IServiceProvider;
 import jadex.standalone.StandaloneComponentAdapter;
-
-import java.util.logging.Logger;
 
 /**
  *  Starter class for  
@@ -32,19 +25,14 @@ public class Starter
 		long starttime = System.currentTimeMillis();
 		
 		// Create an instance of the platform.
-		// Hack as long as no loader is present.
-		ClassLoader cl = Starter.class.getClassLoader();
-
 		IComponentFactory fac = new ApplicationComponentFactory(null);
 		ILoadableComponentModel model = fac.loadModel("jadex/application/bootstrap/Platform.application.xml", null, null);
 //		System.out.println("Model: "+model);
 		IComponentIdentifier cid = new ComponentIdentifier("root@platform");
-		
 		CMSComponentDescription desc = new CMSComponentDescription(cid, null, null, false, false);
 		StandaloneComponentAdapter adapter = new StandaloneComponentAdapter(desc);
 		IComponentInstance instance = fac.createComponentInstance(adapter, model, null, null, null);
 		adapter.setComponent(instance, model);
-//		IApplicationExternalAccess ea = new ExternalAccess((Application)instance);
 //		System.out.println("Instance: "+instance);
 		
 		// Initiate first step of root component (i.e. platform).
