@@ -12,7 +12,7 @@ public interface IServiceProvider
 	 *  @param type The class.
 	 *  @return The corresponding services.
 	 */
-	public IFuture	getServices(ISearchManager manager, IVisitDecider visit, IResultSelector result);
+	public IFuture	getServices(ISearchManager manager, IVisitDecider decider, IResultSelector selector);
 	
 	/**
 	 *  Get the parent service container.

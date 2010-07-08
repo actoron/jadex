@@ -8,12 +8,10 @@ import jadex.commons.concurrent.IResultListener;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  *  A service container is a simple infrastructure for a collection of
@@ -31,97 +29,55 @@ public class BasicServiceContainer implements  IServiceProvider, IServiceContain
 	protected Map services;
 	
 	/** The platform name. */
-	protected String name;
+	protected Object id;
 
 	//-------- constructors --------
 
 	/**
 	 *  Create a new service container.
 	 */
-	public BasicServiceContainer(String name)
+	public BasicServiceContainer(Object id)
 	{
-		this.name = name;
+		this.id = id;
 	}
 	
 	//-------- interface methods --------
 	
 	/**
-	 *  Get a platform service.
+	 *  Get all services of a typ.
 	 *  @param type The class.
-	 *  @return The corresponding platform services.
+	 *  @return The corresponding services.
 	 */
-	public IFuture getServices(Class type, IVisitDecider decider)
+	public IFuture	getServices(ISearchManager manager, IVisitDecider decider, IResultSelector selector)
 	{
-		Future ret = new Future();
-		
-		if(decider.searchNode(null, this, false) && services!=null)
-		{
-			Collection sers = (Collection)services.get(type);
-			ret.setResult(sers==null? Collections.EMPTY_SET: sers);
-		}
-		else
-		{
-			ret.setResult(null);
-		}
-
-		return ret;
-	}
-
-	/**
-	 *  Get a platform service.
-	 *  @param name The name.
-	 *  @return The corresponding platform service.
-	 * /
-	public IFuture getService(Class type, String name)
-	{
-		Future ret = new Future();
-		
-		Object res	= null;
-		Map tmp = getServiceMap(type);
-		if(tmp != null)
-			res = tmp.get(name);
-//		if(ret == null)
-//			throw new RuntimeException("Service not found");
-		
-		ret.setResult(res);
-		return ret;
-	}*/
-
-	
-	/**
-	 *  Get the first declared platform service of a given type.
-	 *  @param type The type.
-	 *  @return The corresponding platform service.
-	 */
-	public IFuture getService(Class type,  IVisitDecider decider)
-	{
-		Future ret = new Future();
-		
-		if(decider.searchNode(null, this, false) && services!=null)
-		{
-			Collection sers = (Collection)services.get(type);
-			ret.setResult(sers!=null && sers.size()>0? sers.iterator().next(): null);
-		}
-		else
-		{
-			ret.setResult(null);
-		}
-
-		return ret;
+		return manager.searchServices(this, decider, selector, services);
 	}
 	
 	/**
-	 *  Get the available service types.
-	 *  @return The service types.
+	 *  Get the parent service container.
+	 *  @return The parent container.
 	 */
-	public IFuture getServicesTypes(IVisitDecider decider)
+	public IFuture	getParent()
 	{
-		Future ret = new Future();
-		
-		ret.setResult(decider.searchNode(null, this, false) && services!=null? new Class[0]: 
-			(Class[])services.keySet().toArray(new Class[services.size()]));
-		
-		return ret;
+		return new Future(null);
+	}
+	
+	/**
+	 *  Get the children container.
+	 *  @return The children container.
+	 */
+	public IFuture	getChildren()
+	{
+		return new Future(null);
+	}
+	
+	/**
+	 *  Get the globally unique id of the provider.
+	 *  @return The id of this provider.
+	 */
+	public Object	getId()
+	{
+		return id;
 	}
 	
 	//-------- methods --------
@@ -131,7 +87,7 @@ public class BasicServiceContainer implements  IServiceProvider, IServiceContain
 	 *  Does NOT start the service automatically.
 	 *  If under the same name and type a service was contained,
 	 *  the old one is removed and shutdowned.
-	 *  @param name The name.
+	 *  @param id The name.
 	 *  @param service The service.
 	 */
 	public IFuture addService(Class type, Object service)
@@ -155,7 +111,7 @@ public class BasicServiceContainer implements  IServiceProvider, IServiceContain
 
 	/**
 	 *  Removes a service from the platform (shutdowns also the service).
-	 *  @param name The name.
+	 *  @param id The name.
 	 *  @param service The service.
 	 */
 	public IFuture removeService(Class type, Object service)
@@ -201,67 +157,7 @@ public class BasicServiceContainer implements  IServiceProvider, IServiceContain
 		return ret;
 	}
 	
-	/**
-	 *  Get a service map for a type.
-	 *  @param type The type.
-	 */
-	public IFuture getServiceOfType(Class type, Set visited)
-	{
-		Future ret = new Future();
-		
-		if((visited==null || !visited.contains(getName())) && services!=null)
-		{
-			Collection sers = (Collection)services.get(type);
-			ret.setResult(sers!=null && sers.size()>0? sers.iterator().next(): null);
-		}
-		else
-		{
-			ret.setResult(null);
-		}
-
-		if(visited!=null && !visited.contains(getName()))
-		{
-			visited.add(getName());
-		}
-
-		return ret;
-	}
-	
-	/**
-	 *  Get a service map for a type.
-	 *  @param type The type.
-	 */
-	public IFuture getServicesOfType(Class type, Set visited)
-	{
-		Future ret = new Future();
-		
-		if((visited==null || !visited.contains(getName())) && services!=null)
-		{
-			ret.setResult(services.get(type));
-		}
-		else
-		{
-			ret.setResult(null);
-		}
-
-		if(visited!=null && !visited.contains(getName()))
-		{
-			visited.add(getName());
-		}
-
-		return ret;
-	}
-	
 	//-------- internal methods --------
-	
-	/**
-	 *  Get the name of the platform
-	 *  @return The name of this platform.
-	 */
-	public String getName()
-	{
-		return name;
-	}
 	
 	/**
 	 *  Start the service.
@@ -376,6 +272,15 @@ public class BasicServiceContainer implements  IServiceProvider, IServiceContain
 		}
 		
 		return ret;
+	}
+	
+	/**
+	 *  Get the string representation.
+	 *  @return The string representation.
+	 */
+	public String toString()
+	{
+		return "BasicServiceContainer(name="+getId()+")";
 	}
 	
 }

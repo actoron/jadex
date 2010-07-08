@@ -101,7 +101,7 @@ public class MApplicationInstance
 
 	/**
 	 *  Set the argument default value.
-	 *  @param name The name.
+	 *  @param id The name.
 	 *  @param defval The default value.
 	 */
 	public void addMArgument(MArgument argument)

@@ -65,7 +65,7 @@ public abstract class NestedServiceContainer extends BasicServiceContainer
 	/**
 	 *  Get the available service types.
 	 *  @return The service types.
-	 */
+	 * /
 	public IFuture getServicesTypes(IVisitDecider decider)
 	{
 		System.out.println("search services: "+this+" "+decider);
@@ -96,12 +96,12 @@ public abstract class NestedServiceContainer extends BasicServiceContainer
 		// todo: parent and children
 		
 		return ret;
-	}
+	}*/
 	
 	/**
 	 *  Get a services for a type.
 	 *  @param type The type.
-	 */
+	 * /
 	public IFuture getServices(final Class type, final IVisitDecider decider)
 	{
 		System.out.println("search services: "+this+" "+type+" "+decider);
@@ -231,7 +231,7 @@ public abstract class NestedServiceContainer extends BasicServiceContainer
 		});
 		
 		return ret;
-	}
+	}*/
 	
 	/**
 	 *  Check if the last result is available and then set it on future.
@@ -253,7 +253,7 @@ public abstract class NestedServiceContainer extends BasicServiceContainer
 	/**
 	 *  Get a service for a type.
 	 *  @param type The type.
-	 */
+	 * /
 	public IFuture getService(final Class type, final IVisitDecider decider)
 	{
 //		System.out.println("search 1: "+this+" "+type+" "+visited);
@@ -283,11 +283,11 @@ public abstract class NestedServiceContainer extends BasicServiceContainer
 		});
 		
 		return ret;
-	}
+	}*/
 	
 	/**
 	 *  Check parent for locating a service.
-	 */
+	 * /
 	protected void checkParent(final Class type, final IVisitDecider decider, final Future ret, final boolean[] results)
 	{
 //		System.out.println("Check parent: "+type+", "+visited+", "+SUtil.arrayToString(results));
@@ -340,11 +340,11 @@ public abstract class NestedServiceContainer extends BasicServiceContainer
 				}
 			}
 		});
-	}
+	}*/
 	
 	/**
 	 *  Check the children for locating a service.
-	 */
+	 * /
 	protected void checkChildren(final Class type, final IVisitDecider decider, final Future ret, final boolean[] results)
 	{
 		getChildren().addResultListener(new IResultListener()
@@ -400,7 +400,7 @@ public abstract class NestedServiceContainer extends BasicServiceContainer
 				checkAndSetResult(results, ret, null, exception);
 			}
 		});	
-	}
+	}*/
 	
 	/**
 	 *  Check if the last result is available and then set it on future.
@@ -429,12 +429,5 @@ public abstract class NestedServiceContainer extends BasicServiceContainer
 		return finished;
 	}
 
-	/**
-	 *  Get the string representation.
-	 *  @return The string representation.
-	 */
-	public String toString()
-	{
-		return "NestedServiceContainer(name="+getName()+")";
-	}
+	
 }
