@@ -38,8 +38,16 @@ public class SequentialSearchManager implements ISearchManager
 	 */
 	public SequentialSearchManager()
 	{
-		this.up	= true;
-		this.down	= true;
+		this(true, true);
+	}
+	
+	/**
+	 *  Create a new search manager.
+	 */
+	public SequentialSearchManager(boolean up, boolean down)
+	{
+		this.up	= up;
+		this.down	= down;
 	}
 	
 	//-------- ISearchManager interface --------

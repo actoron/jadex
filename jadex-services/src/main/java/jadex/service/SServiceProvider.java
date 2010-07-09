@@ -7,7 +7,8 @@ import jadex.commons.IFuture;
  */
 public class SServiceProvider
 {
-	protected static ISearchManager treemanager = new UpwardsSearchManager();
+	protected static ISearchManager treemanager = new SequentialSearchManager();
+	protected static ISearchManager upwardsmanager = new SequentialSearchManager(true, false);
 	protected static IVisitDecider abortdecider = new DefaultVisitDecider();
 	protected static IVisitDecider contdecider = new DefaultVisitDecider(false);
 	
@@ -29,5 +30,15 @@ public class SServiceProvider
 	public static IFuture getServices(IServiceProvider provider, Class type)
 	{
 		return provider.getServices(treemanager, contdecider, new TypeResultSelector(type));
+	}
+
+	/**
+	 *  Get one service of a type and only search upwards (parents).
+	 *  @param type The class.
+	 *  @return The corresponding service.
+	 */
+	public static IFuture getServiceUpwards(IServiceProvider provider, Class type)
+	{
+		return provider.getServices(upwardsmanager, abortdecider, new TypeResultSelector(type));
 	}
 }
