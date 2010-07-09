@@ -14,6 +14,7 @@ import jadex.commons.Properties;
 import jadex.commons.SGUI;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
+import jadex.service.SServiceProvider;
 import jadex.tools.common.ComponentTreeTable;
 import jadex.tools.common.GuiProperties;
 import jadex.tools.common.jtreetable.DefaultTreeTableNode;
@@ -92,7 +93,7 @@ public class ConversationPlugin extends AbstractJCCPlugin
 			DefaultTreeTableNode node = (DefaultTreeTableNode)agents.getTreetable().getTree().getSelectionPath().getLastPathComponent();
 			final IComponentDescription desc = (IComponentDescription)node.getUserObject();
 			// Use clone, as added component id might be modified by user.
-			jcc.getServiceContainer().getService(IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
+			SServiceProvider.getServiceUpwards(jcc.getServiceContainer(), IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
 			{
 				public void customResultAvailable(Object source, Object result)
 				{
@@ -170,7 +171,7 @@ public class ConversationPlugin extends AbstractJCCPlugin
 			}
 		});
 
-		jcc.getServiceContainer().getService(IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
+		SServiceProvider.getServiceUpwards(jcc.getServiceContainer(), IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
 		{
 			public void customResultAvailable(Object source, Object result)
 			{

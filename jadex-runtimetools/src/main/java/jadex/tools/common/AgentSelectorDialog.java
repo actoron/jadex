@@ -9,6 +9,7 @@ import jadex.commons.SGUI;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.commons.jtable.ResizeableTableHeader;
+import jadex.service.SServiceProvider;
 import jadex.tools.common.jtreetable.DefaultTreeTableNode;
 
 import java.awt.BorderLayout;
@@ -192,7 +193,7 @@ public class AgentSelectorDialog
 		// Todo: fetch agent lists from added remote platforms.
 		
 		// todo: show errors in option panel
-		agent.getServiceProvider().getService(IComponentManagementService.class).addResultListener(new DefaultResultListener()
+		SServiceProvider.getServiceUpwards(agent.getServiceProvider(), IComponentManagementService.class).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
@@ -273,7 +274,7 @@ public class AgentSelectorDialog
 	 */
 	protected void refreshSelectedTree()
 	{
-		agent.getServiceProvider().getService(IComponentManagementService.class).addResultListener(new DefaultResultListener()
+		SServiceProvider.getServiceUpwards(agent.getServiceProvider(), IComponentManagementService.class).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
@@ -486,7 +487,7 @@ public class AgentSelectorDialog
 						if(val instanceof IComponentDescription)
 						{
 							// Use clone to keep original aid unchanged.
-							agent.getServiceProvider().getService(IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
+							SServiceProvider.getServiceUpwards(agent.getServiceProvider(), IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
 							{
 								public void customResultAvailable(Object source, Object result)
 								{
@@ -533,7 +534,7 @@ public class AgentSelectorDialog
 					final Object val = ((DefaultTreeTableNode)tree.getTreetable().getTree().getPathForRow(tree.getTreetable().getSelectionModel().getMinSelectionIndex()).getLastPathComponent()).getUserObject();
 					if(val instanceof IComponentDescription)
 					{
-						agent.getServiceProvider().getService(IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
+						SServiceProvider.getServiceUpwards(agent.getServiceProvider(), IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
 						{
 							public void customResultAvailable(Object source, Object result)
 							{
@@ -550,7 +551,7 @@ public class AgentSelectorDialog
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				agent.getServiceProvider().getService(IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
+				SServiceProvider.getServiceUpwards(agent.getServiceProvider(), IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
 				{
 					public void customResultAvailable(Object source, Object result)
 					{

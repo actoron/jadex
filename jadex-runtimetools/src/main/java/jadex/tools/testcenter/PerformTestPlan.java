@@ -8,7 +8,9 @@ import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.commons.IFuture;
+import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
+import jadex.service.SServiceProvider;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -36,14 +38,15 @@ public class PerformTestPlan extends Plan
 		getLogger().info("Performing testcase: "+testcase.getType());
 		long	starttime	= getTime();
 
-		IComponentManagementService	ces	= (IComponentManagementService)getScope().getServiceProvider().getService(IComponentManagementService.class).get(this);
+		IComponentManagementService	cms	= (IComponentManagementService)SServiceProvider.getServiceUpwards(getScope().getServiceProvider(),
+			IComponentManagementService.class).get(this);
 		try
 		{
 //			SyncResultListener	id	= new SyncResultListener();
 			SyncResultListener	res	= new SyncResultListener();
 			Map	args	= new HashMap();
 			args.put("timeout", timeout);
-			IFuture ret = ces.createComponent(null, testcase.getType(), new CreationInfo(args, getComponentIdentifier()), res);
+			IFuture ret = cms.createComponent(null, testcase.getType(), new CreationInfo(args, getComponentIdentifier()), res);
 //			testagent	= (IComponentIdentifier)id.waitForResult();
 			testagent = (IComponentIdentifier)ret.get(this);
 			Testcase	result	= (Testcase)((Map)res.waitForResult(timeout)).get("testresults");
@@ -60,7 +63,7 @@ public class PerformTestPlan extends Plan
 		}
 		catch(TimeoutException te)
 		{
-			ces.destroyComponent(testagent);
+			cms.destroyComponent(testagent);
 			testagent	= null;
 			testcase.setReports(new TestReport[]{new TestReport("answer", 
 				"Test center report", false, "Test agent did not finish in time.")});
@@ -70,7 +73,7 @@ public class PerformTestPlan extends Plan
 			cause.printStackTrace();
 			if(testagent!=null)
 			{
-				ces.destroyComponent(testagent);
+				cms.destroyComponent(testagent);
 				testagent	= null;
 			}
 			testcase.setReports(new TestReport[]{new TestReport("creation", "Test center report", 
@@ -87,7 +90,8 @@ public class PerformTestPlan extends Plan
 	{
 		if(testagent!=null)
 		{
-			IComponentManagementService	cms	= (IComponentManagementService)getScope().getServiceProvider().getService(IComponentManagementService.class);
+			IComponentManagementService	cms	= (IComponentManagementService)SServiceProvider.getServiceUpwards(getScope().getServiceProvider(),
+				IComponentManagementService.class).get(this);
 			// Empty listener avoids failures printed to console.
 			cms.destroyComponent(testagent).get(this);
 			/*, new IResultListener()

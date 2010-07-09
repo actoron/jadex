@@ -1,5 +1,6 @@
 package jadex.tools.jcc;
 
+import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IVersionInfo;
 import jadex.commons.Properties;
 import jadex.commons.Property;
@@ -8,6 +9,7 @@ import jadex.commons.SUtil;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.service.IServiceContainer;
 import jadex.service.PropertiesXMLHelper;
+import jadex.service.SServiceProvider;
 import jadex.service.library.ILibraryService;
 import jadex.tools.common.GuiProperties;
 import jadex.tools.common.RememberOptionMessage;
@@ -256,7 +258,8 @@ public class ControlCenter implements IControlCenter
 //		System.out.println("openPro: "+Thread.currentThread().getName());
 		
 		// Read project properties
-		container.getService(ILibraryService.class).addResultListener(new SwingDefaultResultListener()
+		SServiceProvider.getService(container, ILibraryService.class)
+			.addResultListener(new SwingDefaultResultListener()
 		{
 			public void customResultAvailable(Object source, Object result)
 			{
@@ -414,7 +417,8 @@ public class ControlCenter implements IControlCenter
 					AbstractJCCPlugin.addSubproperties(props, plugin.getName(), plugprops);
 			}
 
-			container.getService(ILibraryService.class).addResultListener(new SwingDefaultResultListener(window)
+			SServiceProvider.getService(container, ILibraryService.class)
+				.addResultListener(new SwingDefaultResultListener(window)
 			{
 				public void customResultAvailable(Object source, Object result)
 				{

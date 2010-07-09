@@ -11,6 +11,7 @@ import jadex.commons.SGUI;
 import jadex.commons.SUtil;
 import jadex.commons.ThreadSuspendable;
 import jadex.commons.concurrent.SwingDefaultResultListener;
+import jadex.service.SServiceProvider;
 
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -302,7 +303,7 @@ public class FipaMessagePanel extends JPanel
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				agent.getServiceProvider().getService(IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
+				SServiceProvider.getServiceUpwards(agent.getServiceProvider(), IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
 				{
 					public void customResultAvailable(Object source, Object result)
 					{
@@ -329,7 +330,7 @@ public class FipaMessagePanel extends JPanel
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				agent.getServiceProvider().getService(IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
+				SServiceProvider.getServiceUpwards(agent.getServiceProvider(), IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
 				{
 					public void customResultAvailable(Object source, Object result)
 					{
@@ -356,7 +357,7 @@ public class FipaMessagePanel extends JPanel
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				agent.getServiceProvider().getService(IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
+				SServiceProvider.getServiceUpwards(agent.getServiceProvider(), IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
 				{
 					public void customResultAvailable(Object source, Object result)
 					{

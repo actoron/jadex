@@ -17,6 +17,7 @@ import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
+import jadex.service.SServiceProvider;
 import jadex.service.library.ILibraryService;
 import jadex.tools.common.AgentSelectorDialog;
 import jadex.tools.common.ElementPanel;
@@ -239,7 +240,8 @@ public class StarterPanel extends JPanel
 			{
 				if(model!=null)
 				{
-					StarterPanel.this.starter.getJCC().getServiceContainer().getService(ILibraryService.class).addResultListener(new SwingDefaultResultListener()
+					SServiceProvider.getService(starter.getJCC().getServiceContainer(),
+						ILibraryService.class).addResultListener(new SwingDefaultResultListener()
 					{
 						public void customResultAvailable(Object source, Object result)
 						{
@@ -389,7 +391,8 @@ public class StarterPanel extends JPanel
 			public void actionPerformed(ActionEvent e)
 			{
 				final IComponentIdentifier paid = (IComponentIdentifier)parent;
-				StarterPanel.this.starter.getJCC().getServiceContainer().getService(IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
+				SServiceProvider.getServiceUpwards(starter.getJCC().getServiceContainer(),
+					IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
 				{
 					public void customResultAvailable(Object source, Object result)
 					{
@@ -869,7 +872,8 @@ public class StarterPanel extends JPanel
 	 */
 	protected void createArguments()
 	{
-		StarterPanel.this.starter.getJCC().getServiceContainer().getService(ILibraryService.class).addResultListener(new SwingDefaultResultListener()
+		SServiceProvider.getService(starter.getJCC().getServiceContainer(),
+			ILibraryService.class).addResultListener(new SwingDefaultResultListener()		
 		{
 			public void customResultAvailable(Object source, Object result)
 			{

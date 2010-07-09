@@ -9,6 +9,7 @@ import jadex.commons.IFuture;
 import jadex.commons.SReflect;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
+import jadex.service.SServiceProvider;
 import jadex.service.library.ILibraryService;
 import jadex.tools.common.plugin.IControlCenter;
 import jadex.tools.debugger.common.ObjectInspectorDebuggerPanel;
@@ -77,7 +78,7 @@ public class DebuggerMainPanel extends JSplitPane
 		this.setOneTouchExpandable(true);
 		setDividerLocation(150);
 		
-		jcc.getServiceContainer().getService(IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
+		SServiceProvider.getServiceUpwards(jcc.getServiceContainer(), IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
 		{
 			public void customResultAvailable(Object source, Object result)
 			{
@@ -125,7 +126,8 @@ public class DebuggerMainPanel extends JSplitPane
 										final Map props2 = (Map)result;
 										if(props2!=null && props2.containsKey(KEY_DEBUGGER_PANELS))
 										{
-											DebuggerMainPanel.this.jcc.getServiceContainer().getService(ILibraryService.class).addResultListener(new SwingDefaultResultListener()
+											SServiceProvider.getService(DebuggerMainPanel.this.jcc.getServiceContainer(), ILibraryService.class)
+												.addResultListener(new SwingDefaultResultListener()
 											{
 												public void customResultAvailable(Object source, Object result)
 												{
@@ -176,7 +178,7 @@ public class DebuggerMainPanel extends JSplitPane
 					{
 						step.setEnabled(false);
 						run.setEnabled(false);
-						DebuggerMainPanel.this.jcc.getServiceContainer().getService(IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
+						SServiceProvider.getServiceUpwards(DebuggerMainPanel.this.jcc.getServiceContainer(), IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
 						{
 							public void customResultAvailable(Object source, Object result)
 							{
@@ -209,7 +211,8 @@ public class DebuggerMainPanel extends JSplitPane
 						step.setEnabled(false);
 						run.setEnabled(false);
 						stepmode.setSelected(false);
-						DebuggerMainPanel.this.jcc.getServiceContainer().getService(IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
+						SServiceProvider.getServiceUpwards(DebuggerMainPanel.this.jcc.getServiceContainer(), IComponentManagementService.class)
+							.addResultListener(new SwingDefaultResultListener()
 						{
 							public void customResultAvailable(Object source, Object result)
 							{
@@ -253,7 +256,8 @@ public class DebuggerMainPanel extends JSplitPane
 				{
 					public void actionPerformed(ActionEvent e)
 					{
-						DebuggerMainPanel.this.jcc.getServiceContainer().getService(IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
+						SServiceProvider.getServiceUpwards(DebuggerMainPanel.this.jcc.getServiceContainer(), IComponentManagementService.class)
+							.addResultListener(new SwingDefaultResultListener()
 						{
 							public void customResultAvailable(Object source, Object result)
 							{

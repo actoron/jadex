@@ -9,6 +9,7 @@ import jadex.commons.SGUI;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.service.IServiceContainer;
+import jadex.service.SServiceProvider;
 import jadex.tools.common.CombiIcon;
 import jadex.tools.common.ComponentTreeTable;
 import jadex.tools.common.ComponentTreeTableNodeType;
@@ -216,7 +217,8 @@ public class RuleProfilerPlugin extends AbstractJCCPlugin	implements IComponentL
 //		jcc.addAgentListListener(this);
 		// todo: ?! is this ok?
 		
-		jcc.getServiceContainer().getService(IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
+		SServiceProvider.getServiceUpwards(jcc.getServiceContainer(),
+			IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
 		{
 			public void customResultAvailable(Object source, Object result)
 			{

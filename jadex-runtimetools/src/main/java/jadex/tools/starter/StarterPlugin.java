@@ -16,6 +16,7 @@ import jadex.commons.ThreadSuspendable;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
+import jadex.service.SServiceProvider;
 import jadex.tools.common.CombiIcon;
 import jadex.tools.common.ComponentTreeTable;
 import jadex.tools.common.ComponentTreeTableNodeType;
@@ -337,7 +338,8 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 		
 		// todo: ?! is this ok?
 		
-		jcc.getServiceContainer().getService(IComponentManagementService.class).addResultListener(new DefaultResultListener()
+		SServiceProvider.getServiceUpwards(jcc.getServiceContainer(),
+			IComponentManagementService.class).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
@@ -502,7 +504,8 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 		public void actionPerformed(ActionEvent e)
 		{
 			final TreePath[] paths = components.getTreetable().getTree().getSelectionPaths();
-			getJCC().getServiceContainer().getService(IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
+			SServiceProvider.getServiceUpwards(jcc.getServiceContainer(),
+				IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()			
 			{
 				public void customResultAvailable(Object source, Object result)
 				{
@@ -557,7 +560,8 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 		{
 			final TreePath[] paths = components.getTreetable().getTree().getSelectionPaths();
 			
-			getJCC().getServiceContainer().getService(IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
+			SServiceProvider.getServiceUpwards(jcc.getServiceContainer(),
+				IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
 			{
 				public void customResultAvailable(Object source, Object result)
 				{
@@ -617,7 +621,8 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 				final DefaultTreeTableNode node = (DefaultTreeTableNode)paths[i].getLastPathComponent();
 				if(node!=null && node.getUserObject() instanceof IComponentDescription)
 				{
-					getJCC().getServiceContainer().getService(IComponentManagementService.class).addResultListener(new IResultListener()
+					SServiceProvider.getServiceUpwards(jcc.getServiceContainer(),
+						IComponentManagementService.class).addResultListener(new DefaultResultListener()
 					{
 						public void resultAvailable(Object source, Object result)
 						{
@@ -951,7 +956,8 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 	 */
 	public void createComponent(final String type, final String name, final String configname, final Map arguments, final boolean suspend, final IResultListener killlistener)
 	{
-		getJCC().getServiceContainer().getService(IComponentManagementService.class).addResultListener(new DefaultResultListener()
+		SServiceProvider.getServiceUpwards(jcc.getServiceContainer(),
+			IComponentManagementService.class).addResultListener(new DefaultResultListener()		
 		{
 			public void resultAvailable(Object source, Object result)
 			{

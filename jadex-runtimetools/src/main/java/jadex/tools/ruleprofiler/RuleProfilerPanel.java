@@ -6,6 +6,7 @@ import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.commons.SGUI;
+import jadex.commons.ThreadSuspendable;
 import jadex.commons.TreeExpansionHandler;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.commons.jtable.ResizeableTableHeader;
@@ -13,6 +14,8 @@ import jadex.rules.state.IProfiler;
 import jadex.rules.state.IProfiler.ProfilingInfo;
 import jadex.rules.tools.profiler.Profiler;
 import jadex.rules.tools.stateviewer.OAVTreeModel;
+import jadex.service.SServiceProvider;
+import jadex.service.library.ILibraryService;
 import jadex.tools.common.GuiProperties;
 import jadex.tools.common.jtreetable.AbstractTreeTableModel;
 import jadex.tools.common.jtreetable.DefaultTreeTableModel;
@@ -75,7 +78,8 @@ public class RuleProfilerPanel	extends JPanel
 		this.agent	= agent;
 		this.observed	= observed;
 
-		agent.getServiceProvider().getService(IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
+		SServiceProvider.getServiceUpwards(agent.getServiceProvider(),
+			IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
 		{
 			public void customResultAvailable(Object source, Object result)
 			{

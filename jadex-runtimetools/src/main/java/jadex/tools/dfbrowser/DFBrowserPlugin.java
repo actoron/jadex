@@ -7,15 +7,14 @@ import jadex.bdi.runtime.IEAGoal;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentManagementService;
-import jadex.commons.IFuture;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SGUI;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.DefaultResultListener;
-import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.service.IServiceContainer;
+import jadex.service.SServiceProvider;
 import jadex.tools.common.ComponentTreeTable;
 import jadex.tools.common.GuiProperties;
 import jadex.tools.common.jtreetable.DefaultTreeTableNode;
@@ -181,9 +180,10 @@ public class DFBrowserPlugin extends AbstractJCCPlugin
 		// Listeners
 //		jcc.addAgentListListener(this);
 
-		jcc.getServiceContainer().getService(IComponentManagementService.class).addResultListener(new DefaultResultListener()
+		SServiceProvider.getServiceUpwards(jcc.getServiceContainer(), IComponentManagementService.class)
+			.addResultListener(new SwingDefaultResultListener()		
 		{
-			public void resultAvailable(Object source, Object result)
+			public void customResultAvailable(Object source, Object result)
 			{
 				IComponentManagementService cms = (IComponentManagementService)result;
 				cms.getComponentDescriptions().addResultListener(new DefaultResultListener()
@@ -451,7 +451,8 @@ public class DFBrowserPlugin extends AbstractJCCPlugin
 		if(getSelectedDF() != null)
 		{
 			IServiceContainer sc = (IServiceContainer)((AgentControlCenter)getJCC()).getAgent().getServiceProvider();
-			sc.getService(IDF.class).addResultListener(new SwingDefaultResultListener()
+			SServiceProvider.getService(jcc.getServiceContainer(), IDF.class)
+				.addResultListener(new SwingDefaultResultListener()
 			{
 				public void customResultAvailable(Object source, Object result)
 				{

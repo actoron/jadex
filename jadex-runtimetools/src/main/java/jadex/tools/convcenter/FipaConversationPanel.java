@@ -21,6 +21,7 @@ import jadex.commons.SUtil;
 import jadex.commons.ThreadSuspendable;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
+import jadex.service.SServiceProvider;
 import jadex.service.library.ILibraryService;
 import jadex.tools.common.FipaMessagePanel;
 import jadex.tools.common.GuiProperties;
@@ -821,7 +822,7 @@ public class FipaConversationPanel extends JSplitPane
 	{
 		final Future ret = new Future();
 		
-		agent.getServiceProvider().getService(ILibraryService.class).addResultListener(new DefaultResultListener()
+		SServiceProvider.getService(agent.getServiceProvider(), ILibraryService.class).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
@@ -928,7 +929,7 @@ public class FipaConversationPanel extends JSplitPane
 					
 					if(last)
 					{
-						agent.getServiceProvider().getService(ILibraryService.class).addResultListener(new DefaultResultListener()
+						SServiceProvider.getService(agent.getServiceProvider(), ILibraryService.class).addResultListener(new DefaultResultListener()
 						{
 							public void resultAvailable(Object source, Object result)
 							{

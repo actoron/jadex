@@ -13,8 +13,11 @@ import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SGUI;
 import jadex.commons.SReflect;
+import jadex.commons.ThreadSuspendable;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
+import jadex.commons.concurrent.SwingDefaultResultListener;
+import jadex.service.SServiceProvider;
 import jadex.service.clock.IClockService;
 import jadex.service.library.ILibraryService;
 import jadex.tools.comanalyzer.chart.ChartPanel;
@@ -202,7 +205,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 	 */
 	public void shutdown()
 	{
-		getJCC().getServiceContainer().getService(IMessageService.class).addResultListener(new DefaultResultListener()
+		SServiceProvider.getService(getJCC().getServiceContainer(), IComponentManagementService.class).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
@@ -480,7 +483,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 
 //		jcc.addAgentListListener(this);
 		
-		jcc.getServiceContainer().getService(IComponentManagementService.class).addResultListener(new DefaultResultListener()
+		SServiceProvider.getService(getJCC().getServiceContainer(), IComponentManagementService.class).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
@@ -532,7 +535,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 		applyAgentFilter(dummy);
 		componentlist.addAgent(dummy);
 		
-		getJCC().getServiceContainer().getService(IMessageService.class).addResultListener(new DefaultResultListener()
+		SServiceProvider.getService(getJCC().getServiceContainer(), IMessageService.class).addResultListener(new DefaultResultListener()
 		{
 			
 			public void resultAvailable(Object source, Object result)
@@ -1021,7 +1024,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 	 */
 	protected boolean isDuplicate(IMessageAdapter newmsg, IComponentIdentifier rec)
 	{
-		IClockService cs = (IClockService)((AgentControlCenter)getJCC()).getServiceContainer().getService(IClockService.class);
+		IClockService cs = (IClockService)SServiceProvider.getService(getJCC().getServiceContainer(), IClockService.class).get(new ThreadSuspendable());
 		
 		boolean ret = false;
 		Message[] messages = messagelist.getMessages();
@@ -1074,8 +1077,8 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 		if(sender == null)
 		{
 			// add to agent tree table
-			IComponentManagementService ces = (IComponentManagementService)jcc.getServiceContainer()
-				.getService(IComponentManagementService.class);
+			IComponentManagementService ces = (IComponentManagementService)SServiceProvider
+				.getService(jcc.getServiceContainer(), IComponentManagementService.class).get(new ThreadSuspendable());
 			sender = new Component(ces.createComponentDescription(sid, null, null, "unknown-component-type", null));
 			sender.setState(Component.STATE_DEAD);
 			sender.addMessage(message);
@@ -1094,8 +1097,8 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 		Component receiver = componentlist.getAgent(rid);
 		if(receiver == null)
 		{
-			IComponentManagementService ces = (IComponentManagementService)jcc.getServiceContainer()
-			.getService(IComponentManagementService.class);
+			IComponentManagementService ces = (IComponentManagementService)SServiceProvider
+				.getService(jcc.getServiceContainer(), IComponentManagementService.class).get(new ThreadSuspendable());
 			receiver = new Component(ces.createComponentDescription(rid, null, null, "unknown-component-type", null));
 			receiver.setState(Component.STATE_DEAD);
 			receiver.addMessage(message);
@@ -1458,44 +1461,52 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 			int returnVal = fileDialog.showSaveDialog(null);
 			if(returnVal == JFileChooser.APPROVE_OPTION)
 			{
-				String fileName = fileDialog.getSelectedFile().getAbsolutePath();
+				final String fileName = fileDialog.getSelectedFile().getAbsolutePath();
 //				List message_maps = new ArrayList();
 //				Message[] messages = messagelist.getMessages();
 //				for(int i = 0; i < messages.length; i++)
 //				{
 //					message_maps.add(messages[i].getParameters());
 //				}
-				ClassLoader cl = ((ILibraryService)jcc.getServiceContainer().getService(ILibraryService.class)).getClassLoader();
-				String xml = JavaWriter.objectToXML(new Object[]{componentlist.getAgents(), messagelist.getMessages()}, cl);
 
-				byte buffer[] = xml.getBytes();
-				File f = new File(fileName);
-				FileOutputStream out = null;
+				SServiceProvider.getService(jcc.getServiceContainer(), ILibraryService.class).addResultListener(new SwingDefaultResultListener()
+				{
+					public void customResultAvailable(Object source, Object result)
+					{
+						ClassLoader cl = ((ILibraryService)result).getClassLoader();
+						String xml = JavaWriter.objectToXML(new Object[]{componentlist.getAgents(), messagelist.getMessages()}, cl);
 
-				try
-				{
-					out = new FileOutputStream(f);
-					out.write(buffer);
-				}
-				catch(FileNotFoundException e1)
-				{
-					e1.printStackTrace();
-				}
-				catch(IOException e1)
-				{
-					e1.printStackTrace();
-				}
-				finally
-				{
-					try
-					{
-						if(out != null)
-							out.close();
+						byte buffer[] = xml.getBytes();
+						File f = new File(fileName);
+						FileOutputStream out = null;
+
+						try
+						{
+							out = new FileOutputStream(f);
+							out.write(buffer);
+						}
+						catch(FileNotFoundException e1)
+						{
+							e1.printStackTrace();
+						}
+						catch(IOException e1)
+						{
+							e1.printStackTrace();
+						}
+						finally
+						{
+							try
+							{
+								if(out != null)
+									out.close();
+							}
+							catch(IOException e1)
+							{
+							}
+						}
 					}
-					catch(IOException e1)
-					{
-					}
-				}
+				});		
+				
 			}
 		}
 	};
@@ -1560,20 +1571,28 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 //						addMessage(m);
 //					}
 //				}
-				ClassLoader cl = ((ILibraryService)jcc.getServiceContainer().getService(ILibraryService.class)).getClassLoader();
-				Object[] stored = (Object[])JavaReader.objectFromXML(xml, cl);
-				
-				componentlist.removeAllAgents();
-				Component[] agents = (Component[])stored[0];
-				for(int i=0; i<agents.length; i++)
-					componentlist.addAgent(agents[i]);
-				
-				messagelist.removeAllMessages();
-				Message[] messages = (Message[])stored[1];
-				for(int i=0; i<messages.length; i++)
-					messagelist.addMessage(messages[i]);
-				
-				messagelist.fireMessagesAdded(messages);
+				final String sxml = xml;
+				SServiceProvider.getService(jcc.getServiceContainer(), ILibraryService.class).addResultListener(new SwingDefaultResultListener()
+				{
+					public void customResultAvailable(Object source, Object result)
+					{
+						ClassLoader cl = ((ILibraryService)result).getClassLoader();
+						
+						Object[] stored = (Object[])JavaReader.objectFromXML(sxml, cl);
+						
+						componentlist.removeAllAgents();
+						Component[] agents = (Component[])stored[0];
+						for(int i=0; i<agents.length; i++)
+							componentlist.addAgent(agents[i]);
+						
+						messagelist.removeAllMessages();
+						Message[] messages = (Message[])stored[1];
+						for(int i=0; i<messages.length; i++)
+							messagelist.addMessage(messages[i]);
+						
+						messagelist.fireMessagesAdded(messages);
+					}
+				});
 			}
 		}
 	};

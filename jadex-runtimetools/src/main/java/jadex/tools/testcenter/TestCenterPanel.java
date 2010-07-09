@@ -7,6 +7,7 @@ import jadex.bdi.runtime.IEAGoal;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IGoalListener;
 import jadex.bridge.ComponentTerminatedException;
+import jadex.bridge.IComponentManagementService;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SGUI;
@@ -14,6 +15,7 @@ import jadex.commons.SUtil;
 import jadex.commons.ThreadSuspendable;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
+import jadex.service.SServiceProvider;
 import jadex.service.library.ILibraryService;
 import jadex.tools.common.BrowserPane;
 import jadex.tools.common.EditableList;
@@ -317,7 +319,8 @@ public class TestCenterPanel extends JSplitPane
 				if(loadsavechooser.showDialog(SGUI.getWindowParent(TestCenterPanel.this)
 					, "Save")==JFileChooser.APPROVE_OPTION)
 				{
-					plugin.getJCC().getServiceContainer().getService(ILibraryService.class).addResultListener(new SwingDefaultResultListener()
+					SServiceProvider.getService(plugin.getJCC().getServiceContainer(),
+						ILibraryService.class).addResultListener(new SwingDefaultResultListener()
 					{
 						public void customResultAvailable(Object source, Object result)
 						{
@@ -346,16 +349,7 @@ public class TestCenterPanel extends JSplitPane
 			}
 		});
 
-		SwingDefaultResultListener d = new SwingDefaultResultListener()
-		{
-			
-			@Override
-			public void customResultAvailable(Object source, Object result)
-			{
-				// TODO Auto-generated method stub
-				
-			}
-		};
+		
 		
 		load.addActionListener(new ActionListener()
 		{
@@ -364,7 +358,8 @@ public class TestCenterPanel extends JSplitPane
 				if(loadsavechooser.showDialog(SGUI.getWindowParent(TestCenterPanel.this)
 					, "Load")==JFileChooser.APPROVE_OPTION)
 				{
-					plugin.getJCC().getServiceContainer().getService(ILibraryService.class).addResultListener(new SwingDefaultResultListener()
+					SServiceProvider.getServiceUpwards(plugin.getJCC().getServiceContainer(),
+						ILibraryService.class).addResultListener(new SwingDefaultResultListener()
 					{
 						public void customResultAvailable(Object source, Object result) 
 						{

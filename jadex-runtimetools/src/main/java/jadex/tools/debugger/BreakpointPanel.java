@@ -12,6 +12,7 @@ import jadex.commons.ThreadSuspendable;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.rules.tools.common.TableSorter;
 import jadex.service.IServiceContainer;
+import jadex.service.SServiceProvider;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -81,7 +82,7 @@ public class BreakpointPanel extends JPanel	implements IBreakpointPanel
 		this.description	= description;
 		this.container	= container;
 				
-		container.getService(IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
+		SServiceProvider.getServiceUpwards(container, IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
 		{
 			public void customResultAvailable(Object source, Object result)
 			{
