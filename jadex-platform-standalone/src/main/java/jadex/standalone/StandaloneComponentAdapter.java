@@ -21,8 +21,7 @@ import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IExecutable;
 import jadex.commons.concurrent.IResultListener;
-import jadex.service.IServiceContainer;
-import jadex.service.IServiceProvider;
+import jadex.service.SServiceProvider;
 import jadex.service.execution.IExecutionService;
 import jadex.standalone.service.ComponentManagementService;
 
@@ -53,6 +52,9 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 
 	/** The component identifier. */
 	protected IComponentIdentifier cid;
+
+	/** The component identifier. */
+	protected IExternalAccess parent;
 
 	/** The component instance. */
 	protected IComponentInstance component;
@@ -103,9 +105,10 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	 *  Create a new component adapter.
 	 *  Uses the thread pool for executing the component.
 	 */
-	public StandaloneComponentAdapter(IComponentDescription desc)
+	public StandaloneComponentAdapter(IComponentDescription desc, IExternalAccess parent)
 	{
 		this.desc	= desc;
+		this.parent	= parent;
 		this.cid	= desc.getName();
 		this.ext_entries = Collections.synchronizedList(new ArrayList());
 	}
@@ -149,7 +152,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 		// Change back to suspended, when previously waiting.
 		if(IComponentDescription.STATE_WAITING.equals(desc.getState()))
 		{
-			component.getServiceProvider().getService(IComponentManagementService.class).addResultListener(new DefaultResultListener()
+			SServiceProvider.getServiceUpwards(component.getServiceProvider(), IComponentManagementService.class).addResultListener(new DefaultResultListener()
 			{
 				public void resultAvailable(Object source, Object result)
 				{
@@ -164,7 +167,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 			|| IComponentDescription.STATE_SUSPENDED.equals(desc.getState()))	// Hack!!! external entries must also be executed in suspended state.
 		{
 			//System.out.println("wakeup called: "+state);
-			component.getServiceProvider().getService(IExecutionService.class).addResultListener(new DefaultResultListener()
+			SServiceProvider.getService(component.getServiceProvider(), IExecutionService.class).addResultListener(new DefaultResultListener()
 			{
 				public void resultAvailable(Object source, Object result)
 				{
@@ -304,7 +307,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	{
 		final Future ret = new Future();
 		
-		component.getServiceProvider().getService(IComponentManagementService.class).addResultListener(new DefaultResultListener()
+		SServiceProvider.getServiceUpwards(component.getServiceProvider(), IComponentManagementService.class).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
@@ -470,7 +473,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 		{
 			if(component.isAtBreakpoint(desc.getBreakpoints()))
 			{
-				component.getServiceProvider().getService(IComponentManagementService.class).addResultListener(new DefaultResultListener()
+				SServiceProvider.getServiceUpwards(component.getServiceProvider(), IComponentManagementService.class).addResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object source, Object result)
 					{
@@ -488,7 +491,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 			// Set state to waiting before step. (may be reset by wakup() call in step)
 			if(dostep && IComponentDescription.STATE_SUSPENDED.equals(desc.getState()))
 			{
-				component.getServiceProvider().getService(IComponentManagementService.class).addResultListener(new DefaultResultListener()
+				SServiceProvider.getServiceUpwards(component.getServiceProvider(), IComponentManagementService.class).addResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object source, Object result)
 					{
@@ -512,7 +515,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 				// Set back to suspended if components is still waiting but wants to execute again.
 				if(again && IComponentDescription.STATE_WAITING.equals(desc.getState()))
 				{
-					component.getServiceProvider().getService(IComponentManagementService.class).addResultListener(new DefaultResultListener()
+					SServiceProvider.getServiceUpwards(component.getServiceProvider(), IComponentManagementService.class).addResultListener(new DefaultResultListener()
 					{
 						public void resultAvailable(Object source, Object result)
 						{
@@ -531,7 +534,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 		{
 			if(component.isAtBreakpoint(desc.getBreakpoints()))
 			{
-				component.getServiceProvider().getService(IComponentManagementService.class).addResultListener(new DefaultResultListener()
+				SServiceProvider.getServiceUpwards(component.getServiceProvider(), IComponentManagementService.class).addResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object source, Object result)
 					{
@@ -564,7 +567,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 		getLogger().severe("Fatal error, component '"+cid+"' will be removed.");
 			
 		// Remove component from platform.
-		component.getServiceProvider().getService(IComponentManagementService.class).addResultListener(new DefaultResultListener()
+		SServiceProvider.getServiceUpwards(component.getServiceProvider(), IComponentManagementService.class).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{

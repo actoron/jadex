@@ -24,6 +24,7 @@ import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.service.IService;
 import jadex.service.IServiceContainer;
+import jadex.service.SServiceProvider;
 import jadex.service.clock.IClockService;
 import jadex.service.clock.ITimedObject;
 import jadex.service.clock.ITimer;
@@ -119,7 +120,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 		this.descs = Collections.synchronizedMap(SCollection.createLinkedHashMap());
 		this.ccs = SCollection.createLinkedHashMap();
 //		this.children	= SCollection.createMultiCollection();
-		this.logger = Logger.getLogger(container.getName()+".cms");
+		this.logger = Logger.getLogger(container.getId()+".cms");
 		this.listeners = SCollection.createMultiCollection();
 		this.killresultlisteners = Collections.synchronizedMap(SCollection.createHashMap());
 		
@@ -158,13 +159,13 @@ public class ComponentManagementService implements IComponentManagementService, 
 		*/
 			
 		// Load the model with fitting factory.
-		container.getService(ILibraryService.class).addResultListener(new DefaultResultListener()
+		SServiceProvider.getService(container, ILibraryService.class).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
 				final ILibraryService ls = (ILibraryService)result;
 				
-				container.getServices(IComponentFactory.class).addResultListener(new IResultListener()
+				SServiceProvider.getServices(container, IComponentFactory.class).addResultListener(new IResultListener()
 				{
 					public void resultAvailable(Object source, Object result)
 					{
@@ -204,14 +205,14 @@ public class ComponentManagementService implements IComponentManagementService, 
 								}
 								else
 								{
-									cid = new ComponentIdentifier(name+"@"+container.getName()); // Hack?!
+									cid = new ComponentIdentifier(name+"@"+container.getId()); // Hack?!
 									if(adapters.containsKey(cid))
 									{
 										ret.setException(new RuntimeException("Component name already exists on platform: "+cid));
 										return;
 									}
 									// todo: hmm adresses may be set too late? use cached message service?
-									container.getService(IMessageService.class).addResultListener(new DefaultResultListener()
+									SServiceProvider.getService(container, IMessageService.class).addResultListener(new DefaultResultListener()
 									{
 										public void resultAvailable(Object source, Object result)
 										{
@@ -250,7 +251,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 								}
 							}
 		
-							adapter = new StandaloneComponentAdapter(ad);
+							adapter = new StandaloneComponentAdapter(ad, info.g);
 							adapters.put(cid, adapter);
 		
 //							if(cinfo.getParent()!=null)
