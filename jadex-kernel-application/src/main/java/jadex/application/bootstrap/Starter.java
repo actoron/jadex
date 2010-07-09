@@ -30,7 +30,7 @@ public class Starter
 //		System.out.println("Model: "+model);
 		IComponentIdentifier cid = new ComponentIdentifier("root@platform");
 		CMSComponentDescription desc = new CMSComponentDescription(cid, null, null, false, false);
-		StandaloneComponentAdapter adapter = new StandaloneComponentAdapter(desc);
+		StandaloneComponentAdapter adapter = new StandaloneComponentAdapter(desc, null);
 		IComponentInstance instance = fac.createComponentInstance(adapter, model, null, null, null);
 		adapter.setComponent(instance, model);
 //		System.out.println("Instance: "+instance);

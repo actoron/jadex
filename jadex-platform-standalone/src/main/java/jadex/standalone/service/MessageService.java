@@ -1,6 +1,5 @@
 package jadex.standalone.service;
 
-import jadex.base.AbstractPlatform;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.ContentException;
 import jadex.bridge.DefaultMessageAdapter;
@@ -22,6 +21,7 @@ import jadex.commons.concurrent.IExecutable;
 import jadex.commons.concurrent.IResultListener;
 import jadex.service.IService;
 import jadex.service.IServiceContainer;
+import jadex.service.SServiceProvider;
 import jadex.service.clock.IClockService;
 import jadex.service.execution.IExecutionService;
 import jadex.standalone.StandaloneComponentAdapter;
@@ -116,8 +116,6 @@ public class MessageService implements IMessageService, IService
 //	public void sendMessage(Map msg, MessageType type, IComponentIdentifier sender, ClassLoader cl)
 	public void sendMessage(final Map msg, final MessageType type, final IComponentAdapter adapter, final ClassLoader cl)
 	{
-		final Future ret = new Future();
-		
 		IComponentIdentifier sender = adapter.getComponentIdentifier();
 		if(sender==null)
 			throw new RuntimeException("Sender must not be null: "+msg);
@@ -139,7 +137,7 @@ public class MessageService implements IMessageService, IService
 		Object senddate = msgcopy.get(sd);
 		if(senddate==null)
 		{
-			container.getService(IClockService.class).addResultListener(new DefaultResultListener()
+			SServiceProvider.getService(container, IClockService.class).addResultListener(new DefaultResultListener()
 			{
 				public void resultAvailable(Object source, Object result)
 				{
@@ -409,7 +407,7 @@ public class MessageService implements IMessageService, IService
 		}
 		else
 		{
-			container.getService(IClockService.class).addResultListener(new IResultListener()
+			SServiceProvider.getService(container, IClockService.class).addResultListener(new IResultListener()
 			{
 				public void resultAvailable(Object source, Object result)
 				{
@@ -517,7 +515,7 @@ public class MessageService implements IMessageService, IService
 		final MessageType	messagetype	= getMessageType(type);
 		final Map	decoded	= new HashMap();	// Decoded messages cached by class loader to avoid decoding the same message more than once, when the same class loader is used.
 		
-		container.getService(IComponentManagementService.class).addResultListener(new DefaultResultListener()
+		SServiceProvider.getServiceUpwards(container, IComponentManagementService.class).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
@@ -638,7 +636,7 @@ public class MessageService implements IMessageService, IService
 		public synchronized void addMessage(Map message, String type, IComponentIdentifier[] receivers)
 		{
 			messages.add(new Object[]{message, type, receivers});
-			container.getService(IExecutionService.class).addResultListener(new DefaultResultListener()
+			SServiceProvider.getService(container, IExecutionService.class).addResultListener(new DefaultResultListener()
 			{
 				public void resultAvailable(Object source, Object result)
 				{
@@ -689,7 +687,7 @@ public class MessageService implements IMessageService, IService
 		public synchronized void addMessage(Map message, String type, IComponentIdentifier[] receivers)
 		{
 			messages.add(new Object[]{message, type, receivers});
-			container.getService(IExecutionService.class).addResultListener(new DefaultResultListener()
+			SServiceProvider.getService(container, IExecutionService.class).addResultListener(new DefaultResultListener()
 			{
 				public void resultAvailable(Object source, Object result)
 				{

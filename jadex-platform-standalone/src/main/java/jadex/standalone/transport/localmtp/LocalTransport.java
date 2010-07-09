@@ -6,6 +6,7 @@ import jadex.bridge.IMessageService;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.service.IServiceContainer;
+import jadex.service.SServiceProvider;
 import jadex.standalone.transport.ITransport;
 
 import java.util.List;
@@ -55,7 +56,7 @@ public class LocalTransport implements ITransport
 	 */
 	public void start()
 	{
-		container.getService(IMessageService.class).addResultListener(new DefaultResultListener()
+		SServiceProvider.getService(container, IMessageService.class).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
@@ -90,7 +91,7 @@ public class LocalTransport implements ITransport
 		
 		for(int i=0; i<recs.length; i++)
 		{
-			if(recs[i].getPlatformName().equals(container.getName()))
+			if(recs[i].getPlatformName().equals(container.getId()))
 				todeliver.add(recs[i]);
 			else
 				undelivered.add(recs[i]);

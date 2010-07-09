@@ -17,6 +17,7 @@ import jadex.commons.collection.IndexMap;
 import jadex.commons.concurrent.IResultListener;
 import jadex.service.IService;
 import jadex.service.IServiceContainer;
+import jadex.service.SServiceProvider;
 import jadex.service.clock.IClockService;
 
 import java.util.ArrayList;
@@ -337,7 +338,7 @@ public class DirectoryFacilitatorService implements IDF, IService
 	{
 		final Future	ret	= new Future();
 		final boolean[]	services	= new boolean[2];
-		platform.getService(IComponentManagementService.class).addResultListener(new IResultListener()
+		SServiceProvider.getServiceUpwards(platform, IComponentManagementService.class).addResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
@@ -357,7 +358,7 @@ public class DirectoryFacilitatorService implements IDF, IService
 				ret.setException(exception);
 			}
 		});
-		platform.getService(IClockService.class).addResultListener(new IResultListener()
+		SServiceProvider.getService(platform, IClockService.class).addResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{

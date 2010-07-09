@@ -11,6 +11,7 @@ import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IThreadPool;
 import jadex.service.IServiceContainer;
+import jadex.service.SServiceProvider;
 import jadex.service.clock.IClockService;
 import jadex.service.clock.ITimedObject;
 import jadex.service.clock.ITimer;
@@ -165,12 +166,12 @@ public class NIOTCPTransport implements ITransport
 			
 			// Start receiver thread.
 			
-			container.getService(ILibraryService.class).addResultListener(new DefaultResultListener()
+			SServiceProvider.getService(container, ILibraryService.class).addResultListener(new DefaultResultListener()
 			{
 				public void resultAvailable(Object source, Object result)
 				{
 					libservice = (ILibraryService)result;
-					container.getService(ThreadPoolService.class).addResultListener(new DefaultResultListener()
+					SServiceProvider.getService(container, ThreadPoolService.class).addResultListener(new DefaultResultListener()
 					{
 						public void resultAvailable(Object source, Object result)
 						{
@@ -225,7 +226,7 @@ public class NIOTCPTransport implements ITransport
 											else if(key.isValid() && key.isReadable())
 											{
 												final NIOTCPInputConnection con = (NIOTCPInputConnection)key.attachment();
-												container.getService(IMessageService.class).addResultListener(new DefaultResultListener()
+												SServiceProvider.getService(container, IMessageService.class).addResultListener(new DefaultResultListener()
 												{
 													public void resultAvailable(Object source, Object result)
 													{
@@ -532,7 +533,7 @@ public class NIOTCPTransport implements ITransport
 			/*if(timer!=null)
 				timer.cancel();
 			timer = platform.getClock().createTimer(System.currentTimeMillis()+MAX_KEEPALIVE, this);*/
-			container.getService(IClockService.class).addResultListener(new DefaultResultListener()
+			SServiceProvider.getService(container, IClockService.class).addResultListener(new DefaultResultListener()
 			{
 				public void resultAvailable(Object source, Object result)
 				{

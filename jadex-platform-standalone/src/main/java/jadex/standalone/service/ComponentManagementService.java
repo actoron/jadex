@@ -25,9 +25,6 @@ import jadex.commons.concurrent.IResultListener;
 import jadex.service.IService;
 import jadex.service.IServiceContainer;
 import jadex.service.SServiceProvider;
-import jadex.service.clock.IClockService;
-import jadex.service.clock.ITimedObject;
-import jadex.service.clock.ITimer;
 import jadex.service.execution.IExecutionService;
 import jadex.service.library.ILibraryService;
 import jadex.standalone.StandaloneComponentAdapter;
@@ -192,9 +189,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 						// Create id and adapter.
 						
 						final ComponentIdentifier cid;
-						final StandaloneComponentAdapter adapter;
 						final CMSComponentDescription ad;
-						StandaloneComponentAdapter pad	= null;
 						synchronized(adapters)
 						{
 							synchronized(descs)
@@ -249,28 +244,19 @@ public class ComponentManagementService implements IComponentManagementService, 
 		//							children.put(parent, cid);
 									padesc.addChild(cid);
 								}
-							}
-		
-							adapter = new StandaloneComponentAdapter(ad, info.g);
-							adapters.put(cid, adapter);
-		
-//							if(cinfo.getParent()!=null)
-							{
-								pad	= (StandaloneComponentAdapter)adapters.get(getParent(cinfo));
-							}
+							}		
 						}
 		
+						final StandaloneComponentAdapter pad	= (StandaloneComponentAdapter)adapters.get(getParent(cinfo));
 						if(pad!=null)
 						{
-		//					final IResultListener	rl	= listener;
 							final IComponentFactory	cf	= factory;
-							final StandaloneComponentAdapter	fpad	= pad;
 							pad.getComponentInstance().getExternalAccess().addResultListener(new IResultListener()
 							{
 								public void resultAvailable(Object source, Object result)
 								{
 									createComponentInstance(cinfo.getConfiguration(), cinfo.getArguments(), cinfo.isSuspend(), ret,
-										killlistener, cf, lmodel, cid, adapter, fpad, ad, (IExternalAccess)result);
+										killlistener, cf, lmodel, cid, pad, ad, (IExternalAccess)result);
 								}
 								
 								public void exceptionOccurred(Object source, Exception exception)
@@ -282,7 +268,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 						else
 						{
 							createComponentInstance(cinfo.getConfiguration(), cinfo.getArguments(), cinfo.isSuspend(), ret,
-								killlistener, factory, lmodel, cid, adapter, null, ad, null);
+								killlistener, factory, lmodel, cid, null, ad, null);
 						}
 					}
 					
@@ -304,9 +290,12 @@ public class ComponentManagementService implements IComponentManagementService, 
 		boolean suspend, Future ret,
 		final IResultListener killlistener, IComponentFactory factory,
 		ILoadableComponentModel lmodel, final ComponentIdentifier cid,
-		StandaloneComponentAdapter adapter, StandaloneComponentAdapter pad,
+		StandaloneComponentAdapter pad,
 		CMSComponentDescription ad, IExternalAccess parent)
 	{
+		final StandaloneComponentAdapter adapter	= new StandaloneComponentAdapter(ad, parent);
+		adapters.put(cid, adapter);
+
 		// Create the component instance.
 		try
 		{
@@ -978,7 +967,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 	public IComponentIdentifier createComponentIdentifier(String name, boolean local, String[] addresses)
 	{
 		if(local)
-			name = name + "@" + container.getName();
+			name = name + "@" + container.getId();
 		return new ComponentIdentifier(name, addresses, null);		
 	}
 
@@ -1157,7 +1146,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 		{
 			do
 			{
-				ret = new ComponentIdentifier(name+(compcnt++)+"@"+container.getName()); // Hack?!
+				ret = new ComponentIdentifier(name+(compcnt++)+"@"+container.getId()); // Hack?!
 			}
 			while(adapters.containsKey(ret));
 		}
@@ -1247,7 +1236,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 		}
 		
 		final boolean[]	services	= new boolean[2];
-		container.getService(IExecutionService.class).addResultListener(new DefaultResultListener()
+		SServiceProvider.getService(container, IExecutionService.class).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
@@ -1262,7 +1251,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 					ret.setResult(null);
 			}
 		});
-		container.getService(IMessageService.class).addResultListener(new DefaultResultListener()
+		SServiceProvider.getService(container, IMessageService.class).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
@@ -1345,14 +1334,14 @@ public class ComponentManagementService implements IComponentManagementService, 
 	 *  @param comps	The component ids.
 	 *  @param timeout	The time after which to inform the listener anyways.
 	 *  @param listener	The result listener.
-	 */
+	 * /
 	protected void killComponents(final List comps, final long timeout, final IResultListener listener)
 	{
 		if(comps.isEmpty())
 			listener.resultAvailable(this, null);
 		System.out.println("killcomps: "+comps);
 		
-		container.getService(IClockService.class).addResultListener(new IResultListener()
+		SServiceProvider.getService(container, IClockService.class).addResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
@@ -1414,24 +1403,13 @@ public class ComponentManagementService implements IComponentManagementService, 
 					}
 				};
 				
-				container.getService(IComponentManagementService.class).addResultListener(new IResultListener()
+
+				for(int i=0; i < comps.size(); i++)
 				{
-					public void resultAvailable(Object source, Object result)
-					{
-						IComponentManagementService	ces	= (IComponentManagementService)result;
-						for(int i=0; i < comps.size(); i++)
-						{
-							System.out.println("Killing component: "+comps.get(i));
-							CMSComponentDescription desc = (CMSComponentDescription)comps.get(i);
-							ces.destroyComponent(desc.getName()).addResultListener(rl);
-						}
-					}
-					
-					public void exceptionOccurred(Object source, Exception exception)
-					{
-						listener.exceptionOccurred(source, exception);
-					}
-				});
+					System.out.println("Killing component: "+comps.get(i));
+					CMSComponentDescription desc = (CMSComponentDescription)comps.get(i);
+					destroyComponent(desc.getName()).addResultListener(rl);
+				}
 			}
 			
 			public void exceptionOccurred(Object source, Exception exception)
@@ -1439,7 +1417,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 				listener.exceptionOccurred(source, exception);
 			}
 		});
-	}
+	}*/
 	
 	//-------- service handling --------
 	

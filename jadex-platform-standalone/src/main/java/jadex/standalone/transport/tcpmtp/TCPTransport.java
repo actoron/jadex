@@ -11,6 +11,7 @@ import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IThreadPool;
 import jadex.service.IServiceContainer;
+import jadex.service.SServiceProvider;
 import jadex.service.clock.IClockService;
 import jadex.service.clock.ITimedObject;
 import jadex.service.clock.ITimer;
@@ -176,17 +177,17 @@ public class TCPTransport implements ITransport
 			addresses = (String[])addrs.toArray(new String[addrs.size()]);
 			
 			// Start the receiver thread.
-			container.getService(ILibraryService.class).addResultListener(new DefaultResultListener()
+			SServiceProvider.getService(container, ILibraryService.class).addResultListener(new DefaultResultListener()
 			{
 				public void resultAvailable(Object source, Object result)
 				{
 					libservice = (ILibraryService)result;
 
-					container.getService(ThreadPoolService.class).addResultListener(new DefaultResultListener()
+					SServiceProvider.getService(container, ThreadPoolService.class).addResultListener(new DefaultResultListener()
 					{
 						public void resultAvailable(Object source, Object result)
 						{
-							IThreadPool tp = (IThreadPool)result;
+							final IThreadPool tp = (IThreadPool)result;
 							tp.execute(new Runnable()
 							{
 								public void run()
@@ -206,17 +207,11 @@ public class TCPTransport implements ITransport
 											{
 												// Each accepted incoming connection request is handled
 												// in a separate thread in async mode.
-												container.getService(ThreadPoolService.class).addResultListener(new DefaultResultListener()
+												tp.execute(new Runnable()
 												{
-													public void resultAvailable(Object source, Object result)
+													public void run()
 													{
-														((IThreadPool)result).execute(new Runnable()
-														{
-															public void run()
-															{
-																TCPTransport.this.deliverMessages(con);
-															}
-														});
+														TCPTransport.this.deliverMessages(con);
 													}
 												});
 											}
@@ -429,7 +424,7 @@ public class TCPTransport implements ITransport
 	 */
 	protected void deliverMessages(final TCPInputConnection con)
 	{
-		container.getService(IMessageService.class).addResultListener(new DefaultResultListener()
+		SServiceProvider.getService(container, IMessageService.class).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
@@ -496,7 +491,7 @@ public class TCPTransport implements ITransport
 			/*if(timer!=null)
 				timer.cancel();
 			timer = platform.getClock().createTimer(System.currentTimeMillis()+MAX_KEEPALIVE, this);*/
-			container.getService(IClockService.class).addResultListener(new DefaultResultListener()
+			SServiceProvider.getService(container, IClockService.class).addResultListener(new DefaultResultListener()
 			{
 				// Todo: synchronize?
 				public void resultAvailable(Object source, Object result)
