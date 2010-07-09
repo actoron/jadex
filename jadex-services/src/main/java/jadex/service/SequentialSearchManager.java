@@ -6,7 +6,9 @@ import jadex.commons.concurrent.IResultListener;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -16,6 +18,11 @@ import java.util.Map;
  */
 public class SequentialSearchManager implements ISearchManager
 {
+	//-------- constants --------
+	
+	/** Key for current list of children. */
+	protected final String	CURRENT_CHILDREN	= "current-children";
+	
 	//-------- attributes --------
 	
 	/** Flag to activate upwards (parent) searching. */
@@ -48,9 +55,9 @@ public class SequentialSearchManager implements ISearchManager
 	{
 		Future	ret	= new Future();
 		Collection	results	= new ArrayList();
-		Collection	todo	= new HashSet(); // Nodes (children) yet to be processed.
+		Map	todo	= new LinkedHashMap(); // Nodes of which children still to be processed (id->provider).
 		LocalSearchManager	lsm	= new LocalSearchManager(results);
-		processNode(provider, decider, selector, services, ret, results, lsm, todo);
+		processNode(provider, decider, selector, services, ret, results, lsm, todo, up);
 		return ret;
 	}
 	
@@ -60,21 +67,42 @@ public class SequentialSearchManager implements ISearchManager
 	 *  Process a single node (provider).
 	 */
 	protected void processNode(final IServiceProvider provider, final IVisitDecider decider, final IResultSelector selector, final Map services,
-		final Future ret, final Collection results, final LocalSearchManager lsm, final Collection todo)
+		final Future ret, final Collection results, final LocalSearchManager lsm, final Map todo, final boolean up)
 	{
-		if(decider.searchNode(null, provider, results))
+		// If node is to be searched, continue with this node.
+		if(provider!=null && decider.searchNode(null, provider, results))
 		{
+			if(down)
+			{
+				// Child nodes of this node still have to be searched.
+				todo.put(provider.getId(), provider);
+			}
+			
 			provider.getServices(lsm, decider, selector).addResultListener(new IResultListener()
 			{
 				public void resultAvailable(Object source, Object result)
 				{
+					// When searching upwards, continue with parent.
 					if(up)
 					{
-						processParent(provider, decider, selector, services, ret, results, lsm, todo);
+						provider.getParent().addResultListener(new IResultListener()
+						{
+							public void resultAvailable(Object source, Object result)
+							{
+								processNode((IServiceProvider)result, decider, selector, services, ret, results, lsm, todo, up);
+							}
+							
+							public void exceptionOccurred(Object source, Exception exception)
+							{
+								ret.setException(exception);
+							}
+						});
 					}
-					else if(down)
+
+					// Else continue with child nodes from todo list (if any).
+					else
 					{
-						processChildren(provider, decider, selector, services, ret, results, lsm, todo);
+						processChildNodes(decider, selector, services, ret, results, lsm, todo);
 					}
 				}
 				
@@ -84,38 +112,61 @@ public class SequentialSearchManager implements ISearchManager
 				}
 			});
 		}
-		else if(todo.isEmpty())
+		
+		// Else continue with child nodes from todo list (if any).
+		else
 		{
-			ret.setResult(selector.getResult(results));
+			processChildNodes(decider, selector, services, ret, results, lsm, todo);
 		}
 	}
 
 	/**
-	 *  Process the parent of a node (provider).
+	 *  Process child nodes from the todo list.
 	 */
-	protected void processParent(final IServiceProvider provider,
+	protected void processChildNodes(
 			final IVisitDecider decider, final IResultSelector selector,
 			final Map services, final Future ret, final Collection results,
-			final LocalSearchManager lsm, final Collection todo)
+			final LocalSearchManager lsm, final Map todo)
 	{
-		provider.getParent().addResultListener(new IResultListener()
+		// Finished, when no more todo nodes.
+		if(todo.isEmpty())
 		{
-			public void resultAvailable(Object source, Object result)
+			ret.setResult(selector.getResult(results));
+		}
+		
+		// Continue with current list of children (if any)
+		else if(todo.containsKey(CURRENT_CHILDREN))
+		{
+			List	ccs	= (List)todo.get(CURRENT_CHILDREN);
+			IServiceProvider	child	= (IServiceProvider)ccs.remove(0);
+			if(ccs.isEmpty())
 			{
-				if(result!=null && decider.searchNode(null, provider, results))
-				{
-					processNode((IServiceProvider)result, decider, selector, services, ret, results, lsm, todo);
-				}
-				else if(todo.isEmpty())
-				{
-					ret.setResult(selector.getResult(results));
-				}
+				todo.remove(CURRENT_CHILDREN);
 			}
 			
-			public void exceptionOccurred(Object source, Exception exception)
+			// Set 'up' to false, once traversing children has started.
+			processNode(child, decider, selector, services, ret, results, lsm, todo, false);
+		}
+
+		// Else pick entry from todo list and continue with its children.
+		else
+		{
+			Object	next	= todo.keySet().iterator().next();
+			IServiceProvider	provider	= (IServiceProvider)todo.remove(next);
+			provider.getChildren().addResultListener(new IResultListener()
 			{
-				ret.setException(exception);
-			}
-		});
+				public void resultAvailable(Object source, Object result)
+				{
+					List	ccs	= new LinkedList((Collection)result);
+					todo.put(CURRENT_CHILDREN, ccs);
+					processChildNodes(decider, selector, services, ret, results, lsm, todo);
+				}
+				
+				public void exceptionOccurred(Object source, Exception exception)
+				{
+					ret.setException(exception);
+				}
+			});
+		}
 	}
 }
