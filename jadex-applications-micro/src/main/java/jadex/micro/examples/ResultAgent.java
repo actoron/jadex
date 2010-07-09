@@ -4,9 +4,11 @@ import jadex.bridge.Argument;
 import jadex.bridge.CreationInfo;
 import jadex.bridge.IArgument;
 import jadex.bridge.IComponentManagementService;
+import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.micro.MicroAgent;
 import jadex.micro.MicroAgentMetaInfo;
+import jadex.service.SServiceProvider;
 
 /**
  * 
@@ -29,21 +31,27 @@ public class ResultAgent extends MicroAgent
 		{
 			setResultValue("result", "not last: "+getAgentName()+": "+Math.random());
 			
-			IComponentManagementService ces = (IComponentManagementService)getServiceProvider()
-				.getService(IComponentManagementService.class);
-			
-			ces.createComponent(null, getClass().getName()+".class", new CreationInfo(getComponentIdentifier()), createResultListener(new IResultListener()
+			SServiceProvider.getServiceUpwards(getServiceProvider(), IComponentManagementService.class)
+				.addResultListener(createResultListener(new DefaultResultListener()
 			{
 				public void resultAvailable(Object source, Object result)
 				{
-					System.out.println(getAgentName()+" got result: "+result);
-					killAgent();
-				}
+					IComponentManagementService ces = (IComponentManagementService)result;
 				
-				public void exceptionOccurred(Object source, Exception exception)
-				{
-					System.out.println("exception occurred: "+exception);
-					killAgent();
+					ces.createComponent(null, getClass().getName()+".class", new CreationInfo(getComponentIdentifier()), createResultListener(new IResultListener()
+					{
+						public void resultAvailable(Object source, Object result)
+						{
+							System.out.println(getAgentName()+" got result: "+result);
+							killAgent();
+						}
+						
+						public void exceptionOccurred(Object source, Exception exception)
+						{
+							System.out.println("exception occurred: "+exception);
+							killAgent();
+						}
+					}));
 				}
 			}));
 		}

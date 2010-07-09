@@ -9,8 +9,10 @@ import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.IFuture;
 import jadex.commons.SimplePropertyObject;
+import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.micro.IMicroExternalAccess;
+import jadex.service.SServiceProvider;
 
 /**
  *  Dumb prey vision processer.
@@ -28,44 +30,49 @@ public class MicroPreyVisionProcessor	extends	SimplePropertyObject	implements IP
 	 */
 	public void processPercept(final IEnvironmentSpace space, final String type, final Object percept, final IComponentIdentifier agent, final ISpaceObject avatar)
 	{
-		IComponentManagementService ces = (IComponentManagementService)space.getContext().getServiceProvider().getService(IComponentManagementService.class);
-		IFuture ret = ces.getExternalAccess(agent);
-		ret.addResultListener(new IResultListener()
+		SServiceProvider.getServiceUpwards(space.getContext().getServiceProvider(), IComponentManagementService.class).addResultListener(new DefaultResultListener()
 		{
-			public void exceptionOccurred(Object source, Exception exception)
-			{
-				// May happen when agent has been killed concurrently.
-				exception.printStackTrace();
-			}
 			public void resultAvailable(Object source, Object result)
 			{
-				final Space2D	space2d	= (Space2D)space;
-				final IMicroExternalAccess	exta	= (IMicroExternalAccess)result;
-				exta.scheduleStep(new Runnable()
+				IComponentManagementService ces = (IComponentManagementService)result;
+				ces.getExternalAccess(agent).addResultListener(new IResultListener()
 				{
-					public void run()
+					public void exceptionOccurred(Object source, Exception exception)
 					{
-						MicroPreyAgent	mp	= (MicroPreyAgent)exta.getAgent();
-						ISpaceObject	nearfood	= mp.getNearestFood();
-						
-						// Remember new food only if nearer than other known food (if any).
-						if(type.equals("food_seen"))
+						// May happen when agent has been killed concurrently.
+						exception.printStackTrace();
+					}
+					public void resultAvailable(Object source, Object result)
+					{
+						final Space2D	space2d	= (Space2D)space;
+						final IMicroExternalAccess	exta	= (IMicroExternalAccess)result;
+						exta.scheduleStep(new Runnable()
 						{
-							if(nearfood==null
-								|| space2d.getDistance((IVector2)avatar.getProperty(Space2D.PROPERTY_POSITION),
-										(IVector2)nearfood.getProperty(Space2D.PROPERTY_POSITION))
-								.greater(
-									space2d.getDistance((IVector2)avatar.getProperty(Space2D.PROPERTY_POSITION),
-										(IVector2)((ISpaceObject)percept).getProperty(Space2D.PROPERTY_POSITION))))
+							public void run()
 							{
-								mp.setNearestFood((ISpaceObject)percept);
+								MicroPreyAgent	mp	= (MicroPreyAgent)exta.getAgent();
+								ISpaceObject	nearfood	= mp.getNearestFood();
+								
+								// Remember new food only if nearer than other known food (if any).
+								if(type.equals("food_seen"))
+								{
+									if(nearfood==null
+										|| space2d.getDistance((IVector2)avatar.getProperty(Space2D.PROPERTY_POSITION),
+												(IVector2)nearfood.getProperty(Space2D.PROPERTY_POSITION))
+										.greater(
+											space2d.getDistance((IVector2)avatar.getProperty(Space2D.PROPERTY_POSITION),
+												(IVector2)((ISpaceObject)percept).getProperty(Space2D.PROPERTY_POSITION))))
+									{
+										mp.setNearestFood((ISpaceObject)percept);
+									}
+								}
+								// Remove disappeared food from belief.
+								else if(percept.equals(nearfood) && (type.equals("food_out_of_sight") || type.equals("food_eaten")))
+								{
+									mp.setNearestFood(null);
+								}
 							}
-						}
-						// Remove disappeared food from belief.
-						else if(percept.equals(nearfood) && (type.equals("food_out_of_sight") || type.equals("food_eaten")))
-						{
-							mp.setNearestFood(null);
-						}
+						});
 					}
 				});
 			}

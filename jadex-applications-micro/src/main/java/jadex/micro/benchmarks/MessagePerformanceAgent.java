@@ -4,6 +4,7 @@ import jadex.base.fipa.SFipa;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IArgument;
 import jadex.bridge.MessageType;
+import jadex.commons.concurrent.DefaultResultListener;
 import jadex.micro.MicroAgent;
 import jadex.micro.MicroAgentMetaInfo;
 
@@ -30,39 +31,45 @@ public class MessagePerformanceAgent extends MicroAgent
 	 */
 	public void executeBody()
 	{
-		int msgcnt = ((Integer)getArgument("max")).intValue();
-		IComponentIdentifier receiver = getComponentIdentifier();
-		starttime = getTime();
-		
-		System.out.println("Now sending " + msgcnt + " messages to " + receiver);
-		
-		boolean usecodec = ((Boolean)getArgument("codec")).booleanValue();
-		System.out.println("Codec is: "+usecodec);
-		// Send messages.
-		for(int i=1; i<=msgcnt; i++)
+		getTime().addResultListener(createResultListener(new DefaultResultListener()
 		{
-			Map request = new HashMap();
-			request.put(SFipa.PERFORMATIVE, SFipa.INFORM);
-			request.put(SFipa.RECEIVERS, new IComponentIdentifier[]{receiver});
-			request.put(SFipa.REPLY_WITH, "some reply id");
-			
-			if(!usecodec)
-			{	
-				request.put(SFipa.CONTENT, "message: "+i);
-			}
-			else
+			public void resultAvailable(Object source, Object result)
 			{
-				request.put(SFipa.LANGUAGE, SFipa.JADEX_XML);
-				request.put(SFipa.CONTENT, new Message("message: "+i, true));
+				starttime = ((Long)result).longValue();
+				int msgcnt = ((Integer)getArgument("max")).intValue();
+				IComponentIdentifier receiver = getComponentIdentifier();
+				
+				System.out.println("Now sending " + msgcnt + " messages to " + receiver);
+				
+				boolean usecodec = ((Boolean)getArgument("codec")).booleanValue();
+				System.out.println("Codec is: "+usecodec);
+				// Send messages.
+				for(int i=1; i<=msgcnt; i++)
+				{
+					Map request = new HashMap();
+					request.put(SFipa.PERFORMATIVE, SFipa.INFORM);
+					request.put(SFipa.RECEIVERS, new IComponentIdentifier[]{receiver});
+					request.put(SFipa.REPLY_WITH, "some reply id");
+					
+					if(!usecodec)
+					{	
+						request.put(SFipa.CONTENT, "message: "+i);
+					}
+					else
+					{
+						request.put(SFipa.LANGUAGE, SFipa.JADEX_XML);
+						request.put(SFipa.CONTENT, new Message("message: "+i, true));
+					}
+					
+					sendMessage(request, SFipa.FIPA_MESSAGE_TYPE);
+					if(i % 10 == 0)
+					{
+						System.out.print('.');
+						// waitFor(0);
+					}
+				}
 			}
-			
-			sendMessage(request, SFipa.FIPA_MESSAGE_TYPE);
-			if(i % 10 == 0)
-			{
-				System.out.print('.');
-				// waitFor(0);
-			}
-		}
+		}));
 	}
 	
 	/**
@@ -71,13 +78,18 @@ public class MessagePerformanceAgent extends MicroAgent
 	public void messageArrived(Map msg, MessageType mt)
 	{
 		received++;
-			
-		int msgcnt = ((Integer)getArgument("max")).intValue();
+		final int msgcnt = ((Integer)getArgument("max")).intValue();
 		if(received==msgcnt)
 		{
-			long dur = getTime() - starttime;
-			System.out.println("Sending/receiving " + msgcnt + " messages took: " + dur + " milliseconds.");
-			killAgent();
+			getTime().addResultListener(createResultListener(new DefaultResultListener()
+			{
+				public void resultAvailable(Object source, Object result)
+				{
+					long dur = ((Long)result).longValue() - starttime;
+					System.out.println("Sending/receiving " + msgcnt + " messages took: " + dur + " milliseconds.");
+					killAgent();
+				}
+			}));
 		}
 	}
 	

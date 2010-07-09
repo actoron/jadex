@@ -18,8 +18,10 @@ import jadex.bridge.ISearchConstraints;
 import jadex.bridge.MessageType;
 import jadex.commons.IFuture;
 import jadex.commons.SUtil;
+import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.micro.MicroAgent;
+import jadex.service.SServiceProvider;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -134,41 +136,48 @@ public class MicroPreyAgent extends MicroAgent
 	protected void register()
 	{
 		// Create a service description to search for.
-		IDF df = (IDF)getServiceProvider().getService(IDF.class);
-		IDFServiceDescription sd = df.createDFServiceDescription(null, "hunter-prey environment", null);
-		IDFComponentDescription ad = df.createDFComponentDescription(null, sd);
-		ISearchConstraints	cons = df.createSearchConstraints(-1, 0);
-		
-		// Search for the environment agent
-		IFuture ret = df.search(ad, cons);
-		ret.addResultListener(createResultListener(new IResultListener()
+		SServiceProvider.getService(getServiceProvider(), IDF.class)
+			.addResultListener(createResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
-				IDFComponentDescription[] tas = (IDFComponentDescription[])result;
-				if(tas.length!=0)
+				IDF df = (IDF)result;
+				IDFServiceDescription sd = df.createDFServiceDescription(null, "hunter-prey environment", null);
+				IDFComponentDescription ad = df.createDFComponentDescription(null, sd);
+				ISearchConstraints	cons = df.createSearchConstraints(-1, 0);
+				
+				// Search for the environment agent
+				IFuture ret = df.search(ad, cons);
+				ret.addResultListener(createResultListener(new IResultListener()
 				{
-					// Found.
-					environment	= tas[0].getName();
-					if(tas.length>1)
-						System.out.println("More than environment agent found.");
-						// Todo: getLogger()
-						// getLogger().warning("More than environment agent found.");
-					else
-						System.out.println("Environment agent found: "+environment);
-				}
-				else
-				{
-					// Not found.
-					throw new RuntimeException("Environment not found.");
-				}
+					public void resultAvailable(Object source, Object result)
+					{
+						IDFComponentDescription[] tas = (IDFComponentDescription[])result;
+						if(tas.length!=0)
+						{
+							// Found.
+							environment	= tas[0].getName();
+							if(tas.length>1)
+								System.out.println("More than environment agent found.");
+								// Todo: getLogger()
+								// getLogger().warning("More than environment agent found.");
+							else
+								System.out.println("Environment agent found: "+environment);
+						}
+						else
+						{
+							// Not found.
+							throw new RuntimeException("Environment not found.");
+						}
 
-				// Register creature.
-				requestAction(new RequestVision(myself));
-			}
-			public void exceptionOccurred(Object source, Exception e)
-			{
-				e.printStackTrace();
+						// Register creature.
+						requestAction(new RequestVision(myself));
+					}
+					public void exceptionOccurred(Object source, Exception e)
+					{
+						e.printStackTrace();
+					}
+				}));
 			}
 		}));
 	}

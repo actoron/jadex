@@ -10,6 +10,7 @@ import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.micro.MicroAgent;
 import jadex.micro.MicroAgentMetaInfo;
+import jadex.service.SServiceProvider;
 import jadex.service.clock.IClockService;
 
 import java.util.HashMap;
@@ -39,7 +40,7 @@ public class AgentCreationAgent extends MicroAgent
 		
 		if(args.get("num")==null)
 		{
-			getServiceProvider().getService(IClockService.class).addResultListener(new ComponentResultListener(new DefaultResultListener()
+			SServiceProvider.getService(getServiceProvider(), IClockService.class).addResultListener(new ComponentResultListener(new DefaultResultListener()
 			{
 				public void resultAvailable(Object source, Object result)
 				{
@@ -66,7 +67,7 @@ public class AgentCreationAgent extends MicroAgent
 	protected void step1(final Map args)
 	{
 		final int num = ((Integer)args.get("num")).intValue();
-		int max = ((Integer)args.get("max")).intValue();
+		final int max = ((Integer)args.get("max")).intValue();
 		
 		System.out.println("Created peer: "+num);
 		
@@ -75,7 +76,7 @@ public class AgentCreationAgent extends MicroAgent
 			args.put("num", new Integer(num+1));
 //				System.out.println("Args: "+num+" "+args);
 
-			getServiceProvider().getService(IComponentManagementService.class).addResultListener(new ComponentResultListener(new DefaultResultListener()
+			SServiceProvider.getServiceUpwards(getServiceProvider(), IComponentManagementService.class).addResultListener(new ComponentResultListener(new DefaultResultListener()
 			{
 				public void resultAvailable(Object source, Object result)
 				{
@@ -86,20 +87,26 @@ public class AgentCreationAgent extends MicroAgent
 		else
 		{
 			Long startmem = (Long)args.get("startmem");
-			Long starttime = (Long)args.get("starttime");
-			long used = Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory();
-			long omem = (used-startmem.longValue())/1024;
-			double upera = ((long)(1000*(used-startmem.longValue())/max/1024))/1000.0;
+			final Long starttime = (Long)args.get("starttime");
+			final long used = Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory();
+			final long omem = (used-startmem.longValue())/1024;
+			final double upera = ((long)(1000*(used-startmem.longValue())/max/1024))/1000.0;
 			System.out.println("Overall memory usage: "+omem+"kB. Per agent: "+upera+" kB.");
 
-			long end = getTime();
-			System.out.println("Last peer created. "+max+" agents started.");
-			double dur = ((double)end-starttime.longValue())/1000.0;
-			double pera = dur/max;
-			System.out.println("Needed: "+dur+" secs. Per agent: "+pera+" sec. Corresponds to "+(1/pera)+" agents per sec.");
-		
-			// Delete prior agents.
-			deletePeers(max-1, getTime(), dur, pera, omem, upera);
+			getTime().addResultListener(createResultListener(new DefaultResultListener()
+			{
+				public void resultAvailable(Object source, Object result)
+				{
+					long end = ((Long)result).longValue();
+					System.out.println("Last peer created. "+max+" agents started.");
+					double dur = ((double)end-starttime.longValue())/1000.0;
+					double pera = dur/max;
+					System.out.println("Needed: "+dur+" secs. Per agent: "+pera+" sec. Corresponds to "+(1/pera)+" agents per sec.");
+				
+					// Delete prior agents.
+					deletePeers(max-1, end, dur, pera, omem, upera);
+				}
+			}));
 		}
 	}
 
@@ -129,55 +136,68 @@ public class AgentCreationAgent extends MicroAgent
 	{
 		final String name = createPeerName(cnt);
 //		System.out.println("Destroying peer: "+name);
-		final IComponentManagementService ces = (IComponentManagementService)getServiceProvider().getService(IComponentManagementService.class);
-		IComponentIdentifier aid = ces.createComponentIdentifier(name, true, null);
-		IResultListener lis = createResultListener(new IResultListener()
+		SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class)
+			.addResultListener(createResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
-				System.out.println("Successfully destroyed peer: "+name);
-				
-				if(cnt-1>0)
+				IComponentManagementService cms = (IComponentManagementService)result;
+				IComponentIdentifier aid = cms.createComponentIdentifier(name, true, null);
+				IResultListener lis = createResultListener(new IResultListener()
 				{
-					deletePeers(cnt-1, killstarttime, dur, pera, omem, upera);
-				}
-				else
-				{
-					killLastPeer(killstarttime, dur, pera, omem, upera);
-				}	
+					public void resultAvailable(Object source, Object result)
+					{
+						System.out.println("Successfully destroyed peer: "+name);
+						
+						if(cnt-1>0)
+						{
+							deletePeers(cnt-1, killstarttime, dur, pera, omem, upera);
+						}
+						else
+						{
+							killLastPeer(killstarttime, dur, pera, omem, upera);
+						}	
+					}
+					public void exceptionOccurred(Object source, Exception exception)
+					{
+						exception.printStackTrace();
+					}
+				});
+				IFuture ret = cms.destroyComponent(aid);
+				ret.addResultListener(lis);
 			}
-			public void exceptionOccurred(Object source, Exception exception)
-			{
-				exception.printStackTrace();
-			}
-		});
-		IFuture ret = ces.destroyComponent(aid);
-		ret.addResultListener(lis);
+		}));
 	}
 	
 	/**
 	 *  Kill the last peer and print out the results.
 	 */
-	protected void killLastPeer(long killstarttime, double dur, double pera, long omem, double upera)
+	protected void killLastPeer(final long killstarttime, final double dur, final double pera, 
+		final long omem, final double upera)
 	{
-		int max = ((Integer)getArgument("max")).intValue();
+		getTime().addResultListener(createResultListener(new DefaultResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				int max = ((Integer)getArgument("max")).intValue();
+				long killend = ((Long)result).longValue();
+				System.out.println("Last peer destroyed. "+(max-1)+" agents killed.");
+				double killdur = ((double)killend-killstarttime)/1000.0;
+				double killpera = killdur/(max-1);
+				
+				Runtime.getRuntime().gc();
+				long stillused = (Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory())/1024;
+				
+				System.out.println("\nCumulated results:");
+				System.out.println("Creation needed: "+dur+" secs. Per agent: "+pera+" sec. Corresponds to "+(1/pera)+" agents per sec.");
+				System.out.println("Killing needed:  "+killdur+" secs. Per agent: "+killpera+" sec. Corresponds to "+(1/killpera)+" agents per sec.");
+				System.out.println("Overall memory usage: "+omem+"kB. Per agent: "+upera+" kB.");
+				System.out.println("Still used memory: "+stillused+"kB.");
 		
-		long killend = getTime();
-		System.out.println("Last peer destroyed. "+(max-1)+" agents killed.");
-		double killdur = ((double)killend-killstarttime)/1000.0;
-		double killpera = killdur/(max-1);
-		
-		Runtime.getRuntime().gc();
-		long stillused = (Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory())/1024;
-		
-		System.out.println("\nCumulated results:");
-		System.out.println("Creation needed: "+dur+" secs. Per agent: "+pera+" sec. Corresponds to "+(1/pera)+" agents per sec.");
-		System.out.println("Killing needed:  "+killdur+" secs. Per agent: "+killpera+" sec. Corresponds to "+(1/killpera)+" agents per sec.");
-		System.out.println("Overall memory usage: "+omem+"kB. Per agent: "+upera+" kB.");
-		System.out.println("Still used memory: "+stillused+"kB.");
-
-		// Todo: killAgent()
-		killAgent();
+				// Todo: killAgent()
+				killAgent();
+			}
+		}));
 	}
 	
 	/**

@@ -2,7 +2,9 @@ package jadex.micro.examples.ping;
 
 import jadex.base.fipa.SFipa;
 import jadex.bridge.MessageType;
+import jadex.commons.concurrent.DefaultResultListener;
 import jadex.micro.MicroAgent;
+import jadex.service.SServiceProvider;
 
 import java.util.Map;
 
@@ -16,18 +18,23 @@ public class PingAgent extends MicroAgent
 	 *  @param msg The message.
 	 *  @param mt The message type.
 	 */
-	public void messageArrived(Map msg, MessageType mt)
+	public void messageArrived(Map msg, final MessageType mt)
 	{
 		String perf = (String)msg.get(SFipa.PERFORMATIVE);
 		if((SFipa.QUERY_IF.equals(perf) || SFipa.QUERY_REF.equals(perf)) 
 			&& "ping".equals(msg.get(SFipa.CONTENT)))
 		{
-			Map reply = createReply(msg, mt);
-	
-			reply.put(SFipa.CONTENT, "alive");
-			reply.put(SFipa.PERFORMATIVE, SFipa.INFORM);
-			reply.put(SFipa.SENDER, getComponentIdentifier());
-			sendMessage(reply, mt);
+			createReply(msg, mt).addResultListener(createResultListener(new DefaultResultListener()
+			{
+				public void resultAvailable(Object source, Object result)
+				{
+					Map reply = (Map)result;
+					reply.put(SFipa.CONTENT, "alive");
+					reply.put(SFipa.PERFORMATIVE, SFipa.INFORM);
+					reply.put(SFipa.SENDER, getComponentIdentifier());
+					sendMessage(reply, mt);
+				}
+			}));
 		}
 		else
 		{
