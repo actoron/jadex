@@ -68,4 +68,14 @@ public class TypeResultSelector implements IResultSelector
 	{
 		return oneresult? results.size()>0? results.toArray()[0]: null: results;
 	}
+	
+	/**
+	 *  Get the cache key.
+	 *  Needs to identify this element with respect to its important features so that
+	 *  two equal elements should return the same key.
+	 */
+	public Object getCacheKey()
+	{
+		return this.getClass().getName()+type.getName();
+	}
 }

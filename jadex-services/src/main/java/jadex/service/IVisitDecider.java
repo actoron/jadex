@@ -15,4 +15,11 @@ public interface IVisitDecider
 	 *  @param results The collection of preliminary results.
 	 */
 	public boolean searchNode(IServiceProvider source, IServiceProvider target, Collection results);
+	
+	/**
+	 *  Get the cache key.
+	 *  Needs to identify this element with respect to its important features so that
+	 *  two equal elements should return the same key.
+	 */
+	public Object getCacheKey();
 }

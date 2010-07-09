@@ -31,6 +31,17 @@ public class Tuple	implements Cloneable, java.io.Serializable
 	{
 		this(new Object[]{entity1, entity2});
 	}
+	
+	/**
+	 *  Convenience constructor for binary tuples.
+	 *  @param entity1	The first object in the tuple.
+	 *  @param entity2	The second object in the tuple.
+	 *  @param entity3	The third object in the tuple.
+	 */
+	public Tuple(Object entity1, Object entity2, Object entity3)
+	{
+		this(new Object[]{entity1, entity2, entity3});
+	}
 
 	/**
 	 *  Create a new tuple.

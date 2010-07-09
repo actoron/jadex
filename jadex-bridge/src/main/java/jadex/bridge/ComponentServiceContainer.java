@@ -2,7 +2,6 @@ package jadex.bridge;
 
 import jadex.commons.Future;
 import jadex.commons.IFuture;
-import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.DelegationResultListener;
 import jadex.service.BasicServiceContainer;
 import jadex.service.IResultSelector;
@@ -20,7 +19,7 @@ public class ComponentServiceContainer implements IServiceContainer
 	/** The component adapter. */
 	protected IComponentAdapter adapter;
 	
-	/** The service provider. */
+	/** The original service container. */
 	protected IServiceContainer container;
 	
 	//-------- constructors --------

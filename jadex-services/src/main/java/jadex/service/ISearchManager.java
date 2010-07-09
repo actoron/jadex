@@ -17,4 +17,11 @@ public interface ISearchManager
 	 *  @param services	The local services of the provider (class->list of services).
 	 */
 	public IFuture	searchServices(IServiceProvider provider, IVisitDecider decider, IResultSelector selector, Map services);
+
+	/**
+	 *  Get the cache key.
+	 *  Needs to identify this element with respect to its important features so that
+	 *  two equal elements should return the same key.
+	 */
+	public Object getCacheKey();
 }

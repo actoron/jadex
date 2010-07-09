@@ -59,4 +59,14 @@ public class DefaultVisitDecider implements IVisitDecider
 		
 		return ret;
 	}
+	
+	/**
+	 *  Get the cache key.
+	 *  Needs to identify this element with respect to its important features so that
+	 *  two equal elements should return the same key.
+	 */
+	public Object getCacheKey()
+	{
+		return this.getClass().getName()+abort;
+	}
 }

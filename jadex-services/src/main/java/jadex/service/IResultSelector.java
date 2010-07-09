@@ -22,4 +22,11 @@ public interface IResultSelector
 	 *  @return A single service or a list of services.
 	 */
 	public Object	getResult(Collection results);
+	
+	/**
+	 *  Get the cache key.
+	 *  Needs to identify this element with respect to its important features so that
+	 *  two equal elements should return the same key.
+	 */
+	public Object getCacheKey();
 }

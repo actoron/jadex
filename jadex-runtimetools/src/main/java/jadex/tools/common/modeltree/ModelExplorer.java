@@ -14,6 +14,7 @@ import jadex.commons.concurrent.IThreadPool;
 import jadex.commons.concurrent.LoadManagingExecutionService;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.service.IServiceContainer;
+import jadex.service.SServiceProvider;
 import jadex.service.library.ILibraryService;
 import jadex.service.library.ILibraryServiceListener;
 import jadex.service.threadpool.ThreadPoolService;
@@ -142,7 +143,7 @@ public class ModelExplorer extends JTree
 //		this.worker	= new LoadManagingExecutionService(
 //			((IThreadPool)container.getService(ThreadPoolService.class)));
 	
-		container.getService(ThreadPoolService.class).addResultListener(new DefaultResultListener()
+		SServiceProvider.getService(container, ThreadPoolService.class).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
@@ -252,7 +253,7 @@ public class ModelExplorer extends JTree
 		});
 		ToolTipManager.sharedInstance().registerComponent(this);
 		
-		container.getService(ILibraryService.class).addResultListener(new DefaultResultListener()
+		SServiceProvider.getService(container, ILibraryService.class).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
@@ -376,7 +377,7 @@ public class ModelExplorer extends JTree
 			}
 		}
 		// todo: remove ThreadSuspendable()
-		ClassLoader cl = ((ILibraryService)container.getService(ILibraryService.class).get(new ThreadSuspendable())).getClassLoader();
+		ClassLoader cl = ((ILibraryService)SServiceProvider.getService(container, ILibraryService.class).get(new ThreadSuspendable())).getClassLoader();
 		String	treesave	= JavaWriter.objectToXML(mep, cl);	// Doesn't support inner classes: ModelExplorer$ModelExplorerProperties
 //		String	treesave	= Nuggets.objectToXML(mep, cl);
 		props.addProperty(new Property("tree", treesave));
@@ -416,7 +417,7 @@ public class ModelExplorer extends JTree
 		// Load root node.
 		String	treexml	= props.getStringProperty("tree");
 		// todo: hack!
-		ILibraryService ls = (ILibraryService)container.getService(ILibraryService.class).get(new ThreadSuspendable());
+		ILibraryService ls = (ILibraryService)SServiceProvider.getService(container, ILibraryService.class).get(new ThreadSuspendable());
 		if(treexml!=null)
 		{
 			try
@@ -551,7 +552,7 @@ public class ModelExplorer extends JTree
 		final Object[] cs = getRootNode().getChildCount()>0 ? getRootNode().getChildren().toArray() : null;
 		if(cs!=null)
 		{
-			container.getService(ILibraryService.class).addResultListener(new SwingDefaultResultListener()
+			SServiceProvider.getService(container, ILibraryService.class).addResultListener(new SwingDefaultResultListener()
 			{
 				public void customResultAvailable(Object source, Object result)
 				{
@@ -686,7 +687,7 @@ public class ModelExplorer extends JTree
 //		String[] filetypes = (String[])SUtil.joinArrays(ft1, ft2);
 //		
 		
-		Collection facts = (Collection)container.getServices(IComponentFactory.class).get(new ThreadSuspendable());
+		Collection facts = (Collection)SServiceProvider.getServices(container, IComponentFactory.class).get(new ThreadSuspendable());
 		
 		if(facts!=null)
 		{
@@ -950,7 +951,7 @@ public class ModelExplorer extends JTree
 						
 						// todo: jars
 						final File fcopy = file;
-						container.getService(ILibraryService.class).addResultListener(new DefaultResultListener()
+						SServiceProvider.getService(container, ILibraryService.class).addResultListener(new DefaultResultListener()
 						{
 							public void resultAvailable(Object source, Object result)
 							{
@@ -1010,7 +1011,7 @@ public class ModelExplorer extends JTree
 				getRootNode().removePathEntry(node);
 				
 				// todo: jars
-				container.getService(ILibraryService.class).addResultListener(new SwingDefaultResultListener()
+				SServiceProvider.getService(container, ILibraryService.class).addResultListener(new SwingDefaultResultListener()
 				{
 					public void customResultAvailable(Object source, Object result)
 					{
