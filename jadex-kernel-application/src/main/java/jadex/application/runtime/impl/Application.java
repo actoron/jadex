@@ -11,7 +11,6 @@ import jadex.application.model.MSpaceInstance;
 import jadex.application.runtime.IApplication;
 import jadex.application.runtime.ISpace;
 import jadex.bridge.ComponentResultListener;
-import jadex.bridge.ComponentServiceContainer;
 import jadex.bridge.CreationInfo;
 import jadex.bridge.IArgument;
 import jadex.bridge.IComponentAdapter;
@@ -36,7 +35,6 @@ import jadex.javaparser.IValueFetcher;
 import jadex.javaparser.SimpleValueFetcher;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 import jadex.service.IService;
-import jadex.service.IServiceContainer;
 import jadex.service.IServiceProvider;
 import jadex.service.SServiceProvider;
 import jadex.service.library.ILibraryService;
@@ -93,9 +91,6 @@ public class Application implements IApplication, IComponentInstance
 	/** The children cnt (without daemons). */
 	protected int children;
 	
-	/** The own service provider. */
-	protected IServiceContainer provider;
-
 	//-------- constructors --------
 	
 	/**
@@ -109,7 +104,6 @@ public class Application implements IApplication, IComponentInstance
 		this.parent = parent;
 		this.arguments = arguments==null ? new HashMap() : arguments;
 		this.results = new HashMap();
-		this.provider = new ComponentServiceContainer(adapter);
 		
 		// Init the arguments with default values.
 		String configname = config!=null? config.getName(): null;
@@ -136,23 +130,23 @@ public class Application implements IApplication, IComponentInstance
 		}
 		
 
-		// Create the services
-		final SimpleValueFetcher fetcher = new SimpleValueFetcher();
-		fetcher.setValue("$platform", getServiceProvider());
-		fetcher.setValue("$args", getArguments());
-		fetcher.setValue("$results", getResults());
-		fetcher.setValue("$component", this);
-		List services = model.getApplicationType().getServices();
-		if(services!=null)
-		{
-			for(int i=0; i<services.size(); i++)
-			{
-				MExpressionType exp = (MExpressionType)services.get(i);
-				IService service = (IService)exp.getParsedValue().getValue(fetcher);
-//				mycontainer.addService(exp.getClazz(), exp.getName(), service);
-				provider.addService(exp.getClazz(), service);
-			}
-		}
+//		// Create the services
+//		final SimpleValueFetcher fetcher = new SimpleValueFetcher();
+//		fetcher.setValue("$platform", getServiceProvider());
+//		fetcher.setValue("$args", getArguments());
+//		fetcher.setValue("$results", getResults());
+//		fetcher.setValue("$component", this);
+//		List services = model.getApplicationType().getServices();
+//		if(services!=null)
+//		{
+//			for(int i=0; i<services.size(); i++)
+//			{
+//				MExpressionType exp = (MExpressionType)services.get(i);
+//				IService service = (IService)exp.getParsedValue().getValue(fetcher);
+////				mycontainer.addService(exp.getClazz(), exp.getName(), service);
+//				adapter.getServiceContainer().addService(exp.getClazz(), service);
+//			}
+//		}
 	}
 
 	//-------- space handling --------
@@ -548,14 +542,6 @@ public class Application implements IApplication, IComponentInstance
 	}
 	
 	/**
-	 *  Get the service provider.
-	 */
-	public IServiceProvider getServiceProvider()
-	{
-		return provider;
-	}
-	
-	/**
 	 *  Create an component in the context.
 	 *  @param name	The name of the newly created component.
 	 *  @param type	The component type as defined in the application type.
@@ -767,18 +753,18 @@ public class Application implements IApplication, IComponentInstance
 
 					// Init service container and init service.
 					// Create the services.
-//					List services = model.getApplicationType().getServices();
-//					if(services!=null)
-//					{
-//						for(int i=0; i<services.size(); i++)
-//						{
-//							MExpressionType exp = (MExpressionType)services.get(i);
-//							IService service = (IService)exp.getParsedValue().getValue(fetcher);
-////							mycontainer.addService(exp.getClazz(), exp.getName(), service);
-//							mycontainer.addService(exp.getClazz(), service);
-//						}
-//					}
-					provider.start().addResultListener(new ComponentResultListener(new DefaultResultListener()
+					List services = model.getApplicationType().getServices();
+					if(services!=null)
+					{
+						for(int i=0; i<services.size(); i++)
+						{
+							MExpressionType exp = (MExpressionType)services.get(i);
+							IService service = (IService)exp.getParsedValue().getValue(fetcher);
+//							mycontainer.addService(exp.getClazz(), exp.getName(), service);
+							adapter.getServiceContainer().addService(exp.getClazz(), service);
+						}
+					}
+					adapter.getServiceContainer().start().addResultListener(new ComponentResultListener(new DefaultResultListener()
 					{
 						public void resultAvailable(Object source, Object result)
 						{
@@ -858,7 +844,7 @@ public class Application implements IApplication, IComponentInstance
 	 */
 	public IFuture cleanupComponent()
 	{
-		return provider.shutdown();
+		return adapter.getServiceContainer().shutdown();
 	}
 	
 	/**
@@ -1090,5 +1076,14 @@ public class Application implements IApplication, IComponentInstance
 		Object val = component.getNumberText()!=null? parser.parseExpression(component.getNumberText(), imports, null, classloader).getValue(fetcher): null;
 		
 		return val instanceof Integer? ((Integer)val).intValue(): 1;
+	}
+
+	
+	/**
+	 *  Get the service provider.
+	 */
+	public IServiceProvider getServiceProvider()
+	{
+		return adapter.getServiceContainer();
 	}
 }

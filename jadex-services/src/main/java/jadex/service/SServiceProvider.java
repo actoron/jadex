@@ -29,7 +29,7 @@ public class SServiceProvider
 	 */
 	public static IFuture getServices(IServiceProvider provider, Class type)
 	{
-		return provider.getServices(treemanager, contdecider, new TypeResultSelector(type));
+		return provider.getServices(treemanager, contdecider, new TypeResultSelector(type, false));
 	}
 
 	/**

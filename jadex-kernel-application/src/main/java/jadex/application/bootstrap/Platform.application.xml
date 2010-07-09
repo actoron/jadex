@@ -42,7 +42,7 @@
 			new ThreadPoolService(new ThreadPool(new DefaultThreadPoolStrategy(0, 20, 30000)))
 		</service>
 		<service name="execution_service" class="IExecutionService">
-			new AsyncExecutionService($platform.getService(ThreadPoolService.class).get(new ThreadSuspendable()))
+			new AsyncExecutionService((IThreadPool)jadex.service.SServiceProvider.getService($platform, ThreadPoolService.class).get(new ThreadSuspendable()))
 		</service>
 		<service name="library_service" class="ILibraryService">
 			//new LibraryService()
@@ -69,7 +69,7 @@
 		</service>
 		<service name="clock_service" class="IClockService">
 			new ClockService(new SystemClock("system_clock", 100,
-				$platform.getService(ThreadPoolService.class).get(new ThreadSuspendable())))
+				(IThreadPool)jadex.service.SServiceProvider.getService($platform, ThreadPoolService.class).get(new ThreadSuspendable())))
 		</service>
 		<service name="simulation_service" class="ISimulationService">
 			new SimulationService($platform)

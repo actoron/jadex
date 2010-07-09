@@ -30,10 +30,10 @@
 						<!-- <argument name="initial_orders">
 							new Order[]
 							{
-								new Order("All about agents", new Date(((IClockService)$platform.getService(IClockService.class)).getTime()+60000), 100, 120, true, (IClockService)$platform.getService(IClockService.class)),
-								new Order("All about web services", new Date(((IClockService)$platform.getService(IClockService.class)).getTime()+60000), 40, 60, true, (IClockService)$platform.getService(IClockService.class)),
-								new Order("Harry Potter", new Date(((IClockService)$platform.getService(IClockService.class)).getTime()+60000), 5, 10, true, (IClockService)$platform.getService(IClockService.class)),
-								new Order("Agents in the real world", new Date(((IClockService)$platform.getService(IClockService.class)).getTime()+60000), 30, 65, true, (IClockService)$platform.getService(IClockService.class))
+								new Order("All about agents", new Date(((IClockService)jadex.service.SServiceProvider.getService($platform, IClockService.class)).getTime()+60000), 100, 120, true, (IClockService)jadex.service.SServiceProvider.getService($platform, IClockService.class)),
+								new Order("All about web services", new Date(((IClockService)jadex.service.SServiceProvider.getService($platform, IClockService.class)).getTime()+60000), 40, 60, true, (IClockService)jadex.service.SServiceProvider.getService($platform, IClockService.class)),
+								new Order("Harry Potter", new Date(((IClockService)jadex.service.SServiceProvider.getService($platform, IClockService.class)).getTime()+60000), 5, 10, true, (IClockService)jadex.service.SServiceProvider.getService($platform, IClockService.class)),
+								new Order("Agents in the real world", new Date(((IClockService)jadex.service.SServiceProvider.getService($platform, IClockService.class)).getTime()+60000), 30, 65, true, (IClockService)jadex.service.SServiceProvider.getService($platform, IClockService.class))
 							}
 						</argument> -->
 						<argument name="initial_orders">
@@ -52,10 +52,10 @@
 						<!-- <argument name="initial_orders">
 							new Order[]
 							{
-								new Order("All about agents", new Date(((IClockService)$platform.getService(IClockService.class)).getTime()+60000), 130, 110, false, (IClockService)$platform.getService(IClockService.class)),
-								new Order("All about web services", new Date(((IClockService)$platform.getService(IClockService.class)).getTime()+60000), 50, 30, false, (IClockService)$platform.getService(IClockService.class)),
-								new Order("Harry Potter", new Date(((IClockService)$platform.getService(IClockService.class)).getTime()+60000), 15, 9, false, (IClockService)$platform.getService(IClockService.class)),
-								new Order("Agents in the real world", new Date(((IClockService)$platform.getService(IClockService.class)).getTime()+60000), 100, 60, false, (IClockService)$platform.getService(IClockService.class))
+								new Order("All about agents", new Date(((IClockService)jadex.service.SServiceProvider.getService($platform, IClockService.class)).getTime()+60000), 130, 110, false, (IClockService)jadex.service.SServiceProvider.getService($platform, IClockService.class)),
+								new Order("All about web services", new Date(((IClockService)jadex.service.SServiceProvider.getService($platform, IClockService.class)).getTime()+60000), 50, 30, false, (IClockService)jadex.service.SServiceProvider.getService($platform, IClockService.class)),
+								new Order("Harry Potter", new Date(((IClockService)jadex.service.SServiceProvider.getService($platform, IClockService.class)).getTime()+60000), 15, 9, false, (IClockService)jadex.service.SServiceProvider.getService($platform, IClockService.class)),
+								new Order("Agents in the real world", new Date(((IClockService)jadex.service.SServiceProvider.getService($platform, IClockService.class)).getTime()+60000), 100, 60, false, (IClockService)jadex.service.SServiceProvider.getService($platform, IClockService.class))
 							}
 						</argument> -->
 						<argument name="initial_orders">
@@ -78,7 +78,7 @@
 						<!-- <argument name="initial_orders">
 							new Order[]
 							{
-								new Order("All about agents", new Date(((IClockService)$platform.getService(IClockService.class)).getTime()+60000), 100, 120, true, (IClockService)$platform.getService(IClockService.class))
+								new Order("All about agents", new Date(((IClockService)jadex.service.SServiceProvider.getService($platform, IClockService.class)).getTime()+60000), 100, 120, true, (IClockService)jadex.service.SServiceProvider.getService($platform, IClockService.class))
 							}
 						</argument> -->
 						<argument name="initial_orders">
@@ -94,7 +94,7 @@
 						<!-- <argument name="initial_orders">
 							new Order[]
 							{
-								new Order("All about agents", new Date(((IClockService)$platform.getService(IClockService.class)).getTime()+60000), 130, 110, false, (IClockService)$platform.getService(IClockService.class))
+								new Order("All about agents", new Date(((IClockService)jadex.service.SServiceProvider.getService($platform, IClockService.class)).getTime()+60000), 130, 110, false, (IClockService)jadex.service.SServiceProvider.getService($platform, IClockService.class))
 							}
 						</argument> -->
 						<argument name="initial_orders">
@@ -114,10 +114,10 @@
 						<!-- <argument name="initial_orders">
 							new Order[]
 							{
-								new Order("All about agents", new Date(((IClockService)$platform.getService(IClockService.class)).getTime()+60000), 100, 120, true, (IClockService)$platform.getService(IClockService.class)),
-								new Order("All about web services", new Date(((IClockService)$platform.getService(IClockService.class)).getTime()+60000), 40, 60, true, (IClockService)$platform.getService(IClockService.class)),
-								new Order("Harry Potter", new Date(((IClockService)$platform.getService(IClockService.class)).getTime()+60000), 5, 10, true, (IClockService)$platform.getService(IClockService.class)),
-								new Order("Agents in the real world", new Date(((IClockService)$platform.getService(IClockService.class)).getTime()+60000), 30, 65, true, (IClockService)$platform.getService(IClockService.class))
+								new Order("All about agents", new Date(((IClockService)jadex.service.SServiceProvider.getService($platform, IClockService.class)).getTime()+60000), 100, 120, true, (IClockService)jadex.service.SServiceProvider.getService($platform, IClockService.class)),
+								new Order("All about web services", new Date(((IClockService)jadex.service.SServiceProvider.getService($platform, IClockService.class)).getTime()+60000), 40, 60, true, (IClockService)jadex.service.SServiceProvider.getService($platform, IClockService.class)),
+								new Order("Harry Potter", new Date(((IClockService)jadex.service.SServiceProvider.getService($platform, IClockService.class)).getTime()+60000), 5, 10, true, (IClockService)jadex.service.SServiceProvider.getService($platform, IClockService.class)),
+								new Order("Agents in the real world", new Date(((IClockService)jadex.service.SServiceProvider.getService($platform, IClockService.class)).getTime()+60000), 30, 65, true, (IClockService)jadex.service.SServiceProvider.getService($platform, IClockService.class))
 							}
 						</argument> -->
 						<argument name="initial_orders">
@@ -136,10 +136,10 @@
 						<!-- <argument name="initial_orders">
 							new Order[]
 							{
-								new Order("All about agents", new Date(((IClockService)$platform.getService(IClockService.class)).getTime()+60000), 130, 110, false, (IClockService)$platform.getService(IClockService.class)),
-								new Order("All about web services", new Date(((IClockService)$platform.getService(IClockService.class)).getTime()+60000), 50, 30, false, (IClockService)$platform.getService(IClockService.class)),
-								new Order("Harry Potter", new Date(((IClockService)$platform.getService(IClockService.class)).getTime()+60000), 15, 9, false, (IClockService)$platform.getService(IClockService.class)),
-								new Order("Agents in the real world", new Date(((IClockService)$platform.getService(IClockService.class)).getTime()+60000), 100, 60, false, (IClockService)$platform.getService(IClockService.class))
+								new Order("All about agents", new Date(((IClockService)jadex.service.SServiceProvider.getService($platform, IClockService.class)).getTime()+60000), 130, 110, false, (IClockService)jadex.service.SServiceProvider.getService($platform, IClockService.class)),
+								new Order("All about web services", new Date(((IClockService)jadex.service.SServiceProvider.getService($platform, IClockService.class)).getTime()+60000), 50, 30, false, (IClockService)jadex.service.SServiceProvider.getService($platform, IClockService.class)),
+								new Order("Harry Potter", new Date(((IClockService)jadex.service.SServiceProvider.getService($platform, IClockService.class)).getTime()+60000), 15, 9, false, (IClockService)jadex.service.SServiceProvider.getService($platform, IClockService.class)),
+								new Order("Agents in the real world", new Date(((IClockService)jadex.service.SServiceProvider.getService($platform, IClockService.class)).getTime()+60000), 100, 60, false, (IClockService)jadex.service.SServiceProvider.getService($platform, IClockService.class))
 							}
 						</argument> -->
 						<argument name="initial_orders">

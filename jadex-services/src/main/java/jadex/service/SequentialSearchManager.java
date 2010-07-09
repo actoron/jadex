@@ -165,8 +165,11 @@ public class SequentialSearchManager implements ISearchManager
 			{
 				public void resultAvailable(Object source, Object result)
 				{
-					List	ccs	= new LinkedList((Collection)result);
-					todo.put(CURRENT_CHILDREN, ccs);
+					if(result!=null && !((Collection)result).isEmpty())
+					{
+						List	ccs	= new LinkedList((Collection)result);
+						todo.put(CURRENT_CHILDREN, ccs);
+					}
 					processChildNodes(decider, selector, services, ret, results, lsm, todo);
 				}
 				

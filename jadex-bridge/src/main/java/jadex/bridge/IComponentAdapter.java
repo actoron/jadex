@@ -1,12 +1,7 @@
 package jadex.bridge;
 
-import jadex.commons.Future;
 import jadex.commons.IFuture;
-import jadex.commons.concurrent.CollectionResultListener;
-import jadex.commons.concurrent.DefaultResultListener;
-import jadex.commons.concurrent.DelegationResultListener;
-import jadex.commons.concurrent.IResultListener;
-import jadex.service.IServiceProvider;
+import jadex.service.IServiceContainer;
 
 import java.util.logging.Logger;
 
@@ -83,5 +78,12 @@ public interface IComponentAdapter
 	 *  @return The children.
 	 */
 	public IFuture getChildren();
+
+	
+	/**
+	 *  Get the service container.
+	 *  @return The service container.
+	 */
+	public IServiceContainer getServiceContainer();
 }
 

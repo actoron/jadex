@@ -55,7 +55,7 @@
 			<property type="jadex.service.clock.IClockService" name="clock_service">
 				new jadex.service.clock.ClockService(
 					new jadex.service.clock.SystemClock("system_clock", 100,
-					$platform.getService(jadex.service.threadpool.ThreadPoolService.class)))
+					jadex.service.SServiceProvider.getService($platform, jadex.service.threadpool.ThreadPoolService.class)))
 //				new jadex.service.clock.SimulationEventClock("simulation_clock",
 //					System.currentTimeMillis(), 200))
 			</property>
@@ -68,7 +68,7 @@
 			<!-- Execution service. -->
 			<property type="jadex.service.execution.IExecutionService" name="execution_service">
 				new jadex.service.execution.SyncExecutionService(
-					$platform.getService(jadex.service.threadpool.ThreadPoolService.class))
+					jadex.service.SServiceProvider.getService($platform, jadex.service.threadpool.ThreadPoolService.class))
 			</property>
 
 			<!-- Context service. -->
@@ -115,7 +115,7 @@
 					new Object[]
 					{
 						new jadex.base.fipa.FIPAMessageType(), 
-						new jadex.bdi.runtime.JavaStandardPlanExecutor($platform.getService(jadex.service.threadpool.ThreadPoolService.class)),
+						new jadex.bdi.runtime.JavaStandardPlanExecutor(jadex.service.SServiceProvider.getService($platform, jadex.service.threadpool.ThreadPoolService.class)),
 						new java.lang.Long(10000),
 						Boolean.TRUE,
 						new jadex.bdibpmn.BpmnPlanExecutor($platform),
@@ -189,7 +189,7 @@
 			</property>
 			
 			<property type="jadex.wfms.service.IWfmsClientService" name="wfms_wfmsclient_service">
-				$platform.getService(jadex.wfms.service.IClientService.class)
+				jadex.service.SServiceProvider.getService($platform, jadex.wfms.service.IClientService.class)
 			</property>
 			
 			<property type="jadex.wfms.service.impl.ClientLaunchService" name="wfms_clientlaunch">
@@ -211,7 +211,7 @@
 					new Object[]
 					{
 						new jadex.base.fipa.FIPAMessageType(), 
-						new jadex.bdi.runtime.JavaStandardPlanExecutor($platform.getService(jadex.service.threadpool.ThreadPoolService.class)),
+						new jadex.bdi.runtime.JavaStandardPlanExecutor(jadex.service.SServiceProvider.getService($platform, jadex.service.threadpool.ThreadPoolService.class)),
 						new java.lang.Long(10000),
 						jadex.tools.introspector.IntrospectorAdapter.class,
 						Boolean.TRUE,

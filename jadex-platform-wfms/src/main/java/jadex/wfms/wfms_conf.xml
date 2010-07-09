@@ -79,7 +79,7 @@
 			</property>
 			
 			<property type="jadex.wfms.service.IWfmsClientService" name="wfms_wfmsclient_service">
-				$platform.getService(jadex.wfms.service.IClientService.class)
+				jadex.service.SServiceProvider.getService($platform, jadex.wfms.service.IClientService.class)
 			</property>
 			
 			<property type="jadex.wfms.service.IModelRepositoryService" name="wfms_model_repository">

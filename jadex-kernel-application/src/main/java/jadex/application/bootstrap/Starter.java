@@ -36,7 +36,7 @@ public class Starter
 //		System.out.println("Instance: "+instance);
 		
 		// Initiate first step of root component (i.e. platform).
-		instance.executeStep();
+		adapter.execute();
 		
 		long startup = System.currentTimeMillis() - starttime;
 		System.out.println("Platform startup time: " + startup + " ms.");

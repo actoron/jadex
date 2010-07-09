@@ -26,7 +26,7 @@
 					{
 						new jadex.base.fipa.FIPAMessageType(), 
 						new jadex.bdi.runtime.impl.JavaStandardPlanExecutor(
-							$platform.getService(jadex.service.threadpool.ThreadPoolService.class).get(new jadex.commons.ThreadSuspendable())),
+							jadex.service.SServiceProvider.getService($platform, jadex.service.threadpool.ThreadPoolService.class).get(new jadex.commons.ThreadSuspendable())),
 						new java.lang.Long(10000),
 						Boolean.TRUE,
 						"jadex.tools.debugger.bdi.BDIAgentInspectorDebuggerPanel, jadex.tools.debugger.bdi.BDIAgentRuleEngineDebuggerPanel"

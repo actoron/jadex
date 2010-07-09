@@ -7,6 +7,7 @@ import jadex.commons.IFuture;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.service.IServiceContainer;
+import jadex.service.SServiceProvider;
 import jadex.service.library.ILibraryService;
 
 import java.util.Collection;
@@ -33,13 +34,13 @@ public class SComponentFactory
 	{
 		final Future ret = new Future();
 		
-		container.getService(ILibraryService.class).addResultListener(new DefaultResultListener()
+		SServiceProvider.getService(container, ILibraryService.class).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
 				final ILibraryService ls = (ILibraryService)result;
 				
-				container.getServices(IComponentFactory.class).addResultListener(new DefaultResultListener()
+				SServiceProvider.getServices(container, IComponentFactory.class).addResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object source, Object result)
 					{
@@ -73,13 +74,13 @@ public class SComponentFactory
 	{
 		final Future ret = new Future();
 		
-		container.getService(ILibraryService.class).addResultListener(new DefaultResultListener()
+		SServiceProvider.getService(container, ILibraryService.class).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
 				final ILibraryService ls = (ILibraryService)result;
 				
-				container.getServices(IComponentFactory.class).addResultListener(new DefaultResultListener()
+				SServiceProvider.getServices(container, IComponentFactory.class).addResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object source, Object result)
 					{
@@ -129,13 +130,13 @@ public class SComponentFactory
 	{
 		final Future ret = new Future();
 		
-		container.getService(ILibraryService.class).addResultListener(new DefaultResultListener()
+		SServiceProvider.getService(container, ILibraryService.class).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
 				final ILibraryService ls = (ILibraryService)result;
 				
-				container.getServices(IComponentFactory.class).addResultListener(new DefaultResultListener()
+				SServiceProvider.getServices(container, IComponentFactory.class).addResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object source, Object result)
 					{
@@ -166,7 +167,7 @@ public class SComponentFactory
 	{
 		final Future ret = new Future();
 		
-		container.getServices(IComponentFactory.class).addResultListener(new DefaultResultListener()
+		SServiceProvider.getServices(container, IComponentFactory.class).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
@@ -195,7 +196,7 @@ public class SComponentFactory
 	{
 		final Future ret = new Future();
 		
-		container.getServices(IComponentFactory.class).addResultListener(new DefaultResultListener()
+		SServiceProvider.getServices(container, IComponentFactory.class).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
@@ -224,7 +225,7 @@ public class SComponentFactory
 	{
 		final Future ret = new Future();
 		
-		container.getServices(IComponentFactory.class).addResultListener(new DefaultResultListener()
+		SServiceProvider.getServices(container, IComponentFactory.class).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
@@ -252,13 +253,13 @@ public class SComponentFactory
 	{
 		final Future ret = new Future();
 		
-		container.getService(ILibraryService.class).addResultListener(new DefaultResultListener()
+		SServiceProvider.getService(container, ILibraryService.class).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
 				final ILibraryService ls = (ILibraryService)result;
 				
-				container.getServices(IComponentFactory.class).addResultListener(new DefaultResultListener()
+				SServiceProvider.getService(container, IComponentFactory.class).addResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object source, Object result)
 					{

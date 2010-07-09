@@ -9,6 +9,7 @@ import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IThreadPool;
 import jadex.service.IServiceContainer;
+import jadex.service.SServiceProvider;
 import jadex.service.clock.ClockService;
 import jadex.service.clock.IClock;
 import jadex.service.clock.IClockService;
@@ -124,7 +125,7 @@ public class SimulationService implements ISimulationService
 		final Future	ret	= new Future();
 		final boolean[]	services	= new boolean[2];
 
-		container.getService(IExecutionService.class).addResultListener(new DefaultResultListener()
+		SServiceProvider.getService(container, IExecutionService.class).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
@@ -140,7 +141,7 @@ public class SimulationService implements ISimulationService
 			}
 		});
 				
-		container.getService(IClockService.class).addResultListener(new DefaultResultListener()
+		SServiceProvider.getService(container, IClockService.class).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{

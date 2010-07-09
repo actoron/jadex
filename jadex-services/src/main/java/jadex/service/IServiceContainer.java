@@ -4,7 +4,7 @@ import jadex.commons.IFuture;
 
 /**
  *  Internal interface for a service container. Allows
- *  fetching service per type (and name). 
+ *  adding and removing services. 
  */
 public interface IServiceContainer extends IServiceProvider
 {	
@@ -14,12 +14,14 @@ public interface IServiceContainer extends IServiceProvider
 	 *  Start the service.
 	 *  @return A future that is done when the service has completed starting.  
 	 */
+	// todo: remove, only call from platform
 	public IFuture start();
 	
 	/**
 	 *  Shutdown the service.
 	 *  @return A future that is done when the service has completed its shutdown.  
 	 */
+	// todo: remove, only call from platform
 	public IFuture shutdown();
 	
 	/**

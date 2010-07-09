@@ -26,7 +26,7 @@
 					new Object[]
 					{
 						new jadex.base.fipa.FIPAMessageType(), 
-						new jadex.bdi.runtime.JavaStandardPlanExecutor($platform.getService(jadex.service.threadpool.ThreadPoolService.class)),
+						new jadex.bdi.runtime.JavaStandardPlanExecutor(jadex.service.SServiceProvider.getService($platform, jadex.service.threadpool.ThreadPoolService.class)),
 						new jadex.bdi.runtime.KilimPlanExecutor(),
 						new java.lang.Long(10000),
 						Boolean.TRUE,

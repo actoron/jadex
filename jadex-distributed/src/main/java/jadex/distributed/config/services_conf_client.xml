@@ -62,7 +62,7 @@
 			<property type="jadex.service.clock.IClockService" name="clock_service">
 				new jadex.service.clock.ClockService(
 					new jadex.service.clock.SystemClock("system_clock", 100,
-					$platform.getService(jadex.service.threadpool.ThreadPoolService.class)))
+					jadex.service.SServiceProvider.getService($platform, jadex.service.threadpool.ThreadPoolService.class)))
 //				new jadex.base.clock.SimulationEventClock("simulation_clock",
 //					System.currentTimeMillis(), 200))
 			</property>
@@ -73,7 +73,7 @@
 		
 			<property type="jadex.service.execution.IExecutionService" name="execution_service">
 				new jadex.service.execution.AsyncExecutionService(
-					$platform.getService(jadex.service.threadpool.ThreadPoolService.class))
+					jadex.service.SServiceProvider.getService($platform, jadex.service.threadpool.ThreadPoolService.class))
 			</property>
 			
 			<property type="jadex.distributed.service.discovery.DiscoverableService" name="discoverable_service">
@@ -105,7 +105,7 @@
 					new Object[]
 					{
 						new jadex.base.fipa.FIPAMessageType(), 
-						new jadex.bdi.runtime.JavaStandardPlanExecutor($platform.getService(jadex.service.threadpool.ThreadPoolService.class)),
+						new jadex.bdi.runtime.JavaStandardPlanExecutor(jadex.service.SServiceProvider.getService($platform, jadex.service.threadpool.ThreadPoolService.class)),
 						new java.lang.Long(10000),
 						Boolean.TRUE,
 						//new jadex.bdi.runtime.BpmnPlanExecutor(),
