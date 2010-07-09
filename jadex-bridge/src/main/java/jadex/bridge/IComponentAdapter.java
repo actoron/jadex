@@ -43,19 +43,6 @@ public interface IComponentAdapter
 	public boolean isExternalThread();
 
 	/**
-	 *  Cause termination of the component.
-	 *  IKernelComponent.killComponent(IResultListener) will be
-	 *  called in turn.
-	 * /
-	public void killComponent()	throws ComponentTerminatedException;*/
-
-	/**
-	 *  Get the component platform.
-	 *  @return The component platform.
-	 * /
-	public IServiceProvider getRootServiceProvider()	throws ComponentTerminatedException;*/
-
-	/**
 	 *  Return the native component-identifier that allows to send
 	 *  messages to this component.
 	 */

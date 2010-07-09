@@ -54,20 +54,7 @@ public class ComponentServiceContainer implements IServiceContainer
 	{
 		final Future ret = new Future();
 		
-		if(adapter.isExternalThread())
-		{
-			adapter.invokeLater(new Runnable() 
-			{
-				public void run() 
-				{
-					container.getServices(manager, decider, selector).addResultListener(new DelegationResultListener(ret));
-				}
-			});
-		}
-		else
-		{
-			container.getServices(manager, decider, selector).addResultListener(new DelegationResultListener(ret));
-		}
+		container.getServices(manager, decider, selector).addResultListener(new DelegationResultListener(ret));
 		
 		return ret;
 	}
@@ -80,20 +67,7 @@ public class ComponentServiceContainer implements IServiceContainer
 	{
 		final Future ret = new Future();
 		
-		if(adapter.isExternalThread())
-		{
-			adapter.invokeLater(new Runnable() 
-			{
-				public void run() 
-				{
-					ret.setResult(adapter.getParent());
-				}
-			});
-		}
-		else
-		{
-			ret.setResult(adapter.getParent());
-		}
+		ret.setResult(adapter.getParent());
 		
 		return ret;
 	}
@@ -106,20 +80,7 @@ public class ComponentServiceContainer implements IServiceContainer
 	{
 		final Future ret = new Future();
 		
-		if(adapter.isExternalThread())
-		{
-			adapter.invokeLater(new Runnable() 
-			{
-				public void run() 
-				{
-					adapter.getChildren().addResultListener(new DelegationResultListener(ret));
-				}
-			});
-		}
-		else
-		{
-			adapter.getChildren().addResultListener(new DelegationResultListener(ret));
-		}
+		adapter.getChildren().addResultListener(new DelegationResultListener(ret));
 		
 		return ret;
 	}

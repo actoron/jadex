@@ -1,5 +1,6 @@
 package jadex.service;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 
@@ -45,15 +46,16 @@ public class TypeResultSelector implements IResultSelector
 	public void	selectServices(Map services, Collection results)
 	{
 		Collection res = (Collection)services.get(type);
-		if(res!=null && res.size()>0)
+		if(res!=null)
 		{
-			if(oneresult)
+			Object[]	ares	= res.toArray();
+			if(oneresult && ares.length>0)
 			{
 				results.add(res.toArray()[0]);
 			}
 			else
 			{
-				results.addAll(res);
+				results.addAll(Arrays.asList(ares));
 			}
 		}
 	}

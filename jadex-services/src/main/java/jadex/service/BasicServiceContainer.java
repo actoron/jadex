@@ -8,6 +8,7 @@ import jadex.commons.concurrent.IResultListener;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -92,15 +93,18 @@ public class BasicServiceContainer implements  IServiceContainer
 //		final Future ret = new Future();
 		
 //		System.out.println("Adding service: " + name + " " + type + " " + service);
-		Collection tmp = services!=null? (Collection)services.get(type): null;
-		if(tmp == null)
+		synchronized(this)
 		{
-			tmp = new ArrayList();
-			if(services==null)
-				services = new LinkedHashMap();
-			services.put(type, tmp);
+			Collection tmp = services!=null? (Collection)services.get(type): null;
+			if(tmp == null)
+			{
+				tmp = Collections.synchronizedList(new ArrayList());
+				if(services==null)
+					services = Collections.synchronizedMap(new LinkedHashMap());
+				services.put(type, tmp);
+			}
+			tmp.add(service);
 		}
-		tmp.add(service);
 		
 //		ret.setResult(null);
 //		return ret;
@@ -116,38 +120,43 @@ public class BasicServiceContainer implements  IServiceContainer
 //		final Future ret = new Future();
 		
 		//		System.out.println("Removing service: " + type + " " + service);
-		Collection tmp = services!=null? (Collection)services.get(type): null;
-		if(tmp == null || (service != null && !tmp.contains(service)))
-			throw new RuntimeException("Service not found: " + service);
-
-		boolean removed = false;
-		if(service == null && tmp.size() == 1)
+		synchronized(this)
 		{
-			IService rem = (IService)tmp.iterator().next();
-			tmp.remove(rem);
-			rem.shutdownService();
-			removed = true;
-		}
-		else
-		{
-			for(Iterator it = tmp.iterator(); it.hasNext();)
+			Collection tmp = services!=null? (Collection)services.get(type): null;
+			if(tmp == null || (service != null && !tmp.contains(service)))
+				throw new RuntimeException("Service not found: " + service);
+	
+			boolean removed = false;
+			if(service == null && tmp.size() == 1)
 			{
-				Object key = it.next();
-				if(tmp.equals(service))
+				service = tmp.iterator().next();
+				tmp.remove(service);
+				removed = true;
+			}
+			else
+			{
+				for(Iterator it=tmp.iterator(); !removed && it.hasNext(); )
 				{
-					tmp.remove(key);
-					if(key instanceof IService)
-						((IService)key).shutdownService();
-					removed = true;
+					Object key = it.next();
+					if(tmp.equals(service))
+					{
+						service	= key;
+						tmp.remove(key);
+						removed = true;
+					}
 				}
 			}
-		}
+	
+			if(!removed)
+				throw new RuntimeException("Service not found: " + service);
 
-		if(tmp.size() == 0)
-			services.remove(type);
+			if(tmp.isEmpty())
+				services.remove(type);
+		}
 		
-		if(!removed)
-			throw new RuntimeException("Service not found: " + service);
+		if(service instanceof IService)
+			((IService)service).shutdownService();
+
 	
 //		if(!removed)
 //			ret.setException(new RuntimeException("Service not found: " + service));

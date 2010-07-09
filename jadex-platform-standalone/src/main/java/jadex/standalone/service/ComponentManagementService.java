@@ -330,7 +330,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 			
 			if(!suspend)
 			{
-				adapter.wakeup();			
+				adapter.wakeup();
 			}
 		}
 		catch(Exception e)
