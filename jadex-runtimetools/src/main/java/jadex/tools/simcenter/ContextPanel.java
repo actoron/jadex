@@ -4,6 +4,7 @@ import jadex.base.ISimulationService;
 import jadex.commons.SGUI;
 import jadex.commons.ThreadSuspendable;
 import jadex.commons.concurrent.SwingDefaultResultListener;
+import jadex.service.SServiceProvider;
 import jadex.service.clock.IClock;
 import jadex.service.clock.IClockService;
 import jadex.tools.common.ToolTipAction;
@@ -122,7 +123,8 @@ public class ContextPanel extends AbstractTimePanel
 	{
 		public void actionPerformed(ActionEvent e)
 		{
-			getPlatform().getService(ISimulationService.class).addResultListener(new SwingDefaultResultListener()
+			SServiceProvider.getService(getPlatform(),
+				ISimulationService.class).addResultListener(new SwingDefaultResultListener()
 			{
 				public void customResultAvailable(Object source, Object result)
 				{
@@ -142,8 +144,8 @@ public class ContextPanel extends AbstractTimePanel
 		{
 			// todo: hack!
 			// problem: clock service must be fetched fresh!
-			IClockService cs = (IClockService)getPlatform().getService(IClockService.class).get(new ThreadSuspendable());
-			ISimulationService sims = (ISimulationService)getPlatform().getService(ISimulationService.class).get(new ThreadSuspendable());
+			IClockService cs = (IClockService)SServiceProvider.getService(getPlatform(), IClockService.class).get(new ThreadSuspendable());
+			ISimulationService sims = (ISimulationService)SServiceProvider.getService(getPlatform(), ISimulationService.class).get(new ThreadSuspendable());
 			boolean clockok = cs.getNextTimer()!=null 
 				|| cs.getClockType().equals(IClock.TYPE_CONTINUOUS)
 				|| cs.getClockType().equals(IClock.TYPE_SYSTEM);
@@ -159,7 +161,8 @@ public class ContextPanel extends AbstractTimePanel
 	{
 		public void actionPerformed(ActionEvent e)
 		{
-			getPlatform().getService(ISimulationService.class).addResultListener(new SwingDefaultResultListener()
+			SServiceProvider.getService(getPlatform(),
+				ISimulationService.class).addResultListener(new SwingDefaultResultListener()
 			{
 				public void customResultAvailable(Object source, Object result)
 				{
@@ -179,8 +182,8 @@ public class ContextPanel extends AbstractTimePanel
 		{
 			// todo: hack!
 			// problem: clock service must be fetched fresh!
-			IClockService cs = (IClockService)getPlatform().getService(IClockService.class).get(new ThreadSuspendable());
-			ISimulationService sims = (ISimulationService)getPlatform().getService(ISimulationService.class).get(new ThreadSuspendable());
+			IClockService cs = (IClockService)SServiceProvider.getService(getPlatform(), IClockService.class).get(new ThreadSuspendable());
+			ISimulationService sims = (ISimulationService)SServiceProvider.getService(getPlatform(), ISimulationService.class).get(new ThreadSuspendable());
 			boolean clockok = cs.getNextTimer()!=null; 
 			return !cs.getClockType().equals(IClock.TYPE_CONTINUOUS) 
 				&& !cs.getClockType().equals(IClock.TYPE_SYSTEM) 
@@ -196,7 +199,8 @@ public class ContextPanel extends AbstractTimePanel
 	{
 		public void actionPerformed(ActionEvent e)
 		{
-			getPlatform().getService(ISimulationService.class).addResultListener(new SwingDefaultResultListener()
+			SServiceProvider.getService(getPlatform(),
+				ISimulationService.class).addResultListener(new SwingDefaultResultListener()
 			{
 				public void customResultAvailable(Object source, Object result)
 				{
@@ -216,8 +220,8 @@ public class ContextPanel extends AbstractTimePanel
 		{
 			// todo: hack!
 			// problem: clock service must be fetched fresh!
-			IClockService cs = (IClockService)getPlatform().getService(IClockService.class).get(new ThreadSuspendable());
-			ISimulationService sims = (ISimulationService)getPlatform().getService(ISimulationService.class).get(new ThreadSuspendable());
+			IClockService cs = (IClockService)SServiceProvider.getService(getPlatform(), IClockService.class).get(new ThreadSuspendable());
+			ISimulationService sims = (ISimulationService)SServiceProvider.getService(getPlatform(), ISimulationService.class).get(new ThreadSuspendable());
 			boolean clockok = cs.getNextTimer()!=null;
 			return !cs.getClockType().equals(IClock.TYPE_CONTINUOUS)
 				&& !cs.getClockType().equals(IClock.TYPE_SYSTEM)
@@ -233,7 +237,8 @@ public class ContextPanel extends AbstractTimePanel
 	{
 		public void actionPerformed(ActionEvent e)
 		{
-			getPlatform().getService(ISimulationService.class).addResultListener(new SwingDefaultResultListener()
+			SServiceProvider.getService(getPlatform(),
+				ISimulationService.class).addResultListener(new SwingDefaultResultListener()
 			{
 				public void customResultAvailable(Object source, Object result)
 				{
@@ -252,7 +257,7 @@ public class ContextPanel extends AbstractTimePanel
 		public boolean isEnabled()
 		{
 			// todo: hack!
-			ISimulationService sims = (ISimulationService)getPlatform().getService(ISimulationService.class).get(new ThreadSuspendable());
+			ISimulationService sims = (ISimulationService)SServiceProvider.getService(getPlatform(), ISimulationService.class).get(new ThreadSuspendable());
 			return sims.isExecuting() && sims.getMode()
 				.equals(ISimulationService.MODE_NORMAL);
 		}

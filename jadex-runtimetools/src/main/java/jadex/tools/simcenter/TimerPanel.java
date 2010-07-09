@@ -1,8 +1,10 @@
 package jadex.tools.simcenter;
 
+import jadex.base.ISimulationService;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.commons.jtable.ObjectTableModel;
+import jadex.service.SServiceProvider;
 import jadex.service.clock.IClockService;
 import jadex.service.clock.ITimer;
 import jadex.service.clock.Timer;
@@ -144,7 +146,8 @@ public class TimerPanel extends AbstractTimePanel
 //			time	= System.currentTimeMillis();
 //		}
 
-		getPlatform().getService(IClockService.class).addResultListener(new SwingDefaultResultListener()
+		SServiceProvider.getService(getPlatform(),
+			IClockService.class).addResultListener(new SwingDefaultResultListener()
 		{
 			public void customResultAvailable(Object source, Object result)
 			{
