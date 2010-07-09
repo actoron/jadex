@@ -26,7 +26,7 @@ public class Starter
 		
 		// Create an instance of the platform.
 		IComponentFactory fac = new ApplicationComponentFactory(null);
-		ILoadableComponentModel model = fac.loadModel("jadex/application/bootstrap/Platform.application.xml", null, null);
+		ILoadableComponentModel model = fac.loadModel("jadex/application/bootstrap/Platform.application.xml", null, Starter.class.getClassLoader());
 //		System.out.println("Model: "+model);
 		IComponentIdentifier cid = new ComponentIdentifier("root@platform");
 		CMSComponentDescription desc = new CMSComponentDescription(cid, null, null, false, false);
