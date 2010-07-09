@@ -17,11 +17,8 @@ import java.util.Map;
  *  A service container is a simple infrastructure for a collection of
  *  services. It allows for starting/shutdowning the container and fetching
  *  service by their type/name.
- *  
- *  The configuration of services is not handled here but can be done
- *  e.g. in subclasses like the PropertyServiceContainer.
  */
-public class BasicServiceContainer implements  IServiceProvider, IServiceContainer
+public class BasicServiceContainer implements  IServiceContainer
 {	
 	//-------- attributes --------
 	
@@ -90,9 +87,9 @@ public class BasicServiceContainer implements  IServiceProvider, IServiceContain
 	 *  @param id The name.
 	 *  @param service The service.
 	 */
-	public IFuture addService(Class type, Object service)
+	public void addService(Class type, Object service)
 	{
-		final Future ret = new Future();
+//		final Future ret = new Future();
 		
 //		System.out.println("Adding service: " + name + " " + type + " " + service);
 		Collection tmp = services!=null? (Collection)services.get(type): null;
@@ -105,8 +102,8 @@ public class BasicServiceContainer implements  IServiceProvider, IServiceContain
 		}
 		tmp.add(service);
 		
-		ret.setResult(null);
-		return ret;
+//		ret.setResult(null);
+//		return ret;
 	}
 
 	/**
@@ -114,9 +111,9 @@ public class BasicServiceContainer implements  IServiceProvider, IServiceContain
 	 *  @param id The name.
 	 *  @param service The service.
 	 */
-	public IFuture removeService(Class type, Object service)
+	public void removeService(Class type, Object service)
 	{
-		final Future ret = new Future();
+//		final Future ret = new Future();
 		
 		//		System.out.println("Removing service: " + type + " " + service);
 		Collection tmp = services!=null? (Collection)services.get(type): null;
@@ -150,11 +147,14 @@ public class BasicServiceContainer implements  IServiceProvider, IServiceContain
 			services.remove(type);
 		
 		if(!removed)
-			ret.setException(new RuntimeException("Service not found: " + service));
-		else
-			ret.setResult(null);
-		
-		return ret;
+			throw new RuntimeException("Service not found: " + service);
+	
+//		if(!removed)
+//			ret.setException(new RuntimeException("Service not found: " + service));
+//		else
+//			ret.setResult(null);
+//		
+//		return ret;
 	}
 	
 	//-------- internal methods --------

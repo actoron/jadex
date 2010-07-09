@@ -5,11 +5,13 @@ import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ProcessThread;
 import jadex.bridge.CheckedAction;
 import jadex.bridge.ComponentResultListener;
+import jadex.bridge.IMessageService;
 import jadex.bridge.InterpreterTimedObject;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
+import jadex.service.SServiceProvider;
 import jadex.service.clock.IClockService;
 import jadex.service.clock.ITimer;
 
@@ -30,8 +32,8 @@ public class EventIntermediateTimerActivityHandler extends	AbstractEventIntermed
 	public void	doWait(final MActivity activity, final BpmnInterpreter instance, final ProcessThread thread, final long duration)
 	{
 		final Future	wifuture	= new Future(); 
-		instance.getServiceProvider().getService(IClockService.class)
-			.addResultListener(new ComponentResultListener(new IResultListener()
+		SServiceProvider.getService(instance.getServiceProvider(), IClockService.class)
+			.addResultListener(instance.createResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
@@ -58,7 +60,7 @@ public class EventIntermediateTimerActivityHandler extends	AbstractEventIntermed
 			{
 				wifuture.setException(exception);
 			}
-		}, instance.getComponentAdapter()));
+		}));
 		
 		thread.setWaitInfo(wifuture);	// Immediate result required for multiple events handler
 	}

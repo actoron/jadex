@@ -17,8 +17,11 @@ import jadex.bridge.IComponentManagementService;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.Tuple;
+import jadex.commons.concurrent.DefaultResultListener;
 import jadex.rules.state.IOAVState;
 import jadex.service.IServiceProvider;
+import jadex.service.SServiceProvider;
+import jadex.service.library.ILibraryService;
 
 import java.util.Map;
 
@@ -483,16 +486,27 @@ public class EAEventbaseFlyweight extends ElementFlyweight implements IEAEventba
 			{
 				public void run()
 				{
-					IComponentManagementService cms = (IComponentManagementService)getInterpreter().getServiceProvider().getService(IComponentManagementService.class);	
-					ret.setResult(cms.createComponentIdentifier(name, local, addresses));
+					SServiceProvider.getService(getInterpreter().getServiceProvider(), IComponentManagementService.class).addResultListener(new DefaultResultListener()
+					{
+						public void resultAvailable(Object source, Object result)
+						{
+							IComponentManagementService cms = (IComponentManagementService)result;
+							ret.setResult(cms.createComponentIdentifier(name, local, addresses));
+						}
+					});
 				}
 			});
 		}
 		else
 		{
-			
-			IComponentManagementService cms = (IComponentManagementService)getInterpreter().getServiceProvider().getService(IComponentManagementService.class);	
-			ret.setResult(cms.createComponentIdentifier(name, local, addresses));
+			SServiceProvider.getService(getInterpreter().getServiceProvider(), IComponentManagementService.class).addResultListener(new DefaultResultListener()
+			{
+				public void resultAvailable(Object source, Object result)
+				{
+					IComponentManagementService cms = (IComponentManagementService)result;
+					ret.setResult(cms.createComponentIdentifier(name, local, addresses));
+				}
+			});
 		}
 		
 		return ret;

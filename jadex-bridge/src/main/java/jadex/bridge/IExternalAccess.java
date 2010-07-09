@@ -7,7 +7,7 @@ import jadex.service.IServiceProvider;
  *  The interface for accessing components from the outside.
  *  To be specialized for concrete component types.
  */
-public interface IExternalAccess extends IServiceProvider
+public interface IExternalAccess
 {
 	/**
 	 *  Get the model of the component.
@@ -37,4 +37,10 @@ public interface IExternalAccess extends IServiceProvider
 	 *  Kill the component.
 	 */
 	public IFuture killComponent();
+	
+	/**
+	 *  Get the service provider.
+	 *  @return The service provider.
+	 */
+	public IServiceProvider getServiceProvider();
 }

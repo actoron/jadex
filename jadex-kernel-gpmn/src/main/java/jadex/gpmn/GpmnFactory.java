@@ -16,6 +16,7 @@ import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.service.IService;
 import jadex.service.IServiceContainer;
+import jadex.service.SServiceProvider;
 import jadex.service.library.ILibraryService;
 import jadex.service.library.ILibraryServiceListener;
 
@@ -83,7 +84,7 @@ public class GpmnFactory implements IComponentFactory, IService
 		this.legacyconverter = new GpmnBDIConverter();
 		this.converter = new GpmnBDIConverter2();
 		
-		container.getServices(IComponentFactory.class).addResultListener(new DefaultResultListener()
+		SServiceProvider.getServices(container, IComponentFactory.class).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{

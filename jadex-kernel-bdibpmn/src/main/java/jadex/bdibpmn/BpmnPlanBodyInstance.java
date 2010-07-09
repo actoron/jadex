@@ -57,10 +57,12 @@ import jadex.bpmn.runtime.handler.AbstractEventIntermediateTimerActivityHandler;
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
+import jadex.commons.concurrent.DefaultResultListener;
 import jadex.javaparser.IExpressionParser;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 import jadex.rules.state.IOAVState;
+import jadex.service.SServiceProvider;
 import jadex.service.clock.IClockService;
 
 import java.util.Collection;
@@ -198,7 +200,7 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 	 *  @param thread	The process thread that should wait.
 	 *  @param duration	The duration to wait for.
 	 */
-	public void addTimer(ProcessThread thread, long duration)
+	public void addTimer(final ProcessThread thread, final long duration)
 	{
 		assert duration==EventIntermediateTimerActivityHandler.TICK_TIMER || duration>=0;
 		
@@ -209,9 +211,22 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 		if(duration==EventIntermediateTimerActivityHandler.TICK_TIMER)
 			throw new UnsupportedOperationException("Tick timers for bdi-bpmn have to be implemented.");
 		
-		IClockService clock = (IClockService)interpreter.getServiceProvider().getService(IClockService.class);
+		// todo: check if asynchronous handling of waittimes is a problem?
+		
+		IClockService clock = interpreter.getClockService();
 		Long ret = new Long(clock.getTime()+duration);
 		waittimes.put(thread, ret);
+		
+//		SServiceProvider.getService(interpreter.getServiceProvider(), IClockService.class)
+//			.addResultListener(interpreter.createResultListener(new DefaultResultListener()
+//		{
+//			public void resultAvailable(Object source, Object result)
+//			{
+//				IClockService clock = (IClockService)result;
+//				Long ret = new Long(clock.getTime()+duration);
+//				waittimes.put(thread, ret);
+//			}
+//		}));
 	}
 	
 	/**
@@ -233,8 +248,9 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 	{
 		if(waittimes!=null)
 		{
-			IClockService clock = (IClockService)interpreter.getServiceProvider().getService(IClockService.class);
+//			IClockService clock = (IClockService)interpreter.getServiceProvider().getService(IClockService.class);
 			
+			IClockService clock = interpreter.getClockService();
 			for(Iterator it=waittimes.keySet().iterator(); it.hasNext(); )
 			{
 				ProcessThread	thread	= (ProcessThread)it.next();
@@ -283,7 +299,8 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 			String pool	= getPool(getLastState());
 			if(!POOL_UNDEFINED.equals(pool))
 			{
-				IClockService	clock	= (IClockService)interpreter.getServiceProvider().getService(IClockService.class);
+				IClockService	clock = interpreter.getClockService();
+//				IClockService	clock	= (IClockService)interpreter.getServiceProvider().getService(IClockService.class);
 				for(Iterator it=waittimes.keySet().iterator(); it.hasNext(); )
 				{
 					ProcessThread	thread	= (ProcessThread) it.next();
@@ -744,7 +761,8 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 	 */
 	public IClockService getClock()
 	{
-		return (IClockService)interpreter.getServiceProvider().getService(IClockService.class);
+		return interpreter.getClockService();
+//		return (IClockService)interpreter.getServiceProvider().getService(IClockService.class);
 	}
 
 	/**

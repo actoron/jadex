@@ -8,7 +8,21 @@ import jadex.commons.IFuture;
 public interface IServiceProvider
 {
 	/**
-	 *  Get all services of a typ.
+	 *  Get one service of a type.
+	 *  @param type The class.
+	 *  @return The corresponding service.
+	 */
+//	public IFuture getService(Class type);
+	
+	/**
+	 *  Get all services of a type.
+	 *  @param type The class.
+	 *  @return The corresponding services.
+	 */
+//	public IFuture getServices(Class type);
+	
+	/**
+	 *  Get all services of a type.
 	 *  @param type The class.
 	 *  @return The corresponding services.
 	 */

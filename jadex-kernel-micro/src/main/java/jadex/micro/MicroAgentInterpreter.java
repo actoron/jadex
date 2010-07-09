@@ -1,6 +1,7 @@
 package jadex.micro;
 
 import jadex.bridge.ComponentResultListener;
+import jadex.bridge.ComponentServiceContainer;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IArgument;
 import jadex.bridge.IComponentAdapter;
@@ -21,7 +22,7 @@ import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.service.IServiceContainer;
 import jadex.service.IServiceProvider;
-import jadex.service.NestedServiceContainer;
+import jadex.service.SServiceProvider;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -122,32 +123,9 @@ public class MicroAgentInterpreter implements IComponentInstance
 			}
 		}
 		
-		this.provider = new NestedServiceContainer(adapter.getComponentIdentifier().getLocalName())
-		{
-			public IFuture getParent()
-			{
-				final Future ret = new Future();
-				ret.setResult(parent);
-				return ret;
-			}
-			
-			public IFuture getChildren()
-			{
-				final Future ret = new Future();
-				
-				// todo: check if own component thread?!
-				microagent.getExternalAccess().getChildren().addResultListener(new DefaultResultListener()
-				{
-					public void resultAvailable(Object source, Object result)
-					{
-						ret.setResult(result);
-					}
-				});
-				return ret;
-			}
-		};
-		
-		// todo: load the serices and then start the provider!
+		// Create the service provider.
+		// Service adding and starting the provider must be done by hand.
+		this.provider = new ComponentServiceContainer(adapter);
 		
 		// Schedule initial step.
 		addStep(new Runnable()
@@ -281,7 +259,7 @@ public class MicroAgentInterpreter implements IComponentInstance
 	{
 		final Future ret = new Future();
 		
-		getServiceProvider().getService(IComponentManagementService.class).addResultListener(new DefaultResultListener()
+		SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
@@ -641,7 +619,8 @@ public class MicroAgentInterpreter implements IComponentInstance
 	{
 		final Future ret = new Future();
 		
-		provider.getService(IComponentManagementService.class).addResultListener(new DefaultResultListener()
+		SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class)
+			.addResultListener(createResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
@@ -654,7 +633,7 @@ public class MicroAgentInterpreter implements IComponentInstance
 					cms.getExternalAccess(childs[i]).addResultListener(crl);
 				}
 			}
-		});
+		}));
 		
 		return ret;
 	}

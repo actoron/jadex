@@ -9,11 +9,16 @@ import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IComponentManagementService;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.ILoadableComponentModel;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.MessageType;
+import jadex.commons.Future;
 import jadex.commons.ICommand;
+import jadex.commons.IFuture;
+import jadex.commons.concurrent.CollectionResultListener;
 import jadex.commons.concurrent.DefaultResultListener;
+import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IExecutable;
 import jadex.commons.concurrent.IResultListener;
 import jadex.service.IServiceContainer;
@@ -282,6 +287,41 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 		return this.model;
 	}
 
+	/**
+	 *  Get the parent component.
+	 *  @return The parent (if any).
+	 */
+	public IExternalAccess getParent()
+	{
+		return parent;
+	}
+	
+	/**
+	 *  Get the children (if any).
+	 *  @return The children.
+	 */
+	public IFuture getChildren()
+	{
+		final Future ret = new Future();
+		
+		component.getServiceProvider().getService(IComponentManagementService.class).addResultListener(new DefaultResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				IComponentManagementService cms = (IComponentManagementService)result;
+				IComponentIdentifier[] childs = cms.getChildren(getComponentIdentifier());
+				
+				IResultListener	crl	= new CollectionResultListener(childs.length, new DelegationResultListener(ret));
+				for(int i=0; !ret.isDone() && i<childs.length; i++)
+				{
+					cms.getExternalAccess(childs[i]).addResultListener(crl);
+				}
+			}
+		});
+		
+		return ret;
+	}
+	
 	/**
 	 *  String representation of the component.
 	 */

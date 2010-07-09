@@ -18,13 +18,11 @@ import jadex.bridge.ILoadableComponentModel;
 import jadex.bridge.InterpreterTimedObject;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
-import jadex.commons.concurrent.DelegationResultListener;
 import jadex.rules.state.IOAVState;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 /**
  *  External access interface.
@@ -1140,227 +1138,12 @@ public class ExternalAccessFlyweight extends EACapabilityFlyweight implements IB
 	}
 	
 	/**
-	 *  Get the first declared service of a given type.
-	 *  @param type The type.
-	 *  @return The corresponding service.
-	 */
-	public IFuture getService(final Class type)
-	{
-		if(getInterpreter().isExternalThread())
-		{
-			AgentInvocation invoc = new AgentInvocation()
-			{
-				public void run()
-				{
-					object = getInterpreter().getServiceProvider().getService(type);
-				}
-			};
-			return (IFuture)invoc.object;
-		}
-		else
-		{
-			return getInterpreter().getServiceProvider().getService(type);
-		}
-	}
-	
-	/**
-	 *  Get a service.
-	 *  @param type The class.
-	 *  @return The corresponding services.
-	 */
-	public IFuture getServices(final Class type)
-	{
-		if(getInterpreter().isExternalThread())
-		{
-			AgentInvocation invoc = new AgentInvocation()
-			{
-				public void run()
-				{
-					object = getInterpreter().getServiceProvider().getServices(type);
-				}
-			};
-			return (IFuture)invoc.object;
-		}
-		else
-		{
-			return getInterpreter().getServiceProvider().getServices(type);
-		}
-	}
-	
-	/**
-	 *  Get a service.
-	 *  @param name The name.
-	 *  @return The corresponding service.
-	 * /
-	public IFuture getService(final Class type, final String name)
-	{
-		if(getInterpreter().isExternalThread())
-		{
-			AgentInvocation invoc = new AgentInvocation()
-			{
-				public void run()
-				{
-					object = getInterpreter().getServiceProvider().getService(type, name);
-				}
-			};
-			return (IFuture)invoc.object;
-		}
-		else
-		{
-			return getInterpreter().getServiceProvider().getService(type, name);
-		}
-	}*/
-	
-	/**
-	 *  Get the available service types.
-	 *  @return The service types.
-	 */
-	public IFuture getServicesTypes()
-	{
-		if(getInterpreter().isExternalThread())
-		{
-			AgentInvocation invoc = new AgentInvocation()
-			{
-				public void run()
-				{
-					object = getInterpreter().getServiceProvider().getServicesTypes();
-				}
-			};
-			return (IFuture)invoc.object;
-		}
-		else
-		{
-			return getInterpreter().getServiceProvider().getServicesTypes();
-		}
-	}
-	
-	/**
 	 *  Get the children (if any).
 	 *  @return The children.
 	 */
 	public IFuture getChildren()
 	{
 		return getInterpreter().getChildren();
-	}
-	
-	// todo: remove me?
-	/**
-	 *  Get all services for a type.
-	 *  @param type The type.
-	 */
-	public IFuture getServiceOfType(final Class type, final Set visited)
-	{
-		final Future ret = new Future();
-		
-		if(adapter.isExternalThread())
-		{
-			adapter.invokeLater(new Runnable() 
-			{
-				public void run() 
-				{
-					getInterpreter().getServiceProvider().getServiceOfType(type, visited).addResultListener(new DelegationResultListener(ret));
-				}
-			});
-		}
-		else
-		{
-			getInterpreter().getServiceProvider().getServiceOfType(type, visited).addResultListener(new DelegationResultListener(ret));
-		}
-		
-		return ret;
-	}
-	
-	// todo: remove me?
-	/**
-	 *  Get all services for a type.
-	 *  @param type The type.
-	 */
-	public IFuture getServicesOfType(final Class type, final Set visited)
-	{
-		final Future ret = new Future();
-		
-		if(adapter.isExternalThread())
-		{
-			adapter.invokeLater(new Runnable() 
-			{
-				public void run() 
-				{
-					getInterpreter().getServiceProvider().getServicesOfType(type, visited).addResultListener(new DelegationResultListener(ret));
-				}
-			});
-		}
-		else
-		{
-			getInterpreter().getServiceProvider().getServicesOfType(type, visited).addResultListener(new DelegationResultListener(ret));
-		}
-		
-		return ret;
-	}
-
-	// todo: remove me?
-	/**
-	 *  Get the name of the provider.
-	 *  @return The name of this provider.
-	 */
-	public String getName()
-	{
-		return getComponentName();
-	}
-	
-	/**
-	 *  Add a service to the platform.
-	 *  If under the same name and type a service was contained,
-	 *  the old one is removed and shutdowned.
-	 *  @param name The name.
-	 *  @param service The service.
-	 */
-	public IFuture addService(final Class type, final Object service)
-	{
-		final Future ret = new Future();
-		
-		if(adapter.isExternalThread())
-		{
-			adapter.invokeLater(new Runnable() 
-			{
-				public void run() 
-				{
-					getInterpreter().getServiceProvider().addService(type, service).addResultListener(new DelegationResultListener(ret));
-				}
-			});
-		}
-		else
-		{
-			getInterpreter().getServiceProvider().addService(type, service).addResultListener(new DelegationResultListener(ret));
-		}
-		
-		return ret;
-	}
-
-	/**
-	 *  Removes a service from the platform (shutdowns also the service).
-	 *  @param name The name.
-	 *  @param service The service.
-	 */
-	public IFuture removeService(final Class type, final Object service)
-	{
-		final Future ret = new Future();
-		
-		if(adapter.isExternalThread())
-		{
-			adapter.invokeLater(new Runnable() 
-			{
-				public void run() 
-				{
-					getInterpreter().getServiceProvider().removeService(type, service).addResultListener(new DelegationResultListener(ret));
-				}
-			});
-		}
-		else
-		{
-			getInterpreter().getServiceProvider().removeService(type, service).addResultListener(new DelegationResultListener(ret));
-		}
-		
-		return ret;
 	}
 	
 	/**

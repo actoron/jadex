@@ -12,6 +12,7 @@ import jadex.commons.IFilter;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.DefaultResultListener;
+import jadex.service.SServiceProvider;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -68,14 +69,14 @@ public class EventIntermediateMessageActivityHandler	extends DefaultActivityHand
 	 */
 	protected void sendMessage(final MActivity activity, final BpmnInterpreter instance, final ProcessThread thread)
 	{
-		instance.getServiceProvider().getService(IMessageService.class)
-			.addResultListener(new ComponentResultListener(new DefaultResultListener()
+		SServiceProvider.getService(instance.getServiceProvider(), IMessageService.class)
+			.addResultListener(instance.createResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
 				final IMessageService	ms	= (IMessageService)result;
-				instance.getServiceProvider().getService(IComponentManagementService.class)
-					.addResultListener(new ComponentResultListener(new DefaultResultListener()
+				SServiceProvider.getService(instance.getServiceProvider(), IComponentManagementService.class)
+					.addResultListener(instance.createResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object source, Object result)
 					{
@@ -141,9 +142,9 @@ public class EventIntermediateMessageActivityHandler	extends DefaultActivityHand
 						ms.sendMessage(msg, mt, instance.getComponentAdapter(), instance.getClassLoader());
 						instance.getStepHandler(activity).step(activity, instance, thread, null);
 					}
-				}, instance.getComponentAdapter()));
+				}));
 			}
-		}, instance.getComponentAdapter()));
+		}));
 	}
 	
 	/**

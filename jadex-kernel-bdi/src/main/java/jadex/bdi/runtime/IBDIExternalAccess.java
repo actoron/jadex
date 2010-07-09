@@ -24,7 +24,6 @@ public interface IBDIExternalAccess extends IExternalAccess, IEACapability
 	 *  @param type	The template goal name as specified in the ADF.
 	 *  @return The created goal.
 	 */
-//	public IGoal createGoal(String type);
 	public IFuture createGoal(String type);
 
 	//-------- eventbase shortcut methods --------
@@ -47,14 +46,12 @@ public interface IBDIExternalAccess extends IExternalAccess, IEACapability
 	 *  Create a new message event.
 	 *  @return The new message event.
 	 */
-//	public IMessageEvent createMessageEvent(String type);
 	public IFuture createMessageEvent(String type);
 
 	/**
 	 *  Create a new intenal event.
 	 *  @return The new intenal event.
 	 */
-//	public IInternalEvent createInternalEvent(String type);
 	public IFuture createInternalEvent(String type);
 
 	/**
@@ -107,7 +104,6 @@ public interface IBDIExternalAccess extends IExternalAccess, IEACapability
 	 *  Wait for an internal event.
 	 *  @param type The internal event type.
 	 */
-//	public IInternalEvent waitForInternalEvent(String type);
 	public IFuture waitForInternalEvent(String type);
 
 	/**
@@ -115,7 +111,6 @@ public interface IBDIExternalAccess extends IExternalAccess, IEACapability
 	 *  @param type The internal event type.
 	 *  @param timeout The timeout.
 	 */
-//	public IInternalEvent waitForInternalEvent(String type, long timeout);
 	public IFuture waitForInternalEvent(String type, long timeout);
 
 	/**
@@ -123,7 +118,6 @@ public interface IBDIExternalAccess extends IExternalAccess, IEACapability
 	 *  @param me The message event.
 	 *  @return The result event.
 	 */
-//	public IMessageEvent sendMessageAndWait(IMessageEvent me);
 	public IFuture sendMessageAndWait(IEAMessageEvent me);
 
 	/**
@@ -133,14 +127,12 @@ public interface IBDIExternalAccess extends IExternalAccess, IEACapability
 	 *  @param timeout The timeout.
 	 *  @return The result event.
 	 */
-//	public IMessageEvent sendMessageAndWait(IMessageEvent me, long timeout);
 	public IFuture sendMessageAndWait(IEAMessageEvent me, long timeout);
 
 	/**
 	 *  Wait for a message event.
 	 *  @param type The message event type.
 	 */
-//	public IMessageEvent waitForMessageEvent(String type);
 	public IFuture waitForMessageEvent(String type);
 
 	/**
@@ -148,28 +140,24 @@ public interface IBDIExternalAccess extends IExternalAccess, IEACapability
 	 *  @param type The message event type.
 	 *  @param timeout The timeout.
 	 */
-//	public IMessageEvent waitForMessageEvent(String type, long timeout);
 	public IFuture waitForMessageEvent(String type, long timeout);
 
 	/**
 	 *  Wait for a message.
 	 *  @param msgevent The message event.
 	 */
-//	public IMessageEvent	waitForReply(IMessageEvent msgevent);
 	public IFuture waitForReply(IEAMessageEvent msgevent);
 
 	/**
 	 *  Wait for a message.
 	 *  @param msgevent The message event.
 	 */
-//	public IMessageEvent waitForReply(IMessageEvent msgevent, long timeout);
 	public IFuture waitForReply(IEAMessageEvent msgevent, long timeout);
 
 	/**
 	 *  Wait for a goal.
 	 *  @param type The goal type.
 	 */
-//	public void waitForGoal(String type);
 	public IFuture waitForGoal(String type);
 
 	/**
@@ -177,7 +165,6 @@ public interface IBDIExternalAccess extends IExternalAccess, IEACapability
 	 *  @param type The goal type.
 	 *  @param timeout The timeout.
 	 */
-//	public void waitForGoal(String type, long timeout);
 	public IFuture waitForGoal(String type, long timeout);
 
 	/**
@@ -185,7 +172,6 @@ public interface IBDIExternalAccess extends IExternalAccess, IEACapability
 	 *  @param belief The belief (set) type.
 	 *  @return The changed fact value.
 	 */
-//	public Object waitForFactChanged(String belief);
 	public IFuture waitForFactChanged(String belief);
 
 	/**
@@ -194,7 +180,6 @@ public interface IBDIExternalAccess extends IExternalAccess, IEACapability
 	 *  @param timeout The timeout.
 	 *  @return The changed fact.
 	 */
-//	public Object waitForFactChanged(String belief, long timeout);
 	public IFuture waitForFactChanged(String belief, long timeout);
 
 	/**
@@ -202,7 +187,6 @@ public interface IBDIExternalAccess extends IExternalAccess, IEACapability
 	 *  @param type The belief set type.
 	 *  @return The fact that was added.
 	 */
-//	public Object waitForFactAdded(String type);
 	public IFuture waitForFactAdded(String type);
 
 	/**
@@ -211,7 +195,6 @@ public interface IBDIExternalAccess extends IExternalAccess, IEACapability
 	 *  @param timeout The timeout.
 	 *  @return The fact that was added.
 	 */
-//	public Object waitForFactAdded(String type, long timeout);
 	public IFuture waitForFactAdded(String type, long timeout);
 
 	/**
@@ -219,7 +202,6 @@ public interface IBDIExternalAccess extends IExternalAccess, IEACapability
 	 *  @param type The belief set type.
 	 *  @return The fact that was added.
 	 */
-//	public Object waitForFactRemoved(String type);
 	public IFuture waitForFactRemoved(String type);
 
 	/**
@@ -228,21 +210,18 @@ public interface IBDIExternalAccess extends IExternalAccess, IEACapability
 	 *  @param timeout The timeout.
 	 *  @return The fact that was added.
 	 */
-//	public Object waitForFactRemoved(String type, long timeout);
 	public IFuture waitForFactRemoved(String type, long timeout);
 
 	/**
 	 *  Dispatch a top level goal and wait for the result.
 	 *  @param goal The goal.
 	 */
-//	public void dispatchTopLevelGoalAndWait(IEGoal goal);
 	public IFuture dispatchTopLevelGoalAndWait(IEAGoal goal);
 
 	/**
 	 *  Dispatch a top level goal and wait for the result.
 	 *  @param goal The goal.
 	 */
-//	public void dispatchTopLevelGoalAndWait(IEGoal goal, long timeout);
 	public IFuture dispatchTopLevelGoalAndWait(IEAGoal goal, long timeout);
 	
 	/**

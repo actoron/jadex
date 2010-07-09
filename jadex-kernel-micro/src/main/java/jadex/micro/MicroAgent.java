@@ -6,8 +6,13 @@ import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IMessageService;
 import jadex.bridge.MessageType;
+import jadex.commons.Future;
+import jadex.commons.IFuture;
+import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
+import jadex.service.IServiceContainer;
 import jadex.service.IServiceProvider;
+import jadex.service.SServiceProvider;
 import jadex.service.clock.IClockService;
 import jadex.service.clock.ITimedObject;
 import jadex.service.clock.ITimer;
@@ -187,9 +192,21 @@ public abstract class MicroAgent implements IMicroAgent
 	 *  Get the current time.
 	 *  @return The current time.
 	 */
-	public long getTime()
+	public IFuture getTime()
 	{
-		return ((IClockService)getServiceProvider().getService(IClockService.class)).getTime();
+		final Future ret = new Future();
+		
+		SServiceProvider.getService(getServiceProvider(), IClockService.class)
+			.addResultListener(createResultListener(new DefaultResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				IClockService cs = (IClockService)result;
+				ret.setResult(new Long(cs.getTime()));
+			}
+		}));
+		
+		return ret;
 	}
 	
 	/**
@@ -201,25 +218,34 @@ public abstract class MicroAgent implements IMicroAgent
 	{
 		if(timer!=null)
 			throw new RuntimeException("timer should be null");
-		this.timer = ((IClockService)getServiceProvider().getService(IClockService.class)).createTimer(time, new ITimedObject()
+		
+		SServiceProvider.getService(getServiceProvider(), IClockService.class)
+			.addResultListener(createResultListener(new DefaultResultListener()
 		{
-			public void timeEventOccurred(long currenttime)
+			public void resultAvailable(Object source, Object result)
 			{
-				interpreter.scheduleStep(new Runnable()
+				IClockService cs = (IClockService)result;
+				timer = cs.createTimer(time, new ITimedObject()
 				{
-					public void run()
+					public void timeEventOccurred(long currenttime)
 					{
-						timer = null;
-						run.run();
-					}
-					
-					public String toString()
-					{
-						return "microagent.waitForDue("+time+")_#"+this.hashCode();
+						interpreter.scheduleStep(new Runnable()
+						{
+							public void run()
+							{
+								timer = null;
+								run.run();
+							}
+							
+							public String toString()
+							{
+								return "microagent.waitForDue("+time+")_#"+this.hashCode();
+							}
+						});
 					}
 				});
 			}
-		});
+		}));
 	}
 	
 	/**
@@ -230,25 +256,33 @@ public abstract class MicroAgent implements IMicroAgent
 	{
 		if(timer!=null)
 			throw new RuntimeException("timer should be null");
-		this.timer = ((IClockService)getServiceProvider().getService(IClockService.class)).createTickTimer(new ITimedObject()
+		SServiceProvider.getService(getServiceProvider(), IClockService.class)
+			.addResultListener(createResultListener(new DefaultResultListener()
 		{
-			public void timeEventOccurred(final long currenttime)
+			public void resultAvailable(Object source, Object result)
 			{
-				interpreter.scheduleStep(new Runnable()
+				IClockService cs = (IClockService)result;
+				timer = cs.createTickTimer(new ITimedObject()
 				{
-					public void run()
+					public void timeEventOccurred(final long currenttime)
 					{
-						timer = null;
-						run.run();
-					}
-					
-					public String toString()
-					{
-						return "microagent.waitForTickDue()_#"+this.hashCode();
+						interpreter.scheduleStep(new Runnable()
+						{
+							public void run()
+							{
+								timer = null;
+								run.run();
+							}
+							
+							public String toString()
+							{
+								return "microagent.waitForTickDue()_#"+this.hashCode();
+							}
+						});
 					}
 				});
 			}
-		});
+		}));
 	}
 	
 	/**
@@ -257,7 +291,7 @@ public abstract class MicroAgent implements IMicroAgent
 	 */
 	public Logger getLogger()
 	{
-		return interpreter.getAgentAdapter().getLogger();
+		return getAgentAdapter().getLogger();
 	}	
 	
 	/**
@@ -265,9 +299,15 @@ public abstract class MicroAgent implements IMicroAgent
 	 */
 	public void killAgent()
 	{
-		((IComponentManagementService)interpreter.getServiceProvider()
-			.getService(IComponentManagementService.class))
-			.destroyComponent(interpreter.getAgentAdapter().getComponentIdentifier());
+		SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class)
+			.addResultListener(createResultListener(new DefaultResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				IComponentManagementService cms = (IComponentManagementService)result;
+				cms.destroyComponent(getComponentIdentifier());
+			}
+		}));
 	}
 		
 	/**
@@ -275,11 +315,17 @@ public abstract class MicroAgent implements IMicroAgent
 	 *  @param me	The message content (name value pairs).
 	 *  @param mt	The message type describing the content.
 	 */
-	public void sendMessage(Map me, MessageType mt)
+	public void sendMessage(final Map me, final MessageType mt)
 	{
-		((IMessageService)getServiceProvider().getService(IMessageService.class)).
-			sendMessage(me, mt, interpreter.getAgentAdapter(), interpreter.getAgentModel().getClassLoader());
-//			sendMessage(me, mt, getComponentIdentifier(), interpreter.getAgentModel().getClassLoader());
+		SServiceProvider.getService(getServiceProvider(), IMessageService.class)
+			.addResultListener(createResultListener(new DefaultResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				IMessageService ms = (IMessageService)result;
+				ms.sendMessage(me, mt, interpreter.getAgentAdapter(), interpreter.getAgentModel().getClassLoader());
+			}
+		}));
 	}
 	
 	/**
@@ -289,7 +335,7 @@ public abstract class MicroAgent implements IMicroAgent
 	 *  @param addresses The addresses.
 	 *  @return The new component identifier.
 	 */
-	public IComponentIdentifier createComponentIdentifier(String name)
+	public IFuture createComponentIdentifier(String name)
 	{
 		return createComponentIdentifier(name, true, null);
 	}
@@ -301,7 +347,7 @@ public abstract class MicroAgent implements IMicroAgent
 	 *  @param addresses The addresses.
 	 *  @return The new component identifier.
 	 */
-	public IComponentIdentifier createComponentIdentifier(String name, boolean local)
+	public IFuture createComponentIdentifier(String name, boolean local)
 	{
 		return createComponentIdentifier(name, local, null);
 	}
@@ -313,10 +359,21 @@ public abstract class MicroAgent implements IMicroAgent
 	 *  @param addresses The addresses.
 	 *  @return The new component identifier.
 	 */
-	public IComponentIdentifier createComponentIdentifier(final String name, final boolean local, final String[] addresses)
+	public IFuture createComponentIdentifier(final String name, final boolean local, final String[] addresses)
 	{
-		IComponentManagementService cms = (IComponentManagementService)interpreter.getServiceProvider().getService(IComponentManagementService.class);	
-		return cms.createComponentIdentifier(name, local, addresses);
+		final Future ret = new Future();
+		
+		SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class)
+			.addResultListener(createResultListener(new DefaultResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				IComponentManagementService cms = (IComponentManagementService)result;
+				ret.setResult(cms.createComponentIdentifier(name, local, addresses));
+			}
+		}));
+		
+		return ret;
 	}
 	
 	/**
@@ -324,10 +381,20 @@ public abstract class MicroAgent implements IMicroAgent
 	 *  @param msgeventtype	The message event type.
 	 *  @return The reply event.
 	 */
-	public Map createReply(Map msg, MessageType mt)
+	public IFuture createReply(final Map msg, final MessageType mt)
 	{
-		IMessageService ms = (IMessageService)interpreter.getServiceProvider().getService(IMessageService.class);	
-		return ms.createReply(msg, mt);
+		final Future ret = new Future();
+		SServiceProvider.getService(getServiceProvider(), IMessageService.class)
+			.addResultListener(createResultListener(new DefaultResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				IMessageService ms = (IMessageService)result;
+				ret.setResult(ms.createReply(msg, mt));
+			}
+		}));
+		
+		return ret;
 	}
 	
 	/**
@@ -356,6 +423,36 @@ public abstract class MicroAgent implements IMicroAgent
 	public void	scheduleStep(Runnable step)
 	{
 		interpreter.scheduleStep(step);
+	}
+	
+	/**
+	 *  Add a service to the platform.
+	 *  If under the same name and type a service was contained,
+	 *  the old one is removed and shutdowned.
+	 *  @param name The name.
+	 *  @param service The service.
+	 */
+	public void addService(Class type, Object service)
+	{
+		((IServiceContainer)interpreter.getServiceProvider()).addService(type, service);
+	}
+
+	/**
+	 *  Removes a service from the platform (shutdowns also the service).
+	 *  @param name The name.
+	 *  @param service The service.
+	 */
+	public void removeService(Class type, Object service)
+	{
+		((IServiceContainer)interpreter.getServiceProvider()).removeService(type, service);
+	}
+	
+	/**
+	 *  Start the service provider.
+	 */
+	public IFuture startServiceProvider(Class type, Object service)
+	{
+		return ((IServiceContainer)interpreter.getServiceProvider()).start();
 	}
 	
 	/**

@@ -11,6 +11,7 @@ import jadex.application.model.MSpaceInstance;
 import jadex.application.runtime.IApplication;
 import jadex.application.runtime.ISpace;
 import jadex.bridge.ComponentResultListener;
+import jadex.bridge.ComponentServiceContainer;
 import jadex.bridge.CreationInfo;
 import jadex.bridge.IArgument;
 import jadex.bridge.IComponentAdapter;
@@ -37,7 +38,7 @@ import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 import jadex.service.IService;
 import jadex.service.IServiceContainer;
 import jadex.service.IServiceProvider;
-import jadex.service.NestedServiceContainer;
+import jadex.service.SServiceProvider;
 import jadex.service.library.ILibraryService;
 
 import java.util.Collection;
@@ -108,28 +109,7 @@ public class Application implements IApplication, IComponentInstance
 		this.parent = parent;
 		this.arguments = arguments==null ? new HashMap() : arguments;
 		this.results = new HashMap();
-		this.provider = new NestedServiceContainer(adapter.getComponentIdentifier().getLocalName())
-		{
-			public IFuture getParent()
-			{
-				final Future ret = new Future();
-				ret.setResult(parent==null? null: parent);
-				return ret;
-			}
-			
-			public IFuture getChildren()
-			{
-				final Future ret = new Future();
-				new ExternalAccess(Application.this).getChildren().addResultListener(new DefaultResultListener()
-				{
-					public void resultAvailable(Object source, Object result)
-					{
-						ret.setResult(result);
-					}
-				});
-				return ret;
-			}
-		};
+		this.provider = new ComponentServiceContainer(adapter);
 		
 		// Init the arguments with default values.
 		String configname = config!=null? config.getName(): null;
@@ -316,7 +296,7 @@ public class Application implements IApplication, IComponentInstance
 	{
 		// Checks if loaded model is defined in the application component types
 		
-		getServiceProvider().getServices(IComponentFactory.class).addResultListener(new DefaultResultListener()
+		SServiceProvider.getServices(getServiceProvider(), IComponentFactory.class).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
@@ -441,7 +421,7 @@ public class Application implements IApplication, IComponentInstance
 	 */
 	public void killApplication()
 	{
-		getServiceProvider().getService(IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
+		SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
 		{
 			public void customResultAvailable(Object source, Object result)
 			{
@@ -825,13 +805,13 @@ public class Application implements IApplication, IComponentInstance
 							}
 
 							final List components = config.getMComponentInstances();
-							getServiceProvider().getService(ILibraryService.class).addResultListener(createResultListener(new DefaultResultListener()
+							SServiceProvider.getService(getServiceProvider(), ILibraryService.class).addResultListener(createResultListener(new DefaultResultListener()
 							{
 								public void resultAvailable(Object source, Object result)
 								{
 									final ILibraryService ls = (ILibraryService)result;
 									final ClassLoader cl = ls.getClassLoader();
-									getServiceProvider().getService(IComponentManagementService.class).addResultListener(createResultListener(new DefaultResultListener()
+									SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class).addResultListener(createResultListener(new DefaultResultListener()
 									{
 										public void resultAvailable(Object source, Object result)
 										{
@@ -888,7 +868,7 @@ public class Application implements IApplication, IComponentInstance
 	{
 		final Future ret = new Future();
 		
-		getServiceProvider().getService(IComponentManagementService.class).addResultListener(new DefaultResultListener()
+		SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
@@ -1001,7 +981,7 @@ public class Application implements IApplication, IComponentInstance
 	{
 		final Future ret = new Future();
 		
-		provider.getService(IComponentManagementService.class).addResultListener(new DefaultResultListener()
+		SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{

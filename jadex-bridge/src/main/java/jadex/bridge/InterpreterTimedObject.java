@@ -2,6 +2,7 @@ package jadex.bridge;
 
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.service.IServiceProvider;
+import jadex.service.SServiceProvider;
 import jadex.service.clock.ITimedObject;
 
 /**
@@ -42,7 +43,7 @@ public class InterpreterTimedObject implements ITimedObject
 	 */
 	public void timeEventOccurred(long currenttime)
 	{
-		provider.getService(IComponentManagementService.class).addResultListener(new DefaultResultListener()
+		SServiceProvider.getService(provider, IComponentManagementService.class).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{

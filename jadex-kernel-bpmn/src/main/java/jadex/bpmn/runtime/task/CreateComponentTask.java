@@ -8,6 +8,7 @@ import jadex.bridge.ComponentResultListener;
 import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentManagementService;
 import jadex.commons.concurrent.IResultListener;
+import jadex.service.SServiceProvider;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -41,7 +42,7 @@ public class CreateComponentTask implements ITask
 	 */
 	public void execute(final ITaskContext context, final BpmnInterpreter instance, final IResultListener listener)
 	{
-		instance.getServiceProvider().getService(IComponentManagementService.class).addResultListener(new ComponentResultListener(new IResultListener()
+		SServiceProvider.getService(instance.getServiceProvider(), IComponentManagementService.class).addResultListener(new ComponentResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{

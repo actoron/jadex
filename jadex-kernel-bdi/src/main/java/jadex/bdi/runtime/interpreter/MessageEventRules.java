@@ -34,6 +34,8 @@ import jadex.rules.rulesystem.rules.Variable;
 import jadex.rules.rulesystem.rules.functions.MethodCallFunction;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVJavaType;
+import jadex.service.SServiceProvider;
+import jadex.service.library.ILibraryService;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -717,7 +719,7 @@ public class MessageEventRules
 				final IMessageAdapter msg = new DefaultMessageAdapter(message, mtype);
 				
 				final BDIInterpreter interpreter = BDIInterpreter.getInterpreter(state);
-				interpreter.getServiceProvider().getService(IMessageService.class)
+				SServiceProvider.getService(interpreter.getServiceProvider(), IMessageService.class)
 					.addResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object source, Object result)

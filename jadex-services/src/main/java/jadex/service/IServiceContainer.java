@@ -29,12 +29,12 @@ public interface IServiceContainer extends IServiceProvider
 	 *  @param name The name.
 	 *  @param service The service.
 	 */
-	public IFuture addService(Class type, Object service);
+	public void addService(Class type, Object service);
 
 	/**
 	 *  Removes a service from the platform (shutdowns also the service).
 	 *  @param name The name.
 	 *  @param service The service.
 	 */
-	public IFuture removeService(Class type, Object service);
+	public void removeService(Class type, Object service);
 }

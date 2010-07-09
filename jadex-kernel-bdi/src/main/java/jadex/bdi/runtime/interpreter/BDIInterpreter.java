@@ -15,6 +15,7 @@ import jadex.bdi.runtime.IPlanbase;
 import jadex.bdi.runtime.IPropertybase;
 import jadex.bdi.runtime.impl.eaflyweights.ExternalAccessFlyweight;
 import jadex.bridge.ComponentResultListener;
+import jadex.bridge.ComponentServiceContainer;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentDescription;
@@ -47,8 +48,9 @@ import jadex.rules.state.IOAVState;
 import jadex.rules.state.IProfiler;
 import jadex.service.IServiceContainer;
 import jadex.service.IServiceProvider;
-import jadex.service.NestedServiceContainer;
+import jadex.service.SServiceProvider;
 import jadex.service.clock.IClockService;
+import jadex.service.library.ILibraryService;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -271,33 +273,11 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 		}
 		
 		// Create the service provider
-		this.provider = new NestedServiceContainer(adapter.getComponentIdentifier().getLocalName())
-		{
-			public IFuture getParent()
-			{
-				final Future ret = new Future();
-				ret.setResult(parent);
-				return ret;
-			}
-			
-			public IFuture getChildren()
-			{
-				final Future ret = new Future();
-				
-				BDIInterpreter.this.getChildren().addResultListener(new DefaultResultListener()
-				{
-					public void resultAvailable(Object source, Object result)
-					{
-						ret.setResult(result);
-					}
-				});
-				return ret;
-			}
-		};
+		this.provider = new ComponentServiceContainer(adapter);
 		
 		// Get the services.
 		final boolean services[]	= new boolean[3];
-		getServiceProvider().getService(IClockService.class).addResultListener(new DefaultResultListener()
+		SServiceProvider.getService(getServiceProvider(), IClockService.class).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
@@ -312,7 +292,7 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 					BDIInterpreter.this.state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state,OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_CREATING);
 			}
 		});
-		getServiceProvider().getService(IComponentManagementService.class).addResultListener(new DefaultResultListener()
+		SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
@@ -327,7 +307,7 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 					BDIInterpreter.this.state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state,OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_CREATING);
 			}
 		});
-		getServiceProvider().getService(IMessageService.class).addResultListener(new DefaultResultListener()
+		SServiceProvider.getService(getServiceProvider(), IMessageService.class).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
@@ -830,7 +810,7 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 	{
 		final Future ret = new Future();
 		
-		getServiceProvider().getService(IComponentManagementService.class).addResultListener(new DefaultResultListener()
+		SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
@@ -1219,7 +1199,7 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 	{
 		final Future ret = new Future();
 		
-		getServiceProvider().getService(IComponentManagementService.class).addResultListener(new ComponentResultListener(new DefaultResultListener()
+		SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class).addResultListener(new ComponentResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
@@ -1243,6 +1223,14 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 	public IServiceProvider getServiceProvider()
 	{
 		return provider;
+	}
+	
+	/**
+	 *  Create a component result listener.
+	 */
+	public IResultListener createResultListener(IResultListener listener)
+	{
+		return new ComponentResultListener(listener, adapter);
 	}
 	
 	//-------- helper methods --------

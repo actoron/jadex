@@ -25,16 +25,11 @@ public interface IMicroExternalAccess	extends IExternalAccess
 	 */
 	public void	scheduleStep(Runnable step);
 	
+	// HACK!!! todo: remove me
 	/**
 	 *  Get the agent implementation.
 	 *  Operations on the agent object
 	 *  should be properly synchronized with invokeLater()!
 	 */
-//	public IMicroAgent getAgent();
 	public IFuture getAgent();
-	
-	/**
-	 *  Get the domain interfaces of the component.
-	 */
-//	public Class[] getDomainInterfaces();
 }

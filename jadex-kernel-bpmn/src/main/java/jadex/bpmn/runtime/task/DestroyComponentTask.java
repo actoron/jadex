@@ -6,7 +6,9 @@ import jadex.bpmn.runtime.ITaskContext;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.IFuture;
+import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
+import jadex.service.SServiceProvider;
 
 /**
  *  Task for destroying a component.
@@ -16,46 +18,53 @@ public class DestroyComponentTask implements ITask
 	/**
 	 *  Execute the task.
 	 */
-	public void execute(ITaskContext context, BpmnInterpreter instance, final IResultListener listener)
+	public void execute(final ITaskContext context, BpmnInterpreter instance, final IResultListener listener)
 	{
-		IComponentManagementService ces = (IComponentManagementService)instance.getServiceProvider().getService(IComponentManagementService.class);
-		final IResultListener resultlistener = (IResultListener)context.getParameterValue("resultlistener");
-		final boolean wait = context.getParameterValue("wait")!=null? ((Boolean)context.getParameterValue("wait")).booleanValue(): false;
-		
-		IComponentIdentifier cid = (IComponentIdentifier)context.getParameterValue("componentid");
-		if(cid==null)
+		SServiceProvider.getService(instance.getServiceProvider(), IComponentManagementService.class)
+			.addResultListener(instance.createResultListener(new DefaultResultListener()
 		{
-			String name = (String)context.getParameterValue("name");
-			cid = ces.createComponentIdentifier(name, true, null);
-		}
-		
-		IFuture ret = ces.destroyComponent(cid);
-		if(wait || resultlistener!=null)
-		{
-			ret.addResultListener(new IResultListener()
+			public void resultAvailable(Object source, Object result)
 			{
-				public void resultAvailable(Object source, Object result)
+				IComponentManagementService ces = (IComponentManagementService)result;
+				final IResultListener resultlistener = (IResultListener)context.getParameterValue("resultlistener");
+				final boolean wait = context.getParameterValue("wait")!=null? ((Boolean)context.getParameterValue("wait")).booleanValue(): false;
+				
+				IComponentIdentifier cid = (IComponentIdentifier)context.getParameterValue("componentid");
+				if(cid==null)
 				{
-					if(resultlistener!=null)
-						resultlistener.resultAvailable(DestroyComponentTask.this, result);
-					if(wait)
-						listener.resultAvailable(DestroyComponentTask.this, result);
+					String name = (String)context.getParameterValue("name");
+					cid = ces.createComponentIdentifier(name, true, null);
 				}
 				
-				public void exceptionOccurred(Object source, Exception exception)
+				IFuture ret = ces.destroyComponent(cid);
+				if(wait || resultlistener!=null)
 				{
-					if(resultlistener!=null)
-						resultlistener.exceptionOccurred(DestroyComponentTask.this, exception);
-					if(wait)
-						listener.exceptionOccurred(DestroyComponentTask.this, exception);
+					ret.addResultListener(new IResultListener()
+					{
+						public void resultAvailable(Object source, Object result)
+						{
+							if(resultlistener!=null)
+								resultlistener.resultAvailable(DestroyComponentTask.this, result);
+							if(wait)
+								listener.resultAvailable(DestroyComponentTask.this, result);
+						}
+						
+						public void exceptionOccurred(Object source, Exception exception)
+						{
+							if(resultlistener!=null)
+								resultlistener.exceptionOccurred(DestroyComponentTask.this, exception);
+							if(wait)
+								listener.exceptionOccurred(DestroyComponentTask.this, exception);
+						}
+					});
 				}
-			});
-		}
 
-		if(!wait)
-		{
-			listener.resultAvailable(this, null);
-		}
+				if(!wait)
+				{
+					listener.resultAvailable(this, null);
+				}
+			}
+		}));
 	}
 	
 	//-------- static methods --------

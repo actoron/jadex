@@ -34,7 +34,8 @@ public class DispatchSubprocessTask	implements ITask
 			boolean	wait	= context.hasParameterValue("wait")
 				? ((Boolean)context.getParameterValue("wait")).booleanValue() : true;
 			
-			IComponentManagementService cms = (IComponentManagementService) plan.getScope().getServiceProvider().getService(IComponentManagementService.class);
+			IComponentManagementService cms = plan.getInterpreter().getCMS();
+//			IComponentManagementService cms = (IComponentManagementService) plan.getScope().getServiceProvider().getService(IComponentManagementService.class);
 			final Object	goal	= new Object() ;
 			ResultFuture rf = new ResultFuture();
 			if (params == null)

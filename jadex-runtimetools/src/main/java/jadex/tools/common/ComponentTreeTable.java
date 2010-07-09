@@ -86,7 +86,7 @@ public class ComponentTreeTable extends JScrollPane
 		// Initialize default node types (may be overriden from outside).
 		this.nodetypes = new HashMap();
 		addNodeType(new TreeTableNodeType(NODE_CONTAINER, new Icon[]{icons.getIcon(NODE_CONTAINER)}, new String[]{"name"}, new String[]{"Name"}));
-		addNodeType(new ComponentTreeTableNodeType(root));
+		addNodeType(new ComponentTreeTableNodeType(root.getServiceProvider()));
 
 		this.nodes = new HashMap();
 		this.getViewport().setBackground(UIManager.getColor("List.background"));

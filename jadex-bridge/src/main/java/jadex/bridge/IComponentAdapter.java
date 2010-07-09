@@ -1,5 +1,11 @@
 package jadex.bridge;
 
+import jadex.commons.Future;
+import jadex.commons.IFuture;
+import jadex.commons.concurrent.CollectionResultListener;
+import jadex.commons.concurrent.DefaultResultListener;
+import jadex.commons.concurrent.DelegationResultListener;
+import jadex.commons.concurrent.IResultListener;
 import jadex.service.IServiceProvider;
 
 import java.util.logging.Logger;
@@ -65,5 +71,17 @@ public interface IComponentAdapter
 	 *  @return The logger.
 	 */
 	public Logger getLogger();
+	
+	/**
+	 *  Get the parent component.
+	 *  @return The parent (if any).
+	 */
+	public IExternalAccess getParent();
+	
+	/**
+	 *  Get the children (if any).
+	 *  @return The children.
+	 */
+	public IFuture getChildren();
 }
 
