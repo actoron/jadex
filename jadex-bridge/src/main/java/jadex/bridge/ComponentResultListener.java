@@ -37,18 +37,26 @@ public class ComponentResultListener implements IResultListener
 	 */
 	public void resultAvailable(final Object source, final Object result)
 	{
-		adapter.invokeLater(new Runnable()
+		if(adapter.isExternalThread())
 		{
-			public void run()
+			adapter.invokeLater(new Runnable()
 			{
-				listener.resultAvailable(source, result);
-			}
-			
-			public String toString()
-			{
-				return "resultAvailable("+result+")_#"+this.hashCode();
-			}
-		});
+				public void run()
+				{
+					listener.resultAvailable(source, result);
+				}
+				
+				public String toString()
+				{
+					return "resultAvailable("+result+")_#"+this.hashCode();
+				}
+			});
+		}
+		else
+		{
+			listener.resultAvailable(source, result);
+		}
+		
 	}
 	
 	/**
@@ -58,17 +66,24 @@ public class ComponentResultListener implements IResultListener
 	 */
 	public void exceptionOccurred(final Object source, final Exception exception)
 	{
-		adapter.invokeLater(new Runnable()
+		if(adapter.isExternalThread())
 		{
-			public void run()
+			adapter.invokeLater(new Runnable()
 			{
-				listener.exceptionOccurred(source, exception);
-			}
-			
-			public String toString()
-			{
-				return "exceptionOccurred("+exception+")_#"+this.hashCode();
-			}
-		});
+				public void run()
+				{
+					listener.exceptionOccurred(source, exception);
+				}
+				
+				public String toString()
+				{
+					return "exceptionOccurred("+exception+")_#"+this.hashCode();
+				}
+			});
+		}
+		else
+		{
+			listener.exceptionOccurred(source, exception);
+		}
 	}
 }

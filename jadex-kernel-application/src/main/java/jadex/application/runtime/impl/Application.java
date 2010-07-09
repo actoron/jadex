@@ -797,7 +797,7 @@ public class Application implements IApplication, IComponentInstance
 								{
 									final ILibraryService ls = (ILibraryService)result;
 									final ClassLoader cl = ls.getClassLoader();
-									SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class).addResultListener(createResultListener(new DefaultResultListener()
+									SServiceProvider.getServiceUpwards(getServiceProvider(), IComponentManagementService.class).addResultListener(createResultListener(new DefaultResultListener()
 									{
 										public void resultAvailable(Object source, Object result)
 										{
