@@ -60,6 +60,7 @@ public class LocalSearchManager implements ISearchManager
 	 */
 	public Object getCacheKey()
 	{
-		return this.getClass().getName();
+		// Do not cache local results.
+		return null;
 	}
 }

@@ -350,7 +350,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 				{
 					public void resultAvailable(Object source, Object result)
 					{
-						System.out.println("killing: "+cid);
+//						System.out.println("killing: "+cid);
 						
 						StandaloneComponentAdapter component = (StandaloneComponentAdapter)adapters.get(cid);
 						if(component==null)
@@ -686,7 +686,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 		
 		public void resultAvailable(Object source, Object result)
 		{
-			System.out.println("CleanupCommand: "+result);
+//			System.out.println("CleanupCommand: "+result);
 			IComponentDescription ad = (IComponentDescription)descs.get(cid);
 			Map results = null;
 			StandaloneComponentAdapter adapter;

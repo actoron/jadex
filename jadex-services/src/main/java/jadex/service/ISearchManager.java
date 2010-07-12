@@ -22,6 +22,7 @@ public interface ISearchManager
 	 *  Get the cache key.
 	 *  Needs to identify this element with respect to its important features so that
 	 *  two equal elements should return the same key.
+	 *  @return	The cache key or null, if results should not be cached.
 	 */
 	public Object getCacheKey();
 }

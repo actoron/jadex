@@ -44,9 +44,10 @@ public class CacheServiceContainer	implements IServiceContainer
 	{
 		final Future ret = new Future();
 		
-		final Tuple key = new Tuple(manager.getCacheKey(), decider.getCacheKey(), selector.getCacheKey());
+		final Tuple key = manager.getCacheKey()!=null && decider.getCacheKey()!=null && selector.getCacheKey()!=null
+			? new Tuple(manager.getCacheKey(), decider.getCacheKey(), selector.getCacheKey()) : null;
 		
-		if(cache.containsKey(key))
+		if(key!=null && cache.containsKey(key))
 		{
 			Object res = cache.get(key);
 			ret.setResult(res);
@@ -57,7 +58,8 @@ public class CacheServiceContainer	implements IServiceContainer
 			{
 				public void resultAvailable(Object source, Object result)
 				{
-					cache.put(key, result);
+					if(key!=null)
+						cache.put(key, result);
 					ret.setResult(result);
 				}
 				

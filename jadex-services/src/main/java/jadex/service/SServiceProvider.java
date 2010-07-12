@@ -2,10 +2,6 @@ package jadex.service;
 
 import jadex.commons.IFuture;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-
 /**
  * 
  */
@@ -16,35 +12,35 @@ public class SServiceProvider
 	protected static IVisitDecider abortdecider = new DefaultVisitDecider();
 	protected static IVisitDecider contdecider = new DefaultVisitDecider(false);
 	
-	protected static Map	profiling	= new HashMap();
-	
-	static
-	{
-		new Thread(new Runnable()
-		{
-			public void run()
-			{
-				try
-				{
-					Thread.sleep(5000);
-					
-					synchronized(profiling)
-					{
-						System.out.println("--------------------");
-						for(Iterator it=profiling.keySet().iterator(); it.hasNext(); )
-						{
-							Object	key	= it.next();
-							System.out.println(key+":\t"+profiling.get(key));
-						}
-					}
-				}
-				catch(InterruptedException e)
-				{
-					e.printStackTrace();
-				}
-			}
-		}).start();
-	}
+//	protected static Map	profiling	= new HashMap();
+//	
+//	static
+//	{
+//		new Thread(new Runnable()
+//		{
+//			public void run()
+//			{
+//				try
+//				{
+//					Thread.sleep(5000);
+//					
+//					synchronized(profiling)
+//					{
+//						System.out.println("--------------------");
+//						for(Iterator it=profiling.keySet().iterator(); it.hasNext(); )
+//						{
+//							Object	key	= it.next();
+//							System.out.println(key+":\t"+profiling.get(key));
+//						}
+//					}
+//				}
+//				catch(InterruptedException e)
+//				{
+//					e.printStackTrace();
+//				}
+//			}
+//		}).start();
+//	}
 	
 	/**
 	 *  Get one service of a type.
@@ -53,11 +49,11 @@ public class SServiceProvider
 	 */
 	public static IFuture getService(IServiceProvider provider, Class type)
 	{
-		synchronized(profiling)
-		{
-			Integer	cnt	= (Integer)profiling.get(type);
-			profiling.put(type, new Integer(cnt!=null ? cnt.intValue()+1 : 1)); 
-		}
+//		synchronized(profiling)
+//		{
+//			Integer	cnt	= (Integer)profiling.get(type);
+//			profiling.put(type, new Integer(cnt!=null ? cnt.intValue()+1 : 1)); 
+//		}
 		return provider.getServices(treemanager, abortdecider, new TypeResultSelector(type));
 	}
 	
@@ -68,11 +64,11 @@ public class SServiceProvider
 	 */
 	public static IFuture getService(IServiceProvider provider, IResultSelector selector)
 	{
-		synchronized(profiling)
-		{
-			Integer	cnt	= (Integer)profiling.get(selector.getCacheKey());
-			profiling.put(selector.getCacheKey(), new Integer(cnt!=null ? cnt.intValue()+1 : 1)); 
-		}
+//		synchronized(profiling)
+//		{
+//			Integer	cnt	= (Integer)profiling.get(selector.getCacheKey());
+//			profiling.put(selector.getCacheKey(), new Integer(cnt!=null ? cnt.intValue()+1 : 1)); 
+//		}
 		return provider.getServices(treemanager, abortdecider, selector);
 	}
 	
@@ -83,11 +79,11 @@ public class SServiceProvider
 	 */
 	public static IFuture getServices(IServiceProvider provider, Class type)
 	{
-		synchronized(profiling)
-		{
-			Integer	cnt	= (Integer)profiling.get(type);
-			profiling.put(type, new Integer(cnt!=null ? cnt.intValue()+1 : 1)); 
-		}
+//		synchronized(profiling)
+//		{
+//			Integer	cnt	= (Integer)profiling.get(type);
+//			profiling.put(type, new Integer(cnt!=null ? cnt.intValue()+1 : 1)); 
+//		}
 		return provider.getServices(treemanager, contdecider, new TypeResultSelector(type, false));
 	}
 
@@ -98,11 +94,11 @@ public class SServiceProvider
 	 */
 	public static IFuture getServiceUpwards(IServiceProvider provider, Class type)
 	{
-		synchronized(profiling)
-		{
-			Integer	cnt	= (Integer)profiling.get(type);
-			profiling.put(type, new Integer(cnt!=null ? cnt.intValue()+1 : 1)); 
-		}
+//		synchronized(profiling)
+//		{
+//			Integer	cnt	= (Integer)profiling.get(type);
+//			profiling.put(type, new Integer(cnt!=null ? cnt.intValue()+1 : 1)); 
+//		}
 		return provider.getServices(upwardsmanager, abortdecider, new TypeResultSelector(type));
 	}
 }
