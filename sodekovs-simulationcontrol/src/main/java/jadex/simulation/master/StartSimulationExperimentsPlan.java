@@ -1,5 +1,6 @@
 package jadex.simulation.master;
 
+import jadex.application.runtime.IApplication;
 import jadex.application.runtime.IApplicationExternalAccess;
 import jadex.application.space.envsupport.MEnvSpaceInstance;
 import jadex.application.space.envsupport.environment.AbstractEnvironmentSpace;
@@ -14,11 +15,15 @@ import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.commons.IFuture;
+import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.javaparser.IExpressionParser;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
+import jadex.service.library.ILibraryService;
 import jadex.simulation.helper.Constants;
 import jadex.simulation.model.Data;
+import jadex.simulation.model.Dataconsumer;
 import jadex.simulation.model.Dataprovider;
 import jadex.simulation.model.ObservedEvent;
 import jadex.simulation.model.Optimization;
@@ -27,6 +32,7 @@ import jadex.simulation.model.Source;
 import jadex.simulation.model.result.ExperimentResult;
 import jadex.simulation.model.result.IntermediateResult;
 import jadex.simulation.model.result.RowResult;
+import jadex.xml.IContext;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -205,7 +211,7 @@ public class StartSimulationExperimentsPlan extends Plan {
 			IFuture fut = executionService.createComponent(appName, fileName, new CreationInfo(configName, args, null, false, false), null);
 			IComponentIdentifier comp = (IComponentIdentifier) fut.get(this);
 			// add data consumer and provider
-			addDataConsumerAndProvider(comp, executionService, (SimulationConfiguration) ((Map) args.get(Constants.SIMULATION_FACTS_FOR_CLIENT)).get(Constants.SIMULATION_FACTS_FOR_CLIENT));
+//			addDataConsumerAndProvider(comp, executionService, (SimulationConfiguration) ((Map) args.get(Constants.SIMULATION_FACTS_FOR_CLIENT)).get(Constants.SIMULATION_FACTS_FOR_CLIENT));
 
 		} catch (Exception e) {
 			// JOptionPane.showMessageDialog(SGUI.getWindowParent(StarterPanel.this),
@@ -262,17 +268,15 @@ public class StartSimulationExperimentsPlan extends Plan {
 		IFuture fut = executionService.getExternalAccess(comp);
 		IApplicationExternalAccess exta = (IApplicationExternalAccess) fut.get(this);
 //		AbstractEnvironmentSpace space = (AbstractEnvironmentSpace) exta.getSpace("my2dspace");
-
-		
 		
 		// Hack: Make sure space has been initialized...
 		int counterTmp = 0;
 		executionService.suspendComponent(comp);
 		
-		while (exta.getSpace("my2dspace") == null) {
-			counterTmp++;
-			waitFor(250);			
-		}		
+//		while (exta.getSpace("my2dspace") == null) {
+//			counterTmp++;
+//			waitFor(100);			
+//		}		
 		executionService.resumeComponent(comp);
 		
 		AbstractEnvironmentSpace space = (AbstractEnvironmentSpace) exta.getSpace("my2dspace");
@@ -300,7 +304,8 @@ public class StartSimulationExperimentsPlan extends Plan {
 					String varname = source.getName() != null ? source.getName() : "$object";
 					String objecttype = source.getObjecttype();
 					boolean aggregate = source.isAggregate();
-					IParsedExpression dataexp = getParsedExpression(source.getValue(), parser);
+//					IParsedExpression dataexp = getParsedExpression(source.getValue(), parser);
+					IParsedExpression dataexp = null;
 					IParsedExpression includeexp = getParsedExpression(source.getIncludecondition(), parser);// 
 					provs[j] = new SpaceObjectSource(varname, space, objecttype, aggregate, dataexp, includeexp);
 				}
@@ -320,27 +325,56 @@ public class StartSimulationExperimentsPlan extends Plan {
 			}
 		}
 		
-		// Create the data consumers.
-		List consumers = mspacetype.getPropertyList("dataconsumers");
-		tmp = si.getPropertyList("dataconsumers");
-		
-		if(consumers==null && tmp!=null)
-			consumers = tmp;
-		else if(consumers!=null && tmp!=null)
-			consumers.addAll(tmp);
+		// Create the data consumers.		
+		List<Dataconsumer> consumers = simConf.getDataconsumerList();		
 		
 //		System.out.println("data consumers: "+consumers);
 		if(consumers!=null)
 		{
 			for(int i=0; i<consumers.size(); i++)
 			{
-				Map dcon = (Map)consumers.get(i);
-				String name = (String)MEnvSpaceInstance.getProperty(dcon, "name");
-				Class clazz = (Class)MEnvSpaceInstance.getProperty(dcon, "class");
-				ITableDataConsumer con = (ITableDataConsumer)clazz.newInstance();
-				MEnvSpaceInstance.setProperties(con, (List)dcon.get("properties"), fetcher);
-				con.setProperty("envspace", this);
-				this.addDataConsumer(name, con);
+				Dataconsumer dcon = consumers.get(i);
+				String name = dcon.getName(); 
+				
+//				Class clazz = (Class)MEnvSpaceInstance.getProperty(dcon, "clazz");
+				Class clazz = null; 
+				try {
+					clazz = SReflect.findClass(dcon.getClazz(),toStringArray(simConf.getImportList()), ((ILibraryService)space.getContext().getServiceContainer().getService(ILibraryService.class)).getClassLoader());
+//					clazz = SUtil.class.getClassLoader().loadClass(tokenizer.nextToken().trim());
+//					clazz = SUtil.class.getClassLoader().loadClass(dcon.getClazz());
+//					clazz =((ILibraryService)space.getContext().getServiceContainer().getService(ILibraryService.class)).getClassLoader().loadClass(dcon.getClazz());
+//					clazz =((IContext)space.getContext()).getClassLoader().loadClass(dcon.getClazz());
+//					clazz = Class.forName(dcon.getClazz());//jadex.application.space.envsupport.evaluation.XYChartDataConsumer
+//					clazz = Class.forName("jadex.application.space.envsupport.evaluation.XYChartDataConsumer");
+				} catch (ClassNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				ITableDataConsumer con = null;
+				try {
+					con = (ITableDataConsumer)clazz.newInstance();
+				} catch (InstantiationException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IllegalAccessException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				//List of Hashmaps with dynamic=false
+				List<Map> tmpPropertyList = new ArrayList<Map>();
+				for(int j=0; j<dcon.getPropertyList().size(); j++){
+					Map map = new HashMap();
+					map.put("dynamic", false);
+					map.put("name", dcon.getPropertyList().get(j).getName());
+//					map.put("value", dcon.getPropertyList().get(j).getValue());
+					//Hack: has to be "initially" an expression that can be parsed
+					map.put("value", getParsedExpression("\"" + dcon.getPropertyList().get(j).getValue()  + "\"", parser));					
+					tmpPropertyList.add(map);
+				}
+//				MEnvSpaceInstance.setProperties(con, (List)dcon.get("properties"), fetcher);
+				MEnvSpaceInstance.setProperties(con, tmpPropertyList, space.getFetcher());//				
+				con.setProperty("envspace", space);
+				space.addDataConsumer(name, con);
 			}
 		}
 System.out.println("nnnnnnnnnnneded iterations: " + counterTmp);
@@ -355,5 +389,20 @@ System.out.println("nnnnnnnnnnneded iterations: " + counterTmp);
 	 */
 	private IParsedExpression getParsedExpression(String expression, IExpressionParser parser) {
 		return expression == null ? null : parser.parseExpression(expression, null, null, null);
+	}
+	
+	/***
+	 * Transforms an ArrayList<String> into String[]
+	 * @param list
+	 * @return
+	 */
+	private String[] toStringArray(ArrayList<String> list){
+		String[] array = new String[list.size()];
+		
+		for(int i=0; i<list.size(); i++){
+			array[i] = list.get(i);
+		}
+		
+		return array;
 	}
 }

@@ -19,7 +19,7 @@
 	                    http://jadex.sourceforge.net/jadex-envspace 
 	                    http://jadex.sourceforge.net/jadex-envspace-2.0.xsd"
 	name="MarsWorld4SimulationExperiments" package="jadex.simulation.examples.marsworld">
-										   
+
 	<imports>
 		<import>jadex.application.space.envsupport.environment.space2d.*</import>
 		<import>jadex.application.space.envsupport.environment.DeltaTimeExecutor</import>
@@ -31,11 +31,24 @@
 		<import>jadex.application.space.envsupport.observer.perspective.*</import>
 		<import>jadex.bdi.examples.marsworld.carry.*</import>
 		<import>jadex.bdi.examples.marsworld.producer.*</import>
-		<import>jadex.bdi.examples.marsworld.sentry.*</import>		
+		<import>jadex.bdi.examples.marsworld.sentry.*</import>
 		<import>jadex.bdi.examples.marsworld.movement.*</import>
 		<import>jadex.bdi.examples.marsworld.movement.MoveTask</import>
-		<import>java.text.SimpleDateFormat</import>		
+		<import>java.text.SimpleDateFormat</import>
 		<import>jadex.simulation.environment.DeltaTimeExecutor4Simulation</import>
+		<import>jadex.application.space.envsupport.evaluation.*</import>
+		<!--
+			ttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttt
+		-->
+		<import>jadex.application.space.envsupport.environment.space2d.*</import>
+		<import>jadex.application.space.envsupport.environment.*</import>
+		<import>jadex.application.space.envsupport.math.*</import>
+		<import>jadex.application.space.envsupport.dataview.*</import>
+		<import>jadex.application.space.envsupport.observer.perspective.*</import>
+		<import>jadex.bdi.planlib.*</import>
+		<import>jadex.application.space.envsupport.evaluation.*</import>
+		<import>jadex.commons.*</import>
+		<import>jadex.application.space.envsupport.observer.gui.plugin.*</import>
 	</imports>
 
 	<arguments>
@@ -43,10 +56,11 @@
 		<argument name="tmp_mission_time" typename="String">"Init"</argument>
 		<argument name="tmp_start_time" typename="long"></argument>
 		<argument name="al" typename="Int">new Integer(258)</argument>
-		<argument name="simulationFacts" typename="Map"/>
+		<argument name="simulationFacts" typename="Map" />
 		<!-- <argument name="nrr" typename="Int">new Integer(10)</argument> -->
-		<argument name="SentryNumber" typename="Int">new Integer(10)</argument>			
-		<argument name="Experiment_id" typename="String">"not set"</argument>		
+		<argument name="SentryNumber" typename="Int">new Integer(10)
+		</argument>
+		<argument name="Experiment_id" typename="String">"not set"</argument>
 	</arguments>
 
 	<spacetypes>
@@ -90,30 +104,42 @@
 				</env:objecttype>
 				<env:objecttype name="homebase">
 					<env:property name="ore">0</env:property>
-					<env:property name="start_time">$args.tmp_start_time</env:property>					  
-					<env:property name="duration" dynamic="true">$object.getProperty("space").getContext().getServiceContainer().getService(IClockService.class).getTime() - $object.getProperty("start_time")</env:property>
-					<!--<env:property name="text" dynamic="true">
-						 $object.getProperty("duration")</env:property>-->
-					 <env:property name="text" dynamic="true">
-						"Collected ore: "+$object.getProperty("ore")+" \n"+ "Experiment duration: "+new SimpleDateFormat("mm:ss").format(new Date(Math.max(0,$object.getProperty("duration"))))</env:property>
-					<!-- <env:property name="text" dynamic="false">"Only test showing argument: " + $args.tmp_mission_time</env:property>-->
+					<env:property name="start_time">$args.tmp_start_time</env:property>
+					<env:property name="duration" dynamic="true">$object.getProperty("space").getContext().getServiceContainer().getService(IClockService.class).getTime()
+						- $object.getProperty("start_time")</env:property>
+					<!--
+						<env:property name="text" dynamic="true">
+						$object.getProperty("duration")</env:property>
+					-->
+					<env:property name="text" dynamic="true">"Collected ore: "+$object.getProperty("ore")+" \n"+ "Experiment duration: "+new SimpleDateFormat("mm:ss").format(new Date(Math.max(0,$object.getProperty("duration"))))</env:property>
+					<!--
+						<env:property name="text" dynamic="false">"Only test showing
+						argument: " + $args.tmp_mission_time</env:property>
+					-->
 				</env:objecttype>
-				
+
 				<!-- TMP_HACK -->
 				<env:objecttype name="experimentID">
-					<env:property name="experimentID">$args.Experiment_id</env:property>					
+					<env:property name="experimentID">$args.Experiment_id</env:property>
 				</env:objecttype>
-				<!-- TMP_HACK: Needed in order to able to find the IComponentIdentifier for this agent from the space. Used within the DeltaTimeExecutor4Simulation. -->
-				<env:objecttype name="clientSimulator"/>					
-				
+				<!--
+					TMP_HACK: Needed in order to able to find the IComponentIdentifier
+					for this agent from the space. Used within the
+					DeltaTimeExecutor4Simulation.
+				-->
+				<env:objecttype name="clientSimulator" />
+
 			</env:objecttypes>
 
 			<env:avatarmappings>
-				<env:avatarmapping componenttype="Sentry" objecttype="sentry" />
+				<env:avatarmapping componenttype="Sentry"
+					objecttype="sentry" />
 				<env:avatarmapping componenttype="Producer"
 					objecttype="producer" />
-				<env:avatarmapping componenttype="Carry" objecttype="carry" />
-				<env:avatarmapping componenttype="ClientSimulator" objecttype="clientSimulator" />
+				<env:avatarmapping componenttype="Carry"
+					objecttype="carry" />
+				<env:avatarmapping componenttype="ClientSimulator"
+					objecttype="clientSimulator" />
 			</env:avatarmappings>
 
 			<env:tasktypes>
@@ -126,23 +152,17 @@
 			<env:dataviews>
 				<env:dataview name="all_view" class="GeneralDataView2D" />
 			</env:dataviews>
-			
+
 			<env:perspectives>
 				<env:perspective name="icons" class="Perspective2D"
 					opengl="false">
 
 					<!-- Target -->
 					<env:drawable objecttype="target" width="0.1" height="0.1">
-						<env:property name="oresize" dynamic="true">new
-							Vector2Double(Math.sqrt(((Number)$object.getProperty("capacity")).intValue()/200.0))
-						</env:property>
-						<env:property name="oreposition" dynamic="true">new
-							Vector2Double(-0.5,
-							0.1-Math.sqrt(((Number)$object.getProperty("capacity")).intValue()/200.0)/2)
-						</env:property>
+						<env:property name="oresize" dynamic="true">new Vector2Double(Math.sqrt(((Number)$object.getProperty("capacity")).intValue()/200.0))</env:property>
+						<env:property name="oreposition" dynamic="true">new Vector2Double(-0.5,	0.1-Math.sqrt(((Number)$object.getProperty("capacity")).intValue()/200.0)/2)</env:property>
 						<env:ellipse layer="0" width="0.2" height="0.2" color="#C8000096">
-							<env:drawcondition>!$object.getProperty("state").equals("analyzed")
-								|| $object.getProperty("ore")!=0</env:drawcondition>
+							<env:drawcondition>!$object.getProperty("state").equals("analyzed") || $object.getProperty("ore")!=0</env:drawcondition>
 						</env:ellipse>
 						<env:ellipse layer="0" width="0.2" height="0.2" color="#32323296">
 							<env:drawcondition>$object.getProperty("state").equals("analyzed")
@@ -248,7 +268,7 @@
 
 			<!-- executor -->
 			<env:spaceexecutor class="DeltaTimeExecutor4Simulation">
-			<!-- <env:spaceexecutor class="DeltaTimeExecutor"> -->
+				<!-- <env:spaceexecutor class="DeltaTimeExecutor"> -->
 				<env:property name="space">$space</env:property>
 				<env:property name="tick">true</env:property>
 			</env:spaceexecutor>
@@ -256,10 +276,12 @@
 	</spacetypes>
 
 	<componenttypes>
-		 <componenttype name="Sentry"
+		<componenttype name="Sentry"
 			filename="jadex/simulation/examples/marsworld/sentry/Sentry.agent.xml" />
-			<!--<componenttype name="Sentry"
-			filename="jadex/bdi/examples/marsworld/sentry/Sentry.agent.xml" />-->
+		<!--
+			<componenttype name="Sentry"
+			filename="jadex/bdi/examples/marsworld/sentry/Sentry.agent.xml" />
+		-->
 		<componenttype name="Producer"
 			filename="jadex/simulation/examples/marsworld/producer/Producer.agent.xml" />
 		<componenttype name="Carry"
@@ -286,7 +308,7 @@
 						<env:object type="homebase">
 							<env:property name="position">new Vector2Double(0.3, 0.3)
 							</env:property>
-							<env:property name="space">$space</env:property>							
+							<env:property name="space">$space</env:property>
 							<env:property name="missiontime">
 								7000000 +
 								$space.getContext().getServiceContainer().getService(IClockService.class).getTime()
@@ -322,18 +344,48 @@
 							</env:property>
 							<env:property name="ore">25</env:property>
 						</env:object>
-						
+
 						<!--  TMP-HACK! -->
 						<env:object type="experimentID">
-							<env:property name="experimentID">$args.Experiment_id</env:property>							
-						</env:object>						
-						
+							<env:property name="experimentID">$args.Experiment_id
+							</env:property>
+						</env:object>
+
 					</env:objects>
-					
-					
+
+					<!-- <env:dataproviders>
+						<env:dataprovider name="homebase_ore">
+							<env:source name="$homebase" objecttype="homebase">
+							</env:source>
+							<env:data name="time">$time</env:data>
+							<env:data name="ore_amount">$homebase.ore</env:data>
+						</env:dataprovider>
+					</env:dataproviders>
+
+					<env:dataconsumers>
+						<env:dataconsumer name="ore_chart" class="XYChartDataConsumer">
+							<env:property name="dataprovider">"homebase_ore"</env:property>
+							<env:property name="title">"Ore in homebase"</env:property>
+							<env:property name="labelx">"Time"</env:property>
+							<env:property name="labely">"Ore"</env:property>
+							<env:property name="maxitemcount">500</env:property>
+							<env:property name="legend">false</env:property>
+
+						
+							<env:property name="seriesname">"Ore"</env:property>
+							<env:property name="valuex">"time"</env:property>
+							<env:property name="valuey">"ore_amount"</env:property>
+						</env:dataconsumer>
+					</env:dataconsumers>-->
+
 					<env:observers>
 						<env:observer name="MarsWorld" dataview="view_all"
-							perspective="icons" />
+							perspective="icons">
+							<!-- <env:plugin name="evaluation" class="EvaluationPlugin">
+								<env:property name="component_0">((AbstractChartDataConsumer)$space.getDataConsumer("ore_chart")).getChartPanel()</env:property>
+								 <env:property name="component_1">((AbstractChartDataConsumer)$space.getDataConsumer("unhappiness_histogram")).getChartPanel()</env:property> 
+							</env:plugin>-->
+						</env:observer>
 					</env:observers>
 				</env:envspace>
 			</spaces>
@@ -344,10 +396,13 @@
 				<component type="ClientSimulator">
 					<arguments>
 						<!-- The mission time. -->
-						<!-- <argument name="msg">new String("really-true-tte")</argument>
-						<argument name="msg">$args.tmp_mission_time</argument>
-						<argument name="simulationFacts">$args.simulationFacts</argument>-->
-						<argument name="simulationFacts">$args.Simulation_Facts_For_Client</argument>						
+						<!--
+							<argument name="msg">new String("really-true-tte")</argument>
+							<argument name="msg">$args.tmp_mission_time</argument> <argument
+							name="simulationFacts">$args.simulationFacts</argument>
+						-->
+						<argument name="simulationFacts">$args.Simulation_Facts_For_Client
+						</argument>
 					</arguments>
 				</component>
 			</components>
@@ -387,7 +442,7 @@
 					</env:observers>
 				</env:envspace>
 			</spaces>
-			
+
 			<components>
 				<component type="Sentry" number="2" />
 				<component type="Producer" number="5" />

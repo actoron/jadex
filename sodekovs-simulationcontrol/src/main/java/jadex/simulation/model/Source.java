@@ -4,8 +4,15 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlValue;
 
+/**
+ * 
+ * @author vilenica
+ *
+ */
+@XmlRootElement(name="Source")
 public class Source {
 
 	/** The name of the variable.*/

@@ -31,11 +31,17 @@ public class SimulationConfiguration {
 	/* List of dataproviders*/
 	private ArrayList<Dataprovider> dataproviderList ;
 	
+	/* List of dataconsumers*/
+	private ArrayList<Dataconsumer> dataconsumerList ;	
+
 	/* Contains run configuration*/
 	private RunConfiguration runConfiguration;
 	
 	/* Contains configuration for optimization aspects*/
 	private Optimization optimization;
+	
+	/* Contains list of strings that represent the imports to be done.*/
+	private ArrayList<String> importList;
 
 	
 	//--methods
@@ -78,6 +84,16 @@ public class SimulationConfiguration {
 	public void setDataproviderList(ArrayList<Dataprovider> dataproviderList) {
 		this.dataproviderList = dataproviderList;
 	}
+
+	@XmlElementWrapper(name="Dataconsumers")
+	@XmlElement(name="Dataconsumer")
+	public ArrayList<Dataconsumer> getDataconsumerList() {
+		return dataconsumerList;
+	}
+
+	public void setDataconsumerList(ArrayList<Dataconsumer> dataconsumerList) {
+		this.dataconsumerList = dataconsumerList;
+	}
 	
 	@XmlElement(name="RunConfiguration")
 	public RunConfiguration getRunConfiguration() {
@@ -104,6 +120,16 @@ public class SimulationConfiguration {
 
 	public void setOptimization(Optimization optimization) {
 		this.optimization = optimization;
+	}
+
+	@XmlElementWrapper(name="Imports")
+	@XmlElement(name="Import")
+	public ArrayList<String> getImportList() {
+		return importList;
+	}
+
+	public void setImportList(ArrayList<String> importList) {
+		this.importList = importList;
 	}
 	
 	
