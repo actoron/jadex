@@ -118,7 +118,7 @@ public class InitBDIAgentForCoordination
 		// init the direct publications
 		for (DirectCoordinationInformation dci : processMASDynamics.getDirectPublications())
 		{
-			DirectCausality causality = masDyn.getCausalities().getDirectCMRealizationByName(dci.getDirectLink().getRealization());
+			DirectCausality causality = masDyn.getCausalities().getDirectLinkRealizationByName(dci.getDirectLink().getRealization());
 			for (AgentElement ae : causality.getFrom_agents())
 			{
 				if (ae.getAgent_id().equals(agentType))
@@ -137,7 +137,7 @@ public class InitBDIAgentForCoordination
 		// init perceptions.....
 		for (DirectCoordinationInformation dci : processMASDynamics.getDirectPerceptions())
 		{
-			DirectCausality causality = masDyn.getCausalities().getDirectCMRealizationByName(dci.getDirectLink().getRealization());
+			DirectCausality causality = masDyn.getCausalities().getDirectLinkRealizationByName(dci.getDirectLink().getRealization());
 			for (AgentElement ae : causality.getTo_agents())
 			{
 				if (ae.getAgent_id().equals(agentType))
