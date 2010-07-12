@@ -1,6 +1,8 @@
 package jadex.bdi.model;
 
 import jadex.bdi.runtime.interpreter.Report;
+import jadex.commons.IFuture;
+import jadex.commons.SReflect;
 import jadex.javaparser.IParsedExpression;
 import jadex.rules.rulesystem.IPatternMatcherFunctionality;
 import jadex.rules.rulesystem.IRule;
@@ -119,9 +121,9 @@ public class OAVAgentModel	extends OAVCapabilityModel
 			{
 				Object	key	= it.next();
 				Object	mexp	= state.getAttributeValue(capa, OAVBDIMetaModel.capability_has_properties, key);
-				Boolean	future	= (Boolean)state.getAttributeValue(mexp, OAVBDIMetaModel.property_has_future);
+				Class	clazz	= (Class)state.getAttributeValue(mexp, OAVBDIMetaModel.expression_has_class);
 				// Ignore future properties, which are evaluated at component instance startup time.
-				if(future==null || !future.booleanValue())
+				if(clazz==null || !SReflect.isSupertype(IFuture.class, clazz))
 				{
 					IParsedExpression	pex = (IParsedExpression)state.getAttributeValue(mexp, OAVBDIMetaModel.expression_has_content);
 					try

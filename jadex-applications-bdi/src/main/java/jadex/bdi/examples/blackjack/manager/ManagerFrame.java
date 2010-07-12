@@ -13,7 +13,6 @@ import jadex.bridge.IComponentManagementService;
 import jadex.commons.IFuture;
 import jadex.commons.SGUI;
 import jadex.commons.concurrent.DefaultResultListener;
-import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.service.SServiceProvider;
 
@@ -311,17 +310,20 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 		{
 			if(n==JOptionPane.YES_OPTION)
 			{
-				final IComponentManagementService	ces	= (IComponentManagementService)SServiceProvider.getService(agent.getServiceProvider(), IComponentManagementService.class);
-				IFuture ret = ces.getComponentDescription(dealeraid);
-				ret.addResultListener(new IResultListener()
+				IFuture	cms	= SServiceProvider.getService(agent.getServiceProvider(), IComponentManagementService.class);
+				cms.addResultListener(new SwingDefaultResultListener(this)
 				{
-					public void resultAvailable(Object source, Object result)
+					public void customResultAvailable(Object source, Object result)
 					{
-						ces.destroyComponent(((IComponentDescription)result).getParent());
-					}
-					
-					public void exceptionOccurred(Object source, Exception exception)
-					{
+						final IComponentManagementService	cms	= (IComponentManagementService)result;
+						IFuture ret = cms.getComponentDescription(dealeraid);
+						ret.addResultListener(new SwingDefaultResultListener(ManagerFrame.this)
+						{
+							public void customResultAvailable(Object source, Object result)
+							{
+								cms.destroyComponent(((IComponentDescription)result).getParent());
+							}
+						});
 					}
 				});
 			}

@@ -26,7 +26,7 @@ public class PlayerSearchDealerPlan extends Plan
 	{
 		//System.out.println("Searching dealer...");
 		// Create a service description to search for.
-		IDF df = (IDF)SServiceProvider.getService(getScope().getServiceProvider(), IDF.class);
+		IDF df = (IDF)SServiceProvider.getService(getScope().getServiceProvider(), IDF.class).get(this);
 		IDFServiceDescription sd = df.createDFServiceDescription(null, "blackjack", null);
 		IDFComponentDescription ad = df.createDFComponentDescription(null, sd);
 		ISearchConstraints sc = df.createSearchConstraints(-1, 0);

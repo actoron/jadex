@@ -9,6 +9,7 @@ import jadex.bridge.ComponentResultListener;
 import jadex.bridge.IArgument;
 import jadex.bridge.InterpreterTimedObject;
 import jadex.commons.Future;
+import jadex.commons.IFuture;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.collection.SCollection;
@@ -984,18 +985,18 @@ public class AgentRules
 			{
 				Object mexp = it.next();
 				final String name = (String)state.getAttributeValue(mexp, OAVBDIMetaModel.modelelement_has_name);
-				Object val = evaluateExpression(state, mexp, new OAVBDIFetcher(state, rcapa));
-				Boolean	future	= (Boolean)state.getAttributeValue(mexp, OAVBDIMetaModel.property_has_future);
-				if(future!=null && future.booleanValue())
+				Object	val	= evaluateExpression(state, mexp, new OAVBDIFetcher(state, rcapa));
+				Class	clazz	= (Class)state.getAttributeValue(mexp, OAVBDIMetaModel.expression_has_class);
+				if(clazz!=null && SReflect.isSupertype(IFuture.class, clazz))
 				{
-					System.out.println("Future property: "+name+" "+val);
+//					System.out.println("Future property: "+name+" "+val);
 					if(val instanceof Future)
 					{
 						((Future)val).addResultListener(new ComponentResultListener(new IResultListener()
 						{
 							public void resultAvailable(Object source, Object result)
 							{
-								System.out.println("Setting future property: "+name+" "+result);
+//								System.out.println("Setting future property: "+name+" "+result);
 								Object param = state.createObject(OAVBDIRuntimeModel.parameter_type);	
 								state.setAttributeValue(param, OAVBDIRuntimeModel.parameter_has_name, name);
 								state.setAttributeValue(param, OAVBDIRuntimeModel.parameter_has_value, result);
