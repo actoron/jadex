@@ -16,7 +16,7 @@ public class TestExecuteWorkflowPlan extends Plan
 		try
 		{
 			IInternalEvent satisfiedService = (IInternalEvent) getReason();
-			startAtomic();
+//			startAtomic();
 			Boolean execute = true;
 			RequiredService[] services = (RequiredService[]) getBeliefbase().getBeliefSet("requiredServices").getFacts();
 			for (RequiredService service : services)
@@ -29,6 +29,7 @@ public class TestExecuteWorkflowPlan extends Plan
 					{
 						service.setSa((IComponentIdentifier)satisfiedService.getParameter("sa").getValue());
 						service.setSearching(false);
+						dispatchInternalEvent(createInternalEvent("returnExecution"));
 					}
 					if (service.isSearching())
 					{
@@ -36,8 +37,8 @@ public class TestExecuteWorkflowPlan extends Plan
 					}
 				}
 			}
-			endAtomic();
-			if (execute)
+//			endAtomic();
+			if (execute && !(Boolean)getBeliefbase().getBelief("executionPhase").getFact())
 			{
 				dispatchTopLevelGoal(createGoal("startWorkflow"));
 			}

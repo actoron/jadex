@@ -21,9 +21,10 @@ public class StartWorkflowPlan extends Plan
 
 			// LOG
 			System.out.println();
-			System.out.println("---- Execution phase" + this.getComponentName() + "started! ----");
+			System.out.println("---- Execution phase " + this.getComponentName() + " started! ----");
 			System.out.println();
 			smaLogger.info("--- Execution phase ---");
+			getBeliefbase().getBelief("executionPhase").setFact(new Boolean(true));
 			getBeliefbase().getBelief("statExetime").setFact(this.getTime());
 			Long negTime = getTime() - (Long) getBeliefbase().getBelief("statNegtime").getFact();
 			workflowTime.info("Negotiation time: " + negTime);

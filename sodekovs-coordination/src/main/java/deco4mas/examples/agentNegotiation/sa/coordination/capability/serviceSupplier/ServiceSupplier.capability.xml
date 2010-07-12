@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+	<!--
+		The ServiceSupplier capability encapsulate requirements to find a
+		contract through a coordination medium
+	-->
+<capability xmlns="http://jadex.sourceforge.net/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-bdi
+	                    http://jadex.sourceforge.net/jadex-bdi-2.0.xsd"
+	package="deco4mas.examples.agentNegotiation.sa.coordination.capability.serviceSupplier"
+	name="ServiceSupplier">
+
+	<imports>
+		<import>jadex.base.fipa.*</import>
+		<import>jadex.application.runtime.*</import>
+		<import>jadex.bridge.IComponentIdentifier</import>
+
+		<import>deco4mas.coordinate.environment.*</import>
+		<import>deco4mas.examples.agentNegotiation.decoMAS.dataObjects.*
+		</import>
+		<import>deco4mas.examples.agentNegotiation.sma.coordination.negotiationStrategy.*
+		</import>
+		<!--
+			<import>deco4mas.examples.agentNegotiation.sma.application.workflow.management.*
+		-->
+		<!--		</import>-->
+		<import>deco4mas.examples.agentNegotiation.sma.application.*</import>
+	</imports>
+
+	<beliefs>
+		<!--  blackout	-->
+		<belief name="blackout" class="boolean">
+			<fact>false</fact>
+		</belief>
+
+		<beliefref name="providedService">
+			<abstract />
+		</beliefref>
+
+		<beliefref name="agentType">
+			<abstract />
+		</beliefref>
+		<!--signed-->
+		<belief name="signed" class="boolean">
+			<fact>false</fact>
+		</belief>
+	</beliefs>
+
+	<plans>
+		<plan name="assignedReward">
+			<body class="AssignedRewardPlan"></body>
+			<trigger>
+				<internalevent ref="assignedReward"></internalevent>
+			</trigger>
+			<!-- <precondition>!$beliefbase.blackout</precondition>-->
+		</plan>
+
+		<plan name="signEnd">
+			<body class="SignEndPlan"></body>
+			<trigger>
+				<messageevent ref="signEnd">
+				</messageevent>
+			</trigger>
+		</plan>
+
+		<!-- proposal -->
+		<plan name="deliverProposal">
+			<body class="DeliverProposalPlan"></body>
+			<trigger>
+				<internalevent ref="publishedOffer"></internalevent>
+			</trigger>
+<!--			<precondition>!$beliefbase.blackout</precondition>-->
+<!--			<precondition>!$beliefbase.signed</precondition>-->
+		</plan>
+	</plans>
+
+	<events>
+		<internalevent name="contractSealed">
+			<parameter name="offer" class="ServiceOffer"></parameter>
+		</internalevent>
+		<!--receive	-->
+		<internalevent name="publishedOffer">
+			<parameter name="offer" class="ServiceOffer"></parameter>
+		</internalevent>
+		<internalevent name="assignedReward">
+			<parameter name="reward" class="Reward"></parameter>
+		</internalevent>
+		<messageevent name="signEnd" type="fipa" direction="receive">
+			<parameter name="performative" class="String" direction="fixed">
+				<value>SFipa.INFORM</value>
+			</parameter>
+		</messageevent>
+
+		<!-- send -->
+		<internalevent name="announceProposal">
+			<parameter name="task" class="String"></parameter>
+			<parameter name="proposal" class="ServiceProposal"></parameter>
+		</internalevent>
+
+		<internalevent name="rewardReply">
+			<parameter name="reward" class="Reward"></parameter>
+			<parameter name="task" class="String"></parameter>
+		</internalevent>
+
+	</events>
+</capability>

@@ -1,4 +1,4 @@
-package deco4mas.examples.agentNegotiation.sa.coordination;
+package deco4mas.examples.agentNegotiation.sa.application;
 
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;

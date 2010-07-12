@@ -29,6 +29,8 @@
 		<beliefref name="utilityFunction">
 			<abstract />
 		</beliefref>
+		
+		<belief name="trustFunction" class="HistorytimeTrustFunction"></belief>
 
 		<!-- History of trust events -->
 		<belief name="history" class="ServiceAgentHistory"></belief>

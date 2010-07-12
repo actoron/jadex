@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
+import deco.lang.dynamics.AgentElementType;
 import deco4mas.coordinate.environment.CoordinationSpace;
 import deco4mas.coordinate.environment.CoordinationSpaceObject;
 import deco4mas.examples.agentNegotiation.decoMAS.dataObjects.AssignReply;
@@ -143,8 +144,8 @@ public class NegSpaceMechanism extends ICoordinationMechanism
 		coordInfo.setType(CoordinationSpaceObject.COORDINATION_INFORMATION_TYPE);
 		coordInfo.addValue(Constants.PARAMETER_DATA_MAPPING, parameterDataMappings);
 		coordInfo.addValue(CoordinationSpaceObject.AGENT_ARCHITECTURE, "BDI");
-		coordInfo.addValue(CoordinationInfo.AGENT_ELEMENT_NAME, "reward");
-		coordInfo.addValue(CoordinationInfo.AGENT_ELEMENT_TYPE, "BDI_GOAL");
+		coordInfo.addValue(CoordinationInfo.AGENT_ELEMENT_NAME, "assignedReward");
+		coordInfo.addValue(CoordinationInfo.AGENT_ELEMENT_TYPE, AgentElementType.INTERNAL_EVENT.toString());
 		coordInfo.addValue(Constants.DML_REALIZATION_NAME, "by_neg");
 
 		// publish
@@ -224,8 +225,8 @@ public class NegSpaceMechanism extends ICoordinationMechanism
 		coordInfo.setType(CoordinationSpaceObject.COORDINATION_INFORMATION_TYPE);
 		coordInfo.addValue(Constants.PARAMETER_DATA_MAPPING, parameterDataMappings);
 		coordInfo.addValue(CoordinationSpaceObject.AGENT_ARCHITECTURE, "BDI");
-		coordInfo.addValue(CoordinationInfo.AGENT_ELEMENT_NAME, "offer");
-		coordInfo.addValue(CoordinationInfo.AGENT_ELEMENT_TYPE, "BDI_GOAL");
+		coordInfo.addValue(CoordinationInfo.AGENT_ELEMENT_NAME, "publishedOffer");
+		coordInfo.addValue(CoordinationInfo.AGENT_ELEMENT_TYPE, AgentElementType.INTERNAL_EVENT.toString());
 		coordInfo.addValue(Constants.DML_REALIZATION_NAME, "by_neg");
 
 		// publish
@@ -253,8 +254,8 @@ public class NegSpaceMechanism extends ICoordinationMechanism
 		coordInfo.setType(CoordinationSpaceObject.COORDINATION_INFORMATION_TYPE);
 		coordInfo.addValue(Constants.PARAMETER_DATA_MAPPING, parameterDataMappings);
 		coordInfo.addValue(CoordinationSpaceObject.AGENT_ARCHITECTURE, "BDI");
-		coordInfo.addValue(CoordinationInfo.AGENT_ELEMENT_NAME, "offer");
-		coordInfo.addValue(CoordinationInfo.AGENT_ELEMENT_TYPE, "BDI_GOAL");
+		coordInfo.addValue(CoordinationInfo.AGENT_ELEMENT_NAME, "publishedOffer");
+		coordInfo.addValue(CoordinationInfo.AGENT_ELEMENT_TYPE, AgentElementType.INTERNAL_EVENT.toString());
 		coordInfo.addValue(Constants.DML_REALIZATION_NAME, "by_neg");
 
 		// publish
@@ -285,7 +286,7 @@ public class NegSpaceMechanism extends ICoordinationMechanism
 		coordInfo.addValue(Constants.PARAMETER_DATA_MAPPING, parameterDataMappings);
 		coordInfo.addValue(CoordinationSpaceObject.AGENT_ARCHITECTURE, "BDI");
 		coordInfo.addValue(CoordinationInfo.AGENT_ELEMENT_NAME, "foundSa");
-		coordInfo.addValue(CoordinationInfo.AGENT_ELEMENT_TYPE, "INTERNAL_EVENT");
+		coordInfo.addValue(CoordinationInfo.AGENT_ELEMENT_TYPE, AgentElementType.INTERNAL_EVENT.toString());
 		coordInfo.addValue(Constants.DML_REALIZATION_NAME, "by_neg");
 
 		// publish

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+	<!--
+		The ServiceSupplier capability encapsulate requirements to find a
+		contract through a coordination medium
+	-->
+<capability xmlns="http://jadex.sourceforge.net/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-bdi
+	                    http://jadex.sourceforge.net/jadex-bdi-2.0.xsd"
+	package="deco4mas.examples.agentNegotiation.sa.coordination.capability.trustSubject"
+	name="TrustSubject">
+
+	<imports>
+		<import>jadex.base.fipa.*</import>
+		<import>jadex.application.runtime.*</import>
+		<import>jadex.bridge.IComponentIdentifier</import>
+
+		<import>deco4mas.coordinate.environment.*</import>
+		<import>deco4mas.examples.agentNegotiation.decoMAS.dataObjects.*
+		</import>
+		<import>deco4mas.examples.agentNegotiation.sa.application.*</import>
+	</imports>
+
+	<plans>
+<!--		<plan name="publishExecution">-->
+<!--			<body class="PublishExecutionPlan"></body>-->
+<!--			<trigger>-->
+<!--				<internalevent ref="contract"></internalevent>-->
+<!--			</trigger>-->
+<!--		</plan>-->
+	</plans>
+
+	<events>
+<!--		<internalevent name="contract">-->
+<!--			<parameter name="contract" class="Contract"></parameter>-->
+<!--		</internalevent>-->
+
+		<internalevent name="executionOccur">
+			<parameter name="execution" class="Execution"></parameter>
+			<parameter name="task" class="String"></parameter>
+		</internalevent>
+	</events>
+</capability>

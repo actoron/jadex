@@ -22,7 +22,7 @@ public class RestartWorkflowPlan extends Plan
 			Long startTime = ClockTime.getStartTime(getClock());
 
 			// restart until 300000 ZE (~msec)
-			if ((getTime() - startTime) <= 300000)
+			if ((getTime() - startTime) <= 1000000)
 			{
 				// LOG
 				smaLogger.info("start new workflow");
@@ -36,7 +36,7 @@ public class RestartWorkflowPlan extends Plan
 						}
 				}
 				getBeliefbase().getBelief("workflow").setFact(null);
-//				getBeliefbase().getBelief("executionPhase").setFact(new Boolean(false));
+				getBeliefbase().getBelief("executionPhase").setFact(new Boolean(false));
 
 				// restart
 				IGoal restart = createGoal("preInstantiateWorkflow");

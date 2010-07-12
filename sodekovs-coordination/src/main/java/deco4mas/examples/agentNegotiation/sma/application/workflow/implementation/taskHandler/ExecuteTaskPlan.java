@@ -48,17 +48,18 @@ public class ExecuteTaskPlan extends Plan
 					success = result;
 			} catch (GoalFailureException gfe)
 			{
-				gfe.printStackTrace();
+//				gfe.printStackTrace();
 				success = false;
 			}
 			if (!success)
 			{
-				workflowLogger.warning("TASK " + taskName + " FAIL!");
-				System.out.println("TASK " + taskName + " FAIL!");
-				// body();
-				aborted();
+//				workflowLogger.warning("TASK " + taskName + " FAIL!");
+//				System.out.println("TASK " + taskName + " FAIL!");
+				body();
+			} else
+			{
+				killAgent();
 			}
-			killAgent();
 		} catch (Exception e)
 		{
 			e.printStackTrace();

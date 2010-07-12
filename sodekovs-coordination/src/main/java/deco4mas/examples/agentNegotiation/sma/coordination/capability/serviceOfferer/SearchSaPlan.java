@@ -43,9 +43,9 @@ public class SearchSaPlan extends Plan
 			// WeightFactorUtilityFunction utilityFunction =
 			// ((WeightFactorUtilityFunction)getBeliefbase().getBelief("utilityFunction").getFact());
 
-			Double costWeight = 0.3;
-			Double durationWeight = 0.2;
-			Double trustWeight = 0.5;
+			Double costWeight = 0.06;
+			Double durationWeight = 0.04;
+			Double trustWeight = 0.9;
 			ServiceType service = (ServiceType) neededService.getServiceType();
 			utilityFunction.addFactor("cost", costWeight, service.getMaxCost(), service.getMinCost(), false);
 			utilityFunction.addFactor("duration", durationWeight, service.getMaxDuration(), service.getMinDuration(), false);

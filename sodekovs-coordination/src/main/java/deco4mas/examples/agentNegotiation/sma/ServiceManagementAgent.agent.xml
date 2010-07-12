@@ -38,23 +38,18 @@
 	</capabilities>
 
 	<beliefs>
-		<!--    CoordSpaceref     -->
+		<!--    CoordSpace     -->
 		<belief name="env" class="CoordinationSpace">
 			<fact>(CoordinationSpace)((IApplicationExternalAccess)$scope.getParent()).getSpace("mycoordspace")
 			</fact>
 		</belief>
 
-		<belief name="myself" class="IComponentIdentifier">
-			<fact>$scope.getComponentIdentifier()</fact>
+		<belief name="executionPhase" class="boolean">
+			<fact>false</fact>
 		</belief>
 
 		<!-- required services for current workflow	-->
 		<beliefset name="requiredServices" class="RequiredService"></beliefset>
-
-		<!--		required services in sma	-->
-		<!--	<beliefsetref name="requiredServices">-->
-		<!--		<concrete ref="socap.requiredServices" />-->
-		<!--	</beliefsetref>-->
 
 		<!--	workflow	-->
 		<belief name="workflow" class="IComponentIdentifier" />
@@ -64,7 +59,6 @@
 		<belief name="utilityFunction" class="IUtilityFunction">
 			<assignto ref="socap.utilityFunction" />
 			<assignto ref="tocap.utilityFunction" />
-
 		</belief>
 
 		<!--	statistik	-->
@@ -146,6 +140,7 @@
 			<trigger>
 				<internalevent ref="serviceSatisfied"></internalevent>
 			</trigger>
+<!--			<precondition>!$beliefbase.executionPhase</precondition>-->
 		</plan>
 
 		<!--start workflow-->
@@ -186,6 +181,7 @@
 
 		<!--	workflow is executed	-->
 		<internalevent name="workflowExecuted"></internalevent>
+		<internalevent name="returnExecution"></internalevent>
 	</events>
 
 	<configurations>

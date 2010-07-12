@@ -6,7 +6,7 @@
 				<agent id="ServiceManagementAgent">
 					<elements>
 						<element id="requiredServices" type="BDI_BELIEFSET" />
-						<element id="beliefChanged" type="INTERNAL_EVENT" />
+						<element id="requiredServices" type="INTERNAL_EVENT" />
 						<element id="searchSa" type="INTERNAL_EVENT" />
 						<element id="foundSa" type="INTERNAL_EVENT" />
 					</elements>
@@ -32,6 +32,8 @@
 			<role_occupation name="TrustSubject" multiple="true">
 				<agent id="ServiceAgent">
 					<elements>
+<!--						<element id="contract" type="BDI_BELIEF" />-->
+<!--						<element id="contract" type="INTERNAL_EVENT" />-->
 						<element id="executionOccur" type="INTERNAL_EVENT" />
 					</elements>
 				</agent>
@@ -64,9 +66,11 @@
 			<direct_link realization="by_directInternalEvent" type="POSITIVE" name="direct">
 				<froms>
 					<from>ServiceManagementAgent</from>
+<!--					<from>ServiceAgent</from>-->
 				</froms>
 				<tos>
 					<to>ServiceManagementAgent</to>
+<!--					<to>ServiceAgent</to>-->
 				</tos>
 			</direct_link>
 		</direct_links>
@@ -80,6 +84,9 @@
 <!--								name="requiredServices" type="BDI_BELIEF"/>-->
 <!--						</parameter_mappings>-->
 					</agent_element>
+<!--					<agent_element element="contract" agent_id="ServiceAgent"-->
+<!--						type="BDI_BELIEF">-->
+<!--					</agent_element>-->
 				</from>
 				<configuration></configuration>
 				<to>
@@ -90,6 +97,13 @@
 								name="service" />
 						</parameter_mappings>
 					</agent_element>
+<!--					<agent_element element="contract" agent_id="ServiceAgent"-->
+<!--						type="INTERNAL_EVENT">-->
+<!--						<parameter_mappings>-->
+<!--							<mapping class="Contract" ref="value"-->
+<!--								name="contract" />-->
+<!--						</parameter_mappings>-->
+<!--					</agent_element>-->
 				</to>
 			</direct_link_configuration>
 		</direct_link_configurations>
@@ -130,15 +144,15 @@
 							<mapping class="AssignReply" ref="reply" name="reply" />
 						</parameter_mappings>
 					</agent_element>
-					<agent_element element="offer" agent_id="ServiceAgent"
-						type="BDI_GOAL">
+					<agent_element element="publishedOffer" agent_id="ServiceAgent"
+						type="INTERNAL_EVENT">
 						<parameter_mappings>
 							<mapping class="ServiceOffer" ref="offer" name="offer">
 							</mapping>
 						</parameter_mappings>
 					</agent_element>
-					<agent_element element="reward" agent_id="ServiceAgent"
-						type="BDI_GOAL">
+					<agent_element element="assignedReward" agent_id="ServiceAgent"
+						type="INTERNAL_EVENT">
 						<parameter_mappings>
 							<mapping class="Reward" ref="reward" name="reward">
 							</mapping>

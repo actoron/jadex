@@ -29,10 +29,12 @@ public class InitAgentPlan extends Plan
 			// trustFunc
 			Map<TrustEvent, Double> eventWeight = new HashMap<TrustEvent, Double>();
 			eventWeight.put(TrustEvent.SuccessfullRequest, 1.0);
-			eventWeight.put(TrustEvent.FailedRequest, -6.0);
+			eventWeight.put(TrustEvent.FailedRequest, -8.0);
 			eventWeight.put(TrustEvent.CancelArrangement, -1.0);
 			HistorytimeTrustFunction trustFunction = new HistorytimeTrustFunction(this.getComponentIdentifier(), history, eventWeight);
 			((WeightFactorUtilityFunction) getBeliefbase().getBelief("utilityFunction").getFact()).setTrustFunction(trustFunction);
+			getBeliefbase().getBelief("trustFunction").setFact(trustFunction);
+			
 		} catch (Exception e)
 		{
 			e.printStackTrace();

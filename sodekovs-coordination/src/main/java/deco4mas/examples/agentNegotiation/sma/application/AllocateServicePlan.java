@@ -73,7 +73,7 @@ public class AllocateServicePlan extends Plan
 				}
 			}
 
-			if (needService.isSearching() || !result)
+			if (!result)
 			{
 				if (currentSa == null)
 				{
@@ -88,32 +88,34 @@ public class AllocateServicePlan extends Plan
 					workflowLogger.info("No/False response by " + currentSa + " at " + this.getComponentName());
 					// getParameter("result").setValue(Boolean.FALSE);
 					smaLogger.info("error in execution with " + currentSa.getLocalName());
+					Object[] param = new Object[4];
+					param[0] = ClockTime.getStartTime(getClock());
+					param[1] = getTime();
+					param[2] = currentSa.getLocalName();
+					param[3] = new Integer(1);
+					saUseLogger.gnuInfo(param, "");
 				}
-				Object[] param = new Object[4];
-				param[0] = ClockTime.getStartTime(getClock());
-				param[1] = getTime();
-				param[2] = currentSa.getLocalName();
-				param[3] = new Integer(1);
-				saUseLogger.gnuInfo(param, "");
-
-				synchronized (needService.getMonitor())
+				
+				if (!needService.isSearching())
 				{
-					needService.setSearching(true);
-					getBeliefbase().getBeliefSet("requiredServices").modified(needService);
-					// getBeliefbase().getBelief("currentSa").setFact(null);
-				}
-
-				Boolean retry = false;
-				while (!retry)
-				{
-					if (!needService.isSearching())
+					synchronized (needService.getMonitor())
 					{
-						retry = true;
-					} else
-					{
-						waitForInternalEvent("serviceSatisfied");
+						needService.setSearching(true);
+						getBeliefbase().getBeliefSet("requiredServices").modified(needService);
+						// getBeliefbase().getBelief("currentSa").setFact(null);
 					}
 				}
+//				Boolean retry = false;
+//				while (!retry)
+//				{
+//					if (!needService.isSearching())
+//					{
+//						retry = true;
+//					} else
+//					{
+						waitForInternalEvent("returnExecution");
+//					}
+//				}
 				body();
 			}
 

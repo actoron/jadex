@@ -1,4 +1,4 @@
-package deco4mas.examples.agentNegotiation.sa.coordination;
+package deco4mas.examples.agentNegotiation.sa.coordination.capability.serviceSupplier;
 
 import jadex.bdi.runtime.Plan;
 import java.util.logging.Logger;
@@ -15,5 +15,6 @@ public class SignEndPlan extends Plan
 		final Logger saLogger = AgentLogger.getTimeEvent(this.getComponentName());
 		saLogger.info("Sign end at request by sma");
 		getBeliefbase().getBelief("signed").setFact(Boolean.FALSE);
+		getBeliefbase().getBelief("contract").setFact(null);
 	}
 }

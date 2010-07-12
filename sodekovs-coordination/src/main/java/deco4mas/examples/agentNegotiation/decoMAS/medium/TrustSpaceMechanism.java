@@ -69,7 +69,7 @@ public class TrustSpaceMechanism extends ICoordinationMechanism
 		coordInfo.setType(CoordinationSpaceObject.COORDINATION_INFORMATION_TYPE);
 		coordInfo.addValue(Constants.PARAMETER_DATA_MAPPING, parameterDataMappings);
 		coordInfo.addValue(CoordinationSpaceObject.AGENT_ARCHITECTURE, "BDI");
-		coordInfo.addValue(CoordinationInfo.AGENT_ELEMENT_NAME, "executionEvent");
+		coordInfo.addValue(CoordinationInfo.AGENT_ELEMENT_NAME, "trustEvent");
 		coordInfo.addValue(CoordinationInfo.AGENT_ELEMENT_TYPE, "INTERNAL_EVENT");
 		coordInfo.addValue(Constants.DML_REALIZATION_NAME, "by_trust");
 

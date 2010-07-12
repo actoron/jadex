@@ -5,6 +5,7 @@ import jadex.bdi.runtime.IInternalEvent;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
 import java.util.logging.Logger;
+import deco4mas.examples.agentNegotiation.decoMAS.dataObjects.Contract;
 import deco4mas.examples.agentNegotiation.decoMAS.dataObjects.Execution;
 import deco4mas.examples.agentNegotiation.decoMAS.dataObjects.ServiceType;
 import deco4mas.examples.agentNegotiation.decoMAS.dataObjects.TrustEvent;
@@ -52,8 +53,14 @@ public class ExecuteServicePlan extends Plan
 				myService, TrustEvent.SuccessfullRequest, this.getTime());
 
 		}
-		executionOccur.getParameter("execution").setValue(execution);
-		dispatchInternalEvent(executionOccur);
+//		Contract contract = (Contract) getBeliefbase().getBelief("contract").getFact();
+//		contract.setExecution(execution);
+//		getBeliefbase().getBelief("contract").modified();
 		// getParameter("result").setValue(Boolean.TRUE);
+		IInternalEvent event = createInternalEvent("executionOccur");
+		event.getParameter("execution").setValue(execution);
+		event.getParameter("task").setValue("executionOccur");
+		dispatchInternalEvent(event);
+		
 	}
 }
