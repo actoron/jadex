@@ -22,7 +22,7 @@ public class ParameterMetaInfo
 	protected String direction;
 	
 	/** The clazz. */
-	protected Class clazz;
+	protected Class<?> clazz;
 	
 	/** The name. */
 	protected String name;
@@ -38,7 +38,7 @@ public class ParameterMetaInfo
 	/**
 	 *  Create a new parameter meta info.
 	 */
-	public ParameterMetaInfo(String direction, Class clazz, String name, String initialval, String description)
+	public ParameterMetaInfo(String direction, Class<?> clazz, String name, String initialval, String description)
 	{
 		this.direction = direction;
 		this.clazz = clazz;
@@ -62,7 +62,7 @@ public class ParameterMetaInfo
 	 *  Get the clazz.
 	 *  @return The clazz.
 	 */
-	public Class getClazz()
+	public Class<?> getClazz()
 	{
 		return this.clazz;
 	}

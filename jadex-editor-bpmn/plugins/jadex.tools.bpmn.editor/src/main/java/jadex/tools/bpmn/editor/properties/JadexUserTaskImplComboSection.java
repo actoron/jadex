@@ -66,7 +66,7 @@ public class JadexUserTaskImplComboSection extends
 	{
 		super(JadexBpmnPropertiesUtil.JADEX_GLOBAL_ANNOTATION, JadexBpmnPropertiesUtil.JADEX_ACTIVITY_CLASS_DETAIL);
 		this.taskProvider = new StaticJadexRuntimeTaskProvider();
-		//this.taskProvider = new DynamicProjectRuntimeTaskProvider();
+		//this.taskProvider = new DynamicWorkspaceTaskProviderProxy();
 	}
 
 	// ---- override methods ----
