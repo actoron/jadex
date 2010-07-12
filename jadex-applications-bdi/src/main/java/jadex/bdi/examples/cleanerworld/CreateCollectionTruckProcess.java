@@ -13,6 +13,7 @@ import jadex.bridge.IComponentManagementService;
 import jadex.commons.IFuture;
 import jadex.commons.SimplePropertyObject;
 import jadex.commons.concurrent.IResultListener;
+import jadex.service.SServiceProvider;
 import jadex.service.clock.IClockService;
 
 import java.util.HashMap;
@@ -80,7 +81,7 @@ public class CreateCollectionTruckProcess extends SimplePropertyObject implement
 				Map params = new HashMap();
 				params.put("wastebins", todo.toArray());
 				ongoing.addAll(todo);
-				IComponentManagementService	ces	= (IComponentManagementService)app.getServiceProvider().getService(IComponentManagementService.class);
+				IComponentManagementService	ces	= (IComponentManagementService)SServiceProvider.getService(app.getServiceProvider(), IComponentManagementService.class);
 				
 				IFuture ret = ces.createComponent(null, app.getComponentFilename("Truck"),
 					new CreationInfo(null, params, app.getComponentIdentifier(), false, false, false, app.getAllImports()), null);
@@ -93,8 +94,8 @@ public class CreateCollectionTruckProcess extends SimplePropertyObject implement
 					public void resultAvailable(Object source, Object result)
 					{
 						IComponentIdentifier truck = (IComponentIdentifier)result;
-						IComponentManagementService ces = (IComponentManagementService)app.getServiceProvider()
-							.getService(IComponentManagementService.class);
+						IComponentManagementService ces = (IComponentManagementService)SServiceProvider
+							.getService(app.getServiceProvider(), IComponentManagementService.class);
 						IFuture ret = ces.getExternalAccess(truck);
 						ret.addResultListener(new IResultListener()
 						{

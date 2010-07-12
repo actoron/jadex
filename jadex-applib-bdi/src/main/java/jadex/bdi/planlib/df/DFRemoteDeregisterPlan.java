@@ -6,6 +6,7 @@ import jadex.base.fipa.IDFComponentDescription;
 import jadex.base.fipa.SFipa;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
+import jadex.service.SServiceProvider;
 
 /**
  *  Register on a remote platform.
@@ -21,7 +22,7 @@ public class DFRemoteDeregisterPlan extends Plan
 		IDFComponentDescription desc = (IDFComponentDescription)getParameter("description").getValue();
 		if(desc==null || desc.getName()==null)
 		{
-			IDF df = (IDF)getScope().getServiceProvider().getService(IDF.class);
+			IDF df = (IDF)SServiceProvider.getService(getScope().getServiceProvider(), IDF.class).get(this);
 			desc = df.createDFComponentDescription(getScope().getComponentIdentifier(), null);
 		}
 

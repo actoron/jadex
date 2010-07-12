@@ -10,6 +10,7 @@ import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.ISearchConstraints;
+import jadex.service.SServiceProvider;
 
 /**
  *  Test the CMS plans.
@@ -25,7 +26,8 @@ public class CMSTestPlan extends Plan
 	{
 		int num=1;
 		num = performTests(num, null); // test locally
-		IComponentManagementService ces = (IComponentManagementService)getScope().getServiceProvider().getService(IComponentManagementService.class);
+		IComponentManagementService ces = (IComponentManagementService)SServiceProvider.getServiceUpwards(
+			getScope().getServiceProvider(), IComponentManagementService.class).get(this);
 		IComponentIdentifier aa = ces.createComponentIdentifier(SFipa.CMS_COMPONENT, true, null);
 		performTests(num, aa); // test remotely
 	}
@@ -50,7 +52,8 @@ public class CMSTestPlan extends Plan
 		// Try to search the CMS.
 		TestReport tr = new TestReport("#"+num++, "Searching for all agents");
 		getLogger().info("\nSearching for all agents.");
-		IComponentManagementService amsservice = (IComponentManagementService)getScope().getServiceProvider().getService(IComponentManagementService.class);
+		IComponentManagementService amsservice = (IComponentManagementService)SServiceProvider.getServiceUpwards(
+			getScope().getServiceProvider(), IComponentManagementService.class).get(this);
 		IComponentDescription desc = amsservice.createComponentDescription(null, null, null, null, null);
 		ISearchConstraints constraints = amsservice.createSearchConstraints(-1, 0);
 		

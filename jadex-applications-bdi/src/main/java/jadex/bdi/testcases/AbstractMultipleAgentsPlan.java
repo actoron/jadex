@@ -8,6 +8,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.commons.IFuture;
 import jadex.commons.collection.SCollection;
+import jadex.service.SServiceProvider;
 
 import java.util.List;
 import java.util.Map;
@@ -66,7 +67,8 @@ public abstract class AbstractMultipleAgentsPlan extends Plan
 //				agents.add(ca.getParameter("componentidentifier").getValue());
 				
 //				SyncResultListener	listener	= new SyncResultListener();
-				IComponentManagementService ces = (IComponentManagementService)getScope().getServiceProvider().getService(IComponentManagementService.class).get(this);
+				IComponentManagementService ces = (IComponentManagementService)SServiceProvider.getService(
+					getScope().getServiceProvider(), IComponentManagementService.class).get(this);
 				IFuture ret = ces.createComponent(null, type, new CreationInfo(config, args[i]), null);
 				IComponentIdentifier aid = (IComponentIdentifier)ret.get(this);
 				agents.add(aid);
@@ -98,7 +100,8 @@ public abstract class AbstractMultipleAgentsPlan extends Plan
 //				dispatchSubgoalAndWait(da);
 				
 //				SyncResultListener	listener	= new SyncResultListener();
-				IComponentManagementService ces	= (IComponentManagementService)getScope().getServiceProvider().getService(IComponentManagementService.class).get(this);
+				IComponentManagementService ces	= (IComponentManagementService)SServiceProvider.getService(
+					getScope().getServiceProvider(), IComponentManagementService.class).get(this);
 				IFuture ret = ces.destroyComponent((IComponentIdentifier)agents.get(i));
 				ret.get(this);
 //				listener.waitForResult();

@@ -3,6 +3,7 @@ package jadex.bdi.benchmarks;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentManagementService;
+import jadex.service.SServiceProvider;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -19,7 +20,8 @@ public class RequestMasterPlan extends Plan
 		args.put("max", getBeliefbase().getBelief("max").getFact());
 		args.put("receiver", getComponentIdentifier());
 		
-		IComponentManagementService	ces	= (IComponentManagementService)getScope().getServiceProvider().getService(IComponentManagementService.class).get(this);
+		
+		IComponentManagementService	ces	= (IComponentManagementService)SServiceProvider.getService(getScope().getServiceProvider(), IComponentManagementService.class).get(this);
 		ces.createComponent(null, "jadex/bdi/benchmarks/RequestPerformance.agent.xml", new CreationInfo("default", args, getComponentIdentifier()), null);
 	}	
 }

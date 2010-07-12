@@ -8,6 +8,7 @@ import jadex.base.fipa.SFipa;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
+import jadex.service.SServiceProvider;
 
 import java.util.Date;
 
@@ -29,7 +30,7 @@ public class DFRemoteModifyPlan extends Plan
 		// When AID is ommited, enter self. Hack???
 		if(desc.getName()==null || lt!=null)
 		{
-			IDF	dfservice	= (IDF)getScope().getServiceProvider().getService(IDF.class);
+			IDF	dfservice	= (IDF)SServiceProvider.getService(getScope().getServiceProvider(), IDF.class).get(this);
 			IComponentIdentifier	bid	= desc.getName()!=null ? desc.getName() : getScope().getComponentIdentifier();
 			Date	leasetime	= lt==null ? desc.getLeaseTime() : new Date(getTime()+lt.longValue());
 			desc	= dfservice.createDFComponentDescription(bid, desc.getServices(), desc.getLanguages(), desc.getOntologies(), desc.getProtocols(), leasetime);

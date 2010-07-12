@@ -7,6 +7,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.commons.IFuture;
 import jadex.commons.collection.SCollection;
+import jadex.service.SServiceProvider;
 
 import java.util.Map;
 
@@ -160,7 +161,7 @@ public class StartPeerPlan extends Plan
 	 */
 	protected IComponentIdentifier serviceCreateAgent(String name, Map args)
 	{
-		final IComponentManagementService ces = (IComponentManagementService)getScope().getServiceProvider().getService(IComponentManagementService.class).get(this);
+		final IComponentManagementService ces = (IComponentManagementService)SServiceProvider.getService(getScope().getServiceProvider(), IComponentManagementService.class).get(this);
 //		SyncResultListener lis = new SyncResultListener();
 //		ces.createComponent(name, "/jadex/bdi/benchmarks/AgentCreation.agent.xml", new CreationInfo(args), lis, null);
 //		IComponentIdentifier aid = (IComponentIdentifier)lis.waitForResult();
@@ -194,7 +195,7 @@ public class StartPeerPlan extends Plan
 	 */
 	protected void serviceDestroyAgent(String name)
 	{
-		final IComponentManagementService ces = (IComponentManagementService)getScope().getServiceProvider().getService(IComponentManagementService.class).get(this);
+		final IComponentManagementService ces = (IComponentManagementService)SServiceProvider.getService(getScope().getServiceProvider(), IComponentManagementService.class).get(this);
 //		SyncResultListener lis = new SyncResultListener();
 //		IComponentIdentifier aid = ces.createComponentIdentifier(name, true, null);
 //		ces.destroyComponent(aid, lis);
@@ -212,7 +213,7 @@ public class StartPeerPlan extends Plan
 	 */
 	protected void capabilityDestroyAgent(String name)
 	{
-		final IComponentManagementService ces = (IComponentManagementService)getScope().getServiceProvider().getService(IComponentManagementService.class).get(this);
+		final IComponentManagementService ces = (IComponentManagementService)SServiceProvider.getService(getScope().getServiceProvider(), IComponentManagementService.class).get(this);
 		IComponentIdentifier aid = ces.createComponentIdentifier(name, true, null);
 		IGoal sp = createGoal("cms_destroy_component");
 		sp.getParameter("componentidentifier").setValue(aid);

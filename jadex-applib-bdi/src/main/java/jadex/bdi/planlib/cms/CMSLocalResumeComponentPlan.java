@@ -5,6 +5,7 @@ import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.commons.IFuture;
+import jadex.service.SServiceProvider;
 
 /**
  *  Plan for resuming a Jadex component on the platform.
@@ -18,7 +19,8 @@ public class CMSLocalResumeComponentPlan extends Plan
 	{	
 		IComponentIdentifier	aid	= (IComponentIdentifier)getParameter("componentidentifier").getValue();
 		
-		IFuture ret = ((IComponentManagementService)getScope().getServiceProvider().getService(IComponentManagementService.class).get(this)).resumeComponent(aid);
+		IFuture ret = ((IComponentManagementService)SServiceProvider.getService(
+			getScope().getServiceProvider(), IComponentManagementService.class).get(this)).resumeComponent(aid);
 		IComponentDescription desc =  (IComponentDescription) ret.get(this);
 		
 		getParameter("componentdescription").setValue(desc);

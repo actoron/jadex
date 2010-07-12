@@ -9,6 +9,7 @@ import jadex.bdi.runtime.IEAGoal;
 import jadex.commons.SGUI;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
+import jadex.service.SServiceProvider;
 import jadex.service.clock.IClockService;
 
 import java.awt.BorderLayout;
@@ -320,7 +321,7 @@ public class Gui extends JFrame
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				while(dia.requestInput(((IClockService)agent.getServiceProvider().getService(IClockService.class)).getTime()))
+				while(dia.requestInput(((IClockService)SServiceProvider.getService(agent.getServiceProvider(), IClockService.class)).getTime()))
 				{
 					try
 					{
@@ -329,7 +330,7 @@ public class Gui extends JFrame
 						int start = Integer.parseInt(dia.start.getText());
 						Date deadline = dformat.parse(dia.deadline.getText());
 						final Order order = new Order(title, deadline, start, limit, buy, 
-							(IClockService)agent.getServiceProvider().getService(IClockService.class));
+							(IClockService)SServiceProvider.getService(agent.getServiceProvider(), IClockService.class));
 						
 						agent.createGoal(goalname).addResultListener(new DefaultResultListener()
 						{
@@ -404,7 +405,7 @@ public class Gui extends JFrame
 					edit_dialog.start.setText(Integer.toString(order.getStartPrice()));
 					edit_dialog.deadline.setText(dformat.format(order.getDeadline()));
 
-					while(edit_dialog.requestInput(((IClockService)agent.getServiceProvider().getService(IClockService.class)).getTime()))
+					while(edit_dialog.requestInput(((IClockService)SServiceProvider.getService(agent.getServiceProvider(), IClockService.class)).getTime()))
 					{
 						try
 						{
@@ -565,7 +566,7 @@ public class Gui extends JFrame
 
 			// Add some default entry for easy testing of the gui.
 			// This order are not added to the agent (see manager.agent.xml).
-			agent.getServiceProvider().getService(IClockService.class).addResultListener(new SwingDefaultResultListener()
+			SServiceProvider.getService(agent.getServiceProvider(), IClockService.class).addResultListener(new SwingDefaultResultListener()
 			{
 				
 				public void customResultAvailable(Object source, Object result)

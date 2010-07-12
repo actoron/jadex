@@ -10,6 +10,7 @@ import jadex.bridge.IComponentManagementService;
 import jadex.commons.IFuture;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
+import jadex.service.SServiceProvider;
 
 /**
  *  This plan performs an illegal action. 
@@ -24,7 +25,8 @@ public class GetExternalAccessPlan extends Plan
 	public void body()
 	{
 		// Create component.
-		IComponentManagementService ces = (IComponentManagementService)getScope().getServiceProvider().getService(IComponentManagementService.class).get(this);
+		IComponentManagementService ces = (IComponentManagementService)SServiceProvider
+			.getServiceUpwards(getScope().getServiceProvider(), IComponentManagementService.class).get(this);
 		IFuture ret = ces.createComponent(null, "jadex/bdi/testcases/misc/ExternalAccess.agent.xml",
 			new CreationInfo("donothing", null, getComponentIdentifier(), true, false), null);
 		IComponentIdentifier cid = (IComponentIdentifier)ret.get(this);

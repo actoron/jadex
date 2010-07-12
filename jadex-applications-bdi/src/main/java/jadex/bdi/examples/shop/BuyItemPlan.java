@@ -8,6 +8,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.IFuture;
+import jadex.service.SServiceProvider;
 
 /**
  * 
@@ -19,17 +20,18 @@ public class BuyItemPlan extends Plan
 	 */
 	public void body()
 	{
-		IDF df = (IDF)getScope().getServiceProvider().getService(IDF.class);
+		IDF df = (IDF)SServiceProvider.getService(getScope().getServiceProvider(), IDF.class).get(this);
 		IDFServiceDescription sd = df.createDFServiceDescription(null, "shop", null);
 		IDFComponentDescription cd = df.createDFComponentDescription(null, sd);
 		IDFComponentDescription[] ret = (IDFComponentDescription[])df.search(cd, null).get(this);
 		
 		if(ret.length>0)
 		{
-			IComponentManagementService cms = (IComponentManagementService)getScope().getServiceProvider().getService(IComponentManagementService.class);
+			IComponentManagementService cms = (IComponentManagementService)SServiceProvider
+				.getServiceUpwards(getScope().getServiceProvider(), IComponentManagementService.class).get(this);
 			IComponentIdentifier cid = ret[0].getName();
 			IExternalAccess exa = (IExternalAccess)cms.getExternalAccess(cid).get(this);
-			IShop shop = (IShop)exa.getService(IShop.class);
+			IShop shop = (IShop)SServiceProvider.getService(exa.getServiceProvider(), IShop.class).get(this);
 			String name	= (String)getParameter("name").getValue();
 			System.out.println(getComponentName()+" buying item: "+name);
 			IFuture	future	= shop.buyItem(name);

@@ -10,6 +10,7 @@ import jadex.bdi.runtime.Plan;
 import jadex.bdi.runtime.PlanFailureException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.ISearchConstraints;
+import jadex.service.SServiceProvider;
 
 
 /**
@@ -61,7 +62,7 @@ public abstract class RemoteActionPlan extends Plan
 
 		if(res==null)
 		{
-			IDF df = (IDF)getScope().getServiceProvider().getService(IDF.class);
+			IDF df = (IDF)SServiceProvider.getService(getScope().getServiceProvider(), IDF.class).get(this);
 			IDFServiceDescription sd = df.createDFServiceDescription(null, "hunter-prey environment", null);
 			IDFComponentDescription ad = df.createDFComponentDescription(null, sd);
 			ISearchConstraints	cons = df.createSearchConstraints(-1, 0);

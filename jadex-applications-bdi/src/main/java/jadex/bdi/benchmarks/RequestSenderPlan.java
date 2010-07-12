@@ -4,6 +4,7 @@ import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentIdentifier;
+import jadex.service.SServiceProvider;
 
 /**
  *	Handle requests and generate reply value.
@@ -51,7 +52,7 @@ public class RequestSenderPlan extends Plan
 		System.out.println("Issued "+max+" protocols in "+time+" millis.");
 		
 		// Kill the receiver (i.e. the request performance master agent.
-		IComponentManagementService	ces	= (IComponentManagementService)getScope().getServiceProvider().getService(IComponentManagementService.class).get(this);
+		IComponentManagementService	ces	= (IComponentManagementService)SServiceProvider.getService(getScope().getServiceProvider(), IComponentManagementService.class).get(this);
 		ces.destroyComponent(receiver);
 	}
 }

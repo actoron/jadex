@@ -5,6 +5,7 @@ import jadex.bdi.runtime.GoalFailureException;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentManagementService;
+import jadex.service.SServiceProvider;
 
 public class SimulationEndPlan extends Plan {
 
@@ -36,7 +37,7 @@ public class SimulationEndPlan extends Plan {
 		
 //		// kill via gui		
 
-		IComponentManagementService	ces	= (IComponentManagementService)getScope().getServiceProvider().getService(IComponentManagementService.class);
-		ces.destroyComponent(getScope().getParent().getComponentIdentifier());
+		IComponentManagementService	cms	= (IComponentManagementService)SServiceProvider.getService(getScope().getServiceProvider(), IComponentManagementService.class).get(this);
+		cms.destroyComponent(getScope().getParent().getComponentIdentifier());
 	}
 }

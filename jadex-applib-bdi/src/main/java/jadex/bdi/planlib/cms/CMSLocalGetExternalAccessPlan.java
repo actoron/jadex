@@ -5,6 +5,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.commons.IFuture;
 import jadex.service.IServiceProvider;
+import jadex.service.SServiceProvider;
 
 /**
  *  Plan for terminating a Jadex component on the platform.
@@ -18,10 +19,10 @@ public class CMSLocalGetExternalAccessPlan extends Plan
 	{	
 		IComponentIdentifier aid = (IComponentIdentifier)getParameter("componentidentifier").getValue();
 
-		final IServiceProvider plat = getScope().getServiceProvider();
 		try
 		{
-			IFuture fut = ((IComponentManagementService)plat.getService(IComponentManagementService.class).get(this)).getExternalAccess(aid);
+			IFuture fut = ((IComponentManagementService)SServiceProvider.getService(
+				getScope().getServiceProvider(), IComponentManagementService.class).get(this)).getExternalAccess(aid);
 			Object ret = fut.get(this);
 			getParameter("result").setValue(ret);
 		}

@@ -5,6 +5,7 @@ import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.ISearchConstraints;
 import jadex.commons.IFuture;
+import jadex.service.SServiceProvider;
 
 
 /**
@@ -20,7 +21,8 @@ public class CMSLocalSearchComponentsPlan extends Plan
 		IComponentDescription	desc	= (IComponentDescription)getParameter("description").getValue();
 		ISearchConstraints	constraints	= (ISearchConstraints)getParameter("constraints").getValue();
 		
-		IFuture ret = ((IComponentManagementService)getScope().getServiceProvider().getService(IComponentManagementService.class).get(this)).searchComponents(desc, constraints);
+		IFuture ret = ((IComponentManagementService)SServiceProvider.getService(
+			getScope().getServiceProvider(), IComponentManagementService.class).get(this)).searchComponents(desc, constraints);
 		IComponentDescription[]	result =  (IComponentDescription[])ret.get(this);
 		for(int i=0; i<result.length; i++)
 			getParameterSet("result").addValue(result[i]);

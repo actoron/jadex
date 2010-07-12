@@ -11,6 +11,7 @@ import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.collection.SCollection;
+import jadex.service.SServiceProvider;
 
 import java.util.List;
 import java.util.Map;
@@ -45,9 +46,9 @@ public class EndStatePlan extends Plan
 		// Check if worker agent has been correctly removed.
 		waitFor(1000);	// Hack!!! how to ensure that agent has time to remove itself?
 		IGoal	search	= createGoal("cmscap.cms_search_components");
-		IComponentManagementService ces = (IComponentManagementService)getScope().getServiceProvider()
-			.getService(IComponentManagementService.class).get(this);
-		search.getParameter("description").setValue(ces.createComponentDescription(worker, null, null, null, null));
+		IComponentManagementService cms = (IComponentManagementService)SServiceProvider.getService(
+			getScope().getServiceProvider(), IComponentManagementService.class).get(this);
+		search.getParameter("description").setValue(cms.createComponentDescription(worker, null, null, null, null));
 		dispatchSubgoalAndWait(search);
 		TestReport	report	= new TestReport("termination", "Test if the worker agent has been terminated");
 		if(search.getParameterSet("result").getValues().length==0)
@@ -75,7 +76,7 @@ public class EndStatePlan extends Plan
 
 		// Check if deregister agent is registered.
 		waitFor(100);	// Hack!!! how to ensure that agent has time to register itself?
-		IDF df = (IDF)getScope().getServiceProvider().getService(IDF.class).get(this);
+		IDF df = (IDF)SServiceProvider.getService(getScope().getServiceProvider(), IDF.class).get(this);
 		IDFServiceDescription sd = df.createDFServiceDescription(null, "endstate_testservice", null);
 		IDFComponentDescription ad = df.createDFComponentDescription(null, sd);
 		
@@ -106,7 +107,7 @@ public class EndStatePlan extends Plan
 			{
 				// Check if deregister agent has been correctly removed.
 				search = createGoal("cmscap.cms_search_components");
-				search.getParameter("description").setValue(ces.createComponentDescription(deregister, null, null, null, null));
+				search.getParameter("description").setValue(cms.createComponentDescription(deregister, null, null, null, null));
 				dispatchSubgoalAndWait(search);
 				if(search.getParameterSet("result").getValues().length!=0)
 				{

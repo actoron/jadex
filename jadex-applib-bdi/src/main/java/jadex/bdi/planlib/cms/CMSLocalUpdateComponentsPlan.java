@@ -7,6 +7,7 @@ import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentManagementService;
 import jadex.commons.IFuture;
+import jadex.service.SServiceProvider;
 
 /**
  *  Update the belief set containing the local components.
@@ -85,7 +86,8 @@ public class CMSLocalUpdateComponentsPlan extends Plan
 				}
 			};
 			
-			IComponentManagementService	ces	= (IComponentManagementService)getScope().getServiceProvider().getService(IComponentManagementService.class).get(this);
+			IComponentManagementService	ces	= (IComponentManagementService)SServiceProvider.getServiceUpwards(
+				getScope().getServiceProvider(), IComponentManagementService.class).get(this);
 			ces.addComponentListener(null, listener);
 			
 			IFuture fut = ces.getComponentDescriptions();
@@ -99,7 +101,7 @@ public class CMSLocalUpdateComponentsPlan extends Plan
 	
 	public void aborted()
 	{
-		IComponentManagementService	ces	= (IComponentManagementService)getScope().getServiceProvider().getService(IComponentManagementService.class).get(this);
+		IComponentManagementService	ces	= (IComponentManagementService)SServiceProvider.getService(getScope().getServiceProvider(), IComponentManagementService.class).get(this);
 		ces.removeComponentListener(null, listener);
 	}
 }

@@ -5,11 +5,14 @@ import jadex.bdi.model.OAVAgentModel;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IExternalAccess;
+import jadex.commons.IFuture;
 import jadex.commons.concurrent.Executor;
 import jadex.commons.concurrent.IExecutable;
 import jadex.commons.concurrent.ThreadPoolFactory;
 import jadex.service.BasicServiceContainer;
 import jadex.service.IService;
+import jadex.service.IServiceContainer;
 import jadex.service.IServiceProvider;
 import jadex.service.clock.ClockService;
 import jadex.service.clock.IClockService;
@@ -67,8 +70,8 @@ public class InterpreterTest
 			final Executor exe = new Executor(ThreadPoolFactory.createThreadPool());
 			final BDIInterpreter[]	interpreters	= new BDIInterpreter[1];
 			
-			final BasicServiceContainer container = new BasicServiceContainer();
-			container.addService(IClockService.class, "clock_service", (IService)clock);
+			final BasicServiceContainer container = new BasicServiceContainer("platform");
+			container.addService(IClockService.class, (IService)clock);
 			
 			final BDIInterpreter interpreter = new BDIInterpreter(new IComponentAdapter()
 			{
@@ -83,7 +86,19 @@ public class InterpreterTest
 					throw new UnsupportedOperationException();
 				}
 				
-				public IServiceProvider getRootServiceProvider()
+				public IExternalAccess getParent()
+				{
+					// TODO Auto-generated method stub
+					return null;
+				}
+				
+				public IFuture getChildren()
+				{
+					// TODO Auto-generated method stub
+					return null;
+				}
+				
+				public IServiceContainer getServiceContainer()
 				{
 					return container;
 				}

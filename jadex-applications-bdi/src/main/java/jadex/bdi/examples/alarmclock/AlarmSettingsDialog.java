@@ -6,6 +6,7 @@ import jadex.commons.SGUI;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
+import jadex.service.SServiceProvider;
 import jadex.service.clock.IClockService;
 
 import java.awt.Dialog;
@@ -350,18 +351,26 @@ public class AlarmSettingsDialog extends JDialog
 
 		// Set the alarm and refresh the view.
 		// Alarm is cloned to avoid modifying the original object.
+		
 		if(alarm==null)
 		{
-			alarm = new Alarm();
-			IClockService cs = (IClockService)agent.getServiceProvider().getService(IClockService.class);
-			alarm.setTime(new Time(new Date(cs.getTime())));
+			final Alarm al = new Alarm();
+			SServiceProvider.getService(agent.getServiceProvider(), IClockService.class).addResultListener(new SwingDefaultResultListener()
+			{
+				public void customResultAvailable(Object source, Object result)
+				{
+					IClockService cs = (IClockService)result;
+					al.setTime(new Time(new Date(cs.getTime())));
+					setAlarm(al);
+				}
+			});
 //			alarm.setClock((IClockService)agent.getServiceContainer().getService(IClockService.class));
 		}
 		else
 		{
 			alarm = (Alarm)alarm.clone();
+			setAlarm(alarm);
 		}
-		setAlarm(alarm);
 	}
 
 	//-------- methods --------

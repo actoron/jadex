@@ -5,6 +5,7 @@ import jadex.base.fipa.IDFComponentDescription;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.ISearchConstraints;
+import jadex.service.SServiceProvider;
 
 /**
  *  Find the service providers.
@@ -19,7 +20,7 @@ public class FindServiceProvidersPlan extends Plan
 	{
 		IDFComponentDescription dfadesc = (IDFComponentDescription)getParameter("description").getValue();
 		
-		IDF df = (IDF)getScope().getServiceProvider().getService(IDF.class);
+		IDF df = (IDF)SServiceProvider.getService(getScope().getServiceProvider(), IDF.class);
 		ISearchConstraints constraints = df.createSearchConstraints(-1, 0);
 
 		// Use a subgoal to search at the df.

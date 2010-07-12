@@ -10,6 +10,7 @@ import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.ISearchConstraints;
 import jadex.commons.SUtil;
+import jadex.service.SServiceProvider;
 
 /**
  *  Inform the sentry agent about a new target.
@@ -72,7 +73,7 @@ public class InformNewTargetPlan extends Plan
 
 		// Search for Production_Service
 		// Create a service description to search for.
-		IDF	df	= (IDF)getScope().getServiceProvider().getService(IDF.class);
+		IDF	df	= (IDF)SServiceProvider.getService(getScope().getServiceProvider(), IDF.class).get(this);
 		IDFServiceDescription sd = df.createDFServiceDescription("service_sentry", null, null);
 		IDFComponentDescription dfadesc = df.createDFComponentDescription(null, sd);
 

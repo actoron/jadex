@@ -3,6 +3,7 @@ package jadex.bdi.examples.alarmclock;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.commons.jtable.ObjectTableModel;
+import jadex.service.SServiceProvider;
 import jadex.service.clock.IClockService;
 
 import java.awt.Color;
@@ -76,7 +77,7 @@ public class AlarmsGui extends JFrame
 		tadata.setColumnClass(Boolean.class, 2);
 		tadata.setColumnEditable(true, 2);
 		
-		agent.getServiceProvider().getService(IClockService.class).addResultListener(new SwingDefaultResultListener()
+		SServiceProvider.getService(agent.getServiceProvider(), IClockService.class).addResultListener(new SwingDefaultResultListener()
 		{
 			public void customResultAvailable(Object source, Object result)
 			{

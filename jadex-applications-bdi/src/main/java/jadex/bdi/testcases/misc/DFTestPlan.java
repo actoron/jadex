@@ -13,6 +13,7 @@ import jadex.bdi.runtime.TimeoutException;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.SUtil;
+import jadex.service.SServiceProvider;
 
 import java.util.Date;
 
@@ -33,7 +34,8 @@ public class DFTestPlan extends Plan
 		num	= performInitialTests(num);
 		num = performTests(num, null); // test locally
 		
-		IComponentManagementService ces = (IComponentManagementService)getScope().getServiceProvider().getService(IComponentManagementService.class);
+		IComponentManagementService ces = (IComponentManagementService)SServiceProvider.getServiceUpwards(
+			getScope().getServiceProvider(), IComponentManagementService.class).get(this);
 		IComponentIdentifier da = ces.createComponentIdentifier(SFipa.DF_COMPONENT, true, null);
 		performTests(num, da); // test remotely
 	}
@@ -43,14 +45,14 @@ public class DFTestPlan extends Plan
 	 */
 	public int	performInitialTests(int num)
 	{
-		IDFComponentDescription desc = ((IDF)getScope().getServiceProvider().getService(IDF.class))
+		IDFComponentDescription desc = ((IDF)SServiceProvider.getService(getScope().getServiceProvider(), IDF.class).get(this))
 			.createDFComponentDescription(null, new IDFServiceDescription[]
 			{
-				((IDF)getScope().getServiceProvider().getService(IDF.class))
+				((IDF)SServiceProvider.getService(getScope().getServiceProvider(), IDF.class).get(this))
 					.createDFServiceDescription("service_a", "a", "a"),
-				((IDF)getScope().getServiceProvider().getService(IDF.class))
+				((IDF)SServiceProvider.getService(getScope().getServiceProvider(), IDF.class).get(this))
 					.createDFServiceDescription("service_b", "b", "b"),
-				((IDF)getScope().getServiceProvider().getService(IDF.class))
+				((IDF)SServiceProvider.getService(getScope().getServiceProvider(), IDF.class).get(this))
 					.createDFServiceDescription("service_c", "c", "c")
 			}, null, null, null, null);
 
@@ -114,21 +116,21 @@ public class DFTestPlan extends Plan
 	 */
 	public int performTests(int num, IComponentIdentifier df)
 	{
-		IDFComponentDescription desc = ((IDF)getScope().getServiceProvider().getService(IDF.class))
+		IDFComponentDescription desc = ((IDF)SServiceProvider.getService(getScope().getServiceProvider(), IDF.class).get(this))
 			.createDFComponentDescription(null, new IDFServiceDescription[]
 			{
-				((IDF)getScope().getServiceProvider().getService(IDF.class))
+				((IDF)SServiceProvider.getService(getScope().getServiceProvider(), IDF.class).get(this))
 					.createDFServiceDescription("service_a", "a", "a"),
-				((IDF)getScope().getServiceProvider().getService(IDF.class))
+				((IDF)SServiceProvider.getService(getScope().getServiceProvider(), IDF.class).get(this))
 					.createDFServiceDescription("service_b", "b", "b"),
-				((IDF)getScope().getServiceProvider().getService(IDF.class))
+				((IDF)SServiceProvider.getService(getScope().getServiceProvider(), IDF.class).get(this))
 					.createDFServiceDescription("service_c", "c", "c")
 			}, null, null, null, null);
 		
 		long olt = getTime()+2000;
 //		desc_clone.setLeaseTime(new Date(olt));
 		
-		IDF dfservice = (IDF)getScope().getServiceProvider().getService(IDF.class);
+		IDF dfservice = (IDF)SServiceProvider.getService(getScope().getServiceProvider(), IDF.class).get(this);
 		// Hack! does not clone services
 		IDFComponentDescription desc_clone = dfservice.createDFComponentDescription(desc.getName(), desc.getServices(), desc.getLanguages(), desc.getOntologies(), desc.getProtocols(), new Date(olt));
 

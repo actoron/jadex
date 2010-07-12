@@ -14,6 +14,7 @@ import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.ISearchConstraints;
+import jadex.service.SServiceProvider;
 
 /**
  *  The main plan for the Production Agent. <br>
@@ -84,7 +85,7 @@ public class ProductionPlan extends Plan
 	{
 		// Search for Carry_Service
 		// Create a service description to search for.
-		IDF	df	= (IDF)getScope().getServiceProvider().getService(IDF.class);
+		IDF	df	= (IDF)SServiceProvider.getService(getScope().getServiceProvider(), IDF.class).get(this);
 		IDFServiceDescription sd = df.createDFServiceDescription("service_carry", null, null);
 		IDFComponentDescription dfadesc = df.createDFComponentDescription(null, sd);
 

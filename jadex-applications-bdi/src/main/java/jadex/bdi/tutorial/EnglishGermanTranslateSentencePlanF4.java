@@ -10,6 +10,7 @@ import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.SUtil;
+import jadex.service.SServiceProvider;
 
 import java.util.StringTokenizer;
 
@@ -61,7 +62,7 @@ public class EnglishGermanTranslateSentencePlanF4 extends Plan
 			// Search a translation agent.
 			while(ta==null)
 			{
-				IDF	dfservice	= (IDF)getScope().getServiceProvider().getService(IDF.class);
+				IDF	dfservice	= (IDF)SServiceProvider.getService(getScope().getServiceProvider(), IDF.class);
 				
 				// Create a service description to search for.
 				IDFServiceDescription sd = dfservice.createDFServiceDescription(null, "translate english_german", null);

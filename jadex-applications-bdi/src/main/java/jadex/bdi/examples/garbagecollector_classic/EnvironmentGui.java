@@ -9,6 +9,7 @@ import jadex.bridge.IComponentManagementService;
 import jadex.commons.SGUI;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
+import jadex.service.SServiceProvider;
 
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -64,16 +65,22 @@ public class EnvironmentGui	extends JFrame
 								{
 									public void resultAvailable(Object source, Object result)
 									{
-										try
+										final IEAGoal kill = (IEAGoal)result;
+										SServiceProvider.getServiceUpwards(agent.getServiceProvider(), IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
 										{
-											IEAGoal kill = (IEAGoal)result;
-											IComponentManagementService ces = (IComponentManagementService)agent.getServiceProvider().getService(IComponentManagementService.class);
-											kill.setParameterValue("componentidentifier", ces.createComponentIdentifier(wobs[num].getName(), true, null));
-											agent.dispatchTopLevelGoalAndWait(kill);
-										}
-										catch(GoalFailureException gfe) 
-										{
-										}
+											public void customResultAvailable(Object source, Object result)
+											{
+												try
+												{
+													IComponentManagementService ces = (IComponentManagementService)result;
+													kill.setParameterValue("componentidentifier", ces.createComponentIdentifier(wobs[num].getName(), true, null));
+													agent.dispatchTopLevelGoalAndWait(kill);
+												}
+												catch(GoalFailureException gfe) 
+												{
+												}
+											}
+										});
 									}
 								});
 							}

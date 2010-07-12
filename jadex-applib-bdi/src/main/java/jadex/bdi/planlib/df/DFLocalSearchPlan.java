@@ -5,6 +5,7 @@ import jadex.base.fipa.IDFComponentDescription;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.ISearchConstraints;
 import jadex.commons.IFuture;
+import jadex.service.SServiceProvider;
 
 
 /**
@@ -21,7 +22,7 @@ public class DFLocalSearchPlan extends Plan
 		IDFComponentDescription desc = (IDFComponentDescription)getParameter("description").getValue();
 		ISearchConstraints	con	= (ISearchConstraints)getParameter("constraints").getValue();
 		
-		IFuture ret = ((IDF)getScope().getServiceProvider().getService(IDF.class).get(this)).search(desc, con);
+		IFuture ret = ((IDF)SServiceProvider.getService(getScope().getServiceProvider(), IDF.class).get(this)).search(desc, con);
 		IDFComponentDescription[] result = (IDFComponentDescription[])ret.get(this);
 		
 		getParameterSet("result").addValues(result);

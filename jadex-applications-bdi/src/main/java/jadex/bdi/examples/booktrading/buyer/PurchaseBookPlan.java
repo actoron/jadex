@@ -11,6 +11,7 @@ import jadex.bdi.runtime.GoalFailureException;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
+import jadex.service.SServiceProvider;
 
 import java.util.Date;
 
@@ -38,7 +39,7 @@ public class PurchaseBookPlan extends Plan
 			+ order.getStartPrice();
 
 		// Find available seller agents.
-		IDF	df	= (IDF)getScope().getServiceProvider().getService(IDF.class).get(this);
+		IDF	df	= (IDF)SServiceProvider.getService(getScope().getServiceProvider(), IDF.class).get(this);
 		IDFServiceDescription	service	= df.createDFServiceDescription(null, "service_seller", null);
 		IDFComponentDescription	desc	= df.createDFComponentDescription(null, service);
 		IGoal df_search = createGoal("df_search");

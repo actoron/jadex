@@ -2,6 +2,7 @@ package jadex.bdi.examples.alarmclock;
 
 import jadex.bdi.runtime.Plan;
 import jadex.commons.SUtil;
+import jadex.service.SServiceProvider;
 import jadex.service.library.ILibraryService;
 import jadex.service.threadpool.ThreadPoolService;
 
@@ -43,9 +44,9 @@ public class PlaySongPlan extends Plan
 	{
 		final URL song = (URL)getParameter("song").getValue();
 		final SyncResultListener lis = new SyncResultListener();
-		final ILibraryService ls = (ILibraryService)getScope().getServiceProvider().getService(ILibraryService.class).get(this);
+		final ILibraryService ls = (ILibraryService)SServiceProvider.getService(getScope().getServiceProvider(), ILibraryService.class).get(this);
 		
-		ThreadPoolService tp = (ThreadPoolService)getScope().getServiceProvider().getService(ThreadPoolService.class).get(this);
+		ThreadPoolService tp = (ThreadPoolService)SServiceProvider.getService(getScope().getServiceProvider(), ThreadPoolService.class).get(this);
 		tp.execute(new Runnable()
 		{
 			public void run()

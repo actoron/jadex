@@ -10,6 +10,7 @@ import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.ISearchConstraints;
+import jadex.service.SServiceProvider;
 
 /**
  *  Analyse a target.
@@ -63,7 +64,7 @@ public class AnalyseTargetPlan extends Plan
 
 		// Search for Production_Service
 		// Create a service description to search for.
-		IDF	df	= (IDF)getScope().getServiceProvider().getService(IDF.class);
+		IDF	df	= (IDF)SServiceProvider.getService(getScope().getServiceProvider(), IDF.class).get(this);
 		IDFServiceDescription sd = df.createDFServiceDescription("service_produce", null, null);
 		IDFComponentDescription dfadesc = df.createDFComponentDescription(null, sd);
 

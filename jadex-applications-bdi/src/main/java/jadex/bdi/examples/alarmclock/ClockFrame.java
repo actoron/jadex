@@ -6,6 +6,7 @@ import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.commons.SGUI;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
+import jadex.service.SServiceProvider;
 import jadex.service.clock.IClockService;
 
 import java.awt.AWTException;
@@ -327,7 +328,7 @@ public class ClockFrame extends JFrame
 				public void resultAvailable(Object source, Object result)
 				{
 					final Settings sets = (Settings)result;
-					agent.getServiceProvider().getService(IClockService.class).addResultListener(new SwingDefaultResultListener()
+					SServiceProvider.getService(agent.getServiceProvider(), IClockService.class).addResultListener(new SwingDefaultResultListener()
 					{
 						public void customResultAvailable(Object source, Object result)
 						{

@@ -14,6 +14,7 @@ import jadex.bdi.examples.cleanerworld_classic.Wastebin;
 import jadex.bdi.runtime.GoalFailureException;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
+import jadex.service.SServiceProvider;
 
 /**
  *  Update the environment belief.
@@ -92,7 +93,7 @@ public class UpdateEnvironmentPlan extends Plan
 	 */
 	protected void searchEnvironmentAgent()
 	{
-		IDF df = (IDF)getScope().getServiceProvider().getService(IDF.class);
+		IDF df = (IDF)SServiceProvider.getService(getScope().getServiceProvider(), IDF.class);
 		IDFServiceDescription sd = df.createDFServiceDescription(null, "dispatch vision", null);
 		IDFComponentDescription ad = df.createDFComponentDescription(null, sd);
 
