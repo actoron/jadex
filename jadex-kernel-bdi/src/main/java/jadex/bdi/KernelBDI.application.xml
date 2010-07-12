@@ -11,12 +11,16 @@
 	<imports>
 		<import>jadex.commons.*</import>
 		<import>jadex.bridge.*</import>
+		<import>jadex.base.fipa.*</import>
+		<import>jadex.service.*</import>
+		<import>jadex.service.threadpool.*</import>
+		<import>jadex.bdi.runtime.impl.*</import>
 	</imports>
 	
 	<services>
 		<service name="bdi_factory" class="jadex.bridge.IComponentFactory">
-			new jadex.bdi.BDIAgentFactory(
-				jadex.commons.SUtil.createHashMap(
+			new BDIAgentFactory(
+				SUtil.createHashMap(
 				new String[]
 				{
 					"messagetype_fipa", 
@@ -28,9 +32,9 @@
 				},
 				new Object[]
 				{
-					new jadex.base.fipa.FIPAMessageType(), 
-					new jadex.bdi.runtime.impl.JavaStandardPlanExecutor(
-						jadex.service.SServiceProvider.getService($platform, jadex.service.threadpool.ThreadPoolService.class).get(new jadex.commons.ThreadSuspendable())),
+					new FIPAMessageType(), 
+					new JavaStandardPlanExecutor((ThreadPoolService)
+						SServiceProvider.getService($platform, ThreadPoolService.class).get(new ThreadSuspendable())),
 					new java.lang.Long(10000),
 					Boolean.TRUE,
 					"jadex.tools.debugger.bdi.BDIAgentInspectorDebuggerPanel, jadex.tools.debugger.bdi.BDIAgentRuleEngineDebuggerPanel"

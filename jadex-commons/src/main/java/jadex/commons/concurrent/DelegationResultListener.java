@@ -29,7 +29,7 @@ public class DelegationResultListener implements IResultListener
 	 *  @param source The source component.
 	 *  @param result The result.
 	 */
-	public void resultAvailable(Object source, Object result)
+	public final void resultAvailable(Object source, Object result)
 	{
 		future.setResult(result);
 	}
@@ -39,7 +39,7 @@ public class DelegationResultListener implements IResultListener
 	 *  @param source The source component.
 	 *  @param exception The exception.
 	 */
-	public void exceptionOccurred(Object source, Exception exception)
+	public final void exceptionOccurred(Object source, Exception exception)
 	{
 		future.setException(exception);
 	}

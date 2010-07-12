@@ -24,6 +24,13 @@ public interface IResultSelector
 	public Object	getResult(Collection results);
 	
 	/**
+	 *  Test if the search result is sufficient to stop the search.
+	 *  @param results	The collection of selected services.
+	 *  @return True, if the search should be stopped.
+	 */
+	public boolean	isFinished(Collection results);
+	
+	/**
 	 *  Get the cache key.
 	 *  Needs to identify this element with respect to its important features so that
 	 *  two equal elements should return the same key.

@@ -23,6 +23,16 @@ public class SServiceProvider
 	}
 	
 	/**
+	 *  Get one service of a type.
+	 *  @param type The class.
+	 *  @return The corresponding service.
+	 */
+	public static IFuture getService(IServiceProvider provider, IResultSelector selector)
+	{
+		return provider.getServices(treemanager, abortdecider, selector);
+	}
+	
+	/**
 	 *  Get all services of a type.
 	 *  @param type The class.
 	 *  @return The corresponding services.

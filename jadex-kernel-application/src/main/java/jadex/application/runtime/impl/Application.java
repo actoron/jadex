@@ -10,6 +10,7 @@ import jadex.application.model.MExpressionType;
 import jadex.application.model.MSpaceInstance;
 import jadex.application.runtime.IApplication;
 import jadex.application.runtime.ISpace;
+import jadex.bridge.ComponentFactorySelector;
 import jadex.bridge.ComponentResultListener;
 import jadex.bridge.CreationInfo;
 import jadex.bridge.IArgument;
@@ -39,7 +40,6 @@ import jadex.service.IServiceProvider;
 import jadex.service.SServiceProvider;
 import jadex.service.library.ILibraryService;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -290,47 +290,37 @@ public class Application implements IApplication, IComponentInstance
 	{
 		// Checks if loaded model is defined in the application component types
 		
-		SServiceProvider.getServices(getServiceProvider(), IComponentFactory.class).addResultListener(new DefaultResultListener()
+		SServiceProvider.getService(getServiceProvider(), new ComponentFactorySelector(desc.getType())).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
-				Collection facts = (Collection)result;
-				
 				IComponentIdentifier comp = desc.getName();
 				List atypes	= Application.this.model.getApplicationType().getMComponentTypes();
 				boolean	found	= false;
 				String	type	= null;
 				
-				for(int i=0; !found	&& i<atypes.size(); i++)
+				IComponentFactory factory = (IComponentFactory)result;
+				// Hack!!! simplify lookup!?
+				if(factory!=null)
 				{
-					MComponentType	atype	= (MComponentType)atypes.get(i);
-					
-					// Hack!!! simplify lookup!?
-					IComponentFactory factory = null;
-					if(facts!=null)
+					for(int i=0; !found	&& i<atypes.size(); i++)
 					{
-						for(Iterator it=facts.iterator(); factory==null && it.hasNext(); )
+						MComponentType	atype	= (MComponentType)atypes.get(i);			
+						if(factory.isLoadable(atype.getFilename(), Application.this.model.getApplicationType().getAllImports(), model.getClassLoader()))
 						{
-							IComponentFactory	cf	= (IComponentFactory)it.next();
-							if(cf.isLoadable(atype.getFilename(), Application.this.model.getApplicationType().getAllImports(), model.getClassLoader()))
+							ILoadableComponentModel amodel = factory.loadModel(atype.getFilename(), Application.this.model.getApplicationType().getAllImports(), model.getClassLoader());
+							if(SUtil.equals(amodel.getPackage(), model.getPackage()) && amodel.getName().equals(model.getName()))
 							{
-								factory	= cf;
+								synchronized(this)
+								{
+									if(ctypes==null)
+										ctypes	= new HashMap();
+									ctypes.put(comp, atype.getName());
+								}
+								type	= atype.getName();
+								found	= true;
 							}
 						}
-					}
-					ILoadableComponentModel amodel = factory.loadModel(atype.getFilename(), Application.this.model.getApplicationType().getAllImports(), model.getClassLoader());
-					
-					if(SUtil.equals(amodel.getPackage(), model.getPackage()) && amodel.getName().equals(model.getName()))
-//					if(amodel.getFilename().equals(model.getFilename()))
-					{
-						synchronized(this)
-						{
-							if(ctypes==null)
-								ctypes	= new HashMap();
-							ctypes.put(comp, atype.getName());
-						}
-						type	= atype.getName();
-						found	= true;
 					}
 				}
 				if(found)

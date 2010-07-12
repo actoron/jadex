@@ -3,6 +3,7 @@ package jadex.standalone.service;
 import jadex.base.fipa.CMSComponentDescription;
 import jadex.base.fipa.ComponentIdentifier;
 import jadex.base.fipa.SearchConstraints;
+import jadex.bridge.ComponentFactorySelector;
 import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentDescription;
@@ -30,7 +31,6 @@ import jadex.service.library.ILibraryService;
 import jadex.standalone.StandaloneComponentAdapter;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -162,29 +162,15 @@ public class ComponentManagementService implements IComponentManagementService, 
 			{
 				final ILibraryService ls = (ILibraryService)result;
 				
-				SServiceProvider.getServices(container, IComponentFactory.class).addResultListener(new IResultListener()
+				SServiceProvider.getService(container, new ComponentFactorySelector(model, cinfo.getImports(), ls.getClassLoader())).addResultListener(new IResultListener()
 				{
 					public void resultAvailable(Object source, Object result)
 					{
-						Collection facts = (Collection)result;
-						IComponentFactory factory = null;
-						String	type	= null;
-						if(facts!=null)
-						{
-							for(Iterator it=facts.iterator(); factory==null && it.hasNext(); )
-							{
-								IComponentFactory	cf	= (IComponentFactory)it.next();
-								if(cf.isLoadable(model, cinfo.getImports(), ls.getClassLoader()))
-								{
-									factory	= cf;
-									type	= factory.getComponentType(model, cinfo.getImports(), ls.getClassLoader());
-								}
-							}
-						}
-						
+						IComponentFactory factory = (IComponentFactory)result;
 						if(factory==null)
 							throw new RuntimeException("No factory found for component: "+model);
 						final ILoadableComponentModel lmodel = factory.loadModel(model, cinfo.getImports(), ls.getClassLoader());
+						String	type	= factory.getComponentType(model, cinfo.getImports(), ls.getClassLoader());
 		
 						// Create id and adapter.
 						
@@ -326,12 +312,12 @@ public class ComponentManagementService implements IComponentManagementService, 
 			if(killlistener!=null)
 				killresultlisteners.put(cid, killlistener);
 			
-			ret.setResult(cid.clone());
-			
 			if(!suspend)
 			{
 				adapter.wakeup();
 			}
+			
+			ret.setResult(cid.clone());
 		}
 		catch(Exception e)
 		{

@@ -88,7 +88,7 @@ public class SequentialSearchManager implements ISearchManager
 		final Future ret, final Collection results, final LocalSearchManager lsm, final Map todo, final boolean up)
 	{
 		// If node is to be searched, continue with this node.
-		if(provider!=null && decider.searchNode(null, provider, results))
+		if(!selector.isFinished(results) && provider!=null && decider.searchNode(null, provider, results))
 		{
 			if(down)
 			{
@@ -101,7 +101,7 @@ public class SequentialSearchManager implements ISearchManager
 				public void resultAvailable(Object source, Object result)
 				{
 					// When searching upwards, continue with parent.
-					if(up)
+					if(!selector.isFinished(results) && up)
 					{
 						provider.getParent().addResultListener(new IResultListener()
 						{
@@ -147,7 +147,7 @@ public class SequentialSearchManager implements ISearchManager
 			final LocalSearchManager lsm, final Map todo)
 	{
 		// Finished, when no more todo nodes.
-		if(todo.isEmpty())
+		if(selector.isFinished(results) || todo.isEmpty())
 		{
 			ret.setResult(selector.getResult(results));
 		}
@@ -175,7 +175,7 @@ public class SequentialSearchManager implements ISearchManager
 			{
 				public void resultAvailable(Object source, Object result)
 				{
-					if(result!=null && !((Collection)result).isEmpty())
+					if(!selector.isFinished(results) && result!=null && !((Collection)result).isEmpty())
 					{
 						List	ccs	= new LinkedList((Collection)result);
 						todo.put(CURRENT_CHILDREN, ccs);

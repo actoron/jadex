@@ -46,7 +46,7 @@ public class LocalSearchManager implements ISearchManager
 	 */
 	public IFuture	searchServices(IServiceProvider provider, IVisitDecider decider, IResultSelector selector, Map services)
 	{
-		if(decider.searchNode(null, provider, results))
+		if(!selector.isFinished(results) && decider.searchNode(null, provider, results))
 		{
 			selector.selectServices(services, results);
 		}
