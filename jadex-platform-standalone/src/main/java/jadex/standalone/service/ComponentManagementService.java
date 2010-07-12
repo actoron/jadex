@@ -186,7 +186,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 								}
 								else
 								{
-									cid = new ComponentIdentifier(name+"@"+container.getId()); // Hack?!
+									cid = new ComponentIdentifier(name+"@"+((IComponentIdentifier)container.getId()).getPlatformName()); // Hack?!
 									if(adapters.containsKey(cid))
 									{
 										ret.setException(new RuntimeException("Component name already exists on platform: "+cid));
@@ -955,7 +955,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 	public IComponentIdentifier createComponentIdentifier(String name, boolean local, String[] addresses)
 	{
 		if(local)
-			name = name + "@" + container.getId();
+			name = name + "@" + ((IComponentIdentifier)container.getId()).getPlatformName(); // Hack?!
 		return new ComponentIdentifier(name, addresses, null);		
 	}
 
@@ -1134,7 +1134,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 		{
 			do
 			{
-				ret = new ComponentIdentifier(name+(compcnt++)+"@"+container.getId()); // Hack?!
+				ret = new ComponentIdentifier(name+(compcnt++)+"@"+((IComponentIdentifier)container.getId()).getPlatformName()); // Hack?!
 			}
 			while(adapters.containsKey(ret));
 		}

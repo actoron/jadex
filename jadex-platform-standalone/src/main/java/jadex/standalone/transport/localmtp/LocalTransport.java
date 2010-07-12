@@ -91,7 +91,8 @@ public class LocalTransport implements ITransport
 		
 		for(int i=0; i<recs.length; i++)
 		{
-			if(recs[i].getPlatformName().equals(container.getId()))
+			// Hack!!! Shouldn't assume component identifier?
+			if(recs[i].getPlatformName().equals(((IComponentIdentifier)container.getId()).getPlatformName()))
 				todeliver.add(recs[i]);
 			else
 				undelivered.add(recs[i]);
