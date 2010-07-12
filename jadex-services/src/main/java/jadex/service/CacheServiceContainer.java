@@ -6,10 +6,13 @@ import jadex.commons.Tuple;
 import jadex.commons.collection.LRU;
 import jadex.commons.concurrent.IResultListener;
 
+import java.util.Collections;
+import java.util.Map;
+
 /**
  *  Service container that uses caching for fast service access.
  */
-public class CacheServiceContainer
+public class CacheServiceContainer	implements IServiceContainer
 {
 	//-------- attributes --------
 	
@@ -17,7 +20,7 @@ public class CacheServiceContainer
 	protected IServiceContainer container;
 	
 	/** The LRU storing the last searches. */
-	protected LRU cache;
+	protected Map	cache;
 	
 	//-------- constructors --------
 
@@ -27,6 +30,7 @@ public class CacheServiceContainer
 	public CacheServiceContainer(IServiceContainer container)
 	{
 		this.container = container;
+		this.cache	= Collections.synchronizedMap(new LRU(25));
 	}
 	
 	//-------- methods --------
@@ -42,10 +46,9 @@ public class CacheServiceContainer
 		
 		final Tuple key = new Tuple(manager.getCacheKey(), decider.getCacheKey(), selector.getCacheKey());
 		
-		Object res = cache.get(key);
-		
 		if(cache.containsKey(key))
 		{
+			Object res = cache.get(key);
 			ret.setResult(res);
 		}
 		else
@@ -93,5 +96,45 @@ public class CacheServiceContainer
 	public Object getId()
 	{
 		return container.getId();
+	}
+	
+	/**
+	 *  Start the service.
+	 *  @return A future that is done when the service has completed starting.  
+	 */
+	public IFuture start()
+	{
+		return container.start();
+	}
+	
+	/**
+	 *  Shutdown the service.
+	 *  @return A future that is done when the service has completed its shutdown.  
+	 */
+	public IFuture shutdown()
+	{
+		return container.shutdown();
+	}
+	
+	/**
+	 *  Add a service to the platform.
+	 *  If under the same name and type a service was contained,
+	 *  the old one is removed and shutdowned.
+	 *  @param name The name.
+	 *  @param service The service.
+	 */
+	public void addService(Class type, Object service)
+	{
+		container.addService(type, service);
+	}
+
+	/**
+	 *  Removes a service from the platform (shutdowns also the service).
+	 *  @param name The name.
+	 *  @param service The service.
+	 */
+	public void removeService(Class type, Object service)
+	{
+		container.removeService(type, service);
 	}
 }

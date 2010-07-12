@@ -15,7 +15,6 @@ import jadex.bdi.runtime.IPlanbase;
 import jadex.bdi.runtime.IPropertybase;
 import jadex.bdi.runtime.impl.eaflyweights.ExternalAccessFlyweight;
 import jadex.bridge.ComponentResultListener;
-import jadex.bridge.ComponentServiceContainer;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentDescription;
@@ -46,11 +45,9 @@ import jadex.rules.rulesystem.Rulebase;
 import jadex.rules.rulesystem.rules.Rule;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.IProfiler;
-import jadex.service.IServiceContainer;
 import jadex.service.IServiceProvider;
 import jadex.service.SServiceProvider;
 import jadex.service.clock.IClockService;
-import jadex.service.library.ILibraryService;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -111,9 +108,6 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 	protected Map kernelprops;
 	
 	//-------- recreate on init (no state) --------
-	
-	/** The service provider. */
-	protected IServiceContainer provider;
 	
 	/** The event reificator creates changeevent objects for relevant state changes. */
 	protected EventReificator reificator;
@@ -271,9 +265,6 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 			if(mps!=null)
 				this.microplansteps = mps.booleanValue();
 		}
-		
-		// Create the service provider
-		this.provider = new ComponentServiceContainer(adapter);
 		
 		// Get the services.
 		final boolean services[]	= new boolean[3];
@@ -495,9 +486,6 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 	{
 //		System.err.println("Cleanup: "+state);
 
-		// Shutdown service provider.
-		provider.shutdown();
-		
 		BDIInterpreter.interpreters.remove(state);
 		
 		for(Iterator it=externalthreads.iterator(); it.hasNext(); )
@@ -1222,7 +1210,7 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 	 */
 	public IServiceProvider getServiceProvider()
 	{
-		return provider;
+		return adapter.getServiceContainer();
 	}
 	
 	/**

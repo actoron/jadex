@@ -112,6 +112,7 @@ public class ComponentFactorySelector implements IResultSelector
 	 */
 	public Object getCacheKey()
 	{
-		return new Tuple(new Object[]{getClass(), model, new Tuple(imports), classloader});
+		return type!=null ? new Tuple(new Object[]{getClass(), type})
+			: new Tuple(new Object[]{getClass(), model, imports!=null ? (Object)new Tuple(imports) : "null", classloader!=null ? (Object)classloader : "null"});
 	}
 }

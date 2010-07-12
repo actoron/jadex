@@ -17,7 +17,6 @@ import jadex.bpmn.runtime.handler.GatewayXORActivityHandler;
 import jadex.bpmn.runtime.handler.SubProcessActivityHandler;
 import jadex.bpmn.runtime.handler.TaskActivityHandler;
 import jadex.bridge.ComponentResultListener;
-import jadex.bridge.ComponentServiceContainer;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IArgument;
 import jadex.bridge.IComponentAdapter;
@@ -41,10 +40,8 @@ import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.IValueFetcher;
-import jadex.service.IServiceContainer;
 import jadex.service.IServiceProvider;
 import jadex.service.SServiceProvider;
-import jadex.service.clock.IClockService;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -134,9 +131,6 @@ public class BpmnInterpreter implements IComponentInstance
 	
 	/** The micro agent model. */
 	protected MBpmnModel model;
-	
-	/** The service provider. */
-	protected IServiceContainer provider;
 	
 	/** The configuration. */
 	protected String config;
@@ -277,9 +271,6 @@ public class BpmnInterpreter implements IComponentInstance
 			}
 		}
 				
-		// Create the service provider
-		this.provider = new ComponentServiceContainer(adapter);
-		
 		// todo: load services and start provider!
 		
 		// Create initial thread(s). 
@@ -692,7 +683,7 @@ public class BpmnInterpreter implements IComponentInstance
 	 */
 	public IServiceProvider getServiceProvider()
 	{
-		return provider;
+		return adapter.getServiceContainer();
 	}
 
 	/**

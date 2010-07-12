@@ -22,6 +22,7 @@ import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IExecutable;
 import jadex.commons.concurrent.IResultListener;
+import jadex.service.CacheServiceContainer;
 import jadex.service.IServiceContainer;
 import jadex.service.SServiceProvider;
 import jadex.service.execution.IExecutionService;
@@ -116,7 +117,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 		this.parent	= parent;
 		this.cid	= desc.getName();
 		this.ext_entries = Collections.synchronizedList(new ArrayList());
-		this.provider = new ComponentServiceContainer(this);
+		this.provider = new CacheServiceContainer(new ComponentServiceContainer(this));
 	}
 	
 	/**
@@ -318,6 +319,8 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 			public void resultAvailable(Object source, Object result)
 			{
 				IComponentManagementService cms = (IComponentManagementService)result;
+				if(cms==null)
+					Thread.dumpStack();
 				IComponentIdentifier[] childs = cms.getChildren(getComponentIdentifier());
 				
 				IResultListener	crl	= new CollectionResultListener(childs.length, new DelegationResultListener(ret));

@@ -1,7 +1,6 @@
 package jadex.micro;
 
 import jadex.bridge.ComponentResultListener;
-import jadex.bridge.ComponentServiceContainer;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IArgument;
 import jadex.bridge.IComponentAdapter;
@@ -20,7 +19,6 @@ import jadex.commons.concurrent.CollectionResultListener;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
-import jadex.service.IServiceContainer;
 import jadex.service.IServiceProvider;
 import jadex.service.SServiceProvider;
 
@@ -46,9 +44,6 @@ public class MicroAgentInterpreter implements IComponentInstance
 	
 	/** The micro agent. */
 	protected MicroAgent microagent;
-	
-	/** The service provider. */
-	protected IServiceContainer provider;
 	
 	/** The configuration. */
 	protected String config;
@@ -123,9 +118,6 @@ public class MicroAgentInterpreter implements IComponentInstance
 			}
 		}
 		
-		// Create the service provider.
-		// Service adding and starting the provider must be done by hand.
-		this.provider = new ComponentServiceContainer(adapter);
 		
 		// Schedule initial step.
 		addStep(new Runnable()
@@ -238,7 +230,6 @@ public class MicroAgentInterpreter implements IComponentInstance
 					microagent.timer = null;
 				}
 				microagent.agentKilled();
-				provider.shutdown();
 				IComponentIdentifier cid = adapter.getComponentIdentifier();
 				ret.setResult(cid);
 			}
@@ -652,7 +643,7 @@ public class MicroAgentInterpreter implements IComponentInstance
 	 */
 	public IServiceProvider getServiceProvider()
 	{
-		return provider;
+		return adapter.getServiceContainer();
 	}
 
 	/**
