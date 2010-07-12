@@ -21,6 +21,7 @@
 		<import>java.util.logging.*</import>
 		<import>java.util.*</import>
 		<import>jadex.rules.rulesystem.rules.functions.*</import>
+		<import>jadex.service.*</import>
 	</imports>
 
 	<capabilities>
@@ -396,6 +397,7 @@
 	 		+new java.text.SimpleDateFormat("yyyy.MM.dd_HH.mm.ss")
 	 		.format(new java.util.Date())+".log"</property>
 	 	<property name="logging.useParentHandlers">false</property> -->
+	 	<property name="dfservice" future="true">SServiceProvider.getService($scope.getServiceProvider(), IDF.class)</property>
 	</properties>
 
 	<configurations>
@@ -415,8 +417,8 @@
 							     the dealers is registered at the directory facilitator.
 							     Note, that the dealer only offers one service, that is 'dealing'
 							     (see service description below).	-->
-							((IDF)$scope.getServiceProvider().getService(IDF.class))
-								.createDFComponentDescription(null, ((IDF)$scope.getServiceProvider().getService(IDF.class))
+							$propertybase.getProperty("dfservice")
+								.createDFComponentDescription(null, $propertybase.getProperty("dfservice")
 								.createDFServiceDescription("dealing", "blackjack", "University of Hamburg"))
 	
 						</value>

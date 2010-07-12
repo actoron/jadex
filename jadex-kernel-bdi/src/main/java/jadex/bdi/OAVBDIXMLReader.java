@@ -253,7 +253,7 @@ public class OAVBDIXMLReader
 		
 //		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "property")), new ObjectInfo(OAVBDIMetaModel.expression_type, expost),
 //			new MappingInfo(null, null, OAVBDIMetaModel.expression_has_content)));
-		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "property")), new ObjectInfo(OAVBDIMetaModel.expression_type, expost),
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "property")), new ObjectInfo(OAVBDIMetaModel.property_type, expost),
 			new MappingInfo(ti_expression)));
 		
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "parameter")), new ObjectInfo(OAVBDIMetaModel.parameter_type, tepost), 

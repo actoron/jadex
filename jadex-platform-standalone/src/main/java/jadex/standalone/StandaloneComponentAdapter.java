@@ -145,42 +145,43 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	 */
 	public void wakeup()
 	{
-//		System.err.println("wakeup: "+getComponentIdentifier());
-//		Thread.dumpStack();
-		
-		// todo: check this assert meaning!
-		
-		// Verify that the component is running.
-//		assert !IComponentDescription.STATE_INITIATED.equals(state) : this;
-		
-		if(IComponentDescription.STATE_TERMINATED.equals(desc.getState()))
-			throw new ComponentTerminatedException(cid.getName());
-		
-		// Change back to suspended, when previously waiting.
-		if(IComponentDescription.STATE_WAITING.equals(desc.getState()))
+		// Ignore wakeup calls, when component not yet inited (hack???).
+		if(component!=null)
 		{
-			SServiceProvider.getServiceUpwards(getServiceContainer(), IComponentManagementService.class).addResultListener(new DefaultResultListener()
+			// todo: check this assert meaning!
+			
+			// Verify that the component is running.
+		//		assert !IComponentDescription.STATE_INITIATED.equals(state) : this;
+			
+			if(IComponentDescription.STATE_TERMINATED.equals(desc.getState()))
+				throw new ComponentTerminatedException(cid.getName());
+			
+			// Change back to suspended, when previously waiting.
+			if(IComponentDescription.STATE_WAITING.equals(desc.getState()))
 			{
-				public void resultAvailable(Object source, Object result)
+				SServiceProvider.getServiceUpwards(getServiceContainer(), IComponentManagementService.class).addResultListener(new DefaultResultListener()
 				{
-					((ComponentManagementService)result).setComponentState(cid, IComponentDescription.STATE_SUSPENDED);
-				}
-			});
-		}
-
-		// Resume execution of the component (when active or terminating).
-		if(IComponentDescription.STATE_ACTIVE.equals(desc.getState())
-			/*|| IComponentDescription.STATE_TERMINATING.equals(desc.getState())*/
-			|| IComponentDescription.STATE_SUSPENDED.equals(desc.getState()))	// Hack!!! external entries must also be executed in suspended state.
-		{
-			//System.out.println("wakeup called: "+state);
-			SServiceProvider.getService(getServiceContainer(), IExecutionService.class).addResultListener(new DefaultResultListener()
+					public void resultAvailable(Object source, Object result)
+					{
+						((ComponentManagementService)result).setComponentState(cid, IComponentDescription.STATE_SUSPENDED);
+					}
+				});
+			}
+		
+			// Resume execution of the component (when active or terminating).
+			if(IComponentDescription.STATE_ACTIVE.equals(desc.getState())
+				/*|| IComponentDescription.STATE_TERMINATING.equals(desc.getState())*/
+				|| IComponentDescription.STATE_SUSPENDED.equals(desc.getState()))	// Hack!!! external entries must also be executed in suspended state.
 			{
-				public void resultAvailable(Object source, Object result)
+				//System.out.println("wakeup called: "+state);
+				SServiceProvider.getService(getServiceContainer(), IExecutionService.class).addResultListener(new DefaultResultListener()
 				{
-					((IExecutionService)result).execute(StandaloneComponentAdapter.this);
-				}
-			});
+					public void resultAvailable(Object source, Object result)
+					{
+						((IExecutionService)result).execute(StandaloneComponentAdapter.this);
+					}
+				});
+			}
 		}
 	}
 
@@ -415,7 +416,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	 */
 	public boolean	execute()
 	{
-//		System.out.println("Execute: "+cid.getName());
+//		System.out.println("Execute: "+cid.getName()+", "+model);
 //		if(cid.getName().indexOf("platform")!=-1)
 //			System.out.println("platform start");
 //		if(cid.getName().indexOf("kernel_micro")!=-1)
@@ -655,5 +656,10 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 			
 		this.dostep	= true;		
 		this.steplistener	= listener;
+	}
+
+	public void setComponentThread(Thread thread)
+	{
+		this.componentthread	= thread;
 	}
 }

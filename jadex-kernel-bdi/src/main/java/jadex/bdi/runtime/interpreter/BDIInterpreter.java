@@ -30,6 +30,7 @@ import jadex.commons.IFuture;
 import jadex.commons.collection.LRU;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.CollectionResultListener;
+import jadex.commons.concurrent.CounterResultListener;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
@@ -267,7 +268,7 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 		}
 		
 		// Get the services.
-		final boolean services[]	= new boolean[3];
+		final boolean services[]	= new boolean[4];
 		SServiceProvider.getService(getServiceProvider(), IClockService.class).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
@@ -277,7 +278,7 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 				synchronized(services)
 				{
 					services[0]	= true;
-					startagent	= services[0] && services[1] && services[2];
+					startagent	= services[0] && services[1] && services[2] && services[3];
 				}
 				if(startagent)
 					BDIInterpreter.this.state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state,OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_CREATING);
@@ -292,7 +293,7 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 				synchronized(services)
 				{
 					services[1]	= true;
-					startagent	= services[0] && services[1] && services[2];
+					startagent	= services[0] && services[1] && services[2] && services[3];
 				}
 				if(startagent)
 					BDIInterpreter.this.state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state,OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_CREATING);
@@ -307,12 +308,53 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 				synchronized(services)
 				{
 					services[2]	= true;
-					startagent	= services[0] && services[1] && services[2];
+					startagent	= services[0] && services[1] && services[2] && services[3];
 				}
 				if(startagent)
 					BDIInterpreter.this.state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state,OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_CREATING);
 			}
 		});
+
+		// Previously done in createStartAgentRule
+		Map parents = new HashMap(); 
+		List	futures	= AgentRules.createCapabilityInstance(state, ragent, parents);
+		IResultListener	crs	= new CounterResultListener(futures.size())
+		{
+			public void finalResultAvailable(Object source, Object result)
+			{
+				boolean	startagent;
+				synchronized(services)
+				{
+					services[3]	= true;
+					startagent	= services[0] && services[1] && services[2] && services[3];
+				}
+				if(startagent)
+					BDIInterpreter.this.state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state,OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_CREATING);
+			}
+			public void exceptionOccurred(Object source, Exception exception)
+			{
+			}
+		};
+		if(futures.isEmpty())
+		{
+			boolean	startagent;
+			synchronized(services)
+			{
+				services[3]	= true;
+				startagent	= services[0] && services[1] && services[2] && services[3];
+			}
+			if(startagent)
+				BDIInterpreter.this.state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state,OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_CREATING);	
+		}
+		else
+		{
+			for(int i=0; i<futures.size(); i++)
+			{
+				((Future)futures.get(i)).addResultListener(crs);
+			}
+		}
+		state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_initparents, parents);
+
 		
 		// This is the clean way to init the logger, but since 
 		// Java 7 the LogManager is a memory leak

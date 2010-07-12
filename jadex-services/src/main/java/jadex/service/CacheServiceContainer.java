@@ -48,12 +48,15 @@ public class CacheServiceContainer	implements IServiceContainer
 		
 		Object	result	= null;
 		boolean	hit	= false;
-		synchronized(cache)
+		if(key!=null)
 		{
-			if(key!=null && cache.containsKey(key))
+			synchronized(cache)
 			{
-				result	= cache.get(key);
-				hit	= true;
+				if(cache.containsKey(key))
+				{
+					result	= cache.get(key);
+					hit	= true;
+				}
 			}
 		}
 
@@ -68,7 +71,12 @@ public class CacheServiceContainer	implements IServiceContainer
 				public void resultAvailable(Object source, Object result)
 				{
 					if(key!=null)
-						cache.put(key, result);
+					{
+						synchronized(cache)
+						{
+							cache.put(key, result);							
+						}
+					}
 					ret.setResult(result);
 				}
 				

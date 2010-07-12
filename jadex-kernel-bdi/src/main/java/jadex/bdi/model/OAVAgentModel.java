@@ -119,17 +119,22 @@ public class OAVAgentModel	extends OAVCapabilityModel
 			{
 				Object	key	= it.next();
 				Object	mexp	= state.getAttributeValue(capa, OAVBDIMetaModel.capability_has_properties, key);
-				IParsedExpression	pex = (IParsedExpression)state.getAttributeValue(mexp, OAVBDIMetaModel.expression_has_content);
-				try
+				Boolean	future	= (Boolean)state.getAttributeValue(mexp, OAVBDIMetaModel.property_has_future);
+				// Ignore future properties, which are evaluated at component instance startup time.
+				if(future==null || !future.booleanValue())
 				{
-					Object	value	= pex.getValue(null);
-					props.put(key, value);
-				}
-				catch(Exception e)
-				{
-					// Hack!!! Exception should be propagated.
-					System.err.println(pex.getExpressionText());
-					e.printStackTrace();
+					IParsedExpression	pex = (IParsedExpression)state.getAttributeValue(mexp, OAVBDIMetaModel.expression_has_content);
+					try
+					{
+						Object	value	= pex.getValue(null);
+						props.put(key, value);
+					}
+					catch(Exception e)
+					{
+						// Hack!!! Exception should be propagated.
+						System.err.println(pex.getExpressionText());
+						e.printStackTrace();
+					}
 				}
 			}
 		}

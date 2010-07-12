@@ -13,23 +13,11 @@
 		<import>jadex.base.fipa.*</import>
 	</imports>
 
-	<capabilities>
-		<capability name="dfcap" file="jadex.bdi.planlib.df.DF"/>
-	</capabilities>
-
 	<goals>
 		<achievegoal name="sell">
 			<parameter name="name" class="String"></parameter>
 			<parameter name="result" class="Object" direction="out"></parameter>
 		</achievegoal>
-		
-		<achievegoalref name="df_register">
-			<concrete ref="dfcap.df_register"/>
-		</achievegoalref>
-		
-		<achievegoalref name="df_deregister">
-			<concrete ref="dfcap.df_deregister"/>
-		</achievegoalref>
 	</goals>
 
 	<plans>
@@ -51,23 +39,4 @@
 		<service name="shopservice" class="IShop">new Shop($scope.getExternalAccess())</service>
 	</services>
 	
-	<configurations>
-		<configuration name="buy">
-			<goals>
-				<initialgoal ref="df_register">
-					<parameter ref="description">
-						<value>
-							((IDF)$scope.getServiceProvider().getService(IDF.class))
-								.createDFComponentDescription(null, ((IDF)$scope.getServiceProvider().getService(IDF.class))
-									.createDFServiceDescription(null, "shop", null))
-						</value>
-					</parameter>
-				</initialgoal>
-				<endgoal ref="df_deregister"/>
-			</goals>
-		</configuration>
-	</configurations>
-	
-				
-
 </agent>

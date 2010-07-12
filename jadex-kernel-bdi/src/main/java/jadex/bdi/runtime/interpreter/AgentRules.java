@@ -5,8 +5,10 @@ import jadex.bdi.runtime.IPlanExecutor;
 import jadex.bdi.runtime.impl.eaflyweights.ExternalAccessFlyweight;
 import jadex.bdi.runtime.impl.flyweights.ParameterFlyweight;
 import jadex.bridge.CheckedAction;
+import jadex.bridge.ComponentResultListener;
 import jadex.bridge.IArgument;
 import jadex.bridge.InterpreterTimedObject;
+import jadex.commons.Future;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.collection.SCollection;
@@ -70,23 +72,19 @@ public class AgentRules
 			{
 				Object	ragent	= assignments.getVariableValue("?ragent");
 				// Get map of arguments for initial beliefs values.
-				Map	arguments	= (Map)state.getAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_arguments);
-				Map	argcopy	= null;
-				if(arguments!=null)
-				{
-					argcopy	= new HashMap();
-					argcopy.putAll(arguments);
-				}
-//				initializeCapabilityInstance(state, ragent, argcopy);	// Only supply copy as map is modified.
-				Map parents = new HashMap(); 
-				createCapabilityInstance(state, ragent, parents);
-				state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_initparents, parents);
+//				Map	arguments	= (Map)state.getAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_arguments);
+//				Map	argcopy	= null;
+//				if(arguments!=null)
+//				{
+//					argcopy	= new HashMap();
+//					argcopy.putAll(arguments);
+//				}
 				initializeCapabilityInstance(state, ragent);
 				state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_initparents, null);
 				
 				state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state, OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_ALIVE);
 				// Remove arguments from state.
-				if(arguments!=null) 
+				if(state.getAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_arguments)!=null) 
 					state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_arguments, null);
 				
 				// Inform get-external-access listeners (if any). Hack???
@@ -968,9 +966,12 @@ public class AgentRules
 	 *  @param state The state.
 	 *  @param rcapa The reference to the capability instance.
 	 *  @param inivals Initial values for beliefs (e.g. arguments or config elements from outer capability);
+	 *  @return A list of futures to wait for the evaluation to finish.
 	 */
-	protected static void createCapabilityInstance(final IOAVState state, final Object rcapa, Map parents)//, Map arguments)
+	protected static List	createCapabilityInstance(final IOAVState state, final Object rcapa, Map parents)//, Map arguments)
 	{
+		List	futures	= new ArrayList();
+		
 		// Get configuration.
 		Object	mcapa	= state.getAttributeValue(rcapa, OAVBDIRuntimeModel.element_has_model);
 		Object	mconfig = getConfiguration(state, rcapa);
@@ -982,13 +983,45 @@ public class AgentRules
 			for(Iterator it=mprops.iterator(); it.hasNext(); )
 			{
 				Object mexp = it.next();
-				String name = (String)state.getAttributeValue(mexp, OAVBDIMetaModel.modelelement_has_name);
+				final String name = (String)state.getAttributeValue(mexp, OAVBDIMetaModel.modelelement_has_name);
 				Object val = evaluateExpression(state, mexp, new OAVBDIFetcher(state, rcapa));
-				Object param = state.createObject(OAVBDIRuntimeModel.parameter_type);	
-				state.setAttributeValue(param, OAVBDIRuntimeModel.parameter_has_name, name);
-				state.setAttributeValue(param, OAVBDIRuntimeModel.parameter_has_value, val);
-				state.addAttributeValue(rcapa, OAVBDIRuntimeModel.capability_has_properties, param);
-//				System.out.println("Property: "+name+" "+val);
+				Boolean	future	= (Boolean)state.getAttributeValue(mexp, OAVBDIMetaModel.property_has_future);
+				if(future!=null && future.booleanValue())
+				{
+					System.out.println("Future property: "+name+" "+val);
+					if(val instanceof Future)
+					{
+						((Future)val).addResultListener(new ComponentResultListener(new IResultListener()
+						{
+							public void resultAvailable(Object source, Object result)
+							{
+								System.out.println("Setting future property: "+name+" "+result);
+								Object param = state.createObject(OAVBDIRuntimeModel.parameter_type);	
+								state.setAttributeValue(param, OAVBDIRuntimeModel.parameter_has_name, name);
+								state.setAttributeValue(param, OAVBDIRuntimeModel.parameter_has_value, result);
+								state.addAttributeValue(rcapa, OAVBDIRuntimeModel.capability_has_properties, param);
+							}
+
+							public void exceptionOccurred(Object source, Exception exception)
+							{
+								throw new RuntimeException(exception);
+							}
+						}, BDIInterpreter.getInterpreter(state).getAgentAdapter()));
+						futures.add(val);
+					}
+					else if(val!=null)
+					{
+						throw new RuntimeException("Future property must evaluate to object of type jadex.commons.Future: "+name+", "+val);
+					}
+				}
+				else
+				{
+					Object param = state.createObject(OAVBDIRuntimeModel.parameter_type);	
+					state.setAttributeValue(param, OAVBDIRuntimeModel.parameter_has_name, name);
+					state.setAttributeValue(param, OAVBDIRuntimeModel.parameter_has_value, val);
+					state.addAttributeValue(rcapa, OAVBDIRuntimeModel.capability_has_properties, param);
+//					System.out.println("Property: "+name+" "+val);
+				}
 			}
 		}
 		// Hack? Add kernelprops to agent properties.
@@ -1066,9 +1099,12 @@ public class AgentRules
 				state.setAttributeValue(rcaparef, OAVBDIRuntimeModel.capabilityreference_has_capability, rsubcapa);
 				state.addAttributeValue(rcapa, OAVBDIRuntimeModel.capability_has_subcapabilities, rcaparef);
 				parents.put(rsubcapa, rcapa);
-				createCapabilityInstance(state, rsubcapa, parents);//, null);//inivals!=null ? (Map)inivals.get(name) : null);
+				List	fs	= createCapabilityInstance(state, rsubcapa, parents);//, null);//inivals!=null ? (Map)inivals.get(name) : null);
+				futures.addAll(fs);
 			}
-		}	
+		}
+		
+		return futures;
 	}
 	
 	/**

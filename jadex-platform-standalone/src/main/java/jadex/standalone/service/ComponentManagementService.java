@@ -285,7 +285,9 @@ public class ComponentManagementService implements IComponentManagementService, 
 		// Create the component instance.
 		try
 		{
+			adapter.setComponentThread(Thread.currentThread());	// Hack!!! Avoid external access during init.
 			IComponentInstance instance = factory.createComponentInstance(adapter, lmodel, config, args, parent);
+			adapter.setComponentThread(null);
 			adapter.setComponent(instance, lmodel);
 			
 	//		System.out.println("added: "+descs.size()+", "+aid);
