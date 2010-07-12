@@ -68,7 +68,8 @@ public class TypeResultSelector implements IResultSelector
 	 */
 	public Object getResult(Collection results)
 	{
-		return oneresult? results.size()>0? results.toArray()[0]: null: results;
+		Object	ret	= oneresult? results.size()>0? results.toArray()[0]: null: results;
+		return ret;
 	}
 	
 	/**

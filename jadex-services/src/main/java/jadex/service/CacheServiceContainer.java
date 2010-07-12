@@ -6,7 +6,6 @@ import jadex.commons.Tuple;
 import jadex.commons.collection.LRU;
 import jadex.commons.concurrent.IResultListener;
 
-import java.util.Collections;
 import java.util.Map;
 
 /**
@@ -30,7 +29,7 @@ public class CacheServiceContainer	implements IServiceContainer
 	public CacheServiceContainer(IServiceContainer container)
 	{
 		this.container = container;
-		this.cache	= Collections.synchronizedMap(new LRU(25));
+		this.cache	= new LRU(25);
 	}
 	
 	//-------- methods --------
@@ -40,17 +39,27 @@ public class CacheServiceContainer	implements IServiceContainer
 	 *  @param type The class.
 	 *  @return The corresponding services.
 	 */
-	public IFuture getServices(ISearchManager manager, IVisitDecider decider, IResultSelector selector)
+	public IFuture getServices(ISearchManager manager, final IVisitDecider decider, final IResultSelector selector)
 	{
 		final Future ret = new Future();
 		
 		final Tuple key = manager.getCacheKey()!=null && decider.getCacheKey()!=null && selector.getCacheKey()!=null
 			? new Tuple(manager.getCacheKey(), decider.getCacheKey(), selector.getCacheKey()) : null;
 		
-		if(key!=null && cache.containsKey(key))
+		Object	result	= null;
+		boolean	hit	= false;
+		synchronized(cache)
 		{
-			Object res = cache.get(key);
-			ret.setResult(res);
+			if(key!=null && cache.containsKey(key))
+			{
+				result	= cache.get(key);
+				hit	= true;
+			}
+		}
+
+		if(hit)
+		{
+			ret.setResult(result);			
 		}
 		else
 		{
@@ -69,7 +78,7 @@ public class CacheServiceContainer	implements IServiceContainer
 				}
 			});
 		}
-		
+
 		return ret;
 	}
 	

@@ -59,7 +59,7 @@ public class SequentialSearchManager implements ISearchManager
 	 *  @param selector	The result selector to select matching services and produce the final result. 
 	 *  @param services	The local services of the provider (class->list of services).
 	 */
-	public IFuture	searchServices(IServiceProvider provider, IVisitDecider decider, IResultSelector selector, Map services)
+	public IFuture	searchServices(final IServiceProvider provider, final IVisitDecider decider, final IResultSelector selector, final Map services)
 	{
 		Future	ret	= new Future();
 		Collection	results	= new ArrayList();
