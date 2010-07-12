@@ -63,22 +63,25 @@ public class ComponentFactorySelector implements IResultSelector
 		if(services!=null)
 		{
 			Collection	coll	= (Collection)services.get(IComponentFactory.class);
-			for(Iterator it=coll.iterator(); results.isEmpty() && it.hasNext(); )
+			if(coll!=null)
 			{
-				IComponentFactory	fac	= (IComponentFactory)it.next();
-				boolean	match;
-				if(type!=null)
+				for(Iterator it=coll.iterator(); results.isEmpty() && it.hasNext(); )
 				{
-					match	= Arrays.asList(fac.getComponentTypes()).contains(type);
-				}
-				else
-				{
-					match	= fac.isLoadable(model, imports, classloader);
-				}
-				
-				if(match)
-				{
-					results.add(fac);
+					IComponentFactory	fac	= (IComponentFactory)it.next();
+					boolean	match;
+					if(type!=null)
+					{
+						match	= Arrays.asList(fac.getComponentTypes()).contains(type);
+					}
+					else
+					{
+						match	= fac.isLoadable(model, imports, classloader);
+					}
+					
+					if(match)
+					{
+						results.add(fac);
+					}
 				}
 			}
 		}

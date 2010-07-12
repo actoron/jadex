@@ -2,6 +2,7 @@ package jadex.gpmn;
 
 import jadex.bdi.BDIAgentFactory;
 import jadex.bdi.model.OAVAgentModel;
+import jadex.bridge.ComponentFactorySelector;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentFactory;
 import jadex.bridge.IComponentInstance;
@@ -13,18 +14,12 @@ import jadex.commons.ResourceInfo;
 import jadex.commons.SGUI;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.DefaultResultListener;
-import jadex.commons.concurrent.IResultListener;
 import jadex.service.IService;
 import jadex.service.IServiceContainer;
 import jadex.service.SServiceProvider;
-import jadex.service.library.ILibraryService;
-import jadex.service.library.ILibraryServiceListener;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.net.URL;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.Map;
 
 import javax.swing.Icon;
@@ -84,17 +79,11 @@ public class GpmnFactory implements IComponentFactory, IService
 		this.legacyconverter = new GpmnBDIConverter();
 		this.converter = new GpmnBDIConverter2();
 		
-		SServiceProvider.getServices(container, IComponentFactory.class).addResultListener(new DefaultResultListener()
+		SServiceProvider.getService(container, new ComponentFactorySelector(BDIAgentFactory.FILETYPE_BDIAGENT)).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
-				Collection facts = (Collection)result;
-				for(Iterator it=facts.iterator(); it.hasNext() && factory==null; )
-				{
-					IComponentFactory tmp = (IComponentFactory)it.next();
-					if(tmp instanceof BDIAgentFactory)
-						factory = (BDIAgentFactory)tmp;
-				}
+				factory = (BDIAgentFactory)result;
 				if(factory == null)
 					throw new RuntimeException("No bdi agent factory found.");
 			}

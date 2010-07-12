@@ -130,23 +130,23 @@ public class Application implements IApplication, IComponentInstance
 		}
 		
 
-//		// Create the services
-//		final SimpleValueFetcher fetcher = new SimpleValueFetcher();
-//		fetcher.setValue("$platform", getServiceProvider());
-//		fetcher.setValue("$args", getArguments());
-//		fetcher.setValue("$results", getResults());
-//		fetcher.setValue("$component", this);
-//		List services = model.getApplicationType().getServices();
-//		if(services!=null)
-//		{
-//			for(int i=0; i<services.size(); i++)
-//			{
-//				MExpressionType exp = (MExpressionType)services.get(i);
-//				IService service = (IService)exp.getParsedValue().getValue(fetcher);
-////				mycontainer.addService(exp.getClazz(), exp.getName(), service);
-//				adapter.getServiceContainer().addService(exp.getClazz(), service);
-//			}
-//		}
+		// Create the services
+		final SimpleValueFetcher fetcher = new SimpleValueFetcher();
+		fetcher.setValue("$platform", getServiceProvider());
+		fetcher.setValue("$args", getArguments());
+		fetcher.setValue("$results", getResults());
+		fetcher.setValue("$component", this);
+		List services = model.getApplicationType().getServices();
+		if(services!=null)
+		{
+			for(int i=0; i<services.size(); i++)
+			{
+				MExpressionType exp = (MExpressionType)services.get(i);
+				IService service = (IService)exp.getParsedValue().getValue(fetcher);
+//				mycontainer.addService(exp.getClazz(), exp.getName(), service);
+				adapter.getServiceContainer().addService(exp.getClazz(), service);
+			}
+		}
 	}
 
 	//-------- space handling --------
@@ -738,22 +738,22 @@ public class Application implements IApplication, IComponentInstance
 					fetcher.setValue("$args", getArguments());
 					fetcher.setValue("$results", getResults());
 					fetcher.setValue("$component", this);
-					// todo: hack remove clock somehow (problem services are behind future in xml)
-//					fetcher.setValue("$clock", clock);
-
-					// Init service container and init service.
-					// Create the services.
-					List services = model.getApplicationType().getServices();
-					if(services!=null)
-					{
-						for(int i=0; i<services.size(); i++)
-						{
-							MExpressionType exp = (MExpressionType)services.get(i);
-							IService service = (IService)exp.getParsedValue().getValue(fetcher);
-//							mycontainer.addService(exp.getClazz(), exp.getName(), service);
-							adapter.getServiceContainer().addService(exp.getClazz(), service);
-						}
-					}
+//					// todo: hack remove clock somehow (problem services are behind future in xml)
+////					fetcher.setValue("$clock", clock);
+//
+//					// Init service container and init service.
+//					// Create the services.
+//					List services = model.getApplicationType().getServices();
+//					if(services!=null)
+//					{
+//						for(int i=0; i<services.size(); i++)
+//						{
+//							MExpressionType exp = (MExpressionType)services.get(i);
+//							IService service = (IService)exp.getParsedValue().getValue(fetcher);
+////							mycontainer.addService(exp.getClazz(), exp.getName(), service);
+//							adapter.getServiceContainer().addService(exp.getClazz(), service);
+//						}
+//					}
 					adapter.getServiceContainer().start().addResultListener(new ComponentResultListener(new DefaultResultListener()
 					{
 						public void resultAvailable(Object source, Object result)

@@ -12,16 +12,13 @@ import jadex.bridge.ILoadableComponentModel;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.SGUI;
-import jadex.commons.concurrent.IResultListener;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVTypeModel;
 import jadex.rules.state.javaimpl.OAVStateFactory;
 import jadex.service.IService;
 import jadex.service.IServiceContainer;
 import jadex.service.library.ILibraryService;
-import jadex.service.library.ILibraryServiceListener;
 
-import java.net.URL;
 import java.util.Map;
 
 import javax.swing.Icon;

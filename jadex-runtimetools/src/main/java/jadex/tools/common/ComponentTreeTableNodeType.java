@@ -1,17 +1,14 @@
 package jadex.tools.common;
 
+import jadex.bridge.ComponentFactorySelector;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentFactory;
 import jadex.commons.SGUI;
 import jadex.commons.ThreadSuspendable;
-import jadex.service.IServiceContainer;
 import jadex.service.IServiceProvider;
 import jadex.service.SServiceProvider;
 import jadex.tools.common.jtreetable.DefaultTreeTableNode;
 import jadex.tools.common.jtreetable.TreeTableNodeType;
-
-import java.util.Collection;
-import java.util.Iterator;
 
 import javax.swing.Icon;
 import javax.swing.UIDefaults;
@@ -60,10 +57,8 @@ public class ComponentTreeTableNodeType extends TreeTableNodeType
 		String type	= ad.getType();
 		if(type!=null)
 		{
-			Collection coll = (Collection)SServiceProvider.getServices(provider, IComponentFactory.class).get(new ThreadSuspendable());
-			Iterator factories	= coll.iterator();
-			while(ret==null && factories.hasNext())
-				ret	= ((IComponentFactory)factories.next()).getComponentTypeIcon(type);
+			IComponentFactory fac = (IComponentFactory)SServiceProvider.getService(provider, new ComponentFactorySelector(type)).get(new ThreadSuspendable());
+			ret	= fac!=null ? fac.getComponentTypeIcon(type) : null;
 		}
 		
 		if(ret==null)

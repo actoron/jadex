@@ -1,20 +1,13 @@
 package jadex.base;
 
+import jadex.bridge.ComponentFactorySelector;
 import jadex.bridge.IComponentFactory;
-import jadex.bridge.ILoadableComponentModel;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
-import jadex.commons.SUtil;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.service.IServiceContainer;
 import jadex.service.SServiceProvider;
 import jadex.service.library.ILibraryService;
-
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Map;
-
-import javax.swing.Icon;
 
 
 /**
@@ -40,23 +33,12 @@ public class SComponentFactory
 			{
 				final ILibraryService ls = (ILibraryService)result;
 				
-				SServiceProvider.getServices(container, IComponentFactory.class).addResultListener(new DefaultResultListener()
+				SServiceProvider.getService(container, new ComponentFactorySelector(model, null, ls.getClassLoader())).addResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object source, Object result)
 					{
-						Collection facts = (Collection)result;
-		
-						ILoadableComponentModel res = null;
-						if(facts != null)
-						{
-							for(Iterator it = facts.iterator(); it.hasNext() && res == null;)
-							{
-								IComponentFactory fac = (IComponentFactory)it.next();
-								if(fac.isLoadable(model, null, ls.getClassLoader()))
-									res = fac.loadModel(model, null, ls.getClassLoader());
-							}
-						}
-						ret.setResult(res);
+						IComponentFactory fac = (IComponentFactory)result;
+						ret.setResult(fac!=null ? fac.loadModel(model, null, ls.getClassLoader()) : null);
 					}
 				});
 			}
@@ -80,22 +62,12 @@ public class SComponentFactory
 			{
 				final ILibraryService ls = (ILibraryService)result;
 				
-				SServiceProvider.getServices(container, IComponentFactory.class).addResultListener(new DefaultResultListener()
+				SServiceProvider.getService(container, new ComponentFactorySelector(model, null, ls.getClassLoader())).addResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object source, Object result)
 					{
-						Collection facts = (Collection)result;
-						boolean res = false;
-				
-						if(facts != null)
-						{
-							for(Iterator it = facts.iterator(); !res && it.hasNext();)
-							{
-								IComponentFactory fac = (IComponentFactory)it.next();
-								res = fac.isLoadable(model, null, ls.getClassLoader());
-							}
-						}
-						ret.setResult(res? Boolean.TRUE: Boolean.FALSE);
+						IComponentFactory fac = (IComponentFactory)result;
+						ret.setResult(fac!=null ? new Boolean(fac.isLoadable(model, null, ls.getClassLoader())) : Boolean.FALSE);
 					}
 				});
 			}
@@ -136,22 +108,12 @@ public class SComponentFactory
 			{
 				final ILibraryService ls = (ILibraryService)result;
 				
-				SServiceProvider.getServices(container, IComponentFactory.class).addResultListener(new DefaultResultListener()
+				SServiceProvider.getService(container, new ComponentFactorySelector(model, null, ls.getClassLoader())).addResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object source, Object result)
 					{
-						Collection facts = (Collection)result;
-						boolean res = false;
-				
-						if(facts != null)
-						{
-							for(Iterator it = facts.iterator(); !res && it.hasNext();)
-							{
-								IComponentFactory fac = (IComponentFactory)it.next();
-								res = fac.isStartable(model, null, ls.getClassLoader());
-							}
-						}
-						ret.setResult(res? Boolean.TRUE: Boolean.FALSE);
+						IComponentFactory fac = (IComponentFactory)result;
+						ret.setResult(fac!=null ? new Boolean(fac.isStartable(model, null, ls.getClassLoader())) : Boolean.FALSE);
 					}
 				});
 			}
@@ -162,7 +124,7 @@ public class SComponentFactory
 
 	/**
 	 * Get the names of ADF file types supported by this factory.
-	 */
+	 * /
 	public static IFuture getFileTypes(IServiceContainer container)
 	{
 		final Future ret = new Future();
@@ -187,7 +149,7 @@ public class SComponentFactory
 		});
 
 		return ret;
-	}
+	}*/
 
 	/**
 	 * Get a default icon for a file type.
@@ -196,22 +158,12 @@ public class SComponentFactory
 	{
 		final Future ret = new Future();
 		
-		SServiceProvider.getServices(container, IComponentFactory.class).addResultListener(new DefaultResultListener()
+		SServiceProvider.getService(container, new ComponentFactorySelector(type)).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
-				Collection facts = (Collection)result;
-				Icon res = null;
-		
-				if(facts != null)
-				{
-					for(Iterator it = facts.iterator(); it.hasNext() && res == null;)
-					{
-						IComponentFactory fac = (IComponentFactory)it.next();
-						res = fac.getComponentTypeIcon(type);
-					}
-				}
-				ret.setResult(res);
+				IComponentFactory fac = (IComponentFactory)result;
+				ret.setResult(fac!=null ? fac.getComponentTypeIcon(type) : null);
 			}
 		});
 
@@ -225,21 +177,12 @@ public class SComponentFactory
 	{
 		final Future ret = new Future();
 		
-		SServiceProvider.getServices(container, IComponentFactory.class).addResultListener(new DefaultResultListener()
+		SServiceProvider.getService(container, new ComponentFactorySelector(type)).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
-				Collection facts = (Collection)result;
-				Map res = null;
-				if(facts != null)
-				{
-					for(Iterator it = facts.iterator(); it.hasNext() && res == null;)
-					{
-						IComponentFactory fac = (IComponentFactory)it.next();
-						res = fac.getProperties(type);
-					}
-				}
-				ret.setResult(res);
+				IComponentFactory fac = (IComponentFactory)result;
+				ret.setResult(fac!=null ? fac.getProperties(type) : null);
 			}
 		});
 		
@@ -259,21 +202,12 @@ public class SComponentFactory
 			{
 				final ILibraryService ls = (ILibraryService)result;
 				
-				SServiceProvider.getService(container, IComponentFactory.class).addResultListener(new DefaultResultListener()
+				SServiceProvider.getService(container, new ComponentFactorySelector(model, null, ls.getClassLoader())).addResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object source, Object result)
 					{
-						Collection facts = (Collection)result;
-						String res = null;
-						if(facts != null)
-						{
-							for(Iterator it = facts.iterator(); it.hasNext() && res == null;)
-							{
-								IComponentFactory fac = (IComponentFactory)it.next();
-								res = fac.getComponentType(model, null, ls.getClassLoader());
-							}
-						}
-						ret.setResult(res);
+						IComponentFactory fac = (IComponentFactory)result;
+						ret.setResult(fac!=null ? fac.getComponentType(model, null, ls.getClassLoader()) : null);
 					}
 				});
 			}

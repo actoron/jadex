@@ -139,4 +139,14 @@ public class CacheServiceContainer	implements IServiceContainer
 	{
 		container.removeService(type, service);
 	}
+
+	
+	/**
+	 *  Get the string representation.
+	 *  @return The string representation.
+	 */
+	public String toString()
+	{
+		return "CacheServiceContainer(name="+getId()+")";
+	}
 }
