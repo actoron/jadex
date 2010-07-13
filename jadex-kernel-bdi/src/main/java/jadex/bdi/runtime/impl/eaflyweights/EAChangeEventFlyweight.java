@@ -7,7 +7,6 @@ import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.rules.state.IOAVState;
-import jadex.rules.state.OAVObjectType;
 
 /**
  *  Flyweight for change events.

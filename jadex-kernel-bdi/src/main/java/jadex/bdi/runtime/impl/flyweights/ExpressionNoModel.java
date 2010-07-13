@@ -4,7 +4,6 @@ import jadex.bdi.runtime.IExpression;
 import jadex.bdi.runtime.impl.FlyweightFunctionality;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.OAVBDIFetcher;
-import jadex.commons.SUtil;
 import jadex.javaparser.IParsedExpression;
 import jadex.rules.state.IOAVState;
 

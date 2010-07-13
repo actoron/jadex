@@ -1,9 +1,7 @@
 package jadex.bdi.testcases.misc;
 
 import jadex.base.test.TestReport;
-import jadex.bdi.runtime.IEAEventbase;
 import jadex.bdi.runtime.IEAInternalEvent;
-import jadex.bdi.runtime.IEventbase;
 import jadex.bdi.runtime.Plan;
 import jadex.bdi.runtime.TimeoutException;
 import jadex.bridge.ComponentTerminatedException;

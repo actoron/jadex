@@ -51,14 +51,14 @@ public class MicroStepPlan extends Plan
 //		Object entry3 = ((RCapability)getRPlan().getOwner().getOwner()).getAgent().getInterpreter().getCurrentAgendaEntry();
 		getLogger().info("Plan: b is now false.");
 		getLogger().info("Step 2 finished.");
-		if(true)//entry1==entry2 && entry2==entry3)
+//		if(entry1==entry2 && entry2==entry3)
 		{
 			tr.setSucceeded(true);
 		}
-		else
-		{
-			tr.setReason("Micro plan step occurred.");
-		}
+//		else
+//		{
+//			tr.setReason("Micro plan step occurred.");
+//		}
 		getBeliefbase().getBeliefSet("testcap.reports").addFact(tr);
 
 		waitFor(100);

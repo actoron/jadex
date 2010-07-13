@@ -76,7 +76,7 @@ public class MoveToLocationPlan extends Plan
 	 */
 	protected void	updateVision()
 	{		
-		long start = System.currentTimeMillis();
+//		long start = System.currentTimeMillis();
 		
 		// Create a representation of myself.
 		Cleaner cl = new Cleaner((Location)getBeliefbase().getBelief("my_location").getFact(),

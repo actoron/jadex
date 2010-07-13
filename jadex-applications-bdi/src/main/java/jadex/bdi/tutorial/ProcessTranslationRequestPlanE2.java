@@ -42,7 +42,7 @@ public class ProcessTranslationRequestPlanE2 extends Plan
 			// Create a translation subgoal.
 			if(cnttokens==3)
 			{
-				String action = stok.nextToken();
+				/*String action =*/ stok.nextToken();
 				String dir	= stok.nextToken();
 				String word = stok.nextToken();
 				// Hack!!!

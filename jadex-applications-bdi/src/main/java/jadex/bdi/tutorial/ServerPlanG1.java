@@ -4,7 +4,6 @@ import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IAgentListener;
 import jadex.bdi.runtime.IEAGoal;
 import jadex.bdi.runtime.IEAParameter;
-import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 import jadex.commons.ThreadSuspendable;
 

@@ -27,7 +27,7 @@ public class DealerGameRoundMasterPlan extends Plan
 		getLogger().info("Starting new game in: "+restart);
 		waitFor(restart);
 		
-		long timeout = ((Long)getBeliefbase().getBelief("playerwaitmillis").getFact()).longValue();
+//		long timeout = ((Long)getBeliefbase().getBelief("playerwaitmillis").getFact()).longValue();
 //		System.out.println("playerwaitmillis: "+timeout);
 		
 		CardSet	cardset	= new CardSet();

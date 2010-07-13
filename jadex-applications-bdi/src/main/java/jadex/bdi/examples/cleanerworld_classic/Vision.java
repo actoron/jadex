@@ -311,7 +311,7 @@ public class Vision extends LocationObject
 	 */
 	public void setDaytime(boolean daytime)
 	{
-		boolean oldd = this.daytime;
+//		boolean oldd = this.daytime;
 		this.daytime = daytime;
 //		pcs.firePropertyChange("daytime", oldd, daytime);
 	}

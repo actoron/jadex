@@ -4,7 +4,6 @@ import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IEAGoal;
 import jadex.commons.SGUI;
 import jadex.commons.concurrent.DefaultResultListener;
-import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.service.SServiceProvider;
 import jadex.service.clock.IClockService;

@@ -6,14 +6,8 @@ import jadex.bdi.runtime.IPlanListener;
 import jadex.bdi.runtime.IPlanbase;
 import jadex.bdi.runtime.impl.FlyweightFunctionality;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
-import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.commons.Tuple;
 import jadex.rules.state.IOAVState;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
 
 /**
  *  Flyweight for the plan base.

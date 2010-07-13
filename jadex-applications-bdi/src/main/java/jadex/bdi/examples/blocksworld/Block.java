@@ -146,7 +146,7 @@ public class Block
 	protected void	addBlock(Block block)
 	{
 		boolean oldclear = isClear();
-		Block	old	= this.upper;
+//		Block	old	= this.upper;
 		this.upper	= block;
 //		this.pcs.firePropertyChange("upper", old, this.upper);
 		pcs.firePropertyChange("clear", new Boolean(oldclear), new Boolean(isClear()));

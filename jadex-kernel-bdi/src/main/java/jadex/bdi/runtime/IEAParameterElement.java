@@ -1,7 +1,5 @@
 package jadex.bdi.runtime;
 
-import jadex.bdi.runtime.impl.FlyweightFunctionality;
-import jadex.commons.Future;
 import jadex.commons.IFuture;
 
 /**

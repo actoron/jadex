@@ -91,7 +91,7 @@ public class RequestFinished implements IComponentAction
 	{
 		if(obj instanceof RequestFinished)
 		{
-			RequestFinished cmp = (RequestFinished)obj;
+//			RequestFinished cmp = (RequestFinished)obj;
 			return true;
 		}
 		return false;

@@ -94,14 +94,6 @@ public class ObserverGui	extends EnvironmentGui
 	protected void	refreshHighscore(IBDIExternalAccess agent)
 	{
 		// Read highscore list from resource.
-		BufferedReader reader = null;
-	
-		// read as serialized object
-		//ObjectInputStream is = new ObjectInputStream(
-		//	SUtil.getResource((String)agent.getBeliefbase().getBelief("highscore").getFact(), ObserverGui.class.getClassLoader()));
-		//Creature[]	hscreatures	= (Creature[])is.readObject();
-		
-		// read as xml file
 		agent.getBeliefbase().getBeliefFact("highscore").addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)

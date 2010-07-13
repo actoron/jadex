@@ -21,7 +21,7 @@ public class GoalRegressionTestPlan extends Plan
 	{
 		IGoal	goal	= (IGoal)getReason();
 		Boolean	state	= (Boolean)goal.getParameter("test_state").getValue();
-		boolean[]	pstates	= (boolean[])goal.getParameter("test_process_states").getValue();
+//		boolean[]	pstates	= (boolean[])goal.getParameter("test_process_states").getValue();
 		String 	errors	= "";
 		TestReport	report	= new TestReport(""+goal, "Test execution of goal "+goal);
 

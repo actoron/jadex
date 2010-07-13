@@ -5,7 +5,6 @@ import jadex.bdi.runtime.GoalFailureException;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 import jadex.bdi.runtime.TimeoutException;
-import jadex.bridge.IComponentIdentifier;
 import jadex.commons.collection.SCollection;
 
 import java.util.Map;
@@ -29,7 +28,7 @@ public class ArgumentsPlan extends Plan
 			args.put("creator", getComponentIdentifier());
 			ca.getParameter("arguments").setValue(args);
 			dispatchSubgoalAndWait(ca);
-			IComponentIdentifier worker = (IComponentIdentifier)ca.getParameter("componentidentifier").getValue();
+//			IComponentIdentifier worker = (IComponentIdentifier)ca.getParameter("componentidentifier").getValue();
 			waitForMessageEvent("inform_created", 1000);
 			tr.setSucceeded(true);
 		}

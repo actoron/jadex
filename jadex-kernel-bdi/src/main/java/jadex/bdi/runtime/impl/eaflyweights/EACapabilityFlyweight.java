@@ -19,7 +19,6 @@ import jadex.commons.IFuture;
 import jadex.commons.concurrent.DelegationResultListener;
 import jadex.rules.state.IOAVState;
 import jadex.service.IServiceProvider;
-import jadex.service.clock.IClockService;
 
 import java.util.logging.Logger;
 

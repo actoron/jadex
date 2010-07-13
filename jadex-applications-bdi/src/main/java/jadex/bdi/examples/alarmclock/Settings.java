@@ -1,8 +1,5 @@
 package jadex.bdi.examples.alarmclock;
 
-import jadex.bdi.runtime.IBDIExternalAccess;
-import jadex.service.clock.IClockService;
-
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -282,7 +279,7 @@ public class Settings implements Cloneable, Serializable
 //			e.printStackTrace();
 			ret = new Settings("./alarmclock_settings.ser");
 		}
-		Alarm[]	alarms	= ret.getAlarms();
+//		Alarm[]	alarms	= ret.getAlarms();
 //		for(int i=0; i<alarms.length; i++)
 //			alarms[i].setClock(clock);
 		return ret;

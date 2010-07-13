@@ -12,16 +12,13 @@ import jadex.bdi.runtime.interpreter.AgentRules;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.InternalEventRules;
 import jadex.bdi.runtime.interpreter.MessageEventRules;
-import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bridge.IComponentManagementService;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.Tuple;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.rules.state.IOAVState;
-import jadex.service.IServiceProvider;
 import jadex.service.SServiceProvider;
-import jadex.service.library.ILibraryService;
 
 import java.util.Map;
 

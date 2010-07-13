@@ -11,12 +11,9 @@ import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.SReflect;
-import jadex.commons.SUtil;
 import jadex.rules.state.IOAVState;
 
-import java.lang.reflect.Array;
 import java.util.Collection;
-import java.util.Iterator;
 
 /**
  *  Flyweight for a belief set.

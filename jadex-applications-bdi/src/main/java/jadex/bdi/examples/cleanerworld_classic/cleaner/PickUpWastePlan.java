@@ -35,7 +35,7 @@ public class PickUpWastePlan extends Plan
 //		getLogger().info("Moving to waste!");
 		IGoal moveto = createGoal("achievemoveto");
 		Location location = waste.getLocation();
-		moveto.getParameter("location").setValue(waste.getLocation());
+		moveto.getParameter("location").setValue(location);
 //		System.out.println("Created: "+location+" "+this);
 		dispatchSubgoalAndWait(moveto);
 //		System.out.println("Reached: "+location+" "+this);

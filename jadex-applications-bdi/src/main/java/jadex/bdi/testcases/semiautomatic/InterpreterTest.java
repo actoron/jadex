@@ -17,7 +17,6 @@ import jadex.commons.concurrent.ThreadPoolFactory;
 import jadex.service.BasicServiceContainer;
 import jadex.service.IService;
 import jadex.service.IServiceContainer;
-import jadex.service.IServiceProvider;
 import jadex.service.clock.ClockService;
 import jadex.service.clock.IClockService;
 import jadex.service.clock.SystemClock;

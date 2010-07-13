@@ -1,18 +1,13 @@
 package jadex.bdi.runtime.impl.flyweights;
 
-import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.runtime.IExternalCondition;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.IWaitAbstraction;
 import jadex.bdi.runtime.impl.FlyweightFunctionality;
-import jadex.bdi.runtime.interpreter.AgentRules;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
-import jadex.bdi.runtime.interpreter.MessageEventRules;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.rules.state.IOAVState;
-
-import java.util.Collection;
 
 /**
  *  Flyweight for a waitabstraction.

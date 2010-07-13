@@ -35,7 +35,6 @@ import jadex.rules.rulesystem.rules.functions.MethodCallFunction;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVJavaType;
 import jadex.service.SServiceProvider;
-import jadex.service.library.ILibraryService;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;

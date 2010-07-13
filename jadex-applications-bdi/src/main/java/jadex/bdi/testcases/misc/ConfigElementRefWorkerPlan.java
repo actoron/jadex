@@ -3,8 +3,6 @@ package jadex.bdi.testcases.misc;
 import jadex.base.fipa.SFipa;
 import jadex.base.test.TestReport;
 import jadex.bdi.runtime.GoalFailureException;
-import jadex.bdi.runtime.IGoal;
-import jadex.bdi.runtime.IInternalEvent;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.IPlan;
 import jadex.bdi.runtime.Plan;
@@ -44,7 +42,7 @@ public class ConfigElementRefWorkerPlan extends Plan
 		TestReport	report	= new TestReport("initial goal", "Check if the initial goal is correctly named.");
 		try
 		{
-			IGoal	goal	= waitForGoal("testgoal", 100);
+			/*IGoal	goal	= */waitForGoal("testgoal", 100);
 //			if(goal.getName().equals("namedinitialgoal"))
 //			{
 				report.setSucceeded(true);
@@ -68,7 +66,7 @@ public class ConfigElementRefWorkerPlan extends Plan
 		report	= new TestReport("initial internal event", "Check if the initial internal event is correctly named.");
 		try
 		{
-			IInternalEvent	event	= waitForInternalEvent("testevent", 100);
+			/*IInternalEvent	event	= */waitForInternalEvent("testevent", 100);
 //			if(event.getName().equals("namedinitialevent"))
 //			{
 				report.setSucceeded(true);
@@ -89,7 +87,7 @@ public class ConfigElementRefWorkerPlan extends Plan
 		try
 		{
 			// Hack!!! getting reply to event is only way to access original name!?
-			IMessageEvent	msg	= waitForMessageEvent("testmsg", 100);
+			/*IMessageEvent	msg	= */waitForMessageEvent("testmsg", 100);
 //			IRMessageEvent	orig	= ((IRMessageEvent)((MessageEventWrapper)msg).unwrap()).getInReplyMessageEvent();
 //			if(orig!=null && orig.getName().equals("namedinitialmsg"))
 //			{
@@ -110,7 +108,7 @@ public class ConfigElementRefWorkerPlan extends Plan
 		report	= new TestReport("initial capa goal", "Check if initial goal from capability is correctly named.");
 		try
 		{
-			IGoal	goal	= waitForGoal("configrefcap.testgoal", 100);
+			/*IGoal	goal	= */waitForGoal("configrefcap.testgoal", 100);
 //			if(goal.getName().equals("namedcapinitialgoal"))
 //			{
 				report.setSucceeded(true);
@@ -134,7 +132,7 @@ public class ConfigElementRefWorkerPlan extends Plan
 		report	= new TestReport("initial capa internal event", "Check if initial internal event from capability is correctly named.");
 		try
 		{
-			IInternalEvent	event	= waitForInternalEvent("configrefcap.testevent", 100);
+			/*IInternalEvent	event	= */waitForInternalEvent("configrefcap.testevent", 100);
 //			if(event.getName().equals("namedcapinitialevent"))
 //			{
 				report.setSucceeded(true);
@@ -154,7 +152,7 @@ public class ConfigElementRefWorkerPlan extends Plan
 		report	= new TestReport("initial message event", "Check if initial message event from capability is correctly named.");
 		try
 		{
-			IMessageEvent	msg	= waitForMessageEvent("configrefcap.testmsg", 100);
+			/*IMessageEvent	msg	=*/ waitForMessageEvent("configrefcap.testmsg", 100);
 			// Hack!!! getting reply to event is only way to access original name!?
 //			IRMessageEvent	orig	= ((IRMessageEvent)((MessageEventWrapper)msg).unwrap()).getInReplyMessageEvent();
 //			List	origs	= orig.getAllOccurrences();
@@ -208,7 +206,7 @@ public class ConfigElementRefWorkerPlan extends Plan
 		TestReport	report	= new TestReport("end goal", "Check if the end goal is correctly named.");
 		try
 		{
-			IGoal	goal	= waitForGoal("testgoal", 100);
+			/*IGoal	goal	=*/ waitForGoal("testgoal", 100);
 //			if(goal.getName().equals("namedendgoal"))
 //			{
 				report.setSucceeded(true);
@@ -232,7 +230,7 @@ public class ConfigElementRefWorkerPlan extends Plan
 		report	= new TestReport("end internal event", "Check if the end internal event is correctly named.");
 		try
 		{
-			IInternalEvent	event	= waitForInternalEvent("testevent", 100);
+			/*IInternalEvent	event	=*/ waitForInternalEvent("testevent", 100);
 //			if(event.getName().equals("namedendevent"))
 //			{
 				report.setSucceeded(true);
@@ -252,7 +250,7 @@ public class ConfigElementRefWorkerPlan extends Plan
 		report	= new TestReport("end message event", "Check if the end message event is correctly named.");
 		try
 		{
-			IMessageEvent	msg	= waitForMessageEvent("testmsg", 100);
+			/*IMessageEvent	msg	=*/ waitForMessageEvent("testmsg", 100);
 			// Hack!!! getting reply to event is only way to access original name!?
 //			IRMessageEvent	orig	= ((IRMessageEvent)((MessageEventWrapper)msg).unwrap()).getInReplyMessageEvent();
 //			if(orig!=null && orig.getName().equals("namedendmsg"))
@@ -274,7 +272,7 @@ public class ConfigElementRefWorkerPlan extends Plan
 		report	= new TestReport("end goal", "Check if end goal from capability is correctly named.");
 		try
 		{
-			IGoal	goal	= waitForGoal("configrefcap.testgoal", 100);
+			/*IGoal	goal	=*/ waitForGoal("configrefcap.testgoal", 100);
 //			if(goal.getName().equals("namedcapendgoal"))
 //			{
 				report.setSucceeded(true);
@@ -298,7 +296,7 @@ public class ConfigElementRefWorkerPlan extends Plan
 		report	= new TestReport("end internal event", "Check if end internal event from capability is correctly named.");
 		try
 		{
-			IInternalEvent	event	= waitForInternalEvent("configrefcap.testevent", 100);
+			/*IInternalEvent	event	=*/ waitForInternalEvent("configrefcap.testevent", 100);
 //			if(event.getName().equals("namedcapendevent"))
 //			{
 				report.setSucceeded(true);
@@ -318,7 +316,7 @@ public class ConfigElementRefWorkerPlan extends Plan
 		report	= new TestReport("end message event", "Check if end message event from capability is correctly named.");
 		try
 		{
-			IMessageEvent	msg	= waitForMessageEvent("configrefcap.testmsg", 100);
+			/*IMessageEvent	msg	=*/ waitForMessageEvent("configrefcap.testmsg", 100);
 			// Hack!!! getting reply to event is only way to access original name!?
 //			IRMessageEvent	orig	= ((IRMessageEvent)((MessageEventWrapper)msg).unwrap()).getInReplyMessageEvent();
 //			List	origs	= orig.getAllOccurrences();

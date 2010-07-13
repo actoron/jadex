@@ -3,7 +3,6 @@ package jadex.bdi.examples.alarmclock;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.commons.SGUI;
 import jadex.commons.concurrent.SwingDefaultResultListener;
-import jadex.service.clock.IClockService;
 
 import java.awt.BorderLayout;
 import java.awt.Dialog;

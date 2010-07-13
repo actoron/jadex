@@ -10,7 +10,6 @@ import jadex.commons.concurrent.SwingDefaultResultListener;
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
-import javax.swing.SwingUtilities;
 
 /**
  *  Update the Gui when manager informs about changes.

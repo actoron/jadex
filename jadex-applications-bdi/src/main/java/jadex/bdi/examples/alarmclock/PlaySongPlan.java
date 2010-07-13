@@ -60,7 +60,6 @@ public class PlaySongPlan extends Plan
 				{
 					try
 					{
-						String filename = song.getPath();
 						in = SUtil.getResource(song.getPath(), ls.getClassLoader());
 					}
 					catch(Exception ex)

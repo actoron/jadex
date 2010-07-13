@@ -1,24 +1,15 @@
 package jadex.bdi.runtime.impl.eaflyweights;
 
 import jadex.bdi.model.OAVBDIMetaModel;
-import jadex.bdi.runtime.IEAExpression;
 import jadex.bdi.runtime.IEAExpressionbase;
 import jadex.bdi.runtime.impl.FlyweightFunctionality;
 import jadex.bdi.runtime.impl.flyweights.ElementFlyweight;
-import jadex.bdi.runtime.impl.flyweights.ExpressionNoModel;
 import jadex.bdi.runtime.interpreter.AgentRules;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
-import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.Tuple;
-import jadex.javaparser.IExpressionParser;
-import jadex.javaparser.IParsedExpression;
-import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 import jadex.rules.state.IOAVState;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  *  Flyweight for the expression base.
