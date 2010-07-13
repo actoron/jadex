@@ -4,8 +4,12 @@ import jadex.bdi.OAVBDIModelLoader;
 import jadex.bdi.model.OAVAgentModel;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bridge.IComponentAdapter;
+import jadex.bridge.IComponentAdapterFactory;
+import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentInstance;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.ILoadableComponentModel;
 import jadex.commons.IFuture;
 import jadex.commons.concurrent.Executor;
 import jadex.commons.concurrent.IExecutable;
@@ -57,93 +61,8 @@ public class InterpreterTest
 			OAVAgentModel loaded = loader.loadAgentModel(model, null, null);
 	
 			// Initialize agent interpreter.
-			final IClockService clock = new ClockService(new SystemClock("system", 1, ThreadPoolFactory.createThreadPool()));
-			clock.start();
-			final Executor exe = new Executor(ThreadPoolFactory.createThreadPool());
-			final BDIInterpreter[]	interpreters	= new BDIInterpreter[1];
-			
-			final BasicServiceContainer container = new BasicServiceContainer("platform");
-			container.addService(IClockService.class, (IService)clock);
-			
-			final BDIInterpreter interpreter = new BDIInterpreter(new IComponentAdapter()
-			{
-				public void	wakeup()
-				{
-					exe.execute();
-				}
-				
-				public void invokeLater(Runnable action)
-				{
-					// TODO Auto-generated method stub
-					throw new UnsupportedOperationException();
-				}
-				
-				public IExternalAccess getParent()
-				{
-					// TODO Auto-generated method stub
-					return null;
-				}
-				
-				public IFuture getChildren()
-				{
-					// TODO Auto-generated method stub
-					return null;
-				}
-				
-				public IServiceContainer getServiceContainer()
-				{
-					return container;
-				}
-	
-				public IComponentIdentifier getComponentIdentifier()
-				{
-					return new IComponentIdentifier()
-					{
-						public String getName()
-						{
-							return "noname";
-						}
-						
-						public String getLocalName()
-						{
-							return "noname";
-						}
-	
-						public String getPlatformName()
-						{
-							return "noplatform";
-						}
-						
-						public String[] getAddresses()
-						{
-							return new String[0];
-						}
-						
-					};
-				}
-				
-				public boolean isExternalThread()
-				{
-					return false;
-				}
-				
-				public Logger getLogger()
-				{
-					return Logger.getAnonymousLogger();
-				}
-			}, loaded.getState(), loaded, null, null, null, config);
-			
-			exe.setExecutable(new IExecutable()
-			{
-				public boolean execute()
-				{
-					// Execute agent.
-	//				System.out.println("Executed agent step.");
-					return interpreter.executeStep();
-				}
-			});
-			interpreters[0]	= interpreter;
-			exe.execute();
+			BDIInterpreter interpreter = new BDIInterpreter(null, new ComponentAdapterFactory(), loaded.getState(), loaded, null, null, null, config);
+			interpreter.getAgentAdapter().wakeup();
 			
 	//		System.out.println("Agent execution finished.");
 			
@@ -157,5 +76,110 @@ public class InterpreterTest
 		{
 			e.printStackTrace();
 		}
+	}
+}
+
+class ComponentAdapterFactory implements IComponentAdapterFactory
+{
+	public boolean executeStep(IComponentAdapter adapter)
+	{
+		((ComponentAdapter)adapter).wakeup();
+		return false;
+	}
+	
+	public IComponentAdapter createComponentAdapter(IComponentDescription desc,
+		ILoadableComponentModel model, IComponentInstance instance, IExternalAccess parent)
+	{
+		return new ComponentAdapter(instance);
+	}
+}
+
+class ComponentAdapter implements IComponentAdapter
+{
+	final Executor exe;
+	final IServiceContainer container;
+	
+	public ComponentAdapter(final IComponentInstance interpreter)
+	{
+		final IClockService clock = new ClockService(new SystemClock("system", 1, ThreadPoolFactory.createThreadPool()));
+		clock.start();
+		container = new BasicServiceContainer("platform");
+		container.addService(IClockService.class, (IService)clock);
+		
+		exe = new Executor(ThreadPoolFactory.createThreadPool());
+		exe.setExecutable(new IExecutable()
+		{
+			public boolean execute()
+			{
+				// Execute agent.
+//				System.out.println("Executed agent step.");
+				return ((BDIInterpreter)interpreter).executeStep();
+			}
+		});
+	}
+	
+	public void	wakeup()
+	{
+		exe.execute();
+	}
+	
+	public void invokeLater(Runnable action)
+	{
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException();
+	}
+	
+	public IExternalAccess getParent()
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	public IFuture getChildren()
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	public IServiceContainer getServiceContainer()
+	{
+		return container;
+	}
+
+	public IComponentIdentifier getComponentIdentifier()
+	{
+		return new IComponentIdentifier()
+		{
+			public String getName()
+			{
+				return "noname";
+			}
+			
+			public String getLocalName()
+			{
+				return "noname";
+			}
+
+			public String getPlatformName()
+			{
+				return "noplatform";
+			}
+			
+			public String[] getAddresses()
+			{
+				return new String[0];
+			}
+			
+		};
+	}
+	
+	public boolean isExternalThread()
+	{
+		return false;
+	}
+	
+	public Logger getLogger()
+	{
+		return Logger.getAnonymousLogger();
 	}
 }
