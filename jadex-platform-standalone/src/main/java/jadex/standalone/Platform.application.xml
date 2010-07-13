@@ -51,6 +51,7 @@
 		<componenttype filename="jadex/tools/jcc/JCC.agent.xml" name="jcc"/>
 		<componenttype filename="jadex/bdi/benchmarks/AgentCreation.agent.xml" name="CreationBDI"/>
 		<componenttype filename="jadex/micro/benchmarks/AgentCreationAgent.class" name="CreationMicro"/>
+		<componenttype filename="jadex/bpmn/benchmarks/AgentCreation2.bpmn" name="CreationBPMN"/>
 	</componenttypes>
 	
 	<services>
@@ -143,6 +144,16 @@
 				<component type="CreationMicro"/>
 			</components>
 		</application>
+
+		<application name="creation_test_bpmn">
+			<arguments>
+				<argument name="libpath">new Object[]{"../jadex-applications-bpmn/target/classes"}</argument>
+			</arguments>
+			<components>
+				<component type="kernel_bpmn"/>
+				<component type="CreationBPMN"/>
+			</components>
+		</application>		
 	</applications>
 	
 </applicationtype>

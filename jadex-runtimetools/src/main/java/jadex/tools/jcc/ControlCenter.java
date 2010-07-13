@@ -1,6 +1,5 @@
 package jadex.tools.jcc;
 
-import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IVersionInfo;
 import jadex.commons.Properties;
 import jadex.commons.Property;
@@ -417,6 +416,8 @@ public class ControlCenter implements IControlCenter
 					AbstractJCCPlugin.addSubproperties(props, plugin.getName(), plugprops);
 			}
 
+			final File	project	= this.project;
+			final Properties	props	= this.props;
 			SServiceProvider.getService(container, ILibraryService.class)
 				.addResultListener(new SwingDefaultResultListener(window)
 			{

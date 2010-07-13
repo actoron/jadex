@@ -159,17 +159,16 @@ public class Application implements IApplication, IComponentInstance
 		fetcher.setValue("$component", this);
 		this.fetcher	= fetcher;
 
-//		List services = model.getApplicationType().getServices();
-//		if(services!=null)
-//		{
-//			for(int i=0; i<services.size(); i++)
-//			{
-//				MExpressionType exp = (MExpressionType)services.get(i);
-//				IService service = (IService)exp.getParsedValue().getValue(fetcher);
-////				mycontainer.addService(exp.getClazz(), exp.getName(), service);
-//				adapter.getServiceContainer().addService(exp.getClazz(), service);
-//			}
-//		}
+		List services = model.getApplicationType().getServices();
+		if(services!=null)
+		{
+			for(int i=0; i<services.size(); i++)
+			{
+				MExpressionType exp = (MExpressionType)services.get(i);
+				IService service = (IService)exp.getParsedValue().getValue(fetcher);
+				adapter.getServiceContainer().addService(exp.getClazz(), service);
+			}
+		}
 
 		// Evaluate (future) properties.
 		List	futures	= new ArrayList();
@@ -822,19 +821,19 @@ public class Application implements IApplication, IComponentInstance
 			// todo: set inited = true after all has been done
 			state = STATE_STARTED;
 			
-			// Init service container and init service.
-			// Create the services.
-			List services = model.getApplicationType().getServices();
-			if(services!=null)
-			{
-				for(int i=0; i<services.size(); i++)
-				{
-					MExpressionType exp = (MExpressionType)services.get(i);
-					IService service = (IService)exp.getParsedValue().getValue(fetcher);
-//							mycontainer.addService(exp.getClazz(), exp.getName(), service);
-					adapter.getServiceContainer().addService(exp.getClazz(), service);
-				}
-			}
+//			// Init service container and init service.
+//			// Create the services.
+//			List services = model.getApplicationType().getServices();
+//			if(services!=null)
+//			{
+//				for(int i=0; i<services.size(); i++)
+//				{
+//					MExpressionType exp = (MExpressionType)services.get(i);
+//					IService service = (IService)exp.getParsedValue().getValue(fetcher);
+////							mycontainer.addService(exp.getClazz(), exp.getName(), service);
+//					adapter.getServiceContainer().addService(exp.getClazz(), service);
+//				}
+//			}
 			adapter.getServiceContainer().start().addResultListener(new ComponentResultListener(new DefaultResultListener()
 			{
 				public void resultAvailable(Object source, Object result)
