@@ -652,13 +652,13 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 			// try to start player-Agent.
 			
 			agent.getLogger().info("starting playerAgent: "+player.getName());
-			agent.getGoalbase().createGoal("cms_create_component").addResultListener(new DefaultResultListener()
+			agent.getGoalbase().createGoal("cms_create_component").addResultListener(new SwingDefaultResultListener(ManagerFrame.this)
 			{
-				public void resultAvailable(Object source, Object result)
+				public void customResultAvailable(Object source, Object result)
 				{
 					try
 					{
-						IEAGoal start = (IEAGoal)result;
+						final IEAGoal start = (IEAGoal)result;
 						
 //						IContextService	cs	= (IContextService) agent.getServiceContainer().getService(IContextService.class);
 //						IContext[]	contexts	= cs.getContexts(agent.getComponentIdentifier(), IApplicationContext.class);
@@ -671,14 +671,18 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 						args.put("myself", player);
 						args.put("dealer", dealeraid);
 						start.setParameterValue("arguments", args);
-						agent.dispatchTopLevelGoalAndWait(start);
-						start.getParameterValue("componentidentifier").addResultListener(new DefaultResultListener()
+						agent.dispatchTopLevelGoalAndWait(start).addResultListener(new SwingDefaultResultListener(ManagerFrame.this)
 						{
-							
-							public void resultAvailable(Object source, Object result)
+							public void customResultAvailable(Object source, Object result)
 							{
-								IComponentIdentifier playerid = (IComponentIdentifier)result;
-								player.setAgentID(playerid);
+								start.getParameterValue("componentidentifier").addResultListener(new SwingDefaultResultListener(ManagerFrame.this)
+								{
+									public void customResultAvailable(Object source, Object result)
+									{
+										IComponentIdentifier playerid = (IComponentIdentifier)result;
+										player.setAgentID(playerid);
+									}
+								});
 							}
 						});
 					}

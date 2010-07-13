@@ -1,11 +1,9 @@
 package jadex.bdi.planlib.cms;
 
 import jadex.bdi.runtime.Plan;
-import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentManagementService;
 import jadex.commons.IFuture;
-import jadex.service.IServiceContainer;
-import jadex.service.IServiceProvider;
 import jadex.service.SServiceProvider;
 
 
