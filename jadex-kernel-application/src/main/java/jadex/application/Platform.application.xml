@@ -17,6 +17,7 @@
 		<import>jadex.service.threadpool.*</import>
 		<import>jadex.base.fipa.*</import>
 		<import>jadex.base.*</import>
+		<import>jadex.base.simulation.*</import>
 		<import>jadex.commons.concurrent.*</import>
 		<import>jadex.standalone.service.*</import>
 		<import>jadex.standalone.transport.*</import>
