@@ -27,7 +27,7 @@ public class DFRemoteRegisterPlan extends Plan
 		DFRegister re = new DFRegister();
 		IDFComponentDescription desc = (IDFComponentDescription)getParameter("description").getValue();
 		Number lt = (Number)getParameter("leasetime").getValue();
-		// When AID is ommited, enter self. Hack???
+		// When AID is omitted, enter self. Hack???
 		if(desc.getName()==null || lt!=null)
 		{
 			IDF	dfservice	= (IDF)SServiceProvider.getService(getScope().getServiceProvider(), IDF.class).get(this);

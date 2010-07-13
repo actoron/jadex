@@ -8,10 +8,7 @@ import jadex.bridge.ILoadableComponentModel;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.concurrent.DelegationResultListener;
-import jadex.service.IServiceContainer;
 import jadex.service.IServiceProvider;
-
-import java.util.Set;
 
 /**
  *  External access for applications.

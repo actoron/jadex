@@ -49,7 +49,8 @@ public class PurchaseBookPlan extends Plan
 			.getParameterSet("result").getValues();
 		if(result.length == 0)
 		{
-			//System.out.println("No seller found, purchase failed.");
+//			System.out.println("No seller found, purchase failed.");
+			generateNegotiationReport(order, null, acceptable_price);
 			fail();
 		}
 		
@@ -91,14 +92,21 @@ public class PurchaseBookPlan extends Plan
 	protected void generateNegotiationReport(Order order, NegotiationRecord rec, double acceptable_price)
 	{
 		String report = "Accepable price: "+acceptable_price+", proposals: ";
-		ParticipantProposal[] proposals = rec.getProposals();
-		for(int i=0; i<proposals.length; i++)
+		if(rec!=null)
 		{
-			report += proposals[i].getProposal()+"-"+proposals[i].getParticipant().getLocalName();
-			if(i+1<proposals.length)
-				report += ", ";
+			ParticipantProposal[] proposals = rec.getProposals();
+			for(int i=0; i<proposals.length; i++)
+			{
+				report += proposals[i].getProposal()+"-"+proposals[i].getParticipant().getLocalName();
+				if(i+1<proposals.length)
+					report += ", ";
+			}
 		}
-		NegotiationReport nr = new NegotiationReport(order, report, rec.getStarttime());
+		else
+		{
+			report	+= "No seller found, purchase failed.";
+		}
+		NegotiationReport nr = new NegotiationReport(order, report, rec!=null ? rec.getStarttime() : getScope().getTime());
 		//System.out.println("REPORT of agent: "+getAgentName()+" "+report);
 		getBeliefbase().getBeliefSet("negotiation_reports").addFact(nr);
 	}

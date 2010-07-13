@@ -989,18 +989,21 @@ public class AgentRules
 				Class	clazz	= (Class)state.getAttributeValue(mexp, OAVBDIMetaModel.expression_has_class);
 				if(clazz!=null && SReflect.isSupertype(IFuture.class, clazz))
 				{
-					System.out.println("Future property: "+name+" "+val);
+//					System.out.println("Future property: "+name+" "+val);
 					if(val instanceof Future)
 					{
+						// Use second future to start agent only when value has already been set.
+						final Future	ret	= new Future();
 						((Future)val).addResultListener(new ComponentResultListener(new IResultListener()
 						{
 							public void resultAvailable(Object source, Object result)
 							{
-								System.out.println("Setting future property: "+name+" "+result);
+//								System.out.println("Setting future property: "+name+" "+result);
 								Object param = state.createObject(OAVBDIRuntimeModel.parameter_type);	
 								state.setAttributeValue(param, OAVBDIRuntimeModel.parameter_has_name, name);
 								state.setAttributeValue(param, OAVBDIRuntimeModel.parameter_has_value, result);
 								state.addAttributeValue(rcapa, OAVBDIRuntimeModel.capability_has_properties, param);
+								ret.setResult(result);
 							}
 
 							public void exceptionOccurred(Object source, Exception exception)
@@ -1008,7 +1011,7 @@ public class AgentRules
 								throw new RuntimeException(exception);
 							}
 						}, BDIInterpreter.getInterpreter(state).getAgentAdapter()));
-						futures.add(val);
+						futures.add(ret);
 					}
 					else if(val!=null)
 					{

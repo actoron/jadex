@@ -196,12 +196,6 @@
 						</value>
 					</parameter>
 				</initialgoal>
-				<!-- <initialgoal ref="sell_book">
-					<parameter ref="order">
-						<value>new Order("All about agents", new Date(
-							$scope.getTime()+60000), 85, 65, false)</value>
-					</parameter>
-				</initialgoal> -->
 				<endgoal ref="df_deregister"/>
 			</goals>
 		</configuration>

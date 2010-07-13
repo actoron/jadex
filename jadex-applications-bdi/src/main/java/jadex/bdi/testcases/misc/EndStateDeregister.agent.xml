@@ -12,20 +12,26 @@
 	
 	<imports>
 		<import>jadex.base.fipa.*</import>
+		<import>jadex.commons.*</import>
+		<import>jadex.service.*</import>
 	</imports>
 	
 	<capabilities>
 		<capability name="dfcap" file="jadex.bdi.planlib.df.DF"/>
 	</capabilities>
 	
+	<properties>
+	 	<property name="dfservice" class="IFuture">SServiceProvider.getService($scope.getServiceProvider(), IDF.class)</property>
+	</properties>
+
 	<configurations>
 		<configuration name="default">
 			<goals>
 				<initialgoal ref="dfcap.df_register">
 					<parameter ref="description">
 						<value>
-							((IDF)$scope.getServiceProvider().getService(IDF.class))
-								.createDFComponentDescription(null, ((IDF)$scope.getServiceProvider().getService(IDF.class))
+							$propertybase.getProperty("dfservice")
+								.createDFComponentDescription(null, $propertybase.getProperty("dfservice")
 									.createDFServiceDescription("endstate_testservice", "endstate_testservice", "EndStateDeregister"))
 						</value>
 					</parameter>

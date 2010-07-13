@@ -38,7 +38,7 @@ public class ComponentTestSuite extends TestSuite
 	{
 		super(name);
 	
-		Starter.createPlatform(new String[]{"-configname", "all_kernels"}).addResultListener(new DefaultResultListener()
+		Starter.createPlatform(new String[]{"-configname", "all_kernels", "-simulation", "true"}).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{

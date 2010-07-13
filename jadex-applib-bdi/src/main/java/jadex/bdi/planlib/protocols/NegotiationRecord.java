@@ -44,7 +44,7 @@ public class NegotiationRecord
 	{
 		this.cfp = cfp;
 		this.cfp_info = cfp_info;
-		//this.starttime	= System.currentTimeMillis();
+		this.starttime	= starttime;
 		this.proposals = new ParticipantProposal[participants.length];
 		for(int i=0; i<proposals.length; i++)
 			proposals[i]	= new ParticipantProposal(participants[i]);
