@@ -48,11 +48,14 @@ public class DefaultStepHandler implements IStepHandler
 			
 			// Continue with timer edge.
 			List outedges = activity.getOutgoingSequenceEdges();
-			if(outedges==null || outedges.size()!=1)
+			if(outedges!=null && outedges.size()==1)
+			{
+				next = (MSequenceEdge)outedges.get(0);
+			}
+			else if(outedges!=null && outedges.size()>1)
 			{
 				throw new RuntimeException("Cannot determine outgoing edge: "+activity);
 			}
-			next = (MSequenceEdge)outedges.get(0);
 		}
 		
 		// Find next element and context(s) to be removed.

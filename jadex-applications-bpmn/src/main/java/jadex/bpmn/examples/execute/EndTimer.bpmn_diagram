@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<notation:Diagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:notation="http://www.eclipse.org/gmf/runtime/1.0.2/notation" xmi:id="_SJPu0I6VEd-q-6UwAd77qg" type="Bpmn" name="EndTimer.bpmn_diagram" measurementUnit="Pixel">
+  <children xmi:type="notation:Node" xmi:id="_SJhboI6VEd-q-6UwAd77qg" type="1001">
+    <children xmi:type="notation:Node" xmi:id="_SJjQ0I6VEd-q-6UwAd77qg" type="4008"/>
+    <children xmi:type="notation:Node" xmi:id="_SJjQ0Y6VEd-q-6UwAd77qg" type="5001">
+      <children xmi:type="notation:Node" xmi:id="_SJj34Y6VEd-q-6UwAd77qg" type="2001">
+        <children xmi:type="notation:Node" xmi:id="_SJke8I6VEd-q-6UwAd77qg" type="4001"/>
+        <styles xmi:type="notation:FontStyle" xmi:id="_SJj34o6VEd-q-6UwAd77qg" fontName="Arial"/>
+        <styles xmi:type="notation:DescriptionStyle" xmi:id="_SJj3446VEd-q-6UwAd77qg"/>
+        <styles xmi:type="notation:FillStyle" xmi:id="_SJj35I6VEd-q-6UwAd77qg"/>
+        <styles xmi:type="notation:LineStyle" xmi:id="_SJj35Y6VEd-q-6UwAd77qg" lineColor="0"/>
+        <element xmi:type="bpmn:Activity" href="EndTimer.bpmn#_SJe_YY6VEd-q-6UwAd77qg"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_SJke8Y6VEd-q-6UwAd77qg" x="55" y="70" width="111" height="61"/>
+      </children>
+      <children xmi:type="notation:Node" xmi:id="_sL9p0I6VEd-q-6UwAd77qg" type="2001">
+        <children xmi:type="notation:Node" xmi:id="_sL_fAI6VEd-q-6UwAd77qg" type="4001"/>
+        <styles xmi:type="notation:FontStyle" xmi:id="_sL-Q4I6VEd-q-6UwAd77qg" fontName="Arial"/>
+        <styles xmi:type="notation:DescriptionStyle" xmi:id="_sL-Q4Y6VEd-q-6UwAd77qg"/>
+        <styles xmi:type="notation:FillStyle" xmi:id="_sL-Q4o6VEd-q-6UwAd77qg"/>
+        <styles xmi:type="notation:LineStyle" xmi:id="_sL-Q446VEd-q-6UwAd77qg" lineColor="0"/>
+        <element xmi:type="bpmn:Activity" href="EndTimer.bpmn#_sL9CwY6VEd-q-6UwAd77qg"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_sL-Q5I6VEd-q-6UwAd77qg" x="220" y="84"/>
+      </children>
+      <styles xmi:type="notation:DrawerStyle" xmi:id="_SJjQ0o6VEd-q-6UwAd77qg"/>
+      <styles xmi:type="notation:SortingStyle" xmi:id="_SJjQ046VEd-q-6UwAd77qg"/>
+      <styles xmi:type="notation:FilteringStyle" xmi:id="_SJjQ1I6VEd-q-6UwAd77qg"/>
+    </children>
+    <styles xmi:type="notation:FontStyle" xmi:id="_SJhboY6VEd-q-6UwAd77qg" fontName="Arial"/>
+    <styles xmi:type="notation:DescriptionStyle" xmi:id="_SJhboo6VEd-q-6UwAd77qg"/>
+    <styles xmi:type="notation:FillStyle" xmi:id="_SJhbo46VEd-q-6UwAd77qg" fillColor="16771304"/>
+    <styles xmi:type="notation:LineStyle" xmi:id="_SJhbpI6VEd-q-6UwAd77qg" lineColor="11119017"/>
+    <element xmi:type="bpmn:Pool" href="EndTimer.bpmn#_SJeYUY6VEd-q-6UwAd77qg"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_SJj34I6VEd-q-6UwAd77qg" x="16" y="16" width="1500" height="200"/>
+  </children>
+  <styles xmi:type="notation:PageStyle" xmi:id="_SJPu0Y6VEd-q-6UwAd77qg"/>
+  <styles xmi:type="notation:GuideStyle" xmi:id="_SJPu0o6VEd-q-6UwAd77qg"/>
+  <styles xmi:type="notation:DescriptionStyle" xmi:id="_SJPu046VEd-q-6UwAd77qg"/>
+  <element xmi:type="bpmn:BpmnDiagram" href="EndTimer.bpmn#_SJN5oY6VEd-q-6UwAd77qg"/>
+  <edges xmi:type="notation:Edge" xmi:id="_sMLsQI6VEd-q-6UwAd77qg" type="3001" source="_SJj34Y6VEd-q-6UwAd77qg" target="_sL9p0I6VEd-q-6UwAd77qg">
+    <children xmi:type="notation:Node" xmi:id="_sMMTUI6VEd-q-6UwAd77qg" type="4012">
+      <styles xmi:type="notation:FillStyle" xmi:id="_sMMTUY6VEd-q-6UwAd77qg" fillColor="16776959"/>
+      <styles xmi:type="notation:LineStyle" xmi:id="_sMMTUo6VEd-q-6UwAd77qg" lineColor="16776959"/>
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_sMMTU46VEd-q-6UwAd77qg" y="-10"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_sMLsQY6VEd-q-6UwAd77qg" routing="Rectilinear" smoothness="Normal" closestDistance="true"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_sMLsQo6VEd-q-6UwAd77qg" fontName="Arial"/>
+    <styles xmi:type="notation:LineStyle" xmi:id="_sMLsQ46VEd-q-6UwAd77qg" lineColor="0"/>
+    <element xmi:type="bpmn:SequenceEdge" href="EndTimer.bpmn#_sMJ3EY6VEd-q-6UwAd77qg"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_sMLsRI6VEd-q-6UwAd77qg" points="[-31, -28, 79, 72]$[-108, -98, 2, 2]"/>
+  </edges>
+</notation:Diagram>
