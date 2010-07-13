@@ -249,4 +249,12 @@ public class MComponentInstance
 		}
 		return ret;
 	}
+	
+	/**
+	 *  A string of this object.
+	 */
+	public String toString()
+	{
+		return "MComponentInstance(typename="+typename+", number="+numbertext+")";
+	}
 }

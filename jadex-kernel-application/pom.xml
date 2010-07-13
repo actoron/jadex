@@ -5,7 +5,7 @@
 	<artifactId>jadex-kernel-application</artifactId>
 	<packaging>jar</packaging>
 	<version>2.0-rc3</version>
-	<name>jadex-kernel-bdi</name>
+	<name>jadex-kernel-applicatiobn</name>
 	<url>http://jadex.sourceforge.net</url>
 
 	<description>

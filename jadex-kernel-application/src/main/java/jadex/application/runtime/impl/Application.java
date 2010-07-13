@@ -1070,24 +1070,25 @@ public class Application implements IApplication, IComponentInstance
 			final MComponentInstance component = (MComponentInstance)components.get(i);
 //			System.out.println("Create: "+component.getName()+" "+component.getTypeName()+" "+component.getConfiguration()+" "+Thread.currentThread());
 			int num = getNumber(component, cl);
+			IResultListener	crl	= new CounterResultListener(num)
+			{
+				public void finalResultAvailable(Object source, Object result)
+				{
+//					System.out.println("Create finished: "+component.getName()+" "+component.getTypeName()+" "+component.getConfiguration()+" "+Thread.currentThread());
+					createComponent(components, cl, ces, i+1);
+				}
+				
+				public void exceptionOccurred(Object source, Exception exception)
+				{
+					exception.printStackTrace();
+				}
+			};
 			for(int j=0; j<num; j++)
 			{
 				IFuture ret = ces.createComponent(component.getName(), component.getType(model.getApplicationType()).getFilename(),
 					new CreationInfo(component.getConfiguration(), getArguments(component, cl), adapter.getComponentIdentifier(),
 					component.isSuspended(), component.isMaster(), component.isDaemon(), model.getApplicationType().getAllImports()), null);
-				ret.addResultListener(createResultListener(new IResultListener()
-				{
-					public void resultAvailable(Object source, Object result)
-					{
-//						System.out.println("Create finished: "+component.getName()+" "+component.getTypeName()+" "+component.getConfiguration()+" "+Thread.currentThread());
-						createComponent(components, cl, ces, i+1);
-					}
-					
-					public void exceptionOccurred(Object source, Exception exception)
-					{
-						exception.printStackTrace();
-					}
-				}));
+				ret.addResultListener(crl);
 			}
 		}
 	}
