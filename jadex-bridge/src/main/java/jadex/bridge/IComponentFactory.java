@@ -56,14 +56,14 @@ public interface IComponentFactory
 	
 	/**
 	 * Create a component instance.
-	 * @param adapter The component adapter.
+	 * @param factory The component adapter factory.
 	 * @param model The component model.
 	 * @param config The name of the configuration (or null for default configuration) 
 	 * @param arguments The arguments for the component as name/value pairs.
 	 * @param parent The parent component (if any).
 	 * @return An instance of a component.
 	 */
-	public IComponentInstance createComponentInstance(IComponentAdapter adapter, ILoadableComponentModel model, String config, Map arguments, IExternalAccess parent);
+	public Object[] createComponentInstance(IComponentDescription desc, IComponentAdapterFactory factory, ILoadableComponentModel model, String config, Map arguments, IExternalAccess parent);
 
 	/**
 	 *  Get the properties (name/value pairs).

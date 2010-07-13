@@ -1,6 +1,6 @@
 package jadex.tools.simcenter;
 
-import jadex.base.ISimulationService;
+import jadex.base.simulation.ISimulationService;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IThreadPool;
 import jadex.commons.concurrent.SwingDefaultResultListener;

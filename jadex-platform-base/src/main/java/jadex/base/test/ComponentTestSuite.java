@@ -1,17 +1,16 @@
 package jadex.base.test;
 
-import jadex.base.Platform;
 import jadex.base.SComponentFactory;
+import jadex.base.Starter;
 import jadex.bridge.IArgument;
 import jadex.bridge.IComponentManagementService;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.ILoadableComponentModel;
-import jadex.commons.SReflect;
 import jadex.commons.concurrent.DefaultResultListener;
-import jadex.service.IServiceContainer;
+import jadex.service.SServiceProvider;
 import jadex.service.library.ILibraryService;
 
 import java.io.File;
-import java.lang.reflect.Constructor;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -28,7 +27,7 @@ public class ComponentTestSuite extends TestSuite
 	//-------- attributes --------
 	
 	/** The platform. */
-	protected IServiceContainer	platform;
+	protected IExternalAccess rootcomp;
 	
 	//-------- constructors --------
 
@@ -40,32 +39,38 @@ public class ComponentTestSuite extends TestSuite
 		super(name);
 	
 		// Hack!!! Make configurations configurable.
-		String[]	confs	= new String[]
-		{
-			"jadex/standalone/services_testconf.xml",
-//		   	Platform.FALLBACK_STANDARDCOMPONENTS_CONFIGURATION,
-			Platform.FALLBACK_APPLICATION_CONFIGURATION,
-			Platform.FALLBACK_BDI_CONFIGURATION,
-		   	Platform.FALLBACK_BPMN_CONFIGURATION,
-		   	Platform.FALLBACK_MICRO_CONFIGURATION,
-		   	Platform.FALLBACK_BDIBPMN_CONFIGURATION			
-		};
+//		String[]	confs	= new String[]
+//		{
+//			"jadex/standalone/services_testconf.xml",
+////		   	Platform.FALLBACK_STANDARDCOMPONENTS_CONFIGURATION,
+//			Platform.FALLBACK_APPLICATION_CONFIGURATION,
+//			Platform.FALLBACK_BDI_CONFIGURATION,
+//		   	Platform.FALLBACK_BPMN_CONFIGURATION,
+//		   	Platform.FALLBACK_MICRO_CONFIGURATION,
+//		   	Platform.FALLBACK_BDIBPMN_CONFIGURATION			
+//		};
 
 		// hack!!! use reflection to avoid compile dependency
-		Class	pfclass	= SReflect.findClass("jadex.standalone.Platform", null, this.getClass().getClassLoader());
-		Constructor	pfcon	= pfclass.getConstructor(new Class[]{confs.getClass(), ClassLoader.class});
-		platform	= (IServiceContainer)pfcon.newInstance(new Object[]{confs, this.getClass().getClassLoader()});
-		platform.start();
+//		Class	pfclass	= SReflect.findClass("jadex.standalone.Platform", null, this.getClass().getClassLoader());
+//		Constructor	pfcon	= pfclass.getConstructor(new Class[]{confs.getClass(), ClassLoader.class});
+//		platform	= (IServiceContainer)pfcon.newInstance(new Object[]{confs, this.getClass().getClassLoader()});
+//		platform.start();
 		
-		platform.getService(IComponentManagementService.class).addResultListener(new DefaultResultListener()
+		Starter.createPlatform(new String[]{"-configname", "all_kernels"}).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
-				IComponentManagementService cms = (IComponentManagementService)result;
-				for(int i=0; i<components.length; i++)
+				SServiceProvider.getService(rootcomp.getServiceProvider(), IComponentManagementService.class).addResultListener(new DefaultResultListener()
 				{
-					addTest(new ComponentTest(cms, components[i]));
-				}
+					public void resultAvailable(Object source, Object result)
+					{
+						IComponentManagementService cms = (IComponentManagementService)result;
+						for(int i=0; i<components.length; i++)
+						{
+							addTest(new ComponentTest(cms, components[i]));
+						}
+					}
+				});
 			}
 		});
 	}
@@ -89,12 +94,12 @@ public class ComponentTestSuite extends TestSuite
 	{
 		this(path.getName(), new String[0]);
 		
-		platform.getService(IComponentManagementService.class).addResultListener(new DefaultResultListener()
+		SServiceProvider.getServiceUpwards(rootcomp.getServiceProvider(), IComponentManagementService.class).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
 				final IComponentManagementService cms = (IComponentManagementService)result;
-				platform.getService(ILibraryService.class).addResultListener(new DefaultResultListener()
+				SServiceProvider.getService(rootcomp.getServiceProvider(), ILibraryService.class).addResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object source, Object result)
 					{
@@ -133,13 +138,13 @@ public class ComponentTestSuite extends TestSuite
 								else
 								{
 									final String fabspath = abspath;
-									SComponentFactory.isLoadable(platform,  abspath).addResultListener(new DefaultResultListener()
+									SComponentFactory.isLoadable(rootcomp.getServiceProvider(), abspath).addResultListener(new DefaultResultListener()
 									{
 										public void resultAvailable(Object source, Object result)
 										{
 											if(((Boolean)result).booleanValue())
 											{
-												SComponentFactory.loadModel(platform, fabspath).addResultListener(new DefaultResultListener()
+												SComponentFactory.loadModel(rootcomp.getServiceProvider(), fabspath).addResultListener(new DefaultResultListener()
 												{
 													public void resultAvailable(Object source, Object result)
 													{

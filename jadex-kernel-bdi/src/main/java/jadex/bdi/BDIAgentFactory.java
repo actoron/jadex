@@ -5,6 +5,8 @@ import jadex.bdi.model.OAVCapabilityModel;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bridge.IComponentAdapter;
+import jadex.bridge.IComponentAdapterFactory;
+import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentFactory;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IExternalAccess;
@@ -100,20 +102,22 @@ public class BDIAgentFactory implements IComponentFactory, IService
 	 * @param parent The parent component (if any).
 	 * @return An instance of a component.
 	 */
-	public IComponentInstance createComponentInstance(IComponentAdapter adapter, ILoadableComponentModel model, String config, Map arguments, IExternalAccess parent)
+	public Object[] createComponentInstance(IComponentDescription desc, IComponentAdapterFactory factory, ILoadableComponentModel model, String config, Map arguments, IExternalAccess parent)
 	{
 //		init();
 		
 		OAVAgentModel amodel = (OAVAgentModel)model;
 		
 		// Create type model for agent instance (e.g. holding dynamically loaded java classes).
-		OAVTypeModel tmodel	= new OAVTypeModel(adapter.getComponentIdentifier().getLocalName()+"_typemodel", ((OAVAgentModel)model).getTypeModel().getClassLoader());
+		OAVTypeModel tmodel	= new OAVTypeModel(desc.getName().getLocalName()+"_typemodel", ((OAVAgentModel)model).getTypeModel().getClassLoader());
+//		OAVTypeModel tmodel	= new OAVTypeModel(model.getName()+"_typemodel", ((OAVAgentModel)model).getTypeModel().getClassLoader());
 		tmodel.addTypeModel(amodel.getTypeModel());
 		tmodel.addTypeModel(OAVBDIRuntimeModel.bdi_rt_model);
 		IOAVState	state	= OAVStateFactory.createOAVState(tmodel); 
 		state.addSubstate(amodel.getState());
 		
-		return new BDIInterpreter(adapter, state, amodel, config, arguments, parent, props);
+		BDIInterpreter interpreter = new BDIInterpreter(desc, factory, state, amodel, config, arguments, parent, props);
+		return new Object[]{interpreter, interpreter.getAgentAdapter()};
 	}
 	
 	/**

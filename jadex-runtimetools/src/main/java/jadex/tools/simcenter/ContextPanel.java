@@ -1,6 +1,6 @@
 package jadex.tools.simcenter;
 
-import jadex.base.ISimulationService;
+import jadex.base.simulation.ISimulationService;
 import jadex.commons.SGUI;
 import jadex.commons.ThreadSuspendable;
 import jadex.commons.concurrent.SwingDefaultResultListener;

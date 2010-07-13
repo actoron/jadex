@@ -28,6 +28,7 @@ import jadex.service.IServiceContainer;
 import jadex.service.SServiceProvider;
 import jadex.service.execution.IExecutionService;
 import jadex.service.library.ILibraryService;
+import jadex.standalone.ComponentAdapterFactory;
 import jadex.standalone.StandaloneComponentAdapter;
 
 import java.util.ArrayList;
@@ -269,6 +270,8 @@ public class ComponentManagementService implements IComponentManagementService, 
 		return ret;
 	}
 
+	public static final ComponentAdapterFactory caf = new ComponentAdapterFactory();
+	
 	/**
 	 *  Create an instance of a component (step 2 of creation process).
 	 */
@@ -279,16 +282,18 @@ public class ComponentManagementService implements IComponentManagementService, 
 		StandaloneComponentAdapter pad,
 		CMSComponentDescription ad, IExternalAccess parent)
 	{
-		final StandaloneComponentAdapter adapter	= new StandaloneComponentAdapter(ad, parent);
-		adapters.put(cid, adapter);
+//		final StandaloneComponentAdapter adapter = new StandaloneComponentAdapter(ad, parent);
 
 		// Create the component instance.
 		try
 		{
-			adapter.setComponentThread(Thread.currentThread());	// Hack!!! Avoid external access during init.
-			IComponentInstance instance = factory.createComponentInstance(adapter, lmodel, config, args, parent);
-			adapter.setComponentThread(null);
-			adapter.setComponent(instance, lmodel);
+//			adapter.setComponentThread(Thread.currentThread());	// Hack!!! Avoid external access during init.
+			Object[] acom = factory.createComponentInstance(ad, caf, lmodel, config, args, parent);
+//			adapter.setComponentThread(null);
+			IComponentInstance instance = (IComponentInstance)acom[0];
+			StandaloneComponentAdapter adapter = (StandaloneComponentAdapter)acom[1];
+//			adapter.setDescription(ad); // todo: remove this hack somehow
+			adapters.put(cid, adapter);
 			
 	//		System.out.println("added: "+descs.size()+", "+aid);
 			

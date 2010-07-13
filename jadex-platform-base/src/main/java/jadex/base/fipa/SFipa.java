@@ -1,7 +1,7 @@
 package jadex.base.fipa;
 
-import jadex.base.JadexXMLContentCodec;
-import jadex.base.NuggetsXMLContentCodec;
+import jadex.base.contentcodecs.JadexXMLContentCodec;
+import jadex.base.contentcodecs.NuggetsXMLContentCodec;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.MessageType;

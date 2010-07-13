@@ -111,24 +111,26 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	 *  Create a new component adapter.
 	 *  Uses the thread pool for executing the component.
 	 */
-	public StandaloneComponentAdapter(IComponentDescription desc, IExternalAccess parent)
+	public StandaloneComponentAdapter(IComponentDescription desc, ILoadableComponentModel model, IComponentInstance component, IExternalAccess parent)
 	{
-		this.desc	= desc;
-		this.parent	= parent;
+		this.desc = desc;
 		this.cid	= desc.getName();
-		this.ext_entries = Collections.synchronizedList(new ArrayList());
 		this.provider = new CacheServiceContainer(new ComponentServiceContainer(this));
+		this.model = model;
+		this.component = component;
+		this.parent	= parent;
+		this.ext_entries = Collections.synchronizedList(new ArrayList());
 	}
 	
 	/**
 	 *  Set the component.
 	 *  @param component The component to set.
-	 */
+	 * /
 	public void setComponent(IComponentInstance component, ILoadableComponentModel model)
 	{
 		this.component = component;
 		this.model = model;
-	}	
+	}*/
 	
 	//-------- IComponentAdapter methods --------
 

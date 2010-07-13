@@ -1,4 +1,4 @@
-package jadex.base;
+package jadex.base.contentcodecs;
 
 import jadex.bridge.IContentCodec;
 

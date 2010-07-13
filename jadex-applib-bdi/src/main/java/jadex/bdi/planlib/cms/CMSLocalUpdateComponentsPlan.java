@@ -101,7 +101,8 @@ public class CMSLocalUpdateComponentsPlan extends Plan
 	
 	public void aborted()
 	{
-		IComponentManagementService	ces	= (IComponentManagementService)SServiceProvider.getService(getScope().getServiceProvider(), IComponentManagementService.class).get(this);
+		IComponentManagementService	ces	= (IComponentManagementService)SServiceProvider.getServiceUpwards(
+			getScope().getServiceProvider(), IComponentManagementService.class).get(this);
 		ces.removeComponentListener(null, listener);
 	}
 }

@@ -1,4 +1,4 @@
-package jadex.standalone;
+package jadex.base;
 
 import jadex.commons.BrowserLauncher2;
 
@@ -32,7 +32,7 @@ public class PlatformApplet extends Applet
 		
 		try
 		{
-			Platform.main(args);
+			Starter.main(args);
 		}
 		catch(Exception e)
 		{

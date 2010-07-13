@@ -5,7 +5,7 @@ import jadex.bridge.IComponentFactory;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.concurrent.DefaultResultListener;
-import jadex.service.IServiceContainer;
+import jadex.service.IServiceProvider;
 import jadex.service.SServiceProvider;
 import jadex.service.library.ILibraryService;
 
@@ -18,22 +18,20 @@ public class SComponentFactory
 {
 	/**
 	 * Load an component model.
-	 * 
 	 * @param model The model.
 	 * @return The loaded model.
 	 */
-//	public static ILoadableComponentModel loadModel(IServiceContainer container, String model)
-	public static IFuture loadModel(final IServiceContainer container, final String model)
+	public static IFuture loadModel(final IServiceProvider provider, final String model)
 	{
 		final Future ret = new Future();
 		
-		SServiceProvider.getService(container, ILibraryService.class).addResultListener(new DefaultResultListener()
+		SServiceProvider.getService(provider, ILibraryService.class).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
 				final ILibraryService ls = (ILibraryService)result;
 				
-				SServiceProvider.getService(container, new ComponentFactorySelector(model, null, ls.getClassLoader())).addResultListener(new DefaultResultListener()
+				SServiceProvider.getService(provider, new ComponentFactorySelector(model, null, ls.getClassLoader())).addResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object source, Object result)
 					{
@@ -48,21 +46,20 @@ public class SComponentFactory
 
 	/**
 	 * Test if a model can be loaded by the factory.
-	 * 
 	 * @param model The model.
 	 * @return True, if model can be loaded.
 	 */
-	public static IFuture isLoadable(final IServiceContainer container, final String model)
+	public static IFuture isLoadable(final IServiceProvider provider, final String model)
 	{
 		final Future ret = new Future();
 		
-		SServiceProvider.getService(container, ILibraryService.class).addResultListener(new DefaultResultListener()
+		SServiceProvider.getService(provider, ILibraryService.class).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
 				final ILibraryService ls = (ILibraryService)result;
 				
-				SServiceProvider.getService(container, new ComponentFactorySelector(model, null, ls.getClassLoader())).addResultListener(new DefaultResultListener()
+				SServiceProvider.getService(provider, new ComponentFactorySelector(model, null, ls.getClassLoader())).addResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object source, Object result)
 					{
@@ -94,21 +91,20 @@ public class SComponentFactory
 
 	/**
 	 * Test if a model is startable (e.g. a component).
-	 * 
 	 * @param model The model.
 	 * @return True, if startable (and should therefore also be loadable).
 	 */
-	public static IFuture isStartable(final IServiceContainer container, final String model)
+	public static IFuture isStartable(final IServiceProvider provider, final String model)
 	{
 		final Future ret = new Future();
 		
-		SServiceProvider.getService(container, ILibraryService.class).addResultListener(new DefaultResultListener()
+		SServiceProvider.getService(provider, ILibraryService.class).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
 				final ILibraryService ls = (ILibraryService)result;
 				
-				SServiceProvider.getService(container, new ComponentFactorySelector(model, null, ls.getClassLoader())).addResultListener(new DefaultResultListener()
+				SServiceProvider.getService(provider, new ComponentFactorySelector(model, null, ls.getClassLoader())).addResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object source, Object result)
 					{
@@ -154,11 +150,11 @@ public class SComponentFactory
 	/**
 	 * Get a default icon for a file type.
 	 */
-	public static IFuture getFileTypeIcon(IServiceContainer container, final String type)
+	public static IFuture getFileTypeIcon(IServiceProvider provider, final String type)
 	{
 		final Future ret = new Future();
 		
-		SServiceProvider.getService(container, new ComponentFactorySelector(type)).addResultListener(new DefaultResultListener()
+		SServiceProvider.getService(provider, new ComponentFactorySelector(type)).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
@@ -173,11 +169,11 @@ public class SComponentFactory
 	/**
 	 * Get a default icon for a file type.
 	 */
-	public static IFuture getProperties(IServiceContainer container, final String type)
+	public static IFuture getProperties(IServiceProvider provider, final String type)
 	{
 		final Future ret = new Future();
 		
-		SServiceProvider.getService(container, new ComponentFactorySelector(type)).addResultListener(new DefaultResultListener()
+		SServiceProvider.getService(provider, new ComponentFactorySelector(type)).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
@@ -192,17 +188,17 @@ public class SComponentFactory
 	/**
 	 * Get the file type of a model.
 	 */
-	public static IFuture getFileType(final IServiceContainer container, final String model)
+	public static IFuture getFileType(final IServiceProvider provider, final String model)
 	{
 		final Future ret = new Future();
 		
-		SServiceProvider.getService(container, ILibraryService.class).addResultListener(new DefaultResultListener()
+		SServiceProvider.getService(provider, ILibraryService.class).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
 				final ILibraryService ls = (ILibraryService)result;
 				
-				SServiceProvider.getService(container, new ComponentFactorySelector(model, null, ls.getClassLoader())).addResultListener(new DefaultResultListener()
+				SServiceProvider.getService(provider, new ComponentFactorySelector(model, null, ls.getClassLoader())).addResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object source, Object result)
 					{

@@ -15,6 +15,7 @@ import jadex.bridge.ComponentResultListener;
 import jadex.bridge.CreationInfo;
 import jadex.bridge.IArgument;
 import jadex.bridge.IComponentAdapter;
+import jadex.bridge.IComponentAdapterFactory;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentFactory;
 import jadex.bridge.IComponentIdentifier;
@@ -96,14 +97,14 @@ public class Application implements IApplication, IComponentInstance
 	/**
 	 *  Create a new context.
 	 */
-	public Application(ApplicationModel model, MApplicationInstance config, final IComponentAdapter adapter, final IExternalAccess parent, Map arguments)
+	public Application(IComponentDescription desc, ApplicationModel model, MApplicationInstance config, final IComponentAdapterFactory factory, final IExternalAccess parent, Map arguments)
 	{
 		this.config	= config;
-		this.adapter = adapter;
 		this.model = model;
 		this.parent = parent;
 		this.arguments = arguments==null ? new HashMap() : arguments;
 		this.results = new HashMap();
+		this.adapter = factory.createComponentAdapter(desc, model, this, parent);
 		
 		// Init the arguments with default values.
 		String configname = config!=null? config.getName(): null;

@@ -2,7 +2,8 @@ package jadex.bpmn;
 
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.runtime.BpmnInterpreter;
-import jadex.bridge.IComponentAdapter;
+import jadex.bridge.IComponentAdapterFactory;
+import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentFactory;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IExternalAccess;
@@ -51,9 +52,6 @@ public class BpmnFactory implements IComponentFactory, IService
 	/** The properties. */
 	protected Map properties;
 	
-	/** The library service. */
-//	protected ILibraryService libservice;
-	
 	//-------- constructors --------
 	
 	/**
@@ -74,36 +72,7 @@ public class BpmnFactory implements IComponentFactory, IService
 	 */
 	public IFuture	startService()
 	{
-		final Future ret = new Future(null);
-		
-//		container.getService(ILibraryService.class).addResultListener(new IResultListener()
-//		{
-//			public void resultAvailable(Object source, Object result)
-//			{
-//				libservice = (ILibraryService)result;
-//				loader.setClassLoader(libservice.getClassLoader());
-//				ILibraryServiceListener lsl = new ILibraryServiceListener()
-//				{
-//					public void urlAdded(URL url)
-//					{
-//						loader.setClassLoader(libservice.getClassLoader());
-//					}
-//					
-//					public void urlRemoved(URL url)
-//					{
-//						loader.setClassLoader(libservice.getClassLoader());
-//					}
-//				};
-//				libservice.addLibraryServiceListener(lsl);
-//				ret.setResult(null);
-//			}
-//			
-//			public void exceptionOccurred(Object source, Exception exception)
-//			{
-//				ret.setException(exception);
-//			}
-//		});
-		return ret;
+		return new Future(null);
 	}
 	
 	/**
@@ -238,9 +207,10 @@ public class BpmnFactory implements IComponentFactory, IService
 	 * @param parent The parent component (if any).
 	 * @return An instance of a component.
 	 */
-	public IComponentInstance createComponentInstance(IComponentAdapter adapter, ILoadableComponentModel model, String config, Map arguments, IExternalAccess parent)
+	public Object[] createComponentInstance(IComponentDescription desc, IComponentAdapterFactory factory, ILoadableComponentModel model, String config, Map arguments, IExternalAccess parent)
 	{
-		return new BpmnInterpreter(adapter, (MBpmnModel)model, arguments, config, parent, null, null, null);
+		BpmnInterpreter interpreter = new BpmnInterpreter(desc, factory, (MBpmnModel)model, arguments, config, parent, null, null, null);
+		return new Object[]{interpreter, interpreter.getComponentAdapter()};
 	}
 	
 	/**

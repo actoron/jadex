@@ -11,7 +11,8 @@ import jadex.application.model.MSpaceInstance;
 import jadex.application.model.MSpaceType;
 import jadex.application.runtime.impl.Application;
 import jadex.bridge.Argument;
-import jadex.bridge.IComponentAdapter;
+import jadex.bridge.IComponentAdapterFactory;
+import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentFactory;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IExternalAccess;
@@ -76,14 +77,8 @@ public class ApplicationComponentFactory	implements IComponentFactory, IService
 	
 	//-------- attributes --------
 	
-	/** The platform. */
-//	protected IServiceContainer container;
-	
 	/** The xml reader. */
 	protected Reader reader;
-	
-	/** The library service. */
-//	protected ILibraryService libservice;
 	
 	//-------- constructors --------
 	
@@ -92,7 +87,17 @@ public class ApplicationComponentFactory	implements IComponentFactory, IService
 	 *  @param platform	The agent platform.
 	 *  @param mappings	The XML reader mappings of supported spaces (if any).
 	 */
-	public ApplicationComponentFactory(Set[] mappings)// Set[] linkinfos)
+	public ApplicationComponentFactory()
+	{
+		this(null);
+	}
+	
+	/**
+	 *  Create a new application factory.
+	 *  @param platform	The agent platform.
+	 *  @param mappings	The XML reader mappings of supported spaces (if any).
+	 */
+	public ApplicationComponentFactory(Set[] mappings)
 	{
 //		this.container = container;
 		
@@ -189,20 +194,7 @@ public class ApplicationComponentFactory	implements IComponentFactory, IService
 	 */
 	public IFuture	startService()
 	{
-		final Future	ret = new Future(null); 
-//		container.getService(ILibraryService.class).addResultListener(new IResultListener()
-//		{
-//			public void resultAvailable(Object source, Object result)
-//			{
-//				libservice = (ILibraryService)result;
-//				ret.setResult(null);
-//			}
-//			public void exceptionOccurred(Object source, Exception exception)
-//			{
-//				ret.setException(exception);
-//			}
-//		});
-		return ret;
+		return new Future(null);
 	}
 	
 	/**
@@ -225,7 +217,7 @@ public class ApplicationComponentFactory	implements IComponentFactory, IService
 	 * @param parent The parent component (if any).
 	 * @return An instance of a component.
 	 */
-	public IComponentInstance createComponentInstance(IComponentAdapter adapter, ILoadableComponentModel model, String config, Map arguments, IExternalAccess parent)
+	public Object[] createComponentInstance(IComponentDescription desc, IComponentAdapterFactory factory, ILoadableComponentModel model, String config, Map arguments, IExternalAccess parent)
 	{
 		Application	context = null;
 		
@@ -248,13 +240,14 @@ public class ApplicationComponentFactory	implements IComponentFactory, IService
 			app = new MApplicationInstance("default");
 
 		// Create context for application.
-		context	= new Application((ApplicationModel)model, app, adapter, parent, arguments);
+		context	= new Application(desc, (ApplicationModel)model, app, factory, parent, arguments);
 		
 		// todo: result listener?
 		
 		// todo: create application context as return value?!
 				
-		return context;
+//		return context;
+		return new Object[]{context, context.getComponentAdapter()};
 	}
 		
 	/**

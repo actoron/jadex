@@ -4,6 +4,7 @@ import jadex.bridge.ComponentResultListener;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IArgument;
 import jadex.bridge.IComponentAdapter;
+import jadex.bridge.IComponentAdapterFactory;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
@@ -77,15 +78,15 @@ public class MicroAgentInterpreter implements IComponentInstance
 	 *  @param adapter The adapter.
 	 *  @param microagent The microagent.
 	 */
-	public MicroAgentInterpreter(IComponentAdapter adapter, MicroAgentModel model, Map arguments, String config, final IExternalAccess parent)
+	public MicroAgentInterpreter(IComponentDescription desc, IComponentAdapterFactory factory, MicroAgentModel model, Map arguments, String config, final IExternalAccess parent)
 	{
-		this.adapter = adapter;
 		this.model = model;
 		this.config = config;
 		this.arguments = arguments;
 		this.parent = parent;
 		// synchronized because of MicroAgentViewPanel, todo
 		this.steps	= Collections.synchronizedList(new ArrayList());
+		this.adapter = factory.createComponentAdapter(desc, model, this, parent);
 		
 //		this.ext_entries = Collections.synchronizedList(new ArrayList());
 		

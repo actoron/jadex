@@ -20,6 +20,7 @@ import jadex.bridge.ComponentResultListener;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IArgument;
 import jadex.bridge.IComponentAdapter;
+import jadex.bridge.IComponentAdapterFactory;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
@@ -192,10 +193,10 @@ public class BpmnInterpreter implements IComponentInstance
 	 *  Create a new bpmn process.
 	 *  @param adapter The adapter.
 	 */
-	public BpmnInterpreter(IComponentAdapter adapter, MBpmnModel model, Map arguments, 
+	public BpmnInterpreter(IComponentDescription desc, IComponentAdapterFactory factory, MBpmnModel model, Map arguments, 
 		String config, final IExternalAccess parent, Map activityhandlers, Map stephandlers, IValueFetcher fetcher)
 	{
-		this.adapter = adapter;
+		this.adapter = factory.createComponentAdapter(desc, model, this, parent);
 		this.model = model;
 		this.config = config;
 		

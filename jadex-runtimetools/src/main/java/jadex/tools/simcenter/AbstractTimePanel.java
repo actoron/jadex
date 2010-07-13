@@ -1,6 +1,6 @@
 package jadex.tools.simcenter;
 
-import jadex.base.ISimulationService;
+import jadex.base.simulation.ISimulationService;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IChangeListener;
 import jadex.commons.concurrent.DefaultResultListener;

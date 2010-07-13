@@ -3,9 +3,9 @@ package jadex.gpmn;
 import jadex.bdi.BDIAgentFactory;
 import jadex.bdi.model.OAVAgentModel;
 import jadex.bridge.ComponentFactorySelector;
-import jadex.bridge.IComponentAdapter;
+import jadex.bridge.IComponentAdapterFactory;
+import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentFactory;
-import jadex.bridge.IComponentInstance;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.ILoadableComponentModel;
 import jadex.commons.Future;
@@ -63,9 +63,6 @@ public class GpmnFactory implements IComponentFactory, IService
 	/** The properties. */
 	protected Map properties;
 	
-	/** The library service. */
-//	protected ILibraryService libservice;
-	
 	//-------- constructors --------
 	
 	/**
@@ -97,72 +94,7 @@ public class GpmnFactory implements IComponentFactory, IService
 	 */
 	public IFuture	startService()
 	{
-//		// Absolute start time (for testing and benchmarking).
-//		long starttime = System.currentTimeMillis();
-//		
-//		// Initialize platform configuration from args.
-//		String conffile = "jadex/bdibpmn/standalone_bpmn_conf.xml";
-//		// Create an instance of the platform.
-//		// Hack as long as no loader is present.
-//		String[] args = new String[0];
-//		if(args.length>0 && args[0].equals("-"+Platform.CONFIGURATION))
-//		{
-//			conffile = args[1];
-//			String[] tmp= new String[args.length-2];
-//			System.arraycopy(args, 2, tmp, 0, args.length-2);
-//			args = tmp;
-//		}
-//		ClassLoader cl = Platform.class.getClassLoader();
-////		Properties configuration = XMLPropertiesReader.readProperties(SUtil.getResource(conffile, cl), cl);
-//		Properties configuration = null;
-//		try
-//		{
-//			configuration = (Properties)PropertiesXMLHelper.getPropertyReader().read(SUtil.getResource(conffile, cl), cl, null);
-//		} 
-//		catch (Exception e)
-//		{
-//			e.printStackTrace();
-//		}
-//		System.out.println(configuration);
-//		
-//		container = new Platform(configuration, container);
-//		((Platform)container).start();
-//		
-//		long startup = System.currentTimeMillis() - starttime;
-//		((Platform)container).getLogger().info("Platform startup time: " + startup + " ms.");
-		
-		final Future	ret	= new Future(null);
-		
-//		container.getService(ILibraryService.class).addResultListener(new IResultListener()
-//		{
-//			public void resultAvailable(Object source, Object result)
-//			{
-//				libservice = (ILibraryService)result;
-//				loader.setClassLoader(libservice.getClassLoader());
-//				ILibraryServiceListener lsl = new ILibraryServiceListener()
-//				{
-//					public void urlAdded(URL url)
-//					{
-//						loader.setClassLoader(libservice.getClassLoader());
-//					}
-//					
-//					public void urlRemoved(URL url)
-//					{
-//						loader.setClassLoader(libservice.getClassLoader());
-//					}
-//				};
-//				libservice.addLibraryServiceListener(lsl);
-//				
-//				ret.setResult(null);
-//			}
-//			
-//			public void exceptionOccurred(Object source, Exception exception)
-//			{
-//				ret.setException(exception);
-//			}
-//		});
-		
-		return ret;
+		return new Future(null);
 	}
 	
 	/**
@@ -210,33 +142,6 @@ public class GpmnFactory implements IComponentFactory, IService
 		}
 		return ret;
 	}
-	
-	/**
-	 * Starts a Gpmn process
-	 * @param name name of the Gpmn model
-	 * @param stepmode if true, the process will start in step mode
-	 * @return instance name
-	 * /
-	public Object startProcess(String modelname, final Object id, Map arguments, boolean stepmode)
-	{
-		final String name = id.toString();
-		final IComponentManagementService ces = (IComponentManagementService)container.getService(IComponentManagementService.class);
-		ces.createComponent(name, modelname, null, null, new IResultListener()
-		{
-			
-			public void resultAvailable(Object result)
-			{
-				ces.startComponent((IComponentIdentifier)result, null);
-				processes.put(id, result);
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-			}
-		}, null);
-		
-		return id;
-	}*/
 	
 	/**
 	 *  Test if a model can be loaded by the factory.
@@ -295,7 +200,7 @@ public class GpmnFactory implements IComponentFactory, IService
 	 * @param parent The parent component (if any).
 	 * @return An instance of a component.
 	 */
-	public IComponentInstance createComponentInstance(IComponentAdapter adapter, ILoadableComponentModel model, String config, Map arguments, IExternalAccess parent)
+	public Object[] createComponentInstance(IComponentDescription desc, IComponentAdapterFactory factory, ILoadableComponentModel model, String config, Map arguments, IExternalAccess parent)
 	{
 //		ILibraryService libservice = (ILibraryService)container.getService(ILibraryService.class);
 		
@@ -306,7 +211,7 @@ public class GpmnFactory implements IComponentFactory, IService
 		else
 			amodel	= legacyconverter.convertGpmnModelToBDIAgents((jadex.gpmn.model.MGpmnModel)model, model.getClassLoader());
 
-		return factory.createComponentInstance(adapter, amodel, config, arguments, parent);
+		return this.factory.createComponentInstance(desc, factory, amodel, config, arguments, parent);
 		
 //		try
 //		{

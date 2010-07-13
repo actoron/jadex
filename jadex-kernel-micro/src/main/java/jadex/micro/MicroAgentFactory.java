@@ -1,8 +1,8 @@
 package jadex.micro;
 
-import jadex.bridge.IComponentAdapter;
+import jadex.bridge.IComponentAdapterFactory;
+import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentFactory;
-import jadex.bridge.IComponentInstance;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.ILoadableComponentModel;
 import jadex.commons.Future;
@@ -42,9 +42,6 @@ public class MicroAgentFactory implements IComponentFactory, IService
 	
 	/** The properties. */
 	protected Map properties;
-	
-	/** The library service. */
-//	protected ILibraryService libservice;
 	
 	//-------- constructors --------
 	
@@ -182,9 +179,10 @@ public class MicroAgentFactory implements IComponentFactory, IService
 	 * @param parent The parent component (if any).
 	 * @return An instance of a component.
 	 */
-	public IComponentInstance createComponentInstance(IComponentAdapter adapter, ILoadableComponentModel model, String config, Map arguments, IExternalAccess parent)
+	public Object[] createComponentInstance(IComponentDescription desc, IComponentAdapterFactory factory, ILoadableComponentModel model, String config, Map arguments, IExternalAccess parent)
 	{
-		return new MicroAgentInterpreter(adapter, (MicroAgentModel)model, arguments, config, parent);
+		MicroAgentInterpreter interpreter = new MicroAgentInterpreter(desc, factory, (MicroAgentModel)model, arguments, config, parent);
+		return new Object[]{interpreter, interpreter.getAgentAdapter()};
 	}
 	
 	/**

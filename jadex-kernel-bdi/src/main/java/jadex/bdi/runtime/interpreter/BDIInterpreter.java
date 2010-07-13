@@ -17,6 +17,7 @@ import jadex.bdi.runtime.impl.eaflyweights.ExternalAccessFlyweight;
 import jadex.bridge.ComponentResultListener;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentAdapter;
+import jadex.bridge.IComponentAdapterFactory;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
@@ -186,10 +187,10 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 	 *  @param config	The name of the configuration (or null for default configuration) 
 	 *  @param arguments	The arguments for the agent as name/value pairs.
 	 */
-	public BDIInterpreter(IComponentAdapter adapter, final IOAVState state, OAVAgentModel model, 
+	public BDIInterpreter(IComponentDescription desc, IComponentAdapterFactory factory, final IOAVState state, OAVAgentModel model, 
 		String config, Map arguments, final IExternalAccess parent, Map kernelprops)
 	{	
-		this.adapter = adapter;
+		this.adapter = factory.createComponentAdapter(desc, model, this, parent);
 		this.state = state;
 		this.model = model;
 		this.parent	= parent;

@@ -1,4 +1,4 @@
-package jadex.base;
+package jadex.base.simulation;
 
 import jadex.commons.IChangeListener;
 import jadex.commons.concurrent.IThreadPool;

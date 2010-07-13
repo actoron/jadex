@@ -1,4 +1,4 @@
-package jadex.base;
+package jadex.base.simulation;
 
 import jadex.commons.ChangeEvent;
 import jadex.commons.Future;

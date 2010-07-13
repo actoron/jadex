@@ -48,14 +48,6 @@ public class InterpreterTest
 			}
 			
 			// Load agent model.
-			
-//			Properties config = new Properties("", "", "");
-//			Properties kernelprops = new Properties("", "", "");
-//			kernelprops.addProperty(new Property("", "messagetype", "new jadex.base.fipa.FIPAMessageType()"));
-//			kernelprops.addProperty(new Property("standard", "planexecutor", "new jadex.bdi.runtime.JavaStandardPlanExecutor("+ 
-//				"jadex.commons.concurrent.ThreadPoolFactory.getThreadPool(\"test\"))"));
-//			config.addSubproperties(kernelprops);
-			
 			Map config = new HashMap();
 			config.put("messagetype_fipa", new jadex.base.fipa.FIPAMessageType());
 			config.put("planexecutor_standard", new jadex.bdi.runtime.impl.JavaStandardPlanExecutor(

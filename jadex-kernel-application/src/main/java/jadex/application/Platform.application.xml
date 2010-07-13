@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Bootstrap platform properties.
+-->
+<applicationtype xmlns="http://jadex.sourceforge.net/jadex-application"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-application
+						http://jadex.sourceforge.net/jadex-application-2.0.xsd"
+	name="Platform" package="jadex.application.bootstrap">
+	
+	<imports>
+		<import>jadex.commons.*</import>
+		<import>jadex.bridge.*</import>
+		<import>jadex.service.clock.*</import>
+		<import>jadex.service.execution.*</import>
+		<import>jadex.service.library.*</import>
+		<import>jadex.service.threadpool.*</import>
+		<import>jadex.base.fipa.*</import>
+		<import>jadex.base.*</import>
+		<import>jadex.commons.concurrent.*</import>
+		<import>jadex.standalone.service.*</import>
+		<import>jadex.standalone.transport.*</import>
+		<import>jadex.standalone.transport.localmtp.*</import>
+		<import>jadex.standalone.transport.tcpmtp.*</import>
+		<import>jadex.standalone.transport.niotcpmtp.*</import>
+		<import>jadex.application.*</import>
+		<import>java.util.*</import>
+	</imports>
+	
+	<arguments>
+		<argument name="platformname">"lars"</argument>
+		<argument name="autoshutdown">true</argument>
+		<argument name="libpath"></argument>
+		
+		<!-- todo?! -->
+		<!-- <argument name="welcome">true</argument>
+		<argument name="platform_shutdown_time">1000</argument> -->
+	</arguments>
+	
+	<componenttypes>
+		<componenttype filename="jadex/micro/KernelMicro.application.xml" name="kernel_micro"/>
+		<componenttype filename="jadex/bdi/KernelBDI.application.xml" name="kernel_bdi"/>
+		<!--  <componenttype filename="jadex/micro/KernelBPMN.application.xml" name="kernel_bpmn"/>-->
+
+		<componenttype filename="jadex/tools/jcc/JCC.agent.xml" name="jcc"/>
+		<componenttype filename="jadex/bdi/benchmarks/AgentCreation.agent.xml" name="CreationBDI"/>
+		<componenttype filename="jadex/micro/benchmarks/AgentCreationAgent.class" name="CreationMicro"/>
+	</componenttypes>
+	
+	<services>
+		<service name="threadpool_service" class="ThreadPoolService">
+			new ThreadPoolService(new ThreadPool(new DefaultThreadPoolStrategy(0, 20, 30000)))
+		</service>
+		<service name="execution_service" class="IExecutionService">
+			new AsyncExecutionService((IThreadPool)jadex.service.SServiceProvider.getService($platform, ThreadPoolService.class).get(new ThreadSuspendable()))
+		</service>
+		<service name="library_service" class="ILibraryService">
+			new LibraryService($args.libpath)
+		</service>
+		<service name="cms_service" class="IComponentManagementService">
+			new ComponentManagementService($platform, $args.autoshutdown, $component.getComponentAdapter())
+		</service>
+		<service name="df_service" class="IDF">
+			new DirectoryFacilitatorService($platform)
+		</service>
+		<service name="message_service" class="IMessageService">
+			new MessageService($platform,
+				new ITransport[]
+				{
+					new LocalTransport($platform),
+					new TCPTransport($platform, 9876),
+					new NIOTCPTransport($platform, 8765)
+				},
+				new MessageType[]
+				{
+					new FIPAMessageType()
+				})
+		</service>
+		<service name="clock_service" class="IClockService">
+			new ClockService(new SystemClock("system_clock", 100,
+				(IThreadPool)jadex.service.SServiceProvider.getService($platform, ThreadPoolService.class).get(new ThreadSuspendable())))
+		</service>
+		<service name="simulation_service" class="ISimulationService">
+			new SimulationService($platform)
+		</service>
+		<service name="application_factory" class="jadex.bridge.IComponentFactory" >
+			new ApplicationComponentFactory(
+				new Set[]
+				{
+					jadex.application.space.envsupport.MEnvSpaceType.getXMLMapping(),
+					jadex.application.space.agr.MAGRSpaceType.getXMLMapping()
+				}
+			)		
+		</service>
+	</services>
+	
+	<applications>
+		<application name="all_kernels_jcc">
+			<components>
+				<component type="kernel_micro"/>
+				<component type="kernel_bdi"/>
+				<component type="jcc"/>
+			</components>
+		</application>
+		
+		<application name="all_kernels">
+			<components>
+				<component type="kernel_micro"/>
+				<component type="kernel_bdi"/>
+			</components>
+		</application>
+		
+		<application name="creation_test_bdi">
+			<arguments>
+				<argument name="libpath">new Object[]{"../jadex-applications-bdi/target/classes"}</argument>
+			</arguments>
+			<components>
+				<component type="kernel_bdi"/>
+				<component type="CreationBDI"/>
+			</components>
+		</application>
+		
+		<application name="creation_test_micro">
+			<arguments>
+				<argument name="libpath">new Object[]{"../jadex-applications-micro/target/classes"}</argument>
+			</arguments>
+			<components>
+				<component type="kernel_micro"/>
+				<component type="CreationMicro"/>
+			</components>
+		</application>
+	</applications>
+	
+</applicationtype>
