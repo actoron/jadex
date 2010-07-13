@@ -54,6 +54,9 @@ import jadex.bpmn.model.MSequenceEdge;
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ProcessThread;
 import jadex.bpmn.runtime.handler.AbstractEventIntermediateTimerActivityHandler;
+import jadex.bridge.IComponentAdapter;
+import jadex.bridge.IComponentAdapterFactory;
+import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
@@ -126,7 +129,8 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 	 */
 	public BpmnPlanBodyInstance(MBpmnModel model, final BDIInterpreter interpreter, final Object rcapa, final Object rplan)
 	{
-		super(interpreter.getAgentAdapter(), model, null, null, null, PLAN_ACTIVITY_HANDLERS, null, new OAVBDIFetcher(interpreter.getState(), rcapa, rplan));
+		super(interpreter.getAgentAdapter(), model, null, null, null, PLAN_ACTIVITY_HANDLERS, 
+			null, new OAVBDIFetcher(interpreter.getState(), rcapa, rplan));
 		this.interpreter	= interpreter;
 		this.state = interpreter.getState();
 		this.rcapa = rcapa;

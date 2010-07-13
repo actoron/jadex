@@ -189,6 +189,100 @@ public class BpmnInterpreter implements IComponentInstance
 	
 	//-------- constructors --------
 	
+	// todo: 
+	/**
+	 *  Create a new bpmn process.
+	 *  @param adapter The adapter.
+	 */
+	public BpmnInterpreter(IComponentAdapter adapter, MBpmnModel model, Map arguments, 
+		String config, final IExternalAccess parent, Map activityhandlers, Map stephandlers, IValueFetcher fetcher)
+	{
+		this.adapter = adapter;
+		this.model = model;
+		this.config = config;
+		
+		// Extract pool/lane from config.
+		if(config==null || "All".equals(config))
+		{
+			this.pool	= null;
+			this.lane	= null;
+		}
+		else
+		{
+			int idx	= config.indexOf('.');
+			if(idx==-1)
+			{
+				this.pool	= config;
+				this.lane	= null;
+			}
+			else
+			{
+				this.pool	= config.substring(0, idx);
+				this.lane	= config.substring(idx+1);
+			}
+		}
+		
+		this.parent	= parent;
+//		this.ext_entries = Collections.synchronizedList(new ArrayList());
+		this.activityhandlers = activityhandlers!=null? activityhandlers: DEFAULT_ACTIVITY_HANDLERS;
+		this.stephandlers = stephandlers!=null? stephandlers: DEFAULT_STEP_HANDLERS;
+		this.fetcher = fetcher!=null? fetcher: new BpmnInstanceFetcher(this, fetcher);
+		this.context = new ThreadContext(model);
+		this.messages = new ArrayList();
+		this.variables	= new HashMap();
+		
+		// Init the arguments with default values.
+		IArgument[] args = model.getArguments();
+		for(int i=0; i<args.length; i++)
+		{
+			if(arguments!=null && arguments.containsKey(args[i].getName()))
+			{
+				this.variables.put(args[i].getName(), arguments.get(args[i].getName()));
+			}
+			else if(args[i].getDefaultValue(config)!=null)
+			{
+				this.variables.put(args[i].getName(), args[i].getDefaultValue(config));
+			}
+		}
+		
+		// Initialize context variables.
+		variables.put("$platform", getServiceProvider());
+//		variables.put("$clock", getServiceProvider().getService(IClockService.class));
+		variables.put("$interpreter", this);
+		
+		Set	vars	= model.getContextVariables();
+		for(Iterator it=vars.iterator(); it.hasNext(); )
+		{
+			String	name	= (String)it.next();
+			if(!variables.containsKey(name))	// Don't overwrite arguments.
+			{
+				Object	value	= null;
+				IParsedExpression	exp	= model.getContextVariableExpression(name);
+				if(exp!=null)
+				{
+					try
+					{
+						value	= exp.getValue(this.fetcher);
+					}
+					catch(RuntimeException e)
+					{
+						throw new RuntimeException("Error parsing context variable: "+this+", "+name+", "+exp, e);
+					}
+				}
+				variables.put(name, value);
+			}
+		}
+				
+		// todo: load services and start provider!
+		
+		// Create initial thread(s). 
+		List	startevents	= model.getStartActivities();
+		for(int i=0; startevents!=null && i<startevents.size(); i++)
+		{
+			context.addThread(new ProcessThread((MActivity)startevents.get(i), context, this));
+		}
+	}	
+		
 	/**
 	 *  Create a new bpmn process.
 	 *  @param adapter The adapter.

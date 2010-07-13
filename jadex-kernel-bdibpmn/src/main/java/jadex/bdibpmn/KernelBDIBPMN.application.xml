@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  BDIBPMN kernel application.
+-->
+<applicationtype xmlns="http://jadex.sourceforge.net/jadex-application"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-application
+						http://jadex.sourceforge.net/jadex-application-2.0.xsd"
+	name="kernel_bdibpmn" package="jadex.bdibpmn">
+	
+	<imports>
+		<import>jadex.commons.*</import>
+		<import>jadex.commons.concurrent.*</import>
+		<import>jadex.bridge.*</import>
+		<import>jadex.base.fipa.*</import>
+		<import>jadex.service.*</import>
+		<import>jadex.service.threadpool.*</import>
+		<import>jadex.bdi.runtime.impl.*</import>
+		<import>jadex.bdi.*</import>
+		<import>jadex.service.*</import>
+	</imports>
+	
+	<services>
+		<service name="bdibpmn_factory" class="jadex.bridge.IComponentFactory">
+			new BDIAgentFactory(
+				SUtil.createHashMap(
+				new String[]
+				{
+					"messagetype_fipa", 
+					"planexecutor_standard", 
+					"standard.timeout", 
+					"microplansteps",
+					"planexecutor_bpmn",
+					"debugger.panels"
+				},
+				new Object[]
+				{
+					new FIPAMessageType(), 
+					new JavaStandardPlanExecutor((IThreadPool)SServiceProvider.getService($platform, ThreadPoolService.class).get(new ThreadSuspendable())),
+					new Long(10000),
+					Boolean.TRUE,
+					new BpmnPlanExecutor($platform),
+					"jadex.tools.debugger.bdi.BDIAgentInspectorDebuggerPanel, jadex.tools.debugger.bdi.BDIAgentRuleEngineDebuggerPanel"
+				}
+			), $platform)
+		</service>
+	</services>
+</applicationtype>
