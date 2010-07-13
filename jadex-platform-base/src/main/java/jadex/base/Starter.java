@@ -26,7 +26,7 @@ public class Starter
 	//-------- constants --------
 
 	/** The fallback platform configuration. */
-	public static final String FALLBACK_PLATFORM_CONFIGURATION = "jadex/application/Platform.application.xml";
+	public static final String FALLBACK_PLATFORM_CONFIGURATION = "jadex/standalone/Platform.application.xml";
 
 	/** The component factory to be used for platform component. */
 	public static final String FALLBACK_COMPONENT_FACTORY = "jadex.application.ApplicationComponentFactory";

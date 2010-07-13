@@ -60,6 +60,7 @@ public class ComponentTestSuite extends TestSuite
 		{
 			public void resultAvailable(Object source, Object result)
 			{
+				rootcomp	= (IExternalAccess)result;
 				SServiceProvider.getService(rootcomp.getServiceProvider(), IComponentManagementService.class).addResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object source, Object result)

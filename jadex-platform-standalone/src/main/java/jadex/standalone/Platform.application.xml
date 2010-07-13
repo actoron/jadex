@@ -6,7 +6,7 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-application
 						http://jadex.sourceforge.net/jadex-application-2.0.xsd"
-	name="Platform" package="jadex.application.bootstrap">
+	name="Platform" package="jadex.standalone">
 	
 	<imports>
 		<import>jadex.commons.*</import>

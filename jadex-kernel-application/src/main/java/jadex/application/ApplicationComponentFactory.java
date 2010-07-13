@@ -14,7 +14,6 @@ import jadex.bridge.Argument;
 import jadex.bridge.IComponentAdapterFactory;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentFactory;
-import jadex.bridge.IComponentInstance;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.ILoadableComponentModel;
 import jadex.commons.Future;
@@ -107,7 +106,9 @@ public class ApplicationComponentFactory	implements IComponentFactory, IService
 		{
 			public Object convertString(String val, IContext context)
 			{
-				return SJavaParser.evaluateExpression((String)val, ((MApplicationType)context.getRootObject()).getAllImports(), null);
+				String[]	imports	= ((MApplicationType)context.getRootObject()).getAllImports();
+				MArgument	arg	= (MArgument)context.getCurrentObject();
+				return SJavaParser.evaluateExpression((String)val, imports, null);
 			}
 		};
 		

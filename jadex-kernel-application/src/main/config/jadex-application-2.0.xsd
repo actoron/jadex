@@ -87,15 +87,15 @@
 						</xs:element>
 					</xs:sequence>
 				</xs:complexType>
-			</xs:element>
-			<xs:element name="services">
+			</xs:element>
+            <xs:element name="services" minOccurs="0" maxOccurs="1">
 				<xs:complexType>
 					<xs:sequence>
-						<xs:element name="service" type="expressiontype" minOccurs="0" maxOccurs="unbounded"/>
+						<xs:element name="service" type="expressiontype" minOccurs="0" maxOccurs="unbounded" />
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
-		</xs:sequence>
+        </xs:sequence>
 		<xs:attribute name="name" type="xs:string" use="required">
 			<xs:annotation>
 				<xs:documentation>The name of the application type is used as a default name for creating application instances and should correspond to the file name (without application.xml).</xs:documentation>
