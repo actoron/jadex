@@ -118,4 +118,13 @@ public class ComponentFactorySelector implements IResultSelector
 		return type!=null ? new Tuple(new Object[]{getClass(), type})
 			: new Tuple(new Object[]{getClass(), model, imports!=null ? (Object)new Tuple(imports) : "null", classloader!=null ? (Object)classloader : "null"});
 	}
+
+	/**
+	 *  Get the string representation.
+	 */
+	public String toString()
+	{
+		return "ComponentFactorySelector [type=" + type + ", model=" + model
+			+ ", imports="+ (imports != null ? Arrays.asList(imports) : null) + "]";
+	}
 }

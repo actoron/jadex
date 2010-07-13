@@ -92,7 +92,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 	/** The message service (cached to avoid using futures). */
 	protected IMessageService	msgservice;
 	
-	
+	/** The root component. */
 	protected IComponentAdapter root;
 	
     //-------- constructors --------
@@ -229,6 +229,8 @@ public class ComponentManagementService implements IComponentManagementService, 
 //								if(getParent(cinfo)!=null)
 								{
 		//							children.put(parent, cid);
+									if(padesc==null)
+										System.out.println("shit");
 									padesc.addChild(cid);
 								}
 							}		
@@ -338,6 +340,9 @@ public class ComponentManagementService implements IComponentManagementService, 
 	 */
 	public IFuture destroyComponent(final IComponentIdentifier cid)
 	{
+//		if(cid.getName().indexOf("lars")!=-1)
+//			Thread.dumpStack();
+		
 		final Future ret = new Future();
 		
 		synchronized(adapters)
@@ -901,7 +906,9 @@ public class ComponentManagementService implements IComponentManagementService, 
 	public IComponentIdentifier getParent(CreationInfo ci)
 	{
 		IComponentIdentifier rt = root.getComponentIdentifier();
-		return ci==null? rt: ci.getParent()==null? rt: ci.getParent(); 
+		IComponentIdentifier ret = ci==null? rt: ci.getParent()==null? rt: ci.getParent(); 
+//		System.out.println("parent id: "+ret);
+		return ret;
 	}
 	
 	/**
@@ -923,8 +930,9 @@ public class ComponentManagementService implements IComponentManagementService, 
 	public IComponentIdentifier[] getChildren(IComponentIdentifier cid)
 	{
 		CMSComponentDescription desc = (CMSComponentDescription)descs.get(cid);
-		return desc!=null? desc.getChildren(): null;
+		return desc!=null? desc.getChildren(): EMPTY_COMPONENTIDENTIFIERS;
 	}
+	public static final IComponentIdentifier[] EMPTY_COMPONENTIDENTIFIERS = new IComponentIdentifier[0]; 
 
 	/**
 	 *  Create component identifier.

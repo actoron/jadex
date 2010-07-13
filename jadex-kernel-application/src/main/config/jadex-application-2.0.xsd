@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- edited with XMLSPY v2004 rel. 3 U (http://www.xmlspy.com) by Lars (RTL) -->
-<xs:schema targetNamespace="http://jadex.sourceforge.net/jadex-application" xmlns="http://jadex.sourceforge.net/jadex-application" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified" version="2.0">
+<xs:schema targetNamespace="http://jadex.sourceforge.net/jadex-application" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://jadex.sourceforge.net/jadex-application" elementFormDefault="qualified" attributeFormDefault="unqualified" version="2.0">
 	<xs:element name="applicationtype">
 		<xs:annotation>
 			<xs:documentation>An application type specifies the structure and content of a agent application.</xs:documentation>
@@ -26,8 +26,7 @@
 				</xs:annotation>
 				<xs:complexType>
 					<xs:sequence>
-						<xs:element name="import" type="import"
-							minOccurs="0" maxOccurs="unbounded">
+						<xs:element name="import" type="import" minOccurs="0" maxOccurs="unbounded">
 							<xs:annotation>
 								<xs:documentation>
 									An import allows to add a package
@@ -49,8 +48,7 @@
 				</xs:annotation>
 				<xs:complexType>
 					<xs:sequence>
-						<xs:element name="argument" type="argumenttype"
-							minOccurs="0" maxOccurs="unbounded">
+						<xs:element name="argument" type="argumenttype" minOccurs="0" maxOccurs="unbounded">
 							<xs:annotation>
 								<xs:documentation>
 									An argument represents an
@@ -58,8 +56,7 @@
 								</xs:documentation>
 							</xs:annotation>
 						</xs:element>
-						<xs:element name="result" type="argumenttype"
-							minOccurs="0" maxOccurs="unbounded">
+						<xs:element name="result" type="argumenttype" minOccurs="0" maxOccurs="unbounded">
 							<xs:annotation>
 								<xs:documentation>
 									An argument represents an
@@ -82,7 +79,7 @@
 				</xs:annotation>
 				<xs:complexType>
 					<xs:sequence>
-						<xs:any minOccurs="0" maxOccurs="unbounded" />
+						<xs:any minOccurs="0" maxOccurs="unbounded"/>
 						<!-- <xs:element name="spacetype" type="spacetype" minOccurs="0" maxOccurs="unbounded"/> -->
 					</xs:sequence>
 				</xs:complexType>
@@ -95,8 +92,7 @@
 				</xs:annotation>
 				<xs:complexType>
 					<xs:sequence>
-						<xs:element name="componenttype"
-							type="componenttype" minOccurs="0" maxOccurs="unbounded">
+						<xs:element name="componenttype" type="componenttype" minOccurs="0" maxOccurs="unbounded">
 							<xs:annotation>
 								<xs:documentation>
 									A component type is defined by a
@@ -108,20 +104,27 @@
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
-			<xs:element name="services" minOccurs="0" maxOccurs="1">
+			<xs:element name="services" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Service declarations of the application type.</xs:documentation>
+				</xs:annotation>
 				<xs:complexType>
 					<xs:sequence>
-						<xs:element name="service" type="expressiontype"
-							minOccurs="0" maxOccurs="unbounded" />
+						<xs:element name="service" type="expressiontype" minOccurs="0" maxOccurs="unbounded"/>
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
-            <xs:element name="properties" minOccurs="0" maxOccurs="1">            	<xs:complexType>            		<xs:sequence>            			<xs:element name="property"
-            				type="expressiontype" minOccurs="0" maxOccurs="unbounded">
-            			</xs:element>
-            		</xs:sequence>
-            	</xs:complexType></xs:element>
-            <xs:element name="applications" minOccurs="0">
+			<xs:element name="properties" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Properties for specifiying settings of the application type.</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="property" type="expressiontype" minOccurs="0" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="applications" minOccurs="0">
 				<xs:annotation>
 					<xs:documentation>
 						In the applications section, predefined
@@ -131,8 +134,7 @@
 				</xs:annotation>
 				<xs:complexType>
 					<xs:sequence>
-						<xs:element name="application"
-							type="application" minOccurs="0" maxOccurs="unbounded">
+						<xs:element name="application" type="application" minOccurs="0" maxOccurs="unbounded">
 							<xs:annotation>
 								<xs:documentation>
 									A predefined application
@@ -142,7 +144,7 @@
 						</xs:element>
 					</xs:sequence>
 				</xs:complexType>
-			</xs:element>
+			</xs:element>
 		</xs:sequence>
 		<xs:attribute name="name" type="xs:string" use="required">
 			<xs:annotation>
@@ -297,5 +299,4 @@
 		<xs:attribute name="class" type="xs:string"/>
 		<xs:attribute name="language" type="xs:string"/>
 	</xs:complexType>
-
 </xs:schema>

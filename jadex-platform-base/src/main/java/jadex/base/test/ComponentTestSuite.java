@@ -38,24 +38,6 @@ public class ComponentTestSuite extends TestSuite
 	{
 		super(name);
 	
-		// Hack!!! Make configurations configurable.
-//		String[]	confs	= new String[]
-//		{
-//			"jadex/standalone/services_testconf.xml",
-////		   	Platform.FALLBACK_STANDARDCOMPONENTS_CONFIGURATION,
-//			Platform.FALLBACK_APPLICATION_CONFIGURATION,
-//			Platform.FALLBACK_BDI_CONFIGURATION,
-//		   	Platform.FALLBACK_BPMN_CONFIGURATION,
-//		   	Platform.FALLBACK_MICRO_CONFIGURATION,
-//		   	Platform.FALLBACK_BDIBPMN_CONFIGURATION			
-//		};
-
-		// hack!!! use reflection to avoid compile dependency
-//		Class	pfclass	= SReflect.findClass("jadex.standalone.Platform", null, this.getClass().getClassLoader());
-//		Constructor	pfcon	= pfclass.getConstructor(new Class[]{confs.getClass(), ClassLoader.class});
-//		platform	= (IServiceContainer)pfcon.newInstance(new Object[]{confs, this.getClass().getClassLoader()});
-//		platform.start();
-		
 		Starter.createPlatform(new String[]{"-configname", "all_kernels"}).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)

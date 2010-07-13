@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  BPMN kernel application.
+-->
+<applicationtype xmlns="http://jadex.sourceforge.net/jadex-application"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-application
+						http://jadex.sourceforge.net/jadex-application-2.0.xsd"
+	name="kernel_bpmn" package="jadex.bpmn">
+	
+	<imports>
+		<import>jadex.commons.*</import>
+	</imports>
+	
+	<services>
+		<service name="bpmn_factory" class="jadex.bridge.IComponentFactory">
+			new BpmnFactory($platform, SUtil.createHashMap(
+				new String[]
+				{
+					"debugger.panels"
+				},
+				new Object[]
+				{
+					"jadex.tools.debugger.bpmn.BpmnDebuggerPanel, jadex.tools.debugger.common.ObjectInspectorDebuggerPanel"
+				})
+			)
+		</service>
+	</services>
+</applicationtype>

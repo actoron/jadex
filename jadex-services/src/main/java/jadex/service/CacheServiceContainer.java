@@ -43,6 +43,9 @@ public class CacheServiceContainer	implements IServiceContainer
 	{
 		final Future ret = new Future();
 		
+//		if(selector.getClass().getName().indexOf("ComponentFactory")!=-1)
+//			System.out.println("search:"+selector+" "+manager.getCacheKey()+" "+decider.getCacheKey());
+		
 		final Tuple key = manager.getCacheKey()!=null && decider.getCacheKey()!=null && selector.getCacheKey()!=null
 			? new Tuple(manager.getCacheKey(), decider.getCacheKey(), selector.getCacheKey()) : null;
 		

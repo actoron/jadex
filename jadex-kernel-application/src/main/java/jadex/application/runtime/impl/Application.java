@@ -373,6 +373,11 @@ public class Application implements IApplication, IComponentInstance
 	{
 		// Checks if loaded model is defined in the application component types
 		
+//		System.out.println("comp created: "+desc.getName()+" "+Application.this.getComponentIdentifier()+" "+children);
+
+		if(!desc.isDaemon())
+			children++;
+		
 		SServiceProvider.getService(getServiceProvider(), new ComponentFactorySelector(desc.getType())).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
@@ -424,9 +429,6 @@ public class Application implements IApplication, IComponentInstance
 							aspaces[i].componentAdded(comp, type);
 						}
 					}
-					
-					if(!desc.isDaemon())
-						children++;
 				}
 				else if(parent!=null)
 				{
@@ -447,6 +449,8 @@ public class Application implements IApplication, IComponentInstance
 	 */
 	public void	componentDestroyed(IComponentDescription desc)
 	{
+//		System.out.println("comp removed: "+desc.getName()+" "+Application.this.getComponentIdentifier()+" "+children);
+		
 		IComponentIdentifier comp = desc.getName();
 		ISpace[]	aspaces	= null;
 		synchronized(this)
@@ -478,7 +482,7 @@ public class Application implements IApplication, IComponentInstance
 		
 		if(!desc.isDaemon())
 			children--;
-		
+				
 		if(children==0 && model.getApplicationType().isAutoShutdown())
 			killApplication();
 	}
