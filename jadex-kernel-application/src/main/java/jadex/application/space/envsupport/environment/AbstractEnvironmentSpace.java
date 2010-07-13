@@ -25,6 +25,7 @@ import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentManagementService;
 import jadex.commons.IFuture;
 import jadex.commons.IPropertyObject;
+import jadex.commons.ThreadSuspendable;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
@@ -32,6 +33,7 @@ import jadex.commons.meta.IPropertyMetaDataSet;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.IValueFetcher;
 import jadex.javaparser.SimpleValueFetcher;
+import jadex.service.SServiceProvider;
 import jadex.service.library.ILibraryService;
 
 import java.util.ArrayList;
@@ -386,7 +388,8 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 				if(owner==null)
 					throw new RuntimeException("Attribute 'owner' required for avatar: "+mobj);
 				IComponentIdentifier	ownerid	= null;
-				IComponentManagementService ces = ((IComponentManagementService)context.getServiceProvider().getService(IComponentManagementService.class));
+				IComponentManagementService ces = ((IComponentManagementService)SServiceProvider.getServiceUpwards
+					(context.getServiceProvider(), IComponentManagementService.class).get(new ThreadSuspendable()));
 				if(owner.indexOf("@")!=-1)
 					ownerid	= ces.createComponentIdentifier((String)owner, false);
 				else
@@ -552,14 +555,14 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 					}
 				}
 				
-				context.getServiceProvider().getService(ILibraryService.class).addResultListener(new DefaultResultListener()
+				SServiceProvider.getService(context.getServiceProvider(), ILibraryService.class).addResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object source, Object result)
 					{
 						final ObserverCenter oc = new ObserverCenter(title, AbstractEnvironmentSpace.this, (ILibraryService)result, plugins,
 								killonexit!=null ? killonexit.booleanValue() : true);
 										
-						context.getServiceProvider().getService(IComponentManagementService.class).addResultListener(new DefaultResultListener()
+						SServiceProvider.getServiceUpwards(context.getServiceProvider(), IComponentManagementService.class).addResultListener(new DefaultResultListener()
 						{
 							public void resultAvailable(Object source, Object result)
 							{
@@ -877,7 +880,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 	 * @param listeners initial listeners (may be null)
 	 * @return the object's ID
 	 */
-	public ISpaceObject createSpaceObject(String typename, Map properties, List tasks)
+	public ISpaceObject createSpaceObject(final String typename, Map properties, List tasks)
 	{
 		if(!objecttypes.containsKey(typename))
 			throw new RuntimeException("Unknown space object type: "+typename);
@@ -970,7 +973,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 					
 					// todo: what about arguments etc.?
 					final Object fid = id;
-					IResultListener lis = new IResultListener()
+					final IResultListener lis = new IResultListener()
 					{
 						public void resultAvailable(Object source, Object result)
 						{
@@ -981,12 +984,19 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 						{
 						}
 					};
-					IComponentManagementService cms = (IComponentManagementService)getContext().getServiceProvider().getService(IComponentManagementService.class);
-					IComponentIdentifier cid = cms.generateComponentIdentifier(typename);
-					setOwner(fid, cid);
-					IFuture fut = cms.createComponent(cid.getLocalName(), getContext().getComponentFilename(componenttype),
-						new CreationInfo(null, null, getContext().getComponentIdentifier(), false, false, false, getContext().getAllImports()), null);
-					fut.addResultListener(lis);
+					final String compotype = componenttype;
+					SServiceProvider.getServiceUpwards(context.getServiceProvider(), IComponentManagementService.class).addResultListener(new DefaultResultListener()
+					{
+						public void resultAvailable(Object source, Object result)
+						{
+							IComponentManagementService cms = (IComponentManagementService)result;
+							IComponentIdentifier cid = cms.generateComponentIdentifier(typename);
+							setOwner(fid, cid);
+							IFuture fut = cms.createComponent(cid.getLocalName(), getContext().getComponentFilename(compotype),
+								new CreationInfo(null, null, getContext().getComponentIdentifier(), false, false, false, getContext().getAllImports()), null);
+							fut.addResultListener(lis);
+						}
+					});
 				}
 			}
 		}
@@ -1084,15 +1094,21 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 			String	objecttype	= obj.getType();
 			
 			// Possibly kill component.
-			IComponentIdentifier component = (IComponentIdentifier)obj.getProperty(ISpaceObject.PROPERTY_OWNER);
+			final IComponentIdentifier component = (IComponentIdentifier)obj.getProperty(ISpaceObject.PROPERTY_OWNER);
 			if(component!=null)
 			{
 				String	componenttype = getContext().getComponentType(component);
 				AvatarMapping mapping = getAvatarMapping(componenttype, objecttype);
 				if(mapping.isKillComponent())
 				{
-					IComponentManagementService ces = (IComponentManagementService)getContext().getServiceProvider().getService(IComponentManagementService.class);
-					ces.destroyComponent(component);
+					SServiceProvider.getServiceUpwards(getContext().getServiceProvider(), IComponentManagementService.class)
+						.addResultListener(new DefaultResultListener()
+					{
+						public void resultAvailable(Object source, Object result)
+						{
+							((IComponentManagementService)result).destroyComponent(component);
+						}
+					});
 				}
 			}
 			

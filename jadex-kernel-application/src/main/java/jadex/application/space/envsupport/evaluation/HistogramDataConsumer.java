@@ -2,6 +2,8 @@ package jadex.application.space.envsupport.evaluation;
 
 import jadex.application.runtime.IApplication;
 import jadex.commons.ResourceInfo;
+import jadex.commons.ThreadSuspendable;
+import jadex.service.SServiceProvider;
 import jadex.service.library.ILibraryService;
 
 import java.awt.Image;
@@ -102,7 +104,9 @@ public class HistogramDataConsumer extends AbstractChartDataConsumer
 			try
 			{
 				IApplication app = getSpace().getContext();
-				ClassLoader cl = ((ILibraryService)app.getServiceProvider().getService(ILibraryService.class)).getClassLoader();
+				// todo: hack remove ThreadSuspendable
+				ClassLoader cl = ((ILibraryService)SServiceProvider.getService(
+					app.getServiceProvider(), ILibraryService.class).get(new ThreadSuspendable())).getClassLoader();
 				ResourceInfo rinfo = getResourceInfo(bgimagefn, app.getApplicationType().getAllImports(), cl);
 				Image image = ImageIO.read(rinfo.getInputStream());
 				rinfo.getInputStream().close();

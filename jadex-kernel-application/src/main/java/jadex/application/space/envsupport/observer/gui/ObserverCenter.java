@@ -10,6 +10,8 @@ import jadex.application.space.envsupport.observer.gui.plugin.VisualsPlugin;
 import jadex.application.space.envsupport.observer.perspective.IPerspective;
 import jadex.bridge.IComponentManagementService;
 import jadex.commons.IChangeListener;
+import jadex.commons.concurrent.SwingDefaultResultListener;
+import jadex.service.SServiceProvider;
 import jadex.service.clock.IClockService;
 import jadex.service.library.ILibraryService;
 
@@ -638,22 +640,43 @@ public class ObserverCenter
 		{
 			if(delay==-1)
 			{
-				vptimer.stop();
-				IClockService	clock	= (IClockService)space.getContext().getServiceProvider().getService(IClockService.class);
-				clock.addChangeListener(clocklistener);
+				SServiceProvider.getService(space.getContext().getServiceProvider(), IClockService.class)
+					.addResultListener(new SwingDefaultResultListener()
+				{
+					public void customResultAvailable(Object source, Object result)
+					{
+						vptimer.stop();
+						IClockService	clock	= (IClockService)result;
+						clock.addChangeListener(clocklistener);
+					}
+				});
 			}
 			else if(delay==0)
 			{
-				vptimer.stop();
-				IClockService	clock	= (IClockService)space.getContext().getServiceProvider().getService(IClockService.class);
-				clock.removeChangeListener(clocklistener);
+				SServiceProvider.getService(space.getContext().getServiceProvider(), IClockService.class)
+					.addResultListener(new SwingDefaultResultListener()
+				{
+					public void customResultAvailable(Object source, Object result)
+					{
+						vptimer.stop();
+						IClockService	clock	= (IClockService)result;
+						clock.removeChangeListener(clocklistener);
+					}
+				});
 			}
 			else
 			{
-				IClockService	clock	= (IClockService)space.getContext().getServiceProvider().getService(IClockService.class);
-				clock.removeChangeListener(clocklistener);
-				vptimer.setDelay(delay);
-				vptimer.start();
+				SServiceProvider.getService(space.getContext().getServiceProvider(), IClockService.class)
+					.addResultListener(new SwingDefaultResultListener()
+				{
+					public void customResultAvailable(Object source, Object result)
+					{
+						IClockService	clock	= (IClockService)result;
+						clock.removeChangeListener(clocklistener);
+						vptimer.setDelay(delay);
+						vptimer.start();
+					}
+				});
 			}
 		}
 	}
@@ -673,9 +696,15 @@ public class ObserverCenter
 			dispose();
 			if(killonexit)
 			{
-				IComponentManagementService	ces	= (IComponentManagementService)space.getContext()
-					.getServiceProvider().getService(IComponentManagementService.class);
-				ces.destroyComponent(space.getContext().getComponentIdentifier());
+				SServiceProvider.getServiceUpwards(space.getContext().getServiceProvider(), IComponentManagementService.class)
+					.addResultListener(new SwingDefaultResultListener()
+				{
+					public void customResultAvailable(Object source, Object result)
+					{
+						IComponentManagementService	cms = (IComponentManagementService)result;
+						cms.destroyComponent(space.getContext().getComponentIdentifier());
+					}
+				});
 			}
 		}
 		
