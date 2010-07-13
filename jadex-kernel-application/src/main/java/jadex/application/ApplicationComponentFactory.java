@@ -108,16 +108,24 @@ public class ApplicationComponentFactory	implements IComponentFactory, IService
 			{
 				String[]	imports	= ((MApplicationType)context.getRootObject()).getAllImports();
 				Argument	arg	= (Argument)context.getCurrentObject();
-				Class	clazz	= SReflect.findClass0(arg.getTypename(), imports, context.getClassLoader());
+				Class clazz;
+				try
+				{
+					clazz = arg.getTypename()!=null ? SReflect.findClass(arg.getTypename(), imports, context.getClassLoader()) : null;
+				}
+				catch(ClassNotFoundException e)
+				{
+					throw new RuntimeException(e);
+				}
 				Object	ret;
 				if(clazz!=null && SReflect.isSupertype(IFuture.class, clazz))
 				{
-					ret	= null;
-//					ret	= SJavaParser.
+					ret	= SJavaParser.parseExpression((String)val, imports, context.getClassLoader());
+					System.out.println("Future argument: "+arg+", "+ret);
 				}
 				else
 				{
-					ret	= SJavaParser.evaluateExpression((String)val, imports, null);
+					ret	= SJavaParser.evaluateExpression((String)val, imports, null, context.getClassLoader());
 				}
 				return ret;
 			}
@@ -152,7 +160,7 @@ public class ApplicationComponentFactory	implements IComponentFactory, IService
 					if(arg==null)
 						throw new RuntimeException("Overridden argument not declared in application type: "+overridenarg.getName());
 					
-					Object val = SJavaParser.evaluateExpression(overridenarg.getValue(), ((MApplicationType)context.getRootObject()).getAllImports(), null);
+					Object val = SJavaParser.evaluateExpression(overridenarg.getValue(), ((MApplicationType)context.getRootObject()).getAllImports(), null, context.getClassLoader());
 					arg.setDefaultValue(app.getName(), val);
 				}
 				

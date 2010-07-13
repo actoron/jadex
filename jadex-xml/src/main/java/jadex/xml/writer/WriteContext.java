@@ -2,6 +2,7 @@ package jadex.xml.writer;
 
 import jadex.commons.collection.MultiCollection;
 import jadex.xml.IContext;
+import jadex.xml.StackElement;
 
 import java.util.ArrayList;
 import java.util.IdentityHashMap;
@@ -107,7 +108,7 @@ public class WriteContext implements IContext
 	 */
 	public Object getCurrentObject()
 	{
-		throw new UnsupportedOperationException();
+		return ((StackElement)getStack().get(getStack().size()-1)).getObject();
 	}
 
 	

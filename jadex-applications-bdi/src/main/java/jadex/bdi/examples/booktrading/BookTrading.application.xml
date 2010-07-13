@@ -15,6 +15,7 @@
 		<import>jadex.bdi.examples.booktrading.common.*</import>
 		<import>java.util.*</import>
 		<import>jadex.service.clock.IClockService</import>
+		<import>jadex.commons.IFuture</import>
 	</imports>
 	
 	<arguments>
