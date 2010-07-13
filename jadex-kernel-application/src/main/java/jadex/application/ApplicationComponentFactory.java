@@ -106,28 +106,7 @@ public class ApplicationComponentFactory	implements IComponentFactory, IService
 		{
 			public Object convertString(String val, IContext context)
 			{
-				String[]	imports	= ((MApplicationType)context.getRootObject()).getAllImports();
-				Argument	arg	= (Argument)context.getCurrentObject();
-				Class clazz;
-				try
-				{
-					clazz = arg.getTypename()!=null ? SReflect.findClass(arg.getTypename(), imports, context.getClassLoader()) : null;
-				}
-				catch(ClassNotFoundException e)
-				{
-					throw new RuntimeException(e);
-				}
-				Object	ret;
-				if(clazz!=null && SReflect.isSupertype(IFuture.class, clazz))
-				{
-					ret	= SJavaParser.parseExpression((String)val, imports, context.getClassLoader());
-					System.out.println("Future argument: "+arg+", "+ret);
-				}
-				else
-				{
-					ret	= SJavaParser.evaluateExpression((String)val, imports, null, context.getClassLoader());
-				}
-				return ret;
+				return SJavaParser.evaluateExpression((String)val, ((MApplicationType)context.getRootObject()).getAllImports(), null, context.getClassLoader());
 			}
 		};
 		
@@ -197,10 +176,15 @@ public class ApplicationComponentFactory	implements IComponentFactory, IService
 			new MappingInfo(null, null, "value")));
 		
 		types.add(new TypeInfo(new XMLInfo(new QName(uri, "service")), new ObjectInfo(MExpressionType.class, new ExpressionProcessor()), 
-			new MappingInfo(null, null, "value", new AttributeInfo[]{
-			new AttributeInfo(new AccessInfo("class", "className"))
-			}, null)));
-				
+				new MappingInfo(null, null, "value", new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("class", "className"))
+				}, null)));
+					
+		types.add(new TypeInfo(new XMLInfo(new QName(uri, "property")), new ObjectInfo(MExpressionType.class, new ExpressionProcessor()), 
+				new MappingInfo(null, null, "value", new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("class", "className"))
+				}, null)));
+					
 		for(int i=0; mappings!=null && i<mappings.length; i++)
 		{
 			types.addAll(mappings[i]);

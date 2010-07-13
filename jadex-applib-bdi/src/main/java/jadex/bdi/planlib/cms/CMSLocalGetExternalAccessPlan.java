@@ -4,7 +4,6 @@ import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.commons.IFuture;
-import jadex.service.IServiceProvider;
 import jadex.service.SServiceProvider;
 
 /**

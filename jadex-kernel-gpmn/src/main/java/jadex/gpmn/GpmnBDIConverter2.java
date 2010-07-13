@@ -6,7 +6,6 @@ import jadex.bdi.model.OAVAgentModel;
 import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bdi.runtime.interpreter.Report;
-import jadex.commons.SUtil;
 import jadex.gpmn.model2.MActivationEdge;
 import jadex.gpmn.model2.MActivationPlan;
 import jadex.gpmn.model2.MBpmnPlan;
@@ -16,15 +15,14 @@ import jadex.gpmn.model2.MGoal;
 import jadex.gpmn.model2.MGpmnModel;
 import jadex.gpmn.model2.MPlanEdge;
 import jadex.gpmn.model2.MSubprocess;
-import jadex.gpmn.runtime.plan.ActivationTarget;
-import jadex.xml.IContext;
-import jadex.xml.IPostProcessor;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.IOAVStateListener;
 import jadex.rules.state.OAVAttributeType;
 import jadex.rules.state.OAVObjectType;
 import jadex.rules.state.OAVTypeModel;
 import jadex.rules.state.javaimpl.OAVStateFactory;
+import jadex.xml.IContext;
+import jadex.xml.IPostProcessor;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -355,10 +353,6 @@ public class GpmnBDIConverter2
 			public Object getUserContext() 
 			{
 				return state;
-			}
-			public Object getCurrentObject()
-			{
-				throw new UnsupportedOperationException();
 			}
 		};
 		

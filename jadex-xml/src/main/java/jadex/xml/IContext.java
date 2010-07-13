@@ -17,8 +17,8 @@ public interface IContext
 	/**
 	 *  Get the current object.
 	 *  @return The current object.
-	 */
-	public Object getCurrentObject();
+	 * /
+	public Object getCurrentObject();*/
 	
 	/**
 	 *  Get the stack.

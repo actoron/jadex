@@ -22,6 +22,8 @@
 		<import>jadex.bridge.IClockService</import>
 		<import>jadex.rules.rulesystem.rules.functions.*</import>
 		<import>jadex.bdi.runtime.*</import>
+		<import>jadex.commons.*</import>
+		<import>jadex.service.*</import>
 	</imports>
 
 	<capabilities>
@@ -170,6 +172,7 @@
 	<properties>
 		<!--<property name="logging.level">java.util.logging.Level.FINE</property>-->
 		<property name="debugging">false</property>
+	 	<property name="dfservice" class="IFuture">SServiceProvider.getService($scope.getServiceProvider(), IDF.class)</property>
 	</properties>
 
 	<configurations>
@@ -187,8 +190,8 @@
 				<initialgoal ref="df_register">
 					<parameter ref="description">
 						<value>
-							((IDF)$scope.getServiceProvider().getService(IDF.class))
-								.createDFComponentDescription(null, ((IDF)$scope.getServiceProvider().getService(IDF.class))
+							$propertybase.getProperty("dfservice")
+								.createDFComponentDescription(null, $propertybase.getProperty("dfservice")
 									.createDFServiceDescription("sell", "service_seller", "UniHH"))
 						</value>
 					</parameter>

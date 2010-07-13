@@ -1,7 +1,7 @@
 package jadex.application.model;
 
 /**
- *  Argument representation.
+ *  Representation for argument of a component
  */
 public class MArgument
 {

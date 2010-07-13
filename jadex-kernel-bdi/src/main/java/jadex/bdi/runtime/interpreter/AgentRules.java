@@ -989,14 +989,14 @@ public class AgentRules
 				Class	clazz	= (Class)state.getAttributeValue(mexp, OAVBDIMetaModel.expression_has_class);
 				if(clazz!=null && SReflect.isSupertype(IFuture.class, clazz))
 				{
-//					System.out.println("Future property: "+name+" "+val);
+					System.out.println("Future property: "+name+" "+val);
 					if(val instanceof Future)
 					{
 						((Future)val).addResultListener(new ComponentResultListener(new IResultListener()
 						{
 							public void resultAvailable(Object source, Object result)
 							{
-//								System.out.println("Setting future property: "+name+" "+result);
+								System.out.println("Setting future property: "+name+" "+result);
 								Object param = state.createObject(OAVBDIRuntimeModel.parameter_type);	
 								state.setAttributeValue(param, OAVBDIRuntimeModel.parameter_has_name, name);
 								state.setAttributeValue(param, OAVBDIRuntimeModel.parameter_has_value, result);
@@ -2118,8 +2118,6 @@ public class AgentRules
 						myinivals	= (Map)inivals.get("");
 						if(myinivals==null)
 						{
-							if(inivals==null)
-								inivals	= new HashMap();
 							myinivals	= arguments!=null ? arguments : new HashMap();
 							inivals.put("", myinivals);
 						}
@@ -2171,8 +2169,6 @@ public class AgentRules
 						myinivals	= (Map)inivals.get("");
 						if(myinivals==null)
 						{
-							if(inivals==null)
-								inivals	= new HashMap();
 							myinivals	= arguments!=null ? arguments : new HashMap();
 							inivals.put("", myinivals);
 						}

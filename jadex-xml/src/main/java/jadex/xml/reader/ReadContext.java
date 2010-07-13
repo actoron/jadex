@@ -112,11 +112,11 @@ public class ReadContext implements IContext
 	/**
 	 *  Get the current object.
 	 *  @return The current object.
-	 */
+	 * /
 	public Object getCurrentObject()
 	{
 		return	getTopStackElement().getObject();
-	}
+	}*/
 
 	/**
 	 *  Set the root object.

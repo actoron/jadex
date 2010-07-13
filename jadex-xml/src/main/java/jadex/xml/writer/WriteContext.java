@@ -2,7 +2,6 @@ package jadex.xml.writer;
 
 import jadex.commons.collection.MultiCollection;
 import jadex.xml.IContext;
-import jadex.xml.StackElement;
 
 import java.util.ArrayList;
 import java.util.IdentityHashMap;
@@ -105,11 +104,11 @@ public class WriteContext implements IContext
 	/**
 	 *  Get the current object.
 	 *  @return The current object.
-	 */
+	 * /
 	public Object getCurrentObject()
 	{
 		return ((StackElement)getStack().get(getStack().size()-1)).getObject();
-	}
+	}*/
 
 	
 	/**

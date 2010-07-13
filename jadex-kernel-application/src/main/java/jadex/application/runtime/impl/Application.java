@@ -29,6 +29,7 @@ import jadex.commons.IFuture;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.CollectionResultListener;
+import jadex.commons.concurrent.CounterResultListener;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
@@ -41,6 +42,7 @@ import jadex.service.IServiceProvider;
 import jadex.service.SServiceProvider;
 import jadex.service.library.ILibraryService;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -56,6 +58,17 @@ import java.util.logging.Logger;
  */
 public class Application implements IApplication, IComponentInstance
 {
+	//-------- constants --------
+	
+	/** Application state, while waiting for initial futures. */
+	protected static final String	STATE_INITFUTURES	= "init-futures";
+	
+	/** Application state, when ready to init. */
+	protected static final String	STATE_INITREADY	= "init-ready";
+	
+	/** Application state, when already started. */
+	protected static final String	STATE_STARTED	= "started";
+	
 	//-------- attributes --------
 	
 	/** The application configuration. */
@@ -63,6 +76,9 @@ public class Application implements IApplication, IComponentInstance
 	
 	/** The contained spaces. */
 	protected Map spaces;
+	
+	/** The properties. */
+	protected Map properties;
 	
 	/** The component adapter. */
 	protected IComponentAdapter	adapter;
@@ -73,8 +89,8 @@ public class Application implements IApplication, IComponentInstance
 	/** The parent component. */
 	protected IExternalAccess parent;
 	
-	/** Flag to indicate that the application is already inited. */
-	protected boolean initstarted;
+	/** Lifecycle state. */
+	protected String state;
 	
 	/** Flag to indicate that the context is about to be deleted
 	 * (no more components can be added). */
@@ -105,6 +121,7 @@ public class Application implements IApplication, IComponentInstance
 		this.arguments = arguments==null ? new HashMap() : arguments;
 		this.results = new HashMap();
 		this.adapter = factory.createComponentAdapter(desc, model, this, parent);
+		this.properties = new HashMap();
 		
 		// Init the arguments with default values.
 		String configname = config!=null? config.getName(): null;
@@ -135,6 +152,7 @@ public class Application implements IApplication, IComponentInstance
 		final SimpleValueFetcher fetcher = new SimpleValueFetcher();
 		fetcher.setValue("$platform", getServiceProvider());
 		fetcher.setValue("$args", getArguments());
+		fetcher.setValue("$properties", properties);
 		fetcher.setValue("$results", getResults());
 		fetcher.setValue("$component", this);
 		List services = model.getApplicationType().getServices();
@@ -146,6 +164,70 @@ public class Application implements IApplication, IComponentInstance
 				IService service = (IService)exp.getParsedValue().getValue(fetcher);
 //				mycontainer.addService(exp.getClazz(), exp.getName(), service);
 				adapter.getServiceContainer().addService(exp.getClazz(), service);
+			}
+		}
+
+		// Evaluate (future) properties.
+		List	futures	= new ArrayList();
+		List	props	= model.getApplicationType().getProperties();
+		if(props!=null)
+		{
+			for(int i=0; i<props.size(); i++)
+			{
+				final MExpressionType	mexp	= (MExpressionType)props.get(i);
+				final Object	val	= mexp.getParsedValue().getValue(fetcher);
+				if(mexp.getClazz()!=null && SReflect.isSupertype(IFuture.class, mexp.getClazz()))
+				{
+					System.out.println("Future argument: "+mexp.getName()+", "+val);
+					if(val instanceof IFuture)
+					{
+						((IFuture)val).addResultListener(new DefaultResultListener()
+						{
+							public void resultAvailable(Object source, Object result)
+							{
+								synchronized(properties)
+								{
+									properties.put(mexp.getName(), result);
+								}
+							}
+						});
+						futures.add(val);
+					}
+					else if(val!=null)
+					{
+						throw new RuntimeException("Future property must be instance of jadex.commons.IFuture: "+mexp.getName()+", "+mexp.getValue());
+					}
+				}
+				else
+				{
+					// Todo: handle specific properties (logging etc.)
+					properties.put(mexp.getName(), val);
+				}
+				
+			}
+		}
+		if(futures.isEmpty())
+		{
+			state	= STATE_INITREADY;
+		}
+		else
+		{
+			state	= STATE_INITFUTURES;
+			IResultListener	crl	= new CounterResultListener(futures.size())
+			{
+				public void finalResultAvailable(Object source, Object result)
+				{
+					state	= STATE_INITREADY;
+					adapter.wakeup();
+				}
+				public void exceptionOccurred(Object source, Exception exception)
+				{
+					// Todo: fail component creation?
+				}
+			};
+			for(int i=0; i<futures.size(); i++)
+			{
+				((IFuture)futures.get(i)).addResultListener(crl);
 			}
 		}
 	}
@@ -723,10 +805,10 @@ public class Application implements IApplication, IComponentInstance
 	 */
 	public boolean executeStep()
 	{
-		if(!initstarted)
+		if(STATE_INITREADY.equals(state))
 		{
 			// todo: set inited = true after all has been done
-			initstarted = true;
+			state = STATE_STARTED;
 			
 //			adapter.getServiceContainer().getService(IClockService.class).addResultListener(createResultListener(new DefaultResultListener()
 //			{
@@ -737,6 +819,7 @@ public class Application implements IApplication, IComponentInstance
 					final SimpleValueFetcher fetcher = new SimpleValueFetcher();
 					fetcher.setValue("$platform", getServiceProvider());
 					fetcher.setValue("$args", getArguments());
+					fetcher.setValue("$properties", properties);
 					fetcher.setValue("$results", getResults());
 					fetcher.setValue("$component", this);
 //					// todo: hack remove clock somehow (problem services are behind future in xml)
