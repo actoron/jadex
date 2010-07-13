@@ -107,8 +107,19 @@ public class ApplicationComponentFactory	implements IComponentFactory, IService
 			public Object convertString(String val, IContext context)
 			{
 				String[]	imports	= ((MApplicationType)context.getRootObject()).getAllImports();
-				MArgument	arg	= (MArgument)context.getCurrentObject();
-				return SJavaParser.evaluateExpression((String)val, imports, null);
+				Argument	arg	= (Argument)context.getCurrentObject();
+				Class	clazz	= SReflect.findClass0(arg.getTypename(), imports, context.getClassLoader());
+				Object	ret;
+				if(clazz!=null && SReflect.isSupertype(IFuture.class, clazz))
+				{
+					ret	= null;
+//					ret	= SJavaParser.
+				}
+				else
+				{
+					ret	= SJavaParser.evaluateExpression((String)val, imports, null);
+				}
+				return ret;
 			}
 		};
 		

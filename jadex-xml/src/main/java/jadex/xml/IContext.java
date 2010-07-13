@@ -15,6 +15,12 @@ public interface IContext
 	public Object getRootObject();
 	
 	/**
+	 *  Get the current object.
+	 *  @return The current object.
+	 */
+	public Object getCurrentObject();
+	
+	/**
 	 *  Get the stack.
 	 *  @return The stack.
 	 * /

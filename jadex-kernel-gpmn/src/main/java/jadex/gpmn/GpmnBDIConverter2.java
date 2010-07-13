@@ -356,6 +356,10 @@ public class GpmnBDIConverter2
 			{
 				return state;
 			}
+			public Object getCurrentObject()
+			{
+				throw new UnsupportedOperationException();
+			}
 		};
 		
 		OAVBDIXMLReader.ExpressionProcessor expost = new OAVBDIXMLReader.ExpressionProcessor();

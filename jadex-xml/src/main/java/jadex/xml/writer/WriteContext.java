@@ -102,6 +102,16 @@ public class WriteContext implements IContext
 	}
 	
 	/**
+	 *  Get the current object.
+	 *  @return The current object.
+	 */
+	public Object getCurrentObject()
+	{
+		throw new UnsupportedOperationException();
+	}
+
+	
+	/**
 	 *  Get the classloader.
 	 *  @return The classloader.
 	 */

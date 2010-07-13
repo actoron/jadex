@@ -17,6 +17,12 @@
 		<import>jadex.service.clock.IClockService</import>
 	</imports>
 	
+	<arguments>
+		<argument name="clock" typename="IFuture">
+			SServiceProvider.getService($scope.getServiceProvider(), IClockService.class)
+		</argument>
+	</arguments>
+	
 	<componenttypes>
 		<componenttype name="Buyer" filename="jadex/bdi/examples/booktrading/buyer/Buyer.agent.xml"/>
 		<componenttype name="Seller" filename="jadex/bdi/examples/booktrading/seller/Seller.agent.xml"/>
@@ -27,44 +33,26 @@
 			<components>
 				<component type="Buyer" >
 					<arguments>
-						<!-- <argument name="initial_orders">
-							new Order[]
-							{
-								new Order("All about agents", new Date(((IClockService)jadex.service.SServiceProvider.getService($platform, IClockService.class)).getTime()+60000), 100, 120, true, (IClockService)jadex.service.SServiceProvider.getService($platform, IClockService.class)),
-								new Order("All about web services", new Date(((IClockService)jadex.service.SServiceProvider.getService($platform, IClockService.class)).getTime()+60000), 40, 60, true, (IClockService)jadex.service.SServiceProvider.getService($platform, IClockService.class)),
-								new Order("Harry Potter", new Date(((IClockService)jadex.service.SServiceProvider.getService($platform, IClockService.class)).getTime()+60000), 5, 10, true, (IClockService)jadex.service.SServiceProvider.getService($platform, IClockService.class)),
-								new Order("Agents in the real world", new Date(((IClockService)jadex.service.SServiceProvider.getService($platform, IClockService.class)).getTime()+60000), 30, 65, true, (IClockService)jadex.service.SServiceProvider.getService($platform, IClockService.class))
-							}
-						</argument> -->
 						<argument name="initial_orders">
 							new Order[]
 							{
-								new Order("All about agents", new Date($clock.getTime()+60000), 100, 120, true, $clock),
-								new Order("All about web services", new Date($clock.getTime()+60000), 40, 60, true, $clock),
-								new Order("Harry Potter", new Date($clock.getTime()+60000), 5, 10, true, $clock),
-								new Order("Agents in the real world", new Date($clock.getTime()+60000), 30, 65, true, $clock)
+								new Order("All about agents", new Date($args.clock.getTime()+60000), 100, 120, true, $args.clock),
+								new Order("All about web services", new Date($args.clock.getTime()+60000), 40, 60, true, $args.clock),
+								new Order("Harry Potter", new Date($args.clock.getTime()+60000), 5, 10, true, $args.clock),
+								new Order("Agents in the real world", new Date($args.clock.getTime()+60000), 30, 65, true, $args.clock)
 							}
 						</argument>
 					</arguments>
 				</component>
 				<component type="Seller">
 					<arguments>
-						<!-- <argument name="initial_orders">
-							new Order[]
-							{
-								new Order("All about agents", new Date(((IClockService)jadex.service.SServiceProvider.getService($platform, IClockService.class)).getTime()+60000), 130, 110, false, (IClockService)jadex.service.SServiceProvider.getService($platform, IClockService.class)),
-								new Order("All about web services", new Date(((IClockService)jadex.service.SServiceProvider.getService($platform, IClockService.class)).getTime()+60000), 50, 30, false, (IClockService)jadex.service.SServiceProvider.getService($platform, IClockService.class)),
-								new Order("Harry Potter", new Date(((IClockService)jadex.service.SServiceProvider.getService($platform, IClockService.class)).getTime()+60000), 15, 9, false, (IClockService)jadex.service.SServiceProvider.getService($platform, IClockService.class)),
-								new Order("Agents in the real world", new Date(((IClockService)jadex.service.SServiceProvider.getService($platform, IClockService.class)).getTime()+60000), 100, 60, false, (IClockService)jadex.service.SServiceProvider.getService($platform, IClockService.class))
-							}
-						</argument> -->
 						<argument name="initial_orders">
 							new Order[]
 							{
-								new Order("All about agents", new Date($clock.getTime()+60000), 130, 110, false, $clock),
-								new Order("All about web services", new Date($clock.getTime()+60000), 50, 30, false, $clock),
-								new Order("Harry Potter", new Date($clock.getTime()+60000), 15, 9, false, $clock),
-								new Order("Agents in the real world", new Date($clock.getTime()+60000), 100, 60, false, $clock)
+								new Order("All about agents", new Date($args.clock.getTime()+60000), 130, 110, false, $args.clock),
+								new Order("All about web services", new Date($args.clock.getTime()+60000), 50, 30, false, $args.clock),
+								new Order("Harry Potter", new Date($args.clock.getTime()+60000), 15, 9, false, $args.clock),
+								new Order("Agents in the real world", new Date($args.clock.getTime()+60000), 100, 60, false, $args.clock)
 							}
 						</argument>
 					</arguments>
@@ -75,32 +63,20 @@
 			<components>
 				<component type="Buyer" >
 					<arguments>
-						<!-- <argument name="initial_orders">
-							new Order[]
-							{
-								new Order("All about agents", new Date(((IClockService)jadex.service.SServiceProvider.getService($platform, IClockService.class)).getTime()+60000), 100, 120, true, (IClockService)jadex.service.SServiceProvider.getService($platform, IClockService.class))
-							}
-						</argument> -->
 						<argument name="initial_orders">
 							new Order[]
 							{
-								new Order("All about agents", new Date($clock.getTime()+60000), 100, 120, true, $clock)
+								new Order("All about agents", new Date($args.clock.getTime()+60000), 100, 120, true, $args.clock)
 							}
 						</argument>
 					</arguments>
 				</component>
 				<component type="Seller">
 					<arguments>
-						<!-- <argument name="initial_orders">
-							new Order[]
-							{
-								new Order("All about agents", new Date(((IClockService)jadex.service.SServiceProvider.getService($platform, IClockService.class)).getTime()+60000), 130, 110, false, (IClockService)jadex.service.SServiceProvider.getService($platform, IClockService.class))
-							}
-						</argument> -->
 						<argument name="initial_orders">
 							new Order[]
 							{
-								new Order("All about agents", new Date($clock.getTime()+60000), 130, 110, false, $clock)
+								new Order("All about agents", new Date($args.clock.getTime()+60000), 130, 110, false, $args.clock)
 							}
 						</argument>
 					</arguments>
@@ -111,44 +87,26 @@
 			<components>
 				<component type="Buyer" number="3">
 					<arguments>
-						<!-- <argument name="initial_orders">
-							new Order[]
-							{
-								new Order("All about agents", new Date(((IClockService)jadex.service.SServiceProvider.getService($platform, IClockService.class)).getTime()+60000), 100, 120, true, (IClockService)jadex.service.SServiceProvider.getService($platform, IClockService.class)),
-								new Order("All about web services", new Date(((IClockService)jadex.service.SServiceProvider.getService($platform, IClockService.class)).getTime()+60000), 40, 60, true, (IClockService)jadex.service.SServiceProvider.getService($platform, IClockService.class)),
-								new Order("Harry Potter", new Date(((IClockService)jadex.service.SServiceProvider.getService($platform, IClockService.class)).getTime()+60000), 5, 10, true, (IClockService)jadex.service.SServiceProvider.getService($platform, IClockService.class)),
-								new Order("Agents in the real world", new Date(((IClockService)jadex.service.SServiceProvider.getService($platform, IClockService.class)).getTime()+60000), 30, 65, true, (IClockService)jadex.service.SServiceProvider.getService($platform, IClockService.class))
-							}
-						</argument> -->
 						<argument name="initial_orders">
 							new Order[]
 							{
-								new Order("All about agents", new Date($clock.getTime()+60000), 100, 120, true, $clock),
-								new Order("All about web services", new Date($clock.getTime()+60000), 40, 60, true, $clock),
-								new Order("Harry Potter", new Date($clock.getTime()+60000), 5, 10, true, $clock),
-								new Order("Agents in the real world", new Date($clock.getTime()+60000), 30, 65, true, $clock)
+								new Order("All about agents", new Date($args.clock.getTime()+60000), 100, 120, true, $args.clock),
+								new Order("All about web services", new Date($args.clock.getTime()+60000), 40, 60, true, $args.clock),
+								new Order("Harry Potter", new Date($args.clock.getTime()+60000), 5, 10, true, $args.clock),
+								new Order("Agents in the real world", new Date($args.clock.getTime()+60000), 30, 65, true, $args.clock)
 							}
 						</argument>
 					</arguments>
 				</component>
 				<component type="Seller">
 					<arguments>
-						<!-- <argument name="initial_orders">
-							new Order[]
-							{
-								new Order("All about agents", new Date(((IClockService)jadex.service.SServiceProvider.getService($platform, IClockService.class)).getTime()+60000), 130, 110, false, (IClockService)jadex.service.SServiceProvider.getService($platform, IClockService.class)),
-								new Order("All about web services", new Date(((IClockService)jadex.service.SServiceProvider.getService($platform, IClockService.class)).getTime()+60000), 50, 30, false, (IClockService)jadex.service.SServiceProvider.getService($platform, IClockService.class)),
-								new Order("Harry Potter", new Date(((IClockService)jadex.service.SServiceProvider.getService($platform, IClockService.class)).getTime()+60000), 15, 9, false, (IClockService)jadex.service.SServiceProvider.getService($platform, IClockService.class)),
-								new Order("Agents in the real world", new Date(((IClockService)jadex.service.SServiceProvider.getService($platform, IClockService.class)).getTime()+60000), 100, 60, false, (IClockService)jadex.service.SServiceProvider.getService($platform, IClockService.class))
-							}
-						</argument> -->
 						<argument name="initial_orders">
 							new Order[]
 							{
-								new Order("All about agents", new Date($clock.getTime()+60000), 130, 110, false, $clock),
-								new Order("All about web services", new Date($clock.getTime()+60000), 50, 30, false, $clock),
-								new Order("Harry Potter", new Date($clock.getTime()+60000), 15, 9, false, $clock),
-								new Order("Agents in the real world", new Date($clock.getTime()+60000), 100, 60, false, $clock)
+								new Order("All about agents", new Date($args.clock.getTime()+60000), 130, 110, false, $args.clock),
+								new Order("All about web services", new Date($args.clock.getTime()+60000), 50, 30, false, $args.clock),
+								new Order("Harry Potter", new Date($args.clock.getTime()+60000), 15, 9, false, $args.clock),
+								new Order("Agents in the real world", new Date($args.clock.getTime()+60000), 100, 60, false, $args.clock)
 							}
 						</argument>
 					</arguments>
