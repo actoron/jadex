@@ -147,20 +147,40 @@ public class ComponentActionList
 						try
 						{
 //							System.out.println("Action: "+entry);
-							
-							Object ret = entry.action.perform(entry.parameters, space);
-							if(entry.listener!=null)
+							if(!entry.invalid)
 							{
-								if(wakeup)
+								Object ret = entry.action.perform(entry.parameters, space);
+								if(entry.listener!=null)
 								{
-									entry.listener.resultAvailable(this, ret);
+									if(wakeup)
+									{
+										entry.listener.resultAvailable(this, ret);
+									}
+									else
+									{
+										entry.result	= ret;
+										if(executed==null)
+											executed	= new ArrayList();
+										executed.add(entry);
+									}
 								}
-								else
+							}
+							else
+							{
+								if(entry.listener!=null)
 								{
-									entry.result	= ret;
-									if(executed==null)
-										executed	= new ArrayList();
-									executed.add(entry);
+									Exception e = new RuntimeException("Invalid action.");
+									if(wakeup)
+									{
+										entry.listener.exceptionOccurred(this, e);
+									}
+									else
+									{
+										entry.exception	= e;
+										if(executed==null)
+											executed	= new ArrayList();
+										executed.add(entry);
+									}
 								}
 							}
 						}
@@ -190,7 +210,6 @@ public class ComponentActionList
 			}
 		}
 	}
-	
 	
 	/**
 	 *  Should be called on environment thread only.
@@ -270,6 +289,9 @@ public class ComponentActionList
 		
 		/** An id to differentiate otherwise equal actions. */
 		public int	id;
+		
+		/** Flag indicating that the action is invalid (e.g. when actor was destroyed in meantime). */
+		public boolean invalid;
 		
 		//-------- constructors --------
 		

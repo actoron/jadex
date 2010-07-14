@@ -131,7 +131,6 @@ public class RoundBasedExecutor extends SimplePropertyObject implements ISpaceEx
 											}
 										}
 									}
-									
 									space.getComponentActionList().addComponentAction(entry);
 								}
 							});

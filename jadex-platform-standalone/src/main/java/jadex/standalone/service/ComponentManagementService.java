@@ -229,8 +229,6 @@ public class ComponentManagementService implements IComponentManagementService, 
 //								if(getParent(cinfo)!=null)
 								{
 		//							children.put(parent, cid);
-									if(padesc==null)
-										System.out.println("shit");
 									padesc.addChild(cid);
 								}
 							}		
@@ -289,6 +287,11 @@ public class ComponentManagementService implements IComponentManagementService, 
 		// Create the component instance.
 		try
 		{
+			if(pad!=null)
+			{
+				pad.getComponentInstance().componentCreated(ad, lmodel);
+			}
+			
 //			adapter.setComponentThread(Thread.currentThread());	// Hack!!! Avoid external access during init.
 			Object[] acom = factory.createComponentInstance(ad, caf, lmodel, config, args, parent);
 //			adapter.setComponentThread(null);
@@ -300,11 +303,6 @@ public class ComponentManagementService implements IComponentManagementService, 
 	//		System.out.println("added: "+descs.size()+", "+aid);
 			
 			// Register component at parent.
-			if(pad!=null)
-			{
-				pad.getComponentInstance().componentCreated(ad, lmodel);
-			}
-	
 			IComponentListener[]	alisteners;
 			synchronized(listeners)
 			{

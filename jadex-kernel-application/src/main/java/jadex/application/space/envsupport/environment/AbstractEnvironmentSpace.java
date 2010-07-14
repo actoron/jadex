@@ -9,6 +9,7 @@ import jadex.application.space.envsupport.MEnvSpaceType;
 import jadex.application.space.envsupport.MObjectType;
 import jadex.application.space.envsupport.MObjectTypeProperty;
 import jadex.application.space.envsupport.dataview.IDataView;
+import jadex.application.space.envsupport.environment.ComponentActionList.ActionEntry;
 import jadex.application.space.envsupport.environment.space2d.Space2D;
 import jadex.application.space.envsupport.evaluation.DefaultDataProvider;
 import jadex.application.space.envsupport.evaluation.IObjectSource;
@@ -1084,6 +1085,8 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 	 */
 	public void destroySpaceObject(final Object id)
 	{
+//		System.out.println("destroy so: "+id);
+		
 		SpaceObject obj;
 		synchronized(monitor)
 		{
@@ -1108,6 +1111,25 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 							((IComponentManagementService)result).destroyComponent(component);
 						}
 					});
+				}
+			}
+
+			// Mark obsolete actions
+			ActionEntry[] actions = actionlist.getActionEntries();
+			for(int i=0; i<actions.length; i++)
+			{
+				Object actorid = actions[i].parameters.get(ISpaceAction.ACTOR_ID);
+				if(actorid!=null)
+				{
+					ISpaceObject so = getAvatar((IComponentIdentifier)actorid);
+					if(so!=null)
+					{
+						Object avatarid = so.getId();
+						if(avatarid==id)
+						{
+							actions[i].invalid = true;
+						}
+					}
 				}
 			}
 			
@@ -1671,6 +1693,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 	 */
 	public void componentRemoved(IComponentIdentifier aid)
 	{
+//		System.out.println("comp removed: "+aid);
 		synchronized(monitor)
 		{
 			String	componenttype	= application.getComponentType(aid);
