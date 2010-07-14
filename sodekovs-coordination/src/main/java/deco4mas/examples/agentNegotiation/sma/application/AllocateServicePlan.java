@@ -52,11 +52,17 @@ public class AllocateServicePlan extends Plan
 					try
 					{
 						dispatchSubgoalAndWait(serviceAllocate);
-						result = (Boolean) serviceAllocate.getParameter("result").getValue();
+						if (!(serviceAllocate.getParameter("result").getValue() instanceof Boolean))
+						{
+							result = false;
+						} else
+						{
+							result = (Boolean) serviceAllocate.getParameter("result").getValue();
+						}
 					} catch (GoalFailureException gfe)
 					{
 						// gfe.printStackTrace();
-						result = Boolean.FALSE;
+						result = false;
 					}
 					if (result)
 					{
@@ -95,7 +101,7 @@ public class AllocateServicePlan extends Plan
 					param[3] = new Integer(1);
 					saUseLogger.gnuInfo(param, "");
 				}
-				
+
 				if (!needService.isSearching())
 				{
 					synchronized (needService.getMonitor())
@@ -105,17 +111,7 @@ public class AllocateServicePlan extends Plan
 						// getBeliefbase().getBelief("currentSa").setFact(null);
 					}
 				}
-//				Boolean retry = false;
-//				while (!retry)
-//				{
-//					if (!needService.isSearching())
-//					{
-//						retry = true;
-//					} else
-//					{
-						waitForInternalEvent("returnExecution");
-//					}
-//				}
+				waitForInternalEvent("returnExecution");
 				body();
 			}
 

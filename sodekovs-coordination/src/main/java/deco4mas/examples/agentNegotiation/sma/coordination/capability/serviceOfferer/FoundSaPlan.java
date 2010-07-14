@@ -30,22 +30,6 @@ public class FoundSaPlan extends Plan
 				System.out.println(this.getComponentName() + " signed with " + reply.getChosenOne().getLocalName());
 				smaLogger.info("signed with " + reply.getChosenOne().getLocalName() + " for " + reply.getServiceType().getName());
 
-				// set signed Sa
-				// RequiredService[] services = (RequiredService[])
-				// getBeliefbase().getBeliefSet("requiredServices").getFacts();
-				// for (RequiredService service : services)
-				// {
-				// if
-				// (service.getServiceType().getName().equals(reply.getServiceType().getName()))
-				// {
-				// synchronized (service.getMonitor())
-				// {
-				// service.setSa(reply.getChosenOne());
-				// service.setSearching(false);
-				// }
-				// }
-				// }
-
 				ValueLogger.addValue("sign_" + reply.getChosenOne().getLocalName(), 1.0);
 
 				// test if the workflow can be executed

@@ -28,7 +28,6 @@ public class PreInstantiateWorkflowPlan extends Plan
 	{
 		try
 		{
-			getBeliefbase().getBelief("utilityFunction").setFact(new WeightFactorUtilityFunction(this.getComponentIdentifier()));
 			// name of new workflow
 			final String workflowName = "workflowNet" + workflowID + "(" + getComponentName() + ")";
 

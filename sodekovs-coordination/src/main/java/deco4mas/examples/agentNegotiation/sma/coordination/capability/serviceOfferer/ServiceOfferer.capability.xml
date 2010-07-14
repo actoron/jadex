@@ -12,36 +12,44 @@
 
 	<imports>
 		<import>jadex.base.fipa.*</import>
-		<import>jadex.application.runtime.*</import>
 		<import>jadex.bridge.IComponentIdentifier</import>
 
-		<import>deco4mas.coordinate.environment.*</import>
 		<import>deco4mas.examples.agentNegotiation.decoMAS.dataObjects.*
 		</import>
-		<import>deco4mas.examples.agentNegotiation.sma.coordination.negotiationStrategy.*
-		</import>
-		<!--
-			<import>deco4mas.examples.agentNegotiation.sma.application.workflow.management.*
-		-->
-		<!--		</import>-->
 		<import>deco4mas.examples.agentNegotiation.sma.application.*</import>
 	</imports>
 
+	<capabilities>
+		<!--  capability can be in a trustOwner role	-->
+		<capability name="tocap"
+			file="deco4mas.examples.agentNegotiation.sma.coordination.capability.serviceOfferer.trustOwner.TrustOwner" />
+	</capabilities>
+
 	<beliefs>
-		<!--utility function-->
-		<beliefref name="utilityFunction">
-			<abstract />
+		<!--  trustFunction of tocap / if no trust is used = null	-->
+		<beliefref name="trustFunction">
+			<concrete ref="tocap.trustFunction">
+			</concrete>
 		</beliefref>
+		
+		<beliefref name="useTrust">
+			<abstract/>
+		</beliefref>
+		
+		<beliefsetref name="negTypes">
+			<abstract/>
+		</beliefsetref>
 	</beliefs>
 
 	<goals>
-		<!-- assign a Sa for this services-->
+		<!-- assign agent a Sa for this services-->
 		<achievegoal name="searchSa">
 			<parameter name="service" class="RequiredService"></parameter>
 		</achievegoal>
 	</goals>
 
 	<plans>
+		<!--  checks if a negotiation is required	-->
 		<plan name="NegotiationRequiredCheck">
 			<body class="NegotiationRequiredCheckPlan"></body>
 			<trigger>
@@ -68,6 +76,18 @@
 	</plans>
 
 	<events>
+		<!-- service found event for agent (can check if workflow can execute-->
+		<internalevent name="serviceSatisfied">
+			<parameter name="id" class="Integer"></parameter>
+			<parameter name="sa" class="IComponentIdentifier"></parameter>
+		</internalevent>
+
+		<!-- deco event when a new service is required by agent-->
+		<internalevent name="requiredServices">
+			<parameter name="service" class="RequiredService"></parameter>
+		</internalevent>
+
+		<!--  deco event for search and found of sa	-->
 		<internalevent name="searchSa">
 			<parameter name="request" class="AssignRequest"></parameter>
 			<parameter name="task" class="String"></parameter>
@@ -76,16 +96,12 @@
 			<parameter name="reply" class="AssignReply"></parameter>
 		</internalevent>
 
+		<!--deco eventref-->
+		<internaleventref name="trustEvent">
+			<concrete ref="tocap.trustEvent" />
+		</internaleventref>
 
-		<internalevent name="serviceSatisfied">
-			<parameter name="id" class="Integer"></parameter>
-			<parameter name="sa" class="IComponentIdentifier"></parameter>
-		</internalevent>
-
-		<internalevent name="requiredServices">
-			<parameter name="service" class="RequiredService"></parameter>
-		</internalevent>
-
+		<!--event to inform sa about signEnd-->
 		<messageevent name="informMessage" direction="send" type="fipa">
 			<parameter name="performative" class="String" direction="fixed">
 				<value>SFipa.INFORM</value>

@@ -12,6 +12,7 @@ import deco4mas.examples.agentNegotiation.decoMAS.dataObjects.ServiceType;
 import deco4mas.examples.agentNegotiation.decoMAS.medium.NegSpaceMechanism;
 import deco4mas.examples.agentNegotiation.evaluate.AgentLogger;
 import deco4mas.examples.agentNegotiation.sma.application.RequiredService;
+import deco4mas.examples.agentNegotiation.sma.coordination.negotiationStrategy.ITrustFunction;
 import deco4mas.examples.agentNegotiation.sma.coordination.negotiationStrategy.SimpleSelectionStrategy;
 import deco4mas.examples.agentNegotiation.sma.coordination.negotiationStrategy.WeightFactorUtilityFunction;
 
@@ -21,7 +22,7 @@ import deco4mas.examples.agentNegotiation.sma.coordination.negotiationStrategy.W
 public class SearchSaPlan extends Plan
 {
 	// TODO Entfernen
-	static private WeightFactorUtilityFunction utilityFunction;
+	// static private WeightFactorUtilityFunction utilityFunction;
 
 	public void body()
 	{
@@ -30,19 +31,18 @@ public class SearchSaPlan extends Plan
 			// get Logger
 			Logger smaLogger = AgentLogger.getTimeEvent(this.getComponentName());
 
-			// get service and currentSa
+			// get service
 			RequiredService neededService = (RequiredService) ((IGoal) getReason()).getParameter("service").getValue();
 
 			// LOG
 			System.out.println(getComponentName() + ": Assign a Sa with deco");
 			smaLogger.info("assign a new sa for " + neededService.getServiceType().getName());
 
-			if (utilityFunction == null)
-				utilityFunction = ((WeightFactorUtilityFunction) getBeliefbase().getBelief("utilityFunction").getFact());
 			// utilityFunc
-			// WeightFactorUtilityFunction utilityFunction =
-			// ((WeightFactorUtilityFunction)getBeliefbase().getBelief("utilityFunction").getFact());
-
+			WeightFactorUtilityFunction utilityFunction = new WeightFactorUtilityFunction(getComponentIdentifier());
+			utilityFunction.setTrustFunction((ITrustFunction) getBeliefbase().getBelief("trustFunction").getFact());
+			
+			//add costs
 			Double costWeight = 0.06;
 			Double durationWeight = 0.04;
 			Double trustWeight = 0.9;
@@ -56,15 +56,22 @@ public class SearchSaPlan extends Plan
 			// Selector
 			SimpleSelectionStrategy selector = new SimpleSelectionStrategy();
 
-			// extra info
-			Map<String, Object> information = new HashMap<String, Object>();
-			information.put("deadline", 300L);
-			smaLogger.info("deadline 300L");
-			RequestInformation info = new RequestInformation(information);
+			//request
+			AssignRequest request = null;
+			for (String mediumName : (String[]) getBeliefbase().getBeliefSet("negTypes").getFacts())
+			{
+				Map<String, Object> information = new HashMap<String, Object>();
+				if (mediumName.equals("by_neg"))
+				{
+					// extra info
+					information.put("deadline", 300L);
+					smaLogger.info("deadline 300L");
+				}
+				RequestInformation info = new RequestInformation(information);
 
-			// request
-			AssignRequest request = new AssignRequest(this.getComponentIdentifier(), service, utilityFunction, selector,
-				NegSpaceMechanism.NAME, neededService.getId(), info);
+				request = new AssignRequest(this.getComponentIdentifier(), service, utilityFunction, selector, mediumName, neededService
+					.getId(), info);
+			}
 
 			// Internal Event for assign Sa
 			IInternalEvent assignSaEvent = createInternalEvent("searchSa");

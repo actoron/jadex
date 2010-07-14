@@ -47,6 +47,11 @@
 			<fact>(CoordinationSpace)((IApplicationExternalAccess)$scope.getParent()).getSpace("mycoordspace")
 			</fact>
 		</belief>
+		
+		<!--	use trust?	-->
+		<belief name="useTrust" class="Boolean" exported="true">
+			<fact>false</fact>
+		</belief>
 
 		<belief name="providedService" class="ServiceType" exported="true">
 			<assignto ref="sscap.providedService"></assignto>
@@ -64,18 +69,18 @@
 
 	<plans>
 		<!-- service request -->
-		<plan name="rp_decide_request_plan">
-			<parameter name="action" class="Object">
-				<goalmapping ref="reqcap.rp_decide_request.action" />
-			</parameter>
-			<parameter name="accept" class="Boolean" direction="out">
-				<goalmapping ref="reqcap.rp_decide_request.accept" />
-			</parameter>
-			<body class="ServiceDecitePlan" />
-			<trigger>
-				<goal ref="reqcap.rp_decide_request" />
-			</trigger>
-		</plan>
+<!--		<plan name="rp_decide_request_plan">-->
+<!--			<parameter name="action" class="Object">-->
+<!--				<goalmapping ref="reqcap.rp_decide_request.action" />-->
+<!--			</parameter>-->
+<!--			<parameter name="accept" class="Boolean" direction="out">-->
+<!--				<goalmapping ref="reqcap.rp_decide_request.accept" />-->
+<!--			</parameter>-->
+<!--			<body class="ServiceDecitePlan" />-->
+<!--			<trigger>-->
+<!--				<goal ref="reqcap.rp_decide_request" />-->
+<!--			</trigger>-->
+<!--		</plan>-->
 		<plan name="rp_execute_request_plan">
 			<parameter name="action" class="Object">
 				<goalmapping ref="reqcap.rp_execute_request.action" />

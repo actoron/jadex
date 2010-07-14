@@ -55,7 +55,7 @@ public class BlackoutPlan extends Plan
 				param[1] = getTime();
 				blackoutLogger.gnuInfo(param, "");
 
-				Double waitTime = 2500 + 1000 * (blackoutCharakter * 3);
+				Double waitTime = 1000 + 500 * (blackoutCharakter * 4);
 				saLogger.info("blackout for " + waitTime);
 				System.out.println(this.getComponentName() + ": Blackout for " + waitTime);
 

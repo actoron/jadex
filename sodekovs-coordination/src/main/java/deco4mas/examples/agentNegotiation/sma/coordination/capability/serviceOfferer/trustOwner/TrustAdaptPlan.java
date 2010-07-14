@@ -1,4 +1,4 @@
-package deco4mas.examples.agentNegotiation.sma.coordination.capability.trustOwner;
+package deco4mas.examples.agentNegotiation.sma.coordination.capability.serviceOfferer.trustOwner;
 
 import jadex.bdi.runtime.IInternalEvent;
 import jadex.bdi.runtime.Plan;

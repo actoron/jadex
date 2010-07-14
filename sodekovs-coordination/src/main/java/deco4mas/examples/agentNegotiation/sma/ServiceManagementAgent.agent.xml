@@ -14,7 +14,7 @@
 		<import>jadex.bdi.planlib.protocols.*</import>
 		<import>jadex.commons.IFilter</import>
 		<import>jadex.application.runtime.*</import>
-		
+
 		<import>deco4mas.coordinate.environment.*</import>
 		<import>deco4mas.examples.agentNegotiation.sma.application.*
 		</import>
@@ -33,35 +33,42 @@
 			file="jadex.bdi.planlib.protocols.request.Request" />
 		<capability name="socap"
 			file="deco4mas.examples.agentNegotiation.sma.coordination.capability.serviceOfferer.ServiceOfferer" />
-		<capability name="tocap"
-			file="deco4mas.examples.agentNegotiation.sma.coordination.capability.trustOwner.TrustOwner" />
 	</capabilities>
 
 	<beliefs>
-		<!--    CoordSpace     -->
+		<!--   CoordSpace (needed by deco impl)   -->
 		<belief name="env" class="CoordinationSpace">
 			<fact>(CoordinationSpace)((IApplicationExternalAccess)$scope.getParent()).getSpace("mycoordspace")
 			</fact>
 		</belief>
 
+		<!--  negotiation types witch should be used 	-->
+		<beliefset name="negTypes" class="String">
+		<fact>"by_neg"</fact>
+			<assignto ref="socap.negTypes" />
+		</beliefset>
+
+<!--			use trust?	-->
+		<belief name="useTrust" class="Boolean">
+		<fact>true</fact>
+			<assignto ref="socap.useTrust" />
+		</belief>
+
+
+
+		<!--agent in execution phase?-->
 		<belief name="executionPhase" class="boolean">
 			<fact>false</fact>
 		</belief>
 
-		<!-- required services for current workflow	-->
+		<!-- required services for current workflow	(observed by deco)-->
 		<beliefset name="requiredServices" class="RequiredService"></beliefset>
 
 		<!--	workflow	-->
 		<belief name="workflow" class="IComponentIdentifier" />
 		<belief name="workflowName" class="String" exported="true"></belief>
 
-		<!--	utility function of sma	-->
-		<belief name="utilityFunction" class="IUtilityFunction">
-			<assignto ref="socap.utilityFunction" />
-			<assignto ref="tocap.utilityFunction" />
-		</belief>
-
-		<!--	statistik	-->
+		<!--	statistik use only	-->
 		<belief name="statNegtime" class="Long">
 			<fact>0l</fact>
 		</belief>
@@ -91,18 +98,18 @@
 
 	<plans>
 		<!-- service request -->
-		<plan name="rp_decide_request_plan">
-			<parameter name="action" class="Object">
-				<goalmapping ref="reqcap.rp_decide_request.action" />
-			</parameter>
-			<parameter name="accept" class="Boolean" direction="out">
-				<goalmapping ref="reqcap.rp_decide_request.accept" />
-			</parameter>
-			<body class="ServiceDecitePlan" />
-			<trigger>
-				<goal ref="reqcap.rp_decide_request" />
-			</trigger>
-		</plan>
+<!--		<plan name="rp_decide_request_plan">-->
+<!--			<parameter name="action" class="Object">-->
+<!--				<goalmapping ref="reqcap.rp_decide_request.action" />-->
+<!--			</parameter>-->
+<!--			<parameter name="accept" class="Boolean" direction="out">-->
+<!--				<goalmapping ref="reqcap.rp_decide_request.accept" />-->
+<!--			</parameter>-->
+<!--			<body class="ServiceDecitePlan" />-->
+<!--			<trigger>-->
+<!--				<goal ref="reqcap.rp_decide_request" />-->
+<!--			</trigger>-->
+<!--		</plan>-->
 		<plan name="rp_execute_request_plan">
 			<parameter name="action" class="Object">
 				<goalmapping ref="reqcap.rp_execute_request.action" />
@@ -133,14 +140,13 @@
 			</trigger>
 		</plan>
 
-		<!-- execution phase decision-->
+		<!-- test if workflow can start-->
 		<plan name="testExecuteWorkflow">
 			<body class="TestExecuteWorkflowPlan">
 			</body>
 			<trigger>
 				<internalevent ref="serviceSatisfied"></internalevent>
 			</trigger>
-<!--			<precondition>!$beliefbase.executionPhase</precondition>-->
 		</plan>
 
 		<!--start workflow-->
@@ -151,7 +157,7 @@
 			</trigger>
 		</plan>
 
-		<!--Test if workflow should restartet-->
+		<!--(maybe) restart workflow -->
 		<plan name="restartWorkflow">
 			<body class="RestartWorkflowPlan">
 			</body>
@@ -162,7 +168,7 @@
 	</plans>
 
 	<events>
-		<!--  events for deco capability	-->
+		<!--  eventrefs for deco capability	-->
 		<internaleventref name="searchSa">
 			<concrete ref="socap.searchSa" />
 		</internaleventref>
@@ -170,7 +176,7 @@
 			<concrete ref="socap.foundSa" />
 		</internaleventref>
 		<internaleventref name="trustEvent">
-			<concrete ref="tocap.trustEvent" />
+			<concrete ref="socap.trustEvent" />
 		</internaleventref>
 		<internaleventref name="serviceSatisfied">
 			<concrete ref="socap.serviceSatisfied" />
@@ -179,7 +185,7 @@
 			<concrete ref="socap.requiredServices" />
 		</internaleventref>
 
-		<!--	workflow is executed	-->
+		<!--	workflow executed events -->
 		<internalevent name="workflowExecuted"></internalevent>
 		<internalevent name="returnExecution"></internalevent>
 	</events>
@@ -187,19 +193,24 @@
 	<configurations>
 		<configuration name="default">
 			<beliefs>
+				<!--	filter and timeout for request protocol	-->
 				<initialbelief ref="reqcap.rp_filter">
 					<fact>IFilter.ALWAYS</fact>
 				</initialbelief>
 				<initialbelief ref="reqcap.timeout">
 					<fact>2000L</fact>
 				</initialbelief>
-				<initialbelief ref="utilityFunction">
-					<fact>new
-						WeightFactorUtilityFunction($scope.getComponentIdentifier())
-					</fact>
-				</initialbelief>
+
+				<!-- use by_neg medium with trust at socap	-->
+<!--				<initialbeliefset ref="socap.negTypes">-->
+<!--					<fact>"by_neg"</fact>-->
+<!--				</initialbeliefset>-->
+<!--				<initialbelief ref="socap.useTrust">-->
+<!--					<fact>true</fact>-->
+<!--				</initialbelief>-->
 			</beliefs>
 			<plans>
+				<!--	init workflow at start		-->
 				<initialplan ref="preInstantiateWorkflow"></initialplan>
 			</plans>
 		</configuration>

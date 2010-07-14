@@ -16,8 +16,8 @@
 				<agent id="ServiceAgent">
 					<elements>
 						<element id="makeProposal" type="INTERNAL_EVENT" />
-						<element id="offer" type="BDI_GOAL" />
-						<element id="reward" type="BDI_GOAL" />
+						<element id="offer" type="INTERNAL_EVENT" />
+						<element id="reward" type="INTERNAL_EVENT" />
 						<element id="rewardReply" type="INTERNAL_EVENT" />
 					</elements>
 				</agent>
@@ -27,15 +27,23 @@
 					<elements>
 						<element id="trustEvent" type="INTERNAL_EVENT" />
 					</elements>
+					<constraints>
+						<condition name="useTrust">$beliefbase.useTrust
+					</condition>
+					</constraints>
 				</agent>
 			</role_occupation>
 			<role_occupation name="TrustSubject" multiple="true">
 				<agent id="ServiceAgent">
 					<elements>
-<!--						<element id="contract" type="BDI_BELIEF" />-->
-<!--						<element id="contract" type="INTERNAL_EVENT" />-->
+						<!--						<element id="contract" type="BDI_BELIEF" />-->
+						<!--						<element id="contract" type="INTERNAL_EVENT" />-->
 						<element id="executionOccur" type="INTERNAL_EVENT" />
 					</elements>
+					<constraints>
+						<condition name="useTrust">$beliefbase.useTrust
+					</condition>
+					</constraints>
 				</agent>
 			</role_occupation>
 		</role_occupations>
@@ -45,32 +53,33 @@
 		<deco_links>
 			<deco_link realization="by_neg" type="POSITIVE" name="neg">
 				<froms>
-					<from>ServiceManagementAgent</from>
-					<from>ServiceAgent</from>
+					<from>ServiceOfferer</from>
+					<from>ServiceSupplier</from>
 				</froms>
 				<tos>
-					<to>ServiceManagementAgent</to>
-					<to>ServiceAgent</to>
+					<to>ServiceOfferer</to>
+					<to>ServiceSupplier</to>
 				</tos>
 			</deco_link>
 			<deco_link realization="by_trust" type="POSITIVE" name="trust">
 				<froms>
-					<from>ServiceAgent</from>
+					<from>TrustSubject</from>
 				</froms>
 				<tos>
-					<to>ServiceManagementAgent</to>
+					<to>TrustOwner</to>
 				</tos>
 			</deco_link>
 		</deco_links>
 		<direct_links>
-			<direct_link realization="by_directInternalEvent" type="POSITIVE" name="direct">
+			<direct_link realization="by_directInternalEvent" type="POSITIVE"
+				name="direct">
 				<froms>
-					<from>ServiceManagementAgent</from>
-<!--					<from>ServiceAgent</from>-->
+					<from>ServiceOfferer</from>
+					<!--					<from>ServiceAgent</from>-->
 				</froms>
 				<tos>
-					<to>ServiceManagementAgent</to>
-<!--					<to>ServiceAgent</to>-->
+					<to>ServiceOfferer</to>
+					<!--					<to>ServiceAgent</to>-->
 				</tos>
 			</direct_link>
 		</direct_links>
@@ -79,31 +88,26 @@
 				<from>
 					<agent_element element="requiredServices" agent_id="ServiceManagementAgent"
 						type="BDI_BELIEFSET">
-<!--						<parameter_mappings>-->
-<!--						<mapping class="RequiredService" ref="service" data="content"-->
-<!--								name="requiredServices" type="BDI_BELIEF"/>-->
-<!--						</parameter_mappings>-->
 					</agent_element>
-<!--					<agent_element element="contract" agent_id="ServiceAgent"-->
-<!--						type="BDI_BELIEF">-->
-<!--					</agent_element>-->
+					<!--					<agent_element element="contract" agent_id="ServiceAgent"-->
+					<!--						type="BDI_BELIEF">-->
+					<!--					</agent_element>-->
 				</from>
 				<configuration></configuration>
 				<to>
 					<agent_element element="requiredServices" agent_id="ServiceManagementAgent"
 						type="INTERNAL_EVENT">
 						<parameter_mappings>
-							<mapping class="RequiredService" ref="value"
-								name="service" />
+							<mapping class="RequiredService" ref="value" name="service" />
 						</parameter_mappings>
 					</agent_element>
-<!--					<agent_element element="contract" agent_id="ServiceAgent"-->
-<!--						type="INTERNAL_EVENT">-->
-<!--						<parameter_mappings>-->
-<!--							<mapping class="Contract" ref="value"-->
-<!--								name="contract" />-->
-<!--						</parameter_mappings>-->
-<!--					</agent_element>-->
+					<!--					<agent_element element="contract" agent_id="ServiceAgent"-->
+					<!--						type="INTERNAL_EVENT">-->
+					<!--						<parameter_mappings>-->
+					<!--							<mapping class="Contract" ref="value"-->
+					<!--								name="contract" />-->
+					<!--						</parameter_mappings>-->
+					<!--					</agent_element>-->
 				</to>
 			</direct_link_configuration>
 		</direct_link_configurations>

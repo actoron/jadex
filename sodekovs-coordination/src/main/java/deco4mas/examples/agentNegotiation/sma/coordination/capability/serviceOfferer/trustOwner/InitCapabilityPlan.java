@@ -1,4 +1,4 @@
-package deco4mas.examples.agentNegotiation.sma.coordination.capability.trustOwner;
+package deco4mas.examples.agentNegotiation.sma.coordination.capability.serviceOfferer.trustOwner;
 
 import jadex.bdi.runtime.Plan;
 import java.util.HashMap;
@@ -9,12 +9,11 @@ import deco4mas.examples.agentNegotiation.evaluate.ClockTime;
 import deco4mas.examples.agentNegotiation.evaluate.ParameterLogger;
 import deco4mas.examples.agentNegotiation.sma.coordination.negotiationStrategy.HistorytimeTrustFunction;
 import deco4mas.examples.agentNegotiation.sma.coordination.negotiationStrategy.ServiceAgentHistory;
-import deco4mas.examples.agentNegotiation.sma.coordination.negotiationStrategy.WeightFactorUtilityFunction;
 
 /**
- * init agent beliefs
+ * init capabilityF beliefs
  */
-public class InitAgentPlan extends Plan
+public class InitCapabilityPlan extends Plan
 {
 	final ParameterLogger trustLogger = (ParameterLogger) AgentLogger.getTimeDiffEventForSa("TrustChange_" + this.getComponentName());
 
@@ -32,7 +31,6 @@ public class InitAgentPlan extends Plan
 			eventWeight.put(TrustEvent.FailedRequest, -8.0);
 			eventWeight.put(TrustEvent.CancelArrangement, -1.0);
 			HistorytimeTrustFunction trustFunction = new HistorytimeTrustFunction(this.getComponentIdentifier(), history, eventWeight);
-			((WeightFactorUtilityFunction) getBeliefbase().getBelief("utilityFunction").getFact()).setTrustFunction(trustFunction);
 			getBeliefbase().getBelief("trustFunction").setFact(trustFunction);
 			
 		} catch (Exception e)
