@@ -50,14 +50,13 @@ import java.util.Set;
  */
 public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObject implements IEnvironmentSpace, ISpace
 {
-
 	//-------- attributes --------
 	
 	/** The space name. */
 	protected String name;
 	
 	/** The context. */
-	protected IApplication context;
+	protected IApplication application;
 	
 	/** The space object types. */
 	protected Map objecttypes;
@@ -180,7 +179,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 		List spaceprops = si.getPropertyList("properties");
 		MEnvSpaceInstance.setProperties(this, spaceprops, fetcher);
 		
-		this.context	= context;
+		this.application	= context;
 		
 		if(this instanceof Space2D) // Hack?
 		{
@@ -965,10 +964,10 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 //					String	name	= null;
 					if(mapping.getComponentName()!=null)
 					{
-						SimpleValueFetcher fetch = new SimpleValueFetcher();
-						fetch.setValue("$space", this);
-						fetch.setValue("$object", ret);
-						name = (String) mapping.getComponentName().getValue(fetch);
+//						SimpleValueFetcher fetch = new SimpleValueFetcher();
+//						fetch.setValue("$space", this);
+//						fetch.setValue("$object", ret);
+						name = (String)mapping.getComponentName().getValue(getFetcher());
 					}
 					
 					// todo: what about arguments etc.?
@@ -985,7 +984,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 						}
 					};
 					final String compotype = componenttype;
-					SServiceProvider.getServiceUpwards(context.getServiceProvider(), IComponentManagementService.class).addResultListener(new DefaultResultListener()
+					SServiceProvider.getServiceUpwards(application.getServiceProvider(), IComponentManagementService.class).addResultListener(new DefaultResultListener()
 					{
 						public void resultAvailable(Object source, Object result)
 						{
@@ -1310,7 +1309,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 			
 //			System.out.println("New percept: "+typename+", "+data+", "+component);
 			
-			String	componenttype = context.getComponentType(component);
+			String	componenttype = application.getComponentType(component);
 			List procs	= (List)perceptprocessors.get(componenttype);
 			IPerceptProcessor proc = null;
 			if(procs!=null)
@@ -1622,7 +1621,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 	/**
 	 *  Called when an component was added. 
 	 */
-	public void componentAdded(IComponentIdentifier aid, String type)
+	public void componentAdded(IComponentIdentifier aid)//, String type)
 	{
 		synchronized(monitor)
 		{
@@ -1639,7 +1638,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 			}
 			else
 			{
-				String	componenttype	= context.getComponentType(aid);
+				String	componenttype	= application.getComponentType(aid);
 				if(componenttype!=null && avatarmappings.getCollection(componenttype)!=null)
 				{
 					for(Iterator it=avatarmappings.getCollection(componenttype).iterator(); it.hasNext(); )
@@ -1674,7 +1673,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 	{
 		synchronized(monitor)
 		{
-			String	componenttype	= context.getComponentType(aid);
+			String	componenttype	= application.getComponentType(aid);
 			
 			// Possibly kill avatars of that component.
 			if(componenttype!=null && avatarmappings.getCollection(componenttype)!=null)
@@ -1714,7 +1713,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 	 */
 	public IApplication getContext()
 	{
-		return context;
+		return application;
 	}
 	
 	/**

@@ -142,6 +142,16 @@ public class MGpmnModel extends MProcess implements ICacheableModel, ILoadableCo
 	}*/
 	
 	/**
+	 *  Get the full model name (package.name)
+	 *  @return The full name.
+	 */
+	public String getFullName()
+	{
+		String pkg = getPackage();
+		return pkg!=null && pkg.length()>0? pkg+"."+getName(): getName();
+	}
+	
+	/**
 	 *  Get the description of the model.
 	 *  @return The description of the model.
 	 */

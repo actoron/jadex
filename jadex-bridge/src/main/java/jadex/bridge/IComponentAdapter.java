@@ -65,7 +65,6 @@ public interface IComponentAdapter
 	 *  @return The children.
 	 */
 	public IFuture getChildren();
-
 	
 	/**
 	 *  Get the service container.

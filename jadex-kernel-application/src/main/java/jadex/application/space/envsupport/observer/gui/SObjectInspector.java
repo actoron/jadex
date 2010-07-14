@@ -3,6 +3,7 @@ package jadex.application.space.envsupport.observer.gui;
 import jadex.application.space.envsupport.environment.ISpaceObject;
 import jadex.commons.IPropertyObject;
 import jadex.javaparser.IParsedExpression;
+import jadex.javaparser.IValueFetcher;
 import jadex.javaparser.SimpleValueFetcher;
 
 import java.beans.BeanInfo;
@@ -124,7 +125,7 @@ public class SObjectInspector
 	 * @param name name of the property
 	 * @return the property
 	 */
-	public static Object getProperty(Object obj, String name, String objname, Map prevals)
+	public static Object getProperty(Object obj, String name, String objname, IValueFetcher fetcher)
 	{
 		Object ret = null;
 		if(obj instanceof IPropertyObject)
@@ -163,16 +164,16 @@ public class SObjectInspector
 		
 		if(ret instanceof IParsedExpression)
 		{
-			SimpleValueFetcher fetcher = new SimpleValueFetcher();
-			fetcher.setValue(objname, obj);
-			if(prevals!=null)
-			{
-				for(Iterator it=prevals.keySet().iterator(); it.hasNext(); )
-				{
-					String valname = (String)it.next();
-					fetcher.setValue(valname, prevals.get(valname));
-				}
-			}
+//			SimpleValueFetcher fetcher = new SimpleValueFetcher();
+//			fetcher.setValue(objname, obj);
+//			if(prevals!=null)
+//			{
+//				for(Iterator it=prevals.keySet().iterator(); it.hasNext(); )
+//				{
+//					String valname = (String)it.next();
+//					fetcher.setValue(valname, prevals.get(valname));
+//				}
+//			}
 			ret = ((IParsedExpression)ret).getValue(fetcher);
 		}
 		

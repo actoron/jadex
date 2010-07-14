@@ -26,15 +26,15 @@ public interface ISpace
 	/**
 	 *  Get the context.
 	 *  @return The context.
-	 * /
-	public IContext getContext();*/
+	 */
+//	public IApplication getApplication();
 	
 	/**
 	 *  Called from application component, when a component was added.
 	 *  @param cid	The id of the added component.
 	 *  @param type	The logical type name.
 	 */
-	public void	componentAdded(IComponentIdentifier cid, String type);
+	public void	componentAdded(IComponentIdentifier cid);
 
 	/**
 	 *  Called from application component, when a component was removed.

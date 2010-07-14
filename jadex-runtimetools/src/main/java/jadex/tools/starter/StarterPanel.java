@@ -289,9 +289,9 @@ public class StarterPanel extends JPanel
 										public void customResultAvailable(Object source, Object result)
 										{
 //											System.out.println("fullname: "+fullname+" "+model.getFilename());
-											String tmp = (String)mymodel.getPackage()+"."+mymodel.getName();
+											String tmp = (String)mymodel.getFullName();
 											resultsets.put(tmp, new Object[]{source, result});
-											if(model!=null && fullname.equals(model.getPackage()+"."+model.getName()))
+											if(model!=null && fullname.equals(model.getFullName()))
 											{
 												selectavail.addItem(source);
 												refreshResults();
@@ -914,7 +914,7 @@ public class StarterPanel extends JPanel
 //		System.out.println("Selected index: "+sel+selectavail.getSelectedItem().hashCode());
 		if(sel>0)
 		{
-			List rs = (List)resultsets.get(model.getPackage()+"."+model.getName());
+			List rs = (List)resultsets.get(model.getFullName());
 			Object[] r = (Object[])rs.get(sel-1);
 			mres = (Map)r[1];
 		}
@@ -989,7 +989,7 @@ public class StarterPanel extends JPanel
 					}
 				});
 				
-				List rs = (List)resultsets.get(model.getPackage()+"."+model.getName());
+				List rs = (List)resultsets.get(model.getFullName());
 				if(rs!=null)
 				{
 					for(int i=0; i<rs.size(); i++)

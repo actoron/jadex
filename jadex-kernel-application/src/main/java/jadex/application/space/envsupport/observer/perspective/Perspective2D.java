@@ -151,8 +151,8 @@ public class Perspective2D extends TypedPropertyObject implements IPerspective
 	{
 		if(fetcher==null)
 		{
-			this.fetcher = new SimpleValueFetcher();
-			fetcher.setValue("$space", obscenter.getSpace());
+			this.fetcher = new SimpleValueFetcher(obscenter.getSpace().getFetcher());
+//			fetcher.setValue("$space", obscenter.getSpace());
 			fetcher.setValue("$perspective", this);
 		}
 		return this.fetcher;

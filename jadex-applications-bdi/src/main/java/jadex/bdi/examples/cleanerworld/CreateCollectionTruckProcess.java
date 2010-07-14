@@ -12,6 +12,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.commons.IFuture;
 import jadex.commons.SimplePropertyObject;
+import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.service.SServiceProvider;
 import jadex.service.clock.IClockService;
@@ -78,48 +79,51 @@ public class CreateCollectionTruckProcess extends SimplePropertyObject implement
 			{
 //				System.out.println("Creating garbage collection truck.");
 				final IApplication app = space.getContext();
-				Map params = new HashMap();
+				final Map params = new HashMap();
 				params.put("wastebins", todo.toArray());
 				ongoing.addAll(todo);
-				IComponentManagementService	ces	= (IComponentManagementService)SServiceProvider.getService(app.getServiceProvider(), IComponentManagementService.class);
-				
-				IFuture ret = ces.createComponent(null, app.getComponentFilename("Truck"),
-					new CreationInfo(null, params, app.getComponentIdentifier(), false, false, false, app.getAllImports()), null);
-			
-				IResultListener lis = new IResultListener()
+				SServiceProvider.getServiceUpwards(app.getServiceProvider(), IComponentManagementService.class)
+					.addResultListener(new DefaultResultListener()
 				{
-					public void exceptionOccurred(Object source, Exception exception)
-					{
-					}
 					public void resultAvailable(Object source, Object result)
 					{
-						IComponentIdentifier truck = (IComponentIdentifier)result;
-						IComponentManagementService ces = (IComponentManagementService)SServiceProvider
-							.getService(app.getServiceProvider(), IComponentManagementService.class);
-						IFuture ret = ces.getExternalAccess(truck);
-						ret.addResultListener(new IResultListener()
+						final IComponentManagementService cms	= (IComponentManagementService)result;
+						IFuture ret = cms.createComponent(null, app.getComponentFilename("Truck"),
+							new CreationInfo(null, params, app.getComponentIdentifier(), false, false, false, app.getAllImports()), null);
+						
+						IResultListener lis = new IResultListener()
 						{
 							public void exceptionOccurred(Object source, Exception exception)
 							{
 							}
 							public void resultAvailable(Object source, Object result)
 							{
-								IBDIExternalAccess ex = (IBDIExternalAccess)result;
-								ex.addAgentListener(new IAgentListener()
+								IComponentIdentifier truck = (IComponentIdentifier)result;
+								cms.getExternalAccess(truck).addResultListener(new IResultListener()
 								{
-									public void agentTerminated(AgentEvent ae)
+									public void exceptionOccurred(Object source, Exception exception)
 									{
-										ongoing.removeAll(todo);
 									}
-									public void agentTerminating(AgentEvent ae)
+									public void resultAvailable(Object source, Object result)
 									{
+										IBDIExternalAccess ex = (IBDIExternalAccess)result;
+										ex.addAgentListener(new IAgentListener()
+										{
+											public void agentTerminated(AgentEvent ae)
+											{
+												ongoing.removeAll(todo);
+											}
+											public void agentTerminating(AgentEvent ae)
+											{
+											}
+										});
 									}
 								});
 							}
-						});
+						};
+						ret.addResultListener(lis);
 					}
-				};
-				ret.addResultListener(lis);
+				});
 			}
 		}
 	}

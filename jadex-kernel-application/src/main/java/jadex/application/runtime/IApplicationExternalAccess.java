@@ -1,7 +1,6 @@
 package jadex.application.runtime;
 
 import jadex.bridge.IExternalAccess;
-import jadex.commons.IFuture;
 
 
 /**
@@ -14,5 +13,5 @@ public interface IApplicationExternalAccess	extends IExternalAccess
 	 *  @param name	The name of the space.
 	 *  @return	The space.
 	 */
-	public IFuture getSpace(String name);
+	public ISpace getSpace(String name);
 }

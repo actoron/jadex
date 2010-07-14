@@ -118,7 +118,7 @@ public class TiledLayer implements ILayer
 	 * @param vp the viewport
 	 * @param g Graphics2D context
 	 */
-	public void draw(final IPerspective perspective, IVector2 areaSize, ViewportJ2D vp, Graphics2D g)
+	public void draw(final IPerspective perspective, IVector2 areaSize, final ViewportJ2D vp, Graphics2D g)
 	{
 		Composite c = g.getComposite();
 		if (!Color.WHITE.equals(modColor_))
@@ -127,9 +127,8 @@ public class TiledLayer implements ILayer
 			{
 				protected Color getColor()
 				{
-					Map prevals = new HashMap();
-					prevals.put("$space", perspective.getObserverCenter().getSpace());
-					return modColor_ instanceof Color? (Color)modColor_: (Color)SObjectInspector.getProperty(perspective, (String)modColor_, "$perspective", prevals);
+					return modColor_ instanceof Color? (Color)modColor_: (Color)SObjectInspector.getProperty(perspective, (String)modColor_, "$perspective", 
+						vp.getPerspective().getObserverCenter().getSpace().getFetcher());
 //						return (Color) SObjectInspector.getPropertyAsClass(propObject, modColor_, Color.class);
 				}
 			});
@@ -167,9 +166,8 @@ public class TiledLayer implements ILayer
 		gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_S, GL.GL_REPEAT);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_T, GL.GL_REPEAT);
 
-		Map prevals = new HashMap();
-		prevals.put("$space", perspective.getObserverCenter().getSpace());
-		Color c = modColor_ instanceof Color? (Color)modColor_: (Color)SObjectInspector.getProperty(perspective, (String)modColor_, "$perspective", prevals);
+		Color c = modColor_ instanceof Color? (Color)modColor_: (Color)SObjectInspector.getProperty(perspective, (String)modColor_, "$perspective", 
+			vp.getPerspective().getObserverCenter().getSpace().getFetcher());
 		gl.glColor4fv(c.getComponents(null), 0);
 //		gl.glColor4fv(((Color) SObjectInspector.getPropertyAsClass(layerObject, modColor_, Color.class)).getComponents(null), 0);
 		

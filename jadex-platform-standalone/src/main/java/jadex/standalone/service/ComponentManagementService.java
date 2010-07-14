@@ -1230,7 +1230,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 				synchronized(descs)
 				{
 					adapters.put(root.getComponentIdentifier(), root);
-					IComponentDescription desc = createComponentDescription(root.getComponentIdentifier(), null, null, null, null);
+					IComponentDescription desc = createComponentDescription(root.getComponentIdentifier(), null, null, null, null); 
 					descs.put(root.getComponentIdentifier(), desc);
 				}
 			}

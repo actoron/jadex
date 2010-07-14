@@ -1,6 +1,7 @@
 package jadex.application.runtime.impl;
 
 import jadex.application.runtime.IApplicationExternalAccess;
+import jadex.application.runtime.ISpace;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
@@ -66,26 +67,29 @@ public class ExternalAccess implements IApplicationExternalAccess
 	 *  @param name	The name of the space.
 	 *  @return	The space.
 	 */
-	public IFuture getSpace(final String name)
+	public ISpace getSpace(final String name)
 	{
-		final Future ret = new Future();
+		// Application getSpace() is synchronized
+		return application.getSpace(name);
 		
-		if(adapter.isExternalThread())
-		{
-			adapter.invokeLater(new Runnable() 
-			{
-				public void run() 
-				{
-					ret.setResult(application.getSpace(name));
-				}
-			});
-		}
-		else
-		{
-			ret.setResult(application.getSpace(name));
-		}
-		
-		return ret;
+//		final Future ret = new Future();
+//		
+//		if(adapter.isExternalThread())
+//		{
+//			adapter.invokeLater(new Runnable() 
+//			{
+//				public void run() 
+//				{
+//					ret.setResult(application.getSpace(name));
+//				}
+//			});
+//		}
+//		else
+//		{
+//			ret.setResult(application.getSpace(name));
+//		}
+//		
+//		return ret;
 	}
 	
 	/**

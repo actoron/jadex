@@ -27,7 +27,6 @@ import jadex.bridge.IMessageAdapter;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.SReflect;
-import jadex.commons.SUtil;
 import jadex.commons.concurrent.CollectionResultListener;
 import jadex.commons.concurrent.CounterResultListener;
 import jadex.commons.concurrent.DefaultResultListener;
@@ -43,6 +42,7 @@ import jadex.service.SServiceProvider;
 import jadex.service.library.ILibraryService;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -96,7 +96,7 @@ public class Application implements IApplication, IComponentInstance
 	 * (no more components can be added). */
 	protected boolean	terminating;
 	
-	/** Component type mapping (cid -> logical type name). */
+	/** Component type mapping (cid -> modelname) and (modelname->application component type). */
 	protected Map ctypes;
 	
 	/** The arguments. */
@@ -125,6 +125,7 @@ public class Application implements IApplication, IComponentInstance
 		this.results = new HashMap();
 		this.adapter = factory.createComponentAdapter(desc, model, this, parent);
 		this.properties = new HashMap();
+		this.ctypes = Collections.synchronizedMap(new HashMap()); 
 		
 		// Init the arguments with default values.
 		String configname = config!=null? config.getName(): null;
@@ -150,7 +151,6 @@ public class Application implements IApplication, IComponentInstance
 			}
 		}
 		
-
 		SimpleValueFetcher	fetcher = new SimpleValueFetcher();
 		fetcher.setValue("$platform", getServiceProvider());
 		fetcher.setValue("$args", getArguments());
@@ -170,8 +170,37 @@ public class Application implements IApplication, IComponentInstance
 			}
 		}
 
+		List futures	= new ArrayList();
+		
+		// Create map of modelnames -> application component typenames
+//		List atypes	= Application.this.model.getApplicationType().getMComponentTypes();
+//		for(int i=0; i<atypes.size(); i++)
+//		{
+//			final MComponentType atype = (MComponentType)atypes.get(i);
+//			final Future ret = new Future();
+//			futures.add(ret);
+//			loadModel(getServiceProvider(), atype.getFilename()).addResultListener(new DefaultResultListener()
+//			{
+//				public void resultAvailable(Object source, Object result)
+//				{
+//					ILoadableComponentModel lmodel = (ILoadableComponentModel)result;
+//					if(lmodel!=null)
+//					{
+//						ctypes.put(lmodel.getFullName(), atype.getName());
+//						System.out.println("added: "+atype.getName());
+//						ret.setResult(null);
+//					}
+//					else
+//					{
+//						System.out.println("ex: "+atype.getName());
+//						ret.setException(new RuntimeException("Model could not be loaded: "+atype.getFilename()));
+//					}
+//				}
+//			});
+//		}
+		
 		// Evaluate (future) properties.
-		List	futures	= new ArrayList();
+//		List	futures	= new ArrayList();
 		List	props	= model.getApplicationType().getProperties();
 		if(props!=null)
 		{
@@ -213,6 +242,7 @@ public class Application implements IApplication, IComponentInstance
 				
 			}
 		}
+		
 		if(futures.isEmpty())
 		{
 			state	= STATE_INITREADY;
@@ -237,6 +267,34 @@ public class Application implements IApplication, IComponentInstance
 				((IFuture)futures.get(i)).addResultListener(crl);
 			}
 		}
+	}
+	
+	/**
+	 * Load an component model.
+	 * @param model The model.
+	 * @return The loaded model.
+	 */
+	public static IFuture loadModel(final IServiceProvider provider, final String model)
+	{
+		final Future ret = new Future();
+		
+		SServiceProvider.getService(provider, ILibraryService.class).addResultListener(new DefaultResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				final ILibraryService ls = (ILibraryService)result;
+				
+				SServiceProvider.getService(provider, new ComponentFactorySelector(model, null, ls.getClassLoader())).addResultListener(new DefaultResultListener()
+				{
+					public void resultAvailable(Object source, Object result)
+					{
+						IComponentFactory fac = (IComponentFactory)result;
+						ret.setResult(fac!=null ? fac.loadModel(model, null, ls.getClassLoader()) : null);
+					}
+				});
+			}
+		});
+		return ret;
 	}
 
 	//-------- space handling --------
@@ -297,7 +355,7 @@ public class Application implements IApplication, IComponentInstance
 	/**
 	 *  Delete a context. Called from context service before a context is
 	 *  removed from the platform. Default context behavior is to do nothing.
-	 *  @param context	The context to be deleted.
+	 *  @param application	The context to be deleted.
 	 *  @param listener	The listener to be notified when deletion is finished (if any).
 	 */
 	public void	deleteContext(final IResultListener listener)
@@ -380,72 +438,55 @@ public class Application implements IApplication, IComponentInstance
 	{
 		// Checks if loaded model is defined in the application component types
 		
-//		System.out.println("comp created: "+desc.getName()+" "+Application.this.getComponentIdentifier()+" "+children);
+		System.out.println("comp created: "+desc.getName()+" "+Application.this.getComponentIdentifier()+" "+children);
 
+		IComponentIdentifier comp = desc.getName();
+		
 		if(!desc.isDaemon())
 			children++;
 		
-		SServiceProvider.getService(getServiceProvider(), new ComponentFactorySelector(desc.getType())).addResultListener(new DefaultResultListener()
+		String modelname = model.getFullName();
+		String appctype = (String)ctypes.get(modelname);
+		if(appctype==null)
 		{
-			public void resultAvailable(Object source, Object result)
+			List atypes	= Application.this.model.getApplicationType().getMComponentTypes();
+			for(int i=0; i<atypes.size(); i++)
 			{
-				IComponentIdentifier comp = desc.getName();
-				List atypes	= Application.this.model.getApplicationType().getMComponentTypes();
-				boolean	found	= false;
-				String	type	= null;
-				
-				IComponentFactory factory = (IComponentFactory)result;
-				// Hack!!! simplify lookup!?
-				if(factory!=null)
+				final MComponentType atype = (MComponentType)atypes.get(i);
+				String tmp = atype.getFilename().replace('/', '.');
+				if(tmp.indexOf(modelname)!=-1)
 				{
-					for(int i=0; !found	&& i<atypes.size(); i++)
-					{
-						MComponentType	atype	= (MComponentType)atypes.get(i);			
-						if(factory.isLoadable(atype.getFilename(), Application.this.model.getApplicationType().getAllImports(), model.getClassLoader()))
-						{
-							ILoadableComponentModel amodel = factory.loadModel(atype.getFilename(), Application.this.model.getApplicationType().getAllImports(), model.getClassLoader());
-							if(SUtil.equals(amodel.getPackage(), model.getPackage()) && amodel.getName().equals(model.getName()))
-							{
-								synchronized(this)
-								{
-									if(ctypes==null)
-										ctypes	= new HashMap();
-									ctypes.put(comp, atype.getName());
-								}
-								type	= atype.getName();
-								found	= true;
-							}
-						}
-					}
-				}
-				if(found)
-				{
-					ISpace[]	aspaces	= null;
-					synchronized(this)
-					{
-						if(spaces!=null)
-						{
-							aspaces	= (ISpace[])spaces.values().toArray(new ISpace[spaces.size()]);
-						}
-					}
-	
-					if(aspaces!=null)
-					{
-						for(int i=0; i<aspaces.length; i++)
-						{
-							aspaces[i].componentAdded(comp, type);
-						}
-					}
-				}
-				else if(parent!=null)
-				{
-					// Hack?
-					// Root application, i.e. platform does not need to declare all known child types 
-					throw new RuntimeException("Unsupported component for application: "+model.getFilename());
+					ctypes.put(modelname, atype.getName());
+					appctype = atype.getName();
+					break;
 				}
 			}
-		});
-	
+		}
+		if(appctype!=null)
+		{
+			ctypes.put(comp, appctype);
+		}
+		else if(parent!=null)
+		{
+			throw new RuntimeException("Unknown/undefined component type: "+model);
+		}
+		
+		ISpace[]	aspaces	= null;
+		synchronized(this)
+		{
+			if(spaces!=null)
+			{
+				aspaces	= (ISpace[])spaces.values().toArray(new ISpace[spaces.size()]);
+			}
+		}
+
+		if(aspaces!=null)
+		{
+			for(int i=0; i<aspaces.length; i++)
+			{
+				aspaces[i].componentAdded(comp);
+			}
+		}
 	}
 	
 	/**
@@ -476,12 +517,9 @@ public class Application implements IApplication, IComponentInstance
 			}
 		}
 		
-		synchronized(this)
+		if(ctypes!=null)
 		{
-			if(ctypes!=null)
-			{
-				ctypes.remove(comp);
-			}
+			ctypes.remove(comp);
 		}
 		
 		if(desc.isMaster())

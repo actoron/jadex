@@ -22,12 +22,15 @@
 		<import>jadex.application.space.envsupport.observer.perspective.*</import>
 		<import>jadex.bdi.planlib.*</import>
 		<import>jadex.bdi.examples.cleanerworld.cleaner.*</import>
+		<import>jadex.service.clock.IClockService</import>
+		<import>jadex.service.SServiceProvider</import>
+		<import>jadex.commons.IFuture</import>
 	</imports>
 	
 	<spacetypes>
 		<env:envspacetype name="2dspace" class="ContinuousSpace2D" width="1" height="1">
 			<env:property name="border">Space2D.BORDER_STRICT</env:property>
-			<env:property name="time" dynamic="true">jadex.service.SServiceProvider.getService($platform, IClockService.class).getTime()</env:property>
+			<env:property name="time" dynamic="true">$properties.clock.getTime()</env:property>
 			<env:property name="timeofday" dynamic="true">(int)($space.time %86400)</env:property>
 			<env:property name="daytime" dynamic="true">$space.timeofday &lt; 43200</env:property>
 			<!-- <env:property name="alpha" dynamic="true">100-(int)(Math.sin($space.timeofday/86400.0*2*Math.PI)*50+50)</env:property> -->
@@ -195,6 +198,12 @@
 		<componenttype name="Cleaner" filename="jadex/bdi/examples/cleanerworld/cleaner/Cleaner.agent.xml"/>
 		<componenttype name="Truck" filename="jadex/bdi/examples/cleanerworld/truck/Truck.agent.xml"/>
 	</componenttypes>
+	
+	<properties>
+		<property name="clock" class="IFuture">
+			SServiceProvider.getService($component.getServiceProvider(), IClockService.class)
+		</property>
+	</properties>
 	
 	<applications>
 		<application name="One cleaner">

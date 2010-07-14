@@ -8,6 +8,7 @@ import jadex.bridge.IComponentManagementService;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IChangeListener;
 import jadex.commons.SimplePropertyObject;
+import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IExecutable;
 import jadex.service.*;
 import jadex.service.clock.IClockService;
@@ -75,123 +76,142 @@ public class DeltaTimeExecutor extends SimplePropertyObject implements ISpaceExe
 		final AbstractEnvironmentSpace space = (AbstractEnvironmentSpace)getProperty("space");
 		final boolean tick = getProperty("tick")!=null && ((Boolean)getProperty("tick")).booleanValue();
 		this.container	= space.getContext().getServiceProvider();
-		final IClockService clockservice = (IClockService)container.getService(IClockService.class);
-		final IExecutionService exeservice = (IExecutionService)container.getService(IExecutionService.class);
-				
-		final IExecutable	executable	= new IExecutable()
-		{
-			public boolean execute()
-			{
-				long currenttime = clockservice.getTime();
-				long progress = currenttime - timestamp;
-				timestamp = currenttime;
-
-//				System.out.println("step: "+timestamp+" "+progress);
-	
-				synchronized(space.getMonitor())
-				{
-					
-					// Update the environment objects.
-					Object[] objs = space.getSpaceObjectsCollection().toArray();
-					for(int i=0; i<objs.length; i++)
-					{
-						SpaceObject obj = (SpaceObject)objs[i];
-						obj.updateObject(space, progress, clockservice);
-					}
-					
-					// Execute the scheduled component actions.
-					space.getComponentActionList().executeActions(null, true);
-					
-					// Execute the processes.
-					Object[] procs = space.getProcesses().toArray();
-					for(int i = 0; i < procs.length; ++i)
-					{
-						ISpaceProcess process = (ISpaceProcess) procs[i];
-						process.execute(clockservice, space);
-					}
-					
-					// Update the views.
-					for(Iterator it = space.getViews().iterator(); it.hasNext(); )
-					{
-						IDataView view = (IDataView)it.next();
-						view.update(space);
-					}
-
-					// Execute the data consumers.
-					for(Iterator it = space.getDataConsumers().iterator(); it.hasNext(); )
-					{
-						ITableDataConsumer consumer = (ITableDataConsumer)it.next();
-						consumer.consumeData(currenttime, clockservice.getTick());
-					}
-					
-					// Send the percepts to the components.
-					space.getPerceptList().processPercepts(null);
-				}
-				
-				return false;
-			}
-		};
 		
-		this.timestamp = clockservice.getTime();
-		
-		// Start the processes.
-		Object[] procs = space.getProcesses().toArray();
-		for(int i = 0; i < procs.length; ++i)
+		SServiceProvider.getService(container, IClockService.class).addResultListener(new DefaultResultListener()
 		{
-			ISpaceProcess process = (ISpaceProcess) procs[i];
-			process.start(clockservice, space);
-		}
-
-		if(tick)
-		{
-			timer = clockservice.createTickTimer(new ITimedObject()
+			public void resultAvailable(Object source, Object result)
 			{
-				public void timeEventOccurred(long currenttime)
+				final IClockService clockservice = (IClockService)result;
+				SServiceProvider.getService(container, IExecutionService.class).addResultListener(new DefaultResultListener()
 				{
-//					boolean t = false;
-//					synchronized(DeltaTimeExecutor.this)
-//					{
-//						t = terminated;
-//					}
-//					if(t)
-//					{
-						if(!terminated)
+					public void resultAvailable(Object source, Object result)
+					{
+						final IExecutionService exeservice = (IExecutionService)result;
+						
+						final IExecutable	executable	= new IExecutable()
 						{
-							exeservice.execute(executable);
-							timer = clockservice.createTickTimer(this);
+							public boolean execute()
+							{
+								long currenttime = clockservice.getTime();
+								long progress = currenttime - timestamp;
+								timestamp = currenttime;
+
+//								System.out.println("step: "+timestamp+" "+progress);
+					
+								synchronized(space.getMonitor())
+								{
+									
+									// Update the environment objects.
+									Object[] objs = space.getSpaceObjectsCollection().toArray();
+									for(int i=0; i<objs.length; i++)
+									{
+										SpaceObject obj = (SpaceObject)objs[i];
+										obj.updateObject(space, progress, clockservice);
+									}
+									
+									// Execute the scheduled component actions.
+									space.getComponentActionList().executeActions(null, true);
+									
+									// Execute the processes.
+									Object[] procs = space.getProcesses().toArray();
+									for(int i = 0; i < procs.length; ++i)
+									{
+										ISpaceProcess process = (ISpaceProcess) procs[i];
+										process.execute(clockservice, space);
+									}
+									
+									// Update the views.
+									for(Iterator it = space.getViews().iterator(); it.hasNext(); )
+									{
+										IDataView view = (IDataView)it.next();
+										view.update(space);
+									}
+
+									// Execute the data consumers.
+									for(Iterator it = space.getDataConsumers().iterator(); it.hasNext(); )
+									{
+										ITableDataConsumer consumer = (ITableDataConsumer)it.next();
+										consumer.consumeData(currenttime, clockservice.getTick());
+									}
+									
+									// Send the percepts to the components.
+									space.getPerceptList().processPercepts(null);
+								}
+								
+								return false;
+							}
+						};
+						
+						timestamp = clockservice.getTime();
+						
+						// Start the processes.
+						Object[] procs = space.getProcesses().toArray();
+						for(int i = 0; i < procs.length; ++i)
+						{
+							ISpaceProcess process = (ISpaceProcess) procs[i];
+							process.start(clockservice, space);
 						}
-//					}
-				}
-			});
-		}
-		else
-		{
-			clocklistener = new IChangeListener()
-			{
-				public void changeOccurred(ChangeEvent e)
-				{
-					exeservice.execute(executable);
-				}
-			};
-			clockservice.addChangeListener(clocklistener);
-		}
-		
-		// Add the executor as context listener on the application.
-		IComponentManagementService	ces	= (IComponentManagementService)container.getService(IComponentManagementService.class);
-		ces.addComponentListener(space.getContext().getComponentIdentifier(), new IComponentListener()
-		{
-			
-			public void componentRemoved(IComponentDescription desc, Map results)
-			{
-				terminate();
-			}
-			
-			public void componentChanged(IComponentDescription desc)
-			{
-			}
-			
-			public void componentAdded(IComponentDescription desc)
-			{
+
+						if(tick)
+						{
+							timer = clockservice.createTickTimer(new ITimedObject()
+							{
+								public void timeEventOccurred(long currenttime)
+								{
+//									boolean t = false;
+//									synchronized(DeltaTimeExecutor.this)
+//									{
+//										t = terminated;
+//									}
+//									if(t)
+//									{
+										if(!terminated)
+										{
+											exeservice.execute(executable);
+											timer = clockservice.createTickTimer(this);
+										}
+//									}
+								}
+							});
+						}
+						else
+						{
+							clocklistener = new IChangeListener()
+							{
+								public void changeOccurred(ChangeEvent e)
+								{
+									exeservice.execute(executable);
+								}
+							};
+							clockservice.addChangeListener(clocklistener);
+						}
+						
+						// Add the executor as context listener on the application.
+						SServiceProvider.getServiceUpwards(container, IComponentManagementService.class).addResultListener(new DefaultResultListener()
+						{
+							public void resultAvailable(Object source, Object result)
+							{
+								IComponentManagementService	cms	= (IComponentManagementService)result;
+								cms.addComponentListener(space.getContext().getComponentIdentifier(), new IComponentListener()
+								{
+									
+									public void componentRemoved(IComponentDescription desc, Map results)
+									{
+										terminate();
+									}
+									
+									public void componentChanged(IComponentDescription desc)
+									{
+									}
+									
+									public void componentAdded(IComponentDescription desc)
+									{
+									}
+								});
+							}
+						});
+					}
+				});
 			}
 		});
 	}
@@ -202,17 +222,22 @@ public class DeltaTimeExecutor extends SimplePropertyObject implements ISpaceExe
 //	public synchronized void terminate()
 	public void terminate()
 	{
-		IClockService clockservice = (IClockService)container.getService(IClockService.class);
-
-		if(clocklistener!=null)
+		SServiceProvider.getService(container, IClockService.class).addResultListener(new DefaultResultListener()
 		{
-			clockservice.removeChangeListener(clocklistener);
-		}
-		else
-		{
-			terminated = true;
-			if(timer!=null)
-				timer.cancel();
-		}
+			public void resultAvailable(Object source, Object result)
+			{
+				IClockService clockservice = (IClockService)result;
+				if(clocklistener!=null)
+				{
+					clockservice.removeChangeListener(clocklistener);
+				}
+				else
+				{
+					terminated = true;
+					if(timer!=null)
+						timer.cancel();
+				}
+			}
+		});
 	}
 }

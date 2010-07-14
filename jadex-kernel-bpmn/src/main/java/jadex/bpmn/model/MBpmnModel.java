@@ -614,6 +614,16 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel, I
 	}
 	
 	/**
+	 *  Get the full model name (package.name)
+	 *  @return The full name.
+	 */
+	public String getFullName()
+	{
+		String pkg = getPackage();
+		return pkg!=null && pkg.length()>0? pkg+"."+getName(): getName();
+	}
+	
+	/**
 	 *  Get all start activities of the model.
 	 *  @return A non-empty List of start activities or null, if none.
 	 */

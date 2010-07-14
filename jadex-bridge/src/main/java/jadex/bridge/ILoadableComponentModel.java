@@ -26,6 +26,12 @@ public interface ILoadableComponentModel
 	public String getPackage();
 	
 	/**
+	 *  Get the full model name (package.name)
+	 *  @return The full name.
+	 */
+	public String getFullName();
+	
+	/**
 	 *  Get the model description.
 	 *  @return The model description.
 	 */

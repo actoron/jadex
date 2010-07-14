@@ -5,6 +5,7 @@ import jadex.application.space.envsupport.observer.graphics.ViewportJ2D;
 import jadex.application.space.envsupport.observer.graphics.ViewportJOGL;
 import jadex.application.space.envsupport.observer.gui.SObjectInspector;
 import jadex.application.space.envsupport.observer.perspective.IPerspective;
+import jadex.javaparser.SimpleValueFetcher;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -61,9 +62,8 @@ public class ColorLayer implements ILayer
 	 */
 	public void draw(IPerspective persp, IVector2 areaSize, ViewportJ2D vp, Graphics2D g)
 	{
-		Map prevals = new HashMap();
-		prevals.put("$space", persp.getObserverCenter().getSpace());
-		Color c = color instanceof Color? (Color)color: (Color)SObjectInspector.getProperty(persp, (String)color, "$perspective", prevals);
+		Color c = color instanceof Color? (Color)color: (Color)SObjectInspector.getProperty(persp, (String)color, "$perspective", 
+			vp.getPerspective().getObserverCenter().getSpace().getFetcher());
 		g.setColor(c);
 		Rectangle2D r = new Rectangle2D.Double(0.0, 0.0, areaSize.getXAsDouble(), areaSize.getYAsDouble());
 		g.fill(r);
@@ -79,9 +79,8 @@ public class ColorLayer implements ILayer
 	 */
 	public void draw(IPerspective persp, IVector2 areaSize, ViewportJOGL vp, GL gl)
 	{
-		Map prevals = new HashMap();
-		prevals.put("$space", persp.getObserverCenter().getSpace());
-		Color c = color instanceof Color? (Color)color: (Color)SObjectInspector.getProperty(persp, (String)color, "$perspective", prevals);
+		Color c = color instanceof Color? (Color)color: (Color)SObjectInspector.getProperty(persp, (String)color, "$perspective", 
+			vp.getPerspective().getObserverCenter().getSpace().getFetcher());
 		
 //		if(c==null)
 //			System.out.println("here");

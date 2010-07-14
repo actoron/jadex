@@ -20,6 +20,9 @@ public class AGRSpace implements ISpace
 	/** The groups. */
 	protected Map groups;
 	
+	/** The application. */
+	protected IApplication application;
+	
 	//-------- methods --------
 	
 	/**
@@ -48,13 +51,14 @@ public class AGRSpace implements ISpace
 	 *  Called from application component, when a component was added.
 	 *  @param cid	The id of the added component.
 	 */
-	public synchronized void	componentAdded(IComponentIdentifier cid, String type)
+	public synchronized void	componentAdded(IComponentIdentifier cid)//, String type)
 	{
 		if(groups!=null)
 		{
 			for(Iterator it=groups.values().iterator(); it.hasNext(); )
 			{
 				Group	group	= (Group)it.next();
+				String type = application.getComponentType(cid);
 				String[]	roles	= group.getRolesForType(type);
 				for(int r=0; roles!=null && r<roles.length; r++)
 				{
@@ -81,8 +85,9 @@ public class AGRSpace implements ISpace
 		// nothing to do.
 	}
 	
-	public void initSpace(IApplication context, MSpaceInstance config, IValueFetcher fetcher) throws Exception
+	public void initSpace(IApplication application, MSpaceInstance config, IValueFetcher fetcher) throws Exception
 	{
+		this.application = application;
 		MGroupInstance[]	mgroups	= ((MAGRSpaceInstance)config).getMGroupInstances();
 		for(int g=0; g<mgroups.length; g++)
 		{

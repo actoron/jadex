@@ -120,10 +120,10 @@ public final class Text implements IDrawable
 		boolean draw = drawcondition==null;
 		if(!draw)
 		{
-			SimpleValueFetcher fetcher = new SimpleValueFetcher();
+			SimpleValueFetcher fetcher = new SimpleValueFetcher(vp.getPerspective().getObserverCenter().getSpace().getFetcher());
 			fetcher.setValue("$object", obj);
 			fetcher.setValue("$perspective", vp.getPerspective());
-			fetcher.setValue("$space", vp.getPerspective().getObserverCenter().getSpace());
+//			fetcher.setValue("$space", vp.getPerspective().getObserverCenter().getSpace());
 			draw = ((Boolean)drawcondition.getValue(fetcher)).booleanValue();
 		}
 		
@@ -188,10 +188,10 @@ public final class Text implements IDrawable
 		boolean draw = drawcondition==null;
 		if(!draw)
 		{
-			SimpleValueFetcher fetcher = new SimpleValueFetcher();
+			SimpleValueFetcher fetcher = new SimpleValueFetcher(vp.getPerspective().getObserverCenter().getSpace().getFetcher());
 			fetcher.setValue("$object", obj);
 			fetcher.setValue("$perspective", vp.getPerspective());
-			fetcher.setValue("$space", vp.getPerspective().getObserverCenter().getSpace());
+//			fetcher.setValue("$space", vp.getPerspective().getObserverCenter().getSpace());
 			draw = ((Boolean)drawcondition.getValue(fetcher)).booleanValue();
 		}
 		

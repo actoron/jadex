@@ -69,9 +69,8 @@ public class SpaceObject extends SynchronizedPropertyObject implements ISpaceObj
 				this.tasks.put(task.getProperty(IObjectTask.PROPERTY_ID), task);
 			}
 		}
-		this.fetcher = new SimpleValueFetcher();
+		this.fetcher = new SimpleValueFetcher(space.getFetcher());
 		fetcher.setValue("$object", this);
-		fetcher.setValue("$space", space);
 	}
 	
 	/**

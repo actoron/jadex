@@ -42,7 +42,7 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 	
 	/** The daemon flag. */
 	protected boolean daemon;
-
+	
 	//-------- constructors --------
 
 	/**
@@ -55,7 +55,7 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 	/**
 	 *  Create a new CESComponentDescription.
 	 */
-	public CMSComponentDescription(IComponentIdentifier aid, String type, IComponentIdentifier parent, boolean master, boolean daemon)
+	public CMSComponentDescription(IComponentIdentifier aid, String type, IComponentIdentifier parent, boolean master, boolean daemon)//, String modelname)
 	{
 		this();
 		setName(aid);
@@ -64,6 +64,7 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 		setState(IComponentDescription.STATE_ACTIVE);
 		setMaster(master);
 		setDaemon(daemon);
+//		setModelName(modelname);
 	}
 
 	//-------- accessor methods --------
@@ -252,6 +253,24 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 	{
 		this.daemon = daemon;
 	}
+	
+	/**
+	 *  Get the model name.
+	 *  @return The name.
+	 * /
+	public String getModelName()
+	{
+		return modelname;
+	}*/
+
+	/**
+	 *  Set the model name.
+	 *  @param modelname The model name.
+	 * /
+	public void setModelName(String modelname)
+	{
+		this.modelname = modelname;
+	}*/
 		
 	//-------- methods --------
 

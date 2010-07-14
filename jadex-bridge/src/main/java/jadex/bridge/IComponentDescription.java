@@ -57,7 +57,7 @@ public interface IComponentDescription
 	 *  @return The component type name (e.g. 'BDI Agent').
 	 */
 	public String getType();
-
+	
 	/**
 	 *  Get the enabled breakpoints (if any).
 	 *  @return The enabled breakpoints.

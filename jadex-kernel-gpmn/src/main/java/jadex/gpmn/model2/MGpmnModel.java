@@ -91,6 +91,16 @@ public class MGpmnModel implements ICacheableModel, ILoadableComponentModel
 	}
 
 	/**
+	 *  Get the full model name (package.name)
+	 *  @return The full name.
+	 */
+	public String getFullName()
+	{
+		String pkg = getPackage();
+		return pkg!=null && pkg.length()>0? pkg+"."+getName(): getName();
+	}
+	
+	/**
 	 *  Get the filename.
 	 *  @return The filename.
 	 */
