@@ -6,7 +6,6 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import deco.lang.dynamics.properties.AgentReference;
 import deco.lang.dynamics.properties.EnvrionmentProperty;
 import deco.lang.dynamics.properties.Group;
 import deco.lang.dynamics.properties.GroupMembership;
@@ -128,20 +127,17 @@ public class Properties {
 	 */
 	public SystemProperty getProperty(String name) {
 		// check all property types:
-		for (EnvrionmentProperty ep : this.env_properties){
-			if (ep.getName().equals(name)) return ep;
+		for (SystemProperty sp : this.env_properties){
+			if (sp.getName().equals(name)) return sp;
 		}
-		for (Group g : this.g_properties){
-			if (g.getName().equals(name)) return g;
+		for (SystemProperty sp : this.g_properties){
+			if (sp.getName().equals(name)) return sp;
 		}
-		for (GroupMembership gm : this.gm_properties){
-			if (gm.getName().equals(name)) return gm;
+		for (SystemProperty sp : this.gm_properties){
+			if (sp.getName().equals(name)) return sp;
 		}
-		for (RoleOccupation ro : this.role_properties){
-			for (AgentReference ar : ro.getAgentReferences())
-			{
-				if (ar.getAgent_id().equals(name)) return ro;
-			}
+		for (SystemProperty sp : this.role_properties){
+			if (sp.getName().equals(name)) return sp;
 		}
 		return null;
 	}

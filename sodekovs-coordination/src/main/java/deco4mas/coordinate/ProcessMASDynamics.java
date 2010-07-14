@@ -252,11 +252,11 @@ public class ProcessMASDynamics
 			if (dl.getRealization() != null)
 			{
 				// System.out.println(this.getCapability().getName() + ":");
-				System.out.println("#ProccssMASDynamics#" +
-					" Processes decentralized interdependency: " + dl.getName() + " at AgentType: " + this.agent_model_id);
+				System.out.println("#ProccssMASDynamics#" + " Processes decentralized interdependency: " + dl.getName() + " at AgentType: "
+					+ this.agent_model_id);
 				for (String s : dl.getFrom())
 				{
-					
+
 					extractDirectCoordinationInformation(direct_publications, dl, this.dyn.getProperties().getProperty(s),
 						DirectionType.PUBLICATION);
 				}
@@ -741,7 +741,7 @@ public class ProcessMASDynamics
 				}
 			}
 		}
-	} // TODO: refactor extractCoordinationInformation()
+	}
 
 	/**
 	 * Retrieve coordination information from "System Property" connections
@@ -751,18 +751,19 @@ public class ProcessMASDynamics
 	 * 
 	 * @param direct_coord_informations
 	 * @param dl
-	 * @param property
+	 * @param sp
 	 * @param direction
 	 */
 	private void extractDirectCoordinationInformation(ArrayList<DirectCoordinationInformation> direct_coord_informations, DirectLink dl,
-		SystemProperty property, DirectionType direction)
+		SystemProperty sp, DirectionType direction)
 	{
 
-		if (property != null)
+		if (sp != null)
 		{ // exists:
-			if (property instanceof RoleOccupation)
+			if (sp instanceof RoleOccupation)
 			{
-				RoleOccupation ro = (RoleOccupation) property;
+
+				RoleOccupation ro = (RoleOccupation) sp;
 				for (AgentReference ar : ro.getAgentReferences())
 				{
 					if (ar.getAgent_id().equals(agent_model_id))
@@ -775,12 +776,13 @@ public class ProcessMASDynamics
 						direct_coord_informations.add(new DirectCoordinationInformation(direction, ar, dl));
 					}
 				}
+
 			}
-			if (property instanceof GroupMembership)
+			if (sp instanceof GroupMembership)
 			{ // "Group" are
 				// GroupMembership as
 				// well
-				GroupMembership gm = (GroupMembership) property;
+				GroupMembership gm = (GroupMembership) sp;
 				for (AgentReference ar : gm.getAgent_elements())
 				{
 					if (ar.getAgent_id().equalsIgnoreCase(agent_model_id))
@@ -846,7 +848,7 @@ public class ProcessMASDynamics
 	{
 		return direct_publications;
 	}
-	
+
 	/**
 	 * @return the perceptions
 	 */
