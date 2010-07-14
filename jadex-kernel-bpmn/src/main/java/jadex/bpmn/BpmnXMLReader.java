@@ -304,36 +304,6 @@ public class BpmnXMLReader
 	}
 	
 	/**
-	 *  Get the XML link infos.
-	 * /
-	public static Set getXMLLinkInfos()
-	{
-		Set linkinfos = new HashSet();
-
-		// bpmn diagram
-		linkinfos.add(new LinkInfo("pools", new BeanAttributeInfo("pool")));
-		linkinfos.add(new LinkInfo("artifacts", new BeanAttributeInfo("artifact")));
-		linkinfos.add(new LinkInfo("messages", new BeanAttributeInfo("messagingEdge")));
-
-		// pool
-		linkinfos.add(new LinkInfo("vertices", new BeanAttributeInfo("activity")));
-		linkinfos.add(new LinkInfo("sequenceEdges", new BeanAttributeInfo("sequenceEdge")));
-		linkinfos.add(new LinkInfo("lanes", new BeanAttributeInfo("lane")));
-		
-		// activities
-		linkinfos.add(new LinkInfo("incomingMessages", new BeanAttributeInfo("incomingMessageDescription")));
-		linkinfos.add(new LinkInfo("outgoingMessages", new BeanAttributeInfo("outgoingMessageDescription")));
-		
-		// subprocesses
-		linkinfos.add(new LinkInfo("eventHandlers", new BeanAttributeInfo("eventHandler")));
-
-		// artifacts
-		linkinfos.add(new LinkInfo("associations", new BeanAttributeInfo("association")));
-		
-		return linkinfos;
-	}*/
-	
-	/**
 	 *  Activity post processor.
 	 */
 	static class ActivityPostProcessor implements IPostProcessor
