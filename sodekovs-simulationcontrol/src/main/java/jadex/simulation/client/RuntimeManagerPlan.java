@@ -253,16 +253,16 @@ public class RuntimeManagerPlan extends Plan {
 		facts.put(Constants.EXPERIMENT_START_TIME, new Long(startTime));
 		getBeliefbase().getBelief("simulationFacts").setFact(facts);
 
-		// Hack: This should happen when application is initialized and before
-		// is starts --> when it is suspended
-		addDataConsumerAndProvider(simConf);
-
 		// Hack: Synchronize start time!
 		System.out.println("-->StartTime at Client: " + startTime);
 		AbstractEnvironmentSpace space = ((AbstractEnvironmentSpace) ((IApplicationExternalAccess) getScope().getParent()).getSpace("my2dspace"));
 		space.setProperty("REAL_START_TIME_OF_SIMULATION", startTime);
 		// This is a hack for this special application.xml
 		space.getSpaceObjectsByType("homebase")[0].setProperty("start_time", startTime);
+		
+		// Hack: This should happen when application is initialized and before
+		// is starts --> when it is suspended
+		addDataConsumerAndProvider(simConf);
 	}
 
 	private void addDataConsumerAndProvider(SimulationConfiguration simConf) {

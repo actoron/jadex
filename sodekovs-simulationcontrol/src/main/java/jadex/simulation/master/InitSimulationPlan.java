@@ -22,7 +22,7 @@ public class InitSimulationPlan extends Plan{
 	public void body() {			
 		System.out.println("#InitSim# Init Master Simulation Agent with configuration file: " + (String) getBeliefbase().getBelief("simulationDescriptionFile").getFact());		
 		String simulationDescription = (String) getBeliefbase().getBelief("simulationDescriptionFile").getFact();
-		SimulationConfiguration simConf = (SimulationConfiguration) XMLHandler.parseXML(simulationDescription, SimulationConfiguration.class);
+		SimulationConfiguration simConf = (SimulationConfiguration) XMLHandler.parseXML(simulationDescription, SimulationConfiguration.class);		
 		
 		//Start Simulation Control Center
 		IComponentManagementService ces = (IComponentManagementService)getScope().getServiceContainer().getService(IComponentManagementService.class);
