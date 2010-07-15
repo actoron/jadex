@@ -148,54 +148,57 @@ public class AsyncExecutionService	implements IExecutionService, IService
 	 *  @param task The task to execute.
 	 *  @param listener The listener.
 	 */
-	public synchronized void cancel(final IExecutable task, final IResultListener listener)
+	public IFuture cancel(final IExecutable task)
 	{
 		// todo: repair me: problem is that method can interfere with execute?!
+		final Future ret = new Future();
 		
-		if(shutdown)
+		if(!isValid())
 		{
-			if(listener!=null)
-				listener.exceptionOccurred(this, new RuntimeException("Shutting down."));
-			return;
-		}
-		
-		Executor exe = (Executor)executors.get(task);
-		if(exe!=null)
-		{
-			IResultListener lis = new IResultListener()
-			{
-				public void resultAvailable(Object source, Object result)
-				{
-					// todo: do not call listener with holding lock
-					synchronized(AsyncExecutionService.this)
-					{
-						if(listener!=null)
-							listener.resultAvailable(source, result);
-						if(executors!=null)
-							executors.remove(task);
-					}
-				}
-
-				public void exceptionOccurred(Object source, Exception exception)
-				{
-					// todo: do not call listener with holding lock
-					synchronized(AsyncExecutionService.this)
-					{
-						if(listener!=null)
-							listener.exceptionOccurred(source, exception);
-						if(executors!=null)
-							executors.remove(task);
-					}
-				}
-			};
-			exe.shutdown().addResultListener(lis);
-//			executors.remove(task);
+			ret.setException(new RuntimeException("Shutting down."));
 		}
 		else
 		{
-			if(listener!=null)
-				listener.resultAvailable(this, null);
+			Executor exe = (Executor)executors.get(task);
+			if(exe!=null)
+			{
+				IResultListener lis = new IResultListener()
+				{
+					public void resultAvailable(Object source, Object result)
+					{
+						// todo: do not call listener with holding lock
+						synchronized(AsyncExecutionService.this)
+						{
+							ret.setResult(result);
+							
+							if(executors!=null)
+								executors.remove(task);
+						}
+					}
+	
+					public void exceptionOccurred(Object source, Exception exception)
+					{
+						// todo: do not call future with holding lock
+						synchronized(AsyncExecutionService.this)
+						{
+							ret.setResult(exception);
+							
+							if(executors!=null)
+								executors.remove(task);
+						}
+						
+					}
+				};
+				exe.shutdown().addResultListener(lis);
+	//			executors.remove(task);
+			}
+			else
+			{
+				ret.setResult(null);
+			}
 		}
+		
+		return ret;
 	}
 	
 	/**
@@ -204,29 +207,37 @@ public class AsyncExecutionService	implements IExecutionService, IService
 	 */
 	public synchronized IFuture	startService()
 	{
-		if(shutdown)
-			throw new RuntimeException("Cannot start: shutdowning service.");
+		final Future ret = new Future();
 		
-		running	= true;
-
-		if(!executors.isEmpty())
+		if(shutdown)
 		{
-			// Resume all suspended tasks.
-			IExecutable[] keys = (IExecutable[])executors.keySet()
-				.toArray(new IExecutable[executors.size()]);
-			for(int i=0; i<keys.length; i++)
-				execute(keys[i]);
+			ret.setException(new RuntimeException("Cannot start: shutdowning service."));
 		}
-		else if(idlecommands!=null)
+		else
 		{
-//			System.out.println("restart: idle");
-			Iterator it	= idlecommands.iterator();
-			while(it.hasNext())
+			running	= true;
+	
+			if(!executors.isEmpty())
 			{
-				((ICommand)it.next()).execute(null);
+				// Resume all suspended tasks.
+				IExecutable[] keys = (IExecutable[])executors.keySet()
+					.toArray(new IExecutable[executors.size()]);
+				for(int i=0; i<keys.length; i++)
+					execute(keys[i]);
+			}
+			else if(idlecommands!=null)
+			{
+	//			System.out.println("restart: idle");
+				Iterator it	= idlecommands.iterator();
+				while(it.hasNext())
+				{
+					((ICommand)it.next()).execute(null);
+				}
 			}
 		}
-		return new Future(null);	// Already done.
+		
+		ret.setResult(null);
+		return ret;
 	}
 	
 	/**
@@ -235,51 +246,60 @@ public class AsyncExecutionService	implements IExecutionService, IService
 	 */
 	public synchronized IFuture	shutdownService()
 	{
-		final Future	ret	= new Future();
+		final Future ret	= new Future();
 		
 		if(shutdown)
 		{
 			ret.setException((new RuntimeException("Already shutdowned.")));
-			return ret;
-		}
-		
-		shutdown = true;
-		
-		IExecutable[] keys = (IExecutable[])executors.keySet()
-			.toArray(new IExecutable[executors.size()]);
-		
-		if(keys.length>0)
-		{
-			// One listener counts until all executors have shutdowned.
-			IResultListener lis = new CounterResultListener(keys.length)
-			{
-				public void finalResultAvailable(Object source, Object result)
-				{
-					ret.setResult(result);
-				}
-				
-				public void exceptionOccurred(Object source, Exception exception)
-				{
-					ret.setException(exception);
-				}
-			};
-			
-			for(int i=0; i<keys.length; i++)
-			{
-				Executor exe = (Executor)executors.get(keys[i]);
-				if(exe!=null)
-					exe.shutdown().addResultListener(lis);
-			}
 		}
 		else
 		{
-			ret.setResult(null);
-		}
+			shutdown = true;
+			
+			IExecutable[] keys = (IExecutable[])executors.keySet()
+				.toArray(new IExecutable[executors.size()]);
+			
+			if(keys.length>0)
+			{
+				// One listener counts until all executors have shutdowned.
+				IResultListener lis = new CounterResultListener(keys.length)
+				{
+					public void finalResultAvailable(Object source, Object result)
+					{
+						ret.setResult(result);
+					}
+					
+					public void exceptionOccurred(Object source, Exception exception)
+					{
+						ret.setException(exception);
+					}
+				};
 				
+				for(int i=0; i<keys.length; i++)
+				{
+					Executor exe = (Executor)executors.get(keys[i]);
+					if(exe!=null)
+						exe.shutdown().addResultListener(lis);
+				}
+			}
+			else
+			{
+				ret.setResult(null);
+			}
+		}
+		
 		executors = null;
 		return ret;
 	}
 
+	/**
+	 *  Test if the service is valid.
+	 *  @return True, if service can be used.
+	 */
+	public synchronized boolean isValid()
+	{
+		return running && !shutdown;
+	}
 	
 	/**
 	 *  Test if the executor is currently idle.

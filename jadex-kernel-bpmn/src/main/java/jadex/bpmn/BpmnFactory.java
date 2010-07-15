@@ -5,13 +5,12 @@ import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bridge.IComponentAdapterFactory;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentFactory;
-import jadex.bridge.IComponentInstance;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.ILoadableComponentModel;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.SGUI;
-import jadex.service.IService;
+import jadex.service.BasicService;
 import jadex.service.IServiceContainer;
 
 import java.util.HashMap;
@@ -23,7 +22,7 @@ import javax.swing.UIDefaults;
 /**
  *  Foctory for loading bpmn processes.
  */
-public class BpmnFactory implements IComponentFactory, IService
+public class BpmnFactory extends BasicService implements IComponentFactory
 {
 	//-------- constants --------
 	

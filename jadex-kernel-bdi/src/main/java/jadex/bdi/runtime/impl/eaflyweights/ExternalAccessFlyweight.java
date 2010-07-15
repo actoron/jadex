@@ -82,7 +82,6 @@ public class ExternalAccessFlyweight extends EACapabilityFlyweight implements IB
 	 *  @param type	The template goal name as specified in the ADF.
 	 *  @return The created goal.
 	 */
-//	public IGoal createGoal(String type)
 	public IFuture createGoal(final String type)
 	{
 //		return getGoalbase().createGoal(type);

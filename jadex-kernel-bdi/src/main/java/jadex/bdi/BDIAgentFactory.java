@@ -15,7 +15,7 @@ import jadex.commons.SGUI;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVTypeModel;
 import jadex.rules.state.javaimpl.OAVStateFactory;
-import jadex.service.IService;
+import jadex.service.BasicService;
 import jadex.service.IServiceContainer;
 import jadex.service.library.ILibraryService;
 
@@ -27,7 +27,7 @@ import javax.swing.UIDefaults;
 /**
  *  Factory for creating Jadex V2 BDI agents.
  */
-public class BDIAgentFactory implements IComponentFactory, IService
+public class BDIAgentFactory extends BasicService implements IComponentFactory
 {
 	//-------- constants --------
 	

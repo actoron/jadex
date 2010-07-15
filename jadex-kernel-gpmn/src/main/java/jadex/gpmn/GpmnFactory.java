@@ -14,7 +14,7 @@ import jadex.commons.ResourceInfo;
 import jadex.commons.SGUI;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.DefaultResultListener;
-import jadex.service.IService;
+import jadex.service.BasicService;
 import jadex.service.IServiceContainer;
 import jadex.service.SServiceProvider;
 
@@ -28,7 +28,7 @@ import javax.swing.UIDefaults;
 /**
  *  Factory for loading gpmn processes. 
  */
-public class GpmnFactory implements IComponentFactory, IService
+public class GpmnFactory extends BasicService implements IComponentFactory
 {
 	//-------- constants --------
 	

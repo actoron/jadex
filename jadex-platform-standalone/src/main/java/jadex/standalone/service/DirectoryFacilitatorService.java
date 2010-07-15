@@ -15,7 +15,7 @@ import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.collection.IndexMap;
 import jadex.commons.concurrent.IResultListener;
-import jadex.service.IService;
+import jadex.service.BasicService;
 import jadex.service.IServiceContainer;
 import jadex.service.SServiceProvider;
 import jadex.service.clock.IClockService;
@@ -29,7 +29,7 @@ import java.util.Set;
 /**
  *  Directory facilitator implementation for standalone platform.
  */
-public class DirectoryFacilitatorService implements IDF, IService
+public class DirectoryFacilitatorService extends BasicService implements IDF
 {
 	//-------- attributes --------
 
@@ -336,6 +336,9 @@ public class DirectoryFacilitatorService implements IDF, IService
 	 */
 	public IFuture	startService()
 	{
+		super.startService();
+		// todo: what about result future?
+		
 		final Future	ret	= new Future();
 		final boolean[]	services	= new boolean[2];
 		SServiceProvider.getServiceUpwards(platform, IComponentManagementService.class).addResultListener(new IResultListener()
@@ -381,15 +384,6 @@ public class DirectoryFacilitatorService implements IDF, IService
 		return ret;
 	}
 	
-	/**
-	 *  Called when the platform shuts down.
-	 *  Do necessary cleanup here (if any).
-	 */
-	public IFuture	shutdownService()
-	{
-		return new Future(null); // Already done.
-	}
-
 	//-------- helper methods --------
 
 	/**

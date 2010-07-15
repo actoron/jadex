@@ -23,7 +23,7 @@ import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
-import jadex.service.IService;
+import jadex.service.BasicService;
 import jadex.service.IServiceContainer;
 import jadex.service.SServiceProvider;
 import jadex.service.execution.IExecutionService;
@@ -44,7 +44,7 @@ import java.util.logging.Logger;
 /**
  *  Standalone implementation of component execution service.
  */
-public class ComponentManagementService implements IComponentManagementService, IService
+public class ComponentManagementService extends BasicService implements IComponentManagementService
 {
 	//-------- constants --------
 
@@ -486,18 +486,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 				}
 				
 				ad.setState(IComponentDescription.STATE_SUSPENDED);
-				exeservice.cancel(adapter, new IResultListener()
-				{
-					public void resultAvailable(Object source, Object result)
-					{
-						ret.setResult(result);
-					}
-					
-					public void exceptionOccurred(Object source, Exception exception)
-					{
-						ret.setException(exception);
-					}
-				});
+				exeservice.cancel(adapter).addResultListener(new DelegationResultListener(ret));
 			}
 		}
 		
@@ -734,7 +723,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 					if(desc.getParent()!=null)
 					{
 						// Stop execution of component. When root component services are already shutdowned.
-						exeservice.cancel(adapter, null);
+						exeservice.cancel(adapter);
 						
 //						children.remove(desc.getParent(), desc.getName());
 						CMSComponentDescription padesc = (CMSComponentDescription)descs.get(desc.getParent());
@@ -1225,6 +1214,9 @@ public class ComponentManagementService implements IComponentManagementService, 
 	 */
 	public IFuture	startService()
 	{
+		super.startService();
+		// todo: what to do with result future?
+		
 		final Future	ret	= new Future();
 		
 		// add root adapter and register root component

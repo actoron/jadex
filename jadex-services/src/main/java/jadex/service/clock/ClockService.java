@@ -4,7 +4,7 @@ import jadex.commons.Future;
 import jadex.commons.IChangeListener;
 import jadex.commons.IFuture;
 import jadex.commons.concurrent.IThreadPool;
-import jadex.service.IService;
+import jadex.service.BasicService;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -14,7 +14,7 @@ import java.util.List;
  *  A clock service abstracts away from clock implementations.
  *  The clock service is menat to be kept constant during runtime.
  */
-public class ClockService implements IClockService, IService
+public class ClockService extends BasicService implements IClockService
 {
 	//-------- attributes --------
 	

@@ -8,6 +8,7 @@ import jadex.commons.IFuture;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IThreadPool;
+import jadex.service.BasicService;
 import jadex.service.IServiceContainer;
 import jadex.service.SServiceProvider;
 import jadex.service.clock.ClockService;
@@ -23,7 +24,7 @@ import java.util.List;
  *  execution of one application. It provides basic features for
  *  starting, stopping and stepwise execution.
  */
-public class SimulationService implements ISimulationService
+public class SimulationService extends BasicService implements ISimulationService
 {		
 	//-------- attributes --------
 
@@ -111,8 +112,9 @@ public class SimulationService implements ISimulationService
 	 */
 	public IFuture	shutdownService()
 	{
+		IFuture ret = super.shutdownService();
 		pause();
-		return new Future(null);	// Already done.
+		return ret;
 	}
 	
 	//-------- methods --------
@@ -122,7 +124,11 @@ public class SimulationService implements ISimulationService
 	 */
 	public IFuture	startService()
 	{
+		super.startService();
+		// todo: what to do with super future?
+		
 		final Future	ret	= new Future();
+		
 		final boolean[]	services	= new boolean[2];
 
 		SServiceProvider.getService(container, IExecutionService.class).addResultListener(new DefaultResultListener()

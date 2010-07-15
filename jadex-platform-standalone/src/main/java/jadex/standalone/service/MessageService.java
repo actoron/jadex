@@ -19,7 +19,7 @@ import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IExecutable;
 import jadex.commons.concurrent.IResultListener;
-import jadex.service.IService;
+import jadex.service.BasicService;
 import jadex.service.IServiceContainer;
 import jadex.service.SServiceProvider;
 import jadex.service.clock.IClockService;
@@ -45,7 +45,7 @@ import java.util.logging.Logger;
  *  that are individually executed on the execution service, i.e. they are delivered
  *  synchronous or asynchronous depending on the execution service mode.
  */
-public class MessageService implements IMessageService, IService
+public class MessageService extends BasicService implements IMessageService
 {
 	//-------- constants --------
 	
@@ -386,6 +386,9 @@ public class MessageService implements IMessageService, IService
 	 */
 	public IFuture	startService()
 	{
+		super.startService();
+		// todo: what about result future?
+		
 		ITransport[] tps = (ITransport[])transports.toArray(new ITransport[transports.size()]);
 		for(int i=0; i<tps.length; i++)
 		{
@@ -434,7 +437,7 @@ public class MessageService implements IMessageService, IService
 			((ITransport)transports.get(i)).shutdown();
 		}
 		
-		return new Future(null); // Already done.
+		return super.shutdownService();
 	}
 
 	/**

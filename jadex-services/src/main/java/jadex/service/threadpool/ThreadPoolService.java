@@ -1,14 +1,13 @@
 package jadex.service.threadpool;
 
-import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.concurrent.IThreadPool;
-import jadex.service.IService;
+import jadex.service.BasicService;
 
 /**
  *  Service wrapper for a threadpool.
  */
-public class ThreadPoolService implements IThreadPool, IService
+public class ThreadPoolService extends BasicService implements IThreadPool
 {
 	//-------- attributes --------
 	
@@ -29,19 +28,22 @@ public class ThreadPoolService implements IThreadPool, IService
 
 	/**
 	 *  Start the service.
+	 *  @return A future that is done when the service has completed starting.  
 	 */
-	public IFuture	startService()
+	public synchronized IFuture	startService()
 	{
-		// Nothing to do.
-		return new Future(null); // Already done.
+		return super.startService();
 	}
 	
 	/**
 	 *  Execute a task in its own thread.
 	 *  @param task The task to execute.
 	 */
-	public void execute(Runnable task)
+	public synchronized void execute(Runnable task)
 	{
+//		if(!isValid())
+//			throw new RuntimeException("Service invalid: "+this);
+		
 		threadpool.execute(task);
 	}
 
@@ -49,10 +51,10 @@ public class ThreadPoolService implements IThreadPool, IService
 	 *  Shutdown the service.
 	 *  @param listener The listener.
 	 */
-	public IFuture	shutdownService()
+	public synchronized IFuture	shutdownService()
 	{
 		threadpool.dispose();
-		return new Future(null); // Already done.
+		return super.shutdownService();
 	}
 	
 	/**
@@ -60,6 +62,6 @@ public class ThreadPoolService implements IThreadPool, IService
 	 */
 	public void dispose()
 	{
-		threadpool.dispose();
+		shutdownService();
 	}
 }

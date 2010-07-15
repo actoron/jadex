@@ -44,7 +44,7 @@ public class SyncExecutionService	implements	IExecutionService, IService
 	protected IExecutable removedtask;
 	
 	/** The removed listeners. */
-	protected List removedlisteners;
+	protected List removedfut;
 	
 	/** The stop listener. */
 	protected IResultListener stoplistener;
@@ -58,7 +58,7 @@ public class SyncExecutionService	implements	IExecutionService, IService
 	{
 		this.running	= false;
 		this.queue	= SCollection.createLinkedHashSet();
-		this.removedlisteners = new ArrayList();
+		this.removedfut = new ArrayList();
 		
 		this.executor = new Executor(threadpool, new IExecutable()
 		{
@@ -105,9 +105,9 @@ public class SyncExecutionService	implements	IExecutionService, IService
 						else if(removedtask==task)
 						{
 							removedtask = null;
-							for(int i=0; i<removedlisteners.size(); i++)
-								((IResultListener)removedlisteners.get(i)).resultAvailable(this, null);
-							removedlisteners.clear();
+							for(int i=0; i<removedfut.size(); i++)
+								((IResultListener)removedfut.get(i)).resultAvailable(this, null);
+							removedfut.clear();
 						}
 						else
 						{
@@ -188,33 +188,45 @@ public class SyncExecutionService	implements	IExecutionService, IService
 	 *  be not executed in future. 
 	 *  @param task The task to execute.
 	 */
-	public synchronized void cancel(IExecutable task, IResultListener listener)
+	public synchronized IFuture cancel(IExecutable task)
 	{
-		if(shutdown)
+		Future ret = new Future();
+		
+		if(!isValid())
 		{
-			listener.exceptionOccurred(this, new RuntimeException("Shutting down."));
-			return;
+			ret.setException(new RuntimeException("Shutting down."));
+		}
+		else
+		{
+			// Remove from scheduled tasks.
+			synchronized(this)
+			{
+				// Is current task removed
+				if(this.task == task)
+				{
+					removedtask = task;
+					removedfut.add(ret);
+				}
+				else
+				{
+					queue.remove(task);
+					ret.setResult(null);
+				}
+			}
 		}
 		
-		// Remove from scheduled tasks.
-		synchronized(this)
-		{
-			// Is current task removed
-			if(this.task == task)
-			{
-				removedtask = task;
-				if(listener!=null)
-					removedlisteners.add(listener);
-			}
-			else
-			{
-				queue.remove(task);
-				if(listener!=null)
-					listener.resultAvailable(this, null);
-			}
-		}
+		return ret;
 	}
 	
+	/**
+	 *  Test if the service is valid.
+	 *  @return True, if service can be used.
+	 */
+	public boolean isValid()
+	{
+		return running && !shutdown;
+	}
+
 	/**
 	 *  Start the executor service.
 	 *  Resumes all tasks.
@@ -239,7 +251,8 @@ public class SyncExecutionService	implements	IExecutionService, IService
 	 */
 	public synchronized IFuture	shutdownService()
 	{
-		if(!running || shutdown)
+		if(!isValid())
+//		if(!running || shutdown)
 		{
 			Future	ret	= new Future();
 			ret.setException(new RuntimeException("Not running."));

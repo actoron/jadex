@@ -6,6 +6,8 @@ import jadex.commons.Tuple;
 import jadex.commons.collection.LRU;
 import jadex.commons.concurrent.IResultListener;
 
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -43,14 +45,12 @@ public class CacheServiceContainer	implements IServiceContainer
 	{
 		final Future ret = new Future();
 		
-//		if(selector.getClass().getName().indexOf("ComponentFactory")!=-1)
-//			System.out.println("search:"+selector+" "+manager.getCacheKey()+" "+decider.getCacheKey());
-		
 		final Tuple key = manager.getCacheKey()!=null && decider.getCacheKey()!=null && selector.getCacheKey()!=null
 			? new Tuple(manager.getCacheKey(), decider.getCacheKey(), selector.getCacheKey()) : null;
 		
 		Object	result	= null;
 		boolean	hit	= false;
+		
 		if(key!=null)
 		{
 			synchronized(cache)
@@ -58,7 +58,46 @@ public class CacheServiceContainer	implements IServiceContainer
 				if(cache.containsKey(key))
 				{
 					result	= cache.get(key);
-					hit	= true;
+					
+					boolean valid = true;
+					
+					if(result instanceof IService)
+					{
+						valid = ((IService)result).isValid();
+					}
+					else if(result instanceof Collection)
+					{
+						Collection coll = (Collection)result;
+						IService[] sers = (IService[])coll.toArray(new IService[((Collection)result).size()]);
+						
+						// Check if all results are still ok.
+						boolean invalid = false;
+						for(int i=0; i<sers.length && !invalid; i++)
+						{
+							if(!sers[i].isValid())
+							{
+								// if one is invalid whole result is invalid
+								valid = false;
+							}
+						}
+					}
+					else if(result==null)
+					{
+						valid = false;
+					}
+					else
+					{
+						throw new RuntimeException("Unknown service type.");
+					}
+				
+					if(valid)
+					{
+						hit = true;
+					}
+					else
+					{
+						cache.remove(key);
+					}
 				}
 			}
 		}

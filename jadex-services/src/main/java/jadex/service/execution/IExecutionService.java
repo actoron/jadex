@@ -1,8 +1,8 @@
 package jadex.service.execution;
 
 import jadex.commons.ICommand;
+import jadex.commons.IFuture;
 import jadex.commons.concurrent.IExecutable;
-import jadex.commons.concurrent.IResultListener;
 import jadex.service.IService;
 
 /**
@@ -24,7 +24,6 @@ public interface IExecutionService	extends IService
 	 *  Execute a task. Triggers the task to
 	 *  be executed in future. 
 	 *  @param task The task to execute.
-	 *  @param listener Called when execution has started.
 	 */
 	public void execute(IExecutable task);
 	
@@ -32,9 +31,9 @@ public interface IExecutionService	extends IService
 	 *  Cancel a task. Triggers the task to
 	 *  be not executed in future. 
 	 *  @param task The task to execute.
-	 *  @param listener Called when execution has stopped.
+	 *  @return Future signaling calcellation.
 	 */
-	public void cancel(IExecutable task, IResultListener listener);
+	public IFuture cancel(IExecutable task);
 		
 	/**
 	 *  Test if the executor is currently idle.

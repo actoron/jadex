@@ -9,7 +9,7 @@ import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.SGUI;
 import jadex.commons.SReflect;
-import jadex.service.IService;
+import jadex.service.BasicService;
 import jadex.service.IServiceContainer;
 
 import java.util.Map;
@@ -20,7 +20,7 @@ import javax.swing.UIDefaults;
 /**
  *  Factory for creating micro agents.
  */
-public class MicroAgentFactory implements IComponentFactory, IService
+public class MicroAgentFactory extends BasicService implements IComponentFactory
 {
 	//-------- constants --------
 	
@@ -52,27 +52,6 @@ public class MicroAgentFactory implements IComponentFactory, IService
 	{
 		this.container = container;
 		this.properties = properties;
-	}
-	
-	//-------- constructors --------
-	
-	/**
-	 *  Start the service.
-	 */
-	public IFuture	startService()
-	{
-		final Future	ret	= new Future(null);
-
-		return ret;
-	}
-	
-	/**
-	 *  Shutdown the service.
-	 *  @param listener The listener.
-	 */
-	public IFuture	shutdownService()
-	{
-		return new Future(null);	// Already done.
 	}
 	
 	//-------- IAgentFactory interface --------

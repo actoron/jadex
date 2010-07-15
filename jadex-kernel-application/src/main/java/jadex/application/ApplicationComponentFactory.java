@@ -26,7 +26,7 @@ import jadex.javaparser.IExpressionParser;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SJavaParser;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
-import jadex.service.IService;
+import jadex.service.BasicService;
 import jadex.xml.AccessInfo;
 import jadex.xml.AttributeConverter;
 import jadex.xml.AttributeInfo;
@@ -56,7 +56,7 @@ import javax.xml.namespace.QName;
  *  Factory for default contexts.
  *  No special properties supported, yet.
  */
-public class ApplicationComponentFactory	implements IComponentFactory, IService
+public class ApplicationComponentFactory extends BasicService implements IComponentFactory
 {
 	//-------- constants --------
 	

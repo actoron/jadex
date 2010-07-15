@@ -8,6 +8,12 @@ import jadex.commons.IFuture;
 public interface IService
 {
 	/**
+	 *  Test if the service is valid.
+	 *  @return True, if service can be used.
+	 */
+	public boolean isValid();
+	
+	/**
 	 *  Start the service.
 	 *  @return A future that is done when the service has completed starting.  
 	 */
