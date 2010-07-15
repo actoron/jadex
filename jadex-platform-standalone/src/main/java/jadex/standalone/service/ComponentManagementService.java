@@ -297,7 +297,6 @@ public class ComponentManagementService implements IComponentManagementService, 
 //			adapter.setComponentThread(null);
 			IComponentInstance instance = (IComponentInstance)acom[0];
 			StandaloneComponentAdapter adapter = (StandaloneComponentAdapter)acom[1];
-//			adapter.setDescription(ad); // todo: remove this hack somehow
 			adapters.put(cid, adapter);
 			
 	//		System.out.println("added: "+descs.size()+", "+aid);
@@ -328,6 +327,14 @@ public class ComponentManagementService implements IComponentManagementService, 
 		}
 		catch(Exception e)
 		{
+			System.out.println("Ex: "+cid+" "+e);
+			adapters.remove(cid);
+			descs.remove(ad.getName());
+			if(pad!=null)
+			{
+				CMSComponentDescription padesc = (CMSComponentDescription)descs.get(parent.getComponentIdentifier());
+				padesc.removeChild(cid);
+			}
 			ret.setException(e);
 		}
 	}

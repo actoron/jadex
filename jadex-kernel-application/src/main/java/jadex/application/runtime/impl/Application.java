@@ -170,37 +170,8 @@ public class Application implements IApplication, IComponentInstance
 			}
 		}
 
-		List futures	= new ArrayList();
-		
-		// Create map of modelnames -> application component typenames
-//		List atypes	= Application.this.model.getApplicationType().getMComponentTypes();
-//		for(int i=0; i<atypes.size(); i++)
-//		{
-//			final MComponentType atype = (MComponentType)atypes.get(i);
-//			final Future ret = new Future();
-//			futures.add(ret);
-//			loadModel(getServiceProvider(), atype.getFilename()).addResultListener(new DefaultResultListener()
-//			{
-//				public void resultAvailable(Object source, Object result)
-//				{
-//					ILoadableComponentModel lmodel = (ILoadableComponentModel)result;
-//					if(lmodel!=null)
-//					{
-//						ctypes.put(lmodel.getFullName(), atype.getName());
-//						System.out.println("added: "+atype.getName());
-//						ret.setResult(null);
-//					}
-//					else
-//					{
-//						System.out.println("ex: "+atype.getName());
-//						ret.setException(new RuntimeException("Model could not be loaded: "+atype.getFilename()));
-//					}
-//				}
-//			});
-//		}
-		
 		// Evaluate (future) properties.
-//		List	futures	= new ArrayList();
+		List	futures	= new ArrayList();
 		List	props	= model.getApplicationType().getProperties();
 		if(props!=null)
 		{
