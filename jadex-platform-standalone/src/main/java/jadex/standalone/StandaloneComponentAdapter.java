@@ -582,9 +582,9 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 		fatalerror	= true;
 		
 		// Todo: delegate printing to parent component (if any).
-		e.printStackTrace();
 		getLogger().severe("Fatal error, component '"+cid+"' will be removed.");
-			
+		e.printStackTrace();
+		
 		// Remove component from platform.
 		SServiceProvider.getServiceUpwards(getServiceContainer(), IComponentManagementService.class).addResultListener(new DefaultResultListener()
 		{

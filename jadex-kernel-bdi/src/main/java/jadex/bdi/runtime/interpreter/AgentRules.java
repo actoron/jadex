@@ -2299,16 +2299,16 @@ public class AgentRules
 		Object ret	= null;
 
 		IParsedExpression	pex = (IParsedExpression)state.getAttributeValue(mexp, OAVBDIMetaModel.expression_has_content);
-		try
-		{
+//		try
+//		{
 			ret	= pex.getValue(fetcher);
-		}
-		catch(Exception e)
-		{
-			// Hack!!! Exception should be propagated.
-			System.err.println(pex.getExpressionText());
-			e.printStackTrace();
-		}
+//		}
+//		catch(Exception e)
+//		{
+//			// Hack!!! Exception should be propagated.
+//			System.err.println(pex.getExpressionText());
+//			e.printStackTrace();
+//		}
 		return ret;
 	}
 	

@@ -6,19 +6,21 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-bdi
 	                    http://jadex.sourceforge.net/jadex-bdi-2.0.xsd"
-	name="Manager"
+	name="Environment"
 	package="jadex.bdi.examples.marsworld_classic.environment">
 
 	<imports>
 		<import>jadex.bdi.examples.marsworld_classic.*</import>
 		<import>jadex.bridge.*</import>
 		<import>jadex.service.clock.IClockService</import>
+		<import>jadex.service.SServiceProvider</import>
+		<import>jadex.commons.IFuture</import>
 	</imports>
 
 	<beliefs>
 		<!-- The environment as singleton object. -->
 		<belief name="environment" class="Environment">
-			<fact>Environment.createInstance($scope.getServiceProvider().getService(IClockService.class))</fact>
+			<fact>Environment.createInstance($propertybase.getProperty("clock"))</fact>
 	  	</belief>
 
 		<belief name="gui" class="jadex.bdi.planlib.GuiCreator">
@@ -26,4 +28,10 @@
 				new Object[]{$scope.getExternalAccess()})</fact>
 		</belief>
 	</beliefs>
+	
+	<properties>
+		<property name="clock" class="IFuture">
+			SServiceProvider.getService($scope.getServiceProvider(), IClockService.class)
+		</property>
+	</properties>
 </agent>

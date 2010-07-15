@@ -16,6 +16,8 @@
 		<import>jadex.bdi.examples.marsworld_classic.movement.*</import>
 		<import>jadex.bdi.examples.marsworld_classic.*</import>
 		<import>jadex.base.fipa.*</import>
+		<import>jadex.commons.*</import>
+		<import>jadex.service.*</import>
 	</imports>
 
 	<capabilities>
@@ -116,6 +118,12 @@
 		</messageevent>
 	</events>
 
+	<properties>
+		<!--<property name="logging.level">java.util.logging.Level.FINE</property>-->
+		<property name="debugging">false</property>
+	 	<property name="dfservice" class="IFuture">SServiceProvider.getService($scope.getServiceProvider(), IDF.class)</property>
+	</properties>
+
 	<configurations>
 		<configuration name="default">
 			<beliefs>
@@ -134,8 +142,8 @@
 				<initialgoal ref="dfcap.df_register">
 					<parameter ref="description">
 						<value>
-							((IDF)$scope.getServiceProvider().getService(IDF.class))
-								.createDFComponentDescription(null, ((IDF)$scope.getServiceProvider().getService(IDF.class))
+							$propertybase.getProperty("dfservice")
+								.createDFComponentDescription(null, $propertybase.getProperty("dfservice")
 									.createDFServiceDescription("service_produce", "service_produce", "University of Hamburg"))
 						</value>
 					</parameter>
