@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	<H3>Shop scenario application descriptor</H3>
+-->
+<applicationtype xmlns="http://jadex.sourceforge.net/jadex-application"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-application 
+	                    http://jadex.sourceforge.net/jadex-application-2.0.xsd"
+	name="Shopping" package="jadex.bdi.examples.shop">
+	
+	<imports>
+		<import>jadex.service.clock.IClockService</import>
+		<import>jadex.service.SServiceProvider</import>
+		<import>jadex.commons.IFuture</import>
+	</imports>
+	
+	<componenttypes>
+		<componenttype name="Shop" filename="jadex/bdi/examples/shop/Shop.agent.xml"/>
+		<componenttype name="Customer" filename="jadex/bdi/examples/shop/Customer.agent.xml"/>
+	</componenttypes>
+	
+	<applications>
+		<application name="1 Shop / 1 Customer">
+			<components>
+				<component type="Shop" number="1"/>
+  				<component type="Customer" number="1"/>
+			</components>
+ 		</application>
+ 		
+ 		<application name="2 Shops / 1 Customer">
+			<components>
+				<component type="Shop">
+					<arguments>
+						<argument name="shopname">"C & B"</argument>
+					</arguments>
+				</component>
+				<component type="Shop">
+					<arguments>
+						<argument name="shopname">"Herzie"</argument>
+					</arguments>
+				</component>
+  				<component type="Customer" number="1"/>
+			</components>
+ 		</application>
+	</applications>
+
+</applicationtype>

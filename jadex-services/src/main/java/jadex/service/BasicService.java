@@ -22,8 +22,8 @@ public class BasicService implements IService
 	 */
 	public boolean isValid()
 	{
-		return true;
-//		return valid;
+//		return true;
+		return valid;
 	}
 	
 	/**
@@ -33,11 +33,11 @@ public class BasicService implements IService
 	public IFuture	startService()
 	{
 		Future ret = new Future();
-//		if(isValid())
-//		{
-//			ret.setException(new RuntimeException("Already running."));
-//		}
-//		else
+		if(isValid())
+		{
+			ret.setException(new RuntimeException("Already running."));
+		}
+		else
 		{
 			valid = true;
 			ret.setResult(null);
@@ -52,11 +52,11 @@ public class BasicService implements IService
 	public IFuture	shutdownService()
 	{
 		Future ret = new Future();
-//		if(!isValid())
-//		{
-//			ret.setException(new RuntimeException("Not running."));
-//		}
-//		else
+		if(!isValid())
+		{
+			ret.setException(new RuntimeException("Not running."));
+		}
+		else
 		{
 			valid = false;
 			ret.setResult(null);

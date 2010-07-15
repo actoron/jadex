@@ -326,6 +326,10 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 				// Previously done in createStartAgentRule
 				Map parents = new HashMap(); 
 				List	futures	= AgentRules.createCapabilityInstance(state, ragent, parents);
+				
+				// Start service container.
+				futures.add(adapter.getServiceContainer().start());
+				
 				IResultListener	crs	= new CounterResultListener(futures.size())
 				{
 					public void finalResultAvailable(Object source, Object result)

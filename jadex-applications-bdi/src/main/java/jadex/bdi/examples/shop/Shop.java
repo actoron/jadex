@@ -6,52 +6,108 @@ import jadex.bridge.IExternalAccess;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.concurrent.DefaultResultListener;
+import jadex.commons.concurrent.DelegationResultListener;
+import jadex.commons.concurrent.IResultListener;
+import jadex.service.BasicService;
 
 /**
- * 
+ *  The shop for buying goods at the shop.
  */
-public class Shop implements IShop 
+public class Shop extends BasicService implements IShop 
 {
+	//-------- attributes --------
+	
 	/** The component. */
 	protected IBDIExternalAccess comp;
 	
+	//-------- constructors --------
+	
 	/**
-	 * 
+	 *  Create a new shop service.
+	 *  @param comp The active component.
 	 */
 	public Shop(IExternalAccess comp)
 	{
 		this.comp = (IBDIExternalAccess)comp;
 	}
 
+	//-------- methods --------
+	
 	/**
-	 * 
+	 *  Get the shop name. 
+	 *  @return The name.
+	 */
+	public IFuture getName()
+	{
+		final Future ret = new Future();
+		
+		if(!isValid())
+		{
+			ret.setException(new RuntimeException("Service unavailable."));
+		}
+		else
+		{
+			comp.getBeliefbase().getBeliefFact("shopname").addResultListener(new DelegationResultListener(ret));
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Buy an item.
+	 *  @param item The item.
 	 */
 	public IFuture buyItem(final String item)
 	{
 		final Future ret = new Future();
 		
-		comp.createGoal("sell").addResultListener(new DefaultResultListener()
+		if(!isValid())
 		{
-			public void resultAvailable(Object source, Object result)
+			ret.setException(new RuntimeException("Service unavailable."));
+		}
+		else
+		{
+			comp.createGoal("sell").addResultListener(new DefaultResultListener()
 			{
-				final IEAGoal buy = (IEAGoal)result;
-				buy.setParameterValue("name", item);
-				comp.dispatchTopLevelGoalAndWait(buy).addResultListener(new DefaultResultListener()
+				public void resultAvailable(Object source, Object result)
 				{
-					public void resultAvailable(Object source, Object result)
+					final IEAGoal buy = (IEAGoal)result;
+					buy.setParameterValue("name", item);
+					comp.dispatchTopLevelGoalAndWait(buy).addResultListener(new IResultListener()
 					{
-						buy.getParameterValue("result").addResultListener(new DefaultResultListener()
+						public void resultAvailable(Object source, Object result)
 						{
-							public void resultAvailable(Object source, Object result)
-							{
-								System.out.println(comp.getComponentIdentifier().getLocalName()+" setting: "+result);
-								ret.setResult(result);
-							}
-						});
-					}
-				});
-			}
-		});
+							buy.getParameterValue("result").addResultListener(new DelegationResultListener(ret));
+						}
+						
+						public void exceptionOccurred(Object source, Exception exception)
+						{
+							ret.setException(exception);
+						}
+					});
+				}
+			});
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Get the item catalog.
+	 *  @return  The catalog.
+	 */	
+	public IFuture getCatalog()
+	{
+		final Future ret = new Future();
+		
+		if(!isValid())
+		{
+			ret.setException(new RuntimeException("Service unavailable."));
+		}
+		else
+		{
+			comp.getBeliefbase().getBeliefSetFacts("catalog").addResultListener(new DelegationResultListener(ret));
+		}
 		
 		return ret;
 	}

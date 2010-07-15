@@ -80,6 +80,7 @@ public class AgentRules
 //					argcopy	= new HashMap();
 //					argcopy.putAll(arguments);
 //				}
+				
 				initializeCapabilityInstance(state, ragent);
 				state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_initparents, null);
 				
@@ -1055,10 +1056,9 @@ public class AgentRules
 				String name = (String)state.getAttributeValue(mexp, OAVBDIMetaModel.modelelement_has_name);
 				Object val = evaluateExpression(state, mexp, new OAVBDIFetcher(state, rcapa));
 				Class type = (Class)state.getAttributeValue(mexp, OAVBDIMetaModel.expression_has_class);
-//				sp.addService(type, name, val);
 				// cast hack?!
 				((IServiceContainer)BDIInterpreter.getInterpreter(state).getServiceProvider()).addService(type, val);
-				System.out.println("Service: "+name+" "+val+" "+type);
+//				System.out.println("Service: "+name+" "+val+" "+type);
 			}
 		}
 		

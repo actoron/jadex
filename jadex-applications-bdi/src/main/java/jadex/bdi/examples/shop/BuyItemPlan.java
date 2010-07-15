@@ -15,8 +15,13 @@ public class BuyItemPlan extends Plan
 	public void body()
 	{
 		IShop shop = (IShop)SServiceProvider.getService(getScope().getServiceProvider(), IShop.class).get(this);
+		
 		if(shop!=null)
 		{
+			// Open gui and let user choose what to buy.
+			
+			CustomerGui gui = new CustomerGui(getExternalAccess(), shop);
+			
 			String name	= (String)getParameter("name").getValue();
 			System.out.println(getComponentName()+" buying item: "+name);
 			IFuture	future	= shop.buyItem(name);

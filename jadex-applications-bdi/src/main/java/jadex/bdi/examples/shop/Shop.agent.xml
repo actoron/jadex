@@ -13,6 +13,10 @@
 		<import>jadex.base.fipa.*</import>
 	</imports>
 
+	<beliefs>
+		<belief name="shopname" class="String" argument="true">"no name"</belief>
+	</beliefs>
+
 	<goals>
 		<achievegoal name="sell">
 			<parameter name="name" class="String"></parameter>

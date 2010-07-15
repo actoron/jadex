@@ -16,5 +16,8 @@ public class SellItemPlan extends Plan
 		System.out.println(getComponentName()+" sell item: "+name);
 		
 		getParameter("result").setValue("Sold item: "+name);
+		
+		// kill shop for cache test purposes.
+		killAgent();
 	}
 }
