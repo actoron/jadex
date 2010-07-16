@@ -56,10 +56,10 @@ public class DefaultVisitDecider implements IVisitDecider
 			visited.add(target.getId());
 			ret = true;
 		}
-//		else
-//		{
-//			ret = false;
-//		}
+		else
+		{
+			ret = false;
+		}
 		
 //		System.out.println("search: "+target.getId()+" "+ret+" "+visited);
 		

@@ -46,7 +46,9 @@ public class LocalSearchManager implements ISearchManager
 	 */
 	public IFuture	searchServices(IServiceProvider provider, IVisitDecider decider, IResultSelector selector, Map services)
 	{
-		if(!selector.isFinished(results) && decider.searchNode(null, provider, results))
+		// local search is always allowed?!
+		// problem: first gsm searches a node, then lsm searches the same node = double visit
+		if(!selector.isFinished(results))// && decider.searchNode(null, provider, results))
 		{
 			selector.selectServices(services, results);
 		}

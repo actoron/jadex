@@ -10,8 +10,8 @@ public class SServiceProvider
 	protected static ISearchManager sequentialmanager = new SequentialSearchManager();
 	protected static ISearchManager parallelmanager = new ParallelSearchManager();
 	protected static ISearchManager upwardsmanager = new SequentialSearchManager(true, false);
-	protected static IVisitDecider abortdecider = new DefaultVisitDecider();
-	protected static IVisitDecider contdecider = new DefaultVisitDecider(false);
+//	protected static IVisitDecider abortdecider = new DefaultVisitDecider();
+//	protected static IVisitDecider contdecider = new DefaultVisitDecider(false);
 	
 //	protected static Map	profiling	= new HashMap();
 //	
@@ -55,7 +55,7 @@ public class SServiceProvider
 //			Integer	cnt	= (Integer)profiling.get(type);
 //			profiling.put(type, new Integer(cnt!=null ? cnt.intValue()+1 : 1)); 
 //		}
-		return provider.getServices(sequentialmanager, abortdecider, new TypeResultSelector(type));
+		return provider.getServices(sequentialmanager, new DefaultVisitDecider(), new TypeResultSelector(type));
 	}
 	
 	/**
@@ -70,7 +70,7 @@ public class SServiceProvider
 //			Integer	cnt	= (Integer)profiling.get(selector.getCacheKey());
 //			profiling.put(selector.getCacheKey(), new Integer(cnt!=null ? cnt.intValue()+1 : 1)); 
 //		}
-		return provider.getServices(sequentialmanager, abortdecider, selector);
+		return provider.getServices(sequentialmanager, new DefaultVisitDecider(), selector);
 	}
 	
 	/**
@@ -85,7 +85,7 @@ public class SServiceProvider
 //			Integer	cnt	= (Integer)profiling.get(type);
 //			profiling.put(type, new Integer(cnt!=null ? cnt.intValue()+1 : 1)); 
 //		}
-		return provider.getServices(parallelmanager, contdecider, new TypeResultSelector(type, false));
+		return provider.getServices(parallelmanager, new DefaultVisitDecider(false), new TypeResultSelector(type, false));
 	}
 
 	/**
@@ -100,6 +100,6 @@ public class SServiceProvider
 //			Integer	cnt	= (Integer)profiling.get(type);
 //			profiling.put(type, new Integer(cnt!=null ? cnt.intValue()+1 : 1)); 
 //		}
-		return provider.getServices(upwardsmanager, abortdecider, new TypeResultSelector(type));
+		return provider.getServices(upwardsmanager, new DefaultVisitDecider(), new TypeResultSelector(type));
 	}
 }
