@@ -55,6 +55,7 @@ public class TypeResultSelector implements IResultSelector
 			}
 			else
 			{
+				System.out.println("adding: "+ares);
 				results.addAll(Arrays.asList(ares));
 			}
 		}

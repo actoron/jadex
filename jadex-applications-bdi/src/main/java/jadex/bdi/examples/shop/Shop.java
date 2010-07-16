@@ -20,15 +20,20 @@ public class Shop extends BasicService implements IShop
 	/** The component. */
 	protected IBDIExternalAccess comp;
 	
+	/** The shop name. */
+	protected String name;
+	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new shop service.
 	 *  @param comp The active component.
 	 */
-	public Shop(IExternalAccess comp)
+	public Shop(IExternalAccess comp, String name)
 	{
+		System.out.println("created: "+name);
 		this.comp = (IBDIExternalAccess)comp;
+		this.name = name;
 	}
 
 	//-------- methods --------
@@ -37,20 +42,9 @@ public class Shop extends BasicService implements IShop
 	 *  Get the shop name. 
 	 *  @return The name.
 	 */
-	public IFuture getName()
+	public String getName()
 	{
-		final Future ret = new Future();
-		
-		if(!isValid())
-		{
-			ret.setException(new RuntimeException("Service unavailable."));
-		}
-		else
-		{
-			comp.getBeliefbase().getBeliefFact("shopname").addResultListener(new DelegationResultListener(ret));
-		}
-		
-		return ret;
+		return name;
 	}
 	
 	/**
@@ -111,4 +105,14 @@ public class Shop extends BasicService implements IShop
 		
 		return ret;
 	}
+
+	/**
+	 *  Get the string representation.
+	 *  @return The string representation.
+	 */
+	public String toString()
+	{
+		return name;
+	}
+	
 }

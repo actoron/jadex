@@ -924,7 +924,8 @@ public class ComponentManagementService extends BasicService implements ICompone
 	public IComponentIdentifier[] getChildren(IComponentIdentifier cid)
 	{
 		CMSComponentDescription desc = (CMSComponentDescription)descs.get(cid);
-		return desc!=null? desc.getChildren(): EMPTY_COMPONENTIDENTIFIERS;
+		IComponentIdentifier[] ret = desc!=null? desc.getChildren()!=null? desc.getChildren(): EMPTY_COMPONENTIDENTIFIERS: EMPTY_COMPONENTIDENTIFIERS;
+		return ret;
 	}
 	public static final IComponentIdentifier[] EMPTY_COMPONENTIDENTIFIERS = new IComponentIdentifier[0]; 
 

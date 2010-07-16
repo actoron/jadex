@@ -921,7 +921,8 @@ public class Application implements IApplication, IComponentInstance
 	 */
 	public IFuture cleanupComponent()
 	{
-		return adapter.getServiceContainer().shutdown();
+		return new Future(null);
+//		return adapter.getServiceContainer().shutdown(); // done in adapter
 	}
 	
 	/**

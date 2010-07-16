@@ -201,6 +201,8 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 		this.microplansteps = true;
 		this.externalthreads	= Collections.synchronizedSet(SCollection.createLinkedHashSet());
 
+//		System.out.println("arguments: "+adapter.getComponentIdentifier().getName()+" "+arguments);
+		
 		state.setSynchronizator(new ISynchronizator()
 		{
 			public boolean isExternalThread()
@@ -325,6 +327,7 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 
 				// Previously done in createStartAgentRule
 				Map parents = new HashMap(); 
+				state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_initparents, parents);
 				List	futures	= AgentRules.createCapabilityInstance(state, ragent, parents);
 				
 				// Start service container.
@@ -362,7 +365,7 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 						((Future)futures.get(i)).addResultListener(crs);
 					}
 				}
-				state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_initparents, parents);
+//				state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_initparents, parents);
 
 				
 				// This is the clean way to init the logger, but since 

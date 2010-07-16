@@ -11,7 +11,7 @@ public interface IShop
 	 *  Get the shop name. 
 	 *  @return The name.
 	 */
-	public IFuture getName();
+	public String getName();
 	
 	/**
 	 *  Buy an item.

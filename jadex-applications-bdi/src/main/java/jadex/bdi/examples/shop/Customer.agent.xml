@@ -9,15 +9,16 @@
 	name="Customer"
 	package="jadex.bdi.examples.shop">
 
-	<!--  <beliefs>
+	<beliefs>
 		<belief name="gui" class="jadex.bdi.planlib.GuiCreator">
 			<fact>new jadex.bdi.planlib.GuiCreator(CustomerGui.class, new Class[]{jadex.bdi.runtime.IBDIExternalAccess.class}, 
-				new Object[]{$scope.getExternalAccess(), Boolean.FALSE})</fact>
+				new Object[]{$scope.getExternalAccess()})</fact>
 		</belief>
-	</beliefs>-->
+	</beliefs>
 
 	<goals>
 		<achievegoal name="buy">
+			<parameter name="shop" class="IShop"></parameter>
 			<parameter name="name" class="String"></parameter>
 			<parameter name="result" class="Object" direction="out"></parameter>
 		</achievegoal>
@@ -25,6 +26,9 @@
 	
 	<plans>
 		<plan name="buyplan">
+			<parameter name="shop" class="IShop">
+				<goalmapping ref="sell.shop"/>
+			</parameter>
 			<parameter name="name" class="String">
 				<goalmapping ref="sell.name"/>
 			</parameter>
@@ -37,22 +41,5 @@
 			</trigger>
 		</plan>
 	</plans>
-	
-	<configurations>
-		<configuration name="buy">
-			<goals>
-				<initialgoal ref="buy">
-					<parameter ref="name">
-						<value>"cookie"</value>
-					</parameter>
-				</initialgoal>
-				<initialgoal ref="buy">
-					<parameter ref="name">
-						<value>"salt"</value>
-					</parameter>
-				</initialgoal>
-			</goals>
-		</configuration>
-	</configurations>
 	
 </agent>

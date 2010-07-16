@@ -372,11 +372,13 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 			{
 				public void resultAvailable(Object source, Object result)
 				{
+					getServiceContainer().shutdown();
 					listener.resultAvailable(this, getComponentIdentifier());
 				}
 				
 				public void exceptionOccurred(Object source, Exception exception)
 				{
+					getServiceContainer().shutdown();
 					listener.resultAvailable(this, getComponentIdentifier());
 				}
 			});

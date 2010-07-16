@@ -22,7 +22,20 @@
 	<applications>
 		<application name="1 Shop / 1 Customer">
 			<components>
-				<component type="Shop" number="1"/>
+				<component type="Shop">
+					<arguments>
+						<argument name="shopname">"Ladl"</argument>
+						<argument name="catalog">
+							new ItemInfo[]
+							{
+								new ItemInfo("Cookies", 0.89),
+								new ItemInfo("Milk", 0.56),
+								new ItemInfo("Bread", 1.09),
+								new ItemInfo("Meat", 2.89)
+							}
+						</argument>
+					</arguments>
+				</component>
   				<component type="Customer" number="1"/>
 			</components>
  		</application>
@@ -31,12 +44,29 @@
 			<components>
 				<component type="Shop">
 					<arguments>
-						<argument name="shopname">"C & B"</argument>
+						<argument name="shopname">"Ladl"</argument>
+						<argument name="catalog">
+							new ItemInfo[]
+							{
+								new ItemInfo("Cookies", 0.89),
+								new ItemInfo("Milk", 0.56),
+								new ItemInfo("Bread", 1.09),
+								new ItemInfo("Meat", 2.89)
+							}
+						</argument>
 					</arguments>
 				</component>
 				<component type="Shop">
 					<arguments>
 						<argument name="shopname">"Herzie"</argument>
+						<argument name="catalog">
+							new ItemInfo[]
+							{
+								new ItemInfo("Shoes", 55.99),
+								new ItemInfo("Shirt", 15.00),
+								new ItemInfo("Pants", 75.99)
+							}
+						</argument>
 					</arguments>
 				</component>
   				<component type="Customer" number="1"/>

@@ -14,7 +14,11 @@
 	</imports>
 
 	<beliefs>
-		<belief name="shopname" class="String" argument="true">"no name"</belief>
+		<belief name="shopname" class="String" argument="true">
+			<fact>"no name"</fact>
+		</belief>
+		<beliefset name="catalog" class="ItemInfo" argument="true">
+		</beliefset>
 	</beliefs>
 
 	<goals>
@@ -40,7 +44,7 @@
 	</plans>
 	
 	<services>
-		<service name="shopservice" class="IShop">new Shop($scope.getExternalAccess())</service>
+		<service name="shopservice" class="IShop">new Shop($scope.getExternalAccess(), $beliefbase.shopname)</service>
 	</services>
 	
 </agent>

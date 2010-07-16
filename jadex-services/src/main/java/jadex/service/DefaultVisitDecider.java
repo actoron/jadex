@@ -53,9 +53,15 @@ public class DefaultVisitDecider implements IVisitDecider
 		
 		if(ret && !visited.contains(target.getId()))
 		{
-			visited.add(target);
+			visited.add(target.getId());
 			ret = true;
 		}
+//		else
+//		{
+//			ret = false;
+//		}
+		
+//		System.out.println("search: "+target.getId()+" "+ret+" "+visited);
 		
 		return ret;
 	}
