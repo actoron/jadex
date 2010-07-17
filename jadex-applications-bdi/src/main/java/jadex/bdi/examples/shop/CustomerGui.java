@@ -1,7 +1,10 @@
 package jadex.bdi.examples.shop;
 
+import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IBDIExternalAccess;
+import jadex.bdi.runtime.IBeliefSetListener;
 import jadex.commons.SGUI;
+import jadex.commons.Tuple;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.service.SServiceProvider;
 
@@ -20,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
@@ -28,9 +32,13 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 
 /**
@@ -39,56 +47,13 @@ import javax.swing.table.AbstractTableModel;
 public class CustomerGui extends JFrame
 {
 	protected IBDIExternalAccess agent;
-	protected List items = new ArrayList();
-	protected JTable table;
+	protected List shoplist = new ArrayList();
+	protected JTable shoptable;
+	protected AbstractTableModel shopmodel = new ItemTableModel(shoplist);
 	
-	private AbstractTableModel lim = new AbstractTableModel()
-	{
-		public int getRowCount()
-		{
-			return items.size();
-		}
-
-		public int getColumnCount()
-		{
-			return 2;
-		}
-
-		public String getColumnName(int column)
-		{
-			switch(column)
-			{
-				case 0:
-					return "Name";
-				case 1:
-					return "Price";
-//				case 2:
-//					return "Bought";
-				default:
-					return "";
-			}
-		}
-
-		public boolean isCellEditable(int row, int column)
-		{
-			return false;
-		}
-
-		public Object getValueAt(int row, int column)
-		{
-			Object value = null;
-			ItemInfo ii = (ItemInfo)items.get(row);
-			if(column == 0)
-			{
-				value = ii.getName();
-			}
-			else if(column == 1)
-			{
-				value = new Double(ii.getPrice());
-			}
-			return value;
-		}
-	};
+	protected List invlist = new ArrayList();
+	protected AbstractTableModel invmodel = new ItemTableModel(invlist);
+	protected JTable invtable;
 	
 	//-------- constructors --------
 	
@@ -138,26 +103,115 @@ public class CustomerGui extends JFrame
 		int x=0;
 		int y=0;
 		selpanel.add(new JLabel("Search for shops: "), new GridBagConstraints(
-			x,y,1,1,1,0,GridBagConstraints.NORTHEAST,GridBagConstraints.NONE,new Insets(2,2,2,2),0,0));
+			x,y,1,1,1,0,GridBagConstraints.EAST,GridBagConstraints.NONE,new Insets(2,2,2,2),0,0));
 		x++;
 		selpanel.add(searchbut, new GridBagConstraints(
-			x,y,1,1,0,0,GridBagConstraints.NORTHWEST,GridBagConstraints.NONE,new Insets(2,2,2,2),0,0));
+			x,y,1,1,0,0,GridBagConstraints.WEST,GridBagConstraints.NONE,new Insets(2,2,2,2),0,0));
 		x=0; y++;
 		selpanel.add(new JLabel("Available shops: "), new GridBagConstraints(
-			x,y,1,1,1,0,GridBagConstraints.NORTHEAST,GridBagConstraints.NONE,new Insets(2,2,2,2),0,0));
+			x,y,1,1,1,0,GridBagConstraints.EAST,GridBagConstraints.NONE,new Insets(2,2,2,2),0,0));
 		x++;
 		selpanel.add(shopscombo, new GridBagConstraints(
-			x,y,1,1,0,0,GridBagConstraints.NORTHWEST,GridBagConstraints.NONE,new Insets(2,2,2,2),0,0));
+			x,y,1,1,0,0,GridBagConstraints.WEST,GridBagConstraints.NONE,new Insets(2,2,2,2),0,0));
 		
-		JPanel itempanel = new JPanel(new BorderLayout());
-		itempanel.setBorder(new TitledBorder(new EtchedBorder(), "Shop Catalog"));
+		JPanel shoppanel = new JPanel(new BorderLayout());
+		shoppanel.setBorder(new TitledBorder(new EtchedBorder(), "Shop Catalog"));
+		shoptable = new JTable(shopmodel);
+		shoptable.setPreferredScrollableViewportSize(new Dimension(600, 120));
+		shoptable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		shoppanel.add(BorderLayout.CENTER, shoptable);
 
-		table = new JTable(lim);
-		table.setPreferredScrollableViewportSize(new Dimension(600, 120));
-		itempanel.add(BorderLayout.CENTER, table);
-
+		JPanel invpanel = new JPanel(new BorderLayout());
+		invpanel.setBorder(new TitledBorder(new EtchedBorder(), "Customer Inventory"));
+		invtable = new JTable(invmodel);
+		invtable.setPreferredScrollableViewportSize(new Dimension(600, 120));
+		invpanel.add(BorderLayout.CENTER, invtable);
+		
+		agent.getBeliefbase().addBeliefSetListener("inventory", new IBeliefSetListener()
+		{
+			public void factRemoved(final AgentEvent ae)
+			{
+				SwingUtilities.invokeLater(new Runnable()
+				{
+					public void run()
+					{
+						invlist.remove(ae.getValue());
+					}
+				});
+			}
+			
+			public void factChanged(final AgentEvent ae)
+			{
+				SwingUtilities.invokeLater(new Runnable()
+				{
+					public void run()
+					{
+						invlist.remove(ae.getValue());
+						invlist.add(ae.getValue());
+					}
+				});
+			}
+			
+			public void factAdded(final AgentEvent ae)
+			{
+				SwingUtilities.invokeLater(new Runnable()
+				{
+					public void run()
+					{
+						invlist.add(ae.getValue());
+					}
+				});
+			}
+		});
+		
+		JPanel butpanel = new JPanel();
+		JButton buy = new JButton("Buy");
+		final JTextField item = new JTextField(15);
+		item.setEditable(false);
+		butpanel.add(new JLabel("Selected item:"));
+		butpanel.add(item);
+		butpanel.add(buy);
+		buy.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				int sel = shoptable.getSelectedRow();
+				if(sel!=-1)
+				{
+					String name = (String)shopmodel.getValueAt(sel, 0);
+					double price = ((Double)shopmodel.getValueAt(sel, 1)).doubleValue();
+					IShop shop = (IShop)shopscombo.getSelectedItem();
+					System.out.println("buying: "+name+" at: "+shop.getName());
+					shop.buyItem(name, price).addResultListener(new SwingDefaultResultListener()
+					{
+						public void customResultAvailable(Object source, Object result)
+						{
+							ItemInfo bought = (ItemInfo)result;
+							System.out.println("bought: "+bought);
+							invlist.add(bought);
+							invmodel.fireTableDataChanged();
+						}
+					});
+				}
+			}
+		});
+		invpanel.add(BorderLayout.SOUTH, butpanel);
+		
+		shoptable.getSelectionModel().addListSelectionListener(new ListSelectionListener()
+		{
+			public void valueChanged(ListSelectionEvent e)
+			{
+				int sel = shoptable.getSelectedRow();
+				if(sel!=-1)
+				{
+					item.setText(""+shopmodel.getValueAt(sel, 0));
+				}
+			}
+		});
+		
 		getContentPane().add(BorderLayout.NORTH, selpanel);
-		getContentPane().add(BorderLayout.CENTER, itempanel);
+		getContentPane().add(BorderLayout.CENTER, shoppanel);
+		getContentPane().add(BorderLayout.SOUTH, invpanel);
 		
 //		refresh();
 		pack();
@@ -184,15 +238,16 @@ public class CustomerGui extends JFrame
 				public void customResultAvailable(Object source, Object result)
 				{
 					ItemInfo[] aitems = (ItemInfo[])result;
-					items.clear();
+					shoplist.clear();
 					for(int i = 0; i < aitems.length; i++)
 					{
-						if(!items.contains(aitems[i]))
+						if(!shoplist.contains(aitems[i]))
 						{
-							items.add(aitems[i]);
+//							System.out.println("added: "+aitems[i]);
+							shoplist.add(aitems[i]);
 						}
 					}
-					lim.fireTableDataChanged();
+					shopmodel.fireTableDataChanged();
 				}
 			});
 		}
@@ -202,10 +257,70 @@ public class CustomerGui extends JFrame
 			{
 				public void run()
 				{
-					items.clear();
-					lim.fireTableDataChanged();
+					shoplist.clear();
+					shopmodel.fireTableDataChanged();
 				}
 			});
 		}
 	}
+		
 }
+
+class ItemTableModel extends AbstractTableModel
+{
+	protected List list;
+	
+	public ItemTableModel(List list)
+	{
+		this.list = list;
+	}
+	
+	public int getRowCount()
+	{
+		return list.size();
+	}
+
+	public int getColumnCount()
+	{
+		return 3;
+	}
+
+	public String getColumnName(int column)
+	{
+		switch(column)
+		{
+			case 0:
+				return "Name";
+			case 1:
+				return "Price";
+			case 2:
+				return "Quantity";
+			default:
+				return "";
+		}
+	}
+
+	public boolean isCellEditable(int row, int column)
+	{
+		return false;
+	}
+
+	public Object getValueAt(int row, int column)
+	{
+		Object value = null;
+		ItemInfo ii = (ItemInfo)list.get(row);
+		if(column == 0)
+		{
+			value = ii.getName();
+		}
+		else if(column == 1)
+		{
+			value = new Double(ii.getPrice());
+		}
+		else if(column == 2)
+		{
+			value = new Integer(ii.getQuantity());
+		}
+		return value;
+	}
+};

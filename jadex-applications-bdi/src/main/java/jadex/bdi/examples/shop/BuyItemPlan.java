@@ -14,10 +14,11 @@ public class BuyItemPlan extends Plan
 	public void body()
 	{
 		IShop shop = (IShop)getParameter("shop").getValue();
-		
 		String name	= (String)getParameter("name").getValue();
+		double price = ((Double)getParameter("price").getValue()).doubleValue();
+		
 		System.out.println(getComponentName()+" buying item: "+name);
-		IFuture	future	= shop.buyItem(name);
+		IFuture	future	= shop.buyItem(name, price);
 		System.out.println(getComponentName()+" getting item: "+future);
 		Object item = future.get(this);
 		System.out.println(getComponentName()+" bought item: "+item);

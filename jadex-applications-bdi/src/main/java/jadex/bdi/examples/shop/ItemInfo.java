@@ -13,15 +13,28 @@ public class ItemInfo
 	/** The price. */
 	protected double price;
 	
+	/** The quantity. */
+	protected int quantity;
+
+	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new item info.
 	 */
-	public ItemInfo(String name, double price)
+	public ItemInfo(String name)
+	{
+		this(name, 0, 0);
+	}
+	
+	/**
+	 *  Create a new item info.
+	 */
+	public ItemInfo(String name, double price, int quantity)
 	{
 		this.name = name;
 		this.price = price;
+		this.quantity = quantity;
 	}
 
 	//-------- methods --------
@@ -61,5 +74,38 @@ public class ItemInfo
 	{
 		this.price = price;
 	}
-	
+
+	/**
+	 *  Get the quantity.
+	 *  @return The quantity.
+	 */
+	public int getQuantity()
+	{
+		return quantity;
+	}
+
+	/**
+	 *  Set the quantity.
+	 *  @param quantity The quantity to set.
+	 */
+	public void setQuantity(int quantity)
+	{
+		this.quantity = quantity;
+	}
+
+	/** 
+	 *
+	 */
+	public int hashCode()
+	{
+		return ((name == null) ? 0 : name.hashCode());
+	}
+
+	/** 
+	 *
+	 */
+	public boolean equals(Object obj)
+	{
+		return obj instanceof ItemInfo && (name.equals(((ItemInfo)obj).name));
+	}
 }

@@ -3,7 +3,7 @@ package jadex.bdi.examples.shop;
 import jadex.bdi.runtime.Plan;
 
 /**
- * 
+ *  Plan for selling an item.
  */
 public class SellItemPlan extends Plan
 {
@@ -13,11 +13,23 @@ public class SellItemPlan extends Plan
 	public void body()
 	{
 		String name = (String)getParameter("name").getValue();
-		System.out.println(getComponentName()+" sell item: "+name);
+		double money = ((Double)getParameter("price").getValue()).doubleValue();
+		ItemInfo ii = (ItemInfo)getBeliefbase().getBeliefSet("catalog").getFact(new ItemInfo(name));
 		
-		getParameter("result").setValue("Sold item: "+name);
-		
-		// kill shop for cache test purposes.
-		killAgent();
+		if(ii.getQuantity()>0 && ii.getPrice()<=money)
+		{
+			System.out.println(getComponentName()+" sell item: "+name+" for: "+money);
+			getParameter("result").setValue(new ItemInfo(name, ii.getPrice(), 1));
+			ii.setQuantity(ii.getQuantity()-1);
+			getBeliefbase().getBeliefSet("catalog").modified(ii);
+		}
+		else if(ii.getQuantity()==0)
+		{
+			throw new RuntimeException("Item not in store: "+name);
+		}
+		else
+		{
+			throw new RuntimeException("Money not sufficient: "+money);
+		}
 	}
 }

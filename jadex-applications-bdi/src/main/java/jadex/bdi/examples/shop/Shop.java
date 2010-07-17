@@ -51,7 +51,7 @@ public class Shop extends BasicService implements IShop
 	 *  Buy an item.
 	 *  @param item The item.
 	 */
-	public IFuture buyItem(final String item)
+	public IFuture buyItem(final String item, final double price)
 	{
 		final Future ret = new Future();
 		
@@ -67,6 +67,7 @@ public class Shop extends BasicService implements IShop
 				{
 					final IEAGoal buy = (IEAGoal)result;
 					buy.setParameterValue("name", item);
+					buy.setParameterValue("price", new Double(price));
 					comp.dispatchTopLevelGoalAndWait(buy).addResultListener(new IResultListener()
 					{
 						public void resultAvailable(Object source, Object result)
