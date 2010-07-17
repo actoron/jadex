@@ -184,6 +184,7 @@ public class CustomerGui extends JFrame
 				public void customResultAvailable(Object source, Object result)
 				{
 					ItemInfo[] aitems = (ItemInfo[])result;
+					items.clear();
 					for(int i = 0; i < aitems.length; i++)
 					{
 						if(!items.contains(aitems[i]))

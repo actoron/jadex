@@ -291,5 +291,26 @@ public class BasicServiceContainer implements  IServiceContainer
 	{
 		return "BasicServiceContainer(name="+getId()+")";
 	}
+
+	/** 
+	 *  Get the hashcode.
+	 *  @return The hashcode.
+	 */
+	public int hashCode()
+	{
+		return ((id == null) ? 0 : id.hashCode());
+	}
+
+	/** 
+	 *  Test if the object eqquals another one.
+	 *  @param obj The object.
+	 *  @return true, if both are equal.
+	 */
+	public boolean equals(Object obj)
+	{
+		return obj instanceof IServiceContainer && ((IServiceContainer)obj).getId().equals(getId());
+	}
+	
+	
 	
 }

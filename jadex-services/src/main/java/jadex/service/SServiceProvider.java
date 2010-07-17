@@ -3,16 +3,29 @@ package jadex.service;
 import jadex.commons.IFuture;
 
 /**
- * 
+ *  Static helper class for searching services.
  */
 public class SServiceProvider
 {
-	protected static ISearchManager sequentialmanager = new SequentialSearchManager();
-	protected static ISearchManager parallelmanager = new ParallelSearchManager();
-	protected static ISearchManager upwardsmanager = new SequentialSearchManager(true, false);
-//	protected static IVisitDecider abortdecider = new DefaultVisitDecider();
-//	protected static IVisitDecider contdecider = new DefaultVisitDecider(false);
+	//-------- constants --------
 	
+	/** The sequential search manager. */
+	protected static ISearchManager sequentialmanager = new SequentialSearchManager();
+
+	/** The parallel search manager. */
+	protected static ISearchManager parallelmanager = new ParallelSearchManager();
+	
+	/** The sequential search manager that searches only upwards. */
+	protected static ISearchManager upwardsmanager = new SequentialSearchManager(true, false);
+
+	/** The vsist decider that stops searching after one result has been found. */
+	protected static IVisitDecider abortdecider = new DefaultVisitDecider();
+
+	/** The vsist decider that never stops. */
+	protected static IVisitDecider contdecider = new DefaultVisitDecider(false);
+
+	//-------- methods --------
+
 //	protected static Map	profiling	= new HashMap();
 //	
 //	static
@@ -55,7 +68,7 @@ public class SServiceProvider
 //			Integer	cnt	= (Integer)profiling.get(type);
 //			profiling.put(type, new Integer(cnt!=null ? cnt.intValue()+1 : 1)); 
 //		}
-		return provider.getServices(sequentialmanager, new DefaultVisitDecider(), new TypeResultSelector(type));
+		return provider.getServices(sequentialmanager, abortdecider, new TypeResultSelector(type));
 	}
 	
 	/**
@@ -70,7 +83,7 @@ public class SServiceProvider
 //			Integer	cnt	= (Integer)profiling.get(selector.getCacheKey());
 //			profiling.put(selector.getCacheKey(), new Integer(cnt!=null ? cnt.intValue()+1 : 1)); 
 //		}
-		return provider.getServices(sequentialmanager, new DefaultVisitDecider(), selector);
+		return provider.getServices(sequentialmanager, abortdecider, selector);
 	}
 	
 	/**
@@ -85,7 +98,7 @@ public class SServiceProvider
 //			Integer	cnt	= (Integer)profiling.get(type);
 //			profiling.put(type, new Integer(cnt!=null ? cnt.intValue()+1 : 1)); 
 //		}
-		return provider.getServices(parallelmanager, new DefaultVisitDecider(false), new TypeResultSelector(type, false));
+		return provider.getServices(parallelmanager, contdecider, new TypeResultSelector(type, false));
 	}
 
 	/**
@@ -100,6 +113,6 @@ public class SServiceProvider
 //			Integer	cnt	= (Integer)profiling.get(type);
 //			profiling.put(type, new Integer(cnt!=null ? cnt.intValue()+1 : 1)); 
 //		}
-		return provider.getServices(upwardsmanager, new DefaultVisitDecider(), new TypeResultSelector(type));
+		return provider.getServices(upwardsmanager, abortdecider, new TypeResultSelector(type));
 	}
 }
