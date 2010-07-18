@@ -6,17 +6,27 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-bdi
 	                    http://jadex.sourceforge.net/jadex-bdi-2.0.xsd"
-	name="Customer"
+	name="ShopAndCustomer"
 	package="jadex.bdi.examples.shop">
 
 	<capabilities>
+		<capability name="shopcap" file="jadex.bdi.examples.shop.Shop"/>
 		<capability name="customercap" file="jadex.bdi.examples.shop.Customer"/>
 	</capabilities>
 
 	<beliefs>
 		<belief name="money" class="double" argument="true">
+			<assignto ref="shopcap.money"/>
 			<assignto ref="customercap.money"/>
 			<fact>100</fact>
 		</belief>
+
+		<beliefref name="shopname" argument="true">
+			<concrete ref="shopcap.shopname"/>
+		</beliefref>
+		
+		<beliefsetref name="catalog"> <!-- todo argument="true" -->
+			<concrete ref="shopcap.catalog"/>
+		</beliefsetref>
 	</beliefs>
 </agent>

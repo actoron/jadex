@@ -2,6 +2,9 @@ package jadex.bdi.examples.shop;
 
 /**
  *  Item info stores details about items.
+ *  
+ *  Note: two item infos are condidered equal if there name is equal.
+ *  This allows fetching old item infos and updating them by item name.
  */
 public class ItemInfo
 {
@@ -94,7 +97,8 @@ public class ItemInfo
 	}
 
 	/** 
-	 *
+	 *  Get the hashcode.
+	 *  @return The hashcode.
 	 */
 	public int hashCode()
 	{
@@ -102,7 +106,9 @@ public class ItemInfo
 	}
 
 	/** 
-	 *
+	 *  Test if an object is equal to this one.
+	 *  @param obj The object to test.
+	 *  @return True, if both are equal.
 	 */
 	public boolean equals(Object obj)
 	{
