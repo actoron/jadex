@@ -469,6 +469,73 @@ public class BpmnXMLReader
 				for(int i=0; i<annos.size(); i++)
 				{
 					MAnnotation anno = (MAnnotation)annos.get(i);
+					
+					// new jadex parameter handling
+					if("jadex_parameters_table".equals(anno.getSource()))
+					{
+						BpmnMultiColumTable table = parseBpmnMultiColumTable(anno
+								.getDetails());
+						
+						for (int row = 0; row < table.dimension[0]; row++)
+						{
+							// normal parameter has 4 values
+							assert table.data[row].length == 4;
+							
+							String dir = table.data[row][0]; 		// direction
+							String name = table.data[row][1];		// name
+							String clazzname = table.data[row][2];	// class
+							String val = table.data[row][3];		// value
+							
+							try
+							{
+								Class clazz = SReflect.findClass(clazzname, dia.getAllImports(), context.getClassLoader());
+								IParsedExpression exp = null;
+								if(val!=null)
+								{
+									exp = parser.parseExpression(val, dia.getAllImports(), null, context.getClassLoader());
+								}
+								MParameter param = new MParameter(dir, clazz, name, exp);
+								act.addParameter(param);
+//								System.out.println("Parameter: "+param);
+							}
+							catch(ClassNotFoundException cnfe)
+							{
+								throw new RuntimeException(cnfe);
+							}
+						}
+						
+						// next annotation
+						continue;
+					}
+					// new jadex properties handling
+					else if ("jadex_properties_table".equals(anno.getSource()) || 
+								"subProcess_properties_table".equals(anno.getSource()))
+					{
+						BpmnMultiColumTable table = parseBpmnMultiColumTable(anno
+								.getDetails());
+						
+						for (int row = 0; row < table.dimension[0]; row++)
+						{
+							// normal property has 2 values
+							assert table.data[row].length == 2;
+			
+							String name =  table.data[row][0];
+							String val = table.data[row][1];
+							
+							// context variable
+							IParsedExpression exp = null;
+							if(val!=null)
+							{
+								exp = parser.parseExpression(val, dia.getAllImports(), null, context.getClassLoader());
+							}
+							act.setPropertyValue(name, exp);
+//							System.out.println("Parameter/property: "+name+" "+exp);
+						}
+						
+						// next annotation
+						continue;
+					}
+					
 					List details = anno.getDetails();
 					if(details!=null)
 					{
@@ -586,6 +653,8 @@ public class BpmnXMLReader
 		{
 			return 2;
 		}
+		
+		
 	}
 	
 	/**
@@ -769,6 +838,40 @@ public class BpmnXMLReader
 				for(int i=0; i<annos.size(); i++)
 				{
 					MAnnotation anno = (MAnnotation)annos.get(i);
+					
+					// new mappings parameter handling
+					// todo: enhance mappings with index?
+					if("sequence_mappings_table".equals(anno.getSource()))
+					{
+						BpmnMultiColumTable table = parseBpmnMultiColumTable(anno
+								.getDetails());
+						
+						for (int row = 0; row < table.dimension[0]; row++)
+						{
+							// normal mapping has 2 values
+							assert table.data[row].length == 2;
+							
+							String propname = table.data[row][0];
+							String proptext = table.data[row][1];
+
+							IParsedExpression exp = parser.parseExpression(proptext, dia.getAllImports(), null, context.getClassLoader());
+							IParsedExpression iexp	= null;
+
+							if(propname.endsWith("]") && propname.indexOf("[")!=-1)
+							{
+								String	itext	= propname.substring(propname.indexOf("[")+1, propname.length()-1);
+								propname	= propname.substring(0, propname.indexOf("["));
+								iexp	= parser.parseExpression(itext, dia.getAllImports(), null, context.getClassLoader());
+							}
+
+							edge.addParameterMapping(propname, exp, iexp);
+
+						}
+						
+						// next annotation
+						continue;
+					}
+					
 					List details = anno.getDetails();
 					if(details!=null)
 					{
@@ -779,7 +882,7 @@ public class BpmnXMLReader
 							String key = detail.getKey();
 							String value = detail.getValue();
 							
-							// todo: enhance mappings with index?
+							// todo: remove old mappings handling
 							
 							if("mappings".equals(key))
 							{
@@ -976,10 +1079,37 @@ public class BpmnXMLReader
 			List annos = model.getAnnotations();
 			if(annos!=null)
 			{
+				// new jadex import handling
+				
 				// Parse imports/package first (editor saves annotations in arbitrary order, grrr.)
 				for(int i=0; i<annos.size(); i++)
 				{
 					MAnnotation anno = (MAnnotation)annos.get(i);
+					
+					
+					if ("jadex_imports_table".equals(anno.getSource())) {
+						BpmnMultiColumTable table = parseBpmnMultiColumTable(anno
+								.getDetails());
+
+						for (int row = 0; row < table.dimension[0]; row++) {
+							// normal import has 1 value
+							assert table.data[row].length == 1;
+
+							String imp = table.data[row][0];
+							if (imp.length() > 0)
+								model.addImport(imp);
+						}
+
+						// we have found the imports
+						break;
+					}
+				}
+				
+				// Parse imports/package first (editor saves annotations in arbitrary order, grrr.)
+				for(int i=0; i<annos.size(); i++)
+				{
+					MAnnotation anno = (MAnnotation)annos.get(i);
+
 					List details = anno.getDetails();
 					if(details!=null)
 					{
@@ -988,6 +1118,7 @@ public class BpmnXMLReader
 							MAnnotationDetail detail = (MAnnotationDetail)details.get(j);
 							String key = detail.getKey().toLowerCase();
 							String value = detail.getValue();							
+							// todo: remove old imports handling
 							if("imports".equals(key))
 							{
 								StringTokenizer stok = new StringTokenizer(value, LIST_ELEMENT_DELIMITER);
@@ -1010,93 +1141,132 @@ public class BpmnXMLReader
 				for(int i=0; i<annos.size(); i++)
 				{
 					MAnnotation anno = (MAnnotation)annos.get(i);
-					List details = anno.getDetails();
-					if(details!=null)
+					
+					// new jadex arguments handling
+					if("jadex_arguments_table".equals(anno.getSource()))
 					{
-						for(int j=0; j<details.size(); j++)
+						BpmnMultiColumTable table = parseBpmnMultiColumTable(anno
+								.getDetails());
+						
+						for (int row = 0; row < table.dimension[0]; row++)
 						{
-							MAnnotationDetail detail = (MAnnotationDetail)details.get(j);
+							// normal argument has 6 values
+							assert table.data[row].length == 6;
 							
-							String key = detail.getKey().toLowerCase();
-							String value = detail.getValue();
-							
-							if("description".equals(key))
-							{
-								model.setDescription(value);
-							}
-							else if("parameters".equals(key))
-							{
-								throw new RuntimeException("parameters no longer separately");
-//								StringTokenizer stok = new StringTokenizer(value, LIST_ELEMENT_DELIMITER);
-//								while(stok.hasMoreTokens())
-//								{
-//									String paramtext = stok.nextToken();
-//									StringTokenizer stok2 = new StringTokenizer(paramtext, LIST_ELEMENT_ATTRIBUTE_DELIMITER);
-//									/*String dir =*/ stok2.nextToken();	// Todo: consider direction.
-//									String name = stok2.nextToken();
-//									String clazzname = stok2.nextToken();
-//									String val = stok2.hasMoreTokens() ? stok2.nextToken() : null;
-//									
-//									// context variable
-//									Class clazz = SReflect.findClass0(clazzname, model.getAllImports(), context.getClassLoader());
-//									if(clazz!=null)
-//									{
-//										IParsedExpression exp = null;
-//										if(val!=null)
-//										{
-//											exp = parser.parseExpression(val, model.getAllImports(), null, context.getClassLoader());
-//										}
-//										model.addContextVariable(name, clazz, exp);
-////										System.out.println("Context variable: "+name);
-//									}
-//								}
-							}
-							else if("arguments".equals(key))
-							{
-								StringTokenizer stok = new StringTokenizer(value, LIST_ELEMENT_DELIMITER);
-								while(stok.hasMoreTokens())
-								{
-									String argtext = stok.nextToken();
-									StringTokenizer stok2 = new StringTokenizer(argtext, LIST_ELEMENT_ATTRIBUTE_DELIMITER);
-									String name = stok2.nextToken();
-									String isarg = stok2.nextToken();
-									String isres = stok2.nextToken();
-									String desc = stok2.nextToken();
-									String typename = stok2.nextToken();
-									String val = stok2.hasMoreTokens()? stok2.nextToken(): null;
-									IParsedExpression exp = null;
+							String name = table.data[row][0];
+							String isarg = table.data[row][1];
+							String isres = table.data[row][2];
+							String desc = table.data[row][3];
+							String typename = table.data[row][4];
+							String val = table.data[row][5];
+							IParsedExpression exp = null;
 
-									// context variable
-									Class clazz = SReflect.findClass0(typename, model.getAllImports(), context.getClassLoader());
-									if(clazz!=null)
+							// context variable
+							Class clazz = SReflect.findClass0(typename, model.getAllImports(), context.getClassLoader());
+							if(clazz!=null)
+							{
+								
+								if(val!=null)
+								{
+									exp = parser.parseExpression(val, model.getAllImports(), null, context.getClassLoader());
+								}
+								model.addContextVariable(name, clazz, exp);
+//								System.out.println("Context variable: "+name);
+							}
+							
+							IArgument arg	= null;
+							if(isarg!=null && Boolean.parseBoolean(isarg))
+							{
+								Object	argval	= null;
+								try
+								{
+									argval	= exp!=null ? exp.getValue(null) : null;
+								}
+								catch(RuntimeException e)
+								{
+									// Hack!!! initial value for context variable might not be accessible statically.
+								}
+								arg = new Argument(name, desc, typename, argval);
+								model.addArgument(arg);
+							}
+							if(isres!=null && Boolean.parseBoolean(isres))
+							{
+								if(arg==null)
+								{
+									Object	argval	= null;
+									try
 									{
+										argval	= exp!=null ? exp.getValue(null) : null;
+									}
+									catch(RuntimeException e)
+									{
+										// Hack!!! initial value for context variable might not be accessible statically.
+									}
+									arg = new Argument(name, desc, typename, argval);
+								}
+								model.addResult(arg);
+							}
+//								System.out.println("Argument: "+arg);
+
+						}
+						
+						// next annotation
+						//continue;
+						
+					} // end new arguments handling
+					else if (!anno.getSource().endsWith("table"))
+					{
+						// handle other annotation details here
+					
+						List details = anno.getDetails();
+						if(details!=null)
+						{
+							for(int j=0; j<details.size(); j++)
+							{
+								MAnnotationDetail detail = (MAnnotationDetail)details.get(j);
+								
+								String key = detail.getKey().toLowerCase();
+								String value = detail.getValue();
+								
+								if("description".equals(key))
+								{
+									model.setDescription(value);
+								}
+								else if("parameters".equals(key))
+								{
+									throw new RuntimeException("parameters no longer separately");
+								}
+								// todo: remove old arguments handling
+								else if("arguments".equals(key))
+								{
+									StringTokenizer stok = new StringTokenizer(value, LIST_ELEMENT_DELIMITER);
+									while(stok.hasMoreTokens())
+									{
+										String argtext = stok.nextToken();
+										StringTokenizer stok2 = new StringTokenizer(argtext, LIST_ELEMENT_ATTRIBUTE_DELIMITER);
+										String name = stok2.nextToken();
+										String isarg = stok2.nextToken();
+										String isres = stok2.nextToken();
+										String desc = stok2.nextToken();
+										String typename = stok2.nextToken();
+										String val = stok2.hasMoreTokens()? stok2.nextToken(): null;
+										IParsedExpression exp = null;
+	
+										// context variable
+										Class clazz = SReflect.findClass0(typename, model.getAllImports(), context.getClassLoader());
+										if(clazz!=null)
+										{
+											
+											if(val!=null)
+											{
+												exp = parser.parseExpression(val, model.getAllImports(), null, context.getClassLoader());
+											}
+											model.addContextVariable(name, clazz, exp);
+	//										System.out.println("Context variable: "+name);
+										}
 										
-										if(val!=null)
-										{
-											exp = parser.parseExpression(val, model.getAllImports(), null, context.getClassLoader());
-										}
-										model.addContextVariable(name, clazz, exp);
-//										System.out.println("Context variable: "+name);
-									}
-									
-									IArgument arg	= null;
-									if(isarg!=null && Boolean.parseBoolean(isarg))
-									{
-										Object	argval	= null;
-										try
-										{
-											argval	= exp!=null ? exp.getValue(null) : null;
-										}
-										catch(RuntimeException e)
-										{
-											// Hack!!! initial value for context variable might not be accessible statically.
-										}
-										arg = new Argument(name, desc, typename, argval);
-										model.addArgument(arg);
-									}
-									if(isres!=null && Boolean.parseBoolean(isres))
-									{
-										if(arg==null)
+										IArgument arg	= null;
+										if(isarg!=null && Boolean.parseBoolean(isarg))
 										{
 											Object	argval	= null;
 											try
@@ -1108,46 +1278,36 @@ public class BpmnXMLReader
 												// Hack!!! initial value for context variable might not be accessible statically.
 											}
 											arg = new Argument(name, desc, typename, argval);
+											model.addArgument(arg);
 										}
-										model.addResult(arg);
+										if(isres!=null && Boolean.parseBoolean(isres))
+										{
+											if(arg==null)
+											{
+												Object	argval	= null;
+												try
+												{
+													argval	= exp!=null ? exp.getValue(null) : null;
+												}
+												catch(RuntimeException e)
+												{
+													// Hack!!! initial value for context variable might not be accessible statically.
+												}
+												arg = new Argument(name, desc, typename, argval);
+											}
+											model.addResult(arg);
+										}
+	//										System.out.println("Argument: "+arg);
 									}
-//										System.out.println("Argument: "+arg);
 								}
-							}
-							else if("results".equals(key))
-							{
-								throw new RuntimeException("results no longer separately");
-//								StringTokenizer stok = new StringTokenizer(value, LIST_ELEMENT_DELIMITER);
-//								while(stok.hasMoreTokens())
-//								{
-//									String argtext = stok.nextToken();
-//									StringTokenizer stok2 = new StringTokenizer(argtext, LIST_ELEMENT_ATTRIBUTE_DELIMITER);
-//									String name = stok2.nextToken();
-//									String desc = stok2.nextToken();
-//									String typename = stok2.nextToken();
-//									String valtext = stok2.hasMoreTokens()? stok2.nextToken(): null;
-//									
-//									Object val = null;
-//									if(valtext!=null)
-//									{
-//										try
-//										{
-//											val = parser.parseExpression(valtext, model.getAllImports(), null, context.getClassLoader()).getValue(null);
-//										}
-//										catch(RuntimeException e)
-//										{
-//											throw new RuntimeException("Error parsing result: "+model+", "+name+", "+valtext, e);
-//										}
-//									}											
-//									IArgument res = new Argument(name, desc, typename, val);
-//									
-//									model.addResult(res);
-////									System.out.println("Argument: "+arg);
-//								}
-							}
-							else if(!"package".equals(key) && !"imports".equals(key))
-							{
-								throw new RuntimeException("Error parsing annotation: "+key+", "+value);
+								else if("results".equals(key))
+								{
+									throw new RuntimeException("results no longer separately");
+								}
+								else if(!"package".equals(key) && !"imports".equals(key))
+								{
+									throw new RuntimeException("Error parsing annotation: "+key+", "+value);
+								}
 							}
 						}
 					}
@@ -1257,4 +1417,120 @@ public class BpmnXMLReader
 			return 1;
 		}
 	}
+	
+	// ---- Helper method for various post IPostProcessor ----
+	
+	/**
+	 * Parse a list of annotation details into an BpmnMultiColumnTable
+	 * @param details
+	 * @return BpmnMultiColumTable from details
+	 */
+	public static BpmnMultiColumTable parseBpmnMultiColumTable(List details)
+	{
+		BpmnMultiColumTable table = null;
+		// initialize the table
+		for(int j=0; j<details.size() && table == null; j++)
+		{
+			MAnnotationDetail detail = (MAnnotationDetail)details.get(j);
+			if("dimension".equals(detail.getKey()))
+			{
+				table = new BpmnMultiColumTable(detail.getValue());
+			}
+		}
+		
+		assert table != null;
+		
+		for (int j = 0; j < details.size(); j++) 
+		{
+			MAnnotationDetail detail = (MAnnotationDetail) details
+					.get(j);
+
+			String key = detail.getKey();
+			String value = detail.getValue();
+
+			if ("dimension".equals(key)
+					|| "uniqueColumnIndex".equals(key)) 
+			{
+				continue;
+			}
+			
+			table.setCellValue(key, value);
+
+		}
+		
+		return table;
+
+	}
+}
+
+//---- BpmnMultiColumTable ----
+
+class BpmnMultiColumTable
+{
+	/** The table dimension [x, y] */
+	int[] dimension;
+	
+	/** The table data */
+	String[][] data;
+
+	/**
+	 * Create a BpmnMultiColumnTable with given dimension
+	 * @param tableDimension
+	 */
+	public BpmnMultiColumTable(String tableDimension) 
+	{
+		super();
+		this.dimension = parseCellIndex(tableDimension);
+		this.data = new String[dimension[0]][dimension[1]];
+	}
+	
+	/**
+	 * Parse a cell index string to an int[] for 2-dimensional table array
+	 * @param index
+	 * @return int[]{row, column} 
+	 */
+	private int[] parseCellIndex(String index)
+	{
+		assert index != null;
+		String[] xy = index.split(":");
+		if (xy.length == 2)
+		{
+			try {
+				return new int[] { Integer.parseInt(xy[0]),
+						Integer.parseInt(xy[1]) };
+			} catch (NumberFormatException nfe) { /*ignore*/ }
+		}
+		
+		return new int[]{-1, -1};
+		
+	}
+	
+	/**
+	 * Set the value at given index in data[][]
+	 * @param cellIndex
+	 * @param value
+	 */
+	public void setCellValue(String cellIndex, String value)
+	{
+		int[] index = parseCellIndex(cellIndex);
+		assert index[0] != -1 && index[1] != -1;
+		assert index[0] < data.length;
+		assert index[1] < data[index[0]].length;
+		data[index[0]][index[1]] = value;
+	}
+	
+	/**
+	 * Get the value at given index
+	 * @param cellIndex
+	 * @return the value at index from data[][] or null
+	 */
+	public String getCellValue(String cellIndex)
+	{
+		int[] index = parseCellIndex(cellIndex);
+		assert index[0] != -1 && index[1] != -1;
+		assert index[0] < data.length;
+		assert index[1] < data[index[0]].length;
+		return data[index[0]][index[1]];
+	}
+
 }
