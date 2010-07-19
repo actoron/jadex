@@ -136,10 +136,12 @@ public class ComponentManagementService extends BasicService implements ICompone
 	 *  @param killlistener The kill listener (if any). Will receive the results of the component execution, after the component has terminated.
 	 */
 	public IFuture createComponent(final String name, final String model, CreationInfo info, final IResultListener killlistener)
-	{
+	{				
 		final Future ret = new Future();
 		
 		final CreationInfo cinfo = info!=null? info: new CreationInfo();	// Dummy default info, if null.
+		
+//		System.out.println("create start1: "+model+" "+cinfo.getParent());
 		
 		if(name!=null && name.indexOf('@')!=-1)
 		{
@@ -167,6 +169,8 @@ public class ComponentManagementService extends BasicService implements ICompone
 				{
 					public void resultAvailable(Object source, Object result)
 					{
+//						System.out.println("create start2: "+model+" "+cinfo.getParent());
+						
 						IComponentFactory factory = (IComponentFactory)result;
 						if(factory==null)
 							throw new RuntimeException("No factory found for component: "+model);
@@ -177,6 +181,8 @@ public class ComponentManagementService extends BasicService implements ICompone
 						
 						final ComponentIdentifier cid;
 						final CMSComponentDescription ad;
+						final StandaloneComponentAdapter pad;
+						
 						synchronized(adapters)
 						{
 							synchronized(descs)
@@ -204,6 +210,7 @@ public class ComponentManagementService extends BasicService implements ICompone
 										}
 									});
 								}
+//								System.out.println("create start3: "+model+" "+cinfo.getParent());
 						
 								ad	= new CMSComponentDescription(cid, type, getParent(cinfo), cinfo.isMaster(), cinfo.isDaemon());
 //								System.out.println("created: "+ad);
@@ -231,10 +238,11 @@ public class ComponentManagementService extends BasicService implements ICompone
 		//							children.put(parent, cid);
 									padesc.addChild(cid);
 								}
+								pad	= (StandaloneComponentAdapter)adapters.get(getParent(cinfo));
 							}		
 						}
 		
-						final StandaloneComponentAdapter pad	= (StandaloneComponentAdapter)adapters.get(getParent(cinfo));
+						
 						if(pad!=null)
 						{
 							final IComponentFactory	cf	= factory;
@@ -285,11 +293,15 @@ public class ComponentManagementService extends BasicService implements ICompone
 //		final StandaloneComponentAdapter adapter = new StandaloneComponentAdapter(ad, parent);
 
 		// Must be synchronized as this method is called on callback!!!
+		
+		// Create the component instance.
+		StandaloneComponentAdapter adapter;
+		IComponentListener[]	alisteners;
+		
 		synchronized(adapters)
 		{
 			synchronized(descs)
 			{
-				// Create the component instance.
 				try
 				{
 					if(pad!=null)
@@ -301,49 +313,76 @@ public class ComponentManagementService extends BasicService implements ICompone
 					Object[] acom = factory.createComponentInstance(ad, caf, lmodel, config, args, parent);
 		//			adapter.setComponentThread(null);
 					IComponentInstance instance = (IComponentInstance)acom[0];
-					StandaloneComponentAdapter adapter = (StandaloneComponentAdapter)acom[1];
+					adapter = (StandaloneComponentAdapter)acom[1];
 					adapters.put(cid, adapter);
-					
-			//		System.out.println("added: "+descs.size()+", "+aid);
-					
-					// Register component at parent.
-					IComponentListener[]	alisteners;
-					synchronized(listeners)
-					{
-						Set	slisteners	= new HashSet(listeners.getCollection(null));
-						slisteners.addAll(listeners.getCollection(cid));
-						alisteners	= (IComponentListener[])slisteners.toArray(new IComponentListener[slisteners.size()]);
-					}
-					// todo: can be called after listener has (concurrently) deregistered
-					for(int i=0; i<alisteners.length; i++)
-					{
-						alisteners[i].componentAdded(ad);
-					}
-					
-					if(killlistener!=null)
-						killresultlisteners.put(cid, killlistener);
-					
-					if(!suspend)
-					{
-						adapter.wakeup();
-					}
-					
-					ret.setResult(cid.clone());
 				}
 				catch(Exception e)
 				{
-					System.out.println("Ex: "+cid+" "+e);
-					adapters.remove(cid);
-					descs.remove(ad.getName());
-					if(pad!=null)
+					synchronized(adapters)
 					{
-						CMSComponentDescription padesc = (CMSComponentDescription)descs.get(parent.getComponentIdentifier());
-						padesc.removeChild(cid);
+						synchronized(descs)
+						{
+//							e.printStackTrace();
+							System.out.println("Ex: "+cid+" "+e);
+							adapters.remove(cid);
+							descs.remove(ad.getName());
+							if(pad!=null)
+							{
+								CMSComponentDescription padesc = (CMSComponentDescription)descs.get(parent.getComponentIdentifier());
+								padesc.removeChild(cid);
+							}
+							ret.setException(e);
+							
+							if(killlistener!=null)
+								killlistener.exceptionOccurred(ComponentManagementService.this, e);
+							return;
+						}
 					}
-					ret.setException(e);
 				}
 			}
 		}
+		// Register component at parent.
+		
+		// todo: can be called after listener has (concurrently) deregistered
+		// notify listeners without holding locks
+		synchronized(listeners)
+		{
+			Set	slisteners	= new HashSet(listeners.getCollection(null));
+			slisteners.addAll(listeners.getCollection(cid));
+			alisteners	= (IComponentListener[])slisteners.toArray(new IComponentListener[slisteners.size()]);
+		}
+		for(int i=0; i<alisteners.length; i++)
+		{
+			try
+			{
+				alisteners[i].componentAdded(ad);
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+			}
+		}
+				
+//		System.out.println("created: "+cid.getLocalName()+" "+(parent!=null?parent.getComponentIdentifier().getLocalName():"null"));
+			
+//		System.out.println("added: "+descs.size()+", "+aid);
+		
+		if(killlistener!=null)
+			killresultlisteners.put(cid, killlistener);
+		
+		if(!suspend)
+		{
+			try
+			{
+				adapter.wakeup();
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+			}
+		}
+		
+		ret.setResult(cid.clone());
 	}
 	
 	/**
@@ -373,15 +412,14 @@ public class ComponentManagementService extends BasicService implements ICompone
 				{
 					public void resultAvailable(Object source, Object result)
 					{
-//						System.out.println("killing: "+cid);
-						
 						StandaloneComponentAdapter component = (StandaloneComponentAdapter)adapters.get(cid);
 						if(component==null)
 						{
-//							System.out.println("xxxxxxxxxxxxxxxxxxxx");
 							ret.setException(new RuntimeException("Component "+cid+" does not exist."));
 							return;
 						}
+						
+//						System.out.println("killing: "+cid+" "+component.getParent().getComponentIdentifier().getLocalName());
 						
 						// todo: does not work always!!! A search could be issued before components had enough time to kill itself!
 						// todo: killcomponent should only be called once for each component?
@@ -700,17 +738,20 @@ public class ComponentManagementService extends BasicService implements ICompone
 		
 		public void resultAvailable(Object source, Object result)
 		{
-//			System.out.println("CleanupCommand: "+result);
-			IComponentDescription ad = (IComponentDescription)descs.get(cid);
-			Map results = null;
-			StandaloneComponentAdapter adapter;
 			StandaloneComponentAdapter pad = null;
 			CMSComponentDescription desc;
-//			boolean shutdown = false;
+			IComponentDescription ad;
+			Map results = null;
 			synchronized(adapters)
 			{
 				synchronized(descs)
 				{
+//					System.out.println("CleanupCommand: "+result);
+					ad = (IComponentDescription)descs.get(cid);
+					StandaloneComponentAdapter adapter;
+					
+		//			boolean shutdown = false;
+		
 //					System.out.println("CleanupCommand remove called for: "+cid);
 					adapter = (StandaloneComponentAdapter)adapters.remove(cid);
 					if(adapter==null)
@@ -787,7 +828,7 @@ public class ComponentManagementService extends BasicService implements ICompone
 			IResultListener reslis = (IResultListener)killresultlisteners.remove(cid);
 			if(reslis!=null)
 			{
-//				System.out.println("result: "+cid+" "+results);
+//				System.out.println("kill lis: "+cid+" "+results);
 				if(exceptions!=null && exceptions.containsKey(cid))
 				{
 					reslis.exceptionOccurred(cid, (Exception)exceptions.get(cid));
@@ -826,17 +867,6 @@ public class ComponentManagementService extends BasicService implements ICompone
 		{
 			resultAvailable(source, cid);
 		}
-		
-		/**
-		 *  Add a listener to be informed, when the component has terminated.
-		 * @param listener
-		 * /
-		public void	addKillListener(IResultListener listener)
-		{
-			if(killlisteners==null)
-				killlisteners	= new ArrayList();
-			killlisteners.add(listener);
-		}*/
 		
 		/**
 		 *  Add a listener to be informed, when the component has terminated.

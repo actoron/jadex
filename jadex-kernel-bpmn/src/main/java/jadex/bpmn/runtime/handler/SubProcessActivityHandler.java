@@ -136,6 +136,8 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 					args.put(param.getName(), thread.getParameterValue(param.getName()));
 				}
 			}
+			
+//			System.out.println("start: "+instance.getComponentIdentifier()+" "+file);
 
 			thread.setWaiting(true);
 			
@@ -155,6 +157,8 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 								{
 									public void run()
 									{
+//										System.out.println("end1: "+instance.getComponentIdentifier()+" "+file);
+										
 										// Store results in out parameters.
 										Map	results	= (Map)result;
 										thread.setParameterValue("$results", results);	// Hack???
@@ -198,11 +202,17 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 								{
 									public void run()
 									{
+										System.out.println("end2: "+instance.getComponentIdentifier()+" "+file+" "+exception);
 										thread.setNonWaiting();
 										thread.setException(exception);
 										instance.getStepHandler(activity).step(activity, instance, thread, null);
 									}
 								});
+							}
+							
+							public String toString()
+							{
+								return "lis: "+instance.getComponentIdentifier()+" "+file;
 							}
 						});
 					

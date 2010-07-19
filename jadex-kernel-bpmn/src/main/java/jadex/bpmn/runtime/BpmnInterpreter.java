@@ -236,7 +236,6 @@ public class BpmnInterpreter implements IComponentInstance
 		}
 		
 		this.parent	= parent;
-//		this.ext_entries = Collections.synchronizedList(new ArrayList());
 		this.activityhandlers = activityhandlers!=null? activityhandlers: DEFAULT_ACTIVITY_HANDLERS;
 		this.stephandlers = stephandlers!=null? stephandlers: DEFAULT_STEP_HANDLERS;
 		this.fetcher = fetcher!=null? fetcher: new BpmnInstanceFetcher(this, fetcher);
@@ -288,6 +287,9 @@ public class BpmnInterpreter implements IComponentInstance
 		// todo: load services and start provider!
 		
 		// Create initial thread(s). 
+		// Note: It is very tricky to call createResultListener() in the constructor as this
+		// indirectly calls adapter.wakeup() but the component shouldn't run!
+		// HACK! now cache is on wrong thread!
 		List	startevents	= model.getStartActivities();
 		for(int i=0; startevents!=null && i<startevents.size(); i++)
 		{
@@ -296,29 +298,29 @@ public class BpmnInterpreter implements IComponentInstance
 		
 		// todo: remove this hack of caching services
 		SServiceProvider.getServiceUpwards(getServiceProvider(), IComponentManagementService.class)
-			.addResultListener(createResultListener(new DefaultResultListener()
+			.addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
 				variables.put("$cms", result);
 			}
-		}));
+		});
 		SServiceProvider.getService(getServiceProvider(), IClockService.class)
-			.addResultListener(createResultListener(new DefaultResultListener()
+			.addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
 				variables.put("$clock", result);
 			}
-		}));
+		});
 		SServiceProvider.getService(getServiceProvider(), IMessageService.class)
-			.addResultListener(createResultListener(new DefaultResultListener()
+			.addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
 				variables.put("$msgservice", result);
 			} 
-		}));
+		});
 	}
 	
 	//-------- IKernelAgent interface --------
