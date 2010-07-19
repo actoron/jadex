@@ -524,6 +524,7 @@ public class MessageService extends BasicService implements IMessageService
 			{
 				for(int i = 0; i < receivers.length; i++)
 				{
+					final int cnt = i; 
 					((ComponentManagementService)result).getComponentAdapter(receivers[i], new IResultListener()
 					{
 						public void resultAvailable(Object source, Object result)
@@ -570,7 +571,7 @@ public class MessageService extends BasicService implements IMessageService
 								}
 								catch(ComponentTerminatedException ate)
 								{
-									logger.warning("Message could not be delivered to receiver(s): " + message);
+									logger.warning("Message could not be delivered to receiver(s): " + receivers[cnt] + message);
 
 									// todo: notify sender that message could not be delivered!
 									// Problem: there is no connection back to the sender, so that
@@ -579,7 +580,7 @@ public class MessageService extends BasicService implements IMessageService
 							}
 							else
 							{
-								logger.warning("Message could not be delivered to receiver(s): " + msg);
+								logger.warning("Message could not be delivered to receiver(s): " + receivers[cnt] + msg);
 
 								// todo: notify sender that message could not be delivered!
 								// Problem: there is no connection back to the sender, so that

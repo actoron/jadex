@@ -671,6 +671,10 @@ public class ReflectNode	extends ExpressionNode
 		{
 			e.printStackTrace();
 		}
+//		catch(Exception e)
+//		{
+//			e.printStackTrace();
+//		}
 		return ret;
 	}
 

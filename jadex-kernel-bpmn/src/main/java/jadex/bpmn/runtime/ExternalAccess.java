@@ -109,6 +109,15 @@ public class ExternalAccess implements IExternalAccess
 	}
 
 	/**
+	 *  Get the interpreter.
+	 *  @return the interpreter.
+	 */
+	public BpmnInterpreter getInterpreter()
+	{
+		return interpreter;
+	}
+
+	/**
 	 *  Get the string representation.
 	 * /
 	public String toString()

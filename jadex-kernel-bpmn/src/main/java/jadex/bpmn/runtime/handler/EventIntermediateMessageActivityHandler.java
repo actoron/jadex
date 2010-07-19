@@ -80,7 +80,7 @@ public class EventIntermediateMessageActivityHandler	extends DefaultActivityHand
 				{
 					public void resultAvailable(Object source, Object result)
 					{
-						IComponentManagementService ces = (IComponentManagementService)result;
+						IComponentManagementService cms = (IComponentManagementService)result;
 						String mtname = (String)thread.getPropertyValue(PROPERTY_MESSAGETYPE, activity);
 						MessageType mt = mtname!=null? ms.getMessageType(mtname): ms.getMessageType("fipa");
 						
@@ -108,7 +108,7 @@ public class EventIntermediateMessageActivityHandler	extends DefaultActivityHand
 									Object rec = it.next();
 									if(rec instanceof String)
 									{
-										newrecs.add(ces.createComponentIdentifier((String)rec, true, null));
+										newrecs.add(cms.createComponentIdentifier((String)rec, true, null));
 									}
 									else
 									{

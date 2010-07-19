@@ -414,6 +414,7 @@ public class ProcessThread	implements ITaskContext
 		{
 			try
 			{
+//				System.out.println("here: "+ret);
 				ret = ((IParsedExpression)ret).getValue(new ProcessThreadValueFetcher(this, true, instance.getValueFetcher()));
 			}
 			catch(RuntimeException e)

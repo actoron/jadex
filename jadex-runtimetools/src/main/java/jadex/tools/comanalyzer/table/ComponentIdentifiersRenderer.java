@@ -23,9 +23,18 @@ class ComponentIdentifiersRenderer extends DefaultTableCellRenderer
 	public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column)
 	{
 		super.getTableCellRendererComponent(table, null, isSelected, hasFocus, row, column);
-		Iterator it = SReflect.getIterator(value);
-
-		IComponentIdentifier aid = (IComponentIdentifier)it.next();
+		IComponentIdentifier aid;
+		Iterator it = null;
+		if(SReflect.isIterable(value))
+		{
+			it = SReflect.getIterator(value);
+			aid = (IComponentIdentifier)it.next();
+		}
+		else
+		{
+			aid = (IComponentIdentifier)value;
+		}
+		
 		String content = aid.getName();
 		String tooltip = "<b>" + aid.getName() + "</b>";
 		String[] addresses = aid.getAddresses();
@@ -33,18 +42,22 @@ class ComponentIdentifiersRenderer extends DefaultTableCellRenderer
 		{
 			tooltip += "<br>" + addresses[i];
 		}
-		
-		while(it.hasNext())
+			
+		if(it!=null)
 		{
-			aid = (IComponentIdentifier)it.next();
-			content += ", " + aid.getName();
-			tooltip += "<br><b>" + aid.getName() + "</b>";
-			addresses = aid.getAddresses();
-			for(int j = 0; j < addresses.length; j++)
+			while(it.hasNext())
 			{
-				tooltip += "<br>" + addresses[j];
+				aid = (IComponentIdentifier)it.next();
+				content += ", " + aid.getName();
+				tooltip += "<br><b>" + aid.getName() + "</b>";
+				addresses = aid.getAddresses();
+				for(int j = 0; j < addresses.length; j++)
+				{
+					tooltip += "<br>" + addresses[j];
+				}
 			}
 		}
+		
 		setText(content);
 		setToolTipText("<html>" + tooltip + "</html>");
 		return this;

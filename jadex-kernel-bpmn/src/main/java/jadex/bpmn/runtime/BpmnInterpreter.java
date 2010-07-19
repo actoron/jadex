@@ -43,6 +43,7 @@ import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.IValueFetcher;
 import jadex.service.IServiceProvider;
 import jadex.service.SServiceProvider;
+import jadex.service.clock.IClockService;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -145,17 +146,9 @@ public class BpmnInterpreter implements IComponentInstance
 	/** The parent. */
 	protected IExternalAccess	parent;
 	
-//	// todo: ensure that entries are empty when saving
-//	/** The entries added from external threads. */
-//	protected transient final List ext_entries;
-	
 	/** The thread executing the component (null for none). */
 	// Todo: need not be transient, because agent should only be serialized when no action is running?
 	protected transient Thread thread;
-	
-//	/** The flag if external entries are forbidden. */
-//	protected boolean ext_forbidden;
-	
 	
 	/** The activity handlers. */
 	protected Map activityhandlers;
@@ -198,89 +191,7 @@ public class BpmnInterpreter implements IComponentInstance
 		String config, final IExternalAccess parent, Map activityhandlers, Map stephandlers, IValueFetcher fetcher)
 	{
 		this.adapter = adapter;
-		this.model = model;
-		this.config = config;
-		
-		// Extract pool/lane from config.
-		if(config==null || "All".equals(config))
-		{
-			this.pool	= null;
-			this.lane	= null;
-		}
-		else
-		{
-			int idx	= config.indexOf('.');
-			if(idx==-1)
-			{
-				this.pool	= config;
-				this.lane	= null;
-			}
-			else
-			{
-				this.pool	= config.substring(0, idx);
-				this.lane	= config.substring(idx+1);
-			}
-		}
-		
-		this.parent	= parent;
-//		this.ext_entries = Collections.synchronizedList(new ArrayList());
-		this.activityhandlers = activityhandlers!=null? activityhandlers: DEFAULT_ACTIVITY_HANDLERS;
-		this.stephandlers = stephandlers!=null? stephandlers: DEFAULT_STEP_HANDLERS;
-		this.fetcher = fetcher!=null? fetcher: new BpmnInstanceFetcher(this, fetcher);
-		this.context = new ThreadContext(model);
-		this.messages = new ArrayList();
-		this.variables	= new HashMap();
-		
-		// Init the arguments with default values.
-		IArgument[] args = model.getArguments();
-		for(int i=0; i<args.length; i++)
-		{
-			if(arguments!=null && arguments.containsKey(args[i].getName()))
-			{
-				this.variables.put(args[i].getName(), arguments.get(args[i].getName()));
-			}
-			else if(args[i].getDefaultValue(config)!=null)
-			{
-				this.variables.put(args[i].getName(), args[i].getDefaultValue(config));
-			}
-		}
-		
-		// Initialize context variables.
-		variables.put("$platform", getServiceProvider());
-//		variables.put("$clock", getServiceProvider().getService(IClockService.class));
-		variables.put("$interpreter", this);
-		
-		Set	vars	= model.getContextVariables();
-		for(Iterator it=vars.iterator(); it.hasNext(); )
-		{
-			String	name	= (String)it.next();
-			if(!variables.containsKey(name))	// Don't overwrite arguments.
-			{
-				Object	value	= null;
-				IParsedExpression	exp	= model.getContextVariableExpression(name);
-				if(exp!=null)
-				{
-					try
-					{
-						value	= exp.getValue(this.fetcher);
-					}
-					catch(RuntimeException e)
-					{
-						throw new RuntimeException("Error parsing context variable: "+this+", "+name+", "+exp, e);
-					}
-				}
-				variables.put(name, value);
-			}
-		}
-				
-		// todo: load services and start provider!
-		
-		// Create initial thread(s). 
-		List	startevents	= model.getStartActivities();
-		for(int i=0; startevents!=null && i<startevents.size(); i++)
-		{
-			context.addThread(new ProcessThread((MActivity)startevents.get(i), context, this));
-		}
+		init(model, arguments, config, parent, activityhandlers, stephandlers, fetcher);
 	}	
 		
 	/**
@@ -291,6 +202,15 @@ public class BpmnInterpreter implements IComponentInstance
 		String config, final IExternalAccess parent, Map activityhandlers, Map stephandlers, IValueFetcher fetcher)
 	{
 		this.adapter = factory.createComponentAdapter(desc, model, this, parent);
+		init(model, arguments, config, parent, activityhandlers, stephandlers, fetcher);
+	}
+	
+	/**
+	 *  Init method holds constructor code for both implementations.
+	 */
+	protected void init(final MBpmnModel model, Map arguments, String config, 
+		final IExternalAccess parent, Map activityhandlers, Map stephandlers, IValueFetcher fetcher)
+	{
 		this.model = model;
 		this.config = config;
 		
@@ -340,7 +260,6 @@ public class BpmnInterpreter implements IComponentInstance
 		
 		// Initialize context variables.
 		variables.put("$platform", getServiceProvider());
-//		variables.put("$clock", getServiceProvider().getService(IClockService.class));
 		variables.put("$interpreter", this);
 		
 		Set	vars	= model.getContextVariables();
@@ -368,12 +287,39 @@ public class BpmnInterpreter implements IComponentInstance
 				
 		// todo: load services and start provider!
 		
-		// Create initial thread(s). 
-		List	startevents	= model.getStartActivities();
-		for(int i=0; startevents!=null && i<startevents.size(); i++)
+		// todo: remove this hack of caching services
+		SServiceProvider.getServiceUpwards(getServiceProvider(), IComponentManagementService.class)
+			.addResultListener(createResultListener(new DefaultResultListener()
 		{
-			context.addThread(new ProcessThread((MActivity)startevents.get(i), context, this));
-		}
+			public void resultAvailable(Object source, Object result)
+			{
+				variables.put("$cms", result);
+				SServiceProvider.getService(getServiceProvider(), IClockService.class)
+					.addResultListener(createResultListener(new DefaultResultListener()
+				{
+					public void resultAvailable(Object source, Object result)
+					{
+						variables.put("$clock", result);
+						
+						SServiceProvider.getService(getServiceProvider(), IMessageService.class)
+							.addResultListener(createResultListener(new DefaultResultListener()
+						{
+							public void resultAvailable(Object source, Object result)
+							{
+								variables.put("$msgservice", result);
+								
+								// Create initial thread(s). 
+								List	startevents	= model.getStartActivities();
+								for(int i=0; startevents!=null && i<startevents.size(); i++)
+								{
+									context.addThread(new ProcessThread((MActivity)startevents.get(i), context, BpmnInterpreter.this));
+								}
+							} 
+						}));
+					}
+				}));
+			}
+		}));
 	}
 	
 	//-------- IKernelAgent interface --------
@@ -1234,7 +1180,7 @@ public class BpmnInterpreter implements IComponentInstance
 	 *  @param addresses The addresses.
 	 *  @return The new component identifier.
 	 */
-	public IFuture createComponentIdentifier(String name)
+	public IComponentIdentifier createComponentIdentifier(String name)
 	{
 		return createComponentIdentifier(name, true, null);
 	}
@@ -1246,7 +1192,7 @@ public class BpmnInterpreter implements IComponentInstance
 	 *  @param addresses The addresses.
 	 *  @return The new component identifier.
 	 */
-	public IFuture createComponentIdentifier(String name, boolean local)
+	public IComponentIdentifier createComponentIdentifier(String name, boolean local)
 	{
 		return createComponentIdentifier(name, local, null);
 	}
@@ -1258,21 +1204,22 @@ public class BpmnInterpreter implements IComponentInstance
 	 *  @param addresses The addresses.
 	 *  @return The new component identifier.
 	 */
-	public IFuture createComponentIdentifier(final String name, final boolean local, final String[] addresses)
+	public IComponentIdentifier createComponentIdentifier(final String name, final boolean local, final String[] addresses)
 	{
-		final Future ret = new Future();
+//		final Future ret = new Future();
 		
-		SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class)
-			.addResultListener(createResultListener(new DefaultResultListener()
-		{
-			public void resultAvailable(Object source, Object result)
-			{
-				IComponentManagementService cms = (IComponentManagementService)result;
-				ret.setResult(cms.createComponentIdentifier(name, local, addresses));
-			}
-		}));
+//		SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class)
+//			.addResultListener(createResultListener(new DefaultResultListener()
+//		{
+//			public void resultAvailable(Object source, Object result)
+//			{
+				IComponentManagementService cms = (IComponentManagementService)variables.get("$cms");//result;
+				return cms.createComponentIdentifier(name, local, addresses);
+//				ret.setResult(cms.createComponentIdentifier(name, local, addresses));
+//			}
+//		}));
 		
-		return ret;
+//		return ret;
 	}
 	
 	/**
@@ -1280,7 +1227,7 @@ public class BpmnInterpreter implements IComponentInstance
 	 *  @param msgeventtype	The message event type.
 	 *  @return The reply event.
 	 */
-	public IFuture createReply(IMessageAdapter msg)
+	public Map createReply(IMessageAdapter msg)
 	{
 		return createReply(msg.getParameterMap(), msg.getMessageType());
 	}
@@ -1290,21 +1237,24 @@ public class BpmnInterpreter implements IComponentInstance
 	 *  @param msgeventtype	The message event type.
 	 *  @return The reply event.
 	 */
-	public IFuture createReply(final Map msg, final MessageType mt)
+	public Map createReply(final Map msg, final MessageType mt)
 	{
-		final Future ret = new Future();
+		IMessageService ms = (IMessageService)variables.get("$msgservice");
+		return ms.createReply(msg, mt);
 		
-		SServiceProvider.getService(getServiceProvider(), IMessageService.class)
-			.addResultListener(createResultListener(new DefaultResultListener()
-		{
-			public void resultAvailable(Object source, Object result)
-			{
-				IMessageService ms = (IMessageService)result;
-				ret.setResult(ms.createReply(msg, mt));
-			}
-		}));
+//		final Future ret = new Future();
+		
+//		SServiceProvider.getService(getServiceProvider(), IMessageService.class)
+//			.addResultListener(createResultListener(new DefaultResultListener()
+//		{
+//			public void resultAvailable(Object source, Object result)
+//			{
+//				IMessageService ms = (IMessageService)result;
+//				ret.setResult(ms.createReply(msg, mt));
+//			}
+//		}));
 				
-		return ret;
+//		return ret;
 	}
 	
 	/**
