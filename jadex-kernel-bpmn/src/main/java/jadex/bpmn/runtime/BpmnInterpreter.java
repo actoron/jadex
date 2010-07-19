@@ -287,6 +287,13 @@ public class BpmnInterpreter implements IComponentInstance
 				
 		// todo: load services and start provider!
 		
+		// Create initial thread(s). 
+		List	startevents	= model.getStartActivities();
+		for(int i=0; startevents!=null && i<startevents.size(); i++)
+		{
+			context.addThread(new ProcessThread((MActivity)startevents.get(i), context, BpmnInterpreter.this));
+		}
+		
 		// todo: remove this hack of caching services
 		SServiceProvider.getServiceUpwards(getServiceProvider(), IComponentManagementService.class)
 			.addResultListener(createResultListener(new DefaultResultListener()
@@ -294,31 +301,23 @@ public class BpmnInterpreter implements IComponentInstance
 			public void resultAvailable(Object source, Object result)
 			{
 				variables.put("$cms", result);
-				SServiceProvider.getService(getServiceProvider(), IClockService.class)
-					.addResultListener(createResultListener(new DefaultResultListener()
-				{
-					public void resultAvailable(Object source, Object result)
-					{
-						variables.put("$clock", result);
-						
-						SServiceProvider.getService(getServiceProvider(), IMessageService.class)
-							.addResultListener(createResultListener(new DefaultResultListener()
-						{
-							public void resultAvailable(Object source, Object result)
-							{
-								variables.put("$msgservice", result);
-								
-								// Create initial thread(s). 
-								List	startevents	= model.getStartActivities();
-								for(int i=0; startevents!=null && i<startevents.size(); i++)
-								{
-									context.addThread(new ProcessThread((MActivity)startevents.get(i), context, BpmnInterpreter.this));
-								}
-							} 
-						}));
-					}
-				}));
 			}
+		}));
+		SServiceProvider.getService(getServiceProvider(), IClockService.class)
+			.addResultListener(createResultListener(new DefaultResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				variables.put("$clock", result);
+			}
+		}));
+		SServiceProvider.getService(getServiceProvider(), IMessageService.class)
+			.addResultListener(createResultListener(new DefaultResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				variables.put("$msgservice", result);
+			} 
 		}));
 	}
 	
@@ -347,17 +346,20 @@ public class BpmnInterpreter implements IComponentInstance
 			
 			this.thread = null;
 			
+//			System.out.println("After step: "+this.getComponentAdapter().getComponentIdentifier().getName()+" "+isFinished(pool, lane));
 			if(!finishing && isFinished(pool, lane))
 			{
 				finishing = true;
-				SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class)
-					.addResultListener(createResultListener(new DefaultResultListener()
-				{
-					public void resultAvailable(Object source, Object result)
-					{
-						((IComponentManagementService)result).destroyComponent(adapter.getComponentIdentifier());
-					}
-				}));
+				((IComponentManagementService)variables.get("$cms")).destroyComponent(adapter.getComponentIdentifier());
+				
+//				SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class)
+//					.addResultListener(createResultListener(new DefaultResultListener()
+//				{
+//					public void resultAvailable(Object source, Object result)
+//					{
+//						((IComponentManagementService)result).destroyComponent(adapter.getComponentIdentifier());
+//					}
+//				}));
 			}
 			
 //			System.out.println("Process wants: "+this.getComponentAdapter().getComponentIdentifier().getLocalName()+" "+!isFinished(null, null)+" "+isReady(null, null));
@@ -766,40 +768,6 @@ public class BpmnInterpreter implements IComponentInstance
 	}
 	
 	/**
-	 *  The micro listener for redirecting listener invocations to the agent thread.
-	 */
-//	class MicroListener implements IResultListener
-//	{
-//		protected IResultListener listener;
-//		
-//		public MicroListener(IResultListener listener)
-//		{
-//			this.listener = listener;
-//		}
-//		
-//		public void resultAvailable(final Object result)
-//		{
-//			invokeLater(new Runnable()
-//			{
-//				public void run()
-//				{
-//					listener.resultAvailable(result);
-//				}
-//			});
-//		}
-//		public void exceptionOccurred(final Exception exception)
-//		{
-//			invokeLater(new Runnable()
-//			{
-//				public void run()
-//				{
-//					listener.resultAvailable(exception);
-//				}
-//			});
-//		}
-//	}
-	
-	/**
 	 *  Get the model of the BPMN process instance.
 	 *  @return The model.
 	 */
@@ -855,7 +823,7 @@ public class BpmnInterpreter implements IComponentInstance
 				throw new UnsupportedOperationException("No handler for activity: "+thread);
 			if(history!=null)
 				history.add(new HistoryEntry(stepnumber++, thread.getId(), thread.getActivity()));
-//			System.out.println("Step: "+thread.getActivity()+" "+thread);
+//			System.out.println("Step: "+this.getComponentAdapter().getComponentIdentifier().getName()+" "+thread.getActivity()+" "+thread);
 			MActivity act = thread.getActivity();
 			handler.execute(act, this, thread);
 	

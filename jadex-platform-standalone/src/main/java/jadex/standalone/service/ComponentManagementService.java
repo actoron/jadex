@@ -284,58 +284,65 @@ public class ComponentManagementService extends BasicService implements ICompone
 	{
 //		final StandaloneComponentAdapter adapter = new StandaloneComponentAdapter(ad, parent);
 
-		// Create the component instance.
-		try
+		// Must be synchronized as this method is called on callback!!!
+		synchronized(adapters)
 		{
-			if(pad!=null)
+			synchronized(descs)
 			{
-				pad.getComponentInstance().componentCreated(ad, lmodel);
+				// Create the component instance.
+				try
+				{
+					if(pad!=null)
+					{
+						pad.getComponentInstance().componentCreated(ad, lmodel);
+					}
+					
+		//			adapter.setComponentThread(Thread.currentThread());	// Hack!!! Avoid external access during init.
+					Object[] acom = factory.createComponentInstance(ad, caf, lmodel, config, args, parent);
+		//			adapter.setComponentThread(null);
+					IComponentInstance instance = (IComponentInstance)acom[0];
+					StandaloneComponentAdapter adapter = (StandaloneComponentAdapter)acom[1];
+					adapters.put(cid, adapter);
+					
+			//		System.out.println("added: "+descs.size()+", "+aid);
+					
+					// Register component at parent.
+					IComponentListener[]	alisteners;
+					synchronized(listeners)
+					{
+						Set	slisteners	= new HashSet(listeners.getCollection(null));
+						slisteners.addAll(listeners.getCollection(cid));
+						alisteners	= (IComponentListener[])slisteners.toArray(new IComponentListener[slisteners.size()]);
+					}
+					// todo: can be called after listener has (concurrently) deregistered
+					for(int i=0; i<alisteners.length; i++)
+					{
+						alisteners[i].componentAdded(ad);
+					}
+					
+					if(killlistener!=null)
+						killresultlisteners.put(cid, killlistener);
+					
+					if(!suspend)
+					{
+						adapter.wakeup();
+					}
+					
+					ret.setResult(cid.clone());
+				}
+				catch(Exception e)
+				{
+					System.out.println("Ex: "+cid+" "+e);
+					adapters.remove(cid);
+					descs.remove(ad.getName());
+					if(pad!=null)
+					{
+						CMSComponentDescription padesc = (CMSComponentDescription)descs.get(parent.getComponentIdentifier());
+						padesc.removeChild(cid);
+					}
+					ret.setException(e);
+				}
 			}
-			
-//			adapter.setComponentThread(Thread.currentThread());	// Hack!!! Avoid external access during init.
-			Object[] acom = factory.createComponentInstance(ad, caf, lmodel, config, args, parent);
-//			adapter.setComponentThread(null);
-			IComponentInstance instance = (IComponentInstance)acom[0];
-			StandaloneComponentAdapter adapter = (StandaloneComponentAdapter)acom[1];
-			adapters.put(cid, adapter);
-			
-	//		System.out.println("added: "+descs.size()+", "+aid);
-			
-			// Register component at parent.
-			IComponentListener[]	alisteners;
-			synchronized(listeners)
-			{
-				Set	slisteners	= new HashSet(listeners.getCollection(null));
-				slisteners.addAll(listeners.getCollection(cid));
-				alisteners	= (IComponentListener[])slisteners.toArray(new IComponentListener[slisteners.size()]);
-			}
-			// todo: can be called after listener has (concurrently) deregistered
-			for(int i=0; i<alisteners.length; i++)
-			{
-				alisteners[i].componentAdded(ad);
-			}
-			
-			if(killlistener!=null)
-				killresultlisteners.put(cid, killlistener);
-			
-			if(!suspend)
-			{
-				adapter.wakeup();
-			}
-			
-			ret.setResult(cid.clone());
-		}
-		catch(Exception e)
-		{
-			System.out.println("Ex: "+cid+" "+e);
-			adapters.remove(cid);
-			descs.remove(ad.getName());
-			if(pad!=null)
-			{
-				CMSComponentDescription padesc = (CMSComponentDescription)descs.get(parent.getComponentIdentifier());
-				padesc.removeChild(cid);
-			}
-			ret.setException(e);
 		}
 	}
 	
@@ -345,8 +352,7 @@ public class ComponentManagementService extends BasicService implements ICompone
 	 */
 	public IFuture destroyComponent(final IComponentIdentifier cid)
 	{
-//		if(cid.getName().indexOf("lars")!=-1)
-//			Thread.dumpStack();
+//		System.out.println("destroy: "+cid.getName());
 		
 		final Future ret = new Future();
 		
@@ -372,28 +378,30 @@ public class ComponentManagementService extends BasicService implements ICompone
 						StandaloneComponentAdapter component = (StandaloneComponentAdapter)adapters.get(cid);
 						if(component==null)
 						{
+//							System.out.println("xxxxxxxxxxxxxxxxxxxx");
 							ret.setException(new RuntimeException("Component "+cid+" does not exist."));
 							return;
 						}
 						
 						// todo: does not work always!!! A search could be issued before components had enough time to kill itself!
 						// todo: killcomponent should only be called once for each component?
-						if(desc!=null)
+						if(!ccs.containsKey(cid))
 						{
-							if(!ccs.containsKey(cid))
-							{
-								CleanupCommand	cc	= new CleanupCommand(cid);
-								ccs.put(cid, cc);
-								cc.addKillFuture(ret);
-								component.killComponent(cc);						
-							}
-							else
-							{
-								CleanupCommand	cc	= (CleanupCommand)ccs.get(cid);
-								if(cc==null)
-									ret.setException(new RuntimeException("No cleanup command for component "+cid+": "+desc.getState()));
-								cc.addKillFuture(ret);
-							}
+//								System.out.println("killing a: "+cid);
+							
+							CleanupCommand	cc	= new CleanupCommand(cid);
+							ccs.put(cid, cc);
+							cc.addKillFuture(ret);
+							component.killComponent(cc);	
+						}
+						else
+						{
+//								System.out.println("killing b: "+cid);
+							
+							CleanupCommand	cc	= (CleanupCommand)ccs.get(cid);
+							if(cc==null)
+								ret.setException(new RuntimeException("No cleanup command for component "+cid+": "+desc.getState()));
+							cc.addKillFuture(ret);
 						}
 					}
 					
@@ -707,6 +715,7 @@ public class ComponentManagementService extends BasicService implements ICompone
 					adapter = (StandaloneComponentAdapter)adapters.remove(cid);
 					if(adapter==null)
 						throw new RuntimeException("Component Identifier not registered: "+cid);
+//					System.out.println("removed adapter: "+adapter.getComponentIdentifier().getLocalName()+" "+cid+" "+adapters);
 					
 					results = adapter.getComponentInstance().getResults();
 					
