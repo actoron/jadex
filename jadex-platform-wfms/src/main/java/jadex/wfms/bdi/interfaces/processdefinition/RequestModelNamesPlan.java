@@ -9,6 +9,7 @@ import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
+import jadex.service.SServiceProvider;
 import jadex.wfms.bdi.client.cap.AbstractWfmsPlan;
 import jadex.wfms.bdi.ontology.RequestModelNames;
 import jadex.wfms.bdi.ontology.RequestProxy;
@@ -28,7 +29,7 @@ public class RequestModelNamesPlan extends AbstractWfmsPlan
 		IClient proxy = ((RequestProxy) ((Done) acqProxy.getParameter("result").getValue()).getAction()).getClientProxy();
 		try
 		{
-			IProcessDefinitionService pd = (IProcessDefinitionService) getScope().getServiceProvider().getService(IProcessDefinitionService.class);
+			IProcessDefinitionService pd = (IProcessDefinitionService) SServiceProvider.getService(getScope().getServiceProvider(), IProcessDefinitionService.class).get(this);
 			Set processModelNames = pd.getProcessModelNames(proxy);
 			
 			RequestModelNames rqmn = (RequestModelNames) getParameter("action").getValue();

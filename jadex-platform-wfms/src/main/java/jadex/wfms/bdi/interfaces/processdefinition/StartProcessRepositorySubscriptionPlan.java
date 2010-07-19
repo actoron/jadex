@@ -5,6 +5,8 @@ import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
+import jadex.service.SServiceProvider;
+import jadex.wfms.GoalDispatchResultListener;
 import jadex.wfms.bdi.client.cap.AbstractWfmsPlan;
 import jadex.wfms.bdi.ontology.ComponentClientProxy;
 import jadex.wfms.bdi.ontology.InformActivityAdded;
@@ -41,7 +43,7 @@ public class StartProcessRepositorySubscriptionPlan extends AbstractWfmsPlan
 			fail();
 		
 		final IBDIExternalAccess agent = getExternalAccess();
-		IProcessDefinitionService pds = (IProcessDefinitionService) getScope().getServiceProvider().getService(IProcessDefinitionService.class);
+		IProcessDefinitionService pds = (IProcessDefinitionService) SServiceProvider.getService(getScope().getServiceProvider(), IProcessDefinitionService.class).get(this);
 		IProcessRepositoryListener listener = new IProcessRepositoryListener()
 		{
 			public void processModelAdded(ProcessRepositoryEvent event)
@@ -49,14 +51,12 @@ public class StartProcessRepositorySubscriptionPlan extends AbstractWfmsPlan
 				final InformProcessModelAdded update = new InformProcessModelAdded();
 				update.setModelName(event.getModelName());
 				
-				agent.invokeLater(new Runnable()
+				agent.createGoal("subcap.sp_submit_update").addResultListener(new GoalDispatchResultListener(agent)
 				{
-					public void run()
+					public void configureGoal(jadex.bdi.runtime.IEAGoal goal)
 					{
-						IGoal acAdded = agent.createGoal("subcap.sp_submit_update");
-						acAdded.getParameter("update").setValue(update);
-						acAdded.getParameter("subscription_id").setValue(subId);
-						agent.dispatchTopLevelGoal(acAdded);
+						goal.setParameterValue("update", update);
+						goal.setParameterValue("subscription_id", subId);
 					}
 				});
 			}
@@ -66,14 +66,12 @@ public class StartProcessRepositorySubscriptionPlan extends AbstractWfmsPlan
 				final InformProcessModelRemoved update = new InformProcessModelRemoved();
 				update.setModelName(event.getModelName());
 				
-				agent.invokeLater(new Runnable()
+				agent.createGoal("subcap.sp_submit_update").addResultListener(new GoalDispatchResultListener(agent)
 				{
-					public void run()
+					public void configureGoal(jadex.bdi.runtime.IEAGoal goal)
 					{
-						IGoal acAdded = agent.createGoal("subcap.sp_submit_update");
-						acAdded.getParameter("update").setValue(update);
-						acAdded.getParameter("subscription_id").setValue(subId);
-						agent.dispatchTopLevelGoal(acAdded);
+						goal.setParameterValue("update", update);
+						goal.setParameterValue("subscription_id", subId);
 					}
 				});
 			}

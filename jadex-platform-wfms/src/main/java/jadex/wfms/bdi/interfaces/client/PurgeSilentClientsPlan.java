@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Set;
 
 import jadex.bdi.runtime.Plan;
+import jadex.service.SServiceProvider;
 import jadex.wfms.client.IClient;
 import jadex.wfms.service.IClientService;
 
@@ -19,7 +20,7 @@ public class PurgeSilentClientsPlan extends Plan
 		
 		Map heartbeatTimers = (Map) getBeliefbase().getBelief("heartbeat_timers").getFact();
 		Map clientProxies = (Map) getBeliefbase().getBelief("client_proxies").getFact();
-		IClientService cs = (IClientService) getScope().getServiceProvider().getService(IClientService.class);
+		IClientService cs = (IClientService) SServiceProvider.getService(getScope().getServiceProvider(), IClientService.class).get(this);
 		
 		long clientTimeout = ((Long) getBeliefbase().getBelief("client_timeout").getFact()).longValue();
 		

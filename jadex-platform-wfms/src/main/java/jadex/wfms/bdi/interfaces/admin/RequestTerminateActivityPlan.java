@@ -3,6 +3,7 @@ package jadex.wfms.bdi.interfaces.admin;
 import jadex.base.fipa.Done;
 import jadex.bdi.runtime.IGoal;
 import jadex.bridge.IComponentIdentifier;
+import jadex.service.SServiceProvider;
 import jadex.wfms.bdi.client.cap.AbstractWfmsPlan;
 import jadex.wfms.bdi.ontology.RequestProxy;
 import jadex.wfms.bdi.ontology.RequestTerminateActivity;
@@ -25,7 +26,8 @@ public class RequestTerminateActivityPlan extends AbstractWfmsPlan
 		try
 		{
 			RequestTerminateActivity rta = (RequestTerminateActivity) getParameter("action").getValue();
-			IAdministrationService as = (IAdministrationService) getScope().getServiceProvider().getService(IAdministrationService.class);
+			
+			IAdministrationService as = (IAdministrationService) SServiceProvider.getService(getScope().getServiceProvider(), IAdministrationService.class).get(this);
 			as.terminateActivity(proxy, rta.getActivity());
 			
 			rta.setActivity(null);

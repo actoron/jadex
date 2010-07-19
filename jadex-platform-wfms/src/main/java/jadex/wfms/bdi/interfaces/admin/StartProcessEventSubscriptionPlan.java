@@ -4,6 +4,8 @@ import jadex.base.fipa.Done;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IGoal;
 import jadex.bridge.IComponentIdentifier;
+import jadex.service.SServiceProvider;
+import jadex.wfms.GoalDispatchResultListener;
 import jadex.wfms.bdi.client.cap.AbstractWfmsPlan;
 import jadex.wfms.bdi.ontology.InformProcessFinished;
 import jadex.wfms.bdi.ontology.RequestProxy;
@@ -25,7 +27,7 @@ public class StartProcessEventSubscriptionPlan extends AbstractWfmsPlan
 		IClient proxy = ((RequestProxy) ((Done) acqProxy.getParameter("result").getValue()).getAction()).getClientProxy();
 		
 		final IBDIExternalAccess agent = getExternalAccess();
-		IAdministrationService as = (IAdministrationService) getScope().getServiceProvider().getService(IAdministrationService.class);
+		IAdministrationService as = (IAdministrationService) SServiceProvider.getService(getScope().getServiceProvider(), IAdministrationService.class).get(this);
 		IProcessListener listener = new IProcessListener()
 		{
 			public void processFinished(ProcessEvent event)
@@ -33,14 +35,12 @@ public class StartProcessEventSubscriptionPlan extends AbstractWfmsPlan
 				final InformProcessFinished update = new InformProcessFinished();
 				update.setInstanceId(event.getInstanceId());
 				
-				agent.invokeLater(new Runnable()
+				agent.createGoal("subcap.sp_submit_update").addResultListener(new GoalDispatchResultListener(agent)
 				{
-					public void run()
+					public void configureGoal(jadex.bdi.runtime.IEAGoal goal)
 					{
-						IGoal pFinished = agent.createGoal("subcap.sp_submit_update");
-						pFinished.getParameter("update").setValue(update);
-						pFinished.getParameter("subscription_id").setValue(subId);
-						agent.dispatchTopLevelGoal(pFinished);
+						goal.setParameterValue("update", update);
+						goal.setParameterValue("subscription_id", subId);
 					}
 				});
 			}

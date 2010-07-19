@@ -1,6 +1,7 @@
 package jadex.wfms.service;
 
 import jadex.bridge.ILoadableComponentModel;
+import jadex.commons.IFuture;
 import jadex.wfms.client.IClient;
 import jadex.wfms.listeners.IProcessRepositoryListener;
 
@@ -32,7 +33,7 @@ public interface IProcessDefinitionService
 	 * @param name name of the model
 	 * @return the model
 	 */
-	public ILoadableComponentModel getProcessModel(IClient client, String name);
+	public IFuture getProcessModel(IClient client, String name);
 	
 	/**
 	 * Loads a process model not listed in the model repository.
@@ -41,7 +42,7 @@ public interface IProcessDefinitionService
 	 * @param imports the imports
 	 * @return the model
 	 */
-	public ILoadableComponentModel loadProcessModel(IClient client, String path, String[] imports);
+	public IFuture loadProcessModel(IClient client, String path, String[] imports);
 	
 	/**
 	 * Gets the names of all available process models

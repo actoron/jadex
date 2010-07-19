@@ -3,10 +3,12 @@ package jadex.wfms.bdi.interfaces.processdefinition;
 import jadex.base.fipa.Done;
 import jadex.bdi.runtime.IGoal;
 import jadex.bpmn.BpmnModelLoader;
-import jadex.bpmn.model.MBpmnModel;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.ILoadableComponentModel;
+import jadex.commons.Future;
+import jadex.commons.IFuture;
 import jadex.gpmn.GpmnModelLoader;
+import jadex.service.SServiceProvider;
 import jadex.service.library.ILibraryService;
 import jadex.wfms.bdi.client.cap.AbstractWfmsPlan;
 import jadex.wfms.bdi.ontology.RequestModel;
@@ -16,7 +18,6 @@ import jadex.wfms.service.IProcessDefinitionService;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
@@ -34,7 +35,7 @@ public class RequestModelPlan extends AbstractWfmsPlan
 		try
 		{
 			RequestModel rqm = (RequestModel) getParameter("action").getValue();
-			ILoadableComponentModel model = null;
+			IFuture modelFuture = new Future();
 			if (rqm.isModelNamePath())
 			{
 				try
@@ -42,14 +43,14 @@ public class RequestModelPlan extends AbstractWfmsPlan
 					if (rqm.getModelName().endsWith(".bpmn"))
 					{
 						BpmnModelLoader bpmnLoader = new BpmnModelLoader();
-						bpmnLoader.setClassLoader(((ILibraryService)getScope().getServiceProvider().getService(ILibraryService.class)).getClassLoader());
-						model = bpmnLoader.loadBpmnModel(rqm.getModelName(), new String[0]);
+						ClassLoader cl = ((ILibraryService) SServiceProvider.getService(getScope().getServiceProvider(), ILibraryService.class).get(this)).getClassLoader();
+						((Future) modelFuture).setResult(bpmnLoader.loadBpmnModel(rqm.getModelName(), new String[0], cl));
 					}
 					else
 					{
 						GpmnModelLoader gpmnLoader = new GpmnModelLoader();
-						gpmnLoader.setClassLoader(((ILibraryService)getScope().getServiceProvider().getService(ILibraryService.class)).getClassLoader());
-						model = gpmnLoader.loadGpmnModel(rqm.getModelName(), new String[0]);
+						ClassLoader cl = ((ILibraryService) SServiceProvider.getService(getScope().getServiceProvider(), ILibraryService.class).get(this)).getClassLoader();
+						((Future) modelFuture).setResult(gpmnLoader.loadGpmnModel(rqm.getModelName(), new String[0], cl));
 					}
 				}
 				catch (Exception e)
@@ -58,7 +59,9 @@ public class RequestModelPlan extends AbstractWfmsPlan
 				}
 			}
 			else
-				model = ((IProcessDefinitionService) getScope().getServiceProvider().getService(IProcessDefinitionService.class)).getProcessModel(proxy, rqm.getModelName());
+				modelFuture = ((IProcessDefinitionService) SServiceProvider.getService(getScope().getServiceProvider(), IProcessDefinitionService.class).get(this)).getProcessModel(proxy, rqm.getModelName());
+			
+			ILoadableComponentModel model = (ILoadableComponentModel) modelFuture.get(this);
 			File modelFile = new File(model.getFilename());
 			byte[] content;
 			try

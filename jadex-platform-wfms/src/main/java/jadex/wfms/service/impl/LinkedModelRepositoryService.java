@@ -1,9 +1,11 @@
 package jadex.wfms.service.impl;
 
-import jadex.bridge.ILoadableComponentModel;
+import jadex.commons.IFuture;
+import jadex.commons.ThreadSuspendable;
 import jadex.commons.concurrent.IResultListener;
-import jadex.service.IService;
+import jadex.service.BasicService;
 import jadex.service.IServiceContainer;
+import jadex.service.SServiceProvider;
 import jadex.service.library.ILibraryService;
 import jadex.service.library.ILibraryServiceListener;
 import jadex.wfms.listeners.IProcessRepositoryListener;
@@ -13,7 +15,6 @@ import jadex.wfms.service.IModelRepositoryService;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collection;
 import java.util.Collections;
@@ -31,7 +32,7 @@ import java.util.jar.JarFile;
  * Basic Model Repository Service implementation
  *
  */
-public class LinkedModelRepositoryService implements IModelRepositoryService, IService
+public class LinkedModelRepositoryService extends BasicService implements IModelRepositoryService
 {
 	/** The wfms. */
 	protected IServiceContainer wfms;
@@ -61,7 +62,7 @@ public class LinkedModelRepositoryService implements IModelRepositoryService, IS
 	/**
 	 *  Start the service.
 	 */
-	public void startService()
+	public IFuture startService()
 	{
 		synchronized (modelRefCount)
 		{
@@ -72,7 +73,7 @@ public class LinkedModelRepositoryService implements IModelRepositoryService, IS
 				addModel(path);
 			}
 			
-			((ILibraryService) wfms.getService(ILibraryService.class)).addLibraryServiceListener(new ILibraryServiceListener()
+			((ILibraryService) SServiceProvider.getService(wfms, ILibraryService.class).get(new ThreadSuspendable())).addLibraryServiceListener(new ILibraryServiceListener()
 			{
 				public void urlRemoved(URL url)
 				{
@@ -105,7 +106,7 @@ public class LinkedModelRepositoryService implements IModelRepositoryService, IS
 				}
 			});
 		}
-		
+		return super.startService();
 	}
 	
 	/**
@@ -124,7 +125,7 @@ public class LinkedModelRepositoryService implements IModelRepositoryService, IS
 	 */
 	public void addProcessResource(URL url)
 	{
-		ILibraryService ls = (ILibraryService) wfms.getService(ILibraryService.class);
+		ILibraryService ls = (ILibraryService) SServiceProvider.getService(wfms, ILibraryService.class).get(new ThreadSuspendable());
 		ls.addURL(url);
 	}
 	
@@ -134,7 +135,7 @@ public class LinkedModelRepositoryService implements IModelRepositoryService, IS
 	 */
 	public void removeProcessResource(URL url)
 	{
-		ILibraryService ls = (ILibraryService) wfms.getService(ILibraryService.class);
+		ILibraryService ls = (ILibraryService) SServiceProvider.getService(wfms, ILibraryService.class).get(new ThreadSuspendable());
 		ls.removeURL(url);
 	}
 	
@@ -149,7 +150,7 @@ public class LinkedModelRepositoryService implements IModelRepositoryService, IS
 		{
 			//Set knownPaths = new HashSet(modelPaths.values());
 			Set modelSet = new HashSet();
-			List urls = ((ILibraryService) wfms.getService(ILibraryService.class)).getURLs();
+			List urls = ((ILibraryService) SServiceProvider.getService(wfms, ILibraryService.class).get(new ThreadSuspendable())).getURLs();
 			for (Iterator it = urls.iterator(); it.hasNext(); )
 			{
 				URL url = (URL) it.next();
@@ -168,10 +169,20 @@ public class LinkedModelRepositoryService implements IModelRepositoryService, IS
 	 *  @param name The model name.
 	 *  @return The process model.
 	 */
-	public ILoadableComponentModel getProcessModel(String name)
+	public IFuture getProcessModel(String name)
 	{
 		//return (ILoadableComponentModel)modelRepository.get(name);
-		return (ILoadableComponentModel)loadProcessModel(name);
+		return loadProcessModel(name);
+	}
+	
+	/**
+	 *  Get a process model file name of a specific name.
+	 *  @param name The model name.
+	 *  @return The process model file name.
+	 */
+	public String getProcessFileName(String name)
+	{
+		return name;
 	}
 	
 	/**
@@ -248,9 +259,9 @@ public class LinkedModelRepositoryService implements IModelRepositoryService, IS
 		}
 	}
 	
-	private ILoadableComponentModel loadProcessModel(String filename)
+	private IFuture loadProcessModel(String filename)
 	{
-		IExecutionService ex = (IExecutionService)wfms.getService(IExecutionService.class);
+		IExecutionService ex = (IExecutionService) SServiceProvider.getService(wfms, IExecutionService.class).get(new ThreadSuspendable());
 		return ex.loadModel(filename, getImports());
 	}
 	

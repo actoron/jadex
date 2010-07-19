@@ -2,6 +2,7 @@ package jadex.wfms.bdi.interfaces.client;
 
 import jadex.base.fipa.Done;
 import jadex.bdi.runtime.Plan;
+import jadex.service.SServiceProvider;
 import jadex.wfms.bdi.ontology.RequestFinishActivity;
 import jadex.wfms.client.IClient;
 import jadex.wfms.service.IClientService;
@@ -18,7 +19,7 @@ public class RequestFinishActivityPlan extends Plan
 		Map clientProxies = (Map) getBeliefbase().getBelief("client_proxies").getFact();
 		IClient proxy = (IClient) clientProxies.get(getParameter("initiator").getValue());
 		
-		IClientService cs = (IClientService) getScope().getServiceProvider().getService(IClientService.class);
+		IClientService cs = (IClientService) SServiceProvider.getService(getScope().getServiceProvider(), IClientService.class).get(this);
 		
 		try
 		{

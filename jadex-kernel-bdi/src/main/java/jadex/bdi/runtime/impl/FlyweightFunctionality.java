@@ -763,7 +763,7 @@ public class FlyweightFunctionality
 			{
 				Object param = it.next();
 				String name = (String)state.getAttributeValue(param, OAVBDIRuntimeModel.parameter_has_name);
-				oarray[i] = ea? EAParameterFlyweight.getParameterFlyweight(state, scope, handle, name, handle)
+				oarray[i] = ea? EAParameterFlyweight.getParameterFlyweight(state, scope, param, name, handle)
 					:ParameterFlyweight.getParameterFlyweight(state, scope, param, name, handle);
 			}
 			ret = oarray;

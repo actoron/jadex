@@ -1,7 +1,6 @@
 package jadex.wfms.service;
 
-import jadex.bridge.ILoadableComponentModel;
-import jadex.service.IService;
+import jadex.commons.IFuture;
 
 import java.util.Map;
 
@@ -16,7 +15,7 @@ public interface IExecutionService
 	 *  @param imports The imports.
 	 *  @return The process model.
 	 */
-	public ILoadableComponentModel loadModel(String filename, String[] imports);
+	public IFuture loadModel(String filename, String[] imports);
 	
 	/**
 	 *  Create a new process.
@@ -31,7 +30,7 @@ public interface IExecutionService
 	 *  @param stepmode enable step mode
 	 *  @return assigned process instance ID
 	 */
-	public Object startProcess(String modelname, Object id, Map arguments, boolean stepmode);
+	public IFuture startProcess(String modelname, Object id, Map arguments);
 
 	/**
 	 *  Stop a process instance.
@@ -43,5 +42,5 @@ public interface IExecutionService
 	 *  @param modelname The model name.
 	 *  @return True, if model can be loaded.
 	 */
-	public boolean isLoadable(String modelname);
+	public IFuture isLoadable(String modelname);
 }

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_P4320Gl2Ed-bhvVt-Y1Mlg" iD="_P43PwGl2Ed-bhvVt-Y1Mlg">
+  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_Q4xNkGl2Ed-bhvVt-Y1Mlg" source="jadex">
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Q4xNkWl2Ed-bhvVt-Y1Mlg" key="Description" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Q4ybsGl2Ed-bhvVt-Y1Mlg" key="Package" value="jadex.wfms.acm.informationsbeschaffung.beschreibe_aenderung.fuehrendenentwickler_festlegen"/>
+  </eAnnotations>
+  <pools xmi:type="bpmn:Pool" xmi:id="_P4321ml2Ed-bhvVt-Y1Mlg" iD="_P4321Wl2Ed-bhvVt-Y1Mlg" name="body">
+    <vertices xmi:type="bpmn:Activity" xmi:id="_P4322Gl2Ed-bhvVt-Y1Mlg" iD="_P43212l2Ed-bhvVt-Y1Mlg" outgoingEdges="_ceX-wWl2Ed-bhvVt-Y1Mlg" incomingEdges="_UicqAWl2Ed-bhvVt-Y1Mlg" name="FuehrEntwExtern_ermitteln" lanes="_SFhUkWl2Ed-bhvVt-Y1Mlg" activityType="Task">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_TV7zkGl2Ed-bhvVt-Y1Mlg" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_TV8aoGl2Ed-bhvVt-Y1Mlg" key="class" value=""/>
+      </eAnnotations>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_UJCrgWl2Ed-bhvVt-Y1Mlg" iD="_UJCrgGl2Ed-bhvVt-Y1Mlg" outgoingEdges="_UicqAWl2Ed-bhvVt-Y1Mlg" lanes="_SFhUkWl2Ed-bhvVt-Y1Mlg" activityType="EventStartEmpty"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_VcqPgWl2Ed-bhvVt-Y1Mlg" iD="_VcqPgGl2Ed-bhvVt-Y1Mlg" incomingEdges="_ceX-wWl2Ed-bhvVt-Y1Mlg" lanes="_SFhUkWl2Ed-bhvVt-Y1Mlg" activityType="EventEndEmpty"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_UicqAWl2Ed-bhvVt-Y1Mlg" iD="_UicqAGl2Ed-bhvVt-Y1Mlg"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_ceX-wWl2Ed-bhvVt-Y1Mlg" iD="_ceX-wGl2Ed-bhvVt-Y1Mlg"/>
+    <lanes xmi:type="bpmn:Lane" xmi:id="_SFhUkWl2Ed-bhvVt-Y1Mlg" iD="_SFhUkGl2Ed-bhvVt-Y1Mlg" name="PAEV_V" activities="_P4322Gl2Ed-bhvVt-Y1Mlg _UJCrgWl2Ed-bhvVt-Y1Mlg _VcqPgWl2Ed-bhvVt-Y1Mlg"/>
+  </pools>
+</bpmn:BpmnDiagram>

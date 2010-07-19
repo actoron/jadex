@@ -3,6 +3,7 @@ package jadex.wfms.bdi.interfaces.processdefinition;
 import jadex.base.fipa.Done;
 import jadex.bdi.runtime.IGoal;
 import jadex.bridge.IComponentIdentifier;
+import jadex.service.SServiceProvider;
 import jadex.wfms.bdi.client.cap.AbstractWfmsPlan;
 import jadex.wfms.bdi.ontology.RequestLoadableModelPaths;
 import jadex.wfms.bdi.ontology.RequestProxy;
@@ -23,7 +24,7 @@ public class RequestLoadableModelPathsPlan extends AbstractWfmsPlan
 		IClient proxy = ((RequestProxy) ((Done) acqProxy.getParameter("result").getValue()).getAction()).getClientProxy();
 		try
 		{
-			IProcessDefinitionService pd = (IProcessDefinitionService) getScope().getServiceProvider().getService(IProcessDefinitionService.class);
+			IProcessDefinitionService pd = (IProcessDefinitionService) SServiceProvider.getService(getScope().getServiceProvider(), IProcessDefinitionService.class).get(this);
 			Set processModelPaths= pd.getLoadableModelPaths(proxy);
 			
 			RequestLoadableModelPaths rqlmp = (RequestLoadableModelPaths) getParameter("action").getValue();

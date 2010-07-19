@@ -17,6 +17,7 @@
 	name="WorkflowManagementSystem" package="jadex.wfms">
 	
 	<imports>
+		<import>jadex.wfms.service.impl.*</import>
 	</imports>
 
 	<componenttypes>
@@ -24,6 +25,30 @@
 		<componenttype name="clientapplicationinterface" filename="jadex/wfms/bdi/interfaces/client/WfmsClientInterface.agent.xml"/>
 		<componenttype name="administrationinterface" filename="jadex/wfms/bdi/interfaces/admin/WfmsAdminInterface.agent.xml"/>
 	</componenttypes>
+	
+	<services>
+		<service name="wfms_AAA_service" class="jadex.wfms.service.IAAAService">
+			jadex.wfms.service.impl.BasicAAAService.getTestService()
+		</service>
+		<service name="wfms_execution_service" class="jadex.wfms.service.IExecutionService">
+			new ExecutionService($platform)
+		</service>
+		<service name="wfms_administration_service" class="jadex.wfms.service.IAdministrationService">
+			new AdministrationService($platform)
+		</service>
+		<service name="wfms_process_definition" class="jadex.wfms.service.IProcessDefinitionService">
+			new ProcessDefinitionConnector($platform)
+		</service>
+		<service name="wfms_client_service" class="jadex.wfms.service.IClientService">
+			new ClientConnector($platform)
+		</service>
+		<service name="wfms_wfmsclient_service" class="jadex.wfms.service.IWfmsClientService">
+			jadex.service.SServiceProvider.getService($platform, jadex.wfms.service.IClientService.class).get(new jadex.commons.ThreadSuspendable())
+		</service>
+		<service name="wfms_model_repository" class="jadex.wfms.service.IModelRepositoryService">
+			new LinkedModelRepositoryService($platform)
+		</service>
+	</services>
 
 	<applications>
 		<application name="Workflow Management System">

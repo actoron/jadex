@@ -1,11 +1,13 @@
 package jadex.wfms.bdi.client.cap;
 
 import jadex.base.fipa.Done;
+import jadex.base.fipa.IDF;
 import jadex.bdi.runtime.IGoal;
 import jadex.bpmn.BpmnModelLoader;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bridge.ILoadableComponentModel;
 import jadex.gpmn.GpmnModelLoader;
+import jadex.service.SServiceProvider;
 import jadex.service.library.ILibraryService;
 import jadex.wfms.bdi.ontology.RequestModel;
 
@@ -42,15 +44,16 @@ public class ModelPlan extends AbstractWfmsPlan
 				if (reqM.getFileName().endsWith(".bpmn"))
 				{
 					BpmnModelLoader ml = new BpmnModelLoader();
-					ml.setClassLoader(((ILibraryService) getScope().getServiceProvider().getService(ILibraryService.class)).getClassLoader());
-					model = ml.loadBpmnModel(tmpFile.getAbsolutePath(), new String[0]);
+					ClassLoader cl = ((ILibraryService) SServiceProvider.getService(getScope().getServiceProvider(), ILibraryService.class)).getClassLoader();
+					model = ml.loadBpmnModel(tmpFile.getAbsolutePath(), new String[0], cl);
 					((MBpmnModel) model).setName(reqM.getFileName().substring(0, reqM.getFileName().length() - 5));
 				}
 				else
 				{
 					GpmnModelLoader ml = new GpmnModelLoader();
-					ml.setClassLoader(((ILibraryService) getScope().getServiceProvider().getService(ILibraryService.class)).getClassLoader());
-					model = ml.loadGpmnModel(tmpFile.getAbsolutePath(), new String[0]);
+					
+					ClassLoader cl = ((ILibraryService) SServiceProvider.getService(getScope().getServiceProvider(), ILibraryService.class)).getClassLoader();
+					model = ml.loadGpmnModel(tmpFile.getAbsolutePath(), new String[0], cl);
 				}
 				tmpFile.delete();
 			}

@@ -7,6 +7,7 @@ import jadex.base.fipa.SFipa;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
+import jadex.service.SServiceProvider;
 import jadex.wfms.bdi.ontology.ComponentClientProxy;
 import jadex.wfms.bdi.ontology.RequestAuth;
 import jadex.wfms.client.IClient;
@@ -20,7 +21,7 @@ public class RequestAuthPlan extends Plan
 		
 		ComponentClientProxy proxy = new ComponentClientProxy(ra.getUserName(), (IComponentIdentifier) getParameter("initiator").getValue());
 		
-		IClientService cs = (IClientService) getScope().getServiceProvider().getService(IClientService.class);
+		IClientService cs = (IClientService) SServiceProvider.getService(getScope().getServiceProvider(), IClientService.class).get(this);
 		if (cs.authenticate(proxy))
 		{
 			Map clientProxies = (Map) getBeliefbase().getBelief("client_proxies").getFact();

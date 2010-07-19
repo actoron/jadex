@@ -10,6 +10,7 @@ import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
+import jadex.service.SServiceProvider;
 import jadex.wfms.bdi.client.cap.AbstractWfmsPlan;
 import jadex.wfms.bdi.ontology.RequestCapabilities;
 import jadex.wfms.bdi.ontology.RequestModelNames;
@@ -26,7 +27,7 @@ public class RequestCapabilitiesPlan extends AbstractWfmsPlan
 	{
 		Map clientProxies = (Map) getBeliefbase().getBelief("client_proxies").getFact();
 		IClient proxy = (IClient) clientProxies.get(getParameter("initiator").getValue());
-		IClientService cs = ((IClientService) getScope().getServiceProvider().getService(IClientService.class));
+		IClientService cs = (IClientService) SServiceProvider.getService(getScope().getServiceProvider(), IClientService.class).get(this);
 		
 		Set capabilities = cs.getCapabilities(proxy);
 		

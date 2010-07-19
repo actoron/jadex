@@ -1,31 +1,37 @@
 package jadex.wfms.service.impl;
 
-import jadex.bridge.ILoadableComponentModel;
+import jadex.base.SComponentFactory;
+import jadex.bridge.CreationInfo;
+import jadex.bridge.IComponentDescription;
+import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentListener;
+import jadex.bridge.IComponentManagementService;
+import jadex.bridge.IExternalAccess;
+import jadex.commons.Future;
+import jadex.commons.IFuture;
+import jadex.commons.ThreadSuspendable;
 import jadex.commons.concurrent.IResultListener;
-import jadex.service.IService;
+import jadex.service.BasicService;
 import jadex.service.IServiceContainer;
+import jadex.service.SServiceProvider;
 import jadex.wfms.IProcess;
-import jadex.wfms.service.IBpmnProcessService;
+import jadex.wfms.service.IAdministrationService;
 import jadex.wfms.service.IExecutionService;
-import jadex.wfms.service.IGpmnProcessService;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *  The meta execution service wraps all specific process execution services.
  */
-public class MetaExecutionService implements IExecutionService, IService
+public class ExecutionService extends BasicService implements IExecutionService
 {
 	//-------- attributes --------
 	
 	/** The WFMS */
 	protected IServiceContainer wfms;
-	
-	/** The execution services. */
-	protected List exeservices;
 	
 	/** Running process instances (id -> IProcess) */
 	protected Map processes;
@@ -38,15 +44,15 @@ public class MetaExecutionService implements IExecutionService, IService
 	/**
 	 *  Create a new execution service.
 	 */
-	public MetaExecutionService(IServiceContainer wfms)
+	public ExecutionService(IServiceContainer wfms)
 	{
 		this.processes = new HashMap();
 		this.wfms = wfms;
 		
 		//TODO: hack!
-		this.exeservices = new ArrayList();
+		/*this.exeservices = new ArrayList();
 		this.exeservices.add(wfms.getService(IBpmnProcessService.class));
-		this.exeservices.add(wfms.getService(IGpmnProcessService.class));
+		this.exeservices.add(wfms.getService(IGpmnProcessService.class));*/
 		
 		//if(exeservices==null || exeservices.size()==0)
 			//throw new RuntimeException("Meta execution service needs at least one sub service.");
@@ -56,32 +62,15 @@ public class MetaExecutionService implements IExecutionService, IService
 	//-------- methods --------
 	
 	/**
-	 *  Start the service.
-	 */
-	public void startService()
-	{
-	}
-	
-	/**
-	 *  Shutdown the service.
-	 *  @param listener The listener.
-	 */
-	public void shutdownService(IResultListener listener)
-	{
-		if(listener!=null)
-			listener.resultAvailable(this, null);
-	}
-	
-	/**
 	 *  Load a process model.
 	 *  @param filename The file name.
 	 *  @return The process model.
 	 */
-	public ILoadableComponentModel loadModel(String filename, String[] imports)
+	public IFuture loadModel(String filename, String[] imports)
 	{
-		ILoadableComponentModel ret = null;
-		
-		for(int i=0; ret==null && i<exeservices.size(); i++)
+		//ILoadableComponentModel ret = null;
+		return SComponentFactory.loadModel(wfms, filename);
+		/*for(int i=0; ret==null && i<exeservices.size(); i++)
 		{
 			IExecutionService es = (IExecutionService)exeservices.get(i);
 			if(es.isLoadable(filename))
@@ -92,31 +81,47 @@ public class MetaExecutionService implements IExecutionService, IService
 		
 		if(ret==null)
 			throw new RuntimeException("Could not load process model: "+filename, null);
-		return ret;
+		return ret;*/
 	}
 	
 	/**
 	 *  Start a process instance.
 	 */
-	public Object startProcess(String modelname, Object id, Map arguments, boolean stepmode)
+	public IFuture startProcess(String modelname, Object id, Map arguments)
 	{
-		Object ret = null;
-		
-		if(id==null)
-			id = generateId(modelname);
-			
-		for(int i=0; ret==null && i<exeservices.size(); i++)
+		final Future ret = new Future();
+		IComponentManagementService ces = (IComponentManagementService) SServiceProvider.getService(wfms, IComponentManagementService.class).get(new ThreadSuspendable());
+		ces.createComponent(null, modelname, new CreationInfo(arguments), null).addResultListener(new IResultListener()
 		{
-			IExecutionService es = (IExecutionService)exeservices.get(i);
-			if(es.isLoadable(modelname))
+			public void resultAvailable(Object source, Object result)
 			{
-				ret = es.startProcess(modelname, id, arguments, stepmode);
+				final IComponentIdentifier id = ((IComponentIdentifier) result);
+				((IComponentManagementService) SServiceProvider.getService(wfms, IComponentManagementService.class).get(new ThreadSuspendable())).addComponentListener(id, new IComponentListener()
+				{
+					
+					public void componentRemoved(IComponentDescription desc, Map results)
+					{
+						Logger.getLogger("Wfms").log(Level.INFO, "Finished process " + id.toString());
+						((AdministrationService) SServiceProvider.getService(wfms,IAdministrationService.class).get(new ThreadSuspendable())).fireProcessFinished(id);
+					}
+					
+					public void componentChanged(IComponentDescription desc)
+					{
+					}
+					
+					public void componentAdded(IComponentDescription desc)
+					{
+					}
+				});
+				ret.setResult(id);
 			}
-		}
-		
-		if(ret==null)
-			throw new RuntimeException("Could not create process: "+modelname, null);
-		return id;
+			
+			public void exceptionOccurred(Object source, Exception exception)
+			{
+				ret.setException(exception);
+			}
+		});
+		return ret;
 	}
 
 	/**
@@ -146,23 +151,15 @@ public class MetaExecutionService implements IExecutionService, IService
 	 *  @param model The model.
 	 *  @return True, if model can be loaded.
 	 */
-	public boolean isLoadable(String name)
+	public IFuture isLoadable(String name)
 	{
-		boolean ret = false;
-		
-		for(int i=0; !ret && i<exeservices.size(); i++)
-		{
-			IExecutionService es = (IExecutionService)exeservices.get(i);
-			ret = es.isLoadable(name);
-		}
-		
-		return ret;
+		return SComponentFactory.isLoadable(wfms, name);
 	}
 	
 	/**
 	 *  Generate a process id.
 	 */
-	protected Object generateId(String modelname)
+	/*protected Object generateId(String modelname)
 	{
 		modelname = modelname.substring(modelname.lastIndexOf('/') + 1);
 		Integer ret = new Integer(0);
@@ -180,5 +177,5 @@ public class MetaExecutionService implements IExecutionService, IService
 		instancecnt.put(modelname, ret);
 		
 		return modelname+"_"+ret;
-	}
+	}*/
 }

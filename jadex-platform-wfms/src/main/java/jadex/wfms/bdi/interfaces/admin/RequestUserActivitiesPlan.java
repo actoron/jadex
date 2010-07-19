@@ -3,6 +3,7 @@ package jadex.wfms.bdi.interfaces.admin;
 import jadex.base.fipa.Done;
 import jadex.bdi.runtime.IGoal;
 import jadex.bridge.IComponentIdentifier;
+import jadex.service.SServiceProvider;
 import jadex.wfms.bdi.client.cap.AbstractWfmsPlan;
 import jadex.wfms.bdi.ontology.RequestProxy;
 import jadex.wfms.bdi.ontology.RequestUserActivities;
@@ -23,7 +24,7 @@ public class RequestUserActivitiesPlan extends AbstractWfmsPlan
 		IClient proxy = ((RequestProxy) ((Done) acqProxy.getParameter("result").getValue()).getAction()).getClientProxy();
 		try
 		{
-			IAdministrationService as = (IAdministrationService) getScope().getServiceProvider().getService(IAdministrationService.class);
+			IAdministrationService as = (IAdministrationService) SServiceProvider.getService(getScope().getServiceProvider(), IAdministrationService.class).get(this);
 			Map userActivities = as.getUserActivities(proxy);
 			
 			RequestUserActivities rua = (RequestUserActivities) getParameter("action").getValue();

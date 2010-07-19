@@ -3,6 +3,8 @@ package jadex.wfms.bdi.interfaces.client;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
+import jadex.service.SServiceProvider;
+import jadex.wfms.GoalDispatchResultListener;
 import jadex.wfms.bdi.ontology.ComponentClientProxy;
 import jadex.wfms.bdi.ontology.InformActivityAdded;
 import jadex.wfms.bdi.ontology.InformActivityRemoved;
@@ -29,7 +31,7 @@ public class StartActivitySubscriptionPlan extends Plan
 			fail();
 		
 		final IBDIExternalAccess agent = getExternalAccess();
-		IClientService cs = (IClientService) getScope().getServiceProvider().getService(IClientService.class);
+		IClientService cs = (IClientService) SServiceProvider.getService(getScope().getServiceProvider(), IClientService.class).get(this);
 		IActivityListener listener = new IActivityListener()
 		{
 			public void activityAdded(ActivityEvent event)
@@ -37,14 +39,12 @@ public class StartActivitySubscriptionPlan extends Plan
 				final InformActivityAdded update = new InformActivityAdded();
 				update.setActivity(event.getActivity());
 				
-				agent.invokeLater(new Runnable()
+				agent.createGoal("subcap.sp_submit_update").addResultListener(new GoalDispatchResultListener(agent)
 				{
-					public void run()
+					public void configureGoal(jadex.bdi.runtime.IEAGoal goal)
 					{
-						IGoal acAdded = agent.createGoal("subcap.sp_submit_update");
-						acAdded.getParameter("update").setValue(update);
-						acAdded.getParameter("subscription_id").setValue(subId);
-						agent.dispatchTopLevelGoal(acAdded);
+						goal.setParameterValue("update", update);
+						goal.setParameterValue("subscription_id", subId);
 					}
 				});
 			}
@@ -54,14 +54,12 @@ public class StartActivitySubscriptionPlan extends Plan
 				final InformActivityRemoved update = new InformActivityRemoved();
 				update.setActivity(event.getActivity());
 				
-				agent.invokeLater(new Runnable()
+				agent.createGoal("subcap.sp_submit_update").addResultListener(new GoalDispatchResultListener(agent)
 				{
-					public void run()
+					public void configureGoal(jadex.bdi.runtime.IEAGoal goal)
 					{
-						IGoal acAdded = agent.createGoal("subcap.sp_submit_update");
-						acAdded.getParameter("update").setValue(update);
-						acAdded.getParameter("subscription_id").setValue(subId);
-						agent.dispatchTopLevelGoal(acAdded);
+						goal.setParameterValue("update", update);
+						goal.setParameterValue("subscription_id", subId);
 					}
 				});
 			}

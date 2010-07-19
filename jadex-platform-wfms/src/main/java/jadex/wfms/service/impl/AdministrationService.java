@@ -1,8 +1,9 @@
 package jadex.wfms.service.impl;
 
-import jadex.commons.concurrent.IResultListener;
-import jadex.service.IService;
+import jadex.commons.ThreadSuspendable;
+import jadex.service.BasicService;
 import jadex.service.IServiceContainer;
+import jadex.service.SServiceProvider;
 import jadex.wfms.client.IClient;
 import jadex.wfms.client.IClientActivity;
 import jadex.wfms.listeners.IActivityListener;
@@ -23,7 +24,7 @@ import java.util.logging.Handler;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
-public class AdministrationService implements IAdministrationService, IService
+public class AdministrationService extends BasicService implements IAdministrationService
 {
 	private IServiceContainer wfms;
 	
@@ -52,7 +53,7 @@ public class AdministrationService implements IAdministrationService, IService
 				{
 					Map.Entry entry = (Map.Entry) it.next();
 					ILogListener listener = (ILogListener) entry.getValue();
-					IAAAService as = (IAAAService) wfms.getService(IAAAService.class);
+					IAAAService as = (IAAAService) SServiceProvider.getService(wfms, IAAAService.class).get(new ThreadSuspendable());
 					LogEvent evt = new LogEvent(String.valueOf(record.getMessage()));
 					//if (as.accessEvent((IClient) entry.getKey(), evt))
 					listener.logMessage(evt);
@@ -68,13 +69,13 @@ public class AdministrationService implements IAdministrationService, IService
 			}
 		});
 		
-		IAAAService as = (IAAAService) wfms.getService(IAAAService.class);
+		IAAAService as = (IAAAService) SServiceProvider.getService(wfms, IAAAService.class).get(new ThreadSuspendable());
 		as.addAuthenticationListener(new IAuthenticationListener()
 		{
 			
 			public void deauthenticated(IClient client)
 			{
-				IWfmsClientService wcs = (IWfmsClientService) wfms.getService(IWfmsClientService.class);
+				IWfmsClientService wcs = (IWfmsClientService) SServiceProvider.getService(wfms, IWfmsClientService.class).get(new ThreadSuspendable());
 				IActivityListener listener = (IActivityListener) activitiesListeners.get(client);
 				if (listener != null)
 					wcs.removeActivityListener(listener);
@@ -87,33 +88,16 @@ public class AdministrationService implements IAdministrationService, IService
 	}
 	
 	/**
-	 *  Start the service.
-	 */
-	public void startService()
-	{
-	}
-	
-	/**
-	 *  Shutdown the service.
-	 *  @param listener The listener.
-	 */
-	public void shutdownService(IResultListener listener)
-	{
-		if(listener!=null)
-			listener.resultAvailable(this, null);
-	}
-	
-	/**
 	 * Returns the current activities for all users
 	 * 
 	 * @param client the client
 	 * @return current activities for all users
 	 */
-	public Map getUserActivities(IClient client)
+	public Map getUserActivities(final IClient client)
 	{
-		if(!((IAAAService)wfms.getService(IAAAService.class)).accessAction(client, IAAAService.ADMIN_REQUEST_ALL_ACTIVITIES))
+		if(!((IAAAService)SServiceProvider.getService(wfms, IAAAService.class).get(new ThreadSuspendable())).accessAction(client, IAAAService.ADMIN_REQUEST_ALL_ACTIVITIES))
 			throw new AccessControlException("Not allowed: "+client);
-		return ((IWfmsClientService) wfms.getService(IWfmsClientService.class)).getUserActivities();
+		return ((IWfmsClientService) SServiceProvider.getService(wfms, IWfmsClientService.class).get(new ThreadSuspendable())).getUserActivities();
 	}
 	
 	/**
@@ -124,9 +108,9 @@ public class AdministrationService implements IAdministrationService, IService
 	 */
 	public void terminateActivity(IClient client, IClientActivity activity)
 	{
-		if(!((IAAAService)wfms.getService(IAAAService.class)).accessAction(client, IAAAService.ADMIN_TERMINATE_ACTIVITY))
+		if(!((IAAAService)SServiceProvider.getService(wfms, IAAAService.class).get(new ThreadSuspendable())).accessAction(client, IAAAService.ADMIN_TERMINATE_ACTIVITY))
 			throw new AccessControlException("Not allowed: "+client);
-		((IWfmsClientService) wfms.getService(IWfmsClientService.class)).terminateActivity(activity);
+		((IWfmsClientService) SServiceProvider.getService(wfms, IWfmsClientService.class).get(new ThreadSuspendable())).terminateActivity(activity);
 	}
 	
 	/**
@@ -138,9 +122,9 @@ public class AdministrationService implements IAdministrationService, IService
 	 */
 	public void addActivitiesListener(IClient client, IActivityListener listener)
 	{
-		if(!((IAAAService)wfms.getService(IAAAService.class)).accessAction(client, IAAAService.ADMIN_ADD_ACTIVITIES_LISTENER))
+		if(!((IAAAService)SServiceProvider.getService(wfms, IAAAService.class).get(new ThreadSuspendable())).accessAction(client, IAAAService.ADMIN_ADD_ACTIVITIES_LISTENER))
 			throw new AccessControlException("Not allowed: "+client);
-		IWfmsClientService wcs = (IWfmsClientService) wfms.getService(IWfmsClientService.class);
+		IWfmsClientService wcs = (IWfmsClientService) SServiceProvider.getService(wfms, IWfmsClientService.class).get(new ThreadSuspendable());
 		wcs.addActivityListener(listener);
 		activitiesListeners.put(client, listener);
 	}
@@ -153,9 +137,9 @@ public class AdministrationService implements IAdministrationService, IService
 	 */
 	public void removeActivitiesListener(IClient client, IActivityListener listener)
 	{
-		if(!((IAAAService)wfms.getService(IAAAService.class)).accessAction(client, IAAAService.ADMIN_REMOVE_ACTIVITIES_LISTENER))
+		if(!((IAAAService)SServiceProvider.getService(wfms, IAAAService.class).get(new ThreadSuspendable())).accessAction(client, IAAAService.ADMIN_REMOVE_ACTIVITIES_LISTENER))
 			throw new AccessControlException("Not allowed: "+client);
-		IWfmsClientService wcs = (IWfmsClientService) wfms.getService(IWfmsClientService.class);
+		IWfmsClientService wcs = (IWfmsClientService) SServiceProvider.getService(wfms, IWfmsClientService.class).get(new ThreadSuspendable());
 		wcs.removeActivityListener(listener);
 		activitiesListeners.remove(client);
 	}
@@ -168,7 +152,7 @@ public class AdministrationService implements IAdministrationService, IService
 	 */
 	public void addLogListener(IClient client, ILogListener listener)
 	{
-		if(!((IAAAService)wfms.getService(IAAAService.class)).accessAction(client, IAAAService.ADMIN_ADD_LOG_LISTENER))
+		if(!((IAAAService)SServiceProvider.getService(wfms, IAAAService.class).get(new ThreadSuspendable())).accessAction(client, IAAAService.ADMIN_ADD_LOG_LISTENER))
 			throw new AccessControlException("Not allowed: "+client);
 		logListeners.put(client, listener);
 	}
@@ -181,7 +165,7 @@ public class AdministrationService implements IAdministrationService, IService
 	 */
 	public void removeLogListener(IClient client, ILogListener listener)
 	{
-		if(!((IAAAService)wfms.getService(IAAAService.class)).accessAction(client, IAAAService.ADMIN_REMOVE_LOG_LISTENER))
+		if(!((IAAAService)SServiceProvider.getService(wfms, IAAAService.class).get(new ThreadSuspendable())).accessAction(client, IAAAService.ADMIN_REMOVE_LOG_LISTENER))
 			throw new AccessControlException("Not allowed: "+client);
 		logListeners.remove(client);
 	}
@@ -194,7 +178,7 @@ public class AdministrationService implements IAdministrationService, IService
 	 */
 	public void addProcessListener(IClient client, IProcessListener listener)
 	{
-		if(!((IAAAService)wfms.getService(IAAAService.class)).accessAction(client, IAAAService.ADMIN_ADD_PROCESS_LISTENER))
+		if(!((IAAAService)SServiceProvider.getService(wfms, IAAAService.class).get(new ThreadSuspendable())).accessAction(client, IAAAService.ADMIN_ADD_PROCESS_LISTENER))
 			throw new AccessControlException("Not allowed: "+client);
 		processListeners.put(client, listener);
 	}
@@ -207,7 +191,7 @@ public class AdministrationService implements IAdministrationService, IService
 	 */
 	public void removeProcessListener(IClient client, IProcessListener listener)
 	{
-		if(!((IAAAService)wfms.getService(IAAAService.class)).accessAction(client, IAAAService.ADMIN_REMOVE_PROCESS_LISTENER))
+		if(!((IAAAService)SServiceProvider.getService(wfms, IAAAService.class).get(new ThreadSuspendable())).accessAction(client, IAAAService.ADMIN_REMOVE_PROCESS_LISTENER))
 			throw new AccessControlException("Not allowed: "+client);
 		processListeners.remove(client);
 	}
@@ -218,7 +202,7 @@ public class AdministrationService implements IAdministrationService, IService
 		{
 			Map.Entry entry = (Map.Entry) it.next();
 			IProcessListener listener = (IProcessListener) entry.getValue();
-			IAAAService as = (IAAAService) wfms.getService(IAAAService.class);
+			IAAAService as = (IAAAService) SServiceProvider.getService(wfms, IAAAService.class).get(new ThreadSuspendable());
 			ProcessEvent evt = new ProcessEvent(String.valueOf(id));
 			//if (as.accessEvent((IClient) entry.getKey(), evt))
 			listener.processFinished(evt);

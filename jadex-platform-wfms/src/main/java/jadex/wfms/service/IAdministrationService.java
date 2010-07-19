@@ -1,6 +1,5 @@
 package jadex.wfms.service;
 
-import jadex.service.IService;
 import jadex.wfms.client.IClient;
 import jadex.wfms.client.IClientActivity;
 import jadex.wfms.listeners.IActivityListener;

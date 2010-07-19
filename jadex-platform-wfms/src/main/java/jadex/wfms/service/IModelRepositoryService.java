@@ -1,6 +1,6 @@
 package jadex.wfms.service;
 
-import jadex.bridge.ILoadableComponentModel;
+import jadex.commons.IFuture;
 import jadex.wfms.listeners.IProcessRepositoryListener;
 
 import java.net.URL;
@@ -41,7 +41,14 @@ public interface IModelRepositoryService
 	 *  @param name The model name.
 	 *  @return The process model.
 	 */
-	public ILoadableComponentModel getProcessModel(String name);
+	public IFuture getProcessModel(String name);
+	
+	/**
+	 *  Get a process model file name of a specific name.
+	 *  @param name The model name.
+	 *  @return The process model file name.
+	 */
+	public String getProcessFileName(String name);
 	
 	/**
 	 *  Get the imports.

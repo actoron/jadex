@@ -1,9 +1,10 @@
 package jadex.wfms.service.impl;
 
-import jadex.bridge.ILoadableComponentModel;
-import jadex.commons.concurrent.IResultListener;
-import jadex.service.IService;
+import jadex.commons.IFuture;
+import jadex.commons.ThreadSuspendable;
+import jadex.service.BasicService;
 import jadex.service.IServiceContainer;
+import jadex.service.SServiceProvider;
 import jadex.wfms.client.IClient;
 import jadex.wfms.listeners.IProcessRepositoryListener;
 import jadex.wfms.service.IAAAService;
@@ -20,7 +21,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-public class ProcessDefinitionConnector implements IProcessDefinitionService, IService
+public class ProcessDefinitionConnector extends BasicService implements IProcessDefinitionService
 {
 	/** The WFMS */
 	private IServiceContainer wfms;
@@ -35,32 +36,15 @@ public class ProcessDefinitionConnector implements IProcessDefinitionService, IS
 	}
 	
 	/**
-	 *  Start the service.
-	 */
-	public void startService()
-	{
-	}
-	
-	/**
-	 *  Shutdown the service.
-	 *  @param listener The listener.
-	 */
-	public void shutdownService(IResultListener listener)
-	{
-		if(listener!=null)
-			listener.resultAvailable(this, null);
-	}
-	
-	/**
 	 * Adds a process model resource to the repository
 	 * @param client the client
 	 * @param url url to the model resource
 	 */
 	public synchronized void addProcessResource(IClient client, URL url)
 	{
-		if (!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.PD_ADD_PROCESS_MODEL))
+		if (!((IAAAService) SServiceProvider.getService(wfms, IAAAService.class).get(new ThreadSuspendable())).accessAction(client, IAAAService.PD_ADD_PROCESS_MODEL))
 			throw new AccessControlException("Not allowed: "+client);
-		IModelRepositoryService mr = (IModelRepositoryService) wfms.getService(IModelRepositoryService.class);
+		IModelRepositoryService mr = (IModelRepositoryService) SServiceProvider.getService(wfms, IModelRepositoryService.class).get(new ThreadSuspendable());
 		mr.addProcessResource(url);
 	}
 	
@@ -71,9 +55,9 @@ public class ProcessDefinitionConnector implements IProcessDefinitionService, IS
 	 */
 	public synchronized void removeProcessResource(IClient client, URL url)
 	{
-		if (!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.PD_REMOVE_PROCESS_MODEL))
+		if (!((IAAAService) SServiceProvider.getService(wfms, IAAAService.class).get(new ThreadSuspendable())).accessAction(client, IAAAService.PD_REMOVE_PROCESS_MODEL))
 			throw new AccessControlException("Not allowed: "+client);
-		IModelRepositoryService mr = (IModelRepositoryService) wfms.getService(IModelRepositoryService.class);
+		IModelRepositoryService mr = (IModelRepositoryService) SServiceProvider.getService(wfms, IModelRepositoryService.class).get(new ThreadSuspendable());
 		mr.removeProcessResource(url);
 	}
 	
@@ -82,11 +66,11 @@ public class ProcessDefinitionConnector implements IProcessDefinitionService, IS
 	 * @param name name of the model
 	 * @return the model
 	 */
-	public synchronized ILoadableComponentModel getProcessModel(IClient client, String name)
+	public synchronized IFuture getProcessModel(IClient client, String name)
 	{
-		if (!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.PD_REQUEST_PROCESS_MODEL))
+		if (!((IAAAService) SServiceProvider.getService(wfms, IAAAService.class).get(new ThreadSuspendable())).accessAction(client, IAAAService.PD_REQUEST_PROCESS_MODEL))
 			throw new AccessControlException("Not allowed: "+client);
-		IModelRepositoryService mr = (IModelRepositoryService) wfms.getService(IModelRepositoryService.class);
+		IModelRepositoryService mr = (IModelRepositoryService) SServiceProvider.getService(wfms, IModelRepositoryService.class).get(new ThreadSuspendable());
 		
 		return mr.getProcessModel(name);
 	}
@@ -96,11 +80,11 @@ public class ProcessDefinitionConnector implements IProcessDefinitionService, IS
 	 * @param path path of the model
 	 * @return the model
 	 */
-	public synchronized ILoadableComponentModel loadProcessModel(IClient client, String path, String[] imports)
+	public synchronized IFuture loadProcessModel(IClient client, String path, String[] imports)
 	{
-		if (!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.PD_REQUEST_PROCESS_MODEL))
+		if (!((IAAAService) SServiceProvider.getService(wfms, IAAAService.class).get(new ThreadSuspendable())).accessAction(client, IAAAService.PD_REQUEST_PROCESS_MODEL))
 			throw new AccessControlException("Not allowed: "+client);
-		IExecutionService es = (IExecutionService) wfms.getService(IExecutionService.class);
+		IExecutionService es = (IExecutionService) SServiceProvider.getService(wfms, IExecutionService.class).get(new ThreadSuspendable());
 		
 		
 		return es.loadModel(path, imports);
@@ -114,9 +98,9 @@ public class ProcessDefinitionConnector implements IProcessDefinitionService, IS
 	 */
 	public synchronized Set getProcessModelNames(IClient client)
 	{
-		if (!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.PD_REQUEST_MODEL_NAMES))
+		if (!((IAAAService) SServiceProvider.getService(wfms, IAAAService.class).get(new ThreadSuspendable())).accessAction(client, IAAAService.PD_REQUEST_MODEL_NAMES))
 			throw new AccessControlException("Not allowed: "+client);
-		IModelRepositoryService rs = (IModelRepositoryService) wfms.getService(IModelRepositoryService.class);
+		IModelRepositoryService rs = (IModelRepositoryService) SServiceProvider.getService(wfms, IModelRepositoryService.class).get(new ThreadSuspendable());
 		return new HashSet(rs.getModelNames());
 	}
 	
@@ -127,9 +111,9 @@ public class ProcessDefinitionConnector implements IProcessDefinitionService, IS
 	 */
 	public Set getLoadableModelPaths(IClient client)
 	{
-		if (!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.PD_REQUEST_MODEL_PATHS))
+		if (!((IAAAService) SServiceProvider.getService(wfms, IAAAService.class).get(new ThreadSuspendable())).accessAction(client, IAAAService.PD_REQUEST_MODEL_PATHS))
 			throw new AccessControlException("Not allowed: "+client);
-		IModelRepositoryService rs = (IModelRepositoryService) wfms.getService(IModelRepositoryService.class);
+		IModelRepositoryService rs = (IModelRepositoryService) SServiceProvider.getService(wfms, IModelRepositoryService.class).get(new ThreadSuspendable());
 		return rs.getLoadableModels();
 	}
 	
@@ -141,10 +125,10 @@ public class ProcessDefinitionConnector implements IProcessDefinitionService, IS
 	 */
 	public synchronized void addProcessRepositoryListener(IClient client, IProcessRepositoryListener listener)
 	{
-		IAAAService as = ((IAAAService) wfms.getService(IAAAService.class));
+		IAAAService as = ((IAAAService) SServiceProvider.getService(wfms, IAAAService.class).get(new ThreadSuspendable()));
 		if (!as.accessAction(client, IAAAService.PD_ADD_REPOSITORY_LISTENER))
 			throw new AccessControlException("Not allowed: "+client);
-		IModelRepositoryService rs = (IModelRepositoryService) wfms.getService(IModelRepositoryService.class);
+		IModelRepositoryService rs = (IModelRepositoryService) SServiceProvider.getService(wfms, IModelRepositoryService.class).get(new ThreadSuspendable());
 		rs.addProcessRepositoryListener(listener);
 		
 		Set listeners = (Set) repositoryListeners.get(client);
@@ -165,7 +149,7 @@ public class ProcessDefinitionConnector implements IProcessDefinitionService, IS
 					 for (Iterator it = listeners.iterator(); it.hasNext(); )
 					 {
 						 IProcessRepositoryListener l = (IProcessRepositoryListener) it.next();
-						 ((IModelRepositoryService) wfms.getService(IModelRepositoryService.class)).removeProcessRepositoryListener(l);
+						 ((IModelRepositoryService) SServiceProvider.getService(wfms, IModelRepositoryService.class).get(new ThreadSuspendable())).removeProcessRepositoryListener(l);
 					 }
 				 }
 			}
@@ -184,9 +168,9 @@ public class ProcessDefinitionConnector implements IProcessDefinitionService, IS
 	 */
 	public synchronized void removeProcessRepositoryListener(IClient client, IProcessRepositoryListener listener)
 	{
-		if (!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.PD_REMOVE_REPOSITORY_LISTENER))
+		if (!((IAAAService) SServiceProvider.getService(wfms, IAAAService.class).get(new ThreadSuspendable())).accessAction(client, IAAAService.PD_REMOVE_REPOSITORY_LISTENER))
 			throw new AccessControlException("Not allowed: "+client);
-		IModelRepositoryService rs = (IModelRepositoryService) wfms.getService(IModelRepositoryService.class);
+		IModelRepositoryService rs = (IModelRepositoryService) SServiceProvider.getService(wfms, IModelRepositoryService.class).get(new ThreadSuspendable());
 		rs.removeProcessRepositoryListener(listener);
 		
 		((Set) repositoryListeners.get(client)).remove(listener);
