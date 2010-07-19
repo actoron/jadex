@@ -3,6 +3,9 @@
  */
 package jadex.tools.bpmn.editor.properties.template;
 
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.ui.IWorkbenchPart;
+
 import jadex.tools.model.common.properties.AbstractCommonPropertySection;
 
 /**
@@ -25,7 +28,7 @@ public abstract class AbstractBpmnPropertySection extends AbstractCommonProperty
 		
 		assert containerEAnnotationName != null && !containerEAnnotationName.isEmpty() : this.getClass() + ": containerEAnnotationName not set";
 		assert annotationDetailName != null && !annotationDetailName.isEmpty() : this.getClass() + ": annotationDetailName not set";
-		
+
 		this.util = new JadexBpmnPropertiesUtil(containerEAnnotationName, annotationDetailName, this);
 		
 	}
@@ -63,6 +66,22 @@ public abstract class AbstractBpmnPropertySection extends AbstractCommonProperty
 		
 		return success;
 	}
+
+	@Override
+	public void setInput(IWorkbenchPart part, ISelection selection) 
+	{
+		super.setInput(part, selection);
+		
+		// as from now on, we use only a single "jadex" annotation
+		// we force conversion here!
+		if (!"jadex".equals(util.containerEAnnotationName))
+		{
+			JadexBpmnPropertiesUtil.checkAnnotationConversion(modelElement);
+			util.containerEAnnotationName = "jadex";
+		}
+	}
+	
+	
 	
 
 }

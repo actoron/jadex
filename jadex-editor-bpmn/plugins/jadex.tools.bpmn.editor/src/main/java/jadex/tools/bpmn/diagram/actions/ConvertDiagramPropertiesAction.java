@@ -5,12 +5,10 @@ package jadex.tools.bpmn.diagram.actions;
 
 import jadex.tools.bpmn.editor.properties.JadexBpmnDiagramImportsSection;
 import jadex.tools.bpmn.editor.properties.JadexBpmnDiagramParameterSection;
-import jadex.tools.bpmn.editor.properties.JadexBpmnDiagramPropertiesSection;
 import jadex.tools.bpmn.editor.properties.JadexBpmnDiagramPropertiesTableSection;
 import jadex.tools.bpmn.editor.properties.JadexCommonParameterSection;
 import jadex.tools.bpmn.editor.properties.JadexIntermediateEventsParameterSection;
 import jadex.tools.bpmn.editor.properties.JadexSequenceMappingSection;
-import jadex.tools.bpmn.editor.properties.template.AbstractBpmnMultiColumnTablePropertySection;
 import jadex.tools.bpmn.editor.properties.template.AbstractParameterTablePropertySection;
 import jadex.tools.bpmn.editor.properties.template.JadexBpmnPropertiesUtil;
 
@@ -21,6 +19,7 @@ import org.eclipse.emf.common.util.TreeIterator;
 import org.eclipse.emf.ecore.EAnnotation;
 import org.eclipse.emf.ecore.EModelElement;
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.gef.EditPart;
 import org.eclipse.gmf.runtime.notation.View;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
@@ -39,17 +38,11 @@ public class ConvertDiagramPropertiesAction implements IObjectActionDelegate
 	public final static String ID = "jadex.tools.bpmn.diagram.actions.ConvertDiagramPropertiesActionID";
 	
 	private IWorkbenchPart targetPart;
-	private BpmnDiagramEditPart selectedElement;
-	private List<TableAnnotationIdentifier> toConvert;
+	private EditPart diagramEdidPart;
+	private static List<TableAnnotationIdentifier> toConvert;
 
-	/**
-	 * 
-	 */
-	public ConvertDiagramPropertiesAction()
-	{
-		super();
-		
-		this.toConvert = new ArrayList<TableAnnotationIdentifier>();
+	static {
+		toConvert = new ArrayList<TableAnnotationIdentifier>();
 		
 		toConvert
 				.add(new TableAnnotationIdentifier(
@@ -80,6 +73,16 @@ public class ConvertDiagramPropertiesAction implements IObjectActionDelegate
 						JadexBpmnPropertiesUtil.JADEX_SEQUENCE_ANNOTATION,
 						JadexBpmnPropertiesUtil.JADEX_MAPPING_LIST_DETAIL,
 						JadexSequenceMappingSection.UNIQUE_LIST_ELEMENT_ATTRIBUTE_INDEX));
+	}
+	
+	/**
+	 * 
+	 */
+	public ConvertDiagramPropertiesAction()
+	{
+		super();
+		
+		
 
 	}
 
@@ -89,14 +92,20 @@ public class ConvertDiagramPropertiesAction implements IObjectActionDelegate
 	@Override
 	public void selectionChanged(IAction action, ISelection selection)
 	{
-		selectedElement = null;
+		diagramEdidPart = null;
 		if (selection instanceof IStructuredSelection)
 		{
 			IStructuredSelection structuredSelection = (IStructuredSelection) selection;
-			if (structuredSelection.getFirstElement() instanceof BpmnDiagramEditPart)
+			if (structuredSelection.getFirstElement() instanceof EditPart)
 			{
-				selectedElement = (BpmnDiagramEditPart) structuredSelection
-						.getFirstElement();
+				EditPart ep = (EditPart) structuredSelection
+				.getFirstElement();
+				
+				while (ep.getParent() != null && !(ep instanceof BpmnDiagramEditPart))
+				{
+					ep = ep.getParent();
+				}
+				diagramEdidPart = ep;
 			}
 		}
 	}
@@ -116,7 +125,7 @@ public class ConvertDiagramPropertiesAction implements IObjectActionDelegate
 		List<EModelElement> elementsToCheck = new ArrayList<EModelElement>();
 		
 		// select all annotations from diagram and subsequent elements
-		EObject element = ((View) selectedElement.getModel()).getElement();
+		EObject element = ((View) diagramEdidPart.getModel()).getElement();
 		TreeIterator<EObject> contents = element.eAllContents();
 		while (contents.hasNext())
 		{
@@ -130,62 +139,65 @@ public class ConvertDiagramPropertiesAction implements IObjectActionDelegate
 		// check each element for existing annotations to convert
 		for (EModelElement eModelElement : elementsToCheck)
 		{
+			// check annotations and convert to a single jadex annotation
+			JadexBpmnPropertiesUtil.checkAnnotationConversion(eModelElement);
+			
+			// check table conversion
 			for (TableAnnotationIdentifier identifier : toConvert)
-			{		
+			{
 				JadexBpmnPropertiesUtil.checkAnnotationConversion(
 						eModelElement, identifier.annotationID,
 						identifier.detailID, identifier.uniqueTableColumn);
 			}
-		}
 
-	}
-	
-	protected class TableAnnotationIdentifier
-	{
-		String annotationID;
-		String detailID;
-		int uniqueTableColumn;
-		
-		/**
-		 * @param annotationID
-		 * @param detailID
-		 * @param uniqueTableColumn
-		 */
-		protected TableAnnotationIdentifier(String annotationID,
-				String detailID, int uniqueTableColumn)
-		{
-			super();
-			this.annotationID = annotationID;
-			this.detailID = detailID;
-			this.uniqueTableColumn = uniqueTableColumn;
-		}
-
-		/**
-		 * @return the annotationID
-		 */
-		public String getAnnotationID()
-		{
-			return annotationID;
-		}
-
-		/**
-		 * @return the detailID
-		 */
-		public String getDetailID()
-		{
-			return detailID;
-		}
-
-		/**
-		 * @return the uniqueTableColumn
-		 */
-		public int getUniqueTableColumn()
-		{
-			return uniqueTableColumn;
 		}
 
 	}
 
 }
 
+class TableAnnotationIdentifier
+{
+	String annotationID;
+	String detailID;
+	int uniqueTableColumn;
+	
+	/**
+	 * @param annotationID
+	 * @param detailID
+	 * @param uniqueTableColumn
+	 */
+	protected TableAnnotationIdentifier(String annotationID,
+			String detailID, int uniqueTableColumn)
+	{
+		super();
+		this.annotationID = annotationID;
+		this.detailID = detailID;
+		this.uniqueTableColumn = uniqueTableColumn;
+	}
 
+	/**
+	 * @return the annotationID
+	 */
+	public String getAnnotationID()
+	{
+		return annotationID;
+	}
+
+	/**
+	 * @return the detailID
+	 */
+	public String getDetailID()
+	{
+		return detailID;
+	}
+
+	/**
+	 * @return the uniqueTableColumn
+	 */
+	public int getUniqueTableColumn()
+	{
+		return uniqueTableColumn;
+	}
+
+}

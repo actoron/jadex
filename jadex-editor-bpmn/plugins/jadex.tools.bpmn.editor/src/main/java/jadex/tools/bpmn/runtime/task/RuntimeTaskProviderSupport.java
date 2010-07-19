@@ -5,16 +5,23 @@ package jadex.tools.bpmn.runtime.task;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.JarURLConnection;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.eclipse.emf.common.util.UniqueEList;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author Claas
@@ -152,84 +159,116 @@ public abstract class RuntimeTaskProviderSupport implements IRuntimeTaskProvider
 		return null;
 	}
 	
-	/**
-	 * Find classes in a package implementing a specific marker
-	 * @param searchPackage
-	 * @param marker
-	 * @return
-	 * @throws ClassNotFoundException
-	 * @throws IOException
-	 */
-	private static Class[] getClasses(String searchPackage, Class<?> marker)
-			throws ClassNotFoundException, IOException {
-
-		ClassLoader classLoader = WorkspaceClassLoaderHelper
-				.getWorkspaceClassLoader(false);
-		
-		if (classLoader == null)
-			return new Class[0];
-
-		// retrieve all resources from the class loader path
-		String path = searchPackage.replace('.', '/');
-		Enumeration<URL> workspaceResources = classLoader.getResources(path);
-		// iterate over resources and save directory
-		List<File> directories = new UniqueEList<File>();
-		while (workspaceResources.hasMoreElements()) {
-			URL resource = workspaceResources.nextElement();
-			directories.add(new File(resource.getFile()));
-		}
-
-		// find all class files in package directories
-		ArrayList<Class<?>> packageClasses = new ArrayList<Class<?>>();
-		for (File directory : directories) {
-			packageClasses.addAll(findPackageClassesInDirectory(directory, searchPackage));
-		}
-		
-		// don't filter with null argument
-		if (marker == null)
-		{
-			return packageClasses.toArray(new Class[packageClasses.size()]); 
-		}
-		
-		// filter for marker interface
-		ArrayList<Class<?>> markerClasses = new ArrayList<Class<?>>();
-		for (Class<?> clazz : markerClasses) 
-		{
-			if (marker.isAssignableFrom(clazz))
-			{
-				markerClasses.add(clazz);
-			}
-		}
-		
-		return markerClasses.toArray(new Class[markerClasses.size()]);
+	
+    /**
+     * 
+     * @param pckgname
+     * @return Luist of classes in package
+     * @throws ClassNotFoundException
+     */
+	public static List<Class<?>> getClassesForPackage(String pckgname)
+	throws ClassNotFoundException {
+		return getClassesForPackage(pckgname, ".class");
 	}
     
-	/**
-	 * Find classes contained in a package in a specific directory
-	 * @param directory
-	 * @param packageName
-	 * @return
-	 * @throws ClassNotFoundException
-	 */
-    private static List<Class<?>> findPackageClassesInDirectory(File directory, String packageName) throws ClassNotFoundException {
-        
-    	List<Class<?>> directoryClasses = new ArrayList<Class<?>>();
-        if (!directory.exists()) {
-            return directoryClasses;
-        }
-        
-        File[] files = directory.listFiles();
-        for (File file : files) {
-            if (file.isDirectory()) {
-                assert !file.getName().contains(".");
-                directoryClasses.addAll(findPackageClassesInDirectory(file, packageName + "." + file.getName()));
-            } else if (file.getName().endsWith(".class")) {
-                directoryClasses.add(Class.forName(packageName + '.' + file.getName().substring(0, file.getName().length() - 6)));
-            }
-        }
-        
-        return directoryClasses;
-    }
+    /**
+     * Search for classes within a package with given suffix.
+     * @param pckgname The package to search
+     * @param classSuffix The suffix of the class name e.g.: "*Task.class"
+     * @return List of matching classes in package
+     * @throws ClassNotFoundException
+     */
+	public static List<Class<?>> getClassesForPackage(String pckgname, String classSuffix)
+			throws ClassNotFoundException {
+		// A list of directories matching the package.
+		// May be more than one if a package is split
+		ArrayList<File> directories = new ArrayList<File>();
+		List<Class<?>> classes = new ArrayList<Class<?>>();
+		
+		try {
+			ClassLoader classLoader = WorkspaceClassLoaderHelper
+				.getWorkspaceClassLoader(false);
+
+			if (classLoader == null) {
+				// return Collections.emptyList();
+				throw new ClassNotFoundException("Can't get class loader.");
+			}
+			// Ask for all resources for the path
+			Enumeration<URL> resources = classLoader.getResources(pckgname.replace('.',
+					'/'));
+			while (resources.hasMoreElements()) {
+				URL res = resources.nextElement();
+				if ("jar".equalsIgnoreCase(res.getProtocol())) {
+					JarURLConnection conn = (JarURLConnection) res
+							.openConnection();
+					JarFile jar = conn.getJarFile();
+					for (JarEntry entry : Collections.list(jar.entries())) {
+
+						if (entry.getName().startsWith(pckgname.replace('.', '/'))
+								&& entry.getName().endsWith(classSuffix)
+								&& !entry.getName().contains("$")) {
+							String className = entry.getName().replace("/", ".")
+									.substring(0, entry.getName().length() - 6);
+							classes.add(Class.forName(className));
+						}
+					}
+				} else
+					directories.add(new File(URLDecoder.decode(res.getPath(),
+							"UTF-8")));
+			}
+		} catch (NullPointerException x) {
+			throw new ClassNotFoundException(pckgname
+					+ " does not appear to be "
+					+ "a valid package (Null pointer exception)");
+		} catch (UnsupportedEncodingException encex) {
+			throw new ClassNotFoundException(pckgname
+					+ " does not appear to be "
+					+ "a valid package (Unsupported encoding)");
+		} catch (IOException ioex) {
+			throw new ClassNotFoundException(
+					"IOException was thrown when trying "
+							+ "to get all resources for " + pckgname);
+		}
+
+		// For every directory identified capture all the .class files
+		for (File directory : directories) {
+			if (directory.exists()) {
+				// Get the list of the files contained in the package
+				String[] files = directory.list();
+				for (String file : files) {
+					// we are only interested in .class files
+					if (file.endsWith(classSuffix)) {
+						// removes the .class extension
+						classes.add(Class.forName(pckgname + '.'
+								+ file.substring(0, file.length() - 6)));
+					}
+				}
+			} else {
+				throw new ClassNotFoundException(pckgname + " ("
+						+ directory.getPath()
+						+ ") does not appear to be a valid package");
+			}
+		}
+		return classes;
+	}
+
+	public static List<Class<?>> getClassessOfInterface(String aPackage,
+			Class<?> aInterface) {
+		List<Class<?>> classList = new ArrayList<Class<?>>();
+		try {
+			for (Class<?> discovered : getClassesForPackage(aPackage)) {
+				if (Arrays.asList(discovered.getInterfaces()).contains(
+						aInterface)) {
+					classList.add(discovered);
+				}
+			}
+		} catch (ClassNotFoundException ex) {
+			Logger.getLogger(RuntimeTaskProviderSupport.class.getName()).log(Level.SEVERE,
+					null, ex);
+		}
+
+		return classList;
+	}
 
 
 }

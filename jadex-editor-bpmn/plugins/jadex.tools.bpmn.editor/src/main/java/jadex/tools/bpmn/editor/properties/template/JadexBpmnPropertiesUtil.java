@@ -13,6 +13,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EAnnotation;
 import org.eclipse.emf.ecore.EModelElement;
 import org.eclipse.emf.ecore.EcoreFactory;
@@ -436,6 +437,14 @@ public class JadexBpmnPropertiesUtil
 			String annotationId, String detailId, int uniqueColumnIndex)
 	{
 		EAnnotation ea = modelElement.getEAnnotation(annotationId);
+		if (ea == null && annotationId != "jadex")
+		{
+			ea = modelElement.getEAnnotation("jadex");
+			
+			assert ea != null : "Can't convert annotation: "+annotationId+":"+detailId+" from '"+modelElement+"'";
+			annotationId = "jadex";
+		}
+		
 		if (ea != null)
 		{
 			String value = (String) ea.getDetails().get(detailId);
@@ -460,6 +469,76 @@ public class JadexBpmnPropertiesUtil
 		return false;
 	}
 	
+	
+	public static boolean checkAnnotationConversion(final EModelElement eModelElement)
+	{
+	
+		if(eModelElement == null)
+		{
+			return false;
+		}
+
+			// update or create the annotation / detail
+			ModifyEObjectCommand command = new ModifyEObjectCommand(
+					eModelElement, Messages.JadexCommonPropertySection_update_eannotation_command_name)
+			{
+				@Override
+				protected CommandResult doExecuteWithResult(
+						IProgressMonitor arg0, IAdaptable arg1)
+						throws ExecutionException
+				{
+					
+					// move all details into a single "jadex" annotation
+					EAnnotation jadexAnnotation = eModelElement.getEAnnotation("jadex");
+					EList<EAnnotation> annos = eModelElement.getEAnnotations();
+					if (jadexAnnotation == null)
+					{
+						// create the jadex annotation
+						jadexAnnotation = EcoreFactory.eINSTANCE.createEAnnotation();
+						jadexAnnotation.setSource("jadex");
+						jadexAnnotation.setEModelElement(eModelElement);
+					}
+					
+					
+					for (int i = annos.size()-1; i >= 0; i--) 
+					{
+						EAnnotation eAnnotation = annos.get(i);
+						// only convert non-table annotations
+						if (!eAnnotation.getSource().equals("jadex") 
+								&& !eAnnotation.getSource().endsWith(JADEX_TABLE_KEY_EXTENSION))
+						{
+							jadexAnnotation.getDetails().addAll(eAnnotation.getDetails());
+							annos.remove(i);
+						}
+					}
+					
+					// add complete annotation to list
+					annos.add(jadexAnnotation);
+
+					return CommandResult.newOKCommandResult();
+				}
+			};
+
+		
+		// execute command
+		try
+		{
+			IStatus status = command.execute(new NullProgressMonitor(), null);
+			return status.isOK();
+		}
+		catch (ExecutionException exception)
+		{
+			JadexBpmnPlugin.getDefault().getLog().log(
+					new Status(IStatus.ERROR, JadexBpmnPlugin.PLUGIN_ID,
+							IStatus.ERROR, exception.getMessage(),
+							exception));
+			
+			return false;
+		}
+		
+		
+		
+	}
 }
 
 /**
