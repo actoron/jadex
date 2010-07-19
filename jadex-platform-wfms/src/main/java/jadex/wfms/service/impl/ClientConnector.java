@@ -179,6 +179,8 @@ public class ClientConnector extends BasicService implements IClientService, IWf
 		boolean ret = aaaService.authenticate(client);
 		if ((ret) && (!userActivities.containsKey(client.getUserName())))
 			userActivities.put(client.getUserName(), new HashSet());
+		if (ret)
+			activityListeners.put(client, new HashSet());
 		return ret;
 	}
 	

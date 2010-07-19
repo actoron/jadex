@@ -44,7 +44,7 @@ public class ModelPlan extends AbstractWfmsPlan
 				if (reqM.getFileName().endsWith(".bpmn"))
 				{
 					BpmnModelLoader ml = new BpmnModelLoader();
-					ClassLoader cl = ((ILibraryService) SServiceProvider.getService(getScope().getServiceProvider(), ILibraryService.class)).getClassLoader();
+					ClassLoader cl = ((ILibraryService) SServiceProvider.getService(getScope().getServiceProvider(), ILibraryService.class).get(this)).getClassLoader();
 					model = ml.loadBpmnModel(tmpFile.getAbsolutePath(), new String[0], cl);
 					((MBpmnModel) model).setName(reqM.getFileName().substring(0, reqM.getFileName().length() - 5));
 				}
@@ -52,7 +52,7 @@ public class ModelPlan extends AbstractWfmsPlan
 				{
 					GpmnModelLoader ml = new GpmnModelLoader();
 					
-					ClassLoader cl = ((ILibraryService) SServiceProvider.getService(getScope().getServiceProvider(), ILibraryService.class)).getClassLoader();
+					ClassLoader cl = ((ILibraryService) SServiceProvider.getService(getScope().getServiceProvider(), ILibraryService.class).get(this)).getClassLoader();
 					model = ml.loadGpmnModel(tmpFile.getAbsolutePath(), new String[0], cl);
 				}
 				tmpFile.delete();

@@ -23,12 +23,10 @@ public class StartWorkitemSubscriptionPlan extends Plan
 	public void body()
 	{
 		final Object subId = getParameter("subscription_id").getValue();
-		
 		Map clientProxies = (Map) getBeliefbase().getBelief("client_proxies").getFact();
 		final ComponentClientProxy proxy = (ComponentClientProxy) clientProxies.get(getParameter("initiator").getValue());
 		if (proxy == null)
 			fail();
-		
 		final IBDIExternalAccess agent = getExternalAccess();
 		IClientService cs = (IClientService) SServiceProvider.getService(getScope().getServiceProvider(), IClientService.class).get(this);
 		IWorkitemListener listener = new IWorkitemListener()
@@ -63,7 +61,6 @@ public class StartWorkitemSubscriptionPlan extends Plan
 				});
 			}
 		};
-		
 		cs.addWorkitemListener(proxy, listener);
 	}
 }

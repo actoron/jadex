@@ -4,7 +4,6 @@ import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IAgentListener;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IEAGoal;
-import jadex.bdi.runtime.IGoal;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.MParameter;
@@ -12,7 +11,9 @@ import jadex.bridge.ILoadableComponentModel;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.SGUI;
+import jadex.commons.ThreadSuspendable;
 import jadex.commons.collection.TreeNode;
+import jadex.commons.concurrent.DefaultResultListener;
 import jadex.gpmn.model2.MGpmnModel;
 import jadex.wfms.GoalDispatchResultListener;
 import jadex.wfms.SwingGoalDispatchResultListener;
@@ -126,184 +127,196 @@ public class ClientSimulator
 					}
 				});
 				
-				login(showLoginDialog());
-				
-				setupActions();
-				
-				
-				//TODO: Add Log
-				/*this.clientService.getMonitoringService(this).addLogListener(this, new ILogListener()
+				login(showLoginDialog()).addResultListener(new DefaultResultListener()
 				{
-					public void logMessage(final LogEvent event)
+					public void resultAvailable(Object source, Object result)
 					{
-						if (EventQueue.isDispatchThread())
-							simWindow.addLogMessage(event.getMessage());
-						else
-						{
-							EventQueue.invokeLater(new Runnable()
-							{
-							
-								public void run()
-								{
-									simWindow.addLogMessage(event.getMessage());
-								}
-							});
-						}
-					}
-					
-					
-				});*/
-				
-				/*this.clientService.getMonitoringService(this).addProcessListener(this, new IProcessListener()
-				{
-					public void processFinished(ProcessEvent event)
-					{
-						if ((activeStateController == null) || (activeStateController.finalState()))
-						{
-							EventQueue.invokeLater(new Runnable()
-							{
-								public void run()
-								{
-									simWindow.enableMenuItem(SimulationWindow.STOP_MENU_ITEM_NAME, false);
-									simWindow.enableMenuItem(SimulationWindow.START_MENU_ITEM_NAME, true);
-									activeStateController = null;
-									simWindow.addLogMessage("Finished Simulation");
-								}
-							});
-						}
-						else
-						{
-							EventQueue.invokeLater(new Runnable()
-							{
-								public void run()
-								{
-									activeStateController.nextState();
-									simWindow.addLogMessage("Setting new process state: " + activeStateController.toString());
-									clientService.startProcess(ClientSimulator.this, clientProcessMetaModel.getMainProcessName());
-								}
-							});
-						}
-					}
-				});*/
-				
-				agent.getBeliefbase().setBeliefFact("clientcap.process_finished_controller", new AbstractAction()
-				{
-					public void actionPerformed(ActionEvent e)
-					{
-						if ((activeStateController == null) || (activeStateController.finalState()))
-						{
-							if (simWindow.isLastScenario())
-								EventQueue.invokeLater(new Runnable()
-								{
-									public void run()
-									{
-										editMode();
-										activeStateController = null;
-										simWindow.addLogMessage("Finished Simulation");
-									}
-								});
-							else
-								EventQueue.invokeLater(new Runnable()
-								{
-									public void run()
-									{
-										simWindow.selectNextScenario();
-										while (simWindow.getSelectedScenario().createProcessStateController().getStateCount() == 0)
-											simWindow.selectNextScenario();
-										simWindow.addLogMessage("Selecting scenario: " + simWindow.getSelectedScenario().getName());
-										activeStateController = simWindow.getSelectedScenario().createProcessStateController();
-										startProcess();
-									}
-								});
-						}
-						else
-						{
-							EventQueue.invokeLater(new Runnable()
-							{
-								public void run()
-								{
-									activeStateController.nextState();
-									simWindow.addLogMessage("Setting new process state: " + activeStateController.toString());
-									startProcess();
-								}
-							});
-						}
-					}
-				});
-				agent.createGoal("clientcap.start_process_event_subscription").addResultListener(new GoalDispatchResultListener(agent));
-				
-				agent.getBeliefbase().setBeliefFact("clientcap.add_workitem_controller", new AbstractAction()
-				{
-					public void actionPerformed(ActionEvent e)
-					{
-						final IWorkitem workitem = (IWorkitem) e.getSource();
-						agent.createGoal("clientcap.begin_activity").addResultListener(new GoalDispatchResultListener(agent)
-						{
-							public void configureGoal(IEAGoal goal)
-							{
-								goal.setParameterValue("workitem",workitem);
-							}
-						});
-					}
-				});
-				agent.createGoal("clientcap.start_workitem_subscription").addResultListener(new GoalDispatchResultListener(agent));
-				
-				agent.getBeliefbase().setBeliefFact("clientcap.add_activity_controller", new AbstractAction()
-				{
-					public void actionPerformed(ActionEvent e)
-					{
-						final IClientActivity activity = (IClientActivity) e.getSource();
-						simWindow.addLogMessage("Processing Activity: " + activity.getName());
-						Map parameterStates = activeStateController.getActivityState(activity.getName(), activity.getParameterValues());
-						if (parameterStates != null)
-							activity.setMultipleParameterValues(parameterStates);
-						
-						agent.createGoal("clientcap.finish_activity").addResultListener(new GoalDispatchResultListener(agent)
-						{
-							public void configureGoal(IEAGoal goal)
-							{
-								goal.setParameterValue("activity", activity);
-							}
-						});
-					}
-				});
-				agent.createGoal("clientcap.start_activity_subscription").addResultListener(new GoalDispatchResultListener(agent));
-				
-				simWindow.setCellRenderer(new DefaultTreeCellRenderer()
-				{
-					public Component getTreeCellRendererComponent(JTree tree,
-							Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus)
-					{
-						super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
-						if (value instanceof TreeNode)
-						{
-							Object data = ((TreeNode) value).getData();
-							if (data instanceof MGpmnModel)
-								setIcon(SimulationWindow.GPMN_ICON);
-							else if (data instanceof MBpmnModel)
-								setIcon(SimulationWindow.BPMN_ICON);
-							else if (data instanceof MActivity)
-								setIcon(SimulationWindow.TASK_ICON);
-							else if (data instanceof MParameter)
-							{
-								setIcon(SimulationWindow.PARAM_ICON);
-								MActivity task = (MActivity) ((ModelTreeNode)((ModelTreeNode)value).getParent()).getData();
-								if ((simWindow.getSelectedScenario() == null) || simWindow.getSelectedScenario().getTaskParameter(task.getName(), ((MParameter) data).getName()).getStateCount() == 0)
-									setForeground(new Color(128,128,128));
-							}
-							else if (data instanceof TreeNode)
-								setForeground(new Color(128,128,128));
-						}
-						
-						return this;
+						continueInit();
 					}
 				});
 				
-				updateGui();
+				
 			}
 		};
 		
 		EventQueue.invokeLater(init);
+	}
+	
+	private void continueInit()
+	{
+		setupActions();
+		
+		
+		//TODO: Add Log
+		/*this.clientService.getMonitoringService(this).addLogListener(this, new ILogListener()
+		{
+			public void logMessage(final LogEvent event)
+			{
+				if (EventQueue.isDispatchThread())
+					simWindow.addLogMessage(event.getMessage());
+				else
+				{
+					EventQueue.invokeLater(new Runnable()
+					{
+					
+						public void run()
+						{
+							simWindow.addLogMessage(event.getMessage());
+						}
+					});
+				}
+			}
+			
+			
+		});*/
+		
+		/*this.clientService.getMonitoringService(this).addProcessListener(this, new IProcessListener()
+		{
+			public void processFinished(ProcessEvent event)
+			{
+				if ((activeStateController == null) || (activeStateController.finalState()))
+				{
+					EventQueue.invokeLater(new Runnable()
+					{
+						public void run()
+						{
+							simWindow.enableMenuItem(SimulationWindow.STOP_MENU_ITEM_NAME, false);
+							simWindow.enableMenuItem(SimulationWindow.START_MENU_ITEM_NAME, true);
+							activeStateController = null;
+							simWindow.addLogMessage("Finished Simulation");
+						}
+					});
+				}
+				else
+				{
+					EventQueue.invokeLater(new Runnable()
+					{
+						public void run()
+						{
+							activeStateController.nextState();
+							simWindow.addLogMessage("Setting new process state: " + activeStateController.toString());
+							clientService.startProcess(ClientSimulator.this, clientProcessMetaModel.getMainProcessName());
+						}
+					});
+				}
+			}
+		});*/
+		
+		agent.getBeliefbase().setBeliefFact("clientcap.process_finished_controller", new AbstractAction()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				if ((activeStateController == null) || (activeStateController.finalState()))
+				{
+					if (simWindow.isLastScenario())
+						EventQueue.invokeLater(new Runnable()
+						{
+							public void run()
+							{
+								editMode();
+								activeStateController = null;
+								simWindow.addLogMessage("Finished Simulation");
+							}
+						});
+					else
+						EventQueue.invokeLater(new Runnable()
+						{
+							public void run()
+							{
+								simWindow.selectNextScenario();
+								while (simWindow.getSelectedScenario().createProcessStateController().getStateCount() == 0)
+									simWindow.selectNextScenario();
+								simWindow.addLogMessage("Selecting scenario: " + simWindow.getSelectedScenario().getName());
+								activeStateController = simWindow.getSelectedScenario().createProcessStateController();
+								startProcess();
+							}
+						});
+				}
+				else
+				{
+					EventQueue.invokeLater(new Runnable()
+					{
+						public void run()
+						{
+							activeStateController.nextState();
+							simWindow.addLogMessage("Setting new process state: " + activeStateController.toString());
+							startProcess();
+						}
+					});
+				}
+			}
+		});
+		agent.createGoal("clientcap.start_process_event_subscription").addResultListener(new GoalDispatchResultListener(agent));
+		
+		agent.getBeliefbase().setBeliefFact("clientcap.add_workitem_controller", new AbstractAction()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				final IWorkitem workitem = (IWorkitem) e.getSource();
+				
+				agent.createGoal("clientcap.begin_activity").addResultListener(new GoalDispatchResultListener(agent)
+				{
+					public void configureGoal(IEAGoal goal)
+					{
+						goal.setParameterValue("workitem",workitem);
+					}
+				});
+			}
+		});
+		agent.createGoal("clientcap.start_workitem_subscription").addResultListener(new GoalDispatchResultListener(agent));
+		
+		agent.getBeliefbase().setBeliefFact("clientcap.add_activity_controller", new AbstractAction()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				final IClientActivity activity = (IClientActivity) e.getSource();
+				simWindow.addLogMessage("Processing Activity: " + activity.getName());
+				Map parameterStates = activeStateController.getActivityState(activity.getName(), activity.getParameterValues());
+				if (parameterStates != null)
+					activity.setMultipleParameterValues(parameterStates);
+				
+				agent.createGoal("clientcap.finish_activity").addResultListener(new GoalDispatchResultListener(agent)
+				{
+					public void configureGoal(IEAGoal goal)
+					{
+						goal.setParameterValue("activity", activity);
+					}
+				});
+			}
+		});
+		agent.createGoal("clientcap.start_activity_subscription").addResultListener(new SwingGoalDispatchResultListener(agent));
+		
+		simWindow.setCellRenderer(new DefaultTreeCellRenderer()
+		{
+			public Component getTreeCellRendererComponent(JTree tree,
+					Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus)
+			{
+				super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
+				if (value instanceof TreeNode)
+				{
+					Object data = ((TreeNode) value).getData();
+					if (data instanceof MGpmnModel)
+						setIcon(SimulationWindow.GPMN_ICON);
+					else if (data instanceof MBpmnModel)
+						setIcon(SimulationWindow.BPMN_ICON);
+					else if (data instanceof MActivity)
+						setIcon(SimulationWindow.TASK_ICON);
+					else if (data instanceof MParameter)
+					{
+						setIcon(SimulationWindow.PARAM_ICON);
+						MActivity task = (MActivity) ((ModelTreeNode)((ModelTreeNode)value).getParent()).getData();
+						if ((simWindow.getSelectedScenario() == null) || simWindow.getSelectedScenario().getTaskParameter(task.getName(), ((MParameter) data).getName()).getStateCount() == 0)
+							setForeground(new Color(128,128,128));
+					}
+					else if (data instanceof TreeNode)
+						setForeground(new Color(128,128,128));
+				}
+				
+				return this;
+			}
+		});
+		
+		updateGui();
 	}
 	
 	protected IFuture loadModelFromPath(final String path)
@@ -356,23 +369,26 @@ public class ClientSimulator
 		return loginDialog;
 	}
 	
-	private void login(LoginDialog loginDialog)
+	private IFuture login(LoginDialog loginDialog)
 	{
+		final Future ret = new Future();
 		final String username = loginDialog.getUserName();
 		final String password = loginDialog.getPassword();
-		agent.createGoal("clientcap.connect").addResultListener(new SwingGoalDispatchResultListener(agent)
+		agent.createGoal("clientcap.connect").addResultListener(new GoalDispatchResultListener(agent)
 		{
 			public void configureGoal(IEAGoal goal)
 			{
 				goal.setParameterValue("user_name", username);
 				goal.setParameterValue("auth_token", password);
+				ret.setResult(null);
 			}
 			
 			public void goalExceptionOccurred(Exception exception)
 			{
-				login(showLoginDialog());
+				System.err.println("Login failed");
 			}
 		});
+		return ret;
 	}
 	
 	private void setupActions()
@@ -480,6 +496,7 @@ public class ClientSimulator
 					simWindow.setSelectedScenario((Scenario) scenarios.getValueAt(scenarios.getRowCount() - 1, 0));
 					simWindow.refreshParameterStates();
 				}
+				editMode();
 			}
 		});
 		
