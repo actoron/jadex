@@ -1,6 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 	<H3>Shop scenario application descriptor</H3>
+	
+	In this scenario a typical online shopping scenario
+	is build up. Customer agents may search for shops
+	and buy offered goods in that shops.
+	
+	The shop application demonstrates how active components (in this
+	application specifically bdi agents) can be equipped with a domain
+	interface. This allows an object oriented interaction with the
+	component that exposes the domain interface. 
 -->
 <applicationtype xmlns="http://jadex.sourceforge.net/jadex-application"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"

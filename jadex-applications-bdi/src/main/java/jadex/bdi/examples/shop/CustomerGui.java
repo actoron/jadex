@@ -1,6 +1,7 @@
 package jadex.bdi.examples.shop;
 
 import jadex.bdi.runtime.AgentEvent;
+import jadex.bdi.runtime.IAgentListener;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBeliefListener;
 import jadex.bdi.runtime.IBeliefSetListener;
@@ -287,6 +288,18 @@ public class CustomerGui extends JFrame
 			public void windowClosing(WindowEvent e)
 			{
 				agent.killAgent();
+			}
+		});
+		agent.addAgentListener(new IAgentListener() 
+		{
+			public void agentTerminating(AgentEvent ae) 
+			{
+				setVisible(false);
+				dispose();
+			}
+			
+			public void agentTerminated(AgentEvent ae) 
+			{
 			}
 		});
 	}

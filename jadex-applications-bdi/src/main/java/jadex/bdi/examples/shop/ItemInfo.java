@@ -18,7 +18,6 @@ public class ItemInfo
 	
 	/** The quantity. */
 	protected int quantity;
-
 	
 	//-------- constructors --------
 	

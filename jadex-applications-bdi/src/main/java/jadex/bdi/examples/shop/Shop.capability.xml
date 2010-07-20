@@ -40,9 +40,9 @@
 			<parameter name="result" class="Object" direction="out">
 				<goalmapping ref="sell.result"/>
 			</parameter>
-			<body class="SellItemPlan"></body>
+			<body class="SellItemPlan"/>
 			<trigger>
-				<goal ref="sell"></goal>
+				<goal ref="sell"/>
 			</trigger>
 		</plan>
 	</plans>
