@@ -14,12 +14,15 @@ import jadex.simulation.helper.TimeConverter;
 @XmlRootElement(name="ObservedEvent")
 public class ObservedEvent {
 	
-	private Data dataReference;
+//	private Data dataReference;
 	private long absoluteTimestamp;
 	private long relativeTimestamp;
 	private String value;
 	private String experimentId;
 	private String applicationName;
+	private String dataName;
+	//HACK: should be the same like the relative timestamp
+	private double tick;
 	
 
 	public ObservedEvent(){
@@ -32,26 +35,27 @@ public class ObservedEvent {
 		
 	}
 	
-	public ObservedEvent(String applicationName, String experimentId, long absoluteTimestamp, Data dataReference, String value){
+	public ObservedEvent(String applicationName, String experimentId, long absoluteTimestamp, String dataName, String value, double tick){
 		this.applicationName = applicationName;
 		this.experimentId = experimentId;
 		this.absoluteTimestamp = absoluteTimestamp;
-		this.dataReference = dataReference;
+		this.dataName = dataName;
 		this.value = value;
+		this.tick = tick;
 	}
 	
 	
-	/**
-	 * Reference to the data object of the observer within the SimulationConfiguration File
-	 * @return
-	 */
-	public Data getDataReference() {
-		return dataReference;
-	}
-	
-	public void setDataReference(Data dataReference) {
-		this.dataReference = dataReference;
-	}
+//	/**
+//	 * Reference to the data object of the observer within the SimulationConfiguration File
+//	 * @return
+//	 */
+//	public Data getDataReference() {
+//		return dataReference;
+//	}
+//	
+//	public void setDataReference(Data dataReference) {
+//		this.dataReference = dataReference;
+//	}
 	
 	/**
 	 * Timestamp of the observed event. The timestamp is absolute.
@@ -118,14 +122,30 @@ public class ObservedEvent {
 	}
 	
 	
-	/**
-	 * Hack!
-	 * Returns the name of the data reference 
-	 * @return
-	 */
-	@XmlAttribute(name="DataName")
-	public String getNameOfObservedData() {
-		return this.getDataReference().getName();
+//	/**
+//	 * Hack!
+//	 * Returns the name of the data reference 
+//	 * @return
+//	 */
+//	@XmlAttribute(name="DataName")
+//	public String getNameOfObservedData() {
+//		return this.getDataReference().getName();
+//	}
+	
+	public String getDataName() {
+		return dataName;
+	}
+
+	public void setDataName(String dataName) {
+		this.dataName = dataName;
+	}
+	
+	public double getTick() {
+		return tick;
+	}
+
+	public void setTick(double tick) {
+		this.tick = tick;
 	}
 	
 	public String toString(){
@@ -143,9 +163,11 @@ public class ObservedEvent {
 		buffer.append("\n");
 		buffer.append("Relative Timestamp: ");
 		buffer.append(getRelativeTimestamp());
+		buffer.append(" == ?");
+		buffer.append(getTick());
 		buffer.append("\n");
 		buffer.append("DataName: ");
-		buffer.append(getDataReference().getName());
+		buffer.append(getDataName());
 		buffer.append("\n");
 		buffer.append("Observed Value: ");
 		buffer.append(getValue().toString());
@@ -153,6 +175,4 @@ public class ObservedEvent {
 		
 		return buffer.toString();
 	}
-
-	
 }

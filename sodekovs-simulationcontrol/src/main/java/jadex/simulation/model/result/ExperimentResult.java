@@ -128,7 +128,7 @@ public class ExperimentResult extends IResult{
 //		buffer.append(" - ");
 //		buffer.append(getOptimizationValue());
 //		buffer.append("\n");
-		buffer.append("Values and relative TimeStamps for Observed Data " + events.get(0).getNameOfObservedData());		
+		buffer.append("Values and relative TimeStamps for Observed Data " + events.get(0).getDataName());		
 		buffer.append("\n");
 		
 		sortEventlist();

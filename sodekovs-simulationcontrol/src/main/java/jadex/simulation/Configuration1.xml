@@ -17,6 +17,7 @@
 
 	<Imports>
 		<Import>jadex.application.space.envsupport.evaluation.*</Import>
+		<Import>jadex.simulation.evaluation.*</Import>
 	</Imports>
 
 	<Observers>
@@ -76,6 +77,26 @@
 			<Datas>
 				<Data name="ore_amount" value="$homebase.ore" />
 				<Data name="time" value="$tick" />
+				<Data name="time_2" value="$tick" />
+				<!-- <Data name="s_time" value="$homebase.start_time" /> -->
+			</Datas>
+		</Dataprovider>
+		<Dataprovider name="snetrylogger">
+			<!--
+				Hack: Should be like this: <Source name="$ore"
+				sourcetype="ISpaceObject" objecttype="homebase"
+				aggregate="false">$object.ore</Source> <Source name="$homebase"
+				sourcetype="ISpaceObject" objecttype="homebase"
+				aggregate="false">$object.money</Source>
+			-->
+			<Sources>
+				<Source name="$homebase" sourcetype="ISpaceObject" objecttype="homebase"
+					aggregate="false" value="" />
+			</Sources>
+			<!-- Hack: should have the same structure as the source(s) -->
+			<Datas>
+				<Data name="sentry_amount" value="$homebase.ore" />
+				<Data name="sentry_time" value="$tick" filter="last"/>				
 				<!-- <Data name="s_time" value="$homebase.start_time" /> -->
 			</Datas>
 		</Dataprovider>
@@ -104,12 +125,19 @@
 				<Property name="valuex_0" value="ore_amount" />
 			</Properties>
 		</Dataconsumer>
-		<!-- <Dataconsumer name="homebaseConsumerReloaded" clazz="CSVFileDataConsumer">
+		<Dataconsumer name="homebaseConsumerReloaded2" clazz="CSVFileDataConsumer">
 			<Properties>
 				<Property name="dataprovider" value="homebaselogger2" />
+				<Property name="dataprovider" value="snetrylogger" />
 				<Property name="filename" value="testint2222.csv" />
 			</Properties>
-		</Dataconsumer>-->
+		</Dataconsumer>
+		<Dataconsumer name="simConsumer" clazz="SimulationDataConsumer">
+			<Properties>
+				<Property name="dataprovider" value="snetrylogger" />				
+				<Property name="sentry_time" value="last" /><!-- HACK: FOR FILTZER=LAST -->
+			</Properties>
+		</Dataconsumer>
 	</Dataconsumers>
 
 	<DataVisualization>

@@ -5,6 +5,7 @@ import jadex.application.space.envsupport.MEnvSpaceInstance;
 import jadex.application.space.envsupport.environment.AbstractEnvironmentSpace;
 import jadex.application.space.envsupport.environment.space2d.ContinuousSpace2D;
 import jadex.application.space.envsupport.evaluation.AbstractChartDataConsumer;
+import jadex.application.space.envsupport.evaluation.CSVFileDataConsumer;
 import jadex.application.space.envsupport.evaluation.DefaultDataProvider;
 import jadex.application.space.envsupport.evaluation.IObjectSource;
 import jadex.application.space.envsupport.evaluation.ITableDataConsumer;
@@ -31,6 +32,7 @@ import jadex.rules.state.IOAVState;
 import jadex.service.clock.IClockService;
 import jadex.service.library.ILibraryService;
 import jadex.simulation.controlcenter.OnlineVisualisation;
+import jadex.simulation.evaluation.SimulationDataConsumer;
 import jadex.simulation.helper.AgentMethods;
 import jadex.simulation.helper.Constants;
 import jadex.simulation.helper.EvaluateExpression;
@@ -46,6 +48,7 @@ import jadex.simulation.model.Time;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -160,7 +163,8 @@ public class RuntimeManagerPlan extends Plan {
 		// container.getService(DeltaTimeExecutor4Simulation.class);
 		// ConcurrentHashMap<Long, ArrayList<ObservedEvent>> results =
 		// simServ.getAllObservedValues();
-		ConcurrentHashMap<Long, ArrayList<ObservedEvent>> results = (ConcurrentHashMap<Long, ArrayList<ObservedEvent>>) space.getProperty("observedEvents");
+//		ConcurrentHashMap<Long, ArrayList<ObservedEvent>> results = (ConcurrentHashMap<Long, ArrayList<ObservedEvent>>) space.getProperty("observedEvents");
+		ConcurrentHashMap<Long, ArrayList<ObservedEvent>> results = getResult(space);		
 
 		// Stop Siumlation when target condition true.
 		// IServiceContainer container =
@@ -174,6 +178,20 @@ public class RuntimeManagerPlan extends Plan {
 		// waitFor(5000);
 		// simServ.start();
 		// exeServ.start();
+		
+//		//TMP:
+//		Collection collection = space.getDataConsumers();
+//		
+//		Iterator itr = collection.iterator();
+//		
+//		while(itr.hasNext()){		
+//			ITableDataConsumer con = (ITableDataConsumer) itr.next();
+//			System.out.println("#consumers# "  + con.getPropertyNames().size());
+//			if(con instanceof CSVFileDataConsumer)
+//				((CSVFileDataConsumer) con).close();
+//		}
+//		
+		 
 
 		sendResult(results);
 		// simServ.start();
@@ -408,6 +426,27 @@ public class RuntimeManagerPlan extends Plan {
 	 */
 	private IParsedExpression getParsedExpression(String expression, IExpressionParser parser) {
 		return expression == null ? null : parser.parseExpression(expression, null, null, null);
+	}
+	
+	/**
+	 * Returns the observedEvents from the SimulationDataConsumer
+	 * Hack: Can only process one SimualtioDataConsumer, i.e. it returns the events from the FIRST SimulatioDataConsumer
+	 * @param space
+	 * @return
+	 */
+	private ConcurrentHashMap<Long, ArrayList<ObservedEvent>> getResult(AbstractEnvironmentSpace space){
+		Collection collection = space.getDataConsumers();
+		
+		Iterator itr = collection.iterator();
+		
+		while(itr.hasNext()){		
+			Object con = itr.next();
+//			ITableDataConsumer con = (ITableDataConsumer) itr.next();
+//			System.out.println("#consumers# "  + con.getPropertyNames().size());
+			if(con instanceof SimulationDataConsumer)
+				return ((SimulationDataConsumer) con).getResults();
+		}
+		return null;
 	}
 
 	/**

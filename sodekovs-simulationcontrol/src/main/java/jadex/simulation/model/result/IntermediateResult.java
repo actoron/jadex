@@ -73,9 +73,11 @@ public class IntermediateResult {
 	 * @param observedEvent
 	 */
 	public void addObservedEventToSortedList(ObservedEvent observedEvent) {
-		ArrayList<ObservedEvent> list = this.sortedObservedEvents.get(observedEvent.getNameOfObservedData());
+//		ArrayList<ObservedEvent> list = this.sortedObservedEvents.get(observedEvent.getNameOfObservedData());
+		ArrayList<ObservedEvent> list = this.sortedObservedEvents.get(observedEvent.getDataName());
 		list.add(observedEvent);
-		this.sortedObservedEvents.put(observedEvent.getNameOfObservedData(), list);
+//		this.sortedObservedEvents.put(observedEvent.getNameOfObservedData(), list);
+		this.sortedObservedEvents.put(observedEvent.getDataName(), list);
 	}
 
 	/**
@@ -103,9 +105,11 @@ public class IntermediateResult {
 	 * @param observedEvent
 	 */
 	public void addLatestObserverResults(ObservedEvent observedEvent) {
-		ArrayList<String> list = this.latestObserverResults.get(observedEvent.getNameOfObservedData());
+//		ArrayList<String> list = this.latestObserverResults.get(observedEvent.getNameOfObservedData());
+		ArrayList<String> list = this.latestObserverResults.get(observedEvent.getDataName());
 		list.add(observedEvent.getValue());
-		this.latestObserverResults.put(observedEvent.getNameOfObservedData(), list);
+//		this.latestObserverResults.put(observedEvent.getNameOfObservedData(), list);
+		this.latestObserverResults.put(observedEvent.getDataName(), list);
 	}
 	
 	/**

@@ -26,7 +26,7 @@ public class SimulationConfiguration {
 	private String applicationConfiguration;	
 		
 	/* List of observers*/
-	private ArrayList<Observer> observerList;
+//	private ArrayList<Observer> observerList;
 	
 	/* List of dataproviders*/
 	private ArrayList<Dataprovider> dataproviderList ;
@@ -65,15 +65,15 @@ public class SimulationConfiguration {
 		this.applicationReference = reference;
 	}
 
-	@XmlElementWrapper(name="Observers")
-	@XmlElement(name="Observer")
-	public ArrayList<Observer> getObserverList() {
-		return observerList;
-	}
-
-	public void setObserverList(ArrayList<Observer> observerList) {
-		this.observerList = observerList;
-	}
+//	@XmlElementWrapper(name="Observers")
+//	@XmlElement(name="Observer")
+//	public ArrayList<Observer> getObserverList() {
+//		return observerList;
+//	}
+//
+//	public void setObserverList(ArrayList<Observer> observerList) {
+//		this.observerList = observerList;
+//	}
 	
 	@XmlElementWrapper(name="Dataproviders")
 	@XmlElement(name="Dataprovider")

@@ -162,12 +162,15 @@ public class ComputeSingleResultPlan extends Plan {
 				long relativeTimestamp = myEvent.getAbsoluteTimestamp() - startTime;
 				myEvent.setRelativeTimestamp(relativeTimestamp);
 				// event does not have to be filtered
-				if (eventsToFilter.get(myEvent.getNameOfObservedData()) == null) {
+//				if (eventsToFilter.get(myEvent.getNameOfObservedData()) == null) {
+				if (eventsToFilter.get(myEvent.getDataName()) == null) {
 					result.add(myEvent);
 				} else {// --- put event into the right bucket
-					ArrayList<ObservedEvent> list = eventsToFilter.get(myEvent.getNameOfObservedData());
+//					ArrayList<ObservedEvent> list = eventsToFilter.get(myEvent.getNameOfObservedData());
+					ArrayList<ObservedEvent> list = eventsToFilter.get(myEvent.getDataName());
 					list.add(myEvent);
-					eventsToFilter.put(myEvent.getNameOfObservedData(), list);
+//					eventsToFilter.put(myEvent.getNameOfObservedData(), list);
+					eventsToFilter.put(myEvent.getDataName(), list);
 				}
 			}
 		}
