@@ -177,7 +177,7 @@ public class OAVBDIMetaModel
 	public static OAVAttributeType typedelement_has_updaterate;
 	
 	/** Typed element has transient attribute. */
-	public static OAVAttributeType typedelement_has_transient;
+//	public static OAVAttributeType typedelement_has_transient;
 	
 	/** Typed element has dynamic attribute. */
 	public static OAVAttributeType typedelement_has_evaluationmode;
@@ -959,7 +959,7 @@ public class OAVBDIMetaModel
 		typedelement_has_classname = typedelement_type.createAttributeType("mtypedelement_has_classname", OAVJavaType.java_string_type, OAVAttributeType.NONE);
 		typedelement_has_class = typedelement_type.createAttributeType("mtypedelement_has_class", OAVJavaType.java_class_type, OAVAttributeType.NONE, Object.class);
 		typedelement_has_updaterate = typedelement_type.createAttributeType("mtypedelement_has_updaterate", OAVJavaType.java_long_type);
-		typedelement_has_transient = typedelement_type.createAttributeType("mtypedelement_has_transient", OAVJavaType.java_boolean_type);
+//		typedelement_has_transient = typedelement_type.createAttributeType("mtypedelement_has_transient", OAVJavaType.java_boolean_type);
 		typedelement_has_evaluationmode = typedelement_type.createAttributeType("mtypedelement_has_evaluationmode", OAVJavaType.java_string_type, OAVAttributeType.NONE, EVALUATIONMODE_STATIC);
 		
 //		// typed element reference

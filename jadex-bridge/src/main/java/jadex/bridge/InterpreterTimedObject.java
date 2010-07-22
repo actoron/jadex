@@ -43,31 +43,41 @@ public class InterpreterTimedObject implements ITimedObject
 	 */
 	public void timeEventOccurred(long currenttime)
 	{
-		SServiceProvider.getService(provider, IComponentManagementService.class).addResultListener(new DefaultResultListener()
+		try
 		{
-			public void resultAvailable(Object source, Object result)
-			{
-				IComponentManagementService	ces	= (IComponentManagementService)result;
-				ces.getComponentDescription(adapter.getComponentIdentifier()).addResultListener(new DefaultResultListener()
-				{
-					public void resultAvailable(Object source, Object result)
-					{
-						IComponentDescription desc = (IComponentDescription)result;
-						if(desc!=null && !IComponentDescription.STATE_TERMINATED.equals(desc.getState()))
-						{
-							try
-							{
-								adapter.invokeLater(action);
-							}
-							catch(ComponentTerminatedException e)
-							{
-							}
-						}						
-						// else component was terminated
-					}
-				});
-			}
-		});
+			// The adapter should check if invocation is allowed?!
+			// Otherwise always InterpreterTest will not work
+			adapter.invokeLater(action);
+		}
+		catch(ComponentTerminatedException e)
+		{
+		}
+		
+//		SServiceProvider.getService(provider, IComponentManagementService.class).addResultListener(new DefaultResultListener()
+//		{
+//			public void resultAvailable(Object source, Object result)
+//			{
+//				IComponentManagementService	ces	= (IComponentManagementService)result;
+//				ces.getComponentDescription(adapter.getComponentIdentifier()).addResultListener(new DefaultResultListener()
+//				{
+//					public void resultAvailable(Object source, Object result)
+//					{
+//						IComponentDescription desc = (IComponentDescription)result;
+//						if(desc!=null && !IComponentDescription.STATE_TERMINATED.equals(desc.getState()))
+//						{
+//							try
+//							{
+//								adapter.invokeLater(action);
+//							}
+//							catch(ComponentTerminatedException e)
+//							{
+//							}
+//						}						
+//						// else component was terminated
+//					}
+//				});
+//			}
+//		});
 	}
 	
 	/**

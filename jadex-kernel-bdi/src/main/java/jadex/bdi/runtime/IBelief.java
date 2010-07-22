@@ -1,5 +1,8 @@
 package jadex.bdi.runtime;
 
+import jadex.bdi.model.IMElement;
+
+
 
 /**
  *  The interface for all beliefs (concrete and referenced).
@@ -50,4 +53,10 @@ public interface IBelief extends IElement
 	 *  @param listener The belief listener.
 	 */
 	public void removeBeliefListener(IBeliefListener listener);
+	
+	/**
+	 *  Get the model element.
+	 *  @return The model element.
+	 */
+	public IMElement getModelElement();
 }

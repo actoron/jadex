@@ -17,13 +17,18 @@ import jadex.commons.concurrent.ThreadPoolFactory;
 import jadex.service.BasicServiceContainer;
 import jadex.service.IService;
 import jadex.service.IServiceContainer;
+import jadex.service.clock.ClockCreationInfo;
 import jadex.service.clock.ClockService;
+import jadex.service.clock.IClock;
 import jadex.service.clock.IClockService;
 import jadex.service.clock.SystemClock;
+import jadex.service.threadpool.ThreadPoolService;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Vector;
 import java.util.logging.Logger;
 
 /**
@@ -40,7 +45,6 @@ public class InterpreterTest
 		try
 		{
 			String	model	= "/jadex/bdi/examples/helloworld/HelloWorld.agent.xml";
-	//		String	model	= "/jadex/bdi/examples/HelloWorldGoal.agent.xml";
 			if(args.length==1)
 			{
 				model	= args[0];
@@ -59,6 +63,8 @@ public class InterpreterTest
 			OAVBDIModelLoader loader = new OAVBDIModelLoader();
 			OAVAgentModel loaded = loader.loadAgentModel(model, null, null);
 	
+			
+			
 			// Initialize agent interpreter.
 			BDIInterpreter interpreter = new BDIInterpreter(null, new ComponentAdapterFactory(), loaded.getState(), loaded, null, null, null, config);
 			interpreter.getAgentAdapter().wakeup();
@@ -100,12 +106,13 @@ class ComponentAdapter implements IComponentAdapter
 	
 	public ComponentAdapter(final IComponentInstance interpreter)
 	{
-		final IClockService clock = new ClockService(new SystemClock("system", 1, ThreadPoolFactory.createThreadPool()));
-		clock.start();
 		container = new BasicServiceContainer("platform");
+		ThreadPoolService tps = new ThreadPoolService(ThreadPoolFactory.createThreadPool());
+		container.addService(ThreadPoolService.class, tps);
+		final IClockService clock = new ClockService(new ClockCreationInfo(IClock.TYPE_SYSTEM, "system"), container);
 		container.addService(IClockService.class, (IService)clock);
 		
-		exe = new Executor(ThreadPoolFactory.createThreadPool());
+		exe = new Executor(tps);
 		exe.setExecutable(new IExecutable()
 		{
 			public boolean execute()
@@ -124,8 +131,7 @@ class ComponentAdapter implements IComponentAdapter
 	
 	public void invokeLater(Runnable action)
 	{
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException();
+		action.run();
 	}
 	
 	public IExternalAccess getParent()
