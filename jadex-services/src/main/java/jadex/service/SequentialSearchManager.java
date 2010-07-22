@@ -61,6 +61,7 @@ public class SequentialSearchManager implements ISearchManager
 	 */
 	public IFuture	searchServices(final IServiceProvider provider, final IVisitDecider decider, final IResultSelector selector, final Map services)
 	{
+//		System.out.println("search: "+selector+" "+provider.getId());
 		Future	ret	= new Future();
 		Collection	results	= new ArrayList();
 		Map	todo	= new LinkedHashMap(); // Nodes of which children still to be processed (id->provider).

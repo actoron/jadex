@@ -848,7 +848,7 @@ public class Application implements IApplication, IComponentInstance
 				public void resultAvailable(Object source, Object result)
 				{
 					// Create spaces for context.
-//							System.out.println("comp services start finished: "+getComponentIdentifier());
+//					System.out.println("comp services start finished: "+getComponentIdentifier());
 					List spaces = config.getMSpaceInstances();
 					if(spaces!=null)
 					{

@@ -92,4 +92,14 @@ public class TypeResultSelector implements IResultSelector
 	{
 		return this.getClass().getName()+type.getName();
 	}
+
+	/**
+	 *  Get the string representation.
+	 */
+	public String toString()
+	{
+		return "TypeResultSelector(type=" + type + ", oneresult=" + oneresult+ ")";
+	}
+	
+	
 }

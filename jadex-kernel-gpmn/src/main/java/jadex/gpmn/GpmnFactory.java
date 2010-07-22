@@ -91,20 +91,20 @@ public class GpmnFactory extends BasicService implements IComponentFactory
 	
 	/**
 	 *  Start the service.
-	 */
-	public IFuture	startService()
+	 * /
+	public synchronized IFuture	startService()
 	{
-		return new Future(null);
-	}
+		return super.startService();
+	}*/
 	
 	/**
 	 *  Shutdown the service.
 	 *  @param listener The listener.
-	 */
-	public IFuture	shutdownService()
+	 * /
+	public synchronized IFuture	shutdownService()
 	{
-		return new Future(null);
-	}
+		return super.shutdownService();
+	}*/
 	
 	/**
 	 *  Load a  model.

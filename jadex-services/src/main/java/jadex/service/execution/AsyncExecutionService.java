@@ -10,6 +10,9 @@ import jadex.commons.concurrent.IExecutable;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.IThreadPool;
 import jadex.service.IService;
+import jadex.service.IServiceProvider;
+import jadex.service.SServiceProvider;
+import jadex.service.threadpool.ThreadPoolService;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -37,6 +40,9 @@ public class AsyncExecutionService	implements IExecutionService, IService
 	/** The shutdown flag. */
 	protected boolean shutdown;
 	
+	/** The provider. */
+	protected IServiceProvider provider;
+	
 	/** The executor cache. */
 //	protected List executorcache;
 	
@@ -56,9 +62,11 @@ public class AsyncExecutionService	implements IExecutionService, IService
 	/**
 	 *  Create a new asynchronous executor service. 
 	 */
-	public AsyncExecutionService(IThreadPool threadpool)//, int max)
+//	public AsyncExecutionService(IThreadPool threadpool)//, int max)
+	public AsyncExecutionService(IServiceProvider provider)//, int max)
 	{
-		this.threadpool = threadpool;
+		this.provider = provider;
+//		this.threadpool = threadpool;
 //		this.max = max;
 		this.running	= false;
 		this.executors	= SCollection.createHashMap();
@@ -207,7 +215,7 @@ public class AsyncExecutionService	implements IExecutionService, IService
 	 */
 	public synchronized IFuture	startService()
 	{
-		final Future ret = new Future();
+		final  Future ret = new Future();
 		
 		if(shutdown)
 		{
@@ -215,28 +223,42 @@ public class AsyncExecutionService	implements IExecutionService, IService
 		}
 		else
 		{
-			running	= true;
-	
-			if(!executors.isEmpty())
+			SServiceProvider.getService(provider, ThreadPoolService.class).addResultListener(new IResultListener()
 			{
-				// Resume all suspended tasks.
-				IExecutable[] keys = (IExecutable[])executors.keySet()
-					.toArray(new IExecutable[executors.size()]);
-				for(int i=0; i<keys.length; i++)
-					execute(keys[i]);
-			}
-			else if(idlecommands!=null)
-			{
-	//			System.out.println("restart: idle");
-				Iterator it	= idlecommands.iterator();
-				while(it.hasNext())
+				public void resultAvailable(Object source, Object result)
 				{
-					((ICommand)it.next()).execute(null);
+					threadpool = (IThreadPool)result;
+					
+					running	= true;
+					
+					if(!executors.isEmpty())
+					{
+						// Resume all suspended tasks.
+						IExecutable[] keys = (IExecutable[])executors.keySet()
+							.toArray(new IExecutable[executors.size()]);
+						for(int i=0; i<keys.length; i++)
+							execute(keys[i]);
+					}
+					else if(idlecommands!=null)
+					{
+			//			System.out.println("restart: idle");
+						Iterator it	= idlecommands.iterator();
+						while(it.hasNext())
+						{
+							((ICommand)it.next()).execute(null);
+						}
+					}
+					
+					ret.setResult(null);
 				}
-			}
+				
+				public void exceptionOccurred(Object source, Exception exception)
+				{
+					ret.setException(exception);
+				}
+			});
 		}
 		
-		ret.setResult(null);
 		return ret;
 	}
 	

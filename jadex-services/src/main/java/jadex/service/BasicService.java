@@ -32,6 +32,7 @@ public class BasicService implements IService
 	 */
 	public IFuture	startService()
 	{
+//		System.out.println("start: "+this);
 		Future ret = new Future();
 		if(isValid())
 		{
@@ -40,7 +41,7 @@ public class BasicService implements IService
 		else
 		{
 			valid = true;
-			ret.setResult(null);
+			ret.setResult(this);
 		}
 		return ret;
 	}

@@ -7,8 +7,11 @@ import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.Executor;
 import jadex.commons.concurrent.IExecutable;
 import jadex.commons.concurrent.IResultListener;
-import jadex.commons.concurrent.IThreadPool;
 import jadex.service.IService;
+import jadex.service.IServiceContainer;
+import jadex.service.IServiceProvider;
+import jadex.service.SServiceProvider;
+import jadex.service.threadpool.ThreadPoolService;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -49,109 +52,21 @@ public class SyncExecutionService	implements	IExecutionService, IService
 	/** The stop listener. */
 	protected IResultListener stoplistener;
 	
+	/** The provider. */
+	protected IServiceProvider provider;
+	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new synchronous executor service. 
 	 */
-	public SyncExecutionService(IThreadPool threadpool)
+//	public SyncExecutionService(IThreadPool threadpool)
+	public SyncExecutionService(IServiceProvider provider)
 	{
+		this.provider = provider;
 		this.running	= false;
 		this.queue	= SCollection.createLinkedHashSet();
 		this.removedfut = new ArrayList();
-		
-		this.executor = new Executor(threadpool, new IExecutable()
-		{
-			public boolean execute()
-			{
-				// Perform one task a time.
-				
-				// assert task==null;
-				synchronized(SyncExecutionService.this)
-				{
-					if(running && !queue.isEmpty())
-					{
-						// Hack!!! Is there a better way to get first element from queue without creating iterator?
-						Iterator iterator = queue.iterator();
-						task = (IExecutable)iterator.next();
-						iterator.remove();
-					}
-				}
-				
-				if(task!=null)
-				{
-					boolean again = false;
-					try
-					{
-						again = task.execute();
-					}
-					catch(Exception e)
-					{
-						System.out.println("Exception during executing task: "+task);
-						e.printStackTrace();
-					}
-					
-					synchronized(SyncExecutionService.this)
-					{
-						// assert task!=null;
-						
-						if(removedtask==null)
-						{
-							if(again && running)
-							{
-								queue.add(task);
-							}
-						}
-						else if(removedtask==task)
-						{
-							removedtask = null;
-							for(int i=0; i<removedfut.size(); i++)
-								((IResultListener)removedfut.get(i)).resultAvailable(this, null);
-							removedfut.clear();
-						}
-						else
-						{
-							throw new RuntimeException("Removedtask!=task: "+task+" "+removedtask);
-						}
-						
-						task = null;
-					}
-				}
-				
-				
-				// When no more executables, inform idle commands.
-				boolean perform = false;
-				synchronized(SyncExecutionService.this)
-				{
-					if(running && queue.isEmpty())
-					{
-						perform = idlecommands!=null;
-					}
-				}
-				if(perform)
-				{
-//					System.out.println("Idle");
-					Iterator it	= idlecommands.iterator();
-					while(it.hasNext())
-					{
-						((ICommand)it.next()).execute(null);
-					}
-				}
-				
-				// Perform next task when queue is not empty and service is running.
-				synchronized(SyncExecutionService.this)
-				{
-					// todo: extract call from synchronized block
-					if(stoplistener!=null)
-					{
-						stoplistener.resultAvailable(this, null);
-						stoplistener = null;
-					}
-					
-					return running && !queue.isEmpty();
-				}
-			}
-		});
 	}
 
 	//-------- methods --------
@@ -232,11 +147,120 @@ public class SyncExecutionService	implements	IExecutionService, IService
 	 *  Resumes all tasks.
 	 */
 	public synchronized IFuture	startService()
-	{
-		IFuture	ret	= new Future(null); // Already done.
-		
+	{	
+		final  Future ret = new Future();
+	
 		if(shutdown)
+		{
+			ret.setResult(null);
 			return ret;
+		}
+		
+		SServiceProvider.getService(provider, ThreadPoolService.class).addResultListener(new IResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				executor = new Executor((ThreadPoolService)result, new IExecutable()
+				{
+					public boolean execute()
+					{
+						// Perform one task a time.
+						
+						// assert task==null;
+						synchronized(SyncExecutionService.this)
+						{
+							if(running && !queue.isEmpty())
+							{
+								// Hack!!! Is there a better way to get first element from queue without creating iterator?
+								Iterator iterator = queue.iterator();
+								task = (IExecutable)iterator.next();
+								iterator.remove();
+							}
+						}
+						
+						if(task!=null)
+						{
+							boolean again = false;
+							try
+							{
+								again = task.execute();
+							}
+							catch(Exception e)
+							{
+								System.out.println("Exception during executing task: "+task);
+								e.printStackTrace();
+							}
+							
+							synchronized(SyncExecutionService.this)
+							{
+								// assert task!=null;
+								
+								if(removedtask==null)
+								{
+									if(again && running)
+									{
+										queue.add(task);
+									}
+								}
+								else if(removedtask==task)
+								{
+									removedtask = null;
+									for(int i=0; i<removedfut.size(); i++)
+										((Future)removedfut.get(i)).setResult(null);
+									removedfut.clear();
+								}
+								else
+								{
+									throw new RuntimeException("Removedtask!=task: "+task+" "+removedtask);
+								}
+								
+								task = null;
+							}
+						}
+						
+						
+						// When no more executables, inform idle commands.
+						boolean perform = false;
+						synchronized(SyncExecutionService.this)
+						{
+							if(running && queue.isEmpty())
+							{
+								perform = idlecommands!=null;
+							}
+						}
+						if(perform)
+						{
+//							System.out.println("Idle");
+							Iterator it	= idlecommands.iterator();
+							while(it.hasNext())
+							{
+								((ICommand)it.next()).execute(null);
+							}
+						}
+						
+						// Perform next task when queue is not empty and service is running.
+						synchronized(SyncExecutionService.this)
+						{
+							// todo: extract call from synchronized block
+							if(stoplistener!=null)
+							{
+								stoplistener.resultAvailable(this, null);
+								stoplistener = null;
+							}
+							
+							return running && !queue.isEmpty();
+						}
+					}
+				});
+				
+				ret.setResult(SyncExecutionService.this);
+			}
+			
+			public void exceptionOccurred(Object source, Exception exception)
+			{
+				ret.setException(exception);
+			}
+		});
 		
 		running = true;
 		// Wake up the main executor for executing tasks

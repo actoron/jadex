@@ -3,8 +3,12 @@ package jadex.service.clock;
 import jadex.commons.Future;
 import jadex.commons.IChangeListener;
 import jadex.commons.IFuture;
+import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.IThreadPool;
 import jadex.service.BasicService;
+import jadex.service.IServiceProvider;
+import jadex.service.SServiceProvider;
+import jadex.service.threadpool.ThreadPoolService;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -21,21 +25,28 @@ public class ClockService extends BasicService implements IClockService
 	/** The clock. */
 	protected IClock clock;
 	
-	/** The platform. */
-//	protected IPlatform platform;
-	
+	/** The threadpool. */
+	protected IThreadPool threadpool;
+
 	/** The clock listeners. */
 	protected List listeners;
+
+	
+	/** The provider. */
+	protected IServiceProvider provider;
+
+	/** The clock type. */
+	protected ClockCreationInfo cinfo;
 	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new clock service.
 	 */
-	public ClockService(IClock clock)//, IPlatform platform)
+	public ClockService(ClockCreationInfo cinfo, IServiceProvider provider)
 	{
-		this.clock = clock;
-//		this.platform = platform;
+		this.cinfo = cinfo;
+		this.provider = provider;
 		this.listeners = Collections.synchronizedList(new ArrayList());
 	}
 	
@@ -217,20 +228,51 @@ public class ClockService extends BasicService implements IClockService
 	/**
 	 *  Start the service.
 	 */
-	public IFuture	startService()
+	public IFuture startService()
 	{
-		clock.start();
-		return new Future(null);	// Already done.
+//		System.out.println("start clock: "+this);
+		
+		final Future ret = new Future();
+		
+		SServiceProvider.getServiceUpwards(provider, ThreadPoolService.class)
+			.addResultListener(new IResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				threadpool = (IThreadPool)result;
+				clock = createClock(cinfo, threadpool);
+				clock.start();
+				ClockService.super.startService().addResultListener(new IResultListener()
+				{
+					public void resultAvailable(Object source, Object result)
+					{
+						ret.setResult(ClockService.this);
+					}
+					
+					public void exceptionOccurred(Object source, Exception exception)
+					{
+						ret.setException(exception);
+					}
+				});
+			}
+			
+			public void exceptionOccurred(Object source, Exception exception)
+			{
+				ret.setException(exception);
+			}
+		});
+	
+		return ret;
 	}
 	
 	/**
 	 *  Shutdown the service.
 	 *  @param listener The listener.
 	 */
-	public IFuture	shutdownService()
+	public IFuture shutdownService()
 	{
 		clock.dispose();
-		return new Future(null);	// Already done.
+		return super.shutdownService();
 	}
 	
 	//--------- methods --------
@@ -250,11 +292,12 @@ public class ClockService extends BasicService implements IClockService
 	 */
 	public void setClock(String type, IThreadPool tp)
 	{
-		IClock clock = null;
-		if(IClock.TYPE_CONTINUOUS.equals(type))
-			clock = new ContinuousClock(this.clock, tp);//(IThreadPool)platform.getService(ThreadPoolService.class));
+		IClock clock;
+		
+		if(IClock.TYPE_CONTINUOUS.equals(cinfo.getClockType()))
+			clock = new ContinuousClock(this.clock, tp);
 		else if(IClock.TYPE_SYSTEM.equals(type))
-			clock = new SystemClock(this.clock, tp);//(IThreadPool)platform.getService(ThreadPoolService.class));
+			clock = new SystemClock(this.clock, tp);
 		else if(IClock.TYPE_TIME_DRIVEN.equals(type))
 			clock = new SimulationTickClock(this.clock);
 		else if(IClock.TYPE_EVENT_DRIVEN.equals(type))
@@ -269,6 +312,37 @@ public class ClockService extends BasicService implements IClockService
 		{
 			this.clock.addChangeListener((IChangeListener)listeners.get(i));
 		}
+	}
+	
+	/**
+	 *  Create a clock.
+	 */
+	public static IClock createClock(ClockCreationInfo cinfo, IThreadPool tp)
+	{
+		IClock ret;
+		
+		if(IClock.TYPE_CONTINUOUS.equals(cinfo.getClockType()))
+		{
+			ret = new ContinuousClock(cinfo.getName(), cinfo.getStart(), cinfo.getDilation(), tp);
+		}
+		else if(IClock.TYPE_SYSTEM.equals(cinfo.getClockType()))
+		{
+			ret = new SystemClock(cinfo.getName(), cinfo.getDelta(), tp);
+		}
+		else if(IClock.TYPE_TIME_DRIVEN.equals(cinfo.getClockType()))
+		{
+			ret = new SimulationTickClock(cinfo.getName(), cinfo.getStart(), cinfo.getDelta());
+		}
+		else if(IClock.TYPE_EVENT_DRIVEN.equals(cinfo.getClockType()))
+		{
+			ret = new SimulationEventClock(cinfo.getName(), cinfo.getStart(), cinfo.getDelta());
+		}
+		else
+		{
+			throw new RuntimeException("Unknown clock type: "+cinfo.getClockType());
+		}
+		
+		return ret;
 	}
 
 }

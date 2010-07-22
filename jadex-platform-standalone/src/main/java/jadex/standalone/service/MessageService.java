@@ -384,53 +384,63 @@ public class MessageService extends BasicService implements IMessageService
 	/**
 	 *  Start the service.
 	 */
-	public IFuture	startService()
+	public synchronized IFuture	startService()
 	{
-		super.startService();
-		// todo: what about result future?
+		final Future ret = new Future();
 		
-		ITransport[] tps = (ITransport[])transports.toArray(new ITransport[transports.size()]);
-		for(int i=0; i<tps.length; i++)
+		super.startService().addResultListener(new IResultListener()
 		{
-			try
+			public void resultAvailable(Object source, Object result)
 			{
-				tps[i].start();
-			}
-			catch(Exception e)
-			{
-				System.out.println("Could not initialize transport: "+tps[i]+" reason: "+e);
-				transports.remove(tps[i]);
-			}
-		}
-		
-		final Future	ret	= new Future();
-		if(transports.size()==0)
-		{
-			ret.setException(new RuntimeException("MessageService has no working transport for sending messages."));
-		}
-		else
-		{
-			SServiceProvider.getService(container, IClockService.class).addResultListener(new IResultListener()
-			{
-				public void resultAvailable(Object source, Object result)
+				ITransport[] tps = (ITransport[])transports.toArray(new ITransport[transports.size()]);
+				for(int i=0; i<tps.length; i++)
 				{
-					clockservice = (IClockService)result;
-					ret.setResult(null);
+					try
+					{
+						tps[i].start();
+					}
+					catch(Exception e)
+					{
+						System.out.println("Could not initialize transport: "+tps[i]+" reason: "+e);
+						transports.remove(tps[i]);
+					}
 				}
 				
-				public void exceptionOccurred(Object source, Exception exception)
+				if(transports.size()==0)
 				{
-					ret.setException(exception);
+					ret.setException(new RuntimeException("MessageService has no working transport for sending messages."));
 				}
-			});
-		}
+				else
+				{
+					SServiceProvider.getService(container, IClockService.class).addResultListener(new IResultListener()
+					{
+						public void resultAvailable(Object source, Object result)
+						{
+							clockservice = (IClockService)result;
+							ret.setResult(MessageService.this);
+						}
+						
+						public void exceptionOccurred(Object source, Exception exception)
+						{
+							ret.setException(exception);
+						}
+					});
+				}
+			}
+			
+			public void exceptionOccurred(Object source, Exception exception)
+			{
+				ret.setException(exception);
+			}
+		});
+		
 		return ret;
 	}
 	
 	/**
 	 *  Called when the platform shuts down. Do necessary cleanup here (if any).
 	 */
-	public IFuture	shutdownService()
+	public synchronized IFuture	shutdownService()
 	{
 		for(int i = 0; i < transports.size(); i++)
 		{

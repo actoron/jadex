@@ -195,20 +195,20 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 	
 	/**
 	 *  Start the service.
-	 */
-	public IFuture	startService()
+	 * /
+	public synchronized IFuture	startService()
 	{
-		return new Future(null);
-	}
+		return super.startService();
+	}*/
 	
 	/**
 	 *  Shutdown the service.
 	 *  @param listener The listener.
-	 */
-	public IFuture	shutdownService()
+	 * /
+	public synchronized IFuture	shutdownService()
 	{
-		return new Future(null);
-	}
+		return super.shutdownService();
+	}*/
 	
 	//-------- IComponentFactory interface --------
 	

@@ -185,4 +185,21 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 		return FILETYPE_MICROAGENT.equals(type)
 		? properties: null;
 	}
+	
+	/**
+	 *  Start the service.
+	 * /
+	public synchronized IFuture	startService()
+	{
+		return new Future(null);
+	}*/
+	
+	/**
+	 *  Shutdown the service.
+	 *  @param listener The listener.
+	 * /
+	public synchronized IFuture	shutdownService()
+	{
+		return new Future(null);
+	}*/
 }

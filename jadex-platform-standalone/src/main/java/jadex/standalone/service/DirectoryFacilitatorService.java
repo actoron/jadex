@@ -334,26 +334,56 @@ public class DirectoryFacilitatorService extends BasicService implements IDF
 	/**
 	 *  Start the service.
 	 */
-	public IFuture	startService()
+	public synchronized IFuture	startService()
 	{
-		super.startService();
-		// todo: what about result future?
+		final Future ret = new Future();
 		
-		final Future	ret	= new Future();
-		final boolean[]	services	= new boolean[2];
-		SServiceProvider.getServiceUpwards(platform, IComponentManagementService.class).addResultListener(new IResultListener()
+		super.startService().addResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
-				cms	= (IComponentManagementService)result;
-				boolean	setresult;
-				synchronized(services)
+				final boolean[]	services	= new boolean[2];
+				SServiceProvider.getServiceUpwards(platform, IComponentManagementService.class).addResultListener(new IResultListener()
 				{
-					services[0]	= true;
-					setresult	= services[0] && services[1];
-				}
-				if(setresult)
-					ret.setResult(null);
+					public void resultAvailable(Object source, Object result)
+					{
+						cms	= (IComponentManagementService)result;
+						boolean	setresult;
+						synchronized(services)
+						{
+							services[0]	= true;
+							setresult	= services[0] && services[1];
+						}
+						if(setresult)
+							ret.setResult(DirectoryFacilitatorService.this);
+					}
+					
+					public void exceptionOccurred(Object source, Exception exception)
+					{
+						ret.setException(exception);
+					}
+				});
+				SServiceProvider.getService(platform, IClockService.class).addResultListener(new IResultListener()
+				{
+					public void resultAvailable(Object source, Object result)
+					{
+						clockservice	= (IClockService)result;
+						boolean	setresult;
+						synchronized(services)
+						{
+							services[1]	= true;
+							setresult	= services[0] && services[1];
+						}
+						if(setresult)
+							ret.setResult(DirectoryFacilitatorService.this);
+					}
+					
+					public void exceptionOccurred(Object source, Exception exception)
+					{
+						ret.setException(exception);
+					}
+				});
+				
 			}
 			
 			public void exceptionOccurred(Object source, Exception exception)
@@ -361,26 +391,7 @@ public class DirectoryFacilitatorService extends BasicService implements IDF
 				ret.setException(exception);
 			}
 		});
-		SServiceProvider.getService(platform, IClockService.class).addResultListener(new IResultListener()
-		{
-			public void resultAvailable(Object source, Object result)
-			{
-				clockservice	= (IClockService)result;
-				boolean	setresult;
-				synchronized(services)
-				{
-					services[1]	= true;
-					setresult	= services[0] && services[1];
-				}
-				if(setresult)
-					ret.setResult(null);
-			}
-			
-			public void exceptionOccurred(Object source, Exception exception)
-			{
-				ret.setException(exception);
-			}
-		});
+		
 		return ret;
 	}
 	

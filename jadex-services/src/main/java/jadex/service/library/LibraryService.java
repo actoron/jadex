@@ -146,11 +146,11 @@ public class LibraryService extends BasicService implements ILibraryService
 
 	/**
 	 *  Start the service.
-	 */
+	 * /
 	public synchronized IFuture	startService()
 	{
 		return super.startService();
-	}
+	}*/
 
 	/** 
 	 *  Shutdown the service.

@@ -1,12 +1,13 @@
 package jadex.service.clock;
 
 import jadex.commons.IChangeListener;
+import jadex.service.IService;
 
 
 /**
  *  The clock service.
  */
-public interface IClockService
+public interface IClockService extends IService
 {
 	//-------- constants --------
 	

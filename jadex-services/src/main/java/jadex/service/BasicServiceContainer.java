@@ -178,9 +178,17 @@ public class BasicServiceContainer implements  IServiceContainer
 		// Start the services.
 		if(services!=null && services.size()>0)
 		{
+//			System.out.println("start: "+services.size());
+			
 			// Start notifies the future when all services have been started.
 			CounterResultListener lis = new CounterResultListener(services.size())
 			{
+//				public void intermediateResultAvailable(Object source,
+//						Object result)
+//				{
+//					System.out.println("finished: "+result);
+//				}
+				
 				public void finalResultAvailable(Object source, Object result)
 				{
 					ret.setResult(null);

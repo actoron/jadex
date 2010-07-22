@@ -1254,56 +1254,65 @@ public class ComponentManagementService extends BasicService implements ICompone
 	 */
 	public IFuture	startService()
 	{
-		super.startService();
-		// todo: what to do with result future?
-		
 		final Future	ret	= new Future();
 		
-		// add root adapter and register root component
-		if(root!=null)
+		super.startService().addResultListener(new IResultListener()
 		{
-			synchronized(adapters)
+			public void resultAvailable(Object source, Object result)
 			{
-				synchronized(descs)
+				// add root adapter and register root component
+				if(root!=null)
 				{
-					adapters.put(root.getComponentIdentifier(), root);
-					IComponentDescription desc = createComponentDescription(root.getComponentIdentifier(), null, null, null, null); 
-					descs.put(root.getComponentIdentifier(), desc);
+					synchronized(adapters)
+					{
+						synchronized(descs)
+						{
+							adapters.put(root.getComponentIdentifier(), root);
+							IComponentDescription desc = createComponentDescription(root.getComponentIdentifier(), null, null, null, null); 
+							descs.put(root.getComponentIdentifier(), desc);
+						}
+					}
 				}
+				
+				final boolean[]	services	= new boolean[2];
+				SServiceProvider.getService(container, IExecutionService.class).addResultListener(new DefaultResultListener()
+				{
+					public void resultAvailable(Object source, Object result)
+					{
+						exeservice	= (IExecutionService)result;
+						boolean	setresult;
+						synchronized(services)
+						{
+							services[0]	= true;
+							setresult	= services[0] && services[1];
+						}
+						if(setresult)
+							ret.setResult(ComponentManagementService.this);
+					}
+				});
+				SServiceProvider.getService(container, IMessageService.class).addResultListener(new DefaultResultListener()
+				{
+					public void resultAvailable(Object source, Object result)
+					{
+						msgservice	= (IMessageService)result;
+						boolean	setresult;
+						synchronized(services)
+						{
+							services[1]	= true;
+							setresult	= services[0] && services[1];
+						}
+						if(setresult)
+							ret.setResult(ComponentManagementService.this);
+					}
+				});
 			}
-		}
+			
+			public void exceptionOccurred(Object source, Exception exception)
+			{
+				ret.setException(exception);
+			}
+		});
 		
-		final boolean[]	services	= new boolean[2];
-		SServiceProvider.getService(container, IExecutionService.class).addResultListener(new DefaultResultListener()
-		{
-			public void resultAvailable(Object source, Object result)
-			{
-				exeservice	= (IExecutionService)result;
-				boolean	setresult;
-				synchronized(services)
-				{
-					services[0]	= true;
-					setresult	= services[0] && services[1];
-				}
-				if(setresult)
-					ret.setResult(null);
-			}
-		});
-		SServiceProvider.getService(container, IMessageService.class).addResultListener(new DefaultResultListener()
-		{
-			public void resultAvailable(Object source, Object result)
-			{
-				msgservice	= (IMessageService)result;
-				boolean	setresult;
-				synchronized(services)
-				{
-					services[1]	= true;
-					setresult	= services[0] && services[1];
-				}
-				if(setresult)
-					ret.setResult(null);
-			}
-		});
 		return ret;
 	}
 	
@@ -1313,7 +1322,7 @@ public class ComponentManagementService extends BasicService implements ICompone
 	 */
 	public IFuture	shutdownService()
 	{
-		return new Future(null);
+		return super.shutdownService();
 
 		/*final Future ret = new Future();
 		final  long shutdowntime = 10000; // todo: shutdowntime and MAX_SHUTDOWM_TIME

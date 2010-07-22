@@ -115,7 +115,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	{
 		this.desc = desc;
 		this.cid	= desc.getName();
-		this.provider = new CacheServiceContainer(new ComponentServiceContainer(this));
+		this.provider = new CacheServiceContainer(new ComponentServiceContainer(this), 25, 1*30*1000); // 30 secs cache expire
 		this.model = model;
 		this.component = component;
 		this.parent	= parent;

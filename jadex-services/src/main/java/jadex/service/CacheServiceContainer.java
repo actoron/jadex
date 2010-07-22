@@ -3,12 +3,12 @@ package jadex.service;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.Tuple;
-import jadex.commons.collection.LRU;
+import jadex.commons.collection.Cache;
+import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
+import jadex.service.clock.IClockService;
 
 import java.util.Collection;
-import java.util.Iterator;
-import java.util.Map;
 
 /**
  *  Service container that uses caching for fast service access.
@@ -21,7 +21,10 @@ public class CacheServiceContainer	implements IServiceContainer
 	protected IServiceContainer container;
 	
 	/** The LRU storing the last searches. */
-	protected Map	cache;
+	protected Cache cache;
+	
+	/** The clock service. */
+	protected IClockService clock;
 	
 	//-------- constructors --------
 
@@ -30,8 +33,16 @@ public class CacheServiceContainer	implements IServiceContainer
 	 */
 	public CacheServiceContainer(IServiceContainer container)
 	{
+		this(container, 25, -1);
+	}
+	
+	/**
+	 *  Create a new service container.
+	 */
+	public CacheServiceContainer(IServiceContainer container, int max, long ttl)
+	{
 		this.container = container;
-		this.cache	= new LRU(25);
+		this.cache	= new Cache(max, ttl);
 	}
 	
 	//-------- methods --------
@@ -41,92 +52,88 @@ public class CacheServiceContainer	implements IServiceContainer
 	 *  @param type The class.
 	 *  @return The corresponding services.
 	 */
-	public IFuture getServices(ISearchManager manager, final IVisitDecider decider, final IResultSelector selector)
+	public IFuture getServices(final ISearchManager manager, final IVisitDecider decider, final IResultSelector selector)
 	{
 		final Future ret = new Future();
 		
 		final Tuple key = manager.getCacheKey()!=null && decider.getCacheKey()!=null && selector.getCacheKey()!=null
 			? new Tuple(manager.getCacheKey(), decider.getCacheKey(), selector.getCacheKey()) : null;
 		
-		Object	result	= null;
-		boolean	hit	= false;
-		
-		if(key!=null)
+		synchronized(cache)
 		{
-			synchronized(cache)
-			{
-				if(cache.containsKey(key))
-				{
-					result	= cache.get(key);
-					
-					boolean valid = true;
-					
-					if(result instanceof IService)
-					{
-						valid = ((IService)result).isValid();
-					}
-					else if(result instanceof Collection)
-					{
-						Collection coll = (Collection)result;
-						IService[] sers = (IService[])coll.toArray(new IService[((Collection)result).size()]);
-						
-						// Check if all results are still ok.
-						boolean invalid = false;
-						for(int i=0; i<sers.length && !invalid; i++)
-						{
-							if(!sers[i].isValid())
-							{
-								// if one is invalid whole result is invalid
-								valid = false;
-							}
-						}
-					}
-					else if(result==null)
-					{
-						valid = false;
-					}
-					else
-					{
-						throw new RuntimeException("Unknown service type.");
-					}
+			Object data = null;
+			
+			// todo: currently services of unfinished containers can be searched
+			// should be strict and a container should exposed only when running.
+//			if(clock==null)
+//				System.out.println("no clock: "+getId());
+			
+			final long now = clock!=null && clock.isValid()? clock.getTime(): -1;
+			
+			// In case the clock if not available caching will not be used
+			// till it is available.
+			if(now!=-1 && key!=null && cache.containsKey(key))
+			{	
+				data = cache.get(key, now);
 				
-					if(valid)
-					{
-						hit = true;
-					}
-					else
+				if(data instanceof IService)
+				{
+					if(!((IService)data).isValid())
 					{
 						cache.remove(key);
+						data = null;
 					}
 				}
-			}
-		}
-
-		if(hit)
-		{
-			ret.setResult(result);			
-		}
-		else
-		{
-			container.getServices(manager, decider, selector).addResultListener(new IResultListener()
-			{
-				public void resultAvailable(Object source, Object result)
+				else if(data instanceof Collection)
 				{
-					if(key!=null)
+					Collection coll = (Collection)data;
+					IService[] sers = (IService[])coll.toArray(new IService[((Collection)data).size()]);
+					
+					// Check if all results are still ok.
+					boolean invalid = false;
+					for(int i=0; data!=null && i<sers.length; i++)
 					{
-						synchronized(cache)
+						if(!sers[i].isValid())
 						{
-							cache.put(key, result);							
+							// if one is invalid whole result is invalid
+							cache.remove(key);
+							data = null;
 						}
 					}
-					ret.setResult(result);
 				}
-				
-				public void exceptionOccurred(Object source, Exception exception)
+				else if(data!=null)
 				{
-					ret.setException(exception);
+					ret.setException(new RuntimeException("Unknown service type: "+data));
+					return ret;
 				}
-			});
+			}
+			
+			if(data!=null)
+			{
+				ret.setResult(data);			
+			}
+			else
+			{
+				container.getServices(manager, decider, selector).addResultListener(new IResultListener()
+				{
+					public void resultAvailable(Object source, Object result)
+					{	
+						if(key!=null)
+						{
+							synchronized(cache)
+							{
+								cache.put(key, result, now);							
+							}
+						}
+						ret.setResult(result);
+					}
+					
+					public void exceptionOccurred(Object source, Exception exception)
+					{
+						ret.setException(exception);
+					}
+				});
+			}
 		}
 
 		return ret;
@@ -165,7 +172,28 @@ public class CacheServiceContainer	implements IServiceContainer
 	 */
 	public IFuture start()
 	{
-		return container.start();
+		final Future ret = new Future();
+		
+//		System.out.println("search clock: "+getId());
+		SServiceProvider.getServiceUpwards(container, IClockService.class).addResultListener(new IResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				clock = (IClockService)result;
+//				System.out.println("Has clock: "+getId());
+				
+				// Services may need other services and thus need to be able to search
+				// the container.
+				container.start().addResultListener(new DelegationResultListener(ret));
+			}
+			
+			public void exceptionOccurred(Object source, Exception exception)
+			{
+				ret.setException(exception);
+			}
+		});
+		
+		return ret;
 	}
 	
 	/**

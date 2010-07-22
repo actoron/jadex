@@ -7,6 +7,7 @@ import jadex.commons.ICommand;
 import jadex.commons.IFuture;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.DefaultResultListener;
+import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.IThreadPool;
 import jadex.service.BasicService;
 import jadex.service.IServiceContainer;
@@ -122,69 +123,77 @@ public class SimulationService extends BasicService implements ISimulationServic
 	/**
 	 *  Start (and run) the execution. 
 	 */
-	public IFuture	startService()
+	public synchronized IFuture	startService()
 	{
-		super.startService();
-		// todo: what to do with super future?
-		
 		final Future	ret	= new Future();
 		
-		final boolean[]	services	= new boolean[2];
+		super.startService().addResultListener(new IResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				final boolean[]	services	= new boolean[2];
 
-		SServiceProvider.getService(container, IExecutionService.class).addResultListener(new DefaultResultListener()
-		{
-			public void resultAvailable(Object source, Object result)
-			{
-				exeservice = (IExecutionService)result;
-				boolean	setresult;
-				synchronized(services)
+				SServiceProvider.getService(container, IExecutionService.class).addResultListener(new DefaultResultListener()
 				{
-					services[0]	= true;
-					setresult	= services[0] && services[1];
-				}
-				if(setresult)
-					ret.setResult(null);
-			}
-		});
-				
-		SServiceProvider.getService(container, IClockService.class).addResultListener(new DefaultResultListener()
-		{
-			public void resultAvailable(Object source, Object result)
-			{
-				clockservice = (IClockService)result;
-				String type = clockservice.getClockType();
-		
-				if(IClock.TYPE_EVENT_DRIVEN.equals(type)
-					|| IClock.TYPE_TIME_DRIVEN.equals(type))
-				{
-					getExecutorService().addIdleCommand(simcommand);
-				}
-	
-				boolean dorun = false;
-				synchronized(this)
-				{
-					setMode(MODE_NORMAL);
-					setExecuting(true);
-					if(!running)
+					public void resultAvailable(Object source, Object result)
 					{
-						dorun = true;
-						running = true;
+						exeservice = (IExecutionService)result;
+						boolean	setresult;
+						synchronized(services)
+						{
+							services[0]	= true;
+							setresult	= services[0] && services[1];
+						}
+						if(setresult)
+							ret.setResult(SimulationService.this);
 					}
-				}
-				
-				if(dorun)
-					getClockService().start();
-					
-				getExecutorService().startService();
-
-				boolean	setresult;
-				synchronized(services)
+				});
+						
+				SServiceProvider.getService(container, IClockService.class).addResultListener(new DefaultResultListener()
 				{
-					services[1]	= true;
-					setresult	= services[0] && services[1];
-				}
-				if(setresult)
-					ret.setResult(null);
+					public void resultAvailable(Object source, Object result)
+					{
+						clockservice = (IClockService)result;
+						String type = clockservice.getClockType();
+				
+						if(IClock.TYPE_EVENT_DRIVEN.equals(type)
+							|| IClock.TYPE_TIME_DRIVEN.equals(type))
+						{
+							getExecutorService().addIdleCommand(simcommand);
+						}
+			
+						boolean dorun = false;
+						synchronized(this)
+						{
+							setMode(MODE_NORMAL);
+							setExecuting(true);
+							if(!running)
+							{
+								dorun = true;
+								running = true;
+							}
+						}
+						
+						if(dorun)
+							getClockService().start();
+							
+						getExecutorService().startService();
+
+						boolean	setresult;
+						synchronized(services)
+						{
+							services[1]	= true;
+							setresult	= services[0] && services[1];
+						}
+						if(setresult)
+							ret.setResult(SimulationService.this);
+					}
+				});
+			}
+			
+			public void exceptionOccurred(Object source, Exception exception)
+			{
+				ret.setException(exception);
 			}
 		});
 

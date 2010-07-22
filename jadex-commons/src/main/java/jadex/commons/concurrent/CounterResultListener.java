@@ -69,5 +69,23 @@ public abstract class CounterResultListener implements IResultListener
 	public void intermediateResultAvailable(Object source, Object result)
 	{
 	}
+
+	/**
+	 *  Get the number.
+	 *  @return The number.
+	 */
+	public int getNumber()
+	{
+		return num;
+	}
+
+	/**
+	 *  Get the cnt.
+	 *  @return The cnt.
+	 */
+	public int getCnt()
+	{
+		return cnt;
+	}
 	
 }

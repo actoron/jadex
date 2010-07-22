@@ -18,6 +18,9 @@ public class SServiceProvider
 	/** The sequential search manager that searches only upwards. */
 	protected static ISearchManager upwardsmanager = new SequentialSearchManager(true, false);
 
+	/** The sequential search manager that searches only locally. */
+	protected static ISearchManager localmanager = new LocalSearchManager();
+	
 	/** The vsist decider that stops searching after one result has been found. */
 	protected static IVisitDecider abortdecider = new DefaultVisitDecider();
 
@@ -114,5 +117,35 @@ public class SServiceProvider
 //			profiling.put(type, new Integer(cnt!=null ? cnt.intValue()+1 : 1)); 
 //		}
 		return provider.getServices(upwardsmanager, abortdecider, new TypeResultSelector(type));
+	}
+	
+	/**
+	 *  Get the declared service of a type and only search the current provider.
+	 *  @param type The class.
+	 *  @return The corresponding service.
+	 */
+	public static IFuture getDeclaredService(IServiceProvider provider, Class type)
+	{
+//		synchronized(profiling)
+//		{
+//			Integer	cnt	= (Integer)profiling.get(type);
+//			profiling.put(type, new Integer(cnt!=null ? cnt.intValue()+1 : 1)); 
+//		}
+		return provider.getServices(localmanager, abortdecider, new TypeResultSelector(type));
+	}
+	
+	/**
+	 *  Get the declared services of a type and only search the current provider.
+	 *  @param type The class.
+	 *  @return The corresponding services.
+	 */
+	public static IFuture getDeclaredServices(IServiceProvider provider, Class type)
+	{
+//		synchronized(profiling)
+//		{
+//			Integer	cnt	= (Integer)profiling.get(type);
+//			profiling.put(type, new Integer(cnt!=null ? cnt.intValue()+1 : 1)); 
+//		}
+		return provider.getServices(upwardsmanager, contdecider, new TypeResultSelector(type));
 	}
 }
