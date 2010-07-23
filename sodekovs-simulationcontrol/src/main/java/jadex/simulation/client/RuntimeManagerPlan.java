@@ -63,10 +63,11 @@ public class RuntimeManagerPlan extends Plan {
 		SimulationConfiguration simConf = (SimulationConfiguration) simFacts.get(Constants.SIMULATION_FACTS_FOR_CLIENT);
 		String experimentID = (String) simFacts.get(Constants.EXPERIMENT_ID);
 		double parameterSweepValue = simConf.getOptimization().getParameterSweeping().getCurrentValue();
-//		String parameterSweepName = simConf.getOptimization().getData().getName();
+		// String parameterSweepName =
+		// simConf.getOptimization().getData().getName();
 
-//		testSend(simConf);
-		
+		// testSend(simConf);
+
 		System.out.println("#Client# Started CLIENT Simulation run....: " + simConf.getName() + " - " + experimentID + ", currentVal: " + parameterSweepValue);
 
 		// Get Space
@@ -99,7 +100,7 @@ public class RuntimeManagerPlan extends Plan {
 			} else {
 				System.err.println("#RunTimeManagerPlan# Time type missing " + simConf);
 			}
-			System.out.println("#TERMINATION TIME: # "+ terminationTime );
+			System.out.println("#TERMINATION TIME: # " + terminationTime);
 			if (terminationTime.longValue() > -1) {
 				waitFor(terminationTime);
 			} else {
@@ -117,7 +118,7 @@ public class RuntimeManagerPlan extends Plan {
 				waitFor(1000);
 
 				// Hack:
-//				vis.update();
+				// vis.update();
 
 				// Hack: Works right now only for single objects but not for all
 				// of that type...
@@ -160,16 +161,18 @@ public class RuntimeManagerPlan extends Plan {
 		}
 
 		// Get Observed Events from space
-//		space.getDataProvider("dd").get
-		
+		// space.getDataProvider("dd").get
+
 		// IServiceContainer container =
 		// getExternalAccess().getServiceContainer();
 		// DeltaTimeExecutor4Simulation simServ = (DeltaTimeExecutor4Simulation)
 		// container.getService(DeltaTimeExecutor4Simulation.class);
 		// ConcurrentHashMap<Long, ArrayList<ObservedEvent>> results =
 		// simServ.getAllObservedValues();
-//		ConcurrentHashMap<Long, ArrayList<ObservedEvent>> results = (ConcurrentHashMap<Long, ArrayList<ObservedEvent>>) space.getProperty("observedEvents");
-		ConcurrentHashMap<Long, ArrayList<ObservedEvent>> results = getResult(space);		
+		// ConcurrentHashMap<Long, ArrayList<ObservedEvent>> results =
+		// (ConcurrentHashMap<Long, ArrayList<ObservedEvent>>)
+		// space.getProperty("observedEvents");
+		ConcurrentHashMap<Long, ArrayList<ObservedEvent>> results = getResult(space);
 
 		// Stop Siumlation when target condition true.
 		// IServiceContainer container =
@@ -201,15 +204,17 @@ public class RuntimeManagerPlan extends Plan {
 	private void sendResult(ConcurrentHashMap<Long, ArrayList<ObservedEvent>> observedEvents) {
 		Map facts = (Map) getBeliefbase().getBelief("simulationFacts").getFact();
 		facts.put(Constants.EXPERIMENT_END_TIME, new Long(getCurrentTime()));
-		//Serialize SimulationConfiguration to enable sending
-//		SimulationConfiguration simConfig = (SimulationConfiguration) facts.get(Constants.SIMULATION_FACTS_FOR_CLIENT);
-		//does not need to be send back
+		// Serialize SimulationConfiguration to enable sending
+		// SimulationConfiguration simConfig = (SimulationConfiguration)
+		// facts.get(Constants.SIMULATION_FACTS_FOR_CLIENT);
+		// does not need to be send back
 		facts.remove(Constants.SIMULATION_FACTS_FOR_CLIENT);
-//		facts.put(Constants.SIMULATION_FACTS_FOR_CLIENT, XMLHandler.writeXMLToString(facts.get(Constants.SIMULATION_FACTS_FOR_CLIENT), SimulationConfiguration.class));
+		// facts.put(Constants.SIMULATION_FACTS_FOR_CLIENT,
+		// XMLHandler.writeXMLToString(facts.get(Constants.SIMULATION_FACTS_FOR_CLIENT),
+		// SimulationConfiguration.class));
 
-		
-		//Hack:
-//		facts.put(Constants.SIMULATION_FACTS_FOR_CLIENT, null);
+		// Hack:
+		// facts.put(Constants.SIMULATION_FACTS_FOR_CLIENT, null);
 		// Get the map of observed events from the beliefbase
 		// HashMap observedEvents = (HashMap)
 		// getBeliefbase().getBelief(Constants.OBSERVED_EVENTS_MAP).getFact();
@@ -276,7 +281,7 @@ public class RuntimeManagerPlan extends Plan {
 		space.setProperty("REAL_START_TIME_OF_SIMULATION", startTime);
 		// This is a hack for this special application.xml
 		space.getSpaceObjectsByType("homebase")[0].setProperty("start_time", startTime);
-		
+
 		// Hack: This should happen when application is initialized and before
 		// is starts --> when it is suspended
 		addDataConsumerAndProvider(simConf);
@@ -331,9 +336,9 @@ public class RuntimeManagerPlan extends Plan {
 					String objecttype = source.getObjecttype();
 					boolean aggregate = source.isAggregate() == null ? false : source.isAggregate();
 					IParsedExpression dataexp = getParsedExpression(source.getContent(), parser);
-					//Hack: Includeconditon is not implemented, yet.
-					IParsedExpression includeexp = null; 
-					provs[j] = new SpaceObjectSource(varname, space, objecttype, aggregate, dataexp, includeexp);													
+					// Hack: Includeconditon is not implemented, yet.
+					IParsedExpression includeexp = null;
+					provs[j] = new SpaceObjectSource(varname, space, objecttype, aggregate, dataexp, includeexp);
 				}
 
 				String tablename = providers.get(i).getName();
@@ -343,7 +348,7 @@ public class RuntimeManagerPlan extends Plan {
 				for (int j = 0; j < subdatas.size(); j++) {
 					Data subdata = subdatas.get(j);
 					columnnames[j] = subdata.getName();
-					exps[j] = getParsedExpression((String)subdata.getContent().get(0), parser);
+					exps[j] = getParsedExpression((String) subdata.getContent().get(0), parser);
 				}
 
 				ITableDataProvider tprov = new DefaultDataProvider(space, provs, tablename, columnnames, exps);
@@ -364,20 +369,8 @@ public class RuntimeManagerPlan extends Plan {
 				// "clazz");
 				Class clazz = null;
 				try {
-					clazz = SReflect.findClass(dcon.getClazz(), toStringArray((ArrayList<String>) simConf.getImports().getImport()), ((ILibraryService) space.getContext().getServiceContainer().getService(ILibraryService.class))
-							.getClassLoader());
-					// clazz =
-					// SUtil.class.getClassLoader().loadClass(tokenizer.nextToken().trim());
-					// clazz =
-					// SUtil.class.getClassLoader().loadClass(dcon.getClazz());
-					// clazz
-					// =((ILibraryService)space.getContext().getServiceContainer().getService(ILibraryService.class)).getClassLoader().loadClass(dcon.getClazz());
-					// clazz
-					// =((IContext)space.getContext()).getClassLoader().loadClass(dcon.getClazz());
-					// clazz =
-					// Class.forName(dcon.getClazz());//jadex.application.space.envsupport.evaluation.XYChartDataConsumer
-					// clazz =
-					// Class.forName("jadex.application.space.envsupport.evaluation.XYChartDataConsumer");
+					clazz = SReflect.findClass(dcon.getClazz(), toStringArray((ArrayList<String>) simConf.getImports().getImport()), ((ILibraryService) space.getContext().getServiceContainer()
+							.getService(ILibraryService.class)).getClassLoader());
 				} catch (ClassNotFoundException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -423,36 +416,40 @@ public class RuntimeManagerPlan extends Plan {
 	 * @return
 	 */
 	private IParsedExpression getParsedExpression(String expression, IExpressionParser parser) {
-		//Hack: ***
-		if(expression == null || expression.length() == 0)
+		// Hack: ***
+		if (expression == null || expression.length() == 0)
 			return null;
-		//***
-		
-//		return expression == null ? null : parser.parseExpression(expression, null, null, null);
+		// ***
+
+		// return expression == null ? null : parser.parseExpression(expression,
+		// null, null, null);
 		return parser.parseExpression(expression, null, null, null);
 	}
 
 	/**
-	 * Returns the observedEvents from the SimulationDataConsumer
-	 * Hack: Can only process one SimualtioDataConsumer, i.e. it returns the events from the FIRST SimulatioDataConsumer
+	 * Returns the observedEvents from the SimulationDataConsumer Hack: Can only
+	 * process one SimualtioDataConsumer, i.e. it returns the events from the
+	 * FIRST SimulatioDataConsumer
+	 * 
 	 * @param space
 	 * @return
 	 */
-	private ConcurrentHashMap<Long, ArrayList<ObservedEvent>> getResult(AbstractEnvironmentSpace space){
+	private ConcurrentHashMap<Long, ArrayList<ObservedEvent>> getResult(AbstractEnvironmentSpace space) {
 		Collection collection = space.getDataConsumers();
-		
+
 		Iterator itr = collection.iterator();
-		
-		while(itr.hasNext()){		
+
+		while (itr.hasNext()) {
 			Object con = itr.next();
-//			ITableDataConsumer con = (ITableDataConsumer) itr.next();
-//			System.out.println("#consumers# "  + con.getPropertyNames().size());
-			if(con instanceof SimulationDataConsumer)
+			// ITableDataConsumer con = (ITableDataConsumer) itr.next();
+			// System.out.println("#consumers# " +
+			// con.getPropertyNames().size());
+			if (con instanceof SimulationDataConsumer)
 				return ((SimulationDataConsumer) con).getResults();
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Compute Termination: Input: Mode=0 ->relative Time; Mode=1 ->absolute
 	 * Time
@@ -503,16 +500,16 @@ public class RuntimeManagerPlan extends Plan {
 
 		return array;
 	}
-	
-	private void testSend(SimulationConfiguration simConf){
+
+	private void testSend(SimulationConfiguration simConf) {
 		Map facts = new HashMap();
-		
+
 		facts.put(Constants.EXPERIMENT_END_TIME, new Long(getCurrentTime()));
-facts.put(Constants.SIMULATION_CONFIGURATION, simConf);
+		facts.put(Constants.SIMULATION_CONFIGURATION, simConf);
 		// Get the map of observed events from the beliefbase
 		// HashMap observedEvents = (HashMap)
 		// getBeliefbase().getBelief(Constants.OBSERVED_EVENTS_MAP).getFact();
-//		facts.put(Constants.OBSERVED_EVENTS_MAP, observedEvents);
+		// facts.put(Constants.OBSERVED_EVENTS_MAP, observedEvents);
 
 		IComponentIdentifier[] receivers = new IComponentIdentifier[1];
 		receivers[0] = getMasterAgent();
