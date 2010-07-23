@@ -43,7 +43,7 @@ public class ComputeExperimentRowResultsPlan extends Plan {
 			result.setRowsResults(new ArrayList(rowResults.values()));
 
 			System.out.println("#ComputeExperimentRowResultsPlan# Simulation finished. Write Res of Simulation to XML!");
-			XMLHandler.writeXML(result, "SimRes" + result.getStarttime() + ".xml", SimulationResult.class);
+			XMLHandler.writeXMLToFile(result, "SimRes" + result.getStarttime() + ".xml", SimulationResult.class);
 
 			doShortEvaluation(rowResults, "Final");
 

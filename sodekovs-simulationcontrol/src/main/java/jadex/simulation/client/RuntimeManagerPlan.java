@@ -5,7 +5,6 @@ import jadex.application.space.envsupport.MEnvSpaceInstance;
 import jadex.application.space.envsupport.environment.AbstractEnvironmentSpace;
 import jadex.application.space.envsupport.environment.space2d.ContinuousSpace2D;
 import jadex.application.space.envsupport.evaluation.AbstractChartDataConsumer;
-import jadex.application.space.envsupport.evaluation.CSVFileDataConsumer;
 import jadex.application.space.envsupport.evaluation.DefaultDataProvider;
 import jadex.application.space.envsupport.evaluation.IObjectSource;
 import jadex.application.space.envsupport.evaluation.ITableDataConsumer;
@@ -37,6 +36,7 @@ import jadex.simulation.helper.AgentMethods;
 import jadex.simulation.helper.Constants;
 import jadex.simulation.helper.EvaluateExpression;
 import jadex.simulation.helper.TimeConverter;
+import jadex.simulation.helper.XMLHandler;
 import jadex.simulation.model.Data;
 import jadex.simulation.model.Dataconsumer;
 import jadex.simulation.model.Dataprovider;
@@ -45,6 +45,7 @@ import jadex.simulation.model.SimulationConfiguration;
 import jadex.simulation.model.Source;
 import jadex.simulation.model.TargetFunction;
 import jadex.simulation.model.Time;
+import jadex.simulation.tmp.Main;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -61,9 +62,11 @@ public class RuntimeManagerPlan extends Plan {
 		HashMap simFacts = (HashMap) getBeliefbase().getBelief("simulationFacts").getFact();
 		SimulationConfiguration simConf = (SimulationConfiguration) simFacts.get(Constants.SIMULATION_FACTS_FOR_CLIENT);
 		String experimentID = (String) simFacts.get(Constants.EXPERIMENT_ID);
-		int parameterSweepValue = simConf.getOptimization().getParameterSweeping().getCurrentValue();
-		String parameterSweepName = simConf.getOptimization().getData().getName();
+		double parameterSweepValue = simConf.getOptimization().getParameterSweeping().getCurrentValue();
+//		String parameterSweepName = simConf.getOptimization().getData().getName();
 
+//		testSend(simConf);
+		
 		System.out.println("#Client# Started CLIENT Simulation run....: " + simConf.getName() + " - " + experimentID + ", currentVal: " + parameterSweepValue);
 
 		// Get Space
@@ -157,6 +160,8 @@ public class RuntimeManagerPlan extends Plan {
 		}
 
 		// Get Observed Events from space
+//		space.getDataProvider("dd").get
+		
 		// IServiceContainer container =
 		// getExternalAccess().getServiceContainer();
 		// DeltaTimeExecutor4Simulation simServ = (DeltaTimeExecutor4Simulation)
@@ -178,20 +183,6 @@ public class RuntimeManagerPlan extends Plan {
 		// waitFor(5000);
 		// simServ.start();
 		// exeServ.start();
-		
-//		//TMP:
-//		Collection collection = space.getDataConsumers();
-//		
-//		Iterator itr = collection.iterator();
-//		
-//		while(itr.hasNext()){		
-//			ITableDataConsumer con = (ITableDataConsumer) itr.next();
-//			System.out.println("#consumers# "  + con.getPropertyNames().size());
-//			if(con instanceof CSVFileDataConsumer)
-//				((CSVFileDataConsumer) con).close();
-//		}
-//		
-		 
 
 		sendResult(results);
 		// simServ.start();
@@ -210,7 +201,15 @@ public class RuntimeManagerPlan extends Plan {
 	private void sendResult(ConcurrentHashMap<Long, ArrayList<ObservedEvent>> observedEvents) {
 		Map facts = (Map) getBeliefbase().getBelief("simulationFacts").getFact();
 		facts.put(Constants.EXPERIMENT_END_TIME, new Long(getCurrentTime()));
+		//Serialize SimulationConfiguration to enable sending
+//		SimulationConfiguration simConfig = (SimulationConfiguration) facts.get(Constants.SIMULATION_FACTS_FOR_CLIENT);
+		//does not need to be send back
+		facts.remove(Constants.SIMULATION_FACTS_FOR_CLIENT);
+//		facts.put(Constants.SIMULATION_FACTS_FOR_CLIENT, XMLHandler.writeXMLToString(facts.get(Constants.SIMULATION_FACTS_FOR_CLIENT), SimulationConfiguration.class));
 
+		
+		//Hack:
+//		facts.put(Constants.SIMULATION_FACTS_FOR_CLIENT, null);
 		// Get the map of observed events from the beliefbase
 		// HashMap observedEvents = (HashMap)
 		// getBeliefbase().getBelief(Constants.OBSERVED_EVENTS_MAP).getFact();
@@ -310,7 +309,7 @@ public class RuntimeManagerPlan extends Plan {
 		IExpressionParser parser = new JavaCCExpressionParser();
 
 		// add new data provider
-		List<Dataprovider> providers = simConf.getDataproviderList();
+		List<Dataprovider> providers = simConf.getDataproviders().getDataprovider();
 		// List tmp = si.getPropertyList("dataproviders");
 
 		// if(providers==null && tmp!=null)
@@ -324,28 +323,27 @@ public class RuntimeManagerPlan extends Plan {
 			for (int i = 0; i < providers.size(); i++) {
 				// Map dcol = (Map)providers.get(i);
 
-				List<Source> sources = providers.get(i).getSourceList();
+				List<Source> sources = providers.get(i).getSource();
 				IObjectSource[] provs = new IObjectSource[sources.size()];
 				for (int j = 0; j < sources.size(); j++) {
 					Source source = sources.get(j);
 					String varname = source.getName() != null ? source.getName() : "$object";
 					String objecttype = source.getObjecttype();
-					boolean aggregate = source.isAggregate();
-					// IParsedExpression dataexp =
-					// getParsedExpression(source.getValue(), parser);
-					IParsedExpression dataexp = null;
-					IParsedExpression includeexp = getParsedExpression(source.getIncludecondition(), parser);// 
-					provs[j] = new SpaceObjectSource(varname, space, objecttype, aggregate, dataexp, includeexp);
+					boolean aggregate = source.isAggregate() == null ? false : source.isAggregate();
+					IParsedExpression dataexp = getParsedExpression(source.getContent(), parser);
+					//Hack: Includeconditon is not implemented, yet.
+					IParsedExpression includeexp = null; 
+					provs[j] = new SpaceObjectSource(varname, space, objecttype, aggregate, dataexp, includeexp);													
 				}
 
 				String tablename = providers.get(i).getName();
-				List<Data> subdatas = providers.get(i).getDataList();
+				List<Data> subdatas = providers.get(i).getData();
 				String[] columnnames = new String[subdatas.size()];
 				IParsedExpression[] exps = new IParsedExpression[subdatas.size()];
 				for (int j = 0; j < subdatas.size(); j++) {
 					Data subdata = subdatas.get(j);
 					columnnames[j] = subdata.getName();
-					exps[j] = getParsedExpression(subdata.getValue(), parser);
+					exps[j] = getParsedExpression((String)subdata.getContent().get(0), parser);
 				}
 
 				ITableDataProvider tprov = new DefaultDataProvider(space, provs, tablename, columnnames, exps);
@@ -354,7 +352,7 @@ public class RuntimeManagerPlan extends Plan {
 		}
 
 		// Create the data consumers.
-		List<Dataconsumer> consumers = simConf.getDataconsumerList();
+		List<Dataconsumer> consumers = simConf.getDataconsumers().getDataconsumer();
 
 		// System.out.println("data consumers: "+consumers);
 		if (consumers != null) {
@@ -366,7 +364,7 @@ public class RuntimeManagerPlan extends Plan {
 				// "clazz");
 				Class clazz = null;
 				try {
-					clazz = SReflect.findClass(dcon.getClazz(), toStringArray(simConf.getImportList()), ((ILibraryService) space.getContext().getServiceContainer().getService(ILibraryService.class))
+					clazz = SReflect.findClass(dcon.getClazz(), toStringArray((ArrayList<String>) simConf.getImports().getImport()), ((ILibraryService) space.getContext().getServiceContainer().getService(ILibraryService.class))
 							.getClassLoader());
 					// clazz =
 					// SUtil.class.getClassLoader().loadClass(tokenizer.nextToken().trim());
@@ -396,15 +394,15 @@ public class RuntimeManagerPlan extends Plan {
 				}
 				// List of Hashmaps with dynamic=false
 				List<Map> tmpPropertyList = new ArrayList<Map>();
-				for (int j = 0; j < dcon.getPropertyList().size(); j++) {
+				for (int j = 0; j < dcon.getProperty().size(); j++) {
 					Map map = new HashMap();
 					map.put("dynamic", false);
-					map.put("name", dcon.getPropertyList().get(j).getName());
+					map.put("name", dcon.getProperty().get(j).getName());
 					// map.put("value",
 					// dcon.getPropertyList().get(j).getValue());
 					// Hack: has to be "initially" an expression that can be
 					// parsed
-					map.put("value", getParsedExpression("\"" + dcon.getPropertyList().get(j).getValue() + "\"", parser));
+					map.put("value", getParsedExpression(dcon.getProperty().get(j).getContent(), parser));
 					tmpPropertyList.add(map);
 				}
 				// MEnvSpaceInstance.setProperties(con,
@@ -425,9 +423,15 @@ public class RuntimeManagerPlan extends Plan {
 	 * @return
 	 */
 	private IParsedExpression getParsedExpression(String expression, IExpressionParser parser) {
-		return expression == null ? null : parser.parseExpression(expression, null, null, null);
+		//Hack: ***
+		if(expression == null || expression.length() == 0)
+			return null;
+		//***
+		
+//		return expression == null ? null : parser.parseExpression(expression, null, null, null);
+		return parser.parseExpression(expression, null, null, null);
 	}
-	
+
 	/**
 	 * Returns the observedEvents from the SimulationDataConsumer
 	 * Hack: Can only process one SimualtioDataConsumer, i.e. it returns the events from the FIRST SimulatioDataConsumer
@@ -448,7 +452,7 @@ public class RuntimeManagerPlan extends Plan {
 		}
 		return null;
 	}
-
+	
 	/**
 	 * Compute Termination: Input: Mode=0 ->relative Time; Mode=1 ->absolute
 	 * Time
@@ -498,5 +502,32 @@ public class RuntimeManagerPlan extends Plan {
 		}
 
 		return array;
+	}
+	
+	private void testSend(SimulationConfiguration simConf){
+		Map facts = new HashMap();
+		
+		facts.put(Constants.EXPERIMENT_END_TIME, new Long(getCurrentTime()));
+facts.put(Constants.SIMULATION_CONFIGURATION, simConf);
+		// Get the map of observed events from the beliefbase
+		// HashMap observedEvents = (HashMap)
+		// getBeliefbase().getBelief(Constants.OBSERVED_EVENTS_MAP).getFact();
+//		facts.put(Constants.OBSERVED_EVENTS_MAP, observedEvents);
+
+		IComponentIdentifier[] receivers = new IComponentIdentifier[1];
+		receivers[0] = getMasterAgent();
+
+		System.out.println("Now sending result message to " + receivers[0]);
+
+		// Send message
+		IMessageEvent inform = createMessageEvent("inform_master_agent");
+		inform.getParameterSet(SFipa.RECEIVERS).addValue(receivers[0]);
+		inform.getParameter(SFipa.CONTENT).setValue(facts);
+
+		try {
+			sendMessage(inform);
+		} catch (Exception e) {
+			System.out.println("#RuntimeManagerPlan# Error on sending result message to Master Simulation Manager");
+		}
 	}
 }

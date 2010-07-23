@@ -1,6 +1,8 @@
 package jadex.simulation.controlcenter;
 
 import jadex.bdi.runtime.IBDIExternalAccess;
+import jadex.simulation.model.Dataconsumer;
+import jadex.simulation.model.Dataprovider;
 import jadex.simulation.model.Observer;
 import jadex.simulation.model.SimulationConfiguration;
 import jadex.simulation.model.result.IntermediateResult;
@@ -201,10 +203,10 @@ public class ControlCenter extends JFrame {
 
 		String[] columnNames = { "Name", "ObjectType", "ObjectName",
 				"ElementName", "EvaluationMode", "FilterMode" };
-		Object[][] data = new Object[simConf.getObserverList().size()][6];
+		Object[][] data = new Object[simConf.getDataproviders().getDataprovider().size()][6];
 
-		for (int i = 0; i < simConf.getObserverList().size(); i++) {
-			Observer obs = simConf.getObserverList().get(i);
+		for (int i = 0; i < simConf.getDataproviders().getDataprovider().size(); i++) {
+			Dataprovider obs = simConf.getDataproviders().getDataprovider().get(i);
 
 			// JPanel tmp = new JPanel(new FlowLayout());
 			// JLabel name = new JLabel("Name: " + obs.getData().getName());
@@ -220,13 +222,14 @@ public class ControlCenter extends JFrame {
 			// obs.getFilter().getMode());
 
 			// do for table:
-
-			data[i][0] = obs.getData().getName();
-			data[i][1] = obs.getData().getObjectSource().getType();
-			data[i][2] = obs.getData().getObjectSource().getName();
-			data[i][3] = obs.getData().getElementSource().getName();
-			data[i][4] = obs.getEvaluation().getMode();
-			data[i][5] = obs.getFilter().getMode();
+//Hack: change from old "observer" structure to new dataconsumer
+			//Hack: example is not 100% correct
+			data[i][0] = obs.getName();
+			data[i][1] = obs.getSource().get(0).getObjecttype();
+			data[i][2] = obs.getSource().get(0).getName();
+			data[i][3] = obs.getSource().get(0).getSourcetype();
+			data[i][4] = obs.getSource().get(0).isAggregate();
+			data[i][5] = obs.getSource().get(0).isAggregate();
 
 			// add table to paek
 			// tmp.add(name);
@@ -278,7 +281,7 @@ public class ControlCenter extends JFrame {
 		JTable ensembleResultsTable = new JTable(ensembleResultsDm);
 		ensembleResultsTable.setPreferredScrollableViewportSize(new Dimension(
 				400, 40));
-		for (Observer obs : simConf.getObserverList()) {
+		for (Observer obs : simConf.getObservers().getObserver()) {
 			ensembleResultsDm.addRow(new Object[] { obs.getData().getName(),
 					"--", "--", "--" });
 		}

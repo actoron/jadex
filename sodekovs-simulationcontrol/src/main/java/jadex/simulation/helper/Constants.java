@@ -86,4 +86,8 @@ public class Constants {
 	public static final String OPTIMIZATION_TYPE_SPACE = "space";
 	// Use of a dedicated optimization algorithm
 	public static final String OPTIMIZATION_TYPE_ALGORITHM = "algorithm";
+	//The name of the class dedicated to consuming data for simulations
+	public static final String SIMULATION_DATA_CONSUMER = "SimulationDataConsumer";	
+	//The name of the element
+	public static final String DATAPROVIDER = "dataprovider";
 }

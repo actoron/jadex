@@ -12,7 +12,6 @@ import java.io.Serializable;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
@@ -28,9 +27,9 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element ref="{}ObjectSource"/>
+ *         &lt;element ref="{}Input"/>
+ *         &lt;element ref="{}Configuration"/>
  *       &lt;/sequence>
- *       &lt;attribute name="function" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -40,66 +39,67 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
-    "objectSource"
+    "input",
+    "configuration"
 })
-@XmlRootElement(name = "TargetFunction")
-public class TargetFunction implements Serializable{
+@XmlRootElement(name = "Algorithm")
+public class Algorithm implements Serializable{
 
     /**
 	 * 
 	 */
-	private static final long serialVersionUID = 8422172517398737935L;
-	@XmlElement(name = "ObjectSource", required = true)
-    protected ObjectSource objectSource;
-    @XmlAttribute(required = true)
-    protected String function;
+	private static final long serialVersionUID = 2043147048000975776L;
+	@XmlElement(name = "Input", required = true)
+    protected String input;
+    @XmlElement(name = "Configuration", required = true)
+    protected Configuration configuration;
 
     /**
-     * Gets the value of the objectSource property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link ObjectSource }
-     *     
-     */
-    public ObjectSource getObjectSource() {
-        return objectSource;
-    }
-
-    /**
-     * Sets the value of the objectSource property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link ObjectSource }
-     *     
-     */
-    public void setObjectSource(ObjectSource value) {
-        this.objectSource = value;
-    }
-
-    /**
-     * Gets the value of the function property.
+     * Gets the value of the input property.
      * 
      * @return
      *     possible object is
      *     {@link String }
      *     
      */
-    public String getFunction() {
-        return function;
+    public String getInput() {
+        return input;
     }
 
     /**
-     * Sets the value of the function property.
+     * Sets the value of the input property.
      * 
      * @param value
      *     allowed object is
      *     {@link String }
      *     
      */
-    public void setFunction(String value) {
-        this.function = value;
+    public void setInput(String value) {
+        this.input = value;
+    }
+
+    /**
+     * Gets the value of the configuration property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link Configuration }
+     *     
+     */
+    public Configuration getConfiguration() {
+        return configuration;
+    }
+
+    /**
+     * Sets the value of the configuration property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link Configuration }
+     *     
+     */
+    public void setConfiguration(Configuration value) {
+        this.configuration = value;
     }
 
 }

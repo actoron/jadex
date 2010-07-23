@@ -65,46 +65,7 @@
 	<plans>		<!--			Responsible for all aspects related to the run of the simulation,			especially to monitor the terminate condition.		-->
 		<plan name="runtime_manager">
 			<body class="RuntimeManagerPlan" />
-		</plan>
-
-		<!-- Init the Observer.-->
-		<plan name="init_observers">
-			<body class="InitApplicationObserverPlan" />
-		</plan>
-
-		<!-- Init the periodical observers. -->
-		<plan name="init_periodical_observers">
-			<parameter name="periodicalObserversList" class="List">
-				<goalmapping ref="InitPeriodicalObservers.periodicalObserversList" />
-			</parameter>
-			<body class="InitPeriodicalObserversPlan" />
-			<trigger>
-				<goal ref="InitPeriodicalObservers" />
-			</trigger>
-		</plan>
-
-		<!-- Init the onChange observers. -->
-		<plan name="init_on_change_observers">
-			<parameter name="onChangeObserversList" class="List">
-				<goalmapping ref="InitonChangeObservers.onChangeObserversList" />
-			</parameter>
-			<body class="InitOnChangeObserversPlan" />
-			<trigger>
-				<goal ref="InitOnChangeObservers" />
-			</trigger>
-		</plan>
-		
-		<!-- Init the periodical observers. -->
-		<plan name="start_periodical_observer">
-			<!-- <parameter name="periodicalObserversList" class="List">
-				<goalmapping ref="InitPeriodicalObservers.periodicalObserversList" />
-			</parameter> -->
-			<body class="StartPeriodicalObserverPlan" />
-			<trigger>
-				<internalevent ref="StartPeriodicalObserverEvent" />
-			</trigger>
-		</plan>
-		
+		</plan>		
 	</plans>
 
 	<events>
@@ -118,11 +79,6 @@
 				<value>SFipa.JADEX_XML</value>
 			</parameter>
 		</messageevent>
-
-		<!-- Event to trigger the start of a periodical observer-->
-		<internalevent name="StartPeriodicalObserverEvent">
-			<parameter name="observer" class="Observer" />
-		</internalevent>
 	</events>
 
 

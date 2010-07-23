@@ -12,7 +12,6 @@ import java.io.Serializable;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
@@ -28,9 +27,9 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element ref="{}ObjectSource"/>
+ *         &lt;element ref="{}Input"/>
+ *         &lt;element ref="{}Function"/>
  *       &lt;/sequence>
- *       &lt;attribute name="function" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -40,42 +39,43 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
-    "objectSource"
+    "input",
+    "function"
 })
-@XmlRootElement(name = "TargetFunction")
-public class TargetFunction implements Serializable{
+@XmlRootElement(name = "DataVisualization")
+public class DataVisualization implements Serializable{
 
     /**
 	 * 
 	 */
-	private static final long serialVersionUID = 8422172517398737935L;
-	@XmlElement(name = "ObjectSource", required = true)
-    protected ObjectSource objectSource;
-    @XmlAttribute(required = true)
-    protected String function;
+	private static final long serialVersionUID = 9171376268686541974L;
+	@XmlElement(name = "Input", required = true)
+    protected String input;
+    @XmlElement(name = "Function", required = true)
+    protected Function function;
 
     /**
-     * Gets the value of the objectSource property.
+     * Gets the value of the input property.
      * 
      * @return
      *     possible object is
-     *     {@link ObjectSource }
+     *     {@link String }
      *     
      */
-    public ObjectSource getObjectSource() {
-        return objectSource;
+    public String getInput() {
+        return input;
     }
 
     /**
-     * Sets the value of the objectSource property.
+     * Sets the value of the input property.
      * 
      * @param value
      *     allowed object is
-     *     {@link ObjectSource }
+     *     {@link String }
      *     
      */
-    public void setObjectSource(ObjectSource value) {
-        this.objectSource = value;
+    public void setInput(String value) {
+        this.input = value;
     }
 
     /**
@@ -83,10 +83,10 @@ public class TargetFunction implements Serializable{
      * 
      * @return
      *     possible object is
-     *     {@link String }
+     *     {@link Function }
      *     
      */
-    public String getFunction() {
+    public Function getFunction() {
         return function;
     }
 
@@ -95,10 +95,10 @@ public class TargetFunction implements Serializable{
      * 
      * @param value
      *     allowed object is
-     *     {@link String }
+     *     {@link Function }
      *     
      */
-    public void setFunction(String value) {
+    public void setFunction(Function value) {
         this.function = value;
     }
 

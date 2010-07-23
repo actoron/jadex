@@ -115,7 +115,7 @@ public class DeltaTimeExecutor4Simulation extends SimplePropertyObject implement
 
 		// needed for observation of simulation experiment
 //		final SimulationConfiguration simConf = (SimulationConfiguration) ((Map) space.getContext().getArguments().get("Simulation_Facts_For_Client")).get("Simulation_Facts_For_Client");
-//		final ArrayList<Observer> observerList = simConf.getObserverList();
+//		final ArrayList<Observer> observerList = (ArrayList<Observer>) simConf.getObservers().getObserver();
 
 		final IExecutable executable = new IExecutable() {
 			public boolean execute() {

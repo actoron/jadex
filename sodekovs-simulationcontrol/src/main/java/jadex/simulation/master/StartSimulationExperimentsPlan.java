@@ -22,6 +22,8 @@ import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 import jadex.service.library.ILibraryService;
 import jadex.simulation.helper.Constants;
+import jadex.simulation.helper.ObjectCloner;
+import jadex.simulation.helper.XMLHandler;
 import jadex.simulation.model.Data;
 import jadex.simulation.model.Dataconsumer;
 import jadex.simulation.model.Dataprovider;
@@ -34,6 +36,7 @@ import jadex.simulation.model.result.IntermediateResult;
 import jadex.simulation.model.result.RowResult;
 import jadex.xml.IContext;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -64,21 +67,10 @@ public class StartSimulationExperimentsPlan extends Plan {
 		rowResult.setStarttime(getClock().getTime());
 		rowResult.setId(String.valueOf(rowCounter));
 
-		// Put SimulationConfiguration into the application.xml as parameter for
-		// the SimulationClient.
-		Map simFacts = new HashMap();
-		simFacts.put(Constants.SIMULATION_FACTS_FOR_CLIENT, simConf);
-		// simFacts.put(Constants.EXPERIMENT_ID, experimentID);
-
-		// Create Map that contains ObservedEvents, produced by the Executor
-		HashMap<Long, ArrayList<ObservedEvent>> observedEvents = new HashMap<Long, ArrayList<ObservedEvent>>();
-
 		// Put args into application. This args are passed to the
 		// application.xml to parameterize application.
 		Map args = new HashMap();
-		args.put(Constants.SIMULATION_FACTS_FOR_CLIENT, simFacts);
-		args.put(Constants.OBSERVED_EVENTS_MAP, observedEvents);
-
+		
 		// check, whether parameters have to be swept
 		if (simConf.getOptimization().getParameterSweeping() != null) {
 			sweepParameters(simConf, args);
@@ -90,7 +82,22 @@ public class StartSimulationExperimentsPlan extends Plan {
 		// gui.createNewEnsembleTable(rowCounter);
 
 		for (long i = 0; i < experimentsPerRowToMake; i++) {
+			
+			
+			// Put SimulationConfiguration into the application.xml as parameter for
+			// the SimulationClient.
+			Map simFacts = new HashMap();
+			try {
+				simFacts.put(Constants.SIMULATION_FACTS_FOR_CLIENT, ObjectCloner.deepCopy(simConf));
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 
+			args.put(Constants.SIMULATION_FACTS_FOR_CLIENT, simFacts);
+//			args.put(Constants.OBSERVED_EVENTS_MAP, observedEvents);				
+
+			
 			String experimentID = rowCounter + "." + expInRow;
 			String appName = simConf.getName() + experimentID;
 
@@ -283,7 +290,7 @@ public class StartSimulationExperimentsPlan extends Plan {
 		IExpressionParser parser = new JavaCCExpressionParser();
 
 		// add new data provider
-		List<Dataprovider> providers = simConf.getDataproviderList();
+		List<Dataprovider> providers = simConf.getDataproviders().getDataprovider();
 		// List tmp = si.getPropertyList("dataproviders");
 
 		// if(providers==null && tmp!=null)
@@ -297,27 +304,27 @@ public class StartSimulationExperimentsPlan extends Plan {
 			for (int i = 0; i < providers.size(); i++) {
 				// Map dcol = (Map)providers.get(i);
 
-				List<Source> sources = providers.get(i).getSourceList();
+				List<Source> sources = providers.get(i).getSource();
 				IObjectSource[] provs = new IObjectSource[sources.size()];
 				for (int j = 0; j < sources.size(); j++) {
 					Source source = sources.get(j);
 					String varname = source.getName() != null ? source.getName() : "$object";
 					String objecttype = source.getObjecttype();
 					boolean aggregate = source.isAggregate();
-//					IParsedExpression dataexp = getParsedExpression(source.getValue(), parser);
-					IParsedExpression dataexp = null;
-					IParsedExpression includeexp = getParsedExpression(source.getIncludecondition(), parser);// 
+					IParsedExpression dataexp = getParsedExpression(source.getContent(), parser);
+					//Hack: Includeconditon is not implemented, yet.
+					IParsedExpression includeexp = null; 
 					provs[j] = new SpaceObjectSource(varname, space, objecttype, aggregate, dataexp, includeexp);
 				}
 
 				String tablename = providers.get(i).getName();
-				List<Data> subdatas = providers.get(i).getDataList();
+				List<Data> subdatas = providers.get(i).getData();
 				String[] columnnames = new String[subdatas.size()];
 				IParsedExpression[] exps = new IParsedExpression[subdatas.size()];
 				for (int j = 0; j < subdatas.size(); j++) {
 					Data subdata = subdatas.get(j);
 					columnnames[j] = subdata.getName();
-					exps[j] = getParsedExpression(subdata.getValue(), parser);
+					exps[j] = getParsedExpression((String)subdata.getContent().get(0), parser);
 				}
 
 				ITableDataProvider tprov = new DefaultDataProvider(space, provs, tablename, columnnames, exps);
@@ -326,7 +333,7 @@ public class StartSimulationExperimentsPlan extends Plan {
 		}
 		
 		// Create the data consumers.		
-		List<Dataconsumer> consumers = simConf.getDataconsumerList();		
+		List<Dataconsumer> consumers = simConf.getDataconsumers().getDataconsumer();		
 		
 //		System.out.println("data consumers: "+consumers);
 		if(consumers!=null)
@@ -339,7 +346,7 @@ public class StartSimulationExperimentsPlan extends Plan {
 //				Class clazz = (Class)MEnvSpaceInstance.getProperty(dcon, "clazz");
 				Class clazz = null; 
 				try {
-					clazz = SReflect.findClass(dcon.getClazz(),toStringArray(simConf.getImportList()), ((ILibraryService)space.getContext().getServiceContainer().getService(ILibraryService.class)).getClassLoader());
+					clazz = SReflect.findClass(dcon.getClazz(),toStringArray((ArrayList<String>) simConf.getImports().getImport()), ((ILibraryService)space.getContext().getServiceContainer().getService(ILibraryService.class)).getClassLoader());
 //					clazz = SUtil.class.getClassLoader().loadClass(tokenizer.nextToken().trim());
 //					clazz = SUtil.class.getClassLoader().loadClass(dcon.getClazz());
 //					clazz =((ILibraryService)space.getContext().getServiceContainer().getService(ILibraryService.class)).getClassLoader().loadClass(dcon.getClazz());
@@ -362,13 +369,13 @@ public class StartSimulationExperimentsPlan extends Plan {
 				}
 				//List of Hashmaps with dynamic=false
 				List<Map> tmpPropertyList = new ArrayList<Map>();
-				for(int j=0; j<dcon.getPropertyList().size(); j++){
+				for(int j=0; j<dcon.getProperty().size(); j++){
 					Map map = new HashMap();
 					map.put("dynamic", false);
-					map.put("name", dcon.getPropertyList().get(j).getName());
+					map.put("name", dcon.getProperty().get(j).getName());
 //					map.put("value", dcon.getPropertyList().get(j).getValue());
 					//Hack: has to be "initially" an expression that can be parsed
-					map.put("value", getParsedExpression("\"" + dcon.getPropertyList().get(j).getValue()  + "\"", parser));					
+					map.put("value", getParsedExpression("\"" + dcon.getProperty().get(j).getContent()  + "\"", parser));					
 					tmpPropertyList.add(map);
 				}
 //				MEnvSpaceInstance.setProperties(con, (List)dcon.get("properties"), fetcher);
@@ -387,7 +394,7 @@ System.out.println("nnnnnnnnnnneded iterations: " + counterTmp);
 	 * @param parser
 	 * @return
 	 */
-	private IParsedExpression getParsedExpression(String expression, IExpressionParser parser) {
+	private IParsedExpression getParsedExpression(String expression, IExpressionParser parser) {		
 		return expression == null ? null : parser.parseExpression(expression, null, null, null);
 	}
 	

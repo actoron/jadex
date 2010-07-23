@@ -42,7 +42,7 @@ public class Main {
 		System.out.println("adad2: " + cal.getTime().toGMTString() + " - " + Calendar.getInstance().getTimeZone().getDisplayName());
 		System.out.println("adad3: " + Calendar.getInstance().getTimeZone().getDSTSavings());
 		System.out.println("Here we go....Read");
-		SimulationConfiguration simConf = (SimulationConfiguration) XMLHandler.parseXML("../jadex-applib-simulation/src/main/java/jadex/simulation/persist/TestXML.xml", SimulationConfiguration.class);
+		SimulationConfiguration simConf = (SimulationConfiguration) XMLHandler.parseXMLFromXMLFile("../jadex-applib-simulation/src/main/java/jadex/simulation/persist/TestXML.xml", SimulationConfiguration.class);
 
 		HelpElement event = new HelpElement();
 		event.setApplicationName("Wow1");
@@ -180,7 +180,7 @@ public class Main {
 		// simRes.addRowsResults(rowRes);
 
 		// XMLHandler.writeXML(simRes, "abc.xml", SimulationResult.class);
-		XMLHandler.writeXML(exRes, "abc.xml", ExperimentResult.class);
+		XMLHandler.writeXMLToFile(exRes, "abc.xml", ExperimentResult.class);
 
 	}
 

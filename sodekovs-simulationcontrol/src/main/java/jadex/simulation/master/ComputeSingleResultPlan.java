@@ -5,8 +5,13 @@ import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
 import jadex.simulation.evaluation.IntermediateEvaluation;
 import jadex.simulation.helper.Constants;
+import jadex.simulation.helper.XMLHandler;
+import jadex.simulation.model.Data;
+import jadex.simulation.model.Dataconsumer;
+import jadex.simulation.model.Dataprovider;
 import jadex.simulation.model.ObservedEvent;
 import jadex.simulation.model.Observer;
+import jadex.simulation.model.Property;
 import jadex.simulation.model.SimulationConfiguration;
 import jadex.simulation.model.result.ExperimentResult;
 import jadex.simulation.model.result.IntermediateResult;
@@ -29,23 +34,8 @@ public class ComputeSingleResultPlan extends Plan {
 
 	public void body() {
 		IMessageEvent msg = (IMessageEvent) getReason();
-		// String content = (String)msg.getParameter(SFipa.CONTENT).getValue();
-		// System.out.println("#Master# Received message: " + content);
 		HashMap content = (HashMap) msg.getParameter(SFipa.CONTENT).getValue();
-
-		// ResClass content = (ResClass)
-		// msg.getParameter(SFipa.CONTENT).getValue();
-		// System.out.println("#Master# Received message: " + content.getA() +
-		// " - " + content.getBb()
-		// );
-
-		// System.out.println("#Master# Received message: "
-		// + content.get("STARTTIME") + ", "
-		// + content.get("EXPERIMENT_NUMBER"));
-		// System.out.println("#Master# Lenght of Content: " + content.size());
-
-		// System.out.println("#Master# Results of Simulation Run: ");
-
+		
 		HashMap facts = (HashMap) getBeliefbase().getBelief("generalSimulationFacts").getFact();
 		int experimentRow = ((Integer) facts.get(Constants.EXPERIMENT_ROW_COUNTER)).intValue();
 		int expInRow = ((Integer) facts.get(Constants.ROW_EXPERIMENT_COUNTER)).intValue();
@@ -192,11 +182,24 @@ public class ComputeSingleResultPlan extends Plan {
 
 		HashMap<String, ArrayList<ObservedEvent>> result = new HashMap<String, ArrayList<ObservedEvent>>();
 		// last indicates this "special" type of observer
-		for (Observer obs : simConf.getObserverList()) {
-			if (obs.getFilter().getMode().equals("last")) {
-				result.put(obs.getData().getName(), new ArrayList<ObservedEvent>());
+		for (Dataconsumer con : simConf.getDataconsumers().getDataconsumer()) {
+			// Do buckets only for SimulationDataConsumer
+			if (con.getClazz().equalsIgnoreCase(Constants.SIMULATION_DATA_CONSUMER)) {
+				for (Property prop : con.getProperty()) {
+					// Check for elements whether the "last" condition applies
+					if (!prop.getName().equalsIgnoreCase(Constants.DATAPROVIDER) && prop.getContent().equalsIgnoreCase("last")) {
+						result.put(prop.getContent(), new ArrayList<ObservedEvent>());				
+						}
+					}
+				}
 			}
-		}
+		
+		//OLD
+//		for (Observer obs : simConf.getObservers().getObserver()) {
+//			if (obs.getFilter().getMode().equals("last")) {
+//				result.put(obs.getData().getName(), new ArrayList<ObservedEvent>());
+//			}
+//		}
 		return result;
 	}
 

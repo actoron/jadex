@@ -19,7 +19,7 @@
 			<components>
 				<component type="SimulationManager" master="true">
 					<arguments>
-						<argument name="simulationDescriptionFile">"../sodekovs-simulationcontrol/src/main/java/jadex/simulation/Configuration1.xml"</argument>
+						<argument name="simulationDescriptionFile">"../sodekovs-simulationcontrol/src/main/java/jadex/simulation/Configuration2.xml"</argument>
 					</arguments>
 				</component>
 			</components>
