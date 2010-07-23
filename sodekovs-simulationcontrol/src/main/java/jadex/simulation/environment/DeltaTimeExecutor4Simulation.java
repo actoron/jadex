@@ -350,8 +350,7 @@ public class DeltaTimeExecutor4Simulation extends SimplePropertyObject implement
 	 * Terminate the space executor.
 	 */
 	// public synchronized void terminate()
-	public void terminate() {
-		System.out.println("tttttttttttttttttttttttttttttttttttttt");
+	public void terminate() {		
 		IClockService clockservice = (IClockService) container.getService(IClockService.class);
 
 		if (clocklistener != null) {

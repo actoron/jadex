@@ -31,7 +31,7 @@ public class InitSimulationPlan extends Plan{
 		Map args = SCollection.createHashMap();
 		args.put("simulationConf", simConf);		
 		IFuture ret = ces.createComponent(null, "/jadex/simulation/controlcenter/ControlCenter.agent.xml", new CreationInfo(args), null);
-		IComponentIdentifier aid = (IComponentIdentifier)ret.get(this);
+//		IComponentIdentifier aid = (IComponentIdentifier)ret.get(this);
 		
 //		IFuture ret = ces.createComponent(name, "/jadex/bdi/benchmarks/AgentCreation.agent.xml", new CreationInfo(args), null);
 		

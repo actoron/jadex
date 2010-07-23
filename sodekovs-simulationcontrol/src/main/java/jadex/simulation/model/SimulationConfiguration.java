@@ -62,7 +62,7 @@ public class SimulationConfiguration  implements Serializable{
     /**
 	 * 
 	 */
-	private static final long serialVersionUID = 488853484316385569L;
+//	private static final long serialVersionUID = 488853484316385569L;
 	@XmlElement(name = "Imports", required = true)
     protected Imports imports;
     @XmlElement(name = "Dataproviders", required = true)

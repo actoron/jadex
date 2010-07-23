@@ -169,6 +169,7 @@
 	<xs:element name="Property">
 		<xs:complexType mixed="true">
 			<xs:attribute name="name" type="xs:string"/>
+			<xs:attribute name="filter" type="xs:string"/>
 		</xs:complexType>
 	</xs:element>
 	<xs:element name="Rows">

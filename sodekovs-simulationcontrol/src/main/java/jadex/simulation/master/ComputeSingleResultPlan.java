@@ -5,12 +5,8 @@ import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
 import jadex.simulation.evaluation.IntermediateEvaluation;
 import jadex.simulation.helper.Constants;
-import jadex.simulation.helper.XMLHandler;
-import jadex.simulation.model.Data;
 import jadex.simulation.model.Dataconsumer;
-import jadex.simulation.model.Dataprovider;
 import jadex.simulation.model.ObservedEvent;
-import jadex.simulation.model.Observer;
 import jadex.simulation.model.Property;
 import jadex.simulation.model.SimulationConfiguration;
 import jadex.simulation.model.result.ExperimentResult;
@@ -45,6 +41,11 @@ public class ComputeSingleResultPlan extends Plan {
 
 		// System.out.println("Map of Observed Events: ");
 		ConcurrentHashMap<Long, ArrayList<ObservedEvent>> observedEventsMap = (ConcurrentHashMap<Long, ArrayList<ObservedEvent>>) content.get(Constants.OBSERVED_EVENTS_MAP);
+		
+		//if SimulationDataConsumer has bee specified
+		if(observedEventsMap == null){
+			observedEventsMap = new ConcurrentHashMap<Long, ArrayList<ObservedEvent>>();
+		}
 		ArrayList sortedResultList = new ArrayList(observedEventsMap.keySet());
 		// Sort by timestamp
 		Collections.sort(sortedResultList);
@@ -107,32 +108,6 @@ public class ComputeSingleResultPlan extends Plan {
 
 	}
 
-	// /**
-	// * HACK!
-	// */
-	// private void startApplication() {
-	// int runs = ((Integer) getBeliefbase().getBelief(
-	// "numberOfRuns").getFact()).intValue();
-	//
-	// System.out.println("*******Restarted Runs...:" + runs);
-	// IServiceContainer container = getExternalAccess()
-	// .getApplicationContext().getServiceContainer();
-	// String appName = "MarsWorld4SimulationExperiments";
-	// String fileName =
-	// "..\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\marsworld\\MarsWorld4SimulationExperiments.application.xml";
-	// String configName = "1 Sentry / 2 Producers / 3 Carries";
-	// Map args = new HashMap();
-	//
-	// try {
-	// SComponentFactory.createApplication(container, appName, fileName,
-	// configName, args);
-	// } catch (Exception e) {
-	// // JOptionPane.showMessageDialog(SGUI.getWindowParent(StarterPanel.this),
-	// // "Could not start application: "+e,
-	// // "Application Problem", JOptionPane.INFORMATION_MESSAGE);
-	// System.out.println("Could not start application...." + e);
-	// }
-	// }
 
 	private ExperimentResult toExperimentResult(Map content, ArrayList<ArrayList<ObservedEvent>> events, SimulationConfiguration simConf) {
 
@@ -187,8 +162,8 @@ public class ComputeSingleResultPlan extends Plan {
 			if (con.getClazz().equalsIgnoreCase(Constants.SIMULATION_DATA_CONSUMER)) {
 				for (Property prop : con.getProperty()) {
 					// Check for elements whether the "last" condition applies
-					if (!prop.getName().equalsIgnoreCase(Constants.DATAPROVIDER) && prop.getContent().equalsIgnoreCase("last")) {
-						result.put(prop.getContent(), new ArrayList<ObservedEvent>());				
+					if (!prop.getName().equalsIgnoreCase(Constants.DATAPROVIDER) && prop.getFilter().equalsIgnoreCase("last")) {
+						result.put(prop.getName(), new ArrayList<ObservedEvent>());				
 						}
 					}
 				}
