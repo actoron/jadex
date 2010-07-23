@@ -14,7 +14,7 @@ import java.util.Iterator;
 /**
  *  Flyweight for goal model.
  */
-public class MGoalFlyweight extends ProcessableElementFlyweight implements IMGoal
+public class MGoalFlyweight extends MProcessableElementFlyweight implements IMGoal
 {
 	//-------- constructors --------
 	
