@@ -57,8 +57,7 @@
 		</Dataconsumer>
 		<Dataconsumer name="simConsumer" clazz="SimulationDataConsumer">		
 				<Property name="dataprovider">"homebaselogger2"</Property>
-				<Property name="ore_amount">"all"</Property><!-- HACK: Denotes the filter type -->
-				<Property name="time">"last"</Property><!-- HACK: Denotes the filter type -->
+				<Property name="time" filter="last"/><!-- HACK: Denotes the filter type ->last= only the last value is of interest. -->
 		</Dataconsumer>		
 	</Dataconsumers>
 
