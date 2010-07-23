@@ -1,6 +1,8 @@
 package jadex.bdi.runtime.impl;
 
 import jadex.bdi.model.OAVBDIMetaModel;
+import jadex.bdi.model.impl.flyweights.MBeliefFlyweight;
+import jadex.bdi.model.impl.flyweights.MElementFlyweight;
 import jadex.bdi.runtime.IEAGoal;
 import jadex.bdi.runtime.IEAParameter;
 import jadex.bdi.runtime.IEAParameterSet;

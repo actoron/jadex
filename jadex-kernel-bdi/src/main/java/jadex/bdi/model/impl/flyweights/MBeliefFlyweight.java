@@ -1,11 +1,12 @@
 package jadex.bdi.model.impl.flyweights;
 
 import jadex.bdi.model.IMBelief;
+import jadex.bdi.model.IMExpression;
 import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.rules.state.IOAVState;
 
 /**
- *  Belief model element.
+ *  Flyweight for belief model element.
  */
 public class MBeliefFlyweight extends MTypedElementFlyweight implements IMBelief
 {
@@ -13,10 +14,6 @@ public class MBeliefFlyweight extends MTypedElementFlyweight implements IMBelief
 	
 	/**
 	 *  Create a new element flyweight.
-	 *  @param state	The state.
-	 *  @param scope	The scope handle.
-	 *  @param handle	The element handle.
-	 *  @param rplan	The calling plan (if called from plan)
 	 */
 	public MBeliefFlyweight(IOAVState state, Object scope, Object handle)
 	{
@@ -28,27 +25,31 @@ public class MBeliefFlyweight extends MTypedElementFlyweight implements IMBelief
 	/**
 	 *  Get the clazz.
 	 *  @return The clazz. 
-	 * /
+	 */
 	public IMExpression getFactExpression()
 	{
-		throw new UnsupportedOperationException();
-		
-//		if(getInterpreter().isExternalThread())
-//		{
-//			AgentInvocation invoc = new AgentInvocation()
-//			{
-//				public void run()
-//				{
-//					getState().getAttributeValue(getHandle(), OAVBDIMetaModel.belief_has_fact);
-//				}
-//			};
-//			return invoc.string;
-//		}
-//		else
-//		{
-//			return null;
-//		}
-	}*/
+		if(getInterpreter().isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					Object handle = getState().getAttributeValue(getHandle(), OAVBDIMetaModel.belief_has_fact);
+					if(handle!=null)
+						object = new MExpressionFlyweight(getState(), getScope(), handle);
+				}
+			};
+			return (IMExpression)invoc.object;
+		}
+		else
+		{
+			IMExpression ret = null;
+			Object handle = getState().getAttributeValue(getHandle(), OAVBDIMetaModel.belief_has_fact);
+			if(handle!=null)
+				ret = new MExpressionFlyweight(getState(), getScope(), handle);
+			return ret;
+		}
+	}
 	
 	/**
 	 *  Test if the belief is used as argument.

@@ -4,7 +4,7 @@ package jadex.bdi.model;
 /**
  *  Interface for typed elements.
  */
-public interface IMTypedElement extends IMElement
+public interface IMTypedElement extends IMReferenceableElement
 {
 	/**
 	 *  Get the clazz.

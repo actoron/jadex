@@ -2,15 +2,21 @@ package jadex.bdi.model;
 
 
 /**
- *  Interface for belief model.
+ *  Interface for belief set model.
  */
-public interface IMBelief extends IMTypedElement
+public interface IMBeliefSet extends IMTypedElement
 {
 	/**
-	 *  Get the clazz.
-	 *  @return The clazz. 
+	 *  Get the facts.
+	 *  @return The facts. 
 	 */
-//	public IParsedExpression getFactExpression();
+	public IMExpression[] getFacts();
+	
+	/**
+	 *  Get the facts expression.
+	 *  @return The facts expression. 
+	 */
+	public IMExpression getFactExpression();
 	
 	/**
 	 *  Test if the belief is used as argument.

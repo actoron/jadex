@@ -1,5 +1,6 @@
 package jadex.bdi.model.impl.flyweights;
 
+import jadex.bdi.model.IMReferenceableElement;
 import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.commons.SUtil;
 import jadex.rules.state.IOAVState;
@@ -8,9 +9,9 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * 
+ *  Referenceable element model flyweight.
  */
-public class MReferenceableElementFlyweight extends MElementFlyweight
+public class MReferenceableElementFlyweight extends MElementFlyweight implements IMReferenceableElement
 {
 	//-------- constructors --------
 	
