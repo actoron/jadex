@@ -18,7 +18,7 @@ public class MPlanbaseFlyweight extends MElementFlyweight implements IMPlanbase
  	/**
  	 *  Create a new planbase flyweight.
  	 */
- 	private MPlanbaseFlyweight(IOAVState state, Object scope)
+ 	public MPlanbaseFlyweight(IOAVState state, Object scope)
  	{
  		super(state, scope, scope);
  	}

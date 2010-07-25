@@ -18,7 +18,7 @@ public class MGoalbaseFlyweight extends MElementFlyweight implements IMGoalbase
 	/**
 	 *  Create a new beliefbase flyweight.
 	 */
-	private MGoalbaseFlyweight(IOAVState state, Object scope)
+	public MGoalbaseFlyweight(IOAVState state, Object scope)
 	{
 		super(state, scope, scope);
 	}

@@ -1,5 +1,6 @@
 package jadex.bdi.model;
 
+import jadex.bridge.IMessageService;
 import jadex.rules.state.OAVAttributeType;
 
 /**
@@ -29,7 +30,7 @@ public interface IMCapability
 	 *  Get the capability references.
 	 *  @return The capability references.
 	 */
-//	public IMCapabilityReference getCapabilityReferences();
+	public IMCapabilityReference[] getCapabilityReferences();
 	
 	/**
 	 *  Get the beliefbase.
@@ -41,7 +42,7 @@ public interface IMCapability
 	 *  Get the beliefbase.
 	 *  @return The goalbase.
 	 */
-	public IMBeliefbase getGoalbase();
+	public IMGoalbase getGoalbase();
 	
 	/**
 	 *  Get the planbase.
@@ -59,7 +60,7 @@ public interface IMCapability
 	 *  Get the expressionbase.
 	 *  @return The expressionbase.
 	 */
-//	public IMExpressionbase getExpressionbase();
+	public IMExpressionbase getExpressionbase();
 	
 	/**
 	 *  Get the services.

@@ -23,7 +23,7 @@ public class MEventbaseFlyweight extends MElementFlyweight implements IMEventbas
 	 *  @param state	The state.
 	 *  @param scope	The scope handle.
 	 */
-	private MEventbaseFlyweight(IOAVState state, Object scope)
+	public MEventbaseFlyweight(IOAVState state, Object scope)
 	{
 		super(state, scope, scope);
 	}

@@ -14,7 +14,7 @@ import jadex.rules.state.IOAVState;
  */
 public class MElementFlyweight implements IMElement
 {
-//-------- attributes --------
+	//-------- attributes --------
 	
 	/** The state. */
 	private IOAVState state;
