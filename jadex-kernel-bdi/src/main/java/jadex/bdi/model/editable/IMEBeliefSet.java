@@ -6,7 +6,7 @@ import jadex.bdi.model.IMExpression;
 /**
  * 
  */
-public interface IMEBeliefSet extends IMBeliefSet
+public interface IMEBeliefSet extends IMBeliefSet, IMETypedElement
 {
 	/**
 	 *  Create the fact.

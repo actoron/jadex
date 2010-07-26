@@ -5,7 +5,7 @@ import jadex.bdi.model.IMExpression;
 /**
  * 
  */
-public interface IMEExpression extends IMExpression
+public interface IMEExpression extends IMExpression, IMEElement
 {
 	/**
 	 *  Get the expression language.

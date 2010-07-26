@@ -5,7 +5,7 @@ import jadex.bdi.model.IMBeliefbase;
 /**
  *  Interface for editable version of beliefbase.
  */
-public interface IMEBeliefbase extends IMBeliefbase
+public interface IMEBeliefbase extends IMBeliefbase, IMEElement
 {
 	/**
 	 *  Create a belief for a name.
@@ -23,11 +23,11 @@ public interface IMEBeliefbase extends IMBeliefbase
 	 *  Create a belief reference for a name.
 	 *  @param name	The belief reference name.
 	 */
-//	public IMEBeliefReference createBeliefReference(String name);
+	public IMEBeliefReference createBeliefReference(String name);
 
 	/**
 	 *  Create a beliefset reference for a name.
 	 *  @param name	The beliefset reference name.
 	 */
-//	public IMEBeliefSetReference createBeliefSetReference(String name);
+	public IMEBeliefSetReference createBeliefSetReference(String name);
 }

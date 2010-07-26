@@ -5,7 +5,7 @@ import jadex.bdi.model.IMMaintainGoal;
 /**
  * 
  */
-public interface IMEMaintainGoal extends IMEGoal, IMMaintainGoal
+public interface IMEMaintainGoal extends IMMaintainGoal, IMEGoal 
 {
 
 }

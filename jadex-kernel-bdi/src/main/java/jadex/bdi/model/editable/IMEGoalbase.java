@@ -7,7 +7,7 @@ import jadex.bdi.model.IMGoalbase;
 /**
  * 
  */
-public interface IMEGoalbase extends IMGoalbase
+public interface IMEGoalbase extends IMGoalbase, IMEElement
 {
 	/**
 	 *  Create a perform goal for a name.
@@ -32,6 +32,12 @@ public interface IMEGoalbase extends IMGoalbase
 	 *  @param name	The goal name.
 	 */
 	public IMEMaintainGoal createMaintainGoal(String name);
+	
+	/**
+	 *  Create a meta goal for a name.
+	 *  @param name	The goal name.
+	 */
+	public IMEMetaGoal createMetaGoal(String name);
 
 	/**
 	 *  Get a goal reference for a name.

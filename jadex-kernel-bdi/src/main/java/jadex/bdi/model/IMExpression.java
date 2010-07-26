@@ -3,7 +3,7 @@ package jadex.bdi.model;
 /**
  *  Interface for expression models.
  */
-public interface IMExpression
+public interface IMExpression extends IMElement
 {
 	/**
 	 *  Get the expression language.

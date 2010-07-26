@@ -4,7 +4,7 @@ package jadex.bdi.model;
 /**
  *  Interface for capability model.
  */
-public interface IMCapability
+public interface IMCapability extends IMElement
 {
 	/**
 	 *  Get the package.

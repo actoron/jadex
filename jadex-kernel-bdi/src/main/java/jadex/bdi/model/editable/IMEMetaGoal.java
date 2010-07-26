@@ -6,7 +6,7 @@ import jadex.bdi.model.IMMetaGoalTrigger;
 /**
  * 
  */
-public interface IMEMetaGoal extends IMEGoal, IMMetaGoal
+public interface IMEMetaGoal extends IMMetaGoal, IMEGoal 
 {
 	/**
 	 *  Create the trigger.

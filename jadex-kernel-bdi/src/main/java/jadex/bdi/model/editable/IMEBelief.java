@@ -5,10 +5,10 @@ import jadex.bdi.model.IMBelief;
 /**
  * 
  */
-public interface IMEBelief extends IMBelief
+public interface IMEBelief extends IMBelief, IMETypedElement
 {
 	/**
-	 *  Get the fact.
+	 *  Create the fact.
 	 *  @return The fact. 
 	 */
 	public IMEExpression createFact();

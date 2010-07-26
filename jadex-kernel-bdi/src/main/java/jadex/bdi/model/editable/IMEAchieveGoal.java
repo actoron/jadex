@@ -7,7 +7,7 @@ import jadex.bdi.model.IMAchieveGoal;
 /**
  * 
  */
-public interface IMEAchieveGoal extends IMEGoal, IMAchieveGoal
+public interface IMEAchieveGoal extends IMAchieveGoal, IMEGoal 
 {
 	/**
 	 *  Create the target condition.

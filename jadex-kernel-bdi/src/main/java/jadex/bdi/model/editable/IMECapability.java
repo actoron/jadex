@@ -14,7 +14,7 @@ import jadex.bdi.model.IMPropertybase;
 /**
  *  Interface for editable version of capability.
  */
-public interface IMECapability extends IMCapability
+public interface IMECapability extends IMCapability, IMEElement
 {
 	/**
 	 *  Set the package.

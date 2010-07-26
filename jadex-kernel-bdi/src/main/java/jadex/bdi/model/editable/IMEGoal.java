@@ -5,7 +5,7 @@ import jadex.bdi.model.IMGoal;
 /**
  * 
  */
-public interface IMEGoal extends IMGoal
+public interface IMEGoal extends IMGoal, IMEProcessableElement
 {
 	/**
 	 *  Create the creation condition.
