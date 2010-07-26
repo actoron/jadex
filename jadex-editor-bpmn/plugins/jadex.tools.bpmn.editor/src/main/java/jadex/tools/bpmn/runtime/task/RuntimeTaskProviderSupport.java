@@ -3,6 +3,8 @@
  */
 package jadex.tools.bpmn.runtime.task;
 
+import jadex.tools.bpmn.editor.JadexBpmnEditor;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -11,7 +13,6 @@ import java.lang.reflect.Method;
 import java.net.JarURLConnection;
 import java.net.URL;
 import java.net.URLDecoder;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -20,8 +21,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.emf.common.util.UniqueEList;
 
 /**
  * @author Claas
@@ -122,6 +124,14 @@ public abstract class RuntimeTaskProviderSupport implements IRuntimeTaskProvider
 	}
 
 
+	// ---- helper methods ----
+	
+	/**
+	 * Loads a class from the workspace and call its getTaskMetaInfo method
+	 * to retrieve the TaskMetaInfo.
+	 * @param className
+	 * @return TaskMetaInfo for class if provided, else null
+	 */
 	private TaskMetaInfo loadMetaInfo(String className) {
 		
 		ClassLoader classLoader = WorkspaceClassLoaderHelper
@@ -141,19 +151,19 @@ public abstract class RuntimeTaskProviderSupport implements IRuntimeTaskProvider
 			return returnValue;
 
 		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
+			JadexBpmnEditor.log(e, IStatus.WARNING);
 		} catch (InstantiationException e) {
-			e.printStackTrace();
+			JadexBpmnEditor.log(e, IStatus.WARNING);
 		} catch (IllegalAccessException e) {
-			e.printStackTrace();
+			JadexBpmnEditor.log(e, IStatus.WARNING);
 		} catch (SecurityException e) {
-			e.printStackTrace();
+			JadexBpmnEditor.log(e, IStatus.WARNING);
 		} catch (NoSuchMethodException e) {
-			e.printStackTrace();
+			JadexBpmnEditor.log(e, IStatus.WARNING);
 		} catch (IllegalArgumentException e) {
-			e.printStackTrace();
+			JadexBpmnEditor.log(e, IStatus.WARNING);
 		} catch (InvocationTargetException e) {
-			e.printStackTrace();
+			JadexBpmnEditor.log(e, IStatus.WARNING);
 		}
 
 		return null;
@@ -163,7 +173,7 @@ public abstract class RuntimeTaskProviderSupport implements IRuntimeTaskProvider
     /**
      * 
      * @param pckgname
-     * @return Luist of classes in package
+     * @return List of classes in package
      * @throws ClassNotFoundException
      */
 	public static List<Class<?>> getClassesForPackage(String pckgname)
@@ -173,17 +183,17 @@ public abstract class RuntimeTaskProviderSupport implements IRuntimeTaskProvider
     
     /**
      * Search for classes within a package with given suffix.
-     * @param pckgname The package to search
+     * @param pkgName The package to search
      * @param classSuffix The suffix of the class name e.g.: "*Task.class"
      * @return List of matching classes in package
      * @throws ClassNotFoundException
      */
-	public static List<Class<?>> getClassesForPackage(String pckgname, String classSuffix)
+	public static List<Class<?>> getClassesForPackage(String pkgName, String classSuffix)
 			throws ClassNotFoundException {
-		// A list of directories matching the package.
-		// May be more than one if a package is split
-		ArrayList<File> directories = new ArrayList<File>();
-		List<Class<?>> classes = new ArrayList<Class<?>>();
+		// List of directories matching the package name. 
+		// Package may be split across multiple directories
+		List<File> directories = new UniqueEList<File>();
+		List<Class<?>> classes = new UniqueEList<Class<?>>();
 		
 		try {
 			ClassLoader classLoader = WorkspaceClassLoaderHelper
@@ -193,18 +203,18 @@ public abstract class RuntimeTaskProviderSupport implements IRuntimeTaskProvider
 				// return Collections.emptyList();
 				throw new ClassNotFoundException("Can't get class loader.");
 			}
-			// Ask for all resources for the path
-			Enumeration<URL> resources = classLoader.getResources(pckgname.replace('.',
+			// Retrieve all resources for the path
+			Enumeration<URL> resources = classLoader.getResources(pkgName.replace('.',
 					'/'));
 			while (resources.hasMoreElements()) {
-				URL res = resources.nextElement();
-				if ("jar".equalsIgnoreCase(res.getProtocol())) {
-					JarURLConnection conn = (JarURLConnection) res
+				URL urlRessource = resources.nextElement();
+				if ("jar".equalsIgnoreCase(urlRessource.getProtocol())) {
+					JarURLConnection connection = (JarURLConnection) urlRessource
 							.openConnection();
-					JarFile jar = conn.getJarFile();
+					JarFile jar = connection.getJarFile();
 					for (JarEntry entry : Collections.list(jar.entries())) {
 
-						if (entry.getName().startsWith(pckgname.replace('.', '/'))
+						if (entry.getName().startsWith(pkgName.replace('.', '/'))
 								&& entry.getName().endsWith(classSuffix)
 								&& !entry.getName().contains("$")) {
 							String className = entry.getName().replace("/", ".")
@@ -213,38 +223,36 @@ public abstract class RuntimeTaskProviderSupport implements IRuntimeTaskProvider
 						}
 					}
 				} else
-					directories.add(new File(URLDecoder.decode(res.getPath(),
+					directories.add(new File(URLDecoder.decode(urlRessource.getPath(),
 							"UTF-8")));
 			}
 		} catch (NullPointerException x) {
-			throw new ClassNotFoundException(pckgname
+			throw new ClassNotFoundException(pkgName
 					+ " does not appear to be "
 					+ "a valid package (Null pointer exception)");
 		} catch (UnsupportedEncodingException encex) {
-			throw new ClassNotFoundException(pckgname
+			throw new ClassNotFoundException(pkgName
 					+ " does not appear to be "
 					+ "a valid package (Unsupported encoding)");
 		} catch (IOException ioex) {
 			throw new ClassNotFoundException(
 					"IOException was thrown when trying "
-							+ "to get all resources for " + pckgname);
+							+ "to get all resources for " + pkgName);
 		}
 
-		// For every directory identified capture all the .class files
 		for (File directory : directories) {
 			if (directory.exists()) {
-				// Get the list of the files contained in the package
 				String[] files = directory.list();
 				for (String file : files) {
-					// we are only interested in .class files
+					// we are only interested in .class files with specific suffix
 					if (file.endsWith(classSuffix)) {
-						// removes the .class extension
-						classes.add(Class.forName(pckgname + '.'
+						// remove .class extension
+						classes.add(Class.forName(pkgName + '.'
 								+ file.substring(0, file.length() - 6)));
 					}
 				}
 			} else {
-				throw new ClassNotFoundException(pckgname + " ("
+				throw new ClassNotFoundException(pkgName + " ("
 						+ directory.getPath()
 						+ ") does not appear to be a valid package");
 			}
@@ -252,19 +260,24 @@ public abstract class RuntimeTaskProviderSupport implements IRuntimeTaskProvider
 		return classes;
 	}
 
-	public static List<Class<?>> getClassessOfInterface(String aPackage,
-			Class<?> aInterface) {
-		List<Class<?>> classList = new ArrayList<Class<?>>();
+	/**
+	 * Get all classes in a package implementing a specific interface
+	 * @param pkgName
+	 * @param classInterface
+	 * @return List of classes
+	 */
+	public static List<Class<?>> getClassessOfInterface(String pkgName,
+			Class<?> classInterface) {
+		List<Class<?>> classList = new UniqueEList<Class<?>>();
 		try {
-			for (Class<?> discovered : getClassesForPackage(aPackage)) {
-				if (Arrays.asList(discovered.getInterfaces()).contains(
-						aInterface)) {
-					classList.add(discovered);
+			for (Class<?> discoveredClasses : getClassesForPackage(pkgName)) {
+				if (Arrays.asList(discoveredClasses.getInterfaces()).contains(
+						classInterface)) {
+					classList.add(discoveredClasses);
 				}
 			}
 		} catch (ClassNotFoundException ex) {
-			Logger.getLogger(RuntimeTaskProviderSupport.class.getName()).log(Level.SEVERE,
-					null, ex);
+			JadexBpmnEditor.log(ex, IStatus.WARNING);
 		}
 
 		return classList;

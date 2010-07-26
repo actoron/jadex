@@ -22,6 +22,22 @@
       </editpartProvider>
    </extension>
    
+   <!-- Jadex BPMN - Preference page -->
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="jadex.tools.editor.JadexPreferences"
+            id="jadex.tools.editor.JadexPreferences"
+            name="Jadex">
+      </page>
+      <page
+            class="jadex.tools.bpmn.editor.preferences.JadexBpmnPluginPreferencePage"
+            id="jadex.tools.bpmn.editor.preferences.JadexBpmnPluginPreferencePage"
+            name="BPMN Editor"
+            category="jadex.tools.editor.JadexPreferences">
+      </page>
+   </extension>
+   
    
    
    <!-- add a jadex property tab to the editor-->
