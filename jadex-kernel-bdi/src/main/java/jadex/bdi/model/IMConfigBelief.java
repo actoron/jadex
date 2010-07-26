@@ -1,7 +1,7 @@
 package jadex.bdi.model;
 
 /**
- * 
+ *  Interface for config belief model.
  */
 public interface IMConfigBelief extends IMBelief
 {

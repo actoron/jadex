@@ -1,14 +1,11 @@
 package jadex.bdi.model.impl.flyweights;
 
 import jadex.bdi.model.IMEventbase;
-import jadex.bdi.model.IMExpression;
-import jadex.bdi.model.IMExpressionReference;
 import jadex.bdi.model.IMInternalEvent;
 import jadex.bdi.model.IMInternalEventReference;
 import jadex.bdi.model.IMMessageEvent;
 import jadex.bdi.model.IMMessageEventReference;
 import jadex.bdi.model.OAVBDIMetaModel;
-import jadex.bdi.model.impl.flyweights.MElementFlyweight.AgentInvocation;
 import jadex.rules.state.IOAVState;
 
 import java.util.Collection;

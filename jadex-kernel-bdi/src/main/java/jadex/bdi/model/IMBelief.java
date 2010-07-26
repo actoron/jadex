@@ -7,10 +7,10 @@ package jadex.bdi.model;
 public interface IMBelief extends IMTypedElement
 {
 	/**
-	 *  Get the clazz.
-	 *  @return The clazz. 
+	 *  Get the fact.
+	 *  @return The fact. 
 	 */
-//	public IParsedExpression getFactExpression();
+	public IMExpression getFact();
 	
 	/**
 	 *  Test if the belief is used as argument.

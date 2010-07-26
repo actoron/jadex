@@ -1,7 +1,8 @@
 package jadex.bdi.model;
 
-import jadex.rules.state.OAVAttributeType;
-
+/**
+ *  Interface for configuration model element.
+ */
 public interface IMConfiguration
 {
 	/**

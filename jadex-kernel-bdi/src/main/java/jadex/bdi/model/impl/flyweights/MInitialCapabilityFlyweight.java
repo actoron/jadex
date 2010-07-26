@@ -5,7 +5,7 @@ import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.rules.state.IOAVState;
 
 /**
- * 
+ *  Flyweight for initial capability model.
  */
 public class MInitialCapabilityFlyweight extends MElementFlyweight implements IMInitialCapability
 {

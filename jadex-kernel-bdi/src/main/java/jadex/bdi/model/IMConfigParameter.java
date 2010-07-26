@@ -1,7 +1,7 @@
 package jadex.bdi.model;
 
 /**
- * 
+ *  Interface for config parameter model.
  */
 public interface IMConfigParameter extends IMParameter
 {

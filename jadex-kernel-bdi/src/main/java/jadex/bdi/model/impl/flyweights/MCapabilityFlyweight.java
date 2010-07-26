@@ -3,6 +3,7 @@ package jadex.bdi.model.impl.flyweights;
 import jadex.bdi.model.IMBeliefbase;
 import jadex.bdi.model.IMCapability;
 import jadex.bdi.model.IMCapabilityReference;
+import jadex.bdi.model.IMConfiguration;
 import jadex.bdi.model.IMEventbase;
 import jadex.bdi.model.IMExpression;
 import jadex.bdi.model.IMExpressionbase;
@@ -348,7 +349,44 @@ public class MCapabilityFlyweight extends MElementFlyweight implements IMCapabil
 	 *  Get the configurations.
 	 *  @return The configurations.
 	 */
-//	public IMConfiguration[] getConfigurations();
+	public IMConfiguration[] getConfigurations()
+	{
+		if(getInterpreter().isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					Collection elems = (Collection)getState().getAttributeValue(getScope(), OAVBDIMetaModel.capability_has_capabilityrefs);
+					IMConfiguration[] ret = new IMConfiguration[elems==null? 0: elems.size()];
+					if(elems!=null)
+					{
+						int i=0;
+						for(Iterator it=elems.iterator(); it.hasNext(); )
+						{
+							ret[i++] = new MConfigurationFlyweight(getState(), getScope(), it.next());
+						}
+					}
+					object = ret;
+				}
+			};
+			return (MConfigurationFlyweight[])invoc.object;
+		}
+		else
+		{
+			Collection elems = (Collection)getState().getAttributeValue(getScope(), OAVBDIMetaModel.capability_has_capabilityrefs);
+			MConfigurationFlyweight[] ret = new MConfigurationFlyweight[elems==null? 0: elems.size()];
+			if(elems!=null)
+			{
+				int i=0;
+				for(Iterator it=elems.iterator(); it.hasNext(); )
+				{
+					ret[i++] = new MConfigurationFlyweight(getState(), getScope(), it.next());
+				}
+			}
+			return ret;
+		}
+	}
 	
 	/**
 	 *  Get the default configuration.

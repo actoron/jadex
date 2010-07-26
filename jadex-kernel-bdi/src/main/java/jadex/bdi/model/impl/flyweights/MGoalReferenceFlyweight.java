@@ -4,7 +4,7 @@ import jadex.bdi.model.IMGoalReference;
 import jadex.rules.state.IOAVState;
 
 /**
- *  Goal reference
+ *  Flyweight for goal reference model.
  */
 public class MGoalReferenceFlyweight extends MElementReferenceFlyweight implements IMGoalReference
 {

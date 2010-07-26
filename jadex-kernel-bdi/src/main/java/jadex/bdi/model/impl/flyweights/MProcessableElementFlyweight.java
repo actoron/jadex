@@ -5,7 +5,7 @@ import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.rules.state.IOAVState;
 
 /**
- *  Flyweight for 
+ *  Flyweight for processable element model.
  */
 public class MProcessableElementFlyweight extends MParameterElementFlyweight implements IMProcessableElement
 {

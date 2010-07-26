@@ -23,10 +23,10 @@ public class MBeliefFlyweight extends MTypedElementFlyweight implements IMBelief
 	//-------- methods --------
 	
 	/**
-	 *  Get the clazz.
-	 *  @return The clazz. 
+	 *  Get the fact.
+	 *  @return The fact. 
 	 */
-	public IMExpression getFactExpression()
+	public IMExpression getFact()
 	{
 		if(getInterpreter().isExternalThread())
 		{

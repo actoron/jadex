@@ -5,7 +5,6 @@ import jadex.bdi.model.IMCondition;
 import jadex.bdi.model.IMGoal;
 import jadex.bdi.model.IMTypedElement;
 import jadex.bdi.model.OAVBDIMetaModel;
-import jadex.bdi.runtime.impl.flyweights.ProcessableElementFlyweight;
 import jadex.rules.state.IOAVState;
 
 import java.util.Collection;

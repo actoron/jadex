@@ -76,7 +76,7 @@ public interface IMCapability
 	 *  Get the configurations.
 	 *  @return The configurations.
 	 */
-//	public IMConfiguration[] getConfigurations();
+	public IMConfiguration[] getConfigurations();
 	
 	/**
 	 *  Get the default configuration.

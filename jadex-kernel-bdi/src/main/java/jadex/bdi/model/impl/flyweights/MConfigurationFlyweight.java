@@ -3,6 +3,7 @@ package jadex.bdi.model.impl.flyweights;
 import jadex.bdi.model.IMConfigBelief;
 import jadex.bdi.model.IMConfigBeliefSet;
 import jadex.bdi.model.IMConfigElement;
+import jadex.bdi.model.IMConfiguration;
 import jadex.bdi.model.IMInitialCapability;
 import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.rules.state.IOAVState;
@@ -11,9 +12,9 @@ import java.util.Collection;
 import java.util.Iterator;
 
 /**
- *
+ *  Flyweight for configuration model element.
  */
-public class MConfigurationFlyweight extends MElementFlyweight
+public class MConfigurationFlyweight extends MElementFlyweight implements IMConfiguration
 {
 	//-------- constructors --------
 	
