@@ -16,7 +16,7 @@ public interface IMBeliefSet extends IMTypedElement
 	 *  Get the facts expression.
 	 *  @return The facts expression. 
 	 */
-	public IMExpression getFactExpression();
+	public IMExpression getFactsExpression();
 	
 	/**
 	 *  Test if the belief is used as argument.

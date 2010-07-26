@@ -1,0 +1,42 @@
+package jadex.bdi.model.editable;
+
+import jadex.bdi.model.IMGoal;
+import jadex.bdi.model.IMGoalReference;
+import jadex.bdi.model.IMGoalbase;
+
+/**
+ * 
+ */
+public interface IMEGoalbase extends IMGoalbase
+{
+	/**
+	 *  Create a perform goal for a name.
+	 *  @param name	The goal name.
+	 */
+	public IMEPerformGoal createPerformGoal(String name);
+	
+	/**
+	 *  Create a achieve goal for a name.
+	 *  @param name	The goal name.
+	 */
+	public IMEAchieveGoal createAchieveGoal(String name);
+	
+	/**
+	 *  Create a query goal for a name.
+	 *  @param name	The goal name.
+	 */
+	public IMEQueryGoal createQueryGoal(String name);
+	
+	/**
+	 *  Create a maintain goal for a name.
+	 *  @param name	The goal name.
+	 */
+	public IMEMaintainGoal createMaintainGoal(String name);
+
+	/**
+	 *  Get a goal reference for a name.
+	 *  @param name	The goal reference name.
+	 */
+	public IMGoalReference createGoalReference(String name);
+
+}

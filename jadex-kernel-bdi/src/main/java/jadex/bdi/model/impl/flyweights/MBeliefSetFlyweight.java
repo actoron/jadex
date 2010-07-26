@@ -74,7 +74,7 @@ public class MBeliefSetFlyweight extends MTypedElementFlyweight implements IMBel
 	 *  Get the facts expression.
 	 *  @return The facts expression. 
 	 */
-	public IMExpression getFactExpression()
+	public IMExpression getFactsExpression()
 	{
 		if(isExternalThread())
 		{
