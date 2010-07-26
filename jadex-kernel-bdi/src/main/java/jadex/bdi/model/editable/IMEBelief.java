@@ -1,7 +1,6 @@
 package jadex.bdi.model.editable;
 
 import jadex.bdi.model.IMBelief;
-import jadex.bdi.model.IMExpression;
 
 /**
  * 
@@ -12,7 +11,7 @@ public interface IMEBelief extends IMBelief
 	 *  Get the fact.
 	 *  @return The fact. 
 	 */
-	public IMExpression createFact();
+	public IMEExpression createFact();
 	
 	/**
 	 *  Set the belief is used as argument.
