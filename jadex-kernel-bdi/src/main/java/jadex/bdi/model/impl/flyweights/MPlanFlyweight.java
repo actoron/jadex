@@ -3,6 +3,8 @@ package jadex.bdi.model.impl.flyweights;
 import jadex.bdi.model.IMCondition;
 import jadex.bdi.model.IMExpression;
 import jadex.bdi.model.IMPlan;
+import jadex.bdi.model.IMPlanTrigger;
+import jadex.bdi.model.IMTrigger;
 import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.rules.state.IOAVState;
 
@@ -89,7 +91,7 @@ public class MPlanFlyweight extends MParameterElementFlyweight implements IMPlan
 				{
 					Object handle = getState().getAttributeValue(getHandle(), OAVBDIMetaModel.plan_has_precondition);
 					if(handle!=null)
-						object = new MExpressionFlyweight(getState(), getScope(), handle);
+						object = new MConditionFlyweight(getState(), getScope(), handle);
 				}
 			};
 			return (IMCondition)invoc.object;
@@ -99,7 +101,7 @@ public class MPlanFlyweight extends MParameterElementFlyweight implements IMPlan
 			IMCondition ret = null;
 			Object handle = getState().getAttributeValue(getHandle(), OAVBDIMetaModel.plan_has_precondition);
 			if(handle!=null)
-				ret = new MExpressionFlyweight(getState(), getScope(), handle);
+				ret = new MConditionFlyweight(getState(), getScope(), handle);
 			return ret;
 		}
 	}
@@ -128,11 +130,11 @@ public class MPlanFlyweight extends MParameterElementFlyweight implements IMPlan
 						object = new MTriggerFlyweight(getState(), getScope(), handle);
 				}
 			};
-			return (IMCondition)invoc.object;
+			return (IMTrigger)invoc.object;
 		}
 		else
 		{
-			IMCondition ret = null;
+			IMTrigger ret = null;
 			Object handle = getState().getAttributeValue(getHandle(), OAVBDIMetaModel.plan_has_waitqueue);
 			if(handle!=null)
 				ret = new MTriggerFlyweight(getState(), getScope(), handle);
@@ -157,11 +159,11 @@ public class MPlanFlyweight extends MParameterElementFlyweight implements IMPlan
 						object = new MPlanTriggerFlyweight(getState(), getScope(), handle);
 				}
 			};
-			return (IMCondition)invoc.object;
+			return (IMPlanTrigger)invoc.object;
 		}
 		else
 		{
-			IMCondition ret = null;
+			IMPlanTrigger ret = null;
 			Object handle = getState().getAttributeValue(getHandle(), OAVBDIMetaModel.plan_has_trigger);
 			if(handle!=null)
 				ret = new MPlanTriggerFlyweight(getState(), getScope(), handle);

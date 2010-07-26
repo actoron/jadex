@@ -41,7 +41,7 @@ public class MGoalFlyweight extends MProcessableElementFlyweight implements IMGo
 				{
 					Object handle = getState().getAttributeValue(getHandle(), OAVBDIMetaModel.goal_has_creationcondition);
 					if(handle!=null)
-						object = new MExpressionFlyweight(getState(), getScope(), handle);
+						object = new MConditionFlyweight(getState(), getScope(), handle);
 				}
 			};
 			return (IMCondition)invoc.object;
@@ -51,7 +51,7 @@ public class MGoalFlyweight extends MProcessableElementFlyweight implements IMGo
 			IMCondition ret = null;
 			Object handle = getState().getAttributeValue(getHandle(), OAVBDIMetaModel.goal_has_creationcondition);
 			if(handle!=null)
-				ret = new MExpressionFlyweight(getState(), getScope(), handle);
+				ret = new MConditionFlyweight(getState(), getScope(), handle);
 			return ret;
 		}
 	}
@@ -70,7 +70,7 @@ public class MGoalFlyweight extends MProcessableElementFlyweight implements IMGo
 				{
 					Object handle = getState().getAttributeValue(getHandle(), OAVBDIMetaModel.goal_has_contextcondition);
 					if(handle!=null)
-						object = new MExpressionFlyweight(getState(), getScope(), handle);
+						object = new MConditionFlyweight(getState(), getScope(), handle);
 				}
 			};
 			return (IMCondition)invoc.object;
@@ -80,7 +80,7 @@ public class MGoalFlyweight extends MProcessableElementFlyweight implements IMGo
 			IMCondition ret = null;
 			Object handle = getState().getAttributeValue(getHandle(), OAVBDIMetaModel.goal_has_contextcondition);
 			if(handle!=null)
-				ret = new MExpressionFlyweight(getState(), getScope(), handle);
+				ret = new MConditionFlyweight(getState(), getScope(), handle);
 			return ret;
 		}
 	}
@@ -99,7 +99,7 @@ public class MGoalFlyweight extends MProcessableElementFlyweight implements IMGo
 				{
 					Object handle = getState().getAttributeValue(getHandle(), OAVBDIMetaModel.goal_has_dropcondition);
 					if(handle!=null)
-						object = new MExpressionFlyweight(getState(), getScope(), handle);
+						object = new MConditionFlyweight(getState(), getScope(), handle);
 				}
 			};
 			return (IMCondition)invoc.object;
@@ -109,7 +109,7 @@ public class MGoalFlyweight extends MProcessableElementFlyweight implements IMGo
 			IMCondition ret = null;
 			Object handle = getState().getAttributeValue(getHandle(), OAVBDIMetaModel.goal_has_dropcondition);
 			if(handle!=null)
-				ret = new MExpressionFlyweight(getState(), getScope(), handle);
+				ret = new MConditionFlyweight(getState(), getScope(), handle);
 			return ret;
 		}
 	}
@@ -220,7 +220,7 @@ public class MGoalFlyweight extends MProcessableElementFlyweight implements IMGo
 				{
 					Object handle = getState().getAttributeValue(getHandle(), OAVBDIMetaModel.goal_has_recurcondition);
 					if(handle!=null)
-						object = new MExpressionFlyweight(getState(), getScope(), handle);
+						object = new MConditionFlyweight(getState(), getScope(), handle);
 				}
 			};
 			return (IMCondition)invoc.object;
@@ -230,7 +230,7 @@ public class MGoalFlyweight extends MProcessableElementFlyweight implements IMGo
 			IMCondition ret = null;
 			Object handle = getState().getAttributeValue(getHandle(), OAVBDIMetaModel.goal_has_recurcondition);
 			if(handle!=null)
-				ret = new MExpressionFlyweight(getState(), getScope(), handle);
+				ret = new MConditionFlyweight(getState(), getScope(), handle);
 			return ret;
 		}
 	}

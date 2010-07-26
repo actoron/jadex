@@ -1,6 +1,5 @@
 package jadex.bdi.model.impl.flyweights;
 
-import jadex.bdi.model.IMCondition;
 import jadex.bdi.model.IMExpression;
 import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.rules.state.IOAVState;
@@ -8,7 +7,7 @@ import jadex.rules.state.IOAVState;
 /**
  *  Flyweight for expression model.
  */
-public class MExpressionFlyweight extends MReferenceableElementFlyweight implements IMExpression, IMCondition
+public class MExpressionFlyweight extends MReferenceableElementFlyweight implements IMExpression
 {
 	//-------- constructors --------
 	

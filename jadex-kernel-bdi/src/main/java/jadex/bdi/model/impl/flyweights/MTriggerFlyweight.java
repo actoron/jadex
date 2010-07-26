@@ -1,10 +1,8 @@
 package jadex.bdi.model.impl.flyweights;
 
-import jadex.bdi.model.IMInternalEvent;
 import jadex.bdi.model.IMTrigger;
 import jadex.bdi.model.IMTriggerReference;
 import jadex.bdi.model.OAVBDIMetaModel;
-import jadex.bdi.model.impl.flyweights.MElementFlyweight.AgentInvocation;
 import jadex.rules.state.IOAVState;
 
 import java.util.Collection;
@@ -45,7 +43,7 @@ public class MTriggerFlyweight extends MElementFlyweight implements IMTrigger
 						int i=0;
 						for(Iterator it=elems.iterator(); it.hasNext(); )
 						{
-							ret[i++] = new MTriggerReference(getState(), getScope(), it.next());
+							ret[i++] = new MTriggerReferenceFlyweight(getState(), getScope(), it.next());
 						}
 					}
 					object = ret;
@@ -62,7 +60,7 @@ public class MTriggerFlyweight extends MElementFlyweight implements IMTrigger
 				int i=0;
 				for(Iterator it=elems.iterator(); it.hasNext(); )
 				{
-					ret[i++] = new MTriggerReference(getState(), getScope(), it.next());
+					ret[i++] = new MTriggerReferenceFlyweight(getState(), getScope(), it.next());
 				}
 			}
 			return ret;
@@ -87,7 +85,7 @@ public class MTriggerFlyweight extends MElementFlyweight implements IMTrigger
 						int i=0;
 						for(Iterator it=elems.iterator(); it.hasNext(); )
 						{
-							ret[i++] = new MTriggerReference(getState(), getScope(), it.next());
+							ret[i++] = new MTriggerReferenceFlyweight(getState(), getScope(), it.next());
 						}
 					}
 					object = ret;
@@ -104,7 +102,7 @@ public class MTriggerFlyweight extends MElementFlyweight implements IMTrigger
 				int i=0;
 				for(Iterator it=elems.iterator(); it.hasNext(); )
 				{
-					ret[i++] = new MTriggerReference(getState(), getScope(), it.next());
+					ret[i++] = new MTriggerReferenceFlyweight(getState(), getScope(), it.next());
 				}
 			}
 			return ret;
@@ -129,7 +127,7 @@ public class MTriggerFlyweight extends MElementFlyweight implements IMTrigger
 						int i=0;
 						for(Iterator it=elems.iterator(); it.hasNext(); )
 						{
-							ret[i++] = new MTriggerReference(getState(), getScope(), it.next());
+							ret[i++] = new MTriggerReferenceFlyweight(getState(), getScope(), it.next());
 						}
 					}
 					object = ret;
@@ -146,7 +144,7 @@ public class MTriggerFlyweight extends MElementFlyweight implements IMTrigger
 				int i=0;
 				for(Iterator it=elems.iterator(); it.hasNext(); )
 				{
-					ret[i++] = new MTriggerReference(getState(), getScope(), it.next());
+					ret[i++] = new MTriggerReferenceFlyweight(getState(), getScope(), it.next());
 				}
 			}
 			return ret;

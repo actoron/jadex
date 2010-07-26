@@ -14,5 +14,5 @@ public interface IMPlanTrigger	extends IMElement
 	/**
 	 *  Get the trigger condition.
 	 */
-	public IMCondition	getFactAddeds();
+	public IMCondition	getCondition();
 }
