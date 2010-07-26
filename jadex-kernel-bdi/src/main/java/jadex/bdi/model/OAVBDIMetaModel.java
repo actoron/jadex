@@ -370,8 +370,8 @@ public class OAVBDIMetaModel
 	/** The agent (model) type. */
 	public static OAVObjectType agent_type;
 
-	/** Agent has propertyfile attribute. */
-	public static OAVAttributeType agent_has_propertyfile;
+//	/** Agent has propertyfile attribute. */
+//	public static OAVAttributeType agent_has_propertyfile;
 
 	//-------- capability --------
 	
@@ -1165,7 +1165,7 @@ public class OAVBDIMetaModel
 		capability_has_configurations = capability_type.createAttributeType("mcapability_has_mconfigurations", configuration_type, OAVAttributeType.ORDEREDMAP, null, modelelement_has_name);
 
 		// agent
-		agent_has_propertyfile	= agent_type.createAttributeType("magent_has_propertyfile", OAVJavaType.java_string_type);
+//		agent_has_propertyfile	= agent_type.createAttributeType("magent_has_propertyfile", OAVJavaType.java_string_type);
 		
 		// propertybase
 		properties_has_properties	= properties_type.createAttributeType("properties_has_properties", properties_type, OAVAttributeType.LIST);
