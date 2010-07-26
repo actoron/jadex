@@ -88,14 +88,14 @@ public class RoundBasedExecutor extends SimplePropertyObject implements ISpaceEx
 	public void start()
 	{
 		final AbstractEnvironmentSpace space = (AbstractEnvironmentSpace)getProperty("space");
-		IServiceProvider provider	= space.getContext().getServiceProvider();
+		final IServiceProvider provider	= space.getContext().getServiceProvider();
 
-		SServiceProvider.getService(space.getContext().getServiceProvider(), IClockService.class).addResultListener(new DefaultResultListener()
+		SServiceProvider.getService(provider, IClockService.class).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
 				final IClockService clockservice = (IClockService)result;
-				SServiceProvider.getService(space.getContext().getServiceProvider(), IExecutionService.class).addResultListener(new DefaultResultListener()
+				SServiceProvider.getService(provider, IExecutionService.class).addResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object source, Object result)
 					{
@@ -224,14 +224,13 @@ public class RoundBasedExecutor extends SimplePropertyObject implements ISpaceEx
 						});
 						
 						// Add the executor as context listener on the application.
-						SServiceProvider.getServiceUpwards(space.getContext().getServiceProvider(), IComponentManagementService.class).addResultListener(new DefaultResultListener()
+						SServiceProvider.getServiceUpwards(provider, IComponentManagementService.class).addResultListener(new DefaultResultListener()
 						{
 							public void resultAvailable(Object source, Object result)
 							{
 								IComponentManagementService	cms	= (IComponentManagementService)result;
 								cms.addComponentListener(space.getContext().getComponentIdentifier(), new IComponentListener()
 								{
-									
 									public void componentRemoved(IComponentDescription desc, Map results)
 									{
 										terminate();

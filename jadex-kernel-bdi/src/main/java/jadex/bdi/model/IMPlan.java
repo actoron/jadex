@@ -35,14 +35,12 @@ public interface IMPlan extends IMParameterElement
 	 *  Get the waitqueue.
 	 *  @return The waitqueue.
 	 */
-	// todo
-//	public IMTriggerType getWaitqueue();
+	public IMTrigger getWaitqueue();
 	
 	/**
 	 *  Get the trigger.
 	 *  @return The trigger.
 	 */
-	// todo
-//	public IMPlanTriggerType getTrigger();
+	public IMPlanTrigger getTrigger();
 }
 

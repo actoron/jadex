@@ -38,8 +38,7 @@ public class OnlineUsersPluginApi extends Api
 	}
 	
 	/**
-	 *  Get names of currently online users sorted by last access.
-	 *  @param max	The maximum number (-1 for no max.).
+	 *  Get number of currently online guests.
 	 */
 	public int	getGuestCount()
 	{
