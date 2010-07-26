@@ -1,7 +1,9 @@
 package jadex.bdi.model.impl.flyweights;
 
 import jadex.bdi.model.IMBelief;
+import jadex.bdi.model.IMBeliefReference;
 import jadex.bdi.model.IMBeliefSet;
+import jadex.bdi.model.IMBeliefSetReference;
 import jadex.bdi.model.IMBeliefbase;
 import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.rules.state.IOAVState;
@@ -171,4 +173,149 @@ public class MBeliefbaseFlyweight extends MElementFlyweight implements IMBeliefb
 			return ret;
 		}
 	}
+	
+	/**
+	 *  Get a belief for a name.
+	 *  @param name	The belief name.
+	 */
+	public IMBeliefReference getBeliefReference(final String name)
+	{
+		if(getInterpreter().isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					Object handle = getState().getAttributeValue(getScope(), OAVBDIMetaModel.capability_has_beliefrefs, name);
+					if(handle==null)
+						throw new RuntimeException("Belief reference not found: "+name);
+					object = new MBeliefReferenceFlyweight(getState(), getScope(), handle);
+				}
+			};
+			return (IMBeliefReference)invoc.object;
+		}
+		else
+		{
+			Object handle = getState().getAttributeValue(getScope(), OAVBDIMetaModel.capability_has_beliefrefs, name);
+			if(handle==null)
+				throw new RuntimeException("Belief reference not found: "+name);
+			return new MBeliefReferenceFlyweight(getState(), getScope(), handle);
+		}
+	}
+
+	/**
+	 *  Returns all belief references.
+	 *  @return All belief references.
+	 */
+	public IMBeliefReference[] getBeliefReferences()
+	{
+		if(getInterpreter().isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					Collection elems = (Collection)getState().getAttributeValue(getScope(), OAVBDIMetaModel.capability_has_beliefrefs);
+					IMBeliefReference[] ret = new IMBeliefReference[elems==null? 0: elems.size()];
+					if(elems!=null)
+					{
+						int i=0;
+						for(Iterator it=elems.iterator(); it.hasNext(); )
+						{
+							ret[i++] = new MBeliefReferenceFlyweight(getState(), getScope(), it.next());
+						}
+					}
+					object = ret;
+				}
+			};
+			return (IMBeliefReference[])invoc.object;
+		}
+		else
+		{
+			Collection elems = (Collection)getState().getAttributeValue(getScope(), OAVBDIMetaModel.capability_has_beliefrefs);
+			IMBeliefReference[] ret = new IMBeliefReference[elems==null? 0: elems.size()];
+			if(elems!=null)
+			{
+				int i=0;
+				for(Iterator it=elems.iterator(); it.hasNext(); )
+				{
+					ret[i++] = new MBeliefReferenceFlyweight(getState(), getScope(), it.next());
+				}
+			}
+			return ret;
+		}
+	}
+	
+	/**
+	 *  Get a beliefset reference for a name.
+	 *  @param name	The beliefset reference name.
+	 */
+	public IMBeliefSetReference getBeliefSetReference(final String name)
+	{
+		if(getInterpreter().isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					Object handle = getState().getAttributeValue(getScope(), OAVBDIMetaModel.capability_has_beliefsetrefs, name);
+					if(handle==null)
+						throw new RuntimeException("Beliefset reference not found: "+name);
+					object = new MBeliefReferenceFlyweight(getState(), getScope(), handle);
+				}
+			};
+			return (IMBeliefSetReference)invoc.object;
+		}
+		else
+		{
+			Object handle = getState().getAttributeValue(getScope(), OAVBDIMetaModel.capability_has_beliefsetrefs, name);
+			if(handle==null)
+				throw new RuntimeException("Beliefset reference not found: "+name);
+			return new MBeliefSetReferenceFlyweight(getState(), getScope(), handle);
+		}
+	}
+
+	/**
+	 *  Returns all beliefset references.
+	 *  @return All beliefset references.
+	 */
+	public IMBeliefSetReference[] getBeliefSetReferences()
+	{
+		if(getInterpreter().isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					Collection elems = (Collection)getState().getAttributeValue(getScope(), OAVBDIMetaModel.capability_has_beliefsetrefs);
+					IMBeliefSetReference[] ret = new IMBeliefSetReference[elems==null? 0: elems.size()];
+					if(elems!=null)
+					{
+						int i=0;
+						for(Iterator it=elems.iterator(); it.hasNext(); )
+						{
+							ret[i++] = new MBeliefSetReferenceFlyweight(getState(), getScope(), it.next());
+						}
+					}
+					object = ret;
+				}
+			};
+			return (IMBeliefSetReference[])invoc.object;
+		}
+		else
+		{
+			Collection elems = (Collection)getState().getAttributeValue(getScope(), OAVBDIMetaModel.capability_has_beliefsetrefs);
+			IMBeliefSetReference[] ret = new IMBeliefSetReference[elems==null? 0: elems.size()];
+			if(elems!=null)
+			{
+				int i=0;
+				for(Iterator it=elems.iterator(); it.hasNext(); )
+				{
+					ret[i++] = new MBeliefSetReferenceFlyweight(getState(), getScope(), it.next());
+				}
+			}
+			return ret;
+		}
+	}
+	
 }

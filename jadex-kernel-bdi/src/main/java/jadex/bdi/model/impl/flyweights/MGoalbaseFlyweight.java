@@ -1,6 +1,7 @@
 package jadex.bdi.model.impl.flyweights;
 
 import jadex.bdi.model.IMGoal;
+import jadex.bdi.model.IMGoalReference;
 import jadex.bdi.model.IMGoalbase;
 import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.rules.state.IOAVState;
@@ -91,6 +92,78 @@ public class MGoalbaseFlyweight extends MElementFlyweight implements IMGoalbase
 				for(Iterator it=elems.iterator(); it.hasNext(); )
 				{
 					ret[i++] = new MGoalFlyweight(getState(), getScope(), it.next());
+				}
+			}
+			return ret;
+		}
+	}
+	
+	/**
+	 *  Get a goal reference for a name.
+	 *  @param name	The goal reference name.
+	 */
+	public IMGoalReference getGoalReference(final String name)
+	{
+		if(getInterpreter().isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					Object handle = getState().getAttributeValue(getScope(), OAVBDIMetaModel.capability_has_goalrefs, name);
+					if(handle==null)
+						throw new RuntimeException("Goal reference not found: "+name);
+					object = new MGoalReferenceFlyweight(getState(), getScope(), handle);
+				}
+			};
+			return (IMGoalReference)invoc.object;
+		}
+		else
+		{
+			Object handle = getState().getAttributeValue(getScope(), OAVBDIMetaModel.capability_has_goalrefs, name);
+			if(handle==null)
+				throw new RuntimeException("Goal reference not found: "+name);
+			return new MGoalReferenceFlyweight(getState(), getScope(), handle);
+		}
+	}
+
+	/**
+	 *  Get all goal references.
+	 *  @param name	Goal references.
+	 */
+	public IMGoalReference[] getGoalReferences()
+	{
+		if(getInterpreter().isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					Collection elems = (Collection)getState().getAttributeValue(getScope(), OAVBDIMetaModel.capability_has_goalrefs);
+					IMGoalReference[] ret = new IMGoalReference[elems==null? 0: elems.size()];
+					if(elems!=null)
+					{
+						int i=0;
+						for(Iterator it=elems.iterator(); it.hasNext(); )
+						{
+							ret[i++] = new MGoalReferenceFlyweight(getState(), getScope(), it.next());
+						}
+					}
+					object = ret;
+				}
+			};
+			return (IMGoalReference[])invoc.object;
+		}
+		else
+		{
+			Collection elems = (Collection)getState().getAttributeValue(getScope(), OAVBDIMetaModel.capability_has_goalrefs);
+			IMGoalReference[] ret = new IMGoalReference[elems==null? 0: elems.size()];
+			if(elems!=null)
+			{
+				int i=0;
+				for(Iterator it=elems.iterator(); it.hasNext(); )
+				{
+					ret[i++] = new MGoalReferenceFlyweight(getState(), getScope(), it.next());
 				}
 			}
 			return ret;

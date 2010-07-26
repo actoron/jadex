@@ -1,7 +1,5 @@
 package jadex.bdi.model;
 
-import jadex.bridge.IMessageService;
-import jadex.rules.state.OAVAttributeType;
 
 /**
  *  Interface for capability model.

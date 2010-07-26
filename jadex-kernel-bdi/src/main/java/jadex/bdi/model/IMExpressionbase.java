@@ -16,4 +16,16 @@ public interface IMExpressionbase extends IMElement
 	 *  @return All expressions.
 	 */
 	public IMExpression[] getExpressions();
+	
+	/**
+	 *  Get a expression reference for a name.
+	 *  @param name	The expression name.
+	 */
+	public IMExpressionReference getExpressionReference(String name);
+
+	/**
+	 *  Returns all expression references.
+	 *  @return All expression references.
+	 */
+	public IMExpressionReference[] getExpressionReferences();
 }

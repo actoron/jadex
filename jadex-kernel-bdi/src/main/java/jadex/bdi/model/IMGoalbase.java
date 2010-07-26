@@ -18,9 +18,14 @@ public interface IMGoalbase
 	public IMGoal[] getGoals();
 	
 	/**
-	 *  Get a goal for a name.
-	 *  @param name	The goal name.
+	 *  Get a goal reference for a name.
+	 *  @param name	The goal reference name.
 	 */
-//	public IMGoal getGoalReference(String name);
+	public IMGoalReference getGoalReference(String name);
 
+	/**
+	 *  Get all goal references.
+	 *  @param name	Goal references.
+	 */
+	public IMGoalReference[] getGoalReferences();
 }
