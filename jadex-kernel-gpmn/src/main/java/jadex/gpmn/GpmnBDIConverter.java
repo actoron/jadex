@@ -133,7 +133,7 @@ public class GpmnBDIConverter
 		}
 		
 		state.removeStateListener(listener);
-		agentmodel =  new OAVAgentModel(state, handle, typemodel, types, model.getFilename(), model.getLastModified(), report);
+		agentmodel =  new OAVAgentModel(state, handle, types, model.getFilename(), model.getLastModified(), report);
 		try
 		{
 			loader.createAgentModelEntry(agentmodel, report);
