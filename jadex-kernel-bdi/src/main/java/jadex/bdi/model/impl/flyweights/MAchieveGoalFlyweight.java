@@ -36,7 +36,7 @@ public class MAchieveGoalFlyweight extends MGoalFlyweight implements IMAchieveGo
 				{
 					Object handle = getState().getAttributeValue(getHandle(), OAVBDIMetaModel.achievegoal_has_targetcondition);
 					if(handle!=null)
-						object = new MExpressionFlyweight(getState(), getScope(), handle);
+						object = new MConditionFlyweight(getState(), getScope(), handle);
 				}
 			};
 			return (IMCondition)invoc.object;
@@ -46,7 +46,7 @@ public class MAchieveGoalFlyweight extends MGoalFlyweight implements IMAchieveGo
 			IMCondition ret = null;
 			Object handle = getState().getAttributeValue(getHandle(), OAVBDIMetaModel.achievegoal_has_targetcondition);
 			if(handle!=null)
-				ret = new MExpressionFlyweight(getState(), getScope(), handle);
+				ret = new MConditionFlyweight(getState(), getScope(), handle);
 			return ret;
 		}
 	}

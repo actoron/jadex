@@ -36,7 +36,7 @@ public class MMaintainGoalFlyweight extends MGoalFlyweight implements IMMaintain
 				{
 					Object handle = getState().getAttributeValue(getHandle(), OAVBDIMetaModel.maintaingoal_has_maintaincondition);
 					if(handle!=null)
-						object = new MExpressionFlyweight(getState(), getScope(), handle);
+						object = new MConditionFlyweight(getState(), getScope(), handle);
 				}
 			};
 			return (IMCondition)invoc.object;
@@ -46,7 +46,7 @@ public class MMaintainGoalFlyweight extends MGoalFlyweight implements IMMaintain
 			IMCondition ret = null;
 			Object handle = getState().getAttributeValue(getHandle(), OAVBDIMetaModel.maintaingoal_has_maintaincondition);
 			if(handle!=null)
-				ret = new MExpressionFlyweight(getState(), getScope(), handle);
+				ret = new MConditionFlyweight(getState(), getScope(), handle);
 			return ret;
 		}
 	}
@@ -65,7 +65,7 @@ public class MMaintainGoalFlyweight extends MGoalFlyweight implements IMMaintain
 				{
 					Object handle = getState().getAttributeValue(getHandle(), OAVBDIMetaModel.maintaingoal_has_targetcondition);
 					if(handle!=null)
-						object = new MExpressionFlyweight(getState(), getScope(), handle);
+						object = new MConditionFlyweight(getState(), getScope(), handle);
 				}
 			};
 			return (IMCondition)invoc.object;
@@ -75,7 +75,7 @@ public class MMaintainGoalFlyweight extends MGoalFlyweight implements IMMaintain
 			IMCondition ret = null;
 			Object handle = getState().getAttributeValue(getHandle(), OAVBDIMetaModel.maintaingoal_has_targetcondition);
 			if(handle!=null)
-				ret = new MExpressionFlyweight(getState(), getScope(), handle);
+				ret = new MConditionFlyweight(getState(), getScope(), handle);
 			return ret;
 		}
 	}
