@@ -823,12 +823,30 @@ public class EABeliefbaseFlyweight extends ElementFlyweight implements IEABelief
 		return ret;
 	}
 	
+	//-------- element interface --------
+	
 	/**
 	 *  Get the model element.
+	 *  @return The model element.
 	 */
 	public IMElement getModelElement()
 	{
-		Object mscope = getState().getAttributeValue(getScope(), OAVBDIRuntimeModel.element_has_model);
-		return new MBeliefbaseFlyweight(getState(), mscope);
+		if(getInterpreter().isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					Object me = getState().getAttributeValue(getHandle(), OAVBDIRuntimeModel.element_has_model);
+					object = new MBeliefbaseFlyweight(getState(), me);
+				}
+			};
+			return (IMElement)invoc.object;
+		}
+		else
+		{
+			Object me = getState().getAttributeValue(getHandle(), OAVBDIRuntimeModel.element_has_model);
+			return new MBeliefbaseFlyweight(getState(), me);
+		}
 	}
 }
