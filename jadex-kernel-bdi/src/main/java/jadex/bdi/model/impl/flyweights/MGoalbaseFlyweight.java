@@ -41,7 +41,7 @@ public class MGoalbaseFlyweight extends MElementFlyweight implements IMGoalbase
 					Object handle = getState().getAttributeValue(getScope(), OAVBDIMetaModel.capability_has_goals, name);
 					if(handle==null)
 						throw new RuntimeException("Goal not found: "+name);
-					object = new MGoalFlyweight(getState(), getScope(), handle);
+					object = createFlyweight(getState(), getScope(), handle);
 				}
 			};
 			return (IMGoal)invoc.object;
@@ -51,7 +51,7 @@ public class MGoalbaseFlyweight extends MElementFlyweight implements IMGoalbase
 			Object handle = getState().getAttributeValue(getScope(), OAVBDIMetaModel.capability_has_goals, name);
 			if(handle==null)
 				throw new RuntimeException("Goal not found: "+name);
-			return new MGoalFlyweight(getState(), getScope(), handle);
+			return createFlyweight(getState(), getScope(), handle);
 		}
 	}
 
@@ -74,7 +74,7 @@ public class MGoalbaseFlyweight extends MElementFlyweight implements IMGoalbase
 						int i=0;
 						for(Iterator it=elems.iterator(); it.hasNext(); )
 						{
-							ret[i++] = new MGoalFlyweight(getState(), getScope(), it.next());
+							ret[i++] = createFlyweight(getState(), getScope(), it.next());
 						}
 					}
 					object = ret;
@@ -91,7 +91,7 @@ public class MGoalbaseFlyweight extends MElementFlyweight implements IMGoalbase
 				int i=0;
 				for(Iterator it=elems.iterator(); it.hasNext(); )
 				{
-					ret[i++] = new MGoalFlyweight(getState(), getScope(), it.next());
+					ret[i++] = createFlyweight(getState(), getScope(), it.next());
 				}
 			}
 			return ret;
@@ -168,5 +168,40 @@ public class MGoalbaseFlyweight extends MElementFlyweight implements IMGoalbase
 			}
 			return ret;
 		}
+	}
+	
+	/**
+	 *  Create a goal flyweight.
+	 */
+	public static IMGoal createFlyweight(IOAVState state, Object scope, Object handle)
+	{
+		IMGoal ret = null;
+		
+		if(OAVBDIMetaModel.metagoal_type.equals(state.getType(handle)))
+		{
+			ret = new MMetaGoalFlyweight(state, scope, handle);
+		}
+		else if(OAVBDIMetaModel.performgoal_type.equals(state.getType(handle)))
+		{
+			ret = new MPerformGoalFlyweight(state, scope, handle);
+		}
+		else if(OAVBDIMetaModel.achievegoal_type.equals(state.getType(handle)))
+		{
+			ret = new MAchieveGoalFlyweight(state, scope, handle);
+		}
+		else if(OAVBDIMetaModel.querygoal_type.equals(state.getType(handle)))
+		{
+			ret = new MQueryGoalFlyweight(state, scope, handle);
+		}
+		else if(OAVBDIMetaModel.maintaingoal_type.equals(state.getType(handle)))
+		{
+			ret = new MMaintainGoalFlyweight(state, scope, handle);
+		}
+		else
+		{
+			throw new RuntimeException("Unknown goal type: "+handle);
+		}
+		
+		return ret;
 	}
 }

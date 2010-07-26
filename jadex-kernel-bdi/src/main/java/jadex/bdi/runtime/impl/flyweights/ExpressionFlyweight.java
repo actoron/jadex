@@ -1,10 +1,13 @@
 package jadex.bdi.runtime.impl.flyweights;
 
+import jadex.bdi.model.IMElement;
+import jadex.bdi.model.impl.flyweights.MExpressionFlyweight;
 import jadex.bdi.runtime.IExpression;
 import jadex.bdi.runtime.impl.FlyweightFunctionality;
 import jadex.bdi.runtime.interpreter.AgentRules;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.OAVBDIFetcher;
+import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.rules.state.IOAVState;
 
 /**
@@ -204,7 +207,7 @@ public class ExpressionFlyweight extends ElementFlyweight implements IExpression
 	/**
 	 *  Get the model element.
 	 *  @return The model element.
-	 * /
+	 */
 	public IMElement getModelElement()
 	{
 		if(getInterpreter().isExternalThread())
@@ -226,5 +229,5 @@ public class ExpressionFlyweight extends ElementFlyweight implements IExpression
 			Object mscope = getState().getAttributeValue(getScope(), OAVBDIRuntimeModel.element_has_model);
 			return new MExpressionFlyweight(getState(), mscope, me);
 		}
-	}*/
+	}
 }

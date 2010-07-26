@@ -1,5 +1,7 @@
 package jadex.bdi.runtime.impl.flyweights;
 
+import jadex.bdi.model.IMElement;
+import jadex.bdi.model.impl.flyweights.MBeliefFlyweight;
 import jadex.bdi.runtime.IElement;
 import jadex.bdi.runtime.impl.eaflyweights.EAParameterFlyweight;
 import jadex.bdi.runtime.impl.eaflyweights.EAParameterSetFlyweight;
@@ -163,7 +165,6 @@ public abstract class ElementFlyweight implements IElement
 	{
 		return interpreter;
 	}
-	
 	
 	/**
 	 *  Remove the external usage preventing
@@ -404,116 +405,5 @@ public abstract class ElementFlyweight implements IElement
 	}
 
 	
-	/*public static Map flycreators;
-	
-	static
-	{
-		flycreators = new HashMap();
-		
-		IFlyweightCreator bc = new IFlyweightCreator()
-		{
-			public ElementFlyweight createFlyweight(IOAVState state, Object scope, Object handle)
-			{
-				return BeliefFlyweight.getBeliefFlyweight(state, scope, handle);
-			}
-		};
-		flycreators.put(IBelief.class, bc);
-		
-		IFlyweightCreator bsc = new IFlyweightCreator()
-		{
-			public ElementFlyweight createFlyweight(IOAVState state, Object scope, Object handle)
-			{
-				return BeliefSetFlyweight.getBeliefSetFlyweight(state, scope, handle);
-			}
-		};
-		flycreators.put(IBeliefSet.class, bsc);
-		
-		IFlyweightCreator gc = new IFlyweightCreator()
-		{
-			public ElementFlyweight createFlyweight(IOAVState state, Object scope, Object handle)
-			{
-				return GoalFlyweight.getGoalFlyweight(state, scope, handle);
-			}
-		};
-		flycreators.put(IGoal.class, gc);
-		
-		IFlyweightCreator pc = new IFlyweightCreator()
-		{
-			public ElementFlyweight createFlyweight(IOAVState state, Object scope, Object handle)
-			{
-				return PlanFlyweight.getPlanFlyweight(state, scope, handle);
-			}
-		};
-		flycreators.put(PlanFlyweight.class, pc);
-		
-		IFlyweightCreator ec = new IFlyweightCreator()
-		{
-			public ElementFlyweight createFlyweight(IOAVState state, Object scope, Object handle)
-			{
-				return ExpressionFlyweight.getExpressionFlyweight(state, scope, handle);
-			}
-		};
-		flycreators.put(IExpression.class, ec);
-		
-		IFlyweightCreator cc = new IFlyweightCreator()
-		{
-			public ElementFlyweight createFlyweight(IOAVState state, Object scope, Object handle)
-			{
-				return new ChangeEventFlyweight(state, scope, handle);
-			}
-		};
-		flycreators.put(IChangeEvent, cc);
-		
-		IFlyweightCreator evc = new IFlyweightCreator()
-		{
-			public ElementFlyweight createFlyweight(IOAVState state, Object scope, Object handle)
-			{
-				return EventbaseFlyweight.getEventbaseFlyweight(state, scope);
-			}
-		};
-		flycreators.put(EventbaseFlyweight.EVENTBASE_TYPE, evc);
-		
-		IFlyweightCreator exc = new IFlyweightCreator()
-		{
-			public ElementFlyweight createFlyweight(IOAVState state, Object scope, Object handle)
-			{
-				return ExpressionbaseFlyweight.getExpressionbaseFlyweight(state, scope);
-			}
-		};
-		flycreators.put(ExpressionbaseFlyweight.EXPRESSIONBASE_TYPE, evc);
-		
-		IFlyweightCreator gbc = new IFlyweightCreator()
-		{
-			public ElementFlyweight createFlyweight(IOAVState state, Object scope, Object handle)
-			{
-				return GoalbaseFlyweight.getGoalbaseFlyweight(state, scope);
-			}
-		};
-		flycreators.put(ExpressionbaseFlyweight.EXPRESSIONBASE_TYPE, evc);
-	}
-	
-	/**
-	 *  Create a flyweight
-	 *  @param type
-	 *  @param ea
-	 *  @param state
-	 *  @param scope
-	 *  @return
-	 * /
-	public static ElementFlyweight createFlyweight(OAVObjectType type, boolean ea, IOAVState state, Object scope, Object handle)
-	{
-		ElementFlyweight ret;
-		if(ea)
-		{
-			IFlyweightCreator fc = (IFlyweightCreator)flycreators.get(type);
-			ret = fc.createFlyweight(state, scope, handle);
-		}
-		else
-		{
-			IFlyweightCreator fc = (IFlyweightCreator)eaflycreators.get(type);
-			ret = fc.createFlyweight(state, scope, handle);
-		}
-		return ret;
-	}*/
 	
 }

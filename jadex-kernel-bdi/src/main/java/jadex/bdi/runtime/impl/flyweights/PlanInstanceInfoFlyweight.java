@@ -1,5 +1,6 @@
 package jadex.bdi.runtime.impl.flyweights;
 
+import jadex.bdi.model.IMElement;
 import jadex.bdi.runtime.ICandidateInfo;
 import jadex.bdi.runtime.IElement;
 import jadex.bdi.runtime.IParameterElement;
@@ -82,9 +83,9 @@ public class PlanInstanceInfoFlyweight extends ElementFlyweight implements ICand
 	/**
 	 *  Get the model element.
 	 *  @return The model element.
-	 * /
+	 */
 	public IMElement getModelElement()
 	{
-		throw new UnsupportedOperationException();
-	}*/
+		throw new RuntimeException("Element has no model: "+this);
+	}
 }

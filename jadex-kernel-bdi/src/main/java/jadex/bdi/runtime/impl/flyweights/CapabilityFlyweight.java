@@ -1,5 +1,7 @@
 package jadex.bdi.runtime.impl.flyweights;
 
+import jadex.bdi.model.IMElement;
+import jadex.bdi.model.impl.flyweights.MCapabilityFlyweight;
 import jadex.bdi.runtime.IAgentListener;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBeliefbase;
@@ -561,7 +563,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	/**
 	 *  Get the model element.
 	 *  @return The model element.
-	 * /
+	 */
 	public IMElement getModelElement()
 	{
 		if(getInterpreter().isExternalThread())
@@ -581,5 +583,5 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 			Object mscope = getState().getAttributeValue(getScope(), OAVBDIRuntimeModel.element_has_model);
 			return new MCapabilityFlyweight(getState(), mscope);
 		}
-	}*/
+	}
 }

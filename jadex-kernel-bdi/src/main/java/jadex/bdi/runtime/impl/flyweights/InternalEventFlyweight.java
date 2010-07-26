@@ -1,7 +1,10 @@
 package jadex.bdi.runtime.impl.flyweights;
 
+import jadex.bdi.model.IMElement;
+import jadex.bdi.model.impl.flyweights.MInternalEventFlyweight;
 import jadex.bdi.runtime.IInternalEvent;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
+import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.rules.state.IOAVState;
 
 /**
@@ -99,7 +102,7 @@ public class InternalEventFlyweight extends ProcessableElementFlyweight implemen
 	/**
 	 *  Get the model element.
 	 *  @return The model element.
-	 * /
+	 */
 	public IMElement getModelElement()
 	{
 		if(getInterpreter().isExternalThread())
@@ -121,5 +124,5 @@ public class InternalEventFlyweight extends ProcessableElementFlyweight implemen
 			Object mscope = getState().getAttributeValue(getScope(), OAVBDIRuntimeModel.element_has_model);
 			return new MInternalEventFlyweight(getState(), mscope, me);
 		}
-	}*/
+	}
 }

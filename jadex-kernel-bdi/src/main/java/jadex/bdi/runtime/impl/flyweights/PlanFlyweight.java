@@ -1,5 +1,7 @@
 package jadex.bdi.runtime.impl.flyweights;
 
+import jadex.bdi.model.IMElement;
+import jadex.bdi.model.impl.flyweights.MPlanFlyweight;
 import jadex.bdi.runtime.IElement;
 import jadex.bdi.runtime.IPlan;
 import jadex.bdi.runtime.IPlanListener;
@@ -212,7 +214,7 @@ public class PlanFlyweight extends ParameterElementFlyweight implements IPlan
 	/**
 	 *  Get the model element.
 	 *  @return The model element.
-	 * /
+	 */
 	public IMElement getModelElement()
 	{
 		if(getInterpreter().isExternalThread())
@@ -234,5 +236,5 @@ public class PlanFlyweight extends ParameterElementFlyweight implements IPlan
 			Object mscope = getState().getAttributeValue(getScope(), OAVBDIRuntimeModel.element_has_model);
 			return new MPlanFlyweight(getState(), mscope, me);
 		}
-	}*/
+	}
 }

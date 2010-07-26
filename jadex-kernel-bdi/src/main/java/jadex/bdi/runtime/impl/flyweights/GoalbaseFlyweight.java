@@ -1,6 +1,8 @@
 package jadex.bdi.runtime.impl.flyweights;
 
+import jadex.bdi.model.IMElement;
 import jadex.bdi.model.OAVBDIMetaModel;
+import jadex.bdi.model.impl.flyweights.MGoalbaseFlyweight;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IGoalListener;
 import jadex.bdi.runtime.IGoalbase;
@@ -275,7 +277,7 @@ public class GoalbaseFlyweight extends ElementFlyweight implements IGoalbase
 	/**
 	 *  Get the model element.
 	 *  @return The model element.
-	 * /
+	 */
 	public IMElement getModelElement()
 	{
 		if(getInterpreter().isExternalThread())
@@ -295,7 +297,7 @@ public class GoalbaseFlyweight extends ElementFlyweight implements IGoalbase
 			Object mscope = getState().getAttributeValue(getScope(), OAVBDIRuntimeModel.element_has_model);
 			return new MGoalbaseFlyweight(getState(), mscope);
 		}
-	}*/
+	}
 	
 	//-------- helper methods --------
 	

@@ -1,6 +1,8 @@
 package jadex.bdi.runtime.impl.flyweights;
 
+import jadex.bdi.model.IMElement;
 import jadex.bdi.model.OAVBDIMetaModel;
+import jadex.bdi.model.impl.flyweights.MEventbaseFlyweight;
 import jadex.bdi.runtime.IEventbase;
 import jadex.bdi.runtime.IInternalEvent;
 import jadex.bdi.runtime.IInternalEventListener;
@@ -11,6 +13,7 @@ import jadex.bdi.runtime.interpreter.AgentRules;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.InternalEventRules;
 import jadex.bdi.runtime.interpreter.MessageEventRules;
+import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.Tuple;
 import jadex.rules.state.IOAVState;
@@ -429,7 +432,7 @@ public class EventbaseFlyweight extends ElementFlyweight implements IEventbase
 	/**
 	 *  Get the model element.
 	 *  @return The model element.
-	 * /
+	 */
 	public IMElement getModelElement()
 	{
 		if(getInterpreter().isExternalThread())
@@ -449,6 +452,6 @@ public class EventbaseFlyweight extends ElementFlyweight implements IEventbase
 			Object mscope = getState().getAttributeValue(getScope(), OAVBDIRuntimeModel.element_has_model);
 			return new MEventbaseFlyweight(getState(), mscope);
 		}
-	}*/
+	}
 	
 }

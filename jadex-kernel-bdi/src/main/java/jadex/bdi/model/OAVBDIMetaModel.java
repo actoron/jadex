@@ -537,7 +537,7 @@ public class OAVBDIMetaModel
 	public static OAVAttributeType achievegoal_has_targetcondition;
 	
 	/** Achieve goal has failure condition attribute . */
-	public static OAVAttributeType achievegoal_has_failurecondition;
+//	public static OAVAttributeType achievegoal_has_failurecondition;
 	
 //	/** The achieve goal ref type. */
 //	public static OAVObjectType achievegoalref_type;
@@ -547,8 +547,8 @@ public class OAVBDIMetaModel
 	/** The query goal type. */
 	public static OAVObjectType querygoal_type;
 	
-	/** Query goal has failure condition attribute . */
-	public static OAVAttributeType querygoal_has_failurecondition;
+//	/** Query goal has failure condition attribute . */
+//	public static OAVAttributeType querygoal_has_failurecondition;
 	
 //	/** The query goal ref type. */
 //	public static OAVObjectType querygoalref_type;
@@ -1057,10 +1057,10 @@ public class OAVBDIMetaModel
 		
 		// achieve goal
 		achievegoal_has_targetcondition = achievegoal_type.createAttributeType("machievegoal_has_targetcondition", condition_type);
-		achievegoal_has_failurecondition = achievegoal_type.createAttributeType("machievegoal_has_failurecondition", condition_type);
+//		achievegoal_has_failurecondition = achievegoal_type.createAttributeType("machievegoal_has_failurecondition", condition_type);
 
 		// query goal
-		querygoal_has_failurecondition = querygoal_type.createAttributeType("mquerygoal_has_failurecondition", condition_type);
+//		querygoal_has_failurecondition = querygoal_type.createAttributeType("mquerygoal_has_failurecondition", condition_type);
 	
 		// maintain goal
 		maintaingoal_has_maintaincondition = maintaingoal_type.createAttributeType("mmaintaingoal_has_maintaincondition", condition_type);

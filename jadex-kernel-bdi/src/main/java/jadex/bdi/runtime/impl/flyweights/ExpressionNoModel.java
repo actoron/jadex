@@ -1,5 +1,6 @@
 package jadex.bdi.runtime.impl.flyweights;
 
+import jadex.bdi.model.IMElement;
 import jadex.bdi.runtime.IExpression;
 import jadex.bdi.runtime.impl.FlyweightFunctionality;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
@@ -154,11 +155,11 @@ public class ExpressionNoModel implements IExpression
 	/**
 	 *  Get the model element.
 	 *  @return The model element.
-	 * /
+	 */
 	public IMElement getModelElement()
 	{
 		throw new RuntimeException("Expression has no model element.");
-	}*/
+	}
 	
 	//-------- inner classes --------
 

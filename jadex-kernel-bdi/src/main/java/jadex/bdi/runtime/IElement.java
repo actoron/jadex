@@ -1,5 +1,7 @@
 package jadex.bdi.runtime;
 
+import jadex.bdi.model.IMElement;
+
 
 /**
  *	Base interface for all runtime elements.
@@ -18,5 +20,5 @@ public interface IElement
 	 *  Get the model element.
 	 *  @return The model element.
 	 */
-//	public IMElement getModelElement();
+	public IMElement getModelElement();
 }

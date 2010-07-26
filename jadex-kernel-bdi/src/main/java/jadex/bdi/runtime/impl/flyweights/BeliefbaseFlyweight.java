@@ -1,10 +1,13 @@
 package jadex.bdi.runtime.impl.flyweights;
 
+import jadex.bdi.model.IMElement;
+import jadex.bdi.model.impl.flyweights.MBeliefbaseFlyweight;
 import jadex.bdi.runtime.IBelief;
 import jadex.bdi.runtime.IBeliefSet;
 import jadex.bdi.runtime.IBeliefbase;
 import jadex.bdi.runtime.impl.FlyweightFunctionality;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
+import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.commons.Tuple;
 import jadex.rules.state.IOAVState;
 
@@ -315,7 +318,7 @@ public class BeliefbaseFlyweight extends ElementFlyweight implements IBeliefbase
 	/**
 	 *  Get the model element.
 	 *  @return The model element.
-	 * /
+	 */
 	public IMElement getModelElement()
 	{
 		if(getInterpreter().isExternalThread())
@@ -335,7 +338,7 @@ public class BeliefbaseFlyweight extends ElementFlyweight implements IBeliefbase
 			Object mscope = getState().getAttributeValue(getScope(), OAVBDIRuntimeModel.element_has_model);
 			return new MBeliefbaseFlyweight(getState(), mscope);
 		}
-	}*/
+	}
 
 //	/**
 //	 *  Create a belief reference flyweight.
