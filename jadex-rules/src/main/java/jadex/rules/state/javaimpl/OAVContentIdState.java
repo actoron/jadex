@@ -1,6 +1,5 @@
 package jadex.rules.state.javaimpl;
 
-import jadex.commons.collection.WeakSet;
 import jadex.rules.state.OAVTypeModel;
 
 import java.util.LinkedHashSet;

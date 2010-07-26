@@ -1,25 +1,34 @@
 package jadex.bdi;
 
+import jadex.bdi.model.IMCapability;
 import jadex.bdi.model.OAVAgentModel;
+import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.model.OAVCapabilityModel;
+import jadex.bdi.model.impl.flyweights.MCapabilityFlyweight;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
+import jadex.bdi.runtime.interpreter.Report;
 import jadex.bridge.IComponentAdapterFactory;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentFactory;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.ILoadableComponentModel;
-import jadex.commons.Future;
-import jadex.commons.IFuture;
 import jadex.commons.SGUI;
 import jadex.rules.state.IOAVState;
+import jadex.rules.state.IOAVStateListener;
+import jadex.rules.state.OAVAttributeType;
+import jadex.rules.state.OAVObjectType;
 import jadex.rules.state.OAVTypeModel;
 import jadex.rules.state.javaimpl.OAVStateFactory;
 import jadex.service.BasicService;
 import jadex.service.IServiceContainer;
 import jadex.service.library.ILibraryService;
 
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
+import java.util.WeakHashMap;
 
 import javax.swing.Icon;
 import javax.swing.UIDefaults;
@@ -60,6 +69,9 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory
 	/** The library service. */
 	protected ILibraryService libservice;
 	
+	/** The types of a manually edited agent model. */
+	protected Map mtypes;
+	
 	//-------- constructors --------
 	
 	/**
@@ -70,6 +82,7 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory
 		this.props = props;
 		this.loader	= new OAVBDIModelLoader();
 		this.container = container;
+		this.mtypes	= Collections.synchronizedMap(new WeakHashMap());
 	}
 	
 	/**
@@ -107,9 +120,9 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory
 		OAVAgentModel amodel = (OAVAgentModel)model;
 		
 		// Create type model for agent instance (e.g. holding dynamically loaded java classes).
-		OAVTypeModel tmodel	= new OAVTypeModel(desc.getName().getLocalName()+"_typemodel", ((OAVAgentModel)model).getTypeModel().getClassLoader());
+		OAVTypeModel tmodel	= new OAVTypeModel(desc.getName().getLocalName()+"_typemodel", amodel.getState().getTypeModel().getClassLoader());
 //		OAVTypeModel tmodel	= new OAVTypeModel(model.getName()+"_typemodel", ((OAVAgentModel)model).getTypeModel().getClassLoader());
-		tmodel.addTypeModel(amodel.getTypeModel());
+		tmodel.addTypeModel(amodel.getState().getTypeModel());
 		tmodel.addTypeModel(OAVBDIRuntimeModel.bdi_rt_model);
 		IOAVState	state	= OAVStateFactory.createOAVState(tmodel); 
 		state.addSubstate(amodel.getState());
@@ -216,5 +229,82 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory
 	{
 		return FILETYPE_BDIAGENT.equals(type) || FILETYPE_BDICAPABILITY.equals(type)
 			? props : null;
+	}
+
+	/**
+	 *  Create a new agent model, which can be manually edited before
+	 *  starting.
+	 *  @param name	A type name for the agent model.
+	 *  @param classloader	A type name for the agent model.
+	 */
+	public IMECapability	createAgentModel(String name, String description, String pkg, String[] imports, boolean abs, String defconf)
+	{
+		OAVTypeModel	typemodel	= new OAVTypeModel(name+"_typemodel", null); // todo: classloader???
+		// Requires runtime meta model, because e.g. user conditions can refer to runtime elements (belief, goal, etc.) 
+		typemodel.addTypeModel(OAVBDIRuntimeModel.bdi_rt_model);
+		IOAVState	state	= OAVStateFactory.createOAVState(typemodel);
+		
+		final Set	types	= new HashSet();
+		IOAVStateListener	listener	= new IOAVStateListener()
+		{
+			public void objectAdded(Object id, OAVObjectType type, boolean root)
+			{
+				// Add the type and its supertypes (if not already contained).
+				while(type!=null && types.add(type))
+					type	= type.getSupertype();
+			}
+			
+			public void objectModified(Object id, OAVObjectType type, OAVAttributeType attr, Object oldvalue, Object newvalue)
+			{
+			}
+			
+			public void objectRemoved(Object id, OAVObjectType type)
+			{
+			}
+		};
+		state.addStateListener(listener, false);
+		
+		Object	handle	= state.createRootObject(OAVBDIMetaModel.agent_type);
+		state.setAttributeValue(handle, OAVBDIMetaModel.modelelement_has_name, name);
+		state.setAttributeValue(handle, OAVBDIMetaModel.modelelement_has_description, description);
+		state.setAttributeValue(handle, OAVBDIMetaModel.capability_has_package, pkg);
+		state.setAttributeValue(handle, OAVBDIMetaModel.capability_has_abstract, abs);
+		state.setAttributeValue(handle, OAVBDIMetaModel.capability_has_defaultconfiguration, defconf);
+		
+		mtypes.put(handle, new Object[]{types, listener});
+
+		return new MCapabilityFlyweight(state, handle);		
+	}
+	
+	/**
+	 *  Register a manually edited agent model in the factory.
+	 *  @param model	The edited agent model.
+	 *  @param filename	The filename for accessing the model.
+	 *  @return	The startable agent model.
+	 */
+	public ILoadableComponentModel	registerAgentModel(IMECapability model, String filename)
+	{
+		OAVCapabilityModel	ret;
+		MCapabilityFlyweight	fw	= (MCapabilityFlyweight)model;
+		IOAVState	state	= fw.getState();
+		Object	handle	= fw.getHandle();
+		;
+		Object[]	types	= (Object[])mtypes.get(handle);
+		if(types!=null)
+		{
+			state.removeStateListener((IOAVStateListener)types[1]);
+		}
+		
+		Report	report	= new Report();
+		if(state.getType(handle).isSubtype(OAVBDIMetaModel.agent_type))
+		{
+			ret	=  new OAVAgentModel(state, handle, (Set)(types!=null ? types[0] : null), filename, System.currentTimeMillis(), report);
+		}
+		else
+		{
+			ret	=  new OAVCapabilityModel(state, handle, (Set)(types!=null ? types[0] : null), filename, System.currentTimeMillis(), report);
+		}
+		loader.createAgentModelEntry(ret, report);
+
 	}
 }

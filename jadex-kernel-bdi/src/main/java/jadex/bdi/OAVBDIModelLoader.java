@@ -156,11 +156,11 @@ public class OAVBDIModelLoader	extends AbstractModelLoader
 
 			if(state.getType(handle).isSubtype(OAVBDIMetaModel.agent_type))
 			{
-				ret	=  new OAVAgentModel(state, handle, typemodel, types, info.getFilename(), info.getLastModified(), report);
+				ret	=  new OAVAgentModel(state, handle, types, info.getFilename(), info.getLastModified(), report);
 			}
 			else
 			{
-				ret	=  new OAVCapabilityModel(state, handle, typemodel, types, info.getFilename(), info.getLastModified(), report);
+				ret	=  new OAVCapabilityModel(state, handle, types, info.getFilename(), info.getLastModified(), report);
 			}
 		}
 		catch(Exception e)

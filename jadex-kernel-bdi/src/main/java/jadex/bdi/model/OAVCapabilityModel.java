@@ -11,7 +11,6 @@ import jadex.commons.SUtil;
 import jadex.rules.rulesystem.IRule;
 import jadex.rules.rulesystem.Rulebase;
 import jadex.rules.state.IOAVState;
-import jadex.rules.state.OAVTypeModel;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -35,9 +34,6 @@ public class OAVCapabilityModel implements ILoadableComponentModel, ICacheableMo
 	/** The agent handle. */
 	protected Object handle;
 	
-	/** The type model. */
-	protected OAVTypeModel	typemodel;
-
 	/** The (actual) object types contained in the state. */
 	protected Set	types;
 	
@@ -61,12 +57,10 @@ public class OAVCapabilityModel implements ILoadableComponentModel, ICacheableMo
 	/**
 	 *  Create a model.
 	 */
-	public OAVCapabilityModel(IOAVState state, Object handle, 
-		OAVTypeModel typemodel, Set types, String filename, long lastmod, Report report)
+	public OAVCapabilityModel(IOAVState state, Object handle, Set types, String filename, long lastmod, Report report)
 	{
 		this.state	= state;
 		this.handle	= handle;
-		this.typemodel	= typemodel;
 		this.types	= types;
 		this.rulebase	= new Rulebase();
 		this.filename	= filename;
@@ -330,7 +324,7 @@ public class OAVCapabilityModel implements ILoadableComponentModel, ICacheableMo
 	 */
 	public ClassLoader getClassLoader()
 	{
-		return getTypeModel().getClassLoader();
+		return getState().getTypeModel().getClassLoader();
 	}
 
 	//-------- methods --------
@@ -389,14 +383,6 @@ public class OAVCapabilityModel implements ILoadableComponentModel, ICacheableMo
 	public Set getTypes()
 	{
 		return types;
-	}
-
-	/**
-	 *  Get the type model.
-	 */
-	public OAVTypeModel getTypeModel()
-	{
-		return typemodel;
 	}
 
 	/**

@@ -7,7 +7,6 @@ import jadex.javaparser.IParsedExpression;
 import jadex.rules.rulesystem.IPatternMatcherFunctionality;
 import jadex.rules.rulesystem.IRule;
 import jadex.rules.state.IOAVState;
-import jadex.rules.state.OAVTypeModel;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -37,10 +36,9 @@ public class OAVAgentModel	extends OAVCapabilityModel
 	/**
 	 *  Create a model.
 	 */
-	public OAVAgentModel(IOAVState state, Object handle, 
-		OAVTypeModel typemodel, Set types, String filename, long lastmod, Report report)
+	public OAVAgentModel(IOAVState state, Object handle, Set types, String filename, long lastmod, Report report)
 	{
-		super(state, handle, typemodel, types, filename, lastmod, report);
+		super(state, handle, types, filename, lastmod, report);
 	}
 	
 	//-------- IAgentModel methods --------
