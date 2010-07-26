@@ -1,8 +1,6 @@
 package jadex.bdi.model.editable;
 
-import jadex.bdi.model.IMCondition;
 import jadex.bdi.model.IMGoal;
-import jadex.bdi.model.IMTypedElement;
 
 /**
  * 
@@ -52,32 +50,32 @@ public interface IMEGoal extends IMGoal
 	public void setRecurDelay(long recurdelay);
 	
 	/**
-	 *  Get the recur condition.
+	 *  Create the recur condition.
 	 *  @return The recur condition.
 	 */
 	public IMECondition createRecurCondition();
 
 	/**
-	 *  Get the exlcude mode.
-	 *  @retur The exclude mode.
+	 *  Set the exlcude mode.
+	 *  @param excludemode The exclude mode.
 	 */
 	public void setExcludeMode(String excludemode);
 	
 	/**
-	 *  Test if rebuild APL.
-	 *  @retur True, if rebuild.
+	 *  Set the rebuild APL flag.
+	 *  @param rebuild Rebuild flag.
 	 */
 	public void setRebuild(boolean rebuild);
 	
 	/**
-	 *  Test if goal should be unique.
-	 *  @retur True, if unique.
+	 *  Set the unique flag.
+	 *  @param unique The unique flag.
 	 */
 	public void setUnique(boolean unique);
 	
 	/**
-	 *  Get excluded parameters.
-	 *  @retur The excluded parameters.
+	 *  Add a excluded parameter.
+	 *  @param name The name of the excluded parameter.
 	 */
 	public void addExcludedParameter(String name);
 	

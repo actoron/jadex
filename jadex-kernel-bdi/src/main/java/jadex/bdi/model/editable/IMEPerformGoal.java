@@ -1,6 +1,12 @@
 package jadex.bdi.model.editable;
 
-public interface IMEPerformGoal
+import jadex.bdi.model.IMPerformGoal;
+
+
+/**
+ * 
+ */
+public interface IMEPerformGoal extends IMEGoal, IMPerformGoal
 {
 
 }

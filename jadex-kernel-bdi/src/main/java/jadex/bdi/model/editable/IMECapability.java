@@ -38,7 +38,7 @@ public interface IMECapability extends IMCapability
 	 *  Get the capability references.
 	 *  @return The capability references.
 	 */
-	public IMECapabilityReference createCapabilityReference();
+	public void createCapabilityReference(String name, String file);
 	
 	/**
 	 *  Create or get the beliefbase.
