@@ -115,13 +115,57 @@ public class MPlanFlyweight extends MParameterElementFlyweight implements IMPlan
 	 *  Get the waitqueue.
 	 *  @return The waitqueue.
 	 */
-	// todo
-//	public IMTriggerType getWaitqueue();
+	public IMTrigger getWaitqueue()
+	{
+		if(getInterpreter().isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					Object handle = getState().getAttributeValue(getHandle(), OAVBDIMetaModel.plan_has_waitqueue);
+					if(handle!=null)
+						object = new MTriggerFlyweight(getState(), getScope(), handle);
+				}
+			};
+			return (IMCondition)invoc.object;
+		}
+		else
+		{
+			IMCondition ret = null;
+			Object handle = getState().getAttributeValue(getHandle(), OAVBDIMetaModel.plan_has_waitqueue);
+			if(handle!=null)
+				ret = new MTriggerFlyweight(getState(), getScope(), handle);
+			return ret;
+		}
+	}
 	
 	/**
 	 *  Get the trigger.
 	 *  @return The trigger.
 	 */
-	// todo
-//	public IMPlanTriggerType getTrigger();
+	public IMPlanTrigger getTrigger()
+	{
+		if(getInterpreter().isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					Object handle = getState().getAttributeValue(getHandle(), OAVBDIMetaModel.plan_has_trigger);
+					if(handle!=null)
+						object = new MPlanTriggerFlyweight(getState(), getScope(), handle);
+				}
+			};
+			return (IMCondition)invoc.object;
+		}
+		else
+		{
+			IMCondition ret = null;
+			Object handle = getState().getAttributeValue(getHandle(), OAVBDIMetaModel.plan_has_trigger);
+			if(handle!=null)
+				ret = new MPlanTriggerFlyweight(getState(), getScope(), handle);
+			return ret;
+		}
+	}
 }
