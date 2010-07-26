@@ -28,7 +28,7 @@ public class MConfigParameterSetFlyweight extends MParameterSetFlyweight impleme
 	 */
 	public String getReference()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{

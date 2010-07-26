@@ -31,7 +31,7 @@ public class MPropertybaseFlyweight extends MElementFlyweight implements IMPrope
 	 */
 	public IMExpression[] getProperties()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{

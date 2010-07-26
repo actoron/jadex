@@ -30,7 +30,7 @@ public class MTriggerFlyweight extends MElementFlyweight implements IMTrigger
 	 */
 	public IMTriggerReference[]	getInternalEvents()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -72,7 +72,7 @@ public class MTriggerFlyweight extends MElementFlyweight implements IMTrigger
 	 */
 	public IMTriggerReference[]	getMessageEvents()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -114,7 +114,7 @@ public class MTriggerFlyweight extends MElementFlyweight implements IMTrigger
 	 */
 	public IMTriggerReference[]	getGoalFinisheds()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -156,7 +156,7 @@ public class MTriggerFlyweight extends MElementFlyweight implements IMTrigger
 	 */
 	public String[]	getFactAddeds()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -178,7 +178,7 @@ public class MTriggerFlyweight extends MElementFlyweight implements IMTrigger
 	 */
 	public String[]	getFactRemoveds()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -200,7 +200,7 @@ public class MTriggerFlyweight extends MElementFlyweight implements IMTrigger
 	 */
 	public String[]	getFactChangeds()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{

@@ -36,7 +36,7 @@ public class MBeliefbaseFlyweight extends MElementFlyweight implements IMBeliefb
 	 */
 	public IMBelief getBelief(final String name)
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation(name)
 			{
@@ -65,7 +65,7 @@ public class MBeliefbaseFlyweight extends MElementFlyweight implements IMBeliefb
 	 */
 	public IMBeliefSet getBeliefSet(final String name)
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation(name)
 			{
@@ -94,7 +94,7 @@ public class MBeliefbaseFlyweight extends MElementFlyweight implements IMBeliefb
 	 */
 	public IMBelief[] getBeliefs()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -137,7 +137,7 @@ public class MBeliefbaseFlyweight extends MElementFlyweight implements IMBeliefb
 	 */
 	public IMBeliefSet[] getBeliefSets()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -180,7 +180,7 @@ public class MBeliefbaseFlyweight extends MElementFlyweight implements IMBeliefb
 	 */
 	public IMBeliefReference getBeliefReference(final String name)
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -209,7 +209,7 @@ public class MBeliefbaseFlyweight extends MElementFlyweight implements IMBeliefb
 	 */
 	public IMBeliefReference[] getBeliefReferences()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -252,7 +252,7 @@ public class MBeliefbaseFlyweight extends MElementFlyweight implements IMBeliefb
 	 */
 	public IMBeliefSetReference getBeliefSetReference(final String name)
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -281,7 +281,7 @@ public class MBeliefbaseFlyweight extends MElementFlyweight implements IMBeliefb
 	 */
 	public IMBeliefSetReference[] getBeliefSetReferences()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{

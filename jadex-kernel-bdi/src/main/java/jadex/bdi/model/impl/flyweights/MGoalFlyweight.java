@@ -33,7 +33,7 @@ public class MGoalFlyweight extends MProcessableElementFlyweight implements IMGo
 	 */
 	public IMCondition getCreationCondition()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -62,7 +62,7 @@ public class MGoalFlyweight extends MProcessableElementFlyweight implements IMGo
 	 */
 	public IMCondition getContextCondition()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -91,7 +91,7 @@ public class MGoalFlyweight extends MProcessableElementFlyweight implements IMGo
 	 */
 	public IMCondition getDropCondition()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -120,7 +120,7 @@ public class MGoalFlyweight extends MProcessableElementFlyweight implements IMGo
 	 */
 	public boolean isRetry()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -143,7 +143,7 @@ public class MGoalFlyweight extends MProcessableElementFlyweight implements IMGo
 	 */
 	public long getRetryDelay()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -166,7 +166,7 @@ public class MGoalFlyweight extends MProcessableElementFlyweight implements IMGo
 	 */
 	public boolean isRecur()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -189,7 +189,7 @@ public class MGoalFlyweight extends MProcessableElementFlyweight implements IMGo
 	 */
 	public long getRecurDelay()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -212,7 +212,7 @@ public class MGoalFlyweight extends MProcessableElementFlyweight implements IMGo
 	 */
 	public IMCondition getRecurCondition()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -241,7 +241,7 @@ public class MGoalFlyweight extends MProcessableElementFlyweight implements IMGo
 	 */
 	public String getExcludeMode()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -264,7 +264,7 @@ public class MGoalFlyweight extends MProcessableElementFlyweight implements IMGo
 	 */
 	public boolean isRebuild()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -287,7 +287,7 @@ public class MGoalFlyweight extends MProcessableElementFlyweight implements IMGo
 	 */
 	public boolean isUnique()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -310,7 +310,7 @@ public class MGoalFlyweight extends MProcessableElementFlyweight implements IMGo
 	 */
 	public IMTypedElement[] getExcludedParameters()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -362,7 +362,7 @@ public class MGoalFlyweight extends MProcessableElementFlyweight implements IMGo
 	 */
 	public int getCardinality()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{

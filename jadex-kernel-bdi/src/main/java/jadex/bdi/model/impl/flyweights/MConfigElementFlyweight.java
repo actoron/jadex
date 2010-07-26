@@ -27,7 +27,7 @@ public class MConfigElementFlyweight extends MConfigParameterElementFlyweight im
 	 */
 	public String getReference()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{

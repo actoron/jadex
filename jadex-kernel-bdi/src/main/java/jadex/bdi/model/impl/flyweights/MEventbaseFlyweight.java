@@ -36,7 +36,7 @@ public class MEventbaseFlyweight extends MElementFlyweight implements IMEventbas
 	 */
 	public IMInternalEvent getInternalEvent(final String name)
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -65,7 +65,7 @@ public class MEventbaseFlyweight extends MElementFlyweight implements IMEventbas
 	 */
 	public IMMessageEvent getMessageEvent(final String name)
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -94,7 +94,7 @@ public class MEventbaseFlyweight extends MElementFlyweight implements IMEventbas
 	 */
 	public IMInternalEvent[] getInternalEvents()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -137,7 +137,7 @@ public class MEventbaseFlyweight extends MElementFlyweight implements IMEventbas
 	 */
 	public IMMessageEvent[] getMessageEvents()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -180,7 +180,7 @@ public class MEventbaseFlyweight extends MElementFlyweight implements IMEventbas
 	 */
 	public IMInternalEventReference getInternalEventReference(final String name)
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -209,7 +209,7 @@ public class MEventbaseFlyweight extends MElementFlyweight implements IMEventbas
 	 */
 	public IMInternalEventReference[] getInternalEventReferences()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -252,7 +252,7 @@ public class MEventbaseFlyweight extends MElementFlyweight implements IMEventbas
 	 */
 	public IMMessageEventReference getMessageEventReference(final String name)
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -281,7 +281,7 @@ public class MEventbaseFlyweight extends MElementFlyweight implements IMEventbas
 	 */
 	public IMMessageEventReference[] getMessageEventReferences()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{

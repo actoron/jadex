@@ -31,7 +31,7 @@ public class MPlanFlyweight extends MParameterElementFlyweight implements IMPlan
 	 */
 	public int getPriority()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -54,7 +54,7 @@ public class MPlanFlyweight extends MParameterElementFlyweight implements IMPlan
 	 */
 	public IMExpression getPrecondition()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -83,7 +83,7 @@ public class MPlanFlyweight extends MParameterElementFlyweight implements IMPlan
 	 */
 	public IMCondition getContextCondition()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -119,7 +119,7 @@ public class MPlanFlyweight extends MParameterElementFlyweight implements IMPlan
 	 */
 	public IMTrigger getWaitqueue()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -148,7 +148,7 @@ public class MPlanFlyweight extends MParameterElementFlyweight implements IMPlan
 	 */
 	public IMPlanTrigger getTrigger()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{

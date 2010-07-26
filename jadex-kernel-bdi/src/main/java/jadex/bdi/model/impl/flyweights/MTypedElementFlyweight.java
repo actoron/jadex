@@ -27,7 +27,7 @@ public class MTypedElementFlyweight extends MReferenceableElementFlyweight imple
 	 */
 	public Class getClazz()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -50,7 +50,7 @@ public class MTypedElementFlyweight extends MReferenceableElementFlyweight imple
 	 */
 	public String getClassname()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -73,7 +73,7 @@ public class MTypedElementFlyweight extends MReferenceableElementFlyweight imple
 	 */
 	public long getUpdateRate()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -100,7 +100,7 @@ public class MTypedElementFlyweight extends MReferenceableElementFlyweight imple
 	 */
 	public String getEvaluationMode()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{

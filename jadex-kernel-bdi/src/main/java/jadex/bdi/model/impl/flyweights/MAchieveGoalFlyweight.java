@@ -28,7 +28,7 @@ public class MAchieveGoalFlyweight extends MGoalFlyweight implements IMAchieveGo
 	 */
 	public IMCondition getTargetCondition()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{

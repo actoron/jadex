@@ -30,7 +30,7 @@ public class MMetaGoalTriggerFlyweight extends MTriggerFlyweight implements IMMe
 	 */
 	public IMTriggerReference[]	getGoals()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{

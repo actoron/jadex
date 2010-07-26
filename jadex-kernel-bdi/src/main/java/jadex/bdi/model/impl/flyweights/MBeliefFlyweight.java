@@ -28,7 +28,7 @@ public class MBeliefFlyweight extends MTypedElementFlyweight implements IMBelief
 	 */
 	public IMExpression getFact()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -57,7 +57,7 @@ public class MBeliefFlyweight extends MTypedElementFlyweight implements IMBelief
 	 */
 	public boolean isArgument()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -80,7 +80,7 @@ public class MBeliefFlyweight extends MTypedElementFlyweight implements IMBelief
 	 */
 	public boolean isResult()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{

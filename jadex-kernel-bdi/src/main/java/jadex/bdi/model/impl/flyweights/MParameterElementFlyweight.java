@@ -32,7 +32,7 @@ public class MParameterElementFlyweight extends MReferenceableElementFlyweight i
 	 */
 	public IMParameter getParameter(final String name)
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -61,7 +61,7 @@ public class MParameterElementFlyweight extends MReferenceableElementFlyweight i
 	 */
 	public IMParameter[] getParameters()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -104,7 +104,7 @@ public class MParameterElementFlyweight extends MReferenceableElementFlyweight i
 	 */
 	public IMParameterSet getParameterSet(final String name)
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -133,7 +133,7 @@ public class MParameterElementFlyweight extends MReferenceableElementFlyweight i
 	 */
 	public IMParameterSet[] getParameterSets()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{

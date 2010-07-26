@@ -27,7 +27,7 @@ public class MExpressionFlyweight extends MReferenceableElementFlyweight impleme
 	 */
 	public String getLanguage()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -50,7 +50,7 @@ public class MExpressionFlyweight extends MReferenceableElementFlyweight impleme
 	 */
 	public Object getContent()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -73,7 +73,7 @@ public class MExpressionFlyweight extends MReferenceableElementFlyweight impleme
 	 */
 	public Class getClazz()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -96,7 +96,7 @@ public class MExpressionFlyweight extends MReferenceableElementFlyweight impleme
 	 */
 	public String getClassname()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -119,7 +119,7 @@ public class MExpressionFlyweight extends MReferenceableElementFlyweight impleme
 	 */
 	public String getVariable()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{

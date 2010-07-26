@@ -28,7 +28,7 @@ public class MMessageEventFlyweight extends MProcessableElementFlyweight impleme
 	 */
 	public String getDirection()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -51,7 +51,7 @@ public class MMessageEventFlyweight extends MProcessableElementFlyweight impleme
 	 */
 	public String getType()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -74,7 +74,7 @@ public class MMessageEventFlyweight extends MProcessableElementFlyweight impleme
 	 */
 	public IMExpression getMatchExpression()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{

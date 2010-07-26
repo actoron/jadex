@@ -27,7 +27,7 @@ public class MProcessableElementFlyweight extends MParameterElementFlyweight imp
 	 */
 	public boolean isPostToAll()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -50,7 +50,7 @@ public class MProcessableElementFlyweight extends MParameterElementFlyweight imp
 	 */
 	public boolean isRandomSelection()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{

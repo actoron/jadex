@@ -27,7 +27,7 @@ public class MConfigBeliefFlyweight extends MBeliefFlyweight implements IMConfig
 	 */
 	public String getReference()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{

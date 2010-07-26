@@ -28,7 +28,7 @@ public class MParameterFlyweight extends MTypedElementFlyweight implements IMPar
 	 */
 	public IMExpression getValue()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -57,7 +57,7 @@ public class MParameterFlyweight extends MTypedElementFlyweight implements IMPar
 	 */
 	public IMExpression getBindingOptions()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -86,7 +86,7 @@ public class MParameterFlyweight extends MTypedElementFlyweight implements IMPar
 	 */
 	public String getDirection()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -109,7 +109,7 @@ public class MParameterFlyweight extends MTypedElementFlyweight implements IMPar
 	 */
 	public boolean isOptional()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{

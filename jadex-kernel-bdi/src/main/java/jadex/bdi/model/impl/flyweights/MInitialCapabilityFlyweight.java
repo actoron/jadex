@@ -27,7 +27,7 @@ public class MInitialCapabilityFlyweight extends MElementFlyweight implements IM
 	 */
 	public String getReference()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -50,7 +50,7 @@ public class MInitialCapabilityFlyweight extends MElementFlyweight implements IM
 	 */
 	public String getConfiguration()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{

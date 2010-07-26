@@ -4,7 +4,6 @@ import jadex.bdi.model.IMElement;
 import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.runtime.impl.flyweights.ElementFlyweight;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
-import jadex.bridge.ComponentTerminatedException;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.rules.state.IOAVState;
@@ -52,8 +51,6 @@ public class MElementFlyweight implements IMElement
 			state.addExternalObjectUsage(scope, this);
 		
 		this.interpreter = BDIInterpreter.getInterpreter(state);
-		if(interpreter==null)
-			throw new ComponentTerminatedException("Cannot create flyweight for dead agent: "+handle);
 		setHandle(handle);
 	}
 	
@@ -65,7 +62,7 @@ public class MElementFlyweight implements IMElement
 	 */
 	public String getName()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -88,7 +85,7 @@ public class MElementFlyweight implements IMElement
 	 */
 	public String getDescription()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -276,7 +273,7 @@ public class MElementFlyweight implements IMElement
 			string	= string.substring(0, string.length()-9);
 		return string;
 		
-//		if(getInterpreter().isExternalThread())
+//		if(isExternalThread())
 //		{
 //			AgentInvocation	invoc	= new AgentInvocation()
 //			{
@@ -372,5 +369,15 @@ public class MElementFlyweight implements IMElement
 			this.args = args;
 			getInterpreter().invokeSynchronized(this);
 		}
+	}
+	
+	public boolean	isExternalThread()
+	{
+		boolean	ret	= false;	// Default for models during creation.
+		if(getInterpreter()!=null)
+		{
+			ret	= getInterpreter().isExternalThread();
+		}
+		return ret;
 	}
 }

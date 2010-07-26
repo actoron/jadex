@@ -34,7 +34,7 @@ public class MConfigurationFlyweight extends MElementFlyweight implements IMConf
 	 */
 	public IMInitialCapability[] getInitialCapabilities()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -77,7 +77,7 @@ public class MConfigurationFlyweight extends MElementFlyweight implements IMConf
 	 */
 	public IMConfigBelief[] getInitialBeliefs()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -120,7 +120,7 @@ public class MConfigurationFlyweight extends MElementFlyweight implements IMConf
 	 */
 	public IMConfigBeliefSet[] getInitialBeliefSets()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -163,7 +163,7 @@ public class MConfigurationFlyweight extends MElementFlyweight implements IMConf
 	 */
 	public IMConfigElement[] getInitialGoals()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -206,7 +206,7 @@ public class MConfigurationFlyweight extends MElementFlyweight implements IMConf
 	 */
 	public IMConfigElement[] getEndGoals()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -249,7 +249,7 @@ public class MConfigurationFlyweight extends MElementFlyweight implements IMConf
 	 */
 	public IMConfigElement[] getInitialPlans()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -292,7 +292,7 @@ public class MConfigurationFlyweight extends MElementFlyweight implements IMConf
 	 */
 	public IMConfigElement[] getEndPlans()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -335,7 +335,7 @@ public class MConfigurationFlyweight extends MElementFlyweight implements IMConf
 	 */
 	public IMConfigElement[] getInitialInternalEvents()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -378,7 +378,7 @@ public class MConfigurationFlyweight extends MElementFlyweight implements IMConf
 	 */
 	public IMConfigElement[] getEndInternalEvents()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -421,7 +421,7 @@ public class MConfigurationFlyweight extends MElementFlyweight implements IMConf
 	 */
 	public IMConfigElement[] getInitialMessageEvents()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -464,7 +464,7 @@ public class MConfigurationFlyweight extends MElementFlyweight implements IMConf
 	 */
 	public IMConfigElement[] getEndMessageEvents()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{

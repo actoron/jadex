@@ -31,7 +31,7 @@ public class MPlanbaseFlyweight extends MElementFlyweight implements IMPlanbase
 	 */
 	public IMPlan getPlan(final String name)
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
  		{
  			AgentInvocation invoc = new AgentInvocation(name)
  			{
@@ -60,7 +60,7 @@ public class MPlanbaseFlyweight extends MElementFlyweight implements IMPlanbase
 	 */
 	public IMPlan[] getPlans()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
  		{
  			AgentInvocation invoc = new AgentInvocation()
  			{

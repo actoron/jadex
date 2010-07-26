@@ -31,7 +31,7 @@ public class MPlanTriggerFlyweight extends MTriggerFlyweight implements IMPlanTr
 	 */
 	public IMTriggerReference[]	getGoals()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -73,7 +73,7 @@ public class MPlanTriggerFlyweight extends MTriggerFlyweight implements IMPlanTr
 	 */
 	public IMCondition	getCondition()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{

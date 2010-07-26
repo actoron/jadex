@@ -29,7 +29,7 @@ public class MCapabilityReferenceFlyweight extends MElementFlyweight implements 
 	 */
 	public String getFilename()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -52,7 +52,7 @@ public class MCapabilityReferenceFlyweight extends MElementFlyweight implements 
 	 */
 	public IMCapability getCapability()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{

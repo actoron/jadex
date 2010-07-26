@@ -28,7 +28,7 @@ public class MMaintainGoalFlyweight extends MGoalFlyweight implements IMMaintain
 	 */
 	public IMCondition getMaintainCondition()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -57,7 +57,7 @@ public class MMaintainGoalFlyweight extends MGoalFlyweight implements IMMaintain
 	 */
 	public IMCondition getTargetCondition()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{

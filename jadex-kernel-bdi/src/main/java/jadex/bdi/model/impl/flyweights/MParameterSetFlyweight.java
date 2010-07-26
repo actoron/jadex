@@ -31,7 +31,7 @@ public class MParameterSetFlyweight extends MTypedElementFlyweight implements IM
 	 */
 	public IMExpression[] getValues()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -74,7 +74,7 @@ public class MParameterSetFlyweight extends MTypedElementFlyweight implements IM
 	 */
 	public IMExpression getValuesExpression()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -97,7 +97,7 @@ public class MParameterSetFlyweight extends MTypedElementFlyweight implements IM
 	 */
 	public String getDirection()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -120,7 +120,7 @@ public class MParameterSetFlyweight extends MTypedElementFlyweight implements IM
 	 */
 	public boolean isOptional()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{

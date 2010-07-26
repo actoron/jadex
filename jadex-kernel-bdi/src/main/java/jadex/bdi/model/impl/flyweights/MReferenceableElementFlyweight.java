@@ -31,7 +31,7 @@ public class MReferenceableElementFlyweight extends MElementFlyweight implements
 	 */
 	public String isExported()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -54,7 +54,7 @@ public class MReferenceableElementFlyweight extends MElementFlyweight implements
 	 */
 	public String[] getAssigntos()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{

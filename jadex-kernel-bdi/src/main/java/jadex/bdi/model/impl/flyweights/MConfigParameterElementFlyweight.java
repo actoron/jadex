@@ -32,7 +32,7 @@ public class MConfigParameterElementFlyweight extends MElementFlyweight implemen
 	 */
 	public IMConfigParameter[] getParameters()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -75,7 +75,7 @@ public class MConfigParameterElementFlyweight extends MElementFlyweight implemen
 	 */
 	public IMConfigParameterSet[] getParameterSets()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{

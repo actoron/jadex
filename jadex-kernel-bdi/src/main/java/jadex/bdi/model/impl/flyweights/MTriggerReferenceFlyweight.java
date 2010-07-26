@@ -27,7 +27,7 @@ public class MTriggerReferenceFlyweight extends MElementFlyweight implements IMT
 	 */
 	public String	getReference()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -49,7 +49,7 @@ public class MTriggerReferenceFlyweight extends MElementFlyweight implements IMT
 	 */
 	public IMExpression	getMatchExpression()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{

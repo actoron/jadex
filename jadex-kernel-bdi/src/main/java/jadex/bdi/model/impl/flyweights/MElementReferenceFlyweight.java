@@ -27,7 +27,7 @@ public class MElementReferenceFlyweight extends MReferenceableElementFlyweight i
 	 */
 	public String getConcrete()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{

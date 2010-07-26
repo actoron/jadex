@@ -33,7 +33,7 @@ public class MExpressionbaseFlyweight  extends MElementFlyweight implements IMEx
 	 */
 	public IMExpression getExpression(final String name)
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -62,7 +62,7 @@ public class MExpressionbaseFlyweight  extends MElementFlyweight implements IMEx
 	 */
 	public IMExpression[] getExpressions()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -105,7 +105,7 @@ public class MExpressionbaseFlyweight  extends MElementFlyweight implements IMEx
 	 */
 	public IMExpressionReference getExpressionReference(final String name)
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -134,7 +134,7 @@ public class MExpressionbaseFlyweight  extends MElementFlyweight implements IMEx
 	 */
 	public IMExpressionReference[] getExpressionReferences()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{

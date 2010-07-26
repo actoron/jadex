@@ -33,7 +33,7 @@ public class MBeliefSetFlyweight extends MTypedElementFlyweight implements IMBel
 	 */
 	public IMExpression[] getFacts()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -76,7 +76,7 @@ public class MBeliefSetFlyweight extends MTypedElementFlyweight implements IMBel
 	 */
 	public IMExpression getFactExpression()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -99,7 +99,7 @@ public class MBeliefSetFlyweight extends MTypedElementFlyweight implements IMBel
 	 */
 	public boolean isArgument()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -122,7 +122,7 @@ public class MBeliefSetFlyweight extends MTypedElementFlyweight implements IMBel
 	 */
 	public boolean isResult()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{

@@ -29,7 +29,7 @@ public class MMetaGoalFlyweight extends MGoalFlyweight implements IMMetaGoal
 	 */
 	public IMMetaGoalTrigger getTrigger()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{

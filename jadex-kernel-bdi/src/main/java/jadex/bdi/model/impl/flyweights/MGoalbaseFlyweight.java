@@ -32,7 +32,7 @@ public class MGoalbaseFlyweight extends MElementFlyweight implements IMGoalbase
 	 */
 	public IMGoal getGoal(final String name)
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation(name)
 			{
@@ -61,7 +61,7 @@ public class MGoalbaseFlyweight extends MElementFlyweight implements IMGoalbase
 	 */
 	public IMGoal[] getGoals()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -104,7 +104,7 @@ public class MGoalbaseFlyweight extends MElementFlyweight implements IMGoalbase
 	 */
 	public IMGoalReference getGoalReference(final String name)
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -133,7 +133,7 @@ public class MGoalbaseFlyweight extends MElementFlyweight implements IMGoalbase
 	 */
 	public IMGoalReference[] getGoalReferences()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{

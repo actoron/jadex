@@ -39,7 +39,7 @@ public class MCapabilityFlyweight extends MElementFlyweight implements IMCapabil
 	 */
 	public String getPackage()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -62,7 +62,7 @@ public class MCapabilityFlyweight extends MElementFlyweight implements IMCapabil
 	 */
 	public String[] getImports()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -85,7 +85,7 @@ public class MCapabilityFlyweight extends MElementFlyweight implements IMCapabil
 	 */
 	public boolean isAbstract()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -108,7 +108,7 @@ public class MCapabilityFlyweight extends MElementFlyweight implements IMCapabil
 	 */
 	public IMCapabilityReference[] getCapabilityReferences()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -151,7 +151,7 @@ public class MCapabilityFlyweight extends MElementFlyweight implements IMCapabil
 	 */
 	public IMBeliefbase getBeliefbase()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -174,7 +174,7 @@ public class MCapabilityFlyweight extends MElementFlyweight implements IMCapabil
 	 */
 	public IMGoalbase getGoalbase()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -197,7 +197,7 @@ public class MCapabilityFlyweight extends MElementFlyweight implements IMCapabil
 	 */
 	public IMPlanbase getPlanbase()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -220,7 +220,7 @@ public class MCapabilityFlyweight extends MElementFlyweight implements IMCapabil
 	 */
 	public IMEventbase getEventbase()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -243,7 +243,7 @@ public class MCapabilityFlyweight extends MElementFlyweight implements IMCapabil
 	 */
 	public IMExpressionbase getExpressionbase()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -266,7 +266,7 @@ public class MCapabilityFlyweight extends MElementFlyweight implements IMCapabil
 	 */
 	public IMPropertybase getPropertybase()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -289,7 +289,7 @@ public class MCapabilityFlyweight extends MElementFlyweight implements IMCapabil
 	 */
 	public IMExpression[] getServices()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -334,7 +334,7 @@ public class MCapabilityFlyweight extends MElementFlyweight implements IMCapabil
 	 */
 	public IMConfiguration[] getConfigurations()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -377,7 +377,7 @@ public class MCapabilityFlyweight extends MElementFlyweight implements IMCapabil
 	 */
 	public String getDefaultConfiguration()
 	{
-		if(getInterpreter().isExternalThread())
+		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
