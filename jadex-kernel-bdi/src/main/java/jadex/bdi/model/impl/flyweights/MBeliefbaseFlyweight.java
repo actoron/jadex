@@ -28,7 +28,7 @@ public class MBeliefbaseFlyweight extends MElementFlyweight implements IMBeliefb
 		super(state, scope, scope);
 	}
 	
-	//-------- methods concerning beliefs --------
+	//-------- methods --------
 
     /**
 	 *  Get a belief for a name.

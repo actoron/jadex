@@ -61,16 +61,16 @@ public interface IMCapability
 	public IMExpressionbase getExpressionbase();
 	
 	/**
+	 *  Get the propertybase.
+	 *  @return The propertybase.
+	 */
+	public IMPropertybase getPropertybase();
+	
+	/**
 	 *  Get the services.
 	 *  @return The services.
 	 */
 	public IMExpression[] getServices();
-	
-	/**
-	 *  Get the properties.
-	 *  @return The properties.
-	 */
-	public IMExpression[] getProperties();
 	
 	/**
 	 *  Get the configurations.

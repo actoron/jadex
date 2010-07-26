@@ -1,5 +1,6 @@
 package jadex.bdi.runtime.impl.flyweights;
 
+import jadex.bdi.model.IMElement;
 import jadex.bdi.runtime.IChangeEvent;
 import jadex.bdi.runtime.impl.FlyweightFunctionality;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
@@ -91,5 +92,16 @@ public class ChangeEventFlyweight extends ElementFlyweight implements IChangeEve
 		{
 			return (String)getState().getAttributeValue(getHandle(), OAVBDIRuntimeModel.changeevent_has_type);
 		}
+	}
+	
+//-------- element interface --------
+	
+	/**
+	 *  Get the model element.
+	 *  @return The model element.
+	 */
+	public IMElement getModelElement()
+	{
+		throw new RuntimeException("Element has no model: "+this);
 	}
 }

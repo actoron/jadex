@@ -9,7 +9,7 @@ import java.util.Collection;
 import java.util.Iterator;
 
 /**
- * 
+ *  Flyweight for trigger model element.
  */
 public class MTriggerFlyweight extends MElementFlyweight implements IMTrigger
 {

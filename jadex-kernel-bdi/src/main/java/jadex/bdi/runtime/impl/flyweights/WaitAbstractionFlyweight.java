@@ -1,10 +1,14 @@
 package jadex.bdi.runtime.impl.flyweights;
 
+import jadex.bdi.model.IMElement;
+import jadex.bdi.model.impl.flyweights.MPropertybaseFlyweight;
+import jadex.bdi.model.impl.flyweights.MTriggerFlyweight;
 import jadex.bdi.runtime.IExternalCondition;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.IWaitAbstraction;
 import jadex.bdi.runtime.impl.FlyweightFunctionality;
+import jadex.bdi.runtime.impl.flyweights.ElementFlyweight.AgentInvocation;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.rules.state.IOAVState;
@@ -575,5 +579,34 @@ public class WaitAbstractionFlyweight extends ElementFlyweight implements IWaitA
 		if(wa==null)
 			wa = createWaitAbstraction();
 		return wa;
+	}
+	
+	//-------- element interface --------
+	
+	/**
+	 *  Get the model element.
+	 *  @return The model element.
+	 */
+	public IMElement getModelElement()
+	{
+		if(getInterpreter().isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					Object me = getState().getAttributeValue(getHandle(), OAVBDIRuntimeModel.element_has_model);
+					Object mscope = getState().getAttributeValue(getScope(), OAVBDIRuntimeModel.element_has_model);
+					object = new MTriggerFlyweight(getState(), mscope, me);
+				}
+			};
+			return (IMElement)invoc.object;
+		}
+		else
+		{
+			Object me = getState().getAttributeValue(getHandle(), OAVBDIRuntimeModel.element_has_model);
+			Object mscope = getState().getAttributeValue(getScope(), OAVBDIRuntimeModel.element_has_model);
+			return new MTriggerFlyweight(getState(), mscope, me);
+		}
 	}
 }

@@ -1,9 +1,14 @@
 package jadex.bdi.runtime.impl.flyweights;
 
+import jadex.bdi.model.IMElement;
+import jadex.bdi.model.impl.flyweights.MBeliefFlyweight;
+import jadex.bdi.model.impl.flyweights.MPropertybaseFlyweight;
 import jadex.bdi.runtime.IPropertybase;
 import jadex.bdi.runtime.impl.FlyweightFunctionality;
+import jadex.bdi.runtime.impl.flyweights.ElementFlyweight.AgentInvocation;
 import jadex.bdi.runtime.interpreter.AgentRules;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
+import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.commons.Tuple;
 import jadex.rules.state.IOAVState;
 
@@ -86,6 +91,33 @@ public class PropertybaseFlyweight extends ElementFlyweight implements IProperty
 		else
 		{
 			return FlyweightFunctionality.getPropertyNames(getState(), getHandle());
+		}
+	}
+	
+	//-------- element interface --------
+	
+	/**
+	 *  Get the model element.
+	 *  @return The model element.
+	 */
+	public IMElement getModelElement()
+	{
+		if(getInterpreter().isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					Object mscope = getState().getAttributeValue(getScope(), OAVBDIRuntimeModel.element_has_model);
+					object = new MPropertybaseFlyweight(getState(), mscope);
+				}
+			};
+			return (IMElement)invoc.object;
+		}
+		else
+		{
+			Object mscope = getState().getAttributeValue(getScope(), OAVBDIRuntimeModel.element_has_model);
+			return new MPropertybaseFlyweight(getState(), mscope);
 		}
 	}
 }

@@ -9,6 +9,7 @@ import jadex.bdi.model.IMExpression;
 import jadex.bdi.model.IMExpressionbase;
 import jadex.bdi.model.IMGoalbase;
 import jadex.bdi.model.IMPlanbase;
+import jadex.bdi.model.IMPropertybase;
 import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.rules.state.IOAVState;
 
@@ -260,6 +261,29 @@ public class MCapabilityFlyweight extends MElementFlyweight implements IMCapabil
 	}
 	
 	/**
+	 *  Get the propertybase.
+	 *  @return The propertybase.
+	 */
+	public IMPropertybase getPropertybase()
+	{
+		if(getInterpreter().isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					object = new MPropertybaseFlyweight(getState(), getScope());
+				}
+			};
+			return (IMPropertybase)invoc.object;
+		}
+		else
+		{
+			return new MPropertybaseFlyweight(getState(), getScope());
+		}
+	}
+	
+	/**
 	 *  Get the services.
 	 *  @return The services.
 	 */
@@ -302,48 +326,7 @@ public class MCapabilityFlyweight extends MElementFlyweight implements IMCapabil
 		}
 	}
 	
-	/**
-	 *  Get the properties.
-	 *  @return The properties.
-	 */
-	public IMExpression[] getProperties()
-	{
-		if(getInterpreter().isExternalThread())
-		{
-			AgentInvocation invoc = new AgentInvocation()
-			{
-				public void run()
-				{
-					Collection elems = (Collection)getState().getAttributeValue(getScope(), OAVBDIMetaModel.capability_has_properties);
-					IMExpression[] ret = new IMExpression[elems==null? 0: elems.size()];
-					if(elems!=null)
-					{
-						int i=0;
-						for(Iterator it=elems.iterator(); it.hasNext(); )
-						{
-							ret[i++] = new MExpressionFlyweight(getState(), getScope(), it.next());
-						}
-					}
-					object = ret;
-				}
-			};
-			return (IMExpression[])invoc.object;
-		}
-		else
-		{
-			Collection elems = (Collection)getState().getAttributeValue(getScope(), OAVBDIMetaModel.capability_has_properties);
-			IMExpression[] ret = new IMExpression[elems==null? 0: elems.size()];
-			if(elems!=null)
-			{
-				int i=0;
-				for(Iterator it=elems.iterator(); it.hasNext(); )
-				{
-					ret[i++] = new MExpressionFlyweight(getState(), getScope(), it.next());
-				}
-			}
-			return ret;
-		}
-	}
+	
 	
 	/**
 	 *  Get the configurations.
