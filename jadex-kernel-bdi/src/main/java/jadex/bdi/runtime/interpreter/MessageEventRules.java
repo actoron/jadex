@@ -723,7 +723,7 @@ public class MessageEventRules
 				{
 					public void resultAvailable(Object source, Object result)
 					{
-						((IMessageService)result).sendMessage(msg.getParameterMap(), msg.getMessageType(), interpreter.getAgentAdapter(), interpreter.getModel().getTypeModel().getClassLoader());
+						((IMessageService)result).sendMessage(msg.getParameterMap(), msg.getMessageType(), interpreter.getAgentAdapter(), interpreter.getModel().getState().getTypeModel().getClassLoader());
 					}
 				});
 

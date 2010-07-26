@@ -522,7 +522,7 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 	 */
 	public ClassLoader getClassLoader()
 	{
-		return getModel().getTypeModel().getClassLoader();
+		return getModel().getState().getTypeModel().getClassLoader();
 	}
 	
 	/**
