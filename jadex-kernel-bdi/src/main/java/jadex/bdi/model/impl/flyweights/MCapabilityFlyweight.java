@@ -11,6 +11,13 @@ import jadex.bdi.model.IMGoalbase;
 import jadex.bdi.model.IMPlanbase;
 import jadex.bdi.model.IMPropertybase;
 import jadex.bdi.model.OAVBDIMetaModel;
+import jadex.bdi.model.editable.IMEBeliefbase;
+import jadex.bdi.model.editable.IMECapability;
+import jadex.bdi.model.editable.IMEExpression;
+import jadex.bdi.model.editable.IMEGoalbase;
+import jadex.javaparser.IExpressionParser;
+import jadex.javaparser.IParsedExpression;
+import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 import jadex.rules.state.IOAVState;
 
 import java.util.Collection;
@@ -19,7 +26,7 @@ import java.util.Iterator;
 /**
  *  Flyweight for capability element model.
  */
-public class MCapabilityFlyweight extends MElementFlyweight implements IMCapability
+public class MCapabilityFlyweight extends MElementFlyweight implements IMCapability, IMECapability
 {
 	//-------- constructors --------
 	
@@ -394,4 +401,265 @@ public class MCapabilityFlyweight extends MElementFlyweight implements IMCapabil
 		}
 	}
 	
+	//-------- IMECapability interface ---------
+	
+	/**
+	 *  Set the package.
+	 *  @param The package.
+	 */
+	public void setPackage(final String name)
+	{
+		if(isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					getState().setAttributeValue(getHandle(), OAVBDIMetaModel.capability_has_package, name);
+				}
+			};
+		}
+		else
+		{
+			getState().setAttributeValue(getHandle(), OAVBDIMetaModel.capability_has_package, name);
+		}
+	}
+	
+	/**
+	 *  Set the imports.
+	 *  @param The imports.
+	 */
+	public void setImports(final String[] imports)
+	{
+		if(isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					Collection	old	= getState().getAttributeValues(getHandle(), OAVBDIMetaModel.capability_has_imports);
+					if(old!=null)
+					{
+						for(Iterator it=old.iterator(); it.hasNext(); )
+						{
+							getState().removeAttributeValue(getHandle(), OAVBDIMetaModel.capability_has_imports, it.next());
+						}
+					}
+					if(imports!=null)
+					{
+						for(int i=0; i<imports.length; i++)
+						{
+							getState().addAttributeValue(getHandle(), OAVBDIMetaModel.capability_has_imports, imports[i]);
+						}
+					}
+				}
+			};
+		}
+		else
+		{
+			Collection	old	= getState().getAttributeValues(getHandle(), OAVBDIMetaModel.capability_has_imports);
+			if(old!=null)
+			{
+				for(Iterator it=old.iterator(); it.hasNext(); )
+				{
+					getState().removeAttributeValue(getHandle(), OAVBDIMetaModel.capability_has_imports, it.next());
+				}
+			}
+			if(imports!=null)
+			{
+				for(int i=0; i<imports.length; i++)
+				{
+					getState().addAttributeValue(getHandle(), OAVBDIMetaModel.capability_has_imports, imports[i]);
+				}
+			}
+		}
+	}
+	
+	/**
+	 *  Set if is abstract.
+	 *  @param True, if is abstract.
+	 */
+	public void setAbstract(final boolean abs)
+	{
+		if(isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					getState().setAttributeValue(getHandle(), OAVBDIMetaModel.capability_has_abstract, abs ? Boolean.TRUE : Boolean.FALSE);
+				}
+			};
+		}
+		else
+		{
+			getState().setAttributeValue(getHandle(), OAVBDIMetaModel.capability_has_abstract, abs ? Boolean.TRUE : Boolean.FALSE);
+		}
+	}
+	
+	/**
+	 *  Get the capability references.
+	 *  @return The capability references.
+	 */
+	public void createCapabilityReference(final String name, final String file)
+	{
+		if(isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					Object	caparef	= getState().createObject(OAVBDIMetaModel.capabilityref_type);
+					getState().setAttributeValue(caparef, OAVBDIMetaModel.modelelement_has_name, name);
+					getState().setAttributeValue(caparef, OAVBDIMetaModel.capabilityref_has_file, file);
+					getState().addAttributeValue(getHandle(), OAVBDIMetaModel.capability_has_capabilityrefs, caparef);
+				}
+			};
+		}
+		else
+		{
+			Object	caparef	= getState().createObject(OAVBDIMetaModel.capabilityref_type);
+			getState().setAttributeValue(caparef, OAVBDIMetaModel.modelelement_has_name, name);
+			getState().setAttributeValue(caparef, OAVBDIMetaModel.capabilityref_has_file, file);
+			getState().addAttributeValue(getHandle(), OAVBDIMetaModel.capability_has_capabilityrefs, caparef);
+		}
+	}
+	
+	/**
+	 *  Create or get the beliefbase.
+	 *  @return The belief base.
+	 */
+	public IMEBeliefbase createBeliefbase()
+	{
+		return new MBeliefbaseFlyweight(getState(), getHandle());
+	}
+	
+	/**
+	 *  Create or get the beliefbase.
+	 *  @return The goalbase.
+	 */
+	public IMEGoalbase createGoalbase()
+	{
+		return new MGoalbaseFlyweight(getState(), getHandle());
+	}
+	
+	/**
+	 *  Create or get the planbase.
+	 *  @return The planbase.
+	 */
+	public IMEPlanbase createPlanbase()
+	{
+		return new MPlanbaseFlyweight(getState(), getHandle());
+	}
+	
+	/**
+	 *  Create or get the eventbase.
+	 *  @return The eventbase.
+	 */
+	public IMEEventbase createEventbase()
+	{
+		return new MEventbaseFlyweight(getState(), getHandle());
+	}
+	
+	/**
+	 *  Get the expressionbase.
+	 *  @return The expressionbase.
+	 */
+	public IMEExpressionbase createExpressionbase()
+	{
+		return new MExpressionbaseFlyweight(getState(), getHandle());
+	}
+	
+	/**
+	 *  Get the propertybase.
+	 *  @return The propertybase.
+	 */
+	public IMEPropertybase createPropertybase()
+	{
+		return new MPropertybaseFlyweight(getState(), getHandle());
+	}
+	
+	/**
+	 *  Add a service.
+	 *  @param name	The service name.
+	 *  @param clazz	The service type (for lookups).
+	 *  @param expression	The creation expression for the service object.
+	 *  @param language	The expression language (or null for default java-like language).
+	 *  @return The service expression object.
+	 */
+	public IMEExpression createService(final String name, final Class cls, final String expression, final String language)
+	{
+		if(!"java".equals(language))
+		{
+			throw new UnsupportedOperationException("Only java currently supported.");
+		}
+		
+		if(isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					Object	mexp	= getState().createObject(OAVBDIMetaModel.expression_type);
+					getState().setAttributeValue(mexp, OAVBDIMetaModel.modelelement_has_name, name);
+					getState().setAttributeValue(mexp, OAVBDIMetaModel.expression_has_class, cls);
+					getState().setAttributeValue(mexp, OAVBDIMetaModel.expression_has_language, language);
+
+					IExpressionParser	exp_parser	= new JavaCCExpressionParser();	// Hack!!! Map language to parser somewhere?
+					IParsedExpression	pexp	= exp_parser.parseExpression(expression,
+						OAVBDIMetaModel.getImports(getState(), getHandle()), null, getState().getTypeModel().getClassLoader());
+					getState().setAttributeValue(mexp, OAVBDIMetaModel.expression_has_content, pexp);
+
+					getState().addAttributeValue(getHandle(), OAVBDIMetaModel.capability_has_services, mexp);
+					object	= new MExpressionFlyweight(getState(), getHandle(), mexp);
+				}
+			};
+			return (IMEExpression)invoc.object;
+		}
+		else
+		{
+			Object	mexp	= getState().createObject(OAVBDIMetaModel.expression_type);
+			getState().setAttributeValue(mexp, OAVBDIMetaModel.modelelement_has_name, name);
+			getState().setAttributeValue(mexp, OAVBDIMetaModel.expression_has_class, cls);
+			getState().setAttributeValue(mexp, OAVBDIMetaModel.expression_has_language, language);
+
+			IExpressionParser	exp_parser	= new JavaCCExpressionParser();	// Hack!!! Map language to parser somewhere?
+			IParsedExpression	pexp	= exp_parser.parseExpression(expression,
+				OAVBDIMetaModel.getImports(getState(), getHandle()), null, getState().getTypeModel().getClassLoader());
+			getState().setAttributeValue(mexp, OAVBDIMetaModel.expression_has_content, pexp);
+
+			getState().addAttributeValue(getHandle(), OAVBDIMetaModel.capability_has_services, mexp);
+			
+			return new MExpressionFlyweight(getState(), getHandle(), mexp);
+		}
+	}
+	
+	/**
+	 *  Create a configuration.
+	 *  @return The configuration.
+	 */
+	public IMEConfiguration createConfiguration(final String name)
+	{
+		if(isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					Object	conf	= getState().createObject(OAVBDIMetaModel.configuration_type);
+					getState().setAttributeValue(conf, OAVBDIMetaModel.modelelement_has_name, name);
+					getState().addAttributeValue(getHandle(), OAVBDIMetaModel.capability_has_configurations, conf);
+					object	= new MConfigurationFlyweight(getState(), getHandle(), conf);
+				}
+			};
+			return (IMEConfiguration)invoc.object;
+		}
+		else
+		{
+			Object	conf	= getState().createObject(OAVBDIMetaModel.configuration_type);
+			getState().setAttributeValue(conf, OAVBDIMetaModel.modelelement_has_name, name);
+			getState().addAttributeValue(getHandle(), OAVBDIMetaModel.capability_has_configurations, conf);
+			return new MConfigurationFlyweight(getState(), getHandle(), conf);
+		}
+	}
 }

@@ -1,9 +1,9 @@
 package jadex.bdi;
 
-import jadex.bdi.model.IMCapability;
 import jadex.bdi.model.OAVAgentModel;
 import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.model.OAVCapabilityModel;
+import jadex.bdi.model.editable.IMECapability;
 import jadex.bdi.model.impl.flyweights.MCapabilityFlyweight;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
@@ -237,7 +237,7 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory
 	 *  @param name	A type name for the agent model.
 	 *  @param classloader	A type name for the agent model.
 	 */
-	public IMECapability	createAgentModel(String name, String description, String pkg, String[] imports, boolean abs, String defconf)
+	public IMECapability	createAgentModel(String name, String pkg, String[] imports)
 	{
 		OAVTypeModel	typemodel	= new OAVTypeModel(name+"_typemodel", null); // todo: classloader???
 		// Requires runtime meta model, because e.g. user conditions can refer to runtime elements (belief, goal, etc.) 
@@ -266,10 +266,14 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory
 		
 		Object	handle	= state.createRootObject(OAVBDIMetaModel.agent_type);
 		state.setAttributeValue(handle, OAVBDIMetaModel.modelelement_has_name, name);
-		state.setAttributeValue(handle, OAVBDIMetaModel.modelelement_has_description, description);
 		state.setAttributeValue(handle, OAVBDIMetaModel.capability_has_package, pkg);
-		state.setAttributeValue(handle, OAVBDIMetaModel.capability_has_abstract, abs);
-		state.setAttributeValue(handle, OAVBDIMetaModel.capability_has_defaultconfiguration, defconf);
+		if(imports!=null)
+		{
+			for(int i=0; i<imports.length; i++)
+			{
+				state.addAttributeValue(handle, OAVBDIMetaModel.capability_has_imports, imports[i]);
+			}
+		}
 		
 		mtypes.put(handle, new Object[]{types, listener});
 

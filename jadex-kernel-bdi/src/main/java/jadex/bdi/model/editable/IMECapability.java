@@ -77,14 +77,19 @@ public interface IMECapability extends IMCapability
 	public IMEPropertybase createPropertybase();
 	
 	/**
-	 *  Get the services.
-	 *  @return The services.
+	 *  Add a service.
+	 *  @param name	The service name.
+	 *  @param clazz	The service type (for lookups).
+	 *  @param expression	The creation expression for the service object.
+	 *  @param language	The expression language (or null for default java-like language).
+	 *  @return The service expression object.
 	 */
-	public IMEExpression createService();
+	public IMEExpression createService(String name, Class clazz, String expression, String language);
 	
 	/**
 	 *  Create a configuration.
+	 *  @param The name.
 	 *  @return The configuration.
 	 */
-	public IMEConfiguration createConfiguration();
+	public IMEConfiguration createConfiguration(String name);
 }
