@@ -1,11 +1,14 @@
 package jadex.bdi.runtime.impl.eaflyweights;
 
+import jadex.bdi.model.IMElement;
 import jadex.bdi.model.OAVBDIMetaModel;
+import jadex.bdi.model.impl.flyweights.MExpressionbaseFlyweight;
 import jadex.bdi.runtime.IEAExpressionbase;
 import jadex.bdi.runtime.impl.FlyweightFunctionality;
 import jadex.bdi.runtime.impl.flyweights.ElementFlyweight;
 import jadex.bdi.runtime.interpreter.AgentRules;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
+import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.Tuple;
@@ -208,7 +211,7 @@ public class EAExpressionbaseFlyweight extends ElementFlyweight implements IEAEx
 	/**
 	 *  Get the model element.
 	 *  @return The model element.
-	 * /
+	 */
 	public IMElement getModelElement()
 	{
 		if(getInterpreter().isExternalThread())
@@ -228,6 +231,6 @@ public class EAExpressionbaseFlyweight extends ElementFlyweight implements IEAEx
 			Object mscope = getState().getAttributeValue(getScope(), OAVBDIRuntimeModel.element_has_model);
 			return new MExpressionbaseFlyweight(getState(), mscope);
 		}
-	}*/
+	}
 }
 

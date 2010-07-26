@@ -1,5 +1,7 @@
 package jadex.bdi.runtime.impl.eaflyweights;
 
+import jadex.bdi.model.IMElement;
+import jadex.bdi.model.impl.flyweights.MPlanFlyweight;
 import jadex.bdi.runtime.IEAPlan;
 import jadex.bdi.runtime.IPlanListener;
 import jadex.bdi.runtime.impl.FlyweightFunctionality;
@@ -241,7 +243,7 @@ public class EAPlanFlyweight extends EAParameterElementFlyweight implements IEAP
 	/**
 	 *  Get the model element.
 	 *  @return The model element.
-	 * /
+	 */
 	public IMElement getModelElement()
 	{
 		if(getInterpreter().isExternalThread())
@@ -263,5 +265,5 @@ public class EAPlanFlyweight extends EAParameterElementFlyweight implements IEAP
 			Object mscope = getState().getAttributeValue(getScope(), OAVBDIRuntimeModel.element_has_model);
 			return new MPlanFlyweight(getState(), mscope, me);
 		}
-	}*/
+	}
 }

@@ -1,6 +1,8 @@
 package jadex.bdi.runtime.impl.eaflyweights;
 
+import jadex.bdi.model.IMElement;
 import jadex.bdi.model.OAVBDIMetaModel;
+import jadex.bdi.model.impl.flyweights.MEventbaseFlyweight;
 import jadex.bdi.runtime.IEAEventbase;
 import jadex.bdi.runtime.IEAInternalEvent;
 import jadex.bdi.runtime.IEAMessageEvent;
@@ -12,6 +14,7 @@ import jadex.bdi.runtime.interpreter.AgentRules;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.InternalEventRules;
 import jadex.bdi.runtime.interpreter.MessageEventRules;
+import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bridge.IComponentManagementService;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
@@ -514,7 +517,7 @@ public class EAEventbaseFlyweight extends ElementFlyweight implements IEAEventba
 	/**
 	 *  Get the model element.
 	 *  @return The model element.
-	 * /
+	 */
 	public IMElement getModelElement()
 	{
 		if(getInterpreter().isExternalThread())
@@ -523,7 +526,7 @@ public class EAEventbaseFlyweight extends ElementFlyweight implements IEAEventba
 			{
 				public void run()
 				{
-					Object mscope = getState().getAttributeValue(getScope(), OAVBDIRuntimeModel.element_has_model);
+					Object mscope = getState().getAttributeValue(getHandle(), OAVBDIRuntimeModel.element_has_model);
 					object = new MEventbaseFlyweight(getState(), mscope);
 				}
 			};
@@ -531,9 +534,9 @@ public class EAEventbaseFlyweight extends ElementFlyweight implements IEAEventba
 		}
 		else
 		{
-			Object mscope = getState().getAttributeValue(getScope(), OAVBDIRuntimeModel.element_has_model);
+			Object mscope = getState().getAttributeValue(getHandle(), OAVBDIRuntimeModel.element_has_model);
 			return new MEventbaseFlyweight(getState(), mscope);
 		}
-	}*/
+	}
 	
 }

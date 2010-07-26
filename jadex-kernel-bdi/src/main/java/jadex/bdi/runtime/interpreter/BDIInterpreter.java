@@ -977,6 +977,7 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 						if(BDIInterpreter.getInterpreter(state)!=null)
 						{
 //							System.err.println("Waiting: "+state);
+							getAgentAdapter().getLogger().warning("Executing synchronized code (might lead to deadlocks): "+code);
 							exception.wait();
 //							System.err.println("Continued: "+state);
 						}

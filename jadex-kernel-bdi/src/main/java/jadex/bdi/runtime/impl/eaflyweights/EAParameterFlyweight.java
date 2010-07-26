@@ -1,6 +1,8 @@
 package jadex.bdi.runtime.impl.eaflyweights;
 
+import jadex.bdi.model.IMElement;
 import jadex.bdi.model.OAVBDIMetaModel;
+import jadex.bdi.model.impl.flyweights.MParameterFlyweight;
 import jadex.bdi.runtime.IEAParameter;
 import jadex.bdi.runtime.impl.flyweights.ElementFlyweight;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
@@ -342,6 +344,35 @@ public class EAParameterFlyweight extends ElementFlyweight implements IEAParamet
 		}
 		
 		return ret;
+	}
+	
+	//-------- element interface --------
+	
+	/**
+	 *  Get the model element.
+	 *  @return The model element.
+	 */
+	public IMElement getModelElement()
+	{
+		if(getInterpreter().isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					Object me = getState().getAttributeValue(getHandle(), OAVBDIRuntimeModel.element_has_model);
+					Object mscope = getState().getAttributeValue(getScope(), OAVBDIRuntimeModel.element_has_model);
+					object = new MParameterFlyweight(getState(), mscope, me);
+				}
+			};
+			return (IMElement)invoc.object;
+		}
+		else
+		{
+			Object me = getState().getAttributeValue(getHandle(), OAVBDIRuntimeModel.element_has_model);
+			Object mscope = getState().getAttributeValue(getScope(), OAVBDIRuntimeModel.element_has_model);
+			return new MParameterFlyweight(getState(), mscope, me);
+		}
 	}
 }
 

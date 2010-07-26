@@ -1,5 +1,7 @@
 package jadex.bdi.runtime.impl.eaflyweights;
 
+import jadex.bdi.model.IMElement;
+import jadex.bdi.model.impl.flyweights.MBeliefbaseFlyweight;
 import jadex.bdi.runtime.IBelief;
 import jadex.bdi.runtime.IBeliefListener;
 import jadex.bdi.runtime.IBeliefSet;
@@ -8,6 +10,7 @@ import jadex.bdi.runtime.IEABeliefbase;
 import jadex.bdi.runtime.impl.FlyweightFunctionality;
 import jadex.bdi.runtime.impl.flyweights.ElementFlyweight;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
+import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.Tuple;
@@ -820,4 +823,12 @@ public class EABeliefbaseFlyweight extends ElementFlyweight implements IEABelief
 		return ret;
 	}
 	
+	/**
+	 *  Get the model element.
+	 */
+	public IMElement getModelElement()
+	{
+		Object mscope = getState().getAttributeValue(getScope(), OAVBDIRuntimeModel.element_has_model);
+		return new MBeliefbaseFlyweight(getState(), mscope);
+	}
 }

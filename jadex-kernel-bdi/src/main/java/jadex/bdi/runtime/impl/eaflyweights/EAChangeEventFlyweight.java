@@ -1,5 +1,6 @@
 package jadex.bdi.runtime.impl.eaflyweights;
 
+import jadex.bdi.model.IMElement;
 import jadex.bdi.runtime.IEAChangeEvent;
 import jadex.bdi.runtime.impl.FlyweightFunctionality;
 import jadex.bdi.runtime.impl.flyweights.ElementFlyweight;
@@ -103,6 +104,17 @@ public class EAChangeEventFlyweight extends ElementFlyweight implements IEAChang
 		}
 		
 		return ret;
+	}
+	
+	//-------- element interface --------
+	
+	/**
+	 *  Get the model element.
+	 *  @return The model element.
+	 */
+	public IMElement getModelElement()
+	{
+		throw new UnsupportedOperationException("Element has no model");
 	}
 }
 

@@ -1,6 +1,8 @@
 package jadex.bdi.runtime.impl.eaflyweights;
 
+import jadex.bdi.model.IMElement;
 import jadex.bdi.model.OAVBDIMetaModel;
+import jadex.bdi.model.impl.flyweights.MGoalbaseFlyweight;
 import jadex.bdi.runtime.IEAGoal;
 import jadex.bdi.runtime.IEAGoalbase;
 import jadex.bdi.runtime.IGoalListener;
@@ -346,5 +348,32 @@ public class EAGoalbaseFlyweight extends ElementFlyweight implements IEAGoalbase
 		Object rgoal = GoalLifecycleRules.createGoal(state, scope[1], (String)scope[0]);
 		return EGoalFlyweight.getGoalFlyweight(state, scope[1], rgoal);
 	}*/
+	
+	//-------- element interface --------
+	
+	/**
+	 *  Get the model element.
+	 *  @return The model element.
+	 */
+	public IMElement getModelElement()
+	{
+		if(getInterpreter().isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					Object mscope = getState().getAttributeValue(getScope(), OAVBDIRuntimeModel.element_has_model);
+					object = new MGoalbaseFlyweight(getState(), mscope);
+				}
+			};
+			return (IMElement)invoc.object;
+		}
+		else
+		{
+			Object mscope = getState().getAttributeValue(getScope(), OAVBDIRuntimeModel.element_has_model);
+			return new MGoalbaseFlyweight(getState(), mscope);
+		}
+	}
 }
 

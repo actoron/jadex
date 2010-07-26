@@ -4,8 +4,6 @@ import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IEAGoal;
 import jadex.bdi.runtime.IEAInternalEvent;
 import jadex.bdi.runtime.IEAMessageEvent;
-import jadex.bdi.runtime.IInternalEvent;
-import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.impl.FlyweightFunctionality;
 import jadex.bdi.runtime.impl.WakeupAction;
 import jadex.bdi.runtime.impl.flyweights.ElementFlyweight;

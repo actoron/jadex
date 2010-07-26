@@ -1,5 +1,7 @@
 package jadex.bdi.runtime.impl.eaflyweights;
 
+import jadex.bdi.model.IMElement;
+import jadex.bdi.model.impl.flyweights.MTriggerFlyweight;
 import jadex.bdi.runtime.IEAGoal;
 import jadex.bdi.runtime.IEAWaitAbstraction;
 import jadex.bdi.runtime.IEAWaitqueue;
@@ -317,4 +319,32 @@ public class EAWaitqueueFlyweight extends EAWaitAbstractionFlyweight implements 
 		return wa;
 	}
 	
+	//-------- element interface --------
+	
+	/**
+	 *  Get the model element.
+	 *  @return The model element.
+	 */
+	public IMElement getModelElement()
+	{
+		if(getInterpreter().isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					Object me = getState().getAttributeValue(getHandle(), OAVBDIRuntimeModel.element_has_model);
+					Object mscope = getState().getAttributeValue(getScope(), OAVBDIRuntimeModel.element_has_model);
+					object = new MTriggerFlyweight(getState(), mscope, me);
+				}
+			};
+			return (IMElement)invoc.object;
+		}
+		else
+		{
+			Object me = getState().getAttributeValue(getHandle(), OAVBDIRuntimeModel.element_has_model);
+			Object mscope = getState().getAttributeValue(getScope(), OAVBDIRuntimeModel.element_has_model);
+			return new MTriggerFlyweight(getState(), mscope, me);
+		}
+	}	
 }

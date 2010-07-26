@@ -1,5 +1,7 @@
 package jadex.bdi.runtime.impl.eaflyweights;
 
+import jadex.bdi.model.IMElement;
+import jadex.bdi.model.impl.flyweights.MMessageEventFlyweight;
 import jadex.bdi.runtime.IEAMessageEvent;
 import jadex.bdi.runtime.IMessageEventListener;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
@@ -207,7 +209,7 @@ public class EAMessageEventFlyweight extends EAProcessableElementFlyweight imple
 	/**
 	 *  Get the model element.
 	 *  @return The model element.
-	 * /
+	 */
 	public IMElement getModelElement()
 	{
 		if(getInterpreter().isExternalThread())
@@ -229,6 +231,6 @@ public class EAMessageEventFlyweight extends EAProcessableElementFlyweight imple
 			Object mscope = getState().getAttributeValue(getScope(), OAVBDIRuntimeModel.element_has_model);
 			return new MMessageEventFlyweight(getState(), mscope, me);
 		}
-	}*/
+	}
 }
 

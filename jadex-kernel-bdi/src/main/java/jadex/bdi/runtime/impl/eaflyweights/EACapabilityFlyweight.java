@@ -1,5 +1,7 @@
 package jadex.bdi.runtime.impl.eaflyweights;
 
+import jadex.bdi.model.IMElement;
+import jadex.bdi.model.impl.flyweights.MCapabilityFlyweight;
 import jadex.bdi.runtime.IAgentListener;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IEABeliefbase;
@@ -389,5 +391,31 @@ public abstract class EACapabilityFlyweight extends ElementFlyweight implements 
 	public IComponentAdapter getAgentAdapter()
 	{
 		return adapter;
+	}
+	//-------- element interface --------
+	
+	/**
+	 *  Get the model element.
+	 *  @return The model element.
+	 */
+	public IMElement getModelElement()
+	{
+		if(getInterpreter().isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					Object me = getState().getAttributeValue(getHandle(), OAVBDIRuntimeModel.element_has_model);
+					object = new MCapabilityFlyweight(getState(), me);
+				}
+			};
+			return (IMElement)invoc.object;
+		}
+		else
+		{
+			Object me = getState().getAttributeValue(getHandle(), OAVBDIRuntimeModel.element_has_model);
+			return new MCapabilityFlyweight(getState(), me);
+		}
 	}
 }

@@ -6,7 +6,6 @@ import jadex.bdi.runtime.IEAWaitAbstraction;
 import jadex.bdi.runtime.IExternalCondition;
 import jadex.bdi.runtime.impl.FlyweightFunctionality;
 import jadex.bdi.runtime.impl.flyweights.ElementFlyweight;
-import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
@@ -15,7 +14,7 @@ import jadex.rules.state.IOAVState;
 /**
  *  Flyweight for a waitabstraction.
  */
-public class EAWaitAbstractionFlyweight extends ElementFlyweight implements IEAWaitAbstraction
+public abstract class EAWaitAbstractionFlyweight extends ElementFlyweight implements IEAWaitAbstraction
 {
 	//-------- constructors --------
 	
@@ -34,7 +33,7 @@ public class EAWaitAbstractionFlyweight extends ElementFlyweight implements IEAW
 	/**
 	 *  Get or create a flyweight.
 	 *  @return The flyweight.
-	 */
+	 * /
 	public static EAWaitAbstractionFlyweight getWaitAbstractionFlyweight(IOAVState state, Object scope, Object handle)
 	{
 		BDIInterpreter ip = BDIInterpreter.getInterpreter(state);
@@ -45,7 +44,7 @@ public class EAWaitAbstractionFlyweight extends ElementFlyweight implements IEAW
 			ip.getFlyweightCache(IEAWaitAbstraction.class).put(handle, ret);
 		}
 		return ret;
-	}
+	}*/
 	
 	//-------- adder methods --------
 	
