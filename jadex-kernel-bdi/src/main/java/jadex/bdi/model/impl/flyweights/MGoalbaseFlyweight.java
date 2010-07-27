@@ -4,6 +4,13 @@ import jadex.bdi.model.IMGoal;
 import jadex.bdi.model.IMGoalReference;
 import jadex.bdi.model.IMGoalbase;
 import jadex.bdi.model.OAVBDIMetaModel;
+import jadex.bdi.model.editable.IMEAchieveGoal;
+import jadex.bdi.model.editable.IMEGoalReference;
+import jadex.bdi.model.editable.IMEGoalbase;
+import jadex.bdi.model.editable.IMEMaintainGoal;
+import jadex.bdi.model.editable.IMEMetaGoal;
+import jadex.bdi.model.editable.IMEPerformGoal;
+import jadex.bdi.model.editable.IMEQueryGoal;
 import jadex.rules.state.IOAVState;
 
 import java.util.Collection;
@@ -12,7 +19,7 @@ import java.util.Iterator;
 /**
  *  Flyweight for the belief base model.
  */
-public class MGoalbaseFlyweight extends MElementFlyweight implements IMGoalbase 
+public class MGoalbaseFlyweight extends MElementFlyweight implements IMGoalbase, IMEGoalbase
 {
 	//-------- constructors --------
 	
@@ -167,6 +174,184 @@ public class MGoalbaseFlyweight extends MElementFlyweight implements IMGoalbase
 				}
 			}
 			return ret;
+		}
+	}
+	
+	/**
+	 *  Create a perform goal for a name.
+	 *  @param name	The goal name.
+	 */
+	public IMEPerformGoal createPerformGoal(final String name)
+	{
+		if(isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					Object elem = getState().createObject(OAVBDIMetaModel.performgoal_type);
+					getState().setAttributeValue(elem, OAVBDIMetaModel.modelelement_has_name, name);
+					getState().addAttributeValue(getHandle(), OAVBDIMetaModel.capability_has_goals, elem);
+					object = new MPerformGoalFlyweight(getState(), getScope(), elem);
+				}
+			};
+			return (IMEPerformGoal)invoc.object;
+		}
+		else
+		{
+			Object elem = getState().createObject(OAVBDIMetaModel.performgoal_type);
+			getState().setAttributeValue(elem, OAVBDIMetaModel.modelelement_has_name, name);
+			getState().addAttributeValue(getHandle(), OAVBDIMetaModel.capability_has_goals, elem);
+			return new MPerformGoalFlyweight(getState(), getScope(), elem);
+		}
+	}
+	
+	/**
+	 *  Create a achieve goal for a name.
+	 *  @param name	The goal name.
+	 */
+	public IMEAchieveGoal createAchieveGoal(final String name)
+	{
+		if(isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					Object elem = getState().createObject(OAVBDIMetaModel.achievegoal_type);
+					getState().setAttributeValue(elem, OAVBDIMetaModel.modelelement_has_name, name);
+					getState().addAttributeValue(getHandle(), OAVBDIMetaModel.capability_has_goals, elem);
+					object = new MAchieveGoalFlyweight(getState(), getScope(), elem);
+				}
+			};
+			return (IMEAchieveGoal)invoc.object;
+		}
+		else
+		{
+			Object elem = getState().createObject(OAVBDIMetaModel.achievegoal_type);
+			getState().setAttributeValue(elem, OAVBDIMetaModel.modelelement_has_name, name);
+			getState().addAttributeValue(getHandle(), OAVBDIMetaModel.capability_has_goals, elem);
+			return new MAchieveGoalFlyweight(getState(), getScope(), elem);
+		}
+	}
+	
+	/**
+	 *  Create a query goal for a name.
+	 *  @param name	The goal name.
+	 */
+	public IMEQueryGoal createQueryGoal(final String name)
+	{
+		if(isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					Object elem = getState().createObject(OAVBDIMetaModel.querygoal_type);
+					getState().setAttributeValue(elem, OAVBDIMetaModel.modelelement_has_name, name);
+					getState().addAttributeValue(getHandle(), OAVBDIMetaModel.capability_has_goals, elem);
+					object = new MQueryGoalFlyweight(getState(), getScope(), elem);
+				}
+			};
+			return (IMEQueryGoal)invoc.object;
+		}
+		else
+		{
+			Object elem = getState().createObject(OAVBDIMetaModel.querygoal_type);
+			getState().setAttributeValue(elem, OAVBDIMetaModel.modelelement_has_name, name);
+			getState().addAttributeValue(getHandle(), OAVBDIMetaModel.capability_has_goals, elem);
+			return new MQueryGoalFlyweight(getState(), getScope(), elem);
+		}
+	}
+	
+	/**
+	 *  Create a maintain goal for a name.
+	 *  @param name	The goal name.
+	 */
+	public IMEMaintainGoal createMaintainGoal(String name)
+	{
+		if(isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					Object elem = getState().createObject(OAVBDIMetaModel.maintaingoal_type);
+					getState().setAttributeValue(elem, OAVBDIMetaModel.modelelement_has_name, name);
+					getState().addAttributeValue(getHandle(), OAVBDIMetaModel.capability_has_goals, elem);
+					object = new MMaintainGoalFlyweight(getState(), getScope(), elem);
+				}
+			};
+			return (IMEMaintainGoal)invoc.object;
+		}
+		else
+		{
+			Object elem = getState().createObject(OAVBDIMetaModel.maintaingoal_type);
+			getState().setAttributeValue(elem, OAVBDIMetaModel.modelelement_has_name, name);
+			getState().addAttributeValue(getHandle(), OAVBDIMetaModel.capability_has_goals, elem);
+			return new MMaintainGoalFlyweight(getState(), getScope(), elem);
+		}
+	}
+	
+	/**
+	 *  Create a meta goal for a name.
+	 *  @param name	The goal name.
+	 */
+	public IMEMetaGoal createMetaGoal(String name)
+	{
+		if(isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					Object elem = getState().createObject(OAVBDIMetaModel.metagoal_type);
+					getState().setAttributeValue(elem, OAVBDIMetaModel.modelelement_has_name, name);
+					getState().addAttributeValue(getHandle(), OAVBDIMetaModel.capability_has_goals, elem);
+					object = new MMetaGoalFlyweight(getState(), getScope(), elem);
+				}
+			};
+			return (IMEMetaGoal)invoc.object;
+		}
+		else
+		{
+			Object elem = getState().createObject(OAVBDIMetaModel.metagoal_type);
+			getState().setAttributeValue(elem, OAVBDIMetaModel.modelelement_has_name, name);
+			getState().addAttributeValue(getHandle(), OAVBDIMetaModel.capability_has_goals, elem);
+			return new MMetaGoalFlyweight(getState(), getScope(), elem);
+		}
+	}
+
+	/**
+	 *  Get a goal reference for a name.
+	 *  @param name	The goal reference name.
+	 */
+	public IMEGoalReference createGoalReference(final String name, final String ref)
+	{
+		if(isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					Object elem = getState().createObject(OAVBDIMetaModel.goalreference_type);
+					getState().setAttributeValue(elem, OAVBDIMetaModel.modelelement_has_name, name);
+					if(ref!=null)
+						getState().setAttributeValue(elem, OAVBDIMetaModel.elementreference_has_concrete, ref);
+					getState().addAttributeValue(getHandle(), OAVBDIMetaModel.capability_has_goalrefs, elem);
+					object = new MGoalReferenceFlyweight(getState(), getScope(), elem);
+				}
+			};
+			return (IMEGoalReference)invoc.object;
+		}
+		else
+		{
+			Object elem = getState().createObject(OAVBDIMetaModel.goalreference_type);
+			getState().setAttributeValue(elem, OAVBDIMetaModel.modelelement_has_name, name);
+			if(ref!=null)
+				getState().setAttributeValue(elem, OAVBDIMetaModel.elementreference_has_concrete, ref);
+			getState().addAttributeValue(getHandle(), OAVBDIMetaModel.capability_has_goalrefs, elem);
+			return new MGoalReferenceFlyweight(getState(), getScope(), elem);
 		}
 	}
 	
