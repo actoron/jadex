@@ -3,6 +3,7 @@ package jadex.bdi.model.impl.flyweights;
 import jadex.bdi.model.IMBelief;
 import jadex.bdi.model.IMCondition;
 import jadex.bdi.model.IMGoal;
+import jadex.bdi.model.IMInhibited;
 import jadex.bdi.model.IMTypedElement;
 import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.rules.state.IOAVState;
@@ -350,11 +351,45 @@ public class MGoalFlyweight extends MProcessableElementFlyweight implements IMGo
 	/**
 	 *  Get inhibited goals.
 	 *  @retur The inhibited goals.
-	 * /
-	public IMInhibitedElement getInhibitedGoals()
+	 */
+	public IMInhibited[] getInhibitedGoals()
 	{
-		
-	}*/
+		if(isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					Collection params = (Collection)getState().getAttributeValue(getScope(), OAVBDIMetaModel.goal_has_inhibits);
+					IMInhibited[] ret = new IMInhibited[params==null? 0: params.size()];
+					if(params!=null)
+					{
+						int i=0;
+						for(Iterator it=params.iterator(); it.hasNext(); )
+						{
+							ret[i++] = new MInhibitedFlyweight(getState(), getScope(), it.next());
+						}
+					}
+					object = ret;
+				}
+			};
+			return (IMInhibited[])invoc.object;
+		}
+		else
+		{
+			Collection params = (Collection)getState().getAttributeValue(getScope(), OAVBDIMetaModel.goal_has_excludedparameter);
+			IMInhibited[] ret = new IMInhibited[params==null? 0: params.size()];
+			if(params!=null)
+			{
+				int i=0;
+				for(Iterator it=params.iterator(); it.hasNext(); )
+				{
+					ret[i++] = new MInhibitedFlyweight(getState(), getScope(), it.next());
+				}
+			}
+			return ret;
+		}
+	}
 	
 	/**
 	 *  Get the cardinality.

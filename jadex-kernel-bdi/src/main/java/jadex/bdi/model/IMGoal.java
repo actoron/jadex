@@ -81,7 +81,7 @@ public interface IMGoal extends IMProcessableElement
 	 *  Get inhibited goals.
 	 *  @retur The inhibited goals.
 	 */
-//	public IMInhibitedElement getInhibitedGoals();
+	public IMInhibited[] getInhibitedGoals();
 	
 	/**
 	 *  Get the cardinality.
