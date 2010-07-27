@@ -7,12 +7,13 @@ import jadex.bdi.model.IMPlanBody;
 import jadex.bdi.model.IMPlanTrigger;
 import jadex.bdi.model.IMTrigger;
 import jadex.bdi.model.OAVBDIMetaModel;
+import jadex.bdi.model.editable.IMEPlan;
 import jadex.rules.state.IOAVState;
 
 /**
  *  Flyweight for plan model element.
  */
-public class MPlanFlyweight extends MParameterElementFlyweight implements IMPlan
+public class MPlanFlyweight extends MParameterElementFlyweight implements IMPlan, IMEPlan
 {
 	//-------- constructors --------
 	

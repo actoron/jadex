@@ -3,6 +3,10 @@ package jadex.bdi.model.impl.flyweights;
 import jadex.bdi.model.IMPlan;
 import jadex.bdi.model.IMPlanbase;
 import jadex.bdi.model.OAVBDIMetaModel;
+import jadex.bdi.model.editable.IMEInternalEvent;
+import jadex.bdi.model.editable.IMEPlan;
+import jadex.bdi.model.editable.IMEPlanbase;
+import jadex.bdi.model.impl.flyweights.MElementFlyweight.AgentInvocation;
 import jadex.rules.state.IOAVState;
 
 import java.util.Collection;
@@ -11,7 +15,7 @@ import java.util.Iterator;
 /**
  *  Flyweight for planbase model.
  */
-public class MPlanbaseFlyweight extends MElementFlyweight implements IMPlanbase 
+public class MPlanbaseFlyweight extends MElementFlyweight implements IMPlanbase, IMEPlanbase
 {
  	//-------- constructors --------
  	
@@ -95,5 +99,34 @@ public class MPlanbaseFlyweight extends MElementFlyweight implements IMPlanbase
  			}
  			return ret;
  		}
+	}
+	
+	/**
+	 *  Create a plan with a name.
+	 *  @param name	The plan name.
+	 */
+	public IMEPlan createPlan(final String name)
+	{
+		if(isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					Object elem = getState().createObject(OAVBDIMetaModel.plan_type);
+					getState().setAttributeValue(elem, OAVBDIMetaModel.modelelement_has_name, name);
+					getState().addAttributeValue(getHandle(), OAVBDIMetaModel.capability_has_plans, elem);
+					object = new MPlanFlyweight(getState(), getScope(), elem);
+				}
+			};
+			return (IMEPlan)invoc.object;
+		}
+		else
+		{
+			Object elem = getState().createObject(OAVBDIMetaModel.plan_type);
+			getState().setAttributeValue(elem, OAVBDIMetaModel.modelelement_has_name, name);
+			getState().addAttributeValue(getHandle(), OAVBDIMetaModel.capability_has_plans, elem);
+			return new MPlanFlyweight(getState(), getScope(), elem);
+		}
 	}
 }
