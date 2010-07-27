@@ -9,26 +9,30 @@ import jadex.bdi.model.IMParameterSet;
 public interface IMEParameterSet extends IMParameterSet, IMETypedElement
 {
 	/**
-	 *  Get the parameter value.
+	 *  Add a parameter value.
+	 *  @param expression	The expression.
+	 *  @param language	The expression language (or null for default java-like language).
 	 *  @return The value.
 	 */
-	public IMExpression createValue();
+	public IMExpression addValue(String expression, String language);
 	
 	/**
-	 *  Get the values expression.
 	 *  @return The values expression.
+	 *  @param expression	The expression.
+	 *  @param language	The expression language (or null for default java-like language).
+	 *  Create the values expression.
 	 */
-	public IMExpression createValuesExpression();
+	public IMExpression createValuesExpression(String expression, String language);
 	
 	/**
-	 *  Get the parameter set direction.
-	 *  @return The direction.
+	 *  Set the parameter direction.
+	 *  @param dir The direction.
 	 */
 	public void setDirection(String dir);
 	
 	/**
-	 *  Flag if parameter set is optional.
-	 *  @return True if optional.
+	 *  Flag if parameter is optional.
+	 *  @param optional True if optional.
 	 */
 	public void setOptional(boolean optional);
 }

@@ -152,16 +152,16 @@ public class MExpressionFlyweight extends MReferenceableElementFlyweight impleme
 				public void run()
 				{
 					IParsedExpression pexp = MExpressionbaseFlyweight.parseExpression(expression, language, getState(), getHandle());
-					getState().addAttributeValue(getHandle(), OAVBDIMetaModel.expression_has_content, pexp);
-					getState().addAttributeValue(getHandle(), OAVBDIMetaModel.expression_has_language, language);
+					getState().setAttributeValue(getHandle(), OAVBDIMetaModel.expression_has_content, pexp);
+					getState().setAttributeValue(getHandle(), OAVBDIMetaModel.expression_has_language, language);
 				}
 			};
 		}
 		else
 		{
 			IParsedExpression pexp = MExpressionbaseFlyweight.parseExpression(expression, language, getState(), getHandle());
-			getState().addAttributeValue(getHandle(), OAVBDIMetaModel.expression_has_content, pexp);
-			getState().addAttributeValue(getHandle(), OAVBDIMetaModel.expression_has_language, language);
+			getState().setAttributeValue(getHandle(), OAVBDIMetaModel.expression_has_content, pexp);
+			getState().setAttributeValue(getHandle(), OAVBDIMetaModel.expression_has_language, language);
 		}
 	}
 	
@@ -177,13 +177,13 @@ public class MExpressionFlyweight extends MReferenceableElementFlyweight impleme
 			{
 				public void run()
 				{
-					getState().addAttributeValue(getHandle(), OAVBDIMetaModel.expression_has_content, content);
+					getState().setAttributeValue(getHandle(), OAVBDIMetaModel.expression_has_content, content);
 				}
 			};
 		}
 		else
 		{
-			getState().addAttributeValue(getHandle(), OAVBDIMetaModel.expression_has_content, content);
+			getState().setAttributeValue(getHandle(), OAVBDIMetaModel.expression_has_content, content);
 		}
 		
 	}
@@ -200,13 +200,13 @@ public class MExpressionFlyweight extends MReferenceableElementFlyweight impleme
 			{
 				public void run()
 				{
-					getState().addAttributeValue(getHandle(), OAVBDIMetaModel.expression_has_class, clz);
+					getState().setAttributeValue(getHandle(), OAVBDIMetaModel.expression_has_class, clz);
 				}
 			};
 		}
 		else
 		{
-			getState().addAttributeValue(getHandle(), OAVBDIMetaModel.expression_has_class, clz);
+			getState().setAttributeValue(getHandle(), OAVBDIMetaModel.expression_has_class, clz);
 		}
 	}
 	
@@ -228,13 +228,13 @@ public class MExpressionFlyweight extends MReferenceableElementFlyweight impleme
 			{
 				public void run()
 				{
-					getState().addAttributeValue(getHandle(), OAVBDIMetaModel.expression_has_variable, var);
+					getState().setAttributeValue(getHandle(), OAVBDIMetaModel.expression_has_variable, var);
 				}
 			};
 		}
 		else
 		{
-			getState().addAttributeValue(getHandle(), OAVBDIMetaModel.expression_has_variable, var);
+			getState().setAttributeValue(getHandle(), OAVBDIMetaModel.expression_has_variable, var);
 		}
 		
 	}

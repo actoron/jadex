@@ -7,11 +7,9 @@ import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.model.editable.IMEExpression;
 import jadex.bdi.model.editable.IMEExpressionReference;
 import jadex.bdi.model.editable.IMEExpressionbase;
-import jadex.bdi.model.editable.IMEGoalReference;
 import jadex.javaparser.IExpressionParser;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
-import jadex.rules.rulesystem.ICondition;
 import jadex.rules.state.IOAVState;
 
 import java.util.Collection;

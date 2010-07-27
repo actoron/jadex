@@ -3,10 +3,8 @@ package jadex.bdi.model.impl.flyweights;
 import jadex.bdi.model.IMPlan;
 import jadex.bdi.model.IMPlanbase;
 import jadex.bdi.model.OAVBDIMetaModel;
-import jadex.bdi.model.editable.IMEInternalEvent;
 import jadex.bdi.model.editable.IMEPlan;
 import jadex.bdi.model.editable.IMEPlanbase;
-import jadex.bdi.model.impl.flyweights.MElementFlyweight.AgentInvocation;
 import jadex.rules.state.IOAVState;
 
 import java.util.Collection;

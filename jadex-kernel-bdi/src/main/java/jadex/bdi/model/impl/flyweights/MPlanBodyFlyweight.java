@@ -4,6 +4,7 @@ import jadex.bdi.model.IMCondition;
 import jadex.bdi.model.IMPlanBody;
 import jadex.bdi.model.IMTriggerReference;
 import jadex.bdi.model.OAVBDIMetaModel;
+import jadex.bdi.model.editable.IMEPlanBody;
 import jadex.rules.state.IOAVState;
 
 import java.util.Collection;
@@ -13,7 +14,7 @@ import java.util.Iterator;
  *  Flyweight for a plan body.
  */
 //Hack!!! Shouldn't be expression.
-public class MPlanBodyFlyweight extends MExpressionFlyweight implements IMPlanBody
+public class MPlanBodyFlyweight extends MExpressionFlyweight implements IMPlanBody, IMEPlanBody
 {
 	//-------- constructors --------
 	
@@ -138,6 +139,50 @@ public class MPlanBodyFlyweight extends MExpressionFlyweight implements IMPlanBo
 			if(handle!=null)
 				ret = new MConditionFlyweight(getState(), getScope(), handle);
 			return ret;
+		}
+	}
+
+	/**
+	 *  Set the body type (e.g. 'standard').
+	 *  @param type	The type. 
+	 */
+	public void	setType(final String type)
+	{
+		if(isExternalThread())
+		{
+			new AgentInvocation()
+			{
+				public void run()
+				{
+					getState().getAttributeValue(getHandle(), OAVBDIMetaModel.body_has_type, type);
+				}
+			};
+		}
+		else
+		{
+			getState().getAttributeValue(getHandle(), OAVBDIMetaModel.body_has_type, type);
+		}
+	}
+
+	/**
+	 *  Set the body implementation (e.g. file name).
+	 *  @param impl	The implementation.
+	 */
+	public void	setImplementation(final String impl)
+	{
+		if(isExternalThread())
+		{
+			new AgentInvocation()
+			{
+				public void run()
+				{
+					getState().getAttributeValue(getHandle(), OAVBDIMetaModel.body_has_impl, impl);
+				}
+			};
+		}
+		else
+		{
+			getState().getAttributeValue(getHandle(), OAVBDIMetaModel.body_has_impl, impl);
 		}
 	}
 }

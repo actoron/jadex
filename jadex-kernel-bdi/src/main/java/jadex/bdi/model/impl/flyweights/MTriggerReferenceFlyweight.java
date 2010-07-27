@@ -111,7 +111,7 @@ public class MTriggerReferenceFlyweight extends MElementFlyweight implements IMT
 				public void run()
 				{
 					MExpressionFlyweight mexp = MExpressionbaseFlyweight.createExpression(expression, language, getState(), getHandle());
-					getState().addAttributeValue(getHandle(), OAVBDIMetaModel.triggerreference_has_match, mexp.getHandle());
+					getState().setAttributeValue(getHandle(), OAVBDIMetaModel.triggerreference_has_match, mexp.getHandle());
 					object	= mexp;
 				}
 			};
@@ -120,7 +120,7 @@ public class MTriggerReferenceFlyweight extends MElementFlyweight implements IMT
 		else
 		{
 			MExpressionFlyweight mexp = MExpressionbaseFlyweight.createExpression(expression, language, getState(), getHandle());
-			getState().addAttributeValue(getHandle(), OAVBDIMetaModel.triggerreference_has_match, mexp.getHandle());			
+			getState().setAttributeValue(getHandle(), OAVBDIMetaModel.triggerreference_has_match, mexp.getHandle());			
 			return mexp;
 		}
 	}

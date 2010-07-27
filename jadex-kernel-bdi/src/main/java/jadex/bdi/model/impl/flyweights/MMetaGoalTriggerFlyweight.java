@@ -3,6 +3,8 @@ package jadex.bdi.model.impl.flyweights;
 import jadex.bdi.model.IMMetaGoalTrigger;
 import jadex.bdi.model.IMTriggerReference;
 import jadex.bdi.model.OAVBDIMetaModel;
+import jadex.bdi.model.editable.IMEMetaGoalTrigger;
+import jadex.bdi.model.editable.IMETriggerReference;
 import jadex.rules.state.IOAVState;
 
 import java.util.Collection;
@@ -11,7 +13,7 @@ import java.util.Iterator;
 /**
  * 
  */
-public class MMetaGoalTriggerFlyweight extends MTriggerFlyweight implements IMMetaGoalTrigger
+public class MMetaGoalTriggerFlyweight extends MTriggerFlyweight implements IMMetaGoalTrigger, IMEMetaGoalTrigger
 {
 	//-------- constructors --------
 	
@@ -65,5 +67,35 @@ public class MMetaGoalTriggerFlyweight extends MTriggerFlyweight implements IMMe
 			}
 			return ret;
 		}
+	}
+	
+	/**
+	 *  Add a goal.
+	 *  @param reference	The referenced goal.
+	 */
+	public IMETriggerReference	createGoal(final String reference)
+	{
+		if(isExternalThread())
+		{
+			AgentInvocation	invoc	= new AgentInvocation()
+			{
+				public void run()
+				{
+					Object	mtr	= getState().createObject(OAVBDIMetaModel.triggerreference_type);
+					getState().setAttributeValue(mtr, OAVBDIMetaModel.triggerreference_has_ref, reference);
+					getState().addAttributeValue(getHandle(), OAVBDIMetaModel.metagoaltrigger_has_goals, mtr);
+					object	= new MTriggerReferenceFlyweight(getState(), getScope(), mtr);
+				}
+			};
+			return (IMETriggerReference)invoc.object;
+		}
+		else
+		{
+			Object	mtr	= getState().createObject(OAVBDIMetaModel.triggerreference_type);
+			getState().setAttributeValue(mtr, OAVBDIMetaModel.triggerreference_has_ref, reference);
+			getState().addAttributeValue(getHandle(), OAVBDIMetaModel.metagoaltrigger_has_goals, mtr);
+			return new MTriggerReferenceFlyweight(getState(), getScope(), mtr);
+		}
+		
 	}
 }

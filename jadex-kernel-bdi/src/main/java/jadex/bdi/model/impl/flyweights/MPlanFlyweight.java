@@ -7,7 +7,13 @@ import jadex.bdi.model.IMPlanBody;
 import jadex.bdi.model.IMPlanTrigger;
 import jadex.bdi.model.IMTrigger;
 import jadex.bdi.model.OAVBDIMetaModel;
+import jadex.bdi.model.editable.IMECondition;
+import jadex.bdi.model.editable.IMEExpression;
 import jadex.bdi.model.editable.IMEPlan;
+import jadex.bdi.model.editable.IMEPlanBody;
+import jadex.bdi.model.editable.IMEPlanTrigger;
+import jadex.bdi.model.editable.IMETrigger;
+import jadex.commons.SReflect;
 import jadex.rules.state.IOAVState;
 
 /**
@@ -199,6 +205,207 @@ public class MPlanFlyweight extends MParameterElementFlyweight implements IMPlan
 			if(handle!=null)
 				ret = new MPlanBodyFlyweight(getState(), getScope(), handle);
 			return ret;
+		}
+	}
+	
+	/**
+	 *  Set the priority.
+	 *  param priority	The priority.
+	 */
+	public void	setPriority(final int priority)
+	{
+		if(isExternalThread())
+		{
+			new AgentInvocation()
+			{
+				public void run()
+				{
+					getState().setAttributeValue(getHandle(), OAVBDIMetaModel.plan_has_priority, priority);
+				}
+			};
+		}
+		else
+		{
+			getState().setAttributeValue(getHandle(), OAVBDIMetaModel.plan_has_priority, priority);
+		}
+	}
+	
+	/**
+	 *  Create a precondition.
+	 *  @param expression	The expression.
+	 *  @param language	The expression language (or null for default java-like language).
+	 *  @return The precondition.
+	 */
+	public IMEExpression	createPrecondition(final String expression, final String language)
+	{
+		if(isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					MExpressionFlyweight mexp = MExpressionbaseFlyweight.createExpression(expression, language, getState(), getHandle());
+					getState().setAttributeValue(getHandle(), OAVBDIMetaModel.goal_has_dropcondition, mexp.getHandle());
+					object	= mexp;
+				}
+			};
+			return (IMECondition)invoc.object;
+		}
+		else
+		{
+			MExpressionFlyweight mexp = MExpressionbaseFlyweight.createExpression(expression, language, getState(), getHandle());
+			getState().setAttributeValue(getHandle(), OAVBDIMetaModel.goal_has_dropcondition, mexp.getHandle());
+			return mexp;
+		}
+	}
+	
+	/**
+	 *  Create a context condition.
+	 *  @param expression	The expression.
+	 *  @param language	The expression language (or null for default java-like language).
+	 *  @return The context condition.
+	 */
+	public IMECondition createContextCondition(final String expression, final String language)
+	{
+		if(isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					MConditionFlyweight mcond = MExpressionbaseFlyweight.createCondition(expression, language, getState(), getHandle());
+					getState().setAttributeValue(getHandle(), OAVBDIMetaModel.plan_has_contextcondition, mcond.getHandle());
+					object	= mcond;
+				}
+			};
+			return (IMECondition)invoc.object;
+		}
+		else
+		{
+			MConditionFlyweight mcond = MExpressionbaseFlyweight.createCondition(expression, language, getState(), getHandle());
+			getState().setAttributeValue(getHandle(), OAVBDIMetaModel.plan_has_contextcondition, mcond.getHandle());
+			return mcond;
+		}
+	}
+	
+	/**
+	 *  Create the body.
+	 *  @param impl	The implementation (e.g. class or file name).
+	 *  @param type	The plan body type (null for standard java plans).
+	 *  @return The body.
+	 */
+	public IMEPlanBody createBody(final String impl, final String type)
+	{
+		if(isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					Object	body	= getState().createObject(OAVBDIMetaModel.body_type);
+					getState().setAttributeValue(body, OAVBDIMetaModel.body_has_type, type);
+					if(type==null || "standard".equals(type))
+					{
+						try
+						{
+							Class	clazz	= SReflect.findClass(impl, OAVBDIMetaModel.getImports(getState(), getScope()),
+								getState().getTypeModel().getClassLoader());
+							getState().setAttributeValue(body, OAVBDIMetaModel.expression_has_class, clazz);
+						}
+						catch(ClassNotFoundException cnfe)
+						{
+							throw new RuntimeException(cnfe);
+						}
+					}
+					else
+					{
+						getState().setAttributeValue(body, OAVBDIMetaModel.body_has_impl, impl);
+					}
+					getState().setAttributeValue(getHandle(), OAVBDIMetaModel.plan_has_body, body);
+					
+					object	= new MPlanBodyFlyweight(getState(), getScope(), body);
+				}
+			};
+			return (IMEPlanBody)invoc.object;
+		}
+		else
+		{
+			Object	body	= getState().createObject(OAVBDIMetaModel.body_type);
+			getState().setAttributeValue(body, OAVBDIMetaModel.body_has_type, type);
+			if(type==null || "standard".equals(type))
+			{
+				try
+				{
+					Class	clazz	= SReflect.findClass(impl, OAVBDIMetaModel.getImports(getState(), getScope()),
+						getState().getTypeModel().getClassLoader());
+					getState().setAttributeValue(body, OAVBDIMetaModel.expression_has_class, clazz);
+				}
+				catch(ClassNotFoundException cnfe)
+				{
+					throw new RuntimeException(cnfe);
+				}
+			}
+			else
+			{
+				getState().setAttributeValue(body, OAVBDIMetaModel.body_has_impl, impl);
+			}
+			getState().setAttributeValue(getHandle(), OAVBDIMetaModel.plan_has_body, body);
+			
+			return new MPlanBodyFlyweight(getState(), getScope(), body);
+		}
+	}
+	
+	/**
+	 *  Create the waitqueue.
+	 *  @return The waitqueue.
+	 */
+	public IMETrigger createWaitqueue()
+	{
+		if(isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					Object	mtrig = getState().createObject(OAVBDIMetaModel.trigger_type);
+					getState().setAttributeValue(getHandle(), OAVBDIMetaModel.plan_has_waitqueue, mtrig);
+					object	= new MTriggerFlyweight(getState(), getScope(), mtrig);
+				}
+			};
+			return (IMETrigger)invoc.object;
+		}
+		else
+		{
+			Object	mtrig = getState().createObject(OAVBDIMetaModel.trigger_type);
+			getState().setAttributeValue(getHandle(), OAVBDIMetaModel.plan_has_waitqueue, mtrig);
+			return new MTriggerFlyweight(getState(), getScope(), mtrig);
+		}
+	}
+	
+	/**
+	 *  Create the trigger.
+	 *  @return The trigger.
+	 */
+	public IMEPlanTrigger createTrigger()
+	{
+		if(isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					Object	mtrig = getState().createObject(OAVBDIMetaModel.plantrigger_type);
+					getState().setAttributeValue(getHandle(), OAVBDIMetaModel.plan_has_trigger, mtrig);
+					object	= new MPlanTriggerFlyweight(getState(), getScope(), mtrig);
+				}
+			};
+			return (IMEPlanTrigger)invoc.object;
+		}
+		else
+		{
+			Object	mtrig = getState().createObject(OAVBDIMetaModel.plantrigger_type);
+			getState().setAttributeValue(getHandle(), OAVBDIMetaModel.plan_has_trigger, mtrig);
+			return new MPlanTriggerFlyweight(getState(), getScope(), mtrig);
 		}
 	}
 }

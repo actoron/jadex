@@ -15,10 +15,9 @@ public interface IMEPlanTrigger	extends IMPlanTrigger, IMEElement
 	
 	/**
 	 *  Create the trigger condition.
-	 *  @param expression	The match expression.
+	 *  @param expression	The expression.
 	 *  @param language	The expression language (or null for default java-like language).
 	 *  @return The trigger condition.
 	 */
 	public IMECondition	createCondition(String expression, String language);
-
 }

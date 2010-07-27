@@ -246,7 +246,6 @@ public class MTriggerFlyweight extends MElementFlyweight implements IMTrigger, I
 			getState().addAttributeValue(getHandle(), OAVBDIMetaModel.trigger_has_internalevents, mtr);
 			return new MTriggerReferenceFlyweight(getState(), getScope(), mtr);
 		}
-		
 	}
 	
 	/**
@@ -276,7 +275,6 @@ public class MTriggerFlyweight extends MElementFlyweight implements IMTrigger, I
 			getState().addAttributeValue(getHandle(), OAVBDIMetaModel.trigger_has_messageevents, mtr);
 			return new MTriggerReferenceFlyweight(getState(), getScope(), mtr);
 		}
-		
 	}
 	
 	/**
@@ -305,8 +303,7 @@ public class MTriggerFlyweight extends MElementFlyweight implements IMTrigger, I
 			getState().setAttributeValue(mtr, OAVBDIMetaModel.triggerreference_has_ref, reference);
 			getState().addAttributeValue(getHandle(), OAVBDIMetaModel.trigger_has_goalfinisheds, mtr);
 			return new MTriggerReferenceFlyweight(getState(), getScope(), mtr);
-		}
-		
+		}		
 	}
 	
 	/**

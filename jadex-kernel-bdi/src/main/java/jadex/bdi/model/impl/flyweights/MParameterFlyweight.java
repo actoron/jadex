@@ -3,6 +3,7 @@ package jadex.bdi.model.impl.flyweights;
 import jadex.bdi.model.IMExpression;
 import jadex.bdi.model.IMParameter;
 import jadex.bdi.model.OAVBDIMetaModel;
+import jadex.bdi.model.editable.IMEExpression;
 import jadex.bdi.model.editable.IMEParameter;
 import jadex.rules.state.IOAVState;
 
@@ -128,26 +129,104 @@ public class MParameterFlyweight extends MTypedElementFlyweight implements IMPar
 	}
 
 	/**
-	 *  Get the parameter value.
+	 *  Create the parameter value.
+	 *  @param expression	The expression.
+	 *  @param language	The expression language (or null for default java-like language).
 	 *  @return The value.
 	 */
-	public IMExpression createValue();
+	public IMExpression createValue(final String expression, final String language)
+	{
+		if(isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					MExpressionFlyweight mexp = MExpressionbaseFlyweight.createExpression(expression, language, getState(), getHandle());
+					getState().setAttributeValue(getHandle(), OAVBDIMetaModel.parameter_has_value, mexp.getHandle());
+					object	= mexp;
+				}
+			};
+			return (IMEExpression)invoc.object;
+		}
+		else
+		{
+			MExpressionFlyweight mexp = MExpressionbaseFlyweight.createExpression(expression, language, getState(), getHandle());
+			getState().setAttributeValue(getHandle(), OAVBDIMetaModel.parameter_has_value, mexp.getHandle());			
+			return mexp;
+		}
+	}
 	
 	/**
-	 *  Get the binding options.
+	 *  Create the binding options.
+	 *  @param expression	The expression.
+	 *  @param language	The expression language (or null for default java-like language).
 	 *  @return The binding options.
 	 */
-	public IMExpression createBindingOptions();
+	public IMExpression createBindingOptions(final String expression, final String language)
+	{
+		if(isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					MExpressionFlyweight mexp = MExpressionbaseFlyweight.createExpression(expression, language, getState(), getHandle());
+					getState().setAttributeValue(getHandle(), OAVBDIMetaModel.parameter_has_bindingoptions, mexp.getHandle());
+					object	= mexp;
+				}
+			};
+			return (IMEExpression)invoc.object;
+		}
+		else
+		{
+			MExpressionFlyweight mexp = MExpressionbaseFlyweight.createExpression(expression, language, getState(), getHandle());
+			getState().setAttributeValue(getHandle(), OAVBDIMetaModel.parameter_has_bindingoptions, mexp.getHandle());			
+			return mexp;
+		}
+	}
 	
 	/**
-	 *  Get the parameter direction.
-	 *  @return The direction.
+	 *  Set the parameter direction.
+	 *  @param dir The direction.
 	 */
-	public void setDirection(String dir);
+	public void setDirection(final String dir)
+	{
+		if(isExternalThread())
+		{
+			new AgentInvocation()
+			{
+				public void run()
+				{
+					getState().setAttributeValue(getHandle(), OAVBDIMetaModel.parameter_has_direction, dir);
+				}
+			};
+		}
+		else
+		{
+			getState().setAttributeValue(getHandle(), OAVBDIMetaModel.parameter_has_direction, dir);
+		}
+	}
 	
 	/**
 	 *  Flag if parameter is optional.
-	 *  @return True if optional.
+	 *  @param optional True if optional.
 	 */
-	public void setOptional(boolean optional);
+	public void setOptional(final boolean optional)
+	{
+		if(isExternalThread())
+		{
+			new AgentInvocation()
+			{
+				public void run()
+				{
+					getState().setAttributeValue(getHandle(), OAVBDIMetaModel.parameter_has_optional, optional ? Boolean.TRUE : Boolean.FALSE);
+				}
+			};
+		}
+		else
+		{
+			getState().setAttributeValue(getHandle(), OAVBDIMetaModel.parameter_has_optional, optional ? Boolean.TRUE : Boolean.FALSE);
+		}
+	}
 }

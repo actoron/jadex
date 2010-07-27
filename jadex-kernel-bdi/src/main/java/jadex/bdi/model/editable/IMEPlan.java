@@ -15,7 +15,7 @@ public interface IMEPlan extends IMPlan, IMEParameterElement
 	
 	/**
 	 *  Create a precondition.
-	 *  @param expression	The match expression.
+	 *  @param expression	The expression.
 	 *  @param language	The expression language (or null for default java-like language).
 	 *  @return The precondition.
 	 */
@@ -23,7 +23,7 @@ public interface IMEPlan extends IMPlan, IMEParameterElement
 	
 	/**
 	 *  Create a context condition.
-	 *  @param expression	The match expression.
+	 *  @param expression	The expression.
 	 *  @param language	The expression language (or null for default java-like language).
 	 *  @return The context condition.
 	 */
@@ -48,5 +48,4 @@ public interface IMEPlan extends IMPlan, IMEParameterElement
 	 *  @return The trigger.
 	 */
 	public IMEPlanTrigger createTrigger();
-
 }

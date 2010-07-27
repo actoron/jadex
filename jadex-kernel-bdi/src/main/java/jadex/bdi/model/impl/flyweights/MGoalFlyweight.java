@@ -431,7 +431,7 @@ public class MGoalFlyweight extends MProcessableElementFlyweight implements IMGo
 				public void run()
 				{
 					MConditionFlyweight mcond = MExpressionbaseFlyweight.createCondition(expression, language, getState(), getHandle());
-					getState().addAttributeValue(getHandle(), OAVBDIMetaModel.goal_has_creationcondition, mcond.getHandle());
+					getState().setAttributeValue(getHandle(), OAVBDIMetaModel.goal_has_creationcondition, mcond.getHandle());
 					object	= mcond;
 				}
 			};
@@ -440,7 +440,7 @@ public class MGoalFlyweight extends MProcessableElementFlyweight implements IMGo
 		else
 		{
 			MConditionFlyweight mcond = MExpressionbaseFlyweight.createCondition(expression, language, getState(), getHandle());
-			getState().addAttributeValue(getHandle(), OAVBDIMetaModel.goal_has_creationcondition, mcond.getHandle());
+			getState().setAttributeValue(getHandle(), OAVBDIMetaModel.goal_has_creationcondition, mcond.getHandle());
 			return mcond;
 		}
 	}
@@ -460,7 +460,7 @@ public class MGoalFlyweight extends MProcessableElementFlyweight implements IMGo
 				public void run()
 				{
 					MConditionFlyweight mcond = MExpressionbaseFlyweight.createCondition(expression, language, getState(), getHandle());
-					getState().addAttributeValue(getHandle(), OAVBDIMetaModel.goal_has_contextcondition, mcond.getHandle());
+					getState().setAttributeValue(getHandle(), OAVBDIMetaModel.goal_has_contextcondition, mcond.getHandle());
 					object	= mcond;
 				}
 			};
@@ -469,7 +469,7 @@ public class MGoalFlyweight extends MProcessableElementFlyweight implements IMGo
 		else
 		{
 			MConditionFlyweight mcond = MExpressionbaseFlyweight.createCondition(expression, language, getState(), getHandle());
-			getState().addAttributeValue(getHandle(), OAVBDIMetaModel.goal_has_contextcondition, mcond.getHandle());
+			getState().setAttributeValue(getHandle(), OAVBDIMetaModel.goal_has_contextcondition, mcond.getHandle());
 			return mcond;
 		}
 	}
@@ -489,7 +489,7 @@ public class MGoalFlyweight extends MProcessableElementFlyweight implements IMGo
 				public void run()
 				{
 					MConditionFlyweight mcond = MExpressionbaseFlyweight.createCondition(expression, language, getState(), getHandle());
-					getState().addAttributeValue(getHandle(), OAVBDIMetaModel.goal_has_dropcondition, mcond.getHandle());
+					getState().setAttributeValue(getHandle(), OAVBDIMetaModel.goal_has_dropcondition, mcond.getHandle());
 					object	= mcond;
 				}
 			};
@@ -498,7 +498,7 @@ public class MGoalFlyweight extends MProcessableElementFlyweight implements IMGo
 		else
 		{
 			MConditionFlyweight mcond = MExpressionbaseFlyweight.createCondition(expression, language, getState(), getHandle());
-			getState().addAttributeValue(getHandle(), OAVBDIMetaModel.goal_has_dropcondition, mcond.getHandle());
+			getState().setAttributeValue(getHandle(), OAVBDIMetaModel.goal_has_dropcondition, mcond.getHandle());
 			return mcond;
 		}
 	}
@@ -606,7 +606,7 @@ public class MGoalFlyweight extends MProcessableElementFlyweight implements IMGo
 				public void run()
 				{
 					MConditionFlyweight mcond = MExpressionbaseFlyweight.createCondition(expression, language, getState(), getHandle());
-					getState().addAttributeValue(getHandle(), OAVBDIMetaModel.goal_has_recurcondition, mcond.getHandle());
+					getState().setAttributeValue(getHandle(), OAVBDIMetaModel.goal_has_recurcondition, mcond.getHandle());
 					object	= mcond;
 				}
 			};
@@ -615,7 +615,7 @@ public class MGoalFlyweight extends MProcessableElementFlyweight implements IMGo
 		else
 		{
 			MConditionFlyweight mcond = MExpressionbaseFlyweight.createCondition(expression, language, getState(), getHandle());
-			getState().addAttributeValue(getHandle(), OAVBDIMetaModel.goal_has_recurcondition, mcond.getHandle());
+			getState().setAttributeValue(getHandle(), OAVBDIMetaModel.goal_has_recurcondition, mcond.getHandle());
 			return mcond;
 		}
 	}
