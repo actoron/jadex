@@ -28,50 +28,57 @@ public interface IMEConfiguration extends IMConfiguration, IMEElement
 	public IMEBeliefSet createInitialBeliefSet(String ref);
 	
 	/**
-	 *  Create the initial goal.
+	 *  Create an initial goal.
 	 *  @param ref The referenced element name.
 	 */
 	public IMEConfigElement createInitialGoal(String ref);
 	
 	/**
-	 *  Get the end goals.
-	 *  @return The end goals.
+	 *  Create an end goal.
+	 *  @param ref The goal reference.
+	 *  @return The end goal.
 	 */
-	public IMConfigElement[] getEndGoals();
+	public IMConfigElement createEndGoal(String ref);
 	
 	/**
-	 *  Get the initial plans.
-	 *  @return The initial plans.
+	 *  Create an initial plan.
+	 *  @param ref The plan reference.
+	 *  @return The initial plan.
 	 */
-	public IMConfigElement[] getInitialPlans();
+	public IMConfigElement createInitialPlan(String ref);
 	
 	/**
-	 *  Get the end plans.
-	 *  @return The end plans.
+	 *  Create an end plan.
+	 *  @param ref The plan reference.
+	 *  @return The end plan.
 	 */
-	public IMConfigElement[] getEndPlans();
+	public IMConfigElement createEndPlan(String ref);
 	
 	/**
-	 *  Get the initial internal events.
-	 *  @return The initial internal events.
+	 *  Create an initial internal event.
+	 *  @param ref The event reference.
+	 *  @return The initial internal event.
 	 */
-	public IMConfigElement[] getInitialInternalEvents();
+	public IMConfigElement createInitialInternalEvent(String ref);
 	
 	/**
-	 *  Get the end internal events.
-	 *  @return The end internal events.
+	 *  Create an end internal event.
+	 *  @param ref The event reference.
+	 *  @return The end internal event.
 	 */
-	public IMConfigElement[] getEndInternalEvents();
+	public IMConfigElement createEndInternalEvent(String ref);
 	
 	/**
-	 *  Get the initial message events.
-	 *  @return The initial message events.
+	 *  Create an initial message event.
+	 *  @param ref The event reference.
+	 *  @return The initial message event.
 	 */
-	public IMConfigElement[] getInitialMessageEvents();
+	public IMConfigElement createInitialMessageEvent(String ref);
 	
 	/**
-	 *  Get the end message events.
-	 *  @return The end message events.
+	 *  Create an end message event.
+	 *  @param ref The event reference.
+	 *  @return The end message event.
 	 */
-	public IMConfigElement[] getEndMessageEvents();
+	public IMConfigElement createEndMessageEvent(String ref);
 }

@@ -6,7 +6,12 @@ import jadex.bdi.model.IMConfigElement;
 import jadex.bdi.model.IMConfiguration;
 import jadex.bdi.model.IMInitialCapability;
 import jadex.bdi.model.OAVBDIMetaModel;
+import jadex.bdi.model.editable.IMEBelief;
+import jadex.bdi.model.editable.IMEBeliefSet;
+import jadex.bdi.model.editable.IMEConfigElement;
+import jadex.bdi.model.editable.IMEConfiguration;
 import jadex.rules.state.IOAVState;
+import jadex.rules.state.OAVAttributeType;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -14,7 +19,7 @@ import java.util.Iterator;
 /**
  *  Flyweight for configuration model element.
  */
-public class MConfigurationFlyweight extends MElementFlyweight implements IMConfiguration
+public class MConfigurationFlyweight extends MElementFlyweight implements IMConfiguration, IMEConfiguration
 {
 	//-------- constructors --------
 	
@@ -498,6 +503,332 @@ public class MConfigurationFlyweight extends MElementFlyweight implements IMConf
 				}
 			}
 			return ret;
+		}
+	}
+	
+	/**
+	 *  Create an initial capability.
+	 *  @param ref The referenced capability name.
+	 *  @param conf The name of configuration to use.
+	 */
+	public void createInitialCapability(final String ref, final String conf)
+	{
+		if(isExternalThread())
+		{
+			new AgentInvocation()
+			{
+				public void run()
+				{
+					Object elem = getState().createObject(OAVBDIMetaModel.initialcapability_type);
+					getState().setAttributeValue(elem, OAVBDIMetaModel.initialcapability_has_ref, ref);
+					getState().setAttributeValue(elem, OAVBDIMetaModel.initialcapability_has_configuration, conf);
+					getState().addAttributeValue(getHandle(), OAVBDIMetaModel.configuration_has_initialcapabilities, elem);
+				}
+			};
+		}
+		else
+		{
+			Object elem = getState().createObject(OAVBDIMetaModel.initialcapability_type);
+			getState().setAttributeValue(elem, OAVBDIMetaModel.initialcapability_has_ref, ref);
+			getState().setAttributeValue(elem, OAVBDIMetaModel.initialcapability_has_configuration, conf);
+			getState().addAttributeValue(getHandle(), OAVBDIMetaModel.configuration_has_initialcapabilities, elem);
+		}
+	}
+
+	/**
+	 *  Create an initial belief.
+	 *  @param ref The referenced element name.
+	 */
+	public IMEBelief createInitialBelief(final String ref)
+	{
+		if(isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					Object elem = getState().createObject(OAVBDIMetaModel.configbelief_type);
+					getState().setAttributeValue(elem, OAVBDIMetaModel.configbelief_has_ref, ref);
+					getState().addAttributeValue(getHandle(), OAVBDIMetaModel.configuration_has_initialbeliefs, elem);
+					object = new MConfigBeliefFlyweight(getState(), getScope(), elem);
+				}
+			};
+			return (IMEBelief)invoc.object;
+		}
+		else
+		{
+			Object elem = getState().createObject(OAVBDIMetaModel.configbelief_type);
+			getState().setAttributeValue(elem, OAVBDIMetaModel.configbelief_has_ref, ref);
+			getState().addAttributeValue(getHandle(), OAVBDIMetaModel.configuration_has_initialbeliefs, elem);
+			return new MConfigBeliefFlyweight(getState(), getScope(), elem);
+		}
+	}
+	
+	/**
+	 *  Create an initial belief set.
+	 *  @param ref The referenced element name.
+	 */
+	public IMEBeliefSet createInitialBeliefSet(final String ref)
+	{
+		if(isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					Object elem = getState().createObject(OAVBDIMetaModel.configbeliefset_type);
+					getState().setAttributeValue(elem, OAVBDIMetaModel.configbeliefset_has_ref, ref);
+					getState().addAttributeValue(getHandle(), OAVBDIMetaModel.configuration_has_initialbeliefsets, elem);
+					object = new MConfigBeliefSetFlyweight(getState(), getScope(), elem);
+				}
+			};
+			return (IMEBeliefSet)invoc.object;
+		}
+		else
+		{
+			Object elem = getState().createObject(OAVBDIMetaModel.configbeliefset_type);
+			getState().setAttributeValue(elem, OAVBDIMetaModel.configbeliefset_has_ref, ref);
+			getState().addAttributeValue(getHandle(), OAVBDIMetaModel.configuration_has_initialbeliefsets, elem);
+			return new MConfigBeliefSetFlyweight(getState(), getScope(), elem);
+		}
+	}
+	
+	/**
+	 *  Create an initial goal.
+	 *  @param ref The referenced element name.
+	 */
+	public IMEConfigElement createInitialGoal(final String ref)
+	{
+		if(isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					Object elem = getState().createObject(OAVBDIMetaModel.configelement_type);
+					getState().setAttributeValue(elem, OAVBDIMetaModel.configelement_has_ref, ref);
+					getState().addAttributeValue(getHandle(), OAVBDIMetaModel.configuration_has_initialgoals, elem);
+					object = new MConfigElementFlyweight(getState(), getScope(), elem);
+				}
+			};
+			return (IMEConfigElement)invoc.object;
+		}
+		else
+		{
+			Object elem = getState().createObject(OAVBDIMetaModel.configelement_type);
+			getState().setAttributeValue(elem, OAVBDIMetaModel.configelement_has_ref, ref);
+			getState().addAttributeValue(getHandle(), OAVBDIMetaModel.configuration_has_initialgoals, elem);
+			return new MConfigElementFlyweight(getState(), getScope(), elem);
+		}
+	}
+	
+	/**
+	 *  Create an end goal.
+	 *  @param ref The goal reference.
+	 *  @return The end goal.
+	 */
+	public IMConfigElement createEndGoal(final String ref)
+	{
+		if(isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					Object elem = getState().createObject(OAVBDIMetaModel.configelement_type);
+					getState().setAttributeValue(elem, OAVBDIMetaModel.configelement_has_ref, ref);
+					getState().addAttributeValue(getHandle(), OAVBDIMetaModel.configuration_has_endgoals, elem);
+					object = new MConfigElementFlyweight(getState(), getScope(), elem);
+				}
+			};
+			return (IMEConfigElement)invoc.object;
+		}
+		else
+		{
+			Object elem = getState().createObject(OAVBDIMetaModel.configelement_type);
+			getState().setAttributeValue(elem, OAVBDIMetaModel.configelement_has_ref, ref);
+			getState().addAttributeValue(getHandle(), OAVBDIMetaModel.configuration_has_endgoals, elem);
+			return new MConfigElementFlyweight(getState(), getScope(), elem);
+		}
+	}
+	
+	/**
+	 *  Create an initial plan.
+	 *  @param ref The plan reference.
+	 *  @return The initial plan.
+	 */
+	public IMConfigElement createInitialPlan(final String ref)
+	{
+		if(isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					Object elem = getState().createObject(OAVBDIMetaModel.configelement_type);
+					getState().setAttributeValue(elem, OAVBDIMetaModel.configelement_has_ref, ref);
+					getState().addAttributeValue(getHandle(), OAVBDIMetaModel.configuration_has_initialplans, elem);
+					object = new MConfigElementFlyweight(getState(), getScope(), elem);
+				}
+			};
+			return (IMEConfigElement)invoc.object;
+		}
+		else
+		{
+			Object elem = getState().createObject(OAVBDIMetaModel.configelement_type);
+			getState().setAttributeValue(elem, OAVBDIMetaModel.configelement_has_ref, ref);
+			getState().addAttributeValue(getHandle(), OAVBDIMetaModel.configuration_has_initialplans, elem);
+			return new MConfigElementFlyweight(getState(), getScope(), elem);
+		}
+	}
+	
+	/**
+	 *  Create an end plan.
+	 *  @param ref The plan reference.
+	 *  @return The end plan.
+	 */
+	public IMConfigElement createEndPlan(final String ref)
+	{
+		if(isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					Object elem = getState().createObject(OAVBDIMetaModel.configelement_type);
+					getState().setAttributeValue(elem, OAVBDIMetaModel.configelement_has_ref, ref);
+					getState().addAttributeValue(getHandle(), OAVBDIMetaModel.configuration_has_endplans, elem);
+					object = new MConfigElementFlyweight(getState(), getScope(), elem);
+				}
+			};
+			return (IMEConfigElement)invoc.object;
+		}
+		else
+		{
+			Object elem = getState().createObject(OAVBDIMetaModel.configelement_type);
+			getState().setAttributeValue(elem, OAVBDIMetaModel.configelement_has_ref, ref);
+			getState().addAttributeValue(getHandle(), OAVBDIMetaModel.configuration_has_endplans, elem);
+			return new MConfigElementFlyweight(getState(), getScope(), elem);
+		}
+	}
+	
+	/**
+	 *  Create an initial internal event.
+	 *  @param ref The event reference.
+	 *  @return The initial internal event.
+	 */
+	public IMConfigElement createInitialInternalEvent(final String ref)
+	{
+		if(isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					Object elem = getState().createObject(OAVBDIMetaModel.configelement_type);
+					getState().setAttributeValue(elem, OAVBDIMetaModel.configelement_has_ref, ref);
+					getState().addAttributeValue(getHandle(), OAVBDIMetaModel.configuration_has_initialinternalevents, elem);
+					object = new MConfigElementFlyweight(getState(), getScope(), elem);
+				}
+			};
+			return (IMEConfigElement)invoc.object;
+		}
+		else
+		{
+			Object elem = getState().createObject(OAVBDIMetaModel.configelement_type);
+			getState().setAttributeValue(elem, OAVBDIMetaModel.configelement_has_ref, ref);
+			getState().addAttributeValue(getHandle(), OAVBDIMetaModel.configuration_has_initialinternalevents, elem);
+			return new MConfigElementFlyweight(getState(), getScope(), elem);
+		}
+	}
+	
+	/**
+	 *  Create an end internal event.
+	 *  @param ref The event reference.
+	 *  @return The end internal event.
+	 */
+	public IMConfigElement createEndInternalEvent(final String ref)
+	{
+		if(isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					Object elem = getState().createObject(OAVBDIMetaModel.configelement_type);
+					getState().setAttributeValue(elem, OAVBDIMetaModel.configelement_has_ref, ref);
+					getState().addAttributeValue(getHandle(), OAVBDIMetaModel.configuration_has_endinternalevents, elem);
+					object = new MConfigElementFlyweight(getState(), getScope(), elem);
+				}
+			};
+			return (IMEConfigElement)invoc.object;
+		}
+		else
+		{
+			Object elem = getState().createObject(OAVBDIMetaModel.configelement_type);
+			getState().setAttributeValue(elem, OAVBDIMetaModel.configelement_has_ref, ref);
+			getState().addAttributeValue(getHandle(), OAVBDIMetaModel.configuration_has_endinternalevents, elem);
+			return new MConfigElementFlyweight(getState(), getScope(), elem);
+		}
+	}
+	
+	/**
+	 *  Create an initial message event.
+	 *  @param ref The event reference.
+	 *  @return The initial message event.
+	 */
+	public IMConfigElement createInitialMessageEvent(final String ref)
+	{
+		if(isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					Object elem = getState().createObject(OAVBDIMetaModel.configelement_type);
+					getState().setAttributeValue(elem, OAVBDIMetaModel.configelement_has_ref, ref);
+					getState().addAttributeValue(getHandle(), OAVBDIMetaModel.configuration_has_initialmessageevents, elem);
+					object = new MConfigElementFlyweight(getState(), getScope(), elem);
+				}
+			};
+			return (IMEConfigElement)invoc.object;
+		}
+		else
+		{
+			Object elem = getState().createObject(OAVBDIMetaModel.configelement_type);
+			getState().setAttributeValue(elem, OAVBDIMetaModel.configelement_has_ref, ref);
+			getState().addAttributeValue(getHandle(), OAVBDIMetaModel.configuration_has_initialmessageevents, elem);
+			return new MConfigElementFlyweight(getState(), getScope(), elem);
+		}
+	}
+	
+	/**
+	 *  Create an end message event.
+	 *  @param ref The event reference.
+	 *  @return The end message event.
+	 */
+	public IMConfigElement createEndMessageEvent(final String ref)
+	{
+		if(isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					Object elem = getState().createObject(OAVBDIMetaModel.configelement_type);
+					getState().setAttributeValue(elem, OAVBDIMetaModel.configelement_has_ref, ref);
+					getState().addAttributeValue(getHandle(), OAVBDIMetaModel.configuration_has_endmessageevents, elem);
+					object = new MConfigElementFlyweight(getState(), getScope(), elem);
+				}
+			};
+			return (IMEConfigElement)invoc.object;
+		}
+		else
+		{
+			Object elem = getState().createObject(OAVBDIMetaModel.configelement_type);
+			getState().setAttributeValue(elem, OAVBDIMetaModel.configelement_has_ref, ref);
+			getState().addAttributeValue(getHandle(), OAVBDIMetaModel.configuration_has_endmessageevents, elem);
+			return new MConfigElementFlyweight(getState(), getScope(), elem);
 		}
 	}
 }

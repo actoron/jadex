@@ -2,12 +2,13 @@ package jadex.bdi.model.impl.flyweights;
 
 import jadex.bdi.model.IMConfigElement;
 import jadex.bdi.model.OAVBDIMetaModel;
+import jadex.bdi.model.editable.IMEConfigElement;
 import jadex.rules.state.IOAVState;
 
 /**
  *  Flyweight for config element model.
  */
-public class MConfigElementFlyweight extends MConfigParameterElementFlyweight implements IMConfigElement
+public class MConfigElementFlyweight extends MConfigParameterElementFlyweight implements IMConfigElement, IMEConfigElement
 {
 	//-------- constructors --------
 	
