@@ -2,12 +2,8 @@ package jadex.bdi.model.impl.flyweights;
 
 import jadex.bdi.model.IMExpression;
 import jadex.bdi.model.OAVBDIMetaModel;
-<<<<<<< .mine
-import jadex.bdi.model.editable.IMEExpression;
-=======
 import jadex.bdi.model.editable.IMEExpression;
 import jadex.javaparser.IParsedExpression;
->>>>>>> .r2232
 import jadex.rules.state.IOAVState;
 
 /**
