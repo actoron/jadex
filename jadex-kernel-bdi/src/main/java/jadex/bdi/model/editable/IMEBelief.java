@@ -21,7 +21,7 @@ public interface IMEBelief extends IMBelief, IMETypedElement
 	
 	/**
 	 *  Set the belief is used as argument.
-	 *  @param arg The argument flag. 
+	 *  @param res The result flag. 
 	 */
-	public void setResult(boolean arg);
+	public void setResult(boolean res);
 }

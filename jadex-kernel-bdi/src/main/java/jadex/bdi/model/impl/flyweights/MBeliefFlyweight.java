@@ -113,13 +113,16 @@ public class MBeliefFlyweight extends MTypedElementFlyweight implements IMBelief
 				{
 					Object elem = getState().createObject(OAVBDIMetaModel.expression_type);
 					getState().setAttributeValue(getHandle(), OAVBDIMetaModel.belief_has_fact, elem);
+					object = new MExpressionFlyweight(getState(), getScope(), elem);
 				}
 			};
-			return invoc.bool;
+			return (IMEExpression)invoc.object;
 		}
 		else
 		{
-			return ((Boolean)getState().getAttributeValue(getHandle(), OAVBDIMetaModel.belief_has_result)).booleanValue();
+			Object elem = getState().createObject(OAVBDIMetaModel.expression_type);
+			getState().setAttributeValue(getHandle(), OAVBDIMetaModel.belief_has_fact, elem);
+			return new MExpressionFlyweight(getState(), getScope(), elem);
 		}
 	}
 	
@@ -127,17 +130,43 @@ public class MBeliefFlyweight extends MTypedElementFlyweight implements IMBelief
 	 *  Set the belief is used as argument.
 	 *  @param arg The argument flag. 
 	 */
-	public void setArgument(boolean arg)
+	public void setArgument(final boolean argu)
 	{
-		
+		if(isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					getState().setAttributeValue(getHandle(), OAVBDIMetaModel.belief_has_argument, argu? Boolean.TRUE: Boolean.FALSE);
+				}
+			};
+		}
+		else
+		{
+			getState().setAttributeValue(getHandle(), OAVBDIMetaModel.belief_has_argument, argu? Boolean.TRUE: Boolean.FALSE);
+		}
 	}
 	
 	/**
 	 *  Set the belief is used as argument.
-	 *  @param arg The argument flag. 
+	 *  @param res The result flag. 
 	 */
-	public void setResult(boolean arg)
+	public void setResult(final boolean res)
 	{
-		
+		if(isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					getState().setAttributeValue(getHandle(), OAVBDIMetaModel.belief_has_result, res? Boolean.TRUE: Boolean.FALSE);
+				}
+			};
+		}
+		else
+		{
+			getState().setAttributeValue(getHandle(), OAVBDIMetaModel.belief_has_result, res? Boolean.TRUE: Boolean.FALSE);
+		}
 	}
 }
