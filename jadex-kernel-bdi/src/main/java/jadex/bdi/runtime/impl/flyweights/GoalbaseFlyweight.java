@@ -6,7 +6,7 @@ import jadex.bdi.model.impl.flyweights.MGoalbaseFlyweight;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IGoalListener;
 import jadex.bdi.runtime.IGoalbase;
-import jadex.bdi.runtime.impl.FlyweightFunctionality;
+import jadex.bdi.runtime.impl.SFlyweightFunctionality;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.GoalLifecycleRules;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
@@ -99,14 +99,14 @@ public class GoalbaseFlyweight extends ElementFlyweight implements IGoalbase
 			{
 				public void run()
 				{
-					object = FlyweightFunctionality.getGoals(getState(), getScope(), false, type);
+					object = SFlyweightFunctionality.getGoals(getState(), getScope(), false, type);
 				}
 			};
 			return (IGoal[])invoc.object;
 		}
 		else
 		{
-			return (IGoal[])FlyweightFunctionality.getGoals(getState(), getScope(), false, type);
+			return (IGoal[])SFlyweightFunctionality.getGoals(getState(), getScope(), false, type);
 		}
 	}
 
@@ -122,14 +122,14 @@ public class GoalbaseFlyweight extends ElementFlyweight implements IGoalbase
 			{
 				public void run()
 				{
-					object = (IGoal[])FlyweightFunctionality.getGoals(getState(), getScope(), false);
+					object = (IGoal[])SFlyweightFunctionality.getGoals(getState(), getScope(), false);
 				}
 			};
 			return (IGoal[])invoc.object;
 		}
 		else
 		{
-			return (IGoal[])FlyweightFunctionality.getGoals(getState(), getScope(), false);
+			return (IGoal[])SFlyweightFunctionality.getGoals(getState(), getScope(), false);
 		}
 	}
 
@@ -148,14 +148,14 @@ public class GoalbaseFlyweight extends ElementFlyweight implements IGoalbase
 			{
 				public void run()
 				{
-					object = FlyweightFunctionality.createGoal(getState(), getScope(), false, type);
+					object = SFlyweightFunctionality.createGoal(getState(), getScope(), false, type);
 				}
 			};
 			return (IGoal)invoc.object;
 		}
 		else
 		{
-			return (IGoal)FlyweightFunctionality.createGoal(getState(), getScope(), false, type);
+			return (IGoal)SFlyweightFunctionality.createGoal(getState(), getScope(), false, type);
 		}
 	}
 
@@ -234,14 +234,14 @@ public class GoalbaseFlyweight extends ElementFlyweight implements IGoalbase
 			{
 				public void run()
 				{
-					Object mgoal = FlyweightFunctionality.checkElementType(getState(), getScope(), type, OAVBDIMetaModel.capability_has_goals);
+					Object mgoal = SFlyweightFunctionality.checkElementType(getState(), getScope(), type, OAVBDIMetaModel.capability_has_goals);
 					addEventListener(listener, mgoal);
 				}
 			};
 		}
 		else
 		{
-			Object mgoal = FlyweightFunctionality.checkElementType(getState(), getScope(), type, OAVBDIMetaModel.capability_has_goals);
+			Object mgoal = SFlyweightFunctionality.checkElementType(getState(), getScope(), type, OAVBDIMetaModel.capability_has_goals);
 			addEventListener(listener, mgoal);
 		}
 	}
@@ -260,14 +260,14 @@ public class GoalbaseFlyweight extends ElementFlyweight implements IGoalbase
 			{
 				public void run()
 				{
-					Object mgoal = FlyweightFunctionality.checkElementType(getState(), getScope(), type, OAVBDIMetaModel.capability_has_goals);
+					Object mgoal = SFlyweightFunctionality.checkElementType(getState(), getScope(), type, OAVBDIMetaModel.capability_has_goals);
 					removeEventListener(listener, mgoal, false);
 				}
 			};
 		}
 		else
 		{
-			Object mgoal = FlyweightFunctionality.checkElementType(getState(), getScope(), type, OAVBDIMetaModel.capability_has_goals);
+			Object mgoal = SFlyweightFunctionality.checkElementType(getState(), getScope(), type, OAVBDIMetaModel.capability_has_goals);
 			removeEventListener(listener, mgoal, false);
 		}
 	}

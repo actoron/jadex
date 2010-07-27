@@ -5,7 +5,7 @@ import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.model.impl.flyweights.MBeliefSetFlyweight;
 import jadex.bdi.runtime.IBeliefSetListener;
 import jadex.bdi.runtime.IEABeliefSet;
-import jadex.bdi.runtime.impl.FlyweightFunctionality;
+import jadex.bdi.runtime.impl.SFlyweightFunctionality;
 import jadex.bdi.runtime.impl.flyweights.ElementFlyweight;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.BeliefRules;
@@ -96,7 +96,7 @@ public class EABeliefSetFlyweight extends ElementFlyweight implements IEABeliefS
 			{
 				public void run()
 				{
-					FlyweightFunctionality.removeFact(getState(), getHandle(), fact);
+					SFlyweightFunctionality.removeFact(getState(), getHandle(), fact);
 					ret.setResult(null);
 				}
 			});
@@ -104,7 +104,7 @@ public class EABeliefSetFlyweight extends ElementFlyweight implements IEABeliefS
 		else
 		{
 			getInterpreter().startMonitorConsequences();
-			FlyweightFunctionality.removeFact(getState(), getHandle(), fact);
+			SFlyweightFunctionality.removeFact(getState(), getHandle(), fact);
 			getInterpreter().endMonitorConsequences();
 			ret.setResult(null);
 		}
@@ -126,7 +126,7 @@ public class EABeliefSetFlyweight extends ElementFlyweight implements IEABeliefS
 			{
 				public void run()
 				{
-					FlyweightFunctionality.addFacts(getState(), getHandle(), facts);
+					SFlyweightFunctionality.addFacts(getState(), getHandle(), facts);
 					ret.setResult(null);
 				}
 			});
@@ -134,7 +134,7 @@ public class EABeliefSetFlyweight extends ElementFlyweight implements IEABeliefS
 		else
 		{
 			getInterpreter().startMonitorConsequences();
-			FlyweightFunctionality.addFacts(getState(), getHandle(), facts);
+			SFlyweightFunctionality.addFacts(getState(), getHandle(), facts);
 			getInterpreter().endMonitorConsequences();
 			ret.setResult(null);
 		}
@@ -155,14 +155,14 @@ public class EABeliefSetFlyweight extends ElementFlyweight implements IEABeliefS
 			{
 				public void run()
 				{
-					FlyweightFunctionality.removeFacts(getState(), getHandle());
+					SFlyweightFunctionality.removeFacts(getState(), getHandle());
 					ret.setResult(null);
 				}
 			});
 		}
 		else
 		{
-			FlyweightFunctionality.removeFacts(getState(), getHandle());
+			SFlyweightFunctionality.removeFacts(getState(), getHandle());
 			ret.setResult(null);
 		}
 		
@@ -183,13 +183,13 @@ public class EABeliefSetFlyweight extends ElementFlyweight implements IEABeliefS
 			{
 				public void run()
 				{
-					ret.setResult(FlyweightFunctionality.getFact(getState(), getHandle(), getScope(), oldval));
+					ret.setResult(SFlyweightFunctionality.getFact(getState(), getHandle(), getScope(), oldval));
 				}
 			});
 		}
 		else
 		{
-			ret.setResult(FlyweightFunctionality.getFact(getState(), getHandle(), getScope(), oldval));
+			ret.setResult(SFlyweightFunctionality.getFact(getState(), getHandle(), getScope(), oldval));
 		}
 		
 		return ret;
@@ -252,13 +252,13 @@ public class EABeliefSetFlyweight extends ElementFlyweight implements IEABeliefS
 			{
 				public void run()
 				{
-					ret.setResult(FlyweightFunctionality.getFacts(getState(), getHandle()));
+					ret.setResult(SFlyweightFunctionality.getFacts(getState(), getHandle()));
 				}
 			});
 		}
 		else
 		{
-			ret.setResult(FlyweightFunctionality.getFacts(getState(), getHandle()));
+			ret.setResult(SFlyweightFunctionality.getFacts(getState(), getHandle()));
 		}
 		
 		return ret;
@@ -279,7 +279,7 @@ public class EABeliefSetFlyweight extends ElementFlyweight implements IEABeliefS
 			{
 				public void run()
 				{
-					FlyweightFunctionality.updateFact(getState(), getHandle(), newfact);
+					SFlyweightFunctionality.updateFact(getState(), getHandle(), newfact);
 					ret.setResult(null);
 				}
 			});
@@ -287,7 +287,7 @@ public class EABeliefSetFlyweight extends ElementFlyweight implements IEABeliefS
 		else
 		{
 			getInterpreter().startMonitorConsequences();
-			FlyweightFunctionality.updateFact(getState(), getHandle(), newfact);
+			SFlyweightFunctionality.updateFact(getState(), getHandle(), newfact);
 			getInterpreter().endMonitorConsequences();
 			ret.setResult(null);
 		}

@@ -20,9 +20,6 @@ import jadex.bdi.model.editable.IMEExpressionbase;
 import jadex.bdi.model.editable.IMEGoalbase;
 import jadex.bdi.model.editable.IMEPlanbase;
 import jadex.bdi.model.editable.IMEPropertybase;
-import jadex.javaparser.IExpressionParser;
-import jadex.javaparser.IParsedExpression;
-import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 import jadex.rules.state.IOAVState;
 
 import java.util.Collection;
@@ -416,7 +413,7 @@ public class MCapabilityFlyweight extends MElementFlyweight implements IMCapabil
 	{
 		if(isExternalThread())
 		{
-			AgentInvocation invoc = new AgentInvocation()
+			new AgentInvocation()
 			{
 				public void run()
 				{
@@ -438,7 +435,7 @@ public class MCapabilityFlyweight extends MElementFlyweight implements IMCapabil
 	{
 		if(isExternalThread())
 		{
-			AgentInvocation invoc = new AgentInvocation()
+			new AgentInvocation()
 			{
 				public void run()
 				{
@@ -488,7 +485,7 @@ public class MCapabilityFlyweight extends MElementFlyweight implements IMCapabil
 	{
 		if(isExternalThread())
 		{
-			AgentInvocation invoc = new AgentInvocation()
+			new AgentInvocation()
 			{
 				public void run()
 				{
@@ -510,7 +507,7 @@ public class MCapabilityFlyweight extends MElementFlyweight implements IMCapabil
 	{
 		if(isExternalThread())
 		{
-			AgentInvocation invoc = new AgentInvocation()
+			new AgentInvocation()
 			{
 				public void run()
 				{
@@ -605,37 +602,24 @@ public class MCapabilityFlyweight extends MElementFlyweight implements IMCapabil
 			{
 				public void run()
 				{
-					Object	mexp	= getState().createObject(OAVBDIMetaModel.expression_type);
-					getState().setAttributeValue(mexp, OAVBDIMetaModel.modelelement_has_name, name);
+					MExpressionFlyweight mexp = SMFlyweightFunctionality.createExpression(expression, language, getState(), getHandle());
+					getState().setAttributeValue(mexp.getHandle(), OAVBDIMetaModel.modelelement_has_name, name);
 					getState().setAttributeValue(mexp, OAVBDIMetaModel.expression_has_class, cls);
-					getState().setAttributeValue(mexp, OAVBDIMetaModel.expression_has_language, language);
-
-					IExpressionParser	exp_parser	= new JavaCCExpressionParser();	// Hack!!! Map language to parser somewhere?
-					IParsedExpression	pexp	= exp_parser.parseExpression(expression,
-						OAVBDIMetaModel.getImports(getState(), getHandle()), null, getState().getTypeModel().getClassLoader());
-					getState().setAttributeValue(mexp, OAVBDIMetaModel.expression_has_content, pexp);
-
-					getState().addAttributeValue(getHandle(), OAVBDIMetaModel.capability_has_services, mexp);
-					object	= new MExpressionFlyweight(getState(), getHandle(), mexp);
+					
+					getState().addAttributeValue(getHandle(), OAVBDIMetaModel.capability_has_services, mexp.getHandle());
+					object	= mexp;
 				}
 			};
 			return (IMEExpression)invoc.object;
 		}
 		else
 		{
-			Object	mexp	= getState().createObject(OAVBDIMetaModel.expression_type);
-			getState().setAttributeValue(mexp, OAVBDIMetaModel.modelelement_has_name, name);
+			MExpressionFlyweight mexp = SMFlyweightFunctionality.createExpression(expression, language, getState(), getHandle());
+			getState().setAttributeValue(mexp.getHandle(), OAVBDIMetaModel.modelelement_has_name, name);
 			getState().setAttributeValue(mexp, OAVBDIMetaModel.expression_has_class, cls);
-			getState().setAttributeValue(mexp, OAVBDIMetaModel.expression_has_language, language);
 
-			IExpressionParser	exp_parser	= new JavaCCExpressionParser();	// Hack!!! Map language to parser somewhere?
-			IParsedExpression	pexp	= exp_parser.parseExpression(expression,
-				OAVBDIMetaModel.getImports(getState(), getHandle()), null, getState().getTypeModel().getClassLoader());
-			getState().setAttributeValue(mexp, OAVBDIMetaModel.expression_has_content, pexp);
-
-			getState().addAttributeValue(getHandle(), OAVBDIMetaModel.capability_has_services, mexp);
-			
-			return new MExpressionFlyweight(getState(), getHandle(), mexp);
+			getState().addAttributeValue(getHandle(), OAVBDIMetaModel.capability_has_services, mexp.getHandle());			
+			return mexp;
 		}
 	}
 	

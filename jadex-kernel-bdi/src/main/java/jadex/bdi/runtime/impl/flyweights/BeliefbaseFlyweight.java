@@ -5,7 +5,7 @@ import jadex.bdi.model.impl.flyweights.MBeliefbaseFlyweight;
 import jadex.bdi.runtime.IBelief;
 import jadex.bdi.runtime.IBeliefSet;
 import jadex.bdi.runtime.IBeliefbase;
-import jadex.bdi.runtime.impl.FlyweightFunctionality;
+import jadex.bdi.runtime.impl.SFlyweightFunctionality;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.commons.Tuple;
@@ -58,14 +58,14 @@ public class BeliefbaseFlyweight extends ElementFlyweight implements IBeliefbase
 			{
 				public void run()
 				{
-					object = FlyweightFunctionality.getBelief(getState(), getHandle(), getScope(), name, false);
+					object = SFlyweightFunctionality.getBelief(getState(), getHandle(), getScope(), name, false);
 				}
 			};
 			return (IBelief)invoc.object;
 		}
 		else
 		{
-			return (IBelief)FlyweightFunctionality.getBelief(getState(), getHandle(), getScope(), name, false);
+			return (IBelief)SFlyweightFunctionality.getBelief(getState(), getHandle(), getScope(), name, false);
 		}
 	}
 
@@ -81,14 +81,14 @@ public class BeliefbaseFlyweight extends ElementFlyweight implements IBeliefbase
 			{
 				public void run()
 				{
-					object = FlyweightFunctionality.getBeliefSet(getState(), getHandle(), getScope(), name, false);
+					object = SFlyweightFunctionality.getBeliefSet(getState(), getHandle(), getScope(), name, false);
 				}
 			};
 			return (IBeliefSet)invoc.object;
 		}
 		else
 		{
-			return (IBeliefSet)FlyweightFunctionality.getBeliefSet(getState(), getHandle(), getScope(), name, false);
+			return (IBeliefSet)SFlyweightFunctionality.getBeliefSet(getState(), getHandle(), getScope(), name, false);
 		}
 	}
 
@@ -108,14 +108,14 @@ public class BeliefbaseFlyweight extends ElementFlyweight implements IBeliefbase
 			{
 				public void run()
 				{
-					bool = FlyweightFunctionality.containsBelief(getState(), getHandle(), getScope(), name);
+					bool = SFlyweightFunctionality.containsBelief(getState(), getHandle(), getScope(), name);
 				}
 			};
 			return invoc.bool;
 		}
 		else
 		{
-			return FlyweightFunctionality.containsBelief(getState(), getHandle(), getScope(), name);
+			return SFlyweightFunctionality.containsBelief(getState(), getHandle(), getScope(), name);
 		}
 	}
 
@@ -135,14 +135,14 @@ public class BeliefbaseFlyweight extends ElementFlyweight implements IBeliefbase
 			{
 				public void run()
 				{
-					bool = FlyweightFunctionality.containsBeliefSet(getState(), getHandle(), getScope(), name);
+					bool = SFlyweightFunctionality.containsBeliefSet(getState(), getHandle(), getScope(), name);
 				}
 			};
 			return invoc.bool;
 		}
 		else
 		{
-			return FlyweightFunctionality.containsBeliefSet(getState(), getHandle(), getScope(), name);
+			return SFlyweightFunctionality.containsBeliefSet(getState(), getHandle(), getScope(), name);
 		}
 	}
 
@@ -158,14 +158,14 @@ public class BeliefbaseFlyweight extends ElementFlyweight implements IBeliefbase
 			{
 				public void run()
 				{
-					FlyweightFunctionality.getBeliefNames(getState(), getHandle(), getScope());
+					SFlyweightFunctionality.getBeliefNames(getState(), getHandle(), getScope());
 				}
 			};
 			return invoc.sarray;
 		}
 		else
 		{
-			return FlyweightFunctionality.getBeliefNames(getState(), getHandle(), getScope());
+			return SFlyweightFunctionality.getBeliefNames(getState(), getHandle(), getScope());
 		}
 	}
 
@@ -181,14 +181,14 @@ public class BeliefbaseFlyweight extends ElementFlyweight implements IBeliefbase
 			{
 				public void run()
 				{
-					sarray = FlyweightFunctionality.getBeliefSetNames(getState(), getHandle(), getScope());
+					sarray = SFlyweightFunctionality.getBeliefSetNames(getState(), getHandle(), getScope());
 				}
 			};
 			return invoc.sarray;
 		}
 		else
 		{
-			return FlyweightFunctionality.getBeliefSetNames(getState(), getHandle(), getScope());
+			return SFlyweightFunctionality.getBeliefSetNames(getState(), getHandle(), getScope());
 		}
 	}
 

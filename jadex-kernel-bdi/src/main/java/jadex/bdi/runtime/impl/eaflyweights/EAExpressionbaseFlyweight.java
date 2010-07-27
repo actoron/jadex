@@ -4,7 +4,7 @@ import jadex.bdi.model.IMElement;
 import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.model.impl.flyweights.MExpressionbaseFlyweight;
 import jadex.bdi.runtime.IEAExpressionbase;
-import jadex.bdi.runtime.impl.FlyweightFunctionality;
+import jadex.bdi.runtime.impl.SFlyweightFunctionality;
 import jadex.bdi.runtime.impl.flyweights.ElementFlyweight;
 import jadex.bdi.runtime.interpreter.AgentRules;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
@@ -66,14 +66,14 @@ public class EAExpressionbaseFlyweight extends ElementFlyweight implements IEAEx
 				public void run()
 				{
 					Object[] scope = AgentRules.resolveCapability(name, OAVBDIMetaModel.expression_type, getScope(), getState());
-					ret.setResult(FlyweightFunctionality.createExpression(getState(), scope[1], (String)scope[0], true));
+					ret.setResult(SFlyweightFunctionality.createExpression(getState(), scope[1], (String)scope[0], true));
 				}
 			});
 		}
 		else
 		{
 			Object[] scope = AgentRules.resolveCapability(name, OAVBDIMetaModel.expression_type, getScope(), getState());
-			ret.setResult(FlyweightFunctionality.createExpression(getState(), scope[1], (String)scope[0], true));
+			ret.setResult(SFlyweightFunctionality.createExpression(getState(), scope[1], (String)scope[0], true));
 		}
 		
 		return ret;
@@ -104,13 +104,13 @@ public class EAExpressionbaseFlyweight extends ElementFlyweight implements IEAEx
 			{
 				public void run()
 				{
-					ret.setResult(FlyweightFunctionality.createExpression(getState(), getScope(), false, expression, paramnames, paramtypes));
+					ret.setResult(SFlyweightFunctionality.createExpression(getState(), getScope(), false, expression, paramnames, paramtypes));
 				}
 			});
 		}
 		else
 		{
-			ret.setResult(FlyweightFunctionality.createExpression(getState(), getScope(), false, expression, paramnames, paramtypes));
+			ret.setResult(SFlyweightFunctionality.createExpression(getState(), getScope(), false, expression, paramnames, paramtypes));
 		}
 		
 		return ret;

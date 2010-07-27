@@ -19,7 +19,7 @@ import jadex.bdi.runtime.IPlanbase;
 import jadex.bdi.runtime.IPropertybase;
 import jadex.bdi.runtime.IWaitqueue;
 import jadex.bdi.runtime.PlanFailureException;
-import jadex.bdi.runtime.impl.FlyweightFunctionality;
+import jadex.bdi.runtime.impl.SFlyweightFunctionality;
 import jadex.bdi.runtime.impl.eaflyweights.ExternalAccessFlyweight;
 import jadex.bdi.runtime.impl.flyweights.BeliefbaseFlyweight;
 import jadex.bdi.runtime.impl.flyweights.CapabilityFlyweight;
@@ -343,7 +343,7 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 						String type = (String)pt.getWaitInfo();
 						if(type==null)
 							throw new RuntimeException("Message type not specified: "+type);
-						FlyweightFunctionality.addMessageEvent(ret, type, state, rcapa);
+						SFlyweightFunctionality.addMessageEvent(ret, type, state, rcapa);
 						empty = false;
 					}
 					else if(MBpmnModel.EVENT_INTERMEDIATE_SIGNAL.equals(act.getActivityType()))
@@ -351,7 +351,7 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 						String type = (String)pt.getWaitInfo();
 						if(type==null)
 							throw new RuntimeException("Internal event type not specified: "+type);
-						FlyweightFunctionality.addInternalEvent(ret, type, state, rcapa);
+						SFlyweightFunctionality.addInternalEvent(ret, type, state, rcapa);
 						empty = false;
 					}
 					else if(MBpmnModel.EVENT_INTERMEDIATE_RULE.equals(act.getActivityType()))
@@ -359,7 +359,7 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 						String type = (String)pt.getWaitInfo();
 						if(type==null)
 							throw new RuntimeException("Rule type not specified: "+type);
-						FlyweightFunctionality.addCondition(ret, type, state, rcapa);
+						SFlyweightFunctionality.addCondition(ret, type, state, rcapa);
 						empty = false;
 					}
 					else if(MBpmnModel.EVENT_INTERMEDIATE_MULTIPLE.equals(act.getActivityType()))
@@ -376,7 +376,7 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 								String type = (String)was[i];
 								if(type==null)
 									throw new RuntimeException("Message type not specified: "+type);
-								FlyweightFunctionality.addMessageEvent(ret, type, state, rcapa);
+								SFlyweightFunctionality.addMessageEvent(ret, type, state, rcapa);
 								empty = false;
 							}
 							else if(MBpmnModel.EVENT_INTERMEDIATE_SIGNAL.equals(nextact.getActivityType()))
@@ -384,7 +384,7 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 								String type = (String)was[i];
 								if(type==null)
 									throw new RuntimeException("Internal event type not specified: "+type);
-								FlyweightFunctionality.addInternalEvent(ret, type, state, rcapa);
+								SFlyweightFunctionality.addInternalEvent(ret, type, state, rcapa);
 								empty = false;
 							}
 							else if(MBpmnModel.EVENT_INTERMEDIATE_RULE.equals(nextact.getActivityType()))
@@ -392,7 +392,7 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 								String type = (String)was[i];
 								if(type==null)
 									throw new RuntimeException("Rule type not specified: "+type);
-								FlyweightFunctionality.addCondition(ret, type, state, rcapa);
+								SFlyweightFunctionality.addCondition(ret, type, state, rcapa);
 								empty = false;
 							}
 							else if(MBpmnModel.EVENT_INTERMEDIATE_TIMER.equals(nextact.getActivityType()))
@@ -492,7 +492,7 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 		if(elem!=null)
 		{
 			// todo: wrong scope
-			ret = FlyweightFunctionality.getFlyweight(state, rcapa, elem, false);
+			ret = SFlyweightFunctionality.getFlyweight(state, rcapa, elem, false);
 		}
 		
 		return ret;
@@ -807,7 +807,7 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 	 */
 	public IGoal createGoal(String type)
 	{
-		return (IGoal)FlyweightFunctionality.createGoal(state, rcapa, false, type);
+		return (IGoal)SFlyweightFunctionality.createGoal(state, rcapa, false, type);
 	}
 
 	//-------- eventbase shortcut methods --------
@@ -846,7 +846,7 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 	 */
 	public IMessageEvent createMessageEvent(String type)
 	{
-		return (IMessageEvent)FlyweightFunctionality.createMessageEvent(state, rcapa, type, false);
+		return (IMessageEvent)SFlyweightFunctionality.createMessageEvent(state, rcapa, type, false);
 	}
 
 	/**
@@ -855,7 +855,7 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 	 */
 	public IInternalEvent createInternalEvent(String type)
 	{
-		return (IInternalEvent)FlyweightFunctionality.createInternalEvent(state, rcapa, type, false);
+		return (IInternalEvent)SFlyweightFunctionality.createInternalEvent(state, rcapa, type, false);
 	}
 
 	/**

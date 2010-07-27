@@ -3,7 +3,7 @@ package jadex.bdi.runtime.impl.eaflyweights;
 import jadex.bdi.model.IMElement;
 import jadex.bdi.model.impl.flyweights.MPropertybaseFlyweight;
 import jadex.bdi.runtime.IEAPropertybase;
-import jadex.bdi.runtime.impl.FlyweightFunctionality;
+import jadex.bdi.runtime.impl.SFlyweightFunctionality;
 import jadex.bdi.runtime.impl.flyweights.ElementFlyweight;
 import jadex.bdi.runtime.interpreter.AgentRules;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
@@ -89,13 +89,13 @@ public class EAPropertybaseFlyweight extends ElementFlyweight implements IEAProp
 			{
 				public void run()
 				{
-					ret.setResult(FlyweightFunctionality.getPropertyNames(getState(), getHandle()));
+					ret.setResult(SFlyweightFunctionality.getPropertyNames(getState(), getHandle()));
 				}
 			});
 		}
 		else
 		{
-			ret.setResult(FlyweightFunctionality.getPropertyNames(getState(), getHandle()));
+			ret.setResult(SFlyweightFunctionality.getPropertyNames(getState(), getHandle()));
 		}
 		
 		return ret;

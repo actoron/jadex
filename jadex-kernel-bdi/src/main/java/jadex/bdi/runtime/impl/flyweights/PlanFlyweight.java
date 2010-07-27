@@ -6,7 +6,7 @@ import jadex.bdi.runtime.IElement;
 import jadex.bdi.runtime.IPlan;
 import jadex.bdi.runtime.IPlanListener;
 import jadex.bdi.runtime.IWaitqueue;
-import jadex.bdi.runtime.impl.FlyweightFunctionality;
+import jadex.bdi.runtime.impl.SFlyweightFunctionality;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bdi.runtime.interpreter.PlanRules;
@@ -103,14 +103,14 @@ public class PlanFlyweight extends ParameterElementFlyweight implements IPlan
 			{
 				public void run()
 				{
-					object = FlyweightFunctionality.getReason(getState(), getScope(), getHandle(), false);
+					object = SFlyweightFunctionality.getReason(getState(), getScope(), getHandle(), false);
 				}
 			};
 			return (IElement) invoc.object;
 		}
 		else
 		{
-			return FlyweightFunctionality.getReason(getState(), getScope(), getHandle(), false);
+			return SFlyweightFunctionality.getReason(getState(), getScope(), getHandle(), false);
 		}
 	}
 

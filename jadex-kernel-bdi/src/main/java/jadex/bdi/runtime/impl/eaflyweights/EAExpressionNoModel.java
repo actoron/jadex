@@ -1,7 +1,7 @@
 package jadex.bdi.runtime.impl.eaflyweights;
 
 import jadex.bdi.runtime.IEAExpression;
-import jadex.bdi.runtime.impl.FlyweightFunctionality;
+import jadex.bdi.runtime.impl.SFlyweightFunctionality;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.OAVBDIFetcher;
 import jadex.commons.Future;
@@ -148,13 +148,13 @@ public class EAExpressionNoModel implements IEAExpression
 			{
 				public void run()
 				{
-					ret.setResult(FlyweightFunctionality.execute(state, expression, scope, true, names, values));
+					ret.setResult(SFlyweightFunctionality.execute(state, expression, scope, true, names, values));
 				}
 			});
 		}
 		else
 		{
-			ret.setResult(FlyweightFunctionality.execute(state, expression, scope, true, names, values));
+			ret.setResult(SFlyweightFunctionality.execute(state, expression, scope, true, names, values));
 		}
 		
 		return ret;

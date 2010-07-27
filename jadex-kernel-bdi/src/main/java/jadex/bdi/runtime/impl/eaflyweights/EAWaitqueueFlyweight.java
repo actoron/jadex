@@ -5,7 +5,7 @@ import jadex.bdi.model.impl.flyweights.MTriggerFlyweight;
 import jadex.bdi.runtime.IEAGoal;
 import jadex.bdi.runtime.IEAWaitAbstraction;
 import jadex.bdi.runtime.IEAWaitqueue;
-import jadex.bdi.runtime.impl.FlyweightFunctionality;
+import jadex.bdi.runtime.impl.SFlyweightFunctionality;
 import jadex.bdi.runtime.impl.flyweights.ElementFlyweight;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
@@ -92,13 +92,13 @@ public class EAWaitqueueFlyweight extends EAWaitAbstractionFlyweight implements 
 			{
 				public void run()
 				{
-					ret.setResult(FlyweightFunctionality.getElements(getState(), getScope(), rplan, true));
+					ret.setResult(SFlyweightFunctionality.getElements(getState(), getScope(), rplan, true));
 				}
 			});
 		}
 		else
 		{
-			ret.setResult(FlyweightFunctionality.getElements(getState(), getScope(), rplan, true));
+			ret.setResult(SFlyweightFunctionality.getElements(getState(), getScope(), rplan, true));
 		}
 		
 		return ret;
@@ -118,13 +118,13 @@ public class EAWaitqueueFlyweight extends EAWaitAbstractionFlyweight implements 
 			{
 				public void run()
 				{
-					ret.setResult(FlyweightFunctionality.removeNextElement(getState(), getScope(), rplan, true));
+					ret.setResult(SFlyweightFunctionality.removeNextElement(getState(), getScope(), rplan, true));
 				}
 			});
 		}
 		else
 		{
-			ret.setResult(FlyweightFunctionality.removeNextElement(getState(), getScope(), rplan, true));
+			ret.setResult(SFlyweightFunctionality.removeNextElement(getState(), getScope(), rplan, true));
 		}
 		
 		return ret;
@@ -171,13 +171,13 @@ public class EAWaitqueueFlyweight extends EAWaitAbstractionFlyweight implements 
 				{
 					Object rgoal  = ((ElementFlyweight)goal).getHandle();
 					// Directly add rgoal to waitqueue if already finished.
-					if(FlyweightFunctionality.isFinished(getState(), ((ElementFlyweight)goal).getHandle()))
+					if(SFlyweightFunctionality.isFinished(getState(), ((ElementFlyweight)goal).getHandle()))
 					{
 						getState().addAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_waitqueueelements, rgoal);
 					}
 					else
 					{
-						FlyweightFunctionality.addGoal(getOrCreateWaitAbstraction(), (ElementFlyweight)goal, getState(), getScope());
+						SFlyweightFunctionality.addGoal(getOrCreateWaitAbstraction(), (ElementFlyweight)goal, getState(), getScope());
 					}
 				}
 			});		
@@ -186,13 +186,13 @@ public class EAWaitqueueFlyweight extends EAWaitAbstractionFlyweight implements 
 		{
 			Object rgoal  = ((ElementFlyweight)goal).getHandle();
 			// Directly add rgoal to waitqueue if already finished.
-			if(FlyweightFunctionality.isFinished(getState(), ((ElementFlyweight)goal).getHandle()))
+			if(SFlyweightFunctionality.isFinished(getState(), ((ElementFlyweight)goal).getHandle()))
 			{
 				getState().addAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_waitqueueelements, rgoal);
 			}
 			else
 			{
-				FlyweightFunctionality.addGoal(getOrCreateWaitAbstraction(), (ElementFlyweight)goal, getState(), getScope());
+				SFlyweightFunctionality.addGoal(getOrCreateWaitAbstraction(), (ElementFlyweight)goal, getState(), getScope());
 			}
 		}
 		

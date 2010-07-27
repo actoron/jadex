@@ -5,7 +5,7 @@ import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.model.impl.flyweights.MExpressionbaseFlyweight;
 import jadex.bdi.runtime.IExpression;
 import jadex.bdi.runtime.IExpressionbase;
-import jadex.bdi.runtime.impl.FlyweightFunctionality;
+import jadex.bdi.runtime.impl.SFlyweightFunctionality;
 import jadex.bdi.runtime.interpreter.AgentRules;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
@@ -63,7 +63,7 @@ public class ExpressionbaseFlyweight extends ElementFlyweight implements IExpres
 				public void run()
 				{
 					Object[] scope = AgentRules.resolveCapability(name, OAVBDIMetaModel.expression_type, getScope(), getState());
-					object = FlyweightFunctionality.createExpression(getState(), scope[1], (String)scope[0], false);
+					object = SFlyweightFunctionality.createExpression(getState(), scope[1], (String)scope[0], false);
 				}
 			};
 			return (IExpression)invoc.object;
@@ -71,7 +71,7 @@ public class ExpressionbaseFlyweight extends ElementFlyweight implements IExpres
 		else
 		{
 			Object[] scope = AgentRules.resolveCapability(name, OAVBDIMetaModel.expression_type, getScope(), getState());
-			return (IExpression)FlyweightFunctionality.createExpression(getState(), scope[1], (String)scope[0], false);
+			return (IExpression)SFlyweightFunctionality.createExpression(getState(), scope[1], (String)scope[0], false);
 		}
 	}
 
@@ -98,14 +98,14 @@ public class ExpressionbaseFlyweight extends ElementFlyweight implements IExpres
 			{
 				public void run()
 				{
-					object = FlyweightFunctionality.createExpression(getState(), getScope(), false, expression, paramnames, paramtypes);
+					object = SFlyweightFunctionality.createExpression(getState(), getScope(), false, expression, paramnames, paramtypes);
 				}
 			};
 			return (IExpression)invoc.object;
 		}
 		else
 		{
-			return (IExpression)FlyweightFunctionality.createExpression(getState(), getScope(), false, expression, paramnames, paramtypes);
+			return (IExpression)SFlyweightFunctionality.createExpression(getState(), getScope(), false, expression, paramnames, paramtypes);
 		}
 	}
 	

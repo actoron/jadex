@@ -3,7 +3,7 @@ package jadex.bdi.runtime.impl.eaflyweights;
 import jadex.bdi.runtime.IEAParameterElement;
 import jadex.bdi.runtime.IParameter;
 import jadex.bdi.runtime.IParameterSet;
-import jadex.bdi.runtime.impl.FlyweightFunctionality;
+import jadex.bdi.runtime.impl.SFlyweightFunctionality;
 import jadex.bdi.runtime.impl.flyweights.ElementFlyweight;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.commons.Future;
@@ -31,7 +31,7 @@ public abstract class EAParameterElementFlyweight extends ElementFlyweight imple
 	protected EAParameterElementFlyweight(IOAVState state, Object scope, Object handle)
 	{
 		super(state, scope, handle);
-		this.type = FlyweightFunctionality.getTypeName(state, handle);
+		this.type = SFlyweightFunctionality.getTypeName(state, handle);
 	}
 	
 	//-------- methods ---------
@@ -50,13 +50,13 @@ public abstract class EAParameterElementFlyweight extends ElementFlyweight imple
 			{
 				public void run()
 				{
-					ret.setResult(FlyweightFunctionality.getParameters(getState(), getScope(), getHandle(), true));
+					ret.setResult(SFlyweightFunctionality.getParameters(getState(), getScope(), getHandle(), true));
 				}
 			});
 		}
 		else
 		{
-			ret.setResult(FlyweightFunctionality.getParameters(getState(), getScope(), getHandle(), true));
+			ret.setResult(SFlyweightFunctionality.getParameters(getState(), getScope(), getHandle(), true));
 		}
 		
 		return ret;
@@ -76,13 +76,13 @@ public abstract class EAParameterElementFlyweight extends ElementFlyweight imple
 			{
 				public void run()
 				{
-					ret.setResult(FlyweightFunctionality.getParameterSets(getState(), getScope(), getHandle(), true));
+					ret.setResult(SFlyweightFunctionality.getParameterSets(getState(), getScope(), getHandle(), true));
 				}
 			});
 		}
 		else
 		{
-			ret.setResult(FlyweightFunctionality.getParameterSets(getState(), getScope(), getHandle(), true));
+			ret.setResult(SFlyweightFunctionality.getParameterSets(getState(), getScope(), getHandle(), true));
 		}
 		
 		return ret;
@@ -103,13 +103,13 @@ public abstract class EAParameterElementFlyweight extends ElementFlyweight imple
 			{
 				public void run()
 				{
-					ret.setResult(FlyweightFunctionality.getParameter(getState(), getScope(), getHandle(), name, true));
+					ret.setResult(SFlyweightFunctionality.getParameter(getState(), getScope(), getHandle(), name, true));
 				}
 			});
 		}
 		else
 		{
-			ret.setResult(FlyweightFunctionality.getParameter(getState(), getScope(), getHandle(), name, true));
+			ret.setResult(SFlyweightFunctionality.getParameter(getState(), getScope(), getHandle(), name, true));
 		}
 		
 		return ret;
@@ -130,13 +130,13 @@ public abstract class EAParameterElementFlyweight extends ElementFlyweight imple
 			{
 				public void run()
 				{
-					ret.setResult(FlyweightFunctionality.getParameterSet(getState(), getScope(), getHandle(), name, true));
+					ret.setResult(SFlyweightFunctionality.getParameterSet(getState(), getScope(), getHandle(), name, true));
 				}
 			});
 		}
 		else
 		{
-			ret.setResult(FlyweightFunctionality.getParameterSet(getState(), getScope(), getHandle(), name, true));
+			ret.setResult(SFlyweightFunctionality.getParameterSet(getState(), getScope(), getHandle(), name, true));
 		}
 		
 		return ret;
@@ -230,14 +230,14 @@ public abstract class EAParameterElementFlyweight extends ElementFlyweight imple
 			{
 				public void run()
 				{
-					IParameter param = (IParameter)FlyweightFunctionality.getParameter(getState(), getScope(), getHandle(), parameter, false);
+					IParameter param = (IParameter)SFlyweightFunctionality.getParameter(getState(), getScope(), getHandle(), parameter, false);
 					ret.setResult(param.getValue());
 				}
 			});
 		}
 		else
 		{
-			IParameter param = (IParameter)FlyweightFunctionality.getParameter(getState(), getScope(), getHandle(), parameter, false);
+			IParameter param = (IParameter)SFlyweightFunctionality.getParameter(getState(), getScope(), getHandle(), parameter, false);
 			ret.setResult(param.getValue());
 		}
 		
@@ -259,7 +259,7 @@ public abstract class EAParameterElementFlyweight extends ElementFlyweight imple
 			{
 				public void run()
 				{
-					IParameter param = (IParameter)FlyweightFunctionality.getParameter(getState(), getScope(), getHandle(), parameter, false);
+					IParameter param = (IParameter)SFlyweightFunctionality.getParameter(getState(), getScope(), getHandle(), parameter, false);
 					param.setValue(value);
 					ret.setResult(null);
 				}
@@ -267,7 +267,7 @@ public abstract class EAParameterElementFlyweight extends ElementFlyweight imple
 		}
 		else
 		{
-			IParameter param = (IParameter)FlyweightFunctionality.getParameter(getState(), getScope(), getHandle(), parameter, false);
+			IParameter param = (IParameter)SFlyweightFunctionality.getParameter(getState(), getScope(), getHandle(), parameter, false);
 			param.setValue(value);
 			ret.setResult(null);
 		}
@@ -289,14 +289,14 @@ public abstract class EAParameterElementFlyweight extends ElementFlyweight imple
 			{
 				public void run()
 				{
-					IParameterSet paramset = (IParameterSet)FlyweightFunctionality.getParameterSet(getState(), getScope(), getHandle(), parameterset, false);
+					IParameterSet paramset = (IParameterSet)SFlyweightFunctionality.getParameterSet(getState(), getScope(), getHandle(), parameterset, false);
 					ret.setResult(paramset.getValues());
 				}
 			});
 		}
 		else
 		{
-			IParameterSet paramset = (IParameterSet)FlyweightFunctionality.getParameterSet(getState(), getScope(), getHandle(), parameterset, false);
+			IParameterSet paramset = (IParameterSet)SFlyweightFunctionality.getParameterSet(getState(), getScope(), getHandle(), parameterset, false);
 			ret.setResult(paramset.getValues());
 		}
 		
@@ -318,7 +318,7 @@ public abstract class EAParameterElementFlyweight extends ElementFlyweight imple
 			{
 				public void run()
 				{
-					IParameterSet paramset = (IParameterSet)FlyweightFunctionality.getParameterSet(getState(), getScope(), getHandle(), parameterset, false);
+					IParameterSet paramset = (IParameterSet)SFlyweightFunctionality.getParameterSet(getState(), getScope(), getHandle(), parameterset, false);
 					paramset.addValue(value);
 					ret.setResult(null);
 				}
@@ -326,7 +326,7 @@ public abstract class EAParameterElementFlyweight extends ElementFlyweight imple
 		}
 		else
 		{
-			IParameterSet paramset = (IParameterSet)FlyweightFunctionality.getParameterSet(getState(), getScope(), getHandle(), parameterset, false);
+			IParameterSet paramset = (IParameterSet)SFlyweightFunctionality.getParameterSet(getState(), getScope(), getHandle(), parameterset, false);
 			paramset.addValue(value);
 			ret.setResult(null);
 		}
@@ -349,7 +349,7 @@ public abstract class EAParameterElementFlyweight extends ElementFlyweight imple
 			{
 				public void run()
 				{
-					IParameterSet paramset = (IParameterSet)FlyweightFunctionality.getParameterSet(getState(), getScope(), getHandle(), parameterset, false);
+					IParameterSet paramset = (IParameterSet)SFlyweightFunctionality.getParameterSet(getState(), getScope(), getHandle(), parameterset, false);
 					paramset.addValues(values);
 					ret.setResult(null);
 				}
@@ -357,7 +357,7 @@ public abstract class EAParameterElementFlyweight extends ElementFlyweight imple
 		}
 		else
 		{
-			IParameterSet paramset = (IParameterSet)FlyweightFunctionality.getParameterSet(getState(), getScope(), getHandle(), parameterset, false);
+			IParameterSet paramset = (IParameterSet)SFlyweightFunctionality.getParameterSet(getState(), getScope(), getHandle(), parameterset, false);
 			paramset.addValues(values);
 			ret.setResult(null);
 		}
@@ -380,7 +380,7 @@ public abstract class EAParameterElementFlyweight extends ElementFlyweight imple
 			{
 				public void run()
 				{
-					IParameterSet paramset = (IParameterSet)FlyweightFunctionality.getParameterSet(getState(), getScope(), getHandle(), parameterset, false);
+					IParameterSet paramset = (IParameterSet)SFlyweightFunctionality.getParameterSet(getState(), getScope(), getHandle(), parameterset, false);
 					paramset.removeValue(value);
 					ret.setResult(null);
 				}
@@ -388,7 +388,7 @@ public abstract class EAParameterElementFlyweight extends ElementFlyweight imple
 		}
 		else
 		{
-			IParameterSet paramset = (IParameterSet)FlyweightFunctionality.getParameterSet(getState(), getScope(), getHandle(), parameterset, false);
+			IParameterSet paramset = (IParameterSet)SFlyweightFunctionality.getParameterSet(getState(), getScope(), getHandle(), parameterset, false);
 			paramset.removeValue(value);
 			ret.setResult(null);
 		}
@@ -410,7 +410,7 @@ public abstract class EAParameterElementFlyweight extends ElementFlyweight imple
 			{
 				public void run()
 				{
-					IParameterSet paramset = (IParameterSet)FlyweightFunctionality.getParameterSet(getState(), getScope(), getHandle(), parameterset, false);
+					IParameterSet paramset = (IParameterSet)SFlyweightFunctionality.getParameterSet(getState(), getScope(), getHandle(), parameterset, false);
 					paramset.removeValues();
 					ret.setResult(null);
 				}
@@ -418,7 +418,7 @@ public abstract class EAParameterElementFlyweight extends ElementFlyweight imple
 		}
 		else
 		{
-			IParameterSet paramset = (IParameterSet)FlyweightFunctionality.getParameterSet(getState(), getScope(), getHandle(), parameterset, false);
+			IParameterSet paramset = (IParameterSet)SFlyweightFunctionality.getParameterSet(getState(), getScope(), getHandle(), parameterset, false);
 			paramset.removeValues();
 			ret.setResult(null);
 		}
@@ -441,14 +441,14 @@ public abstract class EAParameterElementFlyweight extends ElementFlyweight imple
 			{
 				public void run()
 				{
-					IParameterSet paramset = (IParameterSet)FlyweightFunctionality.getParameterSet(getState(), getScope(), getHandle(), parameterset, false);
+					IParameterSet paramset = (IParameterSet)SFlyweightFunctionality.getParameterSet(getState(), getScope(), getHandle(), parameterset, false);
 					ret.setResult(paramset.containsValue(value)? Boolean.TRUE: Boolean.FALSE);
 				}
 			});
 		}
 		else
 		{
-			IParameterSet paramset = (IParameterSet)FlyweightFunctionality.getParameterSet(getState(), getScope(), getHandle(), parameterset, false);
+			IParameterSet paramset = (IParameterSet)SFlyweightFunctionality.getParameterSet(getState(), getScope(), getHandle(), parameterset, false);
 			ret.setResult(paramset.containsValue(value)? Boolean.TRUE: Boolean.FALSE);
 		}
 		
@@ -470,14 +470,14 @@ public abstract class EAParameterElementFlyweight extends ElementFlyweight imple
 			{
 				public void run()
 				{
-					IParameterSet paramset = (IParameterSet)FlyweightFunctionality.getParameterSet(getState(), getScope(), getHandle(), parameterset, false);
+					IParameterSet paramset = (IParameterSet)SFlyweightFunctionality.getParameterSet(getState(), getScope(), getHandle(), parameterset, false);
 					ret.setResult(new Integer(paramset.size()));
 				}
 			});
 		}
 		else
 		{
-			IParameterSet paramset = (IParameterSet)FlyweightFunctionality.getParameterSet(getState(), getScope(), getHandle(), parameterset, false);
+			IParameterSet paramset = (IParameterSet)SFlyweightFunctionality.getParameterSet(getState(), getScope(), getHandle(), parameterset, false);
 			ret.setResult(new Integer(paramset.size()));
 		}
 		

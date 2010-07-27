@@ -228,7 +228,7 @@ public abstract class AbstractPlan implements java.io.Serializable //, IPlan
 		if(elem!=null)
 		{
 			// todo: wrong scope
-			ret = FlyweightFunctionality.getFlyweight(state, rcapa, elem, false);
+			ret = SFlyweightFunctionality.getFlyweight(state, rcapa, elem, false);
 		}
 		
 		return ret;
@@ -549,7 +549,7 @@ public abstract class AbstractPlan implements java.io.Serializable //, IPlan
 	public IGoal createGoal(String type)
 	{
 //		return GoalbaseFlyweight.createGoal(type, rcapa, state);
-		return (IGoal)FlyweightFunctionality.createGoal(state, rcapa, false, type);
+		return (IGoal)SFlyweightFunctionality.createGoal(state, rcapa, false, type);
 	}
 
 	//-------- eventbase shortcut methods --------
@@ -589,7 +589,7 @@ public abstract class AbstractPlan implements java.io.Serializable //, IPlan
 	public IMessageEvent createMessageEvent(String type)
 	{
 //		return EventbaseFlyweight.createMessageEvent(state, rcapa, type);
-		return (IMessageEvent)FlyweightFunctionality.createMessageEvent(state, rcapa, type, false);
+		return (IMessageEvent)SFlyweightFunctionality.createMessageEvent(state, rcapa, type, false);
 	}
 
 	/**
@@ -599,7 +599,7 @@ public abstract class AbstractPlan implements java.io.Serializable //, IPlan
 	public IInternalEvent createInternalEvent(String type)
 	{
 //		return EventbaseFlyweight.createInternalEvent(state, rcapa, type);
-		return (IInternalEvent)FlyweightFunctionality.createInternalEvent(state, rcapa, type, false);
+		return (IInternalEvent)SFlyweightFunctionality.createInternalEvent(state, rcapa, type, false);
 	}
 
 	/**
@@ -647,7 +647,7 @@ public abstract class AbstractPlan implements java.io.Serializable //, IPlan
 	{
 		Object[] scope = AgentRules.resolveCapability(name, OAVBDIMetaModel.expression_type, getRCapability(), getState());
 //		return ExpressionbaseFlyweight.createExpression(getState(), scope[1], (String)scope[0]);
-		return (IExpression)FlyweightFunctionality.createExpression(state, scope[1], (String)scope[0], false);
+		return (IExpression)SFlyweightFunctionality.createExpression(state, scope[1], (String)scope[0], false);
 	}
 
 	/**

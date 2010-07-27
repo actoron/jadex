@@ -1,7 +1,7 @@
 package jadex.bdi.runtime;
 
 import jadex.bdi.runtime.impl.AbstractPlan;
-import jadex.bdi.runtime.impl.FlyweightFunctionality;
+import jadex.bdi.runtime.impl.SFlyweightFunctionality;
 import jadex.bdi.runtime.impl.flyweights.ElementFlyweight;
 import jadex.bdi.runtime.impl.flyweights.WaitAbstractionFlyweight;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
@@ -140,7 +140,7 @@ public abstract class Plan extends AbstractPlan implements ISuspendable//, IExte
 	{
 		// Todo: check thread access.
 		Object	wa	= getState().createObject(OAVBDIRuntimeModel.waitabstraction_type);
-		FlyweightFunctionality.addCondition(wa, condition, getState(), getRCapability());
+		SFlyweightFunctionality.addCondition(wa, condition, getState(), getRCapability());
 		PlanRules.waitForWaitAbstraction(wa, timeout, getState(), getRCapability(), getRPlan());
 	}
 
@@ -169,7 +169,7 @@ public abstract class Plan extends AbstractPlan implements ISuspendable//, IExte
 		dispatchSubgoal(subgoal);
 		// Todo: check thread access.
 		Object	wa	= getState().createObject(OAVBDIRuntimeModel.waitabstraction_type);
-		FlyweightFunctionality.addGoal(wa, (ElementFlyweight)subgoal, getState(), getRCapability());
+		SFlyweightFunctionality.addGoal(wa, (ElementFlyweight)subgoal, getState(), getRCapability());
 		PlanRules.waitForWaitAbstraction(wa, timeout, getState(), getRCapability(), getRPlan());
 	}
 
@@ -191,7 +191,7 @@ public abstract class Plan extends AbstractPlan implements ISuspendable//, IExte
 	{
 		// Todo: check thread access.
 		Object	wa	= getState().createObject(OAVBDIRuntimeModel.waitabstraction_type);
-		FlyweightFunctionality.addInternalEvent(wa, type, getState(), getRCapability());
+		SFlyweightFunctionality.addInternalEvent(wa, type, getState(), getRCapability());
 		return (IInternalEvent)PlanRules.waitForWaitAbstraction(wa, timeout, getState(), getRCapability(), getRPlan());
 	}
 
@@ -216,7 +216,7 @@ public abstract class Plan extends AbstractPlan implements ISuspendable//, IExte
 	{
 		// Todo: check thread access.
 		Object	wa	= getState().createObject(OAVBDIRuntimeModel.waitabstraction_type);
-		FlyweightFunctionality.addReply(wa, (ElementFlyweight)me, getState(), getRCapability());
+		SFlyweightFunctionality.addReply(wa, (ElementFlyweight)me, getState(), getRCapability());
 		Object[] ret = PlanRules.initializeWait(wa, timeout, getState(), getRCapability(), getRPlan());
 		sendMessage(me);
 		if(ret[0]==null)
@@ -245,7 +245,7 @@ public abstract class Plan extends AbstractPlan implements ISuspendable//, IExte
 	{
 		// Todo: check thread access.
 		Object	wa	= getState().createObject(OAVBDIRuntimeModel.waitabstraction_type);
-		FlyweightFunctionality.addMessageEvent(wa, type, getState(), getRCapability());
+		SFlyweightFunctionality.addMessageEvent(wa, type, getState(), getRCapability());
 		return (IMessageEvent)PlanRules.waitForWaitAbstraction(wa, timeout, getState(), getRCapability(), getRPlan());
 	}
 
@@ -275,7 +275,7 @@ public abstract class Plan extends AbstractPlan implements ISuspendable//, IExte
 		
 		// Todo: check thread access.
 		Object	wa	= getState().createObject(OAVBDIRuntimeModel.waitabstraction_type);
-		FlyweightFunctionality.addReply(wa, (ElementFlyweight)msgevent, getState(), getRCapability());
+		SFlyweightFunctionality.addReply(wa, (ElementFlyweight)msgevent, getState(), getRCapability());
 		return (IMessageEvent)PlanRules.waitForWaitAbstraction(wa, timeout, getState(), getRCapability(), getRPlan());
 	}
 
@@ -297,7 +297,7 @@ public abstract class Plan extends AbstractPlan implements ISuspendable//, IExte
 	{
 		// Todo: check thread access.
 		Object	wa	= getState().createObject(OAVBDIRuntimeModel.waitabstraction_type);
-		FlyweightFunctionality.addGoal(wa, type, getState(), getRCapability());
+		SFlyweightFunctionality.addGoal(wa, type, getState(), getRCapability());
 		return (IGoal)PlanRules.waitForWaitAbstraction(wa, timeout, getState(), getRCapability(), getRPlan());
 	}
 
@@ -330,7 +330,7 @@ public abstract class Plan extends AbstractPlan implements ISuspendable//, IExte
 		{
 			// Todo: check thread access.
 			Object	wa	= getState().createObject(OAVBDIRuntimeModel.waitabstraction_type);
-			FlyweightFunctionality.addGoal(wa, (ElementFlyweight)goal, getState(), getRCapability());
+			SFlyweightFunctionality.addGoal(wa, (ElementFlyweight)goal, getState(), getRCapability());
 			PlanRules.waitForWaitAbstraction(wa, timeout, getState(), getRCapability(), getRPlan());
 		}
 	}
@@ -355,7 +355,7 @@ public abstract class Plan extends AbstractPlan implements ISuspendable//, IExte
 	{
 		// Todo: check thread access.
 		Object	wa	= getState().createObject(OAVBDIRuntimeModel.waitabstraction_type);
-		FlyweightFunctionality.addFactChanged(wa, belief, getState(), getRCapability());
+		SFlyweightFunctionality.addFactChanged(wa, belief, getState(), getRCapability());
 		return PlanRules.waitForWaitAbstraction(wa, timeout, getState(), getRCapability(), getRPlan());
 	}
 
@@ -379,7 +379,7 @@ public abstract class Plan extends AbstractPlan implements ISuspendable//, IExte
 	{
 		// Todo: check thread access.
 		Object	wa	= getState().createObject(OAVBDIRuntimeModel.waitabstraction_type);
-		FlyweightFunctionality.addFactAdded(wa, beliefset, getState(), getRCapability());
+		SFlyweightFunctionality.addFactAdded(wa, beliefset, getState(), getRCapability());
 		return PlanRules.waitForWaitAbstraction(wa, timeout, getState(), getRCapability(), getRPlan());
 	}
 
@@ -404,7 +404,7 @@ public abstract class Plan extends AbstractPlan implements ISuspendable//, IExte
 	{
 		// Todo: check thread access.
 		Object	wa	= getState().createObject(OAVBDIRuntimeModel.waitabstraction_type);
-		FlyweightFunctionality.addFactRemoved(wa, beliefset, getState(), getRCapability());
+		SFlyweightFunctionality.addFactRemoved(wa, beliefset, getState(), getRCapability());
 		return PlanRules.waitForWaitAbstraction(wa, timeout, getState(), getRCapability(), getRPlan());
 	}
 	
@@ -429,8 +429,8 @@ public abstract class Plan extends AbstractPlan implements ISuspendable//, IExte
 		// Todo: check thread access.
 		// todo: return change event to indicate the type of change
 		Object	wa	= getState().createObject(OAVBDIRuntimeModel.waitabstraction_type);
-		FlyweightFunctionality.addFactAdded(wa, beliefset, getState(), getRCapability());
-		FlyweightFunctionality.addFactRemoved(wa, beliefset, getState(), getRCapability());
+		SFlyweightFunctionality.addFactAdded(wa, beliefset, getState(), getRCapability());
+		SFlyweightFunctionality.addFactRemoved(wa, beliefset, getState(), getRCapability());
 		return PlanRules.waitForWaitAbstraction(wa, timeout, getState(), getRCapability(), getRPlan());
 	}
 
@@ -452,7 +452,7 @@ public abstract class Plan extends AbstractPlan implements ISuspendable//, IExte
 	{
 		// Todo: check thread access.
 		Object	wa	= getState().createObject(OAVBDIRuntimeModel.waitabstraction_type);
-		FlyweightFunctionality.addExternalCondition(wa, condition, getState(), getRCapability());
+		SFlyweightFunctionality.addExternalCondition(wa, condition, getState(), getRCapability());
 		PlanRules.waitForWaitAbstraction(wa, timeout, getState(), getRCapability(), getRPlan());
 	}
 

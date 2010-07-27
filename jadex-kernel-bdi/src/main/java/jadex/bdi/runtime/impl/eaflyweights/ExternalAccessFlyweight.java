@@ -4,7 +4,7 @@ import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IEAGoal;
 import jadex.bdi.runtime.IEAInternalEvent;
 import jadex.bdi.runtime.IEAMessageEvent;
-import jadex.bdi.runtime.impl.FlyweightFunctionality;
+import jadex.bdi.runtime.impl.SFlyweightFunctionality;
 import jadex.bdi.runtime.impl.WakeupAction;
 import jadex.bdi.runtime.impl.flyweights.ElementFlyweight;
 import jadex.bdi.runtime.interpreter.GoalLifecycleRules;
@@ -92,13 +92,13 @@ public class ExternalAccessFlyweight extends EACapabilityFlyweight implements IB
 			{
 				public void run() 
 				{
-					ret.setResult(FlyweightFunctionality.createGoal(getState(), getScope(), true, type));
+					ret.setResult(SFlyweightFunctionality.createGoal(getState(), getScope(), true, type));
 				}
 			});
 		}
 		else
 		{
-			ret.setResult(FlyweightFunctionality.createGoal(getState(), getScope(), true, type));
+			ret.setResult(SFlyweightFunctionality.createGoal(getState(), getScope(), true, type));
 		}
 		
 		return ret;
@@ -184,13 +184,13 @@ public class ExternalAccessFlyweight extends EACapabilityFlyweight implements IB
 			{
 				public void run() 
 				{
-					ret.setResult(FlyweightFunctionality.createMessageEvent(getState(), getScope(), type, true));
+					ret.setResult(SFlyweightFunctionality.createMessageEvent(getState(), getScope(), type, true));
 				}
 			});
 		}
 		else
 		{
-			ret.setResult(FlyweightFunctionality.createMessageEvent(getState(), getScope(), type, true));
+			ret.setResult(SFlyweightFunctionality.createMessageEvent(getState(), getScope(), type, true));
 		}
 		
 		return ret;
@@ -212,13 +212,13 @@ public class ExternalAccessFlyweight extends EACapabilityFlyweight implements IB
 			{
 				public void run() 
 				{
-					ret.setResult(FlyweightFunctionality.createInternalEvent(getState(), getScope(), type, true));
+					ret.setResult(SFlyweightFunctionality.createInternalEvent(getState(), getScope(), type, true));
 				}
 			});
 		}
 		else
 		{
-			ret.setResult(FlyweightFunctionality.createInternalEvent(getState(), getScope(), type, true));
+			ret.setResult(SFlyweightFunctionality.createInternalEvent(getState(), getScope(), type, true));
 		}
 		
 		return ret;
@@ -329,7 +329,7 @@ public class ExternalAccessFlyweight extends EACapabilityFlyweight implements IB
 				public void run() 
 				{
 					Object	wa	= getState().createObject(OAVBDIRuntimeModel.waitabstraction_type);
-					FlyweightFunctionality.addInternalEvent(wa, type, getState(), getScope());
+					SFlyweightFunctionality.addInternalEvent(wa, type, getState(), getScope());
 					getState().addExternalObjectUsage(wa, ExternalAccessFlyweight.this);
 					waitForExternalAccessWaitAbstraction(wa, timeout, ret);
 				}
@@ -338,7 +338,7 @@ public class ExternalAccessFlyweight extends EACapabilityFlyweight implements IB
 		else
 		{
 			Object	wa	= getState().createObject(OAVBDIRuntimeModel.waitabstraction_type);
-			FlyweightFunctionality.addInternalEvent(wa, type, getState(), getScope());
+			SFlyweightFunctionality.addInternalEvent(wa, type, getState(), getScope());
 			ret.setResult(PlanRules.waitForWaitAbstraction(wa, timeout, getState(), getScope(), getInterpreter().getCurrentPlan()));
 		}
 		
@@ -394,7 +394,7 @@ public class ExternalAccessFlyweight extends EACapabilityFlyweight implements IB
 				public void run() 
 				{
 					Object	wa	= getState().createObject(OAVBDIRuntimeModel.waitabstraction_type);
-					FlyweightFunctionality.addReply(wa, (ElementFlyweight)me, getState(), getScope());
+					SFlyweightFunctionality.addReply(wa, (ElementFlyweight)me, getState(), getScope());
 					getState().addExternalObjectUsage(wa, ExternalAccessFlyweight.this);
 					sendMessage(me);
 					waitForExternalAccessWaitAbstraction(wa, timeout, ret);
@@ -404,7 +404,7 @@ public class ExternalAccessFlyweight extends EACapabilityFlyweight implements IB
 		else
 		{
 			Object	wa	= getState().createObject(OAVBDIRuntimeModel.waitabstraction_type);
-			FlyweightFunctionality.addReply(wa, (ElementFlyweight)me, getState(), getScope());
+			SFlyweightFunctionality.addReply(wa, (ElementFlyweight)me, getState(), getScope());
 			Object[] wret = PlanRules.initializeWait(wa, timeout, getState(), getScope(), getInterpreter().getCurrentPlan());
 			sendMessage(me);
 			PlanRules.doWait(getState(), getInterpreter().getCurrentPlan());
@@ -469,7 +469,7 @@ public class ExternalAccessFlyweight extends EACapabilityFlyweight implements IB
 				public void run() 
 				{
 					Object	wa	= getState().createObject(OAVBDIRuntimeModel.waitabstraction_type);
-					FlyweightFunctionality.addMessageEvent(wa, type, getState(), getScope());
+					SFlyweightFunctionality.addMessageEvent(wa, type, getState(), getScope());
 					getState().addExternalObjectUsage(wa, ExternalAccessFlyweight.this);
 					waitForExternalAccessWaitAbstraction(wa, timeout, ret);
 				}
@@ -478,7 +478,7 @@ public class ExternalAccessFlyweight extends EACapabilityFlyweight implements IB
 		else
 		{
 			Object	wa	= getState().createObject(OAVBDIRuntimeModel.waitabstraction_type);
-			FlyweightFunctionality.addMessageEvent(wa, type, getState(), getScope());
+			SFlyweightFunctionality.addMessageEvent(wa, type, getState(), getScope());
 			ret.setResult(PlanRules.waitForWaitAbstraction(wa, timeout, getState(), getScope(), getInterpreter().getCurrentPlan()));
 		}
 		
@@ -530,7 +530,7 @@ public class ExternalAccessFlyweight extends EACapabilityFlyweight implements IB
 				public void run() 
 				{
 					Object	wa	= getState().createObject(OAVBDIRuntimeModel.waitabstraction_type);
-					FlyweightFunctionality.addReply(wa, (ElementFlyweight)msgevent, getState(), getScope());
+					SFlyweightFunctionality.addReply(wa, (ElementFlyweight)msgevent, getState(), getScope());
 					getState().addExternalObjectUsage(wa, ExternalAccessFlyweight.this);
 					waitForExternalAccessWaitAbstraction(wa, timeout, ret);
 				}
@@ -539,7 +539,7 @@ public class ExternalAccessFlyweight extends EACapabilityFlyweight implements IB
 		else
 		{
 			Object	wa	= getState().createObject(OAVBDIRuntimeModel.waitabstraction_type);
-			FlyweightFunctionality.addReply(wa, (ElementFlyweight)msgevent, getState(), getScope());
+			SFlyweightFunctionality.addReply(wa, (ElementFlyweight)msgevent, getState(), getScope());
 			ret.setResult(PlanRules.waitForWaitAbstraction(wa, timeout, getState(), getScope(), getInterpreter().getCurrentPlan()));
 		}
 		
@@ -592,7 +592,7 @@ public class ExternalAccessFlyweight extends EACapabilityFlyweight implements IB
 				public void run() 
 				{
 					Object	wa	= getState().createObject(OAVBDIRuntimeModel.waitabstraction_type);
-					FlyweightFunctionality.addGoal(wa, type, getState(), getScope());
+					SFlyweightFunctionality.addGoal(wa, type, getState(), getScope());
 					getState().addExternalObjectUsage(wa, ExternalAccessFlyweight.this);
 					waitForExternalAccessWaitAbstraction(wa, timeout, ret);
 				}
@@ -601,7 +601,7 @@ public class ExternalAccessFlyweight extends EACapabilityFlyweight implements IB
 		else
 		{
 			Object	wa	= getState().createObject(OAVBDIRuntimeModel.waitabstraction_type);
-			FlyweightFunctionality.addGoal(wa, type, getState(), getScope());
+			SFlyweightFunctionality.addGoal(wa, type, getState(), getScope());
 			ret.setResult(PlanRules.waitForWaitAbstraction(wa, timeout, getState(), getScope(), getInterpreter().getCurrentPlan()));
 		}
 		
@@ -656,7 +656,7 @@ public class ExternalAccessFlyweight extends EACapabilityFlyweight implements IB
 				public void run() 
 				{
 					Object	wa	= getState().createObject(OAVBDIRuntimeModel.waitabstraction_type);
-					FlyweightFunctionality.addFactChanged(wa, belief, getState(), getScope());
+					SFlyweightFunctionality.addFactChanged(wa, belief, getState(), getScope());
 					getState().addExternalObjectUsage(wa, ExternalAccessFlyweight.this);
 					waitForExternalAccessWaitAbstraction(wa, timeout, ret);
 				}
@@ -665,7 +665,7 @@ public class ExternalAccessFlyweight extends EACapabilityFlyweight implements IB
 		else
 		{
 			Object	wa	= getState().createObject(OAVBDIRuntimeModel.waitabstraction_type);
-			FlyweightFunctionality.addFactChanged(wa, belief, getState(), getScope());
+			SFlyweightFunctionality.addFactChanged(wa, belief, getState(), getScope());
 			ret.setResult(PlanRules.waitForWaitAbstraction(wa, timeout, getState(), getScope(), getInterpreter().getCurrentPlan()));
 		}
 		
@@ -720,7 +720,7 @@ public class ExternalAccessFlyweight extends EACapabilityFlyweight implements IB
 				public void run() 
 				{
 					Object	wa	= getState().createObject(OAVBDIRuntimeModel.waitabstraction_type);
-					FlyweightFunctionality.addFactAdded(wa, type, getState(), getScope());
+					SFlyweightFunctionality.addFactAdded(wa, type, getState(), getScope());
 					getState().addExternalObjectUsage(wa, ExternalAccessFlyweight.this);
 					waitForExternalAccessWaitAbstraction(wa, timeout, ret);
 				}
@@ -729,7 +729,7 @@ public class ExternalAccessFlyweight extends EACapabilityFlyweight implements IB
 		else
 		{
 			Object	wa	= getState().createObject(OAVBDIRuntimeModel.waitabstraction_type);
-			FlyweightFunctionality.addFactAdded(wa, type, getState(), getScope());
+			SFlyweightFunctionality.addFactAdded(wa, type, getState(), getScope());
 			ret.setResult(PlanRules.waitForWaitAbstraction(wa, timeout, getState(), getScope(), getInterpreter().getCurrentPlan()));
 		}
 		
@@ -784,7 +784,7 @@ public class ExternalAccessFlyweight extends EACapabilityFlyweight implements IB
 				public void run() 
 				{
 					Object	wa	= getState().createObject(OAVBDIRuntimeModel.waitabstraction_type);
-					FlyweightFunctionality.addFactRemoved(wa, type, getState(), getScope());
+					SFlyweightFunctionality.addFactRemoved(wa, type, getState(), getScope());
 					getState().addExternalObjectUsage(wa, ExternalAccessFlyweight.this);
 					waitForExternalAccessWaitAbstraction(wa, timeout, ret);
 				}
@@ -793,7 +793,7 @@ public class ExternalAccessFlyweight extends EACapabilityFlyweight implements IB
 		else
 		{
 			Object	wa	= getState().createObject(OAVBDIRuntimeModel.waitabstraction_type);
-			FlyweightFunctionality.addFactRemoved(wa, type, getState(), getScope());
+			SFlyweightFunctionality.addFactRemoved(wa, type, getState(), getScope());
 			ret.setResult(PlanRules.waitForWaitAbstraction(wa, timeout, getState(), getScope(), getInterpreter().getCurrentPlan()));
 		}
 		
@@ -845,7 +845,7 @@ public class ExternalAccessFlyweight extends EACapabilityFlyweight implements IB
 				public void run() 
 				{
 					Object	wa	= getState().createObject(OAVBDIRuntimeModel.waitabstraction_type);
-					FlyweightFunctionality.addGoal(wa, (ElementFlyweight)goal, getState(), getScope());
+					SFlyweightFunctionality.addGoal(wa, (ElementFlyweight)goal, getState(), getScope());
 					getState().addExternalObjectUsage(wa, ExternalAccessFlyweight.this);
 					dispatchTopLevelGoal(goal);
 					waitForExternalAccessWaitAbstraction(wa, timeout, ret);
@@ -855,7 +855,7 @@ public class ExternalAccessFlyweight extends EACapabilityFlyweight implements IB
 		else
 		{
 			Object	wa	= getState().createObject(OAVBDIRuntimeModel.waitabstraction_type);
-			FlyweightFunctionality.addGoal(wa, (ElementFlyweight)goal, getState(), getScope());
+			SFlyweightFunctionality.addGoal(wa, (ElementFlyweight)goal, getState(), getScope());
 			dispatchTopLevelGoal(goal);
 			ret.setResult(PlanRules.waitForWaitAbstraction(wa, timeout, getState(), getScope(), getInterpreter().getCurrentPlan()));
 		}

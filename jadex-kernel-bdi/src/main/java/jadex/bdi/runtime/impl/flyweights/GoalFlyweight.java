@@ -5,7 +5,7 @@ import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.model.impl.flyweights.MGoalbaseFlyweight;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IGoalListener;
-import jadex.bdi.runtime.impl.FlyweightFunctionality;
+import jadex.bdi.runtime.impl.SFlyweightFunctionality;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.GoalLifecycleRules;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
@@ -208,14 +208,14 @@ public class GoalFlyweight extends ProcessableElementFlyweight implements IGoal
 			{
 				public void run()
 				{
-					bool = FlyweightFunctionality.isAdopted(getState(), getHandle());
+					bool = SFlyweightFunctionality.isAdopted(getState(), getHandle());
 				}
 			};
 			return invoc.bool;
 		}
 		else
 		{
-			return FlyweightFunctionality.isAdopted(getState(), getHandle());
+			return SFlyweightFunctionality.isAdopted(getState(), getHandle());
 		}
 	}
 
@@ -254,14 +254,14 @@ public class GoalFlyweight extends ProcessableElementFlyweight implements IGoal
 			{
 				public void run()
 				{
-					bool = FlyweightFunctionality.isFinished(getState(), getHandle());
+					bool = SFlyweightFunctionality.isFinished(getState(), getHandle());
 				}
 			};
 			return invoc.bool;
 		}
 		else
 		{
-			return FlyweightFunctionality.isFinished(getState(), getHandle());
+			return SFlyweightFunctionality.isFinished(getState(), getHandle());
 		}
 	}
 
@@ -278,14 +278,14 @@ public class GoalFlyweight extends ProcessableElementFlyweight implements IGoal
 			{
 				public void run()
 				{
-					bool = FlyweightFunctionality.isSucceeded(getState(), getHandle());				
+					bool = SFlyweightFunctionality.isSucceeded(getState(), getHandle());				
 				}
 			};
 			return invoc.bool;
 		}
 		else
 		{
-			return FlyweightFunctionality.isSucceeded(getState(), getHandle());				
+			return SFlyweightFunctionality.isSucceeded(getState(), getHandle());				
 		}
 	}
 

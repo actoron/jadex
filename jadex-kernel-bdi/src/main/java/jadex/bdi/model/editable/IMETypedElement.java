@@ -13,11 +13,11 @@ public interface IMETypedElement extends IMEReferenceableElement, IMTypedElement
 	 */
 	public void setClazz(Class clazz);
 	
-	/**
-	 *  Set the class name.
-	 *  @param name The class name. 
-	 */
-	public void setClassname(String name);
+//	/**
+//	 *  Set the class name.
+//	 *  @param name The class name. 
+//	 */
+//	public void setClassname(String name);
 	
 	/**
 	 *  Set the update rate.
@@ -29,5 +29,5 @@ public interface IMETypedElement extends IMEReferenceableElement, IMTypedElement
 	 *  Set the evaluation mode.
 	 *  @param mode The evaluation mode.
 	 */
-	public void getEvaluationMode(String mode);
+	public void setEvaluationMode(String mode);
 }

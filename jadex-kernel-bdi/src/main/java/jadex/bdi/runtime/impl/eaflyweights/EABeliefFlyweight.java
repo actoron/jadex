@@ -5,7 +5,7 @@ import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.model.impl.flyweights.MBeliefFlyweight;
 import jadex.bdi.runtime.IBeliefListener;
 import jadex.bdi.runtime.IEABelief;
-import jadex.bdi.runtime.impl.FlyweightFunctionality;
+import jadex.bdi.runtime.impl.SFlyweightFunctionality;
 import jadex.bdi.runtime.impl.flyweights.ElementFlyweight;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.BeliefRules;
@@ -63,14 +63,14 @@ public class EABeliefFlyweight extends ElementFlyweight implements IEABelief
 			{
 				public void run()
 				{
-					FlyweightFunctionality.setFact(getState(), getHandle(), fact);
+					SFlyweightFunctionality.setFact(getState(), getHandle(), fact);
 					ret.setResult(null);
 				}
 			});
 		}
 		else
 		{
-			FlyweightFunctionality.setFact(getState(), getHandle(), fact);
+			SFlyweightFunctionality.setFact(getState(), getHandle(), fact);
 			ret.setResult(null);
 		}
 		

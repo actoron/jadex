@@ -3,7 +3,7 @@ package jadex.bdi.runtime.impl.flyweights;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IWaitAbstraction;
 import jadex.bdi.runtime.IWaitqueue;
-import jadex.bdi.runtime.impl.FlyweightFunctionality;
+import jadex.bdi.runtime.impl.SFlyweightFunctionality;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.commons.Tuple;
@@ -84,7 +84,7 @@ public class WaitqueueFlyweight extends WaitAbstractionFlyweight implements IWai
 			{
 				public void run()
 				{
-					oarray = FlyweightFunctionality.getElements(getState(), getScope(), rplan, false);
+					oarray = SFlyweightFunctionality.getElements(getState(), getScope(), rplan, false);
 
 				}
 			};
@@ -92,7 +92,7 @@ public class WaitqueueFlyweight extends WaitAbstractionFlyweight implements IWai
 		}
 		else
 		{
-			return FlyweightFunctionality.getElements(getState(), getScope(), rplan, false);
+			return SFlyweightFunctionality.getElements(getState(), getScope(), rplan, false);
 		}
 	}
 
@@ -108,14 +108,14 @@ public class WaitqueueFlyweight extends WaitAbstractionFlyweight implements IWai
 			{
 				public void run()
 				{
-					object = FlyweightFunctionality.removeNextElement(getState(), getScope(), rplan, false);
+					object = SFlyweightFunctionality.removeNextElement(getState(), getScope(), rplan, false);
 				}
 			};
 			return invoc.object;
 		}
 		else
 		{
-			return FlyweightFunctionality.removeNextElement(getState(), getScope(), rplan, false);
+			return SFlyweightFunctionality.removeNextElement(getState(), getScope(), rplan, false);
 		}
 	}
 
@@ -160,7 +160,7 @@ public class WaitqueueFlyweight extends WaitAbstractionFlyweight implements IWai
 					}
 					else
 					{
-						FlyweightFunctionality.addGoal(getOrCreateWaitAbstraction(), (ElementFlyweight)goal, getState(), getScope());
+						SFlyweightFunctionality.addGoal(getOrCreateWaitAbstraction(), (ElementFlyweight)goal, getState(), getScope());
 					}
 				}
 			};
@@ -176,7 +176,7 @@ public class WaitqueueFlyweight extends WaitAbstractionFlyweight implements IWai
 			}
 			else
 			{
-				FlyweightFunctionality.addGoal(getOrCreateWaitAbstraction(), (ElementFlyweight)goal, getState(), getScope());
+				SFlyweightFunctionality.addGoal(getOrCreateWaitAbstraction(), (ElementFlyweight)goal, getState(), getScope());
 			}
 			return this;
 		}

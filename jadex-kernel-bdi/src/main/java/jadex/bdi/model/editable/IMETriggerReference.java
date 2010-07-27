@@ -20,5 +20,4 @@ public interface IMETriggerReference	extends IMTriggerReference, IMEElement
 	 *  @return the expression.
 	 */
 	public IMEExpression	createMatchExpression(String expression, String language);	
-
 }

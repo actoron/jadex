@@ -7,7 +7,7 @@ import jadex.bdi.runtime.IExternalCondition;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.IWaitAbstraction;
-import jadex.bdi.runtime.impl.FlyweightFunctionality;
+import jadex.bdi.runtime.impl.SFlyweightFunctionality;
 import jadex.bdi.runtime.impl.flyweights.ElementFlyweight.AgentInvocation;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
@@ -63,7 +63,7 @@ public class WaitAbstractionFlyweight extends ElementFlyweight implements IWaitA
 				public void run()
 				{
 					Object wa = getOrCreateWaitAbstraction();
-					FlyweightFunctionality.addMessageEvent(wa, type, getState(), getScope());
+					SFlyweightFunctionality.addMessageEvent(wa, type, getState(), getScope());
 				}
 			};
 			return this;
@@ -71,7 +71,7 @@ public class WaitAbstractionFlyweight extends ElementFlyweight implements IWaitA
 		else
 		{
 			Object wa = getOrCreateWaitAbstraction();
-			FlyweightFunctionality.addMessageEvent(wa, type, getState(), getScope());		
+			SFlyweightFunctionality.addMessageEvent(wa, type, getState(), getScope());		
 			return this;
 		}
 	}
@@ -89,7 +89,7 @@ public class WaitAbstractionFlyweight extends ElementFlyweight implements IWaitA
 				public void run()
 				{
 					Object wa = getOrCreateWaitAbstraction();
-					FlyweightFunctionality.addReply(wa, (ElementFlyweight)me, getState(), getScope());
+					SFlyweightFunctionality.addReply(wa, (ElementFlyweight)me, getState(), getScope());
 				}
 			};
 			return this;
@@ -97,7 +97,7 @@ public class WaitAbstractionFlyweight extends ElementFlyweight implements IWaitA
 		else
 		{
 			Object wa = getOrCreateWaitAbstraction();
-			FlyweightFunctionality.addReply(wa, (ElementFlyweight)me, getState(), getScope());
+			SFlyweightFunctionality.addReply(wa, (ElementFlyweight)me, getState(), getScope());
 			return this;
 		}
 	}
@@ -115,7 +115,7 @@ public class WaitAbstractionFlyweight extends ElementFlyweight implements IWaitA
 				public void run()
 				{
 					Object wa = getOrCreateWaitAbstraction();
-					FlyweightFunctionality.addInternalEvent(wa, type, getState(), getScope());
+					SFlyweightFunctionality.addInternalEvent(wa, type, getState(), getScope());
 				}
 			};
 			return this;
@@ -123,7 +123,7 @@ public class WaitAbstractionFlyweight extends ElementFlyweight implements IWaitA
 		else
 		{
 			Object wa = getOrCreateWaitAbstraction();
-			FlyweightFunctionality.addInternalEvent(wa, type, getState(), getScope());
+			SFlyweightFunctionality.addInternalEvent(wa, type, getState(), getScope());
 			return this;
 		}
 	}
@@ -141,7 +141,7 @@ public class WaitAbstractionFlyweight extends ElementFlyweight implements IWaitA
 				public void run()
 				{
 					Object wa = getOrCreateWaitAbstraction();
-					FlyweightFunctionality.addGoal(wa, type, getState(), getScope());
+					SFlyweightFunctionality.addGoal(wa, type, getState(), getScope());
 				}
 			};
 			return this;
@@ -149,7 +149,7 @@ public class WaitAbstractionFlyweight extends ElementFlyweight implements IWaitA
 		else
 		{
 			Object wa = getOrCreateWaitAbstraction();
-			FlyweightFunctionality.addGoal(wa, type, getState(), getScope());
+			SFlyweightFunctionality.addGoal(wa, type, getState(), getScope());
 			return this;
 		}
 	}
@@ -167,7 +167,7 @@ public class WaitAbstractionFlyweight extends ElementFlyweight implements IWaitA
 				public void run()
 				{
 					Object wa = getOrCreateWaitAbstraction();
-					FlyweightFunctionality.addGoal(wa, (ElementFlyweight)goal, getState(), getScope());
+					SFlyweightFunctionality.addGoal(wa, (ElementFlyweight)goal, getState(), getScope());
 				}
 			};
 			return this;		
@@ -175,7 +175,7 @@ public class WaitAbstractionFlyweight extends ElementFlyweight implements IWaitA
 		else
 		{
 			Object wa = getOrCreateWaitAbstraction();
-			FlyweightFunctionality.addGoal(wa, (ElementFlyweight)goal, getState(), getScope());
+			SFlyweightFunctionality.addGoal(wa, (ElementFlyweight)goal, getState(), getScope());
 			return this;
 		}
 	}
@@ -192,7 +192,7 @@ public class WaitAbstractionFlyweight extends ElementFlyweight implements IWaitA
 				public void run()
 				{
 					Object wa = getOrCreateWaitAbstraction();
-					FlyweightFunctionality.addFactChanged(wa, type, getState(), getScope());
+					SFlyweightFunctionality.addFactChanged(wa, type, getState(), getScope());
 				}
 			};
 			return this;
@@ -200,7 +200,7 @@ public class WaitAbstractionFlyweight extends ElementFlyweight implements IWaitA
 		else
 		{
 			Object wa = getOrCreateWaitAbstraction();
-			FlyweightFunctionality.addFactChanged(wa, type, getState(), getScope());
+			SFlyweightFunctionality.addFactChanged(wa, type, getState(), getScope());
 			return this;
 		}
 	}
@@ -217,7 +217,7 @@ public class WaitAbstractionFlyweight extends ElementFlyweight implements IWaitA
 				public void run()
 				{
 					Object wa = getOrCreateWaitAbstraction();
-					FlyweightFunctionality.addFactAdded(wa, type, getState(), getScope());
+					SFlyweightFunctionality.addFactAdded(wa, type, getState(), getScope());
 				}
 			};
 			return this;
@@ -225,7 +225,7 @@ public class WaitAbstractionFlyweight extends ElementFlyweight implements IWaitA
 		else
 		{
 			Object wa = getOrCreateWaitAbstraction();
-			FlyweightFunctionality.addFactAdded(wa, type, getState(), getScope());
+			SFlyweightFunctionality.addFactAdded(wa, type, getState(), getScope());
 			return this;
 		}
 	}
@@ -243,7 +243,7 @@ public class WaitAbstractionFlyweight extends ElementFlyweight implements IWaitA
 				public void run()
 				{
 					Object wa = getOrCreateWaitAbstraction();
-					FlyweightFunctionality.addFactRemoved(wa, type, getState(), getScope());
+					SFlyweightFunctionality.addFactRemoved(wa, type, getState(), getScope());
 				}
 			};
 			return this;
@@ -251,7 +251,7 @@ public class WaitAbstractionFlyweight extends ElementFlyweight implements IWaitA
 		else
 		{
 			Object wa = getOrCreateWaitAbstraction();
-			FlyweightFunctionality.addFactRemoved(wa, type, getState(), getScope());
+			SFlyweightFunctionality.addFactRemoved(wa, type, getState(), getScope());
 			return this;
 		}
 	}
@@ -269,7 +269,7 @@ public class WaitAbstractionFlyweight extends ElementFlyweight implements IWaitA
 				public void run()
 				{
 					Object wa = getOrCreateWaitAbstraction();
-					FlyweightFunctionality.addCondition(wa, condition, getState(), getScope());
+					SFlyweightFunctionality.addCondition(wa, condition, getState(), getScope());
 				}
 			};
 			return this;
@@ -277,7 +277,7 @@ public class WaitAbstractionFlyweight extends ElementFlyweight implements IWaitA
 		else
 		{
 			Object wa = getOrCreateWaitAbstraction();
-			FlyweightFunctionality.addCondition(wa, condition, getState(), getScope());
+			SFlyweightFunctionality.addCondition(wa, condition, getState(), getScope());
 			return this;
 		}
 	}
@@ -296,7 +296,7 @@ public class WaitAbstractionFlyweight extends ElementFlyweight implements IWaitA
 				public void run()
 				{
 					Object wa = getOrCreateWaitAbstraction();
-					FlyweightFunctionality.addExternalCondition(wa, condition, getState(), getScope());
+					SFlyweightFunctionality.addExternalCondition(wa, condition, getState(), getScope());
 				}
 			};
 			return this;		
@@ -304,7 +304,7 @@ public class WaitAbstractionFlyweight extends ElementFlyweight implements IWaitA
 		else
 		{
 			Object wa = getOrCreateWaitAbstraction();
-			FlyweightFunctionality.addExternalCondition(wa, condition, getState(), getScope());
+			SFlyweightFunctionality.addExternalCondition(wa, condition, getState(), getScope());
 			return this;
 		}
 	}
@@ -323,13 +323,13 @@ public class WaitAbstractionFlyweight extends ElementFlyweight implements IWaitA
 			{
 				public void run()
 				{
-					FlyweightFunctionality.removeMessageEvent(getState(), getScope(), type, getWaitAbstraction());
+					SFlyweightFunctionality.removeMessageEvent(getState(), getScope(), type, getWaitAbstraction());
 				}
 			};
 		}
 		else
 		{
-			FlyweightFunctionality.removeMessageEvent(getState(), getScope(), type, getWaitAbstraction());
+			SFlyweightFunctionality.removeMessageEvent(getState(), getScope(), type, getWaitAbstraction());
 		}
 	}
 
@@ -345,13 +345,13 @@ public class WaitAbstractionFlyweight extends ElementFlyweight implements IWaitA
 			{
 				public void run()
 				{
-					FlyweightFunctionality.removeReply(getState(), getScope(), (ElementFlyweight)me, getWaitAbstraction());
+					SFlyweightFunctionality.removeReply(getState(), getScope(), (ElementFlyweight)me, getWaitAbstraction());
 				}
 			};
 		}
 		else
 		{
-			FlyweightFunctionality.removeReply(getState(), getScope(), (ElementFlyweight)me, getWaitAbstraction());
+			SFlyweightFunctionality.removeReply(getState(), getScope(), (ElementFlyweight)me, getWaitAbstraction());
 		}
 	}
 
@@ -368,14 +368,14 @@ public class WaitAbstractionFlyweight extends ElementFlyweight implements IWaitA
 				public void run()
 				{
 					Object wa = getWaitAbstraction();
-					FlyweightFunctionality.removeInternalEvent(getState(), getScope(), type, wa);
+					SFlyweightFunctionality.removeInternalEvent(getState(), getScope(), type, wa);
 				}
 			};
 		}
 		else
 		{
 			Object wa = getWaitAbstraction();
-			FlyweightFunctionality.removeInternalEvent(getState(), getScope(), type, wa);
+			SFlyweightFunctionality.removeInternalEvent(getState(), getScope(), type, wa);
 		}
 	}
 
@@ -392,14 +392,14 @@ public class WaitAbstractionFlyweight extends ElementFlyweight implements IWaitA
 				public void run()
 				{
 					Object wa = getWaitAbstraction();
-					FlyweightFunctionality.removeGoal(getState(), getScope(), type, wa);
+					SFlyweightFunctionality.removeGoal(getState(), getScope(), type, wa);
 				}
 			};
 		}
 		else
 		{
 			Object wa = getWaitAbstraction();
-			FlyweightFunctionality.removeGoal(getState(), getScope(), type, wa);
+			SFlyweightFunctionality.removeGoal(getState(), getScope(), type, wa);
 		}
 	}
 
@@ -416,14 +416,14 @@ public class WaitAbstractionFlyweight extends ElementFlyweight implements IWaitA
 				public void run()
 				{
 					Object wa = getWaitAbstraction();
-					FlyweightFunctionality.removeGoal(getState(), (ElementFlyweight)goal, wa);
+					SFlyweightFunctionality.removeGoal(getState(), (ElementFlyweight)goal, wa);
 				}
 			};
 		}
 		else
 		{
 			Object wa = getWaitAbstraction();
-			FlyweightFunctionality.removeGoal(getState(), (ElementFlyweight)goal, wa);
+			SFlyweightFunctionality.removeGoal(getState(), (ElementFlyweight)goal, wa);
 		}
 	}
 	
@@ -440,14 +440,14 @@ public class WaitAbstractionFlyweight extends ElementFlyweight implements IWaitA
 				public void run()
 				{
 					Object wa = getWaitAbstraction();
-					FlyweightFunctionality.removeFactChanged(getState(), getScope(), belief, wa);
+					SFlyweightFunctionality.removeFactChanged(getState(), getScope(), belief, wa);
 				}
 			};
 		}
 		else
 		{
 			Object wa = getWaitAbstraction();
-			FlyweightFunctionality.removeFactChanged(getState(), getScope(), belief, wa);
+			SFlyweightFunctionality.removeFactChanged(getState(), getScope(), belief, wa);
 		}
 	}
 	
@@ -464,14 +464,14 @@ public class WaitAbstractionFlyweight extends ElementFlyweight implements IWaitA
 				public void run()
 				{
 					Object wa = getWaitAbstraction();
-					FlyweightFunctionality.removeFactAdded(getState(), getScope(), beliefset, wa);
+					SFlyweightFunctionality.removeFactAdded(getState(), getScope(), beliefset, wa);
 				}
 			};
 		}
 		else
 		{
 			Object wa = getWaitAbstraction();
-			FlyweightFunctionality.removeFactAdded(getState(), getScope(), beliefset, wa);
+			SFlyweightFunctionality.removeFactAdded(getState(), getScope(), beliefset, wa);
 		}
 	}
 
@@ -489,14 +489,14 @@ public class WaitAbstractionFlyweight extends ElementFlyweight implements IWaitA
 				public void run()
 				{
 					Object wa = getWaitAbstraction();
-					FlyweightFunctionality.removeFactRemoved(getState(), getScope(), beliefset, wa);
+					SFlyweightFunctionality.removeFactRemoved(getState(), getScope(), beliefset, wa);
 				}
 			};
 		}
 		else
 		{
 			Object wa = getWaitAbstraction();
-			FlyweightFunctionality.removeFactRemoved(getState(), getScope(), beliefset, wa);
+			SFlyweightFunctionality.removeFactRemoved(getState(), getScope(), beliefset, wa);
 		}
 	}
 	
@@ -513,14 +513,14 @@ public class WaitAbstractionFlyweight extends ElementFlyweight implements IWaitA
 				public void run()
 				{
 					Object wa = getWaitAbstraction();
-					FlyweightFunctionality.removeCondition(getState(), getScope(), type, wa);
+					SFlyweightFunctionality.removeCondition(getState(), getScope(), type, wa);
 				}
 			};
 		}
 		else
 		{
 			Object wa = getWaitAbstraction();
-			FlyweightFunctionality.removeCondition(getState(), getScope(), type, wa);
+			SFlyweightFunctionality.removeCondition(getState(), getScope(), type, wa);
 		}
 	}
 	
@@ -537,14 +537,14 @@ public class WaitAbstractionFlyweight extends ElementFlyweight implements IWaitA
 				public void run()
 				{
 					Object wa = getWaitAbstraction();
-					FlyweightFunctionality.removeExternalCondition(getState(), condition, wa);
+					SFlyweightFunctionality.removeExternalCondition(getState(), condition, wa);
 				}
 			};
 		}
 		else
 		{
 			Object wa = getWaitAbstraction();
-			FlyweightFunctionality.removeExternalCondition(getState(), condition, wa);
+			SFlyweightFunctionality.removeExternalCondition(getState(), condition, wa);
 		}
 	}
 

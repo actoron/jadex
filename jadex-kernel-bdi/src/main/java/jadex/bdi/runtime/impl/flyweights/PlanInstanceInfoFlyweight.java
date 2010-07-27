@@ -5,7 +5,7 @@ import jadex.bdi.runtime.ICandidateInfo;
 import jadex.bdi.runtime.IElement;
 import jadex.bdi.runtime.IParameterElement;
 import jadex.bdi.runtime.IPlan;
-import jadex.bdi.runtime.impl.FlyweightFunctionality;
+import jadex.bdi.runtime.impl.SFlyweightFunctionality;
 import jadex.rules.state.IOAVState;
 
 /**
@@ -67,14 +67,14 @@ public class PlanInstanceInfoFlyweight extends ElementFlyweight implements ICand
 			{
 				public void run()
 				{
-					object = FlyweightFunctionality.getFlyweight(getState(), getScope(), rpe, false);
+					object = SFlyweightFunctionality.getFlyweight(getState(), getScope(), rpe, false);
 				}
 			};
 			return (IParameterElement)invoc.object;
 		}
 		else
 		{
-			return FlyweightFunctionality.getFlyweight(getState(), getScope(), rpe, false);
+			return SFlyweightFunctionality.getFlyweight(getState(), getScope(), rpe, false);
 		}
 	}
 	

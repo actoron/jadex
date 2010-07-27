@@ -8,7 +8,7 @@ import jadex.bdi.runtime.IEAInternalEvent;
 import jadex.bdi.runtime.IEAMessageEvent;
 import jadex.bdi.runtime.IInternalEventListener;
 import jadex.bdi.runtime.IMessageEventListener;
-import jadex.bdi.runtime.impl.FlyweightFunctionality;
+import jadex.bdi.runtime.impl.SFlyweightFunctionality;
 import jadex.bdi.runtime.impl.flyweights.ElementFlyweight;
 import jadex.bdi.runtime.interpreter.AgentRules;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
@@ -138,13 +138,13 @@ public class EAEventbaseFlyweight extends ElementFlyweight implements IEAEventba
 			{
 				public void run()
 				{
-					ret.setResult(FlyweightFunctionality.createMessageEvent(getState(), getScope(), type, true));
+					ret.setResult(SFlyweightFunctionality.createMessageEvent(getState(), getScope(), type, true));
 				}
 			});
 		}
 		else
 		{
-			ret.setResult(FlyweightFunctionality.createMessageEvent(getState(), getScope(), type, true));
+			ret.setResult(SFlyweightFunctionality.createMessageEvent(getState(), getScope(), type, true));
 		}
 		
 		return ret;
@@ -166,7 +166,7 @@ public class EAEventbaseFlyweight extends ElementFlyweight implements IEAEventba
 			{
 				public void run()
 				{
-					IEAMessageEvent	reply	= (IEAMessageEvent)FlyweightFunctionality.createMessageEvent(getState(), getScope(), msgeventtype, true);
+					IEAMessageEvent	reply	= (IEAMessageEvent)SFlyweightFunctionality.createMessageEvent(getState(), getScope(), msgeventtype, true);
 					MessageEventRules.initializeReply(getState(), getScope(), ((ElementFlyweight)event).getHandle(), ((ElementFlyweight)reply).getHandle());
 					ret.setResult(reply);
 				}
@@ -174,7 +174,7 @@ public class EAEventbaseFlyweight extends ElementFlyweight implements IEAEventba
 		}
 		else
 		{
-			IEAMessageEvent	reply	= (IEAMessageEvent)FlyweightFunctionality.createMessageEvent(getState(), getScope(), msgeventtype, true);
+			IEAMessageEvent	reply	= (IEAMessageEvent)SFlyweightFunctionality.createMessageEvent(getState(), getScope(), msgeventtype, true);
 			MessageEventRules.initializeReply(getState(), getScope(), ((ElementFlyweight)event).getHandle(), ((ElementFlyweight)reply).getHandle());
 			ret.setResult(reply);
 		}
@@ -274,7 +274,7 @@ public class EAEventbaseFlyweight extends ElementFlyweight implements IEAEventba
 			{
 				public void run()
 				{			
-					Object mevent = FlyweightFunctionality.checkElementType(getState(), getScope(), type, OAVBDIMetaModel.capability_has_internalevents);
+					Object mevent = SFlyweightFunctionality.checkElementType(getState(), getScope(), type, OAVBDIMetaModel.capability_has_internalevents);
 					addEventListener(listener, mevent);
 					ret.setResult(null);
 				}
@@ -282,7 +282,7 @@ public class EAEventbaseFlyweight extends ElementFlyweight implements IEAEventba
 		}
 		else
 		{
-			Object mevent = FlyweightFunctionality.checkElementType(getState(), getScope(), type, OAVBDIMetaModel.capability_has_internalevents);
+			Object mevent = SFlyweightFunctionality.checkElementType(getState(), getScope(), type, OAVBDIMetaModel.capability_has_internalevents);
 			addEventListener(listener, mevent);
 			ret.setResult(null);
 		}
@@ -305,7 +305,7 @@ public class EAEventbaseFlyweight extends ElementFlyweight implements IEAEventba
 			{
 				public void run()
 				{
-					Object mevent = FlyweightFunctionality.checkElementType(getState(), getScope(), type, OAVBDIMetaModel.capability_has_internalevents);
+					Object mevent = SFlyweightFunctionality.checkElementType(getState(), getScope(), type, OAVBDIMetaModel.capability_has_internalevents);
 					removeEventListener(listener, mevent, false);
 					ret.setResult(null);
 				}
@@ -313,7 +313,7 @@ public class EAEventbaseFlyweight extends ElementFlyweight implements IEAEventba
 		}
 		else
 		{
-			Object mevent = FlyweightFunctionality.checkElementType(getState(), getScope(), type, OAVBDIMetaModel.capability_has_internalevents);
+			Object mevent = SFlyweightFunctionality.checkElementType(getState(), getScope(), type, OAVBDIMetaModel.capability_has_internalevents);
 			removeEventListener(listener, mevent, false);
 			ret.setResult(null);
 		}
@@ -336,7 +336,7 @@ public class EAEventbaseFlyweight extends ElementFlyweight implements IEAEventba
 			{
 				public void run()
 				{
-					Object mevent = FlyweightFunctionality.checkElementType(getState(), getScope(), type, OAVBDIMetaModel.capability_has_messageevents);
+					Object mevent = SFlyweightFunctionality.checkElementType(getState(), getScope(), type, OAVBDIMetaModel.capability_has_messageevents);
 					addEventListener(listener, mevent);
 					ret.setResult(null);
 				}
@@ -344,7 +344,7 @@ public class EAEventbaseFlyweight extends ElementFlyweight implements IEAEventba
 		}
 		else
 		{
-			Object mevent = FlyweightFunctionality.checkElementType(getState(), getScope(), type, OAVBDIMetaModel.capability_has_messageevents);
+			Object mevent = SFlyweightFunctionality.checkElementType(getState(), getScope(), type, OAVBDIMetaModel.capability_has_messageevents);
 			addEventListener(listener, mevent);
 			ret.setResult(null);
 		}
@@ -367,7 +367,7 @@ public class EAEventbaseFlyweight extends ElementFlyweight implements IEAEventba
 			{
 				public void run()
 				{
-					Object mevent = FlyweightFunctionality.checkElementType(getState(), getScope(), type, OAVBDIMetaModel.capability_has_messageevents);
+					Object mevent = SFlyweightFunctionality.checkElementType(getState(), getScope(), type, OAVBDIMetaModel.capability_has_messageevents);
 					removeEventListener(listener, mevent, false);
 					ret.setResult(null);
 				}
@@ -375,7 +375,7 @@ public class EAEventbaseFlyweight extends ElementFlyweight implements IEAEventba
 		}
 		else
 		{
-			Object mevent = FlyweightFunctionality.checkElementType(getState(), getScope(), type, OAVBDIMetaModel.capability_has_messageevents);
+			Object mevent = SFlyweightFunctionality.checkElementType(getState(), getScope(), type, OAVBDIMetaModel.capability_has_messageevents);
 			removeEventListener(listener, mevent, false);
 			ret.setResult(null);
 		}

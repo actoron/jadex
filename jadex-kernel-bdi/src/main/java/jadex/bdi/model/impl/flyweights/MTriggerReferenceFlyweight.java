@@ -3,12 +3,15 @@ package jadex.bdi.model.impl.flyweights;
 import jadex.bdi.model.IMExpression;
 import jadex.bdi.model.IMTriggerReference;
 import jadex.bdi.model.OAVBDIMetaModel;
+import jadex.bdi.model.editable.IMEExpression;
+import jadex.bdi.model.editable.IMETriggerReference;
+import jadex.bdi.model.impl.flyweights.MElementFlyweight.AgentInvocation;
 import jadex.rules.state.IOAVState;
 
 /**
  * 
  */
-public class MTriggerReferenceFlyweight extends MElementFlyweight implements IMTriggerReference
+public class MTriggerReferenceFlyweight extends MElementFlyweight implements IMTriggerReference, IMETriggerReference
 {
 	//-------- constructors --------
 	
@@ -71,4 +74,34 @@ public class MTriggerReferenceFlyweight extends MElementFlyweight implements IMT
 			return ret;
 		}
 	}
+
+	/**
+	 *  Set the reference.
+	 *  @param reference	The name of the referenced element.
+	 */
+	public void	setReference(final String reference)
+	{
+		if(isExternalThread())
+		{
+			new AgentInvocation()
+			{
+				public void run()
+				{
+					getState().setAttributeValue(getHandle(), OAVBDIMetaModel.triggerreference_has_ref, reference);
+				}
+			};
+		}
+		else
+		{
+			getState().setAttributeValue(getHandle(), OAVBDIMetaModel.triggerreference_has_ref, reference);
+		}
+	}
+	
+	/**
+	 *  Create a match expression.
+	 *  @param expression	The match expression.
+	 *  @param language	The expression language (or null for default java-like language).
+	 *  @return the expression.
+	 */
+	public IMEExpression	createMatchExpression(String expression, String language);	
 }

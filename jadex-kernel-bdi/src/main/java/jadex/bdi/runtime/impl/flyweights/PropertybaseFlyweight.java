@@ -4,7 +4,7 @@ import jadex.bdi.model.IMElement;
 import jadex.bdi.model.impl.flyweights.MBeliefFlyweight;
 import jadex.bdi.model.impl.flyweights.MPropertybaseFlyweight;
 import jadex.bdi.runtime.IPropertybase;
-import jadex.bdi.runtime.impl.FlyweightFunctionality;
+import jadex.bdi.runtime.impl.SFlyweightFunctionality;
 import jadex.bdi.runtime.impl.flyweights.ElementFlyweight.AgentInvocation;
 import jadex.bdi.runtime.interpreter.AgentRules;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
@@ -83,14 +83,14 @@ public class PropertybaseFlyweight extends ElementFlyweight implements IProperty
 			{
 				public void run()
 				{
-					sarray = FlyweightFunctionality.getPropertyNames(getState(), getHandle());
+					sarray = SFlyweightFunctionality.getPropertyNames(getState(), getHandle());
 				}
 			};
 			return invoc.sarray;
 		}
 		else
 		{
-			return FlyweightFunctionality.getPropertyNames(getState(), getHandle());
+			return SFlyweightFunctionality.getPropertyNames(getState(), getHandle());
 		}
 	}
 	

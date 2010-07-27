@@ -3,7 +3,7 @@ package jadex.bdi.runtime.impl.flyweights;
 import jadex.bdi.runtime.IParameter;
 import jadex.bdi.runtime.IParameterElement;
 import jadex.bdi.runtime.IParameterSet;
-import jadex.bdi.runtime.impl.FlyweightFunctionality;
+import jadex.bdi.runtime.impl.SFlyweightFunctionality;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.rules.state.IOAVState;
 
@@ -28,7 +28,7 @@ public abstract class ParameterElementFlyweight extends ElementFlyweight impleme
 	protected ParameterElementFlyweight(IOAVState state, Object scope, Object handle)
 	{
 		super(state, scope, handle);
-		this.type = FlyweightFunctionality.getTypeName(state, handle);
+		this.type = SFlyweightFunctionality.getTypeName(state, handle);
 	}
 	
 	//-------- methods ---------
@@ -45,14 +45,14 @@ public abstract class ParameterElementFlyweight extends ElementFlyweight impleme
 			{
 				public void run()
 				{
-					oarray = FlyweightFunctionality.getParameters(getState(), getScope(), getHandle(), false);
+					oarray = SFlyweightFunctionality.getParameters(getState(), getScope(), getHandle(), false);
 				}
 			};
 			return (IParameter[])invoc.oarray;
 		}
 		else
 		{
-			return (IParameter[])FlyweightFunctionality.getParameters(getState(), getScope(), getHandle(), false);
+			return (IParameter[])SFlyweightFunctionality.getParameters(getState(), getScope(), getHandle(), false);
 		}
 	}
 
@@ -68,14 +68,14 @@ public abstract class ParameterElementFlyweight extends ElementFlyweight impleme
 			{
 				public void run()
 				{
-					oarray = (IParameterSet[])FlyweightFunctionality.getParameterSets(getState(), getScope(), getHandle(), false);
+					oarray = (IParameterSet[])SFlyweightFunctionality.getParameterSets(getState(), getScope(), getHandle(), false);
 				}
 			};
 			return (IParameterSet[])invoc.oarray;
 		}
 		else
 		{
-			return (IParameterSet[])FlyweightFunctionality.getParameterSets(getState(), getScope(), getHandle(), false);
+			return (IParameterSet[])SFlyweightFunctionality.getParameterSets(getState(), getScope(), getHandle(), false);
 		}
 	}
 

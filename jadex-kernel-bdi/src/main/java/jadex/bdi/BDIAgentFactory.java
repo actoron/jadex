@@ -292,7 +292,6 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory
 		MCapabilityFlyweight	fw	= (MCapabilityFlyweight)model;
 		IOAVState	state	= fw.getState();
 		Object	handle	= fw.getHandle();
-		;
 		Object[]	types	= (Object[])mtypes.get(handle);
 		if(types!=null)
 		{
@@ -308,7 +307,19 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory
 		{
 			ret	=  new OAVCapabilityModel(state, handle, (Set)(types!=null ? types[0] : null), filename, System.currentTimeMillis(), report);
 		}
-		loader.createAgentModelEntry(ret, report);
-
+		
+		try
+		{
+			loader.createAgentModelEntry(ret, report);
+		}
+		catch(Exception e)
+		{
+			if(e instanceof RuntimeException)
+				throw (RuntimeException)e;
+			else
+				throw new RuntimeException(e);
+		}
+		
+		return ret;
 	}
 }

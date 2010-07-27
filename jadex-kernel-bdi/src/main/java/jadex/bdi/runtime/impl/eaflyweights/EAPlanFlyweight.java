@@ -4,7 +4,7 @@ import jadex.bdi.model.IMElement;
 import jadex.bdi.model.impl.flyweights.MPlanFlyweight;
 import jadex.bdi.runtime.IEAPlan;
 import jadex.bdi.runtime.IPlanListener;
-import jadex.bdi.runtime.impl.FlyweightFunctionality;
+import jadex.bdi.runtime.impl.SFlyweightFunctionality;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bdi.runtime.interpreter.PlanRules;
@@ -111,13 +111,13 @@ public class EAPlanFlyweight extends EAParameterElementFlyweight implements IEAP
 			{
 				public void run()
 				{
-					ret.setResult(FlyweightFunctionality.getReason(getState(), getScope(), getHandle(), true));
+					ret.setResult(SFlyweightFunctionality.getReason(getState(), getScope(), getHandle(), true));
 				}
 			});
 		}
 		else
 		{
-			ret.setResult(FlyweightFunctionality.getReason(getState(), getScope(), getHandle(), true));
+			ret.setResult(SFlyweightFunctionality.getReason(getState(), getScope(), getHandle(), true));
 		}
 		
 		return ret;

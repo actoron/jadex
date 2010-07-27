@@ -2,7 +2,7 @@ package jadex.bdi.runtime.impl.flyweights;
 
 import jadex.bdi.model.IMElement;
 import jadex.bdi.runtime.IChangeEvent;
-import jadex.bdi.runtime.impl.FlyweightFunctionality;
+import jadex.bdi.runtime.impl.SFlyweightFunctionality;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.rules.state.IOAVState;
 
@@ -37,14 +37,14 @@ public class ChangeEventFlyweight extends ElementFlyweight implements IChangeEve
 			{
 				public void run()
 				{
-					object = FlyweightFunctionality.getElement(getState(), getHandle(), getScope(), false);
+					object = SFlyweightFunctionality.getElement(getState(), getHandle(), getScope(), false);
 				}
 			};
 			return (ElementFlyweight)invoc.object;
 		}
 		else
 		{
-			return FlyweightFunctionality.getElement(getState(), getHandle(), getScope(), false);
+			return SFlyweightFunctionality.getElement(getState(), getHandle(), getScope(), false);
 		}
 	}
 	

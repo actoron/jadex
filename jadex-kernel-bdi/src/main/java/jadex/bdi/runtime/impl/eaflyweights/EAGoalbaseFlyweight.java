@@ -6,7 +6,7 @@ import jadex.bdi.model.impl.flyweights.MGoalbaseFlyweight;
 import jadex.bdi.runtime.IEAGoal;
 import jadex.bdi.runtime.IEAGoalbase;
 import jadex.bdi.runtime.IGoalListener;
-import jadex.bdi.runtime.impl.FlyweightFunctionality;
+import jadex.bdi.runtime.impl.SFlyweightFunctionality;
 import jadex.bdi.runtime.impl.flyweights.ElementFlyweight;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.GoalLifecycleRules;
@@ -109,13 +109,13 @@ public class EAGoalbaseFlyweight extends ElementFlyweight implements IEAGoalbase
 			{
 				public void run()
 				{
-					ret.setResult(FlyweightFunctionality.getGoals(getState(), getScope(), true, type));
+					ret.setResult(SFlyweightFunctionality.getGoals(getState(), getScope(), true, type));
 				}
 			});
 		}
 		else
 		{
-			ret.setResult(FlyweightFunctionality.getGoals(getState(), getScope(), true, type));
+			ret.setResult(SFlyweightFunctionality.getGoals(getState(), getScope(), true, type));
 		}
 		
 		return ret;
@@ -135,13 +135,13 @@ public class EAGoalbaseFlyweight extends ElementFlyweight implements IEAGoalbase
 			{
 				public void run()
 				{
-					ret.setResult(FlyweightFunctionality.getGoals(getState(), getScope(), true));
+					ret.setResult(SFlyweightFunctionality.getGoals(getState(), getScope(), true));
 				}
 			});
 		}
 		else
 		{
-			ret.setResult(FlyweightFunctionality.getGoals(getState(), getScope(), true));
+			ret.setResult(SFlyweightFunctionality.getGoals(getState(), getScope(), true));
 		}
 		
 		return ret;
@@ -164,13 +164,13 @@ public class EAGoalbaseFlyweight extends ElementFlyweight implements IEAGoalbase
 			{
 				public void run()
 				{
-					ret.setResult(FlyweightFunctionality.createGoal(getState(), getScope(), true, type));
+					ret.setResult(SFlyweightFunctionality.createGoal(getState(), getScope(), true, type));
 				}
 			});
 		}
 		else
 		{
-			ret.setResult(FlyweightFunctionality.createGoal(getState(), getScope(), true, type));
+			ret.setResult(SFlyweightFunctionality.createGoal(getState(), getScope(), true, type));
 		}
 		
 		return ret;
@@ -259,7 +259,7 @@ public class EAGoalbaseFlyweight extends ElementFlyweight implements IEAGoalbase
 			{
 				public void run()
 				{
-					Object mgoal = FlyweightFunctionality.checkElementType(getState(), getScope(), type, OAVBDIMetaModel.capability_has_goals);
+					Object mgoal = SFlyweightFunctionality.checkElementType(getState(), getScope(), type, OAVBDIMetaModel.capability_has_goals);
 					addEventListener(listener, mgoal);
 					ret.setResult(null);
 				}
@@ -267,7 +267,7 @@ public class EAGoalbaseFlyweight extends ElementFlyweight implements IEAGoalbase
 		}
 		else
 		{
-			Object mgoal = FlyweightFunctionality.checkElementType(getState(), getScope(), type, OAVBDIMetaModel.capability_has_goals);
+			Object mgoal = SFlyweightFunctionality.checkElementType(getState(), getScope(), type, OAVBDIMetaModel.capability_has_goals);
 			addEventListener(listener, mgoal);
 			ret.setResult(null);
 		}
@@ -291,7 +291,7 @@ public class EAGoalbaseFlyweight extends ElementFlyweight implements IEAGoalbase
 			{
 				public void run()
 				{
-					Object mgoal = FlyweightFunctionality.checkElementType(getState(), getScope(), type, OAVBDIMetaModel.capability_has_goals);
+					Object mgoal = SFlyweightFunctionality.checkElementType(getState(), getScope(), type, OAVBDIMetaModel.capability_has_goals);
 					removeEventListener(listener, mgoal, false);
 					ret.setResult(null);
 				}
@@ -299,7 +299,7 @@ public class EAGoalbaseFlyweight extends ElementFlyweight implements IEAGoalbase
 		}
 		else
 		{
-			Object mgoal = FlyweightFunctionality.checkElementType(getState(), getScope(), type, OAVBDIMetaModel.capability_has_goals);
+			Object mgoal = SFlyweightFunctionality.checkElementType(getState(), getScope(), type, OAVBDIMetaModel.capability_has_goals);
 			removeEventListener(listener, mgoal, false);
 			ret.setResult(null);
 		}

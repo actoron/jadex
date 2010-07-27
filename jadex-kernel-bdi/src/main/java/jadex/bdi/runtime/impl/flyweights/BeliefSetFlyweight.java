@@ -4,7 +4,7 @@ import jadex.bdi.model.IMElement;
 import jadex.bdi.model.impl.flyweights.MBeliefSetFlyweight;
 import jadex.bdi.runtime.IBeliefSet;
 import jadex.bdi.runtime.IBeliefSetListener;
-import jadex.bdi.runtime.impl.FlyweightFunctionality;
+import jadex.bdi.runtime.impl.SFlyweightFunctionality;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.BeliefRules;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
@@ -83,14 +83,14 @@ public class BeliefSetFlyweight extends ElementFlyweight implements IBeliefSet
 			{
 				public void run()
 				{
-					FlyweightFunctionality.removeFact(getState(), getHandle(), fact);
+					SFlyweightFunctionality.removeFact(getState(), getHandle(), fact);
 				}
 			};
 		}
 		else
 		{
 			getInterpreter().startMonitorConsequences();
-			FlyweightFunctionality.removeFact(getState(), getHandle(), fact);
+			SFlyweightFunctionality.removeFact(getState(), getHandle(), fact);
 			getInterpreter().endMonitorConsequences();
 		}
 	}
@@ -107,14 +107,14 @@ public class BeliefSetFlyweight extends ElementFlyweight implements IBeliefSet
 			{
 				public void run()
 				{
-					FlyweightFunctionality.addFacts(getState(), getHandle(), facts);
+					SFlyweightFunctionality.addFacts(getState(), getHandle(), facts);
 				}
 			};
 		}
 		else
 		{
 			getInterpreter().startMonitorConsequences();
-			FlyweightFunctionality.addFacts(getState(), getHandle(), facts);
+			SFlyweightFunctionality.addFacts(getState(), getHandle(), facts);
 			getInterpreter().endMonitorConsequences();
 		}
 	}
@@ -130,13 +130,13 @@ public class BeliefSetFlyweight extends ElementFlyweight implements IBeliefSet
 			{
 				public void run()
 				{
-					FlyweightFunctionality.removeFacts(getState(), getHandle());
+					SFlyweightFunctionality.removeFacts(getState(), getHandle());
 				}
 			};
 		}
 		else
 		{
-			FlyweightFunctionality.removeFacts(getState(), getHandle());
+			SFlyweightFunctionality.removeFacts(getState(), getHandle());
 		}
 	}
 
@@ -152,14 +152,14 @@ public class BeliefSetFlyweight extends ElementFlyweight implements IBeliefSet
 			{
 				public void run()
 				{
-					object = FlyweightFunctionality.getFact(getState(), getHandle(), getScope(), oldval);
+					object = SFlyweightFunctionality.getFact(getState(), getHandle(), getScope(), oldval);
 				}
 			};
 			return invoc.object;
 		}
 		else
 		{
-			return FlyweightFunctionality.getFact(getState(), getHandle(), getScope(), oldval);
+			return SFlyweightFunctionality.getFact(getState(), getHandle(), getScope(), oldval);
 		}
 	}
 
@@ -176,14 +176,14 @@ public class BeliefSetFlyweight extends ElementFlyweight implements IBeliefSet
 			{
 				public void run()
 				{
-					bool = FlyweightFunctionality.containsFact(getState(), getHandle(), fact);
+					bool = SFlyweightFunctionality.containsFact(getState(), getHandle(), fact);
 				}
 			};
 			return invoc.bool;
 		}
 		else
 		{
-			return FlyweightFunctionality.containsFact(getState(), getHandle(), fact);
+			return SFlyweightFunctionality.containsFact(getState(), getHandle(), fact);
 		}
 	}
 
@@ -199,14 +199,14 @@ public class BeliefSetFlyweight extends ElementFlyweight implements IBeliefSet
 			{
 				public void run()
 				{
-					oarray = FlyweightFunctionality.getFacts(getState(), getHandle());
+					oarray = SFlyweightFunctionality.getFacts(getState(), getHandle());
 				}
 			};
 			return invoc.oarray;
 		}
 		else
 		{
-			return FlyweightFunctionality.getFacts(getState(), getHandle());
+			return SFlyweightFunctionality.getFacts(getState(), getHandle());
 		}
 	}
 
@@ -223,14 +223,14 @@ public class BeliefSetFlyweight extends ElementFlyweight implements IBeliefSet
 			{
 				public void run()
 				{
-					FlyweightFunctionality.updateFact(getState(), getHandle(), newfact);
+					SFlyweightFunctionality.updateFact(getState(), getHandle(), newfact);
 				}
 			};
 		}
 		else
 		{
 			getInterpreter().startMonitorConsequences();
-			FlyweightFunctionality.updateFact(getState(), getHandle(), newfact);
+			SFlyweightFunctionality.updateFact(getState(), getHandle(), newfact);
 			getInterpreter().endMonitorConsequences();
 		}
 	}
@@ -313,14 +313,14 @@ public class BeliefSetFlyweight extends ElementFlyweight implements IBeliefSet
 			{
 				public void run()
 				{
-					clazz = FlyweightFunctionality.getClazz(getState(), getHandle());
+					clazz = SFlyweightFunctionality.getClazz(getState(), getHandle());
 				}
 			};
 			return invoc.clazz;
 		}
 		else
 		{
-			return FlyweightFunctionality.getClazz(getState(), getHandle());
+			return SFlyweightFunctionality.getClazz(getState(), getHandle());
 		}
 	}
 

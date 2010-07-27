@@ -2,7 +2,7 @@ package jadex.bdi.runtime.impl.eaflyweights;
 
 import jadex.bdi.model.IMElement;
 import jadex.bdi.runtime.IEAChangeEvent;
-import jadex.bdi.runtime.impl.FlyweightFunctionality;
+import jadex.bdi.runtime.impl.SFlyweightFunctionality;
 import jadex.bdi.runtime.impl.flyweights.ElementFlyweight;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.commons.Future;
@@ -42,13 +42,13 @@ public class EAChangeEventFlyweight extends ElementFlyweight implements IEAChang
 			{
 				public void run()
 				{
-					ret.setResult(FlyweightFunctionality.getElement(getState(), getHandle(), getScope(), true));
+					ret.setResult(SFlyweightFunctionality.getElement(getState(), getHandle(), getScope(), true));
 				}
 			});
 		}
 		else
 		{
-			ret.setResult(FlyweightFunctionality.getElement(getState(), getHandle(), getScope(), true));
+			ret.setResult(SFlyweightFunctionality.getElement(getState(), getHandle(), getScope(), true));
 		}
 		
 		return ret;

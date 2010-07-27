@@ -6,7 +6,7 @@ import jadex.bdi.model.impl.flyweights.MPlanbaseFlyweight;
 import jadex.bdi.runtime.IPlan;
 import jadex.bdi.runtime.IPlanListener;
 import jadex.bdi.runtime.IPlanbase;
-import jadex.bdi.runtime.impl.FlyweightFunctionality;
+import jadex.bdi.runtime.impl.SFlyweightFunctionality;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.commons.Tuple;
@@ -59,14 +59,14 @@ public class PlanbaseFlyweight extends ElementFlyweight implements IPlanbase
 			{
 				public void run()
 				{
-					object = FlyweightFunctionality.getPlans(getState(), getHandle(), false);
+					object = SFlyweightFunctionality.getPlans(getState(), getHandle(), false);
 				}
 			};
 			return (IPlan[])invoc.object;
 		}
 		else
 		{
-			return (IPlan[])FlyweightFunctionality.getPlans(getState(), getHandle(), false);
+			return (IPlan[])SFlyweightFunctionality.getPlans(getState(), getHandle(), false);
 		}
 	}
 
@@ -83,14 +83,14 @@ public class PlanbaseFlyweight extends ElementFlyweight implements IPlanbase
 			{
 				public void run()
 				{
-					object = FlyweightFunctionality.getPlans(getState(), getHandle(), false, type);
+					object = SFlyweightFunctionality.getPlans(getState(), getHandle(), false, type);
 				}
 			};
 			return (IPlan[])invoc.object;
 		}
 		else
 		{
-			return (IPlan[])FlyweightFunctionality.getPlans(getState(), getHandle(), false, type);
+			return (IPlan[])SFlyweightFunctionality.getPlans(getState(), getHandle(), false, type);
 		}
 	}
 
@@ -137,14 +137,14 @@ public class PlanbaseFlyweight extends ElementFlyweight implements IPlanbase
 			{
 				public void run()
 				{
-					Object mplan = FlyweightFunctionality.checkElementType(getState(), getScope(), type, OAVBDIMetaModel.capability_has_plans);
+					Object mplan = SFlyweightFunctionality.checkElementType(getState(), getScope(), type, OAVBDIMetaModel.capability_has_plans);
 					addEventListener(listener, mplan);
 				}
 			};
 		}
 		else
 		{
-			Object mplan = FlyweightFunctionality.checkElementType(getState(), getScope(), type, OAVBDIMetaModel.capability_has_plans);
+			Object mplan = SFlyweightFunctionality.checkElementType(getState(), getScope(), type, OAVBDIMetaModel.capability_has_plans);
 			addEventListener(listener, mplan);
 		}
 	}
@@ -162,14 +162,14 @@ public class PlanbaseFlyweight extends ElementFlyweight implements IPlanbase
 			{
 				public void run()
 				{
-					Object mplan = FlyweightFunctionality.checkElementType(getState(), getScope(), type, OAVBDIMetaModel.capability_has_plans);
+					Object mplan = SFlyweightFunctionality.checkElementType(getState(), getScope(), type, OAVBDIMetaModel.capability_has_plans);
 					removeEventListener(listener, mplan, false);
 				}
 			};
 		}
 		else
 		{
-			Object mplan = FlyweightFunctionality.checkElementType(getState(), getScope(), type, OAVBDIMetaModel.capability_has_plans);
+			Object mplan = SFlyweightFunctionality.checkElementType(getState(), getScope(), type, OAVBDIMetaModel.capability_has_plans);
 			removeEventListener(listener, mplan, false);
 		}
 	}

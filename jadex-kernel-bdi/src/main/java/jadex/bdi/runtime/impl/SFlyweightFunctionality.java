@@ -1,8 +1,6 @@
 package jadex.bdi.runtime.impl;
 
 import jadex.bdi.model.OAVBDIMetaModel;
-import jadex.bdi.model.impl.flyweights.MBeliefFlyweight;
-import jadex.bdi.model.impl.flyweights.MElementFlyweight;
 import jadex.bdi.runtime.IEAGoal;
 import jadex.bdi.runtime.IEAParameter;
 import jadex.bdi.runtime.IEAParameterSet;
@@ -65,7 +63,7 @@ import java.util.Map;
  *  Shared functionality of ea and normal flyweights.
  *  Helps to avoid code copying.
  */
-public class FlyweightFunctionality 
+public class SFlyweightFunctionality 
 {
 	//-------- beliefbase --------
 	
@@ -1000,7 +998,7 @@ public class FlyweightFunctionality
 		if(elem!=null)
 		{
 			// todo: wrong scope
-			ret = FlyweightFunctionality.getFlyweight(state, scope, elem, ea);
+			ret = SFlyweightFunctionality.getFlyweight(state, scope, elem, ea);
 		}
 		return ret;
 	}

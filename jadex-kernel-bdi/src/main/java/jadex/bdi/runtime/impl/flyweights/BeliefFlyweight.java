@@ -4,7 +4,7 @@ import jadex.bdi.model.IMElement;
 import jadex.bdi.model.impl.flyweights.MBeliefFlyweight;
 import jadex.bdi.runtime.IBelief;
 import jadex.bdi.runtime.IBeliefListener;
-import jadex.bdi.runtime.impl.FlyweightFunctionality;
+import jadex.bdi.runtime.impl.SFlyweightFunctionality;
 import jadex.bdi.runtime.impl.flyweights.ElementFlyweight.AgentInvocation;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.BeliefRules;
@@ -58,14 +58,14 @@ public class BeliefFlyweight extends ElementFlyweight implements IBelief
 			{
 				public void run()
 				{
-					FlyweightFunctionality.setFact(getState(), getHandle(), fact);
+					SFlyweightFunctionality.setFact(getState(), getHandle(), fact);
 				}
 			};
 		}
 		else
 		{
 			getInterpreter().startMonitorConsequences();
-			FlyweightFunctionality.setFact(getState(), getHandle(), fact);
+			SFlyweightFunctionality.setFact(getState(), getHandle(), fact);
 			getInterpreter().endMonitorConsequences();
 		}
 	}
@@ -106,14 +106,14 @@ public class BeliefFlyweight extends ElementFlyweight implements IBelief
 			{
 				public void run()
 				{
-					FlyweightFunctionality.modified(getState(), getHandle(), getInterpreter());
+					SFlyweightFunctionality.modified(getState(), getHandle(), getInterpreter());
 				}
 			};
 		}
 		else
 		{
 			getInterpreter().startMonitorConsequences();
-			FlyweightFunctionality.modified(getState(), getHandle(), getInterpreter());
+			SFlyweightFunctionality.modified(getState(), getHandle(), getInterpreter());
 			getInterpreter().endMonitorConsequences();
 		}
 	}
@@ -130,14 +130,14 @@ public class BeliefFlyweight extends ElementFlyweight implements IBelief
 			{
 				public void run()
 				{
-					clazz = FlyweightFunctionality.getClazz(getState(), getHandle());
+					clazz = SFlyweightFunctionality.getClazz(getState(), getHandle());
 				}
 			};
 			return invoc.clazz;
 		}
 		else
 		{
-			return FlyweightFunctionality.getClazz(getState(), getHandle());
+			return SFlyweightFunctionality.getClazz(getState(), getHandle());
 		}
 	}
 

@@ -7,7 +7,7 @@ import jadex.bdi.runtime.IBeliefListener;
 import jadex.bdi.runtime.IBeliefSet;
 import jadex.bdi.runtime.IBeliefSetListener;
 import jadex.bdi.runtime.IEABeliefbase;
-import jadex.bdi.runtime.impl.FlyweightFunctionality;
+import jadex.bdi.runtime.impl.SFlyweightFunctionality;
 import jadex.bdi.runtime.impl.flyweights.ElementFlyweight;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
@@ -65,13 +65,13 @@ public class EABeliefbaseFlyweight extends ElementFlyweight implements IEABelief
 			{
 				public void run()
 				{
-					ret.setResult(FlyweightFunctionality.getBelief(getState(), getHandle(), getScope(), name, true));
+					ret.setResult(SFlyweightFunctionality.getBelief(getState(), getHandle(), getScope(), name, true));
 				}
 			});
 		}
 		else
 		{
-			ret.setResult(FlyweightFunctionality.getBelief(getState(), getHandle(), getScope(), name, true));
+			ret.setResult(SFlyweightFunctionality.getBelief(getState(), getHandle(), getScope(), name, true));
 		}
 		
 		return ret;
@@ -91,13 +91,13 @@ public class EABeliefbaseFlyweight extends ElementFlyweight implements IEABelief
 			{
 				public void run()
 				{
-					ret.setResult(FlyweightFunctionality.getBeliefSet(getState(), getHandle(), getScope(), name, true));
+					ret.setResult(SFlyweightFunctionality.getBeliefSet(getState(), getHandle(), getScope(), name, true));
 				}
 			});
 		}
 		else
 		{
-			ret.setResult(FlyweightFunctionality.getBeliefSet(getState(), getHandle(), getScope(), name, true));
+			ret.setResult(SFlyweightFunctionality.getBeliefSet(getState(), getHandle(), getScope(), name, true));
 		}
 		
 		return ret;
@@ -121,13 +121,13 @@ public class EABeliefbaseFlyweight extends ElementFlyweight implements IEABelief
 			{
 				public void run()
 				{
-					ret.setResult(FlyweightFunctionality.containsBelief(getState(), getHandle(), getScope(), name));
+					ret.setResult(SFlyweightFunctionality.containsBelief(getState(), getHandle(), getScope(), name));
 				}
 			});
 		}
 		else
 		{
-			ret.setResult(FlyweightFunctionality.containsBelief(getState(), getHandle(), getScope(), name));
+			ret.setResult(SFlyweightFunctionality.containsBelief(getState(), getHandle(), getScope(), name));
 		}
 		
 		return ret;
@@ -151,13 +151,13 @@ public class EABeliefbaseFlyweight extends ElementFlyweight implements IEABelief
 			{
 				public void run()
 				{
-					ret.setResult(FlyweightFunctionality.containsBeliefSet(getState(), getHandle(), getScope(), name));
+					ret.setResult(SFlyweightFunctionality.containsBeliefSet(getState(), getHandle(), getScope(), name));
 				}
 			});
 		}
 		else
 		{
-			ret.setResult(FlyweightFunctionality.containsBeliefSet(getState(), getHandle(), getScope(), name));
+			ret.setResult(SFlyweightFunctionality.containsBeliefSet(getState(), getHandle(), getScope(), name));
 		}
 		
 		return ret;
@@ -177,13 +177,13 @@ public class EABeliefbaseFlyweight extends ElementFlyweight implements IEABelief
 			{
 				public void run()
 				{
-					ret.setResult(FlyweightFunctionality.getBeliefNames(getState(), getHandle(), getScope()));
+					ret.setResult(SFlyweightFunctionality.getBeliefNames(getState(), getHandle(), getScope()));
 				}
 			});
 		}
 		else
 		{
-			ret.setResult(FlyweightFunctionality.getBeliefNames(getState(), getHandle(), getScope()));
+			ret.setResult(SFlyweightFunctionality.getBeliefNames(getState(), getHandle(), getScope()));
 		}
 		
 		return ret;
@@ -203,13 +203,13 @@ public class EABeliefbaseFlyweight extends ElementFlyweight implements IEABelief
 			{
 				public void run()
 				{
-					ret.setResult(FlyweightFunctionality.getBeliefSetNames(getState(), getHandle(), getScope()));
+					ret.setResult(SFlyweightFunctionality.getBeliefSetNames(getState(), getHandle(), getScope()));
 				}
 			});
 		}
 		else
 		{
-			ret.setResult(FlyweightFunctionality.getBeliefSetNames(getState(), getHandle(), getScope()));
+			ret.setResult(SFlyweightFunctionality.getBeliefSetNames(getState(), getHandle(), getScope()));
 		}
 		
 		return ret;
@@ -449,14 +449,14 @@ public class EABeliefbaseFlyweight extends ElementFlyweight implements IEABelief
 			{
 				public void run()
 				{
-					IBelief bel = (IBelief)FlyweightFunctionality.getBelief(getState(), getHandle(), getScope(), belief, false);
+					IBelief bel = (IBelief)SFlyweightFunctionality.getBelief(getState(), getHandle(), getScope(), belief, false);
 					ret.setResult(bel.getFact());
 				}
 			});
 		}
 		else
 		{
-			IBelief bel = (IBelief)FlyweightFunctionality.getBelief(getState(), getHandle(), getScope(), belief, false);
+			IBelief bel = (IBelief)SFlyweightFunctionality.getBelief(getState(), getHandle(), getScope(), belief, false);
 			ret.setResult(bel.getFact());
 		}
 		
@@ -478,7 +478,7 @@ public class EABeliefbaseFlyweight extends ElementFlyweight implements IEABelief
 			{
 				public void run()
 				{
-					IBelief bel = (IBelief)FlyweightFunctionality.getBelief(getState(), getHandle(), getScope(), belief, false);
+					IBelief bel = (IBelief)SFlyweightFunctionality.getBelief(getState(), getHandle(), getScope(), belief, false);
 					bel.setFact(fact);
 					ret.setResult(null);
 				}
@@ -486,7 +486,7 @@ public class EABeliefbaseFlyweight extends ElementFlyweight implements IEABelief
 		}
 		else
 		{
-			IBelief bel = (IBelief)FlyweightFunctionality.getBelief(getState(), getHandle(), getScope(), belief, false);
+			IBelief bel = (IBelief)SFlyweightFunctionality.getBelief(getState(), getHandle(), getScope(), belief, false);
 			bel.setFact(fact);
 			ret.setResult(null);
 		}
@@ -508,14 +508,14 @@ public class EABeliefbaseFlyweight extends ElementFlyweight implements IEABelief
 			{
 				public void run()
 				{
-					IBeliefSet belset = (IBeliefSet)FlyweightFunctionality.getBeliefSet(getState(), getHandle(), getScope(), beliefset, false);
+					IBeliefSet belset = (IBeliefSet)SFlyweightFunctionality.getBeliefSet(getState(), getHandle(), getScope(), beliefset, false);
 					ret.setResult(belset.getFacts());
 				}
 			});
 		}
 		else
 		{
-			IBeliefSet belset = (IBeliefSet)FlyweightFunctionality.getBeliefSet(getState(), getHandle(), getScope(), beliefset, false);
+			IBeliefSet belset = (IBeliefSet)SFlyweightFunctionality.getBeliefSet(getState(), getHandle(), getScope(), beliefset, false);
 			ret.setResult(belset.getFacts());
 		}
 		
@@ -536,7 +536,7 @@ public class EABeliefbaseFlyweight extends ElementFlyweight implements IEABelief
 			{
 				public void run()
 				{
-					IBelief bel = (IBelief)FlyweightFunctionality.getBelief(getState(), getHandle(), getScope(), belief, false);
+					IBelief bel = (IBelief)SFlyweightFunctionality.getBelief(getState(), getHandle(), getScope(), belief, false);
 					bel.addBeliefListener(listener);
 					ret.setResult(null);
 				}
@@ -544,7 +544,7 @@ public class EABeliefbaseFlyweight extends ElementFlyweight implements IEABelief
 		}
 		else
 		{
-			IBelief bel = (IBelief)FlyweightFunctionality.getBelief(getState(), getHandle(), getScope(), belief, false);
+			IBelief bel = (IBelief)SFlyweightFunctionality.getBelief(getState(), getHandle(), getScope(), belief, false);
 			bel.addBeliefListener(listener);
 			ret.setResult(null);
 		}
@@ -566,7 +566,7 @@ public class EABeliefbaseFlyweight extends ElementFlyweight implements IEABelief
 			{
 				public void run()
 				{
-					IBelief bel = (IBelief)FlyweightFunctionality.getBelief(getState(), getHandle(), getScope(), belief, false);
+					IBelief bel = (IBelief)SFlyweightFunctionality.getBelief(getState(), getHandle(), getScope(), belief, false);
 					bel.removeBeliefListener(listener);
 					ret.setResult(null);
 				}
@@ -574,7 +574,7 @@ public class EABeliefbaseFlyweight extends ElementFlyweight implements IEABelief
 		}
 		else
 		{
-			IBelief bel = (IBelief)FlyweightFunctionality.getBelief(getState(), getHandle(), getScope(), belief, false);
+			IBelief bel = (IBelief)SFlyweightFunctionality.getBelief(getState(), getHandle(), getScope(), belief, false);
 			bel.removeBeliefListener(listener);
 			ret.setResult(null);
 		}
@@ -597,7 +597,7 @@ public class EABeliefbaseFlyweight extends ElementFlyweight implements IEABelief
 			{
 				public void run()
 				{
-					IBeliefSet belset = (IBeliefSet)FlyweightFunctionality.getBeliefSet(getState(), getHandle(), getScope(), beliefset, false);
+					IBeliefSet belset = (IBeliefSet)SFlyweightFunctionality.getBeliefSet(getState(), getHandle(), getScope(), beliefset, false);
 					belset.addFact(fact);
 					ret.setResult(null);
 				}
@@ -605,7 +605,7 @@ public class EABeliefbaseFlyweight extends ElementFlyweight implements IEABelief
 		}
 		else
 		{
-			IBeliefSet belset = (IBeliefSet)FlyweightFunctionality.getBeliefSet(getState(), getHandle(), getScope(), beliefset, false);
+			IBeliefSet belset = (IBeliefSet)SFlyweightFunctionality.getBeliefSet(getState(), getHandle(), getScope(), beliefset, false);
 			belset.addFact(fact);
 			ret.setResult(null);
 		}
@@ -628,7 +628,7 @@ public class EABeliefbaseFlyweight extends ElementFlyweight implements IEABelief
 			{
 				public void run()
 				{
-					IBeliefSet belset = (IBeliefSet)FlyweightFunctionality.getBeliefSet(getState(), getHandle(), getScope(), beliefset, false);
+					IBeliefSet belset = (IBeliefSet)SFlyweightFunctionality.getBeliefSet(getState(), getHandle(), getScope(), beliefset, false);
 					belset.addFacts(facts);
 					ret.setResult(null);
 				}
@@ -636,7 +636,7 @@ public class EABeliefbaseFlyweight extends ElementFlyweight implements IEABelief
 		}
 		else
 		{
-			IBeliefSet belset = (IBeliefSet)FlyweightFunctionality.getBeliefSet(getState(), getHandle(), getScope(), beliefset, false);
+			IBeliefSet belset = (IBeliefSet)SFlyweightFunctionality.getBeliefSet(getState(), getHandle(), getScope(), beliefset, false);
 			belset.addFacts(facts);
 			ret.setResult(null);
 		}
@@ -659,7 +659,7 @@ public class EABeliefbaseFlyweight extends ElementFlyweight implements IEABelief
 			{
 				public void run()
 				{
-					IBeliefSet belset = (IBeliefSet)FlyweightFunctionality.getBeliefSet(getState(), getHandle(), getScope(), beliefset, false);
+					IBeliefSet belset = (IBeliefSet)SFlyweightFunctionality.getBeliefSet(getState(), getHandle(), getScope(), beliefset, false);
 					belset.removeFact(fact);
 					ret.setResult(null);
 				}
@@ -667,7 +667,7 @@ public class EABeliefbaseFlyweight extends ElementFlyweight implements IEABelief
 		}
 		else
 		{
-			IBeliefSet belset = (IBeliefSet)FlyweightFunctionality.getBeliefSet(getState(), getHandle(), getScope(), beliefset, false);
+			IBeliefSet belset = (IBeliefSet)SFlyweightFunctionality.getBeliefSet(getState(), getHandle(), getScope(), beliefset, false);
 			belset.removeFact(fact);
 			ret.setResult(null);
 		}
@@ -689,7 +689,7 @@ public class EABeliefbaseFlyweight extends ElementFlyweight implements IEABelief
 			{
 				public void run()
 				{
-					IBeliefSet belset = (IBeliefSet)FlyweightFunctionality.getBeliefSet(getState(), getHandle(), getScope(), beliefset, false);
+					IBeliefSet belset = (IBeliefSet)SFlyweightFunctionality.getBeliefSet(getState(), getHandle(), getScope(), beliefset, false);
 					belset.removeFacts();
 					ret.setResult(null);
 				}
@@ -697,7 +697,7 @@ public class EABeliefbaseFlyweight extends ElementFlyweight implements IEABelief
 		}
 		else
 		{
-			IBeliefSet belset = (IBeliefSet)FlyweightFunctionality.getBeliefSet(getState(), getHandle(), getScope(), beliefset, false);
+			IBeliefSet belset = (IBeliefSet)SFlyweightFunctionality.getBeliefSet(getState(), getHandle(), getScope(), beliefset, false);
 			belset.removeFacts();
 			ret.setResult(null);
 		}
@@ -720,14 +720,14 @@ public class EABeliefbaseFlyweight extends ElementFlyweight implements IEABelief
 			{
 				public void run()
 				{
-					IBeliefSet belset = (IBeliefSet)FlyweightFunctionality.getBeliefSet(getState(), getHandle(), getScope(), beliefset, false);
+					IBeliefSet belset = (IBeliefSet)SFlyweightFunctionality.getBeliefSet(getState(), getHandle(), getScope(), beliefset, false);
 					ret.setResult(belset.containsFact(fact)? Boolean.TRUE: Boolean.FALSE);
 				}
 			});
 		}
 		else
 		{
-			IBeliefSet belset = (IBeliefSet)FlyweightFunctionality.getBeliefSet(getState(), getHandle(), getScope(), beliefset, false);
+			IBeliefSet belset = (IBeliefSet)SFlyweightFunctionality.getBeliefSet(getState(), getHandle(), getScope(), beliefset, false);
 			ret.setResult(belset.containsFact(fact)? Boolean.TRUE: Boolean.FALSE);
 		}
 		
@@ -749,14 +749,14 @@ public class EABeliefbaseFlyweight extends ElementFlyweight implements IEABelief
 			{
 				public void run()
 				{
-					IBeliefSet belset = (IBeliefSet)FlyweightFunctionality.getBeliefSet(getState(), getHandle(), getScope(), beliefset, false);
+					IBeliefSet belset = (IBeliefSet)SFlyweightFunctionality.getBeliefSet(getState(), getHandle(), getScope(), beliefset, false);
 					ret.setResult(new Integer(belset.size()));
 				}
 			});
 		}
 		else
 		{
-			IBeliefSet belset = (IBeliefSet)FlyweightFunctionality.getBeliefSet(getState(), getHandle(), getScope(), beliefset, false);
+			IBeliefSet belset = (IBeliefSet)SFlyweightFunctionality.getBeliefSet(getState(), getHandle(), getScope(), beliefset, false);
 			ret.setResult(new Integer(belset.size()));
 		}
 		
@@ -777,7 +777,7 @@ public class EABeliefbaseFlyweight extends ElementFlyweight implements IEABelief
 			{
 				public void run()
 				{
-					IBeliefSet belset = (IBeliefSet)FlyweightFunctionality.getBeliefSet(getState(), getHandle(), getScope(), beliefset, false);
+					IBeliefSet belset = (IBeliefSet)SFlyweightFunctionality.getBeliefSet(getState(), getHandle(), getScope(), beliefset, false);
 					belset.addBeliefSetListener(listener);
 					ret.setResult(null);
 				}
@@ -785,7 +785,7 @@ public class EABeliefbaseFlyweight extends ElementFlyweight implements IEABelief
 		}
 		else
 		{
-			IBeliefSet belset = (IBeliefSet)FlyweightFunctionality.getBeliefSet(getState(), getHandle(), getScope(), beliefset, false);
+			IBeliefSet belset = (IBeliefSet)SFlyweightFunctionality.getBeliefSet(getState(), getHandle(), getScope(), beliefset, false);
 			belset.addBeliefSetListener(listener);
 			ret.setResult(null);
 		}
@@ -807,7 +807,7 @@ public class EABeliefbaseFlyweight extends ElementFlyweight implements IEABelief
 			{
 				public void run()
 				{
-					IBeliefSet belset = (IBeliefSet)FlyweightFunctionality.getBeliefSet(getState(), getHandle(), getScope(), beliefset, false);
+					IBeliefSet belset = (IBeliefSet)SFlyweightFunctionality.getBeliefSet(getState(), getHandle(), getScope(), beliefset, false);
 					belset.removeBeliefSetListener(listener);
 					ret.setResult(null);
 				}
@@ -815,7 +815,7 @@ public class EABeliefbaseFlyweight extends ElementFlyweight implements IEABelief
 		}
 		else
 		{
-			IBeliefSet belset = (IBeliefSet)FlyweightFunctionality.getBeliefSet(getState(), getHandle(), getScope(), beliefset, false);
+			IBeliefSet belset = (IBeliefSet)SFlyweightFunctionality.getBeliefSet(getState(), getHandle(), getScope(), beliefset, false);
 			belset.removeBeliefSetListener(listener);
 			ret.setResult(null);
 		}

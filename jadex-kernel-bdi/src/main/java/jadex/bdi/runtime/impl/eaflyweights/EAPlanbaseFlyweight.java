@@ -5,7 +5,7 @@ import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.model.impl.flyweights.MPlanbaseFlyweight;
 import jadex.bdi.runtime.IEAPlanbase;
 import jadex.bdi.runtime.IPlanListener;
-import jadex.bdi.runtime.impl.FlyweightFunctionality;
+import jadex.bdi.runtime.impl.SFlyweightFunctionality;
 import jadex.bdi.runtime.impl.flyweights.ElementFlyweight;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
@@ -63,13 +63,13 @@ public class EAPlanbaseFlyweight extends ElementFlyweight implements IEAPlanbase
 			{
 				public void run()
 				{
-					ret.setResult(FlyweightFunctionality.getPlans(getState(), getHandle(), true));
+					ret.setResult(SFlyweightFunctionality.getPlans(getState(), getHandle(), true));
 				}
 			});
 		}
 		else
 		{
-			ret.setResult(FlyweightFunctionality.getPlans(getState(), getHandle(), true));
+			ret.setResult(SFlyweightFunctionality.getPlans(getState(), getHandle(), true));
 		}
 		
 		return ret;
@@ -90,13 +90,13 @@ public class EAPlanbaseFlyweight extends ElementFlyweight implements IEAPlanbase
 			{
 				public void run()
 				{
-					ret.setResult(FlyweightFunctionality.getPlans(getState(), getHandle(), true, type));
+					ret.setResult(SFlyweightFunctionality.getPlans(getState(), getHandle(), true, type));
 				}
 			});
 		}
 		else
 		{
-			ret.setResult(FlyweightFunctionality.getPlans(getState(), getHandle(), true, type));
+			ret.setResult(SFlyweightFunctionality.getPlans(getState(), getHandle(), true, type));
 		}
 		
 		return ret;
@@ -147,7 +147,7 @@ public class EAPlanbaseFlyweight extends ElementFlyweight implements IEAPlanbase
 			{
 				public void run()
 				{
-					Object mplan = FlyweightFunctionality.checkElementType(getState(), getScope(), type, OAVBDIMetaModel.capability_has_plans);
+					Object mplan = SFlyweightFunctionality.checkElementType(getState(), getScope(), type, OAVBDIMetaModel.capability_has_plans);
 					addEventListener(listener, mplan);
 					ret.setResult(null);
 				}
@@ -155,7 +155,7 @@ public class EAPlanbaseFlyweight extends ElementFlyweight implements IEAPlanbase
 		}
 		else
 		{
-			Object mplan = FlyweightFunctionality.checkElementType(getState(), getScope(), type, OAVBDIMetaModel.capability_has_plans);
+			Object mplan = SFlyweightFunctionality.checkElementType(getState(), getScope(), type, OAVBDIMetaModel.capability_has_plans);
 			addEventListener(listener, mplan);
 			ret.setResult(null);
 		}
@@ -178,7 +178,7 @@ public class EAPlanbaseFlyweight extends ElementFlyweight implements IEAPlanbase
 			{
 				public void run()
 				{
-					Object mplan = FlyweightFunctionality.checkElementType(getState(), getScope(), type, OAVBDIMetaModel.capability_has_plans);
+					Object mplan = SFlyweightFunctionality.checkElementType(getState(), getScope(), type, OAVBDIMetaModel.capability_has_plans);
 					removeEventListener(listener, mplan, false);
 					ret.setResult(null);
 				}
@@ -186,7 +186,7 @@ public class EAPlanbaseFlyweight extends ElementFlyweight implements IEAPlanbase
 		}
 		else
 		{
-			Object mplan = FlyweightFunctionality.checkElementType(getState(), getScope(), type, OAVBDIMetaModel.capability_has_plans);
+			Object mplan = SFlyweightFunctionality.checkElementType(getState(), getScope(), type, OAVBDIMetaModel.capability_has_plans);
 			removeEventListener(listener, mplan, false);
 			ret.setResult(null);
 		}
