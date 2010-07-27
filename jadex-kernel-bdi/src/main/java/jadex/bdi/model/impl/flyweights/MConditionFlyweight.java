@@ -1,12 +1,13 @@
 package jadex.bdi.model.impl.flyweights;
 
 import jadex.bdi.model.IMCondition;
+import jadex.bdi.model.editable.IMECondition;
 import jadex.rules.state.IOAVState;
 
 /**
  * 
  */
-public class MConditionFlyweight extends MExpressionFlyweight implements IMCondition
+public class MConditionFlyweight extends MExpressionFlyweight implements IMCondition, IMECondition
 {
 	//-------- constructors --------
 	

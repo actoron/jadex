@@ -6,6 +6,10 @@ import jadex.bdi.model.IMGoal;
 import jadex.bdi.model.IMInhibited;
 import jadex.bdi.model.IMTypedElement;
 import jadex.bdi.model.OAVBDIMetaModel;
+import jadex.bdi.model.editable.IMECondition;
+import jadex.bdi.model.editable.IMEExpression;
+import jadex.bdi.model.editable.IMEGoal;
+import jadex.bdi.model.impl.flyweights.MElementFlyweight.AgentInvocation;
 import jadex.rules.state.IOAVState;
 
 import java.util.Collection;
@@ -14,7 +18,7 @@ import java.util.Iterator;
 /**
  *  Flyweight for goal model.
  */
-public class MGoalFlyweight extends MProcessableElementFlyweight implements IMGoal
+public class MGoalFlyweight extends MProcessableElementFlyweight implements IMGoal, IMEGoal
 {
 	//-------- constructors --------
 	
@@ -411,6 +415,253 @@ public class MGoalFlyweight extends MProcessableElementFlyweight implements IMGo
 		else
 		{
 			return ((Integer)getState().getAttributeValue(getHandle(), OAVBDIMetaModel.goal_has_cardinality)).intValue();
+		}
+	}
+
+	/**
+	 *  Create the creation condition.
+	 *  @param expression	The expression.
+	 *  @param language	The expression language (or null for default java-like language).
+	 *  @return The creation condition.
+	 */
+	public IMECondition createCreationCondition(String expression, String language);
+	
+	/**
+	 *  Create the context condition.
+	 *  @param expression	The expression.
+	 *  @param language	The expression language (or null for default java-like language).
+	 *  @return The context condition.
+	 */
+	public IMECondition createContextCondition(String expression, String language);
+	
+	/**
+	 *  Create the drop condition.
+	 *  @param expression	The expression.
+	 *  @param language	The expression language (or null for default java-like language).
+	 *  @return The drop condition.
+	 */
+	public IMECondition createDropCondition(String expression, String language);
+	
+	/**
+	 *  Set the retry flag.
+	 *  @param retry The retry flag.
+	 */
+	public void setRetry(boolean retry);
+	
+	/**
+	 *  Set the retry delay.
+	 *  @param retry The retry delay.
+	 */
+	public void setRetryDelay(final long retrydelay)
+	{
+		if(isExternalThread())
+		{
+			new AgentInvocation()
+			{
+				public void run()
+				{
+					getState().setAttributeValue(getHandle(), OAVBDIMetaModel.goal_has_retrydelay, retrydelay);
+				}
+			};
+		}
+		else
+		{
+			getState().setAttributeValue(getHandle(), OAVBDIMetaModel.goal_has_retrydelay, retrydelay);
+		}
+	}
+	
+	/**
+	 *  Set the recur flag.
+	 *  @param recur The recur flag.
+	 */
+	public void setRecur(final boolean recur)
+	{
+		if(isExternalThread())
+		{
+			new AgentInvocation()
+			{
+				public void run()
+				{
+					getState().setAttributeValue(getHandle(), OAVBDIMetaModel.goal_has_recur, recur);
+				}
+			};
+		}
+		else
+		{
+			getState().setAttributeValue(getHandle(), OAVBDIMetaModel.goal_has_recur, recur);
+		}
+	}
+	
+	/**
+	 *  Set the recur delay.
+	 *  @param recur The retry delay.
+	 */
+	public void setRecurDelay(final long recurdelay)
+	{
+		if(isExternalThread())
+		{
+			new AgentInvocation()
+			{
+				public void run()
+				{
+					getState().setAttributeValue(getHandle(), OAVBDIMetaModel.goal_has_recurdelay, recurdelay);
+				}
+			};
+		}
+		else
+		{
+			getState().setAttributeValue(getHandle(), OAVBDIMetaModel.goal_has_recurdelay, recurdelay);
+		}
+	}
+	
+	/**
+	 *  Create the recur condition.
+	 *  @param expression	The expression.
+	 *  @param language	The expression language (or null for default java-like language).
+	 *  @return The recur condition.
+	 */
+	public IMECondition createRecurCondition(final String expression, final String language)
+	{
+		if(isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					MConditionFlyweight mcond = SMFlyweightFunctionality.createCondition(expression, language, getState(), getHandle());
+					getState().addAttributeValue(getHandle(), OAVBDIMetaModel.goal_has_recurcondition, mcond.getHandle());
+					object	= mcond;
+				}
+			};
+			return (IMECondition)invoc.object;
+		}
+		else
+		{
+			MConditionFlyweight mcond = SMFlyweightFunctionality.createCondition(expression, language, getState(), getHandle());
+			getState().addAttributeValue(getHandle(), OAVBDIMetaModel.goal_has_recurcondition, mcond.getHandle());
+			return mcond;
+		}
+	}
+
+	/**
+	 *  Set the exlcude mode.
+	 *  @param excludemode The exclude mode.
+	 */
+	public void setExcludeMode(final String excludemode)
+	{
+		if(isExternalThread())
+		{
+			new AgentInvocation()
+			{
+				public void run()
+				{
+					getState().setAttributeValue(getHandle(), OAVBDIMetaModel.goal_has_exclude, excludemode);
+				}
+			};
+		}
+		else
+		{
+			getState().setAttributeValue(getHandle(), OAVBDIMetaModel.goal_has_exclude, excludemode);
+		}
+	}
+	
+	/**
+	 *  Set the rebuild APL flag.
+	 *  @param rebuild Rebuild flag.
+	 */
+	public void setRebuild(final boolean rebuild)
+	{
+		if(isExternalThread())
+		{
+			new AgentInvocation()
+			{
+				public void run()
+				{
+					getState().setAttributeValue(getHandle(), OAVBDIMetaModel.goal_has_rebuild, rebuild);
+				}
+			};
+		}
+		else
+		{
+			getState().setAttributeValue(getHandle(), OAVBDIMetaModel.goal_has_rebuild, rebuild);
+		}
+	}
+	
+	/**
+	 *  Set the unique flag.
+	 *  @param unique The unique flag.
+	 */
+	public void setUnique(final boolean unique)
+	{
+		if(isExternalThread())
+		{
+			new AgentInvocation()
+			{
+				public void run()
+				{
+					getState().setAttributeValue(getHandle(), OAVBDIMetaModel.goal_has_unique, unique);
+				}
+			};
+		}
+		else
+		{
+			getState().setAttributeValue(getHandle(), OAVBDIMetaModel.goal_has_unique, unique);
+		}
+	}
+	
+	/**
+	 *  Add a excluded parameter.
+	 *  @param name The name of the excluded parameter.
+	 */
+	public void addExcludedParameter(final String name)
+	{
+		if(isExternalThread())
+		{
+			new AgentInvocation()
+			{
+				public void run()
+				{
+					Object	param	= getState().getAttributeValue(getHandle(), OAVBDIMetaModel.parameterelement_has_parameters, name);
+					if(param==null)
+						throw new RuntimeException("Parameter not found: "+name);
+					getState().addAttributeValue(getHandle(), OAVBDIMetaModel.goal_has_excludedparameter, param);
+				}
+			};
+		}
+		else
+		{
+			Object	param	= getState().getAttributeValue(getHandle(), OAVBDIMetaModel.parameterelement_has_parameters, name);
+			if(param==null)
+				throw new RuntimeException("Parameter not found: "+name);
+			getState().addAttributeValue(getHandle(), OAVBDIMetaModel.goal_has_excludedparameter, param);
+		}
+	}
+	
+	/**
+	 *  Get inhibited goals.
+	 *  @retur The inhibited goals.
+	 */
+//	public IMInhibitedElement getInhibitedGoals();
+	
+	/**
+	 *  Get the cardinality.
+	 *  @retur The cardinality.
+	 */
+	public void setCardinality(final int card)
+	{
+		if(isExternalThread())
+		{
+			new AgentInvocation()
+			{
+				public void run()
+				{
+					getState().setAttributeValue(getHandle(), OAVBDIMetaModel.goal_has_cardinality, card);
+				}
+			};
+		}
+		else
+		{
+			getState().setAttributeValue(getHandle(), OAVBDIMetaModel.goal_has_cardinality, card);
 		}
 	}
 }
