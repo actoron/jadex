@@ -3,7 +3,7 @@ package jadex.bdi.model;
 /**
  *  Interface for property base model.
  */
-public interface IMPropertybase
+public interface IMPropertybase extends IMElement
 {
 	/**
 	 *  Get the properties.

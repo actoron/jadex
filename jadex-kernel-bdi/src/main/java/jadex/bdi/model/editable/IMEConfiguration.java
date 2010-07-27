@@ -1,33 +1,40 @@
-package jadex.bdi.model;
+package jadex.bdi.model.editable;
+
+import jadex.bdi.model.IMConfigBelief;
+import jadex.bdi.model.IMConfigBeliefSet;
+import jadex.bdi.model.IMConfigElement;
+import jadex.bdi.model.IMConfiguration;
+import jadex.bdi.model.IMInitialCapability;
 
 /**
- *  Interface for configuration model element.
+ * 
  */
-public interface IMConfiguration extends IMElement
+public interface IMEConfiguration extends IMConfiguration, IMEElement
 {
 	/**
-	 *  Get the initial capabilities.
-	 *  @return The initial capabilities.
+	 *  Create an initial capability.
+	 *  @param ref The referenced capability name.
+	 *  @param conf The name of configuration to use.
 	 */
-	public IMInitialCapability[] getInitialCapabilities();
+	public void createInitialCapability(String ref, String conf);
 
 	/**
-	 *  Get the initial beliefs.
-	 *  @return The initial beliefs.
+	 *  Create an initial belief.
+	 *  @param ref The referenced element name.
 	 */
-	public IMConfigBelief[] getInitialBeliefs();
+	public IMEBelief createInitialBelief(String ref);
 	
 	/**
-	 *  Get the initial belief sets.
-	 *  @return The initial belief sets.
+	 *  Create an initial belief set.
+	 *  @param ref The referenced element name.
 	 */
-	public IMConfigBeliefSet[] getInitialBeliefSets();
+	public IMEBeliefSet createInitialBeliefSet(String ref);
 	
 	/**
-	 *  Get the initial goals.
-	 *  @return The initial goals.
+	 *  Create the initial goal.
+	 *  @param ref The referenced element name.
 	 */
-	public IMConfigElement[] getInitialGoals();
+	public IMConfigElement createInitialGoal(String ref);
 	
 	/**
 	 *  Get the end goals.

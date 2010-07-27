@@ -3,7 +3,7 @@ package jadex.bdi.model;
 /**
  *  Interface for message event model.
  */
-public interface IMMessageEvent
+public interface IMMessageEvent extends IMProcessableElement
 {
 	/**
 	 *  Get the parameter direction.

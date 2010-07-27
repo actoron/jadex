@@ -1,6 +1,11 @@
 package jadex.bdi.model.editable;
 
-public interface IMEPlan
+import jadex.bdi.model.IMPlan;
+
+/**
+ * 
+ */
+public interface IMEPlan extends IMPlan
 {
 
 }

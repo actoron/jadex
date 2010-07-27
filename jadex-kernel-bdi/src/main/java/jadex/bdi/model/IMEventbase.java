@@ -3,7 +3,7 @@ package jadex.bdi.model;
 /**
  *  Interface for eventbase model.
  */
-public interface IMEventbase
+public interface IMEventbase extends IMElement
 {
 	/**
 	 *  Get an internal event for a name.
