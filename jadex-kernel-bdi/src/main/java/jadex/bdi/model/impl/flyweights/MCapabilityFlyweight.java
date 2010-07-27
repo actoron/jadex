@@ -597,7 +597,7 @@ public class MCapabilityFlyweight extends MElementFlyweight implements IMCapabil
 			{
 				public void run()
 				{
-					MExpressionFlyweight mexp = SMFlyweightFunctionality.createExpression(expression, language, getState(), getHandle());
+					MExpressionFlyweight mexp = MExpressionbaseFlyweight.createExpression(expression, language, getState(), getHandle());
 					getState().setAttributeValue(mexp.getHandle(), OAVBDIMetaModel.modelelement_has_name, name);
 					getState().setAttributeValue(mexp, OAVBDIMetaModel.expression_has_class, cls);
 					
@@ -609,7 +609,7 @@ public class MCapabilityFlyweight extends MElementFlyweight implements IMCapabil
 		}
 		else
 		{
-			MExpressionFlyweight mexp = SMFlyweightFunctionality.createExpression(expression, language, getState(), getHandle());
+			MExpressionFlyweight mexp = MExpressionbaseFlyweight.createExpression(expression, language, getState(), getHandle());
 			getState().setAttributeValue(mexp.getHandle(), OAVBDIMetaModel.modelelement_has_name, name);
 			getState().setAttributeValue(mexp, OAVBDIMetaModel.expression_has_class, cls);
 

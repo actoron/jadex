@@ -2,8 +2,12 @@ package jadex.bdi.model.impl.flyweights;
 
 import jadex.bdi.model.IMExpression;
 import jadex.bdi.model.OAVBDIMetaModel;
+<<<<<<< .mine
+import jadex.bdi.model.editable.IMEExpression;
+=======
 import jadex.bdi.model.editable.IMEExpression;
 import jadex.javaparser.IParsedExpression;
+>>>>>>> .r2232
 import jadex.rules.state.IOAVState;
 
 /**
@@ -151,7 +155,7 @@ public class MExpressionFlyweight extends MReferenceableElementFlyweight impleme
 			{
 				public void run()
 				{
-					IParsedExpression pexp = SMFlyweightFunctionality.parseExpression(expression, language, getState(), getHandle());
+					IParsedExpression pexp = MExpressionbaseFlyweight.parseExpression(expression, language, getState(), getHandle());
 					getState().addAttributeValue(getHandle(), OAVBDIMetaModel.expression_has_content, pexp);
 					getState().addAttributeValue(getHandle(), OAVBDIMetaModel.expression_has_language, language);
 				}
@@ -159,7 +163,7 @@ public class MExpressionFlyweight extends MReferenceableElementFlyweight impleme
 		}
 		else
 		{
-			IParsedExpression pexp = SMFlyweightFunctionality.parseExpression(expression, language, getState(), getHandle());
+			IParsedExpression pexp = MExpressionbaseFlyweight.parseExpression(expression, language, getState(), getHandle());
 			getState().addAttributeValue(getHandle(), OAVBDIMetaModel.expression_has_content, pexp);
 			getState().addAttributeValue(getHandle(), OAVBDIMetaModel.expression_has_language, language);
 		}

@@ -4,6 +4,13 @@ import jadex.bdi.model.IMExpression;
 import jadex.bdi.model.IMExpressionReference;
 import jadex.bdi.model.IMExpressionbase;
 import jadex.bdi.model.OAVBDIMetaModel;
+import jadex.bdi.model.editable.IMEExpression;
+import jadex.bdi.model.editable.IMEExpressionbase;
+import jadex.bdi.model.editable.IMEMetaGoal;
+import jadex.bdi.model.impl.flyweights.MElementFlyweight.AgentInvocation;
+import jadex.javaparser.IExpressionParser;
+import jadex.javaparser.IParsedExpression;
+import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 import jadex.rules.state.IOAVState;
 
 import java.util.Collection;
@@ -12,7 +19,7 @@ import java.util.Iterator;
 /**
  *  Flyweight for expression base model.
  */
-public class MExpressionbaseFlyweight  extends MElementFlyweight implements IMExpressionbase
+public class MExpressionbaseFlyweight  extends MElementFlyweight implements IMExpressionbase, IMEExpressionbase
 {
 	//-------- constructors --------
 	
@@ -169,5 +176,65 @@ public class MExpressionbaseFlyweight  extends MElementFlyweight implements IMEx
 			}
 			return ret;
 		}
+	}
+	
+	/**
+	 *  Create a expression with a name.
+	 *  @param name	The expression name.
+	 *  @param content The expression content.
+	 *  @param lang The language.
+	 */
+	public IMEExpression createExpression(final String name, final String content, final String lang)
+	{
+		if(isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					MExpressionFlyweight fly = createExpression(content, lang, getState(), getScope());
+					fly.setName(name);
+					object = fly;
+				}
+			};
+			return (IMEExpression)invoc.object;
+		}
+		else
+		{
+			MExpressionFlyweight fly = createExpression(content, lang, getState(), getScope());
+			fly.setName(name);
+			return fly;
+		}
+	}
+
+	/**
+	 *  Create an expression reference with a name.
+	 *  @param name	The expression name.
+	 *  @param ref The reference element name.
+	 */
+	public IMExpressionReference createExpressionReference(String name, String ref)
+	{
+		
+	}
+	
+	/**
+	 *  Create an expression.
+	 *  @param expression	The expression.
+	 *  @param language	The expression language or null for default java-like language.
+	 *  @param state	The state.
+	 *  @param scope	The scope.
+	 *  @return	The expression
+	 */
+	public static MExpressionFlyweight	createExpression(String expression, String language, IOAVState state, Object scope)
+	{
+		Object	mexp	= state.createObject(OAVBDIMetaModel.expression_type);
+		state.setAttributeValue(mexp, OAVBDIMetaModel.expression_has_language, language);
+	
+		IExpressionParser	exp_parser	= new JavaCCExpressionParser();	// Hack!!! Map language to parser somewhere?
+		IParsedExpression	pexp	= exp_parser.parseExpression(expression,
+			OAVBDIMetaModel.getImports(state, scope), null, state.getTypeModel().getClassLoader());
+		state.setAttributeValue(mexp, OAVBDIMetaModel.expression_has_content, pexp);
+		
+		return new MExpressionFlyweight(state, scope, mexp);
 	}
 }
