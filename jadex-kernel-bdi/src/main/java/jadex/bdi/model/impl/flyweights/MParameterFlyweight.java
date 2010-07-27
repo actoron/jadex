@@ -3,12 +3,13 @@ package jadex.bdi.model.impl.flyweights;
 import jadex.bdi.model.IMExpression;
 import jadex.bdi.model.IMParameter;
 import jadex.bdi.model.OAVBDIMetaModel;
+import jadex.bdi.model.editable.IMEParameter;
 import jadex.rules.state.IOAVState;
 
 /**
  *  Flyweight for parameter model.
  */
-public class MParameterFlyweight extends MTypedElementFlyweight implements IMParameter
+public class MParameterFlyweight extends MTypedElementFlyweight implements IMParameter, IMEParameter
 {
 	//-------- constructors --------
 	
@@ -125,4 +126,28 @@ public class MParameterFlyweight extends MTypedElementFlyweight implements IMPar
 			return ((Boolean)getState().getAttributeValue(getHandle(), OAVBDIMetaModel.parameter_has_optional)).booleanValue();
 		}
 	}
+
+	/**
+	 *  Get the parameter value.
+	 *  @return The value.
+	 */
+	public IMExpression createValue();
+	
+	/**
+	 *  Get the binding options.
+	 *  @return The binding options.
+	 */
+	public IMExpression createBindingOptions();
+	
+	/**
+	 *  Get the parameter direction.
+	 *  @return The direction.
+	 */
+	public void setDirection(String dir);
+	
+	/**
+	 *  Flag if parameter is optional.
+	 *  @return True if optional.
+	 */
+	public void setOptional(boolean optional);
 }

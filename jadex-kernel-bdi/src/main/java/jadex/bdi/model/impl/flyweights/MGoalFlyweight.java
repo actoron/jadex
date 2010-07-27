@@ -7,9 +7,7 @@ import jadex.bdi.model.IMInhibited;
 import jadex.bdi.model.IMTypedElement;
 import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.model.editable.IMECondition;
-import jadex.bdi.model.editable.IMEExpression;
 import jadex.bdi.model.editable.IMEGoal;
-import jadex.bdi.model.impl.flyweights.MElementFlyweight.AgentInvocation;
 import jadex.rules.state.IOAVState;
 
 import java.util.Collection;
@@ -424,7 +422,28 @@ public class MGoalFlyweight extends MProcessableElementFlyweight implements IMGo
 	 *  @param language	The expression language (or null for default java-like language).
 	 *  @return The creation condition.
 	 */
-	public IMECondition createCreationCondition(String expression, String language);
+	public IMECondition createCreationCondition(final String expression, final String language)
+	{
+		if(isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					MConditionFlyweight mcond = MExpressionbaseFlyweight.createCondition(expression, language, getState(), getHandle());
+					getState().addAttributeValue(getHandle(), OAVBDIMetaModel.goal_has_creationcondition, mcond.getHandle());
+					object	= mcond;
+				}
+			};
+			return (IMECondition)invoc.object;
+		}
+		else
+		{
+			MConditionFlyweight mcond = MExpressionbaseFlyweight.createCondition(expression, language, getState(), getHandle());
+			getState().addAttributeValue(getHandle(), OAVBDIMetaModel.goal_has_creationcondition, mcond.getHandle());
+			return mcond;
+		}
+	}
 	
 	/**
 	 *  Create the context condition.
@@ -432,7 +451,28 @@ public class MGoalFlyweight extends MProcessableElementFlyweight implements IMGo
 	 *  @param language	The expression language (or null for default java-like language).
 	 *  @return The context condition.
 	 */
-	public IMECondition createContextCondition(String expression, String language);
+	public IMECondition createContextCondition(final String expression, final String language)
+	{
+		if(isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					MConditionFlyweight mcond = MExpressionbaseFlyweight.createCondition(expression, language, getState(), getHandle());
+					getState().addAttributeValue(getHandle(), OAVBDIMetaModel.goal_has_contextcondition, mcond.getHandle());
+					object	= mcond;
+				}
+			};
+			return (IMECondition)invoc.object;
+		}
+		else
+		{
+			MConditionFlyweight mcond = MExpressionbaseFlyweight.createCondition(expression, language, getState(), getHandle());
+			getState().addAttributeValue(getHandle(), OAVBDIMetaModel.goal_has_contextcondition, mcond.getHandle());
+			return mcond;
+		}
+	}
 	
 	/**
 	 *  Create the drop condition.
@@ -440,13 +480,50 @@ public class MGoalFlyweight extends MProcessableElementFlyweight implements IMGo
 	 *  @param language	The expression language (or null for default java-like language).
 	 *  @return The drop condition.
 	 */
-	public IMECondition createDropCondition(String expression, String language);
+	public IMECondition createDropCondition(final String expression, final String language)
+	{
+		if(isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					MConditionFlyweight mcond = MExpressionbaseFlyweight.createCondition(expression, language, getState(), getHandle());
+					getState().addAttributeValue(getHandle(), OAVBDIMetaModel.goal_has_dropcondition, mcond.getHandle());
+					object	= mcond;
+				}
+			};
+			return (IMECondition)invoc.object;
+		}
+		else
+		{
+			MConditionFlyweight mcond = MExpressionbaseFlyweight.createCondition(expression, language, getState(), getHandle());
+			getState().addAttributeValue(getHandle(), OAVBDIMetaModel.goal_has_dropcondition, mcond.getHandle());
+			return mcond;
+		}
+	}
 	
 	/**
 	 *  Set the retry flag.
 	 *  @param retry The retry flag.
 	 */
-	public void setRetry(boolean retry);
+	public void setRetry(final boolean retry)
+	{
+		if(isExternalThread())
+		{
+			new AgentInvocation()
+			{
+				public void run()
+				{
+					getState().setAttributeValue(getHandle(), OAVBDIMetaModel.goal_has_retry, retry);
+				}
+			};
+		}
+		else
+		{
+			getState().setAttributeValue(getHandle(), OAVBDIMetaModel.goal_has_retry, retry);
+		}
+	}
 	
 	/**
 	 *  Set the retry delay.

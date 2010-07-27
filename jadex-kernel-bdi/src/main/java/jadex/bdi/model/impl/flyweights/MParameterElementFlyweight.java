@@ -4,6 +4,9 @@ import jadex.bdi.model.IMParameter;
 import jadex.bdi.model.IMParameterElement;
 import jadex.bdi.model.IMParameterSet;
 import jadex.bdi.model.OAVBDIMetaModel;
+import jadex.bdi.model.editable.IMEParameter;
+import jadex.bdi.model.editable.IMEParameterElement;
+import jadex.bdi.model.editable.IMEParameterSet;
 import jadex.rules.state.IOAVState;
 
 import java.util.Collection;
@@ -12,7 +15,7 @@ import java.util.Iterator;
 /**
  *  Flyweight for parameter element model.
  */
-public class MParameterElementFlyweight extends MReferenceableElementFlyweight implements IMParameterElement
+public class MParameterElementFlyweight extends MReferenceableElementFlyweight implements IMParameterElement, IMEParameterElement
 {
 	//-------- constructors --------
 	
@@ -167,6 +170,64 @@ public class MParameterElementFlyweight extends MReferenceableElementFlyweight i
 				}
 			}
 			return ret;
+		}
+	}
+
+	/**
+	 *  Get a parameter.
+	 *  @return The parameter.
+	 */
+	public IMEParameter createParameter(final String name)
+	{
+		if(isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					Object	param	= getState().createObject(OAVBDIMetaModel.parameter_type);
+					getState().setAttributeValue(param, OAVBDIMetaModel.modelelement_has_name, name);
+					getState().addAttributeValue(getHandle(), OAVBDIMetaModel.parameterelement_has_parameters, param);
+					object	= new MParameterFlyweight(getState(), getScope(), param);
+				}
+			};
+			return (IMEParameter)invoc.object;
+		}
+		else
+		{
+			Object	param	= getState().createObject(OAVBDIMetaModel.parameter_type);
+			getState().setAttributeValue(param, OAVBDIMetaModel.modelelement_has_name, name);
+			getState().addAttributeValue(getHandle(), OAVBDIMetaModel.parameterelement_has_parameters, param);
+			return new MParameterFlyweight(getState(), getScope(), param);
+		}
+	}
+	
+	/**
+	 *  Get a parameter set.
+	 *  @return The parameter set.
+	 */
+	public IMEParameterSet createParameterSet(final String name)
+	{
+		if(isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					Object	param	= getState().createObject(OAVBDIMetaModel.parameterset_type);
+					getState().setAttributeValue(param, OAVBDIMetaModel.modelelement_has_name, name);
+					getState().addAttributeValue(getHandle(), OAVBDIMetaModel.parameterelement_has_parametersets, param);
+					object	= new MParameterSetFlyweight(getState(), getScope(), param);
+				}
+			};
+			return (IMEParameterSet)invoc.object;
+		}
+		else
+		{
+			Object	param	= getState().createObject(OAVBDIMetaModel.parameterset_type);
+			getState().setAttributeValue(param, OAVBDIMetaModel.modelelement_has_name, name);
+			getState().addAttributeValue(getHandle(), OAVBDIMetaModel.parameterelement_has_parametersets, param);
+			return new MParameterSetFlyweight(getState(), getScope(), param);
 		}
 	}
 }

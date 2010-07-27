@@ -11,6 +11,7 @@ import jadex.bdi.model.editable.IMEGoalReference;
 import jadex.javaparser.IExpressionParser;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
+import jadex.rules.rulesystem.ICondition;
 import jadex.rules.state.IOAVState;
 
 import java.util.Collection;
@@ -268,8 +269,7 @@ public class MExpressionbaseFlyweight  extends MElementFlyweight implements IMEx
      *  @param scope    The scope.
      *  @return    The parsed expression
      */
-    public static IParsedExpression parseExpression(String expression, String language,
-            IOAVState state, Object scope)
+    public static IParsedExpression parseExpression(String expression, String language, IOAVState state, Object scope)
     {
         if(!"java".equals(language))
         {
@@ -282,4 +282,19 @@ public class MExpressionbaseFlyweight  extends MElementFlyweight implements IMEx
         return pexp;
     }
 
+    /**
+     *  Create a condition.
+     *  @param expression    The expression.
+     *  @param language    The expression language or null for default java-like language.
+     *  @param state    The state.
+     *  @param scope    The scope.
+     *  @return    The expression
+     */
+    public static MConditionFlyweight    createCondition(String expression, String language, IOAVState state, Object scope)
+    {
+        Object    mcon    = state.createObject(OAVBDIMetaModel.condition_type);
+        state.setAttributeValue(mcon, OAVBDIMetaModel.expression_has_language, language);    
+        state.setAttributeValue(mcon, OAVBDIMetaModel.expression_has_content, expression);	// parsed later, when registering model.
+        return new MConditionFlyweight(state, scope, mcon);
+    }
 }

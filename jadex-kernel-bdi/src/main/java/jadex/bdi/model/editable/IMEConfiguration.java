@@ -1,10 +1,7 @@
 package jadex.bdi.model.editable;
 
-import jadex.bdi.model.IMConfigBelief;
-import jadex.bdi.model.IMConfigBeliefSet;
 import jadex.bdi.model.IMConfigElement;
 import jadex.bdi.model.IMConfiguration;
-import jadex.bdi.model.IMInitialCapability;
 
 /**
  * 
