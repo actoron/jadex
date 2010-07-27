@@ -2,12 +2,13 @@ package jadex.bdi.model.impl.flyweights;
 
 import jadex.bdi.model.IMConfigBelief;
 import jadex.bdi.model.OAVBDIMetaModel;
+import jadex.bdi.model.editable.IMEConfigBelief;
 import jadex.rules.state.IOAVState;
 
 /**
  * 
  */
-public class MConfigBeliefFlyweight extends MBeliefFlyweight implements IMConfigBelief
+public class MConfigBeliefFlyweight extends MBeliefFlyweight implements IMConfigBelief, IMEConfigBelief
 {
 	//-------- constructors --------
 	

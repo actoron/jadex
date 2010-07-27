@@ -19,13 +19,13 @@ public interface IMEConfiguration extends IMConfiguration, IMEElement
 	 *  Create an initial belief.
 	 *  @param ref The referenced element name.
 	 */
-	public IMEBelief createInitialBelief(String ref);
+	public IMEConfigBelief createInitialBelief(String ref);
 	
 	/**
 	 *  Create an initial belief set.
 	 *  @param ref The referenced element name.
 	 */
-	public IMEBeliefSet createInitialBeliefSet(String ref);
+	public IMEConfigBeliefSet createInitialBeliefSet(String ref);
 	
 	/**
 	 *  Create an initial goal.
@@ -38,47 +38,47 @@ public interface IMEConfiguration extends IMConfiguration, IMEElement
 	 *  @param ref The goal reference.
 	 *  @return The end goal.
 	 */
-	public IMConfigElement createEndGoal(String ref);
+	public IMEConfigElement createEndGoal(String ref);
 	
 	/**
 	 *  Create an initial plan.
 	 *  @param ref The plan reference.
 	 *  @return The initial plan.
 	 */
-	public IMConfigElement createInitialPlan(String ref);
+	public IMEConfigElement createInitialPlan(String ref);
 	
 	/**
 	 *  Create an end plan.
 	 *  @param ref The plan reference.
 	 *  @return The end plan.
 	 */
-	public IMConfigElement createEndPlan(String ref);
+	public IMEConfigElement createEndPlan(String ref);
 	
 	/**
 	 *  Create an initial internal event.
 	 *  @param ref The event reference.
 	 *  @return The initial internal event.
 	 */
-	public IMConfigElement createInitialInternalEvent(String ref);
+	public IMEConfigElement createInitialInternalEvent(String ref);
 	
 	/**
 	 *  Create an end internal event.
 	 *  @param ref The event reference.
 	 *  @return The end internal event.
 	 */
-	public IMConfigElement createEndInternalEvent(String ref);
+	public IMEConfigElement createEndInternalEvent(String ref);
 	
 	/**
 	 *  Create an initial message event.
 	 *  @param ref The event reference.
 	 *  @return The initial message event.
 	 */
-	public IMConfigElement createInitialMessageEvent(String ref);
+	public IMEConfigElement createInitialMessageEvent(String ref);
 	
 	/**
 	 *  Create an end message event.
 	 *  @param ref The event reference.
 	 *  @return The end message event.
 	 */
-	public IMConfigElement createEndMessageEvent(String ref);
+	public IMEConfigElement createEndMessageEvent(String ref);
 }
