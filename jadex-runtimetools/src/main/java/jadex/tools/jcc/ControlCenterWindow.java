@@ -2,6 +2,9 @@ package jadex.tools.jcc;
 
 import jadex.commons.BrowserLauncher;
 import jadex.commons.SUtil;
+import jadex.commons.concurrent.SwingDefaultResultListener;
+import jadex.service.SServiceProvider;
+import jadex.service.library.ILibraryService;
 import jadex.tools.common.AboutDialog;
 import jadex.tools.common.ConfigurationDialog;
 import jadex.tools.common.ConsolePanel;
@@ -633,33 +636,42 @@ public class ControlCenterWindow extends JFrame
 		{
 			final File file = filechooser.getSelectedFile();
 
-			boolean canopen = file!=null && file.canWrite() && file.getName().toLowerCase().endsWith(ControlCenter.JCCPROJECT_EXTENSION);
-			if(canopen)
+			SServiceProvider.getService(((AgentControlCenter)controlcenter).getAgent().getServiceProvider(), ILibraryService.class)
+				.addResultListener(new SwingDefaultResultListener()
 			{
-				controlcenter.saveProject();
-				controlcenter.closeProject();
-				try
+				public void customResultAvailable(Object source, Object result)
 				{
-					controlcenter.openProject(file);//, true);
-				}
-				catch(Exception e)
-				{
-					canopen = false;
-				}
-			}
+					ClassLoader cl = ((ILibraryService)result).getClassLoader();
 			
-			if(!canopen)
-			{
-				SwingUtilities.invokeLater(new Runnable()
-				{
-					public void run()
+					boolean canopen = file!=null && file.canWrite() && file.getName().toLowerCase().endsWith(ControlCenter.JCCPROJECT_EXTENSION);
+					if(canopen)
 					{
-						String	msg	= SUtil.wrapText("Cannot open the project from file:\n"+file);
-						JOptionPane.showMessageDialog(ControlCenterWindow.this, msg, "Cannot open the project",
-							JOptionPane.ERROR_MESSAGE);
+						controlcenter.saveProject();
+						controlcenter.closeProject();
+						try
+						{
+							controlcenter.openProject(file, cl);//, true);
+						}
+						catch(Exception e)
+						{
+							canopen = false;
+						}
 					}
-				});
-			}
+					
+					if(!canopen)
+					{
+						SwingUtilities.invokeLater(new Runnable()
+						{
+							public void run()
+							{
+								String	msg	= SUtil.wrapText("Cannot open the project from file:\n"+file);
+								JOptionPane.showMessageDialog(ControlCenterWindow.this, msg, "Cannot open the project",
+									JOptionPane.ERROR_MESSAGE);
+							}
+						});
+					}
+				}
+			});
 		}
 	}
 	

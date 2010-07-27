@@ -96,10 +96,13 @@ public class ControlCenter implements IControlCenter
 
 		assert Thread.currentThread().getContextClassLoader() != null;
 
-		SwingUtilities.invokeLater(new Runnable()
+		SServiceProvider.getService(container, ILibraryService.class)
+			.addResultListener(new SwingDefaultResultListener()
 		{
-			public void run()
+			public void customResultAvailable(Object source, Object result)
 			{
+				ClassLoader cl = ((ILibraryService)result).getClassLoader();
+	
 				window = new ControlCenterWindow(ControlCenter.this);
 
 				// Load plugins.
@@ -162,7 +165,7 @@ public class ControlCenter implements IControlCenter
 						try
 						{
 							File project = new File(proj);
-							openProject(project);// , false);
+							openProject(project, cl);// , false);
 							window.filechooser.setCurrentDirectory(project.getParentFile());
 							window.filechooser.setSelectedFile(project);
 							window.setVisible(true);
@@ -252,36 +255,21 @@ public class ControlCenter implements IControlCenter
 	/**
 	 * Open a given project.
 	 */
-	public void openProject(final File pd) throws Exception
+	public void openProject(final File pd, ClassLoader cl) throws Exception
 	{
 //		System.out.println("openPro: "+Thread.currentThread().getName());
 		
 		// Read project properties
-		SServiceProvider.getService(container, ILibraryService.class)
-			.addResultListener(new SwingDefaultResultListener()
-		{
-			public void customResultAvailable(Object source, Object result)
-			{
+//		SServiceProvider.getService(container, ILibraryService.class)
+//			.addResultListener(new SwingDefaultResultListener()
+//		{
+//			public void customResultAvailable(Object source, Object result)
+//			{
 				try
 				{
-					ClassLoader cl = ((ILibraryService)result).getClassLoader();
+//					ClassLoader cl = ((ILibraryService)result).getClassLoader();
 					FileInputStream fis = new FileInputStream(pd);
-					
-		//			try
-		//			{
-		//				DataInputStream dis = new DataInputStream(fis);
-		//				while(dis.available()!=0)
-		//					System.out.println(dis.readLine());
-		//			}
-		//			catch(Exception e)
-		//			{
-		//			}
-		//			fis = new FileInputStream(pd);
-					
 					props = (Properties)PropertiesXMLHelper.getPropertyReader().read(fis, cl, null);
-		//			props = XMLPropertiesReader.readProperties(fis,
-		//					((ILibraryService)agent.getPlatform().getService(
-		//							ILibraryService.class)).getClassLoader());
 					fis.close();
 					
 					setCurrentProject(pd);
@@ -358,12 +346,12 @@ public class ControlCenter implements IControlCenter
 						}
 					});
 					
-//					throw e;
+					throw e;
 					// e.printStackTrace();
 					// return;
 				}
-			}
-		});
+//			}
+//		});
 	}
 
 	/**
