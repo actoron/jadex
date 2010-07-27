@@ -268,7 +268,7 @@ public class MGoalbaseFlyweight extends MElementFlyweight implements IMGoalbase,
 	 *  Create a maintain goal for a name.
 	 *  @param name	The goal name.
 	 */
-	public IMEMaintainGoal createMaintainGoal(String name)
+	public IMEMaintainGoal createMaintainGoal(final String name)
 	{
 		if(isExternalThread())
 		{
@@ -297,7 +297,7 @@ public class MGoalbaseFlyweight extends MElementFlyweight implements IMGoalbase,
 	 *  Create a meta goal for a name.
 	 *  @param name	The goal name.
 	 */
-	public IMEMetaGoal createMetaGoal(String name)
+	public IMEMetaGoal createMetaGoal(final String name)
 	{
 		if(isExternalThread())
 		{

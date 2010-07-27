@@ -7,7 +7,7 @@ import jadex.rules.state.IOAVState;
 /**
  *  Flyweight for perform goal model element.
  */
-public class MPerformGoalFlyweight extends MGoalFlyweight	implements IMPerformGoal, IMEPerformGoal
+public class MPerformGoalFlyweight extends MGoalFlyweight implements IMPerformGoal, IMEPerformGoal
 {
 	//-------- constructors --------
 	
