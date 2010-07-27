@@ -1,6 +1,5 @@
 package jadex.bdi.model.editable;
 
-import jadex.bdi.model.IMConfigElement;
 import jadex.bdi.model.IMConfiguration;
 
 /**

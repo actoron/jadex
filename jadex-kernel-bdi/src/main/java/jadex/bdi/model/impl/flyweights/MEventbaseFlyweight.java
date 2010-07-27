@@ -7,13 +7,10 @@ import jadex.bdi.model.IMMessageEvent;
 import jadex.bdi.model.IMMessageEventReference;
 import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.model.editable.IMEEventbase;
-import jadex.bdi.model.editable.IMEGoalReference;
 import jadex.bdi.model.editable.IMEInternalEvent;
 import jadex.bdi.model.editable.IMEInternalEventReference;
 import jadex.bdi.model.editable.IMEMessageEvent;
 import jadex.bdi.model.editable.IMEMessageEventReference;
-import jadex.bdi.model.editable.IMEMetaGoal;
-import jadex.bdi.model.impl.flyweights.MElementFlyweight.AgentInvocation;
 import jadex.rules.state.IOAVState;
 
 import java.util.Collection;

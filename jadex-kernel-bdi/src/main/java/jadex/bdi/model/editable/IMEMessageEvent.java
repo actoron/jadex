@@ -1,6 +1,5 @@
 package jadex.bdi.model.editable;
 
-import jadex.bdi.model.IMExpression;
 import jadex.bdi.model.IMMessageEvent;
 
 /**

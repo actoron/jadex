@@ -1,7 +1,5 @@
 package jadex.bdi.model;
 
-import java.util.Collection;
-
 import jadex.bridge.MessageType;
 import jadex.javaparser.IParsedExpression;
 import jadex.rules.state.IOAVState;
@@ -9,6 +7,8 @@ import jadex.rules.state.OAVAttributeType;
 import jadex.rules.state.OAVJavaType;
 import jadex.rules.state.OAVObjectType;
 import jadex.rules.state.OAVTypeModel;
+
+import java.util.Collection;
 
 /**
  *  OAV BDI-meta model.

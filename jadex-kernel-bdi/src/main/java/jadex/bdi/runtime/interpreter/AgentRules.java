@@ -1053,7 +1053,7 @@ public class AgentRules
 			for(Iterator it=mservices.iterator(); it.hasNext(); )
 			{
 				Object mexp = it.next();
-				String name = (String)state.getAttributeValue(mexp, OAVBDIMetaModel.modelelement_has_name);
+//				String name = (String)state.getAttributeValue(mexp, OAVBDIMetaModel.modelelement_has_name);
 				Object val = evaluateExpression(state, mexp, new OAVBDIFetcher(state, rcapa));
 				Class type = (Class)state.getAttributeValue(mexp, OAVBDIMetaModel.expression_has_class);
 				// cast hack?!

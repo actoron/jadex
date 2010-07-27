@@ -134,7 +134,7 @@ public class MBeliefFlyweight extends MTypedElementFlyweight implements IMBelief
 	{
 		if(isExternalThread())
 		{
-			AgentInvocation invoc = new AgentInvocation()
+			new AgentInvocation()
 			{
 				public void run()
 				{
@@ -156,7 +156,7 @@ public class MBeliefFlyweight extends MTypedElementFlyweight implements IMBelief
 	{
 		if(isExternalThread())
 		{
-			AgentInvocation invoc = new AgentInvocation()
+			new AgentInvocation()
 			{
 				public void run()
 				{

@@ -5,7 +5,6 @@ import jadex.bdi.model.IMCondition;
 import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.model.editable.IMEAchieveGoal;
 import jadex.bdi.model.editable.IMECondition;
-import jadex.bdi.model.impl.flyweights.MElementFlyweight.AgentInvocation;
 import jadex.rules.state.IOAVState;
 
 /**

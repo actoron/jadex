@@ -1,7 +1,5 @@
 package jadex.bdi.runtime.impl.flyweights;
 
-import jadex.bdi.model.IMElement;
-import jadex.bdi.model.impl.flyweights.MBeliefFlyweight;
 import jadex.bdi.runtime.IElement;
 import jadex.bdi.runtime.impl.eaflyweights.EAParameterFlyweight;
 import jadex.bdi.runtime.impl.eaflyweights.EAParameterSetFlyweight;

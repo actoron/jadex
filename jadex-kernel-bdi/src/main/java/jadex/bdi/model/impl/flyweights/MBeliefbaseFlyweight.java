@@ -11,12 +11,6 @@ import jadex.bdi.model.editable.IMEBeliefReference;
 import jadex.bdi.model.editable.IMEBeliefSet;
 import jadex.bdi.model.editable.IMEBeliefSetReference;
 import jadex.bdi.model.editable.IMEBeliefbase;
-import jadex.bdi.model.editable.IMEExpression;
-import jadex.bdi.model.impl.flyweights.MElementFlyweight.AgentInvocation;
-import jadex.bdi.runtime.interpreter.BeliefRules;
-import jadex.javaparser.IExpressionParser;
-import jadex.javaparser.IParsedExpression;
-import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 import jadex.rules.state.IOAVState;
 
 import java.util.Collection;

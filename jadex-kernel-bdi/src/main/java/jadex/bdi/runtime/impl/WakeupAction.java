@@ -1,7 +1,5 @@
 package jadex.bdi.runtime.impl;
 
-import java.util.List;
-
 import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.runtime.GoalFailureException;
 import jadex.bdi.runtime.TimeoutException;
@@ -16,6 +14,8 @@ import jadex.bridge.CheckedAction;
 import jadex.commons.Future;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVObjectType;
+
+import java.util.List;
 
 /**
  *  The action class for continuing the external thread.

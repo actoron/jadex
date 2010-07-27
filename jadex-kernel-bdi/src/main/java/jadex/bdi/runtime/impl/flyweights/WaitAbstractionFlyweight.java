@@ -1,14 +1,12 @@
 package jadex.bdi.runtime.impl.flyweights;
 
 import jadex.bdi.model.IMElement;
-import jadex.bdi.model.impl.flyweights.MPropertybaseFlyweight;
 import jadex.bdi.model.impl.flyweights.MTriggerFlyweight;
 import jadex.bdi.runtime.IExternalCondition;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.IWaitAbstraction;
 import jadex.bdi.runtime.impl.SFlyweightFunctionality;
-import jadex.bdi.runtime.impl.flyweights.ElementFlyweight.AgentInvocation;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.rules.state.IOAVState;
