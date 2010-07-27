@@ -718,12 +718,14 @@ public class MessageEventRules
 				final IMessageAdapter msg = new DefaultMessageAdapter(message, mtype);
 				
 				final BDIInterpreter interpreter = BDIInterpreter.getInterpreter(state);
+				
 				SServiceProvider.getService(interpreter.getServiceProvider(), IMessageService.class)
 					.addResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object source, Object result)
 					{
-						((IMessageService)result).sendMessage(msg.getParameterMap(), msg.getMessageType(), interpreter.getAgentAdapter(), interpreter.getModel().getState().getTypeModel().getClassLoader());
+						((IMessageService)result).sendMessage(msg.getParameterMap(), msg.getMessageType(), 
+							interpreter.getAgentAdapter().getComponentIdentifier(), interpreter.getModel().getState().getTypeModel().getClassLoader());
 					}
 				});
 

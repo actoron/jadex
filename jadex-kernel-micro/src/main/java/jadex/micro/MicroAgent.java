@@ -323,7 +323,8 @@ public abstract class MicroAgent implements IMicroAgent
 			public void resultAvailable(Object source, Object result)
 			{
 				IMessageService ms = (IMessageService)result;
-				ms.sendMessage(me, mt, interpreter.getAgentAdapter(), interpreter.getAgentModel().getClassLoader());
+				ms.sendMessage(me, mt, interpreter.getAgentAdapter().getComponentIdentifier(),
+					interpreter.getAgentModel().getClassLoader());
 			}
 		}));
 	}

@@ -6,6 +6,7 @@ import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IContentCodec;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.IMessageListener;
 import jadex.bridge.IMessageService;
@@ -85,6 +86,10 @@ public class MessageService extends BasicService implements IMessageService
 	
 	/** The cashed clock service. */
 	protected IClockService	clockservice;
+	
+	/** The cashed clock service. */
+	protected IComponentManagementService cms;
+
 
 	//-------- constructors --------
 
@@ -112,10 +117,10 @@ public class MessageService extends BasicService implements IMessageService
 	 *  Send a message.
 	 *  @param message The native message.
 	 */
-//	public void sendMessage(Map msg, MessageType type, IComponentIdentifier sender, ClassLoader cl)
-	public void sendMessage(final Map msg, final MessageType type, final IComponentAdapter adapter, final ClassLoader cl)
+	public void sendMessage(final Map msg, final MessageType type, IComponentIdentifier sender, final ClassLoader cl)
+//	public void sendMessage(final Map msg, final MessageType type, final IComponentAdapter adapter, final ClassLoader cl)
 	{
-		IComponentIdentifier sender = adapter.getComponentIdentifier();
+//		IComponentIdentifier sender = adapter.getComponentIdentifier();
 		if(sender==null)
 			throw new RuntimeException("Sender must not be null: "+msg);
 	
@@ -133,29 +138,47 @@ public class MessageService extends BasicService implements IMessageService
 			msgcopy.put(idid, SUtil.createUniqueId(sender.getLocalName()));
 
 		final String sd = type.getTimestampIdentifier();
-		Object senddate = msgcopy.get(sd);
-		if(senddate==null)
+		final Object senddate = msgcopy.get(sd);
+		
+		cms.getExternalAccess(sender).addResultListener(new IResultListener()
 		{
-			SServiceProvider.getService(container, IClockService.class).addResultListener(new DefaultResultListener()
+			
+			public void resultAvailable(Object source, Object result)
 			{
-				public void resultAvailable(Object source, Object result)
+				IExternalAccess exta = (IExternalAccess)result;
+				if(senddate==null)
 				{
-					if(result!=null)
-						msgcopy.put(sd, ""+((IClockService)result).getTime());
-					doSendMessage(msg, type, adapter, cl, msgcopy);
+//					SServiceProvider.getService(container, IClockService.class).addResultListener(new DefaultResultListener()
+//					{
+//						public void resultAvailable(Object source, Object result)
+//						{
+//							if(result!=null)
+//								msgcopy.put(sd, ""+((IClockService)result).getTime());
+							
+							msgcopy.put(sd, ""+clockservice.getTime());
+							
+							doSendMessage(msg, type, exta, cl, msgcopy);
+//						}
+//					});
 				}
-			});
-		}
-		else
-		{
-			doSendMessage(msg, type, adapter, cl, msgcopy);
-		}
+				else
+				{
+					doSendMessage(msg, type, exta, cl, msgcopy);
+				}
+			}
+			
+			public void exceptionOccurred(Object source, Exception exception)
+			{
+			}
+		});
+		
+		
 	}
 
 	/**
 	 *  Extracted method to be callable from listener.
 	 */
-	protected void doSendMessage(Map msg, MessageType type, IComponentAdapter adapter, ClassLoader cl, Map msgcopy)
+	protected void doSendMessage(Map msg, MessageType type, IExternalAccess comp, ClassLoader cl, Map msgcopy)
 	{
 		IComponentIdentifier[] receivers = null;
 		Object tmp = msgcopy.get(type.getReceiverIdentifier());
@@ -172,7 +195,7 @@ public class MessageService extends BasicService implements IMessageService
 		}
 
 		// Conversion via platform specific codecs
-		IContentCodec[] compcodecs = getContentCodecs((StandaloneComponentAdapter)adapter);
+		IContentCodec[] compcodecs = getContentCodecs(comp.getModel().getProperties());
 		for(Iterator it=msgcopy.keySet().iterator(); it.hasNext(); )
 		{
 			String	name	= (String)it.next();
@@ -212,10 +235,9 @@ public class MessageService extends BasicService implements IMessageService
 	 *  @param props The properties.
 	 *  @return The content codec.
 	 */
-	public static IContentCodec[] getContentCodecs(StandaloneComponentAdapter adapter)
+	public static IContentCodec[] getContentCodecs(Map props)
 	{
 		List ret = null;
-		Map props = adapter.getModel().getProperties();
 		if(props!=null)
 		{
 			for(Iterator it=props.keySet().iterator(); ret==null && it.hasNext();)
@@ -416,7 +438,19 @@ public class MessageService extends BasicService implements IMessageService
 						public void resultAvailable(Object source, Object result)
 						{
 							clockservice = (IClockService)result;
-							ret.setResult(MessageService.this);
+							SServiceProvider.getServiceUpwards(container, IComponentManagementService.class).addResultListener(new IResultListener()
+							{
+								public void resultAvailable(Object source, Object result)
+								{
+									cms = (IComponentManagementService)result;
+									ret.setResult(MessageService.this);
+								}
+								
+								public void exceptionOccurred(Object source, Exception exception)
+								{
+									ret.setException(exception);
+								}
+							});
 						}
 						
 						public void exceptionOccurred(Object source, Exception exception)
@@ -534,7 +568,7 @@ public class MessageService extends BasicService implements IMessageService
 				for(int i = 0; i < receivers.length; i++)
 				{
 					final int cnt = i; 
-					((ComponentManagementService)result).getComponentAdapter(receivers[i], new IResultListener()
+					((ComponentManagementService)cms).getComponentAdapter(receivers[i], new IResultListener()
 					{
 						public void resultAvailable(Object source, Object result)
 						{
@@ -557,7 +591,7 @@ public class MessageService extends BasicService implements IMessageService
 									}
 
 									// Conversion via platform specific codecs
-									IContentCodec[] compcodecs = getContentCodecs(component);
+									IContentCodec[] compcodecs = getContentCodecs(component.getModel().getProperties());
 									for(Iterator it=message.keySet().iterator(); it.hasNext(); )
 									{
 										String name = (String)it.next();

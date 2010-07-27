@@ -12,8 +12,8 @@ public interface IMessageService
 	 *  Send a message.
 	 *  @param cl The class loader used by the sending component (i.e. corresponding to classes of objects in the message map).
 	 */
-//	public void sendMessage(Map message, MessageType msgtype, IComponentIdentifier sender, ClassLoader cl);
-	public void sendMessage(Map message, MessageType msgtype, IComponentAdapter sender, ClassLoader cl);
+	public void sendMessage(Map message, MessageType msgtype, IComponentIdentifier sender, ClassLoader cl);
+//	public void sendMessage(Map message, MessageType msgtype, IComponentAdapter sender, ClassLoader cl);
 	
 	/**
 	 *  Deliver a message to some components.
