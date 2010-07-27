@@ -3,6 +3,8 @@ package jadex.commons;
 import jadex.commons.collection.LRU;
 
 import java.io.IOException;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  *  Loader for managing models, loaded from disc and kept in cache.
@@ -16,6 +18,9 @@ public abstract class AbstractModelLoader
 	
 	/** The model cache (filename -> loaded model). */
 	protected LRU modelcache;
+	
+	/** The registered models (filename -> loaded model). */
+	protected Map registered;
 	
 	//-------- constructors --------
 	
@@ -36,6 +41,7 @@ public abstract class AbstractModelLoader
 	{
 		this.extensions	= extensions;
 		this.modelcache	= new LRU(cachesize);
+		this.registered	= new LinkedHashMap();
 	}
 
 	//-------- helper methods --------
@@ -56,10 +62,20 @@ public abstract class AbstractModelLoader
 	 */
 	protected ResourceInfo	getResourceInfo(String name, String[] imports, ClassLoader classloader) throws Exception
 	{
-		ResourceInfo ret = getResourceInfo0(name, imports, classloader);
-
-		if(ret==null || ret.getInputStream()==null)
-			throw new IOException("File "+name+" not found in imports: "+SUtil.arrayToString(imports));
+		ResourceInfo ret;
+		if(registered.containsKey(name))
+		{
+			// Hack!!! ignore file handling for registered models.
+			ICacheableModel	model	= (ICacheableModel)registered.get(name);
+			ret	= new ResourceInfo(name, null, model.getLastModified());
+		}
+		else
+		{
+			ret = getResourceInfo0(name, imports, classloader);
+	
+			if(ret==null || ret.getInputStream()==null)
+				throw new IOException("File "+name+" not found in imports: "+SUtil.arrayToString(imports));
+		}
 
 		return ret;
 	}
@@ -111,43 +127,52 @@ public abstract class AbstractModelLoader
 	 */
 	protected ResourceInfo	getResourceInfo(String name, String extension, String[] imports, ClassLoader classloader) throws Exception
 	{
-		// Try to find directly as absolute path.
-		String resstr = name;
-		ResourceInfo ret = SUtil.getResourceInfo0(resstr, classloader);
-		if(ret!=null && !ret.getFilename().endsWith(extension))
-			ret	= null;
-		
-		if(name.endsWith(extension))
-			name	= name.substring(0, name.length()-extension.length());
-
-		if(ret==null || ret.getInputStream()==null)
+		ResourceInfo ret;
+		if(registered.containsKey(name))
 		{
-			// Fully qualified package name? Can also be full package name with empty package ;-)
-			resstr	= SUtil.replace(name, ".", "/") + extension;
-			ret	= SUtil.getResourceInfo0(resstr, classloader);
-
-			// Try to find in imports.
-			for(int i=0; (ret==null || ret.getInputStream()==null) && imports!=null && i<imports.length; i++)
+			// Hack!!! ignore file handling for registered models.
+			ICacheableModel	model	= (ICacheableModel)registered.get(name);
+			ret	= new ResourceInfo(name, null, model.getLastModified());
+		}
+		else
+		{
+			// Try to find directly as absolute path.
+			String resstr = name;
+			ret = SUtil.getResourceInfo0(resstr, classloader);
+			if(ret!=null && !ret.getFilename().endsWith(extension))
+				ret	= null;
+			
+			if(name.endsWith(extension))
+				name	= name.substring(0, name.length()-extension.length());
+	
+			if(ret==null || ret.getInputStream()==null)
 			{
-				// Package import
-				if(imports[i].endsWith(".*"))
+				// Fully qualified package name? Can also be full package name with empty package ;-)
+				resstr	= SUtil.replace(name, ".", "/") + extension;
+				ret	= SUtil.getResourceInfo0(resstr, classloader);
+	
+				// Try to find in imports.
+				for(int i=0; (ret==null || ret.getInputStream()==null) && imports!=null && i<imports.length; i++)
 				{
-					resstr = SUtil.replace(imports[i].substring(0,
-						imports[i].length()-1), ".", "/") + name + extension;
-					ret	= SUtil.getResourceInfo0(resstr, classloader);
-				}
-				// Direct import
-				else if(imports[i].endsWith(name))
-				{
-					resstr = SUtil.replace(imports[i], ".", "/") + extension;
-					ret	= SUtil.getResourceInfo0(resstr, classloader);
+					// Package import
+					if(imports[i].endsWith(".*"))
+					{
+						resstr = SUtil.replace(imports[i].substring(0,
+							imports[i].length()-1), ".", "/") + name + extension;
+						ret	= SUtil.getResourceInfo0(resstr, classloader);
+					}
+					// Direct import
+					else if(imports[i].endsWith(name))
+					{
+						resstr = SUtil.replace(imports[i], ".", "/") + extension;
+						ret	= SUtil.getResourceInfo0(resstr, classloader);
+					}
 				}
 			}
+	
+			if(ret==null || ret.getInputStream()==null)
+				throw new IOException("File "+name+" not found in imports: "+SUtil.arrayToString(imports));
 		}
-
-		if(ret==null || ret.getInputStream()==null)
-			throw new IOException("File "+name+" not found in imports: "+SUtil.arrayToString(imports));
-
 		return ret;
 	}
 	
@@ -199,7 +224,7 @@ public abstract class AbstractModelLoader
 		ResourceInfo	info	= null;
 		//		synchronized(modelcache)
 //		{
-			cached	= (ICacheableModel)modelcache.get(keytuple);
+			cached	= getCachedModel(keytuple);
 			// If model is in cache, check at most every second if file on disc is newer.
 			if(cached!=null && cached.getLastChecked()+1000<System.currentTimeMillis())
 			{
@@ -222,7 +247,7 @@ public abstract class AbstractModelLoader
 //			synchronized(modelcache)
 //			{
 				info	= extension!=null ? getResourceInfo(name, extension, imports, classloader) : getResourceInfo(name, imports, classloader);
-				cached	= (ICacheableModel)modelcache.get(info.getFilename());
+				cached	= getCachedModel(info.getFilename());
 				if(cached!=null)
 				{
 					if(cached.getLastModified()<info.getLastModified())
@@ -298,4 +323,37 @@ public abstract class AbstractModelLoader
 			throw new RuntimeException("Unknown extension: "+filename);
 		return ret;
 	}*/
+	
+	/**
+	 *  Register a model.
+	 */
+	public void	registerModel(Object key, ICacheableModel model)
+	{
+		registered.put(key, model);
+	}
+	
+	/**
+	 *  Deregister a model.
+	 */
+	public void	deregisterModel(Object key)
+	{
+		registered.remove(key);
+	}
+	
+	/**
+	 *  Get a model from cache (if any).
+	 */
+	protected ICacheableModel	getCachedModel(Object key)
+	{
+		ICacheableModel	ret	= null;
+		if(modelcache.containsKey(key))
+		{
+			ret	= (ICacheableModel)modelcache.get(key);
+		}
+		else if(registered.containsKey(key))
+		{
+			ret	= (ICacheableModel)registered.get(key);
+		}
+		return ret;
+	}
 }

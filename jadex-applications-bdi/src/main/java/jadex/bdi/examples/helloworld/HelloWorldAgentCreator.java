@@ -2,6 +2,7 @@ package jadex.bdi.examples.helloworld;
 
 import jadex.base.Starter;
 import jadex.bdi.BDIAgentFactory;
+import jadex.bdi.model.editable.IMEBelief;
 import jadex.bdi.model.editable.IMECapability;
 import jadex.bdi.model.editable.IMEConfiguration;
 import jadex.bdi.model.editable.IMEPlan;
@@ -34,12 +35,16 @@ public class HelloWorldAgentCreator
 						BDIAgentFactory fac = (BDIAgentFactory)result;
 						
 						IMECapability agent = fac.createAgentModel("HelloWorld", "jadex.bdi.examples.helloworld", null);
+						
+						IMEBelief	msgbelief	= agent.createBeliefbase().createBelief("msg");
+						msgbelief.createFact("\"Welcome to editable models!\"", null);
+						
 						IMEPlan helloplan = agent.createPlanbase().createPlan("hello");
 						helloplan.createBody("HelloWorldPlan", null);
 						IMEConfiguration conf = agent.createConfiguration("default");
 						conf.createInitialPlan("hello");
 						
-						fac.registerAgentModel(agent, "helloagent");
+						fac.registerAgentModel(agent, "helloagent.agent.xml");
 						
 						SServiceProvider.getServiceUpwards(plat.getServiceProvider(), IComponentManagementService.class)
 							.addResultListener(new DefaultResultListener()
@@ -47,11 +52,11 @@ public class HelloWorldAgentCreator
 							public void resultAvailable(Object source, Object result)
 							{
 								IComponentManagementService cms = (IComponentManagementService)result;
-								cms.createComponent("hw1", "helloagent", null, new DefaultResultListener()
+								cms.createComponent("hw1", "helloagent.agent.xml", null, new DefaultResultListener()
 								{
 									public void resultAvailable(Object source, Object result)
 									{
-										System.out.println("eeende");
+										System.out.println("finished.");
 									}
 								});
 							}

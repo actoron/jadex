@@ -269,7 +269,7 @@ public class MExpressionbaseFlyweight  extends MElementFlyweight implements IMEx
      */
     public static IParsedExpression parseExpression(String expression, String language, IOAVState state, Object scope)
     {
-        if(!"java".equals(language))
+        if(language!=null && !"java".equals(language))
         {
             throw new UnsupportedOperationException("Only java currently supported.");
         }

@@ -13,7 +13,6 @@ import jadex.bdi.model.editable.IMEPlan;
 import jadex.bdi.model.editable.IMEPlanBody;
 import jadex.bdi.model.editable.IMEPlanTrigger;
 import jadex.bdi.model.editable.IMETrigger;
-import jadex.commons.SReflect;
 import jadex.rules.state.IOAVState;
 
 /**
@@ -303,24 +302,9 @@ public class MPlanFlyweight extends MParameterElementFlyweight implements IMPlan
 				public void run()
 				{
 					Object	body	= getState().createObject(OAVBDIMetaModel.body_type);
-					getState().setAttributeValue(body, OAVBDIMetaModel.body_has_type, type);
-					if(type==null || "standard".equals(type))
-					{
-						try
-						{
-							Class	clazz	= SReflect.findClass(impl, OAVBDIMetaModel.getImports(getState(), getScope()),
-								getState().getTypeModel().getClassLoader());
-							getState().setAttributeValue(body, OAVBDIMetaModel.expression_has_class, clazz);
-						}
-						catch(ClassNotFoundException cnfe)
-						{
-							throw new RuntimeException(cnfe);
-						}
-					}
-					else
-					{
-						getState().setAttributeValue(body, OAVBDIMetaModel.body_has_impl, impl);
-					}
+					if(type!=null)
+						getState().setAttributeValue(body, OAVBDIMetaModel.body_has_type, type);
+					getState().setAttributeValue(body, OAVBDIMetaModel.body_has_impl, impl);
 					getState().setAttributeValue(getHandle(), OAVBDIMetaModel.plan_has_body, body);
 					
 					object	= new MPlanBodyFlyweight(getState(), getScope(), body);
@@ -331,24 +315,9 @@ public class MPlanFlyweight extends MParameterElementFlyweight implements IMPlan
 		else
 		{
 			Object	body	= getState().createObject(OAVBDIMetaModel.body_type);
-			getState().setAttributeValue(body, OAVBDIMetaModel.body_has_type, type);
-			if(type==null || "standard".equals(type))
-			{
-				try
-				{
-					Class	clazz	= SReflect.findClass(impl, OAVBDIMetaModel.getImports(getState(), getScope()),
-						getState().getTypeModel().getClassLoader());
-					getState().setAttributeValue(body, OAVBDIMetaModel.expression_has_class, clazz);
-				}
-				catch(ClassNotFoundException cnfe)
-				{
-					throw new RuntimeException(cnfe);
-				}
-			}
-			else
-			{
-				getState().setAttributeValue(body, OAVBDIMetaModel.body_has_impl, impl);
-			}
+			if(type!=null)
+				getState().setAttributeValue(body, OAVBDIMetaModel.body_has_type, type);
+			getState().setAttributeValue(body, OAVBDIMetaModel.body_has_impl, impl);
 			getState().setAttributeValue(getHandle(), OAVBDIMetaModel.plan_has_body, body);
 			
 			return new MPlanBodyFlyweight(getState(), getScope(), body);

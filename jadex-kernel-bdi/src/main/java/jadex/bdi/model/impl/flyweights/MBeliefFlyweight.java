@@ -101,9 +101,11 @@ public class MBeliefFlyweight extends MTypedElementFlyweight implements IMBelief
 	
 	/**
 	 *  Create the fact.
+	 *  @param expression	The expression.
+	 *  @param language	The expression language (or null for default java-like language).
 	 *  @return The fact. 
 	 */
-	public IMEExpression createFact()
+	public IMEExpression createFact(final String expression, final String language)
 	{
 		if(isExternalThread())
 		{
@@ -111,18 +113,18 @@ public class MBeliefFlyweight extends MTypedElementFlyweight implements IMBelief
 			{
 				public void run()
 				{
-					Object elem = getState().createObject(OAVBDIMetaModel.expression_type);
-					getState().setAttributeValue(getHandle(), OAVBDIMetaModel.belief_has_fact, elem);
-					object = new MExpressionFlyweight(getState(), getScope(), elem);
+					MExpressionFlyweight	mfact	= MExpressionbaseFlyweight.createExpression(expression, language, getState(), getScope());
+					getState().setAttributeValue(getHandle(), OAVBDIMetaModel.belief_has_fact, mfact.getHandle());
+					object = mfact;
 				}
 			};
 			return (IMEExpression)invoc.object;
 		}
 		else
 		{
-			Object elem = getState().createObject(OAVBDIMetaModel.expression_type);
-			getState().setAttributeValue(getHandle(), OAVBDIMetaModel.belief_has_fact, elem);
-			return new MExpressionFlyweight(getState(), getScope(), elem);
+			MExpressionFlyweight	mfact	= MExpressionbaseFlyweight.createExpression(expression, language, getState(), getScope());
+			getState().setAttributeValue(getHandle(), OAVBDIMetaModel.belief_has_fact, mfact.getHandle());
+			return mfact;
 		}
 	}
 	

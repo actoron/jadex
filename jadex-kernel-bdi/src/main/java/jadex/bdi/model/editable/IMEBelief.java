@@ -9,9 +9,11 @@ public interface IMEBelief extends IMBelief, IMETypedElement
 {
 	/**
 	 *  Create the fact.
+	 *  @param expression	The expression.
+	 *  @param language	The expression language (or null for default java-like language).
 	 *  @return The fact. 
 	 */
-	public IMEExpression createFact();
+	public IMEExpression createFact(String expression, String language);
 	
 	/**
 	 *  Set the belief is used as argument.

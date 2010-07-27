@@ -320,6 +320,8 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory
 				throw new RuntimeException(e);
 		}
 		
+		loader.registerModel(filename, ret);
+		
 		return ret;
 	}
 }
