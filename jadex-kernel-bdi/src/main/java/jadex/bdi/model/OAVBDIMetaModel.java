@@ -1051,7 +1051,7 @@ public class OAVBDIMetaModel
 //		goal_has_cardinality = goal_type.createAttributeType("mgoal_has_cardinality", OAVJavaType.java_integer_type, OAVAttributeType.NONE, new Integer(-1));
 		goal_has_cardinality = goal_type.createAttributeType("mgoal_has_cardinality", OAVJavaType.java_integer_type, OAVAttributeType.NONE, new Integer(Integer.MAX_VALUE));
 		goal_has_unique = goal_type.createAttributeType("mgoal_has_unique", OAVJavaType.java_boolean_type);
-		goal_has_excludedparameter = goal_type.createAttributeType("mgoal_has_excludedparameter", typedelement_type, OAVAttributeType.LIST);
+		goal_has_excludedparameter = goal_type.createAttributeType("mgoal_has_excludedparameter", parameter_type, OAVAttributeType.LIST);	// Todo: parameter sets?
 		
 		// perform goal
 		

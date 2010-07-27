@@ -1,12 +1,11 @@
 package jadex.bdi.model.editable;
 
-import jadex.bdi.model.IMParameterElement;
 import jadex.bdi.model.IMProcessableElement;
 
 /**
  * 
  */
-public interface IMEProcessableElement extends IMProcessableElement, IMParameterElement
+public interface IMEProcessableElement extends IMProcessableElement, IMEParameterElement
 {
 	/**
 	 *  Test if is posttoall.

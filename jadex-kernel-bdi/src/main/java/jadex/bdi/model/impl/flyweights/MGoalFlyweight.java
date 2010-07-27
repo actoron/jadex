@@ -528,7 +528,7 @@ public class MGoalFlyweight extends MProcessableElementFlyweight implements IMGo
 			{
 				public void run()
 				{
-					MConditionFlyweight mcond = SMFlyweightFunctionality.createCondition(expression, language, getState(), getHandle());
+					MConditionFlyweight mcond = MExpressionbaseFlyweight.createCondition(expression, language, getState(), getHandle());
 					getState().addAttributeValue(getHandle(), OAVBDIMetaModel.goal_has_recurcondition, mcond.getHandle());
 					object	= mcond;
 				}
@@ -537,7 +537,7 @@ public class MGoalFlyweight extends MProcessableElementFlyweight implements IMGo
 		}
 		else
 		{
-			MConditionFlyweight mcond = SMFlyweightFunctionality.createCondition(expression, language, getState(), getHandle());
+			MConditionFlyweight mcond = MExpressionbaseFlyweight.createCondition(expression, language, getState(), getHandle());
 			getState().addAttributeValue(getHandle(), OAVBDIMetaModel.goal_has_recurcondition, mcond.getHandle());
 			return mcond;
 		}

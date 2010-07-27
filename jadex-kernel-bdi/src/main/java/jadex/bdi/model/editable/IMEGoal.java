@@ -9,21 +9,27 @@ public interface IMEGoal extends IMGoal, IMEProcessableElement
 {
 	/**
 	 *  Create the creation condition.
+	 *  @param expression	The expression.
+	 *  @param language	The expression language (or null for default java-like language).
 	 *  @return The creation condition.
 	 */
-	public IMECondition createCreationCondition();
+	public IMECondition createCreationCondition(String expression, String language);
 	
 	/**
 	 *  Create the context condition.
+	 *  @param expression	The expression.
+	 *  @param language	The expression language (or null for default java-like language).
 	 *  @return The context condition.
 	 */
-	public IMECondition createContextCondition();
+	public IMECondition createContextCondition(String expression, String language);
 	
 	/**
 	 *  Create the drop condition.
+	 *  @param expression	The expression.
+	 *  @param language	The expression language (or null for default java-like language).
 	 *  @return The drop condition.
 	 */
-	public IMECondition createDropCondition();
+	public IMECondition createDropCondition(String expression, String language);
 	
 	/**
 	 *  Set the retry flag.
@@ -51,9 +57,11 @@ public interface IMEGoal extends IMGoal, IMEProcessableElement
 	
 	/**
 	 *  Create the recur condition.
+	 *  @param expression	The expression.
+	 *  @param language	The expression language (or null for default java-like language).
 	 *  @return The recur condition.
 	 */
-	public IMECondition createRecurCondition();
+	public IMECondition createRecurCondition(String expression, String language);
 
 	/**
 	 *  Set the exlcude mode.
