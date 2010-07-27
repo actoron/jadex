@@ -1,12 +1,13 @@
 package jadex.bdi.model.impl.flyweights;
 
 import jadex.bdi.model.IMBeliefReference;
+import jadex.bdi.model.editable.IMEBeliefReference;
 import jadex.rules.state.IOAVState;
 
 /**
  *  Belief model reference flyweight.
  */
-public class MBeliefReferenceFlyweight extends MElementReferenceFlyweight implements IMBeliefReference
+public class MBeliefReferenceFlyweight extends MElementReferenceFlyweight implements IMBeliefReference, IMEBeliefReference
 {
 	//-------- constructors --------
 	

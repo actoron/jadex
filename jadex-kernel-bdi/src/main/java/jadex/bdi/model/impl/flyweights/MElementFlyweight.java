@@ -2,6 +2,8 @@ package jadex.bdi.model.impl.flyweights;
 
 import jadex.bdi.model.IMElement;
 import jadex.bdi.model.OAVBDIMetaModel;
+import jadex.bdi.model.editable.IMEBeliefSetReference;
+import jadex.bdi.model.editable.IMEElement;
 import jadex.bdi.runtime.impl.flyweights.ElementFlyweight;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.commons.SReflect;
@@ -11,7 +13,7 @@ import jadex.rules.state.IOAVState;
 /**
  *  Model element flyweight.
  */
-public class MElementFlyweight implements IMElement
+public class MElementFlyweight implements IMElement, IMEElement
 {
 	//-------- attributes --------
 	
@@ -190,6 +192,49 @@ public class MElementFlyweight implements IMElement
 		return interpreter;
 	}
 	
+	/**
+	 *  Set the name.
+	 *  @param name The name. 
+	 */
+	public void setName(final String name)
+	{
+		if(isExternalThread())
+		{
+			new AgentInvocation()
+			{
+				public void run()
+				{
+					getState().setAttributeValue(getHandle(), OAVBDIMetaModel.modelelement_has_name, name);
+				}
+			};
+		}
+		else
+		{
+			getState().setAttributeValue(getHandle(), OAVBDIMetaModel.modelelement_has_name, name);
+		}
+	}
+	
+	/**
+	 *  Set the description.
+	 *  @param desc The description. 
+	 */
+	public void setDescription(final String desc)
+	{
+		if(isExternalThread())
+		{
+			new AgentInvocation()
+			{
+				public void run()
+				{
+					getState().setAttributeValue(getHandle(), OAVBDIMetaModel.modelelement_has_description, desc);
+				}
+			};
+		}
+		else
+		{
+			getState().setAttributeValue(getHandle(), OAVBDIMetaModel.modelelement_has_description, desc);
+		}
+	}
 	
 	/**
 	 *  Remove the external usage preventing

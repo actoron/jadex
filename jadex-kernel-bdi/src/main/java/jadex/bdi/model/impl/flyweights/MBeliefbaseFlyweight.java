@@ -6,6 +6,17 @@ import jadex.bdi.model.IMBeliefSet;
 import jadex.bdi.model.IMBeliefSetReference;
 import jadex.bdi.model.IMBeliefbase;
 import jadex.bdi.model.OAVBDIMetaModel;
+import jadex.bdi.model.editable.IMEBelief;
+import jadex.bdi.model.editable.IMEBeliefReference;
+import jadex.bdi.model.editable.IMEBeliefSet;
+import jadex.bdi.model.editable.IMEBeliefSetReference;
+import jadex.bdi.model.editable.IMEBeliefbase;
+import jadex.bdi.model.editable.IMEExpression;
+import jadex.bdi.model.impl.flyweights.MElementFlyweight.AgentInvocation;
+import jadex.bdi.runtime.interpreter.BeliefRules;
+import jadex.javaparser.IExpressionParser;
+import jadex.javaparser.IParsedExpression;
+import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 import jadex.rules.state.IOAVState;
 
 import java.util.Collection;
@@ -14,7 +25,7 @@ import java.util.Iterator;
 /**
  *  Flyweight for the belief base model.
  */
-public class MBeliefbaseFlyweight extends MElementFlyweight implements IMBeliefbase 
+public class MBeliefbaseFlyweight extends MElementFlyweight implements IMBeliefbase, IMEBeliefbase
 {
 	//-------- constructors --------
 	
@@ -315,6 +326,133 @@ public class MBeliefbaseFlyweight extends MElementFlyweight implements IMBeliefb
 				}
 			}
 			return ret;
+		}
+	}
+	
+	//-------- editable interface --------
+	
+	/**
+	 *  Create a belief for a name.
+	 *  @param name	The belief name.
+	 */
+	public IMEBelief createBelief(final String name)
+	{
+		if(isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					Object elem = getState().createObject(OAVBDIMetaModel.belief_type);
+					getState().setAttributeValue(elem, OAVBDIMetaModel.modelelement_has_name, name);
+					getState().addAttributeValue(getHandle(), OAVBDIMetaModel.capability_has_beliefs, elem);
+					object	= new MBeliefFlyweight(getState(), getHandle(), elem);
+				}
+			};
+			return (IMEBelief)invoc.object;
+		}
+		else
+		{
+			Object elem = getState().createObject(OAVBDIMetaModel.belief_type);
+			getState().setAttributeValue(elem, OAVBDIMetaModel.modelelement_has_name, name);
+			getState().addAttributeValue(getHandle(), OAVBDIMetaModel.capability_has_beliefs, elem);
+			return new MBeliefFlyweight(getState(), getHandle(), elem);
+		}
+	}
+
+	/**
+	 *  Create a belief set for a name.
+	 *  @param name	The belief set name.
+	 */
+	public IMEBeliefSet createBeliefSet(final String name)
+	{
+		if(isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					Object elem = getState().createObject(OAVBDIMetaModel.beliefset_type);
+					getState().setAttributeValue(elem, OAVBDIMetaModel.modelelement_has_name, name);
+					getState().addAttributeValue(getHandle(), OAVBDIMetaModel.capability_has_beliefsets, elem);
+					object	= new MBeliefFlyweight(getState(), getHandle(), elem);
+				}
+			};
+			return (IMEBeliefSet)invoc.object;
+		}
+		else
+		{
+			Object elem = getState().createObject(OAVBDIMetaModel.beliefset_type);
+			getState().setAttributeValue(elem, OAVBDIMetaModel.modelelement_has_name, name);
+			getState().addAttributeValue(getHandle(), OAVBDIMetaModel.capability_has_beliefsets, elem);
+			return new MBeliefSetFlyweight(getState(), getHandle(), elem);
+		}
+	}
+	
+	/**
+	 *  Create a belief reference for a name.
+	 *  @param name	The belief reference name.
+	 */
+	public IMEBeliefReference createBeliefReference(final String name, final String ref)
+	{
+		if(isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					Object elem = getState().createObject(OAVBDIMetaModel.beliefreference_type);
+					getState().setAttributeValue(elem, OAVBDIMetaModel.modelelement_has_name, name);
+					if(ref!=null)
+						getState().setAttributeValue(elem, OAVBDIMetaModel.elementreference_has_concrete, ref);
+					getState().addAttributeValue(getHandle(), OAVBDIMetaModel.capability_has_beliefrefs, elem);
+					object	= new MBeliefReferenceFlyweight(getState(), getHandle(), elem);
+				}
+			};
+			return (IMEBeliefReference)invoc.object;
+		}
+		else
+		{
+			Object elem = getState().createObject(OAVBDIMetaModel.beliefreference_type);
+			getState().setAttributeValue(elem, OAVBDIMetaModel.modelelement_has_name, name);
+			if(ref!=null)
+				getState().setAttributeValue(elem, OAVBDIMetaModel.elementreference_has_concrete, ref);
+			getState().addAttributeValue(getHandle(), OAVBDIMetaModel.capability_has_beliefrefs, elem);
+			return new MBeliefReferenceFlyweight(getState(), getHandle(), elem);
+
+		}
+	}
+
+	/**
+	 *  Create a beliefset reference for a name.
+	 *  @param name	The beliefset reference name.
+	 */
+	public IMEBeliefSetReference createBeliefSetReference(final String name, final String ref)
+	{
+		if(isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					Object elem = getState().createObject(OAVBDIMetaModel.beliefsetreference_type);
+					getState().setAttributeValue(elem, OAVBDIMetaModel.modelelement_has_name, name);
+					if(ref!=null)
+						getState().setAttributeValue(elem, OAVBDIMetaModel.elementreference_has_concrete, ref);
+					getState().addAttributeValue(getHandle(), OAVBDIMetaModel.capability_has_beliefsetrefs, elem);
+					object	= new MBeliefReferenceFlyweight(getState(), getHandle(), elem);
+				}
+			};
+			return (IMEBeliefSetReference)invoc.object;
+		}
+		else
+		{
+			Object elem = getState().createObject(OAVBDIMetaModel.beliefsetreference_type);
+			getState().setAttributeValue(elem, OAVBDIMetaModel.modelelement_has_name, name);
+			if(ref!=null)
+				getState().setAttributeValue(elem, OAVBDIMetaModel.elementreference_has_concrete, ref);
+			getState().addAttributeValue(getHandle(), OAVBDIMetaModel.capability_has_beliefsetrefs, elem);
+			return new MBeliefSetReferenceFlyweight(getState(), getHandle(), elem);
 		}
 	}
 	

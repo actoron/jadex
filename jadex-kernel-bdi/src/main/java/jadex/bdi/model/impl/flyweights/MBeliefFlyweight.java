@@ -3,12 +3,14 @@ package jadex.bdi.model.impl.flyweights;
 import jadex.bdi.model.IMBelief;
 import jadex.bdi.model.IMExpression;
 import jadex.bdi.model.OAVBDIMetaModel;
+import jadex.bdi.model.editable.IMEBelief;
+import jadex.bdi.model.editable.IMEExpression;
 import jadex.rules.state.IOAVState;
 
 /**
  *  Flyweight for belief model element.
  */
-public class MBeliefFlyweight extends MTypedElementFlyweight implements IMBelief
+public class MBeliefFlyweight extends MTypedElementFlyweight implements IMBelief, IMEBelief
 {
 	//-------- constructors --------
 	
@@ -95,5 +97,47 @@ public class MBeliefFlyweight extends MTypedElementFlyweight implements IMBelief
 		{
 			return ((Boolean)getState().getAttributeValue(getHandle(), OAVBDIMetaModel.belief_has_result)).booleanValue();
 		}
+	}
+	
+	/**
+	 *  Create the fact.
+	 *  @return The fact. 
+	 */
+	public IMEExpression createFact()
+	{
+		if(isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					Object elem = getState().createObject(OAVBDIMetaModel.expression_type);
+					getState().setAttributeValue(getHandle(), OAVBDIMetaModel.belief_has_fact, elem);
+				}
+			};
+			return invoc.bool;
+		}
+		else
+		{
+			return ((Boolean)getState().getAttributeValue(getHandle(), OAVBDIMetaModel.belief_has_result)).booleanValue();
+		}
+	}
+	
+	/**
+	 *  Set the belief is used as argument.
+	 *  @param arg The argument flag. 
+	 */
+	public void setArgument(boolean arg)
+	{
+		
+	}
+	
+	/**
+	 *  Set the belief is used as argument.
+	 *  @param arg The argument flag. 
+	 */
+	public void setResult(boolean arg)
+	{
+		
 	}
 }
