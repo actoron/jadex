@@ -1,12 +1,13 @@
 package jadex.bdi.model.impl.flyweights;
 
 import jadex.bdi.model.IMInternalEvent;
+import jadex.bdi.model.editable.IMEInternalEvent;
 import jadex.rules.state.IOAVState;
 
 /**
  *  Flyweight for internal event model element.
  */
-public class MInternalEventFlyweight extends MProcessableElementFlyweight implements IMInternalEvent
+public class MInternalEventFlyweight extends MProcessableElementFlyweight implements IMInternalEvent, IMEInternalEvent
 {
 	//-------- constructors --------
 	
