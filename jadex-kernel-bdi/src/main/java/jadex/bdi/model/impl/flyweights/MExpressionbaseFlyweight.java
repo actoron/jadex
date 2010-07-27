@@ -5,9 +5,9 @@ import jadex.bdi.model.IMExpressionReference;
 import jadex.bdi.model.IMExpressionbase;
 import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.model.editable.IMEExpression;
+import jadex.bdi.model.editable.IMEExpressionReference;
 import jadex.bdi.model.editable.IMEExpressionbase;
-import jadex.bdi.model.editable.IMEMetaGoal;
-import jadex.bdi.model.impl.flyweights.MElementFlyweight.AgentInvocation;
+import jadex.bdi.model.editable.IMEGoalReference;
 import jadex.javaparser.IExpressionParser;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
@@ -212,9 +212,33 @@ public class MExpressionbaseFlyweight  extends MElementFlyweight implements IMEx
 	 *  @param name	The expression name.
 	 *  @param ref The reference element name.
 	 */
-	public IMExpressionReference createExpressionReference(String name, String ref)
+	public IMEExpressionReference createExpressionReference(final String name, final String ref)
 	{
-		
+		if(isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					Object elem = getState().createObject(OAVBDIMetaModel.expressionreference_type);
+					getState().setAttributeValue(elem, OAVBDIMetaModel.modelelement_has_name, name);
+					if(ref!=null)
+						getState().setAttributeValue(elem, OAVBDIMetaModel.elementreference_has_concrete, ref);
+					getState().addAttributeValue(getHandle(), OAVBDIMetaModel.capability_has_expressionrefs, elem);
+					object = new MExpressionReferenceFlyweight(getState(), getScope(), elem);
+				}
+			};
+			return (IMEExpressionReference)invoc.object;
+		}
+		else
+		{
+			Object elem = getState().createObject(OAVBDIMetaModel.expressionreference_type);
+			getState().setAttributeValue(elem, OAVBDIMetaModel.modelelement_has_name, name);
+			if(ref!=null)
+				getState().setAttributeValue(elem, OAVBDIMetaModel.elementreference_has_concrete, ref);
+			getState().addAttributeValue(getHandle(), OAVBDIMetaModel.capability_has_expressionrefs, elem);
+			return new MExpressionReferenceFlyweight(getState(), getScope(), elem);
+		}
 	}
 	
     /**

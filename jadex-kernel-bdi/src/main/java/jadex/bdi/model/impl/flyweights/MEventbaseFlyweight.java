@@ -423,7 +423,7 @@ public class MEventbaseFlyweight extends MElementFlyweight implements IMEventbas
 	 *  @param name	The event set name.
 	 *  @param ref The name of referenced element.
 	 */
-	public IMEMessageEventReference createMessageEventReference(String name, String ref)
+	public IMEMessageEventReference createMessageEventReference(final String name, final String ref)
 	{
 		if(isExternalThread())
 		{

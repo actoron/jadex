@@ -1,7 +1,10 @@
 package jadex.bdi.model.editable;
 
+import jadex.bdi.model.IMConfigBelief;
+import jadex.bdi.model.IMConfigBeliefSet;
 import jadex.bdi.model.IMConfigElement;
 import jadex.bdi.model.IMConfiguration;
+import jadex.bdi.model.IMInitialCapability;
 
 /**
  * 
@@ -31,7 +34,7 @@ public interface IMEConfiguration extends IMConfiguration, IMEElement
 	 *  Create the initial goal.
 	 *  @param ref The referenced element name.
 	 */
-	public IMConfigElement createInitialGoal(String ref);
+	public IMEConfigElement createInitialGoal(String ref);
 	
 	/**
 	 *  Get the end goals.
