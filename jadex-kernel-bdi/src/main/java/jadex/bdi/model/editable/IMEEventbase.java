@@ -1,10 +1,6 @@
 package jadex.bdi.model.editable;
 
 import jadex.bdi.model.IMEventbase;
-import jadex.bdi.model.IMInternalEvent;
-import jadex.bdi.model.IMInternalEventReference;
-import jadex.bdi.model.IMMessageEvent;
-import jadex.bdi.model.IMMessageEventReference;
 
 /**
  * 

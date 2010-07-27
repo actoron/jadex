@@ -1,9 +1,6 @@
 package jadex.bdi.model.editable;
 
-import jadex.bdi.model.IMParameter;
 import jadex.bdi.model.IMParameterElement;
-import jadex.bdi.model.IMParameterSet;
-import jadex.bdi.model.IMReferenceableElement;
 
 /**
  * 

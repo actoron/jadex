@@ -1,6 +1,5 @@
 package jadex.bdi.model.editable;
 
-import jadex.bdi.model.IMPlan;
 import jadex.bdi.model.IMPlanbase;
 
 /**

@@ -1,7 +1,5 @@
 package jadex.bdi.model.editable;
 
-import jadex.bdi.model.IMGoal;
-import jadex.bdi.model.IMGoalReference;
 import jadex.bdi.model.IMGoalbase;
 
 /**

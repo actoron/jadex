@@ -7,5 +7,9 @@ import jadex.bdi.model.IMMetaGoalTrigger;
  */
 public interface IMEMetaGoalTrigger	extends IMMetaGoalTrigger, IMETrigger
 {
-	todo
+	/**
+	 *  Add a goal.
+	 *  @param reference	The referenced goal.
+	 */
+	public IMETriggerReference	createGoal(String reference);
 }
