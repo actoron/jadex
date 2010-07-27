@@ -929,9 +929,9 @@ public class FipaConversationPanel extends JSplitPane
 					
 					if(last)
 					{
-						SServiceProvider.getService(agent.getServiceProvider(), ILibraryService.class).addResultListener(new DefaultResultListener()
+						SServiceProvider.getService(agent.getServiceProvider(), ILibraryService.class).addResultListener(new SwingDefaultResultListener(FipaConversationPanel.this)
 						{
-							public void resultAvailable(Object source, Object result)
+							public void customResultAvailable(Object source, Object result)
 							{
 								ClassLoader cl = ((ILibraryService)result).getClassLoader();
 								String	msg	= JavaWriter.objectToXML(map, cl);
