@@ -28,8 +28,7 @@ public interface IMPlan extends IMParameterElement
 	 *  Get the body.
 	 *  @return The body.
 	 */
-	// todo
-//	public IMPlanBody getBody();
+	public IMPlanBody getBody();
 	
 	/**
 	 *  Get the waitqueue.

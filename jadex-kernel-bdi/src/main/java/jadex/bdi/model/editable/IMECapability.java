@@ -1,15 +1,6 @@
 package jadex.bdi.model.editable;
 
-import jadex.bdi.model.IMBeliefbase;
 import jadex.bdi.model.IMCapability;
-import jadex.bdi.model.IMCapabilityReference;
-import jadex.bdi.model.IMConfiguration;
-import jadex.bdi.model.IMEventbase;
-import jadex.bdi.model.IMExpression;
-import jadex.bdi.model.IMExpressionbase;
-import jadex.bdi.model.IMGoalbase;
-import jadex.bdi.model.IMPlanbase;
-import jadex.bdi.model.IMPropertybase;
 
 /**
  *  Interface for editable version of capability.

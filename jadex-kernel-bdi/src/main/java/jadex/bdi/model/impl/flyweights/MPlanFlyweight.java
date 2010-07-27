@@ -3,6 +3,7 @@ package jadex.bdi.model.impl.flyweights;
 import jadex.bdi.model.IMCondition;
 import jadex.bdi.model.IMExpression;
 import jadex.bdi.model.IMPlan;
+import jadex.bdi.model.IMPlanBody;
 import jadex.bdi.model.IMPlanTrigger;
 import jadex.bdi.model.IMTrigger;
 import jadex.bdi.model.OAVBDIMetaModel;
@@ -167,6 +168,35 @@ public class MPlanFlyweight extends MParameterElementFlyweight implements IMPlan
 			Object handle = getState().getAttributeValue(getHandle(), OAVBDIMetaModel.plan_has_trigger);
 			if(handle!=null)
 				ret = new MPlanTriggerFlyweight(getState(), getScope(), handle);
+			return ret;
+		}
+	}
+		
+	/**
+	 *  Get the body.
+	 *  @return The body.
+	 */
+	public IMPlanBody getBody()
+	{
+		if(isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					Object handle = getState().getAttributeValue(getHandle(), OAVBDIMetaModel.plan_has_body);
+					if(handle!=null)
+						object = new MPlanBodyFlyweight(getState(), getScope(), handle);
+				}
+			};
+			return (IMPlanBody)invoc.object;
+		}
+		else
+		{
+			IMPlanBody ret = null;
+			Object handle = getState().getAttributeValue(getHandle(), OAVBDIMetaModel.plan_has_body);
+			if(handle!=null)
+				ret = new MPlanBodyFlyweight(getState(), getScope(), handle);
 			return ret;
 		}
 	}

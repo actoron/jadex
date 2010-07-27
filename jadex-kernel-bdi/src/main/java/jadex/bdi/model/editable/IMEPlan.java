@@ -5,7 +5,7 @@ import jadex.bdi.model.IMPlan;
 /**
  * 
  */
-public interface IMEPlan extends IMPlan
+public interface IMEPlan extends IMPlan, IMEParameterElement
 {
 
 }
