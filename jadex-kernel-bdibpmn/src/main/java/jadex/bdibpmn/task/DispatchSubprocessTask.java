@@ -36,7 +36,7 @@ public class DispatchSubprocessTask	implements ITask
 			
 			IComponentManagementService cms = plan.getInterpreter().getCMS();
 //			IComponentManagementService cms = (IComponentManagementService) plan.getScope().getServiceProvider().getService(IComponentManagementService.class);
-			final Object	goal	= new Object() ;
+//			final Object	goal	= new Object() ;
 			ResultFuture rf = new ResultFuture();
 			if (params == null)
 				params = new HashMap();

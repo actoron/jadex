@@ -1,6 +1,5 @@
 package jadex.tools.simcenter;
 
-import jadex.base.simulation.ISimulationService;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.commons.jtable.ObjectTableModel;

@@ -1,6 +1,5 @@
 package jadex.rules.examples.helloworld;
 
-import jadex.rules.examples.manners.Manners;
 import jadex.rules.parser.conditions.ParserHelper;
 import jadex.rules.rulesystem.IAction;
 import jadex.rules.rulesystem.ICondition;
@@ -10,10 +9,7 @@ import jadex.rules.rulesystem.RuleSystem;
 import jadex.rules.rulesystem.RuleSystemExecutor;
 import jadex.rules.rulesystem.Rulebase;
 import jadex.rules.rulesystem.rete.RetePatternMatcherFunctionality;
-import jadex.rules.rulesystem.rules.BoundConstraint;
-import jadex.rules.rulesystem.rules.ObjectCondition;
 import jadex.rules.rulesystem.rules.Rule;
-import jadex.rules.rulesystem.rules.Variable;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVAttributeType;
 import jadex.rules.state.OAVJavaType;

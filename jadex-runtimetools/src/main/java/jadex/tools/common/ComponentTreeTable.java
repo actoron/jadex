@@ -9,8 +9,6 @@ import jadex.commons.SUtil;
 import jadex.commons.collection.SCollection;
 import jadex.commons.jtable.ResizeableTableHeader;
 import jadex.commons.jtable.VisibilityTableColumnModel;
-import jadex.service.IServiceContainer;
-import jadex.service.IServiceProvider;
 import jadex.tools.common.jtreetable.DefaultTreeTableCellRenderer;
 import jadex.tools.common.jtreetable.DefaultTreeTableModel;
 import jadex.tools.common.jtreetable.DefaultTreeTableNode;

@@ -7,7 +7,6 @@ import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVAttributeType;
 
 import java.util.Collection;
-import java.util.Set;
 
 /**
  *  Basic interface for all nodes.

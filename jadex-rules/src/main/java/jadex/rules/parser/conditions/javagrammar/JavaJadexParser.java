@@ -5,7 +5,6 @@ package jadex.rules.parser.conditions.javagrammar;
 import jadex.rules.rulesystem.rules.Variable;
 import jadex.rules.rulesystem.rules.IOperator;
 import jadex.rules.rulesystem.rules.functions.IFunction;
-import jadex.rules.state.OAVTypeModel;
 import jadex.rules.state.OAVObjectType;
 import jadex.rules.state.OAVJavaType;
 
@@ -15,7 +14,6 @@ import java.lang.reflect.Modifier;
 
 
 import org.antlr.runtime.*;
-import java.util.Stack;
 import java.util.List;
 import java.util.ArrayList;
 

@@ -9,9 +9,6 @@ import jadex.rules.rulesystem.rules.IOperator;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVAttributeType;
 
-import java.util.HashSet;
-import java.util.Set;
-
 /**
  *  A constraint evaluator is responsible for evaluating constraints.
  *  It operates on an operator and two extractors. It uses the extractors

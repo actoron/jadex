@@ -1,6 +1,5 @@
 package jadex.tools.debugger.bpmn;
 
-import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ExternalAccess;
 import jadex.bpmn.tools.ProcessViewPanel;
 import jadex.bridge.IComponentIdentifier;

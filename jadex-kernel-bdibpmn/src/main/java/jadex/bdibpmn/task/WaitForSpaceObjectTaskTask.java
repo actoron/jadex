@@ -1,7 +1,5 @@
 package jadex.bdibpmn.task;
 
-import java.util.Map;
-
 import jadex.application.space.envsupport.environment.IEnvironmentSpace;
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ITask;

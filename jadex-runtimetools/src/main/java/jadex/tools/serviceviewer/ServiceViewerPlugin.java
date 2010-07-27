@@ -4,10 +4,6 @@ import jadex.commons.SGUI;
 import jadex.tools.common.plugin.AbstractJCCPlugin;
 
 import javax.swing.Icon;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JSplitPane;
-import javax.swing.JTabbedPane;
 import javax.swing.UIDefaults;
 
 public class ServiceViewerPlugin extends AbstractJCCPlugin

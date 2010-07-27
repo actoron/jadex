@@ -3,7 +3,6 @@ package jadex.bpmn.runtime.handler;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ProcessThread;
-import jadex.bridge.ComponentResultListener;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.IMessageService;

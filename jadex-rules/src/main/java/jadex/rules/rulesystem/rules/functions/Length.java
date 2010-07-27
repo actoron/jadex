@@ -6,8 +6,6 @@ import jadex.rules.rulesystem.rules.ILazyValue;
 import jadex.rules.state.IOAVState;
 
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Set;
 
 /**
  *  Length of a multislot.

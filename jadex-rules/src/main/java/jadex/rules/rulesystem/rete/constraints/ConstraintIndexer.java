@@ -10,7 +10,6 @@ import jadex.rules.rulesystem.rete.nodes.BetaMemory;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVAttributeType;
 
-import java.util.HashSet;
 import java.util.Set;
 
 /**

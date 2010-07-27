@@ -10,7 +10,6 @@ import jadex.bpmn.runtime.ITask;
 import jadex.bpmn.runtime.ITaskContext;
 import jadex.bpmn.runtime.task.ParameterMetaInfo;
 import jadex.bpmn.runtime.task.TaskMetaInfo;
-import jadex.commons.SReflect;
 import jadex.commons.concurrent.IResultListener;
 
 import java.util.Iterator;

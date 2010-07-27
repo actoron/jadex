@@ -55,7 +55,7 @@ public class Test //extends TestCase
 		
 //		System.out.println("xml is:"+xml);
 		
-		Object ro = Nuggets.objectFromXML(xml, null);
+		/*Object ro =*/ Nuggets.objectFromXML(xml, null);
 		
 //		System.out.println("Write: "+wo);
 //		FileOutputStream fos = new FileOutputStream("test.xml");

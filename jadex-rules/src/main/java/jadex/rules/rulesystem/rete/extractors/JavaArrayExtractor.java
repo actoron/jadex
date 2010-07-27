@@ -5,9 +5,6 @@ import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVAttributeType;
 
 import java.lang.reflect.Array;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  *  An extractor for getting elements from arrays.

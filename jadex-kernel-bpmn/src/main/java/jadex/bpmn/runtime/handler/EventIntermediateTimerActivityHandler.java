@@ -4,8 +4,6 @@ import jadex.bpmn.model.MActivity;
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ProcessThread;
 import jadex.bridge.CheckedAction;
-import jadex.bridge.ComponentResultListener;
-import jadex.bridge.IMessageService;
 import jadex.bridge.InterpreterTimedObject;
 import jadex.commons.Future;
 import jadex.commons.IFuture;

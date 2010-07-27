@@ -5,14 +5,9 @@ import jadex.application.space.envsupport.observer.graphics.ViewportJ2D;
 import jadex.application.space.envsupport.observer.graphics.ViewportJOGL;
 import jadex.application.space.envsupport.observer.gui.SObjectInspector;
 import jadex.application.space.envsupport.observer.perspective.IPerspective;
-import jadex.javaparser.SimpleValueFetcher;
-
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
-import java.util.HashMap;
-import java.util.Map;
-
 import javax.media.opengl.GL;
 
 /**

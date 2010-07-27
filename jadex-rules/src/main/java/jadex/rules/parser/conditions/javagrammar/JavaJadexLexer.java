@@ -4,9 +4,6 @@ package jadex.rules.parser.conditions.javagrammar;
 
 
 import org.antlr.runtime.*;
-import java.util.Stack;
-import java.util.List;
-import java.util.ArrayList;
 
 public class JavaJadexLexer extends Lexer {
     public static final int T__29=29;

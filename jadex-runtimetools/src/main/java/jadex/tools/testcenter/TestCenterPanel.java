@@ -6,8 +6,6 @@ import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IEAGoal;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IGoalListener;
-import jadex.bridge.ComponentTerminatedException;
-import jadex.bridge.IComponentManagementService;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SGUI;

@@ -5,9 +5,6 @@ import jadex.rules.rulesystem.rete.extractors.AttributeSet;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVAttributeType;
 
-import java.util.Collections;
-import java.util.Set;
-
 /**
  *  A not constraint evaluator checks if the left tuple
  *  corresponds to the beginning of the right object,

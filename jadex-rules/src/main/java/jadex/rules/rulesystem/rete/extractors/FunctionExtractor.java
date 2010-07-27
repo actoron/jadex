@@ -7,9 +7,6 @@ import jadex.rules.rulesystem.rules.functions.IFunction;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVAttributeType;
 
-import java.util.HashSet;
-import java.util.Set;
-
 /**
  *  A function extractor has the purpose to call a function
  *  and return the result value.

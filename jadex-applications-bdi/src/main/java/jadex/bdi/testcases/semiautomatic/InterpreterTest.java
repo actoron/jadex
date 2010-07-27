@@ -21,14 +21,11 @@ import jadex.service.clock.ClockCreationInfo;
 import jadex.service.clock.ClockService;
 import jadex.service.clock.IClock;
 import jadex.service.clock.IClockService;
-import jadex.service.clock.SystemClock;
 import jadex.service.threadpool.ThreadPoolService;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Vector;
 import java.util.logging.Logger;
 
 /**

@@ -5,8 +5,6 @@ import jadex.rules.rulesystem.rete.extractors.AttributeSet;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVAttributeType;
 
-import java.util.Set;
-
 /**
  *  Interface for all constraint evaluators. They are used
  *  to abstract away the tests nodes have to perform.

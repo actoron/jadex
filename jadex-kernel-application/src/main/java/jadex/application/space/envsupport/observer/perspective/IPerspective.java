@@ -1,7 +1,6 @@
 package jadex.application.space.envsupport.observer.perspective;
 
 import jadex.application.space.envsupport.observer.gui.ObserverCenter;
-import jadex.commons.IPropertyObject;
 import jadex.commons.meta.ITypedPropertyObject;
 
 import java.awt.Component;

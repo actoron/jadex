@@ -1,8 +1,6 @@
 package jadex.bridge;
 
-import jadex.commons.concurrent.DefaultResultListener;
 import jadex.service.IServiceProvider;
-import jadex.service.SServiceProvider;
 import jadex.service.clock.ITimedObject;
 
 /**

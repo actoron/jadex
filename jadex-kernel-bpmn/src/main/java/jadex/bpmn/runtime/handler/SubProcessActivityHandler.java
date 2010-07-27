@@ -9,7 +9,6 @@ import jadex.bpmn.runtime.ProcessThreadValueFetcher;
 import jadex.bpmn.runtime.ThreadContext;
 import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentManagementService;
-import jadex.bridge.IMessageService;
 import jadex.commons.IFuture;
 import jadex.commons.SReflect;
 import jadex.commons.concurrent.DefaultResultListener;

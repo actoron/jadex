@@ -8,7 +8,6 @@ import jadex.commons.concurrent.Executor;
 import jadex.commons.concurrent.IExecutable;
 import jadex.commons.concurrent.IResultListener;
 import jadex.service.IService;
-import jadex.service.IServiceContainer;
 import jadex.service.IServiceProvider;
 import jadex.service.SServiceProvider;
 import jadex.service.threadpool.ThreadPoolService;

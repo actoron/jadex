@@ -7,8 +7,6 @@ import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentFactory;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.ILoadableComponentModel;
-import jadex.commons.Future;
-import jadex.commons.IFuture;
 import jadex.commons.SGUI;
 import jadex.service.BasicService;
 import jadex.service.IServiceContainer;

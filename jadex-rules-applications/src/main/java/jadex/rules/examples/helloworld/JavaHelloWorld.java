@@ -9,13 +9,9 @@ import jadex.rules.rulesystem.RuleSystem;
 import jadex.rules.rulesystem.RuleSystemExecutor;
 import jadex.rules.rulesystem.Rulebase;
 import jadex.rules.rulesystem.rete.RetePatternMatcherFunctionality;
-import jadex.rules.rulesystem.rules.BoundConstraint;
-import jadex.rules.rulesystem.rules.ObjectCondition;
 import jadex.rules.rulesystem.rules.Rule;
-import jadex.rules.rulesystem.rules.Variable;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVJavaType;
-import jadex.rules.state.OAVObjectType;
 import jadex.rules.state.OAVTypeModel;
 import jadex.rules.state.javaimpl.OAVStateFactory;
 import jadex.rules.tools.reteviewer.RuleEnginePanel;
@@ -35,7 +31,7 @@ public class JavaHelloWorld
 		// Create simple OAV type model.
 		OAVTypeModel helloworld_type_model = new OAVTypeModel("helloworld_type_model");
 		helloworld_type_model.addTypeModel(OAVJavaType.java_type_model);
-		OAVObjectType message_type = helloworld_type_model.createJavaType(Message.class,OAVJavaType.KIND_BEAN);
+		/*OAVObjectType message_type = */helloworld_type_model.createJavaType(Message.class,OAVJavaType.KIND_BEAN);
 		
 		// Create rete system.
 		IOAVState state = OAVStateFactory.createOAVState(helloworld_type_model); // Create the production memory.

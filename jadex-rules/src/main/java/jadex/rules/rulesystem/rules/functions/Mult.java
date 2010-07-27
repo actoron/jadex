@@ -5,9 +5,7 @@ import jadex.rules.rulesystem.rete.extractors.AttributeSet;
 import jadex.rules.rulesystem.rules.ILazyValue;
 import jadex.rules.state.IOAVState;
 
-import java.util.Collections;
 import java.util.Iterator;
-import java.util.Set;
 
 /**
  *  Multiply two or more values.

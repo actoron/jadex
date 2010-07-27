@@ -1,11 +1,5 @@
 package jadex.rules.parser.conditions;
 
-import jadex.rules.rulesystem.ICondition;
-import jadex.rules.state.OAVJavaType;
-
-import org.antlr.runtime.ANTLRStringStream;
-import org.antlr.runtime.CommonTokenStream;
-
 //import jadex.bdi.interpreter.OAVBDIRuntimeModel;
 //import jadex.rules.rulesystem.ICondition;
 //

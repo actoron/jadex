@@ -8,8 +8,6 @@ import jadex.rules.state.OAVAttributeType;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  *  Dummy fact node for not conditions, which are no joins.

@@ -14,8 +14,6 @@ import java.util.HashMap;
 
 
 import org.antlr.runtime.*;
-import java.util.Stack;
-import java.util.List;
 import java.util.ArrayList;
 
 public class ClipsJadexParser extends Parser {

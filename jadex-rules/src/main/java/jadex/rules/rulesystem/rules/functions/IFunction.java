@@ -3,8 +3,6 @@ package jadex.rules.rulesystem.rules.functions;
 import jadex.rules.rulesystem.rete.extractors.AttributeSet;
 import jadex.rules.state.IOAVState;
 
-import java.util.Set;
-
 /**
  *  Interface for functions.
  */

@@ -5,7 +5,6 @@ import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SGUI;
 import jadex.commons.collection.SCollection;
-import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.tools.common.PopupBuilder;
 import jadex.tools.common.ToolTipAction;

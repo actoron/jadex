@@ -1,7 +1,5 @@
 package jadex.bpmn.runtime;
 
-import java.util.Set;
-
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;

@@ -4,8 +4,6 @@ import jadex.rules.rulesystem.rete.Tuple;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVAttributeType;
 
-import java.util.Set;
-
 /**
  *  A value extractor is responsible for extracting a certain
  *  attribute or object value from a tuple or object.

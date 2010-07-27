@@ -90,7 +90,6 @@ public class CacheServiceContainer	implements IServiceContainer
 					IService[] sers = (IService[])coll.toArray(new IService[((Collection)data).size()]);
 					
 					// Check if all results are still ok.
-					boolean invalid = false;
 					for(int i=0; data!=null && i<sers.length; i++)
 					{
 						if(!sers[i].isValid())

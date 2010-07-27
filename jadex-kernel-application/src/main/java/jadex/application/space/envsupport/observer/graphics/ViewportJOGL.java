@@ -69,9 +69,11 @@ public class ViewportJOGL extends AbstractViewport
 	private Map					displayLists_;
 
 	/** True, until the OpenGL context is initialized. */
+	@SuppressWarnings("unused")
 	private volatile boolean	uninitialized_;
 
 	/** This will be true if the OpenGL context supports all necessary extensions. */
+	@SuppressWarnings("unused")
 	private volatile boolean	valid_;
 
 	/** True, if non-power-of-two texture support is available. */

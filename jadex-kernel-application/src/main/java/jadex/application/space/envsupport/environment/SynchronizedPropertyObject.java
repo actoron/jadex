@@ -1,13 +1,11 @@
 package jadex.application.space.envsupport.environment;
 
-import jadex.commons.SimplePropertyObject;
 import jadex.commons.meta.IPropertyMetaDataSet;
 import jadex.commons.meta.TypedPropertyObject;
 
 import java.beans.PropertyChangeListener;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 
 

@@ -15,7 +15,6 @@ import jadex.application.space.envsupport.observer.graphics.drawable.TexturedRec
 import jadex.application.space.envsupport.observer.graphics.layer.ILayer;
 import jadex.application.space.envsupport.observer.gui.ObserverCenter;
 import jadex.application.space.envsupport.observer.gui.SObjectInspector;
-import jadex.commons.SimplePropertyObject;
 import jadex.commons.meta.TypedPropertyObject;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SimpleValueFetcher;

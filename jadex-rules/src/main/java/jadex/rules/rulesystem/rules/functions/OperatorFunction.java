@@ -4,9 +4,6 @@ import jadex.rules.rulesystem.rete.extractors.AttributeSet;
 import jadex.rules.rulesystem.rules.IOperator;
 import jadex.rules.state.IOAVState;
 
-import java.util.Collections;
-import java.util.Set;
-
 /**
  *  Wrapper that allows operators being used as functions.
  */

@@ -9,7 +9,6 @@ import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentFactory;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentInstance;
 import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
@@ -312,7 +311,7 @@ public class ComponentManagementService extends BasicService implements ICompone
 		//			adapter.setComponentThread(Thread.currentThread());	// Hack!!! Avoid external access during init.
 					Object[] acom = factory.createComponentInstance(ad, caf, lmodel, config, args, parent);
 		//			adapter.setComponentThread(null);
-					IComponentInstance instance = (IComponentInstance)acom[0];
+//					IComponentInstance instance = (IComponentInstance)acom[0];
 					adapter = (StandaloneComponentAdapter)acom[1];
 					adapters.put(cid, adapter);
 				}

@@ -4,9 +4,6 @@ import jadex.rules.rulesystem.rete.Tuple;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVAttributeType;
 
-import java.util.Collections;
-import java.util.Set;
-
 /**
  *  The state extractor returns the current state as value.
  *  Is the extractor for the reserved variable Variable.STATE ($state). 

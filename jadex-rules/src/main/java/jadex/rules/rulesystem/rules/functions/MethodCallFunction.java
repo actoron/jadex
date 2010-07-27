@@ -5,8 +5,6 @@ import jadex.rules.rulesystem.rules.ILazyValue;
 import jadex.rules.state.IOAVState;
 
 import java.lang.reflect.Method;
-import java.util.Collections;
-import java.util.Set;
 
 /**
  *  Invoke a method on an object.

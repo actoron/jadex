@@ -1,7 +1,5 @@
 package jadex.gpmn.model2;
 
-import jadex.javaparser.IParsedExpression;
-
 /**
  *  A context element model element.
  */

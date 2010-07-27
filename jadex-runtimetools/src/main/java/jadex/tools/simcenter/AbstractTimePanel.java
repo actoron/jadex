@@ -8,8 +8,6 @@ import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.service.IServiceContainer;
 import jadex.service.SServiceProvider;
 import jadex.service.clock.IClockService;
-import jadex.service.library.ILibraryService;
-
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 

@@ -11,7 +11,6 @@ import jadex.xml.IContext;
 import jadex.xml.Namespace;
 import jadex.xml.ObjectInfo;
 import jadex.xml.SXML;
-import jadex.xml.TypeInfo;
 import jadex.xml.writer.AbstractObjectWriterHandler;
 
 import java.util.Collection;

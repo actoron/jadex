@@ -6,10 +6,6 @@ import jadex.rules.rulesystem.rete.nodes.VirtualFact;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVAttributeType;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-
 /**
  *  Extractor for an attribute value (or the whole object).
  */

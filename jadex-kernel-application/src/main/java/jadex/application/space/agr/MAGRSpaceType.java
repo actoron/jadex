@@ -12,8 +12,6 @@ import jadex.xml.MappingInfo;
 import jadex.xml.ObjectInfo;
 import jadex.xml.TypeInfo;
 import jadex.xml.XMLInfo;
-import jadex.xml.bean.BeanAccessInfo;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
