@@ -91,14 +91,21 @@ public class ConversationPlugin extends AbstractJCCPlugin
 		public void actionPerformed(ActionEvent e)
 		{
 			DefaultTreeTableNode node = (DefaultTreeTableNode)agents.getTreetable().getTree().getSelectionPath().getLastPathComponent();
-			final IComponentDescription desc = (IComponentDescription)node.getUserObject();
+			final IComponentIdentifier	rec;
+			if(node.getUserObject() instanceof IComponentIdentifier)
+			{
+				rec	= (IComponentIdentifier)node.getUserObject();
+			}
+			else
+			{
+				rec	= ((IComponentDescription)node.getUserObject()).getName();				
+			}
 			// Use clone, as added component id might be modified by user.
 			SServiceProvider.getServiceUpwards(jcc.getServiceContainer(), IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
 			{
 				public void customResultAvailable(Object source, Object result)
 				{
 					IComponentManagementService cms  = (IComponentManagementService)result;
-					IComponentIdentifier rec = desc.getName();
 					final IComponentIdentifier receiver = cms.createComponentIdentifier(rec.getName(), false, rec.getAddresses());
 					final IEAMessageEvent	message	= convcenter.getMessagePanel().getMessage();
 					message.getParameterSet(SFipa.RECEIVERS).addResultListener(new SwingDefaultResultListener(convcenter)

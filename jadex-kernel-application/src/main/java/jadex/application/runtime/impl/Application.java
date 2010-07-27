@@ -889,11 +889,6 @@ public class Application implements IApplication, IComponentInstance
 				}
 			}, adapter));
 		}
-		// todo: is this necessary? can we ensure that this is not called?
-//		else
-//		{
-//			throw new UnsupportedOperationException();
-//		}
 					
 		return false;
 	}

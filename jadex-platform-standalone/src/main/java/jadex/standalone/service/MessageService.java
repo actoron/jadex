@@ -1,6 +1,5 @@
 package jadex.standalone.service;
 
-import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.ContentException;
 import jadex.bridge.DefaultMessageAdapter;
 import jadex.bridge.IComponentAdapter;
@@ -579,9 +578,9 @@ public class MessageService extends BasicService implements IMessageService
 								{
 									component.receiveMessage(message, messagetype);
 								}
-								catch(ComponentTerminatedException ate)
+								catch(Exception e)
 								{
-									logger.warning("Message could not be delivered to receiver(s): " + receivers[cnt] + message);
+									logger.warning("Message could not be delivered to receiver(s): " + receivers[cnt] + message+", "+e);
 
 									// todo: notify sender that message could not be delivered!
 									// Problem: there is no connection back to the sender, so that
