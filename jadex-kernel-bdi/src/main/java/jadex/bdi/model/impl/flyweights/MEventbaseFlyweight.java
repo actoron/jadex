@@ -6,6 +6,14 @@ import jadex.bdi.model.IMInternalEventReference;
 import jadex.bdi.model.IMMessageEvent;
 import jadex.bdi.model.IMMessageEventReference;
 import jadex.bdi.model.OAVBDIMetaModel;
+import jadex.bdi.model.editable.IMEEventbase;
+import jadex.bdi.model.editable.IMEGoalReference;
+import jadex.bdi.model.editable.IMEInternalEvent;
+import jadex.bdi.model.editable.IMEInternalEventReference;
+import jadex.bdi.model.editable.IMEMessageEvent;
+import jadex.bdi.model.editable.IMEMessageEventReference;
+import jadex.bdi.model.editable.IMEMetaGoal;
+import jadex.bdi.model.impl.flyweights.MElementFlyweight.AgentInvocation;
 import jadex.rules.state.IOAVState;
 
 import java.util.Collection;
@@ -14,7 +22,7 @@ import java.util.Iterator;
 /**
  *  Flyweight for the event base model.
  */
-public class MEventbaseFlyweight extends MElementFlyweight implements IMEventbase 
+public class MEventbaseFlyweight extends MElementFlyweight implements IMEventbase, IMEEventbase
 {
 	//-------- constructors --------
 	
@@ -317,4 +325,131 @@ public class MEventbaseFlyweight extends MElementFlyweight implements IMEventbas
 			return ret;
 		}
 	}
+	
+	/**
+	 *  Create an internal with name.
+	 *  @param name	The event name.
+	 */
+	public IMEInternalEvent createInternalEvent(final String name)
+	{
+		if(isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					Object elem = getState().createObject(OAVBDIMetaModel.internalevent_type);
+					getState().setAttributeValue(elem, OAVBDIMetaModel.modelelement_has_name, name);
+					getState().addAttributeValue(getHandle(), OAVBDIMetaModel.capability_has_internaleventrefs, elem);
+					object = new MInternalEventFlyweight(getState(), getScope(), elem);
+				}
+			};
+			return (IMEInternalEvent)invoc.object;
+		}
+		else
+		{
+			Object elem = getState().createObject(OAVBDIMetaModel.internalevent_type);
+			getState().setAttributeValue(elem, OAVBDIMetaModel.modelelement_has_name, name);
+			getState().addAttributeValue(getHandle(), OAVBDIMetaModel.capability_has_internaleventrefs, elem);
+			return new MInternalEventFlyweight(getState(), getScope(), elem);
+		}
+	}
+
+	/**
+	 *  Create a message with name.
+	 *  @param name	The event set name.
+	 */
+	public IMEMessageEvent createMessageEvent(final String name)
+	{
+		if(isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					Object elem = getState().createObject(OAVBDIMetaModel.messageevent_type);
+					getState().setAttributeValue(elem, OAVBDIMetaModel.modelelement_has_name, name);
+					getState().addAttributeValue(getHandle(), OAVBDIMetaModel.capability_has_messageeventrefs, elem);
+					object = new MMessageEventFlyweight(getState(), getScope(), elem);
+				}
+			};
+			return (IMEMessageEvent)invoc.object;
+		}
+		else
+		{
+			Object elem = getState().createObject(OAVBDIMetaModel.messageevent_type);
+			getState().setAttributeValue(elem, OAVBDIMetaModel.modelelement_has_name, name);
+			getState().addAttributeValue(getHandle(), OAVBDIMetaModel.capability_has_messageeventrefs, elem);
+			return new MMessageEventFlyweight(getState(), getScope(), elem);
+		}
+	}
+	
+	/**
+	 *  Create an internal event reference.
+	 *  @param name	The event name.
+	 *  @param ref The name of referenced element.
+	 */
+	public IMEInternalEventReference createInternalEventReference(final String name, final String ref)
+	{
+		if(isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					Object elem = getState().createObject(OAVBDIMetaModel.internaleventreference_type);
+					getState().setAttributeValue(elem, OAVBDIMetaModel.modelelement_has_name, name);
+					if(ref!=null)
+						getState().setAttributeValue(elem, OAVBDIMetaModel.elementreference_has_concrete, ref);
+					getState().addAttributeValue(getHandle(), OAVBDIMetaModel.capability_has_internaleventrefs, elem);
+					object = new MInternalEventReferenceFlyweight(getState(), getScope(), elem);
+				}
+			};
+			return (IMEInternalEventReference)invoc.object;
+		}
+		else
+		{
+			Object elem = getState().createObject(OAVBDIMetaModel.internaleventreference_type);
+			getState().setAttributeValue(elem, OAVBDIMetaModel.modelelement_has_name, name);
+			if(ref!=null)
+				getState().setAttributeValue(elem, OAVBDIMetaModel.elementreference_has_concrete, ref);
+			getState().addAttributeValue(getHandle(), OAVBDIMetaModel.capability_has_internaleventrefs, elem);
+			return new MInternalEventReferenceFlyweight(getState(), getScope(), elem);
+		}
+	}
+
+	/**
+	 *  Create a message event reference.
+	 *  @param name	The event set name.
+	 *  @param ref The name of referenced element.
+	 */
+	public IMEMessageEventReference createMessageEventReference(String name, String ref)
+	{
+		if(isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					Object elem = getState().createObject(OAVBDIMetaModel.messageeventreference_type);
+					getState().setAttributeValue(elem, OAVBDIMetaModel.modelelement_has_name, name);
+					if(ref!=null)
+						getState().setAttributeValue(elem, OAVBDIMetaModel.elementreference_has_concrete, ref);
+					getState().addAttributeValue(getHandle(), OAVBDIMetaModel.capability_has_messageeventrefs, elem);
+					object = new MMessageEventReferenceFlyweight(getState(), getScope(), elem);
+				}
+			};
+			return (IMEMessageEventReference)invoc.object;
+		}
+		else
+		{
+			Object elem = getState().createObject(OAVBDIMetaModel.messageeventreference_type);
+			getState().setAttributeValue(elem, OAVBDIMetaModel.modelelement_has_name, name);
+			if(ref!=null)
+				getState().setAttributeValue(elem, OAVBDIMetaModel.elementreference_has_concrete, ref);
+			getState().addAttributeValue(getHandle(), OAVBDIMetaModel.capability_has_messageeventrefs, elem);
+			return new MMessageEventReferenceFlyweight(getState(), getScope(), elem);
+		}
+	}
+
 }

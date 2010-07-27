@@ -40,7 +40,8 @@ public interface IMEGoalbase extends IMGoalbase, IMEElement
 	/**
 	 *  Get a goal reference for a name.
 	 *  @param name	The goal reference name.
+	 *  @param ref The referenced element name.
 	 */
-	public IMEGoalReference createGoalReference(String name);
+	public IMEGoalReference createGoalReference(String name, String ref);
 
 }
