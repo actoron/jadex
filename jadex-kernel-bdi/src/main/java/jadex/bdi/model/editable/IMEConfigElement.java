@@ -7,5 +7,4 @@ import jadex.bdi.model.IMConfigElement;
  */
 public interface IMEConfigElement extends IMConfigElement, IMEConfigParameterElement
 {
-
 }
