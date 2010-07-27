@@ -2,12 +2,13 @@ package jadex.bdi.model.impl.flyweights;
 
 import jadex.bdi.model.IMElementReference;
 import jadex.bdi.model.OAVBDIMetaModel;
+import jadex.bdi.model.editable.IMEElementReference;
 import jadex.rules.state.IOAVState;
 
 /**
  *  Flyweight for element reference model.
  */
-public class MElementReferenceFlyweight extends MReferenceableElementFlyweight implements IMElementReference
+public class MElementReferenceFlyweight extends MReferenceableElementFlyweight implements IMElementReference, IMEElementReference
 {
 	//-------- constructors --------
 	
@@ -41,6 +42,28 @@ public class MElementReferenceFlyweight extends MReferenceableElementFlyweight i
 		else
 		{
 			return (String)getState().getAttributeValue(getHandle(), OAVBDIMetaModel.elementreference_has_concrete);
+		}
+	}
+	
+	/**
+	 *  Set concrete element name.
+	 *  @param concrete The concrete element name. 
+	 */
+	public void setConcrete(final String concrete)
+	{
+		if(isExternalThread())
+		{
+			new AgentInvocation()
+			{
+				public void run()
+				{
+					getState().setAttributeValue(getHandle(), OAVBDIMetaModel.elementreference_has_concrete, concrete);
+				}
+			};
+		}
+		else
+		{
+			getState().setAttributeValue(getHandle(), OAVBDIMetaModel.elementreference_has_concrete, concrete);
 		}
 	}
 }
