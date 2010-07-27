@@ -25,5 +25,5 @@ public interface IMEMessageEvent extends IMMessageEvent, IMEProcessableElement
 	 *  @param content The content.
 	 *  @param lang The language.
 	 */
-	public IMExpression createMatchExpression(String content, String lang);
+	public IMEExpression createMatchExpression(String content, String lang);
 }
