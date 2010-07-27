@@ -8,13 +8,14 @@ import jadex.bdi.model.IMExpression;
 public interface IMEExpression extends IMExpression, IMEElement
 {
 	/**
-	 *  Get the expression language.
-	 *  @param lang The language.
+	 *  Set the expression.
+	 *  @param expression The expression.
+	 *  @param language The language (null for default java-like language).
 	 */
-	public void setLanguage(String lang);
+	public void setExpression(String expression, String language);
 	
 	/**
-	 *  Set the expression content.
+	 *  Set the expression content (i.e. parsed expression or condition).
 	 *  @param content The content.
 	 */
 	public void setContent(Object content);
@@ -25,11 +26,11 @@ public interface IMEExpression extends IMExpression, IMEElement
 	 */
 	public void setClazz(Class clazz);
 	
-	/**
-	 *  Set the class name.
-	 *  @param name The class name. 
-	 */
-	public void setClassname(String name);
+//	/**
+//	 *  Set the class name.
+//	 *  @param name The class name. 
+//	 */
+//	public void setClassname(String name);
 	
 	/**
 	 *  Set the variable name.

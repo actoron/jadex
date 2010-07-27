@@ -591,11 +591,6 @@ public class MCapabilityFlyweight extends MElementFlyweight implements IMCapabil
 	 */
 	public IMEExpression createService(final String name, final Class cls, final String expression, final String language)
 	{
-		if(!"java".equals(language))
-		{
-			throw new UnsupportedOperationException("Only java currently supported.");
-		}
-		
 		if(isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
