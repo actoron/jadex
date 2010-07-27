@@ -8,10 +8,11 @@ import jadex.bdi.model.IMInitialCapability;
 import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.model.editable.IMEBelief;
 import jadex.bdi.model.editable.IMEBeliefSet;
+import jadex.bdi.model.editable.IMEConfigBelief;
+import jadex.bdi.model.editable.IMEConfigBeliefSet;
 import jadex.bdi.model.editable.IMEConfigElement;
 import jadex.bdi.model.editable.IMEConfiguration;
 import jadex.rules.state.IOAVState;
-import jadex.rules.state.OAVAttributeType;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -539,7 +540,7 @@ public class MConfigurationFlyweight extends MElementFlyweight implements IMConf
 	 *  Create an initial belief.
 	 *  @param ref The referenced element name.
 	 */
-	public IMEBelief createInitialBelief(final String ref)
+	public IMEConfigBelief createInitialBelief(final String ref)
 	{
 		if(isExternalThread())
 		{
@@ -553,7 +554,7 @@ public class MConfigurationFlyweight extends MElementFlyweight implements IMConf
 					object = new MConfigBeliefFlyweight(getState(), getScope(), elem);
 				}
 			};
-			return (IMEBelief)invoc.object;
+			return (IMEConfigBelief)invoc.object;
 		}
 		else
 		{
@@ -568,7 +569,7 @@ public class MConfigurationFlyweight extends MElementFlyweight implements IMConf
 	 *  Create an initial belief set.
 	 *  @param ref The referenced element name.
 	 */
-	public IMEBeliefSet createInitialBeliefSet(final String ref)
+	public IMEConfigBeliefSet createInitialBeliefSet(final String ref)
 	{
 		if(isExternalThread())
 		{
@@ -582,7 +583,7 @@ public class MConfigurationFlyweight extends MElementFlyweight implements IMConf
 					object = new MConfigBeliefSetFlyweight(getState(), getScope(), elem);
 				}
 			};
-			return (IMEBeliefSet)invoc.object;
+			return (IMEConfigBeliefSet)invoc.object;
 		}
 		else
 		{
@@ -627,7 +628,7 @@ public class MConfigurationFlyweight extends MElementFlyweight implements IMConf
 	 *  @param ref The goal reference.
 	 *  @return The end goal.
 	 */
-	public IMConfigElement createEndGoal(final String ref)
+	public IMEConfigElement createEndGoal(final String ref)
 	{
 		if(isExternalThread())
 		{
@@ -657,7 +658,7 @@ public class MConfigurationFlyweight extends MElementFlyweight implements IMConf
 	 *  @param ref The plan reference.
 	 *  @return The initial plan.
 	 */
-	public IMConfigElement createInitialPlan(final String ref)
+	public IMEConfigElement createInitialPlan(final String ref)
 	{
 		if(isExternalThread())
 		{
@@ -687,7 +688,7 @@ public class MConfigurationFlyweight extends MElementFlyweight implements IMConf
 	 *  @param ref The plan reference.
 	 *  @return The end plan.
 	 */
-	public IMConfigElement createEndPlan(final String ref)
+	public IMEConfigElement createEndPlan(final String ref)
 	{
 		if(isExternalThread())
 		{
@@ -717,7 +718,7 @@ public class MConfigurationFlyweight extends MElementFlyweight implements IMConf
 	 *  @param ref The event reference.
 	 *  @return The initial internal event.
 	 */
-	public IMConfigElement createInitialInternalEvent(final String ref)
+	public IMEConfigElement createInitialInternalEvent(final String ref)
 	{
 		if(isExternalThread())
 		{
@@ -747,7 +748,7 @@ public class MConfigurationFlyweight extends MElementFlyweight implements IMConf
 	 *  @param ref The event reference.
 	 *  @return The end internal event.
 	 */
-	public IMConfigElement createEndInternalEvent(final String ref)
+	public IMEConfigElement createEndInternalEvent(final String ref)
 	{
 		if(isExternalThread())
 		{
@@ -777,7 +778,7 @@ public class MConfigurationFlyweight extends MElementFlyweight implements IMConf
 	 *  @param ref The event reference.
 	 *  @return The initial message event.
 	 */
-	public IMConfigElement createInitialMessageEvent(final String ref)
+	public IMEConfigElement createInitialMessageEvent(final String ref)
 	{
 		if(isExternalThread())
 		{
@@ -807,7 +808,7 @@ public class MConfigurationFlyweight extends MElementFlyweight implements IMConf
 	 *  @param ref The event reference.
 	 *  @return The end message event.
 	 */
-	public IMConfigElement createEndMessageEvent(final String ref)
+	public IMEConfigElement createEndMessageEvent(final String ref)
 	{
 		if(isExternalThread())
 		{

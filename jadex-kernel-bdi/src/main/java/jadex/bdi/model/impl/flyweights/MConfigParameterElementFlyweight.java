@@ -4,6 +4,11 @@ import jadex.bdi.model.IMConfigParameter;
 import jadex.bdi.model.IMConfigParameterElement;
 import jadex.bdi.model.IMConfigParameterSet;
 import jadex.bdi.model.OAVBDIMetaModel;
+import jadex.bdi.model.editable.IMEConfigParameter;
+import jadex.bdi.model.editable.IMEConfigParameterElement;
+import jadex.bdi.model.editable.IMEConfigParameterSet;
+import jadex.bdi.model.editable.IMEParameter;
+import jadex.bdi.model.editable.IMEParameterSet;
 import jadex.rules.state.IOAVState;
 
 import java.util.Collection;
@@ -12,7 +17,7 @@ import java.util.Iterator;
 /**
  * 
  */
-public class MConfigParameterElementFlyweight extends MElementFlyweight implements IMConfigParameterElement
+public class MConfigParameterElementFlyweight extends MElementFlyweight implements IMConfigParameterElement, IMEConfigParameterElement
 {
 	//-------- constructors --------
 	
@@ -109,6 +114,67 @@ public class MConfigParameterElementFlyweight extends MElementFlyweight implemen
 				}
 			}
 			return ret;
+		}
+	}
+	
+	/**
+	 *  Create a parameter.
+	 *  @param ref The name.
+	 *  @return The parameter.
+	 */
+	public IMEConfigParameter createParameter(final String ref)
+	{
+		if(isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					Object elem = getState().createObject(OAVBDIMetaModel.configparameter_type);
+					getState().setAttributeValue(elem, OAVBDIMetaModel.configparameter_has_ref, ref);
+					getState().addAttributeValue(getHandle(), OAVBDIMetaModel.configparameterelement_has_parameters, elem);
+					object = new MConfigParameterFlyweight(getState(), getScope(), elem);
+				}
+			};
+			return (IMEConfigParameter)invoc.object;
+		}
+		else
+		{
+			Object elem = getState().createObject(OAVBDIMetaModel.configparameter_type);
+			getState().setAttributeValue(elem, OAVBDIMetaModel.configparameter_has_ref, ref);
+			getState().addAttributeValue(getHandle(), OAVBDIMetaModel.configparameterelement_has_parameters, elem);
+			return new MConfigParameterFlyweight(getState(), getScope(), elem);
+		}
+	}
+	
+	/**
+	 *  Create a parameter set.
+	 *  @param name The name.
+	 *  @return The parameter sets.
+	 */
+	public IMEConfigParameterSet createParameterSet(final String ref)
+	{
+		if(isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					Object elem = getState().createObject(OAVBDIMetaModel.configparameterset_type);
+					getState().setAttributeValue(elem, OAVBDIMetaModel.configparameterset_has_ref, ref);
+					getState().addAttributeValue(getHandle(), OAVBDIMetaModel.configparameterelement_has_parametersets, elem);
+					object = new MConfigParameterSetFlyweight(getState(), getScope(), elem);
+				}
+			};
+			return (IMEConfigParameterSet)invoc.object;
+		}
+		else
+		{
+			Object elem = getState().createObject(OAVBDIMetaModel.configparameterset_type);
+			getState().setAttributeValue(elem, OAVBDIMetaModel.configparameterset_has_ref, ref);
+			getState().addAttributeValue(getHandle(), OAVBDIMetaModel.configparameterelement_has_parametersets, elem);
+			return new MConfigParameterSetFlyweight(getState(), getScope(), elem);
+
 		}
 	}
 }
