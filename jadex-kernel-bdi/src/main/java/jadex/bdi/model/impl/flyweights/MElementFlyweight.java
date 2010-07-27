@@ -2,7 +2,6 @@ package jadex.bdi.model.impl.flyweights;
 
 import jadex.bdi.model.IMElement;
 import jadex.bdi.model.OAVBDIMetaModel;
-import jadex.bdi.model.editable.IMEBeliefSetReference;
 import jadex.bdi.model.editable.IMEElement;
 import jadex.bdi.runtime.impl.flyweights.ElementFlyweight;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;

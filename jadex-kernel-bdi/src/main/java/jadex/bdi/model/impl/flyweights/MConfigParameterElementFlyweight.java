@@ -7,8 +7,6 @@ import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.model.editable.IMEConfigParameter;
 import jadex.bdi.model.editable.IMEConfigParameterElement;
 import jadex.bdi.model.editable.IMEConfigParameterSet;
-import jadex.bdi.model.editable.IMEParameter;
-import jadex.bdi.model.editable.IMEParameterSet;
 import jadex.rules.state.IOAVState;
 
 import java.util.Collection;

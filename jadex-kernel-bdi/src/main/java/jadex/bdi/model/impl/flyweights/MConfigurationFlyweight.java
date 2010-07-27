@@ -6,8 +6,6 @@ import jadex.bdi.model.IMConfigElement;
 import jadex.bdi.model.IMConfiguration;
 import jadex.bdi.model.IMInitialCapability;
 import jadex.bdi.model.OAVBDIMetaModel;
-import jadex.bdi.model.editable.IMEBelief;
-import jadex.bdi.model.editable.IMEBeliefSet;
 import jadex.bdi.model.editable.IMEConfigBelief;
 import jadex.bdi.model.editable.IMEConfigBeliefSet;
 import jadex.bdi.model.editable.IMEConfigElement;

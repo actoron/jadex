@@ -1,14 +1,15 @@
 package jadex.bdi.model.impl.flyweights;
 
-import jadex.bdi.model.IMCondition;
 import jadex.bdi.model.IMAchieveGoal;
+import jadex.bdi.model.IMCondition;
 import jadex.bdi.model.OAVBDIMetaModel;
+import jadex.bdi.model.editable.IMEAchieveGoal;
 import jadex.rules.state.IOAVState;
 
 /**
  *  Flyweight for achieve goal model element.
  */
-public class MAchieveGoalFlyweight extends MGoalFlyweight implements IMAchieveGoal
+public class MAchieveGoalFlyweight extends MGoalFlyweight implements IMAchieveGoal, IMEAchieveGoal
 {
 	//-------- constructors --------
 	

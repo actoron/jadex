@@ -3,7 +3,6 @@ package jadex.bdi.model.impl.flyweights;
 import jadex.bdi.model.IMCapability;
 import jadex.bdi.model.IMCapabilityReference;
 import jadex.bdi.model.OAVBDIMetaModel;
-import jadex.bdi.model.impl.flyweights.MElementFlyweight.AgentInvocation;
 import jadex.rules.state.IOAVState;
 
 /**

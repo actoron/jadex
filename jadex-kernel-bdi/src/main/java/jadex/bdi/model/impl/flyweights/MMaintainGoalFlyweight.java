@@ -3,12 +3,13 @@ package jadex.bdi.model.impl.flyweights;
 import jadex.bdi.model.IMCondition;
 import jadex.bdi.model.IMMaintainGoal;
 import jadex.bdi.model.OAVBDIMetaModel;
+import jadex.bdi.model.editable.IMEMaintainGoal;
 import jadex.rules.state.IOAVState;
 
 /**
  *  Flyweight for maintain goal model element.
  */
-public class MMaintainGoalFlyweight extends MGoalFlyweight implements IMMaintainGoal
+public class MMaintainGoalFlyweight extends MGoalFlyweight implements IMMaintainGoal, IMEMaintainGoal
 {
 	//-------- constructors --------
 	
