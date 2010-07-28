@@ -568,74 +568,63 @@ public class MessageService extends BasicService implements IMessageService
 				for(int i = 0; i < receivers.length; i++)
 				{
 					final int cnt = i; 
-					((ComponentManagementService)cms).getComponentAdapter(receivers[i], new IResultListener()
+					StandaloneComponentAdapter component = (StandaloneComponentAdapter)((ComponentManagementService)cms).getComponentAdapter(receivers[i]);
+					if(component != null)
 					{
-						public void resultAvailable(Object source, Object result)
+						ClassLoader cl = component.getComponentInstance().getClassLoader();
+						Map	message	= (Map) decoded.get(cl);
+						if(message==null)
 						{
-							StandaloneComponentAdapter component = (StandaloneComponentAdapter)result;
-							if(component != null)
+							if(receivers.length>1)
 							{
-								ClassLoader cl = component.getComponentInstance().getClassLoader();
-								Map	message	= (Map) decoded.get(cl);
-								if(message==null)
-								{
-									if(receivers.length>1)
-									{
-										message	= new HashMap(msg);
-										decoded.put(cl, message);
-									}
-									else
-									{
-										// Skip creation of copy when only one receiver.
-										message	= msg;
-									}
-
-									// Conversion via platform specific codecs
-									IContentCodec[] compcodecs = getContentCodecs(component.getModel().getProperties());
-									for(Iterator it=message.keySet().iterator(); it.hasNext(); )
-									{
-										String name = (String)it.next();
-										Object value = message.get(name);
-										
-										IContentCodec codec = messagetype.findContentCodec(compcodecs, message, name);
-										if(codec==null)
-											codec = messagetype.findContentCodec(DEFCODECS, message, name);
-										
-										if(codec!=null)
-										{
-											message.put(name, codec.decode((String)value, cl));
-										}
-									}
-								}
-
-								try
-								{
-									component.receiveMessage(message, messagetype);
-								}
-								catch(Exception e)
-								{
-									logger.warning("Message could not be delivered to receiver(s): " + receivers[cnt] + message+", "+e);
-
-									// todo: notify sender that message could not be delivered!
-									// Problem: there is no connection back to the sender, so that
-									// the only chance is sending a separate failure message.
-								}
+								message	= new HashMap(msg);
+								decoded.put(cl, message);
 							}
 							else
 							{
-								logger.warning("Message could not be delivered to receiver(s): " + receivers[cnt] + msg);
+								// Skip creation of copy when only one receiver.
+								message	= msg;
+							}
 
-								// todo: notify sender that message could not be delivered!
-								// Problem: there is no connection back to the sender, so that
-								// the only chance is sending a separate failure message.
+							// Conversion via platform specific codecs
+							IContentCodec[] compcodecs = getContentCodecs(component.getModel().getProperties());
+							for(Iterator it=message.keySet().iterator(); it.hasNext(); )
+							{
+								String name = (String)it.next();
+								Object value = message.get(name);
+								
+								IContentCodec codec = messagetype.findContentCodec(compcodecs, message, name);
+								if(codec==null)
+									codec = messagetype.findContentCodec(DEFCODECS, message, name);
+								
+								if(codec!=null)
+								{
+									message.put(name, codec.decode((String)value, cl));
+								}
 							}
 						}
 
-						public void exceptionOccurred(Object source, Exception exception)
+						try
 						{
-							logger.severe("Exception occurred: "+exception);
+							component.receiveMessage(message, messagetype);
 						}
-					});
+						catch(Exception e)
+						{
+							logger.warning("Message could not be delivered to receiver(s): " + receivers[cnt] + message+", "+e);
+
+							// todo: notify sender that message could not be delivered!
+							// Problem: there is no connection back to the sender, so that
+							// the only chance is sending a separate failure message.
+						}
+					}
+					else
+					{
+						logger.warning("Message could not be delivered to receiver(s): " + receivers[cnt] + msg);
+
+						// todo: notify sender that message could not be delivered!
+						// Problem: there is no connection back to the sender, so that
+						// the only chance is sending a separate failure message.
+					}
 				}
 			}	
 		});

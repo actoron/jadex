@@ -55,17 +55,6 @@ public abstract class MicroAgent implements IMicroAgent
 	}
 	
 	/**
-	 *  Called when the agent is born and whenever it wants to execute an action
-	 *  (e.g. calls wakeup() in one of the other methods).
-	 *  The platform guarantees that executeAction() will not be called in parallel. 
-	 *  @return True, when there are more actions waiting to be executed. 
-	 * /
-	public boolean executeAction()
-	{
-		return false;
-	}*/
-	
-	/**
 	 *  Execute the functional body of the agent.
 	 *  Is only called once.
 	 */
@@ -451,7 +440,7 @@ public abstract class MicroAgent implements IMicroAgent
 	/**
 	 *  Start the service provider.
 	 */
-	public IFuture startServiceProvider(Class type, Object service)
+	public IFuture startServiceProvider()
 	{
 		return ((IServiceContainer)interpreter.getServiceProvider()).start();
 	}

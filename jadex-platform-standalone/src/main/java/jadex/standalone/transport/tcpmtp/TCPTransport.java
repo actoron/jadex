@@ -276,7 +276,7 @@ public class TCPTransport implements ITransport
 		// Iterate over all different addresses and try to send
 		// to missing and appropriate receivers
 		String[] addrs = (String[])adrsets.getKeys(String.class);
-		for(int i=0; i<addrs.length; i++)
+		for(int i=0; i<addrs.length && undelivered.size()>0; i++)
 		{
 			TCPOutputConnection con = getConnection(addrs[i]);
 			if(con!=null)
@@ -371,6 +371,7 @@ public class TCPTransport implements ITransport
 		if(address.startsWith(getServiceSchema()))
 		{
 			// Parse the address
+			// todo: handle V6 ip adresses (0:0:0:0 ...)
 			try
 			{
 				int schemalen = getServiceSchema().length();

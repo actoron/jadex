@@ -1,6 +1,5 @@
 package jadex.bridge;
 
-import jadex.commons.IFuture;
 
 /**
  * 
@@ -8,13 +7,17 @@ import jadex.commons.IFuture;
 public interface IRemoteServiceManagementService
 {
 	/**
-	 *  Invoke a method on a remote component.
+	 *  Called when a method invocation result has been retrived.
 	 */
-//	public IFuture invokeServiceMethod(IComponentIdentifier comp, Class service, String methodname, Object[] args);
+	public void remoteResultReceived(RemoteMethodResultInfo result, String convid);
+	
+	/**
+	 *  Called when component receives message with remote method invocation request.
+	 */
+	public void remoteInvocationReceived(IComponentIdentifier rms, RemoteMethodInvocationInfo rmii, String convid);
 	
 	/**
 	 *  Invoke a method on a remote component.
 	 */
-	public Object getProxy(IComponentIdentifier comp, Class service);
-
+	public Object getProxy(IComponentIdentifier rms, IComponentIdentifier target, Class service);
 }

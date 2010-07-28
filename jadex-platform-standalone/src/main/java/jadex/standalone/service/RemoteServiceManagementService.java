@@ -6,9 +6,12 @@ import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IMessageService;
 import jadex.bridge.IRemoteServiceManagementService;
+import jadex.bridge.RemoteMethodInvocationInfo;
+import jadex.bridge.RemoteMethodResultInfo;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.SUtil;
+import jadex.commons.ThreadSuspendable;
 import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.service.BasicService;
@@ -22,10 +25,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 
+ *  The remote service management service is responsible for 
+ *  handling remote service invocations (similar to RMI).
  */
 public class RemoteServiceManagementService extends BasicService implements IRemoteServiceManagementService
 {
+	//-------- attributes --------
+	
 	/** The component. */
 	protected IExternalAccess component;
 	
@@ -38,77 +44,127 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	/** The component management service. */
 	protected IComponentManagementService cms;
 	
+	/** The waiting futures. */
+	protected Map waitingcalls;
+	
+	//-------- constructors --------
+	
 	/**
-	 * 
+	 *  Create a new remote service management service.
 	 */
 	public RemoteServiceManagementService(IExternalAccess component)
 	{
 		this.component = component;
+		this.waitingcalls = new HashMap();
 	}
 	
+	//-------- methods --------
 	
 	/**
-	 *  Invoke a method on a remote component.
-	 * /
-	public IFuture invokeServiceMethod(IComponentIdentifier cid, Class service, String methodname, Object[] args)
+	 *  Called when a method invocation result has been retrived.
+	 *  (called only from own component)
+	 */
+	public void remoteResultReceived(RemoteMethodResultInfo result, String convid)
 	{
-	}*/
+		Future future = (Future)waitingcalls.get(convid);
+		if(result.getException()!=null)
+		{
+			future.setException(result.getException());
+		}
+		else
+		{
+			future.setResult(result.getResult());
+		}
+	}
 	
 	/**
 	 *  Called when component receives message with remote method invocation request.
+	 *  (called only from own component)
 	 */
-	public void invocationReceived(final IComponentIdentifier sendercid, final IComponentIdentifier targetcid, final Class service, 
-		final String methodname, final Class[] argtypes, final Object[] args, final String convid)
+	public void remoteInvocationReceived(final IComponentIdentifier rms, 
+		final RemoteMethodInvocationInfo rmii, final String convid)	
 	{
-		// fetch component
-		// fetch service on comp
-		// invoke method and get results
-		// send result message to sender
-	
-		cms.getExternalAccess(targetcid).addResultListener(new IResultListener()
+		final Future ret = new Future();
+		
+		// create result msg
+		final Map msg = new HashMap();
+		msg.put(SFipa.SENDER, component.getComponentIdentifier());
+		msg.put(SFipa.RECEIVERS, new IComponentIdentifier[]{rms});
+		msg.put(SFipa.CONVERSATION_ID, convid);
+		msg.put(SFipa.LANGUAGE, SFipa.JADEX_XML);
+		
+		// fetch component via target component id
+		cms.getExternalAccess(rmii.getTarget()).addResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
 				IExternalAccess exta = (IExternalAccess)result;
-				SServiceProvider.getDeclaredService(exta.getServiceProvider(), service).addResultListener(new IResultListener()
+				
+				// fetch service on target component 
+				// todo: via id
+				SServiceProvider.getDeclaredService(exta.getServiceProvider(), rmii.getService())
+					.addResultListener(new IResultListener()
 				{
 					public void resultAvailable(Object source, Object result)
 					{
 						try
 						{
-							Method m = result.getClass().getMethod(methodname, argtypes);
-							Object res = m.invoke(result, args);
+							// fetch method on service and invoke method
+							Method m = result.getClass().getMethod(rmii.getMethodName(), rmii.getParameterTypes());
+							Object res = m.invoke(result, rmii.getParameterValues());
 							
-							Map msg = new HashMap();
-							msg.put(SFipa.SENDER, targetcid);
-							msg.put(SFipa.RECEIVERS, new IComponentIdentifier[]{sendercid});
-							msg.put(SFipa.CONTENT, "test");
-							msg.put(SFipa.CONVERSATION_ID, convid);
+							if(res instanceof IFuture)
+							{
+								((IFuture)res).addResultListener(new DelegationResultListener(ret));
+							}
+							else
+							{
+								ret.setResult(res);
+							}
 						}
 						catch(Exception e)
 						{
-							e.printStackTrace();
+							ret.setException(e);
 						}
 					}
 					
 					public void exceptionOccurred(Object source, Exception exception)
 					{
+						ret.setException(exception);	
 					}
 				});
 			}
 			
 			public void exceptionOccurred(Object source, Exception exception)
 			{
+				ret.setException(exception);	
+			}
+		});
+		
+		ret.addResultListener(new IResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				msg.put(SFipa.CONTENT, new RemoteMethodResultInfo(result, null));
+				msgservice.sendMessage(msg, SFipa.FIPA_MESSAGE_TYPE, component.getComponentIdentifier(), libservice.getClassLoader());
+			}
+			
+			public void exceptionOccurred(Object source, Exception exception)
+			{
+				msg.put(SFipa.CONTENT, new RemoteMethodResultInfo(null, exception));
+				msgservice.sendMessage(msg, SFipa.FIPA_MESSAGE_TYPE, component.getComponentIdentifier(), libservice.getClassLoader());
 			}
 		});
 	}
 	
 	/**
 	 *  Invoke a method on a remote component.
+	 *  (called from arbitrary components)
 	 */
-	public Object getProxy(IComponentIdentifier targetcid, Class service)
+	public Object getProxy(IComponentIdentifier rms, IComponentIdentifier target, Class service)
 	{
-		 return Proxy.newProxyInstance(libservice.getClassLoader(), new Class[]{service}, new RSMInvocationHandler(targetcid, service));
+		return Proxy.newProxyInstance(libservice.getClassLoader(), new Class[]{service}, 
+			new RSMInvocationHandler(rms, target, service));
 	}
 
 	/**
@@ -118,21 +174,35 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	{
 		final Future ret = new Future();
 		
-		SServiceProvider.getService(component.getServiceProvider(), ILibraryService.class)
+		SServiceProvider.getServiceUpwards(component.getServiceProvider(), IComponentManagementService.class)
 			.addResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
-				libservice = (ILibraryService)result;
-				SServiceProvider.getService(component.getServiceProvider(), IMessageService.class)
+				cms = (IComponentManagementService)result;
+			
+				SServiceProvider.getService(component.getServiceProvider(), ILibraryService.class)
 					.addResultListener(new IResultListener()
 				{
 					public void resultAvailable(Object source, Object result)
 					{
-						msgservice = (IMessageService)result;
-				
-						RemoteServiceManagementService.super.startService()
-							.addResultListener(new DelegationResultListener(ret));
+						libservice = (ILibraryService)result;
+						SServiceProvider.getService(component.getServiceProvider(), IMessageService.class)
+							.addResultListener(new IResultListener()
+						{
+							public void resultAvailable(Object source, Object result)
+							{
+								msgservice = (IMessageService)result;
+						
+								RemoteServiceManagementService.super.startService()
+									.addResultListener(new DelegationResultListener(ret));
+							}
+							
+							public void exceptionOccurred(Object source, Exception exception)
+							{
+								ret.setException(exception);
+							}
+						});
 					}
 					
 					public void exceptionOccurred(Object source, Exception exception)
@@ -141,7 +211,6 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 					}
 				});
 			}
-			
 			public void exceptionOccurred(Object source, Exception exception)
 			{
 				ret.setException(exception);
@@ -152,40 +221,63 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	}
 	
 	/**
-	 * 
+	 *  Class that implements the Java proxy InvocationHandler, which
+	 *  is called when a method on a proxy is called.
 	 */
 	public class RSMInvocationHandler implements InvocationHandler
 	{
-		/** The component identifier. */
-		protected IComponentIdentifier targetcid;
+		//-------- attributes --------
+		
+		/** The remote rms component identifier. */
+		protected IComponentIdentifier rms;
+		
+		/** The target component identifier. */
+		protected IComponentIdentifier target;
 		
 		/** The service interface. */
 		protected Class service;
 		
+		//-------- constructors --------
+		
 		/**
 		 *  Create a new invocation handler.
 		 */
-		public RSMInvocationHandler(IComponentIdentifier targetcid, Class service)
+		public RSMInvocationHandler(IComponentIdentifier rms, IComponentIdentifier target, Class service)
 		{
-			this.targetcid = targetcid;
+			this.rms = rms;
+			this.target = target;
 			this.service = service;
 		}
+		
+		//-------- methods --------
 		
 		/**
 		 *  Invoke a method.
 		 */
 		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
 		{
-			Future ret = new Future();
-			
+			Future future = new Future();
+			Object ret = future;
+
+			RemoteMethodInvocationInfo mii = new RemoteMethodInvocationInfo(target, service, method.getName(), 
+				method.getParameterTypes(), args);
 			String convid = SUtil.createUniqueId(component.getComponentIdentifier().getLocalName());
+			waitingcalls.put(convid, future);
+			
 			Map msg = new HashMap();
 			msg.put(SFipa.SENDER, component.getComponentIdentifier());
-			msg.put(SFipa.RECEIVERS, new IComponentIdentifier[]{targetcid});
-			msg.put(SFipa.CONTENT, "test");
+			msg.put(SFipa.RECEIVERS, new IComponentIdentifier[]{rms});
+			msg.put(SFipa.CONTENT, mii);
+			msg.put(SFipa.LANGUAGE, SFipa.JADEX_XML);
 			msg.put(SFipa.CONVERSATION_ID, convid);
-			
 			msgservice.sendMessage(msg, SFipa.FIPA_MESSAGE_TYPE, component.getComponentIdentifier(), libservice.getClassLoader());
+
+			if(!method.getReturnType().isAssignableFrom(IFuture.class))
+			{
+				System.out.println("Warning, blocking method call: "+method.getName());
+				ret = future.get(new ThreadSuspendable());
+//				System.out.println("Resumed call: "+method.getName()+" "+ret);
+			}
 		
 			return ret;
 		}

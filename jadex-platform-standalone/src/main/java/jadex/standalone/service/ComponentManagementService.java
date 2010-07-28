@@ -887,12 +887,9 @@ public class ComponentManagementService extends BasicService implements ICompone
 	 *  @param listener The result listener.
 	 */
     // Todo: Hack!!! remove?
-	public void getComponentAdapter(IComponentIdentifier cid, IResultListener listener)
+	public StandaloneComponentAdapter getComponentAdapter(IComponentIdentifier cid)
 	{
-		if(listener==null)
-			throw new RuntimeException("Result listener required.");
-		
-		listener.resultAvailable(this, adapters.get(cid));
+		return (StandaloneComponentAdapter)adapters.get(cid);
 	}
 	
 	/**

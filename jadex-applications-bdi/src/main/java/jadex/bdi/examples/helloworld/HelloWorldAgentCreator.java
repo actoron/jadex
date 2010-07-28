@@ -13,7 +13,9 @@ import jadex.commons.concurrent.DefaultResultListener;
 import jadex.service.SServiceProvider;
 
 /**
- * 
+ *  Example that shows how an agent model can be created via the editable model api.
+ *  This model can be registered with a name at the BDI agent factory and instances
+ *  can be created based on this new model.
  */
 public class HelloWorldAgentCreator
 {
