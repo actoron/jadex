@@ -6,10 +6,10 @@ package jadex.tools.bpmn.editor.properties;
 import jadex.tools.bpmn.editor.properties.template.AbstractComboPropertySection;
 import jadex.tools.bpmn.editor.properties.template.AbstractParameterTablePropertySection;
 import jadex.tools.bpmn.editor.properties.template.JadexBpmnPropertiesUtil;
+import jadex.tools.bpmn.runtime.task.IParameterMetaInfo;
 import jadex.tools.bpmn.runtime.task.IRuntimeTaskProvider;
-import jadex.tools.bpmn.runtime.task.ParameterMetaInfo;
+import jadex.tools.bpmn.runtime.task.ITaskMetaInfo;
 import jadex.tools.bpmn.runtime.task.StaticJadexRuntimeTaskProvider;
-import jadex.tools.bpmn.runtime.task.TaskMetaInfo;
 import jadex.tools.model.common.properties.table.MultiColumnTable;
 import jadex.tools.model.common.properties.table.MultiColumnTable.MultiColumnTableRow;
 
@@ -233,12 +233,12 @@ public class JadexUserTaskImplComboSection extends
 	{
 		
 		String metaInfo;
-		metaInfo = createTaskMetaInfoString(taskProvider.getTaskMetaInfoFor(taskClassName));
+		metaInfo = createTaskMetaInfoString(taskProvider.getTaskMetaInfo(taskClassName));
 		
 		taskMetaInfoText.setText(metaInfo);
 	}
 	
-	protected String createTaskMetaInfoString(TaskMetaInfo taskMetaInfo)
+	protected String createTaskMetaInfoString(ITaskMetaInfo taskMetaInfo)
 	{
 		if (taskMetaInfo == null)
 		{
@@ -248,7 +248,7 @@ public class JadexUserTaskImplComboSection extends
 		StringBuffer info = new StringBuffer();
 		info.append(taskMetaInfo.getDescription() + "\n");
 		
-		ParameterMetaInfo[] params = taskMetaInfo.getParameterMetaInfos();
+		IParameterMetaInfo[] params = taskMetaInfo.getParameterMetaInfos();
 		if (params == null)
 			return info.toString();
 		for (int i = 0; i < params.length; i++)
@@ -267,8 +267,8 @@ public class JadexUserTaskImplComboSection extends
 	
 	protected void updateTaskParameterTable(String taskClassName)
 	{
-		TaskMetaInfo metaInfo = taskProvider.getTaskMetaInfoFor(taskClassName);
-		ParameterMetaInfo[] taskParameter = metaInfo.getParameterMetaInfos();
+		ITaskMetaInfo metaInfo = taskProvider.getTaskMetaInfo(taskClassName);
+		IParameterMetaInfo[] taskParameter = metaInfo.getParameterMetaInfos();
 
 		MultiColumnTable parameterTable = JadexBpmnPropertiesUtil
 					.getJadexEAnnotationTable(
@@ -307,7 +307,7 @@ public class JadexUserTaskImplComboSection extends
 	 * @param parameterMetaInfo
 	 * @return
 	 */
-	protected MultiColumnTable createNewParameterTable(ParameterMetaInfo[] parameterMetaInfo)
+	protected MultiColumnTable createNewParameterTable(IParameterMetaInfo[] parameterMetaInfo)
 	{
 		MultiColumnTable newTable = new MultiColumnTable(parameterMetaInfo.length, JadexCommonParameterSection.UNIQUE_PARAMETER_ROW_ATTRIBUTE);
 		for (int i = 0; i < parameterMetaInfo.length; i++)
@@ -332,7 +332,7 @@ public class JadexUserTaskImplComboSection extends
 	 * @param table
 	 * @param metaInfo
 	 */
-	protected MultiColumnTable updateTaskParamterTable(MultiColumnTable table, ParameterMetaInfo[] metaInfo)
+	protected MultiColumnTable updateTaskParamterTable(MultiColumnTable table, IParameterMetaInfo[] metaInfo)
 	{
 		MultiColumnTable newTable = createNewParameterTable(metaInfo);
 		int typeIndex = AbstractParameterTablePropertySection.getDefaultIndexForColumn(AbstractParameterTablePropertySection.TYPE_COLUMN);
@@ -364,7 +364,7 @@ public class JadexUserTaskImplComboSection extends
 	 * @param table
 	 * @param metaInfo
 	 */
-	protected MultiColumnTable addTaskParamterTable(MultiColumnTable table, ParameterMetaInfo[] metaInfo)
+	protected MultiColumnTable addTaskParamterTable(MultiColumnTable table, IParameterMetaInfo[] metaInfo)
 	{
 		MultiColumnTable newTable = createNewParameterTable(metaInfo);
 		

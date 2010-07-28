@@ -271,7 +271,7 @@ public class JadexBpmnPropertiesUtil
 		catch (ExecutionException exception)
 		{
 			JadexBpmnPlugin.getDefault().getLog().log(
-					new Status(IStatus.ERROR, JadexBpmnPlugin.PLUGIN_ID,
+					new Status(IStatus.ERROR, JadexBpmnPlugin.ID,
 							IStatus.ERROR, exception.getMessage(),
 							exception));
 			
@@ -374,7 +374,7 @@ public class JadexBpmnPropertiesUtil
 		catch (ExecutionException exception)
 		{
 			JadexBpmnPlugin.getDefault().getLog().log(
-					new Status(IStatus.ERROR, JadexBpmnPlugin.PLUGIN_ID,
+					new Status(IStatus.ERROR, JadexBpmnPlugin.ID,
 							IStatus.ERROR, exception.getMessage(),
 							exception));
 			
@@ -529,7 +529,7 @@ public class JadexBpmnPropertiesUtil
 		catch (ExecutionException exception)
 		{
 			JadexBpmnPlugin.getDefault().getLog().log(
-					new Status(IStatus.ERROR, JadexBpmnPlugin.PLUGIN_ID,
+					new Status(IStatus.ERROR, JadexBpmnPlugin.ID,
 							IStatus.ERROR, exception.getMessage(),
 							exception));
 			

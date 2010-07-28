@@ -9,12 +9,12 @@ import org.osgi.framework.BundleContext;
  */
 public class JadexBpmnPlugin extends AbstractUIPlugin {
 
-	// The plug-in ID
-	public static final String PLUGIN_ID = "jadex.tools.bpmn.editor.JadexBpmnPluginID";
+	/** The plug-in ID, its the same as the editor ID */
+	public static final String ID = JadexBpmnEditor.ID;
 
-	// The shared instance
+	/** The shared instance of this plug-in */
 	private static JadexBpmnPlugin plugin;
-	
+
 	/**
 	 * The constructor
 	 */
@@ -56,6 +56,6 @@ public class JadexBpmnPlugin extends AbstractUIPlugin {
 	 * @return the image descriptor
 	 */
 	public static ImageDescriptor getImageDescriptor(String path) {
-		return imageDescriptorFromPlugin(PLUGIN_ID, path);
+		return imageDescriptorFromPlugin(ID, path);
 	}
 }

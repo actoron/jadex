@@ -3,7 +3,7 @@ package jadex.tools.bpmn.runtime.task;
 /**
  *  Meta information for a parameter.
  */
-public class ParameterMetaInfo
+public class ParameterMetaInfo implements IParameterMetaInfo
 {
 	//-------- constants --------
 	
@@ -49,46 +49,46 @@ public class ParameterMetaInfo
 		
 	//-------- methods --------
 	
-	/**
-	 *  Get the direction.
-	 *  @return The direction.
+	/* (non-Javadoc)
+	 * @see jadex.tools.bpmn.runtime.task.IParameterMetaInfo#getDirection()
 	 */
+	@Override
 	public String getDirection()
 	{
 		return this.direction;
 	}
 
-	/**
-	 *  Get the clazz.
-	 *  @return The clazz.
+	/* (non-Javadoc)
+	 * @see jadex.tools.bpmn.runtime.task.IParameterMetaInfo#getClazz()
 	 */
+	@Override
 	public Class<?> getClazz()
 	{
 		return this.clazz;
 	}
 
-	/**
-	 *  Get the name.
-	 *  @return The name.
+	/* (non-Javadoc)
+	 * @see jadex.tools.bpmn.runtime.task.IParameterMetaInfo#getName()
 	 */
+	@Override
 	public String getName()
 	{
 		return this.name;
 	}
 
-	/**
-	 *  Get the initialval.
-	 *  @return The initialval.
+	/* (non-Javadoc)
+	 * @see jadex.tools.bpmn.runtime.task.IParameterMetaInfo#getInitialValue()
 	 */
+	@Override
 	public String getInitialValue()
 	{
 		return this.initialval;
 	}
 
-	/**
-	 *  Get the description.
-	 *  @return The description.
+	/* (non-Javadoc)
+	 * @see jadex.tools.bpmn.runtime.task.IParameterMetaInfo#getDescription()
 	 */
+	@Override
 	public String getDescription()
 	{
 		return this.description;

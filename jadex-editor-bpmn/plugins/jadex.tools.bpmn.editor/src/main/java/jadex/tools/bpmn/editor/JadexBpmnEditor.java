@@ -22,12 +22,18 @@ public class JadexBpmnEditor extends BpmnDiagramEditor {
 
 	/** The contributor id for this editor */
 	public static final String ID = "jadex.tools.bpmn.editor.JadexBpmnEditorID";
-	 
+
     static {
  
         PlatformUI.getWorkbench().getEditorRegistry().
             setDefaultEditor("*.bpmn_diagram", ID); //$NON-NLS-1$
     }
+
+    // ---- preference keys ----
+    
+    public static final String PREFERENCE_TASK_PROVIDER_LIST = "Task Provider";
+    
+    
  
     /** Access the contributor id */
     public String getContributorId() {
