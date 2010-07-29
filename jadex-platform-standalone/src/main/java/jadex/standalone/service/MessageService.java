@@ -2,7 +2,6 @@ package jadex.standalone.service;
 
 import jadex.bridge.ContentException;
 import jadex.bridge.DefaultMessageAdapter;
-import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IContentCodec;

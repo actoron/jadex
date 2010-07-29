@@ -3,7 +3,6 @@ package jadex.tools.convcenter;
 import jadex.base.fipa.SFipa;
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IEAMessageEvent;
-import jadex.bdi.runtime.IEAParameterSet;
 import jadex.bdi.runtime.IMessageEventListener;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
@@ -26,6 +25,10 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 import javax.swing.AbstractAction;
 import javax.swing.Icon;
@@ -48,8 +51,8 @@ public class ConversationPlugin extends AbstractJCCPlugin
 	/** The property storing sent messages (from 0..4). */ 
 	public static final String	SENT_MESSAGE	= "sentmessage";
 
-	/** String used to store the message type in encoded messages. */
-	public static final String	ENCODED_MESSAGE_TYPE	= "encoded-message-type";
+//	/** String used to store the message type in encoded messages. */
+//	public static final String	ENCODED_MESSAGE_TYPE	= "convcenter-encoded-message-type";
 
 	/** The image icons. */
 	protected static final UIDefaults icons = new UIDefaults(new Object[]
@@ -106,42 +109,22 @@ public class ConversationPlugin extends AbstractJCCPlugin
 				public void customResultAvailable(Object source, Object result)
 				{
 					IComponentManagementService cms  = (IComponentManagementService)result;
-					final IComponentIdentifier receiver = cms.createComponentIdentifier(rec.getName(), false, rec.getAddresses());
-					final IEAMessageEvent	message	= convcenter.getMessagePanel().getMessage();
-					message.getParameterSet(SFipa.RECEIVERS).addResultListener(new SwingDefaultResultListener(convcenter)
+					IComponentIdentifier receiver = cms.createComponentIdentifier(rec.getName(), false, rec.getAddresses());
+					Map	message	= convcenter.getMessagePanel().getMessage();
+					IComponentIdentifier[]	recs	= (IComponentIdentifier[])message.get(SFipa.RECEIVERS);
+					List	lrecs	= recs!=null ? new ArrayList(Arrays.asList(recs)) : new ArrayList();
+					if(lrecs.contains(receiver))
 					{
-						public void customResultAvailable(Object source, Object result) 
-						{
-							final IEAParameterSet rcvs = (IEAParameterSet)result;
-							
-							rcvs.containsValue(receiver).addResultListener(new SwingDefaultResultListener(convcenter)
-							{
-								public void customResultAvailable(Object source, Object result) 
-								{
-									if(((Boolean)result).booleanValue())
-									{
-										rcvs.removeValue(receiver);
-									}
-									else
-									{
-										rcvs.addValue(receiver);
-									}
-									convcenter.getMessagePanel().setMessage(message);
-								}
-							});
-						};
-					});
+						lrecs.remove(receiver);
+					}
+					else
+					{
+						lrecs.add(receiver);
+					}
+					message.put(SFipa.RECEIVERS, (IComponentIdentifier[])lrecs.toArray(new IComponentIdentifier[lrecs.size()]));					
+					convcenter.getMessagePanel().setMessage(message);
 				}
 			});
-			
-//			if(rcvs.containsValue(receiver))
-//			{
-//				rcvs.removeValue(receiver);
-//			}
-//			else
-//			{
-//				rcvs.addValue(receiver);
-//			}
 		}
 	};
 	
@@ -160,7 +143,7 @@ public class ConversationPlugin extends AbstractJCCPlugin
 		agents.getTreetable().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		agents.getNodeType(ComponentTreeTable.NODE_COMPONENT).addPopupAction(SEND_MESSAGE);
 
-		split.add(convcenter = new FipaConversationPanel(((AgentControlCenter)getJCC()).getAgent(), null));
+		split.add(convcenter = new FipaConversationPanel(((AgentControlCenter)getJCC()).getAgent()));
 
 		GuiProperties.setupHelp(split, "tools.conversationcenter");
 
@@ -255,39 +238,18 @@ public class ConversationPlugin extends AbstractJCCPlugin
 	 */
 	public void processMessage(final IEAMessageEvent message)
 	{
-		message.hasParameter(SFipa.ONTOLOGY).addResultListener(new SwingDefaultResultListener(convcenter)
+		convcenter.createMessageMap(message).addResultListener(new SwingDefaultResultListener(convcenter)
 		{
 			public void customResultAvailable(Object source, Object result)
 			{
-				if(((Boolean)result).booleanValue())
+				Map	msg	= (Map)result;
+				String onto	= (String)msg.get(SFipa.ONTOLOGY);
+				if(onto==null || !onto.startsWith("jadex.tools"))
 				{
-					message.getParameterValue(SFipa.ONTOLOGY).addResultListener(new SwingDefaultResultListener(convcenter)
-					{
-						public void customResultAvailable(Object source, Object result)
-						{
-							String onto = (String)result;
-							if(onto==null || !onto.startsWith("jadex.tools"))
-							{
-								convcenter.addMessage(message);										
-							}
-						}
-					});
-				}
+					convcenter.addMessage(msg);										
+				}						
 			}
 		});
-		
-//		try
-//		{
-//			String onto = message.hasParameter(SFipa.ONTOLOGY)? 
-//				(String)message.getParameter(SFipa.ONTOLOGY).getValue(): null;
-//			if(onto==null || !onto.startsWith("jadex.tools"))
-//			{
-//				convcenter.addMessage(message);
-//			}
-//		}
-//		catch(Exception e)
-//		{
-//		}
 	}
 
 	/**

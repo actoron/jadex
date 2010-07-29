@@ -14,11 +14,6 @@ import java.net.Socket;
  */
 public class TCPInputConnection
 {
-	//-------- constants ---------
-	
-	/** 2MB as message buffer */
-	static final int BUFFER_SIZE = 1024 * 1024 * 2;
-	
 	//-------- attributes --------
 	
 	/** The client socket. */
@@ -26,9 +21,6 @@ public class TCPInputConnection
 	
 	/** The input stream. */
 	protected InputStream is;
-	
-	/** The buffer. */
-	protected byte[] buffer;
 	
 	/** The codec factory. */
 	protected CodecFactory codecfac;
@@ -47,7 +39,6 @@ public class TCPInputConnection
 		this.sock = sock;
 		this.codecfac = codecfac;
 		this.classloader = classloader;
-		this.buffer = new byte[BUFFER_SIZE];
 		this.is = new BufferedInputStream(sock.getInputStream());
 	}
 	
@@ -64,24 +55,26 @@ public class TCPInputConnection
 		// Calculate message size by reading the first 4 bytes
 		// Read here is always a blocking call.
 		int msg_size;
-		byte codec_id = (byte)readByte();
-		msg_size = readByte() << 24 | readByte() << 16 | readByte() << 8 | readByte();
-		msg_size -= TCPTransport.PROLOG_SIZE; // Remove prolog.
-		if(msg_size <= buffer.length && msg_size>0)
+		int	read	= is.read();
+		if(read!=-1)	// read==-1 when connection is closed on sender side.
 		{
-			int count = 0;
-			while(count<msg_size) 
+			byte codec_id = (byte)read;
+			msg_size = readByte() << 24 | readByte() << 16 | readByte() << 8 | readByte();
+			msg_size -= TCPTransport.PROLOG_SIZE; // Remove prolog.
+			if(msg_size>0)
 			{
-				int bytes_read = is.read(buffer, count, msg_size-count);
-				if(bytes_read==-1) 
-					throw new IOException("Stream closed");
-				count += bytes_read;
+				byte[] rawmsg = new byte[msg_size];
+				int count = 0;
+				while(count<msg_size) 
+				{
+					int bytes_read = is.read(rawmsg, count, msg_size-count);
+					if(bytes_read==-1) 
+						throw new IOException("Stream closed");
+					count += bytes_read;
+				}
+				IDecoder dec = codecfac.getDecoder(codec_id);
+				ret = (MessageEnvelope)dec.decode(rawmsg, classloader);
 			}
-					
-			byte[] rawmsg = new byte[count];
-			System.arraycopy(buffer, 0, rawmsg, 0, count);
-			IDecoder dec = codecfac.getDecoder(codec_id);
-			ret = (MessageEnvelope)dec.decode(rawmsg, classloader);
 		}
 		
 		return ret;

@@ -427,7 +427,7 @@ public class SUtil
 		return ret;
 	}
 
-	  /**
+	/**
 	 * Get a string representation for an array.
 	 * @param array The array.
 	 * @return formatted string.
