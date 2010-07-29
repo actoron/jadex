@@ -427,6 +427,122 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 			return ret;
 		}
 	}
+
+	/**
+	 *  Get the component.
+	 *  @return the component.
+	 */
+	public IExternalAccess getComponent()
+	{
+		return component;
+	}
+
+	/**
+	 *  Get the cms.
+	 *  @return the cms.
+	 */
+	public IComponentManagementService getComponentManagementService()
+	{
+		return cms;
+	}
 }
 
+/**
+ * 
+ * /
+class RemoteMethodInvocationCommand
+{
+	protected String convid;
+	
+	protected RemoteMethodInvocationInfo rmii;
+	
+	protected IComponentIdentifier rms;
+	
+	/**
+	 * 
+	 * /
+	public RemoteMethodInvocationCommand(String convid, RemoteMethodInvocationInfo rmii, IComponentIdentifier rms)
+	{
+		this.convid = convid;
+		this.rmii = rmii;
+		this.rms = rms;
+	}
+	
+	/**
+	 * 
+	 * /
+	public IFuture execute(RemoteServiceManagementService lrms)
+	{
+		final Future ret = new Future();
+		
+		// create result msg
+		final Map msg = new HashMap();
+		msg.put(SFipa.SENDER, lrms.getComponent().getComponentIdentifier());
+		msg.put(SFipa.RECEIVERS, new IComponentIdentifier[]{rms});
+		msg.put(SFipa.CONVERSATION_ID, convid);
+		msg.put(SFipa.LANGUAGE, SFipa.JADEX_XML);
+		
+		// fetch component via target component id
+		lrms.getComponentManagementService().getExternalAccess((IComponentIdentifier)rmii.getServiceIdentifier().getProviderId()).addResultListener(new IResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				IExternalAccess exta = (IExternalAccess)result;
+				
+				// fetch service on target component 
+				SServiceProvider.getDeclaredService(exta.getServiceProvider(), rmii.getServiceIdentifier())
+					.addResultListener(new IResultListener()
+				{
+					public void resultAvailable(Object source, Object result)
+					{
+						try
+						{
+							// fetch method on service and invoke method
+							Method m = result.getClass().getMethod(rmii.getMethodName(), rmii.getParameterTypes());
+							Object res = m.invoke(result, rmii.getParameterValues());
+							
+							if(res instanceof IFuture)
+							{
+								((IFuture)res).addResultListener(new DelegationResultListener(ret));
+							}
+							else
+							{
+								ret.setResult(res);
+							}
+						}
+						catch(Exception e)
+						{
+							ret.setException(e);
+						}
+					}
+					
+					public void exceptionOccurred(Object source, Exception exception)
+					{
+						ret.setException(exception);	
+					}
+				});
+			}
+			
+			public void exceptionOccurred(Object source, Exception exception)
+			{
+				ret.setException(exception);	
+			}
+		});
+		
+		ret.addResultListener(new IResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				msg.put(SFipa.CONTENT, new RemoteMethodResultInfo(result, null));
+				msgservice.sendMessage(msg, SFipa.FIPA_MESSAGE_TYPE, component.getComponentIdentifier(), libservice.getClassLoader());
+			}
+			
+			public void exceptionOccurred(Object source, Exception exception)
+			{
+				msg.put(SFipa.CONTENT, new RemoteMethodResultInfo(null, exception));
+				msgservice.sendMessage(msg, SFipa.FIPA_MESSAGE_TYPE, component.getComponentIdentifier(), libservice.getClassLoader());
+			}
+		});
+	}
+}*/
 
