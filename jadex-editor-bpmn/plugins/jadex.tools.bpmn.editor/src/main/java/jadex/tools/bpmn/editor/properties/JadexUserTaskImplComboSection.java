@@ -7,9 +7,9 @@ import jadex.tools.bpmn.editor.properties.template.AbstractComboPropertySection;
 import jadex.tools.bpmn.editor.properties.template.AbstractParameterTablePropertySection;
 import jadex.tools.bpmn.editor.properties.template.JadexBpmnPropertiesUtil;
 import jadex.tools.bpmn.runtime.task.IParameterMetaInfo;
-import jadex.tools.bpmn.runtime.task.IRuntimeTaskProvider;
+import jadex.tools.bpmn.runtime.task.IJadexTaskProvider;
 import jadex.tools.bpmn.runtime.task.ITaskMetaInfo;
-import jadex.tools.bpmn.runtime.task.StaticJadexRuntimeTaskProvider;
+import jadex.tools.bpmn.runtime.task.StaticJadexTaskProvider;
 import jadex.tools.model.common.properties.table.MultiColumnTable;
 import jadex.tools.model.common.properties.table.MultiColumnTable.MultiColumnTableRow;
 
@@ -52,7 +52,7 @@ public class JadexUserTaskImplComboSection extends
 	
 	protected Text taskMetaInfoText;
 	
-	protected IRuntimeTaskProvider taskProvider;
+	protected IJadexTaskProvider taskProvider;
 	
 	/** The table add default parameter button */
 	protected Button addDefaultButton;
@@ -65,7 +65,7 @@ public class JadexUserTaskImplComboSection extends
 	public JadexUserTaskImplComboSection()
 	{
 		super(JadexBpmnPropertiesUtil.JADEX_GLOBAL_ANNOTATION, JadexBpmnPropertiesUtil.JADEX_ACTIVITY_CLASS_DETAIL);
-		this.taskProvider = new StaticJadexRuntimeTaskProvider();
+		this.taskProvider = new StaticJadexTaskProvider();
 		//this.taskProvider = new DynamicWorkspaceTaskProviderProxy();
 	}
 

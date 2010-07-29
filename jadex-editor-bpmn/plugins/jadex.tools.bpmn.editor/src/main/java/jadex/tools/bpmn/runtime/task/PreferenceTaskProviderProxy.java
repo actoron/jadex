@@ -7,6 +7,7 @@ import jadex.tools.bpmn.editor.JadexBpmnEditor;
 import jadex.tools.bpmn.editor.JadexBpmnPlugin;
 import jadex.tools.bpmn.editor.preferences.JadexTaskProviderTypeListEditor;
 
+import java.io.InvalidObjectException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -27,7 +28,7 @@ import org.eclipse.emf.common.util.UniqueEList;
  * @author Claas
  * 
  */
-public class PreferenceTaskProviderProxy implements IRuntimeTaskProvider
+public class PreferenceTaskProviderProxy implements IJadexTaskProvider
 {
 	/** The list of ITaskProvider */
 	private static List<String> iTaskProviderCache;
@@ -53,7 +54,7 @@ public class PreferenceTaskProviderProxy implements IRuntimeTaskProvider
 	 * Returns a compound array of all Tasks defined by the TaskProviders
 	 * in from the Jadex preference store list.  
 	 * 
-	 * @see jadex.tools.bpmn.runtime.task.IRuntimeTaskProvider#
+	 * @see jadex.tools.bpmn.runtime.task.IJadexTaskProvider#
 	 * getAvailableTaskImplementations()
 	 */
 	@Override
@@ -94,22 +95,25 @@ public class PreferenceTaskProviderProxy implements IRuntimeTaskProvider
 			try
 			{
 				
+				Class<?> clazz = classLoader.loadClass(className);
+				Object instance = clazz.newInstance();
+				String[] tasks;
+				IJadexTaskProvider provider;
 				
-				Object obj = classLoader
-						.loadClass(className).newInstance();
-				
-				if (obj instanceof IRuntimeTaskProvider)
+				if (instance instanceof IJadexTaskProvider)
 				{
-					IRuntimeTaskProvider provider = (IRuntimeTaskProvider) obj;
-					String[] tasks = provider.getAvailableTaskImplementations();
-					for (int i = 0; i < tasks.length; i++)
-					{
-						providerMap.put(tasks[i], provider);
-					}
+					provider = (IJadexTaskProvider) instance;
+					tasks = provider.getAvailableTaskImplementations();
 				} 
 				else
 				{
-					// FIXME: use reflection if needed
+					// use reflection proxy
+					provider = new TaskProviderProxy(instance);
+					tasks = provider.getAvailableTaskImplementations();
+				}
+				for (int i = 0; i < tasks.length; i++)
+				{
+					providerMap.put(tasks[i], provider);
 				}
 				
 			}
@@ -125,7 +129,7 @@ public class PreferenceTaskProviderProxy implements IRuntimeTaskProvider
 	 * Proxy method to the original TaskProvider method
 	 * 
 	 * @see
-	 * jadex.tools.bpmn.runtime.task.IRuntimeTaskProvider#getTaskMetaInfo
+	 * jadex.tools.bpmn.runtime.task.IJadexTaskProvider#getTaskMetaInfo
 	 * (java.lang.String)
 	 */
 	@Override
@@ -133,41 +137,19 @@ public class PreferenceTaskProviderProxy implements IRuntimeTaskProvider
 	{
 
 		Object obj = providerMap.get(fqClassName);
-		if (obj != null && obj instanceof IRuntimeTaskProvider)
+		if (obj != null && obj instanceof IJadexTaskProvider)
 		{
 			// use interface if implemented
-			IRuntimeTaskProvider provider = (IRuntimeTaskProvider) obj;
+			IJadexTaskProvider provider = (IJadexTaskProvider) obj;
 			return provider.getTaskMetaInfo(fqClassName);
 		}
 		else if (obj != null)
 		{
-			try
-			{
-				// use reflection
-				Method getTaskMetaInfoMethod = obj.getClass()
-						.getMethod(IRuntimeTaskProvider.METHOD_GET_TASK_META_INFO);
-				Object returnValue = getTaskMetaInfoMethod.invoke(obj, new Object[]{fqClassName});
-				
-				// check the return value
-				if (returnValue instanceof ITaskMetaInfo)
-				{
-					return (ITaskMetaInfo) returnValue;
-				}
-				else
-				{
-					// FIXME: use reflection proxy
-				}
-			}
-			catch (Exception e)
-			{
-				JadexBpmnEditor.log(e, IStatus.ERROR);
-			}
-			
-			
+			throw new RuntimeException("Unexpected class in "+this, new InvalidObjectException("Object doesn't implement the IJadexTaskProvider interface nor its a Proxy object!" + obj));
 		}
 		
 		// fall through
-		return RuntimeTaskProviderSupport.NO_TASK_META_INFO_PROVIDED;
+		return TaskProviderSupport.NO_TASK_META_INFO_PROVIDED;
 
 	}
 	
@@ -187,20 +169,20 @@ public class PreferenceTaskProviderProxy implements IRuntimeTaskProvider
 					.getWorkspaceClassLoader(false);
 			Class<?> clazz = classLoader.loadClass(fullQualifiedClassName);
 			if (Arrays.asList(clazz.getInterfaces()).contains(
-					IRuntimeTaskProvider.class))
+					IJadexTaskProvider.class))
 			{
 				status = new Status(IStatus.OK, JadexBpmnPlugin.ID, "Implements IRuntimeTaskProvider");
 			}
 			
 			// second check implementing needed methods
 			Method getAvailableTasksMethod = clazz
-					.getMethod(IRuntimeTaskProvider.METHOD_GET_AVAILABLE_TASK_IMPLEMENTATIONS);
+					.getMethod(IJadexTaskProvider.METHOD_IJADEXTASKPROVIDER_GET_AVAILABLE_TASK_IMPLEMENTATIONS);
 			Method getTaskMetaInfoMethod = clazz
-					.getMethod(IRuntimeTaskProvider.METHOD_GET_TASK_META_INFO);
+					.getMethod(IJadexTaskProvider.METHOD_IJADEXTASKPROVIDER_GET_TASK_META_INFO);
 			
 			if (getAvailableTasksMethod != null && getTaskMetaInfoMethod != null)
 			{
-				status = new Status(IStatus.OK, JadexBpmnPlugin.ID, "Implements '"+IRuntimeTaskProvider.METHOD_GET_AVAILABLE_TASK_IMPLEMENTATIONS+"' and '"+IRuntimeTaskProvider.METHOD_GET_TASK_META_INFO+"'");
+				status = new Status(IStatus.OK, JadexBpmnPlugin.ID, "Implements '"+IJadexTaskProvider.METHOD_IJADEXTASKPROVIDER_GET_AVAILABLE_TASK_IMPLEMENTATIONS+"' and '"+IJadexTaskProvider.METHOD_IJADEXTASKPROVIDER_GET_TASK_META_INFO+"'");
 			}
 		}
 		// if something goes wrong, report it
