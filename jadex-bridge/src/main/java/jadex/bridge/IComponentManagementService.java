@@ -74,7 +74,7 @@ public interface IComponentManagementService
 	
 	/**
 	 *  Get all component descriptions.
-	 *  @return The component descriptions of this component.
+	 *  @return The component descriptions of the platform.
 	 */
 	public IFuture getComponentDescriptions();
 	
