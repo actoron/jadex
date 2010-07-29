@@ -116,7 +116,10 @@ public class Starter
 			String cfclname = (String)cmdargs.get(COMPONENT_FACTORY)!=null? 
 				(String)cmdargs.get(COMPONENT_FACTORY): FALLBACK_COMPONENT_FACTORY;
 			Class cfclass = SReflect.findClass(cfclname, null, cl);
-			IComponentFactory cfac = (IComponentFactory)cfclass.newInstance();
+			// The providerid for this service is not important as it will be thrown away 
+			// after loading the first component model.
+			IComponentFactory cfac = (IComponentFactory)cfclass.getConstructor(new Class[]{Object.class})
+				.newInstance(new Object[]{"rootid"});
 			ILoadableComponentModel model = cfac.loadModel(configfile, null, cl);
 	//		System.out.println("Model: "+model);
 			

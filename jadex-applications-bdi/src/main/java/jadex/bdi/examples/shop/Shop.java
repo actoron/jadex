@@ -31,6 +31,8 @@ public class Shop extends BasicService implements IShop
 	 */
 	public Shop(IExternalAccess comp, String name)
 	{
+		super(BasicService.createServiceIdentifier(comp.getServiceProvider().getId(), Shop.class));
+
 //		System.out.println("created: "+name);
 		this.comp = (IBDIExternalAccess)comp;
 		this.name = name;

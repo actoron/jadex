@@ -8,6 +8,7 @@ import jadex.commons.concurrent.IThreadPool;
 import jadex.service.BasicService;
 import jadex.service.IServiceProvider;
 import jadex.service.SServiceProvider;
+import jadex.service.execution.SyncExecutionService;
 import jadex.service.threadpool.ThreadPoolService;
 
 import java.util.ArrayList;
@@ -30,7 +31,6 @@ public class ClockService extends BasicService implements IClockService
 
 	/** The clock listeners. */
 	protected List listeners;
-
 	
 	/** The provider. */
 	protected IServiceProvider provider;
@@ -45,6 +45,8 @@ public class ClockService extends BasicService implements IClockService
 	 */
 	public ClockService(ClockCreationInfo cinfo, IServiceProvider provider)
 	{
+		super(BasicService.createServiceIdentifier(provider.getId(), ClockService.class));
+
 		this.cinfo = cinfo;
 		this.provider = provider;
 		this.listeners = Collections.synchronizedList(new ArrayList());

@@ -3,6 +3,7 @@ package jadex.service.threadpool;
 import jadex.commons.IFuture;
 import jadex.commons.concurrent.IThreadPool;
 import jadex.service.BasicService;
+import jadex.service.IServiceProvider;
 
 /**
  *  Service wrapper for a threadpool.
@@ -19,8 +20,10 @@ public class ThreadPoolService extends BasicService implements IThreadPool
 	/**
 	 *  Create a new threadpool service.
 	 */
-	public ThreadPoolService(IThreadPool threadpool)
+	public ThreadPoolService(IThreadPool threadpool, IServiceProvider provider)
 	{
+		super(BasicService.createServiceIdentifier(provider.getId(), ThreadPoolService.class));
+
 		this.threadpool = threadpool;
 	}
 	

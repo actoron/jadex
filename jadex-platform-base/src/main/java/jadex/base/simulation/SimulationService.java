@@ -11,12 +11,14 @@ import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.IThreadPool;
 import jadex.service.BasicService;
 import jadex.service.IServiceContainer;
+import jadex.service.IServiceProvider;
 import jadex.service.SServiceProvider;
 import jadex.service.clock.ClockService;
 import jadex.service.clock.IClock;
 import jadex.service.clock.IClockService;
 import jadex.service.clock.ITimer;
 import jadex.service.execution.IExecutionService;
+import jadex.service.execution.SyncExecutionService;
 
 import java.util.List;
 
@@ -30,7 +32,7 @@ public class SimulationService extends BasicService implements ISimulationServic
 	//-------- attributes --------
 
 	/** The platform. */
-	protected IServiceContainer container;
+	protected IServiceProvider provider;
 	
 	/** The execution mode. */
 	protected String mode;
@@ -62,9 +64,11 @@ public class SimulationService extends BasicService implements ISimulationServic
 	/**
 	 *  Create a new execution control.
 	 */
-	public SimulationService(IServiceContainer container)
+	public SimulationService(IServiceProvider provider)
 	{
-		this.container = container;
+		super(BasicService.createServiceIdentifier(provider.getId(), SimulationService.class));
+
+		this.provider = provider;
 //		this.mode = mode;
 		this.mode = MODE_NORMAL;
 		this.listeners = SCollection.createArrayList();
@@ -133,7 +137,7 @@ public class SimulationService extends BasicService implements ISimulationServic
 			{
 				final boolean[]	services	= new boolean[2];
 
-				SServiceProvider.getService(container, IExecutionService.class).addResultListener(new DefaultResultListener()
+				SServiceProvider.getService(provider, IExecutionService.class).addResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object source, Object result)
 					{
@@ -149,7 +153,7 @@ public class SimulationService extends BasicService implements ISimulationServic
 					}
 				});
 						
-				SServiceProvider.getService(container, IClockService.class).addResultListener(new DefaultResultListener()
+				SServiceProvider.getService(provider, IClockService.class).addResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object source, Object result)
 					{

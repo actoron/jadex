@@ -21,7 +21,7 @@ import jadex.rules.state.OAVObjectType;
 import jadex.rules.state.OAVTypeModel;
 import jadex.rules.state.javaimpl.OAVStateFactory;
 import jadex.service.BasicService;
-import jadex.service.IServiceContainer;
+import jadex.service.IServiceProvider;
 import jadex.service.library.ILibraryService;
 
 import java.util.Collections;
@@ -63,8 +63,8 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory
 	/** The model loader. */
 	protected OAVBDIModelLoader loader;
 	
-	/** The platform. */
-	protected IServiceContainer container;
+	/** The provider. */
+	protected IServiceProvider provider;
 	
 	/** The library service. */
 	protected ILibraryService libservice;
@@ -77,11 +77,13 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory
 	/**
 	 *  Create a new agent factory.
 	 */
-	public BDIAgentFactory(Map props, IServiceContainer container)
+	public BDIAgentFactory(Map props, IServiceProvider provider)
 	{
+		super(BasicService.createServiceIdentifier(provider.getId(), BDIAgentFactory.class));
+
 		this.props = props;
 		this.loader	= new OAVBDIModelLoader();
-		this.container = container;
+		this.provider = provider;
 		this.mtypes	= Collections.synchronizedMap(new WeakHashMap());
 	}
 	

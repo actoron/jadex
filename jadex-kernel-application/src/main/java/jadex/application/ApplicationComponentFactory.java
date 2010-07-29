@@ -81,12 +81,10 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 	
 	/**
 	 *  Create a new application factory.
-	 *  @param platform	The agent platform.
-	 *  @param mappings	The XML reader mappings of supported spaces (if any).
 	 */
-	public ApplicationComponentFactory()
+	public ApplicationComponentFactory(Object providerid)
 	{
-		this(null);
+		this(null, providerid);
 	}
 	
 	/**
@@ -94,10 +92,10 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 	 *  @param platform	The agent platform.
 	 *  @param mappings	The XML reader mappings of supported spaces (if any).
 	 */
-	public ApplicationComponentFactory(Set[] mappings)
+	public ApplicationComponentFactory(Set[] mappings, Object providerid)
 	{
-//		this.container = container;
-		
+		super(BasicService.createServiceIdentifier(providerid, ApplicationComponentFactory.class));
+
 		Set types = new HashSet();
 		
 		IStringObjectConverter exconv = new IStringObjectConverter()

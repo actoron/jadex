@@ -27,6 +27,9 @@ public class ComponentFactorySelector implements IResultSelector
 	/** The class loader (if any). */
 	protected ClassLoader	classloader;
 	
+	/** The flag if type should be part of result. */
+	protected boolean includetype;
+	
 	//-------- constructors --------
 	
 	/**
@@ -37,9 +40,21 @@ public class ComponentFactorySelector implements IResultSelector
 	 */
 	public ComponentFactorySelector(String model, String[] imports, ClassLoader classloader)
 	{
+		this(model, imports, classloader, false);
+	}
+	
+	/**
+	 *  Find a matching component factory.
+	 *  @param model	The model to be loaded.
+	 *  @param imports	The imports (if any).
+	 *  @param classloader	The class loader (if any).
+	 */
+	public ComponentFactorySelector(String model, String[] imports, ClassLoader classloader, boolean includetype)
+	{
 		this.model	= model;
 		this.imports	= imports;
 		this.classloader	= classloader;
+		this.includetype = includetype;
 	}
 	
 	/**
@@ -80,7 +95,14 @@ public class ComponentFactorySelector implements IResultSelector
 					
 					if(match)
 					{
-						results.add(fac);
+						if(includetype)
+						{
+							results.add(new Object[]{type, fac});
+						}
+						else
+						{
+							results.add(fac);
+						}
 					}
 				}
 			}
@@ -118,7 +140,7 @@ public class ComponentFactorySelector implements IResultSelector
 		return type!=null ? new Tuple(new Object[]{getClass(), type})
 			: new Tuple(new Object[]{getClass(), model, imports!=null ? (Object)new Tuple(imports) : "null", classloader!=null ? (Object)classloader : "null"});
 	}
-
+	
 	/**
 	 *  Get the string representation.
 	 */

@@ -17,12 +17,17 @@ public interface IService
 	 *  Start the service.
 	 *  @return A future that is done when the service has completed starting.  
 	 */
-	public IFuture	startService();
+	public IFuture startService();
 	
 	/**
 	 *  Shutdown the service.
 	 *  @return A future that is done when the service has completed its shutdown.  
 	 */
-	public IFuture	shutdownService();
+	public IFuture shutdownService();
 	
+	/**
+	 *  Get the service identifier.
+	 *  @return The service identifier.
+	 */
+	public IServiceIdentifier getServiceIdentifier();
 }

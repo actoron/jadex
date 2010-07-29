@@ -8,6 +8,8 @@ import jadex.bridge.IMessageService;
 import jadex.bridge.IRemoteServiceManagementService;
 import jadex.bridge.RemoteMethodInvocationInfo;
 import jadex.bridge.RemoteMethodResultInfo;
+import jadex.bridge.RemoteServiceSearchInvocationInfo;
+import jadex.bridge.RemoteServiceSearchResultInfo;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.SUtil;
@@ -15,13 +17,20 @@ import jadex.commons.ThreadSuspendable;
 import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.service.BasicService;
+import jadex.service.IService;
+import jadex.service.IServiceIdentifier;
 import jadex.service.SServiceProvider;
+import jadex.service.TypeResultSelector;
 import jadex.service.library.ILibraryService;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -54,6 +63,8 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	 */
 	public RemoteServiceManagementService(IExternalAccess component)
 	{
+		super(BasicService.createServiceIdentifier(component.getServiceProvider().getId(), RemoteServiceManagementService.class));
+
 		this.component = component;
 		this.waitingcalls = new HashMap();
 	}
@@ -94,15 +105,14 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		msg.put(SFipa.LANGUAGE, SFipa.JADEX_XML);
 		
 		// fetch component via target component id
-		cms.getExternalAccess(rmii.getTarget()).addResultListener(new IResultListener()
+		cms.getExternalAccess((IComponentIdentifier)rmii.getServiceIdentifier().getProviderId()).addResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
 				IExternalAccess exta = (IExternalAccess)result;
 				
 				// fetch service on target component 
-				// todo: via id
-				SServiceProvider.getDeclaredService(exta.getServiceProvider(), rmii.getService())
+				SServiceProvider.getDeclaredService(exta.getServiceProvider(), rmii.getServiceIdentifier())
 					.addResultListener(new IResultListener()
 				{
 					public void resultAvailable(Object source, Object result)
@@ -160,13 +170,148 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	/**
 	 *  Invoke a method on a remote component.
 	 *  (called from arbitrary components)
+	 *  @param rms The remote management service where the original service lives.
+	 *  @param sid The service identifier.
+	 *  @return The service proxy.
 	 */
-	public Object getProxy(IComponentIdentifier rms, IComponentIdentifier target, Class service)
+	public Object getProxy(IComponentIdentifier rms, IServiceIdentifier sid, Class service)
 	{
 		return Proxy.newProxyInstance(libservice.getClassLoader(), new Class[]{service}, 
-			new RSMInvocationHandler(rms, target, service));
+			new RSMInvocationHandler(rms, sid, service));
+	}
+	
+	/**
+	 *  Invoke a method on a remote component.
+	 *  (called from arbitrary components)
+	 *  @param rms The remote management service where the original service lives.
+	 *  @return The service proxy.
+	 */
+	public IFuture getProxy(IComponentIdentifier rms, Object providerid, Class service)
+	{
+		final Future ret = new Future();
+		
+		String convid = SUtil.createUniqueId(component.getComponentIdentifier().getLocalName());
+		RemoteServiceSearchInvocationInfo content = new RemoteServiceSearchInvocationInfo(providerid, 
+			SServiceProvider.sequentialmanager, SServiceProvider.abortdecider, new TypeResultSelector(service, true, true));
+
+		waitingcalls.put(convid, ret);
+		
+		final Map msg = new HashMap();
+		msg.put(SFipa.SENDER, component.getComponentIdentifier());
+		msg.put(SFipa.RECEIVERS, new IComponentIdentifier[]{rms});
+		msg.put(SFipa.CONVERSATION_ID, convid);
+		msg.put(SFipa.LANGUAGE, SFipa.JADEX_XML);
+		msg.put(SFipa.CONTENT, content);
+		msgservice.sendMessage(msg, SFipa.FIPA_MESSAGE_TYPE, component.getComponentIdentifier(), libservice.getClassLoader());
+		
+		return ret;
 	}
 
+	/**
+	 *  Called when a method invocation result has been retrived.
+	 *  (called only from own component)
+	 */
+	public void remoteSearchResultReceived(RemoteServiceSearchResultInfo result, String convid)
+	{
+		Future future = (Future)waitingcalls.get(convid);
+		if(result.getException()!=null)
+		{
+			future.setException(result.getException());
+		}
+		else
+		{
+			if(result.getResult() instanceof Collection)
+			{
+				List ret = new ArrayList();
+				for(Iterator it=((Collection)result.getResult()).iterator(); it.hasNext(); )
+				{
+					ProxyInfo pi = (ProxyInfo)it.next();
+					ret.add(getProxy(pi.getRms(), pi.getServiceIdentifier(), pi.getService()));
+				}
+				future.setResult(ret);
+			}
+			else if(result.getResult() instanceof ProxyInfo)
+			{
+				ProxyInfo pi = (ProxyInfo)result.getResult();
+				future.setResult(getProxy(pi.getRms(), pi.getServiceIdentifier(), pi.getService()));
+			}
+		}
+	}
+	
+	/**
+	 *  Called when component receives message with remote search request.
+	 *  (called only from own component)
+	 */
+	public void remoteSearchReceived(final IComponentIdentifier rms, 
+		final RemoteServiceSearchInvocationInfo rssii, final String convid)	
+	{
+		final Future ret = new Future();
+		
+		// create result msg
+		final Map msg = new HashMap();
+		msg.put(SFipa.SENDER, component.getComponentIdentifier());
+		msg.put(SFipa.RECEIVERS, new IComponentIdentifier[]{rms});
+		msg.put(SFipa.CONVERSATION_ID, convid);
+		msg.put(SFipa.LANGUAGE, SFipa.JADEX_XML);
+		
+		// fetch component via provider/component id
+		IComponentIdentifier comp = rssii.getProviderId()!=null? (IComponentIdentifier)rssii.getProviderId(): component.getComponentIdentifier();
+		cms.getExternalAccess(comp).addResultListener(new IResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				IExternalAccess exta = (IExternalAccess)result;
+				
+				// start serach on target component
+				exta.getServiceProvider().getServices(rssii.getSearchManager(), rssii.getVisitDecider(), 
+					rssii.getResultSelector()).addResultListener(new DelegationResultListener(ret));
+			}
+			
+			public void exceptionOccurred(Object source, Exception exception)
+			{
+				ret.setException(exception);	
+			}
+		});
+		
+		ret.addResultListener(new IResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				// Create proxy info(s) for service(s)
+				Object content;
+				if(result instanceof Collection)
+				{
+					List res = new ArrayList();
+					for(Iterator it=((Collection)result).iterator(); it.hasNext(); )
+					{
+						Object[] tmp = (Object[])it.next();
+						Class sertype = (Class)tmp[0]; 
+						IService ser = (IService)tmp[1];
+						ProxyInfo pi = new ProxyInfo(component.getComponentIdentifier(), ser.getServiceIdentifier(), sertype);
+						res.add(pi);
+					}
+					content = res;
+				}
+				else //if(result instanceof Object[])
+				{
+					Object[] tmp = (Object[])result;
+					Class sertype = (Class)tmp[0]; 
+					IService ser = (IService)tmp[1];
+					content = new ProxyInfo(component.getComponentIdentifier(), ser.getServiceIdentifier(), sertype);
+					
+				}
+				msg.put(SFipa.CONTENT, new RemoteServiceSearchResultInfo(content, null));
+				msgservice.sendMessage(msg, SFipa.FIPA_MESSAGE_TYPE, component.getComponentIdentifier(), libservice.getClassLoader());
+			}
+			
+			public void exceptionOccurred(Object source, Exception exception)
+			{
+				msg.put(SFipa.CONTENT, new RemoteServiceSearchResultInfo(null, exception));
+				msgservice.sendMessage(msg, SFipa.FIPA_MESSAGE_TYPE, component.getComponentIdentifier(), libservice.getClassLoader());
+			}
+		});
+	}
+	
 	/**
 	 *  Start the service.
 	 */
@@ -231,8 +376,8 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		/** The remote rms component identifier. */
 		protected IComponentIdentifier rms;
 		
-		/** The target component identifier. */
-		protected IComponentIdentifier target;
+		/** The service identifier. */
+		protected IServiceIdentifier sid;
 		
 		/** The service interface. */
 		protected Class service;
@@ -242,10 +387,10 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		/**
 		 *  Create a new invocation handler.
 		 */
-		public RSMInvocationHandler(IComponentIdentifier rms, IComponentIdentifier target, Class service)
+		public RSMInvocationHandler(IComponentIdentifier rms, IServiceIdentifier sid, Class service)
 		{
 			this.rms = rms;
-			this.target = target;
+			this.sid = sid;
 			this.service = service;
 		}
 		
@@ -259,7 +404,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 			Future future = new Future();
 			Object ret = future;
 
-			RemoteMethodInvocationInfo mii = new RemoteMethodInvocationInfo(target, service, method.getName(), 
+			RemoteMethodInvocationInfo mii = new RemoteMethodInvocationInfo(sid, method.getName(), 
 				method.getParameterTypes(), args);
 			String convid = SUtil.createUniqueId(component.getComponentIdentifier().getLocalName());
 			waitingcalls.put(convid, future);

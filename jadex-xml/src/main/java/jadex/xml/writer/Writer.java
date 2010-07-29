@@ -470,6 +470,7 @@ public class Writer
 		}
 		catch(Exception e)
 		{
+			System.out.println("Exception writing: "+val);
 			throw new RuntimeException(e);
 		}
 	}

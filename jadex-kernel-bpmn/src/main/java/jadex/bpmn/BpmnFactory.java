@@ -9,7 +9,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.ILoadableComponentModel;
 import jadex.commons.SGUI;
 import jadex.service.BasicService;
-import jadex.service.IServiceContainer;
+import jadex.service.IServiceProvider;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -37,8 +37,8 @@ public class BpmnFactory extends BasicService implements IComponentFactory
 	
 	//-------- attributes --------
 	
-	/** The WFMS */
-	protected IServiceContainer container;
+	/** The provider. */
+	protected IServiceProvider provider;
 	
 	/** Running process instances */
 	protected Map processes;
@@ -54,9 +54,11 @@ public class BpmnFactory extends BasicService implements IComponentFactory
 	/**
 	 *  Create a new BpmnProcessService.
 	 */
-	public BpmnFactory(IServiceContainer container, Map properties)
+	public BpmnFactory(IServiceProvider provider, Map properties)
 	{
-		this.container = container;
+		super(BasicService.createServiceIdentifier(provider.getId(), BpmnFactory.class));
+
+		this.provider = provider;
 		this.processes = new HashMap();
 		this.loader = new BpmnModelLoader();
 		this.properties	= properties;

@@ -37,9 +37,9 @@ public class LibraryService extends BasicService implements ILibraryService
 	/** 
 	 *  Creates a new LibraryService.
 	 */ 
-	public LibraryService()
+	public LibraryService(Object providerid)
 	{
-		this(null);
+		this(null, providerid);
 	}
 	
 	/** 
@@ -48,8 +48,10 @@ public class LibraryService extends BasicService implements ILibraryService
 	 *  	Strings are interpreted as relative files (relative to current directory),
 	 *  	absolute files or URLs (whatever can be found). 
 	 */ 
-	public LibraryService(Object[] urls)
+	public LibraryService(Object[] urls, Object providerid)
 	{
+		super(BasicService.createServiceIdentifier(providerid, LibraryService.class));
+		
 		basecl = Thread.currentThread().getContextClassLoader();
 		libcl = basecl;
 		

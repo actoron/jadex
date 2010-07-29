@@ -5,6 +5,7 @@ import jadex.commons.IFuture;
 import jadex.commons.concurrent.IResultListener;
 import jadex.service.BasicService;
 import jadex.service.IService;
+import jadex.service.IServiceProvider;
 import jadex.wfms.bdi.client.standard.SCapReqs;
 import jadex.wfms.client.IClient;
 import jadex.wfms.service.IAAAService;
@@ -45,11 +46,13 @@ public class BasicAAAService extends BasicService implements IAAAService
 		UserAAAEntry user = new UserAAAEntry("TestUser", new String[] {IAAAService.ALL_ROLES}, new String[] {"User"});
 		UserAAAEntry admin = new UserAAAEntry("TestAdmin", new String[] {IAAAService.ALL_ROLES}, new String[] {"Administrator"});
 		UserAAAEntry bankTeller = new UserAAAEntry("BankTellerUser", new String[] {"Bank Teller"}, new String[] {"User"});
-		return new BasicAAAService(new UserAAAEntry[] { admin, user, userNoStart, bankTeller }, secRoles);
+		return new BasicAAAService(new UserAAAEntry[] { admin, user, userNoStart, bankTeller }, secRoles, null);
 	}
 	
-	public BasicAAAService(UserAAAEntry[] users, Map secrolecaps)
+	public BasicAAAService(UserAAAEntry[] users, Map secrolecaps, IServiceProvider provider)
 	{
+		super(BasicService.createServiceIdentifier(provider.getId(), BasicAAAService.class));
+
 		this.authenticationListeners = new HashSet();
 		this.users = new HashMap();
 		for (int i = 0; i < users.length; ++i)

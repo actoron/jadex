@@ -14,6 +14,7 @@ import jadex.commons.SUtil;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.service.BasicService;
 import jadex.service.IServiceContainer;
+import jadex.service.IServiceProvider;
 import jadex.service.SServiceProvider;
 
 import java.io.BufferedReader;
@@ -43,8 +44,8 @@ public class GpmnFactory extends BasicService implements IComponentFactory
 	
 	//-------- attributes --------
 	
-	/** The platform */
-	protected IServiceContainer container;
+	/** The provider. */
+	protected IServiceProvider provider;
 
 	/** The gpmn loader. */
 	protected GpmnModelLoader loader;
@@ -66,15 +67,17 @@ public class GpmnFactory extends BasicService implements IComponentFactory
 	/**
 	 *  Create a new GpmnProcessService.
 	 */
-	public GpmnFactory(IServiceContainer container, Map properties)
+	public GpmnFactory(IServiceContainer provider, Map properties)
 	{
+		super(BasicService.createServiceIdentifier(provider.getId(), GpmnFactory.class));
+		
 		this.properties	= properties;
-		this.container = container;
+		this.provider = provider;
 		this.loader = new GpmnModelLoader();
 		this.legacyconverter = new GpmnBDIConverter();
 		this.converter = new GpmnBDIConverter2();
 		
-		SServiceProvider.getService(container, new ComponentFactorySelector(BDIAgentFactory.FILETYPE_BDIAGENT)).addResultListener(new DefaultResultListener()
+		SServiceProvider.getService(provider, new ComponentFactorySelector(BDIAgentFactory.FILETYPE_BDIAGENT)).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{

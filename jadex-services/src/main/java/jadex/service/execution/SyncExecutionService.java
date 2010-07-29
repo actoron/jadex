@@ -7,7 +7,7 @@ import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.Executor;
 import jadex.commons.concurrent.IExecutable;
 import jadex.commons.concurrent.IResultListener;
-import jadex.service.IService;
+import jadex.service.BasicService;
 import jadex.service.IServiceProvider;
 import jadex.service.SServiceProvider;
 import jadex.service.threadpool.ThreadPoolService;
@@ -20,7 +20,7 @@ import java.util.Set;
 /**
  *  The synchronous execution service that executes all tasks in zero to one thread.
  */
-public class SyncExecutionService	implements	IExecutionService, IService
+public class SyncExecutionService extends BasicService implements IExecutionService
 {
 	//-------- attributes --------
 	
@@ -59,9 +59,10 @@ public class SyncExecutionService	implements	IExecutionService, IService
 	/**
 	 *  Create a new synchronous executor service. 
 	 */
-//	public SyncExecutionService(IThreadPool threadpool)
 	public SyncExecutionService(IServiceProvider provider)
 	{
+		super(BasicService.createServiceIdentifier(provider.getId(), SyncExecutionService.class));
+
 		this.provider = provider;
 		this.running	= false;
 		this.queue	= SCollection.createLinkedHashSet();

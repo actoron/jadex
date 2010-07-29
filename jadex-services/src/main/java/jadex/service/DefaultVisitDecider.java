@@ -68,6 +68,24 @@ public class DefaultVisitDecider implements IVisitDecider
 	}
 	
 	/**
+	 *  Get the abort flag.
+	 *  @return The abort flag.
+	 */
+	public boolean isAbort()
+	{
+		return abort;
+	}
+
+	/**
+	 *  Set the abort flag.
+	 *  @param abort The abort flag to set.
+	 */
+	public void setAbort(boolean abort)
+	{
+		this.abort = abort;
+	}
+
+	/**
 	 *  Get the cache key.
 	 *  Needs to identify this element with respect to its important features so that
 	 *  two equal elements should return the same key.

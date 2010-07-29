@@ -20,6 +20,7 @@ import jadex.commons.concurrent.IExecutable;
 import jadex.commons.concurrent.IResultListener;
 import jadex.service.BasicService;
 import jadex.service.IServiceContainer;
+import jadex.service.IServiceProvider;
 import jadex.service.SServiceProvider;
 import jadex.service.clock.IClockService;
 import jadex.service.execution.IExecutionService;
@@ -58,9 +59,8 @@ public class MessageService extends BasicService implements IMessageService
 	
 	//-------- attributes --------
 
-	/** The container. */
-//	protected AbstractPlatform platform;
-    protected IServiceContainer container;
+	/** The provider. */
+    protected IServiceProvider provider;
 
 	/** The transports. */
 	protected List transports;
@@ -96,9 +96,11 @@ public class MessageService extends BasicService implements IMessageService
 	 *  Constructor for Outbox.
 	 *  @param platform
 	 */
-	public MessageService(IServiceContainer container, ITransport[] transports, MessageType[] messagetypes)
+	public MessageService(IServiceContainer provider, ITransport[] transports, MessageType[] messagetypes)
 	{
-		this.container = container;
+		super(BasicService.createServiceIdentifier(provider.getId(), RemoteServiceManagementService.class));
+
+		this.provider = provider;
 		this.transports = SCollection.createArrayList();
 		for(int i=0; i<transports.length; i++)
 			this.transports.add(transports[i]);
@@ -117,7 +119,6 @@ public class MessageService extends BasicService implements IMessageService
 	 *  @param message The native message.
 	 */
 	public void sendMessage(final Map msg, final MessageType type, IComponentIdentifier sender, final ClassLoader cl)
-//	public void sendMessage(final Map msg, final MessageType type, final IComponentAdapter adapter, final ClassLoader cl)
 	{
 //		IComponentIdentifier sender = adapter.getComponentIdentifier();
 		if(sender==null)
@@ -432,12 +433,12 @@ public class MessageService extends BasicService implements IMessageService
 				}
 				else
 				{
-					SServiceProvider.getService(container, IClockService.class).addResultListener(new IResultListener()
+					SServiceProvider.getService(provider, IClockService.class).addResultListener(new IResultListener()
 					{
 						public void resultAvailable(Object source, Object result)
 						{
 							clockservice = (IClockService)result;
-							SServiceProvider.getServiceUpwards(container, IComponentManagementService.class).addResultListener(new IResultListener()
+							SServiceProvider.getServiceUpwards(provider, IComponentManagementService.class).addResultListener(new IResultListener()
 							{
 								public void resultAvailable(Object source, Object result)
 								{
@@ -531,7 +532,7 @@ public class MessageService extends BasicService implements IMessageService
 
 		ITransport[] trans = (ITransport[])transports.toArray(new ITransport[transports.size()]);
 
-		for(int i = 0; i < trans.length; i++)
+		for(int i = 0; i < trans.length && receivers.length>0; i++)
 		{
 			try
 			{
@@ -560,7 +561,7 @@ public class MessageService extends BasicService implements IMessageService
 		final MessageType	messagetype	= getMessageType(type);
 		final Map	decoded	= new HashMap();	// Decoded messages cached by class loader to avoid decoding the same message more than once, when the same class loader is used.
 		
-		SServiceProvider.getServiceUpwards(container, IComponentManagementService.class).addResultListener(new DefaultResultListener()
+		SServiceProvider.getServiceUpwards(provider, IComponentManagementService.class).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
@@ -671,7 +672,7 @@ public class MessageService extends BasicService implements IMessageService
 		public synchronized void addMessage(Map message, String type, IComponentIdentifier[] receivers)
 		{
 			messages.add(new Object[]{message, type, receivers});
-			SServiceProvider.getService(container, IExecutionService.class).addResultListener(new DefaultResultListener()
+			SServiceProvider.getService(provider, IExecutionService.class).addResultListener(new DefaultResultListener()
 			{
 				public void resultAvailable(Object source, Object result)
 				{
@@ -722,7 +723,7 @@ public class MessageService extends BasicService implements IMessageService
 		public synchronized void addMessage(Map message, String type, IComponentIdentifier[] receivers)
 		{
 			messages.add(new Object[]{message, type, receivers});
-			SServiceProvider.getService(container, IExecutionService.class).addResultListener(new DefaultResultListener()
+			SServiceProvider.getService(provider, IExecutionService.class).addResultListener(new DefaultResultListener()
 			{
 				public void resultAvailable(Object source, Object result)
 				{

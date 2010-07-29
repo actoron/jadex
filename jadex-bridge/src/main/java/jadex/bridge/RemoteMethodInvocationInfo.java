@@ -1,5 +1,7 @@
 package jadex.bridge;
 
+import jadex.service.IServiceIdentifier;
+
 
 /**
  *  Helper struct for the remote method invocation service.
@@ -9,11 +11,8 @@ public class RemoteMethodInvocationInfo
 {
 	//-------- attributes --------
 	
-	/** The target component id. */
-	protected IComponentIdentifier target;
-	
-	/** The service class !!!todo: use id!!! . */
-	protected Class service;
+	/** The service identifier. */
+	protected IServiceIdentifier sid;
 	
 	/** The methodname. */
 	protected String methodname;
@@ -36,11 +35,10 @@ public class RemoteMethodInvocationInfo
 	/**
 	 *  Create a new invacation info.
 	 */
-	public RemoteMethodInvocationInfo(IComponentIdentifier target, Class service, String methodname, 
+	public RemoteMethodInvocationInfo(IServiceIdentifier sid, String methodname, 
 		Class[] parametertypes, Object[] parametervalues)
 	{
-		this.target = target;
-		this.service = service;
+		this.sid = sid;
 		this.methodname = methodname;
 		this.parametertypes = parametertypes;
 		this.parametervalues = parametervalues;
@@ -49,39 +47,21 @@ public class RemoteMethodInvocationInfo
 	//-------- methods --------
 	
 	/**
-	 *  Get the target.
-	 *  @return the target.
+	 *  Get the service identifier.
+	 *  @return The service identifier.
 	 */
-	public IComponentIdentifier getTarget()
+	public IServiceIdentifier getServiceIdentifier()
 	{
-		return target;
-	}
-	
-	/**
-	 *  Set the target.
-	 *  @param target The target to set.
-	 */
-	public void setTarget(IComponentIdentifier target)
-	{
-		this.target = target;
+		return sid;
 	}
 
 	/**
-	 *  Get the service.
-	 *  @return the service.
+	 *  Set the service identifier.
+	 *  @param sid The service identifier to set.
 	 */
-	public Class getService()
+	public void setServiceIdentifier(IServiceIdentifier sid)
 	{
-		return service;
-	}
-	
-	/**
-	 *  Set the service.
-	 *  @param service The service to set.
-	 */
-	public void setService(Class service)
-	{
-		this.service = service;
+		this.sid = sid;
 	}
 
 	/**

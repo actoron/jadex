@@ -104,7 +104,7 @@ class ComponentAdapter implements IComponentAdapter
 	public ComponentAdapter(final IComponentInstance interpreter)
 	{
 		container = new BasicServiceContainer("platform");
-		ThreadPoolService tps = new ThreadPoolService(ThreadPoolFactory.createThreadPool());
+		ThreadPoolService tps = new ThreadPoolService(ThreadPoolFactory.createThreadPool(), container);
 		container.addService(ThreadPoolService.class, tps);
 		final IClockService clock = new ClockService(new ClockCreationInfo(IClock.TYPE_SYSTEM, "system"), container);
 		container.addService(IClockService.class, (IService)clock);

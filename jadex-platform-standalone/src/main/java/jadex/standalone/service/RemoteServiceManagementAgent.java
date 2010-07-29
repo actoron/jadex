@@ -6,6 +6,8 @@ import jadex.bridge.IRemoteServiceManagementService;
 import jadex.bridge.MessageType;
 import jadex.bridge.RemoteMethodInvocationInfo;
 import jadex.bridge.RemoteMethodResultInfo;
+import jadex.bridge.RemoteServiceSearchInvocationInfo;
+import jadex.bridge.RemoteServiceSearchResultInfo;
 import jadex.micro.MicroAgent;
 
 import java.util.Map;
@@ -56,8 +58,21 @@ public class RemoteServiceManagementAgent extends MicroAgent
 			else if(content instanceof RemoteMethodResultInfo)
 			{
 				String convid = (String)msg.get(SFipa.CONVERSATION_ID);
-				RemoteMethodResultInfo rmri = (RemoteMethodResultInfo)msg.get(SFipa.CONTENT);
-				rms.remoteResultReceived(rmri, convid);
+				RemoteMethodResultInfo res = (RemoteMethodResultInfo)msg.get(SFipa.CONTENT);
+				rms.remoteResultReceived(res, convid);
+			}
+			else if(content instanceof RemoteServiceSearchInvocationInfo)
+			{
+				IComponentIdentifier rrms = (IComponentIdentifier)msg.get(SFipa.SENDER);
+				String convid = (String)msg.get(SFipa.CONVERSATION_ID);
+				RemoteServiceSearchInvocationInfo rssii = (RemoteServiceSearchInvocationInfo)msg.get(SFipa.CONTENT);
+				rms.remoteSearchReceived(rrms, rssii, convid);
+			}
+			else if(content instanceof RemoteServiceSearchResultInfo)
+			{
+				String convid = (String)msg.get(SFipa.CONVERSATION_ID);
+				RemoteServiceSearchResultInfo res = (RemoteServiceSearchResultInfo)msg.get(SFipa.CONTENT);
+				rms.remoteSearchResultReceived(res, convid);
 			}
 			else
 			{

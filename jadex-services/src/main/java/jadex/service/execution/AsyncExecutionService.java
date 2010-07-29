@@ -9,7 +9,7 @@ import jadex.commons.concurrent.Executor;
 import jadex.commons.concurrent.IExecutable;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.IThreadPool;
-import jadex.service.IService;
+import jadex.service.BasicService;
 import jadex.service.IServiceProvider;
 import jadex.service.SServiceProvider;
 import jadex.service.threadpool.ThreadPoolService;
@@ -21,7 +21,7 @@ import java.util.Set;
 /**
  *  The asynchronous executor service that executes all tasks in separate executors.
  */
-public class AsyncExecutionService	implements IExecutionService, IService
+public class AsyncExecutionService	extends BasicService implements IExecutionService
 {
 	//-------- attributes --------
 	
@@ -62,9 +62,10 @@ public class AsyncExecutionService	implements IExecutionService, IService
 	/**
 	 *  Create a new asynchronous executor service. 
 	 */
-//	public AsyncExecutionService(IThreadPool threadpool)//, int max)
 	public AsyncExecutionService(IServiceProvider provider)//, int max)
 	{
+		super(BasicService.createServiceIdentifier(provider.getId(), AsyncExecutionService.class));
+
 		this.provider = provider;
 //		this.threadpool = threadpool;
 //		this.max = max;

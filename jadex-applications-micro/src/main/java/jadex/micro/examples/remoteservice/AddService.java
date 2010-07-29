@@ -3,12 +3,21 @@ package jadex.micro.examples.remoteservice;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.service.BasicService;
+import jadex.service.IServiceProvider;
 
 /**
  *  Simple implementation of the add interface.
  */
 public class AddService extends BasicService implements IAddService
 {
+	/**
+	 *  Create a new add service.
+	 */
+	public AddService(IServiceProvider provider, String name)
+	{
+		super(BasicService.createServiceIdentifier(provider.getId(), name));
+	}
+	
 	/**
 	 *  Add two numbers.
 	 *  @param a First number.

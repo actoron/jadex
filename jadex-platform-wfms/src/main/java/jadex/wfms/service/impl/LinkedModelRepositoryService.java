@@ -4,7 +4,7 @@ import jadex.commons.IFuture;
 import jadex.commons.ThreadSuspendable;
 import jadex.commons.concurrent.IResultListener;
 import jadex.service.BasicService;
-import jadex.service.IServiceContainer;
+import jadex.service.IServiceProvider;
 import jadex.service.SServiceProvider;
 import jadex.service.library.ILibraryService;
 import jadex.service.library.ILibraryServiceListener;
@@ -35,7 +35,7 @@ import java.util.jar.JarFile;
 public class LinkedModelRepositoryService extends BasicService implements IModelRepositoryService
 {
 	/** The wfms. */
-	protected IServiceContainer wfms;
+	protected IServiceProvider provider;
 	
 	/** The imports */
 	private Set imports;
@@ -49,9 +49,11 @@ public class LinkedModelRepositoryService extends BasicService implements IModel
 	/** Model reference counter */
 	private Map modelRefCount;
 	
-	public LinkedModelRepositoryService(IServiceContainer wfms)
+	public LinkedModelRepositoryService(IServiceProvider provider)
 	{
-		this.wfms = wfms;
+		super(BasicService.createServiceIdentifier(provider.getId(), LinkedModelRepositoryService.class));
+
+		this.provider = provider;
 		// TODO: Hack! Needs proper imports...
 		this.imports = Collections.synchronizedSet(new HashSet());
 		this.listeners = Collections.synchronizedSet(new HashSet());
@@ -73,7 +75,7 @@ public class LinkedModelRepositoryService extends BasicService implements IModel
 				addModel(path);
 			}
 			
-			((ILibraryService) SServiceProvider.getService(wfms, ILibraryService.class).get(new ThreadSuspendable())).addLibraryServiceListener(new ILibraryServiceListener()
+			((ILibraryService) SServiceProvider.getService(provider, ILibraryService.class).get(new ThreadSuspendable())).addLibraryServiceListener(new ILibraryServiceListener()
 			{
 				public void urlRemoved(URL url)
 				{
@@ -125,7 +127,7 @@ public class LinkedModelRepositoryService extends BasicService implements IModel
 	 */
 	public void addProcessResource(URL url)
 	{
-		ILibraryService ls = (ILibraryService) SServiceProvider.getService(wfms, ILibraryService.class).get(new ThreadSuspendable());
+		ILibraryService ls = (ILibraryService) SServiceProvider.getService(provider, ILibraryService.class).get(new ThreadSuspendable());
 		ls.addURL(url);
 	}
 	
@@ -135,7 +137,7 @@ public class LinkedModelRepositoryService extends BasicService implements IModel
 	 */
 	public void removeProcessResource(URL url)
 	{
-		ILibraryService ls = (ILibraryService) SServiceProvider.getService(wfms, ILibraryService.class).get(new ThreadSuspendable());
+		ILibraryService ls = (ILibraryService) SServiceProvider.getService(provider, ILibraryService.class).get(new ThreadSuspendable());
 		ls.removeURL(url);
 	}
 	
@@ -150,7 +152,7 @@ public class LinkedModelRepositoryService extends BasicService implements IModel
 		{
 			//Set knownPaths = new HashSet(modelPaths.values());
 			Set modelSet = new HashSet();
-			List urls = ((ILibraryService) SServiceProvider.getService(wfms, ILibraryService.class).get(new ThreadSuspendable())).getURLs();
+			List urls = ((ILibraryService) SServiceProvider.getService(provider, ILibraryService.class).get(new ThreadSuspendable())).getURLs();
 			for (Iterator it = urls.iterator(); it.hasNext(); )
 			{
 				URL url = (URL) it.next();
@@ -261,7 +263,7 @@ public class LinkedModelRepositoryService extends BasicService implements IModel
 	
 	private IFuture loadProcessModel(String filename)
 	{
-		IExecutionService ex = (IExecutionService) SServiceProvider.getService(wfms, IExecutionService.class).get(new ThreadSuspendable());
+		IExecutionService ex = (IExecutionService) SServiceProvider.getService(provider, IExecutionService.class).get(new ThreadSuspendable());
 		return ex.loadModel(filename, getImports());
 	}
 	

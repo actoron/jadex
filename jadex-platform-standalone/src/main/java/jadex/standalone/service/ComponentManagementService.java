@@ -24,6 +24,7 @@ import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.service.BasicService;
 import jadex.service.IServiceContainer;
+import jadex.service.IServiceProvider;
 import jadex.service.SServiceProvider;
 import jadex.service.execution.IExecutionService;
 import jadex.service.library.ILibraryService;
@@ -52,8 +53,8 @@ public class ComponentManagementService extends BasicService implements ICompone
 
 	//-------- attributes --------
 
-	/** The service container. */
-	protected IServiceContainer	container;
+	/** The service provider. */
+	protected IServiceProvider provider;
 
 	/** The components (id->component adapter). */
 	protected Map adapters;
@@ -97,27 +98,29 @@ public class ComponentManagementService extends BasicService implements ICompone
     //-------- constructors --------
 
 	 /**
-     *  Create a new component execution service.#
-     *  @param container	The service container.
+     *  Create a new component execution service.
+     *  @param provider	The service provider.
      */
-    public ComponentManagementService(IServiceContainer container, boolean autoshutdown)
+    public ComponentManagementService(IServiceContainer provider, boolean autoshutdown)
 	{
-    	this(container, autoshutdown, null);
+    	this(provider, autoshutdown, null);
 	}
 	
     /**
-     *  Create a new component execution service.#
-     *  @param container	The service container.
+     *  Create a new component execution service.
+     *  @param provider	The service provider.
      */
-    public ComponentManagementService(IServiceContainer container, boolean autoshutdown, IComponentAdapter root)
+    public ComponentManagementService(IServiceProvider provider, boolean autoshutdown, IComponentAdapter root)
 	{
-		this.container = container;
+		super(BasicService.createServiceIdentifier(provider.getId(), DirectoryFacilitatorService.class));
+
+		this.provider = provider;
 		this.autoshutdown = autoshutdown;
 		this.adapters = Collections.synchronizedMap(SCollection.createHashMap());
 		this.descs = Collections.synchronizedMap(SCollection.createLinkedHashMap());
 		this.ccs = SCollection.createLinkedHashMap();
 //		this.children	= SCollection.createMultiCollection();
-		this.logger = Logger.getLogger(container.getId()+".cms");
+		this.logger = Logger.getLogger(provider.getId()+".cms");
 		this.listeners = SCollection.createMultiCollection();
 		this.killresultlisteners = Collections.synchronizedMap(SCollection.createHashMap());
 		
@@ -158,13 +161,13 @@ public class ComponentManagementService extends BasicService implements ICompone
 		*/
 			
 		// Load the model with fitting factory.
-		SServiceProvider.getService(container, ILibraryService.class).addResultListener(new DefaultResultListener()
+		SServiceProvider.getService(provider, ILibraryService.class).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
 				final ILibraryService ls = (ILibraryService)result;
 				
-				SServiceProvider.getService(container, new ComponentFactorySelector(model, cinfo.getImports(), ls.getClassLoader())).addResultListener(new IResultListener()
+				SServiceProvider.getService(provider, new ComponentFactorySelector(model, cinfo.getImports(), ls.getClassLoader())).addResultListener(new IResultListener()
 				{
 					public void resultAvailable(Object source, Object result)
 					{
@@ -192,14 +195,14 @@ public class ComponentManagementService extends BasicService implements ICompone
 								}
 								else
 								{
-									cid = new ComponentIdentifier(name+"@"+((IComponentIdentifier)container.getId()).getPlatformName()); // Hack?!
+									cid = new ComponentIdentifier(name+"@"+((IComponentIdentifier)provider.getId()).getPlatformName()); // Hack?!
 									if(adapters.containsKey(cid))
 									{
 										ret.setException(new RuntimeException("Component name already exists on platform: "+cid));
 										return;
 									}
 									// todo: hmm adresses may be set too late? use cached message service?
-									SServiceProvider.getService(container, IMessageService.class).addResultListener(new DefaultResultListener()
+									SServiceProvider.getService(provider, IMessageService.class).addResultListener(new DefaultResultListener()
 									{
 										public void resultAvailable(Object source, Object result)
 										{
@@ -998,7 +1001,7 @@ public class ComponentManagementService extends BasicService implements ICompone
 	public IComponentIdentifier createComponentIdentifier(String name, boolean local, String[] addresses)
 	{
 		if(local)
-			name = name + "@" + ((IComponentIdentifier)container.getId()).getPlatformName(); // Hack?!
+			name = name + "@" + ((IComponentIdentifier)provider.getId()).getPlatformName(); // Hack?!
 		return new ComponentIdentifier(name, addresses, null);		
 	}
 
@@ -1177,7 +1180,7 @@ public class ComponentManagementService extends BasicService implements ICompone
 		{
 			do
 			{
-				ret = new ComponentIdentifier(name+(compcnt++)+"@"+((IComponentIdentifier)container.getId()).getPlatformName()); // Hack?!
+				ret = new ComponentIdentifier(name+(compcnt++)+"@"+((IComponentIdentifier)provider.getId()).getPlatformName()); // Hack?!
 			}
 			while(adapters.containsKey(ret));
 		}
@@ -1271,7 +1274,7 @@ public class ComponentManagementService extends BasicService implements ICompone
 				}
 				
 				final boolean[]	services	= new boolean[2];
-				SServiceProvider.getService(container, IExecutionService.class).addResultListener(new DefaultResultListener()
+				SServiceProvider.getService(provider, IExecutionService.class).addResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object source, Object result)
 					{
@@ -1286,7 +1289,7 @@ public class ComponentManagementService extends BasicService implements ICompone
 							ret.setResult(ComponentManagementService.this);
 					}
 				});
-				SServiceProvider.getService(container, IMessageService.class).addResultListener(new DefaultResultListener()
+				SServiceProvider.getService(provider, IMessageService.class).addResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object source, Object result)
 					{

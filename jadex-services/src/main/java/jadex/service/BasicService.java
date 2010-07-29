@@ -10,9 +10,33 @@ import jadex.commons.IFuture;
 public class BasicService implements IService
 {
 	//-------- attributes --------
+
+	/** The id counter. */
+	protected static long idcnt;
 	
 	/** The valid state. */
 	protected boolean valid;
+	
+	/** The service id. */
+	protected IServiceIdentifier sid;
+	
+	//-------- constructors --------
+
+	/**
+	 *  Create a new service.
+	 * /
+	public BasicService()
+	{
+		this(null);
+	}*/
+	
+	/**
+	 *  Create a new service.
+	 */
+	public BasicService(IServiceIdentifier sid)
+	{
+		this.sid = sid;
+	}
 	
 	//-------- methods --------
 	
@@ -26,6 +50,15 @@ public class BasicService implements IService
 		return valid;
 	}
 	
+	/**
+	 *  Get the service id.
+	 *  @return The service id.
+	 */
+	public IServiceIdentifier getServiceIdentifier()
+	{
+		return sid;
+	}
+
 	/**
 	 *  Start the service.
 	 *  @return A future that is done when the service has completed starting.  
@@ -63,5 +96,39 @@ public class BasicService implements IService
 			ret.setResult(null);
 		}
 		return ret;
+	}
+	
+	/**
+	 *  Generate a unique name.
+	 *  @param The calling service class.
+	 */
+	public static String generateServiceName(Class service)
+	{
+		synchronized(BasicService.class)
+		{
+			return service.getName()+"_#"+idcnt++;
+		}
+	}
+	
+	/**
+	 *  Create a new service identifier.
+	 *  @param providerid The provider id.
+	 *  @param servicename The service name.
+	 *  @return A service identifier.
+	 */
+	public static IServiceIdentifier createServiceIdentifier(Object providerid, Class service)
+	{
+		return new ServiceIdentifier(providerid, generateServiceName(service));
+	}
+	
+	/**
+	 *  Create a new service identifier.
+	 *  @param providerid The provider id.
+	 *  @param servicename The service name.
+	 *  @return A service identifier.
+	 */
+	public static IServiceIdentifier createServiceIdentifier(Object providerid, String servicename)
+	{
+		return new ServiceIdentifier(providerid, servicename);
 	}
 }

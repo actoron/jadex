@@ -10,22 +10,22 @@ public class SServiceProvider
 	//-------- constants --------
 	
 	/** The sequential search manager. */
-	protected static ISearchManager sequentialmanager = new SequentialSearchManager();
+	public static ISearchManager sequentialmanager = new SequentialSearchManager();
 
 	/** The parallel search manager. */
-	protected static ISearchManager parallelmanager = new ParallelSearchManager();
+	public static ISearchManager parallelmanager = new ParallelSearchManager();
 	
 	/** The sequential search manager that searches only upwards. */
-	protected static ISearchManager upwardsmanager = new SequentialSearchManager(true, false);
+	public static ISearchManager upwardsmanager = new SequentialSearchManager(true, false);
 
 	/** The sequential search manager that searches only locally. */
-	protected static ISearchManager localmanager = new LocalSearchManager();
+	public static ISearchManager localmanager = new LocalSearchManager();
 	
 	/** The vsist decider that stops searching after one result has been found. */
-	protected static IVisitDecider abortdecider = new DefaultVisitDecider();
+	public static IVisitDecider abortdecider = new DefaultVisitDecider();
 
 	/** The vsist decider that never stops. */
-	protected static IVisitDecider contdecider = new DefaultVisitDecider(false);
+	public static IVisitDecider contdecider = new DefaultVisitDecider(false);
 
 	//-------- methods --------
 
@@ -72,6 +72,21 @@ public class SServiceProvider
 //			profiling.put(type, new Integer(cnt!=null ? cnt.intValue()+1 : 1)); 
 //		}
 		return provider.getServices(sequentialmanager, abortdecider, new TypeResultSelector(type));
+	}
+	
+	/**
+	 *  Get one service with id.
+	 *  @param type The class.
+	 *  @return The corresponding service.
+	 */
+	public static IFuture getService(IServiceProvider provider, IServiceIdentifier sid)
+	{
+//		synchronized(profiling)
+//		{
+//			Integer	cnt	= (Integer)profiling.get(type);
+//			profiling.put(type, new Integer(cnt!=null ? cnt.intValue()+1 : 1)); 
+//		}
+		return provider.getServices(sequentialmanager, abortdecider, new IdResultSelector(sid));
 	}
 	
 	/**
@@ -148,4 +163,38 @@ public class SServiceProvider
 //		}
 		return provider.getServices(upwardsmanager, contdecider, new TypeResultSelector(type));
 	}
+	
+	/**
+	 *  Get the declared service with id and only search the current provider.
+	 *  @param sid The service identifier.
+	 *  @return The corresponding service.
+	 */
+	public static IFuture getDeclaredService(IServiceProvider provider, IServiceIdentifier sid)
+	{
+//		synchronized(profiling)
+//		{
+//			Integer	cnt	= (Integer)profiling.get(type);
+//			profiling.put(type, new Integer(cnt!=null ? cnt.intValue()+1 : 1)); 
+//		}
+		return provider.getServices(localmanager, abortdecider, new IdResultSelector(sid));
+	}
+	
+	/**
+	 *  Get one remote service of a type.
+	 *  @param type The class.
+	 *  @return The corresponding service.
+	 * /
+	public static IFuture getService(Object providerid, Class type)
+	{
+//		synchronized(profiling)
+//		{
+//			Integer	cnt	= (Integer)profiling.get(type);
+//			profiling.put(type, new Integer(cnt!=null ? cnt.intValue()+1 : 1)); 
+//		}
+		
+		// Create message to issue remote search request
+		
+		
+		return provider.getServices(sequentialmanager, abortdecider, new TypeResultSelector(type));
+	}*/
 }

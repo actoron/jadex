@@ -5,6 +5,7 @@ import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IRemoteServiceManagementService;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.micro.MicroAgent;
+import jadex.service.BasicService;
 import jadex.service.SServiceProvider;
 
 /**
@@ -34,32 +35,35 @@ public class UserAgent extends MicroAgent
 						{
 							IRemoteServiceManagementService rms = (IRemoteServiceManagementService)result;
 							
-							// todo: component ids should not be used
 							// instead search for search and get remote service that can be directly accessed
 							
 							// Remote rms
 							IComponentIdentifier rrms = cms.createComponentIdentifier("rms@remote", false, 
 								new String[]{"tcp-mtp://127.0.0.1:11000", "nio-mtp://127.0.0.1:11001"});
-							// Remote component
-							IComponentIdentifier target = cms.createComponentIdentifier("add@remote", false, 
-								new String[]{"tcp-mtp://127.0.0.1:11000", "nio-mtp://127.0.0.1:11001"});
 							
-							IAddService service = (IAddService)rms.getProxy(rrms, target, IAddService.class);
-							
-							// Execute non-blocking method call with future result
-							System.out.println("Calling non-blocking addNB method.");
-							service.addNB(1, 2).addResultListener(new DefaultResultListener()
+							// Search for remote service
+							rms.getProxy(rrms, null, IAddService.class).addResultListener(createResultListener(new DefaultResultListener()
 							{
 								public void resultAvailable(Object source, Object result)
 								{
-									System.out.println("Invoked addNB: "+result);
+									IAddService service = (IAddService)result;
+									
+									// Execute non-blocking method call with future result
+									System.out.println("Calling non-blocking addNB method.");
+									service.addNB(1, 2).addResultListener(new DefaultResultListener()
+									{
+										public void resultAvailable(Object source, Object result)
+										{
+											System.out.println("Invoked addNB: "+result);
+										}
+									});
+									
+									// Execute blocking method call with normal result
+									System.out.println("Calling blocking addB method.");
+									int res= service.addB(1, 2);
+									System.out.println("Invoked addB: "+res);
 								}
-							});
-							
-							// Execute blocking method call with normal result
-							System.out.println("Calling blocking addB method.");
-							int res= service.addB(1, 2);
-							System.out.println("Invoked addB: "+res);
+							}));
 						}
 					}));
 				}

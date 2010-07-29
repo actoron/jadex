@@ -8,7 +8,7 @@ import jadex.bridge.ILoadableComponentModel;
 import jadex.commons.SGUI;
 import jadex.commons.SReflect;
 import jadex.service.BasicService;
-import jadex.service.IServiceContainer;
+import jadex.service.IServiceProvider;
 
 import java.util.Map;
 
@@ -36,7 +36,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	//-------- attributes --------
 	
 	/** The platform. */
-	protected IServiceContainer container;
+	protected IServiceProvider provider;
 	
 	/** The properties. */
 	protected Map properties;
@@ -46,9 +46,11 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	/**
 	 *  Create a new agent factory.
 	 */
-	public MicroAgentFactory(IServiceContainer container, Map properties)
+	public MicroAgentFactory(IServiceProvider provider, Map properties)
 	{
-		this.container = container;
+		super(BasicService.createServiceIdentifier(provider.getId(), MicroAgentFactory.class));
+
+		this.provider = provider;
 		this.properties = properties;
 	}
 	

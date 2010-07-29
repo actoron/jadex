@@ -2,7 +2,7 @@ package jadex.wfms.service.impl;
 
 import jadex.commons.ThreadSuspendable;
 import jadex.service.BasicService;
-import jadex.service.IServiceContainer;
+import jadex.service.IServiceProvider;
 import jadex.service.SServiceProvider;
 import jadex.wfms.client.IClient;
 import jadex.wfms.client.IClientActivity;
@@ -26,7 +26,7 @@ import java.util.logging.Logger;
 
 public class AdministrationService extends BasicService implements IAdministrationService
 {
-	private IServiceContainer wfms;
+	private IServiceProvider wfms;
 	
 	/** The log listeners */
 	private Map logListeners;
@@ -37,9 +37,11 @@ public class AdministrationService extends BasicService implements IAdministrati
 	/** The user activities listeners */
 	private Map activitiesListeners;
 	
-	public AdministrationService(final IServiceContainer wfms)
+	public AdministrationService(final IServiceProvider provider)
 	{
-		this.wfms = wfms;
+		super(BasicService.createServiceIdentifier(provider.getId(), AdministrationService.class));
+
+		this.wfms = provider;
 		this.logListeners = new HashMap();
 		this.processListeners = new HashMap();
 		this.activitiesListeners = new HashMap();
@@ -53,7 +55,7 @@ public class AdministrationService extends BasicService implements IAdministrati
 				{
 					Map.Entry entry = (Map.Entry) it.next();
 					ILogListener listener = (ILogListener) entry.getValue();
-					IAAAService as = (IAAAService) SServiceProvider.getService(wfms, IAAAService.class).get(new ThreadSuspendable());
+					IAAAService as = (IAAAService) SServiceProvider.getService(provider, IAAAService.class).get(new ThreadSuspendable());
 					LogEvent evt = new LogEvent(String.valueOf(record.getMessage()));
 					//if (as.accessEvent((IClient) entry.getKey(), evt))
 					listener.logMessage(evt);
@@ -69,13 +71,13 @@ public class AdministrationService extends BasicService implements IAdministrati
 			}
 		});
 		
-		IAAAService as = (IAAAService) SServiceProvider.getService(wfms, IAAAService.class).get(new ThreadSuspendable());
+		IAAAService as = (IAAAService) SServiceProvider.getService(provider, IAAAService.class).get(new ThreadSuspendable());
 		as.addAuthenticationListener(new IAuthenticationListener()
 		{
 			
 			public void deauthenticated(IClient client)
 			{
-				IWfmsClientService wcs = (IWfmsClientService) SServiceProvider.getService(wfms, IWfmsClientService.class).get(new ThreadSuspendable());
+				IWfmsClientService wcs = (IWfmsClientService) SServiceProvider.getService(provider, IWfmsClientService.class).get(new ThreadSuspendable());
 				IActivityListener listener = (IActivityListener) activitiesListeners.get(client);
 				if (listener != null)
 					wcs.removeActivityListener(listener);

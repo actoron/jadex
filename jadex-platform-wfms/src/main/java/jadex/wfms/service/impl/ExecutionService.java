@@ -6,13 +6,12 @@ import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentManagementService;
-import jadex.bridge.IExternalAccess;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.ThreadSuspendable;
 import jadex.commons.concurrent.IResultListener;
 import jadex.service.BasicService;
-import jadex.service.IServiceContainer;
+import jadex.service.IServiceProvider;
 import jadex.service.SServiceProvider;
 import jadex.wfms.IProcess;
 import jadex.wfms.service.IAdministrationService;
@@ -31,7 +30,7 @@ public class ExecutionService extends BasicService implements IExecutionService
 	//-------- attributes --------
 	
 	/** The WFMS */
-	protected IServiceContainer wfms;
+	protected IServiceProvider provider;
 	
 	/** Running process instances (id -> IProcess) */
 	protected Map processes;
@@ -44,10 +43,12 @@ public class ExecutionService extends BasicService implements IExecutionService
 	/**
 	 *  Create a new execution service.
 	 */
-	public ExecutionService(IServiceContainer wfms)
+	public ExecutionService(IServiceProvider provider)
 	{
+		super(BasicService.createServiceIdentifier(provider.getId(), ExecutionService.class));
+
 		this.processes = new HashMap();
-		this.wfms = wfms;
+		this.provider = provider;
 		
 		//TODO: hack!
 		/*this.exeservices = new ArrayList();
@@ -69,7 +70,7 @@ public class ExecutionService extends BasicService implements IExecutionService
 	public IFuture loadModel(String filename, String[] imports)
 	{
 		//ILoadableComponentModel ret = null;
-		return SComponentFactory.loadModel(wfms, filename);
+		return SComponentFactory.loadModel(provider, filename);
 		/*for(int i=0; ret==null && i<exeservices.size(); i++)
 		{
 			IExecutionService es = (IExecutionService)exeservices.get(i);
@@ -90,19 +91,19 @@ public class ExecutionService extends BasicService implements IExecutionService
 	public IFuture startProcess(String modelname, Object id, Map arguments)
 	{
 		final Future ret = new Future();
-		IComponentManagementService ces = (IComponentManagementService) SServiceProvider.getService(wfms, IComponentManagementService.class).get(new ThreadSuspendable());
+		IComponentManagementService ces = (IComponentManagementService) SServiceProvider.getService(provider, IComponentManagementService.class).get(new ThreadSuspendable());
 		ces.createComponent(null, modelname, new CreationInfo(arguments), null).addResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
 				final IComponentIdentifier id = ((IComponentIdentifier) result);
-				((IComponentManagementService) SServiceProvider.getService(wfms, IComponentManagementService.class).get(new ThreadSuspendable())).addComponentListener(id, new IComponentListener()
+				((IComponentManagementService) SServiceProvider.getService(provider, IComponentManagementService.class).get(new ThreadSuspendable())).addComponentListener(id, new IComponentListener()
 				{
 					
 					public void componentRemoved(IComponentDescription desc, Map results)
 					{
 						Logger.getLogger("Wfms").log(Level.INFO, "Finished process " + id.toString());
-						((AdministrationService) SServiceProvider.getService(wfms,IAdministrationService.class).get(new ThreadSuspendable())).fireProcessFinished(id);
+						((AdministrationService) SServiceProvider.getService(provider,IAdministrationService.class).get(new ThreadSuspendable())).fireProcessFinished(id);
 					}
 					
 					public void componentChanged(IComponentDescription desc)
@@ -153,7 +154,7 @@ public class ExecutionService extends BasicService implements IExecutionService
 	 */
 	public IFuture isLoadable(String name)
 	{
-		return SComponentFactory.isLoadable(wfms, name);
+		return SComponentFactory.isLoadable(provider, name);
 	}
 	
 	/**

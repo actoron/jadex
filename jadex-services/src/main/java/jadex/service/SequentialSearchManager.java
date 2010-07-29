@@ -191,4 +191,41 @@ public class SequentialSearchManager implements ISearchManager
 			});
 		}
 	}
+
+	/**
+	 *  Get the up flag.
+	 *  @return The up flag.
+	 */
+	public boolean isUp()
+	{
+		return up;
+	}
+
+	/**
+	 *  Set the up flag.
+	 *  @param up The up flag to set.
+	 */
+	public void setUp(boolean up)
+	{
+		this.up = up;
+	}
+
+	/**
+	 *  Get the down flag.
+	 *  @return the down.
+	 */
+	public boolean isDown()
+	{
+		return down;
+	}
+
+	/**
+	 *  Set the down flag.
+	 *  @param down The down to set.
+	 */
+	public void setDown(boolean down)
+	{
+		this.down = down;
+	}
+	
 }

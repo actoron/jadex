@@ -17,6 +17,7 @@ import jadex.commons.collection.IndexMap;
 import jadex.commons.concurrent.IResultListener;
 import jadex.service.BasicService;
 import jadex.service.IServiceContainer;
+import jadex.service.IServiceProvider;
 import jadex.service.SServiceProvider;
 import jadex.service.clock.IClockService;
 
@@ -34,7 +35,7 @@ public class DirectoryFacilitatorService extends BasicService implements IDF
 	//-------- attributes --------
 
 	/** The platform. */
-	protected IServiceContainer platform;
+	protected IServiceProvider provider;
 	
 	/** The cached component management service. */
 	protected IComponentManagementService cms;
@@ -50,9 +51,11 @@ public class DirectoryFacilitatorService extends BasicService implements IDF
 	/**
 	 *  Create a standalone df.
 	 */
-	public DirectoryFacilitatorService(IServiceContainer platform)
+	public DirectoryFacilitatorService(IServiceContainer provider)
 	{
-		this.platform = platform;
+		super(BasicService.createServiceIdentifier(provider.getId(), DirectoryFacilitatorService.class));
+
+		this.provider = provider;
 		this.components	= new IndexMap();
 	}
 	
@@ -343,7 +346,7 @@ public class DirectoryFacilitatorService extends BasicService implements IDF
 			public void resultAvailable(Object source, Object result)
 			{
 				final boolean[]	services	= new boolean[2];
-				SServiceProvider.getServiceUpwards(platform, IComponentManagementService.class).addResultListener(new IResultListener()
+				SServiceProvider.getServiceUpwards(provider, IComponentManagementService.class).addResultListener(new IResultListener()
 				{
 					public void resultAvailable(Object source, Object result)
 					{
@@ -363,7 +366,7 @@ public class DirectoryFacilitatorService extends BasicService implements IDF
 						ret.setException(exception);
 					}
 				});
-				SServiceProvider.getService(platform, IClockService.class).addResultListener(new IResultListener()
+				SServiceProvider.getService(provider, IClockService.class).addResultListener(new IResultListener()
 				{
 					public void resultAvailable(Object source, Object result)
 					{
