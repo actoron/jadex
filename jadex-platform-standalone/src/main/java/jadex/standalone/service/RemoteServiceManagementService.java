@@ -264,7 +264,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 				
 				// start serach on target component
 				exta.getServiceProvider().getServices(rssii.getSearchManager(), rssii.getVisitDecider(), 
-					rssii.getResultSelector()).addResultListener(new DelegationResultListener(ret));
+					rssii.getResultSelector(), new ArrayList()).addResultListener(new DelegationResultListener(ret));
 			}
 			
 			public void exceptionOccurred(Object source, Exception exception)

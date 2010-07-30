@@ -1267,7 +1267,7 @@ public class ComponentManagementService extends BasicService implements ICompone
 						synchronized(descs)
 						{
 							adapters.put(root.getComponentIdentifier(), root);
-							IComponentDescription desc = createComponentDescription(root.getComponentIdentifier(), null, null, null, null); 
+							IComponentDescription desc = ((StandaloneComponentAdapter)root).getDescription(); 
 							descs.put(root.getComponentIdentifier(), desc);
 						}
 					}

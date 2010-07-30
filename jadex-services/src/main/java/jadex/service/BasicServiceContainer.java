@@ -46,9 +46,9 @@ public class BasicServiceContainer implements  IServiceContainer
 	 *  @param type The class.
 	 *  @return The corresponding services.
 	 */
-	public IFuture	getServices(ISearchManager manager, IVisitDecider decider, IResultSelector selector)
+	public IFuture	getServices(ISearchManager manager, IVisitDecider decider, IResultSelector selector, Collection results)
 	{
-		return manager.searchServices(this, decider, selector, services!=null ? services : Collections.EMPTY_MAP);
+		return manager.searchServices(this, decider, selector, services!=null ? services : Collections.EMPTY_MAP, results);
 	}
 	
 	/**

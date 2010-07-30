@@ -52,7 +52,7 @@ public class CacheServiceContainer	implements IServiceContainer
 	 *  @param type The class.
 	 *  @return The corresponding services.
 	 */
-	public IFuture getServices(final ISearchManager manager, final IVisitDecider decider, final IResultSelector selector)
+	public IFuture getServices(final ISearchManager manager, final IVisitDecider decider, final IResultSelector selector, Collection results)
 	{
 		final Future ret = new Future();
 		
@@ -113,7 +113,7 @@ public class CacheServiceContainer	implements IServiceContainer
 			}
 			else
 			{
-				container.getServices(manager, decider, selector).addResultListener(new IResultListener()
+				container.getServices(manager, decider, selector, results).addResultListener(new IResultListener()
 				{
 					public void resultAvailable(Object source, Object result)
 					{	

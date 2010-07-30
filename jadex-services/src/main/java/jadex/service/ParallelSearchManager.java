@@ -6,7 +6,6 @@ import jadex.commons.SUtil;
 import jadex.commons.concurrent.CounterResultListener;
 import jadex.commons.concurrent.IResultListener;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
@@ -18,6 +17,11 @@ import java.util.Map;
  */
 public class ParallelSearchManager implements ISearchManager
 {
+	//-------- constants --------
+	
+	/** The local search manager. */
+	protected final LocalSearchManager	LOCAL_SEARCH_MANAGER	= new LocalSearchManager();
+
 	//-------- attributes --------
 	
 	/** Flag to activate upwards (parent) searching. */
@@ -54,12 +58,10 @@ public class ParallelSearchManager implements ISearchManager
 	 *  @param selector	The result selector to select matching services and produce the final result. 
 	 *  @param services	The local services of the provider (class->list of services).
 	 */
-	public IFuture	searchServices(IServiceProvider provider, IVisitDecider decider, final IResultSelector selector, Map services)
+	public IFuture	searchServices(IServiceProvider provider, IVisitDecider decider, final IResultSelector selector, Map services, final Collection results)
 	{
 		final Future	ret	= new Future();
-		final Collection	results	= new ArrayList();
-		LocalSearchManager	lsm	= new LocalSearchManager(results);
-		processNode(null, provider, decider, selector, services, results, lsm, up).addResultListener(new IResultListener()
+		processNode(null, provider, decider, selector, services, results, up).addResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
@@ -90,7 +92,7 @@ public class ParallelSearchManager implements ISearchManager
 	 *  Process a single node (provider).
 	 */
 	protected IFuture	processNode(final IServiceProvider source, final IServiceProvider provider, final IVisitDecider decider, final IResultSelector selector,
-		final Map services, final Collection results, final LocalSearchManager lsm, final boolean up)
+		final Map services, final Collection results, final boolean up)
 	{
 		final Future	ret	= new Future();
 		final boolean[]	finished	= new boolean[3];
@@ -100,7 +102,7 @@ public class ParallelSearchManager implements ISearchManager
 //			if(provider!=null)
 //				System.out.println("from: "+(source!=null?source.getId():"null")+" proc: "+provider.getId());
 			
-			provider.getServices(lsm, decider, selector).addResultListener(new IResultListener()
+			provider.getServices(LOCAL_SEARCH_MANAGER, decider, selector, results).addResultListener(new IResultListener()
 			{
 				public void resultAvailable(Object source, Object result)
 				{
@@ -125,7 +127,7 @@ public class ParallelSearchManager implements ISearchManager
 						// Do not go back to where we came from.
 						if(!SUtil.equals(source, target))
 						{
-							processNode(provider, target, decider, selector, services, results, lsm, up)
+							processNode(provider, target, decider, selector, services, results, up)
 								.addResultListener(new IResultListener()
 							{
 								public void resultAvailable(Object source, Object result)
@@ -184,7 +186,7 @@ public class ParallelSearchManager implements ISearchManager
 							for(Iterator it=coll.iterator(); it.hasNext(); )
 							{
 								IServiceProvider target = (IServiceProvider)it.next();
-								processNode(provider, target, decider, selector, services, results, lsm, false)
+								processNode(provider, target, decider, selector, services, results, false)
 									.addResultListener(crl);
 							}
 						}

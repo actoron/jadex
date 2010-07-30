@@ -2,6 +2,8 @@ package jadex.service;
 
 import jadex.commons.IFuture;
 
+import java.util.Collection;
+
 /**
  *  Interface for service providers.
  */
@@ -26,7 +28,7 @@ public interface IServiceProvider
 	 *  @param type The class.
 	 *  @return The corresponding services.
 	 */
-	public IFuture	getServices(ISearchManager manager, IVisitDecider decider, IResultSelector selector);
+	public IFuture	getServices(ISearchManager manager, IVisitDecider decider, IResultSelector selector, Collection results);
 	
 	/**
 	 *  Get the parent service container.

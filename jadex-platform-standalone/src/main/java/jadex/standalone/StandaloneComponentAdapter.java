@@ -133,6 +133,14 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 		this.model = model;
 	}*/
 	
+	/**
+	 *  Get description.
+	 */
+	public IComponentDescription getDescription()
+	{
+		return desc;
+	}
+
 	//-------- IComponentAdapter methods --------
 
 	/**

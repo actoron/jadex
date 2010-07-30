@@ -4,7 +4,6 @@ import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.concurrent.IResultListener;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -23,6 +22,9 @@ public class SequentialSearchManager implements ISearchManager
 	/** Key for current list of children. */
 	protected final String	CURRENT_CHILDREN	= "current-children";
 	
+	/** The local search manager. */
+	protected final LocalSearchManager	LOCAL_SEARCH_MANAGER	= new LocalSearchManager();
+
 	//-------- attributes --------
 	
 	/** Flag to activate upwards (parent) searching. */
@@ -59,14 +61,12 @@ public class SequentialSearchManager implements ISearchManager
 	 *  @param selector	The result selector to select matching services and produce the final result. 
 	 *  @param services	The local services of the provider (class->list of services).
 	 */
-	public IFuture	searchServices(final IServiceProvider provider, final IVisitDecider decider, final IResultSelector selector, final Map services)
+	public IFuture	searchServices(IServiceProvider provider, IVisitDecider decider, IResultSelector selector, Map services, Collection results)
 	{
 //		System.out.println("search: "+selector+" "+provider.getId());
 		Future	ret	= new Future();
-		Collection	results	= new ArrayList();
 		Map	todo	= new LinkedHashMap(); // Nodes of which children still to be processed (id->provider).
-		LocalSearchManager	lsm	= new LocalSearchManager(results);
-		processNode(provider, decider, selector, services, ret, results, lsm, todo, up);
+		processNode(provider, decider, selector, services, ret, results, todo, up);
 		return ret;
 	}
 	
@@ -86,7 +86,7 @@ public class SequentialSearchManager implements ISearchManager
 	 *  Process a single node (provider).
 	 */
 	protected void processNode(final IServiceProvider provider, final IVisitDecider decider, final IResultSelector selector, final Map services,
-		final Future ret, final Collection results, final LocalSearchManager lsm, final Map todo, final boolean up)
+		final Future ret, final Collection results, final Map todo, final boolean up)
 	{
 		// If node is to be searched, continue with this node.
 		if(!selector.isFinished(results) && provider!=null && decider.searchNode(null, provider, results))
@@ -97,7 +97,7 @@ public class SequentialSearchManager implements ISearchManager
 				todo.put(provider.getId(), provider);
 			}
 			
-			provider.getServices(lsm, decider, selector).addResultListener(new IResultListener()
+			provider.getServices(LOCAL_SEARCH_MANAGER, decider, selector, results).addResultListener(new IResultListener()
 			{
 				public void resultAvailable(Object source, Object result)
 				{
@@ -108,7 +108,7 @@ public class SequentialSearchManager implements ISearchManager
 						{
 							public void resultAvailable(Object source, Object result)
 							{
-								processNode((IServiceProvider)result, decider, selector, services, ret, results, lsm, todo, up);
+								processNode((IServiceProvider)result, decider, selector, services, ret, results, todo, up);
 							}
 							
 							public void exceptionOccurred(Object source, Exception exception)
@@ -121,7 +121,7 @@ public class SequentialSearchManager implements ISearchManager
 					// Else continue with child nodes from todo list (if any).
 					else
 					{
-						processChildNodes(decider, selector, services, ret, results, lsm, todo);
+						processChildNodes(decider, selector, services, ret, results, todo);
 					}
 				}
 				
@@ -135,7 +135,7 @@ public class SequentialSearchManager implements ISearchManager
 		// Else continue with child nodes from todo list (if any).
 		else
 		{
-			processChildNodes(decider, selector, services, ret, results, lsm, todo);
+			processChildNodes(decider, selector, services, ret, results, todo);
 		}
 	}
 
@@ -144,8 +144,7 @@ public class SequentialSearchManager implements ISearchManager
 	 */
 	protected void processChildNodes(
 			final IVisitDecider decider, final IResultSelector selector,
-			final Map services, final Future ret, final Collection results,
-			final LocalSearchManager lsm, final Map todo)
+			final Map services, final Future ret, final Collection results, final Map todo)
 	{
 		// Finished, when no more todo nodes.
 		if(selector.isFinished(results) || todo.isEmpty())
@@ -164,7 +163,7 @@ public class SequentialSearchManager implements ISearchManager
 			}
 			
 			// Set 'up' to false, once traversing children has started.
-			processNode(child, decider, selector, services, ret, results, lsm, todo, false);
+			processNode(child, decider, selector, services, ret, results, todo, false);
 		}
 
 		// Else pick entry from todo list and continue with its children.
@@ -181,7 +180,7 @@ public class SequentialSearchManager implements ISearchManager
 						List	ccs	= new LinkedList((Collection)result);
 						todo.put(CURRENT_CHILDREN, ccs);
 					}
-					processChildNodes(decider, selector, services, ret, results, lsm, todo);
+					processChildNodes(decider, selector, services, ret, results, todo);
 				}
 				
 				public void exceptionOccurred(Object source, Exception exception)

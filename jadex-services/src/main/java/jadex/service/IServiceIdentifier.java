@@ -15,5 +15,5 @@ public interface IServiceIdentifier
 	 *  Get the service name.
 	 *  @return The service name.
 	 */
-	public Object getServiceName();
+	public String	getServiceName();
 }

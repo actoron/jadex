@@ -142,7 +142,7 @@ public class Starter
 			}
 			
 			IComponentIdentifier cid = new ComponentIdentifier(platformname);
-			CMSComponentDescription desc = new CMSComponentDescription(cid, null, null, false, false);
+			CMSComponentDescription desc = new CMSComponentDescription(cid, cfac.getComponentType(configfile, null, cl), null, false, false);
 			
 			String afclname = (String)cmdargs.get(ADAPTER_FACTORY)!=null? 
 				(String)cmdargs.get(ADAPTER_FACTORY): FALLBACK_ADAPTER_FACTORY;

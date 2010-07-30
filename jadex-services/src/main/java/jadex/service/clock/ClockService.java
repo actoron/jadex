@@ -8,7 +8,6 @@ import jadex.commons.concurrent.IThreadPool;
 import jadex.service.BasicService;
 import jadex.service.IServiceProvider;
 import jadex.service.SServiceProvider;
-import jadex.service.execution.SyncExecutionService;
 import jadex.service.threadpool.ThreadPoolService;
 
 import java.util.ArrayList;

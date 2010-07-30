@@ -1,18 +1,11 @@
 package jadex.tools.serviceviewer;
 
-import jadex.bridge.IComponentDescription;
-import jadex.bridge.IComponentManagementService;
 import jadex.commons.SGUI;
-import jadex.commons.concurrent.SwingDefaultResultListener;
-import jadex.service.SServiceProvider;
 import jadex.tools.common.componenttree.ComponentTreePanel;
 import jadex.tools.common.plugin.AbstractJCCPlugin;
 
-import java.awt.BorderLayout;
-
 import javax.swing.Icon;
 import javax.swing.JComponent;
-import javax.swing.JPanel;
 import javax.swing.UIDefaults;
 
 public class ServiceViewerPlugin extends AbstractJCCPlugin
@@ -22,7 +15,7 @@ public class ServiceViewerPlugin extends AbstractJCCPlugin
 	/** The icons. */
 	protected static final UIDefaults	icons	= new UIDefaults(new Object[]
 	{
-		"service_viewer", SGUI.makeIcon(ServiceViewerPlugin.class, "/jadex/tools/serviceviewer/images/configure.png")
+		"service_viewer", SGUI.makeIcon(ServiceViewerPlugin.class, "/jadex/tools/common/images/configure.png")
 	});
 	
 	//-------- IControlCenterPlugin interface --------
@@ -61,34 +54,6 @@ public class ServiceViewerPlugin extends AbstractJCCPlugin
 	 */
 	public JComponent createView()
 	{
-		final JPanel	view	= new JPanel(new BorderLayout());
-		SServiceProvider.getServiceUpwards(getJCC().getServiceContainer(), IComponentManagementService.class).addResultListener(new SwingDefaultResultListener(view)
-		{
-			public void customResultAvailable(Object source, Object result)
-			{
-				final IComponentManagementService	cms	= (IComponentManagementService)result;
-				// Hack!!! How to find root node?
-				cms.getComponentDescriptions().addResultListener(new SwingDefaultResultListener(view)
-				{
-					public void customResultAvailable(Object source, Object result)
-					{
-						IComponentDescription[]	descriptions	= (IComponentDescription[])result;
-						IComponentDescription	root	= null;
-						for(int i=0; root==null && i<descriptions.length; i++)
-						{
-							if(descriptions[i].getParent()==null)
-							{
-								root	= descriptions[i];
-							}
-						}
-						view.add(new ComponentTreePanel(cms, getJCC().getServiceContainer(), root));
-						view.invalidate();
-						view.doLayout();
-						view.paintComponents(view.getGraphics());
-					}
-				});
-			}
-		});
-		return view;
+		return new ComponentTreePanel(getJCC().getServiceContainer());
 	}
 }

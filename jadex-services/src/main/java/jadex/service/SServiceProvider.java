@@ -2,6 +2,8 @@ package jadex.service;
 
 import jadex.commons.IFuture;
 
+import java.util.ArrayList;
+
 /**
  *  Static helper class for searching services.
  */
@@ -71,7 +73,7 @@ public class SServiceProvider
 //			Integer	cnt	= (Integer)profiling.get(type);
 //			profiling.put(type, new Integer(cnt!=null ? cnt.intValue()+1 : 1)); 
 //		}
-		return provider.getServices(sequentialmanager, abortdecider, new TypeResultSelector(type));
+		return provider.getServices(sequentialmanager, abortdecider, new TypeResultSelector(type), new ArrayList());
 	}
 	
 	/**
@@ -86,7 +88,7 @@ public class SServiceProvider
 //			Integer	cnt	= (Integer)profiling.get(type);
 //			profiling.put(type, new Integer(cnt!=null ? cnt.intValue()+1 : 1)); 
 //		}
-		return provider.getServices(sequentialmanager, abortdecider, new IdResultSelector(sid));
+		return provider.getServices(sequentialmanager, abortdecider, new IdResultSelector(sid), new ArrayList());
 	}
 	
 	/**
@@ -101,7 +103,7 @@ public class SServiceProvider
 //			Integer	cnt	= (Integer)profiling.get(selector.getCacheKey());
 //			profiling.put(selector.getCacheKey(), new Integer(cnt!=null ? cnt.intValue()+1 : 1)); 
 //		}
-		return provider.getServices(sequentialmanager, abortdecider, selector);
+		return provider.getServices(sequentialmanager, abortdecider, selector, new ArrayList());
 	}
 	
 	/**
@@ -116,7 +118,7 @@ public class SServiceProvider
 //			Integer	cnt	= (Integer)profiling.get(type);
 //			profiling.put(type, new Integer(cnt!=null ? cnt.intValue()+1 : 1)); 
 //		}
-		return provider.getServices(parallelmanager, contdecider, new TypeResultSelector(type, false));
+		return provider.getServices(parallelmanager, contdecider, new TypeResultSelector(type, false), new ArrayList());
 	}
 
 	/**
@@ -131,7 +133,7 @@ public class SServiceProvider
 //			Integer	cnt	= (Integer)profiling.get(type);
 //			profiling.put(type, new Integer(cnt!=null ? cnt.intValue()+1 : 1)); 
 //		}
-		return provider.getServices(upwardsmanager, abortdecider, new TypeResultSelector(type));
+		return provider.getServices(upwardsmanager, abortdecider, new TypeResultSelector(type), new ArrayList());
 	}
 	
 	/**
@@ -146,7 +148,7 @@ public class SServiceProvider
 //			Integer	cnt	= (Integer)profiling.get(type);
 //			profiling.put(type, new Integer(cnt!=null ? cnt.intValue()+1 : 1)); 
 //		}
-		return provider.getServices(localmanager, abortdecider, new TypeResultSelector(type));
+		return provider.getServices(localmanager, abortdecider, new TypeResultSelector(type), new ArrayList());
 	}
 	
 	/**
@@ -161,7 +163,21 @@ public class SServiceProvider
 //			Integer	cnt	= (Integer)profiling.get(type);
 //			profiling.put(type, new Integer(cnt!=null ? cnt.intValue()+1 : 1)); 
 //		}
-		return provider.getServices(upwardsmanager, contdecider, new TypeResultSelector(type));
+		return provider.getServices(localmanager, contdecider, new TypeResultSelector(type), new ArrayList());
+	}
+	
+	/**
+	 *  Get all declared services of the given provider.
+	 *  @return The corresponding services.
+	 */
+	public static IFuture getDeclaredServices(IServiceProvider provider, boolean includetype)
+	{
+//		synchronized(profiling)
+//		{
+//			Integer	cnt	= (Integer)profiling.get(type);
+//			profiling.put(type, new Integer(cnt!=null ? cnt.intValue()+1 : 1)); 
+//		}
+		return provider.getServices(localmanager, contdecider, new AnyResultSelector(false, includetype), new ArrayList());
 	}
 	
 	/**
@@ -176,7 +192,7 @@ public class SServiceProvider
 //			Integer	cnt	= (Integer)profiling.get(type);
 //			profiling.put(type, new Integer(cnt!=null ? cnt.intValue()+1 : 1)); 
 //		}
-		return provider.getServices(localmanager, abortdecider, new IdResultSelector(sid));
+		return provider.getServices(localmanager, abortdecider, new IdResultSelector(sid), new ArrayList());
 	}
 	
 	/**

@@ -137,6 +137,7 @@ public class ModelExplorer extends JTree
 		nof.setModelExplorer(this);
 		this.root = (RootNode)getModel().getRoot();
 		setRootVisible(false);
+		setShowsRootHandles(true);
 		this.refresh	= true;
 		this.pubuilder = pubuilder!=null? pubuilder: new PopupBuilder(
 			new Action[]{ADD_PATH, REMOVE_PATH, REFRESH});

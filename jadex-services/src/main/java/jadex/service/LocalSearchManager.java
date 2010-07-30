@@ -3,7 +3,6 @@ package jadex.service;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 
@@ -12,11 +11,6 @@ import java.util.Map;
  */
 public class LocalSearchManager implements ISearchManager
 {
-	//-------- attributes --------
-	
-	/** The result collection. */
-	protected Collection	results;
-	
 	//-------- constructors --------
 	
 	/**
@@ -24,15 +18,6 @@ public class LocalSearchManager implements ISearchManager
 	 */
 	public LocalSearchManager()
 	{
-		this(new ArrayList());
-	}
-	
-	/**
-	 *  Create a new local search manager.
-	 */
-	public LocalSearchManager(Collection results)
-	{
-		this.results	= results;
 	}
 	
 	//-------- ISearchManager interface --------
@@ -44,7 +29,7 @@ public class LocalSearchManager implements ISearchManager
 	 *  @param selector	The result selector to select matching services and produce the final result. 
 	 *  @param services	The local services of the provider (class->list of services).
 	 */
-	public IFuture	searchServices(IServiceProvider provider, IVisitDecider decider, IResultSelector selector, Map services)
+	public IFuture	searchServices(IServiceProvider provider, IVisitDecider decider, IResultSelector selector, Map services, Collection results)
 	{
 		// local search is always allowed?!
 		// problem: first gsm searches a node, then lsm searches the same node = double visit
