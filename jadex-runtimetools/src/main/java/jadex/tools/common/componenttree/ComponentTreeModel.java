@@ -241,16 +241,16 @@ public class ComponentTreeModel implements TreeModel
 	/**
 	 *  Add an icon overlay.
 	 */
-	public void	addOverlay(IIconOverlay overlay)
+	public void	addOverlay(INodeHandler overlay)
 	{
 		this.overlays.add(overlay);
 	}
 	
 	/**
-	 *  Get the icon overlays.
+	 *  Get the node handlers.
 	 */
-	public IIconOverlay[]	getOverlays()
+	public INodeHandler[]	getNodeHandlers()
 	{
-		return (IIconOverlay[])overlays.toArray(new IIconOverlay[overlays.size()]);
+		return (INodeHandler[])overlays.toArray(new INodeHandler[overlays.size()]);
 	}
 }
