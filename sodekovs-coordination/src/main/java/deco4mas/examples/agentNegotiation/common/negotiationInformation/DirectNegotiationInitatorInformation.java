@@ -4,7 +4,7 @@ import jadex.bridge.IComponentIdentifier;
 import java.util.Collections;
 import java.util.Map;
 import deco4mas.examples.agentNegotiation.common.dataObjects.ServiceType;
-import deco4mas.examples.agentNegotiation.deco.medien.NegotiationMechanism;
+import deco4mas.examples.agentNegotiation.deco.media.NegotiationMechanism;
 import deco4mas.examples.agentNegotiation.sma.coordination.negotiationStrategy.ISelectionStrategy;
 import deco4mas.examples.agentNegotiation.sma.coordination.negotiationStrategy.IUtilityFunction;
 

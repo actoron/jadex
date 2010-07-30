@@ -1,4 +1,4 @@
-package deco4mas.examples.agentNegotiation.deco.medien;
+package deco4mas.examples.agentNegotiation.deco.media;
 
 import jadex.service.clock.IClockService;
 import java.util.Collections;

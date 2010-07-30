@@ -5,7 +5,7 @@ import jadex.bridge.IComponentIdentifier;
 import deco4mas.examples.agentNegotiation.common.dataObjects.ServiceOffer;
 import deco4mas.examples.agentNegotiation.common.dataObjects.ServiceProposal;
 import deco4mas.examples.agentNegotiation.common.dataObjects.ServiceType;
-import deco4mas.examples.agentNegotiation.deco.medien.NegotiationMechanism;
+import deco4mas.examples.agentNegotiation.deco.media.NegotiationMechanism;
 import deco4mas.examples.agentNegotiation.sa.coordination.negotiationstrategy.IDeliverProposalStrategy;
 
 public class DirectNegotiationParticipantInformation extends NegotiationInformation

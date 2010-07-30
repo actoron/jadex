@@ -1,4 +1,4 @@
-package deco4mas.examples.agentNegotiation.deco.medien;
+package deco4mas.examples.agentNegotiation.deco.media;
 
 import java.util.HashMap;
 import deco.lang.dynamics.AgentElementType;

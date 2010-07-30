@@ -1,4 +1,4 @@
-package deco4mas.examples.agentNegotiation.deco.medien;
+package deco4mas.examples.agentNegotiation.deco.media;
 
 import jadex.application.space.envsupport.environment.IEnvironmentSpace;
 import jadex.application.space.envsupport.environment.ISpaceProcess;
