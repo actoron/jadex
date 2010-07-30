@@ -138,12 +138,19 @@ public abstract class AbstractComponentTreeNode	implements IComponentTreeNode
 	 *  Add a child and update the tree.
 	 *  Must be called from swing thread.
 	 */
+	public void addChild(int index, IComponentTreeNode node)
+	{
+		children.add(index, node);
+		model.fireNodeAdded(this, node, index);
+	}
+	
+	/**
+	 *  Add a child and update the tree.
+	 *  Must be called from swing thread.
+	 */
 	public void addChild(IComponentTreeNode node)
 	{
-		int index	= children.size();
-		children.add(node);
-		model.fireNodeAdded(this, node, index);
-
+		addChild(children.size(), node);
 	}
 	
 	/**

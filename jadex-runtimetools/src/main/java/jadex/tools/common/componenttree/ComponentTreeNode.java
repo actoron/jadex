@@ -3,7 +3,10 @@ package jadex.tools.common.componenttree;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
+import jadex.bridge.IExternalAccess;
 import jadex.commons.concurrent.SwingDefaultResultListener;
+import jadex.service.IService;
+import jadex.service.SServiceProvider;
 
 import java.awt.Component;
 import java.util.ArrayList;
@@ -70,7 +73,6 @@ public class ComponentTreeNode	extends AbstractComponentTreeNode
 		if(achildren.length > 0)
 		{
 			final List	children	= new ArrayList();
-			children.add(new ServiceContainerNode(this, getModel(), cms, ui));
 			for(int i = 0; i < achildren.length; i++)
 			{
 				final int index = i;
@@ -92,9 +94,37 @@ public class ComponentTreeNode	extends AbstractComponentTreeNode
 		else
 		{
 			List	children	= new ArrayList();
-			children.add(new ServiceContainerNode(this, getModel(), cms, ui));
 			setChildren(children);
 		}
+		
+		// Search services and only add container node when services are found.
+		cms.getExternalAccess(desc.getName()).addResultListener(new SwingDefaultResultListener(ui)
+		{
+			public void customResultAvailable(Object source, Object result)
+			{
+				IExternalAccess	ea	= (IExternalAccess)result;
+				SServiceProvider.getDeclaredServices(ea.getServiceProvider(), true).addResultListener(new SwingDefaultResultListener(ui)
+				{
+					public void customResultAvailable(Object source, Object result)
+					{
+						List	services	= (List)result;
+						if(services!=null && !services.isEmpty())
+						{
+							ServiceContainerNode	scn	= new ServiceContainerNode(ComponentTreeNode.this, getModel());
+							addChild(0, scn);
+							List	children	= new ArrayList();
+							for(int i=0; i<services.size(); i++)
+							{
+								Object[]	tuple	= (Object[])services.get(i);
+								children.add(new ServiceNode(scn, getModel(), (Class)tuple[0], (IService)tuple[1]));
+							}
+							scn.setChildren(children);							
+						}
+					}
+				});
+			}
+		});
+
 	}
 	
 	//-------- methods --------

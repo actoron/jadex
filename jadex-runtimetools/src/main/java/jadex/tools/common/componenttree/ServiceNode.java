@@ -65,6 +65,6 @@ public class ServiceNode	extends AbstractComponentTreeNode
 	 */
 	public String toString()
 	{
-		return SReflect.getUnqualifiedClassName(type)+": "+SReflect.getUnqualifiedClassName(service.getClass());
+		return /*SReflect.getUnqualifiedClassName(type)+": "+*/SReflect.getUnqualifiedClassName(service.getClass());
 	}
 }
