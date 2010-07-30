@@ -7,6 +7,7 @@ import jadex.commons.SGUI;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.service.IServiceProvider;
 import jadex.service.SServiceProvider;
+import jadex.tools.common.CombiIcon;
 import jadex.tools.starter.StarterPlugin;
 
 import java.awt.BorderLayout;
@@ -35,8 +36,7 @@ public class ComponentTreePanel extends JPanel
 	protected static final UIDefaults icons = new UIDefaults(new Object[]
 	{
 		"resume_component", SGUI.makeIcon(StarterPlugin.class, "/jadex/tools/common/images/new_agent_big.png"),
-		"suspend_component", SGUI.makeIcon(StarterPlugin.class, "/jadex/tools/common/images/new_agent_szzz_big.png"),
-		"kill_component", SGUI.makeIcon(ComponentTreePanel.class, "/jadex/tools/common/images/new_killagent.png"),
+		"kill_component", SGUI.makeIcon(ComponentTreePanel.class, "/jadex/tools/common/images/overlay_kill.png"),
 		"component_suspended", SGUI.makeIcon(ComponentTreePanel.class, "/jadex/tools/common/images/overlay_szzz.png")
 	});
 	
@@ -104,7 +104,9 @@ public class ComponentTreePanel extends JPanel
 								allact	= IComponentDescription.STATE_ACTIVE.equals(((ComponentTreeNode)nodes[i]).getDescription().getState());
 							}
 							
-							Action	kill	= new AbstractAction("Kill component", icons.getIcon("kill_component"))
+							// Todo: Large icons for popup actions?
+							Icon	icon	= cic.getIcon(nodes[0], ((ComponentTreeNode)nodes[0]).getDescription().getType());
+							Action	kill	= new AbstractAction("Kill component", new CombiIcon(new Icon[]{icon, icons.getIcon("kill_component")}))
 							{
 								public void actionPerformed(ActionEvent e)
 								{
@@ -120,45 +122,46 @@ public class ComponentTreePanel extends JPanel
 									}
 								}
 							};
-							Action	suspend	= new AbstractAction("Suspend component", icons.getIcon("suspend_component"))
-							{
-								public void actionPerformed(ActionEvent e)
-								{
-									for(int i=0; i<nodes.length; i++)
-									{
-										cms.suspendComponent(((ComponentTreeNode)nodes[i]).getDescription().getName())
-											.addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
-										{
-											public void customResultAvailable(Object source, Object result)
-											{
-											}
-										});
-									}
-								}
-							};
-							Action	resume	= new AbstractAction("Resume component", icons.getIcon("resume_component"))
-							{
-								public void actionPerformed(ActionEvent e)
-								{
-									for(int i=0; i<nodes.length; i++)
-									{
-										cms.resumeComponent(((ComponentTreeNode)nodes[i]).getDescription().getName())
-											.addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
-										{
-											public void customResultAvailable(Object source, Object result)
-											{
-											}
-										});
-									}
-								}
-							};
 							
 							if(allact)
 							{
+								icon	= cic.getIcon(nodes[0], ((ComponentTreeNode)nodes[0]).getDescription().getType());
+								Action	suspend	= new AbstractAction("Suspend component", new CombiIcon(new Icon[]{icon, icons.getIcon("component_suspended")}))
+								{
+									public void actionPerformed(ActionEvent e)
+									{
+										for(int i=0; i<nodes.length; i++)
+										{
+											cms.suspendComponent(((ComponentTreeNode)nodes[i]).getDescription().getName())
+												.addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
+											{
+												public void customResultAvailable(Object source, Object result)
+												{
+												}
+											});
+										}
+									}
+								};
 								ret	= new Action[]{kill, suspend};
 							}
 							else if(allsusp)
 							{
+								Action	resume	= new AbstractAction("Resume component", icons.getIcon("resume_component"))
+								{
+									public void actionPerformed(ActionEvent e)
+									{
+										for(int i=0; i<nodes.length; i++)
+										{
+											cms.resumeComponent(((ComponentTreeNode)nodes[i]).getDescription().getName())
+												.addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
+											{
+												public void customResultAvailable(Object source, Object result)
+												{
+												}
+											});
+										}
+									}
+								};
 								ret	= new Action[]{kill, resume};
 							}
 							else
