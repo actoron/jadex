@@ -28,6 +28,9 @@ public class ComponentTreeModel implements TreeModel
 	/** The node lookup table. */
 	private final Map	nodes;
 	
+	/** The icon overlays. */
+	private final List	overlays;
+	
 	//-------- constructors --------
 	
 	/**
@@ -37,6 +40,7 @@ public class ComponentTreeModel implements TreeModel
 	{
 		this.listeners	= new ArrayList();
 		this.nodes	= new HashMap();
+		this.overlays	= new ArrayList();
 	}
 	
 	//-------- TreeModel interface --------
@@ -232,5 +236,21 @@ public class ComponentTreeModel implements TreeModel
 	public void	deregisterNode(Object id)
 	{
 		nodes.remove(id);
+	}
+	
+	/**
+	 *  Add an icon overlay.
+	 */
+	public void	addOverlay(IIconOverlay overlay)
+	{
+		this.overlays.add(overlay);
+	}
+	
+	/**
+	 *  Get the icon overlays.
+	 */
+	public IIconOverlay[]	getOverlays()
+	{
+		return (IIconOverlay[])overlays.toArray(new IIconOverlay[overlays.size()]);
 	}
 }

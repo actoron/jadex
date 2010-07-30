@@ -22,7 +22,7 @@ public class ComponentTreeNode	extends AbstractComponentTreeNode
 	//-------- attributes --------
 	
 	/** The component description. */
-	private final IComponentDescription	desc;
+	private IComponentDescription	desc;
 		
 	/** The component management service. */
 	private final IComponentManagementService	cms;
@@ -143,5 +143,13 @@ public class ComponentTreeNode	extends AbstractComponentTreeNode
 	public IComponentDescription	getDescription()
 	{
 		return desc;
+	}
+
+	/**
+	 *  Set the component description.
+	 */
+	public void setDescription(IComponentDescription desc)
+	{
+		this.desc	= desc;
 	}
 }

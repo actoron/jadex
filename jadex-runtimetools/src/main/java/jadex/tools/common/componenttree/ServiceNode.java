@@ -23,6 +23,7 @@ public class ServiceNode	extends AbstractComponentTreeNode
 	//-------- attributes --------
 	
 	/** The type. */
+	@SuppressWarnings("unused")
 	private final Class	type;
 	
 	/** The service. */

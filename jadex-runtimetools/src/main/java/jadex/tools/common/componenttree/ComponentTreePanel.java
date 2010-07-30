@@ -3,6 +3,7 @@ package jadex.tools.common.componenttree;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentManagementService;
+import jadex.commons.SGUI;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.service.IServiceProvider;
 import jadex.service.SServiceProvider;
@@ -10,16 +11,28 @@ import jadex.service.SServiceProvider;
 import java.awt.BorderLayout;
 import java.util.Map;
 
+import javax.swing.Icon;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
+import javax.swing.UIDefaults;
 
 /**
  *  A panel displaying components on the platform as tree.
  */
 public class ComponentTreePanel extends JPanel
 {
+	//-------- constants --------
+
+	/**
+	 * The image icons.
+	 */
+	protected static final UIDefaults icons = new UIDefaults(new Object[]
+	{
+		"component_suspended", SGUI.makeIcon(ComponentTreePanel.class, "/jadex/tools/common/images/overlay_szzz.png")
+	});
+
 	//-------- constructors --------
 	
 	/**
@@ -33,6 +46,25 @@ public class ComponentTreePanel extends JPanel
 		tree.setShowsRootHandles(true);
 		this.setLayout(new BorderLayout());
 		this.add(new JScrollPane(tree));
+		
+		// Default overlays.
+		model.addOverlay(new IIconOverlay()
+		{
+			public Icon getOverlay(IComponentTreeNode node)
+			{
+				Icon	ret	= null;
+				if(node instanceof ComponentTreeNode)
+				{
+					IComponentDescription	desc	= ((ComponentTreeNode)node).getDescription();
+					if(IComponentDescription.STATE_SUSPENDED.equals(desc.getState())
+						|| IComponentDescription.STATE_WAITING.equals(desc.getState()))
+					{
+						ret = icons.getIcon("component_suspended");
+					}
+				}
+				return ret;
+			}
+		});
 
 		SServiceProvider.getServiceUpwards(provider, IComponentManagementService.class).addResultListener(new SwingDefaultResultListener(this)
 		{
@@ -79,6 +111,9 @@ public class ComponentTreePanel extends JPanel
 					
 					public void componentChanged(IComponentDescription desc)
 					{
+						ComponentTreeNode	node	= (ComponentTreeNode)model.getNode(desc.getName());
+						node.setDescription(desc);
+						model.fireNodeChanged(node);
 					}
 					
 					public void componentAdded(final IComponentDescription desc)
