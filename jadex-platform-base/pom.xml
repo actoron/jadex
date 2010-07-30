@@ -160,6 +160,13 @@
 			<artifactId>jadex-nuggets</artifactId>
 			<version>2.0-rc3</version>
 		</dependency> -->
+		
+		<!-- hack -> remove (because of remote micro agent) -->
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-kernel-micro</artifactId>
+			<version>2.0-rc3</version>
+		</dependency>
 
 		<dependency>
 			<groupId>junit</groupId>

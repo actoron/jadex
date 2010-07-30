@@ -2,6 +2,7 @@ package jadex.bridge;
 
 import jadex.commons.Tuple;
 import jadex.service.IResultSelector;
+import jadex.service.ServiceInfo;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -27,9 +28,6 @@ public class ComponentFactorySelector implements IResultSelector
 	/** The class loader (if any). */
 	protected ClassLoader	classloader;
 	
-	/** The flag if type should be part of result. */
-	protected boolean includetype;
-	
 	//-------- constructors --------
 	
 	/**
@@ -40,21 +38,9 @@ public class ComponentFactorySelector implements IResultSelector
 	 */
 	public ComponentFactorySelector(String model, String[] imports, ClassLoader classloader)
 	{
-		this(model, imports, classloader, false);
-	}
-	
-	/**
-	 *  Find a matching component factory.
-	 *  @param model	The model to be loaded.
-	 *  @param imports	The imports (if any).
-	 *  @param classloader	The class loader (if any).
-	 */
-	public ComponentFactorySelector(String model, String[] imports, ClassLoader classloader, boolean includetype)
-	{
 		this.model	= model;
 		this.imports	= imports;
 		this.classloader	= classloader;
-		this.includetype = includetype;
 	}
 	
 	/**
@@ -95,14 +81,7 @@ public class ComponentFactorySelector implements IResultSelector
 					
 					if(match)
 					{
-						if(includetype)
-						{
-							results.add(new Object[]{type, fac});
-						}
-						else
-						{
-							results.add(fac);
-						}
+						results.add(new ServiceInfo(IComponentFactory.class, fac));
 					}
 				}
 			}

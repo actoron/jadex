@@ -1,6 +1,7 @@
 package jadex.bridge;
 
 import jadex.commons.IFuture;
+import jadex.commons.concurrent.IResultListener;
 import jadex.service.IServiceProvider;
 
 /**
@@ -43,4 +44,12 @@ public interface IExternalAccess
 	 *  @return The service provider.
 	 */
 	public IServiceProvider getServiceProvider();
+	
+	/**
+	 *  Create a result listener that will be 
+	 *  executed on the component thread.
+	 *  @param listener The result listener.
+	 *  @return A result listener that is called on component thread.
+	 */
+	public IResultListener createResultListener(IResultListener listener);
 }

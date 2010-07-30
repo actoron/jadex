@@ -1,5 +1,6 @@
 package jadex.bpmn.runtime;
 
+import jadex.bridge.ComponentResultListener;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
@@ -7,6 +8,7 @@ import jadex.bridge.ILoadableComponentModel;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.concurrent.DelegationResultListener;
+import jadex.commons.concurrent.IResultListener;
 import jadex.service.IServiceProvider;
 
 /**
@@ -113,6 +115,17 @@ public class ExternalAccess implements IExternalAccess
 	public BpmnInterpreter getInterpreter()
 	{
 		return interpreter;
+	}
+	
+	/**
+	 *  Create a result listener that will be 
+	 *  executed on the component thread.
+	 *  @param listener The result listener.
+	 *  @return A result listener that is called on component thread.
+	 */
+	public IResultListener createResultListener(IResultListener listener)
+	{
+		return new ComponentResultListener(listener, adapter);
 	}
 
 	/**

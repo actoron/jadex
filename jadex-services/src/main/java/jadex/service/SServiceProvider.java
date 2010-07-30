@@ -1,8 +1,13 @@
 package jadex.service;
 
+import jadex.commons.Future;
 import jadex.commons.IFuture;
+import jadex.commons.concurrent.IResultListener;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  *  Static helper class for searching services.
@@ -73,7 +78,22 @@ public class SServiceProvider
 //			Integer	cnt	= (Integer)profiling.get(type);
 //			profiling.put(type, new Integer(cnt!=null ? cnt.intValue()+1 : 1)); 
 //		}
-		return provider.getServices(sequentialmanager, abortdecider, new TypeResultSelector(type), new ArrayList());
+		final Future ret = new Future();
+		
+		provider.getServices(sequentialmanager, abortdecider, new TypeResultSelector(type), new ArrayList()).addResultListener(new IResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				ret.setResult(result!=null? ((ServiceInfo)result).getService(): null);
+			}
+			
+			public void exceptionOccurred(Object source, Exception exception)
+			{
+				ret.setException(exception);
+			}
+		});
+		
+		return ret;
 	}
 	
 	/**
@@ -88,7 +108,22 @@ public class SServiceProvider
 //			Integer	cnt	= (Integer)profiling.get(type);
 //			profiling.put(type, new Integer(cnt!=null ? cnt.intValue()+1 : 1)); 
 //		}
-		return provider.getServices(sequentialmanager, abortdecider, new IdResultSelector(sid), new ArrayList());
+		final Future ret = new Future();
+		
+		provider.getServices(sequentialmanager, abortdecider, new IdResultSelector(sid), new ArrayList()).addResultListener(new IResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				ret.setResult(result!=null? ((ServiceInfo)result).getService(): null);
+			}
+			
+			public void exceptionOccurred(Object source, Exception exception)
+			{
+				ret.setException(exception);
+			}
+		});
+		
+		return ret;
 	}
 	
 	/**
@@ -103,7 +138,22 @@ public class SServiceProvider
 //			Integer	cnt	= (Integer)profiling.get(selector.getCacheKey());
 //			profiling.put(selector.getCacheKey(), new Integer(cnt!=null ? cnt.intValue()+1 : 1)); 
 //		}
-		return provider.getServices(sequentialmanager, abortdecider, selector, new ArrayList());
+		final Future ret = new Future();
+		
+		provider.getServices(sequentialmanager, abortdecider, selector, new ArrayList()).addResultListener(new IResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				ret.setResult(result!=null? ((ServiceInfo)result).getService(): null);
+			}
+			
+			public void exceptionOccurred(Object source, Exception exception)
+			{
+				ret.setException(exception);
+			}
+		});
+		
+		return ret;
 	}
 	
 	/**
@@ -118,7 +168,31 @@ public class SServiceProvider
 //			Integer	cnt	= (Integer)profiling.get(type);
 //			profiling.put(type, new Integer(cnt!=null ? cnt.intValue()+1 : 1)); 
 //		}
-		return provider.getServices(parallelmanager, contdecider, new TypeResultSelector(type, false), new ArrayList());
+		final Future ret = new Future();
+		
+		provider.getServices(parallelmanager, contdecider, new TypeResultSelector(type, false), new ArrayList()).addResultListener(new IResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				List res = null;
+				if(result instanceof Collection)
+				{
+					res = new ArrayList();
+					for(Iterator it=((Collection)result).iterator(); it.hasNext(); )
+					{
+						res.add(((ServiceInfo)it.next()).getService());
+					}
+				}
+				ret.setResult(res);
+			}
+			
+			public void exceptionOccurred(Object source, Exception exception)
+			{
+				ret.setException(exception);
+			}
+		});
+		
+		return ret;
 	}
 
 	/**
@@ -133,7 +207,22 @@ public class SServiceProvider
 //			Integer	cnt	= (Integer)profiling.get(type);
 //			profiling.put(type, new Integer(cnt!=null ? cnt.intValue()+1 : 1)); 
 //		}
-		return provider.getServices(upwardsmanager, abortdecider, new TypeResultSelector(type), new ArrayList());
+		final Future ret = new Future();
+		
+		provider.getServices(upwardsmanager, abortdecider, new TypeResultSelector(type), new ArrayList()).addResultListener(new IResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				ret.setResult(result!=null? ((ServiceInfo)result).getService(): null);
+			}
+			
+			public void exceptionOccurred(Object source, Exception exception)
+			{
+				ret.setException(exception);
+			}
+		});
+		
+		return ret;
 	}
 	
 	/**
@@ -148,7 +237,22 @@ public class SServiceProvider
 //			Integer	cnt	= (Integer)profiling.get(type);
 //			profiling.put(type, new Integer(cnt!=null ? cnt.intValue()+1 : 1)); 
 //		}
-		return provider.getServices(localmanager, abortdecider, new TypeResultSelector(type), new ArrayList());
+		final Future ret = new Future();
+		
+		provider.getServices(localmanager, abortdecider, new TypeResultSelector(type), new ArrayList()).addResultListener(new IResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				ret.setResult(result!=null? ((ServiceInfo)result).getService(): null);
+			}
+			
+			public void exceptionOccurred(Object source, Exception exception)
+			{
+				ret.setException(exception);
+			}
+		});
+		
+		return ret;
 	}
 	
 	/**
@@ -163,7 +267,31 @@ public class SServiceProvider
 //			Integer	cnt	= (Integer)profiling.get(type);
 //			profiling.put(type, new Integer(cnt!=null ? cnt.intValue()+1 : 1)); 
 //		}
-		return provider.getServices(localmanager, contdecider, new TypeResultSelector(type), new ArrayList());
+		final Future ret = new Future();
+		
+		provider.getServices(localmanager, contdecider, new TypeResultSelector(type), new ArrayList()).addResultListener(new IResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				List res = null;
+				if(result instanceof Collection)
+				{
+					res = new ArrayList();
+					for(Iterator it=((Collection)result).iterator(); it.hasNext(); )
+					{
+						res.add(((ServiceInfo)it.next()).getService());
+					}
+				}
+				ret.setResult(res);
+			}
+			
+			public void exceptionOccurred(Object source, Exception exception)
+			{
+				ret.setException(exception);
+			}
+		});
+		
+		return ret;
 	}
 	
 	/**
@@ -192,7 +320,22 @@ public class SServiceProvider
 //			Integer	cnt	= (Integer)profiling.get(type);
 //			profiling.put(type, new Integer(cnt!=null ? cnt.intValue()+1 : 1)); 
 //		}
-		return provider.getServices(localmanager, abortdecider, new IdResultSelector(sid), new ArrayList());
+		final Future ret = new Future();
+		
+		provider.getServices(localmanager, abortdecider, new IdResultSelector(sid), new ArrayList()).addResultListener(new IResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				ret.setResult(result!=null? ((ServiceInfo)result).getService(): null);
+			}
+			
+			public void exceptionOccurred(Object source, Exception exception)
+			{
+				ret.setException(exception);
+			}
+		});
+		
+		return ret;
 	}
 	
 	/**
@@ -200,7 +343,7 @@ public class SServiceProvider
 	 *  @param type The class.
 	 *  @return The corresponding service.
 	 * /
-	public static IFuture getService(Object providerid, Class type)
+	public static IFuture getRemoteService(IServiceProvider provider, final IComponentIdentifier platform, final Class type)
 	{
 //		synchronized(profiling)
 //		{
@@ -208,9 +351,22 @@ public class SServiceProvider
 //			profiling.put(type, new Integer(cnt!=null ? cnt.intValue()+1 : 1)); 
 //		}
 		
-		// Create message to issue remote search request
+		final Future ret = new Future();
 		
-		
-		return provider.getServices(sequentialmanager, abortdecider, new TypeResultSelector(type));
+		getService(provider, IRemoteServiceManagementService.class).addResultListener(new IResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				IRemoteServiceManagementService rms = (IRemoteServiceManagementService)result;
+				ret.setResult(rms.getProxy(platform, type));
+			}
+			
+			public void exceptionOccurred(Object source, Exception exception)
+			{
+				ret.setException(exception);
+			}
+		});
+	
+		return ret;
 	}*/
 }

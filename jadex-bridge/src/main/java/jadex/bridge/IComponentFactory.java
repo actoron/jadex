@@ -1,5 +1,7 @@
 package jadex.bridge;
 
+import jadex.service.IService;
+
 import java.util.Map;
 
 import javax.swing.Icon;
@@ -9,7 +11,7 @@ import javax.swing.Icon;
  *  and is capable of loading component models from files
  *  as well as instantiating components.
  */
-public interface IComponentFactory
+public interface IComponentFactory extends IService
 {
 	//-------- methods --------
 	

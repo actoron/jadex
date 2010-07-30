@@ -38,11 +38,15 @@ public class UserAgent extends MicroAgent
 							// instead search for search and get remote service that can be directly accessed
 							
 							// Remote rms
-							IComponentIdentifier rrms = cms.createComponentIdentifier("rms@remote", false, 
+//							IComponentIdentifier rrms = cms.createComponentIdentifier("rms@remote", false, 
+//								new String[]{"tcp-mtp://127.0.0.1:11000", "nio-mtp://127.0.0.1:11001"});
+							IComponentIdentifier platid = cms.createComponentIdentifier("root@remote", false, 
 								new String[]{"tcp-mtp://127.0.0.1:11000", "nio-mtp://127.0.0.1:11001"});
+
 							
 							// Search for remote service
-							rms.getProxy(rrms, null, IAddService.class).addResultListener(createResultListener(new DefaultResultListener()
+//							rms.getProxy(rrms, null, IAddService.class).addResultListener(createResultListener(new DefaultResultListener()
+							rms.getServiceProxy(platid, IAddService.class).addResultListener(createResultListener(new DefaultResultListener()
 							{
 								public void resultAvailable(Object source, Object result)
 								{

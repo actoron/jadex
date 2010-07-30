@@ -98,7 +98,7 @@ public class MessageService extends BasicService implements IMessageService
 	 */
 	public MessageService(IServiceContainer provider, ITransport[] transports, MessageType[] messagetypes)
 	{
-		super(BasicService.createServiceIdentifier(provider.getId(), RemoteServiceManagementService.class));
+		super(BasicService.createServiceIdentifier(provider.getId(), MessageService.class));
 
 		this.provider = provider;
 		this.transports = SCollection.createArrayList();

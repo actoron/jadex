@@ -76,9 +76,9 @@ public class CacheServiceContainer	implements IServiceContainer
 			{	
 				data = cache.get(key, now);
 				
-				if(data instanceof IService)
+				if(data instanceof ServiceInfo)
 				{
-					if(!((IService)data).isValid())
+					if(!((ServiceInfo)data).getService().isValid())
 					{
 						cache.remove(key);
 						data = null;
@@ -87,12 +87,12 @@ public class CacheServiceContainer	implements IServiceContainer
 				else if(data instanceof Collection)
 				{
 					Collection coll = (Collection)data;
-					IService[] sers = (IService[])coll.toArray(new IService[((Collection)data).size()]);
+					ServiceInfo[] sers = (ServiceInfo[])coll.toArray(new ServiceInfo[((Collection)data).size()]);
 					
 					// Check if all results are still ok.
 					for(int i=0; data!=null && i<sers.length; i++)
 					{
-						if(!sers[i].isValid())
+						if(!sers[i].getService().isValid())
 						{
 							// if one is invalid whole result is invalid
 							cache.remove(key);

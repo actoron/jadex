@@ -1,6 +1,5 @@
 package jadex.service;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 
@@ -16,9 +15,6 @@ public class TypeResultSelector implements IResultSelector
 	
 	/** The one result flag. */
 	protected boolean oneresult;
-	
-	/** The flag if type should be part of result. */
-	protected boolean includetype;
 	
 	//-------- constructors --------
 	
@@ -42,17 +38,8 @@ public class TypeResultSelector implements IResultSelector
 	 */
 	public TypeResultSelector(Class type, boolean oneresult)
 	{
-		this(type, oneresult, false);
-	}
-	
-	/**
-	 *  Create a type result listener.
-	 */
-	public TypeResultSelector(Class type, boolean oneresult, boolean includetype)
-	{
 		this.type = type;
 		this.oneresult = oneresult;
-		this.includetype = includetype;
 	}
 	
 	//-------- methods --------
@@ -70,28 +57,14 @@ public class TypeResultSelector implements IResultSelector
 			Object[]	ares	= res.toArray();
 			if(oneresult && ares.length>0)
 			{
-				if(includetype)
-				{
-					results.add(new Object[]{type, res.toArray()[0]});
-				}
-				else
-				{
-					results.add(res.toArray()[0]);
-				}
+				results.add(new ServiceInfo(type, (IService)res.toArray()[0]));
 			}
 			else
 			{
 //				System.out.println("adding: "+ares);
-				if(includetype)
+				for(int i=0; i<ares.length; i++)
 				{
-					for(int i=0; i<ares.length; i++)
-					{
-						results.add(new Object[]{type, ares[i]});
-					}
-				}
-				else
-				{
-					results.addAll(Arrays.asList(ares));
+					results.add(new ServiceInfo(type, (IService)ares[i]));
 				}
 			}
 		}
@@ -165,24 +138,6 @@ public class TypeResultSelector implements IResultSelector
 		this.oneresult = oneresult;
 	}
 	
-	/**
-	 *  Get the includetype.
-	 *  @return the includetype.
-	 */
-	public boolean isIncludeType()
-	{
-		return includetype;
-	}
-
-	/**
-	 *  Set the includetype.
-	 *  @param includetype The includetype to set.
-	 */
-	public void setIncludeType(boolean includetype)
-	{
-		this.includetype = includetype;
-	}
-
 	/**
 	 *  Get the string representation.
 	 */

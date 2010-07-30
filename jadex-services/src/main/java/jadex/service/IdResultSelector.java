@@ -14,9 +14,6 @@ public class IdResultSelector implements IResultSelector
 	/** The id. */
 	protected Object sid;
 	
-	/** The flag if type should be part of result. */
-	protected boolean includetype;
-	
 	//-------- constructors --------
 	
 	/**
@@ -31,16 +28,7 @@ public class IdResultSelector implements IResultSelector
 	 */
 	public IdResultSelector(IServiceIdentifier sid)
 	{
-		this(sid, false);
-	}
-	
-	/**
-	 *  Create a id result listener.
-	 */
-	public IdResultSelector(IServiceIdentifier sid, boolean includetype)
-	{
 		this.sid = sid;
-		this.includetype = includetype;
 	}
 	
 	//-------- methods --------
@@ -60,14 +48,7 @@ public class IdResultSelector implements IResultSelector
 				IService tmp = (IService)vals.next();
 				if(sid.equals(tmp.getServiceIdentifier()))
 				{
-					if(includetype)
-					{
-						results.add(new Object[]{key, tmp});
-					}
-					else
-					{
-						results.add(tmp);
-					}
+					results.add(new ServiceInfo(key, tmp));
 					break;
 				}
 			}
@@ -121,24 +102,6 @@ public class IdResultSelector implements IResultSelector
 	public void setServiceIdentifier(Object sid)
 	{
 		this.sid = sid;
-	}
-	
-	/**
-	 *  Get the includetype.
-	 *  @return the includetype.
-	 */
-	public boolean isIncludeType()
-	{
-		return includetype;
-	}
-
-	/**
-	 *  Set the includetype.
-	 *  @param includetype The includetype to set.
-	 */
-	public void setIncludeType(boolean includetype)
-	{
-		this.includetype = includetype;
 	}
 
 	/**

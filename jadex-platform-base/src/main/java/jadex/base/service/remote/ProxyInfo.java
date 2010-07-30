@@ -1,10 +1,13 @@
-package jadex.standalone.service;
+package jadex.base.service.remote;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.service.IServiceIdentifier;
 
 /**
- * 
+ *  Info struct that holds all necessary information to generate
+ *  a proxy on the local platform. Is necessary because a proxy
+ *  cannot be directly created on the remote side and then sent 
+ *  per message to the calling side.
  */
 public class ProxyInfo
 {
@@ -44,7 +47,7 @@ public class ProxyInfo
 	 *  Get the rms.
 	 *  @return the rms.
 	 */
-	public IComponentIdentifier getRms()
+	public IComponentIdentifier getRemoteManagementServiceIdentifier()
 	{
 		return rms;
 	}
@@ -53,7 +56,7 @@ public class ProxyInfo
 	 *  Set the rms.
 	 *  @param rms The rms to set.
 	 */
-	public void setRms(IComponentIdentifier rms)
+	public void setRemoteManagementServiceIdentifier(IComponentIdentifier rms)
 	{
 		this.rms = rms;
 	}
