@@ -1,9 +1,10 @@
 
 	<!--
-		<H3>A agent negotiation application</H3> It can be started to launch a
-		agent negotiation scenario.
+		<H3>A agent negotiation application</H3>
+		A negotiation application which can be started to launch agent negotiation scenario.
+		
+		Uses components AgentManagementAgent, ServiceAgent (MasterServiceAgentCreator).
 	-->
-
 <applicationtype xmlns="http://jadex.sourceforge.net/jadex-application"
 	xmlns:env="http://jadex.sourceforge.net/jadex-envspace" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-application-2.0.xsd
@@ -14,38 +15,32 @@
 
 	<imports>
 		<import>jadex.application.space.envsupport.environment.*</import>
-		<import>jadex.adapter.base.envsupport.environment.*</import>
-		<import>jadex.application.space.envsupport.math.*</import>
-		<import>jadex.service.clock.IClockService</import>
-		<import>jadex.adapter.base.envsupport.dataview.GeneralDataView2D
-		</import>
-		<import>jadex.adapter.base.envsupport.observer.perspective.*</import>
-		<import>jadex.bdi.planlib.*</import>
-		<import>jadex.application.space.envsupport.dataview.*</import>
-		<import>deco4mas.coordinate.interpreter.coordination_information.*
-		</import>
 		<import>deco4mas.coordinate.environment.*</import>
-		<import>deco4mas.annotation.agent.*</import>
-		<import>deco4mas.coordinate.*</import>
-		<import>deco4mas.examples.agentNegotiation.*</import>
+		
 		<import>deco4mas.examples.agentNegotiation.sa.*</import>
 		<import>deco4mas.examples.agentNegotiation.sma.*</import>
-		<import>deco4mas.examples.agentNegotiation.decoMAS.dataObjects.*</import>
-		<import>deco4mas.examples.agentNegotiation.decoMAS.medium.*</import>
-		<import>deco4mas.examples.agentNegotiation.sa.masterSa.*</import>
+		<import>deco4mas.examples.agentNegotiation.sa.masterServiceAgentCreator.*</import>
+		
+		<import>deco4mas.examples.agentNegotiation.common.dataObjects.*</import>
+		<import>deco4mas.examples.agentNegotiation.deco.medien.*</import>
 	</imports>
 
 	<spacetypes>
+		<!-- define the coordination space -->
 		<env:envspacetype name="coordspace" width="11"
 			height="11" class="CoordinationSpace">
 
-			<env:property name="dynamics_configuration">"deco4mas/examples/agentNegotiation/decoMAS/negotiation.dynamics.xml"</env:property>
+			<!-- decoMAS file -->
+			<env:property name="dynamics_configuration">"deco4mas/examples/agentNegotiation/deco/negotiation.dynamics.xml"
+			</env:property>
 
+			<!-- space process to control time driven events -->
 			<env:processtypes>
 				<env:processtype name="MediumTime" class="MediumTimeProcess">
 				</env:processtype>
 			</env:processtypes>
 
+			<!-- space executer-->
 			<env:spaceexecutor class="DeltaTimeExecutor">
 				<env:property name="space">$space</env:property>
 				<env:property name="tick">true</env:property>
@@ -54,21 +49,22 @@
 	</spacetypes>
 
 	<componenttypes>
-<!--		<componenttype-->
-<!--			filename="deco4mas/examples/agentNegotiation/provider/WorkflowProvider.agent.xml"-->
-<!--			name="WorkflowProvider" />-->
+		<!-- MasterServiceAgentCreator	-->
 		<componenttype
-			filename="deco4mas/examples/agentNegotiation/sa/masterSa/MasterServiceCreator.agent.xml"
-			name="MasterServiceCreator" />
+			filename="deco4mas/examples/agentNegotiation/sa/masterServiceAgentCreator/MasterServiceAgentCreator.agent.xml"
+			name="MasterServiceAgentCreator" />
+		<!--	ServiceAgent		-->
 		<componenttype
 			filename="deco4mas/examples/agentNegotiation/sa/ServiceAgent.agent.xml"
 			name="ServiceAgent" />
+		<!-- ServiceManagementAgent -->
 		<componenttype
 			filename="deco4mas/examples/agentNegotiation/sma/ServiceManagementAgent.agent.xml"
 			name="ServiceManagementAgent" />
 	</componenttypes>
 
 	<applications>
+		<!-- A agent application scenario	-->
 		<application name="agentNegotiation">
 			<spaces>
 				<env:envspace name="mycoordspace" type="coordspace"
@@ -80,61 +76,72 @@
 				</env:envspace>
 			</spaces>
 			<components>
-				<component type="ServiceManagementAgent" number="1">
+				<!-- MasterServiceAgentCreator	-->
+				<component type="MasterServiceAgentCreator">
 					<arguments>
-						<argument name="services">
+						<!-- serviceTypes (name, mean cost, mean duration) -->
+						<argument name="serviceTypes">
 							new ServiceType[]
 							{
 							new ServiceType("Chassisbau",600.0,300.0)
-<!--						new ServiceType("Reifenhersteller",200.0,200.0),-->
-<!--						new ServiceType("Endmontage",400.0,200.0)-->
+							<!--
+								new ServiceType("Reifenhersteller",200.0,200.0),
+							-->
+							<!-- new ServiceType("Endmontage",400.0,200.0) -->
 							}
 						</argument>
+						<!-- serviceAgentTypes (name, costCharaketer, durationCharakter, blackoutCharakter) -->
+						<argument name="serviceAgentTypes">
+							new ServiceAgentType[]
+							{
+							new
+							ServiceAgentType("normal",0.5,0.5,0.5),
+							new
+							ServiceAgentType("billig",0.3,0.3,0.9),
+							new
+							ServiceAgentType("teuer",0.7,0.7,0.1)
+							<!--
+								new ServiceAgentType("ausfall",0.2,0.2,1.0)
+							-->
+							}
+						</argument>
+						<!-- mapping between (ServiceType , ServiceAgentType)-->
+						<argument name="serviceAgentConfigurations">
+							new ServiceAgentConfiguration[]
+							{
+							<!--
+								new ServiceAgentConfiguration("Chassisbau", "ausfall"),
+							-->
+							new ServiceAgentConfiguration("Chassisbau", "billig"),
+							new
+							ServiceAgentConfiguration("Chassisbau", "normal"),
+							new
+							ServiceAgentConfiguration("Chassisbau", "teuer")						
+							<!--
+								new ServiceAgentConfiguration("Reifenhersteller", "normal"),
+							-->
+							<!-- new ServiceAgentConfiguration("Reifenhersteller", "billig"),-->
+							<!-- new ServiceAgentConfiguration("Reifenhersteller", "teuer"),	-->
+							<!-- new ServiceAgentConfiguration("Reifenhersteller", "ausfall"),-->
+							<!-- new ServiceAgentConfiguration("Endmontage", "normal"),-->
+							<!-- new ServiceAgentConfiguration("Endmontage", "billig"),-->
+							<!-- new ServiceAgentConfiguration("Endmontage", "teuer"),-->
+							<!-- new ServiceAgentConfiguration("Endmontage", "ausfall")-->
+							}
+						</argument>
+					</arguments>
+				</component>
+				<!--ServiceManagementAgent-->
+				<component type="ServiceManagementAgent" number="1">
+					<arguments>
+						<!-- NAME of the used workflow 
+						(deco4mas.examples.agentNegotiation.sma.application.workflow.implementation.NAME -->
 						<argument name="workflowName">
 							new String("workflow")
 						</argument>
 					</arguments>
 				</component>
 			</components>
-			<component type="MasterServiceCreator">
-					<arguments>
-					<!-- WARNING: Hack / TODO in CreatesmaforWorkflow: taskTypes - ServiceTypes -->
-						<argument name="services">
-							new ServiceType[]
-							{
-							new ServiceType("Chassisbau",600.0,300.0)
-<!--							new ServiceType("Reifenhersteller",200.0,200.0),-->
-<!--							new ServiceType("Endmontage",400.0,200.0)-->
-							}
-						</argument>
-						<argument name="agentTypes">
-							new AgentType[]
-							{
-							new AgentType("normal",0.5,0.5,0.5),
-							new AgentType("billig",0.3,0.3,0.9),
-							new AgentType("teuer",0.7,0.7,0.1)
-<!--							new AgentType("ausfall",0.2,0.2,1.0)-->
-							}
-						</argument>
-						<argument name="serviceAgentConfigs">
-							new ServiceAgentConfig[]
-							{
-<!--							new ServiceAgentConfig("Chassisbau", "ausfall"),-->
-							new ServiceAgentConfig("Chassisbau", "billig"),
-							new ServiceAgentConfig("Chassisbau", "normal"),
-							new ServiceAgentConfig("Chassisbau", "teuer")						
-<!--							new ServiceAgentConfig("Reifenhersteller", "normal"),-->
-<!--							new ServiceAgentConfig("Reifenhersteller", "billig"),-->
-<!--							new ServiceAgentConfig("Reifenhersteller", "teuer"),-->
-<!--							new ServiceAgentConfig("Reifenhersteller", "ausfall"),-->
-<!--							new ServiceAgentConfig("Endmontage", "normal"),-->
-<!--							new ServiceAgentConfig("Endmontage", "billig"),-->
-<!--							new ServiceAgentConfig("Endmontage", "teuer"),-->
-<!--							new ServiceAgentConfig("Endmontage", "ausfall")-->
-							}	
-						</argument>
-					</arguments>
-				</component>
 		</application>
 	</applications>
 </applicationtype>

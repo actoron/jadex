@@ -3,7 +3,7 @@
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_OLlEYCpFEd-sHNUsLb1C_w" source="jadex">
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_OLlEYSpFEd-sHNUsLb1C_w" key="Description" value=""/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_OLu1YCpFEd-sHNUsLb1C_w" key="Package" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_VJnd4C7BEd-Gmq9Ka500yQ" key="imports" value="jadex.*␟jadex.bridge.*␟java.util.*"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_VJnd4C7BEd-Gmq9Ka500yQ" key="imports" value="jadex.*␟jadex.bridge.*␟java.util.*␟deco4mas.examples.agentNegotiation.common.dataObjects.*"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_514xgC7BEd-Gmq9Ka500yQ" key="arguments" value="provider␋true␋false␋&quot;provider&quot;␋IComponentIdentifier␋␟smas␋true␋false␋&quot;Smas&quot;␋Map␋"/>
   </eAnnotations>
   <pools xmi:type="bpmn:Pool" xmi:id="_NmezQSpFEd-sHNUsLb1C_w" iD="_NmezQCpFEd-sHNUsLb1C_w" name="Pool">

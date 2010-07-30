@@ -8,8 +8,7 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.logging.Logger;
-import deco4mas.examples.agentNegotiation.decoMAS.dataObjects.ServiceProposal;
-import deco4mas.examples.agentNegotiation.decoMAS.medium.AgentNegotiation;
+import deco4mas.examples.agentNegotiation.common.dataObjects.ServiceProposal;
 import deco4mas.examples.agentNegotiation.evaluate.AgentLogger;
 import deco4mas.examples.agentNegotiation.evaluate.ParameterLogger;
 import deco4mas.examples.agentNegotiation.evaluate.ValueLogger;
@@ -38,9 +37,9 @@ public class WeightFactorUtilityFunction implements IUtilityFunction
 	/**
 	 * Evaluate
 	 */
-	public synchronized SortedMap<Double, IComponentIdentifier> benchmarkProposals(Set<ServiceProposal> participants, Long thetime)
+	public synchronized SortedMap<Double, ServiceProposal> benchmarkProposals(Set<ServiceProposal> participants, Long thetime)
 	{
-		SortedMap<Double, IComponentIdentifier> ordered = new TreeMap<Double, IComponentIdentifier>();
+		SortedMap<Double, ServiceProposal> ordered = new TreeMap<Double, ServiceProposal>();
 		Set<ServiceProposal> participantsCopy = new HashSet<ServiceProposal>(participants); 
 		if (!participantsCopy.isEmpty())
 		{
@@ -58,7 +57,7 @@ public class WeightFactorUtilityFunction implements IUtilityFunction
 				bid.put("trust", trustFunction.getTrust(serviceProposal.getOwner().getLocalName(), thetime));
 				statUtility = "-> " + serviceProposal.getOwner().getName() + " Score: ";
 				Double utility = evaluate(bid);
-				ordered.put(utility, serviceProposal.getOwner());
+				ordered.put(utility, serviceProposal);
 
 				Object[] param = new Object[3];
 				param[0] = ((HistorytimeTrustFunction) trustFunction).getHistory().getStartTime();
@@ -150,8 +149,7 @@ public class WeightFactorUtilityFunction implements IUtilityFunction
 		return trustFunction;
 	}
 
-	// HACK!
-	public void logWinner(ServiceProposal pro, Long thetime)
+	public void log(ServiceProposal pro, Long thetime)
 	{
 		Map<String, Double> bid = new HashMap<String, Double>();
 		bid.put("cost", pro.getBid().getBidFactor("cost"));
@@ -161,7 +159,7 @@ public class WeightFactorUtilityFunction implements IUtilityFunction
 
 	}
 
-	public synchronized void log(Map<String, Double> evaluateVector)
+	private synchronized void log(Map<String, Double> evaluateVector)
 	{
 		Double utility = 0.0;
 		for (Map.Entry<String, Double> entry : evaluateVector.entrySet())
@@ -188,6 +186,17 @@ public class WeightFactorUtilityFunction implements IUtilityFunction
 			}
 		}
 		ValueLogger.addValue("Utility", utility);
+	}
+	
+	@Override
+	public String toString()
+	{
+		StringBuffer bidString = new StringBuffer("|");
+			for (Map.Entry<String, Map<String, Double>> bidEntry : factorMap.entrySet())
+			{
+				bidString.append(bidEntry.getKey() + " , " + bidEntry.getValue().get("weight") + "|");
+			}
+		return "Utilityfunction(" + owner + " , " + bidString.toString() + " , " + trustFunction + ")";
 	}
 
 }

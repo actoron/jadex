@@ -7,8 +7,8 @@ import jadex.bdi.runtime.Plan;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Logger;
+import deco4mas.examples.agentNegotiation.common.dataObjects.RequiredService;
 import deco4mas.examples.agentNegotiation.evaluate.AgentLogger;
-import deco4mas.examples.agentNegotiation.sma.application.RequiredService;
 
 /**
  * Test if negotiation or information about sign end is required
@@ -57,9 +57,9 @@ public class NegotiationRequiredCheckPlan extends Plan
 						sendMessage(me);
 					}
 				}
-				IGoal assign = createGoal("searchSa");
-				assign.getParameter("service").setValue(service);
-				dispatchSubgoalAndWait(assign);
+				IGoal assign = createGoal("initiateNegotiation");
+				assign.getParameter("requiredService").setValue(service);
+				dispatchTopLevelGoal(assign);
 			}
 			// }
 		} catch (Exception e)

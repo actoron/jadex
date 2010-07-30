@@ -3,7 +3,7 @@ package deco4mas.examples.agentNegotiation.sma.coordination.capability.serviceOf
 import jadex.bdi.runtime.Plan;
 import java.util.HashMap;
 import java.util.Map;
-import deco4mas.examples.agentNegotiation.decoMAS.dataObjects.TrustEvent;
+import deco4mas.examples.agentNegotiation.common.trustInformation.TrustEvent;
 import deco4mas.examples.agentNegotiation.evaluate.AgentLogger;
 import deco4mas.examples.agentNegotiation.evaluate.ClockTime;
 import deco4mas.examples.agentNegotiation.evaluate.ParameterLogger;
@@ -29,7 +29,7 @@ public class InitCapabilityPlan extends Plan
 			Map<TrustEvent, Double> eventWeight = new HashMap<TrustEvent, Double>();
 			eventWeight.put(TrustEvent.SuccessfullRequest, 1.0);
 			eventWeight.put(TrustEvent.FailedRequest, -8.0);
-			eventWeight.put(TrustEvent.CancelArrangement, -1.0);
+			eventWeight.put(TrustEvent.CancelContract, -1.0);
 			HistorytimeTrustFunction trustFunction = new HistorytimeTrustFunction(this.getComponentIdentifier(), history, eventWeight);
 			getBeliefbase().getBelief("trustFunction").setFact(trustFunction);
 			

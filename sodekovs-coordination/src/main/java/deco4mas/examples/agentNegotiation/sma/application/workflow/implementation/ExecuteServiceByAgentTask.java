@@ -9,7 +9,7 @@ import jadex.commons.concurrent.IResultListener;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
-import deco4mas.examples.agentNegotiation.decoMAS.dataObjects.ServiceType;
+import deco4mas.examples.agentNegotiation.common.dataObjects.ServiceType;
 import deco4mas.examples.agentNegotiation.evaluate.AgentLogger;
 
 /**

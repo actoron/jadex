@@ -12,6 +12,9 @@ import deco4mas.coordinate.environment.CoordinationSpace;
  */
 public abstract class ICoordinationMechanism {
 	
+	/* the default realisation name */
+	public static String DEFAULT_REALISATIONNAME = "default";
+	
 	// -- attributes ---
 	protected CoordinationSpace space;
 	

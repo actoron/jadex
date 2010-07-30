@@ -12,9 +12,15 @@ public class SignEndPlan extends Plan
 
 	public void body()
 	{
-		final Logger saLogger = AgentLogger.getTimeEvent(this.getComponentName());
-		saLogger.info("Sign end at request by sma");
-		getBeliefbase().getBelief("signed").setFact(Boolean.FALSE);
-		getBeliefbase().getBelief("contract").setFact(null);
+		try
+		{
+			final Logger saLogger = AgentLogger.getTimeEvent(this.getComponentName());
+			saLogger.info("Sign end at request by sma");
+			getBeliefbase().getBelief("signed").setFact(Boolean.FALSE);
+		} catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+
 	}
 }

@@ -22,9 +22,9 @@ import deco.lang.dynamics.mechanism.AgentElement;
 import deco.lang.dynamics.mechanism.DecentralizedCausality;
 import deco4mas.coordinate.interpreter.coordination_information.BDICoordinationInformationInterpreter;
 import deco4mas.coordinate.interpreter.coordination_information.DefaultCoordinationEventGenerator;
-import deco4mas.examples.agentNegotiation.decoMAS.medium.DirectInternalEventMechanism;
-import deco4mas.examples.agentNegotiation.decoMAS.medium.NegSpaceMechanism;
-import deco4mas.examples.agentNegotiation.decoMAS.medium.TrustSpaceMechanism;
+import deco4mas.examples.agentNegotiation.deco.medien.DirectInternalEventMechanism;
+import deco4mas.examples.agentNegotiation.deco.medien.NegotiationMechanism;
+import deco4mas.examples.agentNegotiation.deco.medien.TrustSpaceMechanism;
 import deco4mas.mechanism.ICoordinationMechanism;
 import deco4mas.mechanism.v2.tspaces.TSpacesMechanism;
 
@@ -395,7 +395,7 @@ public class InitDeco4mas {
 	{
 		ICoordinationMechanism result = null;
 		if (realisation.equals("by_tuple")) return new TSpacesMechanism((CoordinationSpace) space);
-		else if (realisation.equals("by_neg")) return new NegSpaceMechanism((CoordinationSpace) space);
+		else if (realisation.equals("by_neg")) return new NegotiationMechanism((CoordinationSpace) space);
 		else if (realisation.equals("by_trust")) return new TrustSpaceMechanism((CoordinationSpace) space);
 		else if (realisation.equals("by_directInternalEvent")) return new DirectInternalEventMechanism((CoordinationSpace) space);
 		return result;

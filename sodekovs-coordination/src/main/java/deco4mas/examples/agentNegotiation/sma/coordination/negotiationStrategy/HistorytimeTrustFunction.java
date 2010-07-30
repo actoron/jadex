@@ -5,7 +5,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.logging.Logger;
-import deco4mas.examples.agentNegotiation.decoMAS.dataObjects.TrustEvent;
+import deco4mas.examples.agentNegotiation.common.trustInformation.TrustEvent;
 import deco4mas.examples.agentNegotiation.evaluate.AgentLogger;
 import deco4mas.examples.agentNegotiation.evaluate.ParameterLogger;
 
@@ -116,6 +116,17 @@ public class HistorytimeTrustFunction implements ITrustFunction
 	public ServiceAgentHistory getHistory()
 	{
 		return history;
+	}
+	
+	@Override
+	public String toString()
+	{
+		StringBuffer weightString = new StringBuffer("|");
+		for (Map.Entry<TrustEvent, Double> weightEntry : weights.entrySet())
+		{
+			weightString.append(weightEntry.getKey().toString() + " , " + weightEntry.getValue() + "|");
+		}
+		return "TrustFunction(" + owner + " , " + weightString + " , " + history + ")";
 	}
 
 }

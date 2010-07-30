@@ -1,17 +1,15 @@
-
 	<!--
 		<H3>service agent</H3>
 	-->
-
 <agent xmlns="http://jadex.sourceforge.net/jadex-bdi" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-bdi
 	                    http://jadex.sourceforge.net/jadex-bdi-2.0.xsd"
 	name="ServiceAgent" package="deco4mas.examples.agentNegotiation.sa">
 
 	<imports>
-		<import>jadex.bdi.planlib.df.*</import>
-		<import>jadex.base.fipa.*</import>
-		<import>jadex.bdi.planlib.protocols.*</import>
+		<import>jadex.commons.IFilter</import>
+		
+<!--		<import>jadex.bdi.planlib.protocols.*</import>-->
 		<import>jadex.adapter.base.contextservice.*</import>
 		<import>jadex.adapter.base.appdescriptor.*</import>
 		<import>jadex.application.space.envsupport.environment.space2d.*
@@ -19,15 +17,16 @@
 		<import>jadex.application.space.envsupport.environment.*</import>
 		<import>jadex.application.space.envsupport.math.*</import>
 		<import>jadex.application.runtime.*</import>
-		<import>deco4mas.examples.agentNegotiation.decoMAS.*</import>
-		<import>deco4mas.examples.agentNegotiation.decoMAS.dataObjects.*
+<!--		<import>deco4mas.examples.agentNegotiation.decoMAS.*</import>-->
+		<import>deco4mas.examples.agentNegotiation.common.dataObjects.*
 		</import>
-		<import>deco4mas.examples.agentNegotiation.sa.masterSa.*</import>
+		<import>deco4mas.examples.agentNegotiation.common.trustInformation.*
+		</import>
 		<import>deco4mas.examples.agentNegotiation.sa.application.*</import>
 		<import>deco4mas.examples.agentNegotiation.sa.coordination.*</import>
 		<import>deco4mas.coordinate.environment.*</import>
 		<import>deco4mas.coordinate.*</import>
-		<import>jadex.commons.IFilter</import>
+		
 	</imports>
 
 	<capabilities>
@@ -35,14 +34,9 @@
 			file="jadex.bdi.planlib.protocols.request.Request" />
 		<capability name="sscap"
 			file="deco4mas.examples.agentNegotiation.sa.coordination.capability.serviceSupplier.ServiceSupplier" />
-		<capability name="tscap"
-			file="deco4mas.examples.agentNegotiation.sa.coordination.capability.trustSubject.TrustSubject" />
 	</capabilities>
 
 	<beliefs>
-		<belief name="contract" class="Contract">
-		</belief>
-
 		<belief name="env" class="CoordinationSpace">
 			<fact>(CoordinationSpace)((IApplicationExternalAccess)$scope.getParent()).getSpace("mycoordspace")
 			</fact>
@@ -50,14 +44,17 @@
 		
 		<!--	use trust?	-->
 		<belief name="useTrust" class="Boolean" exported="true">
-			<fact>false</fact>
+			<fact>true</fact>
 		</belief>
+		
+		<!-- executed service requests (observed by deco)-->
+		<beliefset name="executedServices" class="ExecutedService"></beliefset>
 
 		<belief name="providedService" class="ServiceType" exported="true">
 			<assignto ref="sscap.providedService"></assignto>
 		</belief>
-		<belief name="agentType" class="AgentType" exported="true">
-			<assignto ref="sscap.agentType"></assignto>
+		<belief name="serviceAgentType" class="ServiceAgentType" exported="true">
+			<assignto ref="sscap.serviceAgentType"></assignto>
 		</belief>
 
 		<beliefref name="blackout">
@@ -69,18 +66,6 @@
 
 	<plans>
 		<!-- service request -->
-<!--		<plan name="rp_decide_request_plan">-->
-<!--			<parameter name="action" class="Object">-->
-<!--				<goalmapping ref="reqcap.rp_decide_request.action" />-->
-<!--			</parameter>-->
-<!--			<parameter name="accept" class="Boolean" direction="out">-->
-<!--				<goalmapping ref="reqcap.rp_decide_request.accept" />-->
-<!--			</parameter>-->
-<!--			<body class="ServiceDecitePlan" />-->
-<!--			<trigger>-->
-<!--				<goal ref="reqcap.rp_decide_request" />-->
-<!--			</trigger>-->
-<!--		</plan>-->
 		<plan name="rp_execute_request_plan">
 			<parameter name="action" class="Object">
 				<goalmapping ref="reqcap.rp_execute_request.action" />
@@ -101,7 +86,7 @@
 		</plan>
 
 		<plan name="contractSealed">
-			<body class="ContractSealedPlan"></body>
+			<body class="AchieveContractPlan"></body>
 			<trigger>
 				<internalevent ref="contractSealed"></internalevent>
 			</trigger>
@@ -109,29 +94,28 @@
 	</plans>
 
 	<events>
-		<!--  events for deco capability	-->
-		<internaleventref name="publishedOffer">
-			<concrete ref="sscap.publishedOffer" />
-		</internaleventref>
-		<internaleventref name="assignedReward">
-			<concrete ref="sscap.assignedReward" />
-		</internaleventref>
-		<internaleventref name="announceProposal">
-			<concrete ref="sscap.announceProposal" />
-		</internaleventref>
-		<internaleventref name="executionOccur">
-			<concrete ref="tscap.executionOccur" />
-		</internaleventref>
-		<internaleventref name="rewardReply">
-			<concrete ref="sscap.rewardReply" />
-		</internaleventref>
-		<internaleventref name="contract">
-			<concrete ref="tscap.contract" />
-		</internaleventref>
-
+	
 		<!--	workflow is executed	-->
 		<internalevent name="workflowExecuted"></internalevent>
 
+		<!--  events for deco capability	-->
+		<internaleventref name="negotiationContract">
+			<concrete ref="sscap.negotiationContract" />
+		</internaleventref>
+		<internaleventref name="mediumRegister">
+			<concrete ref="sscap.mediumRegister" />
+		</internaleventref>
+		<internaleventref name="negotiationContractReply">
+			<concrete ref="sscap.negotiationContractReply" />
+		</internaleventref>
+		
+		<internaleventref name="executedServices">
+			<concrete ref="sscap.executedServices" />
+		</internaleventref>
+		<internaleventref name="executionOccur">
+			<concrete ref="sscap.executionOccur" />
+		</internaleventref>
+		
 		<internaleventref name="contractSealed">
 			<concrete ref="sscap.contractSealed" />
 		</internaleventref>

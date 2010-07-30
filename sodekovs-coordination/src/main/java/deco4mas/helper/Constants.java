@@ -41,6 +41,9 @@ public class Constants {
 	/** Perceive.*/
 	public static String PERCEIVE = "perceive";
 	
+	/** Architecture BDI.*/
+	public static String BDI = "BDI";
+	
 	/** Publish.*/
 	public static String PUBLISH = "publish";
 	

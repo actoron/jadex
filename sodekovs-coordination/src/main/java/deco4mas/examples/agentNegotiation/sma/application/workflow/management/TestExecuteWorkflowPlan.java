@@ -2,8 +2,8 @@ package deco4mas.examples.agentNegotiation.sma.application.workflow.management;
 
 import jadex.bdi.runtime.IInternalEvent;
 import jadex.bdi.runtime.Plan;
-import jadex.bridge.IComponentIdentifier;
-import deco4mas.examples.agentNegotiation.sma.application.RequiredService;
+import deco4mas.examples.agentNegotiation.common.dataObjects.RequiredService;
+import deco4mas.examples.agentNegotiation.common.dataObjects.ServiceContract;
 
 /**
  * Test if all neededServices found a SA
@@ -16,18 +16,17 @@ public class TestExecuteWorkflowPlan extends Plan
 		try
 		{
 			IInternalEvent satisfiedService = (IInternalEvent) getReason();
-//			startAtomic();
+			// startAtomic();
 			Boolean execute = true;
+			ServiceContract contract = (ServiceContract) satisfiedService.getParameter("contract").getValue();
 			RequiredService[] services = (RequiredService[]) getBeliefbase().getBeliefSet("requiredServices").getFacts();
 			for (RequiredService service : services)
 			{
 				synchronized (service.getMonitor())
 				{
-					Integer int1 = (Integer) satisfiedService.getParameter("id").getValue();
-					Integer int2 = service.getId();
-					if (int1.equals(int2))
+					if (contract.getServiceType().getName().equals(service.getServiceType().getName()))
 					{
-						service.setSa((IComponentIdentifier)satisfiedService.getParameter("sa").getValue());
+						service.setSa(contract.getParticipant());
 						service.setSearching(false);
 						dispatchInternalEvent(createInternalEvent("returnExecution"));
 					}
@@ -37,8 +36,8 @@ public class TestExecuteWorkflowPlan extends Plan
 					}
 				}
 			}
-//			endAtomic();
-			if (execute && !(Boolean)getBeliefbase().getBelief("executionPhase").getFact())
+			// endAtomic();
+			if (execute && !(Boolean) getBeliefbase().getBelief("executionPhase").getFact())
 			{
 				dispatchTopLevelGoal(createGoal("startWorkflow"));
 			}

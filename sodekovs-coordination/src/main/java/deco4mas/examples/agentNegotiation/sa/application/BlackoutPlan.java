@@ -3,11 +3,11 @@ package deco4mas.examples.agentNegotiation.sa.application;
 import jadex.bdi.runtime.Plan;
 import java.util.Random;
 import java.util.logging.Logger;
-import deco4mas.examples.agentNegotiation.decoMAS.dataObjects.ServiceType;
+import deco4mas.examples.agentNegotiation.common.dataObjects.ServiceAgentType;
+import deco4mas.examples.agentNegotiation.common.dataObjects.ServiceType;
 import deco4mas.examples.agentNegotiation.evaluate.AgentLogger;
 import deco4mas.examples.agentNegotiation.evaluate.ClockTime;
 import deco4mas.examples.agentNegotiation.evaluate.ParameterLogger;
-import deco4mas.examples.agentNegotiation.sa.masterSa.AgentType;
 
 /**
  * Sometimes produce Blackouts agentType.getBlackoutCharakter definite frequenz
@@ -33,7 +33,7 @@ public class BlackoutPlan extends Plan
 			{
 				Logger saLogger = AgentLogger.getTimeEvent(this.getComponentName());
 
-				AgentType agentType = (AgentType) getBeliefbase().getBelief("agentType").getFact();
+				ServiceAgentType agentType = (ServiceAgentType) getBeliefbase().getBelief("serviceAgentType").getFact();
 				Double blackoutCharakter = agentType.getBlackoutCharacter();
 
 				// use a expotential distribution

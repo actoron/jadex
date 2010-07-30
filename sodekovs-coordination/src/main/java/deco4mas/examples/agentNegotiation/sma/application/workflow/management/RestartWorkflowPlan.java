@@ -3,10 +3,10 @@ package deco4mas.examples.agentNegotiation.sma.application.workflow.management;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 import java.util.logging.Logger;
+import deco4mas.examples.agentNegotiation.common.dataObjects.RequiredService;
 import deco4mas.examples.agentNegotiation.evaluate.AgentLogger;
 import deco4mas.examples.agentNegotiation.evaluate.ClockTime;
 import deco4mas.examples.agentNegotiation.evaluate.ValueLogger;
-import deco4mas.examples.agentNegotiation.sma.application.RequiredService;
 
 /**
  * Creates a workflow
@@ -30,16 +30,16 @@ public class RestartWorkflowPlan extends Plan
 				for (RequiredService service : services)
 				{
 					synchronized (service.getMonitor())
-						{
-							service.remove();
-							getBeliefbase().getBeliefSet("requiredServices").removeFact(service);
-						}
+					{
+						service.remove();
+						getBeliefbase().getBeliefSet("requiredServices").removeFact(service);
+					}
 				}
 				getBeliefbase().getBelief("workflow").setFact(null);
 				getBeliefbase().getBelief("executionPhase").setFact(new Boolean(false));
 
 				// restart
-				IGoal restart = createGoal("preInstantiateWorkflow");
+				IGoal restart = createGoal("instantiateWorkflow");
 				dispatchTopLevelGoal(restart);
 				System.gc();
 			} else

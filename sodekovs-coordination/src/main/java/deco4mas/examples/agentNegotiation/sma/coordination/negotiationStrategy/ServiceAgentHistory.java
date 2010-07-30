@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
-import deco4mas.examples.agentNegotiation.decoMAS.dataObjects.TrustEvent;
+import deco4mas.examples.agentNegotiation.common.trustInformation.TrustEvent;
 
 public class ServiceAgentHistory
 {
@@ -59,5 +59,11 @@ public class ServiceAgentHistory
 	public Long getStartTime()
 	{
 		return startTime;
+	}
+	
+	@Override
+	public String toString()
+	{
+		return "History(" + owner + " , " + startTime + ")";
 	}
 }

@@ -8,7 +8,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.commons.IFuture;
 import java.util.logging.Logger;
-import deco4mas.examples.agentNegotiation.decoMAS.dataObjects.ServiceType;
+import deco4mas.examples.agentNegotiation.common.dataObjects.ServiceType;
 import deco4mas.examples.agentNegotiation.evaluate.AgentLogger;
 
 /**
@@ -36,7 +36,7 @@ public class ExecuteTaskPlan extends Plan
 			// ask sma for allocate
 			Boolean success = false;
 
-			String taskName = (String) ((ServiceType)getBeliefbase().getBelief("taskName").getFact()).getName();
+			String taskName = (String) ((ServiceType) getBeliefbase().getBelief("taskName").getFact()).getName();
 			try
 			{
 				IGoal serviceAllocate = createGoal("rp_initiate");
@@ -48,13 +48,13 @@ public class ExecuteTaskPlan extends Plan
 					success = result;
 			} catch (GoalFailureException gfe)
 			{
-//				gfe.printStackTrace();
+				// gfe.printStackTrace();
 				success = false;
 			}
 			if (!success)
 			{
-//				workflowLogger.warning("TASK " + taskName + " FAIL!");
-//				System.out.println("TASK " + taskName + " FAIL!");
+				// workflowLogger.warning("TASK " + taskName + " FAIL!");
+				// System.out.println("TASK " + taskName + " FAIL!");
 				body();
 			} else
 			{

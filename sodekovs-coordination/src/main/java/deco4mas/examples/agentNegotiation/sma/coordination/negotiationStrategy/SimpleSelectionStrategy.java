@@ -2,13 +2,14 @@ package deco4mas.examples.agentNegotiation.sma.coordination.negotiationStrategy;
 
 import jadex.bridge.IComponentIdentifier;
 import java.util.SortedMap;
+import deco4mas.examples.agentNegotiation.common.dataObjects.ServiceProposal;
 
 public class SimpleSelectionStrategy implements ISelectionStrategy
 {
 
-	public IComponentIdentifier selectProposal(SortedMap<Double, IComponentIdentifier> orderedProposal)
+	public ServiceProposal selectProposal(SortedMap<Double, ServiceProposal> orderedProposal)
 	{
-		IComponentIdentifier selected = null;
+		ServiceProposal selected = null;
 
 		// just select the best
 		if (!orderedProposal.isEmpty())

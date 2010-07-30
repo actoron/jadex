@@ -16,20 +16,31 @@
 		<import>jadex.bridge.IComponentIdentifier</import>
 
 		<import>deco4mas.coordinate.environment.*</import>
-		<import>deco4mas.examples.agentNegotiation.decoMAS.dataObjects.*
+		<import>deco4mas.examples.agentNegotiation.common.dataObjects.*
+		</import>
+		<import>deco4mas.examples.agentNegotiation.common.trustInformation.*
+		</import>
+		<import>deco4mas.examples.agentNegotiation.common.negotiationInformation.*
 		</import>
 		<import>deco4mas.examples.agentNegotiation.sma.coordination.negotiationStrategy.*
 		</import>
-		<!--
-			<import>deco4mas.examples.agentNegotiation.sma.application.workflow.management.*
-		-->
-		<!--		</import>-->
 		<import>deco4mas.examples.agentNegotiation.sma.application.*</import>
 	</imports>
+	
+	<capabilities>
+		<!--  Can be in a trustOwner role (capability)	-->
+		<capability name="tscap"
+			file="deco4mas.examples.agentNegotiation.sa.coordination.capability.serviceSupplier.trustSubject.TrustSubject" />
+	</capabilities>
 
 	<beliefs>
 		<!--  blackout	-->
 		<belief name="blackout" class="boolean">
+			<fact>false</fact>
+		</belief>
+		
+		<!--signed-->
+		<belief name="signed" class="boolean">
 			<fact>false</fact>
 		</belief>
 
@@ -37,22 +48,17 @@
 			<abstract />
 		</beliefref>
 
-		<beliefref name="agentType">
+		<beliefref name="serviceAgentType">
 			<abstract />
 		</beliefref>
-		<!--signed-->
-		<belief name="signed" class="boolean">
-			<fact>false</fact>
-		</belief>
 	</beliefs>
 
 	<plans>
-		<plan name="assignedReward">
-			<body class="AssignedRewardPlan"></body>
+		<plan name="contractReceive">
+			<body class="ContractReceivePlan"></body>
 			<trigger>
-				<internalevent ref="assignedReward"></internalevent>
+				<internalevent ref="negotiationContract"></internalevent>
 			</trigger>
-			<!-- <precondition>!$beliefbase.blackout</precondition>-->
 		</plan>
 
 		<plan name="signEnd">
@@ -62,45 +68,52 @@
 				</messageevent>
 			</trigger>
 		</plan>
-
-		<!-- proposal -->
-		<plan name="deliverProposal">
-			<body class="DeliverProposalPlan"></body>
-			<trigger>
-				<internalevent ref="publishedOffer"></internalevent>
-			</trigger>
-<!--			<precondition>!$beliefbase.blackout</precondition>-->
-<!--			<precondition>!$beliefbase.signed</precondition>-->
+		
+		<plan name="register">
+			<body class="RegisterAtMediumPlan"></body>
 		</plan>
 	</plans>
 
 	<events>
+		<!-- send -->
 		<internalevent name="contractSealed">
-			<parameter name="offer" class="ServiceOffer"></parameter>
+			<parameter name="contract" class="ServiceContract"></parameter>
 		</internalevent>
-		<!--receive	-->
-		<internalevent name="publishedOffer">
-			<parameter name="offer" class="ServiceOffer"></parameter>
-		</internalevent>
-		<internalevent name="assignedReward">
-			<parameter name="reward" class="Reward"></parameter>
-		</internalevent>
+
+		<!--	receive	-->
 		<messageevent name="signEnd" type="fipa" direction="receive">
 			<parameter name="performative" class="String" direction="fixed">
 				<value>SFipa.INFORM</value>
 			</parameter>
 		</messageevent>
-
-		<!-- send -->
-		<internalevent name="announceProposal">
-			<parameter name="task" class="String"></parameter>
-			<parameter name="proposal" class="ServiceProposal"></parameter>
+		
+		<!-- deco event when a new execution occur by agent-->
+		<internalevent name="negotiationContract">
+			<parameter name="information" class="NegotiationInformation"></parameter>
 		</internalevent>
 
-		<internalevent name="rewardReply">
-			<parameter name="reward" class="Reward"></parameter>
-			<parameter name="task" class="String"></parameter>
+		<!--deco send-->
+		<internalevent name="mediumRegister">
+			<parameter name="information" class="NegotiationInformation"></parameter>
 		</internalevent>
-
+		<internalevent name="negotiationContractReply">
+			<parameter name="information" class="NegotiationInformation"></parameter>
+		</internalevent>
+		
+		<!--deco event REFERENCE to capability-->
+		<internaleventref name="executionOccur">
+			<concrete ref="tscap.executionOccur" />
+		</internaleventref>
+		<internaleventref name="executedServices">
+			<concrete ref="tscap.executedServices" />
+		</internaleventref>
 	</events>
+	
+	<configurations>
+		<configuration name="default">
+			<plans>
+				<initialplan ref="register"></initialplan>
+			</plans>
+		</configuration>
+	</configurations>
 </capability>
