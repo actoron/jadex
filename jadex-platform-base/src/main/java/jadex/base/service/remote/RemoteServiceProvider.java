@@ -1,58 +1,72 @@
 package jadex.base.service.remote;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IRemoteServiceManagementService;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
+import jadex.commons.concurrent.DelegationResultListener;
+import jadex.commons.concurrent.IResultListener;
 import jadex.service.IResultSelector;
 import jadex.service.ISearchManager;
 import jadex.service.IServiceProvider;
 import jadex.service.IVisitDecider;
+import jadex.service.SServiceProvider;
 
 import java.util.Collection;
 
 /**
- * 
+ *  Remote service provider for searching at a remote platform
+ *  in the same way as on a the local one.
  */
 public class RemoteServiceProvider implements IServiceProvider
 {
-	/** The remote component identifier. */
-	protected IComponentIdentifier component;
+	//-------- attributes --------
 	
-	/** A local service provider. */
-	protected IServiceProvider provider;
+	/** The remote component/provider identifier. */
+	protected IComponentIdentifier providerid;
+	
+	/** The parent service provider. */
+	protected IServiceProvider parent;
+	
+	//-------- constructors --------
 	
 	/**
-	 * 
+	 *  Create a new remote service provider.
 	 */
-	public RemoteServiceProvider(IComponentIdentifier component, IServiceProvider provider)
+	public RemoteServiceProvider(IComponentIdentifier providerid, IServiceProvider parent)
 	{
-		this.component = component;
-		this.provider = provider;
+		this.providerid = providerid;
+		this.parent = parent;
 	}
+	
+	//-------- methods --------
 	
 	/**
 	 *  Get all services of a type.
 	 *  @param type The class.
 	 *  @return The corresponding services.
 	 */
-	public IFuture	getServices(ISearchManager manager, IVisitDecider decider, IResultSelector selector, Collection result)
+	public IFuture	getServices(ISearchManager manager, final IVisitDecider decider, final IResultSelector selector, final Collection result)
 	{
-		Future ret = new Future();
+		final Future ret = new Future();
 		
-//		SServiceProvider.getService(provider, IRemoteServiceManagementService.class)
-//			.addResultListener(new IResultListener()
-//		{
-//			public void resultAvailable(Object source, Object result)
-//			{
-//				IRemoteServiceManagementService rms = (IRemoteServiceManagementService)result;
-//				
-//				rms.getProxies(platform, service)
-//			}
-//			
-//			public void exceptionOccurred(Object source, Exception exception)
-//			{
-//			}
-//		});
+		SServiceProvider.getService(parent, IRemoteServiceManagementService.class)
+			.addResultListener(new IResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				IRemoteServiceManagementService rms = (IRemoteServiceManagementService)result;
+				
+				// Hack! Use user search manager.
+				rms.getServiceProxies(providerid, providerid, SServiceProvider.sequentialmanager, decider, selector)
+					.addResultListener(new DelegationResultListener(ret));
+			}
+			
+			public void exceptionOccurred(Object source, Exception exception)
+			{
+				ret.setException(exception);
+			}
+		});
 		
 		return ret;
 	}
@@ -63,7 +77,7 @@ public class RemoteServiceProvider implements IServiceProvider
 	 */
 	public IFuture	getParent()
 	{
-		return new Future(null);
+		return new Future(parent);
 	}
 	
 	/**
@@ -81,6 +95,6 @@ public class RemoteServiceProvider implements IServiceProvider
 	 */
 	public Object	getId()
 	{
-		return component;
+		return providerid;
 	}
 }

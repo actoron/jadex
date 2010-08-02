@@ -46,7 +46,7 @@ public class UserAgent extends MicroAgent
 							
 							// Search for remote service
 //							rms.getProxy(rrms, null, IAddService.class).addResultListener(createResultListener(new DefaultResultListener()
-							rms.getServiceProxy(platid, IAddService.class).addResultListener(createResultListener(new DefaultResultListener()
+							rms.getServiceProxy(platid, null, IAddService.class).addResultListener(createResultListener(new DefaultResultListener()
 							{
 								public void resultAvailable(Object source, Object result)
 								{
