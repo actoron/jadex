@@ -71,7 +71,7 @@
 			//: new AsyncExecutionService((IThreadPool)SServiceProvider.getService($platform, ThreadPoolService.class).get(new ThreadSuspendable()))
 		</service>
 		<service class="ILibraryService">
-			new LibraryService($args.libpath)
+			new LibraryService($args.libpath, $component.getComponentIdentifier())
 		</service>
 		<service class="IComponentManagementService">
 			new ComponentManagementService($platform, $args.autoshutdown, $component.getComponentAdapter())

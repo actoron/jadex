@@ -39,6 +39,6 @@ public class HelloWorldAgent extends MicroAgent
 			new String[]{"c1", "c2"}, 
 			new IArgument[]{
 			new Argument("welcome text", "This parameter is the text printed by the agent.", "String", "Hello world, this is a Jadex micro agent."),	
-			}, null, null);
+			}, null, null, null);
 	}
 }

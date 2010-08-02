@@ -9,6 +9,7 @@ import jadex.commons.SUtil;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -225,6 +226,10 @@ public class MicroAgentModel implements ILoadableComponentModel
 			for(int i=0; metainfo!=null && i<metainfo.getBreakpoints().length; i++)
 				names.add(metainfo.getBreakpoints()[i]);
 			props.put("debugger.breakpoints", names);
+			
+			if(metainfo!=null)
+				props.putAll(metainfo.getProperties());
+			
 			this.properties	= props;
 		}
 		return properties;

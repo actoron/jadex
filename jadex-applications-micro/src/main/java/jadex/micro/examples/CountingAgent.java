@@ -65,6 +65,6 @@ public class CountingAgent extends MicroAgent
 	public static Object getMetaInfo()
 	{
 		return new MicroAgentMetaInfo("A simple agent showing how to use breakpoints in the micro kernel.", 
-			null, null, null, new String[]{"2", "5", "odd", "even", "every tenth"});
+			null, null, null, new String[]{"2", "5", "odd", "even", "every tenth"}, null);
 	}
 }

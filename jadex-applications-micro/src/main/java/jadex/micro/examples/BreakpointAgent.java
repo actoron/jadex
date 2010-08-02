@@ -66,6 +66,6 @@ public class BreakpointAgent extends MicroAgent
 	public static Object getMetaInfo()
 	{
 		return new MicroAgentMetaInfo("A simple agent showing how to use breakpoints in the micro kernel.", 
-			null, null, null, new String[]{"hop", "step", "jump"});
+			null, null, null, new String[]{"hop", "step", "jump"}, null);
 	}
 }

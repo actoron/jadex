@@ -65,6 +65,6 @@ public class ResultAgent extends MicroAgent
 	public static Object getMetaInfo()
 	{
 		return new MicroAgentMetaInfo("This agent starts a subagent and fetches its result.", 
-			null, null, new IArgument[]{new Argument("result", "Result value.", "String", new Integer(0))}, null);
+			null, null, new IArgument[]{new Argument("result", "Result value.", "String", new Integer(0))}, null, null);
 	}
 }

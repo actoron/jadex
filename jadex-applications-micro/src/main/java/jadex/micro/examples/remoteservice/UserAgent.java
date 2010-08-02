@@ -43,7 +43,6 @@ public class UserAgent extends MicroAgent
 							IComponentIdentifier platid = cms.createComponentIdentifier("root@remote", false, 
 								new String[]{"tcp-mtp://127.0.0.1:11000", "nio-mtp://127.0.0.1:11001"});
 
-							
 							// Search for remote service
 //							rms.getProxy(rrms, null, IAddService.class).addResultListener(createResultListener(new DefaultResultListener()
 							rms.getServiceProxy(platid, null, IAddService.class).addResultListener(createResultListener(new DefaultResultListener()

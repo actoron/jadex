@@ -203,6 +203,6 @@ public class DFTestAgent extends MicroAgent
 	public static Object getMetaInfo()
 	{
 		return new MicroAgentMetaInfo("Test DF usage from micro agent.", 
-			null, null, new IArgument[]{new Argument("testresults", null, "Testcase")}, null);
+			null, null, new IArgument[]{new Argument("testresults", null, "Testcase")}, null, null);
 	}
 }

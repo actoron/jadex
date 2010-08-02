@@ -111,6 +111,9 @@ public class Application implements IApplication, IComponentInstance
 	/** The value fetcher. */
 	protected IValueFetcher	fetcher;
 	
+	/** The cached external access. */
+	protected IExternalAccess access;
+	
 	//-------- constructors --------
 	
 	/**
@@ -126,6 +129,7 @@ public class Application implements IApplication, IComponentInstance
 		this.adapter = factory.createComponentAdapter(desc, model, this, parent);
 		this.properties = new HashMap();
 		this.ctypes = Collections.synchronizedMap(new HashMap()); 
+		this.access = new ExternalAccess(this);
 		
 		// Init the arguments with default values.
 		String configname = config!=null? config.getName(): null;
@@ -949,7 +953,7 @@ public class Application implements IApplication, IComponentInstance
 	 */
 	public IFuture getExternalAccess()
 	{
-		return new Future(new ExternalAccess(this));
+		return new Future(access);
 	}
 
 	/**

@@ -22,8 +22,12 @@ import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IExecutable;
 import jadex.commons.concurrent.IResultListener;
+import jadex.javaparser.IParsedExpression;
+import jadex.javaparser.SJavaParser;
+import jadex.javaparser.SimpleValueFetcher;
 import jadex.service.CacheServiceContainer;
 import jadex.service.IServiceContainer;
+import jadex.service.IServiceProvider;
 import jadex.service.SServiceProvider;
 import jadex.service.execution.IExecutionService;
 import jadex.standalone.service.ComponentManagementService;
@@ -115,12 +119,11 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	{
 		this.desc = desc;
 		this.cid	= desc.getName();
-		this.provider = new CacheServiceContainer(new ComponentServiceContainer(this), 25, 1*30*1000); // 30 secs cache expire
-//		this.provider = new ComponentServiceContainer(this);
 		this.model = model;
 		this.component = component;
 		this.parent	= parent;
 		this.ext_entries = Collections.synchronizedList(new ArrayList());
+		this.provider = createProvider();
 	}
 	
 	/**
@@ -298,6 +301,34 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 		    		+ logfile + "\n" + e.getMessage());
 		    }
 		}
+	}
+	
+	/**
+	 *  Init the service provider.
+	 */
+	protected IServiceContainer createProvider()
+	{
+		IServiceContainer ret = null;
+		Object provider = model.getProperties().get("serviceprovider");
+		
+		if(provider instanceof IServiceContainer)
+		{
+			ret = (IServiceContainer)provider;
+		}
+		else if(provider instanceof String)
+		{
+			SimpleValueFetcher fetcher = new SimpleValueFetcher();
+			fetcher.setValue("$component", component.getExternalAccess());
+			IParsedExpression exp = SJavaParser.parseExpression((String)provider, new String[]{model.getPackage()}, model.getClassLoader());
+			ret = (IServiceContainer)exp.getValue(fetcher);
+		}
+		if(provider==null)
+		{
+			ret = new CacheServiceContainer(new ComponentServiceContainer(this), 25, 1*30*1000); // 30 secs cache expire
+//			ret = new ComponentServiceContainer(this);
+		}
+		
+		return ret;
 	}
 	
 	/**

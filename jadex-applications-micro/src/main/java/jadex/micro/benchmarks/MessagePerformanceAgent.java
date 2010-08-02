@@ -166,7 +166,7 @@ public class MessagePerformanceAgent extends MicroAgent
 						return ret;
 					}
 				}
-			}, null, null
+			}, null, null, null
 		);
 	}
 }
