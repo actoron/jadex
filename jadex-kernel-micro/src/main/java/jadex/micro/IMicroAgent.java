@@ -11,14 +11,6 @@ import java.util.Map;
 public interface IMicroAgent
 {
 	/**
-	 *  Called when the agent is born and whenever it wants to execute an action
-	 *  (e.g. calls wakeup() in one of the other methods).
-	 *  The platform guarantees that executeAction() will not be called in parallel. 
-	 *  @return True, when there are more actions waiting to be executed. 
-	 */
-//	public boolean executeAction();
-
-	/**
 	 *  Called once after agent creation.
 	 */
 	public void agentCreated();
@@ -39,7 +31,6 @@ public interface IMicroAgent
 	 *  Called just before the agent is removed from the platform.
 	 */
 	public void agentKilled();
-	
 	
 }
 

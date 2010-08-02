@@ -2,7 +2,6 @@ package jadex.standalone;
 
 import jadex.base.fipa.ComponentIdentifier;
 import jadex.bridge.CheckedAction;
-import jadex.bridge.ComponentServiceContainer;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.DefaultMessageAdapter;
 import jadex.bridge.IComponentAdapter;
@@ -22,12 +21,7 @@ import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IExecutable;
 import jadex.commons.concurrent.IResultListener;
-import jadex.javaparser.IParsedExpression;
-import jadex.javaparser.SJavaParser;
-import jadex.javaparser.SimpleValueFetcher;
-import jadex.service.CacheServiceContainer;
 import jadex.service.IServiceContainer;
-import jadex.service.IServiceProvider;
 import jadex.service.SServiceProvider;
 import jadex.service.execution.IExecutionService;
 import jadex.standalone.service.ComponentManagementService;
@@ -107,7 +101,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	protected boolean ext_forbidden;
 	
 	/** The own service provider. */
-	protected IServiceContainer provider;
+//	protected IServiceContainer provider;
 
 	//-------- constructors --------
 
@@ -123,7 +117,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 		this.component = component;
 		this.parent	= parent;
 		this.ext_entries = Collections.synchronizedList(new ArrayList());
-		this.provider = createProvider();
+//		this.provider = component.createServiceContainer();
 	}
 	
 	/**
@@ -304,34 +298,6 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	}
 	
 	/**
-	 *  Init the service provider.
-	 */
-	protected IServiceContainer createProvider()
-	{
-		IServiceContainer ret = null;
-		Object provider = model.getProperties().get("serviceprovider");
-		
-		if(provider instanceof IServiceContainer)
-		{
-			ret = (IServiceContainer)provider;
-		}
-		else if(provider instanceof String)
-		{
-			SimpleValueFetcher fetcher = new SimpleValueFetcher();
-			fetcher.setValue("$component", component.getExternalAccess());
-			IParsedExpression exp = SJavaParser.parseExpression((String)provider, new String[]{model.getPackage()}, model.getClassLoader());
-			ret = (IServiceContainer)exp.getValue(fetcher);
-		}
-		if(provider==null)
-		{
-			ret = new CacheServiceContainer(new ComponentServiceContainer(this), 25, 1*30*1000); // 30 secs cache expire
-//			ret = new ComponentServiceContainer(this);
-		}
-		
-		return ret;
-	}
-	
-	/**
 	 *  Get the model.
 	 *  @return The model.
 	 */
@@ -389,7 +355,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	 */
 	public IServiceContainer getServiceContainer()
 	{
-		return provider;
+		return component.getServiceContainer();
 	}
 	
 	//-------- methods called by the standalone platform --------
@@ -563,7 +529,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 
 			try
 			{
-				//System.out.println("Executing: "+component);
+//				System.out.println("Executing: "+component);
 				again	= component.executeStep();
 			}
 			catch(Exception e)

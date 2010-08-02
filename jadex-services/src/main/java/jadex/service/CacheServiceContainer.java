@@ -173,7 +173,7 @@ public class CacheServiceContainer	implements IServiceContainer
 	{
 		final Future ret = new Future();
 		
-//		System.out.println("search clock: "+getId());
+		System.out.println("search clock: "+getId());
 		SServiceProvider.getServiceUpwards(container, IClockService.class).addResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object source, Object result)

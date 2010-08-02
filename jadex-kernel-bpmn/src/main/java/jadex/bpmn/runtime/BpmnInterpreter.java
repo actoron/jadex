@@ -17,6 +17,7 @@ import jadex.bpmn.runtime.handler.GatewayXORActivityHandler;
 import jadex.bpmn.runtime.handler.SubProcessActivityHandler;
 import jadex.bpmn.runtime.handler.TaskActivityHandler;
 import jadex.bridge.ComponentResultListener;
+import jadex.bridge.ComponentServiceContainer;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IArgument;
 import jadex.bridge.IComponentAdapter;
@@ -41,6 +42,8 @@ import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.IValueFetcher;
+import jadex.service.CacheServiceContainer;
+import jadex.service.IServiceContainer;
 import jadex.service.IServiceProvider;
 import jadex.service.SServiceProvider;
 import jadex.service.clock.IClockService;
@@ -179,6 +182,9 @@ public class BpmnInterpreter implements IComponentInstance
 	
 	/** The messages waitqueue. */
 	protected List messages;
+	
+	/** The service container. */
+	protected IServiceContainer container;
 	
 	//-------- constructors --------
 	
@@ -728,7 +734,21 @@ public class BpmnInterpreter implements IComponentInstance
 	 */
 	public IServiceProvider getServiceProvider()
 	{
-		return adapter.getServiceContainer();
+		return getServiceContainer();
+	}
+	
+	/**
+	 *  Create the service container.
+	 *  @return The service container.
+	 */
+	public IServiceContainer getServiceContainer()
+	{
+		if(container==null)
+		{
+			// todo: support container customization via bpmn file
+			container = new CacheServiceContainer(new ComponentServiceContainer(getComponentAdapter()), 25, 1*30*1000); // 30 secs cache expire
+		}
+		return container;
 	}
 
 	/**

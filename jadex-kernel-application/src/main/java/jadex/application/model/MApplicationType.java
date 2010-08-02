@@ -46,6 +46,9 @@ public class MApplicationType
 	/** The services. */
 	protected List services;
 	
+	/** The service container. */
+	protected MExpressionType container;
+	
 	/** The properties. */
 	protected List properties;
 	
@@ -357,6 +360,24 @@ public class MApplicationType
 		return this.services;
 	}
 	
+	/**
+	 *  Get the container.
+	 *  @return the container.
+	 */
+	public MExpressionType getContainer()
+	{
+		return container;
+	}
+
+	/**
+	 *  Set the container.
+	 *  @param container The container to set.
+	 */
+	public void setContainer(MExpressionType container)
+	{
+		this.container = container;
+	}
+
 	/**
 	 *  Get the properties.
 	 *  @return The properties.

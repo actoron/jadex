@@ -58,6 +58,7 @@
 	</componenttypes>
 	
 	<services>
+		<container class="IServiceContainer">new ComponentServiceContainer($component.getComponentAdapter())</container>
 		<service class="ThreadPoolService">
 			new ThreadPoolService(new ThreadPool(new DefaultThreadPoolStrategy(0, 20, 30000)), $platform)
 		</service>

@@ -1,6 +1,7 @@
 package jadex.bridge;
 
 import jadex.commons.IFuture;
+import jadex.service.IServiceContainer;
 
 import java.util.Map;
 
@@ -102,4 +103,10 @@ public interface IComponentInstance
 	 *  @return True, when some breakpoint is triggered.
 	 */
 	public boolean isAtBreakpoint(String[] breakpoints);
+	
+	/**
+	 *  Create the service container.
+	 *  @return The service container.
+	 */
+	public IServiceContainer getServiceContainer();
 }

@@ -370,6 +370,9 @@ public class OAVBDIMetaModel
 	/** The agent (model) type. */
 	public static OAVObjectType agent_type;
 
+	/** The agent has a service container type. */
+	public static OAVAttributeType agent_has_servicecontainer;
+	
 //	/** Agent has propertyfile attribute. */
 //	public static OAVAttributeType agent_has_propertyfile;
 
@@ -1166,6 +1169,7 @@ public class OAVBDIMetaModel
 
 		// agent
 //		agent_has_propertyfile	= agent_type.createAttributeType("magent_has_propertyfile", OAVJavaType.java_string_type);
+		agent_has_servicecontainer = agent_type.createAttributeType("magent_has_servicecontainer", expression_type);
 		
 		// propertybase
 		properties_has_properties	= properties_type.createAttributeType("properties_has_properties", properties_type, OAVAttributeType.LIST);

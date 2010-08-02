@@ -12,6 +12,7 @@ import jadex.application.runtime.IApplication;
 import jadex.application.runtime.ISpace;
 import jadex.bridge.ComponentFactorySelector;
 import jadex.bridge.ComponentResultListener;
+import jadex.bridge.ComponentServiceContainer;
 import jadex.bridge.CreationInfo;
 import jadex.bridge.IArgument;
 import jadex.bridge.IComponentAdapter;
@@ -36,7 +37,9 @@ import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.javaparser.IValueFetcher;
 import jadex.javaparser.SimpleValueFetcher;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
+import jadex.service.CacheServiceContainer;
 import jadex.service.IService;
+import jadex.service.IServiceContainer;
 import jadex.service.IServiceProvider;
 import jadex.service.SServiceProvider;
 import jadex.service.library.ILibraryService;
@@ -111,8 +114,8 @@ public class Application implements IApplication, IComponentInstance
 	/** The value fetcher. */
 	protected IValueFetcher	fetcher;
 	
-	/** The cached external access. */
-	protected IExternalAccess access;
+	/** The service container. */
+	protected IServiceContainer container;
 	
 	//-------- constructors --------
 	
@@ -126,11 +129,10 @@ public class Application implements IApplication, IComponentInstance
 		this.parent = parent;
 		this.arguments = arguments==null ? new HashMap() : arguments;
 		this.results = new HashMap();
-		this.adapter = factory.createComponentAdapter(desc, model, this, parent);
 		this.properties = new HashMap();
 		this.ctypes = Collections.synchronizedMap(new HashMap()); 
-		this.access = new ExternalAccess(this);
-		
+		this.adapter = factory.createComponentAdapter(desc, model, this, parent);
+
 		// Init the arguments with default values.
 		String configname = config!=null? config.getName(): null;
 		IArgument[] args = model.getArguments();
@@ -156,13 +158,25 @@ public class Application implements IApplication, IComponentInstance
 		}
 		
 		SimpleValueFetcher	fetcher = new SimpleValueFetcher();
-		fetcher.setValue("$platform", getServiceProvider());
 		fetcher.setValue("$args", getArguments());
 		fetcher.setValue("$properties", properties);
 		fetcher.setValue("$results", getResults());
 		fetcher.setValue("$component", this);
 		this.fetcher	= fetcher;
-
+		
+		// Init service container.
+		MExpressionType mex = model.getApplicationType().getContainer();
+		if(mex!=null)
+		{
+			container = (IServiceContainer)mex.getParsedValue().getValue(fetcher);
+		}
+		else
+		{
+			container = new CacheServiceContainer(new ComponentServiceContainer(getComponentAdapter()), 25, 1*30*1000); // 30 secs cache expire
+		}
+		
+		fetcher.setValue("$platform", getServiceProvider());
+		
 		List services = model.getApplicationType().getServices();
 		if(services!=null)
 		{
@@ -170,7 +184,7 @@ public class Application implements IApplication, IComponentInstance
 			{
 				MExpressionType exp = (MExpressionType)services.get(i);
 				IService service = (IService)exp.getParsedValue().getValue(fetcher);
-				adapter.getServiceContainer().addService(exp.getClazz(), service);
+				container.addService(exp.getClazz(), service);
 			}
 		}
 
@@ -847,7 +861,7 @@ public class Application implements IApplication, IComponentInstance
 //					adapter.getServiceContainer().addService(exp.getClazz(), service);
 //				}
 //			}
-			adapter.getServiceContainer().start().addResultListener(new ComponentResultListener(new DefaultResultListener()
+			container.start().addResultListener(new ComponentResultListener(new DefaultResultListener()
 			{
 				public void resultAvailable(Object source, Object result)
 				{
@@ -953,7 +967,7 @@ public class Application implements IApplication, IComponentInstance
 	 */
 	public IFuture getExternalAccess()
 	{
-		return new Future(access);
+		return new Future(new ExternalAccess(this));
 	}
 
 	/**
@@ -1156,6 +1170,15 @@ public class Application implements IApplication, IComponentInstance
 	 */
 	public IServiceProvider getServiceProvider()
 	{
-		return adapter.getServiceContainer();
+		return container;
+	}
+	
+	/**
+	 *  Create the service container.
+	 *  @return The service container.
+	 */
+	public IServiceContainer getServiceContainer()
+	{
+		return container;
 	}
 }

@@ -1,5 +1,6 @@
 package jadex.micro;
 
+import jadex.bridge.ComponentServiceContainer;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
@@ -10,6 +11,7 @@ import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
+import jadex.service.CacheServiceContainer;
 import jadex.service.IServiceContainer;
 import jadex.service.IServiceProvider;
 import jadex.service.SServiceProvider;
@@ -79,6 +81,26 @@ public abstract class MicroAgent implements IMicroAgent
 	{
 	}
 
+	//-------- methods --------
+	
+	/**
+	 *  Get the service container.
+	 *  @return The service container.
+	 */
+	public IServiceContainer createServiceContainer()
+	{
+		return new CacheServiceContainer(new ComponentServiceContainer(getAgentAdapter()), 25, 1*30*1000); // 30 secs cache expire
+	}
+	
+	/**
+	 *  Get the service provider.
+	 *  @return The service provider.
+	 */
+	public IServiceProvider getServiceProvider()
+	{
+		return interpreter.getServiceProvider();
+	}
+	
 	/**
 	 *  Test if the agent's execution is currently at one of the
 	 *  given breakpoints. If yes, the agent will be suspended by
@@ -92,8 +114,6 @@ public abstract class MicroAgent implements IMicroAgent
 	{
 		return false;
 	}
-	
-	//-------- methods --------
 	
 	/**
 	 *  Get the external access for this agent.
@@ -119,15 +139,6 @@ public abstract class MicroAgent implements IMicroAgent
 	public IComponentAdapter getAgentAdapter()
 	{
 		return interpreter.getAgentAdapter();
-	}
-	
-	/**
-	 *  Get the component service provider.
-	 *  @return The component service provider. 
-	 */
-	public IServiceProvider getServiceProvider()
-	{
-		return interpreter.getServiceProvider();
 	}
 	
 	/**

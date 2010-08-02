@@ -20,6 +20,7 @@ import jadex.commons.concurrent.CollectionResultListener;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
+import jadex.service.IServiceContainer;
 import jadex.service.IServiceProvider;
 import jadex.service.SServiceProvider;
 
@@ -71,6 +72,9 @@ public class MicroAgentInterpreter implements IComponentInstance
 	/** The execution history. */
 	protected List history;
 	
+	/** The service container. */
+	protected IServiceContainer container;
+	
 	//-------- constructors --------
 	
 	/**
@@ -78,7 +82,8 @@ public class MicroAgentInterpreter implements IComponentInstance
 	 *  @param adapter The adapter.
 	 *  @param microagent The microagent.
 	 */
-	public MicroAgentInterpreter(IComponentDescription desc, IComponentAdapterFactory factory, MicroAgentModel model, Map arguments, String config, final IExternalAccess parent)
+	public MicroAgentInterpreter(IComponentDescription desc, IComponentAdapterFactory factory, 
+		MicroAgentModel model, Map arguments, String config, final IExternalAccess parent)
 	{
 		this.model = model;
 		this.config = config;
@@ -644,7 +649,20 @@ public class MicroAgentInterpreter implements IComponentInstance
 	 */
 	public IServiceProvider getServiceProvider()
 	{
-		return adapter.getServiceContainer();
+		return getServiceContainer();
+	}
+	
+	/**
+	 *  Create the service container.
+	 *  @return The service container.
+	 */
+	public IServiceContainer getServiceContainer()
+	{
+		if(container==null)
+		{
+			container = microagent.createServiceContainer();
+		}
+		return container;
 	}
 
 	/**

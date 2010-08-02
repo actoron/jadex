@@ -116,7 +116,8 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 			}, 
 			new SubobjectInfo[]{
 			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "arguments"), new QName(uri, "argument")}), new AccessInfo(new QName(uri, "argument"), "argument")),
-			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "arguments"), new QName(uri, "result")}), new AccessInfo(new QName(uri, "result"), "result"))
+			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "arguments"), new QName(uri, "result")}), new AccessInfo(new QName(uri, "result"), "result")),
+			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "services"), new QName(uri, "container")}), new AccessInfo(new QName(uri, "container"), "container"))
 			})));
 		types.add(new TypeInfo(new XMLInfo(new QName(uri, "spacetype")), new ObjectInfo(MSpaceType.class)));
 		types.add(new TypeInfo(new XMLInfo(new QName(uri, "agenttype")), new ObjectInfo(MComponentType.class)));
@@ -172,14 +173,19 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 			new MappingInfo(null, null, "value")));
 		
 		types.add(new TypeInfo(new XMLInfo(new QName(uri, "service")), new ObjectInfo(MExpressionType.class, new ExpressionProcessor()), 
-				new MappingInfo(null, null, "value", new AttributeInfo[]{
-				new AttributeInfo(new AccessInfo("class", "className"))
-				}, null)));
+			new MappingInfo(null, null, "value", new AttributeInfo[]{
+			new AttributeInfo(new AccessInfo("class", "className"))
+			}, null)));
+		
+		types.add(new TypeInfo(new XMLInfo(new QName(uri, "container")), new ObjectInfo(MExpressionType.class, new ExpressionProcessor()), 
+			new MappingInfo(null, null, "value", new AttributeInfo[]{
+			new AttributeInfo(new AccessInfo("class", "className"))
+			}, null)));
 					
 		types.add(new TypeInfo(new XMLInfo(new QName(uri, "property")), new ObjectInfo(MExpressionType.class, new ExpressionProcessor()), 
-				new MappingInfo(null, null, "value", new AttributeInfo[]{
-				new AttributeInfo(new AccessInfo("class", "className"))
-				}, null)));
+			new MappingInfo(null, null, "value", new AttributeInfo[]{
+			new AttributeInfo(new AccessInfo("class", "className"))
+			}, null)));
 					
 		for(int i=0; mappings!=null && i<mappings.length; i++)
 		{

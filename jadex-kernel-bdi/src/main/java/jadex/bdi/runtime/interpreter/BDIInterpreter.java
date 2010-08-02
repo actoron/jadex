@@ -15,6 +15,7 @@ import jadex.bdi.runtime.IPlanbase;
 import jadex.bdi.runtime.IPropertybase;
 import jadex.bdi.runtime.impl.eaflyweights.ExternalAccessFlyweight;
 import jadex.bridge.ComponentResultListener;
+import jadex.bridge.ComponentServiceContainer;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentAdapterFactory;
@@ -47,6 +48,8 @@ import jadex.rules.rulesystem.Rulebase;
 import jadex.rules.rulesystem.rules.Rule;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.IProfiler;
+import jadex.service.CacheServiceContainer;
+import jadex.service.IServiceContainer;
 import jadex.service.IServiceProvider;
 import jadex.service.SServiceProvider;
 import jadex.service.clock.IClockService;
@@ -178,6 +181,9 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 	/** The get-external-access listeners to be notified after init. */
 	protected Set eal;
 	
+	/** The service container. */
+	protected IServiceContainer container;
+	
 	//-------- constructors --------
 	
 	/**
@@ -225,10 +231,11 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 		interpreters.put(state, this);
 		
 		// Perform init on component thread. (hack!?)
-		getAgentAdapter().invokeLater(new Runnable()
-		{
-			public void run()
-			{
+		// Cannot be done
+//		getAgentAdapter().invokeLater(new Runnable()
+//		{
+//			public void run()
+//			{
 				// Evaluate arguments if necessary
 				// Hack! use constant
 				if(arguments!=null && arguments.get("evaluation_language")!=null)
@@ -277,7 +284,8 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 				
 				// Get the services.
 				final boolean services[]	= new boolean[4];
-				SServiceProvider.getService(getServiceProvider(), IClockService.class).addResultListener(new ComponentResultListener(new DefaultResultListener()
+//				SServiceProvider.getService(getServiceProvider(), IClockService.class).addResultListener(new ComponentResultListener(new DefaultResultListener()
+				SServiceProvider.getService(getServiceProvider(), IClockService.class).addResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object source, Object result)
 					{
@@ -293,8 +301,9 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 							BDIInterpreter.this.state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state,OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_CREATING);							
 						}
 					}
-				}, getAgentAdapter()));
-				SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class).addResultListener(new ComponentResultListener(new DefaultResultListener()
+				});
+//				SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class).addResultListener(new ComponentResultListener(new DefaultResultListener()
+				SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class).addResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object source, Object result)
 					{
@@ -308,8 +317,9 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 						if(startagent)
 							BDIInterpreter.this.state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state,OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_CREATING);
 					}
-				}, getAgentAdapter()));
-				SServiceProvider.getService(getServiceProvider(), IMessageService.class).addResultListener(new ComponentResultListener(new DefaultResultListener()
+				});
+//				SServiceProvider.getService(getServiceProvider(), IMessageService.class).addResultListener(new ComponentResultListener(new DefaultResultListener()
+				SServiceProvider.getService(getServiceProvider(), IMessageService.class).addResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object source, Object result)
 					{
@@ -323,7 +333,7 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 						if(startagent)
 							BDIInterpreter.this.state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state,OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_CREATING);
 					}
-				}, getAgentAdapter()));
+				});
 
 				// Previously done in createStartAgentRule
 				Map parents = new HashMap(); 
@@ -331,7 +341,7 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 				List	futures	= AgentRules.createCapabilityInstance(state, ragent, parents);
 				
 				// Start service container.
-				futures.add(adapter.getServiceContainer().start());
+				futures.add(getServiceContainer().start());
 				
 				IResultListener	crs	= new CounterResultListener(futures.size())
 				{
@@ -374,8 +384,8 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 				// So only access logger if really necessary
 //				Logger logger = adapter.getLogger();
 //				initLogger(ragent, logger);			
-			}
-		});
+//			}
+//		});
 	}
 	
 	//-------- IKernelAgent interface --------
@@ -1262,12 +1272,40 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 		return ret;
 	}
 	
-	/** 
+	/**
 	 *  Get the service provider.
 	 */
 	public IServiceProvider getServiceProvider()
 	{
-		return adapter.getServiceContainer();
+		return getServiceContainer();
+	}
+	
+	/**
+	 *  Create the service container.
+	 *  @return The service container.
+	 */
+	public IServiceContainer getServiceContainer()
+	{
+		if(container==null)
+		{
+			Object mexp = state.getAttributeValue(model.getHandle(), OAVBDIMetaModel.agent_has_servicecontainer);
+			if(mexp!=null)
+			{
+				try
+				{
+					container = (IServiceContainer)AgentRules.evaluateExpression(state, mexp, new OAVBDIFetcher(state, ragent));
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+				}
+			}
+			else
+			{
+				container = new CacheServiceContainer(new ComponentServiceContainer(getAgentAdapter()), 25, 1*30*1000); // 30 secs cache expire
+			}
+		}
+		return container;
 	}
 	
 	/**

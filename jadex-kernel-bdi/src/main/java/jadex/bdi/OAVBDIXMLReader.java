@@ -153,7 +153,12 @@ public class OAVBDIXMLReader
 			}));
 		
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "agent")), new ObjectInfo(OAVBDIMetaModel.agent_type), 
-			new MappingInfo(ti_capability, OAVBDIMetaModel.modelelement_has_description, null)));
+			new MappingInfo(ti_capability, OAVBDIMetaModel.modelelement_has_description, null, null, new SubobjectInfo[]{
+			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "services"), new QName(uri, "container")})
+			, new AccessInfo(new QName(uri, "import"), OAVBDIMetaModel.agent_has_servicecontainer))})));
+		
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "container")), new ObjectInfo(OAVBDIMetaModel.expression_type, expost), 
+			new MappingInfo(ti_expression)));
 		
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "belief")), new ObjectInfo(OAVBDIMetaModel.belief_type, tepost), 
 			new MappingInfo(null, new AttributeInfo[]{
