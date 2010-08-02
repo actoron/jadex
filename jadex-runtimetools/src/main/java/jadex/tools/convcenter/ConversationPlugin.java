@@ -4,39 +4,36 @@ import jadex.base.fipa.SFipa;
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IEAMessageEvent;
 import jadex.bdi.runtime.IMessageEventListener;
-import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentManagementService;
-import jadex.commons.IFuture;
 import jadex.commons.Properties;
 import jadex.commons.SGUI;
-import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.service.SServiceProvider;
-import jadex.tools.common.ComponentTreeTable;
 import jadex.tools.common.GuiProperties;
-import jadex.tools.common.jtreetable.DefaultTreeTableNode;
+import jadex.tools.common.componenttree.ComponentTreeNode;
+import jadex.tools.common.componenttree.ComponentTreePanel;
+import jadex.tools.common.componenttree.IComponentTreeNode;
+import jadex.tools.common.componenttree.INodeHandler;
 import jadex.tools.common.plugin.AbstractJCCPlugin;
 import jadex.tools.jcc.AgentControlCenter;
 import jadex.tools.starter.StarterPlugin;
 
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.Icon;
+import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JSplitPane;
-import javax.swing.ListSelectionModel;
-import javax.swing.SwingUtilities;
 import javax.swing.UIDefaults;
+import javax.swing.tree.TreePath;
 
 /**
  *  The conversation plugin
@@ -58,6 +55,8 @@ public class ConversationPlugin extends AbstractJCCPlugin
 	protected static final UIDefaults icons = new UIDefaults(new Object[]
 	{
 		"conversation",	SGUI.makeIcon(ConversationPlugin.class, "/jadex/tools/common/images/new_conversation.png"),
+		"message",	SGUI.makeIcon(ConversationPlugin.class, "/jadex/tools/common/images/message_small.png"),
+		"message_overlay",	SGUI.makeIcon(ConversationPlugin.class, "/jadex/tools/common/images/overlay_message.png"),
 		"conversation_sel", SGUI.makeIcon(StarterPlugin.class, "/jadex/tools/common/images/new_conversation_sel.png"),
 		"help",	SGUI.makeIcon(ConversationPlugin.class, "/jadex/tools/common/images/help.gif"),
 	});
@@ -65,7 +64,7 @@ public class ConversationPlugin extends AbstractJCCPlugin
 	//-------- attributes --------
 	
 	/** The agent tree table. */
-	protected ComponentTreeTable agents;
+	protected ComponentTreePanel comptree;
 
 	/** The conversation center panel. */
 	protected FipaConversationPanel convcenter;
@@ -93,38 +92,39 @@ public class ConversationPlugin extends AbstractJCCPlugin
 	{
 		public void actionPerformed(ActionEvent e)
 		{
-			DefaultTreeTableNode node = (DefaultTreeTableNode)agents.getTreetable().getTree().getSelectionPath().getLastPathComponent();
-			final IComponentIdentifier	rec;
-			if(node.getUserObject() instanceof IComponentIdentifier)
+			TreePath[]	paths	= comptree.getTree().getSelectionPaths();
+			for(int i=0; paths!=null && i<paths.length; i++)
 			{
-				rec	= (IComponentIdentifier)node.getUserObject();
-			}
-			else
-			{
-				rec	= ((IComponentDescription)node.getUserObject()).getName();				
-			}
-			// Use clone, as added component id might be modified by user.
-			SServiceProvider.getServiceUpwards(jcc.getServiceContainer(), IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
-			{
-				public void customResultAvailable(Object source, Object result)
+				if(paths[i].getLastPathComponent() instanceof ComponentTreeNode)
 				{
-					IComponentManagementService cms  = (IComponentManagementService)result;
-					IComponentIdentifier receiver = cms.createComponentIdentifier(rec.getName(), false, rec.getAddresses());
-					Map	message	= convcenter.getMessagePanel().getMessage();
-					IComponentIdentifier[]	recs	= (IComponentIdentifier[])message.get(SFipa.RECEIVERS);
-					List	lrecs	= recs!=null ? new ArrayList(Arrays.asList(recs)) : new ArrayList();
-					if(lrecs.contains(receiver))
+					final ComponentTreeNode node = (ComponentTreeNode)paths[i].getLastPathComponent();
+					final IComponentIdentifier rec = node.getDescription().getName();
+					// Use clone, as added component id might be modified by user.
+					SServiceProvider.getServiceUpwards(jcc.getServiceContainer(), IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
 					{
-						lrecs.remove(receiver);
-					}
-					else
-					{
-						lrecs.add(receiver);
-					}
-					message.put(SFipa.RECEIVERS, (IComponentIdentifier[])lrecs.toArray(new IComponentIdentifier[lrecs.size()]));					
-					convcenter.getMessagePanel().setMessage(message);
+						public void customResultAvailable(Object source, Object result)
+						{
+							IComponentManagementService cms  = (IComponentManagementService)result;
+							IComponentIdentifier receiver = cms.createComponentIdentifier(rec.getName(), false, rec.getAddresses());
+							Map	message	= convcenter.getMessagePanel().getMessage();
+							IComponentIdentifier[]	recs	= (IComponentIdentifier[])message.get(SFipa.RECEIVERS);
+							List	lrecs	= recs!=null ? new ArrayList(Arrays.asList(recs)) : new ArrayList();
+							if(lrecs.contains(receiver))
+							{
+								lrecs.remove(receiver);
+							}
+							else
+							{
+								lrecs.add(receiver);
+							}
+							message.put(SFipa.RECEIVERS, (IComponentIdentifier[])lrecs.toArray(new IComponentIdentifier[lrecs.size()]));					
+							convcenter.getMessagePanel().setMessage(message);
+							
+							comptree.getModel().fireNodeChanged(node);
+						}
+					});
 				}
-			});
+			}
 		}
 	};
 	
@@ -137,79 +137,69 @@ public class ConversationPlugin extends AbstractJCCPlugin
 		JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true);
 		split.setOneTouchExpandable(true);
 
-		agents = new ComponentTreeTable(((AgentControlCenter)getJCC()).getAgent());
-		agents.setMinimumSize(new Dimension(0, 0));
-		split.add(agents);
-		agents.getTreetable().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		agents.getNodeType(ComponentTreeTable.NODE_COMPONENT).addPopupAction(SEND_MESSAGE);
+		comptree = new ComponentTreePanel(getJCC().getServiceContainer());
+		comptree.setMinimumSize(new Dimension(0, 0));
+		split.add(comptree);
+		comptree.addNodeHandler(new INodeHandler()
+		{
+			public Action[] getPopupActions(IComponentTreeNode[] nodes)
+			{
+				Action[]	ret	= null;
+				
+				boolean	allcomp	= true;
+				for(int i=0; allcomp && i<nodes.length; i++)
+				{
+					allcomp	= nodes[i] instanceof ComponentTreeNode;
+				}
+				
+				if(allcomp)
+				{
+					Action	a	= new AbstractAction((String)SEND_MESSAGE.getValue(Action.NAME), icons.getIcon("message"))
+					{
+						public void actionPerformed(ActionEvent e)
+						{
+							SEND_MESSAGE.actionPerformed(e);
+						}
+					};
+					ret	= new Action[]{a};
+				}
+				
+				return ret;
+			}
+			
+			public Icon getOverlay(IComponentTreeNode node)
+			{
+				Icon	ret	= null;
+				if(node instanceof ComponentTreeNode)
+				{
+					IComponentIdentifier	id	= ((ComponentTreeNode)node).getDescription().getName();
+					Map	message	= convcenter.getMessagePanel().getMessage();
+					IComponentIdentifier[]	recs	= (IComponentIdentifier[])message.get(SFipa.RECEIVERS);
+					if(recs!=null && Arrays.asList(recs).contains(id))
+					{
+						ret	= icons.getIcon("message_overlay");
+					}
+				}
+				return ret;
+			}
+			
+			public Action getDefaultAction(IComponentTreeNode node)
+			{
+				Action	a	= null;
+				if(node instanceof ComponentTreeNode)
+				{
+					a	= SEND_MESSAGE;
+				}
+				return a;
+			}
+		});
 
 		split.add(convcenter = new FipaConversationPanel(((AgentControlCenter)getJCC()).getAgent()));
 
 		GuiProperties.setupHelp(split, "tools.conversationcenter");
 
-		agents.getTreetable().getSelectionModel().setSelectionInterval(0, 0);
 		split.setDividerLocation(150);
 
-		agents.getTreetable().addMouseListener(new MouseAdapter()
-		{
-			public void mouseClicked(MouseEvent e)
-			{
-				if(e.getClickCount()==2)
-				{
-					SEND_MESSAGE.actionPerformed(null);
-				}
-			}
-		});
-
-		SServiceProvider.getServiceUpwards(jcc.getServiceContainer(), IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
-		{
-			public void customResultAvailable(Object source, Object result)
-			{
-				IComponentManagementService cms = (IComponentManagementService)result;
-				IFuture ret = cms.getComponentDescriptions();
-				ret.addResultListener(new IResultListener()
-				{
-					public void resultAvailable(Object source, Object result)
-					{
-						IComponentDescription[] res = (IComponentDescription[])result;
-						for(int i=0; i<res.length; i++)
-							agentBorn(res[i]);
-					}
-					
-					public void exceptionOccurred(Object source, Exception exception)
-					{
-					}
-				});
-				
-				cms.addComponentListener(null, new IComponentListener()
-				{
-					public void componentRemoved(IComponentDescription desc, java.util.Map results)
-					{
-						agentDied(desc);
-					}
-					
-					public void componentAdded(IComponentDescription desc)
-					{
-						agentBorn(desc);
-					}
-
-					public void componentChanged(IComponentDescription desc)
-					{
-					}
-				});
-			}
-		});
-		
-//		SwingUtilities.invokeLater(new Runnable()
-//		{
-//			public void run()
-//			{
-//				agents.adjustColumnWidths();
-//			}
-//		});
-		
-//		jcc.addMessageListener(this);
-		
 		final IMessageEventListener lis = new IMessageEventListener()
 		{
 			public void messageEventSent(AgentEvent ae)
@@ -251,6 +241,21 @@ public class ConversationPlugin extends AbstractJCCPlugin
 			}
 		});
 	}
+	
+	/**
+	 *  The actions.
+	 */
+	public JComponent[] createToolBar()
+	{
+		List components = new ArrayList();
+		JButton	b = new JButton(SEND_MESSAGE);
+		b.setBorder(null);
+		b.setToolTipText(b.getText());
+		b.setText(null);
+		b.setEnabled(true);
+		components.add(b);
+		return (JComponent[])components.toArray((new JComponent[components.size()]));
+	}
 
 	/**
 	 *  Set properties loaded from project.
@@ -260,9 +265,6 @@ public class ConversationPlugin extends AbstractJCCPlugin
 		Properties ps = props.getSubproperty("convcenter");
 		if(ps!=null)
 			convcenter.setProperties(ps);
-		ps = props.getSubproperty("agents");
-		if(ps!=null)
-			agents.setProperties(ps);
 	}
 
 	/**
@@ -272,54 +274,7 @@ public class ConversationPlugin extends AbstractJCCPlugin
 	{
 		Properties props = new Properties();
 		addSubproperties(props, "convcenter", convcenter.getProperties());
-		addSubproperties(props, "agents", agents.getProperties());
 		return props;
-	}
-
-	/**
-	 * @param ad
-	 */
-	public void agentDied(final IComponentDescription ad)
-	{
-		// Update components on awt thread.
-		SwingUtilities.invokeLater(new Runnable()
-		{
-			public void run()
-			{
-				agents.removeComponent(ad);
-			}
-		});
-	}
-
-	/**
-	 * @param ad
-	 */
-	public void agentBorn(final IComponentDescription ad)
-	{
-		// Update components on awt thread.
-		SwingUtilities.invokeLater(new Runnable()
-		{
-			public void run()
-			{
-				agents.addComponent(ad);
-			}
-		});
-	}
-	
-	/**
-	 * @param ad
-	 */
-	public void agentChanged(final IComponentDescription ad)
-	{
-		// nop?
-		// Update components on awt thread.
-		/*SwingUtilities.invokeLater(new Runnable()
-		{
-			public void run()
-			{
-				agents.addAgent(ad);
-			}
-		});*/
 	}
 
 	/** 

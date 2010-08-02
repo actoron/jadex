@@ -239,9 +239,9 @@ public class ComponentTreeModel implements TreeModel
 	}
 	
 	/**
-	 *  Add an icon overlay.
+	 *  Add a node handler.
 	 */
-	public void	addOverlay(INodeHandler overlay)
+	public void	addNodeHandler(INodeHandler overlay)
 	{
 		this.overlays.add(overlay);
 	}

@@ -18,4 +18,9 @@ public interface INodeHandler
 	 *  Get the popup actions available for all of the given nodes, if any.
 	 */
 	public Action[]	getPopupActions(IComponentTreeNode[] nodes);
+
+	/**
+	 *  Get the default action to be performed after a double click.
+	 */
+	public Action	getDefaultAction(IComponentTreeNode node);
 }

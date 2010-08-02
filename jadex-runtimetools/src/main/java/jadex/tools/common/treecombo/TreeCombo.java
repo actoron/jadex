@@ -29,10 +29,10 @@ import java.util.Enumeration;
 public class TreeCombo extends JComboBox {
     static final int OFFSET = 16;
 
-    public TreeCombo(TreeModel aTreeModel) {
+    public TreeCombo(JTree tree) {
         super();
-        setModel(new TreeToListModel(aTreeModel));
-        setRenderer(new ListEntryRenderer());
+        setModel(new TreeToListModel(tree));
+        setRenderer(new ListEntryRenderer(tree));
     }
 
     class TreeToListModel extends AbstractListModel implements 
@@ -42,10 +42,10 @@ ComboBoxModel,TreeModelListener {
         Object currentValue;
         Vector cache = new Vector();
 
-        public TreeToListModel(TreeModel aTreeModel) {
-            source = aTreeModel;
-            aTreeModel.addTreeModelListener(this);
-            setRenderer(new ListEntryRenderer());
+        public TreeToListModel(JTree tree) {
+            source = tree.getModel();
+            source.addTreeModelListener(this);
+            setRenderer(new ListEntryRenderer(tree));
         }
 
         public void setSelectedItem(Object anObject) {
@@ -162,9 +162,11 @@ ComboBoxModel,TreeModelListener {
 );//SwingSet.sharedInstance().loadImageIcon("images/document.gif","Document");
         Icon nodeIcon = (Icon)UIManager.get( "Tree.collapsedIcon" 
 );//SwingSet.sharedInstance().loadImageIcon("images/folder.gif","Folder");
+        JTree	tree;
 
-        public ListEntryRenderer() {
+        public ListEntryRenderer(JTree tree) {
             this.setOpaque(true);
+            this.tree	= tree;
         }
 
         public Component getListCellRendererComponent(
@@ -174,157 +176,160 @@ ComboBoxModel,TreeModelListener {
             boolean isSelected,
             boolean cellHasFocus)
         {
+        	JComponent	ret;
             ListEntry listEntry = (ListEntry)value;
             if(listEntry != null) {
+            	ret	= (JComponent)tree.getCellRenderer().getTreeCellRendererComponent(tree, listEntry.object(), isSelected, true, !listEntry.isNode(), index, cellHasFocus);
                 Border border;
-                setText(listEntry.object().toString());
-                setIcon( listEntry.isNode() ? nodeIcon : leafIcon );
+//                setText(listEntry.object().toString());
+//                setIcon( listEntry.isNode() ? nodeIcon : leafIcon );
                 if(index != -1)
                     border = new EmptyBorder(0, OFFSET * listEntry.level(), 0, 0);
                 else 
                     border = emptyBorder;
-
-                if(UIManager.getLookAndFeel().getName().equals("CDE/Motif")) {
-                    if(index == -1 )
-                        this.setOpaque(false);
-                    else
-                        this.setOpaque(true);
-                } else 
-                    this.setOpaque(true);
-                
-                this.setBorder(border); 
-                if (isSelected) {
-                    
-this.setBackground(UIManager.getColor("ComboBox.selectionBackground"));
-                    
-this.setForeground(UIManager.getColor("ComboBox.selectionForeground"));
-                } else {
-                    this.setBackground(UIManager.getColor("ComboBox.background"));
-                    this.setForeground(UIManager.getColor("ComboBox.foreground"));
-                }
+//
+//                if(UIManager.getLookAndFeel().getName().equals("CDE/Motif")) {
+//                    if(index == -1 )
+//                        this.setOpaque(false);
+//                    else
+//                        this.setOpaque(true);
+//                } else 
+//                    this.setOpaque(true);
+//                
+                ret.setBorder(border); 
+//                if (isSelected) {
+//                    
+//this.setBackground(UIManager.getColor("ComboBox.selectionBackground"));
+//                    
+//this.setForeground(UIManager.getColor("ComboBox.selectionForeground"));
+//                } else {
+//                    this.setBackground(UIManager.getColor("ComboBox.background"));
+//                    this.setForeground(UIManager.getColor("ComboBox.foreground"));
+//                }
             } else {
                 setText("");
+                ret	= this;
             }
-            return this;
+            return ret;
         }
     }
     
-    public static void main(String[] args)
-	{
-		SwingUtilities.invokeLater(new Runnable()
-		{
-			public void run()
-			{
-				TreeCombo	tc	= new TreeCombo(new TreeModel()
-				{
-					// a
-					// +-b
-					// | +-c
-					// | | +-f
-					// | +-d
-					// +-e
-					public void addTreeModelListener(TreeModelListener l)
-					{
-						// TODO Auto-generated method stub
-						
-					}
-					public Object getChild(Object parent, int index)
-					{
-						Object ret	= null;
-						if(parent.equals("a") && index==0)
-						{
-							ret	= "b";
-						}
-						else if(parent.equals("b") && index==0)
-						{
-							ret	= "c";
-						}
-						else if(parent.equals("b") && index==1)
-						{
-							ret	= "d";
-						}
-						else if(parent.equals("a") && index==1)
-						{
-							ret	= "e";
-						}
-						else if(parent.equals("c") && index==0)
-						{
-							ret	= "f";
-						}
-						return ret;
-					}
-					public int getChildCount(Object parent)
-					{
-						int ret	= 0;
-						if(parent.equals("a"))
-						{
-							ret	= 2;
-						}
-						else if(parent.equals("b"))
-						{
-							ret	= 2;
-						}
-						else if(parent.equals("c"))
-						{
-							ret	= 1;
-						}
-						return ret;
-					}
-					public int getIndexOfChild(Object parent, Object child)
-					{
-						int ret	= -1;
-						if(parent.equals("a") && child.equals("b"))
-						{
-							ret	= 0;
-						}
-						else if(parent.equals("b") && child.equals("c"))
-						{
-							ret	= 0;
-						}
-						else if(parent.equals("b") && child.equals("d"))
-						{
-							ret	= 1;
-						}
-						else if(parent.equals("a") && child.equals("e"))
-						{
-							ret	= 1;
-						}
-						else if(parent.equals("c") && child.equals("f"))
-						{
-							ret	= 0;
-						}
-						return ret;
-					}
-					public Object getRoot()
-					{
-						return "a";
-					}
-					public boolean isLeaf(Object node)
-					{
-						return node.equals("f") || node.equals("d") || node.equals("e");
-					}
-					public void removeTreeModelListener(TreeModelListener l)
-					{
-						// TODO Auto-generated method stub
-						
-					}
-					public void valueForPathChanged(TreePath path,
-							Object newValue)
-					{
-						// TODO Auto-generated method stub
-						
-					}
-				});
-				
-				tc.setPreferredSize(new Dimension(300, tc.getPreferredSize().height));
-				
-				JFrame	f	= new JFrame("Tree Combo test");
-				f.getContentPane().setLayout(new FlowLayout());
-				f.getContentPane().add(tc, BorderLayout.CENTER);
-				f.setSize(400, 300);
-				f.setLocation(SGUI.calculateMiddlePosition(f));
-				f.setVisible(true);
-			}
-		});
-	}
+//    public static void main(String[] args)
+//	{
+//		SwingUtilities.invokeLater(new Runnable()
+//		{
+//			public void run()
+//			{
+//				TreeCombo	tc	= new TreeCombo(new TreeModel()
+//				{
+//					// a
+//					// +-b
+//					// | +-c
+//					// | | +-f
+//					// | +-d
+//					// +-e
+//					public void addTreeModelListener(TreeModelListener l)
+//					{
+//						// TODO Auto-generated method stub
+//						
+//					}
+//					public Object getChild(Object parent, int index)
+//					{
+//						Object ret	= null;
+//						if(parent.equals("a") && index==0)
+//						{
+//							ret	= "b";
+//						}
+//						else if(parent.equals("b") && index==0)
+//						{
+//							ret	= "c";
+//						}
+//						else if(parent.equals("b") && index==1)
+//						{
+//							ret	= "d";
+//						}
+//						else if(parent.equals("a") && index==1)
+//						{
+//							ret	= "e";
+//						}
+//						else if(parent.equals("c") && index==0)
+//						{
+//							ret	= "f";
+//						}
+//						return ret;
+//					}
+//					public int getChildCount(Object parent)
+//					{
+//						int ret	= 0;
+//						if(parent.equals("a"))
+//						{
+//							ret	= 2;
+//						}
+//						else if(parent.equals("b"))
+//						{
+//							ret	= 2;
+//						}
+//						else if(parent.equals("c"))
+//						{
+//							ret	= 1;
+//						}
+//						return ret;
+//					}
+//					public int getIndexOfChild(Object parent, Object child)
+//					{
+//						int ret	= -1;
+//						if(parent.equals("a") && child.equals("b"))
+//						{
+//							ret	= 0;
+//						}
+//						else if(parent.equals("b") && child.equals("c"))
+//						{
+//							ret	= 0;
+//						}
+//						else if(parent.equals("b") && child.equals("d"))
+//						{
+//							ret	= 1;
+//						}
+//						else if(parent.equals("a") && child.equals("e"))
+//						{
+//							ret	= 1;
+//						}
+//						else if(parent.equals("c") && child.equals("f"))
+//						{
+//							ret	= 0;
+//						}
+//						return ret;
+//					}
+//					public Object getRoot()
+//					{
+//						return "a";
+//					}
+//					public boolean isLeaf(Object node)
+//					{
+//						return node.equals("f") || node.equals("d") || node.equals("e");
+//					}
+//					public void removeTreeModelListener(TreeModelListener l)
+//					{
+//						// TODO Auto-generated method stub
+//						
+//					}
+//					public void valueForPathChanged(TreePath path,
+//							Object newValue)
+//					{
+//						// TODO Auto-generated method stub
+//						
+//					}
+//				});
+//				
+//				tc.setPreferredSize(new Dimension(300, tc.getPreferredSize().height));
+//				
+//				JFrame	f	= new JFrame("Tree Combo test");
+//				f.getContentPane().setLayout(new FlowLayout());
+//				f.getContentPane().add(tc, BorderLayout.CENTER);
+//				f.setSize(400, 300);
+//				f.setLocation(SGUI.calculateMiddlePosition(f));
+//				f.setVisible(true);
+//			}
+//		});
+//	}
 }

@@ -23,21 +23,17 @@ import jadex.tools.comanalyzer.chart.ChartPanel;
 import jadex.tools.comanalyzer.diagram.DiagramPanel;
 import jadex.tools.comanalyzer.graph.GraphPanel;
 import jadex.tools.comanalyzer.table.TablePanel;
-import jadex.tools.common.CombiIcon;
-import jadex.tools.common.ComponentTreeTable;
-import jadex.tools.common.ComponentTreeTableNodeType;
 import jadex.tools.common.GuiProperties;
-import jadex.tools.common.jtreetable.DefaultTreeTableNode;
+import jadex.tools.common.componenttree.ComponentTreeNode;
+import jadex.tools.common.componenttree.ComponentTreePanel;
+import jadex.tools.common.componenttree.IComponentTreeNode;
+import jadex.tools.common.componenttree.INodeHandler;
 import jadex.tools.common.plugin.AbstractJCCPlugin;
-import jadex.tools.jcc.AgentControlCenter;
 import jadex.xml.bean.JavaReader;
 import jadex.xml.bean.JavaWriter;
 
-import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -67,7 +63,6 @@ import javax.swing.JMenuItem;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JSplitPane;
 import javax.swing.JToolBar;
-import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.UIDefaults;
 import javax.swing.tree.TreePath;
@@ -94,6 +89,8 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 	{
 		"comanalyzer", SGUI.makeIcon(ComanalyzerPlugin.class, COMANALYZER_IMAGES + "new_comanalyzer.png"),
 		"comanalyzer_sel", SGUI.makeIcon(ComanalyzerPlugin.class, COMANALYZER_IMAGES + "new_comanalyzer_sel.png"),
+		"start_observing", SGUI.makeIcon(ComanalyzerPlugin.class, COMANALYZER_IMAGES + "start_observing.png"),
+		"stop_observing", SGUI.makeIcon(ComanalyzerPlugin.class, COMANALYZER_IMAGES + "stop_observing.png"),
 		"introspect_agent", SGUI.makeIcon(ComanalyzerPlugin.class, COMANALYZER_IMAGES + "new_comanalyzer.png"),
 		"close_comanalyzer", SGUI.makeIcon(ComanalyzerPlugin.class, COMANALYZER_IMAGES + "close_comanalyzer.png"),
 		"agent_introspected", SGUI.makeIcon(ComanalyzerPlugin.class, COMANALYZER_IMAGES + "overlay_introspected.png"),
@@ -134,7 +131,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 	protected JSplitPane split;
 
 	/** The agent tree table. */
-	protected ComponentTreeTable agents;
+	protected ComponentTreePanel comptree;
 
 	/** The checkbox items for selecting default values. */
 	protected JCheckBoxMenuItem[] checkboxes;
@@ -227,9 +224,6 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 //			System.out.println(""+checkboxes[i].getText()+" "+checkboxes[i].isSelected());
 			props.addProperty(new Property(checkboxes[i].getText(), ""+checkboxes[i].isSelected()));
 		}
-		
-		addSubproperties(props, "agents", agents.getProperties());
-
 		return props;
 	}
 	
@@ -272,10 +266,6 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 				selected = true;
 			}
 		}
-		
-		Properties ps = props.getSubproperty("agents");
-		if(ps!=null)
-			agents.setProperties(ps);
 	}
 
 	/**
@@ -405,46 +395,97 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 		split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true);
 		split.setOneTouchExpandable(true);
 
-		agents = new ComponentTreeTable(((AgentControlCenter)getJCC()).getAgent());
-		agents.setMinimumSize(new Dimension(0, 0));
-		split.add(agents);
-		agents.getTreetable().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-
-		// Change agent node type to enable introspected icon for agents.
-		agents.addNodeType(new ComponentTreeTableNodeType(getJCC().getServiceContainer())
+		comptree = new ComponentTreePanel(getJCC().getServiceContainer());
+		comptree.setMinimumSize(new Dimension(0, 0));
+		split.add(comptree);
+		
+		comptree.addNodeHandler(new INodeHandler()
 		{
-			public Icon selectIcon(Object value)
+			public Icon getOverlay(IComponentTreeNode node)
 			{
-				Icon ret	= super.selectIcon(value);
-				IComponentDescription ad = (IComponentDescription)((DefaultTreeTableNode)value).getUserObject();
-				Component agent = componentlist.getAgent(ad.getName());
-
-				Icon	overlay	= null;
-				if(agent.getState().equals(Component.STATE_OBSERVED))
+				Icon	ret	= null;
+				if(node instanceof ComponentTreeNode)
 				{
-					overlay = ComanalyzerPlugin.icons.getIcon("agent_introspected");
+					IComponentDescription ad = ((ComponentTreeNode)node).getDescription();
+					Component agent = componentlist.getAgent(ad.getName());
+					if(agent.getState().equals(Component.STATE_OBSERVED))
+					{
+						ret	= ComanalyzerPlugin.icons.getIcon("agent_introspected");
+					}
 				}
-				else if(agent.getState().equals(Component.STATE_DEAD))
-				{
-					overlay = ComanalyzerPlugin.icons.getIcon("agent_dead");
-				}
-				else if(agent.getState().equals(Component.STATE_DUMMY))
-				{
-					overlay = ComanalyzerPlugin.icons.getIcon("agent_dummy");
-				}
-				// else agent.getState().equals(Agent.STATE_IGNORED) -> normal icon.
-				
-				if(overlay!=null)
-				{
-					ret	= new CombiIcon(new Icon[]{ret, overlay});
-				}
-
 				return ret;
 			}
+			
+			public Action[] getPopupActions(IComponentTreeNode[] nodes)
+			{
+				Action[]	ret	= null;
+				
+				boolean	allcomp	= true;
+				for(int i=0; allcomp && i<nodes.length; i++)
+				{
+					allcomp	= nodes[i] instanceof ComponentTreeNode;
+				}
+				
+				if(allcomp)
+				{
+					boolean	allob	= true;
+					for(int i=0; allob && i<nodes.length; i++)
+					{
+						allob	= componentlist.getAgent(((ComponentTreeNode)nodes[i]).getDescription().getName()).getState().equals(Component.STATE_OBSERVED);
+					}
+					boolean	allig	= true;
+					for(int i=0; allig && i<nodes.length; i++)
+					{
+						allig	= componentlist.getAgent(((ComponentTreeNode)nodes[i]).getDescription().getName()).getState().equals(Component.STATE_IGNORED);
+					}
+					
+					// Todo: Large icons for popup actions?
+					if(allig)
+					{
+						Action	a	= new AbstractAction((String)START_OBSERVING.getValue(Action.NAME), icons.getIcon("start_observing"))
+						{
+							public void actionPerformed(ActionEvent e)
+							{
+								START_OBSERVING.actionPerformed(e);
+							}
+						};
+						ret	= new Action[]{a};
+					}
+					else if(allob)
+					{
+						Action	a	= new AbstractAction((String)STOP_OBSERVING.getValue(Action.NAME), icons.getIcon("stop_observing"))
+						{
+							public void actionPerformed(ActionEvent e)
+							{
+								STOP_OBSERVING.actionPerformed(e);
+							}
+						};
+						ret	= new Action[]{a};
+					}
+				}
+				
+				return ret;
+			}
+			
+			public Action getDefaultAction(IComponentTreeNode node)
+			{
+				Action	a	= null;
+				if(node instanceof ComponentTreeNode)
+				{
+					String	state	= componentlist.getAgent(((ComponentTreeNode)node).getDescription().getName()).getState();
+					if(state.equals(Component.STATE_OBSERVED))
+					{
+						a	= STOP_OBSERVING;
+					}
+					else if(state.equals(Component.STATE_IGNORED))
+					{
+						a	= START_OBSERVING;
+					}
+				}
+				return a;
+			}
 		});
-		agents.getNodeType(ComponentTreeTable.NODE_COMPONENT).addPopupAction(START_OBSERVING);
-		agents.getNodeType(ComponentTreeTable.NODE_COMPONENT).addPopupAction(STOP_OBSERVING);
-		agents.getTreetable().getSelectionModel().setSelectionInterval(0, 0);
+
 		split.setDividerLocation(150);
 
 		// create the tools
@@ -465,20 +506,20 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 		GuiProperties.setupHelp(tpanel, "tools.comanalyzer");
 		split.add(tpanel);
 
-		agents.getTreetable().addMouseListener(new MouseAdapter()
-		{
-			public void mouseClicked(MouseEvent e)
-			{
-				if(e.getClickCount() == 2)
-				{
-					if(START_OBSERVING.isEnabled())
-						START_OBSERVING.actionPerformed(null);
-					else if(STOP_OBSERVING.isEnabled())
-						STOP_OBSERVING.actionPerformed(null);
-				}
-
-			}
-		});
+//		agents.getTreetable().addMouseListener(new MouseAdapter()
+//		{
+//			public void mouseClicked(MouseEvent e)
+//			{
+//				if(e.getClickCount() == 2)
+//				{
+//					if(START_OBSERVING.isEnabled())
+//						START_OBSERVING.actionPerformed(null);
+//					else if(STOP_OBSERVING.isEnabled())
+//						STOP_OBSERVING.actionPerformed(null);
+//				}
+//
+//			}
+//		});
 
 //		jcc.addAgentListListener(this);
 		
@@ -570,8 +611,6 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 				Component agent = (Component)componentlist.getAgent(ad.getName());
 				agent.setState(Component.STATE_DEAD);
 				applyAgentFilter(agent);
-				// update agenttree
-				agents.updateComponent(ad);
 			}
 		});
 	}
@@ -604,13 +643,11 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 				if(updateAgent)
 				{
 					applyAgentFilter(agent);
-					agents.updateComponent(ad);
 				}
 				else
 				{
 					applyAgentFilter(agent);
 					componentlist.addAgent(agent);
-					agents.addComponent(ad);
 				}
 			}
 		});
@@ -1083,7 +1120,6 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 			sender.addMessage(message);
 			sender.applyFilter(agentfilter, true);
 			componentlist.addAgent(sender);
-			agents.addComponent(sender.getDescription());
 		}
 		else
 		{
@@ -1103,7 +1139,6 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 			receiver.addMessage(message);
 			receiver.applyFilter(agentfilter, true);
 			componentlist.addAgent(receiver);
-			agents.addComponent(sender.getDescription());
 		}
 		else
 		{
@@ -1210,7 +1245,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 					agents[i].setState(Component.STATE_IGNORED);
 					update.add(agents[i]);
 					observed.remove(agents[i].getDescription().getName());
-					ComanalyzerPlugin.this.agents.updateComponent(agents[i].getDescription());
+					comptree.getModel().fireNodeChanged(comptree.getModel().getNode(agents[i].getDescription().getName()));
 				}
 			}
 
@@ -1232,7 +1267,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 					agents[i].setState(Component.STATE_OBSERVED);
 					update.add(agents[i]);
 					observed.add(agents[i].getDescription().getName());
-					ComanalyzerPlugin.this.agents.updateComponent(agents[i].getDescription());
+					comptree.getModel().fireNodeChanged(comptree.getModel().getNode(agents[i].getDescription().getName()));
 				}
 			}
 //			applyAgentFilter((Agent[])update.toArray(new Agent[update.size()]));
@@ -1265,8 +1300,6 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 					messagelist.fireMessagesRemoved((Message[])agents[i].getMessages().toArray(new Message[0]));
 					// remove dead agent from agentlist
 					componentlist.removeAgent(agents[i]);
-					// remove dead agent from agentree
-					ComanalyzerPlugin.this.agents.removeComponent(agents[i].getDescription());
 				}
 			}
 		}
@@ -1305,11 +1338,10 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 			for(int i = 0; i < agents.length; i++)
 			{
 				agents[i].removeAllMessages();
-				// remove dead agents from agentlist and agentree
+				// remove dead agents from agentlist
 				if(agents[i].getState().equals(Component.STATE_DEAD))
 				{
 					componentlist.removeAgent(agents[i]);
-					ComanalyzerPlugin.this.agents.removeComponent(agents[i].getDescription());
 				}
 			}
 		}
@@ -1352,102 +1384,46 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 	};
 
 	/** Start observing an agent */
-	final AbstractAction START_OBSERVING = new AbstractAction("Observe Agent", icons.getIcon("introspect_agent"))
+	final AbstractAction START_OBSERVING = new AbstractAction("Observe Component", icons.getIcon("introspect_agent"))
 	{
 		public void actionPerformed(ActionEvent e)
 		{
-			if(!isEnabled())
-				return;
-			split.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-			DefaultTreeTableNode node = (DefaultTreeTableNode)agents.getTreetable().getTree().getSelectionPath().getLastPathComponent();
-			final IComponentDescription desc = (IComponentDescription)node.getUserObject();
-			observed.add(desc.getName());
-//			addAgentListener(desc);
-			split.setCursor(Cursor.getDefaultCursor());
-
-//			SwingUtilities.invokeLater(new Runnable()
-//			{
-//				public void run()
-//				{
-					split.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-
+			TreePath[]	paths	= comptree.getTree().getSelectionPaths();
+			for(int i=0; paths!=null && i<paths.length; i++)
+			{
+				if(paths[i].getLastPathComponent() instanceof ComponentTreeNode)
+				{
+					ComponentTreeNode node = (ComponentTreeNode)paths[i].getLastPathComponent();
+					IComponentDescription desc = node.getDescription();
+					observed.add(desc.getName());
 					Component agent = componentlist.getAgent(desc.getName());
 					agent.setState(Component.STATE_OBSERVED);
 					applyAgentFilter(agent);
-
-					agents.updateComponent(desc);
-
-					split.setCursor(Cursor.getDefaultCursor());
-//				}
-//			});
-
-		}
-
-		public boolean isEnabled()
-		{
-			boolean ret = false;
-			TreePath path = agents.getTreetable().getTree().getSelectionPath();
-			if(path != null)
-			{
-				DefaultTreeTableNode node = (DefaultTreeTableNode)path.getLastPathComponent();
-				if(node != null && node.getUserObject() instanceof IComponentDescription)
-				{
-					IComponentDescription desc = (IComponentDescription)node.getUserObject();
-					Component agent = componentlist.getAgent(desc.getName());
-					ret = agent.getState().equals(Component.STATE_IGNORED);
+					comptree.getModel().fireNodeChanged(comptree.getModel().getNode(desc.getName()));
 				}
 			}
-			return ret;
 		}
 	};
 
 	/** Stop observing an agent */
-	final AbstractAction STOP_OBSERVING = new AbstractAction("Ignore Agent", icons.getIcon("close_comanalyzer"))
+	final AbstractAction STOP_OBSERVING = new AbstractAction("Ignore Component", icons.getIcon("close_comanalyzer"))
 	{
 		public void actionPerformed(ActionEvent e)
 		{
-			if(!isEnabled())
-				return;
-			split.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-			DefaultTreeTableNode node = (DefaultTreeTableNode)agents.getTreetable().getTree().getSelectionPath().getLastPathComponent();
-			final IComponentDescription desc = (IComponentDescription)node.getUserObject();
-//			removeAgentListener(desc, true);
-			observed.remove(desc.getName());
-			split.setCursor(Cursor.getDefaultCursor());
-
-			SwingUtilities.invokeLater(new Runnable()
+			TreePath[]	paths	= comptree.getTree().getSelectionPaths();
+			for(int i=0; paths!=null && i<paths.length; i++)
 			{
-				public void run()
+				if(paths[i].getLastPathComponent() instanceof ComponentTreeNode)
 				{
-					split.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-
+					ComponentTreeNode node = (ComponentTreeNode)paths[i].getLastPathComponent();
+					IComponentDescription desc = node.getDescription();
+					observed.remove(desc.getName());
 					Component agent = componentlist.getAgent(desc.getName());
 					agent.setState(Component.STATE_IGNORED);
 					applyAgentFilter(agent);
-
-					agents.updateComponent(desc);
-
-					split.setCursor(Cursor.getDefaultCursor());
-				}
-			});
-
-		}
-
-		public boolean isEnabled()
-		{
-			boolean ret = false;
-			TreePath path = agents.getTreetable().getTree().getSelectionPath();
-			if(path != null)
-			{
-				DefaultTreeTableNode node = (DefaultTreeTableNode)path.getLastPathComponent();
-				if(node != null && node.getUserObject() instanceof IComponentDescription)
-				{
-					IComponentDescription desc = (IComponentDescription)node.getUserObject();
-					Component agent = componentlist.getAgent(desc.getName());
-					ret = agent.getState().equals(Component.STATE_OBSERVED);
+					comptree.getModel().fireNodeChanged(comptree.getModel().getNode(desc.getName()));
 				}
 			}
-			return ret;
 		}
 	};
 

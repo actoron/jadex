@@ -8,7 +8,6 @@ import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.ILoadableComponentModel;
-import jadex.commons.IFuture;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SGUI;
@@ -17,12 +16,9 @@ import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.service.SServiceProvider;
-import jadex.tools.common.CombiIcon;
-import jadex.tools.common.ComponentTreeTable;
-import jadex.tools.common.ComponentTreeTableNodeType;
 import jadex.tools.common.IMenuItemConstructor;
 import jadex.tools.common.PopupBuilder;
-import jadex.tools.common.jtreetable.DefaultTreeTableNode;
+import jadex.tools.common.componenttree.ComponentTreePanel;
 import jadex.tools.common.modeltree.FileNode;
 import jadex.tools.common.modeltree.IExplorerTreeNode;
 import jadex.tools.common.modeltree.ModelExplorer;
@@ -51,12 +47,10 @@ import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JSplitPane;
 import javax.swing.JToolBar;
-import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.UIDefaults;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
-import javax.swing.tree.TreePath;
 
 /**
  *  The starter plugin.
@@ -70,14 +64,10 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 	 */
 	protected static final UIDefaults icons = new UIDefaults(new Object[]
 	{
-		"resume_component", SGUI.makeIcon(StarterPlugin.class, "/jadex/tools/common/images/new_agent_big.png"),
-		"suspend_component", SGUI.makeIcon(StarterPlugin.class, "/jadex/tools/common/images/new_agent_szzz_big.png"),
-		"kill_component", SGUI.makeIcon(StarterPlugin.class, "/jadex/tools/common/images/new_killagent.png"),
 		"kill_platform", SGUI.makeIcon(StarterPlugin.class, "/jadex/tools/common/images/new_killplatform.png"),
 		"starter", SGUI.makeIcon(StarterPlugin.class, "/jadex/tools/common/images/new_starter.png"),
 		"starter_sel", SGUI.makeIcon(StarterPlugin.class, "/jadex/tools/common/images/new_starter_sel.png"),
 		"start_component",	SGUI.makeIcon(StarterPlugin.class, "/jadex/tools/common/images/start.png"),
-		"component_suspended", SGUI.makeIcon(StarterPlugin.class, "/jadex/tools/common/images/overlay_szzz.png"),
 		"checking_menu",	SGUI.makeIcon(StarterPlugin.class, "/jadex/tools/common/images/new_agent_broken.png")
 	});
 
@@ -93,7 +83,7 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 	private JCheckBoxMenuItem	checkingmenu;
 	
 	/** The component instances in a tree. */
-	private ComponentTreeTable components;
+	private ComponentTreePanel comptree;
 	
 	/** A split panel. */
 	private JSplitPane lsplit;
@@ -119,33 +109,34 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 	 */
 	public JComponent[] createToolBar()
 	{
-		JComponent[] ret = new JComponent[6];
+		JComponent[] ret = new JComponent[9];
 		JButton b;
+		int i	= 0;
 
 		b = new JButton(mpanel.ADD_PATH);
 		b.setBorder(null);
 		b.setToolTipText(b.getText());
 		b.setText(null);
 		b.setEnabled(true);
-		ret[0] = b;
+		ret[i++] = b;
 		
 		b = new JButton(mpanel.REMOVE_PATH);
 		b.setBorder(null);
 		b.setToolTipText(b.getText());
 		b.setText(null);
 		b.setEnabled(true);
-		ret[1] = b;
+		ret[i++] = b;
 		
 		b = new JButton(mpanel.REFRESH);
 		b.setBorder(null);
 		b.setToolTipText(b.getText());
 		b.setText(null);
 		b.setEnabled(true);
-		ret[2] = b;
+		ret[i++] = b;
 		
 		JSeparator	separator	= new JToolBar.Separator();
 		separator.setOrientation(JSeparator.VERTICAL);
-		ret[3] = separator;
+		ret[i++] = separator;
 		
 		/*b = new JButton(GENERATE_JADEXDOC);
 		b.setBorder(null);
@@ -158,20 +149,41 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 		separator.setOrientation(JSeparator.VERTICAL);
 		bar.add(separator);*/
 		
-		b = new JButton(KILL_COMPONENT);
-		b.setBorder(null);
-		b.setToolTipText(b.getText());
-		b.setText(null);
-		b.setEnabled(true);
-		ret[4] = b;
-		
 		b = new JButton(KILL_PLATFORM);
 		b.setBorder(null);
 		b.setToolTipText(b.getText());
 		b.setText(null);
 		b.setEnabled(true);
-		ret[5] = b;
+		ret[i++] = b;
 
+		b = new JButton(comptree.getKillAction());
+		b.setBorder(null);
+		b.setToolTipText(b.getText());
+		b.setText(null);
+		b.setEnabled(true);
+		ret[i++] = b;
+		
+		b = new JButton(comptree.getSuspendAction());
+		b.setBorder(null);
+		b.setToolTipText(b.getText());
+		b.setText(null);
+		b.setEnabled(true);
+		ret[i++] = b;
+		
+		b = new JButton(comptree.getResumeAction());
+		b.setBorder(null);
+		b.setToolTipText(b.getText());
+		b.setText(null);
+		b.setEnabled(true);
+		ret[i++] = b;
+		
+		b = new JButton(comptree.getStepAction());
+		b.setBorder(null);
+		b.setToolTipText(b.getText());
+		b.setText(null);
+		b.setEnabled(true);
+		ret[i++] = b;
+		
 		return ret;
 	}
 	
@@ -281,52 +293,13 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
   		};
   		mpanel.addMouseListener(ml);
 
-		components = new ComponentTreeTable(((AgentControlCenter)getJCC()).getAgent());
-		components.setMinimumSize(new Dimension(0, 0));
-		components.getTreetable().setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-		
-		// Change component node type to enable suspended icon for components. 
-		components.addNodeType(new ComponentTreeTableNodeType(getJCC().getServiceContainer())
-		{
-			public Icon selectIcon(Object value)
-			{
-				Icon ret	= super.selectIcon(value);
-
-				Icon	overlay	= null;
-				IComponentDescription ad = (IComponentDescription)((DefaultTreeTableNode)value).getUserObject();
-				if(IComponentDescription.STATE_SUSPENDED.equals(ad.getState())
-					|| IComponentDescription.STATE_WAITING.equals(ad.getState()))
-				{
-					overlay = StarterPlugin.icons.getIcon("component_suspended");
-				}
-				
-				if(ret!=null && overlay!=null)
-				{
-					ret	= new CombiIcon(new Icon[]{ret, overlay});
-				}
-				else if(overlay!=null)
-				{
-					ret	= overlay;
-				}
-
-				return ret;
-			}
-		});
-		components.getNodeType(ComponentTreeTable.NODE_COMPONENT).addPopupAction(KILL_COMPONENT);
-		components.getNodeType(ComponentTreeTable.NODE_COMPONENT).addPopupAction(SUSPEND_COMPONENT);
-		components.getNodeType(ComponentTreeTable.NODE_COMPONENT).addPopupAction(RESUME_COMPONENT);
-		components.getNodeType(ComponentTreeTable.NODE_COMPONENT).addPopupAction(USE_AS_PARENT);
-		components.getNodeType(ComponentTreeTable.NODE_CONTAINER).addPopupAction(KILL_PLATFORM);
-		components.getTreetable().getSelectionModel().setSelectionInterval(0, 0);
-		
-//		JTabbedPane tp = new JTabbedPane();
-//		tp.addTab("components", components);
-//		tp.addTab("applications", applications);
+		comptree = new ComponentTreePanel(getJCC().getServiceContainer());
+		comptree.setMinimumSize(new Dimension(0, 0));
 		
 		lsplit.add(new JScrollPane(mpanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
 			JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED));
 //		lsplit.add(tp);
-		lsplit.add(components);
+		lsplit.add(comptree);
 		lsplit.setDividerLocation(300);
 
 		csplit.add(lsplit);
@@ -399,10 +372,6 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 		csplit.setDividerLocation(props.getIntProperty("mainsplit_location"));
 
 		checkingmenu.setSelected(props.getBooleanProperty("checking"));
-		
-		Properties ps = props.getSubproperty("components");
-		if(ps!=null)
-			components.setProperties(ps);
 	}
 
 	/**
@@ -420,8 +389,6 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 		props.addProperty(new Property("mainsplit_location", ""+csplit.getDividerLocation()));
 		
 		props.addProperty(new Property("checking", ""+checkingmenu.isSelected()));
-
-		addSubproperties(props, "components", components.getProperties());
 		
 		return props;
 	}
@@ -496,220 +463,25 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 		mpanel.close();
 	}
 
-	/**
-	 *  Action for suspending an component.
-	 */
-	final AbstractAction SUSPEND_COMPONENT = new AbstractAction("Suspend component", icons.getIcon("suspend_component"))
-	{
-		public void actionPerformed(ActionEvent e)
-		{
-			final TreePath[] paths = components.getTreetable().getTree().getSelectionPaths();
-			SServiceProvider.getServiceUpwards(jcc.getServiceContainer(),
-				IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()			
-			{
-				public void customResultAvailable(Object source, Object result)
-				{
-					IComponentManagementService ces = (IComponentManagementService)result;
-			
-					for(int i=0; paths!=null && i<paths.length; i++) 
-					{
-						DefaultTreeTableNode node = (DefaultTreeTableNode)paths[i].getLastPathComponent();
-						if(node!=null && node.getUserObject() instanceof IComponentDescription)
-						{
-							IFuture ret = ces.suspendComponent(((IComponentDescription)node.getUserObject()).getName());
-							ret.addResultListener(new IResultListener()
-							{
-								public void resultAvailable(Object source, Object result)
-								{
-									getJCC().setStatusText("Suspended component: " + result);
-								}						
-								public void exceptionOccurred(Object source, Exception exception)
-								{
-									getJCC().displayError("Problem Suspending Component", "Component could not be suspended.", exception);
-								}
-							});
-						}
-					}
-				}
-			});
-		}
-
-		public boolean isEnabled()
-		{
-			TreePath[] paths = components.getTreetable().getTree().getSelectionPaths();
-			boolean ret = paths!=null;
-			for(int i=0; ret && paths!=null && i<paths.length; i++) 
-			{
-				DefaultTreeTableNode node = (DefaultTreeTableNode)paths[i].getLastPathComponent();
-				if(node!=null && node.getUserObject() instanceof IComponentDescription)
-				{
-					ret &= IComponentDescription.STATE_ACTIVE.equals(
-						((IComponentDescription)node.getUserObject()).getState());
-				}
-			}
-			return ret;
-		}
-	};
-	
-	/**
-	 *  Action for resuming an component.
-	 */
-	final AbstractAction RESUME_COMPONENT = new AbstractAction("Resume component", icons.getIcon("resume_component"))
-	{
-		public void actionPerformed(ActionEvent e)
-		{
-			final TreePath[] paths = components.getTreetable().getTree().getSelectionPaths();
-			
-			SServiceProvider.getServiceUpwards(jcc.getServiceContainer(),
-				IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
-			{
-				public void customResultAvailable(Object source, Object result)
-				{
-					IComponentManagementService ces = (IComponentManagementService)result;
-					for(int i=0; paths!=null && i<paths.length; i++)
-					{
-						DefaultTreeTableNode node = (DefaultTreeTableNode)paths[i].getLastPathComponent();
-						if(node!=null && node.getUserObject() instanceof IComponentDescription)
-						{
-							IFuture ret = ces.resumeComponent(((IComponentDescription)node.getUserObject()).getName());
-							ret.addResultListener(new IResultListener()
-							{
-								public void resultAvailable(Object source, Object result)
-								{
-									getJCC().setStatusText("Resumed component: " + result);
-								}						
-								public void exceptionOccurred(Object source, Exception exception)
-								{
-									getJCC().displayError("Problem Resuming Component", "Component could not be resumed.", exception);
-								}
-							});
-						}
-					}
-				}
-			});
-		}
-		
-		public boolean isEnabled()
-		{
-			TreePath[] paths = components.getTreetable().getTree().getSelectionPaths();
-			boolean ret = paths!=null;
-			for(int i=0; ret && paths!=null && i<paths.length; i++) 
-			{
-				DefaultTreeTableNode node = (DefaultTreeTableNode)paths[i].getLastPathComponent();
-				if(node!=null && node.getUserObject() instanceof IComponentDescription)
-				{
-					ret &= IComponentDescription.STATE_SUSPENDED.equals(
-						((IComponentDescription)node.getUserObject()).getState())
-						|| IComponentDescription.STATE_WAITING.equals(
-							((IComponentDescription)node.getUserObject()).getState());
-				}
-			}
-			return ret;
-		}
-	};
-	
-	/**
-	 *  Action for killing an component.
-	 */
-	final AbstractAction KILL_COMPONENT = new AbstractAction("Kill component", icons.getIcon("kill_component"))
-	{
-		public void actionPerformed(ActionEvent e)
-		{
-			TreePath[] paths = components.getTreetable().getTree().getSelectionPaths();
-			for(int i=0; paths!=null && i<paths.length; i++) 
-			{
-				final DefaultTreeTableNode node = (DefaultTreeTableNode)paths[i].getLastPathComponent();
-				if(node!=null && node.getUserObject() instanceof IComponentDescription)
-				{
-					SServiceProvider.getServiceUpwards(jcc.getServiceContainer(),
-						IComponentManagementService.class).addResultListener(new DefaultResultListener()
-					{
-						public void resultAvailable(Object source, Object result)
-						{
-							((IComponentManagementService)result).destroyComponent(((IComponentDescription)node.getUserObject()).getName()).addResultListener(new SwingDefaultResultListener(spanel)
-							{
-								public void customResultAvailable(Object source, Object result)
-								{
-									getJCC().setStatusText("Killed component: " + result);
-									
-								}
-//								public void exceptionOccurred(Object source, Exception exception)
-//								{
-//									getJCC().displayError("Problem Killing Component", "Component could not be killed.", exception);
-//								}
-							});
-						}
-						
-						public void exceptionOccurred(Object source, Exception exception)
-						{
-							getJCC().displayError("Problem Killing Component", "Component could not be killed.", exception);
-						}
-					});					
-				}
-			}
-		}
-	};
-
-	/**
-	 *  Action for selecting a component as current parent.
-	 */
-	final AbstractAction USE_AS_PARENT = new AbstractAction("Use component as parent", icons.getIcon("start_component"))
-	{
-		public void actionPerformed(ActionEvent e)
-		{
-			TreePath[] paths = components.getTreetable().getTree().getSelectionPaths();
-			for(int i=0; paths!=null && i<paths.length; i++) 
-			{
-				DefaultTreeTableNode node = (DefaultTreeTableNode)paths[i].getLastPathComponent();
-				if(node!=null && node.getUserObject() instanceof IComponentDescription)
-				{
-					spanel.setParent(((IComponentDescription)node.getUserObject()).getName());
-				}
-			}
-		}
-	};
-
 //	/**
-//	 *  Action for killing an application.
+//	 *  Action for selecting a component as current parent.
 //	 */
-//	final AbstractAction KILL_APPLICATION = new AbstractAction("Kill application", icons.getIcon("kill_component"))
+//	final AbstractAction USE_AS_PARENT = new AbstractAction("Use component as parent", icons.getIcon("start_component"))
 //	{
 //		public void actionPerformed(ActionEvent e)
 //		{
-//			IContextService cs = (IContextService)jcc.getServiceContainer().getService(IContextService.class);
-//			if(cs!=null)
+//			TreePath[] paths = components.getTreetable().getTree().getSelectionPaths();
+//			for(int i=0; paths!=null && i<paths.length; i++) 
 //			{
-//				TreePath[] paths = applications.getTreetable().getTree().getSelectionPaths();
-//				for(int i=0; paths!=null && i<paths.length; i++) 
+//				DefaultTreeTableNode node = (DefaultTreeTableNode)paths[i].getLastPathComponent();
+//				if(node!=null && node.getUserObject() instanceof IComponentDescription)
 //				{
-//					DefaultTreeTableNode node = (DefaultTreeTableNode)paths[i].getLastPathComponent();
-//					if(node!=null && node.getUserObject() instanceof IContext)
-//					{
-//						final IContext context = (IContext)node.getUserObject();
-//						cs.deleteContext(context, new IResultListener()
-//						{
-//							public void exceptionOccurred(Object source, Exception exception)
-//							{
-//								SwingUtilities.invokeLater(new Runnable()
-//								{
-//									public void run()
-//									{
-//										String text = SUtil.wrapText("Could not kill application: "+context.getName());
-//										JOptionPane.showMessageDialog(SGUI.getWindowParent(spanel), text, "Kill Application Problem", JOptionPane.INFORMATION_MESSAGE);
-//									}
-//								});
-//							}
-//							public void resultAvailable(Object source, Object result)
-//							{
-//								jcc.setStatusText("Killed application: "+context.getName());
-//							}
-//						});
-//					}
+//					spanel.setParent(((IComponentDescription)node.getUserObject()).getName());
 //				}
 //			}
 //		}
 //	};
-	
+
 	/**
 	 *  Action for killing the platform.
 	 */
@@ -722,13 +494,6 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 				root = root.getParent();
 			
 			root.killComponent();
-				
-//			getJCC().getServiceContainer().shutdown().addResultListener(new SwingDefaultResultListener(spanel)
-//			{
-//				public void customResultAvailable(Object source, Object result)
-//				{
-//				}
-//			});
 		}
 	};
 
@@ -745,7 +510,6 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 			{
 				if(ad.getName().equals(spanel.parent))
 					spanel.setParent(null);
-				components.removeComponent(ad);
 			}
 		});
 	}
@@ -756,14 +520,6 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 	 */
 	public void componentAdded(final IComponentDescription ad)
 	{
-		// Update components on awt thread.
-		SwingUtilities.invokeLater(new Runnable()
-		{
-			public void run()
-			{
-				components.addComponent(ad);
-			}
-		});
 	}
 	
 	/**
@@ -772,14 +528,6 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 	 */
 	public void componentChanged(final IComponentDescription ad)
 	{
-		// Update components on awt thread.
-		SwingUtilities.invokeLater(new Runnable()
-		{
-			public void run()
-			{
-				components.updateComponent(ad);
-			}
-		});
 	}
 
 	/** 

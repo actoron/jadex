@@ -1,6 +1,7 @@
 package jadex.tools.common.componenttree;
 
 import java.awt.Point;
+import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -22,15 +23,44 @@ public class ComponentTreePopupListener	extends MouseAdapter
 	// Is only mouseReleased a popup trigger???
 	public void	mousePressed(MouseEvent e)	{doPopup(e);}
 	public void	mouseReleased(MouseEvent e)	{doPopup(e);}
-	public void	mouseClicked(MouseEvent e)	{doPopup(e);}
-
-	/** Open a popup menu. */
-	protected void doPopup(final MouseEvent e)
+	public void	mouseClicked(MouseEvent e)
 	{
+		if(!doPopup(e) && e.getClickCount()==2)
+		{
+			JTree	tree	= (JTree)e.getSource();
+			TreePath[]	paths	= tree.getSelectionPaths();
+			if(paths!=null)
+			{
+				ComponentTreeModel	model	= (ComponentTreeModel)tree.getModel();
+				INodeHandler[]	handlers	= model.getNodeHandlers();
+				if(handlers!=null)
+				{
+					for(int i=0; paths!=null && i<paths.length; i++)
+					{
+						Action	a	= null;
+						for(int j=handlers.length-1; a==null && j>=0; j--)
+						{
+							a	= handlers[j].getDefaultAction((IComponentTreeNode)paths[i].getLastPathComponent());
+						}
+						if(a!=null)
+						{
+							a.actionPerformed(new ActionEvent(tree, 0, null));
+						}
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 *  Open a popup menu.
+	 */
+	protected boolean	doPopup(final MouseEvent e)
+	{
+		boolean	ret	= false;
 		if(e.isPopupTrigger())
 		{
 			JTree	tree	= (JTree)e.getSource();
-			ComponentTreeModel	model	= (ComponentTreeModel)tree.getModel();
 			int row	= tree.getRowForLocation(e.getX(), e.getY());
 			if(row!=-1)
 			{
@@ -49,40 +79,60 @@ public class ComponentTreePopupListener	extends MouseAdapter
 				}
 
 				TreePath[]	paths	= tree.getSelectionPaths();
-				IComponentTreeNode[]	nodes	= new IComponentTreeNode[paths.length];
-				for(int i=0; i<nodes.length; i++)
-					nodes[i]	= (IComponentTreeNode)paths[i].getLastPathComponent();
-				
-				INodeHandler[]	handlers	= model.getNodeHandlers();
-				List	actions	= null;
-				for(int i=0; i<handlers.length; i++)
+				if(paths!=null)
 				{
-					Action[]	acts	= handlers[i].getPopupActions(nodes);
-					if(acts!=null && acts.length>0)
+					IComponentTreeNode[]	nodes	= new IComponentTreeNode[paths.length];
+					for(int i=0; i<nodes.length; i++)
+						nodes[i]	= (IComponentTreeNode)paths[i].getLastPathComponent();
+					
+					ComponentTreeModel	model	= (ComponentTreeModel)tree.getModel();
+					INodeHandler[]	handlers	= model.getNodeHandlers();
+					if(handlers!=null)
 					{
-						if(actions==null)
+						List	actions	= null;
+						for(int i=handlers.length-1; i>=0; i--)
 						{
-							actions	= new ArrayList();
+							Action[]	acts	= handlers[i].getPopupActions(nodes);
+							if(acts!=null && acts.length>0)
+							{
+								if(actions==null)
+								{
+									actions	= new ArrayList();
+								}
+								if(!actions.isEmpty() && !(actions.get(actions.size()-1) instanceof JPopupMenu.Separator))
+								{
+									actions.add(new JPopupMenu.Separator());
+								}
+								actions.addAll(Arrays.asList(acts));
+							}
 						}
-						actions.addAll(Arrays.asList(acts));
+						
+						if(actions!=null)
+						{					
+							// Show menu.
+							JPopupMenu	menu	= new JPopupMenu("Actions");
+							for(int i=0; i<actions.size(); i++)
+							{
+								if(actions.get(i) instanceof JPopupMenu.Separator)
+								{
+									menu.add((JPopupMenu.Separator)actions.get(i));
+								}
+								else
+								{
+									JMenuItem	item	= new JMenuItem((Action)actions.get(i));
+									menu.add(item);
+								}
+							}
+							Point	loc	= tree.getPopupLocation(e);
+							if(loc==null)
+								loc	= e.getPoint();
+							menu.show(tree, loc.x, loc.y);
+							ret	= true;
+						}
 					}
-				}
-				
-				if(actions!=null)
-				{					
-					// Show menu.
-					JPopupMenu	menu	= new JPopupMenu("Actions");
-					for(int i=0; i<actions.size(); i++)
-					{
-						JMenuItem	item	= new JMenuItem((Action)actions.get(i));
-						menu.add(item);
-					}
-					Point	loc	= tree.getPopupLocation(e);
-					if(loc==null)
-						loc	= e.getPoint();
-					menu.show(tree, loc.x, loc.y);
 				}
 			}
 		}
+		return	ret;
 	}
 }

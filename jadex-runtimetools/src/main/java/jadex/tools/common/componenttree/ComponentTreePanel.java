@@ -36,13 +36,23 @@ public class ComponentTreePanel extends JPanel
 	protected static final UIDefaults icons = new UIDefaults(new Object[]
 	{
 		"component_suspended", SGUI.makeIcon(ComponentTreePanel.class, "/jadex/tools/common/images/overlay_szzz.png"),
-		"kill_component", SGUI.makeIcon(ComponentTreePanel.class, "/jadex/tools/common/images/overlay_kill.png"),
-		"suspend_component", SGUI.makeIcon(ComponentTreePanel.class, "/jadex/tools/common/images/overlay_szzz.png"),
-		"resume_component", SGUI.makeIcon(ComponentTreePanel.class, "/jadex/tools/common/images/overlay_wakeup.png"),
-		"step_component", SGUI.makeIcon(ComponentTreePanel.class, "/jadex/tools/common/images/overlay_step.png")
+		"kill_component", SGUI.makeIcon(ComponentTreePanel.class, "/jadex/tools/common/images/new_killagent.png"),
+		"suspend_component", SGUI.makeIcon(ComponentTreePanel.class, "/jadex/tools/common/images/new_agent_szzz_big.png"),
+		"resume_component", SGUI.makeIcon(ComponentTreePanel.class, "/jadex/tools/common/images/resume_component.png"),
+		"step_component", SGUI.makeIcon(ComponentTreePanel.class, "/jadex/tools/common/images/step_component.png"),
+		"overlay_kill", SGUI.makeIcon(ComponentTreePanel.class, "/jadex/tools/common/images/overlay_kill.png"),
+		"overlay_suspend", SGUI.makeIcon(ComponentTreePanel.class, "/jadex/tools/common/images/overlay_szzz.png"),
+		"overlay_resume", SGUI.makeIcon(ComponentTreePanel.class, "/jadex/tools/common/images/overlay_wakeup.png"),
+		"overlay_step", SGUI.makeIcon(ComponentTreePanel.class, "/jadex/tools/common/images/overlay_step.png")
 	});
 	
 	//-------- attributes --------
+	
+	/** The component tree model. */
+	private final ComponentTreeModel	model;
+	
+	/** The component tree. */
+	private final JTree	tree;
 	
 	/** The component management service. */
 	private IComponentManagementService	cms;
@@ -66,8 +76,8 @@ public class ComponentTreePanel extends JPanel
 	 */
 	public ComponentTreePanel(final IServiceProvider provider)
 	{
-		final ComponentTreeModel	model	= new ComponentTreeModel();
-		final JTree	tree	= new JTree(model);
+		this.model	= new ComponentTreeModel();
+		this.tree	= new JTree(model);
 		tree.setCellRenderer(new ComponentTreeCellRenderer());
 		tree.addMouseListener(new ComponentTreePopupListener());
 		tree.setShowsRootHandles(true);
@@ -81,7 +91,7 @@ public class ComponentTreePanel extends JPanel
 				if(cms!=null)
 				{
 					TreePath[]	paths	= tree.getSelectionPaths();
-					for(int i=0; i<paths.length; i++)
+					for(int i=0; paths!=null && i<paths.length; i++)
 					{
 						if(paths[i].getLastPathComponent() instanceof ComponentTreeNode)
 						{
@@ -105,7 +115,7 @@ public class ComponentTreePanel extends JPanel
 				if(cms!=null)
 				{
 					TreePath[]	paths	= tree.getSelectionPaths();
-					for(int i=0; i<paths.length; i++)
+					for(int i=0; paths!=null && i<paths.length; i++)
 					{
 						if(paths[i].getLastPathComponent() instanceof ComponentTreeNode)
 						{
@@ -129,7 +139,7 @@ public class ComponentTreePanel extends JPanel
 				if(cms!=null)
 				{
 					TreePath[]	paths	= tree.getSelectionPaths();
-					for(int i=0; i<paths.length; i++)
+					for(int i=0; paths!=null && i<paths.length; i++)
 					{
 						if(paths[i].getLastPathComponent() instanceof ComponentTreeNode)
 						{
@@ -153,7 +163,7 @@ public class ComponentTreePanel extends JPanel
 				if(cms!=null)
 				{
 					TreePath[]	paths	= tree.getSelectionPaths();
-					for(int i=0; i<paths.length; i++)
+					for(int i=0; paths!=null && i<paths.length; i++)
 					{
 						if(paths[i].getLastPathComponent() instanceof ComponentTreeNode)
 						{
@@ -169,104 +179,108 @@ public class ComponentTreePanel extends JPanel
 				}
 			}
 		};
-		
+
+		// Default overlays and popups.
+		final ComponentIconCache	cic	= new ComponentIconCache(provider, tree);
+		model.addNodeHandler(new INodeHandler()
+		{
+			public Icon getOverlay(IComponentTreeNode node)
+			{
+				Icon	ret	= null;
+				if(node instanceof ComponentTreeNode)
+				{
+					IComponentDescription	desc	= ((ComponentTreeNode)node).getDescription();
+					if(IComponentDescription.STATE_SUSPENDED.equals(desc.getState())
+						|| IComponentDescription.STATE_WAITING.equals(desc.getState()))
+					{
+						ret = icons.getIcon("component_suspended");
+					}
+				}
+				return ret;
+			}
+			
+			public Action[] getPopupActions(final IComponentTreeNode[] nodes)
+			{
+				Action[]	ret	= null;
+				
+				boolean	allcomp	= true;
+				for(int i=0; allcomp && i<nodes.length; i++)
+				{
+					allcomp	= nodes[i] instanceof ComponentTreeNode;
+				}
+				
+				if(allcomp)
+				{
+					boolean	allsusp	= true;
+					for(int i=0; allsusp && i<nodes.length; i++)
+					{
+						allsusp	= IComponentDescription.STATE_SUSPENDED.equals(((ComponentTreeNode)nodes[i]).getDescription().getState())
+							|| IComponentDescription.STATE_WAITING.equals(((ComponentTreeNode)nodes[i]).getDescription().getState());
+					}
+					boolean	allact	= true;
+					for(int i=0; allact && i<nodes.length; i++)
+					{
+						allact	= IComponentDescription.STATE_ACTIVE.equals(((ComponentTreeNode)nodes[i]).getDescription().getState());
+					}
+					
+					// Todo: Large icons for popup actions?
+					Icon	base	= cic.getIcon(nodes[0], ((ComponentTreeNode)nodes[0]).getDescription().getType());
+					Action	pkill	= new AbstractAction((String)kill.getValue(Action.NAME), new CombiIcon(new Icon[]{base, icons.getIcon("overlay_kill")}))
+					{
+						public void actionPerformed(ActionEvent e)
+						{
+							kill.actionPerformed(e);
+						}
+					};
+					if(allact)
+					{
+						Action	psuspend	= new AbstractAction((String)suspend.getValue(Action.NAME), new CombiIcon(new Icon[]{base, icons.getIcon("overlay_suspend")}))
+						{
+							public void actionPerformed(ActionEvent e)
+							{
+								suspend.actionPerformed(e);
+							}
+						};
+						ret	= new Action[]{pkill, psuspend};
+					}
+					else if(allsusp)
+					{
+						Action	presume	= new AbstractAction((String)resume.getValue(Action.NAME), new CombiIcon(new Icon[]{base, icons.getIcon("overlay_resume")}))
+						{
+							public void actionPerformed(ActionEvent e)
+							{
+								resume.actionPerformed(e);
+							}
+						};
+						Action	pstep	= new AbstractAction((String)step.getValue(Action.NAME), new CombiIcon(new Icon[]{base, icons.getIcon("overlay_step")}))
+						{
+							public void actionPerformed(ActionEvent e)
+							{
+								step.actionPerformed(e);
+							}
+						};
+						ret	= new Action[]{pkill, presume, pstep};
+					}
+					else
+					{
+						ret	= new Action[]{pkill};								
+					}
+				}
+				
+				return ret;
+			}
+			
+			public Action getDefaultAction(IComponentTreeNode node)
+			{
+				return null;
+			}
+		});
+
 		SServiceProvider.getServiceUpwards(provider, IComponentManagementService.class).addResultListener(new SwingDefaultResultListener(this)
 		{
 			public void customResultAvailable(Object source, Object result)
 			{
 				cms	= (IComponentManagementService)result;
-				final ComponentIconCache	cic	= new ComponentIconCache(provider, tree);
-				
-				// Default overlays and popups.
-				model.addOverlay(new INodeHandler()
-				{
-					public Icon getOverlay(IComponentTreeNode node)
-					{
-						Icon	ret	= null;
-						if(node instanceof ComponentTreeNode)
-						{
-							IComponentDescription	desc	= ((ComponentTreeNode)node).getDescription();
-							if(IComponentDescription.STATE_SUSPENDED.equals(desc.getState())
-								|| IComponentDescription.STATE_WAITING.equals(desc.getState()))
-							{
-								ret = icons.getIcon("component_suspended");
-							}
-						}
-						return ret;
-					}
-					
-					public Action[] getPopupActions(final IComponentTreeNode[] nodes)
-					{
-						Action[]	ret	= null;
-						
-						boolean	allcomp	= true;
-						for(int i=0; allcomp && i<nodes.length; i++)
-						{
-							allcomp	= nodes[i] instanceof ComponentTreeNode;
-						}
-						
-						if(allcomp)
-						{
-							boolean	allsusp	= true;
-							for(int i=0; allsusp && i<nodes.length; i++)
-							{
-								allsusp	= IComponentDescription.STATE_SUSPENDED.equals(((ComponentTreeNode)nodes[i]).getDescription().getState())
-									|| IComponentDescription.STATE_WAITING.equals(((ComponentTreeNode)nodes[i]).getDescription().getState());
-							}
-							boolean	allact	= true;
-							for(int i=0; allact && i<nodes.length; i++)
-							{
-								allact	= IComponentDescription.STATE_ACTIVE.equals(((ComponentTreeNode)nodes[i]).getDescription().getState());
-							}
-							
-							// Todo: Large icons for popup actions?
-							Icon	base	= cic.getIcon(nodes[0], ((ComponentTreeNode)nodes[0]).getDescription().getType());
-							Action	pkill	= new AbstractAction((String)kill.getValue(Action.NAME), new CombiIcon(new Icon[]{base, icons.getIcon("kill_component")}))
-							{
-								public void actionPerformed(ActionEvent e)
-								{
-									kill.actionPerformed(e);
-								}
-							};
-							if(allact)
-							{
-								Action	psuspend	= new AbstractAction((String)suspend.getValue(Action.NAME), new CombiIcon(new Icon[]{base, icons.getIcon("suspend_component")}))
-								{
-									public void actionPerformed(ActionEvent e)
-									{
-										suspend.actionPerformed(e);
-									}
-								};
-								ret	= new Action[]{pkill, psuspend};
-							}
-							else if(allsusp)
-							{
-								Action	presume	= new AbstractAction((String)resume.getValue(Action.NAME), new CombiIcon(new Icon[]{base, icons.getIcon("resume_component")}))
-								{
-									public void actionPerformed(ActionEvent e)
-									{
-										resume.actionPerformed(e);
-									}
-								};
-								Action	pstep	= new AbstractAction((String)step.getValue(Action.NAME), new CombiIcon(new Icon[]{base, icons.getIcon("step_component")}))
-								{
-									public void actionPerformed(ActionEvent e)
-									{
-										step.actionPerformed(e);
-									}
-								};
-								ret	= new Action[]{pkill, presume, pstep};
-							}
-							else
-							{
-								ret	= new Action[]{pkill};								
-							}
-						}
-						
-						return ret;
-					}
-				});
-
 				
 				// Hack!!! How to find root node?
 				cms.getComponentDescriptions().addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
@@ -368,5 +382,29 @@ public class ComponentTreePanel extends JPanel
 	public Action	getStepAction()
 	{
 		return step;
+	}
+	
+	/**
+	 *  Add a node handler.
+	 */
+	public void	addNodeHandler(INodeHandler handler)
+	{
+		model.addNodeHandler(handler);
+	}
+
+	/**
+	 *  Get the tree model.
+	 */
+	public ComponentTreeModel	getModel()
+	{
+		return model;
+	}
+	
+	/**
+	 *  Get the tree.
+	 */
+	public JTree	getTree()
+	{
+		return tree;
 	}
 }

@@ -40,10 +40,10 @@ public class ComponentTreeCellRenderer	extends DefaultTreeCellRenderer
 		if(tree.getModel() instanceof ComponentTreeModel)
 		{
 			List	icons	= null;
-			INodeHandler[]	overlays	= ((ComponentTreeModel)tree.getModel()).getNodeHandlers();
-			for(int i=0; i<overlays.length; i++)
+			INodeHandler[]	handlers	= ((ComponentTreeModel)tree.getModel()).getNodeHandlers();
+			for(int i=0; handlers!=null && i<handlers.length; i++)
 			{
-				Icon	overlay	= overlays[i].getOverlay(node);
+				Icon	overlay	= handlers[i].getOverlay(node);
 				if(overlay!=null)
 				{
 					if(icons==null)
