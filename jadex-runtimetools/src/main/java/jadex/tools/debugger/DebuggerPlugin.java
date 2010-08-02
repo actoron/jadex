@@ -1,31 +1,22 @@
 package jadex.tools.debugger;
 
 import jadex.bridge.IComponentDescription;
-import jadex.bridge.IComponentManagementService;
-import jadex.bridge.IComponentListener;
-import jadex.commons.IFuture;
 import jadex.commons.Properties;
 import jadex.commons.SGUI;
-import jadex.commons.concurrent.IResultListener;
-import jadex.commons.concurrent.SwingDefaultResultListener;
-import jadex.service.SServiceProvider;
 import jadex.tools.common.CombiIcon;
-import jadex.tools.common.ComponentTreeTable;
-import jadex.tools.common.ComponentTreeTableNodeType;
 import jadex.tools.common.GuiProperties;
 import jadex.tools.common.ObjectCardLayout;
-import jadex.tools.common.jtreetable.DefaultTreeTableNode;
+import jadex.tools.common.componenttree.ComponentTreeNode;
+import jadex.tools.common.componenttree.ComponentTreePanel;
+import jadex.tools.common.componenttree.IComponentTreeNode;
+import jadex.tools.common.componenttree.INodeHandler;
 import jadex.tools.common.plugin.AbstractJCCPlugin;
-import jadex.tools.jcc.AgentControlCenter;
 
-import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.util.Map;
 
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -34,11 +25,9 @@ import javax.swing.JMenu;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JTree;
-import javax.swing.ListSelectionModel;
-import javax.swing.SwingUtilities;
 import javax.swing.UIDefaults;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.TreePath;
 
 
@@ -60,6 +49,7 @@ public class DebuggerPlugin extends AbstractJCCPlugin
 		"debug_component", SGUI.makeIcon(GuiProperties.class, "/jadex/tools/common/images/new_introspector.png"),
 		"close_debugger", SGUI.makeIcon(GuiProperties.class, "/jadex/tools/common/images/close_introspector.png"),
 		"component_debugged", SGUI.makeIcon(GuiProperties.class, "/jadex/tools/common/images/overlay_introspected.png"),
+		"stop_debugger", SGUI.makeIcon(GuiProperties.class, "/jadex/tools/common/images/overlay_notintrospected.png"),
 		"debugger_empty", SGUI.makeIcon(GuiProperties.class, "/jadex/tools/common/images/introspector_empty.png")
 	});
 	
@@ -69,7 +59,7 @@ public class DebuggerPlugin extends AbstractJCCPlugin
 	protected JSplitPane	split;
 
 	/** The component tree table. */
-	protected ComponentTreeTable	components;
+	protected ComponentTreePanel	comptree;
 
 	/** The detail panel. */
 	protected JPanel	detail;
@@ -94,7 +84,6 @@ public class DebuggerPlugin extends AbstractJCCPlugin
 	public Properties getProperties()
 	{
 		Properties	props	= new Properties();
-		addSubproperties(props, "components", components.getProperties());	
 		return props;
 	}
 	
@@ -103,9 +92,6 @@ public class DebuggerPlugin extends AbstractJCCPlugin
 	 */
 	public void setProperties(Properties props)
 	{
-		Properties ps = props.getSubproperty("components");
-		if(ps!=null)
-			components.setProperties(ps);
 	}
 	
 	/**
@@ -166,50 +152,111 @@ public class DebuggerPlugin extends AbstractJCCPlugin
 		this.split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true);
 		split.setOneTouchExpandable(true);
 
-		components = new ComponentTreeTable(((AgentControlCenter)getJCC()).getAgent());
-		components.setMinimumSize(new Dimension(0, 0));
-		split.add(components);
-		components.getTreetable().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		components.getTreetable().getSelectionModel().addListSelectionListener(new ListSelectionListener()
+		comptree = new ComponentTreePanel(getJCC().getServiceContainer());
+		comptree.setMinimumSize(new Dimension(0, 0));
+		split.add(comptree);
+		comptree.getTree().getSelectionModel().addTreeSelectionListener(new TreeSelectionListener()
 		{
-			public void valueChanged(ListSelectionEvent e)
+			public void valueChanged(TreeSelectionEvent e)
 			{
-				JTree tree = components.getTreetable().getTree();
-				if(!e.getValueIsAdjusting() && !tree.isSelectionEmpty())
+				JTree tree = comptree.getTree();
+				if(tree.getSelectionPath()!=null)
 				{
-					DefaultTreeTableNode node = (DefaultTreeTableNode)tree.getSelectionPath().getLastPathComponent();
-					cards.show(node.getUserObject());
+					Object node = tree.getSelectionPath().getLastPathComponent();
+					if(node instanceof ComponentTreeNode)
+					{
+						cards.show(((ComponentTreeNode)node).getDescription());
+					}
 				}
 			}
 		});
-		// Change component node type to enable debugged icon for components.
-		components.addNodeType(new ComponentTreeTableNodeType(getJCC().getServiceContainer())
+		
+		comptree.addNodeHandler(new INodeHandler()
 		{
-			public Icon selectIcon(Object value)
+			public Action[] getPopupActions(IComponentTreeNode[] nodes)
 			{
-				Icon ret	= super.selectIcon(value);
-
-				Icon	overlay	= null;
-				IComponentDescription ad = (IComponentDescription)((DefaultTreeTableNode)value).getUserObject();
-				if(cards.getComponent(ad)!=null)
+				Action[]	ret	= null;
+				
+				boolean	allcomp	= true;
+				for(int i=0; allcomp && i<nodes.length; i++)
 				{
-					overlay = DebuggerPlugin.icons.getIcon("component_debugged");
+					allcomp	= nodes[i] instanceof ComponentTreeNode;
 				}
 				
-				if(ret!=null && overlay!=null)
+				if(allcomp)
 				{
-					ret	= new CombiIcon(new Icon[]{ret, overlay});
+					boolean	allob	= true;
+					for(int i=0; allob && i<nodes.length; i++)
+					{
+						allob	= cards.getComponent(((ComponentTreeNode)nodes[i]).getDescription())!=null;
+					}
+					boolean	allig	= true;
+					for(int i=0; allig && i<nodes.length; i++)
+					{
+						allig	= cards.getComponent(((ComponentTreeNode)nodes[i]).getDescription())==null;
+					}
+					
+					// Todo: Large icons for popup actions?
+					if(allig)
+					{
+						Icon	base	= comptree.getIcon(nodes[0], ((ComponentTreeNode)nodes[0]).getDescription().getType());
+						Action	a	= new AbstractAction((String)START_DEBUGGER.getValue(Action.NAME), new CombiIcon(new Icon[]{base, icons.getIcon("component_debugged")}))
+						{
+							public void actionPerformed(ActionEvent e)
+							{
+								START_DEBUGGER.actionPerformed(e);
+							}
+						};
+						ret	= new Action[]{a};
+					}
+					else if(allob)
+					{
+						Icon	base	= comptree.getIcon(nodes[0], ((ComponentTreeNode)nodes[0]).getDescription().getType());
+						Action	a	= new AbstractAction((String)STOP_DEBUGGER.getValue(Action.NAME), new CombiIcon(new Icon[]{base, icons.getIcon("stop_debugger")}))
+						{
+							public void actionPerformed(ActionEvent e)
+							{
+								STOP_DEBUGGER.actionPerformed(e);
+							}
+						};
+						ret	= new Action[]{a};
+					}
 				}
-				else if(overlay!=null)
-				{
-					ret	= overlay;
-				}
-
+				
 				return ret;
 			}
+			
+			public Icon getOverlay(IComponentTreeNode node)
+			{
+				Icon ret	= null;
+				if(node instanceof ComponentTreeNode)
+				{
+					IComponentDescription ad = ((ComponentTreeNode)node).getDescription();
+					if(cards.getComponent(ad)!=null)
+					{
+						ret = DebuggerPlugin.icons.getIcon("component_debugged");
+					}
+				}
+				return ret;
+			}
+			
+			public Action getDefaultAction(IComponentTreeNode node)
+			{
+				Action	a	= null;
+				if(node instanceof ComponentTreeNode)
+				{
+					if(cards.getComponent(((ComponentTreeNode)node).getDescription())!=null)
+					{
+						a	= STOP_DEBUGGER;
+					}
+					else
+					{
+						a	= START_DEBUGGER;
+					}
+				}
+				return a;
+			}
 		});
-		components.getNodeType(ComponentTreeTable.NODE_COMPONENT).addPopupAction(START_DEBUGGER);
-		components.getNodeType(ComponentTreeTable.NODE_COMPONENT).addPopupAction(STOP_DEBUGGER);
 
 		JLabel	emptylabel	= new JLabel("Select components to activate the debugger",
 			icons.getIcon("debugger_empty"), JLabel.CENTER);
@@ -227,148 +274,28 @@ public class DebuggerPlugin extends AbstractJCCPlugin
 
 		GuiProperties.setupHelp(split, "tools.debugger");
 
-		components.getTreetable().getSelectionModel().setSelectionInterval(0, 0);
 		split.setDividerLocation(150);
-
-		components.getTreetable().addMouseListener(new MouseAdapter()
-		{
-			public void mouseClicked(MouseEvent e)
-			{
-				if(e.getClickCount() == 2)
-				{
-					if(START_DEBUGGER.isEnabled())
-						START_DEBUGGER.actionPerformed(null);
-					else if(STOP_DEBUGGER.isEnabled())
-						STOP_DEBUGGER.actionPerformed(null);
-				}
-
-			}
-		});
-
-		SServiceProvider.getServiceUpwards(jcc.getServiceContainer(), IComponentManagementService.class)
-			.addResultListener(new SwingDefaultResultListener()
-		{
-			public void customResultAvailable(Object source, Object result)
-			{
-				IComponentManagementService ces = (IComponentManagementService)result;
-				IFuture ret = ces.getComponentDescriptions();
-				ret.addResultListener(new IResultListener()
-				{
-					public void resultAvailable(Object source, Object result)
-					{
-						IComponentDescription[] res = (IComponentDescription[])result;
-						for(int i=0; i<res.length; i++)
-							agentBorn(res[i]);
-					}
-					
-					public void exceptionOccurred(Object source, Exception exception)
-					{
-					}
-				});
-				ces.addComponentListener(null, new IComponentListener()
-				{
-					public void componentRemoved(IComponentDescription desc, Map results)
-					{
-						agentDied(desc);
-					}
-					
-					public void componentAdded(IComponentDescription desc)
-					{
-						agentBorn(desc);
-					}
-
-					public void componentChanged(IComponentDescription desc)
-					{
-					}
-				});
-			}
-		});
-		
-		
-//		SwingUtilities.invokeLater(new Runnable()
-//		{
-//			public void run()
-//			{
-//				components.adjustColumnWidths();
-//			}
-//		});
 
 		return split;
 	}
 	
-	/**
-	 *  Called when an agent has changed its state (e.g. suspended).
-	 */
-	public void agentChanged(IComponentDescription ad)
-	{
-	}
-	
-	/**
-	 * @param ad
-	 */
-	public void agentDied(final IComponentDescription ad)
-	{
-		// Update components on awt thread.
-		SwingUtilities.invokeLater(new Runnable()
-		{
-			public void run()
-			{
-				components.removeComponent(ad);
-				if(cards.isAvailable(ad))
-				{
-					DebuggerMainPanel	panel	= (DebuggerMainPanel)cards.getComponent(ad);
-//					System.err.println("Agent died: "+ad);
-					panel.dispose();
-					detail.remove(panel);
-				}
-			}
-		});
-	}
-
-	/**
-	 * @param ad
-	 */
-	public void agentBorn(final IComponentDescription ad)
-	{
-		// Update components on awt thread.
-		SwingUtilities.invokeLater(new Runnable()
-		{
-			public void run()
-			{
-				components.addComponent(ad);
-			}
-		});
-	}
-
 	final AbstractAction START_DEBUGGER	= new AbstractAction("Debug Component", icons.getIcon("debug_component"))
 	{
 		public void actionPerformed(ActionEvent e)
 		{
-			if(!isEnabled())
-				return;
-			
-			split.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-			DefaultTreeTableNode node = (DefaultTreeTableNode)components.getTreetable()
-				.getTree().getSelectionPath().getLastPathComponent();
-			IComponentDescription desc = (IComponentDescription)node.getUserObject();
-			DebuggerMainPanel	panel = new DebuggerMainPanel(getJCC(), desc);
-			GuiProperties.setupHelp(panel, "tools.debugger");
-			detail.add(panel, node.getUserObject());
-			components.updateComponent(desc);
-			split.setCursor(Cursor.getDefaultCursor());
-		}
-
-		public boolean isEnabled()
-		{
-			boolean	ret	= false;
-			TreePath	path	= components.getTreetable().getTree().getSelectionPath();
-			if(path!=null)
+			TreePath[]	paths	= comptree.getTree().getSelectionPaths();
+			for(int i=0; paths!=null && i<paths.length; i++)
 			{
-				DefaultTreeTableNode node = (DefaultTreeTableNode)path.getLastPathComponent();
-				ret = node!=null && node.getUserObject() instanceof IComponentDescription
-					&& cards.getComponent(node.getUserObject())==null;
+				if(paths[i].getLastPathComponent() instanceof ComponentTreeNode)
+				{
+					ComponentTreeNode node = (ComponentTreeNode)paths[i].getLastPathComponent();
+					IComponentDescription desc = node.getDescription();
+					DebuggerMainPanel	panel = new DebuggerMainPanel(getJCC(), desc);
+					GuiProperties.setupHelp(panel, "tools.debugger");
+					detail.add(panel, node.getDescription());
+					comptree.getModel().fireNodeChanged(node);
+				}
 			}
-			return ret;
 		}
 	};
 
@@ -376,29 +303,19 @@ public class DebuggerPlugin extends AbstractJCCPlugin
 	{
 		public void actionPerformed(ActionEvent e)
 		{
-			if(!isEnabled())
-				return;
-
-			split.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-			DefaultTreeTableNode node = (DefaultTreeTableNode)components.getTreetable().getTree().getSelectionPath().getLastPathComponent();
-			DebuggerMainPanel panel = (DebuggerMainPanel)cards.getComponent(node.getUserObject());
-			panel.dispose();
-			detail.remove(panel);
-			components.updateComponent((IComponentDescription)node.getUserObject());
-			split.setCursor(Cursor.getDefaultCursor());
-		}
-
-		public boolean isEnabled()
-		{
-			boolean	ret	= false;
-			TreePath	path	= components.getTreetable().getTree().getSelectionPath();
-			if(path!=null)
+			TreePath[]	paths	= comptree.getTree().getSelectionPaths();
+			for(int i=0; paths!=null && i<paths.length; i++)
 			{
-				DefaultTreeTableNode node = (DefaultTreeTableNode)path.getLastPathComponent();
-				ret = node!=null && node.getUserObject() instanceof IComponentDescription
-					&& cards.getComponent(node.getUserObject())!=null;
+				if(paths[i].getLastPathComponent() instanceof ComponentTreeNode)
+				{
+					ComponentTreeNode node = (ComponentTreeNode)paths[i].getLastPathComponent();
+					IComponentDescription desc = node.getDescription();
+					DebuggerMainPanel panel = (DebuggerMainPanel)cards.getComponent(desc);
+					panel.dispose();
+					detail.remove(panel);
+					comptree.getModel().fireNodeChanged(node);
+				}
 			}
-			return ret;
 		}
 	};
 

@@ -54,6 +54,9 @@ public class ComponentTreePanel extends JPanel
 	/** The component tree. */
 	private final JTree	tree;
 	
+	/** The component icon cache. */
+	private final ComponentIconCache	cic;
+	
 	/** The component management service. */
 	private IComponentManagementService	cms;
 	
@@ -81,6 +84,7 @@ public class ComponentTreePanel extends JPanel
 		tree.setCellRenderer(new ComponentTreeCellRenderer());
 		tree.addMouseListener(new ComponentTreePopupListener());
 		tree.setShowsRootHandles(true);
+		this.cic	= new ComponentIconCache(provider, tree);
 		this.setLayout(new BorderLayout());
 		this.add(new JScrollPane(tree));
 		
@@ -181,7 +185,6 @@ public class ComponentTreePanel extends JPanel
 		};
 
 		// Default overlays and popups.
-		final ComponentIconCache	cic	= new ComponentIconCache(provider, tree);
 		model.addNodeHandler(new INodeHandler()
 		{
 			public Icon getOverlay(IComponentTreeNode node)
@@ -406,5 +409,13 @@ public class ComponentTreePanel extends JPanel
 	public JTree	getTree()
 	{
 		return tree;
+	}
+	
+	/**
+	 *  Get a cached icon.
+	 */
+	public Icon	getIcon(IComponentTreeNode node, String type)
+	{
+		return cic.getIcon(node, type);
 	}
 }
