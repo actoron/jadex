@@ -8,7 +8,6 @@ import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.service.IServiceProvider;
 import jadex.service.SServiceProvider;
 import jadex.tools.common.CombiIcon;
-import jadex.tools.starter.StarterPlugin;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
@@ -22,6 +21,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
 import javax.swing.UIDefaults;
+import javax.swing.tree.TreePath;
 
 /**
  *  A panel displaying components on the platform as tree.
@@ -35,10 +35,29 @@ public class ComponentTreePanel extends JPanel
 	 */
 	protected static final UIDefaults icons = new UIDefaults(new Object[]
 	{
-		"resume_component", SGUI.makeIcon(StarterPlugin.class, "/jadex/tools/common/images/new_agent_big.png"),
+		"component_suspended", SGUI.makeIcon(ComponentTreePanel.class, "/jadex/tools/common/images/overlay_szzz.png"),
 		"kill_component", SGUI.makeIcon(ComponentTreePanel.class, "/jadex/tools/common/images/overlay_kill.png"),
-		"component_suspended", SGUI.makeIcon(ComponentTreePanel.class, "/jadex/tools/common/images/overlay_szzz.png")
+		"suspend_component", SGUI.makeIcon(ComponentTreePanel.class, "/jadex/tools/common/images/overlay_szzz.png"),
+		"resume_component", SGUI.makeIcon(ComponentTreePanel.class, "/jadex/tools/common/images/overlay_wakeup.png"),
+		"step_component", SGUI.makeIcon(ComponentTreePanel.class, "/jadex/tools/common/images/overlay_step.png")
 	});
+	
+	//-------- attributes --------
+	
+	/** The component management service. */
+	private IComponentManagementService	cms;
+	
+	/** The action for killing selected components. */
+	private final Action	kill;
+	
+	/** The action for suspending selected components. */
+	private final Action	suspend;
+	
+	/** The action for resuming selected components. */
+	private final Action	resume;
+	
+	/** The action for stepping selected components. */
+	private final Action	step;
 	
 	//-------- constructors --------
 	
@@ -55,11 +74,107 @@ public class ComponentTreePanel extends JPanel
 		this.setLayout(new BorderLayout());
 		this.add(new JScrollPane(tree));
 		
+		kill	= new AbstractAction("Kill component", icons.getIcon("kill_component"))
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				if(cms!=null)
+				{
+					TreePath[]	paths	= tree.getSelectionPaths();
+					for(int i=0; i<paths.length; i++)
+					{
+						if(paths[i].getLastPathComponent() instanceof ComponentTreeNode)
+						{
+							cms.destroyComponent(((ComponentTreeNode)paths[i].getLastPathComponent()).getDescription().getName())
+								.addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
+							{
+								public void customResultAvailable(Object source, Object result)
+								{
+								}
+							});
+						}
+					}
+				}
+			}
+		};
+		
+		suspend	= new AbstractAction("Suspend component", icons.getIcon("suspend_component"))
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				if(cms!=null)
+				{
+					TreePath[]	paths	= tree.getSelectionPaths();
+					for(int i=0; i<paths.length; i++)
+					{
+						if(paths[i].getLastPathComponent() instanceof ComponentTreeNode)
+						{
+							cms.suspendComponent(((ComponentTreeNode)paths[i].getLastPathComponent()).getDescription().getName())
+								.addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
+							{
+								public void customResultAvailable(Object source, Object result)
+								{
+								}
+							});
+						}
+					}
+				}
+			}
+		};
+		
+		resume	= new AbstractAction("Resume component", icons.getIcon("resume_component"))
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				if(cms!=null)
+				{
+					TreePath[]	paths	= tree.getSelectionPaths();
+					for(int i=0; i<paths.length; i++)
+					{
+						if(paths[i].getLastPathComponent() instanceof ComponentTreeNode)
+						{
+							cms.resumeComponent(((ComponentTreeNode)paths[i].getLastPathComponent()).getDescription().getName())
+								.addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
+							{
+								public void customResultAvailable(Object source, Object result)
+								{
+								}
+							});
+						}
+					}
+				}
+			}
+		};
+		
+		step	= new AbstractAction("Step component", icons.getIcon("step_component"))
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				if(cms!=null)
+				{
+					TreePath[]	paths	= tree.getSelectionPaths();
+					for(int i=0; i<paths.length; i++)
+					{
+						if(paths[i].getLastPathComponent() instanceof ComponentTreeNode)
+						{
+							cms.stepComponent(((ComponentTreeNode)paths[i].getLastPathComponent()).getDescription().getName())
+								.addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
+							{
+								public void customResultAvailable(Object source, Object result)
+								{
+								}
+							});
+						}
+					}
+				}
+			}
+		};
+		
 		SServiceProvider.getServiceUpwards(provider, IComponentManagementService.class).addResultListener(new SwingDefaultResultListener(this)
 		{
 			public void customResultAvailable(Object source, Object result)
 			{
-				final IComponentManagementService	cms	= (IComponentManagementService)result;
+				cms	= (IComponentManagementService)result;
 				final ComponentIconCache	cic	= new ComponentIconCache(provider, tree);
 				
 				// Default overlays and popups.
@@ -105,68 +220,46 @@ public class ComponentTreePanel extends JPanel
 							}
 							
 							// Todo: Large icons for popup actions?
-							Icon	icon	= cic.getIcon(nodes[0], ((ComponentTreeNode)nodes[0]).getDescription().getType());
-							Action	kill	= new AbstractAction("Kill component", new CombiIcon(new Icon[]{icon, icons.getIcon("kill_component")}))
+							Icon	base	= cic.getIcon(nodes[0], ((ComponentTreeNode)nodes[0]).getDescription().getType());
+							Action	pkill	= new AbstractAction((String)kill.getValue(Action.NAME), new CombiIcon(new Icon[]{base, icons.getIcon("kill_component")}))
 							{
 								public void actionPerformed(ActionEvent e)
 								{
-									for(int i=0; i<nodes.length; i++)
-									{
-										cms.destroyComponent(((ComponentTreeNode)nodes[i]).getDescription().getName())
-											.addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
-										{
-											public void customResultAvailable(Object source, Object result)
-											{
-											}
-										});
-									}
+									kill.actionPerformed(e);
 								}
 							};
-							
 							if(allact)
 							{
-								icon	= cic.getIcon(nodes[0], ((ComponentTreeNode)nodes[0]).getDescription().getType());
-								Action	suspend	= new AbstractAction("Suspend component", new CombiIcon(new Icon[]{icon, icons.getIcon("component_suspended")}))
+								Action	psuspend	= new AbstractAction((String)suspend.getValue(Action.NAME), new CombiIcon(new Icon[]{base, icons.getIcon("suspend_component")}))
 								{
 									public void actionPerformed(ActionEvent e)
 									{
-										for(int i=0; i<nodes.length; i++)
-										{
-											cms.suspendComponent(((ComponentTreeNode)nodes[i]).getDescription().getName())
-												.addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
-											{
-												public void customResultAvailable(Object source, Object result)
-												{
-												}
-											});
-										}
+										suspend.actionPerformed(e);
 									}
 								};
-								ret	= new Action[]{kill, suspend};
+								ret	= new Action[]{pkill, psuspend};
 							}
 							else if(allsusp)
 							{
-								Action	resume	= new AbstractAction("Resume component", icons.getIcon("resume_component"))
+								Action	presume	= new AbstractAction((String)resume.getValue(Action.NAME), new CombiIcon(new Icon[]{base, icons.getIcon("resume_component")}))
 								{
 									public void actionPerformed(ActionEvent e)
 									{
-										for(int i=0; i<nodes.length; i++)
-										{
-											cms.resumeComponent(((ComponentTreeNode)nodes[i]).getDescription().getName())
-												.addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
-											{
-												public void customResultAvailable(Object source, Object result)
-												{
-												}
-											});
-										}
+										resume.actionPerformed(e);
 									}
 								};
-								ret	= new Action[]{kill, resume};
+								Action	pstep	= new AbstractAction((String)step.getValue(Action.NAME), new CombiIcon(new Icon[]{base, icons.getIcon("step_component")}))
+								{
+									public void actionPerformed(ActionEvent e)
+									{
+										step.actionPerformed(e);
+									}
+								};
+								ret	= new Action[]{pkill, presume, pstep};
 							}
 							else
 							{
-								ret	= new Action[]{kill};								
+								ret	= new Action[]{pkill};								
 							}
 						}
 						
@@ -241,5 +334,39 @@ public class ComponentTreePanel extends JPanel
 				});				
 			}
 		});
+	}
+	
+	//-------- methods --------
+	
+	/**
+	 *  Get the action for killing the components selected in the tree.
+	 */
+	public Action	getKillAction()
+	{
+		return kill;
+	}
+	
+	/**
+	 *  Get the action for suspending the components selected in the tree.
+	 */
+	public Action	getSuspendAction()
+	{
+		return suspend;
+	}
+	
+	/**
+	 *  Get the action for resuming the components selected in the tree.
+	 */
+	public Action	getResumeAction()
+	{
+		return resume;
+	}
+	
+	/**
+	 *  Get the action for stepping the components selected in the tree.
+	 */
+	public Action	getStepAction()
+	{
+		return step;
 	}
 }
