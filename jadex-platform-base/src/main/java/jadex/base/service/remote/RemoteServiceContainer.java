@@ -59,7 +59,8 @@ public class RemoteServiceContainer extends BasicServiceContainer
 		{
 			public void resultAvailable(Object source, Object result)
 			{
-				if(rms==null || componentid==null || selector instanceof ComponentFactorySelector)
+				if(!decider.searchNode(null, RemoteServiceContainer.this, results)
+					|| rms==null || componentid==null || selector instanceof ComponentFactorySelector)
 				{
 					ret.setResult(selector.getResult(results));
 				}
