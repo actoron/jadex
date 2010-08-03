@@ -180,8 +180,9 @@ public class RuleProfilerPlugin extends AbstractJCCPlugin	implements IComponentL
 					// Todo: Large icons for popup actions?
 					if(allig)
 					{
-						Icon	base	= comptree.getIcon(nodes[0], ((ComponentTreeNode)nodes[0]).getDescription().getType());
-						Action	a	= new AbstractAction((String)START_PROFILER.getValue(Action.NAME), new CombiIcon(new Icon[]{base, icons.getIcon("component_debugged")}))
+						Icon	base	= nodes[0].getIcon();
+						Action	a	= new AbstractAction((String)START_PROFILER.getValue(Action.NAME),
+							base!=null ? new CombiIcon(new Icon[]{base, icons.getIcon("component_debugged")}) : (Icon)START_PROFILER.getValue(Action.SMALL_ICON))
 						{
 							public void actionPerformed(ActionEvent e)
 							{
@@ -192,8 +193,9 @@ public class RuleProfilerPlugin extends AbstractJCCPlugin	implements IComponentL
 					}
 					else if(allob)
 					{
-						Icon	base	= comptree.getIcon(nodes[0], ((ComponentTreeNode)nodes[0]).getDescription().getType());
-						Action	a	= new AbstractAction((String)STOP_PROFILER.getValue(Action.NAME), new CombiIcon(new Icon[]{base, icons.getIcon("stop_debugger")}))
+						Icon	base	= nodes[0].getIcon();
+						Action	a	= new AbstractAction((String)STOP_PROFILER.getValue(Action.NAME),
+							base!=null ? new CombiIcon(new Icon[]{base, icons.getIcon("stop_debugger")}) : (Icon)STOP_PROFILER.getValue(Action.SMALL_ICON))
 						{
 							public void actionPerformed(ActionEvent e)
 							{

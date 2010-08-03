@@ -199,8 +199,9 @@ public class DebuggerPlugin extends AbstractJCCPlugin
 					// Todo: Large icons for popup actions?
 					if(allig)
 					{
-						Icon	base	= comptree.getIcon(nodes[0], ((ComponentTreeNode)nodes[0]).getDescription().getType());
-						Action	a	= new AbstractAction((String)START_DEBUGGER.getValue(Action.NAME), new CombiIcon(new Icon[]{base, icons.getIcon("component_debugged")}))
+						Icon	base	= nodes[0].getIcon();
+						Action	a	= new AbstractAction((String)START_DEBUGGER.getValue(Action.NAME),
+							base!=null ? new CombiIcon(new Icon[]{base, icons.getIcon("component_debugged")}) : (Icon)START_DEBUGGER.getValue(Action.SMALL_ICON))
 						{
 							public void actionPerformed(ActionEvent e)
 							{
@@ -211,8 +212,9 @@ public class DebuggerPlugin extends AbstractJCCPlugin
 					}
 					else if(allob)
 					{
-						Icon	base	= comptree.getIcon(nodes[0], ((ComponentTreeNode)nodes[0]).getDescription().getType());
-						Action	a	= new AbstractAction((String)STOP_DEBUGGER.getValue(Action.NAME), new CombiIcon(new Icon[]{base, icons.getIcon("stop_debugger")}))
+						Icon	base	= nodes[0].getIcon();
+						Action	a	= new AbstractAction((String)STOP_DEBUGGER.getValue(Action.NAME),
+							base!=null ? new CombiIcon(new Icon[]{base, icons.getIcon("stop_debugger")}) : (Icon)STOP_DEBUGGER.getValue(Action.SMALL_ICON))
 						{
 							public void actionPerformed(ActionEvent e)
 							{
