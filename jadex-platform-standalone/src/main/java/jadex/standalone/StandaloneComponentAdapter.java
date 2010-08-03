@@ -186,6 +186,8 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 				{
 					public void resultAvailable(Object source, Object result)
 					{
+						if(result==null)
+							System.out.println("here");
 						((IExecutionService)result).execute(StandaloneComponentAdapter.this);
 					}
 				});

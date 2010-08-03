@@ -92,8 +92,10 @@ public class SequentialSearchManager implements ISearchManager
 //		if(selector.toString().indexOf("IRemoteService")!=-1)
 //			System.out.println("processing: "+provider+" "+selector);
 		
+		boolean dochildren = false;
+		
 		// If node is to be searched, continue with this node.
-		if(!selector.isFinished(results) && provider!=null && decider.searchNode(source, provider, results))
+		if(!selector.isFinished(results) && provider!=null)
 		{
 			if(down)
 			{
@@ -101,46 +103,76 @@ public class SequentialSearchManager implements ISearchManager
 				todo.put(provider.getId(), new Object[]{provider, source});
 			}
 			
-			provider.getServices(LOCAL_SEARCH_MANAGER, decider, selector, results).addResultListener(new IResultListener()
+			if(decider.searchNode(source, provider, results))
 			{
-				public void resultAvailable(Object source, Object result)
+				provider.getServices(LOCAL_SEARCH_MANAGER, decider, selector, results).addResultListener(new IResultListener()
 				{
-					// When searching upwards, continue with parent.
-					if(!selector.isFinished(results) && up)
+					public void resultAvailable(Object source, Object result)
 					{
-						provider.getParent().addResultListener(new IResultListener()
+						// When searching upwards, continue with parent.
+						if(!selector.isFinished(results) && up)
 						{
-							public void resultAvailable(Object source, Object result)
+							provider.getParent().addResultListener(new IResultListener()
 							{
-								// Cut search if parent was already visisted.
-								if(SUtil.equals(source, result))
-									result = null;
-								processNode(provider, (IServiceProvider)result, decider, selector, services, ret, results, todo, up);
-							}
-							
-							public void exceptionOccurred(Object source, Exception exception)
-							{
-								ret.setException(exception);
-							}
-						});
+								public void resultAvailable(Object source, Object result)
+								{
+									// Cut search if parent was already visisted.
+									if(SUtil.equals(source, result))
+										result = null;
+									processNode(provider, (IServiceProvider)result, decider, selector, services, ret, results, todo, up);
+								}
+								
+								public void exceptionOccurred(Object source, Exception exception)
+								{
+									ret.setException(exception);
+								}
+							});
+						}
+	
+						// Else continue with child nodes from todo list (if any).
+						else
+						{
+							processChildNodes(null, decider, selector, services, ret, results, todo);
+						}
 					}
-
-					// Else continue with child nodes from todo list (if any).
-					else
+					
+					public void exceptionOccurred(Object source, Exception exception)
 					{
-						processChildNodes(null, decider, selector, services, ret, results, todo);
+						ret.setException(exception);
 					}
-				}
-				
-				public void exceptionOccurred(Object source, Exception exception)
+				});
+			}
+			else if(up)
+			{
+				// Do not perform local search
+				provider.getParent().addResultListener(new IResultListener()
 				{
-					ret.setException(exception);
-				}
-			});
+					public void resultAvailable(Object source, Object result)
+					{
+						// Cut search if parent was already visisted.
+						if(SUtil.equals(source, result))
+							result = null;
+						processNode(provider, (IServiceProvider)result, decider, selector, services, ret, results, todo, up);
+					}
+					
+					public void exceptionOccurred(Object source, Exception exception)
+					{
+						ret.setException(exception);
+					}
+				});
+			}
+			else
+			{
+				dochildren = true;
+			}
+		}
+		else
+		{
+			dochildren = true;
 		}
 		
 		// Else continue with child nodes from todo list (if any).
-		else
+		if(dochildren)
 		{
 			processChildNodes(null, decider, selector, services, ret, results, todo);
 		}

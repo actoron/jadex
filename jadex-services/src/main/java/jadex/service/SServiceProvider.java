@@ -73,6 +73,16 @@ public class SServiceProvider
 	 */
 	public static IFuture getService(IServiceProvider provider, Class type)
 	{
+		return getService(provider, type, true);
+	}
+	
+	/**
+	 *  Get one service of a type.
+	 *  @param type The class.
+	 *  @return The corresponding service.
+	 */
+	public static IFuture getService(IServiceProvider provider, Class type, boolean onlylocal)
+	{
 //		synchronized(profiling)
 //		{
 //			Integer	cnt	= (Integer)profiling.get(type);
@@ -80,7 +90,9 @@ public class SServiceProvider
 //		}
 		final Future ret = new Future();
 		
-		provider.getServices(sequentialmanager, abortdecider, new TypeResultSelector(type), new ArrayList()).addResultListener(new IResultListener()
+		provider.getServices(sequentialmanager, onlylocal? abortdecider: new DefaultVisitDecider(true, false), 
+			new TypeResultSelector(type, true, onlylocal), new ArrayList())
+			.addResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{

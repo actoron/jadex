@@ -17,6 +17,9 @@ public class DefaultVisitDecider implements IVisitDecider
 	/** A flag that indicates if node should not be searched when one result is already available. */
 	protected boolean abort;
 	
+	/** Flag indicating if remote proxies will be visited. */
+	protected boolean onlylocal;
+	
 	//-------- constructors --------
 
 	/**
@@ -33,8 +36,17 @@ public class DefaultVisitDecider implements IVisitDecider
 	 */
 	public DefaultVisitDecider(boolean abort)
 	{
+		this(abort, true);
+	}
+	
+	/**
+	 *  Create a new visit decider.
+	 */
+	public DefaultVisitDecider(boolean abort, boolean onlylocal)
+	{
 //		this.visited = new HashSet();
 		this.abort = abort;
+		this.onlylocal = onlylocal;
 	}
 	
 	//-------- methods --------
@@ -48,6 +60,10 @@ public class DefaultVisitDecider implements IVisitDecider
 	public synchronized boolean searchNode(IServiceProvider source, IServiceProvider target, Collection results)
 	{
 		boolean ret = !(abort && results.size()>0);
+		
+		// Hack!!!
+		if(ret && onlylocal && target!=null && target.getClass().getName().indexOf("RemoteServiceContainer")!=-1)
+			ret = false;
 		
 //		if(visited.contains(target.getId()))
 //			System.out.println("rattenkack");
