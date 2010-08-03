@@ -60,9 +60,6 @@ public class ComponentTreePanel extends JPanel
 	/** The component tree. */
 	private final JTree	tree;
 	
-	/** The component icon cache. */
-	private final ComponentIconCache	cic;
-	
 	/** The component management service. */
 	private IComponentManagementService	cms;
 	
@@ -96,7 +93,7 @@ public class ComponentTreePanel extends JPanel
 		tree.setCellRenderer(new ComponentTreeCellRenderer());
 		tree.addMouseListener(new ComponentTreePopupListener());
 		tree.setShowsRootHandles(true);
-		this.cic	= new ComponentIconCache(provider, tree);
+		final ComponentIconCache	cic	= new ComponentIconCache(provider, tree);
 		this.setLayout(new BorderLayout());
 		this.add(new JScrollPane(tree));
 		
@@ -230,15 +227,17 @@ public class ComponentTreePanel extends JPanel
 
 			public Action[] getPopupActions(IComponentTreeNode[] nodes)
 			{
-				Icon	base	= cic.getIcon(nodes[0], ((ComponentTreeNode)nodes[0]).getDescription().getType());
-				Action	prefresh	= new AbstractAction((String)refresh.getValue(Action.NAME), new CombiIcon(new Icon[]{base, icons.getIcon("overlay_refresh")}))
+				Icon	base	= nodes[0].getIcon();
+				Action	prefresh	= new AbstractAction((String)refresh.getValue(Action.NAME),
+					base!=null ? new CombiIcon(new Icon[]{base, icons.getIcon("overlay_refresh")}) : (Icon)refresh.getValue(Action.SMALL_ICON))
 				{
 					public void actionPerformed(ActionEvent e)
 					{
 						refresh.actionPerformed(e);
 					}
 				};
-				Action	prefreshtree	= new AbstractAction((String)refreshtree.getValue(Action.NAME), new CombiIcon(new Icon[]{base, icons.getIcon("overlay_refreshtree")}))
+				Action	prefreshtree	= new AbstractAction((String)refreshtree.getValue(Action.NAME),
+					base!=null ? new CombiIcon(new Icon[]{base, icons.getIcon("overlay_refreshtree")}) : (Icon)refreshtree.getValue(Action.SMALL_ICON))
 				{
 					public void actionPerformed(ActionEvent e)
 					{
@@ -296,8 +295,9 @@ public class ComponentTreePanel extends JPanel
 					}
 					
 					// Todo: Large icons for popup actions?
-					Icon	base	= cic.getIcon(nodes[0], ((ComponentTreeNode)nodes[0]).getDescription().getType());
-					Action	pkill	= new AbstractAction((String)kill.getValue(Action.NAME), new CombiIcon(new Icon[]{base, icons.getIcon("overlay_kill")}))
+					Icon	base	= nodes[0].getIcon();
+					Action	pkill	= new AbstractAction((String)kill.getValue(Action.NAME),
+						base!=null ? new CombiIcon(new Icon[]{base, icons.getIcon("overlay_kill")}) : (Icon)kill.getValue(Action.SMALL_ICON))
 					{
 						public void actionPerformed(ActionEvent e)
 						{
@@ -306,7 +306,8 @@ public class ComponentTreePanel extends JPanel
 					};
 					if(allact)
 					{
-						Action	psuspend	= new AbstractAction((String)suspend.getValue(Action.NAME), new CombiIcon(new Icon[]{base, icons.getIcon("overlay_suspend")}))
+						Action	psuspend	= new AbstractAction((String)suspend.getValue(Action.NAME),
+							base!=null ? new CombiIcon(new Icon[]{base, icons.getIcon("overlay_suspend")}) : (Icon)suspend.getValue(Action.SMALL_ICON))
 						{
 							public void actionPerformed(ActionEvent e)
 							{
@@ -317,14 +318,16 @@ public class ComponentTreePanel extends JPanel
 					}
 					else if(allsusp)
 					{
-						Action	presume	= new AbstractAction((String)resume.getValue(Action.NAME), new CombiIcon(new Icon[]{base, icons.getIcon("overlay_resume")}))
+						Action	presume	= new AbstractAction((String)resume.getValue(Action.NAME),
+							base!=null ? new CombiIcon(new Icon[]{base, icons.getIcon("overlay_resume")}) : (Icon)resume.getValue(Action.SMALL_ICON))
 						{
 							public void actionPerformed(ActionEvent e)
 							{
 								resume.actionPerformed(e);
 							}
 						};
-						Action	pstep	= new AbstractAction((String)step.getValue(Action.NAME), new CombiIcon(new Icon[]{base, icons.getIcon("overlay_step")}))
+						Action	pstep	= new AbstractAction((String)step.getValue(Action.NAME),
+							base!=null ? new CombiIcon(new Icon[]{base, icons.getIcon("overlay_step")}) : (Icon)step.getValue(Action.SMALL_ICON))
 						{
 							public void actionPerformed(ActionEvent e)
 							{
@@ -496,13 +499,5 @@ public class ComponentTreePanel extends JPanel
 	public JTree	getTree()
 	{
 		return tree;
-	}
-	
-	/**
-	 *  Get a cached icon.
-	 */
-	public Icon	getIcon(IComponentTreeNode node, String type)
-	{
-		return cic.getIcon(node, type);
 	}
 }
