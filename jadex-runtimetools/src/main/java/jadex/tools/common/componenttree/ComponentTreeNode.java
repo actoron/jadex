@@ -5,8 +5,8 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.concurrent.SwingDefaultResultListener;
-import jadex.service.IService;
 import jadex.service.SServiceProvider;
+import jadex.service.ServiceInfo;
 
 import java.awt.Component;
 import java.util.ArrayList;
@@ -154,10 +154,10 @@ public class ComponentTreeNode	extends AbstractComponentTreeNode
 							List	children	= new ArrayList();
 							for(int i=0; i<services.size(); i++)
 							{
-								Object[]	tuple	= (Object[])services.get(i);
-								ServiceNode	sn	= (ServiceNode)getModel().getNode(((IService)tuple[1]).getServiceIdentifier());
+								ServiceInfo si	= (ServiceInfo)services.get(i);
+								ServiceNode	sn	= (ServiceNode)getModel().getNode(si.getService().getServiceIdentifier());
 								if(sn==null)
-									sn	= new ServiceNode(scn, getModel(), (Class)tuple[0], (IService)tuple[1]);
+									sn	= new ServiceNode(scn, getModel(), si.getType(), si.getService());
 								children.add(sn);
 							}
 							scn.setChildren(children);							

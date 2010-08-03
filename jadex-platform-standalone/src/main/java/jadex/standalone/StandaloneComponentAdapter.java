@@ -1,7 +1,7 @@
 package jadex.standalone;
 
-import jadex.base.fipa.ComponentIdentifier;
 import jadex.bridge.CheckedAction;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.DefaultMessageAdapter;
 import jadex.bridge.IComponentAdapter;

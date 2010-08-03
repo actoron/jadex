@@ -8,7 +8,7 @@ import jadex.service.IServiceProvider;
 /**
  *  Service wrapper for a threadpool.
  */
-public class ThreadPoolService extends BasicService implements IThreadPool
+public class ThreadPoolService extends BasicService implements IThreadPoolService
 {
 	//-------- attributes --------
 	

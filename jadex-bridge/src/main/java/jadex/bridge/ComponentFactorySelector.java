@@ -125,7 +125,7 @@ public class ComponentFactorySelector implements IResultSelector
 	 */
 	public String toString()
 	{
-		return "ComponentFactorySelector [type=" + type + ", model=" + model
-			+ ", imports="+ (imports != null ? Arrays.asList(imports) : null) + "]";
+		return "ComponentFactorySelector( type=" + type + ", model=" + model
+			+ ", imports="+ (imports != null ? Arrays.asList(imports) : null) + ")";
 	}
 }

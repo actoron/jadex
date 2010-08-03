@@ -10,7 +10,7 @@ import jadex.commons.concurrent.IResultListener;
 import jadex.service.BasicService;
 import jadex.service.IServiceProvider;
 import jadex.service.SServiceProvider;
-import jadex.service.threadpool.ThreadPoolService;
+import jadex.service.threadpool.IThreadPoolService;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -156,11 +156,11 @@ public class SyncExecutionService extends BasicService implements IExecutionServ
 			return ret;
 		}
 		
-		SServiceProvider.getService(provider, ThreadPoolService.class).addResultListener(new IResultListener()
+		SServiceProvider.getService(provider, IThreadPoolService.class).addResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
-				executor = new Executor((ThreadPoolService)result, new IExecutable()
+				executor = new Executor((IThreadPoolService)result, new IExecutable()
 				{
 					public boolean execute()
 					{

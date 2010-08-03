@@ -1,6 +1,6 @@
 package jadex.standalone.transport.niotcpmtp;
 
-import jadex.base.fipa.ComponentIdentifier;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IMessageService;
 import jadex.commons.SUtil;
@@ -9,14 +9,13 @@ import jadex.commons.collection.LRU;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.DefaultResultListener;
-import jadex.commons.concurrent.IThreadPool;
 import jadex.service.IServiceContainer;
 import jadex.service.SServiceProvider;
 import jadex.service.clock.IClockService;
 import jadex.service.clock.ITimedObject;
 import jadex.service.clock.ITimer;
 import jadex.service.library.ILibraryService;
-import jadex.service.threadpool.ThreadPoolService;
+import jadex.service.threadpool.IThreadPoolService;
 import jadex.standalone.transport.ITransport;
 import jadex.standalone.transport.MessageEnvelope;
 import jadex.standalone.transport.codecs.CodecFactory;
@@ -33,8 +32,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.logging.Logger;
 
 /**
@@ -171,11 +170,11 @@ public class NIOTCPTransport implements ITransport
 				public void resultAvailable(Object source, Object result)
 				{
 					libservice = (ILibraryService)result;
-					SServiceProvider.getService(container, ThreadPoolService.class).addResultListener(new DefaultResultListener()
+					SServiceProvider.getService(container, IThreadPoolService.class).addResultListener(new DefaultResultListener()
 					{
 						public void resultAvailable(Object source, Object result)
 						{
-							IThreadPool tp = (IThreadPool)result;
+							IThreadPoolService tp = (IThreadPoolService)result;
 							tp.execute(new Runnable()
 							{
 								public void run()

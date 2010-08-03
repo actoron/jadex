@@ -4,6 +4,7 @@ import jadex.bdi.runtime.Plan;
 import jadex.commons.SUtil;
 import jadex.service.SServiceProvider;
 import jadex.service.library.ILibraryService;
+import jadex.service.threadpool.IThreadPoolService;
 import jadex.service.threadpool.ThreadPoolService;
 
 import java.io.BufferedInputStream;
@@ -46,7 +47,7 @@ public class PlaySongPlan extends Plan
 		final SyncResultListener lis = new SyncResultListener();
 		final ILibraryService ls = (ILibraryService)SServiceProvider.getService(getScope().getServiceProvider(), ILibraryService.class).get(this);
 		
-		ThreadPoolService tp = (ThreadPoolService)SServiceProvider.getService(getScope().getServiceProvider(), ThreadPoolService.class).get(this);
+		IThreadPoolService tp = (IThreadPoolService)SServiceProvider.getService(getScope().getServiceProvider(), IThreadPoolService.class).get(this);
 		tp.execute(new Runnable()
 		{
 			public void run()

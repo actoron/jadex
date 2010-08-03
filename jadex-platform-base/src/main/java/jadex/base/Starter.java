@@ -1,7 +1,7 @@
 package jadex.base;
 
 import jadex.base.fipa.CMSComponentDescription;
-import jadex.base.fipa.ComponentIdentifier;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IArgument;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentAdapterFactory;

@@ -20,7 +20,7 @@ public class ProxyInfo
 	protected IServiceIdentifier sid; 
 	
 	/** The service type. */
-	protected Class service;
+	protected Class type;
 
 	//-------- constructors --------
 	
@@ -34,11 +34,11 @@ public class ProxyInfo
 	/**
 	 *  Create a new proxy info.
 	 */
-	public ProxyInfo(IComponentIdentifier rms, IServiceIdentifier sid, Class service)
+	public ProxyInfo(IComponentIdentifier rms, IServiceIdentifier sid, Class type)
 	{
 		this.rms = rms;
 		this.sid = sid;
-		this.service = service;
+		this.type = type;
 	}
 
 	//-------- methods --------
@@ -80,21 +80,21 @@ public class ProxyInfo
 	}
 
 	/**
-	 *  Get the service.
-	 *  @return the service.
+	 *  Get the type.
+	 *  @return the type.
 	 */
-	public Class getService()
+	public Class getType()
 	{
-		return service;
+		return type;
 	}
 
 	/**
-	 *  Set the service.
-	 *  @param service The service to set.
+	 *  Set the type.
+	 *  @param type The type to set.
 	 */
-	public void setService(Class service)
+	public void setType(Class type)
 	{
-		this.service = service;
-	}	
-	
+		this.type = type;
+	}
+
 }

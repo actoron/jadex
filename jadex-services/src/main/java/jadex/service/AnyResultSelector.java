@@ -1,6 +1,5 @@
 package jadex.service;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 
@@ -13,9 +12,6 @@ public class AnyResultSelector implements IResultSelector
 	
 	/** The one result flag. */
 	protected boolean oneresult;
-	
-	/** The flag if type should be part of result. */
-	protected boolean includetype;
 	
 	//-------- constructors --------
 	
@@ -32,16 +28,7 @@ public class AnyResultSelector implements IResultSelector
 	 */
 	public AnyResultSelector(boolean oneresult)
 	{
-		this(oneresult, false);
-	}
-	
-	/**
-	 *  Create a type result listener.
-	 */
-	public AnyResultSelector(boolean oneresult, boolean includetype)
-	{
 		this.oneresult = oneresult;
-		this.includetype = includetype;
 	}
 	
 	//-------- methods --------
@@ -53,7 +40,7 @@ public class AnyResultSelector implements IResultSelector
 	 */
 	public void	selectServices(Map services, Collection results)
 	{
-		Object[]	keys	= services.keySet().toArray();
+		Class[]	keys	= (Class[])services.keySet().toArray(new Class[services.keySet().size()]);
 		if(oneresult)
 		{
 			boolean	found	= false;
@@ -62,14 +49,7 @@ public class AnyResultSelector implements IResultSelector
 				Collection	coll	= (Collection)services.get(keys[i]);
 				if(coll!=null && !coll.isEmpty())
 				{
-					if(includetype)
-					{
-						results.add(new Object[]{keys[i], coll.toArray()[0]});
-					}
-					else
-					{
-						results.add(coll.toArray()[0]);
-					}
+					results.add(new ServiceInfo(keys[i], (IService)coll.toArray()[0]));
 					found	= true;
 				}
 			}
@@ -81,17 +61,10 @@ public class AnyResultSelector implements IResultSelector
 				Collection	coll	= (Collection)services.get(keys[i]);
 				if(coll!=null && !coll.isEmpty())
 				{
-					Object[]	ares	= coll.toArray(); 
-					if(includetype)
+					IService[] ares = (IService[])coll.toArray(new IService[coll.size()]); 
+					for(int j=0; j<ares.length; j++)
 					{
-						for(int j=0; j<ares.length; j++)
-						{
-							results.add(new Object[]{keys[i], ares[j]});
-						}
-					}
-					else
-					{
-						results.addAll(Arrays.asList(ares));
+						results.add(new ServiceInfo(keys[i], ares[j]));
 					}
 				}
 			}
@@ -148,24 +121,6 @@ public class AnyResultSelector implements IResultSelector
 		this.oneresult = oneresult;
 	}
 	
-	/**
-	 *  Get the includetype.
-	 *  @return the includetype.
-	 */
-	public boolean isIncludeType()
-	{
-		return includetype;
-	}
-
-	/**
-	 *  Set the includetype.
-	 *  @param includetype The includetype to set.
-	 */
-	public void setIncludeType(boolean includetype)
-	{
-		this.includetype = includetype;
-	}
-
 	/**
 	 *  Get the string representation.
 	 */

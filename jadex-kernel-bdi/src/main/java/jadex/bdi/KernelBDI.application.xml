@@ -33,8 +33,8 @@
 				new Object[]
 				{
 					new FIPAMessageType(), 
-					new JavaStandardPlanExecutor((ThreadPoolService)
-						SServiceProvider.getService($platform, ThreadPoolService.class).get(new ThreadSuspendable())),
+					new JavaStandardPlanExecutor((IThreadPoolService)
+						SServiceProvider.getService($platform, IThreadPoolService.class).get(new ThreadSuspendable())),
 					new java.lang.Long(10000),
 					Boolean.TRUE,
 					"jadex.tools.debugger.bdi.BDIAgentInspectorDebuggerPanel, jadex.tools.debugger.bdi.BDIAgentRuleEngineDebuggerPanel"

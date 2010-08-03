@@ -17,7 +17,7 @@ import jadex.service.IServiceContainer;
 import jadex.service.SServiceProvider;
 import jadex.service.library.ILibraryService;
 import jadex.service.library.ILibraryServiceListener;
-import jadex.service.threadpool.ThreadPoolService;
+import jadex.service.threadpool.IThreadPoolService;
 import jadex.tools.common.PopupBuilder;
 import jadex.tools.common.ToolTipAction;
 import jadex.xml.bean.JavaReader;
@@ -144,11 +144,11 @@ public class ModelExplorer extends JTree
 //		this.worker	= new LoadManagingExecutionService(
 //			((IThreadPool)container.getService(ThreadPoolService.class)));
 	
-		SServiceProvider.getService(container, ThreadPoolService.class).addResultListener(new DefaultResultListener()
+		SServiceProvider.getService(container, IThreadPoolService.class).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
-				worker	= new LoadManagingExecutionService((IThreadPool)result);
+				worker	= new LoadManagingExecutionService((IThreadPoolService)result);
 			}
 		});
 		

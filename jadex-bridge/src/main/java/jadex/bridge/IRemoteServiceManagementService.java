@@ -3,13 +3,14 @@ package jadex.bridge;
 import jadex.commons.IFuture;
 import jadex.service.IResultSelector;
 import jadex.service.ISearchManager;
+import jadex.service.IService;
 import jadex.service.IVisitDecider;
 
 
 /**
  *  Interface for remote management service.
  */
-public interface IRemoteServiceManagementService
+public interface IRemoteServiceManagementService extends IService
 {	
 	/**
 	 *  Get a service proxies from a remote platform.

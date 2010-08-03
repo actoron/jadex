@@ -8,7 +8,7 @@ import jadex.commons.concurrent.IThreadPool;
 import jadex.service.BasicService;
 import jadex.service.IServiceProvider;
 import jadex.service.SServiceProvider;
-import jadex.service.threadpool.ThreadPoolService;
+import jadex.service.threadpool.IThreadPoolService;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -26,7 +26,7 @@ public class ClockService extends BasicService implements IClockService
 	protected IClock clock;
 	
 	/** The threadpool. */
-	protected IThreadPool threadpool;
+	protected IThreadPoolService threadpool;
 
 	/** The clock listeners. */
 	protected List listeners;
@@ -235,12 +235,12 @@ public class ClockService extends BasicService implements IClockService
 		
 		final Future ret = new Future();
 		
-		SServiceProvider.getServiceUpwards(provider, ThreadPoolService.class)
+		SServiceProvider.getServiceUpwards(provider, IThreadPoolService.class)
 			.addResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
-				threadpool = (IThreadPool)result;
+				threadpool = (IThreadPoolService)result;
 				clock = createClock(cinfo, threadpool);
 				clock.start();
 				ClockService.super.startService().addResultListener(new IResultListener()

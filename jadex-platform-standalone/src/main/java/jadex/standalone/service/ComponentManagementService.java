@@ -1,9 +1,9 @@
 package jadex.standalone.service;
 
 import jadex.base.fipa.CMSComponentDescription;
-import jadex.base.fipa.ComponentIdentifier;
 import jadex.base.fipa.SearchConstraints;
 import jadex.bridge.ComponentFactorySelector;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentDescription;

@@ -269,7 +269,7 @@ public class SServiceProvider
 //		}
 		final Future ret = new Future();
 		
-		provider.getServices(localmanager, contdecider, new TypeResultSelector(type), new ArrayList()).addResultListener(new IResultListener()
+		provider.getServices(localmanager, abortdecider, new TypeResultSelector(type), new ArrayList()).addResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
@@ -298,14 +298,39 @@ public class SServiceProvider
 	 *  Get all declared services of the given provider.
 	 *  @return The corresponding services.
 	 */
-	public static IFuture getDeclaredServices(IServiceProvider provider, boolean includetype)
+	public static IFuture getDeclaredServices(IServiceProvider provider, final boolean includetype)
 	{
 //		synchronized(profiling)
 //		{
 //			Integer	cnt	= (Integer)profiling.get(type);
 //			profiling.put(type, new Integer(cnt!=null ? cnt.intValue()+1 : 1)); 
 //		}
-		return provider.getServices(localmanager, contdecider, new AnyResultSelector(false, includetype), new ArrayList());
+		final Future ret = new Future();
+		
+		provider.getServices(localmanager, contdecider, new AnyResultSelector(false), new ArrayList()).addResultListener(new IResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				List res = null;
+				if(result instanceof Collection)
+				{
+					res = new ArrayList();
+					for(Iterator it=((Collection)result).iterator(); it.hasNext(); )
+					{
+						ServiceInfo si = (ServiceInfo)it.next();
+						res.add(includetype? si: si.getService());
+					}
+				}
+				ret.setResult(res);
+			}
+			
+			public void exceptionOccurred(Object source, Exception exception)
+			{
+				ret.setException(exception);
+			}
+		});
+		
+		return ret;
 	}
 	
 	/**

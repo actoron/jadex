@@ -1,6 +1,6 @@
 package jadex.standalone.transport.localmtp;
 
-import jadex.base.fipa.ComponentIdentifier;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IMessageService;
 import jadex.commons.collection.SCollection;

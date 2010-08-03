@@ -12,6 +12,7 @@ import jadex.commons.concurrent.IThreadPool;
 import jadex.service.BasicService;
 import jadex.service.IServiceProvider;
 import jadex.service.SServiceProvider;
+import jadex.service.threadpool.IThreadPoolService;
 import jadex.service.threadpool.ThreadPoolService;
 
 import java.util.Iterator;
@@ -26,7 +27,7 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 	//-------- attributes --------
 	
 	/** The threadpool. */
-	protected IThreadPool threadpool;
+	protected IThreadPoolService threadpool;
 	
 	/** The currently waiting tasks. */
 	protected Map executors;
@@ -224,11 +225,11 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 		}
 		else
 		{
-			SServiceProvider.getService(provider, ThreadPoolService.class).addResultListener(new IResultListener()
+			SServiceProvider.getService(provider, IThreadPoolService.class).addResultListener(new IResultListener()
 			{
 				public void resultAvailable(Object source, Object result)
 				{
-					threadpool = (IThreadPool)result;
+					threadpool = (IThreadPoolService)result;
 					
 					running	= true;
 					

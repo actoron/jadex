@@ -1,5 +1,6 @@
 package jadex.base.fipa;
 
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
 

@@ -1,25 +1,19 @@
 package jadex.base.service.remote;
 
+import jadex.bridge.ComponentFactorySelector;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IExternalAccess;
 import jadex.bridge.IRemoteServiceManagementService;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
-import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.service.BasicServiceContainer;
 import jadex.service.IResultSelector;
 import jadex.service.ISearchManager;
-import jadex.service.IServiceContainer;
-import jadex.service.IServiceProvider;
 import jadex.service.IVisitDecider;
 import jadex.service.SServiceProvider;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
 
 /**
  *  Remote service container for searching at a remote platform
@@ -29,10 +23,13 @@ public class RemoteServiceContainer extends BasicServiceContainer
 {
 	//-------- attributes --------
 	
+	/** The remote component id. */
+	protected IComponentIdentifier componentid;
+	
 	/** The component adapter. */
 	protected IComponentAdapter adapter;
 	
-	/** The rms. */
+	/** The local rms service. */
 	protected IRemoteServiceManagementService rms;
 	
 	//-------- constructors --------
@@ -40,10 +37,11 @@ public class RemoteServiceContainer extends BasicServiceContainer
 	/**
 	 *  Create a new service container.
 	 */
-	public RemoteServiceContainer(IComponentIdentifier id, IComponentAdapter adapter)
+	public RemoteServiceContainer(IComponentIdentifier componentid, IComponentAdapter adapter)
 	{
-		super(id);
+		super(adapter.getComponentIdentifier());
 		this.adapter = adapter;
+		this.componentid = componentid;
 	}
 	
 	//-------- interface methods --------
@@ -53,7 +51,7 @@ public class RemoteServiceContainer extends BasicServiceContainer
 	 *  @param type The class.
 	 *  @return The corresponding services.
 	 */
-	public IFuture	getServices(ISearchManager manager, final IVisitDecider decider, final IResultSelector selector, final Collection results)
+	public IFuture	getServices(final ISearchManager manager, final IVisitDecider decider, final IResultSelector selector, final Collection results)
 	{
 		final Future ret = new Future();
 		
@@ -61,15 +59,14 @@ public class RemoteServiceContainer extends BasicServiceContainer
 		{
 			public void resultAvailable(Object source, Object result)
 			{
-				if(rms==null)
+				if(rms==null || componentid==null || selector instanceof ComponentFactorySelector)
 				{
 					ret.setResult(selector.getResult(results));
 				}
 				else
 				{
 					// Hack! Use user search manager.
-					IComponentIdentifier cid = (IComponentIdentifier)getId();
-					rms.getServiceProxies(cid, cid, SServiceProvider.sequentialmanager, decider, selector)
+					rms.getServiceProxies(componentid, componentid, SServiceProvider.sequentialmanager, decider, selector)
 						.addResultListener(new IResultListener()
 					{
 						public void resultAvailable(Object source, Object res)
@@ -95,6 +92,7 @@ public class RemoteServiceContainer extends BasicServiceContainer
 			
 			public void exceptionOccurred(Object source, Exception exception)
 			{
+				ret.setException(exception);
 			}
 		});
 			
@@ -155,12 +153,13 @@ public class RemoteServiceContainer extends BasicServiceContainer
 	{
 		final Future ret = new Future();
 		
+//		System.out.println("Searching rms: "+getId());
 		SServiceProvider.getService(this, IRemoteServiceManagementService.class)
 			.addResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
-				System.out.println("Found rms: "+result);
+//				System.out.println("Found rms: "+getId()+result);
 				rms = (IRemoteServiceManagementService)result;	
 				ret.setResult(null);
 			}

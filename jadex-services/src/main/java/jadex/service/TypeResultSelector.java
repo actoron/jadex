@@ -1,5 +1,6 @@
 package jadex.service;
 
+import java.lang.reflect.Proxy;
 import java.util.Collection;
 import java.util.Map;
 
@@ -15,6 +16,9 @@ public class TypeResultSelector implements IResultSelector
 	
 	/** The one result flag. */
 	protected boolean oneresult;
+	
+	/** The only local services flag. */
+	protected boolean onlylocal;
 	
 	//-------- constructors --------
 	
@@ -38,8 +42,17 @@ public class TypeResultSelector implements IResultSelector
 	 */
 	public TypeResultSelector(Class type, boolean oneresult)
 	{
+		this(type, oneresult, true);
+	}
+	
+	/**
+	 *  Create a type result listener.
+	 */
+	public TypeResultSelector(Class type, boolean oneresult, boolean onlylocal)
+	{
 		this.type = type;
 		this.oneresult = oneresult;
+		this.onlylocal = onlylocal;
 	}
 	
 	//-------- methods --------
@@ -54,17 +67,34 @@ public class TypeResultSelector implements IResultSelector
 		Collection res = (Collection)services.get(type);
 		if(res!=null)
 		{
-			Object[]	ares	= res.toArray();
+			Object[] ares	= res.toArray();
 			if(oneresult && ares.length>0)
 			{
-				results.add(new ServiceInfo(type, (IService)res.toArray()[0]));
+				if(onlylocal)
+				{
+					for(int i=0; i<ares.length; i++)
+					{
+						if(!Proxy.isProxyClass(ares[i].getClass()))
+						{
+							results.add(new ServiceInfo(type, (IService)res.toArray()[i]));
+							break;
+						}
+					}
+				}
+				else
+				{
+					results.add(new ServiceInfo(type, (IService)res.toArray()[0]));
+				}
 			}
 			else
 			{
 //				System.out.println("adding: "+ares);
 				for(int i=0; i<ares.length; i++)
 				{
-					results.add(new ServiceInfo(type, (IService)ares[i]));
+					if(!onlylocal || !Proxy.isProxyClass(ares[i].getClass()))
+					{
+						results.add(new ServiceInfo(type, (IService)ares[i]));
+					}
 				}
 			}
 		}
@@ -138,6 +168,24 @@ public class TypeResultSelector implements IResultSelector
 		this.oneresult = oneresult;
 	}
 	
+	/**
+	 *  Get the only local flag.
+	 *  @return the local.
+	 */
+	public boolean isOnlyLocal()
+	{
+		return onlylocal;
+	}
+
+	/**
+	 *  Set the only local flag.
+	 *  @param local The local to set.
+	 */
+	public void setOnlyLocal(boolean onlylocal)
+	{
+		this.onlylocal = onlylocal;
+	}
+
 	/**
 	 *  Get the string representation.
 	 */

@@ -179,7 +179,7 @@ public class BlockingQueue implements IBlockingQueue
 					{
 						Object	item	= queue.dequeue();
 //						Object	item	= queue.take();
-						System.out.println("Processing: "+item);
+//						System.out.println("Processing: "+item);
 						stat[1]	= Math.max(queue.size(), stat[1]);
 						if(queue.size()==0)
 						{

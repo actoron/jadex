@@ -92,15 +92,19 @@ public class RemoteSearchCommand implements IRemoteCommand
 						IExternalAccess exta = (IExternalAccess)result;
 						
 						// start serach on target component
+//						System.out.println("rem search start: "+manager+" "+decider+" "+selector);
 						exta.getServiceProvider().getServices(manager, decider, selector, new ArrayList())
 							.addResultListener(new IResultListener()
 						{
 							public void resultAvailable(Object source, Object result)
 							{
+//								System.out.println("rem search end: "+manager+" "+decider+" "+selector+" "+result);
 								// Create proxy info(s) for service(s)
-								Object content;
+								Object content = null;
 								if(result instanceof Collection)
 								{
+									try
+									{
 									List res = new ArrayList();
 									for(Iterator it=((Collection)result).iterator(); it.hasNext(); )
 									{
@@ -110,6 +114,11 @@ public class RemoteSearchCommand implements IRemoteCommand
 										res.add(pi);
 									}
 									content = res;
+									}
+									catch(Exception e)
+									{
+										e.printStackTrace();
+									}
 								}
 								else //if(result instanceof Object[])
 								{

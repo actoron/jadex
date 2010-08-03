@@ -2,6 +2,7 @@ package jadex.service;
 
 import jadex.commons.Future;
 import jadex.commons.IFuture;
+import jadex.commons.SUtil;
 import jadex.commons.concurrent.IResultListener;
 
 import java.util.Collection;
@@ -66,7 +67,7 @@ public class SequentialSearchManager implements ISearchManager
 //		System.out.println("search: "+selector+" "+provider.getId());
 		Future	ret	= new Future();
 		Map	todo	= new LinkedHashMap(); // Nodes of which children still to be processed (id->provider).
-		processNode(provider, decider, selector, services, ret, results, todo, up);
+		processNode(null, provider, decider, selector, services, ret, results, todo, up);
 		return ret;
 	}
 	
@@ -85,16 +86,19 @@ public class SequentialSearchManager implements ISearchManager
 	/**
 	 *  Process a single node (provider).
 	 */
-	protected void processNode(final IServiceProvider provider, final IVisitDecider decider, final IResultSelector selector, final Map services,
+	protected void processNode(final IServiceProvider source, final IServiceProvider provider, final IVisitDecider decider, final IResultSelector selector, final Map services,
 		final Future ret, final Collection results, final Map todo, final boolean up)
 	{
+//		if(selector.toString().indexOf("IRemoteService")!=-1)
+//			System.out.println("processing: "+provider+" "+selector);
+		
 		// If node is to be searched, continue with this node.
-		if(!selector.isFinished(results) && provider!=null && decider.searchNode(null, provider, results))
+		if(!selector.isFinished(results) && provider!=null && decider.searchNode(source, provider, results))
 		{
 			if(down)
 			{
 				// Child nodes of this node still have to be searched.
-				todo.put(provider.getId(), provider);
+				todo.put(provider.getId(), new Object[]{provider, source});
 			}
 			
 			provider.getServices(LOCAL_SEARCH_MANAGER, decider, selector, results).addResultListener(new IResultListener()
@@ -108,7 +112,10 @@ public class SequentialSearchManager implements ISearchManager
 						{
 							public void resultAvailable(Object source, Object result)
 							{
-								processNode((IServiceProvider)result, decider, selector, services, ret, results, todo, up);
+								// Cut search if parent was already visisted.
+								if(SUtil.equals(source, result))
+									result = null;
+								processNode(provider, (IServiceProvider)result, decider, selector, services, ret, results, todo, up);
 							}
 							
 							public void exceptionOccurred(Object source, Exception exception)
@@ -121,7 +128,7 @@ public class SequentialSearchManager implements ISearchManager
 					// Else continue with child nodes from todo list (if any).
 					else
 					{
-						processChildNodes(decider, selector, services, ret, results, todo);
+						processChildNodes(null, decider, selector, services, ret, results, todo);
 					}
 				}
 				
@@ -135,14 +142,14 @@ public class SequentialSearchManager implements ISearchManager
 		// Else continue with child nodes from todo list (if any).
 		else
 		{
-			processChildNodes(decider, selector, services, ret, results, todo);
+			processChildNodes(null, decider, selector, services, ret, results, todo);
 		}
 	}
 
 	/**
 	 *  Process child nodes from the todo list.
 	 */
-	protected void processChildNodes(
+	protected void processChildNodes(final IServiceProvider source,
 			final IVisitDecider decider, final IResultSelector selector,
 			final Map services, final Future ret, final Collection results, final Map todo)
 	{
@@ -163,24 +170,29 @@ public class SequentialSearchManager implements ISearchManager
 			}
 			
 			// Set 'up' to false, once traversing children has started.
-			processNode(child, decider, selector, services, ret, results, todo, false);
+			processNode(source, child, decider, selector, services, ret, results, todo, false);
 		}
 
 		// Else pick entry from todo list and continue with its children.
 		else
 		{
 			Object	next	= todo.keySet().iterator().next();
-			IServiceProvider	provider	= (IServiceProvider)todo.remove(next);
+			final Object[] prov = (Object[])todo.remove(next);
+			final IServiceProvider	provider = (IServiceProvider)prov[0];
+			final IServiceProvider	src = (IServiceProvider)prov[1];
 			provider.getChildren().addResultListener(new IResultListener()
 			{
 				public void resultAvailable(Object source, Object result)
 				{
+//					if(selector.toString().indexOf("IRemoteService")!=-1)
+//						System.out.println("children: "+provider+" "+result);
 					if(!selector.isFinished(results) && result!=null && !((Collection)result).isEmpty())
 					{
 						List	ccs	= new LinkedList((Collection)result);
+						ccs.remove(src);
 						todo.put(CURRENT_CHILDREN, ccs);
 					}
-					processChildNodes(decider, selector, services, ret, results, todo);
+					processChildNodes(provider, decider, selector, services, ret, results, todo);
 				}
 				
 				public void exceptionOccurred(Object source, Exception exception)

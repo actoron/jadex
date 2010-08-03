@@ -5,7 +5,9 @@ import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
+import jadex.service.IService;
 import jadex.service.SServiceProvider;
+import jadex.service.ServiceInfo;
 import jadex.service.library.ILibraryService;
 
 import java.lang.reflect.Proxy;
@@ -64,18 +66,28 @@ public class RemoteSearchResultCommand extends RemoteResultCommand
 					for(Iterator it=((Collection)result).iterator(); it.hasNext(); )
 					{
 						ProxyInfo pi = (ProxyInfo)it.next();
-						ret.add(Proxy.newProxyInstance(ls.getClassLoader(), new Class[]{pi.getService()},
+						try
+						{
+						
+						ret.add(new ServiceInfo(pi.getType(), (IService)Proxy.newProxyInstance(ls.getClassLoader(), 
+							new Class[]{pi.getType(), IService.class},
 							new RemoteMethodInvocationHandler(component, pi.getRemoteManagementServiceIdentifier(), 
-							pi.getServiceIdentifier(), pi.getService(), waitingcalls)));
+							pi.getServiceIdentifier(), pi.getType(), waitingcalls))));
+						}
+						catch(Exception e)
+						{
+							e.printStackTrace();
+						}
 					}
 					result = ret;
 				}
 				else if(result instanceof ProxyInfo)
 				{
 					ProxyInfo pi = (ProxyInfo)result;
-					result = Proxy.newProxyInstance(ls.getClassLoader(), new Class[]{pi.getService()},
+					result = new ServiceInfo(pi.getType(), (IService)Proxy.newProxyInstance(ls.getClassLoader(), 
+						new Class[]{pi.getType(), IService.class},
 						new RemoteMethodInvocationHandler(component, pi.getRemoteManagementServiceIdentifier(), 
-						pi.getServiceIdentifier(), pi.getService(), waitingcalls));
+						pi.getServiceIdentifier(), pi.getType(), waitingcalls)));
 				}
 				
 				RemoteSearchResultCommand.super.execute(component, waitingcalls)

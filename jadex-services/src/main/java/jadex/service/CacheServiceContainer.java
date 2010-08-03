@@ -59,16 +59,14 @@ public class CacheServiceContainer	implements IServiceContainer
 		final Tuple key = manager.getCacheKey()!=null && decider.getCacheKey()!=null && selector.getCacheKey()!=null
 			? new Tuple(manager.getCacheKey(), decider.getCacheKey(), selector.getCacheKey()) : null;
 		
+		Object data = null;
+		final long now = clock!=null && clock.isValid()? clock.getTime(): -1;
 		synchronized(cache)
 		{
-			Object data = null;
-			
 			// todo: currently services of unfinished containers can be searched
 			// should be strict and a container should exposed only when running.
 //			if(clock==null)
 //				System.out.println("no clock: "+getId());
-			
-			final long now = clock!=null && clock.isValid()? clock.getTime(): -1;
 			
 			// In case the clock if not available caching will not be used
 			// till it is available.
@@ -106,33 +104,33 @@ public class CacheServiceContainer	implements IServiceContainer
 					return ret;
 				}
 			}
-			
-			if(data!=null)
+		}
+		
+		if(data!=null)
+		{
+			ret.setResult(data);			
+		}
+		else
+		{
+			container.getServices(manager, decider, selector, results).addResultListener(new IResultListener()
 			{
-				ret.setResult(data);			
-			}
-			else
-			{
-				container.getServices(manager, decider, selector, results).addResultListener(new IResultListener()
-				{
-					public void resultAvailable(Object source, Object result)
-					{	
-						if(key!=null)
-						{
-							synchronized(cache)
-							{
-								cache.put(key, result, now);							
-							}
-						}
-						ret.setResult(result);
-					}
-					
-					public void exceptionOccurred(Object source, Exception exception)
+				public void resultAvailable(Object source, Object result)
+				{	
+					if(key!=null)
 					{
-						ret.setException(exception);
+						synchronized(cache)
+						{
+							cache.put(key, result, now);							
+						}
 					}
-				});
-			}
+					ret.setResult(result);
+				}
+				
+				public void exceptionOccurred(Object source, Exception exception)
+				{
+					ret.setException(exception);
+				}
+			});
 		}
 
 		return ret;
@@ -173,13 +171,13 @@ public class CacheServiceContainer	implements IServiceContainer
 	{
 		final Future ret = new Future();
 		
-		System.out.println("search clock: "+getId());
+//		System.out.println("search clock: "+getId());
 		SServiceProvider.getServiceUpwards(container, IClockService.class).addResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
 				clock = (IClockService)result;
-//				System.out.println("Has clock: "+getId());
+//				System.out.println("Has clock: "+getId()+" "+clock);
 				
 				// Services may need other services and thus need to be able to search
 				// the container.

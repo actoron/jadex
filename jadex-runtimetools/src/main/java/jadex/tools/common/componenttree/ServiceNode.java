@@ -1,5 +1,7 @@
 package jadex.tools.common.componenttree;
 
+import java.lang.reflect.Proxy;
+
 import jadex.commons.SGUI;
 import jadex.commons.SReflect;
 import jadex.service.IService;
@@ -23,7 +25,6 @@ public class ServiceNode	extends AbstractComponentTreeNode
 	//-------- attributes --------
 	
 	/** The type. */
-	@SuppressWarnings("unused")
 	private final Class	type;
 	
 	/** The service. */
@@ -74,6 +75,9 @@ public class ServiceNode	extends AbstractComponentTreeNode
 	 */
 	public String toString()
 	{
-		return /*SReflect.getUnqualifiedClassName(type)+": "+*/SReflect.getUnqualifiedClassName(service.getClass());
+		return Proxy.isProxyClass(service.getClass())? 
+			SReflect.getUnqualifiedClassName(type)+" ("+service.getServiceIdentifier().getProviderId()+")": 
+			SReflect.getUnqualifiedClassName(service.getClass());
+//		return /*SReflect.getUnqualifiedClassName(type)+": "+*/SReflect.getUnqualifiedClassName(service.getClass());
 	}
 }

@@ -1,6 +1,5 @@
-package jadex.base.fipa;
+package jadex.bridge;
 
-import jadex.bridge.IComponentIdentifier;
 import jadex.commons.SUtil;
 
 import java.io.Serializable;
@@ -303,12 +302,17 @@ public class ComponentIdentifier implements IComponentIdentifier, Cloneable, Ser
 
 	/**
 	 *  The hash code of the object.
+	 *  @return The hashcode.
 	 */
 	public int hashCode()
 	{
 		return 31 + ((name == null) ? 0 : name.hashCode());
 	}
 
+	/**
+	 *  Test if two component identifiers are equal.
+	 *  @return True, if equal.
+	 */
 	public boolean equals(Object obj)
 	{
 		return this==obj
@@ -318,6 +322,7 @@ public class ComponentIdentifier implements IComponentIdentifier, Cloneable, Ser
 	
 	/**
 	 *  Return a string representation.
+	 *  @return The string representation.
 	 */
 	public String	toString()
 	{

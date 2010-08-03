@@ -36,7 +36,7 @@
 				new Object[]
 				{
 					new FIPAMessageType(), 
-					new JavaStandardPlanExecutor((IThreadPool)SServiceProvider.getService($platform, ThreadPoolService.class).get(new ThreadSuspendable())),
+					new JavaStandardPlanExecutor((IThreadPoolService)SServiceProvider.getService($platform, IThreadPoolService.class).get(new ThreadSuspendable())),
 					new Long(10000),
 					Boolean.TRUE,
 					new BpmnPlanExecutor($platform),
