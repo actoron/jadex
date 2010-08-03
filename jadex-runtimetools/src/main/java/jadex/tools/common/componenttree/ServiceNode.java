@@ -45,6 +45,22 @@ public class ServiceNode	extends AbstractComponentTreeNode
 	//-------- methods --------
 	
 	/**
+	 *  Get the service.
+	 */
+	public IService	getService()
+	{
+		return service;
+	}
+
+	/**
+	 *  Get the service type.
+	 */
+	public Class	getType()
+	{
+		return type;
+	}
+
+	/**
 	 *  Get the id used for lookup.
 	 */
 	public Object	getId()

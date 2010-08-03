@@ -232,7 +232,7 @@ public class RuleProfilerPlugin extends AbstractJCCPlugin	implements IComponentL
 					{
 						a	= STOP_PROFILER;
 					}
-					else
+					else if(BDIAgentFactory.FILETYPE_BDIAGENT.equals(((ComponentTreeNode)node).getDescription().getType()))
 					{
 						a	= START_PROFILER;
 					}

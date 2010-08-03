@@ -25,6 +25,9 @@ public class ComponentTreeModel implements TreeModel
 	/** The tree listeners. */
 	private final List	listeners;
 	
+	/** The node listeners. */
+	private final List	nodelisteners;
+	
 	/** The node lookup table. */
 	private final Map	nodes;
 	
@@ -39,6 +42,7 @@ public class ComponentTreeModel implements TreeModel
 	public ComponentTreeModel()
 	{
 		this.listeners	= new ArrayList();
+		this.nodelisteners	= new ArrayList();
 		this.nodes	= new HashMap();
 		this.overlays	= new ArrayList();
 	}
@@ -224,6 +228,12 @@ public class ComponentTreeModel implements TreeModel
 	public void	registerNode(IComponentTreeNode node)
 	{
 		nodes.put(node.getId(), node);
+		
+		INodeListener[]	lis	= (INodeListener[])nodelisteners.toArray(new INodeListener[nodelisteners.size()]);
+		for(int i=0; i<lis.length; i++)
+		{
+			lis[i].nodeAdded(node);
+		}
 	}
 	
 	/**
@@ -240,6 +250,12 @@ public class ComponentTreeModel implements TreeModel
 	public void	deregisterNode(IComponentTreeNode node)
 	{
 		nodes.remove(node.getId());
+		
+		INodeListener[]	lis	= (INodeListener[])nodelisteners.toArray(new INodeListener[nodelisteners.size()]);
+		for(int i=0; i<lis.length; i++)
+		{
+			lis[i].nodeRemoved(node);
+		}
 	}
 	
 	/**
@@ -256,5 +272,21 @@ public class ComponentTreeModel implements TreeModel
 	public INodeHandler[]	getNodeHandlers()
 	{
 		return (INodeHandler[])overlays.toArray(new INodeHandler[overlays.size()]);
+	}
+
+	/**
+	 *  Register a node listener.
+	 */
+	public void	addNodeListener(INodeListener listener)
+	{
+		nodelisteners.add(listener);
+	}
+	
+	/**
+	 *  Deregister a node listener.
+	 */
+	public void	removeNodeListener(INodeListener listener)
+	{
+		nodelisteners.remove(listener);
 	}
 }

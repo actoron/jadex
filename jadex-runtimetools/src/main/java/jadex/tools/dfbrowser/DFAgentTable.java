@@ -33,7 +33,7 @@ public class DFAgentTable extends JTable
 	/** The image icons. */
 	protected static final UIDefaults icons = new UIDefaults(new Object[]
 	{
-		"remove_agent", SGUI.makeIcon(DFBrowserPlugin.class, "/jadex/tools/common/images/new_remove_service.png"),
+		"remove_agent", SGUI.makeIcon(DFBrowserPlugin_old.class, "/jadex/tools/common/images/new_remove_service.png"),
 	});
 	
 	//-------- attributes --------
@@ -41,18 +41,18 @@ public class DFAgentTable extends JTable
 	/** The popup menu. */
 	protected JPopupMenu popup;
 
-	/** The browser plugin. */
-	protected DFBrowserPlugin browser;
+	/** The panel. */
+	protected DFBrowserPanel panel;
 
 	//-------- constructors --------
 	
 	/**
 	 * Constructor for DFAgentTable.
 	 */
-	public DFAgentTable(final DFBrowserPlugin browser)
+	public DFAgentTable(DFBrowserPanel panel)
 	{
 		super(new TableSorter(new AgentTableModel()));
-		this.browser = browser;
+		this.panel	= panel;
 		TableSorter sorter = (TableSorter)getModel();
 		
 		sorter.setTableHeader(getTableHeader());
@@ -109,24 +109,11 @@ public class DFAgentTable extends JTable
 				{
 					TableSorter sorter = (TableSorter)getModel();
 					AgentTableModel model = (AgentTableModel)sorter.getTableModel();
-					browser.removeAgentRegistration(model.getAgentDescription(sorter.modelIndex(selectedRow)));
+					panel.removeAgentRegistration(model.getAgentDescription(sorter.modelIndex(selectedRow)));
 				}
 			}
 
 		}));
-		/*menu.add(new JMenuItem(new AbstractAction("Show services")
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				TableSorter sorter = (TableSorter)getModel();
-				ServiceTableModel model = (ServiceTableModel)sorter.getTableModel();
-				int selectedRow = getSelectedRow();
-				if(selectedRow >= 0)
-				{
-					agentSelected(model.getAgentDescription(sorter.modelIndex(selectedRow)));
-				}
-			}
-		}));*/
 	}
 
 	/**
