@@ -31,6 +31,14 @@ public class ServiceContainerNode	extends AbstractComponentTreeNode
 	//-------- methods --------
 	
 	/**
+	 *  Get the id used for lookup.
+	 */
+	public Object	getId()
+	{
+		return ((ComponentTreeNode)getParent()).getDescription().getName().getName()+toString();
+	}
+	
+	/**
 	 *  Get the icon for a node.
 	 */
 	public Icon	getIcon()

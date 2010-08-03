@@ -34,6 +34,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import javax.swing.AbstractAction;
@@ -109,34 +111,33 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 	 */
 	public JComponent[] createToolBar()
 	{
-		JComponent[] ret = new JComponent[9];
+		List	ret	= new ArrayList();
 		JButton b;
-		int i	= 0;
 
 		b = new JButton(mpanel.ADD_PATH);
 		b.setBorder(null);
 		b.setToolTipText(b.getText());
 		b.setText(null);
 		b.setEnabled(true);
-		ret[i++] = b;
+		ret.add(b);
 		
 		b = new JButton(mpanel.REMOVE_PATH);
 		b.setBorder(null);
 		b.setToolTipText(b.getText());
 		b.setText(null);
 		b.setEnabled(true);
-		ret[i++] = b;
+		ret.add(b);
 		
 		b = new JButton(mpanel.REFRESH);
 		b.setBorder(null);
 		b.setToolTipText(b.getText());
 		b.setText(null);
 		b.setEnabled(true);
-		ret[i++] = b;
+		ret.add(b);
 		
 		JSeparator	separator	= new JToolBar.Separator();
 		separator.setOrientation(JSeparator.VERTICAL);
-		ret[i++] = separator;
+		ret.add(separator);
 		
 		/*b = new JButton(GENERATE_JADEXDOC);
 		b.setBorder(null);
@@ -154,37 +155,55 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 		b.setToolTipText(b.getText());
 		b.setText(null);
 		b.setEnabled(true);
-		ret[i++] = b;
+		ret.add(b);
 
 		b = new JButton(comptree.getKillAction());
 		b.setBorder(null);
 		b.setToolTipText(b.getText());
 		b.setText(null);
 		b.setEnabled(true);
-		ret[i++] = b;
+		ret.add(b);
 		
 		b = new JButton(comptree.getSuspendAction());
 		b.setBorder(null);
 		b.setToolTipText(b.getText());
 		b.setText(null);
 		b.setEnabled(true);
-		ret[i++] = b;
+		ret.add(b);
 		
 		b = new JButton(comptree.getResumeAction());
 		b.setBorder(null);
 		b.setToolTipText(b.getText());
 		b.setText(null);
 		b.setEnabled(true);
-		ret[i++] = b;
+		ret.add(b);
 		
 		b = new JButton(comptree.getStepAction());
 		b.setBorder(null);
 		b.setToolTipText(b.getText());
 		b.setText(null);
 		b.setEnabled(true);
-		ret[i++] = b;
+		ret.add(b);
 		
-		return ret;
+		separator	= new JToolBar.Separator();
+		separator.setOrientation(JSeparator.VERTICAL);
+		ret.add(separator);
+
+		b = new JButton(comptree.getRefreshAction());
+		b.setBorder(null);
+		b.setToolTipText(b.getText());
+		b.setText(null);
+		b.setEnabled(true);
+		ret.add(b);
+		
+		b = new JButton(comptree.getRefreshTreeAction());
+		b.setBorder(null);
+		b.setToolTipText(b.getText());
+		b.setText(null);
+		b.setEnabled(true);
+		ret.add(b);
+
+		return (JComponent[])ret.toArray(new JComponent[ret.size()]);
 	}
 	
 	/**

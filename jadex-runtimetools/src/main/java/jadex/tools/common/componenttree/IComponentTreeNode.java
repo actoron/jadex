@@ -5,6 +5,11 @@ import javax.swing.Icon;
 public interface IComponentTreeNode
 {
 	/**
+	 *  Get the id used for lookup.
+	 */
+	public Object	getId();
+	
+	/**
 	 *  Get the parent node.
 	 */
 	public IComponentTreeNode	getParent();
@@ -33,4 +38,10 @@ public interface IComponentTreeNode
 	 *  Get the icon for a node.
 	 */
 	public Icon	getIcon();
+	
+	/**
+	 *  Refresh the node.
+	 *  @param recurse	Recursively refresh subnodes, if true.
+	 */
+	public void	refresh(boolean recurse);
 }

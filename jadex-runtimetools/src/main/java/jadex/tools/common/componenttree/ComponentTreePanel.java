@@ -4,6 +4,7 @@ import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentManagementService;
 import jadex.commons.SGUI;
+import jadex.commons.TreeExpansionHandler;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.service.IServiceProvider;
 import jadex.service.SServiceProvider;
@@ -21,6 +22,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
 import javax.swing.UIDefaults;
+import javax.swing.event.TreeExpansionEvent;
 import javax.swing.tree.TreePath;
 
 /**
@@ -40,10 +42,14 @@ public class ComponentTreePanel extends JPanel
 		"suspend_component", SGUI.makeIcon(ComponentTreePanel.class, "/jadex/tools/common/images/new_agent_szzz_big.png"),
 		"resume_component", SGUI.makeIcon(ComponentTreePanel.class, "/jadex/tools/common/images/resume_component.png"),
 		"step_component", SGUI.makeIcon(ComponentTreePanel.class, "/jadex/tools/common/images/step_component.png"),
+		"refresh_component", SGUI.makeIcon(ComponentTreePanel.class, "/jadex/tools/common/images/refresh_component.png"),
+		"refresh_tree", SGUI.makeIcon(ComponentTreePanel.class, "/jadex/tools/common/images/refresh_tree.png"),
 		"overlay_kill", SGUI.makeIcon(ComponentTreePanel.class, "/jadex/tools/common/images/overlay_kill.png"),
 		"overlay_suspend", SGUI.makeIcon(ComponentTreePanel.class, "/jadex/tools/common/images/overlay_szzz.png"),
 		"overlay_resume", SGUI.makeIcon(ComponentTreePanel.class, "/jadex/tools/common/images/overlay_wakeup.png"),
-		"overlay_step", SGUI.makeIcon(ComponentTreePanel.class, "/jadex/tools/common/images/overlay_step.png")
+		"overlay_step", SGUI.makeIcon(ComponentTreePanel.class, "/jadex/tools/common/images/overlay_step.png"),
+		"overlay_refresh", SGUI.makeIcon(ComponentTreePanel.class, "/jadex/tools/common/images/overlay_refresh.png"),
+		"overlay_refreshtree", SGUI.makeIcon(ComponentTreePanel.class, "/jadex/tools/common/images/overlay_refresh.png")
 	});
 	
 	//-------- attributes --------
@@ -71,6 +77,12 @@ public class ComponentTreePanel extends JPanel
 	
 	/** The action for stepping selected components. */
 	private final Action	step;
+	
+	/** The action for refreshing selected components. */
+	private final Action	refresh;
+	
+	/** The action for recursively refreshing selected components. */
+	private final Action	refreshtree;
 	
 	//-------- constructors --------
 	
@@ -184,7 +196,64 @@ public class ComponentTreePanel extends JPanel
 			}
 		};
 
+		refresh	= new AbstractAction("Refresh component", icons.getIcon("refresh_component"))
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				TreePath[]	paths	= tree.getSelectionPaths();
+				for(int i=0; paths!=null && i<paths.length; i++)
+				{
+					((IComponentTreeNode)paths[i].getLastPathComponent()).refresh(false);
+				}
+			}
+		};
+
+		refreshtree	= new AbstractAction("Refresh subtree", icons.getIcon("refresh_tree"))
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				TreePath[]	paths	= tree.getSelectionPaths();
+				for(int i=0; paths!=null && i<paths.length; i++)
+				{
+					((IComponentTreeNode)paths[i].getLastPathComponent()).refresh(true);
+				}
+			}
+		};
+
 		// Default overlays and popups.
+		model.addNodeHandler(new INodeHandler()
+		{
+			public Icon getOverlay(IComponentTreeNode node)
+			{
+				return null;
+			}
+
+			public Action[] getPopupActions(IComponentTreeNode[] nodes)
+			{
+				Icon	base	= cic.getIcon(nodes[0], ((ComponentTreeNode)nodes[0]).getDescription().getType());
+				Action	prefresh	= new AbstractAction((String)refresh.getValue(Action.NAME), new CombiIcon(new Icon[]{base, icons.getIcon("overlay_refresh")}))
+				{
+					public void actionPerformed(ActionEvent e)
+					{
+						refresh.actionPerformed(e);
+					}
+				};
+				Action	prefreshtree	= new AbstractAction((String)refreshtree.getValue(Action.NAME), new CombiIcon(new Icon[]{base, icons.getIcon("overlay_refreshtree")}))
+				{
+					public void actionPerformed(ActionEvent e)
+					{
+						refreshtree.actionPerformed(e);
+					}
+				};
+				return new Action[]{prefresh, prefreshtree};
+			}
+
+			public Action getDefaultAction(IComponentTreeNode node)
+			{
+				return null;
+			}
+		});
+		
 		model.addNodeHandler(new INodeHandler()
 		{
 			public Icon getOverlay(IComponentTreeNode node)
@@ -300,6 +369,9 @@ public class ComponentTreePanel extends JPanel
 							}
 						}
 						model.setRoot(new ComponentTreeNode(null, model, root, cms, ComponentTreePanel.this, cic));
+						// Expand root node.
+						TreeExpansionHandler	teh	= new TreeExpansionHandler(tree);
+						teh.treeExpanded(new TreeExpansionEvent(tree, new TreePath(model.getRoot())));
 					}
 				});
 				
@@ -312,7 +384,6 @@ public class ComponentTreePanel extends JPanel
 							public void run()
 							{
 								IComponentTreeNode	node	= model.getNode(desc.getName());
-								model.deregisterNode(desc.getName());
 								if(node.getParent()!=null)
 								{
 									((AbstractComponentTreeNode)node.getParent()).removeChild(node);
@@ -385,6 +456,22 @@ public class ComponentTreePanel extends JPanel
 	public Action	getStepAction()
 	{
 		return step;
+	}
+	
+	/**
+	 *  Get the action for refreshing the components selected in the tree.
+	 */
+	public Action	getRefreshAction()
+	{
+		return refresh;
+	}
+	
+	/**
+	 *  Get the action for recursively refreshing the components selected in the tree.
+	 */
+	public Action	getRefreshTreeAction()
+	{
+		return refreshtree;
 	}
 	
 	/**

@@ -116,7 +116,11 @@ public class ComponentTreeModel implements TreeModel
 	 */
 	public void	setRoot(IComponentTreeNode root)
 	{
+		if(this.root!=null)
+			deregisterNode(this.root);
 		this.root = root;
+		if(root!=null)
+			registerNode(root);
 		fireTreeChanged(root);
 	}
 	
@@ -217,13 +221,13 @@ public class ComponentTreeModel implements TreeModel
 	 *  Add a node (optional).
 	 *  Nodes can be registered for easy access.
 	 */
-	public void	registerNode(Object id, IComponentTreeNode node)
+	public void	registerNode(IComponentTreeNode node)
 	{
-		nodes.put(id, node);
+		nodes.put(node.getId(), node);
 	}
 	
 	/**
-	 *  Get a registered node.
+	 *  Get a node by its id.
 	 */
 	public IComponentTreeNode	getNode(Object id)
 	{
@@ -233,9 +237,9 @@ public class ComponentTreeModel implements TreeModel
 	/**
 	 *  Remove a node registration.
 	 */
-	public void	deregisterNode(Object id)
+	public void	deregisterNode(IComponentTreeNode node)
 	{
-		nodes.remove(id);
+		nodes.remove(node.getId());
 	}
 	
 	/**

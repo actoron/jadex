@@ -1,5 +1,6 @@
 package jadex.tools.common.componenttree;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.Icon;
@@ -24,6 +25,9 @@ public abstract class AbstractComponentTreeNode	implements IComponentTreeNode
 	
 	/** Flag to indicate search in progress. */
 	private boolean	searching;
+
+	/** Flag to indicate recursive refresh. */
+	private boolean	recurse;
 
 	//-------- constructors --------
 	
@@ -93,6 +97,26 @@ public abstract class AbstractComponentTreeNode	implements IComponentTreeNode
 		return getChildCount()==0;
 	}
 	
+	/**
+	 *  Refresh the node.
+	 *  @param recurse	Recursively refresh subnodes, if true.
+	 */
+	public void	refresh(boolean recurse)
+	{
+		if(!searching)
+		{
+			searching	= true;
+			this.recurse	= recurse;
+			searchChildren();
+		}
+		else
+		{
+			// If search in progress upgrade to recursive, but do not downgrade.
+			this.recurse	= this.recurse || recurse;			
+		}
+	}
+
+	
 	//-------- template methods --------
 	
 	
@@ -120,8 +144,65 @@ public abstract class AbstractComponentTreeNode	implements IComponentTreeNode
 		{
 			public void run()
 			{
+				searching	= false;
+				List	oldcs	= AbstractComponentTreeNode.this.children;
 				AbstractComponentTreeNode.this.children	= children;
-				model.fireTreeChanged(AbstractComponentTreeNode.this);
+				List	added	= new ArrayList();
+				List	removed	= new ArrayList();
+				if(oldcs!=null)
+				{
+					removed.addAll(oldcs);
+				}
+				if(children!=null)
+				{
+					added.addAll(children);
+					removed.removeAll(children);
+				}
+				if(oldcs!=null)
+				{
+					added.removeAll(oldcs);
+				}
+				
+				if(!added.isEmpty() && !removed.isEmpty())
+				{
+					for(int i=0; oldcs!=null && i<oldcs.size(); i++)
+					{
+						model.deregisterNode((IComponentTreeNode)oldcs.get(i));
+					}
+					for(int i=0; children!=null && i<children.size(); i++)
+					{
+						model.registerNode((IComponentTreeNode)children.get(i));
+					}
+					model.fireTreeChanged(AbstractComponentTreeNode.this);					
+				}
+				else if(!added.isEmpty())
+				{
+					for(int i=0; i<added.size(); i++)
+					{
+						IComponentTreeNode	node	= (IComponentTreeNode)added.get(i);
+						model.registerNode(node);
+						model.fireNodeAdded(AbstractComponentTreeNode.this, node, children.indexOf(node));
+					}
+					model.fireNodeChanged(AbstractComponentTreeNode.this);
+				}
+				else if(!removed.isEmpty())
+				{
+					for(int i=0; i<removed.size(); i++)
+					{
+						IComponentTreeNode	node	= (IComponentTreeNode)removed.get(i);
+						model.deregisterNode(node);
+						model.fireNodeRemoved(AbstractComponentTreeNode.this, node, oldcs.indexOf(node));
+					}
+					model.fireNodeChanged(AbstractComponentTreeNode.this);
+				}
+				
+				if(recurse)
+				{
+					for(int i=0; children!=null && i<children.size(); i++)
+					{
+						((IComponentTreeNode)children.get(i)).refresh(recurse);
+					}
+				}
 			}
 		});
 	}
@@ -141,6 +222,7 @@ public abstract class AbstractComponentTreeNode	implements IComponentTreeNode
 	public void addChild(int index, IComponentTreeNode node)
 	{
 		children.add(index, node);
+		model.registerNode(node);
 		model.fireNodeAdded(this, node, index);
 	}
 	
@@ -161,6 +243,7 @@ public abstract class AbstractComponentTreeNode	implements IComponentTreeNode
 	{
 		int index	= getIndexOfChild(node);
 		children.remove(node);
+		model.deregisterNode(node);
 		model.fireNodeRemoved(this, node, index);
 	}
 }

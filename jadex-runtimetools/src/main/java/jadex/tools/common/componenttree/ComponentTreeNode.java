@@ -47,12 +47,18 @@ public class ComponentTreeNode	extends AbstractComponentTreeNode
 		this.cms	= cms;
 		this.ui	= ui;
 		this.iconcache	= iconcache;
-		model.registerNode(desc.getName(), this);
 	}
 	
 	//-------- AbstractComponentTreeNode methods --------
 
-	
+	/**
+	 *  Get the id used for lookup.
+	 */
+	public Object	getId()
+	{
+		return desc.getName();
+	}
+
 	/**
 	 *  Get the icon for a node.
 	 */
@@ -62,30 +68,58 @@ public class ComponentTreeNode	extends AbstractComponentTreeNode
 	}
 	
 	/**
+	 *  Refresh the node.
+	 *  @param recurse	Recursively refresh subnodes, if true.
+	 */
+	public void refresh(boolean recurse)
+	{
+		cms.getComponentDescription(desc.getName()).addResultListener(new SwingDefaultResultListener(ui)
+		{
+			public void customResultAvailable(Object source, Object result)
+			{
+				ComponentTreeNode.this.desc	= (IComponentDescription)result;
+				getModel().fireNodeChanged(ComponentTreeNode.this);
+			}
+		});
+
+		super.refresh(recurse);
+	}
+	
+	/**
 	 *  Asynchronously search for children.
 	 *  Called once for each node.
 	 *  Should call setChildren() once children are found.
 	 */
 	protected void	searchChildren()
 	{
+		final List	children	= new ArrayList();
+		final boolean	ready[]	= new boolean[2];
+
 		// Todo: futurize getChildren call.
 		final IComponentIdentifier[] achildren = cms.getChildren(desc.getName());
-		if(achildren.length > 0)
+		if(achildren!=null && achildren.length > 0)
 		{
-			final List	children	= new ArrayList();
-			for(int i = 0; i < achildren.length; i++)
+			for(int i=0; i<achildren.length; i++)
 			{
 				final int index = i;
 				cms.getComponentDescription(achildren[i]).addResultListener(new SwingDefaultResultListener(ui)
 				{
 					public void customResultAvailable(Object source, Object result)
 					{
-						children.add(new ComponentTreeNode(ComponentTreeNode.this, getModel(), (IComponentDescription)result, cms, ui, iconcache));
+						IComponentDescription	desc	= (IComponentDescription)result;
+						IComponentTreeNode	node	= getModel().getNode(desc.getName());
+						if(node==null)
+							node	= new ComponentTreeNode(ComponentTreeNode.this, getModel(), desc, cms, ui, iconcache);
+						children.add(node);
 
 						// Last child? -> inform listeners
 						if(index == achildren.length - 1)
 						{
-							setChildren(children);
+							ready[0]	= true;
+							if(ready[0] &&  ready[1])
+							{
+								setChildren(children);
+							}
 						}
 					}
 				});
@@ -93,8 +127,11 @@ public class ComponentTreeNode	extends AbstractComponentTreeNode
 		}
 		else
 		{
-			List	children	= new ArrayList();
-			setChildren(children);
+			ready[0]	= true;
+			if(ready[0] &&  ready[1])
+			{
+				setChildren(children);
+			}
 		}
 		
 		// Search services and only add container node when services are found.
@@ -110,15 +147,26 @@ public class ComponentTreeNode	extends AbstractComponentTreeNode
 						List	services	= (List)result;
 						if(services!=null && !services.isEmpty())
 						{
-							ServiceContainerNode	scn	= new ServiceContainerNode(ComponentTreeNode.this, getModel());
-							addChild(0, scn);
+							ServiceContainerNode	scn	= (ServiceContainerNode)getModel().getNode(desc.getName().getName()+"ServiceContainer");
+							if(scn==null)
+								scn	= new ServiceContainerNode(ComponentTreeNode.this, getModel());
+							children.add(0, scn);
 							List	children	= new ArrayList();
 							for(int i=0; i<services.size(); i++)
 							{
 								Object[]	tuple	= (Object[])services.get(i);
-								children.add(new ServiceNode(scn, getModel(), (Class)tuple[0], (IService)tuple[1]));
+								ServiceNode	sn	= (ServiceNode)getModel().getNode(((IService)tuple[1]).getServiceIdentifier());
+								if(sn==null)
+									sn	= new ServiceNode(scn, getModel(), (Class)tuple[0], (IService)tuple[1]);
+								children.add(sn);
 							}
 							scn.setChildren(children);							
+						}
+
+						ready[1]	= true;
+						if(ready[0] &&  ready[1])
+						{
+							setChildren(children);
 						}
 					}
 				});

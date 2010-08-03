@@ -44,6 +44,14 @@ public class ServiceNode	extends AbstractComponentTreeNode
 	//-------- methods --------
 	
 	/**
+	 *  Get the id used for lookup.
+	 */
+	public Object	getId()
+	{
+		return service.getServiceIdentifier();
+	}
+
+	/**
 	 *  Get the icon for a node.
 	 */
 	public Icon	getIcon()
