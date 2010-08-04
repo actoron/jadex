@@ -30,7 +30,6 @@ public class RemoteServiceManagementAgent extends MicroAgent
 	{
 		rms = new RemoteServiceManagementService(getExternalAccess());
 		addService(IRemoteServiceManagementService.class, rms);
-		startServiceProvider();
 	}
 	
 	/**

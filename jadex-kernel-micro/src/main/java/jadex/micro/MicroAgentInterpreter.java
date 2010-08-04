@@ -59,10 +59,6 @@ public class MicroAgentInterpreter implements IComponentInstance
 	/** The parent. */
 	protected IExternalAccess parent;
 	
-	/** The thread executing the agent (null for none). */
-	// Todo: need not be transient, because agent should only be serialized when no action is running?
-	protected transient Thread agentthread;
-	
 	/** The scheduled steps of the agent. */
 	protected List steps;
 	
@@ -75,6 +71,9 @@ public class MicroAgentInterpreter implements IComponentInstance
 	/** The service container. */
 	protected IServiceContainer container;
 	
+	/** The stop flag, stops interpreter execution. */
+	protected boolean stop;
+	
 	//-------- constructors --------
 	
 	/**
@@ -83,7 +82,8 @@ public class MicroAgentInterpreter implements IComponentInstance
 	 *  @param microagent The microagent.
 	 */
 	public MicroAgentInterpreter(IComponentDescription desc, IComponentAdapterFactory factory, 
-		MicroAgentModel model, Map arguments, String config, final IExternalAccess parent)
+		final MicroAgentModel model, final Map arguments, final String config, 
+		final IExternalAccess parent, final Future inited)
 	{
 		this.model = model;
 		this.config = config;
@@ -93,20 +93,18 @@ public class MicroAgentInterpreter implements IComponentInstance
 		this.steps	= Collections.synchronizedList(new ArrayList());
 		this.adapter = factory.createComponentAdapter(desc, model, this, parent);
 		
-//		this.ext_entries = Collections.synchronizedList(new ArrayList());
-		
 		// Init the arguments with default values.
 		IArgument[] args = model.getArguments();
 		for(int i=0; i<args.length; i++)
 		{
 			if(args[i].getDefaultValue(config)!=null)
 			{
-				if(this.arguments==null)
-					this.arguments = new HashMap();
+				if(MicroAgentInterpreter.this.arguments==null)
+					MicroAgentInterpreter.this.arguments = new HashMap();
 			
-				if(this.arguments.get(args[i].getName())==null)
+				if(MicroAgentInterpreter.this.arguments.get(args[i].getName())==null)
 				{
-					this.arguments.put(args[i].getName(), args[i].getDefaultValue(config));
+					MicroAgentInterpreter.this.arguments.put(args[i].getName(), args[i].getDefaultValue(config));
 				}
 			}
 		}
@@ -117,38 +115,61 @@ public class MicroAgentInterpreter implements IComponentInstance
 		{
 			if(res[i].getDefaultValue(config)!=null)
 			{
-				if(this.results==null)
-					this.results = new HashMap();
+				if(MicroAgentInterpreter.this.results==null)
+					MicroAgentInterpreter.this.results = new HashMap();
 			
-				this.results.put(res[i].getName(), res[i].getDefaultValue(config));
+				MicroAgentInterpreter.this.results.put(res[i].getName(), res[i].getDefaultValue(config));
 			}
 		}
 		
-		
-		// Schedule initial step.
-		addStep(new Runnable()
-		{
-			public void run()
-			{
-				microagent.executeBody();
-			}
-			public String toString()
-			{
-				return "microagent.executeBody()_#"+this.hashCode();
-			}
-		});
-
 		try
 		{
-			this.microagent = (MicroAgent)model.getMicroAgentClass().newInstance();
-			this.microagent.init(this);
-			this.microagent.agentCreated();
+			microagent = (MicroAgent)model.getMicroAgentClass().newInstance();
+			microagent.init(MicroAgentInterpreter.this);
+			
+			// Schedule initial step.
+			addStep(new Runnable()
+			{
+				public void run()
+				{
+					microagent.agentCreated();
+					getServiceContainer().start().addResultListener(createResultListener(new IResultListener()
+					{
+						public void resultAvailable(Object source, Object result)
+						{
+							// Init is now finished. Notify cms and stop execution.
+							stop = true;
+							inited.setResult(new Object[]{MicroAgentInterpreter.this, adapter});
+							
+							addStep(new Runnable()
+							{
+								public void run()
+								{
+									microagent.executeBody();
+								}
+								public String toString()
+								{
+									return "microagent.executeBody()_#"+this.hashCode();
+								}
+							});
+						}
+						
+						public void exceptionOccurred(Object source, Exception exception)
+						{
+							inited.setException(exception);
+						}
+					}));
+				}
+				public String toString()
+				{
+					return "microagent.init()_#"+this.hashCode();
+				}
+			});
 		}
 		catch(Exception e)
 		{
-			e.printStackTrace();
 			throw new RuntimeException(e);
-		}		
+		}
 	}
 	
 	//-------- IKernelAgent interface --------
@@ -169,8 +190,6 @@ public class MicroAgentInterpreter implements IComponentInstance
 	{
 		try
 		{
-			this.agentthread = Thread.currentThread();
-			
 			if(!steps.isEmpty())
 			{
 				Runnable step = (Runnable)removeStep();
@@ -179,8 +198,9 @@ public class MicroAgentInterpreter implements IComponentInstance
 				addHistoryEntry(steptext);
 			}
 	
-			this.agentthread = null;
-			return !steps.isEmpty();
+			boolean ret = !stop && !steps.isEmpty();
+			stop = false;
+			return ret;
 		}
 		catch(ComponentTerminatedException ate)
 		{

@@ -7,6 +7,7 @@ import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentFactory;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.ILoadableComponentModel;
+import jadex.commons.Future;
 import jadex.commons.SGUI;
 import jadex.service.BasicService;
 import jadex.service.IServiceProvider;
@@ -108,48 +109,6 @@ public class BpmnFactory extends BasicService implements IComponentFactory
 	}
 	
 	/**
-	 * Starts a BPMN process
-	 * @param name name of the BPMN model
-	 * @param stepmode if true, the process will start in step mode
-	 * @return instance name
-	 * /
-	public Object startProcess(String modelname, final Object id, Map arguments, boolean stepmode)
-	{
-		try
-		{
-			IModelRepositoryService mr = (IModelRepositoryService) wfms.getService(IModelRepositoryService.class);
-//			String path = mr.getProcessModelPath(modelname);
-			MBpmnModel model = loader.loadBpmnModel(modelname, mr.getImports());
-			
-			final BpmnInstance instance = new BpmnInstance(model);
-			instance.setWfms(wfms);
-			BpmnExecutor executor = new BpmnExecutor(instance, true);
-			
-			processes.put(id, executor);
-			instance.addChangeListener(new IChangeListener()
-			{
-				public void changeOccurred(ChangeEvent event)
-				{
-					if (instance.isFinished(null, null))
-					{
-						synchronized (BpmnFactory.this)
-						{
-							processes.remove(id);
-						}
-					}
-				}
-			});
-			
-			executor.setStepmode(stepmode);
-		}
-		catch(Exception e)
-		{
-			throw new RuntimeException(e);
-		}
-		return id;
-	}*/
-	
-	/**
 	 *  Test if a model can be loaded by the factory.
 	 *  @param model The model (e.g. file name).
 	 *  @param The imports (if any).
@@ -206,9 +165,10 @@ public class BpmnFactory extends BasicService implements IComponentFactory
 	 * @param parent The parent component (if any).
 	 * @return An instance of a component.
 	 */
-	public Object[] createComponentInstance(IComponentDescription desc, IComponentAdapterFactory factory, ILoadableComponentModel model, String config, Map arguments, IExternalAccess parent)
+	public Object[] createComponentInstance(IComponentDescription desc, IComponentAdapterFactory factory, 
+		ILoadableComponentModel model, String config, Map arguments, IExternalAccess parent, Future inited)
 	{
-		BpmnInterpreter interpreter = new BpmnInterpreter(desc, factory, (MBpmnModel)model, arguments, config, parent, null, null, null);
+		BpmnInterpreter interpreter = new BpmnInterpreter(desc, factory, (MBpmnModel)model, arguments, config, parent, null, null, null, inited);
 		return new Object[]{interpreter, interpreter.getComponentAdapter()};
 	}
 	

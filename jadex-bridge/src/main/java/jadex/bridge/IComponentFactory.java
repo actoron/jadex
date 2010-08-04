@@ -1,5 +1,6 @@
 package jadex.bridge;
 
+import jadex.commons.Future;
 import jadex.service.IService;
 
 import java.util.Map;
@@ -65,7 +66,8 @@ public interface IComponentFactory extends IService
 	 * @param parent The parent component (if any).
 	 * @return An instance of a component.
 	 */
-	public Object[] createComponentInstance(IComponentDescription desc, IComponentAdapterFactory factory, ILoadableComponentModel model, String config, Map arguments, IExternalAccess parent);
+	public Object[] createComponentInstance(IComponentDescription desc, IComponentAdapterFactory factory, ILoadableComponentModel model, 
+		String config, Map arguments, IExternalAccess parent, Future ret);
 
 	/**
 	 *  Get the properties (name/value pairs).

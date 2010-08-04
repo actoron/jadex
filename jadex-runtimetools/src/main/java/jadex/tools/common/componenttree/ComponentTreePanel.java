@@ -387,7 +387,7 @@ public class ComponentTreePanel extends JPanel
 							public void run()
 							{
 								IComponentTreeNode	node	= model.getNode(desc.getName());
-								if(node.getParent()!=null)
+								if(node!=null && node.getParent()!=null)
 								{
 									((AbstractComponentTreeNode)node.getParent()).removeChild(node);
 								}

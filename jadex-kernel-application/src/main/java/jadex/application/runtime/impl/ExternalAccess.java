@@ -21,7 +21,7 @@ public class ExternalAccess implements IApplicationExternalAccess
 	//-------- attributes --------
 
 	/** The agent. */
-	protected Application application;
+	protected ApplicationInterpreter application;
 
 	/** The agent adapter. */
 	protected IComponentAdapter adapter;
@@ -37,7 +37,7 @@ public class ExternalAccess implements IApplicationExternalAccess
 	/**
 	 *	Create an external access.
 	 */
-	public ExternalAccess(Application application)
+	public ExternalAccess(ApplicationInterpreter application)
 	{
 		this.application = application;
 		this.adapter = application.getComponentAdapter();

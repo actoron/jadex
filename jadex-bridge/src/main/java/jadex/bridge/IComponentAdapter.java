@@ -1,7 +1,6 @@
 package jadex.bridge;
 
 import jadex.commons.IFuture;
-import jadex.service.IServiceContainer;
 
 import java.util.logging.Logger;
 

@@ -90,6 +90,9 @@ public class SServiceProvider
 //		}
 		final Future ret = new Future();
 		
+		if(provider==null)
+			System.out.println("here");
+			
 		provider.getServices(sequentialmanager, onlylocal? abortdecider: new DefaultVisitDecider(true, false), 
 			new TypeResultSelector(type, true, onlylocal), new ArrayList())
 			.addResultListener(new IResultListener()

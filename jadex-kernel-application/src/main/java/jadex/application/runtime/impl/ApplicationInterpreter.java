@@ -13,6 +13,7 @@ import jadex.application.runtime.ISpace;
 import jadex.bridge.ComponentFactorySelector;
 import jadex.bridge.ComponentResultListener;
 import jadex.bridge.ComponentServiceContainer;
+import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.CreationInfo;
 import jadex.bridge.IArgument;
 import jadex.bridge.IComponentAdapter;
@@ -53,13 +54,13 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 /**
- *  The application context provides a closed environment for components.
+ *  The application interpreter provides a closed environment for components.
  *  If components spawn other components, these will automatically be added to
  *  the context.
  *  When the context is deleted all components will be destroyed.
  *  An component must only be in one application context.
  */
-public class Application implements IApplication, IComponentInstance
+public class ApplicationInterpreter implements IApplication, IComponentInstance
 {
 	//-------- constants --------
 	
@@ -92,9 +93,6 @@ public class Application implements IApplication, IComponentInstance
 	/** The parent component. */
 	protected IExternalAccess parent;
 	
-	/** Lifecycle state. */
-	protected String state;
-	
 	/** Flag to indicate that the context is about to be deleted
 	 * (no more components can be added). */
 	protected boolean	terminating;
@@ -117,12 +115,19 @@ public class Application implements IApplication, IComponentInstance
 	/** The service container. */
 	protected IServiceContainer container;
 	
+	/** The scheduled steps of the agent. */
+	protected List steps;
+	
+	/** Stop flag for stopping execution. */
+	protected boolean stop;
+	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new context.
 	 */
-	public Application(IComponentDescription desc, ApplicationModel model, MApplicationInstance config, final IComponentAdapterFactory factory, final IExternalAccess parent, Map arguments)
+	public ApplicationInterpreter(final IComponentDescription desc, final ApplicationModel model, final MApplicationInstance config, 
+		final IComponentAdapterFactory factory, final IExternalAccess parent, final Map arguments, final Future inited)
 	{
 		this.config	= config;
 		this.model = model;
@@ -131,8 +136,10 @@ public class Application implements IApplication, IComponentInstance
 		this.results = new HashMap();
 		this.properties = new HashMap();
 		this.ctypes = Collections.synchronizedMap(new HashMap()); 
+		// synchronized because of MicroAgentViewPanel, todo
+		this.steps	= Collections.synchronizedList(new ArrayList());
 		this.adapter = factory.createComponentAdapter(desc, model, this, parent);
-
+	
 		// Init the arguments with default values.
 		String configname = config!=null? config.getName(): null;
 		IArgument[] args = model.getArguments();
@@ -140,9 +147,9 @@ public class Application implements IApplication, IComponentInstance
 		{
 			if(args[i].getDefaultValue(configname)!=null)
 			{
-				if(this.arguments.get(args[i].getName())==null)
+				if(ApplicationInterpreter.this.arguments.get(args[i].getName())==null)
 				{
-					this.arguments.put(args[i].getName(), args[i].getDefaultValue(configname));
+					ApplicationInterpreter.this.arguments.put(args[i].getName(), args[i].getDefaultValue(configname));
 				}
 			}
 		}
@@ -153,16 +160,16 @@ public class Application implements IApplication, IComponentInstance
 		{
 			if(res[i].getDefaultValue(configname)!=null)
 			{
-				this.results.put(res[i].getName(), res[i].getDefaultValue(configname));
+				ApplicationInterpreter.this.results.put(res[i].getName(), res[i].getDefaultValue(configname));
 			}
 		}
 		
-		SimpleValueFetcher	fetcher = new SimpleValueFetcher();
+		final SimpleValueFetcher	fetcher = new SimpleValueFetcher();
 		fetcher.setValue("$args", getArguments());
 		fetcher.setValue("$properties", properties);
 		fetcher.setValue("$results", getResults());
-		fetcher.setValue("$component", this);
-		this.fetcher	= fetcher;
+		fetcher.setValue("$component", ApplicationInterpreter.this);
+		ApplicationInterpreter.this.fetcher = fetcher;
 		
 		// Init service container.
 		MExpressionType mex = model.getApplicationType().getContainer();
@@ -177,87 +184,183 @@ public class Application implements IApplication, IComponentInstance
 		
 		fetcher.setValue("$platform", getServiceProvider());
 		
-		List services = model.getApplicationType().getServices();
-		if(services!=null)
+		// Schedule the futures (first) init step.
+		addStep(new Runnable()
 		{
-			for(int i=0; i<services.size(); i++)
+			public void run()
 			{
-				MExpressionType exp = (MExpressionType)services.get(i);
-				IService service = (IService)exp.getParsedValue().getValue(fetcher);
-				container.addService(exp.getClazz(), service);
-			}
-		}
-
-		// Evaluate (future) properties.
-		List	futures	= new ArrayList();
-		List	props	= model.getApplicationType().getProperties();
-		if(props!=null)
-		{
-			for(int i=0; i<props.size(); i++)
-			{
-				final MExpressionType	mexp	= (MExpressionType)props.get(i);
-				final Object	val	= mexp.getParsedValue().getValue(fetcher);
-				if(mexp.getClazz()!=null && SReflect.isSupertype(IFuture.class, mexp.getClazz()))
+				List services = model.getApplicationType().getServices();
+				if(services!=null)
 				{
-//					System.out.println("Future property: "+mexp.getName()+", "+val);
-					if(val instanceof IFuture)
+					for(int i=0; i<services.size(); i++)
 					{
-						// Use second future to start component only when value has already been set.
-						final Future	ret	= new Future();
-						((IFuture)val).addResultListener(new ComponentResultListener(new DefaultResultListener()
+						MExpressionType exp = (MExpressionType)services.get(i);
+						IService service = (IService)exp.getParsedValue().getValue(fetcher);
+						container.addService(exp.getClazz(), service);
+					}
+				}
+		
+				// Evaluate (future) properties.
+				List	futures	= new ArrayList();
+				List	props	= model.getApplicationType().getProperties();
+				if(props!=null)
+				{
+					for(int i=0; i<props.size(); i++)
+					{
+						final MExpressionType	mexp	= (MExpressionType)props.get(i);
+						final Object	val	= mexp.getParsedValue().getValue(fetcher);
+						if(mexp.getClazz()!=null && SReflect.isSupertype(IFuture.class, mexp.getClazz()))
+						{
+		//					System.out.println("Future property: "+mexp.getName()+", "+val);
+							if(val instanceof IFuture)
+							{
+								// Use second future to start component only when value has already been set.
+								final Future retu = new Future();
+								((IFuture)val).addResultListener(new ComponentResultListener(new DefaultResultListener()
+								{
+									public void resultAvailable(Object source, Object result)
+									{
+										synchronized(properties)
+										{
+		//									System.out.println("Setting future property: "+mexp.getName()+" "+result);
+											properties.put(mexp.getName(), result);
+										}
+										retu.setResult(result);
+									}
+								}, getComponentAdapter()));
+								futures.add(retu);
+							}
+							else if(val!=null)
+							{
+								throw new RuntimeException("Future property must be instance of jadex.commons.IFuture: "+mexp.getName()+", "+mexp.getValue());
+							}
+						}
+						else
+						{
+							// Todo: handle specific properties (logging etc.)
+							properties.put(mexp.getName(), val);
+						}
+					}
+				}
+				
+				final Runnable init2 = new Runnable()
+				{
+					public void run() 
+					{
+						container.start().addResultListener(new ComponentResultListener(new DefaultResultListener()
 						{
 							public void resultAvailable(Object source, Object result)
 							{
-								synchronized(properties)
+								// Create spaces for context.
+//								System.out.println("comp services start finished: "+getComponentIdentifier());
+								List spaces = config.getMSpaceInstances();
+								if(spaces!=null)
 								{
-//									System.out.println("Setting future property: "+mexp.getName()+" "+result);
-									properties.put(mexp.getName(), result);
+									for(int i=0; i<spaces.size(); i++)
+									{
+										MSpaceInstance si = (MSpaceInstance)spaces.get(i);
+										try
+										{
+											ISpace space = (ISpace)si.getClazz().newInstance();
+											addSpace(si.getName(), space);
+											space.initSpace(ApplicationInterpreter.this, si, fetcher);
+										}
+										catch(Exception e)
+										{
+											System.out.println("Exception while creating space: "+si.getName());
+											e.printStackTrace();
+										}
+									}
 								}
-								ret.setResult(result);
+
+								final List components = config.getMComponentInstances();
+								SServiceProvider.getService(getServiceProvider(), ILibraryService.class).addResultListener(createResultListener(new DefaultResultListener()
+								{
+									public void resultAvailable(Object source, Object result)
+									{
+										final ILibraryService ls = (ILibraryService)result;
+										final ClassLoader cl = ls.getClassLoader();
+										SServiceProvider.getServiceUpwards(getServiceProvider(), IComponentManagementService.class).addResultListener(createResultListener(new DefaultResultListener()
+										{
+											public void resultAvailable(Object source, Object result)
+											{
+												final IComponentManagementService	ces	= (IComponentManagementService)result;
+												createComponent(components, cl, ces, 0);
+											}
+										}));
+									}
+								}));
+								
+								// Init is now finished. Notify cms and stop execution.
+//								System.out.println("Application init finished: "+Application.this);
+								stop = true;
+								inited.setResult(new Object[]{ApplicationInterpreter.this, adapter});
 							}
-						}, getComponentAdapter()));
-						futures.add(ret);
+						}, adapter));
 					}
-					else if(val!=null)
-					{
-						throw new RuntimeException("Future property must be instance of jadex.commons.IFuture: "+mexp.getName()+", "+mexp.getValue());
-					}
+				};
+
+				if(futures.isEmpty())
+				{
+					addStep(init2);
 				}
 				else
 				{
-					// Todo: handle specific properties (logging etc.)
-					properties.put(mexp.getName(), val);
+					IResultListener	crl	= new CounterResultListener(futures.size())
+					{
+						public void finalResultAvailable(Object source, Object result)
+						{
+							addStep(init2);
+						}
+						public void exceptionOccurred(Object source, Exception exception)
+						{
+							inited.setException(exception);
+						}
+					};
+					for(int i=0; i<futures.size(); i++)
+					{
+						((IFuture)futures.get(i)).addResultListener(crl);
+					}
 				}
-				
-			}
-		}
-		
-		if(futures.isEmpty())
-		{
-			state	= STATE_INITREADY;
-		}
-		else
-		{
-			state	= STATE_INITFUTURES;
-			IResultListener	crl	= new CounterResultListener(futures.size())
-			{
-				public void finalResultAvailable(Object source, Object result)
-				{
-					state	= STATE_INITREADY;
-					adapter.wakeup();
-				}
-				public void exceptionOccurred(Object source, Exception exception)
-				{
-					// Todo: fail component creation?
-				}
-			};
-			for(int i=0; i<futures.size(); i++)
-			{
-				((IFuture)futures.get(i)).addResultListener(crl);
-			}
-		}
+			}	
+		});		
 	}
 	
+	/**
+	 *  Schedule a step of the agent.
+	 *  May safely be called from external threads.
+	 *  @param step	Code to be executed as a step of the agent.
+	 */
+	public void	scheduleStep(final Runnable step)
+	{
+		adapter.invokeLater(new Runnable()
+		{			
+			public void run()
+			{
+				addStep(step);
+			}
+		});
+	}
+	
+	/**
+	 *  Add a new step.
+	 */
+	protected void addStep(Runnable step)
+	{
+		steps.add(step);
+//		notifyListeners(new ChangeEvent(this, "addStep", step));
+	}
+	
+	/**
+	 *  Add a new step.
+	 */
+	protected Object removeStep()
+	{
+		Object ret = steps.remove(0);
+//		notifyListeners(new ChangeEvent(this, "removeStep", new Integer(0)));
+		return ret;
+	}
+
 	/**
 	 * Load an component model.
 	 * @param model The model.
@@ -438,7 +541,7 @@ public class Application implements IApplication, IComponentInstance
 		String appctype = (String)ctypes.get(modelname);
 		if(appctype==null)
 		{
-			List atypes	= Application.this.model.getApplicationType().getMComponentTypes();
+			List atypes	= ApplicationInterpreter.this.model.getApplicationType().getMComponentTypes();
 			for(int i=0; i<atypes.size(); i++)
 			{
 				final MComponentType atype = (MComponentType)atypes.get(i);
@@ -843,72 +946,26 @@ public class Application implements IApplication, IComponentInstance
 	 */
 	public boolean executeStep()
 	{
-		if(STATE_INITREADY.equals(state))
+		try
 		{
-			// todo: set inited = true after all has been done
-			state = STATE_STARTED;
-			
-//			// Init service container and init service.
-//			// Create the services.
-//			List services = model.getApplicationType().getServices();
-//			if(services!=null)
-//			{
-//				for(int i=0; i<services.size(); i++)
-//				{
-//					MExpressionType exp = (MExpressionType)services.get(i);
-//					IService service = (IService)exp.getParsedValue().getValue(fetcher);
-////							mycontainer.addService(exp.getClazz(), exp.getName(), service);
-//					adapter.getServiceContainer().addService(exp.getClazz(), service);
-//				}
-//			}
-			container.start().addResultListener(new ComponentResultListener(new DefaultResultListener()
+			if(!steps.isEmpty())
 			{
-				public void resultAvailable(Object source, Object result)
-				{
-					// Create spaces for context.
-//					System.out.println("comp services start finished: "+getComponentIdentifier());
-					List spaces = config.getMSpaceInstances();
-					if(spaces!=null)
-					{
-						for(int i=0; i<spaces.size(); i++)
-						{
-							MSpaceInstance si = (MSpaceInstance)spaces.get(i);
-							try
-							{
-								ISpace space = (ISpace)si.getClazz().newInstance();
-								addSpace(si.getName(), space);
-								space.initSpace(Application.this, si, fetcher);
-							}
-							catch(Exception e)
-							{
-								System.out.println("Exception while creating space: "+si.getName());
-								e.printStackTrace();
-							}
-						}
-					}
-
-					final List components = config.getMComponentInstances();
-					SServiceProvider.getService(getServiceProvider(), ILibraryService.class).addResultListener(createResultListener(new DefaultResultListener()
-					{
-						public void resultAvailable(Object source, Object result)
-						{
-							final ILibraryService ls = (ILibraryService)result;
-							final ClassLoader cl = ls.getClassLoader();
-							SServiceProvider.getServiceUpwards(getServiceProvider(), IComponentManagementService.class).addResultListener(createResultListener(new DefaultResultListener()
-							{
-								public void resultAvailable(Object source, Object result)
-								{
-									final IComponentManagementService	ces	= (IComponentManagementService)result;
-									createComponent(components, cl, ces, 0);
-								}
-							}));
-						}
-					}));
-				}
-			}, adapter));
+				Runnable step = (Runnable)removeStep();
+//				String steptext = ""+step;
+				step.run();
+//				addHistoryEntry(steptext);
+			}
+	
+			boolean ret = !stop && !steps.isEmpty();
+			stop = false;
+			return ret;
 		}
-					
-		return false;
+		catch(ComponentTerminatedException ate)
+		{
+			// Todo: fix microkernel bug.
+			ate.printStackTrace();
+			return false; 
+		}
 	}
 
 	/**

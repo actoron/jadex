@@ -99,6 +99,10 @@ public class AgentRules
 					}
 					bdii.eal	= null;
 				}
+				
+				// Stop execution when init has finished and notify cms.
+				bdii.stop = true;
+				bdii.inited.setResult(new Object[]{bdii, bdii.getAgentAdapter()});
 			}
 		};
 		Rule rule = new Rule("agent_start", ragentcon, action);

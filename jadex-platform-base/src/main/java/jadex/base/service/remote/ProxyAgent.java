@@ -8,30 +8,12 @@ import jadex.micro.MicroAgent;
 import jadex.micro.MicroAgentMetaInfo;
 import jadex.service.CacheServiceContainer;
 import jadex.service.IServiceContainer;
-import jadex.service.SServiceProvider;
 
 /**
  *  A proxy agent is a pseudo component that mirrors services of a remote platform (or component).
  */
 public class ProxyAgent extends MicroAgent
 {
-//	/**
-//	 *  Called once after agent creation.
-//	 */
-//	public void agentCreated()
-//	{
-//		startServiceProvider();
-//	}
-	
-	/**
-	 *  Execute the functional body of the agent.
-	 *  Is only called once.
-	 */
-	public void executeBody()
-	{
-		startServiceProvider();
-	}
-	
 	/**
 	 *  Get the service container.
 	 *  @return The service container.
@@ -42,7 +24,6 @@ public class ProxyAgent extends MicroAgent
 			(IComponentIdentifier)getArgument("platform"), getAgentAdapter())/*, 25, 1*30*1000)*/; // 30 secs cache expire
 	}
 	
-
 	/**
 	 *  Get the meta information about the agent.
 	 */

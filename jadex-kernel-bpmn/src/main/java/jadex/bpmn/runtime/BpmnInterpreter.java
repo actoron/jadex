@@ -149,10 +149,6 @@ public class BpmnInterpreter implements IComponentInstance
 	/** The parent. */
 	protected IExternalAccess	parent;
 	
-	/** The thread executing the component (null for none). */
-	// Todo: need not be transient, because agent should only be serialized when no action is running?
-	protected transient Thread thread;
-	
 	/** The activity handlers. */
 	protected Map activityhandlers;
 	
@@ -186,6 +182,12 @@ public class BpmnInterpreter implements IComponentInstance
 	/** The service container. */
 	protected IServiceContainer container;
 	
+	/** The flag if is inited. */
+	protected Boolean initedflag;
+	
+	/** The inited future. */
+	protected Future inited;
+	
 	//-------- constructors --------
 	
 	// todo: 
@@ -194,10 +196,11 @@ public class BpmnInterpreter implements IComponentInstance
 	 *  @param adapter The adapter.
 	 */
 	public BpmnInterpreter(IComponentAdapter adapter, MBpmnModel model, Map arguments, 
-		String config, final IExternalAccess parent, Map activityhandlers, Map stephandlers, IValueFetcher fetcher)
+		String config, final IExternalAccess parent, Map activityhandlers, Map stephandlers, 
+		IValueFetcher fetcher, Future inited)
 	{
 		this.adapter = adapter;
-		init(model, arguments, config, parent, activityhandlers, stephandlers, fetcher);
+		construct(model, arguments, config, parent, activityhandlers, stephandlers, fetcher, inited);
 	}	
 		
 	/**
@@ -205,20 +208,23 @@ public class BpmnInterpreter implements IComponentInstance
 	 *  @param adapter The adapter.
 	 */
 	public BpmnInterpreter(IComponentDescription desc, IComponentAdapterFactory factory, MBpmnModel model, Map arguments, 
-		String config, final IExternalAccess parent, Map activityhandlers, Map stephandlers, IValueFetcher fetcher)
+		String config, final IExternalAccess parent, Map activityhandlers, Map stephandlers, 
+		IValueFetcher fetcher, Future inited)
 	{
 		this.adapter = factory.createComponentAdapter(desc, model, this, parent);
-		init(model, arguments, config, parent, activityhandlers, stephandlers, fetcher);
+		construct(model, arguments, config, parent, activityhandlers, stephandlers, fetcher, inited);
 	}
 	
 	/**
 	 *  Init method holds constructor code for both implementations.
 	 */
-	protected void init(final MBpmnModel model, Map arguments, String config, 
-		final IExternalAccess parent, Map activityhandlers, Map stephandlers, IValueFetcher fetcher)
+	protected void construct(final MBpmnModel model, Map arguments, String config, 
+		final IExternalAccess parent, Map activityhandlers, Map stephandlers, 
+		IValueFetcher fetcher, Future inited)
 	{
 		this.model = model;
 		this.config = config;
+		this.inited = inited;
 		
 		// Extract pool/lane from config.
 		if(config==null || "All".equals(config))
@@ -289,44 +295,6 @@ public class BpmnInterpreter implements IComponentInstance
 				variables.put(name, value);
 			}
 		}
-				
-		// todo: load services and start provider!
-		
-		// Create initial thread(s). 
-		// Note: It is very tricky to call createResultListener() in the constructor as this
-		// indirectly calls adapter.wakeup() but the component shouldn't run!
-		// HACK! now cache is on wrong thread!
-		List	startevents	= model.getStartActivities();
-		for(int i=0; startevents!=null && i<startevents.size(); i++)
-		{
-			context.addThread(new ProcessThread((MActivity)startevents.get(i), context, BpmnInterpreter.this));
-		}
-		
-		// todo: remove this hack of caching services
-		SServiceProvider.getServiceUpwards(getServiceProvider(), IComponentManagementService.class)
-			.addResultListener(new DefaultResultListener()
-		{
-			public void resultAvailable(Object source, Object result)
-			{
-				variables.put("$cms", result);
-			}
-		});
-		SServiceProvider.getService(getServiceProvider(), IClockService.class)
-			.addResultListener(new DefaultResultListener()
-		{
-			public void resultAvailable(Object source, Object result)
-			{
-				variables.put("$clock", result);
-			}
-		});
-		SServiceProvider.getService(getServiceProvider(), IMessageService.class)
-			.addResultListener(new DefaultResultListener()
-		{
-			public void resultAvailable(Object source, Object result)
-			{
-				variables.put("$msgservice", result);
-			} 
-		});
 	}
 	
 	//-------- IKernelAgent interface --------
@@ -345,42 +313,161 @@ public class BpmnInterpreter implements IComponentInstance
 	 */
 	public boolean executeStep()
 	{
-		try
+		boolean ret = false;
+		
+		if(initedflag==null)
 		{
-			this.thread = Thread.currentThread();
-				
-			if(!isFinished(pool, lane) && isReady(pool, lane))
-				executeStep(pool, lane);
-			
-			this.thread = null;
-			
-//			System.out.println("After step: "+this.getComponentAdapter().getComponentIdentifier().getName()+" "+isFinished(pool, lane));
-			if(!finishing && isFinished(pool, lane))
+			initedflag = Boolean.FALSE;
+			executeInitStep1();
+		}
+		else if(initedflag.booleanValue())
+		{
+			try
 			{
-				finishing = true;
-				((IComponentManagementService)variables.get("$cms")).destroyComponent(adapter.getComponentIdentifier());
+				if(!isFinished(pool, lane) && isReady(pool, lane))
+					executeStep(pool, lane);
 				
-//				SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class)
-//					.addResultListener(createResultListener(new DefaultResultListener()
-//				{
-//					public void resultAvailable(Object source, Object result)
-//					{
-//						((IComponentManagementService)result).destroyComponent(adapter.getComponentIdentifier());
-//					}
-//				}));
+	//			System.out.println("After step: "+this.getComponentAdapter().getComponentIdentifier().getName()+" "+isFinished(pool, lane));
+				if(!finishing && isFinished(pool, lane))
+				{
+					finishing = true;
+					((IComponentManagementService)variables.get("$cms")).destroyComponent(adapter.getComponentIdentifier());
+					
+	//				SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class)
+	//					.addResultListener(createResultListener(new DefaultResultListener()
+	//				{
+	//					public void resultAvailable(Object source, Object result)
+	//					{
+	//						((IComponentManagementService)result).destroyComponent(adapter.getComponentIdentifier());
+	//					}
+	//				}));
+				}
+				
+	//			System.out.println("Process wants: "+this.getComponentAdapter().getComponentIdentifier().getLocalName()+" "+!isFinished(null, null)+" "+isReady(null, null));
+				
+				ret = !isFinished(pool, lane) && isReady(pool, lane);
 			}
-			
-//			System.out.println("Process wants: "+this.getComponentAdapter().getComponentIdentifier().getLocalName()+" "+!isFinished(null, null)+" "+isReady(null, null));
-			
-			return !isFinished(pool, lane) && isReady(pool, lane);
+			catch(ComponentTerminatedException ate)
+			{
+				// Todo: fix microkernel bug.
+			}
 		}
-		catch(ComponentTerminatedException ate)
-		{
-			// Todo: fix microkernel bug.
-			return false; 
-		}
+		
+		return ret;
 	}
 
+	/**
+	 *  Execute the init step 1.
+	 */
+	protected void executeInitStep1()
+	{
+		// Fetch and cache services, then init service container.
+		
+		// todo: remove this hack of caching services
+		final boolean services[] = new boolean[3];
+		SServiceProvider.getServiceUpwards(getServiceProvider(), IComponentManagementService.class)
+			.addResultListener(createResultListener(new DefaultResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				variables.put("$cms", result);
+				boolean init2;
+				synchronized(services)
+				{
+					services[0]	= true;
+					init2 = services[0] && services[1] && services[2];
+				}
+				if(init2)
+				{
+					executeInitStep2();
+				}
+			}
+			public void exceptionOccurred(Object source, Exception exception)
+			{
+				inited.setException(exception);
+			}
+		}));
+		SServiceProvider.getService(getServiceProvider(), IClockService.class)
+			.addResultListener(createResultListener(new DefaultResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				variables.put("$clock", result);
+				boolean init2;
+				synchronized(services)
+				{
+					services[1]	= true;
+					init2 = services[0] && services[1] && services[2];
+				}
+				if(init2)
+				{
+					executeInitStep2();
+				}
+			}
+			public void exceptionOccurred(Object source, Exception exception)
+			{
+				inited.setException(exception);
+			}
+		}));
+		SServiceProvider.getService(getServiceProvider(), IMessageService.class)
+			.addResultListener(createResultListener(new IResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				variables.put("$msgservice", result);
+				boolean init2;
+				synchronized(services)
+				{
+					services[2]	= true;
+					init2 = services[0] && services[1] && services[2];
+				}
+				if(init2)
+				{
+					executeInitStep2();
+				}
+			} 
+			public void exceptionOccurred(Object source, Exception exception)
+			{
+				inited.setException(exception);
+			}
+		}));
+	}
+	
+	/**
+	 *  Execute the init step 2.
+	 */
+	protected void executeInitStep2()
+	{
+		// Start the container and notify cms when start has finished.
+		
+		getServiceContainer().start().addResultListener(createResultListener(new IResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				// todo: load services and start provider!
+				
+				// Create initial thread(s). 
+				// Note: It is very tricky to call createResultListener() in the constructor as this
+				// indirectly calls adapter.wakeup() but the component shouldn't run!
+				// HACK! now cache is on wrong thread!
+				List	startevents	= model.getStartActivities();
+				for(int i=0; startevents!=null && i<startevents.size(); i++)
+				{
+					context.addThread(new ProcessThread((MActivity)startevents.get(i), context, BpmnInterpreter.this));
+				}
+				
+				// Set inited to true and notify cms.
+				initedflag = Boolean.TRUE;
+				inited.setResult(new Object[]{BpmnInterpreter.this, adapter});
+			}
+			
+			public void exceptionOccurred(Object source, Exception exception)
+			{
+				inited.setException(exception);
+			}
+		}));
+	}
+	
 	/**
 	 *  Can be called concurrently (also during executeAction()).
 	 *  

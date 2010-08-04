@@ -9,13 +9,14 @@ import jadex.application.model.MComponentType;
 import jadex.application.model.MExpressionType;
 import jadex.application.model.MSpaceInstance;
 import jadex.application.model.MSpaceType;
-import jadex.application.runtime.impl.Application;
+import jadex.application.runtime.impl.ApplicationInterpreter;
 import jadex.bridge.Argument;
 import jadex.bridge.IComponentAdapterFactory;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentFactory;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.ILoadableComponentModel;
+import jadex.commons.Future;
 import jadex.commons.ResourceInfo;
 import jadex.commons.SGUI;
 import jadex.commons.SReflect;
@@ -223,10 +224,9 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 	 * @param parent The parent component (if any).
 	 * @return An instance of a component.
 	 */
-	public Object[] createComponentInstance(IComponentDescription desc, IComponentAdapterFactory factory, ILoadableComponentModel model, String config, Map arguments, IExternalAccess parent)
+	public Object[] createComponentInstance(IComponentDescription desc, IComponentAdapterFactory factory, 
+		ILoadableComponentModel model, String config, Map arguments, IExternalAccess parent, Future ret)
 	{
-		Application	context = null;
-		
 		MApplicationType apptype = ((ApplicationModel)model).getApplicationType();
 		List apps = apptype.getMApplicationInstances();
 				
@@ -246,13 +246,11 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 			app = new MApplicationInstance("default");
 
 		// Create context for application.
-		context	= new Application(desc, (ApplicationModel)model, app, factory, parent, arguments);
+		ApplicationInterpreter context = new ApplicationInterpreter(desc, (ApplicationModel)model, app, factory, parent, arguments, ret);
 		
 		// todo: result listener?
-		
 		// todo: create application context as return value?!
 				
-//		return context;
 		return new Object[]{context, context.getComponentAdapter()};
 	}
 		

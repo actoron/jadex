@@ -9,8 +9,10 @@ import jadex.bridge.IComponentFactory;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.ILoadableComponentModel;
+import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.SReflect;
+import jadex.commons.concurrent.IResultListener;
 import jadex.javaparser.SJavaParser;
 
 import java.util.HashMap;
@@ -86,7 +88,7 @@ public class Starter
 		try
 		{
 			// Absolute start time (for testing and benchmarking).
-			long starttime = System.currentTimeMillis();
+			final long starttime = System.currentTimeMillis();
 		
 			Map cmdargs = new HashMap();
 			Map compargs = new HashMap();
@@ -152,23 +154,51 @@ public class Starter
 			String afclname = (String)cmdargs.get(ADAPTER_FACTORY)!=null? 
 				(String)cmdargs.get(ADAPTER_FACTORY): FALLBACK_ADAPTER_FACTORY;
 			Class afclass = SReflect.findClass(afclname, null, cl);
-			IComponentAdapterFactory afac = (IComponentAdapterFactory)afclass.newInstance();
-			Object[] root = cfac.createComponentInstance(desc, afac, model, (String)cmdargs.get(CONFIGURATION_NAME), compargs, null);
-			IComponentInstance instance = (IComponentInstance)root[0];
+			final IComponentAdapterFactory afac = (IComponentAdapterFactory)afclass.newInstance();
+			
+			Future future = new Future();
+			final Future ret = new Future();
+			future.addResultListener(new IResultListener()
+			{
+				public void resultAvailable(Object source, Object result)
+				{
+					Object[] root = (Object[])result;
+					IComponentInstance instance = (IComponentInstance)root[0];
+//					final IComponentAdapter adapter = (IComponentAdapter)root[1];
+//					System.out.println("Instance: "+instance);
+					
+					long startup = System.currentTimeMillis() - starttime;
+					System.out.println("Platform startup time: " + startup + " ms.");
+			//		platform.logger.info("Platform startup time: " + startup + " ms.");
+					
+					ret.setResult(instance.getExternalAccess());
+				}
+				
+				public void exceptionOccurred(Object source, Exception exception)
+				{
+					ret.setException(exception);
+				}
+			});
+			
+			Object[] root = cfac.createComponentInstance(desc, afac, model, (String)cmdargs.get(CONFIGURATION_NAME), compargs, null, future);
 			IComponentAdapter adapter = (IComponentAdapter)root[1];
-	//		System.out.println("Instance: "+instance);
 			
-			// Initiate first step of root component (i.e. platform).
-			afac.executeStep(adapter);
+			// Execute init steps of root component on main thread (i.e. platform).
+			boolean again = true;
+			while(again)
+			{
+//				System.out.print(".");
+				again = afac.executeStep(adapter);
+			}
 			
-			long startup = System.currentTimeMillis() - starttime;
-			System.out.println("Platform startup time: " + startup + " ms.");
-	//		platform.logger.info("Platform startup time: " + startup + " ms.");
+			// Start normal execution of root component (i.e. platform).
+			adapter.wakeup();
 			
-			return instance.getExternalAccess();
+			return ret;
 		}
 		catch(Exception e)
 		{
+			e.printStackTrace();
 			throw new RuntimeException(e);
 		}
 	}

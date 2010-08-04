@@ -184,6 +184,12 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 	/** The service container. */
 	protected IServiceContainer container;
 	
+	/** Flag if component should stop execution. */
+	protected boolean stop;
+
+	/** The cms future for init return. */
+	protected Future inited;
+	
 	//-------- constructors --------
 	
 	/**
@@ -194,7 +200,7 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 	 *  @param arguments	The arguments for the agent as name/value pairs.
 	 */
 	public BDIInterpreter(IComponentDescription desc, IComponentAdapterFactory factory, final IOAVState state, final OAVAgentModel model, 
-		final String config, final Map arguments, final IExternalAccess parent, final Map kernelprops)
+		final String config, final Map arguments, final IExternalAccess parent, final Map kernelprops, Future inited)
 	{	
 		this.adapter = factory.createComponentAdapter(desc, model, this, parent);
 		this.state = state;
@@ -206,7 +212,8 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 		this.stacache = new LRU(20);
 		this.microplansteps = true;
 		this.externalthreads	= Collections.synchronizedSet(SCollection.createLinkedHashSet());
-
+		this.inited = inited;
+		
 //		System.out.println("arguments: "+adapter.getComponentIdentifier().getName()+" "+arguments);
 		
 		state.setSynchronizator(new ISynchronizator()
@@ -232,10 +239,10 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 		
 		// Perform init on component thread. (hack!?)
 		// Cannot be done
-//		getAgentAdapter().invokeLater(new Runnable()
-//		{
-//			public void run()
-//			{
+		getAgentAdapter().invokeLater(new Runnable()
+		{
+			public void run()
+			{
 				// Evaluate arguments if necessary
 				// Hack! use constant
 				if(arguments!=null && arguments.get("evaluation_language")!=null)
@@ -284,8 +291,8 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 				
 				// Get the services.
 				final boolean services[]	= new boolean[4];
-//				SServiceProvider.getService(getServiceProvider(), IClockService.class).addResultListener(new ComponentResultListener(new DefaultResultListener()
-				SServiceProvider.getService(getServiceProvider(), IClockService.class).addResultListener(new DefaultResultListener()
+				SServiceProvider.getService(getServiceProvider(), IClockService.class).addResultListener(new ComponentResultListener(new DefaultResultListener()
+//				SServiceProvider.getService(getServiceProvider(), IClockService.class).addResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object source, Object result)
 					{
@@ -301,9 +308,9 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 							BDIInterpreter.this.state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state,OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_CREATING);							
 						}
 					}
-				});
-//				SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class).addResultListener(new ComponentResultListener(new DefaultResultListener()
-				SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class).addResultListener(new DefaultResultListener()
+				}, getAgentAdapter()));
+				SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class).addResultListener(new ComponentResultListener(new DefaultResultListener()
+//				SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class).addResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object source, Object result)
 					{
@@ -317,9 +324,9 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 						if(startagent)
 							BDIInterpreter.this.state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state,OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_CREATING);
 					}
-				});
-//				SServiceProvider.getService(getServiceProvider(), IMessageService.class).addResultListener(new ComponentResultListener(new DefaultResultListener()
-				SServiceProvider.getService(getServiceProvider(), IMessageService.class).addResultListener(new DefaultResultListener()
+				}, getAgentAdapter()));
+				SServiceProvider.getService(getServiceProvider(), IMessageService.class).addResultListener(new ComponentResultListener(new DefaultResultListener()
+//				SServiceProvider.getService(getServiceProvider(), IMessageService.class).addResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object source, Object result)
 					{
@@ -333,7 +340,7 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 						if(startagent)
 							BDIInterpreter.this.state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state,OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_CREATING);
 					}
-				});
+				}, getAgentAdapter()));
 
 				// Previously done in createStartAgentRule
 				Map parents = new HashMap(); 
@@ -384,8 +391,8 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 				// So only access logger if really necessary
 //				Logger logger = adapter.getLogger();
 //				initLogger(ragent, logger);			
-//			}
-//		});
+			}
+		});
 	}
 	
 	//-------- IKernelAgent interface --------
@@ -422,7 +429,15 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 			state.notifyEventListeners();
 			state.getProfiler().stop(IProfiler.TYPE_RULE, act!=null?act.getRule():null);
 
-			return !rulesystem.getAgenda().isEmpty(); 
+			if(stop)
+			{
+				stop = false;
+				return false;
+			}
+			else
+			{
+				return !rulesystem.getAgenda().isEmpty(); 
+			}
 		}
 		catch(Throwable e)
 		{

@@ -450,11 +450,11 @@ public abstract class MicroAgent implements IMicroAgent
 	
 	/**
 	 *  Start the service provider.
-	 */
+	 * /
 	public IFuture startServiceProvider()
 	{
 		return ((IServiceContainer)interpreter.getServiceProvider()).start();
-	}
+	}*/
 	
 	/**
 	 *  Invoke a runnable later that is guaranteed 

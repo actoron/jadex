@@ -5,6 +5,7 @@ import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentFactory;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.ILoadableComponentModel;
+import jadex.commons.Future;
 import jadex.commons.SGUI;
 import jadex.commons.SReflect;
 import jadex.service.BasicService;
@@ -158,10 +159,11 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	 * @param parent The parent component (if any).
 	 * @return An instance of a component.
 	 */
-	public Object[] createComponentInstance(IComponentDescription desc, IComponentAdapterFactory factory, ILoadableComponentModel model, String config, Map arguments, IExternalAccess parent)
+	public Object[] createComponentInstance(IComponentDescription desc, IComponentAdapterFactory factory, ILoadableComponentModel model, 
+		String config, Map arguments, IExternalAccess parent, Future ret)
 	{
-		MicroAgentInterpreter interpreter = new MicroAgentInterpreter(desc, factory, (MicroAgentModel)model, arguments, config, parent);
-		return new Object[]{interpreter, interpreter.getAgentAdapter()};
+		MicroAgentInterpreter mai = new MicroAgentInterpreter(desc, factory, (MicroAgentModel)model, arguments, config, parent, ret);
+		return new Object[]{mai, mai.getAgentAdapter()};
 	}
 	
 	/**
