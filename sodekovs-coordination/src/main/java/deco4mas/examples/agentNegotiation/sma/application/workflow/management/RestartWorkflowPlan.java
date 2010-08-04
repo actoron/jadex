@@ -39,7 +39,7 @@ public class RestartWorkflowPlan extends Plan
 				getBeliefbase().getBelief("executionPhase").setFact(new Boolean(false));
 
 				// restart
-				IGoal restart = createGoal("instantiateWorkflow");
+				IGoal restart = createGoal("executeWorkflow");
 				dispatchTopLevelGoal(restart);
 				System.gc();
 			} else

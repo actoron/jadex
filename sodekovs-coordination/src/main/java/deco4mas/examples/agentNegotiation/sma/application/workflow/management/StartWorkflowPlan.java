@@ -4,6 +4,7 @@ import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import java.util.logging.Logger;
+import deco4mas.examples.agentNegotiation.common.dataObjects.WorkflowWrapper;
 import deco4mas.examples.agentNegotiation.evaluate.AgentLogger;
 
 /**
@@ -25,8 +26,8 @@ public class StartWorkflowPlan extends Plan
 			System.out.println();
 			smaLogger.info("--- Execution phase ---");
 			getBeliefbase().getBelief("executionPhase").setFact(new Boolean(true));
-			getBeliefbase().getBelief("statExetime").setFact(this.getTime());
-			Long negTime = getTime() - (Long) getBeliefbase().getBelief("statNegtime").getFact();
+			((WorkflowWrapper)getBeliefbase().getBelief("workflowWrapper").getFact()).setStartExecutionTime(this.getTime());
+			Long negTime = getTime() - ((WorkflowWrapper)getBeliefbase().getBelief("workflowWrapper").getFact()).getStartTime().longValue();;
 			workflowTime.info("Negotiation time: " + negTime);
 
 			// start workflow

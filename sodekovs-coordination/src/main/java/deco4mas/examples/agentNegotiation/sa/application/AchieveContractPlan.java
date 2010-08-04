@@ -7,7 +7,8 @@ import deco4mas.examples.agentNegotiation.common.dataObjects.ServiceContract;
 import deco4mas.examples.agentNegotiation.evaluate.AgentLogger;
 
 /**
- * sign end
+ * achieve a contract
+ * (the belief contract is not in use yet)
  */
 public class AchieveContractPlan extends Plan
 {
@@ -18,6 +19,6 @@ public class AchieveContractPlan extends Plan
 		IInternalEvent offerEvent = (IInternalEvent) getReason();
 		ServiceContract offer = (ServiceContract) offerEvent.getParameter("contract").getValue();
 		saLogger.info("contract sealed with");
-		getBeliefbase().getBelief("contract").setFact(offer);
+//		getBeliefbase().getBelief("contract").setFact(offer);
 	}
 }

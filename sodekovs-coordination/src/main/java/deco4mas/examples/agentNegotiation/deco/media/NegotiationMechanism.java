@@ -142,15 +142,49 @@ public class NegotiationMechanism extends ICoordinationMechanism
 
 		NegotiationInitiator negotiation = negotiations.get(contractInfo.getId());
 		Boolean[] answers = contractInfo.getAnswers();
-		if (answers[0])
-			negotiation.acceptReward(contractInfo.getContract().getInitiator());
-		if (answers[1])
-			negotiation.acceptReward(contractInfo.getContract().getParticipant());
+		// initiator
+		if (answers[0] != null)
+		{
+			if (answers[0])
+			{
+				negotiation.acceptReward(contractInfo.getContract().getInitiator());
+			} else
+			{
+				if (negotiation.setState(NegotiationInitiator.CLOSED, Long.MAX_VALUE))
+				{
+					sendReward(new NegotiationContractInformation(negotiation.getId(), NAME, new ServiceContract(negotiation
+						.getServiceType(), negotiation.getSelected().getBid(), negotiation.getInitiator(), negotiation.getSelected()
+						.getOwner()), NegotiationContractInformation.CANCELED_REWARD));
+					negotiations.remove(negotiation);
+				}
+			}
+		}
+
+		// participant
+		if (answers[1] != null)
+		{
+			if (answers[1])
+			{
+				negotiation.acceptReward(contractInfo.getContract().getParticipant());
+			} else
+			{
+				if (negotiation.setState(NegotiationInitiator.INTERMEDIATE_PHASE, clock.getTime() + negotiation.getDeadline()))
+				{
+					performNegotiation(negotiation);
+				}
+			}
+		}
+
+		// check if we can proceed
 		if (negotiation.areRewardsAccepted())
 		{
-			negotiations.remove(negotiation);
-			negotiation.setState(NegotiationInitiator.CLOSED, Long.MAX_VALUE);
-			sendFinalRewards(negotiation);
+			if (negotiation.setState(NegotiationInitiator.CLOSED, Long.MAX_VALUE))
+			{
+				sendReward(new NegotiationContractInformation(negotiation.getId(), NAME, new ServiceContract(negotiation.getServiceType(),
+					negotiation.getSelected().getBid(), negotiation.getInitiator(), negotiation.getSelected().getOwner()),
+					NegotiationContractInformation.FINAL_REWARD));
+				negotiations.remove(negotiation);
+			}
 		}
 	}
 
@@ -179,20 +213,25 @@ public class NegotiationMechanism extends ICoordinationMechanism
 
 				if (negotiation.areRewardsAccepted())
 				{
-					negotiations.remove(negotiation);
-					negotiation.setState(NegotiationInitiator.CLOSED, Long.MAX_VALUE);
-					sendFinalRewards(negotiation);
-
+					if (negotiation.setState(NegotiationInitiator.CLOSED, Long.MAX_VALUE))
+					{
+						negotiations.remove(negotiation);
+						sendReward(new NegotiationContractInformation(negotiation.getId(), NAME, new ServiceContract(negotiation
+							.getServiceType(), negotiation.getSelected().getBid(), negotiation.getInitiator(), negotiation.getSelected()
+							.getOwner()), NegotiationContractInformation.FINAL_REWARD));
+					}
 				} else
 				{
-					negotiation.setState(NegotiationInitiator.INTERMEDIATE_PHASE, clock.getTime() + negotiation.getDeadline());
-					performNegotiation(negotiation);
+					if (negotiation.setState(NegotiationInitiator.INTERMEDIATE_PHASE, clock.getTime() + negotiation.getDeadline()))
+					{
+						performNegotiation(negotiation);
+					}
 				}
 			}
 		}
 	}
 
-	private void sendReward(NegotiationInitiator negotiation)
+	private void sendReward(NegotiationContractInformation info)
 	{
 		// get Space
 		CoordinationSpace env = (CoordinationSpace) space;
@@ -200,10 +239,6 @@ public class NegotiationMechanism extends ICoordinationMechanism
 		// set parameter
 		CoordinationInfo coordInfo = new CoordinationInfo();
 		HashMap<String, Object> parameterDataMappings = new HashMap<String, Object>();
-		ServiceContract contract = new ServiceContract(negotiation.getServiceType(), negotiation.getSelected().getBid(), negotiation
-			.getInitiator(), negotiation.getSelected().getOwner());
-		NegotiationContractInformation info = new NegotiationContractInformation(negotiation.getId(), NAME, contract,
-			NegotiationContractInformation.TENTATIVE_REWARD);
 		parameterDataMappings.put("information", info);
 
 		coordInfo.setName(info + "@" + clock.getTime());
@@ -215,33 +250,6 @@ public class NegotiationMechanism extends ICoordinationMechanism
 		coordInfo.addValue(Constants.DML_REALIZATION_NAME, NAME);
 
 		// publish
-		mediumLogger.info("sendContract " + info);
-		System.out.println("#publish " + info);
-		env.publishCoordinationEvent(coordInfo);
-	}
-
-	private void sendFinalRewards(NegotiationInitiator negotiation)
-	{
-		// get Space
-		CoordinationSpace env = (CoordinationSpace) space;
-
-		// set parameter sa
-		CoordinationInfo coordInfo = new CoordinationInfo();
-		HashMap<String, Object> parameterDataMappings = new HashMap<String, Object>();
-		ServiceContract contract = new ServiceContract(negotiation.getServiceType(), negotiation.getSelected().getBid(), negotiation
-			.getInitiator(), negotiation.getSelected().getOwner());
-		NegotiationContractInformation info = new NegotiationContractInformation(negotiation.getId(), NAME, contract,
-			NegotiationContractInformation.FINAL_REWARD);
-		parameterDataMappings.put("information", info);
-
-		coordInfo.setName(info + "@" + clock.getTime());
-		coordInfo.setType(CoordinationSpaceObject.COORDINATION_INFORMATION_TYPE);
-		coordInfo.addValue(Constants.PARAMETER_DATA_MAPPING, parameterDataMappings);
-		coordInfo.addValue(CoordinationSpaceObject.AGENT_ARCHITECTURE, Constants.BDI);
-		coordInfo.addValue(CoordinationInfo.AGENT_ELEMENT_NAME, "negotiationContract");
-		coordInfo.addValue(CoordinationInfo.AGENT_ELEMENT_TYPE, AgentElementType.INTERNAL_EVENT.toString());
-		coordInfo.addValue(Constants.DML_REALIZATION_NAME, NAME);
-
 		mediumLogger.info("sendContract " + info);
 		System.out.println("#publish " + info);
 		env.publishCoordinationEvent(coordInfo);
@@ -280,8 +288,12 @@ public class NegotiationMechanism extends ICoordinationMechanism
 			mediumLogger.info("sa found " + negotiation);
 
 			// send rewards
-			negotiation.setState(NegotiationInitiator.FINAL_PHASE, clock.getTime() + negotiation.getDeadline());
-			sendReward(negotiation);
+			if (negotiation.setState(NegotiationInitiator.FINAL_PHASE, clock.getTime() + negotiation.getDeadline()))
+			{
+				sendReward(new NegotiationContractInformation(negotiation.getId(), NAME, new ServiceContract(negotiation.getServiceType(),
+					negotiation.getSelected().getBid(), negotiation.getInitiator(), negotiation.getSelected().getOwner()),
+					NegotiationContractInformation.TENTATIVE_REWARD));
+			}
 		}
 	}
 

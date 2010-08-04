@@ -47,11 +47,11 @@ public class ContractReceivePlan extends Plan
 								IInternalEvent satisfy = createInternalEvent("serviceSatisfied");
 								satisfy.getParameter("contract").setValue(info.getContract());
 								dispatchInternalEvent(satisfy);
-							} else
+							} else if (info.getState().equals(NegotiationContractInformation.TENTATIVE_REWARD))
 							{
 								if (requested.getState().equals(RequestedService.SEARCHING))
 								{
-									smaLogger.info("Designated Sa " + info.getContract().getParticipant());
+									smaLogger.info("Designated Sa: " + info);
 									requested.setDesignatedSa(true);
 									info.setAnswer(true, this.getComponentIdentifier());
 								} else
@@ -62,6 +62,11 @@ public class ContractReceivePlan extends Plan
 								IInternalEvent reply = createInternalEvent("negotiationContractReply");
 								reply.getParameter("information").setValue(info);
 								dispatchInternalEvent(reply);
+							} else if (info.getState().equals(NegotiationContractInformation.CANCELED_REWARD))
+							{
+								smaLogger.info("Reset Designated Sa: " + info);
+								requested.setDesignatedSa(false);
+								info.setAnswer(true, this.getComponentIdentifier());
 							}
 						}
 				}

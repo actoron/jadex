@@ -12,13 +12,14 @@ import jadex.commons.concurrent.IResultListener;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
+import deco4mas.examples.agentNegotiation.common.dataObjects.WorkflowWrapper;
 import deco4mas.examples.agentNegotiation.evaluate.AgentLogger;
 import deco4mas.examples.agentNegotiation.evaluate.ValueLogger;
 
 /**
  * Creates a workflow and init the necessary negotiations
  */
-public class InstantiateWorkflowPlan extends Plan
+public class ExecuteWorkflowPlan extends Plan
 {
 	/* id of the workflow */
 	private static Integer workflowID = new Integer(0);
@@ -50,11 +51,10 @@ public class InstantiateWorkflowPlan extends Plan
 					// LOG
 					workflowLogger.info("workflow executed");
 					providerLogger.info("*** workflow executed ***");
-					Long executionTime = getTime() - (Long) getBeliefbase().getBelief("statExetime").getFact();
-					Long allTime = getTime() - (Long) getBeliefbase().getBelief("statNegtime").getFact();
-					workflowTimeLogger.info("Execution time: " + executionTime);
-					ValueLogger.addValue("workflowTime", allTime.doubleValue());
-					workflowTimeLogger.info("Complete time: " + allTime);
+					((WorkflowWrapper)getBeliefbase().getBelief("workflowWrapper").getFact()).setEndTime(getTime());
+					workflowTimeLogger.info("Execution time: " + ((WorkflowWrapper)getBeliefbase().getBelief("workflowWrapper").getFact()).getExecutionTime().toString());
+					ValueLogger.addValue("workflowTime", ((WorkflowWrapper)getBeliefbase().getBelief("workflowWrapper").getFact()).getCompleteTime().doubleValue());
+					workflowTimeLogger.info("Complete time: " + ((WorkflowWrapper)getBeliefbase().getBelief("workflowWrapper").getFact()).getExecutionTime().toString());
 					workflowTimeLogger.info("---");
 					System.out.println("*** workflow executed ***");
 
@@ -82,7 +82,7 @@ public class InstantiateWorkflowPlan extends Plan
 				.getComponentIdentifier(), true, false), killListener);
 			IComponentIdentifier workflowIdentifier = (IComponentIdentifier) workflowFuture.get(this);
 			getBeliefbase().getBelief("workflow").setFact(workflowIdentifier);
-
+			getBeliefbase().getBelief("workflowWrapper").setFact(new WorkflowWrapper(workflowIdentifier, (Long)getBeliefbase().getBelief("workflowIntendedTime").getFact(), (Double)getBeliefbase().getBelief("workflowProfit").getFact()));
 			// LOG
 			providerLogger.info("workflow [" + workflowName + "] created");
 			workflowLogger.info("workflow created");

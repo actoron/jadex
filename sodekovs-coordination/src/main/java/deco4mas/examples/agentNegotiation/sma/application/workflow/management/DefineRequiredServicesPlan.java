@@ -19,6 +19,7 @@ import java.util.Set;
 import java.util.logging.Logger;
 import deco4mas.examples.agentNegotiation.common.dataObjects.RequiredService;
 import deco4mas.examples.agentNegotiation.common.dataObjects.ServiceType;
+import deco4mas.examples.agentNegotiation.common.dataObjects.WorkflowWrapper;
 import deco4mas.examples.agentNegotiation.evaluate.AgentLogger;
 
 /**
@@ -90,7 +91,7 @@ public class DefineRequiredServicesPlan extends Plan
 				getBeliefbase().getBeliefSet("requiredServices").addFacts(serviceSet.toArray());
 
 				// LOG
-				getBeliefbase().getBelief("statNegtime").setFact(this.getTime());
+				((WorkflowWrapper)getBeliefbase().getBelief("workflowWrapper").getFact()).setStartTime(this.getTime());
 				System.out.println();
 				System.out.println("---- negotiation phase " + this.getComponentName() + " started! ----");
 				System.out.println();

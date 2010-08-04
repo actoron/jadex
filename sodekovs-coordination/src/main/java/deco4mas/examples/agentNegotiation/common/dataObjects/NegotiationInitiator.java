@@ -24,7 +24,7 @@ public class NegotiationInitiator
 	public static String CLOSED = "closed";
 
 	/* current negotiation state */
-	private String state;
+	private String state = "";
 
 	/* end of the current negotiation state (interesting for medium) */
 	private Long phaseEnd = Long.MAX_VALUE;
@@ -101,21 +101,24 @@ public class NegotiationInitiator
 	 */
 	public Boolean evaluateRound(Long thetime)
 	{
-		Set<ServiceProposal> proposalSet = new HashSet<ServiceProposal>();
-		for (Map.Entry<IComponentIdentifier, ServiceProposal> proposal : proposals.entrySet())
+		synchronized (monitor)
 		{
-			proposalSet.add(proposal.getValue());
+			Set<ServiceProposal> proposalSet = new HashSet<ServiceProposal>();
+			for (Map.Entry<IComponentIdentifier, ServiceProposal> proposal : proposals.entrySet())
+			{
+				proposalSet.add(proposal.getValue());
+			}
+			SortedMap<Double, ServiceProposal> orderedProposal = utilityFunction.benchmarkProposals(proposalSet, thetime);
+			selected = selector.selectProposal(orderedProposal);
+
+			// log!
+			((WeightFactorUtilityFunction) utilityFunction).log(proposals.get(selected.getOwner()), thetime);
+
+			Boolean nextRound = false;
+			if (selected == null)
+				nextRound = true;
+			return nextRound;
 		}
-		SortedMap<Double, ServiceProposal> orderedProposal = utilityFunction.benchmarkProposals(proposalSet, thetime);
-		selected = selector.selectProposal(orderedProposal);
-
-		// log!
-		((WeightFactorUtilityFunction) utilityFunction).log(proposals.get(selected.getOwner()), thetime);
-
-		Boolean nextRound = false;
-		if (selected == null)
-			nextRound = true;
-		return nextRound;
 	}
 
 	/**
@@ -126,7 +129,10 @@ public class NegotiationInitiator
 	 */
 	public void addProposal(ServiceProposal proposal)
 	{
-		proposals.put(proposal.getOwner(), proposal);
+		synchronized (monitor)
+		{
+			proposals.put(proposal.getOwner(), proposal);
+		}
 	}
 
 	/**
@@ -139,14 +145,27 @@ public class NegotiationInitiator
 	 * @param endtime
 	 *            time when the phase should end
 	 */
-	public void setState(String state, Long endtime)
+	public boolean setState(String state, Long endtime)
 	{
-		this.state = state;
-		this.phaseEnd = endtime;
-		if (state.equals(INTERMEDIATE_PHASE))
+		synchronized (monitor)
 		{
-			proposals = new HashMap<IComponentIdentifier, ServiceProposal>();
-			selected = null;
+			if (!this.state.equals(state))
+			{
+				this.state = state;
+				this.phaseEnd = endtime;
+				if (state.equals(INTERMEDIATE_PHASE))
+				{
+					proposals = new HashMap<IComponentIdentifier, ServiceProposal>();
+					selected = null;
+				}
+				return true;
+			} else
+			{
+//				System.out.println("--- SAME STATE SET ---");
+				return false;
+			}
+				
+
 		}
 	}
 
@@ -158,12 +177,15 @@ public class NegotiationInitiator
 	 */
 	public void acceptReward(IComponentIdentifier receiver)
 	{
-		if (receiver.getName().equals(inititator.getName()))
+		synchronized (monitor)
 		{
-			accepted[0] = true;
-		} else if (receiver.getName().equals(selected.getOwner().getName()))
-		{
-			accepted[1] = true;
+			if (receiver.getName().equals(inititator.getName()))
+			{
+				accepted[0] = true;
+			} else if (receiver.getName().equals(selected.getOwner().getName()))
+			{
+				accepted[1] = true;
+			}
 		}
 
 	}
@@ -173,12 +195,15 @@ public class NegotiationInitiator
 	 */
 	public boolean areRewardsAccepted()
 	{
-		Boolean result = false;
-		if (accepted[0] && accepted[1])
+		synchronized (monitor)
 		{
-			result = true;
+			Boolean result = false;
+			if (accepted[0] && accepted[1])
+			{
+				result = true;
+			}
+			return result;
 		}
-		return result;
 	}
 
 	/**
@@ -202,7 +227,10 @@ public class NegotiationInitiator
 	 */
 	public Long getPhaseEnd()
 	{
-		return phaseEnd;
+		synchronized (monitor)
+		{
+			return phaseEnd;
+		}
 	}
 
 	/**
@@ -226,7 +254,10 @@ public class NegotiationInitiator
 	 */
 	public String getState()
 	{
-		return state;
+		synchronized (monitor)
+		{
+			return state;
+		}
 	}
 
 	/**
@@ -234,16 +265,19 @@ public class NegotiationInitiator
 	 */
 	public ServiceProposal getSelected()
 	{
-		return selected;
+		synchronized (monitor)
+		{
+			return selected;
+		}
 	}
 
-	/**
-	 * @return the monitor object for synchronization
-	 */
-	public Object getMonitor()
-	{
-		return monitor;
-	}
+	// /**
+	// * @return the monitor object for synchronization
+	// */
+	// public Object getMonitor()
+	// {
+	// return monitor;
+	// }
 
 	@Override
 	public String toString()

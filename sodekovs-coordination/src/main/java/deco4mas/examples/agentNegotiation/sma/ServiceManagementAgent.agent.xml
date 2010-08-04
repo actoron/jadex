@@ -58,17 +58,14 @@
 		<!-- required services for current workflow	(observed by deco) -->
 		<beliefset name="requiredServices" class="RequiredService"></beliefset>
 
-		<!-- workflow -->
-		<belief name="workflow" class="IComponentIdentifier" />
+		<!-- workflow config-->
 		<belief name="workflowName" class="String" exported="true"></belief>
-
-		<!-- statistik use only	-->
-		<belief name="statNegtime" class="Long">
-			<fact>0l</fact>
-		</belief>
-		<belief name="statExetime" class="Long">
-			<fact>0l</fact>
-		</belief>
+		<belief name="workflowProfit" class="Double" exported="true"></belief>
+		<belief name="workflowIntendedTime" class="Long" exported="true"></belief>
+		
+		<!-- workflow name-->
+		<belief name="workflow" class="IComponentIdentifier" />
+		<belief name="workflowWrapper" class="WorkflowWrapper"></belief>
 	</beliefs>
 
 	<goals>
@@ -78,7 +75,7 @@
 		</achievegoalref>
 
 		<!-- create new workflow	-->
-		<achievegoal name="instantiateWorkflow"></achievegoal>
+		<achievegoal name="executeWorkflow"></achievegoal>
 
 		<!-- define necessary offers for workflow -->
 		<achievegoal name="defineServices">
@@ -107,10 +104,10 @@
 		</plan>
 
 		<!-- create new workflow	-->
-		<plan name="instantiateWorkflow">
-			<body class="InstantiateWorkflowPlan"></body>
+		<plan name="executeWorkflow">
+			<body class="ExecuteWorkflowPlan"></body>
 			<trigger>
-				<goal ref="instantiateWorkflow"></goal>
+				<goal ref="executeWorkflow"></goal>
 			</trigger>
 		</plan>
 
@@ -189,7 +186,7 @@
 			</beliefs>
 			<plans>
 				<!-- initiate workflow at start	-->
-				<initialplan ref="instantiateWorkflow"></initialplan>
+				<initialplan ref="executeWorkflow"></initialplan>
 			</plans>
 		</configuration>
 	</configurations>

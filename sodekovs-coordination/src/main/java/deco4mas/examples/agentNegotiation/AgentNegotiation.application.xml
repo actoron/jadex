@@ -1,4 +1,3 @@
-
 	<!--
 		<H3>A agent negotiation application</H3>
 		A negotiation application which can be started to launch agent negotiation scenario.
@@ -138,6 +137,12 @@
 						(deco4mas.examples.agentNegotiation.sma.application.workflow.implementation.NAME -->
 						<argument name="workflowName">
 							new String("workflow")
+						</argument>
+						<argument name="workflowProfit">
+							new Double(10000.0)
+						</argument>
+						<argument name="workflowIntendedTime">
+							new Long(200L)
 						</argument>
 					</arguments>
 				</component>

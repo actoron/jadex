@@ -39,6 +39,8 @@ public class ContractReceivePlan extends Plan
 							saLogger.info("Final Reward " + info);
 
 							getBeliefbase().getBelief("signed").setFact(Boolean.TRUE);
+							
+							//inform agent about a new contract
 							IInternalEvent sealed = createInternalEvent("contractSealed");
 							sealed.getParameter("contract").setValue(info.getContract());
 							dispatchInternalEvent(sealed);

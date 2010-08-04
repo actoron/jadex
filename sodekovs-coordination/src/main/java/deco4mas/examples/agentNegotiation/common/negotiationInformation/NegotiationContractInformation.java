@@ -7,8 +7,9 @@ public class NegotiationContractInformation extends NegotiationInformation
 {
 	public static String TENTATIVE_REWARD = "tentativeContract";
 	public static String FINAL_REWARD = "finalContract";
+	public static String CANCELED_REWARD = "canceledContract";
 
-	private Boolean[] answers = { Boolean.FALSE, Boolean.FALSE };
+	private Boolean[] answers = { null, null };
 	private ServiceContract contract;
 	private String state;
 
