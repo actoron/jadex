@@ -328,6 +328,10 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 			public void resultAvailable(Object source, Object result)
 			{
 				IComponentManagementService cms = (IComponentManagementService)result;
+				
+				if(cms==null)
+					System.out.println("hh");
+				
 				IComponentIdentifier[] childs = cms.getChildren(getComponentIdentifier());
 				
 				IResultListener	crl	= new CollectionResultListener(childs.length, new DelegationResultListener(ret));

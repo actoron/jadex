@@ -247,7 +247,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 				{
 					public void run() 
 					{
-						container.start().addResultListener(new ComponentResultListener(new DefaultResultListener()
+						container.start().addResultListener(new ComponentResultListener(new IResultListener()
 						{
 							public void resultAvailable(Object source, Object result)
 							{
@@ -284,6 +284,13 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 										{
 											public void resultAvailable(Object source, Object result)
 											{
+												// NOTE1: parent cannot wait for subcomponents to be all created
+												// before setting itself inited=true, because subcomponents need
+												// the parent external access. 
+												
+												// NOTE2: subcomponents must be created one by one as they
+												// might depend on each other (e.g. bdi factory must be there for jcc).
+												
 												final IComponentManagementService	ces	= (IComponentManagementService)result;
 												createComponent(components, cl, ces, 0);
 											}
@@ -292,9 +299,14 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 								}));
 								
 								// Init is now finished. Notify cms and stop execution.
-//								System.out.println("Application init finished: "+Application.this);
+//								System.out.println("Application init finished: "+ApplicationInterpreter.this);
 								stop = true;
 								inited.setResult(new Object[]{ApplicationInterpreter.this, adapter});
+							}
+							
+							public void exceptionOccurred(Object source, Exception exception)
+							{
+								inited.setException(exception);
 							}
 						}, adapter));
 					}
@@ -1022,9 +1034,9 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 	 *  and has to be casted to its corresponding incarnation.
 	 *  @param listener	External access is delivered via result listener.
 	 */
-	public IFuture getExternalAccess()
+	public IExternalAccess getExternalAccess()
 	{
-		return new Future(new ExternalAccess(this));
+		return new ExternalAccess(this);
 	}
 
 	/**
@@ -1143,7 +1155,14 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 		return new ComponentResultListener(listener, adapter);
 	}
 
-	protected void createComponent(final List components, final ClassLoader cl, final IComponentManagementService ces, final int i)
+	/**
+	 *  Create subcomponents.
+	 *  NOTE: parent cannot declare itself initing while subcomponents are created
+	 *  because they need the external access of the parent, which is available only
+	 *  after init is finished (otherwise there is a cyclic init dependency between parent and subcomps). 
+	 */
+	protected void createComponent(final List components, final ClassLoader cl, 
+		final IComponentManagementService ces, final int i) //,final Future inited)
 	{
 		if(i<components.size())
 		{
@@ -1155,7 +1174,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 				public void finalResultAvailable(Object source, Object result)
 				{
 //					System.out.println("Create finished: "+component.getName()+" "+component.getTypeName()+" "+component.getConfiguration()+" "+Thread.currentThread());
-					createComponent(components, cl, ces, i+1);
+					createComponent(components, cl, ces, i+1);//, inited);
 				}
 				
 				public void exceptionOccurred(Object source, Exception exception)
@@ -1171,6 +1190,13 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 				ret.addResultListener(crl);
 			}
 		}
+//		else
+//		{
+//			// Init is now finished. Notify cms and stop execution.
+//			System.out.println("Application init finished: "+ApplicationInterpreter.this);
+//			stop = true;
+//			inited.setResult(new Object[]{ApplicationInterpreter.this, adapter});
+//		}
 	}
 
 	/**

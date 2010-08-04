@@ -231,6 +231,6 @@ public class CacheServiceContainer	implements IServiceContainer
 	 */
 	public String toString()
 	{
-		return "CacheServiceContainer(name="+getId()+")";
+		return "CacheServiceContainer(name="+getId()+", container="+container+")";
 	}
 }

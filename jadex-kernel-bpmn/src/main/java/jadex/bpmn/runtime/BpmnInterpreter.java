@@ -581,19 +581,21 @@ public class BpmnInterpreter implements IComponentInstance
 	 *  and has to be casted to its corresponding incarnation.
 	 *  @param listener	External access is delivered via result listener.
 	 */
-	public IFuture getExternalAccess()
+	public IExternalAccess getExternalAccess()
 	{
-		final Future ret = new Future();
+		return new ExternalAccess(BpmnInterpreter.this);
 		
-		adapter.invokeLater(new Runnable()
-		{
-			public void run()
-			{
-				ret.setResult(new ExternalAccess(BpmnInterpreter.this));
-			}
-		});
-		
-		return ret;
+//		final Future ret = new Future();
+//		
+//		adapter.invokeLater(new Runnable()
+//		{
+//			public void run()
+//			{
+//				ret.setResult(new ExternalAccess(BpmnInterpreter.this));
+//			}
+//		});
+//		
+//		return ret;
 	}
 	
 	/**

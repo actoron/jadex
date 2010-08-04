@@ -296,25 +296,27 @@ public class MicroAgentInterpreter implements IComponentInstance
 	 *  and has to be casted to its corresponding incarnation.
 	 *  @param listener	External access is delivered via result listener.
 	 */
-	public IFuture getExternalAccess()
+	public IExternalAccess getExternalAccess()
 	{
-		final Future ret = new Future();
+		return microagent.getExternalAccess();
 		
-		getAgentAdapter().invokeLater(new Runnable()
-		{
-			public void run()
-			{
-				Object exta = microagent.getExternalAccess();
-				ret.setResult(exta);
-			}
-			
-			public String toString()
-			{
-				return "microagent.getExternalAccess()_#"+this.hashCode();
-			}
-		});
-		
-		return ret;
+//		final Future ret = new Future();
+//		
+//		getAgentAdapter().invokeLater(new Runnable()
+//		{
+//			public void run()
+//			{
+//				Object exta = microagent.getExternalAccess();
+//				ret.setResult(exta);
+//			}
+//			
+//			public String toString()
+//			{
+//				return "microagent.getExternalAccess()_#"+this.hashCode();
+//			}
+//		});
+//		
+//		return ret;
 	}
 	
 	/**

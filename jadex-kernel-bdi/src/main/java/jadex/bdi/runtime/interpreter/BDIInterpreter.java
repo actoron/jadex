@@ -178,8 +178,8 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 	/** The externally synchronized threads to be notified on cleanup. */
 	protected Set externalthreads;
 	
-	/** The get-external-access listeners to be notified after init. */
-	protected Set eal;
+//	/** The get-external-access listeners to be notified after init. */
+//	protected Set eal;
 	
 	/** The service container. */
 	protected IServiceContainer container;
@@ -214,7 +214,7 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 		this.externalthreads	= Collections.synchronizedSet(SCollection.createLinkedHashSet());
 		this.inited = inited;
 		
-//		System.out.println("arguments: "+adapter.getComponentIdentifier().getName()+" "+arguments);
+		System.out.println("arguments: "+adapter.getComponentIdentifier().getName()+" "+arguments);
 		
 		state.setSynchronizator(new ISynchronizator()
 		{
@@ -514,28 +514,30 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 	 *  and has to be casted to its corresponding incarnation.
 	 *  @param listener	When cleanup of the agent is finished, the listener must be notified.
 	 */
-	public IFuture getExternalAccess()
+	public IExternalAccess getExternalAccess()
 	{
-		final Future ret = new Future();
+		return new ExternalAccessFlyweight(state, ragent);
 		
-		getAgentAdapter().invokeLater(new Runnable()
-		{
-			public void run()
-			{
-				if(OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_CREATING.equals(state.getAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state)))
-				{
-					if(eal==null)
-						eal	= new HashSet();
-					eal.add(new DelegationResultListener(ret));
-				}
-				else
-				{
-					ret.setResult(new ExternalAccessFlyweight(state, ragent));
-				}
-			}
-		});
-		
-		return ret;
+//		final Future ret = new Future();
+//		
+//		getAgentAdapter().invokeLater(new Runnable()
+//		{
+//			public void run()
+//			{
+//				if(OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_CREATING.equals(state.getAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state)))
+//				{
+//					if(eal==null)
+//						eal	= new HashSet();
+//					eal.add(new DelegationResultListener(ret));
+//				}
+//				else
+//				{
+//					ret.setResult(new ExternalAccessFlyweight(state, ragent));
+//				}
+//			}
+//		});
+//		
+//		return ret;
 	}
 
 	/**

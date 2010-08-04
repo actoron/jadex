@@ -75,7 +75,7 @@ public interface IComponentInstance
 	 *  and has to be casted to its corresponding incarnation.
 	 *  @return External access is delivered via future.
 	 */
-	public IFuture getExternalAccess();
+	public IExternalAccess getExternalAccess();
 
 	/**
 	 *  Get the class loader of the component.

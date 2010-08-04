@@ -91,14 +91,14 @@ public class AgentRules
 				
 				// Inform get-external-access listeners (if any). Hack???
 				BDIInterpreter	bdii	= BDIInterpreter.getInterpreter(state);
-				if(bdii.eal!=null)
-				{
-					for(Iterator it=bdii.eal.iterator(); it.hasNext(); )
-					{
-						((IResultListener)it.next()).resultAvailable(bdii.getAgentAdapter().getComponentIdentifier(), new ExternalAccessFlyweight(state, ragent));
-					}
-					bdii.eal	= null;
-				}
+//				if(bdii.eal!=null)
+//				{
+//					for(Iterator it=bdii.eal.iterator(); it.hasNext(); )
+//					{
+//						((IResultListener)it.next()).resultAvailable(bdii.getAgentAdapter().getComponentIdentifier(), new ExternalAccessFlyweight(state, ragent));
+//					}
+//					bdii.eal	= null;
+//				}
 				
 				// Stop execution when init has finished and notify cms.
 				bdii.stop = true;

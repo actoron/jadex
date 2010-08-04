@@ -6,11 +6,9 @@ import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.IRemoteServiceManagementService;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.service.SServiceProvider;
-import jadex.service.ServiceInfo;
 
 /**
  *  Start two Jadex platforms and one agent on each platform.
@@ -71,7 +69,7 @@ public class StartScenario
 													public void resultAvailable(Object source, Object result)
 													{
 														lcms.createComponent("user", "jadex.micro.examples.remoteservice.UserAgent.class", null, null)
-														.addResultListener(new DefaultResultListener()
+															.addResultListener(new DefaultResultListener()
 														{
 															public void resultAvailable(Object source, Object result)
 															{
