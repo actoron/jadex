@@ -12,6 +12,7 @@ import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.MPool;
 import jadex.bpmn.runtime.ProcessThread;
 import jadex.bpmn.runtime.handler.EventEndErrorActivityHandler.EventEndErrorException;
+import jadex.commons.Future;
 import jadex.service.IServiceContainer;
 import java.io.Serializable;
 import java.util.Iterator;

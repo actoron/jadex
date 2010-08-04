@@ -33,7 +33,7 @@ public class DFAgentTable extends JTable
 	/** The image icons. */
 	protected static final UIDefaults icons = new UIDefaults(new Object[]
 	{
-		"remove_agent", SGUI.makeIcon(DFBrowserPlugin_old.class, "/jadex/tools/common/images/new_remove_service.png"),
+//		"remove_agent", SGUI.makeIcon(DFBrowserPlugin_old.class, "/jadex/tools/common/images/new_remove_service.png"),
 	});
 	
 	//-------- attributes --------

@@ -197,10 +197,25 @@ public class BpmnInterpreter implements IComponentInstance
 	 */
 	public BpmnInterpreter(IComponentAdapter adapter, MBpmnModel model, Map arguments, 
 		String config, final IExternalAccess parent, Map activityhandlers, Map stephandlers, 
-		IValueFetcher fetcher, Future inited)
+		IValueFetcher fetcher, IComponentManagementService cms, IClockService cs, IMessageService ms,
+		IServiceContainer container)
 	{
 		this.adapter = adapter;
-		construct(model, arguments, config, parent, activityhandlers, stephandlers, fetcher, inited);
+		construct(model, arguments, config, parent, activityhandlers, stephandlers, fetcher);
+		variables.put("$cms", cms);
+		variables.put("$clock", cs);
+		variables.put("$msgservice", ms);
+		
+		// Assign container
+		this.container = container;
+		
+		// Create initial thread(s). 
+		List	startevents	= model.getStartActivities();
+		for(int i=0; startevents!=null && i<startevents.size(); i++)
+		{
+			context.addThread(new ProcessThread((MActivity)startevents.get(i), context, BpmnInterpreter.this));
+		}
+		initedflag = Boolean.TRUE;
 	}	
 		
 	/**
@@ -212,7 +227,9 @@ public class BpmnInterpreter implements IComponentInstance
 		IValueFetcher fetcher, Future inited)
 	{
 		this.adapter = factory.createComponentAdapter(desc, model, this, parent);
-		construct(model, arguments, config, parent, activityhandlers, stephandlers, fetcher, inited);
+		this.inited = inited;
+		this.variables	= new HashMap();
+		construct(model, arguments, config, parent, activityhandlers, stephandlers, fetcher);
 	}
 	
 	/**
@@ -220,11 +237,10 @@ public class BpmnInterpreter implements IComponentInstance
 	 */
 	protected void construct(final MBpmnModel model, Map arguments, String config, 
 		final IExternalAccess parent, Map activityhandlers, Map stephandlers, 
-		IValueFetcher fetcher, Future inited)
+		IValueFetcher fetcher)
 	{
 		this.model = model;
 		this.config = config;
-		this.inited = inited;
 		
 		// Extract pool/lane from config.
 		if(config==null || "All".equals(config))
@@ -254,7 +270,7 @@ public class BpmnInterpreter implements IComponentInstance
 		this.context = new ThreadContext(model);
 		this.messages = new ArrayList();
 		this.variables	= new HashMap();
-		
+
 		// Init the arguments with default values.
 		IArgument[] args = model.getArguments();
 		for(int i=0; i<args.length; i++)
@@ -362,6 +378,8 @@ public class BpmnInterpreter implements IComponentInstance
 	protected void executeInitStep1()
 	{
 		// Fetch and cache services, then init service container.
+		// Note: It is very tricky to call createResultListener() in the constructor as this
+		// indirectly calls adapter.wakeup() but the component shouldn't run automatically!
 		
 		// todo: remove this hack of caching services
 		final boolean services[] = new boolean[3];
@@ -444,12 +462,7 @@ public class BpmnInterpreter implements IComponentInstance
 		{
 			public void resultAvailable(Object source, Object result)
 			{
-				// todo: load services and start provider!
-				
 				// Create initial thread(s). 
-				// Note: It is very tricky to call createResultListener() in the constructor as this
-				// indirectly calls adapter.wakeup() but the component shouldn't run!
-				// HACK! now cache is on wrong thread!
 				List	startevents	= model.getStartActivities();
 				for(int i=0; startevents!=null && i<startevents.size(); i++)
 				{

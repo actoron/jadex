@@ -54,11 +54,14 @@ import jadex.bpmn.model.MSequenceEdge;
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ProcessThread;
 import jadex.bpmn.runtime.handler.AbstractEventIntermediateTimerActivityHandler;
+import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IExternalAccess;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.javaparser.IExpressionParser;
 import jadex.javaparser.IParsedExpression;
+import jadex.javaparser.IValueFetcher;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 import jadex.rules.state.IOAVState;
 import jadex.service.clock.IClockService;
@@ -122,10 +125,13 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 	 *  Create a new BPMN process instance using default handler.
 	 *  @param model	The BMPN process model.
 	 */
-	public BpmnPlanBodyInstance(MBpmnModel model, final BDIInterpreter interpreter, final Object rcapa, final Object rplan)
+	public BpmnPlanBodyInstance(MBpmnModel model, final BDIInterpreter interpreter, 
+		final Object rcapa, final Object rplan)
 	{
 		super(interpreter.getAgentAdapter(), model, null, null, null, PLAN_ACTIVITY_HANDLERS, 
-			null, new OAVBDIFetcher(interpreter.getState(), rcapa, rplan));
+			null, new OAVBDIFetcher(interpreter.getState(), rcapa, rplan), 
+			interpreter.getCMS(), interpreter.getClockService(), interpreter.getMessageService(), 
+			interpreter.getServiceContainer());
 		this.interpreter	= interpreter;
 		this.state = interpreter.getState();
 		this.rcapa = rcapa;

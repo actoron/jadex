@@ -10,9 +10,11 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.ILoadableComponentModel;
+import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.concurrent.Executor;
 import jadex.commons.concurrent.IExecutable;
+import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.ThreadPoolFactory;
 import jadex.service.BasicServiceContainer;
 import jadex.service.IService;
@@ -64,7 +66,19 @@ public class InterpreterTest
 			
 			
 			// Initialize agent interpreter.
-			BDIInterpreter interpreter = new BDIInterpreter(null, new ComponentAdapterFactory(), loaded.getState(), loaded, null, null, null, config);
+			Future ret = new Future();
+			ret.addResultListener(new IResultListener()
+			{
+				public void resultAvailable(Object source, Object result)
+				{
+//					interpreter.getAgentAdapter().wakeup();
+				}
+				
+				public void exceptionOccurred(Object source, Exception exception)
+				{
+				}
+			});
+			BDIInterpreter interpreter = new BDIInterpreter(null, new ComponentAdapterFactory(), loaded.getState(), loaded, null, null, null, config, ret);
 			interpreter.getAgentAdapter().wakeup();
 			
 	//		System.out.println("Agent execution finished.");

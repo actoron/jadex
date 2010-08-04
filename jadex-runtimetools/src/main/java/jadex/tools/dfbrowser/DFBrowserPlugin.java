@@ -48,8 +48,8 @@ public class DFBrowserPlugin extends AbstractJCCPlugin
 	 * The image icons.
 	 */
 	protected static final UIDefaults	icons	= new UIDefaults(new Object[]{
-		"dfbrowser", SGUI.makeIcon(DFBrowserPlugin_old.class, "/jadex/tools/common/images/new_dfbrowser.png"), 
-		"dfbrowser_sel", SGUI.makeIcon(DFBrowserPlugin_old.class, "/jadex/tools/common/images/new_dfbrowser_sel.png"), 
+//		"dfbrowser", SGUI.makeIcon(DFBrowserPlugin_old.class, "/jadex/tools/common/images/new_dfbrowser.png"), 
+//		"dfbrowser_sel", SGUI.makeIcon(DFBrowserPlugin_old.class, "/jadex/tools/common/images/new_dfbrowser_sel.png"), 
 		"open_dfbrowser", SGUI.makeIcon(GuiProperties.class, "/jadex/tools/common/images/new_introspector.png"),
 		"close_dfbrowser", SGUI.makeIcon(GuiProperties.class, "/jadex/tools/common/images/close_introspector.png"),
 		"dfbrowser_empty", SGUI.makeIcon(GuiProperties.class, "/jadex/tools/common/images/introspector_empty.png"),
