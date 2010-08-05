@@ -6,6 +6,7 @@ import jadex.bridge.IArgument;
 import jadex.bridge.IComponentIdentifier;
 import jadex.micro.MicroAgent;
 import jadex.micro.MicroAgentMetaInfo;
+import jadex.service.CacheServiceContainer;
 import jadex.service.IServiceContainer;
 
 /**
@@ -19,8 +20,8 @@ public class ProxyAgent extends MicroAgent
 	 */
 	public IServiceContainer createServiceContainer()
 	{
-		return /*new CacheServiceContainer(*/new RemoteServiceContainer(
-			(IComponentIdentifier)getArgument("platform"), getAgentAdapter())/*, 25, 1*30*1000)*/; // 30 secs cache expire
+		return new CacheServiceContainer(new RemoteServiceContainer(
+			(IComponentIdentifier)getArgument("platform"), getAgentAdapter()), 25, 1*30*1000); // 30 secs cache expire
 	}
 	
 	/**

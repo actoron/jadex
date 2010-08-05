@@ -7,8 +7,12 @@ import jadex.commons.IFilter;
  */
 public class ServiceIdFilter implements IFilter
 {
+	//-------- attributes --------
+	
 	/** The service id. */
 	protected Object sid;
+	
+	//-------- constructors --------
 	
 	/**
 	 *  Create a new filter.
@@ -25,6 +29,8 @@ public class ServiceIdFilter implements IFilter
 		this.sid = sid;
 	}
 
+	//-------- methods --------
+	
 	/**
 	 *  Get the id.
 	 *  @return the id.

@@ -1,7 +1,6 @@
 package jadex.service;
 
 import jadex.commons.ConstantFilter;
-import jadex.commons.IFilter;
 
 /**
  *  Select first service to be returned as result of service search.

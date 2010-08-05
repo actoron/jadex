@@ -5,8 +5,12 @@ package jadex.commons;
  */
 public class ConstantFilter implements IFilter
 {
+	//-------- attributes --------
+	
 	/** The return value. */
 	protected boolean value;
+	
+	//-------- constructors --------
 	
 	/**
 	 *  Create filter instance.
@@ -22,6 +26,8 @@ public class ConstantFilter implements IFilter
 	{
 		this.value = value;
 	}
+	
+	//-------- methods --------
 	
 	/**
 	 *  Test if an object passes the filter.

@@ -6,30 +6,13 @@ import jadex.commons.SUtil;
 import java.util.Arrays;
 
 /**
- * 
+ *  Filtering specific component factories.
+ *  a) per model type (bdi, mirco, etc.)
+ *  b) per model filename
  */
 public class FactoryFilter implements IFilter
 {
 	//-------- attributes --------
-	
-	/**
-	 * Returns a hash code value for the array
-	 * @param array the array to create a hash code value for
-	 * @return a hash code value for the array
-	 */
-	private static int hashCode(Object[] array)
-	{
-		int prime = 31;
-		if(array == null)
-			return 0;
-		int result = 1;
-		for(int index = 0; index < array.length; index++)
-		{
-			result = prime * result
-					+ (array[index] == null ? 0 : array[index].hashCode());
-		}
-		return result;
-	}
 
 	/** The component type. */
 	protected String	type;
@@ -108,6 +91,25 @@ public class FactoryFilter implements IFilter
 		return result;
 	}
 
+	/**
+	 * Returns a hash code value for the array
+	 * @param array the array to create a hash code value for
+	 * @return a hash code value for the array
+	 */
+	private static int hashCode(Object[] array)
+	{
+		int prime = 31;
+		if(array == null)
+			return 0;
+		int result = 1;
+		for(int index = 0; index < array.length; index++)
+		{
+			result = prime * result
+					+ (array[index] == null ? 0 : array[index].hashCode());
+		}
+		return result;
+	}
+	
 	/**
 	 *  Test if equal.
 	 */

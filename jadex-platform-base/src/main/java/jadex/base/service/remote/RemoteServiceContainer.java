@@ -1,6 +1,5 @@
 package jadex.base.service.remote;
 
-import jadex.bridge.ComponentFactorySelector;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IRemoteServiceManagementService;
@@ -59,8 +58,9 @@ public class RemoteServiceContainer extends BasicServiceContainer
 		{
 			public void resultAvailable(Object source, Object result)
 			{
+				// If should not search remotely or not inited (no rms)
 				if(!decider.searchNode(null, RemoteServiceContainer.this, results)
-					|| rms==null || componentid==null || selector instanceof ComponentFactorySelector)
+					|| rms==null || componentid==null)// || selector instanceof ComponentFactorySelector)
 				{
 					ret.setResult(selector.getResult(results));
 				}

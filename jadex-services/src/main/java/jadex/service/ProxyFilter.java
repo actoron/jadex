@@ -9,9 +9,13 @@ import java.lang.reflect.Proxy;
  */
 public class ProxyFilter implements IFilter
 {
+	//-------- attributes --------
+	
 	/** Static proxy filter instance. */
 	public static IFilter PROXYFILTER = new ProxyFilter();
 
+	//-------- methods --------
+	
 	/**
 	 *  Test if service is a proxy.
 	 */
