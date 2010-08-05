@@ -30,7 +30,7 @@ class ServiceTableModel extends AbstractTableModel
 	/**
 	 * @param ads
 	 */
-	public void setAgentDescriptions(IDFComponentDescription[] ads)
+	public void setComponentDescriptions(IDFComponentDescription[] ads)
 	{
 		ArrayList ad_list = new ArrayList();
 		ArrayList svd_list = new ArrayList();
@@ -54,7 +54,7 @@ class ServiceTableModel extends AbstractTableModel
 	/**
 	 * @param ad
 	 */
-	public void setAgentDescription(IDFComponentDescription ad)
+	public void setComponentDescription(IDFComponentDescription ad)
 	{
 		IDFServiceDescription[] sd = ad.getServices();
 		IDFComponentDescription[] aid = new IDFComponentDescription[sd.length];
@@ -69,7 +69,7 @@ class ServiceTableModel extends AbstractTableModel
 	}
 
 	/**
-	 * @return all agent subscriptions length
+	 * @return all component subscriptions length
 	 * @see javax.swing.table.TableModel#getRowCount()
 	 */
 	public int getRowCount()
@@ -128,7 +128,7 @@ class ServiceTableModel extends AbstractTableModel
 			case 2:
 				return "Ownership";
 			case 3:
-				return "Agent";
+				return "Component";
 			case 4:
 				return "Ontologies";
 			case 5:
@@ -183,7 +183,7 @@ class ServiceTableModel extends AbstractTableModel
 	 * @param i
 	 * @return the aid of the service at row i
 	 */
-	public IDFComponentDescription getAgentDescription(int i)
+	public IDFComponentDescription getComponentDescription(int i)
 	{
 		return ad == null || i < 0 || i >= ad.length ? null : ad[i];
 	}

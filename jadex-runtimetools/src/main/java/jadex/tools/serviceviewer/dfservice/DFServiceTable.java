@@ -13,12 +13,12 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
 /**
- *  Table showing the df agent services.
+ *  Table showing the df component services.
  */
 public class DFServiceTable extends JTable//JScrollPane
 {
 	/**
-	 * Constructor for DFAgentTable.
+	 * Constructor.
 	 */
 	public DFServiceTable()
 	{
@@ -26,14 +26,14 @@ public class DFServiceTable extends JTable//JScrollPane
 		setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		TableSorter sorter = (TableSorter)getModel();
 		sorter.setTableHeader(getTableHeader());
-		setDefaultRenderer(IComponentIdentifier.class, new AgentIdentifierRenderer());
+		setDefaultRenderer(IComponentIdentifier.class, new ComponentIdentifierRenderer());
 		setDefaultRenderer(String[].class, new StringArrayRenderer());
 		setDefaultRenderer(IProperty[].class, new PropertyArrayRenderer());
 	}
 
 	/**
-	 *  Get the selected agent/service description.
-	 *  @return The currently selected service/agent description.
+	 *  Get the selected component/service description.
+	 *  @return The currently selected service/component description.
 	 */
 	public Object[] getSelectedServices()
 	{
@@ -44,30 +44,30 @@ public class DFServiceTable extends JTable//JScrollPane
 			TableSorter sorter = (TableSorter)getModel();
 			ServiceTableModel model = (ServiceTableModel)sorter.getTableModel();
 			sel = sorter.modelIndex(sel);
-			ret = new Object[]{model.getServiceDescription(sel), model.getAgentDescription(sel)};
+			ret = new Object[]{model.getServiceDescription(sel), model.getComponentDescription(sel)};
 		}
 		return ret;
 	}
 	
 	/**
-	 * Sets Agent descriptions for this element
+	 * Sets descriptions for this element
 	 * @param ad
 	 */
-	public void setAgentDescriptions(IDFComponentDescription[] ad)
+	public void setComponentDescriptions(IDFComponentDescription[] ad)
 	{
 		TableSorter sorter = (TableSorter)getModel();
 		ServiceTableModel model = (ServiceTableModel)sorter.getTableModel();
-		model.setAgentDescriptions(ad);
+		model.setComponentDescriptions(ad);
 	}
 
 	/**
-	 * @param agentDescription
+	 * @param componentDescription
 	 */
-	public void setAgentDescription(IDFComponentDescription ad)
+	public void setComponentDescription(IDFComponentDescription ad)
 	{
 		TableSorter sorter = (TableSorter)getModel();
 		ServiceTableModel model = (ServiceTableModel)sorter.getTableModel();
-		model.setAgentDescription(ad);
+		model.setComponentDescription(ad);
 	}
 
 	/**

@@ -9,9 +9,9 @@ import java.util.Date;
 import javax.swing.table.AbstractTableModel;
 
 /**
- *  The table model for agents.
+ *  The table model for component descriptions.
  */
-class AgentTableModel extends AbstractTableModel
+class ComponentTableModel extends AbstractTableModel
 {
 	protected IDFComponentDescription[] ads;
 
@@ -28,14 +28,14 @@ class AgentTableModel extends AbstractTableModel
 	/**
 	 * @param ad
 	 */
-	public void setAgentDescriptions(IDFComponentDescription[] ad)
+	public void setComponentDescriptions(IDFComponentDescription[] ad)
 	{
 		ads = ad;
 		fireTableDataChanged();
 	}
 
 	/**
-	 * @return all agent subscriptions length
+	 * @return all component subscriptions length
 	 * @see javax.swing.table.TableModel#getRowCount()
 	 */
 	public int getRowCount()
@@ -85,7 +85,7 @@ class AgentTableModel extends AbstractTableModel
 		switch(columnIndex)
 		{
 			case 0:
-				return "Agent";
+				return "Component";
 			case 1:
 				return "Leasetime";
 			case 2:
@@ -127,9 +127,9 @@ class AgentTableModel extends AbstractTableModel
 
 	/**
 	 * @param i
-	 * @return the agent description at row i
+	 * @return the component description at row i
 	 */
-	public IDFComponentDescription getAgentDescription(int i)
+	public IDFComponentDescription getComponentDescription(int i)
 	{
 		return ads == null || i < 0 || i >= ads.length ? null : ads[i];
 	}

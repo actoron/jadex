@@ -30,7 +30,7 @@ public class ServiceDescriptionPanel extends JPanel
 	protected JTextField name;
 	protected JTextField type;
 	protected JTextField owner;
-	protected JTextField agent;
+	protected JTextField component;
 	protected JList onto;
 	protected JList lang;
 	protected JList proto;
@@ -53,7 +53,7 @@ public class ServiceDescriptionPanel extends JPanel
 		this.name = addTextField(c, "Name", "", "Service name");
 		this.type = addTextField(c, "Type", "", "Service type");
 		this.owner = addTextField(c, "Ownership", "", "Service ownership");
-		this.agent = addTextField(c, "Agent", "", "The agent providing this service");
+		this.component = addTextField(c, "Component", "", "The component providing this service");
 		JPanel panel = new JPanel(new GridLayout(1, 4));
 		this.onto = addList(panel, "Ontologies", "Ontologies understood by this service");
 		this.lang = addList(panel, "Languages", "Languages understood by this service");
@@ -75,7 +75,7 @@ public class ServiceDescriptionPanel extends JPanel
 	
 	/**
 	 *  Set the service description.
-	 *  @param ad The agent description.
+	 *  @param ad The component description.
 	 *  @param sd The service description.
 	 */
 	void setService(IDFComponentDescription ad, IDFServiceDescription sd)
@@ -86,7 +86,7 @@ public class ServiceDescriptionPanel extends JPanel
 		type.setToolTipText(sd==null? "": sd.getType());
 		owner.setText(sd==null? "": sd.getOwnership());
 		owner.setToolTipText(sd==null? "": sd.getOwnership());
-		agent.setText(ad==null? "": ad.getName().getName());
+		component.setText(ad==null? "": ad.getName().getName());
 		
 		if(ad!=null)
 		{
@@ -94,7 +94,7 @@ public class ServiceDescriptionPanel extends JPanel
 			String tooltip = "<html>" + ad.getName().getName();
 			for(int addr = 0; addr < addrs.length; addr++)
 				tooltip += "<br>" + addrs[addr];
-			agent.setToolTipText(tooltip);
+			component.setToolTipText(tooltip);
 		}
 		
 		update(onto, sd==null? new String[0]: sd.getOntologies());

@@ -5,6 +5,7 @@ import jadex.base.fipa.IDFServiceDescription;
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.Properties;
 import jadex.commons.Property;
+import jadex.commons.SGUI;
 import jadex.commons.jtable.TableSorter;
 
 import java.awt.Dimension;
@@ -23,16 +24,16 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
 /**
- *  This class serves for displaying agent descriptions.
+ *  This class serves for displaying component descriptions.
  */
-public class DFAgentTable extends JTable
+public class DFComponentTable extends JTable
 {
 	static final IDFComponentDescription[] EMPTY = new IDFComponentDescription[0];
 	
 	/** The image icons. */
 	protected static final UIDefaults icons = new UIDefaults(new Object[]
 	{
-//		"remove_agent", SGUI.makeIcon(DFBrowserPlugin_old.class, "/jadex/tools/common/images/new_remove_service.png"),
+		"remove_component", SGUI.makeIcon(DFComponentTable.class, "/jadex/tools/common/images/new_remove_service.png"),
 	});
 	
 	//-------- attributes --------
@@ -46,37 +47,36 @@ public class DFAgentTable extends JTable
 	//-------- constructors --------
 	
 	/**
-	 * Constructor for DFAgentTable.
+	 * Constructor.
 	 */
-	public DFAgentTable(DFBrowserPanel panel)
+	public DFComponentTable(DFBrowserPanel panel)
 	{
-		super(new TableSorter(new AgentTableModel()));
+		super(new TableSorter(new ComponentTableModel()));
 		this.panel	= panel;
 		TableSorter sorter = (TableSorter)getModel();
 		
 		sorter.setTableHeader(getTableHeader());
 		setPreferredScrollableViewportSize(new Dimension(800, 70));
-		setDefaultRenderer(IComponentIdentifier.class, new AgentIdentifierRenderer());
+		setDefaultRenderer(IComponentIdentifier.class, new ComponentIdentifierRenderer());
 		setDefaultRenderer(String[].class, new StringArrayRenderer());
 		setDefaultRenderer(IDFServiceDescription[].class, new ServiceDescriptionArrayRenderer());
 		setDefaultRenderer(Date.class, new LeaseTimeRenderer());
 		
 		addMouseListener(new MouseAdapter()
 		{
-			/*public void mouseClicked(MouseEvent e)
+			public void mouseClicked(MouseEvent e)
 			{
-				int selectedRow = getSelectedRow();
-				if(e.getClickCount() > 1 && selectedRow >= 0)
+				if(e.isPopupTrigger())
 				{
-					agentSelected(model.getAgentDescription(sorter.modelIndex(selectedRow)));
+					popup.show(DFComponentTable.this, e.getX(), e.getY());
 				}
-			}*/
+			}
 
 			public void mousePressed(MouseEvent e)
 			{
 				if(e.isPopupTrigger())
 				{
-					popup.show(DFAgentTable.this, e.getX(), e.getY());
+					popup.show(DFComponentTable.this, e.getX(), e.getY());
 				}
 			}
 
@@ -84,7 +84,7 @@ public class DFAgentTable extends JTable
 			{
 				if(e.isPopupTrigger())
 				{
-					popup.show(DFAgentTable.this, e.getX(), e.getY());
+					popup.show(DFComponentTable.this, e.getX(), e.getY());
 				}
 			}
 		});
@@ -99,7 +99,7 @@ public class DFAgentTable extends JTable
 	 */
 	protected void addMenuItems(JPopupMenu menu)
 	{
-		menu.add(new JMenuItem(new AbstractAction("Remove agent description", icons.getIcon("remove_agent"))
+		menu.add(new JMenuItem(new AbstractAction("Remove component description", icons.getIcon("remove_component"))
 		{
 			public void actionPerformed(ActionEvent e)
 			{
@@ -107,8 +107,8 @@ public class DFAgentTable extends JTable
 				if(selectedRow >= 0)
 				{
 					TableSorter sorter = (TableSorter)getModel();
-					AgentTableModel model = (AgentTableModel)sorter.getTableModel();
-					panel.removeAgentRegistration(model.getAgentDescription(sorter.modelIndex(selectedRow)));
+					ComponentTableModel model = (ComponentTableModel)sorter.getTableModel();
+					panel.removeComponentRegistration(model.getComponentDescription(sorter.modelIndex(selectedRow)));
 				}
 			}
 
@@ -116,10 +116,10 @@ public class DFAgentTable extends JTable
 	}
 
 	/**
-	 *  Get the selected agents.
-	 *  @return the descriptions of selected agents
+	 *  Get the selected components.
+	 *  @return the descriptions of selected components
 	 */
-	public IDFComponentDescription[] getSelectedAgents()
+	public IDFComponentDescription[] getSelectedComponents()
 	{
 		IDFComponentDescription[] ret = EMPTY;
 		
@@ -127,13 +127,13 @@ public class DFAgentTable extends JTable
 		if(count>0)
 		{
 			TableSorter sorter = (TableSorter)getModel();
-			AgentTableModel model = (AgentTableModel)sorter.getTableModel();
+			ComponentTableModel model = (ComponentTableModel)sorter.getTableModel();
 		
 			ArrayList sa = new ArrayList();
 			int[] rows = getSelectedRows();
 			for(int i = 0; i < rows.length; i++)
 			{
-				sa.add(model.getAgentDescription(sorter.modelIndex(rows[i])));
+				sa.add(model.getComponentDescription(sorter.modelIndex(rows[i])));
 			}
 			ret = (IDFComponentDescription[])sa.toArray(new IDFComponentDescription[sa.size()]);
 		}
@@ -142,14 +142,14 @@ public class DFAgentTable extends JTable
 	}
 
 	/**
-	 *  Sets Agent descriptions for this element.
-	 *  @param ad The agent description.
+	 *  Sets descriptions for this element.
+	 *  @param ad The component description.
 	 */
-	public void setAgentDescriptions(IDFComponentDescription[] ad)
+	public void setComponentDescriptions(IDFComponentDescription[] ad)
 	{
 		TableSorter sorter = (TableSorter)getModel();
-		AgentTableModel model = (AgentTableModel)sorter.getTableModel();
-		model.setAgentDescriptions(ad);
+		ComponentTableModel model = (ComponentTableModel)sorter.getTableModel();
+		model.setComponentDescriptions(ad);
 	}
 
 	/**

@@ -7,7 +7,7 @@ import java.awt.Component;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
 
-class AgentIdentifierRenderer extends DefaultTableCellRenderer
+class ComponentIdentifierRenderer extends DefaultTableCellRenderer
 {
 	/**
 	 * @param table
