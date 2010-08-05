@@ -1,5 +1,6 @@
 package jadex.application.space.envsupport.environment;
 
+import jadex.application.model.MComponentType;
 import jadex.application.model.MSpaceInstance;
 import jadex.application.runtime.IApplication;
 import jadex.application.runtime.ISpace;
@@ -1443,8 +1444,78 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 				else if(ownedobjs.size()==1)
 					ret = (ISpaceObject)ownedobjs.get(0);
 			}
+			
 			return ret;
 		}
+	}
+	
+	/**
+	 *  Get the avatar object.
+	 *  @return The avatar object. 
+	 */
+	public ISpaceObject getAvatar(IComponentIdentifier owner, String fullname)
+	{
+		ISpaceObject	ret	= getAvatar(owner);
+
+		// Create avatar on the fly if componentAdded not yet called.
+		if(ret==null)
+		{
+			ret = createAvatar(owner, fullname);
+		}
+		
+		return ret;
+	}
+
+	/**
+	 *  Create an avatar.
+	 */
+	protected ISpaceObject createAvatar(IComponentIdentifier owner, String fullname)
+	{
+		ISpaceObject	ret	= null;
+		// Possibly add or create avatar(s) if any.
+		if(initialavatars!=null && initialavatars.containsKey(owner))
+		{
+			Object[]	ia	= (Object[])initialavatars.get(owner);
+			String	objecttype	=	(String)ia[0];
+			Map	props	=	(Map)ia[1];
+			if(props==null)
+				props	= new HashMap();
+			props.put(ISpaceObject.PROPERTY_OWNER, owner);
+			ret	= createSpaceObject(objecttype, props, null);
+		}
+		else
+		{
+			String	componenttype	= application.getComponentType(owner);
+			if(componenttype==null && fullname!=null)
+			{
+				List atypes	= application.getApplicationType().getMComponentTypes();
+				for(int i=0; i<atypes.size(); i++)
+				{
+					final MComponentType atype = (MComponentType)atypes.get(i);
+					String tmp = atype.getFilename().replace('/', '.');
+					if(tmp.indexOf(fullname)!=-1)
+					{
+						componenttype = atype.getName();
+						break;
+					}
+				}
+			}
+			if(componenttype!=null && avatarmappings.getCollection(componenttype)!=null)
+			{
+				for(Iterator it=avatarmappings.getCollection(componenttype).iterator(); it.hasNext(); )
+				{
+					AvatarMapping mapping = (AvatarMapping)it.next();
+					// Only create avatar if it has none
+					if(mapping.isCreateAvatar() && !spaceobjectsbyowner.containsKey(owner))
+					{							
+						Map	props	= new HashMap();
+						props.put(ISpaceObject.PROPERTY_OWNER, owner);
+						ret	= createSpaceObject(mapping.getObjectType(), props, null);
+					}
+				}
+			}
+		}
+		return ret;
 	}
 	
 	/**
@@ -1648,33 +1719,10 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 		synchronized(monitor)
 		{
 			// Possibly add or create avatar(s) if any.
-			if(initialavatars!=null && initialavatars.containsKey(aid))
+			List ownedobjs = (List)spaceobjectsbyowner.get(aid);
+			if(ownedobjs==null)
 			{
-				Object[]	ia	= (Object[])initialavatars.get(aid);
-				String	objecttype	=	(String)ia[0];
-				Map	props	=	(Map)ia[1];
-				if(props==null)
-					props	= new HashMap();
-				props.put(ISpaceObject.PROPERTY_OWNER, aid);
-				createSpaceObject(objecttype, props, null);
-			}
-			else
-			{
-				String	componenttype	= application.getComponentType(aid);
-				if(componenttype!=null && avatarmappings.getCollection(componenttype)!=null)
-				{
-					for(Iterator it=avatarmappings.getCollection(componenttype).iterator(); it.hasNext(); )
-					{
-						AvatarMapping mapping = (AvatarMapping)it.next();
-						// Only create avatar if it has none
-						if(mapping.isCreateAvatar() && getAvatar(aid)==null)
-						{							
-							Map	props	= new HashMap();
-							props.put(ISpaceObject.PROPERTY_OWNER, aid);
-							createSpaceObject(mapping.getObjectType(), props, null);
-						}
-					}
-				}
+				createAvatar(aid, null);
 			}
 			
 			if(perceptgenerators!=null)

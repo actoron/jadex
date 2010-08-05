@@ -17,6 +17,7 @@ import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.ILoadableComponentModel;
 import jadex.rules.state.IOAVState;
 import jadex.service.IServiceContainer;
 import jadex.service.IServiceProvider;
@@ -301,6 +302,15 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 			return adapter.getComponentIdentifier().getLocalName();
 		}
 		
+	}
+	
+	/**
+	 * Get the agent model.
+	 * @return The agent model.
+	 */
+	public ILoadableComponentModel getAgentModel()
+	{
+		return getInterpreter().getModel();
 	}
 
 	/**

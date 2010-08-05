@@ -2,6 +2,7 @@ package jadex.bdi.runtime;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.ILoadableComponentModel;
 import jadex.service.IServiceProvider;
 
 import java.util.logging.Logger;
@@ -78,6 +79,12 @@ public interface ICapability	extends IElement
 	 *  @return The logger.
 	 */
 	public Logger getLogger();
+
+	/**
+	 * Get the agent model.
+	 * @return The agent model.
+	 */
+	public ILoadableComponentModel getAgentModel();
 
 	/**
 	 * Get the agent name.
