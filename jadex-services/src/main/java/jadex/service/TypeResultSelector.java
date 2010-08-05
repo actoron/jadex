@@ -1,5 +1,6 @@
 package jadex.service;
 
+import jadex.commons.ConstantFilter;
 import jadex.commons.IFilter;
 import jadex.commons.Tuple;
 
@@ -47,7 +48,7 @@ public class TypeResultSelector extends BasicResultSelector
 	 */
 	public TypeResultSelector(Class type, boolean oneresult, boolean onlylocal)
 	{
-		super(IFilter.ALWAYS, oneresult, onlylocal);
+		super(new ConstantFilter(true), oneresult, onlylocal);
 		this.type = type;
 	}
 	

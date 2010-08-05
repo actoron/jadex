@@ -86,9 +86,9 @@ public class UserAgent extends MicroAgent
 			});
 			
 			// Execute blocking method call with normal result
-			System.out.println("Calling blocking addB method.");
-			int res= service.addB(1, 2);
-			System.out.println("Invoked addB: "+res);
+//			System.out.println("Calling blocking addB method.");
+//			int res= service.addB(1, 2);
+//			System.out.println("Invoked addB: "+res);
 		}
 	}
 }

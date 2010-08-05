@@ -1,5 +1,6 @@
 package jadex.service;
 
+import jadex.commons.ConstantFilter;
 import jadex.commons.IFilter;
 
 /**
@@ -29,6 +30,6 @@ public class AnyResultSelector extends BasicResultSelector
 	 */
 	public AnyResultSelector(boolean oneresult, boolean onlylocal)
 	{
-		super(IFilter.ALWAYS, oneresult, onlylocal);
+		super(new ConstantFilter(true), oneresult, onlylocal);
 	}
 }
