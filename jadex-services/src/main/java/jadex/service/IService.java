@@ -6,6 +6,9 @@ package jadex.service;
  */
 public interface IService
 {
+	/** Empty service array. */
+	public static IService[] EMPTY_SERVICES = new IService[0];
+	
 	/**
 	 *  Get the service identifier.
 	 *  @return The service identifier.

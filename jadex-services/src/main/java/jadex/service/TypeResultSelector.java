@@ -1,24 +1,21 @@
 package jadex.service;
 
-import java.lang.reflect.Proxy;
+import jadex.commons.IFilter;
+import jadex.commons.Tuple;
+
 import java.util.Collection;
 import java.util.Map;
+
 
 /**
  *  Select first service to be returned as result of service search.
  */
-public class TypeResultSelector implements IResultSelector
+public class TypeResultSelector extends BasicResultSelector
 {
 	//-------- attributes --------
-	
+		
 	/** The type. */
 	protected Class type;
-	
-	/** The one result flag. */
-	protected boolean oneresult;
-	
-	/** The only local services flag. */
-	protected boolean onlylocal;
 	
 	//-------- constructors --------
 	
@@ -50,76 +47,19 @@ public class TypeResultSelector implements IResultSelector
 	 */
 	public TypeResultSelector(Class type, boolean oneresult, boolean onlylocal)
 	{
+		super(IFilter.ALWAYS, oneresult, onlylocal);
 		this.type = type;
-		this.oneresult = oneresult;
-		this.onlylocal = onlylocal;
 	}
 	
 	//-------- methods --------
 	
 	/**
-	 *  Called for each searched service provider node.
-	 *  @param services	The provided services (class->list of services).
-	 *  @param results	The collection to which results should be added.
+	 *  Get all services of the map as linear collection.
 	 */
-	public void	selectServices(Map services, Collection results)
+	public IService[] generateServiceArray(Map servicemap)
 	{
-		Collection res = (Collection)services.get(type);
-		if(res!=null)
-		{
-			Object[] ares	= res.toArray();
-			if(oneresult && ares.length>0)
-			{
-				if(onlylocal)
-				{
-					for(int i=0; i<ares.length; i++)
-					{
-						if(!Proxy.isProxyClass(ares[i].getClass()))
-						{
-							results.add(ares[i]);
-							break;
-						}
-					}
-				}
-				else
-				{
-					results.add(ares[0]);
-				}
-			}
-			else
-			{
-//				System.out.println("adding: "+ares);
-				for(int i=0; i<ares.length; i++)
-				{
-					if(!onlylocal || !Proxy.isProxyClass(ares[i].getClass()))
-					{
-						results.add(ares[i]);
-					}
-				}
-			}
-		}
-	}
-	
-	/**
-	 *  Get the result.
-	 *  Called once after search is finished.
-	 *  @param results	The collection of selected services.
-	 *  @return A single service or a list of services.
-	 */
-	public Object getResult(Collection results)
-	{
-		Object	ret	= oneresult? results.size()>0? results.toArray()[0]: null: results;
-		return ret;
-	}
-	
-	/**
-	 *  Test if the search result is sufficient to stop the search.
-	 *  @param results	The collection of selected services.
-	 *  @return True, if the search should be stopped.
-	 */
-	public boolean	isFinished(Collection results)
-	{
-		return oneresult && results.size()>0;
+		Collection tmp = (Collection)servicemap.get(type);
+		return tmp==null? IService.EMPTY_SERVICES: (IService[])tmp.toArray(new IService[0]);
 	}
 	
 	/**
@@ -129,9 +69,10 @@ public class TypeResultSelector implements IResultSelector
 	 */
 	public Object getCacheKey()
 	{
-		return this.getClass().getName()+type.getName();
+		return new Tuple(new Object[]{this.getClass().getName(), filter, 
+			oneresult? Boolean.TRUE: Boolean.FALSE, oneresult? Boolean.TRUE: Boolean.FALSE, type.getName()});
 	}
-
+	
 	/**
 	 *  Get the type.
 	 *  @return the type.
@@ -149,48 +90,6 @@ public class TypeResultSelector implements IResultSelector
 	{
 		this.type = type;
 	}
-
-	/**
-	 *  Get the oneresult.
-	 *  @return the oneresult.
-	 */
-	public boolean isOneResult()
-	{
-		return oneresult;
-	}
-
-	/**
-	 *  Set the oneresult.
-	 *  @param oneresult The oneresult to set.
-	 */
-	public void setOneResult(boolean oneresult)
-	{
-		this.oneresult = oneresult;
-	}
 	
-	/**
-	 *  Get the only local flag.
-	 *  @return the local.
-	 */
-	public boolean isOnlyLocal()
-	{
-		return onlylocal;
-	}
-
-	/**
-	 *  Set the only local flag.
-	 *  @param local The local to set.
-	 */
-	public void setOnlyLocal(boolean onlylocal)
-	{
-		this.onlylocal = onlylocal;
-	}
-
-	/**
-	 *  Get the string representation.
-	 */
-	public String toString()
-	{
-		return "TypeResultSelector(type=" + type + ", oneresult=" + oneresult+ ")";
-	}
 }
+

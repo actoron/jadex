@@ -1,6 +1,7 @@
 package jadex.tools.comanalyzer;
 
 import jadex.bridge.IComponentDescription;
+import jadex.commons.ComposedFilter;
 import jadex.commons.IFilter;
 
 import java.util.ArrayList;

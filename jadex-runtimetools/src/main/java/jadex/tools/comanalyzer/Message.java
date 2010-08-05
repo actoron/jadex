@@ -4,6 +4,7 @@ import jadex.base.fipa.SFipa;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.MessageType;
+import jadex.commons.ComposedFilter;
 import jadex.commons.IFilter;
 import jadex.commons.collection.SCollection;
 

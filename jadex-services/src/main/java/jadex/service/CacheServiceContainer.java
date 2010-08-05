@@ -26,6 +26,9 @@ public class CacheServiceContainer	implements IServiceContainer
 	/** The clock service. */
 	protected IClockService clock;
 	
+	/** Flag if cache is turned on. */
+	protected boolean cacheon = true;
+	
 	//-------- constructors --------
 
 	/**
@@ -62,47 +65,51 @@ public class CacheServiceContainer	implements IServiceContainer
 		Object data = null;
 		// Todo: cast hack??? While no clock service found (during init) search without cache.
 		final long now = clock!=null && ((BasicService)clock).isValid()? clock.getTime(): -1;
-		synchronized(cache)
+		
+		if(cacheon)
 		{
-			// todo: currently services of unfinished containers can be searched
-			// should be strict and a container should exposed only when running.
-//			if(clock==null)
-//				System.out.println("no clock: "+getId());
-			
-			// In case the clock if not available caching will not be used
-			// till it is available.
-			if(now!=-1 && key!=null && cache.containsKey(key))
-			{	
-				data = cache.get(key, now);
+			synchronized(cache)
+			{
+				// todo: currently services of unfinished containers can be searched
+				// should be strict and a container should exposed only when running.
+	//			if(clock==null)
+	//				System.out.println("no clock: "+getId());
 				
-				if(data instanceof BasicService)
-				{
-					if(!((BasicService)data).isValid())
-					{
-						cache.remove(key);
-						data = null;
-					}
-				}
-				else if(data instanceof Collection)
-				{
-					Collection coll = (Collection)data;
-					BasicService[] sers = (BasicService[])coll.toArray(new BasicService[((Collection)data).size()]);
+				// In case the clock if not available caching will not be used
+				// till it is available.
+				if(now!=-1 && key!=null && cache.containsKey(key))
+				{	
+					data = cache.get(key, now);
 					
-					// Check if all results are still ok.
-					for(int i=0; data!=null && i<sers.length; i++)
+					if(data instanceof BasicService)
 					{
-						if(!sers[i].isValid())
+						if(!((BasicService)data).isValid())
 						{
-							// if one is invalid whole result is invalid
 							cache.remove(key);
 							data = null;
 						}
 					}
-				}
-				else if(data!=null)
-				{
-					ret.setException(new RuntimeException("Unknown service type: "+data));
-					return ret;
+					else if(data instanceof Collection)
+					{
+						Collection coll = (Collection)data;
+						BasicService[] sers = (BasicService[])coll.toArray(new BasicService[((Collection)data).size()]);
+						
+						// Check if all results are still ok.
+						for(int i=0; data!=null && i<sers.length; i++)
+						{
+							if(!sers[i].isValid())
+							{
+								// if one is invalid whole result is invalid
+								cache.remove(key);
+								data = null;
+							}
+						}
+					}
+					else if(data!=null)
+					{
+						ret.setException(new RuntimeException("Unknown service type: "+data));
+						return ret;
+					}
 				}
 			}
 		}

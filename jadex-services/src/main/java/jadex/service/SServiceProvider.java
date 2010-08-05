@@ -27,10 +27,16 @@ public class SServiceProvider
 	
 	/** The vsist decider that stops searching after one result has been found. */
 	public static IVisitDecider abortdecider = new DefaultVisitDecider();
+	public static IVisitDecider rabortdecider = new DefaultVisitDecider(true, false);
 
 	/** The vsist decider that never stops. */
 	public static IVisitDecider contdecider = new DefaultVisitDecider(false);
+	public static IVisitDecider rcontdecider = new DefaultVisitDecider(false, false);
 
+	public static IResultSelector contanyselector = new AnyResultSelector(false);
+	public static IResultSelector abortanyselector = new AnyResultSelector(true);
+
+	
 	//-------- methods --------
 
 //	protected static Map	profiling	= new HashMap();
@@ -87,10 +93,7 @@ public class SServiceProvider
 //		}
 		final Future ret = new Future();
 		
-		if(provider==null)
-			System.out.println("here");
-			
-		provider.getServices(sequentialmanager, onlylocal? abortdecider: new DefaultVisitDecider(true, false), 
+		provider.getServices(sequentialmanager, onlylocal? abortdecider: rabortdecider, 
 			new TypeResultSelector(type, true, onlylocal), new ArrayList())
 				.addResultListener(new DelegationResultListener(ret));
 		
@@ -230,7 +233,7 @@ public class SServiceProvider
 //		}
 		final Future ret = new Future();
 		
-		provider.getServices(localmanager, contdecider, new AnyResultSelector(false), new ArrayList())
+		provider.getServices(localmanager, contdecider, contanyselector, new ArrayList())
 			.addResultListener(new DelegationResultListener(ret));
 		
 		return ret;
