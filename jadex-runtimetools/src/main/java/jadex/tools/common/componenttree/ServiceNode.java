@@ -24,9 +24,6 @@ public class ServiceNode	extends AbstractComponentTreeNode
 	
 	//-------- attributes --------
 	
-	/** The type. */
-	private final Class	type;
-	
 	/** The service. */
 	private final IService	service;
 	
@@ -35,10 +32,9 @@ public class ServiceNode	extends AbstractComponentTreeNode
 	/**
 	 *  Create a new service container node.
 	 */
-	public ServiceNode(IComponentTreeNode parent, ComponentTreeModel model, Class type, IService service)
+	public ServiceNode(IComponentTreeNode parent, ComponentTreeModel model, IService service)
 	{
 		super(parent, model);
-		this.type	= type;
 		this.service	= service;
 	}
 	
@@ -50,14 +46,6 @@ public class ServiceNode	extends AbstractComponentTreeNode
 	public IService	getService()
 	{
 		return service;
-	}
-
-	/**
-	 *  Get the service type.
-	 */
-	public Class	getType()
-	{
-		return type;
 	}
 
 	/**
@@ -91,9 +79,9 @@ public class ServiceNode	extends AbstractComponentTreeNode
 	 */
 	public String toString()
 	{
-		return Proxy.isProxyClass(service.getClass())? 
-			SReflect.getUnqualifiedClassName(type)+" ("+service.getServiceIdentifier().getProviderId()+")": 
-			SReflect.getUnqualifiedClassName(service.getClass());
-//		return /*SReflect.getUnqualifiedClassName(type)+": "+*/SReflect.getUnqualifiedClassName(service.getClass());
+		return Proxy.isProxyClass(service.getClass())
+			? SReflect.getUnqualifiedClassName(service.getServiceIdentifier().getServiceType())
+				+" ("+service.getServiceIdentifier().getProviderId()+")"
+			: SReflect.getUnqualifiedClassName(service.getClass());
 	}
 }

@@ -49,7 +49,7 @@ public class AnyResultSelector implements IResultSelector
 				Collection	coll	= (Collection)services.get(keys[i]);
 				if(coll!=null && !coll.isEmpty())
 				{
-					results.add(new ServiceInfo(keys[i], (IService)coll.toArray()[0]));
+					results.add(coll.toArray()[0]);
 					found	= true;
 				}
 			}
@@ -64,7 +64,7 @@ public class AnyResultSelector implements IResultSelector
 					IService[] ares = (IService[])coll.toArray(new IService[coll.size()]); 
 					for(int j=0; j<ares.length; j++)
 					{
-						results.add(new ServiceInfo(keys[i], ares[j]));
+						results.add(ares[j]);
 					}
 				}
 			}

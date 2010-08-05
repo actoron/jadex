@@ -115,7 +115,7 @@ public class ComponentManagementService extends BasicService implements ICompone
      */
     public ComponentManagementService(IServiceProvider provider, boolean autoshutdown, IComponentAdapter root)
 	{
-		super(BasicService.createServiceIdentifier(provider.getId(), DirectoryFacilitatorService.class));
+		super(provider.getId(), IComponentManagementService.class, null);
 
 		this.provider = provider;
 		this.autoshutdown = autoshutdown;
@@ -177,7 +177,6 @@ public class ComponentManagementService extends BasicService implements ICompone
 						// Create id and adapter.
 						
 						final ComponentIdentifier cid;
-						final StandaloneComponentAdapter pad;
 						
 						synchronized(adapters)
 						{

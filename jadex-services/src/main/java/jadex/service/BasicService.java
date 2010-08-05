@@ -3,6 +3,8 @@ package jadex.service;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 
+import java.util.Map;
+
 /**
  *  Basic service provide a simple default isValid() implementation
  *  that returns true after start service and false afterwards.
@@ -20,6 +22,9 @@ public class BasicService implements IService
 	/** The service id. */
 	protected IServiceIdentifier sid;
 	
+	/** The service properties. */
+	protected Map properties;
+	
 	//-------- constructors --------
 
 	/**
@@ -32,10 +37,19 @@ public class BasicService implements IService
 	
 	/**
 	 *  Create a new service.
-	 */
+	 * /
 	public BasicService(IServiceIdentifier sid)
 	{
 		this.sid = sid;
+	}*/
+	
+	/**
+	 *  Create a new service.
+	 */
+	public BasicService(Object providerid, Class type, Map properties)
+	{
+		this.sid = createServiceIdentifier(providerid, type, getClass());
+		this.properties	= properties;
 	}
 	
 	//-------- methods --------
@@ -102,7 +116,7 @@ public class BasicService implements IService
 	 *  Generate a unique name.
 	 *  @param The calling service class.
 	 */
-	public static String generateServiceName(Class service)
+	private static String generateServiceName(Class service)
 	{
 		synchronized(BasicService.class)
 		{
@@ -116,19 +130,8 @@ public class BasicService implements IService
 	 *  @param servicename The service name.
 	 *  @return A service identifier.
 	 */
-	public static IServiceIdentifier createServiceIdentifier(Object providerid, Class service)
+	private static IServiceIdentifier createServiceIdentifier(Object providerid, Class servicetype, Class serviceimpl)
 	{
-		return new ServiceIdentifier(providerid, generateServiceName(service));
-	}
-	
-	/**
-	 *  Create a new service identifier.
-	 *  @param providerid The provider id.
-	 *  @param servicename The service name.
-	 *  @return A service identifier.
-	 */
-	public static IServiceIdentifier createServiceIdentifier(Object providerid, String servicename)
-	{
-		return new ServiceIdentifier(providerid, servicename);
+		return new ServiceIdentifier(providerid, servicetype, generateServiceName(serviceimpl));
 	}
 }

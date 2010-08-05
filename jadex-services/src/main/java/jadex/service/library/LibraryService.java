@@ -50,7 +50,7 @@ public class LibraryService extends BasicService implements ILibraryService
 	 */ 
 	public LibraryService(Object[] urls, Object providerid)
 	{
-		super(BasicService.createServiceIdentifier(providerid, LibraryService.class));
+		super(providerid, ILibraryService.class, null);
 		
 		basecl = Thread.currentThread().getContextClassLoader();
 		libcl = basecl;

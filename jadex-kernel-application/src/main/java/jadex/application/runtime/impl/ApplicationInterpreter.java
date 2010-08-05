@@ -38,8 +38,8 @@ import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.javaparser.IValueFetcher;
 import jadex.javaparser.SimpleValueFetcher;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
+import jadex.service.BasicService;
 import jadex.service.CacheServiceContainer;
-import jadex.service.IService;
 import jadex.service.IServiceContainer;
 import jadex.service.IServiceProvider;
 import jadex.service.SServiceProvider;
@@ -195,8 +195,8 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 					for(int i=0; i<services.size(); i++)
 					{
 						MExpressionType exp = (MExpressionType)services.get(i);
-						IService service = (IService)exp.getParsedValue().getValue(fetcher);
-						container.addService(exp.getClazz(), service);
+						BasicService service = (BasicService)exp.getParsedValue().getValue(fetcher);
+						container.addService(service);
 					}
 				}
 		

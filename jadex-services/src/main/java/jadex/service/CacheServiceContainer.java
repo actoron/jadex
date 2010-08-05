@@ -60,7 +60,8 @@ public class CacheServiceContainer	implements IServiceContainer
 			? new Tuple(manager.getCacheKey(), decider.getCacheKey(), selector.getCacheKey()) : null;
 		
 		Object data = null;
-		final long now = clock!=null && clock.isValid()? clock.getTime(): -1;
+		// Todo: cast hack??? While no clock service found (during init) search without cache.
+		final long now = clock!=null && ((BasicService)clock).isValid()? clock.getTime(): -1;
 		synchronized(cache)
 		{
 			// todo: currently services of unfinished containers can be searched
@@ -74,9 +75,9 @@ public class CacheServiceContainer	implements IServiceContainer
 			{	
 				data = cache.get(key, now);
 				
-				if(data instanceof ServiceInfo)
+				if(data instanceof BasicService)
 				{
-					if(!((ServiceInfo)data).getService().isValid())
+					if(!((BasicService)data).isValid())
 					{
 						cache.remove(key);
 						data = null;
@@ -85,12 +86,12 @@ public class CacheServiceContainer	implements IServiceContainer
 				else if(data instanceof Collection)
 				{
 					Collection coll = (Collection)data;
-					ServiceInfo[] sers = (ServiceInfo[])coll.toArray(new ServiceInfo[((Collection)data).size()]);
+					BasicService[] sers = (BasicService[])coll.toArray(new BasicService[((Collection)data).size()]);
 					
 					// Check if all results are still ok.
 					for(int i=0; data!=null && i<sers.length; i++)
 					{
-						if(!sers[i].getService().isValid())
+						if(!sers[i].isValid())
 						{
 							// if one is invalid whole result is invalid
 							cache.remove(key);
@@ -209,9 +210,9 @@ public class CacheServiceContainer	implements IServiceContainer
 	 *  @param name The name.
 	 *  @param service The service.
 	 */
-	public void addService(Class type, Object service)
+	public IFuture addService(BasicService service)
 	{
-		container.addService(type, service);
+		return container.addService(service);
 	}
 
 	/**
@@ -219,9 +220,9 @@ public class CacheServiceContainer	implements IServiceContainer
 	 *  @param name The name.
 	 *  @param service The service.
 	 */
-	public void removeService(Class type, Object service)
+	public IFuture removeService(BasicService service)
 	{
-		container.removeService(type, service);
+		return container.removeService(service);
 	}
 
 	

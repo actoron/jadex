@@ -10,7 +10,6 @@ import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.IThreadPool;
 import jadex.service.BasicService;
-import jadex.service.IServiceContainer;
 import jadex.service.IServiceProvider;
 import jadex.service.SServiceProvider;
 import jadex.service.clock.ClockService;
@@ -18,7 +17,6 @@ import jadex.service.clock.IClock;
 import jadex.service.clock.IClockService;
 import jadex.service.clock.ITimer;
 import jadex.service.execution.IExecutionService;
-import jadex.service.execution.SyncExecutionService;
 
 import java.util.List;
 
@@ -66,7 +64,7 @@ public class SimulationService extends BasicService implements ISimulationServic
 	 */
 	public SimulationService(IServiceProvider provider)
 	{
-		super(BasicService.createServiceIdentifier(provider.getId(), SimulationService.class));
+		super(provider.getId(), ISimulationService.class, null);
 
 		this.provider = provider;
 //		this.mode = mode;
@@ -149,7 +147,10 @@ public class SimulationService extends BasicService implements ISimulationServic
 							setresult	= services[0] && services[1];
 						}
 						if(setresult)
+						{
+							init();
 							ret.setResult(SimulationService.this);
+						}
 					}
 				});
 						
@@ -158,30 +159,6 @@ public class SimulationService extends BasicService implements ISimulationServic
 					public void resultAvailable(Object source, Object result)
 					{
 						clockservice = (IClockService)result;
-						String type = clockservice.getClockType();
-				
-						if(IClock.TYPE_EVENT_DRIVEN.equals(type)
-							|| IClock.TYPE_TIME_DRIVEN.equals(type))
-						{
-							getExecutorService().addIdleCommand(simcommand);
-						}
-			
-						boolean dorun = false;
-						synchronized(this)
-						{
-							setMode(MODE_NORMAL);
-							setExecuting(true);
-							if(!running)
-							{
-								dorun = true;
-								running = true;
-							}
-						}
-						
-						if(dorun)
-							getClockService().start();
-							
-						getExecutorService().startService();
 
 						boolean	setresult;
 						synchronized(services)
@@ -190,7 +167,10 @@ public class SimulationService extends BasicService implements ISimulationServic
 							setresult	= services[0] && services[1];
 						}
 						if(setresult)
+						{
+							init();
 							ret.setResult(SimulationService.this);
+						}
 					}
 				});
 			}
@@ -202,6 +182,22 @@ public class SimulationService extends BasicService implements ISimulationServic
 		});
 
 		return ret;
+	}
+	
+	/**
+	 *  Called after all required services have been found.
+	 */
+	protected void	init()
+	{
+		String type = getClockService().getClockType();
+		
+		if(IClock.TYPE_EVENT_DRIVEN.equals(type)
+			|| IClock.TYPE_TIME_DRIVEN.equals(type))
+		{
+			getExecutorService().addIdleCommand(simcommand);
+		}
+		
+		start();		
 	}
 	
 	/**
@@ -223,6 +219,28 @@ public class SimulationService extends BasicService implements ISimulationServic
 		
 		if(dostop)
 			getClockService().stop();
+	}
+	
+	/**
+	 *  Restart the execution after pause.
+	 */
+	public void start()
+	{
+		boolean dorun = false;
+		synchronized(this)
+		{
+			setMode(MODE_NORMAL);
+			setExecuting(true);
+			if(!running)
+			{
+				dorun = true;
+				running = true;
+			}
+		}
+		
+		if(dorun)
+			getClockService().start();
+
 	}
 	
 	/**

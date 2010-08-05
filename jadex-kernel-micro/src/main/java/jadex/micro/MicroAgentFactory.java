@@ -49,7 +49,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	 */
 	public MicroAgentFactory(IServiceProvider provider, Map properties)
 	{
-		super(BasicService.createServiceIdentifier(provider.getId(), MicroAgentFactory.class));
+		super(provider.getId(), IComponentFactory.class, null);
 
 		this.provider = provider;
 		this.properties = properties;

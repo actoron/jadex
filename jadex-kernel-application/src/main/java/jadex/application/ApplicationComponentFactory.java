@@ -95,7 +95,7 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 	 */
 	public ApplicationComponentFactory(Set[] mappings, Object providerid)
 	{
-		super(BasicService.createServiceIdentifier(providerid, ApplicationComponentFactory.class));
+		super(providerid, IComponentFactory.class, null);
 
 		Set types = new HashSet();
 		

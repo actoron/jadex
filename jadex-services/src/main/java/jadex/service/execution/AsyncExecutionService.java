@@ -8,12 +8,10 @@ import jadex.commons.concurrent.CounterResultListener;
 import jadex.commons.concurrent.Executor;
 import jadex.commons.concurrent.IExecutable;
 import jadex.commons.concurrent.IResultListener;
-import jadex.commons.concurrent.IThreadPool;
 import jadex.service.BasicService;
 import jadex.service.IServiceProvider;
 import jadex.service.SServiceProvider;
 import jadex.service.threadpool.IThreadPoolService;
-import jadex.service.threadpool.ThreadPoolService;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -65,7 +63,7 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 	 */
 	public AsyncExecutionService(IServiceProvider provider)//, int max)
 	{
-		super(BasicService.createServiceIdentifier(provider.getId(), AsyncExecutionService.class));
+		super(provider.getId(), IExecutionService.class, null);
 
 		this.provider = provider;
 //		this.threadpool = threadpool;

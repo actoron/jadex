@@ -1,7 +1,6 @@
 package jadex.base.service.remote;
 
 import jadex.base.fipa.SFipa;
-import jadex.bridge.IRemoteServiceManagementService;
 import jadex.bridge.MessageType;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
@@ -29,7 +28,7 @@ public class RemoteServiceManagementAgent extends MicroAgent
 	public void agentCreated()
 	{
 		rms = new RemoteServiceManagementService(getExternalAccess());
-		addService(IRemoteServiceManagementService.class, rms);
+		addService(rms);
 	}
 	
 	/**

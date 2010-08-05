@@ -130,7 +130,7 @@ public class ContextPanel extends AbstractTimePanel
 				{
 					try
 					{
-						((ISimulationService)result).startService();
+						((ISimulationService)result).start();
 					}
 					catch(Exception ex)
 					{

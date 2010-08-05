@@ -11,6 +11,7 @@ import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
+import jadex.service.BasicService;
 import jadex.service.CacheServiceContainer;
 import jadex.service.IServiceContainer;
 import jadex.service.IServiceProvider;
@@ -430,22 +431,20 @@ public abstract class MicroAgent implements IMicroAgent
 	 *  Add a service to the platform.
 	 *  If under the same name and type a service was contained,
 	 *  the old one is removed and shutdowned.
-	 *  @param name The name.
 	 *  @param service The service.
 	 */
-	public void addService(Class type, Object service)
+	public void addService(BasicService service)
 	{
-		((IServiceContainer)interpreter.getServiceProvider()).addService(type, service);
+		((IServiceContainer)interpreter.getServiceProvider()).addService(service);
 	}
 
 	/**
 	 *  Removes a service from the platform (shutdowns also the service).
-	 *  @param name The name.
 	 *  @param service The service.
 	 */
-	public void removeService(Class type, Object service)
+	public void removeService(BasicService service)
 	{
-		((IServiceContainer)interpreter.getServiceProvider()).removeService(type, service);
+		((IServiceContainer)interpreter.getServiceProvider()).removeService(service);
 	}
 	
 	/**

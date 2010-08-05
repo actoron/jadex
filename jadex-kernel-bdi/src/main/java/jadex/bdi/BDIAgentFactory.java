@@ -80,7 +80,7 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory
 	 */
 	public BDIAgentFactory(Map props, IServiceProvider provider)
 	{
-		super(BasicService.createServiceIdentifier(provider.getId(), BDIAgentFactory.class));
+		super(provider.getId(), IComponentFactory.class, null);
 
 		this.props = props;
 		this.loader	= new OAVBDIModelLoader();

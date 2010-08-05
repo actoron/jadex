@@ -61,7 +61,7 @@ public class SyncExecutionService extends BasicService implements IExecutionServ
 	 */
 	public SyncExecutionService(IServiceProvider provider)
 	{
-		super(BasicService.createServiceIdentifier(provider.getId(), SyncExecutionService.class));
+		super(provider.getId(), IExecutionService.class, null);
 
 		this.provider = provider;
 		this.running	= false;

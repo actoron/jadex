@@ -43,7 +43,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	 */
 	public RemoteServiceManagementService(IExternalAccess component)
 	{
-		super(BasicService.createServiceIdentifier(component.getServiceProvider().getId(), RemoteServiceManagementService.class));
+		super(component.getServiceProvider().getId(), IRemoteServiceManagementService.class, null);
 
 		this.component = component;
 		this.waitingcalls = Collections.synchronizedMap(new HashMap());

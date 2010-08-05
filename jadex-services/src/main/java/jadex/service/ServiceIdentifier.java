@@ -1,5 +1,6 @@
 package jadex.service;
 
+
 /**
  *  Service identifier for uniquely identifying a service.
  *  Is composed of the container id and the service name.
@@ -10,6 +11,9 @@ public class ServiceIdentifier implements IServiceIdentifier
 	
 	/** The provider identifier. */
 	protected Object providerid;
+	
+	/** The service type. */
+	protected Class type;
 	
 	/** The service name. */
 	protected String servicename;
@@ -26,9 +30,10 @@ public class ServiceIdentifier implements IServiceIdentifier
 	/**
 	 *  Create a new service identifier.
 	 */
-	public ServiceIdentifier(Object providerid, String servicename)
+	public ServiceIdentifier(Object providerid, Class type, String servicename)
 	{
 		this.providerid = providerid;
+		this.type	= type;
 		this.servicename = servicename;
 	}
 	
@@ -38,7 +43,7 @@ public class ServiceIdentifier implements IServiceIdentifier
 	 *  Get the service provider identifier.
 	 *  @return The provider id.
 	 */
-	public Object getProviderId()
+	public Object	getProviderId()
 	{
 		return providerid;
 	}
@@ -52,6 +57,25 @@ public class ServiceIdentifier implements IServiceIdentifier
 		this.providerid = providerid;
 	}
 	
+	/**
+	 *  Get the service type.
+	 *  @return The service type.
+	 */
+	public Class	getServiceType()
+	{
+		return type;
+	}
+
+	
+	/**
+	 *  Set the service type.
+	 *  @param type The service type.
+	 */
+	public void	setServiceType(Class type)
+	{
+		this.type	= type;
+	}
+
 	/**
 	 *  Get the service name.
 	 *  @return The service name.

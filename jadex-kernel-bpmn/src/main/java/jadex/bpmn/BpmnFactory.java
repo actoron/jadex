@@ -57,7 +57,7 @@ public class BpmnFactory extends BasicService implements IComponentFactory
 	 */
 	public BpmnFactory(IServiceProvider provider, Map properties)
 	{
-		super(BasicService.createServiceIdentifier(provider.getId(), BpmnFactory.class));
+		super(provider.getId(), IComponentFactory.class, null);
 
 		this.provider = provider;
 		this.processes = new HashMap();

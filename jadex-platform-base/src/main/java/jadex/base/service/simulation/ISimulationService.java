@@ -28,6 +28,11 @@ public interface ISimulationService	extends IService
 	public void pause();
 	
 	/**
+	 *  Restart the execution after pause.
+	 */
+	public void start();
+	
+	/**
 	 *  Perform one event.
 	 */
 	public void stepEvent();

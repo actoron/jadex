@@ -11,7 +11,6 @@ import jadex.service.ISearchManager;
 import jadex.service.IService;
 import jadex.service.IVisitDecider;
 import jadex.service.SServiceProvider;
-import jadex.service.ServiceInfo;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -105,15 +104,15 @@ public class RemoteSearchCommand implements IRemoteCommand
 								{
 									try
 									{
-									List res = new ArrayList();
-									for(Iterator it=((Collection)result).iterator(); it.hasNext(); )
-									{
-										ServiceInfo tmp = (ServiceInfo)it.next();
-										ProxyInfo pi = new ProxyInfo(component.getComponentIdentifier(), 
-											tmp.getService().getServiceIdentifier(), tmp.getType());
-										res.add(pi);
-									}
-									content = res;
+										List res = new ArrayList();
+										for(Iterator it=((Collection)result).iterator(); it.hasNext(); )
+										{
+											IService tmp = (IService)it.next();
+											ProxyInfo pi = new ProxyInfo(component.getComponentIdentifier(), 
+												tmp.getServiceIdentifier());
+											res.add(pi);
+										}
+										content = res;
 									}
 									catch(Exception e)
 									{
@@ -122,9 +121,9 @@ public class RemoteSearchCommand implements IRemoteCommand
 								}
 								else //if(result instanceof Object[])
 								{
-									ServiceInfo tmp = (ServiceInfo)result;
+									IService tmp = (IService)result;
 									content = new ProxyInfo(component.getComponentIdentifier(), 
-										tmp.getService().getServiceIdentifier(), tmp.getType());
+										tmp.getServiceIdentifier());
 								}
 								
 								ret.setResult(new RemoteSearchResultCommand(content, null , callid));

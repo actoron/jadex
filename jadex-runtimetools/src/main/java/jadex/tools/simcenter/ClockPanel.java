@@ -1,7 +1,6 @@
 package jadex.tools.simcenter;
 
 import jadex.base.service.simulation.ISimulationService;
-import jadex.commons.concurrent.IThreadPool;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.service.SServiceProvider;
 import jadex.service.clock.IClock;

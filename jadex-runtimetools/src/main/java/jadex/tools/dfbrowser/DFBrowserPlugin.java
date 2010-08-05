@@ -48,8 +48,8 @@ public class DFBrowserPlugin extends AbstractJCCPlugin
 	 * The image icons.
 	 */
 	protected static final UIDefaults	icons	= new UIDefaults(new Object[]{
-//		"dfbrowser", SGUI.makeIcon(DFBrowserPlugin_old.class, "/jadex/tools/common/images/new_dfbrowser.png"), 
-//		"dfbrowser_sel", SGUI.makeIcon(DFBrowserPlugin_old.class, "/jadex/tools/common/images/new_dfbrowser_sel.png"), 
+		"dfbrowser", SGUI.makeIcon(DFBrowserPlugin.class, "/jadex/tools/common/images/new_dfbrowser.png"), 
+		"dfbrowser_sel", SGUI.makeIcon(DFBrowserPlugin.class, "/jadex/tools/common/images/new_dfbrowser_sel.png"), 
 		"open_dfbrowser", SGUI.makeIcon(GuiProperties.class, "/jadex/tools/common/images/new_introspector.png"),
 		"close_dfbrowser", SGUI.makeIcon(GuiProperties.class, "/jadex/tools/common/images/close_introspector.png"),
 		"dfbrowser_empty", SGUI.makeIcon(GuiProperties.class, "/jadex/tools/common/images/introspector_empty.png"),
@@ -163,7 +163,7 @@ public class DFBrowserPlugin extends AbstractJCCPlugin
 				boolean	alldf	= true;
 				for(int i=0; alldf && i<nodes.length; i++)
 				{
-					alldf	= nodes[i] instanceof ServiceNode && IDF.class.equals(((ServiceNode)nodes[i]).getType());
+					alldf	= nodes[i] instanceof ServiceNode && IDF.class.equals(((ServiceNode)nodes[i]).getService().getServiceIdentifier().getServiceType());
 				}
 				
 				if(alldf)
@@ -233,7 +233,7 @@ public class DFBrowserPlugin extends AbstractJCCPlugin
 					{
 						a	= STOP_DFBROWSER;
 					}
-					else if(IDF.class.equals(((ServiceNode)node).getType()))
+					else if(IDF.class.equals(((ServiceNode)node).getService().getServiceIdentifier().getServiceType()))
 					{
 						a	= START_DFBROWSER;
 					}
@@ -273,7 +273,7 @@ public class DFBrowserPlugin extends AbstractJCCPlugin
 			
 			public void nodeAdded(IComponentTreeNode node)
 			{
-				if(first && node instanceof ServiceNode && IDF.class.equals(((ServiceNode)node).getType()))
+				if(first && node instanceof ServiceNode && IDF.class.equals(((ServiceNode)node).getService().getServiceIdentifier().getServiceType()))
 				{
 					first	= false;
 					final List	path	= new LinkedList();
@@ -307,7 +307,7 @@ public class DFBrowserPlugin extends AbstractJCCPlugin
 			for(int i=0; paths!=null && i<paths.length; i++)
 			{
 				if(paths[i].getLastPathComponent() instanceof ServiceNode
-					&& IDF.class.equals(((ServiceNode)paths[i].getLastPathComponent()).getType()))
+					&& IDF.class.equals(((ServiceNode)paths[i].getLastPathComponent()).getService().getServiceIdentifier().getServiceType()))
 				{
 					ServiceNode node = (ServiceNode)paths[i].getLastPathComponent();
 					IService service = node.getService();
@@ -329,7 +329,7 @@ public class DFBrowserPlugin extends AbstractJCCPlugin
 			for(int i=0; paths!=null && i<paths.length; i++)
 			{
 				if(paths[i].getLastPathComponent() instanceof ServiceNode
-					&& IDF.class.equals(((ServiceNode)paths[i].getLastPathComponent()).getType()))
+					&& IDF.class.equals(((ServiceNode)paths[i].getLastPathComponent()).getService().getServiceIdentifier().getServiceType()))
 				{
 					ServiceNode node = (ServiceNode)paths[i].getLastPathComponent();
 					IService service = node.getService();

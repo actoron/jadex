@@ -4,7 +4,6 @@ import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.concurrent.CounterResultListener;
 import jadex.commons.concurrent.DelegationResultListener;
-import jadex.commons.concurrent.IResultListener;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -28,6 +27,9 @@ public class BasicServiceContainer implements  IServiceContainer
 	
 	/** The platform name. */
 	protected Object id;
+	
+	/** True, if the container is started. */
+	protected boolean	started;
 
 	//-------- constructors --------
 
@@ -81,33 +83,38 @@ public class BasicServiceContainer implements  IServiceContainer
 	//-------- methods --------
 	
 	/**
-	 *  Add a service to the platform.
-	 *  Does NOT start the service automatically.
-	 *  If under the same name and type a service was contained,
-	 *  the old one is removed and shutdowned.
+	 *  Add a service to the container.
 	 *  @param id The name.
 	 *  @param service The service.
 	 */
-	public void addService(Class type, Object service)
+	public IFuture	addService(BasicService service)
 	{
-//		final Future ret = new Future();
+		final Future ret = new Future();
 		
 //		System.out.println("Adding service: " + name + " " + type + " " + service);
 		synchronized(this)
 		{
-			Collection tmp = services!=null? (Collection)services.get(type): null;
+			Collection tmp = services!=null? (Collection)services.get(service.getServiceIdentifier().getServiceType()): null;
 			if(tmp == null)
 			{
 				tmp = Collections.synchronizedList(new ArrayList());
 				if(services==null)
 					services = Collections.synchronizedMap(new LinkedHashMap());
-				services.put(type, tmp);
+				services.put(service.getServiceIdentifier().getServiceType(), tmp);
 			}
 			tmp.add(service);
+			
+			if(started)
+			{
+				service.startService().addResultListener(new DelegationResultListener(ret));
+			}
+			else
+			{
+				ret.setResult(null);
+			}
 		}
 		
-//		ret.setResult(null);
-//		return ret;
+		return ret;
 	}
 
 	/**
@@ -115,35 +122,35 @@ public class BasicServiceContainer implements  IServiceContainer
 	 *  @param id The name.
 	 *  @param service The service.
 	 */
-	public void removeService(Class type, Object service)
+	public IFuture removeService(BasicService service)
 	{
-//		final Future ret = new Future();
+		Future ret = new Future();
 		
 		//		System.out.println("Removing service: " + type + " " + service);
 		synchronized(this)
 		{
-			Collection tmp = services!=null? (Collection)services.get(type): null;
+			Collection tmp = services!=null? (Collection)services.get(service.getServiceIdentifier().getServiceType()): null;
 			if(tmp == null || (service != null && !tmp.contains(service)))
 				throw new RuntimeException("Service not found: " + service);
 	
 			boolean removed = false;
-			if(service == null && tmp.size() == 1)
+			for(Iterator it=tmp.iterator(); !removed && it.hasNext(); )
 			{
-				service = tmp.iterator().next();
-				tmp.remove(service);
-				removed = true;
-			}
-			else
-			{
-				for(Iterator it=tmp.iterator(); !removed && it.hasNext(); )
+				Object key = it.next();
+				if(tmp.equals(service))
 				{
-					Object key = it.next();
-					if(tmp.equals(service))
+					service	= (BasicService)key;
+					tmp.remove(key);
+					if(started)
 					{
-						service	= key;
-						tmp.remove(key);
-						removed = true;
+						service.shutdownService().addResultListener(new DelegationResultListener(ret));
 					}
+					else
+					{
+						ret.setResult(null);
+					}
+						
+					removed = true;
 				}
 			}
 	
@@ -151,19 +158,10 @@ public class BasicServiceContainer implements  IServiceContainer
 				throw new RuntimeException("Service not found: " + service);
 
 			if(tmp.isEmpty())
-				services.remove(type);
+				services.remove(service.getServiceIdentifier().getServiceType());
 		}
 		
-		if(service instanceof IService)
-			((IService)service).shutdownService();
-
-	
-//		if(!removed)
-//			ret.setException(new RuntimeException("Service not found: " + service));
-//		else
-//			ret.setResult(null);
-//		
-//		return ret;
+		return ret;
 	}
 	
 	//-------- internal methods --------
@@ -173,25 +171,24 @@ public class BasicServiceContainer implements  IServiceContainer
 	 */
 	public IFuture start()
 	{
+		assert	!started;
+		started	= true;
+		
 		final Future ret = new Future();
 		
 		// Start the services.
 		if(services!=null && services.size()>0)
 		{
-//			System.out.println("start: "+services.size());
-			
-			// Start notifies the future when all services have been started.
-			CounterResultListener lis = new CounterResultListener(services.size())
+			List allservices = new ArrayList();
+			for(Iterator it=services.values().iterator(); it.hasNext(); )
 			{
-//				public void intermediateResultAvailable(Object source,
-//						Object result)
-//				{
-//					System.out.println("finished: "+result);
-//				}
-				
+				allservices.addAll((Collection)it.next());
+			}
+			CounterResultListener	crl	= new CounterResultListener(allservices.size())
+			{
 				public void finalResultAvailable(Object source, Object result)
 				{
-					ret.setResult(null);
+					ret.setResult(result);
 				}
 				
 				public void exceptionOccurred(Object source, Exception exception)
@@ -199,19 +196,9 @@ public class BasicServiceContainer implements  IServiceContainer
 					ret.setException(exception);
 				}
 			};
-			for(Iterator it=services.keySet().iterator(); it.hasNext(); )
+			for(Iterator it=allservices.iterator(); it.hasNext(); )
 			{
-				Object key = it.next();
-				Collection tmp = (Collection)services.get(key);
-				if(tmp!=null)
-				{
-					for(Iterator it2=tmp.iterator(); it2.hasNext(); )
-					{
-						IService service = (IService)it2.next();
-//						IService service = (IService)tmp.get(key2);
-						service.startService().addResultListener(lis);
-					}
-				}
+				((BasicService)it.next()).startService().addResultListener(crl);
 			}
 		}
 		else
@@ -227,6 +214,9 @@ public class BasicServiceContainer implements  IServiceContainer
 	 */
 	public IFuture shutdown()
 	{
+		assert started;
+		
+		started	= false;
 //		Thread.dumpStack();
 //		System.out.println("shutdown called: "+getName());
 		final Future ret = new Future();
@@ -239,48 +229,21 @@ public class BasicServiceContainer implements  IServiceContainer
 			{
 				allservices.addAll((Collection)it.next());
 			}
-			
-//			System.out.println("all services: "+allservices);
-			shutdownServices(allservices, allservices.size()-1).addResultListener(new DelegationResultListener(ret));
-		}
-		else
-		{
-			ret.setResult(null);
-		}
-		
-		return ret;
-	}
-	
-	/**
-	 *  Shutdown services loop.
-	 */
-	protected IFuture shutdownServices(final List sers, final int i)
-	{
-		final Future ret = new Future();
-		
-		if(i>=0)
-		{
-			if(sers.get(i) instanceof IService)
+			CounterResultListener	crl	= new CounterResultListener(allservices.size())
 			{
-//				System.out.println("shutdown: "+i+" "+sers.get(i));
-				
-				((IService)sers.get(i)).shutdownService().addResultListener(new IResultListener()
+				public void finalResultAvailable(Object source, Object result)
 				{
-					public void resultAvailable(Object source, Object result)
-					{
-//						System.out.println("shutdown finished: "+i+" "+sers.get(i));
-						shutdownServices(sers, i-1).addResultListener(new DelegationResultListener(ret));
-					}
-					
-					public void exceptionOccurred(Object source, Exception exception)
-					{
-						shutdownServices(sers, i-1).addResultListener(new DelegationResultListener(ret));
-					}
-				});
-			}
-			else
+					ret.setResult(result);
+				}
+				
+				public void exceptionOccurred(Object source, Exception exception)
+				{
+					ret.setException(exception);
+				}
+			};
+			for(Iterator it=allservices.iterator(); it.hasNext(); )
 			{
-				shutdownServices(sers, i-1).addResultListener(new DelegationResultListener(ret));
+				((BasicService)it.next()).shutdownService().addResultListener(crl);
 			}
 		}
 		else

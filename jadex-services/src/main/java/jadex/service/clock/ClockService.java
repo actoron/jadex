@@ -16,7 +16,7 @@ import java.util.List;
 
 /**
  *  A clock service abstracts away from clock implementations.
- *  The clock service is menat to be kept constant during runtime.
+ *  The clock service is meant to be kept constant during runtime.
  */
 public class ClockService extends BasicService implements IClockService
 {
@@ -44,7 +44,7 @@ public class ClockService extends BasicService implements IClockService
 	 */
 	public ClockService(ClockCreationInfo cinfo, IServiceProvider provider)
 	{
-		super(BasicService.createServiceIdentifier(provider.getId(), ClockService.class));
+		super(provider.getId(), IClockService.class, null);
 
 		this.cinfo = cinfo;
 		this.provider = provider;

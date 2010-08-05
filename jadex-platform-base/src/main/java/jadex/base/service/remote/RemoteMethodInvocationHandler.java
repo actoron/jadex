@@ -35,9 +35,6 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 	/** The service identifier. */
 	protected IServiceIdentifier sid;
 	
-	/** The service interface. */
-	protected Class service;
-	
 	/** The waiting calls. */
 	protected Map waitingcalls;
 	
@@ -47,12 +44,11 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 	 *  Create a new invocation handler.
 	 */
 	public RemoteMethodInvocationHandler(IExternalAccess component, IComponentIdentifier rms, 
-		IServiceIdentifier sid, Class service, Map waitingcalls)
+		IServiceIdentifier sid, Map waitingcalls)
 	{
 		this.component = component;
 		this.rms = rms;
 		this.sid = sid;
-		this.service = service;
 		this.waitingcalls = waitingcalls;
 	}
 	

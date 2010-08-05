@@ -2,12 +2,9 @@ package jadex.service;
 
 import jadex.commons.Future;
 import jadex.commons.IFuture;
-import jadex.commons.concurrent.IResultListener;
+import jadex.commons.concurrent.DelegationResultListener;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
 
 /**
  *  Static helper class for searching services.
@@ -95,18 +92,7 @@ public class SServiceProvider
 			
 		provider.getServices(sequentialmanager, onlylocal? abortdecider: new DefaultVisitDecider(true, false), 
 			new TypeResultSelector(type, true, onlylocal), new ArrayList())
-			.addResultListener(new IResultListener()
-		{
-			public void resultAvailable(Object source, Object result)
-			{
-				ret.setResult(result!=null? ((ServiceInfo)result).getService(): null);
-			}
-			
-			public void exceptionOccurred(Object source, Exception exception)
-			{
-				ret.setException(exception);
-			}
-		});
+				.addResultListener(new DelegationResultListener(ret));
 		
 		return ret;
 	}
@@ -125,18 +111,8 @@ public class SServiceProvider
 //		}
 		final Future ret = new Future();
 		
-		provider.getServices(sequentialmanager, abortdecider, new IdResultSelector(sid), new ArrayList()).addResultListener(new IResultListener()
-		{
-			public void resultAvailable(Object source, Object result)
-			{
-				ret.setResult(result!=null? ((ServiceInfo)result).getService(): null);
-			}
-			
-			public void exceptionOccurred(Object source, Exception exception)
-			{
-				ret.setException(exception);
-			}
-		});
+		provider.getServices(sequentialmanager, abortdecider, new IdResultSelector(sid), new ArrayList())
+			.addResultListener(new DelegationResultListener(ret));
 		
 		return ret;
 	}
@@ -155,18 +131,8 @@ public class SServiceProvider
 //		}
 		final Future ret = new Future();
 		
-		provider.getServices(sequentialmanager, abortdecider, selector, new ArrayList()).addResultListener(new IResultListener()
-		{
-			public void resultAvailable(Object source, Object result)
-			{
-				ret.setResult(result!=null? ((ServiceInfo)result).getService(): null);
-			}
-			
-			public void exceptionOccurred(Object source, Exception exception)
-			{
-				ret.setException(exception);
-			}
-		});
+		provider.getServices(sequentialmanager, abortdecider, selector, new ArrayList())
+			.addResultListener(new DelegationResultListener(ret));
 		
 		return ret;
 	}
@@ -185,27 +151,8 @@ public class SServiceProvider
 //		}
 		final Future ret = new Future();
 		
-		provider.getServices(parallelmanager, contdecider, new TypeResultSelector(type, false), new ArrayList()).addResultListener(new IResultListener()
-		{
-			public void resultAvailable(Object source, Object result)
-			{
-				List res = null;
-				if(result instanceof Collection)
-				{
-					res = new ArrayList();
-					for(Iterator it=((Collection)result).iterator(); it.hasNext(); )
-					{
-						res.add(((ServiceInfo)it.next()).getService());
-					}
-				}
-				ret.setResult(res);
-			}
-			
-			public void exceptionOccurred(Object source, Exception exception)
-			{
-				ret.setException(exception);
-			}
-		});
+		provider.getServices(parallelmanager, contdecider, new TypeResultSelector(type, false), new ArrayList())
+			.addResultListener(new DelegationResultListener(ret));
 		
 		return ret;
 	}
@@ -224,18 +171,8 @@ public class SServiceProvider
 //		}
 		final Future ret = new Future();
 		
-		provider.getServices(upwardsmanager, abortdecider, new TypeResultSelector(type), new ArrayList()).addResultListener(new IResultListener()
-		{
-			public void resultAvailable(Object source, Object result)
-			{
-				ret.setResult(result!=null? ((ServiceInfo)result).getService(): null);
-			}
-			
-			public void exceptionOccurred(Object source, Exception exception)
-			{
-				ret.setException(exception);
-			}
-		});
+		provider.getServices(upwardsmanager, abortdecider, new TypeResultSelector(type), new ArrayList())
+			.addResultListener(new DelegationResultListener(ret));
 		
 		return ret;
 	}
@@ -254,18 +191,8 @@ public class SServiceProvider
 //		}
 		final Future ret = new Future();
 		
-		provider.getServices(localmanager, abortdecider, new TypeResultSelector(type), new ArrayList()).addResultListener(new IResultListener()
-		{
-			public void resultAvailable(Object source, Object result)
-			{
-				ret.setResult(result!=null? ((ServiceInfo)result).getService(): null);
-			}
-			
-			public void exceptionOccurred(Object source, Exception exception)
-			{
-				ret.setException(exception);
-			}
-		});
+		provider.getServices(localmanager, abortdecider, new TypeResultSelector(type), new ArrayList())
+			.addResultListener(new DelegationResultListener(ret));
 		
 		return ret;
 	}
@@ -284,27 +211,8 @@ public class SServiceProvider
 //		}
 		final Future ret = new Future();
 		
-		provider.getServices(localmanager, abortdecider, new TypeResultSelector(type), new ArrayList()).addResultListener(new IResultListener()
-		{
-			public void resultAvailable(Object source, Object result)
-			{
-				List res = null;
-				if(result instanceof Collection)
-				{
-					res = new ArrayList();
-					for(Iterator it=((Collection)result).iterator(); it.hasNext(); )
-					{
-						res.add(((ServiceInfo)it.next()).getService());
-					}
-				}
-				ret.setResult(res);
-			}
-			
-			public void exceptionOccurred(Object source, Exception exception)
-			{
-				ret.setException(exception);
-			}
-		});
+		provider.getServices(localmanager, abortdecider, new TypeResultSelector(type), new ArrayList())
+			.addResultListener(new DelegationResultListener(ret));
 		
 		return ret;
 	}
@@ -313,7 +221,7 @@ public class SServiceProvider
 	 *  Get all declared services of the given provider.
 	 *  @return The corresponding services.
 	 */
-	public static IFuture getDeclaredServices(IServiceProvider provider, final boolean includetype)
+	public static IFuture getDeclaredServices(IServiceProvider provider)
 	{
 //		synchronized(profiling)
 //		{
@@ -322,28 +230,8 @@ public class SServiceProvider
 //		}
 		final Future ret = new Future();
 		
-		provider.getServices(localmanager, contdecider, new AnyResultSelector(false), new ArrayList()).addResultListener(new IResultListener()
-		{
-			public void resultAvailable(Object source, Object result)
-			{
-				List res = null;
-				if(result instanceof Collection)
-				{
-					res = new ArrayList();
-					for(Iterator it=((Collection)result).iterator(); it.hasNext(); )
-					{
-						ServiceInfo si = (ServiceInfo)it.next();
-						res.add(includetype? si: si.getService());
-					}
-				}
-				ret.setResult(res);
-			}
-			
-			public void exceptionOccurred(Object source, Exception exception)
-			{
-				ret.setException(exception);
-			}
-		});
+		provider.getServices(localmanager, contdecider, new AnyResultSelector(false), new ArrayList())
+			.addResultListener(new DelegationResultListener(ret));
 		
 		return ret;
 	}
@@ -362,18 +250,8 @@ public class SServiceProvider
 //		}
 		final Future ret = new Future();
 		
-		provider.getServices(localmanager, abortdecider, new IdResultSelector(sid), new ArrayList()).addResultListener(new IResultListener()
-		{
-			public void resultAvailable(Object source, Object result)
-			{
-				ret.setResult(result!=null? ((ServiceInfo)result).getService(): null);
-			}
-			
-			public void exceptionOccurred(Object source, Exception exception)
-			{
-				ret.setException(exception);
-			}
-		});
+		provider.getServices(localmanager, abortdecider, new IdResultSelector(sid), new ArrayList())
+			.addResultListener(new DelegationResultListener(ret));
 		
 		return ret;
 	}

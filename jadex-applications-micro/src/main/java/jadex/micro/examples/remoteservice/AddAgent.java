@@ -12,6 +12,6 @@ public class AddAgent extends MicroAgent
 	 */
 	public void agentCreated()
 	{
-		addService(IAddService.class, new AddService(getServiceProvider(), "addservice"));
+		addService(new AddService(getServiceProvider()));
 	}
 }

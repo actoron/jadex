@@ -76,14 +76,14 @@ public class TypeResultSelector implements IResultSelector
 					{
 						if(!Proxy.isProxyClass(ares[i].getClass()))
 						{
-							results.add(new ServiceInfo(type, (IService)res.toArray()[i]));
+							results.add(ares[i]);
 							break;
 						}
 					}
 				}
 				else
 				{
-					results.add(new ServiceInfo(type, (IService)res.toArray()[0]));
+					results.add(ares[0]);
 				}
 			}
 			else
@@ -93,7 +93,7 @@ public class TypeResultSelector implements IResultSelector
 				{
 					if(!onlylocal || !Proxy.isProxyClass(ares[i].getClass()))
 					{
-						results.add(new ServiceInfo(type, (IService)ares[i]));
+						results.add(ares[i]);
 					}
 				}
 			}

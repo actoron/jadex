@@ -2,7 +2,6 @@ package jadex.bdi.runtime.interpreter;
 
 import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.runtime.IPlanExecutor;
-import jadex.bdi.runtime.impl.eaflyweights.ExternalAccessFlyweight;
 import jadex.bdi.runtime.impl.flyweights.ParameterFlyweight;
 import jadex.bridge.CheckedAction;
 import jadex.bridge.ComponentResultListener;
@@ -30,6 +29,7 @@ import jadex.rules.rulesystem.rules.Variable;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVAttributeType;
 import jadex.rules.state.OAVObjectType;
+import jadex.service.BasicService;
 import jadex.service.IServiceContainer;
 import jadex.service.clock.ITimedObject;
 import jadex.service.clock.ITimer;
@@ -1058,10 +1058,10 @@ public class AgentRules
 			{
 				Object mexp = it.next();
 //				String name = (String)state.getAttributeValue(mexp, OAVBDIMetaModel.modelelement_has_name);
-				Object val = evaluateExpression(state, mexp, new OAVBDIFetcher(state, rcapa));
-				Class type = (Class)state.getAttributeValue(mexp, OAVBDIMetaModel.expression_has_class);
+				BasicService val = (BasicService)evaluateExpression(state, mexp, new OAVBDIFetcher(state, rcapa));
+//				Class type = (Class)state.getAttributeValue(mexp, OAVBDIMetaModel.expression_has_class);
 				// cast hack?!
-				((IServiceContainer)BDIInterpreter.getInterpreter(state).getServiceProvider()).addService(type, val);
+				((IServiceContainer)BDIInterpreter.getInterpreter(state).getServiceProvider()).addService(val);
 //				System.out.println("Service: "+name+" "+val+" "+type);
 			}
 		}

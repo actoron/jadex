@@ -17,13 +17,10 @@ import jadex.commons.concurrent.IExecutable;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.ThreadPoolFactory;
 import jadex.service.BasicServiceContainer;
-import jadex.service.IService;
 import jadex.service.IServiceContainer;
 import jadex.service.clock.ClockCreationInfo;
 import jadex.service.clock.ClockService;
 import jadex.service.clock.IClock;
-import jadex.service.clock.IClockService;
-import jadex.service.threadpool.IThreadPoolService;
 import jadex.service.threadpool.ThreadPoolService;
 
 import java.io.IOException;
@@ -120,9 +117,9 @@ class ComponentAdapter implements IComponentAdapter
 	{
 		container = new BasicServiceContainer("platform");
 		ThreadPoolService tps = new ThreadPoolService(ThreadPoolFactory.createThreadPool(), container);
-		container.addService(IThreadPoolService.class, tps);
-		final IClockService clock = new ClockService(new ClockCreationInfo(IClock.TYPE_SYSTEM, "system"), container);
-		container.addService(IClockService.class, (IService)clock);
+		container.addService(tps);
+		ClockService clock = new ClockService(new ClockCreationInfo(IClock.TYPE_SYSTEM, "system"), container);
+		container.addService(clock);
 		
 		exe = new Executor(tps);
 		exe.setExecutable(new IExecutable()

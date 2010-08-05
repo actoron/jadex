@@ -5,7 +5,6 @@ import jadex.commons.SUtil;
 import jadex.service.SServiceProvider;
 import jadex.service.library.ILibraryService;
 import jadex.service.threadpool.IThreadPoolService;
-import jadex.service.threadpool.ThreadPoolService;
 
 import java.io.BufferedInputStream;
 import java.io.InputStream;

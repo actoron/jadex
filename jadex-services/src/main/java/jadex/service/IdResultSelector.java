@@ -48,7 +48,7 @@ public class IdResultSelector implements IResultSelector
 				IService tmp = (IService)vals.next();
 				if(sid.equals(tmp.getServiceIdentifier()))
 				{
-					results.add(new ServiceInfo(key, tmp));
+					results.add(tmp);
 					break;
 				}
 			}

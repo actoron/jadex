@@ -13,9 +13,9 @@ public class AddService extends BasicService implements IAddService
 	/**
 	 *  Create a new add service.
 	 */
-	public AddService(IServiceProvider provider, String name)
+	public AddService(IServiceProvider provider)
 	{
-		super(BasicService.createServiceIdentifier(provider.getId(), name));
+		super(provider.getId(), IAddService.class, null);
 	}
 	
 	/**

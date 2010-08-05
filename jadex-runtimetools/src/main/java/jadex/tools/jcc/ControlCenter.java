@@ -115,7 +115,8 @@ public class ControlCenter implements IControlCenter
 						Class plugin_class = null;
 						try
 						{
-							plugin_class = SUtil.class.getClassLoader().loadClass(tokenizer.nextToken().trim());
+							String	plugin_string	= tokenizer.nextToken().trim();
+							plugin_class = SUtil.class.getClassLoader().loadClass(plugin_string);
 							if(!plugin_set.contains(plugin_class))
 							{
 								IControlCenterPlugin p = (IControlCenterPlugin)plugin_class.newInstance();

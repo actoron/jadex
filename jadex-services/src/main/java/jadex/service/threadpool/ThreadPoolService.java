@@ -22,7 +22,7 @@ public class ThreadPoolService extends BasicService implements IThreadPoolServic
 	 */
 	public ThreadPoolService(IThreadPool threadpool, IServiceProvider provider)
 	{
-		super(BasicService.createServiceIdentifier(provider.getId(), ThreadPoolService.class));
+		super(provider.getId(), IThreadPoolService.class, null);
 
 		this.threadpool = threadpool;
 	}

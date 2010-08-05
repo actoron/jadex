@@ -16,10 +16,9 @@ public class DynamicServiceAgent extends MicroAgent
 	{
 		Runnable	addservice	= new Runnable()
 		{
-			int cnt	= 0;
 			public void run()
 			{
-				addService(DummyService.class, new DummyService(getServiceProvider(), "DummyService#"+(++cnt)));
+				addService(new DummyService(getServiceProvider()));
 				waitFor(3000, this);
 			}
 		};
@@ -27,16 +26,21 @@ public class DynamicServiceAgent extends MicroAgent
 		addservice.run();
 	}
 	
-	public class DummyService	extends BasicService
+	public class DummyService	extends BasicService	implements IDummyService
 	{
-		public DummyService(IServiceProvider provider, String name)
+		public DummyService(IServiceProvider provider)
 		{
-			super(BasicService.createServiceIdentifier(provider.getId(), name));
+			super(provider.getId(), IDummyService.class, null);
 		}
 		
 		public String toString()
 		{
 			return getServiceIdentifier().getServiceName();
 		}
+	}
+	
+	public interface IDummyService
+	{
+		public String	toString();
 	}
 }

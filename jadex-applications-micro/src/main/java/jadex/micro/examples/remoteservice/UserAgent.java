@@ -1,13 +1,9 @@
 package jadex.micro.examples.remoteservice;
 
-import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
-import jadex.bridge.IRemoteServiceManagementService;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.micro.MicroAgent;
-import jadex.service.BasicService;
 import jadex.service.SServiceProvider;
-import jadex.service.ServiceInfo;
 
 /**
  *  Agent that invokes methods on a remote service.
@@ -26,7 +22,7 @@ public class UserAgent extends MicroAgent
 		{
 			public void resultAvailable(Object source, Object result)
 			{
-				final IComponentManagementService cms = (IComponentManagementService)result;
+//				final IComponentManagementService cms = (IComponentManagementService)result;
 				
 				// get remote management service and fetch service via rms.getProxy()
 				/*SServiceProvider.getService(getServiceProvider(), IRemoteServiceManagementService.class)

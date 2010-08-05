@@ -2,7 +2,6 @@ package jadex.bridge;
 
 import jadex.commons.Tuple;
 import jadex.service.IResultSelector;
-import jadex.service.ServiceInfo;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -81,7 +80,7 @@ public class ComponentFactorySelector implements IResultSelector
 					
 					if(match)
 					{
-						results.add(new ServiceInfo(IComponentFactory.class, fac));
+						results.add(fac);
 					}
 				}
 			}

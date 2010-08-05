@@ -53,7 +53,7 @@ public class DirectoryFacilitatorService extends BasicService implements IDF
 	 */
 	public DirectoryFacilitatorService(IServiceContainer provider)
 	{
-		super(BasicService.createServiceIdentifier(provider.getId(), DirectoryFacilitatorService.class));
+		super(provider.getId(), IDF.class, null);
 
 		this.provider = provider;
 		this.components	= new IndexMap();
