@@ -100,8 +100,7 @@ public class ComponentManagementService extends BasicService implements ICompone
 	
 	/** The init adapters and descriptions, i.e. adapters and desc of initing components, 
 	    are only visible for child components in their init. */
-	protected Map initadapters;
-	protected Map initdescs;
+	protected Map initinfos;
 	
     //-------- constructors --------
 
@@ -132,8 +131,7 @@ public class ComponentManagementService extends BasicService implements ICompone
 		this.listeners = SCollection.createMultiCollection();
 		this.killresultlisteners = Collections.synchronizedMap(SCollection.createHashMap());
 //		this.initfutures = Collections.synchronizedMap(SCollection.createHashMap());
-		this.initadapters = Collections.synchronizedMap(SCollection.createHashMap());
-		this.initdescs = Collections.synchronizedMap(SCollection.createHashMap());
+		this.initinfos = Collections.synchronizedMap(SCollection.createHashMap());
 		
 		this.root = root;
     }
@@ -169,7 +167,8 @@ public class ComponentManagementService extends BasicService implements ICompone
 			{
 				final ILibraryService ls = (ILibraryService)result;
 				
-				SServiceProvider.getService(provider, new ComponentFactorySelector(model, cinfo.getImports(), ls.getClassLoader())).addResultListener(new IResultListener()
+				SServiceProvider.getService(provider, new ComponentFactorySelector(model, cinfo.getImports(), ls.getClassLoader()))
+					.addResultListener(new IResultListener()
 				{
 					public void resultAvailable(Object source, Object result)
 					{
@@ -199,7 +198,7 @@ public class ComponentManagementService extends BasicService implements ICompone
 								else
 								{
 									cid = new ComponentIdentifier(name+"@"+((IComponentIdentifier)provider.getId()).getPlatformName()); // Hack?!
-									if(adapters.containsKey(cid) || initadapters.containsKey(cid))
+									if(adapters.containsKey(cid) || initinfos.containsKey(cid))
 									{
 										inited.setException(new RuntimeException("Component name already exists on platform: "+cid));
 										return;
@@ -219,153 +218,146 @@ public class ComponentManagementService extends BasicService implements ICompone
 							}		
 						}
 						
-//						initfutures.put(cid, inited);
-		
-//						getParentAdapter(cinfo).addResultListener(new IResultListener()
-//						{
-//							public void resultAvailable(Object source, Object result)
-//							{
-//								final StandaloneComponentAdapter pad = (StandaloneComponentAdapter)result;
+						final StandaloneComponentAdapter pad = getParentAdapter(cinfo);
+						IExternalAccess parent = pad.getComponentInstance().getExternalAccess();
+						final CMSComponentDescription ad = new CMSComponentDescription(cid, type, 
+							getParentIdentifier(cinfo), cinfo.isMaster(), cinfo.isDaemon());
 						
-								final StandaloneComponentAdapter pad = getParentAdapter(cinfo);
-								IExternalAccess parent = pad.getComponentInstance().getExternalAccess();
-								final CMSComponentDescription ad = new CMSComponentDescription(cid, type, 
-									getParentIdentifier(cinfo), cinfo.isMaster(), cinfo.isDaemon());
+						Future future = new Future();
+						future.addResultListener(new IResultListener()
+						{
+							public void resultAvailable(Object source, Object result)
+							{
+								// Create the component instance.
+								StandaloneComponentAdapter adapter;
+								IComponentListener[] alisteners;
 								
-								Future future = new Future();
-								future.addResultListener(new IResultListener()
-								{
-									public void resultAvailable(Object source, Object result)
-									{
-										// Create the component instance.
-										StandaloneComponentAdapter adapter;
-										IComponentListener[] alisteners;
-										
-										synchronized(adapters)
-										{
-											synchronized(descs)
-											{
-//												System.out.println("created: "+ad);
-												
-												// Increase daemon cnt
-												if(cinfo.isDaemon())
-													daemons++;
-												
-												CMSComponentDescription padesc = getParentDescription(cinfo);
-												// Suspend when set to suspend or when parent is also suspended or when specified in model.
-												Object	debugging 	= lmodel.getProperties().get("debugging");
-												if(cinfo.isSuspend() || (padesc!=null && (IComponentDescription.STATE_SUSPENDED.equals(padesc.getState()) || IComponentDescription.STATE_WAITING.equals(padesc.getState())))
-													|| debugging instanceof Boolean && ((Boolean)debugging).booleanValue())
-												{
-													ad.setState(IComponentDescription.STATE_SUSPENDED);
-												}
-												else
-												{
-													ad.setState(IComponentDescription.STATE_ACTIVE);
-												}
-												
-												// Init successfully finished. Add description and adapter.
-//												initfutures.remove(cid);
-												adapter = (StandaloneComponentAdapter)((Object[])result)[1];
-												descs.put(cid, ad);
-												adapters.put(cid, adapter);
-												initdescs.remove(cid);
-												initadapters.remove(cid);
-												
-												if(padesc==null)
-													System.out.println("here");
-												padesc.addChild(cid);
-												pad.getComponentInstance().componentCreated(ad, lmodel);
-											}
-										}
-										
-										// Register component at parent.
-										
-										// todo: can be called after listener has (concurrently) deregistered
-										// notify listeners without holding locks
-										synchronized(listeners)
-										{
-											Set	slisteners	= new HashSet(listeners.getCollection(null));
-											slisteners.addAll(listeners.getCollection(cid));
-											alisteners	= (IComponentListener[])slisteners.toArray(new IComponentListener[slisteners.size()]);
-										}
-										for(int i=0; i<alisteners.length; i++)
-										{
-											try
-											{
-												alisteners[i].componentAdded(ad);
-											}
-											catch(Exception e)
-											{
-												e.printStackTrace();
-											}
-										}
-												
-//										System.out.println("created: "+cid.getLocalName()+" "+(parent!=null?parent.getComponentIdentifier().getLocalName():"null"));
-//										System.out.println("added: "+descs.size()+", "+aid);
-										
-										if(killlistener!=null)
-											killresultlisteners.put(cid, killlistener);
-										
-										inited.setResult(cid);
-										
-										// Start regular execution of inited component.
-										if(!cinfo.isSuspend())
-										{
-											try
-											{
-												adapter.wakeup();
-											}
-											catch(Exception e)
-											{
-												e.printStackTrace();
-											}
-										}
-									}
-									
-									public void exceptionOccurred(Object source, Exception exception)
-									{
-//										e.printStackTrace();
-										System.out.println("Ex: "+cid+" "+exception);
-										
-										if(killlistener!=null)
-											killlistener.exceptionOccurred(ComponentManagementService.this, exception);
-										
-										inited.setException(exception);
-									}
-								});
-								
-								// Create component and wakeup for init.
-								Object[] comp = factory.createComponentInstance(ad, caf, lmodel, 
-									cinfo.getConfiguration(), cinfo.getArguments(), parent, future);
-								
-								// Store (invalid) adapter for children
 								synchronized(adapters)
 								{
 									synchronized(descs)
 									{
-										initdescs.put(cid, ad);
-										initadapters.put(cid, comp[1]);
+//										System.out.println("created: "+ad);
+										
+										// Increase daemon cnt
+										if(cinfo.isDaemon())
+											daemons++;
+										
+										boolean pasuspend = false;
+										Object[] painfo = getParentInfo(cinfo);
+										CMSComponentDescription padesc;
+										if(painfo!=null)
+										{
+											pasuspend = ((CreationInfo)painfo[2]).isSuspend();
+											padesc = (CMSComponentDescription)painfo[0];
+										}
+										else
+										{
+											padesc = (CMSComponentDescription)descs.get(getParentIdentifier(cinfo));
+											pasuspend = IComponentDescription.STATE_SUSPENDED.equals(padesc.getState()) || IComponentDescription.STATE_WAITING.equals(padesc.getState());
+										}
+										// Suspend when set to suspend or when parent is also suspended or when specified in model.
+										Object	debugging 	= lmodel.getProperties().get("debugging");
+										if(cinfo.isSuspend() || pasuspend || debugging instanceof Boolean 
+											&& ((Boolean)debugging).booleanValue())
+										{
+											ad.setState(IComponentDescription.STATE_SUSPENDED);
+										}
+										else
+										{
+											ad.setState(IComponentDescription.STATE_ACTIVE);
+										}
+										
+										// Init successfully finished. Add description and adapter.
+//												initfutures.remove(cid);
+										adapter = (StandaloneComponentAdapter)((Object[])result)[1];
+										descs.put(cid, ad);
+										adapters.put(cid, adapter);
+										initinfos.remove(cid);
+										
+										padesc.addChild(cid);
+										pad.getComponentInstance().componentCreated(ad, lmodel);
 									}
 								}
 								
-								// Start the init procedure by waking up the adapter.
-								try
+								// Register component at parent.
+								
+								// todo: can be called after listener has (concurrently) deregistered
+								// notify listeners without holding locks
+								synchronized(listeners)
 								{
-									((IComponentAdapter)comp[1]).wakeup();
+									Set	slisteners	= new HashSet(listeners.getCollection(null));
+									slisteners.addAll(listeners.getCollection(cid));
+									alisteners	= (IComponentListener[])slisteners.toArray(new IComponentListener[slisteners.size()]);
 								}
-								catch(Exception e)
+								for(int i=0; i<alisteners.length; i++)
 								{
-									inited.setException(e);
+									try
+									{
+										alisteners[i].componentAdded(ad);
+									}
+									catch(Exception e)
+									{
+										e.printStackTrace();
+									}
+								}
+										
+//										System.out.println("created: "+cid.getLocalName()+" "+(parent!=null?parent.getComponentIdentifier().getLocalName():"null"));
+//										System.out.println("added: "+descs.size()+", "+aid);
+								
+								if(killlistener!=null)
+									killresultlisteners.put(cid, killlistener);
+								
+								inited.setResult(cid);
+								
+								// Start regular execution of inited component.
+								if(!cinfo.isSuspend())
+								{
+									try
+									{
+										adapter.wakeup();
+									}
+									catch(Exception e)
+									{
+										e.printStackTrace();
+									}
 								}
 							}
 							
-//							public void exceptionOccurred(Object source, Exception exception)
-//							{
-//								inited.setException(exception);
-//							}
-//						});
-//					}
+							public void exceptionOccurred(Object source, Exception exception)
+							{
+//								e.printStackTrace();
+								System.out.println("Ex: "+cid+" "+exception);
+								
+								if(killlistener!=null)
+									killlistener.exceptionOccurred(ComponentManagementService.this, exception);
+								
+								inited.setException(exception);
+							}
+						});
+						
+						// Create component and wakeup for init.
+						Object[] comp = factory.createComponentInstance(ad, caf, lmodel, 
+							cinfo.getConfiguration(), cinfo.getArguments(), parent, future);
+						
+						// Store (invalid) desc, adapter and info for children
+						synchronized(adapters)
+						{
+							synchronized(descs)
+							{
+								initinfos.put(cid, new Object[]{ad, comp[1], cinfo});
+							}
+						}
+						
+						// Start the init procedure by waking up the adapter.
+						try
+						{
+							((IComponentAdapter)comp[1]).wakeup();
+						}
+						catch(Exception e)
+						{
+							inited.setException(e);
+						}
+					}
 					
 					public void exceptionOccurred(Object source, Exception exception)
 					{
@@ -383,6 +375,23 @@ public class ComponentManagementService extends BasicService implements ICompone
 	/**
 	 *  Get the adapter of the parent component.
 	 */
+	protected Object[] getParentInfo(CreationInfo cinfo)
+	{
+		final IComponentIdentifier paid = getParentIdentifier(cinfo);
+		Object[] ret;
+		synchronized(adapters)
+		{
+			synchronized(descs)
+			{
+				ret = (Object[])initinfos.get(paid);
+			}
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Get the adapter of the parent component.
+	 */
 	protected StandaloneComponentAdapter getParentAdapter(CreationInfo cinfo)
 	{
 		final IComponentIdentifier paid = getParentIdentifier(cinfo);
@@ -394,7 +403,7 @@ public class ComponentManagementService extends BasicService implements ICompone
 				adapter = (StandaloneComponentAdapter)adapters.get(paid);
 				if(adapter==null)
 				{
-					adapter = (StandaloneComponentAdapter)initadapters.get(paid);
+					adapter = (StandaloneComponentAdapter)getParentInfo(cinfo)[1];
 				}
 			}
 		}
@@ -415,7 +424,7 @@ public class ComponentManagementService extends BasicService implements ICompone
 				desc = (CMSComponentDescription)descs.get(paid);
 				if(desc==null)
 				{
-					desc = (CMSComponentDescription)initdescs.get(paid);
+					desc = (CMSComponentDescription)getParentInfo(cinfo)[0];
 				}
 			}
 		}
