@@ -1,9 +1,11 @@
 package jadex.tools.serviceviewer;
 
+import jadex.commons.Properties;
 import jadex.commons.SGUI;
 import jadex.commons.SReflect;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.service.IService;
+import jadex.service.IServiceIdentifier;
 import jadex.service.SServiceProvider;
 import jadex.service.library.ILibraryService;
 import jadex.tools.common.CombiIcon;
@@ -19,6 +21,7 @@ import jadex.tools.common.plugin.AbstractJCCPlugin;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import javax.swing.AbstractAction;
@@ -76,6 +79,9 @@ public class ServiceViewerPlugin extends AbstractJCCPlugin
 	
 	/** The service viewer panels. */
 	protected Map	panels;
+	
+	/** Loaded properties. */
+	protected Properties	props;
 	
 	//-------- constructors --------
 	
@@ -149,9 +155,16 @@ public class ServiceViewerPlugin extends AbstractJCCPlugin
 				if(tree.getSelectionPath()!=null)
 				{
 					Object node = tree.getSelectionPath().getLastPathComponent();
-					if(node instanceof ServiceNode && cards.getComponent(((ServiceNode)node).getService().getServiceIdentifier())!=null)
+					if(node instanceof ServiceNode)
 					{
-						cards.show(((ServiceNode)node).getService().getServiceIdentifier());
+						IServiceIdentifier	sid	= ((ServiceNode)node).getService().getServiceIdentifier();
+						if(cards.getComponent(sid)!=null)
+						{
+							storeCurrentPanelSettings();
+							IServiceViewerPanel	panel	= (IServiceViewerPanel)panels.get(sid);
+							panel.setProperties(props!=null ? props.getSubproperty(panel.getId()) : null);
+							cards.show(sid);
+						}
 					}
 				}
 			}
@@ -302,9 +315,12 @@ public class ServiceViewerPlugin extends AbstractJCCPlugin
 								ILibraryService	libservice	= (ILibraryService)result;
 								try
 								{
+									storeCurrentPanelSettings();
 									Class clazz	= SReflect.classForName(classname, libservice.getClassLoader());
 									IServiceViewerPanel	panel	= (IServiceViewerPanel)clazz.newInstance();
 									panel.init(getJCC(), service);
+									Properties	sub	= props!=null ? props.getSubproperty(panel.getId()) : null;
+									panel.setProperties(sub);
 									GuiProperties.setupHelp(panel.getComponent(), getHelpID());
 									panels.put(service.getServiceIdentifier(), panel);
 									detail.add(panel.getComponent(), service.getServiceIdentifier());
@@ -332,6 +348,7 @@ public class ServiceViewerPlugin extends AbstractJCCPlugin
 			{
 				if(isNodeViewable((IComponentTreeNode)paths[i].getLastPathComponent()))
 				{
+					storeCurrentPanelSettings();
 					ServiceNode node = (ServiceNode)paths[i].getLastPathComponent();
 					IService service = node.getService();
 					detail.remove(cards.getComponent(service.getServiceIdentifier()));
@@ -360,5 +377,56 @@ public class ServiceViewerPlugin extends AbstractJCCPlugin
 	protected static boolean isNodeViewable(IComponentTreeNode node)
 	{
 		return node instanceof ServiceNode && ((ServiceNode)node).getService().getProperty(PROPERTY_VIEWERCLASS)!=null;
+	}
+	
+	//-------- loading / saving --------
+	
+	/**
+	 *  Return properties to be saved in project.
+	 */
+	public Properties getProperties()
+	{
+		storeCurrentPanelSettings();
+		
+		return props;
+	}
+	
+	/**
+	 *  Set properties loaded from project.
+	 */
+	public void setProperties(Properties ps)
+	{
+		this.props	=	ps;
+		for(Iterator it=panels.values().iterator(); it.hasNext(); )
+		{
+			IServiceViewerPanel	panel	= (IServiceViewerPanel)it.next();
+			Properties	sub	= props!=null ? props.getSubproperty(panel.getId()) : null;
+			panel.setProperties(sub);
+		}
+	}
+
+	
+	/**
+	 *  Store settings of current panel.
+	 */
+	protected void storeCurrentPanelSettings()
+	{
+		Object	old	= cards.getCurrentKey();
+		if(old!=null)
+		{
+			IServiceViewerPanel	panel	= (IServiceViewerPanel)panels.get(old);
+			if(panel!=null)
+			{
+				if(props==null)
+					props	= new Properties();
+				Properties	sub	= panel.getProperties();
+				props.removeSubproperties(panel.getId());
+				if(sub!=null)
+				{
+					sub.setType(panel.getId());
+					props.addSubproperties(sub);
+				}
+			}
+		}
 	}
 }

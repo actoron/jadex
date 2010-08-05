@@ -1,6 +1,7 @@
 package jadex.commons;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -270,6 +271,19 @@ public class Properties
 		
 //		subproperties.put(props.getType(), props);
 		subproperties.add(props);
+	}
+	
+	/**
+	 *  Remove all subproperties of a given type.
+	 */
+	public void	removeSubproperties(String type)
+	{
+		for(Iterator it=subproperties.iterator(); it.hasNext(); )
+		{
+			Properties	sub	= (Properties)it.next();
+			if(type.equals(sub.getType()))
+				it.remove();
+		}
 	}
 	
 	/**

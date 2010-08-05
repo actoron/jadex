@@ -257,7 +257,15 @@ public class LibServiceBrowser	extends	JTabbedPane	implements IServiceViewerPane
 	{
 		return this;
 	}
-	
+		
+	/**
+	 *  The id used for mapping properties.
+	 */
+	public String getId()
+	{
+		return "libservicebrowser";
+	}
+
 	/**
 	 *  Advices the the panel to restore its properties from the argument
 	 */

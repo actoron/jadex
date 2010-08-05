@@ -35,6 +35,9 @@ public class ObjectCardLayout implements LayoutManager2
 	/** The current component (if any). */
 	protected Component	current;
 
+	/** The key of the current component (if any). */
+	protected Object	curkey;
+
 	//-------- constructors --------
 	
 	/**
@@ -47,7 +50,7 @@ public class ObjectCardLayout implements LayoutManager2
 		this.components	= new HashMap();
 	}
 
-	//-------- methdos --------
+	//-------- methods --------
 	
 	/**
 	 *	Shows the component in the parent.
@@ -67,6 +70,11 @@ public class ObjectCardLayout implements LayoutManager2
 		if(comp==null)
 		{
 			comp	= (Component)components.get(DEFAULT_COMPONENT);
+			curkey	= null;
+		}
+		else
+		{
+			curkey	= object;
 		}
 
 		// Show new component (if any).
@@ -95,6 +103,14 @@ public class ObjectCardLayout implements LayoutManager2
 	public Component	getComponent(Object object)
 	{
 		return (Component)components.get(object);
+	}
+	
+	/**
+	 *  Get the key of the currently shown component (if any).
+	 */
+	public Object	getCurrentKey()
+	{
+		return curkey;
 	}
 	
 	//-------- Interface LayoutManager methods --------

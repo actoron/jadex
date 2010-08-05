@@ -25,6 +25,11 @@ public interface IServiceViewerPanel
 	public void shutdown();
 
 	/**
+	 *  The id used for mapping properties.
+	 */
+	public String getId();
+
+	/**
 	 *  The component to be shown in the gui.
 	 *  @return	The component to be displayed.
 	 */

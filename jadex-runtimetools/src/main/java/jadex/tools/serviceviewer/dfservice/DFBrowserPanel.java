@@ -4,6 +4,7 @@ import jadex.base.fipa.IDF;
 import jadex.base.fipa.IDFComponentDescription;
 import jadex.base.fipa.IDFServiceDescription;
 import jadex.commons.Properties;
+import jadex.commons.Property;
 import jadex.commons.SGUI;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.service.IService;
@@ -71,6 +72,12 @@ public class DFBrowserPanel	extends JPanel implements IServiceViewerPanel
 
 	/** The refresh timer. */
 	protected Timer	timer;
+	
+	/** The refresh delay. */
+	protected int	defrefresh;
+
+	/** The refresh selectzion buttons. */
+	protected JRadioButton[]	rb_refresh;
 
 	//-------- constructors --------
 	
@@ -134,7 +141,6 @@ public class DFBrowserPanel	extends JPanel implements IServiceViewerPanel
 		split2.setResizeWeight(0.5);
 		add(split2, BorderLayout.CENTER);
 		
-		int defrefresh	= 5000;
 		timer = new Timer(defrefresh, new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
@@ -142,26 +148,25 @@ public class DFBrowserPanel	extends JPanel implements IServiceViewerPanel
 				refresh();
 			}
 		});
-		if(defrefresh>0)
-			timer.start();
 		int[]	refreshs	= new int[]{0, 1000, 5000, 30000};
 		JPanel	settings	= new JPanel(new GridBagLayout());
 		settings.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), "Refresh Settings"));
 		GridBagConstraints	gbc	= new GridBagConstraints();
 		gbc.fill	= GridBagConstraints.NONE;
 		ButtonGroup group = new ButtonGroup();
-		JRadioButton[]	buttons	= new JRadioButton[refreshs.length];
-		for(int i=0; i<buttons.length; i++)
+		rb_refresh = new JRadioButton[refreshs.length];
+		for(int i=0; i<rb_refresh.length; i++)
 		{
 			final int	refresh	= refreshs[i];
-			JRadioButton	rb	= new JRadioButton(refresh>0 ? Integer.toString(refresh/1000)+" s" : "No refresh");
-			rb.setSelected(refresh==defrefresh);
-			group.add(rb);
-			settings.add(rb, gbc);
-			rb.addActionListener(new ActionListener()
+			rb_refresh[i]	= new JRadioButton(refresh>0 ? Integer.toString(refresh/1000)+" s" : "No refresh");
+			rb_refresh[i].putClientProperty("refresh", new Integer(refresh));
+			group.add(rb_refresh[i]);
+			settings.add(rb_refresh[i], gbc);
+			rb_refresh[i].addActionListener(new ActionListener()
 			{
 				public void actionPerformed(ActionEvent e)
 				{
+					defrefresh	= refresh;
 					if(refresh>0)
 					{
 						timer.setDelay(refresh);
@@ -213,10 +218,29 @@ public class DFBrowserPanel	extends JPanel implements IServiceViewerPanel
 	}
 	
 	/**
+	 *  The id used for mapping properties.
+	 */
+	public String getId()
+	{
+		return "dfbrowser";
+	}
+
+	/**
 	 *  Advices the the panel to restore its properties from the argument
 	 */
 	public void setProperties(Properties ps)
 	{
+		int	refresh	= 5000;
+		if(ps!=null)
+		{
+			refresh	= ps.getIntProperty("defrefresh");
+		}
+		
+		for(int i=0; i<rb_refresh.length; i++)
+		{
+			if(((Integer)rb_refresh[i].getClientProperty("refresh")).intValue()==refresh)
+				rb_refresh[i].doClick();
+		}
 	}
 
 	/**
@@ -225,7 +249,9 @@ public class DFBrowserPanel	extends JPanel implements IServiceViewerPanel
 	 */
 	public Properties	getProperties()
 	{
-		return null;
+		Properties	props	= new Properties();
+		props.addProperty(new Property("defrefresh", Integer.toString(defrefresh)));
+		return props;
 	}
 
 	//-------- methods --------

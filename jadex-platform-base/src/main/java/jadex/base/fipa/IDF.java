@@ -3,6 +3,7 @@ package jadex.base.fipa;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.ISearchConstraints;
 import jadex.commons.IFuture;
+import jadex.service.IService;
 
 import java.util.Date;
 
@@ -10,7 +11,7 @@ import java.util.Date;
  *  Interface for the directory facilitator (DF). Provides services for registering,
  *  modifying, deregistering and searching of component resp. service descriptions.
  */
-public interface IDF
+public interface IDF	extends IService
 {
 	/**
 	 *  Register an component description.
