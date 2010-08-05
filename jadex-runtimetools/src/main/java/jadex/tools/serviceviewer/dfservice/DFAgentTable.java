@@ -1,4 +1,4 @@
-package jadex.tools.dfbrowser;
+package jadex.tools.serviceviewer.dfservice;
 
 import jadex.base.fipa.IDFComponentDescription;
 import jadex.base.fipa.IDFServiceDescription;

@@ -1,6 +1,7 @@
 package jadex.service.library;
 
 import jadex.commons.IFuture;
+import jadex.commons.SUtil;
 import jadex.service.BasicService;
 
 import java.io.File;
@@ -50,7 +51,8 @@ public class LibraryService extends BasicService implements ILibraryService
 	 */ 
 	public LibraryService(Object[] urls, Object providerid)
 	{
-		super(providerid, ILibraryService.class, null);
+		// Hack!!! Should not reference gui???
+		super(providerid, ILibraryService.class, SUtil.createHashMap(new Object[]{"serviceviewer.viewerclass"}, new Object[]{"jadex.tools.serviceviewer.libservice.LibServiceBrowser"}));
 		
 		basecl = Thread.currentThread().getContextClassLoader();
 		libcl = basecl;

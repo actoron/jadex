@@ -13,6 +13,7 @@ import jadex.bridge.IComponentManagementService;
 import jadex.bridge.ISearchConstraints;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
+import jadex.commons.SUtil;
 import jadex.commons.collection.IndexMap;
 import jadex.commons.concurrent.IResultListener;
 import jadex.service.BasicService;
@@ -53,7 +54,8 @@ public class DirectoryFacilitatorService extends BasicService implements IDF
 	 */
 	public DirectoryFacilitatorService(IServiceContainer provider)
 	{
-		super(provider.getId(), IDF.class, null);
+		// Hack!!! Should not reference gui???
+		super(provider.getId(), IDF.class, SUtil.createHashMap(new Object[]{"serviceviewer.viewerclass"}, new Object[]{"jadex.tools.serviceviewer.dfservice.DFBrowserPanel"}));
 
 		this.provider = provider;
 		this.components	= new IndexMap();

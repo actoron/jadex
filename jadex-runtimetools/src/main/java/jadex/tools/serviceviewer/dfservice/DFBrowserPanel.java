@@ -1,14 +1,19 @@
-package jadex.tools.dfbrowser;
+package jadex.tools.serviceviewer.dfservice;
 
 import jadex.base.fipa.IDF;
 import jadex.base.fipa.IDFComponentDescription;
 import jadex.base.fipa.IDFServiceDescription;
+import jadex.commons.Properties;
 import jadex.commons.concurrent.SwingDefaultResultListener;
+import jadex.service.IService;
 import jadex.tools.common.GuiProperties;
+import jadex.tools.common.plugin.IControlCenter;
+import jadex.tools.serviceviewer.IServiceViewerPanel;
 
 import java.awt.BorderLayout;
 import java.util.Arrays;
 
+import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
@@ -20,7 +25,7 @@ import javax.swing.event.ListSelectionListener;
 /**
  *  DFBrowserPlugin
  */
-public class DFBrowserPanel	extends JPanel
+public class DFBrowserPanel	extends JPanel implements IServiceViewerPanel
 {
 	//-------- attributes --------
 	
@@ -48,12 +53,24 @@ public class DFBrowserPanel	extends JPanel
 	//-------- constructors --------
 	
 	/**
-	 *  Create main panel.
-	 *  @return The main panel.
+	 *  Create a service panel
 	 */
-	public DFBrowserPanel(IDF df)
+	public DFBrowserPanel()
 	{
-		this.df	= df;
+		// Public noarg constructor required.
+	}
+	
+	//-------- IServiceViewerPanel interface --------
+	
+	/**
+	 *  Called once to initialize the panel.
+	 *  Called on the swing thread.
+	 *  @param jcc	The jcc.
+	 * 	@param service	The service.
+	 */
+	public void init(IControlCenter jcc, IService service)
+	{
+		this.df	= (IDF)service;
 		service_panel = new ServiceDescriptionPanel();
 		service_table = new DFServiceTable();
 		JScrollPane stscroll = new JScrollPane(service_table);
@@ -99,6 +116,40 @@ public class DFBrowserPanel	extends JPanel
 		
 		refresh();
 	}
+	
+	/**
+	 *  Informs the plugin that it should stop all its computation
+	 */
+	public void shutdown()
+	{
+	}
+
+	
+	/**
+	 *  Get the component.
+	 */
+	public JComponent getComponent()
+	{
+		return this;
+	}
+	
+	/**
+	 *  Advices the the panel to restore its properties from the argument
+	 */
+	public void setProperties(Properties ps)
+	{
+	}
+
+	/**
+	 *  Advices the panel provide its setting as properties (if any).
+	 *  This is done on project close or save.
+	 */
+	public Properties	getProperties()
+	{
+		return null;
+	}
+
+	//-------- methods --------
 	
 	/**
 	 *  Refresh the view.

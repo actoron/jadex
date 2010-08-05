@@ -175,7 +175,7 @@
 					<fact>
 						new AgentControlCenter($scope.getServiceProvider(),
 						"jadex.tools.starter.StarterPlugin"
-						+" jadex.tools.dfbrowser.DFBrowserPlugin"
+					//	+" jadex.tools.dfbrowser.DFBrowserPlugin"
 						+" jadex.tools.convcenter.ConversationPlugin"
 						+" jadex.tools.comanalyzer.ComanalyzerPlugin"
 						+" jadex.tools.testcenter.TestCenterPlugin"
@@ -184,7 +184,7 @@
 					//	+" jadex.tools.introspector.IntrospectorPlugin"
 						+" jadex.tools.debugger.DebuggerPlugin"
 						+" jadex.tools.ruleprofiler.RuleProfilerPlugin"
-						+" jadex.tools.libtool.LibraryPlugin"
+					//	+" jadex.tools.libtool.LibraryPlugin"
 						+" jadex.tools.serviceviewer.ServiceViewerPlugin",
 						$scope.getExternalAccess())
 					</fact>

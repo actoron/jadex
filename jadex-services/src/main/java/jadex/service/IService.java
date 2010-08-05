@@ -11,4 +11,10 @@ public interface IService
 	 *  @return The service identifier.
 	 */
 	public IServiceIdentifier getServiceIdentifier();
+	
+	/**
+	 *  Get a service property.
+	 *  @return The service property (if any).
+	 */
+	public Object getProperty(String name);
 }

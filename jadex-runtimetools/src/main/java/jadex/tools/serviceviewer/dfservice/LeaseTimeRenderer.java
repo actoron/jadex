@@ -1,12 +1,16 @@
-package jadex.tools.dfbrowser;
+package jadex.tools.serviceviewer.dfservice;
 
 import java.awt.Component;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
 
-class StringArrayRenderer extends DefaultTableCellRenderer
+class LeaseTimeRenderer extends DefaultTableCellRenderer
 {
+	final static DateFormat date_format = new SimpleDateFormat("HH:mm:ss, dd-MM-yyyy");
 
 	/**
 	 * @param table
@@ -21,36 +25,16 @@ class StringArrayRenderer extends DefaultTableCellRenderer
 	public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column)
 	{
 		super.getTableCellRendererComponent(table, null, isSelected, hasFocus, row, column);
-		String[] sa = (String[])value;
-		String content;
-		String tooltip;
-		if(sa == null || sa.length == 0)
+		Date date = (Date)value;
+		String content = "n/a";
+		try
 		{
-			content = "";
-			setToolTipText(null);
+			content = date_format.format(date);
 		}
-		else
-		{
-			content = sa[0];
-			tooltip = sa[0];
-			for(int i = 1; i < sa.length; i++)
-			{
-				content += ", " + sa[i];
-				tooltip += "<br>" + sa[i];
-			}
-			setToolTipText("<html>" + tooltip + "</html>");
-		}
+		catch(Exception e)
+		{/*NOP*/}
 		setText(content);
+		setToolTipText(content);
 		return this;
 	}
 }
-
-/* 
- * $Log$
- * Revision 1.2  2006/03/29 11:55:08  braubach
- * no message
- *
- * Revision 1.1  2006/03/13 18:19:26  walczak
- * Alpha version of df browser (Mock Up)
- *
- */

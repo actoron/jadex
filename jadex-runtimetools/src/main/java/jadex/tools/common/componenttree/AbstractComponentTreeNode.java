@@ -86,7 +86,7 @@ public abstract class AbstractComponentTreeNode	implements IComponentTreeNode
 			searching	= true;
 			searchChildren();
 		}
-		return children==null ? 0 : children.indexOf(child);
+		return children==null ? -1 : children.indexOf(child);
 	}
 	
 	/**
@@ -244,8 +244,11 @@ public abstract class AbstractComponentTreeNode	implements IComponentTreeNode
 	public void removeChild(IComponentTreeNode node)
 	{
 		int index	= getIndexOfChild(node);
-		children.remove(node);
-		model.deregisterNode(node);
-		model.fireNodeRemoved(this, node, index);
+		if(index!=-1)
+		{
+			children.remove(node);
+			model.deregisterNode(node);
+			model.fireNodeRemoved(this, node, index);
+		}
 	}
 }

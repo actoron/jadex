@@ -1,13 +1,11 @@
-package jadex.tools.dfbrowser;
-
-import jadex.base.fipa.IProperty;
+package jadex.tools.serviceviewer.dfservice;
 
 import java.awt.Component;
 
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
 
-class PropertyArrayRenderer extends DefaultTableCellRenderer
+class StringArrayRenderer extends DefaultTableCellRenderer
 {
 
 	/**
@@ -23,7 +21,7 @@ class PropertyArrayRenderer extends DefaultTableCellRenderer
 	public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column)
 	{
 		super.getTableCellRendererComponent(table, null, isSelected, hasFocus, row, column);
-		IProperty[] sa = (IProperty[])value;
+		String[] sa = (String[])value;
 		String content;
 		String tooltip;
 		if(sa == null || sa.length == 0)
@@ -33,12 +31,12 @@ class PropertyArrayRenderer extends DefaultTableCellRenderer
 		}
 		else
 		{
-			content = sa[0].getName() + "=" + sa[0].getValue();
-			tooltip = content;
+			content = sa[0];
+			tooltip = sa[0];
 			for(int i = 1; i < sa.length; i++)
 			{
-				content += ", " + sa[i].getName() + "=" + sa[i].getValue();
-				tooltip += "<br>" + sa[i].getName() + "=" + sa[i].getValue();
+				content += ", " + sa[i];
+				tooltip += "<br>" + sa[i];
 			}
 			setToolTipText("<html>" + tooltip + "</html>");
 		}
@@ -46,3 +44,13 @@ class PropertyArrayRenderer extends DefaultTableCellRenderer
 		return this;
 	}
 }
+
+/* 
+ * $Log$
+ * Revision 1.2  2006/03/29 11:55:08  braubach
+ * no message
+ *
+ * Revision 1.1  2006/03/13 18:19:26  walczak
+ * Alpha version of df browser (Mock Up)
+ *
+ */

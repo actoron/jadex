@@ -73,6 +73,16 @@ public class BasicService implements IService
 		return sid;
 	}
 
+	
+	/**
+	 *  Get a service property.
+	 *  @return The service property (if any).
+	 */
+	public Object getProperty(String name)
+	{
+		return properties!=null ? properties.get(name) : null; 
+	}
+
 	/**
 	 *  Start the service.
 	 *  @return A future that is done when the service has completed starting.  
