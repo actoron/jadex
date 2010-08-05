@@ -291,17 +291,12 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 												// NOTE2: subcomponents must be created one by one as they
 												// might depend on each other (e.g. bdi factory must be there for jcc).
 												
-												final IComponentManagementService	ces	= (IComponentManagementService)result;
-												createComponent(components, cl, ces, 0);
+												final IComponentManagementService ces = (IComponentManagementService)result;
+												createComponent(components, cl, ces, 0, inited);
 											}
 										}));
 									}
 								}));
-								
-								// Init is now finished. Notify cms and stop execution.
-//								System.out.println("Application init finished: "+ApplicationInterpreter.this);
-								stop = true;
-								inited.setResult(new Object[]{ApplicationInterpreter.this, adapter});
 							}
 							
 							public void exceptionOccurred(Object source, Exception exception)
@@ -1162,7 +1157,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 	 *  after init is finished (otherwise there is a cyclic init dependency between parent and subcomps). 
 	 */
 	protected void createComponent(final List components, final ClassLoader cl, 
-		final IComponentManagementService ces, final int i) //,final Future inited)
+		final IComponentManagementService ces, final int i, final Future inited)
 	{
 		if(i<components.size())
 		{
@@ -1174,7 +1169,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 				public void finalResultAvailable(Object source, Object result)
 				{
 //					System.out.println("Create finished: "+component.getName()+" "+component.getTypeName()+" "+component.getConfiguration()+" "+Thread.currentThread());
-					createComponent(components, cl, ces, i+1);//, inited);
+					createComponent(components, cl, ces, i+1, inited);
 				}
 				
 				public void exceptionOccurred(Object source, Exception exception)
@@ -1190,13 +1185,13 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 				ret.addResultListener(crl);
 			}
 		}
-//		else
-//		{
-//			// Init is now finished. Notify cms and stop execution.
+		else
+		{
+			// Init is now finished. Notify cms and stop execution.
 //			System.out.println("Application init finished: "+ApplicationInterpreter.this);
-//			stop = true;
-//			inited.setResult(new Object[]{ApplicationInterpreter.this, adapter});
-//		}
+			stop = true;
+			inited.setResult(new Object[]{ApplicationInterpreter.this, adapter});
+		}
 	}
 
 	/**

@@ -95,8 +95,13 @@ public class ComponentManagementService extends BasicService implements ICompone
 	/** The root component. */
 	protected IComponentAdapter root;
 	
-	/** The map of initing futures of components (created but not yet visible). */
-	protected Map initfutures;
+//	/** The map of initing futures of components (created but not yet visible). */
+//	protected Map initfutures;
+	
+	/** The init adapters and descriptions, i.e. adapters and desc of initing components, 
+	    are only visible for child components in their init. */
+	protected Map initadapters;
+	protected Map initdescs;
 	
     //-------- constructors --------
 
@@ -126,7 +131,9 @@ public class ComponentManagementService extends BasicService implements ICompone
 		this.logger = Logger.getLogger(provider.getId()+".cms");
 		this.listeners = SCollection.createMultiCollection();
 		this.killresultlisteners = Collections.synchronizedMap(SCollection.createHashMap());
-		this.initfutures = Collections.synchronizedMap(SCollection.createHashMap());
+//		this.initfutures = Collections.synchronizedMap(SCollection.createHashMap());
+		this.initadapters = Collections.synchronizedMap(SCollection.createHashMap());
+		this.initdescs = Collections.synchronizedMap(SCollection.createHashMap());
 		
 		this.root = root;
     }
@@ -170,14 +177,17 @@ public class ComponentManagementService extends BasicService implements ICompone
 						
 						final IComponentFactory factory = (IComponentFactory)result;
 						if(factory==null)
-							throw new RuntimeException("No factory found for component: "+model);
+						{
+//							throw new RuntimeException("No factory found for component: "+model);
+							inited.setException(new RuntimeException("No factory found for component: "+model));
+							return;
+						}
 						final ILoadableComponentModel lmodel = factory.loadModel(model, cinfo.getImports(), ls.getClassLoader());
 						final String type = factory.getComponentType(model, cinfo.getImports(), ls.getClassLoader());
 		
 						// Create id and adapter.
 						
 						final ComponentIdentifier cid;
-						
 						synchronized(adapters)
 						{
 							synchronized(descs)
@@ -209,15 +219,18 @@ public class ComponentManagementService extends BasicService implements ICompone
 							}		
 						}
 						
-						initfutures.put(cid, inited);
+//						initfutures.put(cid, inited);
 		
-						getParentAdapter(cinfo).addResultListener(new IResultListener()
-						{
-							public void resultAvailable(Object source, Object result)
-							{
-								final StandaloneComponentAdapter pad = (StandaloneComponentAdapter)result;
+//						getParentAdapter(cinfo).addResultListener(new IResultListener()
+//						{
+//							public void resultAvailable(Object source, Object result)
+//							{
+//								final StandaloneComponentAdapter pad = (StandaloneComponentAdapter)result;
+						
+								final StandaloneComponentAdapter pad = getParentAdapter(cinfo);
 								IExternalAccess parent = pad.getComponentInstance().getExternalAccess();
-								final CMSComponentDescription ad = new CMSComponentDescription(cid, type, getParentIdentifier(cinfo), cinfo.isMaster(), cinfo.isDaemon());
+								final CMSComponentDescription ad = new CMSComponentDescription(cid, type, 
+									getParentIdentifier(cinfo), cinfo.isMaster(), cinfo.isDaemon());
 								
 								Future future = new Future();
 								future.addResultListener(new IResultListener()
@@ -238,7 +251,7 @@ public class ComponentManagementService extends BasicService implements ICompone
 												if(cinfo.isDaemon())
 													daemons++;
 												
-												CMSComponentDescription padesc = (CMSComponentDescription)descs.get(getParentIdentifier(cinfo));
+												CMSComponentDescription padesc = getParentDescription(cinfo);
 												// Suspend when set to suspend or when parent is also suspended or when specified in model.
 												Object	debugging 	= lmodel.getProperties().get("debugging");
 												if(cinfo.isSuspend() || (padesc!=null && (IComponentDescription.STATE_SUSPENDED.equals(padesc.getState()) || IComponentDescription.STATE_WAITING.equals(padesc.getState())))
@@ -252,11 +265,15 @@ public class ComponentManagementService extends BasicService implements ICompone
 												}
 												
 												// Init successfully finished. Add description and adapter.
-												initfutures.remove(cid);
+//												initfutures.remove(cid);
 												adapter = (StandaloneComponentAdapter)((Object[])result)[1];
 												descs.put(cid, ad);
 												adapters.put(cid, adapter);
+												initdescs.remove(cid);
+												initadapters.remove(cid);
 												
+												if(padesc==null)
+													System.out.println("here");
 												padesc.addChild(cid);
 												pad.getComponentInstance().componentCreated(ad, lmodel);
 											}
@@ -319,10 +336,23 @@ public class ComponentManagementService extends BasicService implements ICompone
 								});
 								
 								// Create component and wakeup for init.
-								Object[] comp = factory.createComponentInstance(ad, caf, lmodel, cinfo.getConfiguration(), cinfo.getArguments(), parent, future);
+								Object[] comp = factory.createComponentInstance(ad, caf, lmodel, 
+									cinfo.getConfiguration(), cinfo.getArguments(), parent, future);
+								
+								// Store (invalid) adapter for children
+								synchronized(adapters)
+								{
+									synchronized(descs)
+									{
+										initdescs.put(cid, ad);
+										initadapters.put(cid, comp[1]);
+									}
+								}
+								
+								// Start the init procedure by waking up the adapter.
 								try
 								{
-									((StandaloneComponentAdapter)comp[1]).wakeup();
+									((IComponentAdapter)comp[1]).wakeup();
 								}
 								catch(Exception e)
 								{
@@ -330,12 +360,12 @@ public class ComponentManagementService extends BasicService implements ICompone
 								}
 							}
 							
-							public void exceptionOccurred(Object source, Exception exception)
-							{
-								inited.setException(exception);
-							}
-						});
-					}
+//							public void exceptionOccurred(Object source, Exception exception)
+//							{
+//								inited.setException(exception);
+//							}
+//						});
+//					}
 					
 					public void exceptionOccurred(Object source, Exception exception)
 					{
@@ -351,8 +381,50 @@ public class ComponentManagementService extends BasicService implements ICompone
 	public static final ComponentAdapterFactory caf = new ComponentAdapterFactory();
 	
 	/**
-	 * 
+	 *  Get the adapter of the parent component.
 	 */
+	protected StandaloneComponentAdapter getParentAdapter(CreationInfo cinfo)
+	{
+		final IComponentIdentifier paid = getParentIdentifier(cinfo);
+		StandaloneComponentAdapter adapter;
+		synchronized(adapters)
+		{
+			synchronized(descs)
+			{
+				adapter = (StandaloneComponentAdapter)adapters.get(paid);
+				if(adapter==null)
+				{
+					adapter = (StandaloneComponentAdapter)initadapters.get(paid);
+				}
+			}
+		}
+		return adapter;
+	}
+	
+	/**
+	 *  Get the desc of the parent component.
+	 */
+	protected CMSComponentDescription getParentDescription(CreationInfo cinfo)
+	{
+		final IComponentIdentifier paid = getParentIdentifier(cinfo);
+		CMSComponentDescription desc;
+		synchronized(adapters)
+		{
+			synchronized(descs)
+			{
+				desc = (CMSComponentDescription)descs.get(paid);
+				if(desc==null)
+				{
+					desc = (CMSComponentDescription)initdescs.get(paid);
+				}
+			}
+		}
+		return desc;
+	}
+	
+	/**
+	 *  Get the adapter of the parent component.
+	 * /
 	protected Future getParentAdapter(CreationInfo cinfo)
 	{
 		final Future ret = new Future();
@@ -402,7 +474,7 @@ public class ComponentManagementService extends BasicService implements ICompone
 		}
 		
 		return ret;
-	}
+	}*/
 	
 	/**
 	 *  Destroy (forcefully terminate) an component on the platform.
