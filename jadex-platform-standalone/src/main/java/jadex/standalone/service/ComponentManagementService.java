@@ -199,7 +199,7 @@ public class ComponentManagementService extends BasicService implements ICompone
 								else
 								{
 									cid = new ComponentIdentifier(name+"@"+((IComponentIdentifier)provider.getId()).getPlatformName()); // Hack?!
-									if(adapters.containsKey(cid))
+									if(adapters.containsKey(cid) || initadapters.containsKey(cid))
 									{
 										inited.setException(new RuntimeException("Component name already exists on platform: "+cid));
 										return;

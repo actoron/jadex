@@ -284,12 +284,16 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 										{
 											public void resultAvailable(Object source, Object result)
 											{
-												// NOTE1: parent cannot wait for subcomponents to be all created
-												// before setting itself inited=true, because subcomponents need
-												// the parent external access. 
+												// NOTE: in current implementation application waits for subcomponents
+												// to be finished and cms implements a hack to get the external
+												// access of an uninited parent.
 												
-												// NOTE2: subcomponents must be created one by one as they
-												// might depend on each other (e.g. bdi factory must be there for jcc).
+												// (NOTE1: parent cannot wait for subcomponents to be all created
+												// before setting itself inited=true, because subcomponents need
+												// the parent external access.)
+												
+												// (NOTE2: subcomponents must be created one by one as they
+												// might depend on each other (e.g. bdi factory must be there for jcc)).
 												
 												final IComponentManagementService ces = (IComponentManagementService)result;
 												createComponent(components, cl, ces, 0, inited);

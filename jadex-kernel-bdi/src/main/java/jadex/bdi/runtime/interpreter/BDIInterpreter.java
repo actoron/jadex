@@ -214,7 +214,7 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 		this.externalthreads	= Collections.synchronizedSet(SCollection.createLinkedHashSet());
 		this.inited = inited;
 		
-		System.out.println("arguments: "+adapter.getComponentIdentifier().getName()+" "+arguments);
+//		System.out.println("arguments: "+adapter.getComponentIdentifier().getName()+" "+arguments);
 		
 		state.setSynchronizator(new ISynchronizator()
 		{
