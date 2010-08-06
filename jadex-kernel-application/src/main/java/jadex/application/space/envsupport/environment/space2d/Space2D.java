@@ -11,10 +11,9 @@ import jadex.commons.IFilter;
 
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 /**
  *  General 2D space.
@@ -91,31 +90,20 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 	}
 
 	/** 
-	 * Creates an object in this space.
-	 * @param type the object's type
-	 * @param properties initial properties (may be null)
-	 * @param tasks initial task list (may be null)
-	 * @return the object's ID
+	 * Init an object in this space.
 	 */
-	public ISpaceObject createSpaceObject(String typename, Map properties, List tasks)
+	public void initSpaceObject(ISpaceObject ret)
 	{
-		ISpaceObject ret = super.createSpaceObject(typename, properties, tasks);
+		super.initSpaceObject(ret);
 		
 		IVector2 pos = ret.getPropertyNames().contains(PROPERTY_POSITION)? 
 			(IVector2)ret.getProperty(PROPERTY_POSITION): getRandomPosition(Vector2Int.ZERO);
 
 		if(pos!=null)
 		{
-//			System.out.println("setting pos to: "+ret+" "+pos);
 			ret.setProperty(PROPERTY_POSITION, null);
 			setPosition(ret.getId(), pos);
 		}
-//		else
-//		{
-//			System.out.println("setting no pos to: "+ret);
-//		}
-		
-		return ret;
 	}
 
 	/**

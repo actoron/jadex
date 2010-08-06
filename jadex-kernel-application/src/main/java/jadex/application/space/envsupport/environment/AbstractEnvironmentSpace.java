@@ -131,6 +131,9 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 	/** The data consumers. */
 	protected Map dataconsumers;
 
+	/** The zombie objects. */
+	protected Map	zombieobjects;
+
 	//-------- constructors --------
 	
 	/**
@@ -152,6 +155,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 		this.objecttypes = new HashMap();
 		this.objecttypesMeta = new HashMap();
 		this.spaceobjects = new HashMap();
+		this.zombieobjects = new HashMap();
 		this.spaceobjectsbytype = new HashMap();
 		this.spaceobjectsbyowner = new HashMap();
 		
@@ -878,10 +882,9 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 	 * @param type the object's type
 	 * @param properties initial properties (may be null)
 	 * @param tasks initial task list (may be null)
-	 * @param listeners initial listeners (may be null)
 	 * @return the object's ID
 	 */
-	public ISpaceObject createSpaceObject(final String typename, Map properties, List tasks)
+	public final ISpaceObject createSpaceObject(final String typename, Map properties, List tasks)
 	{
 		if(!objecttypes.containsKey(typename))
 			throw new RuntimeException("Unknown space object type: "+typename);
@@ -896,7 +899,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 			{
 				id = objectidcounter.getNext();
 			}
-			while(spaceobjects.containsKey(id));
+			while(spaceobjects.containsKey(id) || zombieobjects.containsKey(id));
 			
 			// Prepare properties (runtime props override type props).
 			MObjectType mObjectType = (MObjectType)objecttypes.get(typename);
@@ -907,17 +910,8 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 			
 			spaceobjects.put(id, ret);
 
-			// Store in type objects.
-			List typeobjects = (List)spaceobjectsbytype.get(ret.getType());
-			if(typeobjects == null)
-			{
-				typeobjects = new ArrayList();
-				spaceobjectsbytype.put(ret.getType(), typeobjects);
-			}
-			typeobjects.add(ret);
-			
 			// Store in owner objects.
-			if(properties!=null && properties.get(ISpaceObject.PROPERTY_OWNER)!=null)
+			if(properties!=null && properties.containsKey(ISpaceObject.PROPERTY_OWNER))
 			{
 				IComponentIdentifier	owner	= (IComponentIdentifier)properties.get(ISpaceObject.PROPERTY_OWNER);
 				List ownerobjects = (List)spaceobjectsbyowner.get(owner);
@@ -928,11 +922,95 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 				}
 				ownerobjects.add(ret);
 			}
+		}
+		
+		initSpaceObject(ret);
+		
+		return ret;
+	}
+	
+	/** 
+	 * Creates a zombie object in this space.
+	 * Zombies are not (yet) visible in the space and must be inited separately.
+	 * @param type the object's type
+	 * @param properties initial properties (may be null)
+	 * @param tasks initial task list (may be null)
+	 * @return the object's ID
+	 */
+	public ISpaceObject createSpaceObjectZombie(final String typename, Map properties, List tasks)
+	{
+		if(!objecttypes.containsKey(typename))
+			throw new RuntimeException("Unknown space object type: "+typename);
 			
-			// Create view(s) for the object if any.
-			if(dataviewmappings!=null && dataviewmappings.getCollection(typename)!=null)
+		ISpaceObject ret;
+		
+		synchronized(monitor)
+		{
+			// Generate id.
+			Object id;
+			do
 			{
-				for(Iterator it=dataviewmappings.getCollection(typename).iterator(); it.hasNext(); )
+				id = objectidcounter.getNext();
+			}
+			while(spaceobjects.containsKey(id) || zombieobjects.containsKey(id));
+			
+			// Prepare properties (runtime props override type props).
+			MObjectType mObjectType = (MObjectType)objecttypes.get(typename);
+			properties = mergeProperties(mObjectType, properties);
+			
+			// Create the object.
+			ret = new SpaceObject(id, mObjectType, properties, tasks, monitor, this);
+			
+			zombieobjects.put(id, ret);
+
+			// Store in owner objects.
+			if(properties!=null && properties.containsKey(ISpaceObject.PROPERTY_OWNER))
+			{
+				IComponentIdentifier	owner	= (IComponentIdentifier)properties.get(ISpaceObject.PROPERTY_OWNER);
+				List ownerobjects = (List)spaceobjectsbyowner.get(owner);
+				if(ownerobjects == null)
+				{
+					ownerobjects = new ArrayList();
+					spaceobjectsbyowner.put(owner, ownerobjects);
+				}
+				ownerobjects.add(ret);
+			}
+		}
+		
+		return ret;
+	}
+
+	/** 
+	 * Creates an object in this space.
+	 * @param type the object's type
+	 * @param properties initial properties (may be null)
+	 * @param tasks initial task list (may be null)
+	 * @param listeners initial listeners (may be null)
+	 * @return the object's ID
+	 */
+	public void	initSpaceObject(final ISpaceObject ret)
+	{
+		synchronized(monitor)
+		{
+			if(zombieobjects.containsKey(ret.getId()))
+			{
+				zombieobjects.remove(ret.getId());
+				spaceobjects.put(ret.getId(), ret);
+			}
+			
+			// Store in type objects.
+			List typeobjects = (List)spaceobjectsbytype.get(ret.getType());
+			if(typeobjects == null)
+			{
+				typeobjects = new ArrayList();
+				spaceobjectsbytype.put(ret.getType(), typeobjects);
+			}
+			typeobjects.add(ret);
+						
+			// Create view(s) for the object if any.
+			if(dataviewmappings!=null && dataviewmappings.getCollection(ret.getType())!=null)
+			{
+				for(Iterator it=dataviewmappings.getCollection(ret.getType()).iterator(); it.hasNext(); )
 				{
 					try
 					{
@@ -943,7 +1021,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 						viewargs.put("object", ret);
 						
 						IDataView	view	= (IDataView)((IObjectCreator)MEnvSpaceInstance.getProperty(sourceview, "creator")).createObject(viewargs);
-						addDataView((String)MEnvSpaceInstance.getProperty(sourceview, "name")+"_"+id, view);
+						addDataView((String)MEnvSpaceInstance.getProperty(sourceview, "name")+"_"+ret.getId(), view);
 					}
 					catch(Exception e)
 					{
@@ -958,7 +1036,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 			for(Iterator it=avatarmappings.keySet().iterator(); it.hasNext(); )
 			{
 				String componenttype = (String)it.next();
-				AvatarMapping mapping = getAvatarMapping(componenttype, typename);
+				AvatarMapping mapping = getAvatarMapping(componenttype, ret.getType());
 				if(mapping!=null && mapping.isCreateComponent())
 				{
 //					final Object	fid	= id;
@@ -973,13 +1051,12 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 					}
 					
 					// todo: what about arguments etc.?
-					final Object fid = id;
 					final IResultListener lis = new IResultListener()
 					{
 						public void resultAvailable(Object source, Object result)
 						{
 							IComponentIdentifier component = (IComponentIdentifier)result;
-							setOwner(fid, component);
+							setOwner(ret.getId(), component);
 						}
 						public void exceptionOccurred(Object source, Exception exception)
 						{
@@ -991,8 +1068,8 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 						public void resultAvailable(Object source, Object result)
 						{
 							IComponentManagementService cms = (IComponentManagementService)result;
-							IComponentIdentifier cid = cms.generateComponentIdentifier(typename);
-							setOwner(fid, cid);
+							IComponentIdentifier cid = cms.generateComponentIdentifier(ret.getType());
+							setOwner(ret.getId(), cid);
 							IFuture fut = cms.createComponent(cid.getLocalName(), getContext().getComponentFilename(compotype),
 								new CreationInfo(null, null, getContext().getComponentIdentifier(), false, false, false, getContext().getAllImports()), null);
 							fut.addResultListener(lis);
@@ -1011,8 +1088,6 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 				lis.dispatchEnvironmentEvent(event);
 			}
 		}
-		
-		return ret;
 	}
 
 	/**
@@ -1460,7 +1535,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 		// Create avatar on the fly if componentAdded not yet called.
 		if(ret==null)
 		{
-			ret = createAvatar(owner, fullname);
+			ret = createAvatar(owner, fullname, true);
 		}
 		
 		return ret;
@@ -1469,7 +1544,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 	/**
 	 *  Create an avatar.
 	 */
-	protected ISpaceObject createAvatar(IComponentIdentifier owner, String fullname)
+	protected ISpaceObject createAvatar(IComponentIdentifier owner, String fullname, boolean zombie)
 	{
 		ISpaceObject	ret	= null;
 		// Possibly add or create avatar(s) if any.
@@ -1481,7 +1556,8 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 			if(props==null)
 				props	= new HashMap();
 			props.put(ISpaceObject.PROPERTY_OWNER, owner);
-			ret	= createSpaceObject(objecttype, props, null);
+			ret	= zombie ? createSpaceObjectZombie(objecttype, props, null)
+				: createSpaceObject(objecttype, props, null);
 		}
 		else
 		{
@@ -1510,7 +1586,8 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 					{							
 						Map	props	= new HashMap();
 						props.put(ISpaceObject.PROPERTY_OWNER, owner);
-						ret	= createSpaceObject(mapping.getObjectType(), props, null);
+						ret	= zombie ? createSpaceObjectZombie(mapping.getObjectType(), props, null)
+							: createSpaceObject(mapping.getObjectType(), props, null);
 					}
 				}
 			}
@@ -1722,7 +1799,19 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 			List ownedobjs = (List)spaceobjectsbyowner.get(aid);
 			if(ownedobjs==null)
 			{
-				createAvatar(aid, null);
+				createAvatar(aid, null, false);
+			}
+			else
+			{
+				// Init zombie avatars.
+				for(Iterator it=ownedobjs.iterator(); it.hasNext(); )
+				{
+					ISpaceObject	obj	= (ISpaceObject)it.next();
+					if(!spaceobjects.containsKey(obj.getId()))
+					{
+						initSpaceObject(obj);
+					}
+				}
 			}
 			
 			if(perceptgenerators!=null)

@@ -10,11 +10,8 @@ import jadex.commons.collection.MultiCollection;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -220,30 +217,21 @@ public class Grid2D extends Space2D
 	}
 		
 	/** 
-	 * Creates an object in this space.
-	 * @param type the object's type
-	 * @param properties initial properties (may be null)
-	 * @param tasks initial task list (may be null)
-	 * @return the object's ID
+	 * Init an object in this space.
 	 */
-	public ISpaceObject createSpaceObject(String typename, Map properties, List tasks)
+	public void initSpaceObject(ISpaceObject ret)
 	{
 		synchronized(monitor)
 		{
 			// TODO: maybe only assign position to discretePosition vector?
-			if(properties==null)
-			{
-				properties	= new HashMap();
-			}
-			if(!properties.containsKey(Space2D.PROPERTY_POSITION))
+			if(!ret.getPropertyNames().contains(PROPERTY_POSITION))
 			{
 				IVector2 pos = getEmptyGridPosition();
 				if(pos!=null)
-					properties.put(Space2D.PROPERTY_POSITION, pos);
+					ret.setProperty(Space2D.PROPERTY_POSITION, pos);
 			}
 			
-			ISpaceObject obj = super.createSpaceObject(typename, properties, tasks);
-			return obj;
+			super.initSpaceObject(ret);
 		}
 	}
 	
