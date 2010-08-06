@@ -106,6 +106,8 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 					{
 						super.run();
 						
+						ICommand[]	commands	= null;
+						
 						synchronized(AsyncExecutionService.this)
 						{
 							synchronized(this)
@@ -124,11 +126,7 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 									if(AsyncExecutionService.this.running && idlecommands!=null && executors.isEmpty())
 									{
 //										System.out.println("idle");
-										Iterator it	= idlecommands.iterator();
-										while(it.hasNext())
-										{
-											((ICommand)it.next()).execute(null);
-										}
+										commands	= (ICommand[])idlecommands.toArray(new ICommand[idlecommands.size()]);
 									}
 //									else if(AsyncExecutionService.this.running && idlecommands!=null)
 //									{
@@ -136,6 +134,11 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 //									}
 								}
 							}
+						}
+						
+						for(int i=0; commands!=null && i<commands.length; i++)
+						{
+							commands[i].execute(null);
 						}
 					}					
 				};

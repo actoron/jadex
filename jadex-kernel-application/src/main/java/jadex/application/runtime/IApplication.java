@@ -71,4 +71,12 @@ public interface IApplication
 	 */
 	// todo: remove? replace with getModel()?
 	public MApplicationType	getApplicationType();
+	
+	/**
+	 *  Schedule a step of the application component.
+	 *  May safely be called from external threads.
+	 *  @param step	Code to be executed as a step.
+	 */
+	// todo: belogs to interface?
+	public void	scheduleStep(final Runnable step);
 }

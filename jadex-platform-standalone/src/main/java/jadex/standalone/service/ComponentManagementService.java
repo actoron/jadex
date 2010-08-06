@@ -1010,18 +1010,6 @@ public class ComponentManagementService extends BasicService implements ICompone
 		else
 		{
 			ret.setResult(adapter.getComponentInstance().getExternalAccess());
-//			adapter.getComponentInstance().getExternalAccess().addResultListener(new IResultListener()
-//			{
-//				public void resultAvailable(Object source, Object result)
-//				{
-//					ret.setResult(result);
-//				}
-//				
-//				public void exceptionOccurred(Object source, Exception exception)
-//				{
-//					ret.setException(exception);
-//				}
-//			});
 		}
 		
 		return ret;

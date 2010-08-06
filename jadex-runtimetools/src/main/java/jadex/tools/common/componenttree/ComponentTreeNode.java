@@ -171,6 +171,11 @@ public class ComponentTreeNode	extends AbstractComponentTreeNode
 					}
 				});
 			}
+
+			public void customExceptionOccurred(Object source, Exception exception)
+			{
+				// May happen, when components already removed.
+			}
 		});
 
 	}
