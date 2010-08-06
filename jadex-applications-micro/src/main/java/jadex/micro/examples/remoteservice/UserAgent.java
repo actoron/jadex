@@ -52,14 +52,14 @@ public class UserAgent extends MicroAgent
 				
 				// search on local platform and find service via ProxyAgent to other platform
 				SServiceProvider.getService(getServiceProvider(), IAddService.class, false)
-					.addResultListener(new DefaultResultListener()
+					.addResultListener(createResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object source, Object result)
 					{
 						IAddService service = (IAddService)result;
 						invokeAddService("IAddService searched via platform proxy.", service);
 					}
-				});
+				}));
 			}
 		}));
 	}
@@ -86,9 +86,9 @@ public class UserAgent extends MicroAgent
 			});
 			
 			// Execute blocking method call with normal result
-//			System.out.println("Calling blocking addB method.");
-//			int res= service.addB(1, 2);
-//			System.out.println("Invoked addB: "+res);
+			System.out.println("Calling blocking addB method.");
+			int res= service.addB(1, 2);
+			System.out.println("Invoked addB: "+res);
 		}
 	}
 }
