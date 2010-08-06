@@ -145,12 +145,14 @@ public class DeltaTimeExecutor extends SimplePropertyObject implements ISpaceExe
 						final Runnable	step	= this;
 						if(tick)
 						{
+							System.out.println("tick");
 							timer = clockservice.createTickTimer(new ITimedObject()
 							{
 								public void timeEventOccurred(long currenttime)
 								{
 									if(!terminated)
 									{
+										System.out.println("scheduled step");
 										space.getContext().scheduleStep(step);
 									}
 								}
@@ -163,6 +165,7 @@ public class DeltaTimeExecutor extends SimplePropertyObject implements ISpaceExe
 
 				if(!tick)
 				{
+					System.out.println("no tick");
 					clocklistener = new IChangeListener()
 					{
 						public void changeOccurred(ChangeEvent e)
@@ -170,6 +173,7 @@ public class DeltaTimeExecutor extends SimplePropertyObject implements ISpaceExe
 							if(!terminated && !scheduled)
 							{
 								scheduled	= true;
+								System.out.println("scheduled step");
 								space.getContext().scheduleStep(step);
 							}
 						}
