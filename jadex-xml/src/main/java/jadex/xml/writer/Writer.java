@@ -34,12 +34,11 @@ public class Writer
 	/** The object creator. */
 	protected IObjectWriterHandler handler;
 	
-	
 	/** The ignored attribute types. */
 	protected Set ignoredattrs;
 	
 	/** The id counter. */
-	protected int id;
+	protected ThreadLocal id;
 	
 	/** Control flag for generating ids. */
 	protected boolean genids;	
@@ -76,6 +75,7 @@ public class Writer
 		this.handler = handler;
 		this.genids = genids;
 		this.indent = indent;
+		this.id = new ThreadLocal();
 	}
 	
 	//-------- methods --------
@@ -96,6 +96,7 @@ public class Writer
 		writer.writeCharacters(lf);
 		
 		WriteContext wc = new WriteContext(writer, context, object, classloader);
+		id.set(new Integer(0));
 		writeObject(wc, object, null);
 //		Map writtenobs = new IdentityHashMap();
 //		List stack = new ArrayList();
@@ -187,12 +188,13 @@ public class Writer
 			
 			writeStartObject(writer, tag, stack.size());
 			
+			int curid = ((Number)id.get()).intValue();
 			StackElement topse = new StackElement(tag, object);
 			stack.add(topse);
-			wc.getWrittenObjects().put(object, ""+id);
+			wc.getWrittenObjects().put(object, ""+curid);
 			if(genids)
-				writer.writeAttribute(SXML.ID, ""+id);
-			id++;
+				writer.writeAttribute(SXML.ID, ""+curid);
+			id.set(new Integer(curid+1));
 			
 			// Attributes
 			
