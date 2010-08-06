@@ -7,6 +7,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.ILoadableComponentModel;
 import jadex.bridge.MessageType;
 import jadex.commons.Future;
+import jadex.commons.ICommand;
 import jadex.commons.IFuture;
 import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
@@ -71,7 +72,7 @@ public class ExternalAccess implements IMicroExternalAccess
 	 *  May safely be called from external threads.
 	 *  @param step	Code to be executed as a step of the agent.
 	 */
-	public void	scheduleStep(Runnable step)
+	public void	scheduleStep(ICommand step)
 	{
 		interpreter.scheduleStep(step);
 	}
@@ -181,4 +182,5 @@ public class ExternalAccess implements IMicroExternalAccess
 	{
 		return new ComponentResultListener(listener, adapter);
 	}
+	
 }

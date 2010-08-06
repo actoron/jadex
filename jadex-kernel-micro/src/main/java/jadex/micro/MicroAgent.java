@@ -8,6 +8,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IMessageService;
 import jadex.bridge.MessageType;
 import jadex.commons.Future;
+import jadex.commons.ICommand;
 import jadex.commons.IFuture;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
@@ -231,9 +232,9 @@ public abstract class MicroAgent implements IMicroAgent
 				{
 					public void timeEventOccurred(long currenttime)
 					{
-						interpreter.scheduleStep(new Runnable()
+						interpreter.scheduleStep(new ICommand()
 						{
-							public void run()
+							public void execute(Object agent)
 							{
 								timer = null;
 								run.run();
@@ -268,9 +269,9 @@ public abstract class MicroAgent implements IMicroAgent
 				{
 					public void timeEventOccurred(final long currenttime)
 					{
-						interpreter.scheduleStep(new Runnable()
+						interpreter.scheduleStep(new ICommand()
 						{
-							public void run()
+							public void execute(Object agent)
 							{
 								timer = null;
 								run.run();
@@ -423,7 +424,7 @@ public abstract class MicroAgent implements IMicroAgent
 	 *  May safely be called from external threads.
 	 *  @param step	Code to be executed as a step of the agent.
 	 */
-	public void	scheduleStep(Runnable step)
+	public void	scheduleStep(ICommand step)
 	{
 		interpreter.scheduleStep(step);
 	}

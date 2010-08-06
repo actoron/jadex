@@ -52,4 +52,13 @@ public interface IExternalAccess
 	 *  @return A result listener that is called on component thread.
 	 */
 	public IResultListener createResultListener(IResultListener listener);
+	
+	// todo: do we want this? should getArg() deliver only args supplied from
+	// outside or also values that are default/initial values in the model.
+	/**
+	 *  Get argument value.
+	 *  @param name The argument name.
+	 *  @return The argument value.
+	 * /
+	public Object getArgumentValue(String name);*/
 }

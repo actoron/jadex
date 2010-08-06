@@ -21,7 +21,16 @@ public class ProxyAgent extends MicroAgent
 	public IServiceContainer createServiceContainer()
 	{
 		return new CacheServiceContainer(new RemoteServiceContainer(
-			(IComponentIdentifier)getArgument("platform"), getAgentAdapter()), 25, 1*30*1000); // 30 secs cache expire
+			getRemotePlatformIdentifier(), getAgentAdapter()), 25, 1*30*1000); // 30 secs cache expire
+	}
+	
+	/**
+	 *  Get the platform identifier.
+	 *  @return The platform identifier.
+	 */
+	public IComponentIdentifier getRemotePlatformIdentifier()
+	{
+		return (IComponentIdentifier)getArgument("platform");
 	}
 	
 	/**
@@ -35,4 +44,5 @@ public class ProxyAgent extends MicroAgent
 				new ComponentIdentifier("rms@remote", new String[]{"tcp-mtp://127.0.0.1:11000", "nio-mtp://127.0.0.1:11001"}))}, 
 			null, null, null);
 	}
+
 }

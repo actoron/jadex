@@ -15,6 +15,7 @@ import jadex.bridge.IMessageAdapter;
 import jadex.commons.ChangeEvent;
 import jadex.commons.Future;
 import jadex.commons.IChangeListener;
+import jadex.commons.ICommand;
 import jadex.commons.IFuture;
 import jadex.commons.concurrent.CollectionResultListener;
 import jadex.commons.concurrent.DefaultResultListener;
@@ -128,9 +129,9 @@ public class MicroAgentInterpreter implements IComponentInstance
 			microagent.init(MicroAgentInterpreter.this);
 			
 			// Schedule initial step.
-			addStep(new Runnable()
+			addStep(new ICommand()
 			{
-				public void run()
+				public void execute(Object agent)
 				{
 					microagent.agentCreated();
 					getServiceContainer().start().addResultListener(createResultListener(new IResultListener()
@@ -141,9 +142,9 @@ public class MicroAgentInterpreter implements IComponentInstance
 							stop = true;
 							inited.setResult(new Object[]{MicroAgentInterpreter.this, adapter});
 							
-							addStep(new Runnable()
+							addStep(new ICommand()
 							{
-								public void run()
+								public void execute(Object agent)
 								{
 									microagent.executeBody();
 								}
@@ -192,9 +193,9 @@ public class MicroAgentInterpreter implements IComponentInstance
 		{
 			if(!steps.isEmpty())
 			{
-				Runnable step = (Runnable)removeStep();
+				ICommand step = (ICommand)removeStep();
 				String steptext = ""+step;
-				step.run();
+				step.execute(microagent);
 				addHistoryEntry(steptext);
 			}
 	
@@ -220,9 +221,9 @@ public class MicroAgentInterpreter implements IComponentInstance
 	public void messageArrived(final IMessageAdapter message)
 	{
 //		System.out.println("msgrec: "+getAgentAdapter().getComponentIdentifier()+" "+message);
-		scheduleStep(new Runnable()
+		scheduleStep(new ICommand()
 		{
-			public void run()
+			public void execute(Object agent)
 			{
 				microagent.messageArrived(Collections.unmodifiableMap(message.getParameterMap()), message.getMessageType());
 			}
@@ -418,7 +419,7 @@ public class MicroAgentInterpreter implements IComponentInstance
 	 *  May safely be called from external threads.
 	 *  @param step	Code to be executed as a step of the agent.
 	 */
-	public void	scheduleStep(final Runnable step)
+	public void	scheduleStep(final ICommand step)
 	{
 //		System.out.println("ss: "+getAgentAdapter().getComponentIdentifier()+" "+Thread.currentThread()+" "+step);
 		adapter.invokeLater(new Runnable()
@@ -433,7 +434,7 @@ public class MicroAgentInterpreter implements IComponentInstance
 	/**
 	 *  Add a new step.
 	 */
-	protected void addStep(Runnable step)
+	protected void addStep(ICommand step)
 	{
 		steps.add(step);
 		notifyListeners(new ChangeEvent(this, "addStep", step));

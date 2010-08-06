@@ -4,6 +4,9 @@ import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
+import jadex.commons.Future;
+import jadex.commons.IFuture;
+import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.service.IService;
 import jadex.service.SServiceProvider;
@@ -22,17 +25,17 @@ public class ComponentTreeNode	extends AbstractComponentTreeNode
 	//-------- attributes --------
 	
 	/** The component description. */
-	private IComponentDescription	desc;
+	protected IComponentDescription	desc;
 		
 	/** The component management service. */
-	private final IComponentManagementService	cms;
+	protected final IComponentManagementService	cms;
 		
 	/** The UI component used for displaying error messages. */
 	// Todo: status bar for longer lasting actions?
-	private final Component	ui;
+	protected final Component	ui;
 		
 	/** The icon cache. */
-	private final ComponentIconCache	iconcache;
+	protected final ComponentIconCache	iconcache;
 		
 	//-------- constructors --------
 	
@@ -109,16 +112,42 @@ public class ComponentTreeNode	extends AbstractComponentTreeNode
 						IComponentDescription	desc	= (IComponentDescription)result;
 						IComponentTreeNode	node	= getModel().getNode(desc.getName());
 						if(node==null)
-							node	= new ComponentTreeNode(ComponentTreeNode.this, getModel(), desc, cms, ui, iconcache);
-						children.add(node);
-
-						// Last child? -> inform listeners
-						if(index == achildren.length - 1)
 						{
-							ready[0]	= true;
-							if(ready[0] &&  ready[1])
+							createComponentNode(desc).addResultListener(new IResultListener()
 							{
-								setChildren(children);
+								public void resultAvailable(Object source, Object result)
+								{
+									children.add(result);
+									
+									// Last child? -> inform listeners
+									if(index == achildren.length - 1)
+									{
+										ready[0]	= true;
+										if(ready[0] &&  ready[1])
+										{
+											setChildren(children);
+										}
+									}
+								}
+								
+								public void exceptionOccurred(Object source, Exception exception)
+								{
+									exception.printStackTrace();
+								}
+							});
+						}
+						else
+						{
+							children.add(node);
+	
+							// Last child? -> inform listeners
+							if(index == achildren.length - 1)
+							{
+								ready[0]	= true;
+								if(ready[0] &&  ready[1])
+								{
+									setChildren(children);
+								}
 							}
 						}
 					}
@@ -151,16 +180,16 @@ public class ComponentTreeNode	extends AbstractComponentTreeNode
 							if(scn==null)
 								scn	= new ServiceContainerNode(ComponentTreeNode.this, getModel());
 							children.add(0, scn);
-							List	children	= new ArrayList();
+							List	subchildren	= new ArrayList();
 							for(int i=0; i<services.size(); i++)
 							{
 								IService service	= (IService)services.get(i);
 								ServiceNode	sn	= (ServiceNode)getModel().getNode(service.getServiceIdentifier());
 								if(sn==null)
 									sn	= new ServiceNode(scn, getModel(), service);
-								children.add(sn);
+								subchildren.add(sn);
 							}
-							scn.setChildren(children);							
+							scn.setChildren(subchildren);							
 						}
 
 						ready[1]	= true;
@@ -181,6 +210,40 @@ public class ComponentTreeNode	extends AbstractComponentTreeNode
 	}
 	
 	//-------- methods --------
+	
+	/**
+	 *  Create a new component node.
+	 */
+	public IFuture createComponentNode(final IComponentDescription desc)
+	{
+		final Future ret = new Future();
+		
+		cms.getExternalAccess(desc.getName()).addResultListener(new IResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				IExternalAccess exta = (IExternalAccess)result;
+				boolean proxy = "jadex.base.service.remote.Proxy".equals(exta.getModel().getFullName());
+				IComponentTreeNode node;
+				if(proxy)
+				{
+					node = new ProxyComponentTreeNode(ComponentTreeNode.this, getModel(), desc, cms, ui, iconcache);
+				}
+				else
+				{
+					node = new ComponentTreeNode(ComponentTreeNode.this, getModel(), desc, cms, ui, iconcache);
+				}
+				ret.setResult(node);
+			}
+			
+			public void exceptionOccurred(Object source, Exception exception)
+			{
+				ret.setException(exception);
+			}
+		});
+	
+		return ret;
+	}
 	
 	/**
 	 *  Create a string representation.

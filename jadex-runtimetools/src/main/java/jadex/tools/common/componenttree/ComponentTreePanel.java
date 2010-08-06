@@ -5,6 +5,7 @@ import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentManagementService;
 import jadex.commons.SGUI;
 import jadex.commons.TreeExpansionHandler;
+import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.service.IServiceProvider;
 import jadex.service.SServiceProvider;
@@ -409,17 +410,25 @@ public class ComponentTreePanel extends JPanel
 						{
 							public void run()
 							{
-								ComponentTreeNode	parent	= null;
-								if(desc.getParent()!=null)
-								{
-									parent	= (ComponentTreeNode)model.getNode(desc.getParent());
-								}
+								final ComponentTreeNode	parent = desc.getParent()==null? null: (ComponentTreeNode)model.getNode(desc.getParent());
 								
-								IComponentTreeNode	node	= new ComponentTreeNode(parent, model, desc, cms, ComponentTreePanel.this, cic);
-								if(parent!=null)
+								parent.createComponentNode(desc).addResultListener(new IResultListener()
 								{
-									parent.addChild(node);
-								}
+									public void resultAvailable(Object source, Object result)
+									{
+										IComponentTreeNode	node = (IComponentTreeNode)result;
+										if(parent!=null)
+										{
+											parent.addChild(node);
+										}
+									}
+									
+									public void exceptionOccurred(Object source, Exception exception)
+									{
+										exception.printStackTrace();
+									}
+								});
+//								IComponentTreeNode	node	= new ComponentTreeNode(parent, model, desc, cms, ComponentTreePanel.this, cic);
 							}
 						});
 					}

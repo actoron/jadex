@@ -8,6 +8,7 @@ import jadex.application.space.envsupport.environment.space2d.Space2D;
 import jadex.application.space.envsupport.math.IVector2;
 import jadex.bdi.examples.hunterprey.MoveAction;
 import jadex.bridge.ComponentTerminatedException;
+import jadex.commons.ICommand;
 import jadex.commons.concurrent.IResultListener;
 import jadex.micro.MicroAgent;
 
@@ -52,9 +53,9 @@ public class MicroPreyAgent extends MicroAgent
 //				e.printStackTrace();
 				try
 				{
-					getExternalAccess().scheduleStep(new Runnable()
+					getExternalAccess().scheduleStep(new ICommand()
 					{
-						public void run()
+						public void execute(Object agent)
 						{
 							// If move failed, forget about food and turn 90°.
 							food	= null;
@@ -85,9 +86,9 @@ public class MicroPreyAgent extends MicroAgent
 			
 			public void resultAvailable(Object source, Object result)
 			{
-				getExternalAccess().scheduleStep(new Runnable()
+				getExternalAccess().scheduleStep(new ICommand()
 				{
-					public void run()
+					public void execute(Object agent)
 					{
 						act();
 					}

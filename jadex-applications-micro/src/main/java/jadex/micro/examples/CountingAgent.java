@@ -1,5 +1,6 @@
 package jadex.micro.examples;
 
+import jadex.commons.ICommand;
 import jadex.micro.MicroAgent;
 import jadex.micro.MicroAgentMetaInfo;
 
@@ -23,9 +24,9 @@ public class CountingAgent extends MicroAgent
 	{
 		cnt	= 1;
 
-		Runnable	step	= new Runnable()
+		ICommand	step	= new ICommand()
 		{
-			public void run()
+			public void execute(Object agent)
 			{
 				System.out.println("Step: "+cnt);
 				
