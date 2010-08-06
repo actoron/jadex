@@ -24,7 +24,6 @@ import jadex.tools.common.ElementPanel;
 import jadex.tools.common.GuiProperties;
 import jadex.tools.common.JValidatorTextField;
 import jadex.tools.common.ParserValidator;
-import jadex.tools.jcc.AgentControlCenter;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -384,7 +383,7 @@ public class StarterPanel extends JPanel
 		chooseparent.setToolTipText("Choose parent");
 		componentpanel.add(chooseparent, new GridBagConstraints(3, 1, 1, 1, 0, 0, GridBagConstraints.EAST,
 			GridBagConstraints.BOTH, new Insets(2, 2, 0, 2), 0, 0));
-		final AgentSelectorDialog	agentselector = new AgentSelectorDialog(this, ((AgentControlCenter)starter.getJCC()).getAgent());
+		final AgentSelectorDialog	agentselector = new AgentSelectorDialog(this, starter.getJCC().getServiceContainer());
 		chooseparent.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)

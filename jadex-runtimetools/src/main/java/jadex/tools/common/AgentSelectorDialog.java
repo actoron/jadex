@@ -1,18 +1,15 @@
 package jadex.tools.common;
 
-import jadex.bdi.runtime.IBDIExternalAccess;
-import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.commons.SGUI;
-import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
-import jadex.commons.jtable.ResizeableTableHeader;
+import jadex.service.IServiceProvider;
 import jadex.service.SServiceProvider;
 import jadex.tools.common.componenttree.ComponentTreeNode;
 import jadex.tools.common.componenttree.ComponentTreePanel;
 import jadex.tools.common.componenttree.IComponentTreeNode;
-import jadex.tools.common.jtreetable.DefaultTreeTableNode;
+import jadex.tools.common.componenttree.INodeHandler;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -25,29 +22,28 @@ import java.awt.Insets;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
-import java.util.LinkedList;
-import java.util.List;
 
 import javax.help.CSH;
 import javax.help.HelpBroker;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.DefaultListModel;
+import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
-import javax.swing.ListSelectionModel;
 import javax.swing.UIDefaults;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.event.TableModelEvent;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
-import javax.swing.tree.TreePath;
 
 /**
  *  Dialog to select an agent on the platform.
@@ -60,7 +56,8 @@ public class AgentSelectorDialog
 	protected static UIDefaults	icons	= new UIDefaults(new Object[]
 	{
 		// Icons.
-		"arrow_right", SGUI.makeIcon(AgentSelectorDialog.class,	"/jadex/tools/common/images/arrow_right.png")
+		"arrow_right", SGUI.makeIcon(AgentSelectorDialog.class,	"/jadex/tools/common/images/arrow_right.png"),
+		"edit_overlay",	SGUI.makeIcon(AgentSelectorDialog.class, "/jadex/tools/common/images/overlay_edit.png")
 	});
 
 	//-------- attributes --------
@@ -68,14 +65,14 @@ public class AgentSelectorDialog
 	/** The parent component. */
 	protected Component	parent;
 	
-	/** The agent access. */
-	protected IBDIExternalAccess agent;
+	/** The service provider. */
+	protected IServiceProvider provider;
 	
 	/** The element tree table. */
 	protected ComponentTreePanel	comptree;
 	
-	/** The agent tree table of selected agents. */
-	protected ComponentTreeTable	seltree;
+	/** The selected agents. */
+	protected DefaultListModel	sels;
 	
 	/** The agent identifier panel. */
 	protected ComponentIdentifierPanel	aidpanel;
@@ -88,9 +85,6 @@ public class AgentSelectorDialog
 	
 	/** Was the dialog aborted? */
 	protected boolean	aborted;
-	
-	/** The list of selected agents. */
-	protected List	sellist;
 	
 	/** Select an agent. */
 	protected JButton	select;
@@ -111,15 +105,12 @@ public class AgentSelectorDialog
 
 	/**
 	 *  Create a new AgentSelectorDialog.
-	 *  @param parent
-	 *  @param agent
-	 *  @throws java.awt.HeadlessException
 	 */
-	public AgentSelectorDialog(Component parent, IBDIExternalAccess agent)
+	public AgentSelectorDialog(Component parent, IServiceProvider provider)
 	{
 		this.parent	= parent;
-		this.agent	= agent;
-		this.sellist = new LinkedList();
+		this.provider	= provider;
+		this.sels	= new DefaultListModel();
 	}
 
 	//-------- methods --------
@@ -133,27 +124,20 @@ public class AgentSelectorDialog
 		this.singleselection	= true;
 
 		// Pre-init list of selected agents.
-		sellist.clear();
+		sels.clear();
 		if(def!=null)
 		{
-			sellist.add(def);
+			sels.addElement(def);
 		}
 
 		// Create dialog.
 		this.dia	= createDialog(cms);
 
-		// Refresh agent lists in gui.
-		refreshSelectedTree();
-		if(sellist.size()>0)
-			seltree.getTreetable().getSelectionModel().setSelectionInterval(0, 0);
-		else
-			this.aidpanel.setEditable(false);
-
 		aborted	= false;
 		dia.setVisible(true);
 		this.singleselection	= false;
 
-		return !aborted && sellist.size()>0 ? (IComponentIdentifier)sellist.get(0) : null;
+		return !aborted && sels.size()>0 ? (IComponentIdentifier)sels.get(0) : null;
 	}
 
 	/**
@@ -163,118 +147,26 @@ public class AgentSelectorDialog
 	public IComponentIdentifier[] selectAgents(IComponentIdentifier[] receivers, IComponentManagementService cms)
 	{
 		// Pre-init list of selected agents.
-		sellist.clear();
+		sels.clear();
 		for(int i=0; receivers!=null && i<receivers.length; i++)
-			sellist.add(receivers[i]);
+			sels.addElement(receivers[i]);
 
 		// Create dialog.
 		this.dia	= createDialog(cms);
 
-		// Refresh agent lists in gui.
-		refreshSelectedTree();
-		if(sellist.size()>0)
-			seltree.getTreetable().getSelectionModel().setSelectionInterval(0, 0);
-		else
-			this.aidpanel.setEditable(false);
-
 		aborted	= false;
 		dia.setVisible(true);
 
-		return aborted ? null : (IComponentIdentifier[])sellist.toArray(new IComponentIdentifier[sellist.size()]);
+		IComponentIdentifier[]	ret	= null;
+		if(!aborted)
+		{
+			ret	= new IComponentIdentifier[sels.size()];
+			sels.copyInto(ret);
+		}
+		return ret;
 	}
 
 	//-------- helper methods --------
-
-	/**
-	 *  Refresh the selected agents tree.
-	 */
-	protected void refreshSelectedTree()
-	{
-		SServiceProvider.getServiceUpwards(agent.getServiceProvider(), IComponentManagementService.class).addResultListener(new DefaultResultListener()
-		{
-			public void resultAvailable(Object source, Object result)
-			{
-				final IComponentManagementService cms = (IComponentManagementService)result;
-		
-				// Create agent tree of selected agents.
-				int	row	= seltree.getTreetable().getSelectionModel().getMinSelectionIndex();
-				seltree.removeComponents();
-//				DefaultTreeTableNode[]	known	= tree.getAllComponents();
-				for(int i=0; i<sellist.size(); i++)
-				{
-					// Try to find in known agents.
-					boolean	found	= false;
-					IComponentIdentifier	cid	= (IComponentIdentifier)sellist.get(i);
-//					for(int j=0; !found && j<known.length; j++)
-//					{
-//						IComponentDescription	desc	= (IComponentDescription)known[j].getUserObject();
-//						if(desc.getName().equals(cid))
-//						{
-//							found	= true;
-//							seltree.addComponent(desc);
-//						}
-//					}
-					
-					if(!found)
-					{
-						seltree.addComponent(cms.createComponentDescription(cid, null, null, "unknown-component-type", null));
-					}
-				}
-				// Force table repaint (hack???).
-				seltree.getTreetable().tableChanged(new TableModelEvent(seltree.getTreetable().getModel(), TableModelEvent.HEADER_ROW));
-				((ResizeableTableHeader)seltree.getTreetable().getTableHeader()).resizeAllColumns();
-				Dimension	pref	= seltree.getTreetable().getPreferredSize();
-				seltree.getTreetable().setPreferredScrollableViewportSize(new Dimension(Math.min(pref.width, 400), Math.max(100, (int)Math.min(pref.height*1.25, 300))));
-				if(sellist.size()>0)
-				{
-					row	= Math.min(row, sellist.size()-1);
-					seltree.getTreetable().getSelectionModel().setSelectionInterval(row, row);
-					// Hack!!! why row+1!?
-					seltree.getTreetable().scrollRectToVisible(seltree.getTreetable().getCellRect(row+1, seltree.getTreetable().convertColumnIndexToView(0), true));
-				}		
-			}
-		});
-	}
-				
-				
-		// Create agent tree of selected agents.
-//		IComponentManagementService ams = (IComponentManagementService)agent.getServiceContainer().getService(IComponentManagementService.class);
-//		int	row	= seltree.getTreetable().getSelectionModel().getMinSelectionIndex();
-//		this.seltree.removeComponents();
-//		DefaultTreeTableNode[]	known	= tree.getAllComponents();
-//		for(int i=0; i<sellist.size(); i++)
-//		{
-//			// Try to find in known agents.
-//			boolean	found	= false;
-//			IComponentIdentifier	cid	= (IComponentIdentifier)sellist.get(i);
-//			for(int j=0; !found && j<known.length; j++)
-//			{
-//				IComponentDescription	desc	= (IComponentDescription)known[j].getUserObject();
-//				if(desc.getName().equals(cid))
-//				{
-//					found	= true;
-//					seltree.addComponent(desc);
-//				}
-//			}
-//			
-//			if(!found)
-//			{
-//				seltree.addComponent(ams.createComponentDescription(cid, null, null, "unknown-component-type", null));
-//			}
-//		}
-//		// Force table repaint (hack???).
-//		seltree.getTreetable().tableChanged(new TableModelEvent(seltree.getTreetable().getModel(), TableModelEvent.HEADER_ROW));
-//		((ResizeableTableHeader)seltree.getTreetable().getTableHeader()).resizeAllColumns();
-//		Dimension	pref	= seltree.getTreetable().getPreferredSize();
-//		seltree.getTreetable().setPreferredScrollableViewportSize(new Dimension(Math.min(pref.width, 400), Math.max(100, (int)Math.min(pref.height*1.25, 300))));
-//		if(sellist.size()>0)
-//		{
-//			row	= Math.min(row, sellist.size()-1);
-//			seltree.getTreetable().getSelectionModel().setSelectionInterval(row, row);
-//			// Hack!!! why row+1!?
-//			seltree.getTreetable().scrollRectToVisible(seltree.getTreetable().getCellRect(row+1, seltree.getTreetable().convertColumnIndexToView(0), true));
-//		}
-//	}
 
 	/**
 	 *  Create the dialog.
@@ -312,24 +204,89 @@ public class AgentSelectorDialog
 
 		
 		select.setEnabled(false);
-		newaid.setEnabled(!singleselection || sellist.size()==0);
+		newaid.setEnabled(!singleselection || sels.size()==0);
 		remove.setEnabled(false);
-		removeall.setEnabled(sellist.size()>0);
-		ok.setEnabled(!singleselection || sellist.size()>0);
+		removeall.setEnabled(sels.size()>0);
+		ok.setEnabled(!singleselection || sels.size()>0);
 		
-		this.comptree = new ComponentTreePanel(agent.getServiceProvider());
+		final JList	list = new JList(sels);
+		
+		this.comptree = new ComponentTreePanel(provider);
 		this.comptree.setPreferredSize(new Dimension(200, 100));
-		this.seltree = new ComponentTreeTable(agent);
-		this.seltree.setPreferredSize(new Dimension(200, 100));
-		seltree.getTreetable().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		seltree.getTreetable().getTree().setRootVisible(false);	// Don't show platform node.
+		comptree.addNodeHandler(new INodeHandler()
+		{
+			public Action[] getPopupActions(IComponentTreeNode[] nodes)
+			{
+				return null;
+			}
+			
+			public Icon getOverlay(IComponentTreeNode node)
+			{
+				Icon	ret	= null;
+				if(node instanceof ComponentTreeNode)
+				{
+					IComponentIdentifier	id	= ((ComponentTreeNode)node).getDescription().getName();
+					if(sels.contains(id))
+					{
+						ret	= icons.getIcon("edit_overlay");
+					}
+				}
+				return ret;
+			}
+			
+			public Action getDefaultAction(final IComponentTreeNode node)
+			{
+				Action	a	= null;
+				if(node instanceof ComponentTreeNode)
+				{
+					a	= new AbstractAction()
+					{
+						public void actionPerformed(ActionEvent e)
+						{
+							// Use clone to keep original aid unchanged.
+							SServiceProvider.getServiceUpwards(provider, IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
+							{
+								public void customResultAvailable(Object source, Object result)
+								{
+									IComponentManagementService cms = (IComponentManagementService)result;
+									final IComponentIdentifier id	= ((ComponentTreeNode)node).getDescription().getName();
+									addSelectedAgent(cms.createComponentIdentifier(id.getName(), false, id.getAddresses()), list);
+									comptree.getModel().fireNodeChanged(node);
+								}
+							});
+						}
+					};
+				}
+				return a;
+			}
+		});
+		
+		
+		JScrollPane	sp	= new JScrollPane(list);
+		sp.setPreferredSize(new Dimension(200, 100));
+		final boolean[]	editing	= new boolean[1];
 		this.aidpanel = new ComponentIdentifierPanel(null, cms)
 		{
 			protected void aidChanged()
 			{
-				refreshSelectedTree();
+				if(!list.getSelectionModel().isSelectionEmpty())
+				{
+					editing[0]	= true;
+					int	row	= list.getSelectedIndex();
+					sels.remove(row);
+					sels.add(row, aidpanel.getAgentIdentifier());
+					list.setSelectedIndex(row);
+					comptree.repaint();
+					editing[0]	= false;
+				}
 			}
 		};
+		
+		// Refresh selection
+		if(sels.size()>0)
+			list.getSelectionModel().setSelectionInterval(0, 0);
+		else
+			this.aidpanel.setEditable(false);
 
 		// Put trees in extra component to add border.
 		JPanel	treepanel	= new JPanel(new GridBagLayout());
@@ -340,7 +297,7 @@ public class AgentSelectorDialog
 		treepanel.add(new JLabel(),	new GridBagConstraints(1,1, GridBagConstraints.REMAINDER,GridBagConstraints.REMAINDER,	0,1,GridBagConstraints.CENTER,GridBagConstraints.VERTICAL,new Insets(0,0,0,0),0,0));
 
 		JPanel	seltreepanel	= new JPanel(new BorderLayout());
-		seltreepanel.add(BorderLayout.CENTER, seltree);
+		seltreepanel.add(BorderLayout.CENTER, sp);
 		seltreepanel.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), " Selected Agents "));
 		// Add border to aidpanel.
 		aidpanel.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), " Agent Identifier "));
@@ -355,32 +312,24 @@ public class AgentSelectorDialog
 					Object	node	= comptree.getTree().getLastSelectedPathComponent();
 					if(node instanceof ComponentTreeNode)
 					{
-						selectenabled	= !singleselection || sellist.size()==0;
+						selectenabled	= !singleselection || sels.size()==0;
 					}
 				}
 				select.setEnabled(selectenabled);
 			}
 		});
-		// When user selects an agent in tree, show aid in panel.
-		seltree.getTreetable().getSelectionModel().addListSelectionListener(new ListSelectionListener()
+		// When user selects a component in list, show aid in panel.
+		list.getSelectionModel().addListSelectionListener(new ListSelectionListener()
 		{
 			public void valueChanged(ListSelectionEvent e)
 			{
-				if(!e.getValueIsAdjusting())
+				if(!editing[0] && !e.getValueIsAdjusting())
 				{
 					IComponentIdentifier	selected	= null;
-					if(!seltree.getTreetable().getSelectionModel().isSelectionEmpty())
+					if(!list.getSelectionModel().isSelectionEmpty())
 					{
-						int	row	= seltree.getTreetable().getSelectionModel().getMinSelectionIndex();
-						TreePath	path	= seltree.getTreetable().getTree().getPathForRow(row);
-						if(path!=null)
-						{
-							Object	val	= ((DefaultTreeTableNode)path.getLastPathComponent()).getUserObject();
-							if(val instanceof IComponentDescription)
-							{
-								selected	= ((IComponentDescription)val).getName();
-							}
-						}
+						int	row	= list.getSelectionModel().getMinSelectionIndex();
+						selected	= (IComponentIdentifier)sels.get(row);
 					}
 					aidpanel.setAgentIdentifier(selected);
 					aidpanel.setEditable(selected!=null);
@@ -388,35 +337,6 @@ public class AgentSelectorDialog
 				}
 			}
 		});
-		// When user double clicked on an agent, set aid (and close dialog on single selection).
-		comptree.getTree().addMouseListener(new MouseAdapter()
-		{
-			public void mouseClicked(MouseEvent e)
-			{
-				if(e.getClickCount()==2)
-				{
-					TreePath path = comptree.getTree().getPathForLocation(e.getX(), e.getY());
-					if(path!=null)
-					{
-						final Object node = path.getLastPathComponent();
-						if(node instanceof ComponentTreeNode)
-						{
-							// Use clone to keep original aid unchanged.
-							SServiceProvider.getServiceUpwards(agent.getServiceProvider(), IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
-							{
-								public void customResultAvailable(Object source, Object result)
-								{
-									IComponentManagementService cms = (IComponentManagementService)result;
-									final IComponentIdentifier id	= ((ComponentTreeNode)node).getDescription().getName();
-									addSelectedAgent(cms.createComponentIdentifier(id.getName(), false, id.getAddresses()));
-								}
-							});
-						}
-					}
-				}
-			}
-		});
-
 							
 		parent = SGUI.getWindowParent(parent);
 		final JDialog	dia	= parent instanceof Frame
@@ -449,13 +369,13 @@ public class AgentSelectorDialog
 					final Object node = comptree.getTree().getLastSelectedPathComponent();
 					if(node instanceof ComponentTreeNode)
 					{
-						SServiceProvider.getServiceUpwards(agent.getServiceProvider(), IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
+						SServiceProvider.getServiceUpwards(provider, IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
 						{
 							public void customResultAvailable(Object source, Object result)
 							{
 								IComponentManagementService cms = (IComponentManagementService)result;
 								IComponentIdentifier id	= ((ComponentTreeNode)node).getDescription().getName();
-								addSelectedAgent(cms.createComponentIdentifier(id.getName(), false, id.getAddresses()));
+								addSelectedAgent(cms.createComponentIdentifier(id.getName(), false, id.getAddresses()), list);
 							}
 						});
 					}
@@ -466,12 +386,12 @@ public class AgentSelectorDialog
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				SServiceProvider.getServiceUpwards(agent.getServiceProvider(), IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
+				SServiceProvider.getServiceUpwards(provider, IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
 				{
 					public void customResultAvailable(Object source, Object result)
 					{
 						IComponentManagementService cms = (IComponentManagementService)result;
-						addSelectedAgent(cms.createComponentIdentifier("", true, null));
+						addSelectedAgent(cms.createComponentIdentifier("", true, null), list);
 					}
 				});
 			}
@@ -480,26 +400,22 @@ public class AgentSelectorDialog
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				if(!seltree.getTreetable().getSelectionModel().isSelectionEmpty())
+				if(!list.getSelectionModel().isSelectionEmpty())
 				{
-					int	row	= seltree.getTreetable().getSelectionModel().getMinSelectionIndex();
-					Object	val	= ((DefaultTreeTableNode)seltree.getTreetable().getTree().getPathForRow(row).getLastPathComponent()).getUserObject();
-					if(val instanceof IComponentDescription)
-					{
-						sellist.remove(row);
-						refreshSelectedTree();
-						removeall.setEnabled(sellist.size()>0);
+					int	row	= list.getSelectionModel().getMinSelectionIndex();
+					sels.remove(row);
+					removeall.setEnabled(sels.size()>0);
 
-						if(singleselection)
+					if(singleselection)
+					{
+						newaid.setEnabled(true);
+						ok.setEnabled(false);
+						if(!comptree.getTree().getSelectionModel().isSelectionEmpty())
 						{
-							newaid.setEnabled(true);
-							ok.setEnabled(false);
-							if(!comptree.getTree().getSelectionModel().isSelectionEmpty())
-							{
-								select.setEnabled(true);
-							}
+							select.setEnabled(true);
 						}
 					}
+					comptree.repaint();
 				}
 			}
 		});
@@ -507,8 +423,7 @@ public class AgentSelectorDialog
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				sellist.clear();
-				refreshSelectedTree();
+				sels.clear();
 				removeall.setEnabled(false);
 				if(singleselection)
 				{
@@ -519,6 +434,7 @@ public class AgentSelectorDialog
 						select.setEnabled(true);
 					}
 				}
+				comptree.repaint();
 			}
 		});
 		ok.addActionListener(new ActionListener()
@@ -583,22 +499,23 @@ public class AgentSelectorDialog
 	 *  Add an agent to the list of selected agents
 	 *  @param agent	The agent to add.
 	 */
-	protected void addSelectedAgent(IComponentIdentifier agent)
+	protected void addSelectedAgent(IComponentIdentifier agent, JList list)
 	{
 		removeall.setEnabled(true);
-		if(!singleselection || sellist.size()==0)
+		if(singleselection && sels.size()>0)
 		{
-			sellist.add(agent);
-			refreshSelectedTree();
-			
-			seltree.getTreetable().getSelectionModel().setSelectionInterval(sellist.size()-1, sellist.size()-1);
-	
-			if(singleselection)
-			{
-				select.setEnabled(false);
-				newaid.setEnabled(false);
-				ok.setEnabled(true);
-			}
+			sels.removeAllElements();
 		}
+		sels.addElement(agent);
+		
+		list.getSelectionModel().setSelectionInterval(sels.size()-1, sels.size()-1);
+
+		if(singleselection)
+		{
+			select.setEnabled(false);
+			newaid.setEnabled(false);
+			ok.setEnabled(true);
+		}
+		comptree.repaint();
 	}
 }

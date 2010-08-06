@@ -93,6 +93,7 @@ public class ComponentTreePanel extends JPanel
 		tree.setCellRenderer(new ComponentTreeCellRenderer());
 		tree.addMouseListener(new ComponentTreePopupListener());
 		tree.setShowsRootHandles(true);
+		tree.setToggleClickCount(0);
 		final ComponentIconCache	cic	= new ComponentIconCache(provider, tree);
 		this.setLayout(new BorderLayout());
 		this.add(new JScrollPane(tree));

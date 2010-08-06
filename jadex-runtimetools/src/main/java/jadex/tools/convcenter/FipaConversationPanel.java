@@ -97,7 +97,7 @@ public class FipaConversationPanel extends JSplitPane
 	/**
 	 *  Create the gui.
 	 */
-	public FipaConversationPanel(final IBDIExternalAccess agent)
+	public FipaConversationPanel(final IBDIExternalAccess agent, Component comptree)
 	{
 		super(JSplitPane.HORIZONTAL_SPLIT, true);
 		setOneTouchExpandable(true);
@@ -108,7 +108,7 @@ public class FipaConversationPanel extends JSplitPane
 		// Right side starts with initial send panel only.
 		Map	msg	= new HashMap();
 		msg.put(SFipa.SENDER, agent.getComponentIdentifier());
-		sendpanel = new FipaMessagePanel(msg, agent);
+		sendpanel = new FipaMessagePanel(msg, agent.getServiceProvider(), comptree);
 
 		JButton send = new JButton("Send");
 		send.setToolTipText("Send the specified message");
@@ -198,7 +198,7 @@ public class FipaConversationPanel extends JSplitPane
 					final Map msg	= (Map)sentmsgs.getModel()
 						.getElementAt(sentmsgs.locationToIndex(e.getPoint()));
 					final JPanel	msgtab	= new JPanel(new BorderLayout());
-					final FipaMessagePanel	msgpanel = new FipaMessagePanel(msg, agent);
+					final FipaMessagePanel	msgpanel = new FipaMessagePanel(msg, agent.getServiceProvider(), null);
 					msgpanel.setEditable(false);
 					final JScrollPane	scroll	= new JScrollPane(msgtab);
 					scroll.setBorder(null);
@@ -270,7 +270,7 @@ public class FipaConversationPanel extends JSplitPane
 					{
 						final Map	msg	= (Map)receivedmsgs.getModel().getElementAt(idx);
 						final JPanel msgtab	= new JPanel(new BorderLayout());
-						final FipaMessagePanel	msgpanel = new FipaMessagePanel(msg, agent);
+						final FipaMessagePanel	msgpanel = new FipaMessagePanel(msg, agent.getServiceProvider(), null);
 						msgpanel.setEditable(false);
 						final JScrollPane	scroll	= new JScrollPane(msgtab);
 						scroll.setBorder(null);

@@ -15,7 +15,6 @@ import jadex.tools.common.componenttree.ComponentTreePanel;
 import jadex.tools.common.componenttree.IComponentTreeNode;
 import jadex.tools.common.componenttree.INodeHandler;
 import jadex.tools.common.plugin.AbstractJCCPlugin;
-import jadex.tools.jcc.AgentControlCenter;
 
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -343,7 +342,7 @@ public class RuleProfilerPlugin extends AbstractJCCPlugin	implements IComponentL
 				{
 					ComponentTreeNode node = (ComponentTreeNode)paths[i].getLastPathComponent();
 					IComponentDescription desc = node.getDescription();
-					RuleProfilerPanel	panel = new RuleProfilerPanel(((AgentControlCenter)getJCC()).getAgent(), desc.getName());
+					RuleProfilerPanel	panel = new RuleProfilerPanel(getJCC().getServiceContainer(), desc.getName());
 					GuiProperties.setupHelp(panel, getHelpID());
 					detail.add(panel, desc);
 					comptree.getModel().fireNodeChanged(node);

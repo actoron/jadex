@@ -194,7 +194,7 @@ public class ConversationPlugin extends AbstractJCCPlugin
 			}
 		});
 
-		split.add(convcenter = new FipaConversationPanel(((AgentControlCenter)getJCC()).getAgent()));
+		split.add(convcenter = new FipaConversationPanel(((AgentControlCenter)getJCC()).getAgent(), comptree));
 
 		GuiProperties.setupHelp(split, "tools.conversationcenter");
 

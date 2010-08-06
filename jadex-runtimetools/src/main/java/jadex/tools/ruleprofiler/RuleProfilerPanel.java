@@ -1,6 +1,5 @@
 package jadex.tools.ruleprofiler;
 
-import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.impl.flyweights.ElementFlyweight;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bridge.IComponentIdentifier;
@@ -13,6 +12,7 @@ import jadex.rules.state.IProfiler;
 import jadex.rules.state.IProfiler.ProfilingInfo;
 import jadex.rules.tools.profiler.Profiler;
 import jadex.rules.tools.stateviewer.OAVTreeModel;
+import jadex.service.IServiceProvider;
 import jadex.service.SServiceProvider;
 import jadex.tools.common.GuiProperties;
 import jadex.tools.common.jtreetable.AbstractTreeTableModel;
@@ -58,9 +58,6 @@ public class RuleProfilerPanel	extends JPanel
 	
 	//-------- attributes --------
 
-	/** The agent access. */
-	protected IBDIExternalAccess	agent;
-	
 	/** The agent to observe. */
 	protected IComponentIdentifier	observed;
 	
@@ -71,12 +68,11 @@ public class RuleProfilerPanel	extends JPanel
 	 *  @param agent	The agent access.
 	 *  @param active	Flags indicating which tools should be active.
 	 */
-	public RuleProfilerPanel(IBDIExternalAccess agent, final IComponentIdentifier observed)
+	public RuleProfilerPanel(IServiceProvider provider, final IComponentIdentifier observed)
 	{
-		this.agent	= agent;
 		this.observed	= observed;
 
-		SServiceProvider.getServiceUpwards(agent.getServiceProvider(),
+		SServiceProvider.getServiceUpwards(provider,
 			IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
 		{
 			public void customResultAvailable(Object source, Object result)

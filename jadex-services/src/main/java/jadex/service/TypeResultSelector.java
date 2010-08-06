@@ -1,7 +1,6 @@
 package jadex.service;
 
 import jadex.commons.ConstantFilter;
-import jadex.commons.IFilter;
 import jadex.commons.Tuple;
 
 import java.util.Collection;

@@ -184,7 +184,7 @@ public class ComponentIdentifierPanel extends JPanel
 		protected void	update()
 		{
 			nameediting	= true;
-			ComponentIdentifierPanel.this.aid	= ces.createComponentIdentifier(tfname.getText(), true, aid.getAddresses());
+			ComponentIdentifierPanel.this.aid	= ces.createComponentIdentifier(tfname.getText(), false, aid.getAddresses());
 			aidChanged();
 			nameediting	= false;
 		}

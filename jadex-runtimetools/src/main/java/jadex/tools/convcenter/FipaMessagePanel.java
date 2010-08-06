@@ -1,15 +1,16 @@
 package jadex.tools.convcenter;
 
 import jadex.base.fipa.SFipa;
-import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.commons.SGUI;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.SwingDefaultResultListener;
+import jadex.service.IServiceProvider;
 import jadex.service.SServiceProvider;
 import jadex.tools.common.AgentSelectorDialog;
 
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -83,18 +84,18 @@ public class FipaMessagePanel extends JPanel
 	protected IComponentIdentifier	replyto;
 	protected IComponentIdentifier[]	receivers;
 	
-	protected IBDIExternalAccess agent;
-	
 	//-------- constructors --------
 
 	/**
 	 *  Create the panel with an initial message.
+	 *  @param message	The message.
+	 *  @param agent	The agent.
+	 *  @param comptree	The comptree (if any) will be repainted when new receivers are set in the panel.
 	 */
-	public FipaMessagePanel(Map message, final IBDIExternalAccess agent)
+	public FipaMessagePanel(Map message, final IServiceProvider provider, final Component comptree)
 	{
 		super(new GridBagLayout());
 		this.editable	= true;
-		this.agent = agent;
 
 		performative = new JComboBox((String[])SUtil.joinArrays(new String[]{""}, SFipa.PERFORMATIVES.toArray()));
 //		performative.setEditable(true);	// Todo: support arbitrary performatives?
@@ -297,12 +298,12 @@ public class FipaMessagePanel extends JPanel
 
 
 		// Actions for agent selection.
-		final AgentSelectorDialog	agentselector	= new AgentSelectorDialog(this, agent);
+		final AgentSelectorDialog	agentselector	= new AgentSelectorDialog(this, provider);
 		setsender.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				SServiceProvider.getServiceUpwards(agent.getServiceProvider(), IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
+				SServiceProvider.getServiceUpwards(provider, IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
 				{
 					public void customResultAvailable(Object source, Object result)
 					{
@@ -329,7 +330,7 @@ public class FipaMessagePanel extends JPanel
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				SServiceProvider.getServiceUpwards(agent.getServiceProvider(), IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
+				SServiceProvider.getServiceUpwards(provider, IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
 				{
 					public void customResultAvailable(Object source, Object result)
 					{
@@ -356,7 +357,7 @@ public class FipaMessagePanel extends JPanel
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				SServiceProvider.getServiceUpwards(agent.getServiceProvider(), IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
+				SServiceProvider.getServiceUpwards(provider, IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
 				{
 					public void customResultAvailable(Object source, Object result)
 					{
@@ -375,6 +376,8 @@ public class FipaMessagePanel extends JPanel
 								tfreceivers.setText("");
 							}
 						}
+						if(comptree!=null)
+							comptree.repaint();
 					}
 				});
 			}
@@ -386,6 +389,8 @@ public class FipaMessagePanel extends JPanel
 				receivers	= null;
 				tfreceivers.setText("");
 				FipaMessagePanel.this.message.remove(SFipa.RECEIVERS);
+				if(comptree!=null)
+					comptree.repaint();
 			}
 		});
 	}
