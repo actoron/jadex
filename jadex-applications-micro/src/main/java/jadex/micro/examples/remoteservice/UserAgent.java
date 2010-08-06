@@ -51,12 +51,12 @@ public class UserAgent extends MicroAgent
 				}));*/
 				
 				// search on local platform and find service via ProxyAgent to other platform
-				SServiceProvider.getService(getServiceProvider(), IAddService.class, false)
+				SServiceProvider.getService(getServiceProvider(), IMathService.class, false)
 					.addResultListener(createResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object source, Object result)
 					{
-						IAddService service = (IAddService)result;
+						IMathService service = (IMathService)result;
 						invokeAddService("IAddService searched via platform proxy.", service);
 					}
 				}));
@@ -67,7 +67,7 @@ public class UserAgent extends MicroAgent
 	/**
 	 *  Invoke some add methods for testing.
 	 */
-	protected void invokeAddService(String info, IAddService service)
+	protected void invokeAddService(String info, IMathService service)
 	{
 		if(service==null)
 		{
@@ -76,19 +76,24 @@ public class UserAgent extends MicroAgent
 		else
 		{
 			// Execute non-blocking method call with future result
-			System.out.println("Calling non-blocking addNB method.");
-			service.addNB(1, 2).addResultListener(new DefaultResultListener()
-			{
-				public void resultAvailable(Object source, Object result)
-				{
-					System.out.println("Invoked addNB: "+result);
-				}
-			});
+//			System.out.println("Calling non-blocking addNB method.");
+//			service.addNB(1, 2).addResultListener(new DefaultResultListener()
+//			{
+//				public void resultAvailable(Object source, Object result)
+//				{
+//					System.out.println("Invoked addNB: "+result);
+//				}
+//			});
 			
 			// Execute blocking method call with normal result
-			System.out.println("Calling blocking addB method.");
-			int res= service.addB(1, 2);
-			System.out.println("Invoked addB: "+res);
+//			System.out.println("Calling blocking addB method.");
+//			int res = service.addB(1, 2);
+//			System.out.println("Invoked addB: "+res);
+			
+			// Execute constant method call, which does not block but returns a cached value.
+			System.out.println("Calling constant (non-blocking) getPi method.");
+			double pi = service.getPi();
+			System.out.println("Invoked getPi: "+pi);
 		}
 	}
 }

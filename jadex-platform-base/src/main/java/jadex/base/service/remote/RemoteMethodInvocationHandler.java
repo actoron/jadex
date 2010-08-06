@@ -38,18 +38,22 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 	/** The waiting calls. */
 	protected Map waitingcalls;
 	
+	/** The cached return values of constant methods. */
+	protected Map cache;
+	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new invocation handler.
 	 */
 	public RemoteMethodInvocationHandler(IExternalAccess component, IComponentIdentifier rms, 
-		IServiceIdentifier sid, Map waitingcalls)
+		IServiceIdentifier sid, Map waitingcalls, Map cache)
 	{
 		this.component = component;
 		this.rms = rms;
 		this.sid = sid;
 		this.waitingcalls = waitingcalls;
+		this.cache = cache;
 	}
 	
 	//-------- methods --------
@@ -59,9 +63,21 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 	 */
 	public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
 	{
+		// Test if method is constant and a cache value is available.
+		if(cache!=null)
+		{
+			Class rt = method.getReturnType();
+			Class[] ar = method.getParameterTypes();
+			if(rt!=null && !(rt.isAssignableFrom(IFuture.class)) && ar.length==0)
+			{
+				return cache.get(method.getName());
+			}
+		}
+		
+		// Call remote method otherwise.
 		final Future future = new Future();
 		Object ret = future;
-
+		
 		final IComponentIdentifier compid = component.getComponentIdentifier();
 		String callid = SUtil.createUniqueId(compid.getLocalName());
 		waitingcalls.put(callid, future);
@@ -109,8 +125,8 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 		
 		if(!method.getReturnType().isAssignableFrom(IFuture.class))
 		{
-			System.out.println("Warning, blocking method call: "+method.getDeclaringClass()+" "+method.getName());
-//			Thread.dumpStack();
+			System.out.println("Warning, blocking method call: "+method.getDeclaringClass()
+				+" "+method.getName()+" "+Thread.currentThread());
 			ret = future.get(new ThreadSuspendable());
 //			System.out.println("Resumed call: "+method.getName()+" "+ret);
 		}

@@ -44,11 +44,12 @@ public class RemoteServiceManagementAgent extends MicroAgent
 			
 			if(content instanceof IRemoteCommand)
 			{
-				IRemoteCommand com = (IRemoteCommand)content;
+				final IRemoteCommand com = (IRemoteCommand)content;
 				com.execute(getExternalAccess(), rms.getWaitingCalls()).addResultListener(createResultListener(new IResultListener()
 				{
 					public void resultAvailable(Object source, Object result)
 					{
+//						System.out.println("result of command: "+com+" "+result);
 						if(result!=null)
 						{
 							final Object repcontent = result;

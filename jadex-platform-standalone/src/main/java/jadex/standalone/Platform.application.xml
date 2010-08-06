@@ -87,8 +87,8 @@
 				new ITransport[]
 				{
 					new LocalTransport($platform),
-					new TCPTransport($platform, $args.tcpport),
-					new NIOTCPTransport($platform, $args.niotcpport)
+					new TCPTransport($platform, $args.tcpport)//,
+					//new NIOTCPTransport($platform, $args.niotcpport)
 				},
 				new MessageType[]
 				{

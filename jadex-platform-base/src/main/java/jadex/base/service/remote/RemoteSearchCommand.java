@@ -5,6 +5,7 @@ import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
+import jadex.commons.collection.LRU;
 import jadex.commons.concurrent.IResultListener;
 import jadex.service.IResultSelector;
 import jadex.service.ISearchManager;
@@ -12,8 +13,10 @@ import jadex.service.IService;
 import jadex.service.IVisitDecider;
 import jadex.service.SServiceProvider;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +27,9 @@ import java.util.Map;
 public class RemoteSearchCommand implements IRemoteCommand
 {
 	//-------- attributes --------
+
+	/** The cache of proxy infos. */
+	protected static Map proxyinfos = Collections.synchronizedMap(new LRU(200));
 	
 	/** The providerid (i.e. the component to start with searching). */
 	protected Object providerid;
@@ -102,28 +108,19 @@ public class RemoteSearchCommand implements IRemoteCommand
 								Object content = null;
 								if(result instanceof Collection)
 								{
-									try
+									List res = new ArrayList();
+									for(Iterator it=((Collection)result).iterator(); it.hasNext(); )
 									{
-										List res = new ArrayList();
-										for(Iterator it=((Collection)result).iterator(); it.hasNext(); )
-										{
-											IService tmp = (IService)it.next();
-											ProxyInfo pi = new ProxyInfo(component.getComponentIdentifier(), 
-												tmp.getServiceIdentifier());
-											res.add(pi);
-										}
-										content = res;
+										IService tmp = (IService)it.next();
+										ProxyInfo pi = getProxyInfo(component.getComponentIdentifier(), tmp);
+										res.add(pi);
 									}
-									catch(Exception e)
-									{
-										e.printStackTrace();
-									}
+									content = res;
 								}
 								else //if(result instanceof Object[])
 								{
 									IService tmp = (IService)result;
-									content = new ProxyInfo(component.getComponentIdentifier(), 
-										tmp.getServiceIdentifier());
+									content = getProxyInfo(component.getComponentIdentifier(), tmp);
 								}
 								
 								ret.setResult(new RemoteSearchResultCommand(content, null , callid));
@@ -242,4 +239,71 @@ public class RemoteSearchCommand implements IRemoteCommand
 		this.callid = callid;
 	}
 	
+	/**
+	 *  Get a proxy info for a service. 
+	 */
+	protected ProxyInfo getProxyInfo(IComponentIdentifier rms, IService service)
+	{
+		ProxyInfo ret;
+		
+		// This construct ensures
+		// a) fast access to existing proxyinfos in the map
+		// b) creation is performed only once by ordering threads 
+		// via synchronized block and rechecking if proxy was already created.
+		
+		ret = (ProxyInfo)proxyinfos.get(service);
+		if(ret==null)
+		{
+			synchronized(proxyinfos)
+			{
+				ret = (ProxyInfo)proxyinfos.get(service);
+				if(ret==null)
+				{
+					ret = createProxyInfo(rms, service);
+				}
+			}
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Create a proxy info for a service. 
+	 */
+	protected ProxyInfo createProxyInfo(IComponentIdentifier rms, IService service)
+	{
+		Class type = service.getServiceIdentifier().getServiceType();
+		ProxyInfo ret = new ProxyInfo(rms, service.getServiceIdentifier());
+	
+		Method[] methods = type.getMethods();
+		for(int i=0; i<methods.length; i++)
+		{
+			Class rt = methods[i].getReturnType();
+			Class[] ar = methods[i].getParameterTypes();
+			if(rt!=null && !(rt.isAssignableFrom(IFuture.class)))
+			{
+				if(ar.length>0)
+				{
+					System.out.println("Warning, service method is blocking: "+type+" "+methods[i].getName());
+				}
+				else
+				{
+					// Invoke method to get constant return value.
+					try
+					{
+						Object val = methods[i].invoke(service, new Object[0]);
+						ret.putCache(methods[i].getName(), val);
+					}
+					catch(Exception e)
+					{
+						System.out.println("Warning, constant service method threw exception: "+type+" "+methods[i]);
+//						e.printStackTrace();
+					}
+				}
+			}
+		}
+		
+		proxyinfos.put(service, ret);
+		return ret;
+	}
 }

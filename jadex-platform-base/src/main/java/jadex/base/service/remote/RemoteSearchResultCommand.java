@@ -68,7 +68,7 @@ public class RemoteSearchResultCommand extends RemoteResultCommand
 						ret.add((IService)Proxy.newProxyInstance(ls.getClassLoader(), 
 							new Class[]{pi.getServiceIdentifier().getServiceType(), IService.class},
 							new RemoteMethodInvocationHandler(component, pi.getRemoteManagementServiceIdentifier(), 
-								pi.getServiceIdentifier(), waitingcalls)));
+								pi.getServiceIdentifier(), waitingcalls, pi.getCache())));
 					}
 					result = ret;
 				}
@@ -78,7 +78,7 @@ public class RemoteSearchResultCommand extends RemoteResultCommand
 					result = (IService)Proxy.newProxyInstance(ls.getClassLoader(), 
 						new Class[]{pi.getServiceIdentifier().getServiceType(), IService.class},
 						new RemoteMethodInvocationHandler(component, pi.getRemoteManagementServiceIdentifier(), 
-							pi.getServiceIdentifier(), waitingcalls));
+							pi.getServiceIdentifier(), waitingcalls, pi.getCache()));
 				}
 				
 				RemoteSearchResultCommand.super.execute(component, waitingcalls)

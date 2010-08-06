@@ -5,13 +5,13 @@ import jadex.micro.MicroAgent;
 /**
  *  Simple agent that offers the add service.
  */
-public class AddAgent extends MicroAgent
+public class MathAgent extends MicroAgent
 {
 	/**
 	 *  Called once after agent creation.
 	 */
 	public void agentCreated()
 	{
-		addService(new AddService(getServiceProvider()));
+		addService(new MathService(getServiceProvider()));
 	}
 }

@@ -3,6 +3,9 @@ package jadex.base.service.remote;
 import jadex.bridge.IComponentIdentifier;
 import jadex.service.IServiceIdentifier;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  *  Info struct that holds all necessary information to generate
  *  a proxy on the local platform. Is necessary because a proxy
@@ -18,6 +21,9 @@ public class ProxyInfo
 	
 	/** The service identifier. */
 	protected IServiceIdentifier sid; 
+	
+	/** The value cache. */
+	protected Map cache;
 	
 	//-------- constructors --------
 	
@@ -73,5 +79,34 @@ public class ProxyInfo
 	public void setServiceIdentifier(IServiceIdentifier sid)
 	{
 		this.sid = sid;
+	}
+	
+	/**
+	 *  Get the cached values.
+	 *  @return The cached values. 
+	 */
+	public Map getCache()
+	{
+		return cache;
+	}
+	
+	/**
+	 *  Set the cached values.
+	 *  @param cache The cached values. 
+	 */
+	public void setCache(Map cache)
+	{
+		this.cache = cache;
+	}
+	
+	/**
+	 *  Get the cached values.
+	 *  @return The cached values. 
+	 */
+	public void putCache(Object key, Object value)
+	{
+		if(cache==null)
+			cache = new HashMap();
+		cache.put(key, value);
 	}
 }

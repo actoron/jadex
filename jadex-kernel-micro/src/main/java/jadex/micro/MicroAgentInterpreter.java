@@ -219,6 +219,7 @@ public class MicroAgentInterpreter implements IComponentInstance
 	 */
 	public void messageArrived(final IMessageAdapter message)
 	{
+//		System.out.println("msgrec: "+getAgentAdapter().getComponentIdentifier()+" "+message);
 		scheduleStep(new Runnable()
 		{
 			public void run()
@@ -419,6 +420,7 @@ public class MicroAgentInterpreter implements IComponentInstance
 	 */
 	public void	scheduleStep(final Runnable step)
 	{
+//		System.out.println("ss: "+getAgentAdapter().getComponentIdentifier()+" "+Thread.currentThread()+" "+step);
 		adapter.invokeLater(new Runnable()
 		{			
 			public void run()

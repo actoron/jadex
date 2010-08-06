@@ -6,9 +6,11 @@ import jadex.service.IService;
 /**
  *  Simple interface for a component service.
  */
-public interface IAddService extends IService
+public interface IMathService extends IService
 {
 	/**
+	 *  Tests a non-blocking call.
+	 * 
 	 *  Add two numbers.
 	 *  @param a First number.
 	 *  @param b Second number.
@@ -17,10 +19,21 @@ public interface IAddService extends IService
 	public IFuture addNB(int a, int b);
 	
 	/**
+	 *  Tests a blocking call (should be avoided!).
+	 * 
 	 *  Add two numbers.
 	 *  @param a First number.
 	 *  @param b Second number.
 	 *  @return The sum of a and b.
 	 */
 	public int addB(int a, int b);
+	
+	/**
+	 *  Tests a constant call, i.e. call without 
+	 *  parameters are assumed to be constant so that
+	 *  their value can be cached on local side.
+	 *   
+	 *  Get the PI value.
+	 */
+	public double getPi();
 }

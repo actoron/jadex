@@ -52,7 +52,7 @@ public class StartScenario
 									{
 										IComponentManagementService rcms = (IComponentManagementService)result;
 										
-										rcms.createComponent("add", "jadex.micro.examples.remoteservice.AddAgent.class", null, null)
+										rcms.createComponent("math", "jadex.micro.examples.remoteservice.MathAgent.class", null, null)
 											.addResultListener(new DefaultResultListener()
 										{
 											public void resultAvailable(Object source, Object result)
