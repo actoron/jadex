@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -54,8 +55,15 @@ public class DirectoryFacilitatorService extends BasicService implements IDF
 	 */
 	public DirectoryFacilitatorService(IServiceContainer provider)
 	{
-		// Hack!!! Should not reference gui???
-		super(provider.getId(), IDF.class, SUtil.createHashMap(new Object[]{"serviceviewer.viewerclass"}, new Object[]{"jadex.tools.serviceviewer.dfservice.DFBrowserPanel"}));
+		super(provider.getId(), IDF.class, null);
+	}
+	
+	/**
+	 *  Create a standalone df.
+	 */
+	public DirectoryFacilitatorService(IServiceContainer provider, Map properties)
+	{
+		super(provider.getId(), IDF.class, properties);
 
 		this.provider = provider;
 		this.components	= new IndexMap();

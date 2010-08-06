@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -51,8 +52,19 @@ public class LibraryService extends BasicService implements ILibraryService
 	 */ 
 	public LibraryService(Object[] urls, Object providerid)
 	{
+		this(urls, providerid, null);
+	}
+	
+	/** 
+	 *  Creates a new LibraryService.
+	 *  @param urls	Urls may be specified as java.net.URLs, java.io.Files or java.lang.Strings.
+	 *  	Strings are interpreted as relative files (relative to current directory),
+	 *  	absolute files or URLs (whatever can be found). 
+	 */ 
+	public LibraryService(Object[] urls, Object providerid, Map properties)
+	{
 		// Hack!!! Should not reference gui???
-		super(providerid, ILibraryService.class, SUtil.createHashMap(new Object[]{"serviceviewer.viewerclass"}, new Object[]{"jadex.tools.serviceviewer.libservice.LibServiceBrowser"}));
+		super(providerid, ILibraryService.class, properties);
 		
 		basecl = Thread.currentThread().getContextClassLoader();
 		libcl = basecl;

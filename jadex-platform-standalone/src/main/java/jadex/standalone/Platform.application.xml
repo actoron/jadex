@@ -68,27 +68,27 @@
 			$args.simulation
 			? new SyncExecutionService($platform)
 			: new AsyncExecutionService($platform)
-			
-			//$args.simulation
-			//? new SyncExecutionService((IThreadPool)SServiceProvider.getService($platform, ThreadPoolService.class).get(new ThreadSuspendable()))
-			//: new AsyncExecutionService((IThreadPool)SServiceProvider.getService($platform, ThreadPoolService.class).get(new ThreadSuspendable()))
 		</service>
 		<service class="ILibraryService">
-			new LibraryService($args.libpath, $component.getComponentIdentifier())
+			new LibraryService($args.libpath, $component.getComponentIdentifier(), 
+				SUtil.createHashMap(new Object[]{"serviceviewer.viewerclass"}, 
+				new Object[]{"jadex.tools.serviceviewer.libservice.LibServiceBrowser"}))
 		</service>
 		<service class="IComponentManagementService">
 			new ComponentManagementService($platform, $args.autoshutdown, $component.getComponentAdapter())
 		</service>
 		<service class="IDF">
-			new DirectoryFacilitatorService($platform)
+			new DirectoryFacilitatorService($platform, SUtil.createHashMap(
+				new Object[]{"serviceviewer.viewerclass"}, 
+				new Object[]{"jadex.tools.serviceviewer.dfservice.DFBrowserPanel"}))
 		</service>
 		<service class="IMessageService">
 			new MessageService($platform,
 				new ITransport[]
 				{
 					new LocalTransport($platform),
-					new TCPTransport($platform, $args.tcpport)//,
-					//new NIOTCPTransport($platform, $args.niotcpport)
+					new TCPTransport($platform, $args.tcpport),
+					new NIOTCPTransport($platform, $args.niotcpport)
 				},
 				new MessageType[]
 				{
@@ -99,16 +99,11 @@
 			$args.simulation
 			? new ClockService(new ClockCreationInfo(IClock.TYPE_EVENT_DRIVEN, "simulation_clock", System.currentTimeMillis(), 100), $platform)
 			: new ClockService(new ClockCreationInfo(IClock.TYPE_SYSTEM, "simulation_clock", System.currentTimeMillis(), 100), $platform)
-
-			// $args.simulation
-			// ? new ClockService(new jadex.service.clock.SimulationEventClock("simulation_clock", System.currentTimeMillis(), 100))
-			// : new ClockService(new SystemClock("system_clock", 100,
-			//	(IThreadPool)SServiceProvider.getService($platform, ThreadPoolService.class).get(new ThreadSuspendable())))
 		</service>
 		<service class="ISimulationService">
 			new SimulationService($platform)
 		</service>
-		<service class="jadex.bridge.IComponentFactory" >
+		<service class="IComponentFactory" >
 			new ApplicationComponentFactory(
 				new Set[]
 				{
