@@ -3,7 +3,7 @@ package jadex.micro.examples.remoteservice;
 import jadex.micro.MicroAgent;
 
 /**
- *  Simple agent that offers the add service.
+ *  Simple agent that offers the math service.
  */
 public class MathAgent extends MicroAgent
 {

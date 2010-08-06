@@ -6,7 +6,7 @@ import jadex.service.BasicService;
 import jadex.service.IServiceProvider;
 
 /**
- *  Simple implementation of the add interface.
+ *  Simple implementation of the math interface.
  */
 public class MathService extends BasicService implements IMathService
 {

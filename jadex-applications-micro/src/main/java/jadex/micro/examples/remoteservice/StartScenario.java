@@ -12,8 +12,8 @@ import jadex.service.SServiceProvider;
 
 /**
  *  Start two Jadex platforms and one agent on each platform.
- *  On the 'remote' platform the 'add' agent is created, which offers an 
- *  IAdd service interface via its service provider.
+ *  On the 'remote' platform the 'math' agent is created, which offers an 
+ *  IMathService interface via its service provider.
  *  On the 'local' platform the 'user' agent is created, which fetches the
  *  add service via the remote management service (by knowing the remote platform name/address). 
  */

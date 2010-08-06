@@ -1,6 +1,8 @@
 package jadex.micro.examples.remoteservice;
 
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
+import jadex.bridge.IRemoteServiceManagementService;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.micro.MicroAgent;
 import jadex.service.SServiceProvider;
@@ -22,10 +24,10 @@ public class UserAgent extends MicroAgent
 		{
 			public void resultAvailable(Object source, Object result)
 			{
-//				final IComponentManagementService cms = (IComponentManagementService)result;
+				final IComponentManagementService cms = (IComponentManagementService)result;
 				
 				// get remote management service and fetch service via rms.getProxy()
-				/*SServiceProvider.getService(getServiceProvider(), IRemoteServiceManagementService.class)
+				SServiceProvider.getService(getServiceProvider(), IRemoteServiceManagementService.class)
 					.addResultListener(createResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object source, Object result)
@@ -39,16 +41,16 @@ public class UserAgent extends MicroAgent
 
 						// Search for remote service
 //							rms.getProxy(rrms, null, IAddService.class).addResultListener(createResultListener(new DefaultResultListener()
-						rms.getServiceProxy(platid, null, IAddService.class).addResultListener(createResultListener(new DefaultResultListener()
+						rms.getServiceProxy(platid, null, IMathService.class).addResultListener(createResultListener(new DefaultResultListener()
 						{
 							public void resultAvailable(Object source, Object result)
 							{
-								IAddService service = (IAddService)((ServiceInfo)result).getService();
-								invokeAddService("IAddService searched via rms.", service);
+								IMathService service = (IMathService)result;
+								invokeAddService("IMathService searched via rms.", service);
 							}
 						}));
 					}						
-				}));*/
+				}));
 				
 				// search on local platform and find service via ProxyAgent to other platform
 				SServiceProvider.getService(getServiceProvider(), IMathService.class, false)
@@ -57,7 +59,7 @@ public class UserAgent extends MicroAgent
 					public void resultAvailable(Object source, Object result)
 					{
 						IMathService service = (IMathService)result;
-						invokeAddService("IAddService searched via platform proxy.", service);
+						invokeAddService("IMathService searched via platform proxy.", service);
 					}
 				}));
 			}
@@ -75,6 +77,7 @@ public class UserAgent extends MicroAgent
 		}
 		else
 		{
+			System.out.println("Found service: "+info);
 			// Execute non-blocking method call with future result
 //			System.out.println("Calling non-blocking addNB method.");
 //			service.addNB(1, 2).addResultListener(new DefaultResultListener()
