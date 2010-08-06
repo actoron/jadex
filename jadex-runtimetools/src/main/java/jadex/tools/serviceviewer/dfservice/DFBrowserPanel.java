@@ -10,7 +10,6 @@ import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.service.IService;
 import jadex.tools.common.GuiProperties;
 import jadex.tools.common.plugin.IControlCenter;
-import jadex.tools.dfbrowser.DFBrowserPlugin_old;
 import jadex.tools.serviceviewer.IServiceViewerPanel;
 
 import java.awt.BorderLayout;
@@ -44,7 +43,7 @@ public class DFBrowserPanel	extends JPanel implements IServiceViewerPanel
 	/** The image icons. */
 	protected static final UIDefaults icons = new UIDefaults(new Object[]
 	{
-		"refresh", SGUI.makeIcon(DFBrowserPlugin_old.class, "/jadex/tools/common/images/new_refresh_anim00.png")
+		"refresh", SGUI.makeIcon(DFBrowserPanel.class, "/jadex/tools/common/images/new_refresh_anim00.png")
 	});
 	
 	//-------- attributes --------
