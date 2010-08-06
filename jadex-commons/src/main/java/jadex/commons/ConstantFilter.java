@@ -56,4 +56,19 @@ public class ConstantFilter implements IFilter
 		this.value = value;
 	}
 	
+	/**
+	 *  Is equal?
+	 */
+	public boolean equals(Object obj)
+	{
+		return obj instanceof ConstantFilter && value==((ConstantFilter)obj).isValue();
+	}
+	
+	/**
+	 *  Hash code.
+	 */
+	public int hashCode()
+	{
+		return 31 + 31*(getClass().hashCode()+ (value ? 1 : 2));
+	}
 }

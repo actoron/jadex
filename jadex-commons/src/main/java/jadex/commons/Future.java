@@ -52,8 +52,6 @@ public class Future implements IFuture
 	 */
 	public Future()
 	{
-		this.listeners = new ArrayList();
-		this.callers = Collections.synchronizedMap(new HashMap());
 	}
 	
 	/**
@@ -103,6 +101,8 @@ public class Future implements IFuture
 	//        		caller = new ThreadSuspendable(this);
 	     
 //	    	   	System.out.println(this+" suspend: "+caller);
+	    	   	if(callers==null)
+	    	   		callers	= Collections.synchronizedMap(new HashMap());
 	    	   	callers.put(caller, CALLER_QUEUED);
 	    	   	suspend = true;
 	    	}
@@ -185,28 +185,34 @@ public class Future implements IFuture
 	{
 		synchronized(this)
 		{
-			for(Iterator it=callers.keySet().iterator(); it.hasNext(); )
-	    	{
-	    		ISuspendable caller = (ISuspendable)it.next();
-	    		Object mon = caller.getMonitor()!=null? caller.getMonitor(): caller;
-	//    		System.out.println(this+" resume: "+caller+" "+mon);
-	    		synchronized(mon)
-				{
-	    			Object	state	= callers.get(caller);
-	    			if(CALLER_SUSPENDED.equals(state))
-	    			{
-	    				// Only reactivate thread when previously suspended.
-	    				caller.resume();
-	    			}
-	    			callers.put(caller, CALLER_RESUMED);
-				}
-	    	}
+    	   	if(callers!=null)
+    	   	{
+				for(Iterator it=callers.keySet().iterator(); it.hasNext(); )
+		    	{
+		    		ISuspendable caller = (ISuspendable)it.next();
+		    		Object mon = caller.getMonitor()!=null? caller.getMonitor(): caller;
+		//    		System.out.println(this+" resume: "+caller+" "+mon);
+		    		synchronized(mon)
+					{
+		    			Object	state	= callers.get(caller);
+		    			if(CALLER_SUSPENDED.equals(state))
+		    			{
+		    				// Only reactivate thread when previously suspended.
+		    				caller.resume();
+		    			}
+		    			callers.put(caller, CALLER_RESUMED);
+					}
+		    	}
+			}
 		}
 		
-    	for(int i=0; i<listeners.size(); i++)
-    	{
-    		notifyListener((IResultListener)listeners.get(i));
-    	}
+		if(listeners!=null)
+		{
+	    	for(int i=0; i<listeners.size(); i++)
+	    	{
+	    		notifyListener((IResultListener)listeners.get(i));
+	    	}
+		}
 	}
     
     /**
@@ -223,6 +229,8 @@ public class Future implements IFuture
     	}
     	else
     	{
+    		if(listeners==null)
+    			listeners	= new ArrayList();
     		listeners.add(listener);
     	}
     }
