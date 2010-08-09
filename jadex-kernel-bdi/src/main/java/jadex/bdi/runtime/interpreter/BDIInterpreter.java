@@ -1059,6 +1059,22 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 	}*/
 	
 	/**
+	 *  Schedule a step of the agent.
+	 *  May safely be called from external threads.
+	 *  @param step	Code to be executed as a step of the agent.
+	 */
+	public void	scheduleStep(final Runnable step)
+	{
+		adapter.invokeLater(new Runnable()
+		{
+			public void run()
+			{
+				state.addAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_actions, step);
+			}
+		});
+	}
+	
+	/**
 	 *  Set the current plan thread.
 	 *  @param planthread The planthread.
 	 */ 
@@ -1357,7 +1373,7 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 		RULEBASE.addRule(AgentRules.createTerminatingEndAgentRule());
 		RULEBASE.addRule(AgentRules.createTerminateAgentRule());
 		RULEBASE.addRule(AgentRules.createRemoveChangeEventRule());
-//		RULEBASE.addRule(AgentRules.createExecuteActionRule());
+		RULEBASE.addRule(AgentRules.createExecuteActionRule());
 //		RULEBASE.addRule(AgentRules.createTerminatingStartAgentRule());
 
 		// Listener rules.

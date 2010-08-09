@@ -2,7 +2,6 @@ package jadex.bdi.runtime.interpreter;
 
 import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bridge.CheckedAction;
-import jadex.bridge.InterpreterTimedObject;
 import jadex.rules.rulesystem.IAction;
 import jadex.rules.rulesystem.ICondition;
 import jadex.rules.rulesystem.IVariableAssignments;
@@ -1084,7 +1083,7 @@ public class GoalProcessingRules
 //				// changed *.class to *.TYPE due to javaflow bug
 				state.setAttributeValue(rgoal, OAVBDIRuntimeModel.goal_has_retrytimer,
 					BDIInterpreter.getInterpreter(state).getClockService().createTimer(retrydelay, 
-						new InterpreterTimedObject(BDIInterpreter.getInterpreter(state).getServiceProvider(), BDIInterpreter.getInterpreter(state).getAgentAdapter(), new CheckedAction()
+						new InterpreterTimedObject(BDIInterpreter.getInterpreter(state), new CheckedAction()
 				{
 					public void run()
 					{
@@ -1333,7 +1332,7 @@ public class GoalProcessingRules
 //					// changed *.class to *.TYPE due to javaflow bug
 					state.setAttributeValue(rgoal, OAVBDIRuntimeModel.goal_has_recurtimer,
 						BDIInterpreter.getInterpreter(state).getClockService().createTimer(recurdelay, 
-							new InterpreterTimedObject(BDIInterpreter.getInterpreter(state).getServiceProvider(), BDIInterpreter.getInterpreter(state).getAgentAdapter(), new CheckedAction()
+							new InterpreterTimedObject(BDIInterpreter.getInterpreter(state), new CheckedAction()
 					{
 						public void run()
 						{

@@ -6,7 +6,6 @@ import jadex.bdi.runtime.impl.flyweights.ParameterFlyweight;
 import jadex.bridge.CheckedAction;
 import jadex.bridge.ComponentResultListener;
 import jadex.bridge.IArgument;
-import jadex.bridge.InterpreterTimedObject;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.SReflect;
@@ -456,7 +455,7 @@ public class AgentRules
 
 	/**
 	 *  Execute an external action.
-	 * /
+	 */
 	protected static Rule createExecuteActionRule()
 	{
 		Variable	runnable	= new Variable("?runnable", OAVBDIRuntimeModel.java_runnable_type);
@@ -475,13 +474,13 @@ public class AgentRules
 			{
 				Object ragent = assignments.getVariableValue("?ragent");
 				Runnable runnable = (Runnable)assignments.getVariableValue("?runnable");
-//				System.out.println("Executing external action: "+runnable);
+				System.out.println("Executing external action: "+runnable);
 				state.removeAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_actions, runnable);
-				if(runnable instanceof InterpreterTimedObjectAction)
+				if(runnable instanceof CheckedAction)
 				{
-					if(((InterpreterTimedObjectAction)runnable).isValid())
+					if(((CheckedAction)runnable).isValid())
 						runnable.run();
-					((InterpreterTimedObjectAction)runnable).cleanup();
+					((CheckedAction)runnable).cleanup();
 				}
 				else //if(entries[i] instanceof Runnable)
 				{
@@ -492,7 +491,7 @@ public class AgentRules
 		
 		Rule agent_execute_action	= new Rule("agent_execute_action", new AndCondition(new ICondition[]{actioncon, ragentcon}), action);
 		return agent_execute_action;
-	}*/
+	}
 
 	/**
 	 *  Cleanup rule for removing change events.
@@ -1550,7 +1549,7 @@ public class AgentRules
 		{
 			final ITimedObject[]	to	= new ITimedObject[1];
 			final OAVBDIFetcher fet = new OAVBDIFetcher(state, rcapa);
-			to[0] = new InterpreterTimedObject(BDIInterpreter.getInterpreter(state).getServiceProvider(), BDIInterpreter.getInterpreter(state).getAgentAdapter(), new CheckedAction()
+			to[0] = new InterpreterTimedObject(BDIInterpreter.getInterpreter(state), new CheckedAction()
 			{
 				public void run()
 				{
@@ -1765,7 +1764,7 @@ public class AgentRules
 			final ITimedObject[]	to	= new ITimedObject[1];
 			
 			final OAVBDIFetcher fet = new OAVBDIFetcher(state, rcapa);
-			to[0]	= new InterpreterTimedObject(BDIInterpreter.getInterpreter(state).getServiceProvider(), BDIInterpreter.getInterpreter(state).getAgentAdapter(), new CheckedAction()
+			to[0]	= new InterpreterTimedObject(BDIInterpreter.getInterpreter(state), new CheckedAction()
 			{
 				public void run()
 				{
@@ -3050,7 +3049,7 @@ public class AgentRules
 		
 		// changed *.class to *.TYPE due to javaflow bug
 		state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_timer, interpreter.getClockService().createTimer(tt, 
-			new InterpreterTimedObject(BDIInterpreter.getInterpreter(state).getServiceProvider(), BDIInterpreter.getInterpreter(state).getAgentAdapter(), new CheckedAction()
+			new InterpreterTimedObject(BDIInterpreter.getInterpreter(state), new CheckedAction()
 			{
 				public boolean isValid()
 				{

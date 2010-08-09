@@ -9,12 +9,12 @@ import jadex.bdi.runtime.impl.WakeupAction;
 import jadex.bdi.runtime.impl.flyweights.ElementFlyweight;
 import jadex.bdi.runtime.interpreter.GoalLifecycleRules;
 import jadex.bdi.runtime.interpreter.InternalEventRules;
+import jadex.bdi.runtime.interpreter.InterpreterTimedObject;
 import jadex.bdi.runtime.interpreter.MessageEventRules;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bdi.runtime.interpreter.PlanRules;
 import jadex.bridge.ComponentResultListener;
 import jadex.bridge.ILoadableComponentModel;
-import jadex.bridge.InterpreterTimedObject;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.concurrent.IResultListener;
@@ -1000,12 +1000,12 @@ public class ExternalAccessFlyweight extends EACapabilityFlyweight implements IB
 					
 //					System.out.println("Timer created: "+start);
 					getState().setAttributeValue(ea, OAVBDIRuntimeModel.externalaccess_has_timer,
-						getInterpreter().getClockService().createTimer(timeout, new InterpreterTimedObject(getInterpreter().getServiceProvider(), getInterpreter().getAgentAdapter(), wakeup)));
+						getInterpreter().getClockService().createTimer(timeout, new InterpreterTimedObject(getInterpreter(), wakeup)));
 				}
 				else if(timeout==PlanRules.TICK_TIMER)
 				{
 					getState().setAttributeValue(ea, OAVBDIRuntimeModel.externalaccess_has_timer,
-						getInterpreter().getClockService().createTickTimer(new InterpreterTimedObject(getInterpreter().getServiceProvider(), getInterpreter().getAgentAdapter(), wakeup)));
+						getInterpreter().getClockService().createTickTimer(new InterpreterTimedObject(getInterpreter(), wakeup)));
 				}				
 			}
 		});

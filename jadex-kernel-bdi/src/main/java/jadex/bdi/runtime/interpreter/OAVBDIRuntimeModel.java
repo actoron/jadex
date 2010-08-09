@@ -168,8 +168,8 @@ public class OAVBDIRuntimeModel
 
 	//-------- java types --------
 	
-//	/** Java type for runnables. */
-//	public static OAVJavaType java_runnable_type;
+	/** Java type for runnables. */
+	public static OAVJavaType java_runnable_type;
 	
 	/** Java type for maps. */
 	public static OAVJavaType java_map_type;
@@ -220,8 +220,8 @@ public class OAVBDIRuntimeModel
 	/** The agent has an inbox for raw messages. */
 	public static OAVAttributeType agent_has_inbox;
 	
-//	/** The agent has actions (invoke later actions to be executed by the agent). */
-//	public static OAVAttributeType agent_has_actions;
+	/** The agent has actions (invoke later actions to be executed by the agent). */
+	public static OAVAttributeType agent_has_actions;
 
 	/** The agent has arguments (only available during start agent action). */
 	// Hack!!! remove???
@@ -752,7 +752,7 @@ public class OAVBDIRuntimeModel
 		java_serviceprovider_type	= createJavaType(IServiceProvider.class, OAVJavaType.KIND_OBJECT);
 		//java_planexecutor_type = createJavaType(IPlanExecutor.class);
 		//java_waitabstraction_type = bdirt_model_type.createJavaType(WaitAbstraction.class);
-//		java_runnable_type = createJavaType(Runnable.class, OAVJavaType.KIND_OBJECT);
+		java_runnable_type = createJavaType(Runnable.class, OAVJavaType.KIND_OBJECT);
 		
 		// object types (done first, before attributes are created).
 		element_type = bdi_rt_model.createType("element", OAVBDIMetaModel.object_type);
@@ -937,7 +937,7 @@ public class OAVBDIRuntimeModel
 		agent_has_state = agent_type.createAttributeType("agent_has_state", OAVJavaType.java_string_type, OAVAttributeType.NONE);
 		// todo: use IMessageAdapter?
 		agent_has_inbox = agent_type.createAttributeType("agent_has_inbox", java_imessageadapter_type, OAVAttributeType.LIST, null);
-//		agent_has_actions = agent_type.createAttributeType("agent_has_actions", java_runnable_type, OAVAttributeType.LIST, null);
+		agent_has_actions = agent_type.createAttributeType("agent_has_actions", java_runnable_type, OAVAttributeType.LIST, null);
 //		agent_has_serviceprovider = agent_type.createAttributeType("agent_has_serviceprovider", java_serviceprovider_type, OAVAttributeType.NONE);
 
 		java_map_type = createJavaType(Map.class, OAVJavaType.KIND_OBJECT);

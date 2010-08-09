@@ -15,6 +15,7 @@ import jadex.service.threadpool.IThreadPoolService;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -61,7 +62,15 @@ public class SyncExecutionService extends BasicService implements IExecutionServ
 	 */
 	public SyncExecutionService(IServiceProvider provider)
 	{
-		super(provider.getId(), IExecutionService.class, null);
+		this(provider, null);
+	}
+	
+	/**
+	 *  Create a new synchronous executor service. 
+	 */
+	public SyncExecutionService(IServiceProvider provider, Map properties)
+	{
+		super(provider.getId(), IExecutionService.class, properties);
 
 		this.provider = provider;
 		this.running	= false;
@@ -131,6 +140,14 @@ public class SyncExecutionService extends BasicService implements IExecutionServ
 		}
 		
 		return ret;
+	}
+	
+	/**
+	 *  Get the currently running or waiting tasks.
+	 */
+	public synchronized IExecutable[]	getTasks()
+	{
+		return (IExecutable[])queue.toArray(new IExecutable[queue.size()]);
 	}
 	
 	/**

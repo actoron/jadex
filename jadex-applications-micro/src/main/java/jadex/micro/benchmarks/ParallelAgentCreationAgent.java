@@ -5,6 +5,7 @@ import jadex.bridge.CreationInfo;
 import jadex.bridge.IArgument;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
+import jadex.commons.ICommand;
 import jadex.commons.concurrent.CounterResultListener;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
@@ -59,9 +60,9 @@ public class ParallelAgentCreationAgent extends MicroAgent
 								{
 									System.out.println("Created peer: "+cnt);
 									
-									scheduleStep(new Runnable()
+									scheduleStep(new ICommand()
 									{
-										public void run()
+										public void execute(Object args)
 										{
 											long used = Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory();
 											omem[0] = (used-startmem)/1024;
@@ -86,9 +87,9 @@ public class ParallelAgentCreationAgent extends MicroAgent
 								
 								public void exceptionOccurred(Object source, final Exception exception)
 								{
-									scheduleStep(new Runnable()
+									scheduleStep(new ICommand()
 									{
-										public void run()
+										public void execute(Object args)
 										{
 											if(exception instanceof RuntimeException)
 												throw (RuntimeException)exception;
@@ -110,9 +111,9 @@ public class ParallelAgentCreationAgent extends MicroAgent
 								{
 									System.out.println("Successfully destroyed peer: "+source);
 									
-									scheduleStep(new Runnable()
+									scheduleStep(new ICommand()
 									{
-										public void run()
+										public void execute(Object args)
 										{
 											long killend = clock.getTime();
 											System.out.println("Last peer destroyed. "+num+" agents killed.");
@@ -137,9 +138,9 @@ public class ParallelAgentCreationAgent extends MicroAgent
 								
 								public void exceptionOccurred(Object source, final Exception exception)
 								{
-									scheduleStep(new Runnable()
+									scheduleStep(new ICommand()
 									{
-										public void run()
+										public void execute(Object args)
 										{
 											if(exception instanceof RuntimeException)
 												throw (RuntimeException)exception;

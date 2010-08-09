@@ -3,14 +3,13 @@ package jadex.bpmn.runtime.handler;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ProcessThread;
-import jadex.bridge.CheckedAction;
-import jadex.bridge.InterpreterTimedObject;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.service.SServiceProvider;
 import jadex.service.clock.IClockService;
+import jadex.service.clock.ITimedObject;
 import jadex.service.clock.ITimer;
 
 /**
@@ -35,22 +34,23 @@ public class EventIntermediateTimerActivityHandler extends	AbstractEventIntermed
 		{
 			public void resultAvailable(Object source, Object result)
 			{
-				CheckedAction ta = new CheckedAction()
+				ITimedObject	to	= new ITimedObject()
 				{
-					public void run()
+					public void timeEventOccurred(long currenttime)
 					{
 						instance.notify(activity, thread, TIMER_EVENT);
 					}
 				};
 				
+				
 				Object waitinfo; 
 				if(duration==TICK_TIMER)
 				{
-					waitinfo = ((IClockService)result).createTickTimer(new InterpreterTimedObject(instance.getServiceProvider(), instance.getComponentAdapter(), ta));
+					waitinfo = ((IClockService)result).createTickTimer(to);
 				}
 				else
 				{
-					waitinfo = ((IClockService)result).createTimer(duration, new InterpreterTimedObject(instance.getServiceProvider(), instance.getComponentAdapter(), ta));
+					waitinfo = ((IClockService)result).createTimer(duration, to);
 				}
 				wifuture.setResult(waitinfo);
 			}

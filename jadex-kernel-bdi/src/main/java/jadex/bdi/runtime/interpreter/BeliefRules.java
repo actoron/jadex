@@ -2,7 +2,6 @@ package jadex.bdi.runtime.interpreter;
 
 import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bridge.CheckedAction;
-import jadex.bridge.InterpreterTimedObject;
 import jadex.commons.SReflect;
 import jadex.rules.rulesystem.IAction;
 import jadex.rules.rulesystem.ICondition;
@@ -383,7 +382,7 @@ public class BeliefRules
 				final ITimedObject[]	to	= new ITimedObject[1];
 				final OAVBDIFetcher fet = new OAVBDIFetcher(state, rcapa);
 				
-				to[0] = new InterpreterTimedObject(BDIInterpreter.getInterpreter(state).getServiceProvider(), BDIInterpreter.getInterpreter(state).getAgentAdapter(), new CheckedAction()
+				to[0] = new InterpreterTimedObject(BDIInterpreter.getInterpreter(state), new CheckedAction()
 				{
 					public boolean isValid()
 					{
@@ -456,7 +455,7 @@ public class BeliefRules
 				final ITimedObject[]	to	= new ITimedObject[1];
 				final OAVBDIFetcher fet = new OAVBDIFetcher(state, rcapa);
 				
-				to[0] = new InterpreterTimedObject(BDIInterpreter.getInterpreter(state).getServiceProvider(), BDIInterpreter.getInterpreter(state).getAgentAdapter(), new CheckedAction()
+				to[0] = new InterpreterTimedObject(BDIInterpreter.getInterpreter(state), new CheckedAction()
 				{
 					public boolean isValid()
 					{

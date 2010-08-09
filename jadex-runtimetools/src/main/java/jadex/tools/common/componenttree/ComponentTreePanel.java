@@ -411,23 +411,25 @@ public class ComponentTreePanel extends JPanel
 							public void run()
 							{
 								final ComponentTreeNode	parent = desc.getParent()==null? null: (ComponentTreeNode)model.getNode(desc.getParent());
-								
-								parent.createComponentNode(desc).addResultListener(new IResultListener()
+								if(parent!=null)
 								{
-									public void resultAvailable(Object source, Object result)
+									parent.createComponentNode(desc).addResultListener(new IResultListener()
 									{
-										IComponentTreeNode	node = (IComponentTreeNode)result;
-										if(parent!=null)
+										public void resultAvailable(Object source, Object result)
 										{
-											parent.addChild(node);
+											IComponentTreeNode	node = (IComponentTreeNode)result;
+											if(parent!=null)
+											{
+												parent.addChild(node);
+											}
 										}
-									}
-									
-									public void exceptionOccurred(Object source, Exception exception)
-									{
-										exception.printStackTrace();
-									}
-								});
+										
+										public void exceptionOccurred(Object source, Exception exception)
+										{
+											exception.printStackTrace();
+										}
+									});
+								}
 //								IComponentTreeNode	node	= new ComponentTreeNode(parent, model, desc, cms, ComponentTreePanel.this, cic);
 							}
 						});

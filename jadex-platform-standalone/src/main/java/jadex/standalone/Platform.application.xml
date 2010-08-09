@@ -66,7 +66,8 @@
 		</service>
 		<service class="IExecutionService">
 			$args.simulation
-			? new SyncExecutionService($platform)
+			? new SyncExecutionService($platform, SUtil.createHashMap(new Object[]{"serviceviewer.viewerclass"},
+				new Object[]{"jadex.tools.serviceviewer.executionservice.ExecutionServiceViewer"}))
 			: new AsyncExecutionService($platform)
 		</service>
 		<service class="ILibraryService">

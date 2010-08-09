@@ -34,7 +34,12 @@ public interface IExecutionService	extends IService
 	 *  @return Future signaling calcellation.
 	 */
 	public IFuture cancel(IExecutable task);
-		
+	
+	/**
+	 *  Get the currently running or waiting tasks.
+	 */
+	public IExecutable[]	getTasks();
+	
 	/**
 	 *  Test if the executor is currently idle.
 	 */

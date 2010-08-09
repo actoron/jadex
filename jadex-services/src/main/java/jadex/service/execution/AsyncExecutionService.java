@@ -27,7 +27,7 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 	/** The threadpool. */
 	protected IThreadPoolService threadpool;
 	
-	/** The currently waiting tasks. */
+	/** The currently waiting tasks (task->executor). */
 	protected Map executors;
 		
 	/** The idle commands. */
@@ -210,6 +210,14 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 		}
 		
 		return ret;
+	}
+	
+	/**
+	 *  Get the currently running or waiting tasks.
+	 */
+	public synchronized IExecutable[]	getTasks()
+	{
+		return (IExecutable[])executors.keySet().toArray(new IExecutable[executors.size()]);
 	}
 	
 	/**
