@@ -67,7 +67,6 @@ public class JavaReader extends Reader
 		try
 		{
 			// java.util.Map
-			
 			IObjectObjectConverter entryconv = new IObjectObjectConverter()
 			{
 				public Object convertObject(Object val, IContext context)
@@ -92,7 +91,6 @@ public class JavaReader extends Reader
 			typeinfos.add(ti_mapentry);
 			
 			// java.util.List
-			
 			TypeInfo ti_list = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.util", "List")}),
 				new ObjectInfo(List.class), new MappingInfo(null, new SubobjectInfo[]{
 				new SubobjectInfo(new AccessInfo("entries", null, null, null, 
@@ -101,7 +99,6 @@ public class JavaReader extends Reader
 			typeinfos.add(ti_list);
 			
 			// java.util.Set
-			
 			TypeInfo ti_set = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.util", "Set")}),
 				new ObjectInfo(Set.class), new MappingInfo(null, new SubobjectInfo[]{
 				new SubobjectInfo(new AccessInfo("entries", null, null, null,
@@ -110,7 +107,6 @@ public class JavaReader extends Reader
 			typeinfos.add(ti_set);
 			
 			// java.util.Color
-			
 			IStringObjectConverter coconv = new IStringObjectConverter()
 			{
 				public Object convertString(String val, IContext context)
@@ -136,8 +132,124 @@ public class JavaReader extends Reader
 			typeinfos.add(ti_class);
 			
 			// java.util.Date
-			
 			// No special read info necessary.
+			
+			// java.lang.String
+			TypeInfo ti_string = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.lang", "String")}),
+				new ObjectInfo(new IBeanObjectCreator()
+				{
+					public Object createObject(IContext context, Map rawattributes) throws Exception
+					{
+						return (String)rawattributes.get("content");
+					}
+				}),
+				new MappingInfo(null, new AttributeInfo[]{new AttributeInfo(new AccessInfo("content", null, AccessInfo.IGNORE_READWRITE))}
+			));
+			typeinfos.add(ti_string);
+			
+			// java.lang.Boolean
+			TypeInfo ti_boolean = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.lang", "Boolean")}),
+				new ObjectInfo(new IBeanObjectCreator()
+				{
+					public Object createObject(IContext context, Map rawattributes) throws Exception
+					{
+						return new Boolean((String)rawattributes.get("content"));
+					}
+				}),
+				new MappingInfo(null, new AttributeInfo[]{new AttributeInfo(new AccessInfo("content", null, AccessInfo.IGNORE_READWRITE))}
+			));
+			typeinfos.add(ti_boolean);
+			
+			// java.lang.Integer
+			TypeInfo ti_integer = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.lang", "Integer")}),
+				new ObjectInfo(new IBeanObjectCreator()
+				{
+					public Object createObject(IContext context, Map rawattributes) throws Exception
+					{
+						return new Integer((String)rawattributes.get("content"));
+					}
+				}),
+				new MappingInfo(null, new AttributeInfo[]{new AttributeInfo(new AccessInfo("content", null, AccessInfo.IGNORE_READWRITE))}
+			));
+			typeinfos.add(ti_integer);
+			
+			// java.lang.Double
+			TypeInfo ti_double = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.lang", "Double")}),
+				new ObjectInfo(new IBeanObjectCreator()
+				{
+					public Object createObject(IContext context, Map rawattributes) throws Exception
+					{
+						return new Double((String)rawattributes.get("content"));
+					}
+				}),
+				new MappingInfo(null, new AttributeInfo[]{new AttributeInfo(new AccessInfo("content", null, AccessInfo.IGNORE_READWRITE))}
+			));
+			typeinfos.add(ti_double);
+			
+			// java.lang.Float
+			TypeInfo ti_float = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.lang", "Float")}),
+				new ObjectInfo(new IBeanObjectCreator()
+				{
+					public Object createObject(IContext context, Map rawattributes) throws Exception
+					{
+						return new Float((String)rawattributes.get("content"));
+					}
+				}),
+				new MappingInfo(null, new AttributeInfo[]{new AttributeInfo(new AccessInfo("content", null, AccessInfo.IGNORE_READWRITE))}
+			));
+			typeinfos.add(ti_float);
+			
+			// java.lang.Long
+			TypeInfo ti_long = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.lang", "Long")}),
+				new ObjectInfo(new IBeanObjectCreator()
+				{
+					public Object createObject(IContext context, Map rawattributes) throws Exception
+					{
+						return new Long((String)rawattributes.get("content"));
+					}
+				}),
+				new MappingInfo(null, new AttributeInfo[]{new AttributeInfo(new AccessInfo("content", null, AccessInfo.IGNORE_READWRITE))}
+			));
+			typeinfos.add(ti_long);
+			
+			// java.lang.Short
+			TypeInfo ti_short = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.lang", "Short")}),
+				new ObjectInfo(new IBeanObjectCreator()
+				{
+					public Object createObject(IContext context, Map rawattributes) throws Exception
+					{
+						return new Short((String)rawattributes.get("content"));
+					}
+				}),
+				new MappingInfo(null, new AttributeInfo[]{new AttributeInfo(new AccessInfo("content", null, AccessInfo.IGNORE_READWRITE))}
+			));
+			typeinfos.add(ti_short);
+			
+			// java.lang.Byte
+			TypeInfo ti_byte = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.lang", "Byte")}),
+				new ObjectInfo(new IBeanObjectCreator()
+				{
+					public Object createObject(IContext context, Map rawattributes) throws Exception
+					{
+						return new Byte((String)rawattributes.get("content"));
+					}
+				}),
+				new MappingInfo(null, new AttributeInfo[]{new AttributeInfo(new AccessInfo("content", null, AccessInfo.IGNORE_READWRITE))}
+			));
+			typeinfos.add(ti_byte);
+			
+			// java.lang.Character
+			TypeInfo ti_character = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.lang", "Character")}),
+				new ObjectInfo(new IBeanObjectCreator()
+				{
+					public Object createObject(IContext context, Map rawattributes) throws Exception
+					{
+						return new Character(((String)rawattributes.get("content")).charAt(0));
+					}
+				}),
+				new MappingInfo(null, new AttributeInfo[]{new AttributeInfo(new AccessInfo("content", null, AccessInfo.IGNORE_READWRITE))}
+			));
+			typeinfos.add(ti_character);
 		}
 		catch(Exception e)
 		{

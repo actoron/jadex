@@ -5,6 +5,8 @@ package jadex.bridge;
  */
 public interface IComponentIdentifier
 {
+	public static final IComponentIdentifier[] EMPTY_COMPONENTIDENTIFIERS = new IComponentIdentifier[0]; 
+	
 	/**
 	 *  Get the component name.
 	 *  @return The name of an component.

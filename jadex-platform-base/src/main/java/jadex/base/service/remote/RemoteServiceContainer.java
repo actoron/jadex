@@ -67,7 +67,7 @@ public class RemoteServiceContainer extends BasicServiceContainer
 				else
 				{
 					// Hack! Use user search manager.
-					rms.getServiceProxies(componentid, componentid, SServiceProvider.sequentialmanager, decider, selector)
+					rms.getServiceProxies(componentid, SServiceProvider.sequentialmanager, decider, selector)
 						.addResultListener(new IResultListener()
 					{
 						public void resultAvailable(Object source, Object res)

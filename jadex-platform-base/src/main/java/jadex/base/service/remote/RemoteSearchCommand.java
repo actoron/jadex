@@ -79,10 +79,6 @@ public class RemoteSearchCommand implements IRemoteCommand
 	public IFuture execute(final IExternalAccess component, Map waitingcalls)
 	{
 		final Future ret = new Future();
-		
-		// fetch component via provider/component id
-		final IComponentIdentifier compid = providerid!=null? 
-			(IComponentIdentifier)providerid: component.getComponentIdentifier();
 			
 		SServiceProvider.getServiceUpwards(component.getServiceProvider(), IComponentManagementService.class)
 			.addResultListener(component.createResultListener(new IResultListener()
@@ -90,7 +86,7 @@ public class RemoteSearchCommand implements IRemoteCommand
 			public void resultAvailable(Object source, Object result)
 			{
 				IComponentManagementService cms = (IComponentManagementService)result;
-				cms.getExternalAccess(compid).addResultListener(new IResultListener()
+				cms.getExternalAccess((IComponentIdentifier)providerid).addResultListener(new IResultListener()
 				{
 					public void resultAvailable(Object source, Object result)
 					{
@@ -112,7 +108,7 @@ public class RemoteSearchCommand implements IRemoteCommand
 									for(Iterator it=((Collection)result).iterator(); it.hasNext(); )
 									{
 										IService tmp = (IService)it.next();
-										ProxyInfo pi = getProxyInfo(component.getComponentIdentifier(), tmp);
+										ServiceProxyInfo pi = getProxyInfo(component.getComponentIdentifier(), tmp);
 										res.add(pi);
 									}
 									content = res;
@@ -242,21 +238,21 @@ public class RemoteSearchCommand implements IRemoteCommand
 	/**
 	 *  Get a proxy info for a service. 
 	 */
-	protected ProxyInfo getProxyInfo(IComponentIdentifier rms, IService service)
+	protected ServiceProxyInfo getProxyInfo(IComponentIdentifier rms, IService service)
 	{
-		ProxyInfo ret;
+		ServiceProxyInfo ret;
 		
 		// This construct ensures
 		// a) fast access to existing proxyinfos in the map
 		// b) creation is performed only once by ordering threads 
 		// via synchronized block and rechecking if proxy was already created.
 		
-		ret = (ProxyInfo)proxyinfos.get(service);
+		ret = (ServiceProxyInfo)proxyinfos.get(service);
 		if(ret==null)
 		{
 			synchronized(proxyinfos)
 			{
-				ret = (ProxyInfo)proxyinfos.get(service);
+				ret = (ServiceProxyInfo)proxyinfos.get(service);
 				if(ret==null)
 				{
 					ret = createProxyInfo(rms, service);
@@ -270,27 +266,34 @@ public class RemoteSearchCommand implements IRemoteCommand
 	/**
 	 *  Create a proxy info for a service. 
 	 */
-	protected ProxyInfo createProxyInfo(IComponentIdentifier rms, IService service)
+	protected ServiceProxyInfo createProxyInfo(IComponentIdentifier rms, IService service)
 	{
 		Class type = service.getServiceIdentifier().getServiceType();
-		ProxyInfo ret = new ProxyInfo(rms, service.getServiceIdentifier());
+		ServiceProxyInfo ret = new ServiceProxyInfo(rms, service.getServiceIdentifier());
 	
+		System.out.println("Creating proxy for: "+type);
 		Method[] methods = type.getMethods();
 		for(int i=0; i<methods.length; i++)
 		{
 			Class rt = methods[i].getReturnType();
 			Class[] ar = methods[i].getParameterTypes();
-			if(rt!=null && !(rt.isAssignableFrom(IFuture.class)))
+			
+			if(void.class.equals(rt))
+			{
+//				System.out.println("Warning, void method call will be executed asynchronously: "+type+" "+methods[i].getName());
+			}
+			else if(!(rt.isAssignableFrom(IFuture.class)))
 			{
 				if(ar.length>0)
 				{
-					System.out.println("Warning, service method is blocking: "+type+" "+methods[i].getName());
+//					System.out.println("Warning, service method is blocking: "+type+" "+methods[i].getName());
 				}
 				else
 				{
 					// Invoke method to get constant return value.
 					try
 					{
+						System.out.println("Calling for caching: "+methods[i]);
 						Object val = methods[i].invoke(service, new Object[0]);
 						ret.putCache(methods[i].getName(), val);
 					}

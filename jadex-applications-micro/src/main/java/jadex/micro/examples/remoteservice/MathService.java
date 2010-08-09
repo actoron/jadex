@@ -62,4 +62,13 @@ public class MathService extends BasicService implements IMathService
 		System.out.println("getPi");
 		return Math.PI;
 	}
+	
+	/**
+	 *  Print out some message.
+	 *  @param message The message.
+	 */
+	public void printMessage(String message)
+	{
+		System.out.println(message);
+	}
 }

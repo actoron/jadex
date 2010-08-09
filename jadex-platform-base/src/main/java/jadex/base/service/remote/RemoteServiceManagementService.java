@@ -10,6 +10,7 @@ import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.IResultListener;
+import jadex.service.AnyResultSelector;
 import jadex.service.BasicService;
 import jadex.service.IResultSelector;
 import jadex.service.ISearchManager;
@@ -54,14 +55,13 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	/**
 	 *  Get a service proxies from a remote platform.
 	 *  (called from arbitrary components)
-	 *  @param platform The component id of the remote platform.
-	 *  @param providerid Optional component id that is used to start the search.
+	 *  @param cid Component id that is used to start the search.
 	 *  @param manager The search manager.
 	 *  @param decider The visit decider.
 	 *  @param selector The result selector.
 	 *  @return Collection or single result (i.e. service proxies). 
 	 */
-	public IFuture getServiceProxies(final IComponentIdentifier platform, final IComponentIdentifier providerid, 
+	public IFuture getServiceProxies(final IComponentIdentifier cid, 
 		final ISearchManager manager, final IVisitDecider decider, final IResultSelector selector)
 	{
 		final Future ret = new Future();
@@ -73,12 +73,12 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 			{
 				IComponentManagementService cms = (IComponentManagementService)result;
 				// Hack! create remote rms cid with "rms" assumption.
-				IComponentIdentifier rrms = cms.createComponentIdentifier("rms@"+platform.getPlatformName(), false, platform.getAddresses());
+				IComponentIdentifier rrms = cms.createComponentIdentifier("rms@"+cid.getPlatformName(), false, cid.getAddresses());
 		
 				String callid = SUtil.createUniqueId(component.getComponentIdentifier().getLocalName());
 				waitingcalls.put(callid, ret);
 		
-				RemoteSearchCommand content = new RemoteSearchCommand(providerid, manager, 
+				RemoteSearchCommand content = new RemoteSearchCommand(cid, manager, 
 					decider, selector, callid);
 				
 				final Map msg = new HashMap();
@@ -133,9 +133,9 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	 *  @param service The service type.
 	 *  @return The service proxy.
 	 */
-	public IFuture getServiceProxy(final IComponentIdentifier platform, IComponentIdentifier providerid, final Class service)
+	public IFuture getServiceProxy(IComponentIdentifier cid, final Class service)
 	{
-		return getServiceProxies(platform, providerid, SServiceProvider.sequentialmanager, SServiceProvider.abortdecider, 
+		return getServiceProxies(cid, SServiceProvider.sequentialmanager, SServiceProvider.abortdecider, 
 			new TypeResultSelector(service, true));
 	}
 	
@@ -147,11 +147,93 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	 *  @param service The service type.
 	 *  @return The service proxy.
 	 */
-	public IFuture getServiceProxies(final IComponentIdentifier platform, IComponentIdentifier providerid, final Class service)
+	public IFuture getServiceProxies(IComponentIdentifier cid, final Class service)
 	{
-		return getServiceProxies(platform, providerid, SServiceProvider.sequentialmanager, SServiceProvider.contdecider, 
+		return getServiceProxies(cid, SServiceProvider.sequentialmanager, SServiceProvider.contdecider, 
 			new TypeResultSelector(service, true));
 	}
+	
+	/**
+	 *  Get all declared service proxies from a remote component.
+	 *  (called from arbitrary components)
+	 *  @param cid The remote provider id.
+	 *  @param service The service type.
+	 *  @return The service proxy.
+	 */
+	public IFuture getDeclaredServiceProxies(IComponentIdentifier cid)
+	{
+		return getServiceProxies(cid, SServiceProvider.localmanager, SServiceProvider.contdecider, 
+			new AnyResultSelector(false, true));
+	}
+	
+	/**
+	 *  Get an external access proxy from a remote component.
+	 *  (called from arbitrary components)
+	 *  @param cid Component target id.
+	 *  @return External access of remote component. 
+	 */
+	public IFuture getExternalAccessProxy(final IComponentIdentifier cid, final Class targetclass)
+	{
+		final Future ret = new Future();
+		
+		SServiceProvider.getService(component.getServiceProvider(), IComponentManagementService.class)
+			.addResultListener(component.createResultListener(new IResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				IComponentManagementService cms = (IComponentManagementService)result;
+				// Hack! create remote rms cid with "rms" assumption.
+				IComponentIdentifier rrms = cms.createComponentIdentifier("rms@"+cid.getPlatformName(), false, cid.getAddresses());
+		
+				String callid = SUtil.createUniqueId(component.getComponentIdentifier().getLocalName());
+				waitingcalls.put(callid, ret);
+		
+				RemoteGetExternalAccessCommand content = new RemoteGetExternalAccessCommand(cid, targetclass, callid);
+				
+				final Map msg = new HashMap();
+				msg.put(SFipa.SENDER, component.getComponentIdentifier());
+				msg.put(SFipa.RECEIVERS, new IComponentIdentifier[]{rrms});
+				msg.put(SFipa.CONVERSATION_ID, callid);
+				msg.put(SFipa.LANGUAGE, SFipa.JADEX_XML);
+				msg.put(SFipa.CONTENT, content);
+			
+				SServiceProvider.getService(component.getServiceProvider(), ILibraryService.class)
+					.addResultListener(component.createResultListener(new IResultListener()
+				{
+					public void resultAvailable(Object source, Object result)
+					{
+						final ILibraryService ls = (ILibraryService)result;
+						
+						SServiceProvider.getService(component.getServiceProvider(), IMessageService.class)
+							.addResultListener(component.createResultListener(new IResultListener()
+						{
+							public void resultAvailable(Object source, Object result)
+							{
+								IMessageService ms = (IMessageService)result; 
+								ms.sendMessage(msg, SFipa.FIPA_MESSAGE_TYPE, component.getComponentIdentifier(), ls.getClassLoader());
+							}
+							
+							public void exceptionOccurred(Object source, Exception exception)
+							{
+								ret.setException(exception);
+							}
+						}));
+					}
+					public void exceptionOccurred(Object source, Exception exception)
+					{
+						ret.setException(exception);
+					}
+				}));
+			}
+			public void exceptionOccurred(Object source, Exception exception)
+			{
+				ret.setException(exception);
+			}
+		}));
+		
+		return ret;
+	}
+
 	
 	/**
 	 *  Get the component.

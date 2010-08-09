@@ -35,6 +35,9 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 	/** The service identifier. */
 	protected IServiceIdentifier sid;
 	
+	/** The component identifier (alternatively to sid in case of external access). */
+	protected IComponentIdentifier cid;
+	
 	/** The waiting calls. */
 	protected Map waitingcalls;
 	
@@ -42,6 +45,19 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 	protected Map cache;
 	
 	//-------- constructors --------
+	
+	/**
+	 *  Create a new invocation handler.
+	 */
+	public RemoteMethodInvocationHandler(IExternalAccess component, IComponentIdentifier rms, 
+		IComponentIdentifier cid, Map waitingcalls, Map cache)
+	{
+		this.component = component;
+		this.rms = rms;
+		this.cid = cid;
+		this.waitingcalls = waitingcalls;
+		this.cache = cache;
+	}
 	
 	/**
 	 *  Create a new invocation handler.
@@ -82,8 +98,17 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 		String callid = SUtil.createUniqueId(compid.getLocalName());
 		waitingcalls.put(callid, future);
 		
-		RemoteMethodInvocationCommand content = new RemoteMethodInvocationCommand(sid, method.getName(), 
-			method.getParameterTypes(), args, callid, compid);
+		RemoteMethodInvocationCommand content;
+		if(sid!=null)
+		{
+			content = new RemoteMethodInvocationCommand(sid, method.getName(), 
+				method.getParameterTypes(), args, callid, compid);
+		}
+		else
+		{
+			content = new RemoteMethodInvocationCommand(cid, method.getName(), 
+				method.getParameterTypes(), args, callid, compid);
+		}
 		
 		final Map msg = new HashMap();
 		msg.put(SFipa.SENDER, component.getComponentIdentifier());
@@ -123,7 +148,13 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 			}
 		}));
 		
-		if(!method.getReturnType().isAssignableFrom(IFuture.class))
+		if(method.getReturnType().equals(void.class))
+		{
+//			System.out.println("Warning, void method call will be executed asynchronously: "
+//				+method.getDeclaringClass()+" "+method.getName()+" "+Thread.currentThread());
+			future.setResult(null);
+		}
+		else if(!method.getReturnType().isAssignableFrom(IFuture.class))
 		{
 			System.out.println("Warning, blocking method call: "+method.getDeclaringClass()
 				+" "+method.getName()+" "+Thread.currentThread());

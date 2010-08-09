@@ -13,35 +13,50 @@ import jadex.service.IVisitDecider;
 public interface IRemoteServiceManagementService extends IService
 {	
 	/**
-	 *  Get a service proxies from a remote platform.
+	 *  Get service proxies from a remote component.
 	 *  (called from arbitrary components)
-	 *  @param platform The component id of the remote platform.
-	 *  @param providerid Optional component id that is used to start the search.
+	 *  @param cid Component id that is used to start the search.
 	 *  @param manager The search manager.
 	 *  @param decider The visit decider.
 	 *  @param selector The result selector.
 	 *  @return Collection or single result (i.e. service proxies). 
 	 */
-	public IFuture getServiceProxies(IComponentIdentifier platform, IComponentIdentifier providerid, 
+	public IFuture getServiceProxies(IComponentIdentifier cid, 
 		ISearchManager manager, IVisitDecider decider, IResultSelector selector);
 	
 	/**
-	 *  Get a service proxy from a remote platform.
+	 *  Get a service proxy from a remote component.
 	 *  (called from arbitrary components)
-	 *  @param platform The component id of the remote platform.
-	 *  @param providerid The remote provider id.
+	 *  @param cid The remote provider id.
 	 *  @param service The service type.
 	 *  @return The service proxy.
 	 */
-	public IFuture getServiceProxy(IComponentIdentifier platform, IComponentIdentifier providerid, Class service);
+	public IFuture getServiceProxy(IComponentIdentifier cid, Class service);
 	
 	/**
-	 *  Get all service proxies from a remote platform.
+	 *  Get all service proxies from a remote component.
 	 *  (called from arbitrary components)
-	 *  @param platform The component id of the remote platform.
-	 *  @param providerid The remote provider id.
+	 *  @param cid The remote provider id.
 	 *  @param service The service type.
 	 *  @return The service proxy.
 	 */
-	public IFuture getServiceProxies(IComponentIdentifier platform, IComponentIdentifier providerid, Class service);
+	public IFuture getServiceProxies(IComponentIdentifier cid, Class service);
+
+	/**
+	 *  Get all declared service proxies from a remote component.
+	 *  (called from arbitrary components)
+	 *  @param cid The remote provider id.
+	 *  @param service The service type.
+	 *  @return The service proxy.
+	 */
+	public IFuture getDeclaredServiceProxies(IComponentIdentifier cid);
+	
+	/**
+	 *  Get an external access proxy from a remote component.
+	 *  (called from arbitrary components)
+	 *  @param cid Component target id.
+	 *  @return External access of remote component. 
+	 */
+	public IFuture getExternalAccessProxy(IComponentIdentifier cid, Class targetclass);
+	
 }

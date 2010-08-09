@@ -22,6 +22,9 @@ public class RemoteMethodInvocationCommand implements IRemoteCommand
 	/** The service identifier. */
 	protected IServiceIdentifier sid;
 	
+	/** The component identifier (for alternatively invoking method on external access). */
+	protected IComponentIdentifier cid;
+	
 	/** The methodname. */
 	protected String methodname;
 	
@@ -60,6 +63,20 @@ public class RemoteMethodInvocationCommand implements IRemoteCommand
 		this.rms = rms;
 	}
 	
+	/**
+	 *  Create a new remote method invocation command. 
+	 */
+	public RemoteMethodInvocationCommand(IComponentIdentifier cid, String methodname, 
+		Class[] parametertypes, Object[] parametervalues, String callid, IComponentIdentifier rms)
+	{
+		this.cid = cid;
+		this.methodname = methodname;
+		this.parametertypes = parametertypes;
+		this.parametervalues = parametervalues;
+		this.callid = callid;
+		this.rms = rms;
+	}
+	
 	//-------- methods --------
 
 	/**
@@ -80,55 +97,34 @@ public class RemoteMethodInvocationCommand implements IRemoteCommand
 			{
 				IComponentManagementService cms = (IComponentManagementService)result;
 				
-				cms.getExternalAccess((IComponentIdentifier)sid.getProviderId()).addResultListener(new IResultListener()
+				cms.getExternalAccess(getTargetId()).addResultListener(new IResultListener()
 				{
 					public void resultAvailable(Object source, Object result)
 					{
 						IExternalAccess exta = (IExternalAccess)result;
 						
 						// fetch service on target component 
-						SServiceProvider.getDeclaredService(exta.getServiceProvider(), sid)
-							.addResultListener(new IResultListener()
+						if(sid!=null)
 						{
-							public void resultAvailable(Object source, Object result)
+							SServiceProvider.getDeclaredService(exta.getServiceProvider(), sid)
+								.addResultListener(new IResultListener()
 							{
-								try
+								public void resultAvailable(Object source, Object result)
 								{
-									// fetch method on service and invoke method
-									Method m = result.getClass().getMethod(methodname, parametertypes);
-									Object res = m.invoke(result, parametervalues);
-									
-									if(res instanceof IFuture)
-									{
-										((IFuture)res).addResultListener(new IResultListener()
-										{
-											public void resultAvailable(Object source, Object result)
-											{
-												ret.setResult(new RemoteResultCommand(result, null, callid));
-											}
-											
-											public void exceptionOccurred(Object source, Exception exception)
-											{
-												ret.setResult(new RemoteResultCommand(null, exception, callid));
-											}
-										});
-									}
-									else
-									{
-										ret.setResult(new RemoteResultCommand(res, null, callid));
-									}
+									invokeMethod(result, ret);
 								}
-								catch(Exception exception)
+								
+								public void exceptionOccurred(Object source, Exception exception)
 								{
 									ret.setResult(new RemoteResultCommand(null, exception, callid));
 								}
-							}
-							
-							public void exceptionOccurred(Object source, Exception exception)
-							{
-								ret.setResult(new RemoteResultCommand(null, exception, callid));
-							}
-						});
+							});
+						}
+						// invoke method directly on external access
+						else
+						{
+							invokeMethod(exta, ret);
+						}
 					}
 					
 					public void exceptionOccurred(Object source, Exception exception)
@@ -147,8 +143,58 @@ public class RemoteMethodInvocationCommand implements IRemoteCommand
 		return ret;
 	}
 
+	/**
+	 *  Invoke remote method.
+	 *  @param target The target object.
+	 *  @param ret The result future.
+	 */
+	public void invokeMethod(Object target, final Future ret)
+	{
+		try
+		{
+			// fetch method on service and invoke method
+			Method m = target.getClass().getMethod(methodname, parametertypes);
+			Object res = m.invoke(target, parametervalues);
+			
+			if(res instanceof IFuture)
+			{
+				((IFuture)res).addResultListener(new IResultListener()
+				{
+					public void resultAvailable(Object source, Object result)
+					{
+						ret.setResult(new RemoteResultCommand(result, null, callid));
+					}
+					
+					public void exceptionOccurred(Object source, Exception exception)
+					{
+						ret.setResult(new RemoteResultCommand(null, exception, callid));
+					}
+				});
+			}
+			else
+			{
+				ret.setResult(new RemoteResultCommand(res, null, callid));
+			}
+		}
+		catch(Exception exception)
+		{
+			ret.setResult(new RemoteResultCommand(null, exception, callid));
+		}
+	}
+	
+	/**
+	 *  Get the component target id.
+	 *  @return The component id of the target component.
+	 */
+	public IComponentIdentifier getTargetId()
+	{
+		return sid!=null? (IComponentIdentifier)sid.getProviderId(): cid;
+	}
+	
 	//-------- getter/setter methods --------
 
+	
+	
 	/**
 	 *  Get the remote management service identifier.
 	 *  @return The remote management service identifier.
@@ -156,6 +202,24 @@ public class RemoteMethodInvocationCommand implements IRemoteCommand
 	public IComponentIdentifier getRemoteManagementServiceIdentifier()
 	{
 		return rms;
+	}
+
+	/**
+	 *  Get the component identifier.
+	 *  @return the cid.
+	 */
+	public IComponentIdentifier getComponentIdentifier()
+	{
+		return cid;
+	}
+
+	/**
+	 *  Set the component identifier.
+	 *  @param cid The cid to set.
+	 */
+	public void setComponentIdentifier(IComponentIdentifier cid)
+	{
+		this.cid = cid;
 	}
 
 	/**

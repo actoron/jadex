@@ -4,10 +4,21 @@ import jadex.bridge.Argument;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IArgument;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentManagementService;
+import jadex.bridge.IRemoteServiceManagementService;
+import jadex.commons.Future;
+import jadex.commons.IFuture;
+import jadex.commons.SUtil;
+import jadex.commons.concurrent.CollectionResultListener;
+import jadex.commons.concurrent.DelegationResultListener;
+import jadex.commons.concurrent.IResultListener;
 import jadex.micro.MicroAgent;
 import jadex.micro.MicroAgentMetaInfo;
 import jadex.service.CacheServiceContainer;
 import jadex.service.IServiceContainer;
+import jadex.service.SServiceProvider;
+
+import java.util.List;
 
 /**
  *  A proxy agent is a pseudo component that mirrors services of a remote platform (or component).
@@ -34,6 +45,156 @@ public class ProxyAgent extends MicroAgent
 	}
 	
 	/**
+	 *  Get the remote, i.e. virtual children of a component. 
+	 */
+	public IFuture getVirtualChildren(final IComponentIdentifier cid)
+	{
+		final Future ret = new Future();
+		
+		SServiceProvider.getService(getServiceProvider(), IRemoteServiceManagementService.class)
+			.addResultListener(new IResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				IRemoteServiceManagementService rms = (IRemoteServiceManagementService)result;
+				
+				rms.getServiceProxy(cid, IComponentManagementService.class).addResultListener(new IResultListener()
+				{
+					public void resultAvailable(Object source, Object result)
+					{
+						final IComponentManagementService rcms = (IComponentManagementService)result;
+						rcms.getChildren(cid).addResultListener(new IResultListener()
+						{
+							public void resultAvailable(Object source, Object result)
+							{
+								IComponentIdentifier[] tmp = (IComponentIdentifier[])result;
+								List childlist = SUtil.arrayToList(tmp);
+//								childlist.remove(proxy);
+								
+								CollectionResultListener crl = new CollectionResultListener(childlist.size(), new DelegationResultListener(ret));
+								for(int i=0; i<childlist.size(); i++)
+								{
+									rcms.getComponentDescription((IComponentIdentifier)childlist.get(i)).addResultListener(crl);
+								}
+							}
+							
+							public void exceptionOccurred(Object source, Exception exception)
+							{
+								ret.setException(exception);
+							}
+						});
+					}
+					
+					public void exceptionOccurred(Object source, Exception exception)
+					{
+						ret.setException(exception);
+					}
+				});
+			}
+			
+			public void exceptionOccurred(Object source, Exception exception)
+			{
+				ret.setException(exception);
+			}
+		});
+		
+		return ret;
+	}
+	
+	/**
+	 *  Get the declared services of a remote component.
+	 */
+	public IFuture getRemoteServices(final IComponentIdentifier cid)
+	{
+		final Future ret = new Future();
+		
+		SServiceProvider.getService(getServiceProvider(), IRemoteServiceManagementService.class)
+			.addResultListener(new IResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				IRemoteServiceManagementService rms = (IRemoteServiceManagementService)result;
+				rms.getDeclaredServiceProxies(cid).addResultListener(new DelegationResultListener(ret));
+			}
+			
+			public void exceptionOccurred(Object source, Exception exception)
+			{
+			}
+		});
+		
+		return ret;
+	}
+	
+	/**
+	 *  Get the remote, i.e. virtual children of a component. 
+	 * /
+	public IFuture getVirtualChildren(final IComponentIdentifier cid)
+	{
+		final Future ret = new Future();
+		
+		SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class)
+			.addResultListener(new IResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{	
+				final IComponentManagementService cms = (IComponentManagementService)result;
+				
+				SServiceProvider.getService(getServiceProvider(), IRemoteServiceManagementService.class)
+					.addResultListener(new IResultListener()
+				{
+					public void resultAvailable(Object source, Object result)
+					{
+						IRemoteServiceManagementService rms = (IRemoteServiceManagementService)result;
+						
+						rms.getExternalAccessProxy(cid, IExternalAccess.class).addResultListener(new IResultListener()
+						{
+							public void resultAvailable(Object source, Object result)
+							{
+								IExternalAccess exta = (IExternalAccess)result;
+								exta.getChildren().addResultListener(new IResultListener()
+								{
+									public void resultAvailable(Object source, Object result)
+									{
+										Collection extas = (Collection)result;
+										CollectionResultListener crl = new CollectionResultListener(extas.size(), new DelegationResultListener(ret));
+										for(int i=0; i<extas.size(); i++)
+										{
+											IExternalAccess tmp = (IExternalAccess)result;
+											cms.getComponentDescription(tmp.getComponentIdentifier()).addResultListener(crl);
+										}
+									}
+									
+									public void exceptionOccurred(Object source, Exception exception)
+									{
+										ret.setException(exception);
+									}
+								});
+							}
+							
+							public void exceptionOccurred(Object source, Exception exception)
+							{
+								ret.setException(exception);
+							}
+						});
+					}
+					
+					public void exceptionOccurred(Object source, Exception exception)
+					{
+						ret.setException(exception);
+					}
+				});
+			}
+			public void exceptionOccurred(Object source, Exception exception)
+			{
+				ret.setException(exception);
+			}
+		});
+		
+		return ret;
+	}*/
+	
+	
+	/**
 	 *  Get the meta information about the agent.
 	 */
 	public static Object getMetaInfo()
@@ -41,7 +202,7 @@ public class ProxyAgent extends MicroAgent
 		return new MicroAgentMetaInfo("This agent represents a proxy for a remote component.", 
 			new String[0], new IArgument[]{
 			new Argument("platform", "The component id of the remote platform", "jadex.bridge.IComponentIdentifier", 
-				new ComponentIdentifier("rms@remote", new String[]{"tcp-mtp://127.0.0.1:11000", "nio-mtp://127.0.0.1:11001"}))}, 
+				new ComponentIdentifier("remote", new String[]{"tcp-mtp://127.0.0.1:11000", "nio-mtp://127.0.0.1:11001"}))}, 
 			null, null, null);
 	}
 

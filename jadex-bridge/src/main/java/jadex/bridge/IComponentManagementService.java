@@ -117,14 +117,14 @@ public interface IComponentManagementService
 	 *  @param cid The component identifier.
 	 *  @return The parent component identifier.
 	 */
-	public IComponentIdentifier getParent(IComponentIdentifier cid);
+	public IFuture getParent(IComponentIdentifier cid);
 	
 	/**
 	 *  Get the children components of a component.
 	 *  @param cid The component identifier.
 	 *  @return The children component identifiers.
 	 */
-	public IComponentIdentifier[] getChildren(IComponentIdentifier cid);
+	public IFuture getChildren(IComponentIdentifier cid);
 	
 	//-------- create methods for cms objects --------
 	

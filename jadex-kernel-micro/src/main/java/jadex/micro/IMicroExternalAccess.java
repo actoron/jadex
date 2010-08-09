@@ -3,7 +3,6 @@ package jadex.micro;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.MessageType;
 import jadex.commons.ICommand;
-import jadex.commons.IFuture;
 
 import java.util.Map;
 
@@ -26,11 +25,4 @@ public interface IMicroExternalAccess	extends IExternalAccess
 	 */
 	public void	scheduleStep(ICommand com);
 	
-	// HACK!!! todo: remove me
-	/**
-	 *  Get the agent implementation.
-	 *  Operations on the agent object
-	 *  should be properly synchronized with invokeLater()!
-	 * /
-	public IFuture getAgent();*/
 }

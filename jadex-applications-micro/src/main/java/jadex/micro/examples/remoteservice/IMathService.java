@@ -36,4 +36,10 @@ public interface IMathService extends IService
 	 *  Get the PI value.
 	 */
 	public double getPi();
+	
+	/**
+	 *  Print out some message.
+	 *  @param message The message.
+	 */
+	public void printMessage(String message);
 }

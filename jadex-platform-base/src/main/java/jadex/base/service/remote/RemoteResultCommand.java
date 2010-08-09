@@ -53,13 +53,16 @@ public class RemoteResultCommand implements IRemoteCommand
 	public IFuture execute(IExternalAccess component, Map waitingcalls)
 	{
 		Future future = (Future)waitingcalls.get(callid);
-		if(exception!=null)
+		if(!future.isDone())
 		{
-			future.setException(exception);
-		}
-		else
-		{
-			future.setResult(result);
+			if(exception!=null)
+			{
+				future.setException(exception);
+			}
+			else
+			{
+				future.setResult(result);
+			}
 		}
 		return new Future(null);
 	}

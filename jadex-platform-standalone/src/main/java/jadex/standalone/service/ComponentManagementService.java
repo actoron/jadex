@@ -1035,10 +1035,10 @@ public class ComponentManagementService extends BasicService implements ICompone
 	 *  @param cid The component identifier.
 	 *  @return The parent component identifier.
 	 */
-	public IComponentIdentifier getParent(IComponentIdentifier cid)
+	public IFuture getParent(IComponentIdentifier cid)
 	{
 		CMSComponentDescription desc = (CMSComponentDescription)descs.get(cid);
-		return desc!=null? desc.getParent(): null;
+		return new Future(desc!=null? desc.getParent(): null);
 	}
 	
 	/**
@@ -1046,13 +1046,13 @@ public class ComponentManagementService extends BasicService implements ICompone
 	 *  @param cid The component identifier.
 	 *  @return The children component identifiers.
 	 */
-	public IComponentIdentifier[] getChildren(IComponentIdentifier cid)
+	public Future getChildren(IComponentIdentifier cid)
 	{
 		CMSComponentDescription desc = (CMSComponentDescription)descs.get(cid);
-		IComponentIdentifier[] ret = desc!=null? desc.getChildren()!=null? desc.getChildren(): EMPTY_COMPONENTIDENTIFIERS: EMPTY_COMPONENTIDENTIFIERS;
-		return ret;
+		IComponentIdentifier[] ret = desc!=null? desc.getChildren()!=null? desc.getChildren(): 
+			IComponentIdentifier.EMPTY_COMPONENTIDENTIFIERS: IComponentIdentifier.EMPTY_COMPONENTIDENTIFIERS;
+		return new Future(ret);
 	}
-	public static final IComponentIdentifier[] EMPTY_COMPONENTIDENTIFIERS = new IComponentIdentifier[0]; 
 
 	/**
 	 *  Create component identifier.

@@ -99,26 +99,51 @@ public class ComponentTreeNode	extends AbstractComponentTreeNode
 		final boolean	ready[]	= new boolean[2];
 
 		// Todo: futurize getChildren call.
-		final IComponentIdentifier[] achildren = cms.getChildren(desc.getName());
-		if(achildren!=null && achildren.length > 0)
+		cms.getChildren(desc.getName()).addResultListener(new IResultListener()
 		{
-			for(int i=0; i<achildren.length; i++)
+			public void resultAvailable(Object source, Object result)
 			{
-				final int index = i;
-				cms.getComponentDescription(achildren[i]).addResultListener(new SwingDefaultResultListener(ui)
+				final IComponentIdentifier[] achildren = (IComponentIdentifier[])result;
+				if(achildren!=null && achildren.length > 0)
 				{
-					public void customResultAvailable(Object source, Object result)
+					for(int i=0; i<achildren.length; i++)
 					{
-						IComponentDescription	desc	= (IComponentDescription)result;
-						IComponentTreeNode	node	= getModel().getNode(desc.getName());
-						if(node==null)
+						final int index = i;
+						cms.getComponentDescription(achildren[i]).addResultListener(new SwingDefaultResultListener(ui)
 						{
-							createComponentNode(desc).addResultListener(new IResultListener()
+							public void customResultAvailable(Object source, Object result)
 							{
-								public void resultAvailable(Object source, Object result)
+								IComponentDescription	desc	= (IComponentDescription)result;
+								IComponentTreeNode	node	= getModel().getNode(desc.getName());
+								if(node==null)
 								{
-									children.add(result);
-									
+									createComponentNode(desc).addResultListener(new IResultListener()
+									{
+										public void resultAvailable(Object source, Object result)
+										{
+											children.add(result);
+											
+											// Last child? -> inform listeners
+											if(index == achildren.length - 1)
+											{
+												ready[0]	= true;
+												if(ready[0] &&  ready[1])
+												{
+													setChildren(children);
+												}
+											}
+										}
+										
+										public void exceptionOccurred(Object source, Exception exception)
+										{
+											exception.printStackTrace();
+										}
+									});
+								}
+								else
+								{
+									children.add(node);
+			
 									// Last child? -> inform listeners
 									if(index == achildren.length - 1)
 									{
@@ -129,39 +154,26 @@ public class ComponentTreeNode	extends AbstractComponentTreeNode
 										}
 									}
 								}
-								
-								public void exceptionOccurred(Object source, Exception exception)
-								{
-									exception.printStackTrace();
-								}
-							});
-						}
-						else
-						{
-							children.add(node);
-	
-							// Last child? -> inform listeners
-							if(index == achildren.length - 1)
-							{
-								ready[0]	= true;
-								if(ready[0] &&  ready[1])
-								{
-									setChildren(children);
-								}
 							}
-						}
+						});
 					}
-				});
+				}
+				else
+				{
+					ready[0]	= true;
+					if(ready[0] &&  ready[1])
+					{
+						setChildren(children);
+					}
+				}
 			}
-		}
-		else
-		{
-			ready[0]	= true;
-			if(ready[0] &&  ready[1])
+			
+			public void exceptionOccurred(Object source, Exception exception)
 			{
-				setChildren(children);
+				exception.toString();
 			}
-		}
+		});
+		
 		
 		// Search services and only add container node when services are found.
 		cms.getExternalAccess(desc.getName()).addResultListener(new SwingDefaultResultListener(ui)

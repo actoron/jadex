@@ -58,13 +58,15 @@ public class ThreadPool implements IThreadPool
 	 *  Create a new thread pool.
 	 */
 	public ThreadPool(IThreadPoolStrategy strategy)
-	{
+	{		
 		this.strategy = strategy;
 		this.group = new ThreadGroup("strategy_thread_pool_"+poolcnt++);
 		this.running = true;
 		this.tasks	= new ArrayBlockingQueue();
 		this.pool = new ArrayList();
 		this.threads = new Hashtable();
+	
+//		System.out.println("Creating: "+this);
 	}
 
 	//-------- methods --------
@@ -115,12 +117,12 @@ public class ThreadPool implements IThreadPool
 	{
 		StringBuffer buf = new StringBuffer();
 		buf.append(SReflect.getInnerClassName(getClass()));
-		buf.append("poolsize=");
+		buf.append("(poolsize=");
 		buf.append(pool.size());
 		buf.append(", running=");
 		buf.append(running);
 		buf.append(")");
-		return buf.toString();
+		return buf.toString()+" "+hashCode();
 	}
 
 	//-------- helper methods --------

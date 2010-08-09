@@ -1291,14 +1291,24 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 		{
 			public void resultAvailable(Object source, Object result)
 			{
-				IComponentManagementService cms = (IComponentManagementService)result;
-				IComponentIdentifier[] childs = cms.getChildren(getAgentAdapter().getComponentIdentifier());
-				
-				IResultListener	crl	= new CollectionResultListener(childs.length, new DelegationResultListener(ret));
-				for(int i=0; !ret.isDone() && i<childs.length; i++)
+				final IComponentManagementService cms = (IComponentManagementService)result;
+				cms.getChildren(getAgentAdapter().getComponentIdentifier()).addResultListener(new IResultListener()
 				{
-					cms.getExternalAccess(childs[i]).addResultListener(crl);
-				}
+					public void resultAvailable(Object source, Object result)
+					{
+						IComponentIdentifier[] childs = (IComponentIdentifier[])result;
+						IResultListener	crl	= new CollectionResultListener(childs.length, new DelegationResultListener(ret));
+						for(int i=0; !ret.isDone() && i<childs.length; i++)
+						{
+							cms.getExternalAccess(childs[i]).addResultListener(crl);
+						}
+					}
+					
+					public void exceptionOccurred(Object source, Exception exception)
+					{
+						ret.setException(exception);
+					}
+				});
 			}
 		}, adapter));
 		

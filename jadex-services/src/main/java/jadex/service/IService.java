@@ -6,6 +6,14 @@ package jadex.service;
  */
 public interface IService
 {
+	//-------- constants --------
+	
+	/** The from proxy excluded methods. */
+	public static String REMOTE_EXCLUDED = "remote_excluded";
+	
+//	/** The from proxy unsupported methods. */
+//	public static String UNSUPPORTED = "unsupported";
+	
 	/** Empty service array. */
 	public static IService[] EMPTY_SERVICES = new IService[0];
 	

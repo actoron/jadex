@@ -323,19 +323,25 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	{
 		final Future ret = new Future();
 		
-		SServiceProvider.getServiceUpwards(getServiceContainer(), IComponentManagementService.class).addResultListener(new DefaultResultListener()
+		SServiceProvider.getServiceUpwards(getServiceContainer(), IComponentManagementService.class)
+			.addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
-				IComponentManagementService cms = (IComponentManagementService)result;
+				final IComponentManagementService cms = (IComponentManagementService)result;
 				
-				IComponentIdentifier[] childs = cms.getChildren(getComponentIdentifier());
-				
-				IResultListener	crl	= new CollectionResultListener(childs.length, new DelegationResultListener(ret));
-				for(int i=0; !ret.isDone() && i<childs.length; i++)
+				cms.getChildren(getComponentIdentifier()).addResultListener(new DefaultResultListener()
 				{
-					cms.getExternalAccess(childs[i]).addResultListener(crl);
-				}
+					public void resultAvailable(Object source, Object result)
+					{
+						IComponentIdentifier[] childs = (IComponentIdentifier[])result;
+						IResultListener	crl	= new CollectionResultListener(childs.length, new DelegationResultListener(ret));
+						for(int i=0; !ret.isDone() && i<childs.length; i++)
+						{
+							cms.getExternalAccess(childs[i]).addResultListener(crl);
+						}
+					}
+				});
 			}
 		});
 		

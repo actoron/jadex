@@ -36,12 +36,12 @@ public class UserAgent extends MicroAgent
 
 //							IComponentIdentifier rrms = cms.createComponentIdentifier("rms@remote", false, 
 //								new String[]{"tcp-mtp://127.0.0.1:11000", "nio-mtp://127.0.0.1:11001"});
-						IComponentIdentifier platid = cms.createComponentIdentifier("root@remote", false, 
+						IComponentIdentifier platid = cms.createComponentIdentifier("remote", false, 
 							new String[]{"tcp-mtp://127.0.0.1:11000", "nio-mtp://127.0.0.1:11001"});
 
 						// Search for remote service
 //							rms.getProxy(rrms, null, IAddService.class).addResultListener(createResultListener(new DefaultResultListener()
-						rms.getServiceProxy(platid, null, IMathService.class).addResultListener(createResultListener(new DefaultResultListener()
+						rms.getServiceProxy(platid, IMathService.class).addResultListener(createResultListener(new DefaultResultListener()
 						{
 							public void resultAvailable(Object source, Object result)
 							{
@@ -97,6 +97,10 @@ public class UserAgent extends MicroAgent
 			System.out.println("Calling constant (non-blocking) getPi method.");
 			double pi = service.getPi();
 			System.out.println("Invoked getPi: "+pi);
+			
+			System.out.println("Calling void (non-blocking) printMessage method.");
+			service.printMessage("math service");
+			System.out.println("Invoked printMessage");
 		}
 	}
 }

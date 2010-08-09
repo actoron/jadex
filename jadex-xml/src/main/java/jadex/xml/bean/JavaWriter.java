@@ -84,7 +84,6 @@ public class JavaWriter extends Writer
 			typeinfos.add(ti_mapentry);
 			
 			// java.util.List
-			
 			TypeInfo ti_list = new TypeInfo(null, new ObjectInfo(List.class), new MappingInfo(null,
 				new SubobjectInfo[]{
 				new SubobjectInfo(new AccessInfo("entries", AccessInfo.THIS), null, true)
@@ -92,7 +91,6 @@ public class JavaWriter extends Writer
 			typeinfos.add(ti_list);
 			
 			// java.util.Set
-			
 			TypeInfo ti_set = new TypeInfo(null, new ObjectInfo(Set.class), new MappingInfo(null,
 				new SubobjectInfo[]{
 				new SubobjectInfo(new AccessInfo("entries", AccessInfo.THIS), null, true)
@@ -100,7 +98,6 @@ public class JavaWriter extends Writer
 			typeinfos.add(ti_set);
 			
 			// Array
-			
 			TypeInfo ti_array = new TypeInfo(null, new ObjectInfo(Object[].class),
 				new MappingInfo(null, new SubobjectInfo[]{
 				new SubobjectInfo(new AccessInfo("entries", AccessInfo.THIS), null, true)
@@ -108,7 +105,6 @@ public class JavaWriter extends Writer
 			typeinfos.add(ti_array);
 			
 			// java.util.Color
-			
 			IObjectStringConverter coconv = new IObjectStringConverter()
 			{
 				public String convertObject(Object val, IContext context)
@@ -121,7 +117,6 @@ public class JavaWriter extends Writer
 			typeinfos.add(ti_color);
 			
 			// java.util.Date
-			
 			// Ignores several redundant bean attributes for performance reasons.
 			
 			TypeInfo ti_date = new TypeInfo(null, new ObjectInfo(Date.class), 
@@ -137,7 +132,6 @@ public class JavaWriter extends Writer
 			typeinfos.add(ti_date);
 			
 			// java.lang.Class
-			
 			IObjectStringConverter clconv = new IObjectStringConverter()
 			{
 				public String convertObject(Object val, IContext context)
@@ -150,6 +144,51 @@ public class JavaWriter extends Writer
 				null
 			));
 			typeinfos.add(ti_class);
+			
+			// java.lang.String
+			TypeInfo ti_string = new TypeInfo(null, new ObjectInfo(String.class), new MappingInfo(null, new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("content", AccessInfo.THIS))}));
+			typeinfos.add(ti_string);
+			
+			// java.lang.Boolean
+			TypeInfo ti_boolean = new TypeInfo(null, new ObjectInfo(Boolean.class), new MappingInfo(null, new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("content", AccessInfo.THIS))}));
+			typeinfos.add(ti_boolean);
+			
+			// java.lang.Integer
+			TypeInfo ti_integer = new TypeInfo(null, new ObjectInfo(Integer.class), new MappingInfo(null, new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("content", AccessInfo.THIS))}));
+			typeinfos.add(ti_integer);
+			
+			// java.lang.Double
+			TypeInfo ti_double = new TypeInfo(null, new ObjectInfo(Double.class), new MappingInfo(null, new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("content", AccessInfo.THIS))}));
+			typeinfos.add(ti_double);
+			
+			// java.lang.Float
+			TypeInfo ti_float = new TypeInfo(null, new ObjectInfo(Float.class), new MappingInfo(null, new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("content", AccessInfo.THIS))}));
+			typeinfos.add(ti_float);
+			
+			// java.lang.Long
+			TypeInfo ti_long = new TypeInfo(null, new ObjectInfo(Long.class), new MappingInfo(null, new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("content", AccessInfo.THIS))}));
+			typeinfos.add(ti_long);
+			
+			// java.lang.Short
+			TypeInfo ti_short = new TypeInfo(null, new ObjectInfo(Short.class), new MappingInfo(null, new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("content", AccessInfo.THIS))}));
+			typeinfos.add(ti_short);
+			
+			// java.lang.Byte
+			TypeInfo ti_byte = new TypeInfo(null, new ObjectInfo(Byte.class), new MappingInfo(null, new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("content", AccessInfo.THIS))}));
+			typeinfos.add(ti_byte);
+			
+			// java.lang.Character
+			TypeInfo ti_character = new TypeInfo(null, new ObjectInfo(Character.class), new MappingInfo(null, new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("content", AccessInfo.THIS))}));
+			typeinfos.add(ti_character);
 		}
 		catch(Exception e)
 		{
