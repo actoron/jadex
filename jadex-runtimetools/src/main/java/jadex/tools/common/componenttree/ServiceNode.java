@@ -36,6 +36,7 @@ public class ServiceNode	extends AbstractComponentTreeNode
 	{
 		super(parent, model);
 		this.service	= service;
+//		System.out.println("service node: "+service.getServiceIdentifier());
 	}
 	
 	//-------- methods --------
@@ -79,9 +80,17 @@ public class ServiceNode	extends AbstractComponentTreeNode
 	 */
 	public String toString()
 	{
+//		try
+//		{
 		return Proxy.isProxyClass(service.getClass())
 			? SReflect.getUnqualifiedClassName(service.getServiceIdentifier().getServiceType())
 				+" ("+service.getServiceIdentifier().getProviderId()+")"
 			: SReflect.getUnqualifiedClassName(service.getClass());
+//		}
+//		catch(Exception e)
+//		{	
+//			e.printStackTrace();
+//			return "exception";
+//		}
 	}
 }

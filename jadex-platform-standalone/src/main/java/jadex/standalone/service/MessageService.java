@@ -527,7 +527,7 @@ public class MessageService extends BasicService implements IMessageService
 		for(int i=0; i<receivers.length; i++)
 		{
 			if(receivers[i]==null)
-				throw new MessageFailureException(msg, "A receiver nulls");
+				throw new MessageFailureException(msg, "A receiver nulls: "+msg);
 		}
 
 		ITransport[] trans = (ITransport[])transports.toArray(new ITransport[transports.size()]);

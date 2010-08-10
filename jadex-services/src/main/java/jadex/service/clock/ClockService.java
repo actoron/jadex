@@ -13,6 +13,7 @@ import jadex.service.threadpool.IThreadPoolService;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 /**
  *  A clock service abstracts away from clock implementations.
@@ -44,7 +45,15 @@ public class ClockService extends BasicService implements IClockService
 	 */
 	public ClockService(ClockCreationInfo cinfo, IServiceProvider provider)
 	{
-		super(provider.getId(), IClockService.class, null);
+		this(cinfo, provider, null);
+	}
+	
+	/**
+	 *  Create a new clock service.
+	 */
+	public ClockService(ClockCreationInfo cinfo, IServiceProvider provider, Map properties)
+	{
+		super(provider.getId(), IClockService.class, properties);
 
 		this.cinfo = cinfo;
 		this.provider = provider;

@@ -35,7 +35,8 @@ public class ServiceContainerNode	extends AbstractComponentTreeNode
 	 */
 	public Object	getId()
 	{
-		return ((ComponentTreeNode)getParent()).getDescription().getName().getName()+toString();
+//		return ((ComponentTreeNode)getParent()).getDescription().getName().getName()+toString();
+		return getParent().getId()+toString();
 	}
 	
 	/**

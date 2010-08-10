@@ -1,12 +1,14 @@
 package jadex.bridge;
 
+import jadex.service.IService;
+
 import java.util.Map;
 
 /**
  *  The interface for the message service. It is responsible for
  *  managing the transports and sending/delivering messages.
  */
-public interface IMessageService
+public interface IMessageService extends IService
 {
 	/**
 	 *  Send a message.

@@ -3,8 +3,10 @@ package jadex.tools.common.componenttree;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
+import jadex.commons.concurrent.SwingDefaultResultListener;
 
 import java.awt.Component;
+import java.util.List;
 
 import javax.swing.Icon;
 
@@ -37,14 +39,13 @@ public class VirtualComponentTreeNode extends AbstractComponentTreeNode
 	 *  Create a new service container node.
 	 */
 	public VirtualComponentTreeNode(IComponentTreeNode parent, ComponentTreeModel model, IComponentDescription desc,
-		IComponentManagementService cms, Component ui, ComponentIconCache iconcache, IExternalAccess proxy)
+		IComponentManagementService cms, Component ui, ComponentIconCache iconcache)
 	{
 		super(parent, model);
 		this.desc = desc;
 		this.cms = cms;
 		this.ui = ui;
 		this.iconcache = iconcache;
-		this.proxy = proxy;
 	}
 	
 	/**
@@ -54,7 +55,13 @@ public class VirtualComponentTreeNode extends AbstractComponentTreeNode
 	 */
 	protected void	searchChildren()
 	{
-		// todo
+		ProxyComponentTreeNode.searchChildren(cms, this, desc, desc.getName(), ui, iconcache).addResultListener(new SwingDefaultResultListener(ui)
+		{
+			public void customResultAvailable(Object source, Object result)
+			{
+				setChildren((List)result);
+			}
+		});
 	}
 	
 	/**

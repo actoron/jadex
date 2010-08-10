@@ -9,7 +9,6 @@ import jadex.commons.IFuture;
 import jadex.commons.SUtil;
 import jadex.commons.ThreadSuspendable;
 import jadex.commons.concurrent.IResultListener;
-import jadex.service.IServiceIdentifier;
 import jadex.service.SServiceProvider;
 import jadex.service.library.ILibraryService;
 
@@ -29,47 +28,23 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 	/** The host component. */
 	protected IExternalAccess component;
 	
-	/** The remote rms component identifier. */
-	protected IComponentIdentifier rms;
-	
-	/** The service identifier. */
-	protected IServiceIdentifier sid;
-	
-	/** The component identifier (alternatively to sid in case of external access). */
-	protected IComponentIdentifier cid;
+	/** The proxy info. */
+	protected ProxyInfo pi;
 	
 	/** The waiting calls. */
 	protected Map waitingcalls;
-	
-	/** The cached return values of constant methods. */
-	protected Map cache;
 	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new invocation handler.
 	 */
-	public RemoteMethodInvocationHandler(IExternalAccess component, IComponentIdentifier rms, 
-		IComponentIdentifier cid, Map waitingcalls, Map cache)
+	public RemoteMethodInvocationHandler(IExternalAccess component, ProxyInfo pi, Map waitingcalls)
 	{
 		this.component = component;
-		this.rms = rms;
-		this.cid = cid;
+		this.pi = pi;
 		this.waitingcalls = waitingcalls;
-		this.cache = cache;
-	}
-	
-	/**
-	 *  Create a new invocation handler.
-	 */
-	public RemoteMethodInvocationHandler(IExternalAccess component, IComponentIdentifier rms, 
-		IServiceIdentifier sid, Map waitingcalls, Map cache)
-	{
-		this.component = component;
-		this.rms = rms;
-		this.sid = sid;
-		this.waitingcalls = waitingcalls;
-		this.cache = cache;
+//		System.out.println("handler: "+pi.getServiceIdentifier().getServiceType()+" "+pi.getCache());
 	}
 	
 	//-------- methods --------
@@ -79,14 +54,18 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 	 */
 	public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
 	{
+		// Test if method is excluded.
+		if(pi.isExcluded(method))
+			throw new UnsupportedOperationException("Method is excluded from interface for remote invocations.");
+		
 		// Test if method is constant and a cache value is available.
-		if(cache!=null)
+		if(pi.getCache()!=null)
 		{
 			Class rt = method.getReturnType();
 			Class[] ar = method.getParameterTypes();
-			if(rt!=null && !(rt.isAssignableFrom(IFuture.class)) && ar.length==0)
+			if(!rt.equals(void.class) && !(rt.isAssignableFrom(IFuture.class)) && ar.length==0)
 			{
-				return cache.get(method.getName());
+				return pi.getCache().get(method.getName());
 			}
 		}
 		
@@ -99,20 +78,20 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 		waitingcalls.put(callid, future);
 		
 		RemoteMethodInvocationCommand content;
-		if(sid!=null)
+		if(pi.getServiceIdentifier()!=null)
 		{
-			content = new RemoteMethodInvocationCommand(sid, method.getName(), 
+			content = new RemoteMethodInvocationCommand(pi.getServiceIdentifier(), method.getName(), 
 				method.getParameterTypes(), args, callid, compid);
 		}
 		else
 		{
-			content = new RemoteMethodInvocationCommand(cid, method.getName(), 
+			content = new RemoteMethodInvocationCommand(pi.getComponentIdentifier(), method.getName(), 
 				method.getParameterTypes(), args, callid, compid);
 		}
 		
 		final Map msg = new HashMap();
 		msg.put(SFipa.SENDER, component.getComponentIdentifier());
-		msg.put(SFipa.RECEIVERS, new IComponentIdentifier[]{rms});
+		msg.put(SFipa.RECEIVERS, new IComponentIdentifier[]{pi.getRemoteManagementServiceIdentifier()});
 		msg.put(SFipa.CONTENT, content);
 		msg.put(SFipa.LANGUAGE, SFipa.JADEX_XML);
 		msg.put(SFipa.CONVERSATION_ID, callid);
@@ -148,7 +127,7 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 			}
 		}));
 		
-		if(method.getReturnType().equals(void.class))
+		if(method.getReturnType().equals(void.class) && !pi.isSynchronous(method))
 		{
 //			System.out.println("Warning, void method call will be executed asynchronously: "
 //				+method.getDeclaringClass()+" "+method.getName()+" "+Thread.currentThread());
@@ -156,8 +135,9 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 		}
 		else if(!method.getReturnType().isAssignableFrom(IFuture.class))
 		{
+			Thread.dumpStack();
 			System.out.println("Warning, blocking method call: "+method.getDeclaringClass()
-				+" "+method.getName()+" "+Thread.currentThread());
+				+" "+method.getName()+" "+Thread.currentThread()+" "+pi.getServiceIdentifier().getServiceType());
 			ret = future.get(new ThreadSuspendable());
 //			System.out.println("Resumed call: "+method.getName()+" "+ret);
 		}

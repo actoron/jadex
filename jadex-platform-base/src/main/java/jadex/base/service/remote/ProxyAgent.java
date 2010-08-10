@@ -119,6 +119,7 @@ public class ProxyAgent extends MicroAgent
 			
 			public void exceptionOccurred(Object source, Exception exception)
 			{
+				ret.setException(exception);
 			}
 		});
 		

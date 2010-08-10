@@ -4,9 +4,12 @@ import jadex.base.service.remote.ProxyAgent;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
+import jadex.commons.Future;
 import jadex.commons.ICommand;
+import jadex.commons.IFuture;
 import jadex.commons.SGUI;
 import jadex.commons.concurrent.IResultListener;
+import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.micro.IMicroExternalAccess;
 import jadex.service.IService;
 import jadex.tools.common.CombiIcon;
@@ -67,12 +70,9 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 	 */
 	protected void	searchChildren()
 	{
-		final List children = new ArrayList();
-		final boolean ready[] = new boolean[2];
-
-		cms.getExternalAccess(desc.getName()).addResultListener(new IResultListener()
+		cms.getExternalAccess(desc.getName()).addResultListener(new SwingDefaultResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void customResultAvailable(Object source, Object result)
 			{
 				final IMicroExternalAccess exta = (IMicroExternalAccess)result;
 				exta.scheduleStep(new ICommand()
@@ -81,85 +81,16 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 					{
 						ProxyAgent pa = (ProxyAgent)agent;
 						cid = pa.getRemotePlatformIdentifier();
-						pa.getVirtualChildren(cid).addResultListener(pa.createResultListener(new IResultListener()
+						
+						searchChildren(cms, ProxyComponentTreeNode.this, desc, cid, ui, iconcache).addResultListener(new SwingDefaultResultListener(ui)
 						{
-							public void resultAvailable(Object source, Object result)
+							public void customResultAvailable(Object source, Object result)
 							{
-								IComponentDescription[] descs = (IComponentDescription[])
-									((Collection)result).toArray(new IComponentDescription[((Collection)result).size()]);
-								for(int i=0; i<descs.length; i++)
-								{
-									IComponentTreeNode node = getModel().getNode(descs[i].getName());
-									if(node==null)
-									{
-										node = new VirtualComponentTreeNode(ProxyComponentTreeNode.this, getModel(), descs[i], cms, ui, iconcache, exta);
-									}
-									children.add(node);
-								}
-								
-								ready[0] = true;
-								if(ready[0] && ready[1])
-								{
-									setChildren(children);
-								}
+								setChildren((List)result);
 							}
-							
-							public void exceptionOccurred(Object source, Exception exception)
-							{
-								exception.printStackTrace();
-							}
-						}));
+						});
 					}
 				});
-				
-				exta.scheduleStep(new ICommand()
-				{
-					public void execute(Object agent)
-					{
-						ProxyAgent pa = (ProxyAgent)agent;
-						cid = pa.getRemotePlatformIdentifier();
-						pa.getRemoteServices(cid).addResultListener(
-							pa.createResultListener(new IResultListener()
-						{
-							public void resultAvailable(Object source, Object result)
-							{
-								List services = (List)result;
-								if(services!=null && !services.isEmpty())
-								{
-									ServiceContainerNode scn = (ServiceContainerNode)getModel().getNode(desc.getName().getName()+"ServiceContainer");
-									if(scn==null)
-										scn	= new ServiceContainerNode(ProxyComponentTreeNode.this, getModel());
-									children.add(0, scn);
-									List subchildren = new ArrayList();
-									for(int i=0; i<services.size(); i++)
-									{
-										IService service = (IService)services.get(i);
-										ServiceNode	sn = (ServiceNode)getModel().getNode(service.getServiceIdentifier());
-										if(sn==null)
-											sn = new ServiceNode(scn, getModel(), service);
-										subchildren.add(sn);
-									}
-									scn.setChildren(subchildren);							
-								}
-
-								ready[1] = true;
-								if(ready[0] &&  ready[1])
-								{
-									setChildren(children);
-								}
-							}
-							
-							public void exceptionOccurred(Object source, Exception exception)
-							{
-								exception.printStackTrace();
-							}
-						}));
-					}
-				});
-			}
-			
-			public void exceptionOccurred(Object source, Exception exception)
-			{
 			}
 		});
 	}
@@ -170,5 +101,119 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 	public String toString()
 	{
 		return cid==null? desc.getName().getLocalName(): desc.getName().getLocalName()+"("+cid+")";
+	}
+	
+	/**
+	 *  Asynchronously search for children.
+	 *  Called once for each node.
+	 *  Should call setChildren() once children are found.
+	 */
+	protected static IFuture searchChildren(final IComponentManagementService cms, final IComponentTreeNode parent,
+		final IComponentDescription desc, final IComponentIdentifier cid, final Component ui, final  ComponentIconCache iconcache)
+	{
+		final Future ret = new Future();
+	
+		final List children = new ArrayList();
+		final boolean ready[] = new boolean[2];
+
+		IComponentTreeNode tmp = parent;
+		while(!(tmp instanceof ProxyComponentTreeNode))
+			tmp = tmp.getParent();
+		ProxyComponentTreeNode proxy = (ProxyComponentTreeNode)tmp;
+		
+		cms.getExternalAccess(proxy.getDescription().getName()).addResultListener(new IResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				final IMicroExternalAccess exta = (IMicroExternalAccess)result;
+				exta.scheduleStep(new ICommand()
+				{
+					public void execute(Object agent)
+					{
+						ProxyAgent pa = (ProxyAgent)agent;
+						pa.getVirtualChildren(cid).addResultListener(pa.createResultListener(new IResultListener()
+						{
+							public void resultAvailable(Object source, Object result)
+							{
+								IComponentDescription[] descs = (IComponentDescription[])
+									((Collection)result).toArray(new IComponentDescription[((Collection)result).size()]);
+								for(int i=0; i<descs.length; i++)
+								{
+									IComponentTreeNode node = parent.getModel().getNode(descs[i].getName());
+									if(node==null)
+									{
+										node = new VirtualComponentTreeNode(parent, parent.getModel(), descs[i], cms, ui, iconcache);
+									}
+									children.add(node);
+								}
+								
+								ready[0] = true;
+								if(ready[0] && ready[1])
+								{
+									ret.setResult(children);
+								}
+							}
+							
+							public void exceptionOccurred(Object source, Exception exception)
+							{
+								ret.setException(exception);
+							}
+						}));
+					}
+				});
+				
+				exta.scheduleStep(new ICommand()
+				{
+					public void execute(Object agent)
+					{
+						ProxyAgent pa = (ProxyAgent)agent;
+						pa.getRemoteServices(cid).addResultListener(
+							pa.createResultListener(new IResultListener()
+						{
+							public void resultAvailable(Object source, Object result)
+							{
+								List services = (List)result;
+								if(services!=null && !services.isEmpty())
+								{
+									ServiceContainerNode scn = (ServiceContainerNode)
+										parent.getModel().getNode(desc.getName().getName()+"ServiceContainer");
+									if(scn==null)
+										scn	= new ServiceContainerNode(parent, parent.getModel());
+									children.add(0, scn);
+									List subchildren = new ArrayList();
+									for(int i=0; i<services.size(); i++)
+									{
+										IService service = (IService)services.get(i);
+										ServiceNode	sn = (ServiceNode)parent.getModel().getNode(service.getServiceIdentifier());
+										if(sn==null)
+											sn = new ServiceNode(scn, parent.getModel(), service);
+										subchildren.add(sn);
+									}
+									scn.setChildren(subchildren);							
+								}
+
+								ready[1] = true;
+								if(ready[0] &&  ready[1])
+								{
+									ret.setResult(children);
+								}
+							}
+							
+							public void exceptionOccurred(Object source, Exception exception)
+							{
+								ret.setException(exception);
+							}
+						}));
+					}
+				});
+			}
+			
+			public void exceptionOccurred(Object source, Exception exception)
+			{
+				ret.setException(exception);
+			}
+		});
+		
+		return ret;
 	}
 }

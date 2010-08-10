@@ -2,6 +2,9 @@ package jadex.tools.common.componenttree;
 
 import javax.swing.Icon;
 
+/**
+ *  todo
+ */
 public interface IComponentTreeNode
 {
 	/**
@@ -44,4 +47,9 @@ public interface IComponentTreeNode
 	 *  @param recurse	Recursively refresh subnodes, if true.
 	 */
 	public void	refresh(boolean recurse);
+	
+	/**
+	 *  Get the model.
+	 */
+	public ComponentTreeModel	getModel();
 }

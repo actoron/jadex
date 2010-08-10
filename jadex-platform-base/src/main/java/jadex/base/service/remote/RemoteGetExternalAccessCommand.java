@@ -77,7 +77,7 @@ public class RemoteGetExternalAccessCommand implements IRemoteCommand
 				{
 					public void resultAvailable(Object source, Object result)
 					{
-						ExternalAccessProxyInfo pi = getProxyInfo(component.getComponentIdentifier(), result);
+						ProxyInfo pi = getProxyInfo(component.getComponentIdentifier(), result);
 						ret.setResult(new RemoteGetResultCommand(pi, null, callid));
 					}
 					
@@ -154,21 +154,21 @@ public class RemoteGetExternalAccessCommand implements IRemoteCommand
 	/**
 	 *  Get a proxy info for a component. 
 	 */
-	protected ExternalAccessProxyInfo getProxyInfo(IComponentIdentifier rms, Object target)
+	protected ProxyInfo getProxyInfo(IComponentIdentifier rms, Object target)
 	{
-		ExternalAccessProxyInfo ret;
+		ProxyInfo ret;
 		
 		// This construct ensures
 		// a) fast access to existing proxyinfos in the map
 		// b) creation is performed only once by ordering threads 
 		// via synchronized block and rechecking if proxy was already created.
 		
-		ret = (ExternalAccessProxyInfo)proxyinfos.get(target);
+		ret = (ProxyInfo)proxyinfos.get(target);
 		if(ret==null)
 		{
 			synchronized(proxyinfos)
 			{
-				ret = (ExternalAccessProxyInfo)proxyinfos.get(target);
+				ret = (ProxyInfo)proxyinfos.get(target);
 				if(ret==null)
 				{
 					ret = createExternalAccessProxyInfo(rms, target);
@@ -182,9 +182,9 @@ public class RemoteGetExternalAccessCommand implements IRemoteCommand
 	/**
 	 *  Create a proxy info for a component. 
 	 */
-	protected ExternalAccessProxyInfo createExternalAccessProxyInfo(IComponentIdentifier rms, Object target)
+	protected ProxyInfo createExternalAccessProxyInfo(IComponentIdentifier rms, Object target)
 	{
-		ExternalAccessProxyInfo ret = new ExternalAccessProxyInfo(rms, cid, targetclass);
+		ProxyInfo ret = new ProxyInfo(rms, cid, targetclass);
 	
 //		Method[] methods = targetclass.getMethods();
 //		for(int i=0; i<methods.length; i++)

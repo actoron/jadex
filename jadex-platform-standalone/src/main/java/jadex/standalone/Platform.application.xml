@@ -30,6 +30,7 @@
 		<import>jadex.application.space.envsupport.*</import>
 		<import>jadex.application.space.agr.*</import>
 		<import>java.util.*</import>
+		<import>java.lang.reflect.*</import>
 	</imports>
 	
 	<arguments>
@@ -68,15 +69,16 @@
 		<service class="IExecutionService">
 			$args.simulation
 			? new SyncExecutionService($platform, SUtil.createHashMap(new Object[]{"serviceviewer.viewerclass", 
-				RemoteServiceManagementService.REMOTE_EXCLUDED},
-				new Object[]{"jadex.tools.serviceviewer.executionservice.ExecutionServiceViewer", 
-				new java.lang.reflect.Method[]{IExecutionService.class.getMethod("isIdle", new Class[0])}}))
-			: new AsyncExecutionService($platform)
+				RemoteServiceManagementService.REMOTE_UNCACHED}, new Object[]{"jadex.tools.serviceviewer.executionservice.ExecutionServiceViewer", 
+				new String[]{"isIdle", "getTasks"}}))
+			: new AsyncExecutionService($platform, SUtil.createHashMap(new Object[]{"serviceviewer.viewerclass", 
+				RemoteServiceManagementService.REMOTE_UNCACHED}, new Object[]{"jadex.tools.serviceviewer.executionservice.ExecutionServiceViewer", 
+				new String[]{"isIdle", "getTasks"}}))
 		</service>
 		<service class="ILibraryService">
 			new LibraryService($args.libpath, $component.getComponentIdentifier(), 
-				SUtil.createHashMap(new Object[]{"serviceviewer.viewerclass"}, 
-				new Object[]{"jadex.tools.serviceviewer.libservice.LibServiceBrowser"}))
+				SUtil.createHashMap(new Object[]{"serviceviewer.viewerclass", RemoteServiceManagementService.REMOTE_UNCACHED}, 
+				new Object[]{"jadex.tools.serviceviewer.libservice.LibServiceBrowser", new String[]{"getClassLoader", "getURLs"}}))
 		</service>
 		<service class="IComponentManagementService">
 			new ComponentManagementService($platform, $args.autoshutdown, $component.getComponentAdapter())
@@ -101,11 +103,17 @@
 		</service>
 		<service class="IClockService">
 			$args.simulation
-			? new ClockService(new ClockCreationInfo(IClock.TYPE_EVENT_DRIVEN, "simulation_clock", System.currentTimeMillis(), 100), $platform)
-			: new ClockService(new ClockCreationInfo(IClock.TYPE_SYSTEM, "simulation_clock", System.currentTimeMillis(), 100), $platform)
+			? new ClockService(new ClockCreationInfo(IClock.TYPE_EVENT_DRIVEN, "simulation_clock", System.currentTimeMillis(), 100), $platform,
+				SUtil.createHashMap(new Object[]{RemoteServiceManagementService.REMOTE_UNCACHED}, 
+				new Object[]{new String[]{"getState", "getTime", "getTick", "getStarttime", "getDelta", "getDilation", "getNextTimer", "getTimers", "getClockType", "advanceEvent"}}))
+			: new ClockService(new ClockCreationInfo(IClock.TYPE_SYSTEM, "simulation_clock", System.currentTimeMillis(), 100), $platform,
+				SUtil.createHashMap(new Object[]{RemoteServiceManagementService.REMOTE_UNCACHED}, 
+				new Object[]{new String[]{"getState", "getTime", "getTick", "getStarttime", "getDelta", "getDilation", "getNextTimer", "getTimers", "getClockType", "advanceEvent"}}))
 		</service>
 		<service class="ISimulationService">
-			new SimulationService($platform)
+			new SimulationService($platform,
+				SUtil.createHashMap(new Object[]{RemoteServiceManagementService.REMOTE_UNCACHED}, 
+				new Object[]{new String[]{"getMode", "isExecuting"}}))
 		</service>
 		<service class="IComponentFactory" >
 			new ApplicationComponentFactory(

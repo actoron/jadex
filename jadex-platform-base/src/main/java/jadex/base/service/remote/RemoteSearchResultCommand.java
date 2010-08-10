@@ -61,24 +61,23 @@ public class RemoteSearchResultCommand extends RemoteResultCommand
 				
 				if(result instanceof Collection)
 				{
-					List ret = new ArrayList();
+					List tmp = new ArrayList();
 					for(Iterator it=((Collection)result).iterator(); it.hasNext(); )
 					{
-						ServiceProxyInfo pi = (ServiceProxyInfo)it.next();
-						ret.add((IService)Proxy.newProxyInstance(ls.getClassLoader(), 
+						ProxyInfo pi = (ProxyInfo)it.next();
+						IService ser = (IService)Proxy.newProxyInstance(ls.getClassLoader(), 
 							new Class[]{pi.getServiceIdentifier().getServiceType(), IService.class},
-							new RemoteMethodInvocationHandler(component, pi.getRemoteManagementServiceIdentifier(), 
-								pi.getServiceIdentifier(), waitingcalls, pi.getCache())));
+							new RemoteMethodInvocationHandler(component, pi, waitingcalls));
+						tmp.add(ser);
 					}
-					result = ret;
+					result = tmp;
 				}
-				else if(result instanceof ServiceProxyInfo)
+				else if(result instanceof ProxyInfo)
 				{
-					ServiceProxyInfo pi = (ServiceProxyInfo)result;
+					ProxyInfo pi = (ProxyInfo)result;
 					result = (IService)Proxy.newProxyInstance(ls.getClassLoader(), 
 						new Class[]{pi.getServiceIdentifier().getServiceType(), IService.class},
-						new RemoteMethodInvocationHandler(component, pi.getRemoteManagementServiceIdentifier(), 
-							pi.getServiceIdentifier(), waitingcalls, pi.getCache()));
+						new RemoteMethodInvocationHandler(component, pi, waitingcalls));
 				}
 				
 				RemoteSearchResultCommand.super.execute(component, waitingcalls)

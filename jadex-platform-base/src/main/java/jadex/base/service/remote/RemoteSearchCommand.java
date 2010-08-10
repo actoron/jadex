@@ -5,6 +5,7 @@ import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
+import jadex.commons.SReflect;
 import jadex.commons.collection.LRU;
 import jadex.commons.concurrent.IResultListener;
 import jadex.service.IResultSelector;
@@ -17,9 +18,11 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  *  Command for performing a remote service search.
@@ -108,7 +111,7 @@ public class RemoteSearchCommand implements IRemoteCommand
 									for(Iterator it=((Collection)result).iterator(); it.hasNext(); )
 									{
 										IService tmp = (IService)it.next();
-										ServiceProxyInfo pi = getProxyInfo(component.getComponentIdentifier(), tmp);
+										ProxyInfo pi = getProxyInfo(component.getComponentIdentifier(), tmp);
 										res.add(pi);
 									}
 									content = res;
@@ -238,21 +241,21 @@ public class RemoteSearchCommand implements IRemoteCommand
 	/**
 	 *  Get a proxy info for a service. 
 	 */
-	protected ServiceProxyInfo getProxyInfo(IComponentIdentifier rms, IService service)
+	protected ProxyInfo getProxyInfo(IComponentIdentifier rms, IService service)
 	{
-		ServiceProxyInfo ret;
+		ProxyInfo ret;
 		
 		// This construct ensures
 		// a) fast access to existing proxyinfos in the map
 		// b) creation is performed only once by ordering threads 
 		// via synchronized block and rechecking if proxy was already created.
 		
-		ret = (ServiceProxyInfo)proxyinfos.get(service);
+		ret = (ProxyInfo)proxyinfos.get(service);
 		if(ret==null)
 		{
 			synchronized(proxyinfos)
 			{
-				ret = (ServiceProxyInfo)proxyinfos.get(service);
+				ret = (ProxyInfo)proxyinfos.get(service);
 				if(ret==null)
 				{
 					ret = createProxyInfo(rms, service);
@@ -266,47 +269,112 @@ public class RemoteSearchCommand implements IRemoteCommand
 	/**
 	 *  Create a proxy info for a service. 
 	 */
-	protected ServiceProxyInfo createProxyInfo(IComponentIdentifier rms, IService service)
+	protected ProxyInfo createProxyInfo(IComponentIdentifier rms, IService service)
 	{
 		Class type = service.getServiceIdentifier().getServiceType();
-		ServiceProxyInfo ret = new ServiceProxyInfo(rms, service.getServiceIdentifier());
+		ProxyInfo ret = new ProxyInfo(rms, service.getServiceIdentifier());
 	
 		System.out.println("Creating proxy for: "+type);
+		
+		// Check for excluded and synchronous methods.
+		Object ex = service.getProperty(RemoteServiceManagementService.REMOTE_EXCLUDED);
+		if(ex!=null)
+		{
+			for(Iterator it = SReflect.getIterator(ex); it.hasNext(); )
+			{
+				ret.addExcludedMethod(getMethod(it.next(), service, false));
+			}
+		}
+		Object syn = service.getProperty(RemoteServiceManagementService.REMOTE_SYNCHRONOUS);
+		if(syn!=null)
+		{
+			for(Iterator it = SReflect.getIterator(syn); it.hasNext(); )
+			{
+				ret.addExcludedMethod(getMethod(it.next(), service, false));
+			}
+		}
+		Object un = service.getProperty(RemoteServiceManagementService.REMOTE_UNCACHED);
+		if(un!=null)
+		{
+			for(Iterator it = SReflect.getIterator(un); it.hasNext(); )
+			{
+				ret.addExcludedMethod(getMethod(it.next(), service, true));
+			}
+		}
+		
+		// Check methods and possibly cache constant calls.
 		Method[] methods = type.getMethods();
 		for(int i=0; i<methods.length; i++)
 		{
-			Class rt = methods[i].getReturnType();
-			Class[] ar = methods[i].getParameterTypes();
-			
-			if(void.class.equals(rt))
+			if(!ret.isUncached(methods[i]) && !ret.isExcluded(methods[i])) // excluded methods are also not cached
 			{
-//				System.out.println("Warning, void method call will be executed asynchronously: "+type+" "+methods[i].getName());
-			}
-			else if(!(rt.isAssignableFrom(IFuture.class)))
-			{
-				if(ar.length>0)
+				Class rt = methods[i].getReturnType();
+				Class[] ar = methods[i].getParameterTypes();
+				
+				if(void.class.equals(rt))
 				{
-//					System.out.println("Warning, service method is blocking: "+type+" "+methods[i].getName());
+	//				System.out.println("Warning, void method call will be executed asynchronously: "+type+" "+methods[i].getName());
 				}
-				else
+				else if(!(rt.isAssignableFrom(IFuture.class)))
 				{
-					// Invoke method to get constant return value.
-					try
+					if(ar.length>0)
 					{
-						System.out.println("Calling for caching: "+methods[i]);
-						Object val = methods[i].invoke(service, new Object[0]);
-						ret.putCache(methods[i].getName(), val);
+	//					System.out.println("Warning, service method is blocking: "+type+" "+methods[i].getName());
 					}
-					catch(Exception e)
+					else
 					{
-						System.out.println("Warning, constant service method threw exception: "+type+" "+methods[i]);
-//						e.printStackTrace();
+						// Invoke method to get constant return value.
+						try
+						{
+							System.out.println("Calling for caching: "+methods[i]);
+							Object val = methods[i].invoke(service, new Object[0]);
+							ret.putCache(methods[i].getName(), val);
+						}
+						catch(Exception e)
+						{
+							System.out.println("Warning, constant service method threw exception: "+type+" "+methods[i]);
+	//						e.printStackTrace();
+						}
 					}
 				}
 			}
 		}
 		
 		proxyinfos.put(service, ret);
+		return ret;
+	}
+	
+	/**
+	 *  Get method.
+	 */
+	protected Method getMethod(Object tmp, IService service, boolean noargs)
+	{
+		Method ret = null;
+		
+		if(tmp instanceof String)
+		{
+			if(noargs)
+			{
+				ret = SReflect.getMethod(service.getClass(),(String)tmp, new Class[0]);
+			}
+			else
+			{
+				Method[] ms = SReflect.getMethods(service.getClass(), (String)tmp);
+				if(ms.length>1)
+				{
+					throw new RuntimeException("More than one message with the name availble: "+tmp);
+				}
+				else
+				{
+					ret = ms[0];
+				}
+			}
+		}
+		else
+		{
+			ret = (Method)tmp;
+		}
+		
 		return ret;
 	}
 }

@@ -80,18 +80,18 @@ public class UserAgent extends MicroAgent
 			System.out.println("Found service: "+info);
 			// Execute non-blocking method call with future result
 //			System.out.println("Calling non-blocking addNB method.");
-//			service.addNB(1, 2).addResultListener(new DefaultResultListener()
-//			{
-//				public void resultAvailable(Object source, Object result)
-//				{
-//					System.out.println("Invoked addNB: "+result);
-//				}
-//			});
+			service.addNB(1, 2).addResultListener(new DefaultResultListener()
+			{
+				public void resultAvailable(Object source, Object result)
+				{
+					System.out.println("Invoked addNB: "+result);
+				}
+			});
 			
 			// Execute blocking method call with normal result
 //			System.out.println("Calling blocking addB method.");
-//			int res = service.addB(1, 2);
-//			System.out.println("Invoked addB: "+res);
+			int res = service.addB(1, 2);
+			System.out.println("Invoked addB: "+res);
 			
 			// Execute constant method call, which does not block but returns a cached value.
 			System.out.println("Calling constant (non-blocking) getPi method.");

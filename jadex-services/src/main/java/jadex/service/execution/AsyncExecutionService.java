@@ -63,7 +63,15 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 	 */
 	public AsyncExecutionService(IServiceProvider provider)//, int max)
 	{
-		super(provider.getId(), IExecutionService.class, null);
+		this(provider, null);
+	}
+	
+	/**
+	 *  Create a new asynchronous executor service. 
+	 */
+	public AsyncExecutionService(IServiceProvider provider, Map properties)//, int max)
+	{
+		super(provider.getId(), IExecutionService.class, properties);
 
 		this.provider = provider;
 //		this.threadpool = threadpool;

@@ -19,6 +19,7 @@ import jadex.service.clock.ITimer;
 import jadex.service.execution.IExecutionService;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  *  The execution control is the access point for controlling the
@@ -64,7 +65,15 @@ public class SimulationService extends BasicService implements ISimulationServic
 	 */
 	public SimulationService(IServiceProvider provider)
 	{
-		super(provider.getId(), ISimulationService.class, null);
+		this(provider, null);
+	}
+	
+	/**
+	 *  Create a new execution control.
+	 */
+	public SimulationService(IServiceProvider provider, Map properties)
+	{
+		super(provider.getId(), ISimulationService.class, properties);
 
 		this.provider = provider;
 //		this.mode = mode;

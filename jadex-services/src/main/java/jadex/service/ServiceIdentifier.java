@@ -122,6 +122,16 @@ public class ServiceIdentifier implements IServiceIdentifier
 		}
 		return ret;
 	}
+
+	/**
+	 *  Get the string representation.
+	 */
+	public String toString()
+	{
+		return "ServiceIdentifier(providerid=" + providerid + ", type=" + type
+				+ ", servicename=" + servicename + ")";
+	}
+	
 	
 	
 }

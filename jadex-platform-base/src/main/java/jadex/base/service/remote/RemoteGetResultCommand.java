@@ -54,11 +54,10 @@ public class RemoteGetResultCommand extends RemoteResultCommand
 			{
 				ILibraryService ls = (ILibraryService)res;
 				
-				ExternalAccessProxyInfo pi = (ExternalAccessProxyInfo)result;
+				ProxyInfo pi = (ProxyInfo)result;
 				result = Proxy.newProxyInstance(ls.getClassLoader(), 
 					new Class[]{pi.getTargetClass()},
-					new RemoteMethodInvocationHandler(component, pi.getRemoteManagementServiceIdentifier(), 
-						pi.getComponentIdentifier(), waitingcalls, pi.getCache()));
+					new RemoteMethodInvocationHandler(component, pi, waitingcalls));
 				
 				RemoteGetResultCommand.super.execute(component, waitingcalls)
 					.addResultListener(component.createResultListener(new DelegationResultListener(ret)));

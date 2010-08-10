@@ -2,11 +2,12 @@ package jadex.bridge;
 
 import jadex.commons.IFuture;
 import jadex.commons.concurrent.IResultListener;
+import jadex.service.IService;
 
 /**
  *  General interface for components that the container can execute.
  */
-public interface IComponentManagementService
+public interface IComponentManagementService extends IService
 {
 	//-------- management methods --------
 	
