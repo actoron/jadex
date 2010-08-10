@@ -42,6 +42,8 @@ import jadex.bdi.runtime.interpreter.InternalEventRules;
 import jadex.bdi.runtime.interpreter.MessageEventRules;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bridge.IComponentIdentifier;
+import jadex.commons.Future;
+import jadex.commons.IFuture;
 import jadex.commons.SReflect;
 import jadex.commons.collection.SCollection;
 import jadex.javaparser.IExpressionParser;
@@ -559,14 +561,34 @@ public abstract class AbstractPlan implements java.io.Serializable //, IPlan
 	 *  @param me	The message event.
 	 *  @return The filter to wait for an answer.
 	 */
-	public void	sendMessage(IMessageEvent me)
+	public void sendMessage(IMessageEvent me)
 	{	
 		Object revent = ((MessageEventFlyweight)me).getHandle();
+		state.setAttributeValue(revent, OAVBDIRuntimeModel.messageevent_has_sendfuture, new Future());
 		Object rcapa = ((MessageEventFlyweight)me).getScope();
 		interpreter.startMonitorConsequences();
 		MessageEventRules.sendMessage(state, rcapa, revent);
 		interpreter.endMonitorConsequences();
 	}
+	
+	/**
+	 *  Send a message after some delay.
+	 *  @param me	The message event.
+	 *  @return The filter to wait for an answer.
+	 * /
+	public IFuture sendMessage(IMessageEvent me)
+	{	
+		Future ret = new Future();
+		
+		Object revent = ((MessageEventFlyweight)me).getHandle();
+		state.setAttributeValue(revent, OAVBDIRuntimeModel.messageevent_has_sendfuture, ret);
+		Object rcapa = ((MessageEventFlyweight)me).getScope();
+		interpreter.startMonitorConsequences();
+		MessageEventRules.sendMessage(state, rcapa, revent);
+		interpreter.endMonitorConsequences();
+	
+		return ret;
+	}*/
 
 	/**
 	 *  Dispatch an internal event.

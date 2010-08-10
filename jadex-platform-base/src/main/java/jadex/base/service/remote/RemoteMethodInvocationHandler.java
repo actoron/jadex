@@ -109,7 +109,22 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 					public void resultAvailable(Object source, Object result)
 					{
 						IMessageService ms = (IMessageService)result;
-						ms.sendMessage(msg, SFipa.FIPA_MESSAGE_TYPE, compid, ls.getClassLoader());
+						ms.sendMessage(msg, SFipa.FIPA_MESSAGE_TYPE, compid, ls.getClassLoader())
+							.addResultListener(new IResultListener()
+						{
+							public void resultAvailable(Object source, Object result)
+							{
+								// ok message could be sent.
+							}
+							
+							public void exceptionOccurred(Object source, Exception exception)
+							{
+								// message could not be sent -> fail immediately.
+								System.out.println("Callee could not be reached: "+exception);
+								waitingcalls.remove(compid);
+								future.setException(exception);
+							}
+						});
 					}
 					
 					public void exceptionOccurred(Object source, Exception exception)

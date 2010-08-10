@@ -5,6 +5,7 @@ import jadex.bpmn.runtime.ITask;
 import jadex.bpmn.runtime.ITaskContext;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
+import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
@@ -18,8 +19,10 @@ public class DestroyComponentTask implements ITask
 	/**
 	 *  Execute the task.
 	 */
-	public void execute(final ITaskContext context, BpmnInterpreter instance, final IResultListener listener)
+	public IFuture execute(final ITaskContext context, BpmnInterpreter instance)
 	{
+		final Future ret = new Future();
+		
 		SServiceProvider.getService(instance.getServiceProvider(), IComponentManagementService.class)
 			.addResultListener(instance.createResultListener(new DefaultResultListener()
 		{
@@ -36,17 +39,20 @@ public class DestroyComponentTask implements ITask
 					cid = ces.createComponentIdentifier(name, true, null);
 				}
 				
-				IFuture ret = ces.destroyComponent(cid);
+				IFuture tmp = ces.destroyComponent(cid);
 				if(wait || resultlistener!=null)
 				{
-					ret.addResultListener(new IResultListener()
+					tmp.addResultListener(new IResultListener()
 					{
 						public void resultAvailable(Object source, Object result)
 						{
 							if(resultlistener!=null)
 								resultlistener.resultAvailable(DestroyComponentTask.this, result);
 							if(wait)
-								listener.resultAvailable(DestroyComponentTask.this, result);
+							{
+								ret.setResult(result);
+//								listener.resultAvailable(DestroyComponentTask.this, result);
+							}
 						}
 						
 						public void exceptionOccurred(Object source, Exception exception)
@@ -54,17 +60,23 @@ public class DestroyComponentTask implements ITask
 							if(resultlistener!=null)
 								resultlistener.exceptionOccurred(DestroyComponentTask.this, exception);
 							if(wait)
-								listener.exceptionOccurred(DestroyComponentTask.this, exception);
+							{
+								ret.setException(exception);
+//								listener.exceptionOccurred(DestroyComponentTask.this, exception);
+							}
 						}
 					});
 				}
 
 				if(!wait)
 				{
-					listener.resultAvailable(this, null);
+					ret.setResult(null);
+//					listener.resultAvailable(this, null);
 				}
 			}
 		}));
+		
+		return ret;
 	}
 	
 	//-------- static methods --------

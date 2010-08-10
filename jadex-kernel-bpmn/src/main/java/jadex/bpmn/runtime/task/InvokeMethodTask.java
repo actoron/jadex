@@ -49,10 +49,10 @@ public class InvokeMethodTask extends AbstractTask
 		try
 		{
 			Method method = clazz.getMethod(methodname, (Class[])paramclasses.toArray(new Class[paramclasses.size()]));
-			Object ret = method.invoke(object, params.toArray());
+			Object val = method.invoke(object, params.toArray());
 			if(returnname!=null)
 			{
-				context.setParameterValue(returnname, ret);
+				context.setParameterValue(returnname, val);
 			}
 		}
 		catch(InvocationTargetException e)

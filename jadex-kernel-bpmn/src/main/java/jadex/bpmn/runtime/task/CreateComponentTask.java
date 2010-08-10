@@ -7,6 +7,8 @@ import jadex.bpmn.runtime.ITaskContext;
 import jadex.bridge.ComponentResultListener;
 import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentManagementService;
+import jadex.commons.Future;
+import jadex.commons.IFuture;
 import jadex.commons.concurrent.IResultListener;
 import jadex.service.SServiceProvider;
 
@@ -40,8 +42,10 @@ public class CreateComponentTask implements ITask
 	/**
 	 *  Execute the task.
 	 */
-	public void execute(final ITaskContext context, final BpmnInterpreter instance, final IResultListener listener)
+	public IFuture execute(final ITaskContext context, final BpmnInterpreter instance)
 	{
+		final Future ret = new Future();
+		
 		SServiceProvider.getService(instance.getServiceProvider(), IComponentManagementService.class).addResultListener(new ComponentResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
@@ -94,14 +98,16 @@ public class CreateComponentTask implements ITask
 							}
 							if(killlistener!=null)
 								killlistener.resultAvailable(CreateComponentTask.this, result);
-							listener.resultAvailable(CreateComponentTask.this, null);
+//							listener.resultAvailable(CreateComponentTask.this, null);
+							ret.setResult(null);
 						}
 						
 						public void exceptionOccurred(Object source, Exception exception)
 						{
 							if(killlistener!=null)
 								killlistener.exceptionOccurred(CreateComponentTask.this, exception);
-							listener.exceptionOccurred(CreateComponentTask.this, exception);
+//							listener.exceptionOccurred(CreateComponentTask.this, exception);
+							ret.setException(exception);
 						}
 					};
 				}
@@ -110,14 +116,20 @@ public class CreateComponentTask implements ITask
 					new CreationInfo(config, args, sub ? instance.getComponentAdapter().getComponentIdentifier() : null, suspend, master, daemon, instance.getModelElement().getAllImports()), lis);
 
 				if(!wait)
-					listener.resultAvailable(this, null);
+				{
+					ret.setResult(null);
+//					listener.resultAvailable(this, null);
+				}
 			}
 			
 			public void exceptionOccurred(Object source, Exception exception)
 			{
-				listener.exceptionOccurred(source, exception);
+				ret.setException(exception);
+//				listener.exceptionOccurred(source, exception);
 			}
 		}, instance.getComponentAdapter()));
+		
+		return ret;
 	}
 	
 	/**

@@ -11,6 +11,7 @@ import jadex.commons.Future;
 import jadex.commons.ICommand;
 import jadex.commons.IFuture;
 import jadex.commons.concurrent.DefaultResultListener;
+import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.service.BasicService;
 import jadex.service.CacheServiceContainer;
@@ -318,8 +319,10 @@ public abstract class MicroAgent implements IMicroAgent
 	 *  @param me	The message content (name value pairs).
 	 *  @param mt	The message type describing the content.
 	 */
-	public void sendMessage(final Map me, final MessageType mt)
+	public IFuture sendMessage(final Map me, final MessageType mt)
 	{
+		final Future ret = new Future();
+		
 		SServiceProvider.getService(getServiceProvider(), IMessageService.class)
 			.addResultListener(createResultListener(new DefaultResultListener()
 		{
@@ -327,9 +330,12 @@ public abstract class MicroAgent implements IMicroAgent
 			{
 				IMessageService ms = (IMessageService)result;
 				ms.sendMessage(me, mt, interpreter.getAgentAdapter().getComponentIdentifier(),
-					interpreter.getAgentModel().getClassLoader());
+					interpreter.getAgentModel().getClassLoader())
+					.addResultListener(createResultListener(new DelegationResultListener(ret)));
 			}
 		}));
+		
+		return ret;
 	}
 	
 	/**

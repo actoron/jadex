@@ -53,7 +53,12 @@ public class RemoteResultCommand implements IRemoteCommand
 	public IFuture execute(IExternalAccess component, Map waitingcalls)
 	{
 		Future future = (Future)waitingcalls.get(callid);
-		if(!future.isDone())
+		
+		if(future==null)
+		{
+			System.out.println("Unexpected result, no outstanding call for:" +callid);
+		}
+		else if(!future.isDone())
 		{
 			if(exception!=null)
 			{
@@ -64,6 +69,7 @@ public class RemoteResultCommand implements IRemoteCommand
 				future.setResult(result);
 			}
 		}
+		
 		return new Future(null);
 	}
 	

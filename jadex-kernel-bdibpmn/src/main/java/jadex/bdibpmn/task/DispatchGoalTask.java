@@ -10,7 +10,8 @@ import jadex.bpmn.runtime.ITask;
 import jadex.bpmn.runtime.ITaskContext;
 import jadex.bpmn.runtime.task.ParameterMetaInfo;
 import jadex.bpmn.runtime.task.TaskMetaInfo;
-import jadex.commons.concurrent.IResultListener;
+import jadex.commons.Future;
+import jadex.commons.IFuture;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -23,8 +24,10 @@ public class DispatchGoalTask	implements ITask
 	/**
 	 *  Execute the task.
 	 */
-	public void execute(final ITaskContext context, BpmnInterpreter instance, final IResultListener listener)
+	public IFuture execute(final ITaskContext context, BpmnInterpreter instance)
 	{
+		final Future ret = new Future();
+		
 		try
 		{
 			BpmnPlanBodyInstance	plan	= (BpmnPlanBodyInstance)instance;
@@ -62,13 +65,15 @@ public class DispatchGoalTask	implements ITask
 						goal.removeGoalListener(this);
 						if(goal.isSucceeded())
 						{
-							listener.resultAvailable(DispatchGoalTask.this, null);
+							ret.setResult(null);
+//							listener.resultAvailable(DispatchGoalTask.this, null);
 						}
 						else
 						{
 							Exception	e	= new GoalFailureException();
 							e.fillInStackTrace();
-							listener.exceptionOccurred(DispatchGoalTask.this, e);
+							ret.setException(e);
+//							listener.exceptionOccurred(DispatchGoalTask.this, e);
 						}
 					}
 					
@@ -84,12 +89,16 @@ public class DispatchGoalTask	implements ITask
 				plan.dispatchTopLevelGoal(goal);
 			
 			if(!wait)
-				listener.resultAvailable(this, null);
+				ret.setResult(null);
+//				listener.resultAvailable(this, null);
 		}
 		catch(Exception e)
 		{
-			listener.exceptionOccurred(this, e);
+			ret.setException(e);
+//			listener.exceptionOccurred(this, e);
 		}
+		
+		return ret;
 	}
 	
 	//-------- static methods --------

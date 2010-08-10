@@ -90,7 +90,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 				// Hack! create remote rms cid with "rms" assumption.
 				IComponentIdentifier rrms = cms.createComponentIdentifier("rms@"+cid.getPlatformName(), false, cid.getAddresses());
 		
-				String callid = SUtil.createUniqueId(component.getComponentIdentifier().getLocalName());
+				final String callid = SUtil.createUniqueId(component.getComponentIdentifier().getLocalName());
 				waitingcalls.put(callid, ret);
 		
 				RemoteSearchCommand content = new RemoteSearchCommand(cid, manager, 
@@ -116,7 +116,21 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 							public void resultAvailable(Object source, Object result)
 							{
 								IMessageService ms = (IMessageService)result; 
-								ms.sendMessage(msg, SFipa.FIPA_MESSAGE_TYPE, component.getComponentIdentifier(), ls.getClassLoader());
+								ms.sendMessage(msg, SFipa.FIPA_MESSAGE_TYPE, component.getComponentIdentifier(), ls.getClassLoader())
+									.addResultListener(new IResultListener()
+								{
+									public void resultAvailable(Object source, Object result)
+									{
+										// ok message could be sent.
+									}
+									
+									public void exceptionOccurred(Object source, Exception exception)
+									{
+										// ok message could be sent.
+										waitingcalls.remove(callid);
+										ret.setException(exception);
+									}
+								});
 							}
 							
 							public void exceptionOccurred(Object source, Exception exception)
@@ -200,7 +214,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 				// Hack! create remote rms cid with "rms" assumption.
 				IComponentIdentifier rrms = cms.createComponentIdentifier("rms@"+cid.getPlatformName(), false, cid.getAddresses());
 		
-				String callid = SUtil.createUniqueId(component.getComponentIdentifier().getLocalName());
+				final String callid = SUtil.createUniqueId(component.getComponentIdentifier().getLocalName());
 				waitingcalls.put(callid, ret);
 		
 				RemoteGetExternalAccessCommand content = new RemoteGetExternalAccessCommand(cid, targetclass, callid);
@@ -225,17 +239,32 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 							public void resultAvailable(Object source, Object result)
 							{
 								IMessageService ms = (IMessageService)result; 
-								ms.sendMessage(msg, SFipa.FIPA_MESSAGE_TYPE, component.getComponentIdentifier(), ls.getClassLoader());
+								ms.sendMessage(msg, SFipa.FIPA_MESSAGE_TYPE, component.getComponentIdentifier(), ls.getClassLoader()).addResultListener(new IResultListener()
+								{
+									public void resultAvailable(Object source, Object result)
+									{
+										// ok message could be sent.
+									}
+									
+									public void exceptionOccurred(Object source, Exception exception)
+									{
+										// ok message could be sent.
+										waitingcalls.remove(callid);
+										ret.setException(exception);
+									}
+								});
 							}
 							
 							public void exceptionOccurred(Object source, Exception exception)
 							{
+								waitingcalls.remove(callid);
 								ret.setException(exception);
 							}
 						}));
 					}
 					public void exceptionOccurred(Object source, Exception exception)
 					{
+						waitingcalls.remove(callid);
 						ret.setException(exception);
 					}
 				}));

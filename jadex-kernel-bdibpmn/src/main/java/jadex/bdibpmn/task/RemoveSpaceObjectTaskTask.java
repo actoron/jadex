@@ -6,6 +6,8 @@ import jadex.bpmn.runtime.ITask;
 import jadex.bpmn.runtime.ITaskContext;
 import jadex.bpmn.runtime.task.ParameterMetaInfo;
 import jadex.bpmn.runtime.task.TaskMetaInfo;
+import jadex.commons.Future;
+import jadex.commons.IFuture;
 import jadex.commons.concurrent.IResultListener;
 
 /**
@@ -19,12 +21,14 @@ public class RemoveSpaceObjectTaskTask	implements ITask
 	 *  @param process	The process instance executing the task.
 	 *  @param listener	To be notified, when the task has completed.
 	 */
-	public void	execute(ITaskContext context, BpmnInterpreter process, IResultListener listener)
+	public IFuture execute(ITaskContext context, BpmnInterpreter process)
 	{
 		IEnvironmentSpace	space	= (IEnvironmentSpace)context.getParameterValue("space");
 		Object	objectid	= context.getParameterValue("objectid");
 		Object	taskid	= context.getParameterValue("taskid");
 		space.removeObjectTask(taskid, objectid);
+	
+		return new Future(null);
 	}
 	
 	//-------- static methods --------

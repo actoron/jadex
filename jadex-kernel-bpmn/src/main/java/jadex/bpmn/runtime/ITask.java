@@ -1,6 +1,6 @@
 package jadex.bpmn.runtime;
 
-import jadex.commons.concurrent.IResultListener;
+import jadex.commons.IFuture;
 
 /**
  *  Interface for domain specific tasks.
@@ -12,7 +12,7 @@ public interface ITask
 	 *  Execute the task.
 	 *  @param context	The accessible values.
 	 *  @param process	The process instance executing the task.
-	 *  @param listener	To be notified, when the task has completed.
+	 *  @return	To be notified, when the task has completed.
 	 */
-	public void	execute(ITaskContext context, BpmnInterpreter process, IResultListener listener);
+	public IFuture execute(ITaskContext context, BpmnInterpreter process);
 }

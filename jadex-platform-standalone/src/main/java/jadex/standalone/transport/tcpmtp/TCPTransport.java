@@ -439,7 +439,7 @@ public class TCPTransport implements ITransport
 				catch(Exception e)
 				{
 					logger.warning("TCPTransport receiving error: "+e);
-					e.printStackTrace();
+//					e.printStackTrace();
 					con.close();
 				}
 			}

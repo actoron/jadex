@@ -2352,7 +2352,7 @@ class TimeoutAction extends CheckedAction
 	 */
 	public void run()
 	{
-//			System.out.println("Timer occurred: "+start);
+//		System.out.println("Timer occurred: ");
 		to[0] = true;
 		EventProcessingRules.schedulePlanInstanceCandidate(state, null, rplan, rcapa);
 		BDIInterpreter.getInterpreter(state).getAgentAdapter().wakeup();

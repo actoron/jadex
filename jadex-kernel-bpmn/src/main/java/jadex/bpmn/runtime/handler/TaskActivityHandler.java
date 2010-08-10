@@ -27,7 +27,7 @@ public class TaskActivityHandler extends DefaultActivityHandler
 			try
 			{
 				ITask task = (ITask)taskimpl.newInstance();
-				task.execute(thread, instance, new IResultListener()
+				task.execute(thread, instance).addResultListener(new IResultListener()
 				{
 					public void resultAvailable(Object source, Object result)
 					{

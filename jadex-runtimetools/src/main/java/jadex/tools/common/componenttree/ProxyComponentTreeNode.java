@@ -17,26 +17,36 @@ import jadex.tools.common.CombiIcon;
 import java.awt.Component;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import javax.swing.Icon;
 import javax.swing.UIDefaults;
 
 /**
- * 
+ *  Node that represents a remote component and blends in the
+ *  tree of components as virtual children of this node.
  */
 public class ProxyComponentTreeNode extends ComponentTreeNode
 {
-	/** The remote component identifier.*/
-	protected IComponentIdentifier cid;
+	//-------- constants --------
 	
 	/**
 	 * The image icons.
 	 */
 	protected static final UIDefaults icons = new UIDefaults(new Object[]
 	{
-		"overlay_proxy", SGUI.makeIcon(ProxyComponentTreeNode.class, "/jadex/tools/common/images/overlay_proxy.png"),
+		"overlay_proxy_noconnection", SGUI.makeIcon(ProxyComponentTreeNode.class, "/jadex/tools/common/images/overlay_proxy_noconnection.png"),
+		"overlay_proxy_connection", SGUI.makeIcon(ProxyComponentTreeNode.class, "/jadex/tools/common/images/overlay_proxy_connection.png"),
 	});
+	
+	//-------- attribute --------
+
+	/** The remote component identifier.*/
+	protected IComponentIdentifier cid;
+	
+	/** The connection state. */
+	protected boolean connected;
 	
 	//-------- constructors --------
 	
@@ -47,6 +57,7 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 		IComponentManagementService cms, Component ui, ComponentIconCache iconcache)
 	{
 		super(parent, model, desc, cms, ui, iconcache);
+		this.connected = false;
 	}
 	
 	/**
@@ -58,7 +69,8 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 		Icon base = super.getIcon();
 		if(base!=null)
 		{
-			ret = new CombiIcon(new Icon[]{base, icons.getIcon("overlay_proxy")});
+			ret = new CombiIcon(new Icon[]{base, connected? 
+				icons.getIcon("overlay_proxy_connection"): icons.getIcon("overlay_proxy_noconnection")});
 		}
 		return ret;
 	}
@@ -87,6 +99,13 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 							public void customResultAvailable(Object source, Object result)
 							{
 								setChildren((List)result);
+								connected = true;
+							}
+							
+							public void customExceptionOccurred(Object source, Exception exception)
+							{
+								setChildren(Collections.EMPTY_LIST);
+								connected = false;
 							}
 						});
 					}
@@ -216,4 +235,5 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 		
 		return ret;
 	}
+	
 }

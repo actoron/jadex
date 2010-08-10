@@ -6,7 +6,9 @@ import jadex.bpmn.runtime.ITask;
 import jadex.bpmn.runtime.ITaskContext;
 import jadex.bpmn.runtime.task.ParameterMetaInfo;
 import jadex.bpmn.runtime.task.TaskMetaInfo;
-import jadex.commons.concurrent.IResultListener;
+import jadex.commons.Future;
+import jadex.commons.IFuture;
+import jadex.commons.concurrent.DelegationResultListener;
 
 import java.util.Map;
 
@@ -18,8 +20,10 @@ public class CreateSpaceObjectTaskTask	implements	ITask
 	/**
 	 *  Execute the task.
 	 */
-	public void execute(ITaskContext context, BpmnInterpreter instance, IResultListener listener)
+	public IFuture execute(ITaskContext context, BpmnInterpreter instance)
 	{
+		Future ret = new Future();
+		
 		try
 		{
 			String type	= (String)context.getParameterValue("type");
@@ -37,17 +41,19 @@ public class CreateSpaceObjectTaskTask	implements	ITask
 				? ((Boolean)context.getParameterValue("wait")).booleanValue() : true;
 			if(wait)
 			{
-				space.addTaskListener(taskid, objectid, listener);
+				space.addTaskListener(taskid, objectid, new DelegationResultListener(ret));
 			}
 			else
 			{
-				listener.resultAvailable(this, null);
+				ret.setResult(null);
 			}
 		}
 		catch(Exception e)
 		{
-			listener.exceptionOccurred(this, e);
+			ret.setException(e);
 		}
+		
+		return ret;
 	}
 	
 	//-------- static methods --------

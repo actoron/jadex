@@ -25,6 +25,7 @@ public class InterpreterTimedObject implements ITimedObject
 	public InterpreterTimedObject(BDIInterpreter interpreter, CheckedAction runnable)
 	{
 		this.interpreter = interpreter;
+		this.action = runnable;
 	}
 	
 	//-------- methods --------

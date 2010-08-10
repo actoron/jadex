@@ -72,7 +72,6 @@ public class BasicService implements IService
 	{
 		return sid;
 	}
-
 	
 	/**
 	 *  Get a service property.
@@ -126,7 +125,7 @@ public class BasicService implements IService
 	 *  Generate a unique name.
 	 *  @param The calling service class.
 	 */
-	private static String generateServiceName(Class service)
+	protected static String generateServiceName(Class service)
 	{
 		synchronized(BasicService.class)
 		{
@@ -140,8 +139,21 @@ public class BasicService implements IService
 	 *  @param servicename The service name.
 	 *  @return A service identifier.
 	 */
-	private static IServiceIdentifier createServiceIdentifier(Object providerid, Class servicetype, Class serviceimpl)
+	protected static IServiceIdentifier createServiceIdentifier(Object providerid, Class servicetype, Class serviceimpl)
 	{
 		return new ServiceIdentifier(providerid, servicetype, generateServiceName(serviceimpl));
 	}
+	
+	/**
+	 *  Check if the service is valid.
+	 * /
+	public IFuture checkValid()
+	{
+		Future ret = new Future();
+		if(!isValid())
+			ret.setException(new RuntimeException("Service invalid: "+getServiceIdentifier()));
+		else
+			ret.setResult(null);
+		return ret;
+	}*/
 }

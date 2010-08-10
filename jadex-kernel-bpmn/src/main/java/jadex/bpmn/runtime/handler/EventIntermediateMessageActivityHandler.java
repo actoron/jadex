@@ -11,6 +11,7 @@ import jadex.commons.IFilter;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.DefaultResultListener;
+import jadex.commons.concurrent.IResultListener;
 import jadex.service.SServiceProvider;
 
 import java.util.ArrayList;
@@ -137,7 +138,24 @@ public class EventIntermediateMessageActivityHandler	extends DefaultActivityHand
 							}
 						}
 						
-						ms.sendMessage(msg, mt, instance.getComponentAdapter().getComponentIdentifier(), instance.getClassLoader());
+						ms.sendMessage(msg, mt, instance.getComponentAdapter().getComponentIdentifier(), instance.getClassLoader())
+							.addResultListener(instance.createResultListener(new IResultListener()
+						{
+							public void resultAvailable(Object source, Object result)
+							{
+								// ok message could be sent.
+								
+								// todo: futurize method
+							}
+							
+							public void exceptionOccurred(Object source, Exception exception)
+							{
+								// message could not be sent.
+							
+								// todo: futurize method
+							}
+						}));
+						
 //						ms.sendMessage(msg, mt, instance.getComponentAdapter(), instance.getClassLoader());
 						instance.getStepHandler(activity).step(activity, instance, thread, null);
 					}

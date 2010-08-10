@@ -5,8 +5,9 @@ import jadex.bpmn.model.MParameter;
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ITask;
 import jadex.bpmn.runtime.ITaskContext;
+import jadex.commons.Future;
+import jadex.commons.IFuture;
 import jadex.commons.SReflect;
-import jadex.commons.concurrent.IResultListener;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 
@@ -43,8 +44,10 @@ public class UserInteractionTask implements ITask
 	 *  @param instance	The process instance executing the task.
 	 *  @listener	To be notified, when the task has completed.
 	 */
-	public void execute(final ITaskContext context, BpmnInterpreter instance, final IResultListener listener)
+	public IFuture execute(final ITaskContext context, BpmnInterpreter instance)
 	{
+		final Future ret = new Future();
+		
 		SwingUtilities.invokeLater(new Runnable()
 		{
 			public void run()
@@ -174,11 +177,13 @@ public class UserInteractionTask implements ITask
 			                {
 								Exception	e	= new RuntimeException("Task not completed");
 								e.fillInStackTrace();
-								listener.exceptionOccurred(UserInteractionTask.this, e);		                	
+//								listener.exceptionOccurred(UserInteractionTask.this, e);		                	
+								ret.setException(e);
 			                }
 			                else
 			                {
-								listener.resultAvailable(UserInteractionTask.this, null);
+			                	ret.setResult(null);
+//								listener.resultAvailable(UserInteractionTask.this, null);
 			                }
 		            	}
 		            }
@@ -189,6 +194,8 @@ public class UserInteractionTask implements ITask
 				dialog.setVisible(true);
 			}
 		});
+		
+		return ret;
 	}
 	
 	//-------- static methods --------

@@ -1,5 +1,6 @@
 package jadex.bridge;
 
+import jadex.commons.IFuture;
 import jadex.service.IService;
 
 import java.util.Map;
@@ -12,9 +13,13 @@ public interface IMessageService extends IService
 {
 	/**
 	 *  Send a message.
+	 *  @param map The message as key value pairs.
+	 *  @param msgtype The message type.
+	 *  @param sender The sender component identifier.
 	 *  @param cl The class loader used by the sending component (i.e. corresponding to classes of objects in the message map).
+	 *  @return Future that indicates an exception when messages could not be delivered to components. 
 	 */
-	public void sendMessage(Map message, MessageType msgtype, IComponentIdentifier sender, ClassLoader cl);
+	public IFuture sendMessage(Map message, MessageType msgtype, IComponentIdentifier sender, ClassLoader cl);
 	
 	/**
 	 *  Deliver a message to some components.

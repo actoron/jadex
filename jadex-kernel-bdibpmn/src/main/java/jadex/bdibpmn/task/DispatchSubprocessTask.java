@@ -8,6 +8,8 @@ import jadex.bpmn.runtime.task.ParameterMetaInfo;
 import jadex.bpmn.runtime.task.TaskMetaInfo;
 import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentManagementService;
+import jadex.commons.Future;
+import jadex.commons.IFuture;
 import jadex.commons.concurrent.IResultListener;
 
 import java.util.HashMap;
@@ -21,8 +23,10 @@ public class DispatchSubprocessTask	implements ITask
 	/**
 	 *  Execute the task.
 	 */
-	public void execute(final ITaskContext context, BpmnInterpreter instance, final IResultListener listener)
+	public IFuture execute(final ITaskContext context, BpmnInterpreter instance)
 	{
+		final Future ret = new Future();
+		
 		try
 		{
 			BpmnPlanBodyInstance	plan	= (BpmnPlanBodyInstance)instance;
@@ -48,18 +52,24 @@ public class DispatchSubprocessTask	implements ITask
 			if(wait)
 			{
 				Object result = rf.getResults();
-				if (result instanceof Exception)
-					listener.exceptionOccurred(DispatchSubprocessTask.this, (Exception)result);
+				if(result instanceof Exception)
+					ret.setException((Exception)result);
+//					listener.exceptionOccurred(DispatchSubprocessTask.this, (Exception)result);
 				else
-					listener.resultAvailable(DispatchSubprocessTask.this, null);
+					ret.setResult(result);
+//					listener.resultAvailable(DispatchSubprocessTask.this, null);
 			}
 			else
-				listener.resultAvailable(this, null);
+				ret.setResult(null);
+//				listener.resultAvailable(this, null);
 		}
 		catch(Exception e)
 		{
-			listener.exceptionOccurred(this, e);
+			ret.setException(e);
+//			listener.exceptionOccurred(this, e);
 		}
+		
+		return ret;
 	}
 	
 	private static class ResultFuture implements IResultFuture, IResultListener

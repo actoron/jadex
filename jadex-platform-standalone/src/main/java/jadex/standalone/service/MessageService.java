@@ -118,8 +118,10 @@ public class MessageService extends BasicService implements IMessageService
 	 *  Send a message.
 	 *  @param message The native message.
 	 */
-	public void sendMessage(final Map msg, final MessageType type, IComponentIdentifier sender, final ClassLoader cl)
+	public IFuture sendMessage(final Map msg, final MessageType type, IComponentIdentifier sender, final ClassLoader cl)
 	{
+		final Future ret = new Future();
+		
 //		IComponentIdentifier sender = adapter.getComponentIdentifier();
 		if(sender==null)
 			throw new RuntimeException("Sender must not be null: "+msg);
@@ -142,7 +144,6 @@ public class MessageService extends BasicService implements IMessageService
 		
 		cms.getExternalAccess(sender).addResultListener(new IResultListener()
 		{
-			
 			public void resultAvailable(Object source, Object result)
 			{
 				IExternalAccess exta = (IExternalAccess)result;
@@ -157,13 +158,13 @@ public class MessageService extends BasicService implements IMessageService
 							
 							msgcopy.put(sd, ""+clockservice.getTime());
 							
-							doSendMessage(msg, type, exta, cl, msgcopy);
+							doSendMessage(msg, type, exta, cl, msgcopy, ret);
 //						}
 //					});
 				}
 				else
 				{
-					doSendMessage(msg, type, exta, cl, msgcopy);
+					doSendMessage(msg, type, exta, cl, msgcopy, ret);
 				}
 			}
 			
@@ -172,13 +173,13 @@ public class MessageService extends BasicService implements IMessageService
 			}
 		});
 		
-		
+		return ret;
 	}
 
 	/**
 	 *  Extracted method to be callable from listener.
 	 */
-	protected void doSendMessage(Map msg, MessageType type, IExternalAccess comp, ClassLoader cl, Map msgcopy)
+	protected void doSendMessage(Map msg, MessageType type, IExternalAccess comp, ClassLoader cl, Map msgcopy, Future ret)
 	{
 		IComponentIdentifier[] receivers = null;
 		Object tmp = msgcopy.get(type.getReceiverIdentifier());
@@ -227,7 +228,7 @@ public class MessageService extends BasicService implements IMessageService
 			}
 		}
 		
-		sendmsg.addMessage(msgcopy, type.getName(), receivers);
+		sendmsg.addMessage(msgcopy, type, receivers, ret);
 	}
 	
 	/**
@@ -519,15 +520,17 @@ public class MessageService extends BasicService implements IMessageService
 	 *  Send a message.
 	 *  @param message The native message.
 	 */
-	protected void internalSendMessage(Map msg, String type, IComponentIdentifier[] receivers)
+	protected void internalSendMessage(Map msg, MessageType type, IComponentIdentifier[] receivers, Future ret)
 	{
 //		IComponentIdentifier[] receivers = message.getReceivers();
 		if(receivers.length == 0)
-			throw new MessageFailureException(msg, "No receiver specified");
+		{
+			ret.setException(new MessageFailureException(msg, type, null, "No receiver specified"));
+		}
 		for(int i=0; i<receivers.length; i++)
 		{
 			if(receivers[i]==null)
-				throw new MessageFailureException(msg, "A receiver nulls: "+msg);
+				throw new MessageFailureException(msg, type, null, "A receiver nulls: "+msg);
 		}
 
 		ITransport[] trans = (ITransport[])transports.toArray(new ITransport[transports.size()]);
@@ -537,20 +540,25 @@ public class MessageService extends BasicService implements IMessageService
 			try
 			{
 				// Method returns component identifiers of undelivered components
-				receivers = trans[i].sendMessage(msg, type, receivers);
+				receivers = trans[i].sendMessage(msg, type.getName(), receivers);
 			}
 			catch(Exception e)
 			{
-				// todo:
+				// todo: ?
 				e.printStackTrace();
+//				ret.setException(e);
 			}
 		}
 
 		if(receivers.length > 0)
+		{
 			logger.warning("Message could not be delivered to (all) receivers: " + SUtil.arrayToString(receivers));
-		// throw new MessageFailureException(message, "Message could not be
-		// delivered to all receivers: "
-		// +SUtil.arrayToString(receivers));
+			ret.setException(new MessageFailureException(msg, type, receivers, "Message could not be delivered to (all) receivers: "+ SUtil.arrayToString(receivers)));
+		}
+		else
+		{
+			ret.setResult(null);
+		}
 	}
 	
 	/**
@@ -660,7 +668,7 @@ public class MessageService extends BasicService implements IMessageService
 			if(!messages.isEmpty())
 			{
 				Object[] tmp = (Object[])messages.remove(0);
-				internalSendMessage((Map)tmp[0], (String)tmp[1], (IComponentIdentifier[])tmp[2]);
+				internalSendMessage((Map)tmp[0], (MessageType)tmp[1], (IComponentIdentifier[])tmp[2], (Future)tmp[3]);
 			}
 			return !messages.isEmpty();
 		}
@@ -669,9 +677,9 @@ public class MessageService extends BasicService implements IMessageService
 		 *  Add a message to be sent.
 		 *  @param message The message.
 		 */
-		public synchronized void addMessage(Map message, String type, IComponentIdentifier[] receivers)
+		public synchronized void addMessage(Map message, MessageType type, IComponentIdentifier[] receivers, Future ret)
 		{
-			messages.add(new Object[]{message, type, receivers});
+			messages.add(new Object[]{message, type, receivers, ret});
 			SServiceProvider.getService(provider, IExecutionService.class).addResultListener(new DefaultResultListener()
 			{
 				public void resultAvailable(Object source, Object result)

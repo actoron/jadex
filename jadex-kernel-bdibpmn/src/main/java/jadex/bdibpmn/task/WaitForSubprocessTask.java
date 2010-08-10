@@ -5,7 +5,8 @@ import jadex.bpmn.runtime.ITask;
 import jadex.bpmn.runtime.ITaskContext;
 import jadex.bpmn.runtime.task.ParameterMetaInfo;
 import jadex.bpmn.runtime.task.TaskMetaInfo;
-import jadex.commons.concurrent.IResultListener;
+import jadex.commons.Future;
+import jadex.commons.IFuture;
 
 /**
  *  Wait for the subprocess result.
@@ -15,10 +16,13 @@ public class WaitForSubprocessTask	implements ITask
 	/**
 	 *  Execute the task.
 	 */
-	public void execute(ITaskContext context, BpmnInterpreter instance, IResultListener listener)
+	public IFuture execute(ITaskContext context, BpmnInterpreter instance)
 	{
+		// todo: ???
+		
 		IResultFuture	rf = (IResultFuture)context.getParameterValue("resultfuture");
-		listener.resultAvailable(this, rf.getResults());
+//		listener.resultAvailable(this, rf.getResults());
+		return new Future(rf.getResults());
 	}
 	
 	//-------- static methods --------

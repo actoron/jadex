@@ -3,8 +3,9 @@ package jadex.bpmn.tutorial;
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ITask;
 import jadex.bpmn.runtime.ITaskContext;
+import jadex.commons.Future;
+import jadex.commons.IFuture;
 import jadex.commons.SGUI;
-import jadex.commons.concurrent.IResultListener;
 
 import java.awt.Point;
 import java.beans.PropertyChangeEvent;
@@ -14,13 +15,17 @@ import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 
 /**
- *  A task that displays a message using a
- *  JOptionPane.
+ *  A task that displays a message using a JOptionPane.
  */
 public class AsynchronousOKTask	 implements ITask
 {
-	public void execute(ITaskContext context, BpmnInterpreter process, final IResultListener listener)
+	/**
+	 *  Execute the task.
+	 */
+	public IFuture execute(ITaskContext context, BpmnInterpreter process)
 	{
+		final Future ret = new Future();
+		
 		String	message	= (String)context.getParameterValue("message");
 		String	title	= (String)context.getParameterValue("title");
 		int	offset	= context.hasParameterValue("y_offset")
@@ -42,12 +47,15 @@ public class AsynchronousOKTask	 implements ITask
 				if(prop.equals(JOptionPane.VALUE_PROPERTY))
 				{
 	                dialog.setVisible(false);
-	                listener.resultAvailable(this, null);
-		        }
+//	                listener.resultAvailable(this, null);
+	                ret.setResult(null);
+				}
 			}
 	    });
 
 		
 		dialog.setVisible(true);
+	
+		return ret;
 	}
 }

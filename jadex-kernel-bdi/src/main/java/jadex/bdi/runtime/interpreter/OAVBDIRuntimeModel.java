@@ -647,6 +647,9 @@ public class OAVBDIRuntimeModel
 	// Hack!!! Currently already available in processable element to unify rules.
 	public static OAVAttributeType messageevent_has_original;
 	
+	/** The message event has a send future (hack???). */
+	public static OAVAttributeType messageevent_has_sendfuture;
+	
 	//-------- internal event --------
 	
 	/** The internal event type. */
@@ -899,7 +902,8 @@ public class OAVBDIRuntimeModel
 		messageevent_has_nativemessage = messageevent_type.createAttributeType("messageevent_has_nativemessage", OAVJavaType.java_object_type);
 //		messageevent_has_id = messageevent_type.createAttributeType("messageevent_has_id", OAVJavaType.java_integer_type);
 		// Hack!!! Add to processable element to simplify APL building rules.
-		messageevent_has_original = processableelement_type.createAttributeType("messageevent_has_original", messageevent_type);
+		messageevent_has_original = messageevent_type.createAttributeType("messageevent_has_original", messageevent_type);
+		messageevent_has_sendfuture = messageevent_type.createAttributeType("messageevent_has_sendfuture", OAVJavaType.java_object_type);
 		
 		// capability reference
 		capabilityreference_has_name = capabilityreference_type.createAttributeType("capabilityreference_has_name", OAVJavaType.java_string_type);

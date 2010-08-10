@@ -6,7 +6,9 @@ import jadex.bpmn.runtime.ITask;
 import jadex.bpmn.runtime.ITaskContext;
 import jadex.bpmn.runtime.task.ParameterMetaInfo;
 import jadex.bpmn.runtime.task.TaskMetaInfo;
-import jadex.commons.concurrent.IResultListener;
+import jadex.commons.Future;
+import jadex.commons.IFuture;
+import jadex.commons.concurrent.DelegationResultListener;
 
 /**
  *  Create a task for a space object.
@@ -19,12 +21,17 @@ public class WaitForSpaceObjectTaskTask	implements ITask
 	 *  @param process	The process instance executing the task.
 	 *  @param listener	To be notified, when the task has completed.
 	 */
-	public void	execute(ITaskContext context, BpmnInterpreter process, IResultListener listener)
+	public IFuture	execute(ITaskContext context, BpmnInterpreter process)
 	{
+		Future ret = new Future();
+		
 		IEnvironmentSpace	space	= (IEnvironmentSpace)context.getParameterValue("space");
 		Object	objectid	= context.getParameterValue("objectid");
 		Object	taskid	= context.getParameterValue("taskid");
-		space.addTaskListener(taskid, objectid, listener);
+		space.addTaskListener(taskid, objectid, 
+			process.createResultListener(new DelegationResultListener(ret)));
+		
+		return ret;
 	}
 	
 	//-------- static methods --------

@@ -67,14 +67,14 @@ public class ProxyAgent extends MicroAgent
 						{
 							public void resultAvailable(Object source, Object result)
 							{
-								IComponentIdentifier[] tmp = (IComponentIdentifier[])result;
-								List childlist = SUtil.arrayToList(tmp);
-//								childlist.remove(proxy);
+								System.out.println("Found children: "+SUtil.arrayToString(result));
 								
-								CollectionResultListener crl = new CollectionResultListener(childlist.size(), new DelegationResultListener(ret));
-								for(int i=0; i<childlist.size(); i++)
+								IComponentIdentifier[] tmp = (IComponentIdentifier[])result;
+								
+								CollectionResultListener crl = new CollectionResultListener(tmp.length, new DelegationResultListener(ret));
+								for(int i=0; i<tmp.length; i++)
 								{
-									rcms.getComponentDescription((IComponentIdentifier)childlist.get(i)).addResultListener(crl);
+									rcms.getComponentDescription(tmp[i]).addResultListener(crl);
 								}
 							}
 							
@@ -101,6 +101,43 @@ public class ProxyAgent extends MicroAgent
 		return ret;
 	}
 	
+	/**
+	 *  Get the remote component description. 
+	 */
+	public IFuture getRemoteComponentDescription(final IComponentIdentifier cid)
+	{
+		final Future ret = new Future();
+		
+		SServiceProvider.getService(getServiceProvider(), IRemoteServiceManagementService.class)
+			.addResultListener(new IResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				IRemoteServiceManagementService rms = (IRemoteServiceManagementService)result;
+				
+				rms.getServiceProxy(cid, IComponentManagementService.class).addResultListener(new IResultListener()
+				{
+					public void resultAvailable(Object source, Object result)
+					{
+						final IComponentManagementService rcms = (IComponentManagementService)result;
+						rcms.getComponentDescription(cid).addResultListener(new DelegationResultListener(ret));
+					}
+					
+					public void exceptionOccurred(Object source, Exception exception)
+					{
+						ret.setException(exception);
+					}
+				});
+			}
+			
+			public void exceptionOccurred(Object source, Exception exception)
+			{
+				ret.setException(exception);
+			}
+		});
+		
+		return ret;
+	}
 	/**
 	 *  Get the declared services of a remote component.
 	 */

@@ -260,9 +260,18 @@ public class ComponentTreePanel extends JPanel
 			public Icon getOverlay(IComponentTreeNode node)
 			{
 				Icon	ret	= null;
+				
+				// todo: interface or base class for real ac-nodes?
+				IComponentDescription	desc = null;
 				if(node instanceof ComponentTreeNode)
+					desc = ((ComponentTreeNode)node).getDescription();
+				else if(node instanceof ProxyComponentTreeNode)
+					desc = ((ProxyComponentTreeNode)node).getDescription();
+				else if(node instanceof VirtualComponentTreeNode)
+					desc = ((VirtualComponentTreeNode)node).getDescription();
+				
+				if(desc!=null)
 				{
-					IComponentDescription	desc	= ((ComponentTreeNode)node).getDescription();
 					if(IComponentDescription.STATE_SUSPENDED.equals(desc.getState())
 						|| IComponentDescription.STATE_WAITING.equals(desc.getState()))
 					{

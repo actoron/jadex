@@ -1046,12 +1046,33 @@ public class ComponentManagementService extends BasicService implements ICompone
 	 *  @param cid The component identifier.
 	 *  @return The children component identifiers.
 	 */
-	public Future getChildren(IComponentIdentifier cid)
+	public Future getChildren(final IComponentIdentifier cid)
 	{
+//		System.out.println("getChildren: "+this+" "+isValid());
+		final Future ret = new Future();
 		CMSComponentDescription desc = (CMSComponentDescription)descs.get(cid);
-		IComponentIdentifier[] ret = desc!=null? desc.getChildren()!=null? desc.getChildren(): 
+		IComponentIdentifier[] tmp = desc!=null? desc.getChildren()!=null? desc.getChildren(): 
 			IComponentIdentifier.EMPTY_COMPONENTIDENTIFIERS: IComponentIdentifier.EMPTY_COMPONENTIDENTIFIERS;
-		return new Future(ret);
+		ret.setResult(tmp);
+		
+		// Nice style to check for valid?
+//		checkValid().addResultListener(new IResultListener()
+//		{
+//			public void resultAvailable(Object source, Object result)
+//			{
+//				CMSComponentDescription desc = (CMSComponentDescription)descs.get(cid);
+//				IComponentIdentifier[] tmp = desc!=null? desc.getChildren()!=null? desc.getChildren(): 
+//					IComponentIdentifier.EMPTY_COMPONENTIDENTIFIERS: IComponentIdentifier.EMPTY_COMPONENTIDENTIFIERS;
+//				ret.setResult(tmp);
+//			}
+//			
+//			public void exceptionOccurred(Object source, Exception exception)
+//			{
+//				ret.setException(exception);
+//			}
+//		});
+		
+		return ret;
 	}
 
 	/**
@@ -1408,6 +1429,7 @@ public class ComponentManagementService extends BasicService implements ICompone
 	 */
 	public IFuture	shutdownService()
 	{
+		System.out.println("shutdown: "+this);
 		return super.shutdownService();
 
 		/*final Future ret = new Future();

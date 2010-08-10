@@ -9,6 +9,8 @@ import jadex.bpmn.runtime.ITask;
 import jadex.bpmn.runtime.ITaskContext;
 import jadex.bpmn.runtime.task.ParameterMetaInfo;
 import jadex.bpmn.runtime.task.TaskMetaInfo;
+import jadex.commons.Future;
+import jadex.commons.IFuture;
 import jadex.commons.concurrent.IResultListener;
 
 /**
@@ -19,8 +21,10 @@ public class WaitForGoalTask	implements ITask
 	/**
 	 *  Execute the task.
 	 */
-	public void execute(final ITaskContext context, BpmnInterpreter instance, final IResultListener listener)
+	public IFuture execute(final ITaskContext context, BpmnInterpreter instance)
 	{
+		final Future ret = new Future();
+		
 		try
 		{
 			final IGoal	goal	= (IGoal)context.getParameterValue("goal");
@@ -34,13 +38,15 @@ public class WaitForGoalTask	implements ITask
 						goal.removeGoalListener(this);
 						if(goal.isSucceeded())
 						{
-							listener.resultAvailable(WaitForGoalTask.this, null);
+							ret.setResult(null);
+//							listener.resultAvailable(WaitForGoalTask.this, null);
 						}
 						else
 						{
 							Exception	e	= new GoalFailureException();
 							e.fillInStackTrace();
-							listener.exceptionOccurred(WaitForGoalTask.this, e);
+							ret.setException(e);
+//							listener.exceptionOccurred(WaitForGoalTask.this, e);
 						}
 					}
 					
@@ -51,19 +57,24 @@ public class WaitForGoalTask	implements ITask
 			}
 			else if(goal.isSucceeded())
 			{
-				listener.resultAvailable(this, null);
+				ret.setResult(null);
+//				listener.resultAvailable(this, null);
 			}
 			else
 			{
 				Exception	e	= new GoalFailureException();
 				e.fillInStackTrace();
-				listener.exceptionOccurred(this, e);
+				ret.setException(e);
+//				listener.exceptionOccurred(this, e);
 			}
 		}
 		catch(Exception e)
 		{
-			listener.exceptionOccurred(this, e);
+			ret.setException(e);
+//			listener.exceptionOccurred(this, e);
 		}
+		
+		return ret;
 	}
 	
 	//-------- static methods --------

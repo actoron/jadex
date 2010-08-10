@@ -8,10 +8,11 @@ import jadex.bridge.IMessageService;
 import jadex.bridge.MessageFailureException;
 import jadex.bridge.MessageType;
 import jadex.bridge.MessageType.ParameterSpecification;
+import jadex.commons.Future;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.collection.SCollection;
-import jadex.commons.concurrent.DefaultResultListener;
+import jadex.commons.concurrent.IResultListener;
 import jadex.javaparser.IValueFetcher;
 import jadex.rules.rulesystem.IAction;
 import jadex.rules.rulesystem.ICondition;
@@ -637,8 +638,10 @@ public class MessageEventRules
 		{
 			public void execute(IOAVState state, IVariableAssignments assignments)
 			{
+				final BDIInterpreter interpreter = BDIInterpreter.getInterpreter(state);
 				Object rcapa = assignments.getVariableValue("?rcapa");
 				Object rme = assignments.getVariableValue("?me");
+				final Future ret = (Future)state.getAttributeValue(rme, OAVBDIRuntimeModel.messageevent_has_sendfuture);
 				
 				// Transform message event to map.
 				Object mme = state.getAttributeValue(rme, OAVBDIRuntimeModel.element_has_model);
@@ -700,34 +703,52 @@ public class MessageEventRules
 				}
 				
 				// Check receivers
-				String rec = mtype.getReceiverIdentifier();
-				Collection recs = (Collection)message.get(rec);
-				if(recs==null || recs.isEmpty())
-				{
-					throw new MessageFailureException(rme, "No receivers specified");
-				}
-				else
-				{
-					for(Iterator it=recs.iterator(); it.hasNext(); )
-					{
-						if(it.next()==null)
-							throw new MessageFailureException(rme, "A receiver nulls");
-					}
-				}
+				// Done on platform level.
+//				String rec = mtype.getReceiverIdentifier();
+//				Collection recs = (Collection)message.get(rec);
+//				if(recs==null || recs.isEmpty())
+//				{
+//					throw new MessageFailureException(rme, mtype, null, "No receivers specified");
+//				}
+//				else
+//				{
+//					for(Iterator it=recs.iterator(); it.hasNext(); )
+//					{
+//						if(it.next()==null)
+//							throw new MessageFailureException(rme, "A receiver nulls");
+//					}
+//				}
 				
 				final IMessageAdapter msg = new DefaultMessageAdapter(message, mtype);
 				
-				final BDIInterpreter interpreter = BDIInterpreter.getInterpreter(state);
-				
 				SServiceProvider.getService(interpreter.getServiceProvider(), IMessageService.class)
-					.addResultListener(new DefaultResultListener()
-				{
-					public void resultAvailable(Object source, Object result)
+					.addResultListener(interpreter.createResultListener(new IResultListener()
 					{
-						((IMessageService)result).sendMessage(msg.getParameterMap(), msg.getMessageType(), 
-							interpreter.getAgentAdapter().getComponentIdentifier(), interpreter.getModel().getState().getTypeModel().getClassLoader());
-					}
-				});
+						public void resultAvailable(Object source, Object result)
+						{
+							((IMessageService)result).sendMessage(msg.getParameterMap(), msg.getMessageType(), 
+								interpreter.getAgentAdapter().getComponentIdentifier(), interpreter.getModel().getState().getTypeModel().getClassLoader())
+								.addResultListener(interpreter.createResultListener(new IResultListener()
+							{
+								public void resultAvailable(Object source, Object result)
+								{
+									// ok message could be sent.
+									ret.setResult(null);
+								}
+								
+								public void exceptionOccurred(Object source, Exception exception)
+								{
+									// message could not be sent.
+									ret.setException(exception);
+								}
+							}));
+						}
+						
+						public void exceptionOccurred(Object source,Exception exception)
+						{
+							ret.setException(exception);
+						}
+					}));
 
 //				interpreter.getComponentAdapter().sendMessage(message, mtype);
 				
