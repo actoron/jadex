@@ -19,6 +19,7 @@
 		<import>jadex.base.fipa.*</import>
 		<import>jadex.base.*</import>
 		<import>jadex.base.service.simulation.*</import>
+		<import>jadex.base.service.remote.*</import>
 		<import>jadex.commons.concurrent.*</import>
 		<import>jadex.standalone.service.*</import>
 		<import>jadex.standalone.transport.*</import>
@@ -66,7 +67,8 @@
 		</service>
 		<service class="IExecutionService">
 			$args.simulation
-			? new SyncExecutionService($platform, SUtil.createHashMap(new Object[]{"serviceviewer.viewerclass", IService.EXCLUDED},
+			? new SyncExecutionService($platform, SUtil.createHashMap(new Object[]{"serviceviewer.viewerclass", 
+				RemoteServiceManagementService.REMOTE_EXCLUDED},
 				new Object[]{"jadex.tools.serviceviewer.executionservice.ExecutionServiceViewer", 
 				new java.lang.reflect.Method[]{IExecutionService.class.getMethod("isIdle", new Class[0])}}))
 			: new AsyncExecutionService($platform)

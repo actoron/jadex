@@ -14,14 +14,17 @@ import jadex.service.AnyResultSelector;
 import jadex.service.BasicService;
 import jadex.service.IResultSelector;
 import jadex.service.ISearchManager;
+import jadex.service.IService;
 import jadex.service.IVisitDecider;
 import jadex.service.SServiceProvider;
 import jadex.service.TypeResultSelector;
 import jadex.service.library.ILibraryService;
 
+import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  *  The remote service management service is responsible for 
@@ -29,6 +32,21 @@ import java.util.Map;
  */
 public class RemoteServiceManagementService extends BasicService implements IRemoteServiceManagementService
 {
+	//-------- constants --------
+	
+	/** Excluded remote methods (for all methods)
+	    Excluded methods throw UnsupportedOperationException. */
+	public static String REMOTE_EXCLUDED = "remote_excluded";
+	
+	/** Uncached remote methods (for methods with no parameters)
+	    Uncached methods will be invoked on every call. */
+	public static String REMOTE_UNCACHED = "remote_uncached";
+	
+	/** Synchronous remote methods (for methods with void return value). 
+	    If void methods are declared synchronous they will block the caller until
+	    the method has been executed on the remote side (exception thus can arrive). */
+	public static String REMOTE_SYNCHRONOUS = "remote_synchronous";
+	
 	//-------- attributes --------
 	
 	/** The component. */
@@ -251,6 +269,42 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	public Map getWaitingCalls()
 	{
 		return waitingcalls;
+	}
+	
+	/**
+	 *  Test if the method is excluded.
+	 *  @param m The method.
+	 *  @param service The service.
+	 *  @return True, if method is excluded. 
+	 */
+	public static boolean isExcluded(Method m, IService service)
+	{
+		Set set = (Set)service.getProperty(REMOTE_EXCLUDED);
+		return set!=null && set.contains(m);
+	}
+	
+	/**
+	 *  Test if the method is uncached.
+	 *  @param m The method.
+	 *  @param service The service.
+	 *  @return True, if method is uncached. 
+	 */
+	public static boolean isUncached(Method m, IService service)
+	{
+		Set set = (Set)service.getProperty(REMOTE_UNCACHED);
+		return set!=null && set.contains(m);
+	}
+	
+	/**
+	 *  Test if the method is synchronous.
+	 *  @param m The method.
+	 *  @param service The service.
+	 *  @return True, if method is synchronous. 
+	 */
+	public static boolean isSynchronous(Method m, IService service)
+	{
+		Set set = (Set)service.getProperty(REMOTE_SYNCHRONOUS);
+		return set!=null && set.contains(m);
 	}
 }
 

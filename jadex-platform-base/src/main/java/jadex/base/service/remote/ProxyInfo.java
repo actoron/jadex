@@ -5,6 +5,7 @@ import jadex.service.IServiceIdentifier;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  *  Info struct that holds all necessary information to generate
@@ -24,6 +25,15 @@ public class ProxyInfo
 	
 	/** The value cache. */
 	protected Map cache;
+	
+	/** The excluded methods. */
+	protected Set excluded;
+	
+	/** The uncached methods. */
+	protected Set uncached;
+
+	/** The  methods. */
+	protected Set synchronous;
 	
 	//-------- constructors --------
 	
