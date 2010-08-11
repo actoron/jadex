@@ -22,6 +22,8 @@ import jadex.service.clock.IClockService;
 import jadex.service.clock.ITimedObject;
 import jadex.service.clock.ITimer;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -36,7 +38,7 @@ public abstract class MicroAgent implements IMicroAgent
 	protected MicroAgentInterpreter interpreter;
 	
 	/** The current timer. */
-	protected ITimer timer;
+	protected List timers;
 	
 	//-------- constructors --------
 	
@@ -48,6 +50,7 @@ public abstract class MicroAgent implements IMicroAgent
 	{
 //		System.out.println("Init: "+interpreter);
 		this.interpreter = interpreter;
+		this.timers = new ArrayList();
 	}
 	
 	//-------- interface methods --------
@@ -218,18 +221,16 @@ public abstract class MicroAgent implements IMicroAgent
 	 *  @param time The time.
 	 *  @param run The runnable.
 	 */
-	public void waitFor(final long time, final Runnable run)
+	public void waitFor(final long time, final ICommand run)
 	{
-		if(timer!=null)
-			throw new RuntimeException("timer should be null");
-		
 		SServiceProvider.getService(getServiceProvider(), IClockService.class)
 			.addResultListener(createResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
 				IClockService cs = (IClockService)result;
-				timer = cs.createTimer(time, new ITimedObject()
+				final ITimer[] ts = new ITimer[1];
+				ts[0] = cs.createTimer(time, new ITimedObject()
 				{
 					public void timeEventOccurred(long currenttime)
 					{
@@ -237,8 +238,8 @@ public abstract class MicroAgent implements IMicroAgent
 						{
 							public void execute(Object agent)
 							{
-								timer = null;
-								run.run();
+								timers.remove(ts[0]);
+								run.execute(agent);
 							}
 							
 							public String toString()
@@ -248,6 +249,7 @@ public abstract class MicroAgent implements IMicroAgent
 						});
 					}
 				});
+				timers.add(ts[0]);
 			}
 		}));
 	}
@@ -258,15 +260,14 @@ public abstract class MicroAgent implements IMicroAgent
 	 */
 	public void waitForTick(final Runnable run)
 	{
-		if(timer!=null)
-			throw new RuntimeException("timer should be null");
 		SServiceProvider.getService(getServiceProvider(), IClockService.class)
 			.addResultListener(createResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
 				IClockService cs = (IClockService)result;
-				timer = cs.createTickTimer(new ITimedObject()
+				final ITimer[] ts = new ITimer[1];
+				ts[0] = cs.createTickTimer(new ITimedObject()
 				{
 					public void timeEventOccurred(final long currenttime)
 					{
@@ -274,7 +275,7 @@ public abstract class MicroAgent implements IMicroAgent
 						{
 							public void execute(Object agent)
 							{
-								timer = null;
+								timers.remove(ts[0]);
 								run.run();
 							}
 							
@@ -285,6 +286,7 @@ public abstract class MicroAgent implements IMicroAgent
 						});
 					}
 				});
+				timers.add(ts[0]);
 			}
 		}));
 	}

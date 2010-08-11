@@ -2,6 +2,7 @@ package jadex.micro.examples.helloworld;
 
 import jadex.bridge.Argument;
 import jadex.bridge.IArgument;
+import jadex.commons.ICommand;
 import jadex.micro.MicroAgent;
 import jadex.micro.MicroAgentMetaInfo;
 
@@ -18,9 +19,9 @@ public class HelloWorldAgent extends MicroAgent
 	public void executeBody()
 	{
 		System.out.println(getArgument("welcome text"));
-		waitFor(2000, new Runnable()
+		waitFor(2000, new ICommand()
 		{			
-			public void run()
+			public void execute(Object args)
 			{
 				System.out.println("Good bye world.");
 				killAgent();

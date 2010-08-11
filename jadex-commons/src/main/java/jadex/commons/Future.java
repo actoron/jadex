@@ -149,8 +149,7 @@ public class Future implements IFuture
 		{
     		// Ignore exception when already continued?!
         	if(resultavailable)
-        		return;
-//        		throw new RuntimeException();
+        		throw new RuntimeException();
         	
 //        	System.out.println(this+" setResult: "+result);
         	this.exception = exception;

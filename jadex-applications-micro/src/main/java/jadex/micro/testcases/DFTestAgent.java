@@ -11,6 +11,7 @@ import jadex.bridge.IArgument;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.ISearchConstraints;
 import jadex.bridge.MessageType;
+import jadex.commons.ICommand;
 import jadex.commons.IFuture;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
@@ -168,9 +169,9 @@ public class DFTestAgent extends MicroAgent
 		
 		sendMessage(hlefMessage, SFipa.FIPA_MESSAGE_TYPE);
 		
-		waitFor(1000, new Runnable()
+		waitFor(1000, new ICommand()
 		{
-			public void run()
+			public void execute(Object args)
 			{
 				// Set test failure and kill agent.
 				tr.setFailed("No message received.");

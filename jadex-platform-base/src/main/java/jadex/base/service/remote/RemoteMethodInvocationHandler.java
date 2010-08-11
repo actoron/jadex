@@ -2,13 +2,14 @@ package jadex.base.service.remote;
 
 import jadex.base.fipa.SFipa;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IExternalAccess;
 import jadex.bridge.IMessageService;
 import jadex.commons.Future;
+import jadex.commons.ICommand;
 import jadex.commons.IFuture;
 import jadex.commons.SUtil;
 import jadex.commons.ThreadSuspendable;
 import jadex.commons.concurrent.IResultListener;
+import jadex.micro.IMicroExternalAccess;
 import jadex.service.SServiceProvider;
 import jadex.service.library.ILibraryService;
 
@@ -26,7 +27,7 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 	//-------- attributes --------
 	
 	/** The host component. */
-	protected IExternalAccess component;
+	protected IMicroExternalAccess component;
 	
 	/** The proxy info. */
 	protected ProxyInfo pi;
@@ -39,7 +40,7 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 	/**
 	 *  Create a new invocation handler.
 	 */
-	public RemoteMethodInvocationHandler(IExternalAccess component, ProxyInfo pi, Map waitingcalls)
+	public RemoteMethodInvocationHandler(IMicroExternalAccess component, ProxyInfo pi, Map waitingcalls)
 	{
 		this.component = component;
 		this.pi = pi;
@@ -74,7 +75,7 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 		Object ret = future;
 		
 		final IComponentIdentifier compid = component.getComponentIdentifier();
-		String callid = SUtil.createUniqueId(compid.getLocalName());
+		final String callid = SUtil.createUniqueId(compid.getLocalName());
 		waitingcalls.put(callid, future);
 		
 		RemoteMethodInvocationCommand content;
@@ -125,6 +126,21 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 								future.setException(exception);
 							}
 						});
+						component.scheduleStep(new ICommand() 
+						{
+							public void execute(Object args) 
+							{
+								ProxyAgent pa = (ProxyAgent)args;
+								pa.waitFor(getTimeout(), new ICommand() 
+								{
+									public void execute(Object args) 
+									{
+										waitingcalls.remove(compid);
+										future.setException(new RuntimeException("No reply received and timeout occurred: "+callid+" "+msg));
+									}
+								});
+							}
+						});
 					}
 					
 					public void exceptionOccurred(Object source, Exception exception)
@@ -158,6 +174,16 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 		}
 	
 		return ret;
+	}
+
+	/**
+	 *  Get the message timeout.
+	 *  @return The timeout.
+	 */
+	protected long getTimeout()
+	{
+		// todo: make customizable from proxy info
+		return 10000;
 	}
 }
 

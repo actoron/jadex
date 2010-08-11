@@ -1,5 +1,6 @@
 package jadex.micro.examples;
 
+import jadex.commons.ICommand;
 import jadex.micro.MicroAgent;
 import jadex.micro.MicroAgentMetaInfo;
 
@@ -21,25 +22,25 @@ public class BreakpointAgent extends MicroAgent
 	{
 		step	= "hop";	// first step
 		
-		waitFor(1000, new Runnable()
+		waitFor(1000, new ICommand()
 		{			
-			public void run()
+			public void execute(Object args)
 			{
 				System.out.println("Current step: "+step);
 				
 				step	= "step";	// second step
 
-				waitFor(1000, new Runnable()
+				waitFor(1000, new ICommand()
 				{			
-					public void run()
+					public void execute(Object args)
 					{
 						System.out.println("Current step: "+step);
 
 						step	= "jump";	// third step
 						
-						waitFor(1000, new Runnable()
+						waitFor(1000, new ICommand()
 						{			
-							public void run()
+							public void execute(Object args)
 							{
 								System.out.println("Current step: "+step);
 

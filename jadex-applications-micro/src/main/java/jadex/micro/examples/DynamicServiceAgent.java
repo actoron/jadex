@@ -1,5 +1,6 @@
 package jadex.micro.examples;
 
+import jadex.commons.ICommand;
 import jadex.micro.MicroAgent;
 import jadex.service.BasicService;
 import jadex.service.IServiceProvider;
@@ -14,16 +15,16 @@ public class DynamicServiceAgent extends MicroAgent
 	 */
 	public void executeBody()
 	{
-		Runnable	addservice	= new Runnable()
+		ICommand addservice	= new ICommand()
 		{
-			public void run()
+			public void execute(Object args)
 			{
 				addService(new DummyService(getServiceProvider()));
 				waitFor(3000, this);
 			}
 		};
 		
-		addservice.run();
+		addservice.execute(this);
 	}
 	
 	public class DummyService	extends BasicService	implements IDummyService
