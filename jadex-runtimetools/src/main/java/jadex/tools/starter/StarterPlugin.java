@@ -71,6 +71,7 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 	 */
 	protected static final UIDefaults icons = new UIDefaults(new Object[]
 	{
+		"add_remote_component", SGUI.makeIcon(StarterPlugin.class, "/jadex/tools/common/images/add_remote_component.png"),
 		"kill_platform", SGUI.makeIcon(StarterPlugin.class, "/jadex/tools/common/images/new_killplatform.png"),
 		"starter", SGUI.makeIcon(StarterPlugin.class, "/jadex/tools/common/images/new_starter.png"),
 		"starter_sel", SGUI.makeIcon(StarterPlugin.class, "/jadex/tools/common/images/new_starter_sel.png"),
@@ -155,7 +156,7 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 		separator.setOrientation(JSeparator.VERTICAL);
 		bar.add(separator);*/
 		
-		b = new JButton(ADD_REMOTE_PLATFORM);
+		b = new JButton(ADD_REMOTE_COMPONENT);
 		b.setBorder(null);
 		b.setToolTipText(b.getText());
 		b.setText(null);
@@ -529,9 +530,9 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 	};
 	
 	/**
-	 *  Action for killing the platform.
+	 *  Action for adding a remote component.
 	 */
-	final AbstractAction ADD_REMOTE_PLATFORM = new AbstractAction("Add remote platform", icons.getIcon("kill_platform"))
+	final AbstractAction ADD_REMOTE_COMPONENT = new AbstractAction("Add remote component", icons.getIcon("add_remote_component"))
 	{
 		public void actionPerformed(ActionEvent e)
 		{
@@ -541,12 +542,11 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 				public void resultAvailable(Object source, Object result)
 				{
 					IComponentManagementService cms = (IComponentManagementService)result;
-					
-//					ComponentIdentifierPanel cip = new ComponentIdentifierPanel(null, jcc.getServiceContainer());
 					ComponentIdentifierDialog dia = new ComponentIdentifierDialog(spanel, jcc.getServiceContainer());
-//					dia.
+					IComponentIdentifier cid = dia.getComponentIdentifier(null);
 					
 					Map args = new HashMap();
+					args.put("platform", cid);
 					createComponent("jadex/base/service/remote/ProxyAgent.class", null, null, args, false, null);
 				}
 			});

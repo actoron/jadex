@@ -40,6 +40,9 @@ public class ComponentIdentifierDialog
 	/** Was the dialog aborted? */
 	protected boolean	aborted;
 	
+	/** The component identifier. */
+	protected IComponentIdentifier cid;
+	
 	//-------- constructors --------
 
 	/**
@@ -57,24 +60,23 @@ public class ComponentIdentifierDialog
 	 *  Open a modal dialog to select/enter an agent identifier.
 	 *  @return	The selected agent identifier or null, when dialog was aborted.
 	 */
-//	public IComponentIdentifier getComponentIdentifier(final IComponentIdentifier def, IServiceProvider provider)
-//	{
-//		// Create dialog.
-//		this.dia	= createDialog(cms);
-//
-//		aborted	= false;
-//		dia.setVisible(true);
-//		this.singleselection	= false;
-//
-//		return !aborted && sels.size()>0 ? (IComponentIdentifier)sels.get(0) : null;
-//	}
+	public IComponentIdentifier getComponentIdentifier(final IComponentIdentifier def)
+	{
+		// Create dialog.
+		this.dia = createDialog(def, provider);
+
+		aborted	= false;
+		dia.setVisible(true);
+
+		return !aborted? cid: null;
+	}
 	
 	/**
 	 *  Create the dialog.
 	 */
-	public JDialog createDialog(IServiceProvider provider)
+	public JDialog createDialog(IComponentIdentifier def, IServiceProvider provider)
 	{
-		ComponentIdentifierPanel pip = new ComponentIdentifierPanel(null, provider);
+		final ComponentIdentifierPanel pip = new ComponentIdentifierPanel(null, provider);
 		
 		final JButton ok = new JButton("OK");
 		final JButton cancel = new JButton("Cancel");
@@ -87,6 +89,7 @@ public class ComponentIdentifierDialog
 		{
 			public void actionPerformed(ActionEvent e)
 			{
+				cid = pip.cid;
 				dia.dispose();
 			}
 		});
