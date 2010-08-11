@@ -99,7 +99,7 @@ public class ComponentTreePanel extends JPanel
 		this.setLayout(new BorderLayout());
 		this.add(new JScrollPane(tree));
 		
-		kill	= new AbstractAction("Kill component", icons.getIcon("kill_component"))
+		kill = new AbstractAction("Kill component", icons.getIcon("kill_component"))
 		{
 			public void actionPerformed(ActionEvent e)
 			{
@@ -263,15 +263,10 @@ public class ComponentTreePanel extends JPanel
 				
 				// todo: interface or base class for real ac-nodes?
 				IComponentDescription	desc = null;
-				if(node instanceof ComponentTreeNode)
-					desc = ((ComponentTreeNode)node).getDescription();
-				else if(node instanceof ProxyComponentTreeNode)
-					desc = ((ProxyComponentTreeNode)node).getDescription();
-				else if(node instanceof VirtualComponentTreeNode)
-					desc = ((VirtualComponentTreeNode)node).getDescription();
-				
-				if(desc!=null)
+				if(node instanceof IActiveComponentTreeNode)
 				{
+					desc = ((IActiveComponentTreeNode)node).getDescription();
+				
 					if(IComponentDescription.STATE_SUSPENDED.equals(desc.getState())
 						|| IComponentDescription.STATE_WAITING.equals(desc.getState()))
 					{
@@ -288,7 +283,7 @@ public class ComponentTreePanel extends JPanel
 				boolean	allcomp	= true;
 				for(int i=0; allcomp && i<nodes.length; i++)
 				{
-					allcomp	= nodes[i] instanceof ComponentTreeNode;
+					allcomp	= nodes[i] instanceof IActiveComponentTreeNode;
 				}
 				
 				if(allcomp)
@@ -296,13 +291,13 @@ public class ComponentTreePanel extends JPanel
 					boolean	allsusp	= true;
 					for(int i=0; allsusp && i<nodes.length; i++)
 					{
-						allsusp	= IComponentDescription.STATE_SUSPENDED.equals(((ComponentTreeNode)nodes[i]).getDescription().getState())
-							|| IComponentDescription.STATE_WAITING.equals(((ComponentTreeNode)nodes[i]).getDescription().getState());
+						allsusp	= IComponentDescription.STATE_SUSPENDED.equals(((IActiveComponentTreeNode)nodes[i]).getDescription().getState())
+							|| IComponentDescription.STATE_WAITING.equals(((IActiveComponentTreeNode)nodes[i]).getDescription().getState());
 					}
 					boolean	allact	= true;
 					for(int i=0; allact && i<nodes.length; i++)
 					{
-						allact	= IComponentDescription.STATE_ACTIVE.equals(((ComponentTreeNode)nodes[i]).getDescription().getState());
+						allact	= IComponentDescription.STATE_ACTIVE.equals(((IActiveComponentTreeNode)nodes[i]).getDescription().getState());
 					}
 					
 					// Todo: Large icons for popup actions?

@@ -15,19 +15,22 @@ import jadex.service.IService;
 import jadex.tools.common.CombiIcon;
 
 import java.awt.Component;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
 import javax.swing.Icon;
+import javax.swing.Timer;
 import javax.swing.UIDefaults;
 
 /**
  *  Node that represents a remote component and blends in the
  *  tree of components as virtual children of this node.
  */
-public class ProxyComponentTreeNode extends ComponentTreeNode
+public class ProxyComponentTreeNode extends ComponentTreeNode 
 {
 	//-------- constants --------
 	
@@ -48,16 +51,35 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 	/** The connection state. */
 	protected boolean connected;
 	
+	/** The auto refresh timer. */
+	protected Timer timer;
+	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new service container node.
 	 */
-	public ProxyComponentTreeNode(IComponentTreeNode parent, ComponentTreeModel model, IComponentDescription desc,
+	public ProxyComponentTreeNode(final IComponentTreeNode parent, ComponentTreeModel model, IComponentDescription desc,
 		IComponentManagementService cms, Component ui, ComponentIconCache iconcache)
 	{
 		super(parent, model, desc, cms, ui, iconcache);
 		this.connected = false;
+		
+		timer = new Timer(5000, new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				if(parent.isChild(ProxyComponentTreeNode.this))
+				{
+					refresh(false);
+				}
+				else
+				{
+					timer.stop();
+				}
+			}
+		});
+		timer.start();
 	}
 	
 	/**
@@ -110,6 +132,12 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 						});
 					}
 				});
+			}
+			
+			public void customExceptionOccurred(Object source, Exception exception)
+			{
+				setChildren(Collections.EMPTY_LIST);
+				connected = false;
 			}
 		});
 	}

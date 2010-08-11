@@ -28,7 +28,7 @@ public abstract class AbstractComponentTreeNode	implements IComponentTreeNode
 
 	/** Flag to indicate recursive refresh. */
 	private boolean	recurse;
-
+	
 	//-------- constructors --------
 	
 	/**
@@ -114,6 +114,14 @@ public abstract class AbstractComponentTreeNode	implements IComponentTreeNode
 			// If search in progress upgrade to recursive, but do not downgrade.
 			this.recurse	= this.recurse || recurse;			
 		}
+	}
+	
+	/**
+	 *  Test if a node is a child.
+	 */
+	public boolean isChild(IComponentTreeNode node)
+	{
+		return children!=null && children.contains(node);
 	}
 
 	

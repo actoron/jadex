@@ -28,6 +28,11 @@ public interface IComponentTreeNode
 	public IComponentTreeNode	getChild(int index);
 	
 	/**
+	 *  Test if a node is a child.
+	 */
+	public boolean isChild(IComponentTreeNode node);
+	
+	/**
 	 *  Get the index of a child.
 	 */
 	public int	getIndexOfChild(IComponentTreeNode child);

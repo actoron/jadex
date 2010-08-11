@@ -20,7 +20,7 @@ import javax.swing.Icon;
 /**
  *  Node object representing a service container.
  */
-public class ComponentTreeNode	extends AbstractComponentTreeNode
+public class ComponentTreeNode	extends AbstractComponentTreeNode implements IActiveComponentTreeNode
 {
 	//-------- attributes --------
 	

@@ -67,8 +67,8 @@ public class RemoteServiceManagementAgent extends MicroAgent
 					
 					public void exceptionOccurred(Object source, Exception exception)
 					{
-						// todo: send failure reply?
-						exception.printStackTrace();
+						// todo: print or send failure reply?
+//						exception.printStackTrace();
 					}
 				}));
 			}

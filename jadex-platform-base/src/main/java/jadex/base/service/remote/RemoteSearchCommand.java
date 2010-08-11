@@ -273,7 +273,7 @@ public class RemoteSearchCommand implements IRemoteCommand
 		Class type = service.getServiceIdentifier().getServiceType();
 		ProxyInfo ret = new ProxyInfo(rms, service.getServiceIdentifier());
 	
-		System.out.println("Creating proxy for: "+type);
+//		System.out.println("Creating proxy for: "+type);
 		
 		// Check for excluded and synchronous methods.
 		Object ex = service.getProperty(RemoteServiceManagementService.REMOTE_EXCLUDED);
@@ -325,7 +325,7 @@ public class RemoteSearchCommand implements IRemoteCommand
 						// Invoke method to get constant return value.
 						try
 						{
-							System.out.println("Calling for caching: "+methods[i]);
+//							System.out.println("Calling for caching: "+methods[i]);
 							Object val = methods[i].invoke(service, new Object[0]);
 							ret.putCache(methods[i].getName(), val);
 						}

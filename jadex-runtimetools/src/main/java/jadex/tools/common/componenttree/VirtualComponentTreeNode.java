@@ -18,7 +18,7 @@ import javax.swing.Icon;
 /**
  * 
  */
-public class VirtualComponentTreeNode extends AbstractComponentTreeNode
+public class VirtualComponentTreeNode extends AbstractComponentTreeNode implements IActiveComponentTreeNode
 {
 	//-------- attributes --------
 	
