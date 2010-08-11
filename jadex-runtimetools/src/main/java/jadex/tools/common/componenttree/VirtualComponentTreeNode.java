@@ -5,7 +5,6 @@ import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.ICommand;
-import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.micro.IMicroExternalAccess;
 
@@ -16,7 +15,7 @@ import java.util.List;
 import javax.swing.Icon;
 
 /**
- * 
+ *  Node for a virtual component, i.e. a node for a remote component.
  */
 public class VirtualComponentTreeNode extends AbstractComponentTreeNode implements IActiveComponentTreeNode
 {
@@ -101,7 +100,7 @@ public class VirtualComponentTreeNode extends AbstractComponentTreeNode implemen
 							{
 								VirtualComponentTreeNode.this.desc = (IComponentDescription)result;
 								getModel().fireNodeChanged(VirtualComponentTreeNode.this);
-								System.out.println("refreshed: "+desc);
+//								System.out.println("refreshed: "+desc);
 							}
 						});
 					}

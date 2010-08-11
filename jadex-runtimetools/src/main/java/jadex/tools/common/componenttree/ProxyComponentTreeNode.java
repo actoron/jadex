@@ -71,7 +71,8 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 			{
 				if(parent.isChild(ProxyComponentTreeNode.this))
 				{
-					refresh(false);
+					// hmm?! with or without subtree?
+					refresh(true);
 				}
 				else
 				{
