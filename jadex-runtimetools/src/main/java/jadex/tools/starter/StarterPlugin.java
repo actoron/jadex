@@ -16,6 +16,8 @@ import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.service.SServiceProvider;
+import jadex.tools.common.ComponentIdentifierDialog;
+import jadex.tools.common.ComponentIdentifierPanel;
 import jadex.tools.common.IMenuItemConstructor;
 import jadex.tools.common.PopupBuilder;
 import jadex.tools.common.componenttree.ComponentTreePanel;
@@ -26,6 +28,7 @@ import jadex.tools.common.modeltree.ModelExplorerTreeModel;
 import jadex.tools.common.plugin.AbstractJCCPlugin;
 import jadex.tools.jcc.AgentControlCenter;
 
+import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
@@ -35,6 +38,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -43,6 +47,7 @@ import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
+import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JScrollPane;
@@ -150,13 +155,20 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 		separator.setOrientation(JSeparator.VERTICAL);
 		bar.add(separator);*/
 		
-		b = new JButton(KILL_PLATFORM);
+		b = new JButton(ADD_REMOTE_PLATFORM);
 		b.setBorder(null);
 		b.setToolTipText(b.getText());
 		b.setText(null);
 		b.setEnabled(true);
 		ret.add(b);
 
+		b = new JButton(KILL_PLATFORM);
+		b.setBorder(null);
+		b.setToolTipText(b.getText());
+		b.setText(null);
+		b.setEnabled(true);
+		ret.add(b);
+		
 		b = new JButton(comptree.getKillAction());
 		b.setBorder(null);
 		b.setToolTipText(b.getText());
@@ -515,6 +527,32 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 			root.killComponent();
 		}
 	};
+	
+	/**
+	 *  Action for killing the platform.
+	 */
+	final AbstractAction ADD_REMOTE_PLATFORM = new AbstractAction("Add remote platform", icons.getIcon("kill_platform"))
+	{
+		public void actionPerformed(ActionEvent e)
+		{
+			SServiceProvider.getServiceUpwards(jcc.getServiceContainer(),
+				IComponentManagementService.class).addResultListener(new DefaultResultListener()		
+			{
+				public void resultAvailable(Object source, Object result)
+				{
+					IComponentManagementService cms = (IComponentManagementService)result;
+					
+//					ComponentIdentifierPanel cip = new ComponentIdentifierPanel(null, jcc.getServiceContainer());
+					ComponentIdentifierDialog dia = new ComponentIdentifierDialog(spanel, jcc.getServiceContainer());
+//					dia.
+					
+					Map args = new HashMap();
+					createComponent("jadex/base/service/remote/ProxyAgent.class", null, null, args, false, null);
+				}
+			});
+		}
+	};
+
 
 	/**
 	 *  Called when an component has died.

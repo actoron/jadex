@@ -265,9 +265,9 @@ public class AgentSelectorDialog
 		JScrollPane	sp	= new JScrollPane(list);
 		sp.setPreferredSize(new Dimension(200, 100));
 		final boolean[]	editing	= new boolean[1];
-		this.aidpanel = new ComponentIdentifierPanel(null, cms)
+		this.aidpanel = new ComponentIdentifierPanel(null, provider)
 		{
-			protected void aidChanged()
+			protected void cidChanged()
 			{
 				if(!list.getSelectionModel().isSelectionEmpty())
 				{
@@ -331,7 +331,7 @@ public class AgentSelectorDialog
 						int	row	= list.getSelectionModel().getMinSelectionIndex();
 						selected	= (IComponentIdentifier)sels.get(row);
 					}
-					aidpanel.setAgentIdentifier(selected);
+					aidpanel.setComponentIdentifier(selected);
 					aidpanel.setEditable(selected!=null);
 					remove.setEnabled(selected!=null);
 				}

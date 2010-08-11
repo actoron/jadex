@@ -44,6 +44,12 @@ public interface IMessageService extends IService
 	// enhanced with the addresses to enable the other platform answering.
 	// In the local case one could always omit the addresses and try out the services.
 	public String[] getAddresses();
+	
+	/**
+	 *  Get addresses of all transports.
+	 *  @return The address schemes of all transports.
+	 */
+	public String[] getAddressSchemes();
 
 	/**
 	 *  Get the message type.

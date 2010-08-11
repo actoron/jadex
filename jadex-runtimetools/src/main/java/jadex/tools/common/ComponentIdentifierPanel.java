@@ -1,8 +1,15 @@
 package jadex.tools.common;
 
-import jadex.bridge.IComponentManagementService;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentManagementService;
+import jadex.bridge.IMessageService;
+import jadex.commons.concurrent.SwingDefaultResultListener;
+import jadex.service.IServiceProvider;
+import jadex.service.SServiceProvider;
 
+import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -10,78 +17,72 @@ import java.awt.Insets;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
+import javax.swing.table.DefaultTableModel;
 
 /**
- *  A panel for displaying/editing an agent identifier.
+ *  A panel for displaying/editing a component identifier.
  */
 public class ComponentIdentifierPanel extends JPanel
 {
 	//-------- attributes --------
 
-	/** The agent identifier.*/
-	protected IComponentManagementService ces;
+//	/** The component management service.*/
+//	protected IComponentManagementService cms;
 	
-	/** The agent identifier.*/
-	protected IComponentIdentifier	aid;
+	/** The service provider. */
+	protected IServiceProvider provider;
+	
+	/** The component identifier.*/
+	protected IComponentIdentifier cid;
 
 	/** The name textfield. */
-	protected JTextField	tfname; 
+	protected JTextField tfname; 
 
 	/** Listener for name updates. */
-	protected DocumentListener	namelistener;	
+	protected DocumentListener namelistener;	
 	
 	/** Flag indicating that the user is currently editing the name. */
-	protected boolean	nameediting;	
+	protected boolean nameediting;	
 	
 	/** The addresses table. */
-	//protected JTable	taddresses;
-	protected EditableList	taddresses;
+	protected EditableList taddresses;
 
 	/** The editable state. */
-	protected boolean	editable;	
+	protected boolean editable;	
+	
+	/** The list of local transport address schemes. */
+	protected DefaultTableModel schemes;
 	
 	//-------- constructors --------
 
 	/**
-	 *  Create a new agent identifier panel.
-	 *  @param aid	The agent identifier (or null for new).
+	 *  Create a new component identifier panel.
+	 *  @param cid The component identifier (or null for new).
 	 */
-	public ComponentIdentifierPanel(IComponentIdentifier aid, IComponentManagementService ces)
+	public ComponentIdentifierPanel(IComponentIdentifier cid, final IServiceProvider provider)
 	{
-		this.ces	= ces;
-		this.aid	= aid!=null ? aid : ces.createComponentIdentifier(null, false, null);
+		this.provider = provider;
+		this.cid = cid!=null? cid: new ComponentIdentifier();//cms.createComponentIdentifier(null, false, null);
 		this.editable	= true;
 
-		// Constraints for labels (displayed left).
-		int	row	= 0;
-		GridBagConstraints	leftcons	= new GridBagConstraints(0, 0, 1, 1, 0, 0,
-			GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(1,1,1,1), 0, 0);
-		// Constraints for components (displayed right of a label).
-		GridBagConstraints	rightcons	= (GridBagConstraints)leftcons.clone();
-		rightcons.gridx	= 1;
-		rightcons.gridwidth	= GridBagConstraints.REMAINDER;
-		rightcons.weightx	= 1;
-		// Constraints for full-size components (resize in all directions).
-		GridBagConstraints	fullcons	= (GridBagConstraints)rightcons.clone();
-		fullcons.gridx	= 0;
-		fullcons.weighty	= 1;
-		fullcons.fill	= GridBagConstraints.BOTH;
-
 		// Initialize component.
-		this.setLayout(new GridBagLayout());
+		JPanel content = new JPanel();
+		content.setLayout(new GridBagLayout());
 
 		// Name
-		tfname	= new JTextField(this.aid.getName(), 20);
+		tfname	= new JTextField(this.cid.getName(), 20);
 		this.namelistener	= new NameListener();
 		tfname.getDocument().addDocumentListener(namelistener);
-		leftcons.gridy	= rightcons.gridy	= fullcons.gridy	= row++;
-		this.add(new JLabel("Name: "), leftcons);
-		this.add(tfname, rightcons);
+		content.add(new JLabel("Name: "), new GridBagConstraints(0, 0, 1, 1, 0, 0,
+			GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(1,1,1,1), 0, 0));
+		content.add(tfname, new GridBagConstraints(1, 0, 1, 1, 1, 0,
+			GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(1,1,1,1), 0, 0));
 
 		taddresses = new EditableList("Addresses");
 		taddresses.getModel().addTableModelListener(new TableModelListener()
@@ -89,22 +90,76 @@ public class ComponentIdentifierPanel extends JPanel
 			public void tableChanged(TableModelEvent e)
 			{
 				//System.out.println("event: "+e);
-				ComponentIdentifierPanel.this.aid	= ComponentIdentifierPanel.this.ces
-					.createComponentIdentifier(ComponentIdentifierPanel.this.aid.getName(), false, taddresses.getEntries());
-				aidChanged();
+				SServiceProvider.getService(provider, IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
+				{
+					public void customResultAvailable(Object source, Object result)
+					{
+						IComponentManagementService cms = (IComponentManagementService)result;
+						ComponentIdentifierPanel.this.cid = cms.createComponentIdentifier(ComponentIdentifierPanel.this.cid.getName(), false, taddresses.getEntries());
+						cidChanged();
+					}
+				});
 			}
 		});
-
+		
 		JScrollPane	scroll	= new JScrollPane(taddresses);
-		leftcons.gridy	= rightcons.gridy	= fullcons.gridy	= row++;
-		this.add(scroll, fullcons);
+		scroll.setPreferredSize(new Dimension(400, 200));
+		content.add(scroll, new GridBagConstraints(0, 1, 2, 1, 1, 1,
+			GridBagConstraints.WEST, GridBagConstraints.BOTH, new Insets(1,1,1,1), 0, 0));
+//		content.add(new JButton("a"));
+		
+		schemes = new DefaultTableModel(new String[]{"Local transport address schemes"}, 0);
+		JTable adr  = new JTable(schemes);
+		
+//		JScrollPane scp = new JScrollPane(adr);
+
+//		JPanel valp = new JPanel(new BorderLayout());
+//		valp.add(new JLabel("Validate address with local cms: ", JLabel.RIGHT), BorderLayout.CENTER);
+//		JButton val = new JButton("Validate");
+//		val.addActionListener(new ActionListener()
+//		{
+//			public void actionPerformed(ActionEvent e)
+//			{
+//				validate();
+//			}
+//		});
+//		valp.add(val, BorderLayout.EAST);
+		
+		JPanel help = new JPanel(new BorderLayout());
+//		help.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), " Local transport address schemes "));
+		help.add(adr.getTableHeader(), BorderLayout.NORTH);
+		help.add(adr, BorderLayout.CENTER);
+//		help.add(valp, BorderLayout.SOUTH);
+		
+//		JSplitPane split = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+//		split.add(content);
+//		split.add(help);
+//		split.setOneTouchExpandable(true);
+		
+		setLayout(new BorderLayout());
+//		add(split, BorderLayout.CENTER);
+		add(content, BorderLayout.CENTER);
+		add(help, BorderLayout.SOUTH);
+		
+		SServiceProvider.getService(provider, IMessageService.class).addResultListener(new SwingDefaultResultListener()
+		{
+			public void customResultAvailable(Object source, Object result)
+			{
+				IMessageService ms = (IMessageService)result;
+				String[] ss = ms.getAddressSchemes();
+				for(int i=0; i<ss.length; i++)
+				{
+					schemes.addRow(new Object[]{ss[i]});
+				}
+			}
+		});
 	}
 
 	/**
 	 *  Template method to be overriden by subclasses.
-	 *  Called when the AID has been changed through user input.
+	 *  Called when the CID has been changed through user input.
 	 */
-	protected void aidChanged()
+	protected void cidChanged()
 	{
 	}
 
@@ -115,16 +170,16 @@ public class ComponentIdentifierPanel extends JPanel
 	 */
 	public IComponentIdentifier	getAgentIdentifier()
 	{
-		return this.aid;
+		return this.cid;
 	}
 
 	/**
-	 *  Set the agent identifier.
+	 *  Set the component identifier.
 	 */
-	public void setAgentIdentifier(IComponentIdentifier aid)
+	public void setComponentIdentifier(IComponentIdentifier cid)
 	{
-		this.aid	= aid!=null ? aid : ces.createComponentIdentifier(null, false, null);
-		taddresses.setEntries(this.aid.getAddresses());
+		this.cid	= cid!=null? cid: new ComponentIdentifier(); 
+//		this.cid	= aid!=null ? aid : cms.createComponentIdentifier(null, false, null);
 		refresh();
 	}
 
@@ -151,11 +206,12 @@ public class ComponentIdentifierPanel extends JPanel
 		// Update the gui.
 		if(!nameediting)
 		{
-			tfname.getDocument().removeDocumentListener(namelistener);
-			tfname.setText(this.aid.getName());
-			tfname.getDocument().addDocumentListener(namelistener);
+//			tfname.getDocument().removeDocumentListener(namelistener);
+			tfname.setText(this.cid.getName());
+//			tfname.getDocument().addDocumentListener(namelistener);
 		}
-
+		
+		taddresses.setEntries(this.cid.getAddresses());
 		taddresses.refresh();
 		this.invalidate();
 		this.validate();
@@ -183,10 +239,18 @@ public class ComponentIdentifierPanel extends JPanel
 		
 		protected void	update()
 		{
-			nameediting	= true;
-			ComponentIdentifierPanel.this.aid	= ces.createComponentIdentifier(tfname.getText(), false, aid.getAddresses());
-			aidChanged();
-			nameediting	= false;
+			SServiceProvider.getService(provider, IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
+			{
+				public void customResultAvailable(Object source, Object result)
+				{
+					IComponentManagementService cms = (IComponentManagementService)result;
+					nameediting	= true;
+					ComponentIdentifierPanel.this.cid	= cms.createComponentIdentifier(tfname.getText(), false, cid.getAddresses());
+					cidChanged();
+					nameediting	= false;
+				}
+			});
 		}
 	}
+	
 }

@@ -390,6 +390,23 @@ public class MessageService extends BasicService implements IMessageService
 
 		return addresses;
 	}
+	
+	/**
+	 *  Get addresses of all transports.
+	 *  @return The address schemes of all transports.
+	 */
+	public String[] getAddressSchemes()
+	{
+		ITransport[] trans = (ITransport[])transports.toArray(new ITransport[transports.size()]);
+		ArrayList schemes = new ArrayList();
+		for(int i = 0; i < trans.length; i++)
+		{
+			String scheme = trans[i].getServiceSchema();
+			schemes.add(scheme);
+		}
+
+		return (String[])schemes.toArray(new String[schemes.size()]);
+	}
 
 	/**
 	 *  Get the transports.
