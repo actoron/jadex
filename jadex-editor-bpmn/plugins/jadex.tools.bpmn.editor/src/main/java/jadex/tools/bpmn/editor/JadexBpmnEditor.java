@@ -45,10 +45,10 @@ public class JadexBpmnEditor extends BpmnDiagramEditor {
 	 * @param Exception to log
 	 * @param int flag from {@link IStatus}
 	 */
-	public static void log(Exception ex, int iStatus) {
+	public static void log(String message, Exception ex, int iStatus) {
 		BpmnDiagramEditorPlugin.getInstance().getLog().log(
 				new Status(iStatus, ID,
-						iStatus, ex.getMessage(), ex));
+						iStatus, message + " -> " + ex.getMessage(), ex));
 	}
 
 }

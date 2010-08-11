@@ -2,8 +2,6 @@ package jadex.tools.bpmn.runtime.task;
 
 import jadex.tools.bpmn.editor.JadexBpmnEditor;
 
-import java.lang.reflect.Method;
-
 import org.eclipse.core.runtime.IStatus;
 
 public class TaskProviderProxy implements IJadexTaskProvider
@@ -27,20 +25,11 @@ public class TaskProviderProxy implements IJadexTaskProvider
 	public String[] getAvailableTaskImplementations()
 	{
 		String[] tasks;
-		Object returnValue = null;
-		
-		// use reflection
-		Method getTaskMetaInfoMethod;
-		try
-		{
-			getTaskMetaInfoMethod = provider.getClass()
-					.getMethod(IJadexTaskProvider.METHOD_IJADEXTASKPROVIDER_GET_AVAILABLE_TASK_IMPLEMENTATIONS);
-			returnValue = getTaskMetaInfoMethod.invoke(provider);
-		}
-		catch (Exception e)
-		{
-			JadexBpmnEditor.log(e, IStatus.WARNING);
-		}
+
+		Object returnValue = WorkspaceClassLoaderHelper
+			.callUnparametrizedReflectionMethod(
+				provider,
+				IJadexTaskProvider.METHOD_IJADEXTASKPROVIDER_GET_AVAILABLE_TASK_IMPLEMENTATIONS);
 
 		// check the return value
 		if (returnValue != null && returnValue instanceof String[])
@@ -60,17 +49,17 @@ public class TaskProviderProxy implements IJadexTaskProvider
 	{
 		try
 		{
-			// use reflection
-			Method getTaskMetaInfoMethod = provider.getClass()
-					.getMethod(IJadexTaskProvider.METHOD_IJADEXTASKPROVIDER_GET_TASK_META_INFO);
-			Object returnValue = getTaskMetaInfoMethod.invoke(provider, new Object[]{fqClassName});
+			Object returnValue = WorkspaceClassLoaderHelper
+			.callUnparametrizedReflectionMethod(
+					provider,
+					IJadexTaskProvider.METHOD_IJADEXTASKPROVIDER_GET_TASK_META_INFO);
 			
 			// check the return value
 			if (returnValue instanceof ITaskMetaInfo)
 			{
 				return (ITaskMetaInfo) returnValue;
 			}
-			else
+			else if (returnValue != null)
 			{
 				// use reflection proxy
 				return new TaskMetaInfoProxy(returnValue);
@@ -78,7 +67,7 @@ public class TaskProviderProxy implements IJadexTaskProvider
 		}
 		catch (Exception e)
 		{
-			JadexBpmnEditor.log(e, IStatus.ERROR);
+			JadexBpmnEditor.log("Exception getting TaskMetaInfo from '"+fqClassName+"' in "+this.getClass().getSimpleName(), e, IStatus.ERROR);
 		}
 		
 		// fall through

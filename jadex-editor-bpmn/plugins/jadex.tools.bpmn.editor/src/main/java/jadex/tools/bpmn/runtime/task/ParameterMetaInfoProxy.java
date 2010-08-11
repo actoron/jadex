@@ -5,11 +5,11 @@ package jadex.tools.bpmn.runtime.task;
 
 /**
  * @author claas
- *
+ * 
  */
 public class ParameterMetaInfoProxy implements IParameterMetaInfo
 {
-	
+
 	Object parameterMetaInfo;
 
 	/**
@@ -21,66 +21,67 @@ public class ParameterMetaInfoProxy implements IParameterMetaInfo
 		this.parameterMetaInfo = parameterMetaInfo;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see jadex.tools.bpmn.runtime.task.IParameterMetaInfo#getDirection()
 	 */
 	@Override
 	public String getDirection()
 	{
-		// TODO Auto-generated method stub
-		return null;
+		return WorkspaceClassLoaderHelper
+				.getStringFromMethod(parameterMetaInfo,
+						METHOD_IJADEXPARAMETERMETAINFO_GET_DIRECTION);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see jadex.tools.bpmn.runtime.task.IParameterMetaInfo#getClazz()
 	 */
 	@Override
 	public Class<?> getClazz()
 	{
-		// TODO Auto-generated method stub
-		return null;
+		return WorkspaceClassLoaderHelper.getClassFromMethod(parameterMetaInfo,
+				METHOD_IJADEXPARAMETERMETAINFO_GET_CLAZZ);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see jadex.tools.bpmn.runtime.task.IParameterMetaInfo#getName()
 	 */
 	@Override
 	public String getName()
 	{
-		// TODO Auto-generated method stub
-		return null;
+		return WorkspaceClassLoaderHelper.getStringFromMethod(
+				parameterMetaInfo, METHOD_IJADEXPARAMETERMETAINFO_GET_NAME);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see jadex.tools.bpmn.runtime.task.IParameterMetaInfo#getInitialValue()
 	 */
 	@Override
 	public String getInitialValue()
 	{
-		// TODO Auto-generated method stub
-		return null;
+		return WorkspaceClassLoaderHelper.getStringFromMethod(
+				parameterMetaInfo,
+				METHOD_IJADEXPARAMETERMETAINFO_GET_INITIAL_VALUE);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see jadex.tools.bpmn.runtime.task.IParameterMetaInfo#getDescription()
 	 */
 	@Override
 	public String getDescription()
 	{
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
-	/**
-	 * Call an unparameterized method on an object with reflection
-	 * 
-	 * @param source the source object to call the method
-	 * @param methodName the method identifier
-	 * @return the return value from called method, may be null
-	 */
-	private Object callUnparametrizedReflectionMethod(Object source, String methodName)
-	{
-		return null;
+		return WorkspaceClassLoaderHelper.getStringFromMethod(
+				parameterMetaInfo,
+				METHOD_IJADEXPARAMETERMETAINFO_GET_DESCRIPTION);
 	}
 
 }

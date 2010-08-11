@@ -5,8 +5,6 @@ package jadex.tools.bpmn.runtime.task;
 
 import jadex.tools.bpmn.editor.JadexBpmnEditor;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,7 +23,7 @@ public abstract class TaskProviderSupport implements IJadexTaskProvider
 	static final ITaskMetaInfo NO_TASK_META_INFO_PROVIDED = new TaskMetaInfo("No TaskMetaInfo provided", new IParameterMetaInfo[0]);
 
 	/**
-	 * The provided task implementation classes for this {@link IJadexTaskProvider}
+	 * The provided task implementation classes for this {@link IRuntimeTaskProvider}
 	 */
 	protected String[] taskImplementations;
 	
@@ -33,7 +31,7 @@ public abstract class TaskProviderSupport implements IJadexTaskProvider
 	 * Map for provided runtime classes<p>
 	 * Map(ClassName, TaskMetaInfo)
 	 */
-	protected Map<String, TaskMetaInfo> metaInfoMap;
+	protected Map<String, ITaskMetaInfo> metaInfoMap;
 
 
 	// ---- constructor ----
@@ -44,11 +42,11 @@ public abstract class TaskProviderSupport implements IJadexTaskProvider
 	public TaskProviderSupport()
 	{
 		super();
-		Package classPackage = this.getClass().getPackage();
-		System.out.println(classPackage.toString());
+		//Package classPackage = this.getClass().getPackage();
+		//System.out.println(classPackage.toString());
 		
 		taskImplementations = new String[]{""};
-		metaInfoMap = new HashMap<String, TaskMetaInfo>();
+		metaInfoMap = new HashMap<String, ITaskMetaInfo>();
 	}
 
 	/**
@@ -56,7 +54,7 @@ public abstract class TaskProviderSupport implements IJadexTaskProvider
 	 * @param metaInfoMap
 	 */
 	public TaskProviderSupport(String[] taskImplementations,
-			HashMap<String, TaskMetaInfo> metaInfoMap)
+			HashMap<String, ITaskMetaInfo> metaInfoMap)
 	{
 		super();
 		this.taskImplementations = taskImplementations;
@@ -69,7 +67,7 @@ public abstract class TaskProviderSupport implements IJadexTaskProvider
 	/**
 	 * Get the provided task implementations
 	 * Per default return an String[] with an empty String
-	 * @see jadex.tools.bpmn.runtime.task.IJadexTaskProvider#getAvailableTaskImplementations()
+	 * @see jadex.tools.bpmn.runtime.task.IRuntimeTaskProvider#getAvailableTaskImplementations()
 	 */
 	public String[] getAvailableTaskImplementations()
 	{
@@ -79,13 +77,18 @@ public abstract class TaskProviderSupport implements IJadexTaskProvider
 	
 	/**
 	 * Get {@link TaskMetaInfo} for provided task implementation.
-	 * @see jadex.tools.bpmn.runtime.task.IJadexTaskProvider#getTaskMetaInfo(java.lang.String)
+	 * @see jadex.tools.bpmn.runtime.task.IRuntimeTaskProvider#getTaskMetaInfo(java.lang.String)
 	 */
 	public ITaskMetaInfo getTaskMetaInfo(String className)
 	{
+		if (className == null || className.trim().isEmpty())
+		{
+			return null;
+		}
+			
 		if (metaInfoMap != null)
 		{
-			TaskMetaInfo info;
+			ITaskMetaInfo info;
 			if (metaInfoMap.containsKey(className))
 			{
 				info = metaInfoMap.get(className);
@@ -113,38 +116,43 @@ public abstract class TaskProviderSupport implements IJadexTaskProvider
 	 * @param className
 	 * @return TaskMetaInfo for class if provided, else null
 	 */
-	private TaskMetaInfo loadMetaInfo(String className) {
+	private ITaskMetaInfo loadMetaInfo(String className) {
 		
 		ClassLoader classLoader = WorkspaceClassLoaderHelper
 				.getWorkspaceClassLoader(false);
 
-		if (classLoader == null)
+		if (classLoader == null || className == null || className.trim().isEmpty())
+		{
+			JadexBpmnEditor.log("Method loadMetaInfo('" + className
+					+ "') failed in " + this.getClass().getSimpleName()
+					+ " with '" + classLoader + "' as ClassLoader",
+					new Exception(), IStatus.WARNING);
 			return null;
-
-		try {
+		}
+			
+		try 
+		{
 			Class<?> taskImpl = classLoader.loadClass(className);
 			Object taskInstance = taskImpl.newInstance();
-			Method myMethod = taskImpl
-					.getMethod(IJadexTaskProvider.METHOD_IJADEXTASKPROVIDER_GET_TASK_META_INFO);
-			TaskMetaInfo returnValue = (TaskMetaInfo) myMethod
-					.invoke(taskInstance);
+			
+			Object returnValue = WorkspaceClassLoaderHelper
+			.callUnparametrizedReflectionMethod(
+				taskInstance,
+				IJadexTaskProvider.METHOD_IJADEXTASKPROVIDER_GET_TASK_META_INFO);
 
-			return returnValue;
+			if (returnValue instanceof ITaskMetaInfo)
+			{
+				return (ITaskMetaInfo) returnValue;
+			}
+			else
+			{
+				return new TaskMetaInfoProxy(taskInstance);
+			}
 
-		} catch (ClassNotFoundException e) {
-			JadexBpmnEditor.log(e, IStatus.WARNING);
-		} catch (InstantiationException e) {
-			JadexBpmnEditor.log(e, IStatus.WARNING);
-		} catch (IllegalAccessException e) {
-			JadexBpmnEditor.log(e, IStatus.WARNING);
-		} catch (SecurityException e) {
-			JadexBpmnEditor.log(e, IStatus.WARNING);
-		} catch (NoSuchMethodException e) {
-			JadexBpmnEditor.log(e, IStatus.WARNING);
-		} catch (IllegalArgumentException e) {
-			JadexBpmnEditor.log(e, IStatus.WARNING);
-		} catch (InvocationTargetException e) {
-			JadexBpmnEditor.log(e, IStatus.WARNING);
+		}
+		catch (Exception e)
+		{
+			JadexBpmnEditor.log("Exception while loading meta info for class '"+className+"' in "+this.getClass().getSimpleName(), e, IStatus.WARNING);
 		}
 
 		return null;

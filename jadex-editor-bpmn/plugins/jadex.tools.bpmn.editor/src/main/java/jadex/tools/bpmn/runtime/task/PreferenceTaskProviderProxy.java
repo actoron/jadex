@@ -79,7 +79,14 @@ public class PreferenceTaskProviderProxy implements IJadexTaskProvider
 	protected void loadTaskMetaInfos(List<String> iTaskProviderList)
 	{
 		// replace cache and clear map
-		iTaskProviderCache = iTaskProviderList;
+		if (iTaskProviderList == null)
+		{
+			iTaskProviderCache.clear();
+		}
+		else
+		{
+			iTaskProviderCache = iTaskProviderList;
+		}
 		providerMap.clear();
 		
 		ClassLoader classLoader = WorkspaceClassLoaderHelper
@@ -119,7 +126,7 @@ public class PreferenceTaskProviderProxy implements IJadexTaskProvider
 			}
 			catch (Exception e)
 			{
-				JadexBpmnEditor.log(e, IStatus.ERROR);
+				JadexBpmnEditor.log("Problem during TaskMetaInfo load in "+this.getClass().getSimpleName(), e, IStatus.ERROR);
 			}
 			
 		}
@@ -172,6 +179,7 @@ public class PreferenceTaskProviderProxy implements IJadexTaskProvider
 					IJadexTaskProvider.class))
 			{
 				status = new Status(IStatus.OK, JadexBpmnPlugin.ID, "Implements IRuntimeTaskProvider");
+				return status;
 			}
 			
 			// second check implementing needed methods
@@ -183,12 +191,13 @@ public class PreferenceTaskProviderProxy implements IJadexTaskProvider
 			if (getAvailableTasksMethod != null && getTaskMetaInfoMethod != null)
 			{
 				status = new Status(IStatus.OK, JadexBpmnPlugin.ID, "Implements '"+IJadexTaskProvider.METHOD_IJADEXTASKPROVIDER_GET_AVAILABLE_TASK_IMPLEMENTATIONS+"' and '"+IJadexTaskProvider.METHOD_IJADEXTASKPROVIDER_GET_TASK_META_INFO+"'");
+				return status;
 			}
 		}
 		// if something goes wrong, report it
 		catch (Exception e)
 		{
-			JadexBpmnEditor.log(e, IStatus.ERROR);
+			JadexBpmnEditor.log("Exception during task provider check in "+PreferenceTaskProviderProxy.class.getSimpleName(), e, IStatus.ERROR);
 			status = new Status(
 					IStatus.ERROR,
 					JadexBpmnPlugin.ID,

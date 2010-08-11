@@ -76,7 +76,7 @@ public class JadexTaskProviderTypeListEditor extends ListEditor
 		}
 		catch (JavaModelException e)
 		{
-			JadexBpmnEditor.log(e, IStatus.ERROR);
+			JadexBpmnEditor.log("JavaModelException in JadexTaskProviderTypeListEditor#getNewInputObject()", e, IStatus.ERROR);
 		}
 
 		return newInputObject;
@@ -112,7 +112,7 @@ public class JadexTaskProviderTypeListEditor extends ListEditor
 		}
 
 		Object[] types = dialog.getResult();
-		if (types == null || types.length == 0)
+		if (types == null || types.length == 0 || types[0] == null)
 		{
 			return null;
 		}
@@ -126,7 +126,7 @@ public class JadexTaskProviderTypeListEditor extends ListEditor
 	 * @param items 
 	 * @return String for preference store
 	 */
-	protected String createStringList(String[] items)
+	public static String createStringList(String[] items)
 	{
 		StringBuffer buffer = new StringBuffer();
 		if (items != null)

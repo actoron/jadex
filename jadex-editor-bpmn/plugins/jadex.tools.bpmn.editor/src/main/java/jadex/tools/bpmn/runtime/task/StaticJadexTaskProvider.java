@@ -29,7 +29,7 @@ public class StaticJadexTaskProvider extends TaskProviderSupport
 			"jadex.bdibpmn.task.WaitForSpaceObjectTaskTask.class",
 			"jadex.bdibpmn.task.RemoveSpaceObjectTaskTask.class",
 
-			"jadex.wfms.client.task.WorkitemTask.class", };
+			"jadex.wfms.client.task.WorkitemTask.class"};
 
 	private static Map createMetaInfos()
 	{

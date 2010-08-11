@@ -6,6 +6,7 @@ import jadex.tools.bpmn.editor.JadexBpmnPlugin;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Method;
 import java.net.JarURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -287,10 +288,76 @@ class WorkspaceClassLoaderHelper
 		}
 		catch (ClassNotFoundException ex)
 		{
-			JadexBpmnEditor.log(ex, IStatus.WARNING);
+			JadexBpmnEditor.log("ClassNotFoundException in getClassessOfInterface("+pkgName+", "+classSuffix+", "+classInterface+")" ,ex, IStatus.WARNING);
 		}
 
 		return classList;
 	}
 
+	
+// ---- reflection helper methods ----
+	
+	protected static String getStringFromMethod(Object source, String methodName)
+	{
+
+		Object returnValue = callUnparametrizedReflectionMethod(source, methodName);
+		
+		// check the return value
+		if (returnValue instanceof String)
+		{
+			return (String) returnValue;
+		}
+		else
+		{
+			JadexBpmnEditor.log("Wrong return value from method", new UnsupportedOperationException(
+					"No String as result from '" + methodName + "' in : '"
+							+ source +"'"), IStatus.WARNING);
+			return "";
+		}
+	}
+	
+	protected static Class<?> getClassFromMethod(Object source, String methodName)
+	{
+
+		Object returnValue = callUnparametrizedReflectionMethod(source, methodName);
+		
+		// check the return value
+		if (returnValue instanceof Class<?>)
+		{
+			return (Class<?>) returnValue;
+		}
+		else
+		{
+			JadexBpmnEditor.log("Wrong return value from method", new UnsupportedOperationException(
+					"No Class<?> as result from '" + methodName + "' in : '"
+							+ source +"'"), IStatus.WARNING);
+			return null;
+		}
+	}
+	
+	/**
+	 * Call an unparameterized method on an object with reflection
+	 * 
+	 * @param source the source object to call the method
+	 * @param methodName the method identifier
+	 * @return the return value from called method, may be null
+	 */
+	protected static Object callUnparametrizedReflectionMethod(Object source, String methodName)
+	{
+		try
+		{
+			// use reflection
+			Method method = source.getClass()
+					.getMethod(methodName);
+			Object returnValue = method.invoke(source);
+			
+			return returnValue;
+		}
+		catch (Exception e)
+		{
+			JadexBpmnEditor.log("Exception in callUnparametrizedReflectionMethod("+source+", "+methodName+")", e, IStatus.ERROR);
+		}
+		
+		return null;
+	}
 }

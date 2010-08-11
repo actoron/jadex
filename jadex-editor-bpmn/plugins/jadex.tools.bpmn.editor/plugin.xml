@@ -38,6 +38,13 @@
       </page>
    </extension>
    
+   <!-- Jadex BPMN - Preference initializer -->
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="jadex.tools.bpmn.editor.preferences.JadexBpmnPluginPreferenceInitializer">
+      </initializer>
+   </extension>
    
    
    <!-- add a jadex property tab to the editor-->
