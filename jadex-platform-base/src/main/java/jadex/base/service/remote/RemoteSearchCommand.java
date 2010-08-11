@@ -8,6 +8,7 @@ import jadex.commons.IFuture;
 import jadex.commons.SReflect;
 import jadex.commons.collection.LRU;
 import jadex.commons.concurrent.IResultListener;
+import jadex.micro.IMicroExternalAccess;
 import jadex.service.IResultSelector;
 import jadex.service.ISearchManager;
 import jadex.service.IService;
@@ -18,11 +19,9 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  *  Command for performing a remote service search.
@@ -79,7 +78,7 @@ public class RemoteSearchCommand implements IRemoteCommand
 	 *  @return An optional result command that will be 
 	 *  sent back to the command origin. 
 	 */
-	public IFuture execute(final IExternalAccess component, Map waitingcalls)
+	public IFuture execute(final IMicroExternalAccess component, Map waitingcalls)
 	{
 		final Future ret = new Future();
 			

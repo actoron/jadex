@@ -24,6 +24,7 @@ import jadex.commons.concurrent.IResultListener;
 import jadex.service.IServiceContainer;
 import jadex.service.IServiceProvider;
 import jadex.service.SServiceProvider;
+import jadex.service.clock.ITimer;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -252,11 +253,12 @@ public class MicroAgentInterpreter implements IComponentInstance
 		{
 			public void run()
 			{	
-				if(microagent.timer!=null)
+				for(int i=0; i<microagent.timers.size(); i++)
 				{
-					microagent.timer.cancel();
-					microagent.timer = null;
+					ITimer timer = (ITimer)microagent.timers.get(i);
+					timer.cancel();
 				}
+				microagent.timers.clear();
 				microagent.agentKilled();
 				IComponentIdentifier cid = adapter.getComponentIdentifier();
 				ret.setResult(cid);

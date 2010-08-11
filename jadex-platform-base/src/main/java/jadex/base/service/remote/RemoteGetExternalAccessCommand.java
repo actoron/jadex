@@ -2,14 +2,13 @@ package jadex.base.service.remote;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
-import jadex.bridge.IExternalAccess;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.collection.LRU;
 import jadex.commons.concurrent.IResultListener;
+import jadex.micro.IMicroExternalAccess;
 import jadex.service.SServiceProvider;
 
-import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.Map;
 
@@ -59,7 +58,7 @@ public class RemoteGetExternalAccessCommand implements IRemoteCommand
 	 *  @return An optional result command that will be 
 	 *  sent back to the command origin. 
 	 */
-	public IFuture execute(final IExternalAccess component, Map waitingcalls)
+	public IFuture execute(final IMicroExternalAccess component, Map waitingcalls)
 	{
 		final Future ret = new Future();
 		

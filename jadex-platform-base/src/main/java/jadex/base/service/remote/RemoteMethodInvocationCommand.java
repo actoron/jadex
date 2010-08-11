@@ -6,6 +6,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.concurrent.IResultListener;
+import jadex.micro.IMicroExternalAccess;
 import jadex.service.IServiceIdentifier;
 import jadex.service.SServiceProvider;
 
@@ -85,7 +86,7 @@ public class RemoteMethodInvocationCommand implements IRemoteCommand
 	 *  @return An optional result command that will be 
 	 *  sent back to the command origin. 
 	 */
-	public IFuture execute(IExternalAccess component, Map waitingcalls)
+	public IFuture execute(IMicroExternalAccess component, Map waitingcalls)
 	{
 		final Future ret = new Future();
 		

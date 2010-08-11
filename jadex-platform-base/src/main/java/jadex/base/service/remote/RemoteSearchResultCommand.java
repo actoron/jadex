@@ -1,10 +1,10 @@
 package jadex.base.service.remote;
 
-import jadex.bridge.IExternalAccess;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
+import jadex.micro.IMicroExternalAccess;
 import jadex.service.IService;
 import jadex.service.SServiceProvider;
 import jadex.service.library.ILibraryService;
@@ -46,7 +46,7 @@ public class RemoteSearchResultCommand extends RemoteResultCommand
 	 *  @return An optional result command that will be 
 	 *  sent back to the command origin. 
 	 */
-	public IFuture execute(final IExternalAccess component, final Map waitingcalls)
+	public IFuture execute(final IMicroExternalAccess component, final Map waitingcalls)
 	{
 		final Future ret = new Future();
 		
