@@ -58,15 +58,15 @@ public class RemoteResultCommand implements IRemoteCommand
 		{
 			System.out.println("Unexpected result, no outstanding call for:" +callid);
 		}
-		else if(!future.isDone())
+		else //if(!future.isDone())
 		{
 			if(exception!=null)
 			{
-				future.setException(exception);
+				future.setExceptionIfUndone(exception);
 			}
 			else
 			{
-				future.setResult(result);
+				future.setResultIfUndone(result);
 			}
 		}
 		
@@ -128,4 +128,6 @@ public class RemoteResultCommand implements IRemoteCommand
 	{
 		this.callid = callid;
 	}
+	
+	
 }

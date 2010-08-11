@@ -321,5 +321,16 @@ public class RemoteMethodInvocationCommand implements IRemoteCommand
 	{
 		this.callid = callid;
 	}
+
+	/**
+	 *  Get the string representation.
+	 */
+	public String toString()
+	{
+		return "RemoteMethodInvocationCommand(sid=" + sid + ", methodname="
+			+ methodname + ", callid=" + callid + ")";
+	}
+	
+	
 }
 

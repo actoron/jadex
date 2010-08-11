@@ -552,7 +552,7 @@ public class MessageService extends BasicService implements IMessageService
 
 		if(receivers.length > 0)
 		{
-			logger.warning("Message could not be delivered to (all) receivers: " + SUtil.arrayToString(receivers));
+//			logger.warning("Message could not be delivered to (all) receivers: " + SUtil.arrayToString(receivers));
 			ret.setException(new MessageFailureException(msg, type, receivers, "Message could not be delivered to (all) receivers: "+ SUtil.arrayToString(receivers)));
 		}
 		else

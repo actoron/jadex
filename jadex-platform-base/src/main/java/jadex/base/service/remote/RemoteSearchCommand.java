@@ -376,4 +376,16 @@ public class RemoteSearchCommand implements IRemoteCommand
 		
 		return ret;
 	}
+
+	/**
+	 *  Get the string representation.
+	 */
+	public String toString()
+	{
+		return "RemoteSearchCommand(providerid=" + providerid + ", manager="
+			+ manager + ", decider=" + decider + ", selector=" + selector
+			+ ", callid=" + callid + ")";
+	}
+	
+	
 }

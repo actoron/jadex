@@ -396,7 +396,7 @@ public class TCPTransport implements ITransport
 			{ 
 				connections.put(address, new TCPDeadConnection());
 				
-				logger.warning("Could not create connection: "+e.getMessage());
+//				logger.warning("Could not create connection: "+e.getMessage());
 				//e.printStackTrace();
 			}
 		}

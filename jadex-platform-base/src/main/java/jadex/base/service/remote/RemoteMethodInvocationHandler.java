@@ -8,9 +8,12 @@ import jadex.commons.ICommand;
 import jadex.commons.IFuture;
 import jadex.commons.SUtil;
 import jadex.commons.ThreadSuspendable;
+import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.micro.IMicroExternalAccess;
+import jadex.micro.MicroAgent;
 import jadex.service.SServiceProvider;
+import jadex.service.clock.ITimer;
 import jadex.service.library.ILibraryService;
 
 import java.lang.reflect.InvocationHandler;
@@ -55,6 +58,8 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 	 */
 	public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
 	{
+//		System.out.println("remote method invoc: "+method.getName());
+		
 		// Test if method is excluded.
 		if(pi.isExcluded(method))
 			throw new UnsupportedOperationException("Method is excluded from interface for remote invocations.");
@@ -76,7 +81,6 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 		
 		final IComponentIdentifier compid = component.getComponentIdentifier();
 		final String callid = SUtil.createUniqueId(compid.getLocalName());
-		waitingcalls.put(callid, future);
 		
 		RemoteMethodInvocationCommand content;
 		if(pi.getServiceIdentifier()!=null)
@@ -90,73 +94,7 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 				method.getParameterTypes(), args, callid, compid);
 		}
 		
-		final Map msg = new HashMap();
-		msg.put(SFipa.SENDER, component.getComponentIdentifier());
-		msg.put(SFipa.RECEIVERS, new IComponentIdentifier[]{pi.getRemoteManagementServiceIdentifier()});
-		msg.put(SFipa.CONTENT, content);
-		msg.put(SFipa.LANGUAGE, SFipa.JADEX_XML);
-		msg.put(SFipa.CONVERSATION_ID, callid);
-		
-		SServiceProvider.getService(component.getServiceProvider(), ILibraryService.class)
-			.addResultListener(component.createResultListener(new IResultListener()
-		{
-			public void resultAvailable(Object source, Object result)
-			{
-				final ILibraryService ls = (ILibraryService)result;
-				
-				SServiceProvider.getService(component.getServiceProvider(), IMessageService.class)
-					.addResultListener(component.createResultListener(new IResultListener()
-				{
-					public void resultAvailable(Object source, Object result)
-					{
-						IMessageService ms = (IMessageService)result;
-						ms.sendMessage(msg, SFipa.FIPA_MESSAGE_TYPE, compid, ls.getClassLoader())
-							.addResultListener(new IResultListener()
-						{
-							public void resultAvailable(Object source, Object result)
-							{
-								// ok message could be sent.
-							}
-							
-							public void exceptionOccurred(Object source, Exception exception)
-							{
-								// message could not be sent -> fail immediately.
-								System.out.println("Callee could not be reached: "+exception);
-								waitingcalls.remove(compid);
-								future.setException(exception);
-							}
-						});
-						component.scheduleStep(new ICommand() 
-						{
-							public void execute(Object args) 
-							{
-								ProxyAgent pa = (ProxyAgent)args;
-								pa.waitFor(getTimeout(), new ICommand() 
-								{
-									public void execute(Object args) 
-									{
-										waitingcalls.remove(compid);
-										future.setException(new RuntimeException("No reply received and timeout occurred: "+callid+" "+msg));
-									}
-								});
-							}
-						});
-					}
-					
-					public void exceptionOccurred(Object source, Exception exception)
-					{
-						waitingcalls.remove(compid);
-						future.setException(exception);
-					}
-				}));
-			}
-			
-			public void exceptionOccurred(Object source, Exception exception)
-			{
-				waitingcalls.remove(compid);
-				future.setException(exception);
-			}
-		}));
+		RemoteServiceManagementService.sendMessage(component, pi.getRemoteManagementServiceIdentifier(), content, callid, -1, waitingcalls, future);
 		
 		if(method.getReturnType().equals(void.class) && !pi.isSynchronous(method))
 		{
@@ -176,14 +114,6 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 		return ret;
 	}
 
-	/**
-	 *  Get the message timeout.
-	 *  @return The timeout.
-	 */
-	protected long getTimeout()
-	{
-		// todo: make customizable from proxy info
-		return 10000;
-	}
+	
 }
 

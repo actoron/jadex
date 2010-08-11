@@ -340,7 +340,7 @@ public abstract class AbstractClock implements IClock
 	{
 		synchronized(this)
 		{
-//		System.err.println("Added timer: "+timer);
+//			System.err.println("Added timer: "+timer);
 			timers.add(timer);
 		}
 		

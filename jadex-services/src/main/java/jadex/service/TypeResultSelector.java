@@ -90,6 +90,14 @@ public class TypeResultSelector extends BasicResultSelector
 	{
 		this.type = type;
 	}
-	
+
+	/**
+	 *  Get the string representation.
+	 */
+	public String toString()
+	{
+		return "TypeResultSelector(type=" + type + ", oneresult=" + oneresult
+			+ ", onlylocal=" + onlylocal + ")";
+	}
 }
 

@@ -84,6 +84,7 @@ public class Future implements IFuture
     	return get(caller, -1);
     }
 
+    // todo: this are always realtime timeouts, what about simulation clocks!
     /**
      *  Get the result - blocking call.
      *  @param timeout The timeout in millis.
@@ -158,6 +159,27 @@ public class Future implements IFuture
     	
     	resume();
     }
+    
+    /**
+     *  Set the exception. 
+     *  Listener notifications occur on calling thread of this method.
+     *  @param exception The exception.
+     */
+    public void	setExceptionIfUndone(Exception exception)
+    {
+    	synchronized(this)
+		{
+    		// If done just return.
+        	if(resultavailable)
+        		return;
+        		
+//        	System.out.println(this+" setResult: "+result);
+        	this.exception = exception;
+        	resultavailable = true;			
+		}
+    	
+    	resume();
+    }
 
     /**
      *  Set the result. 
@@ -170,6 +192,26 @@ public class Future implements IFuture
 		{
         	if(resultavailable)
         		throw new RuntimeException();
+        	
+//        	System.out.println(this+" setResult: "+result);
+        	this.result = result;
+        	resultavailable = true;			
+		}
+    	
+    	resume();
+    }
+    
+    /**
+     *  Set the result. 
+     *  Listener notifications occur on calling thread of this method.
+     *  @param result The result.
+     */
+    public void	setResultIfUndone(Object result)
+    {
+    	synchronized(this)
+		{
+        	if(resultavailable)
+        		return;
         	
 //        	System.out.println(this+" setResult: "+result);
         	this.result = result;

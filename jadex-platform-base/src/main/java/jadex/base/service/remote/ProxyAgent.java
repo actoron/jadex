@@ -67,7 +67,7 @@ public class ProxyAgent extends MicroAgent
 						{
 							public void resultAvailable(Object source, Object result)
 							{
-								System.out.println("Found children: "+SUtil.arrayToString(result));
+//								System.out.println("Found children: "+SUtil.arrayToString(result));
 								
 								IComponentIdentifier[] tmp = (IComponentIdentifier[])result;
 								

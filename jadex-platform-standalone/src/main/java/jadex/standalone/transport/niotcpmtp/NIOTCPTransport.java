@@ -362,7 +362,7 @@ public class NIOTCPTransport implements ITransport
 			}
 			catch(IOException e)
 			{
-				logger.warning("Address unreachable: "+addrs[i]);
+//				logger.warning("Address unreachable: "+addrs[i]);
 			}
 		}
 		
@@ -479,7 +479,7 @@ public class NIOTCPTransport implements ITransport
 			catch(Exception e)
 			{ 
 				connections.put(address, new NIOTCPDeadConnection());
-				logger.warning("Could not establish connection to: "+address);
+//				logger.warning("Could not establish connection to: "+address);
 				//e.printStackTrace();
 			}
 		}

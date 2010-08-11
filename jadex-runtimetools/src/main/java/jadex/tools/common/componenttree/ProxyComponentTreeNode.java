@@ -175,7 +175,8 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 							
 							public void exceptionOccurred(Object source, Exception exception)
 							{
-								ret.setException(exception);
+								// 2 parallel search branches, i.e. one may fail first
+								ret.setExceptionIfUndone(exception);
 							}
 						}));
 					}
@@ -220,7 +221,8 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 							
 							public void exceptionOccurred(Object source, Exception exception)
 							{
-								ret.setException(exception);
+								// 2 parallel search branches, i.e. one may fail first
+								ret.setExceptionIfUndone(exception);
 							}
 						}));
 					}

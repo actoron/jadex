@@ -221,10 +221,12 @@ public abstract class MicroAgent implements IMicroAgent
 	 *  @param time The time.
 	 *  @param run The runnable.
 	 */
-	public void waitFor(final long time, final ICommand run)
+	public IFuture waitFor(final long time, final ICommand run)
 	{
+		final Future ret = new Future();
+		
 		SServiceProvider.getService(getServiceProvider(), IClockService.class)
-			.addResultListener(createResultListener(new DefaultResultListener()
+			.addResultListener(createResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
@@ -250,8 +252,16 @@ public abstract class MicroAgent implements IMicroAgent
 					}
 				});
 				timers.add(ts[0]);
+				ret.setResult(ts[0]);
+			}
+			
+			public void exceptionOccurred(Object source, Exception exception)
+			{
+				ret.setException(exception);
 			}
 		}));
+		
+		return ret;
 	}
 	
 	/**
