@@ -252,7 +252,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 										{
 											public void execute(Object args) 
 											{
-												System.out.println("timeout triggered: "+msg);
+//												System.out.println("timeout triggered: "+msg);
 												waitingcalls.remove(callid);
 												future.setExceptionIfUndone(new RuntimeException("No reply received and timeout occurred: "+callid+" "+msg));
 											}
