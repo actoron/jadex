@@ -4,6 +4,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IRemoteServiceManagementService;
 import jadex.commons.concurrent.DefaultResultListener;
+import jadex.commons.concurrent.IResultListener;
 import jadex.micro.MicroAgent;
 import jadex.service.SServiceProvider;
 
@@ -24,33 +25,33 @@ public class UserAgent extends MicroAgent
 		{
 			public void resultAvailable(Object source, Object result)
 			{
-				final IComponentManagementService cms = (IComponentManagementService)result;
-				
-				// get remote management service and fetch service via rms.getProxy()
-				SServiceProvider.getService(getServiceProvider(), IRemoteServiceManagementService.class)
-					.addResultListener(createResultListener(new DefaultResultListener()
-				{
-					public void resultAvailable(Object source, Object result)
-					{
-						IRemoteServiceManagementService rms = (IRemoteServiceManagementService)result;
-
-//							IComponentIdentifier rrms = cms.createComponentIdentifier("rms@remote", false, 
-//								new String[]{"tcp-mtp://127.0.0.1:11000", "nio-mtp://127.0.0.1:11001"});
-						IComponentIdentifier platid = cms.createComponentIdentifier("remote", false, 
-							new String[]{"tcp-mtp://127.0.0.1:11000", "nio-mtp://127.0.0.1:11001"});
-
-						// Search for remote service
-//							rms.getProxy(rrms, null, IAddService.class).addResultListener(createResultListener(new DefaultResultListener()
-						rms.getServiceProxy(platid, IMathService.class).addResultListener(createResultListener(new DefaultResultListener()
-						{
-							public void resultAvailable(Object source, Object result)
-							{
-								IMathService service = (IMathService)result;
-								invokeAddService("IMathService searched via rms.", service);
-							}
-						}));
-					}						
-				}));
+//				final IComponentManagementService cms = (IComponentManagementService)result;
+//				
+//				// get remote management service and fetch service via rms.getProxy()
+//				SServiceProvider.getService(getServiceProvider(), IRemoteServiceManagementService.class)
+//					.addResultListener(createResultListener(new DefaultResultListener()
+//				{
+//					public void resultAvailable(Object source, Object result)
+//					{
+//						IRemoteServiceManagementService rms = (IRemoteServiceManagementService)result;
+//
+////							IComponentIdentifier rrms = cms.createComponentIdentifier("rms@remote", false, 
+////								new String[]{"tcp-mtp://127.0.0.1:11000", "nio-mtp://127.0.0.1:11001"});
+//						IComponentIdentifier platid = cms.createComponentIdentifier("remote", false, 
+//							new String[]{"tcp-mtp://127.0.0.1:11000", "nio-mtp://127.0.0.1:11001"});
+//
+//						// Search for remote service
+////							rms.getProxy(rrms, null, IAddService.class).addResultListener(createResultListener(new DefaultResultListener()
+//						rms.getServiceProxy(platid, IMathService.class).addResultListener(createResultListener(new DefaultResultListener()
+//						{
+//							public void resultAvailable(Object source, Object result)
+//							{
+//								IMathService service = (IMathService)result;
+//								invokeAddService("IMathService searched via rms.", service);
+//							}
+//						}));
+//					}						
+//				}));
 				
 				// search on local platform and find service via ProxyAgent to other platform
 				SServiceProvider.getService(getServiceProvider(), IMathService.class, false)
@@ -101,6 +102,21 @@ public class UserAgent extends MicroAgent
 			System.out.println("Calling void (non-blocking) printMessage method.");
 			service.printMessage("math service");
 			System.out.println("Invoked printMessage");
+			
+			System.out.println("Calling (non-blocking) exception throwing divZero method.");
+			service.divZero().addResultListener(new IResultListener()
+			{
+				public void resultAvailable(Object source, Object result)
+				{
+					System.out.println("Invoked divZero without exception");
+				}
+				
+				public void exceptionOccurred(Object source, Exception exception)
+				{
+					System.out.println("Invoked divZero, expected exception occurred: "+exception);
+//					exception.printStackTrace();
+				}
+			});
 		}
 	}
 }

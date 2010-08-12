@@ -38,8 +38,17 @@ public interface IMathService extends IService
 	public double getPi();
 	
 	/**
+	 *  Tests a void message call (default is asynchronous).
+	 * 
 	 *  Print out some message.
 	 *  @param message The message.
 	 */
 	public void printMessage(String message);
+	
+	/**
+	 *  Tests a method that throws an exception.
+	 *  
+	 *  Does a divide by zero operation and causes an exception.
+	 */
+	public IFuture divZero();
 }

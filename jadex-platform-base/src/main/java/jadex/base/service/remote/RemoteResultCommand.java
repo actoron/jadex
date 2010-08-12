@@ -18,7 +18,7 @@ public class RemoteResultCommand implements IRemoteCommand
 	protected Object result;
 
 	/** The exception. */
-	protected Exception exception;
+	protected ExceptionInfo exceptioninfo;
 	
 	/** The callid. */
 	protected String callid;
@@ -38,7 +38,7 @@ public class RemoteResultCommand implements IRemoteCommand
 	public RemoteResultCommand(Object result, Exception exception, String callid)
 	{
 		this.result = result;
-		this.exception = exception;
+		this.exceptioninfo = exception!=null? new ExceptionInfo(exception): null;
 		this.callid = callid;
 	}
 	
@@ -60,9 +60,9 @@ public class RemoteResultCommand implements IRemoteCommand
 		}
 		else //if(!future.isDone())
 		{
-			if(exception!=null)
+			if(exceptioninfo!=null)
 			{
-				future.setExceptionIfUndone(exception);
+				future.setExceptionIfUndone(exceptioninfo.recreateException());
 			}
 			else
 			{
@@ -97,18 +97,18 @@ public class RemoteResultCommand implements IRemoteCommand
 	 *  Get the exception.
 	 *  @return the exception.
 	 */
-	public Exception getException()
+	public ExceptionInfo getExceptionInfo()
 	{
-		return exception;
+		return exceptioninfo;
 	}
 
 	/**
 	 *  Set the exception.
 	 *  @param exception The exception to set.
 	 */
-	public void setException(Exception exception)
+	public void setExceptionInfo(ExceptionInfo exception)
 	{
-		this.exception = exception;
+		this.exceptioninfo = exception;
 	}
 	
 	/**

@@ -59,7 +59,7 @@ public class MathService extends BasicService implements IMathService
 	 */
 	public double getPi()
 	{
-		System.out.println("getPi");
+//		System.out.println("getPi");
 		return Math.PI;
 	}
 	
@@ -70,5 +70,25 @@ public class MathService extends BasicService implements IMathService
 	public void printMessage(String message)
 	{
 		System.out.println(message);
+	}
+	
+	/**
+	 *  Tests a method that throws an exception.
+	 *  
+	 *  Does a divide by zero operation and causes an exception.
+	 */
+	public IFuture divZero()
+	{
+		final Future ret = new Future();
+		try
+		{
+			int tmp = 1/0;
+			ret.setResult(new Integer(tmp));
+		}
+		catch(Exception e)
+		{
+			ret.setException(e);
+		}
+		return ret;
 	}
 }

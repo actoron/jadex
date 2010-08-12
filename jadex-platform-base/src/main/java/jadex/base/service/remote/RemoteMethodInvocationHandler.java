@@ -93,7 +93,7 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 		}
 		else if(!method.getReturnType().isAssignableFrom(IFuture.class))
 		{
-			Thread.dumpStack();
+//			Thread.dumpStack();
 			System.out.println("Warning, blocking method call: "+method.getDeclaringClass()
 				+" "+method.getName()+" "+Thread.currentThread()+" "+pi.getServiceIdentifier().getServiceType());
 			ret = future.get(new ThreadSuspendable());
