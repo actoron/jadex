@@ -105,32 +105,22 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 	 */
 	protected void	searchChildren()
 	{
-		cms.getExternalAccess(desc.getName()).addResultListener(new SwingDefaultResultListener()
+		getRemoteComponentIdentifier().addResultListener(new SwingDefaultResultListener()
 		{
 			public void customResultAvailable(Object source, Object result)
 			{
-				final IMicroExternalAccess exta = (IMicroExternalAccess)result;
-				exta.scheduleStep(new ICommand()
+				searchChildren(cms, ProxyComponentTreeNode.this, desc, cid, ui, iconcache).addResultListener(new SwingDefaultResultListener(ui)
 				{
-					public void execute(Object agent)
+					public void customResultAvailable(Object source, Object result)
 					{
-						ProxyAgent pa = (ProxyAgent)agent;
-						cid = pa.getRemotePlatformIdentifier();
-						
-						searchChildren(cms, ProxyComponentTreeNode.this, desc, cid, ui, iconcache).addResultListener(new SwingDefaultResultListener(ui)
-						{
-							public void customResultAvailable(Object source, Object result)
-							{
-								setChildren((List)result);
-								connected = true;
-							}
-							
-							public void customExceptionOccurred(Object source, Exception exception)
-							{
-								setChildren(Collections.EMPTY_LIST);
-								connected = false;
-							}
-						});
+						setChildren((List)result);
+						connected = true;
+					}
+					
+					public void customExceptionOccurred(Object source, Exception exception)
+					{
+						setChildren(Collections.EMPTY_LIST);
+						connected = false;
 					}
 				});
 			}
@@ -140,7 +130,7 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 				setChildren(Collections.EMPTY_LIST);
 				connected = false;
 			}
-		});
+		});				
 	}
 	
 	/**
@@ -266,5 +256,55 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 		
 		return ret;
 	}
+
+	/**
+	 *  Get the remote component identifier.
+	 *  @return The remote identifier.
+	 */
+	public IFuture getRemoteComponentIdentifier()
+	{
+		final Future ret = new Future();
+		
+		if(cid==null)
+		{
+			cms.getExternalAccess(desc.getName()).addResultListener(new IResultListener()
+			{
+				public void resultAvailable(Object source, Object result)
+				{
+					final IMicroExternalAccess exta = (IMicroExternalAccess)result;
+					exta.scheduleStep(new ICommand()
+					{
+						public void execute(Object agent)
+						{
+							ProxyAgent pa = (ProxyAgent)agent;
+							cid = pa.getRemotePlatformIdentifier();
+							ret.setResult(cid);
+						}
+					});
+				}
+				
+				public void exceptionOccurred(Object source, Exception exception)
+				{
+					ret.setException(exception);
+				}
+			});
+		}
+		else
+		{
+			ret.setResult(cid);
+		}
+		
+		return ret;
+	}
+
+	/**
+	 *  Get the connected.
+	 *  @return the connected.
+	 */
+	public boolean isConnected()
+	{
+		return connected;
+	}
+	
 	
 }

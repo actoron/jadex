@@ -15,6 +15,8 @@ import jadex.tools.common.CombiIcon;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import javax.swing.AbstractAction;
@@ -68,6 +70,9 @@ public class ComponentTreePanel extends JPanel
 	
 	/** The action for killing selected components. */
 	private final Action	kill;
+	
+	/** The action for killing selected proxy component. */
+	private final Action	proxykill;
 	
 	/** The action for suspending selected components. */
 	private final Action	suspend;
@@ -131,12 +136,12 @@ public class ComponentTreePanel extends JPanel
 								{
 									IRemoteServiceManagementService rms = (IRemoteServiceManagementService)result;
 									
-									rms.getServiceProxy(cid, IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
+									rms.getServiceProxy(cid, IComponentManagementService.class).addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
 									{
 										public void customResultAvailable(Object source, Object result)
 										{
 											final IComponentManagementService rcms = (IComponentManagementService)result;
-											rcms.destroyComponent(cid).addResultListener(new SwingDefaultResultListener()
+											rcms.destroyComponent(cid).addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
 											{
 												public void customResultAvailable(Object source, Object result)
 												{
@@ -151,6 +156,56 @@ public class ComponentTreePanel extends JPanel
 								}
 							});
 						}
+					}
+				}
+			}
+		};
+		
+		proxykill = new AbstractAction("Kill also remote component", icons.getIcon("kill_component"))
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				if(cms!=null)
+				{
+					TreePath[]	paths	= tree.getSelectionPaths();
+					for(int i=0; paths!=null && i<paths.length; i++)
+					{
+						final ProxyComponentTreeNode sel = (ProxyComponentTreeNode)paths[i].getLastPathComponent();
+						
+						sel.getRemoteComponentIdentifier().addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
+						{
+							public void customResultAvailable(Object source, Object result)
+							{
+								final IComponentIdentifier cid = (IComponentIdentifier)result;
+								
+								SServiceProvider.getService(provider, IRemoteServiceManagementService.class)
+									.addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
+								{
+									public void customResultAvailable(Object source, Object result)
+									{
+										IRemoteServiceManagementService rms = (IRemoteServiceManagementService)result;
+										
+										rms.getServiceProxy(cid, IComponentManagementService.class).addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
+										{
+											public void customResultAvailable(Object source, Object result)
+											{
+												final IComponentManagementService rcms = (IComponentManagementService)result;
+												rcms.destroyComponent(cid).addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
+												{
+													public void customResultAvailable(Object source, Object result)
+													{
+														if(sel.getParent()!=null)
+														{
+															((AbstractComponentTreeNode)sel.getParent()).removeChild(sel);
+														}
+													}
+												});
+											}
+										});
+									}
+								});
+							}
+						});
 					}
 				}
 			}
@@ -187,12 +242,12 @@ public class ComponentTreePanel extends JPanel
 								{
 									IRemoteServiceManagementService rms = (IRemoteServiceManagementService)result;
 									
-									rms.getServiceProxy(cid, IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
+									rms.getServiceProxy(cid, IComponentManagementService.class).addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
 									{
 										public void customResultAvailable(Object source, Object result)
 										{
 											final IComponentManagementService rcms = (IComponentManagementService)result;
-											rcms.suspendComponent(cid).addResultListener(new SwingDefaultResultListener()
+											rcms.suspendComponent(cid).addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
 											{
 												public void customResultAvailable(Object source, Object result)
 												{
@@ -240,12 +295,12 @@ public class ComponentTreePanel extends JPanel
 								{
 									IRemoteServiceManagementService rms = (IRemoteServiceManagementService)result;
 									
-									rms.getServiceProxy(cid, IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
+									rms.getServiceProxy(cid, IComponentManagementService.class).addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
 									{
 										public void customResultAvailable(Object source, Object result)
 										{
 											final IComponentManagementService rcms = (IComponentManagementService)result;
-											rcms.resumeComponent(cid).addResultListener(new SwingDefaultResultListener()
+											rcms.resumeComponent(cid).addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
 											{
 												public void customResultAvailable(Object source, Object result)
 												{
@@ -293,12 +348,12 @@ public class ComponentTreePanel extends JPanel
 								{
 									IRemoteServiceManagementService rms = (IRemoteServiceManagementService)result;
 									
-									rms.getServiceProxy(cid, IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
+									rms.getServiceProxy(cid, IComponentManagementService.class).addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
 									{
 										public void customResultAvailable(Object source, Object result)
 										{
 											final IComponentManagementService rcms = (IComponentManagementService)result;
-											rcms.stepComponent(cid).addResultListener(new SwingDefaultResultListener()
+											rcms.stepComponent(cid).addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
 											{
 												public void customResultAvailable(Object source, Object result)
 												{
@@ -398,12 +453,17 @@ public class ComponentTreePanel extends JPanel
 			
 			public Action[] getPopupActions(final IComponentTreeNode[] nodes)
 			{
-				Action[]	ret	= null;
+				List ret = new ArrayList();
 				
 				boolean	allcomp	= true;
 				for(int i=0; allcomp && i<nodes.length; i++)
 				{
 					allcomp	= nodes[i] instanceof IActiveComponentTreeNode;
+				}
+				boolean	allproxy = true;
+				for(int i=0; allproxy && i<nodes.length; i++)
+				{
+					allproxy = nodes[i] instanceof ProxyComponentTreeNode && ((ProxyComponentTreeNode)nodes[i]).isConnected();
 				}
 				
 				if(allcomp)
@@ -430,6 +490,21 @@ public class ComponentTreePanel extends JPanel
 							kill.actionPerformed(e);
 						}
 					};
+					ret.add(kill);
+					
+					if(allproxy)
+					{
+						Action	prkill	= new AbstractAction((String)kill.getValue(Action.NAME),
+							base!=null ? new CombiIcon(new Icon[]{base, icons.getIcon("overlay_kill")}) : (Icon)kill.getValue(Action.SMALL_ICON))
+						{
+							public void actionPerformed(ActionEvent e)
+							{
+								proxykill.actionPerformed(e);
+							}
+						};
+					}
+					ret.add(proxykill);
+					
 					if(allact)
 					{
 						Action	psuspend	= new AbstractAction((String)suspend.getValue(Action.NAME),
@@ -440,7 +515,8 @@ public class ComponentTreePanel extends JPanel
 								suspend.actionPerformed(e);
 							}
 						};
-						ret	= new Action[]{pkill, psuspend};
+						ret.add(psuspend);
+//						ret	= new Action[]{pkill, psuspend};
 					}
 					else if(allsusp)
 					{
@@ -460,15 +536,17 @@ public class ComponentTreePanel extends JPanel
 								step.actionPerformed(e);
 							}
 						};
-						ret	= new Action[]{pkill, presume, pstep};
+						ret.add(presume);
+						ret.add(pstep);
+//						ret	= new Action[]{pkill, presume, pstep};
 					}
-					else
-					{
-						ret	= new Action[]{pkill};								
-					}
+//					else
+//					{
+//						ret	= new Action[]{pkill};								
+//					}
 				}
 				
-				return ret;
+				return (Action[])ret.toArray(new Action[ret.size()]);
 			}
 			
 			public Action getDefaultAction(IComponentTreeNode node)

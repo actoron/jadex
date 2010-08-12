@@ -104,8 +104,8 @@ public class ComponentIdentifierDialog
 
 		parent = SGUI.getWindowParent(parent);
 		final JDialog	dia	= parent instanceof Frame
-			? new JDialog((Frame)parent, "Select/Enter Component Identifier", true)
-			: new JDialog((Dialog)parent, "Select/Enter Component Identifier", true);
+			? new JDialog((Frame)parent, "Enter Component Identifier", true)
+			: new JDialog((Dialog)parent, "Enter Component Identifier", true);
 
 		// Set aborted to [true], when dialog was aborted.
 		dia.addWindowListener(new WindowAdapter()
