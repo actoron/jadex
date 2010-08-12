@@ -9,7 +9,7 @@
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-bdi 
 	                    http://jadex.sourceforge.net/jadex-bdi-2.0.xsd"
 	name="Pinging"
-	package="jadex.examples.ping">
+	package="jadex.bdi.examples.ping">
 
 	<imports>
 		<import>jadex.base.fipa.*</import>

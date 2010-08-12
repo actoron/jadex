@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-	<H3> The Ping Application </H3>
+	<H3> The Ping Scenario </H3>
 	
 	Starts pinging agents and agents to be ping'd. 
 -->
@@ -8,7 +8,7 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-application
 						http://jadex.sourceforge.net/jadex-application-2.0.xsd"
-	name="Ping" package="jadex.bdi.examples.ping">
+	name="PingScenario" package="jadex.bdi.examples.ping">
 	
 	<componenttypes>
 		<componenttype name="Ping" filename="jadex/bdi/examples/ping/Ping.agent.xml"/>

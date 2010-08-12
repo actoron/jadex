@@ -532,7 +532,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 
 	/**
 	 *  Called when a component has been created as a subcomponent of this component.
-	 *  This event may be ignored, if no special reaction  to new or destroyed components is required.
+	 *  This event may be ignored, if no special reaction to new or destroyed components is required.
 	 *  The current subcomponents can be accessed by IComponentAdapter.getSubcomponents().
 	 *  @param comp	The newly created component.
 	 */
