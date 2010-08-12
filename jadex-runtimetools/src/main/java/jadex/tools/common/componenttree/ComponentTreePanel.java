@@ -502,8 +502,8 @@ public class ComponentTreePanel extends JPanel
 								proxykill.actionPerformed(e);
 							}
 						};
+						ret.add(proxykill);
 					}
-					ret.add(proxykill);
 					
 					if(allact)
 					{
