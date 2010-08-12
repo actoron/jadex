@@ -901,8 +901,8 @@ public class OAVBDIRuntimeModel
 		// todo: necessary?
 		messageevent_has_nativemessage = messageevent_type.createAttributeType("messageevent_has_nativemessage", OAVJavaType.java_object_type);
 //		messageevent_has_id = messageevent_type.createAttributeType("messageevent_has_id", OAVJavaType.java_integer_type);
-		// Hack!!! Add to processable element to simplify APL building rules.
-		messageevent_has_original = messageevent_type.createAttributeType("messageevent_has_original", messageevent_type);
+		// Hack!!! Add to processable element as required by createBuildRPlanAPLRules.
+		messageevent_has_original = processableelement_type.createAttributeType("messageevent_has_original", messageevent_type);
 		messageevent_has_sendfuture = messageevent_type.createAttributeType("messageevent_has_sendfuture", OAVJavaType.java_object_type);
 		
 		// capability reference
