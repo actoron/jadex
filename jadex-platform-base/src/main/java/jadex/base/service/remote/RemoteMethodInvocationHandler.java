@@ -54,7 +54,7 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 			throw new UnsupportedOperationException("Method is excluded from interface for remote invocations.");
 		
 		// Test if method is constant and a cache value is available.
-		if(pi.getCache()!=null)
+		if(pi.getCache()!=null && !pi.isUncached(method))
 		{
 			Class rt = method.getReturnType();
 			Class[] ar = method.getParameterTypes();

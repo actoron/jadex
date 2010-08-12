@@ -3,6 +3,7 @@ package jadex.xml.benchmark;
 import jadex.xml.bean.JavaReader;
 import jadex.xml.bean.JavaWriter;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -32,18 +33,19 @@ public class Test //extends TestCase
 			for(int i=0; i<cnt; i++)
 //			while(true)
 			{
-				t.testBean();
-				t.testArrayOrder();
-				t.testMultiArray();
-				t.testVectorModel();
-				t.testClass();
-				t.testDate();
-				t.testColor();
-				t.testArray();
-				t.testList();
-				t.testSet();
-				t.testMap();
-				t.testInnerClass();
+//				t.testBean();
+//				t.testArrayOrder();
+//				t.testMultiArray();
+//				t.testVectorModel();
+//				t.testClass();
+//				t.testDate();
+//				t.testColor();
+//				t.testArray();
+//				t.testList();
+//				t.testSet();
+//				t.testMap();
+//				t.testInnerClass();
+				t.testURL();
 			}
 			long dur = System.currentTimeMillis()-start;
 			
@@ -240,6 +242,16 @@ public class Test //extends TestCase
 		InnerClass ic = new InnerClass("some string");
 		
 		doWriteAndRead(ic);
+	}
+	
+	/**
+	 *  Test if URL transfer works.
+	 */
+	public void testURL() throws Exception
+	{
+		URL url = new URL("http", "host", 4711, "file");
+		
+		doWriteAndRead(url);
 	}
 	
 	/**

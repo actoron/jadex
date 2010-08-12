@@ -1,11 +1,14 @@
 package jadex.tools.libtool;
 
+import jadex.commons.Future;
+import jadex.commons.IFuture;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SGUI;
 import jadex.commons.SUtil;
 import jadex.commons.ThreadSuspendable;
 import jadex.commons.concurrent.DefaultResultListener;
+import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.service.SServiceProvider;
 import jadex.service.library.ILibraryService;
@@ -123,11 +126,18 @@ public class LibraryPlugin extends AbstractJCCPlugin
 		
 		final JPanel classview = new JPanel(new BorderLayout());
 		this.classpaths = new EditableList("Class Paths", true);
-		java.util.List entries = fetchManagedClasspathEntries();				
-		for(int i=0; i<entries.size(); i++)
+		fetchManagedClasspathEntries().addResultListener(new SwingDefaultResultListener(classview)
 		{
-			classpaths.addEntry((String)entries.get(i));
-		}
+			public void customResultAvailable(Object source, Object result)
+			{
+				List entries = (List)result;
+				for(int i=0; i<entries.size(); i++)
+				{
+					classpaths.addEntry((String)entries.get(i));
+				}
+			}
+		});	
+		
 		JScrollPane scroll = new JScrollPane(classpaths);
 		classpaths.setPreferredScrollableViewportSize(new Dimension(400, 200));
 		JPanel buts = new JPanel(new GridBagLayout());
@@ -135,7 +145,7 @@ public class LibraryPlugin extends AbstractJCCPlugin
 		add.putClientProperty(SGUI.AUTO_ADJUST, Boolean.TRUE);
 //		JButton fetch = new JButton("Refresh");		
 //		fetch.putClientProperty(SGUI.AUTO_ADJUST, Boolean.TRUE);
-		JButton remove = new JButton("Remove");
+		final JButton remove = new JButton("Remove");
 		remove.putClientProperty(SGUI.AUTO_ADJUST, Boolean.TRUE);
 		add.setToolTipText("Add a class path entry");
 		remove.setToolTipText("Remove one or more selected entries from the classpath");
@@ -169,7 +179,7 @@ public class LibraryPlugin extends AbstractJCCPlugin
 				{
 					final File[] files = cchooser.getSelectedFiles();
 					SServiceProvider.getService(getJCC().getServiceContainer(), ILibraryService.class)
-						.addResultListener(new SwingDefaultResultListener()
+						.addResultListener(new SwingDefaultResultListener(cchooser)
 					{
 						public void customResultAvailable(Object source, Object result)
 						{
@@ -200,7 +210,7 @@ public class LibraryPlugin extends AbstractJCCPlugin
 				final String[] entries = classpaths.getEntries();
 				
 				SServiceProvider.getService(getJCC().getServiceContainer(), ILibraryService.class)
-					.addResultListener(new SwingDefaultResultListener()
+					.addResultListener(new SwingDefaultResultListener(remove)
 				{
 					public void customResultAvailable(Object source, Object result)
 					{
@@ -246,7 +256,7 @@ public class LibraryPlugin extends AbstractJCCPlugin
 					final int end = e.getLastRow();
 
 					SServiceProvider.getService(getJCC().getServiceContainer(), ILibraryService.class)
-						.addResultListener(new SwingDefaultResultListener()
+						.addResultListener(new SwingDefaultResultListener(classpaths)
 					{
 						public void customResultAvailable(Object source, Object result)
 						{
@@ -278,38 +288,50 @@ public class LibraryPlugin extends AbstractJCCPlugin
 		final JPanel otherview = new JPanel(new BorderLayout());
 		final DefaultListModel dlm = new DefaultListModel();
 		SServiceProvider.getService(getJCC().getServiceContainer(), ILibraryService.class)
-			.addResultListener(new SwingDefaultResultListener()
+			.addResultListener(new SwingDefaultResultListener(otherview)
 		{
 			public void customResultAvailable(Object source, Object result)
 			{
-				List entries = fetchOtherClasspathEntries((ILibraryService)result);
-				for(int i=0; i<entries.size(); i++)
+				fetchOtherClasspathEntries((ILibraryService)result).addResultListener(new SwingDefaultResultListener(otherview)
 				{
-					dlm.addElement(entries.get(i));
-				}
+					public void customResultAvailable(Object source, Object result)
+					{
+						List entries = (List)result; 
+						for(int i=0; i<entries.size(); i++)
+						{
+							dlm.addElement(entries.get(i));
+						}
+					}
+				});
 			}
 		});
 		
 		final JList otherlist = new JList(dlm);
 		JPanel obuts = new JPanel(new BorderLayout());
-		JButton refresh = new JButton("Refresh");
+		final JButton refresh = new JButton("Refresh");
 		obuts.add("East", refresh);
 		refresh.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
 			{
 				SServiceProvider.getService(getJCC().getServiceContainer(), ILibraryService.class)
-					.addResultListener(new SwingDefaultResultListener()
+					.addResultListener(new SwingDefaultResultListener(refresh)
 				{
 					public void customResultAvailable(Object source, Object result)
 					{
-						List entries = fetchOtherClasspathEntries((ILibraryService)result);
-						DefaultListModel dlm = (DefaultListModel)otherlist.getModel();
-						dlm.removeAllElements();
-						for(int i=0; i<entries.size(); i++)
+						fetchOtherClasspathEntries((ILibraryService)result).addResultListener(new SwingDefaultResultListener(refresh)
 						{
-							dlm.addElement((String)entries.get(i));
-						}
+							public void customResultAvailable(Object source, Object result)
+							{
+								List entries = (List)result;
+								DefaultListModel dlm = (DefaultListModel)otherlist.getModel();
+								dlm.removeAllElements();
+								for(int i=0; i<entries.size(); i++)
+								{
+									dlm.addElement((String)entries.get(i));
+								}
+							}
+						});
 					}
 				});
 			}
@@ -388,7 +410,9 @@ public class LibraryPlugin extends AbstractJCCPlugin
 		// Hack: todo!?
 		ILibraryService ls = (ILibraryService)SServiceProvider.getService(getJCC()
 			.getServiceContainer(), ILibraryService.class).get(new ThreadSuspendable());
-		List urls = ls.getURLs();
+		
+		// todo: hack remove thread suspendable
+		List urls = (List)ls.getURLs().get(new ThreadSuspendable());
 
 		for(int i=0; i<urls.size(); i++)
 		{
@@ -427,13 +451,18 @@ public class LibraryPlugin extends AbstractJCCPlugin
 		{
 			public void resultAvailable(Object source, Object result)
 			{
-				ILibraryService ls = (ILibraryService)result;
-				URL[]	urls	= (URL[])ls.getURLs().toArray(new URL[ls.getURLs().size()]);
-
-				for(int i=0; i<urls.length; i++)
+				final ILibraryService ls = (ILibraryService)result;
+				ls.getURLs().addResultListener(new SwingDefaultResultListener(classpaths)
 				{
-					ls.removeURL(urls[i]);
-				}
+					public void customResultAvailable(Object source, Object result)
+					{
+						URL[]	urls	= (URL[])((List)result).toArray(new URL[0]);
+						for(int i=0; i<urls.length; i++)
+						{
+							ls.removeURL(urls[i]);
+						}
+					}
+				});
 			}
 		});
 	}
@@ -442,32 +471,60 @@ public class LibraryPlugin extends AbstractJCCPlugin
 	 *  Fetch the current classpath
 	 *  @return classpath entries as a list of strings.
 	 */
-	protected java.util.List fetchManagedClasspathEntries()
+	protected IFuture fetchManagedClasspathEntries()
 	{
-		List ret = new ArrayList();
-		// todo: hack!!!
-		ILibraryService ls = (ILibraryService)SServiceProvider.getService(getJCC()
-			.getServiceContainer(), ILibraryService.class).get(new ThreadSuspendable());		
-		List urls = ls.getURLs();
-		for(Iterator it=urls.iterator(); it.hasNext(); )
+		final Future ret = new Future();
+		
+		SServiceProvider.getService(getJCC().getServiceContainer(), 
+			ILibraryService.class).addResultListener(new IResultListener()
 		{
-			URL	url	= (URL)it.next();
-			ret.add(url.toString());
-			
-//			String file = url.getFile();
-//			File f = new File(file);
-//			
-//			// Hack!!! Above code doesnt handle relative url paths. 
-//			if(!f.exists())
-//			{
-//				File	newfile	= new File(new File("."), file);
-//				if(newfile.exists())
-//				{
-//					f	= newfile;
-//				}
-//			}
-//			ret.add(f.getAbsolutePath());
-		}
+			public void resultAvailable(Object source, Object result)
+			{
+				ILibraryService ls = (ILibraryService)result;
+				
+				ls.getURLs().addResultListener(new IResultListener()
+				{
+					public void resultAvailable(Object source, Object result)
+					{
+						List urls = (List)result;
+						List res = new ArrayList();
+						for(Iterator it=urls.iterator(); it.hasNext(); )
+						{
+							URL	url	= (URL)it.next();
+							res.add(url.toString());
+							
+//							String file = url.getFile();
+//							File f = new File(file);
+//							
+//							// Hack!!! Above code doesnt handle relative url paths. 
+//							if(!f.exists())
+//							{
+//								File	newfile	= new File(new File("."), file);
+//								if(newfile.exists())
+//								{
+//									f	= newfile;
+//								}
+//							}
+//							ret.add(f.getAbsolutePath());
+						}
+						
+						ret.setResult(res);
+					}
+					
+					public void exceptionOccurred(Object source, Exception exception)
+					{
+						ret.setException(exception);
+					}
+				});
+				
+			}
+				
+			public void exceptionOccurred(Object source, Exception exception)
+			{
+				ret.setException(exception);
+			}
+		});
+		
 		return ret;
 	}
 	
@@ -475,36 +532,91 @@ public class LibraryPlugin extends AbstractJCCPlugin
 	 *  Fetch the current classpath
 	 *  @return classpath entries as a list of strings.
 	 */
-	protected java.util.List fetchOtherClasspathEntries(ILibraryService ls)
+	protected IFuture fetchOtherClasspathEntries(ILibraryService ls)
 	{
-		java.util.List	ret	= new ArrayList();
-
-//		ILibraryService ls = (ILibraryService)getJCC().getServiceContainer().getService(ILibraryService.class);
-		// todo: hack
-//		ILibraryService ls = (ILibraryService)getJCC().getServiceContainer().getService(ILibraryService.class).get(new ThreadSuspendable());
-		ClassLoader	cl	= ls.getClassLoader();
+		final Future ret = new Future();
 		
-		List cps = SUtil.getClasspathURLs(cl!=null ? cl.getParent() : null);	// todo: classpath?
-		for(int i=0; i<cps.size(); i++)
+		SServiceProvider.getService(getJCC().getServiceContainer(), 
+			ILibraryService.class).addResultListener(new IResultListener()
 		{
-			URL	url	= (URL)cps.get(i);
-			ret.add(url.toString());
-			
-//			String file = url.getFile();
-//			File f = new File(file);
-//			
-//			// Hack!!! Above code doesnt handle relative url paths. 
-//			if(!f.exists())
-//			{
-//				File	newfile	= new File(new File("."), file);
-//				if(newfile.exists())
-//				{
-//					f	= newfile;
-//				}
-//			}
-//			ret.add(f.getAbsolutePath());
-		}
+			public void resultAvailable(Object source, Object result)
+			{
+				ILibraryService ls = (ILibraryService)result;
+				
+				ls.getNonManagedURLs().addResultListener(new IResultListener()
+				{
+					public void resultAvailable(Object source, Object result)
+					{
+						List urls = (List)result;
+						List res = new ArrayList();
+						for(Iterator it=urls.iterator(); it.hasNext(); )
+						{
+							URL	url	= (URL)it.next();
+							res.add(url.toString());
+							
+//							String file = url.getFile();
+//							File f = new File(file);
+//							
+//							// Hack!!! Above code doesnt handle relative url paths. 
+//							if(!f.exists())
+//							{
+//								File	newfile	= new File(new File("."), file);
+//								if(newfile.exists())
+//								{
+//									f	= newfile;
+//								}
+//							}
+//							ret.add(f.getAbsolutePath());
+						}
+						
+						ret.setResult(res);
+					}
+					
+					public void exceptionOccurred(Object source, Exception exception)
+					{
+						ret.setException(exception);
+					}
+				});
+				
+			}
+				
+			public void exceptionOccurred(Object source, Exception exception)
+			{
+				ret.setException(exception);
+			}
+		});
 		
 		return ret;
+		
+		
+//		java.util.List	ret	= new ArrayList();
+//
+////		ILibraryService ls = (ILibraryService)getJCC().getServiceContainer().getService(ILibraryService.class);
+//		// todo: hack
+////		ILibraryService ls = (ILibraryService)getJCC().getServiceContainer().getService(ILibraryService.class).get(new ThreadSuspendable());
+//		ClassLoader	cl	= ls.getClassLoader();
+//		
+//		List cps = SUtil.getClasspathURLs(cl!=null ? cl.getParent() : null);	// todo: classpath?
+//		for(int i=0; i<cps.size(); i++)
+//		{
+//			URL	url	= (URL)cps.get(i);
+//			ret.add(url.toString());
+//			
+////			String file = url.getFile();
+////			File f = new File(file);
+////			
+////			// Hack!!! Above code doesnt handle relative url paths. 
+////			if(!f.exists())
+////			{
+////				File	newfile	= new File(new File("."), file);
+////				if(newfile.exists())
+////				{
+////					f	= newfile;
+////				}
+////			}
+////			ret.add(f.getAbsolutePath());
+//		}
+//		
+//		return new Future(ret);
 	}
 }

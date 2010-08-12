@@ -77,8 +77,11 @@
 		</service>
 		<service class="ILibraryService">
 			new LibraryService($args.libpath, $component.getComponentIdentifier(), 
-				SUtil.createHashMap(new Object[]{"serviceviewer.viewerclass", RemoteServiceManagementService.REMOTE_UNCACHED}, 
-				new Object[]{"jadex.tools.serviceviewer.libservice.LibServiceBrowser", new String[]{"getClassLoader", "getURLs"}}))
+				SUtil.createHashMap(new Object[]{"serviceviewer.viewerclass", 
+				RemoteServiceManagementService.REMOTE_UNCACHED, RemoteServiceManagementService.REMOTE_EXCLUDED}, 
+				new Object[]{"jadex.tools.serviceviewer.libservice.LibServiceBrowser", 
+				new String[]{"getClassLoader", "getURLs"}, new String[]{"addLibraryServiceListener", "removeLibraryServiceListener"}})
+				)
 		</service>
 		<service class="IComponentManagementService">
 			new ComponentManagementService($platform, $args.autoshutdown, $component.getComponentAdapter())

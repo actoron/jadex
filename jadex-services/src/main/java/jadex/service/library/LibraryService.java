@@ -1,6 +1,8 @@
 package jadex.service.library;
 
+import jadex.commons.Future;
 import jadex.commons.IFuture;
+import jadex.commons.SUtil;
 import jadex.service.BasicService;
 
 import java.io.File;
@@ -145,13 +147,22 @@ public class LibraryService extends BasicService implements ILibraryService
 	 *  Get all managed entries as URLs.
 	 *  @return url The urls.
 	 */
-	public synchronized List getURLs()
+	public synchronized IFuture getURLs()
 	{
 		List ret = new ArrayList();
 		ret.addAll(urls);
-		return ret;
+		return new Future(ret);
 	}
 
+	/**
+	 *  Get other contained (but not directly managed) URLs.
+	 *  @return The list of urls.
+	 */
+	public synchronized IFuture getNonManagedURLs()
+	{
+		return new Future(SUtil.getClasspathURLs(libcl));	
+	}
+	
 	/** 
 	 *  Returns the current ClassLoader
 	 *  @return the current ClassLoader

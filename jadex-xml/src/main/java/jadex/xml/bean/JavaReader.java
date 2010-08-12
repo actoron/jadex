@@ -17,6 +17,7 @@ import jadex.xml.XMLInfo;
 import jadex.xml.reader.Reader;
 
 import java.awt.Color;
+import java.net.URL;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -250,6 +251,25 @@ public class JavaReader extends Reader
 				new MappingInfo(null, new AttributeInfo[]{new AttributeInfo(new AccessInfo("content", null, AccessInfo.IGNORE_READWRITE))}
 			));
 			typeinfos.add(ti_character);
+			
+			// java.net.URL
+			TypeInfo ti_url = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.net", "URL")}),
+				new ObjectInfo(new IBeanObjectCreator()
+				{
+					public Object createObject(IContext context, Map rawattributes) throws Exception
+					{
+						return new URL((String)rawattributes.get("protocol"), (String)rawattributes.get("host"), 
+							new Integer((String)rawattributes.get("port")).intValue(), (String)rawattributes.get("file"));
+					}
+				}),
+				new MappingInfo(null, new AttributeInfo[]{
+					new AttributeInfo(new AccessInfo("protocol", null, AccessInfo.IGNORE_READWRITE)),
+					new AttributeInfo(new AccessInfo("host", null, AccessInfo.IGNORE_READWRITE)),
+					new AttributeInfo(new AccessInfo("port", null, AccessInfo.IGNORE_READWRITE)),
+					new AttributeInfo(new AccessInfo("file", null, AccessInfo.IGNORE_READWRITE)),
+				}
+			));
+			typeinfos.add(ti_url);
 		}
 		catch(Exception e)
 		{

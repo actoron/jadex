@@ -1,9 +1,9 @@
 package jadex.service.library;
 
+import jadex.commons.IFuture;
 import jadex.service.IService;
 
 import java.net.URL;
-import java.util.List;
 
 /** 
  *  Interface for the Library Service. It provides a platform service
@@ -40,9 +40,15 @@ public interface ILibraryService extends IService
 	
 	/**
 	 *  Get all managed entries as URLs.
-	 *  @return url The urls.
+	 *  @return The list of urls.
 	 */
-	public List getURLs();
+	public IFuture getURLs();
+	
+	/**
+	 *  Get other contained (but not directly managed) URLs.
+	 *  @return The list of urls.
+	 */
+	public IFuture getNonManagedURLs();
 	
 	/** 
 	 *  Returns the current ClassLoader.

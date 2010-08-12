@@ -13,6 +13,7 @@ import jadex.xml.XMLInfo;
 import jadex.xml.writer.Writer;
 
 import java.awt.Color;
+import java.net.URL;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -118,7 +119,6 @@ public class JavaWriter extends Writer
 			
 			// java.util.Date
 			// Ignores several redundant bean attributes for performance reasons.
-			
 			TypeInfo ti_date = new TypeInfo(null, new ObjectInfo(Date.class), 
 				new MappingInfo(null, new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo("hours", null, AccessInfo.IGNORE_READWRITE)),
@@ -189,6 +189,17 @@ public class JavaWriter extends Writer
 			TypeInfo ti_character = new TypeInfo(null, new ObjectInfo(Character.class), new MappingInfo(null, new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo("content", AccessInfo.THIS))}));
 			typeinfos.add(ti_character);
+			
+			// java.net.URL
+			TypeInfo ti_url = new TypeInfo(null, new ObjectInfo(URL.class), 
+				new MappingInfo(null, new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("protocol", null)),
+				new AttributeInfo(new AccessInfo("host", null)),
+				new AttributeInfo(new AccessInfo("port", null)),
+				new AttributeInfo(new AccessInfo("file", null))},
+				null
+			));
+			typeinfos.add(ti_url);
 		}
 		catch(Exception e)
 		{
