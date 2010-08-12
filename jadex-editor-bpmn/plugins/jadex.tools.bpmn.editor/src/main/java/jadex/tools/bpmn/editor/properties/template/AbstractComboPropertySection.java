@@ -3,6 +3,9 @@
  */
 package jadex.tools.bpmn.editor.properties.template;
 
+import jadex.tools.bpmn.editor.JadexBpmnEditor;
+
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.emf.ecore.EAnnotation;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.SWT;
@@ -93,7 +96,7 @@ public abstract class AbstractComboPropertySection extends AbstractBpmnPropertyS
 	{
 		super.createControls(parent, aTabbedPropertySheetPage);
 		
-		createTaskClassComposite(sectionComposite);
+		createComboComposite(sectionComposite);
 
 	}
 
@@ -166,7 +169,7 @@ public abstract class AbstractComboPropertySection extends AbstractBpmnPropertyS
 	 *  
 	 * @param parent
 	 */
-	protected Composite createTaskClassComposite(Composite parent)
+	protected Composite createComboComposite(Composite parent)
 	{
 		
 		// The layout of the section composite
@@ -189,8 +192,14 @@ public abstract class AbstractComboPropertySection extends AbstractBpmnPropertyS
 		addDisposable(combo);
 		combo.setLayoutData(comboGridData);
 		
-		//String[] items = this.cComboItems;
 		String[] items = getComboItems();
+		// avoid exception with bad implementations
+		if (items == null || items.length == 0)
+		{
+			items = new String[]{"No items provided"};
+			JadexBpmnEditor.log("No items for class combo property", null, IStatus.WARNING);
+		}
+		
 		
 		combo.setItems(items);
 		combo.setText(combo.getItem(0));

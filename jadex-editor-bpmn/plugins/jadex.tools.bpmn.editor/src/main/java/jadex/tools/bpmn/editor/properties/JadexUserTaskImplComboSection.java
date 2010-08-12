@@ -6,10 +6,10 @@ package jadex.tools.bpmn.editor.properties;
 import jadex.tools.bpmn.editor.properties.template.AbstractComboPropertySection;
 import jadex.tools.bpmn.editor.properties.template.AbstractParameterTablePropertySection;
 import jadex.tools.bpmn.editor.properties.template.JadexBpmnPropertiesUtil;
-import jadex.tools.bpmn.runtime.task.IParameterMetaInfo;
 import jadex.tools.bpmn.runtime.task.IJadexTaskProvider;
+import jadex.tools.bpmn.runtime.task.IParameterMetaInfo;
 import jadex.tools.bpmn.runtime.task.ITaskMetaInfo;
-import jadex.tools.bpmn.runtime.task.StaticJadexTaskProvider;
+import jadex.tools.bpmn.runtime.task.PreferenceTaskProviderProxy;
 import jadex.tools.model.common.properties.table.MultiColumnTable;
 import jadex.tools.model.common.properties.table.MultiColumnTable.MultiColumnTableRow;
 
@@ -65,8 +65,7 @@ public class JadexUserTaskImplComboSection extends
 	public JadexUserTaskImplComboSection()
 	{
 		super(JadexBpmnPropertiesUtil.JADEX_GLOBAL_ANNOTATION, JadexBpmnPropertiesUtil.JADEX_ACTIVITY_CLASS_DETAIL);
-		this.taskProvider = new StaticJadexTaskProvider();
-		//this.taskProvider = new DynamicWorkspaceTaskProviderProxy();
+		this.taskProvider = new PreferenceTaskProviderProxy();
 	}
 
 	// ---- override methods ----
