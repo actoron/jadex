@@ -5,6 +5,7 @@ package jadex.tools.bpmn.runtime.task;
 
 import jadex.tools.bpmn.editor.JadexBpmnEditor;
 import jadex.tools.bpmn.editor.JadexBpmnPlugin;
+import jadex.tools.bpmn.editor.preferences.JadexPreferences;
 import jadex.tools.bpmn.editor.preferences.JadexTaskProviderTypeListEditor;
 
 import java.io.InvalidObjectException;
@@ -61,7 +62,7 @@ public class PreferenceTaskProviderProxy implements IJadexTaskProvider
 	public String[] getAvailableTaskImplementations()
 	{
 
-		List<String> preferenceList = JadexTaskProviderTypeListEditor.parseStringList(JadexBpmnPlugin.getDefault().getPreferenceStore().getString(JadexBpmnEditor.PREFERENCE_TASK_PROVIDER_LIST));
+		List<String> preferenceList = JadexTaskProviderTypeListEditor.parseStringList(JadexBpmnPlugin.getDefault().getPreferenceStore().getString(JadexPreferences.PREFERENCE_TASK_PROVIDER_LIST));
 		if (!iTaskProviderCache.equals(preferenceList))
 		{
 			loadTaskMetaInfos(preferenceList);

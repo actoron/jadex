@@ -9,25 +9,42 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 /**
  * This is only a category page, maybe we add some preferences later.
+ * 
  * @author Claas
- *
+ * 
  */
 public class JadexPreferences extends FieldEditorPreferencePage implements
-		IWorkbenchPreferencePage {
+		IWorkbenchPreferencePage
+{
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.IWorkbenchPreferencePage#init(org.eclipse.ui.IWorkbench)
+	// ---- preference keys ----
+
+	public static final String PREFERENCE_TASK_PROVIDER_LIST = "Task Provider";
+
+	// ---- interface implementation ----
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.IWorkbenchPreferencePage#init(org.eclipse.ui.IWorkbench)
 	 */
 	@Override
-	public void init(IWorkbench workbench) {
+	public void init(IWorkbench workbench)
+	{
 		// no preference store to initialize
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.preference.FieldEditorPreferencePage#createFieldEditors()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.jface.preference.FieldEditorPreferencePage#createFieldEditors
+	 * ()
 	 */
 	@Override
-	protected void createFieldEditors() {
+	protected void createFieldEditors()
+	{
 		// currently nothing to to
 	}
 

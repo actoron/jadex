@@ -3,12 +3,10 @@
  */
 package jadex.tools.bpmn.editor.preferences;
 
-import jadex.tools.bpmn.editor.JadexBpmnEditor;
 import jadex.tools.bpmn.editor.JadexBpmnPlugin;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
-import org.eclipse.core.runtime.preferences.DefaultScope;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.jface.preference.IPreferenceStore;
 
 /**
  * @author claas
@@ -27,11 +25,11 @@ public class JadexBpmnPluginPreferenceInitializer extends
 	@Override
 	public void initializeDefaultPreferences()
 	{
-		IEclipsePreferences prefs = new DefaultScope()
-				.getNode(JadexBpmnPlugin.PLUGIN_PREFERENCE_SCOPE);
+		IPreferenceStore store = JadexBpmnPlugin.getDefault()
+				.getPreferenceStore();
 
-		prefs.put(
-				JadexBpmnEditor.PREFERENCE_TASK_PROVIDER_LIST,
+		store.setDefault(
+				JadexPreferences.PREFERENCE_TASK_PROVIDER_LIST,
 				JadexTaskProviderTypeListEditor
 						.createStringList(new String[] {
 								"jadex.tools.bpmn.runtime.task.StaticJadexTaskProvider",

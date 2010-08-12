@@ -3,7 +3,6 @@
  */
 package jadex.tools.bpmn.editor.preferences;
 
-import jadex.tools.bpmn.editor.JadexBpmnEditor;
 import jadex.tools.bpmn.editor.JadexBpmnPlugin;
 
 
@@ -51,7 +50,7 @@ public class JadexBpmnPluginPreferencePage extends FieldEditorPreferencePage
 	@Override
 	protected void createFieldEditors()
 	{
-		addField(new JadexTaskProviderTypeListEditor(JadexBpmnEditor.PREFERENCE_TASK_PROVIDER_LIST,
+		addField(new JadexTaskProviderTypeListEditor(JadexPreferences.PREFERENCE_TASK_PROVIDER_LIST,
 				"BPMN-Task Provider", getFieldEditorParent()));
 
 	}
