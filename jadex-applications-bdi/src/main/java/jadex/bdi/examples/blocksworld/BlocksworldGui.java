@@ -335,6 +335,7 @@ public class BlocksworldGui	extends JFrame
 						bucket.setCellRenderer(new BlockCellRenderer());
 						JScrollPane	bsp	= new JScrollPane(bucket);
 						bsp.setBorder(new BevelBorder(BevelBorder.LOWERED));
+						bsp.setPreferredSize(new Dimension(100,0));
 						// Create-block components
 						bwoptions.add(create, new GridBagConstraints(0, 0, 1, 1, 0, 0,
 							GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(5,5,2,2), 0, 0));

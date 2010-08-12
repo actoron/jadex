@@ -443,10 +443,10 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	public boolean	execute()
 	{
 		wokenup	= false;
-		if(cid.getName().indexOf("Sokrates")!=-1)
-		{
-			System.err.println("Execute: "+cid.getName());
-		}
+//		if(cid.getName().indexOf("Sokrates")!=-1)
+//		{
+//			System.err.println("Execute: "+cid.getName());
+//		}
 //		if(cid.getName().indexOf("platform")!=-1)
 //			System.out.println("platform start");
 //		if(cid.getName().indexOf("kernel_micro")!=-1)
@@ -480,10 +480,10 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 		{
 			if(!(ext_entries.isEmpty()))
 			{
-				if(cid.getName().indexOf("Sokrates")!=-1)
-				{
-					System.err.println("extentries: "+ext_entries);
-				}
+//				if(cid.getName().indexOf("Sokrates")!=-1)
+//				{
+//					System.err.println(cid.getName()+" extentries: "+ext_entries);
+//				}
 				entries	= (Runnable[])ext_entries.toArray(new Runnable[ext_entries.size()]);
 				ext_entries.clear();
 				

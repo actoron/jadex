@@ -512,33 +512,31 @@ public class ComponentManagementService extends BasicService implements ICompone
 					public void resultAvailable(Object source, Object result)
 					{
 						StandaloneComponentAdapter component = (StandaloneComponentAdapter)adapters.get(cid);
-						if(component==null)
+						// Component may be already killed (e.g. when autoshutdown).
+						if(component!=null)
 						{
-							ret.setException(new RuntimeException("Component "+cid+" does not exist."));
-							return;
-						}
-						
-//						System.out.println("killing: "+cid+" "+component.getParent().getComponentIdentifier().getLocalName());
-						
-						// todo: does not work always!!! A search could be issued before components had enough time to kill itself!
-						// todo: killcomponent should only be called once for each component?
-						if(!ccs.containsKey(cid))
-						{
-//								System.out.println("killing a: "+cid);
+	//						System.out.println("killing: "+cid+" "+component.getParent().getComponentIdentifier().getLocalName());
 							
-							CleanupCommand	cc	= new CleanupCommand(cid);
-							ccs.put(cid, cc);
-							cc.addKillFuture(ret);
-							component.killComponent(cc);	
-						}
-						else
-						{
-//								System.out.println("killing b: "+cid);
-							
-							CleanupCommand	cc	= (CleanupCommand)ccs.get(cid);
-							if(cc==null)
-								ret.setException(new RuntimeException("No cleanup command for component "+cid+": "+desc.getState()));
-							cc.addKillFuture(ret);
+							// todo: does not work always!!! A search could be issued before components had enough time to kill itself!
+							// todo: killcomponent should only be called once for each component?
+							if(!ccs.containsKey(cid))
+							{
+	//								System.out.println("killing a: "+cid);
+								
+								CleanupCommand	cc	= new CleanupCommand(cid);
+								ccs.put(cid, cc);
+								cc.addKillFuture(ret);
+								component.killComponent(cc);	
+							}
+							else
+							{
+	//								System.out.println("killing b: "+cid);
+								
+								CleanupCommand	cc	= (CleanupCommand)ccs.get(cid);
+								if(cc==null)
+									ret.setException(new RuntimeException("No cleanup command for component "+cid+": "+desc.getState()));
+								cc.addKillFuture(ret);
+							}
 						}
 					}
 					

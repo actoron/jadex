@@ -159,6 +159,7 @@ public abstract class OAVAbstractState	implements IOAVState
 	 */
 	public void dispose()
 	{
+		// Drop root objects for clean disposal.
 		Object[]	roots	= rootobjects.toArray();
 		for(int i=0; i<roots.length; i++)
 		{
@@ -168,7 +169,14 @@ public abstract class OAVAbstractState	implements IOAVState
 				removeJavaRootObject(roots[i]);
 		}
 		
-		assert nocheck || beanlistenercnt == 0: beanlistenercnt;
+		// Drop remaining stale objects (e.g. created from external code but never added to state). hack???
+		// Drop objects one at a time, as dropping might remove other unreferenced objects as well.
+		while(!internalGetObjects().isEmpty())
+		{
+			dropObject(internalGetObjects().iterator().next());
+		}
+		
+		assert nocheck || beanlistenercnt == 0: getTypeModel().getName()+", "+beanlistenercnt;
 	}
 	
 	//-------- type management --------
@@ -2131,17 +2139,19 @@ public abstract class OAVAbstractState	implements IOAVState
 			// Invoke addPropertyChangeListener on value
 			try
 			{
+				assert nocheck || ++beanlistenercnt==beanlistenercnt;
+//				if(getTypeModel().getName().equals("BlackjackDealer_typemodel") && value.toString().indexOf("GameState")!=-1)
+//					Thread.dumpStack();
+//				System.out.println(getTypeModel().getName()+": Registered on: "+value);
+
 				// Do not use Class.getMethod (slow).
 				Method	meth	= SReflect.getMethod(value.getClass(),
 					"addPropertyChangeListener", PCL);
 				if(meth!=null)
-					meth.invoke(value, new Object[]{pcl});
-				
-				assert nocheck || ++beanlistenercnt==beanlistenercnt;
-//				System.out.println("Registered on: "+value);
+					meth.invoke(value, new Object[]{pcl});				
 			}
-			catch(IllegalAccessException e){}
-			catch(InvocationTargetException e){}
+			catch(IllegalAccessException e){e.printStackTrace();}
+			catch(InvocationTargetException e){e.printStackTrace();}
 		}
 		// #endif
 	}
@@ -2166,26 +2176,26 @@ public abstract class OAVAbstractState	implements IOAVState
 //			}
 //			System.out.println("deregister ("+cnt[0]+"): "+value);
 			// Stop listening for bean events.
-			try
+			if(pcls!=null)
 			{
-				if(pcls!=null)
+				PropertyChangeListener pcl = (PropertyChangeListener)pcls.remove(value);
+				if(pcl!=null)
 				{
-					PropertyChangeListener pcl = (PropertyChangeListener)pcls.remove(value);
-					if(pcl!=null)
+					try
 					{
-//						System.out.println("Deregister; "+type+" "+value);
+//						System.out.println(getTypeModel().getName()+": Deregister: "+value+", "+type);						
+						assert nocheck || --beanlistenercnt==beanlistenercnt;
+						
 						// Do not use Class.getMethod (slow).
 						Method	meth	= SReflect.getMethod(value.getClass(),
 							"removePropertyChangeListener", PCL);
 						if(meth!=null)
 							meth.invoke(value, new Object[]{pcl});
-						
-						assert nocheck || --beanlistenercnt==beanlistenercnt;
 					}
+					catch(IllegalAccessException e){e.printStackTrace();}
+					catch(InvocationTargetException e){e.printStackTrace();}
 				}
 			}
-			catch(IllegalAccessException e){}
-			catch(InvocationTargetException e){}
 		}
 		// #endif
 	}

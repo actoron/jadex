@@ -418,9 +418,7 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 
 			rulesystem.getAgenda().fireRule();
 
-			// Necessary because in step mode state changes may happen and 
-			// event listeners need to be notified!
-			/*Activation*/	act	= rulesystem.getAgenda().getLastActivation();
+			act	= rulesystem.getAgenda().getLastActivation();
 //			System.err.println("here: "+act);
 			state.getProfiler().start(IProfiler.TYPE_RULE, act!=null?act.getRule():null);
 			state.expungeStaleObjects();
