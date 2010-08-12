@@ -2,9 +2,11 @@ package jadex.tools.common.componenttree;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.help.UnsupportedOperationException;
 import javax.swing.event.TreeModelEvent;
@@ -31,6 +33,9 @@ public class ComponentTreeModel implements TreeModel
 	/** The node lookup table. */
 	private final Map	nodes;
 	
+	/** The zombie node ids. */
+	private final Set	zombies;
+	
 	/** The icon overlays. */
 	private final List	overlays;
 	
@@ -44,6 +49,7 @@ public class ComponentTreeModel implements TreeModel
 		this.listeners	= new ArrayList();
 		this.nodelisteners	= new ArrayList();
 		this.nodes	= new HashMap();
+		this.zombies	= new HashSet();
 		this.overlays	= new ArrayList();
 	}
 	
@@ -249,12 +255,19 @@ public class ComponentTreeModel implements TreeModel
 	 */
 	public void	deregisterNode(IComponentTreeNode node)
 	{
-		nodes.remove(node.getId());
-		
-		INodeListener[]	lis	= (INodeListener[])nodelisteners.toArray(new INodeListener[nodelisteners.size()]);
-		for(int i=0; i<lis.length; i++)
+		if(zombies.contains(node.getId()))
 		{
-			lis[i].nodeRemoved(node);
+			assert !nodes.containsKey(node.getId()) : node.getId();
+			zombies.remove(node.getId());
+		}
+		else
+		{
+			nodes.remove(node.getId());		
+			INodeListener[]	lis	= (INodeListener[])nodelisteners.toArray(new INodeListener[nodelisteners.size()]);
+			for(int i=0; i<lis.length; i++)
+			{
+				lis[i].nodeRemoved(node);
+			}
 		}
 	}
 	
@@ -288,5 +301,22 @@ public class ComponentTreeModel implements TreeModel
 	public void	removeNodeListener(INodeListener listener)
 	{
 		nodelisteners.remove(listener);
+	}
+	
+	/**
+	 *  Called, when a node should be removed that isn't there (yet).
+	 */
+	public void addZombieNode(Object id)
+	{
+		assert !nodes.containsKey(id) : id;
+		zombies.add(id);
+	}
+	
+	/**
+	 *  Check, if a node is a zombie.
+	 */
+	public boolean	isZombieNode(Object id)
+	{
+		return zombies.contains(id);
 	}
 }

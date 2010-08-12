@@ -29,7 +29,6 @@ import jadex.bridge.IMessageAdapter;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.SReflect;
-import jadex.commons.concurrent.CollectionResultListener;
 import jadex.commons.concurrent.CounterResultListener;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.DelegationResultListener;
@@ -1116,43 +1115,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 	public IExternalAccess getParent()
 	{
 		return parent;
-	}
-	
-	/**
-	 *  Get the children (if any).
-	 *  @return The children.
-	 */
-	public IFuture getChildren()
-	{
-		final Future ret = new Future();
-		
-		SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class).addResultListener(new DefaultResultListener()
-		{
-			public void resultAvailable(Object source, Object result)
-			{
-				final IComponentManagementService cms = (IComponentManagementService)result;
-				cms.getChildren(getComponentIdentifier()).addResultListener(new IResultListener()
-				{
-					public void resultAvailable(Object source, Object result)
-					{
-						IComponentIdentifier[] childs = (IComponentIdentifier[])result;
-						IResultListener	crl	= new CollectionResultListener(childs.length, new DelegationResultListener(ret));
-						for(int i=0; !ret.isDone() && i<childs.length; i++)
-						{
-							cms.getExternalAccess(childs[i]).addResultListener(crl);
-						}
-					}
-					
-					public void exceptionOccurred(Object source, Exception exception)
-					{
-						ret.setException(exception);
-					}
-				});
-			}
-		});
-		
-		return ret;
-	}
+	}	
 	
 	/**
 	 *  Create a result listener which is executed as an agent step.

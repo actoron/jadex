@@ -344,7 +344,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 					public void resultAvailable(Object source, Object result)
 					{
 						IComponentIdentifier[] childs = (IComponentIdentifier[])result;
-						IResultListener	crl	= new CollectionResultListener(childs.length, new DelegationResultListener(ret));
+						IResultListener	crl	= new CollectionResultListener(childs.length, true, new DelegationResultListener(ret));
 						for(int i=0; !ret.isDone() && i<childs.length; i++)
 						{
 							cms.getExternalAccess(childs[i]).addResultListener(crl);

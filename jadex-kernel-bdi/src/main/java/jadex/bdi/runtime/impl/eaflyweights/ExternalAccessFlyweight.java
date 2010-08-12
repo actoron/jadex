@@ -1133,7 +1133,7 @@ public class ExternalAccessFlyweight extends EACapabilityFlyweight implements IB
 	 */
 	public IFuture getChildren()
 	{
-		return getInterpreter().getChildren();
+		return getInterpreter().getAgentAdapter().getChildren();
 	}
 	
 	/**

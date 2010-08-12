@@ -607,6 +607,10 @@ public class ComponentTreePanel extends JPanel
 								{
 									((AbstractComponentTreeNode)node.getParent()).removeChild(node);
 								}
+								else
+								{
+									model.addZombieNode(desc.getName());
+								}
 							}
 						});
 					}
@@ -643,6 +647,11 @@ public class ComponentTreePanel extends JPanel
 											IComponentTreeNode	node = (IComponentTreeNode)result;
 											parentnode.addChild(node);
 										}
+										
+										public void customExceptionOccurred(Object source, Exception exception)
+										{
+											// May happen, when component removed in mean time.
+										}										
 									});
 								}
 							}

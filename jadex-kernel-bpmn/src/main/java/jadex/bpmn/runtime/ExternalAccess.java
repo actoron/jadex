@@ -72,7 +72,7 @@ public class ExternalAccess implements IExternalAccess
 	 */
 	public IFuture getChildren()
 	{
-		return interpreter.getChildren();
+		return adapter.getChildren();
 	}
 
 	/**

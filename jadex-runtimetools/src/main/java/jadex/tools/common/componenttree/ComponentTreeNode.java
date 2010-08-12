@@ -131,6 +131,11 @@ public class ComponentTreeNode	extends AbstractComponentTreeNode implements IAct
 												}
 											}
 										}
+										
+										public void customExceptionOccurred(Object source, Exception exception)
+										{
+											// May happen, when component removed in mean time.
+										}
 									});
 								}
 								else

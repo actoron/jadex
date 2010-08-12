@@ -108,7 +108,7 @@ public class ExternalAccess implements IApplicationExternalAccess
 	 */
 	public IFuture getChildren()
 	{
-		return application.getChildren();
+		return adapter.getChildren();
 	}
 	
 	/**

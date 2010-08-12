@@ -68,7 +68,7 @@ public class ProxyAgent extends MicroAgent
 								
 								IComponentIdentifier[] tmp = (IComponentIdentifier[])result;
 								
-								CollectionResultListener crl = new CollectionResultListener(tmp.length, new DelegationResultListener(ret));
+								CollectionResultListener crl = new CollectionResultListener(tmp.length, false, new DelegationResultListener(ret));
 								for(int i=0; i<tmp.length; i++)
 								{
 									rcms.getComponentDescription(tmp[i]).addResultListener(crl);

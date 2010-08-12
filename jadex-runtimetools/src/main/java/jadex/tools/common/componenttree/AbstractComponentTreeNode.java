@@ -234,11 +234,19 @@ public abstract class AbstractComponentTreeNode	implements IComponentTreeNode
 	 */
 	public void addChild(int index, IComponentTreeNode node)
 	{
-		if(children==null)
-			children = new ArrayList();
-		children.add(index, node);
-		model.registerNode(node);
-		model.fireNodeAdded(this, node, index);
+		// Ignore when node already removed.
+		if(!model.isZombieNode(node.getId()))
+		{
+			if(children==null)
+				children = new ArrayList();
+			children.add(index, node);
+			model.registerNode(node);
+			model.fireNodeAdded(this, node, index);
+		}
+		else
+		{
+			model.deregisterNode(node);
+		}
 	}
 	
 	/**

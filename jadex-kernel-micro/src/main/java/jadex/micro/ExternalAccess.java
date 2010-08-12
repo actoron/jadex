@@ -127,7 +127,7 @@ public class ExternalAccess implements IMicroExternalAccess
 	 */
 	public IFuture getChildren()
 	{
-		return interpreter.getChildren();
+		return adapter.getChildren();
 	}
 
 	/**

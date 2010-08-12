@@ -20,7 +20,6 @@ import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentAdapterFactory;
 import jadex.bridge.IComponentDescription;
-import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
@@ -31,7 +30,6 @@ import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.collection.LRU;
 import jadex.commons.collection.SCollection;
-import jadex.commons.concurrent.CollectionResultListener;
 import jadex.commons.concurrent.CounterResultListener;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.DelegationResultListener;
@@ -1278,42 +1276,6 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 	public IExternalAccess getParent()
 	{
 		return parent;
-	}
-	
-	/**
-	 *  Get the children (if any).
-	 *  @return The children.
-	 */
-	public IFuture getChildren()
-	{
-		final Future ret = new Future();
-		
-		SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class).addResultListener(new ComponentResultListener(new DefaultResultListener()
-		{
-			public void resultAvailable(Object source, Object result)
-			{
-				final IComponentManagementService cms = (IComponentManagementService)result;
-				cms.getChildren(getAgentAdapter().getComponentIdentifier()).addResultListener(new IResultListener()
-				{
-					public void resultAvailable(Object source, Object result)
-					{
-						IComponentIdentifier[] childs = (IComponentIdentifier[])result;
-						IResultListener	crl	= new CollectionResultListener(childs.length, new DelegationResultListener(ret));
-						for(int i=0; !ret.isDone() && i<childs.length; i++)
-						{
-							cms.getExternalAccess(childs[i]).addResultListener(crl);
-						}
-					}
-					
-					public void exceptionOccurred(Object source, Exception exception)
-					{
-						ret.setException(exception);
-					}
-				});
-			}
-		}, adapter));
-		
-		return ret;
 	}
 	
 	/**
