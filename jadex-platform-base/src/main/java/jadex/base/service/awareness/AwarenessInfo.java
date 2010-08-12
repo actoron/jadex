@@ -42,4 +42,14 @@ public class AwarenessInfo
 	{
 		this.sender = sender;
 	}
+
+	/**
+	 *  Get the string representation.
+	 */
+	public String toString()
+	{
+		return "AwarenessInfo(sender=" + sender + ")";
+	}
+	
+	
 }
