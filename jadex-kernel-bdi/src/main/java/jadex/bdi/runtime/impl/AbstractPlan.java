@@ -43,7 +43,6 @@ import jadex.bdi.runtime.interpreter.MessageEventRules;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.Future;
-import jadex.commons.IFuture;
 import jadex.commons.SReflect;
 import jadex.commons.collection.SCollection;
 import jadex.javaparser.IExpressionParser;

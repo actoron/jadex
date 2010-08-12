@@ -3,6 +3,7 @@ package jadex.application.space.envsupport.environment;
 import jadex.application.space.envsupport.dataview.IDataView;
 import jadex.application.space.envsupport.environment.ComponentActionList.ActionEntry;
 import jadex.application.space.envsupport.evaluation.ITableDataConsumer;
+import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.ICommand;
 import jadex.commons.SimplePropertyObject;
@@ -203,7 +204,13 @@ public class RoundBasedExecutor extends SimplePropertyObject implements ISpaceEx
 								if(!terminated)
 								{
 									RoundBasedExecutor.this.currenttime = currenttime;
-									space.getContext().scheduleStep(step);
+									try
+									{
+										space.getContext().scheduleStep(step);
+									}
+									catch(ComponentTerminatedException cte)
+									{
+									}
 								}
 							}
 						});

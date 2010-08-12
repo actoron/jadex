@@ -171,6 +171,11 @@ public abstract class AbstractComponentTreeNode	implements IComponentTreeNode
 					added.removeAll(oldcs);
 				}
 				
+//				System.out.println("added: "+added);
+//				System.out.println("removed: "+removed);
+//				System.out.println("children: "+children);
+//				System.out.println("oldcs: "+oldcs);
+				
 				if(!added.isEmpty() && !removed.isEmpty())
 				{
 					for(int i=0; oldcs!=null && i<oldcs.size(); i++)
@@ -195,7 +200,7 @@ public abstract class AbstractComponentTreeNode	implements IComponentTreeNode
 				}
 				else if(!removed.isEmpty())
 				{
-					for(int i=0; i<removed.size(); i++)
+					for(int i=removed.size()-1; i>=0; i--)
 					{
 						IComponentTreeNode	node	= (IComponentTreeNode)removed.get(i);
 						model.deregisterNode(node);

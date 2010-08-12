@@ -6,7 +6,6 @@ import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
-import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.service.IService;
 import jadex.service.SServiceProvider;
@@ -53,7 +52,7 @@ public class ComponentTreeNode	extends AbstractComponentTreeNode implements IAct
 	}
 	
 	//-------- AbstractComponentTreeNode methods --------
-
+	
 	/**
 	 *  Get the id used for lookup.
 	 */
@@ -98,10 +97,9 @@ public class ComponentTreeNode	extends AbstractComponentTreeNode implements IAct
 		final List	children	= new ArrayList();
 		final boolean	ready[]	= new boolean[2];
 
-		// Todo: futurize getChildren call.
-		cms.getChildren(desc.getName()).addResultListener(new IResultListener()
+		cms.getChildren(desc.getName()).addResultListener(new SwingDefaultResultListener(ui)
 		{
-			public void resultAvailable(Object source, Object result)
+			public void customResultAvailable(Object source, Object result)
 			{
 				final IComponentIdentifier[] achildren = (IComponentIdentifier[])result;
 				if(achildren!=null && achildren.length > 0)
@@ -117,9 +115,9 @@ public class ComponentTreeNode	extends AbstractComponentTreeNode implements IAct
 								IComponentTreeNode	node	= getModel().getNode(desc.getName());
 								if(node==null)
 								{
-									createComponentNode(desc).addResultListener(new IResultListener()
+									createComponentNode(desc).addResultListener(new SwingDefaultResultListener(ui)
 									{
-										public void resultAvailable(Object source, Object result)
+										public void customResultAvailable(Object source, Object result)
 										{
 											children.add(result);
 											
@@ -132,11 +130,6 @@ public class ComponentTreeNode	extends AbstractComponentTreeNode implements IAct
 													setChildren(children);
 												}
 											}
-										}
-										
-										public void exceptionOccurred(Object source, Exception exception)
-										{
-											exception.printStackTrace();
 										}
 									});
 								}
@@ -166,11 +159,6 @@ public class ComponentTreeNode	extends AbstractComponentTreeNode implements IAct
 						setChildren(children);
 					}
 				}
-			}
-			
-			public void exceptionOccurred(Object source, Exception exception)
-			{
-				exception.toString();
 			}
 		});
 		
@@ -224,15 +212,23 @@ public class ComponentTreeNode	extends AbstractComponentTreeNode implements IAct
 	//-------- methods --------
 	
 	/**
+	 *  Get the UI for displaying errors.
+	 */
+	protected Component	getUI()
+	{
+		return ui;
+	}
+	
+	/**
 	 *  Create a new component node.
 	 */
 	public IFuture createComponentNode(final IComponentDescription desc)
 	{
 		final Future ret = new Future();
 		
-		cms.getExternalAccess(desc.getName()).addResultListener(new IResultListener()
+		cms.getExternalAccess(desc.getName()).addResultListener(new SwingDefaultResultListener(ui)
 		{
-			public void resultAvailable(Object source, Object result)
+			public void customResultAvailable(Object source, Object result)
 			{
 				IExternalAccess exta = (IExternalAccess)result;
 				boolean proxy = "jadex.base.service.remote.Proxy".equals(exta.getModel().getFullName());
@@ -248,7 +244,7 @@ public class ComponentTreeNode	extends AbstractComponentTreeNode implements IAct
 				ret.setResult(node);
 			}
 			
-			public void exceptionOccurred(Object source, Exception exception)
+			public void customExceptionOccurred(Object source, Exception exception)
 			{
 				ret.setException(exception);
 			}

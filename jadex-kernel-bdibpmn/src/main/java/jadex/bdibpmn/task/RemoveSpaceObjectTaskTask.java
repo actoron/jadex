@@ -8,7 +8,6 @@ import jadex.bpmn.runtime.task.ParameterMetaInfo;
 import jadex.bpmn.runtime.task.TaskMetaInfo;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
-import jadex.commons.concurrent.IResultListener;
 
 /**
  *  Create a task for a space object.

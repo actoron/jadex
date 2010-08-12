@@ -253,7 +253,7 @@ public class ComponentManagementService extends BasicService implements ICompone
 										else
 										{
 											padesc = (CMSComponentDescription)descs.get(getParentIdentifier(cinfo));
-											pasuspend = IComponentDescription.STATE_SUSPENDED.equals(padesc.getState()) || IComponentDescription.STATE_WAITING.equals(padesc.getState());
+											pasuspend = IComponentDescription.STATE_SUSPENDED.equals(padesc.getState());
 										}
 										// Suspend when set to suspend or when parent is also suspended or when specified in model.
 										Object	debugging 	= lmodel.getProperties().get("debugging");
@@ -268,7 +268,6 @@ public class ComponentManagementService extends BasicService implements ICompone
 										}
 										
 										// Init successfully finished. Add description and adapter.
-//												initfutures.remove(cid);
 										adapter = (StandaloneComponentAdapter)((Object[])result)[1];
 										descs.put(cid, ad);
 										adapters.put(cid, adapter);
@@ -673,8 +672,7 @@ public class ComponentManagementService extends BasicService implements ICompone
 				for(int i=0; i<achildren.length; i++)
 				{
 //					IComponentIdentifier	child	= (IComponentIdentifier)it.next();
-					if(IComponentDescription.STATE_SUSPENDED.equals(((IComponentDescription)descs.get(achildren[i])).getState())
-						|| IComponentDescription.STATE_WAITING.equals(((IComponentDescription)descs.get(achildren[i])).getState()))
+					if(IComponentDescription.STATE_SUSPENDED.equals(((IComponentDescription)descs.get(achildren[i])).getState()))
 					{
 						resumeComponent(achildren[i]);	// todo: cascading resume with wait.
 					}
@@ -687,8 +685,7 @@ public class ComponentManagementService extends BasicService implements ICompone
 					ret.setException(new RuntimeException("Component identifier not registered: "+componentid));
 					return ret;
 				}
-				if(!IComponentDescription.STATE_SUSPENDED.equals(ad.getState())
-					&& !IComponentDescription.STATE_WAITING.equals(ad.getState()))
+				if(!IComponentDescription.STATE_SUSPENDED.equals(ad.getState()))
 				{
 					ret.setException(new RuntimeException("Component identifier not registered: "+componentid));
 					return ret;
@@ -754,7 +751,6 @@ public class ComponentManagementService extends BasicService implements ICompone
 						ret.setException(exception);
 					}
 				});
-				exeservice.execute(adapter);
 			}
 		}
 		
@@ -838,18 +834,15 @@ public class ComponentManagementService extends BasicService implements ICompone
 		
 		public void resultAvailable(Object source, Object result)
 		{
+			StandaloneComponentAdapter adapter = null;
 			StandaloneComponentAdapter pad = null;
 			CMSComponentDescription desc;
-			IComponentDescription ad;
 			Map results = null;
 			synchronized(adapters)
 			{
 				synchronized(descs)
 				{
 //					System.out.println("CleanupCommand: "+result);
-					ad = (IComponentDescription)descs.get(cid);
-					StandaloneComponentAdapter adapter;
-					
 		//			boolean shutdown = false;
 		
 //					System.out.println("CleanupCommand remove called for: "+cid);
@@ -917,27 +910,39 @@ public class ComponentManagementService extends BasicService implements ICompone
 			{
 				try
 				{
-					alisteners[i].componentRemoved(ad, results);
+					alisteners[i].componentRemoved(desc, results);
 				}
 				catch(Exception e)
 				{
-					System.out.println("WARNING: Exception when removing component: "+ad+", "+e);
+					System.out.println("WARNING: Exception when removing component: "+desc+", "+e);
 				}
 			}
 			
+			Exception	ex	= null;
+			if(exceptions!=null && exceptions.containsKey(cid))
+			{
+				ex	= (Exception)exceptions.get(cid);
+				exceptions.remove(cid);
+			}
 			IResultListener reslis = (IResultListener)killresultlisteners.remove(cid);
 			if(reslis!=null)
 			{
-//				System.out.println("kill lis: "+cid+" "+results);
-				if(exceptions!=null && exceptions.containsKey(cid))
+//				System.out.println("kill lis: "+cid+" "+results+" "+ex);
+				if(ex!=null)
 				{
-					reslis.exceptionOccurred(cid, (Exception)exceptions.get(cid));
-					exceptions.remove(cid);
+					reslis.exceptionOccurred(cid, ex);
 				}
 				else
 				{
 					reslis.resultAvailable(cid, results);
 				}
+			}
+			else if(ex!=null)
+			{
+				// Unhandled component exception
+				// Todo: delegate printing to parent component (if any).
+				adapter.getLogger().severe("Fatal error, component '"+cid+"' will be removed.");
+				ex.printStackTrace();
 			}
 			
 //			System.out.println("CleanupCommand end.");
@@ -1304,10 +1309,49 @@ public class ComponentManagementService extends BasicService implements ICompone
 	 *  Currently only switching between suspended/waiting is allowed.
 	 */
 	// hack???
+	public void	setProcessingState(IComponentIdentifier comp, String state)
+	{
+		CMSComponentDescription	desc	= null;
+		synchronized(descs)
+		{
+			desc	= (CMSComponentDescription)descs.get(comp);
+			if(desc!=null)	// May be null during platform init. hack!!!
+				desc.setProcessingState(state);			
+		}
+		
+		if(desc!=null)
+		{
+			IComponentListener[]	alisteners;
+			synchronized(listeners)
+			{
+				Set	slisteners	= new HashSet(listeners.getCollection(null));
+				slisteners.addAll(listeners.getCollection(comp));
+				alisteners	= (IComponentListener[])slisteners.toArray(new IComponentListener[slisteners.size()]);
+			}
+			// todo: can be called after listener has (concurrently) deregistered
+			for(int i=0; i<alisteners.length; i++)
+			{
+				try
+				{
+					alisteners[i].componentChanged(desc);
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+					System.out.println("WARNING: Exception when changing component state: "+desc+", "+e);
+				}
+			}
+		}
+	}
+	
+	/**
+	 *  Set the state of a component (i.e. update the component description).
+	 *  Currently only switching between suspended/waiting is allowed.
+	 */
+	// hack???
 	public void	setComponentState(IComponentIdentifier comp, String state)
 	{
-		assert IComponentDescription.STATE_SUSPENDED.equals(state)
-			|| IComponentDescription.STATE_WAITING.equals(state) : "wrong state: "+comp+", "+state;
+		assert IComponentDescription.STATE_SUSPENDED.equals(state) : "wrong state: "+comp+", "+state;
 		
 		CMSComponentDescription	desc	= null;
 		synchronized(descs)

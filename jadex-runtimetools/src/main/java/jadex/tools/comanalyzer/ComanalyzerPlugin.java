@@ -408,7 +408,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 				{
 					IComponentDescription ad = ((ComponentTreeNode)node).getDescription();
 					Component agent = componentlist.getAgent(ad.getName());
-					if(agent.getState().equals(Component.STATE_OBSERVED))
+					if(Component.STATE_OBSERVED.equals(agent.getState()))
 					{
 						ret	= ComanalyzerPlugin.icons.getIcon("agent_introspected");
 					}

@@ -201,7 +201,7 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 								{
 									public void run()
 									{
-										System.out.println("end2: "+instance.getComponentIdentifier()+" "+file+" "+exception);
+//										System.out.println("end2: "+instance.getComponentIdentifier()+" "+file+" "+exception);
 										thread.setNonWaiting();
 										thread.setException(exception);
 										instance.getStepHandler(activity).step(activity, instance, thread, null);

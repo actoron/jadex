@@ -423,7 +423,7 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 			// Necessary because in step mode state changes may happen and 
 			// event listeners need to be notified!
 			/*Activation*/	act	= rulesystem.getAgenda().getLastActivation();
-//			System.out.println("here: "+act);
+//			System.err.println("here: "+act);
 			state.getProfiler().start(IProfiler.TYPE_RULE, act!=null?act.getRule():null);
 			state.expungeStaleObjects();
 			state.notifyEventListeners();
@@ -1069,6 +1069,7 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 		{
 			public void run()
 			{
+//				System.out.println("Scheduling step: "+step);
 				state.addAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_actions, step);
 			}
 		});

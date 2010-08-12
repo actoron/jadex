@@ -7,7 +7,6 @@ import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IRemoteServiceManagementService;
 import jadex.commons.SGUI;
 import jadex.commons.TreeExpansionHandler;
-import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.service.IServiceProvider;
 import jadex.service.SServiceProvider;
@@ -53,6 +52,10 @@ public class ComponentTreePanel extends JPanel
 		"overlay_suspend", SGUI.makeIcon(ComponentTreePanel.class, "/jadex/tools/common/images/overlay_szzz.png"),
 		"overlay_resume", SGUI.makeIcon(ComponentTreePanel.class, "/jadex/tools/common/images/overlay_wakeup.png"),
 		"overlay_step", SGUI.makeIcon(ComponentTreePanel.class, "/jadex/tools/common/images/overlay_step.png"),
+		// no overlay icon for idle
+//		"overlay_idle", SGUI.makeIcon(ComponentTreePanel.class, "/jadex/tools/common/images/overlay_trafficlight_red.png"),
+		"overlay_ready", SGUI.makeIcon(ComponentTreePanel.class, "/jadex/tools/common/images/overlay_busy.png"),
+		"overlay_running", SGUI.makeIcon(ComponentTreePanel.class, "/jadex/tools/common/images/overlay_gearwheel.png"),
 		"overlay_refresh", SGUI.makeIcon(ComponentTreePanel.class, "/jadex/tools/common/images/overlay_refresh.png"),
 		"overlay_refreshtree", SGUI.makeIcon(ComponentTreePanel.class, "/jadex/tools/common/images/overlay_refresh.png")
 	});
@@ -442,11 +445,21 @@ public class ComponentTreePanel extends JPanel
 				{
 					desc = ((IActiveComponentTreeNode)node).getDescription();
 				
-					if(IComponentDescription.STATE_SUSPENDED.equals(desc.getState())
-						|| IComponentDescription.STATE_WAITING.equals(desc.getState()))
+					if(IComponentDescription.PROCESSINGSTATE_READY.equals(desc.getProcessingState()))
 					{
-						ret = icons.getIcon("component_suspended");
+						ret = icons.getIcon("overlay_ready");
 					}
+					else if(IComponentDescription.PROCESSINGSTATE_RUNNING.equals(desc.getProcessingState()))
+					{
+						ret = icons.getIcon("overlay_running");
+					}
+					else if(IComponentDescription.PROCESSINGSTATE_IDLE.equals(desc.getProcessingState()))
+					{
+						if(IComponentDescription.STATE_SUSPENDED.equals(desc.getState()))
+						{
+							ret = icons.getIcon("component_suspended");
+						}
+					}					
 				}
 				return ret;
 			}
@@ -471,8 +484,7 @@ public class ComponentTreePanel extends JPanel
 					boolean	allsusp	= true;
 					for(int i=0; allsusp && i<nodes.length; i++)
 					{
-						allsusp	= IComponentDescription.STATE_SUSPENDED.equals(((IActiveComponentTreeNode)nodes[i]).getDescription().getState())
-							|| IComponentDescription.STATE_WAITING.equals(((IActiveComponentTreeNode)nodes[i]).getDescription().getState());
+						allsusp	= IComponentDescription.STATE_SUSPENDED.equals(((IActiveComponentTreeNode)nodes[i]).getDescription().getState());
 					}
 					boolean	allact	= true;
 					for(int i=0; allact && i<nodes.length; i++)
@@ -490,19 +502,19 @@ public class ComponentTreePanel extends JPanel
 							kill.actionPerformed(e);
 						}
 					};
-					ret.add(kill);
+					ret.add(pkill);
 					
 					if(allproxy)
 					{
-						Action	prkill	= new AbstractAction((String)kill.getValue(Action.NAME),
-							base!=null ? new CombiIcon(new Icon[]{base, icons.getIcon("overlay_kill")}) : (Icon)kill.getValue(Action.SMALL_ICON))
+						Action	prkill	= new AbstractAction((String)proxykill.getValue(Action.NAME),
+							base!=null ? new CombiIcon(new Icon[]{base, icons.getIcon("overlay_kill")}) : (Icon)proxykill.getValue(Action.SMALL_ICON))
 						{
 							public void actionPerformed(ActionEvent e)
 							{
 								proxykill.actionPerformed(e);
 							}
 						};
-						ret.add(proxykill);
+						ret.add(prkill);
 					}
 					
 					if(allact)
@@ -599,11 +611,20 @@ public class ComponentTreePanel extends JPanel
 						});
 					}
 					
-					public void componentChanged(IComponentDescription desc)
+					public void componentChanged(final IComponentDescription desc)
 					{
-						ComponentTreeNode	node	= (ComponentTreeNode)model.getNode(desc.getName());
-						node.setDescription(desc);
-						model.fireNodeChanged(node);
+						SwingUtilities.invokeLater(new Runnable()
+						{
+							public void run()
+							{
+								ComponentTreeNode	node	= (ComponentTreeNode)model.getNode(desc.getName());
+								if(node!=null)
+								{
+									node.setDescription(desc);
+									model.fireNodeChanged(node);
+								}
+							}
+						});
 					}
 					
 					public void componentAdded(final IComponentDescription desc)
@@ -612,27 +633,18 @@ public class ComponentTreePanel extends JPanel
 						{
 							public void run()
 							{
-								final ComponentTreeNode	parent = desc.getParent()==null? null: (ComponentTreeNode)model.getNode(desc.getParent());
-								if(parent!=null)
+								final ComponentTreeNode	parentnode = desc.getParent()==null? null: (ComponentTreeNode)model.getNode(desc.getParent());
+								if(parentnode!=null)
 								{
-									parent.createComponentNode(desc).addResultListener(new IResultListener()
+									parentnode.createComponentNode(desc).addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
 									{
-										public void resultAvailable(Object source, Object result)
+										public void customResultAvailable(Object source, Object result)
 										{
 											IComponentTreeNode	node = (IComponentTreeNode)result;
-											if(parent!=null)
-											{
-												parent.addChild(node);
-											}
-										}
-										
-										public void exceptionOccurred(Object source, Exception exception)
-										{
-											exception.printStackTrace();
+											parentnode.addChild(node);
 										}
 									});
 								}
-//								IComponentTreeNode	node	= new ComponentTreeNode(parent, model, desc, cms, ComponentTreePanel.this, cic);
 							}
 						});
 					}

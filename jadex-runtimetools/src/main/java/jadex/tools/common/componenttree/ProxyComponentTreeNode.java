@@ -146,7 +146,7 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 	 *  Called once for each node.
 	 *  Should call setChildren() once children are found.
 	 */
-	protected static IFuture searchChildren(final IComponentManagementService cms, final IComponentTreeNode parent,
+	protected static IFuture searchChildren(final IComponentManagementService cms, final IComponentTreeNode parentnode,
 		final IComponentDescription desc, final IComponentIdentifier cid, final Component ui, final  ComponentIconCache iconcache)
 	{
 		final Future ret = new Future();
@@ -154,10 +154,10 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 		final List children = new ArrayList();
 		final boolean ready[] = new boolean[2];
 
-		IComponentTreeNode tmp = parent;
+		IComponentTreeNode tmp = parentnode;
 		while(!(tmp instanceof ProxyComponentTreeNode))
 			tmp = tmp.getParent();
-		ProxyComponentTreeNode proxy = (ProxyComponentTreeNode)tmp;
+		final ProxyComponentTreeNode proxy = (ProxyComponentTreeNode)tmp;
 		
 		cms.getExternalAccess(proxy.getDescription().getName()).addResultListener(new IResultListener()
 		{
@@ -169,18 +169,18 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 					public void execute(Object agent)
 					{
 						ProxyAgent pa = (ProxyAgent)agent;
-						pa.getVirtualChildren(cid).addResultListener(pa.createResultListener(new IResultListener()
+						pa.getVirtualChildren(cid).addResultListener(new SwingDefaultResultListener(proxy.getUI())
 						{
-							public void resultAvailable(Object source, Object result)
+							public void customResultAvailable(Object source, Object result)
 							{
 								IComponentDescription[] descs = (IComponentDescription[])
 									((Collection)result).toArray(new IComponentDescription[((Collection)result).size()]);
 								for(int i=0; i<descs.length; i++)
 								{
-									IComponentTreeNode node = parent.getModel().getNode(descs[i].getName());
+									IComponentTreeNode node = parentnode.getModel().getNode(descs[i].getName());
 									if(node==null)
 									{
-										node = new VirtualComponentTreeNode(parent, parent.getModel(), descs[i], cms, ui, iconcache);
+										node = new VirtualComponentTreeNode(parentnode, parentnode.getModel(), descs[i], cms, ui, iconcache);
 									}
 									children.add(node);
 								}
@@ -192,12 +192,12 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 								}
 							}
 							
-							public void exceptionOccurred(Object source, Exception exception)
+							public void customExceptionOccurred(Object source, Exception exception)
 							{
 								// 2 parallel search branches, i.e. one may fail first
 								ret.setExceptionIfUndone(exception);
 							}
-						}));
+						});
 					}
 				});
 				
@@ -206,26 +206,25 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 					public void execute(Object agent)
 					{
 						ProxyAgent pa = (ProxyAgent)agent;
-						pa.getRemoteServices(cid).addResultListener(
-							pa.createResultListener(new IResultListener()
+						pa.getRemoteServices(cid).addResultListener(new SwingDefaultResultListener(proxy.getUI())
 						{
-							public void resultAvailable(Object source, Object result)
+							public void customResultAvailable(Object source, Object result)
 							{
 								List services = (List)result;
 								if(services!=null && !services.isEmpty())
 								{
 									ServiceContainerNode scn = (ServiceContainerNode)
-										parent.getModel().getNode(desc.getName().getName()+"ServiceContainer");
+										parentnode.getModel().getNode(desc.getName().getName()+"ServiceContainer");
 									if(scn==null)
-										scn	= new ServiceContainerNode(parent, parent.getModel());
+										scn	= new ServiceContainerNode(parentnode, parentnode.getModel());
 									children.add(0, scn);
 									List subchildren = new ArrayList();
 									for(int i=0; i<services.size(); i++)
 									{
 										IService service = (IService)services.get(i);
-										ServiceNode	sn = (ServiceNode)parent.getModel().getNode(service.getServiceIdentifier());
+										ServiceNode	sn = (ServiceNode)parentnode.getModel().getNode(service.getServiceIdentifier());
 										if(sn==null)
-											sn = new ServiceNode(scn, parent.getModel(), service);
+											sn = new ServiceNode(scn, parentnode.getModel(), service);
 										subchildren.add(sn);
 									}
 									scn.setChildren(subchildren);							
@@ -238,12 +237,12 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 								}
 							}
 							
-							public void exceptionOccurred(Object source, Exception exception)
+							public void customExceptionOccurred(Object source, Exception exception)
 							{
 								// 2 parallel search branches, i.e. one may fail first
 								ret.setExceptionIfUndone(exception);
 							}
-						}));
+						});
 					}
 				});
 			}

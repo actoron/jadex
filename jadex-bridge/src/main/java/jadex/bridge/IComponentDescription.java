@@ -11,28 +11,41 @@ public interface IComponentDescription
 	
 	// todo: remove? needed for JADE
 	/** Predefined value "initiated" for slot state. */
-	public static String  STATE_INITIATED  = "initiated";
+	public static final String  STATE_INITIATED  = "initiated";
 	/** Predefined value "transit" for slot state. */
-	public static String  STATE_TRANSIT  = "transit";	
+	public static final String  STATE_TRANSIT  = "transit";	
 	
 	/** Predefined value "active" for slot state. */
-	public static String  STATE_ACTIVE  = "active";
+	public static final String  STATE_ACTIVE  = "active";
 	/** Predefined value "suspended" for slot state. */
-	public static String  STATE_SUSPENDED  = "suspended";
-	/** Predefined value "waiting" for slot state. */
-	public static String  STATE_WAITING  = "waiting";
+	public static final String  STATE_SUSPENDED  = "suspended";
 //	/** Predefined value "terminating" for slot state. */
-//	public static String  STATE_TERMINATING  = "terminating";
+//	public static final String  STATE_TERMINATING  = "terminating";
 	/** Predefined value "terminated" for slot state. */
-	public static String  STATE_TERMINATED  = "terminated";
+	public static final String  STATE_TERMINATED  = "terminated";
+	
+	/** The ready processing state. */
+	public static final String	PROCESSINGSTATE_READY	= "ready";
+	/** The running processing state. */
+	public static final String	PROCESSINGSTATE_RUNNING	= "running";
+	/** The idle processing state. */
+	public static final String	PROCESSINGSTATE_IDLE	= "idle";
 	
 	//-------- methods --------
 
 	/**
 	 *  Get the execution state of the component.
+	 *  E.g. active or suspended.
 	 *  @return The state.
 	 */
 	public String getState();
+
+	/**
+	 *  Get the processing state of the component.
+	 *  I.e. ready, running or blocked.
+	 *  @return The processing state.
+	 */
+	public String getProcessingState();
 
 	/**
 	 *  Get the identifier of the component.

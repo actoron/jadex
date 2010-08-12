@@ -8,7 +8,6 @@ import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IRemoteServiceManagementService;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
-import jadex.commons.SUtil;
 import jadex.commons.concurrent.CollectionResultListener;
 import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
@@ -17,8 +16,6 @@ import jadex.micro.MicroAgentMetaInfo;
 import jadex.service.CacheServiceContainer;
 import jadex.service.IServiceContainer;
 import jadex.service.SServiceProvider;
-
-import java.util.List;
 
 /**
  *  A proxy agent is a pseudo component that mirrors services of a remote platform (or component).

@@ -5,7 +5,6 @@ import jadex.bridge.DefaultMessageAdapter;
 import jadex.bridge.IContentCodec;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.IMessageService;
-import jadex.bridge.MessageFailureException;
 import jadex.bridge.MessageType;
 import jadex.bridge.MessageType.ParameterSpecification;
 import jadex.commons.Future;

@@ -2,6 +2,7 @@ package jadex.application.space.envsupport.environment;
 
 import jadex.application.space.envsupport.dataview.IDataView;
 import jadex.application.space.envsupport.evaluation.ITableDataConsumer;
+import jadex.bridge.ComponentTerminatedException;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IChangeListener;
 import jadex.commons.SimplePropertyObject;
@@ -100,7 +101,7 @@ public class DeltaTimeExecutor extends SimplePropertyObject implements ISpaceExe
 						long progress = currenttime - timestamp;
 						timestamp = currenttime;
 
-						System.out.println("step: "+timestamp+" "+progress);
+//						System.out.println("step: "+timestamp+" "+progress);
 			
 						synchronized(space.getMonitor())
 						{
@@ -145,15 +146,21 @@ public class DeltaTimeExecutor extends SimplePropertyObject implements ISpaceExe
 						final Runnable	step	= this;
 						if(tick)
 						{
-							System.out.println("tick");
+//							System.out.println("tick");
 							timer = clockservice.createTickTimer(new ITimedObject()
 							{
 								public void timeEventOccurred(long currenttime)
 								{
 									if(!terminated)
 									{
-										System.out.println("scheduled step");
-										space.getContext().scheduleStep(step);
+//										System.out.println("scheduled step");
+										try
+										{
+											space.getContext().scheduleStep(step);
+										}
+										catch(ComponentTerminatedException cte)
+										{
+										}
 									}
 								}
 							});
@@ -165,7 +172,7 @@ public class DeltaTimeExecutor extends SimplePropertyObject implements ISpaceExe
 
 				if(!tick)
 				{
-					System.out.println("no tick");
+//					System.out.println("no tick");
 					clocklistener = new IChangeListener()
 					{
 						public void changeOccurred(ChangeEvent e)
@@ -173,8 +180,14 @@ public class DeltaTimeExecutor extends SimplePropertyObject implements ISpaceExe
 							if(!terminated && !scheduled)
 							{
 								scheduled	= true;
-								System.out.println("scheduled step");
-								space.getContext().scheduleStep(step);
+//								System.out.println("scheduled step");
+								try
+								{
+									space.getContext().scheduleStep(step);
+								}
+								catch(ComponentTerminatedException cte)
+								{
+								}
 							}
 						}
 					};
@@ -190,6 +203,7 @@ public class DeltaTimeExecutor extends SimplePropertyObject implements ISpaceExe
 //	public synchronized void terminate()
 	public void terminate()
 	{
+		terminated = true;
 		SServiceProvider.getService(container, IClockService.class).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
@@ -201,7 +215,6 @@ public class DeltaTimeExecutor extends SimplePropertyObject implements ISpaceExe
 				}
 				else
 				{
-					terminated = true;
 					if(timer!=null)
 						timer.cancel();
 				}

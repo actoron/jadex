@@ -135,7 +135,7 @@ public class ComponentTreeModel implements TreeModel
 	{
 		List path = buildTreePath(node);
 		
-//		System.out.println("Path changed: "+path);
+//		System.out.println("Path changed: "+node+", "+path+", "+Thread.currentThread());
 		
 		for(int i=0; i<listeners.size(); i++)
 		{
@@ -166,7 +166,7 @@ public class ComponentTreeModel implements TreeModel
 			
 		}
 		
-//		System.out.println("Path changed: "+path);
+//		System.out.println("Node changed: "+node+", "+path+", "+Thread.currentThread());
 		
 		for(int i=0; i<listeners.size(); i++)
 		{
@@ -181,7 +181,7 @@ public class ComponentTreeModel implements TreeModel
 	{
 		List path = buildTreePath(parent);
 		
-//		System.out.println("Node removed: "+child+", "+index+", "+path);
+//		System.out.println("Node removed: "+child+", "+index+", "+path+", "+Thread.currentThread());
 		
 		for(int i=0; i<listeners.size(); i++)
 		{
@@ -196,7 +196,7 @@ public class ComponentTreeModel implements TreeModel
 	{
 		List path = buildTreePath(parent);
 		
-//		System.out.println("Node added: "+child+", "+index+", "+path);
+//		System.out.println("Node added: "+child+", "+index+", "+path+", "+Thread.currentThread());
 		
 		for(int i=0; i<listeners.size(); i++)
 		{

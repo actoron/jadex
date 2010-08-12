@@ -53,6 +53,14 @@ public class MovePlan extends Plan
 		board.move(move);
 //		endAtomic();
 		
+		try
+		{
+			Thread.sleep(100);
+		}
+		catch(InterruptedException e)
+		{
+		}
+		
 		waitFor(delay);
 		
 		//if(!board.isSolution()) // Comment out this line when using goal target condition in the adf.
@@ -71,6 +79,15 @@ public class MovePlan extends Plan
 		print("Failed "+move, depth);
 		assert board.getLastMove().equals(move): "Tries to takeback wrong move.";
 		board.takeback();
+		
+		try
+		{
+			Thread.sleep(100);
+		}
+		catch(InterruptedException e)
+		{
+		}
+
 		waitFor(delay);
 	}
 

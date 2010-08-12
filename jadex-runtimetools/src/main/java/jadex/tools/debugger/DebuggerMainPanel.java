@@ -270,8 +270,6 @@ public class DebuggerMainPanel extends JSplitPane
 								{
 									ces.resumeComponent(DebuggerMainPanel.this.desc.getName());
 								}
-								step.setEnabled(stepmode.isSelected());		
-								run.setEnabled(stepmode.isSelected());	
 							}
 						});
 					}
@@ -323,10 +321,10 @@ public class DebuggerMainPanel extends JSplitPane
 		{
 			public void run()
 			{
-				stepmode.setSelected(IComponentDescription.STATE_SUSPENDED.equals(desc.getState())
-					|| IComponentDescription.STATE_WAITING.equals(desc.getState()));
-				step.setEnabled(IComponentDescription.STATE_SUSPENDED.equals(desc.getState()));		
-				run.setEnabled(IComponentDescription.STATE_SUSPENDED.equals(desc.getState()));		
+				stepmode.setSelected(IComponentDescription.STATE_SUSPENDED.equals(desc.getState()));
+				step.setEnabled(IComponentDescription.STATE_SUSPENDED.equals(desc.getState()));
+//					&& IComponentDescription.PROCESSINGSTATE_READY.equals(desc.getProcessingState()));
+				run.setEnabled(IComponentDescription.STATE_SUSPENDED.equals(desc.getState()));
 			}
 		});
 	}

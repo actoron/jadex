@@ -474,7 +474,7 @@ public class AgentRules
 			{
 				Object ragent = assignments.getVariableValue("?ragent");
 				Runnable runnable = (Runnable)assignments.getVariableValue("?runnable");
-				System.out.println("Executing external action: "+runnable);
+//				System.out.println("Executing external action: "+runnable);
 				state.removeAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_actions, runnable);
 				if(runnable instanceof CheckedAction)
 				{

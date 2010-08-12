@@ -11,7 +11,6 @@ import jadex.bpmn.runtime.task.ParameterMetaInfo;
 import jadex.bpmn.runtime.task.TaskMetaInfo;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
-import jadex.commons.concurrent.IResultListener;
 
 /**
  *  Dispatch a goal and by default wait for the result.

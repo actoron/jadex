@@ -22,10 +22,10 @@ public class InterpreterTimedObject implements ITimedObject
 	/**
 	 *  Create a new timed object.
 	 */
-	public InterpreterTimedObject(BDIInterpreter interpreter, CheckedAction runnable)
+	public InterpreterTimedObject(BDIInterpreter interpreter, CheckedAction action)
 	{
 		this.interpreter = interpreter;
-		this.action = runnable;
+		this.action = action;
 	}
 	
 	//-------- methods --------

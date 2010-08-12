@@ -1,24 +1,13 @@
 package jadex.base.service.remote;
 
-import jadex.base.fipa.SFipa;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IMessageService;
 import jadex.commons.Future;
-import jadex.commons.ICommand;
 import jadex.commons.IFuture;
 import jadex.commons.SUtil;
 import jadex.commons.ThreadSuspendable;
-import jadex.commons.concurrent.DefaultResultListener;
-import jadex.commons.concurrent.IResultListener;
 import jadex.micro.IMicroExternalAccess;
-import jadex.micro.MicroAgent;
-import jadex.service.SServiceProvider;
-import jadex.service.clock.ITimer;
-import jadex.service.library.ILibraryService;
-
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
