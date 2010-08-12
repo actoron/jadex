@@ -484,7 +484,7 @@ public class BpmnXMLReader
 							String dir = table.data[row][0]; 		// direction
 							String name = table.data[row][1];		// name
 							String clazzname = table.data[row][2];	// class
-							String val = table.data[row][3];		// value
+							String val = table.data[row][3] != "" ? table.data[row][3] : null;		// value
 							
 							try
 							{
@@ -520,7 +520,7 @@ public class BpmnXMLReader
 							assert table.data[row].length == 2;
 			
 							String name =  table.data[row][0];
-							String val = table.data[row][1];
+							String val = table.data[row][1] != "" ? table.data[row][1] : null;
 							
 							// context variable
 							IParsedExpression exp = null;
@@ -1158,7 +1158,7 @@ public class BpmnXMLReader
 							String isres = table.data[row][2];
 							String desc = table.data[row][3];
 							String typename = table.data[row][4];
-							String val = table.data[row][5];
+							String val = table.data[row][5] != "" ? table.data[row][5] : null;
 							IParsedExpression exp = null;
 
 							// context variable
