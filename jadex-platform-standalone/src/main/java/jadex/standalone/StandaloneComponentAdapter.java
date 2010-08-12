@@ -158,10 +158,10 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	 */
 	public void wakeup()
 	{
-		if(cid.getName().indexOf("Sokrates")!=-1)
-		{
-			Thread.dumpStack();
-		}
+//		if(cid.getName().indexOf("Sokrates")!=-1)
+//		{
+//			Thread.dumpStack();
+//		}
 		
 		wokenup	= true;
 
@@ -551,10 +551,10 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 			{
 //				System.out.println("Executing: "+component);
 				again	= component.executeStep();
-				if(cid.getName().indexOf("Sokrates")!=-1)
-				{
-					System.err.println("again: "+again);
-				}
+//				if(cid.getName().indexOf("Sokrates")!=-1)
+//				{
+//					System.err.println("again: "+again);
+//				}
 			}
 			catch(Exception e)
 			{

@@ -304,7 +304,7 @@ public class ClockService extends BasicService implements IClockService
 	{
 		IClock clock;
 		
-		if(IClock.TYPE_CONTINUOUS.equals(cinfo.getClockType()))
+		if(IClock.TYPE_CONTINUOUS.equals(type))
 			clock = new ContinuousClock(this.clock, tp);
 		else if(IClock.TYPE_SYSTEM.equals(type))
 			clock = new SystemClock(this.clock, tp);

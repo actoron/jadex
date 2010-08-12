@@ -13,6 +13,7 @@ import java.awt.GridLayout;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 /**
  *  Gui for displaying messages.
@@ -68,7 +69,13 @@ public class MessageGui extends JFrame
 		{
 			public void agentTerminating(AgentEvent ae)
 			{
-				MessageGui.this.dispose();
+				SwingUtilities.invokeLater(new Runnable()
+				{
+					public void run()
+					{						
+						MessageGui.this.dispose();	
+					}
+				});
 			}
 			
 			public void agentTerminated(AgentEvent ae)

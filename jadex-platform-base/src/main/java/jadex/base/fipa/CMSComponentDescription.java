@@ -66,6 +66,7 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 		setType(type);
 		setParent(parent);
 		setState(IComponentDescription.STATE_ACTIVE);
+		setProcessingState(IComponentDescription.PROCESSINGSTATE_IDLE);
 		setMaster(master);
 		setDaemon(daemon);
 //		setModelName(modelname);

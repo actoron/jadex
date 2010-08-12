@@ -124,24 +124,27 @@ public class CleanerGui	extends JFrame
 					// Draw me additionally.
 					// Get world state from beliefs.
 					IVector2 agentloc = (IVector2)agent.getBeliefbase().getBeliefFact("my_location").get(sus);
-					double	vision	= ((Double)agent.getBeliefbase().getBeliefFact("my_vision").get(sus)).doubleValue();
-					double	charge	= ((Double)agent.getBeliefbase().getBeliefFact("my_chargestate").get(sus)).doubleValue();
-					boolean	waste	= ((ISpaceObject)agent.getBeliefbase().getBeliefFact("myself").get(sus)).getProperty("waste")!=null;
-	
-					// Paint agent.
-					Point	p	= onScreenLocation(agentloc, bounds);
-					int w	= (int)(vision*bounds.width);
-					int h	= (int)(vision*bounds.height);
-					g.setColor(new Color(255, 255, 64, 180));	// Vision
-					g.fillOval(p.x-w, p.y-h, w*2, h*2);
-					g.setColor(Color.black);	// Agent
-					g.fillOval(p.x-3, p.y-3, 7, 7);
-					g.drawString(agent.getComponentName(),
-						p.x+5, p.y-5);
-					g.drawString("battery: " + (int)(charge*100.0) + "%",
-						p.x+5, p.y+5);
-					g.drawString("waste: " + (waste ? "yes" : "no"),
-						p.x+5, p.y+15);
+					if(agentloc!=null)
+					{
+						double	vision	= ((Double)agent.getBeliefbase().getBeliefFact("my_vision").get(sus)).doubleValue();
+						double	charge	= ((Double)agent.getBeliefbase().getBeliefFact("my_chargestate").get(sus)).doubleValue();
+						boolean	waste	= ((ISpaceObject)agent.getBeliefbase().getBeliefFact("myself").get(sus)).getProperty("waste")!=null;
+		
+						// Paint agent.
+						Point	p	= onScreenLocation(agentloc, bounds);
+						int w	= (int)(vision*bounds.width);
+						int h	= (int)(vision*bounds.height);
+						g.setColor(new Color(255, 255, 64, 180));	// Vision
+						g.fillOval(p.x-w, p.y-h, w*2, h*2);
+						g.setColor(Color.black);	// Agent
+						g.fillOval(p.x-3, p.y-3, 7, 7);
+						g.drawString(agent.getComponentName(),
+							p.x+5, p.y-5);
+						g.drawString("battery: " + (int)(charge*100.0) + "%",
+							p.x+5, p.y+5);
+						g.drawString("waste: " + (waste ? "yes" : "no"),
+							p.x+5, p.y+15);
+					}
 	
 					// Paint charge Stations.
 					ISpaceObject[] stations = (ISpaceObject[])agent.getBeliefbase()
@@ -149,7 +152,7 @@ public class CleanerGui	extends JFrame
 					for(int i=0; i<stations.length; i++)
 					{
 						g.setColor(Color.blue);
-						p	= onScreenLocation((IVector2)stations[i].getProperty(Space2D.PROPERTY_POSITION), bounds);
+						Point	p	= onScreenLocation((IVector2)stations[i].getProperty(Space2D.PROPERTY_POSITION), bounds);
 						g.drawRect(p.x-10, p.y-10, 20, 20);
 						g.setColor(daytime ? Color.black : Color.white);
 						g.drawString(""+stations[i].getType(), p.x+14, p.y+5);
@@ -160,7 +163,7 @@ public class CleanerGui	extends JFrame
 					for(int i=0; i<wastebins.length; i++)
 					{
 						g.setColor(Color.red);
-						p	= onScreenLocation((IVector2)wastebins[i].getProperty(Space2D.PROPERTY_POSITION), bounds);
+						Point	p	= onScreenLocation((IVector2)wastebins[i].getProperty(Space2D.PROPERTY_POSITION), bounds);
 						g.drawOval(p.x-10, p.y-10, 20, 20);
 						g.setColor(daytime ? Color.black : Color.white);
 //						g.drawString(wastebins[i].getName()+" ("+wastebins[i].getWastes().length+"/"+wastebins[i].getCapacity()+")", p.x+14, p.y+5);
@@ -175,7 +178,7 @@ public class CleanerGui	extends JFrame
 						IVector2 pos = (IVector2)wastes[i].getProperty(Space2D.PROPERTY_POSITION);
 						if(pos!=null)
 						{
-							p = onScreenLocation(pos, bounds);
+							Point	p = onScreenLocation(pos, bounds);
 							g.fillOval(p.x-3, p.y-3, 7, 7);
 						}
 					}
@@ -187,7 +190,7 @@ public class CleanerGui	extends JFrame
 						IVector2	dest	= (IVector2)targets[i].getParameterValue("location").get(sus);
 						if(dest!=null)	// Hack!!! may want to move to null due to asynchronous update of waste position.
 						{
-							p = onScreenLocation(dest, bounds);
+							Point	p = onScreenLocation(dest, bounds);
 							g.setColor(Color.black);
 							g.drawOval(p.x-5, p.y-5, 10, 10);
 							g.drawLine(p.x-7, p.y, p.x+7, p.y);
