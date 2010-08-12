@@ -3,6 +3,8 @@ package jadex.service;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -76,10 +78,28 @@ public class BasicService implements IService
 	/**
 	 *  Get a service property.
 	 *  @return The service property (if any).
-	 */
+	 * /
 	public Object getProperty(String name)
 	{
 		return properties!=null ? properties.get(name) : null; 
+	}*/
+	
+	/**
+	 *  Get a service property.
+	 *  @return The service property (if any).
+	 */
+	public Map getPropertyMap()
+	{
+		return properties!=null? properties: new HashMap();//Collections.EMPTY_MAP; 
+	}
+	
+	/**
+	 *  Set the properties.
+	 *  @param properties The properties to set.
+	 */
+	public void setPropertyMap(Map properties)
+	{
+		this.properties = properties;
 	}
 
 	/**

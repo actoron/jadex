@@ -304,7 +304,7 @@ public class ServiceViewerPlugin extends AbstractJCCPlugin
 				{
 					final ServiceNode node = (ServiceNode)paths[i].getLastPathComponent();
 					final IService service = node.getService();
-					final String	classname	= (String)service.getProperty(PROPERTY_VIEWERCLASS);
+					final String	classname	= (String)service.getPropertyMap().get(PROPERTY_VIEWERCLASS);
 					if(classname!=null)
 					{
 						SServiceProvider.getService(getJCC().getServiceContainer(), ILibraryService.class)
@@ -376,7 +376,7 @@ public class ServiceViewerPlugin extends AbstractJCCPlugin
 	 */
 	protected static boolean isNodeViewable(IComponentTreeNode node)
 	{
-		return node instanceof ServiceNode && ((ServiceNode)node).getService().getProperty(PROPERTY_VIEWERCLASS)!=null;
+		return node instanceof ServiceNode && ((ServiceNode)node).getService().getPropertyMap().get(PROPERTY_VIEWERCLASS)!=null;
 	}
 	
 	//-------- loading / saving --------

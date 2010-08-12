@@ -276,28 +276,28 @@ public class RemoteSearchCommand implements IRemoteCommand
 //		System.out.println("Creating proxy for: "+type);
 		
 		// Check for excluded and synchronous methods.
-		Object ex = service.getProperty(RemoteServiceManagementService.REMOTE_EXCLUDED);
+		Object ex = service.getPropertyMap().get(RemoteServiceManagementService.REMOTE_EXCLUDED);
 		if(ex!=null)
 		{
 			for(Iterator it = SReflect.getIterator(ex); it.hasNext(); )
 			{
-				ret.addExcludedMethod(getMethod(it.next(), service, false));
+				ret.addExcludedMethod(getMethodInfo(it.next(), service, false));
 			}
 		}
-		Object syn = service.getProperty(RemoteServiceManagementService.REMOTE_SYNCHRONOUS);
+		Object syn = service.getPropertyMap().get(RemoteServiceManagementService.REMOTE_SYNCHRONOUS);
 		if(syn!=null)
 		{
 			for(Iterator it = SReflect.getIterator(syn); it.hasNext(); )
 			{
-				ret.addExcludedMethod(getMethod(it.next(), service, false));
+				ret.addSynchronousMethod(getMethodInfo(it.next(), service, false));
 			}
 		}
-		Object un = service.getProperty(RemoteServiceManagementService.REMOTE_UNCACHED);
+		Object un = service.getPropertyMap().get(RemoteServiceManagementService.REMOTE_UNCACHED);
 		if(un!=null)
 		{
 			for(Iterator it = SReflect.getIterator(un); it.hasNext(); )
 			{
-				ret.addExcludedMethod(getMethod(it.next(), service, true));
+				ret.addUncachedMethod(getMethodInfo(it.next(), service, true));
 			}
 		}
 		
@@ -346,15 +346,15 @@ public class RemoteSearchCommand implements IRemoteCommand
 	/**
 	 *  Get method.
 	 */
-	protected Method getMethod(Object tmp, IService service, boolean noargs)
+	protected MethodInfo getMethodInfo(Object tmp, IService service, boolean noargs)
 	{
-		Method ret = null;
+		MethodInfo ret = null;
 		
 		if(tmp instanceof String)
 		{
 			if(noargs)
 			{
-				ret = SReflect.getMethod(service.getClass(),(String)tmp, new Class[0]);
+				ret = new MethodInfo(SReflect.getMethod(service.getClass(),(String)tmp, new Class[0]));
 			}
 			else
 			{
@@ -365,13 +365,13 @@ public class RemoteSearchCommand implements IRemoteCommand
 				}
 				else
 				{
-					ret = ms[0];
+					ret = new MethodInfo(ms[0]);
 				}
 			}
 		}
 		else
 		{
-			ret = (Method)tmp;
+			ret = new MethodInfo((Method)tmp);
 		}
 		
 		return ret;

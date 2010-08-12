@@ -198,11 +198,11 @@ public class ProxyInfo
 	 *  Add an excluded method.
 	 *  @param Method excluded.
 	 */
-	public void addExcludedMethod(Method m)
+	public void addExcludedMethod(MethodInfo m)
 	{
 		if(excluded==null)
 			excluded = new HashSet();
-		excluded.add(new MethodInfo(m));
+		excluded.add(m);
 	}
 	
 	/**
@@ -237,11 +237,11 @@ public class ProxyInfo
 	 *  Add an uncached method.
 	 *  @param Method excluded.
 	 */
-	public void addUncachedMethod(Method m)
+	public void addUncachedMethod(MethodInfo m)
 	{
 		if(uncached==null)
 			uncached = new HashSet();
-		uncached.add(new MethodInfo(m));
+		uncached.add(m);
 	}
 	
 	/**
@@ -276,11 +276,11 @@ public class ProxyInfo
 	 *  Add an synchronous method.
 	 *  @param Method excluded.
 	 */
-	public void addSynchronousMethod(Method m)
+	public void addSynchronousMethod(MethodInfo m)
 	{
 		if(synchronous==null)
 			synchronous = new HashSet();
-		synchronous.add(new MethodInfo(m));
+		synchronous.add(m);
 	}
 	
 	/**

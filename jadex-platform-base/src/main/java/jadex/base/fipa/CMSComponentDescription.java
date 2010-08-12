@@ -59,10 +59,10 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 	/**
 	 *  Create a new CESComponentDescription.
 	 */
-	public CMSComponentDescription(IComponentIdentifier aid, String type, IComponentIdentifier parent, boolean master, boolean daemon)//, String modelname)
+	public CMSComponentDescription(IComponentIdentifier cid, String type, IComponentIdentifier parent, boolean master, boolean daemon)//, String modelname)
 	{
 		this();
-		setName(aid);
+		setName(cid);
 		setType(type);
 		setParent(parent);
 		setState(IComponentDescription.STATE_ACTIVE);

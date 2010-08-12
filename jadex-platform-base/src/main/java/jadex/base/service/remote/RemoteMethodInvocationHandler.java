@@ -91,7 +91,7 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 //				+method.getDeclaringClass()+" "+method.getName()+" "+Thread.currentThread());
 			future.setResult(null);
 		}
-		else if(!method.getReturnType().isAssignableFrom(IFuture.class))
+		else if(!IFuture.class.isAssignableFrom(method.getReturnType()))
 		{
 //			Thread.dumpStack();
 			System.out.println("Warning, blocking method call: "+method.getDeclaringClass()

@@ -1,5 +1,6 @@
 package jadex.tools.serviceviewer.dfservice;
 
+import jadex.base.fipa.DFComponentDescription;
 import jadex.base.fipa.IDF;
 import jadex.base.fipa.IDFComponentDescription;
 import jadex.base.fipa.IDFServiceDescription;
@@ -260,7 +261,8 @@ public class DFBrowserPanel	extends JPanel implements IServiceViewerPanel
 	 */
 	protected void refresh()
 	{
-		df.search(df.createDFComponentDescription(null, null), null).addResultListener(new SwingDefaultResultListener(this)
+//		df.search(df.createDFComponentDescription(null, null), null).addResultListener(new SwingDefaultResultListener(this)
+		df.search(new DFComponentDescription(null), null).addResultListener(new SwingDefaultResultListener(this)
 		{
 			public void customResultAvailable(Object source, Object result) 
 			{

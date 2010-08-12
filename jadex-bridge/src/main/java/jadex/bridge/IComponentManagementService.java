@@ -129,6 +129,9 @@ public interface IComponentManagementService extends IService
 	
 	//-------- create methods for cms objects --------
 	
+	// todo: remove all following methods 
+	// (they are synchronous and not necessary, direct constructor creation)
+	
 	/**
 	 *  Create component identifier.
 	 *  @param name The name.
