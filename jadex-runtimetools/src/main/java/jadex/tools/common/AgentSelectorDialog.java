@@ -119,7 +119,7 @@ public class AgentSelectorDialog
 	 *  Open a modal dialog to select/enter an agent identifier.
 	 *  @return	The selected agent identifier or null, when dialog was aborted.
 	 */
-	public IComponentIdentifier selectAgent(final IComponentIdentifier def, IComponentManagementService cms)
+	public IComponentIdentifier selectAgent(final IComponentIdentifier def)
 	{
 		this.singleselection	= true;
 
@@ -131,7 +131,7 @@ public class AgentSelectorDialog
 		}
 
 		// Create dialog.
-		this.dia	= createDialog(cms);
+		this.dia	= createDialog();
 
 		aborted	= false;
 		dia.setVisible(true);
@@ -144,7 +144,7 @@ public class AgentSelectorDialog
 	 *  Select/edit a list of agents.
 	 *  @return	The (possibly empty) list of agent identifiers or null, when dialog was aborted.
 	 */
-	public IComponentIdentifier[] selectAgents(IComponentIdentifier[] receivers, IComponentManagementService cms)
+	public IComponentIdentifier[] selectAgents(IComponentIdentifier[] receivers)
 	{
 		// Pre-init list of selected agents.
 		sels.clear();
@@ -152,7 +152,7 @@ public class AgentSelectorDialog
 			sels.addElement(receivers[i]);
 
 		// Create dialog.
-		this.dia	= createDialog(cms);
+		this.dia	= createDialog();
 
 		aborted	= false;
 		dia.setVisible(true);
@@ -171,7 +171,7 @@ public class AgentSelectorDialog
 	/**
 	 *  Create the dialog.
 	 */
-	protected JDialog createDialog(IComponentManagementService cms)
+	protected JDialog createDialog()
 	{
 		// Create  buttons.
 		select	= new JButton(icons.getIcon("arrow_right"));
@@ -249,7 +249,7 @@ public class AgentSelectorDialog
 								public void customResultAvailable(Object source, Object result)
 								{
 									IComponentManagementService cms = (IComponentManagementService)result;
-									final IComponentIdentifier id	= ((IActiveComponentTreeNode)node).getDescription().getName();
+									IComponentIdentifier id	= ((IActiveComponentTreeNode)node).getDescription().getName();
 									addSelectedAgent(cms.createComponentIdentifier(id.getName(), false, id.getAddresses()), list);
 									comptree.getModel().fireNodeChanged(node);
 								}

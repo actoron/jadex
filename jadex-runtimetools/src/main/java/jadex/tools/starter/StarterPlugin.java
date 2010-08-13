@@ -17,7 +17,6 @@ import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.service.SServiceProvider;
 import jadex.tools.common.ComponentIdentifierDialog;
-import jadex.tools.common.ComponentIdentifierPanel;
 import jadex.tools.common.IMenuItemConstructor;
 import jadex.tools.common.PopupBuilder;
 import jadex.tools.common.componenttree.ComponentTreePanel;
@@ -28,7 +27,6 @@ import jadex.tools.common.modeltree.ModelExplorerTreeModel;
 import jadex.tools.common.plugin.AbstractJCCPlugin;
 import jadex.tools.jcc.AgentControlCenter;
 
-import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
@@ -47,7 +45,6 @@ import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
-import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JScrollPane;
@@ -541,7 +538,6 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 			{
 				public void resultAvailable(Object source, Object result)
 				{
-					IComponentManagementService cms = (IComponentManagementService)result;
 					ComponentIdentifierDialog dia = new ComponentIdentifierDialog(spanel, jcc.getServiceContainer());
 					IComponentIdentifier cid = dia.getComponentIdentifier(null);
 					
