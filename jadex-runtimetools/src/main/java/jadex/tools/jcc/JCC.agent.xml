@@ -161,7 +161,8 @@
 	</events>
 
 	<properties>
-		<!-- <property name="logging.level">java.util.logging.Level.WARNING</property> -->
+		<!-- Only print severe messages and ignore warnings, e.g. from unhandled messages received by conversation center. -->
+		<property name="logging.level">java.util.logging.Level.SEVERE</property>
 <!--		<property name="debugging">true</property>-->
 	</properties>
 

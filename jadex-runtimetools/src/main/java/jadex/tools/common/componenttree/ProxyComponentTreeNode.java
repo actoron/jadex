@@ -8,6 +8,7 @@ import jadex.commons.Future;
 import jadex.commons.ICommand;
 import jadex.commons.IFuture;
 import jadex.commons.SGUI;
+import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.micro.IMicroExternalAccess;
@@ -111,11 +112,12 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 		{
 			public void customResultAvailable(Object source, Object result)
 			{
-				searchChildren(cms, ProxyComponentTreeNode.this, desc, cid, ui, iconcache).addResultListener(new SwingDefaultResultListener(ui)
+				final Future	future	= new Future();
+				searchChildren(cms, ProxyComponentTreeNode.this, desc, cid, ui, iconcache, future).addResultListener(new SwingDefaultResultListener(ui)
 				{
 					public void customResultAvailable(Object source, Object result)
 					{
-						setChildren((List)result);
+						setChildren((List)result).addResultListener(new DelegationResultListener(future));
 						connected = true;
 					}
 					
@@ -149,12 +151,14 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 	 *  Should call setChildren() once children are found.
 	 */
 	protected static IFuture searchChildren(final IComponentManagementService cms, final IComponentTreeNode parentnode,
-		final IComponentDescription desc, final IComponentIdentifier cid, final Component ui, final  ComponentIconCache iconcache)
+		final IComponentDescription desc, final IComponentIdentifier cid, final Component ui, final  ComponentIconCache iconcache,
+		final // future for determining when services can be added to service container.
+		Future future)
 	{
 		final Future ret = new Future();
 	
 		final List children = new ArrayList();
-		final boolean ready[] = new boolean[2];
+		final boolean	ready[]	= new boolean[2];	// 0: children, 1: services;
 
 		IComponentTreeNode tmp = parentnode;
 		while(!(tmp instanceof ProxyComponentTreeNode))
@@ -220,7 +224,7 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 									if(scn==null)
 										scn	= new ServiceContainerNode(parentnode, parentnode.getModel());
 									children.add(0, scn);
-									List subchildren = new ArrayList();
+									final List subchildren = new ArrayList();
 									for(int i=0; i<services.size(); i++)
 									{
 										IService service = (IService)services.get(i);
@@ -229,7 +233,15 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 											sn = new ServiceNode(scn, parentnode.getModel(), service);
 										subchildren.add(sn);
 									}
-									scn.setChildren(subchildren);							
+									
+									final ServiceContainerNode	node	= scn;
+									future.addResultListener(new SwingDefaultResultListener(proxy.getUI())
+									{
+										public void customResultAvailable(Object source, Object result)
+										{
+											node.setChildren(subchildren);							
+										}
+									});
 								}
 
 								ready[1] = true;

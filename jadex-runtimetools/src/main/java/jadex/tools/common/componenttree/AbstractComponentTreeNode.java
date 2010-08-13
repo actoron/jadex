@@ -1,5 +1,8 @@
 package jadex.tools.common.componenttree;
 
+import jadex.commons.Future;
+import jadex.commons.IFuture;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -154,13 +157,26 @@ public abstract class AbstractComponentTreeNode	implements IComponentTreeNode
 	 *  ongoing search for children.
 	 *  Method may be called from any thread.
 	 */
-	protected void	setChildren(final List children)
+	protected IFuture	setChildren(final List children)
 	{
+		final Future	ret	= new Future();
+		final	RuntimeException	rte;
+		try
+		{
+			throw new RuntimeException();
+		}
+		catch (RuntimeException e)
+		{
+			rte	= e;
+		}
+		
 		SwingUtilities.invokeLater(new Runnable()
 		{
 			public void run()
 			{
+				boolean	dorecurse	= recurse;
 				searching	= false;
+				recurse	= false;
 				List	oldcs	= AbstractComponentTreeNode.this.children;
 				AbstractComponentTreeNode.this.children	= children;
 				List	added	= new ArrayList();
@@ -178,12 +194,10 @@ public abstract class AbstractComponentTreeNode	implements IComponentTreeNode
 				{
 					added.removeAll(oldcs);
 				}
-				
-//				System.out.println("added: "+added);
-//				System.out.println("removed: "+removed);
-//				System.out.println("children: "+children);
-//				System.out.println("oldcs: "+oldcs);
-				
+
+				try
+				{
+					
 				if(!added.isEmpty() && !removed.isEmpty())
 				{
 					for(int i=0; oldcs!=null && i<oldcs.size(); i++)
@@ -217,15 +231,31 @@ public abstract class AbstractComponentTreeNode	implements IComponentTreeNode
 					model.fireNodeChanged(AbstractComponentTreeNode.this);
 				}
 				
-				if(recurse)
+				}
+				catch(RuntimeException e)
+				{
+					System.err.println("node problem: "+AbstractComponentTreeNode.this+"#"+AbstractComponentTreeNode.this.hashCode());
+					System.err.println("added: "+added);
+					System.err.println("removed: "+removed);
+					System.err.println("children: "+children);
+					System.err.println("oldcs: "+oldcs);
+					rte.printStackTrace();
+					throw e;
+				}
+				
+				if(dorecurse)
 				{
 					for(int i=0; children!=null && i<children.size(); i++)
 					{
-						((IComponentTreeNode)children.get(i)).refresh(recurse);
+						((IComponentTreeNode)children.get(i)).refresh(dorecurse);
 					}
 				}
+				
+				ret.setResult(null);
 			}
 		});
+		
+		return ret;
 	}
 	
 	/**

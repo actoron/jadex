@@ -4,7 +4,9 @@ import jadex.base.service.remote.ProxyAgent;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
+import jadex.commons.Future;
 import jadex.commons.ICommand;
+import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.micro.IMicroExternalAccess;
 
@@ -59,11 +61,12 @@ public class VirtualComponentTreeNode extends AbstractComponentTreeNode implemen
 	 */
 	protected void	searchChildren()
 	{
-		ProxyComponentTreeNode.searchChildren(cms, this, desc, desc.getName(), ui, iconcache).addResultListener(new SwingDefaultResultListener(ui)
+		final Future	future	= new Future();
+		ProxyComponentTreeNode.searchChildren(cms, this, desc, desc.getName(), ui, iconcache, future).addResultListener(new SwingDefaultResultListener(ui)
 		{
 			public void customResultAvailable(Object source, Object result)
 			{
-				setChildren((List)result);
+				setChildren((List)result).addResultListener(new DelegationResultListener(future));
 			}
 			
 			public void customExceptionOccurred(Object source, Exception exception)

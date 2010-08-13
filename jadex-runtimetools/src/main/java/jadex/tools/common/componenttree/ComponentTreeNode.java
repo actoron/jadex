@@ -6,6 +6,7 @@ import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
+import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.service.IService;
 import jadex.service.SServiceProvider;
@@ -95,7 +96,8 @@ public class ComponentTreeNode	extends AbstractComponentTreeNode implements IAct
 	protected void	searchChildren()
 	{
 		final List	children	= new ArrayList();
-		final boolean	ready[]	= new boolean[2];
+		final boolean	ready[]	= new boolean[2];	// 0: children, 1: services;
+		final Future	future	= new Future();	// future for determining when services can be added to service container.
 
 		cms.getChildren(desc.getName()).addResultListener(new SwingDefaultResultListener(ui)
 		{
@@ -127,7 +129,7 @@ public class ComponentTreeNode	extends AbstractComponentTreeNode implements IAct
 												ready[0]	= true;
 												if(ready[0] &&  ready[1])
 												{
-													setChildren(children);
+													setChildren(children).addResultListener(new DelegationResultListener(future));
 												}
 											}
 										}
@@ -148,7 +150,7 @@ public class ComponentTreeNode	extends AbstractComponentTreeNode implements IAct
 										ready[0]	= true;
 										if(ready[0] &&  ready[1])
 										{
-											setChildren(children);
+											setChildren(children).addResultListener(new DelegationResultListener(future));
 										}
 									}
 								}
@@ -161,7 +163,7 @@ public class ComponentTreeNode	extends AbstractComponentTreeNode implements IAct
 					ready[0]	= true;
 					if(ready[0] &&  ready[1])
 					{
-						setChildren(children);
+						setChildren(children).addResultListener(new DelegationResultListener(future));
 					}
 				}
 			}
@@ -185,7 +187,8 @@ public class ComponentTreeNode	extends AbstractComponentTreeNode implements IAct
 							if(scn==null)
 								scn	= new ServiceContainerNode(ComponentTreeNode.this, getModel());
 							children.add(0, scn);
-							List	subchildren	= new ArrayList();
+							
+							final List	subchildren	= new ArrayList();
 							for(int i=0; i<services.size(); i++)
 							{
 								IService service	= (IService)services.get(i);
@@ -194,13 +197,21 @@ public class ComponentTreeNode	extends AbstractComponentTreeNode implements IAct
 									sn	= new ServiceNode(scn, getModel(), service);
 								subchildren.add(sn);
 							}
-							scn.setChildren(subchildren);							
+							
+							final ServiceContainerNode	node	= scn;
+							future.addResultListener(new SwingDefaultResultListener(ui)
+							{
+								public void customResultAvailable(Object source, Object result)
+								{
+									node.setChildren(subchildren);							
+								}
+							});
 						}
 
 						ready[1]	= true;
 						if(ready[0] &&  ready[1])
 						{
-							setChildren(children);
+							setChildren(children).addResultListener(new DelegationResultListener(future));
 						}
 					}
 				});

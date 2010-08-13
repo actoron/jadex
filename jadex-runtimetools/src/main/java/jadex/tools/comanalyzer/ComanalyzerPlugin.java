@@ -408,7 +408,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 				{
 					IComponentDescription ad = ((IActiveComponentTreeNode)node).getDescription();
 					Component agent = componentlist.getAgent(ad.getName());
-					if(Component.STATE_OBSERVED.equals(agent.getState()))
+					if(agent!=null && Component.STATE_OBSERVED.equals(agent.getState()))
 					{
 						ret	= ComanalyzerPlugin.icons.getIcon("agent_introspected");
 					}
@@ -431,12 +431,16 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 					boolean	allob	= true;
 					for(int i=0; allob && i<nodes.length; i++)
 					{
-						allob	= componentlist.getAgent(((IActiveComponentTreeNode)nodes[i]).getDescription().getName()).getState().equals(Component.STATE_OBSERVED);
+						IComponentDescription ad = ((IActiveComponentTreeNode)nodes[i]).getDescription();
+						Component agent = componentlist.getAgent(ad.getName());
+						allob	= agent!=null && Component.STATE_OBSERVED.equals(agent.getState());
 					}
 					boolean	allig	= true;
 					for(int i=0; allig && i<nodes.length; i++)
 					{
-						allig	= componentlist.getAgent(((IActiveComponentTreeNode)nodes[i]).getDescription().getName()).getState().equals(Component.STATE_IGNORED);
+						IComponentDescription ad = ((IActiveComponentTreeNode)nodes[i]).getDescription();
+						Component agent = componentlist.getAgent(ad.getName());
+						allig	= agent!=null && Component.STATE_IGNORED.equals(agent.getState());
 					}
 					
 					// Todo: Large icons for popup actions?
@@ -472,12 +476,12 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 				Action	a	= null;
 				if(node instanceof IActiveComponentTreeNode)
 				{
-					String	state	= componentlist.getAgent(((IActiveComponentTreeNode)node).getDescription().getName()).getState();
-					if(state.equals(Component.STATE_OBSERVED))
+					Component	agent	= componentlist.getAgent(((IActiveComponentTreeNode)node).getDescription().getName());
+					if(agent!=null && agent.getState().equals(Component.STATE_OBSERVED))
 					{
 						a	= STOP_OBSERVING;
 					}
-					else if(state.equals(Component.STATE_IGNORED))
+					else if(agent!=null && agent.getState().equals(Component.STATE_IGNORED))
 					{
 						a	= START_OBSERVING;
 					}
