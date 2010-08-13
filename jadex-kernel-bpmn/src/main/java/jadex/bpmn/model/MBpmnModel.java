@@ -1006,6 +1006,19 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel, I
 	}
 
 	/**
+	 *  Add a property.
+	 */
+	public void	addProperty(String name, Object value)
+	{
+		if(properties==null)
+		{
+			Map	props	= new HashMap();
+			props.put(name, value);
+			this.properties	= props;
+		}
+	}
+
+	/**
 	 *  Return the class loader corresponding to the micro agent class.
 	 */
 	public ClassLoader getClassLoader()

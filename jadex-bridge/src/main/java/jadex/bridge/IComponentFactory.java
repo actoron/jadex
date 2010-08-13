@@ -64,7 +64,7 @@ public interface IComponentFactory extends IService
 	 * @param config The name of the configuration (or null for default configuration) 
 	 * @param arguments The arguments for the component as name/value pairs.
 	 * @param parent The parent component (if any).
-	 * @return An instance of a component.
+	 * @return An instance of a component and the corresponding adapter.
 	 */
 	public Object[] createComponentInstance(IComponentDescription desc, IComponentAdapterFactory factory, ILoadableComponentModel model, 
 		String config, Map arguments, IExternalAccess parent, Future ret);

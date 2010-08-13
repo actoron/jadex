@@ -4,6 +4,7 @@ import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IMessageService;
+import jadex.commons.SUtil;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.service.IServiceProvider;
 import jadex.service.SServiceProvider;
@@ -32,9 +33,6 @@ public class ComponentIdentifierPanel extends JPanel
 {
 	//-------- attributes --------
 
-//	/** The component management service.*/
-//	protected IComponentManagementService cms;
-	
 	/** The service provider. */
 	protected IServiceProvider provider;
 	
@@ -90,7 +88,7 @@ public class ComponentIdentifierPanel extends JPanel
 			public void tableChanged(TableModelEvent e)
 			{
 				//System.out.println("event: "+e);
-				SServiceProvider.getService(provider, IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
+				SServiceProvider.getService(provider, IComponentManagementService.class).addResultListener(new SwingDefaultResultListener(ComponentIdentifierPanel.this)
 				{
 					public void customResultAvailable(Object source, Object result)
 					{
@@ -141,7 +139,7 @@ public class ComponentIdentifierPanel extends JPanel
 		add(content, BorderLayout.CENTER);
 		add(help, BorderLayout.SOUTH);
 		
-		SServiceProvider.getService(provider, IMessageService.class).addResultListener(new SwingDefaultResultListener()
+		SServiceProvider.getService(provider, IMessageService.class).addResultListener(new SwingDefaultResultListener(ComponentIdentifierPanel.this)
 		{
 			public void customResultAvailable(Object source, Object result)
 			{
@@ -178,6 +176,7 @@ public class ComponentIdentifierPanel extends JPanel
 	 */
 	public void setComponentIdentifier(IComponentIdentifier cid)
 	{
+		System.out.println("set cid: "+cid+", "+(cid!=null ? SUtil.arrayToString(cid.getAddresses()):"[]"));
 		this.cid	= cid!=null? cid: new ComponentIdentifier(); 
 //		this.cid	= aid!=null ? aid : cms.createComponentIdentifier(null, false, null);
 		refresh();
@@ -239,7 +238,7 @@ public class ComponentIdentifierPanel extends JPanel
 		
 		protected void	update()
 		{
-			SServiceProvider.getService(provider, IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
+			SServiceProvider.getService(provider, IComponentManagementService.class).addResultListener(new SwingDefaultResultListener(ComponentIdentifierPanel.this)
 			{
 				public void customResultAvailable(Object source, Object result)
 				{

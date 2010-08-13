@@ -282,6 +282,26 @@ public class AgentSelectorDialog
 			}
 		};
 		
+		// When user selects a component in list, show aid in panel.
+		list.getSelectionModel().addListSelectionListener(new ListSelectionListener()
+		{
+			public void valueChanged(ListSelectionEvent e)
+			{
+				if(!editing[0] && !e.getValueIsAdjusting())
+				{
+					IComponentIdentifier	selected	= null;
+					if(!list.getSelectionModel().isSelectionEmpty())
+					{
+						int	row	= list.getSelectionModel().getMinSelectionIndex();
+						selected	= (IComponentIdentifier)sels.get(row);
+					}
+					aidpanel.setComponentIdentifier(selected);
+					aidpanel.setEditable(selected!=null);
+					remove.setEnabled(selected!=null);
+				}
+			}
+		});
+
 		// Refresh selection
 		if(sels.size()>0)
 			list.getSelectionModel().setSelectionInterval(0, 0);
@@ -316,25 +336,6 @@ public class AgentSelectorDialog
 					}
 				}
 				select.setEnabled(selectenabled);
-			}
-		});
-		// When user selects a component in list, show aid in panel.
-		list.getSelectionModel().addListSelectionListener(new ListSelectionListener()
-		{
-			public void valueChanged(ListSelectionEvent e)
-			{
-				if(!editing[0] && !e.getValueIsAdjusting())
-				{
-					IComponentIdentifier	selected	= null;
-					if(!list.getSelectionModel().isSelectionEmpty())
-					{
-						int	row	= list.getSelectionModel().getMinSelectionIndex();
-						selected	= (IComponentIdentifier)sels.get(row);
-					}
-					aidpanel.setComponentIdentifier(selected);
-					aidpanel.setEditable(selected!=null);
-					remove.setEnabled(selected!=null);
-				}
 			}
 		});
 							

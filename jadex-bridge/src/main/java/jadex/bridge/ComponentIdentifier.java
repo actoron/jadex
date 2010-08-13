@@ -112,7 +112,11 @@ public class ComponentIdentifier implements IComponentIdentifier, Cloneable, Ser
 			this.addresses = new ArrayList();
 
 		for(int i = 0; i < addresses.length; i++)
+		{
+			if(addresses[i]==null)
+				throw new IllegalArgumentException("Addresses must not null: "+this);
 			this.addresses.add(addresses[i]);
+		}
 	}
 
 	/**

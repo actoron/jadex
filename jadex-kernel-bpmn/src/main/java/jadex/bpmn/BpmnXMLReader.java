@@ -1304,6 +1304,32 @@ public class BpmnXMLReader
 								{
 									throw new RuntimeException("results no longer separately");
 								}
+								else if("properties".equals(key))
+								{
+									StringTokenizer stok = new StringTokenizer(value, LIST_ELEMENT_DELIMITER);
+									while(stok.hasMoreTokens())
+									{
+										String proptext = stok.nextToken();
+										StringTokenizer stok2 = new StringTokenizer(proptext, LIST_ELEMENT_ATTRIBUTE_DELIMITER);
+										String name = stok2.nextToken();
+										String val = stok2.hasMoreTokens()? stok2.nextToken(): null;
+										IParsedExpression exp = null;
+	
+										if(val!=null)
+										{
+											exp = parser.parseExpression(val, model.getAllImports(), null, context.getClassLoader());
+											try
+											{
+												Object	propval	= exp!=null ? exp.getValue(null) : null;
+												model.addProperty(name, propval);
+											}
+											catch(RuntimeException e)
+											{
+												e.printStackTrace();
+											}
+										}
+									}
+								}
 								else if(!"package".equals(key) && !"imports".equals(key))
 								{
 									throw new RuntimeException("Error parsing annotation: "+key+", "+value);

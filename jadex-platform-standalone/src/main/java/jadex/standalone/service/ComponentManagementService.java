@@ -242,23 +242,7 @@ public class ComponentManagementService extends BasicService implements ICompone
 										if(cinfo.isDaemon())
 											daemons++;
 										
-										boolean pasuspend = false;
-										Object[] painfo = getParentInfo(cinfo);
-										CMSComponentDescription padesc;
-										if(painfo!=null)
-										{
-											pasuspend = ((CreationInfo)painfo[2]).isSuspend();
-											padesc = (CMSComponentDescription)painfo[0];
-										}
-										else
-										{
-											padesc = (CMSComponentDescription)descs.get(getParentIdentifier(cinfo));
-											pasuspend = IComponentDescription.STATE_SUSPENDED.equals(padesc.getState());
-										}
-										// Suspend when set to suspend or when parent is also suspended or when specified in model.
-										Object	debugging 	= lmodel.getProperties().get("debugging");
-										if(cinfo.isSuspend() || pasuspend || debugging instanceof Boolean 
-											&& ((Boolean)debugging).booleanValue())
+										if(isInitSuspend(cinfo, lmodel))
 										{
 											ad.setState(IComponentDescription.STATE_SUSPENDED);
 										}
@@ -273,6 +257,16 @@ public class ComponentManagementService extends BasicService implements ICompone
 										adapters.put(cid, adapter);
 										initinfos.remove(cid);
 										
+										CMSComponentDescription padesc;
+										Object[] painfo = getParentInfo(cinfo);
+										if(painfo!=null)
+										{
+											padesc = (CMSComponentDescription)painfo[0];
+										}
+										else
+										{
+											padesc = (CMSComponentDescription)descs.get(getParentIdentifier(cinfo));
+										}
 										padesc.addChild(cid);
 										pad.getComponentInstance().componentCreated(ad, lmodel);
 									}
@@ -343,7 +337,8 @@ public class ComponentManagementService extends BasicService implements ICompone
 						{
 							synchronized(descs)
 							{
-								initinfos.put(cid, new Object[]{ad, comp[1], cinfo});
+								// 0: description, 1: adapter, 2: creation info, 3: model
+								initinfos.put(cid, new Object[]{ad, comp[1], cinfo, lmodel});
 							}
 						}
 						
@@ -1540,6 +1535,36 @@ public class ComponentManagementService extends BasicService implements ICompone
 		});
 		
 		return ret;*/
+	}
+	
+	/**
+	 *  Test if a component should be suspended after init is done.
+	 *  @param cinfo	The creation info.
+	 *  @param lmodel	The model of the component.
+	 *  @return	True, if the component should be suspended
+	 */
+	protected boolean isInitSuspend(CreationInfo cinfo, ILoadableComponentModel lmodel)
+	{
+		boolean pasuspend = false;
+		Object[] painfo = getParentInfo(cinfo);
+		
+		// Parent also still in init.
+		if(painfo!=null)
+		{
+			pasuspend	= isInitSuspend((CreationInfo)painfo[2], (ILoadableComponentModel)painfo[3]);
+		}
+		
+		// Parent already running.
+		else
+		{
+			CMSComponentDescription	padesc = (CMSComponentDescription)descs.get(getParentIdentifier(cinfo));
+			pasuspend = IComponentDescription.STATE_SUSPENDED.equals(padesc.getState());
+		}
+		// Suspend when set to suspend or when parent is also suspended or when specified in model.
+		Object	debugging 	= lmodel.getProperties().get("debugging");
+		boolean	suspend	= cinfo.isSuspend() || pasuspend || debugging instanceof Boolean 
+			&& ((Boolean)debugging).booleanValue();
+		return suspend;
 	}
 	
 	/**

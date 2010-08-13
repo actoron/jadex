@@ -329,6 +329,8 @@ public class TCPTransport implements ITransport
 	 */
 	protected TCPOutputConnection getConnection(String address)
 	{
+		if(address==null)
+			System.out.println("xdjlgbl");
 		address = address.toLowerCase();
 		
 		Object ret = connections.get(address);
