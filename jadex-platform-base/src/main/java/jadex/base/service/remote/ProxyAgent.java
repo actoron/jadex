@@ -79,7 +79,7 @@ public class ProxyAgent extends MicroAgent
 							
 							public void exceptionOccurred(Object source, Exception exception)
 							{
-								System.out.println("Children exception: "+getComponentIdentifier());
+//								System.out.println("Children exception: "+getComponentIdentifier());
 								ret.setException(exception);
 							}
 						});
@@ -87,7 +87,7 @@ public class ProxyAgent extends MicroAgent
 					
 					public void exceptionOccurred(Object source, Exception exception)
 					{
-						System.out.println("No remote cms found: "+getComponentIdentifier());
+//						System.out.println("No remote cms found: "+getComponentIdentifier());
 						ret.setException(exception);
 					}
 				});
@@ -95,7 +95,7 @@ public class ProxyAgent extends MicroAgent
 			
 			public void exceptionOccurred(Object source, Exception exception)
 			{
-				System.out.println("No rms found: "+getComponentIdentifier());
+//				System.out.println("No rms found: "+getComponentIdentifier());
 				ret.setException(exception);
 			}
 		});

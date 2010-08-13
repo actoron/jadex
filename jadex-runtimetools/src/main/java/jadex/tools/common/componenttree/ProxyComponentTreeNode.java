@@ -105,7 +105,8 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 	 */
 	protected void	searchChildren()
 	{
-		getRemoteComponentIdentifier().addResultListener(new SwingDefaultResultListener(ui)
+		// Do not use 'ui' in SwingDefLis because failures will be shown be node color
+		getRemoteComponentIdentifier().addResultListener(new SwingDefaultResultListener((Component)null)
 		{
 			public void customResultAvailable(Object source, Object result)
 			{

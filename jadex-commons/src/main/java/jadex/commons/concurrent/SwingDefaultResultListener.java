@@ -92,7 +92,7 @@ public abstract class SwingDefaultResultListener extends DefaultResultListener
 	 */
 	final public void exceptionOccurred(final Object source, final Exception exception)
 	{
-		exception.printStackTrace();
+//		exception.printStackTrace();
 		SwingUtilities.invokeLater(new Runnable()
 		{
 			public void run()
