@@ -318,7 +318,7 @@ public class TestCenterPanel extends JSplitPane
 					, "Save")==JFileChooser.APPROVE_OPTION)
 				{
 					SServiceProvider.getService(plugin.getJCC().getServiceContainer(),
-						ILibraryService.class).addResultListener(new SwingDefaultResultListener()
+						ILibraryService.class).addResultListener(new SwingDefaultResultListener(TestCenterPanel.this)
 					{
 						public void customResultAvailable(Object source, Object result)
 						{
@@ -357,7 +357,7 @@ public class TestCenterPanel extends JSplitPane
 					, "Load")==JFileChooser.APPROVE_OPTION)
 				{
 					SServiceProvider.getServiceUpwards(plugin.getJCC().getServiceContainer(),
-						ILibraryService.class).addResultListener(new SwingDefaultResultListener()
+						ILibraryService.class).addResultListener(new SwingDefaultResultListener(TestCenterPanel.this)
 					{
 						public void customResultAvailable(Object source, Object result) 
 						{
@@ -1145,7 +1145,7 @@ public class TestCenterPanel extends JSplitPane
 			// Ignore if goal is leftover from aborted execution.
 			if(goals.remove(goal))
 			{
-				goal.isSucceeded().addResultListener(new SwingDefaultResultListener()
+				goal.isSucceeded().addResultListener(new SwingDefaultResultListener(TestCenterPanel.this)
 				{
 					public void customResultAvailable(Object source, Object result)
 					{

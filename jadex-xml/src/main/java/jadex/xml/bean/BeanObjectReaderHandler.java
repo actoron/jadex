@@ -64,9 +64,6 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 //	protected IBeanIntrospector introspector = new BeanReflectionIntrospector();
 	protected IBeanIntrospector introspector = new BeanInfoIntrospector();
 	
-	// Hack!!!
-	protected Map arraycounter;
-	
 	//-------- constructors --------
 	
 	/**
@@ -343,22 +340,10 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 		
 		else if(parent.getClass().isArray())
 		{
-			Integer cnt = null;
-			if(arraycounter==null)
-			{
-				arraycounter = new WeakHashMap();
-			}
-			else
-			{
-				cnt = (Integer)arraycounter.get(parent);
-			}
-			if(cnt==null)
-				cnt = new Integer(0);
+			int cnt = context.getArrayCount(parent);
 			
 			if(!NULL.equals(object))
-				Array.set(parent, cnt.intValue(), object);
-			
-			arraycounter.put(parent, new Integer(cnt.intValue()+1));
+				Array.set(parent, cnt, object);
 			
 			linked = true;
 		}
@@ -463,26 +448,14 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 		// Special case array
 		else if(parent.getClass().isArray())
 		{
-			Integer cnt = null;
-			if(arraycounter==null)
-			{
-				arraycounter = new WeakHashMap();
-			}
-			else
-			{
-				cnt = (Integer)arraycounter.get(parent);
-			}
-			if(cnt==null)
-				cnt = new Integer(0);
-			
 			for(int i=0; i<childs.size(); i++)
 			{
+				int cnt = context.getArrayCount(parent);
+				
 				Object object = childs.get(i);
 				if(!NULL.equals(object))
-					Array.set(parent, cnt.intValue()+i, object);
+					Array.set(parent, cnt, object);
 			}
-			
-			arraycounter.put(parent, new Integer(cnt.intValue()+childs.size()));
 			
 			linked = true;
 		}

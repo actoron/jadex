@@ -78,7 +78,7 @@ public class SimCenterPanel extends JPanel
 		add(sp, "Center");
 		
 		SServiceProvider.getService(simcenter.getJCC().getServiceContainer(),
-			ISimulationService.class).addResultListener(new SwingDefaultResultListener()
+			ISimulationService.class).addResultListener(new SwingDefaultResultListener(SimCenterPanel.this)
 		{
 			public void customResultAvailable(Object source, Object result)
 			{

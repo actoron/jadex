@@ -25,12 +25,12 @@ public abstract class SwingDefaultResultListener extends DefaultResultListener
 	
 	//-------- constructors --------
 	
-	/**
-	 *  Create a new listener.
-	 */
-	public SwingDefaultResultListener()
-	{
-	}
+//	/**
+//	 *  Create a new listener.
+//	 */
+//	public SwingDefaultResultListener()
+//	{
+//	}
 	
 	/**
 	 *  Create a new listener.
@@ -59,7 +59,7 @@ public abstract class SwingDefaultResultListener extends DefaultResultListener
 		// Hack! Implement that logger can be passed
 		if(instance==null)
 		{
-			instance = new SwingDefaultResultListener()
+			instance = new SwingDefaultResultListener((Component)null)
 			{
 				public void customResultAvailable(Object source, Object result)
 				{

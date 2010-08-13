@@ -97,7 +97,7 @@ public class ControlCenter implements IControlCenter
 		assert Thread.currentThread().getContextClassLoader() != null;
 
 		SServiceProvider.getService(container, ILibraryService.class)
-			.addResultListener(new SwingDefaultResultListener()
+			.addResultListener(new SwingDefaultResultListener(window)
 		{
 			public void customResultAvailable(Object source, Object result)
 			{

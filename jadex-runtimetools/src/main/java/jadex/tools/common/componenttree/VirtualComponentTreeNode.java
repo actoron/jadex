@@ -94,7 +94,7 @@ public class VirtualComponentTreeNode extends AbstractComponentTreeNode implemen
 					public void execute(Object agent)
 					{
 						ProxyAgent pa = (ProxyAgent)agent;
-						pa.getRemoteComponentDescription(desc.getName()).addResultListener(new SwingDefaultResultListener()
+						pa.getRemoteComponentDescription(desc.getName()).addResultListener(new SwingDefaultResultListener(ui)
 						{
 							public void customResultAvailable(Object source, Object result)
 							{

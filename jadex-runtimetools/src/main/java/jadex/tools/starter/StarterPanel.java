@@ -238,7 +238,7 @@ public class StarterPanel extends JPanel
 				if(model!=null)
 				{
 					SServiceProvider.getService(starter.getJCC().getServiceContainer(),
-						ILibraryService.class).addResultListener(new SwingDefaultResultListener()
+						ILibraryService.class).addResultListener(new SwingDefaultResultListener(StarterPanel.this)
 					{
 						public void customResultAvailable(Object source, Object result)
 						{
@@ -281,7 +281,7 @@ public class StarterPanel extends JPanel
 								final ILoadableComponentModel mymodel = model;
 								if(storeresults!=null && storeresults.isSelected())
 								{
-									killlistener = new SwingDefaultResultListener()
+									killlistener = new SwingDefaultResultListener(StarterPanel.this)
 									{
 										public void customResultAvailable(Object source, Object result)
 										{
@@ -544,13 +544,13 @@ public class StarterPanel extends JPanel
 		
 		if(adf!=null)
 		{
-			SComponentFactory.isLoadable(starter.getJCC().getServiceContainer(), adf).addResultListener(new SwingDefaultResultListener()
+			SComponentFactory.isLoadable(starter.getJCC().getServiceContainer(), adf).addResultListener(new SwingDefaultResultListener(StarterPanel.this)
 			{
 				public void customResultAvailable(Object source, Object result)
 				{
 					if(((Boolean)result).booleanValue())
 					{
-						SComponentFactory.loadModel(starter.getJCC().getServiceContainer(), adf).addResultListener(new SwingDefaultResultListener()
+						SComponentFactory.loadModel(starter.getJCC().getServiceContainer(), adf).addResultListener(new SwingDefaultResultListener(StarterPanel.this)
 						{
 							public void customResultAvailable(Object source, Object result)
 							{
@@ -863,7 +863,7 @@ public class StarterPanel extends JPanel
 	protected void createArguments()
 	{
 		SServiceProvider.getService(starter.getJCC().getServiceContainer(),
-			ILibraryService.class).addResultListener(new SwingDefaultResultListener()		
+			ILibraryService.class).addResultListener(new SwingDefaultResultListener(StarterPanel.this)		
 		{
 			public void customResultAvailable(Object source, Object result)
 			{

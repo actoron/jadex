@@ -45,6 +45,9 @@ public class ReadContext implements IContext
 	/** The post processors. */
 	protected MultiCollection postprocessors;
 	
+	/** The map or array information. */
+	protected Map arrayinfos;
+	
 	//-------- constructors --------
 	
 	/**
@@ -262,7 +265,22 @@ public class ReadContext implements IContext
 		this.postprocessors = postprocessors;
 	}	
 	
+	/**
+	 *  Get the current array counter.
+	 */
+	public int getArrayCount(Object parent)
+	{
+		int ret = 0;
+		
+		if(arrayinfos==null)
+			arrayinfos = new HashMap();
+		
+		if(arrayinfos.containsKey(parent))
+			ret = ((Integer)arrayinfos.get(parent)).intValue();
+		
+		arrayinfos.put(parent, new Integer(ret+1));
 	
-	
+		return ret;
+	}
 	
 }

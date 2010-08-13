@@ -124,7 +124,7 @@ public class ContextPanel extends AbstractTimePanel
 		public void actionPerformed(ActionEvent e)
 		{
 			SServiceProvider.getService(getPlatform(),
-				ISimulationService.class).addResultListener(new SwingDefaultResultListener()
+				ISimulationService.class).addResultListener(new SwingDefaultResultListener(ContextPanel.this)
 			{
 				public void customResultAvailable(Object source, Object result)
 				{
@@ -162,7 +162,7 @@ public class ContextPanel extends AbstractTimePanel
 		public void actionPerformed(ActionEvent e)
 		{
 			SServiceProvider.getService(getPlatform(),
-				ISimulationService.class).addResultListener(new SwingDefaultResultListener()
+				ISimulationService.class).addResultListener(new SwingDefaultResultListener(ContextPanel.this)
 			{
 				public void customResultAvailable(Object source, Object result)
 				{
@@ -200,7 +200,7 @@ public class ContextPanel extends AbstractTimePanel
 		public void actionPerformed(ActionEvent e)
 		{
 			SServiceProvider.getService(getPlatform(),
-				ISimulationService.class).addResultListener(new SwingDefaultResultListener()
+				ISimulationService.class).addResultListener(new SwingDefaultResultListener(ContextPanel.this)
 			{
 				public void customResultAvailable(Object source, Object result)
 				{
@@ -238,7 +238,7 @@ public class ContextPanel extends AbstractTimePanel
 		public void actionPerformed(ActionEvent e)
 		{
 			SServiceProvider.getService(getPlatform(),
-				ISimulationService.class).addResultListener(new SwingDefaultResultListener()
+				ISimulationService.class).addResultListener(new SwingDefaultResultListener(ContextPanel.this)
 			{
 				public void customResultAvailable(Object source, Object result)
 				{

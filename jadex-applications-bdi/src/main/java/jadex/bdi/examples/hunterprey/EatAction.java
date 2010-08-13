@@ -8,6 +8,7 @@ import jadex.application.space.envsupport.environment.space2d.Space2D;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.SimplePropertyObject;
+import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.service.SServiceProvider;
 
@@ -70,12 +71,16 @@ public class EatAction extends SimplePropertyObject implements ISpaceAction
 		if(target.getProperty(ISpaceObject.PROPERTY_OWNER)!=null)
 		{
 //			System.err.println("Destroying: "+target.getProperty(ISpaceObject.PROPERTY_OWNER));
-			SServiceProvider.getServiceUpwards(space.getContext().getServiceProvider(), IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
+			SServiceProvider.getServiceUpwards(space.getContext().getServiceProvider(), IComponentManagementService.class).addResultListener(new IResultListener()
 			{
-				public void customResultAvailable(Object source, Object result)
+				public void resultAvailable(Object source, Object result)
 				{
 					IComponentManagementService cms = (IComponentManagementService)result;
 					cms.destroyComponent((IComponentIdentifier)target.getProperty(ISpaceObject.PROPERTY_OWNER));
+				}
+				
+				public void exceptionOccurred(Object source, Exception exception)
+				{
 				}
 			});
 		}

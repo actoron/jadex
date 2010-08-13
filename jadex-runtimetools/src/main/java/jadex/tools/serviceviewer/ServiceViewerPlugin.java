@@ -308,7 +308,7 @@ public class ServiceViewerPlugin extends AbstractJCCPlugin
 					if(classname!=null)
 					{
 						SServiceProvider.getService(getJCC().getServiceContainer(), ILibraryService.class)
-							.addResultListener(new SwingDefaultResultListener()
+							.addResultListener(new SwingDefaultResultListener(comptree)
 						{
 							public void customResultAvailable(Object source, Object result)
 							{

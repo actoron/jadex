@@ -60,7 +60,7 @@ public class OptionDialog extends JDialog
 		super(parent, true);
 		this.agent = agent;
 		setTitle("Options");
-		agent.getBeliefbase().getBeliefFact("settings").addResultListener(new SwingDefaultResultListener()
+		agent.getBeliefbase().getBeliefFact("settings").addResultListener(new SwingDefaultResultListener(parent)
 		{
 			public void customResultAvailable(Object source, Object result)
 			{

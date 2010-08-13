@@ -118,7 +118,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 		dealerpan = new JPanel();
 		dealerpan.setBorder(BorderFactory.createTitledBorder(" Dealer "));
 		dealerpan.setBackground(Color.WHITE);
-		SServiceProvider.getService(access.getServiceProvider(), IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
+		SServiceProvider.getService(access.getServiceProvider(), IComponentManagementService.class).addResultListener(new SwingDefaultResultListener(ManagerFrame.this)
 		{
 			public void customResultAvailable(Object source, Object result)
 			{
@@ -133,7 +133,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 		{
 			public void actionPerformed(ActionEvent ae)
 			{
-				SServiceProvider.getService(access.getServiceProvider(), IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
+				SServiceProvider.getService(access.getServiceProvider(), IComponentManagementService.class).addResultListener(new SwingDefaultResultListener(ManagerFrame.this)
 				{
 					public void customResultAvailable(Object source, Object result)
 					{
@@ -219,7 +219,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 //			public void run()
 //			{
 				// create new Player Panels with the properties as specified in the Manager.xml
-				access.getBeliefbase().getBeliefSetFacts("players").addResultListener(new SwingDefaultResultListener()
+				access.getBeliefbase().getBeliefSetFacts("players").addResultListener(new SwingDefaultResultListener(ManagerFrame.this)
 				{
 					public void customResultAvailable(Object source, Object result)
 					{

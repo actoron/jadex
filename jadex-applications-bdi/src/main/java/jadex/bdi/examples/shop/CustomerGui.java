@@ -91,7 +91,7 @@ public class CustomerGui extends JFrame
 		    public void actionPerformed(ActionEvent e)
 		    {
 		    	SServiceProvider.getServices(agent.getServiceProvider(), IShop.class)
-					.addResultListener(new SwingDefaultResultListener()
+					.addResultListener(new SwingDefaultResultListener(CustomerGui.this)
 				{
 					public void customResultAvailable(Object source, Object result)
 					{
@@ -119,7 +119,7 @@ public class CustomerGui extends JFrame
 
 		final JTextField money = new JTextField(5);
 		agent.getBeliefbase().getBeliefFact("money")
-			.addResultListener(new SwingDefaultResultListener()
+			.addResultListener(new SwingDefaultResultListener(CustomerGui.this)
 		{
 			public void customResultAvailable(Object source, Object result)
 			{
@@ -232,7 +232,7 @@ public class CustomerGui extends JFrame
 					final Double price = (Double)shopmodel.getValueAt(sel, 1);
 					final IShop shop = (IShop)shopscombo.getSelectedItem();
 //					System.out.println("buying: "+name+" at: "+shop.getName());
-					agent.createGoal("buy").addResultListener(new SwingDefaultResultListener()
+					agent.createGoal("buy").addResultListener(new SwingDefaultResultListener(CustomerGui.this)
 					{
 						public void customResultAvailable(Object source, Object result)
 						{
@@ -311,7 +311,7 @@ public class CustomerGui extends JFrame
 	{
 		if(shop!=null)
 		{
-			shop.getCatalog().addResultListener(new SwingDefaultResultListener()
+			shop.getCatalog().addResultListener(new SwingDefaultResultListener(CustomerGui.this)
 			{
 				public void customResultAvailable(Object source, Object result)
 				{

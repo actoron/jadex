@@ -93,7 +93,7 @@ public class BlocksworldGui	extends JFrame
 				
 				final JPanel	worlds	= new JPanel(new GridLayout(1, 2));
 				// Create blocksworld panel.
-				agent.getBeliefbase().getBeliefFact("table").addResultListener(new SwingDefaultResultListener()
+				agent.getBeliefbase().getBeliefFact("table").addResultListener(new SwingDefaultResultListener(BlocksworldGui.this)
 				{
 					public void customResultAvailable(Object source, Object result)
 					{
@@ -177,7 +177,7 @@ public class BlocksworldGui	extends JFrame
 								newtable.clear();
 								// Reset list.
 								newblocks.removeAllElements();
-								agent.getBeliefbase().getBeliefSetFacts("blocks").addResultListener(new SwingDefaultResultListener()
+								agent.getBeliefbase().getBeliefSetFacts("blocks").addResultListener(new SwingDefaultResultListener(BlocksworldGui.this)
 								{
 									public void customResultAvailable(Object source, Object result)
 									{
@@ -244,7 +244,7 @@ public class BlocksworldGui	extends JFrame
 						{
 							public void	actionPerformed(ActionEvent ae)
 							{
-								agent.getBeliefbase().getBeliefFact("table").addResultListener(new SwingDefaultResultListener()
+								agent.getBeliefbase().getBeliefFact("table").addResultListener(new SwingDefaultResultListener(BlocksworldGui.this)
 								{
 									public void customResultAvailable(Object source, Object result)
 									{
@@ -292,7 +292,7 @@ public class BlocksworldGui	extends JFrame
 						// Execution mode components
 						final JComboBox	mode	= new JComboBox(new String[]
 							{StackBlocksPlan.MODE_NORMAL, StackBlocksPlan.MODE_STEP, StackBlocksPlan.MODE_SLOW});
-						agent.getBeliefbase().getBeliefFact("mode").addResultListener(new SwingDefaultResultListener()
+						agent.getBeliefbase().getBeliefFact("mode").addResultListener(new SwingDefaultResultListener(BlocksworldGui.this)
 						{
 							public void customResultAvailable(Object source, Object result)
 							{
@@ -324,7 +324,7 @@ public class BlocksworldGui	extends JFrame
 						});
 						// Bucket components
 						final JList bucket = new JList();
-						agent.getBeliefbase().getBeliefFact("bucket").addResultListener(new SwingDefaultResultListener()
+						agent.getBeliefbase().getBeliefFact("bucket").addResultListener(new SwingDefaultResultListener(BlocksworldGui.this)
 						{
 							public void customResultAvailable(Object source, Object result)
 							{

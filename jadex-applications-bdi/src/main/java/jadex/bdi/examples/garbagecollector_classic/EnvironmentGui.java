@@ -66,7 +66,7 @@ public class EnvironmentGui	extends JFrame
 									public void resultAvailable(Object source, Object result)
 									{
 										final IEAGoal kill = (IEAGoal)result;
-										SServiceProvider.getServiceUpwards(agent.getServiceProvider(), IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
+										SServiceProvider.getServiceUpwards(agent.getServiceProvider(), IComponentManagementService.class).addResultListener(new SwingDefaultResultListener(EnvironmentGui.this)
 										{
 											public void customResultAvailable(Object source, Object result)
 											{

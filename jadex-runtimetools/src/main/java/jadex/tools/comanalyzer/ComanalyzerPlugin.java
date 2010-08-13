@@ -1444,7 +1444,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 //					message_maps.add(messages[i].getParameters());
 //				}
 
-				SServiceProvider.getService(jcc.getServiceContainer(), ILibraryService.class).addResultListener(new SwingDefaultResultListener()
+				SServiceProvider.getService(jcc.getServiceContainer(), ILibraryService.class).addResultListener(new SwingDefaultResultListener(comptree)
 				{
 					public void customResultAvailable(Object source, Object result)
 					{
@@ -1547,7 +1547,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 //					}
 //				}
 				final String sxml = xml;
-				SServiceProvider.getService(jcc.getServiceContainer(), ILibraryService.class).addResultListener(new SwingDefaultResultListener()
+				SServiceProvider.getService(jcc.getServiceContainer(), ILibraryService.class).addResultListener(new SwingDefaultResultListener(comptree)
 				{
 					public void customResultAvailable(Object source, Object result)
 					{

@@ -73,12 +73,12 @@ public class RuleProfilerPanel	extends JPanel
 		this.observed	= observed;
 
 		SServiceProvider.getServiceUpwards(provider,
-			IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
+			IComponentManagementService.class).addResultListener(new SwingDefaultResultListener(RuleProfilerPanel.this)
 		{
 			public void customResultAvailable(Object source, Object result)
 			{
 				final IComponentManagementService cms = (IComponentManagementService)result;
-				cms.getExternalAccess(observed).addResultListener(new SwingDefaultResultListener()
+				cms.getExternalAccess(observed).addResultListener(new SwingDefaultResultListener(RuleProfilerPanel.this)
 				{
 					public void customResultAvailable(Object source, final Object result)
 					{

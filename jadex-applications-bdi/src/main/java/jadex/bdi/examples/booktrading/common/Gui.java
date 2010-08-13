@@ -1,5 +1,6 @@
 package jadex.bdi.examples.booktrading.common;
 
+import jadex.bdi.examples.blocksworld.BlocksworldGui;
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IAgentListener;
 import jadex.bdi.runtime.IBDIExternalAccess;
@@ -494,7 +495,7 @@ public class Gui extends JFrame
 	 */
 	public void refresh()
 	{
-		agent.getBeliefbase().getBeliefSetFacts("orders").addResultListener(new SwingDefaultResultListener()
+		agent.getBeliefbase().getBeliefSetFacts("orders").addResultListener(new SwingDefaultResultListener(Gui.this)
 		{
 			public void customResultAvailable(Object source, final Object result)
 			{
@@ -526,7 +527,7 @@ public class Gui extends JFrame
 				{
 					IEAExpression exp = (IEAExpression)result;
 					
-					exp.execute("$order", order).addResultListener(new SwingDefaultResultListener()
+					exp.execute("$order", order).addResultListener(new SwingDefaultResultListener(Gui.this)
 					{
 						public void customResultAvailable(Object source, Object result)
 						{
@@ -566,7 +567,7 @@ public class Gui extends JFrame
 
 			// Add some default entry for easy testing of the gui.
 			// This order are not added to the agent (see manager.agent.xml).
-			SServiceProvider.getService(agent.getServiceProvider(), IClockService.class).addResultListener(new SwingDefaultResultListener()
+			SServiceProvider.getService(agent.getServiceProvider(), IClockService.class).addResultListener(new SwingDefaultResultListener(Gui.this)
 			{
 				
 				public void customResultAvailable(Object source, Object result)

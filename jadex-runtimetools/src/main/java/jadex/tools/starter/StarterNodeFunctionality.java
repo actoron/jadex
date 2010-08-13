@@ -208,7 +208,7 @@ public class StarterNodeFunctionality extends DefaultNodeFunctionality
 						{
 							if(((Boolean)result).booleanValue())
 							{
-								SComponentFactory.loadModel(jcc.getServiceContainer(), file).addResultListener(new SwingDefaultResultListener()
+								SComponentFactory.loadModel(jcc.getServiceContainer(), file).addResultListener(new SwingDefaultResultListener(checkcomp)
 								{
 									public void customResultAvailable(Object source, Object result)
 									{

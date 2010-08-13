@@ -354,7 +354,8 @@ public class AlarmSettingsDialog extends JDialog
 		if(alarm==null)
 		{
 			final Alarm al = new Alarm();
-			SServiceProvider.getService(agent.getServiceProvider(), IClockService.class).addResultListener(new SwingDefaultResultListener()
+			SServiceProvider.getService(agent.getServiceProvider(), IClockService.class)
+				.addResultListener(new SwingDefaultResultListener(AlarmSettingsDialog.this)
 			{
 				public void customResultAvailable(Object source, Object result)
 				{

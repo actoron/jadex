@@ -91,7 +91,7 @@ public class DealerFrame extends GameStateFrame
 		{
 			public void run()
 			{
-				agent.getBeliefbase().getBeliefFact("gamestate").addResultListener(new SwingDefaultResultListener()
+				agent.getBeliefbase().getBeliefFact("gamestate").addResultListener(new SwingDefaultResultListener(DealerFrame.this)
 				{
 					public void customResultAvailable(Object source, Object result)
 					{

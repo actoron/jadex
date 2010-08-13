@@ -1,8 +1,13 @@
 package jadex.xml.benchmark;
 
+import jadex.commons.SUtil;
+import jadex.xml.bean.BeanObjectReaderHandler;
 import jadex.xml.bean.JavaReader;
 import jadex.xml.bean.JavaWriter;
+import jadex.xml.reader.Reader;
 
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,6 +29,17 @@ public class Test //extends TestCase
 	 */
 	public static void main(String[] args)
 	{
+		try
+		{
+			InputStream is = SUtil.getResource("jadex/xml/test.xml", null);
+			Object object = JavaReader.getInstance().read(is, null, null);
+			System.out.println("read: "+object);
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		
 		Test t = new Test();
 		
 		try

@@ -328,7 +328,8 @@ public class ClockFrame extends JFrame
 				public void resultAvailable(Object source, Object result)
 				{
 					final Settings sets = (Settings)result;
-					SServiceProvider.getService(agent.getServiceProvider(), IClockService.class).addResultListener(new SwingDefaultResultListener()
+					SServiceProvider.getService(agent.getServiceProvider(), IClockService.class)
+						.addResultListener(new SwingDefaultResultListener(ClockFrame.this)
 					{
 						public void customResultAvailable(Object source, Object result)
 						{

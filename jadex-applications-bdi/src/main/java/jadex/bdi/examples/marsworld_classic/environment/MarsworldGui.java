@@ -120,7 +120,7 @@ public class MarsworldGui	extends JFrame
 		});
 
 		// Create the gui.
-		agent.getBeliefbase().getBeliefFact("environment").addResultListener(new SwingDefaultResultListener()
+		agent.getBeliefbase().getBeliefFact("environment").addResultListener(new SwingDefaultResultListener(MarsworldGui.this)
 		{
 			public void customResultAvailable(Object source, Object result)
 			{

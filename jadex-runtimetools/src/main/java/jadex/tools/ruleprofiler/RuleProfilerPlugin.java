@@ -259,13 +259,13 @@ public class RuleProfilerPlugin extends AbstractJCCPlugin	implements IComponentL
 		split.setDividerLocation(150);
 
 		SServiceProvider.getServiceUpwards(jcc.getServiceContainer(),
-			IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
+			IComponentManagementService.class).addResultListener(new SwingDefaultResultListener(comptree)
 		{
 			public void customResultAvailable(Object source, Object result)
 			{
 				IComponentManagementService cms = (IComponentManagementService)result;
 				cms.addComponentListener(null, RuleProfilerPlugin.this);
-				cms.getComponentDescriptions().addResultListener(new SwingDefaultResultListener()
+				cms.getComponentDescriptions().addResultListener(new SwingDefaultResultListener(comptree)
 				{
 					public void customResultAvailable(Object source, Object result)
 					{

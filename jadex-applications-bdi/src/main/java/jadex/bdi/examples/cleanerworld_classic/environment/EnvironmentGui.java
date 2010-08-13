@@ -82,7 +82,7 @@ public class EnvironmentGui	extends JFrame
 		super(agent.getComponentName());
 
 		agent.getBeliefbase().getBeliefFact("environment").addResultListener(
-			new SwingDefaultResultListener()
+			new SwingDefaultResultListener(EnvironmentGui.this)
 		{
 			public void customResultAvailable(Object source, Object result)
 			{
@@ -366,7 +366,7 @@ public class EnvironmentGui	extends JFrame
 							1.0-(double)p.y/(double)bounds.height);
 						final double tol = 7/(double)bounds.height;
 
-						agent.getBeliefbase().getBeliefFact("environment").addResultListener(new SwingDefaultResultListener()
+						agent.getBeliefbase().getBeliefFact("environment").addResultListener(new SwingDefaultResultListener(EnvironmentGui.this)
 						{
 							
 							public void customResultAvailable(Object source, Object result)

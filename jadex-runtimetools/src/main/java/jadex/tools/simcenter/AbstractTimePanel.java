@@ -107,13 +107,13 @@ public abstract class AbstractTimePanel extends JPanel
 			if(active)
 			{
 				SServiceProvider.getService(getPlatform(),
-					ISimulationService.class).addResultListener(new SwingDefaultResultListener()
+					ISimulationService.class).addResultListener(new SwingDefaultResultListener(AbstractTimePanel.this)
 				{
 					public void customResultAvailable(Object source, Object result)
 					{
 						((ISimulationService)result).addChangeListener(contextlistener);
 						SServiceProvider.getService(getPlatform(),
-							IClockService.class).addResultListener(new SwingDefaultResultListener()
+							IClockService.class).addResultListener(new SwingDefaultResultListener(AbstractTimePanel.this)
 						{
 							public void customResultAvailable(Object source, Object result)
 							{
@@ -127,13 +127,14 @@ public abstract class AbstractTimePanel extends JPanel
 			else
 			{
 				SServiceProvider.getService(getPlatform(),
-					ISimulationService.class).addResultListener(new SwingDefaultResultListener()
+					ISimulationService.class).addResultListener(new SwingDefaultResultListener(AbstractTimePanel.this)
 				{
 					public void customResultAvailable(Object source, Object result)
 					{
 						((ISimulationService)result).removeChangeListener(contextlistener);
 						SServiceProvider.getService(getPlatform(),
-								IClockService.class).addResultListener(new SwingDefaultResultListener(){
+								IClockService.class).addResultListener(new SwingDefaultResultListener(AbstractTimePanel.this)
+						{
 							public void customResultAvailable(Object source, Object result)
 							{
 								((IClockService)result).removeChangeListener(clocklistener);

@@ -641,7 +641,7 @@ public class ObserverCenter
 			if(delay==-1)
 			{
 				SServiceProvider.getService(space.getContext().getServiceProvider(), IClockService.class)
-					.addResultListener(new SwingDefaultResultListener()
+					.addResultListener(new SwingDefaultResultListener(mainwindow)
 				{
 					public void customResultAvailable(Object source, Object result)
 					{
@@ -654,7 +654,7 @@ public class ObserverCenter
 			else if(delay==0)
 			{
 				SServiceProvider.getService(space.getContext().getServiceProvider(), IClockService.class)
-					.addResultListener(new SwingDefaultResultListener()
+					.addResultListener(new SwingDefaultResultListener(mainwindow)
 				{
 					public void customResultAvailable(Object source, Object result)
 					{
@@ -667,7 +667,7 @@ public class ObserverCenter
 			else
 			{
 				SServiceProvider.getService(space.getContext().getServiceProvider(), IClockService.class)
-					.addResultListener(new SwingDefaultResultListener()
+					.addResultListener(new SwingDefaultResultListener(mainwindow)
 				{
 					public void customResultAvailable(Object source, Object result)
 					{
@@ -697,7 +697,7 @@ public class ObserverCenter
 			if(killonexit)
 			{
 				SServiceProvider.getServiceUpwards(space.getContext().getServiceProvider(), IComponentManagementService.class)
-					.addResultListener(new SwingDefaultResultListener()
+					.addResultListener(new SwingDefaultResultListener(mainwindow)
 				{
 					public void customResultAvailable(Object source, Object result)
 					{

@@ -637,7 +637,7 @@ public class ControlCenterWindow extends JFrame
 			final File file = filechooser.getSelectedFile();
 
 			SServiceProvider.getService(((AgentControlCenter)controlcenter).getAgent().getServiceProvider(), ILibraryService.class)
-				.addResultListener(new SwingDefaultResultListener()
+				.addResultListener(new SwingDefaultResultListener(ControlCenterWindow.this)
 			{
 				public void customResultAvailable(Object source, Object result)
 				{

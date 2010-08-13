@@ -244,7 +244,7 @@ public class AgentSelectorDialog
 						public void actionPerformed(ActionEvent e)
 						{
 							// Use clone to keep original aid unchanged.
-							SServiceProvider.getServiceUpwards(provider, IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
+							SServiceProvider.getServiceUpwards(provider, IComponentManagementService.class).addResultListener(new SwingDefaultResultListener(parent)
 							{
 								public void customResultAvailable(Object source, Object result)
 								{
@@ -370,7 +370,7 @@ public class AgentSelectorDialog
 					final Object node = comptree.getTree().getLastSelectedPathComponent();
 					if(node instanceof IActiveComponentTreeNode)
 					{
-						SServiceProvider.getServiceUpwards(provider, IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
+						SServiceProvider.getServiceUpwards(provider, IComponentManagementService.class).addResultListener(new SwingDefaultResultListener(parent)
 						{
 							public void customResultAvailable(Object source, Object result)
 							{
@@ -387,7 +387,7 @@ public class AgentSelectorDialog
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				SServiceProvider.getServiceUpwards(provider, IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
+				SServiceProvider.getServiceUpwards(provider, IComponentManagementService.class).addResultListener(new SwingDefaultResultListener(parent)
 				{
 					public void customResultAvailable(Object source, Object result)
 					{

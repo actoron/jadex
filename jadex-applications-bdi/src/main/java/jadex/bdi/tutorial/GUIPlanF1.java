@@ -45,7 +45,7 @@ public class GUIPlanF1 extends Plan
 		{
 			public void internalEventOccurred(AgentEvent ae)
 			{
-				((IEAInternalEvent)ae.getSource()).getParameterValue("content").addResultListener(new SwingDefaultResultListener()
+				((IEAInternalEvent)ae.getSource()).getParameterValue("content").addResultListener(new SwingDefaultResultListener(gui)
 				{
 					public void customResultAvailable(Object source, Object result)
 					{

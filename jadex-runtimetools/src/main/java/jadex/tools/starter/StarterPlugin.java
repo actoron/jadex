@@ -275,7 +275,7 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 
 					final String model = ((FileNode)node).getRelativePath();
 //					if(getJCC().getComponent().getPlatform().getComponentFactory().isLoadable(model))
-					SComponentFactory.isLoadable(getJCC().getServiceContainer(), model).addResultListener(new SwingDefaultResultListener()
+					SComponentFactory.isLoadable(getJCC().getServiceContainer(), model).addResultListener(new SwingDefaultResultListener(spanel)
 					{
 						public void customResultAvailable(Object source, Object result)
 						{
@@ -306,7 +306,7 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 							final String type = ((FileNode)node).getFile().getAbsolutePath();
 //							if(getJCC().getComponent().getPlatform().getComponentFactory().isStartable(type))
 							// todo: resultcollect = false?
-							SComponentFactory.isStartable(getJCC().getServiceContainer(), type).addResultListener(new SwingDefaultResultListener()
+							SComponentFactory.isStartable(getJCC().getServiceContainer(), type).addResultListener(new SwingDefaultResultListener(spanel)
 							{
 								public void customResultAvailable(Object source, Object result)
 								{

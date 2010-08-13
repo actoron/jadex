@@ -554,7 +554,7 @@ public class ModelExplorer extends JTree
 		final Object[] cs = getRootNode().getChildCount()>0 ? getRootNode().getChildren().toArray() : null;
 		if(cs!=null)
 		{
-			SServiceProvider.getService(container, ILibraryService.class).addResultListener(new SwingDefaultResultListener()
+			SServiceProvider.getService(container, ILibraryService.class).addResultListener(new SwingDefaultResultListener(this)
 			{
 				public void customResultAvailable(Object source, Object result)
 				{
@@ -1013,7 +1013,7 @@ public class ModelExplorer extends JTree
 				getRootNode().removePathEntry(node);
 				
 				// todo: jars
-				SServiceProvider.getService(container, ILibraryService.class).addResultListener(new SwingDefaultResultListener()
+				SServiceProvider.getService(container, ILibraryService.class).addResultListener(new SwingDefaultResultListener(ModelExplorer.this)
 				{
 					public void customResultAvailable(Object source, Object result)
 					{

@@ -639,9 +639,9 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 	 */
 	public void killApplication()
 	{
-		SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
+		SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class).addResultListener(new DefaultResultListener()
 		{
-			public void customResultAvailable(Object source, Object result)
+			public void resultAvailable(Object source, Object result)
 			{
 				IComponentManagementService cms =(IComponentManagementService)result;
 				cms.destroyComponent(getComponentAdapter().getComponentIdentifier());

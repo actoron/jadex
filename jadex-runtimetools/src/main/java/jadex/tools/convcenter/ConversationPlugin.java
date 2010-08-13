@@ -100,7 +100,7 @@ public class ConversationPlugin extends AbstractJCCPlugin
 					final IActiveComponentTreeNode node = (IActiveComponentTreeNode)paths[i].getLastPathComponent();
 					final IComponentIdentifier rec = node.getDescription().getName();
 					// Use clone, as added component id might be modified by user.
-					SServiceProvider.getServiceUpwards(jcc.getServiceContainer(), IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
+					SServiceProvider.getServiceUpwards(jcc.getServiceContainer(), IComponentManagementService.class).addResultListener(new SwingDefaultResultListener(comptree)
 					{
 						public void customResultAvailable(Object source, Object result)
 						{

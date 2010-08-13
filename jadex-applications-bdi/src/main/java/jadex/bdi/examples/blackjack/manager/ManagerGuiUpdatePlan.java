@@ -16,6 +16,8 @@ import javax.swing.JFrame;
  */
 public class ManagerGuiUpdatePlan extends Plan
 {
+	protected ManagerFrame gui;
+	
 	/**
 	 *  Execute a plan.
 	 */
@@ -24,7 +26,7 @@ public class ManagerGuiUpdatePlan extends Plan
 		IMessageEvent msg = (IMessageEvent)getReason();
 		String	content	= (String)msg.getParameter(SFipa.CONTENT).getValue();
 		final String playerPlaying = content.substring(content.indexOf(':')+1, content.length());
-		final ManagerFrame	gui	= (ManagerFrame)getBeliefbase().getBelief("gui").getFact();
+		gui	= (ManagerFrame)getBeliefbase().getBelief("gui").getFact();
 		getLogger().info("received playerPlaying-Message " + playerPlaying);
 
 		// AWTThread.
@@ -67,7 +69,7 @@ public class ManagerGuiUpdatePlan extends Plan
 	{
 		// Use invoke later to avoid deadlocks,
 		// when killAgent was issued by AWT thread.
-		getExternalAccess().getBeliefbase().getBeliefFact("GUI").addResultListener(new SwingDefaultResultListener()
+		getExternalAccess().getBeliefbase().getBeliefFact("GUI").addResultListener(new SwingDefaultResultListener(gui)
 		{
 			public void customResultAvailable(Object source, Object result)
 			{
