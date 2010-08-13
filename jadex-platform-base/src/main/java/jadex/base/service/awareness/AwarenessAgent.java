@@ -1,6 +1,8 @@
 package jadex.base.service.awareness;
 
+import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.ICommand;
 import jadex.commons.concurrent.IResultListener;
@@ -15,6 +17,10 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * 
@@ -33,6 +39,9 @@ public class AwarenessAgent extends MicroAgent
 	/** The delay. */
 	protected long delay;
 	
+	/** The created proxies via component identifiers. */
+	protected Set proxies;
+	
 	/**
 	 *  Called once after agent creation.
 	 */
@@ -44,68 +53,15 @@ public class AwarenessAgent extends MicroAgent
 			this.port = 55667;
 			this.socket =  new DatagramSocket();
 			this.delay = 5000;
+			this.proxies = new HashSet();
+			proxies.add(getRootIdentifier());
+		
+			startReceiving();
 		}
 		catch(Exception e)
 		{
 			e.printStackTrace();
 		}
-		
-		// Start the receiver thread.
-		SServiceProvider.getService(getServiceProvider(), ILibraryService.class)
-		.addResultListener(createResultListener(new IResultListener()
-		{
-			public void resultAvailable(Object source, Object result)
-			{
-				final ILibraryService ls = (ILibraryService)result;
-				SServiceProvider.getService(getServiceProvider(), IThreadPoolService.class)
-					.addResultListener(createResultListener(new IResultListener()
-				{
-					public void resultAvailable(Object source, Object result)
-					{
-						final IThreadPoolService tp = (IThreadPoolService)result;
-						tp.execute(new Runnable()
-						{
-							public void run()
-							{
-								// todo: max ip datagram length (is there a better way to determine length?)
-								byte buf[] = new byte[65535];
-								while(true)
-								{
-									try
-									{
-										MulticastSocket s = new MulticastSocket(port);
-										s.joinGroup(address);
-										
-										DatagramPacket pack = new DatagramPacket(buf, buf.length);
-										s.receive(pack);
-										
-										byte[] target = new byte[pack.getLength()];
-										System.arraycopy(buf, 0, target, 0, pack.getLength());
-										
-										AwarenessInfo info = (AwarenessInfo)JavaReader.objectFromByteArray(target, ls.getClassLoader());
-										System.out.println(getComponentIdentifier()+" received: "+info);
-									}
-									catch(Exception e)
-									{
-										e.printStackTrace();
-									}
-								}
-							}
-						});
-					}
-			
-					public void exceptionOccurred(Object source, Exception exception)
-					{
-						exception.printStackTrace();
-					}
-				}));
-			}
-			
-			public void exceptionOccurred(Object source, Exception exception)
-			{
-				exception.printStackTrace();
-			}
-		}));
 	}
 	
 	/**
@@ -114,16 +70,13 @@ public class AwarenessAgent extends MicroAgent
 	 */
 	public void executeBody()
 	{
-		IExternalAccess root = getParent();
-		while(root.getParent()!=null)
-			root = root.getParent();
-		final IComponentIdentifier cid = root.getComponentIdentifier();
+		final IComponentIdentifier root = getRootIdentifier();
 		
 		ICommand send = new ICommand()
 		{
 			public void execute(Object args)
 			{
-				send(address, port, new AwarenessInfo(cid));
+				send(address, port, new AwarenessInfo(root));
 				waitFor(delay, this);
 			}
 		};
@@ -146,7 +99,7 @@ public class AwarenessAgent extends MicroAgent
 					byte[] data = JavaWriter.objectToByteArray(info, ls.getClassLoader());
 					DatagramPacket packet = new DatagramPacket(data, data.length, receiver, port);
 					socket.send(packet);
-					System.out.println(getComponentIdentifier()+" sent '"+info+"' to "+receiver+":"+port);
+//					System.out.println(getComponentIdentifier()+" sent '"+info+"' to "+receiver+":"+port);
 				}
 				catch(Exception e)
 				{
@@ -161,4 +114,130 @@ public class AwarenessAgent extends MicroAgent
 		}));
 	}
 
+	/**
+	 * 
+	 */
+	public void startReceiving()
+	{
+		// Start the receiver thread.
+		SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class)
+			.addResultListener(createResultListener(new IResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				final IComponentManagementService cms = (IComponentManagementService)result;
+				SServiceProvider.getService(getServiceProvider(), ILibraryService.class)
+					.addResultListener(createResultListener(new IResultListener()
+				{
+					public void resultAvailable(Object source, Object result)
+					{
+						final ILibraryService ls = (ILibraryService)result;
+						SServiceProvider.getService(getServiceProvider(), IThreadPoolService.class)
+							.addResultListener(createResultListener(new IResultListener()
+						{
+							public void resultAvailable(Object source, Object result)
+							{
+								final IThreadPoolService tp = (IThreadPoolService)result;
+								tp.execute(new Runnable()
+								{
+									public void run()
+									{
+										// todo: max ip datagram length (is there a better way to determine length?)
+										byte buf[] = new byte[65535];
+										while(true)
+										{
+											try
+											{
+												MulticastSocket s = new MulticastSocket(port);
+												s.joinGroup(address);
+												
+												DatagramPacket pack = new DatagramPacket(buf, buf.length);
+												s.receive(pack);
+												
+												byte[] target = new byte[pack.getLength()];
+												System.arraycopy(buf, 0, target, 0, pack.getLength());
+												
+												AwarenessInfo info = (AwarenessInfo)JavaReader.objectFromByteArray(target, ls.getClassLoader());
+//												System.out.println(getComponentIdentifier()+" received: "+info);
+											
+												final IComponentIdentifier sender = info.getSender();
+												if(!proxies.contains(sender))
+												{
+//													System.out.println("Creating new proxy for: "+sender);
+													Map args = new HashMap();
+													args.put("platform", sender);
+													CreationInfo ci = new CreationInfo(args);
+													cms.createComponent(sender.getLocalName(), "jadex/base/service/remote/ProxyAgent.class", ci, 
+														createResultListener(new IResultListener()
+													{
+														public void resultAvailable(Object source, Object result)
+														{
+															// todo: do not use source for cid?!
+//															System.out.println("Proxy killed: "+source);
+															proxies.remove(sender);
+														}
+														
+														public void exceptionOccurred(Object source, Exception exception)
+														{
+														}
+													})).addResultListener(createResultListener(new IResultListener()
+													{
+														
+														public void resultAvailable(Object source, Object result)
+														{
+															proxies.add(sender);
+														}
+														
+														public void exceptionOccurred(Object source, Exception exception)
+														{
+														}
+													}));
+												}
+//												else
+//												{
+//													System.out.println("No proxy for: "+sender);
+//												}
+											}
+											catch(Exception e)
+											{
+												e.printStackTrace();
+											}
+										}
+									}
+								});
+							}
+					
+							public void exceptionOccurred(Object source, Exception exception)
+							{
+								exception.printStackTrace();
+							}
+						}));
+					}
+					
+					public void exceptionOccurred(Object source, Exception exception)
+					{
+						exception.printStackTrace();
+					}
+				}));
+			}
+			
+			public void exceptionOccurred(Object source, Exception exception)
+			{
+				exception.printStackTrace();
+			}
+		}));
+	}
+	
+	/**
+	 *  Get the root component identifier.
+	 */
+	public IComponentIdentifier getRootIdentifier()
+	{
+		IExternalAccess root = getParent();
+		while(root.getParent()!=null)
+			root = root.getParent();
+		IComponentIdentifier ret = root.getComponentIdentifier();
+//		System.out.println("root: "+root.getComponentIdentifier().hashCode()+SUtil.arrayToString(root.getComponentIdentifier().getAddresses()));
+		return ret;
+	}
 }

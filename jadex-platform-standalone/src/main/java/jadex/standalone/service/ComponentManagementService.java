@@ -17,6 +17,7 @@ import jadex.bridge.IMessageService;
 import jadex.bridge.ISearchConstraints;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
+import jadex.commons.SUtil;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.DefaultResultListener;
@@ -1409,19 +1410,7 @@ public class ComponentManagementService extends BasicService implements ICompone
 		{
 			public void resultAvailable(Object source, Object result)
 			{
-				// add root adapter and register root component
-				if(root!=null)
-				{
-					synchronized(adapters)
-					{
-						synchronized(descs)
-						{
-							adapters.put(root.getComponentIdentifier(), root);
-							IComponentDescription desc = ((StandaloneComponentAdapter)root).getDescription(); 
-							descs.put(root.getComponentIdentifier(), desc);
-						}
-					}
-				}
+				
 				
 				final boolean[]	services	= new boolean[2];
 				SServiceProvider.getService(provider, IExecutionService.class).addResultListener(new DefaultResultListener()
@@ -1450,6 +1439,34 @@ public class ComponentManagementService extends BasicService implements ICompone
 							services[1]	= true;
 							setresult	= services[0] && services[1];
 						}
+						
+						msgservice.signalStarted().addResultListener(new IResultListener()
+						{
+							public void resultAvailable(Object source, Object result)
+							{
+								// add root adapter and register root component
+								if(root!=null)
+								{
+									synchronized(adapters)
+									{
+										synchronized(descs)
+										{
+											// Hack?! Need to set transport addresses on root id.
+											((ComponentIdentifier)root.getComponentIdentifier()).setAddresses(msgservice.getAddresses());
+//											System.out.println("root: "+SUtil.arrayToString(msgservice.getAddresses())+" "+root.getComponentIdentifier().hashCode());
+											adapters.put(root.getComponentIdentifier(), root);
+											IComponentDescription desc = ((StandaloneComponentAdapter)root).getDescription(); 
+											descs.put(root.getComponentIdentifier(), desc);
+										}
+									}
+								}
+							}
+							
+							public void exceptionOccurred(Object source, Exception exception)
+							{
+							}
+						});
+						
 						if(setresult)
 							ret.setResult(ComponentManagementService.this);
 					}

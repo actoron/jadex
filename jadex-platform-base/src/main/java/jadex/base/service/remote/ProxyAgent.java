@@ -8,6 +8,7 @@ import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IRemoteServiceManagementService;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
+import jadex.commons.SUtil;
 import jadex.commons.concurrent.CollectionResultListener;
 import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
@@ -28,6 +29,8 @@ public class ProxyAgent extends MicroAgent
 	 */
 	public IServiceContainer createServiceContainer()
 	{
+//		System.out.println("Proxy for: "+getRemotePlatformIdentifier()+" "
+//			+SUtil.arrayToString(getRemotePlatformIdentifier().getAddresses()));
 		return new CacheServiceContainer(new RemoteServiceContainer(
 			getRemotePlatformIdentifier(), getAgentAdapter()), 25, 1*30*1000); // 30 secs cache expire
 	}
@@ -77,6 +80,7 @@ public class ProxyAgent extends MicroAgent
 							
 							public void exceptionOccurred(Object source, Exception exception)
 							{
+								System.out.println("Children exception: "+getComponentIdentifier());
 								ret.setException(exception);
 							}
 						});
@@ -84,6 +88,7 @@ public class ProxyAgent extends MicroAgent
 					
 					public void exceptionOccurred(Object source, Exception exception)
 					{
+						System.out.println("No remote cms found: "+getComponentIdentifier());
 						ret.setException(exception);
 					}
 				});
@@ -91,6 +96,7 @@ public class ProxyAgent extends MicroAgent
 			
 			public void exceptionOccurred(Object source, Exception exception)
 			{
+				System.out.println("No rms found: "+getComponentIdentifier());
 				ret.setException(exception);
 			}
 		});

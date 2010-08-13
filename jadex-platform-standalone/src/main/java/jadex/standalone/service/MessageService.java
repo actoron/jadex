@@ -16,6 +16,7 @@ import jadex.commons.IFuture;
 import jadex.commons.SUtil;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.DefaultResultListener;
+import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IExecutable;
 import jadex.commons.concurrent.IResultListener;
 import jadex.service.BasicService;
@@ -427,48 +428,37 @@ public class MessageService extends BasicService implements IMessageService
 	{
 		final Future ret = new Future();
 		
-		super.startService().addResultListener(new IResultListener()
+		ITransport[] tps = (ITransport[])transports.toArray(new ITransport[transports.size()]);
+		for(int i=0; i<tps.length; i++)
 		{
-			public void resultAvailable(Object source, Object result)
+			try
 			{
-				ITransport[] tps = (ITransport[])transports.toArray(new ITransport[transports.size()]);
-				for(int i=0; i<tps.length; i++)
+				tps[i].start();
+			}
+			catch(Exception e)
+			{
+				System.out.println("Could not initialize transport: "+tps[i]+" reason: "+e);
+				transports.remove(tps[i]);
+			}
+		}
+		
+		if(transports.size()==0)
+		{
+			ret.setException(new RuntimeException("MessageService has no working transport for sending messages."));
+		}
+		else
+		{
+			SServiceProvider.getService(provider, IClockService.class).addResultListener(new IResultListener()
+			{
+				public void resultAvailable(Object source, Object result)
 				{
-					try
-					{
-						tps[i].start();
-					}
-					catch(Exception e)
-					{
-						System.out.println("Could not initialize transport: "+tps[i]+" reason: "+e);
-						transports.remove(tps[i]);
-					}
-				}
-				
-				if(transports.size()==0)
-				{
-					ret.setException(new RuntimeException("MessageService has no working transport for sending messages."));
-				}
-				else
-				{
-					SServiceProvider.getService(provider, IClockService.class).addResultListener(new IResultListener()
+					clockservice = (IClockService)result;
+					SServiceProvider.getServiceUpwards(provider, IComponentManagementService.class).addResultListener(new IResultListener()
 					{
 						public void resultAvailable(Object source, Object result)
 						{
-							clockservice = (IClockService)result;
-							SServiceProvider.getServiceUpwards(provider, IComponentManagementService.class).addResultListener(new IResultListener()
-							{
-								public void resultAvailable(Object source, Object result)
-								{
-									cms = (IComponentManagementService)result;
-									ret.setResult(MessageService.this);
-								}
-								
-								public void exceptionOccurred(Object source, Exception exception)
-								{
-									ret.setException(exception);
-								}
-							});
+							cms = (IComponentManagementService)result;
+							MessageService.super.startService().addResultListener(new DelegationResultListener(ret));
 						}
 						
 						public void exceptionOccurred(Object source, Exception exception)
@@ -477,13 +467,13 @@ public class MessageService extends BasicService implements IMessageService
 						}
 					});
 				}
-			}
-			
-			public void exceptionOccurred(Object source, Exception exception)
-			{
-				ret.setException(exception);
-			}
-		});
+				
+				public void exceptionOccurred(Object source, Exception exception)
+				{
+					ret.setException(exception);
+				}
+			});
+		}
 		
 		return ret;
 	}
@@ -680,23 +670,35 @@ public class MessageService extends BasicService implements IMessageService
 		/**
 		 *  Send a message.
 		 */
-		public synchronized boolean execute()
+		public boolean execute()
 		{
-			if(!messages.isEmpty())
+			Object[] tmp = null;
+			boolean isempty;
+			
+			synchronized(this)
 			{
-				Object[] tmp = (Object[])messages.remove(0);
-				internalSendMessage((Map)tmp[0], (MessageType)tmp[1], (IComponentIdentifier[])tmp[2], (Future)tmp[3]);
+				if(!messages.isEmpty())
+					tmp = (Object[])messages.remove(0);
+				isempty = messages.isEmpty();
 			}
-			return !messages.isEmpty();
+			
+			if(tmp!=null)
+				internalSendMessage((Map)tmp[0], (MessageType)tmp[1], (IComponentIdentifier[])tmp[2], (Future)tmp[3]);
+
+			return !isempty;
 		}
 		
 		/**
 		 *  Add a message to be sent.
 		 *  @param message The message.
 		 */
-		public synchronized void addMessage(Map message, MessageType type, IComponentIdentifier[] receivers, Future ret)
+		public void addMessage(Map message, MessageType type, IComponentIdentifier[] receivers, Future ret)
 		{
-			messages.add(new Object[]{message, type, receivers, ret});
+			synchronized(this)
+			{
+				messages.add(new Object[]{message, type, receivers, ret});
+			}
+			
 			SServiceProvider.getService(provider, IExecutionService.class).addResultListener(new DefaultResultListener()
 			{
 				public void resultAvailable(Object source, Object result)
@@ -732,22 +734,34 @@ public class MessageService extends BasicService implements IMessageService
 		/**
 		 *  Deliver the message.
 		 */
-		public synchronized boolean execute()
+		public boolean execute()
 		{
-			if(!messages.isEmpty())
+			Object[] tmp = null;
+			boolean isempty;
+			
+			synchronized(this)
 			{
-				Object[] tmp = (Object[])messages.remove(0);
-				internalDeliverMessage((Map)tmp[0], (String)tmp[1], (IComponentIdentifier[])tmp[2]);
+				if(!messages.isEmpty())
+					tmp = (Object[])messages.remove(0);
+				isempty = messages.isEmpty();
 			}
-			return !messages.isEmpty();
+			
+			if(tmp!=null)
+				internalDeliverMessage((Map)tmp[0], (String)tmp[1], (IComponentIdentifier[])tmp[2]);
+			
+			return !isempty;
 		}
 		
 		/**
 		 *  Add a message to be delivered.
 		 */
-		public synchronized void addMessage(Map message, String type, IComponentIdentifier[] receivers)
+		public void addMessage(Map message, String type, IComponentIdentifier[] receivers)
 		{
-			messages.add(new Object[]{message, type, receivers});
+			synchronized(this)
+			{
+				messages.add(new Object[]{message, type, receivers});
+			}
+			
 			SServiceProvider.getService(provider, IExecutionService.class).addResultListener(new DefaultResultListener()
 			{
 				public void resultAvailable(Object source, Object result)

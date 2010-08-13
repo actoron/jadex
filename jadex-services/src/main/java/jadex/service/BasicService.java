@@ -3,7 +3,9 @@ package jadex.service;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -17,14 +19,20 @@ public class BasicService implements IService
 	/** The id counter. */
 	protected static long idcnt;
 	
-	/** The valid state. */
-	protected boolean valid;
+	/** The started state. */
+	protected boolean started;
+	
+	/** The shutdowned state. */
+	protected boolean shutdowned;
 	
 	/** The service id. */
 	protected IServiceIdentifier sid;
 	
 	/** The service properties. */
 	protected Map properties;
+	
+	/** The list of start futures. */
+	protected List startfutures;
 	
 	//-------- constructors --------
 
@@ -59,10 +67,9 @@ public class BasicService implements IService
 	 *  Test if the service is valid.
 	 *  @return True, if service can be used.
 	 */
-	public boolean isValid()
+	public synchronized boolean isValid()
 	{
-//		return true;
-		return valid;
+		return started && !shutdowned;
 	}
 	
 	/**
@@ -109,15 +116,43 @@ public class BasicService implements IService
 	{
 //		System.out.println("start: "+this);
 		Future ret = new Future();
-		if(isValid())
+		
+		Future[] tosignal = null;
+		boolean ex = false;
+		synchronized(this)
+		{
+			if(started)
+			{
+				ex = true;
+			}
+			else
+			{
+				started = true;
+				if(startfutures!=null)
+				{
+					tosignal = (Future[])startfutures.toArray(new Future[startfutures.size()]);
+					startfutures = null;
+				}
+			}
+		}
+		
+		if(ex)
 		{
 			ret.setException(new RuntimeException("Already running."));
 		}
-		else
+		else 
 		{
-			valid = true;
+			if(tosignal!=null)
+			{
+				for(int i=0; i<tosignal.length; i++)
+				{
+					tosignal[i].setResult(null);
+				}
+			}
+			
 			ret.setResult(this);
 		}
+		
 		return ret;
 	}
 	
@@ -134,7 +169,7 @@ public class BasicService implements IService
 		}
 		else
 		{
-			valid = false;
+			shutdowned = false;
 			ret.setResult(null);
 		}
 		return ret;
@@ -161,6 +196,41 @@ public class BasicService implements IService
 	protected static IServiceIdentifier createServiceIdentifier(Object providerid, Class servicetype, Class serviceimpl)
 	{
 		return new ServiceIdentifier(providerid, servicetype, generateServiceName(serviceimpl));
+	}
+	
+	/**
+	 *  Get a future that signals when the service is started.
+	 *  @return A future that signals when the service has been started.
+	 */
+	public IFuture signalStarted()
+	{
+		final Future ret = new Future();
+		
+		int alt = 2;
+		synchronized(this)
+		{
+			if(shutdowned)
+				alt = 0;
+			else if(started)
+				alt = 1;
+			else
+			{
+				if(startfutures==null)
+					startfutures = new ArrayList();
+				startfutures.add(ret);
+			}
+		}
+		
+		if(alt==0)
+		{
+			ret.setException(new RuntimeException("Service already shutdowned: "+getServiceIdentifier()));
+		}
+		else if(alt==1)
+		{
+			ret.setResult(null);
+		}
+		
+		return ret;
 	}
 	
 	/**

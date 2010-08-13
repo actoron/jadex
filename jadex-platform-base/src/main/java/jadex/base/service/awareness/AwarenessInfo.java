@@ -1,6 +1,7 @@
 package jadex.base.service.awareness;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.commons.SUtil;
 
 /**
  *
@@ -48,8 +49,8 @@ public class AwarenessInfo
 	 */
 	public String toString()
 	{
-		return "AwarenessInfo(sender=" + sender + ")";
+		return "AwarenessInfo(sender="+sender+"addresses: "
+			+SUtil.arrayToString(sender.getAddresses())+")";
 	}
-	
 	
 }
