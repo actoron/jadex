@@ -4,13 +4,17 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.commons.SUtil;
 
 /**
- *
+ *  Simple info object that is sent between awareness agents.
  */
 public class AwarenessInfo
 {
+	//-------- attributes --------
+	
 	/** The sending component's identifier. */
 	protected IComponentIdentifier sender;
 
+	//-------- constructors --------
+	
 	/**
 	 *  Create a new awareness info.
 	 */
@@ -25,6 +29,8 @@ public class AwarenessInfo
 	{
 		this.sender = sender;
 	}
+	
+	//-------- methods --------
 
 	/**
 	 *  Get the sender.
