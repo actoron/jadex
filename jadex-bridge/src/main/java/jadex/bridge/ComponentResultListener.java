@@ -39,18 +39,25 @@ public class ComponentResultListener implements IResultListener
 	{
 		if(adapter.isExternalThread())
 		{
-			adapter.invokeLater(new Runnable()
+			try
 			{
-				public void run()
+				adapter.invokeLater(new Runnable()
 				{
-					listener.resultAvailable(source, result);
-				}
-				
-				public String toString()
-				{
-					return "resultAvailable("+result+")_#"+this.hashCode();
-				}
-			});
+					public void run()
+					{
+						listener.resultAvailable(source, result);
+					}
+					
+					public String toString()
+					{
+						return "resultAvailable("+result+")_#"+this.hashCode();
+					}
+				});
+			}
+			catch(Exception e)
+			{
+				listener.exceptionOccurred(source, e);
+			}
 		}
 		else
 		{

@@ -1,12 +1,16 @@
 package jadex.base.service.awareness;
 
+import jadex.bridge.Argument;
 import jadex.bridge.CreationInfo;
+import jadex.bridge.IArgument;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.ICommand;
+import jadex.commons.SUtil;
 import jadex.commons.concurrent.IResultListener;
 import jadex.micro.MicroAgent;
+import jadex.micro.MicroAgentMetaInfo;
 import jadex.service.SServiceProvider;
 import jadex.service.library.ILibraryService;
 import jadex.service.threadpool.IThreadPoolService;
@@ -56,12 +60,9 @@ public class AwarenessAgent extends MicroAgent
 	{
 		try
 		{
-			this.address = getArgument("address")==null? 
-				InetAddress.getByName("224.0.0.0"): InetAddress.getByName((String)getArgument("address"));
-			this.port = getArgument("port")==null? 
-				55667: ((Integer)getArgument("port")).intValue();
-			this.delay = getArgument("delay")==null? 
-				10000: ((Integer)getArgument("delay")).intValue();
+			this.address = InetAddress.getByName((String)getArgument("address"));
+			this.port = ((Number)getArgument("port")).intValue();
+			this.delay = ((Number)getArgument("delay")).longValue();
 			
 			this.socket =  new DatagramSocket();
 			this.proxies = new HashSet();
@@ -100,6 +101,7 @@ public class AwarenessAgent extends MicroAgent
 	 */
 	public void agentKilled()
 	{
+		System.out.println("killed set to true: "+getComponentIdentifier());
 		killed = true;
 	}
 	
@@ -185,7 +187,7 @@ public class AwarenessAgent extends MicroAgent
 												final IComponentIdentifier sender = info.getSender();
 												if(!proxies.contains(sender))
 												{
-		//													System.out.println("Creating new proxy for: "+sender);
+													System.out.println("Creating new proxy for: "+sender+" "+getComponentIdentifier());
 													
 													Map args = new HashMap();
 													args.put("platform", sender);
@@ -227,6 +229,8 @@ public class AwarenessAgent extends MicroAgent
 												getLogger().warning("Awareness agent problem, could not handle awareness info: "+e);
 											}
 										}
+										
+										System.out.println("comp and receiver terminated: "+getComponentIdentifier());
 									}
 								});
 							}
@@ -267,5 +271,21 @@ public class AwarenessAgent extends MicroAgent
 		return ret;
 	}
 	
+	//-------- static methods --------
 	
+	/**
+	 *  Get the meta information about the agent.
+	 */
+	public static MicroAgentMetaInfo getMetaInfo()
+	{
+		String[] configs = new String[]{"Frequent updates (5s)", "Normal updates (10s)", "Seldom updates (60s)"};
+		return new MicroAgentMetaInfo("This agent looks for other awareness agents in the local net.", configs, 
+			new IArgument[]
+			{	
+				new Argument("address", "This parameter is the ip multicast address used for finding other agents (range 224.0.0.0-239.255.255.255).", "String", "224.0.0.0"),	
+				new Argument("port", "This parameter is the port used for finding other agents.", "int", new Integer(55667)),	
+				new Argument("delay", "This parameter is the delay between sending awareness infos.", "long", 
+					SUtil.createHashMap(configs, new Object[]{new Long(5000), new Long(10000), new Long(60000)})),	
+			}, null, null, null);
+	}
 }
