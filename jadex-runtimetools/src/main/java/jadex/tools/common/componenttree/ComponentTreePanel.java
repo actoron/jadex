@@ -62,6 +62,9 @@ public class ComponentTreePanel extends JPanel
 	
 	//-------- attributes --------
 	
+	/** The service provider. */
+	private final IServiceProvider	provider;
+	
 	/** The component tree model. */
 	private final ComponentTreeModel	model;
 	
@@ -92,6 +95,9 @@ public class ComponentTreePanel extends JPanel
 	/** The action for recursively refreshing selected components. */
 	private final Action	refreshtree;
 	
+	/** The component listener. */
+	private final IComponentListener	listener;
+	
 	//-------- constructors --------
 	
 	/**
@@ -99,6 +105,7 @@ public class ComponentTreePanel extends JPanel
 	 */
 	public ComponentTreePanel(final IServiceProvider provider)
 	{
+		this.provider	= provider;
 		this.model	= new ComponentTreeModel();
 		this.tree	= new JTree(model);
 		tree.setCellRenderer(new ComponentTreeCellRenderer());
@@ -108,6 +115,72 @@ public class ComponentTreePanel extends JPanel
 		final ComponentIconCache	cic	= new ComponentIconCache(provider, tree);
 		this.setLayout(new BorderLayout());
 		this.add(new JScrollPane(tree));
+		
+		listener	= new IComponentListener()
+		{
+			public void componentRemoved(final IComponentDescription desc, Map results)
+			{
+				SwingUtilities.invokeLater(new Runnable()
+				{
+					public void run()
+					{
+						IComponentTreeNode	node	= model.getNode(desc.getName());
+						if(node!=null && node.getParent()!=null)
+						{
+							((AbstractComponentTreeNode)node.getParent()).removeChild(node);
+						}
+						else
+						{
+							model.addZombieNode(desc.getName());
+						}
+					}
+				});
+			}
+			
+			public void componentChanged(final IComponentDescription desc)
+			{
+				SwingUtilities.invokeLater(new Runnable()
+				{
+					public void run()
+					{
+						ComponentTreeNode	node	= (ComponentTreeNode)model.getNode(desc.getName());
+						if(node!=null)
+						{
+							node.setDescription(desc);
+							model.fireNodeChanged(node);
+						}
+					}
+				});
+			}
+			
+			public void componentAdded(final IComponentDescription desc)
+			{
+				SwingUtilities.invokeLater(new Runnable()
+				{
+					public void run()
+					{
+						final ComponentTreeNode	parentnode = desc.getParent()==null? null: (ComponentTreeNode)model.getNode(desc.getParent());
+						if(parentnode!=null)
+						{
+							parentnode.createComponentNode(desc).addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
+							{
+								public void customResultAvailable(Object source, Object result)
+								{
+									IComponentTreeNode	node = (IComponentTreeNode)result;
+									parentnode.addChild(node);
+								}
+								
+								public void customExceptionOccurred(Object source, Exception exception)
+								{
+									// May happen, when component removed in mean time.
+								}										
+							});
+						}
+					}
+				});
+			}
+		};
+
 		
 		kill = new AbstractAction("Kill component", icons.getIcon("kill_component"))
 		{
@@ -594,70 +667,7 @@ public class ComponentTreePanel extends JPanel
 					}
 				});
 				
-				cms.addComponentListener(null, new IComponentListener()
-				{
-					public void componentRemoved(final IComponentDescription desc, Map results)
-					{
-						SwingUtilities.invokeLater(new Runnable()
-						{
-							public void run()
-							{
-								IComponentTreeNode	node	= model.getNode(desc.getName());
-								if(node!=null && node.getParent()!=null)
-								{
-									((AbstractComponentTreeNode)node.getParent()).removeChild(node);
-								}
-								else
-								{
-									model.addZombieNode(desc.getName());
-								}
-							}
-						});
-					}
-					
-					public void componentChanged(final IComponentDescription desc)
-					{
-						SwingUtilities.invokeLater(new Runnable()
-						{
-							public void run()
-							{
-								ComponentTreeNode	node	= (ComponentTreeNode)model.getNode(desc.getName());
-								if(node!=null)
-								{
-									node.setDescription(desc);
-									model.fireNodeChanged(node);
-								}
-							}
-						});
-					}
-					
-					public void componentAdded(final IComponentDescription desc)
-					{
-						SwingUtilities.invokeLater(new Runnable()
-						{
-							public void run()
-							{
-								final ComponentTreeNode	parentnode = desc.getParent()==null? null: (ComponentTreeNode)model.getNode(desc.getParent());
-								if(parentnode!=null)
-								{
-									parentnode.createComponentNode(desc).addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
-									{
-										public void customResultAvailable(Object source, Object result)
-										{
-											IComponentTreeNode	node = (IComponentTreeNode)result;
-											parentnode.addChild(node);
-										}
-										
-										public void customExceptionOccurred(Object source, Exception exception)
-										{
-											// May happen, when component removed in mean time.
-										}										
-									});
-								}
-							}
-						});
-					}
-				});				
+				cms.addComponentListener(null, listener);				
 			}
 		});
 	}
@@ -734,5 +744,23 @@ public class ComponentTreePanel extends JPanel
 	public JTree	getTree()
 	{
 		return tree;
+	}
+	
+	/**
+	 *  Dispose the tree.
+	 *  Should be called to remove listeners etc.
+	 */
+	public void	dispose()
+	{
+		SServiceProvider.getServiceUpwards(provider, IComponentManagementService.class).addResultListener(new SwingDefaultResultListener(this)
+		{
+			public void customResultAvailable(Object source, Object result)
+			{
+				cms	= (IComponentManagementService)result;
+				cms.removeComponentListener(null, listener);				
+			}
+		});
+		
+		getModel().dispose();
 	}
 }

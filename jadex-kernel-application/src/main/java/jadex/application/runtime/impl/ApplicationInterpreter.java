@@ -33,7 +33,6 @@ import jadex.commons.concurrent.CounterResultListener;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
-import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.javaparser.IValueFetcher;
 import jadex.javaparser.SimpleValueFetcher;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;

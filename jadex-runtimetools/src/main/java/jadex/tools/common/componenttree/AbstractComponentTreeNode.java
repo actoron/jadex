@@ -43,6 +43,14 @@ public abstract class AbstractComponentTreeNode	implements IComponentTreeNode
 	//-------- IComponentTreeNode interface --------
 	
 	/**
+	 *  Called when the node is removed or the tree is closed.
+	 */
+	public void	dispose()
+	{
+		
+	}
+	
+	/**
 	 *  Get the parent node.
 	 */
 	public IComponentTreeNode	getParent()

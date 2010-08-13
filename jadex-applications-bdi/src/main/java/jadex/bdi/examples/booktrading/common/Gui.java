@@ -1,6 +1,5 @@
 package jadex.bdi.examples.booktrading.common;
 
-import jadex.bdi.examples.blocksworld.BlocksworldGui;
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IAgentListener;
 import jadex.bdi.runtime.IBDIExternalAccess;

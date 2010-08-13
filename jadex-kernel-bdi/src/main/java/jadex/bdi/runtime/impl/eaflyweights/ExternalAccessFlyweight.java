@@ -56,7 +56,7 @@ public class ExternalAccessFlyweight extends EACapabilityFlyweight implements IB
 		
 //		getGoalbase().dispatchTopLevelGoal(goal);
 		
-		if(!getInterpreter().isPlanThread())
+		if(getInterpreter().isExternalThread())
 		{
 			getInterpreter().getAgentAdapter().invokeLater(new Runnable() 
 			{
@@ -89,7 +89,7 @@ public class ExternalAccessFlyweight extends EACapabilityFlyweight implements IB
 		
 		final Future ret = new Future();
 		
-		if(!getInterpreter().isPlanThread())
+		if(getInterpreter().isExternalThread())
 		{
 			getInterpreter().getAgentAdapter().invokeLater(new Runnable() 
 			{
@@ -150,7 +150,7 @@ public class ExternalAccessFlyweight extends EACapabilityFlyweight implements IB
 		
 //		getEventbase().dispatchInternalEvent(event);
 		
-		if(!getInterpreter().isPlanThread())
+		if(getInterpreter().isExternalThread())
 		{
 			getInterpreter().getAgentAdapter().invokeLater(new Runnable() 
 			{
@@ -180,7 +180,7 @@ public class ExternalAccessFlyweight extends EACapabilityFlyweight implements IB
 		
 		final Future ret = new Future();
 		
-		if(!getInterpreter().isPlanThread())
+		if(getInterpreter().isExternalThread())
 		{
 			getInterpreter().getAgentAdapter().invokeLater(new Runnable() 
 			{
@@ -208,7 +208,7 @@ public class ExternalAccessFlyweight extends EACapabilityFlyweight implements IB
 		
 		final Future ret = new Future();
 		
-		if(!getInterpreter().isPlanThread())
+		if(getInterpreter().isExternalThread())
 		{
 			getInterpreter().getAgentAdapter().invokeLater(new Runnable() 
 			{
@@ -232,13 +232,19 @@ public class ExternalAccessFlyweight extends EACapabilityFlyweight implements IB
 	 *  Wait for a some time.
 	 *  @param duration The duration.
 	 */
-	public IFuture waitFor(long duration)
+	public IFuture waitFor(final long duration)
 	{
 		final Future ret = new Future();
 		
 		if(!getInterpreter().isPlanThread())
 		{
-			waitForExternalAccessWaitAbstraction(null, duration, ret);
+			getInterpreter().getAgentAdapter().invokeLater(new Runnable() 
+			{
+				public void run() 
+				{
+					waitForExternalAccessWaitAbstraction(null, duration, ret);
+				}
+			});
 		}
 		else
 		{
@@ -258,7 +264,13 @@ public class ExternalAccessFlyweight extends EACapabilityFlyweight implements IB
 		
 		if(!getInterpreter().isPlanThread())
 		{
-			waitForExternalAccessWaitAbstraction(null, PlanRules.TICK_TIMER, ret);
+			getInterpreter().getAgentAdapter().invokeLater(new Runnable() 
+			{
+				public void run() 
+				{
+					waitForExternalAccessWaitAbstraction(null, PlanRules.TICK_TIMER, ret);
+				}
+			});
 		}
 		else
 		{
@@ -345,27 +357,6 @@ public class ExternalAccessFlyweight extends EACapabilityFlyweight implements IB
 		}
 		
 		return ret;
-		
-//		if(!getInterpreter().isPlanThread())
-//		{
-//			final AgentInvocation	invoc	= new AgentInvocation()
-//			{
-//				public void run()
-//				{
-//					Object	wa	= getState().createObject(OAVBDIRuntimeModel.waitabstraction_type);
-//					WaitAbstractionFlyweight.addInternalEvent(wa, type, getState(), getScope());
-//					object	= wa;
-//					getState().addExternalObjectUsage(wa, ExternalAccessFlyweight.this);
-//				}
-//			};
-//			return (IInternalEvent)waitForExternalAccessWaitAbstraction(invoc.object, timeout);
-//		}
-//		else
-//		{
-//			Object	wa	= getState().createObject(OAVBDIRuntimeModel.waitabstraction_type);
-//			WaitAbstractionFlyweight.addInternalEvent(wa, type, getState(), getScope());
-//			return (IInternalEvent)PlanRules.waitForWaitAbstraction(wa, timeout, getState(), getScope(), getInterpreter().getCurrentPlan());
-//		}
 	}
 
 	/**
@@ -414,36 +405,6 @@ public class ExternalAccessFlyweight extends EACapabilityFlyweight implements IB
 		}
 		
 		return ret;
-		
-//		if(!getInterpreter().isPlanThread())
-//		{
-//			synchronized(Thread.currentThread())
-//			{
-//				AgentInvocation	invoc	= new AgentInvocation()
-//				{
-//					public void run()
-//					{
-//						Object	wa	= getState().createObject(OAVBDIRuntimeModel.waitabstraction_type);
-//						WaitAbstractionFlyweight.addReply(wa, me, getState(), getScope());
-//						object	= wa;
-//						getState().addExternalObjectUsage(wa, ExternalAccessFlyweight.this);
-//					}
-//				};
-//				Object[] tmp = initializeWait(invoc.object, timeout);
-//				sendMessage(me);
-//				doWait();
-//				return (IMessageEvent)afterWait(invoc.object, tmp[0], (WakeupAction)tmp[1]);
-//			}
-//		}
-//		else
-//		{
-//			Object	wa	= getState().createObject(OAVBDIRuntimeModel.waitabstraction_type);
-//			WaitAbstractionFlyweight.addReply(wa, me, getState(), getScope());
-//			Object[] ret = PlanRules.initializeWait(wa, timeout, getState(), getScope(), getInterpreter().getCurrentPlan());
-//			sendMessage(me);
-//			PlanRules.doWait(getState(), getInterpreter().getCurrentPlan());
-//			return (IMessageEvent)PlanRules.afterWait(wa, (boolean[])ret[1], getState(), getScope(), getInterpreter().getCurrentPlan());
-//		}
 	}
 
 	/**
@@ -485,27 +446,6 @@ public class ExternalAccessFlyweight extends EACapabilityFlyweight implements IB
 		}
 		
 		return ret;
-		
-//		if(!getInterpreter().isPlanThread())
-//		{
-//			AgentInvocation	invoc	= new AgentInvocation()
-//			{
-//				public void run()
-//				{
-//					Object	wa	= getState().createObject(OAVBDIRuntimeModel.waitabstraction_type);
-//					WaitAbstractionFlyweight.addMessageEvent(wa, type, getState(), getScope());
-//					object	= wa;
-//					getState().addExternalObjectUsage(wa, ExternalAccessFlyweight.this);
-//				}
-//			};
-//			return (IMessageEvent)waitForExternalAccessWaitAbstraction(invoc.object, timeout);
-//		}
-//		else
-//		{
-//			Object	wa	= getState().createObject(OAVBDIRuntimeModel.waitabstraction_type);
-//			WaitAbstractionFlyweight.addMessageEvent(wa, type, getState(), getScope());
-//			return (IMessageEvent)PlanRules.waitForWaitAbstraction(wa, timeout, getState(), getScope(), getInterpreter().getCurrentPlan());
-//		}
 	}
 
 	/**
@@ -546,27 +486,6 @@ public class ExternalAccessFlyweight extends EACapabilityFlyweight implements IB
 		}
 		
 		return ret;
-		
-//		if(!getInterpreter().isPlanThread())
-//		{
-//			AgentInvocation	invoc	= new AgentInvocation()
-//			{
-//				public void run()
-//				{
-//					Object	wa	= getState().createObject(OAVBDIRuntimeModel.waitabstraction_type);
-//					WaitAbstractionFlyweight.addReply(wa, msgevent, getState(), getScope());
-//					object	= wa;
-//					getState().addExternalObjectUsage(wa, ExternalAccessFlyweight.this);
-//				}
-//			};
-//			return (IMessageEvent)waitForExternalAccessWaitAbstraction(invoc.object, timeout);
-//		}
-//		else
-//		{
-//			Object	wa	= getState().createObject(OAVBDIRuntimeModel.waitabstraction_type);
-//			WaitAbstractionFlyweight.addReply(wa, msgevent, getState(), getScope());
-//			return (IMessageEvent)PlanRules.waitForWaitAbstraction(wa, timeout, getState(), getScope(), getInterpreter().getCurrentPlan());
-//		}
 	}
 
 	/**
@@ -608,27 +527,6 @@ public class ExternalAccessFlyweight extends EACapabilityFlyweight implements IB
 		}
 		
 		return ret;
-		
-//		if(!getInterpreter().isPlanThread())
-//		{
-//			AgentInvocation	invoc	= new AgentInvocation()
-//			{
-//				public void run()
-//				{
-//					Object	wa	= getState().createObject(OAVBDIRuntimeModel.waitabstraction_type);
-//					WaitAbstractionFlyweight.addGoal(wa, type, getState(), getScope());
-//					object	= wa;
-//					getState().addExternalObjectUsage(wa, ExternalAccessFlyweight.this);
-//				}
-//			};
-//			waitForExternalAccessWaitAbstraction(invoc.object, timeout);
-//		}
-//		else
-//		{
-//			Object	wa	= getState().createObject(OAVBDIRuntimeModel.waitabstraction_type);
-//			WaitAbstractionFlyweight.addGoal(wa, type, getState(), getScope());
-//			PlanRules.waitForWaitAbstraction(wa, timeout, getState(), getScope(), getInterpreter().getCurrentPlan());
-//		}
 	}
 
 	/**
@@ -672,27 +570,6 @@ public class ExternalAccessFlyweight extends EACapabilityFlyweight implements IB
 		}
 		
 		return ret;
-		
-//		if(!getInterpreter().isPlanThread())
-//		{
-//			AgentInvocation	invoc	= new AgentInvocation()
-//			{
-//				public void run()
-//				{
-//					Object	wa	= getState().createObject(OAVBDIRuntimeModel.waitabstraction_type);
-//					WaitAbstractionFlyweight.addFactChanged(wa, belief, getState(), getScope());
-//					object	= wa;
-//					getState().addExternalObjectUsage(wa, ExternalAccessFlyweight.this);
-//				}
-//			};
-//			return waitForExternalAccessWaitAbstraction(invoc.object, timeout);
-//		}
-//		else
-//		{
-//			Object	wa	= getState().createObject(OAVBDIRuntimeModel.waitabstraction_type);
-//			WaitAbstractionFlyweight.addFactChanged(wa, belief, getState(), getScope());
-//			return PlanRules.waitForWaitAbstraction(wa, timeout, getState(), getScope(), getInterpreter().getCurrentPlan());
-//		}
 	}
 
 	/**
@@ -736,27 +613,6 @@ public class ExternalAccessFlyweight extends EACapabilityFlyweight implements IB
 		}
 		
 		return ret;
-		
-//		if(!getInterpreter().isPlanThread())
-//		{
-//			AgentInvocation	invoc	= new AgentInvocation()
-//			{
-//				public void run()
-//				{
-//					Object	wa	= getState().createObject(OAVBDIRuntimeModel.waitabstraction_type);
-//					WaitAbstractionFlyweight.addFactAdded(wa, type, getState(), getScope());
-//					object	= wa;
-//					getState().addExternalObjectUsage(wa, ExternalAccessFlyweight.this);
-//				}
-//			};
-//			return waitForExternalAccessWaitAbstraction(invoc.object, timeout);
-//		}
-//		else
-//		{
-//			Object	wa	= getState().createObject(OAVBDIRuntimeModel.waitabstraction_type);
-//			WaitAbstractionFlyweight.addFactAdded(wa, type, getState(), getScope());
-//			return PlanRules.waitForWaitAbstraction(wa, timeout, getState(), getScope(), getInterpreter().getCurrentPlan());
-//		}
 	}
 
 	/**
@@ -800,27 +656,6 @@ public class ExternalAccessFlyweight extends EACapabilityFlyweight implements IB
 		}
 		
 		return ret;
-		
-//		if(!getInterpreter().isPlanThread())
-//		{
-//			AgentInvocation	invoc	= new AgentInvocation()
-//			{
-//				public void run()
-//				{
-//					Object	wa	= getState().createObject(OAVBDIRuntimeModel.waitabstraction_type);
-//					WaitAbstractionFlyweight.addFactRemoved(wa, type, getState(), getScope());
-//					object	= wa;
-//					getState().addExternalObjectUsage(wa, ExternalAccessFlyweight.this);
-//				}
-//			};
-//			return waitForExternalAccessWaitAbstraction(invoc.object, timeout);
-//		}
-//		else
-//		{
-//			Object	wa	= getState().createObject(OAVBDIRuntimeModel.waitabstraction_type);
-//			WaitAbstractionFlyweight.addFactRemoved(wa, type, getState(), getScope());
-//			return PlanRules.waitForWaitAbstraction(wa, timeout, getState(), getScope(), getInterpreter().getCurrentPlan());
-//		}
 	}
 
 	/**
@@ -863,41 +698,6 @@ public class ExternalAccessFlyweight extends EACapabilityFlyweight implements IB
 		}
 		
 		return ret;
-		
-		
-//		if(!getInterpreter().isPlanThread())
-//		{
-//			synchronized(Thread.currentThread())
-//			{
-//				AgentInvocation	invoc	= new AgentInvocation()
-//				{
-//					public void run()
-//					{
-//						Object	wa	= getState().createObject(OAVBDIRuntimeModel.waitabstraction_type);
-//						WaitAbstractionFlyweight.addGoal(wa, goal, getState(), getScope());
-//						object	= wa;
-//						getState().addExternalObjectUsage(wa, ExternalAccessFlyweight.this);
-//					}
-//				};
-////				System.err.println("waitforbug: initialize wait");
-////				Thread.dumpStack();
-//				Object[] tmp = initializeWait(invoc.object, timeout);
-////				System.err.println("waitforbug: dispatch");
-////				Thread.dumpStack();
-//				dispatchTopLevelGoal(goal);
-//				doWait();
-////				System.err.println("waitforbug: after wait");
-////				Thread.dumpStack();
-//				afterWait(invoc.object, tmp[0], (WakeupAction)tmp[1]);
-//			}
-//		}
-//		else
-//		{
-//			dispatchTopLevelGoal(goal);
-//			Object	wa	= getState().createObject(OAVBDIRuntimeModel.waitabstraction_type);
-//			WaitAbstractionFlyweight.addGoal(wa, goal, getState(), getScope());
-//			PlanRules.waitForWaitAbstraction(wa, timeout, getState(), getScope(), getInterpreter().getCurrentPlan());
-//		}
 	}
 	
 	/**
@@ -951,66 +751,56 @@ public class ExternalAccessFlyweight extends EACapabilityFlyweight implements IB
 	 */
 	protected void initializeWait(final Object wa, final long timeout, final Future future)
 	{
-		final Object rcapa = getScope();
+		Object ea = getState().createObject(OAVBDIRuntimeModel.externalaccess_type);
+		getState().addAttributeValue(getScope(), OAVBDIRuntimeModel.capability_has_externalaccesses, ea);
 		
-		getInterpreter().getAgentAdapter().invokeLater(new Runnable()
+		// Prohibid wakeup execution in a) agent and b) timer until this thread sleeps. 
+	
+	
+		getState().setAttributeValue(ea, OAVBDIRuntimeModel.externalaccess_has_waitabstraction, wa);
+	
+		List observedobjects = null;
+		if(wa!=null)
 		{
-			public void run()
+			Collection	coll	= getState().getAttributeValues(wa, OAVBDIRuntimeModel.waitabstraction_has_factaddeds);
+			if(coll!=null)
 			{
-				Object ea = getState().createObject(OAVBDIRuntimeModel.externalaccess_type);
-				getState().addAttributeValue(rcapa, OAVBDIRuntimeModel.capability_has_externalaccesses, ea);
-				
-				// Prohibid wakeup execution in a) agent and b) timer until this thread sleeps. 
-			
-			
-				getState().setAttributeValue(ea, OAVBDIRuntimeModel.externalaccess_has_waitabstraction, wa);
-			
-				List observedobjects = null;
-				if(wa!=null)
-				{
-					Collection	coll	= getState().getAttributeValues(wa, OAVBDIRuntimeModel.waitabstraction_has_factaddeds);
-					if(coll!=null)
-					{
-						if(observedobjects==null)
-							observedobjects	= new ArrayList();
-						observedobjects.addAll(coll);
-					}
-					coll	= getState().getAttributeValues(wa, OAVBDIRuntimeModel.waitabstraction_has_factremoveds);
-					if(coll!=null)
-					{
-						if(observedobjects==null)
-							observedobjects	= new ArrayList();
-						observedobjects.addAll(coll);
-					}
-					coll	= getState().getAttributeValues(wa, OAVBDIRuntimeModel.waitabstraction_has_factchangeds);
-					if(coll!=null)
-					{
-						if(observedobjects==null)
-							observedobjects	= new ArrayList();
-						observedobjects.addAll(coll);
-					}
-				}
-				
-				WakeupAction wakeup = new WakeupAction(getState(), getScope(), wa, ea, ExternalAccessFlyweight.this, observedobjects, future);
-				getState().setAttributeValue(ea, OAVBDIRuntimeModel.externalaccess_has_wakeupaction, wakeup);
-
-				if(timeout>-1)
-				{
-//					final long start = System.currentTimeMillis(); 
-					
-//					System.out.println("Timer created: "+start);
-					getState().setAttributeValue(ea, OAVBDIRuntimeModel.externalaccess_has_timer,
-						getInterpreter().getClockService().createTimer(timeout, new InterpreterTimedObject(getInterpreter(), wakeup)));
-				}
-				else if(timeout==PlanRules.TICK_TIMER)
-				{
-					getState().setAttributeValue(ea, OAVBDIRuntimeModel.externalaccess_has_timer,
-						getInterpreter().getClockService().createTickTimer(new InterpreterTimedObject(getInterpreter(), wakeup)));
-				}				
+				if(observedobjects==null)
+					observedobjects	= new ArrayList();
+				observedobjects.addAll(coll);
 			}
-		});
+			coll	= getState().getAttributeValues(wa, OAVBDIRuntimeModel.waitabstraction_has_factremoveds);
+			if(coll!=null)
+			{
+				if(observedobjects==null)
+					observedobjects	= new ArrayList();
+				observedobjects.addAll(coll);
+			}
+			coll	= getState().getAttributeValues(wa, OAVBDIRuntimeModel.waitabstraction_has_factchangeds);
+			if(coll!=null)
+			{
+				if(observedobjects==null)
+					observedobjects	= new ArrayList();
+				observedobjects.addAll(coll);
+			}
+		}
 		
-//		return new Object[]{invoc.object, wakeup, invoc.oarray};
+		WakeupAction wakeup = new WakeupAction(getState(), getScope(), wa, ea, ExternalAccessFlyweight.this, observedobjects, future);
+		getState().setAttributeValue(ea, OAVBDIRuntimeModel.externalaccess_has_wakeupaction, wakeup);
+
+		if(timeout>-1)
+		{
+//					final long start = System.currentTimeMillis(); 
+			
+//					System.out.println("Timer created: "+start);
+			getState().setAttributeValue(ea, OAVBDIRuntimeModel.externalaccess_has_timer,
+				getInterpreter().getClockService().createTimer(timeout, new InterpreterTimedObject(getInterpreter(), wakeup)));
+		}
+		else if(timeout==PlanRules.TICK_TIMER)
+		{
+			getState().setAttributeValue(ea, OAVBDIRuntimeModel.externalaccess_has_timer,
+				getInterpreter().getClockService().createTickTimer(new InterpreterTimedObject(getInterpreter(), wakeup)));
+		}				
 	}
 	
 	/**

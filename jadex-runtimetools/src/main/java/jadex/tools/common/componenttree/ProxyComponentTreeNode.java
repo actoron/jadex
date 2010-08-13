@@ -69,18 +69,19 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				if(parent.isChild(ProxyComponentTreeNode.this))
-				{
-					// hmm?! with or without subtree?
-					refresh(true);
-				}
-				else
-				{
-					timer.stop();
-				}
+				// hmm?! with or without subtree?
+				refresh(true);
 			}
 		});
 		timer.start();
+	}
+	
+	/**
+	 *  Called when the node is removed or the tree is closed.
+	 */
+	public void	dispose()
+	{
+		timer.stop();
 	}
 	
 	/**

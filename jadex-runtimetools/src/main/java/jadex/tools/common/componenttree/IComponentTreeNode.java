@@ -3,10 +3,15 @@ package jadex.tools.common.componenttree;
 import javax.swing.Icon;
 
 /**
- *  todo
+ *  Node for the component tree panel.
  */
 public interface IComponentTreeNode
 {
+	/**
+	 *  Called when the node is removed or the tree is closed.
+	 */
+	public void	dispose();
+	
 	/**
 	 *  Get the id used for lookup.
 	 */

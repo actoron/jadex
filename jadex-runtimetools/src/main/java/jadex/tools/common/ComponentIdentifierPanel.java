@@ -4,7 +4,6 @@ import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IMessageService;
-import jadex.commons.SUtil;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.service.IServiceProvider;
 import jadex.service.SServiceProvider;
@@ -176,7 +175,7 @@ public class ComponentIdentifierPanel extends JPanel
 	 */
 	public void setComponentIdentifier(IComponentIdentifier cid)
 	{
-		System.out.println("set cid: "+cid+", "+(cid!=null ? SUtil.arrayToString(cid.getAddresses()):"[]"));
+//		System.out.println("set cid: "+cid+", "+(cid!=null ? SUtil.arrayToString(cid.getAddresses()):"[]"));
 		this.cid	= cid!=null? cid: new ComponentIdentifier(); 
 //		this.cid	= aid!=null ? aid : cms.createComponentIdentifier(null, false, null);
 		refresh();

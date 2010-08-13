@@ -68,39 +68,28 @@ public class AgentSelectorDialog
 	/** The service provider. */
 	protected IServiceProvider provider;
 	
-	/** The element tree table. */
-	protected ComponentTreePanel	comptree;
-	
 	/** The selected agents. */
 	protected DefaultListModel	sels;
-	
-	/** The agent identifier panel. */
-	protected ComponentIdentifierPanel	aidpanel;
 	
 	/** Is the single selection dialog showing? */
 	protected boolean	singleselection;
 	
-	/** The dialog (created lazily). */
-	protected JDialog	dia;
-	
 	/** Was the dialog aborted? */
 	protected boolean	aborted;
 	
-	/** Select an agent. */
+	/** Button as field for repaint in addSelectedAgent. */
 	protected JButton	select;
-	/** Create new agent id. */
+	/** Button as field for repaint in addSelectedAgent. */
 	protected JButton	newaid;
-	/** Remove a selected agent. */
+	/** Button as field for repaint in addSelectedAgent. */
 	protected JButton	remove;
-	/** Remove all selected agents. */
+	/** Button as field for repaint in addSelectedAgent. */
 	protected JButton	removeall;
-	/** Close the dialog. */
+	/** Button as field for repaint in addSelectedAgent. */
 	protected JButton	ok;
-	/** Abort the dialog. */
-	protected JButton	cancel;
-	/** Show online help. */
-	protected JButton	help;
-
+	/** Panel as field for repaint in addSelectedAgent. */
+	protected ComponentTreePanel	comptree;
+	
 	//-------- constructors --------
 
 	/**
@@ -110,7 +99,6 @@ public class AgentSelectorDialog
 	{
 		this.parent	= parent;
 		this.provider	= provider;
-		this.sels	= new DefaultListModel();
 	}
 
 	//-------- methods --------
@@ -124,18 +112,20 @@ public class AgentSelectorDialog
 		this.singleselection	= true;
 
 		// Pre-init list of selected agents.
-		sels.clear();
+		this.sels	= new DefaultListModel();
 		if(def!=null)
 		{
 			sels.addElement(def);
 		}
 
 		// Create dialog.
-		this.dia	= createDialog();
+		JDialog	dia	= createDialog();
 
 		aborted	= false;
 		dia.setVisible(true);
 		this.singleselection	= false;
+
+		this.comptree.dispose();
 
 		return !aborted && sels.size()>0 ? (IComponentIdentifier)sels.get(0) : null;
 	}
@@ -147,15 +137,17 @@ public class AgentSelectorDialog
 	public IComponentIdentifier[] selectAgents(IComponentIdentifier[] receivers)
 	{
 		// Pre-init list of selected agents.
-		sels.clear();
+		this.sels	= new DefaultListModel();
 		for(int i=0; receivers!=null && i<receivers.length; i++)
 			sels.addElement(receivers[i]);
 
 		// Create dialog.
-		this.dia	= createDialog();
+		JDialog	dia	= createDialog();
 
 		aborted	= false;
 		dia.setVisible(true);
+
+		this.comptree.dispose();
 
 		IComponentIdentifier[]	ret	= null;
 		if(!aborted)
@@ -174,13 +166,13 @@ public class AgentSelectorDialog
 	protected JDialog createDialog()
 	{
 		// Create  buttons.
-		select	= new JButton(icons.getIcon("arrow_right"));
-		newaid	= new JButton("New");
-		remove	= new JButton("Delete");
-		removeall	= new JButton("Clear");
-		ok	= new JButton("Ok");
-		cancel	= new JButton("Cancel");
-		help	= new JButton("Help");
+		this.select	= new JButton(icons.getIcon("arrow_right"));
+		this.newaid	= new JButton("New");
+		this.remove	= new JButton("Delete");
+		this.removeall	= new JButton("Clear");
+		this.ok	= new JButton("Ok");
+		JButton	cancel	= new JButton("Cancel");
+		JButton	help	= new JButton("Help");
 
 		select.setToolTipText("Use selected agent.");
 		newaid.setToolTipText("Add new (empty) agent identifier.");
@@ -212,7 +204,7 @@ public class AgentSelectorDialog
 		final JList	list = new JList(sels);
 		
 		this.comptree = new ComponentTreePanel(provider);
-		this.comptree.setPreferredSize(new Dimension(200, 100));
+		comptree.setPreferredSize(new Dimension(200, 100));
 		comptree.addNodeHandler(new INodeHandler()
 		{
 			public Action[] getPopupActions(IComponentTreeNode[] nodes)
@@ -265,7 +257,7 @@ public class AgentSelectorDialog
 		JScrollPane	sp	= new JScrollPane(list);
 		sp.setPreferredSize(new Dimension(200, 100));
 		final boolean[]	editing	= new boolean[1];
-		this.aidpanel = new ComponentIdentifierPanel(null, provider)
+		final ComponentIdentifierPanel	aidpanel = new ComponentIdentifierPanel(null, provider)
 		{
 			protected void cidChanged()
 			{
@@ -274,7 +266,7 @@ public class AgentSelectorDialog
 					editing[0]	= true;
 					int	row	= list.getSelectedIndex();
 					sels.remove(row);
-					sels.add(row, aidpanel.getAgentIdentifier());
+					sels.add(row, getAgentIdentifier());
 					list.setSelectedIndex(row);
 					comptree.repaint();
 					editing[0]	= false;
@@ -306,7 +298,7 @@ public class AgentSelectorDialog
 		if(sels.size()>0)
 			list.getSelectionModel().setSelectionInterval(0, 0);
 		else
-			this.aidpanel.setEditable(false);
+			aidpanel.setEditable(false);
 
 		// Put trees in extra component to add border.
 		JPanel	treepanel	= new JPanel(new GridBagLayout());
@@ -474,21 +466,6 @@ public class AgentSelectorDialog
 		dia.getContentPane().add(ok,		new GridBagConstraints(1,1, 1,1,							0,0,GridBagConstraints.CENTER,GridBagConstraints.VERTICAL,new Insets(4,4,4,2),0,0));
 		dia.getContentPane().add(cancel,	new GridBagConstraints(2,1, 1,1,	0,0,GridBagConstraints.CENTER,GridBagConstraints.VERTICAL,new Insets(4,2,4,2),0,0));
 		dia.getContentPane().add(help,	new GridBagConstraints(3,1, GridBagConstraints.REMAINDER,1,	0,0,GridBagConstraints.CENTER,GridBagConstraints.VERTICAL,new Insets(4,2,4,4),0,0));
-
-		// Old layout without split.
-//		dia.getContentPane().add(treepanel,	new GridBagConstraints(0,0, 1,6,	1,1,GridBagConstraints.WEST,GridBagConstraints.BOTH,	new Insets(1,1,1,1),0,0));
-//		dia.getContentPane().add(new JLabel(),	new GridBagConstraints(1,0, 1,1,	0,1,GridBagConstraints.NORTH,GridBagConstraints.HORIZONTAL,new Insets(1,1,1,1),0,0));
-//		dia.getContentPane().add(select,	new GridBagConstraints(1,1, 1,1,	0,0,GridBagConstraints.NORTH,GridBagConstraints.HORIZONTAL,new Insets(1,1,1,1),0,0));
-//		dia.getContentPane().add(newaid,	new GridBagConstraints(1,2, 1,1,	0,0,GridBagConstraints.NORTH,GridBagConstraints.HORIZONTAL,new Insets(1,1,1,1),0,0));
-//		dia.getContentPane().add(remove,	new GridBagConstraints(1,3, 1,1,	0,0,GridBagConstraints.NORTH,GridBagConstraints.HORIZONTAL,new Insets(1,1,1,1),0,0));
-//		dia.getContentPane().add(new JLabel(),	new GridBagConstraints(1,4, 1,1,	0,1,GridBagConstraints.NORTH,GridBagConstraints.HORIZONTAL,new Insets(1,1,1,1),0,0));
-//		dia.getContentPane().add(seltreepanel,	new GridBagConstraints(2,0, GridBagConstraints.REMAINDER,5,	1,1,GridBagConstraints.WEST,GridBagConstraints.BOTH,	new Insets(1,1,1,1),0,0));
-//		dia.getContentPane().add(aidpanel,	new GridBagConstraints(2,5, GridBagConstraints.REMAINDER,1,	1,0,GridBagConstraints.WEST,GridBagConstraints.BOTH,	new Insets(1,1,1,1),0,0));
-//		dia.getContentPane().add(new JLabel(),	new GridBagConstraints(3,6, 1,1,	1,0,GridBagConstraints.NORTH,GridBagConstraints.HORIZONTAL,new Insets(1,1,1,1),0,0));
-//		dia.getContentPane().add(ok,		new GridBagConstraints(4,6, 1,1,							0,0,GridBagConstraints.EAST,GridBagConstraints.VERTICAL,new Insets(4,4,4,2),0,0));
-//		dia.getContentPane().add(cancel,	new GridBagConstraints(5,6, 1,1,	0,0,GridBagConstraints.WEST,GridBagConstraints.VERTICAL,new Insets(4,2,4,2),0,0));
-//		dia.getContentPane().add(help,	new GridBagConstraints(6,6, GridBagConstraints.REMAINDER,1,	0,0,GridBagConstraints.WEST,GridBagConstraints.VERTICAL,new Insets(4,2,4,4),0,0));
-
 
 		dia.pack();
 		dia.setLocation(SGUI.calculateMiddlePosition((Window)parent, dia));

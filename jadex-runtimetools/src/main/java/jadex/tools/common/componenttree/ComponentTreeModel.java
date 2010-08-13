@@ -3,6 +3,7 @@ package jadex.tools.common.componenttree;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -255,6 +256,7 @@ public class ComponentTreeModel implements TreeModel
 	 */
 	public void	deregisterNode(IComponentTreeNode node)
 	{
+		node.dispose();
 		if(zombies.contains(node.getId()))
 		{
 			assert !nodes.containsKey(node.getId()) : node.getId();
@@ -262,7 +264,7 @@ public class ComponentTreeModel implements TreeModel
 		}
 		else
 		{
-			nodes.remove(node.getId());		
+			nodes.remove(node.getId());
 			INodeListener[]	lis	= (INodeListener[])nodelisteners.toArray(new INodeListener[nodelisteners.size()]);
 			for(int i=0; i<lis.length; i++)
 			{
@@ -318,5 +320,16 @@ public class ComponentTreeModel implements TreeModel
 	public boolean	isZombieNode(Object id)
 	{
 		return zombies.contains(id);
+	}
+
+	/**
+	 *  Called when the tree is removed.
+	 */
+	public void dispose()
+	{
+		for(Iterator it=nodes.values().iterator(); it.hasNext(); )
+		{
+			((IComponentTreeNode)it.next()).dispose();
+		}
 	}
 }

@@ -1,12 +1,8 @@
 package jadex.xml.benchmark;
 
 import jadex.commons.SUtil;
-import jadex.xml.bean.BeanObjectReaderHandler;
 import jadex.xml.bean.JavaReader;
 import jadex.xml.bean.JavaWriter;
-import jadex.xml.reader.Reader;
-
-import java.io.FileInputStream;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;

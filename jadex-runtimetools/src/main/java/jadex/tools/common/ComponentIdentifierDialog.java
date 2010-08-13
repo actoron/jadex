@@ -1,7 +1,6 @@
 package jadex.tools.common;
 
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentManagementService;
 import jadex.commons.SGUI;
 import jadex.service.IServiceProvider;
 
