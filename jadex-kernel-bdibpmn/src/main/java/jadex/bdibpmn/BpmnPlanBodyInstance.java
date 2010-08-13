@@ -56,6 +56,7 @@ import jadex.bpmn.runtime.ProcessThread;
 import jadex.bpmn.runtime.handler.AbstractEventIntermediateTimerActivityHandler;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
+import jadex.commons.IFuture;
 import jadex.javaparser.IExpressionParser;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
@@ -814,13 +815,14 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 	 *  @param me	The message event.
 	 *  @return The filter to wait for an answer.
 	 */
-	public void	sendMessage(IMessageEvent me)
+	public IFuture	sendMessage(IMessageEvent me)
 	{	
 		Object revent = ((MessageEventFlyweight)me).getHandle();
 		Object rcapa = ((MessageEventFlyweight)me).getScope();
 		interpreter.startMonitorConsequences();
-		MessageEventRules.sendMessage(state, rcapa, revent);
+		IFuture	ret	= MessageEventRules.sendMessage(state, rcapa, revent);
 		interpreter.endMonitorConsequences();
+		return ret;
 	}
 
 	/**

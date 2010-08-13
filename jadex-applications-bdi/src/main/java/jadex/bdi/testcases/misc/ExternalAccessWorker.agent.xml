@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	<H3>Test fetching external access from agent that has not been started.</H3>
+-->
+<agent xmlns="http://jadex.sourceforge.net/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-bdi
+	                    http://jadex.sourceforge.net/jadex-bdi-2.0.xsd"
+	name="ExternalAccessWorker"
+	package="jadex.bdi.testcases.misc">
+
+	<imports>
+		<import>jadex.commons.IFuture</import>
+	</imports>
+
+	<beliefs>
+		<belief name="future" class="IFuture" argument="true" />
+		<belief name="test" class="String">
+			<fact>"testfact"</fact>
+		</belief>
+	</beliefs>
+	
+	<properties>
+		<property name="futureprop" class="IFuture">$beliefbase.future</property>
+	</properties>
+
+</agent>

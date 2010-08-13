@@ -1,8 +1,6 @@
 package jadex.micro.examples.remoteservice;
 
-import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
-import jadex.bridge.IRemoteServiceManagementService;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.micro.MicroAgent;

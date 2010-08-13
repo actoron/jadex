@@ -20,6 +20,7 @@ import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.Tuple;
 import jadex.commons.concurrent.DefaultResultListener;
+import jadex.commons.concurrent.DelegationResultListener;
 import jadex.rules.state.IOAVState;
 import jadex.service.SServiceProvider;
 
@@ -68,25 +69,24 @@ public class EAEventbaseFlyweight extends ElementFlyweight implements IEAEventba
 	 */
 	public IFuture sendMessage(final IEAMessageEvent me)
 	{
-		final Future ret = new Future(); 
-		
+		IFuture	ret;
 		if(getInterpreter().isExternalThread())
 		{
+			final Future	future	= new Future();
 			getInterpreter().getAgentAdapter().invokeLater(new Runnable()
 			{
 				public void run()
 				{
 					Object revent = ((EAMessageEventFlyweight)me).getHandle();
-					MessageEventRules.sendMessage(getState(), getScope(), revent);
-					ret.setResult(null);
+					MessageEventRules.sendMessage(getState(), getScope(), revent).addResultListener(new DelegationResultListener(future));
 				}
 			});
+			ret	= future;
 		}
 		else
 		{
 			Object revent = ((EAMessageEventFlyweight)me).getHandle();
-			MessageEventRules.sendMessage(getState(), getScope(), revent);
-			ret.setResult(null);
+			ret	= MessageEventRules.sendMessage(getState(), getScope(), revent);
 		}
 		
 		return ret;

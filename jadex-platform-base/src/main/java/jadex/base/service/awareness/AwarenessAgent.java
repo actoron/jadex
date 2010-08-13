@@ -3,7 +3,6 @@ package jadex.base.service.awareness;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.ICommand;
-import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.micro.MicroAgent;
 import jadex.service.SServiceProvider;

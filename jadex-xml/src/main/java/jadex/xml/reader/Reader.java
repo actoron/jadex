@@ -9,9 +9,6 @@ import jadex.xml.SXML;
 import jadex.xml.StackElement;
 import jadex.xml.SubobjectInfo;
 import jadex.xml.TypeInfo;
-import jadex.xml.bean.JavaWriter;
-import jadex.xml.writer.Writer;
-
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;

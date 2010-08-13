@@ -15,6 +15,7 @@ import jadex.bdi.runtime.interpreter.InternalEventRules;
 import jadex.bdi.runtime.interpreter.MessageEventRules;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bridge.IComponentIdentifier;
+import jadex.commons.IFuture;
 import jadex.commons.Tuple;
 import jadex.rules.state.IOAVState;
 
@@ -58,23 +59,25 @@ public class EventbaseFlyweight extends ElementFlyweight implements IEventbase
 	 *  @param me	The message event.
 	 *  @return The filter to wait for an answer.
 	 */
-	// changed signature for javaflow, removed final
-	public void	sendMessage(IMessageEvent me)
+	public IFuture	sendMessage(IMessageEvent me)
 	{
+		IFuture	ret;
 		if(getInterpreter().isExternalThread())
 		{
-			new AgentInvocation(me)
+			AgentInvocation	invoc	= new AgentInvocation(me)
 			{
 				public void run()
 				{
-					MessageEventRules.sendMessage(getState(), getScope(), ((ElementFlyweight)arg).getHandle());
+					object	= MessageEventRules.sendMessage(getState(), getScope(), ((ElementFlyweight)arg).getHandle());
 				}
 			};
+			ret	= (IFuture)invoc.object;
 		}
 		else
 		{
-			MessageEventRules.sendMessage(getState(), getScope(), ((ElementFlyweight)me).getHandle());
+			ret	= MessageEventRules.sendMessage(getState(), getScope(), ((ElementFlyweight)me).getHandle());
 		}
+		return ret;
 	}
 
 	/**

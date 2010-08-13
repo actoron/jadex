@@ -8,9 +8,11 @@ import jadex.bridge.IMessageService;
 import jadex.bridge.MessageType;
 import jadex.bridge.MessageType.ParameterSpecification;
 import jadex.commons.Future;
+import jadex.commons.IFuture;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.collection.SCollection;
+import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.javaparser.IValueFetcher;
 import jadex.rules.rulesystem.IAction;
@@ -114,12 +116,17 @@ public class MessageEventRules
 	 *  @param me The message event.
 	 *  @return The filter to wait for an answer.
 	 */
-	public static void	sendMessage(IOAVState state, Object rcapa, Object rmessageevent)
-	{	
+	public static IFuture	sendMessage(IOAVState state, Object rcapa, Object rmessageevent)
+	{
+		Future ret = new Future();
+		
+		state.setAttributeValue(rmessageevent, OAVBDIRuntimeModel.messageevent_has_sendfuture, ret);
 		state.addAttributeValue(rcapa, OAVBDIRuntimeModel.capability_has_outbox, rmessageevent);
 		
 		// Hack!!! Only needed for external access!
 		BDIInterpreter.getInterpreter(state).getAgentAdapter().wakeup();
+		
+		return ret;
 	}
 	
 	/**
@@ -725,27 +732,19 @@ public class MessageEventRules
 					{
 						public void resultAvailable(Object source, Object result)
 						{
-							((IMessageService)result).sendMessage(msg.getParameterMap(), msg.getMessageType(), 
-								interpreter.getAgentAdapter().getComponentIdentifier(), interpreter.getModel().getState().getTypeModel().getClassLoader())
-								.addResultListener(interpreter.createResultListener(new IResultListener()
-							{
-								public void resultAvailable(Object source, Object result)
-								{
-									// ok message could be sent.
-									ret.setResult(null);
-								}
-								
-								public void exceptionOccurred(Object source, Exception exception)
-								{
-									// message could not be sent.
-									ret.setException(exception);
-								}
-							}));
+							IFuture	sent	= ((IMessageService)result).sendMessage(msg.getParameterMap(), msg.getMessageType(), 
+								interpreter.getAgentAdapter().getComponentIdentifier(), interpreter.getModel().getState().getTypeModel().getClassLoader());
+							
+							// ret may be null for initial events.
+							if(ret!=null)
+								sent.addResultListener(new DelegationResultListener(ret));
 						}
 						
 						public void exceptionOccurred(Object source,Exception exception)
 						{
-							ret.setException(exception);
+							// ret may be null for initial events.
+							if(ret!=null)
+								ret.setException(exception);
 						}
 					}));
 

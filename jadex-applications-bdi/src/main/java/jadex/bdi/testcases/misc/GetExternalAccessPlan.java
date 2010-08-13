@@ -7,10 +7,14 @@ import jadex.bdi.runtime.Plan;
 import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
+import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.service.SServiceProvider;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *  This plan performs an illegal action. 
@@ -24,21 +28,28 @@ public class GetExternalAccessPlan extends Plan
 	 */
 	public void body()
 	{
+		// Sub component will not be initialized before wait future is done.
+		Future	wait	= new Future();
+
 		// Create component.
 		IComponentManagementService ces = (IComponentManagementService)SServiceProvider
 			.getServiceUpwards(getScope().getServiceProvider(), IComponentManagementService.class).get(this);
-		IFuture ret = ces.createComponent(null, "jadex/bdi/testcases/misc/ExternalAccess.agent.xml",
-			new CreationInfo("donothing", null, getComponentIdentifier(), true, false), null);
-		IComponentIdentifier cid = (IComponentIdentifier)ret.get(this);
+		IComponentIdentifier cid = ces.generateComponentIdentifier("ExternalAccessWorker");
+		Map	args	= new HashMap();
+		args.put("future", wait);
+		IFuture init = ces.createComponent(cid.getLocalName(), "jadex/bdi/testcases/misc/ExternalAccessWorker.agent.xml",
+			new CreationInfo(null, args, getComponentIdentifier(), false, false), null);
 		
-		// Get external access.
-		IResultListener lis2 = new DefaultResultListener()
+		// Get and use external access.
+		final boolean[]	gotexta	= new boolean[3];	// 0: got exception, 1: got access, 2: got belief value.	
+		IResultListener	lis	= new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
 				IBDIExternalAccess exta = (IBDIExternalAccess)result;
+				gotexta[0]	= true;
 //				System.out.println("Got external access: "+exta);
-				exta.getBeliefbase().getBelief("somebelief").addResultListener(new DefaultResultListener() 
+				exta.getBeliefbase().getBelief("test").addResultListener(new DefaultResultListener() 
 				{
 					public void resultAvailable(Object source, Object result) 
 					{
@@ -46,47 +57,40 @@ public class GetExternalAccessPlan extends Plan
 						{
 							public void resultAvailable(Object source, Object result) 
 							{
-								gotexta	= "some value".equals(result);
+								gotexta[1]	= "testfact".equals(result);
 							}
 						});
 					}
 				}); 
-
-				// alternative with blocking calls
-//				ThreadSuspendable sus = new ThreadSuspendable(new Object());
-//				String	somevalue	= (String)((IEBelief)((IEBeliefbase)exta.getBeliefbase().get(sus))
-//					.getBelief("somebelief").get(sus)).getFact().get(sus);
-				
-//				String	somevalue	= (String)exta.getBeliefbase().getBelief("somebelief").getFact();
-//				System.out.println("Got fact: "+somevalue);	
-//				gotexta	= "some value".equals(somevalue);
 			}
 			
 			public void exceptionOccurred(Object source, Exception exception)
 			{
-				exception.printStackTrace();
+				// Expected on first call.
 			}
 		};
-		IFuture fut = ces.getExternalAccess(cid);
-		fut.addResultListener(lis2);
 
 		// External access should not be made available before component has resumed.
-		TestReport	tr	= new TestReport("#1", "No external access before resume.");
+		TestReport	tr	= new TestReport("#1", "No external access before init.");
 		waitFor(300);
-		if(gotexta)
+		ces.getExternalAccess(cid).addResultListener(lis);
+		waitFor(300);
+		if(gotexta[0])
 			tr.setFailed("Got external access");
 		else
 			tr.setSucceeded(true);
 		getBeliefbase().getBeliefSet("testcap.reports").addFact(tr);
 		
-		// External access should be made available after component has resumed.
-		tr	= new TestReport("#2", "External access after resume.");
-		ces.resumeComponent(cid);
+		// External access should be made available after component is inited.
+		tr	= new TestReport("#2", "External access after init.");
+		wait.setResult(null);
+		init.get(this);
+		ces.getExternalAccess(cid).addResultListener(lis);
 		waitFor(300);
-		if(gotexta)
+		if(gotexta[0] && gotexta[1])
 			tr.setSucceeded(true);
 		else
-			tr.setFailed("Didn't get external access.");
+			tr.setFailed("Didn't get external access or belief value.");
 		getBeliefbase().getBeliefSet("testcap.reports").addFact(tr);
 	}
 }

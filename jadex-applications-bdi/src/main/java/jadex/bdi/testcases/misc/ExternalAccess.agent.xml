@@ -26,10 +26,6 @@
 		<beliefref name="testresults" result="true">
 			<concrete ref="testcap.testresults"/>
 		</beliefref>
-		
-		<belief name="somebelief" class="String">
-			<fact>"some value"</fact>		
-		</belief>
 	</beliefs>
 
 	<plans>

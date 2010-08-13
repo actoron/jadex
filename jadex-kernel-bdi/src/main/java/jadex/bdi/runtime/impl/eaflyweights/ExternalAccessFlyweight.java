@@ -17,6 +17,7 @@ import jadex.bridge.ComponentResultListener;
 import jadex.bridge.ILoadableComponentModel;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
+import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.rules.state.IOAVState;
 
@@ -115,25 +116,24 @@ public class ExternalAccessFlyweight extends EACapabilityFlyweight implements IB
 	 */
 	public IFuture	sendMessage(final IEAMessageEvent me)
 	{
-		final Future ret = new Future();
-		
-//		getEventbase().sendMessage(me);
-		
-		if(!getInterpreter().isPlanThread())
+		IFuture	ret;
+		if(getInterpreter().isExternalThread())
 		{
-			getInterpreter().getAgentAdapter().invokeLater(new Runnable() 
+			final Future	future	= new Future();
+			getInterpreter().getAgentAdapter().invokeLater(new Runnable()
 			{
-				public void run() 
+				public void run()
 				{
-					MessageEventRules.sendMessage(getState(), getScope(), ((ElementFlyweight)me).getHandle());
-					ret.setResult(null);
+					Object revent = ((ElementFlyweight)me).getHandle();
+					MessageEventRules.sendMessage(getState(), getScope(), revent).addResultListener(new DelegationResultListener(future));
 				}
 			});
+			ret	= future;
 		}
 		else
 		{
-			MessageEventRules.sendMessage(getState(), getScope(), ((ElementFlyweight)me).getHandle());
-			ret.setResult(null);
+			Object revent = ((ElementFlyweight)me).getHandle();
+			ret	= MessageEventRules.sendMessage(getState(), getScope(), revent);
 		}
 		
 		return ret;

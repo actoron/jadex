@@ -1,6 +1,7 @@
 package jadex.bdi.runtime;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.commons.IFuture;
 
 
 
@@ -16,7 +17,7 @@ public interface IEventbase extends IElement
 	 *  @param me	The message event.
 	 *  @return The filter to wait for an answer.
 	 */
-	public void	sendMessage(IMessageEvent me);
+	public IFuture	sendMessage(IMessageEvent me);
 
 	/**
 	 *  Dispatch an event.
