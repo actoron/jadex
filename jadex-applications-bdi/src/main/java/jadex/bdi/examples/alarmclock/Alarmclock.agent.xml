@@ -128,44 +128,16 @@
 		<configuration name="default">
 			<beliefs>
 				<initialbeliefset ref="alarms">
-					<!-- todo: call setAlarmtime() on alarms? -->
-					<!--<facts>
-						((Settings)$beliefbase.settings).getAlarms().length!=0?
-						((Settings)$beliefbase.settings).getAlarms():
-						//jadex.commons.SUtil.joinArrays(((Settings)$beliefbase.settings).getAlarms(),
-						new Alarm[]{new Alarm(Alarm.ONCE, new Time(new Date($scope.getTime()+10000)),
-							"jadex/bdi/examples/alarmclock/alarm.mp3", "Built-in start alarm", true, (IClockService)$scope.getServiceProvider().getService(IClockService.class)),
-						new Alarm(Alarm.HOURLY, new Time(0,0,0,0,0,0,0),
-							"jadex/bdi/examples/alarmclock/alarm.mp3", "Chimes", true, (IClockService)$scope.getServiceProvider().getService(IClockService.class)),
-						new Alarm(Alarm.HOURLY, new Time(0,15,0,0,0,0,0),
-							"jadex/bdi/examples/alarmclock/alarm.mp3", "Chimes quartely", true, (IClockService)$scope.getServiceProvider().getService(IClockService.class))}//)
-					</facts>  -->
-					
 					<facts>
-						((Settings)$beliefbase.settings).getAlarms().length!=0?
-						((Settings)$beliefbase.settings).getAlarms():
-						//jadex.commons.SUtil.joinArrays(((Settings)$beliefbase.settings).getAlarms(),
-						new Alarm[]{new Alarm(Alarm.ONCE, new Time(new Date($scope.getTime()+10000)),
-							"jadex/bdi/examples/alarmclock/alarm.mp3", "Built-in start alarm", true),
-						new Alarm(Alarm.HOURLY, new Time(0,0,0,0,0,0,0),
-							"jadex/bdi/examples/alarmclock/alarm.mp3", "Chimes", true),
-						new Alarm(Alarm.HOURLY, new Time(0,15,0,0,0,0,0),
-							"jadex/bdi/examples/alarmclock/alarm.mp3", "Chimes quartely", true)}//)
-					
+						((Settings)$beliefbase.settings).getAlarms().length!=0
+						? ((Settings)$beliefbase.settings).getAlarms()
+						: new Alarm[]{new Alarm(Alarm.ONCE, new Time(new Date($scope.getTime()+10000)),
+								"jadex/bdi/examples/alarmclock/alarm.mp3", "Built-in start alarm", true),
+							new Alarm(Alarm.HOURLY, new Time(0,0,0,0,0,0,0),
+								"jadex/bdi/examples/alarmclock/alarm.mp3", "Chimes", true),
+							new Alarm(Alarm.HOURLY, new Time(0,15,0,0,0,0,0),
+								"jadex/bdi/examples/alarmclock/alarm.mp3", "Chimes quartely", true)}
 					</facts>
-					<!--<fact>
-						new Alarm(Alarm.ONCE,
-						new Time(new Date($agent.getTime()+10000)),
-						"jadex/examples/alarmclock/alarm.mp3", "Built-in start alarm", true)
-					</fact>
-					<fact>
-						new Alarm(Alarm.HOURLY, new Time(0,0,0,0,0,0,0),
-						"jadex/examples/alarmclock/alarm.mp3", "Chimes", true)
-					</fact>
-					<fact>
-						new Alarm(Alarm.HOURLY, new Time(0,15,0,0,0,0,0),
-						"jadex/examples/alarmclock/alarm.mp3", "Chimes quartely", true)
-					</fact>-->
 				</initialbeliefset>
 			</beliefs>
 		</configuration>

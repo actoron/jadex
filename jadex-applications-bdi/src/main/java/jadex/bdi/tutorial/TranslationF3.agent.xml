@@ -16,6 +16,8 @@
 	<imports>
 		<import>jadex.base.fipa.*</import>
 		<import>java.util.logging.*</import>
+		<import>jadex.commons.*</import>
+		<import>jadex.service.*</import>
 	</imports>
 
 	<capabilities>
@@ -48,6 +50,7 @@
  		<!-- The default parent handler prints out log messages on the console. -->
 		<!-- <property name="logging.useParentHandlers">true</property> -->
 		<!--<property name="debugging">true</property>-->
+		<property name="dfservice" class="IFuture">SServiceProvider.getService($scope.getServiceProvider(), IDF.class)</property>
     </properties>
 
 	<configurations>
@@ -56,8 +59,8 @@
 				<initialgoal ref="df_keep_registered">
 					<parameter ref="description">
 						<value>
-							((IDF)$scope.getServiceProvider().getService(IDF.class))
-								.createDFComponentDescription(null, ((IDF)$scope.getServiceProvider().getService(IDF.class))
+							$propertybase.getProperty("dfservice")
+								.createDFComponentDescription(null, $propertybase.getProperty("dfservice")
 								.createDFServiceDescription("service_translate", "translate english_german", "University of Hamburg"))
  						</value>
 					</parameter>
@@ -65,20 +68,6 @@
 						<value>20000</value>
 					</parameter>
 				</initialgoal>
-				 
-				<!-- Initial goal to register the agent at startup. - ->
-				<initialgoal ref="df_register">
-					<parameter ref="description">
-						<value>
- 							SFipa.createComponentDescription(null,
-							SFipa.createServiceDescription("service_translate",
-			 				"translate english_german", "University of Hamburg"))
- 						</value>
-					</parameter>
-				</initialgoal>-->
-				
-				<!-- End goal to deregister the agent at shutdown. - ->
-				<endgoal ref="df_deregister"/>-->
 			</goals>
 		</configuration>
 	</configurations>
