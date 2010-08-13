@@ -6,8 +6,8 @@ import jadex.commons.SGUI;
 import jadex.tools.common.CombiIcon;
 import jadex.tools.common.GuiProperties;
 import jadex.tools.common.ObjectCardLayout;
-import jadex.tools.common.componenttree.ComponentTreeNode;
 import jadex.tools.common.componenttree.ComponentTreePanel;
+import jadex.tools.common.componenttree.IActiveComponentTreeNode;
 import jadex.tools.common.componenttree.IComponentTreeNode;
 import jadex.tools.common.componenttree.INodeHandler;
 import jadex.tools.common.plugin.AbstractJCCPlugin;
@@ -163,9 +163,9 @@ public class DebuggerPlugin extends AbstractJCCPlugin
 				if(tree.getSelectionPath()!=null)
 				{
 					Object node = tree.getSelectionPath().getLastPathComponent();
-					if(node instanceof ComponentTreeNode)
+					if(node instanceof IActiveComponentTreeNode)
 					{
-						cards.show(((ComponentTreeNode)node).getDescription());
+						cards.show(((IActiveComponentTreeNode)node).getDescription());
 					}
 				}
 			}
@@ -180,7 +180,7 @@ public class DebuggerPlugin extends AbstractJCCPlugin
 				boolean	allcomp	= true;
 				for(int i=0; allcomp && i<nodes.length; i++)
 				{
-					allcomp	= nodes[i] instanceof ComponentTreeNode;
+					allcomp	= nodes[i] instanceof IActiveComponentTreeNode;
 				}
 				
 				if(allcomp)
@@ -188,12 +188,12 @@ public class DebuggerPlugin extends AbstractJCCPlugin
 					boolean	allob	= true;
 					for(int i=0; allob && i<nodes.length; i++)
 					{
-						allob	= cards.getComponent(((ComponentTreeNode)nodes[i]).getDescription())!=null;
+						allob	= cards.getComponent(((IActiveComponentTreeNode)nodes[i]).getDescription())!=null;
 					}
 					boolean	allig	= true;
 					for(int i=0; allig && i<nodes.length; i++)
 					{
-						allig	= cards.getComponent(((ComponentTreeNode)nodes[i]).getDescription())==null;
+						allig	= cards.getComponent(((IActiveComponentTreeNode)nodes[i]).getDescription())==null;
 					}
 					
 					// Todo: Large icons for popup actions?
@@ -231,9 +231,9 @@ public class DebuggerPlugin extends AbstractJCCPlugin
 			public Icon getOverlay(IComponentTreeNode node)
 			{
 				Icon ret	= null;
-				if(node instanceof ComponentTreeNode)
+				if(node instanceof IActiveComponentTreeNode)
 				{
-					IComponentDescription ad = ((ComponentTreeNode)node).getDescription();
+					IComponentDescription ad = ((IActiveComponentTreeNode)node).getDescription();
 					if(cards.getComponent(ad)!=null)
 					{
 						ret = DebuggerPlugin.icons.getIcon("component_debugged");
@@ -245,9 +245,9 @@ public class DebuggerPlugin extends AbstractJCCPlugin
 			public Action getDefaultAction(IComponentTreeNode node)
 			{
 				Action	a	= null;
-				if(node instanceof ComponentTreeNode)
+				if(node instanceof IActiveComponentTreeNode)
 				{
-					if(cards.getComponent(((ComponentTreeNode)node).getDescription())!=null)
+					if(cards.getComponent(((IActiveComponentTreeNode)node).getDescription())!=null)
 					{
 						a	= STOP_DEBUGGER;
 					}
@@ -288,9 +288,9 @@ public class DebuggerPlugin extends AbstractJCCPlugin
 			TreePath[]	paths	= comptree.getTree().getSelectionPaths();
 			for(int i=0; paths!=null && i<paths.length; i++)
 			{
-				if(paths[i].getLastPathComponent() instanceof ComponentTreeNode)
+				if(paths[i].getLastPathComponent() instanceof IActiveComponentTreeNode)
 				{
-					ComponentTreeNode node = (ComponentTreeNode)paths[i].getLastPathComponent();
+					IActiveComponentTreeNode node = (IActiveComponentTreeNode)paths[i].getLastPathComponent();
 					IComponentDescription desc = node.getDescription();
 					DebuggerMainPanel	panel = new DebuggerMainPanel(getJCC(), desc);
 					GuiProperties.setupHelp(panel, "tools.debugger");
@@ -308,9 +308,9 @@ public class DebuggerPlugin extends AbstractJCCPlugin
 			TreePath[]	paths	= comptree.getTree().getSelectionPaths();
 			for(int i=0; paths!=null && i<paths.length; i++)
 			{
-				if(paths[i].getLastPathComponent() instanceof ComponentTreeNode)
+				if(paths[i].getLastPathComponent() instanceof IActiveComponentTreeNode)
 				{
-					ComponentTreeNode node = (ComponentTreeNode)paths[i].getLastPathComponent();
+					IActiveComponentTreeNode node = (IActiveComponentTreeNode)paths[i].getLastPathComponent();
 					IComponentDescription desc = node.getDescription();
 					DebuggerMainPanel panel = (DebuggerMainPanel)cards.getComponent(desc);
 					panel.dispose();

@@ -24,8 +24,8 @@ import jadex.tools.comanalyzer.diagram.DiagramPanel;
 import jadex.tools.comanalyzer.graph.GraphPanel;
 import jadex.tools.comanalyzer.table.TablePanel;
 import jadex.tools.common.GuiProperties;
-import jadex.tools.common.componenttree.ComponentTreeNode;
 import jadex.tools.common.componenttree.ComponentTreePanel;
+import jadex.tools.common.componenttree.IActiveComponentTreeNode;
 import jadex.tools.common.componenttree.IComponentTreeNode;
 import jadex.tools.common.componenttree.INodeHandler;
 import jadex.tools.common.plugin.AbstractJCCPlugin;
@@ -404,9 +404,9 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 			public Icon getOverlay(IComponentTreeNode node)
 			{
 				Icon	ret	= null;
-				if(node instanceof ComponentTreeNode)
+				if(node instanceof IActiveComponentTreeNode)
 				{
-					IComponentDescription ad = ((ComponentTreeNode)node).getDescription();
+					IComponentDescription ad = ((IActiveComponentTreeNode)node).getDescription();
 					Component agent = componentlist.getAgent(ad.getName());
 					if(Component.STATE_OBSERVED.equals(agent.getState()))
 					{
@@ -423,7 +423,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 				boolean	allcomp	= true;
 				for(int i=0; allcomp && i<nodes.length; i++)
 				{
-					allcomp	= nodes[i] instanceof ComponentTreeNode;
+					allcomp	= nodes[i] instanceof IActiveComponentTreeNode;
 				}
 				
 				if(allcomp)
@@ -431,12 +431,12 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 					boolean	allob	= true;
 					for(int i=0; allob && i<nodes.length; i++)
 					{
-						allob	= componentlist.getAgent(((ComponentTreeNode)nodes[i]).getDescription().getName()).getState().equals(Component.STATE_OBSERVED);
+						allob	= componentlist.getAgent(((IActiveComponentTreeNode)nodes[i]).getDescription().getName()).getState().equals(Component.STATE_OBSERVED);
 					}
 					boolean	allig	= true;
 					for(int i=0; allig && i<nodes.length; i++)
 					{
-						allig	= componentlist.getAgent(((ComponentTreeNode)nodes[i]).getDescription().getName()).getState().equals(Component.STATE_IGNORED);
+						allig	= componentlist.getAgent(((IActiveComponentTreeNode)nodes[i]).getDescription().getName()).getState().equals(Component.STATE_IGNORED);
 					}
 					
 					// Todo: Large icons for popup actions?
@@ -470,9 +470,9 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 			public Action getDefaultAction(IComponentTreeNode node)
 			{
 				Action	a	= null;
-				if(node instanceof ComponentTreeNode)
+				if(node instanceof IActiveComponentTreeNode)
 				{
-					String	state	= componentlist.getAgent(((ComponentTreeNode)node).getDescription().getName()).getState();
+					String	state	= componentlist.getAgent(((IActiveComponentTreeNode)node).getDescription().getName()).getState();
 					if(state.equals(Component.STATE_OBSERVED))
 					{
 						a	= STOP_OBSERVING;
@@ -1391,9 +1391,9 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 			TreePath[]	paths	= comptree.getTree().getSelectionPaths();
 			for(int i=0; paths!=null && i<paths.length; i++)
 			{
-				if(paths[i].getLastPathComponent() instanceof ComponentTreeNode)
+				if(paths[i].getLastPathComponent() instanceof IActiveComponentTreeNode)
 				{
-					ComponentTreeNode node = (ComponentTreeNode)paths[i].getLastPathComponent();
+					IActiveComponentTreeNode node = (IActiveComponentTreeNode)paths[i].getLastPathComponent();
 					IComponentDescription desc = node.getDescription();
 					observed.add(desc.getName());
 					Component agent = componentlist.getAgent(desc.getName());
@@ -1413,9 +1413,9 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 			TreePath[]	paths	= comptree.getTree().getSelectionPaths();
 			for(int i=0; paths!=null && i<paths.length; i++)
 			{
-				if(paths[i].getLastPathComponent() instanceof ComponentTreeNode)
+				if(paths[i].getLastPathComponent() instanceof IActiveComponentTreeNode)
 				{
-					ComponentTreeNode node = (ComponentTreeNode)paths[i].getLastPathComponent();
+					IActiveComponentTreeNode node = (IActiveComponentTreeNode)paths[i].getLastPathComponent();
 					IComponentDescription desc = node.getDescription();
 					observed.remove(desc.getName());
 					Component agent = componentlist.getAgent(desc.getName());

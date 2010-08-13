@@ -10,8 +10,8 @@ import jadex.service.SServiceProvider;
 import jadex.tools.common.CombiIcon;
 import jadex.tools.common.GuiProperties;
 import jadex.tools.common.ObjectCardLayout;
-import jadex.tools.common.componenttree.ComponentTreeNode;
 import jadex.tools.common.componenttree.ComponentTreePanel;
+import jadex.tools.common.componenttree.IActiveComponentTreeNode;
 import jadex.tools.common.componenttree.IComponentTreeNode;
 import jadex.tools.common.componenttree.INodeHandler;
 import jadex.tools.common.plugin.AbstractJCCPlugin;
@@ -142,9 +142,9 @@ public class RuleProfilerPlugin extends AbstractJCCPlugin	implements IComponentL
 				if(tree.getSelectionPath()!=null)
 				{
 					Object node = tree.getSelectionPath().getLastPathComponent();
-					if(node instanceof ComponentTreeNode)
+					if(node instanceof IActiveComponentTreeNode)
 					{
-						cards.show(((ComponentTreeNode)node).getDescription());
+						cards.show(((IActiveComponentTreeNode)node).getDescription());
 					}
 				}
 			}
@@ -159,8 +159,8 @@ public class RuleProfilerPlugin extends AbstractJCCPlugin	implements IComponentL
 				boolean	allbdi	= true;
 				for(int i=0; allbdi && i<nodes.length; i++)
 				{
-					allbdi	= nodes[i] instanceof ComponentTreeNode
-						&& BDIAgentFactory.FILETYPE_BDIAGENT.equals(((ComponentTreeNode)nodes[i]).getDescription().getType());
+					allbdi	= nodes[i] instanceof IActiveComponentTreeNode
+						&& BDIAgentFactory.FILETYPE_BDIAGENT.equals(((IActiveComponentTreeNode)nodes[i]).getDescription().getType());
 				}
 				
 				if(allbdi)
@@ -168,12 +168,12 @@ public class RuleProfilerPlugin extends AbstractJCCPlugin	implements IComponentL
 					boolean	allob	= true;
 					for(int i=0; allob && i<nodes.length; i++)
 					{
-						allob	= cards.getComponent(((ComponentTreeNode)nodes[i]).getDescription())!=null;
+						allob	= cards.getComponent(((IActiveComponentTreeNode)nodes[i]).getDescription())!=null;
 					}
 					boolean	allig	= true;
 					for(int i=0; allig && i<nodes.length; i++)
 					{
-						allig	= cards.getComponent(((ComponentTreeNode)nodes[i]).getDescription())==null;
+						allig	= cards.getComponent(((IActiveComponentTreeNode)nodes[i]).getDescription())==null;
 					}
 					
 					// Todo: Large icons for popup actions?
@@ -211,9 +211,9 @@ public class RuleProfilerPlugin extends AbstractJCCPlugin	implements IComponentL
 			public Icon getOverlay(IComponentTreeNode node)
 			{
 				Icon ret	= null;
-				if(node instanceof ComponentTreeNode)
+				if(node instanceof IActiveComponentTreeNode)
 				{
-					IComponentDescription ad = ((ComponentTreeNode)node).getDescription();
+					IComponentDescription ad = ((IActiveComponentTreeNode)node).getDescription();
 					if(cards.getComponent(ad)!=null)
 					{
 						ret = icons.getIcon("component_debugged");
@@ -225,13 +225,13 @@ public class RuleProfilerPlugin extends AbstractJCCPlugin	implements IComponentL
 			public Action getDefaultAction(IComponentTreeNode node)
 			{
 				Action	a	= null;
-				if(node instanceof ComponentTreeNode)
+				if(node instanceof IActiveComponentTreeNode)
 				{
-					if(cards.getComponent(((ComponentTreeNode)node).getDescription())!=null)
+					if(cards.getComponent(((IActiveComponentTreeNode)node).getDescription())!=null)
 					{
 						a	= STOP_PROFILER;
 					}
-					else if(BDIAgentFactory.FILETYPE_BDIAGENT.equals(((ComponentTreeNode)node).getDescription().getType()))
+					else if(BDIAgentFactory.FILETYPE_BDIAGENT.equals(((IActiveComponentTreeNode)node).getDescription().getType()))
 					{
 						a	= START_PROFILER;
 					}
@@ -337,10 +337,10 @@ public class RuleProfilerPlugin extends AbstractJCCPlugin	implements IComponentL
 			TreePath[]	paths	= comptree.getTree().getSelectionPaths();
 			for(int i=0; paths!=null && i<paths.length; i++)
 			{
-				if(paths[i].getLastPathComponent() instanceof ComponentTreeNode
-					&& BDIAgentFactory.FILETYPE_BDIAGENT.equals(((ComponentTreeNode)paths[i].getLastPathComponent()).getDescription().getType()))
+				if(paths[i].getLastPathComponent() instanceof IActiveComponentTreeNode
+					&& BDIAgentFactory.FILETYPE_BDIAGENT.equals(((IActiveComponentTreeNode)paths[i].getLastPathComponent()).getDescription().getType()))
 				{
-					ComponentTreeNode node = (ComponentTreeNode)paths[i].getLastPathComponent();
+					IActiveComponentTreeNode node = (IActiveComponentTreeNode)paths[i].getLastPathComponent();
 					IComponentDescription desc = node.getDescription();
 					RuleProfilerPanel	panel = new RuleProfilerPanel(getJCC().getServiceContainer(), desc.getName());
 					GuiProperties.setupHelp(panel, getHelpID());
@@ -358,10 +358,10 @@ public class RuleProfilerPlugin extends AbstractJCCPlugin	implements IComponentL
 			TreePath[]	paths	= comptree.getTree().getSelectionPaths();
 			for(int i=0; paths!=null && i<paths.length; i++)
 			{
-				if(paths[i].getLastPathComponent() instanceof ComponentTreeNode
-					&& BDIAgentFactory.FILETYPE_BDIAGENT.equals(((ComponentTreeNode)paths[i].getLastPathComponent()).getDescription().getType()))
+				if(paths[i].getLastPathComponent() instanceof IActiveComponentTreeNode
+					&& BDIAgentFactory.FILETYPE_BDIAGENT.equals(((IActiveComponentTreeNode)paths[i].getLastPathComponent()).getDescription().getType()))
 				{
-					ComponentTreeNode node = (ComponentTreeNode)paths[i].getLastPathComponent();
+					IActiveComponentTreeNode node = (IActiveComponentTreeNode)paths[i].getLastPathComponent();
 					IComponentDescription desc = node.getDescription();
 					RuleProfilerPanel intro = (RuleProfilerPanel)cards.getComponent(desc);			
 					detail.remove(intro);

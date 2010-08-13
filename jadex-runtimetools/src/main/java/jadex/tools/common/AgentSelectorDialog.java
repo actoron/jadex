@@ -6,8 +6,8 @@ import jadex.commons.SGUI;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.service.IServiceProvider;
 import jadex.service.SServiceProvider;
-import jadex.tools.common.componenttree.ComponentTreeNode;
 import jadex.tools.common.componenttree.ComponentTreePanel;
+import jadex.tools.common.componenttree.IActiveComponentTreeNode;
 import jadex.tools.common.componenttree.IComponentTreeNode;
 import jadex.tools.common.componenttree.INodeHandler;
 
@@ -223,9 +223,9 @@ public class AgentSelectorDialog
 			public Icon getOverlay(IComponentTreeNode node)
 			{
 				Icon	ret	= null;
-				if(node instanceof ComponentTreeNode)
+				if(node instanceof IActiveComponentTreeNode)
 				{
-					IComponentIdentifier	id	= ((ComponentTreeNode)node).getDescription().getName();
+					IComponentIdentifier	id	= ((IActiveComponentTreeNode)node).getDescription().getName();
 					if(sels.contains(id))
 					{
 						ret	= icons.getIcon("edit_overlay");
@@ -237,7 +237,7 @@ public class AgentSelectorDialog
 			public Action getDefaultAction(final IComponentTreeNode node)
 			{
 				Action	a	= null;
-				if(node instanceof ComponentTreeNode)
+				if(node instanceof IActiveComponentTreeNode)
 				{
 					a	= new AbstractAction()
 					{
@@ -249,7 +249,7 @@ public class AgentSelectorDialog
 								public void customResultAvailable(Object source, Object result)
 								{
 									IComponentManagementService cms = (IComponentManagementService)result;
-									final IComponentIdentifier id	= ((ComponentTreeNode)node).getDescription().getName();
+									final IComponentIdentifier id	= ((IActiveComponentTreeNode)node).getDescription().getName();
 									addSelectedAgent(cms.createComponentIdentifier(id.getName(), false, id.getAddresses()), list);
 									comptree.getModel().fireNodeChanged(node);
 								}
@@ -310,7 +310,7 @@ public class AgentSelectorDialog
 				if(comptree.getTree().getLastSelectedPathComponent()!=null)
 				{
 					Object	node	= comptree.getTree().getLastSelectedPathComponent();
-					if(node instanceof ComponentTreeNode)
+					if(node instanceof IActiveComponentTreeNode)
 					{
 						selectenabled	= !singleselection || sels.size()==0;
 					}
@@ -367,14 +367,14 @@ public class AgentSelectorDialog
 				if(!comptree.getTree().getSelectionModel().isSelectionEmpty())
 				{
 					final Object node = comptree.getTree().getLastSelectedPathComponent();
-					if(node instanceof ComponentTreeNode)
+					if(node instanceof IActiveComponentTreeNode)
 					{
 						SServiceProvider.getServiceUpwards(provider, IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
 						{
 							public void customResultAvailable(Object source, Object result)
 							{
 								IComponentManagementService cms = (IComponentManagementService)result;
-								IComponentIdentifier id	= ((ComponentTreeNode)node).getDescription().getName();
+								IComponentIdentifier id	= ((IActiveComponentTreeNode)node).getDescription().getName();
 								addSelectedAgent(cms.createComponentIdentifier(id.getName(), false, id.getAddresses()), list);
 							}
 						});

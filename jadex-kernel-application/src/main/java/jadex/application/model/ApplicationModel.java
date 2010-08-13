@@ -3,8 +3,11 @@ package jadex.application.model;
 import jadex.bridge.IArgument;
 import jadex.bridge.ILoadableComponentModel;
 import jadex.bridge.IReport;
+import jadex.commons.IFuture;
+import jadex.commons.SReflect;
+import jadex.javaparser.IParsedExpression;
 
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -23,6 +26,8 @@ public class ApplicationModel implements ILoadableComponentModel
 		
 	/** The classloader. */
 	protected ClassLoader classloader;
+	
+	protected Map	properties;
 	
 	//-------- constructors --------
 	
@@ -235,8 +240,33 @@ public class ApplicationModel implements ILoadableComponentModel
 	 */
 	public Map	getProperties()
 	{
-		// Todo: implement me.
-		return Collections.EMPTY_MAP;
+		if(properties==null)
+		{
+			properties = new HashMap();
+			List	props	= apptype.getProperties();
+			for(int i=0; i<props.size(); i++)
+			{
+				MExpressionType	mexp	= (MExpressionType)props.get(i);
+				Class	clazz	= mexp.getClazz();
+				// Ignore future properties, which are evaluated at component instance startup time.
+				if(clazz==null || !SReflect.isSupertype(IFuture.class, clazz))
+				{
+					IParsedExpression	pex = mexp.getParsedValue();
+					try
+					{
+						Object	value	= pex.getValue(null);
+						properties.put(mexp.getName(), value);
+					}
+					catch(Exception e)
+					{
+						// Hack!!! Exception should be propagated.
+						System.err.println(pex.getExpressionText());
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+		return properties;
 	}
 	
 	/**

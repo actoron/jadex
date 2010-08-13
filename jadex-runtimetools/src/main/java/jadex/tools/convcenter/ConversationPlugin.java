@@ -11,8 +11,8 @@ import jadex.commons.SGUI;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.service.SServiceProvider;
 import jadex.tools.common.GuiProperties;
-import jadex.tools.common.componenttree.ComponentTreeNode;
 import jadex.tools.common.componenttree.ComponentTreePanel;
+import jadex.tools.common.componenttree.IActiveComponentTreeNode;
 import jadex.tools.common.componenttree.IComponentTreeNode;
 import jadex.tools.common.componenttree.INodeHandler;
 import jadex.tools.common.plugin.AbstractJCCPlugin;
@@ -95,9 +95,9 @@ public class ConversationPlugin extends AbstractJCCPlugin
 			TreePath[]	paths	= comptree.getTree().getSelectionPaths();
 			for(int i=0; paths!=null && i<paths.length; i++)
 			{
-				if(paths[i].getLastPathComponent() instanceof ComponentTreeNode)
+				if(paths[i].getLastPathComponent() instanceof IActiveComponentTreeNode)
 				{
-					final ComponentTreeNode node = (ComponentTreeNode)paths[i].getLastPathComponent();
+					final IActiveComponentTreeNode node = (IActiveComponentTreeNode)paths[i].getLastPathComponent();
 					final IComponentIdentifier rec = node.getDescription().getName();
 					// Use clone, as added component id might be modified by user.
 					SServiceProvider.getServiceUpwards(jcc.getServiceContainer(), IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
@@ -149,7 +149,7 @@ public class ConversationPlugin extends AbstractJCCPlugin
 				boolean	allcomp	= true;
 				for(int i=0; allcomp && i<nodes.length; i++)
 				{
-					allcomp	= nodes[i] instanceof ComponentTreeNode;
+					allcomp	= nodes[i] instanceof IActiveComponentTreeNode;
 				}
 				
 				if(allcomp)
@@ -170,9 +170,9 @@ public class ConversationPlugin extends AbstractJCCPlugin
 			public Icon getOverlay(IComponentTreeNode node)
 			{
 				Icon	ret	= null;
-				if(node instanceof ComponentTreeNode)
+				if(node instanceof IActiveComponentTreeNode)
 				{
-					IComponentIdentifier	id	= ((ComponentTreeNode)node).getDescription().getName();
+					IComponentIdentifier	id	= ((IActiveComponentTreeNode)node).getDescription().getName();
 					Map	message	= convcenter.getMessagePanel().getMessage();
 					IComponentIdentifier[]	recs	= (IComponentIdentifier[])message.get(SFipa.RECEIVERS);
 					if(recs!=null && Arrays.asList(recs).contains(id))
@@ -186,7 +186,7 @@ public class ConversationPlugin extends AbstractJCCPlugin
 			public Action getDefaultAction(IComponentTreeNode node)
 			{
 				Action	a	= null;
-				if(node instanceof ComponentTreeNode)
+				if(node instanceof IActiveComponentTreeNode)
 				{
 					a	= SEND_MESSAGE;
 				}
