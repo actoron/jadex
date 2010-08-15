@@ -8,6 +8,7 @@ import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.ICommand;
 import jadex.commons.SUtil;
+import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.micro.MicroAgent;
 import jadex.micro.MicroAgentMetaInfo;
@@ -40,7 +41,7 @@ public class AwarenessAgent extends MicroAgent
 	protected int port;
 	
 	/** The socket. */
-	protected DatagramSocket socket;
+	protected MulticastSocket socket;
 	
 	/** The delay. */
 	protected long delay;
@@ -64,8 +65,11 @@ public class AwarenessAgent extends MicroAgent
 			this.port = ((Number)getArgument("port")).intValue();
 			this.delay = ((Number)getArgument("delay")).longValue();
 			
-			this.socket =  new DatagramSocket();
+			this.socket =  new MulticastSocket();
+//			System.out.println(socket.getLoopbackMode());
+			this.socket.setLoopbackMode(true);
 			this.proxies = new HashSet();
+//			System.out.println(socket.getLoopbackMode());
 			proxies.add(getRootIdentifier());
 		
 			startReceiving();
@@ -103,6 +107,9 @@ public class AwarenessAgent extends MicroAgent
 	{
 		System.out.println("killed set to true: "+getComponentIdentifier());
 		killed = true;
+
+		if(socket!=null)
+			socket.close();
 	}
 	
 	/**
@@ -111,9 +118,9 @@ public class AwarenessAgent extends MicroAgent
 	public void send(final InetAddress receiver, final int port, final AwarenessInfo info)
 	{
 		SServiceProvider.getService(getServiceProvider(), ILibraryService.class)
-			.addResultListener(createResultListener(new IResultListener()
-		{
-			public void resultAvailable(Object source, Object result)
+			.addResultListener(createResultListener(new DefaultResultListener() 
+		{	
+			public void resultAvailable(Object source, Object result) 
 			{
 				try
 				{
@@ -121,17 +128,13 @@ public class AwarenessAgent extends MicroAgent
 					byte[] data = JavaWriter.objectToByteArray(info, ls.getClassLoader());
 					DatagramPacket packet = new DatagramPacket(data, data.length, receiver, port);
 					socket.send(packet);
-//					System.out.println(getComponentIdentifier()+" sent '"+info+"' to "+receiver+":"+port);
+//						System.out.println(getComponentIdentifier()+" sent '"+info+"' to "+receiver+":"+port);
 				}
 				catch(Exception e)
 				{
-					e.printStackTrace();
-				}
-			}
-			
-			public void exceptionOccurred(Object source, Exception exception)
-			{
-				exception.printStackTrace();
+					getLogger().warning("Could not send awareness message: "+e);
+//						e.printStackTrace();
+				}	
 			}
 		}));
 	}
@@ -168,65 +171,87 @@ public class AwarenessAgent extends MicroAgent
 										// todo: max ip datagram length (is there a better way to determine length?)
 										byte buf[] = new byte[65535];
 										
-										while(!killed)
+										MulticastSocket s = null;
+										try
+										{
+											s = new MulticastSocket(port);
+											s.joinGroup(address);
+										
+											while(!killed)
+											{
+												try
+												{
+													DatagramPacket pack = new DatagramPacket(buf, buf.length);
+													s.receive(pack);
+													
+													byte[] target = new byte[pack.getLength()];
+													System.arraycopy(buf, 0, target, 0, pack.getLength());
+													
+													AwarenessInfo info = (AwarenessInfo)JavaReader.objectFromByteArray(target, ls.getClassLoader());
+			//										System.out.println(getComponentIdentifier()+" received: "+info);
+												
+													final IComponentIdentifier sender = info.getSender();
+													
+													if(!proxies.contains(sender))
+													{
+//														System.out.println("Creating new proxy for: "+sender+" "+getComponentIdentifier());
+														
+														Map args = new HashMap();
+														args.put("platform", sender);
+														CreationInfo ci = new CreationInfo(args);
+														cms.createComponent(sender.getLocalName(), "jadex/base/service/remote/ProxyAgent.class", ci, 
+															createResultListener(new IResultListener()
+														{
+															public void resultAvailable(Object source, Object result)
+															{
+																// todo: do not use source for cid?!
+			//															System.out.println("Proxy killed: "+source);
+																proxies.remove(sender);
+															}
+															
+															public void exceptionOccurred(Object source, Exception exception)
+															{
+																getLogger().warning("Could not create proxy: "+exception);
+															}
+														})).addResultListener(createResultListener(new IResultListener()
+														{
+															
+															public void resultAvailable(Object source, Object result)
+															{
+																proxies.add(sender);
+															}
+															
+															public void exceptionOccurred(Object source, Exception exception)
+															{
+																getLogger().warning("Exception during proxy execution: "+exception);
+															}
+														}));
+													}
+			//										else
+			//										{
+			//											System.out.println("No proxy for: "+sender);
+			//										}
+												}
+												catch(Exception e)
+												{
+													getLogger().warning("Receiving awareness info error: "+e);
+												}
+											}
+										}
+										catch(Exception e)
+										{
+											getLogger().warning("Receiving socket init error: "+e);
+										}
+										if(s!=null)
 										{
 											try
 											{
-												MulticastSocket s = new MulticastSocket(port);
-												s.joinGroup(address);
-												
-												DatagramPacket pack = new DatagramPacket(buf, buf.length);
-												s.receive(pack);
-												
-												byte[] target = new byte[pack.getLength()];
-												System.arraycopy(buf, 0, target, 0, pack.getLength());
-												
-												AwarenessInfo info = (AwarenessInfo)JavaReader.objectFromByteArray(target, ls.getClassLoader());
-		//												System.out.println(getComponentIdentifier()+" received: "+info);
-											
-												final IComponentIdentifier sender = info.getSender();
-												if(!proxies.contains(sender))
-												{
-													System.out.println("Creating new proxy for: "+sender+" "+getComponentIdentifier());
-													
-													Map args = new HashMap();
-													args.put("platform", sender);
-													CreationInfo ci = new CreationInfo(args);
-													cms.createComponent(sender.getLocalName(), "jadex/base/service/remote/ProxyAgent.class", ci, 
-														createResultListener(new IResultListener()
-													{
-														public void resultAvailable(Object source, Object result)
-														{
-															// todo: do not use source for cid?!
-		//															System.out.println("Proxy killed: "+source);
-															proxies.remove(sender);
-														}
-														
-														public void exceptionOccurred(Object source, Exception exception)
-														{
-														}
-													})).addResultListener(createResultListener(new IResultListener()
-													{
-														
-														public void resultAvailable(Object source, Object result)
-														{
-															proxies.add(sender);
-														}
-														
-														public void exceptionOccurred(Object source, Exception exception)
-														{
-														}
-													}));
-												}
-		//										else
-		//										{
-		//											System.out.println("No proxy for: "+sender);
-		//										}
+												s.leaveGroup(address);
+												s.close();
 											}
 											catch(Exception e)
 											{
-		//										e.printStackTrace();
-												getLogger().warning("Awareness agent problem, could not handle awareness info: "+e);
+												getLogger().warning("Receiving socket closing error: "+e);
 											}
 										}
 										

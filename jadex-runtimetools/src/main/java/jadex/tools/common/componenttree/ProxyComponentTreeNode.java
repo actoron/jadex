@@ -66,7 +66,7 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 		super(parent, model, desc, cms, ui, iconcache);
 		this.connected = false;
 		
-		timer = new Timer(5000, new ActionListener()
+		timer = new Timer(10000, new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
 			{
