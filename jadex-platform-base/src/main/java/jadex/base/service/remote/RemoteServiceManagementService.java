@@ -206,6 +206,8 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		return waitingcalls;
 	}
 	
+	protected static Map errors = Collections.synchronizedMap(new HashMap());
+	
 	/**
 	 * final IComponentIdentifier sender,
 	 */
@@ -266,13 +268,15 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 												{
 													public void resultAvailable(Object source, Object result)
 													{
-//														System.out.println("result: "+future);
+														System.out.println("Cancel timeout (res): "+callid+" "+future);
+														errors.put(callid, new Object[]{"Cancel timeout (res)", result});
 														timer.cancel();
 													}
 													
 													public void exceptionOccurred(Object source, Exception exception)
 													{
-//														System.out.println("exception: "+future);
+														System.out.println("Cancel timeout (ex): "+callid+" "+future);
+														errors.put(callid, new Object[]{"Cancel timeout (ex):", exception});
 														timer.cancel();
 													}
 												});
@@ -286,6 +290,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 							{
 								// message could not be sent -> fail immediately.
 //								System.out.println("Callee could not be reached: "+exception);
+								errors.put(callid, new Object[]{"Callee could not be reached", exception});
 								waitingcalls.remove(callid);
 								future.setException(exception);
 							}
@@ -294,6 +299,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 					
 					public void exceptionOccurred(Object source, Exception exception)
 					{
+						errors.put(callid, new Object[]{"No msg service", exception});
 						waitingcalls.remove(callid);
 						future.setException(exception);
 					}
@@ -302,6 +308,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 			
 			public void exceptionOccurred(Object source, Exception exception)
 			{
+				errors.put(callid, new Object[]{"No lib service", exception});
 				waitingcalls.remove(callid);
 				future.setException(exception);
 			}

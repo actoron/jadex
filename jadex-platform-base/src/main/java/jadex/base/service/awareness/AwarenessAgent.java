@@ -52,6 +52,9 @@ public class AwarenessAgent extends MicroAgent
 	/** Flag indicating agent killed. */
 	protected boolean killed;
 	
+	/** Receiving thread. */
+	protected Thread receiver;
+	
 	//-------- methods --------
 	
 	/**
@@ -110,6 +113,11 @@ public class AwarenessAgent extends MicroAgent
 
 		if(socket!=null)
 			socket.close();
+		synchronized(AwarenessAgent.this)
+		{
+			if(receiver!=null)
+				receiver.interrupt();
+		}
 	}
 	
 	/**
@@ -168,6 +176,11 @@ public class AwarenessAgent extends MicroAgent
 								{
 									public void run()
 									{
+										synchronized(AwarenessAgent.this)
+										{
+											receiver = Thread.currentThread();
+										}
+										
 										// todo: max ip datagram length (is there a better way to determine length?)
 										byte buf[] = new byte[65535];
 										
@@ -255,6 +268,10 @@ public class AwarenessAgent extends MicroAgent
 											}
 										}
 										
+										synchronized(AwarenessAgent.this)
+										{
+											receiver = null;
+										}
 										System.out.println("comp and receiver terminated: "+getComponentIdentifier());
 									}
 								});
