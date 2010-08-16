@@ -70,8 +70,22 @@ public class WeightFactorUtilityFunction implements IUtilityFunction
 		}
 		return ordered;
 	}
+	
+	public void setTrustFunction(ITrustFunction trustFunction)
+	{
+		this.trustFunction = trustFunction;
+	}
+	
+	public void addFactor(String name, Double weight, Double max, Double min, boolean maximate)
+	{
 
-	public synchronized Double evaluate(Map<String, Double> evaluateVector)
+		Map<String, Double> valueMap = normValue(min, max, maximate);
+		valueMap.put("weight", weight);
+
+		factorMap.put(name, valueMap);
+	}
+
+	private synchronized Double evaluate(Map<String, Double> evaluateVector)
 	{
 		Double utility = 0.0;
 		for (Map.Entry<String, Double> entry : evaluateVector.entrySet())
@@ -108,15 +122,6 @@ public class WeightFactorUtilityFunction implements IUtilityFunction
 		return utility;
 	}
 
-	public void addFactor(String name, Double weight, Double max, Double min, boolean maximate)
-	{
-
-		Map<String, Double> valueMap = normValue(min, max, maximate);
-		valueMap.put("weight", weight);
-
-		factorMap.put(name, valueMap);
-	}
-
 	private Map<String, Double> normValue(Double min, Double max, boolean maximate)
 	{
 		Double a = 1 / (max - min);
@@ -134,30 +139,7 @@ public class WeightFactorUtilityFunction implements IUtilityFunction
 		return valueMap;
 	}
 
-	public IComponentIdentifier getOwner()
-	{
-		return owner;
-	}
 
-	public void setTrustFunction(ITrustFunction trustFunction)
-	{
-		this.trustFunction = trustFunction;
-	}
-
-	public ITrustFunction getTrustFunction()
-	{
-		return trustFunction;
-	}
-
-	public void log(ServiceProposal pro, Long thetime)
-	{
-		Map<String, Double> bid = new HashMap<String, Double>();
-		bid.put("cost", pro.getBid().getBidFactor("cost"));
-		bid.put("duration", pro.getBid().getBidFactor("duration"));
-		bid.put("trust", trustFunction.getTrust(pro.getOwner().getLocalName(), thetime));
-		log(bid);
-
-	}
 
 	private synchronized void log(Map<String, Double> evaluateVector)
 	{

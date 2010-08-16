@@ -4,25 +4,40 @@ import deco4mas.examples.agentNegotiation.common.statistics.Sum;
 import deco4mas.examples.agentNegotiation.sma.application.workflow.management.evaluate.PenaltyFunction;
 import jadex.bridge.IComponentIdentifier;
 
-public class WorkflowWrapper
+public class WorkflowData
 {
+	private static Integer id = 0;
+	private Integer ident;
 	private IComponentIdentifier identifier;
 	private Long startTime;
 	private Long startExecutionTime;
 	private Long endTime;
 	private Long intendedWorkflowTime;
-	private Integer numberOfNegotiations;
+	private Integer numberOfNegotiations = 0;
 	private Sum costs;
 	private Double profit;
+	private Double negotiationCosts;
 	private PenaltyFunction contratPenalty;
 	
-	public WorkflowWrapper(IComponentIdentifier identifier, Long intendedWorkflowTime, Double profit)
+	public WorkflowData(IComponentIdentifier identifier, Long intendedWorkflowTime, Double profit, Double negotiationCosts)
 	{
 		this.identifier = identifier;
 		this.intendedWorkflowTime = intendedWorkflowTime;
 		this.profit = profit;
+		this.negotiationCosts = negotiationCosts;
 		this.contratPenalty = new PenaltyFunction(intendedWorkflowTime, profit);
 		costs = new Sum();
+		ident = id;
+		id++;
+	}
+	
+	/**
+	 * used to ignore first workflow
+	 * @return
+	 */
+	public Integer getId()
+	{
+		return ident;
 	}
 
 	public Long getStartTime()
@@ -69,20 +84,25 @@ public class WorkflowWrapper
 	{
 		return endTime - startTime;
 	}
+	
+	public Double getNegotiationCosts()
+	{
+		return negotiationCosts;
+	}
 
 	public Integer getNumberOfNegotiations()
 	{
 		return numberOfNegotiations;
 	}
 
-	public void addNegotiations()
+	public void addNegotiation()
 	{
 		numberOfNegotiations++;
 	}
 
-	public Sum getCosts()
+	public Double getCosts()
 	{
-		return costs;
+		return costs.getResult();
 	}
 
 	public void addCost(Double cost)
@@ -107,7 +127,8 @@ public class WorkflowWrapper
 
 	public Double getContratPenalty()
 	{
-		Long overrunTime = (endTime - startTime) - intendedWorkflowTime;
+		Long completeTime = getCompleteTime();
+		Long overrunTime = completeTime - intendedWorkflowTime;
 		if (overrunTime < 0L) overrunTime = 0L;
 		return contratPenalty.getPenalty(overrunTime);
 	}

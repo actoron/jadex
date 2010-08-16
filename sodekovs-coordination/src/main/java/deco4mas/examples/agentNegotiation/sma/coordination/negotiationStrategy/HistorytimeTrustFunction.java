@@ -19,7 +19,7 @@ public class HistorytimeTrustFunction implements ITrustFunction
 	private IComponentIdentifier owner;
 	private Map<TrustEvent, Double> weights;
 	private Double a = 1.0; // TODO hard coded
-	private Double b = 0.0000125;
+	private Double b = 0.0000125; // TODO hard coded
 
 	public HistorytimeTrustFunction(IComponentIdentifier owner, ServiceAgentHistory history, Map<TrustEvent, Double> eventWeight)
 	{
@@ -33,15 +33,7 @@ public class HistorytimeTrustFunction implements ITrustFunction
 
 	public synchronized Double getTrust(String sa, Long time)
 	{
-		// Object[] param = new Object[3];
-		// param[0] = history.getStartTime();
-		// param[1] = time;
-		// param[2] = sa;
-		// trustLogger.gnuInfo(param, getTrust(sa,time).toString());
-
 		TreeMap<Long, TrustEvent> saMap = history.getReliability(sa);
-		// trustLogger.info("Trust " + sa.getLocalName() + " at time " + time +
-		// " with H: " + saMap.toString());
 		Double trust = calculateTrust(saMap, time);
 		return trust;
 	}
@@ -70,15 +62,10 @@ public class HistorytimeTrustFunction implements ITrustFunction
 		return result;
 	}
 
-	public Double getWeight(TrustEvent event)
-	{
-		if (weights.containsKey(event))
-		{
-			return weights.get(event);
-		} else
-			return 0.0;
-	}
-
+	/**
+	 * log trust (just statistic use)
+	 * @param time
+	 */
 	public void logTrust(long time)
 	{
 		while (loggedTime < time)
@@ -101,16 +88,6 @@ public class HistorytimeTrustFunction implements ITrustFunction
 			trustDataLogger.info(buf.toString());
 			loggedTime = loggedTime + 1000l;
 		}
-	}
-
-	public void setWeight(TrustEvent event, Double weight)
-	{
-		weights.put(event, weight);
-	}
-
-	public IComponentIdentifier getOwner()
-	{
-		return owner;
 	}
 
 	public ServiceAgentHistory getHistory()

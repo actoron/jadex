@@ -38,7 +38,7 @@ public class BlackoutPlan extends Plan
 
 				// use a expotential distribution
 				Double nextrnd = rnd.nextDouble();
-				Double mean = 36000 - (10000 * (blackoutCharakter * 3));
+				Double mean = 34000 - (10000 * (blackoutCharakter * 3));
 				Double nextblackout = -java.lang.Math.log(1 - nextrnd) * mean;
 
 				// better Start
@@ -55,7 +55,7 @@ public class BlackoutPlan extends Plan
 				param[1] = getTime();
 				blackoutLogger.gnuInfo(param, "");
 
-				Double waitTime = 1000 + 500 * (blackoutCharakter * 4);
+				Double waitTime = 1000 + 500 * (blackoutCharakter * 3);
 				saLogger.info("blackout for " + waitTime);
 				System.out.println(this.getComponentName() + ": Blackout for " + waitTime);
 

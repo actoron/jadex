@@ -6,6 +6,7 @@ import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
 import java.util.logging.Logger;
 import deco4mas.examples.agentNegotiation.common.dataObjects.RequiredService;
+import deco4mas.examples.agentNegotiation.common.dataObjects.WorkflowData;
 import deco4mas.examples.agentNegotiation.evaluate.AgentLogger;
 import deco4mas.examples.agentNegotiation.evaluate.ClockTime;
 import deco4mas.examples.agentNegotiation.evaluate.ParameterLogger;
@@ -26,49 +27,57 @@ public class AllocateServicePlan extends Plan
 
 			String serviceName = (String) request.getParameter("action").getValue();
 
-			// Sa Present
+			// get required Service
 			RequiredService needService = null;
 			RequiredService[] services = (RequiredService[]) getBeliefbase().getBeliefSet("requiredServices").getFacts();
 			for (RequiredService service : services)
 			{
 				needService = service;
 			}
+			
 			// LOG
 			ParameterLogger saUseLogger = (ParameterLogger) AgentLogger.getTimeDiffEventForSa("SaUsage_"
 				+ needService.getServiceType().getName());
 
+			// execute the requests
 			Boolean result = false;
 			IComponentIdentifier currentSa = null;
-
 			if (!needService.isSearching())
 			{
 				synchronized (needService.getMonitor())
 				{
-					currentSa = needService.getSa();
+					currentSa = needService.getContract().getParticipant();
 
 					IGoal serviceAllocate = createGoal("rp_initiate");
 					serviceAllocate.getParameter("action").setValue((String) request.getParameter("action").getValue());
 					serviceAllocate.getParameter("receiver").setValue(currentSa);
 
+					//try allocate
 					try
 					{
 						dispatchSubgoalAndWait(serviceAllocate);
 						if (!(serviceAllocate.getParameter("result").getValue() instanceof Boolean))
 						{
+							smaLogger.info("result false , " + currentSa.getLocalName());
 							result = false;
 						} else
 						{
+							
 							result = (Boolean) serviceAllocate.getParameter("result").getValue();
+							smaLogger.info("result " + result + " , " + currentSa.getLocalName());
 						}
 					} catch (GoalFailureException gfe)
 					{
-						// gfe.printStackTrace();
+						gfe.printStackTrace();
+						smaLogger.info("GoalFailureException false , " + currentSa.getLocalName());
 						result = false;
 					}
+					// if correct execution ...
 					if (result)
 					{
 						getParameter("result").setValue(Boolean.TRUE);
 						smaLogger.info("successfull execution with " + currentSa.getLocalName());
+						((WorkflowData)getBeliefbase().getBelief("workflowData").getFact()).addCost(needService.getContract().getServiceBid().getBidFactor("cost"));
 
 						Object[] param = new Object[4];
 						param[0] = ClockTime.getStartTime(getClock());
@@ -80,6 +89,7 @@ public class AllocateServicePlan extends Plan
 				}
 			}
 
+			// if false execution ...
 			if (!result)
 			{
 				if (currentSa == null)
@@ -94,6 +104,9 @@ public class AllocateServicePlan extends Plan
 						+ "Assign new!");
 					workflowLogger.info("No/False response by " + currentSa + " at " + this.getComponentName());
 					// getParameter("result").setValue(Boolean.FALSE);
+					
+					((WorkflowData)getBeliefbase().getBelief("workflowData").getFact()).addCost(0.25 * needService.getContract().getServiceBid().getBidFactor("cost"));
+
 					smaLogger.info("error in execution with " + currentSa.getLocalName());
 					Object[] param = new Object[4];
 					param[0] = ClockTime.getStartTime(getClock());
@@ -103,6 +116,7 @@ public class AllocateServicePlan extends Plan
 					saUseLogger.gnuInfo(param, "");
 				}
 
+				// service still searching
 				if (!needService.isSearching())
 				{
 					synchronized (needService.getMonitor())

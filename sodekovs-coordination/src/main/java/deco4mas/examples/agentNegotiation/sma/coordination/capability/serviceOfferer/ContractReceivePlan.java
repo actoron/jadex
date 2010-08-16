@@ -13,9 +13,6 @@ import deco4mas.examples.agentNegotiation.evaluate.ValueLogger;
  */
 public class ContractReceivePlan extends Plan
 {
-	/**
-	 * The plan body.
-	 */
 	public void body()
 	{
 		try
@@ -24,6 +21,7 @@ public class ContractReceivePlan extends Plan
 
 			IInternalEvent rewardEvent = (IInternalEvent) getReason();
 			NegotiationContractInformation info = (NegotiationContractInformation) rewardEvent.getParameter("information").getValue();
+			//find request
 			if ((info.getContract().getInitiator().getName()).equals(this.getComponentIdentifier().getName()))
 			{
 				for (RequestedService requested : (RequestedService[]) getBeliefbase().getBeliefSet("requestedServices").getFacts())

@@ -35,7 +35,7 @@ public class EasyBidStrategy implements IDeliverProposalStrategy
 			Double cost = service.getMedCost() * (0.5 + agentType.getCostCharacter());
 
 			// s. cost
-			Double duration = service.getMedDuration() * (0.5 + agentType.getCostCharacter());
+			Double duration = service.getMedDuration() * (0.5 + agentType.getDurationCharacter());
 
 			System.out.println(owner.getLocalName() + ": " + cost + "/" + duration);
 			saLogger.info("deliver proposal(" + offer.getId() + ") with C(" + cost + ") and D(" + duration + ")");

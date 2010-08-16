@@ -82,7 +82,7 @@
 						<argument name="serviceTypes">
 							new ServiceType[]
 							{
-							new ServiceType("Chassisbau",600.0,300.0)
+							new ServiceType("Chassisbau",1000.0,500.0)
 							<!--
 								new ServiceType("Reifenhersteller",200.0,200.0),
 							-->
@@ -139,10 +139,13 @@
 							new String("workflow")
 						</argument>
 						<argument name="workflowProfit">
-							new Double(10000.0)
+							new Double(2000.0)
 						</argument>
 						<argument name="workflowIntendedTime">
-							new Long(200L)
+							new Long(1100L)
+						</argument>
+						<argument name="negotiationCosts">
+							new Double(800.0)
 						</argument>
 					</arguments>
 				</component>

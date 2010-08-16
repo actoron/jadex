@@ -71,6 +71,9 @@
 		
 		<plan name="register">
 			<body class="RegisterAtMediumPlan"></body>
+			<trigger>
+				<factchanged ref="blackout"/>
+			</trigger>
 		</plan>
 	</plans>
 
@@ -109,11 +112,11 @@
 		</internaleventref>
 	</events>
 	
-	<configurations>
-		<configuration name="default">
-			<plans>
-				<initialplan ref="register"></initialplan>
-			</plans>
-		</configuration>
-	</configurations>
+<!--	<configurations>-->
+<!--		<configuration name="default">-->
+<!--			<plans>-->
+<!--				<initialplan ref="register"></initialplan>-->
+<!--			</plans>-->
+<!--		</configuration>-->
+<!--	</configurations>-->
 </capability>

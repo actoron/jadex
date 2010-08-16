@@ -19,7 +19,7 @@ import java.util.Set;
 import java.util.logging.Logger;
 import deco4mas.examples.agentNegotiation.common.dataObjects.RequiredService;
 import deco4mas.examples.agentNegotiation.common.dataObjects.ServiceType;
-import deco4mas.examples.agentNegotiation.common.dataObjects.WorkflowWrapper;
+import deco4mas.examples.agentNegotiation.common.dataObjects.WorkflowData;
 import deco4mas.examples.agentNegotiation.evaluate.AgentLogger;
 
 /**
@@ -84,14 +84,14 @@ public class DefineRequiredServicesPlan extends Plan
 				}
 				if (newService)
 				{
-					RequiredService needService = new RequiredService(this.getComponentIdentifier(), null, taskType);
+					RequiredService needService = new RequiredService(this.getComponentIdentifier(), taskType);
 					serviceSet.add(needService);
 					smaLogger.info("Add Service " + taskType);
 				}
 				getBeliefbase().getBeliefSet("requiredServices").addFacts(serviceSet.toArray());
 
 				// LOG
-				((WorkflowWrapper)getBeliefbase().getBelief("workflowWrapper").getFact()).setStartTime(this.getTime());
+				((WorkflowData)getBeliefbase().getBelief("workflowData").getFact()).setStartTime(this.getTime());
 				System.out.println();
 				System.out.println("---- negotiation phase " + this.getComponentName() + " started! ----");
 				System.out.println();

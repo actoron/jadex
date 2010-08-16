@@ -7,7 +7,7 @@ public interface ITrustFunction
 	 * 
 	 * @param sa
 	 *            the sa to get trust for
-	 * @return the trust ( 0.0 - 1.0
+	 * @return the trust ( 0.0 - 100.0 )
 	 */
 	public Double getTrust(String sa, Long time);
 }

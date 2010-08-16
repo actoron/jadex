@@ -11,7 +11,7 @@ import deco4mas.examples.agentNegotiation.sma.coordination.negotiationStrategy.H
 import deco4mas.examples.agentNegotiation.sma.coordination.negotiationStrategy.ServiceAgentHistory;
 
 /**
- * init capabilityF beliefs
+ * Init capability beliefs
  */
 public class InitCapabilityPlan extends Plan
 {
@@ -27,8 +27,8 @@ public class InitCapabilityPlan extends Plan
 
 			// trustFunc
 			Map<TrustEvent, Double> eventWeight = new HashMap<TrustEvent, Double>();
-			eventWeight.put(TrustEvent.SuccessfullRequest, 1.0);
-			eventWeight.put(TrustEvent.FailedRequest, -8.0);
+			eventWeight.put(TrustEvent.SuccessfullRequest, 0.5);
+			eventWeight.put(TrustEvent.FailedRequest, -10.0);
 			eventWeight.put(TrustEvent.CancelContract, -1.0);
 			HistorytimeTrustFunction trustFunction = new HistorytimeTrustFunction(this.getComponentIdentifier(), history, eventWeight);
 			getBeliefbase().getBelief("trustFunction").setFact(trustFunction);
@@ -37,6 +37,5 @@ public class InitCapabilityPlan extends Plan
 		{
 			e.printStackTrace();
 		}
-
 	}
 }

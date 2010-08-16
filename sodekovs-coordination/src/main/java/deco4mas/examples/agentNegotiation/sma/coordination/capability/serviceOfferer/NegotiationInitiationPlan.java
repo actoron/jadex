@@ -42,9 +42,9 @@ public class NegotiationInitiationPlan extends Plan
 			utilityFunction.setTrustFunction((ITrustFunction) getBeliefbase().getBelief("trustFunction").getFact());
 
 			// add costs
-			Double costWeight = 0.06;
-			Double durationWeight = 0.04;
-			Double trustWeight = 0.9;
+			Double costWeight = 0.3;
+			Double durationWeight = 0.3;
+			Double trustWeight = 0.4;
 			ServiceType service = (ServiceType) neededService.getServiceType();
 			utilityFunction.addFactor("cost", costWeight, service.getMaxCost(), service.getMinCost(), false);
 			utilityFunction.addFactor("duration", durationWeight, service.getMaxDuration(), service.getMinDuration(), false);
@@ -63,8 +63,8 @@ public class NegotiationInitiationPlan extends Plan
 				if (mediumName.equals("by_neg"))
 				{
 					// extra info
-					information.put("deadline", 200000L);
-					smaLogger.info("deadline 300L");
+					information.put("deadline", 20000L);
+					smaLogger.info("deadline 200L");
 				}
 
 				info = new DirectNegotiationInitatorInformation(id, this.getComponentIdentifier(), service, utilityFunction, selector,
@@ -73,6 +73,7 @@ public class NegotiationInitiationPlan extends Plan
 
 			getBeliefbase().getBeliefSet("requestedServices").addFact(
 				new RequestedService(this.getComponentIdentifier(), info.getServiceType()));
+			
 			// Internal Event for assign Sa
 			IInternalEvent assignSaEvent = createInternalEvent("initiateNegotiation");
 			assignSaEvent.getParameter("information").setValue(info);

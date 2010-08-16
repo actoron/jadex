@@ -15,7 +15,8 @@ public class PenaltyFunction
 		Double result = 0.0;
 		if (overrunTime > 0)
 		{
-			result = workflowProfit * Math.pow(overrunTime/workflowTime.doubleValue(), 2);
+//			result = workflowProfit * Math.pow(overrunTime/workflowTime.doubleValue(), 2);
+			result = workflowProfit/(workflowTime*2) * overrunTime;
 		}
 		return result;
 	}

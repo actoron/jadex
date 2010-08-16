@@ -19,19 +19,38 @@ public abstract class ICoordinationMechanism {
 	protected CoordinationSpace space;
 	
 	// -- constructor ---
+	/**
+	 * Contruct a coordinationMechanism with the given {@link CoordinationSpace}
+	 */
 	public ICoordinationMechanism(CoordinationSpace space){
 		this.space = space;
 		}
 	
 	// -- methods ---
+	/**
+	 * start the coordinationMechanism
+	 */
 	public abstract void start();
 	
+	/**
+	 * stop the coordinationMechanism
+	 */
 	public abstract void stop();
 	
+	/**
+	 * restart the coordinationMechanism
+	 */
 	public abstract void restart();
 	
+	/**
+	 * suspend the coordinationMechanism
+	 */
 	public abstract void suspend();
 	
+	/**
+	 * Get the realisation name of the mechanism
+	 * @return
+	 */
 	public abstract String getRealisationName();
 	
 	

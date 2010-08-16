@@ -12,7 +12,7 @@ import jadex.commons.concurrent.IResultListener;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
-import deco4mas.examples.agentNegotiation.common.dataObjects.WorkflowWrapper;
+import deco4mas.examples.agentNegotiation.common.dataObjects.WorkflowData;
 import deco4mas.examples.agentNegotiation.evaluate.AgentLogger;
 import deco4mas.examples.agentNegotiation.evaluate.ValueLogger;
 
@@ -51,10 +51,11 @@ public class ExecuteWorkflowPlan extends Plan
 					// LOG
 					workflowLogger.info("workflow executed");
 					providerLogger.info("*** workflow executed ***");
-					((WorkflowWrapper)getBeliefbase().getBelief("workflowWrapper").getFact()).setEndTime(getTime());
-					workflowTimeLogger.info("Execution time: " + ((WorkflowWrapper)getBeliefbase().getBelief("workflowWrapper").getFact()).getExecutionTime().toString());
-					ValueLogger.addValue("workflowTime", ((WorkflowWrapper)getBeliefbase().getBelief("workflowWrapper").getFact()).getCompleteTime().doubleValue());
-					workflowTimeLogger.info("Complete time: " + ((WorkflowWrapper)getBeliefbase().getBelief("workflowWrapper").getFact()).getExecutionTime().toString());
+					WorkflowData data = (WorkflowData) getBeliefbase().getBelief("workflowData").getFact();
+					data.setEndTime(getTime());
+					workflowTimeLogger.info("Execution time: " + data.toString());
+					ValueLogger.addValue("workflowTime", data.getCompleteTime().doubleValue());
+					workflowTimeLogger.info("Complete time: " + data.getExecutionTime().toString());
 					workflowTimeLogger.info("---");
 					System.out.println("*** workflow executed ***");
 
@@ -82,7 +83,10 @@ public class ExecuteWorkflowPlan extends Plan
 				.getComponentIdentifier(), true, false), killListener);
 			IComponentIdentifier workflowIdentifier = (IComponentIdentifier) workflowFuture.get(this);
 			getBeliefbase().getBelief("workflow").setFact(workflowIdentifier);
-			getBeliefbase().getBelief("workflowWrapper").setFact(new WorkflowWrapper(workflowIdentifier, (Long)getBeliefbase().getBelief("workflowIntendedTime").getFact(), (Double)getBeliefbase().getBelief("workflowProfit").getFact()));
+			getBeliefbase().getBelief("workflowData").setFact(
+				new WorkflowData(workflowIdentifier, (Long) getBeliefbase().getBelief("workflowIntendedTime").getFact(),
+					(Double) getBeliefbase().getBelief("workflowProfit").getFact(), (Double) getBeliefbase().getBelief("negotiationCosts")
+						.getFact()));
 			// LOG
 			providerLogger.info("workflow [" + workflowName + "] created");
 			workflowLogger.info("workflow created");
@@ -94,6 +98,9 @@ public class ExecuteWorkflowPlan extends Plan
 			workflowID++;
 
 			waitForInternalEvent("workflowExecuted");
+
+			dispatchSubgoalAndWait(createGoal("evaluateWorkflow"));
+
 			IGoal restartWorkflow = createGoal("restartWorkflow");
 			dispatchTopLevelGoal(restartWorkflow);
 		} catch (Exception e)

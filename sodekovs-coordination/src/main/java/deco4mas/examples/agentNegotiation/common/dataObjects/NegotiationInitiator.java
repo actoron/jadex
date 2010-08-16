@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import deco4mas.examples.agentNegotiation.common.negotiationInformation.DirectNegotiationInitatorInformation;
+import deco4mas.examples.agentNegotiation.common.negotiationInformation.NegotiationContractInformation;
 import deco4mas.examples.agentNegotiation.sma.coordination.negotiationStrategy.ISelectionStrategy;
 import deco4mas.examples.agentNegotiation.sma.coordination.negotiationStrategy.ITrustFunction;
 import deco4mas.examples.agentNegotiation.sma.coordination.negotiationStrategy.IUtilityFunction;
@@ -112,7 +113,7 @@ public class NegotiationInitiator
 			selected = selector.selectProposal(orderedProposal);
 
 			// log!
-			((WeightFactorUtilityFunction) utilityFunction).log(proposals.get(selected.getOwner()), thetime);
+//			((WeightFactorUtilityFunction) utilityFunction).log(proposals.get(selected.getOwner()), thetime);
 
 			Boolean nextRound = false;
 			if (selected == null)

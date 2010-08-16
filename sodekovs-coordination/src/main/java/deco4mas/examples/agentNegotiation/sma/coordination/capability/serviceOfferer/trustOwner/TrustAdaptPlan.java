@@ -10,7 +10,7 @@ import deco4mas.examples.agentNegotiation.sma.coordination.negotiationStrategy.H
 import deco4mas.examples.agentNegotiation.sma.coordination.negotiationStrategy.ServiceAgentHistory;
 
 /**
- * Assign a Sa with Deco4mas
+ * adapt the trust
  */
 public class TrustAdaptPlan extends Plan
 {
@@ -28,7 +28,7 @@ public class TrustAdaptPlan extends Plan
 			System.out.println(getComponentName() + ": Trust for " + exe);
 			smaLogger.info("Adapt Trust: " + exe);
 
-			// more trust to Sa
+			// more/less trust to Sa
 			ServiceAgentHistory history = (ServiceAgentHistory) getBeliefbase().getBelief("history").getFact();
 			smaLogger.info("history: "+ exe);
 			history.addEvent(exe.getSa().getLocalName(), getClock().getTime(), exe.getEvent());

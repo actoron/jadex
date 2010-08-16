@@ -10,14 +10,15 @@ public class NegotiationParticipant
 	private IDeliverProposalStrategy strategy;
 	private IComponentIdentifier participant;
 	private ServiceType service;
-	private IBDIExternalAccess exta;
+	private Boolean blackout;
+//	private IBDIExternalAccess exta;
 
 	public NegotiationParticipant(DirectNegotiationParticipantInformation information)
 	{
 		this.participant = information.getParticipant();
 		this.strategy = information.getStrategy();
 		this.service = information.getServiceType();
-		this.exta = information.getExternalAccess();
+		this.blackout = information.getBlackout();
 	}
 
 	public ServiceProposal deliverProposal(ServiceOffer offer)
@@ -37,6 +38,27 @@ public class NegotiationParticipant
 
 	public Boolean isBlackout()
 	{
-		return (Boolean) exta.getBeliefbase().getBelief("blackout").getFact();
+		return blackout;
 	}
+	
+	public void setBlackout(Boolean blackout)
+	{
+		this.blackout = blackout;
+	}
+	
+	@Override
+	public boolean equals(Object obj)
+	{	
+		if (obj instanceof NegotiationParticipant)
+		{
+			NegotiationParticipant neg = (NegotiationParticipant) obj;
+			if (this.getParticipant().getLocalName().equals(neg.getParticipant().getLocalName()))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	
 }

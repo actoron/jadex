@@ -12,7 +12,7 @@
     <vertices xmi:type="bpmn:Activity" xmi:id="_A6jaYS7_Ed-L-IF5Nky85A" iD="_A6jaYC7_Ed-L-IF5Nky85A" outgoingEdges="_oA6PsTUyEd-5Ucm2o2ro_A" incomingEdges="_A6tLaC7_Ed-L-IF5Nky85A" name="Chassis bauen" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_BpC4EC7_Ed-L-IF5Nky85A" source="jadex">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_BpC4ES7_Ed-L-IF5Nky85A" key="class" value="deco4mas.examples.agentNegotiation.sma.application.workflow.implementation.ExecuteServiceByAgentTask.class"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_c3z0YC-MEd-N1eVspKLMDw" key="parameters" value="in␋serviceType␋String␋new ServiceType(&quot;Chassisbau&quot;,600.0,300.0)"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_c3z0YC-MEd-N1eVspKLMDw" key="parameters" value="in␋serviceType␋String␋new ServiceType(&quot;Chassisbau&quot;,1000.0,500.0)"/>
       </eAnnotations>
     </vertices>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_A6tLaC7_Ed-L-IF5Nky85A" iD="_A6tLZy7_Ed-L-IF5Nky85A">

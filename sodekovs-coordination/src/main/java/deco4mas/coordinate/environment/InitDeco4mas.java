@@ -22,9 +22,9 @@ import deco.lang.dynamics.mechanism.AgentElement;
 import deco.lang.dynamics.mechanism.DecentralizedCausality;
 import deco4mas.coordinate.interpreter.coordination_information.BDICoordinationInformationInterpreter;
 import deco4mas.coordinate.interpreter.coordination_information.DefaultCoordinationEventGenerator;
-import deco4mas.examples.agentNegotiation.deco.medien.DirectInternalEventMechanism;
-import deco4mas.examples.agentNegotiation.deco.medien.NegotiationMechanism;
-import deco4mas.examples.agentNegotiation.deco.medien.TrustSpaceMechanism;
+import deco4mas.examples.agentNegotiation.deco.media.DirectInternalEventMechanism;
+import deco4mas.examples.agentNegotiation.deco.media.NegotiationMechanism;
+import deco4mas.examples.agentNegotiation.deco.media.TrustSpaceMechanism;
 import deco4mas.mechanism.ICoordinationMechanism;
 import deco4mas.mechanism.v2.tspaces.TSpacesMechanism;
 

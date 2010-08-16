@@ -7,19 +7,18 @@ public class RequiredService
 	private static Integer id = new Integer(0);
 	private Integer identNumber;
 	private IComponentIdentifier owner;
-	private IComponentIdentifier sa;
+	private ServiceContract contract = null;
 	private ServiceType serviceType;
 	private Boolean searching;
 	private Boolean remove = false;
 
 	private Object monitor = new Object();
 
-	public RequiredService(IComponentIdentifier owner, IComponentIdentifier sa, ServiceType serviceType)
+	public RequiredService(IComponentIdentifier owner, ServiceType serviceType)
 	{
 		synchronized (id)
 		{
 			this.owner = owner;
-			this.sa = sa;
 			this.serviceType = serviceType;
 			searching = true;
 			identNumber = id;
@@ -27,14 +26,14 @@ public class RequiredService
 		}
 	}
 
-	public IComponentIdentifier getSa()
+	public ServiceContract getContract()
 	{
-		return sa;
+		return contract;
 	}
-
-	public void setSa(IComponentIdentifier sa)
+	
+	public void setContract(ServiceContract contract)
 	{
-		this.sa = sa;
+		this.contract = contract;
 	}
 
 	public IComponentIdentifier getOwner()
@@ -80,7 +79,7 @@ public class RequiredService
 	@Override
 	public String toString()
 	{
-		return "RequiredService(" + identNumber + " , " + owner + " , " + serviceType + " , " + searching + " , " + sa + " , " + remove
+		return "RequiredService(" + identNumber + " , " + owner + " , " + serviceType + " , " + searching + " , " + contract + " , " + remove
 			+ ")";
 	}
 }

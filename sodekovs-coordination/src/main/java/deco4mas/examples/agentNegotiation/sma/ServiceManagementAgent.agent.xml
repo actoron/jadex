@@ -1,9 +1,8 @@
-	
+
 	<!--
-		<H3>service management agent</H3>
-		
-		forwards requests for services to serviceAgents. Find serviceAgents with deco. Uses capability Request and ServiceOffer.
-		
+		<H3>service management agent</H3> forwards requests for services to
+		serviceAgents. Find serviceAgents with deco. Uses capability Request
+		and ServiceOffer.
 	-->
 <agent xmlns="http://jadex.sourceforge.net/jadex-bdi" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-bdi
@@ -16,10 +15,14 @@
 
 		<import>deco4mas.coordinate.environment.*</import>
 		<import>deco4mas.examples.agentNegotiation.sma.application.*</import>
-		<import>deco4mas.examples.agentNegotiation.sma.application.workflow.management.*</import>
-		<import>deco4mas.examples.agentNegotiation.sma.coordination.capability.serviceOfferer.*</import>
-		<import>deco4mas.examples.agentNegotiation.sma.coordination.capability.trustOwner.*</import>
-		<import>deco4mas.examples.agentNegotiation.common.dataObjects.*</import>
+		<import>deco4mas.examples.agentNegotiation.sma.application.workflow.management.*
+		</import>
+		<import>deco4mas.examples.agentNegotiation.sma.coordination.capability.serviceOfferer.*
+		</import>
+		<import>deco4mas.examples.agentNegotiation.sma.coordination.capability.trustOwner.*
+		</import>
+		<import>deco4mas.examples.agentNegotiation.common.dataObjects.*
+		</import>
 	</imports>
 
 	<capabilities>
@@ -62,10 +65,16 @@
 		<belief name="workflowName" class="String" exported="true"></belief>
 		<belief name="workflowProfit" class="Double" exported="true"></belief>
 		<belief name="workflowIntendedTime" class="Long" exported="true"></belief>
-		
-		<!-- workflow name-->
+		<belief name="negotiationCosts" class="Double" exported="true"></belief>
+
+		<!-- workflow data-->
 		<belief name="workflow" class="IComponentIdentifier" />
-		<belief name="workflowWrapper" class="WorkflowWrapper"></belief>
+		<belief name="workflowData" class="WorkflowData"></belief>
+
+		<!--	money of the sma	-->
+		<belief name="moneyBank" class="Double">
+			<fact>0.0</fact>
+		</belief>
 	</beliefs>
 
 	<goals>
@@ -85,6 +94,10 @@
 		<!-- (re)start workflow -->
 		<achievegoal name="startWorkflow"></achievegoal>
 		<achievegoal name="restartWorkflow"></achievegoal>
+
+		<!-- evaluate current workflow -->
+		<achievegoal name="evaluateWorkflow"></achievegoal>
+
 	</goals>
 
 	<plans>
@@ -144,6 +157,15 @@
 				<goal ref="restartWorkflow"></goal>
 			</trigger>
 		</plan>
+		
+		<!-- evaluate workflow -->
+		<plan name="evaluateWorkflow">
+			<body class="EvaluateWorkflowPlan">
+			</body>
+			<trigger>
+				<goal ref="evaluateWorkflow"></goal>
+			</trigger>
+		</plan>
 	</plans>
 
 	<events>
@@ -163,7 +185,6 @@
 		<internaleventref name="trustEvent">
 			<concrete ref="socap.trustEvent" />
 		</internaleventref>
-		
 		<internaleventref name="serviceSatisfied">
 			<concrete ref="socap.serviceSatisfied" />
 		</internaleventref>
@@ -180,8 +201,9 @@
 				<initialbelief ref="reqcap.rp_filter">
 					<fact>IFilter.ALWAYS</fact>
 				</initialbelief>
+				<!-- timeout for requests -->
 				<initialbelief ref="reqcap.timeout">
-					<fact>2000L</fact>
+					<fact>1500L</fact>
 				</initialbelief>
 			</beliefs>
 			<plans>

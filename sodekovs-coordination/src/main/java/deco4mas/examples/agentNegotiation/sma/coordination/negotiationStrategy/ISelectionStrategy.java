@@ -1,6 +1,5 @@
 package deco4mas.examples.agentNegotiation.sma.coordination.negotiationStrategy;
 
-import jadex.bridge.IComponentIdentifier;
 import java.util.SortedMap;
 import deco4mas.examples.agentNegotiation.common.dataObjects.ServiceProposal;
 

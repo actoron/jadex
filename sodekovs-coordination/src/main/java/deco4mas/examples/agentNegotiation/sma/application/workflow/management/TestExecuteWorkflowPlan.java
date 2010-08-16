@@ -4,6 +4,7 @@ import jadex.bdi.runtime.IInternalEvent;
 import jadex.bdi.runtime.Plan;
 import deco4mas.examples.agentNegotiation.common.dataObjects.RequiredService;
 import deco4mas.examples.agentNegotiation.common.dataObjects.ServiceContract;
+import deco4mas.examples.agentNegotiation.common.dataObjects.WorkflowData;
 
 /**
  * Test if all neededServices found a SA
@@ -26,8 +27,9 @@ public class TestExecuteWorkflowPlan extends Plan
 				{
 					if (contract.getServiceType().getName().equals(service.getServiceType().getName()))
 					{
-						service.setSa(contract.getParticipant());
+						service.setContract(contract);
 						service.setSearching(false);
+						((WorkflowData)getBeliefbase().getBelief("workflowData").getFact()).addNegotiation();
 						dispatchInternalEvent(createInternalEvent("returnExecution"));
 					}
 					if (service.isSearching())

@@ -60,9 +60,9 @@ public class ExecuteServicePlan extends Plan
 			} else
 			{
 				// LOG
-				System.out.println(getComponentName() + " missed request");
+				System.out.println(getComponentName() + " MISSED EXECUTION");
 				workflowLogger.info("execution missed by " + this.getComponentName());
-				saLogger.info("executtion missed!");
+				saLogger.info("MISSED EXECUTION");
 			}
 
 			ExecutedService execution = null;

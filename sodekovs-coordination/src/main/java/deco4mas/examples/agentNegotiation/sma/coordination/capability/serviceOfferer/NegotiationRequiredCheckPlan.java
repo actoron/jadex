@@ -11,7 +11,7 @@ import deco4mas.examples.agentNegotiation.common.dataObjects.RequiredService;
 import deco4mas.examples.agentNegotiation.evaluate.AgentLogger;
 
 /**
- * Test if negotiation or information about sign end is required
+ * Test if negotiation is required
  */
 public class NegotiationRequiredCheckPlan extends Plan
 {
@@ -26,32 +26,30 @@ public class NegotiationRequiredCheckPlan extends Plan
 			// assign all needed services
 			IInternalEvent event = (IInternalEvent) getReason();
 			RequiredService service = (RequiredService) event.getParameter("service").getValue();
-			// RequiredService[] services = (RequiredService[])
-			// getBeliefbase().getBeliefSet("requiredServices").getFacts();
-			// for (RequiredService service : services)
-			// {
+
+			// sign end
 			if (service.isRemoved())
 			{
 				synchronized (service.getMonitor())
 				{
-					smaLogger.info("Send SignEnd to " + service.getSa().getLocalName());
+					smaLogger.info("Send SignEnd to " + service.getContract().getParticipant().getLocalName());
 					IMessageEvent me = createMessageEvent("informMessage");
 					List cis = new LinkedList();
-					cis.add(service.getSa());
+					cis.add(service.getContract().getParticipant());
 					me.getParameter("receivers").setValue(cis);
 					me.getParameter("content").setValue("sign end");
 					sendMessage(me);
 				}
 			} else if (service.isSearching())
 			{
-				if (service.getSa() != null)
+				if (service.getContract() != null)
 				{
 					synchronized (service.getMonitor())
 					{
-						smaLogger.info("Send SignEnd to " + service.getSa().getLocalName());
+						smaLogger.info("Send SignEnd to " + service.getContract().getParticipant().getLocalName());
 						IMessageEvent me = createMessageEvent("informMessage");
 						List cis = new LinkedList();
-						cis.add(service.getSa());
+						cis.add(service.getContract().getParticipant());
 						me.getParameter("receivers").setValue(cis);
 						me.getParameter("content").setValue("sign end");
 						sendMessage(me);

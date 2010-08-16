@@ -12,15 +12,15 @@ public class DirectNegotiationParticipantInformation extends NegotiationInformat
 {
 	private IDeliverProposalStrategy strategy;
 	private IComponentIdentifier participant;
-	private IBDIExternalAccess externalAcccess;
+	private Boolean present;
 
 	public DirectNegotiationParticipantInformation(Integer id, IComponentIdentifier participant, ServiceType serviceType,
-		IDeliverProposalStrategy strategy, IBDIExternalAccess externalAcccess)
+		IDeliverProposalStrategy strategy, Boolean present)
 	{
 		super(id, NegotiationMechanism.NAME, serviceType);
 		this.participant = participant;
 		this.strategy = strategy;
-		this.externalAcccess = externalAcccess;
+		this.present = present;
 	}
 
 	public IDeliverProposalStrategy getStrategy()
@@ -33,14 +33,14 @@ public class DirectNegotiationParticipantInformation extends NegotiationInformat
 		return participant;
 	}
 	
-	public IBDIExternalAccess getExternalAccess()
+	public Boolean getBlackout()
 	{
-		return externalAcccess;
+		return present;
 	}
 
 	@Override
 	public String toString()
 	{
-		return "DirectNegotiationParticipantInformation(" + id + " , " + mediumType + " , " + participant + " , " + serviceType + ")";
+		return "DirectNegotiationParticipantInformation(" + id + " , " + mediumType + " , " + participant + " , " + serviceType + " , " + present + ")";
 	}
 }

@@ -10,7 +10,7 @@ import deco4mas.examples.agentNegotiation.evaluate.AgentLogger;
 import deco4mas.examples.agentNegotiation.sa.coordination.negotiationstrategy.EasyBidStrategy;
 
 /**
- * Register sa on negotiation medium(s)
+ * (De)Register sa on negotiation medium(s)
  */
 public class RegisterAtMediumPlan extends Plan
 {
@@ -23,9 +23,19 @@ public class RegisterAtMediumPlan extends Plan
 			final Logger saLogger = AgentLogger.getTimeEvent(this.getComponentName());
 
 			EasyBidStrategy strategy = new EasyBidStrategy(this.getComponentIdentifier(), (ServiceType) getBeliefbase().getBelief(
-				"providedService").getFact(), (ServiceAgentType) getBeliefbase().getBelief("serviceAgentType").getFact());
-			DirectNegotiationParticipantInformation info = new DirectNegotiationParticipantInformation(id, this.getComponentIdentifier(),
-				(ServiceType) getBeliefbase().getBelief("providedService").getFact(), strategy, this.getExternalAccess());
+			"providedService").getFact(), (ServiceAgentType) getBeliefbase().getBelief("serviceAgentType").getFact());
+			DirectNegotiationParticipantInformation info = null;
+			if ((Boolean)getBeliefbase().getBelief("blackout").getFact())
+			{
+				info = new DirectNegotiationParticipantInformation(id, this.getComponentIdentifier(),
+					(ServiceType) getBeliefbase().getBelief("providedService").getFact(), strategy, true);
+			} else
+			{
+				info = new DirectNegotiationParticipantInformation(id, this.getComponentIdentifier(),
+					(ServiceType) getBeliefbase().getBelief("providedService").getFact(), strategy, false);
+			}
+			id++;
+
 			saLogger.info("register: " + info);
 			System.out.println(this.getComponentName() + " register " + info);
 			IInternalEvent register = createInternalEvent("mediumRegister");
