@@ -42,6 +42,8 @@ public class RemoteServiceManagementAgent extends MicroAgent
 	 */
 	public void messageArrived(final Map msg, final MessageType mt)
 	{
+//		if(msg.toString().indexOf("Shop")!=-1)
+//			System.out.println("received: "+msg);
 		if(SFipa.MESSAGE_TYPE_NAME_FIPA.equals(mt.getName()))
 		{
 			SServiceProvider.getService(getServiceProvider(), ILibraryService.class)

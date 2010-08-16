@@ -190,6 +190,11 @@ public class ParallelSearchManager implements ISearchManager
 									.addResultListener(crl);
 							}
 						}
+						else
+						{
+							finished[2]	= true;
+							checkAndSetResults(finished, ret);				
+						}
 					}
 					
 					public void exceptionOccurred(Object source, Exception exception)

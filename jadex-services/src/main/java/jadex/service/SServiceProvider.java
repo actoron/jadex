@@ -164,7 +164,7 @@ public class SServiceProvider
 //		}
 		final Future ret = new Future();
 		
-		provider.getServices(parallelmanager, contdecider, new TypeResultSelector(type, false, local), new ArrayList())
+		provider.getServices(parallelmanager, local ? contdecider : rcontdecider, new TypeResultSelector(type, false, local), new ArrayList())
 			.addResultListener(new DelegationResultListener(ret));
 		
 		return ret;

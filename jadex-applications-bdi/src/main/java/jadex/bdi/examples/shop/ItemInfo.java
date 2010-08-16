@@ -24,6 +24,13 @@ public class ItemInfo
 	/**
 	 *  Create a new item info.
 	 */
+	public ItemInfo()
+	{
+	}
+	
+	/**
+	 *  Create a new item info.
+	 */
 	public ItemInfo(String name)
 	{
 		this(name, 0, 0);

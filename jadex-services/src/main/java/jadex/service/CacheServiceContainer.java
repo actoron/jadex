@@ -9,6 +9,7 @@ import jadex.commons.concurrent.IResultListener;
 import jadex.service.clock.IClockService;
 
 import java.util.Collection;
+import java.util.Iterator;
 
 /**
  *  Service container that uses caching for fast service access.
@@ -92,16 +93,18 @@ public class CacheServiceContainer	implements IServiceContainer
 					else if(data instanceof Collection)
 					{
 						Collection coll = (Collection)data;
-						BasicService[] sers = (BasicService[])coll.toArray(new BasicService[((Collection)data).size()]);
-						
 						// Check if all results are still ok.
-						for(int i=0; data!=null && i<sers.length; i++)
+						for(Iterator it=coll.iterator(); it.hasNext(); )
 						{
-							if(!sers[i].isValid())
+							Object	next	= it.next();
+							if(next instanceof BasicService)
 							{
-								// if one is invalid whole result is invalid
-								cache.remove(key);
-								data = null;
+								if(!((BasicService)next).isValid())
+								{
+									// if one is invalid whole result is invalid
+									cache.remove(key);
+									data = null;
+								}
 							}
 						}
 					}

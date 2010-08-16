@@ -25,8 +25,10 @@ import java.awt.event.WindowEvent;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListSelectionModel;
@@ -63,6 +65,7 @@ public class CustomerGui extends JFrame
 	protected List invlist = new ArrayList();
 	protected AbstractTableModel invmodel = new ItemTableModel(invlist);
 	protected JTable invtable;
+	protected Map	shops;
 	
 	//-------- constructors --------
 	
@@ -73,6 +76,7 @@ public class CustomerGui extends JFrame
 	{
 		super(agent.getComponentName());
 		this.agent = agent;
+		this.shops	= new HashMap();
 		
 		final JComboBox shopscombo = new JComboBox();
 		shopscombo.addItem("none");
@@ -80,9 +84,9 @@ public class CustomerGui extends JFrame
 		{
 			public void itemStateChanged(ItemEvent e)
 			{
-				if(shopscombo.getSelectedItem() instanceof IShop)
+				if(shops.get(shopscombo.getSelectedItem()) instanceof IShop)
 				{
-					refresh((IShop)shopscombo.getSelectedItem());
+					refresh((IShop)shops.get(shopscombo.getSelectedItem()));
 				}
 			}
 		});
@@ -99,13 +103,17 @@ public class CustomerGui extends JFrame
 				{
 					public void customResultAvailable(Object source, Object result)
 					{
-						Collection shops = (Collection)result;
+						System.out.println("Customer search result: "+result);
+						Collection coll = (Collection)result;
 						((DefaultComboBoxModel)shopscombo.getModel()).removeAllElements();
-						if(shops!=null && shops.size()>0)
+						shops.clear();
+						if(coll!=null && coll.size()>0)
 						{
-							for(Iterator it=shops.iterator(); it.hasNext(); )
+							for(Iterator it=coll.iterator(); it.hasNext(); )
 							{
-								((DefaultComboBoxModel)shopscombo.getModel()).addElement(it.next());
+								IShop	shop	= (IShop)it.next();
+								shops.put(shop.getName(), shop);
+								((DefaultComboBoxModel)shopscombo.getModel()).addElement(shop.getName());
 							}
 						}
 						else
@@ -237,7 +245,7 @@ public class CustomerGui extends JFrame
 				{
 					final String name = (String)shopmodel.getValueAt(sel, 0);
 					final Double price = (Double)shopmodel.getValueAt(sel, 1);
-					final IShop shop = (IShop)shopscombo.getSelectedItem();
+					final IShop shop = (IShop)shops.get(shopscombo.getSelectedItem());
 //					System.out.println("buying: "+name+" at: "+shop.getName());
 					agent.createGoal("buy").addResultListener(new SwingDefaultResultListener(CustomerGui.this)
 					{
