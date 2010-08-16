@@ -48,7 +48,7 @@
 	</plans>
 	
 	<services>
-		<service name="shopservice" class="IShop">new Shop($scope.getExternalAccess(), $beliefbase.shopname)</service>
+		<service>new Shop($scope.getExternalAccess(), $beliefbase.shopname)</service>
 	</services>
 	
 </capability>

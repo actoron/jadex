@@ -31,6 +31,7 @@ import java.util.List;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListSelectionModel;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -55,6 +56,7 @@ public class CustomerGui extends JFrame
 	
 	protected IBDIExternalAccess agent;
 	protected List shoplist = new ArrayList();
+	protected JCheckBox remote;
 	protected JTable shoptable;
 	protected AbstractTableModel shopmodel = new ItemTableModel(shoplist);
 	
@@ -85,12 +87,14 @@ public class CustomerGui extends JFrame
 			}
 		});
 		
+		remote = new JCheckBox("Remote");
+		remote.setToolTipText("Also search remote platforms for shops.");
 		JButton searchbut = new JButton("Search");
 		searchbut.addActionListener(new ActionListener()
 		{
 		    public void actionPerformed(ActionEvent e)
 		    {
-		    	SServiceProvider.getServices(agent.getServiceProvider(), IShop.class)
+		    	SServiceProvider.getServices(agent.getServiceProvider(), IShop.class, !remote.isSelected())
 					.addResultListener(new SwingDefaultResultListener(CustomerGui.this)
 				{
 					public void customResultAvailable(Object source, Object result)
@@ -158,6 +162,9 @@ public class CustomerGui extends JFrame
 			x,y,1,1,0,0,GridBagConstraints.WEST,GridBagConstraints.HORIZONTAL,new Insets(2,2,2,2),0,0));
 		x++;
 		selpanel.add(searchbut, new GridBagConstraints(
+			x,y,1,1,0,0,GridBagConstraints.WEST,GridBagConstraints.NONE,new Insets(2,2,2,2),0,0));
+		x++;
+		selpanel.add(remote, new GridBagConstraints(
 			x,y,1,1,0,0,GridBagConstraints.WEST,GridBagConstraints.NONE,new Insets(2,2,2,2),0,0));
 		
 		JPanel shoppanel = new JPanel(new BorderLayout());

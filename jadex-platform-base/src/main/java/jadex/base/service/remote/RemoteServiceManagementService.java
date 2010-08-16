@@ -23,6 +23,7 @@ import jadex.service.SServiceProvider;
 import jadex.service.TypeResultSelector;
 import jadex.service.clock.ITimer;
 import jadex.service.library.ILibraryService;
+import jadex.xml.bean.JavaWriter;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -211,7 +212,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	/**
 	 * final IComponentIdentifier sender,
 	 */
-	public static void sendMessage(final IMicroExternalAccess component, IComponentIdentifier receiver, Object content,
+	public static void sendMessage(final IMicroExternalAccess component, IComponentIdentifier receiver, final Object content,
 		final String callid, final long to, final Map waitingcalls, final Future future)
 	{
 		final long timeout = to<=0? DEFAULT_TIMEOUT: to;
@@ -222,8 +223,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		msg.put(SFipa.SENDER, component.getComponentIdentifier());
 		msg.put(SFipa.RECEIVERS, new IComponentIdentifier[]{receiver});
 		msg.put(SFipa.CONVERSATION_ID, callid);
-		msg.put(SFipa.LANGUAGE, SFipa.JADEX_XML);
-		msg.put(SFipa.CONTENT, content);
+//		msg.put(SFipa.LANGUAGE, SFipa.JADEX_XML);
 		
 		SServiceProvider.getService(component.getServiceProvider(), ILibraryService.class)
 			.addResultListener(component.createResultListener(new IResultListener()
@@ -237,6 +237,9 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 				{
 					public void resultAvailable(Object source, Object result)
 					{
+						// Hack!!! Manual encoding for using custom class loader at receiver side.
+						msg.put(SFipa.CONTENT, JavaWriter.objectToXML(content, ls.getClassLoader()));
+
 						IMessageService ms = (IMessageService)result;
 						ms.sendMessage(msg, SFipa.FIPA_MESSAGE_TYPE, component.getComponentIdentifier(), ls.getClassLoader())
 							.addResultListener(new IResultListener()
@@ -268,14 +271,14 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 												{
 													public void resultAvailable(Object source, Object result)
 													{
-														System.out.println("Cancel timeout (res): "+callid+" "+future);
+//														System.out.println("Cancel timeout (res): "+callid+" "+future);
 														errors.put(callid, new Object[]{"Cancel timeout (res)", result});
 														timer.cancel();
 													}
 													
 													public void exceptionOccurred(Object source, Exception exception)
 													{
-														System.out.println("Cancel timeout (ex): "+callid+" "+future);
+//														System.out.println("Cancel timeout (ex): "+callid+" "+future);
 														errors.put(callid, new Object[]{"Cancel timeout (ex):", exception});
 														timer.cancel();
 													}

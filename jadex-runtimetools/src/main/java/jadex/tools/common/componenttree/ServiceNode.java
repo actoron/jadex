@@ -36,7 +36,8 @@ public class ServiceNode	extends AbstractComponentTreeNode
 	{
 		super(parent, model);
 		this.service	= service;
-//		System.out.println("service node: "+service.getServiceIdentifier());
+		if(service==null || service.getServiceIdentifier()==null)
+			System.out.println("service node: "+this);
 	}
 	
 	//-------- methods --------
@@ -89,8 +90,8 @@ public class ServiceNode	extends AbstractComponentTreeNode
 //		}
 //		catch(Exception e)
 //		{	
-//			e.printStackTrace();
-//			return "exception";
+////			e.printStackTrace();
+//			return e.toString();
 //		}
 	}
 }

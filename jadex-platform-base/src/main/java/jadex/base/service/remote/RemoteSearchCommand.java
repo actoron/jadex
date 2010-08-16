@@ -312,20 +312,20 @@ public class RemoteSearchCommand implements IRemoteCommand
 				
 				if(void.class.equals(rt))
 				{
-	//				System.out.println("Warning, void method call will be executed asynchronously: "+type+" "+methods[i].getName());
+					System.out.println("Warning, void method call will be executed asynchronously: "+type+" "+methods[i].getName());
 				}
 				else if(!(rt.isAssignableFrom(IFuture.class)))
 				{
 					if(ar.length>0)
 					{
-	//					System.out.println("Warning, service method is blocking: "+type+" "+methods[i].getName());
+						System.out.println("Warning, service method is blocking: "+type+" "+methods[i].getName());
 					}
 					else
 					{
 						// Invoke method to get constant return value.
 						try
 						{
-//							System.out.println("Calling for caching: "+methods[i]);
+							System.out.println("Calling for caching: "+methods[i]);
 							Object val = methods[i].invoke(service, new Object[0]);
 							ret.putCache(methods[i].getName(), val);
 						}

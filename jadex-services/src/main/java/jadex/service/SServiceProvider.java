@@ -147,6 +147,16 @@ public class SServiceProvider
 	 */
 	public static IFuture getServices(IServiceProvider provider, Class type)
 	{
+		return getServices(provider, type, true);
+	}
+	
+	/**
+	 *  Get all services of a type.
+	 *  @param type The class.
+	 *  @return The corresponding services.
+	 */
+	public static IFuture getServices(IServiceProvider provider, Class type, boolean local)
+	{
 //		synchronized(profiling)
 //		{
 //			Integer	cnt	= (Integer)profiling.get(type);
@@ -154,7 +164,7 @@ public class SServiceProvider
 //		}
 		final Future ret = new Future();
 		
-		provider.getServices(parallelmanager, contdecider, new TypeResultSelector(type, false), new ArrayList())
+		provider.getServices(parallelmanager, contdecider, new TypeResultSelector(type, false, local), new ArrayList())
 			.addResultListener(new DelegationResultListener(ret));
 		
 		return ret;
