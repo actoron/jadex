@@ -9,7 +9,7 @@ import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.ILoadableComponentModel;
+import jadex.bridge.IModelInfo;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.concurrent.Executor;
@@ -102,7 +102,7 @@ class ComponentAdapterFactory implements IComponentAdapterFactory
 	}
 	
 	public IComponentAdapter createComponentAdapter(IComponentDescription desc,
-		ILoadableComponentModel model, IComponentInstance instance, IExternalAccess parent)
+		IModelInfo model, IComponentInstance instance, IExternalAccess parent)
 	{
 		return new ComponentAdapter(instance);
 	}

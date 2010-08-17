@@ -192,46 +192,17 @@ public class ComponentTreePanel extends JPanel
 					for(int i=0; paths!=null && i<paths.length; i++)
 					{
 						final IComponentIdentifier cid = ((IActiveComponentTreeNode)paths[i].getLastPathComponent()).getDescription().getName();
-					
 						final IComponentTreeNode sel = (IComponentTreeNode)paths[i].getLastPathComponent();
-						if(sel instanceof ComponentTreeNode)
+						cms.destroyComponent(cid).addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
 						{
-							cms.destroyComponent(cid).addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
+							public void customResultAvailable(Object source, Object result)
 							{
-								public void customResultAvailable(Object source, Object result)
+								if(sel instanceof VirtualComponentTreeNode && sel.getParent()!=null)
 								{
+									((AbstractComponentTreeNode)sel.getParent()).removeChild(sel);
 								}
-							});
-						}
-						else if(sel instanceof VirtualComponentTreeNode)
-						{
-							SServiceProvider.getService(provider, IRemoteServiceManagementService.class)
-								.addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
-							{
-								public void customResultAvailable(Object source, Object result)
-								{
-									IRemoteServiceManagementService rms = (IRemoteServiceManagementService)result;
-									
-									rms.getServiceProxy(cid, IComponentManagementService.class).addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
-									{
-										public void customResultAvailable(Object source, Object result)
-										{
-											final IComponentManagementService rcms = (IComponentManagementService)result;
-											rcms.destroyComponent(cid).addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
-											{
-												public void customResultAvailable(Object source, Object result)
-												{
-													if(sel.getParent()!=null)
-													{
-														((AbstractComponentTreeNode)sel.getParent()).removeChild(sel);
-													}
-												}
-											});
-										}
-									});
-								}
-							});
-						}
+							}
+						});
 					}
 				}
 			}
@@ -297,44 +268,17 @@ public class ComponentTreePanel extends JPanel
 					for(int i=0; paths!=null && i<paths.length; i++)
 					{
 						final IComponentIdentifier cid = ((IActiveComponentTreeNode)paths[i].getLastPathComponent()).getDescription().getName();
-
 						final IComponentTreeNode sel = (IComponentTreeNode)paths[i].getLastPathComponent();
-						if(sel instanceof ComponentTreeNode)
+						cms.suspendComponent(cid).addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
 						{
-							cms.suspendComponent(cid)
-								.addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
+							public void customResultAvailable(Object source, Object result)
 							{
-								public void customResultAvailable(Object source, Object result)
+								if(sel instanceof VirtualComponentTreeNode)
 								{
+									sel.refresh(false);
 								}
-							});
-						}
-						else if(sel instanceof VirtualComponentTreeNode)
-						{
-							SServiceProvider.getService(provider, IRemoteServiceManagementService.class)
-								.addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
-							{
-								public void customResultAvailable(Object source, Object result)
-								{
-									IRemoteServiceManagementService rms = (IRemoteServiceManagementService)result;
-									
-									rms.getServiceProxy(cid, IComponentManagementService.class).addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
-									{
-										public void customResultAvailable(Object source, Object result)
-										{
-											final IComponentManagementService rcms = (IComponentManagementService)result;
-											rcms.suspendComponent(cid).addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
-											{
-												public void customResultAvailable(Object source, Object result)
-												{
-													sel.refresh(false);
-												}
-											});
-										}
-									});
-								}
-							});
-						}
+							}
+						});
 					}
 				}
 			}
@@ -350,44 +294,17 @@ public class ComponentTreePanel extends JPanel
 					for(int i=0; paths!=null && i<paths.length; i++)
 					{
 						final IComponentIdentifier cid = ((IActiveComponentTreeNode)paths[i].getLastPathComponent()).getDescription().getName();
-
 						final IComponentTreeNode sel = (IComponentTreeNode)paths[i].getLastPathComponent();
-						if(sel instanceof ComponentTreeNode)
+						cms.resumeComponent(cid).addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
 						{
-							cms.resumeComponent(cid)
-							.addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
+							public void customResultAvailable(Object source, Object result)
 							{
-								public void customResultAvailable(Object source, Object result)
+								if(sel instanceof VirtualComponentTreeNode)
 								{
+									sel.refresh(false);
 								}
-							});
-						}
-						else if(sel instanceof VirtualComponentTreeNode)
-						{
-							SServiceProvider.getService(provider, IRemoteServiceManagementService.class)
-								.addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
-							{
-								public void customResultAvailable(Object source, Object result)
-								{
-									IRemoteServiceManagementService rms = (IRemoteServiceManagementService)result;
-									
-									rms.getServiceProxy(cid, IComponentManagementService.class).addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
-									{
-										public void customResultAvailable(Object source, Object result)
-										{
-											final IComponentManagementService rcms = (IComponentManagementService)result;
-											rcms.resumeComponent(cid).addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
-											{
-												public void customResultAvailable(Object source, Object result)
-												{
-													sel.refresh(false);
-												}
-											});
-										}
-									});
-								}
-							});
-						}
+							}
+						});
 					}
 				}
 			}
@@ -405,42 +322,16 @@ public class ComponentTreePanel extends JPanel
 						final IComponentIdentifier cid = ((IActiveComponentTreeNode)paths[i].getLastPathComponent()).getDescription().getName();
 
 						final IComponentTreeNode sel = (IComponentTreeNode)paths[i].getLastPathComponent();
-						if(sel instanceof ComponentTreeNode)
+						cms.stepComponent(cid).addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
 						{
-							cms.stepComponent(cid)
-								.addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
+							public void customResultAvailable(Object source, Object result)
 							{
-								public void customResultAvailable(Object source, Object result)
+								if(sel instanceof VirtualComponentTreeNode)
 								{
+									sel.refresh(false);
 								}
-							});
-						}
-						else if(sel instanceof VirtualComponentTreeNode)
-						{
-							SServiceProvider.getService(provider, IRemoteServiceManagementService.class)
-								.addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
-							{
-								public void customResultAvailable(Object source, Object result)
-								{
-									IRemoteServiceManagementService rms = (IRemoteServiceManagementService)result;
-									
-									rms.getServiceProxy(cid, IComponentManagementService.class).addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
-									{
-										public void customResultAvailable(Object source, Object result)
-										{
-											final IComponentManagementService rcms = (IComponentManagementService)result;
-											rcms.stepComponent(cid).addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
-											{
-												public void customResultAvailable(Object source, Object result)
-												{
-													sel.refresh(false);
-												}
-											});
-										}
-									});
-								}
-							});
-						}
+							}
+						});
 					}
 				}
 			}

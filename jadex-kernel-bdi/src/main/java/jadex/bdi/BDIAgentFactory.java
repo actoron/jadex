@@ -12,7 +12,7 @@ import jadex.bridge.IComponentAdapterFactory;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentFactory;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.ILoadableComponentModel;
+import jadex.bridge.IModelInfo;
 import jadex.commons.Future;
 import jadex.commons.SGUI;
 import jadex.rules.state.IOAVState;
@@ -116,7 +116,7 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory
 	 * @param parent The parent component (if any).
 	 * @return An instance of a component.
 	 */
-	public Object[] createComponentInstance(IComponentDescription desc, IComponentAdapterFactory factory, ILoadableComponentModel model, 
+	public Object[] createComponentInstance(IComponentDescription desc, IComponentAdapterFactory factory, IModelInfo model, 
 		String config, Map arguments, IExternalAccess parent, Future ret)
 	{
 		OAVAgentModel amodel = (OAVAgentModel)model;
@@ -139,7 +139,7 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory
 	 *  @param The imports (if any).
 	 *  @return The loaded model.
 	 */
-	public ILoadableComponentModel loadModel(String filename, String[] imports, ClassLoader classloader)
+	public IModelInfo loadModel(String filename, String[] imports, ClassLoader classloader)
 	{
 //		init();
 		
@@ -288,7 +288,7 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory
 	 *  @param filename	The filename for accessing the model.
 	 *  @return	The startable agent model.
 	 */
-	public ILoadableComponentModel	registerAgentModel(IMECapability model, String filename)
+	public IModelInfo	registerAgentModel(IMECapability model, String filename)
 	{
 		OAVCapabilityModel	ret;
 		MCapabilityFlyweight	fw	= (MCapabilityFlyweight)model;

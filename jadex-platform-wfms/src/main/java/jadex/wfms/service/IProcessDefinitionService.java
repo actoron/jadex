@@ -1,6 +1,6 @@
 package jadex.wfms.service;
 
-import jadex.bridge.ILoadableComponentModel;
+import jadex.bridge.IModelInfo;
 import jadex.commons.IFuture;
 import jadex.wfms.client.IClient;
 import jadex.wfms.listeners.IProcessRepositoryListener;

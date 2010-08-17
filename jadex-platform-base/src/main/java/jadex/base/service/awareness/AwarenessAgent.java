@@ -6,7 +6,9 @@ import jadex.bridge.IArgument;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
+import jadex.commons.Future;
 import jadex.commons.ICommand;
+import jadex.commons.IFuture;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
@@ -73,7 +75,6 @@ public class AwarenessAgent extends MicroAgent
 			this.socket.setLoopbackMode(true);
 			this.proxies = new HashSet();
 //			System.out.println(socket.getLoopbackMode());
-			proxies.add(getRootIdentifier());
 		
 			startReceiving();
 		}
@@ -89,17 +90,29 @@ public class AwarenessAgent extends MicroAgent
 	 */
 	public void executeBody()
 	{
-		final IComponentIdentifier root = getRootIdentifier();
-		
-		ICommand send = new ICommand()
+		getRootIdentifier()
+			.addResultListener(createResultListener(new IResultListener()
 		{
-			public void execute(Object args)
+			public void resultAvailable(Object source, Object result)
 			{
-				send(address, port, new AwarenessInfo(root));
-				waitFor(delay, this);
+				final IComponentIdentifier root = (IComponentIdentifier)result;
+				proxies.add(root);
+				
+				ICommand send = new ICommand()
+				{
+					public void execute(Object args)
+					{
+						send(address, port, new AwarenessInfo(root));
+						waitFor(delay, this);
+					}
+				};
+				send.execute(this);
 			}
-		};
-		send.execute(this);
+			
+			public void exceptionOccurred(Object source, Exception exception)
+			{
+			}
+		}));
 	}
 	
 	/**
@@ -303,14 +316,58 @@ public class AwarenessAgent extends MicroAgent
 	/**
 	 *  Get the root component identifier.
 	 */
-	public IComponentIdentifier getRootIdentifier()
+	public IFuture getRootIdentifier()
 	{
-		IExternalAccess root = getParent();
-		while(root.getParent()!=null)
-			root = root.getParent();
-		IComponentIdentifier ret = root.getComponentIdentifier();
-//		System.out.println("root: "+root.getComponentIdentifier().hashCode()+SUtil.arrayToString(root.getComponentIdentifier().getAddresses()));
+		final Future ret = new Future();
+		
+		SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class)
+			.addResultListener(createResultListener(new IResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				getRootIdentifier(getComponentIdentifier(), (IComponentManagementService)result, ret);
+			}
+			
+			public void exceptionOccurred(Object source, Exception exception)
+			{
+				ret.setException(exception);
+			}
+		}));
+		
 		return ret;
+		
+//		IExternalAccess root = getParent();
+//		while(root.getParent()!=null)
+//			root = root.getParent();
+//		IComponentIdentifier ret = root.getComponentIdentifier();
+////		System.out.println("root: "+root.getComponentIdentifier().hashCode()+SUtil.arrayToString(root.getComponentIdentifier().getAddresses()));
+//		return ret;
+	}
+	
+	/**
+	 *  Internal method to get the root identifier.
+	 */
+	public void getRootIdentifier(final IComponentIdentifier cid, final IComponentManagementService cms, final Future future)
+	{
+		cms.getParent(cid).addResultListener(createResultListener(new IResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				if(result==null)
+				{
+					future.setResult(cid);
+				}
+				else
+				{
+					getRootIdentifier((IComponentIdentifier)result, cms, future);
+				}
+			}
+			
+			public void exceptionOccurred(Object source, Exception exception)
+			{
+				future.setException(exception);
+			}
+		}));
 	}
 	
 	//-------- static methods --------

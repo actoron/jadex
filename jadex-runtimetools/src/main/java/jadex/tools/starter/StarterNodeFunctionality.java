@@ -1,7 +1,7 @@
 package jadex.tools.starter;
 
 import jadex.base.SComponentFactory;
-import jadex.bridge.ILoadableComponentModel;
+import jadex.bridge.IModelInfo;
 import jadex.commons.SGUI;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
@@ -213,7 +213,7 @@ public class StarterNodeFunctionality extends DefaultNodeFunctionality
 									public void customResultAvailable(Object source, Object result)
 									{
 										boolean newvalid = false;
-										ILoadableComponentModel model = (ILoadableComponentModel)result;
+										IModelInfo model = (IModelInfo)result;
 										if(model!=null)
 										{
 											newvalid	= model.getReport().isEmpty();

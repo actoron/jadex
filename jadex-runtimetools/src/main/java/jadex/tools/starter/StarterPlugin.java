@@ -6,8 +6,8 @@ import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentManagementService;
-import jadex.bridge.IExternalAccess;
-import jadex.bridge.ILoadableComponentModel;
+import jadex.bridge.IModelInfo;
+import jadex.commons.Future;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SGUI;
@@ -518,13 +518,57 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 	{
 		public void actionPerformed(ActionEvent e)
 		{
-			IExternalAccess root = ((AgentControlCenter)getJCC()).getAgent();
-			while(root.getParent()!=null)
-				root = root.getParent();
-			
-			root.killComponent();
+			SServiceProvider.getService(((AgentControlCenter)getJCC()).getAgent().getServiceProvider(), IComponentManagementService.class)
+				.addResultListener(new SwingDefaultResultListener(comptree)
+			{
+				public void customResultAvailable(Object source, Object result)
+				{
+					final IComponentManagementService cms = (IComponentManagementService)result;
+					Future ret = new Future();
+					ret.addResultListener(new SwingDefaultResultListener(comptree)
+					{
+						public void customResultAvailable(Object source, Object result)
+						{
+							IComponentIdentifier root = (IComponentIdentifier)result;
+							cms.destroyComponent(root);
+						}
+					});
+					getRootIdentifier(((AgentControlCenter)getJCC()).getAgent().getComponentIdentifier(), (IComponentManagementService)result, ret);
+				}
+			});
 		}
+			
+//			IExternalAccess root = ((AgentControlCenter)getJCC()).getAgent();
+//			while(root.getParent()!=null)
+//				root = root.getParent();
+//			root.killComponent();
 	};
+	
+	/**
+	 *  Internal method to get the root identifier.
+	 */
+	public void getRootIdentifier(final IComponentIdentifier cid, final IComponentManagementService cms, final Future future)
+	{
+		cms.getParent(cid).addResultListener(new IResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				if(result==null)
+				{
+					future.setResult(cid);
+				}
+				else
+				{
+					getRootIdentifier((IComponentIdentifier)result, cms, future);
+				}
+			}
+			
+			public void exceptionOccurred(Object source, Exception exception)
+			{
+				future.setException(exception);
+			}
+		});
+	}
 	
 	/**
 	 *  Action for adding a remote component.
@@ -619,7 +663,7 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 						try
 						{
 //							IComponentFactory componentfactory = getJCC().getComponent().getPlatform().getComponentFactory();
-							ILoadableComponentModel model = (ILoadableComponentModel)SComponentFactory.loadModel(getJCC().getServiceContainer(), type).get(new ThreadSuspendable());
+							IModelInfo model = (IModelInfo)SComponentFactory.loadModel(getJCC().getServiceContainer(), type).get(new ThreadSuspendable());
 							String[] inistates = model.getConfigurations();
 //							IMBDIComponent model = SXML.loadComponentModel(type, null);
 //							final IMConfiguration[] inistates = model.getConfigurationbase().getConfigurations();

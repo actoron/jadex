@@ -1,7 +1,6 @@
 package jadex.bridge;
 
 import jadex.commons.IFuture;
-import jadex.commons.concurrent.IResultListener;
 import jadex.service.IServiceProvider;
 
 /**
@@ -10,23 +9,27 @@ import jadex.service.IServiceProvider;
  */
 public interface IExternalAccess
 {
+	//-------- cache --------
+	
 	/**
 	 *  Get the model of the component.
 	 *  @return	The model.
 	 */
-	public ILoadableComponentModel	getModel();
+	public IModelInfo getModel();
 
+	/**
+	 *  Get the parent (if any).
+	 *  @return The parent.
+	 */
+	public IComponentIdentifier getParent();
+	
 	/**
 	 *  Get the id of the component.
 	 *  @return	The component id.
 	 */
 	public IComponentIdentifier	getComponentIdentifier();
 	
-	/**
-	 *  Get the parent (if any).
-	 *  @return The parent.
-	 */
-	public IExternalAccess getParent();
+	//-------- normal --------
 	
 	/**
 	 *  Get the children (if any).
@@ -39,6 +42,8 @@ public interface IExternalAccess
 	 */
 	public IFuture killComponent();
 	
+	//-------- exclude --------
+	
 	/**
 	 *  Get the service provider.
 	 *  @return The service provider.
@@ -50,8 +55,9 @@ public interface IExternalAccess
 	 *  executed on the component thread.
 	 *  @param listener The result listener.
 	 *  @return A result listener that is called on component thread.
-	 */
-	public IResultListener createResultListener(IResultListener listener);
+	 * /
+	public IResultListener createResultListener(IResultListener listener);*/
+	
 	
 	// todo: do we want this? should getArg() deliver only args supplied from
 	// outside or also values that are default/initial values in the model.

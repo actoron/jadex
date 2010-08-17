@@ -6,7 +6,7 @@ import jadex.bridge.IComponentAdapterFactory;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentFactory;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.ILoadableComponentModel;
+import jadex.bridge.IModelInfo;
 import jadex.commons.Future;
 import jadex.commons.SGUI;
 import jadex.service.BasicService;
@@ -90,7 +90,7 @@ public class BpmnFactory extends BasicService implements IComponentFactory
 	 *  @param The imports (if any).
 	 *  @return The loaded model.
 	 */
-	public ILoadableComponentModel loadModel(String model, String[] imports, ClassLoader classloader)
+	public IModelInfo loadModel(String model, String[] imports, ClassLoader classloader)
 	{
 		MBpmnModel ret = null;
 //		System.out.println("filename: "+filename);
@@ -105,7 +105,7 @@ public class BpmnFactory extends BasicService implements IComponentFactory
 			throw new RuntimeException(e);
 		}
 		
-		return ret;
+		return ret.getModelInfo();
 	}
 	
 	/**
@@ -166,10 +166,18 @@ public class BpmnFactory extends BasicService implements IComponentFactory
 	 * @return An instance of a component.
 	 */
 	public Object[] createComponentInstance(IComponentDescription desc, IComponentAdapterFactory factory, 
-		ILoadableComponentModel model, String config, Map arguments, IExternalAccess parent, Future inited)
+		IModelInfo modelinfo, String config, Map arguments, IExternalAccess parent, Future inited)
 	{
-		BpmnInterpreter interpreter = new BpmnInterpreter(desc, factory, (MBpmnModel)model, arguments, config, parent, null, null, null, inited);
-		return new Object[]{interpreter, interpreter.getComponentAdapter()};
+		try
+		{
+			MBpmnModel model = loader.loadBpmnModel(modelinfo.getFilename(), null, modelinfo.getClassLoader());
+			BpmnInterpreter interpreter = new BpmnInterpreter(desc, factory, model, arguments, config, parent, null, null, null, inited);
+			return new Object[]{interpreter, interpreter.getComponentAdapter()};
+		}
+		catch(Exception e)
+		{
+			throw new RuntimeException(e);
+		}
 	}
 	
 	/**

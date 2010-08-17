@@ -83,7 +83,8 @@ public class RemoteSearchCommand implements IRemoteCommand
 		final Future ret = new Future();
 			
 		SServiceProvider.getServiceUpwards(component.getServiceProvider(), IComponentManagementService.class)
-			.addResultListener(component.createResultListener(new IResultListener()
+			.addResultListener(new IResultListener()
+//			.addResultListener(component.createResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
@@ -142,7 +143,7 @@ public class RemoteSearchCommand implements IRemoteCommand
 			{
 				ret.setResult(new RemoteSearchResultCommand(null, exception, callid));
 			}
-		}));
+		});
 		
 		return ret;
 	}

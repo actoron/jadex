@@ -1,7 +1,7 @@
 package jadex.gpmn.model2;
 
 import jadex.bridge.IArgument;
-import jadex.bridge.ILoadableComponentModel;
+import jadex.bridge.IModelInfo;
 import jadex.bridge.IReport;
 import jadex.commons.ICacheableModel;
 import jadex.commons.SUtil;
@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class MGpmnModel implements ICacheableModel, ILoadableComponentModel
+public class MGpmnModel implements ICacheableModel, IModelInfo
 {
 //-------- attributes --------
 	

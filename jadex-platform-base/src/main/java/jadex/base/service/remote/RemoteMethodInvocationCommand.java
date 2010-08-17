@@ -92,7 +92,8 @@ public class RemoteMethodInvocationCommand implements IRemoteCommand
 		
 		// fetch component via target component id
 		SServiceProvider.getServiceUpwards(component.getServiceProvider(), IComponentManagementService.class)
-			.addResultListener(component.createResultListener(new IResultListener()
+			.addResultListener(new IResultListener()
+//			.addResultListener(component.createResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
@@ -139,7 +140,7 @@ public class RemoteMethodInvocationCommand implements IRemoteCommand
 			{
 				ret.setResult(new RemoteResultCommand(null, exception, callid));
 			}
-		}));
+		});
 			
 		return ret;
 	}

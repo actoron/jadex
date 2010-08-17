@@ -7,7 +7,7 @@ import jadex.bridge.IComponentAdapterFactory;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentFactory;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.ILoadableComponentModel;
+import jadex.bridge.IModelInfo;
 import jadex.commons.Future;
 import jadex.commons.ResourceInfo;
 import jadex.commons.SGUI;
@@ -114,10 +114,10 @@ public class GpmnFactory extends BasicService implements IComponentFactory
 	 *  @param The imports (if any).
 	 *  @return The loaded model.
 	 */
-	public ILoadableComponentModel loadModel(String model, String[] imports, ClassLoader classloader)
+	public IModelInfo loadModel(String model, String[] imports, ClassLoader classloader)
 	{
 		// Todo: support imports for GPMN models (-> use abstract model loader). 
-		ILoadableComponentModel ret = null;
+		IModelInfo ret = null;
 		try
 		{
 //			ILibraryService libservice = (ILibraryService)container.getService(ILibraryService.class);
@@ -203,7 +203,7 @@ public class GpmnFactory extends BasicService implements IComponentFactory
 	 * @return An instance of a component.
 	 */
 	public Object[] createComponentInstance(IComponentDescription desc, IComponentAdapterFactory factory, 
-		ILoadableComponentModel model, String config, Map arguments, IExternalAccess parent, Future inited)
+		IModelInfo model, String config, Map arguments, IExternalAccess parent, Future inited)
 	{
 //		ILibraryService libservice = (ILibraryService)container.getService(ILibraryService.class);
 		

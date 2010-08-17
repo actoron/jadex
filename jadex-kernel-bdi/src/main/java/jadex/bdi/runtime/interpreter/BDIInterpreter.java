@@ -23,7 +23,7 @@ import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.ILoadableComponentModel;
+import jadex.bridge.IModelInfo;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.IMessageService;
 import jadex.commons.Future;
@@ -587,7 +587,7 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 	 *  The current subcomponents can be accessed by IComponentAdapter.getSubcomponents().
 	 *  @param comp	The newly created component.
 	 */
-	public void	componentCreated(IComponentDescription desc, ILoadableComponentModel model)
+	public void	componentCreated(IComponentDescription desc, IModelInfo model)
 	{
 	}
 	

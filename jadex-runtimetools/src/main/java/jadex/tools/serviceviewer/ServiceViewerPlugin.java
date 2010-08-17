@@ -1,5 +1,6 @@
 package jadex.tools.serviceviewer;
 
+import jadex.bridge.IComponentIdentifier;
 import jadex.commons.Properties;
 import jadex.commons.SGUI;
 import jadex.commons.SReflect;
@@ -12,6 +13,7 @@ import jadex.tools.common.CombiIcon;
 import jadex.tools.common.GuiProperties;
 import jadex.tools.common.ObjectCardLayout;
 import jadex.tools.common.componenttree.ComponentTreePanel;
+import jadex.tools.common.componenttree.IActiveComponentTreeNode;
 import jadex.tools.common.componenttree.IComponentTreeNode;
 import jadex.tools.common.componenttree.INodeHandler;
 import jadex.tools.common.componenttree.INodeListener;
@@ -155,15 +157,15 @@ public class ServiceViewerPlugin extends AbstractJCCPlugin
 				if(tree.getSelectionPath()!=null)
 				{
 					Object node = tree.getSelectionPath().getLastPathComponent();
-					if(node instanceof ServiceNode)
+					Object nodeid = getNodeId(node);
+					if(nodeid!=null)
 					{
-						IServiceIdentifier	sid	= ((ServiceNode)node).getService().getServiceIdentifier();
-						if(cards.getComponent(sid)!=null)
+						if(cards.getComponent(nodeid)!=null)
 						{
 							storeCurrentPanelSettings();
-							IServiceViewerPanel	panel	= (IServiceViewerPanel)panels.get(sid);
+							IAbstractViewerPanel panel = (IAbstractViewerPanel)panels.get(nodeid);
 							panel.setProperties(props!=null ? props.getSubproperty(panel.getId()) : null);
-							cards.show(sid);
+							cards.show(nodeid);
 						}
 					}
 				}
@@ -187,12 +189,12 @@ public class ServiceViewerPlugin extends AbstractJCCPlugin
 					boolean	allob	= true;
 					for(int i=0; allob && i<nodes.length; i++)
 					{
-						allob	= cards.getComponent(((ServiceNode)nodes[i]).getService().getServiceIdentifier())!=null;
+						allob	= cards.getComponent(getNodeId(nodes[i]))!=null;
 					}
 					boolean	allig	= true;
 					for(int i=0; allig && i<nodes.length; i++)
 					{
-						allig	= cards.getComponent(((ServiceNode)nodes[i]).getService().getServiceIdentifier())==null;
+						allig	= cards.getComponent(getNodeId(nodes[i]))==null;
 					}
 					
 					// Todo: Large icons for popup actions?
@@ -302,44 +304,86 @@ public class ServiceViewerPlugin extends AbstractJCCPlugin
 			{
 				if(isNodeViewable((IComponentTreeNode)paths[i].getLastPathComponent()))
 				{
-					final ServiceNode node = (ServiceNode)paths[i].getLastPathComponent();
-					final IService service = node.getService();
-					final String	classname	= (String)service.getPropertyMap().get(PROPERTY_VIEWERCLASS);
-					if(classname!=null)
+					final Object tmp = paths[i].getLastPathComponent();
+					
+					if(tmp instanceof ServiceNode)
 					{
-						SServiceProvider.getService(getJCC().getServiceContainer(), ILibraryService.class)
-							.addResultListener(new SwingDefaultResultListener(comptree)
+						final ServiceNode node = (ServiceNode)tmp;
+						final IService service = node.getService();
+						final String classname = (String)service.getPropertyMap().get(PROPERTY_VIEWERCLASS);
+						
+						if(classname!=null)
 						{
-							public void customResultAvailable(Object source, Object result)
+							SServiceProvider.getService(getJCC().getServiceContainer(), ILibraryService.class)
+								.addResultListener(new SwingDefaultResultListener(comptree)
 							{
-								ILibraryService	libservice	= (ILibraryService)result;
-								try
+								public void customResultAvailable(Object source, Object result)
 								{
-									storeCurrentPanelSettings();
-									Class clazz	= SReflect.classForName(classname, libservice.getClassLoader());
-									IServiceViewerPanel	panel	= (IServiceViewerPanel)clazz.newInstance();
-									panel.init(getJCC(), service);
-									Properties	sub	= props!=null ? props.getSubproperty(panel.getId()) : null;
-									panel.setProperties(sub);
-									GuiProperties.setupHelp(panel.getComponent(), getHelpID());
-									panels.put(service.getServiceIdentifier(), panel);
-									detail.add(panel.getComponent(), service.getServiceIdentifier());
-									comptree.getModel().fireNodeChanged(node);
+									ILibraryService	libservice	= (ILibraryService)result;
+									try
+									{
+										storeCurrentPanelSettings();
+										Class clazz	= SReflect.classForName(classname, libservice.getClassLoader());
+										IServiceViewerPanel	panel = (IServiceViewerPanel)clazz.newInstance();
+										panel.init(getJCC(), service);
+										Properties	sub	= props!=null ? props.getSubproperty(panel.getId()) : null;
+										panel.setProperties(sub);
+										GuiProperties.setupHelp(panel.getComponent(), getHelpID());
+										panels.put(service.getServiceIdentifier(), panel);
+										detail.add(panel.getComponent(), service.getServiceIdentifier());
+										comptree.getModel().fireNodeChanged(node);
+									}
+									catch(Exception e)
+									{
+										e.printStackTrace();
+										getJCC().displayError("Error initializing service viewer panel.", "Service viewer panel class: "+classname, e);
+									}
 								}
-								catch(Exception e)
-								{
-									e.printStackTrace();
-									getJCC().displayError("Error initializing service viewer panel.", "Service viewer panel class: "+classname, e);
-								}
-							}
-						});
+							});
+						}
 					}
+//					else if(tmp instanceof IActiveComponentTreeNode)
+//					{
+//						final IActiveComponentTreeNode node = (IActiveComponentTreeNode)tmp;
+//						node.getDescription().get
+//						final String classname = (String).getPropertyMap().get(PROPERTY_VIEWERCLASS);
+//						
+//						if(classname!=null)
+//						{
+//							SServiceProvider.getService(getJCC().getServiceContainer(), ILibraryService.class)
+//								.addResultListener(new SwingDefaultResultListener(comptree)
+//							{
+//								public void customResultAvailable(Object source, Object result)
+//								{
+//									ILibraryService	libservice	= (ILibraryService)result;
+//									try
+//									{
+//										storeCurrentPanelSettings();
+//										Class clazz	= SReflect.classForName(classname, libservice.getClassLoader());
+//										IServiceViewerPanel	panel = (IServiceViewerPanel)clazz.newInstance();
+//										panel.init(getJCC(), exta);
+//										Properties	sub	= props!=null ? props.getSubproperty(panel.getId()) : null;
+//										panel.setProperties(sub);
+//										GuiProperties.setupHelp(panel.getComponent(), getHelpID());
+//										panels.put(exta.getComponentIdentifier(), panel);
+//										detail.add(panel.getComponent(), exta.getComponentIdentifier());
+//										comptree.getModel().fireNodeChanged(node);
+//									}
+//									catch(Exception e)
+//									{
+//										e.printStackTrace();
+//										getJCC().displayError("Error initializing service viewer panel.", "Service viewer panel class: "+classname, e);
+//									}
+//								}
+//							});
+//						}
+//					}
 				}
 			}
 		}
 	};
 
-	final AbstractAction	STOP_VIEWER	= new AbstractAction("Close service viewer", icons.getIcon("close_viewer"))
+	final AbstractAction STOP_VIEWER = new AbstractAction("Close service viewer", icons.getIcon("close_viewer"))
 	{
 		public void actionPerformed(ActionEvent e)
 		{
@@ -350,9 +394,9 @@ public class ServiceViewerPlugin extends AbstractJCCPlugin
 				{
 					storeCurrentPanelSettings();
 					ServiceNode node = (ServiceNode)paths[i].getLastPathComponent();
-					IService service = node.getService();
-					detail.remove(cards.getComponent(service.getServiceIdentifier()));
-					IServiceViewerPanel	panel	= (IServiceViewerPanel)panels.remove(service.getServiceIdentifier());
+					Object nodeid = getNodeId(node);
+					detail.remove(cards.getComponent(nodeid));
+					IAbstractViewerPanel panel = (IAbstractViewerPanel)panels.remove(nodeid);
 					panel.shutdown();
 					comptree.getModel().fireNodeChanged(node);
 				}
@@ -377,6 +421,7 @@ public class ServiceViewerPlugin extends AbstractJCCPlugin
 	protected static boolean isNodeViewable(IComponentTreeNode node)
 	{
 		return node instanceof ServiceNode && ((ServiceNode)node).getService().getPropertyMap().get(PROPERTY_VIEWERCLASS)!=null;
+//			|| node instanceof IActiveComponentTreeNode && ((IActiveComponentTreeNode)node).getEx().getPropertyMap().get(PROPERTY_VIEWERCLASS)!=null;
 	}
 	
 	//-------- loading / saving --------
@@ -399,7 +444,7 @@ public class ServiceViewerPlugin extends AbstractJCCPlugin
 		this.props	=	ps;
 		for(Iterator it=panels.values().iterator(); it.hasNext(); )
 		{
-			IServiceViewerPanel	panel	= (IServiceViewerPanel)it.next();
+			IAbstractViewerPanel	panel	= (IAbstractViewerPanel)it.next();
 			Properties	sub	= props!=null ? props.getSubproperty(panel.getId()) : null;
 			panel.setProperties(sub);
 		}
@@ -414,7 +459,7 @@ public class ServiceViewerPlugin extends AbstractJCCPlugin
 		Object	old	= cards.getCurrentKey();
 		if(old!=null)
 		{
-			IServiceViewerPanel	panel	= (IServiceViewerPanel)panels.get(old);
+			IAbstractViewerPanel	panel	= (IAbstractViewerPanel)panels.get(old);
 			if(panel!=null)
 			{
 				if(props==null)
@@ -428,5 +473,24 @@ public class ServiceViewerPlugin extends AbstractJCCPlugin
 				}
 			}
 		}
+	}
+	
+	/**
+	 *  Get the node id.
+	 */
+	public Object getNodeId(Object node)
+	{
+		Object ret = null;
+		
+		if(node instanceof ServiceNode)
+		{
+			ret = ((ServiceNode)node).getService().getServiceIdentifier();
+		}
+		else if(node instanceof IActiveComponentTreeNode)
+		{
+			ret = ((IActiveComponentTreeNode)node).getDescription().getName();
+		}
+		
+		return ret;
 	}
 }

@@ -22,7 +22,7 @@ public interface IComponentFactory extends IService
 	 *  @param The imports (if any).
 	 *  @return The loaded model.
 	 */
-	public ILoadableComponentModel loadModel(String model, String[] imports, ClassLoader classloader);
+	public IModelInfo loadModel(String model, String[] imports, ClassLoader classloader);
 
 	/**
 	 *  Test if a model can be loaded by the factory.
@@ -66,7 +66,7 @@ public interface IComponentFactory extends IService
 	 * @param parent The parent component (if any).
 	 * @return An instance of a component and the corresponding adapter.
 	 */
-	public Object[] createComponentInstance(IComponentDescription desc, IComponentAdapterFactory factory, ILoadableComponentModel model, 
+	public Object[] createComponentInstance(IComponentDescription desc, IComponentAdapterFactory factory, IModelInfo model, 
 		String config, Map arguments, IExternalAccess parent, Future ret);
 
 	/**

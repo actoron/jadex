@@ -27,7 +27,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.ILoadableComponentModel;
+import jadex.bridge.IModelInfo;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.IMessageService;
 import jadex.bridge.MessageType;
@@ -225,7 +225,7 @@ public class BpmnInterpreter implements IComponentInstance
 		String config, final IExternalAccess parent, Map activityhandlers, Map stephandlers, 
 		IValueFetcher fetcher, Future inited)
 	{
-		this.adapter = factory.createComponentAdapter(desc, model, this, parent);
+		this.adapter = factory.createComponentAdapter(desc, model.getModelInfo(), this, parent);
 		this.inited = inited;
 		this.variables	= new HashMap();
 		construct(model, arguments, config, parent, activityhandlers, stephandlers, fetcher);
@@ -271,7 +271,7 @@ public class BpmnInterpreter implements IComponentInstance
 		this.variables	= new HashMap();
 
 		// Init the arguments with default values.
-		IArgument[] args = model.getArguments();
+		IArgument[] args = model.getModelInfo().getArguments();
 		for(int i=0; i<args.length; i++)
 		{
 			if(arguments!=null && arguments.containsKey(args[i].getName()))
@@ -606,7 +606,7 @@ public class BpmnInterpreter implements IComponentInstance
 	 */
 	public ClassLoader getClassLoader()
 	{
-		return model.getClassLoader();
+		return model.getModelInfo().getClassLoader();
 	}
 	
 	/**
@@ -807,9 +807,9 @@ public class BpmnInterpreter implements IComponentInstance
 	 *  Get the agent model.
 	 *  @return The model.
 	 */
-	public ILoadableComponentModel getModel()
+	public IModelInfo getModel()
 	{
-		return model;
+		return model.getModelInfo();
 	}
 	
 	/**
@@ -825,9 +825,9 @@ public class BpmnInterpreter implements IComponentInstance
 	 *  Get the parent component.
 	 *  @return The parent component.
 	 */
-	public IExternalAccess getParent()
+	public IComponentIdentifier getParent()
 	{
-		return parent;
+		return parent.getComponentIdentifier();
 	}
 	
 	/** 
@@ -1327,7 +1327,7 @@ public class BpmnInterpreter implements IComponentInstance
 	 *  The current subcomponents can be accessed by IComponentAdapter.getSubcomponents().
 	 *  @param comp	The newly created component.
 	 */
-	public void	componentCreated(IComponentDescription desc, ILoadableComponentModel model)
+	public void	componentCreated(IComponentDescription desc, IModelInfo model)
 	{
 	}
 	

@@ -4,7 +4,7 @@ import jadex.bridge.ComponentResultListener;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.ILoadableComponentModel;
+import jadex.bridge.IModelInfo;
 import jadex.bridge.MessageType;
 import jadex.commons.Future;
 import jadex.commons.ICommand;
@@ -98,7 +98,7 @@ public class ExternalAccess implements IMicroExternalAccess
 	/**
 	 *  Get the model of the component.
 	 */
-	public ILoadableComponentModel	getModel()
+	public IModelInfo	getModel()
 	{
 		return interpreter.getAgentModel();
 	}
@@ -116,9 +116,9 @@ public class ExternalAccess implements IMicroExternalAccess
 	 *  Get the parent component.
 	 *  @return The parent component.
 	 */
-	public IExternalAccess	getParent()
+	public IComponentIdentifier	getParent()
 	{
-		return interpreter.getParent();
+		return interpreter.getParent().getComponentIdentifier();
 	}
 	
 	/**

@@ -12,8 +12,9 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.ILoadableComponentModel;
+import jadex.bridge.IModelInfo;
 import jadex.bridge.IMessageService;
+import jadex.bridge.IRemoteServiceManagementService;
 import jadex.bridge.ISearchConstraints;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
@@ -181,7 +182,7 @@ public class ComponentManagementService extends BasicService implements ICompone
 							inited.setException(new RuntimeException("No factory found for component: "+model));
 							return;
 						}
-						final ILoadableComponentModel lmodel = factory.loadModel(model, cinfo.getImports(), ls.getClassLoader());
+						final IModelInfo lmodel = factory.loadModel(model, cinfo.getImports(), ls.getClassLoader());
 						final String type = factory.getComponentType(model, cinfo.getImports(), ls.getClassLoader());
 		
 						// Create id and adapter.
@@ -480,6 +481,14 @@ public class ComponentManagementService extends BasicService implements ICompone
 	}*/
 	
 	/**
+	 *  Test if a component identifier is a remote component.
+	 */
+	protected boolean isRemoteComponent(IComponentIdentifier cid)
+	{
+		return !cid.getPlatformName().equals(root.getComponentIdentifier().getName());
+	}
+	
+	/**
 	 *  Destroy (forcefully terminate) an component on the platform.
 	 *  @param cid	The component to destroy.
 	 */
@@ -489,57 +498,90 @@ public class ComponentManagementService extends BasicService implements ICompone
 		
 		final Future ret = new Future();
 		
-		synchronized(adapters)
+		if(isRemoteComponent(cid))
 		{
-			synchronized(descs)
+			SServiceProvider.getService(provider, IRemoteServiceManagementService.class)
+				.addResultListener(new IResultListener()
 			{
-				// Kill subcomponents
-				final CMSComponentDescription	desc = (CMSComponentDescription)descs.get(cid);
-				if(desc==null)
+				public void resultAvailable(Object source, Object result)
 				{
-					ret.setException(new RuntimeException("Component "+cid+" does not exist."));
-					return ret;
-				}
-				IComponentIdentifier[] achildren = desc.getChildren();
-				
-				destroyComponentLoop(cid, achildren, 0).addResultListener(new IResultListener()
-				{
-					public void resultAvailable(Object source, Object result)
+					IRemoteServiceManagementService rms = (IRemoteServiceManagementService)result;
+					
+					rms.getServiceProxy(cid, IComponentManagementService.class).addResultListener(new IResultListener()
 					{
-						StandaloneComponentAdapter component = (StandaloneComponentAdapter)adapters.get(cid);
-						// Component may be already killed (e.g. when autoshutdown).
-						if(component!=null)
+						public void resultAvailable(Object source, Object result)
 						{
-	//						System.out.println("killing: "+cid+" "+component.getParent().getComponentIdentifier().getLocalName());
-							
-							// todo: does not work always!!! A search could be issued before components had enough time to kill itself!
-							// todo: killcomponent should only be called once for each component?
-							if(!ccs.containsKey(cid))
+							final IComponentManagementService rcms = (IComponentManagementService)result;
+							rcms.destroyComponent(cid).addResultListener(new DelegationResultListener(ret));
+						}
+						public void exceptionOccurred(Object source, Exception exception)
+						{
+							ret.setException(exception);
+						}
+					});
+					
+				}
+				
+				public void exceptionOccurred(Object source, Exception exception)
+				{
+					ret.setException(exception);
+				}
+			});
+		}
+		else
+		{
+			synchronized(adapters)
+			{
+				synchronized(descs)
+				{
+					// Kill subcomponents
+					final CMSComponentDescription	desc = (CMSComponentDescription)descs.get(cid);
+					if(desc==null)
+					{
+						ret.setException(new RuntimeException("Component "+cid+" does not exist."));
+						return ret;
+					}
+					IComponentIdentifier[] achildren = desc.getChildren();
+					
+					destroyComponentLoop(cid, achildren, 0).addResultListener(new IResultListener()
+					{
+						public void resultAvailable(Object source, Object result)
+						{
+							StandaloneComponentAdapter component = (StandaloneComponentAdapter)adapters.get(cid);
+							// Component may be already killed (e.g. when autoshutdown).
+							if(component!=null)
 							{
-	//								System.out.println("killing a: "+cid);
+		//						System.out.println("killing: "+cid+" "+component.getParent().getComponentIdentifier().getLocalName());
 								
-								CleanupCommand	cc	= new CleanupCommand(cid);
-								ccs.put(cid, cc);
-								cc.addKillFuture(ret);
-								component.killComponent(cc);	
-							}
-							else
-							{
-	//								System.out.println("killing b: "+cid);
-								
-								CleanupCommand	cc	= (CleanupCommand)ccs.get(cid);
-								if(cc==null)
-									ret.setException(new RuntimeException("No cleanup command for component "+cid+": "+desc.getState()));
-								cc.addKillFuture(ret);
+								// todo: does not work always!!! A search could be issued before components had enough time to kill itself!
+								// todo: killcomponent should only be called once for each component?
+								if(!ccs.containsKey(cid))
+								{
+		//								System.out.println("killing a: "+cid);
+									
+									CleanupCommand	cc	= new CleanupCommand(cid);
+									ccs.put(cid, cc);
+									cc.addKillFuture(ret);
+									component.killComponent(cc);	
+								}
+								else
+								{
+		//								System.out.println("killing b: "+cid);
+									
+									CleanupCommand	cc	= (CleanupCommand)ccs.get(cid);
+									if(cc==null)
+										ret.setException(new RuntimeException("No cleanup command for component "+cid+": "+desc.getState()));
+									cc.addKillFuture(ret);
+								}
 							}
 						}
-					}
-					
-					public void exceptionOccurred(Object source, Exception exception)
-					{
-						ret.setException(exception);
-					}
-				});
+						
+						public void exceptionOccurred(Object source, Exception exception)
+						{
+							ret.setException(exception);
+						}
+					});
+				}
 			}
 		}
 		
@@ -585,60 +627,93 @@ public class ComponentManagementService extends BasicService implements ICompone
 
 	/**
 	 *  Suspend the execution of an component.
-	 *  @param componentid The component identifier.
+	 *  @param cid The component identifier.
 	 */
-	public IFuture suspendComponent(IComponentIdentifier componentid)
+	public IFuture suspendComponent(final IComponentIdentifier cid)
 	{
 		final Future ret = new Future();
 		
-		CMSComponentDescription ad;
-		synchronized(adapters)
+		if(isRemoteComponent(cid))
 		{
-			synchronized(descs)
+			SServiceProvider.getService(provider, IRemoteServiceManagementService.class)
+				.addResultListener(new IResultListener()
 			{
-				// Suspend subcomponents
-				CMSComponentDescription desc = (CMSComponentDescription)descs.get(componentid);
-				IComponentIdentifier[] achildren = desc.getChildren();
-//				for(Iterator it=children.getCollection(componentid).iterator(); it.hasNext(); )
-				for(int i=0; i<achildren.length; i++)
+				public void resultAvailable(Object source, Object result)
 				{
-//					IComponentIdentifier	child	= (IComponentIdentifier)it.next();
-					if(IComponentDescription.STATE_ACTIVE.equals(((IComponentDescription)descs.get(achildren[i])).getState()))
+					IRemoteServiceManagementService rms = (IRemoteServiceManagementService)result;
+					
+					rms.getServiceProxy(cid, IComponentManagementService.class).addResultListener(new IResultListener()
 					{
-						suspendComponent(achildren[i]);	// todo: cascading resume with wait.
-					}
-				}
-
-				final StandaloneComponentAdapter adapter = (StandaloneComponentAdapter)adapters.get(componentid);
-				ad = (CMSComponentDescription)descs.get(componentid);
-				if(adapter==null || ad==null)
-				{
-					ret.setException(new RuntimeException("Component identifier not registered: "+componentid));
-					return ret;
-				}
-				if(!IComponentDescription.STATE_ACTIVE.equals(ad.getState())
-					/*&& !IComponentDescription.STATE_TERMINATING.equals(ad.getState())*/)
-				{
-					ret.setException(new RuntimeException("Component identifier not registered: "+componentid));
-					return ret;
+						public void resultAvailable(Object source, Object result)
+						{
+							final IComponentManagementService rcms = (IComponentManagementService)result;
+							rcms.suspendComponent(cid).addResultListener(new DelegationResultListener(ret));
+						}
+						public void exceptionOccurred(Object source, Exception exception)
+						{
+							ret.setException(exception);
+						}
+					});
+					
 				}
 				
-				ad.setState(IComponentDescription.STATE_SUSPENDED);
-				exeservice.cancel(adapter).addResultListener(new DelegationResultListener(ret));
+				public void exceptionOccurred(Object source, Exception exception)
+				{
+					ret.setException(exception);
+				}
+			});
+		}
+		else
+		{
+			CMSComponentDescription ad;
+			synchronized(adapters)
+			{
+				synchronized(descs)
+				{
+					// Suspend subcomponents
+					CMSComponentDescription desc = (CMSComponentDescription)descs.get(cid);
+					IComponentIdentifier[] achildren = desc.getChildren();
+	//				for(Iterator it=children.getCollection(componentid).iterator(); it.hasNext(); )
+					for(int i=0; i<achildren.length; i++)
+					{
+	//					IComponentIdentifier	child	= (IComponentIdentifier)it.next();
+						if(IComponentDescription.STATE_ACTIVE.equals(((IComponentDescription)descs.get(achildren[i])).getState()))
+						{
+							suspendComponent(achildren[i]);	// todo: cascading resume with wait.
+						}
+					}
+	
+					final StandaloneComponentAdapter adapter = (StandaloneComponentAdapter)adapters.get(cid);
+					ad = (CMSComponentDescription)descs.get(cid);
+					if(adapter==null || ad==null)
+					{
+						ret.setException(new RuntimeException("Component identifier not registered: "+cid));
+						return ret;
+					}
+					if(!IComponentDescription.STATE_ACTIVE.equals(ad.getState())
+						/*&& !IComponentDescription.STATE_TERMINATING.equals(ad.getState())*/)
+					{
+						ret.setException(new RuntimeException("Component identifier not registered: "+cid));
+						return ret;
+					}
+					
+					ad.setState(IComponentDescription.STATE_SUSPENDED);
+					exeservice.cancel(adapter).addResultListener(new DelegationResultListener(ret));
+				}
 			}
-		}
-		
-		IComponentListener[]	alisteners;
-		synchronized(listeners)
-		{
-			Set	slisteners	= new HashSet(listeners.getCollection(null));
-			slisteners.addAll(listeners.getCollection(componentid));
-			alisteners	= (IComponentListener[])slisteners.toArray(new IComponentListener[slisteners.size()]);
-		}
-		// todo: can be called after listener has (concurrently) deregistered
-		for(int i=0; i<alisteners.length; i++)
-		{
-			alisteners[i].componentChanged(ad);
+			
+			IComponentListener[]	alisteners;
+			synchronized(listeners)
+			{
+				Set	slisteners	= new HashSet(listeners.getCollection(null));
+				slisteners.addAll(listeners.getCollection(cid));
+				alisteners	= (IComponentListener[])slisteners.toArray(new IComponentListener[slisteners.size()]);
+			}
+			// todo: can be called after listener has (concurrently) deregistered
+			for(int i=0; i<alisteners.length; i++)
+			{
+				alisteners[i].componentChanged(ad);
+			}
 		}
 		
 		return ret;
@@ -648,61 +723,94 @@ public class ComponentManagementService extends BasicService implements ICompone
 	 *  Resume the execution of an component.
 	 *  @param componentid The component identifier.
 	 */
-	public IFuture resumeComponent(IComponentIdentifier componentid)
+	public IFuture resumeComponent(final IComponentIdentifier cid)
 	{
-		Future ret = new Future();
+		final Future ret = new Future();
 		
-		CMSComponentDescription ad;
-		
-		synchronized(adapters)
+		if(isRemoteComponent(cid))
 		{
-			synchronized(descs)
+			SServiceProvider.getService(provider, IRemoteServiceManagementService.class)
+				.addResultListener(new IResultListener()
 			{
-				// Resume subcomponents
-				CMSComponentDescription desc = (CMSComponentDescription)descs.get(componentid);
-				IComponentIdentifier[] achildren = desc.getChildren();
-//				for(Iterator it=children.getCollection(componentid).iterator(); it.hasNext(); )
-				for(int i=0; i<achildren.length; i++)
+				public void resultAvailable(Object source, Object result)
 				{
-//					IComponentIdentifier	child	= (IComponentIdentifier)it.next();
-					if(IComponentDescription.STATE_SUSPENDED.equals(((IComponentDescription)descs.get(achildren[i])).getState()))
+					IRemoteServiceManagementService rms = (IRemoteServiceManagementService)result;
+					
+					rms.getServiceProxy(cid, IComponentManagementService.class).addResultListener(new IResultListener()
 					{
-						resumeComponent(achildren[i]);	// todo: cascading resume with wait.
-					}
-				}
-
-				StandaloneComponentAdapter adapter = (StandaloneComponentAdapter)adapters.get(componentid);
-				ad = (CMSComponentDescription)descs.get(componentid);
-				if(adapter==null || ad==null)
-				{
-					ret.setException(new RuntimeException("Component identifier not registered: "+componentid));
-					return ret;
-				}
-				if(!IComponentDescription.STATE_SUSPENDED.equals(ad.getState()))
-				{
-					ret.setException(new RuntimeException("Component identifier not registered: "+componentid));
-					return ret;
+						public void resultAvailable(Object source, Object result)
+						{
+							final IComponentManagementService rcms = (IComponentManagementService)result;
+							rcms.resumeComponent(cid).addResultListener(new DelegationResultListener(ret));
+						}
+						public void exceptionOccurred(Object source, Exception exception)
+						{
+							ret.setException(exception);
+						}
+					});
+					
 				}
 				
-				ad.setState(IComponentDescription.STATE_ACTIVE);
-				adapter.wakeup();
+				public void exceptionOccurred(Object source, Exception exception)
+				{
+					ret.setException(exception);
+				}
+			});
+		}
+		else
+		{
+			CMSComponentDescription ad;
+			synchronized(adapters)
+			{
+				synchronized(descs)
+				{
+					// Resume subcomponents
+					CMSComponentDescription desc = (CMSComponentDescription)descs.get(cid);
+					IComponentIdentifier[] achildren = desc.getChildren();
+	//				for(Iterator it=children.getCollection(componentid).iterator(); it.hasNext(); )
+					for(int i=0; i<achildren.length; i++)
+					{
+	//					IComponentIdentifier	child	= (IComponentIdentifier)it.next();
+						if(IComponentDescription.STATE_SUSPENDED.equals(((IComponentDescription)descs.get(achildren[i])).getState()))
+						{
+							resumeComponent(achildren[i]);	// todo: cascading resume with wait.
+						}
+					}
+	
+					StandaloneComponentAdapter adapter = (StandaloneComponentAdapter)adapters.get(cid);
+					ad = (CMSComponentDescription)descs.get(cid);
+					if(adapter==null || ad==null)
+					{
+						ret.setException(new RuntimeException("Component identifier not registered: "+cid));
+						return ret;
+					}
+					if(!IComponentDescription.STATE_SUSPENDED.equals(ad.getState()))
+					{
+						ret.setException(new RuntimeException("Component identifier not registered: "+cid));
+						return ret;
+					}
+					
+					ad.setState(IComponentDescription.STATE_ACTIVE);
+					adapter.wakeup();
+				}
 			}
+			
+			IComponentListener[]	alisteners;
+			synchronized(listeners)
+			{
+				Set	slisteners	= new HashSet(listeners.getCollection(null));
+				slisteners.addAll(listeners.getCollection(cid));
+				alisteners	= (IComponentListener[])slisteners.toArray(new IComponentListener[slisteners.size()]);
+			}
+			// todo: can be called after listener has (concurrently) deregistered
+			for(int i=0; i<alisteners.length; i++)
+			{
+				alisteners[i].componentChanged(ad);
+			}
+		
+			ret.setResult(ad);
 		}
 		
-		IComponentListener[]	alisteners;
-		synchronized(listeners)
-		{
-			Set	slisteners	= new HashSet(listeners.getCollection(null));
-			slisteners.addAll(listeners.getCollection(componentid));
-			alisteners	= (IComponentListener[])slisteners.toArray(new IComponentListener[slisteners.size()]);
-		}
-		// todo: can be called after listener has (concurrently) deregistered
-		for(int i=0; i<alisteners.length; i++)
-		{
-			alisteners[i].componentChanged(ad);
-		}
-	
-		ret.setResult(ad);
 		return ret;
 //		listener.resultAvailable(this, ad);
 	}
@@ -711,39 +819,71 @@ public class ComponentManagementService extends BasicService implements ICompone
 	 *  Execute a step of a suspended component.
 	 *  @param componentid The component identifier.
 	 */
-	public IFuture stepComponent(IComponentIdentifier componentid)
+	public IFuture stepComponent(final IComponentIdentifier cid)
 	{
 		final Future ret = new Future();
 		
-		synchronized(adapters)
+		if(isRemoteComponent(cid))
 		{
-			synchronized(descs)
+			SServiceProvider.getService(provider, IRemoteServiceManagementService.class)
+				.addResultListener(new IResultListener()
 			{
-				final StandaloneComponentAdapter adapter = (StandaloneComponentAdapter)adapters.get(componentid);
-				IComponentDescription cd = (IComponentDescription)descs.get(componentid);
-				if(adapter==null || cd==null)
+				public void resultAvailable(Object source, Object result)
 				{
-					ret.setException(new RuntimeException("Component identifier not registered: "+componentid));
-					return ret;
-				}
-				if(!IComponentDescription.STATE_SUSPENDED.equals(cd.getState()))
-				{
-					ret.setException(new RuntimeException("Only suspended components can be stepped: "+componentid+" "+cd.getState()));
-					return ret;
+					IRemoteServiceManagementService rms = (IRemoteServiceManagementService)result;
+					
+					rms.getServiceProxy(cid, IComponentManagementService.class).addResultListener(new IResultListener()
+					{
+						public void resultAvailable(Object source, Object result)
+						{
+							final IComponentManagementService rcms = (IComponentManagementService)result;
+							rcms.stepComponent(cid).addResultListener(new DelegationResultListener(ret));
+						}
+						public void exceptionOccurred(Object source, Exception exception)
+						{
+							ret.setException(exception);
+						}
+					});
 				}
 				
-				adapter.doStep(new IResultListener()
+				public void exceptionOccurred(Object source, Exception exception)
 				{
-					public void resultAvailable(Object source, Object result)
+					ret.setException(exception);
+				}
+			});
+		}
+		else
+		{
+			synchronized(adapters)
+			{
+				synchronized(descs)
+				{
+					final StandaloneComponentAdapter adapter = (StandaloneComponentAdapter)adapters.get(cid);
+					IComponentDescription cd = (IComponentDescription)descs.get(cid);
+					if(adapter==null || cd==null)
 					{
-						ret.setResult(result);
+						ret.setException(new RuntimeException("Component identifier not registered: "+cid));
+						return ret;
+					}
+					if(!IComponentDescription.STATE_SUSPENDED.equals(cd.getState()))
+					{
+						ret.setException(new RuntimeException("Only suspended components can be stepped: "+cid+" "+cd.getState()));
+						return ret;
 					}
 					
-					public void exceptionOccurred(Object source, Exception exception)
+					adapter.doStep(new IResultListener()
 					{
-						ret.setException(exception);
-					}
-				});
+						public void resultAvailable(Object source, Object result)
+						{
+							ret.setResult(result);
+						}
+						
+						public void exceptionOccurred(Object source, Exception exception)
+						{
+							ret.setException(exception);
+						}
+					});
+				}
 			}
 		}
 		
@@ -754,30 +894,68 @@ public class ComponentManagementService extends BasicService implements ICompone
 	 *  Set breakpoints for a component.
 	 *  Replaces existing breakpoints.
 	 *  To add/remove breakpoints, use current breakpoints from component description as a base.
-	 *  @param componentid The component identifier.
+	 *  @param cid The component identifier.
 	 *  @param breakpoints The new breakpoints (if any).
 	 */
-	public void setComponentBreakpoints(IComponentIdentifier componentid, String[] breakpoints)
+	public IFuture setComponentBreakpoints(final IComponentIdentifier cid, final String[] breakpoints)
 	{
-		CMSComponentDescription ad;
-		synchronized(descs)
+		final Future ret = new Future();
+		
+		if(isRemoteComponent(cid))
 		{
-			ad = (CMSComponentDescription)descs.get(componentid);
-			ad.setBreakpoints(breakpoints);
+			SServiceProvider.getService(provider, IRemoteServiceManagementService.class)
+				.addResultListener(new IResultListener()
+			{
+				public void resultAvailable(Object source, Object result)
+				{
+					IRemoteServiceManagementService rms = (IRemoteServiceManagementService)result;
+					
+					rms.getServiceProxy(cid, IComponentManagementService.class).addResultListener(new IResultListener()
+					{
+						public void resultAvailable(Object source, Object result)
+						{
+							final IComponentManagementService rcms = (IComponentManagementService)result;
+							rcms.setComponentBreakpoints(cid, breakpoints).addResultListener(new DelegationResultListener(ret));
+						}
+						public void exceptionOccurred(Object source, Exception exception)
+						{
+							ret.setException(exception);
+						}
+					});
+				}
+				
+				public void exceptionOccurred(Object source, Exception exception)
+				{
+					ret.setException(exception);
+				}
+			});
+		}
+		else
+		{
+			CMSComponentDescription ad;
+			synchronized(descs)
+			{
+				ad = (CMSComponentDescription)descs.get(cid);
+				ad.setBreakpoints(breakpoints);
+			}
+			
+			IComponentListener[]	alisteners;
+			synchronized(listeners)
+			{
+				Set	slisteners	= new HashSet(listeners.getCollection(null));
+				slisteners.addAll(listeners.getCollection(cid));
+				alisteners	= (IComponentListener[])slisteners.toArray(new IComponentListener[slisteners.size()]);
+			}
+			// todo: can be called after listener has (concurrently) deregistered
+			for(int i=0; i<alisteners.length; i++)
+			{
+				alisteners[i].componentChanged(ad);
+			}
+			
+			ret.setResult(null);
 		}
 		
-		IComponentListener[]	alisteners;
-		synchronized(listeners)
-		{
-			Set	slisteners	= new HashSet(listeners.getCollection(null));
-			slisteners.addAll(listeners.getCollection(componentid));
-			alisteners	= (IComponentListener[])slisteners.toArray(new IComponentListener[slisteners.size()]);
-		}
-		// todo: can be called after listener has (concurrently) deregistered
-		for(int i=0; i<alisteners.length; i++)
-		{
-			alisteners[i].componentChanged(ad);
-		}
+		return ret;
 	}
 
 	//-------- listener methods --------
@@ -1543,7 +1721,7 @@ public class ComponentManagementService extends BasicService implements ICompone
 	 *  @param lmodel	The model of the component.
 	 *  @return	True, if the component should be suspended
 	 */
-	protected boolean isInitSuspend(CreationInfo cinfo, ILoadableComponentModel lmodel)
+	protected boolean isInitSuspend(CreationInfo cinfo, IModelInfo lmodel)
 	{
 		boolean pasuspend = false;
 		Object[] painfo = getParentInfo(cinfo);
@@ -1551,7 +1729,7 @@ public class ComponentManagementService extends BasicService implements ICompone
 		// Parent also still in init.
 		if(painfo!=null)
 		{
-			pasuspend	= isInitSuspend((CreationInfo)painfo[2], (ILoadableComponentModel)painfo[3]);
+			pasuspend	= isInitSuspend((CreationInfo)painfo[2], (IModelInfo)painfo[3]);
 		}
 		
 		// Parent already running.

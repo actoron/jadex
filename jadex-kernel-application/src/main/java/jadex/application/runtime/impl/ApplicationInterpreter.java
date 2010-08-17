@@ -1,6 +1,5 @@
 package jadex.application.runtime.impl;
 
-import jadex.application.model.ApplicationModel;
 import jadex.application.model.MApplicationInstance;
 import jadex.application.model.MApplicationType;
 import jadex.application.model.MArgument;
@@ -24,7 +23,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.ILoadableComponentModel;
+import jadex.bridge.IModelInfo;
 import jadex.bridge.IMessageAdapter;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
@@ -86,7 +85,8 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 	protected IComponentAdapter	adapter;
 	
 	/** The application type. */
-	protected ApplicationModel model;
+//	protected ApplicationModel model;
+	protected MApplicationType model;
 	
 	/** The parent component. */
 	protected IExternalAccess parent;
@@ -124,7 +124,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 	/**
 	 *  Create a new context.
 	 */
-	public ApplicationInterpreter(final IComponentDescription desc, final ApplicationModel model, final MApplicationInstance config, 
+	public ApplicationInterpreter(final IComponentDescription desc, final MApplicationType model, final MApplicationInstance config, 
 		final IComponentAdapterFactory factory, final IExternalAccess parent, final Map arguments, final Future inited)
 	{
 		this.config	= config;
@@ -136,11 +136,11 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 		this.ctypes = Collections.synchronizedMap(new HashMap()); 
 		// synchronized because of MicroAgentViewPanel, todo
 		this.steps	= Collections.synchronizedList(new ArrayList());
-		this.adapter = factory.createComponentAdapter(desc, model, this, parent);
+		this.adapter = factory.createComponentAdapter(desc, model.getModelInfo(), this, parent);
 	
 		// Init the arguments with default values.
 		String configname = config!=null? config.getName(): null;
-		IArgument[] args = model.getArguments();
+		IArgument[] args = model.getModelInfo().getArguments();
 		for(int i=0; i<args.length; i++)
 		{
 			if(args[i].getDefaultValue(configname)!=null)
@@ -153,7 +153,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 		}
 		
 		// Init the results with default values.
-		IArgument[] res = model.getResults();
+		IArgument[] res = model.getModelInfo().getResults();
 		for(int i=0; i<res.length; i++)
 		{
 			if(res[i].getDefaultValue(configname)!=null)
@@ -170,7 +170,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 		ApplicationInterpreter.this.fetcher = fetcher;
 		
 		// Init service container.
-		MExpressionType mex = model.getApplicationType().getContainer();
+		MExpressionType mex = model.getContainer();
 		if(mex!=null)
 		{
 			container = (IServiceContainer)mex.getParsedValue().getValue(fetcher);
@@ -187,7 +187,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 		{
 			public void run()
 			{
-				List services = model.getApplicationType().getServices();
+				List services = model.getServices();
 				if(services!=null)
 				{
 					for(int i=0; i<services.size(); i++)
@@ -200,7 +200,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 		
 				// Evaluate (future) properties.
 				List	futures	= new ArrayList();
-				List	props	= model.getApplicationType().getProperties();
+				List	props	= model.getPropertyList();
 				if(props!=null)
 				{
 					for(int i=0; i<props.size(); i++)
@@ -535,7 +535,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 	 *  The current subcomponents can be accessed by IComponentAdapter.getSubcomponents().
 	 *  @param comp	The newly created component.
 	 */
-	public void	componentCreated(final IComponentDescription desc, final ILoadableComponentModel model)
+	public void	componentCreated(final IComponentDescription desc, final IModelInfo model)
 	{
 		// Checks if loaded model is defined in the application component types
 		
@@ -550,7 +550,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 		String appctype = (String)ctypes.get(modelname);
 		if(appctype==null)
 		{
-			List atypes	= ApplicationInterpreter.this.model.getApplicationType().getMComponentTypes();
+			List atypes	= ApplicationInterpreter.this.model.getMComponentTypes();
 			for(int i=0; i<atypes.size(); i++)
 			{
 				final MComponentType atype = (MComponentType)atypes.get(i);
@@ -629,7 +629,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 		if(!desc.isDaemon())
 			children--;
 				
-		if(children==0 && model.getApplicationType().isAutoShutdown())
+		if(children==0 && model.isAutoShutdown())
 			killApplication();
 	}
 	
@@ -743,9 +743,9 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 	 *  Get the model.
 	 *  @return The model.
 	 */
-	public ILoadableComponentModel getModel()
+	public IModelInfo getModel()
 	{
-		return model;
+		return model.getModelInfo();
 	}
 	
 	/**
@@ -761,7 +761,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 	 */
 	public MApplicationType	getApplicationType()
 	{
-		return model.getApplicationType();
+		return model;
 	}
 	
 	/**
@@ -936,7 +936,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 	 */
 	public String[] getAllImports()
 	{
-		return model.getApplicationType().getAllImports();
+		return model.getAllImports();
 	}
 	
 	//-------- methods to be called by adapter --------
@@ -1045,7 +1045,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 	 */
 	public ClassLoader getClassLoader()
 	{
-		return model.getClassLoader();
+		return model.getModelInfo().getClassLoader();
 	}
 
 	/**
@@ -1105,7 +1105,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 	 */
 	public String	getComponentFilename(String type)
 	{
-		return model.getApplicationType().getMComponentType(type).getFilename();
+		return model.getMComponentType(type).getFilename();
 	}
 	
 	/**
@@ -1155,9 +1155,9 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 			};
 			for(int j=0; j<num; j++)
 			{
-				IFuture ret = ces.createComponent(component.getName(), component.getType(model.getApplicationType()).getFilename(),
+				IFuture ret = ces.createComponent(component.getName(), component.getType(model).getFilename(),
 					new CreationInfo(component.getConfiguration(), getArguments(component, cl), adapter.getComponentIdentifier(),
-					component.isSuspended(), component.isMaster(), component.isDaemon(), model.getApplicationType().getAllImports()), null);
+					component.isSuspended(), component.isMaster(), component.isDaemon(), model.getAllImports()), null);
 				ret.addResultListener(crl);
 			}
 		}

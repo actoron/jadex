@@ -1,16 +1,23 @@
 package jadex.micro;
 
+import jadex.bridge.IArgument;
 import jadex.bridge.IComponentAdapterFactory;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentFactory;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.ILoadableComponentModel;
+import jadex.bridge.IModelInfo;
+import jadex.bridge.IReport;
+import jadex.bridge.ModelInfo;
 import jadex.commons.Future;
 import jadex.commons.SGUI;
 import jadex.commons.SReflect;
 import jadex.service.BasicService;
 import jadex.service.IServiceProvider;
 
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.swing.Icon;
@@ -63,10 +70,10 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	 *  @param The imports (if any).
 	 *  @return The loaded model.
 	 */
-	public ILoadableComponentModel loadModel(String model, String[] imports, ClassLoader classloader)
+	public IModelInfo loadModel(String model, String[] imports, ClassLoader classloader)
 	{
 //		System.out.println("loading micro: "+model);
-		ILoadableComponentModel ret = null;
+		IModelInfo ret = null;
 		
 		String clname = model;
 		
@@ -77,18 +84,52 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 		clname = clname.replace('/', '.');
 		
 //		ClassLoader	cl	= libservice.getClassLoader();
-		Class cma = SReflect.findClass0(clname, imports, classloader);
-//		System.out.println(clname+" "+cma+" "+ret);
-		int idx;
-		while(cma==null && (idx=clname.indexOf('.'))!=-1)
+		Class cma = getMicroAgentClass(clname, imports, classloader);
+//		Class cma = SReflect.findClass0(clname, imports, classloader);
+////		System.out.println(clname+" "+cma+" "+ret);
+//		int idx;
+//		while(cma==null && (idx=clname.indexOf('.'))!=-1)
+//		{
+//			clname	= clname.substring(idx+1);
+//			cma = SReflect.findClass0(clname, imports, classloader);
+////			System.out.println(clname+" "+cma+" "+ret);
+//		}
+//		if(cma==null)// || !cma.isAssignableFrom(IMicroAgent.class))
+//			throw new RuntimeException("No micro agent file: "+model);
+////		ret = new MicroAgentModel(cma, model, classloader);
+		
+		
+		// Try to read meta information from class.
+		MicroAgentMetaInfo metainfo = null;
+		try
 		{
-			clname	= clname.substring(idx+1);
-			cma = SReflect.findClass0(clname, imports, classloader);
-//			System.out.println(clname+" "+cma+" "+ret);
+			Method m = cma.getMethod("getMetaInfo", new Class[0]);
+			if(m!=null)
+				metainfo = (MicroAgentMetaInfo)m.invoke(null, new Object[0]);
 		}
-		if(cma==null)// || !cma.isAssignableFrom(IMicroAgent.class))
-			throw new RuntimeException("No micro agent file: "+model);
-		ret = new MicroAgentModel(cma, model, classloader);
+		catch(Exception e)
+		{
+//			e.printStackTrace();
+		}
+		String name = SReflect.getUnqualifiedClassName(cma);
+		if(name.endsWith("Agent"))
+			name = name.substring(0, name.lastIndexOf("Agent"));
+		String packagename = cma.getPackage()!=null? cma.getPackage().getName(): null;
+		String description = metainfo!=null && metainfo.getDescription()!=null? metainfo.getDescription(): null;
+		IReport report = null;
+		String[] configurations = metainfo!=null? metainfo.getConfigurations(): null;
+		IArgument[] arguments = metainfo!=null? metainfo.getArguments(): null;
+		IArgument[] results = metainfo!=null? metainfo.getResults(): null;
+		Map properties = metainfo!=null && metainfo.getProperties()!=null? new HashMap(metainfo.getProperties()): new HashMap();
+		
+		List names = new ArrayList();
+		for(int i=0; metainfo!=null && i<metainfo.getBreakpoints().length; i++)
+			names.add(metainfo.getBreakpoints()[i]);
+		properties.put("debugger.breakpoints", names);
+		
+		ret = new ModelInfo(name, packagename, description, report, 
+			configurations, arguments, results, true, model, properties, classloader);
+		
 		return ret;
 	}
 	
@@ -146,8 +187,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	 */
 	public String getComponentType(String model, String[] imports, ClassLoader classloader)
 	{
-		return model.toLowerCase().endsWith("agent.class") ? FILETYPE_MICROAGENT
-			: null;
+		return model.toLowerCase().endsWith("agent.class") ? FILETYPE_MICROAGENT: null;
 	}
 	
 	/**
@@ -159,10 +199,11 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	 * @param parent The parent component (if any).
 	 * @return An instance of a component.
 	 */
-	public Object[] createComponentInstance(IComponentDescription desc, IComponentAdapterFactory factory, ILoadableComponentModel model, 
+	public Object[] createComponentInstance(IComponentDescription desc, IComponentAdapterFactory factory, IModelInfo model, 
 		String config, Map arguments, IExternalAccess parent, Future ret)
 	{
-		MicroAgentInterpreter mai = new MicroAgentInterpreter(desc, factory, (MicroAgentModel)model, arguments, config, parent, ret);
+		MicroAgentInterpreter mai = new MicroAgentInterpreter(desc, factory, model, getMicroAgentClass(model.getFullName()+"Agent", 
+			null, model.getClassLoader()), arguments, config, parent, ret);
 		return new Object[]{mai, mai.getAgentAdapter()};
 	}
 	
@@ -204,4 +245,24 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	{
 		return new Future(null);
 	}*/
+	
+	/**
+	 *  Get the mirco agent class.
+	 */
+	// todo: make use of cache
+	protected Class getMicroAgentClass(String clname, String[] imports, ClassLoader classloader)
+	{
+		Class ret = SReflect.findClass0(clname, imports, classloader);
+//		System.out.println(clname+" "+cma+" "+ret);
+		int idx;
+		while(ret==null && (idx=clname.indexOf('.'))!=-1)
+		{
+			clname	= clname.substring(idx+1);
+			ret = SReflect.findClass0(clname, imports, classloader);
+//			System.out.println(clname+" "+cma+" "+ret);
+		}
+		if(ret==null)// || !cma.isAssignableFrom(IMicroAgent.class))
+			throw new RuntimeException("No micro agent file: "+clname);
+		return ret;
+	}
 }

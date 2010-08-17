@@ -53,7 +53,8 @@ public class RemoteSearchResultCommand extends RemoteResultCommand
 		// Post-process results to make them real proxies.
 		
 		SServiceProvider.getService(component.getServiceProvider(), ILibraryService.class)
-			.addResultListener(component.createResultListener(new IResultListener()
+			.addResultListener(new IResultListener()
+//			.addResultListener(component.createResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object source, Object res)
 			{
@@ -81,14 +82,15 @@ public class RemoteSearchResultCommand extends RemoteResultCommand
 				}
 				
 				RemoteSearchResultCommand.super.execute(component, waitingcalls)
-					.addResultListener(component.createResultListener(new DelegationResultListener(ret)));
+					.addResultListener(new DelegationResultListener(ret));
+//					.addResultListener(component.createResultListener(new DelegationResultListener(ret)));
 			}
 			
 			public void exceptionOccurred(Object source, Exception exception)
 			{
 				ret.setException(exception);
 			}
-		}));
+		});
 		
 		return ret;
 	}

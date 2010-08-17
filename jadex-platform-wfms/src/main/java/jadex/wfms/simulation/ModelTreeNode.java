@@ -6,7 +6,7 @@ import java.util.List;
 
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MParameter;
-import jadex.bridge.ILoadableComponentModel;
+import jadex.bridge.IModelInfo;
 import jadex.commons.collection.TreeNode;
 import jadex.wfms.simulation.stateholder.IParameterStateSet;
 
@@ -53,9 +53,9 @@ public class ModelTreeNode extends TreeNode
 	
 	public String toString()
 	{
-		if (data instanceof ILoadableComponentModel)
+		if (data instanceof IModelInfo)
 		{
-			ILoadableComponentModel model = ((ILoadableComponentModel) data);
+			IModelInfo model = ((IModelInfo) data);
 			String ret = model.getName();
 			if (ret == null)
 			{

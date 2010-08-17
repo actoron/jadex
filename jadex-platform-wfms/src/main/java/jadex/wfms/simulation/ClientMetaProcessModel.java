@@ -3,7 +3,7 @@ package jadex.wfms.simulation;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.MParameter;
-import jadex.bridge.ILoadableComponentModel;
+import jadex.bridge.IModelInfo;
 import jadex.commons.collection.Tree;
 import jadex.commons.collection.TreeNode;
 import jadex.gpmn.model2.MBpmnPlan;
@@ -39,7 +39,7 @@ public class ClientMetaProcessModel extends Tree implements TreeModel
 	{
 	}
 	
-	public void setRootModel(ClientSimulator sim, String processName, ILoadableComponentModel model) throws Exception
+	public void setRootModel(ClientSimulator sim, String processName, IModelInfo model) throws Exception
 	{
 		mainProcessName = processName;
 		processes = new HashMap();
@@ -51,7 +51,7 @@ public class ClientMetaProcessModel extends Tree implements TreeModel
 		root.setData(tmpRoot.getData());
 	}
 	
-	public TreeNode buildTree(ClientSimulator sim, ILoadableComponentModel processModel) throws Exception
+	public TreeNode buildTree(ClientSimulator sim, IModelInfo processModel) throws Exception
 	{
 		TreeNode node = new ModelTreeNode();
 		node.setData(processModel);
@@ -60,7 +60,7 @@ public class ClientMetaProcessModel extends Tree implements TreeModel
 		// Remove subprocesses that are already known
 		for (Iterator it = subProcesses.iterator(); it.hasNext(); )
 		{
-			ILoadableComponentModel subModel = (ILoadableComponentModel) it.next();
+			IModelInfo subModel = (IModelInfo) it.next();
 			if (processes.containsKey(resolveProcessName(subModel)))
 			{
 				it.remove();
@@ -74,7 +74,7 @@ public class ClientMetaProcessModel extends Tree implements TreeModel
 		// Add subprocesses
 		for (Iterator it = subProcesses.iterator(); it.hasNext(); )
 		{
-			ILoadableComponentModel subModel = (ILoadableComponentModel) it.next();
+			IModelInfo subModel = (IModelInfo) it.next();
 			ModelTreeNode tmpNode = new ModelTreeNode();
 			processes.put(resolveProcessName(subModel), tmpNode);
 			TreeNode subTree = buildTree(sim, subModel);
@@ -175,7 +175,7 @@ public class ClientMetaProcessModel extends Tree implements TreeModel
 		return node;
 	}
 	
-	private List getSubProcessModels(ClientSimulator sim, ILoadableComponentModel processModel) throws Exception
+	private List getSubProcessModels(ClientSimulator sim, IModelInfo processModel) throws Exception
 	{
 		List ret = new LinkedList();
 		//ret.add(processModel);
@@ -320,7 +320,7 @@ public class ClientMetaProcessModel extends Tree implements TreeModel
 		}
 	}*/
 	
-	public static final String resolveProcessName(ILoadableComponentModel model)
+	public static final String resolveProcessName(IModelInfo model)
 	{
 		String ret = model.getName();
 		if (ret == null)

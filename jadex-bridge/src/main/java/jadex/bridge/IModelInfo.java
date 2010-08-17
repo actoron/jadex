@@ -11,7 +11,7 @@ import java.util.Map;
  *  Component types can be loaded by the kernel's component factory
  *  @link{IComponentFactory}. 
  */
-public interface ILoadableComponentModel
+public interface IModelInfo
 {
 	/**
 	 *  Get the name.

@@ -23,7 +23,7 @@ public interface IEACapability extends IEAElement
 	 *  Get the parent (if any).
 	 *  @return The parent.
 	 */
-	public IExternalAccess	getParent();
+	public IComponentIdentifier getParent();
 
 	/**
 	 *  Get the belief base.

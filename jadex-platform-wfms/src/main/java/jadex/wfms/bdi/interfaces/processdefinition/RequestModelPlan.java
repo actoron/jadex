@@ -4,7 +4,7 @@ import jadex.base.fipa.Done;
 import jadex.bdi.runtime.IGoal;
 import jadex.bpmn.BpmnModelLoader;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.ILoadableComponentModel;
+import jadex.bridge.IModelInfo;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.gpmn.GpmnModelLoader;
@@ -61,7 +61,7 @@ public class RequestModelPlan extends AbstractWfmsPlan
 			else
 				modelFuture = ((IProcessDefinitionService) SServiceProvider.getService(getScope().getServiceProvider(), IProcessDefinitionService.class).get(this)).getProcessModel(proxy, rqm.getModelName());
 			
-			ILoadableComponentModel model = (ILoadableComponentModel) modelFuture.get(this);
+			IModelInfo model = (IModelInfo) modelFuture.get(this);
 			File modelFile = new File(model.getFilename());
 			byte[] content;
 			try

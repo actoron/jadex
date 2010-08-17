@@ -10,6 +10,7 @@ import jadex.commons.Future;
 import jadex.commons.ICommand;
 import jadex.commons.IFuture;
 import jadex.commons.SUtil;
+import jadex.commons.collection.LRU;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.micro.IMicroExternalAccess;
@@ -91,7 +92,8 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		final Future ret = new Future();
 		
 		SServiceProvider.getService(component.getServiceProvider(), IComponentManagementService.class)
-			.addResultListener(component.createResultListener(new IResultListener()
+//			.addResultListener(component.createResultListener(new IResultListener()
+			.addResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
@@ -109,7 +111,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 			{
 				ret.setException(exception);
 			}
-		}));
+		});
 		
 		return ret;
 	}
@@ -166,7 +168,8 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		final Future ret = new Future();
 		
 		SServiceProvider.getService(component.getServiceProvider(), IComponentManagementService.class)
-			.addResultListener(component.createResultListener(new IResultListener()
+//			.addResultListener(component.createResultListener(new IResultListener()
+			.addResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
@@ -183,7 +186,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 			{
 				ret.setException(exception);
 			}
-		}));
+		});
 		
 		return ret;
 	}
@@ -207,7 +210,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		return waitingcalls;
 	}
 	
-	protected static Map errors = Collections.synchronizedMap(new HashMap());
+//	protected static Map errors = Collections.synchronizedMap(new LRU(200));
 	
 	/**
 	 * final IComponentIdentifier sender,
@@ -226,14 +229,16 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 //		msg.put(SFipa.LANGUAGE, SFipa.JADEX_XML);
 		
 		SServiceProvider.getService(component.getServiceProvider(), ILibraryService.class)
-			.addResultListener(component.createResultListener(new IResultListener()
+			.addResultListener(new IResultListener()
+//			.addResultListener(component.createResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
 				final ILibraryService ls = (ILibraryService)result;
 				
 				SServiceProvider.getService(component.getServiceProvider(), IMessageService.class)
-					.addResultListener(component.createResultListener(new IResultListener()
+					.addResultListener(new IResultListener()
+//					.addResultListener(component.createResultListener(new IResultListener()
 				{
 					public void resultAvailable(Object source, Object result)
 					{
@@ -261,7 +266,8 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 												waitingcalls.remove(callid);
 												future.setExceptionIfUndone(new RuntimeException("No reply received and timeout occurred: "+callid+" "+msg));
 											}
-										}).addResultListener(component.createResultListener(new DefaultResultListener()
+										}).addResultListener(new DefaultResultListener()
+//										}).addResultListener(component.createResultListener(new DefaultResultListener()
 										{
 											public void resultAvailable(Object source, Object result)
 											{
@@ -272,19 +278,19 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 													public void resultAvailable(Object source, Object result)
 													{
 //														System.out.println("Cancel timeout (res): "+callid+" "+future);
-														errors.put(callid, new Object[]{"Cancel timeout (res)", result});
+//														errors.put(callid, new Object[]{"Cancel timeout (res)", result});
 														timer.cancel();
 													}
 													
 													public void exceptionOccurred(Object source, Exception exception)
 													{
 //														System.out.println("Cancel timeout (ex): "+callid+" "+future);
-														errors.put(callid, new Object[]{"Cancel timeout (ex):", exception});
+//														errors.put(callid, new Object[]{"Cancel timeout (ex):", exception});
 														timer.cancel();
 													}
 												});
 											}
-										}));
+										});
 									}
 								});
 							}
@@ -293,7 +299,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 							{
 								// message could not be sent -> fail immediately.
 //								System.out.println("Callee could not be reached: "+exception);
-								errors.put(callid, new Object[]{"Callee could not be reached", exception});
+//								errors.put(callid, new Object[]{"Callee could not be reached", exception});
 								waitingcalls.remove(callid);
 								future.setException(exception);
 							}
@@ -302,20 +308,20 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 					
 					public void exceptionOccurred(Object source, Exception exception)
 					{
-						errors.put(callid, new Object[]{"No msg service", exception});
+//						errors.put(callid, new Object[]{"No msg service", exception});
 						waitingcalls.remove(callid);
 						future.setException(exception);
 					}
-				}));
+				});
 			}
 			
 			public void exceptionOccurred(Object source, Exception exception)
 			{
-				errors.put(callid, new Object[]{"No lib service", exception});
+//				errors.put(callid, new Object[]{"No lib service", exception});
 				waitingcalls.remove(callid);
 				future.setException(exception);
 			}
-		}));
+		});
 	}
 }
 

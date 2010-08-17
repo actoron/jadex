@@ -7,7 +7,7 @@ import jadex.bdi.runtime.IEAGoal;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.MParameter;
-import jadex.bridge.ILoadableComponentModel;
+import jadex.bridge.IModelInfo;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.SGUI;
@@ -419,7 +419,7 @@ public class ClientSimulator
 							{
 								try
 								{
-									model.setRootModel(ClientSimulator.this, modelName, (ILoadableComponentModel) parameters.get("model"));
+									model.setRootModel(ClientSimulator.this, modelName, (IModelInfo) parameters.get("model"));
 								}
 								catch (Exception e)
 								{

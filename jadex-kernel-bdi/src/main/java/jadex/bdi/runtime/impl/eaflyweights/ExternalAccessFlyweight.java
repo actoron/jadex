@@ -14,7 +14,7 @@ import jadex.bdi.runtime.interpreter.MessageEventRules;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bdi.runtime.interpreter.PlanRules;
 import jadex.bridge.ComponentResultListener;
-import jadex.bridge.ILoadableComponentModel;
+import jadex.bridge.IModelInfo;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.concurrent.DelegationResultListener;
@@ -912,7 +912,7 @@ public class ExternalAccessFlyweight extends EACapabilityFlyweight implements IB
 	/**
 	 *  Get the model of the component.
 	 */
-	public ILoadableComponentModel	getModel()
+	public IModelInfo	getModel()
 	{
 		return getInterpreter().getModel();
 	}

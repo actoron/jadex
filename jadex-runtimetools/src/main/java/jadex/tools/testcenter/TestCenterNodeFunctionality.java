@@ -2,7 +2,7 @@ package jadex.tools.testcenter;
 
 import jadex.base.SComponentFactory;
 import jadex.bridge.IArgument;
-import jadex.bridge.ILoadableComponentModel;
+import jadex.bridge.IModelInfo;
 import jadex.commons.SGUI;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.tools.common.CombiIcon;
@@ -210,7 +210,7 @@ public class TestCenterNodeFunctionality extends DefaultNodeFunctionality
 									public void resultAvailable(Object source, Object result)
 									{
 										boolean	newtest	= false;
-										ILoadableComponentModel model = (ILoadableComponentModel)result;
+										IModelInfo model = (IModelInfo)result;
 										if(model!=null && model.getReport().isEmpty())
 										{
 											IArgument[]	results	= model.getResults();

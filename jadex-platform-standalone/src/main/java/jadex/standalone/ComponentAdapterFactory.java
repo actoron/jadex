@@ -5,7 +5,7 @@ import jadex.bridge.IComponentAdapterFactory;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.ILoadableComponentModel;
+import jadex.bridge.IModelInfo;
 
 /**
  *  Standalone version of the adapter factory.
@@ -20,7 +20,7 @@ public class ComponentAdapterFactory implements IComponentAdapterFactory
 	 *  @param parent The external access of the component's parent.
 	 *  @return The component adapter.
 	 */
-	public IComponentAdapter createComponentAdapter(IComponentDescription desc, ILoadableComponentModel model, IComponentInstance instance, IExternalAccess parent)
+	public IComponentAdapter createComponentAdapter(IComponentDescription desc, IModelInfo model, IComponentInstance instance, IExternalAccess parent)
 	{
 		return new StandaloneComponentAdapter(desc, model, instance, parent);
 	}

@@ -4,7 +4,7 @@ import jadex.bdi.runtime.interpreter.MBeliefArgument;
 import jadex.bdi.runtime.interpreter.MBeliefSetArgument;
 import jadex.bdi.runtime.interpreter.Report;
 import jadex.bridge.IArgument;
-import jadex.bridge.ILoadableComponentModel;
+import jadex.bridge.IModelInfo;
 import jadex.bridge.IReport;
 import jadex.commons.ICacheableModel;
 import jadex.commons.SUtil;
@@ -24,7 +24,7 @@ import java.util.Set;
  *  The capability model contains the OAV capability model in a state
  *  and a type-specific compiled rulebase (matcher functionality).
  */
-public class OAVCapabilityModel implements ILoadableComponentModel, ICacheableModel
+public class OAVCapabilityModel implements IModelInfo, ICacheableModel
 {
 	//-------- attributes --------
 	

@@ -4,7 +4,7 @@ import jadex.bridge.ComponentResultListener;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.ILoadableComponentModel;
+import jadex.bridge.IModelInfo;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.concurrent.DelegationResultListener;
@@ -45,7 +45,7 @@ public class ExternalAccess implements IExternalAccess
 	 *  Get the model.
 	 *  @return The model.
 	 */
-	public ILoadableComponentModel	getModel()
+	public IModelInfo	getModel()
 	{
 		return interpreter.getModel();
 	}
@@ -61,7 +61,7 @@ public class ExternalAccess implements IExternalAccess
 	/**
 	 *  Get the parent.
 	 */
-	public IExternalAccess getParent()
+	public IComponentIdentifier getParent()
 	{
 		return interpreter.getParent();
 	}

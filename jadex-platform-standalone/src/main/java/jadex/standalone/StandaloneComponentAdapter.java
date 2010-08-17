@@ -9,7 +9,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.ILoadableComponentModel;
+import jadex.bridge.IModelInfo;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.MessageType;
 import jadex.commons.Future;
@@ -60,7 +60,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	protected IComponentInstance component;
 	
 	/** The component model. */
-	protected ILoadableComponentModel model;
+	protected IModelInfo model;
 
 	/** The description holding the execution state of the component
 	   (read only! managed by component execution service). */
@@ -114,7 +114,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	 *  Create a new component adapter.
 	 *  Uses the thread pool for executing the component.
 	 */
-	public StandaloneComponentAdapter(IComponentDescription desc, ILoadableComponentModel model, IComponentInstance component, IExternalAccess parent)
+	public StandaloneComponentAdapter(IComponentDescription desc, IModelInfo model, IComponentInstance component, IExternalAccess parent)
 	{
 		this.desc = desc;
 		this.cid	= desc.getName();
@@ -310,7 +310,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	 *  Get the model.
 	 *  @return The model.
 	 */
-	public ILoadableComponentModel getModel()
+	public IModelInfo getModel()
 	{
 		return this.model;
 	}
@@ -327,7 +327,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	/**
 	 *  Get the children (if any).
 	 *  @return The children.
-	 */
+	 * /
 	public IFuture getChildren()
 	{
 		final Future ret = new Future();
@@ -351,6 +351,32 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 						}
 					}
 				});
+			}
+		});
+		
+		return ret;
+	}*/
+	
+	/**
+	 *  Get the children (if any).
+	 *  @return The children.
+	 */
+	public IFuture getChildren()
+	{
+		final Future ret = new Future();
+		
+		SServiceProvider.getServiceUpwards(getServiceContainer(), IComponentManagementService.class)
+			.addResultListener(new IResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				final IComponentManagementService cms = (IComponentManagementService)result;
+				cms.getChildren(getComponentIdentifier()).addResultListener(new DelegationResultListener(ret));
+			}
+			
+			public void exceptionOccurred(Object source, Exception exception)
+			{
+				ret.setException(exception);
 			}
 		});
 		
@@ -612,6 +638,8 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	{
 		// Fatal error!
 		fatalerror	= true;
+		
+		e.printStackTrace();
 		
 		// Remove component from platform.
 		SServiceProvider.getServiceUpwards(getServiceContainer(), IComponentManagementService.class).addResultListener(new DefaultResultListener()

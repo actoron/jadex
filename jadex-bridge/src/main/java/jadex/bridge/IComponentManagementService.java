@@ -54,7 +54,7 @@ public interface IComponentManagementService extends IService
 	 *  @param componentid The component identifier.
 	 *  @param breakpoints The new breakpoints (if any).
 	 */
-	public void setComponentBreakpoints(IComponentIdentifier componentid, String[] breakpoints);
+	public IFuture setComponentBreakpoints(IComponentIdentifier componentid, String[] breakpoints);
 	
 	//-------- information methods --------
 	

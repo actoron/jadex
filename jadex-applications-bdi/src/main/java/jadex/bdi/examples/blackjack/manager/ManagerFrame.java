@@ -314,7 +314,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 					public void customResultAvailable(Object source, Object result)
 					{
 						final IComponentManagementService	cms	= (IComponentManagementService)result;
-						cms.destroyComponent(agent.getParent().getComponentIdentifier());
+						cms.destroyComponent(agent.getParent());
 					}
 				});
 			}

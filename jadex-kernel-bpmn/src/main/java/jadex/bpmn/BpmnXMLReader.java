@@ -99,6 +99,7 @@ public class BpmnXMLReader
 	public static MBpmnModel read(ResourceInfo rinfo, ClassLoader classloader) throws Exception
 	{
 		MBpmnModel ret = (MBpmnModel)reader.read(rinfo.getInputStream(), classloader, null);
+		
 		ret.setFilename(rinfo.getFilename());
 		ret.setLastModified(rinfo.getLastModified());
 		ret.setFilename(rinfo.getFilename());
@@ -106,7 +107,9 @@ public class BpmnXMLReader
 		ret.setClassloader(classloader);
 		String name = new File(rinfo.getFilename()).getName();
 		name = name.substring(0, name.length()-5);
-		ret.setName(name);
+		ret.setName(name);	
+		ret.initModelInfo();
+		
 		rinfo.getInputStream().close();
 		return ret;
 	}

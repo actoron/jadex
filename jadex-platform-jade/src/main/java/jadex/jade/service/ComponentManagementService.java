@@ -13,7 +13,7 @@ import jadex.bridge.IComponentInstance;
 import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.ILoadableComponentModel;
+import jadex.bridge.IModelInfo;
 import jadex.bridge.IMessageService;
 import jadex.bridge.ISearchConstraints;
 import jadex.commons.Future;
@@ -132,7 +132,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 		}
 		if(factory==null)
 			throw new RuntimeException("No factory found for component: "+model);
-		final ILoadableComponentModel lmodel = factory.loadModel(model, info.getImports());
+		final IModelInfo lmodel = factory.loadModel(model, info.getImports());
 		
 		if(name!=null && name.indexOf('@')!=-1)
 		{
@@ -256,7 +256,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 	protected void createComponentInstance(String config, Map args,
 		boolean suspend, Future ret,
 		final IResultListener resultlistener, IComponentFactory factory,
-		ILoadableComponentModel lmodel, final ComponentIdentifier cid,
+		IModelInfo lmodel, final ComponentIdentifier cid,
 		JadeAgentAdapter adapter, JadeAgentAdapter pad,
 		CMSComponentDescription ad, IExternalAccess parent)
 	{

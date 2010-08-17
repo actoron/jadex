@@ -100,9 +100,9 @@ public abstract class EACapabilityFlyweight extends ElementFlyweight implements 
 	 *  Get the parent (if any).
 	 *  @return The parent.
 	 */
-	public IExternalAccess	getParent()
+	public IComponentIdentifier	getParent()
 	{
-		return getInterpreter().getParent();
+		return getInterpreter().getParent().getComponentIdentifier();
 	}
 
 	/**

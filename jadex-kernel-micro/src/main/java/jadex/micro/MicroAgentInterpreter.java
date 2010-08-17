@@ -10,7 +10,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.ILoadableComponentModel;
+import jadex.bridge.IModelInfo;
 import jadex.bridge.IMessageAdapter;
 import jadex.commons.ChangeEvent;
 import jadex.commons.Future;
@@ -43,7 +43,7 @@ public class MicroAgentInterpreter implements IComponentInstance
 	protected IComponentAdapter	adapter;
 	
 	/** The micro agent model. */
-	protected MicroAgentModel model;
+	protected IModelInfo model;
 	
 	/** The micro agent. */
 	protected MicroAgent microagent;
@@ -83,7 +83,7 @@ public class MicroAgentInterpreter implements IComponentInstance
 	 *  @param microagent The microagent.
 	 */
 	public MicroAgentInterpreter(IComponentDescription desc, IComponentAdapterFactory factory, 
-		final MicroAgentModel model, final Map arguments, final String config, 
+		final IModelInfo model, Class microclass, final Map arguments, final String config, 
 		final IExternalAccess parent, final Future inited)
 	{
 		this.model = model;
@@ -125,7 +125,8 @@ public class MicroAgentInterpreter implements IComponentInstance
 		
 		try
 		{
-			microagent = (MicroAgent)model.getMicroAgentClass().newInstance();
+//			microagent = (MicroAgent)model.getMicroAgentClass().newInstance();
+			microagent = (MicroAgent)microclass.newInstance();
 			microagent.init(MicroAgentInterpreter.this);
 			
 			// Schedule initial step.
@@ -349,7 +350,7 @@ public class MicroAgentInterpreter implements IComponentInstance
 	 *  The current subcomponents can be accessed by IComponentAdapter.getSubcomponents().
 	 *  @param comp	The newly created component.
 	 */
-	public void	componentCreated(IComponentDescription desc, ILoadableComponentModel model)
+	public void	componentCreated(IComponentDescription desc, IModelInfo model)
 	{
 	}
 	
@@ -599,7 +600,7 @@ public class MicroAgentInterpreter implements IComponentInstance
 	 *  Get the agent model.
 	 *  @return The model.
 	 */
-	public MicroAgentModel getAgentModel()
+	public IModelInfo getAgentModel()
 	{
 		return model;
 	}

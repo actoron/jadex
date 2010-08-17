@@ -45,7 +45,7 @@ public interface IComponentInstance
 	 *  @param comp	The newly created component.
 	 */
 	// todo: Use parent->child creation config information instead of model (e.g. role in AGR!?)
-	public void	componentCreated(IComponentDescription desc, ILoadableComponentModel model);
+	public void	componentCreated(IComponentDescription desc, IModelInfo model);
 
 	/**
 	 *  Called when a subcomponent of this component has been destroyed.

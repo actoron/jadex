@@ -1,8 +1,8 @@
 package jadex.bpmn.model;
 
 import jadex.bridge.IArgument;
-import jadex.bridge.ILoadableComponentModel;
-import jadex.bridge.IReport;
+import jadex.bridge.IModelInfo;
+import jadex.bridge.ModelInfo;
 import jadex.commons.ICacheableModel;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
@@ -20,7 +20,7 @@ import java.util.StringTokenizer;
 /**
  *  Java representation of a bpmn model for xml description.
  */
-public class MBpmnModel extends MAnnotationElement implements ICacheableModel, ILoadableComponentModel
+public class MBpmnModel extends MAnnotationElement implements ICacheableModel//, ILoadableComponentModel
 {
 	//-------- constants --------
 	
@@ -97,16 +97,7 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel, I
 	
 	/** The messages. */
 	protected List messages;
-	
-	/** The name of the model. */
-	protected String name;
-	
-	/** The description. */
-	protected String description;
-	
-	/** The properties. */
-	protected Map properties;
-	
+			
 	//-------- init structures --------
 	
 	/** The cached edges of the model. */
@@ -125,26 +116,35 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel, I
 	protected Map allmessagingedges;
 	
 	//-------- added structures --------
+
+//	/** The name of the model. */
+//	protected String name;
 	
-	/** The package. */
-	protected String packagename;
+//	/** The package. */
+//	protected String packagename;
 	
+//	/** The description. */
+//	protected String description;
+	
+//	/** The properties. */
+//	protected Map properties;
+
 	/** The imports. */
 	protected List imports;
 	
 	/** The context variables (name -> [class, initexpression]). */
 	protected Map	variables;
 	
-	/** The arguments. */
-	protected List arguments;
-	
-	/** The results. */
-	protected List results;
+//	/** The arguments. */
+//	protected List arguments;
+//	
+//	/** The results. */
+//	protected List results;
 	
 	//-------- model management --------
 	
-	/** The filename. */
-	protected String filename;
+//	/** The filename. */
+//	protected String filename;
 	
 	/** The last modified date. */
 	protected long lastmodified;
@@ -152,11 +152,38 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel, I
 	/** The last check date. */
 	protected long lastchecked;
 	
-	/** The classloader. */
-	protected ClassLoader classloader;
+//	/** The classloader. */
+//	protected ClassLoader classloader;
+	
+	/** The model info. */
+	protected ModelInfo modelinfo;
 	
 	//-------- methods --------
 
+	/**
+	 *  Create a new model.
+	 */
+	public MBpmnModel()
+	{
+		this.modelinfo = new ModelInfo();
+	}
+	
+	/**
+	 *  Init the model info.
+	 */
+	public void initModelInfo()
+	{
+		List names = new ArrayList();
+		for(Iterator it=getAllActivities().values().iterator(); it.hasNext(); )
+		{
+			names.add(((MActivity)it.next()).getBreakpointId());
+		}
+		addProperty("debugger.breakpoints", names);
+
+		modelinfo.setConfigurations(getConfigurations());
+		modelinfo.setStartable(true);
+	}
+	
 	/**
 	 *  Get the pools.
 	 *  @return The pools.
@@ -601,7 +628,7 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel, I
 	 */
 	public String	getName()
 	{
-		return name;
+		return modelinfo.getName();
 	}
 	
 	/**
@@ -610,18 +637,18 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel, I
 	 */
 	public void	setName(String name)
 	{
-		this.name = name;
+		modelinfo.setName(name);
 	}
 	
 	/**
 	 *  Get the full model name (package.name)
 	 *  @return The full name.
-	 */
+	 * /
 	public String getFullName()
 	{
 		String pkg = getPackage();
 		return pkg!=null && pkg.length()>0? pkg+"."+getName(): getName();
-	}
+	}*/
 	
 	/**
 	 *  Get all start activities of the model.
@@ -653,8 +680,8 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel, I
 	public String[] getAllImports()
 	{
 		List ret = new ArrayList();
-		if(getPackage()!=null)
-			ret.add(getPackage()+".*");
+		if(modelinfo.getPackage()!=null)
+			ret.add(modelinfo.getPackage()+".*");
 		if(imports!=null)
 			ret.addAll(imports);
 		return (String[])ret.toArray(new String[ret.size()]);
@@ -683,11 +710,11 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel, I
 	/**
 	 *  Get the package name.
 	 *  @return The package name.
-	 */
+	 * /
 	public String getPackage()
 	{
-		return packagename;
-	}
+		return modelinfo.getPackage();
+	}*/
 	
 	/**
 	 *  Set the package name.
@@ -695,7 +722,7 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel, I
 	 */
 	public void setPackage(String packagename)
 	{
-		this.packagename = packagename;
+		modelinfo.setPackage(packagename);
 	}
 
 	/**
@@ -801,15 +828,14 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel, I
 		return (IParsedExpression)((Object[])variables.get(name))[1];
 	}
 
-	
 	/**
 	 *  Get the filename.
 	 *  @return The filename.
-	 */
+	 * /
 	public String getFilename()
 	{
-		return this.filename;
-	}
+		return modelinfo.getFilename();
+	}*/
 
 	/**
 	 *  Set the filename.
@@ -817,7 +843,7 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel, I
 	 */
 	public void setFilename(String filename)
 	{
-		this.filename = filename;
+		modelinfo.setFilename(filename);
 	}
 
 	/**
@@ -860,7 +886,7 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel, I
 	 *  Get the configurations.
 	 *  @return The configuration.
 	 */
-	public String[] getConfigurations()
+	protected String[] getConfigurations()
 	{
 		// Todo: more in configuration than just pools/lanes?
 		String[]	ret;
@@ -906,14 +932,14 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel, I
 		return ret;
 	}
 	
-	/**
-	 *  Is the model startable.
-	 *  @return True, if startable.
-	 */
-	public boolean isStartable()
-	{
-		return true;
-	}
+//	/**
+//	 *  Is the model startable.
+//	 *  @return True, if startable.
+//	 */
+//	public boolean isStartable()
+//	{
+//		return true;
+//	}
 	
 	/**
 	 *  Set the description.
@@ -921,20 +947,20 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel, I
 	 */
 	public void setDescription(String description)
 	{
-		this.description = description;
+		modelinfo.setDescription(description);
 	}
 	
 	/**
 	 *  Get the model description.
 	 *  @return The model description.
-	 */
+	 * /
 	public String getDescription()
 	{
 		// todo: implement me
 		// use description from artifact, or from property field of special editor
 		
-		return description;
-	}
+		return modelinfo.getDescription();
+	}*/
 	
 	/**
 	 *  Add an argument.
@@ -942,53 +968,33 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel, I
 	 */
 	public void addArgument(IArgument argument)
 	{
-		if(arguments==null)
-			arguments = new ArrayList();
-		arguments.add(argument);
+		modelinfo.addArgument(argument);
 	}
 	
 	/**
 	 *  Get the arguments.
 	 *  @return The arguments.
-	 */
+	 * /
 	public IArgument[] getArguments()
 	{		
-		return arguments==null? new IArgument[0]: (IArgument[])arguments.toArray(new IArgument[arguments.size()]);
-	}
+		return modelinfo.getArguments();
+	}*/
 	
 	/**
 	 *  Get the report.
 	 *  @return The report.
-	 */
+	 * /
 	public IReport getReport()
 	{
-		// todo: 
-		
-		return new IReport()
-		{
-			public Map getDocuments()
-			{
-				return null;
-			}
-			
-			public boolean isEmpty()
-			{
-				return true;
-			}
-			
-			public String toHTMLString()
-			{
-				return "";
-			}
-		};
-	}
+		return modelinfo.getReport();
+	}*/
 
 	/**
 	 *  Get the properties.
 	 *  Arbitrary properties that can e.g. be used to
 	 *  define kernel-specific settings to configure tools. 
 	 *  @return The properties.
-	 */
+	 * /
 	public Map	getProperties()
 	{
 		if(properties==null)
@@ -1003,28 +1009,23 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel, I
 			this.properties	= props;
 		}
 		return this.properties;
-	}
+	}*/
 
 	/**
 	 *  Add a property.
 	 */
 	public void	addProperty(String name, Object value)
 	{
-		if(properties==null)
-		{
-			Map	props	= new HashMap();
-			props.put(name, value);
-			this.properties	= props;
-		}
+		modelinfo.addProperty(name, value);
 	}
 
 	/**
 	 *  Return the class loader corresponding to the micro agent class.
-	 */
+	 * /
 	public ClassLoader getClassLoader()
 	{
-		return classloader;
-	}
+		return modelinfo.getClassLoader();
+	}*/
 	
 	/**
 	 *  Add a result.
@@ -1032,19 +1033,17 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel, I
 	 */
 	public void addResult(IArgument result)
 	{
-		if(results==null)
-			results = new ArrayList();
-		results.add(result);
+		modelinfo.addResult(result);
 	}
 	
 	/**
 	 *  Get the results.
 	 *  @return The results.
-	 */
+	 * /
 	public IArgument[] getResults()
 	{
-		return results==null? new IArgument[0]: (IArgument[])results.toArray(new IArgument[results.size()]);
-	}
+		return modelinfo.getResults();
+	}*/
 
 	/**
 	 *  Set the classloader.
@@ -1052,6 +1051,15 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel, I
 	 */
 	public void setClassloader(ClassLoader classloader)
 	{
-		this.classloader = classloader;
+		modelinfo.setClassloader(classloader);
+	}
+	
+	/**
+	 *  Get the model info.
+	 *  @return The model info.
+	 */
+	public IModelInfo getModelInfo()
+	{
+		return modelinfo;
 	}
 }

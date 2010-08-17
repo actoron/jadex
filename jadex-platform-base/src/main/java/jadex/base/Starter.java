@@ -8,7 +8,7 @@ import jadex.bridge.IComponentAdapterFactory;
 import jadex.bridge.IComponentFactory;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
-import jadex.bridge.ILoadableComponentModel;
+import jadex.bridge.IModelInfo;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.SReflect;
@@ -122,7 +122,7 @@ public class Starter
 			// after loading the first component model.
 			IComponentFactory cfac = (IComponentFactory)cfclass.getConstructor(new Class[]{Object.class})
 				.newInstance(new Object[]{"rootid"});
-			ILoadableComponentModel model = cfac.loadModel(configfile, null, cl);
+			IModelInfo model = cfac.loadModel(configfile, null, cl);
 	//		System.out.println("Model: "+model);
 			
 			// Create an instance of the component.

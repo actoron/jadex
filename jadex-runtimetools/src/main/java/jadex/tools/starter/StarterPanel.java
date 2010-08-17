@@ -3,7 +3,7 @@ package jadex.tools.starter;
 import jadex.base.SComponentFactory;
 import jadex.bridge.IArgument;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.ILoadableComponentModel;
+import jadex.bridge.IModelInfo;
 import jadex.bridge.IReport;
 import jadex.commons.FixedJComboBox;
 import jadex.commons.Properties;
@@ -75,7 +75,7 @@ public class StarterPanel extends JPanel
 	//-------- attributes --------
 
 	/** The model. */
-	protected ILoadableComponentModel model;
+	protected IModelInfo model;
 	
 	/** The error (last loading). */
 	protected String error;
@@ -278,7 +278,7 @@ public class StarterPanel extends JPanel
 								String typename = /*ac!=null? ac.getComponentType(filename.getText()):*/ filename.getText();
 								final String fullname = model.getPackage()+"."+model.getName();
 								IResultListener killlistener = null;
-								final ILoadableComponentModel mymodel = model;
+								final IModelInfo mymodel = model;
 								if(storeresults!=null && storeresults.isSelected())
 								{
 									killlistener = new SwingDefaultResultListener(StarterPanel.this)
@@ -554,7 +554,7 @@ public class StarterPanel extends JPanel
 						{
 							public void customResultAvailable(Object source, Object result)
 							{
-								model = (ILoadableComponentModel)result;
+								model = (IModelInfo)result;
 								updateGuiForNewModel(adf);
 							}
 							

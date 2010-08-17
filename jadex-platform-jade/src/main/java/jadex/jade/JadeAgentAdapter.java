@@ -13,7 +13,7 @@ import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IComponentManagementService;
-import jadex.bridge.ILoadableComponentModel;
+import jadex.bridge.IModelInfo;
 import jadex.bridge.MessageFailureException;
 import jadex.bridge.MessageType;
 import jadex.commons.ICommand;
@@ -62,7 +62,7 @@ public class JadeAgentAdapter extends Agent implements IComponentAdapter, Serial
 	protected IComponentInstance	agent;
 	
 	/** The component model. */
-	protected ILoadableComponentModel model;
+	protected IModelInfo model;
 	
 	/** The description holding the execution state of the component
 	 *  (read only! managed by component execution service). */
@@ -249,7 +249,7 @@ public class JadeAgentAdapter extends Agent implements IComponentAdapter, Serial
 	 *  Set the component.
 	 *  @param component The component to set.
 	 */
-	public void setComponent(IComponentInstance component, ILoadableComponentModel model)
+	public void setComponent(IComponentInstance component, IModelInfo model)
 	{
 		this.agent = component;
 		this.model = model;

@@ -14,7 +14,7 @@ public interface IComponentAdapterFactory
 	 *  @param parent The external access of the component's parent.
 	 *  @return The component adapter.
 	 */
-	public IComponentAdapter createComponentAdapter(IComponentDescription desc, ILoadableComponentModel model, IComponentInstance instance, IExternalAccess parent);
+	public IComponentAdapter createComponentAdapter(IComponentDescription desc, IModelInfo model, IComponentInstance instance, IExternalAccess parent);
 	
 	/**
 	 *  Execute a step of the component via triggering the adapter.

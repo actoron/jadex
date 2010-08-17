@@ -1,6 +1,6 @@
 package jadex.gpmn;
 
-import jadex.bridge.ILoadableComponentModel;
+import jadex.bridge.IModelInfo;
 import jadex.commons.AbstractModelLoader;
 import jadex.commons.ICacheableModel;
 import jadex.commons.ResourceInfo;
@@ -32,9 +32,9 @@ public class GpmnModelLoader extends AbstractModelLoader
 	 *  @param name	The filename or logical name (resolved via imports and extensions).
 	 *  @param imports	The imports, if any.
 	 */
-	public ILoadableComponentModel	loadGpmnModel(String name, String[] imports, ClassLoader classloader) throws Exception
+	public IModelInfo	loadGpmnModel(String name, String[] imports, ClassLoader classloader) throws Exception
 	{
-		return (ILoadableComponentModel)loadModel(name, FILE_EXTENSION_GPMN, imports, classloader);
+		return (IModelInfo)loadModel(name, FILE_EXTENSION_GPMN, imports, classloader);
 	}
 	
 	//-------- AbstractModelLoader methods --------

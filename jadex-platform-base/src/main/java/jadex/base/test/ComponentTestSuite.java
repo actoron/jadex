@@ -5,7 +5,7 @@ import jadex.base.Starter;
 import jadex.bridge.IArgument;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.ILoadableComponentModel;
+import jadex.bridge.IModelInfo;
 import jadex.commons.ISuspendable;
 import jadex.commons.ThreadSuspendable;
 import jadex.service.SServiceProvider;
@@ -79,7 +79,7 @@ public class ComponentTestSuite extends TestSuite
 				{
 					if(((Boolean)SComponentFactory.isLoadable(rootcomp.getServiceProvider(), abspath).get(ts)).booleanValue())
 					{
-						ILoadableComponentModel model = (ILoadableComponentModel)SComponentFactory.loadModel(rootcomp.getServiceProvider(), abspath).get(ts);
+						IModelInfo model = (IModelInfo)SComponentFactory.loadModel(rootcomp.getServiceProvider(), abspath).get(ts);
 						boolean istest = false;
 						if(model!=null && model.getReport().isEmpty())
 						{

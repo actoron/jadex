@@ -8,21 +8,7 @@ import java.util.Collection;
  *  Interface for service providers.
  */
 public interface IServiceProvider
-{
-	/**
-	 *  Get one service of a type.
-	 *  @param type The class.
-	 *  @return The corresponding service.
-	 */
-//	public IFuture getService(Class type);
-	
-	/**
-	 *  Get all services of a type.
-	 *  @param type The class.
-	 *  @return The corresponding services.
-	 */
-//	public IFuture getServices(Class type);
-	
+{	
 	/**
 	 *  Get all services of a type.
 	 *  @param type The class.

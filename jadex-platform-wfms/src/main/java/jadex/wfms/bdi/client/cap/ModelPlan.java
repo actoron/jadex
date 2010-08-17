@@ -5,7 +5,7 @@ import jadex.base.fipa.IDF;
 import jadex.bdi.runtime.IGoal;
 import jadex.bpmn.BpmnModelLoader;
 import jadex.bpmn.model.MBpmnModel;
-import jadex.bridge.ILoadableComponentModel;
+import jadex.bridge.IModelInfo;
 import jadex.gpmn.GpmnModelLoader;
 import jadex.service.SServiceProvider;
 import jadex.service.library.ILibraryService;
@@ -31,7 +31,7 @@ public class ModelPlan extends AbstractWfmsPlan
 		dispatchSubgoalAndWait(reqMGoal);
 		Done done = (Done) reqMGoal.getParameter("result").getValue();
 		reqM = (RequestModel) done.getAction();
-		ILoadableComponentModel model = null;
+		IModelInfo model = null;
 		try
 		{
 			if ((reqM.getFileName().endsWith(".bpmn")) || (reqM.getFileName().endsWith(".gpmn")))

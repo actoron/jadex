@@ -1,7 +1,12 @@
 package jadex.application.model;
 
 import jadex.bridge.Argument;
+import jadex.bridge.ModelInfo;
+import jadex.commons.ICacheableModel;
+import jadex.commons.IFuture;
+import jadex.commons.SReflect;
 import jadex.commons.SUtil;
+import jadex.javaparser.IParsedExpression;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,15 +14,9 @@ import java.util.List;
 /**
  *  Application type representation.
  */
-public class MApplicationType
+public class MApplicationType implements ICacheableModel
 {
 	//-------- attributes --------
-	
-	/** The name. */
-	protected String name;
-	
-	/** The package. */
-	protected String packagename;
 	
 	/** The autoshutdown flag. */
 	protected boolean autoshutdown;
@@ -34,23 +33,41 @@ public class MApplicationType
 	/** The list of contained application descriptions. */
 	protected List applications;
 	
-	/** The description. */
-	protected String description;
-	
-	/** The arguments. */
-	protected List arguments;
-	
-	/** The results. */
-	protected List results;
-	
 	/** The services. */
 	protected List services;
 	
 	/** The service container. */
 	protected MExpressionType container;
 	
-	/** The properties. */
-	protected List properties;
+//	/** The name. */
+//	protected String name;
+//	
+//	/** The package. */
+//	protected String packagename;
+//	
+//	/** The description. */
+//	protected String description;
+//	
+//	/** The arguments. */
+//	protected List arguments;
+//	
+//	/** The results. */
+//	protected List results;
+//	
+//	/** The properties. */
+//	protected List properties;
+	
+	/** The last modified date. */
+	protected long lastmodified;
+	
+	/** The last check date. */
+	protected long lastchecked;
+
+	/** The property list. */
+	protected List propertylist;
+	
+	/** The model info. */
+	protected ModelInfo modelinfo;
 	
 	//-------- constructors --------
 	
@@ -63,11 +80,57 @@ public class MApplicationType
 		this.spacetypes = new ArrayList();
 		this.componenttypes = new ArrayList();
 		this.applications = new ArrayList();
-		this.arguments = new ArrayList();
-		this.results = new ArrayList();
+//		this.arguments = new ArrayList();
+//		this.results = new ArrayList();
 		this.services = new ArrayList();
-		this.properties = new ArrayList();
+//		this.properties = new ArrayList();
 		this.autoshutdown = true;
+		this.modelinfo = new ModelInfo();
+	}
+	
+	/**
+	 *  Init the model info.
+	 */
+	public void initModelInfo()
+	{
+		// todo: breakpoints?!
+//		List names = new ArrayList();
+//		modelinfo.addProperty("debugger.breakpoints", names);
+
+		List apps = getMApplicationInstances();
+		String[] configs = new String[apps.size()];
+		for(int i=0; i<configs.length; i++)
+		{
+			configs[i] = ((MApplicationInstance)apps.get(i)).getName();
+		}
+		modelinfo.setConfigurations(configs);
+		
+		if(propertylist!=null)
+		{
+			for(int i=0; i<propertylist.size(); i++)
+			{
+				MExpressionType	mexp	= (MExpressionType)propertylist.get(i);
+				Class	clazz	= mexp.getClazz();
+				// Ignore future properties, which are evaluated at component instance startup time.
+				if(clazz==null || !SReflect.isSupertype(IFuture.class, clazz))
+				{
+					IParsedExpression	pex = mexp.getParsedValue();
+					try
+					{
+						Object	value	= pex.getValue(null);
+						modelinfo.addProperty(mexp.getName(), value);
+					}
+					catch(Exception e)
+					{
+						// Hack!!! Exception should be propagated.
+						System.err.println(pex.getExpressionText());
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+		
+		modelinfo.setStartable(true);
 	}
 	
 	//-------- methods --------
@@ -75,11 +138,11 @@ public class MApplicationType
 	/**
 	 *  Get the name.
 	 *  @return The name.
-	 */
+	 * /
 	public String getName()
 	{
 		return this.name;
-	}
+	}*/
 
 	/**
 	 *  Set the name.
@@ -87,17 +150,17 @@ public class MApplicationType
 	 */
 	public void setName(String name)
 	{
-		this.name = name;
+		modelinfo.setName(name);
 	}
 	
 	/**
 	 *  Get the package name.
 	 *  @return The package name.
-	 */
+	 * /
 	public String getPackage()
 	{
 		return this.packagename;
-	}
+	}*/
 
 	/**
 	 *  Set the package.
@@ -105,17 +168,17 @@ public class MApplicationType
 	 */
 	public void setPackage(String packagename)
 	{
-		this.packagename = packagename;
+		modelinfo.setPackage(packagename);
 	}
 	
 	/**
 	 *  Get the model description.
 	 *  @return The model description.
-	 */
+	 * /
 	public String getDescription()
 	{
 		return description;
-	}
+	}*/
 	
 	/**
 	 *  Set the description.
@@ -123,9 +186,63 @@ public class MApplicationType
 	 */
 	public void setDescription(String description)
 	{
-		this.description = description;
+		modelinfo.setDescription(description);
 	}
 	
+	/**
+	 *  Set the filename.
+	 *  @param filename The filename.
+	 */
+	public void setFilename(String filename)
+	{
+		modelinfo.setFilename(filename);
+	}
+	
+	/**
+	 *  Get the propertylist.
+	 *  @return the propertylist.
+	 */
+	public List getPropertyList()
+	{
+		return propertylist;
+	}
+
+	/**
+	 *  Get the lastmodified.
+	 *  @return the lastmodified.
+	 */
+	public long getLastModified()
+	{
+		return lastmodified;
+	}
+
+	/**
+	 *  Set the lastmodified.
+	 *  @param lastmodified The lastmodified to set.
+	 */
+	public void setLastModified(long lastmodified)
+	{
+		this.lastmodified = lastmodified;
+	}
+
+	/**
+	 *  Get the lastchecked.
+	 *  @return the lastchecked.
+	 */
+	public long getLastChecked()
+	{
+		return lastchecked;
+	}
+
+	/**
+	 *  Set the lastchecked.
+	 *  @param lastchecked The lastchecked to set.
+	 */
+	public void setLastChecked(long lastchecked)
+	{
+		this.lastchecked = lastchecked;
+	}
+
 	/**
 	 *  Get the autoshutdown.
 	 *  @return The autoshutdown.
@@ -186,7 +303,7 @@ public class MApplicationType
 	 */
 	public void addArgument(Argument argument)
 	{
-		this.arguments.add(argument);
+		modelinfo.addArgument(argument);
 	}
 	
 	/**
@@ -195,7 +312,7 @@ public class MApplicationType
 	 */
 	public void addResult(Argument result)
 	{
-		this.results.add(result);
+		modelinfo.addResult(result);
 	}
 	
 	/**
@@ -213,23 +330,25 @@ public class MApplicationType
 	 */
 	public void addProperty(MExpressionType property)
 	{
-		this.properties.add(property);
+		if(propertylist!=null)
+			propertylist = new ArrayList();
+		propertylist.add(property);
 	}
 	
 	/**
 	 *  Get the arguments.
 	 *  @return The arguments.
-	 */
+	 * /
 	public List getArguments()
 	{
 		return this.arguments;
-	}
+	}*/
 	
 	/**
 	 *  Get an argument per name.
 	 *  @param name The name.
 	 *  @return The argument.
-	 */
+	 * /
 	public Argument getArgument(String name)
 	{
 		Argument ret = null;
@@ -240,16 +359,16 @@ public class MApplicationType
 				ret = tmp;
 		}
 		return ret;
-	}
+	}*/
 
 	/**
 	 *  Get the results.
 	 *  @return The results.
-	 */
+	 * /
 	public List getResults()
 	{
 		return this.results;
-	}
+	}*/
 
 	/**
 	 *  Get the imports.
@@ -331,10 +450,10 @@ public class MApplicationType
 		
 		if(imports!=null)
 		{
-			if(packagename!=null)
+			if(modelinfo.getPackage()!=null)
 			{
 				ret = new String[imports.size()+1];
-				ret[imports.size()] = packagename+".*";
+				ret[imports.size()] = modelinfo.getPackage()+".*";
 			}
 			else
 			{
@@ -343,9 +462,9 @@ public class MApplicationType
 			for(int i=0; i<imports.size(); i++)
 				ret[i] = (String)imports.get(i);
 		}
-		else if(packagename!=null)
+		else if(modelinfo.getPackage()!=null)
 		{
-			ret = new String[]{packagename+".*"};
+			ret = new String[]{modelinfo.getPackage()+".*"};
 		}
 		
 		return ret;
@@ -381,9 +500,27 @@ public class MApplicationType
 	/**
 	 *  Get the properties.
 	 *  @return The properties.
-	 */
+	 * /
 	public List getProperties()
 	{
 		return this.properties;
+	}*/
+	
+	/**
+	 *  Set the classloader.
+	 *  @param classloader The classloader.
+	 */
+	public void setClassloader(ClassLoader classloader)
+	{
+		modelinfo.setClassloader(classloader);
+	}
+	
+	/**
+	 *  Get the modelinfo.
+	 *  @return the modelinfo.
+	 */
+	public ModelInfo getModelInfo()
+	{
+		return modelinfo;
 	}
 }

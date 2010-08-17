@@ -1,7 +1,7 @@
 package jadex.gpmn.model;
 
 import jadex.bridge.IArgument;
-import jadex.bridge.ILoadableComponentModel;
+import jadex.bridge.IModelInfo;
 import jadex.bridge.IReport;
 import jadex.commons.ICacheableModel;
 import jadex.commons.SReflect;
@@ -16,7 +16,7 @@ import java.util.Map;
 /**
  *  Java representation of a bpmn model for xml description.
  */
-public class MGpmnModel extends MProcess implements ICacheableModel, ILoadableComponentModel
+public class MGpmnModel extends MProcess implements ICacheableModel, IModelInfo
 {
 	//-------- attributes --------
 	
