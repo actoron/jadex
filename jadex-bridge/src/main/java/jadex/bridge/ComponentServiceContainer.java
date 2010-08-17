@@ -2,19 +2,12 @@ package jadex.bridge;
 
 import jadex.commons.Future;
 import jadex.commons.IFuture;
-import jadex.commons.SReflect;
 import jadex.commons.concurrent.CollectionResultListener;
 import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.service.BasicServiceContainer;
-import jadex.service.IServiceProvider;
 import jadex.service.SServiceProvider;
-import jadex.service.clock.IClockService;
-
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
 
 /**
  *  Service container for active components.

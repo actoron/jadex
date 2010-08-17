@@ -26,7 +26,6 @@ import jadex.xml.XMLInfo;
 import jadex.xml.bean.BeanObjectReaderHandler;
 import jadex.xml.reader.Reader;
 
-import java.io.File;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -90,12 +89,7 @@ public class ApplicationXMLReader
 		
 		ret.setFilename(rinfo.getFilename());
 		ret.setLastModified(rinfo.getLastModified());
-		ret.setFilename(rinfo.getFilename());
-		ret.setLastModified(rinfo.getLastModified());
 		ret.setClassloader(classloader);
-		String name = new File(rinfo.getFilename()).getName();
-		name = name.substring(0, name.length()-5);
-		ret.setName(name);	
 		ret.initModelInfo();
 		
 		rinfo.getInputStream().close();

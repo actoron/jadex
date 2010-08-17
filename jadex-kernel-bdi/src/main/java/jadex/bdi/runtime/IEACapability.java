@@ -1,7 +1,6 @@
 package jadex.bdi.runtime;
 
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IExternalAccess;
 import jadex.commons.IFuture;
 import jadex.service.IServiceProvider;
 

@@ -531,7 +531,7 @@ public class ControlCenter implements IControlCenter
 			}
 			catch(Exception e)
 			{
-				// e.printStackTrace();
+				 e.printStackTrace();
 				plugin.reset();
 				final String failed = SUtil.wrapText("Error applying settings to plugin "
 					+ plugin.getName() + "\n\n" + e.getMessage());

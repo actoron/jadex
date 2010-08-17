@@ -5,7 +5,6 @@ import jadex.bridge.CreationInfo;
 import jadex.bridge.IArgument;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
-import jadex.bridge.IExternalAccess;
 import jadex.commons.Future;
 import jadex.commons.ICommand;
 import jadex.commons.IFuture;
@@ -21,7 +20,6 @@ import jadex.xml.bean.JavaReader;
 import jadex.xml.bean.JavaWriter;
 
 import java.net.DatagramPacket;
-import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.util.HashMap;

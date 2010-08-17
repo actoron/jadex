@@ -10,7 +10,6 @@ import jadex.commons.ThreadSuspendable;
 import jadex.commons.TreeExpansionHandler;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IExecutable;
-import jadex.commons.concurrent.IThreadPool;
 import jadex.commons.concurrent.LoadManagingExecutionService;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.service.IServiceContainer;
@@ -31,7 +30,6 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
-import java.lang.reflect.Proxy;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -255,41 +253,43 @@ public class ModelExplorer extends JTree
 		});
 		ToolTipManager.sharedInstance().registerComponent(this);
 		
-		SServiceProvider.getService(container, ILibraryService.class).addResultListener(new DefaultResultListener()
-		{
-			public void resultAvailable(Object source, Object result)
-			{
-				ILibraryService ls = (ILibraryService)result;
-				ls.addLibraryServiceListener(new ILibraryServiceListener()
-				{
-					public void urlAdded(URL url)
-					{
-					}
-					public void urlRemoved(URL url)
-					{
-						List cs = getRootNode().getChildren();
-						for(int i=0; cs!=null && i<cs.size(); i++)
-						{
-							try
-							{
-								FileNode fn = (FileNode)cs.get(i);
-								URL furl = fn.getFile().toURI().toURL();
-								if(url.equals(furl))
-								{
-									int	index	= ((ModelExplorerTreeModel)getModel()).getIndexOfChild(root, fn);
-									getRootNode().removePathEntry(fn);
-									((ModelExplorerTreeModel)getModel()).fireNodeRemoved(getRootNode(), fn, index);
-								}
-							}
-							catch(Exception e)
-							{
-								e.printStackTrace();
-							}
-						}
-					}
-				});
-			}
-		});
+		// Todo: manual management of relationship between library and model explorer entries!?
+		// E.g. show missing library entry as warning
+//		SServiceProvider.getService(container, ILibraryService.class).addResultListener(new DefaultResultListener()
+//		{
+//			public void resultAvailable(Object source, Object result)
+//			{
+//				ILibraryService ls = (ILibraryService)result;
+//				ls.addLibraryServiceListener(new ILibraryServiceListener()
+//				{
+//					public void urlAdded(URL url)
+//					{
+//					}
+//					public void urlRemoved(URL url)
+//					{
+//						List cs = getRootNode().getChildren();
+//						for(int i=0; cs!=null && i<cs.size(); i++)
+//						{
+//							try
+//							{
+//								FileNode fn = (FileNode)cs.get(i);
+//								URL furl = fn.getFile().toURI().toURL();
+//								if(url.equals(furl))
+//								{
+//									int	index	= ((ModelExplorerTreeModel)getModel()).getIndexOfChild(root, fn);
+//									getRootNode().removePathEntry(fn);
+//									((ModelExplorerTreeModel)getModel()).fireNodeRemoved(getRootNode(), fn, index);
+//								}
+//							}
+//							catch(Exception e)
+//							{
+//								e.printStackTrace();
+//							}
+//						}
+//					}
+//				});
+//			}
+//		});
 		
 		addKeyListener(new KeyListener()
 		{
@@ -571,17 +571,17 @@ public class ModelExplorer extends JTree
 							e.printStackTrace();
 						}
 					}
-					
-					root.reset();
-					
-					SwingUtilities.invokeLater(new Runnable()
-					{
-						public void run()
-						{
-							refreshmenu.setSelected(refresh);
-							((ModelExplorerTreeModel)getModel()).fireTreeStructureChanged(root);
-						}
-					});
+				}
+			});
+			
+			root.reset();
+			
+			SwingUtilities.invokeLater(new Runnable()
+			{
+				public void run()
+				{
+					refreshmenu.setSelected(refresh);
+					((ModelExplorerTreeModel)getModel()).fireTreeStructureChanged(root);
 				}
 			});
 		}

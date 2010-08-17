@@ -120,6 +120,7 @@ public class StarterPanel extends JPanel
 	/** The component arguments. */
 	protected JPanel arguments;
 	protected List argelems;
+	protected String[]	argvals;	// loaded from jccproject.xml and kept until gui is refreshed asynchronously.
 	
 	/** The component results. */
 	protected JPanel results;
@@ -755,6 +756,13 @@ public class StarterPanel extends JPanel
 		
 //		System.out.println("setP: "+Thread.currentThread().getName());
 		
+		Property[]	aargs	= props.getProperties("argument");
+		this.argvals = new String[aargs.length];
+		for(int i=0; i<aargs.length; i++)
+		{
+			argvals[i] = aargs[i].getValue();
+		}
+
 		final String mo = props.getStringProperty("model");
 		if(mo!=null)
 		{
@@ -765,14 +773,6 @@ public class StarterPanel extends JPanel
 		}
 		setStartSuspended(props.getBooleanProperty("startsuspended"));
 
-		Property[]	aargs	= props.getProperties("argument");
-		String[] argvals = new String[aargs.length];
-		for(int i=0; i<aargs.length; i++)
-		{
-			argvals[i] = aargs[i].getValue();
-		}
-		setArguments(argvals);
-		
 		setAutoGenerate(props.getBooleanProperty("autogenerate"));
 	}
 
@@ -781,6 +781,7 @@ public class StarterPanel extends JPanel
 	 */
 	public void reset()
 	{
+		argvals	= null;
 		filename.setText("");
 		modeldesc.removeAll();
 		loadModel(null);
@@ -805,24 +806,24 @@ public class StarterPanel extends JPanel
 		}
 	}
 
-	/**
-	 *  Set the arguments.
-	 *  @param args The arguments.
-	 */
-	protected void setArguments(final String[] args)
-	{
-		if(args!=null && args.length>0)
-		{
-			if(arguments==null || argelems==null || arguments.getComponentCount()!=4*argelems.size())
-				return;
-			
-			for(int i=0; i<args.length; i++)
-			{
-				JTextField valt = (JTextField)arguments.getComponent(i*4+3);
-				valt.setText(args[i]);
-			}
-		}
-	}
+//	/**
+//	 *  Set the arguments.
+//	 *  @param args The arguments.
+//	 */
+//	protected void setArguments(final String[] args)
+//	{
+//		if(args!=null && args.length==argelems.size())
+//		{
+//			if(arguments==null || argelems==null || arguments.getComponentCount()!=4*argelems.size())
+//				return;
+//			
+//			for(int i=0; i<args.length; i++)
+//			{
+//				JTextField valt = (JTextField)arguments.getComponent(i*4+3);
+//				valt.setText(args[i]);
+//			}
+//		}
+//	}
 	
 	/**
 	 *  Refresh the argument values.
@@ -881,6 +882,7 @@ public class StarterPanel extends JPanel
 						argelems.add(args[i]);
 						createArgumentGui(args[i], i, ls);
 					}
+					argvals	= null;
 					
 					if(args.length>0)
 						arguments.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), " Arguments "));
@@ -1028,13 +1030,13 @@ public class StarterPanel extends JPanel
 	 *  @param arg The belief or belief reference.
 	 *  @param y The row number where to add.
 	 */
-	protected void createArgumentGui(final IArgument arg, final int y, ILibraryService ls)
+	protected void createArgumentGui(IArgument arg, int y, ILibraryService ls)
 	{
 		// todo:
 //		System.out.println("argument gui: "+arg+" "+model);
 		
 		JLabel namel = new JLabel(arg.getName());
-		final JValidatorTextField valt = new JValidatorTextField(15);
+		final JValidatorTextField valt = new JValidatorTextField(argvals!=null && argvals.length>y ? argvals[y] : "", 15);
 		valt.setValidator(new ParserValidator(ls.getClassLoader()));
 		
 		String configname = (String)config.getSelectedItem();

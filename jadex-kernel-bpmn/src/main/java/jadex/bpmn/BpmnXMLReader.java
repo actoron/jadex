@@ -102,8 +102,6 @@ public class BpmnXMLReader
 		
 		ret.setFilename(rinfo.getFilename());
 		ret.setLastModified(rinfo.getLastModified());
-		ret.setFilename(rinfo.getFilename());
-		ret.setLastModified(rinfo.getLastModified());
 		ret.setClassloader(classloader);
 		String name = new File(rinfo.getFilename()).getName();
 		name = name.substring(0, name.length()-5);
