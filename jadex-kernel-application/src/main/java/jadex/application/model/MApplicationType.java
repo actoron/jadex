@@ -330,7 +330,7 @@ public class MApplicationType implements ICacheableModel
 	 */
 	public void addProperty(MExpressionType property)
 	{
-		if(propertylist!=null)
+		if(propertylist==null)
 			propertylist = new ArrayList();
 		propertylist.add(property);
 	}

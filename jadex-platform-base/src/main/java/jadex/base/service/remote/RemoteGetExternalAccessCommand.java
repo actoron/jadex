@@ -2,18 +2,20 @@ package jadex.base.service.remote;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
+import jadex.bridge.IExternalAccess;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.collection.LRU;
 import jadex.commons.concurrent.IResultListener;
 import jadex.micro.IMicroExternalAccess;
+import jadex.service.IService;
 import jadex.service.SServiceProvider;
 
 import java.util.Collections;
 import java.util.Map;
 
 /**
- *  Command for performing a remote service search.
+ *  Command for getting a remote external access.
  */
 public class RemoteGetExternalAccessCommand implements IRemoteCommand
 {
@@ -77,7 +79,7 @@ public class RemoteGetExternalAccessCommand implements IRemoteCommand
 				{
 					public void resultAvailable(Object source, Object result)
 					{
-						ProxyInfo pi = getProxyInfo(component.getComponentIdentifier(), result);
+						ProxyInfo pi = getProxyInfo(component.getComponentIdentifier(), (IExternalAccess)result);
 						ret.setResult(new RemoteGetResultCommand(pi, null, callid));
 					}
 					
@@ -154,7 +156,7 @@ public class RemoteGetExternalAccessCommand implements IRemoteCommand
 	/**
 	 *  Get a proxy info for a component. 
 	 */
-	protected ProxyInfo getProxyInfo(IComponentIdentifier rms, Object target)
+	protected ProxyInfo getProxyInfo(IComponentIdentifier rms, IExternalAccess target)
 	{
 		ProxyInfo ret;
 		
@@ -171,7 +173,7 @@ public class RemoteGetExternalAccessCommand implements IRemoteCommand
 				ret = (ProxyInfo)proxyinfos.get(target);
 				if(ret==null)
 				{
-					ret = createExternalAccessProxyInfo(rms, target);
+					ret = createProxyInfo(rms, target);
 				}
 			}
 		}
@@ -180,41 +182,16 @@ public class RemoteGetExternalAccessCommand implements IRemoteCommand
 	}
 	
 	/**
-	 *  Create a proxy info for a component. 
+	 *  Create a proxy info for a service. 
 	 */
-	protected ProxyInfo createExternalAccessProxyInfo(IComponentIdentifier rms, Object target)
+	protected ProxyInfo createProxyInfo(IComponentIdentifier rms, IExternalAccess target)
 	{
 		ProxyInfo ret = new ProxyInfo(rms, cid, targetclass);
-	
-//		Method[] methods = targetclass.getMethods();
-//		for(int i=0; i<methods.length; i++)
-//		{
-//			Class rt = methods[i].getReturnType();
-//			Class[] ar = methods[i].getParameterTypes();
-//			if(rt!=null && !(rt.isAssignableFrom(IFuture.class)))
-//			{
-//				if(ar.length>0)
-//				{
-//					System.out.println("Warning, method is blocking: "+targetclass+" "+methods[i].getName());
-//				}
-//				else
-//				{
-//					// Invoke method to get constant return value.
-//					try
-//					{
-//						Object val = methods[i].invoke(target, new Object[0]);
-//						ret.putCache(methods[i].getName(), val);
-//					}
-//					catch(Exception e)
-//					{
-//						System.out.println("Warning, constant component method threw exception: "+targetclass+" "+methods[i]);
-////						e.printStackTrace();
-//					}
-//				}
-//			}
-//		}
-		
-		proxyinfos.put(target, ret);
+		RemoteSearchCommand.fillProxyInfo(ret, target, targetclass, target.getModel().getProperties());
 		return ret;
+//		System.out.println("Creating proxy for: "+type);
 	}
+	
+	
+	
 }

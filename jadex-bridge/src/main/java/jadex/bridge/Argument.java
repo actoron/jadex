@@ -173,6 +173,24 @@ public class Argument implements IArgument
 	}
 
 	/**
+	 *  Get the defaultvalues.
+	 *  @return the defaultvalues.
+	 */
+	public Map getDefaultValues()
+	{
+		return defaultvalues;
+	}
+
+	/**
+	 *  Set the defaultvalues.
+	 *  @param defaultvalues The defaultvalues to set.
+	 */
+	public void setDefaultValues(Map defaultvalues)
+	{
+		this.defaultvalues = defaultvalues;
+	}
+
+	/**
 	 *  Check the validity of an input.
 	 *  @param input The input.
 	 *  @return True, if valid.

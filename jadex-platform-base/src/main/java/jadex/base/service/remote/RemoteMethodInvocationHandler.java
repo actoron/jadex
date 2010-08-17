@@ -104,7 +104,7 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 		{
 //			Thread.dumpStack();
 			System.out.println("Warning, blocking method call: "+method.getDeclaringClass()
-				+" "+method.getName()+" "+Thread.currentThread()+" "+pi.getServiceIdentifier().getServiceType());
+				+" "+method.getName()+" "+Thread.currentThread()+" "+pi);
 			ret = future.get(new ThreadSuspendable());
 //			System.out.println("Resumed call: "+method.getName()+" "+ret);
 		}

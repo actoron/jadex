@@ -260,6 +260,7 @@ public class RemoteSearchCommand implements IRemoteCommand
 				if(ret==null)
 				{
 					ret = createProxyInfo(rms, service);
+					proxyinfos.put(service, ret);
 				}
 			}
 		}
@@ -272,65 +273,70 @@ public class RemoteSearchCommand implements IRemoteCommand
 	 */
 	protected ProxyInfo createProxyInfo(IComponentIdentifier rms, IService service)
 	{
-		Class type = service.getServiceIdentifier().getServiceType();
 		ProxyInfo ret = new ProxyInfo(rms, service.getServiceIdentifier());
-	
+		fillProxyInfo(ret, service, service.getServiceIdentifier().getServiceType(), service.getPropertyMap());
+		return ret;
 //		System.out.println("Creating proxy for: "+type);
-		
+	}
+	
+	/**
+	 *  Fill a proxy with method information.
+	 */
+	public static void fillProxyInfo(ProxyInfo pi, final Object target, Class targetclass, Map properties)
+	{
 		// Check for excluded and synchronous methods.
-		Object ex = service.getPropertyMap().get(RemoteServiceManagementService.REMOTE_EXCLUDED);
+		Object ex = properties.get(RemoteServiceManagementService.REMOTE_EXCLUDED);
 		if(ex!=null)
 		{
 			for(Iterator it = SReflect.getIterator(ex); it.hasNext(); )
 			{
-				ret.addExcludedMethod(getMethodInfo(it.next(), service, false));
+				pi.addExcludedMethod(getMethodInfo(it.next(), targetclass, false));
 			}
 		}
-		Object syn = service.getPropertyMap().get(RemoteServiceManagementService.REMOTE_SYNCHRONOUS);
+		Object syn = properties.get(RemoteServiceManagementService.REMOTE_SYNCHRONOUS);
 		if(syn!=null)
 		{
 			for(Iterator it = SReflect.getIterator(syn); it.hasNext(); )
 			{
-				ret.addSynchronousMethod(getMethodInfo(it.next(), service, false));
+				pi.addSynchronousMethod(getMethodInfo(it.next(), targetclass, false));
 			}
 		}
-		Object un = service.getPropertyMap().get(RemoteServiceManagementService.REMOTE_UNCACHED);
+		Object un = properties.get(RemoteServiceManagementService.REMOTE_UNCACHED);
 		if(un!=null)
 		{
 			for(Iterator it = SReflect.getIterator(un); it.hasNext(); )
 			{
-				ret.addUncachedMethod(getMethodInfo(it.next(), service, true));
+				pi.addUncachedMethod(getMethodInfo(it.next(), targetclass, true));
 			}
 		}
-		Object mr = service.getPropertyMap().get(RemoteServiceManagementService.REMOTE_METHODREPLACEMENT);
+		Object mr = properties.get(RemoteServiceManagementService.REMOTE_METHODREPLACEMENT);
 		if(mr!=null)
 		{
 			for(Iterator it = SReflect.getIterator(mr); it.hasNext(); )
 			{
 				Object[]	tmp	= (Object[])it.next();
-				ret.addMethodReplacement(getMethodInfo(tmp[0], service, true), (IMethodReplacement)tmp[1]);
+				pi.addMethodReplacement(getMethodInfo(tmp[0], targetclass, true), (IMethodReplacement)tmp[1]);
 			}
 		}
 		
 		// Add default replacement for equals() and hashCode().
 		Method	equals	= SReflect.getMethod(Object.class, "equals", new Class[]{Object.class});
-		if(ret.getMethodReplacement(equals)==null)
+		if(pi.getMethodReplacement(equals)==null)
 		{
-			ret.addMethodReplacement(getMethodInfo(equals, service, false), new DefaultEqualsMethodReplacement());
+			pi.addMethodReplacement(getMethodInfo(equals, targetclass, false), new DefaultEqualsMethodReplacement());
 		}
 		Method	hashcode	= SReflect.getMethod(Object.class, "hashCode", new Class[0]);
-		if(ret.getMethodReplacement(hashcode)==null)
+		if(pi.getMethodReplacement(hashcode)==null)
 		{
-			ret.addMethodReplacement(getMethodInfo(hashcode, service, true), new DefaultHashcodeMethodReplacement());
+			pi.addMethodReplacement(getMethodInfo(hashcode, targetclass, true), new DefaultHashcodeMethodReplacement());
 		}
 		
-		
 		// Check methods and possibly cache constant calls.
-		Method[] methods = type.getMethods();
+		Method[] methods = targetclass.getMethods();
 		methods	= (Method[])SUtil.joinArrays(methods, Object.class.getMethods());
 		for(int i=0; i<methods.length; i++)
 		{
-			if(!ret.isUncached(methods[i]) && !ret.isExcluded(methods[i])) // excluded methods are also not cached
+			if(!pi.isUncached(methods[i]) && !pi.isExcluded(methods[i])) // excluded methods are also not cached
 			{
 				Class rt = methods[i].getReturnType();
 				Class[] ar = methods[i].getParameterTypes();
@@ -351,27 +357,24 @@ public class RemoteSearchCommand implements IRemoteCommand
 						try
 						{
 //							System.out.println("Calling for caching: "+methods[i]);
-							Object val = methods[i].invoke(service, new Object[0]);
-							ret.putCache(methods[i].getName(), val);
+							Object val = methods[i].invoke(target, new Object[0]);
+							pi.putCache(methods[i].getName(), val);
 						}
 						catch(Exception e)
 						{
-							System.out.println("Warning, constant service method threw exception: "+type+" "+methods[i]);
+							System.out.println("Warning, constant service method threw exception: "+targetclass+" "+methods[i]);
 	//						e.printStackTrace();
 						}
 					}
 				}
 			}
 		}
-		
-		proxyinfos.put(service, ret);
-		return ret;
 	}
 	
 	/**
 	 *  Get method.
 	 */
-	protected MethodInfo getMethodInfo(Object tmp, IService service, boolean noargs)
+	public static MethodInfo getMethodInfo(Object tmp, Class targetclass, boolean noargs)
 	{
 		MethodInfo ret;
 		
@@ -379,7 +382,7 @@ public class RemoteSearchCommand implements IRemoteCommand
 		{
 			if(noargs)
 			{
-				Method	method	= SReflect.getMethod(service.getClass(), (String)tmp, new Class[0]);
+				Method	method	= SReflect.getMethod(targetclass, (String)tmp, new Class[0]);
 				if(method==null)
 					method	= SReflect.getMethod(Object.class, (String)tmp, new Class[0]);
 				
@@ -394,7 +397,7 @@ public class RemoteSearchCommand implements IRemoteCommand
 			}
 			else
 			{
-				Method[] ms = SReflect.getMethods(service.getClass(), (String)tmp);
+				Method[] ms = SReflect.getMethods(targetclass, (String)tmp);
 				if(ms.length==0)
 				{
 					ms = SReflect.getMethods(Object.class, (String)tmp);

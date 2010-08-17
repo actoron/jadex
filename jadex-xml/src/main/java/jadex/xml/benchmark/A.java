@@ -1,6 +1,7 @@
 package jadex.xml.benchmark;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class A
@@ -12,6 +13,8 @@ public class A
 	protected B b;
 	
 	protected List bs;
+	
+	protected Integer[] ints;
 	
 	public A()
 	{
@@ -64,7 +67,7 @@ public class A
 
 	public B[] getBs()
 	{
-		return (B[])(this.bs==null? new B[0]: this.bs.toArray(new B[0]));
+		return (B[])(this.bs==null? null: this.bs.toArray(new B[0]));
 	}
 
 	public void setBs(B[] bs)
@@ -83,14 +86,33 @@ public class A
 		bs.add(b);
 	}
 	
+	/**
+	 *  Get the ints.
+	 *  @return the ints.
+	 */
+	public Integer[] getInts()
+	{
+		return ints;
+	}
+
+	/**
+	 *  Set the ints.
+	 *  @param ints The ints to set.
+	 */
+	public void setInts(Integer[] ints)
+	{
+		this.ints = ints;
+	}
+
 	public int hashCode()
 	{
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((this.b == null) ? 0 : this.b.hashCode());
-		result = prime * result + ((this.bs == null) ? 0 : this.bs.hashCode());
-		result = prime * result + this.i;
-		result = prime * result + ((this.s == null) ? 0 : this.s.hashCode());
+		result = prime * result + ((b == null) ? 0 : b.hashCode());
+		result = prime * result + ((bs == null) ? 0 : bs.hashCode());
+		result = prime * result + i;
+		result = prime * result + Arrays.hashCode(ints);
+		result = prime * result + ((s == null) ? 0 : s.hashCode());
 		return result;
 	}
 
@@ -103,35 +125,38 @@ public class A
 		if(getClass() != obj.getClass())
 			return false;
 		A other = (A)obj;
-		if(this.b == null)
+		if(b == null)
 		{
 			if(other.b != null)
 				return false;
 		}
-		else if(!this.b.equals(other.b))
+		else if(!b.equals(other.b))
 			return false;
-		if(this.bs == null)
+		if(bs == null)
 		{
 			if(other.bs != null)
 				return false;
 		}
-		else if(!this.bs.equals(other.bs))
+		else if(!bs.equals(other.bs))
 			return false;
-		if(this.i != other.i)
+		if(i != other.i)
 			return false;
-		if(this.s == null)
+		if(!Arrays.equals(ints, other.ints))
+			return false;
+		if(s == null)
 		{
 			if(other.s != null)
 				return false;
 		}
-		else if(!this.s.equals(other.s))
+		else if(!s.equals(other.s))
 			return false;
 		return true;
 	}
 
 	public String toString()
 	{
-		return "A [b=" + this.b + ", bs=" + bs + ", i="
-				+ this.i + ", s=" + this.s + "]";
+		return "A [i=" + i + ", s=" + s + ", b=" + b + ", bs=" + bs + ", ints="
+				+ Arrays.toString(ints) + "]";
 	}
+	
 }

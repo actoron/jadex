@@ -1174,18 +1174,50 @@ public class ComponentManagementService extends BasicService implements ICompone
 	 *  @param cid The component identifier.
 	 *  @param listener The result listener.
 	 */
-	public IFuture getExternalAccess(IComponentIdentifier cid)
+	public IFuture getExternalAccess(final IComponentIdentifier cid)
 	{
 		final Future ret = new Future();
 		
-		StandaloneComponentAdapter adapter = (StandaloneComponentAdapter)adapters.get(cid);
-		if(adapter==null)
+		if(isRemoteComponent(cid))
 		{
-			ret.setException(new RuntimeException("No local component found for component identifier: "+cid));
+			SServiceProvider.getService(provider, IRemoteServiceManagementService.class)
+				.addResultListener(new IResultListener()
+			{
+				public void resultAvailable(Object source, Object result)
+				{
+					IRemoteServiceManagementService rms = (IRemoteServiceManagementService)result;
+					
+					// todo: specific external accesses
+					rms.getExternalAccessProxy(cid, IExternalAccess.class).addResultListener(new IResultListener()
+					{
+						public void resultAvailable(Object source, Object result)
+						{
+							ret.setResult(result);
+						}
+						public void exceptionOccurred(Object source, Exception exception)
+						{
+							ret.setException(exception);
+						}
+					});
+				}
+				
+				public void exceptionOccurred(Object source, Exception exception)
+				{
+					ret.setException(exception);
+				}
+			});
 		}
 		else
 		{
-			ret.setResult(adapter.getComponentInstance().getExternalAccess());
+			StandaloneComponentAdapter adapter = (StandaloneComponentAdapter)adapters.get(cid);
+			if(adapter==null)
+			{
+				ret.setException(new RuntimeException("No local component found for component identifier: "+cid));
+			}
+			else
+			{
+				ret.setResult(adapter.getComponentInstance().getExternalAccess());
+			}
 		}
 		
 		return ret;

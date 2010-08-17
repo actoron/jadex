@@ -100,7 +100,7 @@ public class ObjectCardLayout implements LayoutManager2
 	/**
 	 *  Get a component for the given identifier.
 	 */
-	public Component	getComponent(Object object)
+	public Component getComponent(Object object)
 	{
 		return (Component)components.get(object);
 	}

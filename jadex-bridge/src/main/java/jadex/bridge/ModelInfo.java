@@ -289,7 +289,7 @@ public class ModelInfo implements IModelInfo
 	 */
 	public void setArguments(IArgument[] arguments)
 	{
-		this.arguments = SUtil.arrayToList(arguments);
+		this.arguments = arguments!=null? SUtil.arrayToList(arguments): null;
 	}
 	
 	/**
@@ -309,7 +309,7 @@ public class ModelInfo implements IModelInfo
 	 */
 	public void setResults(IArgument[] results)
 	{
-		this.results = SUtil.arrayToList(arguments);
+		this.results = results!=null? SUtil.arrayToList(results): null;
 	}
 	
 	/**

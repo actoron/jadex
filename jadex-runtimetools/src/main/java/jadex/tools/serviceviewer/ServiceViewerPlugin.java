@@ -1,6 +1,8 @@
 package jadex.tools.serviceviewer;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentManagementService;
+import jadex.bridge.IExternalAccess;
 import jadex.commons.Properties;
 import jadex.commons.SGUI;
 import jadex.commons.SReflect;
@@ -295,7 +297,7 @@ public class ServiceViewerPlugin extends AbstractJCCPlugin
 		return split;
 	}
 		
-	final AbstractAction	START_VIEWER	= new AbstractAction("Open service viewer", icons.getIcon("open_viewer"))
+	final AbstractAction START_VIEWER = new AbstractAction("Open service viewer", icons.getIcon("open_viewer"))
 	{
 		public void actionPerformed(ActionEvent e)
 		{
@@ -342,42 +344,61 @@ public class ServiceViewerPlugin extends AbstractJCCPlugin
 							});
 						}
 					}
-//					else if(tmp instanceof IActiveComponentTreeNode)
-//					{
-//						final IActiveComponentTreeNode node = (IActiveComponentTreeNode)tmp;
-//						node.getDescription().get
-//						final String classname = (String).getPropertyMap().get(PROPERTY_VIEWERCLASS);
-//						
-//						if(classname!=null)
-//						{
-//							SServiceProvider.getService(getJCC().getServiceContainer(), ILibraryService.class)
-//								.addResultListener(new SwingDefaultResultListener(comptree)
-//							{
-//								public void customResultAvailable(Object source, Object result)
-//								{
-//									ILibraryService	libservice	= (ILibraryService)result;
-//									try
-//									{
-//										storeCurrentPanelSettings();
-//										Class clazz	= SReflect.classForName(classname, libservice.getClassLoader());
-//										IServiceViewerPanel	panel = (IServiceViewerPanel)clazz.newInstance();
-//										panel.init(getJCC(), exta);
-//										Properties	sub	= props!=null ? props.getSubproperty(panel.getId()) : null;
-//										panel.setProperties(sub);
-//										GuiProperties.setupHelp(panel.getComponent(), getHelpID());
-//										panels.put(exta.getComponentIdentifier(), panel);
-//										detail.add(panel.getComponent(), exta.getComponentIdentifier());
-//										comptree.getModel().fireNodeChanged(node);
-//									}
-//									catch(Exception e)
-//									{
-//										e.printStackTrace();
-//										getJCC().displayError("Error initializing service viewer panel.", "Service viewer panel class: "+classname, e);
-//									}
-//								}
-//							});
-//						}
-//					}
+					else if(tmp instanceof IActiveComponentTreeNode)
+					{
+						final IActiveComponentTreeNode node = (IActiveComponentTreeNode)tmp;
+						final IComponentIdentifier cid = node.getDescription().getName();
+						
+						SServiceProvider.getService(getJCC().getServiceContainer(), IComponentManagementService.class)
+							.addResultListener(new SwingDefaultResultListener(comptree)
+						{
+							public void customResultAvailable(Object source, Object result)
+							{
+								final IComponentManagementService cms = (IComponentManagementService)result;
+								
+								cms.getExternalAccess(cid).addResultListener(new SwingDefaultResultListener(comptree)
+								{
+									public void customResultAvailable(Object source, Object result)
+									{
+										final IExternalAccess exta = (IExternalAccess)result;
+										final String classname = (String)exta.getModel().getProperties().get(PROPERTY_VIEWERCLASS);
+									
+										System.out.println("classname for comp: "+classname);
+										
+										if(classname!=null)
+										{
+											SServiceProvider.getService(getJCC().getServiceContainer(), ILibraryService.class)
+												.addResultListener(new SwingDefaultResultListener(comptree)
+											{
+												public void customResultAvailable(Object source, Object result)
+												{
+													ILibraryService	libservice	= (ILibraryService)result;
+													try
+													{
+														storeCurrentPanelSettings();
+														Class clazz	= SReflect.classForName(classname, libservice.getClassLoader());
+														IComponentViewerPanel panel = (IComponentViewerPanel)clazz.newInstance();
+														panel.init(getJCC(), exta);
+														Properties	sub	= props!=null ? props.getSubproperty(panel.getId()) : null;
+														panel.setProperties(sub);
+														GuiProperties.setupHelp(panel.getComponent(), getHelpID());
+														panels.put(exta.getComponentIdentifier(), panel);
+														detail.add(panel.getComponent(), exta.getComponentIdentifier());
+														comptree.getModel().fireNodeChanged(node);
+													}
+													catch(Exception e)
+													{
+														e.printStackTrace();
+														getJCC().displayError("Error initializing service viewer panel.", "Service viewer panel class: "+classname, e);
+													}
+												}
+											});
+										}
+									}
+								});
+							}
+						});
+					}
 				}
 			}
 		}
@@ -420,8 +441,8 @@ public class ServiceViewerPlugin extends AbstractJCCPlugin
 	 */
 	protected static boolean isNodeViewable(IComponentTreeNode node)
 	{
-		return node instanceof ServiceNode && ((ServiceNode)node).getService().getPropertyMap().get(PROPERTY_VIEWERCLASS)!=null;
-//			|| node instanceof IActiveComponentTreeNode && ((IActiveComponentTreeNode)node).getEx().getPropertyMap().get(PROPERTY_VIEWERCLASS)!=null;
+		return node instanceof ServiceNode && ((ServiceNode)node).getService().getPropertyMap().get(PROPERTY_VIEWERCLASS)!=null
+			|| node instanceof IActiveComponentTreeNode;
 	}
 	
 	//-------- loading / saving --------

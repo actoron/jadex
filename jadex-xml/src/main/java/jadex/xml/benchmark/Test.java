@@ -3,6 +3,7 @@ package jadex.xml.benchmark;
 import jadex.commons.SUtil;
 import jadex.xml.bean.JavaReader;
 import jadex.xml.bean.JavaWriter;
+
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
@@ -46,6 +47,7 @@ public class Test //extends TestCase
 //			while(true)
 			{
 //				t.testBean();
+				t.testEmptyArray();
 //				t.testArrayOrder();
 //				t.testMultiArray();
 //				t.testVectorModel();
@@ -57,7 +59,7 @@ public class Test //extends TestCase
 //				t.testSet();
 //				t.testMap();
 //				t.testInnerClass();
-				t.testURL();
+//				t.testURL();
 			}
 			long dur = System.currentTimeMillis()-start;
 			
@@ -97,6 +99,18 @@ public class Test //extends TestCase
 			System.out.println("Not equal: "+wo.getClass()+" \n"+ro.getClass()+" \n"+xml);
 		
 //		assertEquals("Written and read objects should be equal:", wo, ro);
+	}
+	
+	/**
+	 *  Test if multi array transfer works.
+	 */
+	public void testEmptyArray() throws Exception
+	{
+		Integer[] data = new Integer[0];
+		A a = new A();
+		a.setInts(data);
+		
+		doWriteAndRead(a);
 	}
 	
 //	/**

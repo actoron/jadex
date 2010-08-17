@@ -383,6 +383,6 @@ public class AwarenessAgent extends MicroAgent
 				new Argument("port", "This parameter is the port used for finding other agents.", "int", new Integer(55667)),	
 				new Argument("delay", "This parameter is the delay between sending awareness infos.", "long", 
 					SUtil.createHashMap(configs, new Object[]{new Long(5000), new Long(10000), new Long(60000)})),	
-			}, null, null, null);
+			}, null, null, SUtil.createHashMap(new String[]{"serviceviewer.viewerclass"}, new Object[]{"jadex.tools.serviceviewer.awareness.AwarenessAgentPanel"}));
 	}
 }

@@ -1198,9 +1198,6 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	{
 		boolean ret = false;
 			
-		if(name.indexOf("Contain")!=-1)
-			System.out.println("sss");
-		
 		Method[] ms = SReflect.getMethods(parent.getClass(), name);
 		for(int i=0; !ret && i<ms.length; i++)
 		{

@@ -336,4 +336,19 @@ public class ProxyInfo
 	{
 		return synchronous!=null && synchronous.contains(new MethodInfo(m));
 	}
+
+	/**
+	 *  Get the string representation.
+	 *  @return The string representation.
+	 */
+	public String toString()
+	{
+		return "ProxyInfo(rms=" + rms + ", sid=" + sid + ", cache=" + cache
+				+ ", excluded=" + excluded + ", uncached=" + uncached
+				+ ", synchronous=" + synchronous + ", replacements="
+				+ replacements + ", cid=" + cid + ", targetclass="
+				+ targetclass + ")";
+	}
+	
+	
 }
