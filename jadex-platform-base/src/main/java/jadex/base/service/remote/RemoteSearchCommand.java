@@ -6,6 +6,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.commons.collection.LRU;
 import jadex.commons.concurrent.IResultListener;
 import jadex.micro.IMicroExternalAccess;
@@ -301,9 +302,32 @@ public class RemoteSearchCommand implements IRemoteCommand
 				ret.addUncachedMethod(getMethodInfo(it.next(), service, true));
 			}
 		}
+		Object mr = service.getPropertyMap().get(RemoteServiceManagementService.REMOTE_METHODREPLACEMENT);
+		if(mr!=null)
+		{
+			for(Iterator it = SReflect.getIterator(mr); it.hasNext(); )
+			{
+				Object[]	tmp	= (Object[])it.next();
+				ret.addMethodReplacement(getMethodInfo(tmp[0], service, true), (IMethodReplacement)tmp[1]);
+			}
+		}
+		
+		// Add default replacement for equals() and hashCode().
+		Method	equals	= SReflect.getMethod(Object.class, "equals", new Class[]{Object.class});
+		if(ret.getMethodReplacement(equals)==null)
+		{
+			ret.addMethodReplacement(getMethodInfo(equals, service, false), new DefaultEqualsMethodReplacement());
+		}
+		Method	hashcode	= SReflect.getMethod(Object.class, "hashCode", new Class[0]);
+		if(ret.getMethodReplacement(hashcode)==null)
+		{
+			ret.addMethodReplacement(getMethodInfo(hashcode, service, true), new DefaultHashcodeMethodReplacement());
+		}
+		
 		
 		// Check methods and possibly cache constant calls.
 		Method[] methods = type.getMethods();
+		methods	= (Method[])SUtil.joinArrays(methods, Object.class.getMethods());
 		for(int i=0; i<methods.length; i++)
 		{
 			if(!ret.isUncached(methods[i]) && !ret.isExcluded(methods[i])) // excluded methods are also not cached
@@ -349,24 +373,44 @@ public class RemoteSearchCommand implements IRemoteCommand
 	 */
 	protected MethodInfo getMethodInfo(Object tmp, IService service, boolean noargs)
 	{
-		MethodInfo ret = null;
+		MethodInfo ret;
 		
 		if(tmp instanceof String)
 		{
 			if(noargs)
 			{
-				ret = new MethodInfo(SReflect.getMethod(service.getClass(),(String)tmp, new Class[0]));
+				Method	method	= SReflect.getMethod(service.getClass(), (String)tmp, new Class[0]);
+				if(method==null)
+					method	= SReflect.getMethod(Object.class, (String)tmp, new Class[0]);
+				
+				if(method!=null)
+				{
+					ret = new MethodInfo(method);
+				}
+				else
+				{
+					throw new RuntimeException("Method not found: "+tmp);
+				}
 			}
 			else
 			{
 				Method[] ms = SReflect.getMethods(service.getClass(), (String)tmp);
-				if(ms.length>1)
+				if(ms.length==0)
 				{
-					throw new RuntimeException("More than one message with the name availble: "+tmp);
+					ms = SReflect.getMethods(Object.class, (String)tmp);
+				}
+				
+				if(ms.length==1)
+				{
+					ret = new MethodInfo(ms[0]);
+				}
+				else if(ms.length>1)
+				{
+					throw new RuntimeException("More than one method with the name availble: "+tmp);
 				}
 				else
 				{
-					ret = new MethodInfo(ms[0]);
+					throw new RuntimeException("Method not found: "+tmp);
 				}
 			}
 		}

@@ -34,8 +34,11 @@ public class ProxyInfo
 	/** The uncached methods. */
 	protected Set uncached;
 
-	/** The  methods. */
+	/** The synchronous methods. */
 	protected Set synchronous;
+	
+	/** The replacements for methods (method-info -> replacement method). */
+	protected Map replacements;
 	
 	// alternaltively to sid we may have cid and targetclass
 	
@@ -138,6 +141,47 @@ public class ProxyInfo
 		if(cache==null)
 			cache = new HashMap();
 		cache.put(key, value);
+	}
+	
+	/**
+	 *  Get the replacements
+	 *  @return The replacements.
+	 */
+	public Map getMethodReplacements()
+	{
+		return replacements;
+	}
+	
+	/**
+	 *  Set the replacements.
+	 *  @param replacements	The replacements.
+	 */
+	public void setMethodReplacements(Map replacements)
+	{
+		this.replacements = replacements;
+	}
+	
+	/**
+	 *  Add a replacement.
+	 */
+	public void addMethodReplacement(MethodInfo method, IMethodReplacement replacement)
+	{
+		if(replacements==null)
+			replacements = new HashMap();
+		replacements.put(method, replacement);
+	}
+	
+	/**
+	 *  Get a replacements.
+	 */
+	public IMethodReplacement	getMethodReplacement(Method method)
+	{
+		IMethodReplacement	ret	= null;
+		if(replacements!=null)
+		{
+			ret	= (IMethodReplacement)replacements.get(new MethodInfo(method));
+		}
+		return ret;
 	}
 	
 	/**

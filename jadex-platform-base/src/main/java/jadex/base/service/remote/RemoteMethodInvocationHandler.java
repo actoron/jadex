@@ -6,6 +6,7 @@ import jadex.commons.IFuture;
 import jadex.commons.SUtil;
 import jadex.commons.ThreadSuspendable;
 import jadex.micro.IMicroExternalAccess;
+
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.Map;
@@ -62,6 +63,14 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 			{
 				return pi.getCache().get(method.getName());
 			}
+		}
+		
+		// Test if method has a replacement command.
+		IMethodReplacement	replacement	= pi.getMethodReplacement(method);
+		if(replacement!=null)
+		{
+			// Todo: super pointer for around-advice-like replacements.
+			return replacement.invoke(proxy, args);
 		}
 		
 		// Call remote method otherwise.

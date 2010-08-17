@@ -175,9 +175,12 @@ public class ComponentTreeModel implements TreeModel
 		
 //		System.out.println("Node changed: "+node+", "+path+", "+Thread.currentThread());
 		
-		for(int i=0; i<listeners.size(); i++)
+		if(indices==null || indices[0]!=-1)	// Node might be removed already.
 		{
-			((TreeModelListener)listeners.get(i)).treeNodesChanged(new TreeModelEvent(this, path.toArray(), indices, nodes));
+			for(int i=0; i<listeners.size(); i++)
+			{
+				((TreeModelListener)listeners.get(i)).treeNodesChanged(new TreeModelEvent(this, path.toArray(), indices, nodes));
+			}
 		}
 	}
 
