@@ -24,7 +24,7 @@
 	</beliefs>
 
 	<plans>
-		<!--adpat the trust with the event-->
+		<!--adapt the trust with the event-->
 		<plan name="trustAdapt">
 			<body class="TrustAdaptPlan">
 			</body>

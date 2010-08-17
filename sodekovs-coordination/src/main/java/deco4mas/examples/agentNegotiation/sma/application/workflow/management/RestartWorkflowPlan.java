@@ -9,7 +9,7 @@ import deco4mas.examples.agentNegotiation.evaluate.ClockTime;
 import deco4mas.examples.agentNegotiation.evaluate.ValueLogger;
 
 /**
- * Creates a workflow
+ * Restart a workflow
  */
 public class RestartWorkflowPlan extends Plan
 {

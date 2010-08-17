@@ -72,17 +72,41 @@ public class WorkflowData
 	
 	public Long getExecutionTime()
 	{
-		return endTime - startExecutionTime;
+		Long result = -1L;
+		try
+		{
+			result = endTime - startExecutionTime;
+		} catch (Exception e)
+		{
+			//omit this, "not finished"
+		}
+		return result;
 	}
 	
 	public Long getNegotiationTime()
 	{
-		return startExecutionTime - startTime;
+		Long result = -1L;
+		try
+		{
+			result = startExecutionTime - startTime;
+		} catch (Exception e)
+		{
+			//omit this, "not finished"
+		}
+		return result;
 	}
 	
 	public Long getCompleteTime()
 	{
-		return endTime - startTime;
+		Long result = -1L;
+		try
+		{
+			result =  endTime - startTime;
+		} catch (Exception e)
+		{
+			//omit this, "not finished"
+		}
+		return result;
 	}
 	
 	public Double getNegotiationCosts()

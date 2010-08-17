@@ -61,7 +61,7 @@ public class NegotiationInitiator
 	 * indicates if accepted[0] (sma) and accepted[1] accept the potential
 	 * contract
 	 */
-	private Boolean[] accepted = { Boolean.FALSE, Boolean.FALSE };
+	private Boolean[] accepted = { null, null};
 
 	/**
 	 * Encapsulate all relevant information for a agent negotiation
@@ -199,9 +199,12 @@ public class NegotiationInitiator
 		synchronized (monitor)
 		{
 			Boolean result = false;
-			if (accepted[0] && accepted[1])
+			if (accepted[0] != null && accepted[1] != null)
 			{
-				result = true;
+				if (accepted[0] && accepted[1])
+				{
+					result = true;
+				}
 			}
 			return result;
 		}

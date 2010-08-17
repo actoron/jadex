@@ -31,7 +31,7 @@ public class WeightFactorUtilityFunction implements IUtilityFunction
 	{
 		this.owner = owner;
 		utilSaLogger = (ParameterLogger) AgentLogger.getTimeDiffEventForSa("Utility_" + owner.getLocalName());
-		utilDataLogger = (Logger) AgentLogger.getDataTable("UtilityDataTable_" + owner.getLocalName());
+		utilDataLogger = (Logger) AgentLogger.getDataTable("UtilityDataTable_" + owner.getLocalName(), false);
 	}
 
 	/**

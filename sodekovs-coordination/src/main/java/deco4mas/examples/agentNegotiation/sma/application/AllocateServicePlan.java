@@ -68,7 +68,7 @@ public class AllocateServicePlan extends Plan
 						}
 					} catch (GoalFailureException gfe)
 					{
-						gfe.printStackTrace();
+//						gfe.printStackTrace();
 						smaLogger.info("GoalFailureException false , " + currentSa.getLocalName());
 						result = false;
 					}

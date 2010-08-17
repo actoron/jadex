@@ -43,7 +43,14 @@ public class ExecuteServiceByAgentTask implements ITask
 				public void resultAvailable(Object source, Object result)
 				{
 					workflowLogger.info(context.getActivity().getName() + "[" + context.getParameterValue("serviceType") + "]" + " end");
-					listener.resultAvailable(ExecuteServiceByAgentTask.this, result);
+					try
+					{
+						listener.resultAvailable(ExecuteServiceByAgentTask.this, result);
+					} catch (Exception e)
+					{
+						// omit, "may cause exeption at termination"
+					}
+					
 				}
 
 				public void exceptionOccurred(Object source, Exception exception)

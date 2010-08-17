@@ -1,5 +1,8 @@
 package deco4mas.examples.agentNegotiation.sma.application.workflow.management.evaluate;
 
+/**
+ * Function to define a money penalty
+ */
 public class PenaltyFunction
 {
 	Long workflowTime = 0L;
@@ -10,6 +13,15 @@ public class PenaltyFunction
 		this.workflowTime = intendedWorkflowTime;
 		this.workflowProfit = workflowProfit;
 	}
+	
+	/**
+	 * Get Penalty for given overrun time
+	 * (Must instantiated with intendedWorkflowTime and profit) 
+	 * 
+	 * 0.0 if no overrun time
+	 * @param overrunTime time over intendedWorkflowTime
+	 * @return
+	 */
 	public Double getPenalty(Long overrunTime)
 	{
 		Double result = 0.0;

@@ -36,6 +36,7 @@ public class InitCapabilityPlan extends Plan
 		} catch (Exception e)
 		{
 			e.printStackTrace();
+			fail(e);
 		}
 	}
 }

@@ -23,12 +23,10 @@ import deco4mas.examples.agentNegotiation.common.dataObjects.WorkflowData;
 import deco4mas.examples.agentNegotiation.evaluate.AgentLogger;
 
 /**
- * Creates SMAs for the workflow
+ * define services for the workflow
  */
 public class DefineRequiredServicesPlan extends Plan
 {
-	private static Integer requestNumber = new Integer(0);
-
 	public void body()
 	{
 		try
@@ -97,9 +95,6 @@ public class DefineRequiredServicesPlan extends Plan
 				System.out.println();
 				smaLogger.info("--- negotiation phase ---");
 
-				// start Negotiation
-				// IGoal startNegotiation = createGoal("startNegotiation");
-				// dispatchSubgoalAndWait(startNegotiation);
 			}
 		} catch (Exception e)
 		{

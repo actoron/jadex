@@ -6,7 +6,7 @@ import deco4mas.examples.agentNegotiation.common.dataObjects.WorkflowData;
 import deco4mas.examples.agentNegotiation.evaluate.AgentLogger;
 
 /**
- * Creates a workflow
+ * Evaluate the workflow
  */
 public class EvaluateWorkflowPlan extends Plan
 {
@@ -14,7 +14,7 @@ public class EvaluateWorkflowPlan extends Plan
 	{
 		try
 		{
-			Logger logger = (Logger) AgentLogger.getDataTable("Money_" + getComponentName());
+			Logger logger = (Logger) AgentLogger.getDataTable("Money_" + getComponentName(), true);
 			WorkflowData data = (WorkflowData) getBeliefbase().getBelief("workflowData").getFact();
 			if (data.getId() != 0)
 			{

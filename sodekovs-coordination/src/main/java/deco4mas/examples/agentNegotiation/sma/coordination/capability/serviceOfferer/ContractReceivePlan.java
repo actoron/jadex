@@ -33,9 +33,9 @@ public class ContractReceivePlan extends Plan
 							if (info.getState().equals(NegotiationContractInformation.FINAL_REWARD))
 							{
 								// LOG
-								System.out.println(this.getComponentName() + " accept " + info);
 								smaLogger.info("signed " + info);
 
+								System.out.println("#acceptFinal(Sma)" + info);
 								requested.setSa(info.getContract().getParticipant());
 								getBeliefbase().getBeliefSet("requestedServices").removeFact(requested);
 
@@ -49,11 +49,13 @@ public class ContractReceivePlan extends Plan
 							{
 								if (requested.getState().equals(RequestedService.SEARCHING))
 								{
+									System.out.println("#acceptReward(Sma)" + info);
 									smaLogger.info("Designated Sa: " + info);
 									requested.setDesignatedSa(true);
 									info.setAnswer(true, this.getComponentIdentifier());
 								} else
 								{
+									System.out.println("#rejectReward(Sma)" + info);
 									smaLogger.info("Designated Sa rejected " + info.getContract().getParticipant());
 									info.setAnswer(false, this.getComponentIdentifier());
 								}
@@ -62,6 +64,7 @@ public class ContractReceivePlan extends Plan
 								dispatchInternalEvent(reply);
 							} else if (info.getState().equals(NegotiationContractInformation.CANCELED_REWARD))
 							{
+								System.out.println("#resetDesignated(Sma)" + info);
 								smaLogger.info("Reset Designated Sa: " + info);
 								requested.setDesignatedSa(false);
 								info.setAnswer(true, this.getComponentIdentifier());

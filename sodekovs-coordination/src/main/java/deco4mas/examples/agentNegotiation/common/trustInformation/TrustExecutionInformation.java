@@ -31,5 +31,11 @@ public class TrustExecutionInformation extends TrustInformation
 	{
 		return sma;
 	}
+	
+	@Override
+	public String toString()
+	{
+		return "TrustInformation(" + getId() + " , " + getTime() + " , " + getEvent() + " , " + getServiceType() + " , " + getSa() + " , " + getSma() + ")";
+	}
 
 }

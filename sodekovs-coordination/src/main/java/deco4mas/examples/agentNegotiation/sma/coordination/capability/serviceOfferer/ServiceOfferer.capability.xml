@@ -90,13 +90,6 @@
 			<parameter name="contract" class="ServiceContract"></parameter>
 		</internalevent>
 
-		<!-- message event to inform signed sa about a sign that ends -->
-		<messageevent name="informMessage" direction="send" type="fipa">
-			<parameter name="performative" class="String" direction="fixed">
-				<value>SFipa.INFORM</value>
-			</parameter>
-		</messageevent>
-
 		<!--deco SEND-->
 		<!-- request for a new negotiation -->
 		<internalevent name="initiateNegotiation">

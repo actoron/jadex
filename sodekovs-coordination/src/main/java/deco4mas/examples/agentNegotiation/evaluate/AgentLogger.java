@@ -97,7 +97,7 @@ public class AgentLogger
 		return agentLogger;
 	}
 
-	public synchronized static Logger getDataTable(String name)
+	public synchronized static Logger getDataTable(String name, Boolean append)
 	{
 		Logger agentLogger;
 
@@ -112,7 +112,7 @@ public class AgentLogger
 				File f = new File(dir);
 				if (!f.isDirectory())
 					f.mkdir();
-				fh = new FileHandler("%h/agentLogs/plotLogs/" + name + ".log", false);
+				fh = new FileHandler("%h/agentLogs/plotLogs/" + name + ".log", append);
 			} catch (Exception e)
 			{
 				e.printStackTrace();

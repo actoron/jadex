@@ -28,7 +28,7 @@ public class HistorytimeTrustFunction implements ITrustFunction
 		weights = eventWeight;
 		loggedTime = history.getStartTime();
 		trustLogger = (ParameterLogger) AgentLogger.getTimeDiffEventForSa("TrustChange_" + owner.getLocalName());
-		trustDataLogger = (Logger) AgentLogger.getDataTable("TrustDataTable_" + owner.getLocalName());
+		trustDataLogger = (Logger) AgentLogger.getDataTable("TrustDataTable_" + owner.getLocalName(), false);
 	}
 
 	public synchronized Double getTrust(String sa, Long time)

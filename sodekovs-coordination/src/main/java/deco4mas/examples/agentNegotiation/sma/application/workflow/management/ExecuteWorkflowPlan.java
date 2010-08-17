@@ -39,6 +39,8 @@ public class ExecuteWorkflowPlan extends Plan
 			// create workflow
 			Map workflowArgs = new HashMap();
 			workflowArgs.put("sma", getComponentIdentifier());
+			
+			
 
 			// listener at component kill / workflow execution
 			final IBDIExternalAccess myExternalAccess = this.getExternalAccess();
@@ -48,20 +50,19 @@ public class ExecuteWorkflowPlan extends Plan
 				@Override
 				public void resultAvailable(Object source, Object result)
 				{
-					// LOG
-					workflowLogger.info("workflow executed");
-					providerLogger.info("*** workflow executed ***");
-					WorkflowData data = (WorkflowData) getBeliefbase().getBelief("workflowData").getFact();
-					data.setEndTime(getTime());
-					workflowTimeLogger.info("Execution time: " + data.toString());
-					ValueLogger.addValue("workflowTime", data.getCompleteTime().doubleValue());
-					workflowTimeLogger.info("Complete time: " + data.getExecutionTime().toString());
-					workflowTimeLogger.info("---");
 					System.out.println("*** workflow executed ***");
 
 					// workflow executed -> init InternalEvent
-					IInternalEvent workflowExecuted = myExternalAccess.createInternalEvent("workflowExecuted");
-					myExternalAccess.dispatchInternalEvent(workflowExecuted);
+					try
+					{
+						IInternalEvent workflowExecuted = myExternalAccess.createInternalEvent("workflowExecuted");
+						myExternalAccess.dispatchInternalEvent(workflowExecuted);
+					} catch (Exception e)
+					{
+						//omit
+						//exception, when terminated
+					}
+					
 				}
 
 				/** called when workflow throw exception */
@@ -98,7 +99,17 @@ public class ExecuteWorkflowPlan extends Plan
 			workflowID++;
 
 			waitForInternalEvent("workflowExecuted");
-
+			
+			// LOG
+			workflowLogger.info("workflow executed");
+			providerLogger.info("*** workflow executed ***");
+			WorkflowData data = (WorkflowData) getBeliefbase().getBelief("workflowData").getFact();
+			data.setEndTime(getTime());
+			workflowTimeLogger.info("Execution time: " + data.toString());
+			ValueLogger.addValue("workflowTime", data.getCompleteTime().doubleValue());
+			workflowTimeLogger.info("Complete time: " + data.getExecutionTime().toString());
+			workflowTimeLogger.info("---");
+			
 			dispatchSubgoalAndWait(createGoal("evaluateWorkflow"));
 
 			IGoal restartWorkflow = createGoal("restartWorkflow");
