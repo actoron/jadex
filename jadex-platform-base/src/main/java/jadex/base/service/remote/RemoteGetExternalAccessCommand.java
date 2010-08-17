@@ -5,13 +5,17 @@ import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
+import jadex.commons.SReflect;
 import jadex.commons.collection.LRU;
 import jadex.commons.concurrent.IResultListener;
 import jadex.micro.IMicroExternalAccess;
-import jadex.service.IService;
 import jadex.service.SServiceProvider;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -187,7 +191,34 @@ public class RemoteGetExternalAccessCommand implements IRemoteCommand
 	protected ProxyInfo createProxyInfo(IComponentIdentifier rms, IExternalAccess target)
 	{
 		ProxyInfo ret = new ProxyInfo(rms, cid, targetclass);
-		RemoteSearchCommand.fillProxyInfo(ret, target, targetclass, target.getModel().getProperties());
+		
+		// todo: Hack!!!
+		// Exclude getServiceProvider() from remote external access interface
+		Map props = target.getModel().getProperties();
+		if(props==null)
+		{
+			props = new HashMap();
+			props.put("remote_excluded", new String[]{"getServiceProvider"});
+		}
+		else
+		{
+			Object ex = props.get("remote_excluded");
+			if(ex!=null)
+			{
+				List newex = new ArrayList();
+				for(Iterator it=SReflect.getIterator(ex); it.hasNext(); )
+				{
+					newex.add(it.next());
+				}
+				newex.add("getServiceProvider");
+			}
+			else
+			{
+				props.put("remote_excluded", new String[]{"getServiceProvider"});
+			}
+		}
+		
+		RemoteSearchCommand.fillProxyInfo(ret, target, targetclass, props);
 		return ret;
 //		System.out.println("Creating proxy for: "+type);
 	}

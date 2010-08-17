@@ -8,7 +8,6 @@ import jadex.commons.SGUI;
 import jadex.commons.SReflect;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.service.IService;
-import jadex.service.IServiceIdentifier;
 import jadex.service.SServiceProvider;
 import jadex.service.library.ILibraryService;
 import jadex.tools.common.CombiIcon;
@@ -24,6 +23,7 @@ import jadex.tools.common.plugin.AbstractJCCPlugin;
 
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -87,6 +87,9 @@ public class ServiceViewerPlugin extends AbstractJCCPlugin
 	/** Loaded properties. */
 	protected Properties	props;
 	
+	/** The active component node viewable state. */
+	protected Map viewables;
+	
 	//-------- constructors --------
 	
 	/**
@@ -95,6 +98,7 @@ public class ServiceViewerPlugin extends AbstractJCCPlugin
 	public ServiceViewerPlugin()
 	{
 		this.panels	= new HashMap();
+		this.viewables = Collections.synchronizedMap(new HashMap());
 	}
 	
 	//-------- IControlCenterPlugin interface --------
@@ -363,7 +367,7 @@ public class ServiceViewerPlugin extends AbstractJCCPlugin
 										final IExternalAccess exta = (IExternalAccess)result;
 										final String classname = (String)exta.getModel().getProperties().get(PROPERTY_VIEWERCLASS);
 									
-										System.out.println("classname for comp: "+classname);
+//										System.out.println("classname for comp: "+classname);
 										
 										if(classname!=null)
 										{
@@ -439,10 +443,48 @@ public class ServiceViewerPlugin extends AbstractJCCPlugin
 	 *  @param node	The node.
 	 *  @return True, if the node is viewable.
 	 */
-	protected static boolean isNodeViewable(IComponentTreeNode node)
+	protected boolean isNodeViewable(final IComponentTreeNode node)
 	{
-		return node instanceof ServiceNode && ((ServiceNode)node).getService().getPropertyMap().get(PROPERTY_VIEWERCLASS)!=null
-			|| node instanceof IActiveComponentTreeNode;
+		boolean ret = false;
+		if(node instanceof ServiceNode)
+		{
+			ret = ((ServiceNode)node).getService().getPropertyMap().get(PROPERTY_VIEWERCLASS)!=null;
+		}
+		else if(node instanceof IActiveComponentTreeNode)
+		{
+			final IComponentIdentifier cid = ((IActiveComponentTreeNode)node).getDescription().getName();
+
+			Boolean viewable = (Boolean)viewables.get(cid);
+			if(viewable!=null)
+			{
+				ret = viewable.booleanValue();
+			}
+			else
+			{
+				// Unknown -> start search to find out synchronously
+				SServiceProvider.getService(getJCC().getServiceContainer(), IComponentManagementService.class)
+					.addResultListener(new SwingDefaultResultListener(comptree)
+				{
+					public void customResultAvailable(Object source, Object result)
+					{
+						final IComponentManagementService cms = (IComponentManagementService)result;
+						
+						cms.getExternalAccess(cid).addResultListener(new SwingDefaultResultListener(comptree)
+						{
+							public void customResultAvailable(Object source, Object result)
+							{
+								final IExternalAccess exta = (IExternalAccess)result;
+								final String classname = (String)exta.getModel().getProperties().get(PROPERTY_VIEWERCLASS);
+								viewables.put(cid, classname==null? Boolean.FALSE: Boolean.TRUE);
+//								System.out.println("node: "+viewables.get(cid));
+								node.refresh(false);
+							}
+						});
+					}
+				});
+			}
+		}
+		return ret;
 	}
 	
 	//-------- loading / saving --------
