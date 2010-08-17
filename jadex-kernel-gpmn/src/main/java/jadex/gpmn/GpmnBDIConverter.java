@@ -122,7 +122,7 @@ public class GpmnBDIConverter
 		doConvert(process, classloader, state, handle);
 		state.setAttributeValue(handle, OAVBDIMetaModel.modelelement_has_name, model.getName());
 		state.setAttributeValue(handle, OAVBDIMetaModel.modelelement_has_description, model.getDescription());
-		state.setAttributeValue(handle, OAVBDIMetaModel.capability_has_package, model.getPackage());
+		state.setAttributeValue(handle, OAVBDIMetaModel.capability_has_package, model.getModelInfo().getPackage());
 		String[] imports = model.getImports();
 		if(imports!=null)
 		{
@@ -133,7 +133,7 @@ public class GpmnBDIConverter
 		}
 		
 		state.removeStateListener(listener);
-		agentmodel =  new OAVAgentModel(state, handle, types, model.getFilename(), model.getLastModified(), report);
+		agentmodel =  new OAVAgentModel(state, handle, types, model.getModelInfo().getFilename(), model.getLastModified(), report);
 		try
 		{
 			loader.createAgentModelEntry(agentmodel, report);

@@ -61,6 +61,7 @@ public class GpmnXMLReader
 	protected static MGpmnModel read(ResourceInfo rinfo, ClassLoader classloader) throws Exception
 	{
 		MGpmnModel ret = (MGpmnModel)reader.read(rinfo.getInputStream(), classloader, null);
+		
 		ret.setFilename(rinfo.getFilename());
 		ret.setLastModified(rinfo.getLastModified());
 		ret.setClassloader(classloader);
@@ -68,6 +69,7 @@ public class GpmnXMLReader
 		name = name.substring(0, name.length()-5);
 		ret.setName(name);
 		rinfo.getInputStream().close();
+		
 		return ret;
 	}
 	
@@ -86,6 +88,7 @@ public class GpmnXMLReader
 		
 		ret.setLastModified(rinfo.getLastModified());
 		ret.setFilename(rinfo.getFilename());
+		ret.setClassloader(classloader);
 		
 		String name = new File(rinfo.getFilename()).getName();
 		name = name.substring(0, name.length()-5);

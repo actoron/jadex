@@ -116,11 +116,44 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory
 	 * @param parent The parent component (if any).
 	 * @return An instance of a component.
 	 */
-	public Object[] createComponentInstance(IComponentDescription desc, IComponentAdapterFactory factory, IModelInfo model, 
+	public Object[] createComponentInstance(IComponentDescription desc, IComponentAdapterFactory factory, IModelInfo modelinfo, 
 		String config, Map arguments, IExternalAccess parent, Future ret)
 	{
-		OAVAgentModel amodel = (OAVAgentModel)model;
-		
+		try
+		{
+	//		OAVAgentModel amodel = (OAVAgentModel)model;
+			OAVAgentModel amodel = (OAVAgentModel)loader.loadModel(modelinfo.getFilename(), null, modelinfo.getClassLoader());
+			
+			// Create type model for agent instance (e.g. holding dynamically loaded java classes).
+			OAVTypeModel tmodel	= new OAVTypeModel(desc.getName().getLocalName()+"_typemodel", amodel.getState().getTypeModel().getClassLoader());
+	//		OAVTypeModel tmodel	= new OAVTypeModel(model.getName()+"_typemodel", ((OAVAgentModel)model).getTypeModel().getClassLoader());
+			tmodel.addTypeModel(amodel.getState().getTypeModel());
+			tmodel.addTypeModel(OAVBDIRuntimeModel.bdi_rt_model);
+			IOAVState	state	= OAVStateFactory.createOAVState(tmodel); 
+			state.addSubstate(amodel.getState());
+			
+			BDIInterpreter bdii = new BDIInterpreter(desc, factory, state, amodel, config, arguments, parent, props, ret);
+			return new Object[]{bdii, bdii.getAgentAdapter()};
+		}
+		catch(Exception e)
+		{
+			throw new RuntimeException(e);
+		}
+	}
+	
+	// Needed for gpmn factory
+	/**
+	 * Create a component instance.
+	 * @param adapter The component adapter.
+	 * @param model The component model.
+	 * @param config The name of the configuration (or null for default configuration) 
+	 * @param arguments The arguments for the agent as name/value pairs.
+	 * @param parent The parent component (if any).
+	 * @return An instance of a component.
+	 */
+	public Object[] createComponentInstance(IComponentDescription desc, IComponentAdapterFactory factory, OAVAgentModel amodel, 
+		String config, Map arguments, IExternalAccess parent, Future ret)
+	{
 		// Create type model for agent instance (e.g. holding dynamically loaded java classes).
 		OAVTypeModel tmodel	= new OAVTypeModel(desc.getName().getLocalName()+"_typemodel", amodel.getState().getTypeModel().getClassLoader());
 //		OAVTypeModel tmodel	= new OAVTypeModel(model.getName()+"_typemodel", ((OAVAgentModel)model).getTypeModel().getClassLoader());
@@ -141,13 +174,11 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory
 	 */
 	public IModelInfo loadModel(String filename, String[] imports, ClassLoader classloader)
 	{
-//		init();
-		
 		try
 		{
 //			System.out.println("loading bdi: "+filename);
 			OAVCapabilityModel loaded = (OAVCapabilityModel)loader.loadModel(filename, imports, classloader);
-			return loaded;
+			return loaded.getModelInfo();
 		}
 		catch(Exception e)
 		{
@@ -324,6 +355,6 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory
 		
 		loader.registerModel(filename, ret);
 		
-		return ret;
+		return ret.getModelInfo();
 	}
 }

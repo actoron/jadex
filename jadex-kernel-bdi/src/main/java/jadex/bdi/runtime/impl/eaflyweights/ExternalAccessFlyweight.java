@@ -914,7 +914,7 @@ public class ExternalAccessFlyweight extends EACapabilityFlyweight implements IB
 	 */
 	public IModelInfo	getModel()
 	{
-		return getInterpreter().getModel();
+		return getInterpreter().getModel().getModelInfo();
 	}
 	
 	/**

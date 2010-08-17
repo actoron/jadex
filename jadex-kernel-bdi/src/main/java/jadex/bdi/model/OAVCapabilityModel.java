@@ -4,17 +4,19 @@ import jadex.bdi.runtime.interpreter.MBeliefArgument;
 import jadex.bdi.runtime.interpreter.MBeliefSetArgument;
 import jadex.bdi.runtime.interpreter.Report;
 import jadex.bridge.IArgument;
-import jadex.bridge.IModelInfo;
-import jadex.bridge.IReport;
+import jadex.bridge.ModelInfo;
 import jadex.commons.ICacheableModel;
+import jadex.commons.IFuture;
+import jadex.commons.SReflect;
 import jadex.commons.SUtil;
+import jadex.javaparser.IParsedExpression;
 import jadex.rules.rulesystem.IRule;
 import jadex.rules.rulesystem.Rulebase;
 import jadex.rules.state.IOAVState;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -24,7 +26,7 @@ import java.util.Set;
  *  The capability model contains the OAV capability model in a state
  *  and a type-specific compiled rulebase (matcher functionality).
  */
-public class OAVCapabilityModel implements IModelInfo, ICacheableModel
+public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 {
 	//-------- attributes --------
 	
@@ -40,8 +42,9 @@ public class OAVCapabilityModel implements IModelInfo, ICacheableModel
 	/** The rulebase of the capability (includes type-specific rules, if any). */
 	protected Rulebase rulebase;
 	
-	/** The filename. */
-	protected String	filename;
+	
+//	/** The filename. */
+//	protected String	filename;
 	
 	/** The last modified date. */
 	protected long	lastmod;
@@ -49,8 +52,11 @@ public class OAVCapabilityModel implements IModelInfo, ICacheableModel
 	/** The last checked date (when the file date was last read). */
 	protected long	lastcheck;
 	
-	/** The check report. */
-	protected Report	report;
+//	/** The check report. */
+//	protected Report	report;
+	
+	/** The model info. */
+	protected ModelInfo modelinfo;
 	
 	//-------- constructors --------
 	
@@ -63,10 +69,14 @@ public class OAVCapabilityModel implements IModelInfo, ICacheableModel
 		this.handle	= handle;
 		this.types	= types;
 		this.rulebase	= new Rulebase();
-		this.filename	= filename;
+//		this.filename	= filename;
 		this.lastmod	= lastmod;
-		this.report	= report;
+//		this.report	= report;
 		report.setModel(this);
+	
+		boolean startable = !this.getClass().equals(OAVCapabilityModel.class);
+		this.modelinfo = new ModelInfo(getName(), getPackage(), getDescription(), report, getConfigurations(), getArguments(), 
+			getResults(), startable, filename, getProperties(), getClassLoader());
 	}
 	
 	//-------- IAgentModel methods --------
@@ -92,12 +102,12 @@ public class OAVCapabilityModel implements IModelInfo, ICacheableModel
 	/**
 	 *  Get the full model name (package.name)
 	 *  @return The full name.
-	 */
+	 * /
 	public String getFullName()
 	{
 		String pkg = getPackage();
 		return pkg!=null && pkg.length()>0? pkg+"."+getName(): getName();
-	}
+	}*/
 	
 	/**
 	 *  Get the model description.
@@ -112,11 +122,11 @@ public class OAVCapabilityModel implements IModelInfo, ICacheableModel
 	/**
 	 *  Get the report.
 	 *  @return The report.
-	 */
+	 * /
 	public IReport getReport()
 	{
 		return report;
-	}
+	}*/
 	
 	/**
 	 *  Get the configurations.
@@ -293,21 +303,21 @@ public class OAVCapabilityModel implements IModelInfo, ICacheableModel
 	/**
 	 *  Get the model type.
 	 *  @reeturn The model type (kernel specific).
-	 */
+	 * /
 	public String getType()
 	{
 		// todo: 
 		return "v2capability";
-	}
+	}*/
 	
 	/**
 	 *  Get the filename.
 	 *  @return The filename.
-	 */
+	 * /
 	public String getFilename()
 	{
 		return this.filename;
-	}
+	}*/
 	
 	/**
 	 *  Get the last modified date.
@@ -354,8 +364,57 @@ public class OAVCapabilityModel implements IModelInfo, ICacheableModel
 	 */
 	public Map	getProperties()
 	{
-		// Todo: implement me.
-		return Collections.EMPTY_MAP;
+		Map ret = new HashMap();
+		addCapabilityProperties(ret, handle);
+		return ret;
+	}
+	
+	/**
+	 *  Add the properties of a capability.
+	 *  @param props The map to add the properties.
+	 *  @param capa The start capability.
+	 */
+	public void addCapabilityProperties(Map props, Object capa)
+	{
+		// Properties from loaded model.
+		Collection	oprops	= state.getAttributeKeys(capa, OAVBDIMetaModel.capability_has_properties);
+		if(oprops!=null)
+		{
+			for(Iterator it=oprops.iterator(); it.hasNext(); )
+			{
+				Object	key	= it.next();
+				Object	mexp	= state.getAttributeValue(capa, OAVBDIMetaModel.capability_has_properties, key);
+				Class	clazz	= (Class)state.getAttributeValue(mexp, OAVBDIMetaModel.expression_has_class);
+				// Ignore future properties, which are evaluated at component instance startup time.
+				if(clazz==null || !SReflect.isSupertype(IFuture.class, clazz))
+				{
+					IParsedExpression	pex = (IParsedExpression)state.getAttributeValue(mexp, OAVBDIMetaModel.expression_has_content);
+					try
+					{
+						Object	value	= pex.getValue(null);
+						props.put(key, value);
+					}
+					catch(Exception e)
+					{
+						// Hack!!! Exception should be propagated.
+						System.err.println(pex.getExpressionText());
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+		
+//		// Merge with subproperties
+//		Collection subcaparefs = state.getAttributeValues(capa, OAVBDIMetaModel.capability_has_capabilityrefs);
+//		if(subcaparefs!=null)
+//		{
+//			for(Iterator it=subcaparefs.iterator(); it.hasNext(); )
+//			{
+//				Object subcaparef = it.next();
+//				Object subcapa = state.getAttributeValue(subcaparef, OAVBDIMetaModel.capabilityref_has_capability);
+//				addCapabilityProperties(props, subcapa);
+//			}
+//		}
 	}
 	
 	/**
@@ -439,5 +498,14 @@ public class OAVCapabilityModel implements IModelInfo, ICacheableModel
 		}
 		// Add types from subcapability.
 		types.addAll(cmodel.getTypes());
+	}
+
+	/**
+	 *  Get the modelinfo.
+	 *  @return the modelinfo.
+	 */
+	public ModelInfo getModelInfo()
+	{
+		return modelinfo;
 	}
 }

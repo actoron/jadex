@@ -200,7 +200,7 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 	public BDIInterpreter(IComponentDescription desc, IComponentAdapterFactory factory, final IOAVState state, final OAVAgentModel model, 
 		final String config, final Map arguments, final IExternalAccess parent, final Map kernelprops, Future inited)
 	{	
-		this.adapter = factory.createComponentAdapter(desc, model, this, parent);
+		this.adapter = factory.createComponentAdapter(desc, model.getModelInfo(), this, parent);
 		this.state = state;
 		this.model = model;
 		this.parent	= parent;

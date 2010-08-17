@@ -199,13 +199,13 @@ public class OAVBDIModelLoader	extends AbstractModelLoader
 				String	file	= (String)state.getAttributeValue(mcaparef, OAVBDIMetaModel.capabilityref_has_file);
 				OAVCapabilityModel	cmodel	= loadCapabilityModel(file, imports, model.getClassLoader());
 				model.addSubcapabilityModel(cmodel);
-				if(!cmodel.getReport().isEmpty())
+				if(!cmodel.getModelInfo().getReport().isEmpty())
 				{
 					StackElement se	= new StackElement(new QName("capability"), mcaparef, null);
 //					se.path	= model instanceof OAVAgentModel ? "agent/capabilities/capability" : "capability/capabilities/capability";
 //					se.object	= mcaparef;
-					report.addEntry(se, "Included capability <a href=\"#"+cmodel.getFilename()+"\">"+cmodel.getName()+"</a> has errors.");
-					report.addDocument(cmodel.getFilename(), cmodel.getReport().toHTMLString());
+					report.addEntry(se, "Included capability <a href=\"#"+cmodel.getModelInfo().getFilename()+"\">"+cmodel.getName()+"</a> has errors.");
+					report.addDocument(cmodel.getModelInfo().getFilename(), cmodel.getModelInfo().getReport().toHTMLString());
 				}
 
 				state.setAttributeValue(mcaparef, OAVBDIMetaModel.capabilityref_has_capability, cmodel.getHandle());				
@@ -539,6 +539,8 @@ public class OAVBDIModelLoader	extends AbstractModelLoader
 			ReteBuilder builder = pm.getReteNode().getBuilder();
 			if(builder!=null && ReteBuilder.REPORTING)
 				System.out.println(builder.getBuildReport());
+			
+			((OAVAgentModel)model).addAgentProperties();
 		}
 	}
 

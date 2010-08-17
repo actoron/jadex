@@ -310,7 +310,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	 */
 	public IModelInfo getAgentModel()
 	{
-		return getInterpreter().getModel();
+		return getInterpreter().getModel().getModelInfo();
 	}
 
 	/**

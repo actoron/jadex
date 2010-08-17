@@ -3,6 +3,7 @@ package jadex.gpmn.model2;
 import jadex.bridge.IArgument;
 import jadex.bridge.IModelInfo;
 import jadex.bridge.IReport;
+import jadex.bridge.ModelInfo;
 import jadex.commons.ICacheableModel;
 import jadex.commons.SUtil;
 
@@ -12,18 +13,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class MGpmnModel implements ICacheableModel, IModelInfo
+/**
+ * 
+ */
+public class MGpmnModel implements ICacheableModel//, IModelInfo
 {
-//-------- attributes --------
+	//-------- attributes --------
 	
-	/** The model file name. */
-	protected String filename;
+//	/** The model file name. */
+//	protected String filename;
 	
-	/** The model name. */
-	protected String name;
+//	/** The model name. */
+//	protected String name;
 	
-	/** The description. */
-	protected String description;
+//	/** The description. */
+//	protected String description;
 	
 	/** The last modified date. */
 	protected long lastmodified;
@@ -31,11 +35,11 @@ public class MGpmnModel implements ICacheableModel, IModelInfo
 	/** The last check date. */
 	protected long lastchecked;
 	
-	/** The classloader. */
-	protected ClassLoader classloader;
+//	/** The classloader. */
+//	protected ClassLoader classloader;
 	
-	/** The model package. */
-	protected String modelpackage;
+//	/** The model package. */
+//	protected String modelpackage;
 	
 	/** The imports. */
 	protected List imports;
@@ -61,6 +65,12 @@ public class MGpmnModel implements ICacheableModel, IModelInfo
 	/** The context. */
 	protected MContext context;
 	
+	/** The model info. */
+	protected ModelInfo modelinfo;
+	
+	/**
+	 *  Create a new model.
+	 */
 	public MGpmnModel()
 	{
 		this.imports = new ArrayList();
@@ -70,16 +80,17 @@ public class MGpmnModel implements ICacheableModel, IModelInfo
 		this.subprocesses = new HashMap();
 		this.activationedges = new ArrayList();
 		this.planedges = new ArrayList();
+		this.modelinfo = new ModelInfo();
 	}
 
 	/**
 	 *  Get the name.
 	 *  @return The name.
-	 */
+	 * /
 	public String getName()
 	{
 		return name;
-	}
+	}*/
 
 	/**
 	 *  Set the name.
@@ -87,27 +98,27 @@ public class MGpmnModel implements ICacheableModel, IModelInfo
 	 */
 	public void setName(String name)
 	{
-		this.name = name;
+		modelinfo.setName(name);
 	}
 
 	/**
 	 *  Get the full model name (package.name)
 	 *  @return The full name.
-	 */
+	 * /
 	public String getFullName()
 	{
 		String pkg = getPackage();
 		return pkg!=null && pkg.length()>0? pkg+"."+getName(): getName();
-	}
+	}*/
 	
 	/**
 	 *  Get the filename.
 	 *  @return The filename.
-	 */
+	 * /
 	public String getFilename()
 	{
 		return filename;
-	}
+	}*/
 
 	/**
 	 *  Set the filename.
@@ -115,17 +126,17 @@ public class MGpmnModel implements ICacheableModel, IModelInfo
 	 */
 	public void setFilename(String filename)
 	{
-		this.filename = filename;
+		modelinfo.setFilename(filename);
 	}
 	
 	/**
 	 *  Get the description of the model.
 	 *  @return The description of the model.
-	 */
+	 * /
 	public String	getDescription()
 	{
 		return description;
-	}
+	}*/
 	
 	/**
 	 *  Set the description of the model.
@@ -133,11 +144,9 @@ public class MGpmnModel implements ICacheableModel, IModelInfo
 	 */
 	public void	setDescription(String description)
 	{
-		this.description	= description;
+		modelinfo.setDescription(description);
 	}
 
-	// ------------------------------------------------------------
-	
 	/**
 	 *  Get lastmodified.
 	 *  @return The lastmodified.
@@ -176,11 +185,11 @@ public class MGpmnModel implements ICacheableModel, IModelInfo
 	
 	/**
 	 *  Return the class loader.
-	 */
+	 * /
 	public ClassLoader getClassLoader()
 	{
 		return classloader;
-	}
+	}*/
 
 	/**
 	 *  Set the classloader.
@@ -188,68 +197,68 @@ public class MGpmnModel implements ICacheableModel, IModelInfo
 	 */
 	public void setClassloader(ClassLoader classloader)
 	{
-		this.classloader = classloader;
+		modelinfo.setClassloader(classloader);
 	}
 	
 	/**
 	 *  Get the results.
 	 *  @return The results.
-	 */
+	 * /
 	public IArgument[] getResults()
 	{
 		// todo:
 		return new IArgument[0];
-	}
+	}*/
 	
 	/**
 	 *  Get the configurations.
 	 *  @return The configuration.
-	 */
+	 * /
 	public String[] getConfigurations()
 	{
 		// todo: implement me
 		
 		String[] ret = SUtil.EMPTY_STRING_ARRAY;
 		return ret;
-	}
+	}*/
 	
 	/**
 	 *  Is the model startable.
 	 *  @return True, if startable.
-	 */
+	 * /
 	public boolean isStartable()
 	{
 		return true;
-	}
+	}*/
 	
 	/**
 	 *  Get the properties.
 	 *  Arbitrary properties that can e.g. be used to
 	 *  define kernel-specific settings to configure tools. 
 	 *  @return The properties.
-	 */
+	 * /
 	public Map	getProperties()
 	{
 		// Todo: implement me.
 		return Collections.EMPTY_MAP;
-	}
+	}*/
 	
 	/**
 	 *  Get the arguments.
 	 *  @return The arguments.
-	 */
+	 * /
 	public IArgument[] getArguments()
 	{		
 		// todo: 
 		
 		IArgument[] ret = new IArgument[0];
 		return ret;
-	}
+	}*/
 	
 	/**
 	 *  Get the report.
 	 *  @return The report.
-	 */
+	 * /
 	public IReport getReport()
 	{
 		// todo: 
@@ -271,18 +280,18 @@ public class MGpmnModel implements ICacheableModel, IModelInfo
 				return "";
 			}
 		};
-	}
+	}*/
 	
 	// --------------------------------------------------------------------
 
 	/**
 	 *  Get the package.
 	 *  @return The package.
-	 */
+	 * /
 	public String getPackage()
 	{
 		return modelpackage;
-	}
+	}*/
 
 	/**
 	 *  Set the package.
@@ -290,7 +299,7 @@ public class MGpmnModel implements ICacheableModel, IModelInfo
 	 */
 	public void setPackage(String modelpackage)
 	{
-		this.modelpackage = modelpackage;
+		modelinfo.setPackage(modelpackage);
 	}
 	
 	/**
@@ -498,5 +507,14 @@ public class MGpmnModel implements ICacheableModel, IModelInfo
 	public void setContext(MContext context)
 	{
 		this.context = context;
+	}
+	
+	/**
+	 *  Get the modelinfo.
+	 *  @return the modelinfo.
+	 */
+	public ModelInfo getModelInfo()
+	{
+		return modelinfo;
 	}
 }

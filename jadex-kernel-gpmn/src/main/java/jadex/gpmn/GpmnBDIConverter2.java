@@ -64,7 +64,7 @@ public class GpmnBDIConverter2
 	{
 		OAVAgentModel agentmodel = null;
 		
-		OAVTypeModel typemodel = new OAVTypeModel(model.getName()+"_typemodel", classloader);
+		OAVTypeModel typemodel = new OAVTypeModel(model.getModelInfo().getName()+"_typemodel", classloader);
 		// Requires runtime meta model, because e.g. user conditions can refer to runtime elements (belief, goal, etc.) 
 		typemodel.addTypeModel(OAVBDIRuntimeModel.bdi_rt_model);
 		IOAVState state	= OAVStateFactory.createOAVState(typemodel);
@@ -94,10 +94,10 @@ public class GpmnBDIConverter2
 		
 		Object handle = state.createRootObject(OAVBDIMetaModel.agent_type); 
 		
-		state.setAttributeValue(handle, OAVBDIMetaModel.modelelement_has_name, model.getName());
+		state.setAttributeValue(handle, OAVBDIMetaModel.modelelement_has_name, model.getModelInfo().getName());
 		//TODO: Add process description
 		//state.setAttributeValue(handle, OAVBDIMetaModel.modelelement_has_description, model.getDescription());
-		state.setAttributeValue(handle, OAVBDIMetaModel.capability_has_package, model.getPackage());
+		state.setAttributeValue(handle, OAVBDIMetaModel.capability_has_package, model.getModelInfo().getPackage());
 		String[] imports = (String[]) model.getImports().toArray(new String[0]);
 		if(imports!=null)
 		{
@@ -108,7 +108,7 @@ public class GpmnBDIConverter2
 		}
 		doConvert(model, classloader, state, handle);
 		state.removeStateListener(listener);
-		agentmodel =  new OAVAgentModel(state, handle, types, model.getFilename(), model.getLastModified(), report);
+		agentmodel =  new OAVAgentModel(state, handle, types, model.getModelInfo().getFilename(), model.getLastModified(), report);
 		try
 		{
 			loader.createAgentModelEntry(agentmodel, report);
@@ -298,7 +298,7 @@ public class GpmnBDIConverter2
 		}
 		
 		// Create plan for starting/monitoring the process.
-		String planname = "startandmonitor_"+model.getName();//.substring(0, proc.getName().indexOf("."));
+		String planname = "startandmonitor_"+model.getModelInfo().getName();//.substring(0, proc.getName().indexOf("."));
 		Object planhandle = createPlan(scopehandle, state, planname, "jadex.gpmn.runtime.plan.StartAndMonitorProcessPlan", null, null, null);
 		
 		// Prepare activated elements set

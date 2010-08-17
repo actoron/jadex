@@ -110,10 +110,10 @@ public class Report implements IReport, Cloneable
 		buf.append("Report for ");
 		buf.append(model.getName());
 		buf.append("\n");
-		if(model instanceof OAVCapabilityModel && ((OAVCapabilityModel)model).getFilename()!=null)
+		if(model instanceof OAVCapabilityModel && ((OAVCapabilityModel)model).getModelInfo().getFilename()!=null)
 		{
 			buf.append("File: ");
-			buf.append(((OAVCapabilityModel)model).getFilename());
+			buf.append(((OAVCapabilityModel)model).getModelInfo().getFilename());
 			buf.append("\n");
 		}
 		
@@ -152,10 +152,10 @@ public class Report implements IReport, Cloneable
 		buf.append("<h3>Report for ");
 		buf.append(model.getName());
 		buf.append("</h3>\n");
-		if(model instanceof OAVCapabilityModel && ((OAVCapabilityModel)model).getFilename()!=null)
+		if(model instanceof OAVCapabilityModel && ((OAVCapabilityModel)model).getModelInfo().getFilename()!=null)
 		{
 			buf.append("File: ");
-			buf.append(((OAVCapabilityModel)model).getFilename());
+			buf.append(((OAVCapabilityModel)model).getModelInfo().getFilename());
 			buf.append("\n");
 		}
 

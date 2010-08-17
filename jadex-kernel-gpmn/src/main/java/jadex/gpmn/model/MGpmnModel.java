@@ -3,6 +3,7 @@ package jadex.gpmn.model;
 import jadex.bridge.IArgument;
 import jadex.bridge.IModelInfo;
 import jadex.bridge.IReport;
+import jadex.bridge.ModelInfo;
 import jadex.commons.ICacheableModel;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
@@ -16,7 +17,7 @@ import java.util.Map;
 /**
  *  Java representation of a bpmn model for xml description.
  */
-public class MGpmnModel extends MProcess implements ICacheableModel, IModelInfo
+public class MGpmnModel extends MProcess implements ICacheableModel//, IModelInfo
 {
 	//-------- attributes --------
 	
@@ -29,8 +30,8 @@ public class MGpmnModel extends MProcess implements ICacheableModel, IModelInfo
 	/** The name of the model. */
 //	protected String name;
 
-	/** The description. */
-	protected String description;
+//	/** The description. */
+//	protected String description;
 	
 	//-------- init structures --------
 	
@@ -39,16 +40,16 @@ public class MGpmnModel extends MProcess implements ICacheableModel, IModelInfo
 	
 	//-------- added structures --------
 	
-	/** The package. */
-	protected String packagename;
+//	/** The package. */
+//	protected String packagename;
 	
 	/** The imports. */
 	protected String[] imports;
 	
 	//-------- model management --------
 	
-	/** The filename. */
-	protected String filename;
+//	/** The filename. */
+//	protected String filename;
 	
 	/** The last modified date. */
 	protected long lastmodified;
@@ -56,8 +57,11 @@ public class MGpmnModel extends MProcess implements ICacheableModel, IModelInfo
 	/** The last check date. */
 	protected long lastchecked;
 	
-	/** The classloader. */
-	protected ClassLoader classloader;
+//	/** The classloader. */
+//	protected ClassLoader classloader;
+	
+	/** The model info. */
+	protected ModelInfo modelinfo = new ModelInfo();
 	
 	//-------- methods --------
 
@@ -144,12 +148,12 @@ public class MGpmnModel extends MProcess implements ICacheableModel, IModelInfo
 	/**
 	 *  Get the full model name (package.name)
 	 *  @return The full name.
-	 */
+	 * /
 	public String getFullName()
 	{
 		String pkg = getPackage();
 		return pkg!=null && pkg.length()>0? pkg+"."+getName(): getName();
-	}
+	}*/
 	
 	/**
 	 *  Get the description of the model.
@@ -190,11 +194,11 @@ public class MGpmnModel extends MProcess implements ICacheableModel, IModelInfo
 	/**
 	 *  Get the filename.
 	 *  @return The filename.
-	 */
+	 * /
 	public String getFilename()
 	{
 		return this.filename;
-	}
+	}*/
 
 	/**
 	 *  Set the filename.
@@ -202,7 +206,7 @@ public class MGpmnModel extends MProcess implements ICacheableModel, IModelInfo
 	 */
 	public void setFilename(String filename)
 	{
-		this.filename = filename;
+		modelinfo.setFilename(filename);
 	}
 
 	/**
@@ -226,11 +230,11 @@ public class MGpmnModel extends MProcess implements ICacheableModel, IModelInfo
 	/**
 	 *  Get the package name.
 	 *  @return The package name.
-	 */
+	 * /
 	public String getPackage()
 	{
 		return packagename;
-	}
+	}*/
 	
 	/**
 	 *  Set the package name.
@@ -238,7 +242,7 @@ public class MGpmnModel extends MProcess implements ICacheableModel, IModelInfo
 	 */
 	public void setPackage(String packagename)
 	{
-		this.packagename = packagename;
+		modelinfo.setPackage(packagename);
 	}
 
 	/**
@@ -316,44 +320,53 @@ public class MGpmnModel extends MProcess implements ICacheableModel, IModelInfo
 		sbuf.append(")");
 		return sbuf.toString();
 	}
+
+	/**
+	 *  Get the modelinfo.
+	 *  @return the modelinfo.
+	 */
+	public ModelInfo getModelInfo()
+	{
+		return modelinfo;
+	}
 	
 	/**
 	 *  Get the configurations.
 	 *  @return The configuration.
-	 */
+	 * /
 	public String[] getConfigurations()
 	{
 		// todo: implement me
 		
 		String[] ret = SUtil.EMPTY_STRING_ARRAY;
 		return ret;
-	}
+	}*/
 	
 	/**
 	 *  Is the model startable.
 	 *  @return True, if startable.
-	 */
+	 * /
 	public boolean isStartable()
 	{
 		return true;
-	}
+	}*/
 	
 	/**
 	 *  Get the arguments.
 	 *  @return The arguments.
-	 */
+	 * /
 	public IArgument[] getArguments()
 	{		
 		// todo: 
 		
 		IArgument[] ret = new IArgument[0];
 		return ret;
-	}
+	}*/
 	
 	/**
 	 *  Get the report.
 	 *  @return The report.
-	 */
+	 * /
 	public IReport getReport()
 	{
 		// todo: 
@@ -375,37 +388,37 @@ public class MGpmnModel extends MProcess implements ICacheableModel, IModelInfo
 				return "";
 			}
 		};
-	}
+	}*/
 
 	/**
 	 *  Get the properties.
 	 *  Arbitrary properties that can e.g. be used to
 	 *  define kernel-specific settings to configure tools. 
 	 *  @return The properties.
-	 */
+	 * /
 	public Map	getProperties()
 	{
 		// Todo: implement me.
 		return Collections.EMPTY_MAP;
-	}
+	}*/
 	
 	/**
 	 *  Return the class loader corresponding to the micro agent class.
-	 */
+	 * /
 	public ClassLoader getClassLoader()
 	{
 		return classloader;
-	}
+	}*/
 	
 	/**
 	 *  Get the results.
 	 *  @return The results.
-	 */
+	 * /
 	public IArgument[] getResults()
 	{
 		// todo:
 		return new IArgument[0];
-	}
+	}*/
 
 	/**
 	 *  Set the classloader.
@@ -413,6 +426,8 @@ public class MGpmnModel extends MProcess implements ICacheableModel, IModelInfo
 	 */
 	public void setClassloader(ClassLoader classloader)
 	{
-		this.classloader = classloader;
+		modelinfo.setClassloader(classloader);
 	}
+	
+	
 }

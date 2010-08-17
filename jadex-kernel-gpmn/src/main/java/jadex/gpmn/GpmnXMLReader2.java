@@ -36,6 +36,9 @@ import javax.xml.namespace.QName;
  */
 public class GpmnXMLReader2
 {
+	/**
+	 *  Main for testing.
+	 */
 	public static void main(String[] args) throws Exception
 	{
 		File file = new File("/home/jander/test.gpmn");
@@ -92,6 +95,7 @@ public class GpmnXMLReader2
 		
 		ret.setLastModified(rinfo.getLastModified());
 		ret.setFilename(rinfo.getFilename());
+		ret.setClassloader(classloader);
 		
 		String name = new File(rinfo.getFilename()).getName();
 		name = name.substring(0, name.length()-5);
