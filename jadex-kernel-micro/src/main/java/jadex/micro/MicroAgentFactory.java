@@ -122,10 +122,14 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 		IArgument[] results = metainfo!=null? metainfo.getResults(): null;
 		Map properties = metainfo!=null && metainfo.getProperties()!=null? new HashMap(metainfo.getProperties()): new HashMap();
 		
+		// Add debugger breakpoints
 		List names = new ArrayList();
 		for(int i=0; metainfo!=null && i<metainfo.getBreakpoints().length; i++)
 			names.add(metainfo.getBreakpoints()[i]);
 		properties.put("debugger.breakpoints", names);
+		
+		// Exclude getServiceProvider() from remote external access interface
+		properties.put("remote_excluded", new String[]{"getServiceProvider"});
 		
 		ret = new ModelInfo(name, packagename, description, report, 
 			configurations, arguments, results, true, model, properties, classloader);
