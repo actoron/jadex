@@ -146,7 +146,7 @@
 					<archive>
 						<manifest>
 							<addClasspath>true</addClasspath>
-							<mainClass>jadex.standalone.Platform</mainClass>
+							<mainClass>jadex.base.Starter</mainClass>
 						</manifest>
 					</archive>
 				</configuration>
