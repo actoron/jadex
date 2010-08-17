@@ -12,10 +12,9 @@ import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IExecutable;
 import jadex.commons.concurrent.LoadManagingExecutionService;
 import jadex.commons.concurrent.SwingDefaultResultListener;
-import jadex.service.IServiceContainer;
+import jadex.service.IServiceProvider;
 import jadex.service.SServiceProvider;
 import jadex.service.library.ILibraryService;
-import jadex.service.library.ILibraryServiceListener;
 import jadex.service.threadpool.IThreadPoolService;
 import jadex.tools.common.PopupBuilder;
 import jadex.tools.common.ToolTipAction;
@@ -31,7 +30,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
@@ -85,7 +83,7 @@ public class ModelExplorer extends JTree
 	//-------- attributes --------
 
 	/** The service container. */
-	protected IServiceContainer container;
+	protected IServiceProvider container;
 
 	/** The root node. */
 	protected RootNode root;
@@ -128,7 +126,7 @@ public class ModelExplorer extends JTree
 	/**
 	 *  Create a new ModelExplorer.
 	 */
-	public ModelExplorer(IServiceContainer container, DefaultNodeFunctionality nof)
+	public ModelExplorer(IServiceProvider container, DefaultNodeFunctionality nof)
 	{
 		super(new ModelExplorerTreeModel(new RootNode(), nof));
 		this.container = container;

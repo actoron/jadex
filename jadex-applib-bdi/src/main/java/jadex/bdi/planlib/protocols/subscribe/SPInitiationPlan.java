@@ -16,6 +16,8 @@ public class SPInitiationPlan extends Plan
 			subReq.getParameter("language").setValue(getParameter("language").getValue());
 		if(getParameter("ontology").getValue()!=null)
 			subReq.getParameter("ontology").setValue(getParameter("ontology").getValue());
+		if(getParameter("conversation_id").getValue()!=null)
+			subReq.getParameter("conversation_id").setValue(getParameter("conversation_id").getValue());
 		
 		getParameter("subscription_id").setValue(subReq.getParameter(SFipa.CONVERSATION_ID));
 		

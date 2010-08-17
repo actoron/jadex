@@ -47,6 +47,9 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 	/** The daemon flag. */
 	protected boolean daemon;
 	
+	/** The auto shutdown flag. */
+	protected boolean autoshutdown;
+	
 	//-------- constructors --------
 
 	/**
@@ -59,7 +62,7 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 	/**
 	 *  Create a new CESComponentDescription.
 	 */
-	public CMSComponentDescription(IComponentIdentifier cid, String type, IComponentIdentifier parent, boolean master, boolean daemon)//, String modelname)
+	public CMSComponentDescription(IComponentIdentifier cid, String type, IComponentIdentifier parent, boolean master, boolean daemon, boolean autoshutdown)//, String modelname)
 	{
 		this();
 		setName(cid);
@@ -69,6 +72,7 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 		setProcessingState(IComponentDescription.PROCESSINGSTATE_IDLE);
 		setMaster(master);
 		setDaemon(daemon);
+		setAutoShutdown(autoshutdown);
 //		setModelName(modelname);
 	}
 
@@ -276,6 +280,24 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 	public void setDaemon(boolean daemon)
 	{
 		this.daemon = daemon;
+	}
+	
+	/**
+	 *  Get the auto shutdown flag.
+	 *  @return	The flag.
+	 */
+	public boolean isAutoShutdown()
+	{
+		return autoshutdown;
+	}
+	
+	/**
+	 *  Set the auto shutdown flag.
+	 *  @param autoshutdown	The flag.
+	 */
+	public void	setAutoShutdown(boolean autoshutdown)
+	{
+		this.autoshutdown	= autoshutdown;
 	}
 	
 	/**

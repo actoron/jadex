@@ -12,8 +12,8 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.IModelInfo;
 import jadex.bridge.IMessageService;
+import jadex.bridge.IModelInfo;
 import jadex.bridge.IRemoteServiceManagementService;
 import jadex.bridge.ISearchConstraints;
 import jadex.commons.Future;
@@ -24,7 +24,6 @@ import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.service.BasicService;
-import jadex.service.IServiceContainer;
 import jadex.service.IServiceProvider;
 import jadex.service.SServiceProvider;
 import jadex.service.execution.IExecutionService;
@@ -78,12 +77,6 @@ public class ComponentManagementService extends BasicService implements ICompone
 	/** The result (kill listeners). */
 	protected Map killresultlisteners;
 	
-	/** The daemon counter. */
-	protected int daemons;
-	
-	/** The autoshutdown flag. */
-	protected boolean autoshutdown;
-
 	/** The exception of a component during execution (if any). */
 	protected Map exceptions;
 	
@@ -109,21 +102,20 @@ public class ComponentManagementService extends BasicService implements ICompone
      *  Create a new component execution service.
      *  @param provider	The service provider.
      */
-    public ComponentManagementService(IServiceContainer provider, boolean autoshutdown)
+    public ComponentManagementService(IServiceProvider provider)
 	{
-    	this(provider, autoshutdown, null);
+    	this(provider, null);
 	}
 	
     /**
      *  Create a new component execution service.
      *  @param provider	The service provider.
      */
-    public ComponentManagementService(IServiceProvider provider, boolean autoshutdown, IComponentAdapter root)
+    public ComponentManagementService(IServiceProvider provider, IComponentAdapter root)
 	{
 		super(provider.getId(), IComponentManagementService.class, null);
 
 		this.provider = provider;
-		this.autoshutdown = autoshutdown;
 		this.adapters = Collections.synchronizedMap(SCollection.createHashMap());
 		this.descs = Collections.synchronizedMap(SCollection.createLinkedHashMap());
 		this.ccs = SCollection.createLinkedHashMap();
@@ -222,7 +214,7 @@ public class ComponentManagementService extends BasicService implements ICompone
 						final StandaloneComponentAdapter pad = getParentAdapter(cinfo);
 						IExternalAccess parent = pad.getComponentInstance().getExternalAccess();
 						final CMSComponentDescription ad = new CMSComponentDescription(cid, type, 
-							getParentIdentifier(cinfo), cinfo.isMaster(), cinfo.isDaemon());
+							getParentIdentifier(cinfo), cinfo.isMaster(), cinfo.isDaemon(), cinfo.isAutoShutdown());
 						
 						Future future = new Future();
 						future.addResultListener(new IResultListener()
@@ -238,10 +230,6 @@ public class ComponentManagementService extends BasicService implements ICompone
 									synchronized(descs)
 									{
 //										System.out.println("created: "+ad);
-										
-										// Increase daemon cnt
-										if(cinfo.isDaemon())
-											daemons++;
 										
 										if(isInitSuspend(cinfo, lmodel))
 										{
@@ -330,8 +318,11 @@ public class ComponentManagementService extends BasicService implements ICompone
 						});
 						
 						// Create component and wakeup for init.
+						// Use first configuration if no config specified.
+						String config	= cinfo.getConfiguration()!=null ? cinfo.getConfiguration()
+							: lmodel.getConfigurations().length>0 ? lmodel.getConfigurations()[0] : null;
 						Object[] comp = factory.createComponentInstance(ad, caf, lmodel, 
-							cinfo.getConfiguration(), cinfo.getArguments(), parent, future);
+							config, cinfo.getArguments(), parent, future);
 						
 						// Store (invalid) desc, adapter and info for children
 						synchronized(adapters)
@@ -760,6 +751,7 @@ public class ComponentManagementService extends BasicService implements ICompone
 		else
 		{
 			CMSComponentDescription ad;
+			boolean	changed	= false;
 			synchronized(adapters)
 			{
 				synchronized(descs)
@@ -771,10 +763,10 @@ public class ComponentManagementService extends BasicService implements ICompone
 					for(int i=0; i<achildren.length; i++)
 					{
 	//					IComponentIdentifier	child	= (IComponentIdentifier)it.next();
-						if(IComponentDescription.STATE_SUSPENDED.equals(((IComponentDescription)descs.get(achildren[i])).getState()))
-						{
+//						if(IComponentDescription.STATE_SUSPENDED.equals(((IComponentDescription)descs.get(achildren[i])).getState()))
+//						{
 							resumeComponent(achildren[i]);	// todo: cascading resume with wait.
-						}
+//						}
 					}
 	
 					StandaloneComponentAdapter adapter = (StandaloneComponentAdapter)adapters.get(cid);
@@ -784,28 +776,30 @@ public class ComponentManagementService extends BasicService implements ICompone
 						ret.setException(new RuntimeException("Component identifier not registered: "+cid));
 						return ret;
 					}
-					if(!IComponentDescription.STATE_SUSPENDED.equals(ad.getState()))
+
+					if(IComponentDescription.STATE_SUSPENDED.equals(ad.getState()))
 					{
-						ret.setException(new RuntimeException("Component identifier not registered: "+cid));
-						return ret;
+						ad.setState(IComponentDescription.STATE_ACTIVE);						
+						adapter.wakeup();
+						changed	= true;
 					}
-					
-					ad.setState(IComponentDescription.STATE_ACTIVE);
-					adapter.wakeup();
 				}
 			}
 			
-			IComponentListener[]	alisteners;
-			synchronized(listeners)
+			if(changed)
 			{
-				Set	slisteners	= new HashSet(listeners.getCollection(null));
-				slisteners.addAll(listeners.getCollection(cid));
-				alisteners	= (IComponentListener[])slisteners.toArray(new IComponentListener[slisteners.size()]);
-			}
-			// todo: can be called after listener has (concurrently) deregistered
-			for(int i=0; i<alisteners.length; i++)
-			{
-				alisteners[i].componentChanged(ad);
+				IComponentListener[]	alisteners;
+				synchronized(listeners)
+				{
+					Set	slisteners	= new HashSet(listeners.getCollection(null));
+					slisteners.addAll(listeners.getCollection(cid));
+					alisteners	= (IComponentListener[])slisteners.toArray(new IComponentListener[slisteners.size()]);
+				}
+				// todo: can be called after listener has (concurrently) deregistered
+				for(int i=0; i<alisteners.length; i++)
+				{
+					alisteners[i].componentChanged(ad);
+				}
 			}
 		
 			ret.setResult(ad);
@@ -1005,6 +999,7 @@ public class ComponentManagementService extends BasicService implements ICompone
 		
 		public void resultAvailable(Object source, Object result)
 		{
+			boolean	killparent	= false;
 			StandaloneComponentAdapter adapter = null;
 			StandaloneComponentAdapter pad = null;
 			CMSComponentDescription desc;
@@ -1026,10 +1021,6 @@ public class ComponentManagementService extends BasicService implements ICompone
 					
 					desc = (CMSComponentDescription)descs.remove(cid);
 					desc.setState(IComponentDescription.STATE_TERMINATED);
-					if(desc.isDaemon())
-						daemons--;
-//					if((autoshutdown && adapters.size()-daemons==0) || desc.isMaster())
-//						shutdown = true;
 					
 					ccs.remove(cid);
 					
@@ -1039,10 +1030,22 @@ public class ComponentManagementService extends BasicService implements ICompone
 						// Stop execution of component. When root component services are already shutdowned.
 						exeservice.cancel(adapter);
 						
-//						children.remove(desc.getParent(), desc.getName());
+						killparent	= desc.isMaster();
 						CMSComponentDescription padesc = (CMSComponentDescription)descs.get(desc.getParent());
 						if(padesc!=null)
+						{
 							padesc.removeChild(desc.getName());
+							if(padesc.isAutoShutdown())
+							{
+								IComponentIdentifier[]	children	= padesc.getChildren();
+								killparent	= true;
+								for(int i=0; killparent && i<children.length; i++)
+								{
+									CMSComponentDescription cdesc = (CMSComponentDescription)descs.get(children[i]);
+									killparent	= cdesc.isDaemon();
+								}
+							}
+						}
 						pad	= (StandaloneComponentAdapter)adapters.get(desc.getParent());
 					}
 				}
@@ -1057,17 +1060,6 @@ public class ComponentManagementService extends BasicService implements ICompone
 			}
 			// else parent has just been killed.
 			
-//			// Deregister killed component at contexts.
-//			IContextService	cs	= (IContextService)container.getService(IContextService.class);
-//			if(cs!=null)
-//			{
-//				IContext[]	contexts	= cs.getContexts(cid);
-//				for(int i=0; contexts!=null && i<contexts.length; i++)
-//				{
-//					((BaseContext)contexts[i]).componentDestroyed(cid);
-//				}
-//			}
-
 			IComponentListener[] alisteners;
 			synchronized(listeners)
 			{
@@ -1118,14 +1110,6 @@ public class ComponentManagementService extends BasicService implements ICompone
 			
 //			System.out.println("CleanupCommand end.");
 			
-//			if(killlisteners!=null)
-//			{
-//				for(int i=0; i<killlisteners.size(); i++)
-//				{
-//					((IResultListener)killlisteners.get(i)).resultAvailable(source, result);
-//				}
-//			}
-			
 			if(killfutures!=null)
 			{
 				for(int i=0; i<killfutures.size(); i++)
@@ -1134,9 +1118,11 @@ public class ComponentManagementService extends BasicService implements ICompone
 				}
 			}
 			
-			// Shudown platform when last (non-daemon) component was destroyed
-//			if(shutdown)
-//				container.shutdown();
+			// Kill parent is autoshutdown or child was master.
+			if(pad!=null && killparent)
+			{
+				destroyComponent(pad.getComponentIdentifier());
+			}
 		}
 		
 		public void exceptionOccurred(Object source, Exception exception)
@@ -1346,7 +1332,7 @@ public class ComponentManagementService extends BasicService implements ICompone
 	 */
 	public IComponentDescription createComponentDescription(IComponentIdentifier id, String state, String ownership, String type, IComponentIdentifier parent)
 	{
-		CMSComponentDescription	ret	= new CMSComponentDescription(id, type, parent, false, false);
+		CMSComponentDescription	ret	= new CMSComponentDescription(id, type, parent, false, false, false);
 		ret.setState(state);
 		ret.setOwnership(ownership);
 		return ret;
@@ -1692,7 +1678,7 @@ public class ComponentManagementService extends BasicService implements ICompone
 	 */
 	public IFuture	shutdownService()
 	{
-		System.out.println("shutdown: "+this);
+//		System.out.println("shutdown: "+this);
 		return super.shutdownService();
 
 		/*final Future ret = new Future();

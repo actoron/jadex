@@ -3,7 +3,7 @@ package jadex.tools.simcenter;
 import jadex.base.service.simulation.ISimulationService;
 import jadex.commons.TimeFormat;
 import jadex.commons.concurrent.SwingDefaultResultListener;
-import jadex.service.IServiceContainer;
+import jadex.service.IServiceProvider;
 import jadex.service.SServiceProvider;
 
 import java.awt.BorderLayout;
@@ -77,7 +77,7 @@ public class SimCenterPanel extends JPanel
 		
 		add(sp, "Center");
 		
-		SServiceProvider.getService(simcenter.getJCC().getServiceContainer(),
+		SServiceProvider.getService(simcenter.getJCC().getServiceProvider(),
 			ISimulationService.class).addResultListener(new SwingDefaultResultListener(SimCenterPanel.this)
 		{
 			public void customResultAvailable(Object source, Object result)
@@ -102,9 +102,9 @@ public class SimCenterPanel extends JPanel
 	 *  Get the service container.
 	 *  @return The service container.
 	 */
-	public IServiceContainer	getServiceContainer()
+	public IServiceProvider	getServiceContainer()
 	{
-		return (IServiceContainer)simcenter.getJCC().getServiceContainer();
+		return simcenter.getJCC().getServiceProvider();
 	}
 	
 	/**

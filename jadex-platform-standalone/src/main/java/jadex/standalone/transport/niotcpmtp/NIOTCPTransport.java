@@ -9,7 +9,7 @@ import jadex.commons.collection.LRU;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.DefaultResultListener;
-import jadex.service.IServiceContainer;
+import jadex.service.IServiceProvider;
 import jadex.service.SServiceProvider;
 import jadex.service.clock.IClockService;
 import jadex.service.clock.ITimedObject;
@@ -72,7 +72,7 @@ public class NIOTCPTransport implements ITransport
 	//-------- attributes --------
 	
 	/** The platform. */
-	protected IServiceContainer container;
+	protected IServiceProvider container;
 	
 	/** The addresses. */
 	protected String[] addresses;
@@ -105,7 +105,7 @@ public class NIOTCPTransport implements ITransport
 	 *  @param platform The platform.
 	 *  @param settings The settings.
 	 */
-	public NIOTCPTransport(final IServiceContainer container, int port)
+	public NIOTCPTransport(final IServiceProvider container, int port)
 	{
 		this.logger = Logger.getLogger("NIOTCPTransport" + this);
 		this.codecfac = new CodecFactory();

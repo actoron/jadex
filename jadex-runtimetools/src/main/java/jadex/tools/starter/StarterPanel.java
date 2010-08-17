@@ -238,7 +238,7 @@ public class StarterPanel extends JPanel
 			{
 				if(model!=null)
 				{
-					SServiceProvider.getService(starter.getJCC().getServiceContainer(),
+					SServiceProvider.getService(starter.getJCC().getServiceProvider(),
 						ILibraryService.class).addResultListener(new SwingDefaultResultListener(StarterPanel.this)
 					{
 						public void customResultAvailable(Object source, Object result)
@@ -383,7 +383,7 @@ public class StarterPanel extends JPanel
 		chooseparent.setToolTipText("Choose parent");
 		componentpanel.add(chooseparent, new GridBagConstraints(3, 1, 1, 1, 0, 0, GridBagConstraints.EAST,
 			GridBagConstraints.BOTH, new Insets(2, 2, 0, 2), 0, 0));
-		final AgentSelectorDialog	agentselector = new AgentSelectorDialog(this, starter.getJCC().getServiceContainer());
+		final AgentSelectorDialog	agentselector = new AgentSelectorDialog(this, starter.getJCC().getServiceProvider());
 		chooseparent.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
@@ -545,13 +545,13 @@ public class StarterPanel extends JPanel
 		
 		if(adf!=null)
 		{
-			SComponentFactory.isLoadable(starter.getJCC().getServiceContainer(), adf).addResultListener(new SwingDefaultResultListener(StarterPanel.this)
+			SComponentFactory.isLoadable(starter.getJCC().getServiceProvider(), adf).addResultListener(new SwingDefaultResultListener(StarterPanel.this)
 			{
 				public void customResultAvailable(Object source, Object result)
 				{
 					if(((Boolean)result).booleanValue())
 					{
-						SComponentFactory.loadModel(starter.getJCC().getServiceContainer(), adf).addResultListener(new SwingDefaultResultListener(StarterPanel.this)
+						SComponentFactory.loadModel(starter.getJCC().getServiceProvider(), adf).addResultListener(new SwingDefaultResultListener(StarterPanel.this)
 						{
 							public void customResultAvailable(Object source, Object result)
 							{
@@ -863,7 +863,7 @@ public class StarterPanel extends JPanel
 	 */
 	protected void createArguments()
 	{
-		SServiceProvider.getService(starter.getJCC().getServiceContainer(),
+		SServiceProvider.getService(starter.getJCC().getServiceProvider(),
 			ILibraryService.class).addResultListener(new SwingDefaultResultListener(StarterPanel.this)		
 		{
 			public void customResultAvailable(Object source, Object result)

@@ -1,15 +1,9 @@
 package jadex.gpmn.model;
 
-import jadex.bridge.IArgument;
-import jadex.bridge.IModelInfo;
-import jadex.bridge.IReport;
 import jadex.bridge.ModelInfo;
 import jadex.commons.ICacheableModel;
 import jadex.commons.SReflect;
-import jadex.commons.SUtil;
-
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

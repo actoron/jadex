@@ -30,6 +30,9 @@ public class CreationInfo
 	/** The daemon flag (default: false). */
 	protected boolean daemon;
 	
+	/** The auto shutdown flag (default: false). */
+	protected boolean autoshutdown;
+	
 	/** The imports. */
 	protected String[]	imports;
 	
@@ -246,6 +249,24 @@ public class CreationInfo
 	public void setDaemon(boolean daemon)
 	{
 		this.daemon = daemon;
+	}
+	
+	/**
+	 *  Get the auto shutdown flag.
+	 *  @return	The flag.
+	 */
+	public boolean isAutoShutdown()
+	{
+		return autoshutdown;
+	}
+	
+	/**
+	 *  Set the auto shutdown flag.
+	 *  @param autoshutdown	The flag.
+	 */
+	public void	setAutoShutdown(boolean autoshutdown)
+	{
+		this.autoshutdown	= autoshutdown;
 	}
 
 	/**

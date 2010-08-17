@@ -63,8 +63,10 @@
 			<parameter name="cfp_info" class="Object" direction="inout" optional="true"/>
 			<!-- Optional ontology for marshalling. -->
 			<parameter name="ontology" class="String" optional="true"/>
-			<!-- Optional langauge for marshalling. -->
+			<!-- Optional language for marshalling. -->
 			<parameter name="language" class="String" optional="true"/>
+			<!-- Optional conversation id. -->
+			<parameter name="conversation_id" class="String" optional="true"/>
 			<!-- The timeout used during the negotiation. -->
 			<parameter name="timeout" class="Long" optional="true"/>
 			<!-- If several proposals are acceptable, should all be accepted. -->
@@ -163,8 +165,10 @@
 			<parameter name="cfp_info" class="Object" direction="inout" optional="true"/>
 			<!-- Optional ontology for marshalling. -->
 			<parameter name="ontology" class="String" optional="true"/>
-			<!-- Optional langauge for marshalling. -->
+			<!-- Optional language for marshalling. -->
 			<parameter name="language" class="String" optional="true"/>
+			<!-- Optional conversation id. -->
+			<parameter name="conversation_id" class="String" optional="true"/>
 			<!-- The timeout used during the negotiation. -->
 			<parameter name="timeout" class="Long" optional="true"/>
 			<!-- If several proposals are acceptable, should all be accepted. -->
@@ -307,6 +311,9 @@
 			<parameter name="language" class="String">
 				<goalmapping ref="cnp_initiate.language"/>
 			</parameter>
+			<parameter name="conversation_id" class="String">
+				<goalmapping ref="cnp_initiate.conversation_id"/>
+			</parameter>
 			<parameter name="timeout" class="Long">
 				<goalmapping ref="cnp_initiate.timeout"/>
 			</parameter>
@@ -412,6 +419,9 @@
 			</parameter>
 			<parameter name="language" class="String">
 				<goalmapping ref="icnp_initiate.language"/>
+			</parameter>
+			<parameter name="conversation_id" class="String">
+				<goalmapping ref="icnp_initiate.conversation_id"/>
 			</parameter>
 			<parameter name="timeout" class="Long">
 				<goalmapping ref="icnp_initiate.timeout"/>

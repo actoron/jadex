@@ -1,12 +1,13 @@
 package jadex.tools.jcc;
 
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IVersionInfo;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SGUI;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.SwingDefaultResultListener;
-import jadex.service.IServiceContainer;
+import jadex.service.IServiceProvider;
 import jadex.service.PropertiesXMLHelper;
 import jadex.service.SServiceProvider;
 import jadex.service.library.ILibraryService;
@@ -15,6 +16,7 @@ import jadex.tools.common.RememberOptionMessage;
 import jadex.tools.common.plugin.AbstractJCCPlugin;
 import jadex.tools.common.plugin.IControlCenter;
 import jadex.tools.common.plugin.IControlCenterPlugin;
+import jadex.tools.common.plugin.SJCC;
 
 import java.awt.Cursor;
 import java.awt.Dimension;
@@ -64,7 +66,10 @@ public class ControlCenter implements IControlCenter
 	// -------- attributes --------
 
 	/** The service container. */
-	protected IServiceContainer container;
+	protected IServiceProvider container;
+	
+	/** The component id. */
+	protected IComponentIdentifier cid;
 	
 	/** The plugins (plugin->panel). */
 	protected Map					plugins;
@@ -89,9 +94,10 @@ public class ControlCenter implements IControlCenter
 	/**
 	 * Create a control center.
 	 */
-	public ControlCenter(IServiceContainer container, final String plugins_prop)
+	public ControlCenter(IServiceProvider container, IComponentIdentifier cid, final String plugins_prop)
 	{
 		this.container = container;
+		this.cid	= cid;
 		this.plugins = new LinkedHashMap();
 
 		assert Thread.currentThread().getContextClassLoader() != null;
@@ -798,7 +804,7 @@ public class ControlCenter implements IControlCenter
 			closePlugins();
 			killed = true;
 			
-			container.shutdown();
+			SJCC.killPlattform(this, window);
 			
 		}
 		else if(JOptionPane.NO_OPTION == choice)
@@ -812,7 +818,7 @@ public class ControlCenter implements IControlCenter
 			closePlugins();
 			killed = true;
 			
-			container.shutdown();
+			SJCC.killPlattform(this, window);
 		}
 		// else CANCEL
 
@@ -885,8 +891,18 @@ public class ControlCenter implements IControlCenter
 	 *  Get the service container.
 	 *  @return The service container.
 	 */
-	public IServiceContainer getServiceContainer()
+	public IServiceProvider getServiceProvider()
 	{
 		return container;
 	}
+	
+	/**
+	 *  Get the component id of the component executing the JCC.
+	 *  @return The component id.
+	 */
+	public IComponentIdentifier	getComponentIdentifier()
+	{
+		return cid;
+	}
+
 }

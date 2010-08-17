@@ -20,7 +20,6 @@ import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IExecutable;
 import jadex.commons.concurrent.IResultListener;
 import jadex.service.BasicService;
-import jadex.service.IServiceContainer;
 import jadex.service.IServiceProvider;
 import jadex.service.SServiceProvider;
 import jadex.service.clock.IClockService;
@@ -97,7 +96,7 @@ public class MessageService extends BasicService implements IMessageService
 	 *  Constructor for Outbox.
 	 *  @param platform
 	 */
-	public MessageService(IServiceContainer provider, ITransport[] transports, MessageType[] messagetypes)
+	public MessageService(IServiceProvider provider, ITransport[] transports, MessageType[] messagetypes)
 	{
 		super(provider.getId(), IMessageService.class, null);
 

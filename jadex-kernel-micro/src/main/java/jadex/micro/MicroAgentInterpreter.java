@@ -83,7 +83,7 @@ public class MicroAgentInterpreter implements IComponentInstance
 	 *  @param microagent The microagent.
 	 */
 	public MicroAgentInterpreter(IComponentDescription desc, IComponentAdapterFactory factory, 
-		final IModelInfo model, Class microclass, final Map arguments, final String config, 
+		final IModelInfo model, Class microclass, final Map arguments, String config, 
 		final IExternalAccess parent, final Future inited)
 	{
 		this.model = model;
@@ -98,14 +98,14 @@ public class MicroAgentInterpreter implements IComponentInstance
 		IArgument[] args = model.getArguments();
 		for(int i=0; i<args.length; i++)
 		{
-			if(args[i].getDefaultValue(config)!=null)
+			if(args[i].getDefaultValue(this.config)!=null)
 			{
-				if(MicroAgentInterpreter.this.arguments==null)
-					MicroAgentInterpreter.this.arguments = new HashMap();
+				if(this.arguments==null)
+					this.arguments = new HashMap();
 			
-				if(MicroAgentInterpreter.this.arguments.get(args[i].getName())==null)
+				if(!this.arguments.containsKey(args[i].getName()))
 				{
-					MicroAgentInterpreter.this.arguments.put(args[i].getName(), args[i].getDefaultValue(config));
+					this.arguments.put(args[i].getName(), args[i].getDefaultValue(this.config));
 				}
 			}
 		}
@@ -114,12 +114,12 @@ public class MicroAgentInterpreter implements IComponentInstance
 		IArgument[] res = model.getResults();
 		for(int i=0; i<res.length; i++)
 		{
-			if(res[i].getDefaultValue(config)!=null)
+			if(res[i].getDefaultValue(this.config)!=null)
 			{
 				if(MicroAgentInterpreter.this.results==null)
 					MicroAgentInterpreter.this.results = new HashMap();
 			
-				MicroAgentInterpreter.this.results.put(res[i].getName(), res[i].getDefaultValue(config));
+				MicroAgentInterpreter.this.results.put(res[i].getName(), res[i].getDefaultValue(this.config));
 			}
 		}
 		

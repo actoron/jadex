@@ -14,7 +14,6 @@ import jadex.commons.SGUI;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.service.BasicService;
-import jadex.service.IServiceContainer;
 import jadex.service.IServiceProvider;
 import jadex.service.SServiceProvider;
 
@@ -68,7 +67,7 @@ public class GpmnFactory extends BasicService implements IComponentFactory
 	/**
 	 *  Create a new GpmnProcessService.
 	 */
-	public GpmnFactory(IServiceContainer provider, Map properties)
+	public GpmnFactory(IServiceProvider provider, Map properties)
 	{
 		super(provider.getId(), IComponentFactory.class, null);
 		

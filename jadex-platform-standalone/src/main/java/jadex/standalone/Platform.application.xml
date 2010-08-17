@@ -35,7 +35,6 @@
 	
 	<arguments>
 		<argument name="platformname">"lars"</argument>
-		<argument name="autoshutdown">true</argument>
 		<argument name="simulation">false</argument>
 		<argument name="libpath"></argument>
 		<argument name="tcpport">9876</argument>
@@ -43,6 +42,7 @@
 		
 		<!-- todo?! -->
 		<!-- <argument name="welcome">true</argument>
+		<argument name="autoshutdown">true</argument>
 		<argument name="platform_shutdown_time">1000</argument> -->
 	</arguments>
 	
@@ -63,10 +63,10 @@
 		<!-- Using no cached container for root makes creation tests very slow. -->
 		<!-- <container class="IServiceContainer">new ComponentServiceContainer($component.getComponentAdapter())</container>-->
 		
-		<service class="IThreadPoolService">
+		<service>
 			new ThreadPoolService(new ThreadPool(new DefaultThreadPoolStrategy(0, 20, 30000)), $platform)
 		</service>
-		<service class="IExecutionService">
+		<service>
 			$args.simulation
 			? new SyncExecutionService($platform, SUtil.createHashMap(new Object[]{"serviceviewer.viewerclass", 
 				RemoteServiceManagementService.REMOTE_UNCACHED}, new Object[]{"jadex.tools.serviceviewer.executionservice.ExecutionServiceViewer", 
@@ -75,7 +75,7 @@
 				RemoteServiceManagementService.REMOTE_UNCACHED}, new Object[]{"jadex.tools.serviceviewer.executionservice.ExecutionServiceViewer", 
 				new String[]{"isIdle", "getTasks"}}))
 		</service>
-		<service class="ILibraryService">
+		<service>
 			new LibraryService($args.libpath, $component.getComponentIdentifier(), 
 				SUtil.createHashMap(new Object[]{"serviceviewer.viewerclass", 
 				RemoteServiceManagementService.REMOTE_UNCACHED, RemoteServiceManagementService.REMOTE_EXCLUDED}, 
@@ -83,15 +83,15 @@
 				new String[]{"getClassLoader", "getURLs"}, new String[]{"addLibraryServiceListener", "removeLibraryServiceListener"}})
 				)
 		</service>
-		<service class="IComponentManagementService">
-			new ComponentManagementService($platform, $args.autoshutdown, $component.getComponentAdapter())
+		<service>
+			new ComponentManagementService($platform, $component.getComponentAdapter())
 		</service>
-		<service class="IDF">
+		<service>
 			new DirectoryFacilitatorService($platform, SUtil.createHashMap(
 				new Object[]{"serviceviewer.viewerclass"}, 
 				new Object[]{"jadex.tools.serviceviewer.dfservice.DFBrowserPanel"}))
 		</service>
-		<service class="IMessageService">
+		<service>
 			new MessageService($platform,
 				new ITransport[]
 				{
@@ -104,7 +104,7 @@
 					new FIPAMessageType()
 				})
 		</service>
-		<service class="IClockService">
+		<service>
 			$args.simulation
 			? new ClockService(new ClockCreationInfo(IClock.TYPE_EVENT_DRIVEN, "simulation_clock", System.currentTimeMillis(), 100), $platform,
 				SUtil.createHashMap(new Object[]{RemoteServiceManagementService.REMOTE_UNCACHED}, 
@@ -113,12 +113,12 @@
 				SUtil.createHashMap(new Object[]{RemoteServiceManagementService.REMOTE_UNCACHED}, 
 				new Object[]{new String[]{"getState", "getTime", "getTick", "getStarttime", "getDelta", "getDilation", "getNextTimer", "getTimers", "getClockType", "advanceEvent"}}))
 		</service>
-		<service class="ISimulationService">
+		<service>
 			new SimulationService($platform,
 				SUtil.createHashMap(new Object[]{RemoteServiceManagementService.REMOTE_UNCACHED}, 
 				new Object[]{new String[]{"getMode", "isExecuting"}}))
 		</service>
-		<service class="IComponentFactory" >
+		<service>
 			new ApplicationComponentFactory(
 				new Set[]
 				{
@@ -137,12 +137,23 @@
 				<!-- <component type="kernel_bdi" daemon="true"/> -->
 				<component name="kernel_bdibpmn" type="kernel_bdibpmn" daemon="true"/>
 				<component name="kernel_bpmn" type="kernel_bpmn" daemon="true"/>
-				<component name="rms" type="rms"/>
+				<component name="rms" type="rms" daemon="true"/>
 				<component name="jcc" type="jcc"/>
 			</components>
 		</application>
 		
 		<application name="all_kernels">
+			<components>
+				<component name="kernel_micro" type="kernel_micro" daemon="true"/>
+				<!-- <component type="kernel_bdi" daemon="true"/> -->
+				<component name="kernel_bdibpmn" type="kernel_bdibpmn" daemon="true"/>
+				<component name="kernel_bpmn" type="kernel_bpmn" daemon="true"/>
+				<component name="rms" type="rms" daemon="true"/>
+			</components>
+		</application>
+		
+		<!-- todo remove: support autoshutdown as instance level flag. -->
+		<application name="all_kernels_no_daemons">
 			<components>
 				<component name="kernel_micro" type="kernel_micro"/>
 				<!-- <component type="kernel_bdi"/> -->
@@ -157,7 +168,7 @@
 				<argument name="libpath">new Object[]{"../jadex-applications-bdi/target/classes"}</argument>
 			</arguments>
 			<components>
-				<component type="kernel_bdi"/>
+				<component type="kernel_bdi" daemon="true"/>
 				<component type="CreationBDI"/>
 			</components>
 		</application>
@@ -167,7 +178,7 @@
 				<argument name="libpath">new Object[]{"../jadex-applications-micro/target/classes"}</argument>
 			</arguments>
 			<components>
-				<component type="kernel_micro"/>
+				<component type="kernel_micro" daemon="true"/>
 				<component type="CreationMicro"/>
 			</components>
 		</application>
@@ -177,7 +188,7 @@
 				<argument name="libpath">new Object[]{"../jadex-applications-bpmn/target/classes"}</argument>
 			</arguments>
 			<components>
-				<component type="kernel_bpmn"/>
+				<component type="kernel_bpmn" daemon="true"/>
 				<component type="CreationBPMN"/>
 			</components>
 		</application>		

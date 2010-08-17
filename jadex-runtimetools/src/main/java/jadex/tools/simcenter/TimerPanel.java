@@ -145,7 +145,7 @@ public class TimerPanel extends AbstractTimePanel
 //			time	= System.currentTimeMillis();
 //		}
 
-		SServiceProvider.getService(getPlatform(),
+		SServiceProvider.getService(getServiceProvider(),
 			IClockService.class).addResultListener(new SwingDefaultResultListener(TimerPanel.this)
 		{
 			public void customResultAvailable(Object source, Object result)

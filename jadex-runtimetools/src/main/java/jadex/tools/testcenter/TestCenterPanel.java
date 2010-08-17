@@ -138,7 +138,7 @@ public class TestCenterPanel extends JSplitPane
 				String name = f.getName();
 //				return f.isDirectory() || SXML.isAgentFilename(name);
 				return f.isDirectory() || ((Boolean)SComponentFactory.isStartable(plugin.getJCC()
-					.getServiceContainer(), name).get(new ThreadSuspendable())).booleanValue();
+					.getServiceProvider(), name).get(new ThreadSuspendable())).booleanValue();
 			}
 		};
 		addchooser.addChoosableFileFilter(load_filter);
@@ -317,7 +317,7 @@ public class TestCenterPanel extends JSplitPane
 				if(loadsavechooser.showDialog(SGUI.getWindowParent(TestCenterPanel.this)
 					, "Save")==JFileChooser.APPROVE_OPTION)
 				{
-					SServiceProvider.getService(plugin.getJCC().getServiceContainer(),
+					SServiceProvider.getService(plugin.getJCC().getServiceProvider(),
 						ILibraryService.class).addResultListener(new SwingDefaultResultListener(TestCenterPanel.this)
 					{
 						public void customResultAvailable(Object source, Object result)
@@ -356,7 +356,7 @@ public class TestCenterPanel extends JSplitPane
 				if(loadsavechooser.showDialog(SGUI.getWindowParent(TestCenterPanel.this)
 					, "Load")==JFileChooser.APPROVE_OPTION)
 				{
-					SServiceProvider.getServiceUpwards(plugin.getJCC().getServiceContainer(),
+					SServiceProvider.getServiceUpwards(plugin.getJCC().getServiceProvider(),
 						ILibraryService.class).addResultListener(new SwingDefaultResultListener(TestCenterPanel.this)
 					{
 						public void customResultAvailable(Object source, Object result) 

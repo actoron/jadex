@@ -130,7 +130,7 @@ public class RuleProfilerPlugin extends AbstractJCCPlugin	implements IComponentL
 		this.split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true);
 		split.setOneTouchExpandable(true);
 
-		comptree = new ComponentTreePanel(getJCC().getServiceContainer());
+		comptree = new ComponentTreePanel(getJCC().getServiceProvider());
 		comptree.setMinimumSize(new Dimension(0, 0));
 		split.add(comptree);
 
@@ -258,7 +258,7 @@ public class RuleProfilerPlugin extends AbstractJCCPlugin	implements IComponentL
 
 		split.setDividerLocation(150);
 
-		SServiceProvider.getServiceUpwards(jcc.getServiceContainer(),
+		SServiceProvider.getServiceUpwards(jcc.getServiceProvider(),
 			IComponentManagementService.class).addResultListener(new SwingDefaultResultListener(comptree)
 		{
 			public void customResultAvailable(Object source, Object result)
@@ -342,7 +342,7 @@ public class RuleProfilerPlugin extends AbstractJCCPlugin	implements IComponentL
 				{
 					IActiveComponentTreeNode node = (IActiveComponentTreeNode)paths[i].getLastPathComponent();
 					IComponentDescription desc = node.getDescription();
-					RuleProfilerPanel	panel = new RuleProfilerPanel(getJCC().getServiceContainer(), desc.getName());
+					RuleProfilerPanel	panel = new RuleProfilerPanel(getJCC().getServiceProvider(), desc.getName());
 					GuiProperties.setupHelp(panel, getHelpID());
 					detail.add(panel, desc);
 					comptree.getModel().fireNodeChanged(node);

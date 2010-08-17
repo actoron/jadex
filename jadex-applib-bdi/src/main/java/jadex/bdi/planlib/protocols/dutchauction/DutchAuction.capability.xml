@@ -57,6 +57,8 @@
 			<parameter name="ontology" class="String" optional="true"/>
 			<!-- Optional language for marshalling. -->
 			<parameter name="language" class="String" optional="true"/>
+			<!-- Optional conversation id. -->
+			<parameter name="conversation_id" class="String" optional="true"/>
 			<!-- The result of the protocol execution. -->
 			<parameter name="result" class="Object" optional="true" direction="out"/>
 			<!-- The interaction state. -->
@@ -153,6 +155,9 @@
 			</parameter>
 			<parameter name="language" class="String">
 				<goalmapping ref="da_initiate.language"/>
+			</parameter>
+			<parameter name="conversation_id" class="String">
+				<goalmapping ref="da_initiate.conversation_id"/>
 			</parameter>
 			<parameter name="interaction_state" class="InteractionState" direction="out">
 				<goalmapping ref="da_initiate.interaction_state"/>

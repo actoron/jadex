@@ -38,7 +38,15 @@ public class CNPInitiatorPlan extends AbstractInitiatorPlan
 	public void body()
 	{
 		// Start negotiations.
-		String convid = SUtil.createUniqueId(getComponentName());
+		String convid;
+		if(getParameter("conversation_id").getValue()!=null)
+		{
+			convid	= (String)getParameter("conversation_id").getValue();
+		}
+		else
+		{
+			convid = SUtil.createUniqueId(getComponentName());			
+		}
 		NegotiationRecord nr = new NegotiationRecord(getParameter("cfp").getValue(), 
 			getParameter("cfp_info").getValue(), (IComponentIdentifier[])getParameterSet("receivers").getValues(), getTime());
 		getParameterSet("history").addValue(nr);

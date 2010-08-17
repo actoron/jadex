@@ -44,6 +44,8 @@ public class RPInitiatorPlan extends AbstractInitiatorPlan
 			request.getParameter("language").setValue(getParameter("language").getValue());
 		if(getParameter("ontology").getValue()!=null)
 			request.getParameter("ontology").setValue(getParameter("ontology").getValue());
+		if(getParameter("conversation_id").getValue()!=null)
+			request.getParameter("conversation_id").setValue(getParameter("conversation_id").getValue());
 
 		// Send message and wait for answer.
 		try

@@ -129,7 +129,7 @@ public class ComponentTreePanel extends JPanel
 						{
 							((AbstractComponentTreeNode)node.getParent()).removeChild(node);
 						}
-						else
+						else if(node==null)
 						{
 							model.addZombieNode(desc.getName());
 						}
@@ -193,14 +193,20 @@ public class ComponentTreePanel extends JPanel
 					{
 						final IComponentIdentifier cid = ((IActiveComponentTreeNode)paths[i].getLastPathComponent()).getDescription().getName();
 						final IComponentTreeNode sel = (IComponentTreeNode)paths[i].getLastPathComponent();
-						cms.destroyComponent(cid).addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
+						cms.resumeComponent(cid).addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
 						{
 							public void customResultAvailable(Object source, Object result)
 							{
-								if(sel instanceof VirtualComponentTreeNode && sel.getParent()!=null)
+								cms.destroyComponent(cid).addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
 								{
-									((AbstractComponentTreeNode)sel.getParent()).removeChild(sel);
-								}
+									public void customResultAvailable(Object source, Object result)
+									{
+										if(sel instanceof VirtualComponentTreeNode && sel.getParent()!=null)
+										{
+											((AbstractComponentTreeNode)sel.getParent()).removeChild(sel);
+										}
+									}
+								});
 							}
 						});
 					}

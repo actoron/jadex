@@ -1,8 +1,8 @@
 package jadex.tools.debugger;
 
 import jadex.bridge.IComponentDescription;
-import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentListener;
+import jadex.bridge.IComponentManagementService;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IBreakpointPanel;
 import jadex.commons.IChangeListener;
@@ -10,7 +10,7 @@ import jadex.commons.SGUI;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.rules.tools.common.TableSorter;
-import jadex.service.IServiceContainer;
+import jadex.service.IServiceProvider;
 import jadex.service.SServiceProvider;
 
 import java.awt.BorderLayout;
@@ -62,7 +62,7 @@ public class BreakpointPanel extends JPanel	implements IBreakpointPanel
 	protected IComponentDescription	description;
 	
 	/** The service container. */
-	protected IServiceContainer	container;
+	protected IServiceProvider	container;
 	
 	/** The list. */
 	protected JTable list;
@@ -75,7 +75,7 @@ public class BreakpointPanel extends JPanel	implements IBreakpointPanel
 	/**
 	 *  Create a new rulebase panel.
 	 */
-	public BreakpointPanel(Collection breakpoints, final IComponentDescription description, IServiceContainer container)
+	public BreakpointPanel(Collection breakpoints, final IComponentDescription description, IServiceProvider container)
 	{
 		this.breakpoints = new ArrayList(breakpoints);
 		this.description	= description;

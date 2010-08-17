@@ -28,7 +28,7 @@
 						new jadex.bdi.runtime.impl.JavaStandardPlanExecutor(jadex.service.SServiceProvider.getService($platform, jadex.service.threadpool.ThreadPoolService.class).get(new jadex.commons.ThreadSuspendable())),
 						new java.lang.Long(10000),
 						Boolean.TRUE,
-						new jadex.bdibpmn.BpmnPlanExecutor($platform),
+						new jadex.bdibpmn.BpmnPlanExecutor(),
 						"jadex.tools.debugger.bdi.BDIAgentInspectorDebuggerPanel, jadex.tools.debugger.bdi.BDIAgentRuleEngineDebuggerPanel"
 					}
 				), $platform)

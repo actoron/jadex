@@ -9,7 +9,7 @@ import jadex.commons.collection.LRU;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.DefaultResultListener;
-import jadex.service.IServiceContainer;
+import jadex.service.IServiceProvider;
 import jadex.service.SServiceProvider;
 import jadex.service.clock.IClockService;
 import jadex.service.clock.ITimedObject;
@@ -73,7 +73,7 @@ public class TCPTransport implements ITransport
 	//-------- attributes --------
 	
 	/** The platform. */
-	protected IServiceContainer container;
+	protected IServiceProvider container;
 	
 	/** The addresses. */
 	protected String[] addresses;
@@ -108,7 +108,7 @@ public class TCPTransport implements ITransport
 	 *  @param platform The platform.
 	 *  @param settings The settings.
 	 */
-	public TCPTransport(final IServiceContainer container, int port)
+	public TCPTransport(final IServiceProvider container, int port)
 	{
 		this(container, port, true);
 	}
@@ -119,7 +119,7 @@ public class TCPTransport implements ITransport
 	 *  @param platform The platform.
 	 *  @param settings The settings.
 	 */
-	public TCPTransport(final IServiceContainer container, int port, final boolean async)
+	public TCPTransport(final IServiceProvider container, int port, final boolean async)
 	{
 		this.logger = Logger.getLogger("TCPTransport" + this);
 		this.codecfac = new CodecFactory();

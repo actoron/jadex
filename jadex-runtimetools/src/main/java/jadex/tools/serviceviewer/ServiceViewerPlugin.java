@@ -151,7 +151,7 @@ public class ServiceViewerPlugin extends AbstractJCCPlugin
 		this.split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true);
 		split.setOneTouchExpandable(true);
 
-		comptree = new ComponentTreePanel(getJCC().getServiceContainer());
+		comptree = new ComponentTreePanel(getJCC().getServiceProvider());
 		comptree.setMinimumSize(new Dimension(0, 0));
 		split.add(comptree);
 
@@ -320,7 +320,7 @@ public class ServiceViewerPlugin extends AbstractJCCPlugin
 						
 						if(classname!=null)
 						{
-							SServiceProvider.getService(getJCC().getServiceContainer(), ILibraryService.class)
+							SServiceProvider.getService(getJCC().getServiceProvider(), ILibraryService.class)
 								.addResultListener(new SwingDefaultResultListener(comptree)
 							{
 								public void customResultAvailable(Object source, Object result)
@@ -353,7 +353,7 @@ public class ServiceViewerPlugin extends AbstractJCCPlugin
 						final IActiveComponentTreeNode node = (IActiveComponentTreeNode)tmp;
 						final IComponentIdentifier cid = node.getDescription().getName();
 						
-						SServiceProvider.getService(getJCC().getServiceContainer(), IComponentManagementService.class)
+						SServiceProvider.getService(getJCC().getServiceProvider(), IComponentManagementService.class)
 							.addResultListener(new SwingDefaultResultListener(comptree)
 						{
 							public void customResultAvailable(Object source, Object result)
@@ -371,7 +371,7 @@ public class ServiceViewerPlugin extends AbstractJCCPlugin
 										
 										if(classname!=null)
 										{
-											SServiceProvider.getService(getJCC().getServiceContainer(), ILibraryService.class)
+											SServiceProvider.getService(getJCC().getServiceProvider(), ILibraryService.class)
 												.addResultListener(new SwingDefaultResultListener(comptree)
 											{
 												public void customResultAvailable(Object source, Object result)

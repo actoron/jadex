@@ -16,7 +16,6 @@ import jadex.commons.IFuture;
 import jadex.commons.collection.IndexMap;
 import jadex.commons.concurrent.IResultListener;
 import jadex.service.BasicService;
-import jadex.service.IServiceContainer;
 import jadex.service.IServiceProvider;
 import jadex.service.SServiceProvider;
 import jadex.service.clock.IClockService;
@@ -52,7 +51,7 @@ public class DirectoryFacilitatorService extends BasicService implements IDF
 	/**
 	 *  Create a standalone df.
 	 */
-	public DirectoryFacilitatorService(IServiceContainer provider)
+	public DirectoryFacilitatorService(IServiceProvider provider)
 	{
 		super(provider.getId(), IDF.class, null);
 	}
@@ -60,7 +59,7 @@ public class DirectoryFacilitatorService extends BasicService implements IDF
 	/**
 	 *  Create a standalone df.
 	 */
-	public DirectoryFacilitatorService(IServiceContainer provider, Map properties)
+	public DirectoryFacilitatorService(IServiceProvider provider, Map properties)
 	{
 		super(provider.getId(), IDF.class, properties);
 

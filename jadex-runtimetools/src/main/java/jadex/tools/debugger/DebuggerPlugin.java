@@ -152,7 +152,7 @@ public class DebuggerPlugin extends AbstractJCCPlugin
 		this.split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true);
 		split.setOneTouchExpandable(true);
 
-		comptree = new ComponentTreePanel(getJCC().getServiceContainer());
+		comptree = new ComponentTreePanel(getJCC().getServiceProvider());
 		comptree.setMinimumSize(new Dimension(0, 0));
 		split.add(comptree);
 		comptree.getTree().getSelectionModel().addTreeSelectionListener(new TreeSelectionListener()

@@ -104,9 +104,6 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 	/** The arguments. */
 	protected Map results;
 	
-	/** The children cnt (without daemons). */
-	protected int children;
-
 	/** The value fetcher. */
 	protected IValueFetcher	fetcher;
 	
@@ -543,9 +540,6 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 
 		IComponentIdentifier comp = desc.getName();
 		
-		if(!desc.isDaemon())
-			children++;
-		
 		String modelname = model.getFullName();
 		String appctype = (String)ctypes.get(modelname);
 		if(appctype==null)
@@ -622,32 +616,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 		{
 			ctypes.remove(comp);
 		}
-		
-		if(desc.isMaster())
-			killApplication();
-		
-		if(!desc.isDaemon())
-			children--;
-				
-		if(children==0 && model.isAutoShutdown())
-			killApplication();
 	}
-	
-	/**
-	 *  Kill the application.
-	 */
-	public void killApplication()
-	{
-		SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class).addResultListener(new DefaultResultListener()
-		{
-			public void resultAvailable(Object source, Object result)
-			{
-				IComponentManagementService cms =(IComponentManagementService)result;
-				cms.destroyComponent(getComponentAdapter().getComponentIdentifier());
-			}
-		});
-	}
-	
 	
 	/**
 	 *  Add an component property. 

@@ -91,4 +91,10 @@ public interface IComponentDescription
 	 *  @return True, if daemon component.
 	 */
 	public boolean isDaemon();
+	
+	/**
+	 *  Get the auto shutdown flag.
+	 *  @return	The flag.
+	 */
+	public boolean isAutoShutdown();
 }

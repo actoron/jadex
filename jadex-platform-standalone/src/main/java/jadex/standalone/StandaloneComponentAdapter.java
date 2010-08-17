@@ -9,13 +9,12 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.IModelInfo;
 import jadex.bridge.IMessageAdapter;
+import jadex.bridge.IModelInfo;
 import jadex.bridge.MessageType;
 import jadex.commons.Future;
 import jadex.commons.ICommand;
 import jadex.commons.IFuture;
-import jadex.commons.concurrent.CollectionResultListener;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IExecutable;
@@ -420,14 +419,13 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 			{
 				public void resultAvailable(Object source, Object result)
 				{
-					getServiceContainer().shutdown();
-					listener.resultAvailable(this, getComponentIdentifier());
+					shutdownContainer(listener);
 				}
 				
 				public void exceptionOccurred(Object source, Exception exception)
 				{
-					getServiceContainer().shutdown();
-					listener.resultAvailable(this, getComponentIdentifier());
+					getLogger().warning("Exception during component cleanup: "+exception);
+					shutdownContainer(listener);
 				}
 			});
 		}
@@ -438,6 +436,26 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 			
 		// LogManager causes memory leak till Java 7
 		// No way to remove loggers and no weak references. 
+	}
+
+	/**
+	 *  Called from killComponent.
+	 */
+	protected void shutdownContainer(final IResultListener listener)
+	{
+		getServiceContainer().shutdown().addResultListener(new IResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				listener.resultAvailable(this, getComponentIdentifier());
+			}
+			
+			public void exceptionOccurred(Object source, Exception exception)
+			{
+				getLogger().warning("Exception during service container shutdown: "+exception);
+				listener.resultAvailable(this, getComponentIdentifier());
+			}
+		});
 	}
 
 	/**

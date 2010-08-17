@@ -52,6 +52,8 @@
 			<parameter name="ontology" class="String" optional="true"/>
 			<!-- Optional language for marshalling. -->
 			<parameter name="language" class="String" optional="true"/>
+			<!-- Optional conversation id. -->
+			<parameter name="conversation_id" class="String" optional="true"/>
 			<!-- The optional request timeout. -->
 			<parameter name="timeout" class="Long" optional="true"/>
 			<!-- The result of the request. -->
@@ -129,6 +131,9 @@
 			</parameter>
 			<parameter name="language" class="String">
 				<goalmapping ref="qp_initiate.language"/>
+			</parameter>
+			<parameter name="conversation_id" class="String">
+				<goalmapping ref="qp_initiate.conversation_id"/>
 			</parameter>
 			<parameter name="timeout" class="Long">
 				<goalmapping ref="qp_initiate.timeout"/>

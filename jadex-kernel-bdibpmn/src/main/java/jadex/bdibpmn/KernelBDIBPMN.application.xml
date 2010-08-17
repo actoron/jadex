@@ -39,7 +39,7 @@
 					new JavaStandardPlanExecutor((IThreadPoolService)SServiceProvider.getService($platform, IThreadPoolService.class).get(new ThreadSuspendable())),
 					new Long(10000),
 					Boolean.TRUE,
-					new BpmnPlanExecutor($platform),
+					new BpmnPlanExecutor(),
 					"jadex.tools.debugger.bdi.BDIAgentInspectorDebuggerPanel, jadex.tools.debugger.bdi.BDIAgentRuleEngineDebuggerPanel"
 				}
 			), $platform)

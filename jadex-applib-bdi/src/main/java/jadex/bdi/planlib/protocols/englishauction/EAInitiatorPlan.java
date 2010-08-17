@@ -50,7 +50,15 @@ public class EAInitiatorPlan extends AbstractInitiatorPlan
 		List receivers = SUtil.arrayToList(getParameterSet("receivers").getValues());
 		
 		// Initialize negotiations.
-		String convid = SUtil.createUniqueId(getComponentName());
+		String convid;
+		if(getParameter("conversation_id").getValue()!=null)
+		{
+			convid	= (String)getParameter("conversation_id").getValue();
+		}
+		else
+		{
+			convid = SUtil.createUniqueId(getComponentName());			
+		}
 		
 		// Announce the auction by sending information about it.
 		announceAuction(auctiondesc, receivers, convid);

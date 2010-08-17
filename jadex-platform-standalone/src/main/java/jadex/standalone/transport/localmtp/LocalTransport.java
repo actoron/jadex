@@ -5,7 +5,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IMessageService;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.DefaultResultListener;
-import jadex.service.IServiceContainer;
+import jadex.service.IServiceProvider;
 import jadex.service.SServiceProvider;
 import jadex.standalone.transport.ITransport;
 
@@ -35,7 +35,7 @@ public class LocalTransport implements ITransport
 //	protected String platformname;
 	
 	/** The platform. */
-	protected IServiceContainer container;
+	protected IServiceProvider container;
 	
 	//-------- constructors --------
 	
@@ -44,7 +44,7 @@ public class LocalTransport implements ITransport
 	 *  @param platform The platform.
 	 *  @param settings The settings.
 	 */
-	public LocalTransport(IServiceContainer container)
+	public LocalTransport(IServiceProvider container)
 	{
 		this.container = container;
 		this.addresses = new String[0];

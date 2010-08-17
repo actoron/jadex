@@ -205,13 +205,13 @@ public class ClockPanel extends AbstractTimePanel
 			{
 				if("System".equals(emode.getSelectedItem()))
 				{
-					SServiceProvider.getService(getPlatform(),
+					SServiceProvider.getService(getServiceProvider(),
 						IThreadPoolService.class).addResultListener(new SwingDefaultResultListener(ClockPanel.this)
 					{
 						public void customResultAvailable(Object source, Object result)
 						{
 							final IThreadPoolService tp = (IThreadPoolService)result;
-							SServiceProvider.getService(getPlatform(),
+							SServiceProvider.getService(getServiceProvider(),
 								ISimulationService.class).addResultListener(new SwingDefaultResultListener(ClockPanel.this)
 							{
 								public void customResultAvailable(Object source, Object result)
@@ -230,13 +230,13 @@ public class ClockPanel extends AbstractTimePanel
 				}
 				else if("Continuous".equals(emode.getSelectedItem()))
 				{
-					SServiceProvider.getService(getPlatform(),
+					SServiceProvider.getService(getServiceProvider(),
 						IThreadPoolService.class).addResultListener(new SwingDefaultResultListener(ClockPanel.this)
 					{
 						public void customResultAvailable(Object source, Object result)
 						{
 							final IThreadPoolService tp = (IThreadPoolService)result;
-							SServiceProvider.getService(getPlatform(),
+							SServiceProvider.getService(getServiceProvider(),
 								ISimulationService.class).addResultListener(new SwingDefaultResultListener(ClockPanel.this)
 							{
 								public void customResultAvailable(Object source, Object result)
@@ -255,13 +255,13 @@ public class ClockPanel extends AbstractTimePanel
 				}
 				else if("Time Stepped".equals(emode.getSelectedItem()))
 				{
-					SServiceProvider.getService(getPlatform(),
+					SServiceProvider.getService(getServiceProvider(),
 						IThreadPoolService.class).addResultListener(new SwingDefaultResultListener(ClockPanel.this)
 					{
 						public void customResultAvailable(Object source, Object result)
 						{
 							final IThreadPoolService tp = (IThreadPoolService)result;
-							SServiceProvider.getService(getPlatform(),
+							SServiceProvider.getService(getServiceProvider(),
 								ISimulationService.class).addResultListener(new SwingDefaultResultListener(ClockPanel.this)
 							{
 								public void customResultAvailable(Object source, Object result)
@@ -280,13 +280,13 @@ public class ClockPanel extends AbstractTimePanel
 				}
 				else if("Event Driven".equals(emode.getSelectedItem()))
 				{
-					SServiceProvider.getService(getPlatform(),
+					SServiceProvider.getService(getServiceProvider(),
 						IThreadPoolService.class).addResultListener(new SwingDefaultResultListener(ClockPanel.this)
 					{
 						public void customResultAvailable(Object source, Object result)
 						{
 							final IThreadPoolService tp = (IThreadPoolService)result;
-							SServiceProvider.getService(getPlatform(),
+							SServiceProvider.getService(getServiceProvider(),
 								ISimulationService.class).addResultListener(new SwingDefaultResultListener(ClockPanel.this)
 							{
 								public void customResultAvailable(Object source, Object result)
@@ -314,7 +314,7 @@ public class ClockPanel extends AbstractTimePanel
 		{
 			public void stateChanged(ChangeEvent e)
 			{
-				SServiceProvider.getService(getPlatform(),
+				SServiceProvider.getService(getServiceProvider(),
 					IClockService.class).addResultListener(new SwingDefaultResultListener(ClockPanel.this)
 				{
 					public void customResultAvailable(Object source, Object result)
@@ -340,7 +340,7 @@ public class ClockPanel extends AbstractTimePanel
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				SServiceProvider.getService(getPlatform(),
+				SServiceProvider.getService(getServiceProvider(),
 					IClockService.class).addResultListener(new SwingDefaultResultListener(ClockPanel.this)
 				{
 					public void customResultAvailable(Object source, Object result)
@@ -399,13 +399,13 @@ public class ClockPanel extends AbstractTimePanel
 //			time	= System.currentTimeMillis();
 //		}
 		
-		SServiceProvider.getService(getPlatform(),
+		SServiceProvider.getService(getServiceProvider(),
 			IClockService.class).addResultListener(new SwingDefaultResultListener(ClockPanel.this)
 		{
 			public void customResultAvailable(Object source, Object result)
 			{
 				final IClockService cs = (IClockService)result;
-				SServiceProvider.getService(getPlatform(),
+				SServiceProvider.getService(getServiceProvider(),
 					ISimulationService.class).addResultListener(new SwingDefaultResultListener(ClockPanel.this)
 				{
 					public void customResultAvailable(Object source, Object result)

@@ -135,7 +135,7 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 			MApplicationType apptype = loader.loadApplicationModel(modelinfo.getFilename(), null, modelinfo.getClassLoader());
 			List apps = apptype.getMApplicationInstances();
 					
-			// Select application instance according to configuraion.
+			// Select application instance according to configuration.
 			MApplicationInstance app = null;
 			if(config==null && apps.size()>0)
 				app = (MApplicationInstance)apps.get(0);

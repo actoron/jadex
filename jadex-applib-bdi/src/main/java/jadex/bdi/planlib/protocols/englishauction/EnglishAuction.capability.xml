@@ -57,6 +57,8 @@
 			<parameter name="ontology" class="String" optional="true"/>
 			<!-- Optional language for marshalling. -->
 			<parameter name="language" class="String" optional="true"/>
+			<!-- Optional conversation id. -->
+			<parameter name="conversation_id" class="String" optional="true"/>
 			<!-- The auction result. -->
 			<parameter name="result" class="Object" direction="out" optional="true"/>
 			<!-- The interaction state. -->
@@ -172,6 +174,9 @@
 			</parameter>
 			<parameter name="language" class="String">
 				<goalmapping ref="ea_initiate.language"/>
+			</parameter>
+			<parameter name="conversation_id" class="String">
+				<goalmapping ref="ea_initiate.conversation_id"/>
 			</parameter>
 			<parameter name="interaction_state" class="InteractionState" direction="out">
 				<goalmapping ref="ea_initiate.interaction_state"/>

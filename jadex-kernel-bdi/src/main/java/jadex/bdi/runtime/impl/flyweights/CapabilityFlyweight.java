@@ -19,7 +19,6 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IModelInfo;
 import jadex.rules.state.IOAVState;
-import jadex.service.IServiceContainer;
 import jadex.service.IServiceProvider;
 
 import java.util.logging.Logger;
@@ -385,7 +384,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 					object = getInterpreter().getServiceProvider();
 				}
 			};
-			return (IServiceContainer)invoc.object;
+			return (IServiceProvider)invoc.object;
 		}
 		else
 		{

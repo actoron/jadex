@@ -1,6 +1,7 @@
 package jadex.tools.common.plugin;
 
-import jadex.service.IServiceContainer;
+import jadex.bridge.IComponentIdentifier;
+import jadex.service.IServiceProvider;
 
 import javax.swing.JComponent;
 
@@ -14,47 +15,13 @@ public interface IControlCenter
 	 *  Get the service container.
 	 *  @return The service container.
 	 */
-	public IServiceContainer getServiceContainer();
+	public IServiceProvider	getServiceProvider();
 	
-//	/**
-//	 *  Get the external access interface.
-//	 *  @return the external agent access.
-//	 */
-//	public IExternalAccess getAgent();
-//
-//	/**
-//	 *  Listen for changes to the list of known agents.
-//	 */
-//	public void addAgentListListener(IAgentListListener listener);
-//
-//	/**
-//	 *  Listen for incoming messages.
-//	 */
-//	public void addMessageListener(IMessageListener listener);
-//
-//	/**
-//	 *  Create a new agent on the platform.
-//	 *  Any errors will be displayed in a dialog to the user.
-//	 */
-//	public void createAgent(String type, String name, String configname, Map arguments);
-//
-//	/**
-//	 *  Kill an agent on the platform.
-//	 *  Any errors will be displayed in a dialog to the user.
-//	 */
-//	public void killAgent(IComponentIdentifier name);
-//	
-//	/**
-//	 *  Suspend an agent on the platform.
-//	 *  Any errors will be displayed in a dialog to the user.
-//	 */
-//	public void suspendAgent(IComponentIdentifier name);
-//	
-//	/**
-//	 *  Resume an agent on the platform.
-//	 *  Any errors will be displayed in a dialog to the user.
-//	 */
-//	public void resumeAgent(IComponentIdentifier name);
+	/**
+	 *  Get the component id of the component executing the JCC.
+	 *  @return The component id.
+	 */
+	public IComponentIdentifier	getComponentIdentifier();
 	
 	/**
 	 *  Set a text to be displayed in the status bar.

@@ -110,7 +110,7 @@
 				</xs:annotation>
 				<xs:complexType>
 					<xs:sequence>
-						<xs:element name="service" type="expressiontype" minOccurs="0" maxOccurs="unbounded"/>
+						<xs:element name="service" type="servicetype" minOccurs="0" maxOccurs="unbounded"/>
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
@@ -120,7 +120,7 @@
 				</xs:annotation>
 				<xs:complexType>
 					<xs:sequence>
-						<xs:element name="property" type="expressiontype" minOccurs="0" maxOccurs="unbounded"/>
+						<xs:element name="property" type="propertytype" minOccurs="0" maxOccurs="unbounded"/>
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
@@ -155,8 +155,7 @@
 			<xs:annotation>
 				<xs:documentation>The package of the application type. The package should correspond to the directory structure, the application descriptor is contained in (like the package of a Java class). The package is also used for lookup of classes and other files (e.g. agent descriptors).</xs:documentation>
 			</xs:annotation>
-		</xs:attribute>
-		<xs:attribute name="autoshutdown" type="xs:boolean" use="optional" default="true"/>
+		</xs:attribute>
 	</xs:complexType>
 	<xs:complexType name="componenttype">
 		<xs:annotation>
@@ -294,9 +293,13 @@
 		<xs:attribute name="description" type="xs:string" use="optional"/>
 		<xs:attribute name="typename" type="xs:string" use="optional"/>
 	</xs:complexType>
-	<xs:complexType name="expressiontype" mixed="true">
+	<xs:complexType name="propertytype" mixed="true">
 		<xs:attribute name="name" type="xs:string" use="required"/>
 		<xs:attribute name="class" type="xs:string"/>
 		<xs:attribute name="language" type="xs:string"/>
+	</xs:complexType>
+
+	<xs:complexType name="servicetype" mixed="true">
+		<xs:attribute name="language" type="xs:string" use="optional"></xs:attribute>
 	</xs:complexType>
 </xs:schema>

@@ -7,7 +7,6 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IModelInfo;
-import jadex.commons.Future;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SGUI;
@@ -25,7 +24,7 @@ import jadex.tools.common.modeltree.IExplorerTreeNode;
 import jadex.tools.common.modeltree.ModelExplorer;
 import jadex.tools.common.modeltree.ModelExplorerTreeModel;
 import jadex.tools.common.plugin.AbstractJCCPlugin;
-import jadex.tools.jcc.AgentControlCenter;
+import jadex.tools.common.plugin.SJCC;
 
 import java.awt.Component;
 import java.awt.Cursor;
@@ -242,7 +241,7 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 		lsplit.setOneTouchExpandable(true);
 		lsplit.setResizeWeight(0.7);
 
-		mpanel = new ModelExplorer(getJCC().getServiceContainer(), new StarterNodeFunctionality(this));
+		mpanel = new ModelExplorer(getJCC().getServiceProvider(), new StarterNodeFunctionality(this));
 //		mpanel.setAction(FileNode.class, new INodeAction()
 //		{
 //			public void validStateChanged(TreeNode node, boolean valid)
@@ -275,7 +274,7 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 
 					final String model = ((FileNode)node).getRelativePath();
 //					if(getJCC().getComponent().getPlatform().getComponentFactory().isLoadable(model))
-					SComponentFactory.isLoadable(getJCC().getServiceContainer(), model).addResultListener(new SwingDefaultResultListener(spanel)
+					SComponentFactory.isLoadable(getJCC().getServiceProvider(), model).addResultListener(new SwingDefaultResultListener(spanel)
 					{
 						public void customResultAvailable(Object source, Object result)
 						{
@@ -306,7 +305,7 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 							final String type = ((FileNode)node).getFile().getAbsolutePath();
 //							if(getJCC().getComponent().getPlatform().getComponentFactory().isStartable(type))
 							// todo: resultcollect = false?
-							SComponentFactory.isStartable(getJCC().getServiceContainer(), type).addResultListener(new SwingDefaultResultListener(spanel)
+							SComponentFactory.isStartable(getJCC().getServiceProvider(), type).addResultListener(new SwingDefaultResultListener(spanel)
 							{
 								public void customResultAvailable(Object source, Object result)
 								{
@@ -322,7 +321,7 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
   		};
   		mpanel.addMouseListener(ml);
 
-		comptree = new ComponentTreePanel(getJCC().getServiceContainer());
+		comptree = new ComponentTreePanel(getJCC().getServiceProvider());
 		comptree.setMinimumSize(new Dimension(0, 0));
 		
 		lsplit.add(new JScrollPane(mpanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
@@ -340,7 +339,7 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 		
 		// todo: ?! is this ok?
 		
-		SServiceProvider.getServiceUpwards(jcc.getServiceContainer(),
+		SServiceProvider.getServiceUpwards(jcc.getServiceProvider(),
 			IComponentManagementService.class).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
@@ -518,57 +517,9 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 	{
 		public void actionPerformed(ActionEvent e)
 		{
-			SServiceProvider.getService(((AgentControlCenter)getJCC()).getAgent().getServiceProvider(), IComponentManagementService.class)
-				.addResultListener(new SwingDefaultResultListener(comptree)
-			{
-				public void customResultAvailable(Object source, Object result)
-				{
-					final IComponentManagementService cms = (IComponentManagementService)result;
-					Future ret = new Future();
-					ret.addResultListener(new SwingDefaultResultListener(comptree)
-					{
-						public void customResultAvailable(Object source, Object result)
-						{
-							IComponentIdentifier root = (IComponentIdentifier)result;
-							cms.destroyComponent(root);
-						}
-					});
-					getRootIdentifier(((AgentControlCenter)getJCC()).getAgent().getComponentIdentifier(), (IComponentManagementService)result, ret);
-				}
-			});
+			SJCC.killPlattform(getJCC(), comptree);
 		}
-			
-//			IExternalAccess root = ((AgentControlCenter)getJCC()).getAgent();
-//			while(root.getParent()!=null)
-//				root = root.getParent();
-//			root.killComponent();
 	};
-	
-	/**
-	 *  Internal method to get the root identifier.
-	 */
-	public void getRootIdentifier(final IComponentIdentifier cid, final IComponentManagementService cms, final Future future)
-	{
-		cms.getParent(cid).addResultListener(new IResultListener()
-		{
-			public void resultAvailable(Object source, Object result)
-			{
-				if(result==null)
-				{
-					future.setResult(cid);
-				}
-				else
-				{
-					getRootIdentifier((IComponentIdentifier)result, cms, future);
-				}
-			}
-			
-			public void exceptionOccurred(Object source, Exception exception)
-			{
-				future.setException(exception);
-			}
-		});
-	}
 	
 	/**
 	 *  Action for adding a remote component.
@@ -577,12 +528,12 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 	{
 		public void actionPerformed(ActionEvent e)
 		{
-			SServiceProvider.getServiceUpwards(jcc.getServiceContainer(),
+			SServiceProvider.getServiceUpwards(jcc.getServiceProvider(),
 				IComponentManagementService.class).addResultListener(new DefaultResultListener()		
 			{
 				public void resultAvailable(Object source, Object result)
 				{
-					ComponentIdentifierDialog dia = new ComponentIdentifierDialog(spanel, jcc.getServiceContainer());
+					ComponentIdentifierDialog dia = new ComponentIdentifierDialog(spanel, jcc.getServiceProvider());
 					IComponentIdentifier cid = dia.getComponentIdentifier(null);
 					
 					Map args = new HashMap();
@@ -658,12 +609,12 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 				{
 					final String type = ((FileNode)node).getFile().getAbsolutePath();
 					
-					if(((Boolean)SComponentFactory.isStartable(getJCC().getServiceContainer(), type).get(new ThreadSuspendable())).booleanValue())//&& ((FileNode)node).isValid())
+					if(((Boolean)SComponentFactory.isStartable(getJCC().getServiceProvider(), type).get(new ThreadSuspendable())).booleanValue())//&& ((FileNode)node).isValid())
 					{
 						try
 						{
 //							IComponentFactory componentfactory = getJCC().getComponent().getPlatform().getComponentFactory();
-							IModelInfo model = (IModelInfo)SComponentFactory.loadModel(getJCC().getServiceContainer(), type).get(new ThreadSuspendable());
+							IModelInfo model = (IModelInfo)SComponentFactory.loadModel(getJCC().getServiceProvider(), type).get(new ThreadSuspendable());
 							String[] inistates = model.getConfigurations();
 //							IMBDIComponent model = SXML.loadComponentModel(type, null);
 //							final IMConfiguration[] inistates = model.getConfigurationbase().getConfigurations();
@@ -736,7 +687,7 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 			if(node instanceof FileNode)
 			{
 				String type = ((FileNode)node).getFile().getAbsolutePath();
-				if(((Boolean)SComponentFactory.isStartable(getJCC().getServiceContainer(), type).get(new ThreadSuspendable())))
+				if(((Boolean)SComponentFactory.isStartable(getJCC().getServiceProvider(), type).get(new ThreadSuspendable())))
 					ret = true;
 			}
 			return ret;
@@ -801,7 +752,7 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 	 */
 	public void createComponent(final String type, final String name, final String configname, final Map arguments, final boolean suspend, final IResultListener killlistener)
 	{
-		SServiceProvider.getServiceUpwards(jcc.getServiceContainer(),
+		SServiceProvider.getServiceUpwards(jcc.getServiceProvider(),
 			IComponentManagementService.class).addResultListener(new DefaultResultListener()		
 		{
 			public void resultAvailable(Object source, Object result)
