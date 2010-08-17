@@ -462,7 +462,7 @@ public class ServiceViewerPlugin extends AbstractJCCPlugin
 			else
 			{
 				// Unknown -> start search to find out synchronously
-				SServiceProvider.getService(getJCC().getServiceContainer(), IComponentManagementService.class)
+				SServiceProvider.getService(getJCC().getServiceProvider(), IComponentManagementService.class)
 					.addResultListener(new SwingDefaultResultListener(comptree)
 				{
 					public void customResultAvailable(Object source, Object result)
