@@ -70,8 +70,8 @@ public class StaticJadexTaskProvider extends TaskProviderSupport
 				"The value0[..n] parameter(s) identify the value(s) of the result parameter(s) belonging to the name(s).");
 		ITaskMetaInfo tmi = new TaskMetaInfo(desc, new IParameterMetaInfo[] {
 				namemi, valuemi, namesmi, valuesmi });
-		map.put("jadex.bpmn.runtime.task.StoreResults.class", tmi);
-		map.put("StoreResults.class", tmi);
+		map.put("jadex.bpmn.runtime.task.StoreResultsTask.class", tmi);
+		map.put("StoreResultsTask.class", tmi);
 
 		// invoke method task.
 		desc = "The invoke method task can be used to invoke a mathod on an object or a"
