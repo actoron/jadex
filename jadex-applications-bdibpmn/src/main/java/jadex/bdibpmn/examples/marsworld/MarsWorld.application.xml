@@ -38,6 +38,8 @@
 		<import>jadex.bdi.examples.marsworld.producer.*</import>
 		<import>jadex.bdi.examples.marsworld.sentry.*</import>
 		<import>jadex.bdi.examples.marsworld.movement.*</import>
+		<import>jadex.service.SServiceProvider</import>
+		<import>jadex.commons.IFuture</import>
 	</imports>
 	
 	<spacetypes>
@@ -80,7 +82,7 @@
 					<env:property name="text" dynamic="true">
 						"Collected ore: "+$object.getProperty("ore")+" \n"+
 						"Remaining time: "+new SimpleDateFormat("mm:ss").format(new Date(Math.max(0, $object.getProperty("missiontime")
-							- $object.getProperty("space").getContext().getServiceContainer().getService(IClockService.class).getTime())))
+							- $properties.clock.getTime())))
 					</env:property>
 				</env:objecttype>
 			</env:objecttypes>
@@ -188,6 +190,12 @@
 		<componenttype name="Carry" filename="jadex/bdibpmn/examples/marsworld/Carry.agent.xml"/>
 	</componenttypes>
 
+	<properties>
+		<property name="clock" class="IFuture">
+			SServiceProvider.getService($component.getServiceProvider(), IClockService.class)
+		</property>
+	</properties>
+	
 	<applications>
 		<application name="1 Sentry / 2 Producers / 3 Carries">
 			<spaces>
@@ -205,7 +213,7 @@
 							<env:property name="position">new Vector2Double(0.3, 0.3)</env:property>
 							<env:property name="space">$space</env:property><!-- hack!!! -->
 							<env:property name="missiontime">
-								90000 + $space.getContext().getServiceContainer().getService(IClockService.class).getTime()
+								90000 + $properties.clock.getTime()
 							</env:property>
 						</env:object>
 						<env:object type="target">
@@ -260,7 +268,7 @@
 						<env:object type="homebase">
 							<env:property name="space">$space</env:property><!-- hack!!! -->
 							<env:property name="missiontime">
-								300000 + $space.getContext().getServiceContainer().getService(IClockService.class).getTime()
+								300000 + $properties.clock.getTime()
 							</env:property>
 						</env:object>
 						<env:object type="target" number="20">
