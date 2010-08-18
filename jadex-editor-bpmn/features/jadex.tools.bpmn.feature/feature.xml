@@ -8,7 +8,7 @@
       colocation-affinity="jadex.tools.bpmn.feature">
 
    <description url="http://jadex-processes.informatik.uni-hamburg.de">
-      The Jadex BPMN editor is an extension of the STP BPMN editor that provides an extra tab in the properties view for specifying execution details of a process model. 
+      The Jadex BPMN editor is an extension of the STP BPMN editor that provides an extra tab in the properties view for specifying execution details of a process model.
    </description>
 
    <copyright>
@@ -32,7 +32,7 @@ This means the LGPL does not allow you to develop closed source software product
    </requires>
 
    <plugin
-         id="jadex.tools.bpmn.editor"
+         id="jadex.tools.bpmn.editor.JadexBpmnEditorID"
          download-size="0"
          install-size="0"
          version="0.0.0"

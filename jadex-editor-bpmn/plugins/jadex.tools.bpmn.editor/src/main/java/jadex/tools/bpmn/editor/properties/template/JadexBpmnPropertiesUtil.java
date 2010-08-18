@@ -241,10 +241,12 @@ public class JadexBpmnPropertiesUtil
 						annotation = EcoreFactory.eINSTANCE.createEAnnotation();
 						annotation.setSource(annotationIdentifier);
 						annotation.setEModelElement(element);
+						// TODO: maybe remove empty string -- see also below
 						annotation.getDetails().put(annotationDetail, ""); //$NON-NLS-1$
 					}
 					
-					if (value != null)
+					// TODO: maybe check isEmpty and remove detail with empty string?
+					if (value != null /*&& !value.isEmpty()*/)
 					{
 						annotation.getDetails().put(annotationDetail, value);
 					}
@@ -491,19 +493,22 @@ public class JadexBpmnPropertiesUtil
 					// move all details into a single "jadex" annotation
 					EAnnotation jadexAnnotation = eModelElement.getEAnnotation("jadex");
 					EList<EAnnotation> annos = eModelElement.getEAnnotations();
-					if (jadexAnnotation == null)
+					
+					// if there is no jadex annotation but another annotation
+					if (jadexAnnotation == null && annos.size() > 1)
 					{
 						// create the jadex annotation
 						jadexAnnotation = EcoreFactory.eINSTANCE.createEAnnotation();
 						jadexAnnotation.setSource("jadex");
 						jadexAnnotation.setEModelElement(eModelElement);
+
 					}
 					
-					
+					// remember: index is off by one
 					for (int i = annos.size()-1; i >= 0; i--) 
 					{
 						EAnnotation eAnnotation = annos.get(i);
-						// only convert non-table annotations
+						// only convert non-table and none "single jadex" annotations
 						if (!eAnnotation.getSource().equals("jadex") 
 								&& !eAnnotation.getSource().endsWith(JADEX_TABLE_KEY_EXTENSION))
 						{
@@ -512,8 +517,11 @@ public class JadexBpmnPropertiesUtil
 						}
 					}
 					
-					// add complete annotation to list
-					annos.add(jadexAnnotation);
+					// remove annotation from element, if there are no details
+					if (jadexAnnotation != null && jadexAnnotation.getDetails().isEmpty())
+					{
+						annos.remove(jadexAnnotation);
+					}
 
 					return CommandResult.newOKCommandResult();
 				}
