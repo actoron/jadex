@@ -32,8 +32,8 @@ public class JadexBpmnPluginPreferenceInitializer extends
 				JadexPreferences.PREFERENCE_TASK_PROVIDER_LIST,
 				JadexTaskProviderTypeListEditor
 						.createStringList(new String[] {
-								"jadex.tools.bpmn.runtime.task.StaticJadexTaskProvider",
-								"jadex.tools.bpmn.runtime.task.PackageBasedTaskProvider" }));
+								"jadex.tools.bpmn.runtime.task.StaticJadexTaskProvider" /*,
+								"jadex.tools.bpmn.runtime.task.PackageBasedTaskProvider" */}));
 
 	}
 
