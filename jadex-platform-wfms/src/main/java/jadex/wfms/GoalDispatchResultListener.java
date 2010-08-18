@@ -38,9 +38,9 @@ public class GoalDispatchResultListener implements IResultListener
 		{
 			public void resultAvailable(Object source, Object result)
 			{
-				goal.getParameters().addResultListener(new SwingDefaultResultListener()
+				goal.getParameters().addResultListener(new IResultListener()
 				{
-					public void customResultAvailable(Object source, Object result)
+					public void resultAvailable(final Object source, final Object result)
 					{
 						IEAParameter[] params = (IEAParameter[]) result;
 						final Map parameters = new HashMap();
@@ -79,6 +79,11 @@ public class GoalDispatchResultListener implements IResultListener
 						}
 						else
 							goalResultsAvailable(parameters);
+					}
+					
+					public void exceptionOccurred(Object source, Exception exception)
+					{
+						goalExceptionOccurred(exception);
 					}
 				});
 			}

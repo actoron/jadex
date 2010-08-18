@@ -25,6 +25,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -219,7 +220,6 @@ public class StandardClientApplication
 			public void goalResultsAvailable(Map parameters)
 			{
 				capabilities = (Set) parameters.get("capabilities");
-				
 				if (capabilities.containsAll(SCapReqs.ACTIVITY_HANDLING))
 					setupActivityHandling();
 				

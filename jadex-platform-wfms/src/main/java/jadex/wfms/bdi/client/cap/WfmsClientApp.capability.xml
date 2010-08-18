@@ -13,7 +13,6 @@
 		<import>jadex.wfms.bdi.*</import>
 		<import>jadex.wfms.bdi.ontology.*</import>
 		<import>jadex.wfms.client.*</import>
-		<import>jadex.bridge.ILoadableComponentModel</import>
 	</imports>
 	
 	<capabilities>
@@ -109,7 +108,7 @@
 		<achievegoal name="request_model" exported="true">
 			<parameter name="model_name" class="String" direction="in" />
 			<parameter name="model_name_path" class="boolean" direction="in" optional="true"/>
-			<parameter name="model" class="ILoadableComponentModel" direction="out" />
+			<parameter name="model" class="Object" direction="out" />
 		</achievegoal>
 		
 		<achievegoal name="request_loadable_model_paths" exported="true">
@@ -335,7 +334,7 @@
 			<parameter name="model_name_path" class="boolean" direction="in" optional="true">
 				<goalmapping ref="request_model.model_name_path"/>
 			</parameter>
-			<parameter name="model" class="ILoadableComponentModel" direction="out">
+			<parameter name="model" class="Object" direction="out">
 				<goalmapping ref="request_model.model"/>
 			</parameter>
 			<body class="ModelPlan" />

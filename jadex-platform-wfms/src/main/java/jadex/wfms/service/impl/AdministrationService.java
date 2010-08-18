@@ -39,7 +39,8 @@ public class AdministrationService extends BasicService implements IAdministrati
 	
 	public AdministrationService(final IServiceProvider provider)
 	{
-		super(BasicService.createServiceIdentifier(provider.getId(), AdministrationService.class));
+		super(provider.getId(), IAdministrationService.class, null);
+		//super(BasicService.createServiceIdentifier(provider.getId(), IAdministrationService.class, AdministrationService.class));
 
 		this.wfms = provider;
 		this.logListeners = new HashMap();
@@ -99,7 +100,7 @@ public class AdministrationService extends BasicService implements IAdministrati
 	{
 		if(!((IAAAService)SServiceProvider.getService(wfms, IAAAService.class).get(new ThreadSuspendable())).accessAction(client, IAAAService.ADMIN_REQUEST_ALL_ACTIVITIES))
 			throw new AccessControlException("Not allowed: "+client);
-		return ((IWfmsClientService) SServiceProvider.getService(wfms, IWfmsClientService.class).get(new ThreadSuspendable())).getUserActivities();
+		return (Map) ((IWfmsClientService) SServiceProvider.getService(wfms, IWfmsClientService.class).get(new ThreadSuspendable())).getUserActivities().get(new ThreadSuspendable());
 	}
 	
 	/**

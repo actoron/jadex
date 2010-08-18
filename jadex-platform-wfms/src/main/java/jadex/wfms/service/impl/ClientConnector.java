@@ -1,12 +1,13 @@
 package jadex.wfms.service.impl;
 
 import jadex.commons.Future;
+import jadex.commons.ICommand;
 import jadex.commons.IFuture;
 import jadex.commons.ThreadSuspendable;
+import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.service.BasicService;
 import jadex.service.IServiceContainer;
-import jadex.service.IServiceProvider;
 import jadex.service.SServiceProvider;
 import jadex.wfms.client.IClient;
 import jadex.wfms.client.IClientActivity;
@@ -15,13 +16,8 @@ import jadex.wfms.listeners.ActivityEvent;
 import jadex.wfms.listeners.IActivityListener;
 import jadex.wfms.listeners.IWorkitemListener;
 import jadex.wfms.listeners.WorkitemEvent;
+import jadex.wfms.service.AccessControlCheck;
 import jadex.wfms.service.IAAAService;
-import jadex.wfms.service.IAdministrationService;
-import jadex.wfms.service.IClientService;
-import jadex.wfms.service.IExecutionService;
-import jadex.wfms.service.IModelRepositoryService;
-import jadex.wfms.service.IProcessDefinitionService;
-import jadex.wfms.service.IWfmsClientService;
 
 import java.security.AccessControlException;
 import java.util.HashMap;
@@ -33,10 +29,10 @@ import java.util.Set;
 /**
  * 
  */
-public class ClientConnector extends BasicService implements IClientService, IWfmsClientService
+public class ClientConnector extends BasicService // implements IClientService, IWfmsClientService
 {
 	
-	private IServiceProvider provider;
+	private IServiceContainer provider;
 	
 	private Map workitemQueues;
 	
@@ -52,7 +48,8 @@ public class ClientConnector extends BasicService implements IClientService, IWf
 	
 	public ClientConnector(IServiceContainer provider)
 	{
-		super(BasicService.createServiceIdentifier(provider.getId(), AdministrationService.class));
+		super(provider.getId(), ClientConnector.class, null);
+		//super(BasicService.createServiceIdentifier(provider.getId(), AdministrationService.class));
 
 		this.provider = provider;
 		processWorkitemListeners = new HashMap();
@@ -145,45 +142,33 @@ public class ClientConnector extends BasicService implements IClientService, IWf
 	}
 	
 	/**
-	 * Requests the Process Definition Service
-	 * 
-	 * @param client the client
-	 * @return the process definition service
-	 */
-	public synchronized IProcessDefinitionService getProcessDefinitionService(IClient client)
-	{
-		if (!((IAAAService) SServiceProvider.getService(provider, IAAAService.class).get(new ThreadSuspendable())).accessAction(client, IAAAService.REQUEST_PD_SERVICE))
-			return null;
-		
-		return (IProcessDefinitionService) SServiceProvider.getService(provider, IProcessDefinitionService.class).get(new ThreadSuspendable());
-	}
-	
-	/**
-	 * Requests the Monitoring Service
-	 * 
-	 * @param client the client
-	 * @return the process definition service
-	 */
-	public synchronized IAdministrationService getMonitoringService(IClient client)
-	{
-		if (!((IAAAService) SServiceProvider.getService(provider, IAAAService.class).get(new ThreadSuspendable())).accessAction(client, IAAAService.REQUEST_MONITORING_SERVICE))
-			return null;
-		return (IAdministrationService) SServiceProvider.getService(provider, IAdministrationService.class).get(new ThreadSuspendable());
-	}
-	
-	/**
 	 * Authenticated a new client.
 	 * @param client the new client
 	 * @return true, if the client has been successfully authenticated.
 	 */
-	public synchronized boolean authenticate(IClient client)
+	public IFuture authenticate(final IClient client)
 	{
-		IAAAService aaaService = (IAAAService) SServiceProvider.getService(provider, IAAAService.class).get(new ThreadSuspendable());
-		boolean ret = aaaService.authenticate(client);
-		if ((ret) && (!userActivities.containsKey(client.getUserName())))
-			userActivities.put(client.getUserName(), new HashSet());
-		if (ret)
-			activityListeners.put(client, new HashSet());
+		final Future ret = new Future();
+		SServiceProvider.getService(provider, IAAAService.class).addResultListener(new DelegationResultListener(ret)
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				boolean auth = ((IAAAService) result).authenticate(client);
+				if (auth)
+				{
+					synchronized(ClientConnector.this)
+					{
+						activityListeners.put(client, new HashSet());
+						if (!userActivities.containsKey(client.getUserName()))
+							userActivities.put(client.getUserName(), new HashSet());
+					}
+					ret.setResult(Boolean.TRUE);
+				}
+				else
+					ret.setResult(Boolean.FALSE);
+			}
+		});
+		
 		return ret;
 	}
 	
@@ -191,23 +176,22 @@ public class ClientConnector extends BasicService implements IClientService, IWf
 	 * Deauthenticate a client.
 	 * @param client the client
 	 */
-	public synchronized void deauthenticate(IClient client)
+	public IFuture deauthenticate(final IClient client)
 	{
-		IAAAService aaaService = (IAAAService) SServiceProvider.getService(provider, IAAAService.class).get(new ThreadSuspendable());
-		workitemQueueListeners.remove(client);
-		activityListeners.remove(client);
-		aaaService.deauthenticate(client);
-	}
-	
-	/**
-	 * Returns the capabilities of the client
-	 * @param client the client
-	 * @return set of capabilities
-	 */
-	public Set getCapabilities(IClient client)
-	{
-		IAAAService aaaService = (IAAAService) SServiceProvider.getService(provider, IAAAService.class).get(new ThreadSuspendable());
-		return aaaService.getCapabilities(aaaService.getSecurityRole(client.getUserName()));
+		final Future ret = new Future();
+		SServiceProvider.getService(provider, IAAAService.class).addResultListener(new DelegationResultListener(ret)
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				synchronized(ClientConnector.this)
+				{
+					workitemQueueListeners.remove(client);
+					activityListeners.remove(client);
+					((IAAAService) result).deauthenticate(client);
+				}
+			}
+		});
+		return ret;
 	}
 	
 	/**
@@ -243,39 +227,6 @@ public class ClientConnector extends BasicService implements IClientService, IWf
 		IModelRepositoryService rs = (IModelRepositoryService) wfms.getService(IModelRepositoryService.class);
 		return new HashSet(rs.getModelNames());
 	}*/
-	
-	/**
-	 * Gets the names of all available process models
-	 * 
-	 * @param client the client
-	 * @return the names of all available process models
-	 */
-	public synchronized Set getModelNames(IClient client)
-	{
-		if(!((IAAAService) SServiceProvider.getService(provider, IAAAService.class).get(new ThreadSuspendable())).accessAction(client, IAAAService.PD_REQUEST_MODEL_NAMES))
-			throw new AccessControlException("Not allowed: "+client);
-		
-		IModelRepositoryService rs = (IModelRepositoryService) SServiceProvider.getService(provider, IModelRepositoryService.class).get(new ThreadSuspendable());
-		return new HashSet(rs.getModelNames());
-	}
-	
-	/**
-	 * Starts a new process
-	 * 
-	 * @param client the client
-	 * @param name name of the process
-	 */
-	public synchronized void startProcess(IClient client, String name)
-	{
-		if(!((IAAAService) SServiceProvider.getService(provider, IAAAService.class).get(new ThreadSuspendable())).accessAction(client, IAAAService.START_PROCESS))
-			throw new AccessControlException("Not allowed: "+client);
-		
-		IModelRepositoryService rs = (IModelRepositoryService) SServiceProvider.getService(provider, IModelRepositoryService.class).get(new ThreadSuspendable());
-		String filename = rs.getProcessFileName(name);
-		
-		IExecutionService bps = (IExecutionService) SServiceProvider.getService(provider, IExecutionService.class).get(new ThreadSuspendable());
-		Object id  = bps.startProcess(filename, null, null);
-	}
 	
 	/**
 	 *  Finishes an Activity.
@@ -324,34 +275,47 @@ public class ClientConnector extends BasicService implements IClientService, IWf
 		queueWorkitem((IWorkitem) activity, null);
 	}
 	
-	public synchronized Set getAvailableWorkitems(IClient client)
+	public IFuture getAvailableWorkitems(final IClient client)
 	{
-		IAAAService as = (IAAAService) SServiceProvider.getService(provider, IAAAService.class).get(new ThreadSuspendable());
-		if ((!as.accessAction(client, IAAAService.REQUEST_AVAILABLE_WORKITEMS)) &&
-			(!as.accessAction(client, IAAAService.ADD_WORKITEM_LISTENER)))
-			throw new AccessControlException("Not allowed: "+client);
+		final Future ret = new Future();
+		(new AccessControlCheck(client, new Integer[] { IAAAService.REQUEST_AVAILABLE_WORKITEMS, IAAAService.ADD_WORKITEM_LISTENER }))
+			.checkAccess(ret, provider, new ICommand()
+		{
+			public void execute(Object args)
+			{
+				SServiceProvider.getService(provider, IAAAService.class).addResultListener(new DelegationResultListener(ret)
+				{
+					public void resultAvailable(Object source, Object result)
+					{
+						Set roles = ((IAAAService) result).getRoles(client.getUserName());
+						Set workitems = new HashSet();
+						synchronized(ClientConnector.this)
+						{
+							if (roles.contains(IAAAService.ALL_ROLES))
+							{
+								for (Iterator it = workitemQueues.values().iterator(); it.hasNext(); )
+								{
+									Set roleItems = (Set) it.next();
+									workitems.addAll(roleItems);
+								}
+							}
+							else
+							{
+								for (Iterator it = roles.iterator(); it.hasNext(); )
+								{
+									Set roleItems = (Set) workitemQueues.get(it.next());
+									if (roleItems != null)
+										workitems.addAll(roleItems);
+								}
+							}
+						}
+						ret.setResult(workitems);
+					}
+				});
+			}
+		});
 		
-		IAAAService roleService = (IAAAService) SServiceProvider.getService(provider, IAAAService.class).get(new ThreadSuspendable());
-		Set roles = roleService.getRoles(client.getUserName());
-		Set workitems = new HashSet();
-		if (roles.contains(IAAAService.ALL_ROLES))
-		{
-			for (Iterator it = workitemQueues.values().iterator(); it.hasNext(); )
-			{
-				Set roleItems = (Set) it.next();
-				workitems.addAll(roleItems);
-			}
-		}
-		else
-		{
-			for (Iterator it = roles.iterator(); it.hasNext(); )
-			{
-				Set roleItems = (Set) workitemQueues.get(it.next());
-				if (roleItems != null)
-					workitems.addAll(roleItems);
-			}
-		}
-		return workitems;
+		return ret;
 	}
 	
 	/**
@@ -359,11 +323,20 @@ public class ClientConnector extends BasicService implements IClientService, IWf
 	 *  @param client the client
 	 *  @return a set of activities that are available for this client
 	 */
-	public synchronized Set getAvailableActivities(IClient client)
+	public IFuture getAvailableActivities(final IClient client)
 	{
-		if (!((IAAAService) SServiceProvider.getService(provider, IAAAService.class).get(new ThreadSuspendable())).accessAction(client, IAAAService.REQUEST_AVAILABLE_ACTIVITIES))
-			throw new AccessControlException("Not allowed: "+client);
-		return new HashSet((Set) userActivities.get(client.getUserName()));
+		final Future ret = new Future();
+		(new AccessControlCheck(client, IAAAService.REQUEST_AVAILABLE_ACTIVITIES)).checkAccess(ret, provider, new ICommand()
+		{
+			public void execute(Object args)
+			{
+				synchronized(ClientConnector.this)
+				{
+					ret.setResult(new HashSet((Set) userActivities.get(client.getUserName())));
+				}
+			}
+		});
+		return ret;
 	}
 	
 	/**
@@ -371,25 +344,44 @@ public class ClientConnector extends BasicService implements IClientService, IWf
 	 *  @param client the client
 	 *  @param listener a new WFMS listener
 	 */
-	public synchronized void addWorkitemListener(IClient client, IWorkitemListener listener)
+	public IFuture addWorkitemListener(final IClient client, final IWorkitemListener listener)
 	{
-		if (!((IAAAService) SServiceProvider.getService(provider, IAAAService.class).get(new ThreadSuspendable())).accessAction(client, IAAAService.ADD_WORKITEM_LISTENER))
-			throw new AccessControlException("Not allowed: "+client);
-		Set listeners = (Set) workitemQueueListeners.get(client);
-		if (listeners == null)
+		final Future ret = new Future();
+		
+		(new AccessControlCheck(client, IAAAService.ADD_WORKITEM_LISTENER)).checkAccess(ret, provider, new ICommand()
 		{
-			listeners = new HashSet();
-			workitemQueueListeners.put(client, listeners);
-		}
-		listeners.add(listener);
-		Set workitems = getAvailableWorkitems(client);
-		if (workitems != null)
-		{
-			for (Iterator it = workitems.iterator(); it.hasNext(); )
+			public void execute(Object args)
 			{
-				listener.workitemAdded(new WorkitemEvent((IWorkitem) it.next()));
+				getAvailableWorkitems(client).addResultListener(new DelegationResultListener(ret)
+				{
+					public void resultAvailable(Object source, Object result)
+					{
+						synchronized(ClientConnector.this)
+						{
+							Set workitems = (Set) result;
+							Set listeners = (Set) workitemQueueListeners.get(client);
+							if (listeners == null)
+							{
+								listeners = new HashSet();
+								workitemQueueListeners.put(client, listeners);
+							}
+							listeners.add(listener);
+						
+							if (workitems != null)
+							{
+								for (Iterator it = workitems.iterator(); it.hasNext(); )
+								{
+									listener.workitemAdded(new WorkitemEvent((IWorkitem) it.next()));
+								}
+							}
+						}
+						ret.setResult(null);
+					}
+				});
 			}
-		}
+		});
+		
+		return ret;
 	}
 	
 	/**
@@ -397,13 +389,22 @@ public class ClientConnector extends BasicService implements IClientService, IWf
 	 *  @param client the client
 	 *  @param listener a new WFMS listener
 	 */
-	public synchronized void removeWorkitemListener(IClient client, IWorkitemListener listener)
+	public IFuture removeWorkitemListener(final IClient client, final IWorkitemListener listener)
 	{
-		if (!((IAAAService) SServiceProvider.getService(provider, IAAAService.class).get(new ThreadSuspendable())).accessAction(client, IAAAService.REMOVE_WORKITEM_LISTENER))
-			throw new AccessControlException("Not allowed: "+client);
-		Set listeners = (Set) workitemQueueListeners.get(client);
-		if (listeners != null)
-			listeners.remove(listener);
+		final Future ret = new Future();
+		(new AccessControlCheck(client, IAAAService.REMOVE_WORKITEM_LISTENER)).checkAccess(ret, provider, new ICommand()
+		{
+			public void execute(Object args)
+			{
+				synchronized(ClientConnector.this)
+				{
+					Set listeners = (Set) workitemQueueListeners.get(client);
+					if (listeners != null)
+						listeners.remove(listener);
+				}
+			}
+		});
+		return ret;
 	}
 	
 	/**
@@ -438,25 +439,35 @@ public class ClientConnector extends BasicService implements IClientService, IWf
 	 *  @param client the client
 	 *  @param listener a new activity listener
 	 */
-	public synchronized void addActivityListener(IClient client, IActivityListener listener)
+	public IFuture addActivityListener(final IClient client, final IActivityListener listener)
 	{
-		if (!((IAAAService) SServiceProvider.getService(provider, IAAAService.class).get(new ThreadSuspendable())).accessAction(client, IAAAService.ADD_ACTIVITY_LISTENER))
-			throw new AccessControlException("Not allowed: "+client);
-		Set listeners = (Set) activityListeners.get(client);
-		if (listeners == null)
+		final Future ret = new Future();
+		(new AccessControlCheck(client, IAAAService.ADD_ACTIVITY_LISTENER)).checkAccess(ret, provider, new ICommand()
 		{
-			listeners = new HashSet();
-			activityListeners.put(client, listeners);
-		}
-		listeners.add(listener);
-		Set activities = (Set) userActivities.get(client.getUserName());
-		if (activities != null)
-		{
-			for (Iterator it = activities.iterator(); it.hasNext(); )
+			public void execute(Object args)
 			{
-				listener.activityAdded(new ActivityEvent(client.getUserName(), (IClientActivity) it.next()));
+				synchronized(ClientConnector.this)
+				{
+					Set listeners = (Set) activityListeners.get(client);
+					if (listeners == null)
+					{
+						listeners = new HashSet();
+						activityListeners.put(client, listeners);
+					}
+					listeners.add(listener);
+					Set activities = (Set) userActivities.get(client.getUserName());
+					if (activities != null)
+					{
+						for (Iterator it = activities.iterator(); it.hasNext(); )
+						{
+							listener.activityAdded(new ActivityEvent(client.getUserName(), (IClientActivity) it.next()));
+						}
+					}
+				}
 			}
-		}
+		});
+		
+		return ret;
 	}
 	
 	/**
@@ -464,16 +475,26 @@ public class ClientConnector extends BasicService implements IClientService, IWf
 	 *  @param client the client
 	 *  @param listener a new activity listener
 	 */
-	public synchronized void removeActivityListener(IClient client, IActivityListener listener)
+	public IFuture removeActivityListener(final IClient client, final IActivityListener listener)
 	{
-		if (!((IAAAService) SServiceProvider.getService(provider, IAAAService.class).get(new ThreadSuspendable())).accessAction(client, IAAAService.REMOVE_ACTIVITY_LISTENER))
-			throw new AccessControlException("Not allowed: "+client);
-		Set listeners = (Set) activityListeners.get(client);
-		if (listeners != null)
-			listeners.remove(listener);
+		final Future ret = new Future();
+		(new AccessControlCheck(client, IAAAService.REMOVE_ACTIVITY_LISTENER)).checkAccess(ret, provider, new ICommand()
+		{
+			public void execute(Object args)
+			{
+				synchronized (ClientConnector.this)
+				{
+					Set listeners = (Set) activityListeners.get(client);
+					if (listeners != null)
+						listeners.remove(listener);
+				}
+			}
+		});
+		
+		return ret;
 	}
 	
-	private void fireWorkitemAddedEvent(IWorkitem workitem)
+	private synchronized void fireWorkitemAddedEvent(IWorkitem workitem)
 	{
 		IAAAService as = (IAAAService) SServiceProvider.getService(provider, IAAAService.class).get(new ThreadSuspendable());
 		for (Iterator it = workitemQueueListeners.entrySet().iterator(); it.hasNext(); )
@@ -493,7 +514,7 @@ public class ClientConnector extends BasicService implements IClientService, IWf
 		}
 	}
 	
-	private void fireWorkitemRemovedEvent(IWorkitem workitem)
+	private synchronized void fireWorkitemRemovedEvent(IWorkitem workitem)
 	{
 		IAAAService as = (IAAAService) SServiceProvider.getService(provider, IAAAService.class).get(new ThreadSuspendable());
 		for (Iterator it = workitemQueueListeners.entrySet().iterator(); it.hasNext(); )
@@ -513,7 +534,7 @@ public class ClientConnector extends BasicService implements IClientService, IWf
 		}
 	}
 	
-	private void fireActivityAddedEvent(String userName, IClientActivity activity)
+	private synchronized void fireActivityAddedEvent(String userName, IClientActivity activity)
 	{
 		IAAAService as = (IAAAService) SServiceProvider.getService(provider, IAAAService.class).get(new ThreadSuspendable());
 		Set clients = as.getAuthenticatedClients(userName);
@@ -536,7 +557,7 @@ public class ClientConnector extends BasicService implements IClientService, IWf
 			((IActivityListener) it.next()).activityAdded(new ActivityEvent(userName, activity));
 	}
 	
-	private void fireActivityRemovedEvent(String userName, IClientActivity activity)
+	private synchronized void fireActivityRemovedEvent(String userName, IClientActivity activity)
 	{
 		IAAAService as = (IAAAService) SServiceProvider.getService(provider, IAAAService.class).get(new ThreadSuspendable());
 		Set clients = as.getAuthenticatedClients(userName);

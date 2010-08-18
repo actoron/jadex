@@ -8,6 +8,7 @@ import jadex.service.SServiceProvider;
 import jadex.wfms.client.IClient;
 import jadex.wfms.listeners.IProcessRepositoryListener;
 import jadex.wfms.service.IAAAService;
+import jadex.wfms.service.IAdministrationService;
 import jadex.wfms.service.IAuthenticationListener;
 import jadex.wfms.service.IExecutionService;
 import jadex.wfms.service.IModelRepositoryService;
@@ -31,7 +32,8 @@ public class ProcessDefinitionConnector extends BasicService implements IProcess
 	
 	public ProcessDefinitionConnector(IServiceProvider provider)
 	{
-		super(BasicService.createServiceIdentifier(provider.getId(), ProcessDefinitionConnector.class));
+		super(provider.getId(), IProcessDefinitionService.class, null);
+		//super(BasicService.createServiceIdentifier(provider.getId(), ProcessDefinitionConnector.class));
 
 		this.provider = provider;
 		this.repositoryListeners = new HashMap();

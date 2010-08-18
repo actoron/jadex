@@ -25,7 +25,7 @@ public class RequestActivityListPlan extends Plan
 		Set activityList = null;
 		try
 		{
-			activityList = cs.getAvailableActivities(proxy);
+			activityList = (Set) cs.getAvailableActivities(proxy).get(this);
 		}
 		catch (AccessControlException e)
 		{

@@ -30,7 +30,7 @@ public class RequestWorkitemListPlan extends Plan
 		Set workitemList = null;
 		try
 		{
-			workitemList = cs.getAvailableWorkitems(proxy);
+			workitemList = (Set) cs.getAvailableWorkitems(proxy).get(this);
 		}
 		catch (AccessControlException e)
 		{

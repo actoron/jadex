@@ -561,10 +561,11 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 		{
 			ctypes.put(comp, appctype);
 		}
+		/* TODO: Check removed because WfMS requires adding arbitrary subcomponents (processes).
 		else if(parent!=null)
 		{
 			throw new RuntimeException("Unknown/undefined component type: "+model);
-		}
+		}*/
 		
 		ISpace[]	aspaces	= null;
 		synchronized(this)

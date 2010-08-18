@@ -17,6 +17,7 @@ import jadex.wfms.IProcess;
 import jadex.wfms.service.IAdministrationService;
 import jadex.wfms.service.IExecutionService;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -30,6 +31,8 @@ public class ExecutionService extends BasicService implements IExecutionService
 	//-------- attributes --------
 	
 	/** The WFMS */
+	protected IComponentIdentifier wfms;
+	
 	protected IServiceProvider provider;
 	
 	/** Running process instances (id -> IProcess) */
@@ -43,11 +46,13 @@ public class ExecutionService extends BasicService implements IExecutionService
 	/**
 	 *  Create a new execution service.
 	 */
-	public ExecutionService(IServiceProvider provider)
+	public ExecutionService(IComponentIdentifier wfms, IServiceProvider provider)
 	{
-		super(BasicService.createServiceIdentifier(provider.getId(), ExecutionService.class));
+		super(provider.getId(), IExecutionService.class, null);
+		//super(BasicService.createServiceIdentifier(provider.getId(), ExecutionService.class));
 
 		this.processes = new HashMap();
+		this.wfms = wfms;
 		this.provider = provider;
 		
 		//TODO: hack!
@@ -92,7 +97,7 @@ public class ExecutionService extends BasicService implements IExecutionService
 	{
 		final Future ret = new Future();
 		IComponentManagementService ces = (IComponentManagementService) SServiceProvider.getService(provider, IComponentManagementService.class).get(new ThreadSuspendable());
-		ces.createComponent(null, modelname, new CreationInfo(arguments), null).addResultListener(new IResultListener()
+		ces.createComponent(null, modelname, new CreationInfo(arguments, wfms), null).addResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{

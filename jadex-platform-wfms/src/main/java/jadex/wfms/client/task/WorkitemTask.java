@@ -13,6 +13,8 @@ import jadex.bpmn.model.MParameter;
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ITask;
 import jadex.bpmn.runtime.ITaskContext;
+import jadex.commons.Future;
+import jadex.commons.IFuture;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.ThreadSuspendable;
@@ -34,18 +36,20 @@ public class WorkitemTask implements ITask
 	 *  @param process	The process instance executing the task.
 	 *  @listener	To be notified, when the task has completed.
 	 */
-	public void execute(final ITaskContext context, final BpmnInterpreter process, final IResultListener listener)
+	public IFuture execute(final ITaskContext context, final BpmnInterpreter process)
 	{
-		IServiceContainer wfms = (IServiceContainer) process.getComponentAdapter().getServiceContainer();
+		final Future ret = new Future();
+		IServiceContainer wfms = process.getServiceContainer();
 		SServiceProvider.getService(wfms, IWfmsClientService.class).addResultListener(new DefaultResultListener()
 		{
 			
 			public void resultAvailable(Object source, Object result)
 			{
 				IWfmsClientService wiq = (IWfmsClientService) result;
-				wiq.queueWorkitem(createWorkitem(Workitem.GENERIC_WORKITEM_TYPE, context), createRedirListener(context, listener));
+				wiq.queueWorkitem(createWorkitem(Workitem.GENERIC_WORKITEM_TYPE, context), createListener(context, ret));
 			}
 		});
+		return ret;
 	}
 	
 	/**
@@ -142,7 +146,7 @@ public class WorkitemTask implements ITask
 		return wi;
 	}
 	
-	private static IResultListener createRedirListener(final ITaskContext context, final IResultListener listener)
+	private static IResultListener createListener(final ITaskContext context, final Future future)
 	{
 		IResultListener redirListener = new IResultListener()
 		{
@@ -161,12 +165,14 @@ public class WorkitemTask implements ITask
 					}
 				}
 				//System.out.println(listener.getClass().getName());
-				listener.resultAvailable(source, result);
+				future.setResult(result);
+				//listener.resultAvailable(source, result);
 			}
 			
 			public void exceptionOccurred(Object source, Exception exception)
 			{
-				listener.exceptionOccurred(source, exception);
+				//listener.exceptionOccurred(source, exception);
+				future.setException(exception);
 			}
 		};
 		return redirListener;

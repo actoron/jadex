@@ -3,11 +3,10 @@ package jadex.wfms;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IEAGoal;
 import jadex.bdi.runtime.IEAParameter;
-import jadex.commons.ThreadSuspendable;
-import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 
+import java.awt.Component;
 import java.awt.EventQueue;
 import java.util.HashMap;
 import java.util.Map;
@@ -18,6 +17,7 @@ public class SwingGoalDispatchResultListener extends SwingDefaultResultListener
 	
 	public SwingGoalDispatchResultListener(IBDIExternalAccess access)
 	{
+		super((Component) null);
 		this.access = access;
 	}
 	
@@ -29,7 +29,7 @@ public class SwingGoalDispatchResultListener extends SwingDefaultResultListener
 		{
 			public void resultAvailable(Object source, Object result)
 			{
-				goal.getParameters().addResultListener(new SwingDefaultResultListener()
+				goal.getParameters().addResultListener(new SwingDefaultResultListener((Component) null)
 				{
 					public void customResultAvailable(Object source, Object result)
 					{

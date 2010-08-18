@@ -28,9 +28,7 @@ public class RequestCapabilitiesPlan extends AbstractWfmsPlan
 		Map clientProxies = (Map) getBeliefbase().getBelief("client_proxies").getFact();
 		IClient proxy = (IClient) clientProxies.get(getParameter("initiator").getValue());
 		IClientService cs = (IClientService) SServiceProvider.getService(getScope().getServiceProvider(), IClientService.class).get(this);
-		
-		Set capabilities = cs.getCapabilities(proxy);
-		
+		Set capabilities = (Set) cs.getCapabilities(proxy).get(this);
 		RequestCapabilities rc = (RequestCapabilities) getParameter("action").getValue();
 		rc.setCapabilities(capabilities);
 		Done done = new Done();

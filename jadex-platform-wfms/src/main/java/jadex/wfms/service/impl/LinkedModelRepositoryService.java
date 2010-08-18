@@ -10,6 +10,7 @@ import jadex.service.library.ILibraryService;
 import jadex.service.library.ILibraryServiceListener;
 import jadex.wfms.listeners.IProcessRepositoryListener;
 import jadex.wfms.listeners.ProcessRepositoryEvent;
+import jadex.wfms.service.IAdministrationService;
 import jadex.wfms.service.IExecutionService;
 import jadex.wfms.service.IModelRepositoryService;
 
@@ -51,7 +52,8 @@ public class LinkedModelRepositoryService extends BasicService implements IModel
 	
 	public LinkedModelRepositoryService(IServiceProvider provider)
 	{
-		super(BasicService.createServiceIdentifier(provider.getId(), LinkedModelRepositoryService.class));
+		//super(BasicService.createServiceIdentifier(provider.getId(), LinkedModelRepositoryService.class));
+		super(provider.getId(), IModelRepositoryService.class, null);
 
 		this.provider = provider;
 		// TODO: Hack! Needs proper imports...
@@ -152,7 +154,7 @@ public class LinkedModelRepositoryService extends BasicService implements IModel
 		{
 			//Set knownPaths = new HashSet(modelPaths.values());
 			Set modelSet = new HashSet();
-			List urls = ((ILibraryService) SServiceProvider.getService(provider, ILibraryService.class).get(new ThreadSuspendable())).getURLs();
+			List urls = (List) ((ILibraryService) SServiceProvider.getService(provider, ILibraryService.class).get(new ThreadSuspendable())).getURLs().get(new ThreadSuspendable());
 			for (Iterator it = urls.iterator(); it.hasNext(); )
 			{
 				URL url = (URL) it.next();

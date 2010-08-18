@@ -31,7 +31,7 @@ public class ModelPlan extends AbstractWfmsPlan
 		dispatchSubgoalAndWait(reqMGoal);
 		Done done = (Done) reqMGoal.getParameter("result").getValue();
 		reqM = (RequestModel) done.getAction();
-		IModelInfo model = null;
+		Object model = null;
 		try
 		{
 			if ((reqM.getFileName().endsWith(".bpmn")) || (reqM.getFileName().endsWith(".gpmn")))
