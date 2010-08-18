@@ -267,6 +267,9 @@ public class ViewportJ2D extends AbstractViewport implements ComponentListener
 						
 						AffineTransform tf = g.getTransform();
 						g.translate(objShiftX_, objShiftY_);
+						// TODO: Hack!, get Monitor to ensure object draw synchronization
+						Object monitor = getPerspective().getObserverCenter().getSpace().getMonitor();
+						
 						for(Iterator it = objectLayers_.iterator(); it
 								.hasNext();)
 						{
@@ -277,7 +280,11 @@ public class ViewportJ2D extends AbstractViewport implements ComponentListener
 								Object[] o = (Object[])it2.next();
 								Object obj = o[0];
 								DrawableCombiner d = (DrawableCombiner)o[1];
-								d.draw(obj, layer, ViewportJ2D.this);
+								// TODO: Hack!, ensure object draw synchronization
+								synchronized (monitor)
+								{
+									d.draw(obj, layer, ViewportJ2D.this);
+								}
 							}
 						}
 						g.setTransform(tf);

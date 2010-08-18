@@ -490,7 +490,7 @@ public class ViewportJOGL extends AbstractViewport
 			gl.glEnable(GL.GL_SCISSOR_TEST);
 			
 			context_ = gl;
-
+			
 			synchronized(preLayers_)
 			{
 				for (int i = 0; i < preLayers_.length; ++i)
@@ -522,6 +522,9 @@ public class ViewportJOGL extends AbstractViewport
 					}
 					
 					
+					// TODO: Hack!, get Monitor to ensure object draw synchronization
+					Object monitor = getPerspective().getObserverCenter().getSpace().getMonitor();
+					
 					gl.glPushMatrix();
 					gl.glTranslatef(objShiftX_, objShiftY_, 0.0f);
 					for(Iterator it = objectLayers_.iterator(); it.hasNext();)
@@ -533,7 +536,12 @@ public class ViewportJOGL extends AbstractViewport
 							Object[] o = (Object[])it2.next();
 							Object obj = o[0];
 							DrawableCombiner d = (DrawableCombiner)o[1];
-							d.draw(obj, layer, ViewportJOGL.this);
+							
+							// TODO: Hack!, ensure object draw synchronization
+							synchronized (monitor)
+							{
+								d.draw(obj, layer, ViewportJOGL.this);
+							}
 						}
 					}
 					gl.glPopMatrix();
