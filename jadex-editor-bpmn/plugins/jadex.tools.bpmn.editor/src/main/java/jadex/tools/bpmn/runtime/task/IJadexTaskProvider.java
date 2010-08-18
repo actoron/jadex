@@ -3,6 +3,15 @@ package jadex.tools.bpmn.runtime.task;
 public interface IJadexTaskProvider
 {
 
+	/** The method to dispose all resources */
+	public abstract void dispose();
+	/** The implementing dispose() method name*/
+	public static final String METHOD_IJADEXTASKPROVIDER_DISPOSE = "dispose";
+	
+	/** The method to dispose all resources */
+	public abstract void refresh();
+	/** The implementing dispose() method name*/
+	public static final String METHOD_IJADEXTASKPROVIDER_REFRESH = "refresh";
 	
 	
 	/** The method to access the provided task implementations */

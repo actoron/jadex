@@ -20,12 +20,38 @@ public class PackageBasedTaskProvider extends TaskProviderSupport
 	List<String> searchPackages; 
 	List<String> discoveredTasks;
 	
+	// ---- constructors ----
+	
 	/**
 	 * 
 	 */
 	public PackageBasedTaskProvider()
 	{
 		super();
+		initializeSearchPackages();
+		initializeDiscoverdClasses();
+	}
+	
+	// ---- interface methods ---
+
+	/* (non-Javadoc)
+	 * @see jadex.tools.bpmn.runtime.task.IJadexTaskProvider#dispose()
+	 */
+	@Override
+	public void dispose()
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see jadex.tools.bpmn.runtime.task.TaskProviderSupport#refresh()
+	 */
+	@Override
+	public void refresh()
+	{
+		super.refresh();
+		WorkspaceClassLoaderHelper.getWorkspaceClassLoader(true);
 		initializeSearchPackages();
 		initializeDiscoverdClasses();
 	}
@@ -36,8 +62,8 @@ public class PackageBasedTaskProvider extends TaskProviderSupport
 	@Override
 	public String[] getAvailableTaskImplementations()
 	{
-		// TODO: what about re-init discovered classes ?
-		return discoveredTasks.toArray(new String[discoveredTasks.size()]);
+		taskImplementations = discoveredTasks.toArray(new String[discoveredTasks.size()]);
+		return taskImplementations;
 	}
 	
 	/**
@@ -68,6 +94,7 @@ public class PackageBasedTaskProvider extends TaskProviderSupport
 	{
 		searchPackages = new UniqueEList<String>();
 		
+		// TODO: use preference instead of static list
 		searchPackages.add("jadex.bpmn.runtime.task");
 		searchPackages.add("jadex.bdibpmn.task");
 		searchPackages.add("jadex.wfms.client.task");

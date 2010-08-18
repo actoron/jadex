@@ -51,6 +51,29 @@ public class PreferenceTaskProviderProxy implements IJadexTaskProvider
 		getAvailableTaskImplementations();
 	}
 
+	/* (non-Javadoc)
+	 * @see jadex.tools.bpmn.runtime.task.IJadexTaskProvider#dispose()
+	 */
+	@Override
+	public void dispose()
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	
+	/* (non-Javadoc)
+	 * @see jadex.tools.bpmn.runtime.task.IJadexTaskProvider#refresh()
+	 */
+	@Override
+	public void refresh()
+	{
+		iTaskProviderCache.clear();
+		providerMap.clear();
+		WorkspaceClassLoaderHelper.getWorkspaceClassLoader(true);
+		getAvailableTaskImplementations();
+	}
+
 	/**
 	 * Returns a compound array of all Tasks defined by the TaskProviders
 	 * in from the Jadex preference store list.  
@@ -63,6 +86,7 @@ public class PreferenceTaskProviderProxy implements IJadexTaskProvider
 	{
 
 		List<String> preferenceList = JadexTaskProviderTypeListEditor.parseStringList(JadexBpmnPlugin.getDefault().getPreferenceStore().getString(JadexPreferences.PREFERENCE_TASK_PROVIDER_LIST));
+		
 		if (!iTaskProviderCache.equals(preferenceList))
 		{
 			loadTaskMetaInfos(preferenceList);

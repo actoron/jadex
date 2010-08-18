@@ -76,6 +76,7 @@ public class JadexUserTaskImplComboSection extends
 	@Override
 	public void dispose()
 	{
+		this.taskProvider.dispose();
 		this.taskProvider = null;
 		// dispose is done in superclass, see addDisposable
 		super.dispose();

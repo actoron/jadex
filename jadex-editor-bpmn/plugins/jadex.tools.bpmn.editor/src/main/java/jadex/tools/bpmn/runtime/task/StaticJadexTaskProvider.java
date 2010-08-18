@@ -17,7 +17,7 @@ public class StaticJadexTaskProvider extends TaskProviderSupport
 			"jadex.bpmn.runtime.task.CreateComponentTask.class",
 			"jadex.bpmn.runtime.task.DestroyComponentTask.class",
 			"jadex.bpmn.runtime.task.StoreResultsTask.class",
-			"jadex.bpmn.runtime.task.UserInteractionTask",
+			"jadex.bpmn.runtime.task.UserInteractionTask.class",
 
 			"jadex.bdibpmn.task.DispatchGoalTask.class",
 			"jadex.bdibpmn.task.WaitForGoalTask.class",
@@ -27,9 +27,9 @@ public class StaticJadexTaskProvider extends TaskProviderSupport
 
 			"jadex.bdibpmn.task.CreateSpaceObjectTaskTask.class",
 			"jadex.bdibpmn.task.WaitForSpaceObjectTaskTask.class",
-			"jadex.bdibpmn.task.RemoveSpaceObjectTaskTask.class",
+			"jadex.bdibpmn.task.RemoveSpaceObjectTaskTask.class" //,
 
-			"jadex.wfms.client.task.WorkitemTask.class"};
+			/*"jadex.wfms.client.task.WorkitemTask.class"*/};
 
 	private static Map createMetaInfos()
 	{

@@ -20,6 +20,25 @@ public class TaskProviderProxy implements IJadexTaskProvider
 		super();
 		this.provider = provider;
 	}
+	
+	/* (non-Javadoc)
+	 * @see jadex.tools.bpmn.runtime.task.IJadexTaskProvider#dispose()
+	 */
+	@Override
+	public void dispose()
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see jadex.tools.bpmn.runtime.task.IJadexTaskProvider#refresh()
+	 */
+	@Override
+	public void refresh()
+	{
+		// nothing to refresh
+	}
 
 	@Override
 	public String[] getAvailableTaskImplementations()

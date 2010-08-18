@@ -64,6 +64,29 @@ public abstract class TaskProviderSupport implements IJadexTaskProvider
 
 	// ---- interface methods ----
 
+	/* (non-Javadoc)
+	 * @see jadex.tools.bpmn.runtime.task.IJadexTaskProvider#dispose()
+	 */
+	@Override
+	public void dispose()
+	{
+		taskImplementations = null;
+		
+		if (metaInfoMap != null)
+			metaInfoMap.clear();
+		metaInfoMap = null;
+	}
+
+	/* (non-Javadoc)
+	 * @see jadex.tools.bpmn.runtime.task.IJadexTaskProvider#refresh()
+	 */
+	@Override
+	public void refresh()
+	{
+		taskImplementations = new String[0];
+		metaInfoMap.clear();
+	}
+	
 	/**
 	 * Get the provided task implementations
 	 * Per default return an String[] with an empty String
@@ -75,6 +98,8 @@ public abstract class TaskProviderSupport implements IJadexTaskProvider
 	}
 
 	
+	
+
 	/**
 	 * Get {@link TaskMetaInfo} for provided task implementation.
 	 * @see jadex.tools.bpmn.runtime.task.IRuntimeTaskProvider#getTaskMetaInfo(java.lang.String)

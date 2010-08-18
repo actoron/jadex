@@ -18,6 +18,7 @@ import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
@@ -37,6 +38,9 @@ public abstract class AbstractComboPropertySection extends AbstractBpmnPropertyS
 	
 	/** The CCombo label */
 	protected String cComboLabel;
+	
+	/** A Button on the right side of the cCombo */
+	protected Button rightButton;
 
 	// ---- constructor ----
 	
@@ -150,6 +154,7 @@ public abstract class AbstractComboPropertySection extends AbstractBpmnPropertyS
 			}
 			
 			cCombo.setEnabled(true);
+			rightButton.setEnabled(true);
 			return;
 
 		}
@@ -158,6 +163,7 @@ public abstract class AbstractComboPropertySection extends AbstractBpmnPropertyS
 		modelElement = null;
 		cCombo.setText(""); //$NON-NLS-1$
 		cCombo.setEnabled(false);
+		rightButton.setEnabled(false);
 		
 	}
 
@@ -173,14 +179,18 @@ public abstract class AbstractComboPropertySection extends AbstractBpmnPropertyS
 	{
 		
 		// The layout of the section composite
-		GridLayout layout = new GridLayout(2, false);
+		GridLayout layout = new GridLayout(3, false);
 		sectionComposite.setLayout(layout);
 
+		GridData labelGridData = new GridData();
+		labelGridData.minimumWidth = 60;
+		labelGridData.widthHint = 60;
+		
 		GridData comboGridData = new GridData(SWT.FILL);
 		comboGridData.minimumWidth = 500;
 		comboGridData.widthHint = 500;
 		
-		GridData labelGridData = new GridData();
+		GridData buttonGridData = new GridData();
 		labelGridData.minimumWidth = 60;
 		labelGridData.widthHint = 60;
 		
@@ -191,6 +201,13 @@ public abstract class AbstractComboPropertySection extends AbstractBpmnPropertyS
 		final CCombo combo = getWidgetFactory().createCCombo(sectionComposite, SWT.NONE);
 		addDisposable(combo);
 		combo.setLayoutData(comboGridData);
+		
+		Button disabledDefaultButton = getWidgetFactory().createButton(sectionComposite, "", SWT.Hide);
+		disabledDefaultButton.setLayoutData(buttonGridData);
+		disabledDefaultButton.setVisible(false);
+		disabledDefaultButton.setEnabled(false);
+		this.rightButton = disabledDefaultButton;
+		
 		
 		String[] items = getComboItems();
 		// avoid exception with bad implementations
