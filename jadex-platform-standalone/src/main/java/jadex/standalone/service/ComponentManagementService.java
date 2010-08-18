@@ -1173,8 +1173,7 @@ public class ComponentManagementService extends BasicService implements ICompone
 				{
 					IRemoteServiceManagementService rms = (IRemoteServiceManagementService)result;
 					
-					// todo: specific external accesses
-					rms.getExternalAccessProxy(cid, IExternalAccess.class).addResultListener(new IResultListener()
+					rms.getExternalAccessProxy(cid).addResultListener(new IResultListener()
 					{
 						public void resultAvailable(Object source, Object result)
 						{

@@ -41,7 +41,7 @@ public interface IModelInfo
 	 *  Get the report.
 	 *  @return The report.
 	 */
-	public IReport getReport();
+	public IErrorReport getReport();
 	
 	/**
 	 *  Get the configurations.

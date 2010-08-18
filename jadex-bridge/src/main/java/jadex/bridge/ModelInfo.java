@@ -25,7 +25,7 @@ public class ModelInfo implements IModelInfo
 	protected String description;
 	
 	/** The report. */
-	protected IReport report;
+	protected IErrorReport report;
 	
 	/** The configurations. */
 	protected String[] configurations;
@@ -62,14 +62,14 @@ public class ModelInfo implements IModelInfo
 	 *  Create a new model info.
 	 */
 	public ModelInfo(String name, String packagename,
-			String description, IReport report, String[] configurations,
+			String description, IErrorReport report, String[] configurations,
 			IArgument[] arguments, IArgument[] results, boolean startable,
 			String filename, Map properties, ClassLoader classloader)
 	{
 		this.name = name;
 		this.packagename = packagename;
 		this.description = description;
-		this.report = report!=null? report: new BasicReport();
+		this.report = report;//!=null? report: new ErrorReport();
 		this.configurations = configurations;
 		this.arguments = arguments!=null? SUtil.arrayToList(arguments): null;
 		this.results = results!=null? SUtil.arrayToList(results): null;
@@ -122,7 +122,7 @@ public class ModelInfo implements IModelInfo
 	 *  Get the report.
 	 *  @return The report.
 	 */
-	public IReport getReport()
+	public IErrorReport getReport()
 	{
 		return report;
 	}
@@ -269,7 +269,7 @@ public class ModelInfo implements IModelInfo
 	 *  Set the report.
 	 *  @param report The report to set.
 	 */
-	public void setReport(IReport report)
+	public void setReport(IErrorReport report)
 	{
 		this.report = report;
 	}

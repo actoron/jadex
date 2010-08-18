@@ -16,7 +16,7 @@ public interface IEACapability extends IEAElement
 	 *  Get the scope.
 	 *  @return The scope.
 	 */
-	public IBDIExternalAccess	getExternalAccess();
+	public IBDIExternalAccess getExternalAccess();
 
 	/**
 	 *  Get the parent (if any).
@@ -28,7 +28,7 @@ public interface IEACapability extends IEAElement
 	 *  Get the belief base.
 	 *  @return The belief base.
 	 */
-	public IEABeliefbase	getBeliefbase();
+	public IEABeliefbase getBeliefbase();
 
 	/**
 	 *  Get the goal base.
@@ -52,19 +52,19 @@ public interface IEACapability extends IEAElement
 	 * Get the expression base.
 	 * @return The expression base.
 	 */
-	public IEAExpressionbase	getExpressionbase();
+	public IEAExpressionbase getExpressionbase();
 
 	/**
 	 *  Get the logger.
 	 *  @return The logger.
 	 */
-	public Logger	getLogger();
+	public Logger getLogger();
 
 	/**
 	 * Get the agent name.
 	 * @return The agent name.
 	 */
-	public String	getComponentName();
+	public String getComponentName();
 
 	/**
 	 * Get the configuration name.

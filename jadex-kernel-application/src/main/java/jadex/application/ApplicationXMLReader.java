@@ -11,6 +11,7 @@ import jadex.application.model.MSpaceInstance;
 import jadex.application.model.MSpaceType;
 import jadex.bridge.Argument;
 import jadex.commons.ResourceInfo;
+import jadex.commons.SReflect;
 import jadex.javaparser.SJavaParser;
 import jadex.xml.AccessInfo;
 import jadex.xml.AttributeConverter;
@@ -26,8 +27,12 @@ import jadex.xml.XMLInfo;
 import jadex.xml.bean.BeanObjectReaderHandler;
 import jadex.xml.reader.Reader;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.xml.namespace.QName;
@@ -92,8 +97,42 @@ public class ApplicationXMLReader
 		ret.setClassloader(classloader);
 		ret.initModelInfo();
 		
+		// Exclude IApplicationExternalAccess 
+		Map props = ret.getModelInfo().getProperties();
+		if(props==null)
+		{
+			props = new HashMap();
+			ret.getModelInfo().setProperties(props);
+		}
+		addMethodInfos(props, "remote_excluded", new String[]{
+			"getServiceProvider", "getSpace"});
+		
 		rinfo.getInputStream().close();
 		return ret;
+	}
+	
+	/**
+	 *  Add method info.
+	 */
+	public static void addMethodInfos(Map props, String type, String[] names)
+	{
+		Object ex = props.get(type);
+		if(ex!=null)
+		{
+			List newex = new ArrayList();
+			for(Iterator it=SReflect.getIterator(ex); it.hasNext(); )
+			{
+				newex.add(it.next());
+			}
+			for(int i=0; i<names.length; i++)
+			{
+				newex.add(names[i]);
+			}
+		}
+		else
+		{
+			props.put(type, names);
+		}
 	}
 	
 	/**

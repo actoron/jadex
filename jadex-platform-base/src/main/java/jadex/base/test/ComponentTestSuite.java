@@ -81,7 +81,7 @@ public class ComponentTestSuite extends TestSuite
 					{
 						IModelInfo model = (IModelInfo)SComponentFactory.loadModel(rootcomp.getServiceProvider(), abspath).get(ts);
 						boolean istest = false;
-						if(model!=null && model.getReport().isEmpty())
+						if(model!=null && model.getReport()==null)
 						{
 							IArgument[]	results	= model.getResults();
 							for(int i=0; !istest && i<results.length; i++)

@@ -10,13 +10,14 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.IModelInfo;
 import jadex.bridge.IMessageAdapter;
+import jadex.bridge.IModelInfo;
 import jadex.commons.ChangeEvent;
 import jadex.commons.Future;
 import jadex.commons.IChangeListener;
 import jadex.commons.ICommand;
 import jadex.commons.IFuture;
+import jadex.commons.IResultCommand;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
@@ -194,9 +195,37 @@ public class MicroAgentInterpreter implements IComponentInstance
 		{
 			if(!steps.isEmpty())
 			{
-				ICommand step = (ICommand)removeStep();
-				String steptext = ""+step;
-				step.execute(microagent);
+				Object step = removeStep();
+				String steptext;
+				if(step instanceof ICommand)
+				{
+					steptext = ""+step;
+					((ICommand)step).execute(microagent);
+				}
+				else //if(step instanceof Object[])
+				{
+					IResultCommand st = (IResultCommand)((Object[])step)[0];
+					Future future = (Future)((Object[])step)[1];
+					// Correct to execute them in try catch?!
+//					try
+//					{
+						Object res = ((IResultCommand)st).execute(microagent);
+						if(res instanceof IFuture)
+						{
+							((IFuture)res).addResultListener(new DelegationResultListener(future));
+						}
+						else
+						{
+							future.setResult(res);
+						}
+//					}
+//					catch(Exception e)
+//					{
+//						future.setException(e);
+//					}
+					steptext = ""+st;
+				}
+				
 				addHistoryEntry(steptext);
 			}
 	
@@ -432,11 +461,30 @@ public class MicroAgentInterpreter implements IComponentInstance
 			}
 		});
 	}
+	
+	/**
+	 *  Schedule a step of the agent.
+	 *  May safely be called from external threads.
+	 *  @param step	Code to be executed as a step of the agent.
+	 */
+	public IFuture scheduleResultStep(final IResultCommand step)
+	{
+		final Future ret = new Future();
+//		System.out.println("ss: "+getAgentAdapter().getComponentIdentifier()+" "+Thread.currentThread()+" "+step);
+		adapter.invokeLater(new Runnable()
+		{			
+			public void run()
+			{
+				addStep(new Object[]{step, ret});
+			}
+		});
+		return ret;
+	}
 
 	/**
 	 *  Add a new step.
 	 */
-	protected void addStep(ICommand step)
+	protected void addStep(Object step)
 	{
 		steps.add(step);
 		notifyListeners(new ChangeEvent(this, "addStep", step));

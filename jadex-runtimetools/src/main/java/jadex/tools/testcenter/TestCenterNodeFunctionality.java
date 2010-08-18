@@ -211,7 +211,7 @@ public class TestCenterNodeFunctionality extends DefaultNodeFunctionality
 									{
 										boolean	newtest	= false;
 										IModelInfo model = (IModelInfo)result;
-										if(model!=null && model.getReport().isEmpty())
+										if(model!=null && model.getReport()==null)
 										{
 											IArgument[]	results	= model.getResults();
 											for(int i=0; !newtest && i<results.length; i++)

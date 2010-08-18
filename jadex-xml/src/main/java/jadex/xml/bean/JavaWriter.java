@@ -13,12 +13,16 @@ import jadex.xml.XMLInfo;
 import jadex.xml.writer.Writer;
 
 import java.awt.Color;
+import java.net.InetAddress;
 import java.net.URL;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+
+import javax.xml.namespace.QName;
 
 /**
  * Java specific reader that supports collection classes and arrays.
@@ -200,6 +204,27 @@ public class JavaWriter extends Writer
 				null
 			));
 			typeinfos.add(ti_url);
+			
+			// java.logging.Level
+			TypeInfo ti_level = new TypeInfo(null, new ObjectInfo(Level.class), 
+				new MappingInfo(null, new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("name", null))},
+//				new AttributeInfo(new AccessInfo("value", null, null, null, 
+//					new BeanAccessInfo(null, Level.class.getMethod("intValue", new Class[0])))),
+//				new AttributeInfo(new AccessInfo("resourceBundleName", null))},
+				null
+			));
+			typeinfos.add(ti_level);
+			
+			// java.net.InetAddress
+			// The following hack ensures that all subclasses of InetAdress will be stored using the same tag
+			// todo: make this more easily possible
+			TypeInfo ti_inetaddr = new TypeInfo(new XMLInfo(new QName("typeinfo:java.net", "InetAddress")), new ObjectInfo(InetAddress.class), 
+				new MappingInfo(null, new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("hostAddress", null))},
+				null
+			));
+			typeinfos.add(ti_inetaddr);
 		}
 		catch(Exception e)
 		{

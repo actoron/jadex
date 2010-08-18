@@ -122,4 +122,27 @@ public class MethodInfo
 		}
 		return result;
 	}
+	
+	/**
+	 *  Test if two methods have the same signature.
+	 * /
+	protected static boolean hasEqualSignature(Method ma, Method mb)
+	{
+		boolean ret = ma.getName().equals(mb.getName());
+		
+		if(ret)
+		{
+			Class reta = ma.getReturnType();
+			Class retb = mb.getReturnType();
+			ret = reta.equals(retb);
+			if(ret)
+			{
+				Class[] paramsa = ma.getParameterTypes();
+				Class[] paramsb = mb.getParameterTypes();
+				ret = Arrays.equals(paramsa, paramsb);
+			}
+		}
+		
+		return ret;
+	}*/
 }

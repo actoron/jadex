@@ -6,24 +6,24 @@ import java.util.Map;
 /**
  *  The interface for an error report of loaded models.
  */
-public interface IReport extends Serializable
+public interface IErrorReport extends Serializable
 {
 	/**
-	 *  Check if this report is empty (i.e. the model is valid).
-	 *  @return True, if empty.
+	 *  Get the text representation of the report.
+	 *  @return The text.
 	 */
-	public boolean	isEmpty();
-
+	public String getErrorText();
+	
 	/**
-	 *  Generate an html representation of the report.
+	 *  Get the html representation of the report.
 	 *  @return The html string.
 	 */
-	public String	toHTMLString();
+	public String getErrorHTML();
 
 	/**
 	 *  Get the external documents.
 	 *  (model -> report)
 	 *  @return The external documents.
 	 */
-	public Map	getDocuments();
+	public Map getDocuments();
 }

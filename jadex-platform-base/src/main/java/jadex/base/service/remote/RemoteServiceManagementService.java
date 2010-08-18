@@ -165,7 +165,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	 *  @param cid Component target id.
 	 *  @return External access of remote component. 
 	 */
-	public IFuture getExternalAccessProxy(final IComponentIdentifier cid, final Class targetclass)
+	public IFuture getExternalAccessProxy(final IComponentIdentifier cid)
 	{
 		final Future ret = new Future();
 		
@@ -180,7 +180,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 				// Hack! create remote rms cid with "rms" assumption.
 				IComponentIdentifier rrms = cms.createComponentIdentifier("rms@"+cid.getPlatformName(), false, cid.getAddresses());
 				final String callid = SUtil.createUniqueId(component.getComponentIdentifier().getLocalName());
-				RemoteGetExternalAccessCommand content = new RemoteGetExternalAccessCommand(cid, targetclass, callid);
+				RemoteGetExternalAccessCommand content = new RemoteGetExternalAccessCommand(cid, callid);
 				
 				sendMessage(component, rrms, content, callid, -1, waitingcalls, ret);
 			}

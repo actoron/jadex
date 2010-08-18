@@ -2,14 +2,12 @@ package jadex.gpmn.model2;
 
 import jadex.bridge.ModelInfo;
 import jadex.commons.ICacheableModel;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * 
- */
 public class MGpmnModel implements ICacheableModel//, IModelInfo
 {
 	//-------- attributes --------

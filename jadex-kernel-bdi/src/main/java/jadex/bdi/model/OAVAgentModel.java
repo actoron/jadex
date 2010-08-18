@@ -1,6 +1,6 @@
 package jadex.bdi.model;
 
-import jadex.bdi.runtime.interpreter.Report;
+import jadex.commons.SReflect;
 import jadex.rules.rulesystem.IPatternMatcherFunctionality;
 import jadex.rules.rulesystem.IRule;
 import jadex.rules.state.IOAVState;
@@ -8,6 +8,7 @@ import jadex.rules.state.IOAVState;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 
@@ -30,9 +31,9 @@ public class OAVAgentModel	extends OAVCapabilityModel
 	/**
 	 *  Create a model.
 	 */
-	public OAVAgentModel(IOAVState state, Object handle, Set types, String filename, long lastmod, Report report)
+	public OAVAgentModel(IOAVState state, Object handle, Set types, String filename, long lastmod)//, IReport report)
 	{
-		super(state, handle, types, filename, lastmod, report);
+		super(state, handle, types, filename, lastmod);//, report);
 	}
 	
 	//-------- IAgentModel methods --------
@@ -90,6 +91,24 @@ public class OAVAgentModel	extends OAVCapabilityModel
 			names.add(((IRule)it.next()).getName());
 		modelinfo.addProperty("debugger.breakpoints", names);
 		
+		// Exclude IExternalAccess 
+		// Exclude all IBDIExternalAccess methods! :-( they work on flyweights
+		// Exclude many IEACapability methods
+		addMethodInfos(modelinfo.getProperties(), "remote_excluded", new String[]{
+			"getServiceProvider", 
+			
+			"dispatchTopLevelGoal", "createGoal", "sendMessage",
+			"dispatchInternalEvent", "createMessageEvent", "createInternalEvent",
+			"waitFor", "waitForTick", "waitForInternalEvent", "waitForInternalEvent",
+			"sendMessageAndWait", "waitForMessageEvent", "waitForReply", "waitForGoal",
+			"waitForFactChanged", "waitForFactAdded", "waitForFactRemoved", 
+			"dispatchTopLevelGoalAndWait",
+			
+			"getExternalAccess", "getBeliefbase", "getGoalbase", "getPlanbase",
+			"getEventbase", "getExpressionbase", "getLogger", "getPlatformComponent",
+			"getTime", "getClassLoader", "addAgentListener", "removeAgentListener"
+			});
+		
 //		Map ret = super.getProperties();
 //		
 ////		if(properties==null)
@@ -109,7 +128,29 @@ public class OAVAgentModel	extends OAVCapabilityModel
 //		return ret;
 	}
 	
-	
+	/**
+	 *  Add method info.
+	 */
+	public static void addMethodInfos(Map props, String type, String[] names)
+	{
+		Object ex = props.get(type);
+		if(ex!=null)
+		{
+			List newex = new ArrayList();
+			for(Iterator it=SReflect.getIterator(ex); it.hasNext(); )
+			{
+				newex.add(it.next());
+			}
+			for(int i=0; i<names.length; i++)
+			{
+				newex.add(names[i]);
+			}
+		}
+		else
+		{
+			props.put(type, names);
+		}
+	}
 
 	/**
 	 *  Copy content from another capability model.

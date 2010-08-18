@@ -6,7 +6,7 @@ import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentFactory;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IModelInfo;
-import jadex.bridge.IReport;
+import jadex.bridge.IErrorReport;
 import jadex.bridge.ModelInfo;
 import jadex.commons.Future;
 import jadex.commons.SGUI;
@@ -17,6 +17,7 @@ import jadex.service.IServiceProvider;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -116,7 +117,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 			name = name.substring(0, name.lastIndexOf("Agent"));
 		String packagename = cma.getPackage()!=null? cma.getPackage().getName(): null;
 		String description = metainfo!=null && metainfo.getDescription()!=null? metainfo.getDescription(): null;
-		IReport report = null;
+		IErrorReport report = null;
 		String[] configurations = metainfo!=null? metainfo.getConfigurations(): null;
 		IArgument[] arguments = metainfo!=null? metainfo.getArguments(): null;
 		IArgument[] results = metainfo!=null? metainfo.getResults(): null;
@@ -129,8 +130,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 		properties.put("debugger.breakpoints", names);
 		
 		// Exclude getServiceProvider() from remote external access interface
-		// Is now hacked in in RemoteGetExternalAccess
-//		properties.put("remote_excluded", new String[]{"getServiceProvider"});
+		addExcludedMethods(properties, new String[]{"getServiceProvider"});
 		
 		ret = new ModelInfo(name, packagename, description, report, 
 			configurations, arguments, results, true, model, properties, classloader);
@@ -269,5 +269,29 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 		if(ret==null)// || !cma.isAssignableFrom(IMicroAgent.class))
 			throw new RuntimeException("No micro agent file: "+clname);
 		return ret;
+	}
+	
+	/**
+	 *  Add excluded methods.
+	 */
+	public static void addExcludedMethods(Map props, String[] excludes)
+	{
+		Object ex = props.get("remote_excluded");
+		if(ex!=null)
+		{
+			List newex = new ArrayList();
+			for(Iterator it=SReflect.getIterator(ex); it.hasNext(); )
+			{
+				newex.add(it.next());
+			}
+			for(int i=0; i<excludes.length; i++)
+			{
+				newex.add(excludes[i]);
+			}
+		}
+		else
+		{
+			props.put("remote_excluded", excludes);
+		}
 	}
 }

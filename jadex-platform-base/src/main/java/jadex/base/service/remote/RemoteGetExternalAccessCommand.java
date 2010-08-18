@@ -13,7 +13,6 @@ import jadex.service.SServiceProvider;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -31,8 +30,8 @@ public class RemoteGetExternalAccessCommand implements IRemoteCommand
 	/** The providerid (i.e. the component to start with searching). */
 	protected IComponentIdentifier cid;
 	
-	/** The target class (if case of external access). */
-	protected Class targetclass;
+//	/** The target class (if case of external access). */
+//	protected Class targetclass;
 	
 	/** The callid. */
 	protected String callid;
@@ -49,10 +48,10 @@ public class RemoteGetExternalAccessCommand implements IRemoteCommand
 	/**
 	 *  Create a new remote search command.
 	 */
-	public RemoteGetExternalAccessCommand(IComponentIdentifier cid, Class targetclass, String callid)
+	public RemoteGetExternalAccessCommand(IComponentIdentifier cid, String callid) //Class targetclass,
 	{
 		this.cid = cid;
-		this.targetclass = targetclass;
+//		this.targetclass = targetclass;
 		this.callid = callid;
 	}
 	
@@ -83,7 +82,8 @@ public class RemoteGetExternalAccessCommand implements IRemoteCommand
 				{
 					public void resultAvailable(Object source, Object result)
 					{
-						ProxyInfo pi = getProxyInfo(component.getComponentIdentifier(), (IExternalAccess)result);
+						IExternalAccess exta = (IExternalAccess)result;
+						ProxyInfo pi = getProxyInfo(component.getComponentIdentifier(), exta);
 						ret.setResult(new RemoteGetResultCommand(pi, null, callid));
 					}
 					
@@ -142,20 +142,20 @@ public class RemoteGetExternalAccessCommand implements IRemoteCommand
 	/**
 	 *  Get the targetclass.
 	 *  @return the targetclass.
-	 */
+	 * /
 	public Class getTargetClass()
 	{
 		return targetclass;
-	}
+	}*/
 
 	/**
 	 *  Set the targetclass.
 	 *  @param targetclass The targetclass to set.
-	 */
+	 * /
 	public void setTargetClass(Class targetclass)
 	{
 		this.targetclass = targetclass;
-	}
+	}*/
 
 	/**
 	 *  Get a proxy info for a component. 
@@ -190,39 +190,46 @@ public class RemoteGetExternalAccessCommand implements IRemoteCommand
 	 */
 	protected ProxyInfo createProxyInfo(IComponentIdentifier rms, IExternalAccess target)
 	{
+		Class targetclass = null;
+		Class[] inter = target.getClass().getInterfaces();
+		for(int i=0; i<inter.length && targetclass==null; i++)
+		{
+			if(SReflect.isSupertype(IExternalAccess.class, inter[0]));
+				targetclass = inter[i]; 
+		}
+		if(targetclass==null)
+			targetclass = IExternalAccess.class;
+		
 		ProxyInfo ret = new ProxyInfo(rms, cid, targetclass);
 		
 		// todo: Hack!!!
 		// Exclude getServiceProvider() from remote external access interface
 		Map props = target.getModel().getProperties();
-		if(props==null)
-		{
-			props = new HashMap();
-			props.put("remote_excluded", new String[]{"getServiceProvider"});
-		}
-		else
-		{
-			Object ex = props.get("remote_excluded");
-			if(ex!=null)
-			{
-				List newex = new ArrayList();
-				for(Iterator it=SReflect.getIterator(ex); it.hasNext(); )
-				{
-					newex.add(it.next());
-				}
-				newex.add("getServiceProvider");
-			}
-			else
-			{
-				props.put("remote_excluded", new String[]{"getServiceProvider"});
-			}
-		}
+//		if(props==null)
+//		{
+//			props = new HashMap();
+//			props.put("remote_excluded", new String[]{"getServiceProvider"});
+//		}
+//		else
+//		{
+//			Object ex = props.get("remote_excluded");
+//			if(ex!=null)
+//			{
+//				List newex = new ArrayList();
+//				for(Iterator it=SReflect.getIterator(ex); it.hasNext(); )
+//				{
+//					newex.add(it.next());
+//				}
+//				newex.add("getServiceProvider");
+//			}
+//			else
+//			{
+//				props.put("remote_excluded", new String[]{"getServiceProvider"});
+//			}
+//		}
 		
 		RemoteSearchCommand.fillProxyInfo(ret, target, targetclass, props);
 		return ret;
 //		System.out.println("Creating proxy for: "+type);
 	}
-	
-	
-	
 }

@@ -5,7 +5,6 @@ import jadex.bdi.OAVBDIXMLReader;
 import jadex.bdi.model.OAVAgentModel;
 import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
-import jadex.bdi.runtime.interpreter.Report;
 import jadex.gpmn.model2.MActivationEdge;
 import jadex.gpmn.model2.MActivationPlan;
 import jadex.gpmn.model2.MBpmnPlan;
@@ -89,7 +88,7 @@ public class GpmnBDIConverter2
 		};
 		
 		
-		Report	report	= new Report();
+//		Report	report	= new Report();
 		state.addStateListener(listener, false);
 		
 		Object handle = state.createRootObject(OAVBDIMetaModel.agent_type); 
@@ -108,10 +107,10 @@ public class GpmnBDIConverter2
 		}
 		doConvert(model, classloader, state, handle);
 		state.removeStateListener(listener);
-		agentmodel =  new OAVAgentModel(state, handle, types, model.getModelInfo().getFilename(), model.getLastModified(), report);
+		agentmodel =  new OAVAgentModel(state, handle, types, model.getModelInfo().getFilename(), model.getLastModified());//, report);
 		try
 		{
-			loader.createAgentModelEntry(agentmodel, report);
+			loader.createAgentModelEntry(agentmodel);//, report);
 		}
 		catch(Exception e)
 		{

@@ -57,6 +57,6 @@ public interface IRemoteServiceManagementService extends IService
 	 *  @param cid Component target id.
 	 *  @return External access of remote component. 
 	 */
-	public IFuture getExternalAccessProxy(IComponentIdentifier cid, Class targetclass);
+	public IFuture getExternalAccessProxy(IComponentIdentifier cid);
 	
 }

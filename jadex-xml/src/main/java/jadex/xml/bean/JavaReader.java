@@ -17,11 +17,13 @@ import jadex.xml.XMLInfo;
 import jadex.xml.reader.Reader;
 
 import java.awt.Color;
+import java.net.InetAddress;
 import java.net.URL;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
 
 import javax.xml.namespace.QName;
 
@@ -270,6 +272,77 @@ public class JavaReader extends Reader
 				}
 			));
 			typeinfos.add(ti_url);
+			
+			// java.logging.Level
+			TypeInfo ti_level = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.util.logging", "Level")}),
+				new ObjectInfo(new IBeanObjectCreator()
+				{
+					public Object createObject(IContext context, Map rawattributes) throws Exception
+					{
+						Level ret = null;
+						String name = (String)rawattributes.get("name");
+						if(Level.ALL.getName().equals(name))
+						{
+							ret = Level.ALL;
+						}
+						else if(Level.CONFIG.getName().equals(name))
+						{
+							ret = Level.CONFIG;
+						}
+						else if(Level.FINE.getName().equals(name))
+						{
+							ret = Level.FINE;
+						}
+						else if(Level.FINER.getName().equals(name))
+						{
+							ret = Level.FINER;
+						}
+						else if(Level.FINEST.getName().equals(name))
+						{
+							ret = Level.FINEST;
+						}
+						else if(Level.INFO.getName().equals(name))
+						{
+							ret = Level.INFO;
+						}
+						else if(Level.OFF.getName().equals(name))
+						{
+							ret = Level.OFF;
+						}
+						else if(Level.SEVERE.getName().equals(name))
+						{
+							ret = Level.SEVERE;
+						}
+						else if(Level.WARNING.getName().equals(name))
+						{
+							ret = Level.WARNING;
+						}
+						else
+						{
+							throw new RuntimeException("Unknown logging level: "+name);
+						}
+						return ret;
+					}
+				}),
+				new MappingInfo(null, new AttributeInfo[]{
+					new AttributeInfo(new AccessInfo("name", null, AccessInfo.IGNORE_READWRITE))}
+			));
+			typeinfos.add(ti_level);
+			
+			// java.net.InetAddress
+			TypeInfo ti_inetaddr = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.net", "InetAddress")}),
+				new ObjectInfo(new IBeanObjectCreator()
+				{
+					public Object createObject(IContext context, Map rawattributes) throws Exception
+					{
+						return InetAddress.getByName((String)rawattributes.get("hostAddress"));
+					}
+				}),
+				new MappingInfo(null, new AttributeInfo[]{
+					new AttributeInfo(new AccessInfo("hostAddress", null, AccessInfo.IGNORE_READWRITE)),
+				}
+			));
+			typeinfos.add(ti_inetaddr);
 		}
 		catch(Exception e)
 		{

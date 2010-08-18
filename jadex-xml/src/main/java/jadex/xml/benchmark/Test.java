@@ -5,6 +5,7 @@ import jadex.xml.bean.JavaReader;
 import jadex.xml.bean.JavaWriter;
 
 import java.io.InputStream;
+import java.net.InetAddress;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -13,6 +14,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
 
 /**
  *  Testcases for writer and reader.
@@ -26,16 +28,16 @@ public class Test //extends TestCase
 	 */
 	public static void main(String[] args)
 	{
-		try
-		{
-			InputStream is = SUtil.getResource("jadex/xml/test.xml", null);
-			Object object = JavaReader.getInstance().read(is, null, null);
-			System.out.println("read: "+object);
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
+//		try
+//		{
+//			InputStream is = SUtil.getResource("jadex/xml/test.xml", null);
+//			Object object = JavaReader.getInstance().read(is, null, null);
+//			System.out.println("read: "+object);
+//		}
+//		catch(Exception e)
+//		{
+//			e.printStackTrace();
+//		}
 		
 		Test t = new Test();
 		
@@ -60,6 +62,8 @@ public class Test //extends TestCase
 //				t.testMap();
 //				t.testInnerClass();
 //				t.testURL();
+//				t.testLoggingLevel();
+				t.testInetAddress();
 			}
 			long dur = System.currentTimeMillis()-start;
 			
@@ -278,6 +282,26 @@ public class Test //extends TestCase
 		URL url = new URL("http", "host", 4711, "file");
 		
 		doWriteAndRead(url);
+	}
+	
+	/**
+	 *  Test if java.util.logging.Level transfer works.
+	 */
+	public void testLoggingLevel() throws Exception
+	{
+		Level level = Level.SEVERE;
+		
+		doWriteAndRead(level);
+	}
+	
+	/**
+	 *  Test if java.util.logging.Level transfer works.
+	 */
+	public void testInetAddress() throws Exception
+	{
+		InetAddress adr = InetAddress.getByName("127.0.0.1");
+		
+		doWriteAndRead(adr);
 	}
 	
 	/**

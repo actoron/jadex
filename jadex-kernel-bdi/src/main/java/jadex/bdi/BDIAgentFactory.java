@@ -7,7 +7,6 @@ import jadex.bdi.model.editable.IMECapability;
 import jadex.bdi.model.impl.flyweights.MCapabilityFlyweight;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
-import jadex.bdi.runtime.interpreter.Report;
 import jadex.bridge.IComponentAdapterFactory;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentFactory;
@@ -331,19 +330,19 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory
 			state.removeStateListener((IOAVStateListener)types[1]);
 		}
 		
-		Report	report	= new Report();
+//		Report	report	= new Report();
 		if(state.getType(handle).isSubtype(OAVBDIMetaModel.agent_type))
 		{
-			ret	=  new OAVAgentModel(state, handle, (Set)(types!=null ? types[0] : null), filename, System.currentTimeMillis(), report);
+			ret	=  new OAVAgentModel(state, handle, (Set)(types!=null ? types[0] : null), filename, System.currentTimeMillis());//, report);
 		}
 		else
 		{
-			ret	=  new OAVCapabilityModel(state, handle, (Set)(types!=null ? types[0] : null), filename, System.currentTimeMillis(), report);
+			ret	=  new OAVCapabilityModel(state, handle, (Set)(types!=null ? types[0] : null), filename, System.currentTimeMillis());//, report);
 		}
 		
 		try
 		{
-			loader.createAgentModelEntry(ret, report);
+			loader.createAgentModelEntry(ret);
 		}
 		catch(Exception e)
 		{

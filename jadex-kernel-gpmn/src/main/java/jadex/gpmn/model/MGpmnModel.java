@@ -3,6 +3,7 @@ package jadex.gpmn.model;
 import jadex.bridge.ModelInfo;
 import jadex.commons.ICacheableModel;
 import jadex.commons.SReflect;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

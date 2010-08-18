@@ -11,7 +11,6 @@ import jadex.bdi.runtime.interpreter.GoalLifecycleRules;
 import jadex.bdi.runtime.interpreter.GoalProcessingRules;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bdi.runtime.interpreter.PlanRules;
-import jadex.bdi.runtime.interpreter.Report;
 import jadex.commons.AbstractModelLoader;
 import jadex.commons.ICacheableModel;
 import jadex.commons.ResourceInfo;
@@ -146,7 +145,7 @@ public class OAVBDIModelLoader	extends AbstractModelLoader
 		};
 		
 		
-		Report	report	= new Report();
+//		Report	report	= new Report();
 		try
 		{
 			state.addStateListener(listener, false);
@@ -156,11 +155,11 @@ public class OAVBDIModelLoader	extends AbstractModelLoader
 
 			if(state.getType(handle).isSubtype(OAVBDIMetaModel.agent_type))
 			{
-				ret	=  new OAVAgentModel(state, handle, types, info.getFilename(), info.getLastModified(), report);
+				ret	=  new OAVAgentModel(state, handle, types, info.getFilename(), info.getLastModified());//, report);
 			}
 			else
 			{
-				ret	=  new OAVCapabilityModel(state, handle, types, info.getFilename(), info.getLastModified(), report);
+				ret	=  new OAVCapabilityModel(state, handle, types, info.getFilename(), info.getLastModified());//, report);
 			}
 		}
 		catch(Exception e)
@@ -172,7 +171,7 @@ public class OAVBDIModelLoader	extends AbstractModelLoader
 				throw new RuntimeException(e);
 		}
 		
-		createAgentModelEntry(ret, report);
+		createAgentModelEntry(ret);
 
 
 		return ret;
@@ -182,7 +181,7 @@ public class OAVBDIModelLoader	extends AbstractModelLoader
 	 *  Rules for agent elements have to be created and added to the generic
 	 *  BDI interpreter rules.
 	 */
-	public void	createAgentModelEntry(OAVCapabilityModel model, Report report)	throws Exception
+	public void	createAgentModelEntry(OAVCapabilityModel model) throws Exception
 	{
 		IRulebase rb = model.getRulebase();
 		IOAVState state	= model.getState();
@@ -199,13 +198,13 @@ public class OAVBDIModelLoader	extends AbstractModelLoader
 				String	file	= (String)state.getAttributeValue(mcaparef, OAVBDIMetaModel.capabilityref_has_file);
 				OAVCapabilityModel	cmodel	= loadCapabilityModel(file, imports, model.getClassLoader());
 				model.addSubcapabilityModel(cmodel);
-				if(!cmodel.getModelInfo().getReport().isEmpty())
+				if(cmodel.getModelInfo().getReport()!=null)
 				{
 					StackElement se	= new StackElement(new QName("capability"), mcaparef, null);
 //					se.path	= model instanceof OAVAgentModel ? "agent/capabilities/capability" : "capability/capabilities/capability";
 //					se.object	= mcaparef;
-					report.addEntry(se, "Included capability <a href=\"#"+cmodel.getModelInfo().getFilename()+"\">"+cmodel.getName()+"</a> has errors.");
-					report.addDocument(cmodel.getModelInfo().getFilename(), cmodel.getModelInfo().getReport().toHTMLString());
+					cmodel.addEntry(se, "Included capability <a href=\"#"+cmodel.getModelInfo().getFilename()+"\">"+cmodel.getName()+"</a> has errors.");
+					cmodel.addDocument(cmodel.getModelInfo().getFilename(), cmodel.getModelInfo().getReport().getErrorHTML());
 				}
 
 				state.setAttributeValue(mcaparef, OAVBDIMetaModel.capabilityref_has_capability, cmodel.getHandle());				

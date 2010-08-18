@@ -107,8 +107,6 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 		try
 		{
 			ret = loader.loadApplicationModel(model, imports, classloader);
-//			ClassLoader	cl = libservice.getClassLoader();
-//			ret.setClassloader(cl);
 		}
 		catch(Exception e)
 		{

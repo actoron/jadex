@@ -213,7 +213,14 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 					else if(!BasicTypeConverter.isBuiltInType(clazz))
 					{
 						// Must have empty constructor.
-						ret = clazz.newInstance();
+						try
+						{
+							ret = clazz.newInstance();
+						}
+						catch(Exception e)
+						{
+							e.printStackTrace();
+						}
 					}
 					else if(String.class.equals(clazz))
 					{

@@ -4,7 +4,7 @@ import jadex.base.SComponentFactory;
 import jadex.bridge.IArgument;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IModelInfo;
-import jadex.bridge.IReport;
+import jadex.bridge.IErrorReport;
 import jadex.commons.FixedJComboBox;
 import jadex.commons.Properties;
 import jadex.commons.Property;
@@ -674,14 +674,14 @@ public class StarterPanel extends JPanel
 //			componentname.setText("");
 //		}
 		
-		final IReport report = model!=null? model.getReport(): null;
-		if(report!=null && !report.isEmpty())
+		final IErrorReport report = model!=null? model.getReport(): null;
+		if(report!=null && report!=null)
 		{
 			String clazz = SReflect.getInnerClassName(model.getClass());
 			final Icon icon = GuiProperties.getElementIcon(clazz+"_broken");
 			try
 			{
-				modeldesc.addHTMLContent(model.getName(), icon, report.toHTMLString(), adf, report.getDocuments());
+				modeldesc.addHTMLContent(model.getName(), icon, report.getErrorHTML(), adf, report.getDocuments());
 			}
 			catch(final Exception e)
 			{
@@ -711,8 +711,7 @@ public class StarterPanel extends JPanel
 		}
 
 		// Adjust state of start button depending on model checking state.
-//			start.setEnabled(SXML.isComponentFilename(adf) && (report==null || report.isEmpty()));
-		start.setEnabled(model!=null&& model.isStartable() && (report==null || report.isEmpty()));
+		start.setEnabled(model!=null&& model.isStartable() && report==null);
 	
 		for(int i=0; i<lis.length; i++)
 			config.addItemListener(lis[i]);

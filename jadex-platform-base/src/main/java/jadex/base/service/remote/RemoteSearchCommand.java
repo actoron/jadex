@@ -18,6 +18,7 @@ import jadex.service.SServiceProvider;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -290,7 +291,11 @@ public class RemoteSearchCommand implements IRemoteCommand
 		{
 			for(Iterator it = SReflect.getIterator(ex); it.hasNext(); )
 			{
-				pi.addExcludedMethod(getMethodInfo(it.next(), targetclass, false));
+				MethodInfo[] mis = getMethodInfo(it.next(), targetclass, false);
+				for(int i=0; i<mis.length; i++)
+				{
+					pi.addExcludedMethod(mis[i]);
+				}
 			}
 		}
 		Object syn = properties.get(RemoteServiceManagementService.REMOTE_SYNCHRONOUS);
@@ -298,7 +303,11 @@ public class RemoteSearchCommand implements IRemoteCommand
 		{
 			for(Iterator it = SReflect.getIterator(syn); it.hasNext(); )
 			{
-				pi.addSynchronousMethod(getMethodInfo(it.next(), targetclass, false));
+				MethodInfo[] mis = getMethodInfo(it.next(), targetclass, false);
+				for(int i=0; i<mis.length; i++)
+				{
+					pi.addSynchronousMethod(mis[i]);
+				}
 			}
 		}
 		Object un = properties.get(RemoteServiceManagementService.REMOTE_UNCACHED);
@@ -306,7 +315,11 @@ public class RemoteSearchCommand implements IRemoteCommand
 		{
 			for(Iterator it = SReflect.getIterator(un); it.hasNext(); )
 			{
-				pi.addUncachedMethod(getMethodInfo(it.next(), targetclass, true));
+				MethodInfo[] mis = getMethodInfo(it.next(), targetclass, false);
+				for(int i=0; i<mis.length; i++)
+				{
+					pi.addUncachedMethod(mis[i]);
+				}
 			}
 		}
 		Object mr = properties.get(RemoteServiceManagementService.REMOTE_METHODREPLACEMENT);
@@ -314,8 +327,12 @@ public class RemoteSearchCommand implements IRemoteCommand
 		{
 			for(Iterator it = SReflect.getIterator(mr); it.hasNext(); )
 			{
-				Object[]	tmp	= (Object[])it.next();
-				pi.addMethodReplacement(getMethodInfo(tmp[0], targetclass, true), (IMethodReplacement)tmp[1]);
+				Object[] tmp = (Object[])it.next();
+				MethodInfo[] mis = getMethodInfo(tmp[0], targetclass, false);
+				for(int i=0; i<mis.length; i++)
+				{
+					pi.addMethodReplacement(mis[i], (IMethodReplacement)tmp[1]);
+				}
 			}
 		}
 		
@@ -323,12 +340,20 @@ public class RemoteSearchCommand implements IRemoteCommand
 		Method	equals	= SReflect.getMethod(Object.class, "equals", new Class[]{Object.class});
 		if(pi.getMethodReplacement(equals)==null)
 		{
-			pi.addMethodReplacement(getMethodInfo(equals, targetclass, false), new DefaultEqualsMethodReplacement());
+			MethodInfo[] mis = getMethodInfo(equals, targetclass, false);
+			for(int i=0; i<mis.length; i++)
+			{
+				pi.addMethodReplacement(mis[i], new DefaultEqualsMethodReplacement());
+			}
 		}
 		Method	hashcode	= SReflect.getMethod(Object.class, "hashCode", new Class[0]);
 		if(pi.getMethodReplacement(hashcode)==null)
 		{
-			pi.addMethodReplacement(getMethodInfo(hashcode, targetclass, true), new DefaultHashcodeMethodReplacement());
+			MethodInfo[] mis = getMethodInfo(hashcode, targetclass, true);
+			for(int i=0; i<mis.length; i++)
+			{
+				pi.addMethodReplacement(mis[i], new DefaultHashcodeMethodReplacement());
+			}
 		}
 		
 		// Check methods and possibly cache constant calls.
@@ -374,9 +399,9 @@ public class RemoteSearchCommand implements IRemoteCommand
 	/**
 	 *  Get method.
 	 */
-	public static MethodInfo getMethodInfo(Object tmp, Class targetclass, boolean noargs)
+	public static MethodInfo[] getMethodInfo(Object tmp, Class targetclass, boolean noargs)
 	{
-		MethodInfo ret;
+		MethodInfo[] ret;
 		
 		if(tmp instanceof String)
 		{
@@ -388,7 +413,7 @@ public class RemoteSearchCommand implements IRemoteCommand
 				
 				if(method!=null)
 				{
-					ret = new MethodInfo(method);
+					ret = new MethodInfo[]{new MethodInfo(method)};
 				}
 				else
 				{
@@ -405,11 +430,27 @@ public class RemoteSearchCommand implements IRemoteCommand
 				
 				if(ms.length==1)
 				{
-					ret = new MethodInfo(ms[0]);
+					ret = new MethodInfo[]{new MethodInfo(ms[0])};
 				}
 				else if(ms.length>1)
 				{
-					throw new RuntimeException("More than one method with the name availble: "+tmp);
+					// Exclude all if more than one fits?!
+					ret = new MethodInfo[ms.length];
+					for(int i=0; i<ret.length; i++)
+						ret[i] = new MethodInfo(ms[i]);
+					
+					// Check if the methods are equal = same signature (e.g. defined in different interfaces)
+//					boolean eq = true;
+//					Method m0 = ms[0];
+//					for(int i=1; i<ms.length && eq; i++)
+//					{
+//						if(!hasEqualSignature(m0, ms[i]))
+//							eq = false;
+//					}
+//					if(!eq)
+//						throw new RuntimeException("More than one method with the name availble: "+tmp);
+//					else
+//						ret = new MethodInfo(m0);
 				}
 				else
 				{
@@ -419,12 +460,15 @@ public class RemoteSearchCommand implements IRemoteCommand
 		}
 		else
 		{
-			ret = new MethodInfo((Method)tmp);
+			ret = new MethodInfo[]{new MethodInfo((Method)tmp)};
 		}
 		
 		return ret;
 	}
 
+	
+	
+	
 	/**
 	 *  Get the string representation.
 	 */
@@ -434,6 +478,4 @@ public class RemoteSearchCommand implements IRemoteCommand
 			+ manager + ", decider=" + decider + ", selector=" + selector
 			+ ", callid=" + callid + ")";
 	}
-	
-	
 }

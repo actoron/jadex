@@ -216,7 +216,7 @@ public class StarterNodeFunctionality extends DefaultNodeFunctionality
 										IModelInfo model = (IModelInfo)result;
 										if(model!=null)
 										{
-											newvalid	= model.getReport().isEmpty();
+											newvalid = model.getReport()==null;
 										}
 										
 										renew(fn, oldvalid, newvalid);
