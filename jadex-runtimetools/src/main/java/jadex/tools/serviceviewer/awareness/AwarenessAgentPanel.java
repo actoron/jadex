@@ -77,37 +77,40 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 		JPanel p = new JPanel(new GridBagLayout());
 		
 		final SpinnerNumberModel spm = new SpinnerNumberModel(0, 0, 100000, 1);
-		JSpinner delay = new JSpinner(spm);
+		JSpinner spdelay = new JSpinner(spm);
 		component.scheduleResultStep(new GetDelayCommand()).addResultListener(new SwingDefaultResultListener(p)
 		{
 			public void customResultAvailable(Object source, Object result)
 			{
-				spm.setValue(result);
+				long delay = ((Number)result).longValue();
+//				System.out.println("delay is: "+delay/1000);
+				spm.setValue(delay/1000);
 			}
 		});
 		
-		spm.addChangeListener(new ChangeListener()
+		spdelay.addChangeListener(new ChangeListener()
 		{
 			public void stateChanged(ChangeEvent e)
 			{
-				component.scheduleStep(new SetDelayCommand(((Number)spm.getValue()).longValue()));
+				long delay = ((Number)spm.getValue()).longValue()*1000;
+//				System.out.println("cur val: "+delay);
+				component.scheduleStep(new SetDelayCommand(delay));
 			}
 		});
 		
 		final JTextField tfipaddress = new JTextField();
 		final JTextField tfport = new JTextField();
-		final JButton setaddr = new JButton("set");
+		final JButton busetaddr = new JButton("set");
 		component.scheduleResultStep(new GetAddressCommand()).addResultListener(new SwingDefaultResultListener(p)
 		{
 			public void customResultAvailable(Object source, Object result)
 			{
-				System.out.println("here: "+result);
 				Object[] ai = (Object[])result;
 				tfipaddress.setText(""+((InetAddress)ai[0]).getHostAddress());
 				tfport.setText(""+ai[1]);
 			}
 		});
-		setaddr.addActionListener(new ActionListener()
+		busetaddr.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent ae)
 			{
@@ -126,7 +129,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 		
 		p.add(new JLabel("Delay between sending awareness infos [secs]:", JLabel.RIGHT), new GridBagConstraints(0, 0, 1, 1, 1, 0, GridBagConstraints.EAST, 
 			GridBagConstraints.HORIZONTAL, new Insets(1,1,1,1), 0, 0));
-		p.add(delay, new GridBagConstraints(1, 0, 1, 1, 0, 0, GridBagConstraints.EAST, 
+		p.add(spdelay, new GridBagConstraints(1, 0, 1, 1, 0, 0, GridBagConstraints.EAST, 
 			GridBagConstraints.NONE, new Insets(1,1,1,1), 0, 0));
 		
 		p.add(new JLabel("IP-multicast address [ip:port]:", JLabel.RIGHT), new GridBagConstraints(0, 1, 1, 1, 1, 0, GridBagConstraints.EAST, 
@@ -135,7 +138,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 			GridBagConstraints.NONE, new Insets(1,1,1,1), 0, 0));
 		p.add(tfport, new GridBagConstraints(2, 1, 1, 1, 0, 0, GridBagConstraints.EAST, 
 			GridBagConstraints.NONE, new Insets(1,1,1,1), 0, 0));
-		p.add(setaddr, new GridBagConstraints(3, 1, 1, 1, 0, 0, GridBagConstraints.EAST, 
+		p.add(busetaddr, new GridBagConstraints(3, 1, 1, 1, 0, 0, GridBagConstraints.EAST, 
 			GridBagConstraints.NONE, new Insets(1,1,1,1), 0, 0));
 
 		return p;
@@ -165,8 +168,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 		public Object execute(Object args)
 		{
 			AwarenessAgent agent = (AwarenessAgent)args;
-			final long delay = agent.getDelay()/1000;
-			System.out.println("Delay: "+delay);
+			final long delay = agent.getDelay();
 			return new Long(delay);
 		}
 	}
@@ -191,6 +193,16 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 		{
 			AwarenessAgent agent = (AwarenessAgent)args;
 			agent.setDelay(delay);
+		}
+
+		public long getDelay()
+		{
+			return delay;
+		}
+
+		public void setDelay(long delay)
+		{
+			this.delay = delay;
 		}
 	};
 	
@@ -228,6 +240,26 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 		{
 			AwarenessAgent agent = (AwarenessAgent)args;
 			agent.setAddressInfo(address, port);
+		}
+
+		public InetAddress getAddress()
+		{
+			return address;
+		}
+
+		public void setAddress(InetAddress address)
+		{
+			this.address = address;
+		}
+
+		public int getPort()
+		{
+			return port;
+		}
+
+		public void setPort(int port)
+		{
+			this.port = port;
 		}
 	};
 }

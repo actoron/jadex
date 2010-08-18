@@ -134,7 +134,7 @@ public class MicroAgentViewPanel extends JPanel
 								
 								history.removeAllElements();
 								for(int i=0; i<hcpy.length; i++)
-									history.addElement(scpy[i]);
+									history.addElement(hcpy[i]);
 								
 								if(steps.size()>0)
 									sl.setSelectedIndex(0);

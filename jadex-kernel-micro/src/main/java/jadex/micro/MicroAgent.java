@@ -268,7 +268,7 @@ public abstract class MicroAgent implements IMicroAgent
 	 *  Wait for the next tick.
 	 *  @param time The time.
 	 */
-	public void waitForTick(final Runnable run)
+	public void waitForTick(final ICommand run)
 	{
 		SServiceProvider.getService(getServiceProvider(), IClockService.class)
 			.addResultListener(createResultListener(new DefaultResultListener()
@@ -286,7 +286,7 @@ public abstract class MicroAgent implements IMicroAgent
 							public void execute(Object agent)
 							{
 								timers.remove(ts[0]);
-								run.run();
+								run.execute(agent);
 							}
 							
 							public String toString()

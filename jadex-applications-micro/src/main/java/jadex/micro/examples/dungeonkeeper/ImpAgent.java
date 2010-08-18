@@ -8,6 +8,7 @@ import jadex.application.space.envsupport.environment.space2d.Space2D;
 import jadex.application.space.envsupport.environment.space2d.action.GetPosition;
 import jadex.application.space.envsupport.math.IVector2;
 import jadex.application.space.envsupport.math.Vector2Double;
+import jadex.commons.ICommand;
 import jadex.commons.concurrent.IResultListener;
 import jadex.micro.MicroAgent;
 
@@ -29,9 +30,9 @@ public class ImpAgent extends MicroAgent
 		IApplicationExternalAccess	app	= (IApplicationExternalAccess)getParent();
 		final Grid2D space = (Grid2D)app.getSpace("mygc2dspace");
 		
-		Runnable runnable = new Runnable()
+		ICommand com = new ICommand()
 		{
-			public void run()
+			public void execute(Object args)
 			{
 				final ISpaceObject avatar = space.getAvatar(getComponentIdentifier());
 				IVector2 mypos = (IVector2)avatar.getProperty(Space2D.PROPERTY_POSITION);
@@ -92,7 +93,7 @@ public class ImpAgent extends MicroAgent
 			}
 		};
 		
-		waitForTick(runnable);
+		waitForTick(com);
 	}
 	
 	//-------- static methods --------

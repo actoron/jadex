@@ -36,7 +36,6 @@ public class AwarenessAgent extends MicroAgent
 	
 	/** The multicast internet address. */
 	protected InetAddress address;
-	protected InetAddress lastaddress;
 	
 	/** The receiver port. */
 	protected int port;
@@ -56,6 +55,9 @@ public class AwarenessAgent extends MicroAgent
 	/** Receiving thread. */
 	protected Thread receiver;
 	
+	/** The send command. */
+	protected ICommand send;
+	
 	//-------- methods --------
 	
 	/**
@@ -68,6 +70,7 @@ public class AwarenessAgent extends MicroAgent
 			this.address = InetAddress.getByName((String)getArgument("address"));
 			this.port = ((Number)getArgument("port")).intValue();
 			this.delay = ((Number)getArgument("delay")).longValue();
+//			System.out.println("initial delay: "+delay);
 			
 			this.socket =  new MulticastSocket();
 //			System.out.println(socket.getLoopbackMode());
@@ -75,7 +78,7 @@ public class AwarenessAgent extends MicroAgent
 			
 			this.proxies = new HashSet();
 //			System.out.println(socket.getLoopbackMode());
-		
+			
 			startReceiving();
 		}
 		catch(Exception e)
@@ -98,15 +101,25 @@ public class AwarenessAgent extends MicroAgent
 				final IComponentIdentifier root = (IComponentIdentifier)result;
 				proxies.add(root);
 				
-				ICommand send = new ICommand()
+				send = new ICommand()
 				{
 					public void execute(Object args)
 					{
-						send(new AwarenessInfo(root));
 //						System.out.println("before wait: "+delay);
-						waitFor(delay, this);
+						
+						if(delay>0)
+						{
+							send(new AwarenessInfo(root));
+							waitFor(delay, this);
+						}
+						else
+						{
+							// todo: do not poll?!
+							waitFor(3000, this);
+						}
 					}
 				};
+				
 				send.execute(this);
 			}
 			
@@ -150,7 +163,7 @@ public class AwarenessAgent extends MicroAgent
 					byte[] data = JavaWriter.objectToByteArray(info, ls.getClassLoader());
 					DatagramPacket packet = new DatagramPacket(data, data.length, address, port);
 					socket.send(packet);
-//						System.out.println(getComponentIdentifier()+" sent '"+info+"' to "+receiver+":"+port);
+//					System.out.println(getComponentIdentifier()+" sent '"+info+"' to "+receiver+":"+port);
 				}
 				catch(Exception e)
 				{
@@ -398,6 +411,7 @@ public class AwarenessAgent extends MicroAgent
 	 */
 	public synchronized void setAddressInfo(InetAddress address, int port)
 	{
+//		System.out.println("setAddress: "+address+" "+port);
 		this.address = address;
 		this.port = port;
 	}
@@ -426,6 +440,9 @@ public class AwarenessAgent extends MicroAgent
 	 */
 	public synchronized void setDelay(long delay)
 	{
+//		System.out.println("setDelay: "+delay+" "+getComponentIdentifier());
+//		if(this.delay>=0 && delay>0)
+//			scheduleStep(send);
 		this.delay = delay;
 	}
 	
