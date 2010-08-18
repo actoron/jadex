@@ -37,6 +37,7 @@ import jadex.xml.reader.Reader;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -479,30 +480,54 @@ public class BpmnXMLReader
 						
 						for (int row = 0; row < table.dimension[0]; row++)
 						{
-							// normal parameter has 4 values
-							assert table.data[row].length == 4;
-							
-							String dir = table.data[row][0]; 		// direction
-							String name = table.data[row][1];		// name
-							String clazzname = table.data[row][2];	// class
-							String val = table.data[row][3] != "" ? table.data[row][3] : null;		// value
-							
-							try
+							// normal activity parameter has 4 values
+							if (table.data[row].length == 4)
 							{
-								Class clazz = SReflect.findClass(clazzname, dia.getAllImports(), context.getClassLoader());
+							
+								String dir = table.data[row][0]; 		// direction
+								String name = table.data[row][1];		// name
+								String clazzname = table.data[row][2];	// class
+								String val = table.data[row][3] != "" ? table.data[row][3] : null;		// value
+								
+								try
+								{
+									Class clazz = SReflect.findClass(clazzname, dia.getAllImports(), context.getClassLoader());
+									IParsedExpression exp = null;
+									if(val!=null)
+									{
+										exp = parser.parseExpression(val, dia.getAllImports(), null, context.getClassLoader());
+									}
+									MParameter param = new MParameter(dir, clazz, name, exp);
+									act.addParameter(param);
+	//								System.out.println("Parameter: "+param);
+								}
+								catch(ClassNotFoundException cnfe)
+								{
+									throw new RuntimeException(cnfe);
+								}
+							}
+							
+							// Parameters of event handlers have 2 elements = are treated as properties?! 
+							// TODO: rename parameters to properties in editor and write converter?
+							else if (table.data[row].length == 2)
+							{
+								String name =  table.data[row][0];
+								String val = table.data[row][1] != "" ? table.data[row][1] : null;
+								
+								// context variable
 								IParsedExpression exp = null;
 								if(val!=null)
 								{
 									exp = parser.parseExpression(val, dia.getAllImports(), null, context.getClassLoader());
 								}
-								MParameter param = new MParameter(dir, clazz, name, exp);
-								act.addParameter(param);
-//								System.out.println("Parameter: "+param);
+								act.setPropertyValue(name, exp);
 							}
-							catch(ClassNotFoundException cnfe)
+							
+							else
 							{
-								throw new RuntimeException(cnfe);
+								throw new RuntimeException("Parameter specification error: "+table.data[row].length+" "+Arrays.toString(table.data[row]));
 							}
+								
 						}
 						
 						// next annotation
