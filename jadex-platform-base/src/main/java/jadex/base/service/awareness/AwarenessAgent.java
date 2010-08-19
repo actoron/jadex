@@ -24,10 +24,9 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Set;
 
 /**
  *  Agent that sends multicasts to locate other Jadex awareness agents.
@@ -49,11 +48,8 @@ public class AwarenessAgent extends MicroAgent
 	/** Flag indicating if proxies should be automatically created. */
 	protected boolean autocreate;
 	
-	/** The created proxies via component identifiers. */
-	protected Set proxies;
-	
 	/** The discovered components. */
-	protected Set discovered;
+	protected Map discovered;
 	
 	
 	/** The socket to send. */
@@ -94,13 +90,9 @@ public class AwarenessAgent extends MicroAgent
 //			System.out.println(socket.getLoopbackMode());
 			this.sendsocket.setLoopbackMode(true);
 			
-			this.proxies = new HashSet();
-			this.discovered = new LinkedHashSet();
+			this.discovered = new LinkedHashMap();
 			
 //			System.out.println(socket.getLoopbackMode());
-			
-			
-			startReceiving();
 		}
 		catch(Exception e)
 		{
@@ -125,9 +117,11 @@ public class AwarenessAgent extends MicroAgent
 					public void resultAvailable(Object source, Object result)
 					{
 						root = (IComponentIdentifier)result;
-						proxies.add(root);
+						discovered.put(root, new DiscoveryInfo(root, true, DiscoveryInfo.NOW, delay));
 						
 						startSendBehaviour();
+						startRemoveBehaviour();
+						startReceiving();
 					}
 					
 					public void exceptionOccurred(Object source, Exception exception)
@@ -178,7 +172,7 @@ public class AwarenessAgent extends MicroAgent
 					byte[] data = JavaWriter.objectToByteArray(info, ls.getClassLoader());
 					DatagramPacket packet = new DatagramPacket(data, data.length, address, port);
 					sendsocket.send(packet);
-					System.out.println(getComponentIdentifier()+" sent '"+info+"' to "+receiver+":"+port);
+//					System.out.println(getComponentIdentifier()+" sent '"+info+"' to "+receiver+":"+port);
 				}
 				catch(Exception e)
 				{
@@ -254,15 +248,6 @@ public class AwarenessAgent extends MicroAgent
 	{
 		return new Object[]{address, new Integer(port)};
 	}
-	
-	/**
-	 *  Get the discovered proxy data.
-	 *  @return The proxy data.
-	 */
-	public synchronized Object[] getDiscoveredProxies()
-	{
-		return new Object[]{address, new Integer(port)};
-	}
 
 	/**
 	 *  Set the address.
@@ -319,6 +304,15 @@ public class AwarenessAgent extends MicroAgent
 	}
 	
 	/**
+	 *  Get the discovered.
+	 *  @return the discovered.
+	 */
+	public synchronized DiscoveryInfo[] getDiscoveryInfos()
+	{
+		return (DiscoveryInfo[])discovered.values().toArray(new DiscoveryInfo[discovered.size()]);
+	}
+
+	/**
 	 *  Get the sendid.
 	 *  @return the sendid.
 	 */
@@ -339,15 +333,28 @@ public class AwarenessAgent extends MicroAgent
 	/**
 	 *  Start removing discovered proxies.
 	 */
-	protected void startremoveBehaviour()
+	protected void startRemoveBehaviour()
 	{
 		scheduleStep(new ICommand()
 		{
 			public void execute(Object args)
 			{
-				send(new AwarenessInfo(root, clock.getTime(), delay));
+				synchronized(AwarenessAgent.this)
+				{
+					long time = clock.getTime();
+					for(Iterator it=discovered.values().iterator(); it.hasNext(); )
+					{
+						DiscoveryInfo dif = (DiscoveryInfo)it.next();
+						// five seconds buffer
+						if(!(dif.getTime()==DiscoveryInfo.NOW || time<dif.getTime()+dif.getDelay()+5000))
+						{
+//							System.out.println("Removing: "+dif);
+							it.remove();
+						}
+					}
+				}
 				
-				waitFor(delay, this);
+				waitFor(5000, this);
 			}
 		});
 	}
@@ -449,15 +456,31 @@ public class AwarenessAgent extends MicroAgent
 		//										System.out.println(getComponentIdentifier()+" received: "+info);
 											
 												final IComponentIdentifier sender = info.getSender();
-												discovered.add(sender);
+												boolean createproxy = false;
+												DiscoveryInfo dif;
+												synchronized(AwarenessAgent.this)
+												{
+													dif = (DiscoveryInfo)discovered.get(sender);
+													if(dif==null)
+													{
+														createproxy = isAutoCreateProxy();
+														dif = new DiscoveryInfo(sender, createproxy, clock.getTime(), getDelay());
+														discovered.put(sender, dif);
+													}
+													else
+													{
+														dif.setTime(clock.getTime());
+													}
+												}
 												
-												if(isAutoCreateProxy() && !proxies.contains(sender))
+												if(createproxy)
 												{
 //													System.out.println("Creating new proxy for: "+sender+" "+getComponentIdentifier());
 													
 													Map args = new HashMap();
 													args.put("platform", sender);
 													CreationInfo ci = new CreationInfo(args);
+													final DiscoveryInfo mydif = dif;
 													cms.createComponent(sender.getLocalName(), "jadex/base/service/remote/ProxyAgent.class", ci, 
 														createResultListener(new IResultListener()
 													{
@@ -465,11 +488,11 @@ public class AwarenessAgent extends MicroAgent
 														{
 															// todo: do not use source for cid?!
 		//															System.out.println("Proxy killed: "+source);
-															proxies.remove(sender);
 														}
 														
 														public void exceptionOccurred(Object source, Exception exception)
 														{
+															mydif.setProxy(false);
 															getLogger().warning("Could not create proxy: "+exception);
 														}
 													})).addResultListener(createResultListener(new IResultListener()
@@ -477,11 +500,11 @@ public class AwarenessAgent extends MicroAgent
 														
 														public void resultAvailable(Object source, Object result)
 														{
-															proxies.add(sender);
 														}
 														
 														public void exceptionOccurred(Object source, Exception exception)
 														{
+															mydif.setProxy(false);
 															getLogger().warning("Exception during proxy execution: "+exception);
 														}
 													}));

@@ -334,9 +334,10 @@ public class ServiceViewerPlugin extends AbstractJCCPlugin
 										panel.init(getJCC(), service);
 										Properties	sub	= props!=null ? props.getSubproperty(panel.getId()) : null;
 										panel.setProperties(sub);
-										GuiProperties.setupHelp(panel.getComponent(), getHelpID());
+										JComponent comp = panel.getComponent();
+										GuiProperties.setupHelp(comp, getHelpID());
 										panels.put(service.getServiceIdentifier(), panel);
-										detail.add(panel.getComponent(), service.getServiceIdentifier());
+										detail.add(comp, service.getServiceIdentifier());
 										comptree.getModel().fireNodeChanged(node);
 									}
 									catch(Exception e)
@@ -385,9 +386,10 @@ public class ServiceViewerPlugin extends AbstractJCCPlugin
 														panel.init(getJCC(), exta);
 														Properties	sub	= props!=null ? props.getSubproperty(panel.getId()) : null;
 														panel.setProperties(sub);
-														GuiProperties.setupHelp(panel.getComponent(), getHelpID());
+														JComponent comp = panel.getComponent();
+														GuiProperties.setupHelp(comp, getHelpID());
 														panels.put(exta.getComponentIdentifier(), panel);
-														detail.add(panel.getComponent(), exta.getComponentIdentifier());
+														detail.add(comp, exta.getComponentIdentifier());
 														comptree.getModel().fireNodeChanged(node);
 													}
 													catch(Exception e)

@@ -1,38 +1,49 @@
 package jadex.tools.serviceviewer.awareness;
 
 import jadex.base.service.awareness.AwarenessAgent;
+import jadex.base.service.awareness.DiscoveryInfo;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.ICommand;
 import jadex.commons.IResultCommand;
 import jadex.commons.Properties;
-import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.micro.IMicroExternalAccess;
+import jadex.tools.common.DateTimeRenderer;
 import jadex.tools.common.plugin.IControlCenter;
 import jadex.tools.serviceviewer.IComponentViewerPanel;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.net.InetAddress;
+import java.sql.Date;
+import java.util.ArrayList;
+import java.util.List;
 
+import javax.swing.DefaultListSelectionModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JSplitPane;
+import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
 import javax.swing.SpinnerNumberModel;
-import javax.swing.SwingUtilities;
+import javax.swing.Timer;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.table.AbstractTableModel;
 
 /**
  * 
@@ -108,7 +119,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 				}
 				catch(Exception e)
 				{
-					e.printStackTrace();
+					jcc.displayError("Parsing Error", "Could not create address.", e);
 				}
 			}
 		});
@@ -152,39 +163,56 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 		});
 		
 		psettings.add(new JLabel("IP-multicast address [ip:port]:", JLabel.RIGHT), 
-			new GridBagConstraints(0, 0, 1, 1, 0, 1, GridBagConstraints.EAST, 
+			new GridBagConstraints(0, 0, 1, 1, 0, 0, GridBagConstraints.NORTHEAST, 
 			GridBagConstraints.NONE, new Insets(1,1,1,1), 0, 0));
-		psettings.add(tfipaddress, new GridBagConstraints(1, 0, 1, 1, 1, 0, GridBagConstraints.WEST, 
+		psettings.add(tfipaddress, new GridBagConstraints(1, 0, 1, 1, 1, 0, GridBagConstraints.NORTHWEST, 
 			GridBagConstraints.HORIZONTAL, new Insets(1,1,1,1), 0, 0));
-		psettings.add(tfport, new GridBagConstraints(2, 0, 1, 1, 1, 0, GridBagConstraints.WEST, 
+		psettings.add(tfport, new GridBagConstraints(2, 0, 1, 1, 1, 0, GridBagConstraints.NORTHWEST, 
 			GridBagConstraints.HORIZONTAL, new Insets(1,1,1,1), 0, 0));
-		psettings.add(busetaddr, new GridBagConstraints(3, 0, 1, 1, 0, 1, GridBagConstraints.WEST, 
+		psettings.add(busetaddr, new GridBagConstraints(3, 0, 1, 1, 0, 0, GridBagConstraints.NORTHWEST, 
 			GridBagConstraints.NONE, new Insets(1,1,1,1), 0, 0));
 		
 		psettings.add(new JLabel("Delay between sending infos [s]:", JLabel.RIGHT), 
-			new GridBagConstraints(0, 1, 1, 1, 0, 0, GridBagConstraints.EAST, 
+			new GridBagConstraints(0, 1, 1, 1, 0, 0, GridBagConstraints.NORTHEAST, 
 			GridBagConstraints.NONE, new Insets(1,1,1,1), 0, 1));
-		psettings.add(spdelay, new GridBagConstraints(1, 1, 3, 1, 1, 1, GridBagConstraints.WEST, 
-			GridBagConstraints.BOTH, new Insets(1,1,1,1), 0, 0));
+		psettings.add(spdelay, new GridBagConstraints(1, 1, 3, 1, 1, 0, GridBagConstraints.NORTHWEST, 
+			GridBagConstraints.HORIZONTAL, new Insets(1,1,1,1), 0, 0));
 		
 		psettings.add(new JLabel("Autocreate proxy on discovery:", JLabel.RIGHT), 
-			new GridBagConstraints(0, 2, 1, 1, 0, 0, GridBagConstraints.EAST, 
+			new GridBagConstraints(0, 2, 1, 1, 0, 1, GridBagConstraints.NORTHEAST, 
 			GridBagConstraints.NONE, new Insets(1,1,1,1), 0, 0));
-
+		psettings.add(cbauto, new GridBagConstraints(1, 2, 3, 1, 1, 1, GridBagConstraints.NORTHWEST, 
+			GridBagConstraints.NONE, new Insets(1,1,1,1), 0, 0));
 		
-		JPanel precoptions = new JPanel(new GridBagLayout());
-		precoptions.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), " Receive Options "));
-		precoptions.add(new JButton("test"));
+		
+		JPanel pdisinfos = new JPanel(new BorderLayout());
+		pdisinfos.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), " Discovery Infos "));
+		AbstractTableModel dismodel = new DiscoveryTableModel();
+		final JTable jtdis = new JTable(dismodel);
+		jtdis.setPreferredScrollableViewportSize(new Dimension(600, 120));
+		jtdis.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		pdisinfos.add(BorderLayout.CENTER, new JScrollPane(jtdis));
+		jtdis.setDefaultRenderer(Date.class, new DateTimeRenderer());
+
+		updateDiscoveryInfos(jtdis);
+		Timer tup = new Timer(5000, new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+//				System.out.println("update: "+this);
+				updateDiscoveryInfos(jtdis);
+			}
+		});
+		tup.start();
 		
 		JPanel pall = new JPanel(new BorderLayout());
 		
-		JSplitPane pn = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+		JSplitPane pn = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 		pn.setOneTouchExpandable(true);
 		pn.add(psettings);
-		pn.add(precoptions);
+		pn.add(pdisinfos);
 		
-		pall.add(pn, BorderLayout.NORTH);
-//		pall.add(precoptions, BorderLayout.SOUTH);
+		pall.add(pn, BorderLayout.CENTER);
 		
 		return pall;
 	}
@@ -203,6 +231,38 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 	public Properties	getProperties()
 	{
 		return null;
+	}
+	
+	/**
+	 * 
+	 */
+	protected void updateDiscoveryInfos(final JTable jtdis)
+	{
+		component.scheduleResultStep(new GetDiscoveryInfosCommand())
+			.addResultListener(new SwingDefaultResultListener(jtdis)
+		{
+			public void customResultAvailable(Object source, Object result)
+			{
+				DiscoveryInfo[] ds = (DiscoveryInfo[])result;
+				
+				int sel = jtdis.getSelectedRow();
+				DiscoveryTableModel dtm = (DiscoveryTableModel)jtdis.getModel();
+				List disinfos = dtm.getList();
+				disinfos.clear();
+				for(int i = 0; i < ds.length; i++)
+				{
+//					if(!disinfos.contains(ds[i]))
+//					{
+//						System.out.println("added: "+aitems[i]);
+						disinfos.add(ds[i]);
+//					}
+				}
+				
+				dtm.fireTableDataChanged();
+				if(sel!=-1 && sel<ds.length)
+					((DefaultListSelectionModel)jtdis.getSelectionModel()).setSelectionInterval(sel, sel);
+			}
+		});
 	}
 	
 	/**
@@ -353,5 +413,114 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 			this.autocreate = autocreate;
 		}
 	};
+	
+	/**
+	 *  Get discovery info command.
+	 */
+	public static class GetDiscoveryInfosCommand implements IResultCommand
+	{
+		public Object execute(Object args)
+		{
+			AwarenessAgent agent = (AwarenessAgent)args;
+			return agent.getDiscoveryInfos();
+		}
+	}
 }
+
+class DiscoveryTableModel extends AbstractTableModel
+{
+	protected List list;
+	
+	public DiscoveryTableModel()
+	{
+		this(new ArrayList());
+	}
+	
+	public DiscoveryTableModel(List list)
+	{
+		this.list = list;
+	}
+	
+	public List getList()
+	{
+		return list;
+	}
+
+	public int getRowCount()
+	{
+		return list.size();
+	}
+
+	public int getColumnCount()
+	{
+		return 4;
+	}
+
+	public String getColumnName(int column)
+	{
+		switch(column)
+		{
+			case 0:
+				return "Component Identifier";
+			case 1:
+				return "Delay";
+			case 2:
+				return "Last Received Info";
+			case 3:
+				return "Has a Proxy";
+			default:
+				return "";
+		}
+	}
+
+	public boolean isCellEditable(int row, int column)
+	{
+		return false;
+	}
+
+	public Object getValueAt(int row, int column)
+	{
+		Object value = null;
+		DiscoveryInfo dif = (DiscoveryInfo)list.get(row);
+		if(column == 0)
+		{
+			value = dif.getComponentIdentifier();
+		}
+		else if(column == 1)
+		{
+			value = new Long(dif.getDelay());
+		}
+		else if(column == 2)
+		{
+			value = new Date(dif.getTime());
+		}
+		else if(column == 3)
+		{
+			value = dif.hasProxy()? Boolean.TRUE: Boolean.FALSE;
+		}
+		return value;
+	}
+	
+	public Class getColumnClass(int column)
+	{
+		Class ret = Object.class;
+		if(column == 0)
+		{
+			ret = String.class;
+		}
+		else if(column == 1)
+		{
+			ret = Long.class;
+		}
+		else if(column == 2)
+		{
+			ret = Date.class;
+		}
+		else if(column == 3)
+		{
+			ret = Boolean.class;
+		}
+		return ret;
+	}
+};
 

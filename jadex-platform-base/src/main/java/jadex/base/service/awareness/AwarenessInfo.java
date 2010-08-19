@@ -12,8 +12,8 @@ public class AwarenessInfo
 	/** The sending component's identifier. */
 	protected IComponentIdentifier sender;
 
-	/** Time sending timestamp. */
-	protected long sendtime;
+//	/** Time sending timestamp. */
+//	protected long sendtime;
 	
 	/** The current send time delay (interval). */
 	protected long delay;
@@ -33,7 +33,7 @@ public class AwarenessInfo
 	public AwarenessInfo(IComponentIdentifier sender, long sendtime, long delay)
 	{
 		this.sender = sender;
-		this.sendtime = sendtime;
+//		this.sendtime = sendtime;
 		this.delay = delay;
 	}
 	
@@ -57,23 +57,23 @@ public class AwarenessInfo
 		this.sender = sender;
 	}
 	
-	/**
-	 *  Get the sendtime.
-	 *  @return the sendtime.
-	 */
-	public long getSendTime()
-	{
-		return sendtime;
-	}
-
-	/**
-	 *  Set the sendtime.
-	 *  @param sendtime The sendtime to set.
-	 */
-	public void setSendTime(long sendtime)
-	{
-		this.sendtime = sendtime;
-	}
+//	/**
+//	 *  Get the sendtime.
+//	 *  @return the sendtime.
+//	 */
+//	public long getSendTime()
+//	{
+//		return sendtime;
+//	}
+//
+//	/**
+//	 *  Set the sendtime.
+//	 *  @param sendtime The sendtime to set.
+//	 */
+//	public void setSendTime(long sendtime)
+//	{
+//		this.sendtime = sendtime;
+//	}
 
 	/**
 	 *  Get the delay.
@@ -98,6 +98,16 @@ public class AwarenessInfo
 	 */
 	public String toString()
 	{
-		return "AwarenessInfo(sender="+sender+", sendtime="+sendtime+", delay="+delay+")";
+		return "AwarenessInfo(sender=" + sender + ", delay=" + delay + ")";
 	}
+
+//	/**
+//	 *  Get the string representation.
+//	 */
+//	public String toString()
+//	{
+//		return "AwarenessInfo(sender="+sender+", sendtime="+sendtime+", delay="+delay+")";
+//	}
+	
+	
 }

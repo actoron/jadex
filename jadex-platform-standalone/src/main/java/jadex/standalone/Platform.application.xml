@@ -64,7 +64,7 @@
 		<!-- <container class="IServiceContainer">new ComponentServiceContainer($component.getComponentAdapter())</container>-->
 		
 		<service>
-			new ThreadPoolService(new ThreadPool(new DefaultThreadPoolStrategy(0, 20, 30000)), $platform)
+			new ThreadPoolService(new ThreadPool(new DefaultThreadPoolStrategy(0, 20, 30000, 0)), $platform)
 		</service>
 		<service>
 			$args.simulation

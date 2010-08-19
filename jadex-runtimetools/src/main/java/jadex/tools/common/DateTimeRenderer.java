@@ -1,4 +1,4 @@
-package jadex.tools.comanalyzer.table;
+package jadex.tools.common;
 
 import java.awt.Component;
 import java.text.DateFormat;
@@ -12,11 +12,27 @@ import javax.swing.table.DefaultTableCellRenderer;
 /**
  * A renderer for date values. The format is defined by the static field.
  */
-class DateTimeRenderer extends DefaultTableCellRenderer
+public class DateTimeRenderer extends DefaultTableCellRenderer
 {
+	protected DateFormat formatter;
 
-	final static DateFormat date_format = new SimpleDateFormat("HH:mm:ss dd-MM-yyyy");
-
+	/**
+	 *  Create a new renderer.
+	 */
+	public DateTimeRenderer()
+	{
+//		this(new SimpleDateFormat("dd.MM.yyyy.'-'HH:mm:ss ': '"));
+		this(new SimpleDateFormat("HH:mm:ss dd-MM-yyyy"));
+	}
+	
+	/**
+	 *  Create a new renderer.
+	 */
+	public DateTimeRenderer(DateFormat formatter)
+	{
+		this.formatter = formatter;
+	}
+	
 	/**
 	 * @see javax.swing.table.DefaultTableCellRenderer#getTableCellRendererComponent(javax.swing.JTable,
 	 * Object, boolean, boolean, int, int)
@@ -28,7 +44,7 @@ class DateTimeRenderer extends DefaultTableCellRenderer
 		String content = "n/a";
 		try
 		{
-			content = date_format.format(date);
+			content = formatter.format(date);
 		}
 		catch(Exception e)
 		{
