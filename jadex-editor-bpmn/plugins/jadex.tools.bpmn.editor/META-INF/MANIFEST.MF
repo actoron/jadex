@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Jadex BPMN Editor
-Bundle-SymbolicName: jadex.tools.bpmn.editor.JadexBpmnEditorID;singleton:=true
+Bundle-SymbolicName: jadex.tools.bpmn.editor.JadexBpmnEditor;singleton:=true
 Bundle-Version: 0.0.2.qualifier
 Bundle-Activator: jadex.tools.bpmn.editor.JadexBpmnPlugin
 Require-Bundle: org.eclipse.ui,
@@ -13,7 +13,7 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ui.views.log;bundle-version="1.0.100",
  org.eclipse.jdt;bundle-version="3.5.0",
  org.eclipse.jdt.core;bundle-version="3.5.0",
- org.eclipse.jdt.ui;bundle-version="3.6.0"
+ org.eclipse.jdt.ui;bundle-version="3.5.0"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: jadex.tools.model.common.properties,
