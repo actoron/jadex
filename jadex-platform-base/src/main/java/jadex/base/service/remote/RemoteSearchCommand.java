@@ -346,7 +346,7 @@ public class RemoteSearchCommand implements IRemoteCommand
 				pi.addMethodReplacement(mis[i], new DefaultEqualsMethodReplacement());
 			}
 		}
-		Method	hashcode	= SReflect.getMethod(Object.class, "hashCode", new Class[0]);
+		Method	hashcode = SReflect.getMethod(Object.class, "hashCode", new Class[0]);
 		if(pi.getMethodReplacement(hashcode)==null)
 		{
 			MethodInfo[] mis = getMethodInfo(hashcode, targetclass, true);
@@ -361,7 +361,8 @@ public class RemoteSearchCommand implements IRemoteCommand
 		methods	= (Method[])SUtil.joinArrays(methods, Object.class.getMethods());
 		for(int i=0; i<methods.length; i++)
 		{
-			if(!pi.isUncached(methods[i]) && !pi.isExcluded(methods[i])) // excluded methods are also not cached
+			// only cache when not excluded, not cached and not replaced
+			if(!pi.isUncached(methods[i]) && !pi.isExcluded(methods[i]) && !pi.isReplaced(methods[i])) 
 			{
 				Class rt = methods[i].getReturnType();
 				Class[] ar = methods[i].getParameterTypes();

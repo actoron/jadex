@@ -14,6 +14,7 @@ import jadex.commons.concurrent.IResultListener;
 import jadex.micro.MicroAgent;
 import jadex.micro.MicroAgentMetaInfo;
 import jadex.service.SServiceProvider;
+import jadex.service.clock.IClockService;
 import jadex.service.library.ILibraryService;
 import jadex.service.threadpool.IThreadPoolService;
 import jadex.xml.bean.JavaReader;
@@ -24,6 +25,7 @@ import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -40,23 +42,38 @@ public class AwarenessAgent extends MicroAgent
 	/** The receiver port. */
 	protected int port;
 	
-	/** The socket. */
-	protected MulticastSocket socket;
-	
-	/** The delay. */
-	protected long delay;
-	
-	/** The created proxies via component identifiers. */
-	protected Set proxies;
-	
-	/** Flag indicating agent killed. */
-	protected boolean killed;
 	
 	/** Receiving thread. */
 	protected Thread receiver;
 	
-	/** The send command. */
-	protected ICommand send;
+	/** Flag indicating if proxies should be automatically created. */
+	protected boolean autocreate;
+	
+	/** The created proxies via component identifiers. */
+	protected Set proxies;
+	
+	/** The discovered components. */
+	protected Set discovered;
+	
+	
+	/** The socket to send. */
+	protected MulticastSocket sendsocket;
+	
+	/** The send delay. */
+	protected long delay;
+	
+	/** The current send id. */
+	protected String sendid;
+	
+	
+	/** Flag indicating agent killed. */
+	protected boolean killed;
+	
+	/** The clock service. */
+	protected IClockService clock;
+	
+	/** The root component id. */
+	protected IComponentIdentifier root;
 	
 	//-------- methods --------
 	
@@ -70,14 +87,18 @@ public class AwarenessAgent extends MicroAgent
 			this.address = InetAddress.getByName((String)getArgument("address"));
 			this.port = ((Number)getArgument("port")).intValue();
 			this.delay = ((Number)getArgument("delay")).longValue();
+			this.autocreate = ((Boolean)getArgument("autocreate")).booleanValue();
 //			System.out.println("initial delay: "+delay);
 			
-			this.socket =  new MulticastSocket();
+			this.sendsocket = new MulticastSocket();
 //			System.out.println(socket.getLoopbackMode());
-			this.socket.setLoopbackMode(true);
+			this.sendsocket.setLoopbackMode(true);
 			
 			this.proxies = new HashSet();
+			this.discovered = new LinkedHashSet();
+			
 //			System.out.println(socket.getLoopbackMode());
+			
 			
 			startReceiving();
 		}
@@ -93,38 +114,32 @@ public class AwarenessAgent extends MicroAgent
 	 */
 	public void executeBody()
 	{
-		getRootIdentifier()
-			.addResultListener(createResultListener(new IResultListener()
+		SServiceProvider.getService(getServiceProvider(), IClockService.class).addResultListener(createResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
-				final IComponentIdentifier root = (IComponentIdentifier)result;
-				proxies.add(root);
+				clock = (IClockService)result;
 				
-				send = new ICommand()
+				getRootIdentifier().addResultListener(createResultListener(new IResultListener()
 				{
-					public void execute(Object args)
+					public void resultAvailable(Object source, Object result)
 					{
-//						System.out.println("before wait: "+delay);
+						root = (IComponentIdentifier)result;
+						proxies.add(root);
 						
-						if(delay>0)
-						{
-							send(new AwarenessInfo(root));
-							waitFor(delay, this);
-						}
-						else
-						{
-							// todo: do not poll?!
-							waitFor(3000, this);
-						}
+						startSendBehaviour();
 					}
-				};
-				
-				send.execute(this);
+					
+					public void exceptionOccurred(Object source, Exception exception)
+					{
+						throw new RuntimeException(exception);
+					}
+				}));
 			}
 			
 			public void exceptionOccurred(Object source, Exception exception)
 			{
+				throw new RuntimeException(exception);
 			}
 		}));
 	}
@@ -138,8 +153,8 @@ public class AwarenessAgent extends MicroAgent
 //		System.out.println("killed set to true: "+getComponentIdentifier());
 		killed = true;
 
-		if(socket!=null)
-			socket.close();
+		if(sendsocket!=null)
+			sendsocket.close();
 		synchronized(AwarenessAgent.this)
 		{
 			if(receiver!=null)
@@ -162,8 +177,8 @@ public class AwarenessAgent extends MicroAgent
 					ILibraryService ls = (ILibraryService)result;
 					byte[] data = JavaWriter.objectToByteArray(info, ls.getClassLoader());
 					DatagramPacket packet = new DatagramPacket(data, data.length, address, port);
-					socket.send(packet);
-//					System.out.println(getComponentIdentifier()+" sent '"+info+"' to "+receiver+":"+port);
+					sendsocket.send(packet);
+					System.out.println(getComponentIdentifier()+" sent '"+info+"' to "+receiver+":"+port);
 				}
 				catch(Exception e)
 				{
@@ -173,9 +188,196 @@ public class AwarenessAgent extends MicroAgent
 			}
 		}));
 	}
+	
+	/**
+	 *  Get the root component identifier.
+	 */
+	public IFuture getRootIdentifier()
+	{
+		final Future ret = new Future();
+		
+		SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class)
+			.addResultListener(createResultListener(new IResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				getRootIdentifier(getComponentIdentifier(), (IComponentManagementService)result, ret);
+			}
+			
+			public void exceptionOccurred(Object source, Exception exception)
+			{
+				ret.setException(exception);
+			}
+		}));
+		
+		return ret;
+		
+//		IExternalAccess root = getParent();
+//		while(root.getParent()!=null)
+//			root = root.getParent();
+//		IComponentIdentifier ret = root.getComponentIdentifier();
+////		System.out.println("root: "+root.getComponentIdentifier().hashCode()+SUtil.arrayToString(root.getComponentIdentifier().getAddresses()));
+//		return ret;
+	}
+	
+	/**
+	 *  Internal method to get the root identifier.
+	 */
+	public void getRootIdentifier(final IComponentIdentifier cid, final IComponentManagementService cms, final Future future)
+	{
+		cms.getParent(cid).addResultListener(createResultListener(new IResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				if(result==null)
+				{
+					future.setResult(cid);
+				}
+				else
+				{
+					getRootIdentifier((IComponentIdentifier)result, cms, future);
+				}
+			}
+			
+			public void exceptionOccurred(Object source, Exception exception)
+			{
+				future.setException(exception);
+			}
+		}));
+	}
+	
+	/**
+	 *  Get the address.
+	 *  @return the address.
+	 */
+	public synchronized Object[] getAddressInfo()
+	{
+		return new Object[]{address, new Integer(port)};
+	}
+	
+	/**
+	 *  Get the discovered proxy data.
+	 *  @return The proxy data.
+	 */
+	public synchronized Object[] getDiscoveredProxies()
+	{
+		return new Object[]{address, new Integer(port)};
+	}
 
 	/**
-	 *  Start receiving on 
+	 *  Set the address.
+	 *  @param address The address to set.
+	 */
+	public synchronized void setAddressInfo(InetAddress address, int port)
+	{
+//		System.out.println("setAddress: "+address+" "+port);
+		this.address = address;
+		this.port = port;
+	}
+	
+	/**
+	 *  Get the autocreate.
+	 *  @return the autocreate.
+	 */
+	public synchronized boolean isAutoCreateProxy()
+	{
+		return autocreate;
+	}
+
+	/**
+	 *  Set the autocreate.
+	 *  @param autocreate The autocreate to set.
+	 */
+	public synchronized void setAutoCreateProxy(boolean autocreate)
+	{
+		this.autocreate = autocreate;
+	}
+
+	/**
+	 *  Get the delay.
+	 *  @return the delay.
+	 */
+	public synchronized long getDelay()
+	{
+		return delay;
+	}
+
+	/**
+	 *  Set the delay.
+	 *  @param delay The delay to set.
+	 */
+	public synchronized void setDelay(long delay)
+	{
+//		System.out.println("setDelay: "+delay+" "+getComponentIdentifier());
+//		if(this.delay>=0 && delay>0)
+//			scheduleStep(send);
+		if(this.delay!=delay)
+		{
+			this.delay = delay;
+			startSendBehaviour();
+		}
+	}
+	
+	/**
+	 *  Get the sendid.
+	 *  @return the sendid.
+	 */
+	public String getSendId()
+	{
+		return sendid;
+	}
+
+	/**
+	 *  Set the sendid.
+	 *  @param sendid The sendid to set.
+	 */
+	public void setSendId(String sendid)
+	{
+		this.sendid = sendid;
+	}
+	
+	/**
+	 *  Start removing discovered proxies.
+	 */
+	protected void startremoveBehaviour()
+	{
+		scheduleStep(new ICommand()
+		{
+			public void execute(Object args)
+			{
+				send(new AwarenessInfo(root, clock.getTime(), delay));
+				
+				waitFor(delay, this);
+			}
+		});
+	}
+	
+	/**
+	 *  Start sending awareness infos.
+	 *  (Ends automatically when a new send behaviour is started).
+	 */
+	protected void startSendBehaviour()
+	{
+		final String sendid = SUtil.createUniqueId(getAgentName());
+		this.sendid = sendid;	
+		
+		scheduleStep(new ICommand()
+		{
+			public void execute(Object args)
+			{
+				if(sendid.equals(getSendId()))
+				{
+					send(new AwarenessInfo(root, clock.getTime(), delay));
+					
+					if(delay>0)
+						waitFor(delay, this);
+				}
+			}
+		});
+	}
+	
+	/**
+	 *  Start receiving awareness infos.
 	 */
 	public void startReceiving()
 	{
@@ -247,8 +449,9 @@ public class AwarenessAgent extends MicroAgent
 		//										System.out.println(getComponentIdentifier()+" received: "+info);
 											
 												final IComponentIdentifier sender = info.getSender();
+												discovered.add(sender);
 												
-												if(!proxies.contains(sender))
+												if(isAutoCreateProxy() && !proxies.contains(sender))
 												{
 //													System.out.println("Creating new proxy for: "+sender+" "+getComponentIdentifier());
 													
@@ -339,131 +542,6 @@ public class AwarenessAgent extends MicroAgent
 		}));
 	}
 	
-	/**
-	 *  Get the root component identifier.
-	 */
-	public IFuture getRootIdentifier()
-	{
-		final Future ret = new Future();
-		
-		SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class)
-			.addResultListener(createResultListener(new IResultListener()
-		{
-			public void resultAvailable(Object source, Object result)
-			{
-				getRootIdentifier(getComponentIdentifier(), (IComponentManagementService)result, ret);
-			}
-			
-			public void exceptionOccurred(Object source, Exception exception)
-			{
-				ret.setException(exception);
-			}
-		}));
-		
-		return ret;
-		
-//		IExternalAccess root = getParent();
-//		while(root.getParent()!=null)
-//			root = root.getParent();
-//		IComponentIdentifier ret = root.getComponentIdentifier();
-////		System.out.println("root: "+root.getComponentIdentifier().hashCode()+SUtil.arrayToString(root.getComponentIdentifier().getAddresses()));
-//		return ret;
-	}
-	
-	/**
-	 *  Internal method to get the root identifier.
-	 */
-	public void getRootIdentifier(final IComponentIdentifier cid, final IComponentManagementService cms, final Future future)
-	{
-		cms.getParent(cid).addResultListener(createResultListener(new IResultListener()
-		{
-			public void resultAvailable(Object source, Object result)
-			{
-				if(result==null)
-				{
-					future.setResult(cid);
-				}
-				else
-				{
-					getRootIdentifier((IComponentIdentifier)result, cms, future);
-				}
-			}
-			
-			public void exceptionOccurred(Object source, Exception exception)
-			{
-				future.setException(exception);
-			}
-		}));
-	}
-	
-	/**
-	 *  Get the address.
-	 *  @return the address.
-	 */
-	public synchronized Object[] getAddressInfo()
-	{
-		return new Object[]{address, new Integer(port)};
-	}
-
-	/**
-	 *  Set the address.
-	 *  @param address The address to set.
-	 */
-	public synchronized void setAddressInfo(InetAddress address, int port)
-	{
-//		System.out.println("setAddress: "+address+" "+port);
-		this.address = address;
-		this.port = port;
-	}
-	
-//	/**
-//	 *  Get the address.
-//	 *  @return the address.
-//	 */
-//	public synchronized InetAddress getLastAddress()
-//	{
-//		return lastaddress;
-//	}
-
-	/**
-	 *  Get the delay.
-	 *  @return the delay.
-	 */
-	public synchronized long getDelay()
-	{
-		return delay;
-	}
-
-	/**
-	 *  Set the delay.
-	 *  @param delay The delay to set.
-	 */
-	public synchronized void setDelay(long delay)
-	{
-//		System.out.println("setDelay: "+delay+" "+getComponentIdentifier());
-//		if(this.delay>=0 && delay>0)
-//			scheduleStep(send);
-		this.delay = delay;
-	}
-	
-//	/**
-//	 *  Get the port.
-//	 *  @return the port.
-//	 */
-//	public synchronized int getPort()
-//	{
-//		return port;
-//	}
-//
-//	/**
-//	 *  Set the port.
-//	 *  @param port The port to set.
-//	 */
-//	public synchronized void setPort(int port)
-//	{
-//		this.port = port;
-//	}
-	
 	//-------- static methods --------
 
 	/**
@@ -479,6 +557,7 @@ public class AwarenessAgent extends MicroAgent
 				new Argument("port", "This parameter is the port used for finding other agents.", "int", new Integer(55667)),	
 				new Argument("delay", "This parameter is the delay between sending awareness infos.", "long", 
 					SUtil.createHashMap(configs, new Object[]{new Long(5000), new Long(10000), new Long(60000)})),	
+				new Argument("autocreate", "This parameter describes if new proxies should be automatically created when discovering new components.", "boolean", Boolean.TRUE),	
 			}, null, null, SUtil.createHashMap(new String[]{"serviceviewer.viewerclass"}, new Object[]{"jadex.tools.serviceviewer.awareness.AwarenessAgentPanel"}));
 	}
 }

@@ -68,6 +68,7 @@ public class GpmnXMLReader
 		String name = new File(rinfo.getFilename()).getName();
 		name = name.substring(0, name.length()-5);
 		ret.setName(name);
+		ret.initModelInfo();
 		rinfo.getInputStream().close();
 		
 		return ret;
@@ -93,6 +94,7 @@ public class GpmnXMLReader
 		String name = new File(rinfo.getFilename()).getName();
 		name = name.substring(0, name.length()-5);
 		ret.setName(name);
+		ret.initModelInfo();
 		
 		rinfo.getInputStream().close();
 		

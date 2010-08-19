@@ -37,6 +37,7 @@ public class ThreadPool implements IThreadPool
 	/** The tasks to execute. */
 	// Todo: fix blocking queue.
 	protected IBlockingQueue	tasks;
+//	protected BlockingQueue tasks;
 
 	/** The running flag. */
 	protected boolean	running;
@@ -51,7 +52,7 @@ public class ThreadPool implements IThreadPool
 	 */
 	public ThreadPool()
 	{
-		this(new DefaultThreadPoolStrategy(0, 20, 30000));
+		this(new DefaultThreadPoolStrategy(0, 20, 30000, 0));
 	}
 	
 	/**
@@ -63,6 +64,7 @@ public class ThreadPool implements IThreadPool
 		this.group = new ThreadGroup("strategy_thread_pool_"+poolcnt++);
 		this.running = true;
 		this.tasks	= new ArrayBlockingQueue();
+//		this.tasks = new java.util.concurrent.LinkedBlockingQueue();
 		this.pool = new ArrayList();
 		this.threads = new Hashtable();
 	
@@ -84,6 +86,7 @@ public class ThreadPool implements IThreadPool
 			addThreads(1);
 		
 		this.tasks.enqueue(task);
+//		this.tasks.add(task);
 	}
 
 	/**
@@ -206,6 +209,7 @@ public class ThreadPool implements IThreadPool
 				try
 				{
 					this.task = ((Runnable)tasks.dequeue(strategy.getThreadTimeout()));
+//					this.task = ((Runnable)tasks.poll(strategy.getThreadTimeout(), TimeUnit.MILLISECONDS));
 					threads.put(task, this);
 					this.start = System.currentTimeMillis();
 					String	oldname	= this.getName();
@@ -232,6 +236,12 @@ public class ThreadPool implements IThreadPool
 					task = null;
 					terminate = strategy.threadTimeoutOccurred();
 				}
+//				catch(Exception e)
+//				{
+//					task = null;
+//					terminate	= true;
+//					e.printStackTrace();
+//				}
 				
 				if(task!=null)
 				{
@@ -255,9 +265,18 @@ public class ThreadPool implements IThreadPool
 		{
 			return this.task;
 		}
+
+		/**
+		 *  Get the string representation.
+		 */
+		public String toString()
+		{
+			return super.toString()+":"+hashCode();
+		}
 	}
 	
 	//-------- static part --------
+	
 	
 	static int cnt = 0;
 	static int todo;
@@ -267,9 +286,10 @@ public class ThreadPool implements IThreadPool
 	 */
 	public static void main(String[] args)
 	{
-		final ThreadPool tp	= new ThreadPool(new DefaultThreadPoolStrategy(0, 10, 10000));
-		int max = 10000;
+		final ThreadPool tp	= new ThreadPool(new DefaultThreadPoolStrategy(0, 10, 10000, 4));
+		int max = 100000;
 		todo = max;
+		final long start = System.currentTimeMillis();
 		for(int i=0; i<max; i++)
 		{
 			tp.execute(new Runnable()
@@ -279,14 +299,21 @@ public class ThreadPool implements IThreadPool
 				{
 					String t = Thread.currentThread().toString();
 					System.out.println("a_"+this+" : "+t);
-					try{Thread.sleep(100);}
-					catch(InterruptedException e){}
+					
+//					long cnt = 0;
+//					for(int i=0; i<10000; i++)
+//					{
+//						cnt++;
+//					}
+					
+//					try{Thread.sleep(100);}
+//					catch(InterruptedException e){}
 					System.out.println("b_"+this+" : "+t);
 					synchronized(tp)
 					{
 						todo--;
 						if(todo==0)
-							System.out.println("Execution finished.");
+							System.out.println("Execution finished. Needed: "+(System.currentTimeMillis()-start));
 					}
 				}
 

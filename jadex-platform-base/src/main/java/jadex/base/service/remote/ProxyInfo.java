@@ -185,6 +185,16 @@ public class ProxyInfo
 	}
 	
 	/**
+	 *  Test if method is replaced.
+	 *  @param m Method to test.
+	 *  @return True, if is replaced.
+	 */
+	public boolean isReplaced(Method m)
+	{
+		return replacements!=null && replacements.containsKey(new MethodInfo(m));
+	}
+	
+	/**
 	 *  Get the cid.
 	 *  @return the cid.
 	 */

@@ -2,9 +2,11 @@ package jadex.gpmn.model2;
 
 import jadex.bridge.ModelInfo;
 import jadex.commons.ICacheableModel;
+import jadex.commons.SReflect;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -73,6 +75,45 @@ public class MGpmnModel implements ICacheableModel//, IModelInfo
 		this.activationedges = new ArrayList();
 		this.planedges = new ArrayList();
 		this.modelinfo = new ModelInfo();
+	}
+	
+	/**
+	 *  Init the model info.
+	 */
+	public void initModelInfo()
+	{
+		// todo: breakpoints and configurations
+//		modelinfo.addProperty("debugger.breakpoints", names);
+//		modelinfo.setConfigurations(getConfigurations());
+		
+		if(getModelInfo().getProperties()==null)
+			getModelInfo().setProperties(new HashMap());
+		
+		addMethodInfos(getModelInfo().getProperties(), "remote_excluded", new String[]{"getServiceProvider"});
+	}
+	
+	/**
+	 *  Add method info.
+	 */
+	public static void addMethodInfos(Map props, String type, String[] names)
+	{
+		Object ex = props.get(type);
+		if(ex!=null)
+		{
+			List newex = new ArrayList();
+			for(Iterator it=SReflect.getIterator(ex); it.hasNext(); )
+			{
+				newex.add(it.next());
+			}
+			for(int i=0; i<names.length; i++)
+			{
+				newex.add(names[i]);
+			}
+		}
+		else
+		{
+			props.put(type, names);
+		}
 	}
 
 	/**

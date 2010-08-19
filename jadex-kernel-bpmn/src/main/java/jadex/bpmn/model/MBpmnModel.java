@@ -179,9 +179,34 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 			names.add(((MActivity)it.next()).getBreakpointId());
 		}
 		addProperty("debugger.breakpoints", names);
+		
+		addMethodInfos(getModelInfo().getProperties(), "remote_excluded", new String[]{"getServiceProvider"});
 
 		modelinfo.setConfigurations(getConfigurations());
-		modelinfo.setStartable(true);
+	}
+	
+	/**
+	 *  Add method info.
+	 */
+	public static void addMethodInfos(Map props, String type, String[] names)
+	{
+		Object ex = props.get(type);
+		if(ex!=null)
+		{
+			List newex = new ArrayList();
+			for(Iterator it=SReflect.getIterator(ex); it.hasNext(); )
+			{
+				newex.add(it.next());
+			}
+			for(int i=0; i<names.length; i++)
+			{
+				newex.add(names[i]);
+			}
+		}
+		else
+		{
+			props.put(type, names);
+		}
 	}
 	
 	/**

@@ -108,10 +108,11 @@ public class BpmnXMLReader
 		name = name.substring(0, name.length()-5);
 		ret.setName(name);	
 		ret.initModelInfo();
-		
 		rinfo.getInputStream().close();
+		
 		return ret;
 	}
+	
 	
 	/**
 	 *  Get the XML mapping.

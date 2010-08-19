@@ -20,13 +20,17 @@ import java.awt.event.ActionListener;
 import java.net.InetAddress;
 
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
+import javax.swing.JSplitPane;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingUtilities;
+import javax.swing.border.EtchedBorder;
+import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -74,34 +78,16 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 	 */
 	public JComponent getComponent()
 	{
-		JPanel p = new JPanel(new GridBagLayout());
+		JPanel psettings = new JPanel(new GridBagLayout());
+		psettings.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), " Settings "));
 		
-		final SpinnerNumberModel spm = new SpinnerNumberModel(0, 0, 100000, 1);
-		JSpinner spdelay = new JSpinner(spm);
-		component.scheduleResultStep(new GetDelayCommand()).addResultListener(new SwingDefaultResultListener(p)
-		{
-			public void customResultAvailable(Object source, Object result)
-			{
-				long delay = ((Number)result).longValue();
-//				System.out.println("delay is: "+delay/1000);
-				spm.setValue(delay/1000);
-			}
-		});
-		
-		spdelay.addChangeListener(new ChangeListener()
-		{
-			public void stateChanged(ChangeEvent e)
-			{
-				long delay = ((Number)spm.getValue()).longValue()*1000;
-//				System.out.println("cur val: "+delay);
-				component.scheduleStep(new SetDelayCommand(delay));
-			}
-		});
-		
-		final JTextField tfipaddress = new JTextField();
-		final JTextField tfport = new JTextField();
-		final JButton busetaddr = new JButton("set");
-		component.scheduleResultStep(new GetAddressCommand()).addResultListener(new SwingDefaultResultListener(p)
+		final JTextField tfipaddress = new JTextField(8);
+		final JTextField tfport = new JTextField(5);
+		final JButton busetaddr = new JButton("Apply");
+		busetaddr.setMargin(new Insets(0,0,0,0));
+		busetaddr.setToolTipText("Set the address");
+//		busetaddr.setBorder(null);
+		component.scheduleResultStep(new GetAddressCommand()).addResultListener(new SwingDefaultResultListener(psettings)
 		{
 			public void customResultAvailable(Object source, Object result)
 			{
@@ -127,21 +113,80 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 			}
 		});
 		
-		p.add(new JLabel("Delay between sending awareness infos [secs]:", JLabel.RIGHT), new GridBagConstraints(0, 0, 1, 1, 1, 0, GridBagConstraints.EAST, 
+		final SpinnerNumberModel spm = new SpinnerNumberModel(0, 0, 100000, 1);
+		JSpinner spdelay = new JSpinner(spm);
+		component.scheduleResultStep(new GetDelayCommand()).addResultListener(new SwingDefaultResultListener(psettings)
+		{
+			public void customResultAvailable(Object source, Object result)
+			{
+				long delay = ((Number)result).longValue();
+//				System.out.println("delay is: "+delay/1000);
+				spm.setValue(delay/1000);
+			}
+		});
+		spdelay.addChangeListener(new ChangeListener()
+		{
+			public void stateChanged(ChangeEvent e)
+			{
+				long delay = ((Number)spm.getValue()).longValue()*1000;
+//				System.out.println("cur val: "+delay);
+				component.scheduleStep(new SetDelayCommand(delay));
+			}
+		});
+		
+		final JCheckBox cbauto = new JCheckBox();
+		component.scheduleResultStep(new GetAutoCreateProxyCommand()).addResultListener(new SwingDefaultResultListener(psettings)
+		{
+			public void customResultAvailable(Object source, Object result)
+			{
+				boolean auto = ((Boolean)result).booleanValue();
+				cbauto.setSelected(auto);
+			}
+		});
+		cbauto.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				component.scheduleStep(new SetAutoCreateProxyCommand(cbauto.isSelected()));
+			}
+		});
+		
+		psettings.add(new JLabel("IP-multicast address [ip:port]:", JLabel.RIGHT), 
+			new GridBagConstraints(0, 0, 1, 1, 0, 1, GridBagConstraints.EAST, 
+			GridBagConstraints.NONE, new Insets(1,1,1,1), 0, 0));
+		psettings.add(tfipaddress, new GridBagConstraints(1, 0, 1, 1, 1, 0, GridBagConstraints.WEST, 
 			GridBagConstraints.HORIZONTAL, new Insets(1,1,1,1), 0, 0));
-		p.add(spdelay, new GridBagConstraints(1, 0, 1, 1, 0, 0, GridBagConstraints.EAST, 
+		psettings.add(tfport, new GridBagConstraints(2, 0, 1, 1, 1, 0, GridBagConstraints.WEST, 
+			GridBagConstraints.HORIZONTAL, new Insets(1,1,1,1), 0, 0));
+		psettings.add(busetaddr, new GridBagConstraints(3, 0, 1, 1, 0, 1, GridBagConstraints.WEST, 
 			GridBagConstraints.NONE, new Insets(1,1,1,1), 0, 0));
 		
-		p.add(new JLabel("IP-multicast address [ip:port]:", JLabel.RIGHT), new GridBagConstraints(0, 1, 1, 1, 1, 0, GridBagConstraints.EAST, 
-			GridBagConstraints.HORIZONTAL, new Insets(1,1,1,1), 0, 0));
-		p.add(tfipaddress, new GridBagConstraints(1, 1, 1, 1, 0, 0, GridBagConstraints.EAST, 
-			GridBagConstraints.NONE, new Insets(1,1,1,1), 0, 0));
-		p.add(tfport, new GridBagConstraints(2, 1, 1, 1, 0, 0, GridBagConstraints.EAST, 
-			GridBagConstraints.NONE, new Insets(1,1,1,1), 0, 0));
-		p.add(busetaddr, new GridBagConstraints(3, 1, 1, 1, 0, 0, GridBagConstraints.EAST, 
+		psettings.add(new JLabel("Delay between sending infos [s]:", JLabel.RIGHT), 
+			new GridBagConstraints(0, 1, 1, 1, 0, 0, GridBagConstraints.EAST, 
+			GridBagConstraints.NONE, new Insets(1,1,1,1), 0, 1));
+		psettings.add(spdelay, new GridBagConstraints(1, 1, 3, 1, 1, 1, GridBagConstraints.WEST, 
+			GridBagConstraints.BOTH, new Insets(1,1,1,1), 0, 0));
+		
+		psettings.add(new JLabel("Autocreate proxy on discovery:", JLabel.RIGHT), 
+			new GridBagConstraints(0, 2, 1, 1, 0, 0, GridBagConstraints.EAST, 
 			GridBagConstraints.NONE, new Insets(1,1,1,1), 0, 0));
 
-		return p;
+		
+		JPanel precoptions = new JPanel(new GridBagLayout());
+		precoptions.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), " Receive Options "));
+		precoptions.add(new JButton("test"));
+		
+		JPanel pall = new JPanel(new BorderLayout());
+		
+		JSplitPane pn = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+		pn.setOneTouchExpandable(true);
+		pn.add(psettings);
+		pn.add(precoptions);
+		
+		pall.add(pn, BorderLayout.NORTH);
+//		pall.add(precoptions, BorderLayout.SOUTH);
+		
+		return pall;
 	}
 
 	/**
@@ -260,6 +305,52 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 		public void setPort(int port)
 		{
 			this.port = port;
+		}
+	};
+	
+	/**
+	 *  Get auto create command.
+	 */
+	public static class GetAutoCreateProxyCommand implements IResultCommand
+	{
+		public Object execute(Object args)
+		{
+			AwarenessAgent agent = (AwarenessAgent)args;
+			boolean auto = agent.isAutoCreateProxy();
+			return auto? Boolean.TRUE: Boolean.FALSE;
+		}
+	}
+	
+	/**
+	 *  Set auto create command.
+	 */
+	public static class SetAutoCreateProxyCommand implements ICommand
+	{
+		public boolean autocreate;
+		
+		public SetAutoCreateProxyCommand()
+		{
+		}
+
+		public SetAutoCreateProxyCommand(boolean autocreate)
+		{
+			this.autocreate = autocreate;
+		}
+		
+		public void execute(Object args)
+		{
+			AwarenessAgent agent = (AwarenessAgent)args;
+			agent.setAutoCreateProxy(autocreate);
+		}
+
+		public boolean isAutocreate()
+		{
+			return autocreate;
+		}
+
+		public void setAutocreate(boolean autocreate)
+		{
+			this.autocreate = autocreate;
 		}
 	};
 }

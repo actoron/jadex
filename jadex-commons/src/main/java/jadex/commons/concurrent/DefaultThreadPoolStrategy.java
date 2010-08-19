@@ -21,17 +21,21 @@ public class DefaultThreadPoolStrategy implements IThreadPoolStrategy
 	/** The max wait time for threads. */
 	protected long maxwait;
 	
+	/** The maximum number of allowed threads. */
+	protected int maxthreadcnt;
+	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new default threadpool strategy.
 	 */
-	public DefaultThreadPoolStrategy(int threadcnt, int desfree, long maxwait)
+	public DefaultThreadPoolStrategy(int threadcnt, int desfree, long maxwait, int maxthreadcnt)
 	{
 		this.threadcnt = threadcnt;
 		this.capacity = threadcnt;
 		this.desfree = desfree;
 		this.maxwait = maxwait;
+		this.maxthreadcnt = maxthreadcnt;
 	}
 
 	//-------- methods --------
@@ -45,7 +49,7 @@ public class DefaultThreadPoolStrategy implements IThreadPoolStrategy
 		boolean ret = false;
 		
 		// Create a new thread if capacity is lower than desired capacity.
-		if(capacity==0)
+		if(capacity<=0 && (maxthreadcnt<=0 || threadcnt<maxthreadcnt))
 		{
 			ret = true;
 			threadcnt++;
