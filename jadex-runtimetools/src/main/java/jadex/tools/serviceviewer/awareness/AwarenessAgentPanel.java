@@ -100,7 +100,8 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 	 */
 	public void shutdown()
 	{
-		timer.stop();
+		if(timer.isRunning())
+			timer.stop();
 	}
 
 	/**
@@ -152,7 +153,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 		jtdis.setDefaultRenderer(IComponentIdentifier.class, new ComponentIdentifierRenderer());
 		updateDiscoveryInfos(jtdis);
 		
-		final Timer timer = new Timer(timerdelay, new ActionListener()
+		timer = new Timer(timerdelay, new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
 			{
@@ -548,12 +549,6 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 				if(sel!=-1 && sel<ds.length)
 					((DefaultListSelectionModel)jtdis.getSelectionModel()).setSelectionInterval(sel, sel);
 			}
-			
-//			public void customExceptionOccurred(Object source, Exception exception)
-//			{
-//				super.customExceptionOccurred(source, exception);
-//				timer.stop();
-//			}
 		});
 	}
 	

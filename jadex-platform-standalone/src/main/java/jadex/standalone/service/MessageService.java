@@ -170,6 +170,7 @@ public class MessageService extends BasicService implements IMessageService
 			
 			public void exceptionOccurred(Object source, Exception exception)
 			{
+				ret.setException(exception);
 			}
 		});
 		

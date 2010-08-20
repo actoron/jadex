@@ -162,8 +162,8 @@ public class ServiceViewerPlugin extends AbstractJCCPlugin
 				JTree tree = comptree.getTree();
 				if(tree.getSelectionPath()!=null)
 				{
-					Object node = tree.getSelectionPath().getLastPathComponent();
-					Object nodeid = getNodeId(node);
+					IComponentTreeNode node = (IComponentTreeNode)tree.getSelectionPath().getLastPathComponent();
+					Object nodeid = node.getId();
 					if(nodeid!=null)
 					{
 						if(cards.getComponent(nodeid)!=null)
@@ -195,12 +195,12 @@ public class ServiceViewerPlugin extends AbstractJCCPlugin
 					boolean	allob	= true;
 					for(int i=0; allob && i<nodes.length; i++)
 					{
-						allob	= cards.getComponent(getNodeId(nodes[i]))!=null;
+						allob	= cards.getComponent(nodes[i].getId())!=null;
 					}
 					boolean	allig	= true;
 					for(int i=0; allig && i<nodes.length; i++)
 					{
-						allig	= cards.getComponent(getNodeId(nodes[i]))==null;
+						allig	= cards.getComponent(nodes[i].getId())==null;
 					}
 					
 					// Todo: Large icons for popup actions?
@@ -287,9 +287,15 @@ public class ServiceViewerPlugin extends AbstractJCCPlugin
 		{
 			public void nodeRemoved(IComponentTreeNode node)
 			{
-				if(node instanceof ServiceNode && cards.getComponent(((ServiceNode)node).getService().getServiceIdentifier())!=null)
+//				System.out.println("node rem: "+node);
+				Object nodeid = node.getId();
+				if(panels.containsKey(nodeid))
 				{
-					detail.remove(cards.getComponent(((ServiceNode)node).getService().getServiceIdentifier()));
+					storeCurrentPanelSettings();
+					detail.remove(cards.getComponent(nodeid));
+					IAbstractViewerPanel panel = (IAbstractViewerPanel)panels.remove(nodeid);
+					panel.shutdown();
+					comptree.getModel().fireNodeChanged(node);
 				}
 			}
 			
@@ -420,8 +426,8 @@ public class ServiceViewerPlugin extends AbstractJCCPlugin
 				if(isNodeViewable((IComponentTreeNode)paths[i].getLastPathComponent()))
 				{
 					storeCurrentPanelSettings();
-					ServiceNode node = (ServiceNode)paths[i].getLastPathComponent();
-					Object nodeid = getNodeId(node);
+					IComponentTreeNode node = (IComponentTreeNode)paths[i].getLastPathComponent();
+					Object nodeid = node.getId();
 					detail.remove(cards.getComponent(nodeid));
 					IAbstractViewerPanel panel = (IAbstractViewerPanel)panels.remove(nodeid);
 					panel.shutdown();
@@ -538,24 +544,5 @@ public class ServiceViewerPlugin extends AbstractJCCPlugin
 				}
 			}
 		}
-	}
-	
-	/**
-	 *  Get the node id.
-	 */
-	public Object getNodeId(Object node)
-	{
-		Object ret = null;
-		
-		if(node instanceof ServiceNode)
-		{
-			ret = ((ServiceNode)node).getService().getServiceIdentifier();
-		}
-		else if(node instanceof IActiveComponentTreeNode)
-		{
-			ret = ((IActiveComponentTreeNode)node).getDescription().getName();
-		}
-		
-		return ret;
 	}
 }

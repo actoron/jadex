@@ -285,26 +285,33 @@ public class MicroAgentInterpreter implements IComponentInstance
 	{
 		final Future ret = new Future();
 		
-		getAgentAdapter().invokeLater(new Runnable()
+		try
 		{
-			public void run()
-			{	
-				for(int i=0; i<microagent.timers.size(); i++)
-				{
-					ITimer timer = (ITimer)microagent.timers.get(i);
-					timer.cancel();
-				}
-				microagent.timers.clear();
-				microagent.agentKilled();
-				IComponentIdentifier cid = adapter.getComponentIdentifier();
-				ret.setResult(cid);
-			}
-			
-			public String toString()
+			getAgentAdapter().invokeLater(new Runnable()
 			{
-				return "microagent.agentKilled()_#"+this.hashCode();
-			}
-		});
+				public void run()
+				{	
+					for(int i=0; i<microagent.timers.size(); i++)
+					{
+						ITimer timer = (ITimer)microagent.timers.get(i);
+						timer.cancel();
+					}
+					microagent.timers.clear();
+					microagent.agentKilled();
+					IComponentIdentifier cid = adapter.getComponentIdentifier();
+					ret.setResult(cid);
+				}
+				
+				public String toString()
+				{
+					return "microagent.agentKilled()_#"+this.hashCode();
+				}
+			});
+		}
+		catch(Exception e)
+		{
+			ret.setException(e);
+		}
 		
 		return ret;
 	}
@@ -461,13 +468,20 @@ public class MicroAgentInterpreter implements IComponentInstance
 	{
 		final Future ret = new Future();
 //		System.out.println("ss: "+getAgentAdapter().getComponentIdentifier()+" "+Thread.currentThread()+" "+step);
-		adapter.invokeLater(new Runnable()
-		{			
-			public void run()
-			{
-				addStep(new Object[]{step, ret});
-			}
-		});
+		try
+		{
+			adapter.invokeLater(new Runnable()
+			{			
+				public void run()
+				{
+					addStep(new Object[]{step, ret});
+				}
+			});
+		}
+		catch(Exception e)
+		{
+			ret.setException(e);
+		}
 		return ret;
 	}
 	
@@ -480,13 +494,20 @@ public class MicroAgentInterpreter implements IComponentInstance
 	{
 		final Future ret = new Future();
 //		System.out.println("ss: "+getAgentAdapter().getComponentIdentifier()+" "+Thread.currentThread()+" "+step);
-		adapter.invokeLater(new Runnable()
-		{			
-			public void run()
-			{
-				addStep(new Object[]{step, ret});
-			}
-		});
+		try
+		{
+			adapter.invokeLater(new Runnable()
+			{			
+				public void run()
+				{
+					addStep(new Object[]{step, ret});
+				}
+			});
+		}
+		catch(Exception e)
+		{
+			ret.setException(e);
+		}
 		return ret;
 	}
 

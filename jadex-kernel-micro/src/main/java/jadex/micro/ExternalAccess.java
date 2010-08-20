@@ -58,14 +58,21 @@ public class ExternalAccess implements IMicroExternalAccess
 	public IFuture sendMessage(final Map me, final MessageType mt)
 	{
 		final Future ret = new Future();
-		adapter.invokeLater(new Runnable()
+		try
 		{
-			public void run()
+			adapter.invokeLater(new Runnable()
 			{
-				agent.sendMessage(me, mt).addResultListener(new DelegationResultListener(ret));
-				// System.out.println("Send message: "+rme);
-			}
-		});
+				public void run()
+				{
+					agent.sendMessage(me, mt).addResultListener(new DelegationResultListener(ret));
+					// System.out.println("Send message: "+rme);
+				}
+			});
+		}
+		catch(Exception e)
+		{
+			ret.setException(e);
+		}
 		return ret;
 	}
 	
@@ -98,13 +105,20 @@ public class ExternalAccess implements IMicroExternalAccess
 	public IFuture getAgent()
 	{
 		final Future ret = new Future();
-		adapter.invokeLater(new Runnable() 
+		try
 		{
-			public void run() 
+			adapter.invokeLater(new Runnable() 
 			{
-				ret.setResult(agent);
-			}
-		});
+				public void run() 
+				{
+					ret.setResult(agent);
+				}
+			});
+		}
+		catch(Exception e)
+		{
+			ret.setException(e);
+		}
 		return ret;
 	}
 	

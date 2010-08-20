@@ -487,19 +487,26 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 	{
 		final Future ret = new Future();
 		
-		getAgentAdapter().invokeLater(new Runnable()
+		try
 		{
-			public void run()
+			getAgentAdapter().invokeLater(new Runnable()
 			{
-				state.addAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_killlisteners, new DelegationResultListener(ret));
-				Object cs = state.getAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state);
-				if(OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_CREATING.equals(cs) 
-					|| OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_ALIVE.equals(cs))
+				public void run()
 				{
-					AgentRules.startTerminating(state, ragent);
+					state.addAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_killlisteners, new DelegationResultListener(ret));
+					Object cs = state.getAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state);
+					if(OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_CREATING.equals(cs) 
+						|| OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_ALIVE.equals(cs))
+					{
+						AgentRules.startTerminating(state, ragent);
+					}
 				}
-			}
-		});
+			});
+		}
+		catch(Exception e)
+		{
+			ret.setException(e);
+		}
 		
 		return ret;
 	}
