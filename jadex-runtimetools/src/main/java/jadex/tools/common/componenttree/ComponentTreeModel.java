@@ -237,6 +237,9 @@ public class ComponentTreeModel implements TreeModel
 	 */
 	public void	registerNode(IComponentTreeNode node)
 	{
+		if(nodes.containsKey(node.getId()))
+			throw new RuntimeException("Node id already contained: "+node);
+		
 		nodes.put(node.getId(), node);
 		
 		INodeListener[]	lis	= (INodeListener[])nodelisteners.toArray(new INodeListener[nodelisteners.size()]);

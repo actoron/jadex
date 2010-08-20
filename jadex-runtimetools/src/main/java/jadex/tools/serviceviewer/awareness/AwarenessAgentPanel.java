@@ -59,6 +59,9 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 	/** The update timer. */
 	protected Timer timer;
 	
+	/** The timer delay. */
+	protected int timerdelay;
+	
 	
 	/** The inet address. */
 	protected InetAddress address;
@@ -106,64 +109,49 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 	 */
 	public JComponent getComponent()
 	{
+		this.timerdelay = 5000;
+		
 		final JPanel psettings = new JPanel(new GridBagLayout());
 		psettings.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), " Settings "));
 		
 		final JTextField tfipaddress = new JTextField(8);
 		final JTextField tfport = new JTextField(5);
+		updateAddress(tfipaddress, tfport);
+		
 		final JButton buapply = new JButton("Apply");
 //		buapply.setMargin(new Insets(0,0,0,0));
 		buapply.setToolTipText("Apply setting changes.");
 //		busetaddr.setBorder(null);
-		component.scheduleResultStep(new GetAddressCommand()).addResultListener(new SwingDefaultResultListener(psettings)
-		{
-			public void customResultAvailable(Object source, Object result)
-			{
-				Object[] ai = (Object[])result;
-				address = (InetAddress)ai[0];
-				port = ((Number)ai[1]).intValue();
-				tfipaddress.setText(address.getHostAddress());
-				tfport.setText(""+port);
-			}
-		});
 		
-		final SpinnerNumberModel spm = new SpinnerNumberModel(0, 0, 100000, 1);
-		JSpinner spdelay = new JSpinner(spm);
-		component.scheduleResultStep(new GetDelayCommand()).addResultListener(new SwingDefaultResultListener(psettings)
-		{
-			public void customResultAvailable(Object source, Object result)
-			{
-				delay = ((Number)result).longValue();
-//				System.out.println("delay is: "+delay);
-				spm.setValue(delay/1000);
-			}
-		});
-//		spdelay.addChangeListener(new ChangeListener()
-//		{
-//			public void stateChanged(ChangeEvent e)
-//			{
-//				long delay = ((Number)spm.getValue()).longValue()*1000;
-////				System.out.println("cur val: "+delay);
-//				component.scheduleStep(new SetDelayCommand(delay));
-//			}
-//		});
+		SpinnerNumberModel spmdelay = new SpinnerNumberModel(0, 0, 100000, 1);
+		final JSpinner spdelay = new JSpinner(spmdelay);
+		updateDelay(spdelay);
 		
 		final JCheckBox cbauto = new JCheckBox();
-		component.scheduleResultStep(new GetAutoCreateProxyCommand()).addResultListener(new SwingDefaultResultListener(psettings)
+		updateAutocreate(cbauto);
+		
+		JPanel pdisinfos = new JPanel(new BorderLayout());
+		pdisinfos.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), " Discovery Infos "));
+		final DiscoveryTableModel dismodel = new DiscoveryTableModel();
+		final JTable jtdis = new JTable(dismodel);
+		jtdis.setPreferredScrollableViewportSize(new Dimension(600, 120));
+		jtdis.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		pdisinfos.add(BorderLayout.CENTER, new JScrollPane(jtdis));
+		jtdis.setDefaultRenderer(Date.class, new DateTimeRenderer());
+		jtdis.setDefaultRenderer(IComponentIdentifier.class, new ComponentIdentifierRenderer());
+		updateDiscoveryInfos(jtdis);
+		
+		final Timer timer = new Timer(timerdelay, new ActionListener()
 		{
-			public void customResultAvailable(Object source, Object result)
+			public void actionPerformed(ActionEvent e)
 			{
-				autocreate = ((Boolean)result).booleanValue();
-				cbauto.setSelected(autocreate);
+//				System.out.println("update: "+this+" "+System.currentTimeMillis());
+				updateDiscoveryInfos(jtdis);
 			}
 		});
-//		cbauto.addActionListener(new ActionListener()
-//		{
-//			public void actionPerformed(ActionEvent e)
-//			{
-//				component.scheduleStep(new SetAutoCreateProxyCommand(cbauto.isSelected()));
-//			}
-//		});
+		
+		SpinnerNumberModel spmrefresh = new SpinnerNumberModel(5, 0, 100000, 1);
+		final JSpinner sprefresh = new JSpinner(spmrefresh);
 		
 		buapply.addActionListener(new ActionListener()
 		{
@@ -194,7 +182,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 				}
 				
 				// Set delay.
-				final long delay = ((Number)spm.getValue()).longValue()*1000;
+				final long delay = ((Number)spdelay.getValue()).longValue()*1000;
 ////			System.out.println("cur val: "+delay);
 				if(delay!=AwarenessAgentPanel.this.delay)
 				{
@@ -221,6 +209,24 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 						}
 					});
 				}
+				
+				// Set discovery infos refresh delay.
+				final int timerdelay = ((Number)sprefresh.getValue()).intValue()*1000;
+				if(timerdelay!=AwarenessAgentPanel.this.timerdelay)
+				{
+					AwarenessAgentPanel.this.timerdelay = timerdelay;
+					if(timerdelay==0)
+					{
+						timer.stop();
+					}
+					else
+					{
+						System.out.println("timer delay: "+timerdelay);
+						timer.setDelay(timerdelay);
+						if(!timer.isRunning())
+							timer.start();
+					}
+				}
 			}
 		});
 		
@@ -232,34 +238,35 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 			{
 				tfipaddress.setText(address.getHostAddress());
 				tfport.setText(""+port);
-				spm.setValue(delay/1000);
+				spdelay.setValue(delay/1000);
 				cbauto.setSelected(autocreate);
 			}
 		});
 		JButton burefresh = new JButton("Refresh");
-		buapply.setToolTipText("Refresh values from underlying component.");
-		bucancel.addActionListener(new ActionListener()
+		burefresh.setToolTipText("Refresh settings from underlying component.");
+		burefresh.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				tfipaddress.setText(address.getHostAddress());
-				tfport.setText(""+port);
-				spm.setValue(delay/1000);
-				cbauto.setSelected(autocreate);
+				updateAddress(tfipaddress, tfport);
+				updateDelay(spdelay);
+				updateAutocreate(cbauto);
 			}
 		});
-		buapply.setPreferredSize(bucancel.getPreferredSize());
-		buapply.setMinimumSize(bucancel.getMinimumSize());
+		buapply.setPreferredSize(burefresh.getPreferredSize());
+		buapply.setMinimumSize(burefresh.getMinimumSize());
+		bucancel.setPreferredSize(burefresh.getPreferredSize());
+		bucancel.setMinimumSize(burefresh.getMinimumSize());
 		
 		psettings.add(new JLabel("IP-multicast address [ip:port]", JLabel.LEFT), 
 			new GridBagConstraints(0, 0, 1, 1, 0, 0, GridBagConstraints.NORTHWEST, 
 			GridBagConstraints.NONE, new Insets(1,1,1,1), 0, 0));
-		psettings.add(tfipaddress, new GridBagConstraints(1, 0, 1, 1, 1, 0, GridBagConstraints.NORTHWEST, 
+		psettings.add(tfipaddress, new GridBagConstraints(1, 0, 1, 1, 0, 0, GridBagConstraints.NORTHWEST, 
 			GridBagConstraints.HORIZONTAL, new Insets(1,1,1,1), 0, 0));
 		psettings.add(tfport, new GridBagConstraints(2, 0, 1, 1, 1, 0, GridBagConstraints.NORTHWEST, 
 			GridBagConstraints.HORIZONTAL, new Insets(1,1,1,1), 0, 0));
 		
-		psettings.add(new JLabel("Delay between sending infos [s]", JLabel.LEFT), 
+		psettings.add(new JLabel("Delay (0=off) between sending infos [s]", JLabel.LEFT), 
 			new GridBagConstraints(0, 1, 1, 1, 0, 0, GridBagConstraints.NORTHWEST, 
 			GridBagConstraints.NONE, new Insets(1,1,1,1), 0, 1));
 		psettings.add(spdelay, new GridBagConstraints(1, 1, 2, 1, 1, 0, GridBagConstraints.NORTHWEST, 
@@ -271,34 +278,113 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 		psettings.add(cbauto, new GridBagConstraints(1, 2, 2, 1, 1, 0, GridBagConstraints.NORTHWEST, 
 			GridBagConstraints.NONE, new Insets(1,1,1,1), 0, 0));
 		
+		psettings.add(new JLabel("Autorefresh delay (0=off) for discovery infos [s]", JLabel.LEFT), 
+			new GridBagConstraints(0, 3, 1, 1, 0, 0, GridBagConstraints.NORTHWEST, 
+			GridBagConstraints.NONE, new Insets(1,1,1,1), 0, 0));
+		psettings.add(sprefresh, new GridBagConstraints(1, 3, 2, 1, 1, 0, GridBagConstraints.NORTHWEST, 
+			GridBagConstraints.HORIZONTAL, new Insets(1,1,1,1), 0, 0));
+		
 		JPanel pbuts = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+		pbuts.add(burefresh);
 		pbuts.add(buapply);
 		pbuts.add(bucancel);
 		
-		psettings.add(pbuts, new GridBagConstraints(0, 3, 3, 1, 0, 0, GridBagConstraints.NORTHEAST, 
+		psettings.add(pbuts, new GridBagConstraints(0, 4, 3, 1, 0, 1, GridBagConstraints.NORTHEAST, 
 			GridBagConstraints.NONE, new Insets(1,1,1,1), 0, 1));
 
 		
-		
-		JPanel pdisinfos = new JPanel(new BorderLayout());
-		pdisinfos.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), " Discovery Infos "));
-		AbstractTableModel dismodel = new DiscoveryTableModel();
-		final JTable jtdis = new JTable(dismodel);
-		jtdis.setPreferredScrollableViewportSize(new Dimension(600, 120));
-		jtdis.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		pdisinfos.add(BorderLayout.CENTER, new JScrollPane(jtdis));
-		jtdis.setDefaultRenderer(Date.class, new DateTimeRenderer());
-		jtdis.setDefaultRenderer(IComponentIdentifier.class, new ComponentIdentifierRenderer());
-
-		updateDiscoveryInfos(jtdis);
-		Timer timer = new Timer(5000, new ActionListener()
+		JButton burefreshdis = new JButton("Refresh");
+		burefreshdis.setToolTipText("Refresh discovery infos.");
+		burefreshdis.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-//				System.out.println("update: "+this);
 				updateDiscoveryInfos(jtdis);
 			}
 		});
+		
+		JButton bucreate = new JButton("Create");
+		bucreate.setToolTipText("Create a proxy for the selected component.");
+		bucreate.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				int sel = jtdis.getSelectedRow();
+				if(sel==-1)
+				{
+					jcc.displayError("Creation Error", "No discovered component selected.", null);
+				}
+				else
+				{
+					// todo: hack, could be wrong due to sorting (visual!=data order)
+					DiscoveryInfo dif = (DiscoveryInfo)dismodel.getList().get(sel);
+					if(dif.hasProxy())
+					{
+						jcc.displayError("Creation Error", "Component already has proxy.", null);
+					}
+					else
+					{
+						component.scheduleStep(new CreateProxyCommand(dif.getComponentIdentifier()))
+							.addResultListener(new SwingDefaultResultListener(psettings)
+						{
+							public void customResultAvailable(Object source, Object result)
+							{
+								System.out.println("created: "+result);
+								updateDiscoveryInfos(jtdis);
+							}
+							public void customExceptionOccurred(Object source,
+									Exception exception)
+							{
+								System.out.println("not");
+								super.customExceptionOccurred(source, exception);
+							}
+						});
+					}
+				}
+			}
+		});
+		
+		JButton budelete = new JButton("Delete");
+		budelete.setToolTipText("Delete proxy for the selected component.");
+		budelete.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				int sel = jtdis.getSelectedRow();
+				if(sel==-1)
+				{
+					jcc.displayError("Deletion Error", "No discovered component selected.", null);
+				}
+				else
+				{
+					// todo: hack, could be wrong due to sorting (visual!=data order)
+					DiscoveryInfo dif = (DiscoveryInfo)dismodel.getList().get(sel);
+					if(!dif.hasProxy())
+					{
+						jcc.displayError("Deletion Error", "Component has no proxy.", null);
+					}
+					else
+					{
+						component.scheduleStep(new DeleteProxyCommand(dif.getComponentIdentifier()))
+							.addResultListener(new SwingDefaultResultListener(psettings)
+						{
+							public void customResultAvailable(Object source, Object result)
+							{
+								updateDiscoveryInfos(jtdis);
+							}
+						});
+					}
+				}
+			}
+		});
+		
+		JPanel pbobuts = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+		pbobuts.add(burefreshdis);
+		pbobuts.add(bucreate);
+		pbobuts.add(budelete);
+		
+		pdisinfos.add(pbobuts, BorderLayout.SOUTH);
+		
 		timer.start();
 		
 		JPanel pall = new JPanel(new BorderLayout());
@@ -327,6 +413,58 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 	public Properties	getProperties()
 	{
 		return null;
+	}
+	
+	/**
+	 *  Update address.
+	 */
+	protected void updateAddress(final JTextField tfipaddress, final JTextField tfport)
+	{
+		component.scheduleResultStep(new GetAddressCommand())
+			.addResultListener(new SwingDefaultResultListener(tfipaddress)
+		{
+			public void customResultAvailable(Object source, Object result)
+			{
+				Object[] ai = (Object[])result;
+				address = (InetAddress)ai[0];
+				port = ((Number)ai[1]).intValue();
+				tfipaddress.setText(address.getHostAddress());
+				tfport.setText(""+port);
+			}
+		});
+	}
+	
+	/**
+	 *  Update delay.
+	 */
+	protected void updateDelay(final JSpinner spdelay)
+	{
+		component.scheduleResultStep(new GetDelayCommand())
+			.addResultListener(new SwingDefaultResultListener(spdelay)
+		{
+			public void customResultAvailable(Object source, Object result)
+			{
+				delay = ((Number)result).longValue();
+	//			System.out.println("delay is: "+delay);
+				spdelay.setValue(delay/1000);
+			}
+		});
+	}
+	
+	/**
+	 *  Update autocreate.
+	 */
+	protected void updateAutocreate(final JCheckBox cbauto)
+	{
+		component.scheduleResultStep(new GetAutoCreateProxyCommand())
+			.addResultListener(new SwingDefaultResultListener(cbauto)
+		{
+			public void customResultAvailable(Object source, Object result)
+			{
+				autocreate = ((Boolean)result).booleanValue();
+				cbauto.setSelected(autocreate);
+			}
+		});
 	}
 	
 	/**
@@ -527,6 +665,73 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 			return agent.getDiscoveryInfos();
 		}
 	}
+	
+
+	/**
+	 *  Create proxy command.
+	 */
+	public static class CreateProxyCommand implements ICommand
+	{
+		public IComponentIdentifier cid;
+		
+		public CreateProxyCommand()
+		{
+		}
+
+		public CreateProxyCommand(IComponentIdentifier cid)
+		{
+			this.cid = cid;
+		}
+		
+		public void execute(Object args)
+		{
+			AwarenessAgent agent = (AwarenessAgent)args;
+			agent.createProxy(cid);
+		}
+
+		public IComponentIdentifier getComponentIdentifier()
+		{
+			return cid;
+		}
+
+		public void setComponentIdentifier(IComponentIdentifier cid)
+		{
+			this.cid = cid;
+		}
+	};
+	
+	/**
+	 *  Delete proxy command.
+	 */
+	public static class DeleteProxyCommand implements ICommand
+	{
+		public IComponentIdentifier cid;
+		
+		public DeleteProxyCommand()
+		{
+		}
+
+		public DeleteProxyCommand(IComponentIdentifier cid)
+		{
+			this.cid = cid;
+		}
+		
+		public void execute(Object args)
+		{
+			AwarenessAgent agent = (AwarenessAgent)args;
+			agent.deleteProxy(cid);
+		}
+
+		public IComponentIdentifier getComponentIdentifier()
+		{
+			return cid;
+		}
+
+		public void setComponentIdentifier(IComponentIdentifier cid)
+		{
+			this.cid = cid;
+		}
+	};
 }
 
 class DiscoveryTableModel extends AbstractTableModel

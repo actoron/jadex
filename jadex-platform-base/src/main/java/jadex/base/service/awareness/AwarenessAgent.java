@@ -1,6 +1,7 @@
 package jadex.base.service.awareness;
 
 import jadex.bridge.Argument;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.CreationInfo;
 import jadex.bridge.IArgument;
 import jadex.bridge.IComponentIdentifier;
@@ -384,6 +385,124 @@ public class AwarenessAgent extends MicroAgent
 	}
 	
 	/**
+	 *  Get a discovery info.
+	 */
+	public synchronized DiscoveryInfo getDiscoveryInfo(IComponentIdentifier cid)
+	{
+		return (DiscoveryInfo)discovered.get(cid);
+	}
+	
+	/**
+	 *  Create a proxy.
+	 */
+	public IFuture createProxy(final IComponentIdentifier cid)
+	{
+		final Future ret = new Future();
+		
+		SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class)
+			.addResultListener(createResultListener(new IResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				final IComponentManagementService cms = (IComponentManagementService)result;
+				
+				if(cid.equals(root))
+				{
+					ret.setException(new RuntimeException("Proxy for local components not allowed"));
+				}
+				else
+				{
+					Map args = new HashMap();
+					args.put("platform", cid);
+					CreationInfo ci = new CreationInfo(args);
+					cms.createComponent(cid.getLocalName(), "jadex/base/service/remote/ProxyAgent.class", ci, 
+						createResultListener(new IResultListener()
+					{
+						public void resultAvailable(Object source, Object result)
+						{
+							// todo: do not use source for cid?!
+			//				System.out.println("Proxy killed: "+source);
+						}
+						
+						public void exceptionOccurred(Object source, Exception exception)
+						{
+							getLogger().warning("Proxy was killed: "+exception);
+							DiscoveryInfo dif = getDiscoveryInfo(cid);
+							if(dif!=null)
+								dif.setProxy(false);
+						}
+					})).addResultListener(createResultListener(new IResultListener()
+					{
+						
+						public void resultAvailable(Object source, Object result)
+						{
+							DiscoveryInfo dif = getDiscoveryInfo(cid);
+							dif.setProxy(true);
+							ret.setResult(result);
+						}
+						
+						public void exceptionOccurred(Object source, Exception exception)
+						{
+	//						getLogger().warning("Exception during proxy creation: "+exception);
+							ret.setException(exception);
+						}
+					}));
+				}
+			}
+			
+			public void exceptionOccurred(Object source, Exception exception)
+			{
+				ret.setException(exception);
+			}
+		}));
+		
+		return ret;
+	}
+	
+	/**
+	 *  Delete a proxy.
+	 */
+	public IFuture deleteProxy(final IComponentIdentifier cid)
+	{
+		final Future ret = new Future();
+		
+		SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class)
+			.addResultListener(createResultListener(new IResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				final IComponentManagementService cms = (IComponentManagementService)result;
+				
+				IComponentIdentifier pcid = cms.createComponentIdentifier(cid.getLocalName(), true);
+//				System.out.println("dela: "+pcid);
+				
+				cms.destroyComponent(pcid).addResultListener(createResultListener(new IResultListener()
+				{
+					public void resultAvailable(Object source, Object result)
+					{
+						DiscoveryInfo dif = getDiscoveryInfo(cid);
+						dif.setProxy(false);
+						ret.setResult(result);
+					}
+					
+					public void exceptionOccurred(Object source, Exception exception)
+					{
+//						getLogger().warning("Exception during proxy creation: "+exception);
+						ret.setException(exception);
+					}
+				}));
+			}
+			
+			public void exceptionOccurred(Object source, Exception exception)
+			{
+				ret.setException(exception);
+			}
+		}));
+		
+		return ret;
+	}
+	
+	/**
 	 *  Start receiving awareness infos.
 	 */
 	public void startReceiving()
@@ -476,43 +595,8 @@ public class AwarenessAgent extends MicroAgent
 												if(createproxy)
 												{
 //													System.out.println("Creating new proxy for: "+sender+" "+getComponentIdentifier());
-													
-													Map args = new HashMap();
-													args.put("platform", sender);
-													CreationInfo ci = new CreationInfo(args);
-													final DiscoveryInfo mydif = dif;
-													cms.createComponent(sender.getLocalName(), "jadex/base/service/remote/ProxyAgent.class", ci, 
-														createResultListener(new IResultListener()
-													{
-														public void resultAvailable(Object source, Object result)
-														{
-															// todo: do not use source for cid?!
-		//															System.out.println("Proxy killed: "+source);
-														}
-														
-														public void exceptionOccurred(Object source, Exception exception)
-														{
-															mydif.setProxy(false);
-															getLogger().warning("Could not create proxy: "+exception);
-														}
-													})).addResultListener(createResultListener(new IResultListener()
-													{
-														
-														public void resultAvailable(Object source, Object result)
-														{
-														}
-														
-														public void exceptionOccurred(Object source, Exception exception)
-														{
-															mydif.setProxy(false);
-															getLogger().warning("Exception during proxy execution: "+exception);
-														}
-													}));
+													createProxy(sender);
 												}
-		//										else
-		//										{
-		//											System.out.println("No proxy for: "+sender);
-		//										}
 											}
 											catch(Exception e)
 											{
