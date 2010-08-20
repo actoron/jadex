@@ -1,6 +1,7 @@
 package jadex.tools.common.componenttree;
 
 import javax.swing.Icon;
+import javax.swing.JComponent;
 
 /**
  *  Node for the component tree panel.
@@ -59,7 +60,14 @@ public interface IComponentTreeNode
 	public void	refresh(boolean recurse);
 	
 	/**
-	 *  Get the model.
+	 *  True, if the node has properties that can be displayed.
 	 */
-	public ComponentTreeModel	getModel();
+	public boolean	hasProperties();
+
+	
+	/**
+	 *  Get or create a component displaying the node properties.
+	 *  Only to be called if hasProperties() is true;
+	 */
+	public JComponent	getPropertiesComponent();
 }

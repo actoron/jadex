@@ -12,7 +12,8 @@ import jadex.service.IServiceProvider;
 import jadex.service.SServiceProvider;
 import jadex.tools.common.CombiIcon;
 
-import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,18 +22,21 @@ import java.util.Map;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Icon;
-import javax.swing.JPanel;
+import javax.swing.JComponent;
 import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
 import javax.swing.UIDefaults;
 import javax.swing.event.TreeExpansionEvent;
+import javax.swing.plaf.basic.BasicSplitPaneDivider;
+import javax.swing.plaf.basic.BasicSplitPaneUI;
 import javax.swing.tree.TreePath;
 
 /**
  *  A panel displaying components on the platform as tree.
  */
-public class ComponentTreePanel extends JPanel
+public class ComponentTreePanel extends JSplitPane
 {
 	//-------- constants --------
 
@@ -48,6 +52,7 @@ public class ComponentTreePanel extends JPanel
 		"step_component", SGUI.makeIcon(ComponentTreePanel.class, "/jadex/tools/common/images/step_component.png"),
 		"refresh_component", SGUI.makeIcon(ComponentTreePanel.class, "/jadex/tools/common/images/refresh_component.png"),
 		"refresh_tree", SGUI.makeIcon(ComponentTreePanel.class, "/jadex/tools/common/images/refresh_tree.png"),
+		"show_properties", SGUI.makeIcon(ComponentTreePanel.class, "/jadex/tools/common/images/new_agent_props.png"),
 		"overlay_kill", SGUI.makeIcon(ComponentTreePanel.class, "/jadex/tools/common/images/overlay_kill.png"),
 		"overlay_suspend", SGUI.makeIcon(ComponentTreePanel.class, "/jadex/tools/common/images/overlay_szzz.png"),
 		"overlay_resume", SGUI.makeIcon(ComponentTreePanel.class, "/jadex/tools/common/images/overlay_wakeup.png"),
@@ -57,7 +62,8 @@ public class ComponentTreePanel extends JPanel
 		"overlay_ready", SGUI.makeIcon(ComponentTreePanel.class, "/jadex/tools/common/images/overlay_busy.png"),
 		"overlay_running", SGUI.makeIcon(ComponentTreePanel.class, "/jadex/tools/common/images/overlay_gearwheel.png"),
 		"overlay_refresh", SGUI.makeIcon(ComponentTreePanel.class, "/jadex/tools/common/images/overlay_refresh.png"),
-		"overlay_refreshtree", SGUI.makeIcon(ComponentTreePanel.class, "/jadex/tools/common/images/overlay_refresh.png")
+		"overlay_refreshtree", SGUI.makeIcon(ComponentTreePanel.class, "/jadex/tools/common/images/overlay_refresh.png"),
+		"overlay_showprops", SGUI.makeIcon(ComponentTreePanel.class, "/jadex/tools/common/images/overlay_doc.png")
 	});
 	
 	//-------- attributes --------
@@ -95,16 +101,33 @@ public class ComponentTreePanel extends JPanel
 	/** The action for recursively refreshing selected components. */
 	private final Action	refreshtree;
 	
+	/** The action for showing properties of the selected node. */
+	private final Action	showprops;
+	
 	/** The component listener. */
 	private final IComponentListener	listener;
+	
+	/** The properties panel. */
+	private final JScrollPane	proppanel;
 	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new component tree panel.
 	 */
-	public ComponentTreePanel(final IServiceProvider provider)
+	public ComponentTreePanel(IServiceProvider provider)
 	{
+		this(provider, VERTICAL_SPLIT);
+	}
+	
+	/**
+	 *  Create a new component tree panel.
+	 */
+	public ComponentTreePanel(final IServiceProvider provider, int orientation)
+	{
+		super(orientation);
+		this.setOneTouchExpandable(true);
+		
 		this.provider	= provider;
 		this.model	= new ComponentTreeModel();
 		this.tree	= new JTree(model);
@@ -113,8 +136,14 @@ public class ComponentTreePanel extends JPanel
 		tree.setShowsRootHandles(true);
 		tree.setToggleClickCount(0);
 		final ComponentIconCache	cic	= new ComponentIconCache(provider, tree);
-		this.setLayout(new BorderLayout());
-		this.add(new JScrollPane(tree));
+		JScrollPane	scroll	= new JScrollPane(tree);
+		this.add(scroll);
+		
+		this.proppanel	= new JScrollPane();
+		proppanel.setMinimumSize(new Dimension(0, 0));
+		proppanel.setPreferredSize(new Dimension(0, 0));
+		this.add(proppanel);
+		this.setResizeWeight(1.0);
 		
 		listener	= new IComponentListener()
 		{
@@ -367,6 +396,19 @@ public class ComponentTreePanel extends JPanel
 			}
 		};
 
+		showprops	= new AbstractAction("Show properties", icons.getIcon("show_properties"))
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				TreePath	path	= tree.getSelectionPath();
+				if(path!=null && ((IComponentTreeNode)path.getLastPathComponent()).hasProperties())
+				{
+					showProperties(path.getLastPathComponent().toString(),
+						((IComponentTreeNode)path.getLastPathComponent()).getPropertiesComponent());
+				}
+			}
+		};
+
 		// Default overlays and popups.
 		model.addNodeHandler(new INodeHandler()
 		{
@@ -377,6 +419,7 @@ public class ComponentTreePanel extends JPanel
 
 			public Action[] getPopupActions(IComponentTreeNode[] nodes)
 			{
+				Action[]	ret;
 				Icon	base	= nodes[0].getIcon();
 				Action	prefresh	= new AbstractAction((String)refresh.getValue(Action.NAME),
 					base!=null ? new CombiIcon(new Icon[]{base, icons.getIcon("overlay_refresh")}) : (Icon)refresh.getValue(Action.SMALL_ICON))
@@ -394,12 +437,34 @@ public class ComponentTreePanel extends JPanel
 						refreshtree.actionPerformed(e);
 					}
 				};
-				return new Action[]{prefresh, prefreshtree};
+				
+				if(nodes.length==1 && nodes[0].hasProperties())
+				{
+					Action	pshowprops	= new AbstractAction((String)showprops.getValue(Action.NAME),
+						base!=null ? new CombiIcon(new Icon[]{base, icons.getIcon("overlay_showprops")}) : (Icon)showprops.getValue(Action.SMALL_ICON))
+					{
+						public void actionPerformed(ActionEvent e)
+						{
+							showprops.actionPerformed(e);
+						}
+					};
+					ret	= new Action[]{pshowprops, prefresh, prefreshtree};
+				}
+				else
+				{
+					ret	= new Action[]{prefresh, prefreshtree};					
+				}
+				return ret;
 			}
 
-			public Action getDefaultAction(IComponentTreeNode node)
+			public Action getDefaultAction(final IComponentTreeNode node)
 			{
-				return null;
+				Action	ret	= null;
+				if(node.hasProperties())
+				{
+					ret	= showprops;
+				}
+				return ret;
 			}
 		});
 		
@@ -620,6 +685,14 @@ public class ComponentTreePanel extends JPanel
 	}
 	
 	/**
+	 *  Get the action for showing component properties.
+	 */
+	public Action	getShowPropertiesAction()
+	{
+		return showprops;
+	}
+	
+	/**
 	 *  Add a node handler.
 	 */
 	public void	addNodeHandler(INodeHandler handler)
@@ -659,5 +732,49 @@ public class ComponentTreePanel extends JPanel
 		});
 		
 		getModel().dispose();
+	}
+	
+	/**
+	 *  Set the title and contents of the properties panel.
+	 */
+	public void	showProperties(String title, JComponent content)
+	{
+		proppanel.setViewportView(content);
+		proppanel.repaint();
+
+		// Code to simulate a one touch expandable click,
+	 	// see BasicSplitPaneDivider.OneTouchActionHandler)
+		
+		Insets  insets = getInsets();
+		int lastloc = getLastDividerLocation();
+	    int currentloc = getUI().getDividerLocation(this);
+		int newloc = currentloc;
+		BasicSplitPaneDivider divider = ((BasicSplitPaneUI)getUI()).getDivider();
+
+		boolean	adjust	= false;
+		if(getOrientation()==VERTICAL_SPLIT)
+		{
+			if(currentloc >= (getHeight() - insets.bottom - divider.getHeight())) 
+			{
+				adjust	= true;
+				int maxloc = getMaximumDividerLocation();
+				newloc = lastloc>=0 && lastloc<maxloc? lastloc: maxloc*1/2;
+	        }			
+		}
+		else
+		{
+			if(currentloc >= (getWidth() - insets.right - divider.getWidth())) 
+			{
+				adjust	= true;
+				int maxloc = getMaximumDividerLocation();
+				newloc = lastloc>=0 && lastloc<maxloc? lastloc: maxloc*1/2;
+	        }			
+		}
+
+		if(adjust && currentloc!=newloc) 
+		{
+			setDividerLocation(newloc);
+			setLastDividerLocation(currentloc);
+		}
 	}
 }

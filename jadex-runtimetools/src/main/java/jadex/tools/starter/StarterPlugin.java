@@ -198,6 +198,13 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 		separator.setOrientation(JSeparator.VERTICAL);
 		ret.add(separator);
 
+		b = new JButton(comptree.getShowPropertiesAction());
+		b.setBorder(null);
+		b.setToolTipText(b.getText());
+		b.setText(null);
+		b.setEnabled(true);
+		ret.add(b);
+
 		b = new JButton(comptree.getRefreshAction());
 		b.setBorder(null);
 		b.setToolTipText(b.getText());
@@ -321,7 +328,7 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
   		};
   		mpanel.addMouseListener(ml);
 
-		comptree = new ComponentTreePanel(getJCC().getServiceProvider());
+		comptree = new ComponentTreePanel(getJCC().getServiceProvider(), JSplitPane.HORIZONTAL_SPLIT);
 		comptree.setMinimumSize(new Dimension(0, 0));
 		
 		lsplit.add(new JScrollPane(mpanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,

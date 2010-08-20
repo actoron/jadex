@@ -12,10 +12,20 @@ import jadex.service.IService;
 import jadex.service.SServiceProvider;
 
 import java.awt.Component;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.Icon;
+import javax.swing.JCheckBox;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.border.EtchedBorder;
+import javax.swing.border.TitledBorder;
 
 /**
  *  Node object representing a service container.
@@ -36,6 +46,9 @@ public class ComponentTreeNode	extends AbstractComponentTreeNode implements IAct
 		
 	/** The icon cache. */
 	protected final ComponentIconCache	iconcache;
+		
+	/** The properties component (if any). */
+	protected PropertiesComponent	propcomp;
 		
 	//-------- constructors --------
 	
@@ -291,5 +304,146 @@ public class ComponentTreeNode	extends AbstractComponentTreeNode implements IAct
 	public void setDescription(IComponentDescription desc)
 	{
 		this.desc	= desc;
+		if(propcomp!=null)
+		{
+			propcomp.setDescription(desc);
+			propcomp.repaint();
+		}
+	}
+
+	/**
+	 *  True, if the node has properties that can be displayed.
+	 */
+	public boolean	hasProperties()
+	{
+		return true;
+	}
+
+	
+	/**
+	 *  Get or create a component displaying the node properties.
+	 *  Only to be called if hasProperties() is true;
+	 */
+	public JComponent	getPropertiesComponent()
+	{
+		if(propcomp==null)
+			propcomp	= new PropertiesComponent();
+		propcomp.setDescription(desc);
+		return propcomp;
+	}
+	
+	//-------- helper classes --------
+	
+	/**
+	 *  Panel for showing component properties.
+	 */
+	public static class PropertiesComponent	extends	JPanel
+	{
+		//-------- attributes --------
+		
+		/** The name textfield. */
+		protected JTextField	tfname;
+		
+		/** The type textfield. */
+		protected JTextField	tftype;
+		
+		/** The ownership textfield. */
+		protected JTextField	tfownership;
+		
+		/** The state textfield. */
+		protected JTextField	tfstate;
+		
+		/** The processingstate textfield. */
+		protected JTextField	tfprocstate;
+		
+		/** The master checkbox. */
+		protected JCheckBox	cbmaster;
+		
+		/** The daemon checkbox. */
+		protected JCheckBox	cbdaemon;
+		
+		/** The autoshutdown checkbox. */
+		protected JCheckBox	cbautoshutdown;
+		
+		//-------- constructors --------
+		
+		/**
+		 *  Create new component proeprties panel.
+		 */
+		public PropertiesComponent()
+		{
+			super(new GridBagLayout());
+			setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), " Component properties "));
+
+			GridBagConstraints	gbc	= new GridBagConstraints();
+			gbc.gridy	= 0;
+			gbc.anchor	= GridBagConstraints.NORTHWEST;
+			gbc.fill	= GridBagConstraints.HORIZONTAL;
+			gbc.insets	= new Insets(1,1,1,1);
+
+			tfname	= createTextField("Name", gbc);
+			tftype	= createTextField("Type", gbc);
+			tfownership	= createTextField("Ownership", gbc);
+			tfstate	= createTextField("State", gbc);
+			tfprocstate	= createTextField("Processing state", gbc);
+			
+			cbmaster	= createCheckBox("Master", gbc);
+			cbdaemon	= createCheckBox("Daemon", gbc);
+
+			// Last component gets remaining space
+			gbc.weighty	= 1.0;
+
+			cbautoshutdown	= createCheckBox("Auto shutdown", gbc);
+		}
+		
+		//-------- methods --------
+		
+		/**
+		 *  Set the description.
+		 */
+		public void	setDescription(IComponentDescription desc)
+		{
+			tfname.setText(desc.getName().getName());
+			tftype.setText(desc.getType());
+			tfownership.setText(desc.getOwnership());
+			tfstate.setText(desc.getState());
+			tfprocstate.setText(desc.getProcessingState());
+			cbmaster.setSelected(desc.isMaster());
+			cbdaemon.setSelected(desc.isDaemon());
+			cbautoshutdown.setSelected(desc.isAutoShutdown());
+		}
+
+		//-------- helper methods --------
+		
+		/**
+		 *  Create a text field and add it to the panel.
+		 */
+		protected JTextField	createTextField(String name, GridBagConstraints gbc)
+		{
+			gbc.weightx	= 0;
+			add(new JLabel(name), gbc);
+			JTextField	tf	= new JTextField();
+			tf.setEditable(false);
+			gbc.weightx	= 1;
+			add(tf, gbc);
+			gbc.gridy++;
+			return tf;
+		}
+		
+		/**
+		 *  Create a check box and add it to the panel.
+		 */
+		protected JCheckBox	createCheckBox(String name, GridBagConstraints gbc)
+		{
+			gbc.weightx	= 0;
+			add(new JLabel(name), gbc);
+			JCheckBox	cb	= new JCheckBox("");
+			cb.setMargin(new Insets(0,0,0,0));
+			cb.setEnabled(false);
+			gbc.weightx	= 1;
+			add(cb, gbc);
+			gbc.gridy++;
+			return cb;
+		}
 	}
 }

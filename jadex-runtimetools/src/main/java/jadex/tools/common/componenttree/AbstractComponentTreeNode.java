@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.Icon;
+import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 
 
@@ -135,6 +136,23 @@ public abstract class AbstractComponentTreeNode	implements IComponentTreeNode
 		return children!=null && children.contains(node);
 	}
 
+	/**
+	 *  True, if the node has properties that can be displayed.
+	 */
+	public boolean	hasProperties()
+	{
+		return false;
+	}
+
+	
+	/**
+	 *  Get or create a component displaying the node properties.
+	 *  Only to be called if hasProperties() is true;
+	 */
+	public JComponent	getPropertiesComponent()
+	{
+		throw new UnsupportedOperationException("Node has no properties: "+this);
+	}
 	
 	//-------- template methods --------
 	

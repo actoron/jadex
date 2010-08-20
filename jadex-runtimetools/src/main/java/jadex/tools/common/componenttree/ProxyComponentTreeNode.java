@@ -183,10 +183,10 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 									((Collection)result).toArray(new IComponentDescription[((Collection)result).size()]);
 								for(int i=0; i<descs.length; i++)
 								{
-									IComponentTreeNode node = parentnode.getModel().getNode(descs[i].getName());
+									IComponentTreeNode node = proxy.getModel().getNode(descs[i].getName());
 									if(node==null)
 									{
-										node = new VirtualComponentTreeNode(parentnode, parentnode.getModel(), descs[i], cms, ui, iconcache);
+										node = new VirtualComponentTreeNode(parentnode, proxy.getModel(), descs[i], cms, ui, iconcache);
 									}
 									children.add(node);
 								}
@@ -220,17 +220,17 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 								if(services!=null && !services.isEmpty())
 								{
 									ServiceContainerNode scn = (ServiceContainerNode)
-										parentnode.getModel().getNode(desc.getName().getName()+"ServiceContainer");
+										proxy.getModel().getNode(desc.getName().getName()+"ServiceContainer");
 									if(scn==null)
-										scn	= new ServiceContainerNode(parentnode, parentnode.getModel());
+										scn	= new ServiceContainerNode(parentnode, proxy.getModel());
 									children.add(0, scn);
 									final List subchildren = new ArrayList();
 									for(int i=0; i<services.size(); i++)
 									{
 										IService service = (IService)services.get(i);
-										ServiceNode	sn = (ServiceNode)parentnode.getModel().getNode(service.getServiceIdentifier());
+										ServiceNode	sn = (ServiceNode)proxy.getModel().getNode(service.getServiceIdentifier());
 										if(sn==null)
-											sn = new ServiceNode(scn, parentnode.getModel(), service);
+											sn = new ServiceNode(scn, proxy.getModel(), service);
 										subchildren.add(sn);
 									}
 									
