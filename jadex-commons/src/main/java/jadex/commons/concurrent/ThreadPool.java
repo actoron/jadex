@@ -287,7 +287,7 @@ public class ThreadPool implements IThreadPool
 	public static void main(String[] args)
 	{
 		final ThreadPool tp	= new ThreadPool(new DefaultThreadPoolStrategy(0, 10, 10000, 4));
-		int max = 100000;
+		int max = 10000;
 		todo = max;
 		final long start = System.currentTimeMillis();
 		for(int i=0; i<max; i++)
@@ -300,11 +300,11 @@ public class ThreadPool implements IThreadPool
 					String t = Thread.currentThread().toString();
 					System.out.println("a_"+this+" : "+t);
 					
-//					long cnt = 0;
-//					for(int i=0; i<10000; i++)
-//					{
-//						cnt++;
-//					}
+					long cnt = 0;
+					for(int i=0; i<1000000; i++)
+					{
+						cnt++;
+					}
 					
 //					try{Thread.sleep(100);}
 //					catch(InterruptedException e){}

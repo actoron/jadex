@@ -18,6 +18,7 @@ import jadex.service.clock.IClockService;
 import jadex.service.clock.ITimer;
 import jadex.service.execution.IExecutionService;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -36,27 +37,29 @@ public class SimulationService extends BasicService implements ISimulationServic
 	/** The execution mode. */
 	protected String mode;
 	
-	/** The running flag. */
-	protected boolean running;
-	
 	/** The executing flag. */
 	protected boolean executing;
 	
 	/** The listeners. */
 	protected List listeners;
 
-	/** The current time step time. */
-	protected long timesteptime;
-	
 	/** The simcommand for a simulation clock. */
 	protected ICommand simcommand;
+		
+	/** The time of a time step. */
+	protected long timesteptime;
 		
 	/** The clock service. */
 	protected IClockService clockservice;
 	
 	/** The execution service. */
 	protected IExecutionService exeservice;
-
+	
+	/** The outstanding listener notifications (change events). */
+	protected List	notifications;
+	
+	/** Change indicator to coordinate separate threads. */
+	protected int change;
 	
 	//-------- constructors --------
 
@@ -86,34 +89,48 @@ public class SimulationService extends BasicService implements ISimulationServic
 			{				
 				IClockService simclock = getClockService();
 				
-				boolean steptime = false;
-				boolean advanceevent = false;
+				int	choice	= 0;
+				final int	advance	= 1;
+				final int	step_time	= 2;
 				synchronized(SimulationService.this)
 				{
+					if(isExecuting() && (MODE_TIME_STEP.equals(getMode()) || MODE_ACTION_STEP.equals(getMode())))
+					{
+						setExecuting(false);						
+					}
+
 					if(MODE_NORMAL.equals(getMode()) && executing)
 					{
-						advanceevent = true;
+						choice	= advance;
 					}
-					if(MODE_TIME_STEP.equals(getMode()))
+					else if(MODE_TIME_STEP.equals(getMode()))
 					{
-						//System.out.println("Do one step: "+timesteptime);
 						ITimer t = simclock.getNextTimer();
 						if(t!=null && t.getNotificationTime()<=timesteptime)
-							//stepTime();
-							steptime = true;
-						else
-							setExecuting(false);
-					}
-					else if(MODE_ACTION_STEP.equals(getMode()))
-					{
-						setExecuting(false);
+						{
+//							System.out.println("continuing time step: "+timesteptime);
+							choice	= step_time;
+						}
+//						else
+//						{
+//							System.out.println("time step finished");
+//						}
 					}
 				}
 				
-				if(steptime)
-					stepTime();
-				else if(advanceevent)
-					simclock.advanceEvent();
+				notifyListeners();	// delayed notifications of setExecuting()
+				
+				// Perform action out of synchronized block.
+				switch(choice)
+				{
+					case advance:
+						simclock.advanceEvent();
+						break;
+					case step_time:
+						stepTime();
+						break;
+					default:
+				}
 			}	
 		};
 	}
@@ -214,18 +231,16 @@ public class SimulationService extends BasicService implements ISimulationServic
 	 */
 	public void pause()
 	{
-		boolean dostop = false;
+		boolean	dostop	= false;
 		synchronized(this)
 		{
-			if(running)
+			if(isExecuting())
 			{
-	//			executor.stop();
-				dostop = true;
-				running = false;
+				dostop	= true;
+				setExecuting(false);
 			}
-			setExecuting(false);
 		}
-		
+		notifyListeners();	// delayed notifications of setExecuting()
 		if(dostop)
 			getClockService().stop();
 	}
@@ -235,21 +250,30 @@ public class SimulationService extends BasicService implements ISimulationServic
 	 */
 	public void start()
 	{
-		boolean dorun = false;
+		boolean	dostart	= false;
+		String	type	= null;
 		synchronized(this)
 		{
-			setMode(MODE_NORMAL);
-			setExecuting(true);
-			if(!running)
+			if(!isExecuting())
 			{
-				dorun = true;
-				running = true;
+				type = getClockService().getClockType();
+				setMode(MODE_NORMAL);
+				setExecuting(true);
+				dostart	= true;
 			}
 		}
+		notifyListeners();	// delayed notifications of setExecuting()
 		
-		if(dorun)
+		if(dostart)
+		{
 			getClockService().start();
-
+			
+			if(IClock.TYPE_EVENT_DRIVEN.equals(type)
+				|| IClock.TYPE_TIME_DRIVEN.equals(type))
+			{
+				getClockService().advanceEvent();
+			}
+		}
 	}
 	
 	/**
@@ -257,44 +281,40 @@ public class SimulationService extends BasicService implements ISimulationServic
 	 */
 	public void stepEvent()
 	{
-		boolean dorun = false;
+		boolean	dostart	= false;
+		int	oldchange;
 		synchronized(this)
 		{
-			if(executing)
-				return;
-//				throw new RuntimeException("Step only possible when executing.");
-
-			if(IClock.TYPE_CONTINUOUS.equals(getClockService().getClockType())
-				|| IClock.TYPE_SYSTEM.equals(getClockService().getClockType()))
+			if(!isExecuting())
 			{
-				throw new RuntimeException("Step only possible in simulation mode.");
+				if(IClock.TYPE_CONTINUOUS.equals(getClockService().getClockType())
+					|| IClock.TYPE_SYSTEM.equals(getClockService().getClockType()))
+				{
+					throw new RuntimeException("Step only possible in simulation mode.");
+				}
+				setMode(MODE_ACTION_STEP);
+				setExecuting(true);
+				dostart	= true;
 			}
-	
-			setMode(MODE_ACTION_STEP);
-			setExecuting(true);
-			if(!running)
-			{
-				dorun = true;
-				running = true;
-			}
+			oldchange	= change;
 		}
-		
-		if(dorun)
+		notifyListeners();	// delayed notifications of setExecuting()
+
+		if(dostart)
 		{
 			getClockService().start();
-		}
-		
-		boolean advanced = getClockService().advanceEvent();
-		
-		synchronized(this)
-		{
-			// Have to make sure that executing is set back to false,
-			// even if there is no time point or timing entry does not cause any execution.
-			if(!advanced || getExecutorService().isIdle())
+			boolean advanced = getClockService().advanceEvent();
+			synchronized(this)
 			{
-				//System.out.println("No further timepoint.");
-				setExecuting(false);
+				// Have to make sure that executing is set back to false,
+				// even if there is no time point or timing entry does not cause any execution.
+				if(oldchange==change && (!advanced || getExecutorService().isIdle()))
+				{
+					//System.out.println("No further timepoint.");
+					setExecuting(false);
+				}
 			}
+			notifyListeners();	// delayed notifications of setExecuting()
 		}
 	}
 	
@@ -303,48 +323,45 @@ public class SimulationService extends BasicService implements ISimulationServic
 	 */
 	public void stepTime()
 	{
-		boolean dorun = false;
+		boolean	dostart	= false;
+		int	oldchange;
 		synchronized(this)
 		{
-			if(executing)
-				return;
-//				throw new RuntimeException("Step only possible when not executing.");
-			
-			if(IClock.TYPE_CONTINUOUS.equals(getClockService().getClockType())
-				|| IClock.TYPE_SYSTEM.equals(getClockService().getClockType()))
+			if(!isExecuting())
 			{
-				throw new RuntimeException("Step only possible in simulation mode.");
+				if(IClock.TYPE_CONTINUOUS.equals(getClockService().getClockType())
+					|| IClock.TYPE_SYSTEM.equals(getClockService().getClockType()))
+				{
+					throw new RuntimeException("Step only possible in simulation mode.");
+				}
+				setMode(MODE_TIME_STEP);
+				setExecuting(true);
+				dostart	= true;
 			}
-			
-			//System.out.println(simclock.getTimers().length+" "+jadex.commons.SUtil.arrayToString(simclock.getTimers()));
-				
-			setMode(MODE_TIME_STEP);
-			setExecuting(true);
-			if(!running)
-			{
-				dorun = true;
-				running = true;
-			}
+			oldchange	= change;
 		}
+		notifyListeners();	// delayed notifications of setExecuting()
 
-		if(dorun)
+		if(dostart)
 		{
-			getClockService().start();
-		}
-		
-		// Do not hold lock while clock is advanced to avoid deadlocks
-		boolean advanced = getClockService().advanceEvent();
-		
-		synchronized(this)
-		{
-			if(!advanced || getExecutorService().isIdle())
+			ITimer	next	= getClockService().getNextTimer();
+			if(next!=null)
 			{
-				setExecuting(false);
-			}
-			else
-			{
-				timesteptime = getClockService().getTime();
-				//System.out.println("Steptime is: "+timesteptime);
+				timesteptime	= next.getNotificationTime();
+//				System.out.println("time step: "+timesteptime);
+				getClockService().start();
+				boolean advanced = getClockService().advanceEvent();
+				synchronized(this)
+				{
+					// Have to make sure that executing is set back to false,
+					// even if there is no time point or timing entry does not cause any execution.
+					if(oldchange==change && (!advanced || getExecutorService().isIdle()))
+					{
+//						System.out.println("No further timepoint.");
+						setExecuting(false);
+					}
+				}
+				notifyListeners();	// delayed notifications of setExecuting()
 			}
 		}
 	}
@@ -374,8 +391,7 @@ public class SimulationService extends BasicService implements ISimulationServic
 	public void setClockType(String type, IThreadPool tp)
 	{
 		if(isExecuting())
-			return;
-//			throw new RuntimeException("Change clock not allowed during execution.");
+			throw new RuntimeException("Change clock not allowed during execution.");
 		
 		
 //		IClockService cs = (IClockService)container.getService(IClockService.class);
@@ -398,19 +414,13 @@ public class SimulationService extends BasicService implements ISimulationServic
 				getExecutorService().addIdleCommand(simcommand);
 			}
 			
-			running = false;
-			notifyListeners(new ChangeEvent(this, "clock_type", type));
+			if(notifications==null)
+				notifications	= new ArrayList();
+			notifications.add(new ChangeEvent(this, "clock_type", type));
+			notifyListeners();
 		}
 	}
 		
-	/**
-	 *  Test if context is running.
-	 */
-	public boolean isRunning()
-	{
-		return running;
-	}
-	
 	/**
 	 *  Test if context is executing.
 	 */
@@ -425,7 +435,10 @@ public class SimulationService extends BasicService implements ISimulationServic
 	 */
 	public void addChangeListener(IChangeListener listener)
 	{
-		listeners.add(listener);
+		synchronized(this)
+		{
+			listeners.add(listener);
+		}
 	}
 	
 	/**
@@ -434,7 +447,10 @@ public class SimulationService extends BasicService implements ISimulationServic
 	 */
 	public void removeChangeListener(IChangeListener listener)
 	{
-		listeners.remove(listener);
+		synchronized(this)
+		{
+			listeners.remove(listener);
+		}
 	}
 	
 	/**
@@ -442,21 +458,46 @@ public class SimulationService extends BasicService implements ISimulationServic
 	 */
 	public void setExecuting(boolean executing)
 	{
-		if(executing!=this.executing)
+		synchronized(this)
 		{
-//			System.out.println("executing: "+executing);
-			this.executing = executing;
-			notifyListeners(new ChangeEvent(this, "executing", executing? Boolean.TRUE: Boolean.FALSE));
+			if(executing!=this.executing)
+			{
+				change++;
+				this.executing = executing;
+				if(notifications==null)
+					notifications	= new ArrayList();
+				notifications.add(new ChangeEvent(this, "executing", executing? Boolean.TRUE: Boolean.FALSE));
+			}
+			else
+			{
+				Thread.dumpStack();
+			}
 		}
 	}
 	
 	/**
 	 *  Notify the listeners.
 	 */
-	protected void notifyListeners(ChangeEvent ce)
+	protected void notifyListeners()
 	{
-		for(int i=0; i<listeners.size(); i++)
-			((IChangeListener)listeners.get(i)).changeOccurred(ce);
+		ChangeEvent[]	events;
+		IChangeListener[]	alisteners;
+		synchronized(this)
+		{
+			events	= notifications!=null ? (ChangeEvent[])notifications.toArray(new ChangeEvent[notifications.size()]) : null;
+			alisteners	= listeners.isEmpty() ? null : (IChangeListener[])listeners.toArray(new IChangeListener[listeners.size()]);
+			notifications	= null;
+		}
+		if(alisteners!=null && events!=null)
+		{
+			for(int i=0; i<alisteners.length; i++)
+			{
+				for(int j=0; j<events.length; j++)
+				{
+					alisteners[i].changeOccurred(events[j]);
+				}
+			}
+		}
 	}
 	
 	/**

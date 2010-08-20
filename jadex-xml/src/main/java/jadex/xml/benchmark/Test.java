@@ -1,10 +1,8 @@
 package jadex.xml.benchmark;
 
-import jadex.commons.SUtil;
 import jadex.xml.bean.JavaReader;
 import jadex.xml.bean.JavaWriter;
 
-import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.URL;
 import java.util.ArrayList;

@@ -45,7 +45,7 @@ public class SwingWorker	extends Timer implements ActionListener
 	public void actionPerformed(ActionEvent arg0)
 	{
 		// Starttime (for debugging)
-		long starttime	= System.currentTimeMillis();
+//		long starttime	= System.currentTimeMillis();
 		
 		// Execute all tasks.
 		boolean	removed	= false;

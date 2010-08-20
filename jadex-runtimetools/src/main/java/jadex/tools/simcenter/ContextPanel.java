@@ -143,13 +143,13 @@ public class ContextPanel extends AbstractTimePanel
 		public boolean isEnabled()
 		{
 			// todo: hack!
-			// problem: clock service must be fetched fresh!
-			IClockService cs = (IClockService)SServiceProvider.getService(getServiceProvider(), IClockService.class).get(new ThreadSuspendable());
+			// problem: service must be fetched fresh!
+//			IClockService cs = (IClockService)SServiceProvider.getService(getServiceProvider(), IClockService.class).get(new ThreadSuspendable());
 			ISimulationService sims = (ISimulationService)SServiceProvider.getService(getServiceProvider(), ISimulationService.class).get(new ThreadSuspendable());
-			boolean clockok = cs.getNextTimer()!=null 
-				|| cs.getClockType().equals(IClock.TYPE_CONTINUOUS)
-				|| cs.getClockType().equals(IClock.TYPE_SYSTEM);
-			return !sims.isExecuting() && clockok;
+//			boolean clockok = cs.getNextTimer()!=null 
+//				|| cs.getClockType().equals(IClock.TYPE_CONTINUOUS)
+//				|| cs.getClockType().equals(IClock.TYPE_SYSTEM);
+			return !sims.isExecuting();// && clockok;
 		}
 	};
 	

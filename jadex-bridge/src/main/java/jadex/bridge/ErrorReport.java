@@ -1,9 +1,5 @@
 package jadex.bridge;
 
-import jadex.commons.collection.IndexMap;
-import jadex.commons.collection.MultiCollection;
-
-import java.util.ArrayList;
 import java.util.Map;
 
 /**

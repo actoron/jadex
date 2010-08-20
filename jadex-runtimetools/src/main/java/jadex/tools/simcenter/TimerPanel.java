@@ -153,7 +153,24 @@ public class TimerPanel extends AbstractTimePanel
 				if(!active)
 					return;
 				
+				ITimer next = ((IClockService)result).getNextTimer();
 				ITimer[] t = ((IClockService)result).getTimers();
+				// If next timer is tick timer add to list.
+				// Todo: tick timer should be in list?
+				if(next!=null)
+				{
+					if(t==null || t.length==0)
+					{
+						t	= new ITimer[]{next};
+					}
+					else if(!next.equals(t[0]))
+					{
+						ITimer[]	tmp	= new ITimer[t.length+1];
+						tmp[0]	= next;
+						System.arraycopy(t, 0, tmp, 1, t.length);
+						t	= tmp;
+					}
+				}
 				//System.out.println(SUtil.arrayToString(t));
 				model.removeAllRows();
 			

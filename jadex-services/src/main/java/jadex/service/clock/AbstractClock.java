@@ -105,6 +105,11 @@ public abstract class AbstractClock implements IClock
 				for(int i=0; i<tts.length; i++)
 					tts[i].getTimedObject().timeEventOccurred(currenttime);
 			}
+			
+			public String toString()
+			{
+				return "Tick Timer";
+			}
 		});
 	}
 	
@@ -139,10 +144,7 @@ public abstract class AbstractClock implements IClock
 		for(int i=0; i<tts.length; i++)
 		{
 			addTickTimer(new TickTimer(this, tts[i].getTimedObject()));
-//			ticktimers.add(new Timer(timer.getNotificationTime(), this, timer.getTimedObject()));
 		}		
-		
-		activateTickTimer();
 	}
 
 	/**
@@ -216,7 +218,7 @@ public abstract class AbstractClock implements IClock
 				long num = (getTime()-getStarttime())/getDelta();
 				long time = (num+1)*getDelta()+getStarttime();
 				ticktimer.setNotificationTime(time);
-				//System.out.println("Ticktimer at: "+time);
+//				System.out.println("Ticktimer at: "+time);
 			}
 		}
 		

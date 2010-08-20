@@ -4,6 +4,7 @@ import jadex.base.fipa.SFipa;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
+import jadex.commons.SUtil;
 import jadex.tools.ontology.ToolRequest;
 
 
@@ -29,7 +30,7 @@ public class ToolRequestPlan extends Plan
 		// (and not the update plan, which only waits for the conversation id).
 		IMessageEvent	request_msg	= createMessageEvent("tool_request");
 		request_msg.getParameterSet(SFipa.RECEIVERS).addValue(agent);
-		request_msg.getParameter(SFipa.REPLY_WITH).setValue(SFipa.createUniqueId(tool.getId()));
+		request_msg.getParameter(SFipa.REPLY_WITH).setValue(SUtil.createUniqueId(tool.getId()));
 		request_msg.getParameter(SFipa.CONVERSATION_ID).setValue(tool.getId());
 		request_msg.getParameter(SFipa.CONTENT).setValue(request);
 		
