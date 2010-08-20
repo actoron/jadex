@@ -593,130 +593,115 @@ public class AwarenessAgent extends MicroAgent
 			public void resultAvailable(Object source, Object result)
 			{
 				final ILibraryService ls = (ILibraryService)result;
-				SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class)
+				SServiceProvider.getService(getServiceProvider(), IThreadPoolService.class)
 					.addResultListener(createResultListener(new IResultListener()
 				{
 					public void resultAvailable(Object source, Object result)
 					{
-						final IComponentManagementService cms = (IComponentManagementService)result;
+						final IThreadPoolService tp = (IThreadPoolService)result;
 						
-						SServiceProvider.getService(getServiceProvider(), IThreadPoolService.class)
-							.addResultListener(createResultListener(new IResultListener()
+						tp.execute(new Runnable()
 						{
-							public void resultAvailable(Object source, Object result)
+							public void run()
 							{
-								final IThreadPoolService tp = (IThreadPoolService)result;
-								
-								tp.execute(new Runnable()
+								synchronized(AwarenessAgent.this)
 								{
-									public void run()
+									receiver = Thread.currentThread();
+								}
+								
+								// todo: max ip datagram length (is there a better way to determine length?)
+								byte buf[] = new byte[65535];
+								
+								MulticastSocket s = null;
+								InetAddress myaddress = null;
+								
+								while(!killed)
+								{
+									try
 									{
-										synchronized(AwarenessAgent.this)
+										// reopen when
+										Object[] ai = getAddressInfo();
+										InetAddress curaddress = (InetAddress)ai[0];
+										int curport = ((Integer)ai[1]).intValue();
+										
+										if(s!=null && (s.getPort()!=curport || !SUtil.equals(curaddress, myaddress)))
 										{
-											receiver = Thread.currentThread();
+											s.leaveGroup(myaddress);
+											s.close();
+											s = null;
+										}
+										if(s==null)
+										{
+											s = new MulticastSocket(curport);
+											s.joinGroup(curaddress);
+											myaddress = curaddress;
 										}
 										
-										// todo: max ip datagram length (is there a better way to determine length?)
-										byte buf[] = new byte[65535];
+										DatagramPacket pack = new DatagramPacket(buf, buf.length);
+										s.receive(pack);
 										
-										MulticastSocket s = null;
-										InetAddress myaddress = null;
+										byte[] target = new byte[pack.getLength()];
+										System.arraycopy(buf, 0, target, 0, pack.getLength());
 										
-										while(!killed)
+										AwarenessInfo info = (AwarenessInfo)JavaReader.objectFromByteArray(target, ls.getClassLoader());
+//										System.out.println(getComponentIdentifier()+" received: "+info);
+									
+										final IComponentIdentifier sender = info.getSender();
+										boolean createproxy = false;
+										DiscoveryInfo dif;
+										synchronized(AwarenessAgent.this)
 										{
-											try
+											dif = (DiscoveryInfo)discovered.get(sender);
+											if(dif==null)
 											{
-												// reopen when
-												Object[] ai = getAddressInfo();
-												InetAddress curaddress = (InetAddress)ai[0];
-												int curport = ((Integer)ai[1]).intValue();
-												
-												if(s!=null && (s.getPort()!=curport || !SUtil.equals(curaddress, myaddress)))
-												{
-													s.leaveGroup(myaddress);
-													s.close();
-													s = null;
-												}
-												if(s==null)
-												{
-													s = new MulticastSocket(curport);
-													s.joinGroup(curaddress);
-													myaddress = curaddress;
-												}
-												
-												DatagramPacket pack = new DatagramPacket(buf, buf.length);
-												s.receive(pack);
-												
-												byte[] target = new byte[pack.getLength()];
-												System.arraycopy(buf, 0, target, 0, pack.getLength());
-												
-												AwarenessInfo info = (AwarenessInfo)JavaReader.objectFromByteArray(target, ls.getClassLoader());
-		//										System.out.println(getComponentIdentifier()+" received: "+info);
-											
-												final IComponentIdentifier sender = info.getSender();
-												boolean createproxy = false;
-												DiscoveryInfo dif;
-												synchronized(AwarenessAgent.this)
-												{
-													dif = (DiscoveryInfo)discovered.get(sender);
-													if(dif==null)
-													{
-														createproxy = isAutoCreateProxy();
-														dif = new DiscoveryInfo(sender, createproxy, clock.getTime(), getDelay());
-														discovered.put(sender, dif);
-													}
-													else
-													{
-														dif.setTime(clock.getTime());
-													}
-												}
-												
-												if(createproxy)
-												{
+												createproxy = isAutoCreateProxy();
+												dif = new DiscoveryInfo(sender, createproxy, clock.getTime(), getDelay());
+												discovered.put(sender, dif);
+											}
+											else
+											{
+												dif.setTime(clock.getTime());
+											}
+										}
+										
+										if(createproxy)
+										{
 //													System.out.println("Creating new proxy for: "+sender+" "+getComponentIdentifier());
-													createProxy(sender);
-												}
-											}
-											catch(Exception e)
-											{
-												getLogger().warning("Receiving awareness info error: "+e);
-											}
+											createProxy(sender);
 										}
-										
-										if(s!=null)
-										{
-											try
-											{
-												s.leaveGroup(address);
-												s.close();
-											}
-											catch(Exception e)
-											{
-												getLogger().warning("Receiving socket closing error: "+e);
-											}
-										}
-										
-										synchronized(AwarenessAgent.this)
-										{
-											receiver = null;
-										}
-//										System.out.println("comp and receiver terminated: "+getComponentIdentifier());
 									}
-								});
+									catch(Exception e)
+									{
+										getLogger().warning("Receiving awareness info error: "+e);
+									}
+								}
+								
+								if(s!=null)
+								{
+									try
+									{
+										s.leaveGroup(address);
+										s.close();
+									}
+									catch(Exception e)
+									{
+										getLogger().warning("Receiving socket closing error: "+e);
+									}
+								}
+								
+								synchronized(AwarenessAgent.this)
+								{
+									receiver = null;
+								}
+//										System.out.println("comp and receiver terminated: "+getComponentIdentifier());
 							}
-							
-							public void exceptionOccurred(Object source, Exception exception)
-							{
-								getLogger().warning("Awareness agent problem, could not get threadpool service: "+exception);
-		//						exception.printStackTrace();
-							}
-						}));
+						});
 					}
 					
 					public void exceptionOccurred(Object source, Exception exception)
 					{
-						getLogger().warning("Awareness agent problem, could not get component management service: "+exception);
-		//				exception.printStackTrace();
+						getLogger().warning("Awareness agent problem, could not get threadpool service: "+exception);
+//						exception.printStackTrace();
 					}
 				}));
 			}
