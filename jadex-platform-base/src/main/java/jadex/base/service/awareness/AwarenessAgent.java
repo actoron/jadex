@@ -1,7 +1,6 @@
 package jadex.base.service.awareness;
 
 import jadex.bridge.Argument;
-import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.CreationInfo;
 import jadex.bridge.IArgument;
 import jadex.bridge.IComponentIdentifier;
@@ -24,9 +23,11 @@ import jadex.xml.bean.JavaWriter;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -48,6 +49,10 @@ public class AwarenessAgent extends MicroAgent
 	
 	/** Flag indicating if proxies should be automatically created. */
 	protected boolean autocreate;
+	
+	/** Flag indicating if proxies should be automatically deleted. */
+	protected boolean autodelete;
+
 	
 	/** The discovered components. */
 	protected Map discovered;
@@ -85,6 +90,7 @@ public class AwarenessAgent extends MicroAgent
 			this.port = ((Number)getArgument("port")).intValue();
 			this.delay = ((Number)getArgument("delay")).longValue();
 			this.autocreate = ((Boolean)getArgument("autocreate")).booleanValue();
+			this.autodelete = ((Boolean)getArgument("autodelete")).booleanValue();
 //			System.out.println("initial delay: "+delay);
 			
 			this.sendsocket = new MulticastSocket();
@@ -278,6 +284,24 @@ public class AwarenessAgent extends MicroAgent
 	{
 		this.autocreate = autocreate;
 	}
+	
+	/**
+	 *  Get the autodelete.
+	 *  @return the autodelete.
+	 */
+	public synchronized boolean isAutoDeleteProxy()
+	{
+		return autodelete;
+	}
+
+	/**
+	 *  Set the autodelete.
+	 *  @param autodelete The autodelete to set.
+	 */
+	public synchronized void setAutoDeleteProxy(boolean autodelete)
+	{
+		this.autodelete = autodelete;
+	}
 
 	/**
 	 *  Get the delay.
@@ -340,6 +364,7 @@ public class AwarenessAgent extends MicroAgent
 		{
 			public void execute(Object args)
 			{
+				List todel = autodelete? new ArrayList(): null;
 				synchronized(AwarenessAgent.this)
 				{
 					long time = clock.getTime();
@@ -351,13 +376,66 @@ public class AwarenessAgent extends MicroAgent
 						{
 //							System.out.println("Removing: "+dif);
 							it.remove();
+							if(autodelete)
+							{
+								todel.add(dif.getComponentIdentifier());
+							}
 						}
+						
+						// Check if the proxies still exist
+						checkProxy(dif);
+					}
+				}
+				
+				if(todel!=null)
+				{
+					for(int i=0; i<todel.size(); i++)
+					{
+						IComponentIdentifier cid = (IComponentIdentifier)todel.get(i);
+						deleteProxy(cid).addResultListener(new DefaultResultListener(getLogger())
+						{
+							public void resultAvailable(Object source, Object result)
+							{
+							}
+						});
 					}
 				}
 				
 				waitFor(5000, this);
 			}
 		});
+	}
+	
+	/**
+	 *  Check if local proxy is still available.
+	 */
+	public void checkProxy(final DiscoveryInfo dif)
+	{
+		SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class)
+		.addResultListener(createResultListener(new IResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				final IComponentManagementService cms = (IComponentManagementService)result;
+				
+				IComponentIdentifier lcid = cms.createComponentIdentifier(dif.getComponentIdentifier().getLocalName(), true);
+				cms.getComponentDescription(lcid).addResultListener(new IResultListener()
+				{
+					public void resultAvailable(Object source, Object result)
+					{
+					}
+					
+					public void exceptionOccurred(Object source, Exception exception)
+					{
+						dif.setProxy(false);
+					}
+				});
+			}
+			public void exceptionOccurred(Object source, Exception exception) 
+			{
+				getLogger().warning("Could not get cms: "+exception);
+			}
+		}));
 	}
 	
 	/**
@@ -481,7 +559,8 @@ public class AwarenessAgent extends MicroAgent
 					public void resultAvailable(Object source, Object result)
 					{
 						DiscoveryInfo dif = getDiscoveryInfo(cid);
-						dif.setProxy(false);
+						if(dif!=null)
+							dif.setProxy(false);
 						ret.setResult(result);
 					}
 					
@@ -621,7 +700,7 @@ public class AwarenessAgent extends MicroAgent
 										{
 											receiver = null;
 										}
-										System.out.println("comp and receiver terminated: "+getComponentIdentifier());
+//										System.out.println("comp and receiver terminated: "+getComponentIdentifier());
 									}
 								});
 							}
@@ -665,6 +744,7 @@ public class AwarenessAgent extends MicroAgent
 				new Argument("delay", "This parameter is the delay between sending awareness infos.", "long", 
 					SUtil.createHashMap(configs, new Object[]{new Long(5000), new Long(10000), new Long(60000)})),	
 				new Argument("autocreate", "This parameter describes if new proxies should be automatically created when discovering new components.", "boolean", Boolean.TRUE),	
+				new Argument("autodelete", "This parameter describes if proxies should be automatically deleted when not discovered any longer.", "boolean", Boolean.TRUE),	
 			}, null, null, SUtil.createHashMap(new String[]{"serviceviewer.viewerclass"}, new Object[]{"jadex.tools.serviceviewer.awareness.AwarenessAgentPanel"}));
 	}
 }

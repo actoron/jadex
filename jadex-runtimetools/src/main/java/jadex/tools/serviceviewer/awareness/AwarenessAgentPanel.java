@@ -46,10 +46,12 @@ import javax.swing.border.TitledBorder;
 import javax.swing.table.AbstractTableModel;
 
 /**
- * 
+ *  Panel for the awareness infos.
  */
 public class AwarenessAgentPanel implements IComponentViewerPanel
 {
+	//-------- attributes --------
+	
 	/** The jcc. */
 	protected IControlCenter jcc;
 	
@@ -74,6 +76,12 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 	
 	/** The autocreate flag. */
 	protected boolean autocreate;
+	
+	/** The autocreate flag. */
+	protected boolean autodelete;
+
+	
+	//-------- methods --------
 	
 	/**
 	 *  Called once to initialize the panel.
@@ -127,8 +135,11 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 		final JSpinner spdelay = new JSpinner(spmdelay);
 		updateDelay(spdelay);
 		
-		final JCheckBox cbauto = new JCheckBox();
-		updateAutocreate(cbauto);
+		final JCheckBox cbautocreate = new JCheckBox();
+		updateAutoCreate(cbautocreate);
+		
+		final JCheckBox cbautodelete = new JCheckBox();
+		updateAutoDelete(cbautodelete);
 		
 		JPanel pdisinfos = new JPanel(new BorderLayout());
 		pdisinfos.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), " Discovery Infos "));
@@ -197,7 +208,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 				}
 				
 				// Set autocreate.
-				final boolean autocreate = cbauto.isSelected();
+				final boolean autocreate = cbautocreate.isSelected();
 				if(autocreate!=AwarenessAgentPanel.this.autocreate)
 				{
 					component.scheduleStep(new SetAutoCreateProxyCommand())
@@ -206,6 +217,20 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 						public void customResultAvailable(Object source, Object result)
 						{
 							AwarenessAgentPanel.this.autocreate = autocreate;
+						}
+					});
+				}
+				
+				// Set autodelete.
+				final boolean autodelete = cbautodelete.isSelected();
+				if(autodelete!=AwarenessAgentPanel.this.autodelete)
+				{
+					component.scheduleStep(new SetAutoDeleteProxyCommand())
+						.addResultListener(new SwingDefaultResultListener(psettings)
+					{
+						public void customResultAvailable(Object source, Object result)
+						{
+							AwarenessAgentPanel.this.autodelete = autodelete;
 						}
 					});
 				}
@@ -221,7 +246,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 					}
 					else
 					{
-						System.out.println("timer delay: "+timerdelay);
+//						System.out.println("timer delay: "+timerdelay);
 						timer.setDelay(timerdelay);
 						if(!timer.isRunning())
 							timer.start();
@@ -239,7 +264,8 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 				tfipaddress.setText(address.getHostAddress());
 				tfport.setText(""+port);
 				spdelay.setValue(delay/1000);
-				cbauto.setSelected(autocreate);
+				cbautocreate.setSelected(autocreate);
+				cbautodelete.setSelected(autodelete);
 			}
 		});
 		JButton burefresh = new JButton("Refresh");
@@ -250,7 +276,8 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 			{
 				updateAddress(tfipaddress, tfport);
 				updateDelay(spdelay);
-				updateAutocreate(cbauto);
+				updateAutoCreate(cbautocreate);
+				updateAutoDelete(cbautodelete);
 			}
 		});
 		buapply.setPreferredSize(burefresh.getPreferredSize());
@@ -258,38 +285,51 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 		bucancel.setPreferredSize(burefresh.getPreferredSize());
 		bucancel.setMinimumSize(burefresh.getMinimumSize());
 		
-		psettings.add(new JLabel("IP-multicast address [ip:port]", JLabel.LEFT), 
-			new GridBagConstraints(0, 0, 1, 1, 0, 0, GridBagConstraints.NORTHWEST, 
-			GridBagConstraints.NONE, new Insets(1,1,1,1), 0, 0));
-		psettings.add(tfipaddress, new GridBagConstraints(1, 0, 1, 1, 0, 0, GridBagConstraints.NORTHWEST, 
-			GridBagConstraints.HORIZONTAL, new Insets(1,1,1,1), 0, 0));
-		psettings.add(tfport, new GridBagConstraints(2, 0, 1, 1, 1, 0, GridBagConstraints.NORTHWEST, 
-			GridBagConstraints.HORIZONTAL, new Insets(1,1,1,1), 0, 0));
+		int y=0;
 		
-		psettings.add(new JLabel("Delay (0=off) between sending infos [s]", JLabel.LEFT), 
-			new GridBagConstraints(0, 1, 1, 1, 0, 0, GridBagConstraints.NORTHWEST, 
-			GridBagConstraints.NONE, new Insets(1,1,1,1), 0, 1));
-		psettings.add(spdelay, new GridBagConstraints(1, 1, 2, 1, 1, 0, GridBagConstraints.NORTHWEST, 
+		psettings.add(new JLabel("IP-multicast address [ip:port]", JLabel.LEFT), 
+			new GridBagConstraints(0, y, 1, 1, 0, 0, GridBagConstraints.NORTHWEST, 
+			GridBagConstraints.NONE, new Insets(1,1,1,1), 0, 0));
+		psettings.add(tfipaddress, new GridBagConstraints(1, y, 1, 1, 0, 0, GridBagConstraints.NORTHWEST, 
 			GridBagConstraints.HORIZONTAL, new Insets(1,1,1,1), 0, 0));
+		psettings.add(tfport, new GridBagConstraints(2, y, 1, 1, 1, 0, GridBagConstraints.NORTHWEST, 
+			GridBagConstraints.HORIZONTAL, new Insets(1,1,1,1), 0, 0));
+		y++;
+
+		psettings.add(new JLabel("Delay (0=off) between sending infos [s]", JLabel.LEFT), 
+			new GridBagConstraints(0, y, 1, 1, 0, 0, GridBagConstraints.NORTHWEST, 
+			GridBagConstraints.NONE, new Insets(1,1,1,1), 0, 1));
+		psettings.add(spdelay, new GridBagConstraints(1, y, 2, 1, 1, 0, GridBagConstraints.NORTHWEST, 
+			GridBagConstraints.HORIZONTAL, new Insets(1,1,1,1), 0, 0));
+		y++;
 		
 		psettings.add(new JLabel("Autocreate proxy on discovery", JLabel.LEFT), 
-			new GridBagConstraints(0, 2, 1, 1, 0, 0, GridBagConstraints.NORTHWEST, 
+			new GridBagConstraints(0, y, 1, 1, 0, 0, GridBagConstraints.NORTHWEST, 
 			GridBagConstraints.NONE, new Insets(1,1,1,1), 0, 0));
-		psettings.add(cbauto, new GridBagConstraints(1, 2, 2, 1, 1, 0, GridBagConstraints.NORTHWEST, 
+		psettings.add(cbautocreate, new GridBagConstraints(1, y, 2, 1, 1, 0, GridBagConstraints.NORTHWEST, 
 			GridBagConstraints.NONE, new Insets(1,1,1,1), 0, 0));
+		y++;
+		
+		psettings.add(new JLabel("Autodelete proxy on disappearance", JLabel.LEFT), 
+			new GridBagConstraints(0, y, 1, 1, 0, 0, GridBagConstraints.NORTHWEST, 
+			GridBagConstraints.NONE, new Insets(1,1,1,1), 0, 0));
+		psettings.add(cbautodelete, new GridBagConstraints(1, y, 2, 1, 1, 0, GridBagConstraints.NORTHWEST, 
+			GridBagConstraints.NONE, new Insets(1,1,1,1), 0, 0));
+		y++;
 		
 		psettings.add(new JLabel("Autorefresh delay (0=off) for discovery infos [s]", JLabel.LEFT), 
-			new GridBagConstraints(0, 3, 1, 1, 0, 0, GridBagConstraints.NORTHWEST, 
+			new GridBagConstraints(0, y, 1, 1, 0, 0, GridBagConstraints.NORTHWEST, 
 			GridBagConstraints.NONE, new Insets(1,1,1,1), 0, 0));
-		psettings.add(sprefresh, new GridBagConstraints(1, 3, 2, 1, 1, 0, GridBagConstraints.NORTHWEST, 
+		psettings.add(sprefresh, new GridBagConstraints(1, y, 2, 1, 1, 0, GridBagConstraints.NORTHWEST, 
 			GridBagConstraints.HORIZONTAL, new Insets(1,1,1,1), 0, 0));
+		y++;
 		
 		JPanel pbuts = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 		pbuts.add(burefresh);
 		pbuts.add(buapply);
 		pbuts.add(bucancel);
 		
-		psettings.add(pbuts, new GridBagConstraints(0, 4, 3, 1, 0, 1, GridBagConstraints.NORTHEAST, 
+		psettings.add(pbuts, new GridBagConstraints(0, y, 3, 1, 0, 1, GridBagConstraints.NORTHEAST, 
 			GridBagConstraints.NONE, new Insets(1,1,1,1), 0, 1));
 
 		
@@ -324,19 +364,12 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 					}
 					else
 					{
-						component.scheduleStep(new CreateProxyCommand(dif.getComponentIdentifier()))
+						component.scheduleResultStep(new CreateProxyCommand(dif.getComponentIdentifier()))
 							.addResultListener(new SwingDefaultResultListener(psettings)
 						{
 							public void customResultAvailable(Object source, Object result)
 							{
-								System.out.println("created: "+result);
 								updateDiscoveryInfos(jtdis);
-							}
-							public void customExceptionOccurred(Object source,
-									Exception exception)
-							{
-								System.out.println("not");
-								super.customExceptionOccurred(source, exception);
 							}
 						});
 					}
@@ -365,7 +398,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 					}
 					else
 					{
-						component.scheduleStep(new DeleteProxyCommand(dif.getComponentIdentifier()))
+						component.scheduleResultStep(new DeleteProxyCommand(dif.getComponentIdentifier()))
 							.addResultListener(new SwingDefaultResultListener(psettings)
 						{
 							public void customResultAvailable(Object source, Object result)
@@ -404,6 +437,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 	 */
 	public void setProperties(Properties ps)
 	{
+		// todo: proerties?
 	}
 
 	/**
@@ -412,6 +446,8 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 	 */
 	public Properties	getProperties()
 	{
+		// todo: proerties?
+		
 		return null;
 	}
 	
@@ -454,15 +490,31 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 	/**
 	 *  Update autocreate.
 	 */
-	protected void updateAutocreate(final JCheckBox cbauto)
+	protected void updateAutoCreate(final JCheckBox cbautocreate)
 	{
 		component.scheduleResultStep(new GetAutoCreateProxyCommand())
-			.addResultListener(new SwingDefaultResultListener(cbauto)
+			.addResultListener(new SwingDefaultResultListener(cbautocreate)
 		{
 			public void customResultAvailable(Object source, Object result)
 			{
 				autocreate = ((Boolean)result).booleanValue();
-				cbauto.setSelected(autocreate);
+				cbautocreate.setSelected(autocreate);
+			}
+		});
+	}
+	
+	/**
+	 *  Update autodelete.
+	 */
+	protected void updateAutoDelete(final JCheckBox cbautodelete)
+	{
+		component.scheduleResultStep(new GetAutoDeleteProxyCommand())
+			.addResultListener(new SwingDefaultResultListener(cbautodelete)
+		{
+			public void customResultAvailable(Object source, Object result)
+			{
+				autodelete = ((Boolean)result).booleanValue();
+				cbautodelete.setSelected(autodelete);
 			}
 		});
 	}
@@ -655,6 +707,52 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 	};
 	
 	/**
+	 *  Get auto delete command.
+	 */
+	public static class GetAutoDeleteProxyCommand implements IResultCommand
+	{
+		public Object execute(Object args)
+		{
+			AwarenessAgent agent = (AwarenessAgent)args;
+			boolean auto = agent.isAutoDeleteProxy();
+			return auto? Boolean.TRUE: Boolean.FALSE;
+		}
+	}
+	
+	/**
+	 *  Set auto delete command.
+	 */
+	public static class SetAutoDeleteProxyCommand implements ICommand
+	{
+		public boolean autodelete;
+		
+		public SetAutoDeleteProxyCommand()
+		{
+		}
+
+		public SetAutoDeleteProxyCommand(boolean autodelete)
+		{
+			this.autodelete = autodelete;
+		}
+		
+		public void execute(Object args)
+		{
+			AwarenessAgent agent = (AwarenessAgent)args;
+			agent.setAutoDeleteProxy(autodelete);
+		}
+
+		public boolean isAutoDelete()
+		{
+			return autodelete;
+		}
+
+		public void setAutoDelete(boolean autodelete)
+		{
+			this.autodelete = autodelete;
+		}
+	};
+	
+	/**
 	 *  Get discovery info command.
 	 */
 	public static class GetDiscoveryInfosCommand implements IResultCommand
@@ -670,7 +768,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 	/**
 	 *  Create proxy command.
 	 */
-	public static class CreateProxyCommand implements ICommand
+	public static class CreateProxyCommand implements IResultCommand
 	{
 		public IComponentIdentifier cid;
 		
@@ -683,10 +781,10 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 			this.cid = cid;
 		}
 		
-		public void execute(Object args)
+		public Object execute(Object args)
 		{
 			AwarenessAgent agent = (AwarenessAgent)args;
-			agent.createProxy(cid);
+			return agent.createProxy(cid);
 		}
 
 		public IComponentIdentifier getComponentIdentifier()
@@ -703,7 +801,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 	/**
 	 *  Delete proxy command.
 	 */
-	public static class DeleteProxyCommand implements ICommand
+	public static class DeleteProxyCommand implements IResultCommand
 	{
 		public IComponentIdentifier cid;
 		
@@ -716,10 +814,10 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 			this.cid = cid;
 		}
 		
-		public void execute(Object args)
+		public Object execute(Object args)
 		{
 			AwarenessAgent agent = (AwarenessAgent)args;
-			agent.deleteProxy(cid);
+			return agent.deleteProxy(cid);
 		}
 
 		public IComponentIdentifier getComponentIdentifier()
