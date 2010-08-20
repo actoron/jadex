@@ -231,8 +231,7 @@ public class VisualsPlugin implements IObserverCenterPlugin
 						IPerspective p = observerCenter_.getSelectedPerspective();
 						if (p instanceof Perspective2D)
 						{
-							Perspective2D pers = (Perspective2D) p;
-							pers.reset();
+							p.resetZoomAndPosition();
 						}
 					}
 				});

@@ -10,17 +10,12 @@ import jadex.application.space.envsupport.math.IVector2;
 import jadex.application.space.envsupport.math.Vector2Double;
 import jadex.application.space.envsupport.math.Vector3Double;
 import jadex.application.space.envsupport.observer.graphics.drawable.DrawableCombiner;
-import jadex.application.space.envsupport.observer.graphics.drawable.Ellipse;
-import jadex.application.space.envsupport.observer.graphics.drawable.IDrawable;
-import jadex.application.space.envsupport.observer.graphics.drawable.Rectangle;
+import jadex.application.space.envsupport.observer.graphics.drawable.Primitive;
 import jadex.application.space.envsupport.observer.graphics.drawable.RegularPolygon;
-import jadex.application.space.envsupport.observer.graphics.drawable.RotatingPrimitive;
 import jadex.application.space.envsupport.observer.graphics.drawable.Text;
 import jadex.application.space.envsupport.observer.graphics.drawable.TexturedRectangle;
-import jadex.application.space.envsupport.observer.graphics.drawable.Triangle;
-import jadex.application.space.envsupport.observer.graphics.layer.ColorLayer;
 import jadex.application.space.envsupport.observer.graphics.layer.GridLayer;
-import jadex.application.space.envsupport.observer.graphics.layer.ILayer;
+import jadex.application.space.envsupport.observer.graphics.layer.Layer;
 import jadex.application.space.envsupport.observer.graphics.layer.TiledLayer;
 import jadex.application.space.envsupport.observer.perspective.IPerspective;
 import jadex.application.space.envsupport.observer.perspective.Perspective2D;
@@ -406,7 +401,7 @@ public class MEnvSpaceType	extends MSpaceType
 //							System.out.println("prelayer: "+layer);
 							targetprelayers.add(((IObjectCreator)MEnvSpaceInstance.getProperty(layer, "creator")).createObject(layer));
 						}
-						((Perspective2D) ret).setPrelayers((ILayer[]) targetprelayers.toArray(new ILayer[0]));
+						((Perspective2D) ret).setPrelayers((Layer[]) targetprelayers.toArray(new Layer[0]));
 					}
 					
 					List postlayers = (List)args.get("postlayers");
@@ -419,7 +414,7 @@ public class MEnvSpaceType	extends MSpaceType
 //							System.out.println("postlayer: "+layer);
 							targetpostlayers.add(((IObjectCreator)MEnvSpaceInstance.getProperty(layer, "creator")).createObject(layer));
 						}
-						((Perspective2D) ret).setPostlayers((ILayer[]) targetpostlayers.toArray(new ILayer[0]));
+						((Perspective2D) ret).setPostlayers((Layer[]) targetpostlayers.toArray(new Layer[0]));
 					}
 					
 					return ret;
@@ -484,7 +479,7 @@ public class MEnvSpaceType	extends MSpaceType
 						{
 							Map sourcepart = (Map)parts.get(l);
 							int layer = MEnvSpaceInstance.getProperty(sourcepart, "layer")!=null? ((Integer)MEnvSpaceInstance.getProperty(sourcepart, "layer")).intValue(): 0;
-							ret.addDrawable((IDrawable)((IObjectCreator)MEnvSpaceInstance.getProperty(sourcepart, "creator")).createObject(sourcepart), layer);
+							ret.addPrimitive((Primitive)((IObjectCreator)MEnvSpaceInstance.getProperty(sourcepart, "creator")).createObject(sourcepart), layer);
 						}
 					}
 					
@@ -547,9 +542,9 @@ public class MEnvSpaceType	extends MSpaceType
 						size = Vector2Double.getVector2((Double)MEnvSpaceInstance.getProperty(args, "width"),
 							(Double)MEnvSpaceInstance.getProperty(args, "height"));
 					}
-					int absFlags = Boolean.TRUE.equals(MEnvSpaceInstance.getProperty(args, "abspos"))? RotatingPrimitive.ABSOLUTE_POSITION : 0;
-					absFlags |= Boolean.TRUE.equals(MEnvSpaceInstance.getProperty(args, "abssize"))? RotatingPrimitive.ABSOLUTE_SIZE : 0;
-					absFlags |= Boolean.TRUE.equals(MEnvSpaceInstance.getProperty(args, "absrot"))? RotatingPrimitive.ABSOLUTE_ROTATION : 0;
+					int absFlags = Boolean.TRUE.equals(MEnvSpaceInstance.getProperty(args, "abspos"))? Primitive.ABSOLUTE_POSITION : 0;
+					absFlags |= Boolean.TRUE.equals(MEnvSpaceInstance.getProperty(args, "abssize"))? Primitive.ABSOLUTE_SIZE : 0;
+					absFlags |= Boolean.TRUE.equals(MEnvSpaceInstance.getProperty(args, "absrot"))? Primitive.ABSOLUTE_ROTATION : 0;
 
 					IParsedExpression exp = (IParsedExpression)MEnvSpaceInstance.getProperty(args, "drawcondition");
 					return new TexturedRectangle(position, rotation, size, absFlags, MEnvSpaceInstance.getProperty(args, "color"), (String)MEnvSpaceInstance.getProperty(args, "imagepath"), exp);
@@ -602,12 +597,13 @@ public class MEnvSpaceType	extends MSpaceType
 							(Double)MEnvSpaceInstance.getProperty(args, "height"));
 					}
 					
-					int absFlags = Boolean.TRUE.equals(MEnvSpaceInstance.getProperty(args, "abspos"))? RotatingPrimitive.ABSOLUTE_POSITION : 0;
-					absFlags |= Boolean.TRUE.equals(MEnvSpaceInstance.getProperty(args, "abssize"))? RotatingPrimitive.ABSOLUTE_SIZE : 0;
-					absFlags |= Boolean.TRUE.equals(MEnvSpaceInstance.getProperty(args, "absrot"))? RotatingPrimitive.ABSOLUTE_ROTATION : 0;
+					int absFlags = Boolean.TRUE.equals(MEnvSpaceInstance.getProperty(args, "abspos"))? Primitive.ABSOLUTE_POSITION : 0;
+					absFlags |= Boolean.TRUE.equals(MEnvSpaceInstance.getProperty(args, "abssize"))? Primitive.ABSOLUTE_SIZE : 0;
+					absFlags |= Boolean.TRUE.equals(MEnvSpaceInstance.getProperty(args, "absrot"))? Primitive.ABSOLUTE_ROTATION : 0;
 					
 					IParsedExpression exp = (IParsedExpression)MEnvSpaceInstance.getProperty(args, "drawcondition");
-					return new Triangle(position, rotation, size, absFlags, MEnvSpaceInstance.getProperty(args, "color"), exp);
+					return new Primitive(Primitive.PRIMITIVE_TYPE_TRIANGLE, position, rotation, size, absFlags, MEnvSpaceInstance.getProperty(args, "color"), exp);
+					//return new Triangle(position, rotation, size, absFlags, MEnvSpaceInstance.getProperty(args, "color"), exp);
 				}
 			}, new BeanAccessInfo(AccessInfo.THIS)))
 			},
@@ -656,12 +652,13 @@ public class MEnvSpaceType	extends MSpaceType
 						size = Vector2Double.getVector2((Double)MEnvSpaceInstance.getProperty(args, "width"),
 							(Double)MEnvSpaceInstance.getProperty(args, "height"));
 					}
-					int absFlags = Boolean.TRUE.equals(MEnvSpaceInstance.getProperty(args, "abspos"))? RotatingPrimitive.ABSOLUTE_POSITION : 0;
-					absFlags |= Boolean.TRUE.equals(MEnvSpaceInstance.getProperty(args, "abssize"))? RotatingPrimitive.ABSOLUTE_SIZE : 0;
-					absFlags |= Boolean.TRUE.equals(MEnvSpaceInstance.getProperty(args, "absrot"))? RotatingPrimitive.ABSOLUTE_ROTATION : 0;
+					int absFlags = Boolean.TRUE.equals(MEnvSpaceInstance.getProperty(args, "abspos"))? Primitive.ABSOLUTE_POSITION : 0;
+					absFlags |= Boolean.TRUE.equals(MEnvSpaceInstance.getProperty(args, "abssize"))? Primitive.ABSOLUTE_SIZE : 0;
+					absFlags |= Boolean.TRUE.equals(MEnvSpaceInstance.getProperty(args, "absrot"))? Primitive.ABSOLUTE_ROTATION : 0;
 					
 					IParsedExpression exp = (IParsedExpression)MEnvSpaceInstance.getProperty(args, "drawcondition");
-					return new Rectangle(position, rotation, size, absFlags, MEnvSpaceInstance.getProperty(args, "color"), exp);
+					return new Primitive(Primitive.PRIMITIVE_TYPE_RECTANGLE, position, rotation, size, absFlags, MEnvSpaceInstance.getProperty(args, "color"), exp);
+					//return new Rectangle(position, rotation, size, absFlags, MEnvSpaceInstance.getProperty(args, "color"), exp);
 				}
 			}, new BeanAccessInfo(AccessInfo.THIS)))
 			},
@@ -712,9 +709,9 @@ public class MEnvSpaceType	extends MSpaceType
 							(Double)MEnvSpaceInstance.getProperty(args, "height"));
 					}
 					
-					int absFlags = Boolean.TRUE.equals(MEnvSpaceInstance.getProperty(args, "abspos"))? RotatingPrimitive.ABSOLUTE_POSITION : 0;
-					absFlags |= Boolean.TRUE.equals(MEnvSpaceInstance.getProperty(args, "abssize"))? RotatingPrimitive.ABSOLUTE_SIZE : 0;
-					absFlags |= Boolean.TRUE.equals(MEnvSpaceInstance.getProperty(args, "absrot"))? RotatingPrimitive.ABSOLUTE_ROTATION : 0;
+					int absFlags = Boolean.TRUE.equals(MEnvSpaceInstance.getProperty(args, "abspos"))? Primitive.ABSOLUTE_POSITION : 0;
+					absFlags |= Boolean.TRUE.equals(MEnvSpaceInstance.getProperty(args, "abssize"))? Primitive.ABSOLUTE_SIZE : 0;
+					absFlags |= Boolean.TRUE.equals(MEnvSpaceInstance.getProperty(args, "absrot"))? Primitive.ABSOLUTE_ROTATION : 0;
 					
 					int vertices  = MEnvSpaceInstance.getProperty(args, "vertices")==null? 3: 
 						((Integer)MEnvSpaceInstance.getProperty(args, "vertices")).intValue();
@@ -770,12 +767,13 @@ public class MEnvSpaceType	extends MSpaceType
 							(Double)MEnvSpaceInstance.getProperty(args, "height"));
 					}
 					
-					int absFlags = Boolean.TRUE.equals(MEnvSpaceInstance.getProperty(args, "abspos"))? RotatingPrimitive.ABSOLUTE_POSITION : 0;
-					absFlags |= Boolean.TRUE.equals(MEnvSpaceInstance.getProperty(args, "abssize"))? RotatingPrimitive.ABSOLUTE_SIZE : 0;
-					absFlags |= Boolean.TRUE.equals(MEnvSpaceInstance.getProperty(args, "absrot"))? RotatingPrimitive.ABSOLUTE_ROTATION : 0;
+					int absFlags = Boolean.TRUE.equals(MEnvSpaceInstance.getProperty(args, "abspos"))? Primitive.ABSOLUTE_POSITION : 0;
+					absFlags |= Boolean.TRUE.equals(MEnvSpaceInstance.getProperty(args, "abssize"))? Primitive.ABSOLUTE_SIZE : 0;
+					absFlags |= Boolean.TRUE.equals(MEnvSpaceInstance.getProperty(args, "absrot"))? Primitive.ABSOLUTE_ROTATION : 0;
 					
 					IParsedExpression exp = (IParsedExpression)MEnvSpaceInstance.getProperty(args, "drawcondition");
-					return new Ellipse(position, rotation, size, absFlags, MEnvSpaceInstance.getProperty(args, "color"), exp);
+					return new Primitive(Primitive.PRIMITIVE_TYPE_ELLIPSE, position, rotation, size, absFlags, MEnvSpaceInstance.getProperty(args, "color"), exp);
+					//return new Ellipse(position, rotation, size, absFlags, MEnvSpaceInstance.getProperty(args, "color"), exp);
 				}
 			}, new BeanAccessInfo(AccessInfo.THIS)))
 			},
@@ -839,8 +837,8 @@ public class MEnvSpaceType	extends MSpaceType
 					else if (aligntxt.equals("center"))
 						align = Text.ALIGN_CENTER;
 					
-					int absFlags = Boolean.TRUE.equals(MEnvSpaceInstance.getProperty(args, "abspos"))? RotatingPrimitive.ABSOLUTE_POSITION : 0;
-					absFlags |= Boolean.TRUE.equals(MEnvSpaceInstance.getProperty(args, "abssize"))? RotatingPrimitive.ABSOLUTE_SIZE : 0;
+					int absFlags = Boolean.TRUE.equals(MEnvSpaceInstance.getProperty(args, "abspos"))? Primitive.ABSOLUTE_POSITION : 0;
+					absFlags |= Boolean.TRUE.equals(MEnvSpaceInstance.getProperty(args, "abssize"))? Primitive.ABSOLUTE_SIZE : 0;
 					
 					IParsedExpression exp = (IParsedExpression)MEnvSpaceInstance.getProperty(args, "drawcondition");
 					return new Text(position, font, (Color)MEnvSpaceInstance.getProperty(args, "color"), text, align, absFlags, exp);
@@ -894,7 +892,7 @@ public class MEnvSpaceType	extends MSpaceType
 			{
 				public Object createObject(Map args) throws Exception
 				{
-					return new ColorLayer(MEnvSpaceInstance.getProperty(args, "color"));
+					return new Layer(Layer.LAYER_TYPE_COLOR, MEnvSpaceInstance.getProperty(args, "color"));
 				}
 			}, new BeanAccessInfo(AccessInfo.THIS)))
 			})));

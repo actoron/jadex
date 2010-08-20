@@ -2,7 +2,9 @@ package jadex.application.space.envsupport.observer.graphics;
 
 
 import jadex.application.space.envsupport.math.IVector2;
-import jadex.application.space.envsupport.observer.graphics.layer.ILayer;
+import jadex.application.space.envsupport.observer.graphics.drawable.DrawableCombiner;
+import jadex.application.space.envsupport.observer.graphics.drawable.Primitive;
+import jadex.application.space.envsupport.observer.graphics.layer.Layer;
 import jadex.application.space.envsupport.observer.perspective.IPerspective;
 
 import java.awt.Canvas;
@@ -107,14 +109,14 @@ public interface IViewport
 	 * 
 	 * @param layers new layers
 	 */
-	public void setPreLayers(ILayer[] layer);
+	public void setPreLayers(Layer[] layer);
 
 	/**
 	 * Sets the layers that are applied after the drawables are drawn.
 	 * 
 	 * @param layers new layers
 	 */
-	public void setPostLayers(ILayer[] layer);
+	public void setPostLayers(Layer[] layer);
 
 	/**
 	 * Sets the current objects to draw.
@@ -174,4 +176,12 @@ public interface IViewport
 	 *  @return The perspective.
 	 */
 	public IPerspective getPerspective();
+	
+	/**
+	 *  Draws a primitive
+	 *  @param dc The combiner.
+	 *  @param primitive The primitive.
+	 *  @param obj The object being drawn.
+	 */
+	public void drawPrimitive(DrawableCombiner dc, Primitive primitive, Object obj);
 }

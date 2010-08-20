@@ -1,8 +1,10 @@
-package jadex.application.space.envsupport.observer.graphics;
+package jadex.application.space.envsupport.observer.graphics.java2d;
 
 import jadex.application.space.envsupport.math.IVector2;
+import jadex.application.space.envsupport.observer.graphics.AbstractViewport;
 import jadex.application.space.envsupport.observer.graphics.drawable.DrawableCombiner;
-import jadex.application.space.envsupport.observer.graphics.layer.ILayer;
+import jadex.application.space.envsupport.observer.graphics.drawable.Primitive;
+import jadex.application.space.envsupport.observer.graphics.layer.Layer;
 import jadex.application.space.envsupport.observer.perspective.IPerspective;
 import jadex.service.library.ILibraryService;
 
@@ -40,6 +42,27 @@ public class ViewportJ2D extends AbstractViewport implements ComponentListener
 	
 	/** The default transform */
 	private AffineTransform defaultTransform_;
+	
+	/** The renderers. */
+	private static final IJ2DRenderer[] RENDERERS = new IJ2DRenderer[6];
+	static
+	{
+		RENDERERS[0] = new EllipseJ2DRenderer();
+		RENDERERS[1] = new RectangleJ2DRenderer();
+		RENDERERS[2] = new RegularPolygonJ2DRenderer();
+		RENDERERS[3] = new TextJ2DRenderer();
+		RENDERERS[4] = new TexturedRectangleJ2DRenderer();
+		RENDERERS[5] = new TriangleJ2DRenderer();
+	}
+	
+	/** The layer renderers. */
+	private static final ILayerJ2DRenderer[] LAYER_RENDERERS = new ILayerJ2DRenderer[3];
+	static
+	{
+		LAYER_RENDERERS[0] = new ColorLayerJ2DRenderer();
+		LAYER_RENDERERS[1] = new GridLayerJ2DRenderer();
+		LAYER_RENDERERS[2] = new TiledLayerJ2DRenderer();
+	}
 
 	/**
 	 * Creates a new Viewport.
@@ -130,7 +153,18 @@ public class ViewportJ2D extends AbstractViewport implements ComponentListener
 				/ (double)sizeY);
 		return imageTransform;
 	}
-
+	
+	/**
+	 *  Draws a primitive
+	 *  @param dc The combiner.
+	 *  @param primitive The primitive.
+	 *  @param obj The object being drawn.
+	 */
+	public void drawPrimitive(DrawableCombiner dc, Primitive primitive, Object obj)
+	{
+		RENDERERS[primitive.getType()].prepareAndExecuteDraw(dc, primitive, obj, this);
+	}
+	
 	// Component events
 	public void componentHidden(ComponentEvent e)
 	{
@@ -239,12 +273,8 @@ public class ViewportJ2D extends AbstractViewport implements ComponentListener
 				{
 					for (int i = 0; i < preLayers_.length; ++i)
 					{
-						ILayer l = preLayers_[i];
-						if (!drawObjects_.contains(l))
-						{
-							l.init(ViewportJ2D.this, g);
-						}
-						l.draw(perspective, areaSize_, ViewportJ2D.this, g);
+						Layer l = preLayers_[i];
+						LAYER_RENDERERS[l.getType()].draw(getPerspective(), l, areaSize_, ViewportJ2D.this);
 					}
 				}
 
@@ -259,7 +289,7 @@ public class ViewportJ2D extends AbstractViewport implements ComponentListener
 							DrawableCombiner d = (DrawableCombiner) o[1];
 							if (!drawObjects_.contains(d))
 							{
-								d.init(ViewportJ2D.this);
+								//d.init(ViewportJ2D.this);
 								drawObjects_.add(d);
 							}
 							objectLayers_.addAll(d.getLayers());
@@ -295,12 +325,8 @@ public class ViewportJ2D extends AbstractViewport implements ComponentListener
 				{
 					for (int i = 0; i < postLayers_.length; ++i)
 					{
-						ILayer l = postLayers_[i];
-						if (!drawObjects_.contains(l))
-						{
-							l.init(ViewportJ2D.this, g);
-						}
-						l.draw(perspective, areaSize_, ViewportJ2D.this, g);
+						Layer l = postLayers_[i];
+						LAYER_RENDERERS[l.getType()].draw(getPerspective(), l, areaSize_, ViewportJ2D.this);
 					}
 				}
 				

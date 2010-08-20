@@ -77,7 +77,12 @@ public interface IPerspective extends ITypedPropertyObject
 	public boolean getOpenGl();
 	
 	/**
-	 * Resets the perspective.
+	 * Resets position of the perspective.
+	 */
+	public void resetZoomAndPosition();
+	
+	/**
+	 * Resets position and flushes render info
 	 */
 	public void reset();
 	
@@ -85,5 +90,5 @@ public interface IPerspective extends ITypedPropertyObject
 	 *  Sets whether to try to use OpenGL.
 	 *  @param opengl true, if attempt should be made to use OpenGL
 	 */
-	public void setOpenGl(boolean opengl);
+	public boolean setOpenGl(boolean opengl);
 }

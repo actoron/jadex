@@ -3,7 +3,7 @@ package jadex.application.space.envsupport.observer.graphics;
 import jadex.application.space.envsupport.math.IVector2;
 import jadex.application.space.envsupport.math.Vector2Double;
 import jadex.application.space.envsupport.math.Vector2Int;
-import jadex.application.space.envsupport.observer.graphics.layer.ILayer;
+import jadex.application.space.envsupport.observer.graphics.layer.Layer;
 import jadex.application.space.envsupport.observer.perspective.IPerspective;
 import jadex.service.library.ILibraryService;
 
@@ -74,10 +74,10 @@ public abstract class AbstractViewport implements IViewport
 	protected List				objectList_;
 
 	/** Layers applied before drawable rendering */
-	protected ILayer[]				preLayers_;
+	protected Layer[]				preLayers_;
 
 	/** Layers applied after drawable rendering */
-	protected ILayer[]				postLayers_;
+	protected Layer[]				postLayers_;
 	
 	/** IPropertyObject holding properties for layers. */
 	protected IPerspective perspective;
@@ -105,8 +105,8 @@ public abstract class AbstractViewport implements IViewport
 		drawObjects_ = Collections.synchronizedSet(new HashSet());
 		objectLayers_ = Collections.synchronizedSortedSet(new TreeSet());
 		objectList_ = Collections.synchronizedList(new ArrayList());
-		preLayers_ = new ILayer[0];
-		postLayers_ = new ILayer[0];
+		preLayers_ = new Layer[0];
+		postLayers_ = new Layer[0];
 		listeners_ = Collections.synchronizedSet(new HashSet());
 		zoomLimit_ = 20.0;
 	}
@@ -147,7 +147,7 @@ public abstract class AbstractViewport implements IViewport
 	 * 
 	 * @param layers the pre-layers
 	 */
-	public void setPreLayers(ILayer[] layers)
+	public void setPreLayers(Layer[] layers)
 	{
 		synchronized(preLayers_)
 		{
@@ -157,7 +157,7 @@ public abstract class AbstractViewport implements IViewport
 			}
 			else
 			{
-				preLayers_ = new ILayer[0];
+				preLayers_ = new Layer[0];
 			}
 		}
 	}
@@ -167,7 +167,7 @@ public abstract class AbstractViewport implements IViewport
 	 * 
 	 * @param layers the post-layers
 	 */
-	public void setPostLayers(ILayer[] layers)
+	public void setPostLayers(Layer[] layers)
 	{
 		synchronized(postLayers_)
 		{
@@ -177,7 +177,7 @@ public abstract class AbstractViewport implements IViewport
 			}
 			else
 			{
-				postLayers_ = new ILayer[0];
+				postLayers_ = new Layer[0];
 			}
 		}
 	}

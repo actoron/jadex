@@ -1,39 +1,28 @@
 package jadex.application.space.envsupport.observer.graphics.drawable;
 
-import jadex.application.space.envsupport.math.IVector2;
-import jadex.application.space.envsupport.observer.graphics.ModulateComposite;
-import jadex.application.space.envsupport.observer.graphics.ViewportJ2D;
-import jadex.application.space.envsupport.observer.graphics.ViewportJOGL;
 import jadex.javaparser.IParsedExpression;
-
-import java.awt.Color;
-import java.awt.Composite;
-import java.awt.Graphics2D;
-import java.awt.image.BufferedImage;
-
-import javax.media.opengl.GL;
 
 /**
  * 
  */
-public class TexturedRectangle extends ColoredPrimitive
+public class TexturedRectangle extends Primitive
 {
-	private static final long	serialVersionUID	= 0L;
+	private static final long	serialVersionUID	= 1L;
 
 	/** Texture path. */
 	protected String			texturePath_;
 
 	/** Texture ID for OpenGL operations. */
-	private int					texture_;
+	//private int					texture_;
 
 	/** Image for Java2D operations. */
-	private BufferedImage		image_;
+	//private BufferedImage		image_;
 	
 	/** Composite for modulating in Java2D */
-	private Composite modComposite_;
+	//private Composite modComposite_;
 	
 	/** Current color value */
-	private Color currentColor_;
+	//private Color currentColor_;
 
 	/**
 	 * Creates default TexturedRectangle.
@@ -43,9 +32,10 @@ public class TexturedRectangle extends ColoredPrimitive
 	public TexturedRectangle(String texturePath)
 	{
 		super();
+		type = Primitive.PRIMITIVE_TYPE_TEXTUREDRECTANGLE;
 		texturePath_ = texturePath;
-		texture_ = 0;
-		image_ = null;
+		//texture_ = 0;
+		//image_ = null;
 	}
 
 	/**
@@ -62,87 +52,27 @@ public class TexturedRectangle extends ColoredPrimitive
 	 */
 	public TexturedRectangle(Object position, Object rotation, Object size, int absFlags, Object c, String texturePath, IParsedExpression drawcondition)
 	{
-		super(position, rotation, size, absFlags, c, drawcondition);
-		
+		super(Primitive.PRIMITIVE_TYPE_TEXTUREDRECTANGLE, position, rotation, size, absFlags, c, drawcondition);
 		texturePath_ = texturePath;
-		texture_ = 0;
-		image_ = null;
+		//texture_ = 0;
+		//image_ = null;
 	}
-
-	public void init(ViewportJ2D vp)
+	
+	/**
+	 *  Set the primitive type (Disabled).
+	 *  @param type The type to set.
+	 */
+	public void setType(int type)
 	{
-		image_ = vp.getImage(texturePath_);
-		modComposite_ = new ModulateComposite()
-			{
-				protected Color getColor()
-				{
-					return currentColor_;
-				}
-			};
+		throw new RuntimeException("Set type not supported: " + getClass().getCanonicalName());
 	}
-
-	public void init(ViewportJOGL vp)
+	
+	/**
+	 *  Returns the texture path.
+	 *  @return The texture path.
+	 */
+	public String getTexturePath()
 	{
-		//texture_ = vp.getClampedTexture(vp.getContext(), texturePath_);
-		texture_ = vp.getTexture(vp.getContext(), texturePath_);
-	}
-
-	public synchronized void doDraw(DrawableCombiner dc, Object obj, ViewportJ2D vp)
-	{
-		Graphics2D g = vp.getContext();
-		
-		IVector2 size = (IVector2)dc.getBoundValue(obj, getSize(), vp);
-		
-		BufferedImage image = image_;
-		
-		g.translate(-size.getXAsDouble() / 2.0, -size.getYAsDouble() / 2.0);
-		if (!setupMatrix(dc, obj, g, vp))
-			return;
-		
-		currentColor_ = (Color) dc.getBoundValue(obj, color_, vp);
-		
-		if (!Color.WHITE.equals(currentColor_))
-		{
-			Composite c = g.getComposite();
-			g.setComposite(modComposite_);
-			g.drawImage(image, vp.getImageTransform(image.getWidth(), image
-					.getHeight()), null);
-			g.setComposite(c);
-		}
-		else
-		{
-			g.drawImage(image, vp.getImageTransform(image.getWidth(), image
-					.getHeight()), null);
-		}
-	}
-
-	public synchronized void doDraw(DrawableCombiner dc, Object obj, ViewportJOGL vp)
-	{
-		GL gl = vp.getContext();
-		gl.glEnable(GL.GL_TEXTURE_2D);
-		gl.glBindTexture(GL.GL_TEXTURE_2D, texture_);
-		
-		gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_S, GL.GL_CLAMP_TO_EDGE);
-		gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_T, GL.GL_CLAMP_TO_EDGE);
-		
-		currentColor_ = (Color) dc.getBoundValue(obj, color_, vp);
-		
-		gl.glColor4fv(currentColor_.getComponents(null), 0);
-		
-		if(setupMatrix(dc, obj, gl, vp));
-		{
-			gl.glBegin(GL.GL_QUADS);
-			gl.glTexCoord2f(0.0f, 0.0f);
-			gl.glVertex2f(-0.5f, -0.5f);
-			gl.glTexCoord2f(1.0f, 0.0f);
-			gl.glVertex2f(0.5f, -0.5f);
-			gl.glTexCoord2f(1.0f, 1.0f);
-			gl.glVertex2f(0.5f, 0.5f);
-			gl.glTexCoord2f(0.0f, 1.0f);
-			gl.glVertex2f(-0.5f, 0.5f);
-			gl.glEnd();
-
-			gl.glDisable(GL.GL_TEXTURE_2D);
-		}
+		return texturePath_;
 	}
 }

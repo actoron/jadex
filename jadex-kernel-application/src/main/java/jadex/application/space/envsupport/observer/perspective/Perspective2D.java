@@ -7,12 +7,11 @@ import jadex.application.space.envsupport.math.Vector1Double;
 import jadex.application.space.envsupport.math.Vector2Double;
 import jadex.application.space.envsupport.observer.graphics.IViewport;
 import jadex.application.space.envsupport.observer.graphics.IViewportListener;
-import jadex.application.space.envsupport.observer.graphics.ViewportJ2D;
-import jadex.application.space.envsupport.observer.graphics.ViewportJOGL;
 import jadex.application.space.envsupport.observer.graphics.drawable.DrawableCombiner;
-import jadex.application.space.envsupport.observer.graphics.drawable.IDrawable;
+import jadex.application.space.envsupport.observer.graphics.drawable.Primitive;
 import jadex.application.space.envsupport.observer.graphics.drawable.TexturedRectangle;
-import jadex.application.space.envsupport.observer.graphics.layer.ILayer;
+import jadex.application.space.envsupport.observer.graphics.java2d.ViewportJ2D;
+import jadex.application.space.envsupport.observer.graphics.layer.Layer;
 import jadex.application.space.envsupport.observer.gui.ObserverCenter;
 import jadex.application.space.envsupport.observer.gui.SObjectInspector;
 import jadex.commons.meta.TypedPropertyObject;
@@ -24,10 +23,13 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.EventQueue;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -82,10 +84,10 @@ public class Perspective2D extends TypedPropertyObject implements IPerspective
 	protected Map visuals;
 	
 	/** The prelayers */
-	protected ILayer[] prelayers;
+	protected Layer[] prelayers;
 	
 	/** The postlayers */
-	protected ILayer[] postlayers;
+	protected Layer[] postlayers;
 	
 	/** The marker drawable combiner */
 	protected DrawableCombiner marker;
@@ -110,8 +112,8 @@ public class Perspective2D extends TypedPropertyObject implements IPerspective
 		zoomlimit = 20.0;
 		setBackground(null);
 		this.visuals = Collections.synchronizedMap(new HashMap());
-		this.prelayers = new ILayer[0];
-		this.postlayers = new ILayer[0];
+		this.prelayers = new Layer[0];
+		this.postlayers = new Layer[0];
 		
 		this.objectShift = new Vector2Double();
 		this.selectorDistance = new Vector1Double(1.0);
@@ -236,7 +238,7 @@ public class Perspective2D extends TypedPropertyObject implements IPerspective
 	 * Returns the prelayers.
 	 * @return the prelayers
 	 */
-	public ILayer[] getPrelayers()
+	public Layer[] getPrelayers()
 	{
 		return prelayers;
 	}
@@ -245,7 +247,7 @@ public class Perspective2D extends TypedPropertyObject implements IPerspective
 	 * Sets the prelayers.
 	 * @param prelayers the prelayers
 	 */
-	public void setPrelayers(ILayer[] prelayers)
+	public void setPrelayers(Layer[] prelayers)
 	{
 		this.prelayers = prelayers;
 	}
@@ -254,7 +256,7 @@ public class Perspective2D extends TypedPropertyObject implements IPerspective
 	 * Returns the Postlayers.
 	 * @return the Postlayers
 	 */
-	public ILayer[] getPostlayers()
+	public Layer[] getPostlayers()
 	{
 		return postlayers;
 	}
@@ -263,7 +265,7 @@ public class Perspective2D extends TypedPropertyObject implements IPerspective
 	 * Sets the Postlayers.
 	 * @param Postlayers the Postlayers
 	 */
-	public void setPostlayers(ILayer[] postlayers)
+	public void setPostlayers(Layer[] postlayers)
 	{
 		this.postlayers = postlayers;
 	}
@@ -297,8 +299,8 @@ public class Perspective2D extends TypedPropertyObject implements IPerspective
 			if(marker == null)
 			{
 				marker = new DrawableCombiner();
-				IDrawable markerDrawable = new TexturedRectangle(getClass().getPackage().getName().replaceAll("perspective", "").concat("images.").replaceAll("\\.", "/").concat("selection_marker.png"));
-				marker.addDrawable(markerDrawable, Integer.MAX_VALUE);
+				Primitive markerPrimitive = new TexturedRectangle(getClass().getPackage().getName().replaceAll("perspective", "").concat("images.").replaceAll("\\.", "/").concat("selection_marker.png"));
+				marker.addPrimitive(markerPrimitive, Integer.MAX_VALUE);
 			}
 //			System.out.println("Persp: "+name+" opengl="+tryopengl);
 			viewport = createViewport(this, obscenter.getLibraryService(), bgColor, tryopengl);
@@ -333,14 +335,26 @@ public class Perspective2D extends TypedPropertyObject implements IPerspective
 	 * Sets whether to try to use OpenGL.
 	 * @param opengl true, if attempt should be made to use OpenGL
 	 */
-	public void setOpenGl(boolean opengl)
+	public boolean setOpenGl(boolean opengl)
 	{
 		this.tryopengl = opengl;
 		if (viewport != null)
 		{
 			viewport = null;
 			getView();
+			try
+			{
+				if (!Class.forName("jadex.application.space.envsupport.observer.graphics.opengl.ViewportJOGL",
+						true,
+						Thread.currentThread().getContextClassLoader()).isInstance(viewport))
+					return false;
+			}
+			catch (ClassNotFoundException e)
+			{
+				return false;
+			}
 		}
+		return true;
 	}
 	
 	/**
@@ -513,11 +527,38 @@ public class Perspective2D extends TypedPropertyObject implements IPerspective
 	}
 	
 	/**
-	 * Resets the zoom and position.
+	 * Resets position and flushes render info
 	 */
 	public void reset()
 	{
+		flushRenderInfo();
+		resetZoomAndPosition();
+	}
+	
+	/**
+	 * Resets the zoom and position.
+	 */
+	public void resetZoomAndPosition()
+	{
 		viewport.setAreaSize(obscenter.getAreaSize());
+	}
+	
+	/**
+	 *  Flushes the render information.
+	 */
+	public void flushRenderInfo()
+	{
+		synchronized(visuals)
+		{
+			for (Iterator it = visuals.values().iterator(); it.hasNext(); )
+				((DrawableCombiner) it.next()).flushRenderInfo();
+		}
+		
+		for (int i = 0; i < prelayers.length; ++i)
+			prelayers[i].flushRenderInfo();
+		
+		for (int i = 0; i < postlayers.length; ++i)
+			postlayers[i].flushRenderInfo();
 	}
 	
 	/**
@@ -605,26 +646,51 @@ public class Perspective2D extends TypedPropertyObject implements IPerspective
 			// Try OpenGL...
 			try
 			{
-				ViewportJOGL vp = new ViewportJOGL(persp, libService);
+				Constructor con = Class.forName("jadex.application.space.envsupport.observer.graphics.opengl.ViewportJOGL",
+												true,
+												Thread.currentThread().getContextClassLoader())
+													.getConstructor(new Class[] {IPerspective.class, ILibraryService.class});
+				IViewport vp =  (IViewport) con.newInstance(new Object[] {persp, libService});
+				//new ViewportJOGL(persp, libService);
 				frame.add(vp.getCanvas());
 				frame.setVisible(true);
-				if (!vp.isValid())
+				if (Boolean.FALSE.equals(vp.getClass().getMethod("isValid", new Class[] {}).invoke(vp, new Object[0])))
 				{
 					System.err.println("OpenGL support insufficient, using Java2D fallback...");
 					tryopengl = false;
 				}
 				frame.dispose();
 			}
-			catch (RuntimeException e0)
+			catch (ClassNotFoundException e)
 			{
-				System.err.println("OpenGL initialization failed, using Java2D fallback...");
-				System.err.println(e0);
 				tryopengl = false;
 			}
-			catch (Error e1)
+			catch (NoSuchMethodException e)
+			{
+				tryopengl = false;
+			}
+			catch (InvocationTargetException e)
+			{
+				tryopengl = false;
+			}
+			catch (IllegalAccessException e)
+			{
+				tryopengl = false;
+			}
+			catch (InstantiationException e)
+			{
+				tryopengl = false;
+			}
+			catch (RuntimeException e)
 			{
 				System.err.println("OpenGL initialization failed, using Java2D fallback...");
-				System.err.println(e1);
+				System.err.println(e);
+				tryopengl = false;
+			}
+			catch (Error e)
+			{
+				System.err.println("OpenGL initialization failed, using Java2D fallback...");
+				System.err.println(e);
 				tryopengl = false;
 			}
 		}
@@ -632,7 +698,17 @@ public class Perspective2D extends TypedPropertyObject implements IPerspective
 		IViewport viewport = null;
 		if (tryopengl)
 		{
-			viewport = new ViewportJOGL(persp, libService);
+			try
+			{
+				Constructor con = Class.forName("jadex.application.space.envsupport.observer.graphics.opengl.ViewportJOGL",
+												true,
+												Thread.currentThread().getContextClassLoader())
+													.getConstructor(new Class[] {IPerspective.class, ILibraryService.class});
+				viewport = (IViewport) con.newInstance(new Object[] {persp, libService});
+			}
+			catch (Exception e0)
+			{
+			}
 		}
 		else
 		{

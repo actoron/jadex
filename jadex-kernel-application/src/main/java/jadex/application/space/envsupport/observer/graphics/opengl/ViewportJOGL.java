@@ -1,9 +1,12 @@
-package jadex.application.space.envsupport.observer.graphics;
+package jadex.application.space.envsupport.observer.graphics.opengl;
 
 import jadex.application.space.envsupport.math.IVector2;
 import jadex.application.space.envsupport.math.Vector2Double;
+import jadex.application.space.envsupport.observer.graphics.AbstractViewport;
+import jadex.application.space.envsupport.observer.graphics.JOGLNativeLoader;
 import jadex.application.space.envsupport.observer.graphics.drawable.DrawableCombiner;
-import jadex.application.space.envsupport.observer.graphics.layer.ILayer;
+import jadex.application.space.envsupport.observer.graphics.drawable.Primitive;
+import jadex.application.space.envsupport.observer.graphics.layer.Layer;
 import jadex.application.space.envsupport.observer.perspective.IPerspective;
 import jadex.commons.SUtil;
 import jadex.service.library.ILibraryService;
@@ -90,6 +93,27 @@ public class ViewportJOGL extends AbstractViewport
 	
 	/** OpenGL thread execution queue */
 	private List glQueue_;
+	
+	/** The renderers. */
+	private static final IGLRenderer[] RENDERERS = new IGLRenderer[6];
+	static
+	{
+		RENDERERS[0] = new EllipseGLRenderer();
+		RENDERERS[1] = new RectangleGLRenderer();
+		RENDERERS[2] = new RegularPolygonGLRenderer();
+		RENDERERS[3] = new TextGLRenderer();
+		RENDERERS[4] = new TexturedRectangleGLRenderer();
+		RENDERERS[5] = new TriangleGLRenderer();
+	}
+	
+	/** The layer renderers. */
+	private static final ILayerGLRenderer[] LAYER_RENDERERS = new ILayerGLRenderer[3];
+	static
+	{
+		LAYER_RENDERERS[0] = new ColorLayerGLRenderer();
+		LAYER_RENDERERS[1] = new GridLayerGLRenderer();
+		LAYER_RENDERERS[2] = new TiledLayerGLRenderer();
+	}
 
 	/**
 	 * Creates a new OpenGL-based viewport. May throw UnsatisfiedLinkError and
@@ -307,6 +331,17 @@ public class ViewportJOGL extends AbstractViewport
 	{
 		return context_;
 	}
+	
+	/**
+	 *  Draws a primitive
+	 *  @param dc The combiner.
+	 *  @param primitive The primitive.
+	 *  @param obj The object being drawn.
+	 */
+	public void drawPrimitive(DrawableCombiner dc, Primitive primitive, Object obj)
+	{
+		RENDERERS[primitive.getType()].prepareAndExecuteDraw(dc, primitive, obj, this);
+	}
 
 	private void setupMatrix(GL gl)
 	{
@@ -495,12 +530,8 @@ public class ViewportJOGL extends AbstractViewport
 			{
 				for (int i = 0; i < preLayers_.length; ++i)
 				{
-					ILayer l = preLayers_[i];
-					if (!drawObjects_.contains(l))
-					{
-						l.init(ViewportJOGL.this, gl);
-					}
-					l.draw(perspective, areaSize_, ViewportJOGL.this, gl);
+					Layer l = preLayers_[i];
+					LAYER_RENDERERS[l.getType()].draw(getPerspective(), l, areaSize_, ViewportJOGL.this);
 				}
 			}
 			
@@ -515,7 +546,7 @@ public class ViewportJOGL extends AbstractViewport
 						DrawableCombiner d = (DrawableCombiner) o[1];
 						if (!drawObjects_.contains(d))
 						{
-							d.init(ViewportJOGL.this);
+							//d.init(ViewportJOGL.this);
 							drawObjects_.add(d);
 						}
 						objectLayers_.addAll(d.getLayers());
@@ -552,12 +583,8 @@ public class ViewportJOGL extends AbstractViewport
 			{
 				for (int i = 0; i < postLayers_.length; ++i)
 				{
-					ILayer l = postLayers_[i];
-					if (!drawObjects_.contains(l))
-					{
-						l.init(ViewportJOGL.this, gl);
-					}
-					l.draw(perspective, areaSize_, ViewportJOGL.this, gl);
+					Layer l = postLayers_[i];
+					LAYER_RENDERERS[l.getType()].draw(getPerspective(), l, areaSize_, ViewportJOGL.this);
 				}
 			}
 			
