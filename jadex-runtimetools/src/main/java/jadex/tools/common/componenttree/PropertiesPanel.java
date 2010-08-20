@@ -42,7 +42,7 @@ public class PropertiesPanel	extends	JPanel
 
 		this.gbc	= new GridBagConstraints();
 		gbc.gridy	= 0;
-		gbc.anchor	= GridBagConstraints.NORTHWEST;
+		gbc.anchor	= GridBagConstraints.WEST;
 		gbc.fill	= GridBagConstraints.HORIZONTAL;
 		gbc.insets	= new Insets(1,1,1,1);
 		
@@ -63,6 +63,14 @@ public class PropertiesPanel	extends	JPanel
 	}
 	
 	/**
+	 *  Get a component.
+	 */
+	public JComponent	getComponent(String name)
+	{
+		return (JComponent)components.get(name);
+	}
+	
+	/**
 	 *  Get a check box.
 	 */
 	public JCheckBox	getCheckBox(String name)
@@ -77,20 +85,7 @@ public class PropertiesPanel	extends	JPanel
 	{
 		JTextField	tf	= new JTextField();
 		tf.setEditable(false);
-		components.put(name, tf);
-
-		remove(dummy);
-		
-		gbc.weightx	= 0;
-		add(new JLabel(name), gbc);
-		gbc.weightx	= 1;
-		add(tf, gbc);
-		gbc.gridy++;
-		
-		gbc.weighty	= 1;
-		add(dummy, gbc);
-		gbc.weighty	= 0;
-
+		addComponent(name, tf);
 	}
 	
 	/**
@@ -101,18 +96,51 @@ public class PropertiesPanel	extends	JPanel
 		JCheckBox	cb	= new JCheckBox("");
 		cb.setMargin(new Insets(0,0,0,0));
 		cb.setEnabled(false);
-		components.put(name, cb);
+		addComponent(name, cb);
+	}
+	
+	/**
+	 *  Add a component
+	 */
+	protected void	addComponent(String name, JComponent comp)
+	{
+		components.put(name, comp);
 
 		remove(dummy);
 
 		gbc.weightx	= 0;
+		gbc.gridwidth	= 1;
 		add(new JLabel(name), gbc);
 		gbc.weightx	= 1;
-		add(cb, gbc);
+		gbc.gridwidth	= GridBagConstraints.REMAINDER;
+		add(comp, gbc);
+		gbc.gridy++;
+		
+		gbc.weighty	= 1;
+		gbc.gridwidth	= GridBagConstraints.REMAINDER;
+		add(dummy, gbc);
+		gbc.gridwidth	= 1;
+		gbc.weighty	= 0;
+	}
+	
+	/**
+	 *  Add a component that spans a full line.
+	 *  No label is rendered.
+	 */
+	protected void	addFullLineComponent(String name, JComponent comp)
+	{
+		components.put(name, comp);
+
+		remove(dummy);
+
+		gbc.weightx	= 1;
+		gbc.gridwidth	= GridBagConstraints.REMAINDER;
+		add(comp, gbc);
 		gbc.gridy++;
 		
 		gbc.weighty	= 1;
 		add(dummy, gbc);
+		gbc.gridwidth	= 1;
 		gbc.weighty	= 0;
 	}
 }

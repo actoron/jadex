@@ -15,6 +15,7 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.swing.Icon;
+import javax.swing.JComponent;
 
 /**
  *  Node for a virtual component, i.e. a node for a remote component.
@@ -38,6 +39,9 @@ public class VirtualComponentTreeNode extends AbstractComponentTreeNode implemen
 	
 	/** The proxy component. */
 	protected IExternalAccess proxy;
+	
+	/** The properties component (if any). */
+	protected ComponentProperties	propcomp;
 	
 	//-------- constructors --------
 	
@@ -101,7 +105,7 @@ public class VirtualComponentTreeNode extends AbstractComponentTreeNode implemen
 						{
 							public void customResultAvailable(Object source, Object result)
 							{
-								VirtualComponentTreeNode.this.desc = (IComponentDescription)result;
+								setDescription((IComponentDescription)result);
 								getModel().fireNodeChanged(VirtualComponentTreeNode.this);
 //								System.out.println("refreshed: "+desc);
 							}
@@ -144,5 +148,49 @@ public class VirtualComponentTreeNode extends AbstractComponentTreeNode implemen
 	public String toString()
 	{
 		return desc.getName().toString();
+	}
+
+	/**
+	 *  Set the component description.
+	 */
+	public void setDescription(IComponentDescription desc)
+	{
+		this.desc	= desc;
+		if(propcomp!=null)
+		{
+			propcomp.setDescription(desc);
+			propcomp.repaint();
+		}
+	}
+
+	/**
+	 *  True, if the node has properties that can be displayed.
+	 */
+	public boolean	hasProperties()
+	{
+		return true;
+	}
+
+	
+	/**
+	 *  Get or create a component displaying the node properties.
+	 *  Only to be called if hasProperties() is true;
+	 */
+	public JComponent	getPropertiesComponent()
+	{
+		if(propcomp==null)
+		{
+			propcomp	= new ComponentProperties();
+			cms.getExternalAccess(desc.getName()).addResultListener(new SwingDefaultResultListener(ui)
+			{
+				public void customResultAvailable(Object source, Object result)
+				{
+					IExternalAccess	ea	= (IExternalAccess)result;
+					propcomp.setModelname(ea.getModel().getFullName());
+				}
+			});
+		}
+		propcomp.setDescription(desc);
+		return propcomp;
 	}
 }

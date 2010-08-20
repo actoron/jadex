@@ -318,53 +318,18 @@ public class ComponentTreeNode	extends AbstractComponentTreeNode implements IAct
 	public JComponent	getPropertiesComponent()
 	{
 		if(propcomp==null)
+		{
 			propcomp	= new ComponentProperties();
+			cms.getExternalAccess(desc.getName()).addResultListener(new SwingDefaultResultListener(ui)
+			{
+				public void customResultAvailable(Object source, Object result)
+				{
+					IExternalAccess	ea	= (IExternalAccess)result;
+					propcomp.setModelname(ea.getModel().getFullName());
+				}
+			});
+		}
 		propcomp.setDescription(desc);
 		return propcomp;
-	}
-	
-	//-------- helper classes --------
-	
-	/**
-	 *  Panel for showing component properties.
-	 */
-	public static class ComponentProperties	extends	PropertiesPanel
-	{
-		//-------- constructors --------
-		
-		/**
-		 *  Create new component proeprties panel.
-		 */
-		public ComponentProperties()
-		{
-			super(" Component properties ");
-
-			createTextField("Name");
-			createTextField("Type");
-			createTextField("Ownership");
-			createTextField("State");
-			createTextField("Processing state");
-			
-			createCheckBox("Master");
-			createCheckBox("Daemon");
-			createCheckBox("Auto shutdown");
-		}
-		
-		//-------- methods --------
-		
-		/**
-		 *  Set the description.
-		 */
-		public void	setDescription(IComponentDescription desc)
-		{
-			getTextField("Name").setText(desc.getName().getName());
-			getTextField("Type").setText(desc.getType());
-			getTextField("Ownership").setText(desc.getOwnership());
-			getTextField("State").setText(desc.getState());
-			getTextField("Processing state").setText(desc.getProcessingState());
-			getCheckBox("Master").setSelected(desc.isMaster());
-			getCheckBox("Daemon").setSelected(desc.isDaemon());
-			getCheckBox("Auto shutdown").setSelected(desc.isAutoShutdown());
-		}
 	}
 }
