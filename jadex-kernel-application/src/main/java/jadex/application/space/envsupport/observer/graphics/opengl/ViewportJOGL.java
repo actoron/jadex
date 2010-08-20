@@ -3,7 +3,6 @@ package jadex.application.space.envsupport.observer.graphics.opengl;
 import jadex.application.space.envsupport.math.IVector2;
 import jadex.application.space.envsupport.math.Vector2Double;
 import jadex.application.space.envsupport.observer.graphics.AbstractViewport;
-import jadex.application.space.envsupport.observer.graphics.JOGLNativeLoader;
 import jadex.application.space.envsupport.observer.graphics.drawable.DrawableCombiner;
 import jadex.application.space.envsupport.observer.graphics.drawable.Primitive;
 import jadex.application.space.envsupport.observer.graphics.layer.Layer;

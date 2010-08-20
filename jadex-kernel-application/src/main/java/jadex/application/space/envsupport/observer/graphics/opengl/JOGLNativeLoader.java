@@ -1,4 +1,4 @@
-package jadex.application.space.envsupport.observer.graphics;
+package jadex.application.space.envsupport.observer.graphics.opengl;
 
 import java.io.File;
 import java.io.FileOutputStream;
