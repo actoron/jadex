@@ -26,6 +26,11 @@ public class Writer
 {
 	//-------- static part --------
 	
+	/** Constant for indicating if public fields should be written. 
+		The field has to be declared as public and its value
+		will be used to determine if fields should be included. */
+	public static final String XML_INCLUDE_FIELDS = "XML_INCLUDE_FIELDS";
+	
 	/** The linefeed separator. */
 	public static final String lf = (String)System.getProperty("line.separator");
 		

@@ -47,7 +47,7 @@ public class Test //extends TestCase
 //			while(true)
 			{
 //				t.testBean();
-				t.testEmptyArray();
+//				t.testEmptyArray();
 //				t.testArrayOrder();
 //				t.testMultiArray();
 //				t.testVectorModel();
@@ -59,9 +59,10 @@ public class Test //extends TestCase
 //				t.testSet();
 //				t.testMap();
 //				t.testInnerClass();
-//				t.testURL();
+				t.testURL();
 //				t.testLoggingLevel();
-				t.testInetAddress();
+//				t.testInetAddress();
+//				t.testBeanWithPublicFields();
 			}
 			long dur = System.currentTimeMillis()-start;
 			
@@ -300,6 +301,16 @@ public class Test //extends TestCase
 		InetAddress adr = InetAddress.getByName("127.0.0.1");
 		
 		doWriteAndRead(adr);
+	}
+	
+	/**
+	 *  Test if writer writes public bean fields (when XML_INCLUDE_FIELDS is set).
+	 */
+	public void testBeanWithPublicFields() throws Exception
+	{
+		C c = new C("test", 23);
+		
+		doWriteAndRead(c);
 	}
 	
 	/**

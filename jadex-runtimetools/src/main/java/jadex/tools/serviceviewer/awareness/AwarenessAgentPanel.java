@@ -570,6 +570,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 	 */
 	public static class SetDelayCommand implements ICommand
 	{
+		public static boolean XML_INCLUDE_FIELDS = true;
 		public long delay;
 		
 		public SetDelayCommand()
@@ -585,16 +586,6 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 		{
 			AwarenessAgent agent = (AwarenessAgent)args;
 			agent.setDelay(delay);
-		}
-
-		public long getDelay()
-		{
-			return delay;
-		}
-
-		public void setDelay(long delay)
-		{
-			this.delay = delay;
 		}
 	};
 	
@@ -615,6 +606,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 	 */
 	public static class SetAddressCommand implements ICommand
 	{
+		public static boolean XML_INCLUDE_FIELDS = true;
 		public InetAddress address;
 		public int port;
 		
@@ -632,26 +624,6 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 		{
 			AwarenessAgent agent = (AwarenessAgent)args;
 			agent.setAddressInfo(address, port);
-		}
-
-		public InetAddress getAddress()
-		{
-			return address;
-		}
-
-		public void setAddress(InetAddress address)
-		{
-			this.address = address;
-		}
-
-		public int getPort()
-		{
-			return port;
-		}
-
-		public void setPort(int port)
-		{
-			this.port = port;
 		}
 	};
 	
@@ -673,6 +645,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 	 */
 	public static class SetAutoCreateProxyCommand implements ICommand
 	{
+		public static boolean XML_INCLUDE_FIELDS = true;
 		public boolean autocreate;
 		
 		public SetAutoCreateProxyCommand()
@@ -688,16 +661,6 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 		{
 			AwarenessAgent agent = (AwarenessAgent)args;
 			agent.setAutoCreateProxy(autocreate);
-		}
-
-		public boolean isAutocreate()
-		{
-			return autocreate;
-		}
-
-		public void setAutocreate(boolean autocreate)
-		{
-			this.autocreate = autocreate;
 		}
 	};
 	
@@ -719,6 +682,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 	 */
 	public static class SetAutoDeleteProxyCommand implements ICommand
 	{
+		public static boolean XML_INCLUDE_FIELDS = true;
 		public boolean autodelete;
 		
 		public SetAutoDeleteProxyCommand()
@@ -734,16 +698,6 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 		{
 			AwarenessAgent agent = (AwarenessAgent)args;
 			agent.setAutoDeleteProxy(autodelete);
-		}
-
-		public boolean isAutoDelete()
-		{
-			return autodelete;
-		}
-
-		public void setAutoDelete(boolean autodelete)
-		{
-			this.autodelete = autodelete;
 		}
 	};
 	
@@ -765,6 +719,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 	 */
 	public static class CreateProxyCommand implements IResultCommand
 	{
+		public static boolean XML_INCLUDE_FIELDS = true;
 		public IComponentIdentifier cid;
 		
 		public CreateProxyCommand()
@@ -781,16 +736,6 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 			AwarenessAgent agent = (AwarenessAgent)args;
 			return agent.createProxy(cid);
 		}
-
-		public IComponentIdentifier getComponentIdentifier()
-		{
-			return cid;
-		}
-
-		public void setComponentIdentifier(IComponentIdentifier cid)
-		{
-			this.cid = cid;
-		}
 	};
 	
 	/**
@@ -798,6 +743,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 	 */
 	public static class DeleteProxyCommand implements IResultCommand
 	{
+		public static boolean XML_INCLUDE_FIELDS = true;
 		public IComponentIdentifier cid;
 		
 		public DeleteProxyCommand()
@@ -813,16 +759,6 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 		{
 			AwarenessAgent agent = (AwarenessAgent)args;
 			return agent.deleteProxy(cid);
-		}
-
-		public IComponentIdentifier getComponentIdentifier()
-		{
-			return cid;
-		}
-
-		public void setComponentIdentifier(IComponentIdentifier cid)
-		{
-			this.cid = cid;
 		}
 	};
 }

@@ -113,6 +113,12 @@ public class VirtualComponentTreeNode extends AbstractComponentTreeNode implemen
 					}
 				});
 			}
+			
+			public void customExceptionOccurred(Object source, Exception exception)
+			{
+				AbstractComponentTreeNode parent = (AbstractComponentTreeNode)getParent();
+				parent.removeChild(VirtualComponentTreeNode.this);
+			}
 		});
 
 		super.refresh(recurse);

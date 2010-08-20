@@ -10,6 +10,8 @@ import jadex.xml.SubobjectInfo;
 import jadex.xml.TypeInfo;
 import jadex.xml.TypeInfoTypeManager;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -289,7 +291,28 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 			
 		// Get properties from type inspection.
 		
-		Collection props = getProperties(object, context, typeinfo!=null? typeinfo.isIncludeFields(): false);
+		boolean includefields = false;
+		if(typeinfo!=null)
+		{
+			includefields = typeinfo.isIncludeFields();
+		}
+		else
+		{
+			// Hack!!! todo: must not be Java object (OAV) ?!
+			try
+			{
+				Field field = object.getClass().getField(Writer.XML_INCLUDE_FIELDS);
+				if(SReflect.getWrappedType(field.getType()).equals(Boolean.class))
+				{
+					includefields = ((Boolean)field.get(object)).booleanValue();
+				}
+			}
+			catch(Exception e)
+			{
+			}
+		}
+
+		Collection props = getProperties(object, context, includefields);
 		if(props!=null)
 		{
 			for(Iterator it=props.iterator(); it.hasNext(); )

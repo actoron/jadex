@@ -1,5 +1,8 @@
 package jadex.base.service.remote;
 
+import java.util.Collection;
+import java.util.List;
+
 import jadex.bridge.Argument;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IArgument;
@@ -16,12 +19,23 @@ import jadex.micro.MicroAgentMetaInfo;
 import jadex.service.CacheServiceContainer;
 import jadex.service.IServiceContainer;
 import jadex.service.SServiceProvider;
+import jadex.service.clock.IClockService;
 
 /**
  *  A proxy agent is a pseudo component that mirrors services of a remote platform (or component).
  */
 public class ProxyAgent extends MicroAgent
 {
+	//-------- attributes --------
+	
+	/** The refresh delay. */
+	protected long delay;
+	
+	/** The cached children. */
+	protected Collection children;
+	
+	//-------- methods --------
+	
 	/**
 	 *  Get the service container.
 	 *  @return The service container.
@@ -50,6 +64,36 @@ public class ProxyAgent extends MicroAgent
 	{
 		final Future ret = new Future();
 		
+		searchVirtualChildren(cid).addResultListener(new DelegationResultListener(ret));
+		
+//		SServiceProvider.getService(getServiceProvider(), IRemoteServiceManagementService.class)
+//			.addResultListener(new IResultListener()
+//		{
+//			public void resultAvailable(Object source, Object result)
+//			{
+//				IClockService cs = (IClockService)result;
+//				
+//				if(children==null || )
+//				{
+//					searchVirtualChildren(cid).addResultListener(new DelegationResultListener(ret));
+//				}
+//				else
+//				{
+//					ret.setResult(children);
+//				}
+//			}
+//		});
+		
+		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	protected IFuture searchVirtualChildren(final IComponentIdentifier cid)
+	{
+		final Future ret = new Future();
+		
 		SServiceProvider.getService(getServiceProvider(), IRemoteServiceManagementService.class)
 			.addResultListener(new IResultListener()
 		{
@@ -66,11 +110,19 @@ public class ProxyAgent extends MicroAgent
 						{
 							public void resultAvailable(Object source, Object result)
 							{
-//								System.out.println("Found children: "+SUtil.arrayToString(result));
+	//							System.out.println("Found children: "+SUtil.arrayToString(result));
 								
 								IComponentIdentifier[] tmp = (IComponentIdentifier[])result;
 								
-								CollectionResultListener crl = new CollectionResultListener(tmp.length, false, new DelegationResultListener(ret));
+								CollectionResultListener crl = new CollectionResultListener(tmp.length, false, new DelegationResultListener(ret)
+								{
+									public void resultAvailable(Object source, Object result)
+									{
+										children = (Collection)result;
+										ret.setResult(result);
+									}
+								});
+
 								for(int i=0; i<tmp.length; i++)
 								{
 									rcms.getComponentDescription(tmp[i]).addResultListener(crl);
@@ -79,7 +131,7 @@ public class ProxyAgent extends MicroAgent
 							
 							public void exceptionOccurred(Object source, Exception exception)
 							{
-//								System.out.println("Children exception: "+getComponentIdentifier());
+	//							System.out.println("Children exception: "+getComponentIdentifier());
 								ret.setException(exception);
 							}
 						});
@@ -87,7 +139,7 @@ public class ProxyAgent extends MicroAgent
 					
 					public void exceptionOccurred(Object source, Exception exception)
 					{
-//						System.out.println("No remote cms found: "+getComponentIdentifier());
+	//					System.out.println("No remote cms found: "+getComponentIdentifier());
 						ret.setException(exception);
 					}
 				});
@@ -95,7 +147,7 @@ public class ProxyAgent extends MicroAgent
 			
 			public void exceptionOccurred(Object source, Exception exception)
 			{
-//				System.out.println("No rms found: "+getComponentIdentifier());
+	//			System.out.println("No rms found: "+getComponentIdentifier());
 				ret.setException(exception);
 			}
 		});
@@ -140,6 +192,7 @@ public class ProxyAgent extends MicroAgent
 		
 		return ret;
 	}
+	
 	/**
 	 *  Get the declared services of a remote component.
 	 */

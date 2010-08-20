@@ -56,7 +56,8 @@ public class RemoteResultCommand implements IRemoteCommand
 		
 		if(future==null)
 		{
-			System.out.println("Unexpected result, no outstanding call for:" +callid);
+			// NOP, ignore invocation results that arrive late.
+//			System.out.println("Unexpected result, no outstanding call for:" +callid);
 		}
 		else //if(!future.isDone())
 		{
