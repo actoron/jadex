@@ -13,21 +13,19 @@ import java.util.Map;
  */
 public interface IMicroExternalAccess	extends IExternalAccess
 {
-	// todo: do we want to futurize these methods
-	
 	/**
 	 *  Send a message.
 	 *  @param me	The message.
 	 *  @param mt	The message type.
 	 */
-	public void	sendMessage(Map me, MessageType mt);
+	public IFuture sendMessage(Map me, MessageType mt);
 
 	/**
 	 *  Schedule a step of the agent.
 	 *  May safely be called from external threads.
 	 *  @param step	Code to be executed as a step of the agent.
 	 */
-	public void scheduleStep(ICommand com);
+	public IFuture scheduleStep(ICommand com);
 	
 	/**
 	 *  Schedule a step of the agent.

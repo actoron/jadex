@@ -117,7 +117,7 @@ public class AwarenessAgent extends MicroAgent
 					public void resultAvailable(Object source, Object result)
 					{
 						root = (IComponentIdentifier)result;
-						discovered.put(root, new DiscoveryInfo(root, true, DiscoveryInfo.NOW, delay));
+						discovered.put(root, new DiscoveryInfo(root, false, clock.getTime(), delay));
 						
 						startSendBehaviour();
 						startRemoveBehaviour();
@@ -346,7 +346,7 @@ public class AwarenessAgent extends MicroAgent
 					{
 						DiscoveryInfo dif = (DiscoveryInfo)it.next();
 						// five seconds buffer
-						if(!(dif.getTime()==DiscoveryInfo.NOW || time<dif.getTime()+dif.getDelay()+5000))
+						if(time>dif.getTime()+dif.getDelay()+5000)
 						{
 //							System.out.println("Removing: "+dif);
 							it.remove();

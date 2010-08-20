@@ -10,8 +10,8 @@ public class DiscoveryInfo
 {
 	//-------- constants --------
 	
-	/** Constant for time now. */
-	public static long NOW = 0;
+//	/** Constant for time now. */
+//	public static long NOW = 0;
 	
 	//-------- attributes --------
 	

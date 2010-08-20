@@ -1,4 +1,4 @@
-package jadex.tools.common;
+package jadex.tools.common.jtable;
 
 import java.awt.Component;
 import java.text.DateFormat;

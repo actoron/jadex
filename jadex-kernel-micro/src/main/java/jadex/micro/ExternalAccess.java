@@ -55,16 +55,18 @@ public class ExternalAccess implements IMicroExternalAccess
 	 *  @param me	The message.
 	 *  @param mt	The message type.
 	 */
-	public void sendMessage(final Map me, final MessageType mt)
+	public IFuture sendMessage(final Map me, final MessageType mt)
 	{
+		final Future ret = new Future();
 		adapter.invokeLater(new Runnable()
 		{
 			public void run()
 			{
-				agent.sendMessage(me, mt);
+				agent.sendMessage(me, mt).addResultListener(new DelegationResultListener(ret));
 				// System.out.println("Send message: "+rme);
 			}
 		});
+		return ret;
 	}
 	
 	/**
@@ -72,9 +74,9 @@ public class ExternalAccess implements IMicroExternalAccess
 	 *  May safely be called from external threads.
 	 *  @param step	Code to be executed as a step of the agent.
 	 */
-	public void scheduleStep(ICommand step)
+	public IFuture scheduleStep(ICommand step)
 	{
-		interpreter.scheduleStep(step);
+		return interpreter.scheduleStep(step);
 	}
 	
 	/**

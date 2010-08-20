@@ -131,7 +131,7 @@ public class MicroAgentInterpreter implements IComponentInstance
 			microagent.init(MicroAgentInterpreter.this);
 			
 			// Schedule initial step.
-			addStep(new ICommand()
+			addStep(new Object[]{new ICommand()
 			{
 				public void execute(Object agent)
 				{
@@ -144,7 +144,7 @@ public class MicroAgentInterpreter implements IComponentInstance
 							stop = true;
 							inited.setResult(new Object[]{MicroAgentInterpreter.this, adapter});
 							
-							addStep(new ICommand()
+							addStep(new Object[]{new ICommand()
 							{
 								public void execute(Object agent)
 								{
@@ -154,7 +154,7 @@ public class MicroAgentInterpreter implements IComponentInstance
 								{
 									return "microagent.executeBody()_#"+this.hashCode();
 								}
-							});
+							}, new Future()});
 						}
 						
 						public void exceptionOccurred(Object source, Exception exception)
@@ -167,7 +167,7 @@ public class MicroAgentInterpreter implements IComponentInstance
 				{
 					return "microagent.init()_#"+this.hashCode();
 				}
-			});
+			}, new Future()});
 		}
 		catch(Exception e)
 		{
@@ -195,21 +195,29 @@ public class MicroAgentInterpreter implements IComponentInstance
 		{
 			if(!steps.isEmpty())
 			{
-				Object step = removeStep();
-				String steptext;
-				if(step instanceof ICommand)
+				Object[] step = removeStep();
+				String steptext = ""+step[0];
+				Future future = (Future)step[1];
+				
+				// Correct to execute them in try catch?!
+				
+				if(step[0] instanceof ICommand)
 				{
-					steptext = ""+step;
-					((ICommand)step).execute(microagent);
+					try
+					{
+						((ICommand)step[0]).execute(microagent);
+						future.setResult(null);
+					}
+					catch(Exception e)
+					{
+						future.setException(e);
+					}
 				}
-				else //if(step instanceof Object[])
+				else 
 				{
-					IResultCommand st = (IResultCommand)((Object[])step)[0];
-					Future future = (Future)((Object[])step)[1];
-					// Correct to execute them in try catch?!
-//					try
-//					{
-						Object res = ((IResultCommand)st).execute(microagent);
+					try
+					{
+						Object res = ((IResultCommand)step[0]).execute(microagent);
 						if(res instanceof IFuture)
 						{
 							((IFuture)res).addResultListener(new DelegationResultListener(future));
@@ -218,12 +226,11 @@ public class MicroAgentInterpreter implements IComponentInstance
 						{
 							future.setResult(res);
 						}
-//					}
-//					catch(Exception e)
-//					{
-//						future.setException(e);
-//					}
-					steptext = ""+st;
+					}
+					catch(Exception e)
+					{
+						future.setException(e);
+					}
 				}
 				
 				addHistoryEntry(steptext);
@@ -450,16 +457,18 @@ public class MicroAgentInterpreter implements IComponentInstance
 	 *  May safely be called from external threads.
 	 *  @param step	Code to be executed as a step of the agent.
 	 */
-	public void	scheduleStep(final ICommand step)
+	public IFuture scheduleStep(final ICommand step)
 	{
+		final Future ret = new Future();
 //		System.out.println("ss: "+getAgentAdapter().getComponentIdentifier()+" "+Thread.currentThread()+" "+step);
 		adapter.invokeLater(new Runnable()
 		{			
 			public void run()
 			{
-				addStep(step);
+				addStep(new Object[]{step, ret});
 			}
 		});
+		return ret;
 	}
 	
 	/**
@@ -484,7 +493,7 @@ public class MicroAgentInterpreter implements IComponentInstance
 	/**
 	 *  Add a new step.
 	 */
-	protected void addStep(Object step)
+	protected void addStep(Object[] step)
 	{
 		steps.add(step);
 		notifyListeners(new ChangeEvent(this, "addStep", step));
@@ -493,9 +502,9 @@ public class MicroAgentInterpreter implements IComponentInstance
 	/**
 	 *  Add a new step.
 	 */
-	protected Object removeStep()
+	protected Object[] removeStep()
 	{
-		Object ret = steps.remove(0);
+		Object[] ret = (Object[])steps.remove(0);
 		notifyListeners(new ChangeEvent(this, "removeStep", new Integer(0)));
 		return ret;
 	}

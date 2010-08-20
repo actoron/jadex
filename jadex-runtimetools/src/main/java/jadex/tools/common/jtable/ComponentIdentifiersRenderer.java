@@ -1,4 +1,4 @@
-package jadex.tools.comanalyzer.table;
+package jadex.tools.common.jtable;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.SReflect;
@@ -14,7 +14,7 @@ import javax.swing.table.DefaultTableCellRenderer;
  * A renderer for AgentIdentifiers. This class is used to display the
  * receivers entry in the table. Each receiver is displayed with its addresses.
  */
-class ComponentIdentifiersRenderer extends DefaultTableCellRenderer
+public class ComponentIdentifiersRenderer extends DefaultTableCellRenderer
 {
 	/**
 	 * @see javax.swing.table.DefaultTableCellRenderer#getTableCellRendererComponent(javax.swing.JTable,

@@ -10,7 +10,9 @@ import jadex.tools.comanalyzer.Message;
 import jadex.tools.comanalyzer.MessageFilterMenu;
 import jadex.tools.comanalyzer.ToolCanvas;
 import jadex.tools.comanalyzer.ToolTab;
-import jadex.tools.common.DateTimeRenderer;
+import jadex.tools.common.jtable.ComponentIdentifierRenderer;
+import jadex.tools.common.jtable.ComponentIdentifiersRenderer;
+import jadex.tools.common.jtable.DateTimeRenderer;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
