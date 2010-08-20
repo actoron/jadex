@@ -50,7 +50,7 @@ public class ComponentTreePanel extends JSplitPane
 		"suspend_component", SGUI.makeIcon(ComponentTreePanel.class, "/jadex/tools/common/images/new_agent_szzz_big.png"),
 		"resume_component", SGUI.makeIcon(ComponentTreePanel.class, "/jadex/tools/common/images/resume_component.png"),
 		"step_component", SGUI.makeIcon(ComponentTreePanel.class, "/jadex/tools/common/images/step_component.png"),
-		"refresh_component", SGUI.makeIcon(ComponentTreePanel.class, "/jadex/tools/common/images/refresh_component.png"),
+		"refresh", SGUI.makeIcon(ComponentTreePanel.class, "/jadex/tools/common/images/refresh_component.png"),
 		"refresh_tree", SGUI.makeIcon(ComponentTreePanel.class, "/jadex/tools/common/images/refresh_tree.png"),
 		"show_properties", SGUI.makeIcon(ComponentTreePanel.class, "/jadex/tools/common/images/new_agent_props.png"),
 		"overlay_kill", SGUI.makeIcon(ComponentTreePanel.class, "/jadex/tools/common/images/overlay_kill.png"),
@@ -372,7 +372,7 @@ public class ComponentTreePanel extends JSplitPane
 			}
 		};
 
-		refresh	= new AbstractAction("Refresh component", icons.getIcon("refresh_component"))
+		refresh	= new AbstractAction("Refresh", icons.getIcon("refresh"))
 		{
 			public void actionPerformed(ActionEvent e)
 			{

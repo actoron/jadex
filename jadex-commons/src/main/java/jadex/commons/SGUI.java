@@ -16,6 +16,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.EventObject;
 import java.util.LinkedList;
 
 import javax.swing.AbstractAction;
@@ -29,8 +30,13 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.JToolBar;
 import javax.swing.UIDefaults;
+import javax.swing.border.LineBorder;
+import javax.swing.event.CellEditorListener;
+import javax.swing.table.TableCellEditor;
 
 
 /**
@@ -313,5 +319,75 @@ public class SGUI
 			JComponent[]	jcomps	= (JComponent[])adjustables.toArray(new JComponent[adjustables.size()]);
 			adjustComponentSizes(jcomps);
 		}
+	}
+	
+	/**
+	 *  Create a table that displays its contents using nto editable text fields. 
+	 */
+	public static JTable	createReadOnlyTable()
+	{
+		final JTextField	editor	= new JTextField();
+		editor.setEditable(false);
+
+		JTable	table	= new JTable();
+		table.setBackground(editor.getBackground());
+		table.setBorder(new LineBorder(table.getGridColor()));
+//		table.setShowGrid(false);
+//		final TableCellRenderer	defrenderer	= table.getDefaultRenderer(Object.class);
+//		table.setDefaultRenderer(Object.class, new TableCellRenderer()
+//		{
+//			public Component getTableCellRendererComponent(JTable table, Object value,
+//					boolean isSelected, boolean hasFocus, int row, int column)
+//			{
+//				Component	ret	= defrenderer.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+//				Dimension	dim	= ret.getPreferredSize();
+//				ret.setBounds(new Rectangle(0, 0, dim.width, dim.height));
+//				return ret;
+//			}
+//		});
+		table.setDefaultEditor(Object.class, new TableCellEditor()
+		{
+			public boolean stopCellEditing()
+			{
+				return true;
+			}
+			
+			public boolean shouldSelectCell(EventObject anEvent)
+			{
+				return true;
+			}
+			
+			public void removeCellEditorListener(CellEditorListener l)
+			{
+			}
+			
+			public boolean isCellEditable(EventObject anEvent)
+			{
+				return true;
+			}
+			
+			public Object getCellEditorValue()
+			{
+				return null;
+			}
+			
+			public void cancelCellEditing()
+			{
+			}
+			
+			public void addCellEditorListener(CellEditorListener l)
+			{
+			}
+			
+			public Component getTableCellEditorComponent(JTable table, Object value,
+					boolean isSelected, int row, int column)
+			{
+				editor.setText(""+value);
+				Dimension	dim	= editor.getPreferredSize();
+				editor.setBounds(new Rectangle(0, 0, dim.width, dim.height));
+				return editor;
+			}
+		});
+		return table;
 	}
 }

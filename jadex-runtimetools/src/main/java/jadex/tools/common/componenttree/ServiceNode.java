@@ -1,12 +1,13 @@
 package jadex.tools.common.componenttree;
 
-import java.lang.reflect.Proxy;
-
 import jadex.commons.SGUI;
 import jadex.commons.SReflect;
 import jadex.service.IService;
 
+import java.lang.reflect.Proxy;
+
 import javax.swing.Icon;
+import javax.swing.JComponent;
 import javax.swing.UIDefaults;
 
 /**
@@ -26,7 +27,10 @@ public class ServiceNode	extends AbstractComponentTreeNode
 	
 	/** The service. */
 	private final IService	service;
-	
+
+	/** The properties component (if any). */
+	protected ServiceProperties	propcomp;
+
 	//-------- constructors --------
 	
 	/**
@@ -93,5 +97,27 @@ public class ServiceNode	extends AbstractComponentTreeNode
 ////			e.printStackTrace();
 //			return e.toString();
 //		}
+	}
+
+	/**
+	 *  True, if the node has properties that can be displayed.
+	 */
+	public boolean	hasProperties()
+	{
+		return true;
+	}
+
+	/**
+	 *  Get or create a component displaying the node properties.
+	 *  Only to be called if hasProperties() is true;
+	 */
+	public JComponent	getPropertiesComponent()
+	{
+		if(propcomp==null)
+		{
+			propcomp	= new ServiceProperties();
+		}
+		propcomp.setService(service);
+		return propcomp;
 	}
 }
