@@ -30,7 +30,6 @@ import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.collection.LRU;
 import jadex.commons.collection.SCollection;
-import jadex.commons.concurrent.CounterResultListener;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
@@ -231,166 +230,57 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 				getAgentAdapter().invokeLater(action);
 			}
 		});
-				
+		
+		// Evaluate arguments if necessary
+		// Hack! use constant
+		if(arguments!=null && arguments.get("evaluation_language")!=null)
+		{
+			arguments.remove("evaluation_language");
+			// todo: support more than Java language parsers
+			JavaCCExpressionParser parser = new JavaCCExpressionParser();
+			for(Iterator it=arguments.keySet().iterator(); it.hasNext(); )
+			{
+				Object key = it.next();
+				try
+				{
+					IParsedExpression pex = parser.parseExpression((String)arguments.get(key), null, null, state.getTypeModel().getClassLoader());
+					Object val = pex.getValue(null);
+					arguments.put(key, val);
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+					throw new RuntimeException("Could not evaluate argument: "+key);
+				}
+			}
+		}
+		
+		// Set up initial state of agent
+		ragent = state.createRootObject(OAVBDIRuntimeModel.agent_type);
+		state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_name, adapter.getComponentIdentifier().getName());
+		state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_localname, adapter.getComponentIdentifier().getLocalName());
+		state.setAttributeValue(ragent, OAVBDIRuntimeModel.element_has_model, model.getHandle());
+		state.setAttributeValue(ragent, OAVBDIRuntimeModel.capability_has_configuration, config);
+		if(arguments!=null && !arguments.isEmpty())
+			state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_arguments, arguments);
+
+		state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state, OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_INITING0);
+		
+		reificator	= new EventReificator(state, ragent);
+		
+		// Initialize rule system.
+		rulesystem = new RuleSystem(state, model.getMatcherFunctionality().getRulebase(), model.getMatcherFunctionality(), new PriorityAgenda());
+		rulesystem.init();
+		
+		if(kernelprops!=null)
+		{
+			Boolean mps = (Boolean)kernelprops.get("microplansteps");
+			if(mps!=null)
+				microplansteps = mps.booleanValue();
+		}
+		
 		// Hack! todo:
 		interpreters.put(state, this);
-		
-		// Perform init on component thread. (hack!?)
-		// Cannot be done
-		getAgentAdapter().invokeLater(new Runnable()
-		{
-			public void run()
-			{
-				// Evaluate arguments if necessary
-				// Hack! use constant
-				if(arguments!=null && arguments.get("evaluation_language")!=null)
-				{
-					arguments.remove("evaluation_language");
-					// todo: support more than Java language parsers
-					JavaCCExpressionParser parser = new JavaCCExpressionParser();
-					for(Iterator it=arguments.keySet().iterator(); it.hasNext(); )
-					{
-						Object key = it.next();
-						try
-						{
-							IParsedExpression pex = parser.parseExpression((String)arguments.get(key), null, null, state.getTypeModel().getClassLoader());
-							Object val = pex.getValue(null);
-							arguments.put(key, val);
-						}
-						catch(Exception e)
-						{
-							e.printStackTrace();
-							throw new RuntimeException("Could not evaluate argument: "+key);
-						}
-					}
-				}
-				
-				// Set up initial state of agent
-				ragent = state.createRootObject(OAVBDIRuntimeModel.agent_type);
-				state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_name, adapter.getComponentIdentifier().getName());
-				state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_localname, adapter.getComponentIdentifier().getLocalName());
-				state.setAttributeValue(ragent, OAVBDIRuntimeModel.element_has_model, model.getHandle());
-				state.setAttributeValue(ragent, OAVBDIRuntimeModel.capability_has_configuration, config);
-				if(arguments!=null && !arguments.isEmpty())
-					state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_arguments, arguments);
-				
-				reificator	= new EventReificator(state, ragent);
-				
-				// Initialize rule system.
-				rulesystem = new RuleSystem(state, model.getMatcherFunctionality().getRulebase(), model.getMatcherFunctionality(), new PriorityAgenda());
-				rulesystem.init();
-				
-				if(kernelprops!=null)
-				{
-					Boolean mps = (Boolean)kernelprops.get("microplansteps");
-					if(mps!=null)
-						microplansteps = mps.booleanValue();
-				}
-				
-				// Get the services.
-				final boolean services[]	= new boolean[4];
-				SServiceProvider.getService(getServiceProvider(), IClockService.class).addResultListener(new ComponentResultListener(new DefaultResultListener()
-//				SServiceProvider.getService(getServiceProvider(), IClockService.class).addResultListener(new DefaultResultListener()
-				{
-					public void resultAvailable(Object source, Object result)
-					{
-						BDIInterpreter.this.clockservice	= (IClockService)result;
-						boolean	startagent;
-						synchronized(services)
-						{
-							services[0]	= true;
-							startagent	= services[0] && services[1] && services[2] && services[3];
-						}
-						if(startagent)
-						{
-							BDIInterpreter.this.state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state,OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_CREATING);							
-						}
-					}
-				}, getAgentAdapter()));
-				SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class).addResultListener(new ComponentResultListener(new DefaultResultListener()
-//				SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class).addResultListener(new DefaultResultListener()
-				{
-					public void resultAvailable(Object source, Object result)
-					{
-						BDIInterpreter.this.cms	= (IComponentManagementService)result;
-						boolean	startagent;
-						synchronized(services)
-						{
-							services[1]	= true;
-							startagent	= services[0] && services[1] && services[2] && services[3];
-						}
-						if(startagent)
-							BDIInterpreter.this.state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state,OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_CREATING);
-					}
-				}, getAgentAdapter()));
-				SServiceProvider.getService(getServiceProvider(), IMessageService.class).addResultListener(new ComponentResultListener(new DefaultResultListener()
-//				SServiceProvider.getService(getServiceProvider(), IMessageService.class).addResultListener(new DefaultResultListener()
-				{
-					public void resultAvailable(Object source, Object result)
-					{
-						BDIInterpreter.this.msgservice	= (IMessageService)result;
-						boolean	startagent;
-						synchronized(services)
-						{
-							services[2]	= true;
-							startagent	= services[0] && services[1] && services[2] && services[3];
-						}
-						if(startagent)
-							BDIInterpreter.this.state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state,OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_CREATING);
-					}
-				}, getAgentAdapter()));
-
-				// Previously done in createStartAgentRule
-				Map parents = new HashMap(); 
-				state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_initparents, parents);
-				List	futures	= AgentRules.createCapabilityInstance(state, ragent, parents);
-				
-				// Start service container.
-				futures.add(getServiceContainer().start());
-				
-				IResultListener	crs	= new CounterResultListener(futures.size())
-				{
-					public void finalResultAvailable(Object source, Object result)
-					{
-						boolean	startagent;
-						synchronized(services)
-						{
-							services[3]	= true;
-							startagent	= services[0] && services[1] && services[2] && services[3];
-						}
-						if(startagent)
-						{
-							getAgentAdapter().invokeLater(new Runnable()
-							{
-								public void run()
-								{
-									BDIInterpreter.this.state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state,OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_CREATING);
-								}
-							});
-						}
-					}
-					public void exceptionOccurred(Object source, Exception exception)
-					{
-					}
-				};
-				if(!futures.isEmpty())
-				{
-					for(int i=0; i<futures.size(); i++)
-					{
-						((Future)futures.get(i)).addResultListener(crs);
-					}
-				}
-//				state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_initparents, parents);
-
-				
-				// This is the clean way to init the logger, but since 
-				// Java 7 the LogManager is a memory leak
-				// Also in Java 7 the memory leak exists :-(
-				// So only access logger if really necessary
-//				Logger logger = adapter.getLogger();
-//				initLogger(ragent, logger);			
-			}
-		});
 	}
 	
 	//-------- IKernelAgent interface --------
@@ -495,7 +385,8 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 				{
 					state.addAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_killlisteners, new DelegationResultListener(ret));
 					Object cs = state.getAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state);
-					if(OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_CREATING.equals(cs) 
+					if(OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_INITING0.equals(cs) 
+						|| OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_INITING1.equals(cs) 
 						|| OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_ALIVE.equals(cs))
 					{
 						AgentRules.startTerminating(state, ragent);
@@ -1347,7 +1238,8 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 		RULEBASE = new Rulebase();
 		
 		// Agent rules.
-		RULEBASE.addRule(AgentRules.createStartAgentRule());
+		RULEBASE.addRule(AgentRules.createInit0AgentRule());
+		RULEBASE.addRule(AgentRules.createInit1AgentRule());
 		RULEBASE.addRule(AgentRules.createTerminatingEndAgentRule());
 		RULEBASE.addRule(AgentRules.createTerminateAgentRule());
 		RULEBASE.addRule(AgentRules.createRemoveChangeEventRule());

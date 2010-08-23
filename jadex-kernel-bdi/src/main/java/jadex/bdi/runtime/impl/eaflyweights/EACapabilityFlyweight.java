@@ -312,7 +312,8 @@ public abstract class EACapabilityFlyweight extends ElementFlyweight implements 
 				public void run()
 				{
 					Object cs = getState().getAttributeValue(agent, OAVBDIRuntimeModel.agent_has_state);
-					if(OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_CREATING.equals(cs) 
+					if(OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_INITING0.equals(cs) 
+						|| OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_INITING1.equals(cs)
 						|| OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_ALIVE.equals(cs))
 					{
 						getInterpreter().killAgent().addResultListener(new DelegationResultListener(ret));
@@ -323,7 +324,8 @@ public abstract class EACapabilityFlyweight extends ElementFlyweight implements 
 		else
 		{
 			Object cs = getState().getAttributeValue(agent, OAVBDIRuntimeModel.agent_has_state);
-			if(OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_CREATING.equals(cs) 
+			if(OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_INITING0.equals(cs) 
+				|| OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_INITING1.equals(cs)
 				|| OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_ALIVE.equals(cs))
 			{
 				//	System.out.println("set to terminating");

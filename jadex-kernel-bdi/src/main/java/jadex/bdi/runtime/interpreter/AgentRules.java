@@ -6,21 +6,30 @@ import jadex.bdi.runtime.impl.flyweights.ParameterFlyweight;
 import jadex.bridge.CheckedAction;
 import jadex.bridge.ComponentResultListener;
 import jadex.bridge.IArgument;
+import jadex.bridge.IComponentManagementService;
+import jadex.bridge.IMessageService;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.collection.SCollection;
+import jadex.commons.concurrent.CounterResultListener;
+import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.service.BasicService;
 import jadex.commons.service.IServiceContainer;
+import jadex.commons.service.SServiceProvider;
+import jadex.commons.service.clock.IClockService;
 import jadex.commons.service.clock.ITimedObject;
 import jadex.commons.service.clock.ITimer;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.IValueFetcher;
+import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 import jadex.rules.rulesystem.IAction;
 import jadex.rules.rulesystem.ICondition;
 import jadex.rules.rulesystem.IVariableAssignments;
+import jadex.rules.rulesystem.PriorityAgenda;
+import jadex.rules.rulesystem.RuleSystem;
 import jadex.rules.rulesystem.rules.AndCondition;
 import jadex.rules.rulesystem.rules.BoundConstraint;
 import jadex.rules.rulesystem.rules.IOperator;
@@ -59,26 +68,141 @@ public class AgentRules
 	//-------- rule methods --------
 
 	/**
-	 *  Create the start agent rule.
+	 *  Create the init1 agent rule.
 	 */
-	protected static Rule createStartAgentRule()
+	protected static Rule createInit0AgentRule()
 	{
 		ObjectCondition	ragentcon	= new ObjectCondition(OAVBDIRuntimeModel.agent_type);
 		ragentcon.addConstraint(new BoundConstraint(null, new Variable("?ragent", OAVBDIRuntimeModel.agent_type)));
-		ragentcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.agent_has_state, OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_CREATING));
+		ragentcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.agent_has_state, OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_INITING0));
+		IAction	action	= new IAction()
+		{
+			public void execute(IOAVState state, IVariableAssignments assignments)
+			{
+				final Object ragent	= assignments.getVariableValue("?ragent");
+				final BDIInterpreter ip = BDIInterpreter.getInterpreter(state);
+				
+				// Get the services.
+				final boolean services[]	= new boolean[4];
+				SServiceProvider.getService(ip.getServiceProvider(), IClockService.class).addResultListener(new ComponentResultListener(new DefaultResultListener()
+	//			SServiceProvider.getService(getServiceProvider(), IClockService.class).addResultListener(new DefaultResultListener()
+				{
+					public void resultAvailable(Object source, Object result)
+					{
+						ip.clockservice	= (IClockService)result;
+						boolean	startagent;
+						synchronized(services)
+						{
+							services[0]	= true;
+							startagent	= services[0] && services[1] && services[2] && services[3];
+						}
+						if(startagent)
+						{
+							ip.state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state,OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_INITING1);							
+						}
+					}
+				}, ip.getAgentAdapter()));
+				SServiceProvider.getService(ip.getServiceProvider(), IComponentManagementService.class).addResultListener(new ComponentResultListener(new DefaultResultListener()
+	//			SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class).addResultListener(new DefaultResultListener()
+				{
+					public void resultAvailable(Object source, Object result)
+					{
+						ip.cms	= (IComponentManagementService)result;
+						boolean	startagent;
+						synchronized(services)
+						{
+							services[1]	= true;
+							startagent	= services[0] && services[1] && services[2] && services[3];
+						}
+						if(startagent)
+							ip.state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state,OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_INITING1);
+					}
+				}, ip.getAgentAdapter()));
+				SServiceProvider.getService(ip.getServiceProvider(), IMessageService.class).addResultListener(new ComponentResultListener(new DefaultResultListener()
+	//			SServiceProvider.getService(getServiceProvider(), IMessageService.class).addResultListener(new DefaultResultListener()
+				{
+					public void resultAvailable(Object source, Object result)
+					{
+						ip.msgservice	= (IMessageService)result;
+						boolean	startagent;
+						synchronized(services)
+						{
+							services[2]	= true;
+							startagent	= services[0] && services[1] && services[2] && services[3];
+						}
+						if(startagent)
+							ip.state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state,OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_INITING1);
+					}
+				}, ip.getAgentAdapter()));
+	
+				// Previously done in createStartAgentRule
+				Map parents = new HashMap(); 
+				state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_initparents, parents);
+				List	futures	= AgentRules.createCapabilityInstance(state, ragent, parents);
+				
+				// Start service container.
+				futures.add(ip.getServiceContainer().start());
+				
+				IResultListener	crs	= new CounterResultListener(futures.size())
+				{
+					public void finalResultAvailable(Object source, Object result)
+					{
+						boolean	startagent;
+						synchronized(services)
+						{
+							services[3]	= true;
+							startagent	= services[0] && services[1] && services[2] && services[3];
+						}
+						if(startagent)
+						{
+							ip.getAgentAdapter().invokeLater(new Runnable()
+							{
+								public void run()
+								{
+									ip.state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state,OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_INITING1);
+								}
+							});
+						}
+					}
+					public void exceptionOccurred(Object source, Exception exception)
+					{
+					}
+				};
+				if(!futures.isEmpty())
+				{
+					for(int i=0; i<futures.size(); i++)
+					{
+						((Future)futures.get(i)).addResultListener(crs);
+					}
+				}
+	//			state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_initparents, parents);
+	
+				
+				// This is the clean way to init the logger, but since 
+				// Java 7 the LogManager is a memory leak
+				// Also in Java 7 the memory leak exists :-(
+				// So only access logger if really necessary
+	//			Logger logger = adapter.getLogger();
+	//			initLogger(ragent, logger);			
+			}
+		};
+		Rule rule = new Rule("agent_init0", ragentcon, action);
+		return rule;
+	}
+	
+	/**
+	 *  Create the start agent rule.
+	 */
+	protected static Rule createInit1AgentRule()
+	{
+		ObjectCondition	ragentcon	= new ObjectCondition(OAVBDIRuntimeModel.agent_type);
+		ragentcon.addConstraint(new BoundConstraint(null, new Variable("?ragent", OAVBDIRuntimeModel.agent_type)));
+		ragentcon.addConstraint(new LiteralConstraint(OAVBDIRuntimeModel.agent_has_state, OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_INITING1));
 		IAction	action	= new IAction()
 		{
 			public void execute(IOAVState state, IVariableAssignments assignments)
 			{
 				Object	ragent	= assignments.getVariableValue("?ragent");
-				// Get map of arguments for initial beliefs values.
-//				Map	arguments	= (Map)state.getAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_arguments);
-//				Map	argcopy	= null;
-//				if(arguments!=null)
-//				{
-//					argcopy	= new HashMap();
-//					argcopy.putAll(arguments);
-//				}
 				
 				initializeCapabilityInstance(state, ragent);
 				state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_initparents, null);
@@ -90,21 +214,13 @@ public class AgentRules
 				
 				// Inform get-external-access listeners (if any). Hack???
 				BDIInterpreter	bdii	= BDIInterpreter.getInterpreter(state);
-//				if(bdii.eal!=null)
-//				{
-//					for(Iterator it=bdii.eal.iterator(); it.hasNext(); )
-//					{
-//						((IResultListener)it.next()).resultAvailable(bdii.getAgentAdapter().getComponentIdentifier(), new ExternalAccessFlyweight(state, ragent));
-//					}
-//					bdii.eal	= null;
-//				}
 				
 				// Stop execution when init has finished and notify cms.
 				bdii.stop = true;
 				bdii.inited.setResult(new Object[]{bdii, bdii.getAgentAdapter()});
 			}
 		};
-		Rule rule = new Rule("agent_start", ragentcon, action);
+		Rule rule = new Rule("agent_init1", ragentcon, action);
 		return rule;
 	}
 

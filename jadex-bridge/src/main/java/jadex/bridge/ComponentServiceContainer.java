@@ -66,7 +66,7 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 				{
 					IComponentIdentifier[] childs = (IComponentIdentifier[])result;
 					final IResultListener lis = new CollectionResultListener(
-						childs.length, false, new DelegationResultListener(ret));
+						childs.length, true, new DelegationResultListener(ret));
 					for(int i=0; i<childs.length; i++)
 					{
 						cms.getExternalAccess(childs[i]).addResultListener(new IResultListener()
@@ -79,7 +79,7 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 							
 							public void exceptionOccurred(Object source, Exception exception)
 							{
-								ret.setException(exception);
+								lis.exceptionOccurred(null, exception);
 							}
 						});
 					}

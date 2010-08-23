@@ -32,6 +32,8 @@ public class CollectionResultListener	implements IResultListener
 	/**
 	 *  Create a new collection listener.
 	 *  @param num The expected number of results.
+	 *  @param ignorefailures When set to true failures will be 
+	 *  	tolerated and just not be added to the result collection.
 	 *  @param delegate	The delegate result listener.
 	 */
 	public CollectionResultListener(int num, boolean ignorefailures, IResultListener delegate)

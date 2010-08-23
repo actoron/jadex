@@ -243,6 +243,7 @@ public class ComponentManagementService extends BasicService implements ICompone
 										// Init successfully finished. Add description and adapter.
 										adapter = (StandaloneComponentAdapter)((Object[])result)[1];
 										descs.put(cid, ad);
+//										System.out.println("adding cid: "+cid);
 										adapters.put(cid, adapter);
 										initinfos.remove(cid);
 										
