@@ -5,7 +5,7 @@ import jadex.bridge.IArgument;
 import jadex.bridge.IModelInfo;
 import jadex.commons.SGUI;
 import jadex.commons.concurrent.DefaultResultListener;
-import jadex.tools.common.CombiIcon;
+import jadex.commons.gui.CombiIcon;
 import jadex.tools.common.modeltree.DefaultNodeFunctionality;
 import jadex.tools.common.modeltree.DirNode;
 import jadex.tools.common.modeltree.FileNode;

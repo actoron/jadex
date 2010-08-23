@@ -6,11 +6,11 @@ import jadex.commons.Properties;
 import jadex.commons.SGUI;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
+import jadex.commons.gui.EditableList;
+import jadex.commons.gui.EditableListEvent;
 import jadex.commons.service.IService;
 import jadex.commons.service.library.ILibraryService;
 import jadex.commons.service.library.ILibraryServiceListener;
-import jadex.tools.common.EditableList;
-import jadex.tools.common.EditableListEvent;
 import jadex.tools.common.plugin.IControlCenter;
 import jadex.tools.serviceviewer.IServiceViewerPanel;
 

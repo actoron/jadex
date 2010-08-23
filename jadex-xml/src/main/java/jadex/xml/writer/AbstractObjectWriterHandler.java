@@ -11,7 +11,6 @@ import jadex.xml.TypeInfo;
 import jadex.xml.TypeInfoTypeManager;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;

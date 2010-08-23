@@ -9,8 +9,8 @@ import jadex.commons.Property;
 import jadex.commons.SGUI;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.commons.service.IService;
-import jadex.tools.common.GuiProperties;
 import jadex.tools.common.plugin.IControlCenter;
+import jadex.tools.help.SHelp;
 import jadex.tools.serviceviewer.IServiceViewerPanel;
 
 import java.awt.BorderLayout;
@@ -194,7 +194,7 @@ public class DFBrowserPanel	extends JPanel implements IServiceViewerPanel
 
 		add(settings, BorderLayout.NORTH);
 
-		GuiProperties.setupHelp(this, "tools.dfbrowser");
+		SHelp.setupHelp(this, "tools.dfbrowser");
 		
 		refresh();
 	}

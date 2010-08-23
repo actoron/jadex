@@ -5,7 +5,7 @@ import jadex.bridge.IModelInfo;
 import jadex.commons.SGUI;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
-import jadex.tools.common.CombiIcon;
+import jadex.commons.gui.CombiIcon;
 import jadex.tools.common.modeltree.DefaultNodeFunctionality;
 import jadex.tools.common.modeltree.DirNode;
 import jadex.tools.common.modeltree.FileNode;
@@ -40,7 +40,7 @@ public class StarterNodeFunctionality extends DefaultNodeFunctionality
 	 */
 	static UIDefaults icons = new UIDefaults(new Object[]
 	{
-		"check_overlay", SGUI.makeIcon(StarterNodeFunctionality.class, "/jadex/tools/common/images/check_overlay.png"),
+		"overlay_check", SGUI.makeIcon(StarterNodeFunctionality.class, "/jadex/tools/common/images/overlay_check.png"),
 		"checking_on",	SGUI.makeIcon(StarterNodeFunctionality.class, "/jadex/tools/common/images/new_agent_check_anim.gif"),	
 	});
 	

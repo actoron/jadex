@@ -4,10 +4,10 @@ import jadex.base.service.simulation.ISimulationService;
 import jadex.commons.SGUI;
 import jadex.commons.ThreadSuspendable;
 import jadex.commons.concurrent.SwingDefaultResultListener;
+import jadex.commons.gui.ToolTipAction;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.clock.IClock;
 import jadex.commons.service.clock.IClockService;
-import jadex.tools.common.ToolTipAction;
 
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;

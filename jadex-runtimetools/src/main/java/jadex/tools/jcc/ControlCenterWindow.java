@@ -1,17 +1,15 @@
 package jadex.tools.jcc;
 
+import jadex.base.gui.AboutDialog;
+import jadex.base.gui.ConfigurationDialog;
+import jadex.base.gui.JadexLogoButton;
 import jadex.commons.BrowserLauncher;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.library.ILibraryService;
-import jadex.tools.common.AboutDialog;
-import jadex.tools.common.ConfigurationDialog;
-import jadex.tools.common.ConsolePanel;
-import jadex.tools.common.GuiProperties;
-import jadex.tools.common.JadexLogoButton;
-import jadex.tools.common.StatusBar;
 import jadex.tools.common.plugin.IControlCenterPlugin;
+import jadex.tools.help.SHelp;
 
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
@@ -207,7 +205,7 @@ public class ControlCenterWindow extends JFrame
 	            	}
 	            });
 	            if(plugins[i].getHelpID()!=null)
-	            	GuiProperties.setupHelp(button, plugins[i].getHelpID());
+	            	SHelp.setupHelp(button, plugins[i].getHelpID());
 	            
 	            //bg.add(button);
 	     	    toolbar.add(button);
@@ -281,7 +279,7 @@ public class ControlCenterWindow extends JFrame
 		
 		// Help menu.
 		JMenu help = new JMenu("Help");
-		HelpBroker hb = GuiProperties.setupHelp(this.getContentPane(), "tools.controlcenter");
+		HelpBroker hb = SHelp.setupHelp(this.getContentPane(), "tools.controlcenter");
 		if(hb!=null)
 		{
 			JMenuItem helptopics = new JMenuItem("Help Topics");

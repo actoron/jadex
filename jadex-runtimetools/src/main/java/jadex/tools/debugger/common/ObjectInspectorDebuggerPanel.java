@@ -8,9 +8,9 @@ import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVJavaType;
 import jadex.rules.state.javaimpl.OAVStateFactory;
 import jadex.rules.tools.stateviewer.OAVPanel;
-import jadex.tools.common.GuiProperties;
 import jadex.tools.common.plugin.IControlCenter;
 import jadex.tools.debugger.IDebuggerPanel;
+import jadex.tools.help.SHelp;
 
 import javax.swing.Icon;
 import javax.swing.JComponent;
@@ -28,7 +28,7 @@ public class ObjectInspectorDebuggerPanel	implements IDebuggerPanel
 	 * The image icons.
 	 */
 	protected static final UIDefaults	icons	= new UIDefaults(new Object[]{
-		"contents", SGUI.makeIcon(GuiProperties.class, "/jadex/tools/common/images/bug_small.png")
+		"contents", SGUI.makeIcon(SHelp.class, "/jadex/tools/common/images/bug_small.png")
 	});
 
 	//-------- attributes --------

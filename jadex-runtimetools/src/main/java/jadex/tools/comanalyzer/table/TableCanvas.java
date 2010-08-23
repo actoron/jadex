@@ -1,7 +1,10 @@
 package jadex.tools.comanalyzer.table;
 
+import jadex.base.gui.jtable.ComponentIdentifierRenderer;
+import jadex.base.gui.jtable.ComponentIdentifiersRenderer;
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.SUtil;
+import jadex.commons.jtable.DateTimeRenderer;
 import jadex.commons.jtable.ResizeableTableHeader;
 import jadex.commons.jtable.TableSorter;
 import jadex.commons.jtable.VisibilityTableColumnModel;
@@ -10,9 +13,6 @@ import jadex.tools.comanalyzer.Message;
 import jadex.tools.comanalyzer.MessageFilterMenu;
 import jadex.tools.comanalyzer.ToolCanvas;
 import jadex.tools.comanalyzer.ToolTab;
-import jadex.tools.common.jtable.ComponentIdentifierRenderer;
-import jadex.tools.common.jtable.ComponentIdentifiersRenderer;
-import jadex.tools.common.jtable.DateTimeRenderer;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;

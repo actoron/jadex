@@ -1,5 +1,6 @@
 package jadex.tools.serviceviewer.awareness;
 
+import jadex.base.gui.jtable.ComponentIdentifierRenderer;
 import jadex.base.service.awareness.AwarenessAgent;
 import jadex.base.service.awareness.DiscoveryInfo;
 import jadex.bridge.IComponentIdentifier;
@@ -8,9 +9,8 @@ import jadex.commons.ICommand;
 import jadex.commons.IResultCommand;
 import jadex.commons.Properties;
 import jadex.commons.concurrent.SwingDefaultResultListener;
+import jadex.commons.jtable.DateTimeRenderer;
 import jadex.micro.IMicroExternalAccess;
-import jadex.tools.common.jtable.ComponentIdentifierRenderer;
-import jadex.tools.common.jtable.DateTimeRenderer;
 import jadex.tools.common.plugin.IControlCenter;
 import jadex.tools.serviceviewer.IComponentViewerPanel;
 

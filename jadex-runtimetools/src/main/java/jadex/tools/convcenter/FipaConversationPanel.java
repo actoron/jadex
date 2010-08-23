@@ -17,7 +17,7 @@ import jadex.commons.SGUI;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.CounterResultListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
-import jadex.tools.common.GuiProperties;
+import jadex.tools.help.SHelp;
 import jadex.xml.bean.JavaReader;
 import jadex.xml.bean.JavaWriter;
 
@@ -168,7 +168,7 @@ public class FipaConversationPanel extends JSplitPane
 		south.add(send);
 		south.add(reset);
 
-		HelpBroker hb = GuiProperties.setupHelp(FipaConversationPanel.this,  "tools.conversationcenter");
+		HelpBroker hb = SHelp.setupHelp(FipaConversationPanel.this,  "tools.conversationcenter");
 		if (hb != null)
 		{
 			JButton help = new JButton("Help");

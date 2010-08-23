@@ -16,7 +16,6 @@
 	<capabilities>
 		<capability name="cms" file="jadex.bdi.planlib.cms.CMS" />
 		<capability name="df" file="jadex.bdi.planlib.df.DF" />
-		<!--  <capability name="toolcap" file="jadex.tools.common.Tool" />-->
 		<!-- <capability name="loggercap" file="jadex.tools.logger.Logger"/> -->
 		<capability name="testcentercap" file="jadex.tools.testcenter.TestCenter"/>
 	</capabilities>
@@ -70,14 +69,6 @@
             <concrete ref="df.df_search"/>
         </achievegoalref>
       
-		<!-- <performgoalref name="manage_tool">
-			<concrete ref="toolcap.manage_tool" />
-		</performgoalref>
-
-		<achievegoalref name="tool_request">
-			<concrete ref="toolcap.tool_request" />
-		</achievegoalref> -->
-		
 		<!-- <achievegoalref name="logger_tool_request">
 			<concrete ref="loggercap.tool_request" />
 		</achievegoalref>

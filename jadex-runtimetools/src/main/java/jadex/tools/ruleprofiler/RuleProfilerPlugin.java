@@ -1,20 +1,20 @@
 package jadex.tools.ruleprofiler;
 
+import jadex.base.gui.componenttree.ComponentTreePanel;
+import jadex.base.gui.componenttree.IActiveComponentTreeNode;
+import jadex.base.gui.componenttree.IComponentTreeNode;
+import jadex.base.gui.componenttree.INodeHandler;
 import jadex.bdi.BDIAgentFactory;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentManagementService;
 import jadex.commons.SGUI;
 import jadex.commons.concurrent.SwingDefaultResultListener;
+import jadex.commons.gui.CombiIcon;
+import jadex.commons.gui.ObjectCardLayout;
 import jadex.commons.service.SServiceProvider;
-import jadex.tools.common.CombiIcon;
-import jadex.tools.common.GuiProperties;
-import jadex.tools.common.ObjectCardLayout;
-import jadex.tools.common.componenttree.ComponentTreePanel;
-import jadex.tools.common.componenttree.IActiveComponentTreeNode;
-import jadex.tools.common.componenttree.IComponentTreeNode;
-import jadex.tools.common.componenttree.INodeHandler;
 import jadex.tools.common.plugin.AbstractJCCPlugin;
+import jadex.tools.help.SHelp;
 
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -48,13 +48,13 @@ public class RuleProfilerPlugin extends AbstractJCCPlugin	implements IComponentL
 	 * The image icons.
 	 */
 	protected static final UIDefaults	icons	= new UIDefaults(new Object[]{
-		"profiler", SGUI.makeIcon(GuiProperties.class, "/jadex/tools/common/images/ruleprofiler.png"),
-		"profiler_sel", SGUI.makeIcon(GuiProperties.class, "/jadex/tools/common/images/ruleprofiler_sel.png"),
-		"profile_agent", SGUI.makeIcon(GuiProperties.class, "/jadex/tools/common/images/new_introspector.png"),
-		"close_profiler", SGUI.makeIcon(GuiProperties.class, "/jadex/tools/common/images/close_introspector.png"),
-		"profiler_empty", SGUI.makeIcon(GuiProperties.class, "/jadex/tools/common/images/introspector_empty.png"),
-		"component_debugged", SGUI.makeIcon(GuiProperties.class, "/jadex/tools/common/images/overlay_introspected.png"),
-		"stop_debugger", SGUI.makeIcon(GuiProperties.class, "/jadex/tools/common/images/overlay_notintrospected.png")
+		"profiler", SGUI.makeIcon(SHelp.class, "/jadex/tools/common/images/ruleprofiler.png"),
+		"profiler_sel", SGUI.makeIcon(SHelp.class, "/jadex/tools/common/images/ruleprofiler_sel.png"),
+		"profile_agent", SGUI.makeIcon(SHelp.class, "/jadex/tools/common/images/new_introspector.png"),
+		"close_profiler", SGUI.makeIcon(SHelp.class, "/jadex/tools/common/images/close_introspector.png"),
+		"profiler_empty", SGUI.makeIcon(SHelp.class, "/jadex/tools/common/images/introspector_empty.png"),
+		"component_debugged", SGUI.makeIcon(SHelp.class, "/jadex/tools/common/images/overlay_introspected.png"),
+		"stop_debugger", SGUI.makeIcon(SHelp.class, "/jadex/tools/common/images/overlay_notintrospected.png")
 	});
 
 	//-------- attributes --------
@@ -254,7 +254,7 @@ public class RuleProfilerPlugin extends AbstractJCCPlugin	implements IComponentL
 		split.add(detail);
 		//split.setResizeWeight(1.0);
 
-		GuiProperties.setupHelp(split, getHelpID());
+		SHelp.setupHelp(split, getHelpID());
 
 		split.setDividerLocation(150);
 
@@ -343,7 +343,7 @@ public class RuleProfilerPlugin extends AbstractJCCPlugin	implements IComponentL
 					IActiveComponentTreeNode node = (IActiveComponentTreeNode)paths[i].getLastPathComponent();
 					IComponentDescription desc = node.getDescription();
 					RuleProfilerPanel	panel = new RuleProfilerPanel(getJCC().getServiceProvider(), desc.getName());
-					GuiProperties.setupHelp(panel, getHelpID());
+					SHelp.setupHelp(panel, getHelpID());
 					detail.add(panel, desc);
 					comptree.getModel().fireNodeChanged(node);
 				}

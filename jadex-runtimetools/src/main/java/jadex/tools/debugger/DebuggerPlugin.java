@@ -1,16 +1,16 @@
 package jadex.tools.debugger;
 
+import jadex.base.gui.componenttree.ComponentTreePanel;
+import jadex.base.gui.componenttree.IActiveComponentTreeNode;
+import jadex.base.gui.componenttree.IComponentTreeNode;
+import jadex.base.gui.componenttree.INodeHandler;
 import jadex.bridge.IComponentDescription;
 import jadex.commons.Properties;
 import jadex.commons.SGUI;
-import jadex.tools.common.CombiIcon;
-import jadex.tools.common.GuiProperties;
-import jadex.tools.common.ObjectCardLayout;
-import jadex.tools.common.componenttree.ComponentTreePanel;
-import jadex.tools.common.componenttree.IActiveComponentTreeNode;
-import jadex.tools.common.componenttree.IComponentTreeNode;
-import jadex.tools.common.componenttree.INodeHandler;
+import jadex.commons.gui.CombiIcon;
+import jadex.commons.gui.ObjectCardLayout;
 import jadex.tools.common.plugin.AbstractJCCPlugin;
+import jadex.tools.help.SHelp;
 
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -44,13 +44,13 @@ public class DebuggerPlugin extends AbstractJCCPlugin
 	 * The image icons.
 	 */
 	protected static final UIDefaults	icons	= new UIDefaults(new Object[]{
-		"debugger", SGUI.makeIcon(GuiProperties.class, "/jadex/tools/common/images/new_introspector.png"),
-		"debugger_sel", SGUI.makeIcon(GuiProperties.class, "/jadex/tools/common/images/new_introspector_sel.png"),
-		"debug_component", SGUI.makeIcon(GuiProperties.class, "/jadex/tools/common/images/new_introspector.png"),
-		"close_debugger", SGUI.makeIcon(GuiProperties.class, "/jadex/tools/common/images/close_introspector.png"),
-		"component_debugged", SGUI.makeIcon(GuiProperties.class, "/jadex/tools/common/images/overlay_introspected.png"),
-		"stop_debugger", SGUI.makeIcon(GuiProperties.class, "/jadex/tools/common/images/overlay_notintrospected.png"),
-		"debugger_empty", SGUI.makeIcon(GuiProperties.class, "/jadex/tools/common/images/introspector_empty.png")
+		"debugger", SGUI.makeIcon(SHelp.class, "/jadex/tools/common/images/new_introspector.png"),
+		"debugger_sel", SGUI.makeIcon(SHelp.class, "/jadex/tools/common/images/new_introspector_sel.png"),
+		"debug_component", SGUI.makeIcon(SHelp.class, "/jadex/tools/common/images/new_introspector.png"),
+		"close_debugger", SGUI.makeIcon(SHelp.class, "/jadex/tools/common/images/close_introspector.png"),
+		"component_debugged", SGUI.makeIcon(SHelp.class, "/jadex/tools/common/images/overlay_introspected.png"),
+		"stop_debugger", SGUI.makeIcon(SHelp.class, "/jadex/tools/common/images/overlay_notintrospected.png"),
+		"debugger_empty", SGUI.makeIcon(SHelp.class, "/jadex/tools/common/images/introspector_empty.png")
 	});
 	
 	//-------- attributes --------
@@ -274,7 +274,7 @@ public class DebuggerPlugin extends AbstractJCCPlugin
 		split.add(detail);
 		//split.setResizeWeight(1.0);
 
-		GuiProperties.setupHelp(split, "tools.debugger");
+		SHelp.setupHelp(split, "tools.debugger");
 
 		split.setDividerLocation(150);
 
@@ -293,7 +293,7 @@ public class DebuggerPlugin extends AbstractJCCPlugin
 					IActiveComponentTreeNode node = (IActiveComponentTreeNode)paths[i].getLastPathComponent();
 					IComponentDescription desc = node.getDescription();
 					DebuggerMainPanel	panel = new DebuggerMainPanel(getJCC(), desc);
-					GuiProperties.setupHelp(panel, "tools.debugger");
+					SHelp.setupHelp(panel, "tools.debugger");
 					detail.add(panel, node.getDescription());
 					comptree.getModel().fireNodeChanged(node);
 				}

@@ -6,8 +6,8 @@ import jadex.commons.Property;
 import jadex.commons.SGUI;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.SwingDefaultResultListener;
-import jadex.tools.common.PopupBuilder;
-import jadex.tools.common.ToolTipAction;
+import jadex.commons.gui.PopupBuilder;
+import jadex.commons.gui.ToolTipAction;
 import jadex.tools.common.modeltree.DirNode;
 import jadex.tools.common.modeltree.FileNode;
 import jadex.tools.common.modeltree.IExplorerTreeNode;
@@ -48,7 +48,6 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 		"testcenter_sel", SGUI.makeIcon(TestCenterPlugin.class, "/jadex/tools/common/images/new_testcenter_sel.png"),
 		"testcenter", SGUI.makeIcon(TestCenterPlugin.class, "/jadex/tools/common/images/new_testcenter.png"),
 		"arrow_right", SGUI.makeIcon(TestCenterPlugin.class,	"/jadex/tools/common/images/arrow_right.png"),		
-		"arrow_left", SGUI.makeIcon(TestCenterPlugin.class,	"/jadex/tools/common/images/arrow_right.png"),
 		"test_small", SGUI.makeIcon(TestCenterPlugin.class,	"/jadex/tools/common/images/new_agent_testable.png"),
 		"add_agent", SGUI.makeIcon(TestCenterPlugin.class,	"/jadex/tools/common/images/new_add_agent_testable.png"),
 		"add_package", SGUI.makeIcon(TestCenterPlugin.class,	"/jadex/tools/common/images/new_add_package_testable.png"),

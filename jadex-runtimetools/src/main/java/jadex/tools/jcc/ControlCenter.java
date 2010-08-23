@@ -10,12 +10,11 @@ import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.commons.service.IServiceProvider;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.library.ILibraryService;
-import jadex.tools.common.GuiProperties;
-import jadex.tools.common.RememberOptionMessage;
 import jadex.tools.common.plugin.AbstractJCCPlugin;
 import jadex.tools.common.plugin.IControlCenter;
 import jadex.tools.common.plugin.IControlCenterPlugin;
 import jadex.tools.common.plugin.SJCC;
+import jadex.tools.help.SHelp;
 import jadex.xml.PropertiesXMLHelper;
 
 import java.awt.Cursor;
@@ -613,7 +612,7 @@ public class ControlCenter implements IControlCenter
 
 				// Todo: move this code to controlcenterwindow!?
 				if(plugin.getHelpID() != null)
-					GuiProperties.setupHelp(comp, plugin.getHelpID());
+					SHelp.setupHelp(comp, plugin.getHelpID());
 
 				window.content.add(comp, plugin.getName());
 //				window.setPerspective(plugin);

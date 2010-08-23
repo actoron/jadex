@@ -1,5 +1,6 @@
 package jadex.bdi.examples.blackjack.manager;
 
+import jadex.base.gui.ComponentSelectorDialog;
 import jadex.bdi.examples.blackjack.Player;
 import jadex.bdi.examples.blackjack.gui.GUIImageLoader;
 import jadex.bdi.examples.blackjack.player.strategies.AbstractStrategy;
@@ -144,24 +145,23 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 			}
 		});
 		
-		//dealertf.setEditable(false);
-		/*JButton dealerbut = new JButton("...");
-		dealerbut.setMargin(new Insets(0,0,0,0));
-		dealerbut.setToolTipText("Set dealer agent identifier");
+		final	ComponentSelectorDialog	csd	= new ComponentSelectorDialog(ManagerFrame.this, access.getServiceProvider());
+		JButton	dealerbut	= new JButton("...");
 		dealerbut.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				IComponentIdentifier tst = new AgentSelectorDialog(ManagerFrame.this, agent).selectAgent(LOCAL_DEALER);
-				if(tst!=null)
+				IComponentIdentifier	cid	= csd.selectAgent(dealeraid);
+				if(cid!=null)
 				{
-					dealeraid = tst;
-					dealertf.setText(""+dealeraid);
+					dealeraid	= cid;
+					dealertf.setText(dealeraid!=null ? dealeraid.getName() : "");
 				}
 			}
-		})*/;
+		});
+		
 		dealerpan.add(dealertf);
-		//dealerpan.add(dealerbut);
+		dealerpan.add(dealerbut);
 
 		JPanel centerpan = new JPanel(new BorderLayout());
 		centerpan.add(playerpan, BorderLayout.CENTER);

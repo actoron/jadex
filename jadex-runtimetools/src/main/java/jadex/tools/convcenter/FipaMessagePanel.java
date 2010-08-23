@@ -1,11 +1,11 @@
 package jadex.tools.convcenter;
 
 import jadex.base.fipa.SFipa;
+import jadex.base.gui.ComponentSelectorDialog;
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.SGUI;
 import jadex.commons.SUtil;
 import jadex.commons.service.IServiceProvider;
-import jadex.tools.common.AgentSelectorDialog;
 
 import java.awt.Component;
 import java.awt.Dimension;
@@ -295,7 +295,7 @@ public class FipaMessagePanel extends JPanel
 
 
 		// Actions for agent selection.
-		final AgentSelectorDialog	agentselector	= new AgentSelectorDialog(this, provider);
+		final ComponentSelectorDialog	agentselector	= new ComponentSelectorDialog(this, provider);
 		setsender.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)

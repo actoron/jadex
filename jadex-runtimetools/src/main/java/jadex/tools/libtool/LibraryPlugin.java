@@ -10,11 +10,11 @@ import jadex.commons.ThreadSuspendable;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
+import jadex.commons.gui.EditableList;
+import jadex.commons.gui.EditableListEvent;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.library.ILibraryService;
 import jadex.commons.service.library.ILibraryServiceListener;
-import jadex.tools.common.EditableList;
-import jadex.tools.common.EditableListEvent;
 import jadex.tools.common.plugin.AbstractJCCPlugin;
 import jadex.tools.starter.StarterPlugin;
 

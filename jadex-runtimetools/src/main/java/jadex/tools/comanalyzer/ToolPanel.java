@@ -1,6 +1,6 @@
 package jadex.tools.comanalyzer;
 
-import jadex.tools.common.ElementPanel;
+import jadex.base.gui.ElementPanel;
 
 import java.awt.BorderLayout;
 import java.util.Map;

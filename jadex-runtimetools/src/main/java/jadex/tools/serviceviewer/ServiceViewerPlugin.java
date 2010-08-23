@@ -1,5 +1,11 @@
 package jadex.tools.serviceviewer;
 
+import jadex.base.gui.componenttree.ComponentTreePanel;
+import jadex.base.gui.componenttree.IActiveComponentTreeNode;
+import jadex.base.gui.componenttree.IComponentTreeNode;
+import jadex.base.gui.componenttree.INodeHandler;
+import jadex.base.gui.componenttree.INodeListener;
+import jadex.base.gui.componenttree.ServiceNode;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
@@ -7,19 +13,13 @@ import jadex.commons.Properties;
 import jadex.commons.SGUI;
 import jadex.commons.SReflect;
 import jadex.commons.concurrent.SwingDefaultResultListener;
+import jadex.commons.gui.CombiIcon;
+import jadex.commons.gui.ObjectCardLayout;
 import jadex.commons.service.IService;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.library.ILibraryService;
-import jadex.tools.common.CombiIcon;
-import jadex.tools.common.GuiProperties;
-import jadex.tools.common.ObjectCardLayout;
-import jadex.tools.common.componenttree.ComponentTreePanel;
-import jadex.tools.common.componenttree.IActiveComponentTreeNode;
-import jadex.tools.common.componenttree.IComponentTreeNode;
-import jadex.tools.common.componenttree.INodeHandler;
-import jadex.tools.common.componenttree.INodeListener;
-import jadex.tools.common.componenttree.ServiceNode;
 import jadex.tools.common.plugin.AbstractJCCPlugin;
+import jadex.tools.help.SHelp;
 
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -56,12 +56,12 @@ public class ServiceViewerPlugin extends AbstractJCCPlugin
 	protected static final UIDefaults	icons	= new UIDefaults(new Object[]{
 		"serviceviewer", SGUI.makeIcon(ServiceViewerPlugin.class, "/jadex/tools/common/images/configure.png"), 
 		"serviceviewer_sel", SGUI.makeIcon(ServiceViewerPlugin.class, "/jadex/tools/common/images/configure.png"), 
-		"open_viewer", SGUI.makeIcon(GuiProperties.class, "/jadex/tools/common/images/new_introspector.png"),
-		"close_viewer", SGUI.makeIcon(GuiProperties.class, "/jadex/tools/common/images/close_introspector.png"),
-		"viewer_empty", SGUI.makeIcon(GuiProperties.class, "/jadex/tools/common/images/introspector_empty.png"),
-		"overlay_viewable", SGUI.makeIcon(GuiProperties.class, "/jadex/tools/common/images/overlay_edit.png"),
-		"overlay_viewed", SGUI.makeIcon(GuiProperties.class, "/jadex/tools/common/images/overlay_introspected.png"),
-		"overlay_notviewed", SGUI.makeIcon(GuiProperties.class, "/jadex/tools/common/images/overlay_notintrospected.png")
+		"open_viewer", SGUI.makeIcon(SHelp.class, "/jadex/tools/common/images/new_introspector.png"),
+		"close_viewer", SGUI.makeIcon(SHelp.class, "/jadex/tools/common/images/close_introspector.png"),
+		"viewer_empty", SGUI.makeIcon(SHelp.class, "/jadex/tools/common/images/introspector_empty.png"),
+		"overlay_viewable", SGUI.makeIcon(SHelp.class, "/jadex/tools/common/images/overlay_edit.png"),
+		"overlay_viewed", SGUI.makeIcon(SHelp.class, "/jadex/tools/common/images/overlay_introspected.png"),
+		"overlay_notviewed", SGUI.makeIcon(SHelp.class, "/jadex/tools/common/images/overlay_notintrospected.png")
 	});
 	
 	/** The property for the viewer panel class. */
@@ -278,7 +278,7 @@ public class ServiceViewerPlugin extends AbstractJCCPlugin
 		split.add(detail);
 		//split.setResizeWeight(1.0);
 		
-		GuiProperties.setupHelp(split, getHelpID());
+		SHelp.setupHelp(split, getHelpID());
 
 		split.setDividerLocation(150);
 		
@@ -341,7 +341,7 @@ public class ServiceViewerPlugin extends AbstractJCCPlugin
 										Properties	sub	= props!=null ? props.getSubproperty(panel.getId()) : null;
 										panel.setProperties(sub);
 										JComponent comp = panel.getComponent();
-										GuiProperties.setupHelp(comp, getHelpID());
+										SHelp.setupHelp(comp, getHelpID());
 										panels.put(service.getServiceIdentifier(), panel);
 										detail.add(comp, service.getServiceIdentifier());
 										comptree.getModel().fireNodeChanged(node);
@@ -393,7 +393,7 @@ public class ServiceViewerPlugin extends AbstractJCCPlugin
 														Properties	sub	= props!=null ? props.getSubproperty(panel.getId()) : null;
 														panel.setProperties(sub);
 														JComponent comp = panel.getComponent();
-														GuiProperties.setupHelp(comp, getHelpID());
+														SHelp.setupHelp(comp, getHelpID());
 														panels.put(exta.getComponentIdentifier(), panel);
 														detail.add(comp, exta.getComponentIdentifier());
 														comptree.getModel().fireNodeChanged(node);

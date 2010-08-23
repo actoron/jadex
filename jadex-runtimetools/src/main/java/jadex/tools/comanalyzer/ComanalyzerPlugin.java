@@ -1,5 +1,9 @@
 package jadex.tools.comanalyzer;
 
+import jadex.base.gui.componenttree.ComponentTreePanel;
+import jadex.base.gui.componenttree.IActiveComponentTreeNode;
+import jadex.base.gui.componenttree.IComponentTreeNode;
+import jadex.base.gui.componenttree.INodeHandler;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentListener;
@@ -23,12 +27,8 @@ import jadex.tools.comanalyzer.chart.ChartPanel;
 import jadex.tools.comanalyzer.diagram.DiagramPanel;
 import jadex.tools.comanalyzer.graph.GraphPanel;
 import jadex.tools.comanalyzer.table.TablePanel;
-import jadex.tools.common.GuiProperties;
-import jadex.tools.common.componenttree.ComponentTreePanel;
-import jadex.tools.common.componenttree.IActiveComponentTreeNode;
-import jadex.tools.common.componenttree.IComponentTreeNode;
-import jadex.tools.common.componenttree.INodeHandler;
 import jadex.tools.common.plugin.AbstractJCCPlugin;
+import jadex.tools.help.SHelp;
 import jadex.xml.bean.JavaReader;
 import jadex.xml.bean.JavaWriter;
 
@@ -507,7 +507,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 
 		tpanel = new ToolPanel(tools);
 
-		GuiProperties.setupHelp(tpanel, "tools.comanalyzer");
+		SHelp.setupHelp(tpanel, "tools.comanalyzer");
 		split.add(tpanel);
 
 //		agents.getTreetable().addMouseListener(new MouseAdapter()

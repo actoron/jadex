@@ -7,6 +7,9 @@ import jadex.bridge.IComponentManagementService;
 import jadex.commons.SGUI;
 import jadex.commons.TreeExpansionHandler;
 import jadex.commons.concurrent.SwingDefaultResultListener;
+import jadex.commons.gui.jtreetable.AbstractTreeTableModel;
+import jadex.commons.gui.jtreetable.DefaultTreeTableModel;
+import jadex.commons.gui.jtreetable.JTreeTable;
 import jadex.commons.jtable.ResizeableTableHeader;
 import jadex.commons.service.IServiceProvider;
 import jadex.commons.service.SServiceProvider;
@@ -14,10 +17,7 @@ import jadex.rules.state.IProfiler;
 import jadex.rules.state.IProfiler.ProfilingInfo;
 import jadex.rules.tools.profiler.Profiler;
 import jadex.rules.tools.stateviewer.OAVTreeModel;
-import jadex.tools.common.GuiProperties;
-import jadex.tools.common.jtreetable.AbstractTreeTableModel;
-import jadex.tools.common.jtreetable.DefaultTreeTableModel;
-import jadex.tools.common.jtreetable.JTreeTable;
+import jadex.tools.help.SHelp;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -50,10 +50,10 @@ public class RuleProfilerPanel	extends JPanel
 	 */
 	// Todo: new icons for profiler elements.
 	protected static final UIDefaults	icons	= new UIDefaults(new Object[]{
-		"root", SGUI.makeIcon(GuiProperties.class, "/jadex/tools/common/images/new_agent.png"),
-		"rule", SGUI.makeIcon(GuiProperties.class, "/jadex/tools/common/images/arrow_right.png"),
+		"root", SGUI.makeIcon(SHelp.class, "/jadex/tools/common/images/new_agent.png"),
+		"rule", SGUI.makeIcon(SHelp.class, "/jadex/tools/common/images/arrow_right.png"),
 		"object", SGUI.makeIcon(OAVTreeModel.class, "/jadex/rules/state/viewer/images/object.png"),
-		"event", SGUI.makeIcon(GuiProperties.class, "/jadex/tools/common/images/goalevent.png"),
+		"event", SGUI.makeIcon(SHelp.class, "/jadex/tools/common/images/goalevent.png"),
 	});
 	
 	//-------- attributes --------

@@ -1,6 +1,10 @@
 package jadex.tools.convcenter;
 
 import jadex.base.fipa.SFipa;
+import jadex.base.gui.componenttree.ComponentTreePanel;
+import jadex.base.gui.componenttree.IActiveComponentTreeNode;
+import jadex.base.gui.componenttree.IComponentTreeNode;
+import jadex.base.gui.componenttree.INodeHandler;
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IEAMessageEvent;
 import jadex.bdi.runtime.IMessageEventListener;
@@ -10,12 +14,8 @@ import jadex.commons.Properties;
 import jadex.commons.SGUI;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.commons.service.SServiceProvider;
-import jadex.tools.common.GuiProperties;
-import jadex.tools.common.componenttree.ComponentTreePanel;
-import jadex.tools.common.componenttree.IActiveComponentTreeNode;
-import jadex.tools.common.componenttree.IComponentTreeNode;
-import jadex.tools.common.componenttree.INodeHandler;
 import jadex.tools.common.plugin.AbstractJCCPlugin;
+import jadex.tools.help.SHelp;
 import jadex.tools.jcc.AgentControlCenter;
 import jadex.tools.starter.StarterPlugin;
 
@@ -196,7 +196,7 @@ public class ConversationPlugin extends AbstractJCCPlugin
 
 		split.add(convcenter = new FipaConversationPanel(((AgentControlCenter)getJCC()).getAgent(), comptree));
 
-		GuiProperties.setupHelp(split, "tools.conversationcenter");
+		SHelp.setupHelp(split, "tools.conversationcenter");
 
 		split.setDividerLocation(150);
 

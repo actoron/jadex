@@ -1,8 +1,8 @@
 package jadex.tools.ruleprofiler;
 
 import jadex.commons.SUtil;
+import jadex.commons.gui.jtreetable.TreeTableNode;
 import jadex.rules.state.IProfiler.ProfilingInfo;
-import jadex.tools.common.jtreetable.TreeTableNode;
 
 import java.util.ArrayList;
 import java.util.Collections;

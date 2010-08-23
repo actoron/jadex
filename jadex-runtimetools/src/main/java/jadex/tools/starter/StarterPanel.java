@@ -1,6 +1,9 @@
 package jadex.tools.starter;
 
 import jadex.base.SComponentFactory;
+import jadex.base.gui.ComponentSelectorDialog;
+import jadex.base.gui.ElementPanel;
+import jadex.base.gui.ParserValidator;
 import jadex.bridge.IArgument;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IErrorReport;
@@ -9,20 +12,17 @@ import jadex.commons.FixedJComboBox;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SGUI;
-import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
+import jadex.commons.gui.CombiIcon;
+import jadex.commons.gui.JValidatorTextField;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.library.ILibraryService;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
-import jadex.tools.common.AgentSelectorDialog;
-import jadex.tools.common.ElementPanel;
-import jadex.tools.common.GuiProperties;
-import jadex.tools.common.JValidatorTextField;
-import jadex.tools.common.ParserValidator;
+import jadex.tools.help.SHelp;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -68,6 +68,7 @@ public class StarterPanel extends JPanel
 	/** The image icons. */
 	protected static UIDefaults	icons	= new UIDefaults(new Object[]
 	{
+		"overlay_check", SGUI.makeIcon(StarterPanel.class, "/jadex/tools/common/images/overlay_check.png"),
 		"Browse", SGUI.makeIcon(StarterPanel.class,	"/jadex/tools/common/images/dots_small.png"),
 		"delete", SGUI.makeIcon(StarterPanel.class,	"/jadex/tools/common/images/delete_small.png")
 	});
@@ -345,7 +346,6 @@ public class StarterPanel extends JPanel
 				{
 					//System.out.println("SystemEvent: "+id);
 					loadModel((String)id);
-					updateGuiForNewModel((String)id);
 				}
 			}
 		};
@@ -383,7 +383,7 @@ public class StarterPanel extends JPanel
 		chooseparent.setToolTipText("Choose parent");
 		componentpanel.add(chooseparent, new GridBagConstraints(3, 1, 1, 1, 0, 0, GridBagConstraints.EAST,
 			GridBagConstraints.BOTH, new Insets(2, 2, 0, 2), 0, 0));
-		final AgentSelectorDialog	agentselector = new AgentSelectorDialog(this, starter.getJCC().getServiceProvider());
+		final ComponentSelectorDialog	agentselector = new ComponentSelectorDialog(this, starter.getJCC().getServiceProvider());
 		chooseparent.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
@@ -491,7 +491,7 @@ public class StarterPanel extends JPanel
 		buts.add(reset, new GridBagConstraints(2, 0, 1, 1, 0, 0, GridBagConstraints.EAST, GridBagConstraints.NONE,
 				new Insets(2, 2, 2, 2), 0, 0));
 
-		HelpBroker hb = GuiProperties.setupHelp(this, "tools.starter");
+		HelpBroker hb = SHelp.setupHelp(this, "tools.starter");
 		if(hb!=null)
 		{
 			JButton help = new JButton("Help");
@@ -556,7 +556,29 @@ public class StarterPanel extends JPanel
 							public void customResultAvailable(Object source, Object result)
 							{
 								model = (IModelInfo)result;
-								updateGuiForNewModel(adf);
+								SComponentFactory.getFileType(starter.getJCC().getServiceProvider(), adf).addResultListener(new SwingDefaultResultListener(StarterPanel.this)
+								{
+									public void customResultAvailable(Object source, Object result)
+									{
+										SComponentFactory.getFileTypeIcon(starter.getJCC().getServiceProvider(), (String)result).addResultListener(new SwingDefaultResultListener(StarterPanel.this)
+										{
+											public void customResultAvailable(Object source, Object result)
+											{
+												updateGuiForNewModel(adf, (Icon)result);
+											}
+											
+											public void customExceptionOccurred(Object source, Exception exception)
+											{
+												updateGuiForNewModel(adf, null);
+											}
+										});								
+									}
+									
+									public void customExceptionOccurred(Object source, Exception exception)
+									{
+										updateGuiForNewModel(adf, null);
+									}
+								});								
 							}
 							
 							public void customExceptionOccurred(Object source, Exception exception)
@@ -565,44 +587,23 @@ public class StarterPanel extends JPanel
 								StringWriter sw = new StringWriter();
 								exception.printStackTrace(new PrintWriter(sw));
 								error = sw.toString();
-								updateGuiForNewModel(adf);
+								updateGuiForNewModel(adf, null);
 							}
 						});
 					}
 					else
 					{
 						model = null;
-						updateGuiForNewModel(adf);
+						updateGuiForNewModel(adf, null);
 					}
 				}
 			});
-			
-//			try
-//			{
-//				if(SComponentFactory.isLoadable(starter.getJCC().getServiceContainer(), adf))
-//				{
-//					model = SComponentFactory.loadModel(starter.getJCC().getServiceContainer(), adf);
-//				}
-//				else
-//				{
-//					model = null;
-//				}
-//			}
-//			catch(Exception e)
-//			{
-//				//e.printStackTrace();
-//				model = null;
-//				StringWriter sw = new StringWriter();
-//				e.printStackTrace(new PrintWriter(sw));
-//				error = sw.toString();
-//			}
-//			lastfile = adf;
 		}
 		else
 		{
 			model = null;
 			error = null;
-			updateGuiForNewModel(adf);
+			updateGuiForNewModel(adf, null);
 		}
 	}
 
@@ -610,8 +611,9 @@ public class StarterPanel extends JPanel
 	/**
 	 *  Update the GUI for a new model.
 	 *  @param adf The adf.
+	 *  @param icon The component icon (if available).
 	 */
-	void updateGuiForNewModel(final String adf)
+	void updateGuiForNewModel(String adf, Icon icon)
 	{
 //		System.out.println("updategui "+adf);
 		
@@ -630,7 +632,7 @@ public class StarterPanel extends JPanel
 		if(confignames.length>0)
 			config.getModel().setSelectedItem(confignames[0]);
 		
-		if(model!=null && model.isStartable()) //adf!=null && SComponentFactory.isStartable(starter.getJCC().getServiceContainer(), adf))
+		if(model!=null && model.isStartable())
 		{
 			createArguments();
 			createResults();
@@ -665,20 +667,10 @@ public class StarterPanel extends JPanel
 				
 		filename.setText(adf);
 
-//		if(model!=null && model.isStartable())
-//		{
-//			componentname.setText(model.getName());
-//		}
-//		else
-//		{
-//			componentname.setText("");
-//		}
-		
 		final IErrorReport report = model!=null? model.getReport(): null;
-		if(report!=null && report!=null)
+		if(report!=null)
 		{
-			String clazz = SReflect.getInnerClassName(model.getClass());
-			final Icon icon = GuiProperties.getElementIcon(clazz+"_broken");
+			icon	= icon!=null ? new CombiIcon(new Icon[]{icon, icons.getIcon("overlay_check")}) : icons.getIcon("overlay_check");
 			try
 			{
 				modeldesc.addHTMLContent(model.getName(), icon, report.getErrorHTML(), adf, report.getDocuments());
@@ -692,8 +684,6 @@ public class StarterPanel extends JPanel
 		}
 		else if(model!=null)
 		{
-			String clazz = SReflect.getInnerClassName(model.getClass());
-			final Icon icon = GuiProperties.getElementIcon(clazz);
 			try
 			{
 				modeldesc.addHTMLContent(model.getName(), icon, model.getDescription(), adf, null);

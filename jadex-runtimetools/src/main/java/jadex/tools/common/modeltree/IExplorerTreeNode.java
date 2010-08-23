@@ -1,6 +1,7 @@
 package jadex.tools.common.modeltree;
 
 
+
 /**
  *  Common interface for explorer tree nodes.
  */

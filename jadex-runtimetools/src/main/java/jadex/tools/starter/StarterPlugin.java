@@ -1,6 +1,8 @@
 package jadex.tools.starter;
 
 import jadex.base.SComponentFactory;
+import jadex.base.gui.ComponentIdentifierDialog;
+import jadex.base.gui.componenttree.ComponentTreePanel;
 import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
@@ -14,11 +16,9 @@ import jadex.commons.ThreadSuspendable;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
+import jadex.commons.gui.IMenuItemConstructor;
+import jadex.commons.gui.PopupBuilder;
 import jadex.commons.service.SServiceProvider;
-import jadex.tools.common.ComponentIdentifierDialog;
-import jadex.tools.common.IMenuItemConstructor;
-import jadex.tools.common.PopupBuilder;
-import jadex.tools.common.componenttree.ComponentTreePanel;
 import jadex.tools.common.modeltree.FileNode;
 import jadex.tools.common.modeltree.IExplorerTreeNode;
 import jadex.tools.common.modeltree.ModelExplorer;

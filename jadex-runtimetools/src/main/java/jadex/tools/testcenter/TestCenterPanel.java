@@ -1,6 +1,7 @@
 package jadex.tools.testcenter;
 
 import jadex.base.SComponentFactory;
+import jadex.base.gui.ElementPanel;
 import jadex.base.test.Testcase;
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IEAGoal;
@@ -13,12 +14,10 @@ import jadex.commons.SUtil;
 import jadex.commons.ThreadSuspendable;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
+import jadex.commons.gui.BrowserPane;
+import jadex.commons.gui.EditableList;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.library.ILibraryService;
-import jadex.tools.common.BrowserPane;
-import jadex.tools.common.EditableList;
-import jadex.tools.common.ElementPanel;
-import jadex.tools.common.ScrollablePanel;
 import jadex.tools.jcc.AgentControlCenter;
 import jadex.xml.bean.JavaReader;
 import jadex.xml.bean.JavaWriter;
