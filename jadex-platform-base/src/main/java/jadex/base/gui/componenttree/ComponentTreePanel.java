@@ -5,6 +5,7 @@ import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentManagementService;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IRemoteServiceManagementService;
 import jadex.commons.SGUI;
 import jadex.commons.TreeExpansionHandler;
@@ -13,6 +14,7 @@ import jadex.commons.gui.CombiIcon;
 import jadex.commons.service.IServiceProvider;
 import jadex.commons.service.SServiceProvider;
 
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
@@ -24,6 +26,7 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.JComponent;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTree;
@@ -411,8 +414,7 @@ public class ComponentTreePanel extends JSplitPane
 				TreePath	path	= tree.getSelectionPath();
 				if(path!=null && ((IComponentTreeNode)path.getLastPathComponent()).hasProperties())
 				{
-					showProperties(path.getLastPathComponent().toString(),
-						((IComponentTreeNode)path.getLastPathComponent()).getPropertiesComponent());
+					showProperties(((IComponentTreeNode)path.getLastPathComponent()).getPropertiesComponent());
 				}
 			}
 		};
@@ -424,14 +426,25 @@ public class ComponentTreePanel extends JSplitPane
 				TreePath path = tree.getSelectionPath();
 				if(path!=null)
 				{
-					IComponentTreeNode node = (IComponentTreeNode)path.getLastPathComponent();
-					JComponent panel = null;
-					Object obj = null;
+					final IComponentTreeNode node = (IComponentTreeNode)path.getLastPathComponent();
 					if(node instanceof ServiceNode)
 					{
-						obj = ((ServiceNode)node).getService();
-						panel = new ObjectInspectorPanel(obj);
-						showProperties(node.toString(), panel);
+						Object obj = ((ServiceNode)node).getService();
+						JPanel panel = new ObjectInspectorPanel(obj);
+						showProperties(panel);
+					}
+					else if(node instanceof IActiveComponentTreeNode)
+					{
+						IComponentDescription desc = ((IActiveComponentTreeNode)node).getDescription();
+						cms.getExternalAccess(desc.getName()).addResultListener(new SwingDefaultResultListener((Component)null)
+						{
+							public void customResultAvailable(Object source, Object result)
+							{
+								IExternalAccess	ea	= (IExternalAccess)result;
+								JPanel panel = new ObjectInspectorPanel(ea);
+								showProperties(panel);
+							}
+						});
 					}
 				}
 			}
@@ -468,17 +481,33 @@ public class ComponentTreePanel extends JSplitPane
 				};
 				ret.add(refreshtree);
 				
-				if(nodes.length==1 && nodes[0].hasProperties())
+				if(nodes.length==1)
 				{
-					Action	pshowprops	= new AbstractAction((String)showprops.getValue(Action.NAME),
-						base!=null ? new CombiIcon(new Icon[]{base, icons.getIcon("overlay_showprops")}) : (Icon)showprops.getValue(Action.SMALL_ICON))
+					if(nodes[0].hasProperties())
 					{
-						public void actionPerformed(ActionEvent e)
+						Action pshowprops = new AbstractAction((String)showprops.getValue(Action.NAME),
+							base!=null ? new CombiIcon(new Icon[]{base, icons.getIcon("overlay_showprops")}) : (Icon)showprops.getValue(Action.SMALL_ICON))
 						{
-							showprops.actionPerformed(e);
-						}
-					};
-					ret.add(0, pshowprops);
+							public void actionPerformed(ActionEvent e)
+							{
+								showprops.actionPerformed(e);
+							}
+						};
+						ret.add(0, pshowprops);
+					}
+					
+					if(nodes[0] instanceof ServiceNode || nodes[0] instanceof IActiveComponentTreeNode)
+					{
+						Action pshowobject = new AbstractAction((String)showobject.getValue(Action.NAME),
+							base!=null ? new CombiIcon(new Icon[]{base, icons.getIcon("overlay_showprops")}) : (Icon)showprops.getValue(Action.SMALL_ICON))
+						{
+							public void actionPerformed(ActionEvent e)
+							{
+								showobject.actionPerformed(e);
+							}
+						};
+						ret.add(0, pshowobject);
+					}
 				}
 			
 				return (Action[])ret.toArray(new Action[0]);
@@ -764,7 +793,7 @@ public class ComponentTreePanel extends JSplitPane
 	/**
 	 *  Set the title and contents of the properties panel.
 	 */
-	public void	showProperties(String title, JComponent content)
+	public void	showProperties(JComponent content)
 	{
 		proppanel.setViewportView(content);
 		proppanel.repaint();
