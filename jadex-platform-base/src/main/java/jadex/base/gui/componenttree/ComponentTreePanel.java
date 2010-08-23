@@ -1,5 +1,6 @@
 package jadex.base.gui.componenttree;
 
+import jadex.base.gui.ObjectInspectorPanel;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentListener;
@@ -104,11 +105,18 @@ public class ComponentTreePanel extends JSplitPane
 	/** The action for showing properties of the selected node. */
 	private final Action	showprops;
 	
+	/** The action for showing object details of the selected node. */
+	private final Action	showobject;
+	
 	/** The component listener. */
 	private final IComponentListener	listener;
 	
 	/** The properties panel. */
 	private final JScrollPane	proppanel;
+	
+//	/** The object panel. */
+//	private final JScrollPane	objectpanel;
+
 	
 	//-------- constructors --------
 	
@@ -408,6 +416,26 @@ public class ComponentTreePanel extends JSplitPane
 				}
 			}
 		};
+		
+		showobject = new AbstractAction("Show object details", icons.getIcon("show_object"))
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				TreePath path = tree.getSelectionPath();
+				if(path!=null)
+				{
+					IComponentTreeNode node = (IComponentTreeNode)path.getLastPathComponent();
+					JComponent panel = null;
+					Object obj = null;
+					if(node instanceof ServiceNode)
+					{
+						obj = ((ServiceNode)node).getService();
+						panel = new ObjectInspectorPanel(obj);
+						showProperties(node.toString(), panel);
+					}
+				}
+			}
+		};
 
 		// Default overlays and popups.
 		model.addNodeHandler(new INodeHandler()
@@ -419,7 +447,7 @@ public class ComponentTreePanel extends JSplitPane
 
 			public Action[] getPopupActions(IComponentTreeNode[] nodes)
 			{
-				Action[]	ret;
+				List ret = new ArrayList();
 				Icon	base	= nodes[0].getIcon();
 				Action	prefresh	= new AbstractAction((String)refresh.getValue(Action.NAME),
 					base!=null ? new CombiIcon(new Icon[]{base, icons.getIcon("overlay_refresh")}) : (Icon)refresh.getValue(Action.SMALL_ICON))
@@ -429,6 +457,7 @@ public class ComponentTreePanel extends JSplitPane
 						refresh.actionPerformed(e);
 					}
 				};
+				ret.add(prefresh);
 				Action	prefreshtree	= new AbstractAction((String)refreshtree.getValue(Action.NAME),
 					base!=null ? new CombiIcon(new Icon[]{base, icons.getIcon("overlay_refreshtree")}) : (Icon)refreshtree.getValue(Action.SMALL_ICON))
 				{
@@ -437,6 +466,7 @@ public class ComponentTreePanel extends JSplitPane
 						refreshtree.actionPerformed(e);
 					}
 				};
+				ret.add(refreshtree);
 				
 				if(nodes.length==1 && nodes[0].hasProperties())
 				{
@@ -448,13 +478,10 @@ public class ComponentTreePanel extends JSplitPane
 							showprops.actionPerformed(e);
 						}
 					};
-					ret	= new Action[]{pshowprops, prefresh, prefreshtree};
+					ret.add(0, pshowprops);
 				}
-				else
-				{
-					ret	= new Action[]{prefresh, prefreshtree};					
-				}
-				return ret;
+			
+				return (Action[])ret.toArray(new Action[0]);
 			}
 
 			public Action getDefaultAction(final IComponentTreeNode node)

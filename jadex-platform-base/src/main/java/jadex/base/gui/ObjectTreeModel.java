@@ -1,24 +1,15 @@
-package jadex.rules.tools.stateviewer;
+package jadex.base.gui;
 
 import jadex.commons.SGUI;
 import jadex.commons.SUtil;
-import jadex.rules.state.IOAVState;
-import jadex.rules.state.IOAVStateListener;
-import jadex.rules.state.OAVAttributeType;
-import jadex.rules.state.OAVJavaType;
-import jadex.rules.state.OAVObjectType;
 
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.lang.ref.WeakReference;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.Iterator;
@@ -39,19 +30,17 @@ import javax.swing.tree.TreePath;
 
 
 /**
- *  Swing Tree model for an OAV state. Enables displaying an 
- *  oav state in a swing tree.
+ * 
  */
-public class OAVTreeModel implements TreeModel
+public class ObjectTreeModel implements TreeModel
 {
-
+	//-------- static part --------
+	
 	/**
 	 * flag to indicate if java objects should be inspectable in the tree
 	 * TO DO: make configurable via GUI?
 	 */
 	protected final static boolean enableObjectInspection = true;
-	
-	//-------- static part --------
 	
 	/**
 	 * The image icons.
@@ -59,28 +48,19 @@ public class OAVTreeModel implements TreeModel
 	protected static UIDefaults icons = new UIDefaults(new Object[]
 	{
 		// Tab icons.
-		"object", SGUI.makeIcon(OAVTreeModel.class, "/jadex/rules/tools/stateviewer/images/object.png"),
-		"attribute", SGUI.makeIcon(OAVTreeModel.class, "/jadex/rules/tools/stateviewer/images/attribute.png"),
-		"value", SGUI.makeIcon(OAVTreeModel.class, "/jadex/rules/tools/stateviewer/images/value.png"),
-		"javaobject", SGUI.makeIcon(OAVTreeModel.class, "/jadex/rules/tools/stateviewer/images/bean.png"),
-		"javaattribute", SGUI.makeIcon(OAVTreeModel.class, "/jadex/rules/tools/stateviewer/images/javaattribute.png"),
-		"javavalue", SGUI.makeIcon(OAVTreeModel.class, "/jadex/rules/tools/stateviewer/images/value.png")
+		"javaobject", SGUI.makeIcon(ObjectTreeModel.class, "/jadex/rules/tools/stateviewer/images/bean.png"),
+		"javaattribute", SGUI.makeIcon(ObjectTreeModel.class, "/jadex/rules/tools/stateviewer/images/javaattribute.png"),
+		"javavalue", SGUI.makeIcon(ObjectTreeModel.class, "/jadex/rules/tools/stateviewer/images/value.png")
 	});
 	
-	/**
-	 * The list of timers to update the object inspector tree nodes
-	 */
-	protected static List timerList;
+	/** The list of timers to update the object inspector tree nodes .*/
+	protected static List timers;
 
-	
 	//-------- attributes --------
 	
 	/** The root node. */
-	protected RootNode	root;
+	protected ObjectInspectorNode root;
 
-	/** The local copy of the state (synchronized to swing thread). */
-	protected CopyState	copy;
-	
 	/** The listeners. */
 	protected Set	listeners;
 
@@ -94,47 +74,31 @@ public class OAVTreeModel implements TreeModel
 	/** list for all created Attribute inspector nodes */
 	protected List inspectors;
 	
-//	/** Random to generate unique(?) IDs*/
-//	protected Random rng;
-	
 	/** UUID counter */
 	private int uuidcounter;
-
 	
 	//-------- constructors --------
 
 	/**
 	 *  Create new OAV tree model.
-	 *  @param id	The root object id.
-	 *  @param state	The OAV state.
 	 *  @param showempty	Flag, if empty attributes should be shown.
 	 */
-	public OAVTreeModel(IOAVState state)
+	public ObjectTreeModel(Object root)
 	{
 		// use identity hash for different (java) objects being equal (e.g. empty list).
 		// todo: mixed identity map like used in state?
 		this.nodes	= new IdentityHashMap();
-		this.root	= new RootNode();
+		this.root	= new ObjectInspectorNode(null, root.getClass(), null, root);
 		
 		this.inspectors = new ArrayList();
 //		this.rng = new Random(System.currentTimeMillis());
 		this.uuidcounter = 0;
 		
-		Timer refreshTimer = new Timer(5000, new ObjectInspectorRefreshAction(this));
-		refreshTimer.start();
-		OAVTreeModel.addRefreshTimer(refreshTimer);
+//		Timer refreshTimer = new Timer(5000, new ObjectInspectorRefreshAction(this));
+//		refreshTimer.start();
+//		OAVTreeModel.addRefreshTimer(refreshTimer);
 		
-		// Todo: create copy state on state thread.
-		this.copy	= new CopyState(state, new SwingSynchronizator());
-		
-		// could this anonymous inner class result in a cyclic reference  that prevents the TreeModel 
-		// to be removed from gc when Introspector plugin is closed?
-		// model -> copystate -> listener -> model$this0
-		// 				|-> state -> listener -> copystate-lister$this0
-		//					  ^-<- Agent
-		// IMHO the OAVTreeModel for the Introspector plugin will be removed only
-		// if the Agent that was introspected is removed too
-		copy.addStateListener(new IOAVStateListener()
+		/*copy.addStateListener(new IOAVStateListener()
 		{
 			/**
 			 *  Notification when an attribute value of an object has been set.
@@ -142,7 +106,7 @@ public class OAVTreeModel implements TreeModel
 			 *  @param attr The attribute type.
 			 *  @param oldvalue The oldvalue.
 			 *  @param newvalue The newvalue.
-			 */
+			 * /
 			public void objectModified(Object id, OAVObjectType type,  
 				final OAVAttributeType attr, Object oldvalue, Object newvalue)
 			{
@@ -314,7 +278,7 @@ public class OAVTreeModel implements TreeModel
 			 *  Notification when an object has been added to the state.
 			 *  @param child The object id.
 			 *  @param type The object type.
-			 */
+			 * /
 			public void objectAdded(Object id, OAVObjectType type, boolean root)
 			{
 				if(root)
@@ -352,7 +316,7 @@ public class OAVTreeModel implements TreeModel
 			 *  Notification when an object has been removed from state.
 			 *  @param id The object id.
 			 *  @param type The object type.
-			 */
+			 * /
 			public void objectRemoved(Object id, OAVObjectType type)
 			{
 //				System.out.println("removed: "+id);
@@ -413,7 +377,7 @@ public class OAVTreeModel implements TreeModel
 					}
 				}
 			}
-		}, false);
+		}, false);*/
 	}
 	
 	
@@ -436,26 +400,8 @@ public class OAVTreeModel implements TreeModel
 //		System.out.println("getChildCount: "+parent);
 		int	count;
 		
-		// Node for an attribute.
-		if(parent instanceof AttributeNode)
-		{
-			count	= ((AttributeNode)parent).getChildren().size();
-		}
-		
-		// Node for an OAV object.
-		else if(parent instanceof ObjectNode)
-		{
-			count	= ((ObjectNode)parent).getChildren().size();
-		}
-		
-		// Root node.
-		else if(parent instanceof RootNode)
-		{
-			count	= ((RootNode)parent).getChildren().size();
-		}
-		
 		// Node for an ObjectInspector object.
-		else if(parent instanceof ObjectInspectorNode)
+		if(parent instanceof ObjectInspectorNode)
 		{
 			count	= ((ObjectInspectorNode)parent).getChildren().size();
 		}
@@ -483,26 +429,8 @@ public class OAVTreeModel implements TreeModel
 //		System.out.println("getChild: "+parent+", "+index);
 		Object ret;
 		
-		// Node for an attribute.
-		if(parent instanceof AttributeNode)
-		{
-			ret	= ((AttributeNode)parent).getChildren().get(index);
-		}
-		
-		// Node for an object.
-		else if(parent instanceof ObjectNode)
-		{
-			ret	= ((ObjectNode)parent).getChildren().get(index);
-		}
-		
-		// Root node.
-		else if(parent instanceof RootNode)
-		{
-			ret	= ((RootNode)parent).getChildren().get(index);
-		}
-		
 		// Node for an ObjectInspector object.
-		else if(parent instanceof ObjectInspectorNode)
+		if(parent instanceof ObjectInspectorNode)
 		{
 			ret	= ((ObjectInspectorNode)parent).getChildren().get(index);
 		}
@@ -670,12 +598,7 @@ public class OAVTreeModel implements TreeModel
 		for(int i=start; index==-1 && i<children.size(); i++)
 //		for(int i=children.size()-1; i>=0 && index == -1; i--)
 		{
-			if((children.get(i) instanceof ObjectNode) 
-				&& ((ObjectNode)children.get(i)).equals(child, false))
-			{
-				index = i;
-			}
-			else if ((children.get(i) instanceof ObjectInspectorNode) 
+			if ((children.get(i) instanceof ObjectInspectorNode) 
 					&& ((ObjectInspectorNode)children.get(i)).equals(child, false))
 			{
 				index = i;
@@ -957,14 +880,6 @@ public class OAVTreeModel implements TreeModel
 		}
 	}
 	
-	/**
-	 *  Dispose the model and remove all listeners.
-	 */
-	public void	dispose()
-	{
-		this.copy.dispose();
-	}
-	
 	//-------- static part --------
 
 	/**
@@ -1009,14 +924,14 @@ public class OAVTreeModel implements TreeModel
 	/**
 	 * Sets the refresh delay for the ObjectInspector refresh
 	 * A value equal or lower to 0 disables the refresh and stop the timers
-	 */
+	 * /
 	public static void setRefreshDelay(int millis)
 	{
 //		System.out.println("Set OAVTreeModel refresh delay to " + millis);
-		if (timerList != null)
+		if (timers != null)
 		{
 			if (millis > 0)
-				for (Iterator timers = timerList.iterator(); timers.hasNext();)
+				for (Iterator timers = timers.iterator(); timers.hasNext();)
 				{
 					Timer timer = (Timer) timers.next();
 					timer.setDelay(millis);
@@ -1024,14 +939,14 @@ public class OAVTreeModel implements TreeModel
 						timer.start();
 				}
 			else
-				for (Iterator timers = timerList.iterator(); timers.hasNext();)
+				for (Iterator timers = timers.iterator(); timers.hasNext();)
 				{
 					Timer timer = (Timer) timers.next();
 					if (timer.isRunning())
 						timer.stop();
 				}
 		}
-	}
+	}*/
 	
 	/**
 	 * Add a timer to the static refresh timer list 
@@ -1039,10 +954,10 @@ public class OAVTreeModel implements TreeModel
 	 */
 	protected static void addRefreshTimer(Timer t)
 	{
-		if (timerList == null)
-			timerList = new ArrayList();
+		if (timers == null)
+			timers = new ArrayList();
 		
-		timerList.add(t);
+		timers.add(t);
 	}
 	
 	/**
@@ -1054,8 +969,8 @@ public class OAVTreeModel implements TreeModel
 		if (t != null)
 		{
 			t.stop();
-			if (timerList == null)
-				timerList.remove(t);
+			if (timers == null)
+				timers.remove(t);
 		}
 	}
 
@@ -1101,384 +1016,7 @@ public class OAVTreeModel implements TreeModel
 	}
 	
 	/**
-	 *  A node representing an attribute value.
-	 */
-	public class AttributeNode
-	{
-		//-------- attributes --------
-		
-		/** The attribute. */
-		protected OAVAttributeType	attribute;
-		
-		/** The object node. */
-		protected ObjectNode	parent;
-
-		/** The children. */
-		protected List	children;
-		
-		/** The path from the root node to this node. */
-		protected Object[]	path;
-		
-		/** A unique id for this node */
-		protected int nodeUUID;
-
-		//-------- constructors --------
-		
-		/**
-		 *  Create a new attribute node.
-		 *  @param parent	The parent.
-		 *  @param attribute	The attribute.
-		 */
-		public AttributeNode(ObjectNode parent, OAVAttributeType attribute)
-		{
-			this.parent	= parent;
-			this.attribute	= attribute;
-			
-			this.nodeUUID = getNextNodeUUID();
-		}
-		
-		//-------- methods --------
-		
-		/**
-		 *  Get the children of this node.
-		 */
-		public List	getChildren()
-		{
-			if(children==null)
-			{
-				children 	= new ArrayList();
-				if(OAVAttributeType.NONE.equals(attribute.getMultiplicity()))
-				{
-					Object	child	= copy.getAttributeValue(parent.object, attribute);
-					if(!(attribute.getType() instanceof OAVJavaType))
-						child = new ObjectNode(this, child);
-					else if(isInspectable(child))
-						// objectInspector Node
-						child = new ObjectInspectorNode(this, child.getClass(), null, child);
-					// else use plain value
-					
-					children.add(child);
-				}
-				else
-				{
-					Collection	coll	= copy.getAttributeValues(parent.object, attribute);
-					if(coll!=null)
-					{
-						for(Iterator it=coll.iterator(); it.hasNext(); )
-						{
-							Object	child	= it.next();
-							if(!(attribute.getType() instanceof OAVJavaType))
-								child = new ObjectNode(this, child);
-							else if(isInspectable(child))
-								// objectInspector Node
-								child = new ObjectInspectorNode(this, child.getClass(), null, child);
-							else
-								// else use wrapped plain value, as JTree does not allow duplicates.
-								child	= new ObjectInspectorValueNode(this, null, child);
-							
-							children.add(child);
-						}
-					}
-				}
-			}
-			return children;
-		}
-		
-		/**
-		 *  Get the path of this node (inclusive) starting from the root node.
-		 */
-		public Object[]	getPath()
-		{
-			if(path==null)
-			{
-				if(parent!=null)
-				{
-					path	= (Object[])SUtil.joinArrays(parent.getPath(), new Object[]{this});
-				}
-				else
-				{
-					path	= new Object[]{this};
-				}
-			}
-			
-			return path;
-		}
-		
-		/**
-		 *  Unregister a node and its subnodes.
-		 */
-		public void	drop()
-		{
-			if(children!=null)
-			{
-				for(int i=0; i<children.size(); i++)
-				{
-					if(children.get(i) instanceof ObjectNode)
-						((ObjectNode)children.get(i)).drop();
-				}
-			}
-		}
-
-		/**
-		 *  Create a string representation of the attribute node.
-		 *  @return A string representation of the attribute node.
-		 */
-		public String	toString()
-		{
-			String name	= attribute.getName();
-			int idx	= name.indexOf("has_");
-			if(idx!=-1)
-				name	= name.substring(idx+4);
-			return name; //+" (attribute)";
-		}
-		
-		protected boolean equals(Object obj, boolean checkUUID)
-		{
-			boolean ret = 
-				obj instanceof AttributeNode
-				&& ((AttributeNode)obj).parent==parent 
-				&& ((AttributeNode)obj).attribute==attribute;
-			
-			if (checkUUID && ret)
-				ret = ret && ((AttributeNode)obj).nodeUUID==nodeUUID;
-			
-			return ret;
-		}
-		
-		public boolean equals(Object obj)
-		{
-//			return obj instanceof AttributeNode
-//				&& ((AttributeNode)obj).parent==parent 
-//				&& ((AttributeNode)obj).attribute==attribute;
-			
-			return equals(obj, true);
-		}
-		
-		public int hashCode()
-		{
-//			int	ret	= 31 + parent.hashCode();
-//			ret	= ret*31 + attribute.hashCode();
-//			return ret;
-			
-			return nodeUUID;
-		}		
-	}
-	
-	/**
-	 *  A node representing an object.
-	 */
-	public class ObjectNode
-	{
-		//-------- attributes --------
-		
-		/** The object. */
-		protected Object	object;
-		
-		/** The parent node (attribute or root node). */
-		protected Object	parent;
-
-		/** The children. */
-		protected List	children;
-
-		/** The path from the root node to this node. */
-		protected Object[]	path;
-		
-		/** A unique id for this node */
-		protected int nodeUUID;
-		
-		//-------- constructors --------
-		
-		/**
-		 *  Create a new object node.
-		 *  @param parent	The parent node (if not root node).
-		 *  @param object	The object.
-		 *  @param attribute	The attribute.
-		 */
-		public ObjectNode(Object parent, Object object)
-		{
-			this.parent	= parent;
-			this.object	= object;
-			this.nodeUUID = getNextNodeUUID();
-			nodes.put(object, this);
-		}
-		
-		//-------- methods --------
-		
-		/**
-		 *  Get the children of this node.
-		 */
-		public List	getChildren()
-		{
-			if(children==null)
-			{
-				children 	= new ArrayList();
-				OAVObjectType	type	= copy.getType(object);
-				while(type!=null)
-				{
-					Iterator	it	= type.getDeclaredAttributeTypes().iterator();
-					while(it.hasNext())
-					{
-						OAVAttributeType	attr	= (OAVAttributeType)it.next();
-						if(OAVAttributeType.NONE.equals(attr.getMultiplicity()))
-						{
-							if(copy.getAttributeValue(object, attr)!=null)
-								children.add(new AttributeNode(this, attr));
-						}
-						else
-						{
-							if(copy.getAttributeValues(object, attr)!=null)
-								children.add(new AttributeNode(this, attr));
-						}
-					}
-					type	= type.getSupertype();
-				}
-			}
-			return children;
-		}
-		
-		/**
-		 *  Get the path of this node (inclusive) starting from the root node.
-		 */
-		public Object[]	getPath()
-		{
-			if(path==null)
-			{
-				if(parent instanceof AttributeNode)
-				{
-					path	= (Object[])SUtil.joinArrays(((AttributeNode)parent).getPath(), new Object[]{this});
-				}
-				else
-				{
-					path	= new Object[]{parent, this};
-				}
-			}
-			
-			return path;
-		}
-		
-		/**
-		 *  Unregister a node and its subnodes.
-		 */
-		public void	drop()
-		{
-			nodes.remove(object);
-			if(children!=null)
-			{
-				for(int i=0; i<children.size(); i++)
-					((AttributeNode)children.get(i)).drop();
-			}
-		}
-		
-		/**
-		 *  Create a string representation of the attribute node.
-		 *  @return A string representation of the attribute node.
-		 */
-		public String	toString()
-		{
-			String ret = ""+object;
-			try
-			{
-				// Hack!!! configure name slot?
-				OAVObjectType	type	= copy.getType(object);
-				OAVAttributeType name = null;
-				try{name = type.getAttributeType("element_has_name");} catch(Exception e){}
-				if(name!=null)
-				{
-					Object val	= copy.getAttributeValue(object, name);
-					if(val!=null)
-						ret = val.toString() + " (id="+ret+")";
-				}
-			}
-			catch(Exception e)
-			{
-				System.err.println("no name for "+object+", "+(object!=null?object.getClass().toString():"null"));
-				e.printStackTrace();
-			}
-			
-			return ret;
-		}
-		
-		/**
-		 * This method can be used to do a sematically equals check.
-		 * E.g. check only the fields, not the unique identifier.
-		 * @param obj Object to test for equals
-		 * @param checkUUID flag to check the unique Identifier for the node. <br><code>true</code>=do a compete equals check<br><code>false</code>=do a sematically equals check
-		 */
-		protected boolean equals(Object obj, boolean checkUUID) 
-		{
-			boolean ret =  obj instanceof ObjectNode
-					&& ((ObjectNode)obj).object==object;
-			
-			if (checkUUID && ret)
-				ret = ret && ((ObjectNode)obj).nodeUUID==nodeUUID;
-			
-			return ret;
-		}
-		
-		public boolean equals(Object obj)
-		{
-			return equals(obj, true);
-		}
-		
-		public int hashCode()
-		{
-//			int ret = 31 + object.hashCode();
-//				//ret = ret*31 + nodeUUID;
-//				//ret = ret*31	+ (nodeUUID != null ? nodeUUID.hashCode() : 0);
-//			return ret;
-			
-			return nodeUUID;
-		}
-	}
-	
-	/**
-	 *  The root node containing the nodes for the root objects of the state.
-	 */
-	public class RootNode 
-	{
-		//-------- attributes --------
-		
-		/** The children. */
-		protected List	children;
-		
-		//-------- constructors --------
-		
-		/**
-		 *  Create a new object node.
-		 */
-		public RootNode()
-		{
-		}
-		
-		//-------- methods --------
-		
-		/**
-		 *  Get the children of this node.
-		 */
-		public List	getChildren()
-		{
-			if(children==null)
-			{
-				children 	= new ArrayList();
-				for(Iterator it=copy.getRootObjects(); it.hasNext(); )
-				{
-					Object	child	= it.next();
-					if(!(copy.getType(child) instanceof OAVJavaType))
-						child = new ObjectNode(this, child);
-					else if(isInspectable(child))
-						// objectInspector Node
-						child = new ObjectInspectorNode(this, child.getClass(), null, child);
-					children.add(child);
-				}
-			}
-			return children;
-		}		
-	}
-	
-	/**
 	 * TreeModel node for java object inspection
-	 * @author claas
-	 *
 	 */
 	public class ObjectInspectorNode extends AbstractInspectorNode
 	{
@@ -1604,11 +1142,7 @@ public class OAVTreeModel implements TreeModel
 			{
 				if (parent != null)
 				{
-					if(parent instanceof AttributeNode)
-					{
-						path	= (Object[])SUtil.joinArrays(((AttributeNode)parent).getPath(), new Object[]{this});
-					}
-					else if(parent instanceof ObjectInspectorAttributeNode)
+					if(parent instanceof ObjectInspectorAttributeNode)
 					{
 						path	= (Object[])SUtil.joinArrays(((ObjectInspectorAttributeNode)parent).getPath(), new Object[]{this});
 					}
@@ -1756,12 +1290,8 @@ public class OAVTreeModel implements TreeModel
 
 	} // class ObjectInspectorNode
 
-	
-	
 	/**
 	 * Node for an Java object attribute
-	 * @author claas
-	 *
 	 */
 	class ObjectInspectorAttributeNode extends AbstractInspectorNode
 	{
@@ -1808,7 +1338,7 @@ public class OAVTreeModel implements TreeModel
 		 *  Get the children of this node.
 		 */
 		public List	getChildren()
-		{
+		{		
 			if(children==null)
 			{
 				this.children = new ArrayList();
@@ -1819,16 +1349,16 @@ public class OAVTreeModel implements TreeModel
 				// the parent Array-Field if this is an array, else the value itself
 				//Object value = null;
 				//if (type.isArray())
-				if (isArrayNode())
+				if(isArrayNode())
 				{
 					try
 					{
-//						attributeValue = getArrayValue();
+	//					attributeValue = getArrayValue();
 						attributeValue = getFieldValue();
 						
-						if (attributeValue == null)
+						if(attributeValue == null)
 						{
-//							children.add("null");
+	//						children.add("null");
 							
 							// IGNORE !
 							
@@ -1839,27 +1369,24 @@ public class OAVTreeModel implements TreeModel
 						{
 							for (int i = 0; i < Array.getLength(attributeValue); i++)
 							{
-								
 								Object obj = Array.get(attributeValue, i);
 								
-								if (OAVTreeModel.isInspectable(obj))
+								if(ObjectTreeModel.isInspectable(obj))
 								{
 									children.add(new ObjectInspectorNode(this, obj.getClass(), "["+i+"] ", null, obj));
 								}
 								else
 								{
-//									children.add("["+i+"] "+obj);
+	//								children.add("["+i+"] "+obj);
 									children.add(new ObjectInspectorValueNode(this, "["+i+"] ", obj));
 								}
-								
 							}
 						}
-						
-					} catch (Exception e)
+					} 
+					catch (Exception e)
 					{
 						e.printStackTrace();
 						children.add("-ERROR- Exception occurred: " +e);
-						
 					}
 				}
 				else
@@ -1867,7 +1394,7 @@ public class OAVTreeModel implements TreeModel
 					this.attributeValue = getFieldValue();
 					
 					// create a new object inspector node for inspectable attribute
-					if (OAVTreeModel.isInspectable(attributeValue))
+					if(ObjectTreeModel.isInspectable(attributeValue))
 					{
 						children.add(new ObjectInspectorNode(this, type, name, attributeValue));	
 					}
@@ -1877,7 +1404,6 @@ public class OAVTreeModel implements TreeModel
 						//children.add((attributeValue!=null ? attributeValue : "null"));
 						children.add(new ObjectInspectorValueNode(this, null, attributeValue));
 					}
-					
 				}
 			}
 			return children;
@@ -1900,7 +1426,8 @@ public class OAVTreeModel implements TreeModel
 			try
 			{
 				return field.get(((ObjectInspectorNode)parent).getNodeObject());
-			} catch (Exception e)
+			} 
+			catch (Exception e)
 			{
 				//e.printStackTrace();
 				return "-ERROR- Exception occurred: " + e;
@@ -2058,6 +1585,9 @@ public class OAVTreeModel implements TreeModel
 	/**
 	 * This class represents a simple value for ObjectInspectorAtttributeNode values.
 	 * It is needed to display a prefix [index] for arrays
+	 * 
+	 * @author claas
+	 *
 	 */
 	class ObjectInspectorValueNode extends AbstractInspectorNode
 	{
@@ -2075,10 +1605,8 @@ public class OAVTreeModel implements TreeModel
 		public ObjectInspectorValueNode(Object parent, String namePrefix, Object value)
 		{
 			super.parent = parent;
-			
 			this.namePrefix = namePrefix;
 			this.value = value;
-			
 		}
 		
 		// --- methods ---
@@ -2158,11 +1686,7 @@ public class OAVTreeModel implements TreeModel
 		{
 			super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
 //			System.out.println(value+" "+value.getClass());
-			if(value instanceof ObjectNode)
-				setIcon(icons.getIcon("object"));
-			else if(value instanceof AttributeNode)
-				setIcon(icons.getIcon("attribute"));
-			else if (value instanceof ObjectInspectorNode)
+			if(value instanceof ObjectInspectorNode)
 				setIcon(icons.getIcon("javaobject"));
 			else if (value instanceof ObjectInspectorAttributeNode)
 				setIcon(icons.getIcon("javaattribute"));
@@ -2183,24 +1707,25 @@ public class OAVTreeModel implements TreeModel
 			Dimension d = new Dimension(super.getPreferredSize());
 			d.setSize(d.getWidth()+10, d.getHeight());
 			return d;
-		}	
+		}
 	}
+	
 }
 
 /**
  * Action class to update the tree model e.g. with a timer
- */
+ * /
 class ObjectInspectorRefreshAction implements ActionListener
 {
 	/** 
 	 * A WeakReference to the tree model to allow the JVM to remove the 
 	 * model from heap when introspector plugin is closed 
-	 */
+	 * /
 	WeakReference treeModel;
 	
 	/** 
 	 * Create a ActionListener with a weak reference to the OAVTreeModel to update 
-	 */
+	 * /
 	public ObjectInspectorRefreshAction(OAVTreeModel treeModel)
 	{
 		this.treeModel = new WeakReference(treeModel);
@@ -2209,10 +1734,10 @@ class ObjectInspectorRefreshAction implements ActionListener
 	/**
 	 * Perform OAVTreeModel refresh if TreeModel reference exist else remove 
 	 * Timer from Timer list
-	 */
+	 * /
 	public void actionPerformed(ActionEvent e)
 	{		
-		OAVTreeModel model = (OAVTreeModel) treeModel.get();
+		OAVTreeModel model = (OAVTreeModel)treeModel.get();
 		if (model != null)
 		{
 			model.refreshInspectorNodes();
@@ -2228,4 +1753,4 @@ class ObjectInspectorRefreshAction implements ActionListener
 		}
 	}
 	
-}
+}*/
