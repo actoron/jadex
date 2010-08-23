@@ -20,18 +20,46 @@ public class TexturedRectangleGLRenderer extends AbstractGLRenderer
 	 */
 	public void draw(DrawableCombiner dc, Primitive primitive, Object obj, ViewportJOGL vp)
 	{
+		GL gl = vp.getContext();
 		int texture = 0;
+		int dList = 0;
 		try
 		{
 			texture = ((Integer) primitive.getRenderInfo(0)).intValue();
+			dList = ((Integer) primitive.getRenderInfo(1)).intValue();
 		}
 		catch (Exception e)
 		{
 			texture = vp.getTexture(vp.getContext(), ((TexturedRectangle) primitive).getTexturePath());
 			primitive.setRenderInfo(0, new Integer(texture));
+			
+			String listName = getClass().getName();
+			Integer list = vp.getDisplayList(listName);
+			if(list == null)
+			{
+				dList = gl.glGenLists(1);
+				gl.glNewList(dList, GL.GL_COMPILE);
+
+				gl.glBegin(GL.GL_QUADS);
+				gl.glTexCoord2f(0.0f, 0.0f);
+				gl.glVertex2f(-0.5f, -0.5f);
+				gl.glTexCoord2f(1.0f, 0.0f);
+				gl.glVertex2f(0.5f, -0.5f);
+				gl.glTexCoord2f(1.0f, 1.0f);
+				gl.glVertex2f(0.5f, 0.5f);
+				gl.glTexCoord2f(0.0f, 1.0f);
+				gl.glVertex2f(-0.5f, 0.5f);
+				gl.glEnd();
+				gl.glEndList();
+
+				list = new Integer(dList);
+				vp.setDisplayList(listName, list);
+			}
+			dList = list.intValue();
+			primitive.setRenderInfo(1, list);
 		}
 		
-		GL gl = vp.getContext();
+		
 		gl.glEnable(GL.GL_TEXTURE_2D);
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture);
 		
@@ -43,20 +71,8 @@ public class TexturedRectangleGLRenderer extends AbstractGLRenderer
 		gl.glColor4fv(currentColor.getComponents(null), 0);
 		
 		if(setupMatrix(dc, primitive, obj, gl, vp));
-		{
-			gl.glBegin(GL.GL_QUADS);
-			gl.glTexCoord2f(0.0f, 0.0f);
-			gl.glVertex2f(-0.5f, -0.5f);
-			gl.glTexCoord2f(1.0f, 0.0f);
-			gl.glVertex2f(0.5f, -0.5f);
-			gl.glTexCoord2f(1.0f, 1.0f);
-			gl.glVertex2f(0.5f, 0.5f);
-			gl.glTexCoord2f(0.0f, 1.0f);
-			gl.glVertex2f(-0.5f, 0.5f);
-			gl.glEnd();
-
-			gl.glDisable(GL.GL_TEXTURE_2D);
-		}
+			gl.glCallList(dList);
+		gl.glDisable(GL.GL_TEXTURE_2D);
 	}
 
 }
