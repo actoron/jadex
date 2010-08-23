@@ -1,5 +1,7 @@
 package jadex.base.gui.componenttree;
 
+import java.util.List;
+
 import javax.swing.Icon;
 import javax.swing.JComponent;
 
@@ -34,11 +36,6 @@ public interface IComponentTreeNode
 	public IComponentTreeNode	getChild(int index);
 	
 	/**
-	 *  Test if a node is a child.
-	 */
-	public boolean isChild(IComponentTreeNode node);
-	
-	/**
 	 *  Get the index of a child.
 	 */
 	public int	getIndexOfChild(IComponentTreeNode child);
@@ -58,6 +55,11 @@ public interface IComponentTreeNode
 	 *  @param recurse	Recursively refresh subnodes, if true.
 	 */
 	public void	refresh(boolean recurse);
+	
+	/**
+	 *  Get the cached children, i.e. do not start any background processes for updating the children.
+	 */
+	public List	getCachedChildren();
 	
 	/**
 	 *  True, if the node has properties that can be displayed.

@@ -4,6 +4,7 @@ import jadex.commons.Future;
 import jadex.commons.IFuture;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.swing.Icon;
@@ -135,6 +136,14 @@ public abstract class AbstractComponentTreeNode	implements IComponentTreeNode
 	{
 		return children!=null && children.contains(node);
 	}
+	
+	/**
+	 *  Get the cached children, i.e. do not start any background processes for updating the children.
+	 */
+	public List	getCachedChildren()
+	{
+		return children!=null ? children : Collections.EMPTY_LIST;
+	}
 
 	/**
 	 *  True, if the node has properties that can be displayed.
@@ -178,6 +187,8 @@ public abstract class AbstractComponentTreeNode	implements IComponentTreeNode
 	protected IFuture	setChildren(final List children)
 	{
 		final Future	ret	= new Future();
+		
+		// For debugging: todo:remove
 		final	RuntimeException	rte;
 		try
 		{

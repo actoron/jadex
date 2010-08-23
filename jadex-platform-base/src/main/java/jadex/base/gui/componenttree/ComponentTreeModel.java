@@ -241,6 +241,11 @@ public class ComponentTreeModel implements TreeModel
 		
 		nodes.put(node.getId(), node);
 		
+		for(int i=0; i<node.getCachedChildren().size(); i++)
+		{
+			registerNode((IComponentTreeNode)node.getCachedChildren().get(i));
+		}
+		
 		INodeListener[]	lis	= (INodeListener[])nodelisteners.toArray(new INodeListener[nodelisteners.size()]);
 		for(int i=0; i<lis.length; i++)
 		{
@@ -275,6 +280,11 @@ public class ComponentTreeModel implements TreeModel
 			{
 				lis[i].nodeRemoved(node);
 			}
+		}
+
+		for(int i=0; i<node.getCachedChildren().size(); i++)
+		{
+			deregisterNode((IComponentTreeNode)node.getCachedChildren().get(i));
 		}
 	}
 	
