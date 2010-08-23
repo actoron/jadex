@@ -64,7 +64,7 @@ public class ProxyAgent extends MicroAgent
 	/**
 	 *  Test if the cached children are still valid.
 	 */
-	protected IFuture isInvalid(IComponentIdentifier cid)
+	protected IFuture isInvalid(final IComponentIdentifier cid)
 	{
 		final Future ret = new Future();
 		
@@ -84,6 +84,7 @@ public class ProxyAgent extends MicroAgent
 					long time = cs.getTime();
 					
 					long lastaccess = ((Long)entry[0]).longValue();
+//					System.out.println("here: "+cid+" "+(time>lastaccess+delay)+" "+time+" "+lastaccess+" "+delay);
 					ret.setResult(time>lastaccess+delay? Boolean.TRUE: Boolean.FALSE);
 				}
 				
@@ -167,6 +168,7 @@ public class ProxyAgent extends MicroAgent
 											{
 												IClockService cs = (IClockService)result;
 												long lastaccess = cs.getTime();
+//												System.out.println("cs of "+cid+" "+vcs);
 												children.put(cid, new Object[]{new Long(lastaccess), vcs});
 												ret.setResult(vcs);
 											}
