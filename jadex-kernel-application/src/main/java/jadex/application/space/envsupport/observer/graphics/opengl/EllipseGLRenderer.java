@@ -51,6 +51,7 @@ public class EllipseGLRenderer extends AbstractGLRenderer
 				
 			}
 			
+			dList = list.intValue();
 			primitive.setRenderInfo(0, list);
 		}
 		

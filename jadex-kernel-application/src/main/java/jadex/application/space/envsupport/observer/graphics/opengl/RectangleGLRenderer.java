@@ -19,18 +19,18 @@ public class RectangleGLRenderer extends AbstractGLRenderer
 	 */
 	public void draw(DrawableCombiner dc, Primitive primitive, Object obj, ViewportJOGL vp)
 	{
+		GL gl = vp.getContext();
 		int dList = 0;
 		try
 		{
 			dList = ((Integer) primitive.getRenderInfo(0)).intValue();
 		}
-		catch (ArrayIndexOutOfBoundsException e)
+		catch (Exception e)
 		{
 			String listName = getClass().getName();
 			Integer list = vp.getDisplayList(listName);
 			if(list == null)
 			{
-				GL gl = vp.getContext();
 				dList = gl.glGenLists(1);
 				gl.glNewList(dList, GL.GL_COMPILE);
 
@@ -45,9 +45,9 @@ public class RectangleGLRenderer extends AbstractGLRenderer
 				list = new Integer(dList);
 				vp.setDisplayList(listName, list);
 			}
+			dList = list.intValue();
+			primitive.setRenderInfo(0, list);
 		}
-		
-		GL gl = vp.getContext();
 		Color c = (Color)dc.getBoundValue(obj, primitive.getColor(), vp);
 		gl.glColor4fv(c.getComponents(null), 0);
 		if(setupMatrix(dc, primitive, obj, gl, vp))

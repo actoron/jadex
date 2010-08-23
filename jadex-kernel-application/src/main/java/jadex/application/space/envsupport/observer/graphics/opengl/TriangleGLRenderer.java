@@ -44,6 +44,7 @@ public class TriangleGLRenderer extends AbstractGLRenderer
 				list = new Integer(dList);
 				vp.setDisplayList(listName, list);
 			}
+			dList = list.intValue();
 			primitive.setRenderInfo(0, list);
 		}
 		
