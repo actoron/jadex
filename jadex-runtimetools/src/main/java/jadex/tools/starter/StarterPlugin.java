@@ -544,7 +544,7 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 					IComponentIdentifier cid = dia.getComponentIdentifier(null);
 					
 					Map args = new HashMap();
-					args.put("platform", cid);
+					args.put("component", cid);
 					createComponent("jadex/base/service/remote/ProxyAgent.class", null, null, args, false, null);
 				}
 			});

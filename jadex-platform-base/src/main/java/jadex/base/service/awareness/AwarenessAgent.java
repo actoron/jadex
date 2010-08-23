@@ -491,7 +491,7 @@ public class AwarenessAgent extends MicroAgent
 				else
 				{
 					Map args = new HashMap();
-					args.put("platform", cid);
+					args.put("component", cid);
 					CreationInfo ci = new CreationInfo(args);
 					cms.createComponent(cid.getLocalName(), "jadex/base/service/remote/ProxyAgent.class", ci, 
 						createResultListener(new IResultListener()
