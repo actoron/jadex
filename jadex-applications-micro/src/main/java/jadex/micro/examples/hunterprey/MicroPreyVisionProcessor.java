@@ -11,8 +11,8 @@ import jadex.commons.ICommand;
 import jadex.commons.SimplePropertyObject;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
+import jadex.commons.service.SServiceProvider;
 import jadex.micro.IMicroExternalAccess;
-import jadex.service.SServiceProvider;
 
 /**
  *  Dumb prey vision processer.

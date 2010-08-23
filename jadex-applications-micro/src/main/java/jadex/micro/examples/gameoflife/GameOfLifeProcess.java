@@ -8,7 +8,7 @@ import jadex.application.space.envsupport.environment.space2d.Space2D;
 import jadex.application.space.envsupport.math.Vector1Int;
 import jadex.application.space.envsupport.math.Vector2Int;
 import jadex.commons.SimplePropertyObject;
-import jadex.service.clock.IClockService;
+import jadex.commons.service.clock.IClockService;
 
 import java.util.HashMap;
 import java.util.Iterator;

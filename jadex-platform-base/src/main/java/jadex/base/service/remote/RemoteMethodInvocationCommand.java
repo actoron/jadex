@@ -6,9 +6,9 @@ import jadex.bridge.IExternalAccess;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.concurrent.IResultListener;
+import jadex.commons.service.IServiceIdentifier;
+import jadex.commons.service.SServiceProvider;
 import jadex.micro.IMicroExternalAccess;
-import jadex.service.IServiceIdentifier;
-import jadex.service.SServiceProvider;
 
 import java.lang.reflect.Method;
 import java.util.Map;

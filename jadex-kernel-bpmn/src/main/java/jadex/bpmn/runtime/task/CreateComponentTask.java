@@ -10,7 +10,7 @@ import jadex.bridge.IComponentManagementService;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.concurrent.IResultListener;
-import jadex.service.SServiceProvider;
+import jadex.commons.service.SServiceProvider;
 
 import java.util.HashMap;
 import java.util.HashSet;

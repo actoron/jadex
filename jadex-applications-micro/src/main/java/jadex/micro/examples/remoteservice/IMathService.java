@@ -1,7 +1,7 @@
 package jadex.micro.examples.remoteservice;
 
 import jadex.commons.IFuture;
-import jadex.service.IService;
+import jadex.commons.service.IService;
 
 /**
  *  Simple interface for a component service.

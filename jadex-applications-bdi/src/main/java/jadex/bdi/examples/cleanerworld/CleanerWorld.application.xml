@@ -17,13 +17,13 @@
 		<import>jadex.application.space.envsupport.environment.space2d.*</import>
 		<import>jadex.application.space.envsupport.environment.*</import>
 		<import>jadex.application.space.envsupport.math.*</import>
-		<import>jadex.service.clock.IClockService</import>
+		<import>jadex.commons.service.clock.IClockService</import>
 		<import>jadex.application.space.envsupport.dataview.*</import>
 		<import>jadex.application.space.envsupport.observer.perspective.*</import>
 		<import>jadex.bdi.planlib.*</import>
 		<import>jadex.bdi.examples.cleanerworld.cleaner.*</import>
-		<import>jadex.service.clock.IClockService</import>
-		<import>jadex.service.SServiceProvider</import>
+		<import>jadex.commons.service.clock.IClockService</import>
+		<import>jadex.commons.service.SServiceProvider</import>
 		<import>jadex.commons.IFuture</import>
 	</imports>
 	
@@ -64,17 +64,6 @@
 				</env:objecttype>
 			</env:objecttypes>
 			
-			<env:avatarmappings>
-				<env:avatarmapping componenttype="Cleaner" objecttype="cleaner"/>
-				<env:avatarmapping componenttype="Truck" objecttype="truck"/>
-			</env:avatarmappings>
-		
-			<env:actiontypes>
-				<env:actiontype name="pickup_waste" class="PickupWasteAction"/>
-				<env:actiontype name="drop_waste" class="DropWasteAction"/>
-				<env:actiontype name="empty_wastebin" class="EmptyWastebinAction"/>
-			</env:actiontypes>
-			
 			<env:tasktypes>
 				<env:tasktype name="move" class="MoveTask" />
 				<env:tasktype name="load" class="LoadBatteryTask" />
@@ -89,6 +78,19 @@
 				</env:processtype>
 			</env:processtypes>
 			
+			<env:dataviews>
+				<env:dataview name="view_all" class="GeneralDataView2D" />
+				<env:dataview name="cleaner_view" class="LocalDataView2D" objecttype="collector">
+					<env:property name="object">$object</env:property>
+					<env:property name="range">$object.vision_range</env:property>
+				</env:dataview>
+			</env:dataviews>
+			
+			<env:avatarmappings>
+				<env:avatarmapping componenttype="Cleaner" objecttype="cleaner"/>
+				<env:avatarmapping componenttype="Truck" objecttype="truck"/>
+			</env:avatarmappings>
+		
 			<env:percepttypes>
 				<env:percepttype name="cleaner_moved" objecttype="cleaner" componenttype="Cleaner" />
 				<env:percepttype name="waste_appeared" objecttype="waste" componenttype="Cleaner" />
@@ -131,13 +133,11 @@
 				</env:perceptprocessor>
 			</env:percepttypes>
 			
-			<env:dataviews>
-				<env:dataview name="view_all" class="GeneralDataView2D" />
-				<env:dataview name="cleaner_view" class="LocalDataView2D" objecttype="collector">
-					<env:property name="object">$object</env:property>
-					<env:property name="range">$object.vision_range</env:property>
-				</env:dataview>
-			</env:dataviews>
+			<env:actiontypes>
+				<env:actiontype name="pickup_waste" class="PickupWasteAction"/>
+				<env:actiontype name="drop_waste" class="DropWasteAction"/>
+				<env:actiontype name="empty_wastebin" class="EmptyWastebinAction"/>
+			</env:actiontypes>
 			
 			<env:perspectives>			
 				<env:perspective name="icons" class="Perspective2D" opengl="true" invertyaxis="false">

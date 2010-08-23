@@ -2,7 +2,7 @@ package jadex.application.runtime;
 
 import jadex.application.model.MApplicationType;
 import jadex.bridge.IComponentIdentifier;
-import jadex.service.IServiceProvider;
+import jadex.commons.service.IServiceProvider;
 
 import java.util.Map;
 

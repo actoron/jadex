@@ -3,10 +3,10 @@ package jadex.tools.simcenter;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.commons.jtable.ObjectTableModel;
-import jadex.service.SServiceProvider;
-import jadex.service.clock.IClockService;
-import jadex.service.clock.ITimer;
-import jadex.service.clock.Timer;
+import jadex.commons.service.SServiceProvider;
+import jadex.commons.service.clock.IClockService;
+import jadex.commons.service.clock.ITimer;
+import jadex.commons.service.clock.Timer;
 
 import java.awt.BorderLayout;
 import java.awt.Color;

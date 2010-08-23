@@ -3,8 +3,8 @@ package jadex.tools.common.componenttree;
 import jadex.bridge.ComponentFactorySelector;
 import jadex.bridge.IComponentFactory;
 import jadex.commons.concurrent.SwingDefaultResultListener;
-import jadex.service.IServiceProvider;
-import jadex.service.SServiceProvider;
+import jadex.commons.service.IServiceProvider;
+import jadex.commons.service.SServiceProvider;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -9,8 +9,8 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IModelInfo;
 import jadex.commons.Future;
 import jadex.commons.SGUI;
-import jadex.service.BasicService;
-import jadex.service.IServiceProvider;
+import jadex.commons.service.BasicService;
+import jadex.commons.service.IServiceProvider;
 
 import java.util.HashMap;
 import java.util.Map;

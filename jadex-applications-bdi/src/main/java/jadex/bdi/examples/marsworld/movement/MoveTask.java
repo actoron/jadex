@@ -8,7 +8,7 @@ import jadex.application.space.envsupport.math.IVector2;
 import jadex.application.space.envsupport.math.Vector1Double;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.commons.concurrent.DefaultResultListener;
-import jadex.service.clock.IClockService;
+import jadex.commons.service.clock.IClockService;
 
 import java.util.Iterator;
 import java.util.Set;

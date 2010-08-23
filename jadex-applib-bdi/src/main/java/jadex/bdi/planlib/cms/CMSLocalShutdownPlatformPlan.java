@@ -3,7 +3,7 @@ package jadex.bdi.planlib.cms;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
-import jadex.service.SServiceProvider;
+import jadex.commons.service.SServiceProvider;
 
 /**
  *  Shutdown the platform.

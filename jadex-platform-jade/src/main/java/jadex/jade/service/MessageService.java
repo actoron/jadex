@@ -43,11 +43,11 @@ import jadex.commons.IFuture;
 import jadex.commons.SUtil;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.IResultListener;
+import jadex.commons.service.IService;
 import jadex.jade.JadeAgentAdapter;
 import jadex.jade.Platform;
 import jadex.jade.SJade;
-import jadex.service.IService;
-import jadex.service.clock.IClockService;
+import jadex.commons.service.clock.IClockService;
 
 import java.util.ArrayList;
 import java.util.Collection;

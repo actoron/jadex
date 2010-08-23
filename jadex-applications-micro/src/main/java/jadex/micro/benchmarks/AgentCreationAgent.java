@@ -8,10 +8,10 @@ import jadex.bridge.IComponentManagementService;
 import jadex.commons.IFuture;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
+import jadex.commons.service.SServiceProvider;
+import jadex.commons.service.clock.IClockService;
 import jadex.micro.MicroAgent;
 import jadex.micro.MicroAgentMetaInfo;
-import jadex.service.SServiceProvider;
-import jadex.service.clock.IClockService;
 
 import java.util.HashMap;
 import java.util.Map;

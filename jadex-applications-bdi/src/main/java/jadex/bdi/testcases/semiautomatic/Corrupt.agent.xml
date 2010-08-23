@@ -11,7 +11,8 @@
 	name="Corrupt"
 	package="jadex.bdi.testcases.semiautomatic">
 
-	<corrupt>
-	</corrupt>
+	<!-- Comment the corrupt tags below in for testing. -->
+	<!-- <corrupt>
+	</corrupt> -->
 
 </agent>

@@ -8,7 +8,7 @@ import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.DefaultResultListener;
-import jadex.service.SServiceProvider;
+import jadex.commons.service.SServiceProvider;
 
 /**
  *  Start two Jadex platforms and one agent on each platform.

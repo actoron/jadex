@@ -10,7 +10,7 @@ import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.ISearchConstraints;
 import jadex.commons.SUtil;
-import jadex.service.SServiceProvider;
+import jadex.commons.service.SServiceProvider;
 
 /**
  *  Inform the sentry agent about a new target.

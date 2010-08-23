@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- edited with XMLSPY v2004 rel. 3 U (http://www.xmlspy.com) by Lars (RTL) -->
-<xs:schema targetNamespace="http://jadex.sourceforge.net/jadex-envspace" xmlns="http://jadex.sourceforge.net/jadex-envspace" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+<xs:schema targetNamespace="http://jadex.sourceforge.net/jadex-envspace" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://jadex.sourceforge.net/jadex-envspace" elementFormDefault="qualified">
 	<xs:element name="envspacetype" type="envspacetype">
 		<xs:annotation>
 			<xs:documentation>Declaration of an environment space. The concrete type of the space can be defined using the class.</xs:documentation>
@@ -323,33 +323,33 @@
 		</xs:annotation>
 		<xs:complexContent>
 			<xs:extension base="propertyobject">
-				<xs:choice minOccurs="0">
-					<xs:element name="triangle" type="drawableelement" minOccurs="0" maxOccurs="unbounded">
+				<xs:choice minOccurs="0" maxOccurs="unbounded">
+					<xs:element name="triangle" type="drawableelement" minOccurs="0">
 						<xs:annotation>
 							<xs:documentation>Triangle display element.</xs:documentation>
 						</xs:annotation>
 					</xs:element>
-					<xs:element name="rectangle" type="drawableelement" minOccurs="0" maxOccurs="unbounded">
+					<xs:element name="rectangle" type="drawableelement" minOccurs="0">
 						<xs:annotation>
 							<xs:documentation>Rectangle display element.</xs:documentation>
 						</xs:annotation>
 					</xs:element>
-					<xs:element name="ellipse" type="drawableelement" minOccurs="0" maxOccurs="unbounded">
+					<xs:element name="ellipse" type="drawableelement" minOccurs="0">
 						<xs:annotation>
 							<xs:documentation>Ellipse display element.</xs:documentation>
 						</xs:annotation>
 					</xs:element>
-					<xs:element name="regularpolygon" type="regularpolygon" minOccurs="0" maxOccurs="unbounded">
+					<xs:element name="regularpolygon" type="regularpolygon" minOccurs="0">
 						<xs:annotation>
 							<xs:documentation>A regular polygon for displaying simple polygons.</xs:documentation>
 						</xs:annotation>
 					</xs:element>
-					<xs:element name="texturedrectangle" type="texturedrectangle" minOccurs="0" maxOccurs="unbounded">
+					<xs:element name="texturedrectangle" type="texturedrectangle" minOccurs="0">
 						<xs:annotation>
 							<xs:documentation>A textured rectangle can be used display images.</xs:documentation>
 						</xs:annotation>
 					</xs:element>
-					<xs:element name="text" type="text" minOccurs="0" maxOccurs="unbounded">
+					<xs:element name="text" type="text" minOccurs="0">
 						<xs:annotation>
 							<xs:documentation>Text for displaying textual information about the object. </xs:documentation>
 						</xs:annotation>

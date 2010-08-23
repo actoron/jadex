@@ -16,12 +16,12 @@ import jadex.commons.concurrent.Executor;
 import jadex.commons.concurrent.IExecutable;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.ThreadPoolFactory;
-import jadex.service.BasicServiceContainer;
-import jadex.service.IServiceContainer;
-import jadex.service.clock.ClockCreationInfo;
-import jadex.service.clock.ClockService;
-import jadex.service.clock.IClock;
-import jadex.service.threadpool.ThreadPoolService;
+import jadex.commons.service.BasicServiceContainer;
+import jadex.commons.service.IServiceContainer;
+import jadex.commons.service.clock.ClockCreationInfo;
+import jadex.commons.service.clock.ClockService;
+import jadex.commons.service.clock.IClock;
+import jadex.commons.service.threadpool.ThreadPoolService;
 
 import java.io.IOException;
 import java.util.HashMap;

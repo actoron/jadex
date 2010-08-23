@@ -18,8 +18,8 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.concurrent.DelegationResultListener;
+import jadex.commons.service.IServiceProvider;
 import jadex.rules.state.IOAVState;
-import jadex.service.IServiceProvider;
 
 import java.util.logging.Logger;
 

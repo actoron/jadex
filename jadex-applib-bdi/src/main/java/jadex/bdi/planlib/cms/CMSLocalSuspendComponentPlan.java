@@ -5,7 +5,7 @@ import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.IFuture;
-import jadex.service.SServiceProvider;
+import jadex.commons.service.SServiceProvider;
 
 /**
  *  Plan for suspending a Jadex component on the platform.

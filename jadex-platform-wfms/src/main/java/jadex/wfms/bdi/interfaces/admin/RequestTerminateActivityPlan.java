@@ -3,7 +3,7 @@ package jadex.wfms.bdi.interfaces.admin;
 import jadex.base.fipa.Done;
 import jadex.bdi.runtime.IGoal;
 import jadex.bridge.IComponentIdentifier;
-import jadex.service.SServiceProvider;
+import jadex.commons.service.SServiceProvider;
 import jadex.wfms.bdi.client.cap.AbstractWfmsPlan;
 import jadex.wfms.bdi.ontology.RequestProxy;
 import jadex.wfms.bdi.ontology.RequestTerminateActivity;

@@ -9,10 +9,10 @@ import jadex.commons.ICommand;
 import jadex.commons.concurrent.CounterResultListener;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
+import jadex.commons.service.SServiceProvider;
+import jadex.commons.service.clock.IClockService;
 import jadex.micro.MicroAgent;
 import jadex.micro.MicroAgentMetaInfo;
-import jadex.service.SServiceProvider;
-import jadex.service.clock.IClockService;
 
 import java.util.HashMap;
 import java.util.Map;

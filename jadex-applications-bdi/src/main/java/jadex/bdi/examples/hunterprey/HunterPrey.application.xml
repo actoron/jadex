@@ -20,7 +20,7 @@
 		<import>jadex.application.space.envsupport.environment.space2d.*</import>
 		<import>jadex.application.space.envsupport.environment.RoundBasedExecutor</import>
 		<import>jadex.application.space.envsupport.math.*</import>
-		<import>jadex.service.clock.IClockService</import>
+		<import>jadex.commons.service.clock.IClockService</import>
 		<import>jadex.application.space.envsupport.dataview.*</import>
 		<import>jadex.bdi.examples.hunterprey.dumbprey.*</import>
 		<import>jadex.bdi.examples.hunterprey.cleverprey.*</import>
@@ -52,18 +52,6 @@
 				</env:objecttype>
 			</env:objecttypes>
 			
-			<env:avatarmappings>
-				<env:avatarmapping componenttype="DumbPrey" objecttype="prey"/>
-				<env:avatarmapping componenttype="CleverPrey" objecttype="prey"/>
-				<env:avatarmapping componenttype="DumbHunter" objecttype="hunter"/>
-				<env:avatarmapping componenttype="LAHunter" objecttype="hunter"/>
-			</env:avatarmappings>
-			
-			<env:actiontypes>
-				<env:actiontype name="move" class="MoveAction" />
-				<env:actiontype name="eat" class="EatAction" />
-			</env:actiontypes>
-			
 			<env:processtypes>
 				<env:processtype name="create" class="DefaultObjectCreationProcess">
 					<env:property name="tickrate">5</env:property>
@@ -79,7 +67,26 @@
 				</env:processtype>
 			</env:processtypes>
 			
-
+			<env:dataviews>
+				<env:dataview name="all_view" class="GeneralDataView2D" />
+				<!-- <env:dataview name="prey_view" objecttype="prey">new LocalDataView2D($object, 2)</env:dataview> -->
+				<env:dataview name="prey_view" class="LocalDataView2D" objecttype="prey">
+					<env:property name="object">$object</env:property>
+					<env:property name="range">2</env:property>
+				</env:dataview>
+				<env:dataview name="hunter_view" class="LocalDataView2D" objecttype="hunter">
+					<env:property name="object">$object</env:property>
+					<env:property name="range">2</env:property>
+				</env:dataview>
+			</env:dataviews>
+			
+			<env:avatarmappings>
+				<env:avatarmapping componenttype="DumbPrey" objecttype="prey"/>
+				<env:avatarmapping componenttype="CleverPrey" objecttype="prey"/>
+				<env:avatarmapping componenttype="DumbHunter" objecttype="hunter"/>
+				<env:avatarmapping componenttype="LAHunter" objecttype="hunter"/>
+			</env:avatarmappings>
+			
 			<env:percepttypes>
 				<env:percepttype name="food_seen" objecttype="food">
 					<env:componenttypes>
@@ -232,19 +239,11 @@
 				</env:perceptprocessor>
 			</env:percepttypes>
 			
-			<env:dataviews>
-				<env:dataview name="all_view" class="GeneralDataView2D" />
-				<!-- <env:dataview name="prey_view" objecttype="prey">new LocalDataView2D($object, 2)</env:dataview> -->
-				<env:dataview name="prey_view" class="LocalDataView2D" objecttype="prey">
-					<env:property name="object">$object</env:property>
-					<env:property name="range">2</env:property>
-				</env:dataview>
-				<env:dataview name="hunter_view" class="LocalDataView2D" objecttype="hunter">
-					<env:property name="object">$object</env:property>
-					<env:property name="range">2</env:property>
-				</env:dataview>
-			</env:dataviews>
-
+			<env:actiontypes>
+				<env:actiontype name="move" class="MoveAction" />
+				<env:actiontype name="eat" class="EatAction" />
+			</env:actiontypes>
+			
 			<env:perspectives>
 				<env:perspective name="icons" class="Perspective2D" objectplacement="center">
 					<env:drawable objecttype="food" width="1.0" height="1.0">

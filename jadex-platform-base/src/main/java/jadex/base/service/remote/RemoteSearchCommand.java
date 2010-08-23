@@ -9,12 +9,12 @@ import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.collection.LRU;
 import jadex.commons.concurrent.IResultListener;
+import jadex.commons.service.IResultSelector;
+import jadex.commons.service.ISearchManager;
+import jadex.commons.service.IService;
+import jadex.commons.service.IVisitDecider;
+import jadex.commons.service.SServiceProvider;
 import jadex.micro.IMicroExternalAccess;
-import jadex.service.IResultSelector;
-import jadex.service.ISearchManager;
-import jadex.service.IService;
-import jadex.service.IVisitDecider;
-import jadex.service.SServiceProvider;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;

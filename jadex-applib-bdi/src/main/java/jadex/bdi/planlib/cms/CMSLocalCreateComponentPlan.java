@@ -5,7 +5,7 @@ import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.commons.IFuture;
-import jadex.service.SServiceProvider;
+import jadex.commons.service.SServiceProvider;
 
 import java.util.Map;
 

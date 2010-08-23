@@ -5,8 +5,9 @@ import jadex.commons.IFuture;
 import jadex.commons.concurrent.CollectionResultListener;
 import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
-import jadex.service.BasicServiceContainer;
-import jadex.service.SServiceProvider;
+import jadex.commons.service.BasicServiceContainer;
+import jadex.commons.service.SServiceProvider;
+
 import java.util.Collections;
 
 /**

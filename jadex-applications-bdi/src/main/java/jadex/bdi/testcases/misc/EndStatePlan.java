@@ -11,7 +11,7 @@ import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.collection.SCollection;
-import jadex.service.SServiceProvider;
+import jadex.commons.service.SServiceProvider;
 
 import java.util.List;
 import java.util.Map;

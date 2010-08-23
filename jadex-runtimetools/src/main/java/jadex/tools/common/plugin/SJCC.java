@@ -5,7 +5,7 @@ import jadex.bridge.IComponentManagementService;
 import jadex.commons.Future;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
-import jadex.service.SServiceProvider;
+import jadex.commons.service.SServiceProvider;
 
 import java.awt.Component;
 

@@ -4,9 +4,9 @@ import jadex.base.fipa.SFipa;
 import jadex.bridge.MessageType;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
+import jadex.commons.service.SServiceProvider;
+import jadex.commons.service.library.ILibraryService;
 import jadex.micro.MicroAgent;
-import jadex.service.SServiceProvider;
-import jadex.service.library.ILibraryService;
 import jadex.xml.bean.JavaReader;
 import jadex.xml.bean.JavaWriter;
 

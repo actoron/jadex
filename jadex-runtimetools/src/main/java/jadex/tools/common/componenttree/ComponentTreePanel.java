@@ -8,8 +8,8 @@ import jadex.bridge.IRemoteServiceManagementService;
 import jadex.commons.SGUI;
 import jadex.commons.TreeExpansionHandler;
 import jadex.commons.concurrent.SwingDefaultResultListener;
-import jadex.service.IServiceProvider;
-import jadex.service.SServiceProvider;
+import jadex.commons.service.IServiceProvider;
+import jadex.commons.service.SServiceProvider;
 import jadex.tools.common.CombiIcon;
 
 import java.awt.Dimension;

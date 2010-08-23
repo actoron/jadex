@@ -11,7 +11,7 @@ import jadex.commons.IFuture;
 import jadex.commons.IResultCommand;
 import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
-import jadex.service.IServiceProvider;
+import jadex.commons.service.IServiceProvider;
 
 import java.util.Map;
 

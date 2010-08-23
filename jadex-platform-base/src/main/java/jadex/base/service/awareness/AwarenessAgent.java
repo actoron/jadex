@@ -11,12 +11,12 @@ import jadex.commons.IFuture;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
+import jadex.commons.service.SServiceProvider;
+import jadex.commons.service.clock.IClockService;
+import jadex.commons.service.library.ILibraryService;
+import jadex.commons.service.threadpool.IThreadPoolService;
 import jadex.micro.MicroAgent;
 import jadex.micro.MicroAgentMetaInfo;
-import jadex.service.SServiceProvider;
-import jadex.service.clock.IClockService;
-import jadex.service.library.ILibraryService;
-import jadex.service.threadpool.IThreadPoolService;
 import jadex.xml.bean.JavaReader;
 import jadex.xml.bean.JavaWriter;
 

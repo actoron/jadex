@@ -3,6 +3,7 @@ package jadex.bdi.runtime.interpreter;
 import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bridge.CheckedAction;
 import jadex.commons.SReflect;
+import jadex.commons.service.clock.ITimedObject;
 import jadex.rules.rulesystem.IAction;
 import jadex.rules.rulesystem.ICondition;
 import jadex.rules.rulesystem.IVariableAssignments;
@@ -17,7 +18,6 @@ import jadex.rules.rulesystem.rules.OrConstraint;
 import jadex.rules.rulesystem.rules.Variable;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVAttributeType;
-import jadex.service.clock.ITimedObject;
 
 import java.beans.PropertyChangeListener;
 import java.util.Collection;

@@ -4,9 +4,9 @@ import jadex.application.space.envsupport.MObjectType;
 import jadex.commons.SReflect;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.concurrent.IResultListener;
+import jadex.commons.service.clock.IClockService;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SimpleValueFetcher;
-import jadex.service.clock.IClockService;
 
 import java.util.Collection;
 import java.util.Iterator;

@@ -11,8 +11,8 @@ import jadex.commons.SGUI;
 import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
+import jadex.commons.service.IService;
 import jadex.micro.IMicroExternalAccess;
-import jadex.service.IService;
 import jadex.tools.common.CombiIcon;
 
 import java.awt.Component;

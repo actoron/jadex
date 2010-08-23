@@ -3,8 +3,8 @@ package jadex.application.space.envsupport.evaluation;
 import jadex.application.runtime.IApplication;
 import jadex.commons.ResourceInfo;
 import jadex.commons.ThreadSuspendable;
-import jadex.service.SServiceProvider;
-import jadex.service.library.ILibraryService;
+import jadex.commons.service.SServiceProvider;
+import jadex.commons.service.library.ILibraryService;
 
 import java.awt.Image;
 import java.util.Date;

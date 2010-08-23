@@ -2,7 +2,7 @@ package jadex.wfms.bdi.interfaces.client;
 
 import jadex.base.fipa.Done;
 import jadex.bdi.runtime.Plan;
-import jadex.service.SServiceProvider;
+import jadex.commons.service.SServiceProvider;
 import jadex.wfms.bdi.ontology.RequestDeAuth;
 import jadex.wfms.client.IClient;
 import jadex.wfms.listeners.IWorkitemListener;

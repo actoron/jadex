@@ -2,10 +2,10 @@ package jadex.tools.simcenter;
 
 import jadex.base.service.simulation.ISimulationService;
 import jadex.commons.concurrent.SwingDefaultResultListener;
-import jadex.service.SServiceProvider;
-import jadex.service.clock.IClock;
-import jadex.service.clock.IClockService;
-import jadex.service.threadpool.IThreadPoolService;
+import jadex.commons.service.SServiceProvider;
+import jadex.commons.service.clock.IClock;
+import jadex.commons.service.clock.IClockService;
+import jadex.commons.service.threadpool.IThreadPoolService;
 
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;

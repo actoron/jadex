@@ -1,8 +1,8 @@
 package jadex.tools.serviceviewer.executionservice;
 
 import jadex.commons.Properties;
-import jadex.service.IService;
-import jadex.service.execution.IExecutionService;
+import jadex.commons.service.IService;
+import jadex.commons.service.execution.IExecutionService;
 import jadex.tools.common.plugin.IControlCenter;
 import jadex.tools.serviceviewer.IServiceViewerPanel;
 

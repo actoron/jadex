@@ -2,7 +2,7 @@ package jadex.bridge;
 
 import jadex.commons.IFuture;
 import jadex.commons.concurrent.IResultListener;
-import jadex.service.IService;
+import jadex.commons.service.IService;
 
 /**
  *  General interface for components that the container can execute.

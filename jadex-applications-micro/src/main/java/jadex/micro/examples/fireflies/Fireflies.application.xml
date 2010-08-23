@@ -56,6 +56,10 @@
 				</env:objecttype>
 			</env:objecttypes>
 			
+			<env:dataviews>
+				<env:dataview name="view_all" class="GeneralDataView2D" />
+			</env:dataviews>
+			
 			<env:avatarmappings>
 				<env:avatarmapping componenttype="Firefly" objecttype="firefly"/>
 			</env:avatarmappings>
@@ -64,10 +68,6 @@
 				<env:actiontype name="move" class="MoveAction" />
 			</env:actiontypes>
 		
-			<env:dataviews>
-				<env:dataview name="view_all" class="GeneralDataView2D" />
-			</env:dataviews>
-			
 			<env:perspectives>
 				<env:perspective name="icon" class="Perspective2D" opengl="true" objectplacement="center">
 					<env:drawable objecttype="firefly" width="1.0" height="1.0">

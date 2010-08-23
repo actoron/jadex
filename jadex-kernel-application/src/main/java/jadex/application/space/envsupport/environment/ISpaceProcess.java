@@ -1,7 +1,7 @@
 package jadex.application.space.envsupport.environment;
 
 import jadex.commons.IPropertyObject;
-import jadex.service.clock.IClockService;
+import jadex.commons.service.clock.IClockService;
 
 /**
  * Space process interface. Use this interface to implement new

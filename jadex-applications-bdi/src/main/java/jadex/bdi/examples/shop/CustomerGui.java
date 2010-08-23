@@ -8,7 +8,7 @@ import jadex.bdi.runtime.IBeliefSetListener;
 import jadex.bdi.runtime.IEAGoal;
 import jadex.commons.SGUI;
 import jadex.commons.concurrent.SwingDefaultResultListener;
-import jadex.service.SServiceProvider;
+import jadex.commons.service.SServiceProvider;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;

@@ -47,18 +47,7 @@
 					</env:property>
 				</env:objecttype>
 			</env:objecttypes>
-			
-			<env:avatarmappings>
-				<env:avatarmapping componenttype="MicroPrey" objecttype="prey"/>
-				<env:avatarmapping componenttype="DumbPrey" objecttype="prey"/>
-				<env:avatarmapping componenttype="DumbHunter" objecttype="hunter"/>
-			</env:avatarmappings>
 
-			<env:actiontypes>
-				<env:actiontype name="move" class="MoveAction" />
-				<env:actiontype name="eat" class="EatAction" />
-			</env:actiontypes>
-			
 			<env:processtypes>
 				<env:processtype name="create" class="DefaultObjectCreationProcess">
 					<env:property name="tickrate">5</env:property>
@@ -73,6 +62,25 @@
 					</env:property>
 				</env:processtype>
 			</env:processtypes>
+
+			<env:dataviews>
+				<env:dataview name="all_view" class="GeneralDataView2D" />
+				<!-- <env:dataview name="prey_view" objecttype="prey">new LocalDataView2D($object, 2)</env:dataview> -->
+				<env:dataview name="prey_view" class="LocalDataView2D" objecttype="prey">
+					<env:property name="object">$object</env:property>
+					<env:property name="range">2</env:property>
+				</env:dataview>
+				<env:dataview name="hunter_view" class="LocalDataView2D" objecttype="hunter">
+					<env:property name="object">$object</env:property>
+					<env:property name="range">2</env:property>
+				</env:dataview>
+			</env:dataviews>
+			
+			<env:avatarmappings>
+				<env:avatarmapping componenttype="MicroPrey" objecttype="prey"/>
+				<env:avatarmapping componenttype="DumbPrey" objecttype="prey"/>
+				<env:avatarmapping componenttype="DumbHunter" objecttype="hunter"/>
+			</env:avatarmappings>
 			
 			<env:percepttypes>
 				<env:percepttype name="food_seen" objecttype="food">
@@ -230,19 +238,11 @@
 					</env:property>
 				</env:perceptprocessor>
 			</env:percepttypes>
-
-			<env:dataviews>
-				<env:dataview name="all_view" class="GeneralDataView2D" />
-				<!-- <env:dataview name="prey_view" objecttype="prey">new LocalDataView2D($object, 2)</env:dataview> -->
-				<env:dataview name="prey_view" class="LocalDataView2D" objecttype="prey">
-					<env:property name="object">$object</env:property>
-					<env:property name="range">2</env:property>
-				</env:dataview>
-				<env:dataview name="hunter_view" class="LocalDataView2D" objecttype="hunter">
-					<env:property name="object">$object</env:property>
-					<env:property name="range">2</env:property>
-				</env:dataview>
-			</env:dataviews>
+			
+			<env:actiontypes>
+				<env:actiontype name="move" class="MoveAction" />
+				<env:actiontype name="eat" class="EatAction" />
+			</env:actiontypes>
 
 			<env:perspectives>
 				<env:perspective name="icons" class="Perspective2D" objectplacement="center">
@@ -403,7 +403,7 @@
 			</spaces>
 
 			<components>
-				<agent type="MicroPrey" number="500"/>
+				<component type="MicroPrey" number="500"/>
 			</components>
  		</application>
  		
@@ -427,8 +427,8 @@
 			</spaces>
 
 			<components>
-				<agent type="MicroPrey" number="2000"/>
-				<agent name="Lupo" type="DumbHunter"/>
+				<component type="MicroPrey" number="2000"/>
+				<component name="Lupo" type="DumbHunter"/>
 			</components>
  		</application>
 
@@ -452,8 +452,8 @@
 			</spaces>
 
 			<components>
-				<agent type="MicroPrey" number="100"/>
-				<agent type="DumbHunter" number="10"/>
+				<component type="MicroPrey" number="100"/>
+				<component type="DumbHunter" number="10"/>
 			</components>
  		</application>
 

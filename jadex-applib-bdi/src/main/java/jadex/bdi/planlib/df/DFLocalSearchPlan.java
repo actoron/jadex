@@ -5,7 +5,7 @@ import jadex.base.fipa.IDFComponentDescription;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.ISearchConstraints;
 import jadex.commons.IFuture;
-import jadex.service.SServiceProvider;
+import jadex.commons.service.SServiceProvider;
 
 
 /**

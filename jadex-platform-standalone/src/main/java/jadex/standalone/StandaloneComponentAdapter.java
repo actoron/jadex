@@ -19,9 +19,9 @@ import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IExecutable;
 import jadex.commons.concurrent.IResultListener;
-import jadex.service.IServiceContainer;
-import jadex.service.SServiceProvider;
-import jadex.service.execution.IExecutionService;
+import jadex.commons.service.IServiceContainer;
+import jadex.commons.service.SServiceProvider;
+import jadex.commons.service.execution.IExecutionService;
 import jadex.standalone.service.ComponentManagementService;
 
 import java.io.IOException;

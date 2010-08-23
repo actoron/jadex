@@ -8,11 +8,11 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.commons.ICommand;
 import jadex.commons.SimplePropertyObject;
 import jadex.commons.concurrent.DefaultResultListener;
-import jadex.service.IServiceProvider;
-import jadex.service.SServiceProvider;
-import jadex.service.clock.IClockService;
-import jadex.service.clock.ITimedObject;
-import jadex.service.clock.ITimer;
+import jadex.commons.service.IServiceProvider;
+import jadex.commons.service.SServiceProvider;
+import jadex.commons.service.clock.IClockService;
+import jadex.commons.service.clock.ITimedObject;
+import jadex.commons.service.clock.ITimer;
 
 import java.util.Comparator;
 import java.util.Iterator;

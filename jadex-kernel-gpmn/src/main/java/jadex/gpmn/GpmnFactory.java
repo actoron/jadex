@@ -13,9 +13,9 @@ import jadex.commons.ResourceInfo;
 import jadex.commons.SGUI;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.DefaultResultListener;
-import jadex.service.BasicService;
-import jadex.service.IServiceProvider;
-import jadex.service.SServiceProvider;
+import jadex.commons.service.BasicService;
+import jadex.commons.service.IServiceProvider;
+import jadex.commons.service.SServiceProvider;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;

@@ -3,7 +3,7 @@ package jadex.base.fipa;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.ISearchConstraints;
 import jadex.commons.IFuture;
-import jadex.service.IService;
+import jadex.commons.service.IService;
 
 import java.util.Date;
 

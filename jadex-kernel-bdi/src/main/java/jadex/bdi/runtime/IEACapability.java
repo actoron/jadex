@@ -2,7 +2,7 @@ package jadex.bdi.runtime;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.IFuture;
-import jadex.service.IServiceProvider;
+import jadex.commons.service.IServiceProvider;
 
 import java.util.logging.Logger;
 

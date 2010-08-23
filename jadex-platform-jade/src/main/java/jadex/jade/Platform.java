@@ -4,7 +4,7 @@ import jade.Boot;
 import jade.core.AID;
 import jade.wrapper.PlatformController;
 import jadex.commons.Properties;
-import jadex.service.IServiceContainer;
+import jadex.commons.service.IServiceContainer;
 
 /**
  *  Built-in JADE platform.

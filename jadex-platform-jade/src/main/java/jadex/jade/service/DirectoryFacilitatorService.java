@@ -29,9 +29,9 @@ import jadex.commons.IFuture;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
+import jadex.commons.service.IService;
 import jadex.jade.Platform;
 import jadex.jade.SJade;
-import jadex.service.IService;
 
 import java.util.Date;
 import java.util.HashSet;

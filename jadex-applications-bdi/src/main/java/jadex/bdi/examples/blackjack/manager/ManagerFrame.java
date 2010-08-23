@@ -12,7 +12,7 @@ import jadex.bridge.IComponentManagementService;
 import jadex.commons.SGUI;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
-import jadex.service.SServiceProvider;
+import jadex.commons.service.SServiceProvider;
 
 import java.awt.BorderLayout;
 import java.awt.Color;

@@ -2,7 +2,7 @@ package jadex.tools.common.componenttree;
 
 import jadex.commons.SGUI;
 import jadex.commons.SReflect;
-import jadex.service.IService;
+import jadex.commons.service.IService;
 
 import java.lang.reflect.Proxy;
 

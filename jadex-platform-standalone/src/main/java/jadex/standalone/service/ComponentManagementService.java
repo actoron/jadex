@@ -23,11 +23,11 @@ import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
-import jadex.service.BasicService;
-import jadex.service.IServiceProvider;
-import jadex.service.SServiceProvider;
-import jadex.service.execution.IExecutionService;
-import jadex.service.library.ILibraryService;
+import jadex.commons.service.BasicService;
+import jadex.commons.service.IServiceProvider;
+import jadex.commons.service.SServiceProvider;
+import jadex.commons.service.execution.IExecutionService;
+import jadex.commons.service.library.ILibraryService;
 import jadex.standalone.ComponentAdapterFactory;
 import jadex.standalone.StandaloneComponentAdapter;
 

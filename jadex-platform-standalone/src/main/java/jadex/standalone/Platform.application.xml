@@ -11,11 +11,11 @@
 	<imports>
 		<import>jadex.commons.*</import>
 		<import>jadex.bridge.*</import>
-		<import>jadex.service.*</import>
-		<import>jadex.service.clock.*</import>
-		<import>jadex.service.execution.*</import>
-		<import>jadex.service.library.*</import>
-		<import>jadex.service.threadpool.*</import>
+		<import>jadex.commons.service.*</import>
+		<import>jadex.commons.service.clock.*</import>
+		<import>jadex.commons.service.execution.*</import>
+		<import>jadex.commons.service.library.*</import>
+		<import>jadex.commons.service.threadpool.*</import>
 		<import>jadex.base.fipa.*</import>
 		<import>jadex.base.*</import>
 		<import>jadex.base.service.simulation.*</import>

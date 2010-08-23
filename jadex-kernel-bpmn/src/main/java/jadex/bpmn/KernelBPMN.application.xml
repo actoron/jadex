@@ -13,7 +13,7 @@
 	</imports>
 	
 	<services>
-		<service name="bpmn_factory" class="jadex.bridge.IComponentFactory">
+		<service>
 			new BpmnFactory($platform, SUtil.createHashMap(
 				new String[]
 				{

@@ -14,12 +14,12 @@
 		<property type="autoshutdown">true</property>
 		
 		<properties type="services">
-			<property type="jadex.service.library.ILibraryService" name="library_service">
-				new jadex.service.library.LibraryService()
+			<property type="jadex.commons.service.library.ILibraryService" name="library_service">
+				new jadex.commons.service.library.LibraryService()
 			</property>
 			
-			<property type="jadex.service.threadpool.ThreadPoolService" name="threadpool_service">
-				new jadex.service.threadpool.ThreadPoolService(
+			<property type="jadex.commons.service.threadpool.ThreadPoolService" name="threadpool_service">
+				new jadex.commons.service.threadpool.ThreadPoolService(
 					//new jadex.commons.concurrent.java5.JavaThreadPool()
 					new jadex.commons.concurrent.ThreadPool(
 						new jadex.commons.concurrent.DefaultThreadPoolStrategy(0, 20, 30000)))
@@ -42,10 +42,10 @@
             </property>
 			
 			<!-- Clock service. -->
-			<property type="jadex.service.clock.IClockService" name="clock_service">
-				new jadex.service.clock.ClockService(
-					new jadex.service.clock.SystemClock("system_clock", 100,
-					(IThreadPool)jadex.service.SServiceProvider.getService($platform, jadex.service.threadpool.ThreadPoolService.class)))
+			<property type="jadex.commons.service.clock.IClockService" name="clock_service">
+				new jadex.commons.service.clock.ClockService(
+					new jadex.commons.service.clock.SystemClock("system_clock", 100,
+					(IThreadPool)jadex.commons.service.SServiceProvider.getService($platform, jadex.commons.service.threadpool.ThreadPoolService.class)))
 //				new jadex.base.clock.SimulationEventClock("simulation_clock",
 //					System.currentTimeMillis(), 200))
 			</property>
@@ -54,9 +54,9 @@
 				new jadex.base.SimulationService($platform)
 			</property>
 		
-			<property type="jadex.service.execution.IExecutionService" name="execution_service">
-				new jadex.service.execution.AsyncExecutionService(
-					(IThreadPool)jadex.service.SServiceProvider.getService($platform, jadex.service.threadpool.ThreadPoolService.class))
+			<property type="jadex.commons.service.execution.IExecutionService" name="execution_service">
+				new jadex.commons.service.execution.AsyncExecutionService(
+					(IThreadPool)jadex.commons.service.SServiceProvider.getService($platform, jadex.commons.service.threadpool.ThreadPoolService.class))
 			</property>
 		</properties>
 	</properties>

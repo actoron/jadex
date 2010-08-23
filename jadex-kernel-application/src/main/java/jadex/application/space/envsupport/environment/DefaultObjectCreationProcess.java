@@ -1,9 +1,9 @@
 package jadex.application.space.envsupport.environment;
 
 import jadex.commons.SimplePropertyObject;
+import jadex.commons.service.clock.IClockService;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SimpleValueFetcher;
-import jadex.service.clock.IClockService;
 
 import java.util.HashMap;
 import java.util.Map;

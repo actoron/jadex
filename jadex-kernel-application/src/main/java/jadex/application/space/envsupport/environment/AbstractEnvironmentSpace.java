@@ -32,11 +32,11 @@ import jadex.commons.collection.MultiCollection;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.meta.IPropertyMetaDataSet;
+import jadex.commons.service.SServiceProvider;
+import jadex.commons.service.library.ILibraryService;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.IValueFetcher;
 import jadex.javaparser.SimpleValueFetcher;
-import jadex.service.SServiceProvider;
-import jadex.service.library.ILibraryService;
 
 import java.util.ArrayList;
 import java.util.Collection;

@@ -16,10 +16,10 @@ import jadex.commons.SimplePropertyObject;
 import jadex.commons.ThreadSuspendable;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
+import jadex.commons.service.SServiceProvider;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.IValueFetcher;
 import jadex.javaparser.SimpleValueFetcher;
-import jadex.service.SServiceProvider;
 
 import java.util.HashMap;
 import java.util.Map;

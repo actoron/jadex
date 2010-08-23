@@ -21,10 +21,10 @@ import jadex.commons.IResultCommand;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
-import jadex.service.IServiceContainer;
-import jadex.service.IServiceProvider;
-import jadex.service.SServiceProvider;
-import jadex.service.clock.ITimer;
+import jadex.commons.service.IServiceContainer;
+import jadex.commons.service.IServiceProvider;
+import jadex.commons.service.SServiceProvider;
+import jadex.commons.service.clock.ITimer;
 
 import java.util.ArrayList;
 import java.util.Collections;

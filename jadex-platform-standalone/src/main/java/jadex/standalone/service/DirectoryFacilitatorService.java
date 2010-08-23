@@ -15,10 +15,10 @@ import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.collection.IndexMap;
 import jadex.commons.concurrent.IResultListener;
-import jadex.service.BasicService;
-import jadex.service.IServiceProvider;
-import jadex.service.SServiceProvider;
-import jadex.service.clock.IClockService;
+import jadex.commons.service.BasicService;
+import jadex.commons.service.IServiceProvider;
+import jadex.commons.service.SServiceProvider;
+import jadex.commons.service.clock.IClockService;
 
 import java.util.ArrayList;
 import java.util.Date;

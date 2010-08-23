@@ -9,8 +9,8 @@ import jadex.commons.IFuture;
 import jadex.commons.SReflect;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
-import jadex.service.SServiceProvider;
-import jadex.service.library.ILibraryService;
+import jadex.commons.service.SServiceProvider;
+import jadex.commons.service.library.ILibraryService;
 import jadex.tools.common.plugin.IControlCenter;
 import jadex.tools.debugger.common.ObjectInspectorDebuggerPanel;
 

@@ -1,7 +1,7 @@
 package jadex.tools.common.plugin;
 
 import jadex.bridge.IComponentIdentifier;
-import jadex.service.IServiceProvider;
+import jadex.commons.service.IServiceProvider;
 
 import javax.swing.JComponent;
 

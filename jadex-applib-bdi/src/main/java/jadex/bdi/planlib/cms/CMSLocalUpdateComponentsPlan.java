@@ -7,7 +7,7 @@ import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentManagementService;
 import jadex.commons.IFuture;
-import jadex.service.SServiceProvider;
+import jadex.commons.service.SServiceProvider;
 
 /**
  *  Update the belief set containing the local components.

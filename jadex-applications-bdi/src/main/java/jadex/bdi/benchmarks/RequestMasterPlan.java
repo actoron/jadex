@@ -3,7 +3,7 @@ package jadex.bdi.benchmarks;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentManagementService;
-import jadex.service.SServiceProvider;
+import jadex.commons.service.SServiceProvider;
 
 import java.util.HashMap;
 import java.util.Map;

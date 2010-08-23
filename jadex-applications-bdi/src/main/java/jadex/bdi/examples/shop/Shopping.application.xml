@@ -18,8 +18,8 @@
 	name="Shopping" package="jadex.bdi.examples.shop">
 	
 	<imports>
-		<import>jadex.service.clock.IClockService</import>
-		<import>jadex.service.SServiceProvider</import>
+		<import>jadex.commons.service.clock.IClockService</import>
+		<import>jadex.commons.service.SServiceProvider</import>
 		<import>jadex.commons.IFuture</import>
 	</imports>
 	

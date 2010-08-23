@@ -4,9 +4,9 @@ import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
+import jadex.commons.service.SServiceProvider;
+import jadex.commons.service.library.ILibraryService;
 import jadex.micro.IMicroExternalAccess;
-import jadex.service.SServiceProvider;
-import jadex.service.library.ILibraryService;
 
 import java.lang.reflect.Proxy;
 import java.util.Map;

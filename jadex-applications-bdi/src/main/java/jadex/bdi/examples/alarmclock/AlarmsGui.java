@@ -3,8 +3,8 @@ package jadex.bdi.examples.alarmclock;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.commons.jtable.ObjectTableModel;
-import jadex.service.SServiceProvider;
-import jadex.service.clock.IClockService;
+import jadex.commons.service.SServiceProvider;
+import jadex.commons.service.clock.IClockService;
 
 import java.awt.Color;
 import java.awt.Component;

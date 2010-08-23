@@ -23,7 +23,7 @@
 		<import>jadex.rules.rulesystem.rules.functions.*</import>
 		<import>jadex.bdi.runtime.*</import>
 		<import>jadex.commons.*</import>
-		<import>jadex.service.*</import>
+		<import>jadex.commons.service.*</import>
 	</imports>
 
 	<capabilities>

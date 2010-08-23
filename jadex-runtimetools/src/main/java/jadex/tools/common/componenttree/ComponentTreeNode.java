@@ -8,8 +8,8 @@ import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
-import jadex.service.IService;
-import jadex.service.SServiceProvider;
+import jadex.commons.service.IService;
+import jadex.commons.service.SServiceProvider;
 
 import java.awt.Component;
 import java.util.ArrayList;

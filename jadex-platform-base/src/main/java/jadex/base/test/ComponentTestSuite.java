@@ -8,8 +8,8 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IModelInfo;
 import jadex.commons.ISuspendable;
 import jadex.commons.ThreadSuspendable;
-import jadex.service.SServiceProvider;
-import jadex.service.library.ILibraryService;
+import jadex.commons.service.SServiceProvider;
+import jadex.commons.service.library.ILibraryService;
 
 import java.io.File;
 import java.net.URL;

@@ -13,15 +13,15 @@
 		<import>jadex.commons.concurrent.*</import>
 		<import>jadex.bridge.*</import>
 		<import>jadex.base.fipa.*</import>
-		<import>jadex.service.*</import>
-		<import>jadex.service.threadpool.*</import>
+		<import>jadex.commons.service.*</import>
+		<import>jadex.commons.service.threadpool.*</import>
 		<import>jadex.bdi.runtime.impl.*</import>
 		<import>jadex.bdi.*</import>
-		<import>jadex.service.*</import>
+		<import>jadex.commons.service.*</import>
 	</imports>
 	
 	<services>
-		<service name="bdibpmn_factory" class="jadex.bridge.IComponentFactory">
+		<service>
 			new BDIAgentFactory(
 				SUtil.createHashMap(
 				new String[]

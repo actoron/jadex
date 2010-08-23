@@ -2,7 +2,7 @@ package jadex.base.service.simulation;
 
 import jadex.commons.IChangeListener;
 import jadex.commons.concurrent.IThreadPool;
-import jadex.service.IService;
+import jadex.commons.service.IService;
 
 /**
  *  Interface for the time simulation service.

@@ -45,11 +45,11 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.commons.IFuture;
 import jadex.commons.SReflect;
 import jadex.commons.collection.SCollection;
+import jadex.commons.service.clock.IClockService;
 import jadex.javaparser.IExpressionParser;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 import jadex.rules.state.IOAVState;
-import jadex.service.clock.IClockService;
 
 import java.util.Collection;
 import java.util.HashMap;

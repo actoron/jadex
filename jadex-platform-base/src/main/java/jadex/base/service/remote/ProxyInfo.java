@@ -1,7 +1,7 @@
 package jadex.base.service.remote;
 
 import jadex.bridge.IComponentIdentifier;
-import jadex.service.IServiceIdentifier;
+import jadex.commons.service.IServiceIdentifier;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;

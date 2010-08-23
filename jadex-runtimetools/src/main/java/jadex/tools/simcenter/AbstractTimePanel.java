@@ -5,9 +5,9 @@ import jadex.commons.ChangeEvent;
 import jadex.commons.IChangeListener;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
-import jadex.service.IServiceProvider;
-import jadex.service.SServiceProvider;
-import jadex.service.clock.IClockService;
+import jadex.commons.service.IServiceProvider;
+import jadex.commons.service.SServiceProvider;
+import jadex.commons.service.clock.IClockService;
 
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;

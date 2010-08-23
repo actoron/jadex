@@ -7,7 +7,7 @@ import jadex.base.fipa.SFipa;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
-import jadex.service.SServiceProvider;
+import jadex.commons.service.SServiceProvider;
 import jadex.wfms.bdi.ontology.ComponentClientProxy;
 import jadex.wfms.bdi.ontology.RequestAuth;
 import jadex.wfms.client.IClient;

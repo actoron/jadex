@@ -4,7 +4,7 @@ import jadex.base.fipa.SFipa;
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.SGUI;
 import jadex.commons.SUtil;
-import jadex.service.IServiceProvider;
+import jadex.commons.service.IServiceProvider;
 import jadex.tools.common.AgentSelectorDialog;
 
 import java.awt.Component;

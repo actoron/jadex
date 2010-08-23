@@ -16,7 +16,7 @@
 		<import>jadex.wfms.client.IClient</import>
 		<import>jadex.wfms.bdi.ontology.*</import>
 		<import>jadex.commons.ThreadSuspendable</import>
-		<import>jadex.service.SServiceProvider</import>
+		<import>jadex.commons.service.SServiceProvider</import>
 	</imports>
 
 	<capabilities>

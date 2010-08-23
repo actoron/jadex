@@ -10,7 +10,7 @@ import jadex.bridge.ComponentFactorySelector;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.concurrent.DefaultResultListener;
-import jadex.service.SServiceProvider;
+import jadex.commons.service.SServiceProvider;
 
 /**
  *  Example that shows how an agent model can be created via the editable model api.

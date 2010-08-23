@@ -11,9 +11,9 @@ import jadex.application.space.envsupport.observer.perspective.IPerspective;
 import jadex.bridge.IComponentManagementService;
 import jadex.commons.IChangeListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
-import jadex.service.SServiceProvider;
-import jadex.service.clock.IClockService;
-import jadex.service.library.ILibraryService;
+import jadex.commons.service.SServiceProvider;
+import jadex.commons.service.clock.IClockService;
+import jadex.commons.service.library.ILibraryService;
 
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;

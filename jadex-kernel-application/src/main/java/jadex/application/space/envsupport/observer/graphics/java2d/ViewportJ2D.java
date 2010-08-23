@@ -6,7 +6,7 @@ import jadex.application.space.envsupport.observer.graphics.drawable.DrawableCom
 import jadex.application.space.envsupport.observer.graphics.drawable.Primitive;
 import jadex.application.space.envsupport.observer.graphics.layer.Layer;
 import jadex.application.space.envsupport.observer.perspective.IPerspective;
-import jadex.service.library.ILibraryService;
+import jadex.commons.service.library.ILibraryService;
 
 import java.awt.Canvas;
 import java.awt.Dimension;

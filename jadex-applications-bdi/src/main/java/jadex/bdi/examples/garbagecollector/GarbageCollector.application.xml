@@ -21,7 +21,7 @@
 		<import>jadex.application.space.envsupport.environment.space2d.*</import>
 		<import>jadex.application.space.envsupport.environment.RoundBasedExecutor</import>
 		<import>jadex.application.space.envsupport.math.*</import>
-		<import>jadex.service.clock.IClockService</import>
+		<import>jadex.commons.service.clock.IClockService</import>
 		<import>jadex.application.space.envsupport.dataview.*</import>
 		<import>jadex.application.space.envsupport.observer.perspective.*</import>
 		<import>jadex.bdi.planlib.*</import>
@@ -53,29 +53,6 @@
 				</env:objecttype>
 			</env:objecttypes>
 			
-			<!-- Declaration of the relationships between agents and their avatar objects in the space. -->
-			<env:avatarmappings>
-				<env:avatarmapping componenttype="Collector" objecttype="collector"/>
-				<env:avatarmapping componenttype="Burner" objecttype="burner"/>
-			</env:avatarmappings>
-		
-			<!-- Actions that can be performed in the environment. -->
-			<env:actiontypes>
-				<env:actiontype name="pickup" class="PickupWasteAction">
-					<env:property name="actor_id" class="IComponentIdentifier"/>
-				</env:actiontype>
-				<env:actiontype name="drop" class="DropWasteAction" >
-					<env:property name="actor_id" class="IComponentIdentifier"/>
-				</env:actiontype>
-				<env:actiontype name="burn" class="BurnWasteAction" >
-					<env:property name="actor_id" class="IComponentIdentifier"/>
-				</env:actiontype>
-				<env:actiontype name="go" class="GoAction" >
-					<env:property name="object_id" class="Object"/>
-					<env:property name="direction" class="String"/>
-				</env:actiontype>
-			</env:actiontypes>
-			
 			<!-- Processes run on their own in the environment. -->
 			<env:processtypes>
 				<env:processtype name="create" class="DefaultObjectCreationProcess">
@@ -89,6 +66,25 @@
 				</env:processtype>
 			</env:processtypes>
 			
+			<!-- Data views for defining cut outs of the world objects. -->
+			<env:dataviews>
+				<env:dataview name="view_all" class="GeneralDataView2D" />
+				<env:dataview name="collector_view" class="LocalDataView2D" objecttype="collector">
+					<env:property name="object">$object</env:property>
+					<env:property name="range">$object.vision_range</env:property>
+				</env:dataview>
+				<env:dataview name="burner_view" class="LocalDataView2D" objecttype="burner">
+					<env:property name="object">$object</env:property>
+					<env:property name="range">$object.vision_range</env:property>
+				</env:dataview>
+			</env:dataviews>
+			
+			<!-- Declaration of the relationships between agents and their avatar objects in the space. -->
+			<env:avatarmappings>
+				<env:avatarmapping componenttype="Collector" objecttype="collector"/>
+				<env:avatarmapping componenttype="Burner" objecttype="burner"/>
+			</env:avatarmappings>
+		
 			<!-- The percepttypes, generators and processors. -->
 			<env:percepttypes>
 				
@@ -133,18 +129,22 @@
 				</env:perceptprocessor>
 			</env:percepttypes>
 			
-			<!-- Data views for defining cut outs of the world objects. -->
-			<env:dataviews>
-				<env:dataview name="view_all" class="GeneralDataView2D" />
-				<env:dataview name="collector_view" class="LocalDataView2D" objecttype="collector">
-					<env:property name="object">$object</env:property>
-					<env:property name="range">$object.vision_range</env:property>
-				</env:dataview>
-				<env:dataview name="burner_view" class="LocalDataView2D" objecttype="burner">
-					<env:property name="object">$object</env:property>
-					<env:property name="range">$object.vision_range</env:property>
-				</env:dataview>
-			</env:dataviews>
+			<!-- Actions that can be performed in the environment. -->
+			<env:actiontypes>
+				<env:actiontype name="pickup" class="PickupWasteAction">
+					<env:property name="actor_id" class="IComponentIdentifier"/>
+				</env:actiontype>
+				<env:actiontype name="drop" class="DropWasteAction" >
+					<env:property name="actor_id" class="IComponentIdentifier"/>
+				</env:actiontype>
+				<env:actiontype name="burn" class="BurnWasteAction" >
+					<env:property name="actor_id" class="IComponentIdentifier"/>
+				</env:actiontype>
+				<env:actiontype name="go" class="GoAction" >
+					<env:property name="object_id" class="Object"/>
+					<env:property name="direction" class="String"/>
+				</env:actiontype>
+			</env:actiontypes>
 			
 			<!-- Perspectives define the user-interface appearance. -->
 			<env:perspectives>

@@ -19,9 +19,9 @@ import jadex.bridge.MessageType;
 import jadex.commons.ICommand;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.IResultListener;
+import jadex.commons.service.IServiceProvider;
 import jadex.jade.service.ComponentManagementService;
-import jadex.service.IServiceProvider;
-import jadex.service.clock.IClockService;
+import jadex.commons.service.clock.IClockService;
 
 import java.io.IOException;
 import java.io.Serializable;

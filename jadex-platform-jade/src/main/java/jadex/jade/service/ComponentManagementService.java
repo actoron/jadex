@@ -21,10 +21,10 @@ import jadex.commons.IFuture;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.IResultListener;
+import jadex.commons.service.IService;
 import jadex.jade.JadeAgentAdapter;
 import jadex.jade.Platform;
 import jadex.jade.SJade;
-import jadex.service.IService;
 
 import java.util.ArrayList;
 import java.util.Collection;

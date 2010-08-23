@@ -15,9 +15,9 @@ import jadex.commons.ICommand;
 import jadex.commons.IFuture;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
+import jadex.commons.service.SServiceProvider;
 import jadex.micro.MicroAgent;
 import jadex.micro.MicroAgentMetaInfo;
-import jadex.service.SServiceProvider;
 
 import java.util.ArrayList;
 import java.util.HashMap;

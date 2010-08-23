@@ -9,9 +9,9 @@ import jadex.commons.IChangeListener;
 import jadex.commons.SGUI;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.SwingDefaultResultListener;
+import jadex.commons.service.IServiceProvider;
+import jadex.commons.service.SServiceProvider;
 import jadex.rules.tools.common.TableSorter;
-import jadex.service.IServiceProvider;
-import jadex.service.SServiceProvider;
 
 import java.awt.BorderLayout;
 import java.awt.Component;

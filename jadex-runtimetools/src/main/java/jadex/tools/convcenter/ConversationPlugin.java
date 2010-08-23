@@ -9,7 +9,7 @@ import jadex.bridge.IComponentManagementService;
 import jadex.commons.Properties;
 import jadex.commons.SGUI;
 import jadex.commons.concurrent.SwingDefaultResultListener;
-import jadex.service.SServiceProvider;
+import jadex.commons.service.SServiceProvider;
 import jadex.tools.common.GuiProperties;
 import jadex.tools.common.componenttree.ComponentTreePanel;
 import jadex.tools.common.componenttree.IActiveComponentTreeNode;

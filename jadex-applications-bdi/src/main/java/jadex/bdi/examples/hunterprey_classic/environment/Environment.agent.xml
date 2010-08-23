@@ -14,7 +14,7 @@
 		<import>jadex.commons.IFilter</import>
 		<import>jadex.base.fipa.*</import>
 		<import>jadex.commons.*</import>
-		<import>jadex.service.*</import>
+		<import>jadex.commons.service.*</import>
 	</imports>
 
 	<capabilities>

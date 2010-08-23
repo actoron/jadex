@@ -5,8 +5,8 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IMessageService;
 import jadex.commons.concurrent.SwingDefaultResultListener;
-import jadex.service.IServiceProvider;
-import jadex.service.SServiceProvider;
+import jadex.commons.service.IServiceProvider;
+import jadex.commons.service.SServiceProvider;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;

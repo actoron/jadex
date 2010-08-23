@@ -8,7 +8,7 @@ import jadex.application.space.envsupport.observer.graphics.drawable.Primitive;
 import jadex.application.space.envsupport.observer.graphics.layer.Layer;
 import jadex.application.space.envsupport.observer.perspective.IPerspective;
 import jadex.commons.SUtil;
-import jadex.service.library.ILibraryService;
+import jadex.commons.service.library.ILibraryService;
 
 import java.awt.AlphaComposite;
 import java.awt.Color;

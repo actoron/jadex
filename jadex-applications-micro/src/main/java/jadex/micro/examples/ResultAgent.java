@@ -6,9 +6,9 @@ import jadex.bridge.IArgument;
 import jadex.bridge.IComponentManagementService;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
+import jadex.commons.service.SServiceProvider;
 import jadex.micro.MicroAgent;
 import jadex.micro.MicroAgentMetaInfo;
-import jadex.service.SServiceProvider;
 
 /**
  * 

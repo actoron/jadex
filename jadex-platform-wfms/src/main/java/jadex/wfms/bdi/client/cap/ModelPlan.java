@@ -1,18 +1,15 @@
 package jadex.wfms.bdi.client.cap;
 
 import jadex.base.fipa.Done;
-import jadex.base.fipa.IDF;
 import jadex.bdi.runtime.IGoal;
 import jadex.bpmn.BpmnModelLoader;
 import jadex.bpmn.model.MBpmnModel;
-import jadex.bridge.IModelInfo;
+import jadex.commons.service.SServiceProvider;
+import jadex.commons.service.library.ILibraryService;
 import jadex.gpmn.GpmnModelLoader;
-import jadex.service.SServiceProvider;
-import jadex.service.library.ILibraryService;
 import jadex.wfms.bdi.ontology.RequestModel;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.RandomAccessFile;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel.MapMode;

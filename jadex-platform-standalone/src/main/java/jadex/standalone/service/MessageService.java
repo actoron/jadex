@@ -19,11 +19,11 @@ import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IExecutable;
 import jadex.commons.concurrent.IResultListener;
-import jadex.service.BasicService;
-import jadex.service.IServiceProvider;
-import jadex.service.SServiceProvider;
-import jadex.service.clock.IClockService;
-import jadex.service.execution.IExecutionService;
+import jadex.commons.service.BasicService;
+import jadex.commons.service.IServiceProvider;
+import jadex.commons.service.SServiceProvider;
+import jadex.commons.service.clock.IClockService;
+import jadex.commons.service.execution.IExecutionService;
 import jadex.standalone.StandaloneComponentAdapter;
 import jadex.standalone.transport.ITransport;
 

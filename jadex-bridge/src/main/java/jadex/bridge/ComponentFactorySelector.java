@@ -1,7 +1,7 @@
 package jadex.bridge;
 
-import jadex.service.BasicResultSelector;
-import jadex.service.IService;
+import jadex.commons.service.BasicResultSelector;
+import jadex.commons.service.IService;
 
 import java.util.Collection;
 import java.util.Map;

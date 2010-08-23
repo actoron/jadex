@@ -13,7 +13,7 @@
 		<import>java.net.URL</import>
 		<import>java.util.*</import>
 		<import>jadex.bridge.*</import>
-		<import>jadex.service.clock.IClockService</import>
+		<import>jadex.commons.service.clock.IClockService</import>
 	</imports>
 
 	<capabilities>

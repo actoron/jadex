@@ -21,8 +21,8 @@ import jadex.commons.IFuture;
 import jadex.commons.Tuple;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.DelegationResultListener;
+import jadex.commons.service.SServiceProvider;
 import jadex.rules.state.IOAVState;
-import jadex.service.SServiceProvider;
 
 import java.util.Map;
 

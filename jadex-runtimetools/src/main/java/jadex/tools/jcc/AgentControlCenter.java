@@ -3,7 +3,7 @@ package jadex.tools.jcc;
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IAgentListener;
 import jadex.bdi.runtime.IBDIExternalAccess;
-import jadex.service.IServiceProvider;
+import jadex.commons.service.IServiceProvider;
 
 import javax.swing.SwingUtilities;
 

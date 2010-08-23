@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- edited with XMLSPY v2004 rel. 3 U (http://www.xmlspy.com) by Lars (RTL) -->
-<xs:schema targetNamespace="http://jadex.sourceforge.net/jadex-application" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://jadex.sourceforge.net/jadex-application" elementFormDefault="qualified" attributeFormDefault="unqualified" version="2.0">
+<xs:schema targetNamespace="http://jadex.sourceforge.net/jadex-application" xmlns="http://jadex.sourceforge.net/jadex-application" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified" version="2.0">
 	<xs:element name="applicationtype">
 		<xs:annotation>
 			<xs:documentation>An application type specifies the structure and content of a agent application.</xs:documentation>
@@ -155,7 +155,8 @@
 			<xs:annotation>
 				<xs:documentation>The package of the application type. The package should correspond to the directory structure, the application descriptor is contained in (like the package of a Java class). The package is also used for lookup of classes and other files (e.g. agent descriptors).</xs:documentation>
 			</xs:annotation>
-		</xs:attribute>
+		</xs:attribute>
+		<xs:attribute name="autoshutdown" type="xs:boolean"/>
 	</xs:complexType>
 	<xs:complexType name="componenttype">
 		<xs:annotation>
@@ -298,8 +299,7 @@
 		<xs:attribute name="class" type="xs:string"/>
 		<xs:attribute name="language" type="xs:string"/>
 	</xs:complexType>
-
 	<xs:complexType name="servicetype" mixed="true">
-		<xs:attribute name="language" type="xs:string" use="optional"></xs:attribute>
+		<xs:attribute name="language" type="xs:string" use="optional"/>
 	</xs:complexType>
 </xs:schema>

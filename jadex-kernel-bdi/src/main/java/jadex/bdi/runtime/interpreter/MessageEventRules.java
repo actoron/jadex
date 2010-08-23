@@ -14,6 +14,7 @@ import jadex.commons.SUtil;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
+import jadex.commons.service.SServiceProvider;
 import jadex.javaparser.IValueFetcher;
 import jadex.rules.rulesystem.IAction;
 import jadex.rules.rulesystem.ICondition;
@@ -36,7 +37,6 @@ import jadex.rules.rulesystem.rules.Variable;
 import jadex.rules.rulesystem.rules.functions.MethodCallFunction;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVJavaType;
-import jadex.service.SServiceProvider;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;

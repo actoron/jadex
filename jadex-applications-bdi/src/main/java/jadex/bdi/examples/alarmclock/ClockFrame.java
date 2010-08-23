@@ -6,8 +6,8 @@ import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.commons.SGUI;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
-import jadex.service.SServiceProvider;
-import jadex.service.clock.IClockService;
+import jadex.commons.service.SServiceProvider;
+import jadex.commons.service.clock.IClockService;
 
 import java.awt.AWTException;
 import java.awt.MenuItem;

@@ -28,7 +28,7 @@
 		<import>jadex.application.space.envsupport.environment.space2d.*</import>
 		<import>jadex.application.space.envsupport.environment.DeltaTimeExecutor</import>
 		<import>jadex.application.space.envsupport.math.*</import>
-		<import>jadex.service.clock.IClockService</import>
+		<import>jadex.commons.service.clock.IClockService</import>
 		<import>jadex.application.space.envsupport.dataview.*</import>
 		<import>java.text.SimpleDateFormat</import>
 		<import>java.util.Date</import>
@@ -38,7 +38,7 @@
 		<import>jadex.bdi.examples.marsworld.producer.*</import>
 		<import>jadex.bdi.examples.marsworld.sentry.*</import>
 		<import>jadex.bdi.examples.marsworld.movement.*</import>
-		<import>jadex.service.SServiceProvider</import>
+		<import>jadex.commons.service.SServiceProvider</import>
 		<import>jadex.commons.IFuture</import>
 	</imports>
 	
@@ -86,12 +86,6 @@
 					</env:property>
 				</env:objecttype>
 			</env:objecttypes>
-									
-			<env:avatarmappings>
-				<env:avatarmapping componenttype="Sentry" objecttype="sentry"/>
-				<env:avatarmapping componenttype="Producer" objecttype="producer"/>
-				<env:avatarmapping componenttype="Carry" objecttype="carry"/>
-			</env:avatarmappings>
 			
 			<env:tasktypes>
 				<env:tasktype name="move" class="MoveTask" />
@@ -99,10 +93,16 @@
 				<env:tasktype name="produce" class="ProduceOreTask" />
 				<env:tasktype name="load" class="LoadOreTask" />
 			</env:tasktypes>
-
+						
 			<env:dataviews>
 				<env:dataview name="all_view" class="GeneralDataView2D" />
-			</env:dataviews>
+			</env:dataviews>			
+									
+			<env:avatarmappings>
+				<env:avatarmapping componenttype="Sentry" objecttype="sentry"/>
+				<env:avatarmapping componenttype="Producer" objecttype="producer"/>
+				<env:avatarmapping componenttype="Carry" objecttype="carry"/>
+			</env:avatarmappings>
 
 			<env:perspectives>
 				<env:perspective name="icons" class="Perspective2D" opengl="true">
@@ -161,10 +161,10 @@
 					<!-- Carry -->
 					<env:drawable objecttype="carry" width="0.07" height="0.07">
 						<env:property name="visionsize" dynamic="true">new Vector2Double($object.getProperty("vision").doubleValue()*2)</env:property>
-						<env:ellipse layer="1" size="visionsize" abssize="true" color="#FAFA1E32" />
-						<env:texturedrectangle layer="2" imagepath="jadex/bdibpmn/examples/marsworld/images/carry.png" />
 						<env:property name="oresize" dynamic="true">new Vector2Double(Math.sqrt(((Number)$object.getProperty("ore")).intValue()/200.0))</env:property>
 						<env:property name="oreposition" dynamic="true">new Vector2Double(0.3, -0.08-Math.sqrt(((Number)$object.getProperty("ore")).intValue()/200.0)/2)</env:property>
+						<env:ellipse layer="1" size="visionsize" abssize="true" color="#FAFA1E32" />
+						<env:texturedrectangle layer="2" imagepath="jadex/bdibpmn/examples/marsworld/images/carry.png" />
 						<env:texturedrectangle layer="1" size="oresize" position="oreposition" imagepath="jadex/bdibpmn/examples/marsworld/images/ore.png">
 							<env:drawcondition>((Number)$object.getProperty("ore")).intValue()>0</env:drawcondition>
 						</env:texturedrectangle>
@@ -247,9 +247,9 @@
 	 		</spaces>
 
 			<components>
-				<agent type="Sentry" number="1"/>
-  				<agent type="Producer" number="2"/>
-				<agent type="Carry" number="3"/>
+				<component type="Sentry" number="1"/>
+  				<component type="Producer" number="2"/>
+				<component type="Carry" number="3"/>
 			</components>	 		
  		</application>
 
@@ -282,9 +282,9 @@
 			</spaces>
 
 			<components>
-				<agent type="Sentry" number="2"/>
-  				<agent type="Producer" number="5"/>
-				<agent type="Carry" number="10"/>
+				<component type="Sentry" number="2"/>
+  				<component type="Producer" number="5"/>
+				<component type="Carry" number="10"/>
 			</components>
 
  		</application>

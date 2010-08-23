@@ -7,10 +7,10 @@ import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
-import jadex.service.SServiceProvider;
-import jadex.service.clock.IClockService;
-import jadex.service.clock.ITimedObject;
-import jadex.service.clock.ITimer;
+import jadex.commons.service.SServiceProvider;
+import jadex.commons.service.clock.IClockService;
+import jadex.commons.service.clock.ITimedObject;
+import jadex.commons.service.clock.ITimer;
 
 /**
  *  Uses timer service for implementing waiting.

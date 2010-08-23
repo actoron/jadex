@@ -8,7 +8,7 @@ import jadex.commons.IFuture;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
-import jadex.service.BasicService;
+import jadex.commons.service.BasicService;
 
 /**
  *  The shop for buying goods at the shop.

@@ -27,28 +27,28 @@
 	</componenttypes>
 	
 	<services>
-		<service name="wfms_AAA_service" class="jadex.wfms.service.IAAAService">
+		<service>
 			jadex.wfms.service.impl.BasicAAAService.getTestService($platform)
 		</service>
-		<service name="wfms_execution_service" class="jadex.wfms.service.IExecutionService">
+		<service>
 			new ExecutionService($component.getComponentIdentifier(), $platform)
 		</service>
-		<service name="wfms_administration_service" class="jadex.wfms.service.IAdministrationService">
+		<service>
 			new AdministrationService($platform)
 		</service>
-		<service name="wfms_process_definition" class="jadex.wfms.service.IProcessDefinitionService">
+		<service>
 			new ProcessDefinitionConnector($platform)
 		</service>
-		<service name="wfms_client_connector" class="jadex.wfms.service.impl.ClientConnector">
+		<service>
 			new ClientConnector($platform)
 		</service>
-		<service name="wfms_client_service" class="jadex.wfms.service.IClientService">
+		<service>
 			new ClientService($platform)
 		</service>
-		<service name="wfms_wfmsclient_service" class="jadex.wfms.service.IWfmsClientService">
+		<service>
 			new WfmsClientService($platform)
 		</service>
-		<service name="wfms_model_repository" class="jadex.wfms.service.IModelRepositoryService">
+		<service>
 			new LinkedModelRepositoryService($platform)
 		</service>
 	</services>

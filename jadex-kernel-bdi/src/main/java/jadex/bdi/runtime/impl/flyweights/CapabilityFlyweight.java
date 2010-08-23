@@ -18,8 +18,8 @@ import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IModelInfo;
+import jadex.commons.service.IServiceProvider;
 import jadex.rules.state.IOAVState;
-import jadex.service.IServiceProvider;
 
 import java.util.logging.Logger;
 

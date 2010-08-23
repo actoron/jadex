@@ -1,6 +1,6 @@
 package jadex.tools.serviceviewer;
 
-import jadex.service.IService;
+import jadex.commons.service.IService;
 import jadex.tools.common.plugin.IControlCenter;
 
 /**

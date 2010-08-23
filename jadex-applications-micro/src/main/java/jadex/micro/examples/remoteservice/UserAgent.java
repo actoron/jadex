@@ -5,8 +5,8 @@ import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IRemoteServiceManagementService;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
+import jadex.commons.service.SServiceProvider;
 import jadex.micro.MicroAgent;
-import jadex.service.SServiceProvider;
 
 /**
  *  Agent that invokes methods on a remote service.

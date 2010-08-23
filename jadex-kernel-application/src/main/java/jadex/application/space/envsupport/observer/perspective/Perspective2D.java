@@ -15,9 +15,9 @@ import jadex.application.space.envsupport.observer.graphics.layer.Layer;
 import jadex.application.space.envsupport.observer.gui.ObserverCenter;
 import jadex.application.space.envsupport.observer.gui.SObjectInspector;
 import jadex.commons.meta.TypedPropertyObject;
+import jadex.commons.service.library.ILibraryService;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SimpleValueFetcher;
-import jadex.service.library.ILibraryService;
 
 import java.awt.BorderLayout;
 import java.awt.Color;

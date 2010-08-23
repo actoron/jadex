@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.Set;
 
 import jadex.bdi.runtime.Plan;
-import jadex.service.SServiceProvider;
+import jadex.commons.service.SServiceProvider;
 import jadex.wfms.client.IClient;
 import jadex.wfms.service.IClientService;
 

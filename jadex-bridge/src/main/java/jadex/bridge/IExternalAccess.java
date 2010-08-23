@@ -1,7 +1,7 @@
 package jadex.bridge;
 
 import jadex.commons.IFuture;
-import jadex.service.IServiceProvider;
+import jadex.commons.service.IServiceProvider;
 
 /**
  *  The interface for accessing components from the outside.

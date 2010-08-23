@@ -34,6 +34,14 @@
 				</env:objecttype>
 			</env:objecttypes>
 						
+			<env:processtypes>
+				<env:processtype name="init" class="InitMapProcess" />
+			</env:processtypes>
+			
+			<env:dataviews>
+				<env:dataview name="view_all" class="GeneralDataView2D" />
+			</env:dataviews>
+						
 			<env:avatarmappings>
 				<env:avatarmapping componenttype="Imp" objecttype="imp" createcomponent="true"/>
 			</env:avatarmappings>
@@ -45,14 +53,6 @@
 				</env:actiontype>
 			</env:actiontypes>
 		
-			<env:processtypes>
-				<env:processtype name="init" class="InitMapProcess" />
-			</env:processtypes>
-			
-			<env:dataviews>
-				<env:dataview name="view_all" class="GeneralDataView2D" />
-			</env:dataviews>
-			
 			<env:perspectives>
 				<env:perspective name="main" class="Perspective2D" opengl="true" objectplacement="center">
 					<env:drawable objecttype="field" width="1.0" height="1.0">

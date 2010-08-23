@@ -1,7 +1,7 @@
 package jadex.bdi.runtime.interpreter;
 
 import jadex.bridge.CheckedAction;
-import jadex.service.clock.ITimedObject;
+import jadex.commons.service.clock.ITimedObject;
 
 /**
  *  This timed object ensures that timed objects are executed

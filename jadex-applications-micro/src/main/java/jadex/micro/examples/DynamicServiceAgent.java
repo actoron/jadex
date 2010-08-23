@@ -1,9 +1,9 @@
 package jadex.micro.examples;
 
 import jadex.commons.ICommand;
+import jadex.commons.service.BasicService;
+import jadex.commons.service.IServiceProvider;
 import jadex.micro.MicroAgent;
-import jadex.service.BasicService;
-import jadex.service.IServiceProvider;
 
 /**
  *  An agent that dynamically adds services at runtime.

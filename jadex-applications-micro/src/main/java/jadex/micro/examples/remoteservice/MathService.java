@@ -2,8 +2,8 @@ package jadex.micro.examples.remoteservice;
 
 import jadex.commons.Future;
 import jadex.commons.IFuture;
-import jadex.service.BasicService;
-import jadex.service.IServiceProvider;
+import jadex.commons.service.BasicService;
+import jadex.commons.service.IServiceProvider;
 
 /**
  *  Simple implementation of the math interface.

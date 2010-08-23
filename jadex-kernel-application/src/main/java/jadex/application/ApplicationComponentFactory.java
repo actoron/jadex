@@ -12,10 +12,10 @@ import jadex.bridge.IModelInfo;
 import jadex.commons.Future;
 import jadex.commons.SGUI;
 import jadex.commons.SReflect;
+import jadex.commons.service.BasicService;
 import jadex.javaparser.IExpressionParser;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
-import jadex.service.BasicService;
 import jadex.xml.IContext;
 import jadex.xml.IPostProcessor;
 

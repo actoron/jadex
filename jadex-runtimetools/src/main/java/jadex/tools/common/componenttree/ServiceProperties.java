@@ -3,8 +3,8 @@ package jadex.tools.common.componenttree;
 import jadex.commons.SGUI;
 import jadex.commons.SReflect;
 import jadex.commons.jtable.ResizeableTableHeader;
-import jadex.service.IService;
-import jadex.service.IServiceIdentifier;
+import jadex.commons.service.IService;
+import jadex.commons.service.IServiceIdentifier;
 
 import java.awt.BorderLayout;
 import java.lang.reflect.Method;

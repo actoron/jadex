@@ -17,7 +17,7 @@
 		<import>jadex.bdi.examples.blackjack.gui.*</import>
 		<import>java.util.*</import>
 		<import>jadex.commons.*</import>
-		<import>jadex.service.*</import>
+		<import>jadex.commons.service.*</import>
 		<import>jadex.base.fipa.*</import>
 		<import>java.util.logging.*</import>
 		<import>java.util.*</import>

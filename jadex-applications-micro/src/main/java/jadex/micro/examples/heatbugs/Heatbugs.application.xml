@@ -61,14 +61,6 @@
 				</env:objecttype>
 			</env:objecttypes>
 			
-			<env:avatarmappings>
-				<env:avatarmapping componenttype="Heatbug" objecttype="heatbug"/>
-			</env:avatarmappings>
-		
-			<env:actiontypes>
-				<env:actiontype name="move" class="MoveAction" />
-			</env:actiontypes>
-		
 			<env:processtypes>
 				<env:processtype name="diffuse" class="DiffusionProcess">
 					<env:property name="diffusion_rate">$space.diffusion_rate</env:property>
@@ -79,6 +71,14 @@
 			<env:dataviews>
 				<env:dataview name="view_all" class="GeneralDataView2D" />
 			</env:dataviews>
+			
+			<env:avatarmappings>
+				<env:avatarmapping componenttype="Heatbug" objecttype="heatbug"/>
+			</env:avatarmappings>
+		
+			<env:actiontypes>
+				<env:actiontype name="move" class="MoveAction" />
+			</env:actiontypes>
 			
 			<env:perspectives>
 				<env:perspective name="main" class="Perspective2D" opengl="true" objectplacement="center">

@@ -5,8 +5,8 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IMessageService;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.DefaultResultListener;
-import jadex.service.IServiceProvider;
-import jadex.service.SServiceProvider;
+import jadex.commons.service.IServiceProvider;
+import jadex.commons.service.SServiceProvider;
 import jadex.standalone.transport.ITransport;
 
 import java.util.List;

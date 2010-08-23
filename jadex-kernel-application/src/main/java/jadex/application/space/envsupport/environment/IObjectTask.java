@@ -1,7 +1,7 @@
 package jadex.application.space.envsupport.environment;
 
 import jadex.commons.IPropertyObject;
-import jadex.service.clock.IClockService;
+import jadex.commons.service.clock.IClockService;
 
 /**
  *  Interface for a task of an object.

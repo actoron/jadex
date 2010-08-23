@@ -13,7 +13,7 @@ import jadex.bdi.runtime.TimeoutException;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.SUtil;
-import jadex.service.SServiceProvider;
+import jadex.commons.service.SServiceProvider;
 
 import java.util.Date;
 

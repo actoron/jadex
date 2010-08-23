@@ -11,8 +11,8 @@ import jadex.bridge.ModelInfo;
 import jadex.commons.Future;
 import jadex.commons.SGUI;
 import jadex.commons.SReflect;
-import jadex.service.BasicService;
-import jadex.service.IServiceProvider;
+import jadex.commons.service.BasicService;
+import jadex.commons.service.IServiceProvider;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;

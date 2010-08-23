@@ -6,11 +6,11 @@ import jadex.bridge.IRemoteServiceManagementService;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.concurrent.IResultListener;
-import jadex.service.BasicServiceContainer;
-import jadex.service.IResultSelector;
-import jadex.service.ISearchManager;
-import jadex.service.IVisitDecider;
-import jadex.service.SServiceProvider;
+import jadex.commons.service.BasicServiceContainer;
+import jadex.commons.service.IResultSelector;
+import jadex.commons.service.ISearchManager;
+import jadex.commons.service.IVisitDecider;
+import jadex.commons.service.SServiceProvider;
 
 import java.util.Collection;
 

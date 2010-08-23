@@ -3,7 +3,7 @@ package jadex.bdi.runtime;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IModelInfo;
-import jadex.service.IServiceProvider;
+import jadex.commons.service.IServiceProvider;
 
 import java.util.logging.Logger;
 

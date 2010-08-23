@@ -8,8 +8,8 @@ import jadex.commons.IFuture;
 import jadex.commons.SReflect;
 import jadex.commons.collection.LRU;
 import jadex.commons.concurrent.IResultListener;
+import jadex.commons.service.SServiceProvider;
 import jadex.micro.IMicroExternalAccess;
-import jadex.service.SServiceProvider;
 
 import java.util.Collections;
 import java.util.Map;

@@ -3,8 +3,8 @@ package jadex.wfms.service;
 import jadex.commons.Future;
 import jadex.commons.ICommand;
 import jadex.commons.concurrent.DelegationResultListener;
-import jadex.service.IServiceContainer;
-import jadex.service.SServiceProvider;
+import jadex.commons.service.IServiceContainer;
+import jadex.commons.service.SServiceProvider;
 import jadex.wfms.client.IClient;
 
 import java.security.AccessControlException;

@@ -1,17 +1,10 @@
 package jadex.wfms.bdi.client.cap;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-import java.util.Map.Entry;
-
 import jadex.base.fipa.Done;
 import jadex.bdi.runtime.IGoal;
-import jadex.commons.SReflect;
-import jadex.service.library.ILibraryService;
 import jadex.wfms.bdi.ontology.RequestWorkitemList;
-import jadex.wfms.client.Workitem;
+
+import java.util.Set;
 
 public class WorkitemListPlan extends AbstractWfmsPlan
 {

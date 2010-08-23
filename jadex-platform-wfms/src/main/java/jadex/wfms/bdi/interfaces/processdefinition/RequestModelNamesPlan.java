@@ -9,7 +9,7 @@ import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
-import jadex.service.SServiceProvider;
+import jadex.commons.service.SServiceProvider;
 import jadex.wfms.bdi.client.cap.AbstractWfmsPlan;
 import jadex.wfms.bdi.ontology.RequestModelNames;
 import jadex.wfms.bdi.ontology.RequestProxy;

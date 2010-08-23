@@ -2,7 +2,7 @@ package jadex.tools.common;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.SGUI;
-import jadex.service.IServiceProvider;
+import jadex.commons.service.IServiceProvider;
 
 import java.awt.Component;
 import java.awt.Dialog;

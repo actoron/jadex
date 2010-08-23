@@ -320,7 +320,6 @@
 			<modules>
 				<module>jadex-commons</module>
 				<module>jadex-xml</module>
-				<module>jadex-services</module>
 				<module>jadex-javaparser</module>
 				<module>jadex-bridge</module>
 				<module>jadex-platform-base</module>
@@ -368,7 +367,6 @@
 			<modules>
 				<module>jadex-commons</module>
 				<module>jadex-xml</module>
-				<module>jadex-services</module>
 				<module>jadex-javaparser</module>
 				<module>jadex-bridge</module>
 				<module>jadex-platform-base</module>
@@ -466,7 +464,6 @@
 				</plugins>
 			</build>
 			<modules>
-				<module>jadex-services</module>
 				<module>jadex-commons</module>
 				<module>jadex-xml</module>
 				<module>jadex-javaparser</module>
@@ -501,7 +498,6 @@
 				<!-- <module>jadex-kernel-bdi-continuations</module> -->
 				<module>jadex-commons</module>
 				<module>jadex-xml</module>
-				<module>jadex-services</module>
 				<module>jadex-javaparser</module>
 				<module>jadex-bridge</module>
 				<module>jadex-platform-base</module>

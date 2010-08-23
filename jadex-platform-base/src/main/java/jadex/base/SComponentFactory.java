@@ -5,9 +5,9 @@ import jadex.bridge.IComponentFactory;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.concurrent.DefaultResultListener;
-import jadex.service.IServiceProvider;
-import jadex.service.SServiceProvider;
-import jadex.service.library.ILibraryService;
+import jadex.commons.service.IServiceProvider;
+import jadex.commons.service.SServiceProvider;
+import jadex.commons.service.library.ILibraryService;
 
 
 /**

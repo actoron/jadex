@@ -8,7 +8,7 @@ import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SGUI;
 import jadex.commons.concurrent.SwingDefaultResultListener;
-import jadex.service.IService;
+import jadex.commons.service.IService;
 import jadex.tools.common.GuiProperties;
 import jadex.tools.common.plugin.IControlCenter;
 import jadex.tools.serviceviewer.IServiceViewerPanel;
