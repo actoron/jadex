@@ -262,20 +262,27 @@ public class Future implements IFuture
      *  Add a result listener.
      *  @param listsner The listener.
      */
-    public synchronized void addResultListener(IResultListener listener)
+    public void	addResultListener(IResultListener listener)
     {
     	if(listener==null)
-    		throw new RuntimeException(); 
-    	if(resultavailable)
+    		throw new RuntimeException();
+    	
+    	boolean	notify	= false;
+    	synchronized(this)
     	{
+	    	if(resultavailable)
+	    	{
+	    		notify	= true;
+	    	}
+	    	else
+	    	{
+	    		if(listeners==null)
+	    			listeners	= new ArrayList();
+	    		listeners.add(listener);
+	    	}
+    	}
+    	if(notify)
     		notifyListener(listener);
-    	}
-    	else
-    	{
-    		if(listeners==null)
-    			listeners	= new ArrayList();
-    		listeners.add(listener);
-    	}
     }
     
     /**

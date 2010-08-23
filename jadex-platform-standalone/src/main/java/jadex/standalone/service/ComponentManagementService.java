@@ -257,9 +257,9 @@ public class ComponentManagementService extends BasicService implements ICompone
 											padesc = (CMSComponentDescription)descs.get(getParentIdentifier(cinfo));
 										}
 										padesc.addChild(cid);
-										pad.getComponentInstance().componentCreated(ad, lmodel);
 									}
 								}
+								pad.getComponentInstance().componentCreated(ad, lmodel);
 								
 								// Register component at parent.
 								
