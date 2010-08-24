@@ -18,6 +18,8 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -688,6 +690,18 @@ public class ComponentTreePanel extends JSplitPane
 				});
 				
 				cms.addComponentListener(null, listener);				
+			}
+		});
+		
+		// Remove selection in tree, when user clicks in background.
+		tree.addMouseListener(new MouseAdapter()
+		{
+			public void mouseClicked(MouseEvent e)
+			{
+				if(tree.getPathForLocation(e.getX(), e.getY())==null)
+				{
+					tree.clearSelection();
+				}
 			}
 		});
 	}
