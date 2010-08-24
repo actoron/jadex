@@ -109,11 +109,11 @@ public class Future implements IFuture
 	    	}
     	}
     	
-    	Object mon = caller.getMonitor()!=null? caller.getMonitor(): caller;
-    	synchronized(mon)
-    	{
-    		if(suspend)
-    		{
+    	if(suspend)
+		{
+	    	Object mon = caller.getMonitor()!=null? caller.getMonitor(): caller;
+	    	synchronized(mon)
+	    	{
     			Object	state	= callers.get(caller);
     			if(CALLER_QUEUED.equals(state))
     			{
@@ -131,7 +131,8 @@ public class Future implements IFuture
     	
     	if(exception!=null)
     	{
-    		throw exception instanceof RuntimeException ? (RuntimeException)exception : new RuntimeException(exception);
+    		throw exception instanceof RuntimeException ?(RuntimeException)exception 
+    			:new RuntimeException(exception);
     	}
     	else
     	{

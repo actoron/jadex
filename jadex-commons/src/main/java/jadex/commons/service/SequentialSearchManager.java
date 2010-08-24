@@ -89,9 +89,6 @@ public class SequentialSearchManager implements ISearchManager
 	protected void processNode(final IServiceProvider source, final IServiceProvider provider, final IVisitDecider decider, final IResultSelector selector, final Map services,
 		final Future ret, final Collection results, final Map todo, final boolean up)
 	{
-//		if(selector.toString().indexOf("IRemoteService")!=-1)
-//			System.out.println("processing: "+provider+" "+selector);
-		
 		boolean dochildren = false;
 		
 		// If node is to be searched, continue with this node.
@@ -105,9 +102,50 @@ public class SequentialSearchManager implements ISearchManager
 			
 			if(decider.searchNode(source, provider, results))
 			{
-				provider.getServices(LOCAL_SEARCH_MANAGER, decider, selector, results).addResultListener(new IResultListener()
+				// Use fut.isDone() to reduce stack depth
+				IFuture fut = provider.getServices(LOCAL_SEARCH_MANAGER, decider, selector, results);
+				if(!fut.isDone())
 				{
-					public void resultAvailable(Object source, Object result)
+					fut.addResultListener(new IResultListener()
+					{
+						public void resultAvailable(Object source, Object result)
+						{
+							// When searching upwards, continue with parent.
+							if(!selector.isFinished(results) && up)
+							{
+								provider.getParent().addResultListener(new IResultListener()
+								{
+									public void resultAvailable(Object source, Object result)
+									{
+										// Cut search if parent was already visisted.
+										if(SUtil.equals(source, result))
+											result = null;
+										processNode(provider, (IServiceProvider)result, decider, selector, services, ret, results, todo, up);
+									}
+									
+									public void exceptionOccurred(Object source, Exception exception)
+									{
+										ret.setException(exception);
+									}
+								});
+							}
+		
+							// Else continue with child nodes from todo list (if any).
+							else
+							{
+								processChildNodes(null, decider, selector, services, ret, results, todo);
+							}
+						}
+						
+						public void exceptionOccurred(Object source, Exception exception)
+						{
+							ret.setException(exception);
+						}
+					});
+				}
+				else
+				{
+					try
 					{
 						// When searching upwards, continue with parent.
 						if(!selector.isFinished(results) && up)
@@ -135,12 +173,11 @@ public class SequentialSearchManager implements ISearchManager
 							processChildNodes(null, decider, selector, services, ret, results, todo);
 						}
 					}
-					
-					public void exceptionOccurred(Object source, Exception exception)
+					catch(Exception exception)
 					{
 						ret.setException(exception);
 					}
-				});
+				}
 			}
 			else if(up)
 			{
@@ -212,12 +249,14 @@ public class SequentialSearchManager implements ISearchManager
 			final Object[] prov = (Object[])todo.remove(next);
 			final IServiceProvider	provider = (IServiceProvider)prov[0];
 			final IServiceProvider	src = (IServiceProvider)prov[1];
-			provider.getChildren().addResultListener(new IResultListener()
+			IFuture fut = provider.getChildren();
+			
+			// Use fut.isDone() to reduce stack depth
+			if(fut.isDone())
 			{
-				public void resultAvailable(Object source, Object result)
+				try
 				{
-//					if(selector.toString().indexOf("IRemoteService")!=-1)
-//						System.out.println("children: "+provider+" "+result);
+					Object result = fut.get(null);
 					if(!selector.isFinished(results) && result!=null && !((Collection)result).isEmpty())
 					{
 						List	ccs	= new LinkedList((Collection)result);
@@ -226,12 +265,32 @@ public class SequentialSearchManager implements ISearchManager
 					}
 					processChildNodes(provider, decider, selector, services, ret, results, todo);
 				}
-				
-				public void exceptionOccurred(Object source, Exception exception)
+				catch(Exception exception)
 				{
 					ret.setException(exception);
 				}
-			});
+			}
+			else
+			{
+				fut.addResultListener(new IResultListener()
+				{
+					public void resultAvailable(Object source, Object result)
+					{
+						if(!selector.isFinished(results) && result!=null && !((Collection)result).isEmpty())
+						{
+							List	ccs	= new LinkedList((Collection)result);
+							ccs.remove(src);
+							todo.put(CURRENT_CHILDREN, ccs);
+						}
+						processChildNodes(provider, decider, selector, services, ret, results, todo);
+					}
+					
+					public void exceptionOccurred(Object source, Exception exception)
+					{
+						ret.setException(exception);
+					}
+				});
+			}
 		}
 	}
 
