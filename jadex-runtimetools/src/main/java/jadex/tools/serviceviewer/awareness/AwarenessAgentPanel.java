@@ -858,11 +858,11 @@ class DiscoveryTableModel extends AbstractTableModel
 			case 1:
 				return "Delay";
 			case 2:
-				return "Timepoint of Last Received Info";
+				return "Time of Last Received Info";
 			case 3:
 				return "Has a Proxy";
 			case 4:
-				return "Is Excluded from Proxy Creation";
+				return "Excluded from Proxy Creation";
 			default:
 				return "";
 		}
