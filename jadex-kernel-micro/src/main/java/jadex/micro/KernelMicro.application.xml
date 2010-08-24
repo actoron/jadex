@@ -15,7 +15,7 @@
 	
 	<services>
 		<service>
-			new MicroAgentFactory($platform, SUtil.createHashMap(
+			new MicroAgentFactory($component.getServiceProvider(), SUtil.createHashMap(
 				new String[]
 				{
 					"debugger.panels"

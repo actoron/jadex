@@ -11,7 +11,7 @@
 	<properties type="platform_standalone">
 		<properties type="services">
 			<property type="jadex.bridge.IComponentFactory" name="gpmn_factory">
-				new jadex.gpmn.GpmnFactory($platform, jadex.commons.SUtil.createHashMap(
+				new jadex.gpmn.GpmnFactory($component.getServiceProvider(), jadex.commons.SUtil.createHashMap(
 					new String[]
 					{
 						"debugger.panels"

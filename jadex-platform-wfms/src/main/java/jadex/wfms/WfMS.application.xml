@@ -28,28 +28,28 @@
 	
 	<services>
 		<service>
-			jadex.wfms.service.impl.BasicAAAService.getTestService($platform)
+			jadex.wfms.service.impl.BasicAAAService.getTestService($component.getServiceProvider())
 		</service>
 		<service>
-			new ExecutionService($component.getComponentIdentifier(), $platform)
+			new ExecutionService($component.getComponentIdentifier(), $component.getServiceProvider())
 		</service>
 		<service>
-			new AdministrationService($platform)
+			new AdministrationService($component.getServiceProvider())
 		</service>
 		<service>
-			new ProcessDefinitionConnector($platform)
+			new ProcessDefinitionConnector($component.getServiceProvider())
 		</service>
 		<service>
-			new ClientConnector($platform)
+			new ClientConnector($component.getServiceProvider())
 		</service>
 		<service>
-			new ClientService($platform)
+			new ClientService($component.getServiceProvider())
 		</service>
 		<service>
-			new WfmsClientService($platform)
+			new WfmsClientService($component.getServiceProvider())
 		</service>
 		<service>
-			new LinkedModelRepositoryService($platform)
+			new LinkedModelRepositoryService($component.getServiceProvider())
 		</service>
 	</services>
 

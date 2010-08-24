@@ -65,14 +65,14 @@
 		<!-- <container class="IServiceContainer">new ComponentServiceContainer($component.getComponentAdapter())</container>-->
 		
 		<service>
-			new ThreadPoolService(new ThreadPool(new DefaultThreadPoolStrategy(0, 20, 30000, 0)), $platform)
+			new ThreadPoolService(new ThreadPool(new DefaultThreadPoolStrategy(0, 20, 30000, 0)), $component.getServiceProvider())
 		</service>
 		<service>
 			$args.simulation
-			? new SyncExecutionService($platform, SUtil.createHashMap(new Object[]{"serviceviewer.viewerclass", 
+			? new SyncExecutionService($component.getServiceProvider(), SUtil.createHashMap(new Object[]{"serviceviewer.viewerclass", 
 				RemoteServiceManagementService.REMOTE_UNCACHED}, new Object[]{"jadex.tools.serviceviewer.executionservice.ExecutionServiceViewer", 
 				new String[]{"isIdle", "getTasks"}}))
-			: new AsyncExecutionService($platform, SUtil.createHashMap(new Object[]{"serviceviewer.viewerclass", 
+			: new AsyncExecutionService($component.getServiceProvider(), SUtil.createHashMap(new Object[]{"serviceviewer.viewerclass", 
 				RemoteServiceManagementService.REMOTE_UNCACHED}, new Object[]{"jadex.tools.serviceviewer.executionservice.ExecutionServiceViewer", 
 				new String[]{"isIdle", "getTasks"}}))
 		</service>
@@ -85,20 +85,20 @@
 				)
 		</service>
 		<service>
-			new ComponentManagementService($platform, $component.getComponentAdapter())
+			new ComponentManagementService($component.getServiceProvider(), $component.getComponentAdapter())
 		</service>
 		<service>
-			new DirectoryFacilitatorService($platform, SUtil.createHashMap(
+			new DirectoryFacilitatorService($component.getServiceProvider(), SUtil.createHashMap(
 				new Object[]{"serviceviewer.viewerclass"}, 
 				new Object[]{"jadex.tools.serviceviewer.dfservice.DFBrowserPanel"}))
 		</service>
 		<service>
-			new MessageService($platform,
+			new MessageService($component.getServiceProvider(),
 				new ITransport[]
 				{
-					new LocalTransport($platform),
-					new TCPTransport($platform, $args.tcpport),
-					new NIOTCPTransport($platform, $args.niotcpport)
+					new LocalTransport($component.getServiceProvider()),
+					new TCPTransport($component.getServiceProvider(), $args.tcpport),
+					new NIOTCPTransport($component.getServiceProvider(), $args.niotcpport)
 				},
 				new MessageType[]
 				{
@@ -107,15 +107,15 @@
 		</service>
 		<service>
 			$args.simulation
-			? new ClockService(new ClockCreationInfo(IClock.TYPE_EVENT_DRIVEN, "simulation_clock", System.currentTimeMillis(), 100), $platform,
+			? new ClockService(new ClockCreationInfo(IClock.TYPE_EVENT_DRIVEN, "simulation_clock", System.currentTimeMillis(), 100), $component.getServiceProvider(),
 				SUtil.createHashMap(new Object[]{RemoteServiceManagementService.REMOTE_UNCACHED}, 
 				new Object[]{new String[]{"getState", "getTime", "getTick", "getStarttime", "getDelta", "getDilation", "getNextTimer", "getTimers", "getClockType", "advanceEvent"}}))
-			: new ClockService(new ClockCreationInfo(IClock.TYPE_SYSTEM, "simulation_clock", System.currentTimeMillis(), 100), $platform,
+			: new ClockService(new ClockCreationInfo(IClock.TYPE_SYSTEM, "simulation_clock", System.currentTimeMillis(), 100), $component.getServiceProvider(),
 				SUtil.createHashMap(new Object[]{RemoteServiceManagementService.REMOTE_UNCACHED}, 
 				new Object[]{new String[]{"getState", "getTime", "getTick", "getStarttime", "getDelta", "getDilation", "getNextTimer", "getTimers", "getClockType", "advanceEvent"}}))
 		</service>
 		<service>
-			new SimulationService($platform,
+			new SimulationService($component.getServiceProvider(),
 				SUtil.createHashMap(new Object[]{RemoteServiceManagementService.REMOTE_UNCACHED}, 
 				new Object[]{new String[]{"getMode", "isExecuting"}}))
 		</service>
@@ -126,7 +126,7 @@
 					MEnvSpaceType.getXMLMapping(),
 					MAGRSpaceType.getXMLMapping()
 				}, 
-				$platform.getId()
+				$component.getServiceProvider().getId()
 			)		
 		</service>
 	</services>

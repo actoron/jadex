@@ -14,7 +14,7 @@
 	
 	<services>
 		<service>
-			new BpmnFactory($platform, SUtil.createHashMap(
+			new BpmnFactory($component.getServiceProvider(), SUtil.createHashMap(
 				new String[]
 				{
 					"debugger.panels"

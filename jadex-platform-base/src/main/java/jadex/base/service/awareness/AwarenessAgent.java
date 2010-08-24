@@ -403,9 +403,13 @@ public class AwarenessAgent extends MicroAgent
 					for(int i=0; i<todel.size(); i++)
 					{
 						IComponentIdentifier cid = (IComponentIdentifier)todel.get(i);
-						deleteProxy(cid).addResultListener(new DefaultResultListener(getLogger())
+						// Ignore deletion failures
+						deleteProxy(cid).addResultListener(new IResultListener()
 						{
 							public void resultAvailable(Object source, Object result)
+							{
+							}
+							public void exceptionOccurred(Object source, Exception exception)
 							{
 							}
 						});

@@ -36,13 +36,13 @@
 				new Object[]
 				{
 					new FIPAMessageType(), 
-					new JavaStandardPlanExecutor((IThreadPoolService)SServiceProvider.getService($platform, IThreadPoolService.class).get(new ThreadSuspendable())),
+					new JavaStandardPlanExecutor((IThreadPoolService)SServiceProvider.getService($component.getServiceProvider(), IThreadPoolService.class).get(new ThreadSuspendable())),
 					new Long(10000),
 					Boolean.TRUE,
 					new BpmnPlanExecutor(),
 					"jadex.tools.debugger.bdi.BDIAgentInspectorDebuggerPanel, jadex.tools.debugger.bdi.BDIAgentRuleEngineDebuggerPanel"
 				}
-			), $platform)
+			), $component.getServiceProvider())
 		</service>
 	</services>
 </applicationtype>

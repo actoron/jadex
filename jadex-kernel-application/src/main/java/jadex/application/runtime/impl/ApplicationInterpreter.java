@@ -177,7 +177,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 			container = new CacheServiceContainer(new ComponentServiceContainer(getComponentAdapter()), 25, 1*30*1000); // 30 secs cache expire
 		}
 		
-		fetcher.setValue("$platform", getServiceProvider());
+		fetcher.setValue("$provider", getServiceProvider());
 		
 		// Schedule the futures (first) init step.
 		addStep(new Runnable()
@@ -1175,7 +1175,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 	public int getNumber(MComponentInstance component, ClassLoader classloader)
 	{
 //		SimpleValueFetcher fetcher = new SimpleValueFetcher();
-//		fetcher.setValue("$platform", context.getServiceContainer());
+//		fetcher.setValue("$provider", context.getServiceContainer());
 //		fetcher.setValue("$args", context.getArguments());
 //		fetcher.setValue("$results", context.getResults());
 //		fetcher.setValue("$clock", clock);

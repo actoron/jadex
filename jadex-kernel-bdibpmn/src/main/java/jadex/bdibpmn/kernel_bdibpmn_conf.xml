@@ -25,13 +25,13 @@
 					new Object[]
 					{
 						new jadex.base.fipa.FIPAMessageType(), 
-						new jadex.bdi.runtime.impl.JavaStandardPlanExecutor(jadex.commons.service.SServiceProvider.getService($platform, jadex.commons.service.threadpool.ThreadPoolService.class).get(new jadex.commons.ThreadSuspendable())),
+						new jadex.bdi.runtime.impl.JavaStandardPlanExecutor(jadex.commons.service.SServiceProvider.getService($component.getServiceProvider(), jadex.commons.service.threadpool.ThreadPoolService.class).get(new jadex.commons.ThreadSuspendable())),
 						new java.lang.Long(10000),
 						Boolean.TRUE,
 						new jadex.bdibpmn.BpmnPlanExecutor(),
 						"jadex.tools.debugger.bdi.BDIAgentInspectorDebuggerPanel, jadex.tools.debugger.bdi.BDIAgentRuleEngineDebuggerPanel"
 					}
-				), $platform)
+				), $component.getServiceProvider())
 			</property>
 		</properties>
 	</properties>

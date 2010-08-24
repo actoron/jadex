@@ -15,6 +15,7 @@ public class SServiceProvider
 	
 	/** The sequential search manager. */
 	public static ISearchManager sequentialmanager = new SequentialSearchManager();
+//	public static ISearchManager sequentialmanager = new ParallelSearchManager();
 
 	/** The parallel search manager. */
 	public static ISearchManager parallelmanager = new ParallelSearchManager();

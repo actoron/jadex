@@ -262,18 +262,22 @@ public class MessageService extends BasicService implements IMessageService
 	 *  @param message The native message. 
 	 *  (Synchronized because can be called from concurrently executing transports)
 	 */
-	public synchronized void deliverMessage(Map message, String msgtype, IComponentIdentifier[] receivers)
+	public void deliverMessage(Map message, String msgtype, IComponentIdentifier[] receivers)
 	{	
-//		internalDeliverMessage(message);
+		IMessageListener[] lis;
+		synchronized(this)
+		{
+			lis = listeners==null? null: (IMessageListener[])listeners.toArray(new IMessageListener[listeners.size()]);
+		}
 		
-		if(listeners!=null)
+		if(lis!=null)
 		{
 			// Hack?!
 			IMessageAdapter msg = new DefaultMessageAdapter(message, getMessageType(msgtype));
-			for(int i=0; i<listeners.size(); i++)
+			for(int i=0; i<lis.length; i++)
 			{
-				IMessageListener lis = (IMessageListener)listeners.get(i);
-				lis.messageReceived(msg);
+				IMessageListener li = (IMessageListener)lis[i];
+				li.messageReceived(msg);
 			}
 		}
 		
@@ -424,7 +428,7 @@ public class MessageService extends BasicService implements IMessageService
 	/**
 	 *  Start the service.
 	 */
-	public synchronized IFuture	startService()
+	public IFuture startService()
 	{
 		final Future ret = new Future();
 		
@@ -481,7 +485,7 @@ public class MessageService extends BasicService implements IMessageService
 	/**
 	 *  Called when the platform shuts down. Do necessary cleanup here (if any).
 	 */
-	public synchronized IFuture	shutdownService()
+	public IFuture shutdownService()
 	{
 		for(int i = 0; i < transports.size(); i++)
 		{
