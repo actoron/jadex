@@ -33,7 +33,7 @@ import javax.swing.tree.TreePath;
 
 
 /**
- * 
+ *  Tree model for inspecting objects.
  */
 public class ObjectTreeModel implements TreeModel
 {
@@ -45,19 +45,16 @@ public class ObjectTreeModel implements TreeModel
 	 */
 	protected final static boolean enableObjectInspection = true;
 	
-	/**
-	 * The image icons.
-	 */
+	/** The image icons. */
 	protected static UIDefaults icons = new UIDefaults(new Object[]
 	{
-		// Tab icons.
-		"javaobject", SGUI.makeIcon(ObjectTreeModel.class, "/jadex/rules/tools/stateviewer/images/bean.png"),
-		"javaattribute", SGUI.makeIcon(ObjectTreeModel.class, "/jadex/rules/tools/stateviewer/images/javaattribute.png"),
-		"javavalue", SGUI.makeIcon(ObjectTreeModel.class, "/jadex/rules/tools/stateviewer/images/value.png")
+		"javaobject", SGUI.makeIcon(ObjectTreeModel.class, "/jadex/base/gui/images/bean.png"),
+		"javaattribute", SGUI.makeIcon(ObjectTreeModel.class, "/jadex/base/gui/images/attribute.png"),
+		"javavalue", SGUI.makeIcon(ObjectTreeModel.class, "/jadex/base/gui/images/value.png")
 	});
 	
-	/** The list of timers to update the object inspector tree nodes .*/
-	protected static List timers;
+//	/** The list of timers to update the object inspector tree nodes .*/
+//	protected static List timers;
 
 	//-------- attributes --------
 	
@@ -100,8 +97,6 @@ public class ObjectTreeModel implements TreeModel
 		timer.start();
 //		ObjectTreeModel.addRefreshTimer(timer);
 	}
-	
-	
 
 	//-------- TreeModel interface --------
 

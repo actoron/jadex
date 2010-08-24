@@ -67,7 +67,8 @@ public class ComponentTreePanel extends JSplitPane
 		"overlay_running", SGUI.makeIcon(ComponentTreePanel.class, "/jadex/base/gui/images/overlay_gearwheel.png"),
 		"overlay_refresh", SGUI.makeIcon(ComponentTreePanel.class, "/jadex/base/gui/images/overlay_refresh.png"),
 		"overlay_refreshtree", SGUI.makeIcon(ComponentTreePanel.class, "/jadex/base/gui/images/overlay_refresh.png"),
-		"overlay_showprops", SGUI.makeIcon(ComponentTreePanel.class, "/jadex/base/gui/images/overlay_doc.png")
+		"overlay_showprops", SGUI.makeIcon(ComponentTreePanel.class, "/jadex/base/gui/images/overlay_doc.png"),
+		"overlay_showobject", SGUI.makeIcon(ComponentTreePanel.class, "/jadex/base/gui/images/overlay_bean.png")
 	});
 	
 	//-------- attributes --------
@@ -499,7 +500,7 @@ public class ComponentTreePanel extends JSplitPane
 					if(nodes[0] instanceof ServiceNode || nodes[0] instanceof IActiveComponentTreeNode)
 					{
 						Action pshowobject = new AbstractAction((String)showobject.getValue(Action.NAME),
-							base!=null ? new CombiIcon(new Icon[]{base, icons.getIcon("overlay_showprops")}) : (Icon)showprops.getValue(Action.SMALL_ICON))
+							base!=null ? new CombiIcon(new Icon[]{base, icons.getIcon("overlay_showobject")}) : (Icon)showprops.getValue(Action.SMALL_ICON))
 						{
 							public void actionPerformed(ActionEvent e)
 							{
