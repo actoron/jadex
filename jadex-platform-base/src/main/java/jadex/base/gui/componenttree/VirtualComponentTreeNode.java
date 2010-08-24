@@ -66,7 +66,8 @@ public class VirtualComponentTreeNode extends AbstractComponentTreeNode implemen
 	protected void	searchChildren()
 	{
 		final Future	future	= new Future();
-		ProxyComponentTreeNode.searchChildren(cms, this, desc, desc.getName(), ui, iconcache, future).addResultListener(new SwingDefaultResultListener(ui)
+		ProxyComponentTreeNode.searchChildren(cms, this, desc, desc.getName(), ui, iconcache, future)
+			.addResultListener(new SwingDefaultResultListener((Component)null)
 		{
 			public void customResultAvailable(Object source, Object result)
 			{
@@ -91,7 +92,8 @@ public class VirtualComponentTreeNode extends AbstractComponentTreeNode implemen
 			tmp = tmp.getParent();
 		ProxyComponentTreeNode proxy = (ProxyComponentTreeNode)tmp;
 		
-		cms.getExternalAccess(proxy.getDescription().getName()).addResultListener(new SwingDefaultResultListener(ui)
+		cms.getExternalAccess(proxy.getDescription().getName())
+			.addResultListener(new SwingDefaultResultListener((Component)null)
 		{
 			public void customResultAvailable(Object source, Object result)
 			{
@@ -101,13 +103,20 @@ public class VirtualComponentTreeNode extends AbstractComponentTreeNode implemen
 					public void execute(Object agent)
 					{
 						ProxyAgent pa = (ProxyAgent)agent;
-						pa.getRemoteComponentDescription(desc.getName()).addResultListener(new SwingDefaultResultListener(ui)
+						pa.getRemoteComponentDescription(desc.getName())
+							.addResultListener(new SwingDefaultResultListener((Component)null)
 						{
 							public void customResultAvailable(Object source, Object result)
 							{
 								setDescription((IComponentDescription)result);
 								getModel().fireNodeChanged(VirtualComponentTreeNode.this);
 //								System.out.println("refreshed: "+desc);
+							}
+							
+							public void customExceptionOccurred(Object source, Exception exception)
+							{
+								AbstractComponentTreeNode parent = (AbstractComponentTreeNode)getParent();
+								parent.removeChild(VirtualComponentTreeNode.this);
 							}
 						});
 					}

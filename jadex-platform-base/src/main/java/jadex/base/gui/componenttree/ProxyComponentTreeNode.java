@@ -113,7 +113,8 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 			public void customResultAvailable(Object source, Object result)
 			{
 				final Future	future	= new Future();
-				searchChildren(cms, ProxyComponentTreeNode.this, desc, cid, ui, iconcache, future).addResultListener(new SwingDefaultResultListener(ui)
+				searchChildren(cms, ProxyComponentTreeNode.this, desc, cid, ui, iconcache, future)
+					.addResultListener(new SwingDefaultResultListener((Component)null)
 				{
 					public void customResultAvailable(Object source, Object result)
 					{
@@ -175,7 +176,7 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 					public void execute(Object agent)
 					{
 						ProxyAgent pa = (ProxyAgent)agent;
-						pa.getVirtualChildren(cid).addResultListener(new SwingDefaultResultListener(proxy.getUI())
+						pa.getVirtualChildren(cid).addResultListener(new SwingDefaultResultListener((Component)null)
 						{
 							public void customResultAvailable(Object source, Object result)
 							{
@@ -212,7 +213,7 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 					public void execute(Object agent)
 					{
 						ProxyAgent pa = (ProxyAgent)agent;
-						pa.getRemoteServices(cid).addResultListener(new SwingDefaultResultListener(proxy.getUI())
+						pa.getRemoteServices(cid).addResultListener(new SwingDefaultResultListener((Component)null)
 						{
 							public void customResultAvailable(Object source, Object result)
 							{
@@ -235,11 +236,15 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 									}
 									
 									final ServiceContainerNode	node	= scn;
-									future.addResultListener(new SwingDefaultResultListener(proxy.getUI())
+									future.addResultListener(new SwingDefaultResultListener((Component)null)
 									{
 										public void customResultAvailable(Object source, Object result)
 										{
 											node.setChildren(subchildren);							
+										}
+										public void customExceptionOccurred(Object source, Exception exception)
+										{
+											ret.setExceptionIfUndone(exception);
 										}
 									});
 								}

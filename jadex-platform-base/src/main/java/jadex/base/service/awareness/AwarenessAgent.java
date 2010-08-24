@@ -124,7 +124,7 @@ public class AwarenessAgent extends MicroAgent
 					public void resultAvailable(Object source, Object result)
 					{
 						root = (IComponentIdentifier)result;
-						discovered.put(root, new DiscoveryInfo(root, false, clock.getTime(), delay));
+						discovered.put(root, new DiscoveryInfo(root, false, false, clock.getTime(), delay));
 						
 						startSendBehaviour();
 						startRemoveBehaviour();
@@ -326,6 +326,17 @@ public class AwarenessAgent extends MicroAgent
 			this.delay = delay;
 			startSendBehaviour();
 		}
+	}
+	
+	/**
+	 *  Set the delay.
+	 *  @param delay The delay to set.
+	 */
+	public synchronized void setExcluded(IComponentIdentifier cid, boolean excluded)
+	{
+		DiscoveryInfo dif = getDiscoveryInfo(cid);
+		if(dif!=null)
+			dif.setExcluded(excluded);
 	}
 	
 	/**
@@ -647,7 +658,7 @@ public class AwarenessAgent extends MicroAgent
 //										System.out.println(getComponentIdentifier()+" received: "+info);
 									
 										final IComponentIdentifier sender = info.getSender();
-										boolean createproxy = false;
+										boolean createproxy;
 										DiscoveryInfo dif;
 										synchronized(AwarenessAgent.this)
 										{
@@ -655,18 +666,19 @@ public class AwarenessAgent extends MicroAgent
 											if(dif==null)
 											{
 												createproxy = isAutoCreateProxy();
-												dif = new DiscoveryInfo(sender, createproxy, clock.getTime(), getDelay());
+												dif = new DiscoveryInfo(sender, createproxy, false, clock.getTime(), getDelay());
 												discovered.put(sender, dif);
 											}
 											else
 											{
+												createproxy = isAutoCreateProxy() && !dif.hasProxy() && !dif.isExcluded();
 												dif.setTime(clock.getTime());
 											}
 										}
 										
 										if(createproxy)
 										{
-//													System.out.println("Creating new proxy for: "+sender+" "+getComponentIdentifier());
+//											System.out.println("Creating new proxy for: "+sender+" "+getComponentIdentifier());
 											createProxy(sender);
 										}
 									}

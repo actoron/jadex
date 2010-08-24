@@ -412,10 +412,42 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 			}
 		});
 		
+		JButton buexclude = new JButton("Exclude");
+		buexclude.setToolTipText("Exclude/include from automatic proxy generation.");
+		buexclude.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				int sel = jtdis.getSelectedRow();
+				if(sel==-1)
+				{
+					jcc.displayError("Exclusion Error", "No discovered component selected.", null);
+				}
+				else
+				{
+					// todo: hack, could be wrong due to sorting (visual!=data order)
+					DiscoveryInfo dif = (DiscoveryInfo)dismodel.getList().get(sel);
+					component.scheduleStep(new SetExcludedCommand(dif.getComponentIdentifier(), !dif.isExcluded()))
+						.addResultListener(new SwingDefaultResultListener(psettings)
+					{
+						public void customResultAvailable(Object source, Object result)
+						{
+							updateDiscoveryInfos(jtdis);
+						}
+					});
+				}
+			}
+		});
+		
+		bucreate.setPreferredSize(buexclude.getPreferredSize());
+		budelete.setMinimumSize(buexclude.getMinimumSize());
+		burefreshdis.setPreferredSize(buexclude.getPreferredSize());
+		
 		JPanel pbobuts = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 		pbobuts.add(burefreshdis);
 		pbobuts.add(bucreate);
 		pbobuts.add(budelete);
+		pbobuts.add(buexclude);
 		
 		pdisinfos.add(pbobuts, BorderLayout.SOUTH);
 		
@@ -712,7 +744,6 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 			return agent.getDiscoveryInfos();
 		}
 	}
-	
 
 	/**
 	 *  Create proxy command.
@@ -761,6 +792,32 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 			return agent.deleteProxy(cid);
 		}
 	};
+	
+	/**
+	 *  Set exclude command.
+	 */
+	public static class SetExcludedCommand implements ICommand
+	{
+		public static boolean XML_INCLUDE_FIELDS = true;
+		public IComponentIdentifier cid;
+		public boolean excluded;
+		
+		public SetExcludedCommand()
+		{
+		}
+
+		public SetExcludedCommand(IComponentIdentifier cid, boolean excluded)
+		{
+			this.cid = cid;
+			this.excluded = excluded;
+		}
+		
+		public void execute(Object args)
+		{
+			AwarenessAgent agent = (AwarenessAgent)args;
+			agent.setExcluded(cid, excluded);
+		}
+	};
 }
 
 class DiscoveryTableModel extends AbstractTableModel
@@ -789,7 +846,7 @@ class DiscoveryTableModel extends AbstractTableModel
 
 	public int getColumnCount()
 	{
-		return 4;
+		return 5;
 	}
 
 	public String getColumnName(int column)
@@ -801,9 +858,11 @@ class DiscoveryTableModel extends AbstractTableModel
 			case 1:
 				return "Delay";
 			case 2:
-				return "Last Received Info";
+				return "Timepoint of Last Received Info";
 			case 3:
 				return "Has a Proxy";
+			case 4:
+				return "Is Excluded from Proxy Creation";
 			default:
 				return "";
 		}
@@ -834,6 +893,10 @@ class DiscoveryTableModel extends AbstractTableModel
 		{
 			value = dif.hasProxy()? Boolean.TRUE: Boolean.FALSE;
 		}
+		else if(column == 4)
+		{
+			value = dif.isExcluded()? Boolean.TRUE: Boolean.FALSE;
+		}
 		return value;
 	}
 	
@@ -853,6 +916,10 @@ class DiscoveryTableModel extends AbstractTableModel
 			ret = Date.class;
 		}
 		else if(column == 3)
+		{
+			ret = Boolean.class;
+		}
+		else if(column == 4)
 		{
 			ret = Boolean.class;
 		}

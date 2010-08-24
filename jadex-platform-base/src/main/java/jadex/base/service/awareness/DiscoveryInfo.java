@@ -21,6 +21,9 @@ public class DiscoveryInfo
 	/** Flag if a proxy exists. */
 	public boolean proxy;
 	
+	/** Flag if no proxy should be created (overrides general policy). */
+	public boolean excluded;
+	
 	/** Time when last awareness info was received. */
 	public long time;
 	
@@ -39,10 +42,11 @@ public class DiscoveryInfo
 	/**
 	 *  Create a new discovery info.
 	 */
-	public DiscoveryInfo(IComponentIdentifier cid, boolean proxy, long time, long delay)
+	public DiscoveryInfo(IComponentIdentifier cid, boolean proxy, boolean excluded, long time, long delay)
 	{
 		this.cid = cid;
 		this.proxy = proxy;
+		this.excluded = excluded;
 		this.time = time;
 		this.delay = delay;
 	}
@@ -83,6 +87,24 @@ public class DiscoveryInfo
 	public void setProxy(boolean proxy)
 	{
 		this.proxy = proxy;
+	}
+	
+	/**
+	 *  Get the excluded.
+	 *  @return the excluded.
+	 */
+	public boolean isExcluded()
+	{
+		return excluded;
+	}
+
+	/**
+	 *  Set the excluded.
+	 *  @param excluded The excluded to set.
+	 */
+	public void setExcluded(boolean excluded)
+	{
+		this.excluded = excluded;
 	}
 
 	/**
@@ -131,6 +153,7 @@ public class DiscoveryInfo
 		result = prime * result + ((cid == null) ? 0 : cid.hashCode());
 		result = prime * result + (int)(delay ^ (delay >>> 32));
 		result = prime * result + (proxy ? 1231 : 1237);
+		result = prime * result + (excluded ? 1391 : 2173);
 		result = prime * result + (int)(time ^ (time >>> 32));
 		return result;
 	}
@@ -144,7 +167,8 @@ public class DiscoveryInfo
 		if(obj instanceof DiscoveryInfo)
 		{
 			DiscoveryInfo other = (DiscoveryInfo)obj;
-			ret = SUtil.equals(cid, other.cid) && delay==other.delay && proxy==other.proxy && time==other.time;
+			ret = SUtil.equals(cid, other.cid) && delay==other.delay && proxy==other.proxy 
+				&& excluded==other.excluded && time==other.time;
 		}
 		return ret;
 	}
@@ -154,7 +178,7 @@ public class DiscoveryInfo
 	 */
 	public String toString()
 	{
-		return "DiscoveryInfo(cid=" + cid + ", proxy=" + proxy + ", time="
-				+ time + ", delay=" + delay + ")";
+		return "DiscoveryInfo(cid=" + cid + ", proxy=" + proxy + ", excluded="
+			+ excluded + ", time=" + time + ", delay=" + delay + ")";
 	}
 }
