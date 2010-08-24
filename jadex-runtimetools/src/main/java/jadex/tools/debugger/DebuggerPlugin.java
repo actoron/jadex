@@ -4,6 +4,7 @@ import jadex.base.gui.componenttree.ComponentTreePanel;
 import jadex.base.gui.componenttree.IActiveComponentTreeNode;
 import jadex.base.gui.componenttree.IComponentTreeNode;
 import jadex.base.gui.componenttree.INodeHandler;
+import jadex.base.gui.componenttree.INodeListener;
 import jadex.bridge.IComponentDescription;
 import jadex.commons.Properties;
 import jadex.commons.SGUI;
@@ -257,6 +258,27 @@ public class DebuggerPlugin extends AbstractJCCPlugin
 					}
 				}
 				return a;
+			}
+		});
+		
+		comptree.getModel().addNodeListener(new INodeListener()
+		{
+			public void nodeRemoved(IComponentTreeNode node)
+			{
+				if(node instanceof IActiveComponentTreeNode)
+				{
+					IComponentDescription desc = ((IActiveComponentTreeNode)node).getDescription();
+					if(cards.getComponent(desc)!=null)
+					{
+						DebuggerMainPanel panel = (DebuggerMainPanel)cards.getComponent(desc);
+						panel.dispose();
+						detail.remove(panel);
+					}
+				}
+			}
+			
+			public void nodeAdded(IComponentTreeNode node)
+			{
 			}
 		});
 

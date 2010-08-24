@@ -101,38 +101,38 @@ public class TreeExpansionHandler	implements TreeExpansionListener, TreeModelLis
 	 */
 	public void	treeStructureChanged(final TreeModelEvent event)
 	{
-		// Can't expand during structure change event (Java bug?)
-		SwingUtilities.invokeLater(new Runnable()
+		TreePath	root	= event.getTreePath();
+//		System.out.println("root: "+root);
+		for(int i=Math.max(tree.getRowForPath(root), 0); i<tree.getRowCount(); i++)
 		{
-			public void run()
+			TreePath	path	= tree.getPathForRow(i);
+//			System.out.println("path "+i+": "+path);
+			if(!root.isDescendant(path))
 			{
-				TreePath	root	= event.getTreePath();
-//				System.out.println("root: "+root);
-				for(int i=Math.max(tree.getRowForPath(root), 0); i<tree.getRowCount(); i++)
-				{
-					TreePath	path	= tree.getPathForRow(i);
-//					System.out.println("path "+i+": "+path);
-					if(!root.isDescendant(path))
-					{
-//						System.out.println("break: "+path);
-						break;
-					}
-					
-					handlePath(path);
-				}
+//				System.out.println("break: "+path);
+				break;
 			}
-		});
+			
+			handlePath(path);
+		}
 	}
 	
 	/**
 	 *  Check if an action (e.g. expand) has to be performed on the path.
 	 */
-	protected void	handlePath(TreePath path)
+	protected void	handlePath(final TreePath path)
 	{
 //		System.out.println("handle expand: "+path.getLastPathComponent()+", "+expanded);
 		if(expanded.contains(path.getLastPathComponent()))
 		{
-			tree.expandPath(path);
+			// Can't expand during change event (Java bug?)
+			SwingUtilities.invokeLater(new Runnable()
+			{
+				public void run()
+				{
+					tree.expandPath(path);
+				}
+			});
 //			System.out.println("expanded: "+path.getLastPathComponent());
 		}
 	}

@@ -177,7 +177,7 @@
 						+" jadex.tools.debugger.DebuggerPlugin"
 						+" jadex.tools.ruleprofiler.RuleProfilerPlugin"
 					//	+" jadex.tools.libtool.LibraryPlugin"
-						+" jadex.tools.serviceviewer.ServiceViewerPlugin",
+						+" jadex.tools.componentviewer.ComponentViewerPlugin",
 						$scope.getExternalAccess())
 					</fact>
 				</initialbelief>

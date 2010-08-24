@@ -293,4 +293,14 @@ public class ConversationPlugin extends AbstractJCCPlugin
 	{
 		convcenter.reset();
 	}
+	
+	/**
+	 *  Test if this plugin should be initialized lazily.
+	 *  @return True, if lazy.
+	 */
+	public boolean isLazy()
+	{
+		return false;
+	}
+
 }

@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.swing.SwingUtilities;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreeModel;
@@ -60,6 +61,8 @@ public class ComponentTreeModel implements TreeModel
 	 */
 	public Object getRoot()
 	{
+		assert SwingUtilities.isEventDispatchThread();
+
 		return root;
 	}
 	
@@ -68,6 +71,8 @@ public class ComponentTreeModel implements TreeModel
 	 */
 	public Object getChild(Object parent, int index)
 	{
+		assert SwingUtilities.isEventDispatchThread();
+
 		return ((IComponentTreeNode)parent).getChild(index);
 	}
 	
@@ -76,6 +81,8 @@ public class ComponentTreeModel implements TreeModel
 	 */
 	public int getChildCount(Object parent)
 	{
+		assert SwingUtilities.isEventDispatchThread();
+
 		return ((IComponentTreeNode)parent).getChildCount();
 	}
 	
@@ -84,6 +91,8 @@ public class ComponentTreeModel implements TreeModel
 	 */
 	public int getIndexOfChild(Object parent, Object child)
 	{
+		assert SwingUtilities.isEventDispatchThread();
+
 		return ((IComponentTreeNode)parent).getIndexOfChild((IComponentTreeNode)child);
 	}
 	
@@ -92,6 +101,8 @@ public class ComponentTreeModel implements TreeModel
 	 */
 	public boolean isLeaf(Object node)
 	{
+		assert SwingUtilities.isEventDispatchThread();
+
 		return ((IComponentTreeNode)node).isLeaf();
 	}
 	
@@ -100,6 +111,8 @@ public class ComponentTreeModel implements TreeModel
 	 */
 	public void valueForPathChanged(TreePath path, Object newValue)
 	{
+		assert SwingUtilities.isEventDispatchThread();
+
 		throw new UnsupportedOperationException("Component Tree is not editable.");
 	}
 	
@@ -108,6 +121,8 @@ public class ComponentTreeModel implements TreeModel
 	 */
 	public void addTreeModelListener(TreeModelListener l)
 	{
+		assert SwingUtilities.isEventDispatchThread();
+		
 		this.listeners.add(l);
 	}
 	
@@ -116,6 +131,8 @@ public class ComponentTreeModel implements TreeModel
 	 */
 	public void removeTreeModelListener(TreeModelListener l)
 	{
+		assert SwingUtilities.isEventDispatchThread();
+		
 		this.listeners.remove(l);
 	}
 	
@@ -126,6 +143,8 @@ public class ComponentTreeModel implements TreeModel
 	 */
 	public void	setRoot(IComponentTreeNode root)
 	{
+		assert SwingUtilities.isEventDispatchThread();
+
 		if(this.root!=null)
 			deregisterNode(this.root);
 		this.root = root;
@@ -139,9 +158,11 @@ public class ComponentTreeModel implements TreeModel
      */
 	public void fireTreeChanged(IComponentTreeNode node)
 	{
+		assert SwingUtilities.isEventDispatchThread();
+		
 		List path = buildTreePath(node);
 		
-//		System.out.println("Path changed: "+node+", "+path+", "+Thread.currentThread());
+//		System.out.println("Path changed: "+node+", "+path);
 		
 		for(int i=0; i<listeners.size(); i++)
 		{
@@ -154,6 +175,8 @@ public class ComponentTreeModel implements TreeModel
      */
 	public void fireNodeChanged(IComponentTreeNode node)
 	{
+		assert SwingUtilities.isEventDispatchThread();
+
 		int[]	indices;
 		Object[]	nodes;
 		List	path;
@@ -172,7 +195,7 @@ public class ComponentTreeModel implements TreeModel
 			
 		}
 		
-//		System.out.println("Node changed: "+node+", "+path+", "+Thread.currentThread());
+//		System.out.println("Node changed: "+node+", "+path);
 		
 		if(indices==null || indices[0]!=-1)	// Node might be removed already.
 		{
@@ -188,9 +211,11 @@ public class ComponentTreeModel implements TreeModel
      */
 	public void fireNodeRemoved(IComponentTreeNode parent, IComponentTreeNode child, int index)
 	{
+		assert SwingUtilities.isEventDispatchThread();
+		
 		List path = buildTreePath(parent);
 		
-//		System.out.println("Node removed: "+child+", "+index+", "+path+", "+Thread.currentThread());
+//		System.out.println("Node removed: "+child+", "+index+", "+path);
 		
 		for(int i=0; i<listeners.size(); i++)
 		{
@@ -203,9 +228,11 @@ public class ComponentTreeModel implements TreeModel
      */
 	public void fireNodeAdded(IComponentTreeNode parent, IComponentTreeNode child, int index)
 	{
+		assert SwingUtilities.isEventDispatchThread();
+		
 		List path = buildTreePath(parent);
 		
-//		System.out.println("Node added: "+child+", "+index+", "+path+", "+Thread.currentThread());
+//		System.out.println("Node added: "+child+", "+index+", "+path);
 		
 		for(int i=0; i<listeners.size(); i++)
 		{
@@ -220,6 +247,8 @@ public class ComponentTreeModel implements TreeModel
 	 */
 	public List buildTreePath(IComponentTreeNode node)
 	{
+		assert SwingUtilities.isEventDispatchThread();
+
 		List	path	= new LinkedList();
 		IComponentTreeNode	pnode	= node;
 		while(pnode!=null)
@@ -236,6 +265,8 @@ public class ComponentTreeModel implements TreeModel
 	 */
 	public void	registerNode(IComponentTreeNode node)
 	{
+		assert SwingUtilities.isEventDispatchThread();
+
 		if(nodes.containsKey(node.getId()))
 			throw new RuntimeException("Node id already contained: "+node);
 		
@@ -258,6 +289,8 @@ public class ComponentTreeModel implements TreeModel
 	 */
 	public IComponentTreeNode	getNode(Object id)
 	{
+		assert SwingUtilities.isEventDispatchThread();
+
 		return (IComponentTreeNode)nodes.get(id);
 	}
 	
@@ -266,6 +299,8 @@ public class ComponentTreeModel implements TreeModel
 	 */
 	public void	deregisterNode(IComponentTreeNode node)
 	{
+		assert SwingUtilities.isEventDispatchThread();
+		
 		node.dispose();
 		if(zombies.contains(node.getId()))
 		{
@@ -274,6 +309,7 @@ public class ComponentTreeModel implements TreeModel
 		}
 		else
 		{
+//			System.out.println("Removed: "+node.getId());
 			nodes.remove(node.getId());
 			INodeListener[]	lis	= (INodeListener[])nodelisteners.toArray(new INodeListener[nodelisteners.size()]);
 			for(int i=0; i<lis.length; i++)
@@ -293,6 +329,8 @@ public class ComponentTreeModel implements TreeModel
 	 */
 	public void	addNodeHandler(INodeHandler overlay)
 	{
+		assert SwingUtilities.isEventDispatchThread();
+
 		this.overlays.add(overlay);
 	}
 	
@@ -301,6 +339,8 @@ public class ComponentTreeModel implements TreeModel
 	 */
 	public INodeHandler[]	getNodeHandlers()
 	{
+		assert SwingUtilities.isEventDispatchThread();
+
 		return (INodeHandler[])overlays.toArray(new INodeHandler[overlays.size()]);
 	}
 
@@ -309,6 +349,8 @@ public class ComponentTreeModel implements TreeModel
 	 */
 	public void	addNodeListener(INodeListener listener)
 	{
+		assert SwingUtilities.isEventDispatchThread();
+
 		nodelisteners.add(listener);
 	}
 	
@@ -317,6 +359,8 @@ public class ComponentTreeModel implements TreeModel
 	 */
 	public void	removeNodeListener(INodeListener listener)
 	{
+		assert SwingUtilities.isEventDispatchThread();
+
 		nodelisteners.remove(listener);
 	}
 	
@@ -325,6 +369,8 @@ public class ComponentTreeModel implements TreeModel
 	 */
 	public void addZombieNode(Object id)
 	{
+		assert SwingUtilities.isEventDispatchThread();
+
 		assert !nodes.containsKey(id) : id;
 		zombies.add(id);
 	}
@@ -334,6 +380,8 @@ public class ComponentTreeModel implements TreeModel
 	 */
 	public boolean	isZombieNode(Object id)
 	{
+		assert SwingUtilities.isEventDispatchThread();
+
 		return zombies.contains(id);
 	}
 
@@ -342,6 +390,8 @@ public class ComponentTreeModel implements TreeModel
 	 */
 	public void dispose()
 	{
+		assert SwingUtilities.isEventDispatchThread();
+
 		for(Iterator it=nodes.values().iterator(); it.hasNext(); )
 		{
 			((IComponentTreeNode)it.next()).dispose();

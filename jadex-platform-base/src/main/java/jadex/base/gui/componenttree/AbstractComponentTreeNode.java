@@ -52,7 +52,6 @@ public abstract class AbstractComponentTreeNode	implements IComponentTreeNode
 	 */
 	public void	dispose()
 	{
-		
 	}
 	
 	/**
@@ -68,6 +67,8 @@ public abstract class AbstractComponentTreeNode	implements IComponentTreeNode
 	 */
 	public int	getChildCount()
 	{
+		assert SwingUtilities.isEventDispatchThread();
+
 		if(children==null && !searching)
 		{
 			searching	= true;
@@ -81,6 +82,8 @@ public abstract class AbstractComponentTreeNode	implements IComponentTreeNode
 	 */
 	public IComponentTreeNode	getChild(int index)
 	{
+		assert SwingUtilities.isEventDispatchThread();
+
 		if(children==null && !searching)
 		{
 			searching	= true;
@@ -94,6 +97,8 @@ public abstract class AbstractComponentTreeNode	implements IComponentTreeNode
 	 */
 	public int	getIndexOfChild(IComponentTreeNode child)
 	{
+		assert SwingUtilities.isEventDispatchThread();
+
 		if(children==null && !searching)
 		{
 			searching	= true;
@@ -107,6 +112,8 @@ public abstract class AbstractComponentTreeNode	implements IComponentTreeNode
 	 */
 	public boolean	isLeaf()
 	{
+		assert SwingUtilities.isEventDispatchThread();
+
 		return getChildCount()==0;
 	}
 	
@@ -116,6 +123,8 @@ public abstract class AbstractComponentTreeNode	implements IComponentTreeNode
 	 */
 	public void	refresh(boolean recurse)
 	{
+		assert SwingUtilities.isEventDispatchThread();
+
 		if(!searching)
 		{
 			searching	= true;
@@ -130,18 +139,12 @@ public abstract class AbstractComponentTreeNode	implements IComponentTreeNode
 	}
 	
 	/**
-	 *  Test if a node is a child.
-	 */
-	public boolean isChild(IComponentTreeNode node)
-	{
-		return children!=null && children.contains(node);
-	}
-	
-	/**
 	 *  Get the cached children, i.e. do not start any background processes for updating the children.
 	 */
 	public List	getCachedChildren()
 	{
+		assert SwingUtilities.isEventDispatchThread();
+
 		return children!=null ? children : Collections.EMPTY_LIST;
 	}
 
@@ -301,6 +304,8 @@ public abstract class AbstractComponentTreeNode	implements IComponentTreeNode
 	 */
 	public void addChild(int index, IComponentTreeNode node)
 	{
+		assert SwingUtilities.isEventDispatchThread();
+
 		// Ignore when node already removed.
 		if(!model.isZombieNode(node.getId()))
 		{
@@ -322,6 +327,8 @@ public abstract class AbstractComponentTreeNode	implements IComponentTreeNode
 	 */
 	public void addChild(IComponentTreeNode node)
 	{
+		assert SwingUtilities.isEventDispatchThread();
+
 		addChild(getChildCount(), node);
 	}
 	
@@ -331,6 +338,8 @@ public abstract class AbstractComponentTreeNode	implements IComponentTreeNode
 	 */
 	public void removeChild(IComponentTreeNode node)
 	{
+		assert SwingUtilities.isEventDispatchThread();
+
 		int index	= getIndexOfChild(node);
 		if(index!=-1)
 		{

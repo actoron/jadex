@@ -208,6 +208,7 @@ public class ComponentTreePanel extends JSplitPane
 								public void customResultAvailable(Object source, Object result)
 								{
 									IComponentTreeNode	node = (IComponentTreeNode)result;
+//									System.out.println("addChild: "+parentnode+", "+node);
 									parentnode.addChild(node);
 								}
 								
@@ -480,7 +481,7 @@ public class ComponentTreePanel extends JSplitPane
 						refreshtree.actionPerformed(e);
 					}
 				};
-				ret.add(refreshtree);
+				ret.add(prefreshtree);
 				
 				if(nodes.length==1)
 				{

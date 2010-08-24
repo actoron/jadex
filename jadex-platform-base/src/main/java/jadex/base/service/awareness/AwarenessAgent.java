@@ -746,6 +746,6 @@ public class AwarenessAgent extends MicroAgent
 					SUtil.createHashMap(configs, new Object[]{new Long(5000), new Long(10000), new Long(60000)})),	
 				new Argument("autocreate", "This parameter describes if new proxies should be automatically created when discovering new components.", "boolean", Boolean.TRUE),	
 				new Argument("autodelete", "This parameter describes if proxies should be automatically deleted when not discovered any longer.", "boolean", Boolean.TRUE),	
-			}, null, null, SUtil.createHashMap(new String[]{"serviceviewer.viewerclass"}, new Object[]{"jadex.tools.serviceviewer.awareness.AwarenessAgentPanel"}));
+			}, null, null, SUtil.createHashMap(new String[]{"componentviewer.viewerclass"}, new Object[]{"jadex.tools.componentviewer.awareness.AwarenessAgentPanel"}));
 	}
 }
