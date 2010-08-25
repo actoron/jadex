@@ -29,5 +29,10 @@ public interface IThreadPoolStrategy
 	 *  @return True, if the thread be excluded from the pool.
 	 */
 	public boolean threadTimeoutOccurred();
+
+	/**
+	 *  Get the threadcnt.
+	 */
+	public int getThreadCount();
 	
 }

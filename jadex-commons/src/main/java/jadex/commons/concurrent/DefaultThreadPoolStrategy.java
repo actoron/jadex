@@ -133,4 +133,12 @@ public class DefaultThreadPoolStrategy implements IThreadPoolStrategy
 //		
 //		return ret;
 	}
+	
+	/**
+	 *  Get the threadcnt.
+	 */
+	public int getThreadCount()
+	{
+		return threadcnt;
+	}
 }

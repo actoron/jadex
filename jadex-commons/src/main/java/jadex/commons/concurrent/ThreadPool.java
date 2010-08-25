@@ -67,6 +67,8 @@ public class ThreadPool implements IThreadPool
 //		this.tasks = new java.util.concurrent.LinkedBlockingQueue();
 		this.pool = new ArrayList();
 		this.threads = new Hashtable();
+		
+		addThreads(strategy.getThreadCount());
 	
 //		System.out.println("Creating: "+this);
 	}
@@ -111,6 +113,7 @@ public class ThreadPool implements IThreadPool
 //			}
 //		}
 	}
+	
 	
 	/**
 	 *  Get the string representation.
@@ -286,7 +289,7 @@ public class ThreadPool implements IThreadPool
 	 */
 	public static void main(String[] args)
 	{
-		final ThreadPool tp	= new ThreadPool(new DefaultThreadPoolStrategy(0, 10, 10000, 4));
+		final ThreadPool tp	= new ThreadPool(new DefaultThreadPoolStrategy(10, 100, 10000, 4));
 		int max = 10000;
 		todo = max;
 		final long start = System.currentTimeMillis();
