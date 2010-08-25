@@ -1143,6 +1143,34 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 	/**
 	 *  Get the arguments.
 	 *  @return The arguments as a map of name-value pairs.
+	 * /
+	public Map getArguments(String appname, ClassLoader classloader)
+	{
+		Map ret = null;	
+		
+		IArgument[] args = getModel().getArguments();
+		if(args!=null)
+		{
+			ret = new HashMap();
+
+			JavaCCExpressionParser	parser = new JavaCCExpressionParser();
+			String[] imports = getApplicationType().getAllImports();
+			for(int i=0; i<args.length; i++)
+			{
+				IArgument arg = (IArgument)args[i];
+				String valtext = (String)arg.getDefaultValue(appname);
+				
+				Object val = parser.parseExpression(valtext, imports, null, classloader).getValue(fetcher);
+				ret.put(arg.getName(), val);
+			}
+		}
+		
+		return ret;
+	}*/
+	
+	/**
+	 *  Get the arguments.
+	 *  @return The arguments as a map of name-value pairs.
 	 */
 	public Map getArguments(MComponentInstance component, ClassLoader classloader)
 	{
@@ -1167,6 +1195,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 		
 		return ret;
 	}
+	
 	/**
 	 *  Get the number of components to start.
 	 *  @return The number.

@@ -7,8 +7,10 @@ import jadex.commons.IFuture;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.javaparser.IParsedExpression;
+import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -104,6 +106,24 @@ public class MApplicationType implements ICacheableModel
 			configs[i] = ((MApplicationInstance)apps.get(i)).getName();
 		}
 		modelinfo.setConfigurations(configs);
+
+		// Init arguments.
+		String[] imports = getAllImports();
+		JavaCCExpressionParser	parser = new JavaCCExpressionParser();
+		for(int i=0; i<apps.size(); i++)
+		{
+			MApplicationInstance mapp = (MApplicationInstance)apps.get(i);
+			List instargs = mapp.getArguments();
+			for(int j=0; j<instargs.size(); j++)
+			{
+				MArgument arg = (MArgument)instargs.get(j);
+				String valtext = arg.getValue();
+				Argument rarg = (Argument)getModelInfo().getArgument(arg.getName());
+				
+//				IParsedExpression exp = parser.parseExpression(valtext, imports, null, modelinfo.getClassLoader());
+				rarg.setDefaultValue(mapp.getName(), valtext);
+			}
+		}
 		
 		if(propertylist!=null)
 		{

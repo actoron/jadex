@@ -132,6 +132,22 @@
 	</services>
 	
 	<applications>
+		<application name="all_kernels auto (rms, awa, jcc)">
+			<arguments>
+				<argument name="tcpport">0</argument>
+				<argument name="niotcpport">0</argument>
+			</arguments>
+			<components>
+				<component name="kernel_micro" type="kernel_micro" daemon="true"/>
+				<!-- <component type="kernel_bdi" daemon="true"/> -->
+				<component name="kernel_bdibpmn" type="kernel_bdibpmn" daemon="true"/>
+				<component name="kernel_bpmn" type="kernel_bpmn" daemon="true"/>
+				<component name="rms" type="rms" daemon="true"/>
+				<component name="awa" type="awa"/>
+				<component name="jcc" type="jcc"/>
+			</components>
+		</application>
+	
 		<application name="all_kernels (rms, awa, jcc)">
 			<components>
 				<component name="kernel_micro" type="kernel_micro" daemon="true"/>

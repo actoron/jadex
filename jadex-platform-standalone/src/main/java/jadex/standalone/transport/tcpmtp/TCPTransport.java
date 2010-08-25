@@ -121,6 +121,7 @@ public class TCPTransport implements ITransport
 	 */
 	public TCPTransport(final IServiceProvider container, int port, final boolean async)
 	{
+		System.out.println("port: "+port);
 		this.logger = Logger.getLogger("TCPTransport" + this);
 		this.codecfac = new CodecFactory();
 		

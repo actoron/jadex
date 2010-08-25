@@ -92,7 +92,7 @@ public class RemoteServiceManagementAgent extends MicroAgent
 							}
 						}));
 					}
-					else
+					else if(content!=null)
 					{
 						System.out.println("Unexpected message: "+msg);
 					}

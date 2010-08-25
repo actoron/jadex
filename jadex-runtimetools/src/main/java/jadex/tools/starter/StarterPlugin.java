@@ -545,7 +545,7 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 					
 					Map args = new HashMap();
 					args.put("component", cid);
-					createComponent("jadex/base/service/remote/ProxyAgent.class", null, null, args, false, null);
+					createComponent("jadex/base/service/remote/ProxyAgent.class", cid.getLocalName(), null, args, false, null);
 				}
 			});
 		}
@@ -760,9 +760,9 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 	public void createComponent(final String type, final String name, final String configname, final Map arguments, final boolean suspend, final IResultListener killlistener)
 	{
 		SServiceProvider.getServiceUpwards(jcc.getServiceProvider(),
-			IComponentManagementService.class).addResultListener(new DefaultResultListener()		
+			IComponentManagementService.class).addResultListener(new SwingDefaultResultListener(spanel)
 		{
-			public void resultAvailable(Object source, Object result)
+			public void customResultAvailable(Object source, Object result)
 			{
 				IComponentManagementService cms = (IComponentManagementService)result;
 				cms.createComponent(name, type, new CreationInfo(configname, arguments, spanel.parent, suspend, false), killlistener).addResultListener(new IResultListener()
@@ -778,6 +778,6 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 					}
 				});
 			}
-		});
+		});		
 	}
 }
