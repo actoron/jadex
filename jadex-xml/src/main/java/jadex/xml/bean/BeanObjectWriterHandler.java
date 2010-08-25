@@ -14,11 +14,13 @@ import jadex.xml.SXML;
 import jadex.xml.SubobjectInfo;
 import jadex.xml.TypeInfo;
 import jadex.xml.writer.AbstractObjectWriterHandler;
+import jadex.xml.writer.WriteContext;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -39,8 +41,8 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 //	protected IBeanIntrospector introspector = new BeanInfoIntrospector();
 	
 	/** The namespaces by package. */
-	protected Map namespacebypackage = new HashMap();
-	protected int nscnt;
+//	protected Map namespacebypackage = new HashMap();
+//	protected int nscnt;
 		
 	/** No type infos. */
 	protected Set no_typeinfos;
@@ -77,6 +79,7 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 	public BeanObjectWriterHandler(Set typeinfos, boolean gentypetags, boolean prefertags ,boolean flattening)
 	{
 		super(gentypetags, prefertags, flattening, typeinfos);
+		this.no_typeinfos = Collections.synchronizedSet(new HashSet());
 	}
 	
 	//-------- methods --------
@@ -90,7 +93,7 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 	public TypeInfo getTypeInfo(Object object, QName[] fullpath, IContext context)
 	{
 		Object type = getObjectType(object, context);
-		if(no_typeinfos!=null && no_typeinfos.contains(type))
+		if(no_typeinfos.contains(type))
 			return null;
 			
 		TypeInfo ret = super.getTypeInfo(object, fullpath, context);
@@ -148,8 +151,8 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 				}
 				else
 				{
-					if(no_typeinfos==null)
-						no_typeinfos = new HashSet();
+//					if(no_typeinfos==null)
+//						no_typeinfos = new HashSet();
 					no_typeinfos.add(type);
 				}
 			}
@@ -205,23 +208,25 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 			tag = "null";
 		}
 		
-		Namespace ns = getNamespace(pck);
+		WriteContext wc = (WriteContext)context;
+		Namespace ns = wc.getNamespace(pck);
 		return new QName(ns.getURI(), tag, ns.getPrefix());
 	}
 	
 	/**
 	 *  Get the tag with namespace.
 	 */
-	public QName getTagWithPrefix(QName tag)
+	public QName getTagWithPrefix(QName tag, IContext context)
 	{
-		Namespace ns = getNamespace(tag.getNamespaceURI());
+		WriteContext wc = (WriteContext)context;
+		Namespace ns = wc.getNamespace(tag.getNamespaceURI());
 		return new QName(ns.getURI(), tag.getLocalPart(), ns.getPrefix());
 	}
 	
 	/**
 	 *  Get or create a namespace.
 	 *  @param uri The namespace uri.
-	 */
+	 * /
 	protected Namespace getNamespace(String uri)
 	{
 		Namespace ns = (Namespace)namespacebypackage.get(uri);
@@ -233,7 +238,7 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 			nscnt++;
 		}
 		return ns;
-	}
+	}*/
 
 	/**
 	 *  Get a value from an object.

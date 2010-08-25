@@ -1,7 +1,6 @@
 package jadex.xml.reader;
 
 import jadex.commons.SUtil;
-import jadex.commons.collection.MultiCollection;
 import jadex.xml.AttributeInfo;
 import jadex.xml.IPostProcessor;
 import jadex.xml.IStringObjectConverter;
@@ -9,6 +8,7 @@ import jadex.xml.SXML;
 import jadex.xml.StackElement;
 import jadex.xml.SubobjectInfo;
 import jadex.xml.TypeInfo;
+
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -36,7 +36,6 @@ public class Reader
 	
 	/** The string marker object. */
 	public static final Object STRING_MARKER = new String();
-
 	
 	//-------- attributes --------
 	
@@ -46,9 +45,6 @@ public class Reader
 	/** The link mode. */
 	protected boolean bulklink;
 	
-	/** The map of objects to link in bulk mode (object -> map of tags -> objects per tag). */
-	protected MultiCollection children;
-		
 	//-------- constructors --------
 
 	/**
@@ -67,7 +63,6 @@ public class Reader
 	public Reader(IObjectReaderHandler handler, boolean bulklink)
 	{
 		this.handler = handler;
-		this.children = new MultiCollection();
 		this.bulklink = bulklink;
 	}
 	
@@ -460,7 +455,7 @@ public class Reader
 				if(stack.size()>0 && bulklink)
 				{
 					// Invoke bulk link for the finished object (as parent).
-					List childs = (List)children.remove(topse.getObject());
+					List childs = readcontext.removeChildren(topse.getObject());
 					if(childs!=null)
 					{
 						IBulkObjectLinker linker = (IBulkObjectLinker)(typeinfo!=null && typeinfo.getLinker()!=null? typeinfo.getLinker(): handler);
@@ -496,7 +491,7 @@ public class Reader
 					else
 					{
 						// Save the finished object as child for its parent.
-						children.put(pse.getObject(), new LinkData(topse.getObject(), linkinfo==null? null: linkinfo, 
+						readcontext.addChild(pse.getObject(), new LinkData(topse.getObject(), linkinfo==null? null: linkinfo, 
 							(QName[])pathname.toArray(new QName[pathname.size()])));	
 					}
 				}

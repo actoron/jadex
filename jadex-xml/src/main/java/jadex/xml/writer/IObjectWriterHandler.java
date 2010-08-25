@@ -28,7 +28,7 @@ public interface IObjectWriterHandler
 	/**
 	 *  Get the tag with namespace.
 	 */
-	public QName getTagWithPrefix(QName tag);
+	public QName getTagWithPrefix(QName tag, IContext context);
 	
 	/**
 	 *  Get all subobjects of an object.

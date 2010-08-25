@@ -12,7 +12,6 @@ import java.io.PrintWriter;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
@@ -38,12 +37,6 @@ public class Writer
 	
 	/** The object creator. */
 	protected IObjectWriterHandler handler;
-	
-	/** The ignored attribute types. */
-	protected Set ignoredattrs;
-	
-	/** The id counter. */
-	protected ThreadLocal id;
 	
 	/** Control flag for generating ids. */
 	protected boolean genids;	
@@ -80,7 +73,7 @@ public class Writer
 		this.handler = handler;
 		this.genids = genids;
 		this.indent = indent;
-		this.id = new ThreadLocal();
+//		this.id = new ThreadLocal();
 	}
 	
 	//-------- methods --------
@@ -101,11 +94,7 @@ public class Writer
 		writer.writeCharacters(lf);
 		
 		WriteContext wc = new WriteContext(writer, context, object, classloader);
-		id.set(new Integer(0));
 		writeObject(wc, object, null);
-//		Map writtenobs = new IdentityHashMap();
-//		List stack = new ArrayList();
-//		writeObject(writer, object, writtenobs, null, stack, context, classloader);
 		writer.writeEndDocument();
 		writer.close();
 	}
@@ -157,7 +146,7 @@ public class Writer
 		// Create tag with prefix if it has a namespace but no prefix.
 		if(!XMLConstants.NULL_NS_URI.equals(tag.getNamespaceURI()) && XMLConstants.DEFAULT_NS_PREFIX.equals(tag.getPrefix()))
 		{
-			tag = handler.getTagWithPrefix(tag);
+			tag = handler.getTagWithPrefix(tag, wc);
 		}
 		
 		if(genids && wc.getWrittenObjects().containsKey(object))
@@ -193,13 +182,13 @@ public class Writer
 			
 			writeStartObject(writer, tag, stack.size());
 			
-			int curid = ((Number)id.get()).intValue();
+			int curid = wc.getId();
 			StackElement topse = new StackElement(tag, object);
 			stack.add(topse);
 			wc.getWrittenObjects().put(object, ""+curid);
 			if(genids)
 				writer.writeAttribute(SXML.ID, ""+curid);
-			id.set(new Integer(curid+1));
+			wc.setId(curid+1);
 			
 			// Attributes
 			
@@ -220,7 +209,7 @@ public class Writer
 						// Create tag with prefix if it has a namespace but no prefix.
 						if(!XMLConstants.NULL_NS_URI.equals(attrname.getNamespaceURI()) && XMLConstants.DEFAULT_NS_PREFIX.equals(attrname.getPrefix()))
 						{
-							attrname = handler.getTagWithPrefix(tag);
+							attrname = handler.getTagWithPrefix(tag, wc);
 						}
 						String uri = attrname.getNamespaceURI();
 						String prefix = attrname.getPrefix();

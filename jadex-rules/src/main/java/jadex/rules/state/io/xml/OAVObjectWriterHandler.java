@@ -12,6 +12,7 @@ import jadex.xml.Namespace;
 import jadex.xml.ObjectInfo;
 import jadex.xml.SXML;
 import jadex.xml.writer.AbstractObjectWriterHandler;
+import jadex.xml.writer.WriteContext;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -27,12 +28,6 @@ import javax.xml.namespace.QName;
  */
 public class OAVObjectWriterHandler extends AbstractObjectWriterHandler
 {
-	//-------- attributes --------
-	
-	/** The namespaces by package. */
-	protected Map namespacebypackage = new HashMap();
-	protected int nscnt;
-	
 	//-------- constructors --------
 	
 	/**
@@ -100,7 +95,8 @@ public class OAVObjectWriterHandler extends AbstractObjectWriterHandler
 			String pck = SXML.PROTOCOL_TYPEINFO+clazzname.substring(0, idx);
 			String tag = clazzname.substring(idx+1);
 			
-			ns = getNamespace(pck);
+			WriteContext wc = (WriteContext)context;
+			ns = wc.getNamespace(pck);
 			ret = new QName(ns.getURI(), tag, ns.getPrefix());
 		}
 		
@@ -110,28 +106,29 @@ public class OAVObjectWriterHandler extends AbstractObjectWriterHandler
 	/**
 	 *  Get the tag with namespace.
 	 */
-	public QName getTagWithPrefix(QName tag)
+	public QName getTagWithPrefix(QName tag, IContext context)
 	{
-		Namespace ns = getNamespace(tag.getNamespaceURI());
+		WriteContext wc = (WriteContext)context;
+		Namespace ns = wc.getNamespace(tag.getNamespaceURI());
 		return new QName(ns.getURI(), tag.getLocalPart(), ns.getPrefix());
 	}
 	
-	/**
-	 *  Get or create a namespace.
-	 *  @param uri The namespace uri.
-	 */
-	protected Namespace getNamespace(String uri)
-	{
-		Namespace ns = (Namespace)namespacebypackage.get(uri);
-		if(ns==null)
-		{
-			String prefix = "p"+nscnt;
-			ns = new Namespace(prefix, uri);
-			namespacebypackage.put(uri, ns);
-			nscnt++;
-		}
-		return ns;
-	}
+//	/**
+//	 *  Get or create a namespace.
+//	 *  @param uri The namespace uri.
+//	 */
+//	protected Namespace getNamespace(String uri)
+//	{
+//		Namespace ns = (Namespace)namespacebypackage.get(uri);
+//		if(ns==null)
+//		{
+//			String prefix = "p"+nscnt;
+//			ns = new Namespace(prefix, uri);
+//			namespacebypackage.put(uri, ns);
+//			nscnt++;
+//		}
+//		return ns;
+//	}
 	
 	/**
 	 *  Get a value from an object.

@@ -48,6 +48,9 @@ public class ReadContext implements IContext
 	/** The map or array information. */
 	protected Map arrayinfos;
 	
+	/** The map of objects to link in bulk mode (object -> map of tags -> objects per tag). */
+	protected MultiCollection children;
+	
 	//-------- constructors --------
 	
 	/**
@@ -281,6 +284,32 @@ public class ReadContext implements IContext
 		arrayinfos.put(parent, new Integer(ret+1));
 	
 		return ret;
+	}
+	
+	/**
+	 *  Get children.
+	 */
+	public Object getChildren(Object key)
+	{
+		return children==null? null: children.get(key);
+	}
+	
+	/**
+	 *  Add a child.
+	 */
+	public void addChild(Object key, Object value)
+	{
+		if(children==null)
+			children = new MultiCollection();
+		children.put(key, value);
+	}
+	
+	/**
+	 *  Remove a child.
+	 */
+	public List removeChildren(Object key)
+	{
+		return children==null? null: (List)children.remove(key);
 	}
 	
 }

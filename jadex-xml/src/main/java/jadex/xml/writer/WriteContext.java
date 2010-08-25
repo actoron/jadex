@@ -2,8 +2,10 @@ package jadex.xml.writer;
 
 import jadex.commons.collection.MultiCollection;
 import jadex.xml.IContext;
+import jadex.xml.Namespace;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +39,16 @@ public class WriteContext implements IContext
 	
 	/** The pre processors. */
 	protected MultiCollection preprocessors;
+	
+	/** The id counter. */
+	protected int id;
+	
+	/** The namespaces. */
+	protected Map namespacebypackage;
+	protected int nscnt;
+	
+//	/** Storage for objects. */
+//	protected Map storage;
 	
 	//-------- constructors --------
 		
@@ -199,6 +211,61 @@ public class WriteContext implements IContext
 	public void setPreProcessors(MultiCollection preprocessors)
 	{
 		this.preprocessors = preprocessors;
+	}
+
+	/**
+	 *  Get the id.
+	 *  @return the id.
+	 */
+	public int getId()
+	{
+		return id;
+	}
+
+	/**
+	 *  Set the id.
+	 *  @param id The id to set.
+	 */
+	public void setId(int id)
+	{
+		this.id = id;
 	}		
 	
+	/**
+	 *  Get or create a namespace.
+	 *  @param uri The namespace uri.
+	 */
+	public Namespace getNamespace(String uri)
+	{
+		if(namespacebypackage==null)
+			namespacebypackage = new HashMap();
+		
+		Namespace ns = (Namespace)namespacebypackage.get(uri);
+		if(ns==null)
+		{
+			String prefix = "p"+nscnt;
+			ns = new Namespace(prefix, uri);
+			namespacebypackage.put(uri, ns);
+			nscnt++;
+		}
+		return ns;
+	}
+	
+//	/**
+//	 *  Get store object.
+//	 */
+//	public Object getStorageObject(Object key)
+//	{
+//		return storage==null? null: storage.get(key);
+//	}
+//	
+//	/**
+//	 *  Put an object in the storage.
+//	 */
+//	public void putStorageObject(Object key, Object value)
+//	{
+//		if(storage==null)
+//			storage = new HashMap();
+//		storage.put(key, value);
+//	}
 }

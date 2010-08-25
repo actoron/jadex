@@ -44,7 +44,7 @@ public class TypeInfoPathManager
 	 *  @param fullpath The full path.
 	 *  @return The most specific mapping info.
 	 */
-	public TypeInfo getTypeInfo(QName tag, QName[] fullpath, Map rawattributes)
+	public synchronized TypeInfo getTypeInfo(QName tag, QName[] fullpath, Map rawattributes)
 	{
 		return findTypeInfo((Set)typeinfos.get(tag), fullpath, rawattributes);
 	}
@@ -53,7 +53,7 @@ public class TypeInfoPathManager
 	 *  Add a type info.
 	 *  @param typeinfo The type info.
 	 */
-	public void addTypeInfo(TypeInfo typeinfo)
+	public synchronized void addTypeInfo(TypeInfo typeinfo)
 	{
 		if(typeinfos==null)
 			typeinfos = new HashMap();
@@ -73,7 +73,7 @@ public class TypeInfoPathManager
 	/**
 	 *  Find type find in the set of type infos.
 	 */
-	protected TypeInfo findTypeInfo(Set typeinfos, QName[] fullpath, Map rawattributes)
+	protected synchronized TypeInfo findTypeInfo(Set typeinfos, QName[] fullpath, Map rawattributes)
 	{
 		TypeInfo ret = null;
 		if(typeinfos!=null)

@@ -41,7 +41,7 @@ public class TypeInfoTypeManager
 	/**
 	 *  Add a typeinfo.
 	 */
-	public void addTypeInfo(TypeInfo typeinfo)
+	public synchronized void addTypeInfo(TypeInfo typeinfo)
 	{
 		if(typeinfos==null)
 			typeinfos = new HashMap();
@@ -63,7 +63,7 @@ public class TypeInfoTypeManager
 	 *  @param fullpath The full path.
 	 *  @return The most specific mapping info.
 	 */
-	public TypeInfo getTypeInfo(Object type, QName[] fullpath)
+	public synchronized TypeInfo getTypeInfo(Object type, QName[] fullpath)
 	{
 //		Object type = getObjectType(object, context);
 //		System.out.println("type is: "+type);
@@ -78,7 +78,7 @@ public class TypeInfoTypeManager
 	 *  @param fullpath The full path.
 	 *  @return The most specific mapping info.
 	 */
-	public Set getTypeInfosByType(Object type)
+	public synchronized Set getTypeInfosByType(Object type)
 	{
 		return (Set)typeinfos.get(type);
 	}
@@ -88,7 +88,7 @@ public class TypeInfoTypeManager
 	 *  Note that here the typeinfo path is checked for compliance
 	 *  with the stack path.
 	 */
-	public TypeInfo findTypeInfo(Set typeinfos, QName[] fullpath)
+	public synchronized TypeInfo findTypeInfo(Set typeinfos, QName[] fullpath)
 	{
 		TypeInfo ret = null;
 		if(typeinfos!=null)

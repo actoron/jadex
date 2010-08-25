@@ -46,23 +46,23 @@ public class Test //extends TestCase
 			for(int i=0; i<cnt; i++)
 //			while(true)
 			{
-//				t.testBean();
-//				t.testEmptyArray();
-//				t.testArrayOrder();
-//				t.testMultiArray();
-//				t.testVectorModel();
-//				t.testClass();
-//				t.testDate();
-//				t.testColor();
-//				t.testArray();
-//				t.testList();
-//				t.testSet();
-//				t.testMap();
-//				t.testInnerClass();
+				t.testBean();
+				t.testEmptyArray();
+				t.testArrayOrder();
+				t.testMultiArray();
+				t.testVectorModel();
+				t.testClass();
+				t.testDate();
+				t.testColor();
+				t.testArray();
+				t.testList();
+				t.testSet();
+				t.testMap();
+				t.testInnerClass();
 				t.testURL();
-//				t.testLoggingLevel();
-//				t.testInetAddress();
-//				t.testBeanWithPublicFields();
+				t.testLoggingLevel();
+				t.testInetAddress();
+				t.testBeanWithPublicFields();
 			}
 			long dur = System.currentTimeMillis()-start;
 			
@@ -116,24 +116,24 @@ public class Test //extends TestCase
 		doWriteAndRead(a);
 	}
 	
-//	/**
-//	 * Test if the order of an array is preserved when (de-)serializing.
-//	 */
-//	private void testArrayOrder() throws Exception
-//	{
-//		Object[][] data = new Object[1][8];
-//
-//		data[0][0] = new Long(1);
-//		data[0][1] = "A";
-//		data[0][2] = "";
-//		data[0][3] = "";
-//		data[0][4] = "B";
-//		data[0][5] = null;
-//		data[0][6] = "";
-//		data[0][7] = new Long(2);
-//        
-//		doWriteAndRead(data);
-//	}
+	/**
+	 * Test if the order of an array is preserved when (de-)serializing.
+	 */
+	private void testArrayOrder() throws Exception
+	{
+		Object[][] data = new Object[1][8];
+
+		data[0][0] = new Long(1);
+		data[0][1] = "A";
+		data[0][2] = "";
+		data[0][3] = "";
+		data[0][4] = "B";
+		data[0][5] = null;
+		data[0][6] = "";
+		data[0][7] = new Long(2);
+        
+		doWriteAndRead(data);
+	}
 
 	
 	/**

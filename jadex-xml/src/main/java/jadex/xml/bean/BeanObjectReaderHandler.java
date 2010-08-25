@@ -92,7 +92,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	 *  @param fullpath The full path.
 	 *  @return The most specific mapping info.
 	 */
-	public TypeInfo getTypeInfo(Object object, QName[] fullpath, ReadContext context)
+	public synchronized TypeInfo getTypeInfo(Object object, QName[] fullpath, ReadContext context)
 	{
 		Object type = getObjectType(object, context);
 		if(no_typeinfos!=null && no_typeinfos.contains(type))
