@@ -10,6 +10,7 @@ import jadex.xml.ObjectInfo;
 import jadex.xml.SubobjectInfo;
 import jadex.xml.TypeInfo;
 import jadex.xml.XMLInfo;
+import jadex.xml.reader.Reader;
 import jadex.xml.writer.Writer;
 
 import java.awt.Color;
@@ -251,5 +252,16 @@ public class JavaWriter extends Writer
 		if(writer==null)
 			writer = new JavaWriter(null);
 		return Writer.objectToByteArray(writer, val, classloader);
+	}
+	
+	/**
+	 *  Get the default Java writer.
+	 *  @return The Java writer.
+	 */
+	public static Writer getInstance()
+	{
+		if(writer==null)
+			writer = new JavaWriter(null);
+		return writer;
 	}
 }

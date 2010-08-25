@@ -47,7 +47,7 @@ public class RemoteServiceManagementAgent extends MicroAgent
 		if(SFipa.MESSAGE_TYPE_NAME_FIPA.equals(mt.getName()))
 		{
 			SServiceProvider.getService(getServiceProvider(), ILibraryService.class)
-				.addResultListener(createResultListener(new IResultListener()
+				.addResultListener(createResultListener(new DefaultResultListener()
 			{
 				public void resultAvailable(Object source, Object result)
 				{
@@ -56,13 +56,22 @@ public class RemoteServiceManagementAgent extends MicroAgent
 					Object	content	= msg.get(SFipa.CONTENT);
 					if(content instanceof String)
 					{
-						content = JavaReader.objectFromXML((String)content, ls.getClassLoader());
+						// Catch decode problems.
+						// Should be ignored or be a warning.
+						try
+						{
+							content = JavaReader.objectFromXML((String)content, ls.getClassLoader());
+						}
+						catch(Exception e)
+						{
+//							getLogger().warning("Remote service management service could not decode message."+content);
+						}
 					}
 					
 					if(content instanceof IRemoteCommand)
 					{
 						final IRemoteCommand com = (IRemoteCommand)content;
-						com.execute(getExternalAccess(), rms.getWaitingCalls()).addResultListener(createResultListener(new IResultListener()
+						com.execute(getExternalAccess(), rms.getWaitingCalls()).addResultListener(createResultListener(new DefaultResultListener()
 						{
 							public void resultAvailable(Object source, Object result)
 							{
@@ -81,24 +90,12 @@ public class RemoteServiceManagementAgent extends MicroAgent
 									}));
 								}
 							}
-							
-							public void exceptionOccurred(Object source, Exception exception)
-							{
-								// todo: print or send failure reply?
-								exception.printStackTrace();
-							}
 						}));
 					}
 					else
 					{
 						System.out.println("Unexpected message: "+msg);
 					}
-				}
-				
-				public void exceptionOccurred(Object source, Exception exception)
-				{
-					// todo: print or send failure reply?
-					exception.printStackTrace();
 				}
 			}));
 		}
