@@ -67,17 +67,13 @@
 		</repository>
 	</distributionManagement>
 
-	<!--
-		<parent> <groupId>net.sourceforge.jadex</groupId>
-		<artifactId>jadex-settings</artifactId>
-		<version>${jadexVersion}</version>
-		<relativePath>../src/main/config/jadex-settings-pom.xml</relativePath>
-		</parent>
-	-->
+	<!-- <parent> <groupId>net.sourceforge.jadex</groupId> <artifactId>jadex-settings</artifactId> 
+		<version>${jadexVersion}</version> <relativePath>../src/main/config/jadex-settings-pom.xml</relativePath> 
+		</parent> -->
 
 	<properties>
 		<project.build.sourceEncoding>ISO-8859-1</project.build.sourceEncoding>
-  	</properties>
+	</properties>
 
 	<build>
 		<resources>
@@ -143,7 +139,15 @@
 			</plugin>
 		</plugins>
 	</build>
-
+	
+	<repositories>
+		<repository>
+			<id>project</id>
+			<name>Maven Project Repository</name>
+			<url>file:///${basedir}/lib</url>
+		</repository>
+	</repositories>
+	
 	<dependencies>
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
