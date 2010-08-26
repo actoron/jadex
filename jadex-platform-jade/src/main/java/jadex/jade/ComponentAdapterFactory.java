@@ -71,7 +71,7 @@ public class ComponentAdapterFactory implements IComponentAdapterFactory
 	 */
 	public IComponentAdapter createComponentAdapter(IComponentDescription desc, IModelInfo model, IComponentInstance instance, IExternalAccess parent)
 	{
-		return new JadeComponentAdapter(desc, model, instance, parent);
+		return new JadeComponentAdapter(desc, model, instance, parent, this);
 	}
 	
 	/**
@@ -84,7 +84,15 @@ public class ComponentAdapterFactory implements IComponentAdapterFactory
 		return ((JadeComponentAdapter)adapter).execute();
 	}
 	
-	//-------- helper methods --------
+	//-------- methods --------
+	
+	/**
+	 *  Get the platform controller.
+	 */
+	public PlatformController	getPlatformController()
+	{
+		return this.controller;
+	}
 	
 	/**
 	 *  Set the platform agent.
@@ -95,8 +103,8 @@ public class ComponentAdapterFactory implements IComponentAdapterFactory
 	}
 	
 	/**
-	 *  Set the container.
-	 *  @param container The container.
+	 *  Set the platform controller.
+	 *  @param controller The platform controller.
 	 */
 	protected void setPlatformController(PlatformController controller)
 	{
