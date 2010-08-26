@@ -93,8 +93,11 @@ public abstract class ComponentManagementService extends BasicService implements
 //	protected Map initfutures;
 	
 	/** The init adapters and descriptions, i.e. adapters and desc of initing components, 
-	    are only visible for child components in their init. */
+	 *  are only visible for child components in their init. */
 	protected Map initinfos;
+	
+	/** Number of non-daemon children for each autoshutdown component (cid->Integer). */
+	protected Map childcounts;
 	
     //-------- constructors --------
 
@@ -125,6 +128,7 @@ public abstract class ComponentManagementService extends BasicService implements
 		this.killresultlisteners = Collections.synchronizedMap(SCollection.createHashMap());
 //		this.initfutures = Collections.synchronizedMap(SCollection.createHashMap());
 		this.initinfos = Collections.synchronizedMap(SCollection.createHashMap());
+		this.childcounts = SCollection.createHashMap();
 		
 		this.root = root;
     }
@@ -289,6 +293,12 @@ public abstract class ComponentManagementService extends BasicService implements
 											padesc = (CMSComponentDescription)descs.get(getParentIdentifier(cinfo));
 										}
 										padesc.addChild(cid);
+										
+										if(padesc.isAutoShutdown() && !ad.isDaemon())
+										{
+											Integer	childcount	= (Integer)childcounts.get(padesc.getName());
+											childcounts.put(padesc.getName(), new Integer(childcount!=null ? childcount.intValue()+1 : 1));
+										}
 									}
 								}
 								getComponentInstance(pad).componentCreated(ad, lmodel);
@@ -1069,14 +1079,14 @@ public abstract class ComponentManagementService extends BasicService implements
 						if(padesc!=null)
 						{
 							padesc.removeChild(desc.getName());
-							if(padesc.isAutoShutdown())
+							if(padesc.isAutoShutdown() && !desc.isDaemon())
 							{
-								IComponentIdentifier[]	children	= padesc.getChildren();
-								killparent	= true;
-								for(int i=0; killparent && i<children.length; i++)
+								Integer	childcount	= (Integer)childcounts.get(padesc.getName());
+								assert childcount!=null && childcount.intValue()>0;
+								killparent	= childcount==null || childcount.intValue()<=1;
+								if(!killparent)
 								{
-									CMSComponentDescription cdesc = (CMSComponentDescription)descs.get(children[i]);
-									killparent	= cdesc.isDaemon();
+									childcounts.put(padesc.getName(), new Integer(childcount.intValue()-1));
 								}
 							}
 						}

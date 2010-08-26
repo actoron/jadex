@@ -178,7 +178,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 			// Set processing state to ready if not running.
 			if(IComponentDescription.PROCESSINGSTATE_IDLE.equals(desc.getProcessingState()))
 			{
-				SServiceProvider.getServiceUpwards(getServiceContainer(), IComponentManagementService.class).addResultListener(new DefaultResultListener()
+				getCMS().addResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object source, Object result)
 					{
@@ -364,8 +364,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	{
 		final Future ret = new Future();
 		
-		SServiceProvider.getServiceUpwards(getServiceContainer(), IComponentManagementService.class)
-			.addResultListener(new IResultListener()
+		getCMS().addResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
@@ -398,6 +397,42 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	{
 		return component.getServiceContainer();
 	}
+
+	/** The cached cms. */
+	protected IComponentManagementService	cms;
+	
+	/**
+	 *  Get the (cached) cms.
+	 */
+	protected IFuture getCMS()
+	{
+		// Change comments below to test performance of cached cms vs. direct access.
+		return SServiceProvider.getServiceUpwards(getServiceContainer(), IComponentManagementService.class);
+//		final Future	ret	= new Future();
+//		if(cms==null)
+//		{
+//			SServiceProvider.getServiceUpwards(getServiceContainer(), IComponentManagementService.class)
+//				.addResultListener(new IResultListener()
+//			{
+//				public void resultAvailable(Object source, Object result)
+//				{
+//					cms	= (IComponentManagementService)result;
+//					ret.setResult(cms);
+//				}
+//				
+//				public void exceptionOccurred(Object source, Exception exception)
+//				{
+//					ret.setException(exception);
+//				}
+//			});
+//		}
+//		else
+//		{
+//			ret.setResult(cms);
+//		}
+//		return ret;
+	}
+
 	
 	//-------- methods called by the standalone platform --------
 
@@ -522,7 +557,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 		ClassLoader	cl	= componentthread.getContextClassLoader();
 		componentthread.setContextClassLoader(model.getClassLoader());
 
-		SServiceProvider.getServiceUpwards(getServiceContainer(), IComponentManagementService.class).addResultListener(new DefaultResultListener()
+		getCMS().addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
@@ -594,7 +629,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 			if(component.isAtBreakpoint(desc.getBreakpoints()))
 			{
 				breakpoint_triggered	= true;
-				SServiceProvider.getServiceUpwards(getServiceContainer(), IComponentManagementService.class).addResultListener(new DefaultResultListener()
+				getCMS().addResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object source, Object result)
 					{
@@ -634,7 +669,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 				if(component.isAtBreakpoint(desc.getBreakpoints()))
 				{
 					breakpoint_triggered	= true;
-					SServiceProvider.getServiceUpwards(getServiceContainer(), IComponentManagementService.class).addResultListener(new DefaultResultListener()
+					getCMS().addResultListener(new DefaultResultListener()
 					{
 						public void resultAvailable(Object source, Object result)
 						{
@@ -646,8 +681,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 		}
 		
 		final boolean	ready	= again && !breakpoint_triggered || extexecuted || wokenup;
-		SServiceProvider.getServiceUpwards(getServiceContainer(), IComponentManagementService.class)
-			.addResultListener(new DefaultResultListener()
+		getCMS().addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
@@ -677,7 +711,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 		e.printStackTrace();
 		
 		// Remove component from platform.
-		SServiceProvider.getServiceUpwards(getServiceContainer(), IComponentManagementService.class).addResultListener(new DefaultResultListener()
+		getCMS().addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
