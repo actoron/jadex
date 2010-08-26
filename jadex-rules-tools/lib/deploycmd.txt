@@ -1,1 +1,0 @@
-mvn deploy:deploy-file -Durl=file://C:/Files/Checkouts/jadex-maven/jadex-rules/lib -DrepositoryId=project -Dfile=jung-api-2.0-beta1.jar -Dversion=2.0-beta1 -DgroupId=jung2 -DartifactId=jung-api -Dpackaging=jar
