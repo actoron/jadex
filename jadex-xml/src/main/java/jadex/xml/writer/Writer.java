@@ -86,11 +86,14 @@ public class Writer
  	 */
 	public void write(Object object, OutputStream out, ClassLoader classloader, final Object context) throws Exception
 	{
+//		String encoding = "ISO-8859-1";
+		String encoding = "utf-8";
+		
 		XMLOutputFactory factory = XMLOutputFactory.newInstance();
 //		factory.setProperty("javax.xml.stream.isRepairingNamespaces", Boolean.TRUE);
-		XMLStreamWriter	writer	= factory.createXMLStreamWriter(out);
+		XMLStreamWriter	writer	= factory.createXMLStreamWriter(out, encoding);
 		
-		writer.writeStartDocument();//"utf-8", "1.0");
+		writer.writeStartDocument(encoding, "1.0"); 
 		writer.writeCharacters(lf);
 		
 		WriteContext wc = new WriteContext(writer, context, object, classloader);

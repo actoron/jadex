@@ -28,18 +28,18 @@ public class Test //extends TestCase
 	 */
 	public static void main(String[] args)
 	{
-		try
-		{
-			InputStream is = SUtil.getResource("jadex/xml/test.xml", null);
-			Object object = JavaReader.getInstance().read(is, null, null);
-			System.out.println("read: "+object);
-			String xml = JavaWriter.objectToXML(object, null);
-			System.out.println("wrote: "+xml);
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
+//		try
+//		{
+//			InputStream is = SUtil.getResource("jadex/xml/test.xml", null);
+//			Object object = JavaReader.getInstance().read(is, null, null);
+//			System.out.println("read: "+object);
+//			String xml = JavaWriter.objectToXML(object, null);
+//			System.out.println("wrote: "+xml);
+//		}
+//		catch(Exception e)
+//		{
+//			e.printStackTrace();
+//		}
 		
 		Test t = new Test();
 		
@@ -50,23 +50,24 @@ public class Test //extends TestCase
 			for(int i=0; i<cnt; i++)
 //			while(true)
 			{
-				t.testBean();
-				t.testEmptyArray();
-				t.testArrayOrder();
-				t.testMultiArray();
-				t.testVectorModel();
-				t.testClass();
-				t.testDate();
-				t.testColor();
-				t.testArray();
-				t.testList();
-				t.testSet();
-				t.testMap();
-				t.testInnerClass();
-				t.testURL();
-				t.testLoggingLevel();
-				t.testInetAddress();
-				t.testBeanWithPublicFields();
+				t.testSpecialCharacter();
+//				t.testBean();
+//				t.testEmptyArray();
+//				t.testArrayOrder();
+//				t.testMultiArray();
+//				t.testVectorModel();
+//				t.testClass();
+//				t.testDate();
+//				t.testColor();
+//				t.testArray();
+//				t.testList();
+//				t.testSet();
+//				t.testMap();
+//				t.testInnerClass();
+//				t.testURL();
+//				t.testLoggingLevel();
+//				t.testInetAddress();
+//				t.testBeanWithPublicFields();
 			}
 			long dur = System.currentTimeMillis()-start;
 			
@@ -315,6 +316,16 @@ public class Test //extends TestCase
 		C c = new C("test", 23);
 		
 		doWriteAndRead(c);
+	}
+	
+	/**
+	 *  Test if special characters can be transferred.
+	 */
+	protected void testSpecialCharacter() throws Exception
+	{
+		String str = "ö";
+		
+		doWriteAndRead(str);
 	}
 	
 	/**
