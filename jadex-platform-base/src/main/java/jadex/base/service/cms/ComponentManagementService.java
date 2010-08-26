@@ -1640,6 +1640,7 @@ public abstract class ComponentManagementService extends BasicService implements
 			public void resultAvailable(Object source, Object result)
 			{
 				final boolean[]	services = new boolean[2];
+				
 				SServiceProvider.getService(provider, IExecutionService.class).addResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object source, Object result)
@@ -1655,11 +1656,13 @@ public abstract class ComponentManagementService extends BasicService implements
 							ret.setResult(ComponentManagementService.this);
 					}
 				});
+				
 				SServiceProvider.getService(provider, IMessageService.class).addResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object source, Object result)
 					{
 						msgservice	= (IMessageService)result;
+						
 						boolean	setresult;
 						synchronized(services)
 						{
@@ -1667,34 +1670,37 @@ public abstract class ComponentManagementService extends BasicService implements
 							setresult	= services[0] && services[1];
 						}
 						
-						msgservice.signalStarted().addResultListener(new IResultListener()
+						if(msgservice!=null)
 						{
-							public void resultAvailable(Object source, Object result)
+							msgservice.signalStarted().addResultListener(new IResultListener()
 							{
-								// add root adapter and register root component
-								if(root!=null)
+								public void resultAvailable(Object source, Object result)
 								{
-									synchronized(adapters)
+									// add root adapter and register root component
+									if(root!=null)
 									{
-										synchronized(descs)
+										synchronized(adapters)
 										{
-											// Hack?! Need to set transport addresses on root id.
-											((ComponentIdentifier)root.getComponentIdentifier()).setAddresses(msgservice.getAddresses());
-//											System.out.println("root: "+SUtil.arrayToString(msgservice.getAddresses())+" "+root.getComponentIdentifier().hashCode());
-											adapters.put(root.getComponentIdentifier(), root);
-											
-											IComponentDescription desc = getDescription(root);
-//											IComponentDescription desc = ((IComponentAdapter)root).getDescription(); 
-											descs.put(root.getComponentIdentifier(), desc);
+											synchronized(descs)
+											{
+												// Hack?! Need to set transport addresses on root id.
+												((ComponentIdentifier)root.getComponentIdentifier()).setAddresses(msgservice.getAddresses());
+	//											System.out.println("root: "+SUtil.arrayToString(msgservice.getAddresses())+" "+root.getComponentIdentifier().hashCode());
+												adapters.put(root.getComponentIdentifier(), root);
+												
+												IComponentDescription desc = getDescription(root);
+	//											IComponentDescription desc = ((IComponentAdapter)root).getDescription(); 
+												descs.put(root.getComponentIdentifier(), desc);
+											}
 										}
 									}
 								}
-							}
-							
-							public void exceptionOccurred(Object source, Exception exception)
-							{
-							}
-						});
+								
+								public void exceptionOccurred(Object source, Exception exception)
+								{
+								}
+							});
+						}
 						
 						if(setresult)
 							ret.setResult(ComponentManagementService.this);

@@ -63,4 +63,13 @@ public class JadeComponentAdapter	extends AbstractComponentAdapter	implements IC
 		System.out.println("Agent is: "+agent);
 		this.agent	= agent;
 	}
+
+	/**
+	 *  Get the agent.
+	 *  @return the agent.
+	 */
+	public ComponentAgent getJadeAgent()
+	{
+		return agent;
+	}
 }

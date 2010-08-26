@@ -30,7 +30,6 @@ import jadex.base.fipa.DFSearch;
 import jadex.base.fipa.IDFComponentDescription;
 import jadex.base.fipa.SFipa;
 import jadex.bridge.ContentException;
-import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IContentCodec;
@@ -48,7 +47,9 @@ import jadex.commons.service.BasicService;
 import jadex.commons.service.IServiceProvider;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.clock.IClockService;
+import jadex.jade.ComponentAdapterFactory;
 import jadex.jade.JadeAgentAdapter;
+import jadex.jade.JadeComponentAdapter;
 import jadex.jade.SJade;
 
 import java.util.ArrayList;
@@ -354,20 +355,11 @@ public class MessageService  extends BasicService implements IMessageService
 		
 		// Send message over Jade.
 //		ComponentManagementService ams = (ComponentManagementService)platform.getService(IComponentManagementService.class);
-		((ComponentManagementService)cms).getComponentAdapter(sender, new IResultListener()
-		{
-			public void resultAvailable(Object source, Object result)
-			{
-				JadeAgentAdapter adapter = (JadeAgentAdapter)result;
-				adapter.send(msg);
-				ret.setResult(null);
-//				System.out.println("message sent: "+msg);
-			}
-			public void exceptionOccurred(Object source, Exception exception)
-			{
-				ret.setException(exception);
-			}
-		});
+		
+		JadeComponentAdapter adapter = ((ComponentManagementService)cms).getComponentAdapter(sender);
+		adapter.getJadeAgent().send(msg);
+		ret.setResult(null);
+//		System.out.println("message sent: "+msg);
 		
 		return ret;
 		
@@ -434,7 +426,7 @@ public class MessageService  extends BasicService implements IMessageService
 	public String[] getAddresses()
 	{
 		// Hack! Should be looked up dynamically.
-		return platform.getPlatformAgent().getAddressesArray();
+		return ComponentAdapterFactory.getInstance().getPlatformAgent().getAddressesArray();
 	}
 	
 	/**

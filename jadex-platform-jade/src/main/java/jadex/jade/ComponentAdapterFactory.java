@@ -103,6 +103,15 @@ public class ComponentAdapterFactory implements IComponentAdapterFactory
 	}
 	
 	/**
+	 *  Get the platformagent.
+	 *  @return the platformagent.
+	 */
+	public AID getPlatformAgent()
+	{
+		return platformagent;
+	}
+
+	/**
 	 *  Set the platform controller.
 	 *  @param controller The platform controller.
 	 */
