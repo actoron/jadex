@@ -160,7 +160,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 			}
 		}
 		
-		final SimpleValueFetcher	fetcher = new SimpleValueFetcher();
+		final SimpleValueFetcher fetcher = new SimpleValueFetcher();
 		fetcher.setValue("$args", getArguments());
 		fetcher.setValue("$properties", properties);
 		fetcher.setValue("$results", getResults());

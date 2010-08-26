@@ -12,6 +12,7 @@ import jadex.bridge.IModelInfo;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.commons.concurrent.IResultListener;
 import jadex.javaparser.SJavaParser;
 
@@ -126,13 +127,16 @@ public class Starter
 	//		System.out.println("Model: "+model);
 			
 			// Create an instance of the component.
+			String configname = (String)cmdargs.get("configname")!=null? (String)cmdargs.get("configname"): 
+				model.getConfigurations().length>0?  model.getConfigurations()[0]: null;
+			
 			String platformname = (String)cmdargs.get(PLATFORM_NAME);
 			if(platformname==null)
 			{
 				IArgument[] cargs = model.getArguments();
 				for(int i=0; i<cargs.length; i++)
 				{
-					Object argval = cargs[i].getDefaultValue((String)cmdargs.get("configname"));
+					Object argval = cargs[i].getDefaultValue(configname);
 //					if(!compargs.containsKey(cargs[i].getName()))
 //					{
 //						compargs.put(cargs[i].getName(), argval);
@@ -145,7 +149,7 @@ public class Starter
 			}
 			if(platformname==null)
 			{
-				platformname = "platform";
+				platformname = SUtil.createUniqueId("platform");
 			}
 			
 			IComponentIdentifier cid = new ComponentIdentifier(platformname);
