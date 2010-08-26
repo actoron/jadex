@@ -107,7 +107,7 @@ public class ComponentAdapterFactory implements IComponentAdapterFactory
 	/**
 	 *  Get the global factory.
 	 */
-	protected static ComponentAdapterFactory	getInstance()
+	public static ComponentAdapterFactory	getInstance()
 	{
 		return FACTORY;
 	}

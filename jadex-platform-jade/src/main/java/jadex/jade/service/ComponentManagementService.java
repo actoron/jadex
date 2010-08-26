@@ -20,11 +20,6 @@ import jadex.jade.JadeComponentAdapter;
  */
 public class ComponentManagementService extends jadex.base.service.cms.ComponentManagementService implements IComponentManagementService, IService
 {
-//-------- attributes --------
-	
-	/** The adapter factory. */
-	protected ComponentAdapterFactory adapterfactory = new ComponentAdapterFactory();
-	
 	//-------- constructors --------
 
 	/**
@@ -58,7 +53,7 @@ public class ComponentManagementService extends jadex.base.service.cms.Component
 	 */
 	public IComponentAdapterFactory getComponentAdapterFactory()
 	{
-		return adapterfactory;
+		return ComponentAdapterFactory.getInstance();
 	}
 	
 	/**
