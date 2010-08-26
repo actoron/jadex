@@ -1,8 +1,11 @@
 package jadex.base.gui.componenttree;
 
+import jadex.commons.collection.MultiCollection;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -38,6 +41,9 @@ public class ComponentTreeModel implements TreeModel
 	
 	/** The icon overlays. */
 	private final List	overlays;
+	
+	/** The changed nodes (delayed update for improving perceived speed). */
+	private MultiCollection	changed;
 	
 	//-------- constructors --------
 	
@@ -176,33 +182,88 @@ public class ComponentTreeModel implements TreeModel
 	{
 		assert SwingUtilities.isEventDispatchThread();
 
-		int[]	indices;
-		Object[]	nodes;
-		List	path;
-		if(node.getParent()!=null)
+		if(changed==null)
 		{
-			IComponentTreeNode	parent	= node.getParent();
-			indices	= new int[]{parent.getIndexOfChild(node)};
-			nodes	= new Object[]{node};
-			path = buildTreePath(parent);	
-		}
-		else
-		{
-			indices	= null;
-			nodes	= null;
-			path = buildTreePath(node);	
-			
-		}
-		
-//		System.out.println("Node changed: "+node+", "+path);
-		
-		if(indices==null || indices[0]!=-1)	// Node might be removed already.
-		{
-			for(int i=0; i<listeners.size(); i++)
+			changed	= new MultiCollection(new HashMap(), HashSet.class);
+			SwingUtilities.invokeLater(new Runnable()
 			{
-				((TreeModelListener)listeners.get(i)).treeNodesChanged(new TreeModelEvent(this, path.toArray(), indices, nodes));
-			}
+				public void run()
+				{
+					IComponentTreeNode[]	parents	= (IComponentTreeNode[])changed.getKeys(IComponentTreeNode.class);
+					for(int i=0; i<parents.length; i++)
+					{
+						// Only throw event when root node or parent still in tree
+						if(parents[i]==null || getNode(parents[i].getId())!=null)
+						{
+							boolean	skip	= false;
+							Set	set	= (Set)changed.get(parents[i]);
+							int[]	indices;
+							Object[]	nodes;
+							List	path	= null;
+							if(parents[i]!=null)
+							{
+								int cnt	= 0;
+								nodes	= new Object[set.size()];
+								indices	= new int[nodes.length];
+								Iterator	it	= set.iterator();
+								for(int j=0; j<nodes.length; j++)
+								{
+									nodes[cnt]	= it.next();
+									if(getNode(((IComponentTreeNode)nodes[cnt]).getId())!=null)
+									{
+										indices[cnt]	= parents[i].getIndexOfChild((IComponentTreeNode)nodes[cnt]);
+										if(indices[cnt]!=-1)
+										{
+											cnt++;
+										}
+									}
+								}
+								if(cnt==0)
+								{
+									skip	= true;
+								}
+								else
+								{
+									if(cnt<nodes.length)
+									{
+										Object[]	ntmp	= new Object[cnt];
+										int[]	itmp	= new int[cnt];
+										System.arraycopy(nodes, 0, ntmp, 0, cnt);
+										System.arraycopy(indices, 0, itmp, 0, cnt);
+										nodes	= ntmp;
+										indices	= itmp;
+									}
+									path = buildTreePath(parents[i]);
+								}
+							}
+							
+							// Root node (there can be only one with parent==null)
+							else
+							{
+								assert set.size()==1 : set;
+								indices	= null;
+								nodes	= null;
+								path = buildTreePath((IComponentTreeNode)set.iterator().next());
+								
+							}
+							
+							if(!skip)	// Nodes might be removed already.
+							{
+								for(int j=0; j<listeners.size(); j++)
+								{
+									((TreeModelListener)listeners.get(j)).treeNodesChanged(new TreeModelEvent(this, path.toArray(), indices, nodes));
+								}
+							}
+						}
+					}
+					
+					changed	= null;
+				}
+			});
 		}
+		changed.put(node.getParent(), node);
+		
+//		System.out.println("Node changed: "+node+", "+path);		
 	}
 
     /**
