@@ -10,7 +10,6 @@ import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 /**
