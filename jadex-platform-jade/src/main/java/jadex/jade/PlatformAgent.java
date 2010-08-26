@@ -26,9 +26,9 @@ public class PlatformAgent extends GatewayAgent
     	
     	try
     	{
-   			Platform.getPlatform().setPlatformController(getContainerController().getPlatformController());
+   			ComponentAdapterFactory.getInstance().setPlatformController(getContainerController().getPlatformController());
 //       	Platform.getPlatform().setPlatformAgentController(getContainerController().getAgent(getLocalName()));
-  			Platform.getPlatform().setPlatformAgent(getAID());
+   			ComponentAdapterFactory.getInstance().setPlatformAgent(getAID());
   	   	}
     	catch(Exception e)
     	{

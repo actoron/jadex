@@ -1,5 +1,2 @@
-mvn deploy:deploy-file -Durl=file://C:/Files/Checkouts/jadexv2/jadex-platform-jade/lib -DrepositoryId=project -Dfile=jade.jar -Dversion=3.6.1 -DgroupId=jade -DartifactId=jade-core -Dpackaging=jar
-mvn deploy:deploy-file -Durl=file://C:/Files/Checkouts/jadexv2/jadex-platform-jade/lib -DrepositoryId=project -Dfile=http.jar -Dversion=3.6.1 -DgroupId=jade -DartifactId=jade-http -Dpackaging=jar
-mvn deploy:deploy-file -Durl=file://C:/Files/Checkouts/jadexv2/jadex-platform-jade/lib -DrepositoryId=project -Dfile=iiop.jar -Dversion=3.6.1 -DgroupId=jade -DartifactId=jade-iiop -Dpackaging=jar
-mvn deploy:deploy-file -Durl=file://C:/Files/Checkouts/jadexv2/jadex-platform-jade/lib -DrepositoryId=project -Dfile=jadeTools.jar -Dversion=3.6.1 -DgroupId=jade -DartifactId=jade-tools -Dpackaging=jar
-mvn deploy:deploy-file -Durl=file://C:/Files/Checkouts/jadexv2/jadex-platform-jade/lib -DrepositoryId=project -Dfile=jade.pom.xml -Dversion=3.6.1 -DgroupId=jade -DartifactId=jade -Dpackaging=pom -DpomFile=jade.pom.xml
+mvn deploy:deploy-file -Durl=file://C:/Files/Checkouts/jadexv2rz/jadex-platform-jade/lib -DrepositoryId=project -Dfile=jade.jar -Dversion=4.0.1 -DgroupId=jade -DartifactId=jade-core -Dpackaging=jar
+mvn deploy:deploy-file -Durl=file://C:/Files/Checkouts/jadexv2rz/jadex-platform-jade/lib -DrepositoryId=project -Dfile=jade.pom.xml -Dversion=4.0.1 -DgroupId=jade -DartifactId=jade -Dpackaging=pom -DpomFile=jade.pom.xml
