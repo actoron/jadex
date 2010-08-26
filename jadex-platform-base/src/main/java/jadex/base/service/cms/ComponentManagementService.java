@@ -1670,14 +1670,14 @@ public abstract class ComponentManagementService extends BasicService implements
 							setresult	= services[0] && services[1];
 						}
 						
-						if(msgservice!=null)
+						// add root adapter and register root component
+						if(root!=null)
 						{
-							msgservice.signalStarted().addResultListener(new IResultListener()
+							if(msgservice!=null)
 							{
-								public void resultAvailable(Object source, Object result)
+								msgservice.signalStarted().addResultListener(new IResultListener()
 								{
-									// add root adapter and register root component
-									if(root!=null)
+									public void resultAvailable(Object source, Object result)
 									{
 										synchronized(adapters)
 										{
@@ -1694,12 +1694,24 @@ public abstract class ComponentManagementService extends BasicService implements
 											}
 										}
 									}
-								}
-								
-								public void exceptionOccurred(Object source, Exception exception)
+									
+									public void exceptionOccurred(Object source, Exception exception)
+									{
+									}
+								});
+							}
+							else
+							{
+								synchronized(adapters)
 								{
+									synchronized(descs)
+									{
+										adapters.put(root.getComponentIdentifier(), root);
+										IComponentDescription desc = getDescription(root);
+										descs.put(root.getComponentIdentifier(), desc);
+									}
 								}
-							});
+							}
 						}
 						
 						if(setresult)
