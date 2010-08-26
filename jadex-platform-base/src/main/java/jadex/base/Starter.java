@@ -133,10 +133,10 @@ public class Starter
 				for(int i=0; i<cargs.length; i++)
 				{
 					Object argval = cargs[i].getDefaultValue((String)cmdargs.get("configname"));
-					if(!compargs.containsKey(cargs[i].getName()))
-					{
-						compargs.put(cargs[i].getName(), argval);
-					}
+//					if(!compargs.containsKey(cargs[i].getName()))
+//					{
+//						compargs.put(cargs[i].getName(), argval);
+//					}
 					if("platformname".equals(cargs[i].getName()))
 					{
 						platformname = (String)argval;

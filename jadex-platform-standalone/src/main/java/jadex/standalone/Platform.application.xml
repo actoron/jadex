@@ -136,6 +136,7 @@
 			<arguments>
 				<argument name="tcpport">0</argument>
 				<argument name="niotcpport">0</argument>
+				<argument name="platformname">null</argument>
 			</arguments>
 			<components>
 				<component name="kernel_micro" type="kernel_micro" daemon="true"/>

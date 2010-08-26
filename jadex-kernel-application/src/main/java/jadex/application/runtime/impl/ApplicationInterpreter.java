@@ -136,7 +136,8 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 		this.adapter = factory.createComponentAdapter(desc, model.getModelInfo(), this, parent);
 	
 		// Init the arguments with default values.
-		String configname = config!=null? config.getName(): null;
+		String[] configs = model.getModelInfo().getConfigurations();
+		String configname = config!=null? config.getName(): configs.length>0? configs[0]: null;
 		IArgument[] args = model.getModelInfo().getArguments();
 		for(int i=0; i<args.length; i++)
 		{

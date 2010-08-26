@@ -120,8 +120,8 @@ public class MApplicationType implements ICacheableModel
 				String valtext = arg.getValue();
 				Argument rarg = (Argument)getModelInfo().getArgument(arg.getName());
 				
-//				IParsedExpression exp = parser.parseExpression(valtext, imports, null, modelinfo.getClassLoader());
-				rarg.setDefaultValue(mapp.getName(), valtext);
+				Object val = parser.parseExpression(valtext, imports, null, modelinfo.getClassLoader()).getValue(null);
+				rarg.setDefaultValue(mapp.getName(), val);
 			}
 		}
 		
