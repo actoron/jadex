@@ -7,5 +7,14 @@
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-application
 						http://jadex.sourceforge.net/jadex-application-2.0.xsd"
 	name="Platform" package="jadex.jade">
-		
+	
+	<imports>
+		<import>jadex.jade.service.*</import>
+	</imports>
+	
+	<services>
+		<service>
+			new ComponentManagementService($component.getServiceProvider(), $component.getComponentAdapter())
+		</service>
+	</services>
 </applicationtype>

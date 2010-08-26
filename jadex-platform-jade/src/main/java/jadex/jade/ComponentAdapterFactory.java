@@ -44,7 +44,7 @@ public class ComponentAdapterFactory implements IComponentAdapterFactory
 		
 		// Start Jade platform with platform agent
 		// This agent make accessible the platform controller
-		new Boot(new String[]{"-gui", "platform:jadex.jade.PlatformAgent"});
+		Boot.main(new String[]{"-gui", "platform:jadex.jade.PlatformAgent"});
 		// Hack! Busy waiting for platform agent init finished.
 		while(platformagent==null)
 		{
@@ -71,7 +71,7 @@ public class ComponentAdapterFactory implements IComponentAdapterFactory
 	 */
 	public IComponentAdapter createComponentAdapter(IComponentDescription desc, IModelInfo model, IComponentInstance instance, IExternalAccess parent)
 	{
-		return new JadeAgentAdapter(desc, model, instance, parent);
+		return new JadeComponentAdapter(desc, model, instance, parent);
 	}
 	
 	/**
@@ -81,7 +81,7 @@ public class ComponentAdapterFactory implements IComponentAdapterFactory
 	 */
 	public boolean executeStep(IComponentAdapter adapter)
 	{
-		return ((JadeAgentAdapter)adapter).execute();
+		return ((JadeComponentAdapter)adapter).execute();
 	}
 	
 	//-------- helper methods --------
