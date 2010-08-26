@@ -48,6 +48,9 @@ public class JadeComponentAdapter	extends AbstractComponentAdapter	implements IC
 	 */
 	protected void	doWakeup()
 	{
+		// Todo: What if agent isn't yet available!? 
+		if(agent!=null)
+			agent.wakeup();
 	}
 	
 	//-------- methods --------

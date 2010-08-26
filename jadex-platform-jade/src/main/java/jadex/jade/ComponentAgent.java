@@ -7,10 +7,13 @@ import jade.core.Agent;
  */
 public class ComponentAgent extends Agent
 {
-	//-------- arttributes --------
+	//-------- attributes --------
 	
 	/** The component adapter. */
 	protected JadeComponentAdapter	adapter;
+	
+	/** The execution behavior. */
+	protected ActionExecutionBehaviour	execution;
 	
 	//-------- constructors --------
 	
@@ -21,5 +24,18 @@ public class ComponentAgent extends Agent
 	{
 		adapter	= (JadeComponentAdapter)getArguments()[0];
 		adapter.setJadeAgent(this);
+		
+		execution	= new ActionExecutionBehaviour(adapter); 
+		addBehaviour(execution);
+	}
+	
+	//-------- methods --------
+	
+	/**
+	 *  Resume agent execution.
+	 */
+	public void	wakeup()
+	{
+		execution.restart();
 	}
 }
