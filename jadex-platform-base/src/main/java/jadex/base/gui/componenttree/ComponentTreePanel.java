@@ -163,21 +163,20 @@ public class ComponentTreePanel extends JSplitPane
 		{
 			public void componentRemoved(final IComponentDescription desc, Map results)
 			{
-				SwingUtilities.invokeLater(new Runnable()
+				final IComponentTreeNode	node	= model.getNodeOrAddZombie(desc.getName());
+				if(node!=null)
 				{
-					public void run()
+					SwingUtilities.invokeLater(new Runnable()
 					{
-						IComponentTreeNode	node	= model.getNode(desc.getName());
-						if(node!=null && node.getParent()!=null)
+						public void run()
 						{
-							((AbstractComponentTreeNode)node.getParent()).removeChild(node);
+							if(node.getParent()!=null)
+							{
+								((AbstractComponentTreeNode)node.getParent()).removeChild(node);
+							}
 						}
-						else if(node==null)
-						{
-							model.addZombieNode(desc.getName());
-						}
-					}
-				});
+					});
+				}
 			}
 			
 			public void componentChanged(final IComponentDescription desc)

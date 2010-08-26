@@ -3,7 +3,6 @@ package jadex.base.gui.componenttree;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -267,10 +266,13 @@ public class ComponentTreeModel implements TreeModel
 	{
 		assert SwingUtilities.isEventDispatchThread();
 
-		if(nodes.containsKey(node.getId()))
-			throw new RuntimeException("Node id already contained: "+node);
-		
-		nodes.put(node.getId(), node);
+		synchronized(nodes)
+		{
+			if(nodes.containsKey(node.getId()))
+				throw new RuntimeException("Node id already contained: "+node);
+			
+			nodes.put(node.getId(), node);
+		}
 		
 		for(int i=0; i<node.getCachedChildren().size(); i++)
 		{
@@ -291,7 +293,12 @@ public class ComponentTreeModel implements TreeModel
 	{
 		assert SwingUtilities.isEventDispatchThread();
 
-		return (IComponentTreeNode)nodes.get(id);
+		IComponentTreeNode	ret;
+		synchronized(nodes)
+		{
+			ret	= (IComponentTreeNode)nodes.get(id);
+		}
+		return ret;
 	}
 	
 	/**
@@ -302,20 +309,29 @@ public class ComponentTreeModel implements TreeModel
 		assert SwingUtilities.isEventDispatchThread();
 		
 		node.dispose();
-		if(zombies.contains(node.getId()))
+		boolean	notify	= false;
+		synchronized(nodes)
 		{
-			assert !nodes.containsKey(node.getId()) : node.getId();
-			zombies.remove(node.getId());
+			if(zombies.contains(node.getId()))
+			{
+				assert !nodes.containsKey(node.getId()) : node.getId();
+				zombies.remove(node.getId());
+			}
+			else
+			{
+	//			System.out.println("Removed: "+node.getId());
+				nodes.remove(node.getId());
+				notify	= true;
+			}
 		}
-		else
+		
+		if(notify)
 		{
-//			System.out.println("Removed: "+node.getId());
-			nodes.remove(node.getId());
 			INodeListener[]	lis	= (INodeListener[])nodelisteners.toArray(new INodeListener[nodelisteners.size()]);
 			for(int i=0; i<lis.length; i++)
 			{
 				lis[i].nodeRemoved(node);
-			}
+			}			
 		}
 
 		for(int i=0; i<node.getCachedChildren().size(); i++)
@@ -371,8 +387,11 @@ public class ComponentTreeModel implements TreeModel
 	{
 		assert SwingUtilities.isEventDispatchThread();
 
-		assert !nodes.containsKey(id) : id;
-		zombies.add(id);
+		synchronized(nodes)
+		{
+			assert !nodes.containsKey(id) : id;
+			zombies.add(id);
+		}
 	}
 	
 	/**
@@ -381,8 +400,13 @@ public class ComponentTreeModel implements TreeModel
 	public boolean	isZombieNode(Object id)
 	{
 		assert SwingUtilities.isEventDispatchThread();
-
-		return zombies.contains(id);
+		
+		boolean ret;
+		synchronized(nodes)
+		{
+			ret	= zombies.contains(id);
+		}
+		return ret;
 	}
 
 	/**
@@ -392,9 +416,33 @@ public class ComponentTreeModel implements TreeModel
 	{
 		assert SwingUtilities.isEventDispatchThread();
 
-		for(Iterator it=nodes.values().iterator(); it.hasNext(); )
+		IComponentTreeNode[]	anodes;
+		synchronized(nodes)
 		{
-			((IComponentTreeNode)it.next()).dispose();
+			anodes	= (IComponentTreeNode[])nodes.values().toArray(new IComponentTreeNode[nodes.values().size()]);
 		}
+		
+		for(int i=0; i<anodes.length; i++)
+		{
+			anodes[i].dispose();
+		}
+	}
+
+	/**
+	 *  Get a node for removal.
+	 *  Add a zombie node, if node does not exist.
+	 */
+	public IComponentTreeNode getNodeOrAddZombie(Object id)
+	{
+		IComponentTreeNode	ret;
+		synchronized(nodes)
+		{
+			ret	= (IComponentTreeNode)nodes.get(id);
+			if(ret==null)
+			{
+				zombies.add(id);
+			}
+		}
+		return ret;
 	}
 }
