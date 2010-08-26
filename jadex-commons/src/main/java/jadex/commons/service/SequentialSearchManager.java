@@ -261,7 +261,10 @@ public class SequentialSearchManager implements ISearchManager
 					{
 						List	ccs	= new LinkedList((Collection)result);
 						ccs.remove(src);
-						todo.put(CURRENT_CHILDREN, ccs);
+						if(!ccs.isEmpty())
+						{
+							todo.put(CURRENT_CHILDREN, ccs);
+						}
 					}
 					processChildNodes(provider, decider, selector, services, ret, results, todo);
 				}
@@ -280,7 +283,10 @@ public class SequentialSearchManager implements ISearchManager
 						{
 							List	ccs	= new LinkedList((Collection)result);
 							ccs.remove(src);
-							todo.put(CURRENT_CHILDREN, ccs);
+							if(!ccs.isEmpty())
+							{
+								todo.put(CURRENT_CHILDREN, ccs);
+							}
 						}
 						processChildNodes(provider, decider, selector, services, ret, results, todo);
 					}

@@ -11,6 +11,7 @@
 	<imports>
 		<import>jadex.jade.service.*</import>
 		<import>jadex.commons.service.library.*</import>
+		<import>jadex.application.*</import>
 	</imports>
 	
 	<componenttypes>
@@ -39,6 +40,17 @@
 	
 		<service>
 			new ComponentManagementService($component.getServiceProvider(), $component.getComponentAdapter())
+		</service>
+		
+		<service>
+			new ApplicationComponentFactory(null,
+				// new Set[]
+				// {
+				// 	MEnvSpaceType.getXMLMapping(),
+				// 	MAGRSpaceType.getXMLMapping()
+				// }, 
+				$component.getServiceProvider().getId()
+			)		
 		</service>
 	</services>
 	
