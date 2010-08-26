@@ -77,7 +77,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	protected boolean	dostep;
 	
 	/** The listener to be informed, when the requested step is finished. */
-	protected IResultListener	steplistener;
+	protected Future stepfuture;
 	
 	/** The selected breakpoints (component will change to step mode, when a breakpoint is reached). */
 	protected Set	breakpoints;
@@ -407,33 +407,42 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	 *  which might perform arbitrary cleanup actions, goals, etc.
 	 *  @param listener	When cleanup of the component is finished, the listener must be notified.
 	 */
-	public void killComponent(final IResultListener listener)
+	public IFuture killComponent()
 	{
+		final Future ret = new Future();
+		
 //		System.out.println("killComponent: "+listener);
 		if(IComponentDescription.STATE_TERMINATED.equals(desc.getState()))
-			throw new ComponentTerminatedException(cid.getName());
-
-		if(!fatalerror)
 		{
-			component.cleanupComponent().addResultListener(new IResultListener()
+			ret.setException(new ComponentTerminatedException(cid.getName()));
+		}
+		else
+		{
+			if(!fatalerror)
 			{
-				public void resultAvailable(Object source, Object result)
+				component.cleanupComponent().addResultListener(new IResultListener()
 				{
-					shutdownContainer(listener);
-				}
-				
-				public void exceptionOccurred(Object source, Exception exception)
-				{
-					getLogger().warning("Exception during component cleanup: "+exception);
-					shutdownContainer(listener);
-				}
-			});
+					public void resultAvailable(Object source, Object result)
+					{
+						shutdownContainer().addResultListener(new DelegationResultListener(ret));
+					}
+					
+					public void exceptionOccurred(Object source, Exception exception)
+					{
+						getLogger().warning("Exception during component cleanup: "+exception);
+						shutdownContainer().addResultListener(new DelegationResultListener(ret));
+					}
+				});
+			}
+			else
+			{
+				ret.setResult(getComponentIdentifier());
+//				listener.resultAvailable(this, getComponentIdentifier());
+			}
 		}
-		else if(listener!=null)
-		{
-			listener.resultAvailable(this, getComponentIdentifier());
-		}
-			
+		
+		return ret;
+		
 		// LogManager causes memory leak till Java 7
 		// No way to remove loggers and no weak references. 
 	}
@@ -441,21 +450,27 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	/**
 	 *  Called from killComponent.
 	 */
-	protected void shutdownContainer(final IResultListener listener)
+	protected IFuture shutdownContainer()
 	{
+		final Future ret = new Future();
+		
 		getServiceContainer().shutdown().addResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
-				listener.resultAvailable(this, getComponentIdentifier());
+				ret.setResult(getComponentIdentifier());
+//				listener.resultAvailable(this, getComponentIdentifier());
 			}
 			
 			public void exceptionOccurred(Object source, Exception exception)
 			{
 				getLogger().warning("Exception during service container shutdown: "+exception);
-				listener.resultAvailable(this, getComponentIdentifier());
+//				listener.resultAvailable(this, getComponentIdentifier());
+				ret.setResult(getComponentIdentifier());
 			}
 		});
+		
+		return ret;
 	}
 
 	/**
@@ -607,8 +622,10 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 			if(dostep)
 			{
 				dostep	= false;
-				if(steplistener!=null)
-					steplistener.resultAvailable(this, desc);
+				if(stepfuture!=null)
+				{
+					stepfuture.setResult(desc);
+				}
 			}
 			
 			// Suspend when breakpoint is triggered.
@@ -722,18 +739,20 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	/**
 	 *  Set the step mode.
 	 */
-	public void	doStep(IResultListener listener)
+	public IFuture doStep()
 	{
+		Future ret = new Future();
 		if(IComponentDescription.STATE_TERMINATED.equals(desc.getState()) || fatalerror)
-			throw new ComponentTerminatedException(cid.getName());
-
-		if(dostep)
-			listener.exceptionOccurred(this, new RuntimeException("Only one step allowed at a time."));
+			ret.setException(new ComponentTerminatedException(cid.getName()));
+		else if(dostep)
+			ret.setException(new RuntimeException("Only one step allowed at a time."));
 			
 		this.dostep	= true;		
-		this.steplistener	= listener;
+		this.stepfuture = ret;
 		
 		wakeup();
+		
+		return ret;
 	}
 
 	public void setComponentThread(Thread thread)
