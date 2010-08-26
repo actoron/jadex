@@ -23,13 +23,19 @@ import jadex.base.fipa.IProperty;
 import jadex.base.fipa.SearchConstraints;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
+import jadex.bridge.IMessageService;
 import jadex.bridge.ISearchConstraints;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.DefaultResultListener;
+import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
+import jadex.commons.service.BasicService;
 import jadex.commons.service.IService;
+import jadex.commons.service.IServiceProvider;
+import jadex.commons.service.SServiceProvider;
+import jadex.commons.service.clock.IClockService;
 import jadex.jade.Platform;
 import jadex.jade.SJade;
 
@@ -40,24 +46,32 @@ import java.util.Set;
 /**
  *  Directory facilitator implementation for standalone platform.
  */
-public class DirectoryFacilitatorService implements IDF, IService
+public class DirectoryFacilitatorService extends BasicService implements IDF
 {
 	//-------- attributes --------
 
 	/** The platform. */
-	protected Platform platform;
+	protected IServiceProvider provider;
 	
 	/** The logger. */
 	//protected Logger logger;
+	
+	
+//	/** The cashed clock service. */
+//	protected IClockService	clockservice;
+	
+	/** The cashed clock service. */
+	protected IComponentManagementService cms;
 	
 	//-------- constructors --------
 
 	/**
 	 *  Create a standalone df.
 	 */
-	public DirectoryFacilitatorService(Platform platform)
+	public DirectoryFacilitatorService(IServiceProvider provider)
 	{
-		this.platform = platform;
+		super(provider.getId(), IDF.class, null);
+		this.provider = provider;
 		//this.logger = Logger.getLogger("DF" + this);
 	}
 	
@@ -96,7 +110,7 @@ public class DirectoryFacilitatorService implements IDF, IService
 								Register reg = (Register)((Action)done.getAction()).getAction();
 								ret.setResult(SJade.convertAgentDescriptiontoFipa(
 									(jade.domain.FIPAAgentManagement.DFAgentDescription)reg.getDescription(), 
-									(IComponentManagementService)platform.getService(IComponentManagementService.class)));
+									(IComponentManagementService)cms));
 							}
 							catch(Exception e)
 							{
@@ -286,7 +300,7 @@ public class DirectoryFacilitatorService implements IDF, IService
 								Modify mod = (Modify)((Action)done.getAction()).getAction();
 								ret.setResult(SJade.convertAgentDescriptiontoFipa(
 									(jade.domain.FIPAAgentManagement.DFAgentDescription)mod.getDescription(), 
-									(IComponentManagementService)platform.getService(IComponentManagementService.class)));
+									(IComponentManagementService)cms));
 							}
 							catch(Exception e)
 							{
@@ -382,11 +396,11 @@ public class DirectoryFacilitatorService implements IDF, IService
 								Result res = (Result)myAgent.getContentManager().extractContent(reply);
 								jade.util.leap.List descs = res.getItems();
 								IDFComponentDescription[] cret = new IDFComponentDescription[descs.size()];
-								IComponentManagementService ams = (IComponentManagementService)platform.getService(IComponentManagementService.class);
+//								IComponentManagementService ams = (IComponentManagementService)platform.getService(IComponentManagementService.class);
 								for(int i=0; i<cret.length; i++)
 								{
 									cret[i] = SJade.convertAgentDescriptiontoFipa(
-										(jade.domain.FIPAAgentManagement.DFAgentDescription)descs.get(i), ams);
+										(jade.domain.FIPAAgentManagement.DFAgentDescription)descs.get(i), cms);
 								}
 								ret.setResult(cret);
 							}
@@ -555,7 +569,6 @@ public class DirectoryFacilitatorService implements IDF, IService
 	 */
 	public IComponentIdentifier createComponentIdentifier(String name, boolean local)
 	{
-		IComponentManagementService cms = (IComponentManagementService)platform.getService(IComponentManagementService.class);
 		return cms.createComponentIdentifier(name, local, null);
 		
 //		if(local)
@@ -571,33 +584,13 @@ public class DirectoryFacilitatorService implements IDF, IService
 	 */
 	public IComponentIdentifier createComponentIdentifier(String name, boolean local, String[] addresses)
 	{
-		IComponentManagementService cms = (IComponentManagementService)platform.getService(IComponentManagementService.class);
 		return cms.createComponentIdentifier(name, local, addresses);
 
 //		if(local)
 //			name = name + "@" + platform.getName();
 //		return new AgentIdentifier(name, addresses, null);
 	}
-
-	//-------- IPlatformService interface methods --------
 	
-	/**
-	 *  Start the service.
-	 */
-	public IFuture startService()
-	{
-		return new Future(null);
-	}
-	
-	/**
-	 *  Called when the platform shuts down.
-	 *  Do necessary cleanup here (if any).
-	 */
-	public IFuture shutdownService()
-	{
-		return new Future(null);
-	}
-
 	//-------- helper methods --------
 
 	/**
@@ -662,5 +655,31 @@ public class DirectoryFacilitatorService implements IDF, IService
 		for(int i=0; i<a.length; i++)
 			entries.remove(a[i]);
 		return entries.isEmpty();
+	}
+	
+//-------- IPlatformService interface --------
+	
+	/**
+	 *  Start the service.
+	 */
+	public IFuture startService()
+	{
+		final Future ret = new Future();
+		
+		SServiceProvider.getServiceUpwards(provider, IComponentManagementService.class).addResultListener(new IResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				cms = (IComponentManagementService)result;
+				ret.setResult(null);
+			}
+			
+			public void exceptionOccurred(Object source, Exception exception)
+			{
+				ret.setException(exception);
+			}
+		});
+		
+		return ret;
 	}
 }

@@ -42,12 +42,14 @@ import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.SUtil;
 import jadex.commons.collection.SCollection;
+import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
-import jadex.commons.service.IService;
-import jadex.jade.JadeAgentAdapter;
-import jadex.jade.Platform;
-import jadex.jade.SJade;
+import jadex.commons.service.BasicService;
+import jadex.commons.service.IServiceProvider;
+import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.clock.IClockService;
+import jadex.jade.JadeAgentAdapter;
+import jadex.jade.SJade;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -62,7 +64,7 @@ import java.util.logging.Logger;
  *  The Message service serves several message-oriented purposes: a) sending and
  *  delivering messages by using transports 
  */
-public class MessageService implements IMessageService, IService
+public class MessageService  extends BasicService implements IMessageService
 {
 	//-------- constants --------
 	
@@ -76,9 +78,9 @@ public class MessageService implements IMessageService, IService
 	
 	//-------- attributes --------
 
-	/** The ams. */
-	protected Platform platform;
-
+	/** The provider. */
+    protected IServiceProvider provider;
+	
 	/** The transports. */
 //	protected List transports;
 
@@ -100,15 +102,23 @@ public class MessageService implements IMessageService, IService
 	/** The listeners. */
 	protected List listeners;
 	
+	/** The cashed clock service. */
+	protected IClockService	clockservice;
+	
+	/** The cashed clock service. */
+	protected IComponentManagementService cms;
+
+	
 	//-------- constructors --------
 
 	/**
 	 *  Constructor for Outbox.
 	 *  @param platform
 	 */
-	public MessageService(Platform platform, MessageType[] messagetypes)
+	public MessageService(IServiceProvider provider, MessageType[] messagetypes)
 	{
-		this.platform = platform;
+		super(provider.getId(), IMessageService.class, null);
+		this.provider = provider;
 		this.logger = Logger.getLogger("JADE_Platform.mts");
 		
 		this.messagetypes	= SCollection.createHashMap();
@@ -122,10 +132,12 @@ public class MessageService implements IMessageService, IService
 	 *  Send a message.
 	 *  @param message The native message.
 	 */
-//	public void sendMessage(Map message, MessageType type, IComponentIdentifier sender, ClassLoader cl)
-	public void sendMessage(Map message, MessageType type, IComponentAdapter adapter, ClassLoader cl)
+	public IFuture sendMessage(Map message, MessageType type, IComponentIdentifier sender, ClassLoader cl)
+//	public void sendMessage(Map message, MessageType type, IComponentAdapter adapter, ClassLoader cl)
 	{
-		IComponentIdentifier sender = adapter.getComponentIdentifier();
+		final Future ret = new Future();
+		
+//		IComponentIdentifier sender = adapter.getComponentIdentifier();
 		if(sender==null)
 			throw new RuntimeException("Sender must not be null: "+message);
 		
@@ -144,9 +156,9 @@ public class MessageService implements IMessageService, IService
 		Object senddate = message.get(sd);
 		if(senddate==null)
 		{
-			IClockService	clock	= (IClockService) platform.getService(IClockService.class);
-			if(clock!=null)
-				message.put(sd, ""+clock.getTime());
+//			IClockService	clock	= (IClockService)platform.getService(IClockService.class);
+			if(clockservice!=null)
+				message.put(sd, ""+clockservice.getTime());
 		}
 		
 		IComponentIdentifier[] receivers = null;
@@ -214,9 +226,9 @@ public class MessageService implements IMessageService, IService
 					CMSCreateComponent	aca	= (CMSCreateComponent)content;
 					if(aca.getName()==null)
 					{
-						ComponentManagementService	ams	= (ComponentManagementService)platform.getService(IComponentManagementService.class);
+//						ComponentManagementService	ams	= (ComponentManagementService)platform.getService(IComponentManagementService.class);
 //						aca.setName(ams.generateAgentName(ams.getShortName(aca.getType())));
-						aca.setName(ams.generateComponentIdentifier(aca.getType()).getLocalName());
+						aca.setName(cms.generateComponentIdentifier(aca.getType()).getLocalName());
 					}
 					CreateAgent	create	= new CreateAgent();
 					create.setAgentName(aca.getName());
@@ -341,19 +353,23 @@ public class MessageService implements IMessageService, IService
 		final ACLMessage msg = SJade.convertMessagetoJade(message, type);
 		
 		// Send message over Jade.
-		ComponentManagementService ams = (ComponentManagementService)platform.getService(IComponentManagementService.class);
-		ams.getComponentAdapter(sender, new IResultListener()
+//		ComponentManagementService ams = (ComponentManagementService)platform.getService(IComponentManagementService.class);
+		((ComponentManagementService)cms).getComponentAdapter(sender, new IResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
 				JadeAgentAdapter adapter = (JadeAgentAdapter)result;
 				adapter.send(msg);
+				ret.setResult(null);
 //				System.out.println("message sent: "+msg);
 			}
 			public void exceptionOccurred(Object source, Exception exception)
 			{
+				ret.setException(exception);
 			}
 		});
+		
+		return ret;
 		
 //		sendmsg.addMessage(message, type.getName(), receivers);
 	}
@@ -422,6 +438,18 @@ public class MessageService implements IMessageService, IService
 	}
 	
 	/**
+	 *  Get addresses of all transports.
+	 *  @return The address schemes of all transports.
+	 */
+	public String[] getAddressSchemes()
+	{
+		// todo
+		return new String[0];
+//		String[] ret = platform.getPlatformAgent().getAddressesArray();
+		
+	}
+	
+	/**
 	 *  Add a message listener.
 	 *  @param listener The change listener.
 	 */
@@ -458,16 +486,44 @@ public class MessageService implements IMessageService, IService
 	 */
 	public IFuture startService()
 	{
-		return new Future(null);
+		final Future ret = new Future();
+		
+		SServiceProvider.getService(provider, IClockService.class).addResultListener(new IResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				clockservice = (IClockService)result;
+				SServiceProvider.getServiceUpwards(provider, IComponentManagementService.class).addResultListener(new IResultListener()
+				{
+					public void resultAvailable(Object source, Object result)
+					{
+						cms = (IComponentManagementService)result;
+						MessageService.super.startService().addResultListener(new DelegationResultListener(ret));
+					}
+					
+					public void exceptionOccurred(Object source, Exception exception)
+					{
+						ret.setException(exception);
+					}
+				});
+			}
+			
+			public void exceptionOccurred(Object source, Exception exception)
+			{
+				ret.setException(exception);
+			}
+		});
+		
+		return ret;
 	}
 	
 	/**
 	 *  Called when the platform shuts down. Do necessary cleanup here (if any).
-	 */
+	 * /
 	public IFuture shutdownService()
 	{
 		return new Future(null);
-	}
+	}*/
 }
 
 

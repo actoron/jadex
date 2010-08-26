@@ -1,50 +1,24 @@
 package jadex.jade.service;
 
-import jade.core.AID;
-import jade.wrapper.AgentController;
-import jadex.base.fipa.CMSComponentDescription;
-import jadex.base.fipa.SearchConstraints;
-import jadex.bridge.ComponentIdentifier;
-import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentAdapterFactory;
 import jadex.bridge.IComponentDescription;
-import jadex.bridge.IComponentFactory;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
-import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentManagementService;
-import jadex.bridge.IExternalAccess;
-import jadex.bridge.IModelInfo;
-import jadex.bridge.IMessageService;
-import jadex.bridge.ISearchConstraints;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
-import jadex.commons.collection.MultiCollection;
-import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.DelegationResultListener;
-import jadex.commons.concurrent.IResultListener;
 import jadex.commons.service.IService;
 import jadex.commons.service.IServiceProvider;
-import jadex.jade.JadeAgentAdapter;
-import jadex.jade.Platform;
-import jadex.jade.SJade;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.logging.Logger;
+import jadex.jade.ComponentAdapterFactory;
+import jadex.jade.JadeComponentAdapter;
 
 /**
  *  Built-in standalone agent platform, with only basic features.
  *  // todo: what about this property change support? where used?
  */
-public class ComponentManagementService implements IComponentManagementService, IService
+public class ComponentManagementService extends jadex.base.service.cms.ComponentManagementService implements IComponentManagementService, IService
 {
 //-------- attributes --------
 	
@@ -76,7 +50,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 	 */
 	public IComponentInstance getComponentInstance(IComponentAdapter adapter)
 	{
-		return ((StandaloneComponentAdapter)adapter).getComponentInstance();
+		return ((JadeComponentAdapter)adapter).getComponentInstance();
 	}
 
 	/**
@@ -93,7 +67,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 	public IFuture killComponent(IComponentAdapter adapter)
 	{
 		Future ret = new Future();
-		((StandaloneComponentAdapter)adapter).killComponent()
+		((JadeComponentAdapter)adapter).killComponent()
 			.addResultListener(new DelegationResultListener(ret));
 		return ret;
 	}
@@ -104,7 +78,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 	public IFuture cancel(IComponentAdapter adapter)
 	{
 		Future ret = new Future();
-		getExecutionService().cancel((StandaloneComponentAdapter)adapter)
+		getExecutionService().cancel((JadeComponentAdapter)adapter)
 			.addResultListener(new DelegationResultListener(ret));
 		return ret;
 	}
@@ -115,7 +89,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 	public IFuture doStep(IComponentAdapter adapter)
 	{
 		Future ret = new Future();
-		((StandaloneComponentAdapter)adapter).doStep()
+		((JadeComponentAdapter)adapter).doStep()
 			.addResultListener(new DelegationResultListener(ret));
 		return ret;
 	}
@@ -125,7 +99,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 	 */
 	public IComponentDescription getDescription(IComponentAdapter adapter)
 	{
-		return ((StandaloneComponentAdapter)adapter).getDescription();
+		return ((JadeComponentAdapter)adapter).getDescription();
 	}
 	
 	/**
@@ -134,54 +108,54 @@ public class ComponentManagementService implements IComponentManagementService, 
 	 *  @param listener The result listener.
 	 */
     // Todo: Hack!!! remove?
-	public StandaloneComponentAdapter getComponentAdapter(IComponentIdentifier cid)
+	public JadeComponentAdapter getComponentAdapter(IComponentIdentifier cid)
 	{
-		return (StandaloneComponentAdapter)adapters.get(cid);
+		return (JadeComponentAdapter)adapters.get(cid);
 	}
 	
 	//-------- constants --------
 
-	/** The component counter. Used for generating unique component ids. */
-	public static int compcnt = 0;
-
-	//-------- attributes --------
-
-	/** The service container. */
-	protected Platform platform;
-
-	/** The components (id->component adapter). */
-	protected Map adapters;
-	
-	/** The component descriptions (id -> component description). */
-	protected Map descs;
-	
-	/** The cleanup commands for the components (component id -> cleanup command). */
-	protected Map ccs;
-	
-	/** The children of a component (component id -> children ids). */
-	protected MultiCollection children;
-	
-	/** The logger. */
-	protected Logger logger;
-
-	/** The listeners. */
-	protected MultiCollection listeners;
-	
-	/** The result (kill listeners). */
-	protected Map killresultlisteners;
-	
-	/** The daemon counter. */
-	protected int daemons;
-	
-	/** The autoshutdown flag. */
-	protected boolean autoshutdown;
+//	/** The component counter. Used for generating unique component ids. */
+//	public static int compcnt = 0;
+//
+//	//-------- attributes --------
+//
+//	/** The service container. */
+//	protected Platform platform;
+//
+//	/** The components (id->component adapter). */
+//	protected Map adapters;
+//	
+//	/** The component descriptions (id -> component description). */
+//	protected Map descs;
+//	
+//	/** The cleanup commands for the components (component id -> cleanup command). */
+//	protected Map ccs;
+//	
+//	/** The children of a component (component id -> children ids). */
+//	protected MultiCollection children;
+//	
+//	/** The logger. */
+//	protected Logger logger;
+//
+//	/** The listeners. */
+//	protected MultiCollection listeners;
+//	
+//	/** The result (kill listeners). */
+//	protected Map killresultlisteners;
+//	
+//	/** The daemon counter. */
+//	protected int daemons;
+//	
+//	/** The autoshutdown flag. */
+//	protected boolean autoshutdown;
 	
     //-------- constructors --------
 
     /**
      *  Create a new component execution service.#
      *  @param container	The service container.
-     */
+     * /
     public ComponentManagementService(Platform platform, boolean autoshutdown)
 	{
 		this.platform = platform;
@@ -203,7 +177,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 	 *  @param model The model identifier (e.g. file name).
 	 *  @param listener The result listener (if any). Will receive the id of the component as result, when the component has been created.
 	 *  @param killlistener The kill listener (if any). Will receive the results of the component execution, after the component has terminated.
-	 */
+	 * /
 	public IFuture createComponent(String name, String model, CreationInfo cinfo, final IResultListener killlistener)
 	{
 		final Future ret = new Future();
@@ -253,7 +227,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 					
 			try
 			{
-				AgentController ac = platform.getPlatformController().createNewAgent(name, "jadex.jade.JadeAgentAdapter", argus.toArray());
+				AgentController ac = platform.getPlatformController().createNewAgent(name, "jadex.jade.JadeComponentAdapter", argus.toArray());
 				// Hack!!! Bug in JADE not returning created agent's AID.
 				// Should do ams_search do get correct AID?
 				AID tmp = (AID)platform.getPlatformAgent().clone();
@@ -309,19 +283,19 @@ public class ComponentManagementService implements IComponentManagementService, 
 				{
 				}
 			}
-			final JadeAgentAdapter adapter = (JadeAgentAdapter)adapters.get(aid);
+			final JadeComponentAdapter adapter = (JadeComponentAdapter)adapters.get(aid);
 			adapter.setComponentDescription(ad);
 	
-			JadeAgentAdapter pad = null;
+			JadeComponentAdapter pad = null;
 			if(info.getParent()!=null)
 			{
-				pad	= (JadeAgentAdapter)adapters.get(info.getParent());
+				pad	= (JadeComponentAdapter)adapters.get(info.getParent());
 			}
 	
 			if(pad!=null)
 			{
 				final IComponentFactory	cf = factory;
-				final JadeAgentAdapter fpad = pad;
+				final JadeComponentAdapter fpad = pad;
 				final ComponentIdentifier faid = (ComponentIdentifier)aid;
 				pad.getComponentInstance().getExternalAccess(new IResultListener()
 				{
@@ -349,12 +323,12 @@ public class ComponentManagementService implements IComponentManagementService, 
 		
 	/**
 	 *  Create an instance of a component (step 2 of creation process).
-	 */
+	 * /
 	protected void createComponentInstance(String config, Map args,
 		boolean suspend, Future ret,
 		final IResultListener resultlistener, IComponentFactory factory,
 		IModelInfo lmodel, final ComponentIdentifier cid,
-		JadeAgentAdapter adapter, JadeAgentAdapter pad,
+		JadeComponentAdapter adapter, JadeComponentAdapter pad,
 		CMSComponentDescription ad, IExternalAccess parent)
 	{
 		// Create the component instance.
@@ -394,7 +368,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 	/**
 	 *  Destroy (forcefully terminate) an component on the platform.
 	 *  @param componentid	The component to destroy.
-	 */
+	 * /
 	public IFuture destroyComponent(IComponentIdentifier cid)
 	{
 		final Future ret = new Future();
@@ -413,7 +387,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 				
 //					System.out.println("killing: "+cid);
 				
-				JadeAgentAdapter component = (JadeAgentAdapter)adapters.get(cid);
+				JadeComponentAdapter component = (JadeComponentAdapter)adapters.get(cid);
 				if(component==null)
 				{
 					ret.setException(new RuntimeException("Component "+cid+" does not exist."));
@@ -452,7 +426,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 	/**
 	 *  Suspend the execution of an component.
 	 *  @param componentid The component identifier.
-	 */
+	 * /
 	public IFuture suspendComponent(IComponentIdentifier componentid)
 	{
 		final Future ret = new Future();
@@ -472,7 +446,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 					}
 				}
 
-				JadeAgentAdapter adapter = (JadeAgentAdapter)adapters.get(componentid);
+				JadeComponentAdapter adapter = (JadeComponentAdapter)adapters.get(componentid);
 				ad = (CMSComponentDescription)descs.get(componentid);
 				if(adapter==null || ad==null)
 				{
@@ -481,7 +455,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 				}
 					//throw new RuntimeException("Component Identifier not registered in CES: "+aid);
 				if(!IComponentDescription.STATE_ACTIVE.equals(ad.getState())
-					/*&& !IComponentDescription.STATE_TERMINATING.equals(ad.getState())*/)
+					/*&& !IComponentDescription.STATE_TERMINATING.equals(ad.getState())* /)
 				{
 					ret.setException(new RuntimeException("Only active components can be suspended: "+componentid+" "+ad.getState()));
 					return ret;
@@ -522,7 +496,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 	/**
 	 *  Resume the execution of an component.
 	 *  @param componentid The component identifier.
-	 */
+	 * /
 	public IFuture resumeComponent(IComponentIdentifier componentid)
 	{
 		final Future ret = new Future();
@@ -544,7 +518,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 					}
 				}
 
-				JadeAgentAdapter adapter = (JadeAgentAdapter)adapters.get(componentid);
+				JadeComponentAdapter adapter = (JadeComponentAdapter)adapters.get(componentid);
 				ad = (CMSComponentDescription)descs.get(componentid);
 				if(adapter==null || ad==null)
 				{
@@ -595,7 +569,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 	 *  Execute a step of a suspended component.
 	 *  @param componentid The component identifier.
 	 *  @param listener Called when the step is finished (result will be the component description).
-	 */
+	 * /
 	public IFuture stepComponent(IComponentIdentifier componentid)
 	{
 		final Future ret = new Future();
@@ -604,7 +578,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 		{
 			synchronized(descs)
 			{
-				JadeAgentAdapter adapter = (JadeAgentAdapter)adapters.get(componentid);
+				JadeComponentAdapter adapter = (JadeComponentAdapter)adapters.get(componentid);
 				IComponentDescription cd = (IComponentDescription)descs.get(componentid);
 				if(adapter==null || cd==null)
 				{
@@ -642,7 +616,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 	 *  To add/remove breakpoints, use current breakpoints from component description as a base.
 	 *  @param componentid The component identifier.
 	 *  @param breakpoints The new breakpoints (if any).
-	 */
+	 * /
 	public void setComponentBreakpoints(IComponentIdentifier componentid, String[] breakpoints)
 	{
 		CMSComponentDescription ad;
@@ -673,7 +647,7 @@ public class ComponentManagementService implements IComponentManagementService, 
      *  The listener is registered for component changes.
      *  @param comp  The component to be listened on (or null for listening on all components).
      *  @param listener  The listener to be added.
-     */
+     * /
     public void addComponentListener(IComponentIdentifier comp, IComponentListener listener)
     {
 		synchronized(listeners)
@@ -686,7 +660,7 @@ public class ComponentManagementService implements IComponentManagementService, 
      *  Remove a listener.
      *  @param comp  The component to be listened on (or null for listening on all components).
      *  @param listener  The listener to be removed.
-     */
+     * /
     public void removeComponentListener(IComponentIdentifier comp, IComponentListener listener)
     {
 		synchronized(listeners)
@@ -698,7 +672,7 @@ public class ComponentManagementService implements IComponentManagementService, 
     /**
      *  Get the adapter map. 
      *  @return The adapter map.
-     */
+     * /
     public Map getComponentAdapterMap()
     {
     	return adapters;
@@ -708,7 +682,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 
 	/**
 	 *  Command that is executed on component cleanup.
-	 */
+	 * /
 	class CleanupCommand implements IResultListener
 	{
 		protected IComponentIdentifier cid;
@@ -726,8 +700,8 @@ public class ComponentManagementService implements IComponentManagementService, 
 			
 			IComponentDescription ad = (IComponentDescription)descs.get(cid);
 			Map results = null;
-			JadeAgentAdapter adapter;
-			JadeAgentAdapter pad = null;
+			JadeComponentAdapter adapter;
+			JadeComponentAdapter pad = null;
 			CMSComponentDescription desc;
 			boolean shutdown = false;
 			synchronized(adapters)
@@ -735,7 +709,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 				synchronized(descs)
 				{
 //					System.out.println("CleanupCommand remove called for: "+cid);
-					adapter = (JadeAgentAdapter)adapters.remove(cid);
+					adapter = (JadeComponentAdapter)adapters.remove(cid);
 					if(adapter==null)
 						throw new RuntimeException("Component Identifier not registered: "+cid);
 					
@@ -758,7 +732,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 					if(desc.getParent()!=null)
 					{
 						children.remove(desc.getParent(), desc.getName());
-						pad	= (JadeAgentAdapter)adapters.get(desc.getParent());
+						pad	= (JadeComponentAdapter)adapters.get(desc.getParent());
 					}
 				}
 			}
@@ -834,7 +808,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 		/**
 		 *  Add a listener to be informed, when the component has terminated.
 		 * @param listener
-		 */
+		 * /
 		public void	addKillFuture(Future killfuture)
 		{
 			if(killfutures==null)
@@ -849,7 +823,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 	 *  Get the component adapter for a component identifier.
 	 *  @param aid The component identifier.
 	 *  @param listener The result listener.
-	 */
+	 * /
     // Todo: Hack!!! remove?
 	public void getComponentAdapter(IComponentIdentifier cid, IResultListener listener)
 	{
@@ -863,11 +837,11 @@ public class ComponentManagementService implements IComponentManagementService, 
 	 *  Get the external access of a component.
 	 *  @param cid The component identifier.
 	 *  @param listener The result listener (recieves an IExternalAccess object).
-	 */
+	 * /
 	public IFuture getExternalAccess(IComponentIdentifier cid)
 	{
 		final Future ret = new Future();	
-		JadeAgentAdapter adapter = (JadeAgentAdapter)adapters.get(cid);
+		JadeComponentAdapter adapter = (JadeComponentAdapter)adapters.get(cid);
 		if(adapter==null)
 			ret.setException(new RuntimeException("No local component found for component identifier: "+cid));
 		else
@@ -891,7 +865,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 	 *  Get the parent component of a component.
 	 *  @param cid The component identifier.
 	 *  @return The parent component identifier.
-	 */
+	 * /
 	public IComponentIdentifier getParent(IComponentIdentifier cid)
 	{
 		CMSComponentDescription desc = (CMSComponentDescription)descs.get(cid);
@@ -902,7 +876,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 	 *  Get the children components of a component.
 	 *  @param cid The component identifier.
 	 *  @return The children component identifiers.
-	 */
+	 * /
 	public IComponentIdentifier[] getChildren(IComponentIdentifier cid)
 	{
 		List ret = (List)children.get(cid);
@@ -918,7 +892,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 	 *  @param local True for local name.
 	 *  @param addresses The addresses.
 	 *  @return The new component identifier.
-	 */
+	 * /
 	public IComponentIdentifier createComponentIdentifier(String name)
 	{
 		return createComponentIdentifier(name, true, null);
@@ -930,7 +904,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 	 *  @param local True for local name.
 	 *  @param addresses The addresses.
 	 *  @return The new component identifier.
-	 */
+	 * /
 	public IComponentIdentifier createComponentIdentifier(String name, boolean local)
 	{
 		return createComponentIdentifier(name, local, null);
@@ -942,7 +916,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 	 *  @param local True for local name.
 	 *  @param addresses The addresses.
 	 *  @return The new component identifier.
-	 */
+	 * /
 	public IComponentIdentifier createComponentIdentifier(String name, boolean local, String[] addresses)
 	{
 		if(local)
@@ -955,7 +929,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 	 *  @param maxresults The maximum number of results.
 	 *  @param maxdepth The maximal search depth.
 	 *  @return The search constraints.
-	 */
+	 * /
 	public ISearchConstraints createSearchConstraints(int maxresults, int maxdepth)
 	{
 		SearchConstraints	ret	= new SearchConstraints();
@@ -972,7 +946,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 	 * @param type The component type.
 	 * @param parent The parent.
 	 * @return The component description.
-	 */
+	 * /
 	public IComponentDescription createComponentDescription(IComponentIdentifier id, String state, String ownership, String type, IComponentIdentifier parent)
 	{
 		CMSComponentDescription	ret	= new CMSComponentDescription(id, type, parent, false, false);
@@ -987,7 +961,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 	 *  Get the component description of a single component.
 	 *  @param cid The component identifier.
 	 *  @return The component description of this component.
-	 */
+	 * /
 	public IFuture getComponentDescription(IComponentIdentifier cid)
 	{
 		Future ret = new Future();		
@@ -1004,7 +978,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 	/**
 	 *  Get all component descriptions.
 	 *  @return The component descriptions of this component.
-	 */
+	 * /
 	public IFuture getComponentDescriptions()
 	{
 		Future ret = new Future();
@@ -1017,7 +991,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 	 *  @return The component identifiers.
 	 *  
 	 *  This method should be used with caution when the agent population is large.
-	 */
+	 * /
 	public IFuture getComponentIdentifiers()
 	{
 		Future fut = new Future();
@@ -1039,7 +1013,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 	/**
 	 * Search for components matching the given description.
 	 * @return An array of matching component descriptions.
-	 */
+	 * /
 	public IFuture searchComponents(IComponentDescription adesc, ISearchConstraints con)
 	{
 		Future ret = new Future();
@@ -1094,7 +1068,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 	 *  Create a component identifier that is allowed on the platform.
 	 *  @param name The base name.
 	 *  @return The component identifier.
-	 */
+	 * /
 	public IComponentIdentifier generateComponentIdentifier(String name)
 	{
 		ComponentIdentifier ret = null;
@@ -1118,7 +1092,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 	/**
 	 *  Set the state of a component (i.e. update the component description).
 	 *  Currently only switching between suspended/waiting is allowed.
-	 */
+	 * /
 	// hack???
 	public void	setComponentState(IComponentIdentifier comp, String state)
 	{
@@ -1157,7 +1131,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 	
 	/**
 	 *  Start the service.
-	 */
+	 * /
 	public IFuture startService()
 	{
 		return new Future(null);
@@ -1166,11 +1140,11 @@ public class ComponentManagementService implements IComponentManagementService, 
 	/**
 	 *  Shutdown the service.
 	 *  @param listener The listener.
-	 */
+	 * /
 	public IFuture shutdownService()
 	{
 		return new Future(null);
-	}
+	}*/
 }
 
 	
@@ -1325,7 +1299,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 ////					{
 ////						CreateAgent ca = new CreateAgent();
 ////						ca.setAgentName(name!=null? name: getShortName(model));
-////						ca.setClassName("jadex.jade.JadeAgentAdapter");
+////						ca.setClassName("jadex.jade.JadeComponentAdapter");
 ////						ca.setContainer(new ContainerID(myAgent.getContainerController().getContainerName(), null));
 ////						if(argus!=null)
 ////						{
@@ -1370,7 +1344,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 //				
 //		try
 //		{
-//			AgentController ac = platform.getPlatformController().createNewAgent(name, "jadex.jade.JadeAgentAdapter", argus.toArray());
+//			AgentController ac = platform.getPlatformController().createNewAgent(name, "jadex.jade.JadeComponentAdapter", argus.toArray());
 //			// Hack!!! Bug in JADE not returning created agent's AID.
 //			// Should do ams_search do get correct AID?
 //			AID tmp = (AID)platform.getPlatformAgent().clone();
@@ -1493,7 +1467,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 //////					platform.getPlatformAgentController().putO2AObject(e, AgentController.ASYNC);
 ////			platform.getPlatformController().getAgent("platform").putO2AObject(e, AgentController.ASYNC);
 ////			
-//////					AgentController ac = platform.getPlatformController().createNewAgent(getShortName(model), "jadex.jade.JadeAgentAdapter", argus.toArray());
+//////					AgentController ac = platform.getPlatformController().createNewAgent(getShortName(model), "jadex.jade.JadeComponentAdapter", argus.toArray());
 //////					ac.start();
 ////		}
 ////		catch(ControllerException e)
@@ -1525,7 +1499,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 //		if(listener==null)
 //			listener = DefaultResultListener.getInstance();
 //		
-//		JadeAgentAdapter adapter = (JadeAgentAdapter)adapters.get(aid);
+//		JadeComponentAdapter adapter = (JadeComponentAdapter)adapters.get(aid);
 //		adapter.killAgent(new CleanupCommand((IComponentIdentifier)aid, listener));
 //		
 ////		try
@@ -1919,7 +1893,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 //		if(listener==null)
 //			throw new RuntimeException("Result listener required.");
 //		
-//		JadeAgentAdapter adapter = (JadeAgentAdapter)adapters.get(aid);
+//		JadeComponentAdapter adapter = (JadeComponentAdapter)adapters.get(aid);
 //		if(adapter==null)
 //			listener.exceptionOccurred(new RuntimeException("No local agent found for agent identifier: "+aid));
 //		else
@@ -2144,7 +2118,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 //		{
 //			synchronized(adapters)
 //			{
-//				JadeAgentAdapter adapter	= (JadeAgentAdapter)adapters.remove(aid);
+//				JadeComponentAdapter adapter	= (JadeComponentAdapter)adapters.remove(aid);
 //				if(adapter==null)
 //					throw new RuntimeException("Agent Identifier not registered in AMS: "+aid);
 //				adapter.setState(IComponentDescription.STATE_TERMINATED);
