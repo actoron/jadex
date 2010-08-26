@@ -7,6 +7,7 @@ import jadex.application.space.envsupport.environment.IEnvironmentSpace;
 import jadex.application.space.envsupport.environment.IPerceptGenerator;
 import jadex.application.space.envsupport.environment.IPerceptProcessor;
 import jadex.application.space.envsupport.environment.PerceptType;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -14,7 +15,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
+
 import javax.xml.bind.JAXBException;
+
 import deco.lang.dynamics.MASDynamics;
 import deco.lang.dynamics.causalities.DecentralMechanismLink;
 import deco.lang.dynamics.causalities.DirectLink;
@@ -126,6 +129,10 @@ public class InitDeco4mas {
 		
 		// ------ INIT COORDINATION MEDIA! -----------//
 
+		// TODO: Init media according to the deco4Mas file!
+//		TSpacesMechanism coordMechanism = new TSpacesMechanism((CoordinationSpace) space);
+//		coordMechanism.start();
+//		NegSpaceMechanism coordMechanism = new NegSpaceMechanism((CoordinationSpace) space);
 		
 
 		// Process deco4MAS-File:
