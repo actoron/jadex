@@ -16,7 +16,7 @@ public class NightlyBuild
 	/** The name of the build (e.g. jadex-xml). */
 	protected String	name;
 	
-	/** The file name of the build (e.g. jadex-xml-2.0-rc3-dist.zip). */
+	/** The file name of the build (e.g. jadex-xml-2.0-rc4-dist.zip). */
 	protected String	filename;
 	
 	/** The date of the build. */

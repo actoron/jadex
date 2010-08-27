@@ -28,7 +28,7 @@
 									<parent>
 										<p0:DirNode __ID="5" relativePath="jadex/">
 											<parent>
-												<p0:JarNode __ID="6" relativePath="jadex-applications-bdi-2.0-rc3.jar">
+												<p0:JarNode __ID="6" relativePath="jadex-applications-bdi-2.0-rc4.jar">
 													<parent>
 														<p0:RootNode __ID="7">
 															<children>
@@ -13584,7 +13584,7 @@
 	</expandedNodes>
 </p0:ModelExplorer-ModelExplorerProperties>
 ]]></p0:property>
-			<p0:property __ID="16" type="lastpath">jadex-applications-bdi-2.0-rc3.jar</p0:property>
+			<p0:property __ID="16" type="lastpath">jadex-applications-bdi-2.0-rc4.jar</p0:property>
 			<p0:property __ID="17" type="refresh">false</p0:property>
 		</p0:properties>
 		<p0:properties __ID="18" type="spanel">

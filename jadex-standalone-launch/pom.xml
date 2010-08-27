@@ -5,7 +5,7 @@
 	<artifactId>jadex-standalone-launch</artifactId>
 	<packaging>jar</packaging>
 	<name>jadex-standalone-launch</name>
-	<version>2.0-rc3</version>
+	<version>2.0-rc4</version>
 	<url>http://jadex.sourceforge.net</url>
 
 	<description>
@@ -188,61 +188,61 @@
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-platform-standalone</artifactId>
-			<version>2.0-rc3</version>
+			<version>2.0-rc4</version>
 		</dependency>
 
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-runtimetools</artifactId>
-			<version>2.0-rc3</version>
+			<version>2.0-rc4</version>
 		</dependency>
 
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-kernel-micro</artifactId>
-			<version>2.0-rc3</version>
+			<version>2.0-rc4</version>
 		</dependency>
 
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-rules-tools</artifactId>
-			<version>2.0-rc3</version>
+			<version>2.0-rc4</version>
 		</dependency>
 
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-kernel-bpmn</artifactId>
-			<version>2.0-rc3</version>
+			<version>2.0-rc4</version>
 		</dependency>
 
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-kernel-bdibpmn</artifactId>
-			<version>2.0-rc3</version>
+			<version>2.0-rc4</version>
 		</dependency>
 
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-kernel-application</artifactId>
-			<version>2.0-rc3</version>
+			<version>2.0-rc4</version>
 		</dependency>
 
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-kernel-gpmn</artifactId>
-			<version>2.0-rc3</version>
+			<version>2.0-rc4</version>
 		</dependency>
 
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-xml</artifactId>
-			<version>2.0-rc3</version>
+			<version>2.0-rc4</version>
 		</dependency>
 
 		<!--
 			<dependency> <groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-kernel-bdi-continuations</artifactId>
-			<version>2.0-rc3</version> </dependency>
+			<version>2.0-rc4</version> </dependency>
 		-->
 	</dependencies>
 </project>
