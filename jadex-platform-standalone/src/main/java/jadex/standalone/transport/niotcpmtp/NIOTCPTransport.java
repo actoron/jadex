@@ -118,8 +118,11 @@ public class NIOTCPTransport implements ITransport
 		{
 			public void cleanupEldestEntry(Entry eldest)
 			{
-				NIOTCPOutputConnection con = (NIOTCPOutputConnection)eldest.getValue();
-				con.close();
+				Object con = eldest.getValue();
+				if(con instanceof NIOTCPOutputConnection)
+				{
+					((NIOTCPOutputConnection)con).close();
+				}
 			}
 		});
 	}

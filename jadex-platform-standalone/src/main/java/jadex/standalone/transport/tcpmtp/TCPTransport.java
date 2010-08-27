@@ -134,8 +134,11 @@ public class TCPTransport implements ITransport
 		{
 			public void cleanupEldestEntry(Entry eldest)
 			{
-				TCPOutputConnection con = (TCPOutputConnection)eldest.getValue();
-				con.close();
+				Object con = eldest.getValue();
+				if(con instanceof TCPOutputConnection)
+				{
+					((TCPOutputConnection)con).close();
+				}
 			}
 		});
 		this.connections = Collections.synchronizedMap(this.connections);
