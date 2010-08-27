@@ -497,16 +497,6 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	public boolean	execute()
 	{
 		wokenup	= false;
-//		if(cid.getName().indexOf("Sokrates")!=-1)
-//		{
-//			System.err.println("Execute: "+cid.getName());
-//		}
-//		if(cid.getName().indexOf("platform")!=-1)
-//			System.out.println("platform start");
-//		if(cid.getName().indexOf("kernel_micro")!=-1)
-//			System.out.println("micro start");
-//		else if(cid.getName().indexOf("bdi")!=-1)
-//			System.out.println("bdi start");
 		
 		if(IComponentDescription.STATE_TERMINATED.equals(desc.getState()) || fatalerror)
 			throw new ComponentTerminatedException(cid.getName());
@@ -534,10 +524,6 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 		{
 			if(!(ext_entries.isEmpty()))
 			{
-//				if(cid.getName().indexOf("Sokrates")!=-1)
-//				{
-//					System.err.println(cid.getName()+" extentries: "+ext_entries);
-//				}
 				entries	= (Runnable[])ext_entries.toArray(new Runnable[ext_entries.size()]);
 				ext_entries.clear();
 				
@@ -605,10 +591,6 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 			{
 //				System.out.println("Executing: "+component);
 				again	= component.executeStep();
-//				if(cid.getName().indexOf("Sokrates")!=-1)
-//				{
-//					System.err.println("again: "+again);
-//				}
 			}
 			catch(Exception e)
 			{

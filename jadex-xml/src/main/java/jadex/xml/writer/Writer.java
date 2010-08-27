@@ -32,7 +32,10 @@ public class Writer
 	
 	/** The linefeed separator. */
 	public static final String lf = (String)System.getProperty("line.separator");
-		
+
+	/** The default encoding. */
+	public static String DEFAULT_ENCODING = "utf-8";
+	
 	//-------- attributes --------
 	
 	/** The object creator. */
@@ -86,9 +89,18 @@ public class Writer
  	 */
 	public void write(Object object, OutputStream out, ClassLoader classloader, final Object context) throws Exception
 	{
-//		String encoding = "ISO-8859-1";
-		String encoding = "utf-8";
+		write(object, DEFAULT_ENCODING, out, classloader, context);
+	}
 		
+	/**
+	 *  Write the properties to an xml.
+	 *  @param input The input stream.
+	 *  @param classloader The classloader.
+	 * 	@param context The context.
+ 	 */
+	public void write(Object object, String encoding, OutputStream out, ClassLoader classloader, final Object context) throws Exception
+	{
+//		
 		XMLOutputFactory factory = XMLOutputFactory.newInstance();
 //		factory.setProperty("javax.xml.stream.isRepairingNamespaces", Boolean.TRUE);
 		XMLStreamWriter	writer	= factory.createXMLStreamWriter(out, encoding);

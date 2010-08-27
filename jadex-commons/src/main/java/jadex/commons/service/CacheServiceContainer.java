@@ -60,9 +60,12 @@ public class CacheServiceContainer	implements IServiceContainer
 	{
 		final Future ret = new Future();
 		
-		final Tuple key = manager.getCacheKey()!=null && decider.getCacheKey()!=null && selector.getCacheKey()!=null
-			? new Tuple(manager.getCacheKey(), decider.getCacheKey(), selector.getCacheKey()) : null;
-		
+//		final Tuple key = manager.getCacheKey()!=null && decider.getCacheKey()!=null && selector.getCacheKey()!=null
+//			? new Tuple(manager.getCacheKey(), decider.getCacheKey(), selector.getCacheKey()) : null;
+
+		final Tuple key = decider.getCacheKey()!=null && selector.getCacheKey()!=null
+			? new Tuple(decider.getCacheKey(), selector.getCacheKey()) : null;
+			
 		Object data = null;
 		// Todo: cast hack??? While no clock service found (during init) search without cache.
 		final long now = clock!=null && ((BasicService)clock).isValid()? clock.getTime(): -1;
@@ -73,8 +76,6 @@ public class CacheServiceContainer	implements IServiceContainer
 			{
 				// todo: currently services of unfinished containers can be searched
 				// should be strict and a container should exposed only when running.
-	//			if(clock==null)
-	//				System.out.println("no clock: "+getId());
 				
 				// In case the clock if not available caching will not be used
 				// till it is available.
@@ -82,12 +83,22 @@ public class CacheServiceContainer	implements IServiceContainer
 				{	
 					data = cache.get(key, now);
 					
+//					if(data!=null && data.getClass().getName().indexOf("ComponentManagement")!=-1)
+//					{
+//						System.out.println("hit: "+data+" "+getId());
+//					}
+					
 					if(data instanceof BasicService)
 					{
 						if(!((BasicService)data).isValid())
 						{
 							cache.remove(key);
 							data = null;
+						}
+						else
+						{
+							if(!results.contains(data))
+								results.add(data);
 						}
 					}
 					else if(data instanceof Collection)
@@ -105,6 +116,14 @@ public class CacheServiceContainer	implements IServiceContainer
 									cache.remove(key);
 									data = null;
 								}
+							}
+						}
+						if(data!=null)
+						{
+							for(Iterator it=coll.iterator(); it.hasNext(); )
+							{
+								Object	next	= it.next();
+								results.add(next);
 							}
 						}
 					}
@@ -127,13 +146,16 @@ public class CacheServiceContainer	implements IServiceContainer
 			{
 				public void resultAvailable(Object source, Object result)
 				{	
-					if(key!=null)
+					if(key!=null && result!=null)
 					{
 						synchronized(cache)
 						{
+//							System.out.println("putting: "+key+" "+result);
 							cache.put(key, result, now);							
 						}
 					}
+//					if(result==null)
+//						System.out.println("found null: "+key);
 					ret.setResult(result);
 				}
 				
