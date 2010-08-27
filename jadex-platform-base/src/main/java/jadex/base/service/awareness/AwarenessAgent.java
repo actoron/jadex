@@ -44,9 +44,6 @@ public class AwarenessAgent extends MicroAgent
 	protected int port;
 	
 	
-	/** Receiving thread. */
-	protected Thread receiver;
-	
 	/** Flag indicating if proxies should be automatically created. */
 	protected boolean autocreate;
 	
@@ -67,6 +64,9 @@ public class AwarenessAgent extends MicroAgent
 	/** The current send id. */
 	protected String sendid;
 	
+	
+	/** The socket to send. */
+	protected MulticastSocket receivesocket;
 	
 	/** Flag indicating agent killed. */
 	protected boolean killed;
@@ -157,9 +157,23 @@ public class AwarenessAgent extends MicroAgent
 			killed = true;
 	
 			if(sendsocket!=null)
+			{
 				sendsocket.close();
-			if(receiver!=null)
-				receiver.interrupt();
+			}
+			if(receivesocket!=null)
+			{
+				try
+				{
+					receivesocket.leaveGroup(address);
+				}
+				catch(Exception e)
+				{
+				}
+				finally
+				{
+					receivesocket.close();
+				}
+			}
 		}
 	}
 	
@@ -519,7 +533,7 @@ public class AwarenessAgent extends MicroAgent
 						
 						public void exceptionOccurred(Object source, Exception exception)
 						{
-							getLogger().warning("Proxy was killed: "+exception);
+//							getLogger().warning("Proxy was killed: "+exception);
 							DiscoveryInfo dif = getDiscoveryInfo(cid);
 							if(dif!=null)
 								dif.setProxy(false);
@@ -619,15 +633,9 @@ public class AwarenessAgent extends MicroAgent
 						{
 							public void run()
 							{
-								synchronized(AwarenessAgent.this)
-								{
-									receiver = Thread.currentThread();
-								}
-								
 								// todo: max ip datagram length (is there a better way to determine length?)
 								byte buf[] = new byte[65535];
 								
-								MulticastSocket s = null;
 								InetAddress myaddress = null;
 								
 								while(!killed)
@@ -639,21 +647,27 @@ public class AwarenessAgent extends MicroAgent
 										InetAddress curaddress = (InetAddress)ai[0];
 										int curport = ((Integer)ai[1]).intValue();
 										
-										if(s!=null && (s.getPort()!=curport || !SUtil.equals(curaddress, myaddress)))
+										synchronized(AwarenessAgent.this)
 										{
-											s.leaveGroup(myaddress);
-											s.close();
-											s = null;
-										}
-										if(s==null)
-										{
-											s = new MulticastSocket(curport);
-											s.joinGroup(curaddress);
-											myaddress = curaddress;
+											if(!killed)
+											{
+												if(receivesocket!=null && (receivesocket.getPort()!=curport || !SUtil.equals(curaddress, myaddress)))
+												{
+													receivesocket.leaveGroup(myaddress);
+													receivesocket.close();
+													receivesocket = null;
+												}
+												if(receivesocket==null)
+												{
+													receivesocket = new MulticastSocket(curport);
+													receivesocket.joinGroup(curaddress);
+													myaddress = curaddress;
+												}
+											}
 										}
 										
 										DatagramPacket pack = new DatagramPacket(buf, buf.length);
-										s.receive(pack);
+										receivesocket.receive(pack);
 										
 										byte[] target = new byte[pack.getLength()];
 										System.arraycopy(buf, 0, target, 0, pack.getLength());
@@ -664,6 +678,7 @@ public class AwarenessAgent extends MicroAgent
 										final IComponentIdentifier sender = info.getSender();
 										boolean createproxy;
 										DiscoveryInfo dif;
+										
 										synchronized(AwarenessAgent.this)
 										{
 											dif = (DiscoveryInfo)discovered.get(sender);
@@ -688,26 +703,24 @@ public class AwarenessAgent extends MicroAgent
 									}
 									catch(Exception e)
 									{
-										getLogger().warning("Receiving awareness info error: "+e);
-									}
-								}
-								
-								if(s!=null)
-								{
-									try
-									{
-										s.leaveGroup(address);
-										s.close();
-									}
-									catch(Exception e)
-									{
-										getLogger().warning("Receiving socket closing error: "+e);
+//										getLogger().warning("Receiving awareness info error: "+e);
 									}
 								}
 								
 								synchronized(AwarenessAgent.this)
 								{
-									receiver = null;
+									if(receivesocket!=null)
+									{
+										try
+										{
+											receivesocket.leaveGroup(address);
+											receivesocket.close();
+										}
+										catch(Exception e)
+										{
+//											getLogger().warning("Receiving socket closing error: "+e);
+										}
+									}
 								}
 								System.out.println("comp and receiver terminated: "+getComponentIdentifier());
 							}
