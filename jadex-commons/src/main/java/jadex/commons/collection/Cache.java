@@ -87,7 +87,7 @@ public class Cache
 		{
 			if(ce.isExpired(now))
 			{
-				System.out.println("expired: "+ce.getData()+" "+now+" "+ce.getCacheDate()+" "+ce.getTimeToLive());
+//				System.out.println("expired: "+ce.getData()+" "+now+" "+ce.getCacheDate()+" "+ce.getTimeToLive());
 				lru.remove(key);
 			}
 			else
