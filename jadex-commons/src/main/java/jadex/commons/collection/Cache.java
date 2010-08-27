@@ -64,7 +64,7 @@ public class Cache
 	 *  Put an entry in the cache.
 	 *  @param key The key.
 	 *  @param value The value.
-	 *  @param now The current time.
+	 *  @param now The current time (-1 for never expire).
 	 */
 	public void put(Object key, Object value, long now, long ttl)
 	{
@@ -75,7 +75,7 @@ public class Cache
 	/**
 	 *  Get data from the cache.
 	 *  @param key The key.
-	 *  @param now The current time.
+	 *  @param now The current time (-1 for never expire).
 	 *  @return The cached object.
 	 */
 	public Object get(Object key, long now)
@@ -117,6 +117,22 @@ public class Cache
 	public boolean containsKey(Object key)
 	{
 		return lru.containsKey(key);
+	}
+	
+	/**
+	 *  Test if an entry can expire.
+	 *  @param key The key.
+	 *  @return True, if entry can expire.
+	 */
+	public boolean canExpire(Object key)
+	{
+		boolean ret = true;
+		CacheEntry ce = (CacheEntry)lru.get(key);
+		if(ce!=null)
+		{
+			ret = ce.getCacheDate()!=-1;
+		}
+		return ret;
 	}
 	
 	/**

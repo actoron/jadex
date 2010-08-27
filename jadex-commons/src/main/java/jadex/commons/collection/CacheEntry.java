@@ -59,11 +59,11 @@ public class CacheEntry
 
 	/**
 	 *  Test if a cache entry is expired.
-	 *  @param now The current time.
+	 *  @param now The current time (-1 for never expire).
 	 *  @return True, if it is expired.
 	 */
 	public boolean isExpired(long now)
 	{
-		return cachedate + ttl < now;
+		return now!=-1 && cachedate!=-1 && cachedate + ttl < now;
 	}
 }

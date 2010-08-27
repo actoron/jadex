@@ -79,9 +79,17 @@ public class CacheServiceContainer	implements IServiceContainer
 				
 				// In case the clock if not available caching will not be used
 				// till it is available.
-				if(now!=-1 && key!=null && cache.containsKey(key))
+				if(key!=null && cache.containsKey(key))
 				{	
 					data = cache.get(key, now);
+					if(data!=null)
+					{
+						// Replace non-expireable entry
+						if(!cache.canExpire(key))
+						{
+							cache.put(key, data, now);
+						}
+					}
 					
 					if(selector instanceof TypeResultSelector && ((TypeResultSelector)selector).getType().getName().indexOf("Clock")!=-1)
 					{	
