@@ -1,5 +1,6 @@
 package jadex.micro.benchmarks;
 
+import jadex.bridge.Argument;
 import jadex.bridge.ComponentResultListener;
 import jadex.bridge.CreationInfo;
 import jadex.bridge.IArgument;
@@ -21,11 +22,6 @@ import java.util.Map;
  */
 public class AgentCreationAgent extends MicroAgent
 {
-	//-------- attributes --------
-	
-	/** The step indicating what should the agent do. */
-//	protected int step;
-	
 	//-------- methods --------
 	
 	/**
@@ -45,7 +41,6 @@ public class AgentCreationAgent extends MicroAgent
 				public void resultAvailable(Object source, Object result)
 				{
 					args.put("num", new Integer(1));
-//					args.put("max", new Integer(100000));
 					Long startmem = new Long(Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory());
 					Long starttime = new Long(((IClockService)result).getTime());
 					args.put("startmem", startmem);
@@ -68,19 +63,21 @@ public class AgentCreationAgent extends MicroAgent
 	{
 		final int num = ((Integer)args.get("num")).intValue();
 		final int max = ((Integer)args.get("max")).intValue();
+		final boolean nested = ((Boolean)args.get("nested")).booleanValue();
 		
 		System.out.println("Created peer: "+num);
 		
 		if(num<max)
 		{
 			args.put("num", new Integer(num+1));
-//				System.out.println("Args: "+num+" "+args);
+//			System.out.println("Args: "+num+" "+args);
 
 			SServiceProvider.getServiceUpwards(getServiceProvider(), IComponentManagementService.class).addResultListener(new ComponentResultListener(new DefaultResultListener()
 			{
 				public void resultAvailable(Object source, Object result)
 				{
-					((IComponentManagementService)result).createComponent(createPeerName(num+1), AgentCreationAgent.this.getClass().getName()+".class", new CreationInfo(args), null);		
+					((IComponentManagementService)result).createComponent(createPeerName(num+1), AgentCreationAgent.this.getClass().getName()+".class",
+						new CreationInfo(args, nested ? getComponentIdentifier() : null), null);		
 				}
 			}, getAgentAdapter()));
 		}
@@ -194,7 +191,6 @@ public class AgentCreationAgent extends MicroAgent
 				System.out.println("Overall memory usage: "+omem+"kB. Per agent: "+upera+" kB.");
 				System.out.println("Still used memory: "+stillused+"kB.");
 		
-				// Todo: killAgent()
 				killAgent();
 			}
 		}));
@@ -238,6 +234,6 @@ public class AgentCreationAgent extends MicroAgent
 				}
 				return ret;
 			}
-		}}, null, null, null);
+		}, new Argument("nested", "If true, each agent is created as a subcomponent of the previous agent.", "boolean", Boolean.FALSE)}, null, null, null);
 	}
 }

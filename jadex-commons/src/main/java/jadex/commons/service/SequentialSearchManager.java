@@ -67,7 +67,8 @@ public class SequentialSearchManager implements ISearchManager
 //		System.out.println("search: "+selector+" "+provider.getId());
 		Future	ret	= new Future();
 		Map	todo	= new LinkedHashMap(); // Nodes of which children still to be processed (id->provider).
-		processNode(null, provider, decider, selector, services, ret, results, todo, up);
+		SearchContext	context	= new SearchContext(decider, selector, results, todo);
+		processNode(null, provider, context, ret, up, 0);
 		return ret;
 	}
 	
@@ -86,55 +87,44 @@ public class SequentialSearchManager implements ISearchManager
 	/**
 	 *  Process a single node (provider).
 	 */
-	protected void processNode(final IServiceProvider source, final IServiceProvider provider, final IVisitDecider decider, final IResultSelector selector, final Map services,
-		final Future ret, final Collection results, final Map todo, final boolean up)
+	protected void processNode(final IServiceProvider source, final IServiceProvider provider,
+		final SearchContext context, final Future ret, final boolean up, final int callstack)
 	{
+		// Hack!!! Break call stack when it becomes too large.
+		if(callstack>1000)
+		{
+			new Thread(new Runnable()
+			{
+				public void run()
+				{
+					processNode(source, provider, context, ret, up, 0);
+				}
+			}).start();
+			return;
+		}
+		
 		boolean dochildren = false;
 		
 		// If node is to be searched, continue with this node.
-		if(!selector.isFinished(results) && provider!=null)
+		if(!context.selector.isFinished(context.results) && provider!=null)
 		{
 			if(down)
 			{
 				// Child nodes of this node still have to be searched.
-				todo.put(provider.getId(), new Object[]{provider, source});
+				context.todo.put(provider.getId(), new Object[]{provider, source});
 			}
 			
-			if(decider.searchNode(source, provider, results))
+			if(context.decider.searchNode(source, provider, context.results))
 			{
 				// Use fut.isDone() to reduce stack depth
-				IFuture fut = provider.getServices(LOCAL_SEARCH_MANAGER, decider, selector, results);
-				if(!fut.isDone())
+				IFuture future = provider.getServices(LOCAL_SEARCH_MANAGER, context.decider, context.selector, context.results);
+				if(!future.isDone())
 				{
-					fut.addResultListener(new IResultListener()
+					future.addResultListener(new IResultListener()
 					{
-						public void resultAvailable(Object source, Object result)
+						public void resultAvailable(Object src, Object result)
 						{
-							// When searching upwards, continue with parent.
-							if(!selector.isFinished(results) && up)
-							{
-								provider.getParent().addResultListener(new IResultListener()
-								{
-									public void resultAvailable(Object source, Object result)
-									{
-										// Cut search if parent was already visisted.
-										if(SUtil.equals(source, result))
-											result = null;
-										processNode(provider, (IServiceProvider)result, decider, selector, services, ret, results, todo, up);
-									}
-									
-									public void exceptionOccurred(Object source, Exception exception)
-									{
-										ret.setException(exception);
-									}
-								});
-							}
-		
-							// Else continue with child nodes from todo list (if any).
-							else
-							{
-								processChildNodes(null, decider, selector, services, ret, results, todo);
-							}
+							processParent(source, provider, context, ret, up, 0);
 						}
 						
 						public void exceptionOccurred(Object source, Exception exception)
@@ -145,58 +135,13 @@ public class SequentialSearchManager implements ISearchManager
 				}
 				else
 				{
-					try
-					{
-						// When searching upwards, continue with parent.
-						if(!selector.isFinished(results) && up)
-						{
-							provider.getParent().addResultListener(new IResultListener()
-							{
-								public void resultAvailable(Object source, Object result)
-								{
-									// Cut search if parent was already visisted.
-									if(SUtil.equals(source, result))
-										result = null;
-									processNode(provider, (IServiceProvider)result, decider, selector, services, ret, results, todo, up);
-								}
-								
-								public void exceptionOccurred(Object source, Exception exception)
-								{
-									ret.setException(exception);
-								}
-							});
-						}
-	
-						// Else continue with child nodes from todo list (if any).
-						else
-						{
-							processChildNodes(null, decider, selector, services, ret, results, todo);
-						}
-					}
-					catch(Exception exception)
-					{
-						ret.setException(exception);
-					}
+					processParent(source, provider, context, ret, up, callstack+1);
 				}
 			}
 			else if(up)
 			{
 				// Do not perform local search
-				provider.getParent().addResultListener(new IResultListener()
-				{
-					public void resultAvailable(Object source, Object result)
-					{
-						// Cut search if parent was already visisted.
-						if(SUtil.equals(source, result))
-							result = null;
-						processNode(provider, (IServiceProvider)result, decider, selector, services, ret, results, todo, up);
-					}
-					
-					public void exceptionOccurred(Object source, Exception exception)
-					{
-						ret.setException(exception);
-					}
-				});
+				processParent(source, provider, context, ret, up, callstack+1);
 			}
 			else
 			{
@@ -211,84 +156,33 @@ public class SequentialSearchManager implements ISearchManager
 		// Else continue with child nodes from todo list (if any).
 		if(dochildren)
 		{
-			processChildNodes(null, decider, selector, services, ret, results, todo);
+			processChildNodes(provider, context, ret, callstack+1);
 		}
 	}
 
 	/**
-	 *  Process child nodes from the todo list.
+	 *  Continue search with the parent of the current node (if any).
 	 */
-	protected void processChildNodes(final IServiceProvider source,
-			final IVisitDecider decider, final IResultSelector selector,
-			final Map services, final Future ret, final Collection results, final Map todo)
+	protected void processParent(final IServiceProvider source, final IServiceProvider provider,
+		final SearchContext context, final Future ret, final boolean up, final int callstack)
 	{
-		// Finished, when no more todo nodes.
-		if(selector.isFinished(results) || todo.isEmpty())
-		{
-			ret.setResult(selector.getResult(results));
-		}
-		
-		// Continue with current list of children (if any)
-		else if(todo.containsKey(CURRENT_CHILDREN))
-		{
-			List	ccs	= (List)todo.get(CURRENT_CHILDREN);
-			IServiceProvider	child	= (IServiceProvider)ccs.remove(0);
-			if(ccs.isEmpty())
-			{
-				todo.remove(CURRENT_CHILDREN);
-			}
-			
-			// Set 'up' to false, once traversing children has started.
-			processNode(source, child, decider, selector, services, ret, results, todo, false);
-		}
+		context.callstack++;
 
-		// Else pick entry from todo list and continue with its children.
-		else
+		// When searching upwards, continue with parent.
+		if(!context.selector.isFinished(context.results) && up)
 		{
-			Object	next	= todo.keySet().iterator().next();
-			final Object[] prov = (Object[])todo.remove(next);
-			final IServiceProvider	provider = (IServiceProvider)prov[0];
-			final IServiceProvider	src = (IServiceProvider)prov[1];
-			IFuture fut = provider.getChildren();
-			
 			// Use fut.isDone() to reduce stack depth
-			if(fut.isDone())
+			IFuture	future	= provider.getParent();
+			if(!future.isDone())
 			{
-				try
+				future.addResultListener(new IResultListener()
 				{
-					Object result = fut.get(null);
-					if(!selector.isFinished(results) && result!=null && !((Collection)result).isEmpty())
+					public void resultAvailable(Object src, Object result)
 					{
-						List	ccs	= new LinkedList((Collection)result);
-						ccs.remove(src);
-						if(!ccs.isEmpty())
-						{
-							todo.put(CURRENT_CHILDREN, ccs);
-						}
-					}
-					processChildNodes(provider, decider, selector, services, ret, results, todo);
-				}
-				catch(Exception exception)
-				{
-					ret.setException(exception);
-				}
-			}
-			else
-			{
-				fut.addResultListener(new IResultListener()
-				{
-					public void resultAvailable(Object source, Object result)
-					{
-						if(!selector.isFinished(results) && result!=null && !((Collection)result).isEmpty())
-						{
-							List	ccs	= new LinkedList((Collection)result);
-							ccs.remove(src);
-							if(!ccs.isEmpty())
-							{
-								todo.put(CURRENT_CHILDREN, ccs);
-							}
-						}
-						processChildNodes(provider, decider, selector, services, ret, results, todo);
+						// Cut search if parent was already visisted.
+						if(SUtil.equals(source, result))
+							result = null;
+						processNode(provider, (IServiceProvider)result, context, ret, up, 0);
 					}
 					
 					public void exceptionOccurred(Object source, Exception exception)
@@ -297,8 +191,125 @@ public class SequentialSearchManager implements ISearchManager
 					}
 				});
 			}
+			else
+			{
+				try
+				{
+					// Cut search if parent was already visisted.
+					Object	result	= future.get(null);
+					if(SUtil.equals(source, result))
+						result = null;
+					processNode(provider, (IServiceProvider)result, context, ret, up, callstack+1);
+					
+				}
+				catch(Exception exception)
+				{
+					ret.setException(exception);
+				}
+			}
 		}
+
+		// Else continue with child nodes from todo list (if any).
+		else
+		{
+			processChildNodes(provider, context, ret, callstack+1);
+		}
+		
+		context.callstack--;
 	}
+
+	/**
+	 *  Process child nodes from the todo list.
+	 */
+	protected void processChildNodes(final IServiceProvider provider,
+		final SearchContext context, final Future ret, final int callstack)
+	{
+		context.callstack++;
+		
+		// Finished, when no more todo nodes.
+		if(context.selector.isFinished(context.results) || context.todo.isEmpty())
+		{
+			ret.setResult(context.selector.getResult(context.results));
+		}
+		
+		// Continue with current list of children (if any)
+		else if(context.todo.containsKey(CURRENT_CHILDREN))
+		{
+			List	ccs	= (List)context.todo.get(CURRENT_CHILDREN);
+			IServiceProvider	child	= (IServiceProvider)ccs.remove(0);
+			if(ccs.isEmpty())
+			{
+				context.todo.remove(CURRENT_CHILDREN);
+			}
+			
+			// Set 'up' to false, once traversing children has started.
+			processNode(provider, child, context, ret, false, callstack+1);
+		}
+
+		// Else pick entry from todo list and continue with its children.
+		else
+		{
+			Object	next	= context.todo.keySet().iterator().next();
+			final Object[] prov = (Object[])context.todo.remove(next);
+			final IServiceProvider	provi = (IServiceProvider)prov[0];
+			final IServiceProvider	src = (IServiceProvider)prov[1];
+			IFuture future = provi.getChildren();
+			
+			// Use fut.isDone() to reduce stack depth
+			if(!future.isDone())
+			{
+				future.addResultListener(new IResultListener()
+				{
+					public void resultAvailable(Object source, Object result)
+					{
+						addChildren(src, provi, context, ret, (Collection)result, 0);
+					}
+					
+					public void exceptionOccurred(Object source, Exception exception)
+					{
+						ret.setException(exception);
+					}
+				});
+			}
+			else
+			{
+				try
+				{
+					Object result = future.get(null);
+					addChildren(src, provi, context, ret, (Collection)result, callstack+1);
+				}
+				catch(Exception exception)
+				{
+					ret.setException(exception);
+				}
+			}
+		}
+		
+		context.callstack--;
+	}
+	
+	/**
+	 *  Add children to the current search.
+	 */
+	protected void addChildren(IServiceProvider source, IServiceProvider provider,
+		SearchContext context, Future ret, Collection children, int callstack)
+	{
+		context.callstack++;
+		
+		if(!context.selector.isFinished(context.results) && children!=null && !children.isEmpty())
+		{
+			List	ccs	= new LinkedList(children);
+			ccs.remove(source);
+			if(!ccs.isEmpty())
+			{
+				context.todo.put(CURRENT_CHILDREN, ccs);
+			}
+		}
+		processChildNodes(provider, context, ret, callstack+1);
+		
+		context.callstack--;
+	}
+
 
 	/**
 	 *  Get the up flag.
@@ -336,4 +347,26 @@ public class SequentialSearchManager implements ISearchManager
 		this.down = down;
 	}
 	
+	//-------- helper classes --------
+	
+	/**
+	 *  Struct for data that remains constant during search.
+	 *  Used to reduce stack memory usage.
+	 */
+	public static class SearchContext
+	{
+		public IVisitDecider	decider;
+		public IResultSelector	selector;
+		public Collection	results;
+		public Map	todo;
+		public int	callstack;
+		
+		public SearchContext(IVisitDecider decider, IResultSelector selector, Collection results, Map todo)
+		{
+			this.decider	= decider;
+			this.selector	= selector;
+			this.results	= results;
+			this.todo	= todo;
+		}
+	}
 }

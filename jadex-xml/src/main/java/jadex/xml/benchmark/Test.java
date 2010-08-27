@@ -1,10 +1,8 @@
 package jadex.xml.benchmark;
 
-import jadex.commons.SUtil;
 import jadex.xml.bean.JavaReader;
 import jadex.xml.bean.JavaWriter;
 
-import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.URL;
 import java.util.ArrayList;
@@ -51,23 +49,23 @@ public class Test //extends TestCase
 //			while(true)
 			{
 				t.testSpecialCharacter();
-//				t.testBean();
-//				t.testEmptyArray();
-//				t.testArrayOrder();
-//				t.testMultiArray();
-//				t.testVectorModel();
-//				t.testClass();
-//				t.testDate();
-//				t.testColor();
-//				t.testArray();
-//				t.testList();
-//				t.testSet();
-//				t.testMap();
-//				t.testInnerClass();
-//				t.testURL();
-//				t.testLoggingLevel();
-//				t.testInetAddress();
-//				t.testBeanWithPublicFields();
+				t.testBean();
+				t.testEmptyArray();
+				t.testArrayOrder();
+				t.testMultiArray();
+				t.testVectorModel();
+				t.testClass();
+				t.testDate();
+				t.testColor();
+				t.testArray();
+				t.testList();
+				t.testSet();
+				t.testMap();
+				t.testInnerClass();
+				t.testURL();
+				t.testLoggingLevel();
+				t.testInetAddress();
+				t.testBeanWithPublicFields();
 			}
 			long dur = System.currentTimeMillis()-start;
 			
