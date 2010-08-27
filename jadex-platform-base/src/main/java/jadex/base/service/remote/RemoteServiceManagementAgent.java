@@ -63,6 +63,7 @@ public class RemoteServiceManagementAgent extends MicroAgent
 						}
 						catch(Exception e)
 						{
+							content	= null;
 //							getLogger().warning("Remote service management service could not decode message."+content);
 						}
 					}
@@ -93,7 +94,7 @@ public class RemoteServiceManagementAgent extends MicroAgent
 					}
 					else if(content!=null)
 					{
-						System.out.println("Unexpected message: "+msg);
+						getLogger().warning("RMS unexpected message content: "+content);
 					}
 				}
 			}));

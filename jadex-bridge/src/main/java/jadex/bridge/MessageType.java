@@ -113,6 +113,15 @@ public abstract class MessageType	implements Serializable //, Cloneable // todo
 	}
 	
 	/**
+	 *  Get a parameter specification by name (including parameter sets).
+	 *  @return The parameter specification.
+	 */
+	public ParameterSpecification getParameterSet(String name)
+	{
+		return (ParameterSpecification)parammap.get(name);
+	}
+	
+	/**
 	 *  Get the conversation identifiers.
 	 *  @return The conversation identifiers.
 	 */

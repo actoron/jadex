@@ -1009,8 +1009,13 @@ public class MessageEventRules
 			Object	msgvalue = getValue(msg, paramsetnames[i], scope);
 			if(msgvalue!=null)
 			{
-				BeliefRules.createParameter(state, paramsetnames[i], SReflect.getIterator(msgvalue), 
-					mt.getParameter(paramsetnames[i]).getClazz(), ret, null, scope);
+				List	vals	= new ArrayList();
+				Iterator it = SReflect.getIterator(msgvalue);
+				while(it.hasNext())
+					vals.add(it.next());
+				
+				BeliefRules.createParameterSet(state, paramsetnames[i], vals, 
+					mt.getParameterSet(paramsetnames[i]).getClazz(), ret, null, scope);
 			}
 		}
 		
