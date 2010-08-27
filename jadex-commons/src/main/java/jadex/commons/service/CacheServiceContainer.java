@@ -91,10 +91,10 @@ public class CacheServiceContainer	implements IServiceContainer
 						}
 					}
 					
-					if(selector instanceof TypeResultSelector && ((TypeResultSelector)selector).getType().getName().indexOf("Clock")!=-1)
-					{	
-						System.out.println("hit: "+selector+" "+getId());
-					}
+//					if(selector instanceof TypeResultSelector && ((TypeResultSelector)selector).getType().getName().indexOf("Clock")!=-1)
+//					{	
+//						System.out.println("hit: "+selector+" "+getId());
+//					}
 					
 //					if(data!=null && data.getClass().getName().indexOf("ComponentManagement")!=-1)
 //					{
@@ -148,10 +148,10 @@ public class CacheServiceContainer	implements IServiceContainer
 				}
 				else
 				{
-					if(selector instanceof TypeResultSelector && ((TypeResultSelector)selector).getType().getName().indexOf("Clock")!=-1)
-					{
-						System.out.println("no hit: "+selector+" "+getId()+" "+now);
-					}
+//					if(selector instanceof TypeResultSelector && ((TypeResultSelector)selector).getType().getName().indexOf("Clock")!=-1)
+//					{
+//						System.out.println("no hit: "+selector+" "+getId()+" "+now);
+//					}
 				}
 			}
 		}
@@ -170,11 +170,13 @@ public class CacheServiceContainer	implements IServiceContainer
 					{
 						synchronized(cache)
 						{
-							if(selector instanceof TypeResultSelector && ((TypeResultSelector)selector).getType().getName().indexOf("Clock")!=-1)
-							{
-								System.out.println("putting: "+getId()+" "+result);
-							}
-							cache.put(key, result, now);							
+//							if(selector instanceof TypeResultSelector && ((TypeResultSelector)selector).getType().getName().indexOf("Clock")!=-1)
+//							{
+//								System.out.println("putting: "+getId()+" "+result);
+//							}
+							// Put result in cache, even if service may not (yet) be valid.
+							// May lead to cache hit and still service put in cache again.
+							cache.put(key, result, now);
 						}
 					}
 //					if(result==null)
@@ -228,7 +230,7 @@ public class CacheServiceContainer	implements IServiceContainer
 		final Future ret = new Future();
 		
 //		System.out.println("search clock: "+getId());
-		SServiceProvider.getServiceUpwards(container, IClockService.class).addResultListener(new IResultListener()
+		SServiceProvider.getServiceUpwards(this, IClockService.class).addResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{

@@ -295,6 +295,6 @@ public class AgentCreationAgent extends MicroAgent
 				}
 				return ret;
 			}
-		}, new Argument("nested", "If true, each agent is created as a subcomponent of the previous agent.", "boolean", Boolean.TRUE)}, null, null, null);
+		}, new Argument("nested", "If true, each agent is created as a subcomponent of the previous agent.", "boolean", Boolean.FALSE)}, null, null, null);
 	}
 }
