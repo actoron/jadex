@@ -152,12 +152,12 @@ public class AwarenessAgent extends MicroAgent
 	public void agentKilled()
 	{
 //		System.out.println("killed set to true: "+getComponentIdentifier());
-		killed = true;
-
-		if(sendsocket!=null)
-			sendsocket.close();
 		synchronized(AwarenessAgent.this)
 		{
+			killed = true;
+	
+			if(sendsocket!=null)
+				sendsocket.close();
 			if(receiver!=null)
 				receiver.interrupt();
 		}
@@ -709,7 +709,7 @@ public class AwarenessAgent extends MicroAgent
 								{
 									receiver = null;
 								}
-//										System.out.println("comp and receiver terminated: "+getComponentIdentifier());
+								System.out.println("comp and receiver terminated: "+getComponentIdentifier());
 							}
 						});
 					}
