@@ -1,8 +1,9 @@
+
 	<!--
-		<H3>A agent negotiation application</H3>
-		A negotiation application which can be started to launch agent negotiation scenario.
-		
-		Uses components AgentManagementAgent, ServiceAgent (MasterServiceAgentCreator).
+		<H3>A agent negotiation application</H3> A negotiation application
+		which can be started to launch agent negotiation scenario. Uses
+		components AgentManagementAgent, ServiceAgent
+		(MasterServiceAgentCreator).
 	-->
 <applicationtype xmlns="http://jadex.sourceforge.net/jadex-application"
 	xmlns:env="http://jadex.sourceforge.net/jadex-envspace" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -15,13 +16,12 @@
 	<imports>
 		<import>jadex.application.space.envsupport.environment.*</import>
 		<import>deco4mas.coordinate.environment.*</import>
-		
 		<import>deco4mas.examples.agentNegotiation.sa.*</import>
 		<import>deco4mas.examples.agentNegotiation.sma.*</import>
 		<import>deco4mas.examples.agentNegotiation.sa.masterServiceAgentCreator.*</import>
-		
 		<import>deco4mas.examples.agentNegotiation.common.dataObjects.*</import>
 		<import>deco4mas.examples.agentNegotiation.deco.media.*</import>
+		<import>jadex.simulation.environment.DeltaTimeExecutor4Simulation</import>
 	</imports>
 
 	<spacetypes>
@@ -40,7 +40,8 @@
 			</env:processtypes>
 
 			<!-- space executer-->
-			<env:spaceexecutor class="DeltaTimeExecutor">
+			<env:spaceexecutor class="DeltaTimeExecutor4Simulation">
+				<!-- <env:spaceexecutor class="DeltaTimeExecutor"> -->
 				<env:property name="space">$space</env:property>
 				<env:property name="tick">true</env:property>
 			</env:spaceexecutor>
@@ -60,6 +61,9 @@
 		<componenttype
 			filename="deco4mas/examples/agentNegotiation/sma/ServiceManagementAgent.agent.xml"
 			name="ServiceManagementAgent" />
+		<!-- ClientSimulator -->
+		<componenttype filename="jadex/simulation/client/ClientSimulator.agent.xml"
+			name="ClientSimulator" />
 	</componenttypes>
 
 	<applications>
@@ -89,7 +93,10 @@
 							<!-- new ServiceType("Endmontage",400.0,200.0) -->
 							}
 						</argument>
-						<!-- serviceAgentTypes (name, costCharaketer, durationCharakter, blackoutCharakter) -->
+						<!--
+							serviceAgentTypes (name, costCharaketer, durationCharakter,
+							blackoutCharakter)
+						-->
 						<argument name="serviceAgentTypes">
 							new ServiceAgentType[]
 							{
@@ -133,8 +140,10 @@
 				<!--ServiceManagementAgent-->
 				<component type="ServiceManagementAgent" number="1">
 					<arguments>
-						<!-- NAME of the used workflow 
-						(deco4mas.examples.agentNegotiation.sma.application.workflow.implementation.NAME -->
+						<!--
+							NAME of the used workflow
+							(deco4mas.examples.agentNegotiation.sma.application.workflow.implementation.NAME
+						-->
 						<argument name="workflowName">
 							new String("workflow")
 						</argument>
@@ -146,6 +155,12 @@
 						</argument>
 						<argument name="negotiationCosts">
 							new Double(800.0)
+						</argument>
+					</arguments>
+				</component>
+				<component type="ClientSimulator">
+					<arguments>
+						<argument name="simulationFacts">$args.Simulation_Facts_For_Client
 						</argument>
 					</arguments>
 				</component>

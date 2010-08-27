@@ -83,6 +83,9 @@ public class SimulationConfiguration  implements Serializable{
     protected String applicationReference;
     @XmlAttribute(required = true)
     protected String applicationConfiguration;
+    @XmlAttribute(required = true)
+    protected String nameOfSpace;
+
 
     /**
      * Gets the value of the imports property.
@@ -322,6 +325,30 @@ public class SimulationConfiguration  implements Serializable{
      */
     public void setApplicationConfiguration(String value) {
         this.applicationConfiguration = value;
+    }
+    
+    /**
+     * Gets the value of the nameOfSpace property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getNameOfSpace() {
+        return nameOfSpace;
+    }
+
+    /**
+     * Sets the value of the nameOfSpace property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setNameOfSpace(String value) {
+        this.nameOfSpace = value;
     }
 
 }

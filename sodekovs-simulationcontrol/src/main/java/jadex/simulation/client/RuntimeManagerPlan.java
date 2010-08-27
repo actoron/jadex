@@ -71,7 +71,7 @@ public class RuntimeManagerPlan extends Plan {
 		System.out.println("#Client# Started CLIENT Simulation run....: " + simConf.getName() + " - " + experimentID + ", currentVal: " + parameterSweepValue);
 
 		// Get Space
-		AbstractEnvironmentSpace space = (AbstractEnvironmentSpace) ((IApplicationExternalAccess) getScope().getParent()).getSpace("my2dspace");
+		AbstractEnvironmentSpace space = (AbstractEnvironmentSpace) ((IApplicationExternalAccess) getScope().getParent()).getSpace(simConf.getNameOfSpace());
 
 		// Init Arguments like StartTime
 		init(simConf);
@@ -277,11 +277,15 @@ public class RuntimeManagerPlan extends Plan {
 
 		// Hack: Synchronize start time!
 		System.out.println("-->StartTime at Client: " + startTime);
-		AbstractEnvironmentSpace space = ((AbstractEnvironmentSpace) ((IApplicationExternalAccess) getScope().getParent()).getSpace("my2dspace"));
+		AbstractEnvironmentSpace space = ((AbstractEnvironmentSpace) ((IApplicationExternalAccess) getScope().getParent()).getSpace(simConf.getNameOfSpace()));
 		space.setProperty("REAL_START_TIME_OF_SIMULATION", startTime);
-		// This is a hack for this special application.xml
-		space.getSpaceObjectsByType("homebase")[0].setProperty("start_time", startTime);
-
+		//*************************************************************
+		// This is a hack for this special application.xml -> MarsWorld
+		if (space.getSpaceObjectsByType("homebase").length > 0) {
+			space.getSpaceObjectsByType("homebase")[0].setProperty("start_time", startTime);
+		}
+		//*************************************************************
+		
 		// Hack: This should happen when application is initialized and before
 		// is starts --> when it is suspended
 		addDataConsumerAndProvider(simConf);
@@ -291,26 +295,26 @@ public class RuntimeManagerPlan extends Plan {
 		// IComponentManagementService executionService =
 		// (IComponentManagementService)
 		// getScope().getServiceContainer().getService(IComponentManagementService.class);
-		AbstractEnvironmentSpace space = ((ContinuousSpace2D) ((IApplicationExternalAccess) getScope().getParent()).getSpace("my2dspace"));
+		AbstractEnvironmentSpace space = ((AbstractEnvironmentSpace) ((IApplicationExternalAccess) getScope().getParent()).getSpace(simConf.getNameOfSpace()));
 
 		// IFuture fut = executionService.getExternalAccess(space.get);
 		// IApplicationExternalAccess exta = (IApplicationExternalAccess)
 		// fut.get(this);
 		// AbstractEnvironmentSpace space = (AbstractEnvironmentSpace)
-		// exta.getSpace("my2dspace");
+		// exta.getSpace(simConf.getNameOfSpace());
 
 		// Hack: Make sure space has been initialized...
 		// int counterTmp = 0;
 		// executionService.suspendComponent(comp);
 
-		// while (exta.getSpace("my2dspace") == null) {
+		// while (exta.getSpace(simConf.getNameOfSpace()) == null) {
 		// counterTmp++;
 		// waitFor(100);
 		// }
 		// executionService.resumeComponent(comp);
 
 		// AbstractEnvironmentSpace space = (AbstractEnvironmentSpace)
-		// exta.getSpace("my2dspace");
+		// exta.getSpace(simConf.getNameOfSpace());
 		IExpressionParser parser = new JavaCCExpressionParser();
 
 		// add new data provider
