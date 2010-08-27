@@ -6,7 +6,6 @@ import jadex.application.space.envsupport.environment.ISpaceObject;
 import jadex.application.space.envsupport.environment.space2d.Grid2D;
 import jadex.application.space.envsupport.environment.space2d.Space2D;
 import jadex.application.space.envsupport.math.IVector2;
-import jadex.bdi.examples.hunterprey.MoveAction;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.commons.ICommand;
 import jadex.commons.concurrent.IResultListener;
@@ -16,7 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- *  Simple agent participating in (bdi-based) hunter prey.
+ *  Simple agent participating in hunter prey.
  */
 public class MicroPreyAgent extends MicroAgent
 {

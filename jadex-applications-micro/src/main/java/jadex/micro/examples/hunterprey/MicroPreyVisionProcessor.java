@@ -40,7 +40,7 @@ public class MicroPreyVisionProcessor	extends	SimplePropertyObject	implements IP
 					public void exceptionOccurred(Object source, Exception exception)
 					{
 						// May happen when agent has been killed concurrently.
-						exception.printStackTrace();
+//						exception.printStackTrace();
 					}
 					public void resultAvailable(Object source, Object result)
 					{
