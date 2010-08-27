@@ -6,11 +6,13 @@ import jadex.bridge.CreationInfo;
 import jadex.bridge.IArgument;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
+import jadex.commons.ICommand;
 import jadex.commons.IFuture;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.clock.IClockService;
+import jadex.micro.IMicroExternalAccess;
 import jadex.micro.MicroAgent;
 import jadex.micro.MicroAgentMetaInfo;
 
@@ -72,14 +74,14 @@ public class AgentCreationAgent extends MicroAgent
 			args.put("num", new Integer(num+1));
 //			System.out.println("Args: "+num+" "+args);
 
-			SServiceProvider.getServiceUpwards(getServiceProvider(), IComponentManagementService.class).addResultListener(new ComponentResultListener(new DefaultResultListener()
+			SServiceProvider.getServiceUpwards(getServiceProvider(), IComponentManagementService.class).addResultListener(createResultListener(new DefaultResultListener()
 			{
 				public void resultAvailable(Object source, Object result)
 				{
-					((IComponentManagementService)result).createComponent(createPeerName(num+1), AgentCreationAgent.this.getClass().getName()+".class",
-						new CreationInfo(args, nested ? getComponentIdentifier() : null), null);		
+					((IComponentManagementService)result).createComponent(createPeerName(num+1, getComponentIdentifier()), AgentCreationAgent.this.getClass().getName()+".class",
+						new CreationInfo(args, nested ? getComponentIdentifier() : null), null);
 				}
-			}, getAgentAdapter()));
+			}));
 		}
 		else
 		{
@@ -94,14 +96,39 @@ public class AgentCreationAgent extends MicroAgent
 			{
 				public void resultAvailable(Object source, Object result)
 				{
-					long end = ((Long)result).longValue();
+					final long end = ((Long)result).longValue();
 					System.out.println("Last peer created. "+max+" agents started.");
-					double dur = ((double)end-starttime.longValue())/1000.0;
-					double pera = dur/max;
+					final double dur = ((double)end-starttime.longValue())/1000.0;
+					final double pera = dur/max;
 					System.out.println("Needed: "+dur+" secs. Per agent: "+pera+" sec. Corresponds to "+(1/pera)+" agents per sec.");
 				
 					// Delete prior agents.
-					deletePeers(max-1, end, dur, pera, omem, upera);
+					if(!nested)
+					{
+						deletePeers(max-1, end, dur, pera, omem, upera, max, getExternalAccess(), nested);
+					}
+					
+					// If nested, use initial component to kill others
+					else
+					{
+						SServiceProvider.getServiceUpwards(getServiceProvider(), IComponentManagementService.class).addResultListener(createResultListener(new DefaultResultListener()
+						{
+							public void resultAvailable(Object source, Object result)
+							{
+								IComponentManagementService	cms	= (IComponentManagementService)result;
+								String	initial	= createPeerName(1, getComponentIdentifier());
+								IComponentIdentifier	cid	= cms.createComponentIdentifier(initial, true);
+								cms.getExternalAccess(cid).addResultListener(createResultListener(new DefaultResultListener()
+								{
+									public void resultAvailable(Object source, Object result)
+									{
+										IMicroExternalAccess	exta	= (IMicroExternalAccess)result;
+										deletePeers(max, end, dur, pera, omem, upera, max, exta, nested);
+									}
+								}));
+							}
+						}));
+					}
 				}
 			}));
 		}
@@ -110,9 +137,9 @@ public class AgentCreationAgent extends MicroAgent
 	/**
 	 *  Create a name for a peer with a given number.
 	 */
-	protected String createPeerName(int num)
+	protected String createPeerName(int num, IComponentIdentifier cid)
 	{
-		String	name = getComponentIdentifier().getLocalName();
+		String	name = cid.getLocalName();
 		int	index	= name.indexOf("Peer_#");
 		if(index!=-1)
 		{
@@ -129,71 +156,105 @@ public class AgentCreationAgent extends MicroAgent
 	 *  Delete all peers from last-1 to first.
 	 *  @param cnt The highest number of the agent to kill.
 	 */
-	protected void deletePeers(final int cnt, final long killstarttime, final double dur, final double pera, final long omem, final double upera)
+	protected void deletePeers(final int cnt, final long killstarttime, final double dur, final double pera,
+		final long omem, final double upera, final int max, final IMicroExternalAccess exta, final boolean nested)
 	{
-		final String name = createPeerName(cnt);
+		final String name = createPeerName(cnt, exta.getComponentIdentifier());
 //		System.out.println("Destroying peer: "+name);
-		SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class)
-			.addResultListener(createResultListener(new DefaultResultListener()
+		SServiceProvider.getService(exta.getServiceProvider(), IComponentManagementService.class)
+			.addResultListener(new DefaultResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object source, final Object result)
 			{
-				IComponentManagementService cms = (IComponentManagementService)result;
-				IComponentIdentifier aid = cms.createComponentIdentifier(name, true, null);
-				IResultListener lis = createResultListener(new IResultListener()
+				exta.scheduleStep(new ICommand()
 				{
-					public void resultAvailable(Object source, Object result)
+					public void execute(Object args)
 					{
-						System.out.println("Successfully destroyed peer: "+name);
-						
-						if(cnt-1>0)
+						IComponentManagementService cms = (IComponentManagementService)result;
+						IComponentIdentifier aid = cms.createComponentIdentifier(name, true, null);
+						IResultListener lis = new IResultListener()
 						{
-							deletePeers(cnt-1, killstarttime, dur, pera, omem, upera);
-						}
-						else
-						{
-							killLastPeer(killstarttime, dur, pera, omem, upera);
-						}	
-					}
-					public void exceptionOccurred(Object source, Exception exception)
-					{
-						exception.printStackTrace();
+							public void resultAvailable(Object source, Object result)
+							{
+								exta.scheduleStep(new ICommand()
+								{
+									public void execute(Object args)
+									{
+										System.out.println("Successfully destroyed peer: "+name);
+										
+										if(cnt-1>(nested?1:0))
+										{
+											deletePeers(cnt-1, killstarttime, dur, pera, omem, upera, max, exta, nested);
+										}
+										else
+										{
+											killLastPeer(max, killstarttime, dur, pera, omem, upera, exta);
+										}
+									}
+								});
+							}
+							public void exceptionOccurred(Object source, Exception exception)
+							{
+								exception.printStackTrace();
+							}
+						};
+						IFuture ret = cms.destroyComponent(aid);
+						ret.addResultListener(lis);
 					}
 				});
-				IFuture ret = cms.destroyComponent(aid);
-				ret.addResultListener(lis);
 			}
-		}));
+		});
 	}
 	
 	/**
 	 *  Kill the last peer and print out the results.
 	 */
-	protected void killLastPeer(final long killstarttime, final double dur, final double pera, 
-		final long omem, final double upera)
+	protected void killLastPeer(final int max, final long killstarttime, final double dur, final double pera, 
+		final long omem, final double upera, final IMicroExternalAccess exta)
 	{
-		getTime().addResultListener(createResultListener(new DefaultResultListener()
+		SServiceProvider.getService(exta.getServiceProvider(), IClockService.class)
+			.addResultListener(new DefaultResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object source, final Object result)
 			{
-				int max = ((Integer)getArgument("max")).intValue();
-				long killend = ((Long)result).longValue();
-				System.out.println("Last peer destroyed. "+(max-1)+" agents killed.");
-				double killdur = ((double)killend-killstarttime)/1000.0;
-				double killpera = killdur/(max-1);
+				exta.scheduleStep(new ICommand()
+				{
+					public void execute(Object args)
+					{
+						IClockService cs = (IClockService)result;
+						long killend = cs.getTime();
+						System.out.println("Last peer destroyed. "+(max-1)+" agents killed.");
+						double killdur = ((double)killend-killstarttime)/1000.0;
+						double killpera = killdur/(max-1);
+						
+						Runtime.getRuntime().gc();
+						long stillused = (Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory())/1024;
+						
+						System.out.println("\nCumulated results:");
+						System.out.println("Creation needed: "+dur+" secs. Per agent: "+pera+" sec. Corresponds to "+(1/pera)+" agents per sec.");
+						System.out.println("Killing needed:  "+killdur+" secs. Per agent: "+killpera+" sec. Corresponds to "+(1/killpera)+" agents per sec.");
+						System.out.println("Overall memory usage: "+omem+"kB. Per agent: "+upera+" kB.");
+						System.out.println("Still used memory: "+stillused+"kB.");
 				
-				Runtime.getRuntime().gc();
-				long stillused = (Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory())/1024;
-				
-				System.out.println("\nCumulated results:");
-				System.out.println("Creation needed: "+dur+" secs. Per agent: "+pera+" sec. Corresponds to "+(1/pera)+" agents per sec.");
-				System.out.println("Killing needed:  "+killdur+" secs. Per agent: "+killpera+" sec. Corresponds to "+(1/killpera)+" agents per sec.");
-				System.out.println("Overall memory usage: "+omem+"kB. Per agent: "+upera+" kB.");
-				System.out.println("Still used memory: "+stillused+"kB.");
-		
-				killAgent();
+						SServiceProvider.getService(exta.getServiceProvider(), IComponentManagementService.class)
+							.addResultListener(new DefaultResultListener()
+						{
+							public void resultAvailable(Object source, final Object result)
+							{
+								exta.scheduleStep(new ICommand()
+								{
+									public void execute(Object args)
+									{
+										IComponentManagementService cms = (IComponentManagementService)result;
+										cms.destroyComponent(exta.getComponentIdentifier());
+									}
+								});
+							}
+						});
+					}
+				});
 			}
-		}));
+		});
 	}
 	
 	/**
