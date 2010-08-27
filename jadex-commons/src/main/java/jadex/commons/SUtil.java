@@ -19,6 +19,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.net.URLConnection;
 import java.net.URLDecoder;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
@@ -31,6 +32,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.UUID;
 import java.util.Vector;
 import java.util.jar.JarFile;
 
@@ -1517,8 +1519,32 @@ public class SUtil
 		synchronized(SUtil.class)
 		{
 			//return "id_"+name+"_"+System.currentTimeMillis()+"_"+Math.random()+"_"+(++convidcnt);
-			return "id_"+name+"_"+Math.random()+"_"+(++convidcnt);
+//			return "id_"+name+"_"+Math.random()+"_"+(++convidcnt);
+			return name+"_"+Math.random()+"_"+(++convidcnt);
 		}
+	}
+	
+	/**
+	 *  Create a globally unique conversation id.
+	 *  @return The conversation id.
+	 */
+	public static String createUniqueId(String name, int length)
+	{
+		UUID uuid = UUID.randomUUID();
+		String rand = uuid.toString();
+		return name+"_"+rand.substring(0, length);
+		
+//		String rand = ""+Math.random();
+//		rand = rand.substring(2, 2+Math.min(length-2, rand.length()-2));
+//		return name+"_"+rand+(++convidcnt%100);
+	}
+	
+	/**
+	 *  Main method for testing.
+	 */
+	public static void main(String[] args)
+	{
+		System.out.println("Here: "+createUniqueId("test", 3));
 	}
 	
 	public static String	convertPathToRelative(String absolute)

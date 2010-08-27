@@ -298,6 +298,11 @@ public class OptionDialog extends JDialog
 				pan.add(sett, "Center");
 
 				getContentPane().add("Center", pan);
+				
+				// Must be done here because 
+				pack();
+				setLocation(SGUI.calculateMiddlePosition(OptionDialog.this));
+				setVisible(true);
 			}
 		});
 	}

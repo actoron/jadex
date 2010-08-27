@@ -149,7 +149,7 @@ public class Starter
 			}
 			if(platformname==null)
 			{
-				platformname = SUtil.createUniqueId("platform");
+				platformname = SUtil.createUniqueId("platform", 3);
 			}
 			
 			IComponentIdentifier cid = new ComponentIdentifier(platformname);

@@ -160,9 +160,6 @@ public class ClockFrame extends JFrame
 			public void actionPerformed(ActionEvent e)
 			{
 				OptionDialog odia = new OptionDialog(ClockFrame.this, ClockFrame.this.agent);
-				odia.pack();
-				odia.setLocation(SGUI.calculateMiddlePosition(odia));
-				odia.setVisible(true);
 			}
 		};
 		ActionListener lexit = new ActionListener()
