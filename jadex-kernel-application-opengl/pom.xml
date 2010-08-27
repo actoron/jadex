@@ -2,18 +2,14 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>net.sourceforge.jadex</groupId>
-	<artifactId>jadex-kernel-application</artifactId>
+	<artifactId>jadex-kernel-application-opengl</artifactId>
 	<packaging>jar</packaging>
 	<version>2.0-rc4</version>
-	<name>jadex-kernel-application</name>
+	<name>jadex-kernel-application-opengl</name>
 	<url>http://jadex.sourceforge.net</url>
 
 	<description>
-		The Jadex application kernel provides application
-		support for active components, whereby an application
-		is itself considered as an active component. Applications
-		are composed of subcomponents as well as spaces in
-		various characteristics.
+		Open GL support for environment space perspectives.
 	</description>
 
 	<licenses>
@@ -136,10 +132,9 @@
 	
 	<repositories>
 		<repository>
-			<id>maven2-repository.dev.java.net</id>
-			<name>Java.net Repository for Maven</name>
-			<url>http://download.java.net/maven/2/</url>
-			<layout>default</layout>
+			<id>project</id>
+			<name>Maven Project Repository</name>
+			<url>file:///${basedir}/lib</url>
 		</repository>
 	</repositories>
 
@@ -153,13 +148,7 @@
 
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-bridge</artifactId>
-			<version>2.0-rc4</version>
-		</dependency>
-
-		<dependency>
-			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-xml</artifactId>
+			<artifactId>jadex-kernel-application</artifactId>
 			<version>2.0-rc4</version>
 		</dependency>
 
@@ -175,24 +164,16 @@
 			<version>1.0b05</version>
 		</dependency>-->
 		
-		<!-- 
 		<dependency>
 			<groupId>jogl</groupId>
 			<artifactId>jogl</artifactId>
 			<version>1</version>
-		</dependency> -->
+		</dependency>
 		
-		<!-- 
 		<dependency>
 			<groupId>gluegen-rt</groupId>
 			<artifactId>gluegen-rt</artifactId>
 			<version>1</version>
-		</dependency> -->
-
-		<dependency>
-			<groupId>jfree</groupId>
-			<artifactId>jfreechart</artifactId>
-			<version>1.0.9</version>
 		</dependency>
 	</dependencies>
 </project>

@@ -2,18 +2,15 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>net.sourceforge.jadex</groupId>
-	<artifactId>jadex-kernel-application</artifactId>
+	<artifactId>jadex-platform-standalone-launch</artifactId>
 	<packaging>jar</packaging>
+	<name>jadex-platform-standalone-launch</name>
 	<version>2.0-rc4</version>
-	<name>jadex-kernel-application</name>
 	<url>http://jadex.sourceforge.net</url>
 
 	<description>
-		The Jadex application kernel provides application
-		support for active components, whereby an application
-		is itself considered as an active component. Applications
-		are composed of subcomponents as well as spaces in
-		various characteristics.
+		The Jadex launch package facilitates
+		executing the Jadex standalone platform.
 	</description>
 
 	<licenses>
@@ -90,17 +87,23 @@
 					<exclude>**/*.java</exclude>
 					<exclude>**/.svn/*</exclude>
 				</excludes>
-			</resource>
+			</resource><!-- 
+			<resource>
+				<directory>src/test/java</directory>
+				<excludes>
+					<exclude>**/*.java</exclude>
+					<exclude>**/.svn/*</exclude>
+				</excludes> 
+			</resource>-->
 		</resources>
 
 		<plugins>
-			<!-- Java 1.6 javax.xml.stream.* -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
-					<source>1.6</source>
-					<target>1.6</target>
+					<source>1.4</source>
+					<target>1.4</target>
 				</configuration>
 			</plugin>
 
@@ -131,17 +134,48 @@
 					</execution>
 				</executions>
 			</plugin>
+
+			<!--
+				Make jar executable (cannot do this in standalone, because maven
+				claims cyclic reference)
+			-->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<configuration>
+					<archive>
+						<manifest>
+							<addClasspath>true</addClasspath>
+							<mainClass>jadex.base.Starter</mainClass>
+						</manifest>
+					</archive>
+				</configuration>
+			</plugin>
+
+			<!--
+				copy all dependencies (including transitive dependencies) to lib
+				directory, ease starting jadex without eclipse
+			-->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>copy</id>
+						<phase>package</phase>
+						<goals>
+							<goal>copy-dependencies</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${project.build.directory}/lib</outputDirectory>
+							<overWriteReleases>true</overWriteReleases>
+							<overWriteSnapshots>true</overWriteSnapshots>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
-	
-	<repositories>
-		<repository>
-			<id>maven2-repository.dev.java.net</id>
-			<name>Java.net Repository for Maven</name>
-			<url>http://download.java.net/maven/2/</url>
-			<layout>default</layout>
-		</repository>
-	</repositories>
 
 	<dependencies>
 		<dependency>
@@ -153,7 +187,54 @@
 
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-bridge</artifactId>
+			<artifactId>jadex-platform-standalone</artifactId>
+			<version>2.0-rc4</version>
+		</dependency>
+
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-runtimetools</artifactId>
+			<version>2.0-rc4</version>
+		</dependency>
+
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-kernel-micro</artifactId>
+			<version>2.0-rc4</version>
+		</dependency>
+
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-rules-tools</artifactId>
+			<version>2.0-rc4</version>
+		</dependency>
+
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-kernel-bpmn</artifactId>
+			<version>2.0-rc4</version>
+		</dependency>
+
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-kernel-bdibpmn</artifactId>
+			<version>2.0-rc4</version>
+		</dependency>
+
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-kernel-application</artifactId>
+			<version>2.0-rc4</version>
+		</dependency>
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-kernel-application-opengl</artifactId>
+			<version>2.0-rc4</version>
+		</dependency>
+
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-kernel-gpmn</artifactId>
 			<version>2.0-rc4</version>
 		</dependency>
 
@@ -163,36 +244,10 @@
 			<version>2.0-rc4</version>
 		</dependency>
 
-		<!-- <dependency>
-			<groupId>net.java.dev.jogl</groupId>
-			<artifactId>jogl</artifactId>
-			<version>1.1.1-rc6</version>
-		</dependency>
-		
-		<dependency>
-			<groupId>net.java.dev.gluegen</groupId>
-			<artifactId>gluegen-rt</artifactId>
-			<version>1.0b05</version>
-		</dependency>-->
-		
-		<!-- 
-		<dependency>
-			<groupId>jogl</groupId>
-			<artifactId>jogl</artifactId>
-			<version>1</version>
-		</dependency> -->
-		
-		<!-- 
-		<dependency>
-			<groupId>gluegen-rt</groupId>
-			<artifactId>gluegen-rt</artifactId>
-			<version>1</version>
-		</dependency> -->
-
-		<dependency>
-			<groupId>jfree</groupId>
-			<artifactId>jfreechart</artifactId>
-			<version>1.0.9</version>
-		</dependency>
+		<!--
+			<dependency> <groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-kernel-bdi-continuations</artifactId>
+			<version>2.0-rc4</version> </dependency>
+		-->
 	</dependencies>
 </project>

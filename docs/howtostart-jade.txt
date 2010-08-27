@@ -1,7 +1,7 @@
 Jadex V2 on Jade can be launched in the following ways:
 
 a) directly via java from the lib directory:
-java -jar jadex-jade-launch-2.0-beta2.jar
+java -jar jadex-platform-jade-launch-2.0-beta2.jar
 
 b) on Windows machines also via the batch file
 jadex-jade.bat

@@ -319,6 +319,7 @@
 				<module>jadex-nuggets</module>
 
 				<module>jadex-kernel-application</module>
+				<module>jadex-kernel-application-opengl</module>
 				<module>jadex-kernel-bdi</module>
 				<module>jadex-kernel-micro</module>
 				<module>jadex-kernel-bpmn</module>
@@ -338,7 +339,7 @@
 
 				<module>jadex-runtimetools</module>
 				<module>jadex-platform-standalone</module>
-				<module>jadex-standalone-launch</module>
+				<module>jadex-platform-standalone-launch</module>
 				<!-- <module>jadex-apleis</module> -->
 			</modules>
 		</profile>
@@ -385,7 +386,7 @@
 
 				<module>jadex-runtimetools</module>
 				<module>jadex-platform-standalone</module>
-				<module>jadex-standalone-launch</module>
+				<module>jadex-platform-standalone-launch</module>
 				<!-- <module>jadex-apleis</module> -->
 			</modules>
 		</profile>
@@ -429,7 +430,8 @@
 				<module>jadex-rules-applications</module>
 				<module>jadex-rules-tools</module>
 				<module>jadex-kernel-application</module>
-				<module>jadex-jade-launch</module>
+				<module>jadex-kernel-application-opengl</module>
+				<module>jadex-platform-jade-launch</module>
 				<module>jadex-platform-jade</module>
 			</modules>
 		</profile>
@@ -470,6 +472,7 @@
 				<module>jadex-rules</module>
 				<module>jadex-rules-tools</module>
 				<module>jadex-kernel-application</module>
+				<module>jadex-kernel-application-opengl</module>
 				<module>jadex-kernel-bpmn</module>
 				<module>jadex-kernel-bdibpmn</module>
 				<module>jadex-kernel-gpmn</module>
@@ -497,6 +500,7 @@
 				<module>jadex-nuggets</module>
 
 				<module>jadex-kernel-application</module>
+				<module>jadex-kernel-application-opengl</module>
 				<module>jadex-kernel-bdi</module>
 				<module>jadex-kernel-micro</module>
 				<module>jadex-kernel-bdibpmn</module>
@@ -518,14 +522,14 @@
 
 				<module>jadex-runtimetools</module>
 				<module>jadex-platform-standalone</module>
-				<module>jadex-standalone-launch</module>
+				<module>jadex-platform-standalone-launch</module>
 
 				<module>jadex-platform-wfms</module>
 				<module>jadex-wfms-launch</module>
 				<module>jadex-applications-wfms</module>
 
 				<module>jadex-platform-jade</module>
-				<module>jadex-jade-launch</module>
+				<module>jadex-platform-jade-launch</module>
 
 				<module>sodekovs-simulationcontrol</module>
 				<module>sodekovs-coordination</module>
