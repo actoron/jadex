@@ -83,6 +83,11 @@ public class CacheServiceContainer	implements IServiceContainer
 				{	
 					data = cache.get(key, now);
 					
+					if(selector instanceof TypeResultSelector && ((TypeResultSelector)selector).getType().getName().indexOf("Clock")!=-1)
+					{	
+						System.out.println("hit: "+selector+" "+getId());
+					}
+					
 //					if(data!=null && data.getClass().getName().indexOf("ComponentManagement")!=-1)
 //					{
 //						System.out.println("hit: "+data+" "+getId());
@@ -133,6 +138,13 @@ public class CacheServiceContainer	implements IServiceContainer
 						return ret;
 					}
 				}
+				else
+				{
+					if(selector instanceof TypeResultSelector && ((TypeResultSelector)selector).getType().getName().indexOf("Clock")!=-1)
+					{
+						System.out.println("no hit: "+selector+" "+getId()+" "+now);
+					}
+				}
 			}
 		}
 		
@@ -150,7 +162,10 @@ public class CacheServiceContainer	implements IServiceContainer
 					{
 						synchronized(cache)
 						{
-//							System.out.println("putting: "+key+" "+result);
+							if(selector instanceof TypeResultSelector && ((TypeResultSelector)selector).getType().getName().indexOf("Clock")!=-1)
+							{
+								System.out.println("putting: "+getId()+" "+result);
+							}
 							cache.put(key, result, now);							
 						}
 					}
