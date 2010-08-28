@@ -16,6 +16,8 @@ import jadex.commons.SUtil;
 import jadex.commons.concurrent.IResultListener;
 import jadex.javaparser.SJavaParser;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -149,7 +151,14 @@ public class Starter
 			}
 			if(platformname==null)
 			{
-				platformname = SUtil.createUniqueId("platform", 3);
+				try
+				{
+					platformname = SUtil.createUniqueId(InetAddress.getLocalHost().getHostName(), 3);
+				}
+				catch(UnknownHostException e)
+				{
+					platformname = SUtil.createUniqueId("platform", 3);
+				}
 			}
 			
 			IComponentIdentifier cid = new ComponentIdentifier(platformname);
