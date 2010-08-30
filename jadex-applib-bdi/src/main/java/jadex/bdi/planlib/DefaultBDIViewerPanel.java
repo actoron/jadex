@@ -15,11 +15,13 @@ import jadex.commons.concurrent.IResultListener;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.library.ILibraryService;
 
+import java.awt.BorderLayout;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JComponent;
 import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
 
 /**
  * 
@@ -66,11 +68,33 @@ public class DefaultBDIViewerPanel extends JPanel implements IComponentViewerPan
 						String[] subcapnames = (String[])result;
 						if(subcapnames!=null)
 						{
-							List subpanels = new ArrayList();
+							final List subpanels = new ArrayList();
 							final CollectionResultListener lis = new CollectionResultListener(
-								subpanels.size(), true, new DelegationResultListener(ret));
+								subcapnames.length, true, new DelegationResultListener(ret)
+							{
+								public void customResultAvailable(Object source, Object result) 
+								{
+									if(subpanels.size()==1)
+									{
+										Object[] tmp = (Object[])subpanels.get(0);
+										add(((IComponentViewerPanel)tmp[1]).getComponent(), BorderLayout.CENTER);
+									}
+									else if(subpanels.size()>1)
+									{
+										JTabbedPane tp = new JTabbedPane();
+										for(int i=0; i<subpanels.size(); i++)
+										{
+											Object[] tmp = (Object[])subpanels.get(i);
+											tp.addTab((String)tmp[0], ((IComponentViewerPanel)tmp[1]).getComponent());
+										}
+										add(tp, BorderLayout.CENTER);
+									}
+									super.customResultAvailable(source, result);
+								}	
+							});
 							for(int i=0; i<subcapnames.length; i++)
 							{
+								final String subcapaname = subcapnames[i];
 								DefaultBDIViewerPanel.this.component.getExternalAccess(subcapnames[i])
 									.addResultListener(new IResultListener()
 								{
@@ -86,6 +110,7 @@ public class DefaultBDIViewerPanel extends JPanel implements IComponentViewerPan
 												{
 													Class clazz	= SReflect.classForName(clname, ls.getClassLoader());
 													IComponentViewerPanel panel = (IComponentViewerPanel)clazz.newInstance();
+													subpanels.add(new Object[]{subcapaname, panel});
 													panel.init(jcc, subcap).addResultListener(lis);
 												}
 												catch(Exception e)

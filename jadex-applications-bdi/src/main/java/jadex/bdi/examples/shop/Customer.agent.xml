@@ -21,10 +21,6 @@
 	</beliefs>
 	
 	<properties>
-		<property name="componentviewer.viewerclass">"jadex.bdi.examples.shop.CustomerViewerPanel"</property>
-		<property name="componentviewer.externalaccessresolver">new jadex.bdi.runtime.BDIExternalAccessResolver("customercap")</property>
-		<!-- <propertyref name="componentviewer.viewerclass">
-			<concrete ref="customercap.componentviewer.viewerclass"></concrete>
-		</propertyref> -->
+		<property name="componentviewer.viewerclass">"jadex.bdi.planlib.DefaultBDIViewerPanel"</property>
 	</properties>
 </agent>
