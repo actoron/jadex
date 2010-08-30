@@ -121,7 +121,15 @@ public class StarterPanel extends JPanel
 	/** The component arguments. */
 	protected JPanel arguments;
 	protected List argelems;
-	protected String[]	argvals;	// loaded from jccproject.xml and kept until gui is refreshed asynchronously.
+	
+	/** loaded from jccproject.xml and kept until gui is refreshed asynchronously. */
+	protected String[]	loadargs;	
+	
+	/** loaded from jccproject.xml and kept until gui is refreshed asynchronously. */
+	protected String	loadconfig;	
+	
+	/** loaded from jccproject.xml and kept until gui is refreshed asynchronously. */
+	protected String	loadname;	
 	
 	/** The component results. */
 	protected JPanel results;
@@ -629,8 +637,16 @@ public class StarterPanel extends JPanel
 		{
 			((DefaultComboBoxModel)config.getModel()).addElement(confignames[i]);
 		}
-		if(confignames.length>0)
+		
+		if(loadconfig!=null)
+		{
+			config.getModel().setSelectedItem(loadconfig);
+			loadconfig	= null;
+		}
+		else if(confignames.length>0)
+		{
 			config.getModel().setSelectedItem(confignames[0]);
+		}
 		
 		if(model!=null && model.isStartable())
 		{
@@ -648,7 +664,8 @@ public class StarterPanel extends JPanel
 			componentnamel.setMinimumSize(confdummy.getMinimumSize());
 			componentnamel.setPreferredSize(confdummy.getPreferredSize());
 			
-			componentname.setText(model.getName());
+			componentname.setText(loadname!=null ? loadname	: model.getName());
+			loadname	= null;
 		}
 		else
 		{
@@ -746,10 +763,10 @@ public class StarterPanel extends JPanel
 //		System.out.println("setP: "+Thread.currentThread().getName());
 		
 		Property[]	aargs	= props.getProperties("argument");
-		this.argvals = new String[aargs.length];
+		this.loadargs = new String[aargs.length];
 		for(int i=0; i<aargs.length; i++)
 		{
-			argvals[i] = aargs[i].getValue();
+			loadargs[i] = aargs[i].getValue();
 		}
 
 		final String mo = props.getStringProperty("model");
@@ -757,8 +774,8 @@ public class StarterPanel extends JPanel
 		{
 			lastfile = mo;
 			reloadModel();
-			selectConfiguration(props.getStringProperty("config"));
-			setComponentName(props.getStringProperty("name"));
+			loadconfig	= props.getStringProperty("config");
+			loadname	= props.getStringProperty("name");
 		}
 		setStartSuspended(props.getBooleanProperty("startsuspended"));
 
@@ -770,7 +787,7 @@ public class StarterPanel extends JPanel
 	 */
 	public void reset()
 	{
-		argvals	= null;
+		loadargs	= null;
 		filename.setText("");
 		modeldesc.removeAll();
 		loadModel(null);
@@ -871,7 +888,7 @@ public class StarterPanel extends JPanel
 						argelems.add(args[i]);
 						createArgumentGui(args[i], i, ls);
 					}
-					argvals	= null;
+					loadargs	= null;
 					
 					if(args.length>0)
 						arguments.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), " Arguments "));
@@ -1025,7 +1042,7 @@ public class StarterPanel extends JPanel
 //		System.out.println("argument gui: "+arg+" "+model);
 		
 		JLabel namel = new JLabel(arg.getName());
-		final JValidatorTextField valt = new JValidatorTextField(argvals!=null && argvals.length>y ? argvals[y] : "", 15);
+		final JValidatorTextField valt = new JValidatorTextField(loadargs!=null && loadargs.length>y ? loadargs[y] : "", 15);
 		valt.setValidator(new ParserValidator(ls.getClassLoader()));
 		
 		String configname = (String)config.getSelectedItem();
