@@ -3,6 +3,8 @@ package jadex.tools.starter;
 import jadex.base.SComponentFactory;
 import jadex.base.gui.ComponentIdentifierDialog;
 import jadex.base.gui.componenttree.ComponentTreePanel;
+import jadex.base.gui.plugin.AbstractJCCPlugin;
+import jadex.base.gui.plugin.SJCC;
 import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
@@ -23,8 +25,6 @@ import jadex.tools.common.modeltree.FileNode;
 import jadex.tools.common.modeltree.IExplorerTreeNode;
 import jadex.tools.common.modeltree.ModelExplorer;
 import jadex.tools.common.modeltree.ModelExplorerTreeModel;
-import jadex.tools.common.plugin.AbstractJCCPlugin;
-import jadex.tools.common.plugin.SJCC;
 
 import java.awt.Component;
 import java.awt.Cursor;
@@ -100,7 +100,7 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 	/**
 	 *  Get the name.
 	 *  @return The name.
-	 *  @see jadex.tools.common.plugin.IControlCenterPlugin#getName()
+	 *  @see jadex.base.gui.plugin.IControlCenterPlugin#getName()
 	 */
 	public String getName()
 	{
@@ -382,7 +382,7 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 	
 	/**
 	 * @return the starter icon
-	 * @see jadex.tools.common.plugin.IControlCenterPlugin#getToolIcon()
+	 * @see jadex.base.gui.plugin.IControlCenterPlugin#getToolIcon()
 	 */
 	public Icon getToolIcon(boolean selected)
 	{
@@ -475,7 +475,7 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 	}
 
 	/**
-	 * @see jadex.tools.common.plugin.IControlCenterPlugin#reset()
+	 * @see jadex.base.gui.plugin.IControlCenterPlugin#reset()
 	 */
 	public void reset()
 	{
@@ -587,7 +587,7 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 
 	/** 
 	 * @return the help id of the perspective
-	 * @see jadex.tools.jcc.AbstractJCCPlugin#getHelpID()
+	 * @see jadex.base.gui.plugin.AbstractJCCPlugin#getHelpID()
 	 */
 	public String getHelpID()
 	{

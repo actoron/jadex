@@ -60,7 +60,7 @@ public interface ICapability	extends IElement
 	 * Get the property base.
 	 * @return The property base.
 	 */
-//	public IPropertybase getPropertybase();
+	public IPropertybase getPropertybase();
 
 	/**
 	 *  Register a subcapability.

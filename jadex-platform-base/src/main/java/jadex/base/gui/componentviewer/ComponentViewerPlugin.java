@@ -1,4 +1,4 @@
-package jadex.tools.componentviewer;
+package jadex.base.gui.componentviewer;
 
 import jadex.base.gui.componenttree.ComponentTreePanel;
 import jadex.base.gui.componenttree.IActiveComponentTreeNode;
@@ -6,6 +6,7 @@ import jadex.base.gui.componenttree.IComponentTreeNode;
 import jadex.base.gui.componenttree.INodeHandler;
 import jadex.base.gui.componenttree.INodeListener;
 import jadex.base.gui.componenttree.ServiceNode;
+import jadex.base.gui.plugin.AbstractJCCPlugin;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
@@ -18,8 +19,6 @@ import jadex.commons.gui.ObjectCardLayout;
 import jadex.commons.service.IService;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.library.ILibraryService;
-import jadex.tools.common.plugin.AbstractJCCPlugin;
-import jadex.tools.help.SHelp;
 
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -56,17 +55,14 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 	protected static final UIDefaults	icons	= new UIDefaults(new Object[]{
 		"componentviewer", SGUI.makeIcon(ComponentViewerPlugin.class, "/jadex/tools/common/images/configure.png"), 
 		"componentviewer_sel", SGUI.makeIcon(ComponentViewerPlugin.class, "/jadex/tools/common/images/configure.png"), 
-		"open_viewer", SGUI.makeIcon(SHelp.class, "/jadex/tools/common/images/new_introspector.png"),
-		"close_viewer", SGUI.makeIcon(SHelp.class, "/jadex/tools/common/images/close_introspector.png"),
-		"viewer_empty", SGUI.makeIcon(SHelp.class, "/jadex/tools/common/images/viewer_empty.png"),
-		"overlay_viewable", SGUI.makeIcon(SHelp.class, "/jadex/tools/common/images/overlay_edit.png"),
-		"overlay_viewed", SGUI.makeIcon(SHelp.class, "/jadex/tools/common/images/overlay_introspected.png"),
-		"overlay_notviewed", SGUI.makeIcon(SHelp.class, "/jadex/tools/common/images/overlay_notintrospected.png")
+		"open_viewer", SGUI.makeIcon(ComponentViewerPlugin.class, "/jadex/tools/common/images/new_introspector.png"),
+		"close_viewer", SGUI.makeIcon(ComponentViewerPlugin.class, "/jadex/tools/common/images/close_introspector.png"),
+		"viewer_empty", SGUI.makeIcon(ComponentViewerPlugin.class, "/jadex/tools/common/images/viewer_empty.png"),
+		"overlay_viewable", SGUI.makeIcon(ComponentViewerPlugin.class, "/jadex/tools/common/images/overlay_edit.png"),
+		"overlay_viewed", SGUI.makeIcon(ComponentViewerPlugin.class, "/jadex/tools/common/images/overlay_introspected.png"),
+		"overlay_notviewed", SGUI.makeIcon(ComponentViewerPlugin.class, "/jadex/tools/common/images/overlay_notintrospected.png")
 	});
 	
-	/** The property for the viewer panel class. */
-	public static final String	PROPERTY_VIEWERCLASS	= "componentviewer.viewerclass";
-
 	//-------- attributes --------
 
 	/** The split panel. */
@@ -278,7 +274,8 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 		split.add(detail);
 		//split.setResizeWeight(1.0);
 		
-		SHelp.setupHelp(split, getHelpID());
+		// todo:
+//		SHelp.setupHelp(split, getHelpID());
 
 		split.setDividerLocation(150);
 		
@@ -322,7 +319,7 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 					{
 						final ServiceNode node = (ServiceNode)tmp;
 						final IService service = node.getService();
-						final String classname = (String)service.getPropertyMap().get(PROPERTY_VIEWERCLASS);
+						final String classname = (String)service.getPropertyMap().get(IAbstractViewerPanel.PROPERTY_VIEWERCLASS);
 						
 						if(classname!=null)
 						{
@@ -344,7 +341,9 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 												Properties	sub	= props!=null ? props.getSubproperty(panel.getId()) : null;
 												panel.setProperties(sub);
 												JComponent comp = panel.getComponent();
-												SHelp.setupHelp(comp, getHelpID());
+												
+												// todo: help 
+												//SHelp.setupHelp(comp, getHelpID());
 												panels.put(service.getServiceIdentifier(), panel);
 												detail.add(comp, service.getServiceIdentifier());
 												comptree.getModel().fireNodeChanged(node);
@@ -377,7 +376,7 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 									public void customResultAvailable(Object source, Object result)
 									{
 										final IExternalAccess exta = (IExternalAccess)result;
-										final String classname = (String)exta.getModel().getProperties().get(PROPERTY_VIEWERCLASS);
+										final String classname = (String)exta.getModel().getProperties().get(IAbstractViewerPanel.PROPERTY_VIEWERCLASS);
 									
 //										System.out.println("classname for comp: "+classname);
 										
@@ -401,7 +400,8 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 																Properties	sub	= props!=null ? props.getSubproperty(panel.getId()) : null;
 																panel.setProperties(sub);
 																JComponent comp = panel.getComponent();
-																SHelp.setupHelp(comp, getHelpID());
+																// todo: help
+																//SHelp.setupHelp(comp, getHelpID());
 																panels.put(exta.getComponentIdentifier(), panel);
 																detail.add(comp, exta.getComponentIdentifier());
 																comptree.getModel().fireNodeChanged(node);
@@ -471,7 +471,7 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 		boolean ret = false;
 		if(node instanceof ServiceNode)
 		{
-			ret = ((ServiceNode)node).getService().getPropertyMap().get(PROPERTY_VIEWERCLASS)!=null;
+			ret = ((ServiceNode)node).getService().getPropertyMap().get(IAbstractViewerPanel.PROPERTY_VIEWERCLASS)!=null;
 		}
 		else if(node instanceof IActiveComponentTreeNode)
 		{
@@ -497,7 +497,7 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 							public void customResultAvailable(Object source, Object result)
 							{
 								final IExternalAccess exta = (IExternalAccess)result;
-								final String classname = (String)exta.getModel().getProperties().get(PROPERTY_VIEWERCLASS);
+								final String classname = (String)exta.getModel().getProperties().get(IAbstractViewerPanel.PROPERTY_VIEWERCLASS);
 								viewables.put(cid, classname==null? Boolean.FALSE: Boolean.TRUE);
 //								System.out.println("node: "+viewables.get(cid));
 								node.refresh(false);

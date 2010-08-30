@@ -5,7 +5,6 @@ import jadex.bridge.IExternalAccess;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.Properties;
-import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.tools.common.plugin.IControlCenter;
 import jadex.tools.componentviewer.IComponentViewerPanel;
 
@@ -30,28 +29,26 @@ public class CustomerViewerPanel implements IComponentViewerPanel
 	 */
 	public IFuture init(IControlCenter jcc, IExternalAccess component)
 	{
-		final Future ret = new Future();
-		
 		this.jcc = jcc;
 		
 		// Hack!!!
-		IBDIExternalAccess agent = (IBDIExternalAccess)component;
-		agent.getExternalAccess("customercap").addResultListener(new SwingDefaultResultListener((JComponent)null)
-		{
-			public void customResultAvailable(Object source, Object result)
-			{
-				CustomerViewerPanel.this.component = (IExternalAccess)result; 
-				ret.setResult(null);
-			}
-			
-			public void customExceptionOccurred(Object source, Exception exception)
-			{
-				ret.setException(exception);
-			}
-		});
-//		this.component = component;
+//		IBDIExternalAccess agent = (IBDIExternalAccess)component;
+//		agent.getExternalAccess("customercap").addResultListener(new SwingDefaultResultListener((JComponent)null)
+//		{
+//			public void customResultAvailable(Object source, Object result)
+//			{
+//				CustomerViewerPanel.this.component = (IExternalAccess)result; 
+//				ret.setResult(null);
+//			}
+//			
+//			public void customExceptionOccurred(Object source, Exception exception)
+//			{
+//				ret.setException(exception);
+//			}
+//		});
+		this.component = component;
 	
-		return ret;
+		return new Future(null);
 	}
 	
 	/**
@@ -76,7 +73,7 @@ public class CustomerViewerPanel implements IComponentViewerPanel
 	 */
 	public JComponent getComponent()
 	{
-		return new CustomerGui((IBDIExternalAccess)component);
+		return new CustomerPanel((IBDIExternalAccess)component);
 	}
 
 	/**

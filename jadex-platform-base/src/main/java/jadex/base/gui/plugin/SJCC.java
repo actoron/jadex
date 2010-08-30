@@ -1,4 +1,4 @@
-package jadex.tools.common.plugin;
+package jadex.base.gui.plugin;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;

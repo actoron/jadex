@@ -1,4 +1,4 @@
-package jadex.tools.componentviewer.dfservice;
+package jadex.base.gui.componentviewer.dfservice;
 
 import jadex.base.fipa.DFComponentDescription;
 import jadex.base.fipa.IDF;
@@ -13,7 +13,6 @@ import jadex.commons.Property;
 import jadex.commons.SGUI;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.commons.service.IService;
-import jadex.tools.help.SHelp;
 
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
@@ -196,7 +195,8 @@ public class DFBrowserPanel	extends JPanel implements IServiceViewerPanel
 
 		add(settings, BorderLayout.NORTH);
 
-		SHelp.setupHelp(this, "tools.dfbrowser");
+		// todo:
+//		SHelp.setupHelp(this, "tools.dfbrowser");
 		
 		refresh();
 		

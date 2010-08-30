@@ -3,12 +3,12 @@ package jadex.tools.jcc;
 import jadex.base.gui.AboutDialog;
 import jadex.base.gui.ConfigurationDialog;
 import jadex.base.gui.JadexLogoButton;
+import jadex.base.gui.plugin.IControlCenterPlugin;
 import jadex.commons.BrowserLauncher;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.library.ILibraryService;
-import jadex.tools.common.plugin.IControlCenterPlugin;
 import jadex.tools.help.SHelp;
 
 import java.awt.BorderLayout;

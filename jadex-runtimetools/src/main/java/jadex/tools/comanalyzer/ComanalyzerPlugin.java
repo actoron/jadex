@@ -4,6 +4,7 @@ import jadex.base.gui.componenttree.ComponentTreePanel;
 import jadex.base.gui.componenttree.IActiveComponentTreeNode;
 import jadex.base.gui.componenttree.IComponentTreeNode;
 import jadex.base.gui.componenttree.INodeHandler;
+import jadex.base.gui.plugin.AbstractJCCPlugin;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentListener;
@@ -27,7 +28,6 @@ import jadex.tools.comanalyzer.chart.ChartPanel;
 import jadex.tools.comanalyzer.diagram.DiagramPanel;
 import jadex.tools.comanalyzer.graph.GraphPanel;
 import jadex.tools.comanalyzer.table.TablePanel;
-import jadex.tools.common.plugin.AbstractJCCPlugin;
 import jadex.tools.help.SHelp;
 import jadex.xml.bean.JavaReader;
 import jadex.xml.bean.JavaWriter;
@@ -270,7 +270,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 
 	/**
 	 * @return "Comanalyzer"
-	 * @see jadex.tools.common.plugin.IControlCenterPlugin#getName()
+	 * @see jadex.base.gui.plugin.IControlCenterPlugin#getName()
 	 */
 	public String getName()
 	{
@@ -279,7 +279,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 
 	/**
 	 * @return The icon of comanalyzer.
-	 * @see jadex.tools.common.plugin.IControlCenterPlugin#getToolIcon()
+	 * @see jadex.base.gui.plugin.IControlCenterPlugin#getToolIcon()
 	 */
 	public Icon getToolIcon(boolean selected)
 	{
@@ -288,7 +288,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 
 	/**
 	 * @return The help id of the perspective.
-	 * @see jadex.tools.jcc.AbstractJCCPlugin#getHelpID()
+	 * @see jadex.base.gui.plugin.AbstractJCCPlugin#getHelpID()
 	 */
 	public String getHelpID()
 	{

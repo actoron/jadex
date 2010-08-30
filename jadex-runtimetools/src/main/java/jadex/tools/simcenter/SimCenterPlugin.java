@@ -1,7 +1,7 @@
 package jadex.tools.simcenter;
 
+import jadex.base.gui.plugin.AbstractJCCPlugin;
 import jadex.commons.SGUI;
-import jadex.tools.common.plugin.AbstractJCCPlugin;
 import jadex.tools.help.SHelp;
 
 import java.awt.Insets;
@@ -153,7 +153,7 @@ public class SimCenterPlugin extends AbstractJCCPlugin
 	}
 
 	/**
-	 * @see jadex.tools.common.plugin.IControlCenterPlugin#reset()
+	 * @see jadex.base.gui.plugin.IControlCenterPlugin#reset()
 	 */
 	public void reset()
 	{

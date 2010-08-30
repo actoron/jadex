@@ -1,9 +1,9 @@
 package jadex.tools.debugger;
 
+import jadex.base.gui.plugin.IControlCenter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.IBreakpointPanel;
-import jadex.tools.common.plugin.IControlCenter;
 
 import javax.swing.Icon;
 import javax.swing.JComponent;

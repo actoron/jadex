@@ -1,4 +1,4 @@
-package jadex.tools.componentviewer.libservice;
+package jadex.base.gui.componentviewer.libservice;
 
 import jadex.base.gui.componentviewer.IServiceViewerPanel;
 import jadex.base.gui.plugin.IControlCenter;

@@ -10,6 +10,7 @@ import jadex.bdi.runtime.IEAEventbase;
 import jadex.bdi.runtime.IEAExpressionbase;
 import jadex.bdi.runtime.IEAGoalbase;
 import jadex.bdi.runtime.IEAPlanbase;
+import jadex.bdi.runtime.IEAPropertybase;
 import jadex.bdi.runtime.impl.flyweights.ElementFlyweight;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
@@ -51,6 +52,9 @@ public abstract class EACapabilityFlyweight extends ElementFlyweight implements 
 	/** The expression base. */
 	protected IEAExpressionbase	expressionbase;
 	
+	/** The property base. */
+	protected IEAPropertybase propertybase;
+	
 	/** The logger. */
 	protected Logger	logger;
 	
@@ -79,6 +83,7 @@ public abstract class EACapabilityFlyweight extends ElementFlyweight implements 
 		this.planbase	= EAPlanbaseFlyweight.getPlanbaseFlyweight(getState(), getScope());
 		this.eventbase	= EAEventbaseFlyweight.getEventbaseFlyweight(getState(), getScope());
 		this.expressionbase	= EAExpressionbaseFlyweight.getExpressionbaseFlyweight(getState(), getScope());
+		this.propertybase = EAPropertybaseFlyweight.getPropertybaseFlyweight(getState(), getScope());
 		this.logger	= BDIInterpreter.getInterpreter(getState()).getLogger(getScope());
 		this.cid	= adapter.getComponentIdentifier();
 		this.provider = getInterpreter().getServiceProvider();
@@ -147,6 +152,15 @@ public abstract class EACapabilityFlyweight extends ElementFlyweight implements 
 	public IEAExpressionbase getExpressionbase()
 	{
 		return expressionbase;
+	}
+	
+	/**
+	 * Get the property base.
+	 * @return The property base.
+	 */
+	public IEAPropertybase getPropertybase()
+	{
+		return propertybase;
 	}
 
 	/**

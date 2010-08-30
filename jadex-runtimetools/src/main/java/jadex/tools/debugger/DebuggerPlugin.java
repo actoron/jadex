@@ -5,12 +5,12 @@ import jadex.base.gui.componenttree.IActiveComponentTreeNode;
 import jadex.base.gui.componenttree.IComponentTreeNode;
 import jadex.base.gui.componenttree.INodeHandler;
 import jadex.base.gui.componenttree.INodeListener;
+import jadex.base.gui.plugin.AbstractJCCPlugin;
 import jadex.bridge.IComponentDescription;
 import jadex.commons.Properties;
 import jadex.commons.SGUI;
 import jadex.commons.gui.CombiIcon;
 import jadex.commons.gui.ObjectCardLayout;
-import jadex.tools.common.plugin.AbstractJCCPlugin;
 import jadex.tools.help.SHelp;
 
 import java.awt.Dimension;
@@ -345,7 +345,7 @@ public class DebuggerPlugin extends AbstractJCCPlugin
 
 	/**
 	 * @return the help id of the perspective
-	 * @see jadex.tools.common.plugin.AbstractJCCPlugin#getHelpID()
+	 * @see jadex.base.gui.plugin.AbstractJCCPlugin#getHelpID()
 	 */
 	public String getHelpID()
 	{

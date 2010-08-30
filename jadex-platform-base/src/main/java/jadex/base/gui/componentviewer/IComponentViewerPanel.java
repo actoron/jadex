@@ -1,8 +1,8 @@
-package jadex.tools.componentviewer;
+package jadex.base.gui.componentviewer;
 
+import jadex.base.gui.plugin.IControlCenter;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.IFuture;
-import jadex.tools.common.plugin.IControlCenter;
 
 /**
  *  An inner panel of the viewer.

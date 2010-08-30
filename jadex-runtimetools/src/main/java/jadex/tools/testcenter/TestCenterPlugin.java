@@ -1,6 +1,7 @@
 package jadex.tools.testcenter;
 
 import jadex.base.SComponentFactory;
+import jadex.base.gui.plugin.AbstractJCCPlugin;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SGUI;
@@ -13,7 +14,6 @@ import jadex.tools.common.modeltree.FileNode;
 import jadex.tools.common.modeltree.IExplorerTreeNode;
 import jadex.tools.common.modeltree.ModelExplorer;
 import jadex.tools.common.modeltree.ModelExplorerTreeModel;
-import jadex.tools.common.plugin.AbstractJCCPlugin;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
@@ -311,7 +311,7 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 	}
 
 	/**
-	 * @see jadex.tools.common.plugin.IControlCenterPlugin#reset()
+	 * @see jadex.base.gui.plugin.IControlCenterPlugin#reset()
 	 */
 	public void reset()
 	{

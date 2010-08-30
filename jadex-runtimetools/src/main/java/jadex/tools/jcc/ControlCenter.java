@@ -1,5 +1,9 @@
 package jadex.tools.jcc;
 
+import jadex.base.gui.plugin.AbstractJCCPlugin;
+import jadex.base.gui.plugin.IControlCenter;
+import jadex.base.gui.plugin.IControlCenterPlugin;
+import jadex.base.gui.plugin.SJCC;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IVersionInfo;
 import jadex.commons.Properties;
@@ -10,10 +14,6 @@ import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.commons.service.IServiceProvider;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.library.ILibraryService;
-import jadex.tools.common.plugin.AbstractJCCPlugin;
-import jadex.tools.common.plugin.IControlCenter;
-import jadex.tools.common.plugin.IControlCenterPlugin;
-import jadex.tools.common.plugin.SJCC;
 import jadex.tools.help.SHelp;
 import jadex.xml.PropertiesXMLHelper;
 

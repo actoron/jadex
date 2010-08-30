@@ -1,6 +1,7 @@
 package jadex.tools.debugger;
 
 import jadex.base.SComponentFactory;
+import jadex.base.gui.plugin.IControlCenter;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentManagementService;
@@ -11,7 +12,6 @@ import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.library.ILibraryService;
-import jadex.tools.common.plugin.IControlCenter;
 import jadex.tools.debugger.common.ObjectInspectorDebuggerPanel;
 
 import java.awt.GridBagConstraints;

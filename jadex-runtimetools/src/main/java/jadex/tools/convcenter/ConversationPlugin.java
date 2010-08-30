@@ -5,6 +5,7 @@ import jadex.base.gui.componenttree.ComponentTreePanel;
 import jadex.base.gui.componenttree.IActiveComponentTreeNode;
 import jadex.base.gui.componenttree.IComponentTreeNode;
 import jadex.base.gui.componenttree.INodeHandler;
+import jadex.base.gui.plugin.AbstractJCCPlugin;
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IEAMessageEvent;
 import jadex.bdi.runtime.IMessageEventListener;
@@ -14,7 +15,6 @@ import jadex.commons.Properties;
 import jadex.commons.SGUI;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.commons.service.SServiceProvider;
-import jadex.tools.common.plugin.AbstractJCCPlugin;
 import jadex.tools.help.SHelp;
 import jadex.tools.jcc.AgentControlCenter;
 import jadex.tools.starter.StarterPlugin;
@@ -71,7 +71,7 @@ public class ConversationPlugin extends AbstractJCCPlugin
 
 	/**
 	 * @return "Conversation Center"
-	 * @see jadex.tools.common.plugin.IControlCenterPlugin#getName()
+	 * @see jadex.base.gui.plugin.IControlCenterPlugin#getName()
 	 */
 	public String getName()
 	{
@@ -80,7 +80,7 @@ public class ConversationPlugin extends AbstractJCCPlugin
 
 	/**
 	 * @return the conversation icon
-	 * @see jadex.tools.common.plugin.IControlCenterPlugin#getToolIcon()
+	 * @see jadex.base.gui.plugin.IControlCenterPlugin#getToolIcon()
 	 */
 	public Icon getToolIcon(boolean selected)
 	{
@@ -279,7 +279,7 @@ public class ConversationPlugin extends AbstractJCCPlugin
 
 	/** 
 	 * @return the help id of the perspective
-	 * @see jadex.tools.jcc.AbstractJCCPlugin#getHelpID()
+	 * @see jadex.base.gui.plugin.AbstractJCCPlugin#getHelpID()
 	 */
 	public String getHelpID()
 	{

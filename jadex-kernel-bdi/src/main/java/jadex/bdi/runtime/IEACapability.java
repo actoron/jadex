@@ -53,6 +53,12 @@ public interface IEACapability extends IEAElement
 	 * @return The expression base.
 	 */
 	public IEAExpressionbase getExpressionbase();
+	
+	/**
+	 * Get the expression base.
+	 * @return The expression base.
+	 */
+	public IEAPropertybase getPropertybase();
 
 	/**
 	 *  Get the logger.

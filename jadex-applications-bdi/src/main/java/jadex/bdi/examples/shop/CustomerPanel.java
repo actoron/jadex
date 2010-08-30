@@ -52,7 +52,7 @@ import javax.swing.table.AbstractTableModel;
 /**
  *  Customer gui that allows buying items at different shops.
  */
-public class CustomerGui extends JPanel
+public class CustomerPanel extends JPanel
 {
 	//-------- attributes --------
 	
@@ -72,7 +72,7 @@ public class CustomerGui extends JPanel
 	/**
 	 *  Create a new gui.
 	 */
-	public CustomerGui(final IBDIExternalAccess agent)
+	public CustomerPanel(final IBDIExternalAccess agent)
 	{
 //		super(agent.getComponentName());
 		this.agent = agent;
@@ -99,7 +99,7 @@ public class CustomerGui extends JPanel
 		    public void actionPerformed(ActionEvent e)
 		    {
 		    	SServiceProvider.getServices(agent.getServiceProvider(), IShop.class, !remote.isSelected())
-					.addResultListener(new SwingDefaultResultListener(CustomerGui.this)
+					.addResultListener(new SwingDefaultResultListener(CustomerPanel.this)
 				{
 					public void customResultAvailable(Object source, Object result)
 					{
@@ -131,7 +131,7 @@ public class CustomerGui extends JPanel
 
 		final JTextField money = new JTextField(5);
 		agent.getBeliefbase().getBeliefFact("money")
-			.addResultListener(new SwingDefaultResultListener(CustomerGui.this)
+			.addResultListener(new SwingDefaultResultListener(CustomerPanel.this)
 		{
 			public void customResultAvailable(Object source, Object result)
 			{
@@ -247,7 +247,7 @@ public class CustomerGui extends JPanel
 					final Double price = (Double)shopmodel.getValueAt(sel, 1);
 					final IShop shop = (IShop)shops.get(shopscombo.getSelectedItem());
 //					System.out.println("buying: "+name+" at: "+shop.getName());
-					agent.createGoal("buy").addResultListener(new SwingDefaultResultListener(CustomerGui.this)
+					agent.createGoal("buy").addResultListener(new SwingDefaultResultListener(CustomerPanel.this)
 					{
 						public void customResultAvailable(Object source, Object result)
 						{
@@ -255,7 +255,7 @@ public class CustomerGui extends JPanel
 							buy.setParameterValue("name", name);
 							buy.setParameterValue("shop", shop);
 							buy.setParameterValue("price", price);
-							agent.dispatchTopLevelGoalAndWait(buy).addResultListener(new SwingDefaultResultListener(CustomerGui.this)
+							agent.dispatchTopLevelGoalAndWait(buy).addResultListener(new SwingDefaultResultListener(CustomerPanel.this)
 							{
 								public void customResultAvailable(Object source, Object result)
 								{
@@ -303,7 +303,7 @@ public class CustomerGui extends JPanel
 	public static void createCustomerGui(final IBDIExternalAccess agent)
 	{
 		final JFrame f = new JFrame();
-		f.add(new CustomerGui(agent));
+		f.add(new CustomerPanel(agent));
 		f.pack();
 		f.setLocation(SGUI.calculateMiddlePosition(f));
 		f.setVisible(true);
@@ -335,7 +335,7 @@ public class CustomerGui extends JPanel
 	{
 		if(shop!=null)
 		{
-			shop.getCatalog().addResultListener(new SwingDefaultResultListener(CustomerGui.this)
+			shop.getCatalog().addResultListener(new SwingDefaultResultListener(CustomerPanel.this)
 			{
 				public void customResultAvailable(Object source, Object result)
 				{

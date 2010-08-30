@@ -1,5 +1,6 @@
 package jadex.tools.debugger.bdi;
 
+import jadex.base.gui.plugin.IControlCenter;
 import jadex.bdi.runtime.impl.flyweights.ElementFlyweight;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bridge.IComponentIdentifier;
@@ -7,7 +8,6 @@ import jadex.bridge.IExternalAccess;
 import jadex.commons.IBreakpointPanel;
 import jadex.commons.SGUI;
 import jadex.rules.tools.stateviewer.OAVPanel;
-import jadex.tools.common.plugin.IControlCenter;
 import jadex.tools.debugger.IDebuggerPanel;
 import jadex.tools.help.SHelp;
 

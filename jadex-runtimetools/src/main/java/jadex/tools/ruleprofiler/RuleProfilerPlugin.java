@@ -4,6 +4,7 @@ import jadex.base.gui.componenttree.ComponentTreePanel;
 import jadex.base.gui.componenttree.IActiveComponentTreeNode;
 import jadex.base.gui.componenttree.IComponentTreeNode;
 import jadex.base.gui.componenttree.INodeHandler;
+import jadex.base.gui.plugin.AbstractJCCPlugin;
 import jadex.bdi.BDIAgentFactory;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentListener;
@@ -13,7 +14,6 @@ import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.commons.gui.CombiIcon;
 import jadex.commons.gui.ObjectCardLayout;
 import jadex.commons.service.SServiceProvider;
-import jadex.tools.common.plugin.AbstractJCCPlugin;
 import jadex.tools.help.SHelp;
 
 import java.awt.Dimension;
@@ -84,7 +84,7 @@ public class RuleProfilerPlugin extends AbstractJCCPlugin	implements IComponentL
 	
 	/**
 	 *  @return The plugin name 
-	 *  @see jadex.tools.common.plugin.IControlCenterPlugin#getName()
+	 *  @see jadex.base.gui.plugin.IControlCenterPlugin#getName()
 	 */
 	public String getName()
 	{
@@ -93,7 +93,7 @@ public class RuleProfilerPlugin extends AbstractJCCPlugin	implements IComponentL
 
 	/**
 	 *  @return The icon of plugin
-	 *  @see jadex.tools.common.plugin.IControlCenterPlugin#getToolIcon()
+	 *  @see jadex.base.gui.plugin.IControlCenterPlugin#getToolIcon()
 	 */
 	public Icon getToolIcon(boolean selected)
 	{
@@ -373,7 +373,7 @@ public class RuleProfilerPlugin extends AbstractJCCPlugin	implements IComponentL
 
 	/**
 	 * @return the help id of the perspective
-	 * @see jadex.tools.common.plugin.AbstractJCCPlugin#getHelpID()
+	 * @see jadex.base.gui.plugin.AbstractJCCPlugin#getHelpID()
 	 */
 	public String getHelpID()
 	{

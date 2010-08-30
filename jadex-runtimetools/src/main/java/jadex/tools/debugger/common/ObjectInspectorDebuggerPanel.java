@@ -1,5 +1,6 @@
 package jadex.tools.debugger.common;
 
+import jadex.base.gui.plugin.IControlCenter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.IBreakpointPanel;
@@ -8,7 +9,6 @@ import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVJavaType;
 import jadex.rules.state.javaimpl.OAVStateFactory;
 import jadex.rules.tools.stateviewer.OAVPanel;
-import jadex.tools.common.plugin.IControlCenter;
 import jadex.tools.debugger.IDebuggerPanel;
 import jadex.tools.help.SHelp;
 

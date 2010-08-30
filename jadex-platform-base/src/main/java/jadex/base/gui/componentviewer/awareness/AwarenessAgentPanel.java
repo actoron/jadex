@@ -1,4 +1,4 @@
-package jadex.tools.componentviewer.awareness;
+package jadex.base.gui.componentviewer.awareness;
 
 import jadex.base.gui.componentviewer.IComponentViewerPanel;
 import jadex.base.gui.jtable.ComponentIdentifierRenderer;
@@ -268,7 +268,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 			{
 				tfipaddress.setText(address.getHostAddress());
 				tfport.setText(""+port);
-				spdelay.setValue(delay/1000);
+				spdelay.setValue(new Long(delay/1000));
 				cbautocreate.setSelected(autocreate);
 				cbautodelete.setSelected(autodelete);
 			}
@@ -519,7 +519,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 			{
 				delay = ((Number)result).longValue();
 	//			System.out.println("delay is: "+delay);
-				spdelay.setValue(delay/1000);
+				spdelay.setValue(new Long(delay/1000));
 			}
 		});
 	}

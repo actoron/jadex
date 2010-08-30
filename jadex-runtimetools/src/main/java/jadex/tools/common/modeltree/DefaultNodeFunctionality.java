@@ -1,9 +1,9 @@
 package jadex.tools.common.modeltree;
 
 import jadex.base.SComponentFactory;
+import jadex.base.gui.plugin.IControlCenter;
 import jadex.commons.SGUI;
 import jadex.commons.ThreadSuspendable;
-import jadex.tools.common.plugin.IControlCenter;
 
 import java.io.File;
 import java.util.ArrayList;

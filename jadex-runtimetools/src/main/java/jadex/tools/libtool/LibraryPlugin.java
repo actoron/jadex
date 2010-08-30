@@ -1,5 +1,6 @@
 package jadex.tools.libtool;
 
+import jadex.base.gui.plugin.AbstractJCCPlugin;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.Properties;
@@ -15,7 +16,6 @@ import jadex.commons.gui.EditableListEvent;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.library.ILibraryService;
 import jadex.commons.service.library.ILibraryServiceListener;
-import jadex.tools.common.plugin.AbstractJCCPlugin;
 import jadex.tools.starter.StarterPlugin;
 
 import java.awt.BorderLayout;
@@ -98,7 +98,7 @@ public class LibraryPlugin extends AbstractJCCPlugin
 	
 	/**
 	 * @return "Library Tool"
-	 * @see jadex.tools.common.plugin.IControlCenterPlugin#getName()
+	 * @see jadex.base.gui.plugin.IControlCenterPlugin#getName()
 	 */
 	public String getName()
 	{
@@ -107,7 +107,7 @@ public class LibraryPlugin extends AbstractJCCPlugin
 
 	/**
 	 * @return the conversation icon
-	 * @see jadex.tools.common.plugin.IControlCenterPlugin#getToolIcon()
+	 * @see jadex.base.gui.plugin.IControlCenterPlugin#getToolIcon()
 	 */
 	public Icon getToolIcon(boolean selected)
 	{
@@ -434,7 +434,7 @@ public class LibraryPlugin extends AbstractJCCPlugin
 
 	/** 
 	 * @return the help id of the perspective
-	 * @see jadex.tools.jcc.AbstractJCCPlugin#getHelpID()
+	 * @see jadex.base.gui.plugin.AbstractJCCPlugin#getHelpID()
 	 */
 	public String getHelpID()
 	{
