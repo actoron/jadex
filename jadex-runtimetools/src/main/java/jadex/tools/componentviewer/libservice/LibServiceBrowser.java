@@ -71,7 +71,7 @@ public class LibServiceBrowser	extends	JTabbedPane	implements IServiceViewerPane
 	 *  Create main panel.
 	 *  @return The main panel.
 	 */
-	public void	init(final IControlCenter jcc, IService service)
+	public IFuture init(final IControlCenter jcc, IService service)
 	{
 		this.libservice	= (ILibraryService)service;
 		
@@ -292,12 +292,14 @@ public class LibServiceBrowser	extends	JTabbedPane	implements IServiceViewerPane
 		}
 		
 		// Todo: remove listener, when tool is closed.
+		
+		return new Future(null);
 	}
 	
 	/**
 	 *  Informs the plugin that it should stop all its computation
 	 */
-	public void shutdown()
+	public IFuture shutdown()
 	{
 		try
 		{
@@ -306,6 +308,8 @@ public class LibServiceBrowser	extends	JTabbedPane	implements IServiceViewerPane
 		catch(Exception e)
 		{
 		}
+		
+		return new Future(null);
 	}
 
 	

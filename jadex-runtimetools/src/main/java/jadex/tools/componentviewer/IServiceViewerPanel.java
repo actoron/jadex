@@ -1,5 +1,6 @@
 package jadex.tools.componentviewer;
 
+import jadex.commons.IFuture;
 import jadex.commons.service.IService;
 import jadex.tools.common.plugin.IControlCenter;
 
@@ -14,5 +15,5 @@ public interface IServiceViewerPanel extends IAbstractViewerPanel
 	 *  @param jcc	The jcc.
 	 * 	@param service	The service.
 	 */
-	public void init(IControlCenter jcc, IService service);
+	public IFuture init(IControlCenter jcc, IService service);
 }

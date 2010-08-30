@@ -21,9 +21,9 @@
 	</beliefs>
 	
 	<properties>
-		<!-- <property name="componentviewer.viewerclass">"jadex.bdi.examples.shop.CustomerViewerPanel"</property> -->
-		<propertyref name="componentviewer.viewerclass">
+		<property name="componentviewer.viewerclass">"jadex.bdi.examples.shop.CustomerViewerPanel"</property>
+		<!-- <propertyref name="componentviewer.viewerclass">
 			<concrete ref="customercap.componentviewer.viewerclass"></concrete>
-		</propertyref>
+		</propertyref> -->
 	</properties>
 </agent>

@@ -336,15 +336,20 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 									{
 										storeCurrentPanelSettings();
 										Class clazz	= SReflect.classForName(classname, libservice.getClassLoader());
-										IServiceViewerPanel	panel = (IServiceViewerPanel)clazz.newInstance();
-										panel.init(getJCC(), service);
-										Properties	sub	= props!=null ? props.getSubproperty(panel.getId()) : null;
-										panel.setProperties(sub);
-										JComponent comp = panel.getComponent();
-										SHelp.setupHelp(comp, getHelpID());
-										panels.put(service.getServiceIdentifier(), panel);
-										detail.add(comp, service.getServiceIdentifier());
-										comptree.getModel().fireNodeChanged(node);
+										final IServiceViewerPanel	panel = (IServiceViewerPanel)clazz.newInstance();
+										panel.init(getJCC(), service).addResultListener(new SwingDefaultResultListener(comptree)
+										{
+											public void customResultAvailable(Object source, Object result)
+											{
+												Properties	sub	= props!=null ? props.getSubproperty(panel.getId()) : null;
+												panel.setProperties(sub);
+												JComponent comp = panel.getComponent();
+												SHelp.setupHelp(comp, getHelpID());
+												panels.put(service.getServiceIdentifier(), panel);
+												detail.add(comp, service.getServiceIdentifier());
+												comptree.getModel().fireNodeChanged(node);
+											}
+										});
 									}
 									catch(Exception e)
 									{
@@ -388,15 +393,20 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 													{
 														storeCurrentPanelSettings();
 														Class clazz	= SReflect.classForName(classname, libservice.getClassLoader());
-														IComponentViewerPanel panel = (IComponentViewerPanel)clazz.newInstance();
-														panel.init(getJCC(), exta);
-														Properties	sub	= props!=null ? props.getSubproperty(panel.getId()) : null;
-														panel.setProperties(sub);
-														JComponent comp = panel.getComponent();
-														SHelp.setupHelp(comp, getHelpID());
-														panels.put(exta.getComponentIdentifier(), panel);
-														detail.add(comp, exta.getComponentIdentifier());
-														comptree.getModel().fireNodeChanged(node);
+														final IComponentViewerPanel panel = (IComponentViewerPanel)clazz.newInstance();
+														panel.init(getJCC(), exta).addResultListener(new SwingDefaultResultListener(comptree)
+														{
+															public void customResultAvailable(Object source, Object result)
+															{
+																Properties	sub	= props!=null ? props.getSubproperty(panel.getId()) : null;
+																panel.setProperties(sub);
+																JComponent comp = panel.getComponent();
+																SHelp.setupHelp(comp, getHelpID());
+																panels.put(exta.getComponentIdentifier(), panel);
+																detail.add(comp, exta.getComponentIdentifier());
+																comptree.getModel().fireNodeChanged(node);
+															}
+														});
 													}
 													catch(Exception e)
 													{
@@ -426,12 +436,17 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 				if(isNodeViewable((IComponentTreeNode)paths[i].getLastPathComponent()))
 				{
 					storeCurrentPanelSettings();
-					IComponentTreeNode node = (IComponentTreeNode)paths[i].getLastPathComponent();
+					final IComponentTreeNode node = (IComponentTreeNode)paths[i].getLastPathComponent();
 					Object nodeid = node.getId();
 					detail.remove(cards.getComponent(nodeid));
 					IAbstractViewerPanel panel = (IAbstractViewerPanel)panels.remove(nodeid);
-					panel.shutdown();
-					comptree.getModel().fireNodeChanged(node);
+					panel.shutdown().addResultListener(new SwingDefaultResultListener(comptree)
+					{
+						public void customResultAvailable(Object source, Object result)
+						{
+							comptree.getModel().fireNodeChanged(node);
+						}
+					});
 				}
 			}
 		}

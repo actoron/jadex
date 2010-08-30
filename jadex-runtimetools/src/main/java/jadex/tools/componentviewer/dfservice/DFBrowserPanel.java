@@ -4,6 +4,8 @@ import jadex.base.fipa.DFComponentDescription;
 import jadex.base.fipa.IDF;
 import jadex.base.fipa.IDFComponentDescription;
 import jadex.base.fipa.IDFServiceDescription;
+import jadex.commons.Future;
+import jadex.commons.IFuture;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SGUI;
@@ -97,7 +99,7 @@ public class DFBrowserPanel	extends JPanel implements IServiceViewerPanel
 	 *  @param jcc	The jcc.
 	 * 	@param service	The service.
 	 */
-	public void init(IControlCenter jcc, IService service)
+	public IFuture init(IControlCenter jcc, IService service)
 	{
 		this.df	= (IDF)service;
 		service_panel = new ServiceDescriptionPanel();
@@ -197,15 +199,18 @@ public class DFBrowserPanel	extends JPanel implements IServiceViewerPanel
 		SHelp.setupHelp(this, "tools.dfbrowser");
 		
 		refresh();
+		
+		return new Future(null);
 	}
 	
 	/**
 	 *  Informs the plugin that it should stop all its computation
 	 */
-	public void shutdown()
+	public IFuture shutdown()
 	{
 		if(timer.isRunning())
 			timer.stop();
+		return new Future(null);
 	}
 
 	

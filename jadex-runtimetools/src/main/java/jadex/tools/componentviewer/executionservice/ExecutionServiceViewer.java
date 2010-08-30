@@ -1,5 +1,7 @@
 package jadex.tools.componentviewer.executionservice;
 
+import jadex.commons.Future;
+import jadex.commons.IFuture;
 import jadex.commons.Properties;
 import jadex.commons.service.IService;
 import jadex.commons.service.execution.IExecutionService;
@@ -26,16 +28,18 @@ public class ExecutionServiceViewer	implements IServiceViewerPanel
 	 *  @param jcc	The jcc.
 	 * 	@param service	The service.
 	 */
-	public void init(IControlCenter jcc, IService service)
+	public IFuture init(IControlCenter jcc, IService service)
 	{
-		this.exe	= (IExecutionService)service;
+		this.exe = (IExecutionService)service;
+		return new Future(null);
 	}
 	
 	/**
 	 *  Informs the panel that it should stop all its computation
 	 */
-	public void shutdown()
+	public IFuture shutdown()
 	{
+		return new Future(null);
 	}
 
 	/**

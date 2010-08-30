@@ -1,5 +1,6 @@
 package jadex.tools.componentviewer;
 
+import jadex.commons.IFuture;
 import jadex.commons.Properties;
 
 import javax.swing.JComponent;
@@ -12,7 +13,7 @@ public interface IAbstractViewerPanel
 	/**
 	 *  Informs the panel that it should stop all its computation
 	 */
-	public void shutdown();
+	public IFuture shutdown();
 
 	/**
 	 *  The id used for mapping properties.

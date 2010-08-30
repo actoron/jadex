@@ -1,6 +1,7 @@
 package jadex.tools.componentviewer;
 
 import jadex.bridge.IExternalAccess;
+import jadex.commons.IFuture;
 import jadex.tools.common.plugin.IControlCenter;
 
 /**
@@ -14,5 +15,5 @@ public interface IComponentViewerPanel extends IAbstractViewerPanel
 	 *  @param jcc	The jcc.
 	 * 	@param component The component.
 	 */
-	public void init(IControlCenter jcc, IExternalAccess component);
+	public IFuture init(IControlCenter jcc, IExternalAccess component);
 }

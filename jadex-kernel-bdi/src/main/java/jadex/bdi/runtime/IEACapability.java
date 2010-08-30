@@ -124,4 +124,17 @@ public interface IEACapability extends IEAElement
 	 *  @param listener The listener.
 	 */
 	public void removeAgentListener(IAgentListener listener);
+	
+	/**
+	 *  Get external access of subcapability.
+	 *  @param name The capability name.
+	 *  @return The future with external access.
+	 */
+	public IFuture getExternalAccess(String name);
+	
+	/**
+	 *  Get subcapability names.
+	 *  @return The future with array of subcapability names.
+	 */
+	public IFuture getSubcapabilityNames();
 }

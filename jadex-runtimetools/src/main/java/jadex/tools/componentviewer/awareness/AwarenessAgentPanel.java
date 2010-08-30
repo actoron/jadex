@@ -5,7 +5,9 @@ import jadex.base.service.awareness.AwarenessAgent;
 import jadex.base.service.awareness.DiscoveryInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
+import jadex.commons.Future;
 import jadex.commons.ICommand;
+import jadex.commons.IFuture;
 import jadex.commons.IResultCommand;
 import jadex.commons.Properties;
 import jadex.commons.concurrent.SwingDefaultResultListener;
@@ -89,19 +91,21 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 	 *  @param jcc	The jcc.
 	 * 	@param component The component.
 	 */
-	public void init(IControlCenter jcc, IExternalAccess component)
+	public IFuture init(IControlCenter jcc, IExternalAccess component)
 	{
 		this.jcc = jcc;
 		this.component = (IMicroExternalAccess)component;
+		return new Future(null);
 	}
 	
 	/**
 	 *  Informs the panel that it should stop all its computation
 	 */
-	public void shutdown()
+	public IFuture shutdown()
 	{
 		if(timer.isRunning())
 			timer.stop();
+		return new Future(null);
 	}
 
 	/**

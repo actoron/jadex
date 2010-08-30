@@ -53,8 +53,8 @@
 		</plan>
 	</plans>
 	
-	<properties>
+	<!-- <properties>
 		<property name="componentviewer.viewerclass" exported="true">"jadex.bdi.examples.shop.CustomerViewerPanel"</property>
-	</properties>
+	</properties>-->
 	
 </capability>
