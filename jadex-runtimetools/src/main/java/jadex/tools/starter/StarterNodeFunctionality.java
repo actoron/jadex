@@ -79,7 +79,7 @@ public class StarterNodeFunctionality extends DefaultNodeFunctionality
 			icon	= new CombiIcon(new Icon[]
 			{
 				icon,
-				icons.getIcon("check_overlay")
+				icons.getIcon("overlay_check")
 			});
 		}
 		return icon;

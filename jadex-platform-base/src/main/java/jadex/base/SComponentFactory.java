@@ -4,7 +4,7 @@ import jadex.bridge.ComponentFactorySelector;
 import jadex.bridge.IComponentFactory;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
-import jadex.commons.concurrent.DefaultResultListener;
+import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.service.IServiceProvider;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.library.ILibraryService;
@@ -25,15 +25,15 @@ public class SComponentFactory
 	{
 		final Future ret = new Future();
 		
-		SServiceProvider.getService(provider, ILibraryService.class).addResultListener(new DefaultResultListener()
+		SServiceProvider.getService(provider, ILibraryService.class).addResultListener(new DelegationResultListener(ret)
 		{
-			public void resultAvailable(Object source, Object result)
+			public void customResultAvailable(Object source, Object result)
 			{
 				final ILibraryService ls = (ILibraryService)result;
 				
-				SServiceProvider.getService(provider, new ComponentFactorySelector(model, null, ls.getClassLoader())).addResultListener(new DefaultResultListener()
+				SServiceProvider.getService(provider, new ComponentFactorySelector(model, null, ls.getClassLoader())).addResultListener(new DelegationResultListener(ret)
 				{
-					public void resultAvailable(Object source, Object result)
+					public void customResultAvailable(Object source, Object result)
 					{
 						IComponentFactory fac = (IComponentFactory)result;
 						ret.setResult(fac!=null ? fac.loadModel(model, null, ls.getClassLoader()) : null);
@@ -53,15 +53,15 @@ public class SComponentFactory
 	{
 		final Future ret = new Future();
 		
-		SServiceProvider.getService(provider, ILibraryService.class).addResultListener(new DefaultResultListener()
+		SServiceProvider.getService(provider, ILibraryService.class).addResultListener(new DelegationResultListener(ret)
 		{
-			public void resultAvailable(Object source, Object result)
+			public void customResultAvailable(Object source, Object result)
 			{
 				final ILibraryService ls = (ILibraryService)result;
 				
-				SServiceProvider.getService(provider, new ComponentFactorySelector(model, null, ls.getClassLoader())).addResultListener(new DefaultResultListener()
+				SServiceProvider.getService(provider, new ComponentFactorySelector(model, null, ls.getClassLoader())).addResultListener(new DelegationResultListener(ret)
 				{
-					public void resultAvailable(Object source, Object result)
+					public void customResultAvailable(Object source, Object result)
 					{
 						IComponentFactory fac = (IComponentFactory)result;
 						ret.setResult(fac!=null ? new Boolean(fac.isLoadable(model, null, ls.getClassLoader())) : Boolean.FALSE);
@@ -74,22 +74,6 @@ public class SComponentFactory
 	}
 
 	/**
-	 * Create an application. / public static void
-	 * createApplication(IServiceContainer container, String name, String model,
-	 * String config, Map args) { try { Collection facts =
-	 * container.getServices(IComponentFactory.class); if(facts!=null) {
-	 * for(Iterator it=facts.iterator(); it.hasNext(); ) { IComponentFactory fac
-	 * = (IComponentFactory)it.next(); if(fac.isLoadable(model)) {
-	 * ILoadableComponentModel lmodel = fac.loadModel(model);
-	 * fac.createComponentInstance(null, lmodel, config, args); //(name, model,
-	 * config, args); break; } } } //
-	 * getApplicationFactory().createApplication(name, model, config, args); }
-	 * catch(Exception e) {
-	 * System.err.println("Exception occurred while creating application: ");
-	 * e.printStackTrace(); } }
-	 */
-
-	/**
 	 * Test if a model is startable (e.g. a component).
 	 * @param model The model.
 	 * @return True, if startable (and should therefore also be loadable).
@@ -98,15 +82,15 @@ public class SComponentFactory
 	{
 		final Future ret = new Future();
 		
-		SServiceProvider.getService(provider, ILibraryService.class).addResultListener(new DefaultResultListener()
+		SServiceProvider.getService(provider, ILibraryService.class).addResultListener(new DelegationResultListener(ret)
 		{
-			public void resultAvailable(Object source, Object result)
+			public void customResultAvailable(Object source, Object result)
 			{
 				final ILibraryService ls = (ILibraryService)result;
 				
-				SServiceProvider.getService(provider, new ComponentFactorySelector(model, null, ls.getClassLoader())).addResultListener(new DefaultResultListener()
+				SServiceProvider.getService(provider, new ComponentFactorySelector(model, null, ls.getClassLoader())).addResultListener(new DelegationResultListener(ret)
 				{
-					public void resultAvailable(Object source, Object result)
+					public void customResultAvailable(Object source, Object result)
 					{
 						IComponentFactory fac = (IComponentFactory)result;
 						ret.setResult(fac!=null ? new Boolean(fac.isStartable(model, null, ls.getClassLoader())) : Boolean.FALSE);
@@ -119,44 +103,15 @@ public class SComponentFactory
 	}
 
 	/**
-	 * Get the names of ADF file types supported by this factory.
-	 * /
-	public static IFuture getFileTypes(IServiceContainer container)
-	{
-		final Future ret = new Future();
-		
-		SServiceProvider.getServices(container, IComponentFactory.class).addResultListener(new DefaultResultListener()
-		{
-			public void resultAvailable(Object source, Object result)
-			{
-				Collection facts = (Collection)result;
-				String[] res = new String[0];
-		
-				if(facts != null)
-				{
-					for(Iterator it = facts.iterator(); it.hasNext();)
-					{
-						IComponentFactory fac = (IComponentFactory)it.next();
-						res = (String[])SUtil.joinArrays(res, fac.getComponentTypes());
-					}
-				}
-				ret.setResult(res);
-			}
-		});
-
-		return ret;
-	}*/
-
-	/**
 	 * Get a default icon for a file type.
 	 */
 	public static IFuture getFileTypeIcon(IServiceProvider provider, final String type)
 	{
 		final Future ret = new Future();
 		
-		SServiceProvider.getService(provider, new ComponentFactorySelector(type)).addResultListener(new DefaultResultListener()
+		SServiceProvider.getService(provider, new ComponentFactorySelector(type)).addResultListener(new DelegationResultListener(ret)
 		{
-			public void resultAvailable(Object source, Object result)
+			public void customResultAvailable(Object source, Object result)
 			{
 				IComponentFactory fac = (IComponentFactory)result;
 				ret.setResult(fac!=null ? fac.getComponentTypeIcon(type) : null);
@@ -173,9 +128,9 @@ public class SComponentFactory
 	{
 		final Future ret = new Future();
 		
-		SServiceProvider.getService(provider, new ComponentFactorySelector(type)).addResultListener(new DefaultResultListener()
+		SServiceProvider.getService(provider, new ComponentFactorySelector(type)).addResultListener(new DelegationResultListener(ret)
 		{
-			public void resultAvailable(Object source, Object result)
+			public void customResultAvailable(Object source, Object result)
 			{
 				IComponentFactory fac = (IComponentFactory)result;
 				ret.setResult(fac!=null ? fac.getProperties(type) : null);
@@ -192,15 +147,15 @@ public class SComponentFactory
 	{
 		final Future ret = new Future();
 		
-		SServiceProvider.getService(provider, ILibraryService.class).addResultListener(new DefaultResultListener()
+		SServiceProvider.getService(provider, ILibraryService.class).addResultListener(new DelegationResultListener(ret)
 		{
-			public void resultAvailable(Object source, Object result)
+			public void customResultAvailable(Object source, Object result)
 			{
 				final ILibraryService ls = (ILibraryService)result;
 				
-				SServiceProvider.getService(provider, new ComponentFactorySelector(model, null, ls.getClassLoader())).addResultListener(new DefaultResultListener()
+				SServiceProvider.getService(provider, new ComponentFactorySelector(model, null, ls.getClassLoader())).addResultListener(new DelegationResultListener(ret)
 				{
-					public void resultAvailable(Object source, Object result)
+					public void customResultAvailable(Object source, Object result)
 					{
 						IComponentFactory fac = (IComponentFactory)result;
 						ret.setResult(fac!=null ? fac.getComponentType(model, null, ls.getClassLoader()) : null);

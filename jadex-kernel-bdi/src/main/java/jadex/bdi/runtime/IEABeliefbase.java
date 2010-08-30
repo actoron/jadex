@@ -54,12 +54,12 @@ public interface IEABeliefbase extends IEAElement
 	 */
 	public IFuture getBeliefSetNames();
 
-	/**
-	 *  Create a belief with given key and class.
-	 *  @param key The key identifying the belief.
-	 *  @param clazz The class.
-	 *  @deprecated
-	 */
+//	/**
+//	 *  Create a belief with given key and class.
+//	 *  @param key The key identifying the belief.
+//	 *  @param clazz The class.
+//	 *  @deprecated
+//	 */
 //	public void createBelief(String key, Class clazz, int update);
 
 	/**

@@ -158,7 +158,7 @@ public class ProxyAgent extends MicroAgent
 								
 								CollectionResultListener crl = new CollectionResultListener(tmp.length, false, new DelegationResultListener(ret)
 								{
-									public void resultAvailable(Object source, Object result)
+									public void customResultAvailable(Object source, Object result)
 									{
 										final Collection vcs = (Collection)result; 
 										SServiceProvider.getService(getServiceProvider(), IClockService.class)

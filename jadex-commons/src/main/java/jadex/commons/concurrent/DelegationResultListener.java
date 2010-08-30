@@ -29,11 +29,28 @@ public class DelegationResultListener implements IResultListener
 	 *  @param source The source component.
 	 *  @param result The result.
 	 */
-	public void resultAvailable(Object source, Object result)
+	public final void resultAvailable(Object source, Object result)
+	{
+		try
+		{
+			customResultAvailable(source, result);
+		}
+		catch(Exception e)
+		{
+			future.setException(e);
+		}
+	}
+	
+	/**
+	 *  Called when the result is available.
+	 *  @param source The source component.
+	 *  @param result The result.
+	 */
+	public void customResultAvailable(Object source, Object result)
 	{
 		future.setResult(result);
 	}
-	
+
 	/**
 	 *  Called when an exception occurred.
 	 *  @param source The source component.

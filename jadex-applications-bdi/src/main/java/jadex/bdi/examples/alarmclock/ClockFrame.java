@@ -159,7 +159,7 @@ public class ClockFrame extends JFrame
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				OptionDialog odia = new OptionDialog(ClockFrame.this, ClockFrame.this.agent);
+				new OptionDialog(ClockFrame.this, ClockFrame.this.agent);
 			}
 		};
 		ActionListener lexit = new ActionListener()

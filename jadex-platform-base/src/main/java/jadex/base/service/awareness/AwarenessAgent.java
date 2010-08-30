@@ -722,7 +722,7 @@ public class AwarenessAgent extends MicroAgent
 										}
 									}
 								}
-								System.out.println("comp and receiver terminated: "+getComponentIdentifier());
+//								System.out.println("comp and receiver terminated: "+getComponentIdentifier());
 							}
 						});
 					}
