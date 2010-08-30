@@ -148,7 +148,9 @@ public class DealerGameRoundPlayerPlan extends Plan
 		}
 		else
 		{
-			waitFor(1000*((Number)getBeliefbase().getBelief("stepdelay").getFact()).intValue());
+//			waitFor(1000*((Number)getBeliefbase().getBelief("stepdelay").getFact()).intValue());
+			int restart = 1000*((Number)getBeliefbase().getBelief("restartdelay").getFact()).intValue();
+			waitFor(restart);
 		}
 	}
 

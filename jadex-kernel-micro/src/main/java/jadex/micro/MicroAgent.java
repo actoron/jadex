@@ -216,6 +216,9 @@ public abstract class MicroAgent implements IMicroAgent
 		return ret;
 	}
 	
+	// for debugging.
+	protected long	longtime	= 0;
+	
 	/**
 	 *  Wait for an secified amount of time.
 	 *  @param time The time.
@@ -223,6 +226,7 @@ public abstract class MicroAgent implements IMicroAgent
 	 */
 	public IFuture waitFor(final long time, final ICommand run)
 	{
+		longtime	= Math.max(longtime, time);
 		final Future ret = new Future();
 		
 		SServiceProvider.getService(getServiceProvider(), IClockService.class)
@@ -252,7 +256,7 @@ public abstract class MicroAgent implements IMicroAgent
 					}
 				});
 				timers.add(ts[0]);
-				ret.setResult(ts[0]);
+				ret.setResult(new TimerWrapper(ts[0]));
 			}
 			
 			public void exceptionOccurred(Object source, Exception exception)
@@ -485,4 +489,66 @@ public abstract class MicroAgent implements IMicroAgent
 	{
 		interpreter.getAgentAdapter().invokeLater(run);
 	}*/
+	
+	//-------- helper classes --------
+	
+	/**
+	 *  Wrap a timer and remove it from the agent when it is cancelled.
+	 */
+	protected class TimerWrapper implements ITimer
+	{
+		//-------- attributes --------
+		
+		/** The wrapped timer. */
+		ITimer	timer;
+		
+		//-------- constructors--------
+		
+		/**
+		 *  Wrap a timer.
+		 */
+		public TimerWrapper(ITimer timer)
+		{
+			this.timer	= timer;
+		}
+		
+		//-------- ITimer interface --------
+		
+		public void cancel()
+		{
+			timers.remove(timer);
+			timer.cancel();
+		}
+
+		public long getNotificationTime()
+		{
+			return timer.getNotificationTime();
+		}
+
+		public ITimedObject getTimedObject()
+		{
+			return timer.getTimedObject();
+		}
+
+		public void setNotificationTime(long time)
+		{
+			timer.setNotificationTime(time);
+		}
+
+		public boolean equals(Object obj)
+		{
+			return timer.equals(obj);
+		}
+
+		public int hashCode()
+		{
+			return timer.hashCode();
+		}
+
+		public String toString()
+		{
+			return timer.toString();
+		}
+	}
+
 }

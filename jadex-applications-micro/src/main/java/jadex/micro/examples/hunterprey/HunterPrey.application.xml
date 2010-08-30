@@ -228,6 +228,30 @@
 			</spaces>	
  		</application>
 
+		<application name="Semi">
+			<spaces>
+				<env:envspace name="my2dspace" type="2dspace" width="50" height="50">
+					<env:objects>
+						<env:object type="obstacle" number="250"/>
+					</env:objects>
+	
+					<env:processes>
+						<env:process type="create">
+							<env:property name="tickrate">0.5</env:property>
+						</env:process>
+					</env:processes>
+	
+					<env:observers>
+						<env:observer name="HunterPrey World" dataview="view_all" perspective="icons" />
+					</env:observers>
+	 			</env:envspace>
+			</spaces>
+
+			<components>
+				<component type="MicroPrey" number="100"/>
+			</components>
+ 		</application>
+ 		
 		<application name="Multi">
 			<spaces>
 				<env:envspace name="my2dspace" type="2dspace" width="75" height="75">

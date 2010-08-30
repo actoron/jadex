@@ -22,11 +22,6 @@ public class DealerGameRoundMasterPlan extends Plan
 	 */
 	public void body()
 	{
-		int restart = 1000*((Number)getBeliefbase().getBelief("restartdelay").getFact()).intValue();
-//		System.out.println("Starting new game in: "+restart);
-		getLogger().info("Starting new game in: "+restart);
-		waitFor(restart);
-		
 //		long timeout = ((Long)getBeliefbase().getBelief("playerwaitmillis").getFact()).longValue();
 //		System.out.println("playerwaitmillis: "+timeout);
 		
@@ -122,6 +117,12 @@ public class DealerGameRoundMasterPlan extends Plan
 			.addGameRound(me, players);
 
 		me.setState(Dealer.STATE_IDLE);
+
+		// Restart delay now in player plans.
+//		int restart = 1000*((Number)getBeliefbase().getBelief("restartdelay").getFact()).intValue();
+////		System.out.println("Starting new game in: "+restart);
+//		getLogger().info("Starting new game in: "+restart);
+//		waitFor(restart);
 	}
 
 	/**

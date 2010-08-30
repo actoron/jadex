@@ -1107,11 +1107,11 @@ public class AgentRules
 				if(clazz!=null && SReflect.isSupertype(IFuture.class, clazz))
 				{
 //					System.out.println("Future property: "+name+" "+val);
-					if(val instanceof Future)
+					if(val instanceof IFuture)
 					{
 						// Use second future to start agent only when value has already been set.
 						final Future	ret	= new Future();
-						((Future)val).addResultListener(new ComponentResultListener(new IResultListener()
+						((IFuture)val).addResultListener(new ComponentResultListener(new IResultListener()
 						{
 							public void resultAvailable(Object source, Object result)
 							{

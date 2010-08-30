@@ -223,6 +223,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		final long timeout = to<=0? DEFAULT_TIMEOUT: to;
 		
 		waitingcalls.put(callid, future);
+//		System.out.println("Waitingcalls: "+waitingcalls.size());
 		
 		final Map msg = new HashMap();
 		msg.put(SFipa.SENDER, component.getComponentIdentifier());
@@ -266,6 +267,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 											{
 //												System.out.println("timeout triggered: "+msg);
 												waitingcalls.remove(callid);
+//												System.out.println("Waitingcalls: "+waitingcalls.size());
 												future.setExceptionIfUndone(new RuntimeException("No reply received and timeout occurred: "+callid+" "+msg));
 											}
 										}).addResultListener(new DefaultResultListener()
@@ -279,6 +281,8 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 												{
 													public void resultAvailable(Object source, Object result)
 													{
+														waitingcalls.remove(callid);
+//														System.out.println("Waitingcalls: "+waitingcalls.size());
 //														System.out.println("Cancel timeout (res): "+callid+" "+future);
 //														errors.put(callid, new Object[]{"Cancel timeout (res)", result});
 														timer.cancel();
@@ -286,6 +290,8 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 													
 													public void exceptionOccurred(Object source, Exception exception)
 													{
+														waitingcalls.remove(callid);
+//														System.out.println("Waitingcalls: "+waitingcalls.size());
 //														System.out.println("Cancel timeout (ex): "+callid+" "+future);
 //														errors.put(callid, new Object[]{"Cancel timeout (ex):", exception});
 														timer.cancel();
@@ -303,6 +309,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 //								System.out.println("Callee could not be reached: "+exception);
 //								errors.put(callid, new Object[]{"Callee could not be reached", exception});
 								waitingcalls.remove(callid);
+//								System.out.println("Waitingcalls: "+waitingcalls.size());
 								future.setException(exception);
 							}
 						});
@@ -312,6 +319,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 					{
 //						errors.put(callid, new Object[]{"No msg service", exception});
 						waitingcalls.remove(callid);
+//						System.out.println("Waitingcalls: "+waitingcalls.size());
 						future.setException(exception);
 					}
 				});
@@ -321,6 +329,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 			{
 //				errors.put(callid, new Object[]{"No lib service", exception});
 				waitingcalls.remove(callid);
+//				System.out.println("Waitingcalls: "+waitingcalls.size());
 				future.setException(exception);
 			}
 		});
