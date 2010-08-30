@@ -1,12 +1,12 @@
 package jadex.bdi.examples.shop;
 
+import jadex.base.gui.componentviewer.IComponentViewerPanel;
+import jadex.base.gui.plugin.IControlCenter;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.Properties;
-import jadex.tools.common.plugin.IControlCenter;
-import jadex.tools.componentviewer.IComponentViewerPanel;
 
 import javax.swing.JComponent;
 
