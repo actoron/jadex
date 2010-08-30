@@ -19,4 +19,11 @@
 			<fact>100</fact>
 		</belief>
 	</beliefs>
+	
+	<properties>
+		<!-- <property name="componentviewer.viewerclass">"jadex.bdi.examples.shop.CustomerViewerPanel"</property> -->
+		<propertyref name="componentviewer.viewerclass">
+			<concrete ref="customercap.componentviewer.viewerclass"></concrete>
+		</propertyref>
+	</properties>
 </agent>

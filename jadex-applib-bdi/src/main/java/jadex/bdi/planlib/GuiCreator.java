@@ -1,6 +1,7 @@
 package jadex.bdi.planlib;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
@@ -17,7 +18,7 @@ public class GuiCreator
 	//-------- attributes --------
 
 	/** The gui. */
-	protected JFrame	frame;
+	protected JFrame frame;
 
 	//-------- constructors --------
 
@@ -42,6 +43,27 @@ public class GuiCreator
 			}
 		});
 	}
+	
+	/**
+	 *  Create a new clock.
+	 */
+	public GuiCreator(final Method createmethod, final Class[] argclasses, final Object[] args)
+	{
+		SwingUtilities.invokeLater(new Runnable()
+		{
+			public void run()
+			{
+				try
+				{
+					frame = (JFrame)createmethod.invoke(null, args);
+				}
+				catch(Exception e)
+				{
+					throw new RuntimeException(e);
+				}
+			}
+		});
+	}
 
 	//-------- methods --------
 
@@ -53,5 +75,4 @@ public class GuiCreator
 	{
 		return frame;
 	}
-	
 }

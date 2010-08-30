@@ -52,7 +52,7 @@ import javax.swing.table.AbstractTableModel;
 /**
  *  Customer gui that allows buying items at different shops.
  */
-public class CustomerGui extends JFrame
+public class CustomerGui extends JPanel
 {
 	//-------- attributes --------
 	
@@ -74,7 +74,7 @@ public class CustomerGui extends JFrame
 	 */
 	public CustomerGui(final IBDIExternalAccess agent)
 	{
-		super(agent.getComponentName());
+//		super(agent.getComponentName());
 		this.agent = agent;
 		this.shops	= new HashMap();
 		
@@ -282,23 +282,32 @@ public class CustomerGui extends JFrame
 			}
 		});
 		
-		getContentPane().setLayout(new GridBagLayout());
+		setLayout(new GridBagLayout());
 		x=0;
 		y=0;
-		getContentPane().add(selpanel, new GridBagConstraints(
+		add(selpanel, new GridBagConstraints(
 			x,y++,1,1,0,0,GridBagConstraints.WEST,GridBagConstraints.BOTH,new Insets(2,2,2,2),0,0));
-		getContentPane().add(shoppanel, new GridBagConstraints(
+		add(shoppanel, new GridBagConstraints(
 			x,y++,1,1,1,1,GridBagConstraints.WEST,GridBagConstraints.BOTH,new Insets(2,2,2,2),0,0));
-		getContentPane().add(invpanel, new GridBagConstraints(
+		add(invpanel, new GridBagConstraints(
 			x,y++,1,1,1,1,GridBagConstraints.WEST,GridBagConstraints.BOTH,new Insets(2,2,2,2),0,0));
-		getContentPane().add(butpanel, new GridBagConstraints(
+		add(butpanel, new GridBagConstraints(
 			x,y++,1,1,0,0,GridBagConstraints.WEST,GridBagConstraints.BOTH,new Insets(2,2,2,2),0,0));
 		
 //		refresh();
-		pack();
-		setLocation(SGUI.calculateMiddlePosition(this));
-		setVisible(true);
-		addWindowListener(new WindowAdapter()
+	}
+	
+	/**
+	 *  Create a customer gui frame.
+	 */
+	public static void createCustomerGui(final IBDIExternalAccess agent)
+	{
+		final JFrame f = new JFrame();
+		f.add(new CustomerGui(agent));
+		f.pack();
+		f.setLocation(SGUI.calculateMiddlePosition(f));
+		f.setVisible(true);
+		f.addWindowListener(new WindowAdapter()
 		{
 			public void windowClosing(WindowEvent e)
 			{
@@ -309,8 +318,8 @@ public class CustomerGui extends JFrame
 		{
 			public void agentTerminating(AgentEvent ae) 
 			{
-				setVisible(false);
-				dispose();
+				f.setVisible(false);
+				f.dispose();
 			}
 			
 			public void agentTerminated(AgentEvent ae) 

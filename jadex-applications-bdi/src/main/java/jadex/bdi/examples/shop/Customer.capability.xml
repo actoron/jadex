@@ -17,7 +17,8 @@
 		<beliefset name="inventory" class="ItemInfo"/>
 		
 		<belief name="gui" class="jadex.bdi.planlib.GuiCreator">
-			<fact>new jadex.bdi.planlib.GuiCreator(CustomerGui.class, new Class[]{jadex.bdi.runtime.IBDIExternalAccess.class}, 
+			<fact>new jadex.bdi.planlib.GuiCreator(CustomerGui.class.getMethod("createCustomerGui", 
+				new Class[]{jadex.bdi.runtime.IBDIExternalAccess.class}), new Class[]{jadex.bdi.runtime.IBDIExternalAccess.class}, 
 				new Object[]{$scope.getExternalAccess()})</fact>
 		</belief>
 	</beliefs>
@@ -51,5 +52,9 @@
 			</trigger>
 		</plan>
 	</plans>
+	
+	<properties>
+		<property name="componentviewer.viewerclass" exported="true">"jadex.bdi.examples.shop.CustomerViewerPanel"</property>
+	</properties>
 	
 </capability>
