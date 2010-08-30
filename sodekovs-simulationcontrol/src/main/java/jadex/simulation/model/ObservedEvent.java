@@ -168,8 +168,8 @@ public class ObservedEvent {
 		buffer.append("\n");
 		buffer.append("DataName: ");
 		buffer.append(getDataName());
-		buffer.append("\n");
-		buffer.append("Observed Value: ");
+		buffer.append("\t");
+		buffer.append("-> observed value: ");
 		buffer.append(getValue().toString());
 		buffer.append("\n");
 		

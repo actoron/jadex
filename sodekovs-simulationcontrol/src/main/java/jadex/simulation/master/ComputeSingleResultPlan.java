@@ -31,7 +31,7 @@ public class ComputeSingleResultPlan extends Plan {
 	public void body() {
 		IMessageEvent msg = (IMessageEvent) getReason();
 		HashMap content = (HashMap) msg.getParameter(SFipa.CONTENT).getValue();
-		
+
 		HashMap facts = (HashMap) getBeliefbase().getBelief("generalSimulationFacts").getFact();
 		int experimentRow = ((Integer) facts.get(Constants.EXPERIMENT_ROW_COUNTER)).intValue();
 		int expInRow = ((Integer) facts.get(Constants.ROW_EXPERIMENT_COUNTER)).intValue();
@@ -41,19 +41,20 @@ public class ComputeSingleResultPlan extends Plan {
 
 		// System.out.println("Map of Observed Events: ");
 		ConcurrentHashMap<Long, ArrayList<ObservedEvent>> observedEventsMap = (ConcurrentHashMap<Long, ArrayList<ObservedEvent>>) content.get(Constants.OBSERVED_EVENTS_MAP);
-		
-		//if SimulationDataConsumer has bee specified
-		if(observedEventsMap == null){
+
+		// if SimulationDataConsumer has bee specified
+		if (observedEventsMap == null) {
 			observedEventsMap = new ConcurrentHashMap<Long, ArrayList<ObservedEvent>>();
 		}
 		ArrayList sortedResultList = new ArrayList(observedEventsMap.keySet());
 		// Sort by timestamp
 		Collections.sort(sortedResultList);
 
- 
-		//Hack: Since the Executor starts observing the application while the application is initilazed the early events have to be deleted:
-		//"the official" start time -> StartTime at Executor != StartTime at application (is delayed)
-		deleteEventsBefore(sortedResultList, observedEventsMap, ((Long)content.get(Constants.EXPERIMENT_START_TIME)).longValue());
+		// Hack: Since the Executor starts observing the application while the
+		// application is initilazed the early events have to be deleted:
+		// "the official" start time -> StartTime at Executor != StartTime at
+		// application (is delayed)
+		deleteEventsBefore(sortedResultList, observedEventsMap, ((Long) content.get(Constants.EXPERIMENT_START_TIME)).longValue());
 
 		ExperimentResult experimentRes = toExperimentResult(content, new ArrayList(observedEventsMap.values()), simConf);
 
@@ -108,7 +109,6 @@ public class ComputeSingleResultPlan extends Plan {
 
 	}
 
-
 	private ExperimentResult toExperimentResult(Map content, ArrayList<ArrayList<ObservedEvent>> events, SimulationConfiguration simConf) {
 
 		long startTime = ((Long) content.get(Constants.EXPERIMENT_START_TIME)).longValue();
@@ -127,14 +127,17 @@ public class ComputeSingleResultPlan extends Plan {
 				long relativeTimestamp = myEvent.getAbsoluteTimestamp() - startTime;
 				myEvent.setRelativeTimestamp(relativeTimestamp);
 				// event does not have to be filtered
-//				if (eventsToFilter.get(myEvent.getNameOfObservedData()) == null) {
+				// if (eventsToFilter.get(myEvent.getNameOfObservedData()) ==
+				// null) {
 				if (eventsToFilter.get(myEvent.getDataName()) == null) {
 					result.add(myEvent);
 				} else {// --- put event into the right bucket
-//					ArrayList<ObservedEvent> list = eventsToFilter.get(myEvent.getNameOfObservedData());
+				// ArrayList<ObservedEvent> list =
+				// eventsToFilter.get(myEvent.getNameOfObservedData());
 					ArrayList<ObservedEvent> list = eventsToFilter.get(myEvent.getDataName());
 					list.add(myEvent);
-//					eventsToFilter.put(myEvent.getNameOfObservedData(), list);
+					// eventsToFilter.put(myEvent.getNameOfObservedData(),
+					// list);
 					eventsToFilter.put(myEvent.getDataName(), list);
 				}
 			}
@@ -161,20 +164,22 @@ public class ComputeSingleResultPlan extends Plan {
 			// Do buckets only for SimulationDataConsumer
 			if (con.getClazz().equalsIgnoreCase(Constants.SIMULATION_DATA_CONSUMER)) {
 				for (Property prop : con.getProperty()) {
-					// Check for elements whether the "last" condition applies
-					if (!prop.getName().equalsIgnoreCase(Constants.DATAPROVIDER) && prop.getFilter().equalsIgnoreCase("last")) {
-						result.put(prop.getName(), new ArrayList<ObservedEvent>());				
+					// Check for elements whether the "last" condition applies: check first whether filter !=null 
+					if (prop.getFilter() != null) {
+						if (!prop.getName().equalsIgnoreCase(Constants.DATAPROVIDER) && prop.getFilter().equalsIgnoreCase("last")) {
+							result.put(prop.getName(), new ArrayList<ObservedEvent>());
 						}
 					}
 				}
 			}
-		
-		//OLD
-//		for (Observer obs : simConf.getObservers().getObserver()) {
-//			if (obs.getFilter().getMode().equals("last")) {
-//				result.put(obs.getData().getName(), new ArrayList<ObservedEvent>());
-//			}
-//		}
+		}
+
+		// OLD
+		// for (Observer obs : simConf.getObservers().getObserver()) {
+		// if (obs.getFilter().getMode().equals("last")) {
+		// result.put(obs.getData().getName(), new ArrayList<ObservedEvent>());
+		// }
+		// }
 		return result;
 	}
 
@@ -217,41 +222,43 @@ public class ComputeSingleResultPlan extends Plan {
 			}
 		});
 	}
-	
+
 	/**
-	 * Deletes events from List and Map that occurred before the starttime. 
+	 * Deletes events from List and Map that occurred before the starttime.
+	 * 
 	 * @param sortedResultList
 	 * @param observedEventsMap
 	 * @param startTime
 	 */
-	private void deleteEventsBefore(ArrayList sortedResultList, ConcurrentHashMap<Long, ArrayList<ObservedEvent>> observedEventsMap, long startTime){
+	private void deleteEventsBefore(ArrayList sortedResultList, ConcurrentHashMap<Long, ArrayList<ObservedEvent>> observedEventsMap, long startTime) {
 		ArrayList<Long> values2Remove = filterSortedList(sortedResultList, startTime);
-		
-		//Remove values from both: list and hash map
-		for(int i=0; i<values2Remove.size(); i++){
+
+		// Remove values from both: list and hash map
+		for (int i = 0; i < values2Remove.size(); i++) {
 			sortedResultList.remove(0);
 			observedEventsMap.remove(values2Remove.get(i));
-		}		
+		}
 	}
-	
-	
+
 	/**
-	 * Filters given list. Returns a new list that contains all values that are smaller than the given timestamp.
+	 * Filters given list. Returns a new list that contains all values that are
+	 * smaller than the given timestamp.
+	 * 
 	 * @param sortedList
 	 * @param timestamp
 	 * @return
 	 */
-	private ArrayList<Long> filterSortedList(ArrayList sortedList, long timestamp){
+	private ArrayList<Long> filterSortedList(ArrayList sortedList, long timestamp) {
 		ArrayList<Long> res = new ArrayList<Long>();
-		
-		for(int i=0; i<sortedList.size(); i++){
-			if((Long) sortedList.get(i) < timestamp){
+
+		for (int i = 0; i < sortedList.size(); i++) {
+			if ((Long) sortedList.get(i) < timestamp) {
 				res.add((Long) sortedList.get(i));
-			}else{
+			} else {
 				break;
-			}			
-		}		
-		return res;		
+			}
+		}
+		return res;
 	}
-	
+
 }

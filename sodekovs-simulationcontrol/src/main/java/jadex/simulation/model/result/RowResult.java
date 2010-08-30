@@ -1,6 +1,10 @@
 package jadex.simulation.model.result;
 
+import jadex.simulation.model.ObservedEvent;
+
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
@@ -16,6 +20,10 @@ public class RowResult extends IResult {
 	private ArrayList<ExperimentResult> experimentResults = new ArrayList<ExperimentResult>();
 	private String optimizationName;
 	private String optimizationValue;
+	
+	// --- contains the FINAL results of the statistical evaluation for
+	// each observer type, i.e. the statics for each observed type for this row.
+	private HashMap<String, HashMap<String,String>> finalStatsMap;
 
 	@XmlElementWrapper(name = "Experiments")
 	@XmlElement(name = "Experiment")
@@ -66,6 +74,20 @@ public class RowResult extends IResult {
 	public String getName() {
 		return name;
 	}
+	
+	/**
+	 * 1. HashMap: Key: Name of observer 2. HashMap: Key: Name of statistical
+	 * type, Value: computed value
+	 * 
+	 * @return
+	 */
+	public HashMap<String, HashMap<String, String>> getFinalStatsMap() {
+		return finalStatsMap;
+	}
+
+	public void setFinalStatsMap(HashMap<String, HashMap<String, String>> statsMap) {
+		this.finalStatsMap = statsMap;
+	}
 
 	public String toStringShort() {
 //		double meanValue = 0.0;
@@ -79,8 +101,20 @@ public class RowResult extends IResult {
 		buffer.append(getOptimizationName());
 		buffer.append(" - ");
 		buffer.append(getOptimizationValue());
+		buffer.append("\n\n");
+		buffer.append("Cumulated Stats of Observed Events:");
+		//Print out cumulated stats for each type of observed event
+		for (Iterator it = finalStatsMap.keySet().iterator(); it.hasNext();) {
+			Object key = it.next();
+			HashMap<String,String> resForEvent = finalStatsMap.get(key);
+			buffer.append("\n\tName: " + key);
+			buffer.append("\tMeanValue: " + resForEvent.get("MeanValue"));
+			buffer.append("\tMedianValue: " + resForEvent.get("MedianValue"));
+			buffer.append("\tSampleVarianceValue: " + resForEvent.get("sampleVarianceValue"));				
+		}
+		
 		buffer.append("\n");
-		buffer.append("Results of Experiment: ");
+		buffer.append("Results of Single Experiment: ");
 		buffer.append("\n");
 
 		for (ExperimentResult experiment : getExperimentsResults()) {
@@ -92,6 +126,16 @@ public class RowResult extends IResult {
 			buffer.append("Duration: ");
 			buffer.append(experiment.getDuraration());
 			buffer.append("\n");
+			
+//			for (Iterator it = finalStatsMap.keySet().iterator(); it.hasNext();) {
+//				Object key = it.next();
+//				HashMap<String,String> resForEvent = finalStatsMap.get(key);
+//				buffer.append("\n\tName: " + key);
+//				buffer.append("\tMeanValue: " + resForEvent.get("MeanValue"));
+//				buffer.append("\tMedianValue: " + resForEvent.get("MedianValue"));
+//				buffer.append("\tSampleVarianceValue: " + resForEvent.get("sampleVarianceValue"));				
+//			}
+			
 //			meanValue += experiment.getDuraration();
 			durations.add(experiment.getDuraration());
 		}

@@ -163,11 +163,12 @@ public class StartSimulationExperimentsPlan extends Plan {
 		rowResult.setName("Tmp-Test");
 		rowResult.setOptimizationName(experimentList.get(0).getOptimizationParameterName());
 		rowResult.setOptimizationValue(experimentList.get(0).getOptimizationValue());
+		rowResult.setFinalStatsMap( ((IntermediateResult)getBeliefbase().getBelief("intermediateResults").getFact()).getIntermediateStats());
 
 		rowResults.put(rowResult.getId(), rowResult);
 
 		getBeliefbase().getBelief("experimentResults").setFact(new HashMap());
-		getBeliefbase().getBelief("intermediateResults").setFact(new IntermediateResult(rowCounter, 0, simConf));
+//		getBeliefbase().getBelief("intermediateResults").setFact(new IntermediateResult(rowCounter, 0, simConf));
 		getBeliefbase().getBelief("rowResults").setFact(rowResults);
 
 		// System.out.println("#StartSimEx# Try to write RowResult to XML-File.");

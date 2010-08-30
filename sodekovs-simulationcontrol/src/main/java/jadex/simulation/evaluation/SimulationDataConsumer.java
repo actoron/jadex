@@ -1,25 +1,13 @@
 package jadex.simulation.evaluation;
 
 import jadex.application.space.envsupport.environment.AbstractEnvironmentSpace;
-import jadex.application.space.envsupport.environment.ISpaceObject;
 import jadex.application.space.envsupport.evaluation.DataTable;
 import jadex.application.space.envsupport.evaluation.ITableDataConsumer;
 import jadex.application.space.envsupport.evaluation.ITableDataProvider;
-import jadex.bdi.runtime.impl.ExternalAccessFlyweight;
-import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentManagementService;
-import jadex.commons.IFuture;
 import jadex.commons.SimplePropertyObject;
-import jadex.commons.concurrent.IResultListener;
-import jadex.service.IServiceContainer;
-import jadex.service.clock.IClockService;
-import jadex.simulation.helper.AgentMethods;
 import jadex.simulation.helper.Constants;
 import jadex.simulation.model.ObservedEvent;
-import jadex.simulation.model.Observer;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;

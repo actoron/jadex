@@ -6,6 +6,7 @@ import jadex.simulation.model.ObservedEvent;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -62,8 +63,8 @@ public class EvaluationResult {
 
 	public void setRowResults(ArrayList<RowResult> rowResults) {
 		this.rowResults = rowResults;
-	}
-
+	}	
+	
 	public String toString() {
 
 		StringBuffer buffer = new StringBuffer();

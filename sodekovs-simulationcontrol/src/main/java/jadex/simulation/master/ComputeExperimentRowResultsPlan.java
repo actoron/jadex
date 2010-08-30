@@ -6,6 +6,7 @@ import jadex.simulation.helper.Constants;
 import jadex.simulation.helper.XMLHandler;
 import jadex.simulation.model.SimulationConfiguration;
 import jadex.simulation.model.result.EvaluationResult;
+import jadex.simulation.model.result.IntermediateResult;
 import jadex.simulation.model.result.RowResult;
 import jadex.simulation.model.result.SimulationResult;
 
@@ -29,7 +30,7 @@ public class ComputeExperimentRowResultsPlan extends Plan {
 		HashMap facts = (HashMap) getBeliefbase().getBelief("generalSimulationFacts").getFact();
 		int rowCounter = ((Integer) facts.get(Constants.EXPERIMENT_ROW_COUNTER)).intValue();
 		int rowsDoTo = ((Integer) facts.get(Constants.ROWS_TO_DO)).intValue();
-
+		IntermediateResult interRes = (IntermediateResult) getBeliefbase().getBelief("intermediateResults").getFact();
 		// check terminate condition: time or counter or semantic
 		if (rowCounter == rowsDoTo) {
 
@@ -45,20 +46,23 @@ public class ComputeExperimentRowResultsPlan extends Plan {
 			System.out.println("#ComputeExperimentRowResultsPlan# Simulation finished. Write Res of Simulation to XML!");
 			XMLHandler.writeXMLToFile(result, "SimRes" + result.getStarttime() + ".xml", SimulationResult.class);
 
-			doShortEvaluation(rowResults, "Final");
+			doShortEvaluation(rowResults, interRes,  "Final");
 
 		} else {
 			
 			//Print and persist intermediateResults
 			System.out.println("#ComputeExperimentRowResultsPlan# Printing intermediate results!");
-			doShortEvaluation((HashMap) getBeliefbase().getBelief("rowResults").getFact(), "Intermediate");
+			doShortEvaluation((HashMap) getBeliefbase().getBelief("rowResults").getFact(), interRes, "Intermediate");
 
 			// optimize --> put new parameters
 			// Start new Row
 
 			facts.put(Constants.ROW_EXPERIMENT_COUNTER, new Integer(0));
 			getBeliefbase().getBelief("generalSimulationFacts").setFact(facts);
-
+			
+			//re-init intermediate results since of the start of a new row
+			getBeliefbase().getBelief("intermediateResults").setFact(new IntermediateResult(rowCounter, 0, (SimulationConfiguration) getBeliefbase().getBelief("simulationConf").getFact()));
+			
 			IGoal goal = createGoal("StartSimulationExperiments");
 			System.out.println("#InitSim# Starting " + rowCounter + ". round of Simulation Experiments.");
 			dispatchTopLevelGoal(goal);
@@ -70,7 +74,7 @@ public class ComputeExperimentRowResultsPlan extends Plan {
 	 * 
 	 * @param rowResults
 	 */
-	private void doShortEvaluation(HashMap rowResults, String fileAppendix) {
+	private void doShortEvaluation(HashMap rowResults, IntermediateResult interRes, String fileAppendix) {
 
 		SimulationConfiguration simConf = (SimulationConfiguration) getBeliefbase().getBelief("simulationConf").getFact();
 		HashMap facts = (HashMap) getBeliefbase().getBelief("generalSimulationFacts").getFact();

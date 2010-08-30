@@ -85,8 +85,8 @@ public class XMLHandler {
 			JAXBContext context = JAXBContext.newInstance(classname);
 			Marshaller m = context.createMarshaller();
 			m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-			// m.marshal(output, System.out);
-			m.marshal(obj, System.out);
+			//print to screen
+			//m.marshal(obj, System.out);
 
 			w = new FileWriter(filename);
 			m.marshal(obj, w);

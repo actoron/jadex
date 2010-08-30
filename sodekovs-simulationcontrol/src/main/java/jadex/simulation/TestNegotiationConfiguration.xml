@@ -18,43 +18,40 @@
 	</Imports>
 
 	<Dataproviders>
-		<Dataprovider name="homebaselogger2">
-			<!-- <Source name="$ore" sourcetype="ISpaceObject" objecttype="homebase" aggregate="false">$object.ore</Source>-->
-			<Source name="$homebase" sourcetype="ISpaceObject" objecttype="homebase"/> 						
-			<Data name="ore_amount">$homebase.ore</Data>
-			<Data name="time">$tick</Data>				
+		<Dataprovider name="moneyBankLogger">			
+			<Source name="$moneyBank" sourcetype="ISpaceObject" objecttype="moneyBankOfSMA"/> 						
+			<Data name="money_amount">$moneyBank.money</Data>
+			<Data name="workflows">$moneyBank.executedWorkflows</Data>				
 		</Dataprovider>
-		<Dataprovider name="homebaselogger223">
-			<!-- <Source name="$ore" sourcetype="ISpaceObject" objecttype="homebase" aggregate="false">$object.ore</Source>-->
-			<Source name="$homebase" sourcetype="ISpaceObject" objecttype="homebase"/> 						
-			<Data name="ore_amount">$homebase.ore</Data>
-			<Data name="time">$tick</Data>				
+		<Dataprovider name="moneyBankLogger2">			
+			<Source name="$moneyBank" sourcetype="ISpaceObject" objecttype="moneyBankOfSMA"/> 						
+			<Data name="money_amount">$moneyBank.money</Data>					
 		</Dataprovider>
 	</Dataproviders>
 
 	<Dataconsumers>
 		<Dataconsumer name="homebaseConsumer" clazz="XYChartDataConsumer">
-				<Property name="dataprovider">"homebaselogger2"</Property>
-				<Property name="title">"Evaluation of homebase"</Property>
-				<Property name="labelx">"Time"</Property>
-				<Property name="labely">"Collected Ore"</Property>							
+				<Property name="dataprovider">"moneyBankLogger"</Property>
+				<Property name="title">"Evaluation of moneyBank of SMA"</Property>
+				<Property name="labelx">"Executed Workflows"</Property>
+				<Property name="labely">"Money(cumulated)"</Property>							
 				<Property name="seriesname_0">"Collected Ore"</Property>
-				<Property name="valuex_0">"time"</Property>
-				<Property name="valuey_0">"ore_amount"</Property>
+				<Property name="valuex_0">"workflows"</Property>
+				<Property name="valuey_0">"money_amount"</Property>
 		</Dataconsumer>
 		<Dataconsumer name="homebaseConsumerReloaded" clazz="XYChartDataConsumer">
-				<Property name="dataprovider">"homebaselogger2"</Property>
-				<Property name="title">"Evaluation of homebase"</Property>
-				<Property name="labely">"Time"</Property>
-				<Property name="labelx">"Collected Ore"</Property>							
+				<Property name="dataprovider">"moneyBankLogger"</Property>
+				<Property name="title">"Evaluation of moneyBank of SMA"</Property>
+				<Property name="labelx">"Executed Workflows"</Property>
+				<Property name="labely">"Money(cumulated)"</Property>											
 				<Property name="seriesname_0">"Collected Ore"</Property>
-				<Property name="valuey_0">"time"</Property>
-				<Property name="valuex_0">"ore_amount"</Property>
+				<Property name="valuex_0">"money_amount"</Property>
+				<Property name="valuey_0">"workflows"</Property>				
 		</Dataconsumer>
 		<Dataconsumer name="simConsumer" clazz="SimulationDataConsumer">		
-				<Property name="dataprovider">"homebaselogger2"</Property>
-				<Property name="time" filter="last"/><!-- HACK: Denotes the filter type ->last= only the last value is of interest. -->
-		</Dataconsumer>		
+				<Property name="dataprovider">"moneyBankLogger2"</Property>
+				<Property name="money_amount" /> <!-- filter="last"/>< HACK: Denotes the filter type ->last= only the last value is of interest. -->
+		</Dataconsumer>				
 	</Dataconsumers>
 
 	<DataVisualization>
@@ -90,7 +87,7 @@
 		</Data>
 		<!-- Important: Number of sweeps has to be equal with number of rows!-->
 		<ParameterSweeping type="space"> <!-- space, list or algorithm (algorithm is not implemented yet!)-->
-			<Configuration start="5" end="9" step="1" class="int" />
+			<Configuration start="0" end="2" step="1" class="int" />
 			<!-- 			<Configuration values="12;17;28;33;"/>--> <!-- Has to be comma separated list, with a comma as last character. -->
 		</ParameterSweeping>
 		<Algorithm>
@@ -100,7 +97,7 @@
 	</Optimization>
 
 	<RunConfiguration>
-		<General rows="9" parallelRuns="2" delta="true"><!-- For all runs.-->
+		<General rows="3" parallelRuns="2" delta="true"><!-- For all runs.-->
 			<!-- Delay of start time can be defined relatively or absolute.-->
 			<!-- <StartTime value="2010-06-29 10:50:00" type="absolute" /> -->
 			<!-- <StartTime value="6500" type="relative" />-->
@@ -110,12 +107,12 @@
 				Randoms gleich sind.
 			-->
 			<TerminateCondition>
-				<Time value="10000" type="absolute" />
+				<Time value="5000" type="absolute" />
 			</TerminateCondition>
 		</General>
-		<Rows experiments="5">
+		<Rows experiments="2">
 			<TerminateCondition>
-				  <Time value="6000" type="relative" />
+				  <Time value="5000" type="relative" />
 				
 					<TargetFunction function="$object.getProperty(&quot;ore&quot;) >=
 					25">	<ObjectSource type="ISpaceObject" name="homebase" /> </TargetFunction>
