@@ -31,7 +31,7 @@ public class ExecuteTaskPlan extends Plan
 			BpmnInterpreter workflow = (BpmnInterpreter) fut.get(this);
 
 			IComponentIdentifier sma = (IComponentIdentifier) workflow.getContextVariable("sma");
-			System.out.println("Task  -> " + sma.getLocalName());
+//			System.out.println("Task  -> " + sma.getLocalName());
 
 			// ask sma for allocate
 			Boolean success = false;

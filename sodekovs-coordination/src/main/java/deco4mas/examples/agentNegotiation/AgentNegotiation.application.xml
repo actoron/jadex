@@ -29,6 +29,14 @@
 		<env:envspacetype name="coordspace" width="11"
 			height="11" class="CoordinationSpace">
 
+			<!-- TMP Object Type: accumalates money bank of SMA -->
+			<env:objecttypes>
+				<env:objecttype name="moneyBankOfSMA">
+					<env:property name="money">0</env:property>
+					<env:property name="executedWorkflows">0</env:property>
+				</env:objecttype>
+			</env:objecttypes>
+
 			<!-- decoMAS file -->
 			<env:property name="dynamics_configuration">"deco4mas/examples/agentNegotiation/deco/negotiation.dynamics.xml"
 			</env:property>
@@ -72,6 +80,14 @@
 			<spaces>
 				<env:envspace name="mycoordspace" type="coordspace"
 					width="2" height="2">
+					
+					<env:objects>
+						<env:object type="moneyBankOfSMA">
+							<env:property name="money">new Integer(0)</env:property>
+							<env:property name="executedWorkflows">new Integer(0)</env:property>
+						</env:object>
+					</env:objects>
+					
 					<env:processes>
 						<env:process type="MediumTime">
 						</env:process>

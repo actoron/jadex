@@ -52,7 +52,7 @@ public class TrustSpaceMechanism extends ICoordinationMechanism
 	private void executionOccur(TrustInformation info)
 	{
 		TrustExecutionInformation executionInfo = (TrustExecutionInformation) info;
-		System.out.println("#perceiveCoordinationEvent " + executionInfo);
+//		System.out.println("#perceiveCoordinationEvent " + executionInfo);
 		mediumLogger.info("execution: " + executionInfo);
 
 		// get Space
@@ -72,7 +72,7 @@ public class TrustSpaceMechanism extends ICoordinationMechanism
 		coordInfo.addValue(CoordinationInfo.AGENT_ELEMENT_TYPE, "INTERNAL_EVENT");
 		coordInfo.addValue(Constants.DML_REALIZATION_NAME, "by_trust");
 
-		System.out.println("#publish TrustEvent " + executionInfo);
+//		System.out.println("#publish TrustEvent " + executionInfo);
 		env.publishCoordinationEvent(coordInfo);
 	}
 

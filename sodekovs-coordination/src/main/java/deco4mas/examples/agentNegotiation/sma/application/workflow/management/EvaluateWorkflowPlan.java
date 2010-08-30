@@ -1,7 +1,11 @@
 package deco4mas.examples.agentNegotiation.sma.application.workflow.management;
 
-import java.util.logging.Logger;
+import jadex.application.runtime.IApplicationExternalAccess;
+import jadex.application.space.envsupport.environment.AbstractEnvironmentSpace;
 import jadex.bdi.runtime.Plan;
+
+import java.util.logging.Logger;
+
 import deco4mas.examples.agentNegotiation.common.dataObjects.WorkflowData;
 import deco4mas.examples.agentNegotiation.evaluate.AgentLogger;
 
@@ -22,6 +26,19 @@ public class EvaluateWorkflowPlan extends Plan {
 				
 				logger.info(buf.toString());
 				getBeliefbase().getBelief("moneyBank").setFact(money);
+				
+
+				//*************************************************************
+				// This is a hack for this special application.xml -> AgentNegotiation
+				//: save result also to space in order to enable evaluation by automated simulation component
+				AbstractEnvironmentSpace space = ((AbstractEnvironmentSpace) ((IApplicationExternalAccess) getScope().getParent()).getSpace("mycoordspace"));
+				space.getSpaceObjectsByType("moneyBankOfSMA")[0].setProperty("money", new Double ((Math.round(money))).intValue());
+				int counter = (Integer) space.getSpaceObjectsByType("moneyBankOfSMA")[0].getProperty("executedWorkflows");
+				space.getSpaceObjectsByType("moneyBankOfSMA")[0].setProperty("executedWorkflows", counter+1);
+				
+				System.out.println("#########################################################################################################################################");
+				System.out.println(space.getSpaceObjectsByType("moneyBankOfSMA")[0].getProperty("money") +  "  - " + space.getSpaceObjectsByType("moneyBankOfSMA")[0].getProperty("executedWorkflows"));
+				System.out.println("#########################################################################################################################################");
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

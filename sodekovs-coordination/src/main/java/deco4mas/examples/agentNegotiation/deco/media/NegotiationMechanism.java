@@ -95,7 +95,7 @@ public class NegotiationMechanism extends ICoordinationMechanism
 	private synchronized void newInitiatiorRequest(NegotiationInformation info)
 	{
 		DirectNegotiationInitatorInformation initiatorInfo = (DirectNegotiationInitatorInformation) info;
-		System.out.println("#perceiveCoordinationEvent " + initiatorInfo);
+		//System.out.println("#perceiveCoordinationEvent " + initiatorInfo);
 		mediumLogger.info("New request: " + initiatorInfo);
 
 		// create NegotiationInitiatorObject
@@ -121,7 +121,7 @@ public class NegotiationMechanism extends ICoordinationMechanism
 	private synchronized void participantRegister(NegotiationInformation info)
 	{
 		DirectNegotiationParticipantInformation participantInfo = (DirectNegotiationParticipantInformation) info;
-		System.out.println("#perceiveCoordinationEvent " + participantInfo);
+//		System.out.println("#perceiveCoordinationEvent " + participantInfo);
 		mediumLogger.info("participant: " + participantInfo);
 
 		boolean found = false;
@@ -151,7 +151,7 @@ public class NegotiationMechanism extends ICoordinationMechanism
 	private void contractReply(NegotiationInformation info)
 	{
 		NegotiationContractInformation contractInfo = (NegotiationContractInformation) info;
-		System.out.println("#perceiveCoordinationEvent " + contractInfo);
+//		System.out.println("#perceiveCoordinationEvent " + contractInfo);
 		mediumLogger.info("New Answer: " + contractInfo);
 
 		NegotiationInitiator negotiation = negotiations.get(contractInfo.getId());
@@ -219,7 +219,7 @@ public class NegotiationMechanism extends ICoordinationMechanism
 				&& (negotiation.getState().equals(NegotiationInitiator.EXPLORATORY_PHASE) || negotiation.getState().equals(
 					NegotiationInitiator.INTERMEDIATE_PHASE)))
 			{
-				System.out.println("#tick " + negotiation + " at deadline");
+//				System.out.println("#tick " + negotiation + " at deadline");
 				mediumLogger.info(negotiation + ") at deadline");
 
 				// go next round
@@ -228,7 +228,7 @@ public class NegotiationMechanism extends ICoordinationMechanism
 
 			if (negotiation.getPhaseEnd() < clock.getTime() && negotiation.getState().equals(NegotiationInitiator.FINAL_PHASE))
 			{
-				System.out.println("#tick " + negotiation + " at deadline");
+//				System.out.println("#tick " + negotiation + " at deadline");
 				mediumLogger.info(negotiation + ") at deadline");
 
 				if (negotiation.areRewardsAccepted())
@@ -275,7 +275,7 @@ public class NegotiationMechanism extends ICoordinationMechanism
 
 		// publish
 		mediumLogger.info("sendContract " + info);
-		System.out.println("#publish " + info);
+//		System.out.println("#publish " + info);
 		env.publishCoordinationEvent(coordInfo);
 	}
 
@@ -286,7 +286,7 @@ public class NegotiationMechanism extends ICoordinationMechanism
 	 */
 	private void performNegotiation(NegotiationInitiator negotiation)
 	{
-		System.out.println("#bidRound " + negotiation);
+//		System.out.println("#bidRound " + negotiation);
 		mediumLogger.info("bid round " + negotiation);
 
 		ServiceOffer offer = new ServiceOffer(negotiation.getId(), negotiation.getServiceType());
@@ -302,7 +302,7 @@ public class NegotiationMechanism extends ICoordinationMechanism
 		// return false if a proposal is accepted
 		if (negotiation.evaluateRound(clock.getTime()))
 		{
-			System.out.println("#noSaFound " + negotiation);
+//			System.out.println("#noSaFound " + negotiation);
 			mediumLogger.info("no sa found " + negotiation);
 
 			// wait 1 deadline and then try again
@@ -310,7 +310,7 @@ public class NegotiationMechanism extends ICoordinationMechanism
 
 		} else
 		{
-			System.out.println("#saFound " + negotiation);
+//			System.out.println("#saFound " + negotiation);
 			mediumLogger.info("sa found " + negotiation);
 
 			// send rewards

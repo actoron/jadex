@@ -35,7 +35,7 @@ public class ContractReceivePlan extends Plan
 					{
 						if (info.getState().equals(NegotiationContractInformation.FINAL_REWARD))
 						{
-							System.out.println("#finalReward(Sa) " + info);
+//							System.out.println("#finalReward(Sa) " + info);
 							saLogger.info("Final Reward " + info);
 
 							getBeliefbase().getBelief("signed").setFact(Boolean.TRUE);
@@ -47,7 +47,7 @@ public class ContractReceivePlan extends Plan
 						} else
 						{
 							info.setAnswer(Boolean.TRUE, this.getComponentIdentifier());
-							System.out.println("#acceptReward(Sa) " + info);
+//							System.out.println("#acceptReward(Sa) " + info);
 							saLogger.info("Accept Reward " + info);
 
 							IInternalEvent reply = createInternalEvent("negotiationContractReply");

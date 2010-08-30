@@ -565,9 +565,9 @@ public class BDICoordinationInformationInterpreter extends SimplePropertyObject 
 																			throw new RuntimeException("No such belief: " + scope[0] + " in " + scope[1]);
 																		}
 																		
-																		System.out
-																			.println("#BDICoordInfInterpreter# Dispatched new InternalEvent: "
-																				+ elementId + " for " + exta.getAgentName());
+//																		System.out
+//																			.println("#BDICoordInfInterpreter# Dispatched new InternalEvent: "
+//																				+ elementId + " for " + exta.getAgentName());
 																	}
 																}
 															}
