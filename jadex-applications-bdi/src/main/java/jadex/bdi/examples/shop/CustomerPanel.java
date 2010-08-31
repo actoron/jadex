@@ -93,17 +93,19 @@ public class CustomerPanel extends JPanel
 		
 		remote = new JCheckBox("Remote");
 		remote.setToolTipText("Also search remote platforms for shops.");
-		JButton searchbut = new JButton("Search");
+		final JButton searchbut = new JButton("Search");
 		searchbut.addActionListener(new ActionListener()
 		{
 		    public void actionPerformed(ActionEvent e)
 		    {
+		    	searchbut.setEnabled(false);
 		    	SServiceProvider.getServices(agent.getServiceProvider(), IShop.class, !remote.isSelected())
 					.addResultListener(new SwingDefaultResultListener(CustomerPanel.this)
 				{
 					public void customResultAvailable(Object source, Object result)
 					{
-						System.out.println("Customer search result: "+result);
+				    	searchbut.setEnabled(true);
+//						System.out.println("Customer search result: "+result);
 						Collection coll = (Collection)result;
 						((DefaultComboBoxModel)shopscombo.getModel()).removeAllElements();
 						shops.clear();
@@ -119,7 +121,13 @@ public class CustomerPanel extends JPanel
 						else
 						{
 							((DefaultComboBoxModel)shopscombo.getModel()).addElement("none");
-						}						
+						}					
+					}
+					
+					public void customExceptionOccurred(Object source, Exception exception)
+					{
+				    	searchbut.setEnabled(true);
+						super.customExceptionOccurred(source, exception);
 					}
 				});
 		    }
