@@ -70,17 +70,17 @@
 		<service>
 			$args.simulation
 			? new SyncExecutionService($component.getServiceProvider(), SUtil.createHashMap(new Object[]{"componentviewer.viewerclass", 
-				RemoteServiceManagementService.REMOTE_UNCACHED}, new Object[]{"jadex.tools.componentviewer.executionservice.Executioncomponentviewer", 
+				RemoteServiceManagementService.REMOTE_UNCACHED}, new Object[]{"jadex.base.gui.componentviewer.executionservice.Executioncomponentviewer", 
 				new String[]{"isIdle", "getTasks"}}))
 			: new AsyncExecutionService($component.getServiceProvider(), SUtil.createHashMap(new Object[]{"componentviewer.viewerclass", 
-				RemoteServiceManagementService.REMOTE_UNCACHED}, new Object[]{"jadex.tools.componentviewer.executionservice.Executioncomponentviewer", 
+				RemoteServiceManagementService.REMOTE_UNCACHED}, new Object[]{"jadex.base.gui.componentviewer.executionservice.Executioncomponentviewer", 
 				new String[]{"isIdle", "getTasks"}}))
 		</service>
 		<service>
 			new LibraryService($args.libpath, $component.getComponentIdentifier(), 
 				SUtil.createHashMap(new Object[]{"componentviewer.viewerclass", 
 				RemoteServiceManagementService.REMOTE_UNCACHED, RemoteServiceManagementService.REMOTE_EXCLUDED}, 
-				new Object[]{"jadex.tools.componentviewer.libservice.LibServiceBrowser", 
+				new Object[]{"jadex.base.gui.componentviewer.libservice.LibServiceBrowser", 
 				new String[]{"getClassLoader", "getURLs"}, new String[]{"addLibraryServiceListener", "removeLibraryServiceListener"}})
 				)
 		</service>
@@ -90,7 +90,7 @@
 		<service>
 			new DirectoryFacilitatorService($component.getServiceProvider(), SUtil.createHashMap(
 				new Object[]{"componentviewer.viewerclass"}, 
-				new Object[]{"jadex.tools.componentviewer.dfservice.DFBrowserPanel"}))
+				new Object[]{"jadex.base.gui.componentviewer.dfservice.DFBrowserPanel"}))
 		</service>
 		<service>
 			new MessageService($component.getServiceProvider(),

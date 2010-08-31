@@ -330,7 +330,7 @@ public class ComponentTreeModel implements TreeModel
 		synchronized(nodes)
 		{
 			if(nodes.containsKey(node.getId()))
-				throw new RuntimeException("Node id already contained: "+node);
+				throw new RuntimeException("Node id already contained: "+node+", "+node.getId());
 			
 			nodes.put(node.getId(), node);
 		}

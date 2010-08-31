@@ -50,7 +50,9 @@ public class AwarenessAgent extends MicroAgent
 	/** Flag indicating if proxies should be automatically deleted. */
 	protected boolean autodelete;
 
-	
+	/** The proxy delay. */
+	protected long proxydelay;
+
 	/** The discovered components. */
 	protected Map discovered;
 	
@@ -60,7 +62,7 @@ public class AwarenessAgent extends MicroAgent
 	
 	/** The send delay. */
 	protected long delay;
-	
+		
 	/** The current send id. */
 	protected String sendid;
 	
@@ -91,6 +93,7 @@ public class AwarenessAgent extends MicroAgent
 			this.delay = ((Number)getArgument("delay")).longValue();
 			this.autocreate = ((Boolean)getArgument("autocreate")).booleanValue();
 			this.autodelete = ((Boolean)getArgument("autodelete")).booleanValue();
+			this.proxydelay = ((Number)getArgument("proxydelay")).longValue();
 //			System.out.println("initial delay: "+delay);
 			
 			this.sendsocket = new MulticastSocket();
@@ -343,6 +346,24 @@ public class AwarenessAgent extends MicroAgent
 	}
 	
 	/**
+	 *  Get the proxy delay.
+	 *  @return the delay.
+	 */
+	public synchronized long getProxyDelay()
+	{
+		return proxydelay;
+	}
+
+	/**
+	 *  Set the proxy delay.
+	 *  @param delay The delay to set.
+	 */
+	public synchronized void setProxyDelay(long proxydelay)
+	{
+		this.proxydelay = proxydelay;
+	}
+	
+	/**
 	 *  Set the delay.
 	 *  @param delay The delay to set.
 	 */
@@ -500,10 +521,14 @@ public class AwarenessAgent extends MicroAgent
 	}
 	
 	/**
-	 *  Create a proxy.
+	 *  Create a proxy using given settings.
 	 */
 	public IFuture createProxy(final IComponentIdentifier cid)
 	{
+		final Map	args = new HashMap();
+		args.put("component", cid);
+		args.put("delay", new Long(proxydelay));
+		
 		final Future ret = new Future();
 		
 		SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class)
@@ -519,8 +544,6 @@ public class AwarenessAgent extends MicroAgent
 				}
 				else
 				{
-					Map args = new HashMap();
-					args.put("component", cid);
 					CreationInfo ci = new CreationInfo(args);
 					cms.createComponent(cid.getLocalName(), "jadex/base/service/remote/ProxyAgent.class", ci, 
 						createResultListener(new IResultListener()
@@ -759,6 +782,7 @@ public class AwarenessAgent extends MicroAgent
 					SUtil.createHashMap(configs, new Object[]{new Long(5000), new Long(10000), new Long(60000)})),	
 				new Argument("autocreate", "This parameter describes if new proxies should be automatically created when discovering new components.", "boolean", Boolean.TRUE),	
 				new Argument("autodelete", "This parameter describes if proxies should be automatically deleted when not discovered any longer.", "boolean", Boolean.TRUE),	
-			}, null, null, SUtil.createHashMap(new String[]{"componentviewer.viewerclass"}, new Object[]{"jadex.tools.componentviewer.awareness.AwarenessAgentPanel"}));
+				new Argument("proxydelay", "This parameter is the delay used by proxies.", "long", new Long(10000)),	
+			}, null, null, SUtil.createHashMap(new String[]{"componentviewer.viewerclass"}, new Object[]{"jadex.base.gui.componentviewer.awareness.AwarenessAgentPanel"}));
 	}
 }

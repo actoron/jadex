@@ -33,7 +33,7 @@
 			new LibraryService($args.libpath, $component.getComponentIdentifier(), null)
 				//SUtil.createHashMap(new Object[]{"componentviewer.viewerclass", 
 				//RemoteServiceManagementService.REMOTE_UNCACHED, RemoteServiceManagementService.REMOTE_EXCLUDED}, 
-				//new Object[]{"jadex.tools.componentviewer.libservice.LibServiceBrowser", 
+				//new Object[]{"jadex.base.gui.componentviewer.libservice.LibServiceBrowser", 
 				//new String[]{"getClassLoader", "getURLs"}, new String[]{"addLibraryServiceListener", "removeLibraryServiceListener"}})
 				//)
 		</service>
