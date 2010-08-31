@@ -2,6 +2,7 @@ package jadex.tools.common.modeltree;
 
 import jadex.base.SComponentFactory;
 import jadex.bridge.IComponentFactory;
+import jadex.commons.IFuture;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SGUI;
@@ -10,6 +11,7 @@ import jadex.commons.ThreadSuspendable;
 import jadex.commons.TreeExpansionHandler;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IExecutable;
+import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.LoadManagingExecutionService;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.commons.gui.PopupBuilder;
@@ -794,16 +796,31 @@ public class ModelExplorer extends JTree
 		/**
 		 *  Check if an action (e.g. expand) has to be performed on the path.
 		 */
-		protected void handlePath(TreePath path)
+		protected IFuture handlePath(final TreePath path)
 		{
-			super.handlePath(path);
+			IFuture	ret	= super.handlePath(path);
 		
-			// Check if the node that was saved as selected is added.
-			if(lastselected!=null && lastselected.equals(path.getLastPathComponent()))
+			ret.addResultListener(new IResultListener()
 			{
-				lastselected	= null;
-				tree.setSelectionPath(path);
-			}
+				public void resultAvailable(Object source, Object result)
+				{
+					// Check if the node that was saved as selected is added.
+					if(lastselected!=null && lastselected.equals(path.getLastPathComponent()))
+					{
+						lastselected	= null;
+						tree.setSelectionPath(path);
+						tree.scrollPathToVisible(path);
+					}
+				}
+				
+				public void exceptionOccurred(Object source, Exception exception)
+				{
+					// Shouldn't happen
+					exception.printStackTrace();
+				}
+			});
+			
+			return ret;
 		}
 	}
 
@@ -1060,23 +1077,6 @@ public class ModelExplorer extends JTree
 		{
 			IExplorerTreeNode	node	= (IExplorerTreeNode)getLastSelectedPathComponent();
 			refreshAll(node!=null ? node : getRootNode());
-		}
-
-		/**
-		 * Get the tool tip text.
-		 * @return The tool tip text.
-		 */
-		public String getToolTipText()
-		{
-			String ret = null;
-			Object tmp = getLastSelectedPathComponent();
-			if(tmp instanceof DirNode)
-				ret = "Refresh directory recursively [F5]: "+((DirNode)tmp).getFile().getName();
-			else if(tmp instanceof FileNode)
-				ret = "Refresh file [F5]: "+((FileNode)tmp).getFile().getName();
-			else
-				ret = "Refresh all items of tree [F5]";
-			return ret;
 		}
 	};
 }

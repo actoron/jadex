@@ -1,5 +1,7 @@
 package jadex.commons;
 
+import jadex.commons.concurrent.IResultListener;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -101,27 +103,49 @@ public class TreeExpansionHandler	implements TreeExpansionListener, TreeModelLis
 	 */
 	public void	treeStructureChanged(final TreeModelEvent event)
 	{
-		TreePath	root	= event.getTreePath();
-//		System.out.println("root: "+root);
-		for(int i=Math.max(tree.getRowForPath(root), 0); i<tree.getRowCount(); i++)
+		handleTreeStructureChanged(event, event.getTreePath(), Math.max(tree.getRowForPath(event.getTreePath()), 0));
+	}
+	
+	/**
+	 *  Handle each node in the subtree.
+	 *  Wait for node to be expanded before continuing to inlcude subnodes.
+	 */
+	public void	handleTreeStructureChanged(final TreeModelEvent event, final TreePath root, final int i)
+	{
+		TreePath	path	= tree.getPathForRow(i);
+		if(path!=null)
 		{
-			TreePath	path	= tree.getPathForRow(i);
-//			System.out.println("path "+i+": "+path);
-			if(!root.isDescendant(path))
+			if(root.isDescendant(path))
 			{
-//				System.out.println("break: "+path);
-				break;
+//				System.out.println("path "+i+": "+path);
+				
+				handlePath(path).addResultListener(new IResultListener()
+				{
+					public void resultAvailable(Object source, Object result)
+					{
+						handleTreeStructureChanged(event, root, i+1);
+					}
+					
+					public void exceptionOccurred(Object source, Exception exception)
+					{
+						// Shouldn't happen.
+						exception.printStackTrace();
+					}
+				});
 			}
-			
-			handlePath(path);
+//			else
+//			{
+//				System.out.println("break at: "+path);
+//			}
 		}
 	}
 	
 	/**
 	 *  Check if an action (e.g. expand) has to be performed on the path.
 	 */
-	protected void	handlePath(final TreePath path)
+	protected IFuture	handlePath(final TreePath path)
 	{
+		final Future	ret	= new Future();
 //		System.out.println("handle expand: "+path.getLastPathComponent()+", "+expanded);
 		if(expanded.contains(path.getLastPathComponent()))
 		{
@@ -131,10 +155,16 @@ public class TreeExpansionHandler	implements TreeExpansionListener, TreeModelLis
 				public void run()
 				{
 					tree.expandPath(path);
+//					System.out.println("expanded: "+path.getLastPathComponent());
+					ret.setResult(null);
 				}
 			});
-//			System.out.println("expanded: "+path.getLastPathComponent());
 		}
+		else
+		{
+			ret.setResult(null);
+		}
+		return ret;
 	}
 }
 
