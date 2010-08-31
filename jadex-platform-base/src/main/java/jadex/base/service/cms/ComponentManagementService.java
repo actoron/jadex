@@ -1388,13 +1388,21 @@ public abstract class ComponentManagementService extends BasicService implements
 	{
 		Future ret = new Future();
 		
-		IComponentDescription desc = (IComponentDescription)descs.get(cid);
+		IComponentDescription desc;
+		synchronized(descs)
+		{
+			desc = (IComponentDescription)descs.get(cid);
+			
+			// Todo: addresses required for communication across platforms.
+	//		ret.setName(refreshComponentIdentifier(aid));
+			if(desc!=null)
+			{
+				desc = (IComponentDescription)((CMSComponentDescription)desc).clone();
+			}
+		}
 		
-		// Todo: addresses required for communication across platforms.
-//		ret.setName(refreshComponentIdentifier(aid));
 		if(desc!=null)
 		{
-			desc = (IComponentDescription)((CMSComponentDescription)desc).clone();	// Todo: synchronize?
 			ret.setResult(desc);
 		}
 		else
