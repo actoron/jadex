@@ -75,7 +75,7 @@ public class DiscoveryInfo
 	 *  Get the proxy.
 	 *  @return the proxy.
 	 */
-	public boolean hasProxy()
+	public boolean isProxy()
 	{
 		return proxy;
 	}

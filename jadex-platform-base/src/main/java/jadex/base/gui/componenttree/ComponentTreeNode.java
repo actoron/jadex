@@ -252,16 +252,19 @@ public class ComponentTreeNode	extends AbstractComponentTreeNode implements IAct
 		{
 			public void customResultAvailable(Object source, Object result)
 			{
-				IExternalAccess exta = (IExternalAccess)result;
-				boolean proxy = "jadex.base.service.remote.Proxy".equals(exta.getModel().getFullName());
-				IComponentTreeNode node;
-				if(proxy)
+				IComponentTreeNode node	= getModel().getNode(desc.getName());
+				if(node==null)
 				{
-					node = new ProxyComponentTreeNode(ComponentTreeNode.this, getModel(), desc, cms, ui, iconcache);
-				}
-				else
-				{
-					node = new ComponentTreeNode(ComponentTreeNode.this, getModel(), desc, cms, ui, iconcache);
+					IExternalAccess exta = (IExternalAccess)result;
+					boolean proxy = "jadex.base.service.remote.Proxy".equals(exta.getModel().getFullName());
+					if(proxy)
+					{
+						node = new ProxyComponentTreeNode(ComponentTreeNode.this, getModel(), desc, cms, ui, iconcache);
+					}
+					else
+					{
+						node = new ComponentTreeNode(ComponentTreeNode.this, getModel(), desc, cms, ui, iconcache);
+					}
 				}
 				ret.setResult(node);
 			}

@@ -713,7 +713,7 @@ public class AwarenessAgent extends MicroAgent
 											}
 											else
 											{
-												createproxy = isAutoCreateProxy() && !dif.hasProxy() && !dif.isExcluded();
+												createproxy = isAutoCreateProxy() && !dif.isProxy() && !dif.isExcluded();
 												dif.setTime(clock.getTime());
 											}
 										}
