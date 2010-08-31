@@ -49,7 +49,7 @@ public abstract class AbstractComponentViewerPanel implements IComponentViewerPa
 	 */
 	public String getId()
 	{
-		return null;
+		return toString();
 	}
 
 	/**

@@ -51,6 +51,9 @@ public class BeliefRules
 		
 		Collection oldorigfacts = state.getAttributeValues(rbeliefset, OAVBDIRuntimeModel.beliefset_has_facts);
 		Collection oldfacts = null;
+	
+//		System.out.println("oldorigfacts: "+oldorigfacts);
+//		System.out.println("neworigfacts: "+neworigfacts);
 		
 		// Clone newfacts for being able to use efficient contains.
 		if(neworigfacts!=null)
@@ -86,6 +89,10 @@ public class BeliefRules
 					removeBeliefSetValue(state, rbeliefset, oldfact);
 			}
 		}
+		
+		Collection changed = state.getAttributeValues(rbeliefset, OAVBDIRuntimeModel.beliefset_has_facts);
+		
+//		System.out.println("changed to: "+changed);
 	}
 
 	/**

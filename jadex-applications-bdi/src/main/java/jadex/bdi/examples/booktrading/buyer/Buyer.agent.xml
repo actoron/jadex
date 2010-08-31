@@ -33,9 +33,6 @@
 	<beliefs>
 		<beliefset name="orders" class="Order" evaluationmode="push">
 			<facts language="jcl">
-				// select $g.getParameter("order").getValue()
-				// from IGoal $g in $goalbase.getGoals("purchase_book")
-				
 				collect(
 					Order $order &amp;&amp;
 					IGoal $g &amp;&amp;
@@ -60,39 +57,17 @@
 		<!--  Initiate negotiation rounds every 10 secs. -->
 		<achievegoal name="purchase_book" recur="true" recurdelay="10000">
 			<parameter name="order" class="Order">
-				<!-- <bindingoptions>$beliefbase.initial_orders</bindingoptions> -->
 				<value>$order</value>
 			</parameter>
 			<unique/>
 			<creationcondition language="jcl">
-				// $beliefbase.initial_orders!=null
 				Order $order &amp;&amp; $order.getState()==Order.OPEN
-				
-				// ?rbelset = (beliefset (element_has_model ?mbelset) (beliefset_has_facts $?x ?order $?y))
-				// ?order = (Order (state "open"))
-				// ?mbelset = (mbeliefset (melement_has_name "initial_orders"))
-				// (not
-				// 	(and
-				// 		?rparam = (parameter (parameter_has_name "order") (parameter_has_value ?order))
-				// 		?rgoal = (goal (parameterelement_has_parameters contains ?rparam) (element_has_model ?mgoal))
-				// 		?mgoal = (mgoal (melement_has_name "purchase_book"))
-				// 	)
-				// )
 			</creationcondition>
 			<dropcondition language="jcl">
-				// $beliefbase.time > $goal.order.getDeadline().getTime()
 				$goal.order.getState().equals(Order.FAILED)
-				
-				// ?order = (Order (state "failed"))
-				// ?rparam = (parameter (parameter_has_name "order") (parameter_has_value ?order))
-				// ?rgoal = (goal (parameterelement_has_parameters contains ?rparam))
 			</dropcondition>
 			<targetcondition language="jcl">
 				Order.DONE.equals($goal.order.getState())
-				
-				// ?rparam =(parameter (parameter_has_name "order") (parameter_has_value ?order)) 
-				// ?order = (Order (state "done"))
-				// ?rgoal = (goal (parameterelement_has_parameters contains ?rparam))
 			</targetcondition>
 		</achievegoal>
 		
@@ -155,14 +130,18 @@
 	<properties>
 		<!-- <property name="logging.level">java.util.logging.Level.FINE</property> -->
 		<property name="debugging">false</property>
+		<property name="componentviewer.viewerclass">"jadex.bdi.examples.booktrading.common.GuiViewerPanel"</property>
 	</properties>
 
 	<configurations>
 		<configuration name="default">
 			 <beliefs>
 				 <initialbelief ref="gui">
-					<fact>new jadex.bdi.planlib.GuiCreator(Gui.class, new Class[]{jadex.bdi.runtime.IBDIExternalAccess.class, boolean.class}, 
-						new Object[]{$scope.getExternalAccess(), Boolean.TRUE})</fact>
+					<fact>
+						new jadex.bdi.planlib.GuiCreator(Gui.class, 
+						new Class[]{jadex.bdi.runtime.IBDIExternalAccess.class}, 
+						new Object[]{$scope.getExternalAccess()})
+					</fact>
 				</initialbelief> 
 			</beliefs>
 			<!-- <goals>

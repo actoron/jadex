@@ -57,6 +57,12 @@ public class AlphaNode extends AbstractNode implements IObjectConsumerNode, IObj
 	public void addObject(Object object, IOAVState state, ReteMemory mem, AbstractAgenda agenda)
 	{
 		//System.out.println("Add object called: "+this+" "+object);
+		
+		if(object.getClass().toString().indexOf("Order")!=-1)
+			System.out.println("here: "+object);
+		if(state.getType(object).getName().indexOf("goal")!=-1)
+			System.out.println("here: "+object);
+		
 		state.getProfiler().start(IProfiler.TYPE_NODE, this);
 		state.getProfiler().start(IProfiler.TYPE_NODEEVENT, IProfiler.NODEEVENT_OBJECTADDED);
 		

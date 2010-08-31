@@ -139,8 +139,9 @@ public abstract class AbstractBetaNode extends AbstractNode implements IObjectCo
 	 */
 	public void addTuple(Tuple left, IOAVState state, ReteMemory mem, AbstractAgenda agenda)
 	{
-//		if(getNodeId()==455)
-//			System.out.println(this+".addTuple: "+left);
+		if(getNodeId()==530)
+			System.out.println(this+".addTuple: "+left);
+		
 //		System.out.println("Add tuple called: "+this+" "+left);
 		state.getProfiler().start(IProfiler.TYPE_NODE, this);
 		state.getProfiler().start(IProfiler.TYPE_NODEEVENT, IProfiler.NODEEVENT_TUPLEADDED);
@@ -340,7 +341,7 @@ public abstract class AbstractBetaNode extends AbstractNode implements IObjectCo
 	 */
 	public void addObject(Object right, IOAVState state, ReteMemory mem, AbstractAgenda agenda)
 	{
-//		if(getNodeId()==455)
+//		if(getNodeId()==530)
 //			System.out.println(this+".addObject: "+right);
 
 //		System.out.println("Add object called: "+this+" "+right);

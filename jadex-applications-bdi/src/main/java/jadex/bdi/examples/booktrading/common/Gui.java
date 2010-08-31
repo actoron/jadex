@@ -23,11 +23,11 @@ public class Gui extends JFrame
 	/**
 	 *  Shows the gui, and updates it when beliefs change.
 	 */
-	public Gui(final IBDIExternalAccess agent, final boolean buy)
+	public Gui(final IBDIExternalAccess agent)//, final boolean buy)
 	{
-		super((buy? "Buyer: ": "Seller: ")+agent.getComponentName());
+		super((GuiPanel.isBuyer(agent)? "Buyer: ": "Seller: ")+agent.getComponentName());
 		
-		GuiPanel gp = new GuiPanel(agent, buy);
+		GuiPanel gp = new GuiPanel(agent);
 		agent.addAgentListener(new IAgentListener()
 		{
 			public void agentTerminating(AgentEvent ae)
@@ -45,7 +45,7 @@ public class Gui extends JFrame
 			{
 			}
 		});
-		gp.refresh();
+//		gp.refresh();
 		add(gp, BorderLayout.CENTER);
 		pack();
 		setLocation(SGUI.calculateMiddlePosition(this));
