@@ -36,6 +36,9 @@ public class ComponentTreeModel implements TreeModel
 	/** The node lookup table. */
 	private final Map	nodes;
 	
+	/** The added nodes. */
+	private final Map	added;
+	
 	/** The zombie node ids. */
 	private final Set	zombies;
 	
@@ -55,6 +58,7 @@ public class ComponentTreeModel implements TreeModel
 		this.listeners	= new ArrayList();
 		this.nodelisteners	= new ArrayList();
 		this.nodes	= new HashMap();
+		this.added	= new HashMap();
 		this.zombies	= new HashSet();
 		this.overlays	= new ArrayList();
 	}
@@ -154,7 +158,7 @@ public class ComponentTreeModel implements TreeModel
 			deregisterNode(this.root);
 		this.root = root;
 		if(root!=null)
-			registerNode(root);
+			addNode(root);
 		fireTreeChanged(root);
 	}
 	
@@ -185,15 +189,16 @@ public class ComponentTreeModel implements TreeModel
 		if(changed==null)
 		{
 			changed	= new MultiCollection(new HashMap(), HashSet.class);
-			SwingUtilities.invokeLater(new Runnable()
-			{
-				public void run()
-				{
+			changed.put(node.getParent(), node);
+//			SwingUtilities.invokeLater(new Runnable()
+//			{
+//				public void run()
+//				{
 					IComponentTreeNode[]	parents	= (IComponentTreeNode[])changed.getKeys(IComponentTreeNode.class);
 					for(int i=0; i<parents.length; i++)
 					{
 						// Only throw event when root node or parent still in tree
-						if(parents[i]==null || getNode(parents[i].getId())!=null)
+						if(parents[i]==null || getAddedNode(parents[i].getId())!=null)
 						{
 							boolean	skip	= false;
 							Set	set	= (Set)changed.get(parents[i]);
@@ -209,7 +214,7 @@ public class ComponentTreeModel implements TreeModel
 								for(int j=0; j<nodes.length; j++)
 								{
 									nodes[cnt]	= it.next();
-									if(getNode(((IComponentTreeNode)nodes[cnt]).getId())!=null)
+									if(getAddedNode(((IComponentTreeNode)nodes[cnt]).getId())!=null)
 									{
 										indices[cnt]	= parents[i].getIndexOfChild((IComponentTreeNode)nodes[cnt]);
 										if(indices[cnt]!=-1)
@@ -258,10 +263,9 @@ public class ComponentTreeModel implements TreeModel
 					}
 					
 					changed	= null;
-				}
-			});
+//				}
+//			});
 		}
-		changed.put(node.getParent(), node);
 		
 //		System.out.println("Node changed: "+node+", "+path);		
 	}
@@ -320,7 +324,7 @@ public class ComponentTreeModel implements TreeModel
 	}
 	
 	/**
-	 *  Add a node (optional).
+	 *  Register a node.
 	 *  Nodes can be registered for easy access.
 	 */
 	public void	registerNode(IComponentTreeNode node)
@@ -334,17 +338,28 @@ public class ComponentTreeModel implements TreeModel
 			
 			nodes.put(node.getId(), node);
 		}
-		
-		for(int i=0; i<node.getCachedChildren().size(); i++)
-		{
-			registerNode((IComponentTreeNode)node.getCachedChildren().get(i));
-		}
+	}
+	
+	/**
+	 *  Add a node.
+	 *  Informs listeners.
+	 */
+	public void	addNode(IComponentTreeNode node)
+	{
+		assert SwingUtilities.isEventDispatchThread();
+
+		added.put(node.getId(), node);
 		
 		INodeListener[]	lis	= (INodeListener[])nodelisteners.toArray(new INodeListener[nodelisteners.size()]);
 		for(int i=0; i<lis.length; i++)
 		{
 			lis[i].nodeAdded(node);
 		}
+
+		for(int i=0; i<node.getCachedChildren().size(); i++)
+		{
+			addNode((IComponentTreeNode)node.getCachedChildren().get(i));
+		}		
 	}
 	
 	/**
@@ -363,6 +378,16 @@ public class ComponentTreeModel implements TreeModel
 	}
 	
 	/**
+	 *  Get a node by its id.
+	 */
+	public IComponentTreeNode	getAddedNode(Object id)
+	{
+		assert SwingUtilities.isEventDispatchThread();
+
+		return (IComponentTreeNode)added.get(id);
+	}
+	
+	/**
 	 *  Remove a node registration.
 	 */
 	public void	deregisterNode(IComponentTreeNode node)
@@ -375,13 +400,14 @@ public class ComponentTreeModel implements TreeModel
 		{
 			if(zombies.contains(node.getId()))
 			{
-				assert !nodes.containsKey(node.getId()) : node.getId();
 				zombies.remove(node.getId());
+				nodes.remove(node.getId());
 			}
 			else
 			{
 	//			System.out.println("Removed: "+node.getId());
 				nodes.remove(node.getId());
+				added.remove(node.getId());
 				notify	= true;
 			}
 		}

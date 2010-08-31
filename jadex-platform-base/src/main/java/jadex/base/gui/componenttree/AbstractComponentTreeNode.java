@@ -238,7 +238,7 @@ public abstract class AbstractComponentTreeNode	implements IComponentTreeNode
 					}
 					for(int i=0; children!=null && i<children.size(); i++)
 					{
-						model.registerNode((IComponentTreeNode)children.get(i));
+						model.addNode((IComponentTreeNode)children.get(i));
 					}
 					model.fireTreeChanged(AbstractComponentTreeNode.this);					
 				}
@@ -247,7 +247,7 @@ public abstract class AbstractComponentTreeNode	implements IComponentTreeNode
 					for(int i=0; i<added.size(); i++)
 					{
 						IComponentTreeNode	node	= (IComponentTreeNode)added.get(i);
-						model.registerNode(node);
+						model.addNode(node);
 						model.fireNodeAdded(AbstractComponentTreeNode.this, node, children.indexOf(node));
 					}
 					model.fireNodeChanged(AbstractComponentTreeNode.this);
@@ -312,7 +312,7 @@ public abstract class AbstractComponentTreeNode	implements IComponentTreeNode
 			if(children==null)
 				children = new ArrayList();
 			children.add(index, node);
-			model.registerNode(node);
+			model.addNode(node);
 			model.fireNodeAdded(this, node, index);
 		}
 		else

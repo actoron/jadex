@@ -185,7 +185,7 @@ public class ComponentTreePanel extends JSplitPane
 				{
 					public void run()
 					{
-						ComponentTreeNode	node	= (ComponentTreeNode)model.getNode(desc.getName());
+						ComponentTreeNode	node	= (ComponentTreeNode)model.getAddedNode(desc.getName());
 						if(node!=null)
 						{
 							node.setDescription(desc);
@@ -201,7 +201,7 @@ public class ComponentTreePanel extends JSplitPane
 				{
 					public void run()
 					{
-						final ComponentTreeNode	parentnode = desc.getParent()==null? null: (ComponentTreeNode)model.getNode(desc.getParent());
+						final ComponentTreeNode	parentnode = desc.getParent()==null? null: (ComponentTreeNode)model.getAddedNode(desc.getParent());
 						if(parentnode!=null)
 						{
 							parentnode.createComponentNode(desc).addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)

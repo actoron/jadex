@@ -26,6 +26,8 @@ public class ServiceContainerNode	extends AbstractComponentTreeNode
 	public ServiceContainerNode(IComponentTreeNode parent, ComponentTreeModel model)
 	{
 		super(parent, model);
+		
+		model.registerNode(this);
 	}
 	
 	//-------- methods --------

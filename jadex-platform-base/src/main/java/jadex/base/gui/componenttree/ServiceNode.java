@@ -42,6 +42,7 @@ public class ServiceNode	extends AbstractComponentTreeNode
 		this.service	= service;
 //		if(service==null || service.getServiceIdentifier()==null)
 //			System.out.println("service node: "+this);
+		model.registerNode(this);
 	}
 	
 	//-------- methods --------

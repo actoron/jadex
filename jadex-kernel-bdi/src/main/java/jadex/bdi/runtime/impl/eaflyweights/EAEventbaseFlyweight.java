@@ -24,7 +24,6 @@ import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.service.SServiceProvider;
 import jadex.rules.state.IOAVState;
 
-import java.util.Map;
 
 /**
  *  Flyweight for the eventbase.

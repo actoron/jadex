@@ -56,6 +56,7 @@ public class VirtualComponentTreeNode extends AbstractComponentTreeNode implemen
 		this.cms = cms;
 		this.ui = ui;
 		this.iconcache = iconcache;
+		model.registerNode(this);
 	}
 	
 	/**

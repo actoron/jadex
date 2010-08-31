@@ -54,6 +54,8 @@ public class ComponentTreeNode	extends AbstractComponentTreeNode implements IAct
 		this.cms	= cms;
 		this.ui	= ui;
 		this.iconcache	= iconcache;
+		
+		model.registerNode(this);
 	}
 	
 	//-------- AbstractComponentTreeNode methods --------
