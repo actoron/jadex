@@ -42,11 +42,11 @@ public class EAGoalbaseFlyweight extends ElementFlyweight implements IEAGoalbase
 	public static EAGoalbaseFlyweight getGoalbaseFlyweight(IOAVState state, Object scope)
 	{
 		BDIInterpreter ip = BDIInterpreter.getInterpreter(state);
-		EAGoalbaseFlyweight ret = (EAGoalbaseFlyweight)ip.getFlyweightCache(IEAGoalbase.class).get(new Tuple(IEAGoalbase.class, scope));
+		EAGoalbaseFlyweight ret = (EAGoalbaseFlyweight)ip.getFlyweightCache(IEAGoalbase.class, new Tuple(IEAGoalbase.class, scope));
 		if(ret==null)
 		{
 			ret = new EAGoalbaseFlyweight(state, scope);
-			ip.getFlyweightCache(IEAGoalbase.class).put(new Tuple(IEAGoalbase.class, scope), ret);
+			ip.putFlyweightCache(IEAGoalbase.class, new Tuple(IEAGoalbase.class, scope), ret);
 		}
 		return ret;
 	}

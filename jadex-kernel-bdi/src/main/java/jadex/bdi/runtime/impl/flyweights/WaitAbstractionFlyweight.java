@@ -9,6 +9,7 @@ import jadex.bdi.runtime.IWaitAbstraction;
 import jadex.bdi.runtime.impl.SFlyweightFunctionality;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
+import jadex.commons.Tuple;
 import jadex.rules.state.IOAVState;
 
 /**
@@ -37,11 +38,11 @@ public class WaitAbstractionFlyweight extends ElementFlyweight implements IWaitA
 	public static WaitAbstractionFlyweight getWaitAbstractionFlyweight(IOAVState state, Object scope, Object handle)
 	{
 		BDIInterpreter ip = BDIInterpreter.getInterpreter(state);
-		WaitAbstractionFlyweight ret = (WaitAbstractionFlyweight)ip.getFlyweightCache(IWaitAbstraction.class).get(handle);
+		WaitAbstractionFlyweight ret = (WaitAbstractionFlyweight)ip.getFlyweightCache(IWaitAbstraction.class, new Tuple(IWaitAbstraction.class, handle));
 		if(ret==null)
 		{
 			ret = new WaitAbstractionFlyweight(state, scope, handle);
-			ip.getFlyweightCache(IWaitAbstraction.class).put(handle, ret);
+			ip.putFlyweightCache(IWaitAbstraction.class, new Tuple(IWaitAbstraction.class, handle), ret);
 		}
 		return ret;
 	}

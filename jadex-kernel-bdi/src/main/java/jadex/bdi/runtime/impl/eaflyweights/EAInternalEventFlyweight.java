@@ -5,6 +5,7 @@ import jadex.bdi.model.impl.flyweights.MInternalEventFlyweight;
 import jadex.bdi.runtime.IEAInternalEvent;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
+import jadex.commons.Tuple;
 import jadex.rules.state.IOAVState;
 
 /**
@@ -31,11 +32,11 @@ public class EAInternalEventFlyweight extends EAProcessableElementFlyweight impl
 	public static EAInternalEventFlyweight getInternalEventFlyweight(IOAVState state, Object scope, Object handle)
 	{
 		BDIInterpreter ip = BDIInterpreter.getInterpreter(state);
-		EAInternalEventFlyweight ret = (EAInternalEventFlyweight)ip.getFlyweightCache(IEAInternalEvent.class).get(handle);
+		EAInternalEventFlyweight ret = (EAInternalEventFlyweight)ip.getFlyweightCache(IEAInternalEvent.class, new Tuple(IEAInternalEvent.class, handle));
 		if(ret==null)
 		{
 			ret = new EAInternalEventFlyweight(state, scope, handle);
-			ip.getFlyweightCache(IEAInternalEvent.class).put(handle, ret);
+			ip.putFlyweightCache(IEAInternalEvent.class, new Tuple(IEAInternalEvent.class, handle), ret);
 		}
 		return ret;
 	}

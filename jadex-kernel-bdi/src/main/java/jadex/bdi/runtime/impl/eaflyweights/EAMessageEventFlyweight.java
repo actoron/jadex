@@ -10,6 +10,7 @@ import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bridge.MessageType;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
+import jadex.commons.Tuple;
 import jadex.rules.state.IOAVState;
 
 /**
@@ -43,11 +44,11 @@ public class EAMessageEventFlyweight extends EAProcessableElementFlyweight imple
 	public static EAMessageEventFlyweight getMessageEventFlyweight(IOAVState state, Object scope, Object handle)
 	{
 		BDIInterpreter ip = BDIInterpreter.getInterpreter(state);
-		EAMessageEventFlyweight ret = (EAMessageEventFlyweight)ip.getFlyweightCache(IEAMessageEvent.class).get(handle);
+		EAMessageEventFlyweight ret = (EAMessageEventFlyweight)ip.getFlyweightCache(IEAMessageEvent.class, new Tuple(IEAMessageEvent.class, handle));
 		if(ret==null)
 		{
 			ret = new EAMessageEventFlyweight(state, scope, handle);
-			ip.getFlyweightCache(IEAMessageEvent.class).put(handle, ret);
+			ip.putFlyweightCache(IEAMessageEvent.class, new Tuple(IEAMessageEvent.class, handle), ret);
 		}
 		return ret;
 	}

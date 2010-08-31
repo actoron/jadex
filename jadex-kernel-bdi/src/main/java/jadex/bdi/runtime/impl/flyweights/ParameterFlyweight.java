@@ -57,11 +57,11 @@ public class ParameterFlyweight extends ElementFlyweight implements IParameter
 	public static ParameterFlyweight getParameterFlyweight(IOAVState state, Object scope, Object handle, String name, Object parameterelement)
 	{
 		BDIInterpreter ip = BDIInterpreter.getInterpreter(state);
-		ParameterFlyweight ret = (ParameterFlyweight)ip.getFlyweightCache(IParameter.class).get(new Tuple(parameterelement, name));
+		ParameterFlyweight ret = (ParameterFlyweight)ip.getFlyweightCache(IParameter.class, new Tuple(IParameter.class, parameterelement, name));
 		if(ret==null)
 		{
 			ret = new ParameterFlyweight(state, scope, handle, name, parameterelement);
-			ip.getFlyweightCache(IParameter.class).put(new Tuple(parameterelement, name), ret);
+			ip.putFlyweightCache(IParameter.class, new Tuple(IParameter.class, parameterelement, name), ret);
 		}
 		return ret;
 	}

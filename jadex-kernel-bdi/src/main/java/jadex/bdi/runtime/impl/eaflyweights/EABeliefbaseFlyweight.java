@@ -40,11 +40,11 @@ public class EABeliefbaseFlyweight extends ElementFlyweight implements IEABelief
 	public static EABeliefbaseFlyweight getBeliefbaseFlyweight(IOAVState state, Object scope)
 	{
 		BDIInterpreter ip = BDIInterpreter.getInterpreter(state);
-		EABeliefbaseFlyweight ret = (EABeliefbaseFlyweight)ip.getFlyweightCache(IEABeliefbase.class).get(new Tuple(IEABeliefbase.class, scope));
+		EABeliefbaseFlyweight ret = (EABeliefbaseFlyweight)ip.getFlyweightCache(IEABeliefbase.class, new Tuple(IEABeliefbase.class, scope));
 		if(ret==null)
 		{
 			ret = new EABeliefbaseFlyweight(state, scope);
-			ip.getFlyweightCache(IEABeliefbase.class).put(new Tuple(IEABeliefbase.class, scope), ret);
+			ip.putFlyweightCache(IEABeliefbase.class, new Tuple(IEABeliefbase.class, scope), ret);
 		}
 		return ret;
 	}

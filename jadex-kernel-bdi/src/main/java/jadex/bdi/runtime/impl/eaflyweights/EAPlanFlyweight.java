@@ -10,6 +10,7 @@ import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bdi.runtime.interpreter.PlanRules;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
+import jadex.commons.Tuple;
 import jadex.rules.state.IOAVState;
 
 /**
@@ -34,11 +35,11 @@ public class EAPlanFlyweight extends EAParameterElementFlyweight implements IEAP
 	public static EAPlanFlyweight getPlanFlyweight(IOAVState state, Object scope, Object handle)
 	{
 		BDIInterpreter ip = BDIInterpreter.getInterpreter(state);
-		EAPlanFlyweight ret = (EAPlanFlyweight)ip.getFlyweightCache(IEAPlan.class).get(handle);
+		EAPlanFlyweight ret = (EAPlanFlyweight)ip.getFlyweightCache(IEAPlan.class, new Tuple(IEAPlan.class, handle));
 		if(ret==null)
 		{
 			ret = new EAPlanFlyweight(state, scope, handle);
-			ip.getFlyweightCache(IEAPlan.class).put(handle, ret);
+			ip.putFlyweightCache(IEAPlan.class, new Tuple(IEAPlan.class, handle), ret);
 		}
 		return ret;
 	}

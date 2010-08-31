@@ -12,6 +12,7 @@ import jadex.bdi.runtime.interpreter.BeliefRules;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
+import jadex.commons.Tuple;
 import jadex.rules.state.IOAVState;
 
 /**
@@ -38,11 +39,11 @@ public class EABeliefFlyweight extends ElementFlyweight implements IEABelief
 	public static EABeliefFlyweight getBeliefFlyweight(IOAVState state, Object scope, Object handle)
 	{
 		BDIInterpreter ip = BDIInterpreter.getInterpreter(state);
-		EABeliefFlyweight ret = (EABeliefFlyweight)ip.getFlyweightCache(IEABelief.class).get(handle);
+		EABeliefFlyweight ret = (EABeliefFlyweight)ip.getFlyweightCache(IEABelief.class, new Tuple(IEABelief.class, handle));
 		if(ret==null)
 		{
 			ret = new EABeliefFlyweight(state, scope, handle);
-			ip.getFlyweightCache(IEABelief.class).put(handle, ret);
+			ip.putFlyweightCache(IEABelief.class, new Tuple(IEABelief.class, handle), ret);
 		}
 		return ret;
 	}

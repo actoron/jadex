@@ -50,12 +50,11 @@ public class EAEventbaseFlyweight extends ElementFlyweight implements IEAEventba
 	public static EAEventbaseFlyweight getEventbaseFlyweight(IOAVState state, Object scope)
 	{
 		BDIInterpreter ip = BDIInterpreter.getInterpreter(state);
-		Map fwc = ip.getFlyweightCache(IEAEventbase.class);
-		EAEventbaseFlyweight ret = (EAEventbaseFlyweight)fwc.get(new Tuple(IEAEventbase.class, scope));
+		EAEventbaseFlyweight ret = (EAEventbaseFlyweight)ip.getFlyweightCache(IEAEventbase.class, new Tuple(IEAEventbase.class, scope));
 		if(ret==null)
 		{
 			ret = new EAEventbaseFlyweight(state, scope);
-			ip.getFlyweightCache(IEAEventbase.class).put(new Tuple(IEAEventbase.class, scope), ret);
+			ip.putFlyweightCache(IEAEventbase.class, new Tuple(IEAEventbase.class, scope), ret);
 		}
 		return ret;
 	}

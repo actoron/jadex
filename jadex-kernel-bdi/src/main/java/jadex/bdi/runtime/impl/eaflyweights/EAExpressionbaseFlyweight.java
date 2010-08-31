@@ -38,11 +38,11 @@ public class EAExpressionbaseFlyweight extends ElementFlyweight implements IEAEx
 	public static EAExpressionbaseFlyweight getExpressionbaseFlyweight(IOAVState state, Object scope)
 	{
 		BDIInterpreter ip = BDIInterpreter.getInterpreter(state);
-		EAExpressionbaseFlyweight ret = (EAExpressionbaseFlyweight)ip.getFlyweightCache(IEAExpressionbase.class).get(new Tuple(IEAExpressionbase.class, scope));
+		EAExpressionbaseFlyweight ret = (EAExpressionbaseFlyweight)ip.getFlyweightCache(IEAExpressionbase.class, new Tuple(IEAExpressionbase.class, scope));
 		if(ret==null)
 		{
 			ret = new EAExpressionbaseFlyweight(state, scope);
-			ip.getFlyweightCache(IEAExpressionbase.class).put(new Tuple(IEAExpressionbase.class, scope), ret);
+			ip.putFlyweightCache(IEAExpressionbase.class, new Tuple(IEAExpressionbase.class, scope), ret);
 		}
 		return ret;
 	}

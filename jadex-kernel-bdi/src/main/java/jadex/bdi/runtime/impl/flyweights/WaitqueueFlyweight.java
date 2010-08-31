@@ -47,11 +47,11 @@ public class WaitqueueFlyweight extends WaitAbstractionFlyweight implements IWai
 	{
 		Tuple	key	= new Tuple(rplan, IWaitqueue.class);
 		BDIInterpreter ip = BDIInterpreter.getInterpreter(state);
-		WaitqueueFlyweight ret = (WaitqueueFlyweight)ip.getFlyweightCache(IWaitqueue.class).get(key);
+		WaitqueueFlyweight ret = (WaitqueueFlyweight)ip.getFlyweightCache(IWaitqueue.class, key);
 		if(ret==null)
 		{
 			ret = new WaitqueueFlyweight(state, scope, rplan);
-			ip.getFlyweightCache(IWaitqueue.class).put(key, ret);
+			ip.putFlyweightCache(IWaitqueue.class, key, ret);
 		}
 		return ret;
 	}

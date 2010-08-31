@@ -35,11 +35,11 @@ public class BeliefbaseFlyweight extends ElementFlyweight implements IBeliefbase
 	public static BeliefbaseFlyweight getBeliefbaseFlyweight(IOAVState state, Object scope)
 	{
 		BDIInterpreter ip = BDIInterpreter.getInterpreter(state);
-		BeliefbaseFlyweight ret = (BeliefbaseFlyweight)ip.getFlyweightCache(IBeliefbase.class).get(new Tuple(IBeliefbase.class, scope));
+		BeliefbaseFlyweight ret = (BeliefbaseFlyweight)ip.getFlyweightCache(IBeliefbase.class, new Tuple(IBeliefbase.class, scope));
 		if(ret==null)
 		{
 			ret = new BeliefbaseFlyweight(state, scope);
-			ip.getFlyweightCache(IBeliefbase.class).put(new Tuple(IBeliefbase.class, scope), ret);
+			ip.putFlyweightCache(IBeliefbase.class, new Tuple(IBeliefbase.class, scope), ret);
 		}
 		return ret;
 	}

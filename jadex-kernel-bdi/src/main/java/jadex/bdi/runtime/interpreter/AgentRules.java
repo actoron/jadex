@@ -2,6 +2,7 @@ package jadex.bdi.runtime.interpreter;
 
 import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.runtime.IPlanExecutor;
+import jadex.bdi.runtime.impl.eaflyweights.ExternalAccessFlyweight;
 import jadex.bdi.runtime.impl.flyweights.ParameterFlyweight;
 import jadex.bridge.CheckedAction;
 import jadex.bridge.ComponentResultListener;
@@ -78,6 +79,9 @@ public class AgentRules
 			{
 				final Object ragent	= assignments.getVariableValue("?ragent");
 				final BDIInterpreter ip = BDIInterpreter.getInterpreter(state);
+				
+				// Init the external access
+				ip.ea = new ExternalAccessFlyweight(state, ragent);
 				
 				// Get the services.
 				final boolean services[]	= new boolean[4];

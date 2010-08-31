@@ -53,11 +53,11 @@ public class EAWaitqueueFlyweight extends EAWaitAbstractionFlyweight implements 
 	{
 		Tuple	key	= new Tuple(rplan, IEAWaitqueue.class);
 		BDIInterpreter ip = BDIInterpreter.getInterpreter(state);
-		EAWaitqueueFlyweight ret = (EAWaitqueueFlyweight)ip.getFlyweightCache(IEAWaitqueue.class).get(key);
+		EAWaitqueueFlyweight ret = (EAWaitqueueFlyweight)ip.getFlyweightCache(IEAWaitqueue.class, key);
 		if(ret==null)
 		{
 			ret = new EAWaitqueueFlyweight(state, scope, rplan);
-			ip.getFlyweightCache(IEAWaitqueue.class).put(key, ret);
+			ip.putFlyweightCache(IEAWaitqueue.class, key, ret);
 		}
 		return ret;
 	}

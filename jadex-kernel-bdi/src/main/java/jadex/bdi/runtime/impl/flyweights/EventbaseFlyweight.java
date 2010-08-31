@@ -43,11 +43,11 @@ public class EventbaseFlyweight extends ElementFlyweight implements IEventbase
 	public static EventbaseFlyweight getEventbaseFlyweight(IOAVState state, Object scope)
 	{
 		BDIInterpreter ip = BDIInterpreter.getInterpreter(state);
-		EventbaseFlyweight ret = (EventbaseFlyweight)ip.getFlyweightCache(IEventbase.class).get(new Tuple(IEventbase.class, scope));
+		EventbaseFlyweight ret = (EventbaseFlyweight)ip.getFlyweightCache(IEventbase.class, new Tuple(IEventbase.class, scope));
 		if(ret==null)
 		{
 			ret = new EventbaseFlyweight(state, scope);
-			ip.getFlyweightCache(IEventbase.class).put(new Tuple(IEventbase.class, scope), ret);
+			ip.putFlyweightCache(IEventbase.class, new Tuple(IEventbase.class, scope), ret);
 		}
 		return ret;
 	}

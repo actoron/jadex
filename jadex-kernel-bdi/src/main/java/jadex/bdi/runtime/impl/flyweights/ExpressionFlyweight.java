@@ -8,6 +8,7 @@ import jadex.bdi.runtime.interpreter.AgentRules;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.OAVBDIFetcher;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
+import jadex.commons.Tuple;
 import jadex.rules.state.IOAVState;
 
 /**
@@ -34,11 +35,11 @@ public class ExpressionFlyweight extends ElementFlyweight implements IExpression
 	public static ExpressionFlyweight getExpressionFlyweight(IOAVState state, Object scope, Object handle)
 	{
 		BDIInterpreter ip = BDIInterpreter.getInterpreter(state);
-		ExpressionFlyweight ret = (ExpressionFlyweight)ip.getFlyweightCache(IExpression.class).get(handle);
+		ExpressionFlyweight ret = (ExpressionFlyweight)ip.getFlyweightCache(IExpression.class, new Tuple(IExpression.class, handle));
 		if(ret==null)
 		{
 			ret = new ExpressionFlyweight(state, scope, handle);
-			ip.getFlyweightCache(IExpression.class).put(handle, ret);
+			ip.putFlyweightCache(IExpression.class, new Tuple(IExpression.class, handle), ret);
 		}
 		return ret;
 	}

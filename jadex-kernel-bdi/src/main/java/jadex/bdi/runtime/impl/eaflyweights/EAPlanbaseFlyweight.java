@@ -38,11 +38,11 @@ public class EAPlanbaseFlyweight extends ElementFlyweight implements IEAPlanbase
 	public static EAPlanbaseFlyweight getPlanbaseFlyweight(IOAVState state, Object scope)
 	{
 		BDIInterpreter ip = BDIInterpreter.getInterpreter(state);
-		EAPlanbaseFlyweight ret = (EAPlanbaseFlyweight)ip.getFlyweightCache(IEAPlanbase.class).get(new Tuple(IEAPlanbase.class, scope));
+		EAPlanbaseFlyweight ret = (EAPlanbaseFlyweight)ip.getFlyweightCache(IEAPlanbase.class, new Tuple(IEAPlanbase.class, scope));
 		if(ret==null)
 		{
 			ret = new EAPlanbaseFlyweight(state, scope);
-			ip.getFlyweightCache(IEAPlanbase.class).put(new Tuple(IEAPlanbase.class, scope), ret);
+			ip.putFlyweightCache(IEAPlanbase.class, new Tuple(IEAPlanbase.class, scope), ret);
 		}
 		return ret;
 	}

@@ -8,6 +8,7 @@ import jadex.bdi.runtime.impl.SFlyweightFunctionality;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.BeliefRules;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
+import jadex.commons.Tuple;
 import jadex.rules.state.IOAVState;
 
 import java.util.Collection;
@@ -36,11 +37,11 @@ public class BeliefSetFlyweight extends ElementFlyweight implements IBeliefSet
 	public static BeliefSetFlyweight getBeliefSetFlyweight(IOAVState state, Object scope, Object handle)
 	{
 		BDIInterpreter ip = BDIInterpreter.getInterpreter(state);
-		BeliefSetFlyweight ret = (BeliefSetFlyweight)ip.getFlyweightCache(IBeliefSet.class).get(handle);
+		BeliefSetFlyweight ret = (BeliefSetFlyweight)ip.getFlyweightCache(IBeliefSet.class, new Tuple(IBeliefSet.class, handle));
 		if(ret==null)
 		{
 			ret = new BeliefSetFlyweight(state, scope, handle);
-			ip.getFlyweightCache(IBeliefSet.class).put(handle, ret);
+			ip.putFlyweightCache(IBeliefSet.class, new Tuple(IBeliefSet.class, handle), ret);
 		}
 		return ret;
 	}

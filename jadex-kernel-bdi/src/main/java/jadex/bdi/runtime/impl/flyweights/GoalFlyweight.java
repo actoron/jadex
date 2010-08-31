@@ -9,6 +9,7 @@ import jadex.bdi.runtime.impl.SFlyweightFunctionality;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.GoalLifecycleRules;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
+import jadex.commons.Tuple;
 import jadex.rules.state.IOAVState;
 
 /**
@@ -36,11 +37,11 @@ public class GoalFlyweight extends ProcessableElementFlyweight implements IGoal
 	public static GoalFlyweight getGoalFlyweight(IOAVState state, Object scope, Object handle)
 	{
 		BDIInterpreter ip = BDIInterpreter.getInterpreter(state);
-		GoalFlyweight ret = (GoalFlyweight)ip.getFlyweightCache(IGoal.class).get(handle);
+		GoalFlyweight ret = (GoalFlyweight)ip.getFlyweightCache(IGoal.class, new Tuple(IGoal.class, handle));
 		if(ret==null)
 		{
 			ret = new GoalFlyweight(state, scope, handle);
-			ip.getFlyweightCache(IGoal.class).put(handle, ret);
+			ip.putFlyweightCache(IGoal.class, new Tuple(IGoal.class, handle), ret);
 		}
 		return ret;
 	}

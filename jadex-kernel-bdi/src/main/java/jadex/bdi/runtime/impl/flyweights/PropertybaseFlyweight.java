@@ -34,11 +34,11 @@ public class PropertybaseFlyweight extends ElementFlyweight implements IProperty
 	public static PropertybaseFlyweight getPropertybaseFlyweight(IOAVState state, Object scope)
 	{
 		BDIInterpreter ip = BDIInterpreter.getInterpreter(state);
-		PropertybaseFlyweight ret = (PropertybaseFlyweight)ip.getFlyweightCache(IPropertybase.class).get(new Tuple(IPropertybase.class, scope));
+		PropertybaseFlyweight ret = (PropertybaseFlyweight)ip.getFlyweightCache(IPropertybase.class, new Tuple(IPropertybase.class, scope));
 		if(ret==null)
 		{
 			ret = new PropertybaseFlyweight(state, scope);
-			ip.getFlyweightCache(IPropertybase.class).put(new Tuple(IPropertybase.class, scope), ret);
+			ip.putFlyweightCache(IPropertybase.class, new Tuple(IPropertybase.class, scope), ret);
 		}
 		return ret;
 	}

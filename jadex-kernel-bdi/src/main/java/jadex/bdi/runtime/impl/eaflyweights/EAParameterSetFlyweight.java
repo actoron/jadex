@@ -62,11 +62,11 @@ public class EAParameterSetFlyweight extends ElementFlyweight implements IEAPara
 	public static EAParameterSetFlyweight getParameterSetFlyweight(IOAVState state, Object scope, Object handle, String name, Object parameterelement)
 	{
 		BDIInterpreter ip = BDIInterpreter.getInterpreter(state);
-		EAParameterSetFlyweight ret = (EAParameterSetFlyweight)ip.getFlyweightCache(IEAParameterSet.class).get(new Tuple(parameterelement, name));
+		EAParameterSetFlyweight ret = (EAParameterSetFlyweight)ip.getFlyweightCache(IEAParameterSet.class, new Tuple(IEAParameterSet.class, parameterelement, name));
 		if(ret==null)
 		{
 			ret = new EAParameterSetFlyweight(state, scope, handle, name, parameterelement);
-			ip.getFlyweightCache(IEAParameterSet.class).put(new Tuple(parameterelement, name), ret);
+			ip.putFlyweightCache(IEAParameterSet.class, new Tuple(IEAParameterSet.class, parameterelement, name), ret);
 		}
 		return ret;
 	}

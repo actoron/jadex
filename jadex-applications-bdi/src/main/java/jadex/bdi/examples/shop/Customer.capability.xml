@@ -17,9 +17,12 @@
 		<beliefset name="inventory" class="ItemInfo"/>
 		
 		<belief name="gui" class="jadex.bdi.planlib.GuiCreator">
-			<fact>new jadex.bdi.planlib.GuiCreator(CustomerPanel.class.getMethod("createCustomerGui", 
-				new Class[]{jadex.bdi.runtime.IBDIExternalAccess.class}), new Class[]{jadex.bdi.runtime.IBDIExternalAccess.class}, 
+			<fact>new jadex.bdi.planlib.GuiCreator(CustomerFrame.class, 
+				new Class[]{jadex.bdi.runtime.IBDIExternalAccess.class}, 
 				new Object[]{$scope.getExternalAccess()})</fact>
+			<!-- <fact>new jadex.bdi.planlib.GuiCreator(CustomerPanel.class.getMethod("createCustomerGui", 
+				new Class[]{jadex.bdi.runtime.IBDIExternalAccess.class}), new Class[]{jadex.bdi.runtime.IBDIExternalAccess.class}, 
+				new Object[]{$scope.getExternalAccess()})</fact> -->
 		</belief>
 	</beliefs>
 

@@ -10,6 +10,7 @@ import jadex.bdi.runtime.interpreter.OAVBDIFetcher;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
+import jadex.commons.Tuple;
 import jadex.rules.state.IOAVState;
 
 /**
@@ -36,11 +37,11 @@ public class EAExpressionFlyweight extends ElementFlyweight implements IEAExpres
 	public static EAExpressionFlyweight getExpressionFlyweight(IOAVState state, Object scope, Object handle)
 	{
 		BDIInterpreter ip = BDIInterpreter.getInterpreter(state);
-		EAExpressionFlyweight ret = (EAExpressionFlyweight)ip.getFlyweightCache(IEAExpression.class).get(handle);
+		EAExpressionFlyweight ret = (EAExpressionFlyweight)ip.getFlyweightCache(IEAExpression.class, new Tuple(IEAExpression.class, handle));
 		if(ret==null)
 		{
 			ret = new EAExpressionFlyweight(state, scope, handle);
-			ip.getFlyweightCache(IEAExpression.class).put(handle, ret);
+			ip.putFlyweightCache(IEAExpression.class, new Tuple(IEAExpression.class, handle), ret);
 		}
 		return ret;
 	}

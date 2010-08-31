@@ -307,7 +307,7 @@ public class CustomerPanel extends JPanel
 	
 	/**
 	 *  Create a customer gui frame.
-	 */
+	 * /
 	public static void createCustomerGui(final IBDIExternalAccess agent)
 	{
 		final JFrame f = new JFrame();
@@ -334,7 +334,7 @@ public class CustomerPanel extends JPanel
 			{
 			}
 		});
-	}
+	}*/
 	
 	/**
 	 * Method to be called when goals may have changed.

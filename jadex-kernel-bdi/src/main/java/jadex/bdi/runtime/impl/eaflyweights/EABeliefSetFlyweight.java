@@ -13,6 +13,7 @@ import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.SReflect;
+import jadex.commons.Tuple;
 import jadex.rules.state.IOAVState;
 
 import java.util.Collection;
@@ -41,11 +42,11 @@ public class EABeliefSetFlyweight extends ElementFlyweight implements IEABeliefS
 	public static EABeliefSetFlyweight getBeliefSetFlyweight(IOAVState state, Object scope, Object handle)
 	{
 		BDIInterpreter ip = BDIInterpreter.getInterpreter(state);
-		EABeliefSetFlyweight ret = (EABeliefSetFlyweight)ip.getFlyweightCache(IEABeliefSet.class).get(handle);
+		EABeliefSetFlyweight ret = (EABeliefSetFlyweight)ip.getFlyweightCache(IEABeliefSet.class, new Tuple(IEABeliefSet.class, handle));
 		if(ret==null)
 		{
 			ret = new EABeliefSetFlyweight(state, scope, handle);
-			ip.getFlyweightCache(IEABeliefSet.class).put(handle, ret);
+			ip.putFlyweightCache(IEABeliefSet.class, new Tuple(IEABeliefSet.class, handle), ret);
 		}
 		return ret;
 	}

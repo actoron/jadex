@@ -187,6 +187,9 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 	/** The cms future for init return. */
 	protected Future inited;
 	
+	/** The cached external access. */
+	protected IExternalAccess ea;
+	
 	//-------- constructors --------
 	
 	/**
@@ -410,7 +413,8 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 	 */
 	public IExternalAccess getExternalAccess()
 	{
-		return new ExternalAccessFlyweight(state, ragent);
+		return ea;
+//		return new ExternalAccessFlyweight(state, ragent);
 		
 //		final Future ret = new Future();
 //		
@@ -1157,12 +1161,36 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 	/**
 	 *  Get the flyweight cache.
 	 *  @return The flyweight cache.
-	 */
+	 * /
 	public Map getFlyweightCache(Class type)
 	{
 //		System.out.println("stacache: "+stacache.size());
 //		System.out.println("volcache: "+volcache.size());
 		return stacacheelems.contains(type)? stacache: volcache;
+	}*/
+	
+	/**
+	 *  Put an element into the cache.
+	 */
+	public void putFlyweightCache(Class type, Object key, Object flyweight)
+	{
+//		if(isExternalThread())
+//			System.out.println("wrong thread");
+		
+		Map cache = stacacheelems.contains(type)? stacache: volcache;
+		cache.put(key, flyweight);
+	}
+	
+	/**
+	 *  Get an element from the cache.
+	 */
+	public Object getFlyweightCache(Class type, Object key)
+	{
+//		if(isExternalThread())
+//			System.out.println("wrong thread");
+		
+		Map cache = stacacheelems.contains(type)? stacache: volcache;
+		return cache.get(key);
 	}
 	
 	/**

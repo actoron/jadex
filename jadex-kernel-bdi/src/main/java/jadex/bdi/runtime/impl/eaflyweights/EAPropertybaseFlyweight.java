@@ -37,11 +37,11 @@ public class EAPropertybaseFlyweight extends ElementFlyweight implements IEAProp
 	public static EAPropertybaseFlyweight getPropertybaseFlyweight(IOAVState state, Object scope)
 	{
 		BDIInterpreter ip = BDIInterpreter.getInterpreter(state);
-		EAPropertybaseFlyweight ret = (EAPropertybaseFlyweight)ip.getFlyweightCache(IEAPropertybase.class).get(new Tuple(IEAPropertybase.class, scope));
+		EAPropertybaseFlyweight ret = (EAPropertybaseFlyweight)ip.getFlyweightCache(IEAPropertybase.class, new Tuple(IEAPropertybase.class, scope));
 		if(ret==null)
 		{
 			ret = new EAPropertybaseFlyweight(state, scope);
-			ip.getFlyweightCache(IEAPropertybase.class).put(new Tuple(IEAPropertybase.class, scope), ret);
+			ip.putFlyweightCache(IEAPropertybase.class, new Tuple(IEAPropertybase.class, scope), ret);
 		}
 		return ret;
 	}

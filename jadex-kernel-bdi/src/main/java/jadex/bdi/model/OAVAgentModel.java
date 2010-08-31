@@ -105,8 +105,9 @@ public class OAVAgentModel	extends OAVCapabilityModel
 			"dispatchTopLevelGoalAndWait",
 			
 			"getExternalAccess", "getBeliefbase", "getGoalbase", "getPlanbase",
-			"getEventbase", "getExpressionbase", "getLogger", "getPlatformComponent",
-			"getTime", "getClassLoader", "addAgentListener", "removeAgentListener"
+			"getEventbase", "getExpressionbase", "getPropertybase", "getLogger", 
+			"getPlatformComponent", "getTime", "getClassLoader", "addAgentListener", 
+			"removeAgentListener"
 			});
 		
 //		Map ret = super.getProperties();

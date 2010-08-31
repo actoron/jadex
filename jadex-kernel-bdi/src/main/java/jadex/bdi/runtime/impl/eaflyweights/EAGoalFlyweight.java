@@ -10,6 +10,7 @@ import jadex.bdi.runtime.interpreter.GoalLifecycleRules;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
+import jadex.commons.Tuple;
 import jadex.rules.state.IOAVState;
 
 /**
@@ -37,11 +38,11 @@ public class EAGoalFlyweight extends EAProcessableElementFlyweight implements IE
 	public static EAGoalFlyweight getGoalFlyweight(IOAVState state, Object scope, Object handle)
 	{
 		BDIInterpreter ip = BDIInterpreter.getInterpreter(state);
-		EAGoalFlyweight ret = (EAGoalFlyweight)ip.getFlyweightCache(IEAGoal.class).get(handle);
+		EAGoalFlyweight ret = (EAGoalFlyweight)ip.getFlyweightCache(IEAGoal.class, new Tuple(IEAGoal.class, handle));
 		if(ret==null)
 		{
 			ret = new EAGoalFlyweight(state, scope, handle);
-			ip.getFlyweightCache(IEAGoal.class).put(handle, ret);
+			ip.putFlyweightCache(IEAGoal.class, new Tuple(IEAGoal.class, handle), ret);
 		}
 		return ret;
 	}

@@ -11,15 +11,19 @@ import jadex.commons.Properties;
 import javax.swing.JComponent;
 
 /**
- * 
+ *  Panel for the customer view.
  */
 public class CustomerViewerPanel implements IComponentViewerPanel
 {
+	//-------- attributes --------
+	
 	/** The jcc. */
 	protected IControlCenter jcc;
 	
 	/** The component. */
 	protected IExternalAccess component;
+	
+	//-------- methods --------
 	
 	/**
 	 *  Called once to initialize the panel.
@@ -30,24 +34,7 @@ public class CustomerViewerPanel implements IComponentViewerPanel
 	public IFuture init(IControlCenter jcc, IExternalAccess component)
 	{
 		this.jcc = jcc;
-		
-		// Hack!!!
-//		IBDIExternalAccess agent = (IBDIExternalAccess)component;
-//		agent.getExternalAccess("customercap").addResultListener(new SwingDefaultResultListener((JComponent)null)
-//		{
-//			public void customResultAvailable(Object source, Object result)
-//			{
-//				CustomerViewerPanel.this.component = (IExternalAccess)result; 
-//				ret.setResult(null);
-//			}
-//			
-//			public void customExceptionOccurred(Object source, Exception exception)
-//			{
-//				ret.setException(exception);
-//			}
-//		});
 		this.component = component;
-	
 		return new Future(null);
 	}
 	
