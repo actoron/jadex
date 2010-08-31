@@ -36,11 +36,19 @@
 			<facts language="jcl">	
 				collect(
 					Order $order &amp;&amp;
+					IGoal $g &amp;&amp; $g.getModelElement().getName().equals("sell_book") &amp;&amp;
+					$goalbase.containsGoal($g) &amp;&amp;
+					$g.getParameter("order").getValue()==$order
+				)
+			</facts>
+			<!-- <facts language="jcl">	
+				collect(
+					Order $order &amp;&amp;
 					IGoal $g &amp;&amp;
 					Arrays.asList($goalbase.getGoals("sell_book")).contains($g) &amp;&amp;
 					$g.getParameter("order").getValue()==$order
 				)
-			</facts>
+			</facts> -->
 		</beliefset>
 	
 		<belief name="time" class="long" updaterate="1000">
