@@ -103,6 +103,7 @@ public class RowResult extends IResult {
 		buffer.append(getOptimizationValue());
 		buffer.append("\n\n");
 		buffer.append("Cumulated Stats of Observed Events:");
+		
 		//Print out cumulated stats for each type of observed event
 		for (Iterator it = finalStatsMap.keySet().iterator(); it.hasNext();) {
 			Object key = it.next();

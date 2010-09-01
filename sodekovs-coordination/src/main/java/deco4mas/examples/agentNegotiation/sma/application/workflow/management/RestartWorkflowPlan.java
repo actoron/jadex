@@ -22,7 +22,7 @@ public class RestartWorkflowPlan extends Plan
 			Long startTime = ClockTime.getStartTime(getClock());
 
 			// restart until 300000 ZE (~msec)
-			if ((getTime() - startTime) <= 40000)
+			if ((getTime() - startTime) <= 900000000)
 			{
 				// LOG
 				smaLogger.info("start new workflow");

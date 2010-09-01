@@ -79,7 +79,7 @@ public class EvaluationResult {
 		buffer.append(TimeConverter.longTime2DateString(getSimulationStartime()));
 		buffer.append(" - ");
 		buffer.append(getSimulationDuration());
-		buffer.append("\n");
+		buffer.append("\n\n");
 
 		sortRowlist();
 		for (RowResult row : getRowResults()) {
