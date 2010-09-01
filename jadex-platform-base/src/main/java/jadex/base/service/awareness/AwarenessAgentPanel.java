@@ -1,10 +1,8 @@
-package jadex.base.gui.componentviewer.awareness;
+package jadex.base.service.awareness;
 
 import jadex.base.gui.componentviewer.IComponentViewerPanel;
 import jadex.base.gui.jtable.ComponentIdentifierRenderer;
 import jadex.base.gui.plugin.IControlCenter;
-import jadex.base.service.awareness.AwarenessAgent;
-import jadex.base.service.awareness.DiscoveryInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.Future;

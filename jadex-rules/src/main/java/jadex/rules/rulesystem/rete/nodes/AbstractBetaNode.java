@@ -139,8 +139,8 @@ public abstract class AbstractBetaNode extends AbstractNode implements IObjectCo
 	 */
 	public void addTuple(Tuple left, IOAVState state, ReteMemory mem, AbstractAgenda agenda)
 	{
-		if(getNodeId()==530)
-			System.out.println(this+".addTuple: "+left);
+//		if(getNodeId()==530)
+//			System.out.println(this+".addTuple: "+left);
 		
 //		System.out.println("Add tuple called: "+this+" "+left);
 		state.getProfiler().start(IProfiler.TYPE_NODE, this);
@@ -221,7 +221,7 @@ public abstract class AbstractBetaNode extends AbstractNode implements IObjectCo
 			{
 				Tuple next = (Tuple)it.next();
 				if(next.getLastTuple().equals(left))
-					System.out.println("driss: "+this+" "+next);
+					System.out.println("error: "+this+" "+next);
 				assert !next.getLastTuple().equals(left) : "Tuple not removed: "+left+", "+this;
 			}
 		}
@@ -463,8 +463,12 @@ public abstract class AbstractBetaNode extends AbstractNode implements IObjectCo
 	
 					// Tuple newly valid -> add match
 					if(!contains && check)
+					{
+						if(getNodeId()==530)
+							System.out.println("add: "+left+" "+right);
 						addMatch(left, right, state, mem, agenda);
-
+					}
+					
 					// Tuple no longer valid -> remove match
 					else if(contains && !check)
 						removeMatch(left, right, state, mem, agenda);

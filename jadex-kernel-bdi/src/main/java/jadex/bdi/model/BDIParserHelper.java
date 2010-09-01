@@ -390,7 +390,9 @@ public class BDIParserHelper extends	DefaultParserHelper
 			{
 				public AttributeSet getRelevantAttributes()
 				{
-					return AttributeSet.EMPTY_ATTRIBUTESET;
+					AttributeSet ret = new AttributeSet();
+					ret.addAttribute(OAVBDIRuntimeModel.capability_has_goals);
+					return ret;
 				}
 				public Class getReturnType()
 				{
@@ -416,7 +418,9 @@ public class BDIParserHelper extends	DefaultParserHelper
 			{
 				public AttributeSet getRelevantAttributes()
 				{
-					return AttributeSet.EMPTY_ATTRIBUTESET;
+					AttributeSet ret = new AttributeSet();
+					ret.addAttribute(OAVBDIRuntimeModel.capability_has_plans);
+					return ret;
 				}
 				public Class getReturnType()
 				{

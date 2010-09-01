@@ -36,6 +36,12 @@ public interface IDF	extends IService
 	 *  @return An array of matching component descriptions. 
 	 */
 	public IFuture search(IDFComponentDescription adesc, ISearchConstraints con);
+	
+	/**
+	 *  Search for components matching the given description.
+	 *  @return An array of matching component descriptions. 
+	 */
+	public IFuture search(IDFComponentDescription adesc, ISearchConstraints con, boolean federated);
 
 	/**
 	 *  Create a df service description.

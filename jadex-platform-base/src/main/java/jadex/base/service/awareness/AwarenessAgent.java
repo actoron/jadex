@@ -783,6 +783,6 @@ public class AwarenessAgent extends MicroAgent
 				new Argument("autocreate", "This parameter describes if new proxies should be automatically created when discovering new components.", "boolean", Boolean.TRUE),	
 				new Argument("autodelete", "This parameter describes if proxies should be automatically deleted when not discovered any longer.", "boolean", Boolean.TRUE),	
 				new Argument("proxydelay", "This parameter is the delay used by proxies.", "long", new Long(10000)),	
-			}, null, null, SUtil.createHashMap(new String[]{"componentviewer.viewerclass"}, new Object[]{"jadex.base.gui.componentviewer.awareness.AwarenessAgentPanel"}));
+			}, null, null, SUtil.createHashMap(new String[]{"componentviewer.viewerclass"}, new Object[]{"jadex.base.service.awareness.AwarenessAgentPanel"}));
 	}
 }

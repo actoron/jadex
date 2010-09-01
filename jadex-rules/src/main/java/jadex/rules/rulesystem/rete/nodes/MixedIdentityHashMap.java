@@ -5,10 +5,13 @@ import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVJavaType;
 import jadex.rules.state.OAVObjectType;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -98,7 +101,10 @@ public class MixedIdentityHashMap	implements Map
 	
 	public Collection values()
 	{
-		throw new UnsupportedOperationException("Not yet implemented");
+		List vals = new ArrayList();
+		vals.addAll(equality.values());
+		vals.addAll(identity.values());
+		return vals;
 	}
 
 	public Set entrySet()
@@ -108,16 +114,34 @@ public class MixedIdentityHashMap	implements Map
 	
 	public Set keySet()
 	{
-		throw new UnsupportedOperationException("Not yet implemented");
+		Set keys = new HashSet();
+		keys.addAll(equality.keySet());
+		keys.addAll(identity.keySet());
+		return keys;
 	}
-	
-	public boolean equals(Object obj)
-	{
-		throw new UnsupportedOperationException("Not yet implemented");
-	}
-	
+
 	public int hashCode()
 	{
-		throw new UnsupportedOperationException("Not yet implemented");
-	}		
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+			+ ((equality == null) ? 0 : equality.hashCode());
+		result = prime * result
+			+ ((identity == null) ? 0 : identity.hashCode());
+		result = prime * result + ((state == null) ? 0 : state.hashCode());
+		return result;
+	}
+
+	public boolean equals(Object obj)
+	{
+		boolean ret = false;
+		if(obj instanceof MixedIdentityHashMap)
+		{
+			MixedIdentityHashMap other = (MixedIdentityHashMap)obj;
+			ret = equality.equals(other.equality) && identity.equals(other.identity) && state.equals(other.state);
+		}
+		return ret;
+	}
+	
+		
 }

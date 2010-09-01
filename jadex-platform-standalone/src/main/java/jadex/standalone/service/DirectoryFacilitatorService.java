@@ -14,6 +14,8 @@ import jadex.bridge.ISearchConstraints;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.collection.IndexMap;
+import jadex.commons.concurrent.CollectionResultListener;
+import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.service.BasicService;
 import jadex.commons.service.IServiceProvider;
@@ -21,8 +23,10 @@ import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.clock.IClockService;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -53,7 +57,7 @@ public class DirectoryFacilitatorService extends BasicService implements IDF
 	 */
 	public DirectoryFacilitatorService(IServiceProvider provider)
 	{
-		super(provider.getId(), IDF.class, null);
+		this(provider, null);
 	}
 	
 	/**
@@ -164,13 +168,22 @@ public class DirectoryFacilitatorService extends BasicService implements IDF
 	 *  Search for components matching the given description.
 	 *  @return An array of matching component descriptions. 
 	 */
-	public IFuture search(IDFComponentDescription adesc, ISearchConstraints con)
+	public IFuture search(final IDFComponentDescription adesc, final ISearchConstraints con)
 	{
-		Future fut = new Future();
+		return search(adesc, con, false);
+	}
+	
+	/**
+	 *  Search for components matching the given description.
+	 *  @return An array of matching component descriptions. 
+	 */
+	public IFuture search(final IDFComponentDescription adesc, final ISearchConstraints con, boolean federated)
+	{
+		final Future fut = new Future();
 		
 		//System.out.println("Searching: "+adesc.getName());
 
-		List ret = new ArrayList();
+		final List ret = new ArrayList();
 
 		// If name is supplied, just lookup description.
 		if(adesc.getName()!=null)
@@ -213,11 +226,75 @@ public class DirectoryFacilitatorService extends BasicService implements IDF
 				}
 			}
 		}
+		
+		System.out.println("Started search: "+ret);
+		if(federated)
+		{
+			SServiceProvider.getServices(provider, IDF.class, false).addResultListener(new IResultListener()
+			{
+				public void resultAvailable(Object source, Object result)
+				{
+					Collection coll = (Collection)result;
+					if(coll.size()>2)
+						System.out.println("here");
+					// Ignore search failures of remote dfs
+					CollectionResultListener lis = new CollectionResultListener(coll.size(), true, new IResultListener()
+					{
+						public void resultAvailable(Object source, Object result)
+						{
+							// Add all services of all remote dfs
+							for(Iterator it=((Collection)result).iterator(); it.hasNext(); )
+							{
+								IDFComponentDescription[] res = (IDFComponentDescription[])it.next();
+								if(res!=null)
+								{
+									for(int i=0; i<res.length; i++)
+									{
+										ret.add(res[i]);
+									}
+								}
+							}
+							if(ret.size()>1)
+								System.out.println("here");
+							System.out.println("Federated search: "+ret);
+							fut.setResult(ret.toArray(new DFComponentDescription[ret.size()]));
+						}
+						
+						public void exceptionOccurred(Object source, Exception exception)
+						{
+							fut.setException(exception);
+//								fut.setResult(ret.toArray(new DFComponentDescription[ret.size()]));
+						}
+					});
+					for(Iterator it=coll.iterator(); it.hasNext(); )
+					{
+						IDF remotedf = (IDF)it.next();
+						if(remotedf!=DirectoryFacilitatorService.this)
+						{
+							remotedf.search(adesc, con, false).addResultListener(lis);
+						}
+						else
+						{
+							lis.resultAvailable(null, null);
+						}
+					}
+				}
+				
+				public void exceptionOccurred(Object source, Exception exception)
+				{
+					fut.setResult(ret.toArray(new DFComponentDescription[ret.size()]));
+				}
+			});
+		}
+		else
+		{
+			System.out.println("Local search: "+ret);
+			fut.setResult(ret.toArray(new DFComponentDescription[ret.size()]));
+		}
 
 		//System.out.println("Searched: "+ret);
 		//return (ComponentDescription[])ret.toArray(new ComponentDescription[ret.size()]);
 		
-		fut.setResult(ret.toArray(new DFComponentDescription[ret.size()]));
 		return fut;
 	}
 

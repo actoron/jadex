@@ -127,9 +127,6 @@ public class ReteBuilder
 	 */
 	public ReteNode addRule(ReteNode root, IRule rule)
 	{
-//		if(rule.getName().indexOf("achievecleanup")!=-1)
-//			System.out.println("ysfklk");
-		
 		// todo: or, exists conditions
 		
 		// System.nanoTime() : @since 1.5

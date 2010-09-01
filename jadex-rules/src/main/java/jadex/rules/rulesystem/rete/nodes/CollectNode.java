@@ -55,8 +55,6 @@ public class CollectNode extends AbstractNode implements ITupleConsumerNode, ITu
 	public CollectNode(int nodeid, int tupleindex, IConstraintEvaluator[] evaluators)
 	{
 		super(nodeid);
-//		System.out.println("Collect Node created");
-//		Thread.dumpStack();
 		this.tupleindex = tupleindex;
 		this.evaluators	= evaluators;
 	}
@@ -143,7 +141,8 @@ public class CollectNode extends AbstractNode implements ITupleConsumerNode, ITu
 	 */
 	public void addTuple(Tuple left, IOAVState state, ReteMemory mem, AbstractAgenda agenda)
 	{
-//		System.out.println("Add tuple called: "+this+" "+left);
+//		if(getNodeId()==531)
+//			System.out.println("Add tuple called: "+this+" "+left);
 		state.getProfiler().start(IProfiler.TYPE_NODE, this);
 		state.getProfiler().start(IProfiler.TYPE_NODEEVENT, IProfiler.NODEEVENT_TUPLEADDED);
 
@@ -172,7 +171,7 @@ public class CollectNode extends AbstractNode implements ITupleConsumerNode, ITu
 			}
 			nodemem.putWorkingTuple(indextuple, resulttuple);
 		}
-		// Add new value to existing reult tuple.
+		// Add new value to existing result tuple.
 		else
 		{
 			// Hack!!! Changing original tuple should be avoided,
@@ -224,7 +223,8 @@ public class CollectNode extends AbstractNode implements ITupleConsumerNode, ITu
 	 */
 	public void removeTuple(Tuple left, IOAVState state, ReteMemory mem, AbstractAgenda agenda)
 	{
-		//System.out.println("Remove tuple called: "+this+" "+left);
+//		if(getNodeId()==531)
+//			System.out.println("Remove tuple called: "+this+" "+left);
 		state.getProfiler().start(IProfiler.TYPE_NODE, this);
 		state.getProfiler().start(IProfiler.TYPE_NODEEVENT, IProfiler.NODEEVENT_TUPLEREMOVED);
 
@@ -294,6 +294,9 @@ public class CollectNode extends AbstractNode implements ITupleConsumerNode, ITu
 	public void modifyTuple(Tuple left, int tupleindex, OAVAttributeType type,
 		Object oldvalue, Object newvalue, IOAVState state, ReteMemory mem, AbstractAgenda agenda)
 	{
+//		if(getNodeId()==531)
+//			System.out.println("Modify tuple called: "+this+" "+left);
+
 		if(!getRelevantAttributes().contains(type))
 			return;
 
@@ -534,8 +537,8 @@ public class CollectNode extends AbstractNode implements ITupleConsumerNode, ITu
 	/**
 	 *  Create an index tuple from a tuple.
 	 *  The index tuple excludes the index position at
-	 *  which the compression happens and all elements
-	 *  thereafter.
+	 *  which the compression happens (and all elements
+	 *  thereafter -> why, could be the last node?).
 	 *  @param tuple The tuple.
 	 *  @return The index tuple. 
 	 */
@@ -546,7 +549,8 @@ public class CollectNode extends AbstractNode implements ITupleConsumerNode, ITu
 		for(int i=0; i<obs.size(); i++)
 		{
 			if(i<tupleindex)
-				t = mem.getTuple(state, t, obs.get(i));
+//			if(i!=tupleindex)
+				t = mem.getTuple(state, t, obs.get(i)); // Create tuple from tuples
 		}
 		return t;
 	}

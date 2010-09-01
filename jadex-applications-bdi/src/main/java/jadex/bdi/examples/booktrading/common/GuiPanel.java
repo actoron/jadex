@@ -255,19 +255,19 @@ public class GuiPanel extends JPanel
 		{
 			public void factChanged(AgentEvent ae)
 			{
-				System.out.println("Changed: "+ae.getValue());
+//				System.out.println("Changed: "+ae.getValue());
 				refresh();
 			}
 			
 			public void factAdded(AgentEvent ae)
 			{
-				System.out.println("Added: "+ae.getValue());
+//				System.out.println("Added: "+ae.getValue());
 				refresh();
 			}
 			
 			public void factRemoved(AgentEvent ae)
 			{
-				System.out.println("Removed: "+ae.getValue());
+//				System.out.println("Removed: "+ae.getValue());
 				refresh();
 			}
 		});
@@ -484,7 +484,7 @@ public class GuiPanel extends JPanel
 			{
 				if(order.equals(result))
 				{
-					System.out.println("Dropping: "+goals[num]);
+//					System.out.println("Dropping: "+goals[num]);
 					goals[num].drop();
 				}
 				else if(num+1<goals.length)
@@ -508,7 +508,7 @@ public class GuiPanel extends JPanel
 			public void customResultAvailable(Object source, final Object result)
 			{
 				Order[]	aorders = (Order[])result;
-				System.out.println("refresh: "+SUtil.arrayToString(aorders)+" "+GuiPanel.this);
+//				System.out.println("refresh: "+SUtil.arrayToString(aorders)+" "+GuiPanel.this);
 				for(int i = 0; i < aorders.length; i++)
 				{
 					if(!orders.contains(aorders[i]))
@@ -542,7 +542,7 @@ public class GuiPanel extends JPanel
 						{
 							List res = (List)result;
 							for(int i=0; i<res.size(); i++)
-		//						System.out.println(""+i+res.get(i));
+								System.out.println(""+i+res.get(i));
 							
 							while(detailsdm.getRowCount()>0)
 								detailsdm.removeRow(0);

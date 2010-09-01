@@ -117,8 +117,6 @@ public class RetePatternMatcherState implements IPatternMatcherState, IOAVStateL
 	 */
 	public void objectAdded(Object id, OAVObjectType type, boolean root)
 	{
-		if(running)
-			System.out.println("grumpflmpf");
 		assert !running;
 		running	= true;
 		
@@ -140,8 +138,6 @@ public class RetePatternMatcherState implements IPatternMatcherState, IOAVStateL
 	 */
 	public void objectRemoved(Object id, OAVObjectType type)
 	{
-		if(running)
-			System.out.println("grumpflmpf");
 		assert !running;
 		running	= true;
 		

@@ -236,6 +236,7 @@ public class CollectNodeTest extends TestCase
 		state.addAttributeValue(store, store_has_cds, music2);
 		
 //		state.notifyEventListeners();
+//		RuleEnginePanel.createRuleEngineFrame(new RuleSystemExecutor(system, false), "Collect Node Test");
 //		RetePanel.createReteFrame("Collect Node Test", system, new Object());
 //		synchronized(system){system.wait();}
 	}
@@ -443,7 +444,15 @@ public class CollectNodeTest extends TestCase
 		{
 			CollectNodeTest test = new CollectNodeTest();
 			test.setUp();
+			test.testNoInitialTrigger();
+			
+			test.testLeftAddNoTrigger();
+			test.testLeftModifyNoTrigger();
+			test.testLeftRemovalNoTrigger();
+			
 			test.testLeftAddTrigger();
+			test.testLeftModifyTrigger();
+			test.testLeftRemovalTrigger();
 		}
 		catch(Exception e)
 		{

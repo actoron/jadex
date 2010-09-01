@@ -91,6 +91,8 @@ public class CollectionResultListener	implements IResultListener
 			if(ignorefailures)
 			{
 				num--;
+				notify	= num==this.results.size();
+				notified	= notify;
 			}
 			else if(!notified)
 			{

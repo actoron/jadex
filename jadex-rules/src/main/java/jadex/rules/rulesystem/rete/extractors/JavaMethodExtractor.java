@@ -60,8 +60,6 @@ public class JavaMethodExtractor implements IValueExtractor
 		Object	object	= objex.getValue(left, right, prefix, state);
 		try
 		{
-//			if(methodcall.toString().indexOf("getDistance")!=-1)
-//				System.out.println("huhu");
 			return methodcall.getMethod().invoke(object, paramvalues);
 		}
 		catch(Throwable e)
