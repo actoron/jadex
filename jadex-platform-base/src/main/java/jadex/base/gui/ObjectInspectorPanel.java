@@ -1,6 +1,6 @@
 package jadex.base.gui;
 
-import jadex.base.gui.ObjectTreeModel.OAVTreeCellRenderer;
+import jadex.base.gui.ObjectTreeModel.ObjectTreeCellRenderer;
 import jadex.commons.TreeExpansionHandler;
 
 import java.awt.BorderLayout;
@@ -65,7 +65,7 @@ public class ObjectInspectorPanel  extends JPanel
 //		}
 		
 		new TreeExpansionHandler(tree);
-		tree.setCellRenderer(new OAVTreeCellRenderer());
+		tree.setCellRenderer(new ObjectTreeCellRenderer());
 		
 		this.add(new JScrollPane(tree), BorderLayout.CENTER);
 	}
@@ -79,7 +79,7 @@ public class ObjectInspectorPanel  extends JPanel
 	 *  @param obj	The OAV root object.
 	 *  @return	The frame.
 	 */
-	public static JFrame createOAVFrame(String title, Object root)
+	public static JFrame createObjectFrame(String title, Object root)
 	{
 		JFrame	frame	= new JFrame(title);
 		frame.getContentPane().add(new ObjectInspectorPanel(root), BorderLayout.CENTER);
@@ -92,7 +92,7 @@ public class ObjectInspectorPanel  extends JPanel
 	 */
 	public static void main(String[] args)
 	{
-		JFrame f = createOAVFrame("test", new JFrame());
+		JFrame f = createObjectFrame("test", new JFrame());
 		f.setVisible(true);
 	}
 }

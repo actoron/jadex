@@ -14,7 +14,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
@@ -67,10 +66,6 @@ public class ObjectTreeModel implements TreeModel
 	/** The pending notification flag. */
 	protected boolean	notify;
 	
-	/** Nodes for objects to allow fine-tuned tree redraw (object-id -> {node1, node2, ...}).
-	 *  Because the state is a (possibly cyclic) graph, there may be more than one node for a single object! */
-	protected Map	nodes;
-	
 	/** list for all created Attribute inspector nodes */
 	protected List inspectors;
 	
@@ -86,8 +81,6 @@ public class ObjectTreeModel implements TreeModel
 	public ObjectTreeModel(Object root)
 	{
 		// use identity hash for different (java) objects being equal (e.g. empty list).
-		// todo: mixed identity map like used in state?
-		this.nodes	= new IdentityHashMap();
 		this.root	= new ObjectInspectorNode(null, root.getClass(), null, root);
 		
 		this.inspectors = new ArrayList();
@@ -437,10 +430,6 @@ public class ObjectTreeModel implements TreeModel
 								indexes[i] = ((Integer) entry.getKey()).intValue();
 								childs[i] = entry.getValue();
 								
-								// drop child if it is an inspector node
-								if (entry.getValue() instanceof ObjectInspectorNode)
-									((ObjectInspectorNode) entry.getValue()).drop();
-								
 								// remove from children list
 								oldchildren.remove(entry.getValue());
 								//oldchildren.remove(getIndexForChild(oldchildren, entry.getValue()));
@@ -473,9 +462,6 @@ public class ObjectTreeModel implements TreeModel
 									oldchildren.remove(index);
 									newchildren.remove(i);
 									newchildren.add(i, oldchild);
-									// drop newchild, it was replaced by the old one
-									if (newchild instanceof ObjectInspectorNode)
-										((ObjectInspectorNode) newchild).drop();
 								}
 								// value was added
 								else
@@ -554,10 +540,6 @@ public class ObjectTreeModel implements TreeModel
 						{
 							// replace old children with new children and drop old
 							node.children = newchildren;
-							if (oldchildren.get(0) instanceof ObjectInspectorNode)
-							{
-								((ObjectInspectorNode) oldchildren.get(0)).drop();
-							}
 							
 							// create and fire event
 							if (oldchildren.get(0) instanceof ObjectInspectorNode || newchildren.get(0) instanceof ObjectInspectorNode)
@@ -577,13 +559,6 @@ public class ObjectTreeModel implements TreeModel
 									
 								}
 							}
-							
-							
-						}
-						else if (newchildren.get(0) instanceof ObjectInspectorNode)
-						{
-							// no difference between children, drop new children if it is an ObjectInspectorNode
-							((ObjectInspectorNode) newchildren.get(0)).drop();
 						}
 					}
 				}
@@ -722,8 +697,6 @@ public class ObjectTreeModel implements TreeModel
 		
 		// --- methods ---
 		
-		public void drop() { };
-		
 		public int hashCode()
 		{		
 			return nodeUUID;
@@ -781,8 +754,6 @@ public class ObjectTreeModel implements TreeModel
 			this.nodeObject = object;
 			
 			getFields();
-			
-			nodes.put(object, this);
 		}
 
 		// --- methods ----
@@ -874,23 +845,6 @@ public class ObjectTreeModel implements TreeModel
 			}
 			
 			return path;
-		}
-		
-		
-		/**
-		 *  Unregister a node and its subnodes.
-		 */
-		public void	drop()
-		{
-			nodes.remove(nodeObject);
-			
-			if(children!=null)
-			{
-				for(int i=0; i<children.size(); i++)
-				{
-					((ObjectInspectorAttributeNode)children.get(i)).drop();
-				}
-			}
 		}
 		
 		/** 
@@ -1175,24 +1129,6 @@ public class ObjectTreeModel implements TreeModel
 		}
 		
 		/**
-		 *  Unregister a node and its subnodes.
-		 */
-		public void	drop()
-		{
-			inspectors.remove(this);
-			
-			if(children!=null)
-			{
-				for(int i=0; i<children.size(); i++)
-				{
-					if(children.get(i) instanceof ObjectInspectorNode)
-						((ObjectInspectorNode)children.get(i)).drop();
-				}
-			}
-			
-		}
-		
-		/**
 		 *  Get the path of this node (inclusive) starting from the root node.
 		 */
 		public Object[]	getPath()
@@ -1392,7 +1328,7 @@ public class ObjectTreeModel implements TreeModel
 	/**
 	 *  OAV tree cell renderer displays right icons.
 	 */
-	public static class OAVTreeCellRenderer extends DefaultTreeCellRenderer
+	public static class ObjectTreeCellRenderer extends DefaultTreeCellRenderer
 	{
 		/**
 		 *  Get the tree cell renderer component.
