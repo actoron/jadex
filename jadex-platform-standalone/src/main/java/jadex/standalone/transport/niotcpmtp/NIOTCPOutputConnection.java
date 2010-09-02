@@ -67,7 +67,7 @@ class NIOTCPOutputConnection
 			System.out.println("NIOTCP Connection: "+iaddr+":"+iport);
 		    // Kick off connection establishment
 		    this.sc.connect(new InetSocketAddress(iaddr, iport));
-			System.out.println("established");
+			System.out.println("NIOTCP Connection: "+iaddr+":"+iport+" established");
 		}
 		catch(IOException e)
 		{

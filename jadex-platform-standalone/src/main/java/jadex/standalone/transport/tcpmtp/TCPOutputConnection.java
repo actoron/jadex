@@ -49,7 +49,7 @@ class TCPOutputConnection
 		{
 			System.out.println("TCP Connection: "+iaddr+":"+iport);
 			this.sock = new Socket(iaddr, iport);
-			System.out.println("established");
+			System.out.println("TCP Connection: "+iaddr+":"+iport+" established");
 		}
 		catch(IOException e)
 		{
