@@ -54,7 +54,7 @@ public class CMSTestPlan extends Plan
 		getLogger().info("\nSearching for all agents.");
 		IComponentManagementService amsservice = (IComponentManagementService)SServiceProvider.getServiceUpwards(
 			getScope().getServiceProvider(), IComponentManagementService.class).get(this);
-		IComponentDescription desc = amsservice.createComponentDescription(null, null, null, null, null);
+		IComponentDescription desc = amsservice.createComponentDescription(null, null, null, null, null, null);
 		ISearchConstraints constraints = amsservice.createSearchConstraints(-1, 0);
 		
 		IGoal	search	= createGoal("cmscap.cms_search_components");
@@ -106,7 +106,7 @@ public class CMSTestPlan extends Plan
 		{
 			getLogger().info("\nSearching for agent.");
 			
-			desc = amsservice.createComponentDescription((IComponentIdentifier)create.getParameter("componentidentifier").getValue(), null, null, null, null);
+			desc = amsservice.createComponentDescription((IComponentIdentifier)create.getParameter("componentidentifier").getValue(), null, null, null, null, null);
 			constraints = amsservice.createSearchConstraints(-1, 0);
 		
 			search	= createGoal("cmscap.cms_search_components");
@@ -203,7 +203,7 @@ public class CMSTestPlan extends Plan
 		{
 			getLogger().info("\nSearching for agent again.");
 			
-			desc = amsservice.createComponentDescription((IComponentIdentifier)create.getParameter("componentidentifier").getValue(), null, null, null, null);
+			desc = amsservice.createComponentDescription((IComponentIdentifier)create.getParameter("componentidentifier").getValue(), null, null, null, null, null);
 			constraints = amsservice.createSearchConstraints(-1, 0);
 	
 			search	= createGoal("cmscap.cms_search_components");
