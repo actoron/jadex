@@ -85,6 +85,12 @@ public interface IComponentManagementService extends IService
 	 */
 	public IFuture searchComponents(IComponentDescription adesc, ISearchConstraints con);
 
+	/**
+	 *  Search for components matching the given description.
+	 *  @return An array of matching component descriptions.
+	 */
+	public IFuture searchComponents(final IComponentDescription adesc, final ISearchConstraints con, boolean remote);
+	
 	//-------- listener methods --------
 	
 	/**
@@ -175,7 +181,8 @@ public interface IComponentManagementService extends IService
 	 * @param parent The parent.
 	 * @return The component description.
 	 */
-	public IComponentDescription createComponentDescription(IComponentIdentifier id, String state, String ownership, String type, IComponentIdentifier parent);
+	public IComponentDescription createComponentDescription(IComponentIdentifier id, String state, 
+		String ownership, String type, IComponentIdentifier parent, String modelname);
 	
 	/**
 	* Create a search constraints object.

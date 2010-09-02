@@ -177,7 +177,7 @@ public class DirectoryFacilitatorService extends BasicService implements IDF
 	 *  Search for components matching the given description.
 	 *  @return An array of matching component descriptions. 
 	 */
-	public IFuture search(final IDFComponentDescription adesc, final ISearchConstraints con, boolean federated)
+	public IFuture search(final IDFComponentDescription adesc, final ISearchConstraints con, boolean remote)
 	{
 		final Future fut = new Future();
 		
@@ -229,7 +229,7 @@ public class DirectoryFacilitatorService extends BasicService implements IDF
 		
 //		System.out.println("Started search: "+ret);
 //		open.add(fut);
-		if(federated)
+		if(remote)
 		{
 			SServiceProvider.getServices(provider, IDF.class, false).addResultListener(new IResultListener()
 			{

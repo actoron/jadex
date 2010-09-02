@@ -24,14 +24,14 @@ public class StartScenario
 	 */
 	public static void main(String[] args)
 	{
-		Starter.createPlatform(new String[]{"-configname", "all_kernels", "-platformname", "local", "-tcpport", "10000", "-niotcpport", "10001"})
+		Starter.createPlatform(new String[]{"-platformname", "local", "-tcpport", "10000", "-niotcpport", "10001"})
 			.addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
 				final IExternalAccess lplat = (IExternalAccess)result;
 				
-				Starter.createPlatform(new String[]{"-configname", "all_kernels", "-platformname", "remote", "-tcpport", "11000", "-niotcpport", "11001"})
+				Starter.createPlatform(new String[]{"-platformname", "remote", "-tcpport", "11000", "-niotcpport", "11001"})
 					.addResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object source, Object result)

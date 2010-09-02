@@ -34,6 +34,36 @@ public interface IComponentDescription
 	//-------- methods --------
 
 	/**
+	 *  Get the identifier of the component.
+	 *  @return The component identifier.
+	 */
+	public IComponentIdentifier getName();
+	
+	/**
+	 *  Get the model name.
+	 *  @return The model name.
+	 */
+	public String getModelName();
+	
+	/**
+	 *  Get the identifier of the parent component (if any).
+	 *  @return The parent component identifier.
+	 */
+	public IComponentIdentifier getParent();
+	
+	/**
+	 *  Get the ownership string of the component.
+	 *  @return The ownership string.
+	 */
+	public String getOwnership();
+
+	/**
+	 *  Get the component type.
+	 *  @return The component type name (e.g. 'BDI Agent').
+	 */
+	public String getType();
+	
+	/**
 	 *  Get the execution state of the component.
 	 *  E.g. active or suspended.
 	 *  @return The state.
@@ -47,29 +77,7 @@ public interface IComponentDescription
 	 */
 	public String getProcessingState();
 
-	/**
-	 *  Get the identifier of the component.
-	 *  @return The component identifier.
-	 */
-	public IComponentIdentifier getName();
-
-	/**
-	 *  Get the identifier of the parent component (if any).
-	 *  @return The parent component identifier.
-	 */
-	public IComponentIdentifier getParent();
-
-	/**
-	 *  Get the ownership string of the component.
-	 *  @return The ownership string.
-	 */
-	public String getOwnership();
-
-	/**
-	 *  Get the component type.
-	 *  @return The component type name (e.g. 'BDI Agent').
-	 */
-	public String getType();
+	//-------- internal properties not used for search --------
 	
 	/**
 	 *  Get the enabled breakpoints (if any).

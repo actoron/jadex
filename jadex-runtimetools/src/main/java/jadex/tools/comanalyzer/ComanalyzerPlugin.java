@@ -1119,7 +1119,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 			// add to agent tree table
 			IComponentManagementService ces = (IComponentManagementService)SServiceProvider
 				.getService(jcc.getServiceProvider(), IComponentManagementService.class).get(new ThreadSuspendable());
-			sender = new Component(ces.createComponentDescription(sid, null, null, "unknown-component-type", null));
+			sender = new Component(ces.createComponentDescription(sid, null, null, "unknown-component-type", null, null));
 			sender.setState(Component.STATE_DEAD);
 			sender.addMessage(message);
 			sender.applyFilter(agentfilter, true);
@@ -1138,7 +1138,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 		{
 			IComponentManagementService ces = (IComponentManagementService)SServiceProvider
 				.getService(jcc.getServiceProvider(), IComponentManagementService.class).get(new ThreadSuspendable());
-			receiver = new Component(ces.createComponentDescription(rid, null, null, "unknown-component-type", null));
+			receiver = new Component(ces.createComponentDescription(rid, null, null, "unknown-component-type", null, null));
 			receiver.setState(Component.STATE_DEAD);
 			receiver.addMessage(message);
 			receiver.applyFilter(agentfilter, true);

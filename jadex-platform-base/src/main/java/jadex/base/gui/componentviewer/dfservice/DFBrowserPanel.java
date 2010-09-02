@@ -17,12 +17,14 @@ import jadex.commons.service.IService;
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Arrays;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
@@ -79,6 +81,9 @@ public class DFBrowserPanel	extends JPanel implements IServiceViewerPanel
 
 	/** The refresh selectzion buttons. */
 	protected JRadioButton[]	rb_refresh;
+	
+	/** The remote checkbox. */
+	protected JCheckBox remotecb;
 
 	//-------- constructors --------
 	
@@ -151,9 +156,18 @@ public class DFBrowserPanel	extends JPanel implements IServiceViewerPanel
 		});
 		int[]	refreshs	= new int[]{0, 1000, 5000, 30000};
 		JPanel	settings	= new JPanel(new GridBagLayout());
-		settings.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), "Refresh Settings"));
+		settings.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), "Settings"));
 		GridBagConstraints	gbc	= new GridBagConstraints();
+		gbc.fill	= GridBagConstraints.HORIZONTAL;
+		gbc.anchor	= GridBagConstraints.WEST;
+		gbc.weightx	= 1.0;
+		
+		remotecb = new JCheckBox("Remote search");
+		settings.add(remotecb, gbc);
+		
+		gbc.weightx	= 0;
 		gbc.fill	= GridBagConstraints.NONE;
+		gbc.anchor	= GridBagConstraints.EAST;
 		ButtonGroup group = new ButtonGroup();
 		rb_refresh = new JRadioButton[refreshs.length];
 		for(int i=0; i<rb_refresh.length; i++)
@@ -181,9 +195,10 @@ public class DFBrowserPanel	extends JPanel implements IServiceViewerPanel
 				}
 			});
 		}
-		gbc.anchor	= GridBagConstraints.EAST;
-		gbc.weightx	= 1.0;	// Last button gets remaining size.
+//		gbc.anchor	= GridBagConstraints.EAST;
+//		gbc.weightx	= 1.0;	// Last button gets remaining size.
 		JButton	button	= new JButton("Refresh", icons.getIcon("refresh"));
+		button.setMargin(new Insets(2,2,2,2));
 		button.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
@@ -239,6 +254,7 @@ public class DFBrowserPanel	extends JPanel implements IServiceViewerPanel
 		if(ps!=null)
 		{
 			refresh	= ps.getIntProperty("defrefresh");
+			remotecb.setSelected(ps.getBooleanProperty("dfremote"));
 		}
 		
 		for(int i=0; i<rb_refresh.length; i++)
@@ -256,6 +272,7 @@ public class DFBrowserPanel	extends JPanel implements IServiceViewerPanel
 	{
 		Properties	props	= new Properties();
 		props.addProperty(new Property("defrefresh", Integer.toString(defrefresh)));
+		props.addProperty(new Property("dfremote", Boolean.toString(remotecb.isSelected())));
 		return props;
 	}
 
@@ -267,8 +284,7 @@ public class DFBrowserPanel	extends JPanel implements IServiceViewerPanel
 	protected void refresh()
 	{
 //		df.search(df.createDFComponentDescription(null, null), null).addResultListener(new SwingDefaultResultListener(this)
-		boolean federated = true;
-		df.search(new DFComponentDescription(null), null, federated).addResultListener(new SwingDefaultResultListener(this)
+		df.search(new DFComponentDescription(null), null, remotecb.isSelected()).addResultListener(new SwingDefaultResultListener(this)
 		{
 			public void customResultAvailable(Object source, Object result) 
 			{

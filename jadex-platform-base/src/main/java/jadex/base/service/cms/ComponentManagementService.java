@@ -22,6 +22,7 @@ import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.collection.SCollection;
+import jadex.commons.concurrent.CollectionResultListener;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
@@ -32,6 +33,7 @@ import jadex.commons.service.execution.IExecutionService;
 import jadex.commons.service.library.ILibraryService;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -249,7 +251,7 @@ public abstract class ComponentManagementService extends BasicService implements
 						final IComponentAdapter pad = getParentAdapter(cinfo);
 						IExternalAccess parent = getComponentInstance(pad).getExternalAccess();
 						final CMSComponentDescription ad = new CMSComponentDescription(cid, type, 
-							getParentIdentifier(cinfo), cinfo.isMaster(), cinfo.isDaemon(), cinfo.isAutoShutdown());
+							getParentIdentifier(cinfo), cinfo.isMaster(), cinfo.isDaemon(), cinfo.isAutoShutdown(), lmodel.getFullName());
 						
 						Future future = new Future();
 						future.addResultListener(new IResultListener()
@@ -1369,9 +1371,9 @@ public abstract class ComponentManagementService extends BasicService implements
 	 * @param parent The parent.
 	 * @return The component description.
 	 */
-	public IComponentDescription createComponentDescription(IComponentIdentifier id, String state, String ownership, String type, IComponentIdentifier parent)
+	public IComponentDescription createComponentDescription(IComponentIdentifier id, String state, String ownership, String type, IComponentIdentifier parent, String modelname)
 	{
-		CMSComponentDescription	ret	= new CMSComponentDescription(id, type, parent, false, false, false);
+		CMSComponentDescription	ret	= new CMSComponentDescription(id, type, parent, false, false, false, modelname);
 		ret.setState(state);
 		ret.setOwnership(ownership);
 		return ret;
@@ -1466,10 +1468,19 @@ public abstract class ComponentManagementService extends BasicService implements
 	 */
 	public IFuture searchComponents(IComponentDescription adesc, ISearchConstraints con)
 	{
-		Future fut = new Future();
+		return searchComponents(adesc, con, false);
+	}
+	
+	/**
+	 *  Search for components matching the given description.
+	 *  @return An array of matching component descriptions.
+	 */
+	public IFuture searchComponents(final IComponentDescription adesc, final ISearchConstraints con, boolean remote)
+	{
+		final Future fut = new Future();
 		
 //		System.out.println("search: "+components);
-		CMSComponentDescription[] ret;
+		final List ret = new ArrayList();
 
 		// If name is supplied, just lookup description.
 		if(adesc!=null && adesc.getName()!=null)
@@ -1480,18 +1491,13 @@ public abstract class ComponentManagementService extends BasicService implements
 				// Todo: addresses reuqired for interplatform comm.
 //				ad.setName(refreshComponentIdentifier(ad.getName()));
 				CMSComponentDescription	desc	= (CMSComponentDescription)ad.clone();
-				ret = new CMSComponentDescription[]{desc};
-			}
-			else
-			{
-				ret	= new CMSComponentDescription[0];
+				ret.add(desc);
 			}
 		}
 
 		// Otherwise search for matching descriptions.
 		else
 		{
-			List	tmp	= new ArrayList();
 			synchronized(descs)
 			{
 				for(Iterator it=descs.values().iterator(); it.hasNext(); )
@@ -1501,16 +1507,85 @@ public abstract class ComponentManagementService extends BasicService implements
 						(adesc.getOwnership()==null || adesc.getOwnership().equals(test.getOwnership()))
 						&& (adesc.getParent()==null || adesc.getParent().equals(test.getParent()))
 						&& (adesc.getType()==null || adesc.getType().equals(test.getType()))
-						&& (adesc.getState()==null || adesc.getState().equals(test.getState())))					
+						&& (adesc.getState()==null || adesc.getState().equals(test.getState()))
+						&& (adesc.getProcessingState()==null || adesc.getProcessingState().equals(test.getProcessingState()))
+						&& (adesc.getModelName()==null || adesc.getModelName().equals(test.getModelName())))					
 					{
-						tmp.add(test);
+						ret.add(test);
 					}
 				}
 			}
-			ret	= (CMSComponentDescription[])tmp.toArray(new CMSComponentDescription[tmp.size()]);
 		}
 
 		//System.out.println("searched: "+ret);
+		
+//		System.out.println("Started search: "+ret);
+//		open.add(fut);
+		if(remote)
+		{
+			SServiceProvider.getServices(provider, IComponentManagementService.class, false).addResultListener(new IResultListener()
+			{
+				public void resultAvailable(Object source, Object result)
+				{
+					Collection coll = (Collection)result;
+//					System.out.println("dfs: "+coll);
+					// Ignore search failures of remote dfs
+					CollectionResultListener lis = new CollectionResultListener(coll.size(), true, new IResultListener()
+					{
+						public void resultAvailable(Object source, Object result)
+						{
+							// Add all services of all remote dfs
+							for(Iterator it=((Collection)result).iterator(); it.hasNext(); )
+							{
+								IComponentDescription[] res = (IComponentDescription[])it.next();
+								if(res!=null)
+								{
+									for(int i=0; i<res.length; i++)
+									{
+										ret.add(res[i]);
+									}
+								}
+							}
+//							open.remove(fut);
+//							System.out.println("Federated search: "+ret);//+" "+open);
+							fut.setResult(ret.toArray(new CMSComponentDescription[ret.size()]));
+						}
+						
+						public void exceptionOccurred(Object source, Exception exception)
+						{
+//							open.remove(fut);
+							fut.setException(exception);
+//								fut.setResult(ret.toArray(new DFComponentDescription[ret.size()]));
+						}
+					});
+					for(Iterator it=coll.iterator(); it.hasNext(); )
+					{
+						IComponentManagementService remotecms = (IComponentManagementService)it.next();
+						if(remotecms!=ComponentManagementService.this)
+						{
+							remotecms.searchComponents(adesc, con, false).addResultListener(lis);
+						}
+						else
+						{
+							lis.resultAvailable(null, null);
+						}
+					}
+				}
+				
+				public void exceptionOccurred(Object source, Exception exception)
+				{
+//					open.remove(fut);
+					fut.setResult(ret.toArray(new CMSComponentDescription[ret.size()]));
+				}
+			});
+		}
+		else
+		{
+//			open.remove(fut);
+//			System.out.println("Local search: "+ret+" "+open);
+			fut.setResult(ret.toArray(new CMSComponentDescription[ret.size()]));
+		}
+		
 		
 		fut.setResult(ret);
 		return fut;

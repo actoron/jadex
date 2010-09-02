@@ -50,6 +50,9 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 	/** The auto shutdown flag. */
 	protected boolean autoshutdown;
 	
+	/** The model name. */
+	protected String modelname;
+	
 	//-------- constructors --------
 
 	/**
@@ -62,7 +65,7 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 	/**
 	 *  Create a new CESComponentDescription.
 	 */
-	public CMSComponentDescription(IComponentIdentifier cid, String type, IComponentIdentifier parent, boolean master, boolean daemon, boolean autoshutdown)//, String modelname)
+	public CMSComponentDescription(IComponentIdentifier cid, String type, IComponentIdentifier parent, boolean master, boolean daemon, boolean autoshutdown, String modelname)
 	{
 		this();
 		setName(cid);
@@ -73,7 +76,7 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 		setMaster(master);
 		setDaemon(daemon);
 		setAutoShutdown(autoshutdown);
-//		setModelName(modelname);
+		setModelName(modelname);
 	}
 
 	//-------- accessor methods --------
@@ -303,20 +306,20 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 	/**
 	 *  Get the model name.
 	 *  @return The name.
-	 * /
+	 */
 	public String getModelName()
 	{
 		return modelname;
-	}*/
+	}
 
 	/**
 	 *  Set the model name.
 	 *  @param modelname The model name.
-	 * /
+	 */
 	public void setModelName(String modelname)
 	{
 		this.modelname = modelname;
-	}*/
+	}
 		
 	//-------- methods --------
 
