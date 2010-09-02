@@ -173,8 +173,7 @@ public class ConversationPlugin extends AbstractJCCPlugin
 				if(node instanceof IActiveComponentTreeNode)
 				{
 					IComponentIdentifier	id	= ((IActiveComponentTreeNode)node).getDescription().getName();
-					Map	message	= convcenter.getMessagePanel().getMessage();
-					IComponentIdentifier[]	recs	= (IComponentIdentifier[])message.get(SFipa.RECEIVERS);
+					IComponentIdentifier[]	recs	= (IComponentIdentifier[])convcenter.getMessagePanel().getReceivers();
 					if(recs!=null && Arrays.asList(recs).contains(id))
 					{
 						ret	= icons.getIcon("message_overlay");

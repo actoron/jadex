@@ -531,4 +531,12 @@ public class FipaMessagePanel extends JPanel
 	{
 		message.put(name, values);
 	}
+
+	/**
+	 *  Get the currently set receivers.
+	 */
+	public IComponentIdentifier[] getReceivers()
+	{
+		return receivers;
+	}
 }

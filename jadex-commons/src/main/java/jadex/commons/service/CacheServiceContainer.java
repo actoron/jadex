@@ -136,7 +136,8 @@ public class CacheServiceContainer	implements IServiceContainer
 							for(Iterator it=coll.iterator(); it.hasNext(); )
 							{
 								Object	next	= it.next();
-								results.add(next);
+								if(!results.contains(next))
+									results.add(next);
 							}
 						}
 					}

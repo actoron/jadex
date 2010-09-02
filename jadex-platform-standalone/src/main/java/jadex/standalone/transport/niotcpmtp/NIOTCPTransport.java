@@ -64,7 +64,7 @@ public class NIOTCPTransport implements ITransport
 	protected static final int BUFFER_SIZE	= 1024 * 1024 * 2;
 	
 	/** Maximum number of outgoing connections */
-	protected static final int MAX_CONNECTIONS	= 10;
+	protected static final int MAX_CONNECTIONS	= 20;
 	
 	/** Default port. */
 	protected static final int DEFAULT_PORT	= 8765;

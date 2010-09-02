@@ -37,7 +37,8 @@ public class LocalSearchManager implements ISearchManager
 		{
 			selector.selectServices(services, results);
 		}
-		System.out.println("lsm: "+provider+" "+results);
+		if(selector instanceof TypeResultSelector && results.toString().indexOf("Directory")!=-1)
+			System.out.println("lsm: "+provider+" "+results);
 		return new Future(selector.getResult(results));
 	}
 	
