@@ -126,6 +126,7 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 					{
 						setChildren(Collections.EMPTY_LIST);
 						connected = false;
+//						exception.printStackTrace();
 					}
 				});
 			}
@@ -134,6 +135,7 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 			{
 				setChildren(Collections.EMPTY_LIST);
 				connected = false;
+//				exception.printStackTrace();
 			}
 		});				
 	}
@@ -242,11 +244,7 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 									{
 										public void customResultAvailable(Object source, Object result)
 										{
-											ready[1] = true;
-											if(ready[0] &&  ready[1])
-											{
-												node.setChildren(subchildren);
-											}
+											node.setChildren(subchildren);
 										}
 										public void customExceptionOccurred(Object source, Exception exception)
 										{

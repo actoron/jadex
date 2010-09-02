@@ -96,7 +96,6 @@ public class ComponentTreeNode	extends AbstractComponentTreeNode implements IAct
 	
 	/**
 	 *  Asynchronously search for children.
-	 *  Called once for each node.
 	 *  Should call setChildren() once children are found.
 	 */
 	protected void	searchChildren()
@@ -110,11 +109,11 @@ public class ComponentTreeNode	extends AbstractComponentTreeNode implements IAct
 			public void customResultAvailable(Object source, Object result)
 			{
 				final IComponentIdentifier[] achildren = (IComponentIdentifier[])result;
+				final int[]	childcnt	= new int[]{0};
 				if(achildren!=null && achildren.length > 0)
 				{
 					for(int i=0; i<achildren.length; i++)
 					{
-						final int index = i;
 						cms.getComponentDescription(achildren[i]).addResultListener(new SwingDefaultResultListener(ui)
 						{
 							public void customResultAvailable(Object source, Object result)
@@ -129,9 +128,10 @@ public class ComponentTreeNode	extends AbstractComponentTreeNode implements IAct
 										{
 //											System.err.println(getModel().hashCode()+", "+ready.hashCode()+" searchChildren.add "+result);
 											children.add(result);
+											childcnt[0]++;
 											
 											// Last child? -> inform listeners
-											if(index == achildren.length - 1)
+											if(childcnt[0] == achildren.length)
 											{
 												ready[0]	= true;
 												if(ready[0] &&  ready[1])
@@ -151,9 +151,10 @@ public class ComponentTreeNode	extends AbstractComponentTreeNode implements IAct
 								{
 //									System.err.println(getModel().hashCode()+", "+ready.hashCode()+" searchChildren.add "+node);
 									children.add(node);
+									childcnt[0]++;
 			
 									// Last child? -> inform listeners
-									if(index == achildren.length - 1)
+									if(childcnt[0] == achildren.length)
 									{
 										ready[0]	= true;
 										if(ready[0] &&  ready[1])
@@ -212,11 +213,7 @@ public class ComponentTreeNode	extends AbstractComponentTreeNode implements IAct
 							{
 								public void customResultAvailable(Object source, Object result)
 								{
-									ready[1]	= true;
-									if(ready[0] &&  ready[1])
-									{
-										node.setChildren(subchildren);
-									}
+									node.setChildren(subchildren);
 								}
 							});
 						}
