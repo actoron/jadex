@@ -2,7 +2,6 @@ package jadex.commons.service;
 
 import jadex.commons.ComposedFilter;
 import jadex.commons.IFilter;
-import jadex.commons.SUtil;
 import jadex.commons.Tuple;
 
 import java.util.ArrayList;

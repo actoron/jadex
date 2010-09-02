@@ -70,7 +70,12 @@ public class ProxyAgent extends MicroAgent
 		final Future ret = new Future();
 		
 		final Object[] entry = (Object[])children.get(cid);
-		if(entry==null)
+		
+		if(delay==0)
+		{
+			ret.setResult(Boolean.FALSE);
+		}
+		else if(entry==null)
 		{
 			ret.setResult(Boolean.TRUE);
 		}

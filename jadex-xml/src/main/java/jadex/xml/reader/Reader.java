@@ -37,6 +37,9 @@ public class Reader
 	/** The string marker object. */
 	public static final Object STRING_MARKER = new String();
 	
+	/** The xml input factory. */
+	protected static final XMLInputFactory	FACTORY	= XMLInputFactory.newInstance();
+	
 	//-------- attributes --------
 	
 	/** The object creator. */
@@ -76,8 +79,11 @@ public class Reader
  	 */
 	public Object read(InputStream input, final ClassLoader classloader, final Object callcontext) throws Exception
 	{
-		XMLInputFactory	factory	= XMLInputFactory.newInstance();
-		XMLStreamReader	parser	= factory.createXMLStreamReader(input);
+		XMLStreamReader	parser;
+		synchronized(FACTORY)
+		{
+			parser	= FACTORY.createXMLStreamReader(input);
+		}
 		ReadContext readcontext = new ReadContext(parser, callcontext, classloader);
 		
 		while(parser.hasNext())
@@ -561,7 +567,7 @@ public class Reader
 		catch(Exception e)
 		{
 //			e.printStackTrace();
-//			System.out.println("problem: "+new String(val));
+			System.out.println("problem: "+new String(val));
 			throw new RuntimeException(e);
 		}
 	}

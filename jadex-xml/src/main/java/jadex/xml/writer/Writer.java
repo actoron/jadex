@@ -36,6 +36,10 @@ public class Writer
 	/** The default encoding. */
 	public static String DEFAULT_ENCODING = "utf-8";
 	
+	/** The xml output factory. */
+	protected static final XMLOutputFactory	FACTORY = XMLOutputFactory.newInstance();
+//	factory.setProperty("javax.xml.stream.isRepairingNamespaces", Boolean.TRUE);
+	
 	//-------- attributes --------
 	
 	/** The object creator. */
@@ -100,10 +104,11 @@ public class Writer
  	 */
 	public void write(Object object, String encoding, OutputStream out, ClassLoader classloader, final Object context) throws Exception
 	{
-//		
-		XMLOutputFactory factory = XMLOutputFactory.newInstance();
-//		factory.setProperty("javax.xml.stream.isRepairingNamespaces", Boolean.TRUE);
-		XMLStreamWriter	writer	= factory.createXMLStreamWriter(out, encoding);
+		XMLStreamWriter	writer;
+		synchronized(FACTORY)
+		{
+			writer	= FACTORY.createXMLStreamWriter(out, encoding);
+		}
 		
 		writer.writeStartDocument(encoding, "1.0"); 
 		writer.writeCharacters(lf);

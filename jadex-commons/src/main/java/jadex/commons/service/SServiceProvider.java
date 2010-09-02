@@ -5,7 +5,6 @@ import jadex.commons.IFuture;
 import jadex.commons.concurrent.DelegationResultListener;
 
 import java.util.ArrayList;
-import java.util.Collections;
 
 /**
  *  Static helper class for searching services.
