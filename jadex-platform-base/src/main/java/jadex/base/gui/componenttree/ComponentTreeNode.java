@@ -127,6 +127,7 @@ public class ComponentTreeNode	extends AbstractComponentTreeNode implements IAct
 									{
 										public void customResultAvailable(Object source, Object result)
 										{
+//											System.err.println(getModel().hashCode()+", "+ready.hashCode()+" searchChildren.add "+result);
 											children.add(result);
 											
 											// Last child? -> inform listeners
@@ -148,6 +149,7 @@ public class ComponentTreeNode	extends AbstractComponentTreeNode implements IAct
 								}
 								else
 								{
+//									System.err.println(getModel().hashCode()+", "+ready.hashCode()+" searchChildren.add "+node);
 									children.add(node);
 			
 									// Last child? -> inform listeners
@@ -192,6 +194,7 @@ public class ComponentTreeNode	extends AbstractComponentTreeNode implements IAct
 							ServiceContainerNode	scn	= (ServiceContainerNode)getModel().getNode(desc.getName().getName()+"ServiceContainer");
 							if(scn==null)
 								scn	= new ServiceContainerNode(ComponentTreeNode.this, getModel());
+//							System.err.println(getModel().hashCode()+", "+ready.hashCode()+" searchChildren.add "+scn);
 							children.add(0, scn);
 							
 							final List	subchildren	= new ArrayList();
@@ -209,7 +212,11 @@ public class ComponentTreeNode	extends AbstractComponentTreeNode implements IAct
 							{
 								public void customResultAvailable(Object source, Object result)
 								{
-									node.setChildren(subchildren);							
+									ready[1]	= true;
+									if(ready[0] &&  ready[1])
+									{
+										node.setChildren(subchildren);
+									}
 								}
 							});
 						}

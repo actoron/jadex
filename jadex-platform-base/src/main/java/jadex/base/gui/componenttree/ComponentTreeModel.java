@@ -159,6 +159,8 @@ public class ComponentTreeModel implements TreeModel
 		this.root = root;
 		if(root!=null)
 			addNode(root);
+		
+//		System.err.println(""+hashCode()+" set root");
 		fireTreeChanged(root);
 	}
 	
@@ -171,7 +173,7 @@ public class ComponentTreeModel implements TreeModel
 		
 		List path = buildTreePath(node);
 		
-//		System.out.println("Path changed: "+node+", "+path);
+//		System.err.println(""+hashCode()+" Path changed: "+node+", "+path+", "+node.getCachedChildren());
 		
 		for(int i=0; i<listeners.size(); i++)
 		{
@@ -279,7 +281,7 @@ public class ComponentTreeModel implements TreeModel
 		
 		List path = buildTreePath(parent);
 		
-//		System.out.println("Node removed: "+child+", "+index+", "+path);
+//		System.err.println(""+hashCode()+" Node removed: "+child+", "+index+", "+path);
 		
 		for(int i=0; i<listeners.size(); i++)
 		{
@@ -296,7 +298,7 @@ public class ComponentTreeModel implements TreeModel
 		
 		List path = buildTreePath(parent);
 		
-//		System.out.println("Node added: "+child+", "+index+", "+path);
+//		System.err.println(""+hashCode()+" Node added: "+child+", "+index+", "+path);
 		
 		for(int i=0; i<listeners.size(); i++)
 		{

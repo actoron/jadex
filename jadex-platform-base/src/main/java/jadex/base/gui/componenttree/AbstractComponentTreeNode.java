@@ -202,6 +202,7 @@ public abstract class AbstractComponentTreeNode	implements IComponentTreeNode
 			rte	= e;
 		}
 		
+//		System.err.println(""+model.hashCode()+" setChildren queued: "+children);
 		SwingUtilities.invokeLater(new Runnable()
 		{
 			public void run()
@@ -240,7 +241,12 @@ public abstract class AbstractComponentTreeNode	implements IComponentTreeNode
 					{
 						model.addNode((IComponentTreeNode)children.get(i));
 					}
-					model.fireTreeChanged(AbstractComponentTreeNode.this);					
+//					System.err.println(""+model.hashCode()+" tree change: "+AbstractComponentTreeNode.this+"#"+AbstractComponentTreeNode.this.hashCode());
+//					System.err.println(""+model.hashCode()+" added: "+added);
+//					System.err.println(""+model.hashCode()+" removed: "+removed);
+//					System.err.println(""+model.hashCode()+" children: "+children);
+//					System.err.println(""+model.hashCode()+" oldcs: "+oldcs);
+					model.fireTreeChanged(AbstractComponentTreeNode.this);			
 				}
 				else if(!added.isEmpty())
 				{
@@ -248,6 +254,7 @@ public abstract class AbstractComponentTreeNode	implements IComponentTreeNode
 					{
 						IComponentTreeNode	node	= (IComponentTreeNode)added.get(i);
 						model.addNode(node);
+//						System.err.println(""+model.hashCode()+" setChildren->fireNodeAdded: "+node+", "+added);
 						model.fireNodeAdded(AbstractComponentTreeNode.this, node, children.indexOf(node));
 					}
 					model.fireNodeChanged(AbstractComponentTreeNode.this);

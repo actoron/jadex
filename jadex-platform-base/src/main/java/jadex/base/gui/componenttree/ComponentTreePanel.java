@@ -197,6 +197,7 @@ public class ComponentTreePanel extends JSplitPane
 			
 			public void componentAdded(final IComponentDescription desc)
 			{
+//				System.err.println(""+model.hashCode()+" Panel->addChild queued: "+desc.getName()+", "+desc.getParent());
 				SwingUtilities.invokeLater(new Runnable()
 				{
 					public void run()
@@ -210,7 +211,21 @@ public class ComponentTreePanel extends JSplitPane
 								{
 									IComponentTreeNode	node = (IComponentTreeNode)result;
 //									System.out.println("addChild: "+parentnode+", "+node);
-									parentnode.addChild(node);
+									try
+									{
+										if(parentnode.getIndexOfChild(node)==-1)
+										{
+//											System.err.println(""+model.hashCode()+" Panel->addChild: "+node+", "+parentnode);
+											parentnode.addChild(node);
+										}
+									}
+									catch(Exception e)
+									{
+										System.err.println(""+model.hashCode()+" Broken node: "+node);
+										System.err.println(""+model.hashCode()+" Parent: "+parentnode+", "+parentnode.getCachedChildren());
+										e.printStackTrace();
+//										model.fireNodeAdded(parentnode, node, parentnode.getIndexOfChild(node));
+									}
 								}
 								
 								public void customExceptionOccurred(Object source, Exception exception)

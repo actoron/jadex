@@ -189,6 +189,7 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 									{
 										node = new VirtualComponentTreeNode(parentnode, proxy.getModel(), descs[i], cms, ui, iconcache);
 									}
+//									System.err.println(proxy.getModel().hashCode()+", "+ready.hashCode()+" searchChildren.add "+node);
 									children.add(node);
 								}
 								
@@ -224,6 +225,7 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 										proxy.getModel().getNode(desc.getName().getName()+"ServiceContainer");
 									if(scn==null)
 										scn	= new ServiceContainerNode(parentnode, proxy.getModel());
+//									System.err.println(proxy.getModel().hashCode()+", "+ready.hashCode()+" searchChildren.add "+scn);
 									children.add(0, scn);
 									final List subchildren = new ArrayList();
 									for(int i=0; i<services.size(); i++)
@@ -240,7 +242,11 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 									{
 										public void customResultAvailable(Object source, Object result)
 										{
-											node.setChildren(subchildren);							
+											ready[1] = true;
+											if(ready[0] &&  ready[1])
+											{
+												node.setChildren(subchildren);
+											}
 										}
 										public void customExceptionOccurred(Object source, Exception exception)
 										{
