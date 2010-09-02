@@ -53,7 +53,8 @@ class TCPOutputConnection
 		}
 		catch(IOException e)
 		{
-			e.printStackTrace();
+			System.out.println("TCP Connection: "+iaddr+":"+iport+" failed");
+//			e.printStackTrace();
 			throw e;
 		}
 		this.sos = new BufferedOutputStream(sock.getOutputStream());

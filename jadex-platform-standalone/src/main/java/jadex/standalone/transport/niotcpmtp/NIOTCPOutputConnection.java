@@ -71,7 +71,8 @@ class NIOTCPOutputConnection
 		}
 		catch(IOException e)
 		{
-			e.printStackTrace();
+			System.out.println("NIOTCP Connection: "+iaddr+":"+iport+" failed");
+//			e.printStackTrace();
 			throw e;
 		}
 
