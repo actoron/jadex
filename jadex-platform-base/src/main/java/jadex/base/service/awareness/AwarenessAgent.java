@@ -552,14 +552,14 @@ public class AwarenessAgent extends MicroAgent
 						{
 							// todo: do not use source for cid?!
 			//				System.out.println("Proxy killed: "+source);
+							DiscoveryInfo dif = getDiscoveryInfo(cid);
+							if(dif!=null)
+								dif.setProxy(false);
 						}
 						
 						public void exceptionOccurred(Object source, Exception exception)
 						{
 //							getLogger().warning("Proxy was killed: "+exception);
-							DiscoveryInfo dif = getDiscoveryInfo(cid);
-							if(dif!=null)
-								dif.setProxy(false);
 						}
 					})).addResultListener(createResultListener(new IResultListener()
 					{

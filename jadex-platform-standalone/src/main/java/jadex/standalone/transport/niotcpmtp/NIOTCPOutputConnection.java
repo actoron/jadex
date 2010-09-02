@@ -18,6 +18,9 @@ class NIOTCPOutputConnection
 {
 	//-------- constants --------
 	
+	/** 5 sec timeout. */
+	public static final int TIMEOUT = 5000;
+	
 	/** 2MB as message buffer. */
 	public static final int BUFFER_SIZE = 1024 * 1024 * 2;
 	
@@ -66,7 +69,8 @@ class NIOTCPOutputConnection
 		{
 			System.out.println("NIOTCP Connection: "+iaddr+":"+iport);
 		    // Kick off connection establishment
-		    this.sc.connect(new InetSocketAddress(iaddr, iport));
+//		    this.sc.connect(new InetSocketAddress(iaddr, iport));	// Requires this for non blocking (what about timeouts?) 
+			sc.socket().connect(new InetSocketAddress(iaddr, iport) , TIMEOUT);	// Doesn't work for non blocking.
 			System.out.println("NIOTCP Connection: "+iaddr+":"+iport+" established");
 		}
 		catch(IOException e)

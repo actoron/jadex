@@ -9,6 +9,7 @@ import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 
 /**
@@ -16,6 +17,11 @@ import java.net.Socket;
  */
 class TCPOutputConnection
 {
+	//-------- constants --------
+	
+	/** 5 sec timeout. */
+	public static final int	TIMEOUT	= 5000;
+	
 	//-------- attributes --------
 	
 	/** The client socket for sending data. */
@@ -48,7 +54,8 @@ class TCPOutputConnection
 		try
 		{
 			System.out.println("TCP Connection: "+iaddr+":"+iport);
-			this.sock = new Socket(iaddr, iport);
+			this.sock = new Socket();
+			sock.connect(new InetSocketAddress(iaddr, iport), TIMEOUT);
 			System.out.println("TCP Connection: "+iaddr+":"+iport+" established");
 		}
 		catch(IOException e)

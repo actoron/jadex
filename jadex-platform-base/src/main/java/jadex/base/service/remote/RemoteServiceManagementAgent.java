@@ -1,6 +1,7 @@
 package jadex.base.service.remote;
 
 import jadex.base.fipa.SFipa;
+import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.MessageType;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.service.SServiceProvider;
@@ -87,7 +88,23 @@ public class RemoteServiceManagementAgent extends MicroAgent
 											reply.put(SFipa.CONTENT, JavaWriter.objectToXML(repcontent, ls.getClassLoader()));
 											sendMessage(reply, mt);
 										}
+										public void exceptionOccurred(Object source, Exception exception)
+										{
+											// Terminated, when rms killed in mean time
+											if(!(exception instanceof ComponentTerminatedException))
+											{
+												super.exceptionOccurred(source, exception);
+											}
+										}
 									}));
+								}
+							}
+							public void exceptionOccurred(Object source, Exception exception)
+							{
+								// Terminated, when rms killed in mean time
+								if(!(exception instanceof ComponentTerminatedException))
+								{
+									super.exceptionOccurred(source, exception);
 								}
 							}
 						}));

@@ -301,16 +301,18 @@ public class ComponentTreePanel extends JSplitPane
 											public void customResultAvailable(Object source, Object result)
 											{
 												final IComponentManagementService rcms = (IComponentManagementService)result;
-												rcms.destroyComponent(cid).addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
-												{
-													public void customResultAvailable(Object source, Object result)
-													{
-														if(sel.getParent()!=null)
-														{
-															((AbstractComponentTreeNode)sel.getParent()).removeChild(sel);
-														}
-													}
-												});
+												rcms.destroyComponent(cid);
+												// Hack!!! Result will not be received when remote comp is platform. 
+//													.addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
+//												{
+//													public void customResultAvailable(Object source, Object result)
+//													{
+//														if(sel.getParent()!=null)
+//														{
+//															((AbstractComponentTreeNode)sel.getParent()).removeChild(sel);
+//														}
+//													}
+//												});
 											}
 										});
 									}
