@@ -106,6 +106,7 @@ public class SequentialSearchManager implements ISearchManager
 		boolean dochildren = false;
 		
 		// If node is to be searched, continue with this node.
+//		System.out.println("proc node: "+source+" "+provider);
 		if(!context.selector.isFinished(context.results) && provider!=null)
 		{
 			if(down)

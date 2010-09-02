@@ -2,6 +2,7 @@ package jadex.commons.service;
 
 import jadex.commons.ComposedFilter;
 import jadex.commons.IFilter;
+import jadex.commons.SUtil;
 import jadex.commons.Tuple;
 
 import java.util.ArrayList;
@@ -99,11 +100,13 @@ public class BasicResultSelector implements IResultSelector
 			}
 			else
 			{
-//				System.out.println("adding: "+ares);
+//				if(services.length>0)
+//					System.out.println("adding: "+SUtil.arrayToString(services)+" "+this);
 				for(int i=0; i<services.length; i++)
 				{
-					if(fil.filter(services[i]))
+					if(fil.filter(services[i]) && !results.contains(services[i]))
 					{
+						System.out.println("add: "+services[i]+" to: "+results);
 						results.add(services[i]);
 					}
 				}
@@ -130,6 +133,7 @@ public class BasicResultSelector implements IResultSelector
 				}
 			}
 		}
+		
 		return (IService[])ret.toArray(new IService[ret.size()]);
 	}
 	

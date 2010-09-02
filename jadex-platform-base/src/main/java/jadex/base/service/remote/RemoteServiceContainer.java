@@ -59,6 +59,10 @@ public class RemoteServiceContainer extends BasicServiceContainer
 			public void resultAvailable(Object source, Object result)
 			{
 				// If should not search remotely or not inited (no rms)
+				
+				// Problem that the container calls itself the decider, could already
+				// be done in search manager when this call is part of a search
+				// But could also be called directly :-(
 				if(!decider.searchNode(null, RemoteServiceContainer.this, results)
 					|| rms==null || componentid==null)// || selector instanceof ComponentFactorySelector)
 				{

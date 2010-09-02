@@ -169,7 +169,7 @@ public class DirectoryFacilitatorService extends BasicService implements IDF
 	 */
 	public IFuture search(final IDFComponentDescription adesc, final ISearchConstraints con)
 	{
-		return search(adesc, con, false);
+		return search(adesc, con, true);
 	}
 	
 	/**
@@ -253,8 +253,6 @@ public class DirectoryFacilitatorService extends BasicService implements IDF
 									}
 								}
 							}
-							if(ret.size()>1)
-								System.out.println("here");
 							System.out.println("Federated search: "+ret);
 							fut.setResult(ret.toArray(new DFComponentDescription[ret.size()]));
 						}

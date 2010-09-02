@@ -94,6 +94,10 @@ public class SServiceProvider
 //		}
 		final Future ret = new Future();
 		
+		// Hack->remove
+		IVisitDecider abortdecider = new DefaultVisitDecider();
+		IVisitDecider rabortdecider = new DefaultVisitDecider(true, false);
+		
 		provider.getServices(sequentialmanager, onlylocal? abortdecider: rabortdecider, 
 			new TypeResultSelector(type, true, onlylocal), new ArrayList())
 				.addResultListener(new DelegationResultListener(ret));
@@ -115,6 +119,9 @@ public class SServiceProvider
 //		}
 		final Future ret = new Future();
 		
+		// Hack->remove
+		IVisitDecider abortdecider = new DefaultVisitDecider();
+		
 		provider.getServices(sequentialmanager, abortdecider, new IdResultSelector(sid), new ArrayList())
 			.addResultListener(new DelegationResultListener(ret));
 		
@@ -134,6 +141,9 @@ public class SServiceProvider
 //			profiling.put(selector.getCacheKey(), new Integer(cnt!=null ? cnt.intValue()+1 : 1)); 
 //		}
 		final Future ret = new Future();
+		
+		// Hack->remove
+		IVisitDecider abortdecider = new DefaultVisitDecider();
 		
 		provider.getServices(sequentialmanager, abortdecider, selector, new ArrayList())
 			.addResultListener(new DelegationResultListener(ret));
@@ -165,6 +175,10 @@ public class SServiceProvider
 //		}
 		final Future ret = new Future();
 		
+		// Hack->remove
+		IVisitDecider contdecider = new DefaultVisitDecider(false);
+		IVisitDecider rcontdecider = new DefaultVisitDecider(false, false);
+		
 		provider.getServices(parallelmanager, local ? contdecider : rcontdecider, new TypeResultSelector(type, false, local), new ArrayList())
 			.addResultListener(new DelegationResultListener(ret));
 		
@@ -184,6 +198,9 @@ public class SServiceProvider
 //			profiling.put(type, new Integer(cnt!=null ? cnt.intValue()+1 : 1)); 
 //		}
 		final Future ret = new Future();
+		
+		// Hack->remove
+		IVisitDecider abortdecider = new DefaultVisitDecider();
 		
 		provider.getServices(upwardsmanager, abortdecider, new TypeResultSelector(type), new ArrayList())
 			.addResultListener(new DelegationResultListener(ret));
@@ -205,6 +222,9 @@ public class SServiceProvider
 //		}
 		final Future ret = new Future();
 		
+		// Hack->remove
+		IVisitDecider abortdecider = new DefaultVisitDecider();
+		
 		provider.getServices(localmanager, abortdecider, new TypeResultSelector(type), new ArrayList())
 			.addResultListener(new DelegationResultListener(ret));
 		
@@ -225,6 +245,9 @@ public class SServiceProvider
 //		}
 		final Future ret = new Future();
 		
+		// Hack->remove
+		IVisitDecider abortdecider = new DefaultVisitDecider();
+		
 		provider.getServices(localmanager, abortdecider, new TypeResultSelector(type), new ArrayList())
 			.addResultListener(new DelegationResultListener(ret));
 		
@@ -243,6 +266,9 @@ public class SServiceProvider
 //			profiling.put(type, new Integer(cnt!=null ? cnt.intValue()+1 : 1)); 
 //		}
 		final Future ret = new Future();
+		
+		// Hack->remove
+		IVisitDecider contdecider = new DefaultVisitDecider(false);
 		
 		provider.getServices(localmanager, contdecider, contanyselector, new ArrayList())
 			.addResultListener(new DelegationResultListener(ret));
@@ -263,6 +289,9 @@ public class SServiceProvider
 //			profiling.put(type, new Integer(cnt!=null ? cnt.intValue()+1 : 1)); 
 //		}
 		final Future ret = new Future();
+		
+		// Hack->remove
+		IVisitDecider abortdecider = new DefaultVisitDecider();
 		
 		provider.getServices(localmanager, abortdecider, new IdResultSelector(sid), new ArrayList())
 			.addResultListener(new DelegationResultListener(ret));
