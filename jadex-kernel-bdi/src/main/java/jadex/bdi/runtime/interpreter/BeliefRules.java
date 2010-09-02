@@ -90,8 +90,7 @@ public class BeliefRules
 			}
 		}
 		
-		Collection changed = state.getAttributeValues(rbeliefset, OAVBDIRuntimeModel.beliefset_has_facts);
-		
+//		Collection changed = state.getAttributeValues(rbeliefset, OAVBDIRuntimeModel.beliefset_has_facts);
 //		System.out.println("changed to: "+changed);
 	}
 

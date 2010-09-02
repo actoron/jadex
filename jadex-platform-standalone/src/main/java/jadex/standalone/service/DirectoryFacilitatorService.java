@@ -15,7 +15,6 @@ import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.collection.IndexMap;
 import jadex.commons.concurrent.CollectionResultListener;
-import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.service.BasicService;
 import jadex.commons.service.IServiceProvider;

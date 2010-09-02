@@ -7,8 +7,6 @@ import jadex.bdi.runtime.IEAExpression;
 import jadex.bdi.runtime.IEAGoal;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.SGUI;
-import jadex.commons.SUtil;
-import jadex.commons.concurrent.CollectionResultListener;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.commons.service.SServiceProvider;

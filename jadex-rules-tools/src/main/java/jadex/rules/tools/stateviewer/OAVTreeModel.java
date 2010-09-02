@@ -268,9 +268,12 @@ public class OAVTreeModel implements TreeModel
 
 //									int index	= attrnode.children.indexOf(child);
 								int index	= getIndexForChild(attrnode.children, child);
+//								System.out.println("modified removing: "+child+", "+index);
 								
 								if(attrnode.children.get(index) instanceof ObjectNode)
 									((ObjectNode)attrnode.children.get(index)).drop();
+								if(attrnode.children.get(index) instanceof AbstractInspectorNode)
+									((AbstractInspectorNode)attrnode.children.get(index)).drop();
 								attrnode.children.remove(index);
 								
 								if(listeners!=null)
@@ -317,6 +320,7 @@ public class OAVTreeModel implements TreeModel
 			 */
 			public void objectAdded(Object id, OAVObjectType type, boolean root)
 			{
+//				System.out.println("added: "+id+", "+type+", "+root);
 				if(root)
 				{
 					assert !nodes.containsKey(id): "Node already contained: "+id+", "+nodes.get(id);
@@ -355,7 +359,7 @@ public class OAVTreeModel implements TreeModel
 			 */
 			public void objectRemoved(Object id, OAVObjectType type)
 			{
-//				System.out.println("removed: "+id);
+//				System.out.println("removed: "+id+", "+type);
 				
 				Object node	= nodes.get(id);
 				if(node instanceof ObjectNode)
@@ -397,8 +401,15 @@ public class OAVTreeModel implements TreeModel
 					}
 					else if(onode.parent instanceof AttributeNode)
 					{
-						((AttributeNode)onode.parent).children.remove(index);
-						path	= ((AttributeNode)onode.parent).getPath();
+//						try
+//						{
+							((AttributeNode)onode.parent).children.remove(index);
+							path	= ((AttributeNode)onode.parent).getPath();
+//						}
+//						catch(Exception e)
+//						{
+//							e.printStackTrace();
+//						}
 					}
 					onode.drop();
 					
