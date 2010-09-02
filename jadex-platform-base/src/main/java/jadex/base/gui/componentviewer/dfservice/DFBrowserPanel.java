@@ -267,7 +267,8 @@ public class DFBrowserPanel	extends JPanel implements IServiceViewerPanel
 	protected void refresh()
 	{
 //		df.search(df.createDFComponentDescription(null, null), null).addResultListener(new SwingDefaultResultListener(this)
-		df.search(new DFComponentDescription(null), null).addResultListener(new SwingDefaultResultListener(this)
+		boolean federated = true;
+		df.search(new DFComponentDescription(null), null, federated).addResultListener(new SwingDefaultResultListener(this)
 		{
 			public void customResultAvailable(Object source, Object result) 
 			{

@@ -1,8 +1,6 @@
 package jadex.commons.service;
 
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  *  Default visit decider that implements the following strategy:
@@ -14,7 +12,7 @@ public class DefaultVisitDecider implements IVisitDecider
 	//-------- attributes --------
 	
 	/** The set of visited nodes. */
-	protected Set visited;
+//	protected Set visited;
 
 	/** A flag that indicates if node should not be searched when one result is already available. */
 	protected boolean abort;
@@ -46,7 +44,7 @@ public class DefaultVisitDecider implements IVisitDecider
 	 */
 	public DefaultVisitDecider(boolean abort, boolean onlylocal)
 	{
-		this.visited = new HashSet();
+//		this.visited = new HashSet();
 		this.abort = abort;
 		this.onlylocal = onlylocal;
 	}
@@ -70,15 +68,15 @@ public class DefaultVisitDecider implements IVisitDecider
 //		if(visited.contains(target.getId()))
 //			System.out.println("rattenkack");
 		
-		if(ret && !visited.contains(target.getId()))
-		{
-			visited.add(target.getId());
-			ret = true;
-		}
-		else
-		{
-			ret = false;
-		}
+//		if(ret && !visited.contains(target.getId()))
+//		{
+//			visited.add(target.getId());
+//			ret = true;
+//		}
+//		else
+//		{
+//			ret = false;
+//		}
 		
 //		System.out.println("search: "+target.getId()+" "+ret+" "+visited);
 		

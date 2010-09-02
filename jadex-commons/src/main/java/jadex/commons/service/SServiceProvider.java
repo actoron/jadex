@@ -5,6 +5,7 @@ import jadex.commons.IFuture;
 import jadex.commons.concurrent.DelegationResultListener;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 /**
  *  Static helper class for searching services.
@@ -176,8 +177,8 @@ public class SServiceProvider
 		final Future ret = new Future();
 		
 		// Hack->remove
-		IVisitDecider contdecider = new DefaultVisitDecider(false);
-		IVisitDecider rcontdecider = new DefaultVisitDecider(false, false);
+//		IVisitDecider contdecider = new DefaultVisitDecider(false);
+//		IVisitDecider rcontdecider = new DefaultVisitDecider(false, false);
 		
 		provider.getServices(parallelmanager, local ? contdecider : rcontdecider, new TypeResultSelector(type, false, local), new ArrayList())
 			.addResultListener(new DelegationResultListener(ret));

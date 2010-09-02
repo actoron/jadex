@@ -23,6 +23,7 @@ import jadex.commons.service.clock.IClockService;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -172,6 +173,7 @@ public class DirectoryFacilitatorService extends BasicService implements IDF
 		return search(adesc, con, true);
 	}
 	
+//	protected List open = Collections.synchronizedList(new ArrayList());
 	/**
 	 *  Search for components matching the given description.
 	 *  @return An array of matching component descriptions. 
@@ -226,7 +228,8 @@ public class DirectoryFacilitatorService extends BasicService implements IDF
 			}
 		}
 		
-		System.out.println("Started search: "+ret);
+//		System.out.println("Started search: "+ret);
+//		open.add(fut);
 		if(federated)
 		{
 			SServiceProvider.getServices(provider, IDF.class, false).addResultListener(new IResultListener()
@@ -234,8 +237,7 @@ public class DirectoryFacilitatorService extends BasicService implements IDF
 				public void resultAvailable(Object source, Object result)
 				{
 					Collection coll = (Collection)result;
-					if(coll.size()>2)
-						System.out.println("here");
+//					System.out.println("dfs: "+coll);
 					// Ignore search failures of remote dfs
 					CollectionResultListener lis = new CollectionResultListener(coll.size(), true, new IResultListener()
 					{
@@ -253,12 +255,14 @@ public class DirectoryFacilitatorService extends BasicService implements IDF
 									}
 								}
 							}
-							System.out.println("Federated search: "+ret);
+//							open.remove(fut);
+//							System.out.println("Federated search: "+ret);//+" "+open);
 							fut.setResult(ret.toArray(new DFComponentDescription[ret.size()]));
 						}
 						
 						public void exceptionOccurred(Object source, Exception exception)
 						{
+//							open.remove(fut);
 							fut.setException(exception);
 //								fut.setResult(ret.toArray(new DFComponentDescription[ret.size()]));
 						}
@@ -279,13 +283,15 @@ public class DirectoryFacilitatorService extends BasicService implements IDF
 				
 				public void exceptionOccurred(Object source, Exception exception)
 				{
+//					open.remove(fut);
 					fut.setResult(ret.toArray(new DFComponentDescription[ret.size()]));
 				}
 			});
 		}
 		else
 		{
-			System.out.println("Local search: "+ret);
+//			open.remove(fut);
+//			System.out.println("Local search: "+ret+" "+open);
 			fut.setResult(ret.toArray(new DFComponentDescription[ret.size()]));
 		}
 
