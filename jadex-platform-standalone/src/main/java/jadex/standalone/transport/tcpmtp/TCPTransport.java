@@ -65,7 +65,7 @@ public class TCPTransport implements ITransport
 	protected final static int BUFFER_SIZE	= 1024 * 1024 * 2;
 	
 	/** Maximum number of outgoing connections */
-	protected final static int MAX_CONNECTIONS	= 10;
+	protected final static int MAX_CONNECTIONS	= 20;
 	
 	/** Default port. */
 	protected final static int DEFAULT_PORT	= 9876;
@@ -200,7 +200,9 @@ public class TCPTransport implements ITransport
 										try
 										{
 //											ClassLoader cl = ((ILibraryService)container.getService(ILibraryService.class)).getClassLoader();
+//											System.out.println("accepting");
 											final TCPInputConnection con = new TCPInputConnection(serversocket.accept(), codecfac, libservice.getClassLoader());
+//											System.out.println("busy");
 											if(!async)
 											{
 												TCPTransport.this.deliverMessages(con);

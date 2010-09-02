@@ -88,8 +88,7 @@ public class MessageService extends BasicService implements IMessageService
 	
 	/** The cashed clock service. */
 	protected IComponentManagementService cms;
-
-
+	
 	//-------- constructors --------
 
 	/**
@@ -134,7 +133,7 @@ public class MessageService extends BasicService implements IMessageService
 		if(sen==null)
 			msgcopy.put(senid, sender);
 		
-		String idid = type.getIdIdentifier();
+		final String idid = type.getIdIdentifier();
 		Object id = msgcopy.get(idid);
 		if(id==null)
 			msgcopy.put(idid, SUtil.createUniqueId(sender.getLocalName()));
@@ -142,6 +141,7 @@ public class MessageService extends BasicService implements IMessageService
 		final String sd = type.getTimestampIdentifier();
 		final Object senddate = msgcopy.get(sd);
 		
+		// External access of sender required for content encoding etc.
 		cms.getExternalAccess(sender).addResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object source, Object result)

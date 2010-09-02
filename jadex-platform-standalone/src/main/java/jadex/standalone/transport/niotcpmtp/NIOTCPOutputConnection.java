@@ -62,8 +62,18 @@ class NIOTCPOutputConnection
 	    // todo: perform sending asynchronous to caller thread
 	    //this.sc.configureBlocking(false);
 	  
-	    // Kick off connection establishment
-	    this.sc.connect(new InetSocketAddress(iaddr, iport));
+		try
+		{
+			System.out.println("NIOTCP Connection: "+iaddr+":"+iport);
+		    // Kick off connection establishment
+		    this.sc.connect(new InetSocketAddress(iaddr, iport));
+			System.out.println("established");
+		}
+		catch(IOException e)
+		{
+			e.printStackTrace();
+			throw e;
+		}
 
 	    this.buffer = ByteBuffer.allocateDirect(BUFFER_SIZE);
 	    

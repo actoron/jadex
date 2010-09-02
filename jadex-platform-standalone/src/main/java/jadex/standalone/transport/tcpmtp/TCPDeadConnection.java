@@ -8,7 +8,7 @@ public class TCPDeadConnection
 	//-------- constants --------
 	
 	/** The time span for which this connection is dead. */
-	public static long DEADSPAN = 10000;
+	public static long DEADSPAN = 60000;
 	
 	//-------- attributes --------
 	
