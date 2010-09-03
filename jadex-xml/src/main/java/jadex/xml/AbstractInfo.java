@@ -120,7 +120,7 @@ public class AbstractInfo
 	 */
 	public IFilter getFilter()
 	{
-		return xmlinfo.getFilter();
+		return xmlinfo!=null ? xmlinfo.getFilter() : null;
 	}
 
 	/**

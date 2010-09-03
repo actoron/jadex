@@ -206,5 +206,21 @@ public class MixedIdentityHashSet	implements Set
 	public int hashCode()
 	{
 		return (equality!=null ? equality.hashCode() : 0) + (identity!=null ? identity.hashCode() : 0);
-	}		
+	}
+    
+    /**
+     *  Create a string representation.
+     */
+    public String	toString()
+    {
+    	StringBuffer	ret	= new StringBuffer("{");
+    	for(Iterator it=iterator(); it.hasNext();)
+    	{
+    		ret.append(it.next());
+    		if(it.hasNext())
+    			ret.append(",");
+    	}
+    	ret.append("}");
+    	return ret.toString();
+    }
 }

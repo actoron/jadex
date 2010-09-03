@@ -539,14 +539,16 @@ public class GuiPanel extends JPanel
 						public void customResultAvailable(Object source, Object result)
 						{
 							List res = (List)result;
-							for(int i=0; i<res.size(); i++)
-								System.out.println(""+i+res.get(i));
+//							for(int i=0; i<res.size(); i++)
+//								System.out.println(""+i+res.get(i));
 							
 							while(detailsdm.getRowCount()>0)
 								detailsdm.removeRow(0);
 							for(int i=0; i<res.size(); i++)
+							{
 								detailsdm.addRow(new Object[]{res.get(i)});
 								//System.out.println(""+i+res.get(i));
+							}
 						}
 					});
 				}

@@ -16,7 +16,7 @@ public class CollectMemory
 {
 	//-------- attributes --------
 	
-	/** The working memory (tuple -> tuple). */
+	/** The working memory (index tuple -> result tuple). */
 	protected Map workingmem;
 	
 	/** The result memory. */

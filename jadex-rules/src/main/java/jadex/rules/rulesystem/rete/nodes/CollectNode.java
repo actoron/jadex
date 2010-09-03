@@ -157,6 +157,7 @@ public class CollectNode extends AbstractNode implements ITupleConsumerNode, ITu
 			List obs = left.getObjects();
 			for(int i=0; i<obs.size(); i++)
 			{
+				// Todo: should be i<tupleindex ???
 				if(i!=tupleindex)
 				{
 					resulttuple = mem.getTuple(state, resulttuple, obs.get(i));
@@ -180,7 +181,7 @@ public class CollectNode extends AbstractNode implements ITupleConsumerNode, ITu
 			Object newob = left.getObject(tupleindex);
 			Set vals = (Set)resulttuple.getObject(tupleindex);
 			if(vals.contains(newob))
-				throw new RuntimeException("Object already contained: "+newob);
+				throw new UnsupportedOperationException("Multiple matches to same object not supported: "+newob);
 			vals.add(newob);
 		}
 		
@@ -549,7 +550,6 @@ public class CollectNode extends AbstractNode implements ITupleConsumerNode, ITu
 		for(int i=0; i<obs.size(); i++)
 		{
 			if(i<tupleindex)
-//			if(i!=tupleindex)
 				t = mem.getTuple(state, t, obs.get(i)); // Create tuple from tuples
 		}
 		return t;

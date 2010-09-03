@@ -2139,7 +2139,7 @@ public abstract class OAVAbstractState	implements IOAVState
 			// Invoke addPropertyChangeListener on value
 			try
 			{
-				assert nocheck || ++beanlistenercnt==beanlistenercnt;
+				assert nocheck || beanlistenercnt+1==++beanlistenercnt;
 //				if(getTypeModel().getName().equals("BlackjackDealer_typemodel") && value.toString().indexOf("GameState")!=-1)
 //					Thread.dumpStack();
 //				System.out.println(getTypeModel().getName()+": Registered on: "+value);
@@ -2184,7 +2184,7 @@ public abstract class OAVAbstractState	implements IOAVState
 					try
 					{
 //						System.out.println(getTypeModel().getName()+": Deregister: "+value+", "+type);						
-						assert nocheck || --beanlistenercnt==beanlistenercnt;
+						assert nocheck || beanlistenercnt-1==--beanlistenercnt;
 						
 						// Do not use Class.getMethod (slow).
 						Method	meth	= SReflect.getMethod(value.getClass(),

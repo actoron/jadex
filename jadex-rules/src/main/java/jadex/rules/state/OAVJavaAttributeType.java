@@ -97,7 +97,7 @@ public class OAVJavaAttributeType extends OAVAttributeType
 			{
 				if(propreadmethod==null)
 					propreadmethod = IPropertyObject.class.getMethod("getProperty", new Class[]{String.class});
-				ret = propreadmethod.invoke(object, new String[]{name});
+				ret = propreadmethod.invoke(object, new Object[]{name});
 			}
 			catch(Exception e)
 			{

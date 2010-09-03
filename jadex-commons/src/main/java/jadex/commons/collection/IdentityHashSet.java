@@ -358,4 +358,20 @@ public class IdentityHashSet	implements Set
     {
     	return map.keySet().hashCode();
     }
+    
+    /**
+     *  Create a string representation.
+     */
+    public String	toString()
+    {
+    	StringBuffer	ret	= new StringBuffer("{");
+    	for(Iterator it=iterator(); it.hasNext();)
+    	{
+    		ret.append(it.next());
+    		if(it.hasNext())
+    			ret.append(",");
+    	}
+    	ret.append("}");
+    	return ret.toString();
+    }
 }
