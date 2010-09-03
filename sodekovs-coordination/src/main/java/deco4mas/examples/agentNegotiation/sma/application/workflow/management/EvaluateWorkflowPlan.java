@@ -32,12 +32,12 @@ public class EvaluateWorkflowPlan extends Plan {
 				// This is a hack for this special application.xml -> AgentNegotiation
 				//: save result also to space in order to enable evaluation by automated simulation component
 				AbstractEnvironmentSpace space = ((AbstractEnvironmentSpace) ((IApplicationExternalAccess) getScope().getParent()).getSpace("mycoordspace"));
-				space.getSpaceObjectsByType("moneyBankOfSMA")[0].setProperty("money", new Double ((Math.round(money))).intValue());
-				int counter = (Integer) space.getSpaceObjectsByType("moneyBankOfSMA")[0].getProperty("executedWorkflows");
-				space.getSpaceObjectsByType("moneyBankOfSMA")[0].setProperty("executedWorkflows", counter+1);
+				space.getSpaceObjectsByType("KIVSeval")[0].setProperty("moneyBankSMA", new Double ((Math.round(money))).intValue());
+				int counter = (Integer) space.getSpaceObjectsByType("KIVSeval")[0].getProperty("executedWorkflows");
+				space.getSpaceObjectsByType("KIVSeval")[0].setProperty("executedWorkflows", counter+1);
 				
 				System.out.println("#########################################################################################################################################");
-				System.out.println(space.getSpaceObjectsByType("moneyBankOfSMA")[0].getProperty("money") +  "  - " + space.getSpaceObjectsByType("moneyBankOfSMA")[0].getProperty("executedWorkflows"));
+				System.out.println(space.getSpaceObjectsByType("KIVSeval")[0].getProperty("moneyBankSMA") +  "  - " + space.getSpaceObjectsByType("KIVSeval")[0].getProperty("executedWorkflows"));
 				System.out.println("#########################################################################################################################################");
 			}
 		} catch (Exception e) {

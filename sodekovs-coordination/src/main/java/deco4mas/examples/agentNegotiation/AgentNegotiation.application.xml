@@ -31,15 +31,19 @@
 
 			<!-- TMP Object Type: accumalates money bank of SMA -->
 			<env:objecttypes>
-				<env:objecttype name="moneyBankOfSMA">
-					<env:property name="money">0</env:property>
+				<env:objecttype name="KIVSeval">
+					<env:property name="moneyBankSMA">0</env:property>
 					<env:property name="executedWorkflows">0</env:property>
-				</env:objecttype>
+			<!-- Counts how often the Service Type was executed successfully -->
+					<env:property name="Chassisbaubillig">0</env:property>
+					<env:property name="Chassisbaunormal">0</env:property>
+					<env:property name="Chassisbauteuer">0</env:property>
+				</env:objecttype>					
+			
 			</env:objecttypes>
 
 			<!-- decoMAS file -->
-			<env:property name="dynamics_configuration">"deco4mas/examples/agentNegotiation/deco/negotiation.dynamics.xml"
-			</env:property>
+			<env:property name="dynamics_configuration">"deco4mas/examples/agentNegotiation/deco/negotiation.dynamics.xml"</env:property>
 
 			<!-- space process to control time driven events -->
 			<env:processtypes>
@@ -82,12 +86,16 @@
 					width="2" height="2">
 					
 					<env:objects>
-						<env:object type="moneyBankOfSMA">
-							<env:property name="money">new Integer(0)</env:property>
+						<env:object type="KIVSeval">
+							<env:property name="moneyBankSMA">new Integer(0)</env:property>
 							<env:property name="executedWorkflows">new Integer(0)</env:property>
-						</env:object>
-					</env:objects>
-					
+							<!-- Counts how often the Service Type was executed successfully -->
+							<env:property name="Chassisbaubillig">new Integer(0)</env:property>
+							<env:property name="Chassisbaunormal">new Integer(0)</env:property>
+							<env:property name="Chassisbauteuer">new Integer(0)</env:property>
+						</env:object>									
+				</env:objects>
+			
 					<env:processes>
 						<env:process type="MediumTime">
 						</env:process>
@@ -176,8 +184,7 @@
 				</component>
 				<component type="ClientSimulator">
 					<arguments>
-						<argument name="simulationFacts">$args.Simulation_Facts_For_Client
-						</argument>
+						<argument name="simulationFacts">$args.Simulation_Facts_For_Client</argument>
 					</arguments>
 				</component>
 			</components>

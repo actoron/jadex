@@ -24,9 +24,12 @@
 			<Data name="workflows">$moneyBank.executedWorkflows</Data>				
 		</Dataprovider>
 		<Dataprovider name="moneyBankLogger2">			
-			<Source name="$moneyBank" sourcetype="ISpaceObject" objecttype="moneyBankOfSMA"/> 						
-			<Data name="money_amount">$moneyBank.money</Data>			
-			<Data name="workflows">$moneyBank.executedWorkflows</Data>		
+			<Source name="$kivsEval" sourcetype="ISpaceObject" objecttype="KIVSeval"/> 						
+			<Data name="money_amount">$kivsEval.moneyBankSMA</Data>			
+			<Data name="workflows">$kivsEval.executedWorkflows</Data>
+			<Data name="Chassisbaubillig">$kivsEval.Chassisbaubillig</Data>
+			<Data name="Chassisbaunormal">$kivsEval.Chassisbaunormal</Data>
+			<Data name="Chassisbauteuer">$kivsEval.Chassisbauteuer</Data>
 		</Dataprovider>
 	</Dataproviders>
 
@@ -53,6 +56,9 @@
 				<Property name="dataprovider">"moneyBankLogger2"</Property>
 				<Property name="money_amount" filter="last"/> <!-- filter="last"/>< HACK: Denotes the filter type ->last= only the last value is of interest. -->
 				<Property name="workflows" filter="last"/>
+				<Property name="Chassisbaubillig" filter="last"/>
+				<Property name="Chassisbaunormal" filter="last"/>
+				<Property name="Chassisbauteuer" filter="last"/>
 		</Dataconsumer>				
 	</Dataconsumers>
 
@@ -109,15 +115,15 @@
 				Randoms gleich sind.
 			-->
 			<TerminateCondition>
-				<Time value="5000" type="absolute" />
+				<Time value="15000" type="absolute" />
 			</TerminateCondition>
 		</General>
-		<Rows experiments="25">
+		<Rows experiments="1">
 			<TerminateCondition>
-				  <!--<Time value="5000" type="relative" />-->				
-					<TargetFunction function="$object.getProperty(&quot;executedWorkflows&quot;) >=
+				  <Time value="15000" type="relative" />				
+					<!--<TargetFunction function="$object.getProperty(&quot;executedWorkflows&quot;) >=
 					50">	<ObjectSource type="ISpaceObject" name="moneyBankOfSMA" /> </TargetFunction>
-																			
+														-->					
 				<!--
 					<TargetFunction function="$beliefbase.tmpCounter>= 13">
 					<ObjectSource type="BDI_AGENT" name="Sentry" /> </TargetFunction>
