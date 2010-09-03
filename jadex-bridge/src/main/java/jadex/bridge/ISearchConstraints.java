@@ -1,5 +1,8 @@
 package jadex.bridge;
 
+/**
+ *  Interface for search constraints.
+ */
 public interface ISearchConstraints
 {
 	/**

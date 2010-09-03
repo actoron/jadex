@@ -1,9 +1,10 @@
 package jadex.tools.generic;
 
 import jadex.base.gui.plugin.AbstractJCCPlugin;
+import jadex.commons.IFuture;
 import jadex.commons.Properties;
-import jadex.commons.SGUI;
 import jadex.commons.concurrent.SwingDefaultResultListener;
+import jadex.commons.service.IService;
 import jadex.commons.service.SServiceProvider;
 
 import java.awt.BorderLayout;
@@ -19,26 +20,12 @@ import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.UIDefaults;
 
 /**
- *  The generic plugin for a specified component or service. 
+ * 
  */
-public abstract class ComponentServicePlugin extends AbstractJCCPlugin
+public abstract class ServicePlugin extends AbstractJCCPlugin
 {
-	//-------- constants --------
-
-	/** The image icons. */
-	protected static final UIDefaults icons = new UIDefaults(new Object[]
-	{
-		"conversation",	SGUI.makeIcon(ComponentServicePlugin.class, "/jadex/tools/common/images/libcenter.png"),
-		"conversation_sel", SGUI.makeIcon(ComponentServicePlugin.class, "/jadex/tools/common/images/libcenter_sel.png"),
-	});
-
-	//-------- attributes --------
-	
-	//-------- methods --------
-	
 	/**
 	 *  Get the service type.
 	 *  @return The service type.
@@ -46,10 +33,14 @@ public abstract class ComponentServicePlugin extends AbstractJCCPlugin
 	public abstract Class getServiceType();
 	
 	/**
-	 *  Get the model name.
-	 *  @return the model name.
+	 *  Create the component/service panel.
 	 */
-	public abstract String getModelName();
+	public abstract IFuture createServicePanel(IService service);
+	
+	/**
+	 *  Get the tool icon.
+	 */
+	public abstract Icon getToolIcon(boolean selected);
 	
 	/**
 	 *  Test if this plugin should be initialized lazily.
@@ -61,21 +52,12 @@ public abstract class ComponentServicePlugin extends AbstractJCCPlugin
 	}
 	
 	/**
-	 * @return "Library Tool"
-	 * @see jadex.base.gui.plugin.IControlCenterPlugin#getName()
+	 *  Get the name.
+	 *  @return The name.
 	 */
 	public String getName()
 	{
-		return getModelName()!=null? getModelName(): getServiceType().getName();
-	}
-
-	/**
-	 * @return the conversation icon
-	 * @see jadex.base.gui.plugin.IControlCenterPlugin#getToolIcon()
-	 */
-	public Icon getToolIcon(boolean selected)
-	{
-		return selected? icons.getIcon("conversation_sel"): icons.getIcon("conversation");
+		return getServiceType().getName();
 	}
 
 	/**
@@ -84,12 +66,12 @@ public abstract class ComponentServicePlugin extends AbstractJCCPlugin
 	 */
 	public JComponent createView()
 	{		
-		JPanel mainp = new JPanel(new BorderLayout());
+		final JPanel mainp = new JPanel(new BorderLayout());
 		
 		JPanel northp = new JPanel(new FlowLayout());
 		final JComboBox selcb = new JComboBox(); 
 		final JButton refreshb = new JButton("Refresh");
-		northp.add(new JLabel(getModelName()!=null? "Select component": "Select service"));
+		northp.add(new JLabel("Select service"));
 		northp.add(selcb);
 		northp.add(refreshb);
 		
@@ -105,6 +87,17 @@ public abstract class ComponentServicePlugin extends AbstractJCCPlugin
 			public void actionPerformed(ActionEvent e) 
 			{
 				System.out.println("Selected : "+selcb.getSelectedItem());
+				
+				final Object sel = selcb.getSelectedItem();
+				
+				IService service = (IService)sel;
+				createServicePanel(service).addResultListener(new SwingDefaultResultListener(mainp)
+				{
+					public void customResultAvailable(Object source, Object result)
+					{
+						mainp.add((JPanel)result, BorderLayout.CENTER);
+					}
+				});
 			}
 		});
 		
@@ -120,36 +113,22 @@ public abstract class ComponentServicePlugin extends AbstractJCCPlugin
 	{
 		boolean remote = false;
 
-		if(getModelName()!=null)
+		SServiceProvider.getServices(getJCC().getServiceProvider(), getServiceType(), remote)
+			.addResultListener(new SwingDefaultResultListener(getView()) 
 		{
-			SServiceProvider.getService(getJCC().getServiceProvider(), , remote)
-				.addResultListener(new SwingDefaultResultListener(getView()) 
+			public void customResultAvailable(Object source, Object result) 
 			{
-				public void customResultAvailable(Object source, Object result) 
+				selcb.removeAllItems();
+				Collection coll = (Collection)result;
+				if(coll!=null)
 				{
-					
-				}
-			});
-		}
-		else
-		{
-			SServiceProvider.getServices(getJCC().getServiceProvider(), getServiceType(), remote)
-				.addResultListener(new SwingDefaultResultListener(getView()) 
-			{
-				public void customResultAvailable(Object source, Object result) 
-				{
-					selcb.removeAllItems();
-					Collection coll = (Collection)result;
-					if(coll!=null)
+					for(Iterator it=coll.iterator(); it.hasNext(); )
 					{
-						for(Iterator it=coll.iterator(); it.hasNext(); )
-						{
-							selcb.addItem(it.next());
-						}
+						selcb.addItem(it.next());
 					}
 				}
-			});
-		}
+			}
+		});
 	}
 
 	/**
@@ -188,4 +167,3 @@ public abstract class ComponentServicePlugin extends AbstractJCCPlugin
 	{
 	}
 }
-

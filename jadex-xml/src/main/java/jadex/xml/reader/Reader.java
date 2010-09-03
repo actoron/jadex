@@ -564,11 +564,11 @@ public class Reader
 			bis.close();
 			return ret;
 		}
-		catch(Exception e)
+		catch(Throwable t)
 		{
-//			e.printStackTrace();
+			t.printStackTrace();
 			System.out.println("problem: "+new String(val));
-			throw new RuntimeException(e);
+			throw new RuntimeException(t);
 		}
 	}
 	

@@ -104,7 +104,15 @@ public class CollectionResultListener	implements IResultListener
 		if(notify)
 		{
 //			System.out.println("exceptionOcurred: "+this+", "+this.sresults.size());
-			delegate.exceptionOccurred(null, exception);
+//			
+			if(ignorefailures)
+			{
+				delegate.resultAvailable(source, results);
+			}
+			else
+			{
+				delegate.exceptionOccurred(null, exception);
+			}
 		}
 	}
 }

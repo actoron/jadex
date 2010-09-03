@@ -82,6 +82,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 	/** The autocreate flag. */
 	protected boolean autodelete;
 
+	
 	protected JTextField	tfipaddress;
 
 	protected JTextField	tfport;

@@ -1199,6 +1199,12 @@ public abstract class ComponentManagementService extends BasicService implements
 	{
 		final Future ret = new Future();
 		
+		if(cid==null)
+		{
+			ret.setException(new IllegalArgumentException("Identifier is null."));
+			return ret;
+		}
+		
 		if(isRemoteComponent(cid))
 		{
 			SServiceProvider.getService(provider, IRemoteServiceManagementService.class)
@@ -1586,8 +1592,6 @@ public abstract class ComponentManagementService extends BasicService implements
 			fut.setResult(ret.toArray(new CMSComponentDescription[ret.size()]));
 		}
 		
-		
-		fut.setResult(ret);
 		return fut;
 	}
 	
