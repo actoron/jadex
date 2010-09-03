@@ -54,7 +54,7 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 	 */
 	protected static final UIDefaults	icons	= new UIDefaults(new Object[]{
 		"componentviewer", SGUI.makeIcon(ComponentViewerPlugin.class, "/jadex/tools/common/images/configure.png"), 
-		"componentviewer_sel", SGUI.makeIcon(ComponentViewerPlugin.class, "/jadex/tools/common/images/configure.png"), 
+		"componentviewer_sel", SGUI.makeIcon(ComponentViewerPlugin.class, "/jadex/tools/common/images/configure_sel.png"), 
 		"open_viewer", SGUI.makeIcon(ComponentViewerPlugin.class, "/jadex/tools/common/images/new_introspector.png"),
 		"close_viewer", SGUI.makeIcon(ComponentViewerPlugin.class, "/jadex/tools/common/images/close_introspector.png"),
 		"viewer_empty", SGUI.makeIcon(ComponentViewerPlugin.class, "/jadex/tools/common/images/viewer_empty.png"),

@@ -30,18 +30,16 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.UIDefaults;
 
+
 /**
- *  Plugin that allows to look at viewable components.
+ *  Abstract base plugin that allows to look at viewable components or service.
  */
-public abstract class ComponentPlugin extends AbstractJCCPlugin
+public abstract class AbstractGenericPlugin extends AbstractJCCPlugin
 {	
 	//-------- constants --------
 
 	/** The image icons. */
-	protected static final UIDefaults icons = new UIDefaults(new Object[]
-	{
-		"viewer_empty", SGUI.makeIcon(AwarenessComponentPlugin.class, "/jadex/tools/common/images/viewer_empty.png"),
-	});
+	protected static final UIDefaults icons = new UIDefaults();
 
 	//-------- attributes --------
 	
@@ -63,25 +61,20 @@ public abstract class ComponentPlugin extends AbstractJCCPlugin
 	//-------- methods --------
 	
 	/**
-	 *  Get the model name.
-	 *  @return the model name.
+	 *  Create a panel for a component identifier.
 	 */
-	public abstract String getModelName();
-	
-	/**
-	 *  Create the component panel.
-	 */
-	public abstract IFuture createComponentPanel(IExternalAccess component);
-	
-	/**
-	 *  Get the name.
-	 *  @return The name.
-	 */
-	public String getName()
-	{
-		return getModelName();
-	}
+	public abstract IFuture createPanel(Object element);
 
+	/**
+	 *  Refresh the combo box.
+	 */
+	public abstract void refreshCombo();
+	
+	/**
+	 *  Convert object to string for property saving.
+	 */
+	public abstract String convertToString(Object element);
+	
 	/**
 	 *  Create main panel.
 	 *  @return The main panel.
@@ -93,7 +86,7 @@ public abstract class ComponentPlugin extends AbstractJCCPlugin
 		ocl = new ObjectCardLayout();
 		centerp = new JPanel(ocl);
 		
-		JLabel emptylabel = new JLabel("Select component instance that should be viewed",
+		JLabel emptylabel = new JLabel("Select instance that should be viewed",
 		icons.getIcon("viewer_empty"), JLabel.CENTER);
 		emptylabel.setVerticalAlignment(JLabel.CENTER);
 		emptylabel.setHorizontalTextPosition(JLabel.CENTER);
@@ -106,7 +99,7 @@ public abstract class ComponentPlugin extends AbstractJCCPlugin
 		selcb = new JComboBox(); 
 		remotecb = new JCheckBox("Remote");
 		final JButton refreshb = new JButton("Refresh");
-		northp.add(new JLabel("Select component"));
+		northp.add(new JLabel("Select instance"));
 		northp.add(selcb);
 		northp.add(remotecb);
 		northp.add(refreshb);
@@ -132,7 +125,7 @@ public abstract class ComponentPlugin extends AbstractJCCPlugin
 				}
 				else
 				{
-					createPanel((IComponentIdentifier)sel);
+					createPanel(sel);
 				}
 			}
 		});
@@ -146,91 +139,6 @@ public abstract class ComponentPlugin extends AbstractJCCPlugin
 	}
 	
 	/**
-	 *  Refresh the combo box.
-	 */
-	public void refreshCombo()
-	{
-		boolean remote = false;
-
-		if(getModelName()!=null)
-		{
-			SServiceProvider.getService(getJCC().getServiceProvider(), IComponentManagementService.class, remote)
-				.addResultListener(new SwingDefaultResultListener(centerp) 
-			{
-				public void customResultAvailable(Object source, Object result) 
-				{
-					IComponentManagementService cms = (IComponentManagementService)result;
-					IComponentDescription adesc = cms.createComponentDescription(null, null, null, null, null, getModelName());
-					cms.searchComponents(adesc, null, remotecb.isSelected()).addResultListener(new SwingDefaultResultListener(centerp)
-					{
-						public void customResultAvailable(Object source, Object result)
-						{
-							IComponentDescription[] descs = (IComponentDescription[])result;
-							selcb.removeAllItems();
-							for(int i=0; i<descs.length; i++)
-							{
-								selcb.addItem(descs[i].getName());
-							}
-						}
-					});
-				}
-			});
-		}
-	}
-	
-	/**
-	 *  Create a panel for a component identifier.
-	 */
-	public IFuture createPanel(final IComponentIdentifier cid)
-	{
-		final Future ret = new Future();
-		
-		SServiceProvider.getService(getJCC().getServiceProvider(), IComponentManagementService.class)
-			.addResultListener(new SwingDefaultResultListener(centerp)
-		{
-			public void customResultAvailable(Object source, Object result)
-			{
-				IComponentManagementService cms = (IComponentManagementService)result;
-				cms.getExternalAccess((IComponentIdentifier)cid)
-					.addResultListener(new SwingDefaultResultListener(centerp)
-				{
-					public void customResultAvailable(Object source, Object result)
-					{
-						IExternalAccess exta = (IExternalAccess)result;
-						createComponentPanel(exta).addResultListener(new SwingDefaultResultListener(centerp)
-						{
-							public void customResultAvailable(Object source, Object result)
-							{
-	//							System.out.println("add: "+result+" "+sel);
-								IComponentViewerPanel panel = (IComponentViewerPanel)result;
-								panels.put(cid, panel);
-								centerp.add(panel.getComponent(), cid);
-								ret.setResult(panel);
-							}
-							
-							public void customExceptionOccurred(Object source, Exception exception)
-							{
-								ret.setException(exception);
-							}
-						});
-					}
-					public void customExceptionOccurred(Object source, Exception exception)
-					{
-						ret.setException(exception);
-					}
-				});
-			}
-			
-			public void customExceptionOccurred(Object source, Exception exception)
-			{
-				ret.setException(exception);
-			}
-		});
-		
-		return ret;
-	}
-
-	/**
 	 *  Set properties loaded from project.
 	 */
 	public void setProperties(Properties props)
@@ -239,23 +147,22 @@ public abstract class ComponentPlugin extends AbstractJCCPlugin
 		{
 			Properties subprops = props.getSubproperty(getName());
 			
-			System.out.println("set props: "+subprops);
-			
+//			System.out.println("set props: "+subprops);
 			for(int i=0; i<selcb.getItemCount(); i++)
 			{
-				IComponentIdentifier cid =  (IComponentIdentifier)selcb.getItemAt(i);
+				Object element =  selcb.getItemAt(i);
 				
-				final Properties ps = subprops.getSubproperty(cid.getName());
+				final Properties ps = subprops.getSubproperty(convertToString(element));
 				if(ps!=null)
 				{
-					if(panels.containsKey(cid))
+					if(panels.containsKey(element))
 					{
-						IComponentViewerPanel panel = (IComponentViewerPanel)panels.get(cid);
+						IComponentViewerPanel panel = (IComponentViewerPanel)panels.get(element);
 						panel.setProperties(ps);
 					}
 					else
 					{
-						createPanel(cid).addResultListener(new SwingDefaultResultListener(centerp)
+						createPanel(element).addResultListener(new SwingDefaultResultListener(centerp)
 						{
 							public void customResultAvailable(Object source, Object result)
 							{
@@ -281,17 +188,17 @@ public abstract class ComponentPlugin extends AbstractJCCPlugin
 			
 			for(Iterator it=panels.keySet().iterator(); it.hasNext(); )
 			{
-				IComponentIdentifier cid = (IComponentIdentifier)it.next();
-				IComponentViewerPanel panel = (IComponentViewerPanel)panels.get(cid);
+				Object element = it.next();
+				IComponentViewerPanel panel = (IComponentViewerPanel)panels.get(element);
 				if(panel.getProperties()!=null)
 				{
-					addSubproperties(subprops, cid.getName(), panel.getProperties());
+					addSubproperties(subprops, convertToString(element), panel.getProperties());
 				}
 			}
 			addSubproperties(props, getName(), subprops);
 		}
 		
-		System.out.println("props: "+props);
+//		System.out.println("props: "+props);
 		return props;
 	}
 

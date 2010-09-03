@@ -167,18 +167,17 @@
 					<fact>
 						new AgentControlCenter($scope.getServiceProvider(),
 						"jadex.tools.starter.StarterPlugin"
-					//	+" jadex.tools.dfbrowser.DFBrowserPlugin"
-						+" jadex.tools.convcenter.ConversationPlugin"
-						+" jadex.tools.comanalyzer.ComanalyzerPlugin"
-						+" jadex.tools.testcenter.TestCenterPlugin"
-					//	+" jadex.tools.jadexdoc.JadexdocPlugin"
-						+" jadex.tools.simcenter.SimCenterPlugin"
-					//	+" jadex.tools.introspector.IntrospectorPlugin"
-						+" jadex.tools.debugger.DebuggerPlugin"
-						+" jadex.tools.ruleprofiler.RuleProfilerPlugin"
-					//	+" jadex.tools.libtool.LibraryPlugin"
-						+" jadex.base.gui.componentviewer.ComponentViewerPlugin"
-						+" jadex.tools.generic.AwarenessComponentPlugin",
+						+ " jadex.tools.generic.DFServicePlugin"
+						+ " jadex.tools.convcenter.ConversationPlugin"
+						+ " jadex.tools.comanalyzer.ComanalyzerPlugin"
+						+ " jadex.tools.testcenter.TestCenterPlugin"
+					//	+ " jadex.tools.jadexdoc.JadexdocPlugin"
+						+ " jadex.tools.simcenter.SimCenterPlugin"
+						+ " jadex.tools.debugger.DebuggerPlugin"
+					//	+ " jadex.tools.ruleprofiler.RuleProfilerPlugin"
+						+ " jadex.tools.generic.LibraryServicePlugin"
+						+ " jadex.tools.generic.AwarenessComponentPlugin"
+						+ " jadex.base.gui.componentviewer.ComponentViewerPlugin",
 						$scope.getExternalAccess())
 					</fact>
 				</initialbelief>
