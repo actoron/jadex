@@ -68,17 +68,13 @@
 		</repository>
 	</distributionManagement>
 
-	<!--
-		<parent> <groupId>net.sourceforge.jadex</groupId>
-		<artifactId>jadex-settings</artifactId>
-		<version>${jadexVersion}</version>
-		<relativePath>../src/main/config/jadex-settings-pom.xml</relativePath>
-		</parent>
-	-->
+	<!-- <parent> <groupId>net.sourceforge.jadex</groupId> <artifactId>jadex-settings</artifactId> 
+		<version>${jadexVersion}</version> <relativePath>../src/main/config/jadex-settings-pom.xml</relativePath> 
+		</parent> -->
 
 	<properties>
 		<project.build.sourceEncoding>ISO-8859-1</project.build.sourceEncoding>
-  	</properties>
+	</properties>
 
 	<build>
 		<resources>
@@ -87,6 +83,7 @@
 				<excludes>
 					<exclude>**/*.java</exclude>
 					<exclude>**/.svn/*</exclude>
+					<exclude>**/dungeonkeeper/</exclude>
 				</excludes>
 			</resource>
 		</resources>
@@ -98,6 +95,9 @@
 				<configuration>
 					<source>1.4</source>
 					<target>1.4</target>
+					<excludes>
+						<exclude>**/dungeonkeeper/</exclude>
+					</excludes>
 				</configuration>
 			</plugin>
 
@@ -130,7 +130,7 @@
 			</plugin>
 		</plugins>
 	</build>
-	
+
 	<dependencies>
 		<dependency>
 			<groupId>junit</groupId>
@@ -138,25 +138,25 @@
 			<version>3.8.1</version>
 			<scope>test</scope>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-bridge</artifactId>
 			<version>2.0-rc4</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-platform-base</artifactId>
 			<version>2.0-rc4</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-kernel-micro</artifactId>
 			<version>2.0-rc4</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-kernel-application</artifactId>
