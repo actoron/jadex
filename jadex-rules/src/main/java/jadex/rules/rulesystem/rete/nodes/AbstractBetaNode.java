@@ -464,8 +464,8 @@ public abstract class AbstractBetaNode extends AbstractNode implements IObjectCo
 					// Tuple newly valid -> add match
 					if(!contains && check)
 					{
-						if(getNodeId()==530)
-							System.out.println("add: "+left+" "+right);
+//						if(getNodeId()==530)
+//							System.out.println("add: "+left+" "+right);
 						addMatch(left, right, state, mem, agenda);
 					}
 					
