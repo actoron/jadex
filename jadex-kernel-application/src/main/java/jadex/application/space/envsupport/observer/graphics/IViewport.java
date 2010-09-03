@@ -184,4 +184,9 @@ public interface IViewport
 	 *  @param obj The object being drawn.
 	 */
 	public void drawPrimitive(DrawableCombiner dc, Primitive primitive, Object obj);
+	
+	/**
+	 *  Disposes the Viewport.
+	 */
+	public void dispose();
 }

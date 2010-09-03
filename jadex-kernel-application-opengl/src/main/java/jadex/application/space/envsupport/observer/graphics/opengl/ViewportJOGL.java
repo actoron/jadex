@@ -341,6 +341,16 @@ public class ViewportJOGL extends AbstractViewport
 	{
 		RENDERERS[primitive.getType()].prepareAndExecuteDraw(dc, primitive, obj, this);
 	}
+	
+	/**
+	 *  Disposes the Viewport.
+	 */
+	public void dispose()
+	{
+		((GLCanvas) canvas_).setAutoSwapBufferMode(false);
+		((GLCanvas) canvas_).getContext().destroy();
+		canvas_ = null;
+	}
 
 	private void setupMatrix(GL gl)
 	{

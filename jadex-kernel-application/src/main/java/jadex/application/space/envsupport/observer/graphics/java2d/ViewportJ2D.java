@@ -165,6 +165,14 @@ public class ViewportJ2D extends AbstractViewport implements ComponentListener
 		RENDERERS[primitive.getType()].prepareAndExecuteDraw(dc, primitive, obj, this);
 	}
 	
+	/**
+	 *  Disposes the Viewport.
+	 */
+	public void dispose()
+	{
+		
+	}
+	
 	// Component events
 	public void componentHidden(ComponentEvent e)
 	{

@@ -8,6 +8,7 @@ import jadex.application.space.envsupport.observer.gui.plugin.IObserverCenterPlu
 import jadex.application.space.envsupport.observer.gui.plugin.IntrospectorPlugin;
 import jadex.application.space.envsupport.observer.gui.plugin.VisualsPlugin;
 import jadex.application.space.envsupport.observer.perspective.IPerspective;
+import jadex.application.space.envsupport.observer.perspective.Perspective2D;
 import jadex.bridge.IComponentManagementService;
 import jadex.commons.IChangeListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
@@ -731,6 +732,31 @@ public class ObserverCenter
 	public void dispose()
 	{
 		plugintimer.stop();
+		
+		for (Iterator it = perspectives.values().iterator(); it.hasNext(); )
+		{
+			IPerspective persp = (IPerspective) it.next();
+			if (persp instanceof Perspective2D)
+				((Perspective2D) persp).getViewport().dispose();
+		}
+		
+		if(clocklistener != null)
+		{
+			SServiceProvider.getService(space.getContext().getServiceProvider(), IClockService.class)
+			.addResultListener(new SwingDefaultResultListener(mainwindow)
+			{
+				public void customResultAvailable(Object source, Object result)
+				{
+					IClockService	clock	= (IClockService)result;
+					clock.removeChangeListener(clocklistener);
+				}
+			});
+		}
+		
+		if (vptimer != null)
+			vptimer.stop();
+		if (plugintimer != null)
+			plugintimer.stop();
 		mainwindow.dispose();
 	}
 }
