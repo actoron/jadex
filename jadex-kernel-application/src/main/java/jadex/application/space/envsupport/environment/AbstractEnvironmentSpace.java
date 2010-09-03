@@ -569,12 +569,13 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 										
 						SServiceProvider.getServiceUpwards(context.getServiceProvider(), IComponentManagementService.class).addResultListener(new DefaultResultListener()
 						{
-							public void resultAvailable(Object source, Object result)
+							public void resultAvailable(Object source, final Object result)
 							{
 								((IComponentManagementService)result).addComponentListener(context.getComponentIdentifier(), new IComponentListener()
 								{
 									public void componentRemoved(IComponentDescription desc, Map results)
 									{
+										((IComponentManagementService)result).removeComponentListener(context.getComponentIdentifier(), this);
 										oc.dispose();
 									}
 									

@@ -201,6 +201,10 @@ public abstract class AbstractViewport implements IViewport
 	 */
 	public void setSize(IVector2 size)
 	{
+		Canvas canvas = canvas_;
+		if (canvas == null)
+			return;
+		
 		if (areaSize_.copy().divide(size).getMean().getAsDouble() > zoomLimit_)
 			return;
 		size_ = new Vector2Double(size);
@@ -210,22 +214,22 @@ public abstract class AbstractViewport implements IViewport
 		if(preserveAR_)
 		{
 			double sizeAR = size.getXAsDouble() / size.getYAsDouble();
-			double windowAR = (double)canvas_.getWidth()
-					/ (double)canvas_.getHeight();
+			double windowAR = (double)canvas.getWidth()
+					/ (double)canvas.getHeight();
 
 			if(sizeAR > windowAR)
 			{
 				width = size.getXAsDouble();
 				//height = size.getXAsDouble() / windowAR;
-				double pixX = width / canvas_.getWidth();
-				height = canvas_.getHeight() * pixX;
+				double pixX = width / canvas.getWidth();
+				height = canvas.getHeight() * pixX;
 			}
 			else
 			{
 				//width = size.getYAsDouble() * windowAR;
 				height = size.getYAsDouble();
-				double pixY = height / canvas_.getHeight();
-				width = canvas_.getWidth() * pixY;
+				double pixY = height / canvas.getHeight();
+				width = canvas.getWidth() * pixY;
 			}
 		}
 		else
@@ -302,7 +306,10 @@ public abstract class AbstractViewport implements IViewport
 	 */
 	public IVector2 getPixelSize()
 	{
-		return paddedSize_.copy().divide(new Vector2Double(canvas_.getWidth(), canvas_.getHeight()));
+		Canvas canvas = canvas_;
+		if (canvas == null)
+			return Vector2Double.ZERO;
+		return paddedSize_.copy().divide(new Vector2Double(canvas.getWidth(), canvas.getHeight()));
 	}
 	
 	/**

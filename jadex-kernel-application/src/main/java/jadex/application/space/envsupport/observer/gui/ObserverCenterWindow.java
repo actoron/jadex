@@ -150,11 +150,4 @@ public class ObserverCenterWindow extends JFrame
 		mainpane.setRightComponent(view);
 		mainpane.setDividerLocation(250 + mainpane.getInsets().left);
 	}
-	
-	@Override
-	public void dispose()
-	{
-		mainpane.remove(mainpane.getRightComponent());
-		super.dispose();
-	}
 }

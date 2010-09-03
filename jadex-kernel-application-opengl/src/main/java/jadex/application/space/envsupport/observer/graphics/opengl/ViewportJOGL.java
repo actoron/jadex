@@ -25,6 +25,7 @@ import java.awt.image.DataBuffer;
 import java.awt.image.DataBufferByte;
 import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
+import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
@@ -45,6 +46,7 @@ import javax.media.opengl.GLEventListener;
 import javax.media.opengl.GLException;
 import javax.media.opengl.glu.GLU;
 
+import com.sun.opengl.impl.GLDrawableHelper;
 import com.sun.opengl.util.j2d.TextRenderer;
 
 
@@ -163,8 +165,11 @@ public class ViewportJOGL extends AbstractViewport
 		{
 			public void run()
 			{
+				GLCanvas canvas = ((GLCanvas)ViewportJOGL.this.canvas_);
+				if (canvas == null)
+					return;
 //				System.out.println("repaint");
-				((GLCanvas)ViewportJOGL.this.canvas_).display();
+				canvas.display();
 //				System.out.println("repaint done");
 				rendering	= false;
 			}
@@ -349,6 +354,22 @@ public class ViewportJOGL extends AbstractViewport
 	{
 		((GLCanvas) canvas_).setAutoSwapBufferMode(false);
 		((GLCanvas) canvas_).getContext().destroy();
+		
+		try
+		{
+			Field helperField = GLCanvas.class.getDeclaredField("drawableHelper");
+			helperField.setAccessible(true);
+			
+			Field tlField = GLDrawableHelper.class.getDeclaredField("perThreadInitAction");
+			tlField.setAccessible(true);
+			
+			ThreadLocal tl = (ThreadLocal) tlField.get(helperField.get(canvas_));
+			tl.remove();
+		}
+		catch (Exception e)
+		{
+		}
+		
 		canvas_ = null;
 	}
 
