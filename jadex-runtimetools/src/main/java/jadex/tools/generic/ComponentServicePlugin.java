@@ -2,36 +2,54 @@ package jadex.tools.generic;
 
 import jadex.base.gui.plugin.AbstractJCCPlugin;
 import jadex.commons.Properties;
+import jadex.commons.SGUI;
+import jadex.commons.concurrent.SwingDefaultResultListener;
+import jadex.commons.service.SServiceProvider;
+
+import java.awt.BorderLayout;
+import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Collection;
+import java.util.Iterator;
 
 import javax.swing.Icon;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JSplitPane;
+import javax.swing.UIDefaults;
 
 /**
  *  The generic plugin for a specified component or service. 
  */
-public class ComponentServicePlugin extends AbstractJCCPlugin
+public abstract class ComponentServicePlugin extends AbstractJCCPlugin
 {
 	//-------- constants --------
 
-//	/** The image icons. */
-//	protected static final UIDefaults icons = new UIDefaults(new Object[]
-//	{
-//		"conversation",	SGUI.makeIcon(LibraryPlugin.class, "/jadex/tools/common/images/libcenter.png"),
-//		"conversation_sel", SGUI.makeIcon(StarterPlugin.class, "/jadex/tools/common/images/libcenter_sel.png"),
-//		"help",	SGUI.makeIcon(LibraryPlugin.class, "/jadex/tools/common/images/help.gif"),
-//	});
+	/** The image icons. */
+	protected static final UIDefaults icons = new UIDefaults(new Object[]
+	{
+		"conversation",	SGUI.makeIcon(ComponentServicePlugin.class, "/jadex/tools/common/images/libcenter.png"),
+		"conversation_sel", SGUI.makeIcon(ComponentServicePlugin.class, "/jadex/tools/common/images/libcenter_sel.png"),
+	});
 
 	//-------- attributes --------
 	
-	/** The service class. */
-	protected Class servicetype;
-	
-	/** The component model name. */
-	protected String modelname;
-	
 	//-------- methods --------
+	
+	/**
+	 *  Get the service type.
+	 *  @return The service type.
+	 */
+	public abstract Class getServiceType();
+	
+	/**
+	 *  Get the model name.
+	 *  @return the model name.
+	 */
+	public abstract String getModelName();
 	
 	/**
 	 *  Test if this plugin should be initialized lazily.
@@ -48,7 +66,7 @@ public class ComponentServicePlugin extends AbstractJCCPlugin
 	 */
 	public String getName()
 	{
-		return "";
+		return getModelName()!=null? getModelName(): getServiceType().getName();
 	}
 
 	/**
@@ -57,7 +75,7 @@ public class ComponentServicePlugin extends AbstractJCCPlugin
 	 */
 	public Icon getToolIcon(boolean selected)
 	{
-		return null;//selected? icons.getIcon("conversation_sel"): icons.getIcon("conversation");
+		return selected? icons.getIcon("conversation_sel"): icons.getIcon("conversation");
 	}
 
 	/**
@@ -65,8 +83,73 @@ public class ComponentServicePlugin extends AbstractJCCPlugin
 	 *  @return The main panel.
 	 */
 	public JComponent createView()
+	{		
+		JPanel mainp = new JPanel(new BorderLayout());
+		
+		JPanel northp = new JPanel(new FlowLayout());
+		final JComboBox selcb = new JComboBox(); 
+		final JButton refreshb = new JButton("Refresh");
+		northp.add(new JLabel(getModelName()!=null? "Select component": "Select service"));
+		northp.add(selcb);
+		northp.add(refreshb);
+		
+		refreshb.addActionListener(new ActionListener() 
+		{
+			public void actionPerformed(ActionEvent e) 
+			{
+				refreshCombo(selcb);
+			}
+		});
+		selcb.addActionListener(new ActionListener() 
+		{
+			public void actionPerformed(ActionEvent e) 
+			{
+				System.out.println("Selected : "+selcb.getSelectedItem());
+			}
+		});
+		
+		mainp.add(northp, BorderLayout.NORTH);
+		
+		return mainp;
+	}
+	
+	/**
+	 * 
+	 */
+	public void refreshCombo(final JComboBox selcb)
 	{
-		return new JPanel();
+		boolean remote = false;
+
+		if(getModelName()!=null)
+		{
+			SServiceProvider.getService(getJCC().getServiceProvider(), , remote)
+				.addResultListener(new SwingDefaultResultListener(getView()) 
+			{
+				public void customResultAvailable(Object source, Object result) 
+				{
+					
+				}
+			});
+		}
+		else
+		{
+			SServiceProvider.getServices(getJCC().getServiceProvider(), getServiceType(), remote)
+				.addResultListener(new SwingDefaultResultListener(getView()) 
+			{
+				public void customResultAvailable(Object source, Object result) 
+				{
+					selcb.removeAllItems();
+					Collection coll = (Collection)result;
+					if(coll!=null)
+					{
+						for(Iterator it=coll.iterator(); it.hasNext(); )
+						{
+							selcb.addItem(it.next());
+						}
+					}
+				}
+			});
+		}
 	}
 
 	/**
@@ -74,10 +157,8 @@ public class ComponentServicePlugin extends AbstractJCCPlugin
 	 */
 	public void setProperties(Properties props)
 	{
-		if(props.getProperty("gen_")!=null);
-			((JSplitPane)getView()).setDividerLocation(props.getIntProperty("mainsplit_location"));
-
-		
+//		if(props.getProperty(getName())!=null);
+//			((JSplitPane)getView()).setDividerLocation(props.getIntProperty("mainsplit_location"));
 	}
 
 	/**
@@ -85,9 +166,10 @@ public class ComponentServicePlugin extends AbstractJCCPlugin
 	 */
 	public Properties	getProperties()
 	{
-		Properties	props	= new Properties();
+//		Properties	props	= new Properties();
 //		props.addProperty(new Property("cp", urlstring));
-		return props;
+//		return props;
+		return null;
 	}
 
 	/** 
@@ -96,7 +178,7 @@ public class ComponentServicePlugin extends AbstractJCCPlugin
 	 */
 	public String getHelpID()
 	{
-		return "tools.librarytool";
+		return "tools."+getName();
 	}
 	
 	/**
@@ -104,7 +186,6 @@ public class ComponentServicePlugin extends AbstractJCCPlugin
 	 */
 	public void	reset()
 	{
-		
 	}
 }
 
