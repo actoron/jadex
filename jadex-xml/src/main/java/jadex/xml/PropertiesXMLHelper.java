@@ -67,7 +67,7 @@ public class PropertiesXMLHelper
 		{
 			synchronized(PropertiesXMLHelper.class)
 			{
-				if(reader==null)
+				if(writer==null)
 				{
 					writer = new jadex.xml.writer.Writer(new BeanObjectWriterHandler(typeinfos));
 				}
