@@ -418,7 +418,7 @@ public class AwarenessAgent extends MicroAgent
 					{
 						DiscoveryInfo dif = (DiscoveryInfo)it.next();
 						// five seconds buffer
-						if(time>dif.getTime()+dif.getDelay()+5000)
+						if(time>dif.getTime()+dif.getDelay()*3.2) // Have some time buffer before delete
 						{
 //							System.out.println("Removing: "+dif);
 							it.remove();
@@ -779,10 +779,10 @@ public class AwarenessAgent extends MicroAgent
 				new Argument("address", "This parameter is the ip multicast address used for finding other agents (range 224.0.0.0-239.255.255.255).", "String", "224.0.0.0"),	
 				new Argument("port", "This parameter is the port used for finding other agents.", "int", new Integer(55667)),	
 				new Argument("delay", "This parameter is the delay between sending awareness infos.", "long", 
-					SUtil.createHashMap(configs, new Object[]{new Long(5000), new Long(10000), new Long(60000)})),	
+					SUtil.createHashMap(configs, new Object[]{new Long(10000), new Long(20000), new Long(60000)})),	
 				new Argument("autocreate", "This parameter describes if new proxies should be automatically created when discovering new components.", "boolean", Boolean.TRUE),	
 				new Argument("autodelete", "This parameter describes if proxies should be automatically deleted when not discovered any longer.", "boolean", Boolean.TRUE),	
-				new Argument("proxydelay", "This parameter is the delay used by proxies.", "long", new Long(10000)),	
+				new Argument("proxydelay", "This parameter is the delay used by proxies.", "long", new Long(15000)),	
 			}, null, null, SUtil.createHashMap(new String[]{"componentviewer.viewerclass"}, new Object[]{"jadex.base.service.awareness.AwarenessAgentPanel"}));
 	}
 }

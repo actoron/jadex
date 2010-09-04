@@ -46,6 +46,8 @@ public class ProxyAgent extends MicroAgent
 		int cachesize = ((Number)getArgument("cachesize")).intValue();
 		this.children = new LRU(cachesize);
 		
+//		System.out.println("proxy delay: "+delay);
+		
 //		System.out.println("Proxy for: "+getRemotePlatformIdentifier()
 //			+", "+SUtil.arrayToString(getRemotePlatformIdentifier().getAddresses())
 //			+", "+delay+", "+cachesize);
