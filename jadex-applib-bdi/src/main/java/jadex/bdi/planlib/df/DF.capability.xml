@@ -92,6 +92,7 @@
 			<parameter name="description" class="IDFComponentDescription"/>
 			<parameter name="df" class="jadex.bridge.IComponentIdentifier" optional="true"/>
 			<parameter name="constraints" class="ISearchConstraints" optional="true"/>
+			<parameter name="remote" class="boolean" optional="true"/>
 			<parameterset name="result" class="IDFComponentDescription" direction="out"/>
 		</achievegoal>
 		
@@ -171,6 +172,9 @@
 			</parameter>
 			<parameter name="df" class="jadex.bridge.IComponentIdentifier">
  				<goalmapping ref="df_search.df"/>
+			</parameter>
+			<parameter name="remote" class="boolean">
+				<goalmapping ref="df_search.remote"/>
 			</parameter>
 			<parameterset name="result" class="IDFComponentDescription" direction="out">
  				<goalmapping ref="df_search.result"/>
@@ -254,6 +258,9 @@
 			</parameter>
 			<parameter name="df" class="jadex.bridge.IComponentIdentifier">
  				<goalmapping ref="df_search.df"/>
+			</parameter>
+			<parameter name="remote" class="boolean">
+				<goalmapping ref="df_search.remote"/>
 			</parameter>
 			<parameterset name="result" class="IDFComponentDescription" direction="out">
  				<goalmapping ref="df_search.result"/>

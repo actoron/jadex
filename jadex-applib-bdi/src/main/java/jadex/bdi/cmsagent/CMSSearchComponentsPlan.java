@@ -22,6 +22,7 @@ public class CMSSearchComponentsPlan extends Plan
 		IGoal sag = createGoal("cms_search_components");
 		sag.getParameter("description").setValue(sa.getComponentDescription());
 		sag.getParameter("constraints").setValue(sa.getSearchConstraints());
+		sag.getParameter("remote").setValue(sa.isRemote()? Boolean.TRUE: Boolean.FALSE);
 		dispatchSubgoalAndWait(sag);
 
 		sa.setComponentDescriptions((IComponentDescription[])sag.getParameterSet("result").getValues());

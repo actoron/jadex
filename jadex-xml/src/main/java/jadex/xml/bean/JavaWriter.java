@@ -241,7 +241,7 @@ public class JavaWriter extends Writer
 	public static String objectToXML(Object val, ClassLoader classloader)
 	{
 		if(writer==null)
-			writer = new JavaWriter(null);
+			createWriter();
 		return Writer.objectToXML(writer, val, classloader);
 	}
 	
@@ -251,7 +251,7 @@ public class JavaWriter extends Writer
 	public static byte[] objectToByteArray(Object val, ClassLoader classloader)
 	{
 		if(writer==null)
-			writer = new JavaWriter(null);
+			createWriter();
 		return Writer.objectToByteArray(writer, val, classloader);
 	}
 	
@@ -262,7 +262,19 @@ public class JavaWriter extends Writer
 	public static Writer getInstance()
 	{
 		if(writer==null)
-			writer = new JavaWriter(null);
+			createWriter();
 		return writer;
+	}
+	
+	/**
+	 *  Conditionally create the writer instance.
+	 *  Note that the synchronized check needs to be done.
+	 *  Otherwise double creation may happen (leading to
+	 *  concurrency issues).
+	 */
+	protected static synchronized void createWriter()
+	{
+		if(writer==null)
+			writer = new JavaWriter(null);
 	}
 }

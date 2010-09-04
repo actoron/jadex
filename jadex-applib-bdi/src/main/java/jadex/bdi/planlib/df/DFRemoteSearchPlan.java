@@ -22,7 +22,9 @@ public class DFRemoteSearchPlan extends Plan
 		DFSearch se = new DFSearch();
 		se.setComponentDescription((IDFComponentDescription)getParameter("description").getValue());
 		se.setSearchConstraints((ISearchConstraints)getParameter("constraints").getValue());
-
+		se.setRemote(getParameter("remote").getValue()!=null? 
+			((Boolean)getParameter("remote").getValue()).booleanValue(): false);
+		
 		IGoal req = createGoal("rp_initiate");
 		req.getParameter("receiver").setValue(getParameter("df").getValue());
 		req.getParameter("action").setValue(se);

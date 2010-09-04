@@ -99,6 +99,8 @@
 			<parameter name="constraints" class="ISearchConstraints" optional="true"/>
 			<!-- The CMS component identifier (only needed for remote requests). -->
 			<parameter name="cms" class="jadex.bridge.IComponentIdentifier" optional="true"/> 
+			<!-- The remote flag. -->
+			<parameter name="remote" class="boolean" optional="true"/> 
 			<!-- The search results. -->
 			<parameterset name="result" class="IComponentDescription" direction="out"/>
 		</achievegoal>
@@ -218,6 +220,9 @@
 			</parameter>
 			<parameter name="cms" class="jadex.bridge.IComponentIdentifier">
  				<goalmapping ref="cms_search_components.cms"/>
+			</parameter>
+			<parameter name="remote" class="boolean">
+				<goalmapping ref="cms_search_components.remote"/>
 			</parameter>
 			<parameterset name="result" class="IComponentDescription" direction="out">
  				<goalmapping ref="cms_search_components.result"/>
@@ -352,6 +357,9 @@
 			</parameter>
 			<parameter name="cms" class="jadex.bridge.IComponentIdentifier">
  				<goalmapping ref="cms_search_components.cms"/>
+			</parameter>
+			<parameter name="remote" class="boolean">
+				<goalmapping ref="cms_search_components.remote"/>
 			</parameter>
 			<parameterset name="result" class="IComponentDescription" direction="out">
  				<goalmapping ref="cms_search_components.result"/>

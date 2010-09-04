@@ -64,7 +64,15 @@ public class PropertiesXMLHelper
 	public static Writer getPropertyWriter()
 	{
 		if(writer==null)
-			writer = new jadex.xml.writer.Writer(new BeanObjectWriterHandler(typeinfos));
+		{
+			synchronized(PropertiesXMLHelper.class)
+			{
+				if(reader==null)
+				{
+					writer = new jadex.xml.writer.Writer(new BeanObjectWriterHandler(typeinfos));
+				}
+			}
+		}
 		return writer;
 	}
 	
@@ -75,7 +83,15 @@ public class PropertiesXMLHelper
 	public static Reader getPropertyReader()
 	{
 		if(reader==null)
-			reader = new jadex.xml.reader.Reader(new BeanObjectReaderHandler(typeinfos));
+		{
+			synchronized(PropertiesXMLHelper.class)
+			{
+				if(reader==null)
+				{
+					reader = new jadex.xml.reader.Reader(new BeanObjectReaderHandler(typeinfos));
+				}
+			}
+		}
 		return reader;
 	}
 }

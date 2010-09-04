@@ -355,8 +355,10 @@ public class OAVBDIXMLReader
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "endmessageevent"), new QName(uri, "parameter")}), new ObjectInfo(OAVBDIMetaModel.configparameter_type)));
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "endmessageevent"), new QName(uri, "parameterset")}), new ObjectInfo(OAVBDIMetaModel.configparameterset_type), new MappingInfo(ti_paramset)));
 
+		// Different readers and writers should not work on the same typeinfos
+		// because they may alter them (e.g. add additional array types).
 		reader = new Reader(new OAVObjectReaderHandler(typeinfos));
-		writer = new Writer(new OAVObjectWriterHandler(typeinfos));
+		writer = new Writer(new OAVObjectWriterHandler(new HashSet(typeinfos)));
 	}
 	
 	/**

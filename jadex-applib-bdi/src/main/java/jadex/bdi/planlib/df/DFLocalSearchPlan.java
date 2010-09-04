@@ -21,8 +21,10 @@ public class DFLocalSearchPlan extends Plan
 		// Todo: support other parameters!?
 		IDFComponentDescription desc = (IDFComponentDescription)getParameter("description").getValue();
 		ISearchConstraints	con	= (ISearchConstraints)getParameter("constraints").getValue();
-		
-		IFuture ret = ((IDF)SServiceProvider.getService(getScope().getServiceProvider(), IDF.class).get(this)).search(desc, con);
+		boolean remote = getParameter("remote").getValue()!=null? 
+			((Boolean)getParameter("remote").getValue()).booleanValue(): false;
+
+		IFuture ret = ((IDF)SServiceProvider.getService(getScope().getServiceProvider(), IDF.class, remote).get(this)).search(desc, con);
 		IDFComponentDescription[] result = (IDFComponentDescription[])ret.get(this);
 		
 		getParameterSet("result").addValues(result);

@@ -22,6 +22,8 @@ public class CMSRemoteSearchComponentsPlan extends Plan
 		CMSSearchComponents sa = new CMSSearchComponents();
 		sa.setComponentDescription((IComponentDescription)getParameter("description").getValue());
 		sa.setSearchConstraints((ISearchConstraints)getParameter("constraints").getValue());
+		sa.setRemote(getParameter("remote").getValue()!=null? 
+			((Boolean)getParameter("remote").getValue()).booleanValue(): false);
 
 		IGoal req = createGoal("rp_initiate");
 		req.getParameter("receiver").setValue(getParameter("cms").getValue());

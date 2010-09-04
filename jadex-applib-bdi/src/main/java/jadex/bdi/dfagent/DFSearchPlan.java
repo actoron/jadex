@@ -23,6 +23,7 @@ public class DFSearchPlan extends Plan
 		IGoal sag = createGoal("df_search");
 		sag.getParameter("description").setValue(sa.getComponentDescription());
 		sag.getParameter("constraints").setValue(sa.getSearchConstraints());
+		sag.getParameter("remote").setValue(sa.isRemote()? Boolean.TRUE: Boolean.FALSE);
 		dispatchSubgoalAndWait(sag);
 
 		sa.setResults((IDFComponentDescription[])sag.getParameterSet("result").getValues());

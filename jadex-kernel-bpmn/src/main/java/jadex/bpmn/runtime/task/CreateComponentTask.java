@@ -113,7 +113,8 @@ public class CreateComponentTask implements ITask
 				}
 				
 				cms.createComponent(name, model,
-					new CreationInfo(config, args, sub ? instance.getComponentAdapter().getComponentIdentifier() : null, suspend, master, daemon, instance.getModelElement().getAllImports()), lis);
+					new CreationInfo(config, args, sub ? instance.getComponentAdapter().getComponentIdentifier() : null, 
+						suspend, master, daemon, instance.getModelElement().getAllImports()), lis);
 
 				if(!wait)
 				{

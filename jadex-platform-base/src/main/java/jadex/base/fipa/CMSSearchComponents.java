@@ -24,6 +24,9 @@ public class CMSSearchComponents implements IComponentAction
 	/** Attribute for slot componentdescription. */
 	protected IComponentDescription componentdescription;
 
+	/** Flag if remote search should be done. */
+	protected boolean remote;
+	
 	//-------- constructors --------
 
 	/**
@@ -141,8 +144,28 @@ public class CMSSearchComponents implements IComponentAction
 	{
 		this.componentdescription = componentdescription;
 	}
+	
+	
 
 	//-------- additional methods --------
+
+	/**
+	 *  Test if remote.
+	 *  @return True, if is remote.
+	 */
+	public boolean isRemote() 
+	{
+		return remote;
+	}
+
+	/**
+	 *  Set remote flag.
+	 *  @param remote The remote flag to set.
+	 */
+	public void setRemote(boolean remote) 
+	{
+		this.remote = remote;
+	}
 
 	/**
 	 *  Get a string representation of this CMSSearchComponents.

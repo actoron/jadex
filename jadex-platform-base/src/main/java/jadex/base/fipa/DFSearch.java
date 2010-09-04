@@ -20,6 +20,9 @@ public class DFSearch implements IComponentAction
 	/** Attribute for slot dfcomponentdescription. */
 	protected IDFComponentDescription dfcomponentdescription;
 
+	/** Remote flag. */
+	protected boolean remote;
+	
 	/** Attribute for slot results. */
 	protected List results;
 
@@ -142,6 +145,24 @@ public class DFSearch implements IComponentAction
 	}
 
 	//-------- additional methods --------
+
+	/**
+	 *  Get the remote.
+	 *  @return The remote.
+	 */
+	public boolean isRemote()
+	{
+		return remote;
+	}
+
+	/**
+	 *  Set the remote.
+	 *  @param remote The remote to set.
+	 */
+	public void setRemote(boolean remote)
+	{
+		this.remote = remote;
+	}
 
 	/**
 	 *  Get a string representation of this DFSearch.

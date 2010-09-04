@@ -359,7 +359,7 @@ public class JavaReader extends Reader
 	public static Object objectFromXML(String val, ClassLoader classloader)
 	{
 		if(reader==null)
-			reader = new JavaReader(null);
+			createReader();
 		return Reader.objectFromXML(reader, val, classloader);
 	}
 	
@@ -372,7 +372,7 @@ public class JavaReader extends Reader
 	public static Object objectFromByteArray(byte[] val, ClassLoader classloader)
 	{
 		if(reader==null)
-			reader = new JavaReader(null);
+			createReader();
 		return Reader.objectFromByteArray(reader, val, classloader);
 	}
 	
@@ -383,7 +383,19 @@ public class JavaReader extends Reader
 	public static Reader getInstance()
 	{
 		if(reader==null)
-			reader = new JavaReader(null);
+			createReader();
 		return reader;
+	}
+	
+	/**
+	 *  Conditionally create the reader instance.
+	 *  Note that the synchronized check needs to be done.
+	 *  Otherwise double creation may happen (leading to
+	 *  concurrency issues).
+	 */
+	protected static synchronized void createReader()
+	{
+		if(reader==null)
+			reader = new JavaReader(null);
 	}
 }
