@@ -59,6 +59,7 @@ public class ComponentTreePanel extends JSplitPane
 		"refresh", SGUI.makeIcon(ComponentTreePanel.class, "/jadex/base/gui/images/refresh_component.png"),
 		"refresh_tree", SGUI.makeIcon(ComponentTreePanel.class, "/jadex/base/gui/images/refresh_tree.png"),
 		"show_properties", SGUI.makeIcon(ComponentTreePanel.class, "/jadex/base/gui/images/new_agent_props.png"),
+		"show_details", SGUI.makeIcon(ComponentTreePanel.class, "/jadex/base/gui/images/new_agent_details.png"),
 		"overlay_kill", SGUI.makeIcon(ComponentTreePanel.class, "/jadex/base/gui/images/overlay_kill.png"),
 		"overlay_suspend", SGUI.makeIcon(ComponentTreePanel.class, "/jadex/base/gui/images/overlay_szzz.png"),
 		"overlay_resume", SGUI.makeIcon(ComponentTreePanel.class, "/jadex/base/gui/images/overlay_wakeup.png"),
@@ -439,7 +440,7 @@ public class ComponentTreePanel extends JSplitPane
 			}
 		};
 		
-		showobject = new AbstractAction("Show object details", icons.getIcon("show_object"))
+		showobject = new AbstractAction("Show object details", icons.getIcon("show_details"))
 		{
 			public void actionPerformed(ActionEvent e)
 			{
@@ -778,6 +779,14 @@ public class ComponentTreePanel extends JSplitPane
 	public Action	getShowPropertiesAction()
 	{
 		return showprops;
+	}
+	
+	/**
+	 *  Get the action for showing component details.
+	 */
+	public Action	getShowObjectDetailsAction()
+	{
+		return showobject;
 	}
 	
 	/**

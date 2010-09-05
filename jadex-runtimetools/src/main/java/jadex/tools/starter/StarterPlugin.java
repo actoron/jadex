@@ -204,6 +204,13 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 		b.setText(null);
 		b.setEnabled(true);
 		ret.add(b);
+		
+		b = new JButton(comptree.getShowObjectDetailsAction());
+		b.setBorder(null);
+		b.setToolTipText(b.getText());
+		b.setText(null);
+		b.setEnabled(true);
+		ret.add(b);
 
 		b = new JButton(comptree.getRefreshAction());
 		b.setBorder(null);
