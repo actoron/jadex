@@ -20,6 +20,7 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -162,7 +163,7 @@ public class ComponentTreePanel extends JSplitPane
 		proppanel.setPreferredSize(new Dimension(0, 0));
 		this.add(proppanel);
 		this.setResizeWeight(1.0);
-		
+				
 		listener	= new IComponentListener()
 		{
 			public void componentRemoved(final IComponentDescription desc, Map results)
@@ -552,7 +553,7 @@ public class ComponentTreePanel extends JSplitPane
 						ret.add(0, pshowobject);
 					}
 					
-					if(nodes[0] instanceof ServiceNode)
+					if(nodes[0] instanceof ServiceNode && !Proxy.isProxyClass(((ServiceNode)nodes[0]).getService().getClass()))
 					{
 						Action premoveservice = new AbstractAction((String)removeservice.getValue(Action.NAME),
 							base!=null ? new CombiIcon(new Icon[]{base, icons.getIcon("overlay_kill")}) : (Icon)showprops.getValue(Action.SMALL_ICON))
