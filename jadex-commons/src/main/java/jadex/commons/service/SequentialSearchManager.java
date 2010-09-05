@@ -21,10 +21,13 @@ public class SequentialSearchManager implements ISearchManager
 	//-------- constants --------
 	
 	/** Key for current list of children. */
-	protected final String	CURRENT_CHILDREN	= "current-children";
+	protected static final String	CURRENT_CHILDREN	= "current-children";
 	
 	/** The local search manager. */
-	protected final LocalSearchManager	LOCAL_SEARCH_MANAGER	= new LocalSearchManager();
+	protected static final LocalSearchManager	LOCAL_SEARCH_MANAGER	= new LocalSearchManager();
+
+	/** The local search manager. */
+	protected static final LocalSearchManager	LOCAL_SEARCH_MANAGER_FORCED	= new LocalSearchManager(true);
 
 	//-------- attributes --------
 	
@@ -34,6 +37,12 @@ public class SequentialSearchManager implements ISearchManager
 	/** Flag to activate downwards (children) searching. */
 	protected boolean down;
 	
+	/** Force search flag. */
+	protected boolean forcedsearch;
+	
+	/** The local search manager. */
+	protected ISearchManager lsm;
+
 	//-------- constructors --------
 	
 	/**
@@ -49,8 +58,18 @@ public class SequentialSearchManager implements ISearchManager
 	 */
 	public SequentialSearchManager(boolean up, boolean down)
 	{
+		this(up, down, false);
+	}
+	
+	/**
+	 *  Create a new search manager.
+	 */
+	public SequentialSearchManager(boolean up, boolean down, boolean forcedsearch)
+	{
 		this.up	= up;
 		this.down	= down;
+		this.forcedsearch = forcedsearch;
+		this.lsm = forcedsearch? LOCAL_SEARCH_MANAGER_FORCED: LOCAL_SEARCH_MANAGER;
 	}
 	
 	//-------- ISearchManager interface --------
@@ -118,7 +137,7 @@ public class SequentialSearchManager implements ISearchManager
 			if(context.decider.searchNode(source, provider, context.results))
 			{
 				// Use fut.isDone() to reduce stack depth
-				IFuture future = provider.getServices(LOCAL_SEARCH_MANAGER, context.decider, context.selector, context.results);
+				IFuture future = provider.getServices(lsm, context.decider, context.selector, context.results);
 				if(!future.isDone())
 				{
 					future.addResultListener(new IResultListener()
@@ -346,6 +365,24 @@ public class SequentialSearchManager implements ISearchManager
 	public void setDown(boolean down)
 	{
 		this.down = down;
+	}
+	
+	/**
+	 *  Get the forcedsearch.
+	 *  @return The forcedsearch.
+	 */
+	public boolean isForcedSearch()
+	{
+		return forcedsearch;
+	}
+	
+	/**
+	 *  Set the forcedsearch.
+	 *  @param forcedsearch The forcedsearch to set.
+	 */
+	public void setForcedSearch(boolean forcedsearch)
+	{
+		this.forcedsearch = forcedsearch;
 	}
 	
 	//-------- helper classes --------

@@ -53,7 +53,7 @@ public abstract class AbstractServicePlugin extends AbstractGenericPlugin
 	 */
 	public void refreshCombo()
 	{
-		SServiceProvider.getServices(getJCC().getServiceProvider(), getServiceType(), remotecb.isSelected())
+		SServiceProvider.getServices(getJCC().getServiceProvider(), getServiceType(), remotecb.isSelected(), true)
 			.addResultListener(new SwingDefaultResultListener(getView()) 
 		{
 			public void customResultAvailable(Object source, Object result) 

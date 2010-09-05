@@ -15,16 +15,18 @@ public class SServiceProvider
 	
 	/** The sequential search manager. */
 	public static ISearchManager sequentialmanager = new SequentialSearchManager();
-//	public static ISearchManager sequentialmanager = new ParallelSearchManager();
+	public static ISearchManager sequentialmanagerforced = new SequentialSearchManager(true, true, true);
 
 	/** The parallel search manager. */
 	public static ISearchManager parallelmanager = new ParallelSearchManager();
+	public static ISearchManager parallelmanagerforced = new ParallelSearchManager(true, true, true);
 	
 	/** The sequential search manager that searches only upwards. */
 	public static ISearchManager upwardsmanager = new SequentialSearchManager(true, false);
 
 	/** The sequential search manager that searches only locally. */
 	public static ISearchManager localmanager = new LocalSearchManager();
+	public static ISearchManager localmanagerforced = new LocalSearchManager(true);
 	
 	/** The vsist decider that stops searching after one result has been found. */
 	public static IVisitDecider abortdecider = new DefaultVisitDecider();
@@ -87,6 +89,16 @@ public class SServiceProvider
 	 */
 	public static IFuture getService(IServiceProvider provider, Class type, boolean onlylocal)
 	{
+		return getService(provider, type, true, false);
+	}
+	
+	/**
+	 *  Get one service of a type.
+	 *  @param type The class.
+	 *  @return The corresponding service.
+	 */
+	public static IFuture getService(IServiceProvider provider, Class type, boolean local, boolean forcedsearch)
+	{
 //		synchronized(profiling)
 //		{
 //			Integer	cnt	= (Integer)profiling.get(type);
@@ -98,8 +110,9 @@ public class SServiceProvider
 //		IVisitDecider abortdecider = new DefaultVisitDecider();
 //		IVisitDecider rabortdecider = new DefaultVisitDecider(true, false);
 		
-		provider.getServices(sequentialmanager, onlylocal? abortdecider: rabortdecider, 
-			new TypeResultSelector(type, true, onlylocal), new ArrayList())
+		provider.getServices(forcedsearch? sequentialmanagerforced: sequentialmanager, 
+			local? abortdecider: rabortdecider, 
+			new TypeResultSelector(type, true, local), new ArrayList())
 				.addResultListener(new DelegationResultListener(ret));
 		
 		return ret;
@@ -168,6 +181,16 @@ public class SServiceProvider
 	 */
 	public static IFuture getServices(IServiceProvider provider, Class type, boolean local)
 	{
+		return getServices(provider, type, true, false);
+	}
+	
+	/**
+	 *  Get all services of a type.
+	 *  @param type The class.
+	 *  @return The corresponding services.
+	 */
+	public static IFuture getServices(IServiceProvider provider, Class type, boolean local, boolean forcedsearch)
+	{
 //		synchronized(profiling)
 //		{
 //			Integer	cnt	= (Integer)profiling.get(type);
@@ -179,7 +202,9 @@ public class SServiceProvider
 //		IVisitDecider contdecider = new DefaultVisitDecider(false);
 //		IVisitDecider rcontdecider = new DefaultVisitDecider(false, false);
 		
-		provider.getServices(parallelmanager, local ? contdecider : rcontdecider, new TypeResultSelector(type, false, local), new ArrayList())
+		provider.getServices(forcedsearch? parallelmanagerforced: parallelmanager, 
+			local? contdecider: rcontdecider, 
+			new TypeResultSelector(type, false, local), new ArrayList())
 			.addResultListener(new DelegationResultListener(ret));
 		
 		return ret;
@@ -272,6 +297,29 @@ public class SServiceProvider
 		
 		provider.getServices(localmanager, contdecider, contanyselector, new ArrayList())
 			.addResultListener(new DelegationResultListener(ret));
+		
+		return ret;
+	}
+	
+	/**
+	 *  Get all declared services of the given provider.
+	 *  @return The corresponding services.
+	 */
+	public static IFuture getDeclaredServices(IServiceProvider provider, boolean forcedsearch)
+	{
+//		synchronized(profiling)
+//		{
+//			Integer	cnt	= (Integer)profiling.get(type);
+//			profiling.put(type, new Integer(cnt!=null ? cnt.intValue()+1 : 1)); 
+//		}
+		final Future ret = new Future();
+		
+		// Hack->remove
+//		IVisitDecider contdecider = new DefaultVisitDecider(false);
+		
+		provider.getServices(forcedsearch? localmanagerforced: localmanager, 
+			contdecider, contanyselector, new ArrayList())
+				.addResultListener(new DelegationResultListener(ret));
 		
 		return ret;
 	}

@@ -17,7 +17,8 @@ public interface ISearchManager
 	 *  @param selector	The result selector to select matching services and produce the final result. 
 	 *  @param services	The local services of the provider (class->list of services).
 	 */
-	public IFuture	searchServices(IServiceProvider provider, IVisitDecider decider, IResultSelector selector, Map services, Collection results);
+	public IFuture	searchServices(IServiceProvider provider, IVisitDecider decider, 
+		IResultSelector selector, Map services, Collection results);
 
 	/**
 	 *  Get the cache key.
@@ -26,4 +27,11 @@ public interface ISearchManager
 	 *  @return	The cache key or null, if results should not be cached.
 	 */
 	public Object getCacheKey();
+	
+	/**
+	 *  Test if a search must be performed (no cached values allowed).
+	 *  @return True, if search must be performed.
+	 */
+	public boolean isForcedSearch();
+	
 }

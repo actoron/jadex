@@ -20,8 +20,12 @@ public class ParallelSearchManager implements ISearchManager
 	//-------- constants --------
 	
 	/** The local search manager. */
-	protected final LocalSearchManager	LOCAL_SEARCH_MANAGER	= new LocalSearchManager();
+	protected static final LocalSearchManager	LOCAL_SEARCH_MANAGER	= new LocalSearchManager();
 
+	/** The local search manager. */
+	protected static final LocalSearchManager	LOCAL_SEARCH_MANAGER_FORCED	= new LocalSearchManager(true);
+
+	
 	//-------- attributes --------
 	
 	/** Flag to activate upwards (parent) searching. */
@@ -29,6 +33,12 @@ public class ParallelSearchManager implements ISearchManager
 	
 	/** Flag to activate downwards (children) searching. */
 	protected boolean down;
+	
+	/** Force search flag. */
+	protected boolean forcedsearch;
+	
+	/** The local search manager. */
+	protected ISearchManager lsm;
 	
 	//-------- constructors --------
 	
@@ -45,8 +55,18 @@ public class ParallelSearchManager implements ISearchManager
 	 */
 	public ParallelSearchManager(boolean up, boolean down)
 	{
+		this(up, down, false);
+	}
+	
+	/**
+	 *  Create a new search manager.
+	 */
+	public ParallelSearchManager(boolean up, boolean down, boolean forcedsearch)
+	{
 		this.up	= up;
 		this.down	= down;
+		this.forcedsearch = forcedsearch;
+		this.lsm = forcedsearch? LOCAL_SEARCH_MANAGER_FORCED: LOCAL_SEARCH_MANAGER;
 	}
 	
 	//-------- ISearchManager interface --------
@@ -88,7 +108,25 @@ public class ParallelSearchManager implements ISearchManager
 	{
 		return getClass().getName()+up+down;
 	}
-
+	
+	/**
+	 *  Get the forcedsearch.
+	 *  @return The forcedsearch.
+	 */
+	public boolean isForcedSearch()
+	{
+		return forcedsearch;
+	}
+	
+	/**
+	 *  Set the forcedsearch.
+	 *  @param forcedsearch The forcedsearch to set.
+	 */
+	public void setForcedSearch(boolean forcedsearch)
+	{
+		this.forcedsearch = forcedsearch;
+	}
+	
 	//-------- helper methods --------
 
 	/**
@@ -105,7 +143,7 @@ public class ParallelSearchManager implements ISearchManager
 //			if(provider!=null)
 //				System.out.println("from: "+(source!=null?source.getId():"null")+" proc: "+provider.getId());
 			
-			provider.getServices(LOCAL_SEARCH_MANAGER, decider, selector, results).addResultListener(new IResultListener()
+			provider.getServices(lsm, decider, selector, results).addResultListener(new IResultListener()
 			{
 				public void resultAvailable(Object source, Object result)
 				{

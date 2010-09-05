@@ -169,7 +169,7 @@ public class DirectoryFacilitatorService extends BasicService implements IDF
 	 */
 	public IFuture search(final IDFComponentDescription adesc, final ISearchConstraints con)
 	{
-		return search(adesc, con, true);
+		return search(adesc, con, false);
 	}
 	
 //	protected List open = Collections.synchronizedList(new ArrayList());

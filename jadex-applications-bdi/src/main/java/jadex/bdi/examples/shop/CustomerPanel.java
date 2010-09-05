@@ -94,7 +94,7 @@ public class CustomerPanel extends JPanel
 		    public void actionPerformed(ActionEvent e)
 		    {
 		    	searchbut.setEnabled(false);
-		    	SServiceProvider.getServices(agent.getServiceProvider(), IShop.class, !remote.isSelected())
+		    	SServiceProvider.getServices(agent.getServiceProvider(), IShop.class, !remote.isSelected(), true)
 					.addResultListener(new SwingDefaultResultListener(CustomerPanel.this)
 				{
 					public void customResultAvailable(Object source, Object result)

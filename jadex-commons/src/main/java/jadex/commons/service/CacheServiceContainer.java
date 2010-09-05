@@ -70,7 +70,7 @@ public class CacheServiceContainer	implements IServiceContainer
 		// Todo: cast hack??? While no clock service found (during init) search without cache.
 		final long now = clock!=null && ((BasicService)clock).isValid()? clock.getTime(): -1;
 		
-		if(cacheon)
+		if(cacheon && !manager.isForcedSearch())
 		{
 			synchronized(cache)
 			{

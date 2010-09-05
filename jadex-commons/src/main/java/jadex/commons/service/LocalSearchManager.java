@@ -11,6 +11,11 @@ import java.util.Map;
  */
 public class LocalSearchManager implements ISearchManager
 {
+	//-------- attributes --------
+	
+	/** Force search flag. */
+	protected boolean forcedsearch;
+	
 	//-------- constructors --------
 	
 	/**
@@ -18,6 +23,15 @@ public class LocalSearchManager implements ISearchManager
 	 */
 	public LocalSearchManager()
 	{
+		this(false);
+	}
+	
+	/**
+	 *  Create a new local search manager.
+	 */
+	public LocalSearchManager(boolean forcedsearch)
+	{
+		this.forcedsearch = forcedsearch;
 	}
 	
 	//-------- ISearchManager interface --------
@@ -52,4 +66,23 @@ public class LocalSearchManager implements ISearchManager
 		// Do not cache local results.
 		return null;
 	}
+
+	/**
+	 *  Get the forcedsearch.
+	 *  @return The forcedsearch.
+	 */
+	public boolean isForcedSearch()
+	{
+		return forcedsearch;
+	}
+	
+	/**
+	 *  Set the forcedsearch.
+	 *  @param forcedsearch The forcedsearch to set.
+	 */
+	public void setForcedSearch(boolean forcedsearch)
+	{
+		this.forcedsearch = forcedsearch;
+	}
+
 }
