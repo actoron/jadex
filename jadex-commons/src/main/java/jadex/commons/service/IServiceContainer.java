@@ -33,7 +33,7 @@ public interface IServiceContainer extends IServiceProvider
 
 	/**
 	 *  Removes a service from the container (shutdowns also the service if the container is running).
-	 *  @param service The service.
+	 *  @param service The service identifier.
 	 */
-	public IFuture	removeService(BasicService service);
+	public IFuture	removeService(IServiceIdentifier sid);
 }

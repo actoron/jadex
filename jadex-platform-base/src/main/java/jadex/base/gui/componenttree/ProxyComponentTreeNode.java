@@ -13,6 +13,7 @@ import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.commons.gui.CombiIcon;
 import jadex.commons.service.IService;
+import jadex.commons.service.IServiceContainer;
 import jadex.micro.IMicroExternalAccess;
 
 import java.awt.Component;
@@ -226,7 +227,7 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 									ServiceContainerNode scn = (ServiceContainerNode)
 										proxy.getModel().getNode(desc.getName().getName()+"ServiceContainer");
 									if(scn==null)
-										scn	= new ServiceContainerNode(parentnode, proxy.getModel());
+										scn	= new ServiceContainerNode(parentnode, proxy.getModel(), null);
 //									System.err.println(proxy.getModel().hashCode()+", "+ready.hashCode()+" searchChildren.add "+scn);
 									children.add(0, scn);
 									final List subchildren = new ArrayList();

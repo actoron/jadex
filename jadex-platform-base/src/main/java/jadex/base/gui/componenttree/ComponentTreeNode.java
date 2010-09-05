@@ -9,6 +9,7 @@ import jadex.commons.IFuture;
 import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.commons.service.IService;
+import jadex.commons.service.IServiceContainer;
 import jadex.commons.service.SServiceProvider;
 
 import java.awt.Component;
@@ -184,7 +185,7 @@ public class ComponentTreeNode	extends AbstractComponentTreeNode implements IAct
 		{
 			public void customResultAvailable(Object source, Object result)
 			{
-				IExternalAccess	ea	= (IExternalAccess)result;
+				final IExternalAccess	ea	= (IExternalAccess)result;
 				SServiceProvider.getDeclaredServices(ea.getServiceProvider()).addResultListener(new SwingDefaultResultListener(ui)
 				{
 					public void customResultAvailable(Object source, Object result)
@@ -194,7 +195,7 @@ public class ComponentTreeNode	extends AbstractComponentTreeNode implements IAct
 						{
 							ServiceContainerNode	scn	= (ServiceContainerNode)getModel().getNode(desc.getName().getName()+"ServiceContainer");
 							if(scn==null)
-								scn	= new ServiceContainerNode(ComponentTreeNode.this, getModel());
+								scn	= new ServiceContainerNode(ComponentTreeNode.this, getModel(), (IServiceContainer)ea.getServiceProvider());
 //							System.err.println(getModel().hashCode()+", "+ready.hashCode()+" searchChildren.add "+scn);
 							children.add(0, scn);
 							

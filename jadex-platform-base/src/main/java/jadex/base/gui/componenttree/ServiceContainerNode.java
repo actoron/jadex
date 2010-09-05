@@ -1,6 +1,7 @@
 package jadex.base.gui.componenttree;
 
 import jadex.commons.SGUI;
+import jadex.commons.service.IServiceContainer;
 
 import javax.swing.Icon;
 import javax.swing.UIDefaults;
@@ -13,20 +14,25 @@ public class ServiceContainerNode	extends AbstractComponentTreeNode
 	//-------- constants --------
 	
 	/** The service container icon. */
-	private static final UIDefaults icons = new UIDefaults(new Object[]
+	protected static final UIDefaults icons = new UIDefaults(new Object[]
 	{
 		"service-container", SGUI.makeIcon(ServiceContainerNode.class, "/jadex/base/gui/images/services.png")
 	});
-		
+	
+	//-------- attributes --------
+	
+	/** The service container. */
+	protected IServiceContainer container;
+	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new service container node.
 	 */
-	public ServiceContainerNode(IComponentTreeNode parent, ComponentTreeModel model)
+	public ServiceContainerNode(IComponentTreeNode parent, ComponentTreeModel model, IServiceContainer container)
 	{
 		super(parent, model);
-		
+		this.container = container;
 		model.registerNode(this);
 	}
 	
@@ -59,6 +65,15 @@ public class ServiceContainerNode	extends AbstractComponentTreeNode
 		// Done by parent node.
 	}
 	
+	/**
+	 *  Get the container.
+	 *  @return The container.
+	 */
+	public IServiceContainer getContainer()
+	{
+		return container;
+	}
+
 	/**
 	 *  A string representation.
 	 */

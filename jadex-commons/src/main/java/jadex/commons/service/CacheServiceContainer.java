@@ -278,9 +278,9 @@ public class CacheServiceContainer	implements IServiceContainer
 	 *  @param name The name.
 	 *  @param service The service.
 	 */
-	public IFuture removeService(BasicService service)
+	public IFuture removeService(IServiceIdentifier sid)
 	{
-		return container.removeService(service);
+		return container.removeService(sid);
 	}
 
 	

@@ -16,6 +16,7 @@ import jadex.commons.concurrent.IResultListener;
 import jadex.commons.service.BasicService;
 import jadex.commons.service.CacheServiceContainer;
 import jadex.commons.service.IServiceContainer;
+import jadex.commons.service.IServiceIdentifier;
 import jadex.commons.service.IServiceProvider;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.clock.IClockService;
@@ -466,9 +467,9 @@ public abstract class MicroAgent implements IMicroAgent
 	 *  Removes a service from the platform (shutdowns also the service).
 	 *  @param service The service.
 	 */
-	public void removeService(BasicService service)
+	public void removeService(IServiceIdentifier sid)
 	{
-		((IServiceContainer)interpreter.getServiceProvider()).removeService(service);
+		((IServiceContainer)interpreter.getServiceProvider()).removeService(sid);
 	}
 	
 	/**

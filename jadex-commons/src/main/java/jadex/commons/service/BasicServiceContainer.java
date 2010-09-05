@@ -122,43 +122,50 @@ public class BasicServiceContainer implements  IServiceContainer
 	 *  @param id The name.
 	 *  @param service The service.
 	 */
-	public IFuture removeService(BasicService service)
+	public IFuture removeService(IServiceIdentifier sid)
 	{
 		Future ret = new Future();
 		
-		//		System.out.println("Removing service: " + type + " " + service);
+		if(sid==null)
+		{
+			ret.setException(new IllegalArgumentException("Service identifier nulls."));
+			return ret;
+		}
+		
+		// System.out.println("Removing service: " + type + " " + service);
 		synchronized(this)
 		{
-			Collection tmp = services!=null? (Collection)services.get(service.getServiceIdentifier().getServiceType()): null;
-			if(tmp == null || (service != null && !tmp.contains(service)))
-				throw new RuntimeException("Service not found: " + service);
-	
-			boolean removed = false;
-			for(Iterator it=tmp.iterator(); !removed && it.hasNext(); )
+			Collection tmp = services!=null? (Collection)services.get(sid.getServiceType()): null;
+			
+			BasicService service = null;
+			if(tmp!=null)
 			{
-				Object key = it.next();
-				if(tmp.equals(service))
+				for(Iterator it=tmp.iterator(); it.hasNext() && service==null; )
 				{
-					service	= (BasicService)key;
-					tmp.remove(key);
-					if(started)
+					BasicService tst = (BasicService)it.next();
+					if(tst.getServiceIdentifier().equals(sid))
 					{
-						service.shutdownService().addResultListener(new DelegationResultListener(ret));
+						service = tst;
+						tmp.remove(service);
+						if(started)
+						{
+							service.shutdownService().addResultListener(new DelegationResultListener(ret));
+						}
+						else
+						{
+							ret.setResult(null);
+						}
 					}
-					else
-					{
-						ret.setResult(null);
-					}
-						
-					removed = true;
 				}
 			}
+			if(service==null)
+			{
+				ret.setException(new IllegalArgumentException("Service not found: "+sid));
+				return ret;
+			}
 	
-			if(!removed)
-				throw new RuntimeException("Service not found: " + service);
-
 			if(tmp.isEmpty())
-				services.remove(service.getServiceIdentifier().getServiceType());
+				services.remove(sid.getServiceType());
 		}
 		
 		return ret;

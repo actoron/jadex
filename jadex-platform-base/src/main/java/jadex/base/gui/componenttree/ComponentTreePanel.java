@@ -113,8 +113,11 @@ public class ComponentTreePanel extends JSplitPane
 	private final Action	showprops;
 	
 	/** The action for showing object details of the selected node. */
-	private final Action	showobject;
+	private final Action showobject;
 	
+	/** The action for removing a service. */
+	private final Action removeservice;
+
 	/** The component listener. */
 	private final IComponentListener	listener;
 	
@@ -240,7 +243,6 @@ public class ComponentTreePanel extends JSplitPane
 			}
 		};
 
-		
 		kill = new AbstractAction("Kill component", icons.getIcon("kill_component"))
 		{
 			public void actionPerformed(ActionEvent e)
@@ -440,6 +442,26 @@ public class ComponentTreePanel extends JSplitPane
 			}
 		};
 		
+		removeservice = new AbstractAction("Remove service", icons.getIcon("show_properties"))
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				TreePath path = tree.getSelectionPath();
+				if(path!=null)
+				{
+					final ServiceContainerNode scn = (ServiceContainerNode)path.getPathComponent(path.getPathCount()-2);
+					final ServiceNode sn = (ServiceNode)path.getLastPathComponent();
+					scn.getContainer().removeService(sn.getService().getServiceIdentifier()).addResultListener(new SwingDefaultResultListener(proppanel)
+					{
+						public void customResultAvailable(Object source, Object result)
+						{
+							scn.removeChild(sn);
+						}
+					});
+				}
+			}
+		};
+		
 		showobject = new AbstractAction("Show object details", icons.getIcon("show_details"))
 		{
 			public void actionPerformed(ActionEvent e)
@@ -528,6 +550,19 @@ public class ComponentTreePanel extends JSplitPane
 							}
 						};
 						ret.add(0, pshowobject);
+					}
+					
+					if(nodes[0] instanceof ServiceNode)
+					{
+						Action premoveservice = new AbstractAction((String)removeservice.getValue(Action.NAME),
+							base!=null ? new CombiIcon(new Icon[]{base, icons.getIcon("overlay_kill")}) : (Icon)showprops.getValue(Action.SMALL_ICON))
+						{
+							public void actionPerformed(ActionEvent e)
+							{
+								removeservice.actionPerformed(e);
+							}
+						};
+						ret.add(0, premoveservice);
 					}
 				}
 			
