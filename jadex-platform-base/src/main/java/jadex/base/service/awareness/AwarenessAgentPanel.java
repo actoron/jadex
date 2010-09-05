@@ -97,6 +97,8 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 	
 	protected JSpinner	spprorefresh;
 
+	protected JPanel panel;
+	
 	
 	//-------- methods --------
 	
@@ -106,38 +108,12 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 	 *  @param jcc	The jcc.
 	 * 	@param component The component.
 	 */
-	public IFuture init(IControlCenter jcc, IExternalAccess component)
+	public IFuture init(final IControlCenter jcc, IExternalAccess component)
 	{
 		this.jcc = jcc;
 		this.component = (IMicroExternalAccess)component;
-		return new Future(null);
-	}
-	
-	/**
-	 *  Informs the panel that it should stop all its computation
-	 */
-	public IFuture shutdown()
-	{
-		if(timer.isRunning())
-			timer.stop();
-		return new Future(null);
-	}
-
-	/**
-	 *  The id used for mapping properties.
-	 */
-	public String getId()
-	{
-		return "awarenessviewer";
-	}
-
-	/**
-	 *  The component to be shown in the gui.
-	 *  @return	The component to be displayed.
-	 */
-	public JComponent getComponent()
-	{
-		final JPanel	ret	= new JPanel(new GridBagLayout());
+		
+		this.panel = new JPanel(new GridBagLayout());
 		
 		this.timerdelay = 5000;
 				
@@ -213,7 +189,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 		{
 			public void actionPerformed(ActionEvent ae)
 			{
-				applySettings(ret);
+				applySettings(panel);
 			}
 		});
 		JButton bucancel = new JButton("Cancel");
@@ -305,8 +281,8 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 					}
 					else
 					{
-						component.scheduleResultStep(new CreateProxyCommand(dif.getComponentIdentifier()))
-							.addResultListener(new SwingDefaultResultListener(ret)
+						AwarenessAgentPanel.this.component.scheduleResultStep(new CreateProxyCommand(dif.getComponentIdentifier()))
+							.addResultListener(new SwingDefaultResultListener(panel)
 						{
 							public void customResultAvailable(Object source, Object result)
 							{
@@ -339,8 +315,8 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 					}
 					else
 					{
-						component.scheduleResultStep(new DeleteProxyCommand(dif.getComponentIdentifier()))
-							.addResultListener(new SwingDefaultResultListener(ret)
+						AwarenessAgentPanel.this.component.scheduleResultStep(new DeleteProxyCommand(dif.getComponentIdentifier()))
+							.addResultListener(new SwingDefaultResultListener(panel)
 						{
 							public void customResultAvailable(Object source, Object result)
 							{
@@ -367,8 +343,8 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 				{
 					// todo: hack, could be wrong due to sorting (visual!=data order)
 					DiscoveryInfo dif = (DiscoveryInfo)dismodel.getList().get(sel);
-					component.scheduleStep(new SetExcludedCommand(dif.getComponentIdentifier(), !dif.isExcluded()))
-						.addResultListener(new SwingDefaultResultListener(ret)
+					AwarenessAgentPanel.this.component.scheduleStep(new SetExcludedCommand(dif.getComponentIdentifier(), !dif.isExcluded()))
+						.addResultListener(new SwingDefaultResultListener(panel)
 					{
 						public void customResultAvailable(Object source, Object result)
 						{
@@ -397,19 +373,46 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 		gbc.weightx	= 1;
 		gbc.weighty	= 0;
 		gbc.fill	= GridBagConstraints.BOTH;
-		ret.add(pdissettings, gbc);
-		ret.add(pprosettings, gbc);
+		panel.add(pdissettings, gbc);
+		panel.add(pprosettings, gbc);
 		gbc.gridy	= 1;
 		gbc.gridwidth	= GridBagConstraints.REMAINDER;
-		ret.add(pbuts, gbc);
+		panel.add(pbuts, gbc);
 		gbc.gridy	= 2;
 		gbc.weighty	= 1;
-		ret.add(pdisinfos, gbc);
+		panel.add(pdisinfos, gbc);
 		gbc.gridy	= 3;
 		gbc.weighty	= 0;
-		ret.add(pbobuts, gbc);
+		panel.add(pbobuts, gbc);
 		
-		return ret;
+		return new Future(null);
+	}
+	
+	/**
+	 *  Informs the panel that it should stop all its computation
+	 */
+	public IFuture shutdown()
+	{
+		if(timer.isRunning())
+			timer.stop();
+		return new Future(null);
+	}
+
+	/**
+	 *  The id used for mapping properties.
+	 */
+	public String getId()
+	{
+		return "awarenessviewer";
+	}
+
+	/**
+	 *  The component to be shown in the gui.
+	 *  @return	The component to be displayed.
+	 */
+	public JComponent getComponent()
+	{
+		return panel;
 	}
 
 	/**
@@ -544,6 +547,11 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 				dtm.fireTableDataChanged();
 				if(sel!=-1 && sel<ds.length)
 					((DefaultListSelectionModel)jtdis.getSelectionModel()).setSelectionInterval(sel, sel);
+			}
+			
+			public void customExceptionOccurred(Object source, Exception exception)
+			{
+				sprefresh.setValue(new Integer(0));
 			}
 		});
 	}

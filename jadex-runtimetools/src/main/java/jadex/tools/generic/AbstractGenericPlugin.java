@@ -1,18 +1,13 @@
 package jadex.tools.generic;
 
+import jadex.base.gui.componentviewer.IAbstractViewerPanel;
 import jadex.base.gui.componentviewer.IComponentViewerPanel;
 import jadex.base.gui.plugin.AbstractJCCPlugin;
-import jadex.bridge.IComponentDescription;
-import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentManagementService;
-import jadex.bridge.IExternalAccess;
-import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.Properties;
 import jadex.commons.SGUI;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.commons.gui.ObjectCardLayout;
-import jadex.commons.service.SServiceProvider;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
@@ -29,6 +24,8 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.UIDefaults;
+import javax.swing.border.EtchedBorder;
+import javax.swing.border.TitledBorder;
 
 
 /**
@@ -39,7 +36,10 @@ public abstract class AbstractGenericPlugin extends AbstractJCCPlugin
 	//-------- constants --------
 
 	/** The image icons. */
-	protected static final UIDefaults icons = new UIDefaults();
+	protected static final UIDefaults icons = new UIDefaults(new Object[]
+	{
+		"viewer_empty", SGUI.makeIcon(AbstractGenericPlugin.class, "/jadex/tools/common/images/viewer_empty.png"),
+	});
 
 	//-------- attributes --------
 	
@@ -76,6 +76,15 @@ public abstract class AbstractGenericPlugin extends AbstractJCCPlugin
 	public abstract String convertToString(Object element);
 	
 	/**
+	 *  Remove a panel.
+	 */
+	public void removePanel(IAbstractViewerPanel panel)
+	{
+		centerp.remove(panel.getComponent());
+		panel.shutdown();
+	}
+	
+	/**
 	 *  Create main panel.
 	 *  @return The main panel.
 	 */
@@ -96,6 +105,8 @@ public abstract class AbstractGenericPlugin extends AbstractJCCPlugin
 		centerp.add(ObjectCardLayout.DEFAULT_COMPONENT, emptylabel);
 		
 		JPanel northp = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+		northp.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), "Instance Settings "));
+
 		selcb = new JComboBox(); 
 		remotecb = new JCheckBox("Remote");
 		final JButton refreshb = new JButton("Refresh");

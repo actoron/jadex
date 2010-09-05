@@ -10,6 +10,9 @@ import jadex.commons.IFuture;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.commons.service.SServiceProvider;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  *  Plugin that allows to look at viewable components.
  */
@@ -62,6 +65,24 @@ public abstract class AbstractComponentPlugin extends AbstractGenericPlugin
 					public void customResultAvailable(Object source, Object result)
 					{
 						IComponentDescription[] descs = (IComponentDescription[])result;
+						Set newcids = new HashSet();
+						for(int i=0; i<newcids.size(); i++)
+						{
+							newcids.add(descs[i].getName());
+						}
+						
+						// Find items to remove
+						for(int i=0; i<selcb.getItemCount(); i++)
+						{
+							IComponentIdentifier oldcid = (IComponentIdentifier)selcb.getItemAt(i);
+							if(!newcids.contains(oldcid))
+							{
+								// remove old cid
+								IComponentViewerPanel panel = (IComponentViewerPanel)panels.remove(oldcid);
+								removePanel(panel);
+							}
+						}
+						
 						selcb.removeAllItems();
 						for(int i=0; i<descs.length; i++)
 						{

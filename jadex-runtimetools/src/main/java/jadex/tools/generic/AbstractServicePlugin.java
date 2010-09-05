@@ -1,6 +1,9 @@
 package jadex.tools.generic;
 
+import jadex.base.gui.componentviewer.IComponentViewerPanel;
 import jadex.base.gui.componentviewer.IServiceViewerPanel;
+import jadex.bridge.IComponentDescription;
+import jadex.bridge.IComponentIdentifier;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.concurrent.SwingDefaultResultListener;
@@ -8,12 +11,14 @@ import jadex.commons.service.IService;
 import jadex.commons.service.SServiceProvider;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 
 import javax.swing.Icon;
 
 /**
- * 
+ *  Abstract plugin for wrapping service views to plugin view.
  */
 public abstract class AbstractServicePlugin extends AbstractGenericPlugin
 {
@@ -53,14 +58,24 @@ public abstract class AbstractServicePlugin extends AbstractGenericPlugin
 		{
 			public void customResultAvailable(Object source, Object result) 
 			{
-				selcb.removeAllItems();
-				Collection coll = (Collection)result;
-				if(coll!=null)
+				Collection newservices = (Collection)result;
+				
+				// Find items to remove
+				for(int i=0; i<selcb.getItemCount(); i++)
 				{
-					for(Iterator it=coll.iterator(); it.hasNext(); )
+					Object oldservice = selcb.getItemAt(i);
+					if(!newservices.contains(oldservice))
 					{
-						selcb.addItem(it.next());
+						// remove old cid
+						IComponentViewerPanel panel = (IComponentViewerPanel)panels.remove(oldservice);
+						removePanel(panel);
 					}
+				}
+				
+				selcb.removeAllItems();
+				for(Iterator it=newservices.iterator(); it.hasNext(); )
+				{
+					selcb.addItem(it.next());
 				}
 			}
 		});

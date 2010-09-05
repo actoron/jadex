@@ -22,6 +22,9 @@ public class ExecutionServiceViewer	implements IServiceViewerPanel
 	/** The execution service. */
 	protected IExecutionService	exe;
 	
+	/** The panel. */
+	protected JScrollPane panel;
+	
 	/**
 	 *  Called once to initialize the panel.
 	 *  Called on the swing thread.
@@ -31,6 +34,8 @@ public class ExecutionServiceViewer	implements IServiceViewerPanel
 	public IFuture init(IControlCenter jcc, IService service)
 	{
 		this.exe = (IExecutionService)service;
+		JList	list = new JList(exe.getTasks());
+		panel = new JScrollPane(list);
 		return new Future(null);
 	}
 	
@@ -56,8 +61,7 @@ public class ExecutionServiceViewer	implements IServiceViewerPanel
 	 */
 	public JComponent getComponent()
 	{
-		JList	list	= new JList(exe.getTasks());
-		return new JScrollPane(list);
+		return panel;
 	}
 
 	/**
