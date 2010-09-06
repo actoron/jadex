@@ -286,7 +286,7 @@ public class ControlCenterWindow extends JFrame
 			helptopics.addActionListener(new CSH.DisplayHelpFromSource(hb));
 
 			JMenuItem helptrack = new JMenuItem(new ImageIcon(ControlCenter.class
-				.getResource("/jadex/tools/common/images/help.gif"), "Help cursor"));
+				.getResource("/jadex/tools/common/images/help.png"), "Help cursor"));
 
 			helptrack.addActionListener(new CSH.DisplayHelpAfterTracking(hb));
 
