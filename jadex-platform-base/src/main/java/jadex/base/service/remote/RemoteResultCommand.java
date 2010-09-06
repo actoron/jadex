@@ -67,6 +67,7 @@ public class RemoteResultCommand implements IRemoteCommand
 			}
 			else
 			{
+//				System.out.println("resu: "+result);
 				future.setResultIfUndone(result);
 			}
 		}

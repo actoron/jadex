@@ -30,11 +30,11 @@ public class SServiceProvider
 	
 	/** The vsist decider that stops searching after one result has been found. */
 	public static IVisitDecider abortdecider = new DefaultVisitDecider();
-	public static IVisitDecider rabortdecider = new DefaultVisitDecider(true, false);
+	public static IVisitDecider rabortdecider = new DefaultVisitDecider(true, true);
 
 	/** The vsist decider that never stops. */
 	public static IVisitDecider contdecider = new DefaultVisitDecider(false);
-	public static IVisitDecider rcontdecider = new DefaultVisitDecider(false, false);
+	public static IVisitDecider rcontdecider = new DefaultVisitDecider(false, true);
 
 	public static IResultSelector contanyselector = new AnyResultSelector(false);
 	public static IResultSelector abortanyselector = new AnyResultSelector(true);
@@ -79,7 +79,7 @@ public class SServiceProvider
 	 */
 	public static IFuture getService(IServiceProvider provider, Class type)
 	{
-		return getService(provider, type, true);
+		return getService(provider, type, false);
 	}
 	
 	/**
@@ -87,9 +87,9 @@ public class SServiceProvider
 	 *  @param type The class.
 	 *  @return The corresponding service.
 	 */
-	public static IFuture getService(IServiceProvider provider, Class type, boolean onlylocal)
+	public static IFuture getService(IServiceProvider provider, Class type, boolean remote)
 	{
-		return getService(provider, type, true, false);
+		return getService(provider, type, false, false);
 	}
 	
 	/**
@@ -97,7 +97,7 @@ public class SServiceProvider
 	 *  @param type The class.
 	 *  @return The corresponding service.
 	 */
-	public static IFuture getService(IServiceProvider provider, Class type, boolean local, boolean forcedsearch)
+	public static IFuture getService(IServiceProvider provider, Class type, boolean remote, boolean forcedsearch)
 	{
 //		synchronized(profiling)
 //		{
@@ -111,8 +111,8 @@ public class SServiceProvider
 //		IVisitDecider rabortdecider = new DefaultVisitDecider(true, false);
 		
 		provider.getServices(forcedsearch? sequentialmanagerforced: sequentialmanager, 
-			local? abortdecider: rabortdecider, 
-			new TypeResultSelector(type, true, local), new ArrayList())
+			remote? rabortdecider: abortdecider, 
+			new TypeResultSelector(type, true, remote), new ArrayList())
 				.addResultListener(new DelegationResultListener(ret));
 		
 		return ret;
@@ -171,7 +171,7 @@ public class SServiceProvider
 	 */
 	public static IFuture getServices(IServiceProvider provider, Class type)
 	{
-		return getServices(provider, type, true);
+		return getServices(provider, type, false);
 	}
 	
 	/**
@@ -179,9 +179,9 @@ public class SServiceProvider
 	 *  @param type The class.
 	 *  @return The corresponding services.
 	 */
-	public static IFuture getServices(IServiceProvider provider, Class type, boolean local)
+	public static IFuture getServices(IServiceProvider provider, Class type, boolean remote)
 	{
-		return getServices(provider, type, true, false);
+		return getServices(provider, type, remote, false);
 	}
 	
 	/**
@@ -189,7 +189,7 @@ public class SServiceProvider
 	 *  @param type The class.
 	 *  @return The corresponding services.
 	 */
-	public static IFuture getServices(IServiceProvider provider, Class type, boolean local, boolean forcedsearch)
+	public static IFuture getServices(IServiceProvider provider, Class type, boolean remote, boolean forcedsearch)
 	{
 //		synchronized(profiling)
 //		{
@@ -203,9 +203,9 @@ public class SServiceProvider
 //		IVisitDecider rcontdecider = new DefaultVisitDecider(false, false);
 		
 		provider.getServices(forcedsearch? parallelmanagerforced: parallelmanager, 
-			local? contdecider: rcontdecider, 
-			new TypeResultSelector(type, false, local), new ArrayList())
-			.addResultListener(new DelegationResultListener(ret));
+			remote? rcontdecider: contdecider, 
+			new TypeResultSelector(type, false, remote), new ArrayList())
+				.addResultListener(new DelegationResultListener(ret));
 		
 		return ret;
 	}

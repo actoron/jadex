@@ -39,15 +39,15 @@ public class TypeResultSelector extends BasicResultSelector
 	 */
 	public TypeResultSelector(Class type, boolean oneresult)
 	{
-		this(type, oneresult, true);
+		this(type, oneresult, false);
 	}
 	
 	/**
 	 *  Create a type result listener.
 	 */
-	public TypeResultSelector(Class type, boolean oneresult, boolean onlylocal)
+	public TypeResultSelector(Class type, boolean oneresult, boolean remote)
 	{
-		super(new ConstantFilter(true), oneresult, onlylocal);
+		super(new ConstantFilter(true), oneresult, remote);
 		this.type = type;
 	}
 	
@@ -97,7 +97,7 @@ public class TypeResultSelector extends BasicResultSelector
 	public String toString()
 	{
 		return "TypeResultSelector(type=" + type + ", oneresult=" + oneresult
-			+ ", onlylocal=" + onlylocal + ")";
+			+ ", remote=" + remote + ")";
 	}
 }
 

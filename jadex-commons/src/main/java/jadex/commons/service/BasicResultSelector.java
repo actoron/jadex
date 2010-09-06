@@ -23,7 +23,7 @@ public class BasicResultSelector implements IResultSelector
 	protected boolean oneresult;
 	
 	/** The only local services flag. */
-	protected boolean onlylocal;
+	protected boolean remote;
 	
 	//-------- constructors --------
 	
@@ -47,17 +47,17 @@ public class BasicResultSelector implements IResultSelector
 	 */
 	public BasicResultSelector(IFilter filter, boolean oneresult)
 	{
-		this(filter, oneresult, true);
+		this(filter, oneresult, false);
 	}
 	
 	/**
 	 *  Create a type result listener.
 	 */
-	public BasicResultSelector(IFilter filter, boolean oneresult, boolean onlylocal)
+	public BasicResultSelector(IFilter filter, boolean oneresult, boolean remote)
 	{
 		this.filter = filter;
 		this.oneresult = oneresult;
-		this.onlylocal = onlylocal;
+		this.remote = remote;
 	}
 	
 	//-------- methods --------
@@ -70,7 +70,7 @@ public class BasicResultSelector implements IResultSelector
 	public void	selectServices(Map servicemap, Collection results)
 	{
 		IFilter fil = filter;
-		if(onlylocal)
+		if(!remote)
 		{
 			if(fil!=null)
 			{
@@ -206,21 +206,21 @@ public class BasicResultSelector implements IResultSelector
 	}
 	
 	/**
-	 *  Get the only local flag.
-	 *  @return the local.
+	 *  Get the remote.
+	 *  @return the remote.
 	 */
-	public boolean isOnlyLocal()
+	public boolean isRemote()
 	{
-		return onlylocal;
+		return remote;
 	}
 
 	/**
-	 *  Set the only local flag.
-	 *  @param local The local to set.
+	 *  Set the remote.
+	 *  @param remote The remote to set.
 	 */
-	public void setOnlyLocal(boolean onlylocal)
+	public void setRemote(boolean remote)
 	{
-		this.onlylocal = onlylocal;
+		this.remote = remote;
 	}
 
 	/**
@@ -228,7 +228,7 @@ public class BasicResultSelector implements IResultSelector
 	 */
 	public String toString()
 	{
-		return getClass().getName()+"(filter=" + filter + ", oneresult=" + oneresult+ ", onlylocal=" + onlylocal + ")";
+		return getClass().getName()+"(filter=" + filter + ", oneresult=" + oneresult+ ", remote=" + remote + ")";
 	}
 }
 

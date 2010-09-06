@@ -18,7 +18,7 @@ public class DefaultVisitDecider implements IVisitDecider
 	protected boolean abort;
 	
 	/** Flag indicating if remote proxies will be visited. */
-	protected boolean onlylocal;
+	protected boolean remote;
 	
 	//-------- constructors --------
 
@@ -36,17 +36,17 @@ public class DefaultVisitDecider implements IVisitDecider
 	 */
 	public DefaultVisitDecider(boolean abort)
 	{
-		this(abort, true);
+		this(abort, false);
 	}
 	
 	/**
 	 *  Create a new visit decider.
 	 */
-	public DefaultVisitDecider(boolean abort, boolean onlylocal)
+	public DefaultVisitDecider(boolean abort, boolean remote)
 	{
 //		this.visited = new HashSet();
 		this.abort = abort;
-		this.onlylocal = onlylocal;
+		this.remote = remote;
 	}
 	
 	//-------- methods --------
@@ -62,7 +62,7 @@ public class DefaultVisitDecider implements IVisitDecider
 		boolean ret = !(abort && results.size()>0);
 		
 		// Hack!!!
-		if(ret && onlylocal && target!=null && target.getClass().getName().indexOf("RemoteServiceContainer")!=-1)
+		if(ret && !remote && target!=null && target.getClass().getName().indexOf("RemoteServiceContainer")!=-1)
 			ret = false;
 		
 //		if(visited.contains(target.getId()))
@@ -100,6 +100,29 @@ public class DefaultVisitDecider implements IVisitDecider
 	{
 		this.abort = abort;
 	}
+	
+	// NOTE! This methods currently must be commented for remote searches
+	// to work. Otherwise, remote=true will lead to ping-pong searches that
+	// never terminate. todo: make search information more declarative and
+	// allow to modify the search strategy on the sending or receiving host.
+	
+//	/**
+//	 *  Get the remote.
+//	 *  @return the remote.
+//	 */
+//	public boolean isRemote()
+//	{
+//		return remote;
+//	}
+//
+//	/**
+//	 *  Set the remote.
+//	 *  @param remote The remote to set.
+//	 */
+//	public void setRemote(boolean remote)
+//	{
+//		this.remote = remote;
+//	}
 
 	/**
 	 *  Get the cache key.

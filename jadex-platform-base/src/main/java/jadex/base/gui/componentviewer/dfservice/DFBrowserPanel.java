@@ -195,6 +195,8 @@ public class DFBrowserPanel	extends JPanel implements IServiceViewerPanel
 				}
 			});
 		}
+		rb_refresh[2].setSelected(true);
+		
 //		gbc.anchor	= GridBagConstraints.EAST;
 //		gbc.weightx	= 1.0;	// Last button gets remaining size.
 		JButton	button	= new JButton("Refresh", icons.getIcon("refresh"));

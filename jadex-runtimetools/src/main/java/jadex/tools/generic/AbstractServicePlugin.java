@@ -68,7 +68,8 @@ public abstract class AbstractServicePlugin extends AbstractGenericPlugin
 					{
 						// remove old cid
 						IComponentViewerPanel panel = (IComponentViewerPanel)panels.remove(oldservice);
-						removePanel(panel);
+						if(panel!=null)
+							removePanel(panel);
 					}
 				}
 				

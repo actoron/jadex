@@ -21,14 +21,14 @@ public class AnyResultSelector extends BasicResultSelector
 	 */
 	public AnyResultSelector(boolean oneresult)
 	{
-		this(oneresult, true);
+		this(oneresult, false);
 	}
 	
 	/**
 	 *  Create a id result listener.
 	 */
-	public AnyResultSelector(boolean oneresult, boolean onlylocal)
+	public AnyResultSelector(boolean oneresult, boolean remote)
 	{
-		super(new ConstantFilter(true), oneresult, onlylocal);
+		super(new ConstantFilter(true), oneresult, remote);
 	}
 }

@@ -1529,12 +1529,12 @@ public abstract class ComponentManagementService extends BasicService implements
 //		open.add(fut);
 		if(remote)
 		{
-			SServiceProvider.getServices(provider, IComponentManagementService.class, false).addResultListener(new IResultListener()
+			SServiceProvider.getServices(provider, IComponentManagementService.class, true, true).addResultListener(new IResultListener()
 			{
 				public void resultAvailable(Object source, Object result)
 				{
 					Collection coll = (Collection)result;
-//					System.out.println("dfs: "+coll);
+//					System.out.println("cms: "+coll);
 					// Ignore search failures of remote dfs
 					CollectionResultListener lis = new CollectionResultListener(coll.size(), true, new IResultListener()
 					{

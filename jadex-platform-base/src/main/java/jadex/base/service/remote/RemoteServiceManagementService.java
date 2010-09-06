@@ -156,7 +156,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	public IFuture getDeclaredServiceProxies(IComponentIdentifier cid)
 	{
 		return getServiceProxies(cid, SServiceProvider.localmanager, SServiceProvider.contdecider, 
-			new AnyResultSelector(false, true));
+			new AnyResultSelector(false, false));
 	}
 	
 	/**

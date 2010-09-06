@@ -33,15 +33,15 @@ public class IdResultSelector extends BasicResultSelector
 	 */
 	public IdResultSelector(Object sid, boolean oneresult)
 	{
-		this(sid, oneresult, true);
+		this(sid, oneresult, false);
 	}
 	
 	/**
 	 *  Create a id result listener.
 	 */
-	public IdResultSelector(Object sid, boolean oneresult, boolean onlylocal)
+	public IdResultSelector(Object sid, boolean oneresult, boolean remote)
 	{
-		super(new ServiceIdFilter(sid), oneresult, onlylocal);
+		super(new ServiceIdFilter(sid), oneresult, remote);
 	}
 	
 	//-------- methods --------
