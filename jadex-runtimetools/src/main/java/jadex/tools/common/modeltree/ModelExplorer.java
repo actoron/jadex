@@ -416,6 +416,45 @@ public class ModelExplorer extends JTree
 					root.addPathEntry(new File(entries[i]));
 				((ModelExplorerTreeModel)getModel()).setRoot(this.root);
 
+				if(getRootNode().getChildCount()>0)
+				{
+					for(Enumeration e=getRootNode().children(); e.hasMoreElements();)
+					{
+						// Todo: support non-file (e.g. url nodes).
+						File	file	= ((FileNode)e.nextElement()).getFile();
+						
+						// Hack!!! Build new file object. This strips trailing "/" from jar file nodes.
+						file	= new File(file.getParentFile(), file.getName());
+			//			String fname = file.getAbsolutePath();
+						// Todo: slash is needed for package determination(?)
+						// but breaks for jar files...
+			//			if(file.isDirectory() && !fname.endsWith(System.getProperty("file.separator", "/"))
+			//				&& !file.getName().endsWith(".jar"))
+			//			{
+			//				fname += "/";
+			//			}
+//						try
+						{
+//							ls.addPath(file.getAbsolutePath());
+							try
+							{
+								ls.addURL(file.toURI().toURL());
+							}
+							catch(MalformedURLException ex)
+							{
+								ex.printStackTrace();
+							}
+							//					urls.add(file.toURL());
+						}
+//						catch(MalformedURLException ex)
+//						{
+//							String failed = SUtil.wrapText("Could not add path\n\n"+ex.getMessage());
+//							JOptionPane.showMessageDialog(SGUI.getWindowParent(ModelExplorer.this), failed, "Path Error", JOptionPane.ERROR_MESSAGE);
+							//e.printStackTrace();
+//						}
+					}
+				}
+				
 				// Select the last selected model in the tree.
 				expansionhandler.setSelectedPath(mep.getSelectedNode());
 
@@ -430,46 +469,7 @@ public class ModelExplorer extends JTree
 //				e.printStackTrace();
 			}
 		}
-		
-		if(getRootNode().getChildCount()>0)
-		{
-			for(Enumeration e=getRootNode().children(); e.hasMoreElements();)
-			{
-				// Todo: support non-file (e.g. url nodes).
-				File	file	= ((FileNode)e.nextElement()).getFile();
 				
-				// Hack!!! Build new file object. This strips trailing "/" from jar file nodes.
-				file	= new File(file.getParentFile(), file.getName());
-	//			String fname = file.getAbsolutePath();
-				// Todo: slash is needed for package determination(?)
-				// but breaks for jar files...
-	//			if(file.isDirectory() && !fname.endsWith(System.getProperty("file.separator", "/"))
-	//				&& !file.getName().endsWith(".jar"))
-	//			{
-	//				fname += "/";
-	//			}
-//				try
-				{
-//					ls.addPath(file.getAbsolutePath());
-					try
-					{
-						ls.addURL(file.toURI().toURL());
-					}
-					catch(MalformedURLException ex)
-					{
-						ex.printStackTrace();
-					}
-					//					urls.add(file.toURL());
-				}
-//				catch(MalformedURLException ex)
-//				{
-//					String failed = SUtil.wrapText("Could not add path\n\n"+ex.getMessage());
-//					JOptionPane.showMessageDialog(SGUI.getWindowParent(ModelExplorer.this), failed, "Path Error", JOptionPane.ERROR_MESSAGE);
-					//e.printStackTrace();
-//				}
-			}
-		}
-		
 		// Load last selected model.
 		String lastpath = props.getStringProperty("lastpath");
 		if(lastpath!=null)
