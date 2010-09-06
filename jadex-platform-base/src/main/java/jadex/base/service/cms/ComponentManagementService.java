@@ -1123,7 +1123,7 @@ public abstract class ComponentManagementService extends BasicService implements
 				}
 				catch(Exception e)
 				{
-					e.printStackTrace();
+//					e.printStackTrace();
 					System.out.println("WARNING: Exception when removing component: "+desc+", "+e);
 				}
 			}

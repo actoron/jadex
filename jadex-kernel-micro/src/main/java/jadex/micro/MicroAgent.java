@@ -251,9 +251,14 @@ public abstract class MicroAgent implements IMicroAgent
 							
 							public String toString()
 							{
-								return "microagent.waitForDue("+time+")_#"+this.hashCode();
+								return getComponentIdentifier().getLocalName()+".waitForDue("+time+")_#"+this.hashCode();
 							}
 						});
+					}
+					
+					public String toString()
+					{
+						return getComponentIdentifier().getLocalName()+".waitForDue("+time+")_#"+this.hashCode();
 					}
 				});
 				timers.add(ts[0]);

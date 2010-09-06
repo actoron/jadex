@@ -8,8 +8,8 @@ public class RemoteException extends RuntimeException
 {
 	//-------- attributes --------
 	
-	/** The exception type. */
-	protected Class type;
+	/** The remote exception type. */
+	protected Class	type;
 	
 	//-------- constructors --------
 	
@@ -19,6 +19,18 @@ public class RemoteException extends RuntimeException
 	public RemoteException(Class type, String message)
 	{
 		super(message);
-		this.type = type;
+		this.type	= type;
+	}
+	
+	//-------- methods --------
+	
+	/**
+	 *  A string representation.
+	 */
+	public String toString()
+	{
+		String	clazz	= type!=null ? type.getName() : getClass().getName();
+        String	msg	= getLocalizedMessage();
+        return msg!=null ? clazz+": "+msg : clazz;
 	}
 }

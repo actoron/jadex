@@ -352,6 +352,10 @@ public class ViewportJOGL extends AbstractViewport
 	 */
 	public void dispose()
 	{
+		// Dispose called twice???
+		if(canvas_==null)
+			return;
+		
 		((GLCanvas) canvas_).setAutoSwapBufferMode(false);
 		((GLCanvas) canvas_).getContext().destroy();
 		

@@ -120,6 +120,11 @@ public class Future implements IFuture
     	    	   	callers.put(caller, CALLER_SUSPENDED);
 //    				System.out.println(this+" caller suspending: "+caller+" "+mon);
     				caller.suspend(timeout);
+    		    	if(exception!=null)
+    		    	{
+    		    		// Nest exception to have both calling and manually set exception stack trace.
+    		    		exception	= new RuntimeException(exception);
+    		    	}
 //    				System.out.println(this+" caller awoke: "+caller+" "+mon);
     			}
     			// else already resumed.
