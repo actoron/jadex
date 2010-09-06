@@ -20,6 +20,8 @@ import javax.swing.border.TitledBorder;
  */
 public class PropertiesPanel	extends	JPanel
 {
+	//-------- attributes --------
+	
 	/** The grid bag constraints. */
 	protected GridBagConstraints	gbc;
 	

@@ -172,8 +172,8 @@ public class ComponentTreeModel implements TreeModel
 		assert SwingUtilities.isEventDispatchThread();
 		
 		List path = buildTreePath(node);
-		
-//		System.err.println(""+hashCode()+" Path changed: "+node+", "+path+", "+node.getCachedChildren());
+
+		System.err.println(""+hashCode()+" Path changed: "+node+", "+path+", "+node.getCachedChildren());
 		
 		for(int i=0; i<listeners.size(); i++)
 		{
