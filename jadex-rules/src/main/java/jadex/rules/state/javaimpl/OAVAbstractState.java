@@ -1277,6 +1277,8 @@ public abstract class OAVAbstractState	implements IOAVState
 	public boolean containsKey(Object id, OAVAttributeType attribute, Object key)
 	{
 		// #ifndef MIDP
+		if(!generator.isId(id))
+			System.out.println("no id: "+id);
 		assert nocheck || generator.isId(id);
 		assert nocheck || checkValidStateObjectRead(id);
 		assert nocheck || checkTypeHasAttribute(id, attribute);

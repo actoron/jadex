@@ -1,5 +1,7 @@
 package jadex.bdi.model;
 
+import jadex.bridge.Argument;
+import jadex.bridge.IArgument;
 import jadex.commons.SReflect;
 import jadex.rules.rulesystem.IPatternMatcherFunctionality;
 import jadex.rules.rulesystem.IRule;
@@ -109,6 +111,13 @@ public class OAVAgentModel	extends OAVCapabilityModel
 			"getPlatformComponent", "getTime", "getClassLoader", "addAgentListener", 
 			"removeAgentListener"
 			});
+		
+		// Init the arguments.
+		IArgument[] args = getModelInfo().getArguments();
+		for(int i=0; i<args.length; i++)
+		{
+			OAVCapabilityModel.initArgument(((Argument)args[i]), state, getHandle());
+		}
 		
 //		Map ret = super.getProperties();
 //		

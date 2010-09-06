@@ -3002,7 +3002,7 @@ public class AgentRules
 				name = (String)state.getAttributeValue(refelem, OAVBDIMetaModel.elementreference_has_concrete);
 				if(name!=null)
 				{
-					ret = resolveCapability(name, type, mcapa, state, true);
+					ret = resolveMCapability(name, type, mcapa, state, true);
 				}
 				else
 				{
