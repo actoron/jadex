@@ -620,16 +620,16 @@ public abstract class AbstractPlan implements java.io.Serializable //, IPlan
 		return (IInternalEvent)SFlyweightFunctionality.createInternalEvent(state, rcapa, type, false);
 	}
 
-	/**
-	 *  Create a new intenal event.
-	 *  @return The new intenal event.
-	 *  @deprecated Convenience method for easy conversion to new explicit internal events.
-	 *  Will be removed in later releases.
-	 * /
-	public IInternalEvent createInternalEvent(String type, Object content)
-	{
-		return capability.getEventbase().createInternalEvent(type, content);
-	}*/
+//	/**
+//	 *  Create a new intenal event.
+//	 *  @return The new intenal event.
+//	 *  @deprecated Convenience method for easy conversion to new explicit internal events.
+//	 *  Will be removed in later releases.
+//	 * /
+//	public IInternalEvent createInternalEvent(String type, Object content)
+//	{
+//		return capability.getEventbase().createInternalEvent(type, content);
+//	}*/
 
 	//-------- gui methods --------
 

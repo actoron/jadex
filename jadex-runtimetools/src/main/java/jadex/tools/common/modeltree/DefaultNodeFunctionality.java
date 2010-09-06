@@ -132,7 +132,7 @@ public class	DefaultNodeFunctionality
 	}
 	
 	/**
-	 *  Get the children opf a node.
+	 *  Get the children of a node.
 	 */
 	public List	getChildren(FileNode node)
 	{

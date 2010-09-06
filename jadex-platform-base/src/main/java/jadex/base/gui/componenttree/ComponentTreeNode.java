@@ -18,6 +18,7 @@ import java.util.List;
 
 import javax.swing.Icon;
 import javax.swing.JComponent;
+import javax.swing.JTree;
 
 /**
  *  Node object representing a service container.
@@ -47,10 +48,10 @@ public class ComponentTreeNode	extends AbstractComponentTreeNode implements IAct
 	/**
 	 *  Create a new service container node.
 	 */
-	public ComponentTreeNode(IComponentTreeNode parent, ComponentTreeModel model, IComponentDescription desc,
+	public ComponentTreeNode(IComponentTreeNode parent, ComponentTreeModel model, JTree tree, IComponentDescription desc,
 		IComponentManagementService cms, Component ui, ComponentIconCache iconcache)
 	{
-		super(parent, model);
+		super(parent, model, tree);
 		this.desc	= desc;
 		this.cms	= cms;
 		this.ui	= ui;
@@ -195,7 +196,7 @@ public class ComponentTreeNode	extends AbstractComponentTreeNode implements IAct
 						{
 							ServiceContainerNode	scn	= (ServiceContainerNode)getModel().getNode(desc.getName().getName()+"ServiceContainer");
 							if(scn==null)
-								scn	= new ServiceContainerNode(ComponentTreeNode.this, getModel(), (IServiceContainer)ea.getServiceProvider());
+								scn	= new ServiceContainerNode(ComponentTreeNode.this, getModel(), getTree(), (IServiceContainer)ea.getServiceProvider());
 //							System.err.println(getModel().hashCode()+", "+ready.hashCode()+" searchChildren.add "+scn);
 							children.add(0, scn);
 							
@@ -205,7 +206,7 @@ public class ComponentTreeNode	extends AbstractComponentTreeNode implements IAct
 								IService service	= (IService)services.get(i);
 								ServiceNode	sn	= (ServiceNode)getModel().getNode(service.getServiceIdentifier());
 								if(sn==null)
-									sn	= new ServiceNode(scn, getModel(), service);
+									sn	= new ServiceNode(scn, getModel(), getTree(), service);
 								subchildren.add(sn);
 							}
 							
@@ -264,11 +265,11 @@ public class ComponentTreeNode	extends AbstractComponentTreeNode implements IAct
 					boolean proxy = "jadex.base.service.remote.Proxy".equals(exta.getModel().getFullName());
 					if(proxy)
 					{
-						node = new ProxyComponentTreeNode(ComponentTreeNode.this, getModel(), desc, cms, ui, iconcache);
+						node = new ProxyComponentTreeNode(ComponentTreeNode.this, getModel(), getTree(), desc, cms, ui, iconcache);
 					}
 					else
 					{
-						node = new ComponentTreeNode(ComponentTreeNode.this, getModel(), desc, cms, ui, iconcache);
+						node = new ComponentTreeNode(ComponentTreeNode.this, getModel(), getTree(), desc, cms, ui, iconcache);
 					}
 				}
 				ret.setResult(node);
@@ -330,14 +331,6 @@ public class ComponentTreeNode	extends AbstractComponentTreeNode implements IAct
 		if(propcomp==null)
 		{
 			propcomp	= new ComponentProperties();
-			cms.getExternalAccess(desc.getName()).addResultListener(new SwingDefaultResultListener(ui)
-			{
-				public void customResultAvailable(Object source, Object result)
-				{
-					IExternalAccess	ea	= (IExternalAccess)result;
-					propcomp.setModelname(ea.getModel().getFullName());
-				}
-			});
 		}
 		propcomp.setDescription(desc);
 		return propcomp;

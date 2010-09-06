@@ -736,7 +736,7 @@ public class ComponentTreePanel extends JSplitPane
 								root	= descriptions[i];
 							}
 						}
-						model.setRoot(new ComponentTreeNode(null, model, root, cms, ComponentTreePanel.this, cic));
+						model.setRoot(new ComponentTreeNode(null, model, tree, root, cms, ComponentTreePanel.this, cic));
 						// Expand root node.
 						TreeExpansionHandler	teh	= new TreeExpansionHandler(tree);
 						teh.treeExpanded(new TreeExpansionEvent(tree, new TreePath(model.getRoot())));

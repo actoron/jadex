@@ -16,6 +16,7 @@ import java.util.List;
 
 import javax.swing.Icon;
 import javax.swing.JComponent;
+import javax.swing.JTree;
 
 /**
  *  Node for a virtual component, i.e. a node for a remote component.
@@ -48,10 +49,10 @@ public class VirtualComponentTreeNode extends AbstractComponentTreeNode implemen
 	/**
 	 *  Create a new service container node.
 	 */
-	public VirtualComponentTreeNode(IComponentTreeNode parent, ComponentTreeModel model, IComponentDescription desc,
+	public VirtualComponentTreeNode(IComponentTreeNode parent, ComponentTreeModel model, JTree tree, IComponentDescription desc,
 		IComponentManagementService cms, Component ui, ComponentIconCache iconcache)
 	{
-		super(parent, model);
+		super(parent, model, tree);
 		this.desc = desc;
 		this.cms = cms;
 		this.ui = ui;
@@ -197,14 +198,6 @@ public class VirtualComponentTreeNode extends AbstractComponentTreeNode implemen
 		if(propcomp==null)
 		{
 			propcomp	= new ComponentProperties();
-			cms.getExternalAccess(desc.getName()).addResultListener(new SwingDefaultResultListener(ui)
-			{
-				public void customResultAvailable(Object source, Object result)
-				{
-					IExternalAccess	ea	= (IExternalAccess)result;
-					propcomp.setModelname(ea.getModel().getFullName());
-				}
-			});
 		}
 		propcomp.setDescription(desc);
 		return propcomp;

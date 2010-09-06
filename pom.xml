@@ -367,6 +367,7 @@
 				<module>jadex-nuggets</module>
 
 				<module>jadex-kernel-application</module>
+				<!-- <module>jadex-kernel-application</module> --><!-- Not yet possible due to jogl libraries not in maven repo -->
 				<module>jadex-kernel-bdi</module>
 				<module>jadex-kernel-micro</module>
 				<module>jadex-kernel-bpmn</module>
@@ -386,8 +387,7 @@
 
 				<module>jadex-runtimetools</module>
 				<module>jadex-platform-standalone</module>
-				<module>jadex-platform-standalone-launch</module>
-				<!-- <module>jadex-apleis</module> -->
+
 			</modules>
 		</profile>
 

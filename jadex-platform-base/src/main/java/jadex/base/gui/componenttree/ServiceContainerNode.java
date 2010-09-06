@@ -4,6 +4,7 @@ import jadex.commons.SGUI;
 import jadex.commons.service.IServiceContainer;
 
 import javax.swing.Icon;
+import javax.swing.JTree;
 import javax.swing.UIDefaults;
 
 /**
@@ -29,9 +30,9 @@ public class ServiceContainerNode	extends AbstractComponentTreeNode
 	/**
 	 *  Create a new service container node.
 	 */
-	public ServiceContainerNode(IComponentTreeNode parent, ComponentTreeModel model, IServiceContainer container)
+	public ServiceContainerNode(IComponentTreeNode parent, ComponentTreeModel model, JTree tree, IServiceContainer container)
 	{
-		super(parent, model);
+		super(parent, model, tree);
 		this.container = container;
 		model.registerNode(this);
 	}

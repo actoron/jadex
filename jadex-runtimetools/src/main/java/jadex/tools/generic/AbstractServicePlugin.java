@@ -2,8 +2,6 @@ package jadex.tools.generic;
 
 import jadex.base.gui.componentviewer.IComponentViewerPanel;
 import jadex.base.gui.componentviewer.IServiceViewerPanel;
-import jadex.bridge.IComponentDescription;
-import jadex.bridge.IComponentIdentifier;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.concurrent.SwingDefaultResultListener;
@@ -11,9 +9,7 @@ import jadex.commons.service.IService;
 import jadex.commons.service.SServiceProvider;
 
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Set;
 
 import javax.swing.Icon;
 

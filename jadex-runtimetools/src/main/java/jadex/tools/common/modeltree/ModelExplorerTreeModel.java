@@ -200,7 +200,7 @@ public class ModelExplorerTreeModel implements TreeModel
 	public void setRoot(RootNode root)
 	{
 		this.root	= root;
-		fireTreeStructureChanged(root);
+//		fireTreeStructureChanged(root);	// Done outside.
 	}
 
 	/**

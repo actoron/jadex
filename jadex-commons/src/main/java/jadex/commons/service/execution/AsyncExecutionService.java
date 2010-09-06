@@ -246,29 +246,36 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 			{
 				public void resultAvailable(Object source, Object result)
 				{
-					threadpool = (IThreadPoolService)result;
-					
-					running	= true;
-					
-					if(!executors.isEmpty())
+					try
 					{
-						// Resume all suspended tasks.
-						IExecutable[] keys = (IExecutable[])executors.keySet()
-							.toArray(new IExecutable[executors.size()]);
-						for(int i=0; i<keys.length; i++)
-							execute(keys[i]);
-					}
-					else if(idlecommands!=null)
-					{
-			//			System.out.println("restart: idle");
-						Iterator it	= idlecommands.iterator();
-						while(it.hasNext())
+						threadpool = (IThreadPoolService)result;
+						
+						running	= true;
+						
+						if(!executors.isEmpty())
 						{
-							((ICommand)it.next()).execute(null);
+							// Resume all suspended tasks.
+							IExecutable[] keys = (IExecutable[])executors.keySet()
+								.toArray(new IExecutable[executors.size()]);
+							for(int i=0; i<keys.length; i++)
+								execute(keys[i]);
 						}
+						else if(idlecommands!=null)
+						{
+				//			System.out.println("restart: idle");
+							Iterator it	= idlecommands.iterator();
+							while(it.hasNext())
+							{
+								((ICommand)it.next()).execute(null);
+							}
+						}
+						
+						ret.setResult(null);
 					}
-					
-					ret.setResult(null);
+					catch(RuntimeException e)
+					{
+						ret.setException(e);
+					}
 				}
 				
 				public void exceptionOccurred(Object source, Exception exception)

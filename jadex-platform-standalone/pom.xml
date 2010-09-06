@@ -153,17 +153,5 @@
 			<artifactId>jadex-platform-base</artifactId>
 			<version>2.0-rc4</version>
 		</dependency>
-		
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-beans</artifactId>
-			<version>2.5.6</version>
-		</dependency>
-		
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-context</artifactId>
-			<version>2.5.6</version>
-		</dependency>
 	</dependencies>
 </project>

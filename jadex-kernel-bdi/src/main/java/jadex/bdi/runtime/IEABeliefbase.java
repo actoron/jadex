@@ -62,26 +62,26 @@ public interface IEABeliefbase extends IEAElement
 //	 */
 //	public void createBelief(String key, Class clazz, int update);
 
-	/**
-	 *  Create a belief with given key and class.
-	 *  @param key The key identifying the belief.
-	 *  @param clazz The class.
-	 *  @deprecated
-	 */
+//	/**
+//	 *  Create a belief with given key and class.
+//	 *  @param key The key identifying the belief.
+//	 *  @param clazz The class.
+//	 *  @deprecated
+//	 */
 //	public void createBeliefSet(String key, Class clazz, int update);
 
-	/**
-	 *  Delete a belief with given key.
-	 *  @param key The key identifying the belief.
-	 *  @deprecated
-	 */
+//	/**
+//	 *  Delete a belief with given key.
+//	 *  @param key The key identifying the belief.
+//	 *  @deprecated
+//	 */
 //	public void deleteBelief(String key);
 
-	/**
-	 *  Delete a belief with given key.
-	 *  @param key The key identifying the belief.
-	 *  @deprecated
-	 */
+//	/**
+//	 *  Delete a belief with given key.
+//	 *  @param key The key identifying the belief.
+//	 *  @deprecated
+//	 */
 //	public void deleteBeliefSet(String key);
 
 	/**

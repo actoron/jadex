@@ -51,19 +51,19 @@ class TCPOutputConnection
 	public TCPOutputConnection(InetAddress iaddr, int iport, CodecFactory codecfac, 
 		Cleaner cleaner, ClassLoader classloader) throws IOException
 	{
-		try
-		{
-			System.out.println("TCP Connection: "+iaddr+":"+iport);
+//		try
+//		{
+//			System.out.println("TCP Connection: "+iaddr+":"+iport);
 			this.sock = new Socket();
 			sock.connect(new InetSocketAddress(iaddr, iport), TIMEOUT);
-			System.out.println("TCP Connection: "+iaddr+":"+iport+" established");
-		}
-		catch(IOException e)
-		{
-			System.out.println("TCP Connection: "+iaddr+":"+iport+" failed");
-//			e.printStackTrace();
-			throw e;
-		}
+//			System.out.println("TCP Connection: "+iaddr+":"+iport+" established");
+//		}
+//		catch(IOException e)
+//		{
+//			System.out.println("TCP Connection: "+iaddr+":"+iport+" failed");
+////			e.printStackTrace();
+//			throw e;
+//		}
 		this.sos = new BufferedOutputStream(sock.getOutputStream());
 		this.codecfac = codecfac;
 		this.cleaner = cleaner;

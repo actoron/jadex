@@ -707,7 +707,14 @@ public class MessageService extends BasicService implements IMessageService
 			{
 				public void resultAvailable(Object source, Object result)
 				{
-					((IExecutionService)result).execute(SendMessage.this);
+					try
+					{
+						((IExecutionService)result).execute(SendMessage.this);
+					}
+					catch(RuntimeException e)
+					{
+						// ignore if execution service is shutting down.
+					}						
 				}
 			});
 		}
@@ -770,7 +777,14 @@ public class MessageService extends BasicService implements IMessageService
 			{
 				public void resultAvailable(Object source, Object result)
 				{
-					((IExecutionService)result).execute(DeliverMessage.this);
+					try
+					{
+						((IExecutionService)result).execute(DeliverMessage.this);
+					}
+					catch(RuntimeException e)
+					{
+						// ignore if execution service is shutting down.
+					}
 				}
 			});
 		}

@@ -54,13 +54,13 @@ public interface IBDIExternalAccess extends IExternalAccess, IEACapability
 	 */
 	public IFuture createInternalEvent(String type);
 
-	/**
-	 *  Create a new intenal event.
-	 *  @return The new intenal event.
-	 *  @deprecated Convenience method for easy conversion to new explicit internal events.
-	 *  Will be removed in later releases.
-	 * /
-	public IInternalEvent createInternalEvent(String type, Object content);*/
+//	/**
+//	 *  Create a new intenal event.
+//	 *  @return The new intenal event.
+//	 *  @deprecated Convenience method for easy conversion to new explicit internal events.
+//	 *  Will be removed in later releases.
+//	 * /
+//	public IInternalEvent createInternalEvent(String type, Object content);*/
 
 	//-------- methods --------
 

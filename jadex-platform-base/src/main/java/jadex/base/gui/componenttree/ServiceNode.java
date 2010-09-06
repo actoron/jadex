@@ -8,6 +8,7 @@ import java.lang.reflect.Proxy;
 
 import javax.swing.Icon;
 import javax.swing.JComponent;
+import javax.swing.JTree;
 import javax.swing.UIDefaults;
 
 /**
@@ -36,9 +37,9 @@ public class ServiceNode	extends AbstractComponentTreeNode
 	/**
 	 *  Create a new service container node.
 	 */
-	public ServiceNode(IComponentTreeNode parent, ComponentTreeModel model, IService service)
+	public ServiceNode(IComponentTreeNode parent, ComponentTreeModel model, JTree tree, IService service)
 	{
-		super(parent, model);
+		super(parent, model, tree);
 		this.service	= service;
 //		if(service==null || service.getServiceIdentifier()==null)
 //			System.out.println("service node: "+this);

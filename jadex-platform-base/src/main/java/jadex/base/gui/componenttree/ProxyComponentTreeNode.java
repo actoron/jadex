@@ -13,7 +13,6 @@ import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.commons.gui.CombiIcon;
 import jadex.commons.service.IService;
-import jadex.commons.service.IServiceContainer;
 import jadex.micro.IMicroExternalAccess;
 
 import java.awt.Component;
@@ -25,6 +24,7 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.swing.Icon;
+import javax.swing.JTree;
 import javax.swing.Timer;
 import javax.swing.UIDefaults;
 
@@ -61,10 +61,10 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 	/**
 	 *  Create a new service container node.
 	 */
-	public ProxyComponentTreeNode(final IComponentTreeNode parent, ComponentTreeModel model, IComponentDescription desc,
+	public ProxyComponentTreeNode(final IComponentTreeNode parent, ComponentTreeModel model, JTree tree, IComponentDescription desc,
 		IComponentManagementService cms, Component ui, ComponentIconCache iconcache)
 	{
-		super(parent, model, desc, cms, ui, iconcache);
+		super(parent, model, tree, desc, cms, ui, iconcache);
 		this.connected = false;
 		
 		timer = new Timer(10000, new ActionListener()
@@ -190,7 +190,7 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 									IComponentTreeNode node = proxy.getModel().getNode(descs[i].getName());
 									if(node==null)
 									{
-										node = new VirtualComponentTreeNode(parentnode, proxy.getModel(), descs[i], cms, ui, iconcache);
+										node = new VirtualComponentTreeNode(parentnode, proxy.getModel(), proxy.getTree(), descs[i], cms, ui, iconcache);
 									}
 //									System.err.println(proxy.getModel().hashCode()+", "+ready.hashCode()+" searchChildren.add "+node);
 									children.add(node);
@@ -227,7 +227,7 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 									ServiceContainerNode scn = (ServiceContainerNode)
 										proxy.getModel().getNode(desc.getName().getName()+"ServiceContainer");
 									if(scn==null)
-										scn	= new ServiceContainerNode(parentnode, proxy.getModel(), null);
+										scn	= new ServiceContainerNode(parentnode, proxy.getModel(), proxy.getTree(), null);
 //									System.err.println(proxy.getModel().hashCode()+", "+ready.hashCode()+" searchChildren.add "+scn);
 									children.add(0, scn);
 									final List subchildren = new ArrayList();
@@ -236,7 +236,7 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 										IService service = (IService)services.get(i);
 										ServiceNode	sn = (ServiceNode)proxy.getModel().getNode(service.getServiceIdentifier());
 										if(sn==null)
-											sn = new ServiceNode(scn, proxy.getModel(), service);
+											sn = new ServiceNode(scn, proxy.getModel(), proxy.getTree(), service);
 										subchildren.add(sn);
 									}
 									

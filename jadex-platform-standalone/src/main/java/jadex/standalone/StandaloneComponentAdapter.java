@@ -43,7 +43,14 @@ public class StandaloneComponentAdapter	extends AbstractComponentAdapter	impleme
 		{
 			public void resultAvailable(Object source, Object result)
 			{
-				((IExecutionService)result).execute(StandaloneComponentAdapter.this);
+				try
+				{
+					((IExecutionService)result).execute(StandaloneComponentAdapter.this);
+				}
+				catch(RuntimeException e)
+				{
+					// ignore if service is shutting down.
+				}
 			}
 		});
 	}

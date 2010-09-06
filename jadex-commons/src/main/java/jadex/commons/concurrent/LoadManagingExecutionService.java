@@ -170,7 +170,14 @@ public class LoadManagingExecutionService
 
 			if(!tasks.isEmpty())
 			{
-				executor.execute();
+				try
+				{
+					executor.execute();
+				}
+				catch(Exception e)
+				{
+					// Ignore when threadpool is shut down.
+				}
 			}
 //			else
 //			{

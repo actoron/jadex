@@ -33,10 +33,13 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -50,7 +53,6 @@ import javax.swing.JTree;
 import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
 import javax.swing.UIDefaults;
-import javax.swing.event.TreeExpansionEvent;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.event.TreeSelectionEvent;
@@ -335,26 +337,6 @@ public class ModelExplorer extends JTree
 	}
 
 	/**
-	 *  Struct for storing Tree proeprties.
-	 */
-	public static class	ModelExplorerProperties
-	{
-		/** The root node. */
-		protected RootNode	root;
-		/** The selected node (if any). */
-		protected FileNode	selected;
-		/** This list of expanded nodes. */
-		protected List	expanded;
-		
-		public RootNode	getRootNode(){return root;}
-		public FileNode	getSelectedNode(){return selected;}
-		public List	getExpandedNodes(){return expanded;}
-		public void	setRootNode(RootNode root){this.root=root;}
-		public void	setSelectedNode(FileNode selected){this.selected=selected;}
-		public void	setExpandedNodes(List expanded){this.expanded=expanded;}
-	}
-	
-	/**
 	 *  Write current state into properties.
 	 */
 	public Properties	getProperties()
@@ -362,10 +344,10 @@ public class ModelExplorer extends JTree
 		Properties	props	= new Properties();
 		// Save tree properties.
 		ModelExplorerProperties	mep	= new ModelExplorerProperties();
-		mep.root	= getRootNode();
-		mep.selected	= getSelectionPath()==null ? null
-			: (FileNode)getSelectionPath().getLastPathComponent();
-		mep.expanded	= new ArrayList();
+		mep.setRootPathEntries(getRootNode().getPathEntries());
+		mep.setSelectedNode(getSelectionPath()==null ? null
+			: NodePath.createNodePath((FileNode)getSelectionPath().getLastPathComponent()));
+		List	expanded	= new ArrayList();
 		Enumeration exp = getExpandedDescendants(new TreePath(getRootNode()));
 		if(exp!=null)
 		{
@@ -374,14 +356,14 @@ public class ModelExplorer extends JTree
 				TreePath	path	= (TreePath)exp.nextElement();
 				if(path.getLastPathComponent() instanceof FileNode)
 				{
-					mep.expanded.add(path.getLastPathComponent());
+					expanded.add(NodePath.createNodePath((FileNode)path.getLastPathComponent()));
 				}
 			}
 		}
+		mep.setExpandedNodes((NodePath[])expanded.toArray(new NodePath[expanded.size()]));
 		// todo: remove ThreadSuspendable()
 		ClassLoader cl = ((ILibraryService)SServiceProvider.getService(provider, ILibraryService.class).get(new ThreadSuspendable())).getClassLoader();
 		String	treesave	= JavaWriter.objectToXML(mep, cl);	// Doesn't support inner classes: ModelExplorer$ModelExplorerProperties
-//		String	treesave	= Nuggets.objectToXML(mep, cl);
 		props.addProperty(new Property("tree", treesave));
 				
 		// Save the last loaded file.
@@ -428,16 +410,17 @@ public class ModelExplorer extends JTree
 				ClassLoader cl = ls.getClassLoader();
 				ModelExplorerProperties	mep	= (ModelExplorerProperties)JavaReader.objectFromXML(treexml, cl); 	// Doesn't support inner classes: ModelExplorer$ModelExplorerProperties
 //				ModelExplorerProperties	mep	= (ModelExplorerProperties)Nuggets.objectFromXML(treexml, cl);
-				this.root	= mep.root;
+				this.root	= new RootNode();
+				String[]	entries	= mep.getRootPathEntries();
+				for(int i=0; i<entries.length; i++)
+					root.addPathEntry(new File(entries[i]));
 				((ModelExplorerTreeModel)getModel()).setRoot(this.root);
 
 				// Select the last selected model in the tree.
-				expansionhandler.setSelectedNode(mep.selected);
+				expansionhandler.setSelectedPath(mep.getSelectedNode());
 
 				// Load the expanded tree nodes.
-				for(int i=0; i<mep.expanded.size(); i++)
-					expansionhandler.treeExpanded(new TreeExpansionEvent(
-						this, new TreePath(mep.expanded.get(i))));
+				expansionhandler.setExpandedPaths(mep.getExpandedNodes());
 
 				((ModelExplorerTreeModel)getModel()).fireTreeStructureChanged(getRootNode());
 			}
@@ -773,6 +756,13 @@ public class ModelExplorer extends JTree
 		// Hack!!! Move to treeselection listener.
 		protected FileNode	lastselected;
 
+		/** The node that was selected before the current project was last saved. */
+		// Hack!!! Move to treeselection listener.
+		protected NodePath	lastselectedpath;
+
+		/** The expanded node paths. */
+		protected Set	expandedpaths;
+
 		//-------- constructors --------
 		
 		/**
@@ -794,10 +784,35 @@ public class ModelExplorer extends JTree
 		}
 	
 		/**
+		 *  Set the selected path.
+		 */
+		public void	setSelectedPath(NodePath path)
+		{
+			this.lastselectedpath	= path;
+		}
+	
+		/**
+		 *  Set the expanded paths.
+		 */
+		public void	setExpandedPaths(NodePath[]	paths)
+		{
+			this.expandedpaths	= new HashSet();
+			expandedpaths.addAll(Arrays.asList(paths));
+		}
+	
+		/**
 		 *  Check if an action (e.g. expand) has to be performed on the path.
 		 */
 		protected IFuture handlePath(final TreePath path)
 		{
+			// Move from paths (loaded) to expanded nodes (created dynamically).
+			if(expandedpaths!=null && expandedpaths.remove(NodePath.createNodePath((FileNode)path.getLastPathComponent())))
+			{
+				expanded.add(path.getLastPathComponent());
+				if(expandedpaths.isEmpty())
+					expandedpaths	= null;
+			}
+			
 			IFuture	ret	= super.handlePath(path);
 		
 			ret.addResultListener(new IResultListener()
@@ -808,6 +823,14 @@ public class ModelExplorer extends JTree
 					if(lastselected!=null && lastselected.equals(path.getLastPathComponent()))
 					{
 						lastselected	= null;
+						lastselectedpath	= null;
+						tree.setSelectionPath(path);
+						tree.scrollPathToVisible(path);
+					}
+					else if(lastselectedpath!=null && lastselectedpath.equals(NodePath.createNodePath((FileNode)path.getLastPathComponent())))
+					{
+						lastselected	= null;
+						lastselectedpath	= null;
 						tree.setSelectionPath(path);
 						tree.scrollPathToVisible(path);
 					}

@@ -47,6 +47,7 @@ public class ComponentProperties	extends	PropertiesPanel
 	{
 		getTextField("Name").setText(desc.getName().getName());
 		getTextField("Type").setText(desc.getType());
+		getTextField("Model name").setText(desc.getModelName());
 		getTextField("Ownership").setText(desc.getOwnership());
 		getTextField("State").setText(desc.getState());
 		getTextField("Processing state").setText(desc.getProcessingState());
@@ -59,13 +60,5 @@ public class ComponentProperties	extends	PropertiesPanel
 		DefaultTableModel	dtm	= new DefaultTableModel();
 		dtm.addColumn("Addresses", addresses!=null?addresses:SUtil.EMPTY_STRING_ARRAY);
 		list.setModel(dtm);
-	}
-	
-	/**
-	 *  Set the model name.
-	 */
-	public void	setModelname(String name)
-	{
-		getTextField("Model name").setText(name);
 	}
 }

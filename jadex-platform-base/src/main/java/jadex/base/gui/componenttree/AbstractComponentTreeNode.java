@@ -9,7 +9,9 @@ import java.util.List;
 
 import javax.swing.Icon;
 import javax.swing.JComponent;
+import javax.swing.JTree;
 import javax.swing.SwingUtilities;
+import javax.swing.tree.TreePath;
 
 
 /**
@@ -25,6 +27,10 @@ public abstract class AbstractComponentTreeNode	implements IComponentTreeNode
 	/** The tree model. */
 	private final ComponentTreeModel	model;
 	
+	/** The tree. */
+	// Hack!!! Model should not have access to ui, required for refresh only on expanded nodes.
+	private final JTree	tree;
+	
 	/** The component description. */
 	private List	children;
 	
@@ -39,10 +45,11 @@ public abstract class AbstractComponentTreeNode	implements IComponentTreeNode
 	/**
 	 *  Create a node.
 	 */
-	public AbstractComponentTreeNode(IComponentTreeNode parent, ComponentTreeModel model)
+	public AbstractComponentTreeNode(IComponentTreeNode parent, ComponentTreeModel model, JTree tree)
 	{
 		this.parent	= parent;
 		this.model	= model;
+		this.tree	= tree;
 	}
 	
 	//-------- IComponentTreeNode interface --------
@@ -134,7 +141,7 @@ public abstract class AbstractComponentTreeNode	implements IComponentTreeNode
 		else
 		{
 			// If search in progress upgrade to recursive, but do not downgrade.
-			this.recurse	= this.recurse || recurse;			
+			this.recurse	= this.recurse || recurse;
 		}
 	}
 	
@@ -282,7 +289,7 @@ public abstract class AbstractComponentTreeNode	implements IComponentTreeNode
 					throw e;
 				}
 				
-				if(dorecurse)
+				if(dorecurse && tree.isExpanded(new TreePath(model.buildTreePath(AbstractComponentTreeNode.this).toArray())))
 				{
 					for(int i=0; children!=null && i<children.size(); i++)
 					{
@@ -303,6 +310,14 @@ public abstract class AbstractComponentTreeNode	implements IComponentTreeNode
 	public ComponentTreeModel	getModel()
 	{
 		return model;
+	}
+
+	/**
+	 *  Get the tree.
+	 */
+	public JTree	getTree()
+	{
+		return tree;
 	}
 
 	/**
