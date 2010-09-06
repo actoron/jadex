@@ -248,11 +248,11 @@ public abstract class AbstractComponentTreeNode	implements IComponentTreeNode
 					{
 						model.addNode((IComponentTreeNode)children.get(i));
 					}
-					System.err.println(""+model.hashCode()+" tree change: "+AbstractComponentTreeNode.this+"#"+AbstractComponentTreeNode.this.hashCode());
-					System.err.println(""+model.hashCode()+" added: "+added);
-					System.err.println(""+model.hashCode()+" removed: "+removed);
-					System.err.println(""+model.hashCode()+" children: "+children);
-					System.err.println(""+model.hashCode()+" oldcs: "+oldcs);
+//					System.err.println(""+model.hashCode()+" tree change: "+AbstractComponentTreeNode.this+"#"+AbstractComponentTreeNode.this.hashCode());
+//					System.err.println(""+model.hashCode()+" added: "+added);
+//					System.err.println(""+model.hashCode()+" removed: "+removed);
+//					System.err.println(""+model.hashCode()+" children: "+children);
+//					System.err.println(""+model.hashCode()+" oldcs: "+oldcs);
 					model.fireTreeChanged(AbstractComponentTreeNode.this);			
 				}
 				else if(!added.isEmpty())
