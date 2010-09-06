@@ -30,6 +30,9 @@
 			<Data name="Chassisbaubillig">$kivsEval.Chassisbaubillig</Data>
 			<Data name="Chassisbaunormal">$kivsEval.Chassisbaunormal</Data>
 			<Data name="Chassisbauteuer">$kivsEval.Chassisbauteuer</Data>
+			<Data name="ChassisbaubilligTrustValue">$kivsEval.ChassisbaubilligTrustValue</Data>
+			<Data name="ChassisbaunormalTrustValue">$kivsEval.ChassisbaunormalTrustValue</Data>
+			<Data name="ChassisbauteuerTrustValue">$kivsEval.ChassisbauteuerTrustValue</Data>
 		</Dataprovider>
 	</Dataproviders>
 
@@ -59,6 +62,9 @@
 				<Property name="Chassisbaubillig" filter="last"/>
 				<Property name="Chassisbaunormal" filter="last"/>
 				<Property name="Chassisbauteuer" filter="last"/>
+				<Property name="ChassisbaubilligTrustValue" filter="last"/>
+				<Property name="ChassisbaunormalTrustValue" filter="last"/>
+				<Property name="ChassisbauteuerTrustValue" filter="last"/>
 		</Dataconsumer>				
 	</Dataconsumers>
 
@@ -120,7 +126,7 @@
 		</General>
 		<Rows experiments="1">
 			<TerminateCondition>
-				  <Time value="15000" type="relative" />				
+				  <Time value="90000" type="relative" />				
 					<!--<TargetFunction function="$object.getProperty(&quot;executedWorkflows&quot;) >=
 					50">	<ObjectSource type="ISpaceObject" name="moneyBankOfSMA" /> </TargetFunction>
 														-->					

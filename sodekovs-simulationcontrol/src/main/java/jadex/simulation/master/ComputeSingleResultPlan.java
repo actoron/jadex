@@ -63,15 +63,16 @@ public class ComputeSingleResultPlan extends Plan {
 		// Sorted output of results
 		for (Object key : sortedResultList) {
 			ArrayList<ObservedEvent> values = (ArrayList<ObservedEvent>) observedEventsMap.get(key);
-			String tmp = "";
+//			String tmp = "";
 
 			for (ObservedEvent event : values) {
-				tmp += " - " + event.toString();
+//				tmp += " - " + event.toString();
+				
 				// Persist value
 				// XMLHandler.writeXML(event, "abcresult.xml",
 				// ObservedEvent.class);
 			}
-			System.out.println(key.toString() + " : " + tmp);
+//			System.out.println(key.toString() + " : " + tmp);
 		}
 
 		String res = "ID: " + experimentRow + "." + expInRow + " - Total #" + totalRuns + " (Size of ObservedEvents: " + sortedResultList.size() + ") ***********************************";
