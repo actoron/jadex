@@ -272,8 +272,8 @@ public class ControlCenterWindow extends JFrame
 		file.add(new JMenuItem(SAVE_PROJECT));
         file.add(new JMenuItem(SAVE_PROJECT_AS));
 		file.addSeparator();
-		file.add(new JMenuItem(SETTINGS));
-		file.addSeparator();
+//		file.add(new JMenuItem(SETTINGS));
+//		file.addSeparator();
 		file.add(new JMenuItem(EXIT));
 		menubar.add(file, 0);	// prepend "File" menu.
 		
@@ -739,19 +739,19 @@ public class ControlCenterWindow extends JFrame
 		}
 	};
 
-	final AbstractAction SETTINGS = new AbstractAction("Settings...")
-	{
-		public void actionPerformed(ActionEvent ae)
-		{
-			JDialog f = new ConfigurationDialog(ControlCenterWindow.this);
-			f.pack();
-			Dimension size = Toolkit.getDefaultToolkit().getScreenSize();
-			int centerx = (int)size.getWidth()/2;
-			int centery = (int)size.getHeight()/2;
-			f.setLocation(centerx-f.getWidth()/2, centery-f.getHeight()/2);
-			f.setVisible(true);
-		}
-	};
+//	final AbstractAction SETTINGS = new AbstractAction("Settings...")
+//	{
+//		public void actionPerformed(ActionEvent ae)
+//		{
+//			JDialog f = new ConfigurationDialog(ControlCenterWindow.this);
+//			f.pack();
+//			Dimension size = Toolkit.getDefaultToolkit().getScreenSize();
+//			int centerx = (int)size.getWidth()/2;
+//			int centery = (int)size.getHeight()/2;
+//			f.setLocation(centerx-f.getWidth()/2, centery-f.getHeight()/2);
+//			f.setVisible(true);
+//		}
+//	};
 
 	/**
 	 *  Toolbar action for activating a plugin.
