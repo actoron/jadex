@@ -121,15 +121,18 @@ public class DealerOptionPanel	extends JPanel	//	implements ActionListener, Chan
 					{
 						GameStatistics stats = (GameStatistics)result;
 						
-						JFrame statsgui	= new JFrame("Blackjack Statistics");
-
-						// set the icon to be displayed for the frame
-						statsgui.setIconImage(GUIImageLoader.getImage("statistics").getImage());				
-						statsgui.getContentPane().add(new StatisticGraph(stats));
-						statsgui.setSize(400, 300);
-						statsgui.setLocation(SGUI.calculateMiddlePosition(statsgui));
-						statsgui.setVisible(true);
-						frame.addChildWindow(statsgui);
+						if(stats!=null)
+						{
+							JFrame statsgui	= new JFrame("Blackjack Statistics");
+	
+							// set the icon to be displayed for the frame
+							statsgui.setIconImage(GUIImageLoader.getImage("statistics").getImage());				
+							statsgui.getContentPane().add(new StatisticGraph(stats));
+							statsgui.setSize(400, 300);
+							statsgui.setLocation(SGUI.calculateMiddlePosition(statsgui));
+							statsgui.setVisible(true);
+							frame.addChildWindow(statsgui);
+						}
 					}
 				});
 			}

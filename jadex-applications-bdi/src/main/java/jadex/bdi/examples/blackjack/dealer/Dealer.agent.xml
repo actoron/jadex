@@ -428,6 +428,34 @@
 				<endgoal ref="df_deregister"/>
 			</goals>
 		</configuration>
+		
+		<configuration name="no_stats">
+			<beliefs>
+				<initialbelief ref="statistics">
+					<fact>null</fact>
+				</initialbelief>
+			</beliefs>
+			<goals>
+				<!-- Register the dealer at the df on startup. -->
+				<initialgoal ref="df_register">
+					<!-- The services to register. -->
+					<parameter ref="description">
+						<value>
+							<!-- This is the agent-description for the dealer. With this description
+							     the dealers is registered at the directory facilitator.
+							     Note, that the dealer only offers one service, that is 'dealing'
+							     (see service description below).	-->
+							$propertybase.getProperty("dfservice")
+								.createDFComponentDescription(null, $propertybase.getProperty("dfservice")
+								.createDFServiceDescription("dealing", "blackjack", "University of Hamburg"))
+	
+						</value>
+					</parameter>
+				</initialgoal>				
+				<initialgoal ref="play_game"/>
+				<endgoal ref="df_deregister"/>
+			</goals>
+		</configuration>
 	</configurations>
 
 </agent>

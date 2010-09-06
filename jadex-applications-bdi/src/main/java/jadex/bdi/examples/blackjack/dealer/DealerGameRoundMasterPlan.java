@@ -113,8 +113,9 @@ public class DealerGameRoundMasterPlan extends Plan
 		}
 
 		// Store history.
-		((GameStatistics)getBeliefbase().getBelief("statistics").getFact())
-			.addGameRound(me, players);
+		GameStatistics stats = (GameStatistics)getBeliefbase().getBelief("statistics").getFact();
+		if(stats!=null)
+			stats.addGameRound(me, players);
 
 		me.setState(Dealer.STATE_IDLE);
 
