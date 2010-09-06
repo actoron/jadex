@@ -20,6 +20,7 @@ public class CustomerFrame extends JFrame
 	 */
 	public CustomerFrame(final IBDIExternalAccess agent)
 	{
+		super(agent.getComponentIdentifier().getName());
 		add(new CustomerPanel(agent));
 		pack();
 		setLocation(SGUI.calculateMiddlePosition(this));

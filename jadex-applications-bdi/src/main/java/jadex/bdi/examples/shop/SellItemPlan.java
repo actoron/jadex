@@ -25,6 +25,7 @@ public class SellItemPlan extends Plan
 			getParameter("result").setValue(new ItemInfo(name, ii.getPrice(), 1));
 			ii.setQuantity(ii.getQuantity()-1);
 			getBeliefbase().getBeliefSet("catalog").modified(ii);
+			
 			double money = ((Double)getBeliefbase().getBelief("money").getFact()).doubleValue();
 			getBeliefbase().getBelief("money").setFact(new Double(money+price));
 		}

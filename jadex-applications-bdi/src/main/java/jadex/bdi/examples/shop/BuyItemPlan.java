@@ -17,10 +17,10 @@ public class BuyItemPlan extends Plan
 		IShop shop = (IShop)getParameter("shop").getValue();
 		String name	= (String)getParameter("name").getValue();
 		double price = ((Double)getParameter("price").getValue()).doubleValue();
-		double mon = ((Double)getBeliefbase().getBelief("money").getFact()).doubleValue();
+		double money = ((Double)getBeliefbase().getBelief("money").getFact()).doubleValue();
 
 		// Check if enough money to buy the item
-		if(mon<price)
+		if(money<price)
 			fail(new RuntimeException("Not enough money to buy: "+name));
 		
 		// Buy the item at the shop (the shop is a service at another agent)
@@ -45,6 +45,8 @@ public class BuyItemPlan extends Plan
 		}
 		
 		// Update the account
-		getBeliefbase().getBelief("money").setFact(new Double(mon-price));
+		// Re-read money, could have changed due to executed sell plan
+		money = ((Double)getBeliefbase().getBelief("money").getFact()).doubleValue();
+		getBeliefbase().getBelief("money").setFact(new Double(money-price));
 	}
 }
