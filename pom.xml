@@ -216,7 +216,7 @@
 								</goals>
 							</execution>
 						</executions>
-					</plugin>
+					</plugin><!-- 
 					<plugin>
 						<groupId>org.codehaus.mojo</groupId>
 						<artifactId>wagon-maven-plugin</artifactId>
@@ -307,7 +307,7 @@
 								</configuration>
 							</execution>
 						</executions>
-					</plugin>
+					</plugin> -->
 				</plugins>
 			</build>
 			<modules>

@@ -94,7 +94,7 @@
 		<file>
 			<source>docs/howtostart.txt</source>
 			<outputDirectory>/</outputDirectory>
-		</file>
+		</file><!-- 
 		<file>
 			<source>target/application_guide.pdf</source>
 			<outputDirectory>/docs</outputDirectory>
@@ -118,7 +118,7 @@
 		<file>
 			<source>target/environment_user_guide.pdf</source>
 			<outputDirectory>/docs</outputDirectory>
-		</file>
+		</file> -->
 	</files>
 
 </assembly>
