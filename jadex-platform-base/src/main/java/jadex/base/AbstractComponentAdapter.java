@@ -498,6 +498,10 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	{
 		wokenup	= false;
 		
+		// Note: wakeup() can be called from arbitrary threads (even when the
+		// component itself is currently running. I.e. it cannot be ensured easily
+		// that an execution task is enqueued and the component has terminated
+		// meanwhile.
 		if(IComponentDescription.STATE_TERMINATED.equals(desc.getState()))
 			return false;
 		
