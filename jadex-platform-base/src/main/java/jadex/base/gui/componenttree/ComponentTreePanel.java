@@ -506,6 +506,49 @@ public class ComponentTreePanel extends JSplitPane
 			{
 				List ret = new ArrayList();
 				Icon	base	= nodes[0].getIcon();
+				
+				if(nodes.length==1)
+				{
+					if(nodes[0].hasProperties())
+					{
+						Action pshowprops = new AbstractAction((String)showprops.getValue(Action.NAME),
+							base!=null ? new CombiIcon(new Icon[]{base, icons.getIcon("overlay_showprops")}) : (Icon)showprops.getValue(Action.SMALL_ICON))
+						{
+							public void actionPerformed(ActionEvent e)
+							{
+								showprops.actionPerformed(e);
+							}
+						};
+						ret.add(pshowprops);
+					}
+					
+					if(nodes[0] instanceof ServiceNode || nodes[0] instanceof IActiveComponentTreeNode)
+					{
+						Action pshowobject = new AbstractAction((String)showobject.getValue(Action.NAME),
+							base!=null ? new CombiIcon(new Icon[]{base, icons.getIcon("overlay_showobject")}) : (Icon)showprops.getValue(Action.SMALL_ICON))
+						{
+							public void actionPerformed(ActionEvent e)
+							{
+								showobject.actionPerformed(e);
+							}
+						};
+						ret.add(pshowobject);
+					}
+					
+					if(nodes[0] instanceof ServiceNode && !Proxy.isProxyClass(((ServiceNode)nodes[0]).getService().getClass()))
+					{
+						Action premoveservice = new AbstractAction((String)removeservice.getValue(Action.NAME),
+							base!=null ? new CombiIcon(new Icon[]{base, icons.getIcon("overlay_kill")}) : (Icon)showprops.getValue(Action.SMALL_ICON))
+						{
+							public void actionPerformed(ActionEvent e)
+							{
+								removeservice.actionPerformed(e);
+							}
+						};
+						ret.add(premoveservice);
+					}
+				}
+				
 				Action	prefresh	= new AbstractAction((String)refresh.getValue(Action.NAME),
 					base!=null ? new CombiIcon(new Icon[]{base, icons.getIcon("overlay_refresh")}) : (Icon)refresh.getValue(Action.SMALL_ICON))
 				{
@@ -524,48 +567,6 @@ public class ComponentTreePanel extends JSplitPane
 					}
 				};
 				ret.add(prefreshtree);
-				
-				if(nodes.length==1)
-				{
-					if(nodes[0].hasProperties())
-					{
-						Action pshowprops = new AbstractAction((String)showprops.getValue(Action.NAME),
-							base!=null ? new CombiIcon(new Icon[]{base, icons.getIcon("overlay_showprops")}) : (Icon)showprops.getValue(Action.SMALL_ICON))
-						{
-							public void actionPerformed(ActionEvent e)
-							{
-								showprops.actionPerformed(e);
-							}
-						};
-						ret.add(0, pshowprops);
-					}
-					
-					if(nodes[0] instanceof ServiceNode || nodes[0] instanceof IActiveComponentTreeNode)
-					{
-						Action pshowobject = new AbstractAction((String)showobject.getValue(Action.NAME),
-							base!=null ? new CombiIcon(new Icon[]{base, icons.getIcon("overlay_showobject")}) : (Icon)showprops.getValue(Action.SMALL_ICON))
-						{
-							public void actionPerformed(ActionEvent e)
-							{
-								showobject.actionPerformed(e);
-							}
-						};
-						ret.add(0, pshowobject);
-					}
-					
-					if(nodes[0] instanceof ServiceNode && !Proxy.isProxyClass(((ServiceNode)nodes[0]).getService().getClass()))
-					{
-						Action premoveservice = new AbstractAction((String)removeservice.getValue(Action.NAME),
-							base!=null ? new CombiIcon(new Icon[]{base, icons.getIcon("overlay_kill")}) : (Icon)showprops.getValue(Action.SMALL_ICON))
-						{
-							public void actionPerformed(ActionEvent e)
-							{
-								removeservice.actionPerformed(e);
-							}
-						};
-						ret.add(0, premoveservice);
-					}
-				}
 			
 				return (Action[])ret.toArray(new Action[0]);
 			}
