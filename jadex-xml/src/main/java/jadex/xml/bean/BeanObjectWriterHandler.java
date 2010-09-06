@@ -88,7 +88,7 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 	 *  @param fullpath The full path.
 	 *  @return The most specific mapping info.
 	 */
-	public TypeInfo getTypeInfo(Object object, QName[] fullpath, IContext context)
+	public synchronized TypeInfo getTypeInfo(Object object, QName[] fullpath, IContext context)
 	{
 		Object type = getObjectType(object, context);
 		if(no_typeinfos.contains(type))
