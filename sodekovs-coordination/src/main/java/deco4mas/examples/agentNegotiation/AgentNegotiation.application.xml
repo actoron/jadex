@@ -38,6 +38,10 @@
 					<env:property name="Chassisbaubillig">0</env:property>
 					<env:property name="Chassisbaunormal">0</env:property>
 					<env:property name="Chassisbauteuer">0</env:property>
+					<!-- logs the trust value for each service type -->
+					<env:property name="ChassisbaubilligTrustValue">0</env:property>
+					<env:property name="ChassisbaunormalTrustValue">0</env:property>
+					<env:property name="ChassisbauteuerTrustValue">0</env:property>
 				</env:objecttype>					
 			
 			</env:objecttypes>
@@ -93,6 +97,11 @@
 							<env:property name="Chassisbaubillig">new Integer(0)</env:property>
 							<env:property name="Chassisbaunormal">new Integer(0)</env:property>
 							<env:property name="Chassisbauteuer">new Integer(0)</env:property>
+							<!-- logs the trust value for each service type -->
+							<env:property name="ChassisbaubilligTrustValue">new Double(30.0)</env:property>
+							<env:property name="ChassisbaunormalTrustValue">new Double(30.0)</env:property>
+							<env:property name="ChassisbauteuerTrustValue">new Double(30.0)</env:property>
+							
 						</env:object>									
 				</env:objects>
 			

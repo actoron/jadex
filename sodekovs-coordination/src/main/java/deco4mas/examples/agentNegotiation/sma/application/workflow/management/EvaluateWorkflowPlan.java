@@ -8,6 +8,7 @@ import java.util.logging.Logger;
 
 import deco4mas.examples.agentNegotiation.common.dataObjects.WorkflowData;
 import deco4mas.examples.agentNegotiation.evaluate.AgentLogger;
+import deco4mas.examples.agentNegotiation.sma.coordination.negotiationStrategy.HistorytimeTrustFunction;
 
 /**
  * Evaluate the workflow
@@ -35,7 +36,7 @@ public class EvaluateWorkflowPlan extends Plan {
 				space.getSpaceObjectsByType("KIVSeval")[0].setProperty("moneyBankSMA", new Double ((Math.round(money))).intValue());
 				int counter = (Integer) space.getSpaceObjectsByType("KIVSeval")[0].getProperty("executedWorkflows");
 				space.getSpaceObjectsByType("KIVSeval")[0].setProperty("executedWorkflows", counter+1);
-				
+								
 				System.out.println("#########################################################################################################################################");
 				System.out.println(space.getSpaceObjectsByType("KIVSeval")[0].getProperty("moneyBankSMA") +  "  - " + space.getSpaceObjectsByType("KIVSeval")[0].getProperty("executedWorkflows"));
 				System.out.println("#########################################################################################################################################");

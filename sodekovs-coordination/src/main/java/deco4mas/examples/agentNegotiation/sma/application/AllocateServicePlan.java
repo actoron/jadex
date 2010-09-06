@@ -84,13 +84,10 @@ public class AllocateServicePlan extends Plan
 						AbstractEnvironmentSpace space = ((AbstractEnvironmentSpace) ((IApplicationExternalAccess) getScope().getParent()).getSpace("mycoordspace"));
 						//substring: geht the "right" part of the id -> only the type: billig, normal, teuer
 						String keyOfSA = currentSa.getLocalName().substring(currentSa.getLocalName().indexOf("(")+1, currentSa.getLocalName().lastIndexOf(")"));
-						keyOfSA = keyOfSA.replace("-", "");
-						System.out.println("1+++###" + keyOfSA);
-						int counter = (Integer) space.getSpaceObjectsByType("KIVSeval")[0].getProperty(keyOfSA);
-						System.out.println("2+++###" + counter);
+						keyOfSA = keyOfSA.replace("-", "");						
+						int counter = (Integer) space.getSpaceObjectsByType("KIVSeval")[0].getProperty(keyOfSA);						
 						space.getSpaceObjectsByType("KIVSeval")[0].setProperty(keyOfSA, counter+1);
-						counter = counter+1;
-						System.out.println("3+++###" + counter);
+						counter = counter+1;						
 						//*******************************************************************************
 
 						getParameter("result").setValue(Boolean.TRUE);
@@ -121,6 +118,9 @@ public class AllocateServicePlan extends Plan
 				{
 					System.out.println(this.getComponentIdentifier().getLocalName() + ": No/False response by + " + currentSa
 						+ "Assign new!");
+					//Hack: Penalty-Time. Wait for a certain amount of time before re-negotiationstarts:
+					waitFor(250);
+					
 					workflowLogger.info("No/False response by " + currentSa + " at " + this.getComponentName());
 					// getParameter("result").setValue(Boolean.FALSE);
 					
