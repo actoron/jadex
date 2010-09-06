@@ -1,33 +1,39 @@
 package jadex.distributed.jmx;
 
+import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
+import jadex.commons.IFuture;
+import jadex.commons.ISuspendable;
+import jadex.commons.ThreadSuspendable;
 import jadex.commons.concurrent.IResultListener;
-import jadex.standalone.service.ComponentManagementService;
 
 public class Agents implements AgentsMBean {
 	
 	private IComponentManagementService _platform;
-	private IComponentIdentifier[] _resultAgentCount;
-	
-	private Thread _current;
-	
-	
-	//private IResultListener _countListener;
 	
 	public Agents(IComponentManagementService platform) {
-		super(); // javac automatically inserts this, but ok
+		super(); // well, the java compiler automatically inserts this already,  but OK to write it out for clarity
 		this._platform = platform;
-		this._current = null; // unnecessary
-		
-		//this._countListener = new CountListener();
+		/*this._current = null; // unnecessary
+		this._countListener = new CountListener();*/
 	}
 	
+	@Override
+	public int getAgentCount() {
+		//this._platform.getComponentIdentifiers(this._countListener);
+		IFuture future = this._platform.getComponentDescriptions();
+		ISuspendable caller = new ThreadSuspendable(new Object()); // I don't know what you think, but I think something really weird is going on here and that the IFuture+ISuspendable mechanism is in some way total broke
+		IComponentDescription[] desc = (IComponentDescription[]) future.get(caller);
+		return desc.length;
+	};
 	
-	/**
-	 * There is a problem: a call to IComponentManagementService.
-	 */
-	/*@Override
+	/*
+	private IComponentIdentifier[] _resultAgentCount;
+	private Thread _current;
+	private IResultListener _countListener;
+	// There is a problem: a call to IComponentManagementService.
+	@Override
 	public int getAgentCount() {
 		// background thread called getComponentDescriptions, dieser thread hat callback, und hier wird .join() an diesem thread aufgerufen um das Ergebniss abzugreifen
 		Thread t = new ResultThread(this._platform, Thread.currentThread());
@@ -50,19 +56,8 @@ public class Agents implements AgentsMBean {
 		
 		return _resultAgentCount.length;
 	}*/
-
-	@Override
-	public int getAgentCount() {
-		//this._platform.getComponentIdentifiers(this._countListener);
-		
-		
-		
-		return 0;
-	};
 	
-	
-	
-	private class ResultThread extends Thread implements IResultListener {
+	/*private class ResultThread extends Thread implements IResultListener {
 		
 		private IComponentManagementService _platform;
 		private Thread _thread;
@@ -88,19 +83,17 @@ public class Agents implements AgentsMBean {
 			_thread.interrupt(); // interrupt() thread to signal him that the result is available
 		}
 		
-		/*** For IResultListener: exceptionOccured and resultAvailable ***/
+		// For IResultListener: exceptionOccured and resultAvailable
 		@Override
 		public void exceptionOccurred(Object source, Exception exception) {
 			
 		}
 
-	}
+	}*/
 	
 	/*
 	private class CountListener implements IResultListener {
 
-		
-		
 		@Override
 		public void exceptionOccurred(Object source, Exception exception) {
 			// TODO Auto-generated method stub
