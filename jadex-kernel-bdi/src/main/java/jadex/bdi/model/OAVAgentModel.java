@@ -118,6 +118,12 @@ public class OAVAgentModel	extends OAVCapabilityModel
 		{
 			OAVCapabilityModel.initArgument(((Argument)args[i]), state, getHandle());
 		}
+		// Init the results.
+		IArgument[] ress = getModelInfo().getResults();
+		for(int i=0; i<ress.length; i++)
+		{
+			OAVCapabilityModel.initArgument(((Argument)ress[i]), state, getHandle());
+		}
 		
 //		Map ret = super.getProperties();
 //		
