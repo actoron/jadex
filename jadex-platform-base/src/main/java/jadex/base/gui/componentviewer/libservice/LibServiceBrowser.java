@@ -51,7 +51,7 @@ public class LibServiceBrowser	extends	JTabbedPane	implements IServiceViewerPane
 	/** The image icons. */
 	protected static final UIDefaults icons = new UIDefaults(new Object[]
 	{
-		"help",	SGUI.makeIcon(LibServiceBrowser.class, "/jadex/tools/common/images/help.gif")
+		"help",	SGUI.makeIcon(LibServiceBrowser.class, "/jadex/base/gui/images/help.gng")
 	});
 
 	//-------- attributes --------

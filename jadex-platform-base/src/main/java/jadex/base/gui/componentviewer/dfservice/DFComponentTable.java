@@ -33,7 +33,7 @@ public class DFComponentTable extends JTable
 	/** The image icons. */
 	protected static final UIDefaults icons = new UIDefaults(new Object[]
 	{
-		"remove_component", SGUI.makeIcon(DFComponentTable.class, "/jadex/tools/common/images/new_remove_service.png"),
+		"remove_component", SGUI.makeIcon(DFComponentTable.class, "/jadex/base/gui/images/new_remove_service.png"),
 	});
 	
 	//-------- attributes --------

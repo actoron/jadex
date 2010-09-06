@@ -6,13 +6,16 @@ import jadex.commons.Properties;
 import javax.swing.JComponent;
 
 /**
- * 
+ *  Abstract viewer panel for components and services.
  */
 public interface IAbstractViewerPanel
 {
+	//-------- constants ---------
+	
 	/** The property for the viewer panel class. */
 	public static final String	PROPERTY_VIEWERCLASS	= "componentviewer.viewerclass";
 
+	//-------- attributes --------
 	
 	/**
 	 *  Informs the panel that it should stop all its computation

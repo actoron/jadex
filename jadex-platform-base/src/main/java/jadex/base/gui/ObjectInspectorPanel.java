@@ -13,6 +13,9 @@ import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreePath;
 
+/**
+ *  Panel for inspecting Java objects.
+ */
 public class ObjectInspectorPanel  extends JPanel
 {
 	/**

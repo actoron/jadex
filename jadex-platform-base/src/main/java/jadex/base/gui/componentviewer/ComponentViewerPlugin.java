@@ -53,14 +53,14 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 	 * The image icons.
 	 */
 	protected static final UIDefaults	icons	= new UIDefaults(new Object[]{
-		"componentviewer", SGUI.makeIcon(ComponentViewerPlugin.class, "/jadex/tools/common/images/configure.png"), 
+		"componentviewer", SGUI.makeIcon(ComponentViewerPlugin.class, "/jadex/base/gui/images/configure.png"), 
 		"componentviewer_sel", SGUI.makeIcon(ComponentViewerPlugin.class, "/jadex/tools/common/images/configure_sel.png"), 
-		"open_viewer", SGUI.makeIcon(ComponentViewerPlugin.class, "/jadex/tools/common/images/new_introspector.png"),
-		"close_viewer", SGUI.makeIcon(ComponentViewerPlugin.class, "/jadex/tools/common/images/close_introspector.png"),
-		"viewer_empty", SGUI.makeIcon(ComponentViewerPlugin.class, "/jadex/tools/common/images/viewer_empty.png"),
-		"overlay_viewable", SGUI.makeIcon(ComponentViewerPlugin.class, "/jadex/tools/common/images/overlay_edit.png"),
-		"overlay_viewed", SGUI.makeIcon(ComponentViewerPlugin.class, "/jadex/tools/common/images/overlay_introspected.png"),
-		"overlay_notviewed", SGUI.makeIcon(ComponentViewerPlugin.class, "/jadex/tools/common/images/overlay_notintrospected.png")
+		"open_viewer", SGUI.makeIcon(ComponentViewerPlugin.class, "/jadex/base/gui/images/new_introspector.png"),
+		"close_viewer", SGUI.makeIcon(ComponentViewerPlugin.class, "/jadex/base/gui/images/close_introspector.png"),
+		"viewer_empty", SGUI.makeIcon(ComponentViewerPlugin.class, "/jadex/base/gui/images/viewer_empty.png"),
+		"overlay_viewable", SGUI.makeIcon(ComponentViewerPlugin.class, "/jadex/base/gui/images/overlay_edit.png"),
+		"overlay_viewed", SGUI.makeIcon(ComponentViewerPlugin.class, "/jadex/base/gui/images/overlay_introspected.png"),
+		"overlay_notviewed", SGUI.makeIcon(ComponentViewerPlugin.class, "/jadex/base/gui/images/overlay_notintrospected.png")
 	});
 	
 	//-------- attributes --------

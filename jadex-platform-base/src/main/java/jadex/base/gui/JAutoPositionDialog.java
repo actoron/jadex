@@ -11,7 +11,7 @@ import javax.swing.JComponent;
 import javax.swing.JDialog;
 
 /**
- *
+ *  Dialog that positions itself in the middle of the screen.
  */
 public class JAutoPositionDialog extends JDialog
 {

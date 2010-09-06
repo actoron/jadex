@@ -70,7 +70,7 @@ public class ObjectTreeModel implements TreeModel
 	protected List inspectors;
 	
 	/** UUID counter */
-	private int uuidcounter;
+	protected int uuidcounter;
 	
 	//-------- constructors --------
 

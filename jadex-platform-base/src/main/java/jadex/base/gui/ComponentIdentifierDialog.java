@@ -21,7 +21,7 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 
 /**
- * 
+ *  Dialog for component identifier.
  */
 public class ComponentIdentifierDialog
 {
