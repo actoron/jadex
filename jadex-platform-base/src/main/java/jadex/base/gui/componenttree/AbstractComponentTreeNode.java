@@ -79,7 +79,7 @@ public abstract class AbstractComponentTreeNode	implements IComponentTreeNode
 		if(children==null && !searching)
 		{
 			searching	= true;
-			searchChildren();
+			searchChildren(false);
 		}
 		return children==null ? 0 : children.size();
 	}
@@ -94,7 +94,7 @@ public abstract class AbstractComponentTreeNode	implements IComponentTreeNode
 		if(children==null && !searching)
 		{
 			searching	= true;
-			searchChildren();
+			searchChildren(false);
 		}
 		return children==null ? null : (IComponentTreeNode)children.get(index);
 	}
@@ -109,7 +109,7 @@ public abstract class AbstractComponentTreeNode	implements IComponentTreeNode
 		if(children==null && !searching)
 		{
 			searching	= true;
-			searchChildren();
+			searchChildren(false);
 		}
 		return children==null ? -1 : children.indexOf(child);
 	}
@@ -128,7 +128,7 @@ public abstract class AbstractComponentTreeNode	implements IComponentTreeNode
 	 *  Refresh the node.
 	 *  @param recurse	Recursively refresh subnodes, if true.
 	 */
-	public void	refresh(boolean recurse)
+	public void	refresh(boolean recurse, boolean force)
 	{
 		assert SwingUtilities.isEventDispatchThread();
 
@@ -136,7 +136,7 @@ public abstract class AbstractComponentTreeNode	implements IComponentTreeNode
 		{
 			searching	= true;
 			this.recurse	= recurse;
-			searchChildren();
+			searchChildren(force);
 		}
 		else
 		{
@@ -186,7 +186,7 @@ public abstract class AbstractComponentTreeNode	implements IComponentTreeNode
 	 *  Called once for each node.
 	 *  Should call setChildren() once children are found.
 	 */
-	protected abstract void	searchChildren();
+	protected abstract void	searchChildren(boolean force);
 	
 	/**
 	 *  Set the children.
@@ -293,7 +293,7 @@ public abstract class AbstractComponentTreeNode	implements IComponentTreeNode
 				{
 					for(int i=0; children!=null && i<children.size(); i++)
 					{
-						((IComponentTreeNode)children.get(i)).refresh(dorecurse);
+						((IComponentTreeNode)children.get(i)).refresh(dorecurse, false);
 					}
 				}
 				

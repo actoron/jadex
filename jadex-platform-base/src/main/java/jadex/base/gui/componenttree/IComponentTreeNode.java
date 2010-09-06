@@ -54,7 +54,7 @@ public interface IComponentTreeNode
 	 *  Refresh the node.
 	 *  @param recurse	Recursively refresh subnodes, if true.
 	 */
-	public void	refresh(boolean recurse);
+	public void	refresh(boolean recurse, boolean force);
 	
 	/**
 	 *  Get the cached children, i.e. do not start any background processes for updating the children.

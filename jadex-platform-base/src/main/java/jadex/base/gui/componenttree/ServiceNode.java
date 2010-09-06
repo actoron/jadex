@@ -77,7 +77,7 @@ public class ServiceNode	extends AbstractComponentTreeNode
 	 *  Called once for each node.
 	 *  Should call setChildren() once children are found.
 	 */
-	protected void	searchChildren()
+	protected void	searchChildren(boolean force)
 	{
 		// no children
 	}

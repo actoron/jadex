@@ -345,7 +345,7 @@ public class ComponentTreePanel extends JSplitPane
 							{
 								if(sel instanceof VirtualComponentTreeNode)
 								{
-									sel.refresh(false);
+									sel.refresh(false, false);
 								}
 							}
 						});
@@ -371,7 +371,7 @@ public class ComponentTreePanel extends JSplitPane
 							{
 								if(sel instanceof VirtualComponentTreeNode)
 								{
-									sel.refresh(false);
+									sel.refresh(false, false);
 								}
 							}
 						});
@@ -398,7 +398,7 @@ public class ComponentTreePanel extends JSplitPane
 							{
 								if(sel instanceof VirtualComponentTreeNode)
 								{
-									sel.refresh(false);
+									sel.refresh(false, false);
 								}
 							}
 						});
@@ -414,7 +414,7 @@ public class ComponentTreePanel extends JSplitPane
 				TreePath[]	paths	= tree.getSelectionPaths();
 				for(int i=0; paths!=null && i<paths.length; i++)
 				{
-					((IComponentTreeNode)paths[i].getLastPathComponent()).refresh(false);
+					((IComponentTreeNode)paths[i].getLastPathComponent()).refresh(false, true);
 				}
 			}
 		};
@@ -426,7 +426,7 @@ public class ComponentTreePanel extends JSplitPane
 				TreePath[]	paths	= tree.getSelectionPaths();
 				for(int i=0; paths!=null && i<paths.length; i++)
 				{
-					((IComponentTreeNode)paths[i].getLastPathComponent()).refresh(true);
+					((IComponentTreeNode)paths[i].getLastPathComponent()).refresh(true, true);
 				}
 			}
 		};

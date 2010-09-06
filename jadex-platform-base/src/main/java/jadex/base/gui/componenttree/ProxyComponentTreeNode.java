@@ -72,7 +72,7 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 			public void actionPerformed(ActionEvent e)
 			{
 				// hmm?! with or without subtree?
-				refresh(true);
+				refresh(true, false);
 			}
 		});
 		timer.start();
@@ -106,7 +106,7 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 	 *  Called once for each node.
 	 *  Should call setChildren() once children are found.
 	 */
-	protected void	searchChildren()
+	protected void	searchChildren(final boolean force)
 	{
 		// Do not use 'ui' in SwingDefLis because failures will be shown be node color
 		getRemoteComponentIdentifier().addResultListener(new SwingDefaultResultListener((Component)null)
@@ -114,7 +114,7 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 			public void customResultAvailable(Object source, Object result)
 			{
 				final Future	future	= new Future();
-				searchChildren(cms, ProxyComponentTreeNode.this, desc, cid, ui, iconcache, future)
+				searchChildren(cms, ProxyComponentTreeNode.this, desc, cid, ui, iconcache, future, force)
 					.addResultListener(new SwingDefaultResultListener((Component)null)
 				{
 					public void customResultAvailable(Object source, Object result)
@@ -157,7 +157,7 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 	protected static IFuture searchChildren(final IComponentManagementService cms, final IComponentTreeNode parentnode,
 		final IComponentDescription desc, final IComponentIdentifier cid, final Component ui, final  ComponentIconCache iconcache,
 		final // future for determining when services can be added to service container.
-		Future future)
+		Future future, final boolean force)
 	{
 		final Future ret = new Future();
 	
@@ -179,7 +179,7 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 					public void execute(Object agent)
 					{
 						ProxyAgent pa = (ProxyAgent)agent;
-						pa.getVirtualChildren(cid).addResultListener(new SwingDefaultResultListener((Component)null)
+						pa.getVirtualChildren(cid, force).addResultListener(new SwingDefaultResultListener((Component)null)
 						{
 							public void customResultAvailable(Object source, Object result)
 							{

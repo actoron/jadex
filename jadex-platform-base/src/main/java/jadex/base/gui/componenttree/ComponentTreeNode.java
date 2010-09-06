@@ -82,7 +82,7 @@ public class ComponentTreeNode	extends AbstractComponentTreeNode implements IAct
 	 *  Refresh the node.
 	 *  @param recurse	Recursively refresh subnodes, if true.
 	 */
-	public void refresh(boolean recurse)
+	public void refresh(boolean recurse, boolean force)
 	{
 		cms.getComponentDescription(desc.getName()).addResultListener(new SwingDefaultResultListener(ui)
 		{
@@ -93,14 +93,14 @@ public class ComponentTreeNode	extends AbstractComponentTreeNode implements IAct
 			}
 		});
 
-		super.refresh(recurse);
+		super.refresh(recurse, force);
 	}
 	
 	/**
 	 *  Asynchronously search for children.
 	 *  Should call setChildren() once children are found.
 	 */
-	protected void	searchChildren()
+	protected void	searchChildren(boolean force)
 	{
 		final List	children	= new ArrayList();
 		final boolean	ready[]	= new boolean[2];	// 0: children, 1: services;

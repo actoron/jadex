@@ -65,10 +65,10 @@ public class VirtualComponentTreeNode extends AbstractComponentTreeNode implemen
 	 *  Called once for each node.
 	 *  Should call setChildren() once children are found.
 	 */
-	protected void	searchChildren()
+	protected void	searchChildren(boolean force)
 	{
 		final Future	future	= new Future();
-		ProxyComponentTreeNode.searchChildren(cms, this, desc, desc.getName(), ui, iconcache, future)
+		ProxyComponentTreeNode.searchChildren(cms, this, desc, desc.getName(), ui, iconcache, future, force)
 			.addResultListener(new SwingDefaultResultListener((Component)null)
 		{
 			public void customResultAvailable(Object source, Object result)
@@ -87,7 +87,7 @@ public class VirtualComponentTreeNode extends AbstractComponentTreeNode implemen
 	 *  Refresh the node.
 	 *  @param recurse	Recursively refresh subnodes, if true.
 	 */
-	public void refresh(boolean recurse)
+	public void refresh(boolean recurse, boolean force)
 	{
 		IComponentTreeNode tmp = getParent();
 		while(!(tmp instanceof ProxyComponentTreeNode))
@@ -132,7 +132,7 @@ public class VirtualComponentTreeNode extends AbstractComponentTreeNode implemen
 			}
 		});
 
-		super.refresh(recurse);
+		super.refresh(recurse, force);
 	}
 	
 	/**

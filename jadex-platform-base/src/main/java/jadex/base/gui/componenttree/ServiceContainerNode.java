@@ -61,7 +61,7 @@ public class ServiceContainerNode	extends AbstractComponentTreeNode
 	 *  Called once for each node.
 	 *  Should call setChildren() once children are found.
 	 */
-	protected void	searchChildren()
+	protected void	searchChildren(boolean force)
 	{
 		// Done by parent node.
 	}

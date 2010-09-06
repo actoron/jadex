@@ -500,7 +500,7 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 								final String classname = (String)exta.getModel().getProperties().get(IAbstractViewerPanel.PROPERTY_VIEWERCLASS);
 								viewables.put(cid, classname==null? Boolean.FALSE: Boolean.TRUE);
 //								System.out.println("node: "+viewables.get(cid));
-								node.refresh(false);
+								node.refresh(false, false);
 							}
 						});
 					}

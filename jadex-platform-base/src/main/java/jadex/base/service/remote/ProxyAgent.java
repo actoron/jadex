@@ -109,31 +109,38 @@ public class ProxyAgent extends MicroAgent
 	/**
 	 *  Get the remote, i.e. virtual children of a component. 
 	 */
-	public IFuture getVirtualChildren(final IComponentIdentifier cid)
+	public IFuture getVirtualChildren(final IComponentIdentifier cid, boolean force)
 	{
 		final Future ret = new Future();
 		
-		isInvalid(cid).addResultListener(createResultListener(new IResultListener()
+		if(force)
 		{
-			public void resultAvailable(Object source, Object result)
+			searchVirtualChildren(cid).addResultListener(createResultListener(new DelegationResultListener(ret)));
+		}
+		else
+		{
+			isInvalid(cid).addResultListener(createResultListener(new IResultListener()
 			{
-				if(((Boolean)result).booleanValue())
+				public void resultAvailable(Object source, Object result)
 				{
-//					System.out.println("search children");
-					searchVirtualChildren(cid).addResultListener(createResultListener(new DelegationResultListener(ret)));
+					if(((Boolean)result).booleanValue())
+					{
+	//					System.out.println("search children");
+						searchVirtualChildren(cid).addResultListener(createResultListener(new DelegationResultListener(ret)));
+					}
+					else
+					{
+	//					System.out.println("cached children");
+						ret.setResult(((Object[])children.get(cid))[1]);
+					}
 				}
-				else
+				
+				public void exceptionOccurred(Object source, Exception exception)
 				{
-//					System.out.println("cached children");
-					ret.setResult(((Object[])children.get(cid))[1]);
+					ret.setException(exception);
 				}
-			}
-			
-			public void exceptionOccurred(Object source, Exception exception)
-			{
-				ret.setException(exception);
-			}
-		}));
+			}));
+		}
 		
 		return ret;
 	}
