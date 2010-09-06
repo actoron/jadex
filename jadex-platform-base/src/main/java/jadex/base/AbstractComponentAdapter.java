@@ -498,7 +498,10 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	{
 		wokenup	= false;
 		
-		if(IComponentDescription.STATE_TERMINATED.equals(desc.getState()) || fatalerror)
+		if(IComponentDescription.STATE_TERMINATED.equals(desc.getState()))
+			return false;
+		
+		if(fatalerror)
 			throw new ComponentTerminatedException(cid.getName());
 
 		// Remember execution thread.
