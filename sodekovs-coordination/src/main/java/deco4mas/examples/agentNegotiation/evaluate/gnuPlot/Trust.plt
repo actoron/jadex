@@ -145,5 +145,5 @@ set loadpath
 set fontpath 
 set fit noerrorvariables
 GNUTERM = "wxt"
-plot[][] "TrustChange_Sma0(Chassisbau-workflowProvider1).dat" u 1:2 t 3 w l ls 1, "TrustChange_Sma0(Chassisbau-workflowProvider1).dat" u 4:5 t 6 w l ls 2, "TrustChange_Sma0(Chassisbau-workflowProvider1).dat" u 7:8 t 9 w l ls 3, "TrustChange_Sma0(Chassisbau-workflowProvider1).dat" using 10:11 t 12 w l ls 4
+plot[][] "TrustChange_ServiceManagementAgent3.dat" u 1:2 t 3 w l ls 1, "TrustChange_ServiceManagementAgent3.dat" u 4:5 t 6 w l ls 2, "TrustChange_ServiceManagementAgent3.dat" u 7:8 t 9 w l ls 3, "TrustChange_ServiceManagementAgent3.dat" using 10:11 t 12 w l ls 4
 #    EOF

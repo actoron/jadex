@@ -145,5 +145,5 @@ set loadpath
 set fontpath 
 set fit noerrorvariables
 GNUTERM = "wxt"
-plot[0:300][0:100] "Utility_Sma0.dat" u 1:2 t 3 w steps ls 1, "Utility_Sma0.dat" u 4:5 t 6 w steps ls 2, "Utility_Sma0.dat" u 7:8 t 9 w steps ls 3
+plot[0:300][0:100] "Utility_ServiceManagementAgent3.dat" u 1:2 t 3 w steps ls 1, "Utility_ServiceManagementAgent3.dat" u 4:5 t 6 w steps ls 2, "Utility_ServiceManagementAgent3.dat" u 7:8 t 9 w steps ls 3
 #    EOF
