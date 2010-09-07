@@ -183,6 +183,7 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 		addMethodInfos(getModelInfo().getProperties(), "remote_excluded", new String[]{"getServiceProvider"});
 
 		modelinfo.setConfigurations(getConfigurations());
+		modelinfo.setStartable(true);
 	}
 	
 	/**

@@ -197,6 +197,7 @@ public class BpmnInterpreter implements IComponentInstance
 	 *  Create a new bpmn process.
 	 *  @param adapter The adapter.
 	 */
+	// Constructor for bdi plan interpreter
 	public BpmnInterpreter(IComponentAdapter adapter, MBpmnModel model, Map arguments, 
 		String config, final IExternalAccess parent, Map activityhandlers, Map stephandlers, 
 		IValueFetcher fetcher, IComponentManagementService cms, IClockService cs, IMessageService ms,
@@ -226,6 +227,7 @@ public class BpmnInterpreter implements IComponentInstance
 	 *  Create a new bpmn process.
 	 *  @param adapter The adapter.
 	 */
+	// Constructor for self-contained bpmn components
 	public BpmnInterpreter(IComponentDescription desc, IComponentAdapterFactory factory, MBpmnModel model, Map arguments, 
 		String config, final IExternalAccess parent, Map activityhandlers, Map stephandlers, 
 		IValueFetcher fetcher, Future inited)
