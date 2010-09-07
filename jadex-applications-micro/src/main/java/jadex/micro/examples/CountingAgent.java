@@ -28,11 +28,19 @@ public class CountingAgent extends MicroAgent
 		{
 			public void execute(Object agent)
 			{
+				final ICommand	step	= this;
 				System.out.println("Step: "+cnt);
 				
 				cnt++;
 
-				scheduleStep(this);
+				// Hack!!! Blocks jcc without wait, why?
+				waitFor(10, new ICommand()
+				{
+					public void execute(Object args)
+					{
+						scheduleStep(step);
+					}
+				});
 			}
 			
 			public String toString()

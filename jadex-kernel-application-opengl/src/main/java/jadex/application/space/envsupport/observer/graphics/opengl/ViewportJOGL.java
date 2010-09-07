@@ -633,6 +633,10 @@ public class ViewportJOGL extends AbstractViewport
 
 		public void init(GLAutoDrawable drawable)
 		{
+			// Hack!!! Why is init called after cleanup!?
+			if(canvas_==null)
+				return;
+			
 			GL gl = drawable.getGL();
 			context_ = gl;
 			gl.glViewport(0, 0, canvas_.getWidth(), canvas_.getHeight());
