@@ -611,7 +611,7 @@ public class MessageService extends BasicService implements IMessageService
 			{
 				for(int i = 0; i < receivers.length; i++)
 				{
-					final int cnt = i; 
+//					final int cnt = i; 
 					StandaloneComponentAdapter component = (StandaloneComponentAdapter)((ComponentManagementService)cms).getComponentAdapter(receivers[i]);
 					if(component != null)
 					{
@@ -804,8 +804,6 @@ public class MessageService extends BasicService implements IMessageService
 					catch(Exception e)
 					{
 //						e.printStackTrace();
-						ret.setException(e);
-						return !isempty;
 					}
 				}
 		
