@@ -3,15 +3,6 @@
 	<H3>Test messaging perfomance.</H3>
 	
 	Sends/receives a number of messages and prints out the time it takes.
-	<hr>
-	1000 messages (p4-3000, JVM 1.5).
-	<table>
-		<tr><td></td>        <td>Standalone(nsmt)</td><td>Jade(http)</td></tr>
-		<tr><td>platform</td><td>1400ms</td>          <td>2000</td></tr>
-		<tr><td>host</td>    <td>7000ms</td>          <td>8400</td></tr>
-		<tr><td>network</td> <td>5000ms</td>          <td>6000</td></tr>
-	</table>
-	
 -->
 <agent xmlns="http://jadex.sourceforge.net/jadex-bdi"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"

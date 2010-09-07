@@ -4,6 +4,7 @@ import jadex.base.fipa.SFipa;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IArgument;
 import jadex.bridge.MessageType;
+import jadex.commons.ICommand;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.micro.MicroAgent;
 import jadex.micro.MicroAgentMetaInfo;
@@ -24,6 +25,9 @@ public class MessagePerformanceAgent extends MicroAgent
 	/** The start time. */
 	protected long starttime;
 	
+	/** The current message number sent. */
+	protected int current;
+	
 	//-------- methods --------
 	
 	/**
@@ -35,39 +39,63 @@ public class MessagePerformanceAgent extends MicroAgent
 		{
 			public void resultAvailable(Object source, Object result)
 			{
+				current = 1;
 				starttime = ((Long)result).longValue();
-				int msgcnt = ((Integer)getArgument("max")).intValue();
-				IComponentIdentifier receiver = getComponentIdentifier();
 				
-				System.out.println("Now sending " + msgcnt + " messages to " + receiver);
+				final int msgcnt = ((Integer)getArgument("max")).intValue();
+				final IComponentIdentifier receiver = getComponentIdentifier();
+				final boolean usecodec = ((Boolean)getArgument("codec")).booleanValue();
 				
-				boolean usecodec = ((Boolean)getArgument("codec")).booleanValue();
-				System.out.println("Codec is: "+usecodec);
-				// Send messages.
-				for(int i=1; i<=msgcnt; i++)
+				ICommand send = new ICommand()
 				{
-					Map request = new HashMap();
-					request.put(SFipa.PERFORMATIVE, SFipa.INFORM);
-					request.put(SFipa.RECEIVERS, new IComponentIdentifier[]{receiver});
-					request.put(SFipa.REPLY_WITH, "some reply id");
-					
-					if(!usecodec)
-					{	
-						request.put(SFipa.CONTENT, "message: "+i);
-					}
-					else
+					public void execute(Object args)
 					{
-						request.put(SFipa.LANGUAGE, SFipa.JADEX_XML);
-						request.put(SFipa.CONTENT, new Message("message: "+i, true));
+						if(current==1)
+						{
+							System.out.println("Now sending " + msgcnt + " messages to " + receiver);
+							System.out.println("Codec is: "+usecodec);
+						}
+						
+						// Send messages.
+						int i = current;
+						for(; i<=msgcnt; i++)
+						{
+							Map request = new HashMap();
+							request.put(SFipa.PERFORMATIVE, SFipa.INFORM);
+							request.put(SFipa.RECEIVERS, new IComponentIdentifier[]{receiver});
+							request.put(SFipa.REPLY_WITH, "some reply id");
+							
+							if(!usecodec)
+							{	
+								request.put(SFipa.CONTENT, "message: "+i);
+							}
+							else
+							{
+								request.put(SFipa.LANGUAGE, SFipa.JADEX_XML);
+								request.put(SFipa.CONTENT, new Message("message: "+i, true));
+							}
+							
+							sendMessage(request, SFipa.FIPA_MESSAGE_TYPE);
+							if(i>0 && i%10 == 0)
+							{
+								System.out.print('.');
+								if(i%1000==0)
+								{
+									System.out.println();
+									break;
+								}
+							}
+						}
+						
+						current = i+1;
+						if(current<=msgcnt)
+						{
+							waitFor(0, this);
+						}
 					}
-					
-					sendMessage(request, SFipa.FIPA_MESSAGE_TYPE);
-					if(i % 10 == 0)
-					{
-						System.out.print('.');
-						// waitFor(0);
-					}
-				}
+				};
+				
+				send.execute(this);
 			}
 		}));
 	}

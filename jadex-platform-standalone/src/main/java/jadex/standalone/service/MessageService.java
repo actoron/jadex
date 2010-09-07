@@ -596,51 +596,6 @@ public class MessageService extends BasicService implements IMessageService
 	}
 	
 	//-------- internal methods --------
-
-	/**
-	 *  Send a message.
-	 *  @param message The native message.
-	 * /
-	protected void internalSendMessage(Map msg, MessageType type, IComponentIdentifier[] receivers, Future ret)
-	{
-//		IComponentIdentifier[] receivers = message.getReceivers();
-		if(receivers.length == 0)
-		{
-			ret.setException(new MessageFailureException(msg, type, null, "No receiver specified"));
-		}
-		for(int i=0; i<receivers.length; i++)
-		{
-			if(receivers[i]==null)
-				throw new MessageFailureException(msg, type, null, "A receiver nulls: "+msg);
-		}
-
-		ITransport[] trans = (ITransport[])transports.toArray(new ITransport[transports.size()]);
-
-		for(int i = 0; i < trans.length && receivers.length>0; i++)
-		{
-			try
-			{
-				// Method returns component identifiers of undelivered components
-				receivers = trans[i].sendMessage(msg, type.getName(), receivers);
-			}
-			catch(Exception e)
-			{
-				// todo: ?
-				e.printStackTrace();
-//				ret.setException(e);
-			}
-		}
-
-		if(receivers.length > 0)
-		{
-//			logger.warning("Message could not be delivered to (all) receivers: " + SUtil.arrayToString(receivers));
-			ret.setException(new MessageFailureException(msg, type, receivers, "Message could not be delivered to (all) receivers: "+ SUtil.arrayToString(receivers)));
-		}
-		else
-		{
-			ret.setResult(null);
-		}
-	}*/
 	
 	/**
 	 *  Deliver a message to the receivers.
@@ -803,7 +758,7 @@ public class MessageService extends BasicService implements IMessageService
 		//-------- constructors --------
 		
 		/**
-		 * 
+		 *  Send manager.
 		 */
 		public SendManager()
 		{
@@ -817,78 +772,56 @@ public class MessageService extends BasicService implements IMessageService
 		 */
 		public boolean execute()
 		{
-			Object[] task = null;
+			Object[] tmp = null;
 			boolean isempty;
 			
 			synchronized(this)
 			{
 				if(!messages.isEmpty())
-					task = (Object[])messages.remove(0);
+					tmp = (Object[])messages.remove(0);
 				isempty = messages.isEmpty();
 			}
 			
-			if(task!=null)
-				internalSendMessage((ManagerSendTask)task[0], (Future)task[1]);
-	
-			return !isempty;
-		}
+			if(tmp!=null)
+			{
+				ManagerSendTask task = (ManagerSendTask)tmp[0];
+				Future ret = (Future)tmp[1];
+				
+				IComponentIdentifier[] receivers = task.getReceivers();
+//				System.out.println("recs: "+SUtil.arrayToString(receivers)+" "+this);
+				
+				ITransport[] transports = getTransports();
+				for(int i = 0; i < transports.length && receivers.length>0; i++)
+				{
+					try
+					{
+						// Method returns component identifiers of undelivered components
+		//				IConnection con = transports[i].getConnection(addresses[i]);
+		//				if(con==null)
+						
+						receivers = transports[i].sendMessage(task.getMessage(), task.getMessageType().getName(), receivers);
+					}
+					catch(Exception e)
+					{
+//						e.printStackTrace();
+						ret.setException(e);
+						return !isempty;
+					}
+				}
 		
-		/**
-		 *  Send a message.
-		 *  @param message The native message.
-		 */
-		protected void internalSendMessage(ManagerSendTask task, Future ret)
-		{
-			// todo: move out
-			
-	//		if(receivers.length == 0)
-	//		{
-	//			ret.setException(new MessageFailureException(msg, type, null, "No receiver specified"));
-	//			return;
-	//		}
-	//		for(int i=0; i<receivers.length; i++)
-	//		{
-	//			if(receivers[i]==null)
-	//			{
-	//				ret.setException(new MessageFailureException(msg, type, null, "A receiver nulls: "+msg));
-	//				return;
-	//			}
-	//		}
-	
-			// todo: transport shifting in case of no connection
-			
-			IComponentIdentifier[] receivers = task.getReceivers();
-//			System.out.println("recs: "+SUtil.arrayToString(receivers)+" "+this);
-			
-			ITransport[] transports = getTransports();
-			for(int i = 0; i < transports.length && receivers.length>0; i++)
-			{
-				try
+				if(receivers.length > 0)
 				{
-					// Method returns component identifiers of undelivered components
-	//				IConnection con = transports[i].getConnection(addresses[i]);
-	//				if(con==null)
-					
-					receivers = transports[i].sendMessage(task.getMessage(), task.getMessageType().getName(), receivers);
+		//			logger.warning("Message could not be delivered to (all) receivers: " + SUtil.arrayToString(receivers));
+					ret.setException(new MessageFailureException(task.getMessage(), task.getMessageType(), receivers, 
+						"Message could not be delivered to (all) receivers: "+ SUtil.arrayToString(receivers)));
 				}
-				catch(Exception e)
+				else
 				{
-					// todo: ?
-					e.printStackTrace();
-	//				ret.setException(e);
+					ret.setResult(null);
 				}
 			}
-	
-			if(receivers.length > 0)
-			{
-	//			logger.warning("Message could not be delivered to (all) receivers: " + SUtil.arrayToString(receivers));
-				ret.setException(new MessageFailureException(task.getMessage(), task.getMessageType(), receivers, 
-					"Message could not be delivered to (all) receivers: "+ SUtil.arrayToString(receivers)));
-			}
-			else
-			{
-				ret.setResult(null);
-			}
+			
+			return !isempty;
 		}
 		
 		/**
