@@ -234,6 +234,8 @@ public class BpmnInterpreter implements IComponentInstance
 		this.inited = inited;
 		this.variables	= new HashMap();
 		construct(model, arguments, config, parent, activityhandlers, stephandlers, fetcher);
+		
+		activitylisteners = new ArrayList();
 	}
 	
 	/**
