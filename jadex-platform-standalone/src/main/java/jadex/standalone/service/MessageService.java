@@ -13,8 +13,12 @@ import jadex.bridge.MessageFailureException;
 import jadex.bridge.MessageType;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
+import jadex.commons.SReflect;
 import jadex.commons.SUtil;
+import jadex.commons.collection.LRU;
+import jadex.commons.collection.MultiCollection;
 import jadex.commons.collection.SCollection;
+import jadex.commons.concurrent.CollectionResultListener;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IExecutable;
@@ -58,7 +62,7 @@ public class MessageService extends BasicService implements IMessageService
     };
 
     /** No addresses constant. */
-    protected String NO_ADDRESSES = "no_addresses";
+    protected String LOCAL = "local";
     
 	//-------- attributes --------
 
@@ -93,7 +97,7 @@ public class MessageService extends BasicService implements IMessageService
 	protected IComponentManagementService cms;
 	
 	/** The target managers. */
-	protected Map managers;
+	protected LRU managers;
 	
 	//-------- constructors --------
 
@@ -116,9 +120,7 @@ public class MessageService extends BasicService implements IMessageService
 		this.delivermsg = new DeliverMessage();
 		this.logger = Logger.getLogger("MessageService" + this);
 		
-		this.managers = new HashMap();
-		TargetManager localmanager = new TargetManager(provider, transports);
-		managers.put(NO_ADDRESSES, localmanager);
+		this.managers = new LRU(100);
 	}
 	
 	//-------- interface methods --------
@@ -239,8 +241,31 @@ public class MessageService extends BasicService implements IMessageService
 			}
 		}
 		
-		SendTask task = new SendTask(this, msgcopy, type);
-		task.execute().addResultListener(new DelegationResultListener(ret));
+		// Determine manager tasks
+		MultiCollection managers = new MultiCollection();
+		String recid = type.getReceiverIdentifier();
+		for(Iterator it = SReflect.getIterator(msgcopy.get(recid)); it.hasNext(); )
+		{
+			IComponentIdentifier cid = (IComponentIdentifier)it.next();
+			SendManager sm = getSendManager(cid); 
+			managers.put(sm, cid);
+		}
+		
+		List tasks = new ArrayList();
+		for(Iterator it=managers.keySet().iterator(); it.hasNext();)
+		{
+			SendManager tm = (SendManager)it.next();
+			IComponentIdentifier[] recs = (IComponentIdentifier[])managers.getCollection(tm)
+				.toArray(new IComponentIdentifier[0]);
+			tasks.add(new ManagerSendTask(msgcopy, type, recs, tm));
+		}
+		
+		CollectionResultListener lis = new CollectionResultListener(tasks.size(), false, new DelegationResultListener(ret));
+		for(int i=0; i<tasks.size(); i++)
+		{
+			ManagerSendTask mst = (ManagerSendTask)tasks.get(i);
+			mst.getTargetManager().addMessage(mst).addResultListener(lis);
+		}
 		
 //		sendmsg.addMessage(msgcopy, type, receivers, ret);
 	}
@@ -437,23 +462,40 @@ public class MessageService extends BasicService implements IMessageService
 	}
 	
 	/**
-	 *  Get a target manager for addresses.
+	 *  Get a send target manager for addresses.
 	 */
-	public TargetManager getTargetManager(IComponentIdentifier cid)
+	public SendManager getSendManager(IComponentIdentifier cid)
 	{
-		TargetManager ret = null;
+		SendManager ret = null;
 		
 		String[] adrs = cid.getAddresses();
-		for(int i=0; i<adrs.length && ret==null; i++)
+		
+		if(adrs==null || adrs.length==0)
 		{
-			ret = (TargetManager)managers.get(adrs[i]);
+			ret = (SendManager)managers.get(LOCAL);
 		}
+		else
+		{
+			for(int i=0; i<adrs.length && ret==null; i++)
+			{
+				ret = (SendManager)managers.get(adrs[i]);
+			}
+		}
+		
 		if(ret==null)
 		{
-			ret = new TargetManager(provider, getTransports());
-			for(int i=0; i<adrs.length; i++)
+			ret = new SendManager();
+			
+			if(adrs==null || adrs.length==0)
 			{
-				managers.put(adrs[i], ret);
+				managers.put(LOCAL, ret);
+			}
+			else
+			{
+				for(int i=0; i<adrs.length; i++)
+				{
+					managers.put(adrs[i], ret);
+				}
 			}
 		}
 		
@@ -470,19 +512,11 @@ public class MessageService extends BasicService implements IMessageService
 		final Future ret = new Future();
 		
 		ITransport[] tps = (ITransport[])transports.toArray(new ITransport[transports.size()]);
-		TargetManager tm = (TargetManager)managers.get(NO_ADDRESSES);
 		for(int i=0; i<tps.length; i++)
 		{
 			try
 			{
 				tps[i].start();
-				
-				// Add local manager to all local addresses
-				String[] adrs = tps[i].getAddresses();
-				for(int j=0; j<adrs.length; j++)
-				{
-					managers.put(adrs[i], tm);
-				}
 			}
 			catch(Exception e)
 			{
@@ -575,7 +609,7 @@ public class MessageService extends BasicService implements IMessageService
 	/**
 	 *  Send a message.
 	 *  @param message The native message.
-	 */
+	 * /
 	protected void internalSendMessage(Map msg, MessageType type, IComponentIdentifier[] receivers, Future ret)
 	{
 //		IComponentIdentifier[] receivers = message.getReceivers();
@@ -615,7 +649,7 @@ public class MessageService extends BasicService implements IMessageService
 		{
 			ret.setResult(null);
 		}
-	}
+	}*/
 	
 	/**
 	 *  Deliver a message to the receivers.
@@ -764,6 +798,138 @@ public class MessageService extends BasicService implements IMessageService
 //			});
 //		}
 //	}
+	
+	/**
+	 *  Send message(s) executable.
+	 */
+	protected class SendManager implements IExecutable
+	{
+		//-------- attributes --------
+		
+		/** The list of messages to send. */
+		protected List messages;
+		
+		//-------- constructors --------
+		
+		/**
+		 * 
+		 */
+		public SendManager()
+		{
+			this.messages = new ArrayList();
+		}
+		
+		//-------- methods --------
+	
+		/**
+		 *  Send a message.
+		 */
+		public boolean execute()
+		{
+			Object[] task = null;
+			boolean isempty;
+			
+			synchronized(this)
+			{
+				if(!messages.isEmpty())
+					task = (Object[])messages.remove(0);
+				isempty = messages.isEmpty();
+			}
+			
+			if(task!=null)
+				internalSendMessage((ManagerSendTask)task[0], (Future)task[1]);
+	
+			return !isempty;
+		}
+		
+		/**
+		 *  Send a message.
+		 *  @param message The native message.
+		 */
+		protected void internalSendMessage(ManagerSendTask task, Future ret)
+		{
+			// todo: move out
+			
+	//		if(receivers.length == 0)
+	//		{
+	//			ret.setException(new MessageFailureException(msg, type, null, "No receiver specified"));
+	//			return;
+	//		}
+	//		for(int i=0; i<receivers.length; i++)
+	//		{
+	//			if(receivers[i]==null)
+	//			{
+	//				ret.setException(new MessageFailureException(msg, type, null, "A receiver nulls: "+msg));
+	//				return;
+	//			}
+	//		}
+	
+			// todo: transport shifting in case of no connection
+			
+			IComponentIdentifier[] receivers = task.getReceivers();
+			
+			ITransport[] transports = getTransports();
+			for(int i = 0; i < transports.length && receivers.length>0; i++)
+			{
+				try
+				{
+					// Method returns component identifiers of undelivered components
+	//				IConnection con = transports[i].getConnection(addresses[i]);
+	//				if(con==null)
+					
+					receivers = transports[i].sendMessage(task.getMessage(), task.getMessageType().getName(), receivers);
+				}
+				catch(Exception e)
+				{
+					// todo: ?
+					e.printStackTrace();
+	//				ret.setException(e);
+				}
+			}
+	
+			if(receivers.length > 0)
+			{
+	//			logger.warning("Message could not be delivered to (all) receivers: " + SUtil.arrayToString(receivers));
+				ret.setException(new MessageFailureException(task.getMessage(), task.getMessageType(), receivers, 
+					"Message could not be delivered to (all) receivers: "+ SUtil.arrayToString(receivers)));
+			}
+			else
+			{
+				ret.setResult(null);
+			}
+		}
+		
+		/**
+		 *  Add a message to be sent.
+		 *  @param message The message.
+		 */
+		public IFuture addMessage(ManagerSendTask task)
+		{
+			final Future ret = new Future();
+			
+			synchronized(this)
+			{
+				messages.add(new Object[]{task, ret});
+			}
+			
+			SServiceProvider.getService(provider, IExecutionService.class).addResultListener(new DefaultResultListener()
+			{
+				public void resultAvailable(Object source, Object result)
+				{
+					try
+					{
+						((IExecutionService)result).execute(SendManager.this);
+					}
+					catch(RuntimeException e)
+					{
+						// ignore if execution service is shutting down.
+					}						
+				}
+			});
+			
+			return ret;
+		}
+	}
 	
 	/**
 	 *  Deliver message(s) executable.

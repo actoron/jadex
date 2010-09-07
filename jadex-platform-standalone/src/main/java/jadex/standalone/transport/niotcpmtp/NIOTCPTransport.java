@@ -239,8 +239,8 @@ public class NIOTCPTransport implements ITransport
 														}
 														catch(IOException e)
 														{ 
-															logger.warning("NIOTCP receiving error while reading data.");
-															e.printStackTrace();
+//															logger.warning("NIOTCP receiving error while reading data.");
+//															e.printStackTrace();
 															con.close();
 															key.cancel();
 														}

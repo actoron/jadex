@@ -1,55 +1,39 @@
 package jadex.standalone.service;
 
-import java.util.Map;
-
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.MessageType;
-import jadex.commons.Future;
-import jadex.commons.IFuture;
-import jadex.commons.concurrent.DelegationResultListener;
+import jadex.standalone.service.MessageService.SendManager;
+
+import java.util.Map;
 
 /**
  * 
  */
 public class ManagerSendTask
 {
-	/** The overall send task. */
-	protected SendTask sendtask;
+	/** The message. */
+	protected Map message;
+	
+	/** The message type. */
+	protected MessageType messagetype;
 	
 	/** The managed receivers. */
 	protected IComponentIdentifier[] receivers;
 
 	/** The target manager. */
-	protected TargetManager manager;
+	protected SendManager manager;
 	
 	/**
 	 *  Create a new manager send task.
 	 */
-	public ManagerSendTask(SendTask sendtask, IComponentIdentifier[] receivers, TargetManager manager)
+	public ManagerSendTask(Map message, MessageType messagetype, IComponentIdentifier[] receivers, SendManager manager)
 	{
-		this.sendtask = sendtask;
+		this.message = message;
+		this.messagetype = messagetype;
 		this.receivers = receivers;
 		this.manager = manager;
 	}
-
-	/**
-	 * 
-	 */
-	public IFuture execute()
-	{
-		Future ret = new Future();
-		manager.addMessage(this).addResultListener(new DelegationResultListener(ret));
-		return ret;
-	}
 	
-	/**
-	 *  Get the sendtask.
-	 *  @return the sendtask.
-	 */
-	public SendTask getSendTask()
-	{
-		return sendtask;
-	}
 	
 	/**
 	 *  Get the message.
@@ -57,7 +41,7 @@ public class ManagerSendTask
 	 */
 	public Map getMessage()
 	{
-		return sendtask.getMessage();
+		return message;
 	}
 
 	/**
@@ -66,7 +50,7 @@ public class ManagerSendTask
 	 */
 	public MessageType getMessageType()
 	{
-		return sendtask.getMessageType();
+		return messagetype;
 	}
 
 	/**
@@ -82,9 +66,8 @@ public class ManagerSendTask
 	 *  Get the manager.
 	 *  @return the manager.
 	 */
-	public TargetManager getTargetManager()
+	public SendManager getTargetManager()
 	{
 		return manager;
 	}
-
 }
