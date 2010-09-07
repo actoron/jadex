@@ -32,7 +32,6 @@ import jadex.standalone.StandaloneComponentAdapter;
 import jadex.standalone.transport.ITransport;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;

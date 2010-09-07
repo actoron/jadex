@@ -438,11 +438,14 @@ public class NIOTCPTransport implements ITransport
 	 */
 	protected void removeConnection(String address)
 	{
-		address = address.toLowerCase();
-		
-		NIOTCPOutputConnection con = (NIOTCPOutputConnection)connections.remove(address);
-		if(con!=null)
-			con.close();
+		if(connections!=null)
+		{
+			address = address.toLowerCase();
+			
+			NIOTCPOutputConnection con = (NIOTCPOutputConnection)connections.remove(address);
+			if(con!=null)
+				con.close();
+		}
 	}
 	
 	/**

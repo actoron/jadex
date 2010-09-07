@@ -737,11 +737,6 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 		
 		return ret;
 	}
-
-	public void setComponentThread(Thread thread)
-	{
-		this.componentthread	= thread;
-	}
 	
 	/**
 	 *  Wake up this component.
