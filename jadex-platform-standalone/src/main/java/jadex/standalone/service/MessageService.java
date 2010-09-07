@@ -654,7 +654,7 @@ public class MessageService extends BasicService implements IMessageService
 						}
 						catch(Exception e)
 						{
-							logger.warning("Message could not be delivered to receiver(s): " + receivers[cnt] + ", "+ message.get(messagetype.getIdIdentifier())+", "+e);
+//							logger.warning("Message could not be delivered to receiver(s): " + receivers[cnt] + ", "+ message.get(messagetype.getIdIdentifier())+", "+e);
 
 							// todo: notify sender that message could not be delivered!
 							// Problem: there is no connection back to the sender, so that
@@ -663,7 +663,7 @@ public class MessageService extends BasicService implements IMessageService
 					}
 					else
 					{
-						logger.warning("Message could not be delivered to receiver(s): " + receivers[cnt] + ", "+ msg.get(messagetype.getIdIdentifier()));
+//						logger.warning("Message could not be delivered to receiver(s): " + receivers[cnt] + ", "+ msg.get(messagetype.getIdIdentifier()));
 
 						// todo: notify sender that message could not be delivered!
 						// Problem: there is no connection back to the sender, so that
