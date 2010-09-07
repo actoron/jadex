@@ -1,7 +1,6 @@
 package jadex.tools.jcc;
 
 import jadex.base.gui.AboutDialog;
-import jadex.base.gui.ConfigurationDialog;
 import jadex.base.gui.JadexLogoButton;
 import jadex.base.gui.plugin.IControlCenterPlugin;
 import jadex.commons.BrowserLauncher;
@@ -16,7 +15,6 @@ import java.awt.CardLayout;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Insets;
-import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
@@ -37,7 +35,6 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
