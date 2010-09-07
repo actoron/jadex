@@ -1,4 +1,4 @@
-package jadex.wfms.simulation.stateholder;
+package jadex.wfms.simulation.stateset;
 
 import jadex.bpmn.model.MParameter;
 import jadex.javaparser.SimpleValueFetcher;

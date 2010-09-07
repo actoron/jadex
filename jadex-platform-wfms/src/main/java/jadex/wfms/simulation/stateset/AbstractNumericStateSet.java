@@ -1,4 +1,4 @@
-package jadex.wfms.simulation.stateholder;
+package jadex.wfms.simulation.stateset;
 
 import java.util.ArrayList;
 import java.util.Collections;

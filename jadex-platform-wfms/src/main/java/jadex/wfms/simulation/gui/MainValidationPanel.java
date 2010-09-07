@@ -2,7 +2,7 @@ package jadex.wfms.simulation.gui;
 
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.wfms.common.SClassLoaderTools;
-import jadex.wfms.simulation.stateholder.gui.IStatePanel;
+import jadex.wfms.simulation.stateset.gui.IStatePanel;
 
 import java.io.File;
 import java.io.FileFilter;

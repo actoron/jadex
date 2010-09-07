@@ -1,7 +1,7 @@
-package jadex.wfms.simulation.stateholder.gui;
+package jadex.wfms.simulation.stateset.gui;
 
 import jadex.wfms.simulation.gui.SimulationWindow;
-import jadex.wfms.simulation.stateholder.BooleanStateSet;
+import jadex.wfms.simulation.stateset.BooleanStateSet;
 
 import java.awt.event.ActionEvent;
 

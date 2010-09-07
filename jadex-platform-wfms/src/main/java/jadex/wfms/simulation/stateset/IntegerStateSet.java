@@ -1,4 +1,4 @@
-package jadex.wfms.simulation.stateholder;
+package jadex.wfms.simulation.stateset;
 
 /**
  * State holder for Integer values.

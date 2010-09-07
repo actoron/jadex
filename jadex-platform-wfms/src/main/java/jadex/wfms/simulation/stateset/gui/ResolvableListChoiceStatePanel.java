@@ -1,10 +1,10 @@
-package jadex.wfms.simulation.stateholder.gui;
+package jadex.wfms.simulation.stateset.gui;
 
 import jadex.bpmn.model.MParameter;
 import jadex.javaparser.SimpleValueFetcher;
 import jadex.wfms.parametertypes.ListChoice;
 import jadex.wfms.simulation.gui.SimulationWindow;
-import jadex.wfms.simulation.stateholder.ResolvableListChoiceStateSet;
+import jadex.wfms.simulation.stateset.ResolvableListChoiceStateSet;
 
 import java.awt.EventQueue;
 import java.awt.GridBagConstraints;

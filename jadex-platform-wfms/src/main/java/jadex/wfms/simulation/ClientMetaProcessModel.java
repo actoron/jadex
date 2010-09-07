@@ -11,7 +11,7 @@ import jadex.gpmn.model2.MBpmnPlan;
 import jadex.gpmn.model2.MGpmnModel;
 import jadex.gpmn.model2.MSubprocess;
 import jadex.wfms.client.task.WorkitemTask;
-import jadex.wfms.simulation.stateholder.ParameterStateSetFactory;
+import jadex.wfms.simulation.stateset.ParameterStateSetFactory;
 
 import java.io.File;
 import java.util.ArrayList;

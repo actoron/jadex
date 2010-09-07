@@ -1,16 +1,16 @@
-package jadex.wfms.simulation.stateholder.gui;
+package jadex.wfms.simulation.stateset.gui;
 
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MParameter;
 import jadex.wfms.simulation.gui.SimulationWindow;
-import jadex.wfms.simulation.stateholder.AbstractNumericStateSet;
-import jadex.wfms.simulation.stateholder.BooleanStateSet;
-import jadex.wfms.simulation.stateholder.DocumentStateSet;
-import jadex.wfms.simulation.stateholder.ParameterStateSetFactory;
-import jadex.wfms.simulation.stateholder.ResolvableListChoiceStateSet;
-import jadex.wfms.simulation.stateholder.ResolvableMultiListChoiceStateSet;
-import jadex.wfms.simulation.stateholder.StringArrayStateSet;
-import jadex.wfms.simulation.stateholder.StringStateSet;
+import jadex.wfms.simulation.stateset.AbstractNumericStateSet;
+import jadex.wfms.simulation.stateset.BooleanStateSet;
+import jadex.wfms.simulation.stateset.DocumentStateSet;
+import jadex.wfms.simulation.stateset.ParameterStateSetFactory;
+import jadex.wfms.simulation.stateset.ResolvableListChoiceStateSet;
+import jadex.wfms.simulation.stateset.ResolvableMultiListChoiceStateSet;
+import jadex.wfms.simulation.stateset.StringArrayStateSet;
+import jadex.wfms.simulation.stateset.StringStateSet;
 
 import javax.swing.JPanel;
 

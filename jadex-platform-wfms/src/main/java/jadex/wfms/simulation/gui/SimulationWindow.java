@@ -7,8 +7,8 @@ import jadex.commons.collection.TreeNode;
 import jadex.commons.service.library.ILibraryService;
 import jadex.wfms.simulation.ModelTreeNode;
 import jadex.wfms.simulation.Scenario;
-import jadex.wfms.simulation.stateholder.gui.IStatePanel;
-import jadex.wfms.simulation.stateholder.gui.StatePanelFactory;
+import jadex.wfms.simulation.stateset.gui.IStatePanel;
+import jadex.wfms.simulation.stateset.gui.StatePanelFactory;
 
 import java.awt.BorderLayout;
 import java.awt.Font;

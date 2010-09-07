@@ -1,4 +1,4 @@
-package jadex.wfms.simulation.stateholder.gui;
+package jadex.wfms.simulation.stateset.gui;
 
 public interface IStatePanel
 {

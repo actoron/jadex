@@ -1,4 +1,4 @@
-package jadex.wfms.simulation.stateholder.gui;
+package jadex.wfms.simulation.stateset.gui;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -16,8 +16,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import jadex.wfms.simulation.gui.SimulationWindow;
-import jadex.wfms.simulation.stateholder.AbstractNumericStateSet;
-import jadex.wfms.simulation.stateholder.NumberRange;
+import jadex.wfms.simulation.stateset.AbstractNumericStateSet;
+import jadex.wfms.simulation.stateset.NumberRange;
 
 public class NumericPanel extends JPanel implements IStatePanel
 {

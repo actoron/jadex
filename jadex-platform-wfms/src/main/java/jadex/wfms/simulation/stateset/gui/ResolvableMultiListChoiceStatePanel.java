@@ -1,4 +1,4 @@
-package jadex.wfms.simulation.stateholder.gui;
+package jadex.wfms.simulation.stateset.gui;
 
 import jadex.bpmn.model.MParameter;
 import jadex.commons.SGUI;
@@ -7,7 +7,7 @@ import jadex.wfms.guicomponents.ButtonPanel;
 import jadex.wfms.guicomponents.ChoiceTable;
 import jadex.wfms.parametertypes.MultiListChoice;
 import jadex.wfms.simulation.gui.SimulationWindow;
-import jadex.wfms.simulation.stateholder.ResolvableMultiListChoiceStateSet;
+import jadex.wfms.simulation.stateset.ResolvableMultiListChoiceStateSet;
 
 import java.awt.Component;
 import java.awt.Frame;

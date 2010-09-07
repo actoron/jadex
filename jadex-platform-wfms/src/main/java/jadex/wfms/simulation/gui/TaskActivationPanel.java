@@ -1,7 +1,7 @@
 package jadex.wfms.simulation.gui;
 
 import jadex.wfms.simulation.ActivationConstraint;
-import jadex.wfms.simulation.stateholder.gui.IStatePanel;
+import jadex.wfms.simulation.stateset.gui.IStatePanel;
 
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;

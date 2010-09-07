@@ -1,9 +1,9 @@
-package jadex.wfms.simulation.stateholder.gui;
+package jadex.wfms.simulation.stateset.gui;
 
 import jadex.wfms.guicomponents.StringTable;
 import jadex.wfms.guicomponents.StringTable.AbstractStringTableModel;
 import jadex.wfms.simulation.gui.SimulationWindow;
-import jadex.wfms.simulation.stateholder.StringStateSet;
+import jadex.wfms.simulation.stateset.StringStateSet;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;

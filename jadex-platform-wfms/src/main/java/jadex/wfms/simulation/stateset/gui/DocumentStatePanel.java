@@ -1,10 +1,10 @@
-package jadex.wfms.simulation.stateholder.gui;
+package jadex.wfms.simulation.stateset.gui;
 
 import jadex.wfms.guicomponents.ButtonPanel;
 import jadex.wfms.parametertypes.Document;
 import jadex.wfms.simulation.Scenario;
 import jadex.wfms.simulation.gui.SimulationWindow;
-import jadex.wfms.simulation.stateholder.DocumentStateSet;
+import jadex.wfms.simulation.stateset.DocumentStateSet;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;

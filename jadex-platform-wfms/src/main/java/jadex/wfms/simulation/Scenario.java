@@ -1,8 +1,8 @@
 package jadex.wfms.simulation;
 
-import jadex.wfms.simulation.stateholder.ActivityStateController;
-import jadex.wfms.simulation.stateholder.IParameterStateSet;
-import jadex.wfms.simulation.stateholder.ProcessStateController;
+import jadex.wfms.simulation.stateset.ActivityStateController;
+import jadex.wfms.simulation.stateset.IParameterStateSet;
+import jadex.wfms.simulation.stateset.ProcessStateController;
 
 import java.util.ArrayList;
 import java.util.Collection;
