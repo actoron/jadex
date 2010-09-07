@@ -59,7 +59,7 @@ public class ComponentIconCache
 		{
 			// Todo: remember ongoing searches for efficiency?
 //			System.out.println("getIcon: "+type);
-			SServiceProvider.getService(provider, new ComponentFactorySelector(type)).addResultListener(new SwingDefaultResultListener(tree)
+			SServiceProvider.getService(provider, new ComponentFactorySelector(type)).addResultListener(new SwingDefaultResultListener()
 			{
 				public void customResultAvailable(Object source, Object result)
 				{
@@ -74,6 +74,10 @@ public class ComponentIconCache
 					{
 						tree.repaint();
 					}
+				}
+				public void customExceptionOccurred(Object source, Exception exception)
+				{
+					// ignore
 				}
 			});
 		}

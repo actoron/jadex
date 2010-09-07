@@ -210,7 +210,7 @@ public class ComponentTreePanel extends JSplitPane
 						final ComponentTreeNode	parentnode = desc.getParent()==null? null: (ComponentTreeNode)model.getAddedNode(desc.getParent());
 						if(parentnode!=null)
 						{
-							parentnode.createComponentNode(desc).addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
+							parentnode.createComponentNode(desc).addResultListener(new SwingDefaultResultListener()
 							{
 								public void customResultAvailable(Object source, Object result)
 								{
@@ -736,7 +736,7 @@ public class ComponentTreePanel extends JSplitPane
 								root	= descriptions[i];
 							}
 						}
-						model.setRoot(new ComponentTreeNode(null, model, tree, root, cms, ComponentTreePanel.this, cic));
+						model.setRoot(new ComponentTreeNode(null, model, tree, root, cms, cic));
 						// Expand root node.
 						TreeExpansionHandler	teh	= new TreeExpansionHandler(tree);
 						teh.treeExpanded(new TreeExpansionEvent(tree, new TreePath(model.getRoot())));
@@ -856,12 +856,16 @@ public class ComponentTreePanel extends JSplitPane
 	 */
 	public void	dispose()
 	{
-		SServiceProvider.getServiceUpwards(provider, IComponentManagementService.class).addResultListener(new SwingDefaultResultListener(this)
+		SServiceProvider.getServiceUpwards(provider, IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
 		{
 			public void customResultAvailable(Object source, Object result)
 			{
 				cms	= (IComponentManagementService)result;
 				cms.removeComponentListener(null, listener);				
+			}
+			public void customExceptionOccurred(Object source, Exception exception)
+			{
+				// ignore
 			}
 		});
 		

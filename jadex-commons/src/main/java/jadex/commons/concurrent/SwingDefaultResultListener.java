@@ -25,12 +25,12 @@ public abstract class SwingDefaultResultListener extends DefaultResultListener
 	
 	//-------- constructors --------
 	
-//	/**
-//	 *  Create a new listener.
-//	 */
-//	public SwingDefaultResultListener()
-//	{
-//	}
+	/**
+	 *  Create a new listener.
+	 */
+	public SwingDefaultResultListener()
+	{
+	}
 	
 	/**
 	 *  Create a new listener.

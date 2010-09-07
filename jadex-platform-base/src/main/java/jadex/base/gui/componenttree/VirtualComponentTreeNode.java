@@ -10,7 +10,6 @@ import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.micro.IMicroExternalAccess;
 
-import java.awt.Component;
 import java.util.Collections;
 import java.util.List;
 
@@ -31,10 +30,6 @@ public class VirtualComponentTreeNode extends AbstractComponentTreeNode implemen
 	/** The component management service. */
 	protected final IComponentManagementService	cms;
 		
-	/** The UI component used for displaying error messages. */
-	// Todo: status bar for longer lasting actions?
-	protected final Component	ui;
-		
 	/** The icon cache. */
 	protected final ComponentIconCache	iconcache;
 	
@@ -50,12 +45,11 @@ public class VirtualComponentTreeNode extends AbstractComponentTreeNode implemen
 	 *  Create a new service container node.
 	 */
 	public VirtualComponentTreeNode(IComponentTreeNode parent, ComponentTreeModel model, JTree tree, IComponentDescription desc,
-		IComponentManagementService cms, Component ui, ComponentIconCache iconcache)
+		IComponentManagementService cms, ComponentIconCache iconcache)
 	{
 		super(parent, model, tree);
 		this.desc = desc;
 		this.cms = cms;
-		this.ui = ui;
 		this.iconcache = iconcache;
 		model.registerNode(this);
 	}
@@ -68,8 +62,8 @@ public class VirtualComponentTreeNode extends AbstractComponentTreeNode implemen
 	protected void	searchChildren(boolean force)
 	{
 		final Future	future	= new Future();
-		ProxyComponentTreeNode.searchChildren(cms, this, desc, desc.getName(), ui, iconcache, future, force)
-			.addResultListener(new SwingDefaultResultListener((Component)null)
+		ProxyComponentTreeNode.searchChildren(cms, this, desc, desc.getName(), iconcache, future, force)
+			.addResultListener(new SwingDefaultResultListener()
 		{
 			public void customResultAvailable(Object source, Object result)
 			{
@@ -95,7 +89,7 @@ public class VirtualComponentTreeNode extends AbstractComponentTreeNode implemen
 		ProxyComponentTreeNode proxy = (ProxyComponentTreeNode)tmp;
 		
 		cms.getExternalAccess(proxy.getDescription().getName())
-			.addResultListener(new SwingDefaultResultListener((Component)null)
+			.addResultListener(new SwingDefaultResultListener()
 		{
 			public void customResultAvailable(Object source, Object result)
 			{
@@ -106,7 +100,7 @@ public class VirtualComponentTreeNode extends AbstractComponentTreeNode implemen
 					{
 						ProxyAgent pa = (ProxyAgent)agent;
 						pa.getRemoteComponentDescription(desc.getName())
-							.addResultListener(new SwingDefaultResultListener((Component)null)
+							.addResultListener(new SwingDefaultResultListener()
 						{
 							public void customResultAvailable(Object source, Object result)
 							{

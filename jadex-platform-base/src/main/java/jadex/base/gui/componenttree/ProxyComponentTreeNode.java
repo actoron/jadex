@@ -15,7 +15,6 @@ import jadex.commons.gui.CombiIcon;
 import jadex.commons.service.IService;
 import jadex.micro.IMicroExternalAccess;
 
-import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -62,9 +61,9 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 	 *  Create a new service container node.
 	 */
 	public ProxyComponentTreeNode(final IComponentTreeNode parent, ComponentTreeModel model, JTree tree, IComponentDescription desc,
-		IComponentManagementService cms, Component ui, ComponentIconCache iconcache)
+		IComponentManagementService cms, ComponentIconCache iconcache)
 	{
-		super(parent, model, tree, desc, cms, ui, iconcache);
+		super(parent, model, tree, desc, cms, iconcache);
 		this.connected = false;
 		
 		timer = new Timer(10000, new ActionListener()
@@ -108,14 +107,13 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 	 */
 	protected void	searchChildren(final boolean force)
 	{
-		// Do not use 'ui' in SwingDefLis because failures will be shown be node color
-		getRemoteComponentIdentifier().addResultListener(new SwingDefaultResultListener((Component)null)
+		getRemoteComponentIdentifier().addResultListener(new SwingDefaultResultListener()
 		{
 			public void customResultAvailable(Object source, Object result)
 			{
 				final Future	future	= new Future();
-				searchChildren(cms, ProxyComponentTreeNode.this, desc, cid, ui, iconcache, future, force)
-					.addResultListener(new SwingDefaultResultListener((Component)null)
+				searchChildren(cms, ProxyComponentTreeNode.this, desc, cid, iconcache, future, force)
+					.addResultListener(new SwingDefaultResultListener()
 				{
 					public void customResultAvailable(Object source, Object result)
 					{
@@ -155,7 +153,7 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 	 *  Should call setChildren() once children are found.
 	 */
 	protected static IFuture searchChildren(final IComponentManagementService cms, final IComponentTreeNode parentnode,
-		final IComponentDescription desc, final IComponentIdentifier cid, final Component ui, final  ComponentIconCache iconcache,
+		final IComponentDescription desc, final IComponentIdentifier cid, final  ComponentIconCache iconcache,
 		final // future for determining when services can be added to service container.
 		Future future, final boolean force)
 	{
@@ -179,7 +177,7 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 					public void execute(Object agent)
 					{
 						ProxyAgent pa = (ProxyAgent)agent;
-						pa.getVirtualChildren(cid, force).addResultListener(new SwingDefaultResultListener((Component)null)
+						pa.getVirtualChildren(cid, force).addResultListener(new SwingDefaultResultListener()
 						{
 							public void customResultAvailable(Object source, Object result)
 							{
@@ -190,7 +188,7 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 									IComponentTreeNode node = proxy.getModel().getNode(descs[i].getName());
 									if(node==null)
 									{
-										node = new VirtualComponentTreeNode(parentnode, proxy.getModel(), proxy.getTree(), descs[i], cms, ui, iconcache);
+										node = new VirtualComponentTreeNode(parentnode, proxy.getModel(), proxy.getTree(), descs[i], cms, iconcache);
 									}
 //									System.err.println(proxy.getModel().hashCode()+", "+ready.hashCode()+" searchChildren.add "+node);
 									children.add(node);
@@ -217,7 +215,7 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 					public void execute(Object agent)
 					{
 						ProxyAgent pa = (ProxyAgent)agent;
-						pa.getRemoteServices(cid).addResultListener(new SwingDefaultResultListener((Component)null)
+						pa.getRemoteServices(cid).addResultListener(new SwingDefaultResultListener()
 						{
 							public void customResultAvailable(Object source, Object result)
 							{
@@ -241,7 +239,7 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 									}
 									
 									final ServiceContainerNode	node	= scn;
-									future.addResultListener(new SwingDefaultResultListener((Component)null)
+									future.addResultListener(new SwingDefaultResultListener()
 									{
 										public void customResultAvailable(Object source, Object result)
 										{
@@ -249,7 +247,7 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 										}
 										public void customExceptionOccurred(Object source, Exception exception)
 										{
-											ret.setExceptionIfUndone(exception);
+											// Shouldn't happen
 										}
 									});
 								}

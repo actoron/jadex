@@ -12,7 +12,6 @@ import jadex.commons.service.IService;
 import jadex.commons.service.IServiceContainer;
 import jadex.commons.service.SServiceProvider;
 
-import java.awt.Component;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,10 +32,6 @@ public class ComponentTreeNode	extends AbstractComponentTreeNode implements IAct
 	/** The component management service. */
 	protected final IComponentManagementService	cms;
 		
-	/** The UI component used for displaying error messages. */
-	// Todo: status bar for longer lasting actions?
-	protected final Component	ui;
-		
 	/** The icon cache. */
 	protected final ComponentIconCache	iconcache;
 		
@@ -49,12 +44,11 @@ public class ComponentTreeNode	extends AbstractComponentTreeNode implements IAct
 	 *  Create a new service container node.
 	 */
 	public ComponentTreeNode(IComponentTreeNode parent, ComponentTreeModel model, JTree tree, IComponentDescription desc,
-		IComponentManagementService cms, Component ui, ComponentIconCache iconcache)
+		IComponentManagementService cms, ComponentIconCache iconcache)
 	{
 		super(parent, model, tree);
 		this.desc	= desc;
 		this.cms	= cms;
-		this.ui	= ui;
 		this.iconcache	= iconcache;
 		
 		model.registerNode(this);
@@ -84,12 +78,16 @@ public class ComponentTreeNode	extends AbstractComponentTreeNode implements IAct
 	 */
 	public void refresh(boolean recurse, boolean force)
 	{
-		cms.getComponentDescription(desc.getName()).addResultListener(new SwingDefaultResultListener(ui)
+		cms.getComponentDescription(desc.getName()).addResultListener(new SwingDefaultResultListener()
 		{
 			public void customResultAvailable(Object source, Object result)
 			{
 				ComponentTreeNode.this.desc	= (IComponentDescription)result;
 				getModel().fireNodeChanged(ComponentTreeNode.this);
+			}
+			public void customExceptionOccurred(Object source, Exception exception)
+			{
+				// ignore
 			}
 		});
 
@@ -106,7 +104,7 @@ public class ComponentTreeNode	extends AbstractComponentTreeNode implements IAct
 		final boolean	ready[]	= new boolean[2];	// 0: children, 1: services;
 		final Future	future	= new Future();	// future for determining when services can be added to service container.
 
-		cms.getChildren(desc.getName()).addResultListener(new SwingDefaultResultListener(ui)
+		cms.getChildren(desc.getName()).addResultListener(new SwingDefaultResultListener()
 		{
 			public void customResultAvailable(Object source, Object result)
 			{
@@ -116,7 +114,7 @@ public class ComponentTreeNode	extends AbstractComponentTreeNode implements IAct
 				{
 					for(int i=0; i<achildren.length; i++)
 					{
-						cms.getComponentDescription(achildren[i]).addResultListener(new SwingDefaultResultListener(ui)
+						cms.getComponentDescription(achildren[i]).addResultListener(new SwingDefaultResultListener()
 						{
 							public void customResultAvailable(Object source, Object result)
 							{
@@ -124,7 +122,7 @@ public class ComponentTreeNode	extends AbstractComponentTreeNode implements IAct
 								IComponentTreeNode	node	= getModel().getNode(desc.getName());
 								if(node==null)
 								{
-									createComponentNode(desc).addResultListener(new SwingDefaultResultListener(ui)
+									createComponentNode(desc).addResultListener(new SwingDefaultResultListener()
 									{
 										public void customResultAvailable(Object source, Object result)
 										{
@@ -203,16 +201,20 @@ public class ComponentTreeNode	extends AbstractComponentTreeNode implements IAct
 					}
 				}
 			}
+			public void customExceptionOccurred(Object source, Exception exception)
+			{
+				// ignore
+			}
 		});
 		
 		
 		// Search services and only add container node when services are found.
-		cms.getExternalAccess(desc.getName()).addResultListener(new SwingDefaultResultListener((Component)null)
+		cms.getExternalAccess(desc.getName()).addResultListener(new SwingDefaultResultListener()
 		{
 			public void customResultAvailable(Object source, Object result)
 			{
 				final IExternalAccess	ea	= (IExternalAccess)result;
-				SServiceProvider.getDeclaredServices(ea.getServiceProvider()).addResultListener(new SwingDefaultResultListener(ui)
+				SServiceProvider.getDeclaredServices(ea.getServiceProvider()).addResultListener(new SwingDefaultResultListener()
 				{
 					public void customResultAvailable(Object source, Object result)
 					{
@@ -236,15 +238,27 @@ public class ComponentTreeNode	extends AbstractComponentTreeNode implements IAct
 							}
 							
 							final ServiceContainerNode	node	= scn;
-							future.addResultListener(new SwingDefaultResultListener(ui)
+							future.addResultListener(new SwingDefaultResultListener()
 							{
 								public void customResultAvailable(Object source, Object result)
 								{
 									node.setChildren(subchildren);
 								}
+								public void customExceptionOccurred(Object source, Exception exception)
+								{
+									// Shouldn't happen???
+								}
 							});
 						}
 
+						ready[1]	= true;
+						if(ready[0] &&  ready[1])
+						{
+							setChildren(children).addResultListener(new DelegationResultListener(future));
+						}
+					}
+					public void customExceptionOccurred(Object source, Exception exception)
+					{
 						ready[1]	= true;
 						if(ready[0] &&  ready[1])
 						{
@@ -265,21 +279,13 @@ public class ComponentTreeNode	extends AbstractComponentTreeNode implements IAct
 	//-------- methods --------
 	
 	/**
-	 *  Get the UI for displaying errors.
-	 */
-	protected Component	getUI()
-	{
-		return ui;
-	}
-	
-	/**
 	 *  Create a new component node.
 	 */
 	public IFuture createComponentNode(final IComponentDescription desc)
 	{
 		final Future ret = new Future();
 		
-		cms.getExternalAccess(desc.getName()).addResultListener(new SwingDefaultResultListener(ui)
+		cms.getExternalAccess(desc.getName()).addResultListener(new SwingDefaultResultListener()
 		{
 			public void customResultAvailable(Object source, Object result)
 			{
@@ -290,11 +296,11 @@ public class ComponentTreeNode	extends AbstractComponentTreeNode implements IAct
 					boolean proxy = "jadex.base.service.remote.Proxy".equals(exta.getModel().getFullName());
 					if(proxy)
 					{
-						node = new ProxyComponentTreeNode(ComponentTreeNode.this, getModel(), getTree(), desc, cms, ui, iconcache);
+						node = new ProxyComponentTreeNode(ComponentTreeNode.this, getModel(), getTree(), desc, cms, iconcache);
 					}
 					else
 					{
-						node = new ComponentTreeNode(ComponentTreeNode.this, getModel(), getTree(), desc, cms, ui, iconcache);
+						node = new ComponentTreeNode(ComponentTreeNode.this, getModel(), getTree(), desc, cms, iconcache);
 					}
 				}
 				ret.setResult(node);
