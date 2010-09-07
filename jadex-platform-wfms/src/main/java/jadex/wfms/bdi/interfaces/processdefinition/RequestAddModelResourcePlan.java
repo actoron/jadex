@@ -8,7 +8,6 @@ import jadex.wfms.bdi.client.cap.AbstractWfmsPlan;
 import jadex.wfms.bdi.ontology.RequestAddModelResource;
 import jadex.wfms.bdi.ontology.RequestProxy;
 import jadex.wfms.client.IClient;
-import jadex.wfms.service.IClientService;
 import jadex.wfms.service.IProcessDefinitionService;
 
 import java.io.File;

@@ -1,7 +1,6 @@
 package jadex.wfms.bdi.ontology;
 
 import jadex.base.fipa.IComponentAction;
-import jadex.base.fipa.SFipa;
 
 public class RequestDeAuth implements IComponentAction
 {

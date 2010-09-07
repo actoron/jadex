@@ -5,7 +5,6 @@ import jadex.bdi.runtime.Plan;
 import jadex.commons.service.SServiceProvider;
 import jadex.wfms.bdi.ontology.RequestDeAuth;
 import jadex.wfms.client.IClient;
-import jadex.wfms.listeners.IWorkitemListener;
 import jadex.wfms.service.IClientService;
 
 import java.util.Map;

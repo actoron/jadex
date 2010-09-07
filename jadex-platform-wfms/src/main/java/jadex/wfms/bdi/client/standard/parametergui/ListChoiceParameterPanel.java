@@ -2,11 +2,9 @@ package jadex.wfms.bdi.client.standard.parametergui;
 
 import jadex.wfms.parametertypes.ListChoice;
 
-import java.awt.Color;
 import java.awt.GridBagConstraints;
 
 import javax.swing.JComboBox;
-import javax.swing.JTextField;
 
 public class ListChoiceParameterPanel extends AbstractParameterPanel
 {

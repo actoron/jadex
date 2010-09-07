@@ -1,16 +1,18 @@
 package jadex.wfms.service.impl;
 
-import jadex.commons.Future;
-import jadex.commons.IFuture;
-import jadex.commons.concurrent.IResultListener;
+import jadex.bridge.CreationInfo;
+import jadex.bridge.IComponentManagementService;
+import jadex.commons.IFilter;
+import jadex.commons.concurrent.DefaultResultListener;
+import jadex.commons.service.BasicResultSelector;
 import jadex.commons.service.BasicService;
-import jadex.commons.service.IService;
 import jadex.commons.service.IServiceContainer;
 import jadex.commons.service.IServiceProvider;
+import jadex.commons.service.SServiceProvider;
+import jadex.gpmn.GpmnFactory;
 import jadex.wfms.bdi.client.standard.SCapReqs;
 import jadex.wfms.client.IClient;
 import jadex.wfms.service.IAAAService;
-import jadex.wfms.service.IAdministrationService;
 import jadex.wfms.service.IAuthenticationListener;
 
 import java.util.Collections;
@@ -34,8 +36,39 @@ public class BasicAAAService extends BasicService implements IAAAService
 	
 	private Set authenticationListeners;
 	
-	public static IAAAService getTestService(IServiceContainer provider)
+	public static IAAAService getTestService(final IServiceContainer provider)
 	{
+		SServiceProvider.getService(provider, new BasicResultSelector(new IFilter()
+		{
+			
+			public boolean filter(Object obj)
+			{
+				if (obj instanceof GpmnFactory)
+					return true;
+				return false;
+			}
+		}, true)).addResultListener(new DefaultResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				if (result == null)
+					SServiceProvider.getService(provider, IComponentManagementService.class).addResultListener(new DefaultResultListener()
+					{
+						public void resultAvailable(Object source, Object result)
+						{
+							IComponentManagementService cms = (IComponentManagementService) result;
+							try
+							{
+								cms.createComponent("kernel_gpmn", "/jadex/gpmn/KernelGPMN.application.xml", new CreationInfo(null, null, null), null);
+							}
+							catch (Exception e)
+							{
+							}
+						}
+					});
+			}
+		});
+		
 		Map secRoles = new HashMap();
 		Set userNoStartCaps = new HashSet();
 		userNoStartCaps.addAll(SCapReqs.ACTIVITY_HANDLING);

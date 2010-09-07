@@ -3,16 +3,11 @@ package jadex.wfms.bdi.interfaces.client;
 import jadex.base.fipa.Done;
 import jadex.bdi.runtime.Plan;
 import jadex.commons.service.SServiceProvider;
-import jadex.wfms.bdi.ontology.RequestProcessStart;
 import jadex.wfms.bdi.ontology.RequestWorkitemList;
 import jadex.wfms.client.IClient;
-import jadex.wfms.client.Workitem;
 import jadex.wfms.service.IClientService;
 
 import java.security.AccessControlException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 

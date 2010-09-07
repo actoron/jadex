@@ -7,12 +7,10 @@ import jadex.commons.service.SServiceProvider;
 import jadex.wfms.bdi.client.cap.AbstractWfmsPlan;
 import jadex.wfms.bdi.ontology.RequestProxy;
 import jadex.wfms.bdi.ontology.RequestTerminateActivity;
-import jadex.wfms.bdi.ontology.RequestUserActivities;
 import jadex.wfms.client.IClient;
 import jadex.wfms.service.IAdministrationService;
 
 import java.security.AccessControlException;
-import java.util.Map;
 
 public class RequestTerminateActivityPlan extends AbstractWfmsPlan
 {

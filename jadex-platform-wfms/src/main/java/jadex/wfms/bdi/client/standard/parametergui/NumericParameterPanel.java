@@ -3,11 +3,7 @@ package jadex.wfms.bdi.client.standard.parametergui;
 import jadex.wfms.bdi.client.standard.SNumberUtils;
 
 import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.util.HashMap;
-import java.util.Map;
 
-import javax.swing.JLabel;
 import javax.swing.JTextField;
 
 public class NumericParameterPanel extends AbstractParameterPanel

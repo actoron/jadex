@@ -3,15 +3,9 @@ package jadex.wfms;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IEAGoal;
 import jadex.bdi.runtime.IEAParameter;
-import jadex.bdi.runtime.IParameter;
-import jadex.bridge.ComponentResultListener;
 import jadex.bridge.IComponentAdapter;
-import jadex.commons.ThreadSuspendable;
-import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
-import jadex.commons.concurrent.SwingDefaultResultListener;
 
-import java.awt.EventQueue;
 import java.util.HashMap;
 import java.util.Map;
 

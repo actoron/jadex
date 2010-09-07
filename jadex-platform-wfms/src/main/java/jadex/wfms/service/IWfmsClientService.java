@@ -6,8 +6,6 @@ import jadex.wfms.client.IClientActivity;
 import jadex.wfms.client.IWorkitem;
 import jadex.wfms.listeners.IActivityListener;
 
-import java.util.Map;
-
 /**
  * Service for accessing the workitem queue and client event handling.
  */

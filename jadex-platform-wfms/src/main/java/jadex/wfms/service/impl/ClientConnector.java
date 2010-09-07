@@ -151,7 +151,7 @@ public class ClientConnector extends BasicService // implements IClientService, 
 		final Future ret = new Future();
 		SServiceProvider.getService(provider, IAAAService.class).addResultListener(new DelegationResultListener(ret)
 		{
-			public void resultAvailable(Object source, Object result)
+			public void customResultAvailable(Object source, Object result)
 			{
 				boolean auth = ((IAAAService) result).authenticate(client);
 				if (auth)
@@ -181,7 +181,7 @@ public class ClientConnector extends BasicService // implements IClientService, 
 		final Future ret = new Future();
 		SServiceProvider.getService(provider, IAAAService.class).addResultListener(new DelegationResultListener(ret)
 		{
-			public void resultAvailable(Object source, Object result)
+			public void customResultAvailable(Object source, Object result)
 			{
 				synchronized(ClientConnector.this)
 				{
@@ -285,7 +285,7 @@ public class ClientConnector extends BasicService // implements IClientService, 
 			{
 				SServiceProvider.getService(provider, IAAAService.class).addResultListener(new DelegationResultListener(ret)
 				{
-					public void resultAvailable(Object source, Object result)
+					public void customResultAvailable(Object source, Object result)
 					{
 						Set roles = ((IAAAService) result).getRoles(client.getUserName());
 						Set workitems = new HashSet();
@@ -354,7 +354,7 @@ public class ClientConnector extends BasicService // implements IClientService, 
 			{
 				getAvailableWorkitems(client).addResultListener(new DelegationResultListener(ret)
 				{
-					public void resultAvailable(Object source, Object result)
+					public void customResultAvailable(Object source, Object result)
 					{
 						synchronized(ClientConnector.this)
 						{

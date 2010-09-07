@@ -187,6 +187,9 @@ public class BpmnInterpreter implements IComponentInstance
 	/** The inited future. */
 	protected Future inited;
 	
+	/** Listeners for activities. */
+	protected List activitylisteners;
+	
 	//-------- constructors --------
 	
 	// todo: 
@@ -215,6 +218,8 @@ public class BpmnInterpreter implements IComponentInstance
 			context.addThread(new ProcessThread((MActivity)startevents.get(i), context, BpmnInterpreter.this));
 		}
 		initedflag = Boolean.TRUE;
+		
+		activitylisteners = new ArrayList();
 	}	
 		
 	/**
@@ -919,6 +924,7 @@ public class BpmnInterpreter implements IComponentInstance
 				throw new UnsupportedOperationException("No handler for activity: "+thread);
 			if(history!=null)
 				history.add(new HistoryEntry(stepnumber++, thread.getId(), thread.getActivity()));
+			fireExecutingActivity(thread.getId(), thread.getActivity());
 //			System.out.println("Step: "+this.getComponentAdapter().getComponentIdentifier().getName()+" "+thread.getActivity()+" "+thread);
 			MActivity act = thread.getActivity();
 			handler.execute(act, this, thread);
@@ -1347,5 +1353,38 @@ public class BpmnInterpreter implements IComponentInstance
 	public IResultListener createResultListener(IResultListener listener)
 	{
 		return new ComponentResultListener(listener, adapter);
+	}
+	
+	/**
+	 *  Adds an activity listener. The listener will be called
+	 *  once a process thread executes a new activity.
+	 *  
+	 *  @param listener The activity listener.
+	 */
+	public void addActivityListener(IActivityListener listener)
+	{
+		activitylisteners.add(listener);
+	}
+	
+	/**
+	 *  Removes an activity listener.
+	 *  
+	 *  @param listener The activity listener.
+	 */
+	public void removeActivityListener(IActivityListener listener)
+	{
+		activitylisteners.remove(listener);
+	}
+	
+	/**
+	 *  Fires an activity execution event.
+	 *  
+	 *  @param threadid ID of the executing ProcessThread.
+	 *  @param activity The activity being executed.
+	 */
+	protected void fireExecutingActivity(String threadid, MActivity activity)
+	{
+		for (Iterator it = activitylisteners.iterator(); it.hasNext(); )
+			((IActivityListener) it.next()).activityExecuting(new ChangeEvent(threadid, "Activity Execution", activity));
 	}
 }

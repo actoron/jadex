@@ -1,17 +1,12 @@
 package jadex.wfms.bdi.interfaces.client;
 
 import jadex.bdi.runtime.IBDIExternalAccess;
-import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 import jadex.commons.service.SServiceProvider;
 import jadex.wfms.GoalDispatchResultListener;
 import jadex.wfms.bdi.ontology.ComponentClientProxy;
-import jadex.wfms.bdi.ontology.InformActivityAdded;
-import jadex.wfms.bdi.ontology.InformActivityRemoved;
 import jadex.wfms.bdi.ontology.InformWorkitemAdded;
 import jadex.wfms.bdi.ontology.InformWorkitemRemoved;
-import jadex.wfms.client.IClient;
-import jadex.wfms.listeners.ActivityEvent;
 import jadex.wfms.listeners.IWorkitemListener;
 import jadex.wfms.listeners.WorkitemEvent;
 import jadex.wfms.service.IClientService;

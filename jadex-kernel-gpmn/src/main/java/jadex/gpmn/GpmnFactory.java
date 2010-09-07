@@ -69,7 +69,7 @@ public class GpmnFactory extends BasicService implements IComponentFactory
 	 */
 	public GpmnFactory(IServiceProvider provider, Map properties)
 	{
-		super(provider.getId(), IComponentFactory.class, null);
+		super(provider.getId(), IComponentFactory.class, properties);
 		
 		this.properties	= properties;
 		this.provider = provider;

@@ -1,6 +1,8 @@
 package jadex.wfms.service.impl;
 
 import jadex.base.SComponentFactory;
+import jadex.bpmn.model.MActivity;
+import jadex.bpmn.runtime.ProcessThread;
 import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
@@ -9,7 +11,8 @@ import jadex.bridge.IComponentManagementService;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.ThreadSuspendable;
-import jadex.commons.concurrent.IResultListener;
+import jadex.commons.concurrent.DefaultResultListener;
+import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.service.BasicService;
 import jadex.commons.service.IServiceProvider;
 import jadex.commons.service.SServiceProvider;
@@ -17,8 +20,11 @@ import jadex.wfms.IProcess;
 import jadex.wfms.service.IAdministrationService;
 import jadex.wfms.service.IExecutionService;
 
-import java.util.Collection;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -97,28 +103,96 @@ public class ExecutionService extends BasicService implements IExecutionService
 	{
 		final Future ret = new Future();
 		IComponentManagementService ces = (IComponentManagementService) SServiceProvider.getService(provider, IComponentManagementService.class).get(new ThreadSuspendable());
-		ces.createComponent(null, modelname, new CreationInfo(arguments, wfms), null).addResultListener(new IResultListener()
+		ces.createComponent(null, modelname, new CreationInfo(null, arguments, wfms, true, false), null).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
 				final IComponentIdentifier id = ((IComponentIdentifier) result);
-				((IComponentManagementService) SServiceProvider.getService(provider, IComponentManagementService.class).get(new ThreadSuspendable())).addComponentListener(id, new IComponentListener()
+				SServiceProvider.getService(provider, IComponentManagementService.class).addResultListener(new DelegationResultListener(ret)
 				{
-					
-					public void componentRemoved(IComponentDescription desc, Map results)
+					public void customResultAvailable(Object source, Object result)
 					{
-						Logger.getLogger("Wfms").log(Level.INFO, "Finished process " + id.toString());
-						((AdministrationService) SServiceProvider.getService(provider,IAdministrationService.class).get(new ThreadSuspendable())).fireProcessFinished(id);
-					}
-					
-					public void componentChanged(IComponentDescription desc)
-					{
-					}
-					
-					public void componentAdded(IComponentDescription desc)
-					{
+						final IComponentManagementService cms = (IComponentManagementService) result;
+						cms.addComponentListener(id, new IComponentListener()
+						{
+							private List currentActivities = new ArrayList();
+							
+							private List activityHistory = new ArrayList();
+							
+							public void componentRemoved(IComponentDescription desc, Map results)
+							{
+								Logger.getLogger("Wfms").log(Level.INFO, "Finished process " + id.toString());
+								Logger.getLogger("Wfms").log(Level.INFO, "History: " + Arrays.toString(activityHistory.toArray()));
+								((AdministrationService) SServiceProvider.getService(provider,IAdministrationService.class).get(new ThreadSuspendable())).fireProcessFinished(id);
+							}
+							
+							public void componentChanged(IComponentDescription desc)
+							{
+								//System.out.println(desc.getName() + " " + desc.getState() + desc.getProcessingState() + " " + desc.getType());
+								if ("BPMN Process".equals(desc.getType()))
+								{
+									cms.getExternalAccess(id).addResultListener(new DefaultResultListener()
+									{
+										public void resultAvailable(Object source, Object result)
+										{
+											final jadex.bpmn.runtime.ExternalAccess ea = (jadex.bpmn.runtime.ExternalAccess) result;
+											List newStates = new ArrayList();
+											for (Iterator it = ea.getInterpreter().getThreadContext().getAllThreads().iterator(); it.hasNext(); )
+											{
+												ProcessThread p = (ProcessThread) it.next();
+												newStates.add(p.getModelElement());
+												//System.out.print(p.getModelElement().get + ", ");
+											}
+											if (!currentActivities.containsAll(newStates))
+											{
+												List diff = new ArrayList(newStates);
+												diff.removeAll(currentActivities);
+												//System.out.println(Arrays.toString(diff.toArray()));
+												activityHistory.add(((MActivity) diff.get(0)).getActivityType() + ": " + ((MActivity) diff.get(0)).getName());
+												currentActivities = newStates;
+											}
+											//System.out.println();
+										}
+									});
+								}
+								/*else if ("GPMN Process".equals(desc.getType()))
+								{
+									cms.getExternalAccess(id).addResultListener(new DefaultResultListener()
+									{
+										public void resultAvailable(Object source, Object result)
+										{
+											final IBDIExternalAccess ea = (IBDIExternalAccess) result;
+											List newStates = new ArrayList();
+											for (Iterator it = ea.getInterpreter().getThreadContext().getAllThreads().iterator(); it.hasNext(); )
+											{
+												ProcessThread p = (ProcessThread) it.next();
+												newStates.add(p.getModelElement());
+												//System.out.print(p.getModelElement().get + ", ");
+											}
+											if (!currentActivities.containsAll(newStates))
+											{
+												List diff = new ArrayList(newStates);
+												diff.removeAll(currentActivities);
+												//System.out.println(Arrays.toString(diff.toArray()));
+												activityHistory.add(((MActivity) diff.get(0)).getActivityType() + ": " + ((MActivity) diff.get(0)).getName());
+												currentActivities = newStates;
+											}
+											//System.out.println();
+										}
+									});
+								}*/
+							}
+							
+							public void componentAdded(IComponentDescription desc)
+							{
+							}
+						});
+						
+						cms.resumeComponent(id);
 					}
 				});
+						
+				
 				ret.setResult(id);
 			}
 			

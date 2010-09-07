@@ -29,7 +29,7 @@ public class AccessControlCheck
 	{
 		SServiceProvider.getService(provider, IAAAService.class).addResultListener(new DelegationResultListener(targetFuture)
 		{
-			public void resultAvailable(Object source, Object result)
+			public void customResultAvailable(Object source, Object result)
 			{
 				for (int i = 0; i < actions.length; ++i)
 					if (!((IAAAService) result).accessAction(client, actions[i]))

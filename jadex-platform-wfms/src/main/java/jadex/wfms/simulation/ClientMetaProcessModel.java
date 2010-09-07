@@ -4,6 +4,7 @@ import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.MParameter;
 import jadex.bridge.IModelInfo;
+import jadex.commons.ICacheableModel;
 import jadex.commons.collection.Tree;
 import jadex.commons.collection.TreeNode;
 import jadex.gpmn.model2.MBpmnPlan;
@@ -39,7 +40,7 @@ public class ClientMetaProcessModel extends Tree implements TreeModel
 	{
 	}
 	
-	public void setRootModel(ClientSimulator sim, String processName, IModelInfo model) throws Exception
+	public void setRootModel(ClientSimulator sim, String processName, ICacheableModel model) throws Exception
 	{
 		mainProcessName = processName;
 		processes = new HashMap();
@@ -51,7 +52,7 @@ public class ClientMetaProcessModel extends Tree implements TreeModel
 		root.setData(tmpRoot.getData());
 	}
 	
-	public TreeNode buildTree(ClientSimulator sim, IModelInfo processModel) throws Exception
+	public TreeNode buildTree(ClientSimulator sim, ICacheableModel processModel) throws Exception
 	{
 		TreeNode node = new ModelTreeNode();
 		node.setData(processModel);
@@ -60,7 +61,7 @@ public class ClientMetaProcessModel extends Tree implements TreeModel
 		// Remove subprocesses that are already known
 		for (Iterator it = subProcesses.iterator(); it.hasNext(); )
 		{
-			IModelInfo subModel = (IModelInfo) it.next();
+			ICacheableModel subModel = (ICacheableModel) it.next();
 			if (processes.containsKey(resolveProcessName(subModel)))
 			{
 				it.remove();
@@ -74,7 +75,7 @@ public class ClientMetaProcessModel extends Tree implements TreeModel
 		// Add subprocesses
 		for (Iterator it = subProcesses.iterator(); it.hasNext(); )
 		{
-			IModelInfo subModel = (IModelInfo) it.next();
+			ICacheableModel subModel = (ICacheableModel) it.next();
 			ModelTreeNode tmpNode = new ModelTreeNode();
 			processes.put(resolveProcessName(subModel), tmpNode);
 			TreeNode subTree = buildTree(sim, subModel);
@@ -175,7 +176,7 @@ public class ClientMetaProcessModel extends Tree implements TreeModel
 		return node;
 	}
 	
-	private List getSubProcessModels(ClientSimulator sim, IModelInfo processModel) throws Exception
+	private List getSubProcessModels(ClientSimulator sim, ICacheableModel processModel) throws Exception
 	{
 		List ret = new LinkedList();
 		//ret.add(processModel);
@@ -320,14 +321,25 @@ public class ClientMetaProcessModel extends Tree implements TreeModel
 		}
 	}*/
 	
-	public static final String resolveProcessName(IModelInfo model)
+	public static final String resolveProcessName(ICacheableModel model)
 	{
-		String ret = model.getName();
-		if (ret == null)
+		String ret = null;
+		IModelInfo modelinfo = null;
+		if (model instanceof MBpmnModel)
+			modelinfo = ((MBpmnModel) model).getModelInfo();
+		else if (model instanceof MGpmnModel)
+			modelinfo = ((MGpmnModel) model).getModelInfo();
+		
+		if (modelinfo != null)
 		{
-			ret = model.getFilename();
-			ret = ret.substring(Math.max(ret.lastIndexOf('/'), ret.lastIndexOf(File.separator)) + 1);
+			ret = modelinfo.getName();
+			if (ret == null)
+			{
+				ret = modelinfo.getFilename();
+				ret = ret.substring(Math.max(ret.lastIndexOf('/'), ret.lastIndexOf(File.separator)) + 1);
+			}
 		}
+		
 		return ret;
 	}
 }

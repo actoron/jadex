@@ -1,14 +1,13 @@
 package jadex.wfms.simulation;
 
+import jadex.bpmn.model.MActivity;
+import jadex.bpmn.model.MParameter;
+import jadex.commons.ICacheableModel;
+import jadex.commons.collection.TreeNode;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
-import jadex.bpmn.model.MActivity;
-import jadex.bpmn.model.MParameter;
-import jadex.bridge.IModelInfo;
-import jadex.commons.collection.TreeNode;
-import jadex.wfms.simulation.stateholder.IParameterStateSet;
 
 public class ModelTreeNode extends TreeNode
 {
@@ -53,16 +52,10 @@ public class ModelTreeNode extends TreeNode
 	
 	public String toString()
 	{
-		if (data instanceof IModelInfo)
+		if (data instanceof ICacheableModel)
 		{
-			IModelInfo model = ((IModelInfo) data);
-			String ret = model.getName();
-			if (ret == null)
-			{
-				ret = model.getFilename();
-				ret = ClientMetaProcessModel.resolveProcessName(model);
-			}
-			return ret;
+			ICacheableModel model = ((ICacheableModel) data);
+			return ClientMetaProcessModel.resolveProcessName(model);
 		}
 		else if (data instanceof MActivity)
 			return ((MActivity) data).getName();

@@ -3,13 +3,7 @@ package jadex.wfms.bdi.interfaces.client;
 import jadex.base.fipa.Done;
 import jadex.bdi.runtime.Plan;
 import jadex.wfms.bdi.ontology.PerformHeartbeat;
-import jadex.wfms.bdi.ontology.RequestBeginActivity;
-import jadex.wfms.bdi.ontology.RequestCancelActivity;
-import jadex.wfms.client.IClient;
-import jadex.wfms.client.IClientActivity;
-import jadex.wfms.service.IClientService;
 
-import java.security.AccessControlException;
 import java.util.Map;
 
 public class RequestPerformHeartbeatPlan extends Plan

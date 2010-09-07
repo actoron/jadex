@@ -1,15 +1,14 @@
 package jadex.wfms.bdi.interfaces.client;
 
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import jadex.bdi.runtime.Plan;
 import jadex.commons.service.SServiceProvider;
 import jadex.wfms.client.IClient;
 import jadex.wfms.service.IClientService;
+
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 public class PurgeSilentClientsPlan extends Plan
 {

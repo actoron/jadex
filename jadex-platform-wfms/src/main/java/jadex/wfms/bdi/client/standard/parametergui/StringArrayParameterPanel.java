@@ -2,10 +2,8 @@ package jadex.wfms.bdi.client.standard.parametergui;
 
 import jadex.wfms.guicomponents.SGuiHelper;
 import jadex.wfms.guicomponents.StringTable;
-import jadex.wfms.guicomponents.StringTable.AbstractStringTableModel;
 import jadex.wfms.guicomponents.StringTable.DefaultStringTableModel;
 
-import java.util.ArrayList;
 import java.util.Map;
 
 public class StringArrayParameterPanel extends AbstractParameterPanel

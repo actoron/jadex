@@ -8,7 +8,6 @@ import jadex.commons.service.SServiceProvider;
 import jadex.wfms.client.IClient;
 import jadex.wfms.listeners.IProcessRepositoryListener;
 import jadex.wfms.service.IAAAService;
-import jadex.wfms.service.IAdministrationService;
 import jadex.wfms.service.IAuthenticationListener;
 import jadex.wfms.service.IExecutionService;
 import jadex.wfms.service.IModelRepositoryService;

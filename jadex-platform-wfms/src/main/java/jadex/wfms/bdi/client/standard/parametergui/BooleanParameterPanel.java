@@ -3,7 +3,6 @@ package jadex.wfms.bdi.client.standard.parametergui;
 import java.awt.GridBagConstraints;
 
 import javax.swing.JCheckBox;
-import javax.swing.JTextField;
 
 public class BooleanParameterPanel extends AbstractParameterPanel
 {

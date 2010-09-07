@@ -16,11 +16,6 @@ import jadex.wfms.bdi.ontology.RequestProxy;
 import jadex.wfms.client.IClient;
 import jadex.wfms.service.IProcessDefinitionService;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.nio.MappedByteBuffer;
-import java.nio.channels.FileChannel;
 import java.security.AccessControlException;
 
 public class RequestModelPlan extends AbstractWfmsPlan
@@ -44,7 +39,7 @@ public class RequestModelPlan extends AbstractWfmsPlan
 					{
 						BpmnModelLoader bpmnLoader = new BpmnModelLoader();
 						ClassLoader cl = ((ILibraryService) SServiceProvider.getService(getScope().getServiceProvider(), ILibraryService.class).get(this)).getClassLoader();
-						((Future) modelFuture).setResult(bpmnLoader.loadBpmnModel(rqm.getModelName(), new String[0], cl));
+						((Future) modelFuture).setResult(bpmnLoader.loadBpmnModel(rqm.getModelName(), new String[0], cl).getModelInfo());
 					}
 					else
 					{
@@ -62,7 +57,7 @@ public class RequestModelPlan extends AbstractWfmsPlan
 				modelFuture = ((IProcessDefinitionService) SServiceProvider.getService(getScope().getServiceProvider(), IProcessDefinitionService.class).get(this)).getProcessModel(proxy, rqm.getModelName());
 			
 			IModelInfo model = (IModelInfo) modelFuture.get(this);
-			File modelFile = new File(model.getFilename());
+			/*File modelFile = new File(model.getFilename());
 			byte[] content;
 			try
 			{
@@ -73,10 +68,11 @@ public class RequestModelPlan extends AbstractWfmsPlan
 			catch (IOException e)
 			{
 				throw new RuntimeException(e);
-			}
+			}*/
 			
-			rqm.encodeModelContent(content);
-			rqm.setFileName(modelFile.getName());
+			//rqm.encodeModelContent(content);
+			//rqm.setFileName(modelFile.getName());
+			rqm.setModelInfo(model);
 			Done done = new Done();
 			done.setAction(rqm);
 			getParameter("result").setValue(done);

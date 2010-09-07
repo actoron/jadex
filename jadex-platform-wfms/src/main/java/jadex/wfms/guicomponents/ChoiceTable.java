@@ -1,8 +1,5 @@
 package jadex.wfms.guicomponents;
 
-import java.awt.Component;
-import java.awt.EventQueue;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -10,8 +7,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.TableCellRenderer;
 
 public class ChoiceTable extends JPanel
 {

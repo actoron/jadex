@@ -1,6 +1,5 @@
 package jadex.wfms.service;
 
-import jadex.commons.service.IService;
 import jadex.wfms.client.IClient;
 
 import java.util.Arrays;

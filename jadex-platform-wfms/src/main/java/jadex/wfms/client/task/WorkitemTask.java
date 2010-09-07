@@ -1,13 +1,5 @@
 package jadex.wfms.client.task;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
-
 import jadex.bpmn.model.MLane;
 import jadex.bpmn.model.MParameter;
 import jadex.bpmn.runtime.BpmnInterpreter;
@@ -15,18 +7,21 @@ import jadex.bpmn.runtime.ITask;
 import jadex.bpmn.runtime.ITaskContext;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
-import jadex.commons.SReflect;
-import jadex.commons.SUtil;
-import jadex.commons.ThreadSuspendable;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.service.IServiceContainer;
 import jadex.commons.service.SServiceProvider;
 import jadex.wfms.client.IWorkitem;
 import jadex.wfms.client.Workitem;
-import jadex.wfms.parametertypes.Text;
 import jadex.wfms.service.IAAAService;
 import jadex.wfms.service.IWfmsClientService;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
 
 public class WorkitemTask implements ITask
 {

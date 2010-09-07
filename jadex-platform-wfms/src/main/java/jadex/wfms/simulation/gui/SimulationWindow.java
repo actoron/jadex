@@ -4,6 +4,7 @@ import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MParameter;
 import jadex.commons.SGUI;
 import jadex.commons.collection.TreeNode;
+import jadex.commons.service.library.ILibraryService;
 import jadex.wfms.simulation.ModelTreeNode;
 import jadex.wfms.simulation.Scenario;
 import jadex.wfms.simulation.stateholder.gui.IStatePanel;
@@ -20,7 +21,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -47,7 +47,6 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
-import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
@@ -101,9 +100,13 @@ public class SimulationWindow extends JFrame
 	
 	private JMenuBar menuBar;
 	
-	public SimulationWindow(final TableModel scenarios)
+	private ILibraryService libService;
+	
+	public SimulationWindow(final TableModel scenarios, ILibraryService libService)
 	{
 		super("Process Simulator");
+		
+		this.libService = libService;
 		
 		menuItems = new HashMap();
 		
@@ -150,6 +153,7 @@ public class SimulationWindow extends JFrame
 		    	if ((selection == null) || !(selection instanceof TreeNode))
 		    		return;
 		        TreeNode node = (TreeNode) selection;
+		        
 		        if (node.getData() instanceof ModelTreeNode)
 		        {
 		        	ModelTreeNode mNode = (ModelTreeNode) node.getData();
@@ -162,6 +166,10 @@ public class SimulationWindow extends JFrame
 		        	processModelTree.scrollPathToVisible(path);
 		        	processModelTree.setSelectionPath(path);
 		        }
+		        else if (node.getData() instanceof MActivity)
+		        {
+		        	mainPane.setRightComponent(new TaskActivationPanel(((MActivity) node.getData()).getActivityType(), SimulationWindow.this));
+		        }
 		        else if (node.getData() instanceof MParameter)
 		        {
 		        	MActivity activity = (MActivity) ((ModelTreeNode) node).getParent().getData();
@@ -169,6 +177,10 @@ public class SimulationWindow extends JFrame
 		        	if (statePanel == null)
 		        		statePanel = EMPTY_PANEL;
 		        	mainPane.setRightComponent(statePanel);
+		        }
+		        else if (node instanceof ModelTreeNode && ((ModelTreeNode) node).getParent() == null)
+		        {
+		        	mainPane.setRightComponent(new MainValidationPanel(SimulationWindow.this));
 		        }
 		        else
 		        {
@@ -425,6 +437,11 @@ public class SimulationWindow extends JFrame
 		while (row < processModelTree.getRowCount())
 			processModelTree.expandRow(row++);
 		processModelTree.repaint();
+	}
+	
+	public ILibraryService getLibService()
+	{
+		return libService;
 	}
 	
 	private void setMenuItemAction(JMenuItem menuItem, Action action)

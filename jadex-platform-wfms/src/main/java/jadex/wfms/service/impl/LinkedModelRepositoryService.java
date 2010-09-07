@@ -38,7 +38,7 @@ public class LinkedModelRepositoryService extends BasicService implements IModel
 	protected IServiceProvider provider;
 	
 	/** The imports */
-	private Set imports;
+	//private Set imports;
 	
 	/** The process repository listeners */
 	private Set listeners;
@@ -56,7 +56,7 @@ public class LinkedModelRepositoryService extends BasicService implements IModel
 
 		this.provider = provider;
 		// TODO: Hack! Needs proper imports...
-		this.imports = Collections.synchronizedSet(new HashSet());
+		//this.imports = Collections.synchronizedSet(new HashSet());
 		this.listeners = Collections.synchronizedSet(new HashSet());
 		this.urlEntries = Collections.synchronizedMap(new HashMap());
 		this.modelRefCount = Collections.synchronizedMap(new HashMap());
@@ -167,6 +167,55 @@ public class LinkedModelRepositoryService extends BasicService implements IModel
 		//return new HashSet();
 	}
 	
+	private Set searchDirectory(File dir, boolean prependDir)
+	{
+		HashSet ret = new HashSet();
+		File[] content = dir.listFiles();
+		for (int i = 0; i < content.length; ++i)
+		{
+			if (content[i].isDirectory())
+			{
+				Set subSet = searchDirectory(content[i], true);
+				for (Iterator it = subSet.iterator(); it.hasNext(); )
+				{
+					if (prependDir)
+						ret.add(dir.getName().concat("/").concat((String) it.next()));
+					else
+						ret.add(it.next());
+				}
+			}
+			else if ((content[i].getName().endsWith(".bpmn")) || (content[i].getName().endsWith(".gpmn")))
+			{
+				if (prependDir)
+					ret.add(dir.getName().concat("/").concat(content[i].getName()));
+				else
+					ret.add(content[i].getName());
+			}
+		}
+		
+		return ret;
+	}
+	
+	private Set searchJar(File jar)
+	{
+		HashSet ret = new HashSet();
+		try
+		{
+			JarFile jarFile = new JarFile(jar);
+			for (Enumeration entries = jarFile.entries(); entries.hasMoreElements(); )
+			{
+				JarEntry entry = (JarEntry) entries.nextElement();
+				if (entry.getName().endsWith(".bpmn") || entry.getName().endsWith(".gpmn"))
+					ret.add(entry.getName());
+			}
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
+		return ret;
+	}
+	
 	/**
 	 *  Get a process model of a specific name.
 	 *  @param name The model name.
@@ -268,54 +317,7 @@ public class LinkedModelRepositoryService extends BasicService implements IModel
 		return ex.loadModel(filename, getImports());
 	}
 	
-	private Set searchDirectory(File dir, boolean prependDir)
-	{
-		HashSet ret = new HashSet();
-		File[] content = dir.listFiles();
-		for (int i = 0; i < content.length; ++i)
-		{
-			if (content[i].isDirectory())
-			{
-				Set subSet = searchDirectory(content[i], true);
-				for (Iterator it = subSet.iterator(); it.hasNext(); )
-				{
-					if (prependDir)
-						ret.add(dir.getName().concat("/").concat((String) it.next()));
-					else
-						ret.add(it.next());
-				}
-			}
-			else if ((content[i].getName().endsWith(".bpmn")) || (content[i].getName().endsWith(".gpmn")))
-			{
-				if (prependDir)
-					ret.add(dir.getName().concat("/").concat(content[i].getName()));
-				else
-					ret.add(content[i].getName());
-			}
-		}
-		
-		return ret;
-	}
 	
-	private Set searchJar(File jar)
-	{
-		HashSet ret = new HashSet();
-		try
-		{
-			JarFile jarFile = new JarFile(jar);
-			for (Enumeration entries = jarFile.entries(); entries.hasMoreElements(); )
-			{
-				JarEntry entry = (JarEntry) entries.nextElement();
-				if (entry.getName().endsWith(".bpmn") || entry.getName().endsWith(".gpmn"))
-					ret.add(entry.getName());
-			}
-		}
-		catch (IOException e)
-		{
-			e.printStackTrace();
-		}
-		return ret;
-	}
 	
 	private void addModel(String path)
 	{

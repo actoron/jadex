@@ -7,13 +7,14 @@ import jadex.bdi.runtime.IEAGoal;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.MParameter;
-import jadex.bridge.IModelInfo;
 import jadex.commons.Future;
+import jadex.commons.ICacheableModel;
 import jadex.commons.IFuture;
 import jadex.commons.SGUI;
-import jadex.commons.ThreadSuspendable;
 import jadex.commons.collection.TreeNode;
 import jadex.commons.concurrent.DefaultResultListener;
+import jadex.commons.service.SServiceProvider;
+import jadex.commons.service.library.ILibraryService;
 import jadex.gpmn.model2.MGpmnModel;
 import jadex.wfms.GoalDispatchResultListener;
 import jadex.wfms.SwingGoalDispatchResultListener;
@@ -107,35 +108,47 @@ public class ClientSimulator
 						updateGui();
 					}
 				});
-				simWindow = new SimulationWindow(scenarios);
-				agent.addAgentListener(new IAgentListener()
+				SServiceProvider.getService(agent.getServiceProvider(), ILibraryService.class).addResultListener(new DefaultResultListener()
 				{
-					public void agentTerminating(AgentEvent ae)
+					public void resultAvailable(Object source, Object result)
 					{
-					}
-					
-					public void agentTerminated(AgentEvent ae)
-					{
+						final ILibraryService libService = (ILibraryService) result;
 						EventQueue.invokeLater(new Runnable()
 						{
 							
 							public void run()
 							{
-								simWindow.dispose();
+								simWindow = new SimulationWindow(scenarios, libService);
+								agent.addAgentListener(new IAgentListener()
+								{
+									public void agentTerminating(AgentEvent ae)
+									{
+									}
+									
+									public void agentTerminated(AgentEvent ae)
+									{
+										EventQueue.invokeLater(new Runnable()
+										{
+											
+											public void run()
+											{
+												simWindow.dispose();
+											}
+										});
+									}
+								});
+								
+								login(showLoginDialog()).addResultListener(new DefaultResultListener()
+								{
+									public void resultAvailable(Object source, Object result)
+									{
+										continueInit();
+									}
+								});
 							}
 						});
 					}
 				});
-				
-				login(showLoginDialog()).addResultListener(new DefaultResultListener()
-				{
-					public void resultAvailable(Object source, Object result)
-					{
-						continueInit();
-					}
-				});
-				
-				
 			}
 		};
 		
@@ -419,7 +432,7 @@ public class ClientSimulator
 							{
 								try
 								{
-									model.setRootModel(ClientSimulator.this, modelName, (IModelInfo) parameters.get("model"));
+									model.setRootModel(ClientSimulator.this, modelName, (ICacheableModel) parameters.get("model"));
 								}
 								catch (Exception e)
 								{

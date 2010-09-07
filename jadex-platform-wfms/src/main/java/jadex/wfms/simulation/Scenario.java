@@ -6,6 +6,7 @@ import jadex.wfms.simulation.stateholder.ProcessStateController;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -24,7 +25,10 @@ public class Scenario implements ChangeListener
 	private String name;
 	
 	/** The parameter map. */
-	private Map parameterMap; 
+	private Map parameterMap;
+	
+	/** The task validation map */
+	private Map taskValidationInfo;
 	
 	/** State change listeners */
 	public Set stateListeners;
@@ -33,6 +37,7 @@ public class Scenario implements ChangeListener
 	{
 		this.name = name;
 		this.parameterMap = parameterMap;
+		this.taskValidationInfo = new HashMap();
 		this.stateListeners = new HashSet();
 		for (Iterator it = getParameterSets().iterator(); it.hasNext(); )
 			((IParameterStateSet) it.next()).addStateChangeListener(this);
@@ -76,6 +81,38 @@ public class Scenario implements ChangeListener
 			for (Iterator it2 = ((Map) it.next()).values().iterator(); it2.hasNext(); )
 				sets.add(it2.next());
 		return sets;
+	}
+	
+	/**
+	 *  Sets the validation information for a task.
+	 *  
+	 *  @param taskName Name of the task.
+	 *  @param activationConstraint Constraint on the number of activations 
+	 */
+	public void setTaskValidationInfo(String taskName, ActivationConstraint activationConstraint)
+	{
+		taskValidationInfo.put(taskName, activationConstraint);
+	}
+	
+	/**
+	 *  Removes the validation information for a task.
+	 *  
+	 *  @param taskName Name of the task. 
+	 */
+	public void removeTaskValidationInfo(String taskName)
+	{
+		taskValidationInfo.remove(taskName);
+	}
+	
+	/**
+	 *  Gets the validation information for a task.
+	 *  
+	 *  @param taskName Name of the task.
+	 *  @return The Task validation information. 
+	 */
+	public ActivationConstraint getTaskValidationInfo(String taskName)
+	{
+		return (ActivationConstraint) taskValidationInfo.get(taskName);
 	}
 
 	/**

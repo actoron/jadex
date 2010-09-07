@@ -32,7 +32,7 @@ public class WfmsClientService extends BasicService implements IWfmsClientServic
 		final Future ret = new Future();
 		SServiceProvider.getService(provider, ClientConnector.class).addResultListener(new DelegationResultListener(ret)
 		{
-			public void resultAvailable(Object source, Object result)
+			public void customResultAvailable(Object source, Object result)
 			{
 				((ClientConnector) result).queueWorkitem(workitem, listener);
 				ret.setResult(null);
@@ -52,7 +52,7 @@ public class WfmsClientService extends BasicService implements IWfmsClientServic
 		final Future ret = new Future();
 		SServiceProvider.getService(provider, ClientConnector.class).addResultListener(new DelegationResultListener(ret)
 		{
-			public void resultAvailable(Object source, Object result)
+			public void customResultAvailable(Object source, Object result)
 			{
 				ret.setResult(((ClientConnector) result).getUserActivities());
 			}
@@ -70,7 +70,7 @@ public class WfmsClientService extends BasicService implements IWfmsClientServic
 		final Future ret = new Future();
 		SServiceProvider.getService(provider, ClientConnector.class).addResultListener(new DelegationResultListener(ret)
 		{
-			public void resultAvailable(Object source, Object result)
+			public void customResultAvailable(Object source, Object result)
 			{
 				((ClientConnector) result).terminateActivity(activity);
 				ret.setResult(null);
@@ -88,7 +88,7 @@ public class WfmsClientService extends BasicService implements IWfmsClientServic
 		final Future ret = new Future();
 		SServiceProvider.getService(provider, ClientConnector.class).addResultListener(new DelegationResultListener(ret)
 		{
-			public void resultAvailable(Object source, Object result)
+			public void customResultAvailable(Object source, Object result)
 			{
 				((ClientConnector) result).addActivityListener(listener);
 				ret.setResult(null);
@@ -106,7 +106,7 @@ public class WfmsClientService extends BasicService implements IWfmsClientServic
 		final Future ret = new Future();
 		SServiceProvider.getService(provider, ClientConnector.class).addResultListener(new DelegationResultListener(ret)
 		{
-			public void resultAvailable(Object source, Object result)
+			public void customResultAvailable(Object source, Object result)
 			{
 				((ClientConnector) result).removeActivityListener(listener);
 				ret.setResult(null);
