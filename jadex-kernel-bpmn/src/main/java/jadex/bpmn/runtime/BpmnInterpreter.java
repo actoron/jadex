@@ -291,34 +291,7 @@ public class BpmnInterpreter implements IComponentInstance
 			{
 				this.variables.put(args[i].getName(), args[i].getDefaultValue(config));
 			}
-		}
-		
-		// Initialize context variables.
-		variables.put("$platform", getServiceProvider());
-		variables.put("$interpreter", this);
-		
-		Set	vars	= model.getContextVariables();
-		for(Iterator it=vars.iterator(); it.hasNext(); )
-		{
-			String	name	= (String)it.next();
-			if(!variables.containsKey(name))	// Don't overwrite arguments.
-			{
-				Object	value	= null;
-				IParsedExpression	exp	= model.getContextVariableExpression(name);
-				if(exp!=null)
-				{
-					try
-					{
-						value	= exp.getValue(this.fetcher);
-					}
-					catch(RuntimeException e)
-					{
-						throw new RuntimeException("Error parsing context variable: "+this+", "+name+", "+exp, e);
-					}
-				}
-				variables.put(name, value);
-			}
-		}
+		}		
 	}
 	
 	//-------- IKernelAgent interface --------
@@ -464,8 +437,33 @@ public class BpmnInterpreter implements IComponentInstance
 	 */
 	protected void executeInitStep2()
 	{
-		// Start the container and notify cms when start has finished.
+		// Initialize context variables.
+		variables.put("$interpreter", this);
 		
+		Set	vars	= model.getContextVariables();
+		for(Iterator it=vars.iterator(); it.hasNext(); )
+		{
+			String	name	= (String)it.next();
+			if(!variables.containsKey(name))	// Don't overwrite arguments.
+			{
+				Object	value	= null;
+				IParsedExpression	exp	= model.getContextVariableExpression(name);
+				if(exp!=null)
+				{
+					try
+					{
+						value	= exp.getValue(this.fetcher);
+					}
+					catch(RuntimeException e)
+					{
+						throw new RuntimeException("Error parsing context variable: "+this+", "+name+", "+exp, e);
+					}
+				}
+				variables.put(name, value);
+			}
+		}
+
+		// Start the container and notify cms when start has finished.		
 		getServiceContainer().start().addResultListener(createResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
