@@ -59,9 +59,6 @@ public class NIOTCPTransport implements ITransport
 
 	/** The prolog size. */
 	protected static final int PROLOG_SIZE = 5;
-
-	/** 2MB as message buffer */
-	protected static final int BUFFER_SIZE	= 1024 * 1024 * 2;
 	
 	/** Maximum number of outgoing connections */
 	protected static final int MAX_CONNECTIONS	= 20;

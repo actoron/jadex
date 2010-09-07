@@ -146,6 +146,17 @@ public class ComponentTreeNode	extends AbstractComponentTreeNode implements IAct
 										public void customExceptionOccurred(Object source, Exception exception)
 										{
 											// May happen, when component removed in mean time.
+											childcnt[0]++;
+											
+											// Last child? -> inform listeners
+											if(childcnt[0] == achildren.length)
+											{
+												ready[0]	= true;
+												if(ready[0] &&  ready[1])
+												{
+													setChildren(children).addResultListener(new DelegationResultListener(future));
+												}
+											}
 										}
 									});
 								}
@@ -163,6 +174,20 @@ public class ComponentTreeNode	extends AbstractComponentTreeNode implements IAct
 										{
 											setChildren(children).addResultListener(new DelegationResultListener(future));
 										}
+									}
+								}
+							}
+							public void customExceptionOccurred(Object source, Exception exception)
+							{
+								childcnt[0]++;
+								
+								// Last child? -> inform listeners
+								if(childcnt[0] == achildren.length)
+								{
+									ready[0]	= true;
+									if(ready[0] &&  ready[1])
+									{
+										setChildren(children).addResultListener(new DelegationResultListener(future));
 									}
 								}
 							}

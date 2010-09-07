@@ -1,5 +1,6 @@
 package jadex.standalone.transport.niotcpmtp;
 
+import jadex.commons.SUtil;
 import jadex.standalone.transport.MessageEnvelope;
 import jadex.standalone.transport.codecs.CodecFactory;
 import jadex.standalone.transport.codecs.IEncoder;
@@ -22,7 +23,7 @@ class NIOTCPOutputConnection
 	public static final int TIMEOUT = 5000;
 	
 	/** 2MB as message buffer. */
-	public static final int BUFFER_SIZE = 1024 * 1024 * 2;
+	public static final int BUFFER_SIZE = 2* 1024 * 1024;
 	
 	//-------- attributes --------
 	
@@ -80,7 +81,7 @@ class NIOTCPOutputConnection
 //			throw e;
 //		}
 
-	    this.buffer = ByteBuffer.allocateDirect(BUFFER_SIZE);
+//	    this.buffer = ByteBuffer.allocateDirect(BUFFER_SIZE);
 	    
 		//address = SMTransport.SERVICE_SCHEMA+iaddr.getHostAddress()+":"+iport;
 	 }
@@ -93,20 +94,32 @@ class NIOTCPOutputConnection
 	 *  Sending is done synchronously on caller thread.
 	 *  (todo: relax synchronization by performing sends 
 	 *  on extra sender thread of transport, only needed
-	 *  if message service is used in synchrnous mode.)
+	 *  if message service is used in synchronous mode.)
 	 */
 	public synchronized void send(MessageEnvelope msg) throws IOException
 	{
-		IEncoder enc = codecfac.getDefaultEncoder();
-		byte codec_id = codecfac.getCodecId(enc.getClass());
-		byte[] enc_msg = enc.encode(msg, classloader);
-		int size = enc_msg.length+NIOTCPTransport.PROLOG_SIZE;
-		buffer.put(codec_id);
-		buffer.putInt(size);
-		buffer.put(enc_msg);
-		buffer.flip();
-		sc.write(buffer);
-		buffer.clear();
+		// Code using preallocated buffer
+//		IEncoder enc = codecfac.getDefaultEncoder();
+//		byte codec_id = codecfac.getCodecId(enc.getClass());
+//		byte[] enc_msg = enc.encode(msg, classloader);
+//		int size = enc_msg.length+NIOTCPTransport.PROLOG_SIZE;
+//		buffer.put(codec_id);
+//		buffer.putInt(size);
+//		buffer.put(enc_msg);
+//		buffer.flip();
+//		sc.write(buffer);
+//		buffer.clear();
+//		cleaner.refresh();
+		
+		// Code using new buffers
+		IEncoder	enc	= codecfac.getDefaultEncoder();
+		byte	codec_id	= codecfac.getCodecId(enc.getClass());
+		byte[]	enc_msg	= enc.encode(msg, classloader);
+		byte[]	buffer	= new byte[enc_msg.length+NIOTCPTransport.PROLOG_SIZE];
+		System.arraycopy(enc_msg, 0, buffer, NIOTCPTransport.PROLOG_SIZE, enc_msg.length);
+		System.arraycopy(SUtil.intToBytes(buffer.length), 0, buffer, 1, 4);
+		buffer[0]	= codec_id;
+		sc.write(ByteBuffer.wrap(buffer));
 		cleaner.refresh();
 	}
 	

@@ -654,7 +654,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	 */
 	protected void fatalError(final Exception e)
 	{
-		e.printStackTrace();
+//		e.printStackTrace();
 		
 		// Fatal error!
 		fatalerror	= true;
