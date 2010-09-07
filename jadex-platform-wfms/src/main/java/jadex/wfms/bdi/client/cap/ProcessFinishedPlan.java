@@ -1,13 +1,11 @@
 package jadex.wfms.bdi.client.cap;
 
+import jadex.bdi.runtime.Plan;
+
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 
 import javax.swing.Action;
-
-import jadex.bdi.runtime.Plan;
-import jadex.wfms.client.IClientActivity;
-import jadex.wfms.client.IWorkitem;
 
 public class ProcessFinishedPlan extends Plan
 {

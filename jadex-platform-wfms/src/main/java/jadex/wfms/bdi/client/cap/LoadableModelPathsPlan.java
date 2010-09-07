@@ -1,10 +1,8 @@
 package jadex.wfms.bdi.client.cap;
 
 import jadex.base.fipa.Done;
-import jadex.bdi.runtime.GoalFailureException;
 import jadex.bdi.runtime.IGoal;
 import jadex.wfms.bdi.ontology.RequestLoadableModelPaths;
-import jadex.wfms.bdi.ontology.RequestModelNames;
 
 import java.util.Set;
 

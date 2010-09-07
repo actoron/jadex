@@ -7,10 +7,7 @@ import jadex.wfms.simulation.stateholder.StringStateSet;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.util.Iterator;
-import java.util.List;
 
-import javax.swing.DefaultListModel;
 import javax.swing.JPanel;
 import javax.swing.table.AbstractTableModel;
 

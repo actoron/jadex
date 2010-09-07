@@ -8,7 +8,6 @@ import jadex.wfms.simulation.stateholder.DocumentStateSet;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;

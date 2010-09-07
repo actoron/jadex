@@ -1,12 +1,7 @@
 package jadex.wfms.bdi.client.cap;
 
-import jadex.base.fipa.Done;
-import jadex.bdi.runtime.GoalFailureException;
 import jadex.bdi.runtime.IGoal;
-import jadex.wfms.bdi.ontology.RequestModelNames;
 import jadex.wfms.bdi.ontology.RequestProcessStart;
-
-import java.util.Set;
 
 public class StartProcessPlan extends AbstractWfmsPlan
 {

@@ -1,6 +1,5 @@
 package jadex.wfms.bdi.client.cap;
 
-import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 
 import java.awt.EventQueue;

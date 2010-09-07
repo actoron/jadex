@@ -3,16 +3,10 @@ package jadex.wfms.bdi.client.cap;
 import jadex.base.fipa.Done;
 import jadex.bdi.runtime.IGoal;
 import jadex.bpmn.BpmnModelLoader;
-import jadex.bpmn.model.MBpmnModel;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.library.ILibraryService;
 import jadex.gpmn.GpmnModelLoader;
 import jadex.wfms.bdi.ontology.RequestModel;
-
-import java.io.File;
-import java.io.RandomAccessFile;
-import java.nio.MappedByteBuffer;
-import java.nio.channels.FileChannel.MapMode;
 
 public class ModelPlan extends AbstractWfmsPlan
 {

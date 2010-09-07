@@ -2,21 +2,16 @@ package jadex.wfms.simulation.stateholder.gui;
 
 import jadex.bpmn.model.MParameter;
 import jadex.commons.SGUI;
-import jadex.javaparser.SimpleValueFetcher;
 import jadex.wfms.guicomponents.ButtonPanel;
-import jadex.wfms.guicomponents.ChoiceTable;
 import jadex.wfms.guicomponents.StringTable;
 import jadex.wfms.guicomponents.StringTable.DefaultStringTableModel;
-import jadex.wfms.parametertypes.MultiListChoice;
 import jadex.wfms.simulation.gui.SimulationWindow;
-import jadex.wfms.simulation.stateholder.ResolvableMultiListChoiceStateSet;
 import jadex.wfms.simulation.stateholder.StringArrayStateSet;
 
 import java.awt.Component;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.util.Arrays;
 
@@ -27,7 +22,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.border.EtchedBorder;
-import javax.swing.border.TitledBorder;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableColumnModel;

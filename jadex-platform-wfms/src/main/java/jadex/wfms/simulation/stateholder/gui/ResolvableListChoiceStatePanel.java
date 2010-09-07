@@ -1,23 +1,19 @@
 package jadex.wfms.simulation.stateholder.gui;
 
-import java.awt.EventQueue;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-
 import jadex.bpmn.model.MParameter;
 import jadex.javaparser.SimpleValueFetcher;
 import jadex.wfms.parametertypes.ListChoice;
 import jadex.wfms.simulation.gui.SimulationWindow;
 import jadex.wfms.simulation.stateholder.ResolvableListChoiceStateSet;
 
+import java.awt.EventQueue;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
-import javax.swing.table.DefaultTableColumnModel;
-import javax.swing.table.TableColumn;
 
 public class ResolvableListChoiceStatePanel extends JPanel implements IStatePanel
 {

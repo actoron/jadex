@@ -1,14 +1,9 @@
 package jadex.wfms.simulation.gui;
 
 import jadex.wfms.simulation.ActivationConstraint;
-import jadex.wfms.simulation.gui.SimulationWindow;
-import jadex.wfms.simulation.stateholder.BooleanStateSet;
 import jadex.wfms.simulation.stateholder.gui.IStatePanel;
 
-import java.awt.BorderLayout;
 import java.awt.FlowLayout;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
@@ -38,7 +33,7 @@ public class TaskActivationPanel extends JPanel implements IStatePanel
 		activationCheck = new JCheckBox();
 		activationCount = new JSpinner(new SpinnerNumberModel(1, 1, MAX_COUNT, 1));
 		
-		BooleanStateSet stateSet =  null;
+		//BooleanStateSet stateSet =  null;
 		
 		JPanel activationPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		
