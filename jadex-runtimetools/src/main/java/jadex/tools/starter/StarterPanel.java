@@ -548,6 +548,8 @@ public class StarterPanel extends JPanel
 		if(adf!=null && adf.equals(lastfile))
 			return;
 		
+		lastfile	= adf;
+		
 //		System.out.println("loadModel: "+adf);
 //		String	error	= null;
 		
@@ -773,9 +775,9 @@ public class StarterPanel extends JPanel
 		if(mo!=null)
 		{
 			lastfile = mo;
-			reloadModel();
 			loadconfig	= props.getStringProperty("config");
 			loadname	= props.getStringProperty("name");
+			reloadModel();
 		}
 		setStartSuspended(props.getBooleanProperty("startsuspended"));
 
