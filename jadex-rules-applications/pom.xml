@@ -127,10 +127,22 @@
 					</execution>
 				</executions>
 			</plugin>
+			
+			<plugin>
+		        <groupId>org.apache.maven.plugins</groupId>
+        		<artifactId>maven-javadoc-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>attach-javadoc</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+        	</plugin>
 
 			<!--
-				Make jar executable (cannot do this in standalone, because maven
-				claims cyclic reference)
+				Make jar reference other jars for being able to execute examples
 			-->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>

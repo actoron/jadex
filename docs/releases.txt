@@ -1,5 +1,14 @@
 Jadex Releases Overview
 
+Release 2.0 rc4 (Awareness release 09/2010)
+	- Unified model of active components with services
+	- Platform bootstraps as root component
+	- Remote access for services and components
+	- Awareness for detection of other platforms in the network
+	- Shop example illustrating the use of services
+	- Improved component tree in JCC
+	- Tool support custom service and component guis
+
 Release 2.0 rc2 (Bugfix release 04/2010)
 	- New Fireflies example based on micro kernel
 	- Numerous bug fixes

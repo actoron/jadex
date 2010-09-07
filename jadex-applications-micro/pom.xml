@@ -127,11 +127,28 @@
 							<goal>jar</goal>
 						</goals>
 					</execution>
-				</executions> 
+				</executions>
 				<configuration>
 					<excludes>
 						<exclude>**/dungeonkeeper/</exclude>
 					</excludes>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>2.7</version>
+				<executions>
+					<execution>
+						<id>attach-javadoc</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<excludePackageNames>*.dungeonkeeper.*</excludePackageNames>
 				</configuration>
 			</plugin>
 		</plugins>

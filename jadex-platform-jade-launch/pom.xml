@@ -132,6 +132,19 @@
 				</executions>
 			</plugin>
 			
+			<plugin>
+		        <groupId>org.apache.maven.plugins</groupId>
+        		<artifactId>maven-javadoc-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>attach-javadoc</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+        	</plugin>
+			
 			<!--
 				Make jar executable (cannot do this in jade, because maven claims
 				cyclic reference)
