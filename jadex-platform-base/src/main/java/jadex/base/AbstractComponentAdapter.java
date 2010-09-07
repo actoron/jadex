@@ -569,7 +569,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 				}
 				catch(Exception e)
 				{
-					e.printStackTrace();
+//					e.printStackTrace();
 					fatalError(e);
 				}
 			}

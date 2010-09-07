@@ -1254,7 +1254,8 @@ public class BpmnInterpreter implements IComponentInstance
 	 */
 	public IComponentIdentifier createComponentIdentifier(String name)
 	{
-		return createComponentIdentifier(name, true, null);
+		IComponentManagementService cms = (IComponentManagementService)variables.get("$cms");
+		return cms.createComponentIdentifier(name);
 	}
 	
 	/**
@@ -1266,7 +1267,7 @@ public class BpmnInterpreter implements IComponentInstance
 	 */
 	public IComponentIdentifier createComponentIdentifier(String name, boolean local)
 	{
-		return createComponentIdentifier(name, local, null);
+		return createComponentIdentifier(name, local);
 	}
 	
 	/**
@@ -1278,20 +1279,8 @@ public class BpmnInterpreter implements IComponentInstance
 	 */
 	public IComponentIdentifier createComponentIdentifier(final String name, final boolean local, final String[] addresses)
 	{
-//		final Future ret = new Future();
-		
-//		SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class)
-//			.addResultListener(createResultListener(new DefaultResultListener()
-//		{
-//			public void resultAvailable(Object source, Object result)
-//			{
-				IComponentManagementService cms = (IComponentManagementService)variables.get("$cms");//result;
-				return cms.createComponentIdentifier(name, local, addresses);
-//				ret.setResult(cms.createComponentIdentifier(name, local, addresses));
-//			}
-//		}));
-		
-//		return ret;
+		IComponentManagementService cms = (IComponentManagementService)variables.get("$cms");
+		return cms.createComponentIdentifier(name, local, addresses);
 	}
 	
 	/**

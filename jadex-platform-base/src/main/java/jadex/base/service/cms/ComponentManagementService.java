@@ -1326,7 +1326,7 @@ public abstract class ComponentManagementService extends BasicService implements
 	 */
 	public IComponentIdentifier createComponentIdentifier(String name)
 	{
-		return createComponentIdentifier(name, true, null);
+		return createComponentIdentifier(name, true);
 	}
 	
 	/**
@@ -1338,7 +1338,7 @@ public abstract class ComponentManagementService extends BasicService implements
 	 */
 	public IComponentIdentifier createComponentIdentifier(String name, boolean local)
 	{
-		return createComponentIdentifier(name, local, null);
+		return createComponentIdentifier(name, local, msgservice!=null ? msgservice.getAddresses() : null);		
 	}
 	
 	/**

@@ -127,8 +127,8 @@ public class FipaConversationPanel extends JSplitPane
 				// Check if receiver is specified
 				if(ris.isSet())
 				{
-					Object[]	values = (Object[])msg.get(ri);
-					if(values==null || values.length==0)
+					Object	value = msg.get(ri);
+					if(value==null || value instanceof Object[] && ((Object[])value).length==0)	// Hack!!! Even for set may use single cid???
 					{
 						noReceiverSpecified();
 					}

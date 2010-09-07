@@ -138,26 +138,21 @@ public class EventIntermediateMessageActivityHandler	extends DefaultActivityHand
 							}
 						}
 						
+						thread.setWaiting(true);
 						ms.sendMessage(msg, mt, instance.getComponentAdapter().getComponentIdentifier(), instance.getClassLoader())
-							.addResultListener(instance.createResultListener(new IResultListener()
+							.addResultListener(new IResultListener()
 						{
 							public void resultAvailable(Object source, Object result)
 							{
-								// ok message could be sent.
-								
-								// todo: futurize method
+								instance.notify(activity, thread, null);
 							}
 							
 							public void exceptionOccurred(Object source, Exception exception)
 							{
-								// message could not be sent.
-							
-								// todo: futurize method
+								thread.setException(exception);
+								instance.notify(activity, thread, null);
 							}
-						}));
-						
-//						ms.sendMessage(msg, mt, instance.getComponentAdapter(), instance.getClassLoader());
-						instance.getStepHandler(activity).step(activity, instance, thread, null);
+						});
 					}
 				}));
 			}

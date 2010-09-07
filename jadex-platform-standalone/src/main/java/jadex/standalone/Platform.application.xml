@@ -34,11 +34,11 @@
 	</imports>
 	
 	<arguments>
-		<argument name="platformname">null</argument>
+		<argument name="platformname">"lars"</argument>
 		<argument name="simulation">false</argument>
 		<argument name="libpath"></argument>
-		<argument name="tcpport">0</argument>
-		<argument name="niotcpport">0</argument>
+		<argument name="tcpport">9876</argument>
+		<argument name="niotcpport">8765</argument>
 		
 		<!-- todo?! -->
 		<!-- <argument name="welcome">true</argument>
@@ -96,7 +96,7 @@
 			new MessageService($component.getServiceProvider(),
 				new ITransport[]
 				{
-					//new LocalTransport($component.getServiceProvider()),
+					new LocalTransport($component.getServiceProvider()),
 					//new TCPTransport($component.getServiceProvider(), $args.tcpport),
 					new NIOTCPTransport($component.getServiceProvider(), $args.niotcpport)
 				},
@@ -132,23 +132,11 @@
 	</services>
 	
 	<applications>
-		<application name="all_kernels (rms, awa, jcc)">
-			<components>
-				<component name="kernel_micro" type="kernel_micro" daemon="true"/>
-				<!-- <component type="kernel_bdi" daemon="true"/> -->
-				<component name="kernel_bdibpmn" type="kernel_bdibpmn" daemon="true"/>
-				<component name="kernel_bpmn" type="kernel_bpmn" daemon="true"/>
-				<component name="rms" type="rms" daemon="true"/>
-				<component name="awa" type="awa"/>
-				<component name="jcc" type="jcc"/>
-			</components>
-		</application>
-	
-		<application name="all_kernels fixed (rms, awa, jcc)">
+		<application name="all_kernels auto (rms, awa, jcc)">
 			<arguments>
-				<argument name="tcpport">9876</argument>
-				<argument name="niotcpport">8765</argument>
-				<argument name="platformname">"platform"</argument>
+				<argument name="tcpport">0</argument>
+				<argument name="niotcpport">0</argument>
+				<argument name="platformname">null</argument>
 			</arguments>
 			<components>
 				<component name="kernel_micro" type="kernel_micro" daemon="true"/>
@@ -160,14 +148,15 @@
 				<component name="jcc" type="jcc"/>
 			</components>
 		</application>
-		
-		<application name="all_kernels (rms, jcc)">
+	
+		<application name="all_kernels (rms, awa, jcc)">
 			<components>
 				<component name="kernel_micro" type="kernel_micro" daemon="true"/>
 				<!-- <component type="kernel_bdi" daemon="true"/> -->
 				<component name="kernel_bdibpmn" type="kernel_bdibpmn" daemon="true"/>
 				<component name="kernel_bpmn" type="kernel_bpmn" daemon="true"/>
 				<component name="rms" type="rms" daemon="true"/>
+				<component name="awa" type="awa"/>
 				<component name="jcc" type="jcc"/>
 			</components>
 		</application>

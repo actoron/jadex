@@ -190,17 +190,20 @@ public class MessageService extends BasicService implements IMessageService
 	protected void doSendMessage(Map msg, MessageType type, IExternalAccess comp, ClassLoader cl, Map msgcopy, Future ret)
 	{
 		Object tmp = msgcopy.get(type.getReceiverIdentifier());
-		if(tmp==null || !SReflect.getIterator(tmp).hasNext())
+		if(tmp==null || SReflect.isIterable(tmp) &&	!SReflect.getIterator(tmp).hasNext())
 		{
 			ret.setException(new RuntimeException("Receivers must not be empty: "+msgcopy));
 			return;
 		}
-		for(Iterator it=SReflect.getIterator(tmp); it.hasNext(); )
+		if(SReflect.isIterable(tmp))
 		{
-			if(it.next()==null)
+			for(Iterator it=SReflect.getIterator(tmp); it.hasNext(); )
 			{
-				ret.setException(new MessageFailureException(msg, type, null, "A receiver nulls: "+msg));
-				return;
+				if(it.next()==null)
+				{
+					ret.setException(new MessageFailureException(msg, type, null, "A receiver nulls: "+msg));
+					return;
+				}
 			}
 		}
 
@@ -241,11 +244,21 @@ public class MessageService extends BasicService implements IMessageService
 		// Determine manager tasks
 		MultiCollection managers = new MultiCollection();
 		String recid = type.getReceiverIdentifier();
-		for(Iterator it = SReflect.getIterator(msgcopy.get(recid)); it.hasNext(); )
+		tmp	= msgcopy.get(recid);
+		if(SReflect.isIterable(tmp))
 		{
-			IComponentIdentifier cid = (IComponentIdentifier)it.next();
+			for(Iterator it = SReflect.getIterator(tmp); it.hasNext(); )
+			{
+				IComponentIdentifier cid = (IComponentIdentifier)it.next();
+				SendManager sm = getSendManager(cid); 
+				managers.put(sm, cid);
+			}
+		}
+		else
+		{
+			IComponentIdentifier cid = (IComponentIdentifier)tmp;
 			SendManager sm = getSendManager(cid); 
-			managers.put(sm, cid);
+			managers.put(sm, cid);			
 		}
 		
 		CollectionResultListener lis = new CollectionResultListener(managers.size(), false, new DelegationResultListener(ret));
@@ -799,6 +812,7 @@ public class MessageService extends BasicService implements IMessageService
 		//				IConnection con = transports[i].getConnection(addresses[i]);
 		//				if(con==null)
 						
+//						System.out.println("sending: "+transports[i]+", "+task.getMessage().get(task.getMessageType().getIdIdentifier())+", "+SUtil.arrayToString(receivers));
 						receivers = transports[i].sendMessage(task.getMessage(), task.getMessageType().getName(), receivers);
 					}
 					catch(Exception e)
@@ -811,7 +825,7 @@ public class MessageService extends BasicService implements IMessageService
 				{
 		//			logger.warning("Message could not be delivered to (all) receivers: " + SUtil.arrayToString(receivers));
 					ret.setException(new MessageFailureException(task.getMessage(), task.getMessageType(), receivers, 
-						"Message could not be delivered to (all) receivers: "+ SUtil.arrayToString(receivers)));
+						"Message could not be delivered to (all) receivers: "+ SUtil.arrayToString(receivers)+", "+SUtil.arrayToString(receivers[0].getAddresses())));
 				}
 				else
 				{
