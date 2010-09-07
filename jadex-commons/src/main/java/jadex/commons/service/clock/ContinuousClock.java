@@ -68,17 +68,17 @@ public class ContinuousClock extends AbstractClock implements IContinuousClock
 //		System.out.println("Delta: "+delta);
 //		if(delta>0)
 //		{
-			createTickTimer(new ITimedObject()
-			{
-				public void timeEventOccurred(long currenttime)
-				{
-					synchronized(this)
-					{
-//						System.out.println("tick: "+getTime()+" "+getTick());
-						createTickTimer(this);
-					}
-				}
-			});
+//			createTickTimer(new ITimedObject()
+//			{
+//				public void timeEventOccurred(long currenttime)
+//				{
+//					synchronized(this)
+//					{
+////						System.out.println("tick: "+getTime()+" "+getTick());
+//						createTickTimer(this);
+//					}
+//				}
+//			});
 //		}
 	}
 	

@@ -89,6 +89,8 @@ public class AwarenessAgent extends MicroAgent
 		try
 		{
 			this.address = InetAddress.getByName((String)getArgument("address"));
+			if(address==null)
+				throw new NullPointerException("Cannot get address: "+getArgument("address"));
 			this.port = ((Number)getArgument("port")).intValue();
 			this.delay = ((Number)getArgument("delay")).longValue();
 			this.autocreate = ((Boolean)getArgument("autocreate")).booleanValue();
@@ -106,6 +108,7 @@ public class AwarenessAgent extends MicroAgent
 		}
 		catch(Exception e)
 		{
+			e.printStackTrace();
 			throw new RuntimeException(e);
 		}
 	}
@@ -682,9 +685,18 @@ public class AwarenessAgent extends MicroAgent
 												}
 												if(receivesocket==null)
 												{
-													receivesocket = new MulticastSocket(curport);
-													receivesocket.joinGroup(curaddress);
-													myaddress = curaddress;
+													try
+													{
+														receivesocket = new MulticastSocket(curport);
+														receivesocket.joinGroup(curaddress);
+														myaddress = curaddress;
+													}
+													catch(Exception e)
+													{
+														receivesocket	= null;
+														getLogger().warning("Awareness error when joining mutlicast group: "+e);
+														break;
+													}
 												}
 											}
 										}

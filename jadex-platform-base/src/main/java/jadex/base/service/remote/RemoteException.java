@@ -29,7 +29,7 @@ public class RemoteException extends RuntimeException
 	 */
 	public String toString()
 	{
-		String	clazz	= type!=null ? type.getName() : getClass().getName();
+		String	clazz	= getClass().getName() + (type!=null ? "("+type.getName()+")" : "");
         String	msg	= getLocalizedMessage();
         return msg!=null ? clazz+": "+msg : clazz;
 	}

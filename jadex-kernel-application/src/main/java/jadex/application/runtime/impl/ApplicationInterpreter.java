@@ -317,7 +317,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 					{
 						public void finalResultAvailable(Object source, Object result)
 						{
-							addStep(init2);
+							scheduleStep(init2);
 						}
 						public void exceptionOccurred(Object source, Exception exception)
 						{
@@ -368,33 +368,33 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 		return ret;
 	}
 
-	/**
-	 * Load an component model.
-	 * @param model The model.
-	 * @return The loaded model.
-	 */
-	public static IFuture loadModel(final IServiceProvider provider, final String model)
-	{
-		final Future ret = new Future();
-		
-		SServiceProvider.getService(provider, ILibraryService.class).addResultListener(new DefaultResultListener()
-		{
-			public void resultAvailable(Object source, Object result)
-			{
-				final ILibraryService ls = (ILibraryService)result;
-				
-				SServiceProvider.getService(provider, new ComponentFactorySelector(model, null, ls.getClassLoader())).addResultListener(new DefaultResultListener()
-				{
-					public void resultAvailable(Object source, Object result)
-					{
-						IComponentFactory fac = (IComponentFactory)result;
-						ret.setResult(fac!=null ? fac.loadModel(model, null, ls.getClassLoader()) : null);
-					}
-				});
-			}
-		});
-		return ret;
-	}
+//	/**
+//	 * Load an component model.
+//	 * @param model The model.
+//	 * @return The loaded model.
+//	 */
+//	public static IFuture loadModel(final IServiceProvider provider, final String model)
+//	{
+//		final Future ret = new Future();
+//		
+//		SServiceProvider.getService(provider, ILibraryService.class).addResultListener(new DefaultResultListener()
+//		{
+//			public void resultAvailable(Object source, Object result)
+//			{
+//				final ILibraryService ls = (ILibraryService)result;
+//				
+//				SServiceProvider.getService(provider, new ComponentFactorySelector(model, null, ls.getClassLoader())).addResultListener(new DefaultResultListener()
+//				{
+//					public void resultAvailable(Object source, Object result)
+//					{
+//						IComponentFactory fac = (IComponentFactory)result;
+//						ret.setResult(fac!=null ? fac.loadModel(model, null, ls.getClassLoader()) : null);
+//					}
+//				});
+//			}
+//		});
+//		return ret;
+//	}
 
 	//-------- space handling --------
 		
@@ -1116,7 +1116,13 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 				public void finalResultAvailable(Object source, Object result)
 				{
 //					System.out.println("Create finished: "+component.getName()+" "+component.getTypeName()+" "+component.getConfiguration()+" "+Thread.currentThread());
-					createComponent(components, cl, ces, i+1, inited);
+					scheduleStep(new Runnable()
+					{
+						public void run()
+						{
+							createComponent(components, cl, ces, i+1, inited);
+						}
+					});
 				}
 				
 				public void exceptionOccurred(Object source, Exception exception)
