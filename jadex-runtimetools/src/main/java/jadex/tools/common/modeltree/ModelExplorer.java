@@ -344,7 +344,10 @@ public class ModelExplorer extends JTree
 		Properties	props	= new Properties();
 		// Save tree properties.
 		ModelExplorerProperties	mep	= new ModelExplorerProperties();
-		mep.setRootPathEntries(getRootNode().getPathEntries());
+		String[]	paths	= getRootNode().getPathEntries();
+		for(int i=0; i<paths.length; i++)
+			paths[i]	= SUtil.convertPathToRelative(paths[i]);
+		mep.setRootPathEntries(paths);
 		mep.setSelectedNode(getSelectionPath()==null ? null
 			: NodePath.createNodePath((FileNode)getSelectionPath().getLastPathComponent()));
 		List	expanded	= new ArrayList();
@@ -398,6 +401,8 @@ public class ModelExplorer extends JTree
 	 */
 	public void setProperties(final Properties props)
 	{
+		refresh	= false;	// stops crawler task, if any
+		
 		// Load root node.
 		String	treexml	= props.getStringProperty("tree");
 		// todo: hack!
@@ -484,12 +489,11 @@ public class ModelExplorer extends JTree
 			{
 			}
 		}				
-		
+				
 		// Load refresh/checking flag (defaults to true).
 		refresh	= !"false".equals(props.getStringProperty("refresh"));
 		if(refreshmenu!=null)
 			refreshmenu.setState(this.refresh);
-		
 		resetCrawler();
 		
 		// Load the filter settings
@@ -510,14 +514,6 @@ public class ModelExplorer extends JTree
 				}
 			}
 		}
-		
-//		SwingUtilities.invokeLater(new Runnable()
-//		{
-//			public void run()
-//			{
-//				refresh(getRootNode());
-//			}
-//		});
 	}
 	
 	/**
@@ -808,6 +804,7 @@ public class ModelExplorer extends JTree
 			// Move from paths (loaded) to expanded nodes (created dynamically).
 			if(expandedpaths!=null && expandedpaths.remove(NodePath.createNodePath((FileNode)path.getLastPathComponent())))
 			{
+//				System.out.println("loaded: "+path.getLastPathComponent());
 				expanded.add(path.getLastPathComponent());
 				if(expandedpaths.isEmpty())
 					expandedpaths	= null;
@@ -829,6 +826,7 @@ public class ModelExplorer extends JTree
 					}
 					else if(lastselectedpath!=null && lastselectedpath.equals(NodePath.createNodePath((FileNode)path.getLastPathComponent())))
 					{
+//						System.out.println("selected: "+path.getLastPathComponent());
 						lastselected	= null;
 						lastselectedpath	= null;
 						tree.setSelectionPath(path);

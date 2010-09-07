@@ -426,24 +426,35 @@ public class	DefaultNodeFunctionality
 								: (IExplorerTreeNode)new FileNode(node, files[i]);
 			
 							// Check if child is new
-							if(old==null || !old.remove(child))
+							int	index;
+							for(index=0; index<children.size() && FILENODE_COMPARATOR.compare(children.get(index), child)<0; index++);
+							// New child.
+							if(index>=children.size() || FILENODE_COMPARATOR.compare(children.get(index), child)>0)
 							{
-								int	index;
-								for(index=0; index<children.size() 
-									&& FILENODE_COMPARATOR.compare(
-									children.get(index), child)<=0; index++);
 								children.add(index, child);	
 								changed	= true;
 							}
+							// Child already exists.
+							else
+							{
+								old.remove(children.get(index));
+							}
 						}
 						
-						// Remove old entries.
+						// Remove no longer existing entries.
 						if(old!=null)
 						{
 							for(Iterator it=old.iterator(); it.hasNext(); )
 							{
-								children.remove(it.next());
-								changed	= true;
+								Object	child	= it.next();
+								int	index;
+								for(index=0; index<children.size() && FILENODE_COMPARATOR.compare(children.get(index), child)<0; index++);
+								if(FILENODE_COMPARATOR.compare(children.get(index), child)==0)
+								{
+									assert index<children.size();	// old child should always be contained.
+									children.remove(index);
+									changed	= true;
+								}
 							}
 						}
 					}
@@ -466,6 +477,7 @@ public class	DefaultNodeFunctionality
 					public void run()
 					{
 						// Hack??? Should propagate adds/removes separately?
+//						System.out.println("found children: "+node+", "+((FileNode)node).getProperties().get(CHILDREN));
 						((ModelExplorerTreeModel)explorer.getModel()).fireTreeStructureChanged(node);
 					}
 				});

@@ -11,11 +11,6 @@ import java.util.Map;
  */
 public class FileNode implements IExplorerTreeNode
 {
-	//-------- constants --------
-	
-	/** Node id counter. */
-	protected static int	COUNTER	= 0;
-	
 	//-------- attributes --------
 	
 	/** The parent of this node. */

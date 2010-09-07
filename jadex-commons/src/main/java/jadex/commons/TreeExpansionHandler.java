@@ -81,6 +81,7 @@ public class TreeExpansionHandler	implements TreeExpansionListener, TreeModelLis
 	 */
 	public void	treeNodesInserted(TreeModelEvent event)
 	{
+//		System.out.println("nodes inserted: "+event);
 		// When a new node has been inserted,
 		// we may have to re-expand its parent.
 		handlePath(event.getTreePath());
@@ -146,7 +147,7 @@ public class TreeExpansionHandler	implements TreeExpansionListener, TreeModelLis
 	protected IFuture	handlePath(final TreePath path)
 	{
 		final Future	ret	= new Future();
-//		System.out.println("handle expand: "+path.getLastPathComponent()+", "+expanded);
+//		System.out.println("handle expand ("+expanded.contains(path.getLastPathComponent())+"): "+path.getLastPathComponent()+", "+expanded);
 		if(expanded.contains(path.getLastPathComponent()))
 		{
 			// Can't expand during change event (Java bug?)

@@ -1546,6 +1546,10 @@ public class SUtil
 		System.out.println("Here: "+createUniqueId("test", 3));
 	}
 	
+	/**
+	 *  Convert an absolute path to a relative path
+	 *  based on the current user directory.
+	 */
 	public static String	convertPathToRelative(String absolute)
 	{
 		// Build path as list of files (directories).

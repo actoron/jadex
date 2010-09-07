@@ -401,6 +401,7 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 	 */
 	public void setProperties(Properties props)
 	{
+		checkingmenu.setSelected(false);
 //		System.out.println("Starter set props: "+props);
 		
 		Properties	mpanelprops	= props.getSubproperty("mpanel");
