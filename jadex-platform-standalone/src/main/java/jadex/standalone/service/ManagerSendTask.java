@@ -66,7 +66,7 @@ public class ManagerSendTask
 	 *  Get the manager.
 	 *  @return the manager.
 	 */
-	public SendManager getTargetManager()
+	public SendManager getSendManager()
 	{
 		return manager;
 	}

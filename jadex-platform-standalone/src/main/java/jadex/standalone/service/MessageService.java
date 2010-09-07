@@ -78,9 +78,6 @@ public class MessageService extends BasicService implements IMessageService
 	/** The message types. */
 	protected Map messagetypes;
 	
-//	/** The send message action executed by platform executor. */
-//	protected SendMessage sendmsg;
-	
 	/** The deliver message action executed by platform executor. */
 	protected DeliverMessage delivermsg;
 	
@@ -116,11 +113,10 @@ public class MessageService extends BasicService implements IMessageService
 		this.messagetypes	= SCollection.createHashMap();
 		for(int i=0; i<messagetypes.length; i++)
 			this.messagetypes.put(messagetypes[i].getName(), messagetypes[i]);		
-//		this.sendmsg = new SendMessage();
 		this.delivermsg = new DeliverMessage();
 		this.logger = Logger.getLogger("MessageService" + this);
 		
-		this.managers = new LRU(100);
+		this.managers = new LRU(800);
 	}
 	
 	//-------- interface methods --------
@@ -194,18 +190,19 @@ public class MessageService extends BasicService implements IMessageService
 	 */
 	protected void doSendMessage(Map msg, MessageType type, IExternalAccess comp, ClassLoader cl, Map msgcopy, Future ret)
 	{
-		IComponentIdentifier[] receivers = null;
 		Object tmp = msgcopy.get(type.getReceiverIdentifier());
-		if(tmp instanceof Collection)
-			receivers = (IComponentIdentifier[])((Collection)tmp).toArray(new IComponentIdentifier[0]);
-		else if(tmp.getClass().isArray())
-			receivers = (IComponentIdentifier[])tmp;
-		else if(tmp instanceof IComponentIdentifier)
-			receivers = new IComponentIdentifier[]{(IComponentIdentifier)tmp};
-		
-		if(receivers==null || receivers==new IComponentIdentifier[0])
+		if(tmp==null || !SReflect.getIterator(tmp).hasNext())
 		{
-			throw new RuntimeException("Receivers must not be empty: "+msgcopy);
+			ret.setException(new RuntimeException("Receivers must not be empty: "+msgcopy));
+			return;
+		}
+		for(Iterator it=SReflect.getIterator(tmp); it.hasNext(); )
+		{
+			if(it.next()==null)
+			{
+				ret.setException(new MessageFailureException(msg, type, null, "A receiver nulls: "+msg));
+				return;
+			}
 		}
 
 		// Conversion via platform specific codecs
@@ -226,7 +223,8 @@ public class MessageService extends BasicService implements IMessageService
 			else if(value!=null && !(value instanceof String) 
 				&& !(name.equals(type.getSenderIdentifier()) || name.equals(type.getReceiverIdentifier())))
 			{	
-				throw new ContentException("No content codec found for: "+name+", "+msgcopy);
+				ret.setException(new ContentException("No content codec found for: "+name+", "+msgcopy));
+				return;
 			}
 		}
 
@@ -251,20 +249,14 @@ public class MessageService extends BasicService implements IMessageService
 			managers.put(sm, cid);
 		}
 		
-		List tasks = new ArrayList();
+		CollectionResultListener lis = new CollectionResultListener(managers.size(), false, new DelegationResultListener(ret));
 		for(Iterator it=managers.keySet().iterator(); it.hasNext();)
 		{
 			SendManager tm = (SendManager)it.next();
 			IComponentIdentifier[] recs = (IComponentIdentifier[])managers.getCollection(tm)
 				.toArray(new IComponentIdentifier[0]);
-			tasks.add(new ManagerSendTask(msgcopy, type, recs, tm));
-		}
-		
-		CollectionResultListener lis = new CollectionResultListener(tasks.size(), false, new DelegationResultListener(ret));
-		for(int i=0; i<tasks.size(); i++)
-		{
-			ManagerSendTask mst = (ManagerSendTask)tasks.get(i);
-			mst.getTargetManager().addMessage(mst).addResultListener(lis);
+			ManagerSendTask task = new ManagerSendTask(msgcopy, type, recs, tm);
+			task.getSendManager().addMessage(task).addResultListener(lis);
 		}
 		
 //		sendmsg.addMessage(msgcopy, type, receivers, ret);
@@ -867,6 +859,7 @@ public class MessageService extends BasicService implements IMessageService
 			// todo: transport shifting in case of no connection
 			
 			IComponentIdentifier[] receivers = task.getReceivers();
+//			System.out.println("recs: "+SUtil.arrayToString(receivers)+" "+this);
 			
 			ITransport[] transports = getTransports();
 			for(int i = 0; i < transports.length && receivers.length>0; i++)

@@ -308,6 +308,10 @@ public class NIOTCPTransport implements ITransport
 		// Iterate over all different addresses and try to send
 		// to missing and appropriate receivers
 		String[] addrs = (String[])adrsets.getKeys(String.class);
+		
+//		if(addrs.length>1)
+//			System.out.println("here: "+SUtil.arrayToString(addrs));
+		
 		for(int i=0; i<addrs.length && undelivered.size()>0; i++)
 		{
 			try
