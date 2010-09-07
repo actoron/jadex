@@ -56,7 +56,10 @@ public class MessageService extends BasicService implements IMessageService
         new jadex.base.contentcodecs.JadexXMLContentCodec(),
         new jadex.base.contentcodecs.NuggetsXMLContentCodec()
     };
-	
+
+    /** No addresses constant. */
+    protected String NO_ADDRESSES = "no_addresses";
+    
 	//-------- attributes --------
 
 	/** The provider. */
@@ -71,8 +74,8 @@ public class MessageService extends BasicService implements IMessageService
 	/** The message types. */
 	protected Map messagetypes;
 	
-	/** The send message action executed by platform executor. */
-	protected SendMessage sendmsg;
+//	/** The send message action executed by platform executor. */
+//	protected SendMessage sendmsg;
 	
 	/** The deliver message action executed by platform executor. */
 	protected DeliverMessage delivermsg;
@@ -88,6 +91,9 @@ public class MessageService extends BasicService implements IMessageService
 	
 	/** The cashed clock service. */
 	protected IComponentManagementService cms;
+	
+	/** The target managers. */
+	protected Map managers;
 	
 	//-------- constructors --------
 
@@ -106,9 +112,13 @@ public class MessageService extends BasicService implements IMessageService
 		this.messagetypes	= SCollection.createHashMap();
 		for(int i=0; i<messagetypes.length; i++)
 			this.messagetypes.put(messagetypes[i].getName(), messagetypes[i]);		
-		this.sendmsg = new SendMessage();
+//		this.sendmsg = new SendMessage();
 		this.delivermsg = new DeliverMessage();
 		this.logger = Logger.getLogger("MessageService" + this);
+		
+		this.managers = new HashMap();
+		TargetManager localmanager = new TargetManager(provider, transports);
+		managers.put(NO_ADDRESSES, localmanager);
 	}
 	
 	//-------- interface methods --------
@@ -229,7 +239,10 @@ public class MessageService extends BasicService implements IMessageService
 			}
 		}
 		
-		sendmsg.addMessage(msgcopy, type, receivers, ret);
+		SendTask task = new SendTask(this, msgcopy, type);
+		task.execute().addResultListener(new DelegationResultListener(ret));
+		
+//		sendmsg.addMessage(msgcopy, type, receivers, ret);
 	}
 	
 	/**
@@ -422,6 +435,30 @@ public class MessageService extends BasicService implements IMessageService
 		ITransport[] transportsArray = new ITransport[transports.size()];
 		return (ITransport[])transports.toArray(transportsArray);
 	}
+	
+	/**
+	 *  Get a target manager for addresses.
+	 */
+	public TargetManager getTargetManager(IComponentIdentifier cid)
+	{
+		TargetManager ret = null;
+		
+		String[] adrs = cid.getAddresses();
+		for(int i=0; i<adrs.length && ret==null; i++)
+		{
+			ret = (TargetManager)managers.get(adrs[i]);
+		}
+		if(ret==null)
+		{
+			ret = new TargetManager(provider, getTransports());
+			for(int i=0; i<adrs.length; i++)
+			{
+				managers.put(adrs[i], ret);
+			}
+		}
+		
+		return ret;
+	}
 
 	//-------- IPlatformService interface --------
 	
@@ -433,11 +470,19 @@ public class MessageService extends BasicService implements IMessageService
 		final Future ret = new Future();
 		
 		ITransport[] tps = (ITransport[])transports.toArray(new ITransport[transports.size()]);
+		TargetManager tm = (TargetManager)managers.get(NO_ADDRESSES);
 		for(int i=0; i<tps.length; i++)
 		{
 			try
 			{
 				tps[i].start();
+				
+				// Add local manager to all local addresses
+				String[] adrs = tps[i].getAddresses();
+				for(int j=0; j<adrs.length; j++)
+				{
+					managers.put(adrs[i], tm);
+				}
 			}
 			catch(Exception e)
 			{
@@ -649,76 +694,76 @@ public class MessageService extends BasicService implements IMessageService
 		});
 	}
 	
-	/**
-	 *  Send message(s) executable.
-	 */
-	protected class SendMessage implements IExecutable
-	{
-		//-------- attributes --------
-		
-		/** The list of messages to send. */
-		protected List messages;
-		
-		//-------- constructors --------
-		
-		/**
-		 *  Create a new send message executable.
-		 */
-		public SendMessage()
-		{
-			this.messages = new ArrayList();
-		}
-		
-		//-------- methods --------
-		
-		/**
-		 *  Send a message.
-		 */
-		public boolean execute()
-		{
-			Object[] tmp = null;
-			boolean isempty;
-			
-			synchronized(this)
-			{
-				if(!messages.isEmpty())
-					tmp = (Object[])messages.remove(0);
-				isempty = messages.isEmpty();
-			}
-			
-			if(tmp!=null)
-				internalSendMessage((Map)tmp[0], (MessageType)tmp[1], (IComponentIdentifier[])tmp[2], (Future)tmp[3]);
-
-			return !isempty;
-		}
-		
-		/**
-		 *  Add a message to be sent.
-		 *  @param message The message.
-		 */
-		public void addMessage(Map message, MessageType type, IComponentIdentifier[] receivers, Future ret)
-		{
-			synchronized(this)
-			{
-				messages.add(new Object[]{message, type, receivers, ret});
-			}
-			
-			SServiceProvider.getService(provider, IExecutionService.class).addResultListener(new DefaultResultListener()
-			{
-				public void resultAvailable(Object source, Object result)
-				{
-					try
-					{
-						((IExecutionService)result).execute(SendMessage.this);
-					}
-					catch(RuntimeException e)
-					{
-						// ignore if execution service is shutting down.
-					}						
-				}
-			});
-		}
-	}
+//	/**
+//	 *  Send message(s) executable.
+//	 */
+//	protected class SendMessage implements IExecutable
+//	{
+//		//-------- attributes --------
+//		
+//		/** The list of messages to send. */
+//		protected List messages;
+//		
+//		//-------- constructors --------
+//		
+//		/**
+//		 *  Create a new send message executable.
+//		 */
+//		public SendMessage()
+//		{
+//			this.messages = new ArrayList();
+//		}
+//		
+//		//-------- methods --------
+//		
+//		/**
+//		 *  Send a message.
+//		 */
+//		public boolean execute()
+//		{
+//			Object[] tmp = null;
+//			boolean isempty;
+//			
+//			synchronized(this)
+//			{
+//				if(!messages.isEmpty())
+//					tmp = (Object[])messages.remove(0);
+//				isempty = messages.isEmpty();
+//			}
+//			
+//			if(tmp!=null)
+//				internalSendMessage((Map)tmp[0], (MessageType)tmp[1], (IComponentIdentifier[])tmp[2], (Future)tmp[3]);
+//
+//			return !isempty;
+//		}
+//		
+//		/**
+//		 *  Add a message to be sent.
+//		 *  @param message The message.
+//		 */
+//		public void addMessage(Map message, MessageType type, IComponentIdentifier[] receivers, Future ret)
+//		{
+//			synchronized(this)
+//			{
+//				messages.add(new Object[]{message, type, receivers, ret});
+//			}
+//			
+//			SServiceProvider.getService(provider, IExecutionService.class).addResultListener(new DefaultResultListener()
+//			{
+//				public void resultAvailable(Object source, Object result)
+//				{
+//					try
+//					{
+//						((IExecutionService)result).execute(SendMessage.this);
+//					}
+//					catch(RuntimeException e)
+//					{
+//						// ignore if execution service is shutting down.
+//					}						
+//				}
+//			});
+//		}
+//	}
 	
 	/**
 	 *  Deliver message(s) executable.

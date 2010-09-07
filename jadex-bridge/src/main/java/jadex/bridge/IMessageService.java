@@ -57,7 +57,7 @@ public interface IMessageService extends IService
 	 *  @return The message type.
 	 */
 	public MessageType getMessageType(String type);
-	
+		
 	/**
 	 *  Add a message listener.
 	 *  @param listener The change listener.
