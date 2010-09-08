@@ -34,7 +34,7 @@ public class ExecuteServicePlan extends Plan
 			if (!(Boolean) getBeliefbase().getBelief("blackout").getFact())
 			{
 				// LOG
-				Double duration = myService.getMedDuration() * (0.5 + agentType.getCostCharacter());
+				Double duration = myService.getMedDuration() * (0.5 + agentType.getDurationCharacter());
 				workflowLogger.info(myService.getName() + " execute by " + this.getComponentName() + " for " + duration);
 				saLogger.info("execute servicerequest by " + (String) request.getParameter("action").getValue() + " for " + duration);
 

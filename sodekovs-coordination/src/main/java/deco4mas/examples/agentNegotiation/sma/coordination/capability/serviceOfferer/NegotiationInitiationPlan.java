@@ -42,15 +42,15 @@ public class NegotiationInitiationPlan extends Plan
 			utilityFunction.setTrustFunction((ITrustFunction) getBeliefbase().getBelief("trustFunction").getFact());
 
 			// add costs
-			Double costWeight = 0.2;
-			Double durationWeight = 0.2;
-			Double trustWeight = 0.6;
+			Double costWeight = 0.35;
+			Double durationWeight = 0.35;
+			Double trustWeight = 0.3;
 			ServiceType service = (ServiceType) neededService.getServiceType();
 			utilityFunction.addFactor("cost", costWeight, service.getMaxCost(), service.getMinCost(), false);
 			utilityFunction.addFactor("duration", durationWeight, service.getMaxDuration(), service.getMinDuration(), false);
 			utilityFunction.addFactor("trust", trustWeight, 100.0, 0.0, true);
 
-			smaLogger.info("weight for utility " + costWeight + ", " + durationWeight + ", " + trustWeight);
+			smaLogger.info("weight for utility " + costWeight + ", " + durationWeight + ", " + trustWeight);			
 
 			// Selector
 			SimpleSelectionStrategy selector = new SimpleSelectionStrategy();
