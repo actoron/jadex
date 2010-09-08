@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+	<H3>Agent that provides a service and tries to get it.</H3>
+ -->
+<agent xmlns="http://jadex.sourceforge.net/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-bdi
+	                    http://jadex.sourceforge.net/jadex-bdi-2.0.xsd"
+	name="BeliefProvider"
+	package="jadex.bdi.testcases.service">
+
+	<capabilities>
+		<capability name="testcap" file="jadex.bdi.planlib.test.Test"/>
+	</capabilities>
+
+	<beliefs>
+		<belief name="money" class="double" argument="true">
+			<fact>100</fact>
+		</belief>
+		<beliefref name="timeout"  exported="true">
+			<concrete ref="testcap.timeout"/>
+		</beliefref>
+		<beliefref name="testresults"  result="true">
+			<concrete ref="testcap.testresults"/>
+		</beliefref>
+	</beliefs>
+	
+	<plans>
+		<plan name="getter">
+			<body class="FactFetcherPlan"></body>
+		</plan>
+	</plans>
+	
+	<services>
+		<service>new BeliefGetter($scope.getExternalAccess())</service>
+	</services>
+	
+	<configurations>
+		<configuration name="default">
+			<plans>
+				<initialplan ref="getter"/>
+			</plans>
+		</configuration>
+	</configurations>
+</agent>
