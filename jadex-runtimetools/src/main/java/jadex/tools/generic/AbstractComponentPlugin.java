@@ -7,7 +7,6 @@ import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
-import jadex.commons.SUtil;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.commons.service.SServiceProvider;
 
@@ -66,7 +65,7 @@ public abstract class AbstractComponentPlugin extends AbstractGenericPlugin
 					public void customResultAvailable(Object source, Object result)
 					{
 						IComponentDescription[] descs = (IComponentDescription[])result;
-						System.out.println("descs: "+SUtil.arrayToString(descs)+" "+remotecb.isSelected());
+//						System.out.println("descs: "+SUtil.arrayToString(descs)+" "+remotecb.isSelected());
 						Set newcids = new HashSet();
 						for(int i=0; i<descs.length; i++)
 						{
