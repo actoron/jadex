@@ -1,33 +1,70 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_P3fdwXLtEd-fEqakq96uUw" iD="_P3fdwHLtEd-fEqakq96uUw">
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_EfIsIHLyEd-fEqakq96uUw" source="jadex">
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_EfIsIXLyEd-fEqakq96uUw" key="Description" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_EfIsIXLyEd-fEqakq96uUw" key="Description" value="&lt;h1>Simple Delivery Process&lt;/h1> This process sends payment reminders to the JCC. Try sending the process an 'inform(payment)'."/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_EfJ6QHLyEd-fEqakq96uUw" key="Package" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_6iQEwLtJEd-rNtpDP1AqqQ" key="arguments" value="dunnings␋false␋false␋Number of dunnings sent␋int␋0"/>
   </eAnnotations>
   <pools xmi:type="bpmn:Pool" xmi:id="_P3gE1XLtEd-fEqakq96uUw" iD="_P3gE1HLtEd-fEqakq96uUw" name="Pool">
     <vertices xmi:type="bpmn:Activity" xmi:id="_P3gr4XLtEd-fEqakq96uUw" iD="_P3gr4HLtEd-fEqakq96uUw" outgoingEdges="_jDbHIXLtEd-fEqakq96uUw" incomingEdges="_9tq00XLwEd-fEqakq96uUw _6-6acHLuEd-fEqakq96uUw" name="Ship  Items" activityType="Task"/>
     <vertices xmi:type="bpmn:Activity" xmi:id="_jDRWIXLtEd-fEqakq96uUw" iD="_jDRWIHLtEd-fEqakq96uUw" outgoingEdges="_wLM1sXLtEd-fEqakq96uUw" incomingEdges="_jDbHIXLtEd-fEqakq96uUw" name="Send Invoice" activityType="Task"/>
-    <vertices xmi:type="bpmn:Activity" xmi:id="_wLDrwXLtEd-fEqakq96uUw" iD="_wLDrwHLtEd-fEqakq96uUw" outgoingEdges="_xre8sXLtEd-fEqakq96uUw _1t96sXLtEd-fEqakq96uUw _9KYo8XLtEd-fEqakq96uUw" incomingEdges="_wLM1sXLtEd-fEqakq96uUw _tB864XLvEd-fEqakq96uUw" activityType="EventIntermediateMultiple"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_wLDrwXLtEd-fEqakq96uUw" iD="_wLDrwHLtEd-fEqakq96uUw" outgoingEdges="_xre8sXLtEd-fEqakq96uUw _1t96sXLtEd-fEqakq96uUw _9KYo8XLtEd-fEqakq96uUw" incomingEdges="_wLM1sXLtEd-fEqakq96uUw _YDcm4btMEd-rNtpDP1AqqQ" activityType="EventIntermediateMultiple"/>
     <vertices xmi:type="bpmn:Activity" xmi:id="_xrVywXLtEd-fEqakq96uUw" iD="_xrVywHLtEd-fEqakq96uUw" outgoingEdges="_QIl_YXLuEd-fEqakq96uUw" incomingEdges="_xre8sXLtEd-fEqakq96uUw" name="Payment arrived" activityType="EventIntermediateMessage">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_Oqe7QHLxEd-fEqakq96uUw" source="isThrowing">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_OqfiUHLxEd-fEqakq96uUw" key="isThrowing" value="false"/>
       </eAnnotations>
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_8Ip6gLtMEd-rNtpDP1AqqQ" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_8Ip6gbtMEd-rNtpDP1AqqQ" key="msgtype" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_8Ip6grtMEd-rNtpDP1AqqQ" key="message" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_8Ip6g7tMEd-rNtpDP1AqqQ" key="match expression" value=""/>
+      </eAnnotations>
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_9BHzkLtMEd-rNtpDP1AqqQ" source="activity">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_9BHzkbtMEd-rNtpDP1AqqQ" key="parameters" value="performative␋&quot;inform&quot;"/>
+      </eAnnotations>
     </vertices>
-    <vertices xmi:type="bpmn:Activity" xmi:id="_1t1X0HLtEd-fEqakq96uUw" iD="_1t0wwHLtEd-fEqakq96uUw" outgoingEdges="_wTCGkXLuEd-fEqakq96uUw" incomingEdges="_1t96sXLtEd-fEqakq96uUw" name="Item returned" activityType="EventIntermediateMessage"/>
-    <vertices xmi:type="bpmn:Activity" xmi:id="_9KQtIXLtEd-fEqakq96uUw" iD="_9KQtIHLtEd-fEqakq96uUw" outgoingEdges="_xZ8O0XLvEd-fEqakq96uUw" incomingEdges="_9KYo8XLtEd-fEqakq96uUw" name="Payment target &#xD;&#xA;exceeded" activityType="EventIntermediateTimer"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_1t1X0HLtEd-fEqakq96uUw" iD="_1t0wwHLtEd-fEqakq96uUw" outgoingEdges="_wTCGkXLuEd-fEqakq96uUw" incomingEdges="_1t96sXLtEd-fEqakq96uUw" name="Item returned" activityType="EventIntermediateMessage">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_KLQSkLtNEd-rNtpDP1AqqQ" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_KLQSkbtNEd-rNtpDP1AqqQ" key="msgtype" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_KLQSkrtNEd-rNtpDP1AqqQ" key="message" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_KLQSk7tNEd-rNtpDP1AqqQ" key="match expression" value=""/>
+      </eAnnotations>
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_Ku2u4LtNEd-rNtpDP1AqqQ" source="activity">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Ku2u4btNEd-rNtpDP1AqqQ" key="parameters" value="performative␋&quot;inform&quot;␟content␋&quot;item&quot;"/>
+      </eAnnotations>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_9KQtIXLtEd-fEqakq96uUw" iD="_9KQtIHLtEd-fEqakq96uUw" outgoingEdges="_xZ8O0XLvEd-fEqakq96uUw" incomingEdges="_9KYo8XLtEd-fEqakq96uUw" name="Payment target &#xD;&#xA;exceeded" activityType="EventIntermediateTimer">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_QZqAcLtLEd-rNtpDP1AqqQ" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_QZqAcbtLEd-rNtpDP1AqqQ" key="duration" value="5000"/>
+      </eAnnotations>
+    </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_QIeDkXLuEd-fEqakq96uUw" iD="_QIeDkHLuEd-fEqakq96uUw" outgoingEdges="_TXTXEXLuEd-fEqakq96uUw" incomingEdges="_QIl_YXLuEd-fEqakq96uUw" name="Enter Payment" activityType="Task"/>
     <vertices xmi:type="bpmn:Activity" xmi:id="_TXPssXLuEd-fEqakq96uUw" iD="_TXPssHLuEd-fEqakq96uUw" incomingEdges="_TXTXEXLuEd-fEqakq96uUw _DwzG0XLvEd-fEqakq96uUw _NNCs4XLxEd-fEqakq96uUw" activityType="EventEndEmpty"/>
     <vertices xmi:type="bpmn:SubProcess" xmi:id="_wS0rMXLuEd-fEqakq96uUw" iD="_wS0rMHLuEd-fEqakq96uUw" outgoingEdges="_4djQ8XLuEd-fEqakq96uUw" incomingEdges="_wTCGkXLuEd-fEqakq96uUw" name="Complaint&#xD;&#xA;Subprocess" activityType="SubProcess"/>
     <vertices xmi:type="bpmn:Activity" xmi:id="_4db8MXLuEd-fEqakq96uUw" iD="_4db8MHLuEd-fEqakq96uUw" outgoingEdges="_6-6acHLuEd-fEqakq96uUw _DwzG0XLvEd-fEqakq96uUw" incomingEdges="_4djQ8XLuEd-fEqakq96uUw" name="Complaint &#xD;&#xA;solved?" activityType="GatewayDataBasedExclusive"/>
-    <vertices xmi:type="bpmn:Activity" xmi:id="_mqlwMHLvEd-fEqakq96uUw" iD="_mqlJIHLvEd-fEqakq96uUw" outgoingEdges="_tB864XLvEd-fEqakq96uUw" incomingEdges="_mqr20XLvEd-fEqakq96uUw" name="Send dunning" activityType="EventIntermediateMessage">
-      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_QuXekHLxEd-fEqakq96uUw" source="isThrowing">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_QuXekXLxEd-fEqakq96uUw" key="isThrowing" value="true"/>
-      </eAnnotations>
-    </vertices>
-    <vertices xmi:type="bpmn:Activity" xmi:id="_xZ1hIXLvEd-fEqakq96uUw" iD="_xZ1hIHLvEd-fEqakq96uUw" outgoingEdges="_mqr20XLvEd-fEqakq96uUw _EE1yQXLxEd-fEqakq96uUw" incomingEdges="_xZ8O0XLvEd-fEqakq96uUw" name="Number &#xD;&#xA;dunnings sent &lt; 3" activityType="GatewayDataBasedExclusive"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_xZ1hIXLvEd-fEqakq96uUw" iD="_xZ1hIHLvEd-fEqakq96uUw" outgoingEdges="_EE1yQXLxEd-fEqakq96uUw _XPdlMbtMEd-rNtpDP1AqqQ" incomingEdges="_xZ8O0XLvEd-fEqakq96uUw" name="Number &#xD;&#xA;dunnings sent &lt; 3" activityType="GatewayDataBasedExclusive"/>
     <vertices xmi:type="bpmn:Activity" xmi:id="_9RNiUXLwEd-fEqakq96uUw" iD="_9RNiUHLwEd-fEqakq96uUw" outgoingEdges="_9tq00XLwEd-fEqakq96uUw" activityType="EventStartEmpty"/>
     <vertices xmi:type="bpmn:Activity" xmi:id="_EEvroXLxEd-fEqakq96uUw" iD="_EEvroHLxEd-fEqakq96uUw" outgoingEdges="_J5EasXLxEd-fEqakq96uUw" incomingEdges="_EE1yQXLxEd-fEqakq96uUw" name="Blacklist &#xD;&#xA;Customer" activityType="Task"/>
     <vertices xmi:type="bpmn:Activity" xmi:id="_J4-UEXLxEd-fEqakq96uUw" iD="_J4-UEHLxEd-fEqakq96uUw" outgoingEdges="_NNCs4XLxEd-fEqakq96uUw" incomingEdges="_J5EasXLxEd-fEqakq96uUw" name="Instruct Debt &#xD;&#xA;Collecting" activityType="Task"/>
+    <vertices xmi:type="bpmn:SubProcess" xmi:id="_-fcoMbtLEd-rNtpDP1AqqQ" iD="_-fcoMLtLEd-rNtpDP1AqqQ" outgoingEdges="_YDcm4btMEd-rNtpDP1AqqQ" incomingEdges="_XPdlMbtMEd-rNtpDP1AqqQ" activityType="SubProcess">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_-jBgoLtLEd-rNtpDP1AqqQ" source="subProcess">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-jBgobtLEd-rNtpDP1AqqQ" key="file" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-jBgortLEd-rNtpDP1AqqQ" key="parallel" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-jBgo7tLEd-rNtpDP1AqqQ" key="items" value=""/>
+      </eAnnotations>
+      <vertices xmi:type="bpmn:Activity" xmi:id="_IRH9qbtMEd-rNtpDP1AqqQ" iD="_IRH9obtMEd-rNtpDP1AqqQ" name="Send dunning" activityType="EventIntermediateMessage">
+        <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_IRH9qrtMEd-rNtpDP1AqqQ" source="isThrowing">
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_IRH9q7tMEd-rNtpDP1AqqQ" key="isThrowing" value="true"/>
+        </eAnnotations>
+        <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_IRH9rLtMEd-rNtpDP1AqqQ" source="jadex">
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_IRH9rbtMEd-rNtpDP1AqqQ" key="msgtype" value=""/>
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_IRH9rrtMEd-rNtpDP1AqqQ" key="message" value=""/>
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_IRH9r7tMEd-rNtpDP1AqqQ" key="match expression" value=""/>
+        </eAnnotations>
+        <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_IRH9sLtMEd-rNtpDP1AqqQ" source="activity">
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_IRH9sbtMEd-rNtpDP1AqqQ" key="parameters" value="receivers␋&quot;jcc&quot;␟performative␋&quot;inform&quot;␟content␋&quot;Payment late!&quot;"/>
+        </eAnnotations>
+      </vertices>
+    </vertices>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_jDbHIXLtEd-fEqakq96uUw" iD="_jDbHIHLtEd-fEqakq96uUw"/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_wLM1sXLtEd-fEqakq96uUw" iD="_wLM1sHLtEd-fEqakq96uUw"/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_xre8sXLtEd-fEqakq96uUw" iD="_xre8sHLtEd-fEqakq96uUw"/>
@@ -39,12 +76,23 @@
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_4djQ8XLuEd-fEqakq96uUw" iD="_4djQ8HLuEd-fEqakq96uUw"/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_6-6acHLuEd-fEqakq96uUw" iD="_6-5zYHLuEd-fEqakq96uUw" name="yes"/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_DwzG0XLvEd-fEqakq96uUw" iD="_DwzG0HLvEd-fEqakq96uUw" name="no"/>
-    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_mqr20XLvEd-fEqakq96uUw" iD="_mqr20HLvEd-fEqakq96uUw" name="yes"/>
-    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_tB864XLvEd-fEqakq96uUw" iD="_tB864HLvEd-fEqakq96uUw"/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_xZ8O0XLvEd-fEqakq96uUw" iD="_xZ8O0HLvEd-fEqakq96uUw"/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_9tq00XLwEd-fEqakq96uUw" iD="_9tq00HLwEd-fEqakq96uUw"/>
-    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_EE1yQXLxEd-fEqakq96uUw" iD="_EE1yQHLxEd-fEqakq96uUw" name="no"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_EE1yQXLxEd-fEqakq96uUw" iD="_EE1yQHLxEd-fEqakq96uUw" name="no" conditionType="Default" isDefault="true">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_v_jiELtJEd-rNtpDP1AqqQ" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_v_jiEbtJEd-rNtpDP1AqqQ" key="condition" value=""/>
+      </eAnnotations>
+    </sequenceEdges>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_J5EasXLxEd-fEqakq96uUw" iD="_J5EasHLxEd-fEqakq96uUw"/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_NNCs4XLxEd-fEqakq96uUw" iD="_NNCs4HLxEd-fEqakq96uUw"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_XPdlMbtMEd-rNtpDP1AqqQ" iD="_XPdlMLtMEd-rNtpDP1AqqQ">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_hwXYILtMEd-rNtpDP1AqqQ" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_hwXYIbtMEd-rNtpDP1AqqQ" key="condition" value="dunnings&lt;3"/>
+      </eAnnotations>
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_iOT4YLtMEd-rNtpDP1AqqQ" source="sequence">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_iOT4YbtMEd-rNtpDP1AqqQ" key="mappings" value="dunnings␋dunnings+1"/>
+      </eAnnotations>
+    </sequenceEdges>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_YDcm4btMEd-rNtpDP1AqqQ" iD="_YDcm4LtMEd-rNtpDP1AqqQ"/>
   </pools>
 </bpmn:BpmnDiagram>

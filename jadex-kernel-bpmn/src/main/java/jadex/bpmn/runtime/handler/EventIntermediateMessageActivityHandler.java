@@ -100,9 +100,9 @@ public class EventIntermediateMessageActivityHandler	extends DefaultActivityHand
 						if(thread.hasPropertyValue(ri))
 						{
 							Object recs = thread.getPropertyValue(ri);
+							List newrecs = new ArrayList();
 							if(SReflect.isIterable(recs))
 							{
-								List newrecs = new ArrayList();
 								for(Iterator it=SReflect.getIterator(recs); it.hasNext(); )
 								{
 									Object rec = it.next();
@@ -115,9 +115,19 @@ public class EventIntermediateMessageActivityHandler	extends DefaultActivityHand
 										newrecs.add(rec);
 									}
 								}
-								recs = newrecs;
 							}
-							msg.put(ri, recs);
+							else
+							{
+								if(recs instanceof String)
+								{
+									newrecs.add(cms.createComponentIdentifier((String)recs, true, null));
+								}
+								else
+								{
+									newrecs.add(recs);
+								}
+							}
+							msg.put(ri, newrecs);
 						}
 						
 						String[] params	= mt.getParameterNames();
@@ -185,8 +195,12 @@ public class EventIntermediateMessageActivityHandler	extends DefaultActivityHand
 							String[]	params	= activity.getPropertyNames();
 							for(int i=0; ret && params!=null && i<params.length; i++)
 							{
-								// Fetch property from message event activity, because current activity might be mutliple event.
-								ret	= SUtil.equals(thread.getPropertyValue(params[i], activity), msg.getValue(params[i]));
+								// Todo: distinguish message activity properties and message parameters
+								if(!params[i].equals("isThrowing"))
+								{
+									// Fetch property from message event activity, because current activity might be multiple event.
+									ret	= SUtil.equals(thread.getPropertyValue(params[i], activity), msg.getValue(params[i]));
+								}
 							}
 						}
 						catch(RuntimeException e)

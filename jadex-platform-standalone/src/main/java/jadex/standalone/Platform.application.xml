@@ -156,7 +156,7 @@
 				<component name="kernel_bdibpmn" type="kernel_bdibpmn" daemon="true"/>
 				<component name="kernel_bpmn" type="kernel_bpmn" daemon="true"/>
 				<component name="rms" type="rms" daemon="true"/>
-				<component name="awa" type="awa"/>
+				<component name="awa" type="awa" daemon="true"/>
 				<component name="jcc" type="jcc"/>
 			</components>
 		</application>
@@ -179,7 +179,7 @@
 				<component name="kernel_bdibpmn" type="kernel_bdibpmn" daemon="true"/>
 				<component name="kernel_bpmn" type="kernel_bpmn" daemon="true"/>
 				<component name="rms" type="rms" daemon="true"/>
-				<component name="awa" type="awa"/>
+				<component name="awa" type="awa" daemon="true"/>
 			</components>
 		</application>
 		
