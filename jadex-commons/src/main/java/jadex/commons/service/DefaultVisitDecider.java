@@ -131,6 +131,6 @@ public class DefaultVisitDecider implements IVisitDecider
 	 */
 	public Object getCacheKey()
 	{
-		return this.getClass().getName()+abort;
+		return this.getClass().getName()+abort+remote;
 	}
 }

@@ -167,7 +167,7 @@ public class BasicResultSelector implements IResultSelector
 	public Object getCacheKey()
 	{
 		return new Tuple(new Object[]{this.getClass().getName(), filter, 
-			oneresult? Boolean.TRUE: Boolean.FALSE, oneresult? Boolean.TRUE: Boolean.FALSE});
+			oneresult? Boolean.TRUE: Boolean.FALSE, remote? Boolean.TRUE: Boolean.FALSE});
 	}
 
 	/**
