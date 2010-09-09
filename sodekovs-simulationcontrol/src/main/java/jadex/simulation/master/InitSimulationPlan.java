@@ -7,13 +7,13 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.commons.IFuture;
 import jadex.commons.collection.SCollection;
+import jadex.commons.service.SServiceProvider;
 import jadex.simulation.helper.Constants;
 import jadex.simulation.helper.TimeConverter;
 import jadex.simulation.helper.XMLHandler;
 import jadex.simulation.model.SimulationConfiguration;
 import jadex.simulation.model.StartTime;
 import jadex.simulation.model.result.IntermediateResult;
-import jadex.simulation.tmp.Main;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -27,10 +27,10 @@ public class InitSimulationPlan extends Plan{
 		
 		
 		//Start Simulation Control Center
-		IComponentManagementService ces = (IComponentManagementService)getScope().getServiceContainer().getService(IComponentManagementService.class);
+		IComponentManagementService ces = (IComponentManagementService)SServiceProvider.getService(getScope().getServiceProvider(), IComponentManagementService.class).get(this);
 		Map args = SCollection.createHashMap();
 		args.put("simulationConf", simConf);		
-		IFuture ret = ces.createComponent(null, "/jadex/simulation/controlcenter/ControlCenter.agent.xml", new CreationInfo(args), null);
+//		IFuture ret = ces.createComponent(null, "/jadex/simulation/controlcenter/ControlCenter.agent.xml", new CreationInfo(args), null);
 //		IComponentIdentifier aid = (IComponentIdentifier)ret.get(this);
 		
 //		IFuture ret = ces.createComponent(name, "/jadex/bdi/benchmarks/AgentCreation.agent.xml", new CreationInfo(args), null);

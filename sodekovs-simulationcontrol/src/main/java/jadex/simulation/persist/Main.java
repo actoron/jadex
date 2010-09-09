@@ -161,12 +161,12 @@ public class Main {
 		ObservedEvent event = new ObservedEvent();
 		event.setValue("123");
 		event.setApplicationName("EventId1");
-		event.setDataReference(new Data());
+//		event.setDataReference(new Data());
 
 		ObservedEvent event2 = new ObservedEvent();
 		event2.setValue("12345");
 		event2.setApplicationName("EventId2");
-		event2.setDataReference(new Data());
+//		event2.setDataReference(new Data());
 
 		exRes.addEvent(event);
 		exRes.addEvent(event2);
@@ -188,11 +188,11 @@ public class Main {
 		ArrayList<ObservedEvent> list = new ArrayList<ObservedEvent>();
 		Long s = new Long(2);
 
-		list.add(new ObservedEvent(null, null, 45, null, null));
-		list.add(new ObservedEvent(null, null, 2, null, null));
-		list.add(new ObservedEvent(null, null, 1, null, null));
-		list.add(new ObservedEvent(null, null, 101, null, null));
-		list.add(new ObservedEvent(null, null, 247, null, null));
+//		list.add(new ObservedEvent(null, null, 45, null, null));
+//		list.add(new ObservedEvent(null, null, 2, null, null));
+//		list.add(new ObservedEvent(null, null, 1, null, null));
+//		list.add(new ObservedEvent(null, null, 101, null, null));
+//		list.add(new ObservedEvent(null, null, 247, null, null));
 
 		Collections.sort(list, new Comparator() {
 			public int compare(Object arg0, Object arg1) {

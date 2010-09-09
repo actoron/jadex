@@ -7,7 +7,6 @@ import jadex.application.space.envsupport.environment.ISpaceObject;
 import jadex.application.space.envsupport.environment.ISpaceProcess;
 import jadex.application.space.envsupport.environment.SpaceObject;
 import jadex.application.space.envsupport.evaluation.ITableDataConsumer;
-import jadex.bdi.runtime.impl.ExternalAccessFlyweight;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentListener;
@@ -18,11 +17,8 @@ import jadex.commons.IFuture;
 import jadex.commons.SimplePropertyObject;
 import jadex.commons.concurrent.IExecutable;
 import jadex.commons.concurrent.IResultListener;
-import jadex.service.IServiceContainer;
-import jadex.service.clock.IClockService;
-import jadex.service.clock.ITimedObject;
-import jadex.service.clock.ITimer;
-import jadex.service.execution.IExecutionService;
+import jadex.commons.service.IServiceContainer;
+import jadex.commons.service.clock.ITimer;
 import jadex.simulation.helper.AgentMethods;
 import jadex.simulation.helper.Constants;
 import jadex.simulation.model.ObservedEvent;
@@ -48,7 +44,7 @@ public class DeltaTimeExecutor4Simulation extends SimplePropertyObject implement
 	protected long timestamp;
 
 	/** The platform. */
-	protected IServiceContainer container;
+//	protected IServiceContainer container;
 
 	/** The clock listener. */
 	protected IChangeListener clocklistener;
@@ -109,7 +105,7 @@ public class DeltaTimeExecutor4Simulation extends SimplePropertyObject implement
 		allObservedEventsMap = new ConcurrentHashMap<Long, ArrayList<ObservedEvent>>();
 		final AbstractEnvironmentSpace space = (AbstractEnvironmentSpace) getProperty("space");
 		final boolean tick = getProperty("tick") != null && ((Boolean) getProperty("tick")).booleanValue();
-		this.container = space.getContext().getServiceContainer();
+//		this.container = space.getContext().getServiceContainer();						
 		final IClockService clockservice = (IClockService) container.getService(IClockService.class);
 		final IExecutionService exeservice = (IExecutionService) container.getService(IExecutionService.class);
 

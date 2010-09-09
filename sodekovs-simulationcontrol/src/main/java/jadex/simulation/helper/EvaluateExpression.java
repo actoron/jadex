@@ -2,21 +2,9 @@ package jadex.simulation.helper;
 
 import jadex.application.space.envsupport.environment.AbstractEnvironmentSpace;
 import jadex.application.space.envsupport.environment.ISpaceObject;
-import jadex.bdi.examples.shop.IShop;
-import jadex.bdi.runtime.impl.ElementFlyweight;
-import jadex.bdi.runtime.impl.ExternalAccessFlyweight;
-import jadex.bdi.runtime.interpreter.OAVBDIFetcher;
-import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentManagementService;
-import jadex.bridge.IExternalAccess;
-import jadex.commons.IFuture;
-import jadex.commons.ISuspendable;
-import jadex.commons.concurrent.IResultListener;
 import jadex.javaparser.IValueFetcher;
 import jadex.javaparser.SJavaParser;
 import jadex.javaparser.SimpleValueFetcher;
-import jadex.rules.state.IOAVState;
-import jadex.simulation.model.ObservedEvent;
 
 /**
  * Check whether an expression is true, defined for an Object

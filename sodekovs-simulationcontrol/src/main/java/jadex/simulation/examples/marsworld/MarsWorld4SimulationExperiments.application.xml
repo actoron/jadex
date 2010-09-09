@@ -21,35 +21,27 @@
 	name="MarsWorld4SimulationExperiments" package="jadex.simulation.examples.marsworld">
 
 	<imports>
-		<import>jadex.application.space.envsupport.environment.space2d.*</import>
-		<import>jadex.application.space.envsupport.environment.DeltaTimeExecutor</import>
-		<import>jadex.application.space.envsupport.math.*</import>
-		<import>jadex.service.clock.IClockService</import>
-		<import>jadex.application.space.envsupport.dataview.*</import>
-		<import>java.text.SimpleDateFormat</import>
-		<import>java.util.Date</import>
-		<import>jadex.application.space.envsupport.observer.perspective.*</import>
-		<import>jadex.bdi.examples.marsworld.carry.*</import>
-		<import>jadex.bdi.examples.marsworld.producer.*</import>
-		<import>jadex.bdi.examples.marsworld.sentry.*</import>
-		<import>jadex.bdi.examples.marsworld.movement.*</import>
-		<import>jadex.bdi.examples.marsworld.movement.MoveTask</import>
-		<import>java.text.SimpleDateFormat</import>
-		<import>jadex.simulation.environment.DeltaTimeExecutor4Simulation</import>
-		<import>jadex.application.space.envsupport.evaluation.*</import>
-		<!--
-			ttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttt
-		-->
-		<import>jadex.application.space.envsupport.environment.space2d.*</import>
-		<import>jadex.application.space.envsupport.environment.*</import>
-		<import>jadex.application.space.envsupport.math.*</import>
-		<import>jadex.application.space.envsupport.dataview.*</import>
-		<import>jadex.application.space.envsupport.observer.perspective.*</import>
-		<import>jadex.bdi.planlib.*</import>
-		<import>jadex.application.space.envsupport.evaluation.*</import>
-		<import>jadex.commons.*</import>
-		<import>jadex.application.space.envsupport.observer.gui.plugin.*</import>
+	<import>jadex.application.space.envsupport.environment.space2d.*</import>
+	<import>jadex.application.space.envsupport.environment.DeltaTimeExecutor</import>
+	<import>jadex.application.space.envsupport.math.*</import>
+	<import>jadex.commons.service.clock.IClockService</import>
+	<import>jadex.application.space.envsupport.dataview.*</import>
+	<import>java.text.SimpleDateFormat</import>
+	<import>java.util.Date</import>
+	<import>jadex.application.space.envsupport.observer.perspective.*</import>
+	<import>jadex.bdi.examples.marsworld.carry.*</import>
+	<import>jadex.bdi.examples.marsworld.producer.*</import>
+	<import>jadex.bdi.examples.marsworld.sentry.*</import>
+	<import>jadex.bdi.examples.marsworld.movement.*</import>
+	<import>jadex.application.space.envsupport.evaluation.*</import>
+	<import>jadex.application.space.envsupport.observer.gui.plugin.*</import>
+	<import>jadex.commons.service.clock.IClockService</import>
+	<import>jadex.commons.service.SServiceProvider</import>
+	<import>jadex.commons.IFuture</import>
+	<import>jadex.simulation.environment.*</import>
+	<import>jadex.application.space.envsupport.evaluation.*</import>
 	</imports>
+			
 
 	<arguments>
 		<!-- The mission time. -->
@@ -58,8 +50,7 @@
 		<argument name="al" typename="Int">new Integer(258)</argument>
 		<argument name="simulationFacts" typename="Map" />
 		<!-- <argument name="nrr" typename="Int">new Integer(10)</argument> -->
-		<argument name="SentryNumber" typename="Int">new Integer(10)
-		</argument>
+		<argument name="SentryNumber" typename="Int">new Integer(10)</argument>
 		<argument name="Experiment_id" typename="String">"not set"</argument>
 	</arguments>
 
@@ -105,12 +96,9 @@
 				<env:objecttype name="homebase">
 					<env:property name="ore">0</env:property>
 					<env:property name="start_time">$args.tmp_start_time</env:property>
-					<env:property name="duration" dynamic="true">$object.getProperty("space").getContext().getServiceContainer().getService(IClockService.class).getTime()
-						- $object.getProperty("start_time")</env:property>
-					<!--
-						<env:property name="text" dynamic="true">
-						$object.getProperty("duration")</env:property>
-					-->
+					<!-- <env:property name="duration" dynamic="true">$object.getProperty("space").getContext().getServiceContainer().getService(IClockService.class).getTime()
+						- $object.getProperty("start_time")</env:property>-->
+						<env:property name="duration" dynamic="true">$properties.clock.getTime()- $object.getProperty("start_time")</env:property>																						
 					<env:property name="text" dynamic="true">"Collected ore: "+$object.getProperty("ore")+" \n"+ "Experiment duration: "+new SimpleDateFormat("mm:ss").format(new Date(Math.max(0,$object.getProperty("duration"))))</env:property>
 					<!--
 						<env:property name="text" dynamic="false">"Only test showing
@@ -267,7 +255,7 @@
 			</env:perspectives>
 
 			<!-- executor -->
-			<env:spaceexecutor class="DeltaTimeExecutor4Simulation">
+			<env:spaceexecutor class="DeltaTimeNEW">
 				<!-- <env:spaceexecutor class="DeltaTimeExecutor"> -->
 				<env:property name="space">$space</env:property>
 				<env:property name="tick">true</env:property>
@@ -289,6 +277,13 @@
 		<componenttype name="ClientSimulator"
 			filename="jadex/simulation/client/ClientSimulator.agent.xml" />
 	</componenttypes>
+	
+		
+	<properties>
+		<property name="clock" class="IFuture">
+			SServiceProvider.getService($component.getServiceProvider(), IClockService.class)
+		</property>
+	</properties>
 
 	<applications>
 		<application name="1 Sentry / 2 Producers / 3 Carries">
@@ -310,8 +305,7 @@
 							</env:property>
 							<env:property name="space">$space</env:property>
 							<env:property name="missiontime">
-								7000000 +
-								$space.getContext().getServiceContainer().getService(IClockService.class).getTime()
+								7000000 + $properties.clock.getTime()
 							</env:property>
 						</env:object>
 						<env:object type="target">
@@ -427,8 +421,7 @@
 								hack!!!
 							-->
 							<env:property name="missiontime">
-								300000 +
-								$space.getContext().getServiceContainer().getService(IClockService.class).getTime()
+								300000 + $properties.clock.getTime()
 							</env:property>
 						</env:object>
 						<env:object type="target" number="20">

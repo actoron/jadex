@@ -1,20 +1,7 @@
 package jadex.simulation.master;
 
-import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
-import jadex.bridge.CreationInfo;
-import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentManagementService;
-import jadex.commons.concurrent.IResultListener;
-import jadex.service.clock.IClockService;
-import jadex.simulation.controlcenter.ControlCenter;
 import jadex.simulation.helper.Constants;
-import jadex.simulation.model.ObservedEvent;
-import jadex.simulation.model.Optimization;
-import jadex.simulation.model.SimulationConfiguration;
-import jadex.simulation.model.result.ExperimentResult;
-import jadex.simulation.model.result.IntermediateResult;
-import jadex.simulation.model.result.RowResult;
 
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
@@ -22,9 +9,7 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 
 public class MemoryLoggerPlan extends Plan {
 

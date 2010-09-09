@@ -3,7 +3,6 @@ package jadex.simulation.client;
 import jadex.application.runtime.IApplicationExternalAccess;
 import jadex.application.space.envsupport.MEnvSpaceInstance;
 import jadex.application.space.envsupport.environment.AbstractEnvironmentSpace;
-import jadex.application.space.envsupport.environment.space2d.ContinuousSpace2D;
 import jadex.application.space.envsupport.evaluation.AbstractChartDataConsumer;
 import jadex.application.space.envsupport.evaluation.DefaultDataProvider;
 import jadex.application.space.envsupport.evaluation.IObjectSource;
@@ -17,26 +16,26 @@ import jadex.base.fipa.SFipa;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
-import jadex.bdi.runtime.impl.ElementFlyweight;
+import jadex.bdi.runtime.impl.flyweights.ElementFlyweight;
 import jadex.bdi.runtime.interpreter.OAVBDIFetcher;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.IFuture;
 import jadex.commons.SReflect;
+import jadex.commons.service.SServiceProvider;
+import jadex.commons.service.clock.IClockService;
+import jadex.commons.service.library.ILibraryService;
 import jadex.javaparser.IExpressionParser;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 import jadex.rules.state.IOAVState;
-import jadex.service.clock.IClockService;
-import jadex.service.library.ILibraryService;
 import jadex.simulation.controlcenter.OnlineVisualisation;
 import jadex.simulation.evaluation.SimulationDataConsumer;
 import jadex.simulation.helper.AgentMethods;
 import jadex.simulation.helper.Constants;
 import jadex.simulation.helper.EvaluateExpression;
 import jadex.simulation.helper.TimeConverter;
-import jadex.simulation.helper.XMLHandler;
 import jadex.simulation.model.Data;
 import jadex.simulation.model.Dataconsumer;
 import jadex.simulation.model.Dataprovider;
@@ -45,7 +44,6 @@ import jadex.simulation.model.SimulationConfiguration;
 import jadex.simulation.model.Source;
 import jadex.simulation.model.TargetFunction;
 import jadex.simulation.model.Time;
-import jadex.simulation.tmp.Main;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -137,8 +135,8 @@ public class RuntimeManagerPlan extends Plan {
 						break;
 					}
 				} else {
-					IComponentIdentifier agentIdentifier = AgentMethods.getIComponentIdentifier(space, targetFunct.getObjectSource().getName());
-					IFuture fut = ((IComponentManagementService) space.getContext().getServiceContainer().getService(IComponentManagementService.class)).getExternalAccess(agentIdentifier);
+					IComponentIdentifier agentIdentifier = AgentMethods.getIComponentIdentifier(space, targetFunct.getObjectSource().getName());//					
+					IFuture fut = ((IComponentManagementService)SServiceProvider.getService(getScope().getServiceProvider(), IComponentManagementService.class)).getExternalAccess(agentIdentifier);
 					IExternalAccess exta = (IExternalAccess) fut.get(this);
 
 					IOAVState state = ((ElementFlyweight) exta).getState();
@@ -195,7 +193,10 @@ public class RuntimeManagerPlan extends Plan {
 		vis.setExit();
 		vis.dispose();
 		// getExternalAccess().killAgent();
-		IComponentManagementService ces = (IComponentManagementService) space.getContext().getServiceContainer().getService(IComponentManagementService.class);
+		IComponentManagementService ces = (IComponentManagementService)SServiceProvider.getService(getScope().getServiceProvider(), IComponentManagementService.class).get(this);
+			
+		
+		
 		ces.destroyComponent(space.getContext().getComponentIdentifier());
 		// getExternalAccess().getApplicationContext().killComponent(null);
 
@@ -238,8 +239,8 @@ public class RuntimeManagerPlan extends Plan {
 	}
 
 	private IComponentIdentifier getMasterAgent() {
-		// Create a service description to search for.
-		IDF df = (IDF) getScope().getServiceContainer().getService(IDF.class);
+		// Create a service description to search for.		
+		IDF df = (IDF) SServiceProvider.getService(getScope().getServiceProvider(), IDF.class).get(this);
 		IDFServiceDescription sd = df.createDFServiceDescription("master_simulation_agent", null, null);
 		IDFComponentDescription ad = df.createDFComponentDescription(null, sd);
 		// ISearchConstraints sc = df.createSearchConstraints(-1, 0);
@@ -269,7 +270,7 @@ public class RuntimeManagerPlan extends Plan {
 	 */
 	private void init(SimulationConfiguration simConf) {
 
-		IClockService clockservice = (IClockService) getScope().getServiceContainer().getService(IClockService.class);
+		IClockService clockservice = (IClockService)SServiceProvider.getService(getScope().getServiceProvider(), IClockService.class).get(this);
 		long startTime = clockservice.getTime();
 		Map facts = (Map) getBeliefbase().getBelief("simulationFacts").getFact();
 		facts.put(Constants.EXPERIMENT_START_TIME, new Long(startTime));
@@ -373,8 +374,9 @@ public class RuntimeManagerPlan extends Plan {
 				// "clazz");
 				Class clazz = null;
 				try {
-					clazz = SReflect.findClass(dcon.getClazz(), toStringArray((ArrayList<String>) simConf.getImports().getImport()), ((ILibraryService) space.getContext().getServiceContainer()
-							.getService(ILibraryService.class)).getClassLoader());
+					clazz = SReflect.findClass(dcon.getClazz(), toStringArray((ArrayList<String>) simConf.getImports().getImport()),		
+							((ILibraryService)SServiceProvider.getService(getScope().getServiceProvider(), ILibraryService.class).get(this)).getClassLoader());					
+					
 				} catch (ClassNotFoundException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -484,8 +486,8 @@ public class RuntimeManagerPlan extends Plan {
 	 * 
 	 * @return
 	 */
-	private long getCurrentTime() {
-		IClockService clockservice = (IClockService) getScope().getServiceContainer().getService(IClockService.class);
+	private long getCurrentTime() {		
+		IClockService clockservice = (IClockService)SServiceProvider.getService(getScope().getServiceProvider(), IClockService.class).get(this);
 		return clockservice.getTime();
 	}
 

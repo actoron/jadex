@@ -1,45 +1,21 @@
 package jadex.simulation.master;
 
-import jadex.application.runtime.IApplication;
-import jadex.application.runtime.IApplicationExternalAccess;
-import jadex.application.space.envsupport.MEnvSpaceInstance;
-import jadex.application.space.envsupport.environment.AbstractEnvironmentSpace;
-import jadex.application.space.envsupport.evaluation.DefaultDataProvider;
-import jadex.application.space.envsupport.evaluation.IObjectSource;
-import jadex.application.space.envsupport.evaluation.ITableDataConsumer;
-import jadex.application.space.envsupport.evaluation.ITableDataProvider;
-import jadex.application.space.envsupport.evaluation.SpaceObjectSource;
-import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.commons.IFuture;
-import jadex.commons.SReflect;
-import jadex.commons.SUtil;
-import jadex.javaparser.IExpressionParser;
-import jadex.javaparser.IParsedExpression;
-import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
-import jadex.service.library.ILibraryService;
+import jadex.commons.service.SServiceProvider;
 import jadex.simulation.helper.Constants;
 import jadex.simulation.helper.ObjectCloner;
-import jadex.simulation.helper.XMLHandler;
-import jadex.simulation.model.Data;
-import jadex.simulation.model.Dataconsumer;
-import jadex.simulation.model.Dataprovider;
-import jadex.simulation.model.ObservedEvent;
 import jadex.simulation.model.Optimization;
 import jadex.simulation.model.SimulationConfiguration;
-import jadex.simulation.model.Source;
 import jadex.simulation.model.result.ExperimentResult;
 import jadex.simulation.model.result.IntermediateResult;
 import jadex.simulation.model.result.RowResult;
-import jadex.xml.IContext;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class StartSimulationExperimentsPlan extends Plan {
@@ -184,7 +160,8 @@ public class StartSimulationExperimentsPlan extends Plan {
 	private void startApplication(String appName, String fileName, String configName, Map args) {
 
 		try {
-			IComponentManagementService executionService = (IComponentManagementService) getScope().getServiceContainer().getService(IComponentManagementService.class);
+			IComponentManagementService executionService = (IComponentManagementService)SServiceProvider.getService(getScope().getServiceProvider(), IComponentManagementService.class).get(this);
+			             
 
 			// create application in order to add additional components to
 			// application
