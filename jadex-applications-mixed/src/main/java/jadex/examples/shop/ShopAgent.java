@@ -6,22 +6,24 @@ import jadex.bridge.IArgument;
 import jadex.micro.MicroAgent;
 import jadex.micro.MicroAgentMetaInfo;
 
-import java.util.Map;
-
 /**
  *  Micro agent implementation of the shop.
  */
 public class ShopAgent extends MicroAgent
 {
+	//-------- attributes --------
+	
 	/** The money account. */
 	protected double money;
+	
+	//--------methods --------
 	
 	/**
 	 *  Called once after agent creation.
 	 */
 	public void agentCreated()
 	{
-		addService(new Shop(getExternalAccess(), (String)getArgument("name")));
+		addService(new ShopService(getExternalAccess(), (String)getArgument("name")));
 	}
 	
 	/**

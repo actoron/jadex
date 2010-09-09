@@ -1,22 +1,18 @@
 package jadex.examples.shop;
 
 import jadex.bdi.examples.shop.IShop;
-import jadex.bdi.runtime.IBDIExternalAccess;
-import jadex.bdi.runtime.IEAGoal;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.IResultCommand;
-import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.DelegationResultListener;
-import jadex.commons.concurrent.IResultListener;
 import jadex.commons.service.BasicService;
 import jadex.micro.IMicroExternalAccess;
 
 /**
  *  The shop for buying goods at the shop.
  */
-public class Shop extends BasicService implements IShop 
+public class ShopService extends BasicService implements IShop 
 {
 	//-------- attributes --------
 	
@@ -32,7 +28,7 @@ public class Shop extends BasicService implements IShop
 	 *  Create a new shop service.
 	 *  @param comp The active component.
 	 */
-	public Shop(IExternalAccess comp, String name)
+	public ShopService(IExternalAccess comp, String name)
 	{
 		super(comp.getServiceProvider().getId(), IShop.class, null);
 
