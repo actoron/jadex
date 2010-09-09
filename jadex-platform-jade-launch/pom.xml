@@ -4,7 +4,7 @@
 	<groupId>net.sourceforge.jadex</groupId>
 	<artifactId>jadex-platform-jade-launch</artifactId>
 	<packaging>jar</packaging>
-	<version>2.0-rc4</version>
+	<version>2.0-rc5</version>
 	<name>jadex-platform-jade-launch</name>
 	<url>http://jadex.sourceforge.net</url>
 
@@ -200,54 +200,54 @@
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-runtimetools</artifactId>
-			<version>2.0-rc4</version>
+			<version>2.0-rc5</version>
 		</dependency>
 		
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-kernel-micro</artifactId>
-			<version>2.0-rc4</version>
+			<version>2.0-rc5</version>
 		</dependency>
 		
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-rules-tools</artifactId>
-			<version>2.0-rc4</version>
+			<version>2.0-rc5</version>
 		</dependency>
 		
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-kernel-bpmn</artifactId>
-			<version>2.0-rc4</version>
+			<version>2.0-rc5</version>
 		</dependency>
 		
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-kernel-bdibpmn</artifactId>
-			<version>2.0-rc4</version>
+			<version>2.0-rc5</version>
 		</dependency>
 		
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-kernel-application</artifactId>
-			<version>2.0-rc4</version>
+			<version>2.0-rc5</version>
 		</dependency>
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-kernel-application-opengl</artifactId>
-			<version>2.0-rc4</version>
+			<version>2.0-rc5</version>
 		</dependency>
 		
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-kernel-gpmn</artifactId>
-			<version>2.0-rc4</version>
+			<version>2.0-rc5</version>
 		</dependency>
 		
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-platform-jade</artifactId>
-			<version>2.0-rc4</version>
+			<version>2.0-rc5</version>
 		</dependency>
 	</dependencies>
 </project>

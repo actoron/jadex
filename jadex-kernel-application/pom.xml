@@ -4,7 +4,7 @@
 	<groupId>net.sourceforge.jadex</groupId>
 	<artifactId>jadex-kernel-application</artifactId>
 	<packaging>jar</packaging>
-	<version>2.0-rc4</version>
+	<version>2.0-rc5</version>
 	<name>jadex-kernel-application</name>
 	<url>http://jadex.sourceforge.net</url>
 
@@ -169,13 +169,13 @@
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-bridge</artifactId>
-			<version>2.0-rc4</version>
+			<version>2.0-rc5</version>
 		</dependency>
 
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-xml</artifactId>
-			<version>2.0-rc4</version>
+			<version>2.0-rc5</version>
 		</dependency>
 
 		<!-- <dependency>

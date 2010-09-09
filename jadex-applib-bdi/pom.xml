@@ -4,7 +4,7 @@
 	<groupId>net.sourceforge.jadex</groupId>
 	<artifactId>jadex-applib-bdi</artifactId>
 	<packaging>jar</packaging>
-	<version>2.0-rc4</version>
+	<version>2.0-rc5</version>
 	<name>jadex-applib-bdi</name>
 	<url>http://jadex.sourceforge.net</url>
 
@@ -158,27 +158,27 @@
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-platform-base</artifactId>
-			<version>2.0-rc4</version>
+			<version>2.0-rc5</version>
 		</dependency>
 
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-kernel-bdi</artifactId>
-			<version>2.0-rc4</version>
+			<version>2.0-rc5</version>
 		</dependency>
 
 		<!-- dependency caused by DefaultBDIVisionProcessor -->
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-kernel-application</artifactId>
-			<version>2.0-rc4</version>
+			<version>2.0-rc5</version>
 		</dependency>
 		
 		<!-- Hack?! Needed for IComponentViewerPanel -->
 		<!-- <dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-runtimetools</artifactId>
-			<version>2.0-rc4</version>
+			<version>2.0-rc5</version>
 		</dependency> -->
 
 		<dependency>
