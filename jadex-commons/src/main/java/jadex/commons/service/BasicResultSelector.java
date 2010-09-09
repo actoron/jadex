@@ -105,7 +105,8 @@ public class BasicResultSelector implements IResultSelector
 				{
 					if(fil.filter(services[i]) && !results.contains(services[i]))
 					{
-//						System.out.println("add: "+services[i]+" to: "+results);
+						if(services[i].getClass().getName().indexOf("Shop")!=-1)
+							System.out.println("add: "+services[i]+" to: "+results);
 						results.add(services[i]);
 					}
 				}

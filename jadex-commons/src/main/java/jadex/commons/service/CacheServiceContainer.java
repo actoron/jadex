@@ -111,7 +111,12 @@ public class CacheServiceContainer	implements IServiceContainer
 						else
 						{
 							if(!results.contains(data))
+							{
+								if(data.getClass().getName().indexOf("Shop")!=-1)
+									System.out.println("cache add: "+data+" to: "+results);
+
 								results.add(data);
+							}
 						}
 					}
 					else if(data instanceof Collection)
@@ -137,7 +142,12 @@ public class CacheServiceContainer	implements IServiceContainer
 							{
 								Object	next	= it.next();
 								if(!results.contains(next))
+								{
+									if(data.getClass().getName().indexOf("Shop")!=-1)
+										System.out.println("cache add: "+data+" to: "+results);
+
 									results.add(next);
+								}
 							}
 						}
 					}

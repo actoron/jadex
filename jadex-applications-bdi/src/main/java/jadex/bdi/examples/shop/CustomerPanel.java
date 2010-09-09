@@ -100,7 +100,7 @@ public class CustomerPanel extends JPanel
 					public void customResultAvailable(Object source, Object result)
 					{
 				    	searchbut.setEnabled(true);
-//						System.out.println("Customer search result: "+result);
+						System.out.println("Customer search result: "+result);
 						Collection coll = (Collection)result;
 						((DefaultComboBoxModel)shopscombo.getModel()).removeAllElements();
 						shops.clear();
