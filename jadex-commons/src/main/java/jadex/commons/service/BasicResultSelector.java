@@ -206,23 +206,26 @@ public class BasicResultSelector implements IResultSelector
 		this.oneresult = oneresult;
 	}
 	
-	/**
-	 *  Get the remote.
-	 *  @return the remote.
-	 */
-	public boolean isRemote()
-	{
-		return remote;
-	}
-
-	/**
-	 *  Set the remote.
-	 *  @param remote The remote to set.
-	 */
-	public void setRemote(boolean remote)
-	{
-		this.remote = remote;
-	}
+	// NOTE! This methods currently must be commented for remote searches
+	// to work. Otherwise, remote=true will lead to cache hits of proxies.
+	
+//	/**
+//	 *  Get the remote.
+//	 *  @return the remote.
+//	 */
+//	public boolean isRemote()
+//	{
+//		return remote;
+//	}
+//
+//	/**
+//	 *  Set the remote.
+//	 *  @param remote The remote to set.
+//	 */
+//	public void setRemote(boolean remote)
+//	{
+//		this.remote = remote;
+//	}
 
 	/**
 	 *  Get the string representation.
