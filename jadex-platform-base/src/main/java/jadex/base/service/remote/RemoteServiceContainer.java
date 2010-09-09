@@ -13,6 +13,7 @@ import jadex.commons.service.IVisitDecider;
 import jadex.commons.service.SServiceProvider;
 
 import java.util.Collection;
+import java.util.Iterator;
 
 /**
  *  Remote service container for searching at a remote platform
@@ -78,11 +79,19 @@ public class RemoteServiceContainer extends BasicServiceContainer
 						{
 							if(res instanceof Collection)
 							{
-								results.addAll((Collection)res);
+								for(Iterator it=((Collection)res).iterator(); it.hasNext(); )
+								{
+									Object next = it.next();
+									System.out.println("add rem: "+next);
+									if(!results.contains(next))
+										results.add(next);
+								}
 							}
-							else
+							else if(res!=null)
 							{
-								results.add(res);
+								System.out.println("add rem: "+res);
+								if(!results.contains(res))
+									results.add(res);
 							}
 							ret.setResult(selector.getResult(results));
 						}
