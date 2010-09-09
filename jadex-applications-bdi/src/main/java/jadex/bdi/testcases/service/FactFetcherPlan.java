@@ -27,7 +27,7 @@ public class FactFetcherPlan extends Plan
 			for(Iterator it=services.iterator(); it.hasNext(); )
 			{
 				IBeliefGetter getter = (IBeliefGetter)it.next();
-				Object fact = getter.getFact("money").get(this);
+				/*Object fact =*/ getter.getFact("money").get(this);
 //				System.out.println("Fact is: "+fact);
 				tr.setSucceeded(true);
 			}

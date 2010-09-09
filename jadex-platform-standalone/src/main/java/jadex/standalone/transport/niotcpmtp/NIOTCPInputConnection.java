@@ -81,9 +81,8 @@ public class NIOTCPInputConnection
 		// Write data from channel into the buffer.
 		if(sc.read(writebuffer) == -1)
 		{
-			return null;
-			// throw new
-			// IOException("Channel closed: "+sc.socket().getInetAddress()+":"+sc.socket().getPort());
+//			return null;
+			throw new IOException("Channel closed: "+sc.socket().getInetAddress()+":"+sc.socket().getPort());
 		}
 
 		// First try to determine the message size if unknown (-1)
