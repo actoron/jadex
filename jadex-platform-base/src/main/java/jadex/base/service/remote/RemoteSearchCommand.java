@@ -354,6 +354,13 @@ public class RemoteSearchCommand implements IRemoteCommand
 				pi.addMethodReplacement(mis[i], new DefaultHashcodeMethodReplacement());
 			}
 		}
+		// Add getClass as excluded. Otherwise the target class must be present on
+		// the computer which only uses the proxy.
+		Method getclass = SReflect.getMethod(Object.class, "getClass", new Class[0]);
+		if(pi.getMethodReplacement(getclass)==null)
+		{
+			pi.addExcludedMethod(new MethodInfo(getclass));
+		}
 		
 		// Check methods and possibly cache constant calls.
 		Method[] methods = targetclass.getMethods();
