@@ -515,6 +515,7 @@
 				<module>jadex-applications-bpmn</module>
 				<module>jadex-applications-bdibpmn</module>
 				<module>jadex-applications-gpmn</module>
+				<module>jadex-applications-mixed</module>
 
 				<module>jadex-rules</module>
 				<module>jadex-rules-applications</module>

@@ -352,7 +352,7 @@ public abstract class ComponentManagementService extends BasicService implements
 							public void exceptionOccurred(Object source, Exception exception)
 							{
 //								e.printStackTrace();
-								System.out.println("Ex: "+cid+" "+exception);
+//								System.out.println("Ex: "+cid+" "+exception);
 								
 								if(killlistener!=null)
 									killlistener.exceptionOccurred(ComponentManagementService.this, exception);

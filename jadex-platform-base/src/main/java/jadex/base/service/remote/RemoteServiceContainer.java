@@ -82,14 +82,14 @@ public class RemoteServiceContainer extends BasicServiceContainer
 								for(Iterator it=((Collection)res).iterator(); it.hasNext(); )
 								{
 									Object next = it.next();
-									System.out.println("add rem: "+next);
+//									System.out.println("add rem: "+next);
 									if(!results.contains(next))
 										results.add(next);
 								}
 							}
 							else if(res!=null)
 							{
-								System.out.println("add rem: "+res);
+//								System.out.println("add rem: "+res);
 								if(!results.contains(res))
 									results.add(res);
 							}

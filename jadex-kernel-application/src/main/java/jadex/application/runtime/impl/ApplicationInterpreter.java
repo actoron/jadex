@@ -26,6 +26,7 @@ import jadex.bridge.IModelInfo;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.SReflect;
+import jadex.commons.concurrent.CollectionResultListener;
 import jadex.commons.concurrent.CounterResultListener;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.DelegationResultListener;
@@ -1109,9 +1110,9 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 			final MComponentInstance component = (MComponentInstance)components.get(i);
 //			System.out.println("Create: "+component.getName()+" "+component.getTypeName()+" "+component.getConfiguration()+" "+Thread.currentThread());
 			int num = getNumber(component, cl);
-			IResultListener	crl	= new CounterResultListener(num)
+			IResultListener	crl	= new CollectionResultListener(num, false, new IResultListener()
 			{
-				public void finalResultAvailable(Object source, Object result)
+				public void resultAvailable(Object source, Object result)
 				{
 //					System.out.println("Create finished: "+component.getName()+" "+component.getTypeName()+" "+component.getConfiguration()+" "+Thread.currentThread());
 					scheduleStep(new Runnable()
@@ -1125,9 +1126,9 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 				
 				public void exceptionOccurred(Object source, Exception exception)
 				{
-					exception.printStackTrace();
+					inited.setException(exception);
 				}
-			};
+			});
 			for(int j=0; j<num; j++)
 			{
 				IFuture ret = ces.createComponent(component.getName(), component.getType(model).getFilename(),
