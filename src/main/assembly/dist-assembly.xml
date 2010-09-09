@@ -32,6 +32,7 @@
 						</includes>
 						<excludes>
 							<exclude>**/dungeonkeeper/</exclude>
+							<exclude>**/disasterrescue/</exclude>
 						</excludes>
 					</fileSet>
 					<fileSet>

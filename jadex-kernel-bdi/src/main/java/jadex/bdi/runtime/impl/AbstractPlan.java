@@ -645,16 +645,16 @@ public abstract class AbstractPlan implements java.io.Serializable //, IPlan
 	//-------- expressionbase shortcut methods --------
 	// Hack!!! Not really shortcuts, because expressions/conditions are remembered for cleanup.
 	
-	/**
-	 *  Get a query created from a predefined expression.
-	 *  @param name	The name of an expression defined in the ADF.
-	 *  @return The query object.
-	 *  @deprecated	Use @link{#getExpression(String)} instead.
-	 * /
-	public IExpression	getQuery(String name)
-	{
-		return	getExpression(name);
-	}*/
+//	/**
+//	 *  Get a query created from a predefined expression.
+//	 *  @param name	The name of an expression defined in the ADF.
+//	 *  @return The query object.
+//	 *  @deprecated	Use @link{#getExpression(String)} instead.
+//	 * /
+//	public IExpression	getQuery(String name)
+//	{
+//		return	getExpression(name);
+//	}*/
 
 	/**
 	 *  Get an instance of a predefined expression.
