@@ -39,6 +39,13 @@
 		<achievegoal name="move" exported="true">
 			<parameter name="destination" class="IVector2"/>
 		</achievegoal>
+		
+		<achievegoal name="go_home">
+			<unique/>
+			<creationcondition>
+				$goalbase.getGoals().length==0
+			</creationcondition>
+		</achievegoal>
 	</goals>
 
 	<plans>
@@ -50,6 +57,17 @@
 			<body class="MoveToLocationPlan"/>
 			<trigger>
 				<goal ref="move"/>
+			</trigger>
+		</plan>
+		
+		<!-- Go to a destination. -->
+		<plan name="go_home">
+			<parameter name="destination" class="IVector2">
+ 				<value>$beliefbase.home</value>
+			</parameter>
+			<body class="MoveToLocationPlan"/>
+			<trigger>
+				<goal ref="go_home"/>
 			</trigger>
 		</plan>
 	</plans>

@@ -38,14 +38,21 @@ public class GoalbaseFlyweight extends ElementFlyweight implements IGoalbase
 	 */
 	public static GoalbaseFlyweight getGoalbaseFlyweight(IOAVState state, Object scope)
 	{
-		BDIInterpreter ip = BDIInterpreter.getInterpreter(state);
-		GoalbaseFlyweight ret = (GoalbaseFlyweight)ip.getFlyweightCache(IGoalbase.class, new Tuple(IGoalbase.class, scope));
-		if(ret==null)
+		try
 		{
-			ret = new GoalbaseFlyweight(state, scope);
-			ip.putFlyweightCache(IGoalbase.class, new Tuple(IGoalbase.class, scope), ret);
+			BDIInterpreter ip = BDIInterpreter.getInterpreter(state);
+			GoalbaseFlyweight ret = (GoalbaseFlyweight)ip.getFlyweightCache(IGoalbase.class, new Tuple(IGoalbase.class, scope));
+			if(ret==null)
+			{
+				ret = new GoalbaseFlyweight(state, scope);
+				ip.putFlyweightCache(IGoalbase.class, new Tuple(IGoalbase.class, scope), ret);
+			}
+			return ret;
 		}
-		return ret;
+		catch(RuntimeException e)
+		{
+			throw e;
+		}
 	}
 	
 	//-------- IGoalbase interface --------
