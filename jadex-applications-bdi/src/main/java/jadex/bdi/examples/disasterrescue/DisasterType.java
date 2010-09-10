@@ -160,6 +160,10 @@ public class DisasterType
 	 */
 	public static IVector2	getFireLocation(ISpaceObject disaster)
 	{
+		// Treat earthquakes differently
+		if("Earthquake".equals(disaster.getProperty("type")))
+			return getEarthquakeIncidentLocation(disaster);
+		
 		IVector2	center	= (IVector2)disaster.getProperty(Space2D.PROPERTY_POSITION);
 		int	size	= ((Number)disaster.getProperty("size")).intValue();
 		double	angle	= random.nextDouble()*Math.PI*2;
@@ -187,12 +191,40 @@ public class DisasterType
 	{
 		return getFireLocation(disaster);
 	}
-
 	
 	/**
 	 *  Get the position of a victim at the given disaster.
 	 */
 	public static IVector2	getVictimLocation(ISpaceObject disaster)
+	{
+		// Treat earthquakes differently
+		if("Earthquake".equals(disaster.getProperty("type")))
+			return getEarthquakeIncidentLocation(disaster);
+
+		IVector2	center	= (IVector2)disaster.getProperty(Space2D.PROPERTY_POSITION);
+		int	size	= ((Number)disaster.getProperty("size")).intValue();
+		double	angle	= random.nextDouble()*Math.PI*2;
+		double	x	= Math.cos(angle)*size/2 * 0.005;	// 0.005 = scale of drawsize in application.xml
+		double	y	= Math.sin(angle)*size/2 * 0.005;	// 0.005 = scale of drawsize in application.xml
+		double	range	= random.nextDouble();
+		
+		// Place victims at outer area of circle
+		x	= x*0.6 + x*0.4*range;
+		y	= y*0.6 + y*0.4*range;
+		
+		// Clip position at space borders
+		x	+= center.getXAsDouble();
+		y	+= center.getYAsDouble();
+		x	= Math.max(Math.min(x, 1), 0);
+		y	= Math.max(Math.min(y, 1), 0);
+		
+		return new Vector2Double(x, y);
+	}
+	
+	/**
+	 *  Get the position of an incident at the given earthquake.
+	 */
+	public static IVector2	getEarthquakeIncidentLocation(ISpaceObject disaster)
 	{
 		IVector2	center	= (IVector2)disaster.getProperty(Space2D.PROPERTY_POSITION);
 		int	size	= ((Number)disaster.getProperty("size")).intValue();
@@ -201,9 +233,9 @@ public class DisasterType
 		double	y	= Math.sin(angle)*size/2 * 0.005;	// 0.005 = scale of drawsize in application.xml
 		double	range	= random.nextDouble();
 		
-		// Place fires at outer area of circle
-		x	= x*0.6 + x*0.4*range;
-		y	= y*0.6 + y*0.4*range;
+		// Place incidents anywhere except the middle
+		x	= x*0.1 + x*0.9*range;
+		y	= y*0.1 + y*0.9*range;
 		
 		// Clip position at space borders
 		x	+= center.getXAsDouble();
