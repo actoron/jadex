@@ -36,4 +36,14 @@ public class MoveToLocationPlan extends Plan
 		space.addTaskListener(taskid, myself.getId(), res);
 		res.waitForResult();
 	}
+
+	
+	/**
+	 *  Called when a plan fails.
+	 */
+	public void failed()
+	{
+		System.err.println("Plan failed: "+this);
+		getException().printStackTrace();
+	}
 }

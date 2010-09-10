@@ -12,6 +12,9 @@ import jadex.bdi.runtime.Plan;
  */
 public class FireEnginePlan extends Plan
 {
+	/**
+	 *  The plan body.
+	 */
 	public void body()
 	{
 		Space2D	space	= (Space2D)getBeliefbase().getBelief("environment").getFact();
@@ -69,5 +72,14 @@ public class FireEnginePlan extends Plan
 				waitFor((long)(Math.random()*5000));
 			}
 		}
+	}
+	
+	/**
+	 *  Called when a plan fails.
+	 */
+	public void failed()
+	{
+		System.err.println("Plan failed: "+this);
+		getException().printStackTrace();
 	}
 }

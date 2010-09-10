@@ -6,7 +6,7 @@ import jadex.commons.IFuture;
 /**
  *  Extinguish fire service interface.
  */
-public interface IFireExtinguishService
+public interface IExtinguishFireService
 {
 	/**
 	 *  Extinguish a fire.

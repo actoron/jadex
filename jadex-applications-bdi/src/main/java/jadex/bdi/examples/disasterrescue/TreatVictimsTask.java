@@ -33,14 +33,14 @@ public class TreatVictimsTask extends AbstractTask
 	 */
 	public void execute(IEnvironmentSpace space, ISpaceObject obj, long progress, IClockService clock)
 	{
-		// Check if engine object is in range of victims.
+		// Check if ambulance object is in range of victims.
 		Space2D	space2d	= (Space2D)space;
 		ISpaceObject	disaster	= (ISpaceObject)getProperty(PROPERTY_DISASTER);
 		double	range	= ((Number)disaster.getProperty("size")).intValue()/2 * 0.005;	// 0.005 = scale of drawsize in application.xml
 		if(space2d.getDistance((IVector2)obj.getProperty(Space2D.PROPERTY_POSITION),
-			(IVector2)disaster.getProperty(Space2D.PROPERTY_POSITION)).getAsDouble()>range)
+			(IVector2)disaster.getProperty(Space2D.PROPERTY_POSITION)).getAsDouble()>range*1.1) // allow for 10% rounding error
 		{
-			throw new RuntimeException("Fire out of range: "+obj);
+			throw new RuntimeException("Victims out of range: "+obj);
 		}
 
 		// Update disaster object based on time progress.

@@ -18,6 +18,9 @@ import java.util.Map;
  */
 public class TreatVictimsPlan extends Plan
 {
+	/**
+	 *  The plan body.
+	 */
 	public void body()
 	{
 		Space2D	space	= (Space2D)getBeliefbase().getBelief("environment").getFact();
@@ -38,5 +41,15 @@ public class TreatVictimsPlan extends Plan
 		SyncResultListener	res	= new SyncResultListener();
 		space.addTaskListener(taskid, myself.getId(), res);
 		res.waitForResult();
+	}
+
+	
+	/**
+	 *  Called when a plan fails.
+	 */
+	public void failed()
+	{
+		System.err.println("Plan failed: "+this);
+		getException().printStackTrace();
 	}
 }

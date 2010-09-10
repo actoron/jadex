@@ -12,6 +12,9 @@ import jadex.bdi.runtime.Plan;
  */
 public class AmbulancePlan extends Plan
 {
+	/**
+	 *  The plan body.
+	 */
 	public void body()
 	{
 		Space2D	space	= (Space2D)getBeliefbase().getBelief("environment").getFact();
@@ -51,7 +54,7 @@ public class AmbulancePlan extends Plan
 			{
 				IGoal move = createGoal("move");
 				move.getParameter("destination").setValue(home);
-				dispatchSubgoalAndWait(move);				
+				dispatchSubgoalAndWait(move);
 			}
 			
 			// If no fire and at home: wait a little before checking again
@@ -60,5 +63,14 @@ public class AmbulancePlan extends Plan
 				waitFor((long)(Math.random()*5000));
 			}
 		}
+	}
+	
+	/**
+	 *  Called when a plan fails.
+	 */
+	public void failed()
+	{
+		System.err.println("Plan failed: "+this);
+		getException().printStackTrace();
 	}
 }

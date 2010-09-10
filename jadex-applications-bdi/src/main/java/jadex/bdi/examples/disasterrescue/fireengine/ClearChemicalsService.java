@@ -2,7 +2,7 @@ package jadex.bdi.examples.disasterrescue.fireengine;
 
 import jadex.application.space.envsupport.environment.ISpaceObject;
 import jadex.bdi.examples.disasterrescue.IClearChemicalsService;
-import jadex.bdi.examples.disasterrescue.IFireExtinguishService;
+import jadex.bdi.examples.disasterrescue.IExtinguishFireService;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IEAGoal;
 import jadex.bridge.IExternalAccess;
@@ -29,7 +29,7 @@ public class ClearChemicalsService extends BasicService implements IClearChemica
 	 */
 	public ClearChemicalsService(IExternalAccess agent)
 	{
-		super(agent.getServiceProvider().getId(), IFireExtinguishService.class, null);
+		super(agent.getServiceProvider().getId(), IExtinguishFireService.class, null);
 		this.agent = (IBDIExternalAccess)agent;
 	}
 	

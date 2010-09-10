@@ -50,7 +50,7 @@
 		</achievegoalref>
 
 		<!-- Goal to extinguish fire. -->
-		<achievegoal name="extinguish_fire">
+		<achievegoal name="extinguish_fire" exclude="when_failed">
 			<parameter name="disaster" class="ISpaceObject"/>
 			<targetcondition>
 				$goal.disaster.fire==0
@@ -58,7 +58,7 @@
 		</achievegoal>
 
 		<!-- Goal to clear chemicals. -->
-		<achievegoal name="clear_chemicals">
+		<achievegoal name="clear_chemicals" exclude="when_failed">
 			<parameter name="disaster" class="ISpaceObject"/>
 			<targetcondition>
 				$goal.disaster.chemicals==0
@@ -96,7 +96,7 @@
 	</plans>
 	
 	<services>
-		<service>new FireExtinguishService($scope.getExternalAccess())</service>
+		<service>new ExtinguishFireService($scope.getExternalAccess())</service>
 		<service>new ClearChemicalsService($scope.getExternalAccess())</service>
 	</services>
 	

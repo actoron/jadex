@@ -1,7 +1,7 @@
 package jadex.bdi.examples.disasterrescue.ambulance;
 
 import jadex.application.space.envsupport.environment.ISpaceObject;
-import jadex.bdi.examples.disasterrescue.IFireExtinguishService;
+import jadex.bdi.examples.disasterrescue.IExtinguishFireService;
 import jadex.bdi.examples.disasterrescue.ITreatVictimsService;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IEAGoal;
@@ -29,7 +29,7 @@ public class TreatVictimsService extends BasicService implements ITreatVictimsSe
 	 */
 	public TreatVictimsService(IExternalAccess agent)
 	{
-		super(agent.getServiceProvider().getId(), IFireExtinguishService.class, null);
+		super(agent.getServiceProvider().getId(), IExtinguishFireService.class, null);
 		this.agent = (IBDIExternalAccess)agent;
 	}
 	
@@ -87,6 +87,6 @@ public class TreatVictimsService extends BasicService implements ITreatVictimsSe
 	 */
 	public String toString()
 	{
-		return "ClearChemicalsService, "+agent.getComponentIdentifier();
+		return "TreatVictimsService, "+agent.getComponentIdentifier();
 	}
 }

@@ -38,7 +38,7 @@ public class ExtinguishFireTask extends AbstractTask
 		ISpaceObject	disaster	= (ISpaceObject)getProperty(PROPERTY_DISASTER);
 		double	range	= ((Number)disaster.getProperty("size")).intValue()/2 * 0.005;	// 0.005 = scale of drawsize in application.xml
 		if(space2d.getDistance((IVector2)obj.getProperty(Space2D.PROPERTY_POSITION),
-			(IVector2)disaster.getProperty(Space2D.PROPERTY_POSITION)).getAsDouble()>range)
+			(IVector2)disaster.getProperty(Space2D.PROPERTY_POSITION)).getAsDouble()>range*1.1) // allow for 10% rounding error
 		{
 			throw new RuntimeException("Fire out of range: "+obj);
 		}

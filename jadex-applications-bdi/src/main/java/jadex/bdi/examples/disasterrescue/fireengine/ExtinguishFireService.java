@@ -1,7 +1,7 @@
 package jadex.bdi.examples.disasterrescue.fireengine;
 
 import jadex.application.space.envsupport.environment.ISpaceObject;
-import jadex.bdi.examples.disasterrescue.IFireExtinguishService;
+import jadex.bdi.examples.disasterrescue.IExtinguishFireService;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IEAGoal;
 import jadex.bridge.IExternalAccess;
@@ -14,7 +14,7 @@ import jadex.commons.service.BasicService;
 /**
  *  Fire extinguish service.
  */
-public class FireExtinguishService extends BasicService implements IFireExtinguishService
+public class ExtinguishFireService extends BasicService implements IExtinguishFireService
 {
 	//-------- attributes --------
 	
@@ -26,9 +26,9 @@ public class FireExtinguishService extends BasicService implements IFireExtingui
 	/**
 	 *  Create a new service.
 	 */
-	public FireExtinguishService(IExternalAccess agent)
+	public ExtinguishFireService(IExternalAccess agent)
 	{
-		super(agent.getServiceProvider().getId(), IFireExtinguishService.class, null);
+		super(agent.getServiceProvider().getId(), IExtinguishFireService.class, null);
 		this.agent = (IBDIExternalAccess)agent;
 	}
 	
