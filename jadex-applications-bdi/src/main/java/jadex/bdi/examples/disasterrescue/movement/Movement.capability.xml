@@ -28,6 +28,10 @@
  			<fact>$beliefbase.environment.getAvatar($scope.getComponentIdentifier(), $scope.getAgentModel().getFullName())</fact>
  		</belief>
  		
+ 		<belief name="position" class="IVector2" evaluationmode="push">
+			<fact language="jcl">$beliefbase.myself.position</fact>
+ 		</belief>
+ 		
  		<!-- Home location. -->
  		<belief name="home" class="IVector2" exported="true">
  			<fact>(IVector2)$beliefbase.myself.getProperty(Space2D.PROPERTY_POSITION)</fact>
@@ -44,7 +48,7 @@
 			<unique/>
 			<creationcondition>
 				$goalbase.getGoals().length==0 &amp;&amp; 
-				$beliefbase.environment.getDistance($beliefbase.home, (IVector2)$beliefbase.myself.position).getAsDouble()&gt;0.05
+				$beliefbase.environment.getDistance($beliefbase.home, $beliefbase.position).getAsDouble()&gt;0.001
 			</creationcondition>
 		</achievegoal>
 	</goals>

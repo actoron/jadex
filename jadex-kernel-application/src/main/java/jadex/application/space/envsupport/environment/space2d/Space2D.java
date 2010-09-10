@@ -133,18 +133,20 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 	{
 		synchronized(monitor)
 		{
-//			try
-//			{
+			try
+			{
 				IVector1 dx = getDistance(pos1.getX(), pos2.getX(), true);
 				IVector1 dy = getDistance(pos1.getY(), pos2.getY(), false);
 			
-				return calculateDistance(dx, dy);
-//			}
-//			catch(Exception e)
-//			{
-//				e.printStackTrace();
-//				throw new RuntimeException();
-//			}
+				IVector1 ret = calculateDistance(dx, dy);
+				System.out.println(ret);
+				return ret;
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+				throw new RuntimeException();
+			}
 		}
 	}
 	
