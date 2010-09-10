@@ -1,19 +1,11 @@
 package jadex.bdi.examples.disasterrescue.fireengine;
 
-import jadex.application.space.envsupport.environment.AbstractTask;
 import jadex.application.space.envsupport.environment.ISpaceObject;
 import jadex.application.space.envsupport.environment.space2d.Space2D;
 import jadex.application.space.envsupport.math.IVector2;
 import jadex.application.space.envsupport.math.Vector1Int;
-import jadex.bdi.examples.disasterrescue.ClearChemicalsTask;
-import jadex.bdi.examples.disasterrescue.DisasterType;
-import jadex.bdi.examples.disasterrescue.ExtinguishFireTask;
-import jadex.bdi.planlib.PlanFinishedTaskCondition;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  *  Move to fires and extinguish them.
@@ -24,7 +16,7 @@ public class FireEnginePlan extends Plan
 	{
 		Space2D	space	= (Space2D)getBeliefbase().getBelief("environment").getFact();
 		ISpaceObject	myself	= (ISpaceObject)getBeliefbase().getBelief("myself").getFact();
-		IVector2	home	= (IVector2)myself.getProperty(Space2D.PROPERTY_POSITION);
+		IVector2	home	= (IVector2)getBeliefbase().getBelief("home").getFact();
 		
 		while(true)
 		{
@@ -48,29 +40,19 @@ public class FireEnginePlan extends Plan
 			
 			// Extinguish fire
 			if(target!=null)
-			{
-				// Move to disaster location
-				targetpos	= DisasterType.getFireLocation(target);
-				IGoal move = createGoal("move");
-				move.getParameter("destination").setValue(targetpos);
-				dispatchSubgoalAndWait(move);
-				
+			{				
 				// Decide between fire and chemicals
 				boolean	fire	= ((Number)target.getProperty("fire")).intValue()>0;
 				boolean	chemicals	= ((Number)target.getProperty("chemicals")).intValue()>0;
-				String	tasktype	= fire && !chemicals ? ExtinguishFireTask.PROPERTY_TYPENAME
-					: !fire && chemicals ? ClearChemicalsTask.PROPERTY_TYPENAME
-					: fire && chemicals ? Math.random()>0.5 ? ExtinguishFireTask.PROPERTY_TYPENAME : ClearChemicalsTask.PROPERTY_TYPENAME
+				String	goaltype	= fire && !chemicals ? "extinguish_fire"
+					: !fire && chemicals ? "clear_chemicals"
+					: fire && chemicals ? Math.random()>0.5 ? "extinguish_fire" : "clear_chemicals"
 					: null;
-				if(tasktype!=null)
+				if(goaltype!=null)
 				{
-					Map props = new HashMap();
-					props.put("disaster", target);
-					props.put(AbstractTask.PROPERTY_CONDITION, new PlanFinishedTaskCondition(getPlanElement()));
-					Object taskid = space.createObjectTask(tasktype, props, myself.getId());
-					SyncResultListener	res	= new SyncResultListener();
-					space.addTaskListener(taskid, myself.getId(), res);
-					res.waitForResult();
+					IGoal	goal	= createGoal(goaltype);
+					goal.getParameter("disaster").setValue(target);
+					dispatchSubgoalAndWait(goal);
 				}
 			}
 			

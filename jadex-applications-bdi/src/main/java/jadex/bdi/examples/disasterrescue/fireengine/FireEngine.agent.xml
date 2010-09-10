@@ -36,6 +36,11 @@
 		<beliefref name="myself">
 			<concrete ref="move.myself"/>
 		</beliefref>
+		
+		<!-- Home location belief imported from move capability. -->
+		<beliefref name="home">
+			<concrete ref="move.home"/>
+		</beliefref>
 	</beliefs>
 
 	<goals>
@@ -43,12 +48,50 @@
 		<achievegoalref name="move">
 			<concrete ref="move.move"/>
 		</achievegoalref>
+
+		<!-- Goal to extinguish fire. -->
+		<achievegoal name="extinguish_fire">
+			<parameter name="disaster" class="ISpaceObject"/>
+			<targetcondition>
+				$goal.disaster.fire==0
+			</targetcondition>
+		</achievegoal>
+
+		<!-- Goal to clear chemicals. -->
+		<achievegoal name="clear_chemicals">
+			<parameter name="disaster" class="ISpaceObject"/>
+			<targetcondition>
+				$goal.disaster.chemicals==0
+			</targetcondition>
+		</achievegoal>
 	</goals>
 	
 	<plans>
 		<!-- Basic fire engine behavior plan. -->
 		<plan name="fireengine_plan">
 			<body class="FireEnginePlan"/>
+		</plan>
+		
+		<!-- Plan for extinguishing fire. -->
+		<plan name="extinguish_fire_plan">
+			<parameter name="disaster" class="ISpaceObject">
+				<goalmapping ref="extinguish_fire.disaster"/>
+			</parameter>
+			<body class="ExtinguishFirePlan"/>
+			<trigger>
+				<goal ref="extinguish_fire"/>
+			</trigger>
+		</plan>
+		
+		<!-- Plan for clearing chemicals. -->
+		<plan name="clear_chemicals_plan">
+			<parameter name="disaster" class="ISpaceObject">
+				<goalmapping ref="clear_chemicals.disaster"/>
+			</parameter>
+			<body class="ClearChemicalsPlan"/>
+			<trigger>
+				<goal ref="clear_chemicals"/>
+			</trigger>
 		</plan>
 	</plans>
 	

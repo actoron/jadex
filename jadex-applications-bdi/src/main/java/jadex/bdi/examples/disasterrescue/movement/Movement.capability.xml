@@ -27,6 +27,11 @@
  		<belief name="myself" class="ISpaceObject" exported="true">
  			<fact>$beliefbase.environment.getAvatar($scope.getComponentIdentifier(), $scope.getAgentModel().getFullName())</fact>
  		</belief>
+ 		
+ 		<!-- Home location. -->
+ 		<belief name="home" class="IVector2" exported="true">
+ 			<fact>(IVector2)$beliefbase.myself.getProperty(Space2D.PROPERTY_POSITION)</fact>
+ 		</belief>
 	</beliefs>
 
 	<goals>
