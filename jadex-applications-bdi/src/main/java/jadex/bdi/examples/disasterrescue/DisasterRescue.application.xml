@@ -105,19 +105,19 @@
 					</env:drawable>
 					
 					<env:drawable objecttype="firestation" width="0.1" height="0.1">
-						<env:texturedrectangle layer="3" height="1" width="1" imagepath="jadex/bdi/examples/disasterrescue/images/firestation.png"/>
+						<env:texturedrectangle layer="4" height="1" width="1" imagepath="jadex/bdi/examples/disasterrescue/images/firestation.png"/>
 					</env:drawable>
 					
 					<env:drawable objecttype="fireengine" width="0.05" height="0.05">
-						<env:texturedrectangle layer="2" height="1" width="1" imagepath="jadex/bdi/examples/disasterrescue/images/fireengine.png"/>
+						<env:texturedrectangle layer="3" height="1" width="1" imagepath="jadex/bdi/examples/disasterrescue/images/fireengine.png"/>
 					</env:drawable>
 
 					<env:drawable objecttype="hospital" width="0.1" height="0.1">
-						<env:texturedrectangle layer="3" height="1" width="1" imagepath="jadex/bdi/examples/disasterrescue/images/hospital.png"/>
+						<env:texturedrectangle layer="4" height="1" width="1" imagepath="jadex/bdi/examples/disasterrescue/images/hospital.png"/>
 					</env:drawable>
 					
 					<env:drawable objecttype="ambulance" width="0.05" height="0.05">
-						<env:texturedrectangle layer="2" height="1" width="1" imagepath="jadex/bdi/examples/disasterrescue/images/ambulance.png"/>
+						<env:texturedrectangle layer="3" height="1" width="1" imagepath="jadex/bdi/examples/disasterrescue/images/ambulance.png"/>
 					</env:drawable>
 
 					<env:prelayers>
