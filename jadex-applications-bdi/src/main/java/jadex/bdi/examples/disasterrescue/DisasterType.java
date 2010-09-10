@@ -169,7 +169,7 @@ public class DisasterType
 		
 		// Place fires at inner area of circle
 		x	= x*0.2 + x*0.4*range;
-		y	= x*0.2 + y*0.4*range;
+		y	= y*0.2 + y*0.4*range;
 		
 		// Clip position at space borders
 		x	+= center.getXAsDouble();
@@ -186,5 +186,31 @@ public class DisasterType
 	public static IVector2	getChemicalsLocation(ISpaceObject disaster)
 	{
 		return getFireLocation(disaster);
+	}
+
+	
+	/**
+	 *  Get the position of a victim at the given disaster.
+	 */
+	public static IVector2	getVictimLocation(ISpaceObject disaster)
+	{
+		IVector2	center	= (IVector2)disaster.getProperty(Space2D.PROPERTY_POSITION);
+		int	size	= ((Number)disaster.getProperty("size")).intValue();
+		double	angle	= random.nextDouble()*Math.PI*2;
+		double	x	= Math.cos(angle)*size/2 * 0.005;	// 0.005 = scale of drawsize in application.xml
+		double	y	= Math.sin(angle)*size/2 * 0.005;	// 0.005 = scale of drawsize in application.xml
+		double	range	= random.nextDouble();
+		
+		// Place fires at outer area of circle
+		x	= x*0.6 + x*0.4*range;
+		y	= y*0.6 + y*0.4*range;
+		
+		// Clip position at space borders
+		x	+= center.getXAsDouble();
+		y	+= center.getYAsDouble();
+		x	= Math.max(Math.min(x, 1), 0);
+		y	= Math.max(Math.min(y, 1), 0);
+		
+		return new Vector2Double(x, y);
 	}
 }

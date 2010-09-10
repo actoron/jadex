@@ -33,7 +33,7 @@ public class ClearChemicalsTask extends AbstractTask
 	 */
 	public void execute(IEnvironmentSpace space, ISpaceObject obj, long progress, IClockService clock)
 	{
-		// Check if engine object is in rage of chemicals.
+		// Check if engine object is in range of chemicals.
 		Space2D	space2d	= (Space2D)space;
 		ISpaceObject	disaster	= (ISpaceObject)getProperty(PROPERTY_DISASTER);
 		double	range	= ((Number)disaster.getProperty("size")).intValue()/2 * 0.005;	// 0.005 = scale of drawsize in application.xml
@@ -56,8 +56,15 @@ public class ClearChemicalsTask extends AbstractTask
 		chemicals	= Math.max(chemicals-cnt, 0);
 		disaster.setProperty("chemicals", new Integer(chemicals));
 
-		// If not finished but least one fire was extinguished
-		// use random to determine if need to move to another position for next fire.
+		// Remove disaster object when everything is now fine.
+		if(chemicals==0 && ((Number)disaster.getProperty("fire")).intValue()==0 && ((Number)disaster.getProperty("victims")).intValue()==0)
+		{
+			if(space2d.getSpaceObject0(disaster.getId())!=null)
+				space.destroySpaceObject(disaster.getId());
+		}
+
+		// If not finished but least one chemical was cleared
+		// use random to determine if need to move to another position for next chemical.
 		if(chemicals==0 || cnt>0 && Math.random()>0.5)
 		{
 			obj.setProperty(PROPERTY_CLEARED, new Double(0));

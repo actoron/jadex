@@ -1,16 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-	<H3>Fire Engine</H3>
+	<H3>Ambulance</H3>
 
-	Moves to fires and extinguishes them
-	and clears chemicals.
+	Moves to victims and treats them.
 -->
 <agent xmlns="http://jadex.sourceforge.net/jadex-bdi"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-bdi
 	                    http://jadex.sourceforge.net/jadex-bdi-2.0.xsd"
-	name="FireEngine"
-	package="jadex.bdi.examples.disasterrescue.fireengine">
+	name="Ambulance"
+	package="jadex.bdi.examples.disasterrescue.ambulance">
 
 	<imports>
 		<import>java.util.*</import>
@@ -46,17 +45,17 @@
 	</goals>
 	
 	<plans>
-		<!-- Basic fire engine behavior plan. -->
-		<plan name="fireengine_plan">
-			<body class="FireEnginePlan"/>
+		<!-- Basic ambulance behavior plan. -->
+		<plan name="ambulance_plan">
+			<body class="AmbulancePlan"/>
 		</plan>
 	</plans>
 	
 	<configurations>
 		<configuration name="default">
 			<plans>
-				<!-- Start fire engine plan when agent is born. -->
-				<initialplan ref="fireengine_plan"/>
+				<!-- Start ambulance plan when agent is born. -->
+				<initialplan ref="ambulance_plan"/>
 			</plans>
 		</configuration>
 	</configurations>

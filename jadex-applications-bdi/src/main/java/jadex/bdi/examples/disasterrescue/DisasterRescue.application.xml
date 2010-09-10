@@ -45,12 +45,19 @@
 					<env:property name="extinguished" class="double">0</env:property>
 					<env:property name="cleared" class="double">0</env:property>
 				</env:objecttype>
+				
+				<env:objecttype name="hospital"/>
+				<env:objecttype name="ambulance">
+					<env:property name="speed" class="double">0.05</env:property>
+					<env:property name="treated" class="double">0</env:property>
+				</env:objecttype>
 			</env:objecttypes>
 			
 			<env:tasktypes>
 				<env:tasktype name="move" class="MoveTask" />
 				<env:tasktype name="extinguish_fire" class="ExtinguishFireTask" />
 				<env:tasktype name="clear_chemicals" class="ClearChemicalsTask" />
+				<env:tasktype name="treat_victims" class="TreatVictimsTask" />
 			</env:tasktypes>			
 						
 			<env:processtypes>
@@ -69,6 +76,7 @@
 			
 			<env:avatarmappings>
 				<env:avatarmapping objecttype="fireengine" componenttype="FireEngine" createavatar="false" createcomponent="true"/>
+				<env:avatarmapping objecttype="ambulance" componenttype="Ambulance" createavatar="false" createcomponent="true"/>
 			</env:avatarmappings>
 			
 			<env:perspectives>
@@ -104,6 +112,14 @@
 						<env:texturedrectangle layer="2" height="1" width="1" imagepath="jadex/bdi/examples/disasterrescue/images/fireengine.png"/>
 					</env:drawable>
 
+					<env:drawable objecttype="hospital" width="0.1" height="0.1">
+						<env:texturedrectangle layer="3" height="1" width="1" imagepath="jadex/bdi/examples/disasterrescue/images/hospital.png"/>
+					</env:drawable>
+					
+					<env:drawable objecttype="ambulance" width="0.05" height="0.05">
+						<env:texturedrectangle layer="2" height="1" width="1" imagepath="jadex/bdi/examples/disasterrescue/images/ambulance.png"/>
+					</env:drawable>
+
 					<env:prelayers>
 						<env:tiledlayer width="1" height="1" imagepath="jadex/bdi/examples/disasterrescue/images/map.jpg" />
 					</env:prelayers>
@@ -120,6 +136,7 @@
 	
 	<componenttypes>
 		<componenttype name="FireEngine" filename="jadex/bdi/examples/disasterrescue/fireengine/FireEngine.agent.xml"/>
+		<componenttype name="Ambulance" filename="jadex/bdi/examples/disasterrescue/ambulance/Ambulance.agent.xml"/>
 	</componenttypes>
 
 	<applications>
@@ -150,6 +167,26 @@
 						</env:object>
 						<env:object type="fireengine">
 							<env:property name="position">new Vector2Double(0.2, 0.7)</env:property>
+						</env:object>
+						
+						<!-- Hospital with 5 ambulances -->
+						<env:object type="hospital">
+							<env:property name="position">new Vector2Double(0.3, 0.3)</env:property>
+						</env:object>
+						<env:object type="ambulance">
+							<env:property name="position">new Vector2Double(0.3, 0.3)</env:property>
+						</env:object>
+						<env:object type="ambulance">
+							<env:property name="position">new Vector2Double(0.3, 0.3)</env:property>
+						</env:object>
+						<env:object type="ambulance">
+							<env:property name="position">new Vector2Double(0.3, 0.3)</env:property>
+						</env:object>
+						<env:object type="ambulance">
+							<env:property name="position">new Vector2Double(0.3, 0.3)</env:property>
+						</env:object>
+						<env:object type="ambulance">
+							<env:property name="position">new Vector2Double(0.3, 0.3)</env:property>
 						</env:object>
 						
 					</env:objects>

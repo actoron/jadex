@@ -10,18 +10,18 @@ import jadex.commons.service.clock.IClockService;
 /**
  *  Extinguish fire at a disaster.
  */
-public class ExtinguishFireTask extends AbstractTask
+public class TreatVictimsTask extends AbstractTask
 {
 	//-------- constants --------
 	
 	/** The task name. */
-	public static final String	PROPERTY_TYPENAME = "extinguish_fire";
+	public static final String	PROPERTY_TYPENAME = "treat_victims";
 	
 	/** The disaster property. */
 	public static final String	PROPERTY_DISASTER = "disaster";
 	
-	/** The extinguished property (of the space object). */
-	public static final String	PROPERTY_EXTINGUISHED = "extinguished";
+	/** The treated property (of the space object). */
+	public static final String	PROPERTY_TREATED = "treated";
 
 	//-------- IObjectTask methods --------
 	
@@ -33,7 +33,7 @@ public class ExtinguishFireTask extends AbstractTask
 	 */
 	public void execute(IEnvironmentSpace space, ISpaceObject obj, long progress, IClockService clock)
 	{
-		// Check if engine object is in range of fire.
+		// Check if engine object is in range of victims.
 		Space2D	space2d	= (Space2D)space;
 		ISpaceObject	disaster	= (ISpaceObject)getProperty(PROPERTY_DISASTER);
 		double	range	= ((Number)disaster.getProperty("size")).intValue()/2 * 0.005;	// 0.005 = scale of drawsize in application.xml
@@ -45,34 +45,34 @@ public class ExtinguishFireTask extends AbstractTask
 
 		// Update disaster object based on time progress.
 		int	cnt	= 0;
-		double	extinguished	= ((Number)obj.getProperty(PROPERTY_EXTINGUISHED)).doubleValue();
-		extinguished	+= progress*0.0002;	// 1 fire per 5 seconds.
-		while(extinguished>1)
+		double	treated	= ((Number)obj.getProperty(PROPERTY_TREATED)).doubleValue();
+		treated	+= progress*0.0002;	// 1 victim per 5 seconds.
+		while(treated>1)
 		{
 			cnt++;
-			extinguished	-= 1;
+			treated	-= 1;
 		}
-		int fire	= ((Number)disaster.getProperty("fire")).intValue();
-		fire	= Math.max(fire-cnt, 0);
-		disaster.setProperty("fire", new Integer(fire));
-		
+		int victims	= ((Number)disaster.getProperty("victims")).intValue();
+		victims	= Math.max(victims-cnt, 0);
+		disaster.setProperty("victims", new Integer(victims));
+
 		// Remove disaster object when everything is now fine.
-		if(fire==0 && ((Number)disaster.getProperty("chemicals")).intValue()==0 && ((Number)disaster.getProperty("victims")).intValue()==0)
+		if(victims==0 && ((Number)disaster.getProperty("fire")).intValue()==0 && ((Number)disaster.getProperty("chemicals")).intValue()==0)
 		{
 			if(space2d.getSpaceObject0(disaster.getId())!=null)
 				space.destroySpaceObject(disaster.getId());
 		}
 
-		// If not finished but least one fire was extinguished
-		// use random to determine if need to move to another position for next fire.
-		if(fire==0 || cnt>0 && Math.random()>0.5)
+		// If not finished but least one victim was treated
+		// use random to determine if need to move to another position for next victim.
+		if(victims==0 || cnt>0 && Math.random()>0.5)
 		{
-			obj.setProperty(PROPERTY_EXTINGUISHED, new Double(0));
+			obj.setProperty(PROPERTY_TREATED, new Double(0));
 			setFinished(space, obj, true);
 		}
 		else
 		{
-			obj.setProperty(PROPERTY_EXTINGUISHED, new Double(extinguished));			
+			obj.setProperty(PROPERTY_TREATED, new Double(treated));			
 		}
 	}
 }
