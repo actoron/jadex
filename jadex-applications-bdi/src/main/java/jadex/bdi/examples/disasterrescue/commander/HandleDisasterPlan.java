@@ -1,13 +1,11 @@
 package jadex.bdi.examples.disasterrescue.commander;
 
 import jadex.application.space.envsupport.environment.ISpaceObject;
-import jadex.application.space.envsupport.environment.space2d.Space2D;
 import jadex.bdi.examples.disasterrescue.IClearChemicalsService;
-import jadex.bdi.examples.disasterrescue.IFireExtinguishService;
+import jadex.bdi.examples.disasterrescue.IExtinguishFireService;
 import jadex.bdi.examples.disasterrescue.ITreatVictimsService;
 import jadex.bdi.runtime.IBeliefSet;
 import jadex.bdi.runtime.Plan;
-import jadex.bridge.IComponentManagementService;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.service.SServiceProvider;
 
@@ -65,12 +63,12 @@ public class HandleDisasterPlan extends Plan
 		
 		if(fire>0)
 		{
-			Collection exfireser = (Collection)SServiceProvider.getServices(getScope().getServiceProvider(), IFireExtinguishService.class).get(this);
+			Collection exfireser = (Collection)SServiceProvider.getServices(getScope().getServiceProvider(), IExtinguishFireService.class).get(this);
 			if(exfireser.size()>0)
 			{
 				for(Iterator it=exfireser.iterator(); it.hasNext(); )
 				{
-					IFireExtinguishService fes = (IFireExtinguishService)it.next();
+					IExtinguishFireService fes = (IExtinguishFireService)it.next();
 					final Object provid = fes.getServiceIdentifier().getProviderId();
 					if(!busy.containsFact(provid))
 					{
