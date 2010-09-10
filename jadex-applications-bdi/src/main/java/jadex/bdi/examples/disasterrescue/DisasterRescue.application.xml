@@ -121,7 +121,7 @@
 					</env:drawable>
 
 					<env:prelayers>
-						<env:tiledlayer width="1" height="1" imagepath="jadex/bdi/examples/disasterrescue/images/map.jpg" />
+						<env:tiledlayer width="1" height="1" imagepath="jadex/bdi/examples/disasterrescue/images/hamburg.png" />
 					</env:prelayers>
 				</env:perspective>
 			</env:perspectives>
