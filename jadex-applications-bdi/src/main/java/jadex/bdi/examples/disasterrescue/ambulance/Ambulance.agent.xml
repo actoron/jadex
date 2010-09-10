@@ -51,7 +51,12 @@
 		</plan>
 	</plans>
 	
+	<services>
+		<service>new TreatVictimsService($scope.getExternalAccess())</service>
+	</services>
+	
 	<configurations>
+		<configuration name="do_nothing"/>
 		<configuration name="default">
 			<plans>
 				<!-- Start ambulance plan when agent is born. -->

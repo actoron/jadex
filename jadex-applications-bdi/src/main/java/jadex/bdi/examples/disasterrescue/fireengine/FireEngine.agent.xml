@@ -97,9 +97,11 @@
 	
 	<services>
 		<service>new FireExtinguishService($scope.getExternalAccess())</service>
+		<service>new ClearChemicalsService($scope.getExternalAccess())</service>
 	</services>
 	
 	<configurations>
+		<configuration name="do_nothing"/>
 		<configuration name="default">
 			<plans>
 				<!-- Start fire engine plan when agent is born. -->
