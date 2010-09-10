@@ -33,6 +33,7 @@
 						<excludes>
 							<exclude>**/dungeonkeeper/</exclude>
 							<exclude>**/disasterrescue/</exclude>
+							<exclude>**/helpline/</exclude>
 						</excludes>
 					</fileSet>
 					<fileSet>
