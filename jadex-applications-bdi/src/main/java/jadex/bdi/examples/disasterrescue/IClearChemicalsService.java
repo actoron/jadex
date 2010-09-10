@@ -2,11 +2,12 @@ package jadex.bdi.examples.disasterrescue;
 
 import jadex.application.space.envsupport.environment.ISpaceObject;
 import jadex.commons.IFuture;
+import jadex.commons.service.IService;
 
 /**
  *  Clear chemicals service interface.
  */
-public interface IClearChemicalsService 
+public interface IClearChemicalsService extends IService
 {	
 	/**
 	 *  Clear chemicals.

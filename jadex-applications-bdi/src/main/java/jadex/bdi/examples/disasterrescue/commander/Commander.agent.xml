@@ -31,6 +31,8 @@
 		<beliefset name="disasters" class="ISpaceObject" updaterate="1000">
 			<facts>$beliefbase.environment.getSpaceObjectsByType("disaster")</facts>
 		</beliefset>
+		
+		<beliefset name="busy_entities" class="Object"/>
 	</beliefs>
 
 	<goals>

@@ -2,11 +2,12 @@ package jadex.bdi.examples.disasterrescue;
 
 import jadex.application.space.envsupport.environment.ISpaceObject;
 import jadex.commons.IFuture;
+import jadex.commons.service.IService;
 
 /**
  *  Interface for treat victim service.
  */
-public interface ITreatVictimsService
+public interface ITreatVictimsService  extends IService
 {
 	/**
 	 *  Treat victims.

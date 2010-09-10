@@ -97,8 +97,8 @@
 				new ITransport[]
 				{
 					new LocalTransport($component.getServiceProvider()),
-					//new TCPTransport($component.getServiceProvider(), $args.tcpport),
 					new NIOTCPTransport($component.getServiceProvider(), $args.niotcpport)
+					//new TCPTransport($component.getServiceProvider(), $args.tcpport)
 				},
 				new MessageType[]
 				{

@@ -41,10 +41,12 @@ import jadex.bdi.runtime.interpreter.GoalLifecycleRules;
 import jadex.bdi.runtime.interpreter.InternalEventRules;
 import jadex.bdi.runtime.interpreter.MessageEventRules;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
+import jadex.bridge.ComponentResultListener;
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.IFuture;
 import jadex.commons.SReflect;
 import jadex.commons.collection.SCollection;
+import jadex.commons.concurrent.IResultListener;
 import jadex.commons.service.clock.IClockService;
 import jadex.javaparser.IExpressionParser;
 import jadex.javaparser.IParsedExpression;
@@ -962,6 +964,14 @@ public abstract class AbstractPlan implements java.io.Serializable //, IPlan
 	public IComponentIdentifier createComponentIdentifier(String name, boolean local, String[] addresses)
 	{
 		return interpreter.getCMS().createComponentIdentifier(name, local, addresses);
+	}
+	
+	/**
+	 *  Create a component result listener.
+	 */
+	public IResultListener createResultListener(IResultListener listener)
+	{
+		return new ComponentResultListener(listener, interpreter.getAgentAdapter());
 	}
 	
 	//-------- static part -------
