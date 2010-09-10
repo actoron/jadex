@@ -189,6 +189,9 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 	/** The cached external access. */
 	protected IExternalAccess ea;
 	
+	/** The initthread. */
+	protected Thread initthread;
+	
 	//-------- constructors --------
 	
 	/**
@@ -201,6 +204,8 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 	public BDIInterpreter(IComponentDescription desc, IComponentAdapterFactory factory, final IOAVState state, final OAVAgentModel model, 
 		final String config, final Map arguments, final IExternalAccess parent, final Map kernelprops, Future inited)
 	{	
+		this.initthread = Thread.currentThread();
+		
 		this.adapter = factory.createComponentAdapter(desc, model.getModelInfo(), this, parent);
 		this.state = state;
 		this.model = model;
@@ -212,6 +217,9 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 		this.microplansteps = true;
 		this.externalthreads	= Collections.synchronizedSet(SCollection.createLinkedHashSet());
 		this.inited = inited;
+		
+		// Hack! todo:
+		interpreters.put(state, this);
 		
 //		System.out.println("arguments: "+adapter.getComponentIdentifier().getName()+" "+arguments);
 		
@@ -281,8 +289,7 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 				microplansteps = mps.booleanValue();
 		}
 		
-		// Hack! todo:
-		interpreters.put(state, this);
+		this.initthread = null;
 	}
 	
 	//-------- IKernelAgent interface --------
@@ -1005,7 +1012,7 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 	 */ 
 	public boolean isExternalThread()
 	{
-		return !isAgentThread() && !isPlanThread();
+		return initthread!=Thread.currentThread() && !isAgentThread() && !isPlanThread();
 	}
 
 	/**
