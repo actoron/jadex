@@ -502,7 +502,7 @@ public class ReflectNode	extends ExpressionNode
 				}
 				catch(Exception e)
 				{
-					throw new RuntimeException(e);
+					throw new RuntimeException(""+this, e);
 				}
 			}
 		}

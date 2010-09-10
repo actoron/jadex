@@ -242,7 +242,7 @@
 	 			</env:envspace>
 			</spaces>
 			<components>
-				<component type="commander"/>
+				<component type="Commander"/>
 			</components>
  		</application>
 	</applications>

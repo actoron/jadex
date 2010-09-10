@@ -15,16 +15,18 @@
 		<import>java.util.*</import>
 		<import>java.util.logging.*</import>
 		<import>jadex.base.fipa.*</import>
+		<import>jadex.application.runtime.*</import>
 		<import>jadex.application.space.envsupport.environment.*</import>
+		<import>jadex.application.space.envsupport.environment.space2d.*</import>
 		<import>jadex.bdi.examples.disasterrescue.*</import>
 		<import>jadex.bdi.examples.disasterrescue.movement.*</import>
 	</imports>
 
 	<beliefs>
 		<!-- Environment imported inherited from move capability. -->
-		<beliefref name="environment">
-			<concrete ref="move.environment"/>
-		</beliefref>
+		<belief name="environment" class="ContinuousSpace2D">
+			<fact>(ContinuousSpace2D)((IApplicationExternalAccess)$scope.getParent()).getSpace("my2dspace")</fact>
+		</belief>
 		
 		<beliefset name="disasters" class="ISpaceObject" updaterate="1000">
 			<facts>$beliefbase.environment.getSpaceObjectsByType("disaster")</facts>
@@ -32,7 +34,7 @@
 	</beliefs>
 
 	<goals>
-		<achievegoal name="handle_disaster" retry="true">
+		<achievegoal name="handle_disaster" recur="true" recurdelay="10000000">
 			<parameter name="disaster" class="ISpaceObject">
 				<value>$disaster</value>
 			</parameter>
@@ -40,6 +42,9 @@
 			<creationcondition language="jcl">
 				ISpaceObject $disaster &amp;&amp; $disaster.getType().equals("disaster")
 			</creationcondition>
+			<targetcondition>
+				!Arrays.asList($beliefbase.disasters).contains($goal.disaster)
+			</targetcondition>
 		</achievegoal>
 	</goals>
 	
@@ -50,6 +55,9 @@
 				<goalmapping ref="handle_disaster.disaster"/>
 			</parameter>
 			<body class="HandleDisasterPlan"/>
+			<trigger>
+				<goal ref="handle_disaster"/>
+			</trigger>
 		</plan>
 	</plans>
 </agent>
