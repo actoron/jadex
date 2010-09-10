@@ -52,6 +52,10 @@
 		</plan>
 	</plans>
 	
+	<services>
+		<service>new FireExtinguishService($scope.getExternalAccess())</service>
+	</services>
+	
 	<configurations>
 		<configuration name="default">
 			<plans>
