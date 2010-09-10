@@ -34,80 +34,89 @@ public class HandleDisasterPlan extends Plan
 		
 		final IBeliefSet busy = getBeliefbase().getBeliefSet("busy_entities");	
 		
-		Collection clearchemser = (Collection)SServiceProvider.getServices(getScope().getServiceProvider(), IClearChemicalsService.class).get(this);
-		if(chemicals>0 && clearchemser.size()>0)
+		if(chemicals>0)
 		{
-			for(Iterator it=clearchemser.iterator(); it.hasNext(); )
+			Collection clearchemser = (Collection)SServiceProvider.getServices(getScope().getServiceProvider(), IClearChemicalsService.class).get(this);
+			if(clearchemser.size()>0)
 			{
-				IClearChemicalsService ccs = (IClearChemicalsService)it.next();
-				final Object provid = ccs.getServiceIdentifier().getProviderId();
-				if(!busy.containsFact(provid))
+				for(Iterator it=clearchemser.iterator(); it.hasNext(); )
 				{
-					busy.addFact(provid);
-					ccs.clearChemicals(disaster).addResultListener(createResultListener(new IResultListener()
+					IClearChemicalsService ccs = (IClearChemicalsService)it.next();
+					final Object provid = ccs.getServiceIdentifier().getProviderId();
+					if(!busy.containsFact(provid))
 					{
-						public void resultAvailable(Object source, Object result)
+						busy.addFact(provid);
+						ccs.clearChemicals(disaster).addResultListener(createResultListener(new IResultListener()
 						{
-							busy.removeFact(provid);
-						}
-						
-						public void exceptionOccurred(Object source, Exception exception)
-						{
-							busy.removeFact(provid);
-						}
-					}));
+							public void resultAvailable(Object source, Object result)
+							{
+								busy.removeFact(provid);
+							}
+							
+							public void exceptionOccurred(Object source, Exception exception)
+							{
+								busy.removeFact(provid);
+							}
+						}));
+					}
 				}
 			}
 		}
 		
-		Collection exfireser = (Collection)SServiceProvider.getServices(getScope().getServiceProvider(), IFireExtinguishService.class).get(this);
-		if(fire>0 && exfireser.size()>0)
+		if(fire>0)
 		{
-			for(Iterator it=exfireser.iterator(); it.hasNext(); )
+			Collection exfireser = (Collection)SServiceProvider.getServices(getScope().getServiceProvider(), IFireExtinguishService.class).get(this);
+			if(exfireser.size()>0)
 			{
-				IFireExtinguishService fes = (IFireExtinguishService)it.next();
-				final Object provid = fes.getServiceIdentifier().getProviderId();
-				if(!busy.containsFact(provid))
+				for(Iterator it=exfireser.iterator(); it.hasNext(); )
 				{
-					busy.addFact(provid);
-					fes.extinguishFire(disaster).addResultListener(createResultListener(new IResultListener()
+					IFireExtinguishService fes = (IFireExtinguishService)it.next();
+					final Object provid = fes.getServiceIdentifier().getProviderId();
+					if(!busy.containsFact(provid))
 					{
-						public void resultAvailable(Object source, Object result)
+						busy.addFact(provid);
+						fes.extinguishFire(disaster).addResultListener(createResultListener(new IResultListener()
 						{
-							busy.removeFact(provid);
-						}
-						
-						public void exceptionOccurred(Object source, Exception exception)
-						{
-							busy.removeFact(provid);
-						}
-					}));
+							public void resultAvailable(Object source, Object result)
+							{
+								busy.removeFact(provid);
+							}
+							
+							public void exceptionOccurred(Object source, Exception exception)
+							{
+								busy.removeFact(provid);
+							}
+						}));
+					}
 				}
 			}
 		}
 		
-		Collection treatvicser = (Collection)SServiceProvider.getServices(getScope().getServiceProvider(), ITreatVictimsService.class).get(this);
-		if(victims>0 && treatvicser.size()>0)
+		if(victims>0)
 		{
-			for(Iterator it=treatvicser.iterator(); it.hasNext(); )
+			Collection treatvicser = (Collection)SServiceProvider.getServices(getScope().getServiceProvider(), ITreatVictimsService.class).get(this);
+			if(treatvicser.size()>0)
 			{
-				ITreatVictimsService tvs = (ITreatVictimsService)it.next();
-				final Object provid = tvs.getServiceIdentifier().getProviderId();
-				if(!busy.containsFact(provid))
+				for(Iterator it=treatvicser.iterator(); it.hasNext(); )
 				{
-					busy.addFact(provid);
-					tvs.treatVictims(disaster).addResultListener(createResultListener(new IResultListener()
+					ITreatVictimsService tvs = (ITreatVictimsService)it.next();
+					final Object provid = tvs.getServiceIdentifier().getProviderId();
+					if(!busy.containsFact(provid))
 					{
-						public void resultAvailable(Object source, Object result)
+						busy.addFact(provid);
+						tvs.treatVictims(disaster).addResultListener(createResultListener(new IResultListener()
 						{
-							busy.removeFact(provid);
-						}
-						
-						public void exceptionOccurred(Object source, Exception exception)
-						{
-							busy.removeFact(provid);
-						}
-					}));
+							public void resultAvailable(Object source, Object result)
+							{
+								busy.removeFact(provid);
+							}
+							
+							public void exceptionOccurred(Object source, Exception exception)
+							{
+								busy.removeFact(provid);
+							}
+						}));
+					}
 				}
 			}
 		}
