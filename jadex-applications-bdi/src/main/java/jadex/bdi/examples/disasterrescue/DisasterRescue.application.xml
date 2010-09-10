@@ -145,8 +145,11 @@
 			<spaces>
 				<env:envspace name="my2dspace" type="2dspace">
 					<env:objects>
-						<!-- Firestation with 3 engines -->
+						<!-- Firestation with 4 engines -->
 						<env:object type="firestation">
+							<env:property name="position">new Vector2Double(0.8, 0.4)</env:property>
+						</env:object>
+						<env:object type="fireengine">
 							<env:property name="position">new Vector2Double(0.8, 0.4)</env:property>
 						</env:object>
 						<env:object type="fireengine">
@@ -159,7 +162,7 @@
 							<env:property name="position">new Vector2Double(0.8, 0.4)</env:property>
 						</env:object>
 						
-						<!-- Firestation with 2 engines -->
+						<!-- Firestation with 3 engines -->
 						<env:object type="firestation">
 							<env:property name="position">new Vector2Double(0.2, 0.7)</env:property>
 						</env:object>
@@ -168,6 +171,9 @@
 						</env:object>
 						<env:object type="fireengine">
 							<env:property name="position">new Vector2Double(0.2, 0.7)</env:property>
+						</env:object>
+						<env:object type="fireengine">
+							<env:property name="position">new Vector2Double(0.8, 0.4)</env:property>
 						</env:object>
 						
 						<!-- Hospital with 5 ambulances -->
@@ -212,7 +218,7 @@
 						<env:dataconsumer name="statistics_chart" class="XYChartDataConsumer">
 							<env:property name="dataprovider">"statistics"</env:property>
 							<env:property name="title">"Disaster Statistics"</env:property>
-							<env:property name="maxitemcount">500</env:property>
+							<!-- <env:property name="maxitemcount">500</env:property> -->
 							<env:property name="legend">true</env:property>
 							
 							<!-- Define series for victims. -->

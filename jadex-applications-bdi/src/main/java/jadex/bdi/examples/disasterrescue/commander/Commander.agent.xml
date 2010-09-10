@@ -36,7 +36,7 @@
 	</beliefs>
 
 	<goals>
-		<achievegoal name="handle_disaster" recur="true" recurdelay="10000000">
+		<achievegoal name="handle_disaster" retry="true" retrydelay="5000" exclude="never">
 			<parameter name="disaster" class="ISpaceObject">
 				<value>$disaster</value>
 			</parameter>

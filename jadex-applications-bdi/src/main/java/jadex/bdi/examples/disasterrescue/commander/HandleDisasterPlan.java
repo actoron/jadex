@@ -24,7 +24,6 @@ public class HandleDisasterPlan extends Plan
 	public void	body()
 	{
 		ISpaceObject disaster = (ISpaceObject)getParameter("disaster").getValue();
-		System.out.println("handle disaster: "+disaster);
 		
 		int chemicals = ((Integer)disaster.getProperty("chemicals")).intValue();
 		int fire = ((Integer)disaster.getProperty("fire")).intValue();

@@ -28,7 +28,7 @@
  			<fact>$beliefbase.environment.getAvatar($scope.getComponentIdentifier(), $scope.getAgentModel().getFullName())</fact>
  		</belief>
  		
- 		<belief name="position" class="IVector2" evaluationmode="push">
+ 		<belief name="position" class="IVector2" evaluationmode="push" exported="true">
 			<fact language="jcl">$beliefbase.myself.position</fact>
  		</belief>
  		
@@ -42,15 +42,7 @@
 		<!-- Move to a certain location. -->
 		<achievegoal name="move" exported="true">
 			<parameter name="destination" class="IVector2"/>
-		</achievegoal>
-		
-		<achievegoal name="go_home">
-			<unique/>
-			<creationcondition>
-				$goalbase.getGoals().length==0 &amp;&amp; 
-				$beliefbase.environment.getDistance($beliefbase.home, $beliefbase.position).getAsDouble()&gt;0.001
-			</creationcondition>
-		</achievegoal>
+		</achievegoal>		
 	</goals>
 
 	<plans>
@@ -62,17 +54,6 @@
 			<body class="MoveToLocationPlan"/>
 			<trigger>
 				<goal ref="move"/>
-			</trigger>
-		</plan>
-		
-		<!-- Go to a destination. -->
-		<plan name="go_home">
-			<parameter name="destination" class="IVector2">
- 				<value>$beliefbase.home</value>
-			</parameter>
-			<body class="MoveToLocationPlan"/>
-			<trigger>
-				<goal ref="go_home"/>
 			</trigger>
 		</plan>
 	</plans>

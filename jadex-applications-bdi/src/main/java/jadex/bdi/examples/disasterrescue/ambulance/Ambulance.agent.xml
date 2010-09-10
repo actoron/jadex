@@ -36,6 +36,11 @@
 			<concrete ref="move.myself"/>
 		</beliefref>
 		
+		<!-- Position belief imported from move capability. -->
+		<beliefref name="position">
+			<concrete ref="move.position"/>
+		</beliefref>
+		
 		<!-- Home location belief imported from move capability. -->
 		<beliefref name="home">
 			<concrete ref="move.home"/>
@@ -47,6 +52,17 @@
 		<achievegoalref name="move">
 			<concrete ref="move.move"/>
 		</achievegoalref>
+		
+		<!-- Goal to move home when nothing else to do. -->
+		<achievegoal name="go_home">
+			<creationcondition>
+				$goalbase.getGoals().length==0 &amp;&amp; $beliefbase.home!=null &amp;&amp; $beliefbase.position!=null &amp;&amp;
+				$beliefbase.environment.getDistance($beliefbase.home, $beliefbase.position).getAsDouble()&gt;0.001
+			</creationcondition>
+			<dropcondition>
+				$goalbase.getGoals().length>1
+			</dropcondition>
+		</achievegoal>
 
 		<!-- Goal to treat victims. -->
 		<achievegoal name="treat_victims" exclude="when_failed">
@@ -61,6 +77,17 @@
 		<!-- Basic ambulance behavior plan. -->
 		<plan name="ambulance_plan">
 			<body class="AmbulancePlan"/>
+		</plan>
+		
+		<!-- Plan for moving home. -->
+		<plan name="go_home_plan">
+			<parameter name="destination" class="ISpaceObject">
+				<value>$beliefbase.home</value>
+			</parameter>
+			<body class="MoveToLocationPlan"/>
+			<trigger>
+				<goal ref="go_home"/>
+			</trigger>
 		</plan>
 		
 		<!-- Plan for treating victims. -->
