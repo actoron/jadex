@@ -298,7 +298,9 @@ public class ViewportJOGL extends AbstractViewport
 		TextRenderer tr = (TextRenderer) textRenderers_.get(font);
 		if (tr == null)
 		{
-			tr = new TextRenderer(font);
+//			tr = new TextRenderer(font);
+			// Activate mipmapping, because renderer otherwise tends to hang.
+			tr = new TextRenderer(font, false, false, null, true);
 			tr.setUseVertexArrays(false);
 			textRenderers_.put(font, tr);
 		}

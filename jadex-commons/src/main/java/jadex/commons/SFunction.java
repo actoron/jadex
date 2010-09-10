@@ -31,4 +31,23 @@ public class SFunction
 		
 		return ret;
 	}
+	
+	/**
+	 *  Calculate the sum of values.
+	 *  @param numbers The numbers (as some form of iterable element).
+	 */
+	public static double sum(Object numbers)
+	{
+		double ret = 0;
+		
+		if(numbers!=null)
+		{
+			for(Iterator it=SReflect.getIterator(numbers); it.hasNext(); )
+			{
+				ret += ((Number)it.next()).doubleValue();
+			}
+		}
+		
+		return ret;
+	}
 }

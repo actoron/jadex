@@ -58,6 +58,18 @@ public class DefaultObjectCreationProcess extends SimplePropertyObject implement
 		this.fetcher = new SimpleValueFetcher();
 		fetcher.setValue("$space", space);
 		fetcher.setValue("$clock", clock);
+
+		// Set back counters to trigger immediate object creation at startup.
+		if(getProperty("tickrate")!=null)
+		{
+			double	rate	= ((Number)getProperty("tickrate")).doubleValue();
+			lasttick	-= rate;
+		}
+		if(getProperty("timerate")!=null)
+		{
+			double	rate	= ((Number)getProperty("timerate")).doubleValue();
+			lasttime	-= rate;
+		}
 	}
 
 	/**

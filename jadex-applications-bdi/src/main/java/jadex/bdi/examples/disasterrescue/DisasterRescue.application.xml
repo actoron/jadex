@@ -20,6 +20,9 @@
 		<import>jadex.application.space.envsupport.math.*</import>
 		<import>jadex.application.space.envsupport.dataview.*</import>
 		<import>jadex.application.space.envsupport.observer.perspective.*</import>
+		<import>jadex.application.space.envsupport.evaluation.*</import>
+		<import>jadex.application.space.envsupport.observer.gui.plugin.*</import>
+		<import>jadex.commons.SFunction</import>
 	</imports>
 	
 	<spacetypes>
@@ -33,11 +36,24 @@
 					<env:property name="fire" class="int"/>
 					<env:property name="chemicals" class="int"/>
 				</env:objecttype>
+
+				<env:objecttype name="firestation"/>
+				<env:objecttype name="fireengine">
+					<env:property name="speed" class="double">0.05</env:property>
+					<env:property name="extinguished" class="double">0</env:property>
+					<env:property name="cleared" class="double">0</env:property>
+				</env:objecttype>
 			</env:objecttypes>
 			
+			<env:tasktypes>
+				<env:tasktype name="move" class="MoveTask" />
+				<env:tasktype name="extinguish_fire" class="ExtinguishFireTask" />
+				<env:tasktype name="clear_chemicals" class="ClearChemicalsTask" />
+			</env:tasktypes>			
+						
 			<env:processtypes>
 				<env:processtype name="create" class="DefaultObjectCreationProcess">
-					<env:property name="tickrate">30</env:property>
+					<env:property name="timerate">30000</env:property>
 					<env:property name="type">"disaster"</env:property>
 					<env:property name="properties" dynamic="true">
 						DisasterType.generateDisaster()
@@ -49,7 +65,10 @@
 				<env:dataview name="all_view" class="GeneralDataView2D" />
 			</env:dataviews>
 			
-						
+			<env:avatarmappings>
+				<env:avatarmapping objecttype="fireengine" componenttype="FireEngine" createavatar="false" createcomponent="true"/>
+			</env:avatarmappings>
+			
 			<env:perspectives>
 				<env:perspective name="icons" class="Perspective2D" opengl="true">
 					<env:drawable objecttype="disaster" width="0.08" height="0.08">
@@ -74,6 +93,14 @@
 						</env:texturedrectangle>
 						<env:text layer="3" x="0.04" y="-0.02" size="6" font="Arial" abssize="true" text="victims: $victims$\nfire: $fire$\nchemicals: $chemicals$" align="left" color="black"/>
 					</env:drawable>
+					
+					<env:drawable objecttype="firestation" width="0.1" height="0.1">
+						<env:texturedrectangle layer="3" height="1" width="1" imagepath="jadex/bdi/examples/disasterrescue/images/firestation.png"/>
+					</env:drawable>
+					
+					<env:drawable objecttype="fireengine" width="0.05" height="0.05">
+						<env:texturedrectangle layer="2" height="1" width="1" imagepath="jadex/bdi/examples/disasterrescue/images/fireengine.png"/>
+					</env:drawable>
 
 					<env:prelayers>
 						<env:tiledlayer width="1" height="1" imagepath="jadex/bdi/examples/disasterrescue/images/map.jpg" />
@@ -88,16 +115,89 @@
 			</env:spaceexecutor>
 		</env:envspacetype>
 	</spacetypes>
+	
+	<componenttypes>
+		<componenttype name="FireEngine" filename="jadex/bdi/examples/disasterrescue/fireengine/FireEngine.agent.xml"/>
+	</componenttypes>
 
 	<applications>
 		<application name="default">
 			<spaces>
 				<env:envspace name="my2dspace" type="2dspace">
+					<env:objects>
+						<!-- Firestation with 3 engines -->
+						<env:object type="firestation">
+							<env:property name="position">new Vector2Double(0.8, 0.4)</env:property>
+						</env:object>
+						<env:object type="fireengine">
+							<env:property name="position">new Vector2Double(0.8, 0.4)</env:property>
+						</env:object>
+						<env:object type="fireengine">
+							<env:property name="position">new Vector2Double(0.8, 0.4)</env:property>
+						</env:object>
+						<env:object type="fireengine">
+							<env:property name="position">new Vector2Double(0.8, 0.4)</env:property>
+						</env:object>
+						
+						<!-- Firestation with 2 engines -->
+						<env:object type="firestation">
+							<env:property name="position">new Vector2Double(0.2, 0.7)</env:property>
+						</env:object>
+						<env:object type="fireengine">
+							<env:property name="position">new Vector2Double(0.2, 0.7)</env:property>
+						</env:object>
+						<env:object type="fireengine">
+							<env:property name="position">new Vector2Double(0.2, 0.7)</env:property>
+						</env:object>
+						
+					</env:objects>
+
 					<env:processes>
 						<env:process type="create"/>
 					</env:processes>
+					
+					<env:dataproviders>
+						<env:dataprovider name="statistics">
+							<env:source name="$victims" objecttype="disaster" aggregate="true">$object.victims</env:source>
+							<env:source name="$fire" objecttype="disaster" aggregate="true">$object.fire</env:source>
+							<env:source name="$chemicals" objecttype="disaster" aggregate="true">$object.chemicals</env:source>
+							<env:data name="time">$time</env:data>
+							<env:data name="victims">SFunction.sum($victims)</env:data>
+							<env:data name="fire">SFunction.sum($fire)</env:data>
+							<env:data name="chemicals">SFunction.sum($chemicals)</env:data>
+						</env:dataprovider>
+					</env:dataproviders>
+			
+					<env:dataconsumers>
+						<env:dataconsumer name="statistics_chart" class="XYChartDataConsumer">
+							<env:property name="dataprovider">"statistics"</env:property>
+							<env:property name="title">"Disaster Statistics"</env:property>
+							<env:property name="maxitemcount">500</env:property>
+							<env:property name="legend">true</env:property>
+							
+							<!-- Define series for victims. -->
+							<env:property name="seriesname_0">"Victims"</env:property>
+							<env:property name="valuex_0">"time"</env:property>
+							<env:property name="valuey_0">"victims"</env:property>
+							
+							<!-- Define series for fire. -->
+							<env:property name="seriesname_1">"Fire"</env:property>
+							<env:property name="valuex_1">"time"</env:property>
+							<env:property name="valuey_1">"fire"</env:property>
+							
+							<!-- Define series for chemicals. -->
+							<env:property name="seriesname_2">"Chemicals"</env:property>
+							<env:property name="valuex_2">"time"</env:property>
+							<env:property name="valuey_2">"chemicals"</env:property>
+						</env:dataconsumer>
+					</env:dataconsumers>
+					
 					<env:observers>
-						<env:observer name="DisasterRescue" dataview="view_all" perspective="icons"/>
+						<env:observer name="DisasterRescue" dataview="view_all" perspective="icons">
+							<env:plugin name="evaluation" class="EvaluationPlugin">
+								<env:property name="component_0">((AbstractChartDataConsumer)$space.getDataConsumer("statistics_chart")).getChartPanel()</env:property>
+							</env:plugin>
+						</env:observer>
 					</env:observers>
 	 			</env:envspace>
 			</spaces>

@@ -1051,18 +1051,6 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 						name = (String)mapping.getComponentName().getValue(getFetcher());
 					}
 					
-					// todo: what about arguments etc.?
-					final IResultListener lis = new IResultListener()
-					{
-						public void resultAvailable(Object source, Object result)
-						{
-							IComponentIdentifier component = (IComponentIdentifier)result;
-							setOwner(ret.getId(), component);
-						}
-						public void exceptionOccurred(Object source, Exception exception)
-						{
-						}
-					};
 					final String compotype = componenttype;
 					SServiceProvider.getServiceUpwards(application.getServiceProvider(), IComponentManagementService.class).addResultListener(new DefaultResultListener()
 					{
@@ -1071,9 +1059,20 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 							IComponentManagementService cms = (IComponentManagementService)result;
 							IComponentIdentifier cid = cms.generateComponentIdentifier(ret.getType());
 							setOwner(ret.getId(), cid);
-							IFuture fut = cms.createComponent(cid.getLocalName(), getContext().getComponentFilename(compotype),
+							IFuture	future	= cms.createComponent(cid.getLocalName(), getContext().getComponentFilename(compotype),
 								new CreationInfo(null, null, getContext().getComponentIdentifier(), false, false, false, getContext().getAllImports()), null);
-							fut.addResultListener(lis);
+							future.addResultListener(new IResultListener()
+							{
+								public void resultAvailable(Object source, Object result)
+								{
+								}
+								
+								public void exceptionOccurred(Object source, Exception exception)
+								{
+									// Todo: propagate exception: kills application!?
+									exception.printStackTrace();
+								}
+							});
 						}
 					});
 				}

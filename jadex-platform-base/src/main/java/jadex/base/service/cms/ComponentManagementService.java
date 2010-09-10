@@ -354,8 +354,32 @@ public abstract class ComponentManagementService extends BasicService implements
 //								e.printStackTrace();
 //								System.out.println("Ex: "+cid+" "+exception);
 								
-								if(killlistener!=null)
-									killlistener.exceptionOccurred(ComponentManagementService.this, exception);
+								CleanupCommand	cc	= null;
+								synchronized(adapters)
+								{
+									synchronized(descs)
+									{
+										adapters.remove(cid);
+										descs.remove(cid);
+										initinfos.remove(cid);										
+										exceptions.remove(cid);
+										cc	= (CleanupCommand)ccs.remove(cid);										
+									}
+								}
+								
+								IResultListener reslis = (IResultListener)killresultlisteners.remove(cid);
+								if(reslis!=null)
+								{
+									reslis.exceptionOccurred(cid, exception);
+								}
+								
+								if(cc!=null && cc.killfutures!=null)
+								{
+									for(int i=0; i<cc.killfutures.size(); i++)
+									{
+										((Future)cc.killfutures.get(i)).setException(exception);
+									}
+								}
 								
 								inited.setException(exception);
 							}
@@ -373,8 +397,8 @@ public abstract class ComponentManagementService extends BasicService implements
 						{
 							synchronized(descs)
 							{
-								// 0: description, 1: adapter, 2: creation info, 3: model
-								initinfos.put(cid, new Object[]{ad, comp[1], cinfo, lmodel});
+								// 0: description, 1: adapter, 2: creation info, 3: model, 4: initfuture
+								initinfos.put(cid, new Object[]{ad, comp[1], cinfo, lmodel, future});
 							}
 						}
 						
@@ -1710,6 +1734,12 @@ public abstract class ComponentManagementService extends BasicService implements
 				exceptions	= new HashMap();
 			
 			exceptions.put(comp, e);
+
+			Object[]	infos = (Object[])initinfos.get(comp);
+			if(infos!=null)
+			{
+				((Future)infos[4]).setException(e);
+			}
 		}
 	}
 	

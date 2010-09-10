@@ -357,7 +357,7 @@ public class NIOTCPTransport implements ITransport
 							}
 							else
 							{
-								logger.warning("Send connection closed: "+addrs[i]);
+//								logger.warning("Send connection closed: "+addrs[i]);
 								break;
 							}
 						}

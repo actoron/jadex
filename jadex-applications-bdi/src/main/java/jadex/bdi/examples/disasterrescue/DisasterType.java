@@ -1,5 +1,10 @@
 package jadex.bdi.examples.disasterrescue;
 
+import jadex.application.space.envsupport.environment.ISpaceObject;
+import jadex.application.space.envsupport.environment.space2d.Space2D;
+import jadex.application.space.envsupport.math.IVector2;
+import jadex.application.space.envsupport.math.Vector2Double;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -148,5 +153,32 @@ public class DisasterType
 		ret.put("fire", new Integer(DISASTER_TYPES[index].getFire()>0 ? (int)((0.75+random.nextDouble()/2)*DISASTER_TYPES[index].getFire()*size): 0));
 		ret.put("chemicals", new Integer(DISASTER_TYPES[index].getChemicals()>0 ? (int)((0.75+random.nextDouble()/2)*DISASTER_TYPES[index].getChemicals()*size): 0));
 		return ret;
+	}
+	
+	/**
+	 *  Get the position of a fire at the given disaster.
+	 */
+	public static IVector2	getFireLocation(ISpaceObject disaster)
+	{
+		IVector2	center	= (IVector2)disaster.getProperty(Space2D.PROPERTY_POSITION);
+		int	size	= ((Number)disaster.getProperty("size")).intValue();
+		double	angle	= random.nextDouble()*Math.PI*2;
+		double	x	= Math.cos(angle)*size/2 * 0.005;	// 0.005 = scale of drawsize in application.xml
+		double	y	= Math.sin(angle)*size/2 * 0.005;	// 0.005 = scale of drawsize in application.xml
+		double	range	= random.nextDouble();
+		
+		// Place fires at inner area of circle
+		x	= x*0.2 + x*0.4*range;
+		y	= x*0.2 + y*0.4*range;
+		
+		return new Vector2Double(center.getXAsDouble()+x, center.getYAsDouble()+y);
+	}
+	
+	/**
+	 *  Get the position of chemicals at the given disaster.
+	 */
+	public static IVector2	getChemicalsLocation(ISpaceObject disaster)
+	{
+		return getFireLocation(disaster);
 	}
 }

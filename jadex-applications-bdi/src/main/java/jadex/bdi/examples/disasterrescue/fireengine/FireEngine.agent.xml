@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	<H3>Fire Engine</H3>
+
+	Moves to fires and extinguishes them.
+	Todo: clear chemicals 
+-->
+<agent xmlns="http://jadex.sourceforge.net/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-bdi
+	                    http://jadex.sourceforge.net/jadex-bdi-2.0.xsd"
+	name="FireEngine"
+	package="jadex.bdi.examples.disasterrescue.fireengine">
+
+	<imports>
+		<import>java.util.*</import>
+		<import>java.util.logging.*</import>
+		<import>jadex.base.fipa.*</import>
+		<import>jadex.application.space.envsupport.environment.*</import>
+		<import>jadex.bdi.examples.disasterrescue.*</import>
+		<import>jadex.bdi.examples.disasterrescue.movement.*</import>
+	</imports>
+
+	<capabilities>
+		<!-- Include the move capability as move for basic movement. -->
+		<capability name="move" file="Movement" />
+	</capabilities>
+
+	<beliefs>
+		<!-- Environment imported inherited from move capability. -->
+		<beliefref name="environment">
+			<concrete ref="move.environment"/>
+		</beliefref>
+		
+		<!-- Myself belief imported from move capability. -->
+		<beliefref name="myself">
+			<concrete ref="move.myself"/>
+		</beliefref>
+	</beliefs>
+
+	<goals>
+		<!-- Move goal imported from capability. -->
+		<achievegoalref name="move">
+			<concrete ref="move.move"/>
+		</achievegoalref>
+	</goals>
+	
+	<plans>
+		<!-- Basic fire engine behavior plan. -->
+		<plan name="fireengine_plan">
+			<body class="FireEnginePlan"/>
+		</plan>
+	</plans>
+	
+	<configurations>
+		<configuration name="default">
+			<plans>
+				<!-- Start fire engine plan when agent is born. -->
+				<initialplan ref="fireengine_plan"/>
+			</plans>
+		</configuration>
+	</configurations>
+
+</agent>

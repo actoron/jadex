@@ -103,9 +103,9 @@ public class TextGLRenderer implements IGLRenderer
 
 //			System.out.println("hier2.3");
 			tr.beginRendering(canvasSize.getXAsInteger(), canvasSize.getYAsInteger());
-//			System.out.println("hier2.4");
+//			System.out.println("vorher: "+SUtil.arrayToString(lines[i])+", "+(xPos + textP.getAlignment(tl))+", "+yPos);
 			tr.draw(lines[i], (int) (xPos + textP.getAlignment(tl)), (int) yPos);
-//			System.out.println("hier2.5");
+//			System.out.println("nachher");
 			tr.endRendering();
 			
 //			System.out.println("hier2.6");
