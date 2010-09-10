@@ -52,7 +52,7 @@
 		<achievegoal name="treat_victims" exclude="when_failed">
 			<parameter name="disaster" class="ISpaceObject"/>
 			<targetcondition>
-				$goal.disaster.victims==0
+				$goal.disaster.victims==0 
 			</targetcondition>
 		</achievegoal>
 	</goals>

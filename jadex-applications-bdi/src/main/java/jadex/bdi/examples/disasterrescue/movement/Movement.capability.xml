@@ -43,7 +43,8 @@
 		<achievegoal name="go_home">
 			<unique/>
 			<creationcondition>
-				$goalbase.getGoals().length==0
+				$goalbase.getGoals().length==0 &amp;&amp; 
+				$beliefbase.environment.getDistance($beliefbase.home, (IVector2)$beliefbase.myself.position).getAsDouble()&gt;0.05
 			</creationcondition>
 		</achievegoal>
 	</goals>
