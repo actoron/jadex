@@ -1,11 +1,15 @@
 package jadex.micro.examples.helpline;
 
+import jadex.commons.SUtil;
+
 /**
- * 
+ *  Simple struct storing information about a person.
  */
 public class InformationEntry implements Comparable
 {
-	/** The person name. */
+	//-------- attributes --------
+	
+	/** The person's name. */
 	protected String name;
 	
 	/** The information. */
@@ -14,6 +18,8 @@ public class InformationEntry implements Comparable
 	/** The date of the information. */
 	protected long date;
 
+	//-------- constructors --------
+	
 	/**
 	 * 
 	 */
@@ -31,9 +37,11 @@ public class InformationEntry implements Comparable
 		this.date = date;
 	}
 
+	//-------- methods --------
+	
 	/**
 	 *  Get the name.
-	 *  @return The name.
+	 *  @return the name.
 	 */
 	public String getName()
 	{
@@ -86,7 +94,35 @@ public class InformationEntry implements Comparable
 	}
 	
 	/**
-	 * 
+	 *  Get the hashcode.
+	 */
+	public int hashCode()
+	{
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((information == null) ? 0 : information.hashCode());
+		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		return result;
+	}
+
+	/**
+	 *  Test if equal to another object.
+	 */
+	public boolean equals(Object obj)
+	{
+		boolean ret = false;
+		if(obj instanceof InformationEntry)
+		{
+			InformationEntry other = (InformationEntry)obj;
+			ret = SUtil.equals(name, other.name) && SUtil.equals(information, other.information);
+				//&& date==other.date;
+		}
+		return ret;
+	}
+
+	/**
+	 *  Compare this entry to another one.
 	 */
 	public int compareTo(Object o)
 	{

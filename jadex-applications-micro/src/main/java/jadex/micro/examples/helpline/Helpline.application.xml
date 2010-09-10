@@ -6,9 +6,10 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-application 
 	                    http://jadex.sourceforge.net/jadex-application-2.0.xsd"
-	name="Helpline" package="jadex.mico.examples.helpline">
+	name="Helpline" package="jadex.micro.examples.helpline">
 	
 	<imports>
+		<import>jadex.commons.service.clock.IClockService</import>
 		<import>jadex.commons.service.SServiceProvider</import>
 		<import>jadex.commons.IFuture</import>
 	</imports>
@@ -17,10 +18,27 @@
 		<componenttype name="HelplineAgent" filename="jadex/micro/examples/helpline/HelplineAgent.class"/>
 	</componenttypes>
 	
+	<properties>
+		<property name="clock" class="IFuture">
+			SServiceProvider.getService($component.getServiceProvider(), IClockService.class)
+		</property>
+	</properties>
+	
 	<applications>
 		<application name="1 Helpline Agent">
 			<components>
-				<component type="HelplineAgent"/>
+				<component type="HelplineAgent">
+					<arguments>
+						<argument name="infos">
+							new InformationEntry[]
+							{
+								new InformationEntry("Lennie Lost", "First aid given at Hummel square.", $properties.clock.getTime()-2*60*60*1000),
+								new InformationEntry("Lennie Lost", "Brought to collection point.", $properties.clock.getTime()-1*60*60*1000),
+								new InformationEntry("Lennie Lost", "Savely reached Mainville Hospital.", $properties.clock.getTime())
+							}
+						</argument>
+					</arguments>
+				</component>
 			</components>
  		</application>
 	</applications>

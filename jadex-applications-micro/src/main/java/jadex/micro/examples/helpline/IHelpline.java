@@ -3,14 +3,16 @@ package jadex.micro.examples.helpline;
 import jadex.commons.IFuture;
 
 /**
- * 
+ *  Basic interface for helpline.
+ *  Allows to get local information about a person and
+ *  add information about a person.
  */
 public interface IHelpline
 {
 	/**
-	 *  Get all information about a person.
+	 *  Get all locally stored information about a person.
 	 *  @param name The person's name.
-	 *  @return Future that contains the information.
+	 *  @return Future that contains all information records as collection.
 	 */
 	public IFuture getInformation(String name);
 	
@@ -20,11 +22,4 @@ public interface IHelpline
 	 *  @param info The information.
 	 */
 	public void addInformation(String name, String info);
-	
-	/**
-	 *  Get all locally stored information about a person.
-	 *  @param name The person's name.
-	 *  @return Future that contains the information.
-	 */
-	public IFuture getLocalInformation(String name);
 }

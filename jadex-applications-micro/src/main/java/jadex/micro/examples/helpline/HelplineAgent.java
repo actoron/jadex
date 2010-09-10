@@ -2,13 +2,10 @@ package jadex.micro.examples.helpline;
 
 import jadex.bridge.Argument;
 import jadex.bridge.IArgument;
-import jadex.commons.Future;
-import jadex.commons.IFuture;
+import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.collection.MultiCollection;
-import jadex.commons.concurrent.CollectionResultListener;
 import jadex.commons.concurrent.DefaultResultListener;
-import jadex.commons.concurrent.IResultListener;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.clock.IClockService;
 import jadex.micro.MicroAgent;
@@ -20,79 +17,36 @@ import java.util.Iterator;
 import java.util.TreeSet;
 
 /**
- * 
+ *  Helpline micro agent. 
  */
 public class HelplineAgent extends MicroAgent
 {
+	//-------- attributes --------
+	
 	/** The map of information. */
 	protected MultiCollection infos;
+	
+	//-------- methods --------
 	
 	/**
 	 *  Called once after agent creation.
 	 */
 	public void agentCreated()
 	{
-		this.infos = new MultiCollection(new HashMap(), TreeSet.class);
+//		this.infos = new MultiCollection(new HashMap(), TreeSet.class);
+		this.infos = new MultiCollection();
+		Object ini = getArgument("infos");
+		if(ini!=null && SReflect.isIterable(ini))
+		{
+			for(Iterator it=SReflect.getIterator(ini); it.hasNext(); )
+			{
+				InformationEntry ie = (InformationEntry)it.next();
+				infos.put(ie.getName(), ie);
+			}
+		}
 		addService(new HelplineService(getExternalAccess()));
 	}
-	
-	/**
-	 *  Get all information about a person.
-	 *  @param name The person's name.
-	 *  @return Future that contains the information.
-	 */
-	public IFuture getInformation(final String name)
-	{
-		final Future ret = new Future();
 		
-		SServiceProvider.getService(getServiceProvider(), IHelpline.class, true, true)
-			.addResultListener(createResultListener(new IResultListener()
-		{
-			public void resultAvailable(Object source, Object result)
-			{
-				if(result!=null)
-				{
-					Collection coll = (Collection)result;
-					CollectionResultListener crl = new CollectionResultListener(
-						coll.size(), true, new DefaultResultListener()
-					{
-						public void resultAvailable(Object source, Object result)
-						{
-							if(result!=null)
-							{
-								Collection tmp = (Collection)result;
-								Iterator it = tmp.iterator();
-								TreeSet all = (TreeSet)it.next();
-								for(; it.hasNext(); )
-								{
-									TreeSet part = (TreeSet)it.next();
-									all.addAll(part);
-								}
-								ret.setResult(all);
-							}
-							else
-							{
-								ret.setResult(null);
-							}
-						}
-					});
-					for(Iterator it=coll.iterator(); it.hasNext(); )
-					{
-						IHelpline hl = (IHelpline)it.next();
-						hl.getLocalInformation(name).addResultListener(crl);
-					}
-				}
-			}
-			
-			public void exceptionOccurred(Object source, Exception exception)
-			{
-				ret.setException(exception);
-			}
-		}));
-			
-		return ret;
-	}
-	
 	/**
 	 *  Add an information about a person.
 	 *  @param name The person's name.
@@ -116,9 +70,9 @@ public class HelplineAgent extends MicroAgent
 	 *  @param name The person's name.
 	 *  @return Future that contains the information.
 	 */
-	public TreeSet getLocalInformation(String name)
+	public Collection getInformation(String name)
 	{
-		return (TreeSet)infos.get(name);
+		return (Collection)infos.get(name);
 	}
 	
 	//-------- static methods --------
@@ -129,7 +83,8 @@ public class HelplineAgent extends MicroAgent
 	public static MicroAgentMetaInfo getMetaInfo()
 	{
 		return new MicroAgentMetaInfo("This agent offers a helpline for getting information about missing persons.", null, 
-			null, null, null, SUtil.createHashMap(new String[]{"componentviewer.viewerclass"}, new Object[]{"jadex.micro.examples.helpline.HelplineViewerPanel"}));
+			new IArgument[]{new Argument("infos", "Initial information records.", "InformationEntry[]")}
+			, null, null, SUtil.createHashMap(new String[]{"componentviewer.viewerclass"}, new Object[]{"jadex.micro.examples.helpline.HelplineViewerPanel"}));
 	}
 
 }

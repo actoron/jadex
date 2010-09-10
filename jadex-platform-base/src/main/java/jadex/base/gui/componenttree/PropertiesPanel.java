@@ -83,7 +83,7 @@ public class PropertiesPanel	extends	JPanel
 	/**
 	 *  Create a text field and add it to the panel.
 	 */
-	protected void	createTextField(String name)
+	public void	createTextField(String name)
 	{
 		JTextField	tf	= new JTextField();
 		tf.setEditable(false);
@@ -93,7 +93,7 @@ public class PropertiesPanel	extends	JPanel
 	/**
 	 *  Create a check box and add it to the panel.
 	 */
-	protected void	createCheckBox(String name)
+	public void	createCheckBox(String name)
 	{
 		JCheckBox	cb	= new JCheckBox("");
 		cb.setMargin(new Insets(0,0,0,0));
@@ -104,7 +104,7 @@ public class PropertiesPanel	extends	JPanel
 	/**
 	 *  Add a component
 	 */
-	protected void	addComponent(String name, JComponent comp)
+	public void	addComponent(String name, JComponent comp)
 	{
 		components.put(name, comp);
 
@@ -129,7 +129,7 @@ public class PropertiesPanel	extends	JPanel
 	 *  Add a component that spans a full line.
 	 *  No label is rendered.
 	 */
-	protected void	addFullLineComponent(String name, JComponent comp)
+	public void	addFullLineComponent(String name, JComponent comp)
 	{
 		components.put(name, comp);
 

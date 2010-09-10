@@ -10,15 +10,19 @@ import jadex.commons.service.BasicService;
 import jadex.micro.IMicroExternalAccess;
 
 /**
- * 
+ *  Helpline service implementation.
  */
 public class HelplineService extends BasicService implements IHelpline
 {
+	//-------- attributes --------
+	
 	/** The agent. */
 	protected IMicroExternalAccess agent;
 	
+	//-------- constructors --------
+	
 	/**
-	 * 
+	 *  Create a new helpline service.
 	 */
 	public HelplineService(IExternalAccess agent)
 	{
@@ -26,23 +30,7 @@ public class HelplineService extends BasicService implements IHelpline
 		this.agent = (IMicroExternalAccess)agent;
 	}
 	
-	/**
-	 *  Get all information about a person.
-	 *  @param name The person's name.
-	 *  @return Future that contains the information.
-	 */
-	public IFuture getInformation(final String name)
-	{
-		final Future ret = new Future();
-		agent.scheduleResultStep(new IResultCommand()
-		{
-			public Object execute(Object args)
-			{
-				return ((HelplineAgent)args).getInformation(name);
-			}
-		}).addResultListener(new DelegationResultListener(ret));
-		return ret;
-	}
+	//-------- methods --------
 	
 	/**
 	 *  Add an information about a person.
@@ -65,16 +53,25 @@ public class HelplineService extends BasicService implements IHelpline
 	 *  @param name The person's name.
 	 *  @return Future that contains the information.
 	 */
-	public IFuture getLocalInformation(final String name)
+	public IFuture getInformation(final String name)
 	{
 		final Future ret = new Future();
 		agent.scheduleResultStep(new IResultCommand()
 		{
 			public Object execute(Object args)
 			{
-				return ((HelplineAgent)args).getLocalInformation(name);
+				return ((HelplineAgent)args).getInformation(name);
 			}
 		}).addResultListener(new DelegationResultListener(ret));
 		return ret;
+	}
+
+	/**
+	 *  Get the string representation.
+	 *  @return The string representation.
+	 */
+	public String toString()
+	{
+		return "HelplineService, "+agent.getComponentIdentifier();
 	}
 }

@@ -1,61 +1,55 @@
 package jadex.micro.examples.helpline;
 
+import jadex.commons.Future;
+import jadex.commons.IFuture;
+import jadex.commons.SGUI;
+import jadex.commons.concurrent.CollectionResultListener;
+import jadex.commons.concurrent.DefaultResultListener;
+import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
+import jadex.commons.jtable.DateTimeRenderer;
 import jadex.commons.service.SServiceProvider;
 import jadex.micro.IMicroExternalAccess;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.text.NumberFormat;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.DefaultListSelectionModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
-import javax.swing.SwingUtilities;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 
 /**
- *  Customer gui that allows buying items at different shops.
+ *  Helpline gui that allows searching for person info and adding new info.
  */
 public class HelplinePanel extends JPanel
 {
 	//-------- attributes --------
 	
+	/** The external access of the agent. */
 	protected IMicroExternalAccess agent;
-	protected List shoplist = new ArrayList();
-	protected JCheckBox remote;
-	protected JTable infotable;
-	protected AbstractTableModel infomodel = new ItemTableModel(shoplist);
-	
-	protected List invlist = new ArrayList();
-	protected AbstractTableModel invmodel = new ItemTableModel(invlist);
-	protected JTable invtable;
 	
 	//-------- constructors --------
 	
@@ -65,137 +59,246 @@ public class HelplinePanel extends JPanel
 	public HelplinePanel(final IMicroExternalAccess agent)
 	{
 		this.agent = agent;
+		this.setLayout(new BorderLayout());
 		
-		final JComboBox helplinescombo = new JComboBox();
-		helplinescombo.addItem("none");
-		helplinescombo.addItemListener(new ItemListener()
+		JPanel phelp = new JPanel(new BorderLayout());
+		
+		JPanel pget = new JPanel(new GridBagLayout());
+		pget.setBorder(new TitledBorder(new EtchedBorder(), "Search Options"));
+		final JTextField tfname = new JTextField("Lennie Lost");
+		final JButton bsearchinfo = new JButton("Search");
+		final JCheckBox cbremoteinfo = new JCheckBox("Remote");
+		pget.add(new JLabel("Person's name"), new GridBagConstraints(0, 0, 1, 1, 0, 0, 
+			GridBagConstraints.EAST, GridBagConstraints.VERTICAL, new Insets(1,2,1,2), 0, 0));
+		pget.add(tfname, new GridBagConstraints(1, 0, 1, 1, 1, 0, 
+			GridBagConstraints.EAST, GridBagConstraints.BOTH, new Insets(1,2,1,2), 0, 0));
+//		pget.add(new JLabel("Remote"), new GridBagConstraints(2, 0, 1, 1, 0, 0, 
+//			GridBagConstraints.EAST, GridBagConstraints.VERTICAL, new Insets(1,2,1,2), 0, 0));
+		pget.add(cbremoteinfo, new GridBagConstraints(2, 0, 1, 1, 0, 0, 
+			GridBagConstraints.EAST, GridBagConstraints.VERTICAL, new Insets(1,2,1,2), 0, 0));
+		pget.add(bsearchinfo, new GridBagConstraints(3, 0, 1, 1, 0, 0, 
+			GridBagConstraints.EAST, GridBagConstraints.VERTICAL, new Insets(1,2,1,2), 0, 0));
+		
+		final List infolist = new ArrayList();
+		final JTable infotable;
+		final AbstractTableModel infomodel = new InfoTableModel(infolist);
+		
+		bsearchinfo.addActionListener(new ActionListener()
 		{
-			public void itemStateChanged(ItemEvent e)
+			public void actionPerformed(ActionEvent e)
 			{
-				if(helplinescombo.getSelectedItem() instanceof IHelpline)
-					refresh((IHelpline)helplinescombo.getSelectedItem());
-			}
-		});
-		
-		remote = new JCheckBox("Remote");
-		remote.setToolTipText("Also search remote platforms for shops.");
-		final JButton searchbut = new JButton("Search");
-		searchbut.addActionListener(new ActionListener()
-		{
-		    public void actionPerformed(ActionEvent e)
-		    {
-		    	searchbut.setEnabled(false);
-		    	SServiceProvider.getServices(agent.getServiceProvider(), IHelpline.class, remote.isSelected(), true)
-					.addResultListener(new SwingDefaultResultListener(HelplinePanel.this)
+				bsearchinfo.setEnabled(false);
+				getInformation(tfname.getText(), cbremoteinfo.isSelected()).addResultListener(new SwingDefaultResultListener()
 				{
 					public void customResultAvailable(Object source, Object result)
 					{
-				    	searchbut.setEnabled(true);
-						System.out.println("Helpline search result: "+result);
-						Collection coll = (Collection)result;
-						((DefaultComboBoxModel)helplinescombo.getModel()).removeAllElements();
-						if(coll!=null && coll.size()>0)
-						{
-							for(Iterator it=coll.iterator(); it.hasNext(); )
-							{
-								IHelpline hl = (IHelpline)it.next();
-								((DefaultComboBoxModel)helplinescombo.getModel()).addElement(hl);
-							}
-						}
-						else
-						{
-							((DefaultComboBoxModel)helplinescombo.getModel()).addElement("none");
-						}					
+						infolist.clear();
+						if(result!=null)
+							infolist.addAll((Collection)result);
+						infomodel.fireTableDataChanged();
+						bsearchinfo.setEnabled(true);
 					}
 					
 					public void customExceptionOccurred(Object source, Exception exception)
 					{
-				    	searchbut.setEnabled(true);
 						super.customExceptionOccurred(source, exception);
+						bsearchinfo.setEnabled(true);
 					}
 				});
-		    }
-		});
-		
-		JPanel selpanel = new JPanel(new GridBagLayout());
-		selpanel.setBorder(new TitledBorder(new EtchedBorder(), "Properties"));
-		int x=0;
-		int y=0;
-		x++;
-		selpanel.add(new JLabel("Available helplines: "), new GridBagConstraints(
-			x,y,1,1,0,0,GridBagConstraints.EAST,GridBagConstraints.NONE,new Insets(2,2,2,2),0,0));
-		x++;
-		selpanel.add(helplinescombo, new GridBagConstraints(
-			x,y,1,1,0,0,GridBagConstraints.WEST,GridBagConstraints.HORIZONTAL,new Insets(2,2,2,2),0,0));
-		x++;
-		selpanel.add(searchbut, new GridBagConstraints(
-			x,y,1,1,0,0,GridBagConstraints.WEST,GridBagConstraints.NONE,new Insets(2,2,2,2),0,0));
-		x++;
-		selpanel.add(remote, new GridBagConstraints(
-			x,y,1,1,0,0,GridBagConstraints.WEST,GridBagConstraints.NONE,new Insets(2,2,2,2),0,0));
-		
-		JPanel shoppanel = new JPanel(new BorderLayout());
-		shoppanel.setBorder(new TitledBorder(new EtchedBorder(), "Shop Catalog"));
-		infotable = new JTable(infomodel);
-		infotable.setPreferredScrollableViewportSize(new Dimension(600, 120));
-		infotable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		shoppanel.add(BorderLayout.CENTER, new JScrollPane(infotable));
-
-		JPanel invpanel = new JPanel(new BorderLayout());
-		invpanel.setBorder(new TitledBorder(new EtchedBorder(), "Customer Inventory"));
-		invtable = new JTable(invmodel);
-		invtable.setPreferredScrollableViewportSize(new Dimension(600, 120));
-		invpanel.add(BorderLayout.CENTER, new JScrollPane(invtable));
-
-		JPanel butpanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-//		butpanel.setBorder(new TitledBorder(new EtchedBorder(), "Actions"));
-		JButton add = new JButton("Add");
-		final JTextField item = new JTextField(8);
-		item.setEditable(false);
-		butpanel.add(new JLabel("Selected item:"));
-		butpanel.add(item);
-		butpanel.add(add);
-		add.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
 			}
 		});
 		
-		infotable.getSelectionModel().addListSelectionListener(new ListSelectionListener()
+		phelp.add(pget, BorderLayout.NORTH);
+		
+		JPanel infopanel = new JPanel(new BorderLayout());
+		infopanel.setBorder(new TitledBorder(new EtchedBorder(), "Person Information"));
+		infotable = new JTable(infomodel);
+		infotable.setPreferredScrollableViewportSize(new Dimension(600, 120));
+		infotable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		infotable.setDefaultRenderer(Date.class, new DateTimeRenderer());
+		infopanel.add(BorderLayout.CENTER, new JScrollPane(infotable));
+		
+		phelp.add(infopanel, BorderLayout.CENTER);
+		
+		JPanel padd = new JPanel(new BorderLayout());
+		padd.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), "Add Information Entry "));
+		JPanel pss = new JPanel(new GridBagLayout());
+	
+		final JComboBox cbselser = new JComboBox(); 
+		final JCheckBox cbremoteser = new JCheckBox("Remote");
+		final JButton bsearchser = new JButton("Search");
+		JLabel selsl = new JLabel("Select service");
+		pss.add(selsl, new GridBagConstraints(0, 0, 1, 1, 0, 0, 
+			GridBagConstraints.EAST, GridBagConstraints.VERTICAL, new Insets(1,2,1,2), 0, 0));
+		pss.add(cbselser,  new GridBagConstraints(1, 0, 1, 1, 1, 0, 
+			GridBagConstraints.EAST, GridBagConstraints.BOTH, new Insets(1,2,1,2), 0, 0));
+		pss.add(cbremoteser, new GridBagConstraints(2, 0, 1, 1, 0, 0, 
+			GridBagConstraints.EAST, GridBagConstraints.VERTICAL, new Insets(1,2,1,2), 0, 0));
+		pss.add(bsearchser, new GridBagConstraints(3, 0, 1, 1, 0, 0, 
+			GridBagConstraints.EAST, GridBagConstraints.VERTICAL, new Insets(1,2,1,2), 0, 0));;
+		
+		bsearchser.addActionListener(new ActionListener() 
 		{
-			public void valueChanged(ListSelectionEvent e)
+			public void actionPerformed(ActionEvent e) 
 			{
-				int sel = infotable.getSelectedRow();
-				if(sel!=-1)
+				refreshServicesCombo(cbselser, cbremoteser.isSelected());
+			}
+		});
+		
+		padd.add(pss, BorderLayout.NORTH);
+		
+		final JPanel pinfoentry = new JPanel(new GridBagLayout());
+		JLabel lname = new JLabel("Name");
+		lname.setPreferredSize(selsl.getPreferredSize());
+		pinfoentry.add(lname, new GridBagConstraints(0, 0, 1, 1, 0, 0, 
+			GridBagConstraints.EAST, GridBagConstraints.BOTH, new Insets(1,2,1,2), 0, 0));
+		final JTextField tfpname = new JTextField("Lennie Lost");
+		pinfoentry.add(tfpname, new GridBagConstraints(1, 0, 1, 1, 1, 0, 
+			GridBagConstraints.EAST, GridBagConstraints.BOTH, new Insets(1,2,1,2), 0, 0));
+		pinfoentry.add(new JLabel("Information"), new GridBagConstraints(2, 0, 1, 1, 0, 0, 
+			GridBagConstraints.EAST, GridBagConstraints.VERTICAL, new Insets(1,12,1,2), 0, 0));
+		final JTextField tfpinfo = new JTextField(8);
+		pinfoentry.add(tfpinfo, new GridBagConstraints(3, 0, 1, 1, 3, 0, 
+			GridBagConstraints.EAST, GridBagConstraints.BOTH, new Insets(1,2,1,2), 0, 0));
+		final JButton badd = new JButton("Add");
+		badd.setPreferredSize(bsearchser.getPreferredSize());
+		badd.setEnabled(false);
+		pinfoentry.add(badd, new GridBagConstraints(4, 0, 1, 1, 0, 0, 
+			GridBagConstraints.EAST, GridBagConstraints.VERTICAL, new Insets(1,2,1,2), 0, 0));
+		
+		badd.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				IHelpline hl = (IHelpline)cbselser.getSelectedItem();
+				if(hl!=null)
 				{
-					item.setText(""+infomodel.getValueAt(sel, 0));
+					hl.addInformation(tfpname.getText(), tfpinfo.getText());
 				}
 			}
 		});
 		
-		setLayout(new GridBagLayout());
-		x=0;
-		y=0;
-		add(selpanel, new GridBagConstraints(
-			x,y++,1,1,0,0,GridBagConstraints.WEST,GridBagConstraints.BOTH,new Insets(2,2,2,2),0,0));
-		add(shoppanel, new GridBagConstraints(
-			x,y++,1,1,1,1,GridBagConstraints.WEST,GridBagConstraints.BOTH,new Insets(2,2,2,2),0,0));
-		add(invpanel, new GridBagConstraints(
-			x,y++,1,1,1,1,GridBagConstraints.WEST,GridBagConstraints.BOTH,new Insets(2,2,2,2),0,0));
-		add(butpanel, new GridBagConstraints(
-			x,y++,1,1,0,0,GridBagConstraints.WEST,GridBagConstraints.BOTH,new Insets(2,2,2,2),0,0));
+		cbselser.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				IHelpline hl = (IHelpline)cbselser.getSelectedItem();
+				if(hl!=null)
+				{
+					badd.setEnabled(true);
+				}
+				else
+				{
+					badd.setEnabled(false);
+				}
+			}
+		});
 		
-//		refresh();
+		padd.add(pinfoentry, BorderLayout.CENTER);
+		
+		phelp.add(padd, BorderLayout.SOUTH);
+		
+		this.add(phelp, BorderLayout.CENTER);
+		
+		refreshServicesCombo(cbselser, cbremoteser.isSelected());
+	}
+	
+	/**
+	 *  Refresh the service combo box.
+	 */
+	protected void refreshServicesCombo(final JComboBox selcb, boolean remote)
+	{
+		SServiceProvider.getServices(agent.getServiceProvider(), IHelpline.class, remote, true)
+			.addResultListener(new SwingDefaultResultListener(HelplinePanel.this) 
+		{
+			public void customResultAvailable(Object source, Object result) 
+			{
+				Collection newservices = (Collection)result;
+				
+				selcb.removeAllItems();
+				if(newservices!=null)
+				{
+					for(Iterator it=newservices.iterator(); it.hasNext(); )
+					{
+						selcb.addItem(it.next());
+					}
+				}
+			}
+		});
+	}
+	
+	/**
+	 *  Get all information about a person.
+	 *  @param name The person's name.
+	 *  @return Future that contains the information.
+	 */
+	public IFuture getInformation(final String name, boolean remote)
+	{
+		final Future ret = new Future();
+		
+		SServiceProvider.getServices(agent.getServiceProvider(), IHelpline.class, remote, true)
+			.addResultListener(new IResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				if(result!=null)
+				{
+					Collection coll = (Collection)result;
+					CollectionResultListener crl = new CollectionResultListener(
+						coll.size(), true, new DefaultResultListener()
+					{
+						public void resultAvailable(Object source, Object result)
+						{
+							if(result!=null)
+							{
+								Collection tmp = (Collection)result;
+								Iterator it = tmp.iterator();
+								List all = new ArrayList();
+								for(; it.hasNext(); )
+								{
+									Collection part = (Collection)it.next();
+									for(Iterator it2=part.iterator(); it2.hasNext(); )
+									{
+										Object next = it2.next();
+										if(next instanceof InformationEntry && !all.contains(next))
+											all.add(next);
+									}
+								}
+								// Sorts the list by date.
+								Collections.sort(all);
+								
+								ret.setResult(all);
+							}
+							else
+							{
+								ret.setResult(null);
+							}
+						}
+					});
+					for(Iterator it=coll.iterator(); it.hasNext(); )
+					{
+						IHelpline hl = (IHelpline)it.next();
+						hl.getInformation(name).addResultListener(crl);
+					}
+				}
+			}
+			
+			public void exceptionOccurred(Object source, Exception exception)
+			{
+				ret.setException(exception);
+			}
+		});
+			
+		return ret;
 	}
 	
 	/**
 	 *  Create a customer gui frame.
-	 * /
-	public static void createCustomerGui(final IBDIExternalAccess agent)
+	 */
+	public static void createHelplineGui(final IMicroExternalAccess agent)
 	{
 		final JFrame f = new JFrame();
-		f.add(new CustomerPanel(agent));
+		f.add(new HelplinePanel(agent));
 		f.pack();
 		f.setLocation(SGUI.calculateMiddlePosition(f));
 		f.setVisible(true);
@@ -203,71 +306,19 @@ public class HelplinePanel extends JPanel
 		{
 			public void windowClosing(WindowEvent e)
 			{
-				agent.killAgent();
+				agent.killComponent();
 			}
 		});
-		agent.addAgentListener(new IAgentListener() 
-		{
-			public void agentTerminating(AgentEvent ae) 
-			{
-				f.setVisible(false);
-				f.dispose();
-			}
-			
-			public void agentTerminated(AgentEvent ae) 
-			{
-			}
-		});
-	}*/
-	
-	/**
-	 * Method to be called when goals may have changed.
-	 */
-	public void refresh(IHelpline hl)
-	{
-		if(hl!=null)
-		{
-//			hl.get.addResultListener(new SwingDefaultResultListener(HelplinePanel.this)
-//			{
-//				public void customResultAvailable(Object source, Object result)
-//				{
-//					int sel = infotable.getSelectedRow();
-//					ItemInfo[] aitems = (ItemInfo[])result;
-//					shoplist.clear();
-//					for(int i = 0; i < aitems.length; i++)
-//					{
-//						if(!shoplist.contains(aitems[i]))
-//						{
-////							System.out.println("added: "+aitems[i]);
-//							shoplist.add(aitems[i]);
-//						}
-//					}
-//					infomodel.fireTableDataChanged();
-//					if(sel!=-1 && sel<aitems.length)
-//						((DefaultListSelectionModel)infotable.getSelectionModel()).setSelectionInterval(sel, sel);
-//				}
-//			});
-		}
-		else
-		{
-			SwingUtilities.invokeLater(new Runnable()
-			{
-				public void run()
-				{
-					shoplist.clear();
-					infomodel.fireTableDataChanged();
-				}
-			});
-		}
-	}
 		
+		// todo: micro listener
+	}
 }
 
-class ItemTableModel extends AbstractTableModel
+class InfoTableModel extends AbstractTableModel
 {
 	protected List list;
 	
-	public ItemTableModel(List list)
+	public InfoTableModel(List list)
 	{
 		this.list = list;
 	}
@@ -287,7 +338,7 @@ class ItemTableModel extends AbstractTableModel
 		switch(column)
 		{
 			case 0:
-				return "Name";
+				return "Date and Time";
 			case 1:
 				return "Information";
 			default:
@@ -306,12 +357,27 @@ class ItemTableModel extends AbstractTableModel
 		InformationEntry ie = (InformationEntry)list.get(row);
 		if(column == 0)
 		{
-			value = ie.getName();
+			value = new Date(ie.getDate());
 		}
 		else if(column == 1)
 		{
 			value = ie.getInformation();
 		}
+		
 		return value;
+	}
+	
+	public Class getColumnClass(int column)
+	{
+		Class ret = Object.class;
+		if(column == 0)
+		{
+			ret = Date.class;
+		}
+		else if(column == 1)
+		{
+			ret = String.class;
+		}
+		return ret;
 	}
 };
