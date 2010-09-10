@@ -37,7 +37,8 @@ public class HandleDisasterPlan extends Plan
 			Collection clearchemser = (Collection)SServiceProvider.getServices(getScope().getServiceProvider(), IClearChemicalsService.class).get(this);
 			if(clearchemser.size()>0)
 			{
-				for(Iterator it=clearchemser.iterator(); it.hasNext(); )
+				Iterator it=clearchemser.iterator();
+				for(int i=0; i<chemicals && it.hasNext(); i++)
 				{
 					IClearChemicalsService ccs = (IClearChemicalsService)it.next();
 					final Object provid = ccs.getServiceIdentifier().getProviderId();
@@ -66,7 +67,8 @@ public class HandleDisasterPlan extends Plan
 			Collection exfireser = (Collection)SServiceProvider.getServices(getScope().getServiceProvider(), IExtinguishFireService.class).get(this);
 			if(exfireser.size()>0)
 			{
-				for(Iterator it=exfireser.iterator(); it.hasNext(); )
+				Iterator it=exfireser.iterator();
+				for(int i=0; i<fire && it.hasNext(); i++)
 				{
 					IExtinguishFireService fes = (IExtinguishFireService)it.next();
 					final Object provid = fes.getServiceIdentifier().getProviderId();
@@ -95,7 +97,8 @@ public class HandleDisasterPlan extends Plan
 			Collection treatvicser = (Collection)SServiceProvider.getServices(getScope().getServiceProvider(), ITreatVictimsService.class).get(this);
 			if(treatvicser.size()>0)
 			{
-				for(Iterator it=treatvicser.iterator(); it.hasNext(); )
+				Iterator it=treatvicser.iterator();
+				for(int i=0; i<victims && it.hasNext(); i++)
 				{
 					ITreatVictimsService tvs = (ITreatVictimsService)it.next();
 					final Object provid = tvs.getServiceIdentifier().getProviderId();
