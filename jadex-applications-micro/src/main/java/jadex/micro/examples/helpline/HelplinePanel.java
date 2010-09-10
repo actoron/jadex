@@ -1,12 +1,8 @@
-package jadex.bdi.examples.shop;
+package jadex.micro.examples.helpline;
 
-import jadex.bdi.runtime.AgentEvent;
-import jadex.bdi.runtime.IBDIExternalAccess;
-import jadex.bdi.runtime.IBeliefListener;
-import jadex.bdi.runtime.IBeliefSetListener;
-import jadex.bdi.runtime.IEAGoal;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.commons.service.SServiceProvider;
+import jadex.micro.IMicroExternalAccess;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -47,42 +43,37 @@ import javax.swing.table.AbstractTableModel;
 /**
  *  Customer gui that allows buying items at different shops.
  */
-public class CustomerPanel extends JPanel
+public class HelplinePanel extends JPanel
 {
 	//-------- attributes --------
 	
-	protected IBDIExternalAccess agent;
+	protected IMicroExternalAccess agent;
 	protected List shoplist = new ArrayList();
 	protected JCheckBox remote;
-	protected JTable shoptable;
-	protected AbstractTableModel shopmodel = new ItemTableModel(shoplist);
+	protected JTable infotable;
+	protected AbstractTableModel infomodel = new ItemTableModel(shoplist);
 	
 	protected List invlist = new ArrayList();
 	protected AbstractTableModel invmodel = new ItemTableModel(invlist);
 	protected JTable invtable;
-	protected Map	shops;
 	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new gui.
 	 */
-	public CustomerPanel(final IBDIExternalAccess agent)
+	public HelplinePanel(final IMicroExternalAccess agent)
 	{
-//		super(agent.getComponentName());
 		this.agent = agent;
-		this.shops	= new HashMap();
 		
-		final JComboBox shopscombo = new JComboBox();
-		shopscombo.addItem("none");
-		shopscombo.addItemListener(new ItemListener()
+		final JComboBox helplinescombo = new JComboBox();
+		helplinescombo.addItem("none");
+		helplinescombo.addItemListener(new ItemListener()
 		{
 			public void itemStateChanged(ItemEvent e)
 			{
-				if(shops.get(shopscombo.getSelectedItem()) instanceof IShop)
-				{
-					refresh((IShop)shops.get(shopscombo.getSelectedItem()));
-				}
+				if(helplinescombo.getSelectedItem() instanceof IHelpline)
+					refresh((IHelpline)helplinescombo.getSelectedItem());
 			}
 		});
 		
@@ -94,28 +85,26 @@ public class CustomerPanel extends JPanel
 		    public void actionPerformed(ActionEvent e)
 		    {
 		    	searchbut.setEnabled(false);
-		    	SServiceProvider.getServices(agent.getServiceProvider(), IShop.class, remote.isSelected(), true)
-					.addResultListener(new SwingDefaultResultListener(CustomerPanel.this)
+		    	SServiceProvider.getServices(agent.getServiceProvider(), IHelpline.class, remote.isSelected(), true)
+					.addResultListener(new SwingDefaultResultListener(HelplinePanel.this)
 				{
 					public void customResultAvailable(Object source, Object result)
 					{
 				    	searchbut.setEnabled(true);
-//						System.out.println("Customer search result: "+result);
+						System.out.println("Helpline search result: "+result);
 						Collection coll = (Collection)result;
-						((DefaultComboBoxModel)shopscombo.getModel()).removeAllElements();
-						shops.clear();
+						((DefaultComboBoxModel)helplinescombo.getModel()).removeAllElements();
 						if(coll!=null && coll.size()>0)
 						{
 							for(Iterator it=coll.iterator(); it.hasNext(); )
 							{
-								IShop	shop	= (IShop)it.next();
-								shops.put(shop.getName(), shop);
-								((DefaultComboBoxModel)shopscombo.getModel()).addElement(shop.getName());
+								IHelpline hl = (IHelpline)it.next();
+								((DefaultComboBoxModel)helplinescombo.getModel()).addElement(hl);
 							}
 						}
 						else
 						{
-							((DefaultComboBoxModel)shopscombo.getModel()).addElement("none");
+							((DefaultComboBoxModel)helplinescombo.getModel()).addElement("none");
 						}					
 					}
 					
@@ -127,49 +116,16 @@ public class CustomerPanel extends JPanel
 				});
 		    }
 		});
-
-		final NumberFormat df = NumberFormat.getInstance();
-		df.setMaximumFractionDigits(2);
-		df.setMinimumFractionDigits(2);
-
-		final JTextField money = new JTextField(5);
-		agent.getBeliefbase().getBeliefFact("money")
-			.addResultListener(new SwingDefaultResultListener(CustomerPanel.this)
-		{
-			public void customResultAvailable(Object source, Object result)
-			{
-				money.setText(df.format(result));
-			}
-		});
-		money.setEditable(false);
-		agent.getBeliefbase().addBeliefListener("money", new IBeliefListener()
-		{
-			public void beliefChanged(final AgentEvent ae)
-			{
-				SwingUtilities.invokeLater(new Runnable()
-				{
-					public void run()
-					{
-						money.setText(df.format(ae.getValue()));
-					}
-				});
-			}
-		});
 		
 		JPanel selpanel = new JPanel(new GridBagLayout());
 		selpanel.setBorder(new TitledBorder(new EtchedBorder(), "Properties"));
 		int x=0;
 		int y=0;
-		selpanel.add(new JLabel("Money: "), new GridBagConstraints(
-			x,y,1,1,0,0,GridBagConstraints.WEST,GridBagConstraints.NONE,new Insets(2,2,2,2),0,0));
 		x++;
-		selpanel.add(money, new GridBagConstraints(
-			x,y,1,1,1,0,GridBagConstraints.WEST,GridBagConstraints.NONE,new Insets(2,2,2,2),0,0));
-		x++;
-		selpanel.add(new JLabel("Available shops: "), new GridBagConstraints(
+		selpanel.add(new JLabel("Available helplines: "), new GridBagConstraints(
 			x,y,1,1,0,0,GridBagConstraints.EAST,GridBagConstraints.NONE,new Insets(2,2,2,2),0,0));
 		x++;
-		selpanel.add(shopscombo, new GridBagConstraints(
+		selpanel.add(helplinescombo, new GridBagConstraints(
 			x,y,1,1,0,0,GridBagConstraints.WEST,GridBagConstraints.HORIZONTAL,new Insets(2,2,2,2),0,0));
 		x++;
 		selpanel.add(searchbut, new GridBagConstraints(
@@ -180,10 +136,10 @@ public class CustomerPanel extends JPanel
 		
 		JPanel shoppanel = new JPanel(new BorderLayout());
 		shoppanel.setBorder(new TitledBorder(new EtchedBorder(), "Shop Catalog"));
-		shoptable = new JTable(shopmodel);
-		shoptable.setPreferredScrollableViewportSize(new Dimension(600, 120));
-		shoptable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		shoppanel.add(BorderLayout.CENTER, new JScrollPane(shoptable));
+		infotable = new JTable(infomodel);
+		infotable.setPreferredScrollableViewportSize(new Dimension(600, 120));
+		infotable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		shoppanel.add(BorderLayout.CENTER, new JScrollPane(infotable));
 
 		JPanel invpanel = new JPanel(new BorderLayout());
 		invpanel.setBorder(new TitledBorder(new EtchedBorder(), "Customer Inventory"));
@@ -191,96 +147,29 @@ public class CustomerPanel extends JPanel
 		invtable.setPreferredScrollableViewportSize(new Dimension(600, 120));
 		invpanel.add(BorderLayout.CENTER, new JScrollPane(invtable));
 
-		agent.getBeliefbase().addBeliefSetListener("inventory", new IBeliefSetListener()
-		{
-			public void factRemoved(final AgentEvent ae)
-			{
-				SwingUtilities.invokeLater(new Runnable()
-				{
-					public void run()
-					{
-						invlist.remove(ae.getValue());
-						invmodel.fireTableDataChanged();
-					}
-				});
-			}
-			
-			public void factChanged(final AgentEvent ae)
-			{
-				SwingUtilities.invokeLater(new Runnable()
-				{
-					public void run()
-					{
-						invlist.remove(ae.getValue());
-						invlist.add(ae.getValue());
-						invmodel.fireTableDataChanged();
-					}
-				});
-			}
-			
-			public void factAdded(final AgentEvent ae)
-			{
-				SwingUtilities.invokeLater(new Runnable()
-				{
-					public void run()
-					{
-						invlist.add(ae.getValue());
-						invmodel.fireTableDataChanged();
-					}
-				});
-			}
-		});
-		
 		JPanel butpanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 //		butpanel.setBorder(new TitledBorder(new EtchedBorder(), "Actions"));
-		JButton buy = new JButton("Buy");
+		JButton add = new JButton("Add");
 		final JTextField item = new JTextField(8);
 		item.setEditable(false);
 		butpanel.add(new JLabel("Selected item:"));
 		butpanel.add(item);
-		butpanel.add(buy);
-		buy.addActionListener(new ActionListener()
+		butpanel.add(add);
+		add.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				int sel = shoptable.getSelectedRow();
-				if(sel!=-1)
-				{
-					final String name = (String)shopmodel.getValueAt(sel, 0);
-					final Double price = (Double)shopmodel.getValueAt(sel, 1);
-					final IShop shop = (IShop)shops.get(shopscombo.getSelectedItem());
-//					System.out.println("buying: "+name+" at: "+shop.getName());
-					agent.createGoal("buy").addResultListener(new SwingDefaultResultListener(CustomerPanel.this)
-					{
-						public void customResultAvailable(Object source, Object result)
-						{
-							IEAGoal buy = (IEAGoal)result;
-							buy.setParameterValue("name", name);
-							buy.setParameterValue("shop", shop);
-							buy.setParameterValue("price", price);
-							agent.dispatchTopLevelGoalAndWait(buy).addResultListener(new SwingDefaultResultListener(CustomerPanel.this)
-							{
-								public void customResultAvailable(Object source, Object result)
-								{
-									// Update number of available items
-									refresh(shop);
-								}
-							});
-						}
-					});
-					
-				}
 			}
 		});
 		
-		shoptable.getSelectionModel().addListSelectionListener(new ListSelectionListener()
+		infotable.getSelectionModel().addListSelectionListener(new ListSelectionListener()
 		{
 			public void valueChanged(ListSelectionEvent e)
 			{
-				int sel = shoptable.getSelectedRow();
+				int sel = infotable.getSelectedRow();
 				if(sel!=-1)
 				{
-					item.setText(""+shopmodel.getValueAt(sel, 0));
+					item.setText(""+infomodel.getValueAt(sel, 0));
 				}
 			}
 		});
@@ -334,30 +223,30 @@ public class CustomerPanel extends JPanel
 	/**
 	 * Method to be called when goals may have changed.
 	 */
-	public void refresh(IShop shop)
+	public void refresh(IHelpline hl)
 	{
-		if(shop!=null)
+		if(hl!=null)
 		{
-			shop.getCatalog().addResultListener(new SwingDefaultResultListener(CustomerPanel.this)
-			{
-				public void customResultAvailable(Object source, Object result)
-				{
-					int sel = shoptable.getSelectedRow();
-					ItemInfo[] aitems = (ItemInfo[])result;
-					shoplist.clear();
-					for(int i = 0; i < aitems.length; i++)
-					{
-						if(!shoplist.contains(aitems[i]))
-						{
-//							System.out.println("added: "+aitems[i]);
-							shoplist.add(aitems[i]);
-						}
-					}
-					shopmodel.fireTableDataChanged();
-					if(sel!=-1 && sel<aitems.length)
-						((DefaultListSelectionModel)shoptable.getSelectionModel()).setSelectionInterval(sel, sel);
-				}
-			});
+//			hl.get.addResultListener(new SwingDefaultResultListener(HelplinePanel.this)
+//			{
+//				public void customResultAvailable(Object source, Object result)
+//				{
+//					int sel = infotable.getSelectedRow();
+//					ItemInfo[] aitems = (ItemInfo[])result;
+//					shoplist.clear();
+//					for(int i = 0; i < aitems.length; i++)
+//					{
+//						if(!shoplist.contains(aitems[i]))
+//						{
+////							System.out.println("added: "+aitems[i]);
+//							shoplist.add(aitems[i]);
+//						}
+//					}
+//					infomodel.fireTableDataChanged();
+//					if(sel!=-1 && sel<aitems.length)
+//						((DefaultListSelectionModel)infotable.getSelectionModel()).setSelectionInterval(sel, sel);
+//				}
+//			});
 		}
 		else
 		{
@@ -366,7 +255,7 @@ public class CustomerPanel extends JPanel
 				public void run()
 				{
 					shoplist.clear();
-					shopmodel.fireTableDataChanged();
+					infomodel.fireTableDataChanged();
 				}
 			});
 		}
@@ -390,7 +279,7 @@ class ItemTableModel extends AbstractTableModel
 
 	public int getColumnCount()
 	{
-		return 3;
+		return 2;
 	}
 
 	public String getColumnName(int column)
@@ -400,9 +289,7 @@ class ItemTableModel extends AbstractTableModel
 			case 0:
 				return "Name";
 			case 1:
-				return "Price";
-			case 2:
-				return "Quantity";
+				return "Information";
 			default:
 				return "";
 		}
@@ -416,18 +303,14 @@ class ItemTableModel extends AbstractTableModel
 	public Object getValueAt(int row, int column)
 	{
 		Object value = null;
-		ItemInfo ii = (ItemInfo)list.get(row);
+		InformationEntry ie = (InformationEntry)list.get(row);
 		if(column == 0)
 		{
-			value = ii.getName();
+			value = ie.getName();
 		}
 		else if(column == 1)
 		{
-			value = new Double(ii.getPrice());
-		}
-		else if(column == 2)
-		{
-			value = new Integer(ii.getQuantity());
+			value = ie.getInformation();
 		}
 		return value;
 	}

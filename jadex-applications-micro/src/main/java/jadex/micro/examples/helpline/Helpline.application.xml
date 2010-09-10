@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	<H3>Helpline scenario application descriptor</H3>
+-->
+<applicationtype xmlns="http://jadex.sourceforge.net/jadex-application"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-application 
+	                    http://jadex.sourceforge.net/jadex-application-2.0.xsd"
+	name="Helpline" package="jadex.mico.examples.helpline">
+	
+	<imports>
+		<import>jadex.commons.service.SServiceProvider</import>
+		<import>jadex.commons.IFuture</import>
+	</imports>
+	
+	<componenttypes>
+		<componenttype name="HelplineAgent" filename="jadex/micro/examples/helpline/HelplineAgent.class"/>
+	</componenttypes>
+	
+	<applications>
+		<application name="1 Helpline Agent">
+			<components>
+				<component type="HelplineAgent"/>
+			</components>
+ 		</application>
+	</applications>
+
+</applicationtype>
