@@ -90,12 +90,12 @@
 			</trigger>
 		</plan>
 		
-		<!-- Plan for treating victims. -->
-		<plan name="treat_victims_plan">
+		<!-- Plan for treating a victim. -->
+		<plan name="treat_victim_plan">
 			<parameter name="disaster" class="ISpaceObject">
 				<goalmapping ref="treat_victims.disaster"/>
 			</parameter>
-			<body class="TreatVictimsPlan"/>
+			<body class="TreatVictimPlan"/>
 			<trigger>
 				<goal ref="treat_victims"/>
 			</trigger>

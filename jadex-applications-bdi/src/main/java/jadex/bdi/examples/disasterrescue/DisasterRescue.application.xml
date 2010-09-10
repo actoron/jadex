@@ -57,7 +57,7 @@
 				<env:tasktype name="move" class="MoveTask" />
 				<env:tasktype name="extinguish_fire" class="ExtinguishFireTask" />
 				<env:tasktype name="clear_chemicals" class="ClearChemicalsTask" />
-				<env:tasktype name="treat_victims" class="TreatVictimsTask" />
+				<env:tasktype name="treat_victim" class="TreatVictimTask" />
 			</env:tasktypes>			
 						
 			<env:processtypes>

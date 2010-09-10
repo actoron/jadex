@@ -5,7 +5,7 @@ import jadex.application.space.envsupport.environment.ISpaceObject;
 import jadex.application.space.envsupport.environment.space2d.Space2D;
 import jadex.application.space.envsupport.math.IVector2;
 import jadex.bdi.examples.disasterrescue.DisasterType;
-import jadex.bdi.examples.disasterrescue.TreatVictimsTask;
+import jadex.bdi.examples.disasterrescue.TreatVictimTask;
 import jadex.bdi.planlib.PlanFinishedTaskCondition;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
@@ -14,9 +14,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- *  Move to victims and treat them.
+ *  Move to victim and treat her.
  */
-public class TreatVictimsPlan extends Plan
+public class TreatVictimPlan extends Plan
 {
 	/**
 	 *  The plan body.
@@ -25,6 +25,7 @@ public class TreatVictimsPlan extends Plan
 	{
 		Space2D	space	= (Space2D)getBeliefbase().getBelief("environment").getFact();
 		ISpaceObject	myself	= (ISpaceObject)getBeliefbase().getBelief("myself").getFact();
+		IVector2	home	= (IVector2)getBeliefbase().getBelief("home").getFact();
 		ISpaceObject	disaster	= (ISpaceObject)getParameter("disaster").getValue();
 		
 		// Move to disaster location
@@ -33,14 +34,20 @@ public class TreatVictimsPlan extends Plan
 		move.getParameter("destination").setValue(targetpos);
 		dispatchSubgoalAndWait(move);
 		
-		// Treat victims.
+		// Treat victim.
 		Map props = new HashMap();
-		props.put(TreatVictimsTask.PROPERTY_DISASTER, disaster);
+		props.put(TreatVictimTask.PROPERTY_DISASTER, disaster);
 		props.put(AbstractTask.PROPERTY_CONDITION, new PlanFinishedTaskCondition(getPlanElement()));
-		Object taskid = space.createObjectTask(TreatVictimsTask.PROPERTY_TYPENAME, props, myself.getId());
+		Object taskid = space.createObjectTask(TreatVictimTask.PROPERTY_TYPENAME, props, myself.getId());
 		SyncResultListener	res	= new SyncResultListener();
 		space.addTaskListener(taskid, myself.getId(), res);
 		res.waitForResult();
+		
+		// Move to hospital and deliver victim.
+		move = createGoal("move");
+		move.getParameter("destination").setValue(home);
+		dispatchSubgoalAndWait(move);
+
 	}
 
 	
