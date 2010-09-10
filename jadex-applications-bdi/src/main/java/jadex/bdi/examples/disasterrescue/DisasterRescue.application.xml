@@ -136,6 +136,7 @@
 	
 	<componenttypes>
 		<componenttype name="FireEngine" filename="jadex/bdi/examples/disasterrescue/fireengine/FireEngine.agent.xml"/>
+		<componenttype name="Commander" filename="jadex/bdi/examples/disasterrescue/commander/Commander.agent.xml"/>
 		<componenttype name="Ambulance" filename="jadex/bdi/examples/disasterrescue/ambulance/Ambulance.agent.xml"/>
 	</componenttypes>
 
@@ -240,6 +241,9 @@
 					</env:observers>
 	 			</env:envspace>
 			</spaces>
+			<components>
+				<component type="commander"/>
+			</components>
  		</application>
 	</applications>
 

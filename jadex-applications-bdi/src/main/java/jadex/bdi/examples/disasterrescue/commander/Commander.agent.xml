@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	<H3>Commander</H3>
+
+	Coordinates entities to efficiently handle disasters.
+-->
+<agent xmlns="http://jadex.sourceforge.net/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-bdi
+	                    http://jadex.sourceforge.net/jadex-bdi-2.0.xsd"
+	name="Commander"
+	package="jadex.bdi.examples.disasterrescue.commander">
+
+	<imports>
+		<import>java.util.*</import>
+		<import>java.util.logging.*</import>
+		<import>jadex.base.fipa.*</import>
+		<import>jadex.application.space.envsupport.environment.*</import>
+		<import>jadex.bdi.examples.disasterrescue.*</import>
+		<import>jadex.bdi.examples.disasterrescue.movement.*</import>
+	</imports>
+
+	<beliefs>
+		<!-- Environment imported inherited from move capability. -->
+		<beliefref name="environment">
+			<concrete ref="move.environment"/>
+		</beliefref>
+		
+		<beliefset name="disasters" class="ISpaceObject" updaterate="1000">
+			<facts>$beliefbase.environment.getSpaceObjectsByType("disaster")</facts>
+		</beliefset>
+	</beliefs>
+
+	<goals>
+		<achievegoal name="handle_disaster" retry="true">
+			<parameter name="disaster" class="ISpaceObject">
+				<value>$disaster</value>
+			</parameter>
+			<unique/>
+			<creationcondition language="jcl">
+				ISpaceObject $disaster &amp;&amp; $disaster.getType().equals("disaster")
+			</creationcondition>
+		</achievegoal>
+	</goals>
+	
+	<plans>
+		<!-- Basic fire engine behavior plan. -->
+		<plan name="handle_disaster_plan">
+			<parameter name="disaster" class="ISpaceObject">
+				<goalmapping ref="handle_disaster.disaster"/>
+			</parameter>
+			<body class="HandleDisasterPlan"/>
+		</plan>
+	</plans>
+</agent>
