@@ -171,7 +171,13 @@ public class DisasterType
 		x	= x*0.2 + x*0.4*range;
 		y	= x*0.2 + y*0.4*range;
 		
-		return new Vector2Double(center.getXAsDouble()+x, center.getYAsDouble()+y);
+		// Clip position at space borders
+		x	+= center.getXAsDouble();
+		y	+= center.getYAsDouble();
+		x	= Math.max(Math.min(x, 1), 0);
+		y	= Math.max(Math.min(y, 1), 0);
+		
+		return new Vector2Double(x, y);
 	}
 	
 	/**

@@ -27,6 +27,8 @@
 	
 	<spacetypes>
 		<env:envspacetype name="2dspace" class="ContinuousSpace2D" width="1" height="1">
+			<env:property name="border">Space2D.BORDER_STRICT</env:property>
+		
 			<env:objecttypes>
 				<env:objecttype name="disaster">
 					<env:property name="type" class="String"/>
