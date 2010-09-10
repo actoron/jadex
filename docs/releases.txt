@@ -1,5 +1,8 @@
 Jadex Releases Overview
 
+Release 2.0 rc5 (Bugfix release 09/2010)
+	- Minor bug fixes
+
 Release 2.0 rc4 (Awareness release 09/2010)
 	- Unified model of active components with services
 	- Platform bootstraps as root component
