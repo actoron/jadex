@@ -35,6 +35,11 @@
 		<beliefref name="myself">
 			<concrete ref="move.myself"/>
 		</beliefref>
+		
+		<!-- Home location belief imported from move capability. -->
+		<beliefref name="home">
+			<concrete ref="move.home"/>
+		</beliefref>
 	</beliefs>
 
 	<goals>
@@ -42,12 +47,31 @@
 		<achievegoalref name="move">
 			<concrete ref="move.move"/>
 		</achievegoalref>
+
+		<!-- Goal to treat victims. -->
+		<achievegoal name="treat_victims">
+			<parameter name="disaster" class="ISpaceObject"/>
+			<targetcondition>
+				$goal.disaster.victims==0
+			</targetcondition>
+		</achievegoal>
 	</goals>
 	
 	<plans>
 		<!-- Basic ambulance behavior plan. -->
 		<plan name="ambulance_plan">
 			<body class="AmbulancePlan"/>
+		</plan>
+		
+		<!-- Plan for treating victims. -->
+		<plan name="treat_victims_plan">
+			<parameter name="disaster" class="ISpaceObject">
+				<goalmapping ref="treat_victims.disaster"/>
+			</parameter>
+			<body class="TreatVictimsPlan"/>
+			<trigger>
+				<goal ref="treat_victims"/>
+			</trigger>
 		</plan>
 	</plans>
 	

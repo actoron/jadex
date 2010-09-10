@@ -20,7 +20,7 @@ public class FireEnginePlan extends Plan
 		
 		while(true)
 		{
-			// Find nearest disaster with fire.
+			// Find nearest disaster with fire or chemicals.
 			IVector2	mypos	= (IVector2)myself.getProperty(Space2D.PROPERTY_POSITION);
 			IVector2	targetpos	= null;
 			ISpaceObject	target	= null;
@@ -38,10 +38,9 @@ public class FireEnginePlan extends Plan
 				}
 			}
 			
-			// Extinguish fire
+			// Decide between fire and chemicals
 			if(target!=null)
-			{				
-				// Decide between fire and chemicals
+			{
 				boolean	fire	= ((Number)target.getProperty("fire")).intValue()>0;
 				boolean	chemicals	= ((Number)target.getProperty("chemicals")).intValue()>0;
 				String	goaltype	= fire && !chemicals ? "extinguish_fire"
@@ -56,7 +55,7 @@ public class FireEnginePlan extends Plan
 				}
 			}
 			
-			// If no fire and not home: move to home base
+			// If no fire or chemicals and not home: move to home base
 			else if(space.getDistance(mypos, home).greater(Vector1Int.ZERO))
 			{
 				IGoal move = createGoal("move");
@@ -64,7 +63,7 @@ public class FireEnginePlan extends Plan
 				dispatchSubgoalAndWait(move);				
 			}
 			
-			// If no fire and at home: wait a little before checking again
+			// If no fire or chemicals and at home: wait a little before checking again
 			else
 			{
 				waitFor((long)(Math.random()*5000));

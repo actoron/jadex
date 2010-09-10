@@ -12,9 +12,7 @@ import jadex.micro.MicroAgent;
 import jadex.micro.MicroAgentMetaInfo;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.TreeSet;
 
 /**
  *  Helpline micro agent. 

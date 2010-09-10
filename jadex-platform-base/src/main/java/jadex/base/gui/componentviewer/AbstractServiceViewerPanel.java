@@ -1,7 +1,6 @@
 package jadex.base.gui.componentviewer;
 
 import jadex.base.gui.plugin.IControlCenter;
-import jadex.bridge.IExternalAccess;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.Properties;

@@ -1,18 +1,11 @@
 package jadex.bdi.examples.disasterrescue.ambulance;
 
-import jadex.application.space.envsupport.environment.AbstractTask;
 import jadex.application.space.envsupport.environment.ISpaceObject;
 import jadex.application.space.envsupport.environment.space2d.Space2D;
 import jadex.application.space.envsupport.math.IVector2;
 import jadex.application.space.envsupport.math.Vector1Int;
-import jadex.bdi.examples.disasterrescue.DisasterType;
-import jadex.bdi.examples.disasterrescue.TreatVictimsTask;
-import jadex.bdi.planlib.PlanFinishedTaskCondition;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  *  Move to victims and treat them.
@@ -23,11 +16,11 @@ public class AmbulancePlan extends Plan
 	{
 		Space2D	space	= (Space2D)getBeliefbase().getBelief("environment").getFact();
 		ISpaceObject	myself	= (ISpaceObject)getBeliefbase().getBelief("myself").getFact();
-		IVector2	home	= (IVector2)myself.getProperty(Space2D.PROPERTY_POSITION);
+		IVector2	home	= (IVector2)getBeliefbase().getBelief("home").getFact();
 		
 		while(true)
 		{
-			// Find nearest disaster with victim.
+			// Find nearest disaster with victims.
 			IVector2	mypos	= (IVector2)myself.getProperty(Space2D.PROPERTY_POSITION);
 			IVector2	targetpos	= null;
 			ISpaceObject	target	= null;
@@ -45,25 +38,15 @@ public class AmbulancePlan extends Plan
 				}
 			}
 			
-			// Treat victims
+			// Treat victims.
 			if(target!=null)
 			{
-				// Move to disaster location
-				targetpos	= DisasterType.getFireLocation(target);
-				IGoal move = createGoal("move");
-				move.getParameter("destination").setValue(targetpos);
-				dispatchSubgoalAndWait(move);
-				
-				Map props = new HashMap();
-				props.put(TreatVictimsTask.PROPERTY_DISASTER, target);
-				props.put(AbstractTask.PROPERTY_CONDITION, new PlanFinishedTaskCondition(getPlanElement()));
-				Object taskid = space.createObjectTask(TreatVictimsTask.PROPERTY_TYPENAME, props, myself.getId());
-				SyncResultListener	res	= new SyncResultListener();
-				space.addTaskListener(taskid, myself.getId(), res);
-				res.waitForResult();
+				IGoal	goal	= createGoal("treat_victims");
+				goal.getParameter("disaster").setValue(target);
+				dispatchSubgoalAndWait(goal);
 			}
 			
-			// If no victim and not home: move to home base
+			// If no victims and not home: move to home base
 			else if(space.getDistance(mypos, home).greater(Vector1Int.ZERO))
 			{
 				IGoal move = createGoal("move");
@@ -71,7 +54,7 @@ public class AmbulancePlan extends Plan
 				dispatchSubgoalAndWait(move);				
 			}
 			
-			// If no victim and at home: wait a little before checking again
+			// If no fire and at home: wait a little before checking again
 			else
 			{
 				waitFor((long)(Math.random()*5000));
