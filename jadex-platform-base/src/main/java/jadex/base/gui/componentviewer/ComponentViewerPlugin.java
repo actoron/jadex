@@ -105,7 +105,7 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 	 */
 	public String getName()
 	{
-		return "Service Viewer";
+		return "Component Viewer";
 	}
 
 	/**
@@ -353,7 +353,7 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 									catch(Exception e)
 									{
 										e.printStackTrace();
-										getJCC().displayError("Error initializing service viewer panel.", "Service viewer panel class: "+classname, e);
+										getJCC().displayError("Error initializing service viewer panel.", "Component viewer panel class: "+classname, e);
 									}
 								}
 							});
@@ -411,7 +411,7 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 													catch(Exception e)
 													{
 //														e.printStackTrace();
-														getJCC().displayError("Error initializing service viewer panel.", "Service viewer panel class: "+classname, e);
+														getJCC().displayError("Error initializing service viewer panel.", "Component viewer panel class: "+classname, e);
 													}
 												}
 											});

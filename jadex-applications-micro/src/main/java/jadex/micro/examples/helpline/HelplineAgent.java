@@ -14,6 +14,8 @@ import jadex.micro.MicroAgentMetaInfo;
 import java.util.Collection;
 import java.util.Iterator;
 
+import javax.swing.SwingUtilities;
+
 /**
  *  Helpline micro agent. 
  */
@@ -43,6 +45,13 @@ public class HelplineAgent extends MicroAgent
 			}
 		}
 		addService(new HelplineService(getExternalAccess()));
+		SwingUtilities.invokeLater(new Runnable()
+		{
+			public void run()
+			{
+				HelplinePanel.createHelplineGui(getExternalAccess());
+			}
+		});
 	}
 		
 	/**
