@@ -91,7 +91,7 @@ public class HandleDisasterPlan extends Plan
 			}
 		}
 		
-		if(victims>0)
+		if(chemicals==0 && victims>0)
 		{
 			Collection treatvicser = (Collection)SServiceProvider.getServices(getScope().getServiceProvider(), ITreatVictimsService.class).get(this);
 			if(treatvicser.size()>0)
