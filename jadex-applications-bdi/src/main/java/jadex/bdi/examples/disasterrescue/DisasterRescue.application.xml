@@ -50,6 +50,7 @@
 				<env:objecttype name="ambulance">
 					<env:property name="speed" class="double">0.05</env:property>
 					<env:property name="treated" class="double">0</env:property>
+					<env:property name="patient" class="boolean">false</env:property>
 				</env:objecttype>
 			</env:objecttypes>
 			
@@ -78,6 +79,10 @@
 				<env:avatarmapping objecttype="fireengine" componenttype="FireEngine" createavatar="false" createcomponent="true"/>
 				<env:avatarmapping objecttype="ambulance" componenttype="Ambulance" createavatar="false" createcomponent="true"/>
 			</env:avatarmappings>
+			
+			<env:actiontypes>
+				<env:actiontype name="deliver_patient" class="DeliverPatientAction"/>
+			</env:actiontypes>
 			
 			<env:perspectives>
 				<env:perspective name="icons" class="Perspective2D" opengl="true">
@@ -121,7 +126,7 @@
 					</env:drawable>
 
 					<env:prelayers>
-						<env:tiledlayer width="1" height="1" imagepath="jadex/bdi/examples/disasterrescue/images/hamburg.png" />
+						<env:tiledlayer width="1" height="1" imagepath="jadex/bdi/examples/disasterrescue/images/hongkong.png" />
 					</env:prelayers>
 				</env:perspective>
 			</env:perspectives>

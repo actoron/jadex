@@ -42,32 +42,38 @@ public class TreatVictimTask extends AbstractTask
 		{
 			throw new RuntimeException("Victim out of range: "+obj);
 		}
-
-		// Update disaster object based on time progress.
-		int victims	= ((Number)disaster.getProperty("victims")).intValue();
-		double	treated	= ((Number)obj.getProperty(PROPERTY_TREATED)).doubleValue();
-		treated	+= progress*0.0002;	// 1 victim per 5 seconds.
-		if(treated>1)
+		
+		// Only treat victims if area clear of chemicals
+		int chemicals	= ((Number)disaster.getProperty("chemicals")).intValue();
+		if(chemicals==0)
 		{
-			victims	= Math.max(victims-1, 0);
-			disaster.setProperty("victims", new Integer(victims));
-		}
-
-		// Remove disaster object when everything is now fine.
-		if(victims==0 && ((Number)disaster.getProperty("fire")).intValue()==0 && ((Number)disaster.getProperty("chemicals")).intValue()==0)
-		{
-			if(space2d.getSpaceObject0(disaster.getId())!=null)
-				space.destroySpaceObject(disaster.getId());
-		}
-
-		if(treated>1)
-		{
-			obj.setProperty(PROPERTY_TREATED, new Double(0));
-			setFinished(space, obj, true);
-		}
-		else
-		{
-			obj.setProperty(PROPERTY_TREATED, new Double(treated));			
+			// Update disaster object based on time progress.
+			int victims	= ((Number)disaster.getProperty("victims")).intValue();
+			double	treated	= ((Number)obj.getProperty(PROPERTY_TREATED)).doubleValue();
+			treated	+= progress*0.0002;	// 1 victim per 5 seconds.
+			if(treated>1)
+			{
+				obj.setProperty(DeliverPatientAction.PROPERTY_PATIENT, Boolean.TRUE);
+				victims	= Math.max(victims-1, 0);
+				disaster.setProperty("victims", new Integer(victims));
+			}
+	
+			// Remove disaster object when everything is now fine.
+			if(victims==0 && ((Number)disaster.getProperty("fire")).intValue()==0 && ((Number)disaster.getProperty("chemicals")).intValue()==0)
+			{
+				if(space2d.getSpaceObject0(disaster.getId())!=null)
+					space.destroySpaceObject(disaster.getId());
+			}
+	
+			if(treated>1)
+			{
+				obj.setProperty(PROPERTY_TREATED, new Double(0));
+				setFinished(space, obj, true);
+			}
+			else
+			{
+				obj.setProperty(PROPERTY_TREATED, new Double(treated));			
+			}
 		}
 	}
 }

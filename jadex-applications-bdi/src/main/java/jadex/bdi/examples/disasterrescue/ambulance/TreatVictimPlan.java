@@ -1,6 +1,7 @@
 package jadex.bdi.examples.disasterrescue.ambulance;
 
 import jadex.application.space.envsupport.environment.AbstractTask;
+import jadex.application.space.envsupport.environment.ISpaceAction;
 import jadex.application.space.envsupport.environment.ISpaceObject;
 import jadex.application.space.envsupport.environment.space2d.Space2D;
 import jadex.application.space.envsupport.math.IVector2;
@@ -43,11 +44,16 @@ public class TreatVictimPlan extends Plan
 		space.addTaskListener(taskid, myself.getId(), res);
 		res.waitForResult();
 		
-		// Move to hospital and deliver victim.
+		// Move to hospital
 		move = createGoal("move");
 		move.getParameter("destination").setValue(home);
 		dispatchSubgoalAndWait(move);
-
+		
+		//  Deliver patient.
+		Map params = new HashMap();
+		params.put(ISpaceAction.ACTOR_ID, getComponentIdentifier());
+		space.performSpaceAction("deliver_patient", params, res);
+		res.waitForResult();
 	}
 
 	
