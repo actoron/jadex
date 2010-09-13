@@ -5,7 +5,6 @@ import jadex.tools.bpmn.editor.JadexBpmnPlugin;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IJavaElement;
-import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.ui.IJavaElementSearchConstants;
 import org.eclipse.swt.widgets.Composite;
@@ -24,7 +23,8 @@ public class JadexPackageListEditor extends AbstractPreferenceListEditor
 		IStatus verify(IJavaElement toVerify)
 		{
 			if (null != toVerify
-					&& toVerify.getElementType() == IJavaElement.PACKAGE_DECLARATION)
+					&& (toVerify.getElementType() == IJavaElement.PACKAGE_FRAGMENT 
+							|| toVerify.getElementType() == IJavaElement.PACKAGE_FRAGMENT_ROOT))
 			{
 				return new Status(IStatus.OK, JadexBpmnPlugin.ID, "Is package");
 			}
@@ -66,7 +66,7 @@ public class JadexPackageListEditor extends AbstractPreferenceListEditor
 	 * openSelectDialog(int, java.lang.String, java.lang.String)
 	 */
 	@Override
-	protected IType openSelectDialog(int iJavaElementSearchConstant,
+	protected IJavaElement openSelectDialog(int iJavaElementSearchConstant,
 			String dialogTitle, String dialogMessage) throws JavaModelException
 	{
 		return super.selectPackage(iJavaElementSearchConstant, dialogTitle,

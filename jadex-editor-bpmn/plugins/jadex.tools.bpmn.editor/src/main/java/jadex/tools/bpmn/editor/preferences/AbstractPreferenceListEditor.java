@@ -98,15 +98,15 @@ public abstract class AbstractPreferenceListEditor extends ListEditor
 		
 		try 
 		{
-			IType selectedType = openSelectDialog(iJavaElementSearchConstant, dialogTitle, dialogMessage);
-			if (null != selectedType)
+			IJavaElement selectedElement = openSelectDialog(iJavaElementSearchConstant, dialogTitle, dialogMessage);
+			if (null != selectedElement)
 			{
 				// check the selected type
-				IStatus status = verifier.verify(selectedType);
+				IStatus status = verifier.verify(selectedElement);
 				
 				if (status.getSeverity() == IStatus.OK)
 				{
-					newInputObject = selectedType.getFullyQualifiedName();
+					newInputObject = selectedElement.getElementName(); // getFullyQualifiedName();
 				}
 				else
 				{
@@ -139,7 +139,7 @@ public abstract class AbstractPreferenceListEditor extends ListEditor
 	 * @param dialogMessage the Message
 	 * @return
 	 */
-	protected abstract IType openSelectDialog(int iJavaElementSearchConstant, String dialogTitle, String dialogMessage) throws JavaModelException;
+	protected abstract IJavaElement openSelectDialog(int iJavaElementSearchConstant, String dialogTitle, String dialogMessage) throws JavaModelException;
 	
 	/**
 	 * Open a dialog to select a java type
@@ -177,7 +177,7 @@ public abstract class AbstractPreferenceListEditor extends ListEditor
 	 * @return IType selected or null
 	 * @throws JavaModelException
 	 */
-	protected IType selectPackage(int iJavaElementSearchConstant, String dialogTitle, String dialogMessage) throws JavaModelException
+	protected IJavaElement selectPackage(int iJavaElementSearchConstant, String dialogTitle, String dialogMessage) throws JavaModelException
 	{
 		Shell parent = getShell();
 	
@@ -193,12 +193,12 @@ public abstract class AbstractPreferenceListEditor extends ListEditor
 			return null;
 		}
 	
-		Object[] types = dialog.getResult();
-		if (types == null || types.length == 0 || types[0] == null)
+		Object[] elements = dialog.getResult();
+		if (elements == null || elements.length == 0 || elements[0] == null)
 		{
 			return null;
 		}
-		return (IType) types[0];
+		return (IJavaElement) elements[0];
 	}
 	
 	/**
