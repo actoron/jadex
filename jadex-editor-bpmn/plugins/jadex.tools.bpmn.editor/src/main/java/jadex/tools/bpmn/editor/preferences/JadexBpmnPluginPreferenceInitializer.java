@@ -10,7 +10,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
 
 /**
  * @author claas
- *
+ * 
  */
 public class JadexBpmnPluginPreferenceInitializer extends
 		AbstractPreferenceInitializer
@@ -28,12 +28,17 @@ public class JadexBpmnPluginPreferenceInitializer extends
 		IPreferenceStore store = JadexBpmnPlugin.getDefault()
 				.getPreferenceStore();
 
+		store.setDefault(JadexPreferences.PREFERENCE_TASK_PROVIDER_LIST,
+				AbstractPreferenceListEditor.createStringList(new String[] {
+				/* "jadex.tools.bpmn.runtime.task.StaticJadexTaskProvider" , */
+				"jadex.tools.bpmn.runtime.task.PackageBasedTaskProvider" }));
+
 		store.setDefault(
-				JadexPreferences.PREFERENCE_TASK_PROVIDER_LIST,
-				JadexTaskProviderTypeListEditor
-						.createStringList(new String[] {
-								/*"jadex.tools.bpmn.runtime.task.StaticJadexTaskProvider" ,*/
-								"jadex.tools.bpmn.runtime.task.PackageBasedTaskProvider" }));
+				JadexPreferences.PREFERENCE_TASK_PROVIDER_SEARCH_PACKAGE_LIST,
+				AbstractPreferenceListEditor.createStringList(new String[] {
+						"jadex.bpmn.runtime.task", 
+						"jadex.bdibpmn.task"/*,
+						"jadex.wfms.client.task" */}));
 
 	}
 

@@ -5,7 +5,6 @@ package jadex.tools.bpmn.editor.preferences;
 
 import jadex.tools.bpmn.editor.JadexBpmnPlugin;
 
-
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
@@ -52,6 +51,9 @@ public class JadexBpmnPluginPreferencePage extends FieldEditorPreferencePage
 	{
 		addField(new JadexTaskProviderTypeListEditor(JadexPreferences.PREFERENCE_TASK_PROVIDER_LIST,
 				"BPMN-Task Provider", getFieldEditorParent()));
+		
+		addField(new JadexPackageListEditor(JadexPreferences.PREFERENCE_TASK_PROVIDER_SEARCH_PACKAGE_LIST,
+				"Search packages for PackageBasedTaskProvider", getFieldEditorParent()));
 
 	}
 

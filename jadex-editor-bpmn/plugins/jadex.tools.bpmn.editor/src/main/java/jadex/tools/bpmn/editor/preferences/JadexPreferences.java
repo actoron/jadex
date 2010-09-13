@@ -21,6 +21,8 @@ public class JadexPreferences extends FieldEditorPreferencePage implements
 
 	public static final String PREFERENCE_TASK_PROVIDER_LIST = "Task Provider";
 
+	public static final String PREFERENCE_TASK_PROVIDER_SEARCH_PACKAGE_LIST = "Search packages";
+	
 	// ---- interface implementation ----
 	
 	/*
