@@ -53,16 +53,18 @@ public class TaskMetaInfoProxy implements ITaskMetaInfo
 			// check the return value
 			if (returnValue instanceof IParameterMetaInfo[])
 			{
-				return ( IParameterMetaInfo[]) returnValue;
+				return (IParameterMetaInfo[]) returnValue;
 			}
-			else if (returnValue.getClass().isArray())
+			else if (returnValue != null && returnValue.getClass().isArray())
 			{
+				// create proxy objects
 				Object[] objects = (Object[]) returnValue;
 				IParameterMetaInfo[] params = new IParameterMetaInfo[objects.length];
 				for (int i = 0; i < objects.length; i++)
 				{
 					params[i] = new ParameterMetaInfoProxy(objects[i]);
 				}
+				return params;
 			}
 		}
 		catch (Exception e)

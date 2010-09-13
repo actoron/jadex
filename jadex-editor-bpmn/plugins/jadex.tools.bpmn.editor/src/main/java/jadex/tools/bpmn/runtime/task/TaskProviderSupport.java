@@ -106,26 +106,24 @@ public abstract class TaskProviderSupport implements IJadexTaskProvider
 	 */
 	public ITaskMetaInfo getTaskMetaInfo(String className)
 	{
-		if (className == null || className.trim().isEmpty())
+		if (className != null && !className.trim().isEmpty())
 		{
-			return null;
-		}
-			
-		if (metaInfoMap != null)
-		{
-			ITaskMetaInfo info;
-			if (metaInfoMap.containsKey(className))
+			if (metaInfoMap != null)
 			{
-				info = metaInfoMap.get(className);
-				if (info != null) 
+				ITaskMetaInfo info;
+				if (metaInfoMap.containsKey(className))
+				{
+					info = metaInfoMap.get(className);
+					if (info != null) 
+						return info;
+				}
+				
+				info = loadMetaInfo(className);
+				if (info != null)
+				{
+					metaInfoMap.put(className, info);
 					return info;
-			}
-			
-			info = loadMetaInfo(className);
-			if (info != null)
-			{
-				metaInfoMap.put(className, info);
-				return info;
+				}
 			}
 		}
 		
@@ -138,7 +136,7 @@ public abstract class TaskProviderSupport implements IJadexTaskProvider
 	/**
 	 * Loads a class from the workspace and call its getTaskMetaInfo method
 	 * to retrieve the TaskMetaInfo.
-	 * @param className
+	 * @param className to load and call getMetaInfo() on
 	 * @return TaskMetaInfo for class if provided, else null
 	 */
 	private ITaskMetaInfo loadMetaInfo(String className) {
@@ -163,16 +161,16 @@ public abstract class TaskProviderSupport implements IJadexTaskProvider
 			Object returnValue = WorkspaceClassLoaderHelper
 			.callUnparametrizedReflectionMethod(
 				taskInstance,
-				IJadexTaskProvider.METHOD_IJADEXTASKPROVIDER_GET_TASK_META_INFO);
+				IJadexTask.METHOD_IJADEXTASK_GET_TASK_METAINFO);
 
 			if (returnValue instanceof ITaskMetaInfo)
 			{
 				return (ITaskMetaInfo) returnValue;
 			}
-			else
+			else if (returnValue != null)
 			{
-				return new TaskMetaInfoProxy(taskInstance);
-			}
+				return new TaskMetaInfoProxy(returnValue);
+			} 
 
 		}
 		catch (Exception e)
@@ -180,7 +178,8 @@ public abstract class TaskProviderSupport implements IJadexTaskProvider
 			JadexBpmnEditor.log("Exception while loading meta info for class '"+className+"' in "+this.getClass().getSimpleName(), e, IStatus.WARNING);
 		}
 
-		return null;
+		// fall through
+		return NO_TASK_META_INFO_PROVIDED;
 	}
 	
 	

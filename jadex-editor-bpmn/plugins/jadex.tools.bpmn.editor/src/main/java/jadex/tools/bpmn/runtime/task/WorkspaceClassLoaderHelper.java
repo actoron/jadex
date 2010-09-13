@@ -180,14 +180,15 @@ class WorkspaceClassLoaderHelper
 	public static List<Class<?>> getClassesForPackage(String pkgName, String classSuffix)
 			throws ClassNotFoundException {
 		// List of directories matching the package name. 
-		// Package may be split across multiple directories
+		// Needed because the package may be split across multiple directories
 		List<File> directories = new UniqueEList<File>();
 		List<Class<?>> classes = new UniqueEList<Class<?>>();
 		
+		ClassLoader classLoader = WorkspaceClassLoaderHelper
+			.getWorkspaceClassLoader(false);
+		
 		try {
-			ClassLoader classLoader = WorkspaceClassLoaderHelper
-				.getWorkspaceClassLoader(false);
-
+			
 			if (classLoader == null) {
 				// return Collections.emptyList();
 				throw new ClassNotFoundException("Can't get class loader.");
@@ -206,14 +207,17 @@ class WorkspaceClassLoaderHelper
 						if (entry.getName().startsWith(pkgName.replace('.', '/'))
 								&& entry.getName().endsWith(classSuffix)
 								&& !entry.getName().contains("$")) {
+							// remove class extension
 							String className = entry.getName().replace("/", ".")
 									.substring(0, entry.getName().length() - 6);
 							classes.add(Class.forName(className));
 						}
 					}
 				} else
+				{
 					directories.add(new File(URLDecoder.decode(urlRessource.getPath(),
 							"UTF-8")));
+				}
 			}
 		} catch (NullPointerException x) {
 			throw new ClassNotFoundException(pkgName
@@ -236,8 +240,12 @@ class WorkspaceClassLoaderHelper
 					// we are only interested in .class files with specific suffix
 					if (file.endsWith(classSuffix)) {
 						// remove .class extension
-						classes.add(Class.forName(pkgName + '.'
+						classes.add(classLoader.loadClass(pkgName + '.'
 								+ file.substring(0, file.length() - 6)));
+								/*
+								Class.forName(pkgName + '.'
+								+ file.substring(0, file.length() - 6)));
+								*/
 					}
 				}
 			} else {
@@ -355,7 +363,7 @@ class WorkspaceClassLoaderHelper
 		}
 		catch (Exception e)
 		{
-			JadexBpmnEditor.log("Exception in callUnparametrizedReflectionMethod("+source+", "+methodName+")", e, IStatus.ERROR);
+			JadexBpmnEditor.log("Exception in callUnparametrizedReflectionMethod("+source+", "+methodName+")", e, IStatus.WARNING);
 		}
 		
 		return null;
