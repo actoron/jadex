@@ -14,6 +14,7 @@ import jadex.tools.model.common.properties.table.MultiColumnTable;
 import jadex.tools.model.common.properties.table.MultiColumnTable.MultiColumnTableRow;
 
 import org.eclipse.emf.ecore.xml.type.internal.RegEx.RegularExpression;
+import org.eclipse.jface.viewers.CellEditor.LayoutData;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.SWT;
@@ -117,10 +118,42 @@ public class JadexUserTaskImplComboSection extends
 		
 		super.createControls(parent, tabbedPropertySheetPage);
 
+		if (rightButton != null)
+		{
+			Button oldButton = rightButton;
+			
+			// Create and configure the "Refresh" button
+			Button refreshButton = getWidgetFactory().createButton(sectionComposite, "Refresh" ,SWT.PUSH | SWT.CENTER);
+			refreshButton.setLayoutData(oldButton.getLayoutData());
+			refreshButton.setToolTipText("Refresh the workspace classloader and task list");
+			//addDefaultParameter.setLayoutData(gridData);
+			refreshButton.addSelectionListener(new SelectionAdapter()
+			{
+				/** 
+				 * Add a list of default parameter to the parameter table
+				 * @generated NOT 
+				 */
+				@Override
+				public void widgetSelected(SelectionEvent e)
+				{
+					// TODO:
+				}
+			});
+			super.rightButton = refreshButton;
+			addDisposable(refreshButton);
+			
+			oldButton.dispose();
+			oldButton = null;
+			
+			sectionComposite.pack();
+		}
+		
+		// add the MetaInfo frame
 		addUserTaskMetaInfoText();
 		
+		//
 		// Add some listeners to the abstract combo
-		
+		//
 		cCombo.addVerifyListener(new VerifyListener()
 		{
 			public void verifyText(VerifyEvent e)
@@ -199,6 +232,8 @@ public class JadexUserTaskImplComboSection extends
 		});
 		addDefaultButton = addDefaultParameterButton;
 		addDisposable(addDefaultParameterButton);
+		
+		
 
 	}
 
