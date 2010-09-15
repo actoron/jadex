@@ -1,6 +1,6 @@
 package jadex.tools.bpmn.runtime.task;
 
-public interface IJadexTaskProvider
+public interface IEditorTaskProvider
 {
 
 	/** The method to dispose all resources */
@@ -23,6 +23,6 @@ public interface IJadexTaskProvider
 	/** The implementing getTaskMetaInfoFor(fqClassName) method name*/
 	public static final String METHOD_IJADEXTASKPROVIDER_GET_TASK_META_INFO = "getTaskMetaInfoFor";
 	/** The method to access the meta info for a task */
-	public abstract ITaskMetaInfo getTaskMetaInfo(String fqClassName);
+	public abstract IEditorTaskMetaInfo getTaskMetaInfo(String fqClassName);
 
 }

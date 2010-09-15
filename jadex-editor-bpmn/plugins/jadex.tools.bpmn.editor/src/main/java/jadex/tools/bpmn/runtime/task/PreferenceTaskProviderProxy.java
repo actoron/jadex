@@ -29,7 +29,7 @@ import org.eclipse.emf.common.util.UniqueEList;
  * @author Claas
  * 
  */
-public class PreferenceTaskProviderProxy implements IJadexTaskProvider
+public class PreferenceTaskProviderProxy implements IEditorTaskProvider
 {
 	/** The list of ITaskProvider */
 	private static List<String> iTaskProviderCache;
@@ -52,7 +52,7 @@ public class PreferenceTaskProviderProxy implements IJadexTaskProvider
 	}
 
 	/* (non-Javadoc)
-	 * @see jadex.tools.bpmn.runtime.task.IJadexTaskProvider#dispose()
+	 * @see jadex.tools.bpmn.runtime.task.IEditorTaskProvider#dispose()
 	 */
 	@Override
 	public void dispose()
@@ -63,7 +63,7 @@ public class PreferenceTaskProviderProxy implements IJadexTaskProvider
 
 	
 	/* (non-Javadoc)
-	 * @see jadex.tools.bpmn.runtime.task.IJadexTaskProvider#refresh()
+	 * @see jadex.tools.bpmn.runtime.task.IEditorTaskProvider#refresh()
 	 */
 	@Override
 	public void refresh()
@@ -78,7 +78,7 @@ public class PreferenceTaskProviderProxy implements IJadexTaskProvider
 	 * Returns a compound array of all Tasks defined by the TaskProviders
 	 * in from the Jadex preference store list.  
 	 * 
-	 * @see jadex.tools.bpmn.runtime.task.IJadexTaskProvider#
+	 * @see jadex.tools.bpmn.runtime.task.IEditorTaskProvider#
 	 * getAvailableTaskImplementations()
 	 */
 	@Override
@@ -130,11 +130,11 @@ public class PreferenceTaskProviderProxy implements IJadexTaskProvider
 				Class<?> clazz = classLoader.loadClass(className);
 				Object instance = clazz.newInstance();
 				String[] tasks;
-				IJadexTaskProvider provider;
+				IEditorTaskProvider provider;
 				
-				if (instance instanceof IJadexTaskProvider)
+				if (instance instanceof IEditorTaskProvider)
 				{
-					provider = (IJadexTaskProvider) instance;
+					provider = (IEditorTaskProvider) instance;
 					tasks = provider.getAvailableTaskImplementations();
 				} 
 				else
@@ -161,23 +161,23 @@ public class PreferenceTaskProviderProxy implements IJadexTaskProvider
 	 * Proxy method to the original TaskProvider method
 	 * 
 	 * @see
-	 * jadex.tools.bpmn.runtime.task.IJadexTaskProvider#getTaskMetaInfo
+	 * jadex.tools.bpmn.runtime.task.IEditorTaskProvider#getTaskMetaInfo
 	 * (java.lang.String)
 	 */
 	@Override
-	public ITaskMetaInfo getTaskMetaInfo(String fqClassName)
+	public IEditorTaskMetaInfo getTaskMetaInfo(String fqClassName)
 	{
 
 		Object obj = providerMap.get(fqClassName);
-		if (obj != null && obj instanceof IJadexTaskProvider)
+		if (obj != null && obj instanceof IEditorTaskProvider)
 		{
 			// use interface if implemented
-			IJadexTaskProvider provider = (IJadexTaskProvider) obj;
+			IEditorTaskProvider provider = (IEditorTaskProvider) obj;
 			return provider.getTaskMetaInfo(fqClassName);
 		}
 		else if (obj != null)
 		{
-			throw new RuntimeException("Unexpected class in "+this, new InvalidObjectException("Object doesn't implement the IJadexTaskProvider interface nor its a Proxy object!" + obj));
+			throw new RuntimeException("Unexpected class in "+this, new InvalidObjectException("Object doesn't implement the IEditorTaskProvider interface nor its a Proxy object!" + obj));
 		}
 		
 		// fall through
@@ -201,7 +201,7 @@ public class PreferenceTaskProviderProxy implements IJadexTaskProvider
 					.getWorkspaceClassLoader(false);
 			Class<?> clazz = classLoader.loadClass(fullQualifiedClassName);
 			if (Arrays.asList(clazz.getInterfaces()).contains(
-					IJadexTaskProvider.class))
+					IEditorTaskProvider.class))
 			{
 				status = new Status(IStatus.OK, JadexBpmnPlugin.ID, "Implements IRuntimeTaskProvider");
 				return status;
@@ -209,13 +209,13 @@ public class PreferenceTaskProviderProxy implements IJadexTaskProvider
 			
 			// second check implementing needed methods
 			Method getAvailableTasksMethod = clazz
-					.getMethod(IJadexTaskProvider.METHOD_IJADEXTASKPROVIDER_GET_AVAILABLE_TASK_IMPLEMENTATIONS);
+					.getMethod(IEditorTaskProvider.METHOD_IJADEXTASKPROVIDER_GET_AVAILABLE_TASK_IMPLEMENTATIONS);
 			Method getTaskMetaInfoMethod = clazz
-					.getMethod(IJadexTaskProvider.METHOD_IJADEXTASKPROVIDER_GET_TASK_META_INFO);
+					.getMethod(IEditorTaskProvider.METHOD_IJADEXTASKPROVIDER_GET_TASK_META_INFO);
 			
 			if (getAvailableTasksMethod != null && getTaskMetaInfoMethod != null)
 			{
-				status = new Status(IStatus.OK, JadexBpmnPlugin.ID, "Implements '"+IJadexTaskProvider.METHOD_IJADEXTASKPROVIDER_GET_AVAILABLE_TASK_IMPLEMENTATIONS+"' and '"+IJadexTaskProvider.METHOD_IJADEXTASKPROVIDER_GET_TASK_META_INFO+"'");
+				status = new Status(IStatus.OK, JadexBpmnPlugin.ID, "Implements '"+IEditorTaskProvider.METHOD_IJADEXTASKPROVIDER_GET_AVAILABLE_TASK_IMPLEMENTATIONS+"' and '"+IEditorTaskProvider.METHOD_IJADEXTASKPROVIDER_GET_TASK_META_INFO+"'");
 				return status;
 			}
 		}

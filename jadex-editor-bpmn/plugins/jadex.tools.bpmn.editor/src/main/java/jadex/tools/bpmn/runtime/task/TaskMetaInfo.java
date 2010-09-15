@@ -5,7 +5,7 @@ package jadex.tools.bpmn.runtime.task;
  *  Should contain a description of what the task is useful for
  *  and which parameters it has.
  */
-public class TaskMetaInfo implements ITaskMetaInfo
+public class TaskMetaInfo implements IEditorTaskMetaInfo
 {
 	//-------- attributes --------
 	
@@ -13,12 +13,12 @@ public class TaskMetaInfo implements ITaskMetaInfo
 	protected String description;
 	
 	/** The parameter descriptions. */
-	protected IParameterMetaInfo[] parammetainfos;
+	protected IEditorParameterMetaInfo[] parammetainfos;
 
 	/**
 	 *  Create a task meta info.
 	 */
-	public TaskMetaInfo(String description, IParameterMetaInfo[] parammetainfos)
+	public TaskMetaInfo(String description, IEditorParameterMetaInfo[] parammetainfos)
 	{
 		this.description = description;
 		this.parammetainfos = parammetainfos;
@@ -27,7 +27,7 @@ public class TaskMetaInfo implements ITaskMetaInfo
 	//-------- methods --------
 	
 	/* (non-Javadoc)
-	 * @see jadex.tools.bpmn.runtime.task.ITaskMetaInfo#getDescription()
+	 * @see jadex.tools.bpmn.runtime.task.IEditorTaskMetaInfo#getDescription()
 	 */
 	@Override
 	public String getDescription()
@@ -36,10 +36,10 @@ public class TaskMetaInfo implements ITaskMetaInfo
 	}
 
 	/* (non-Javadoc)
-	 * @see jadex.tools.bpmn.runtime.task.ITaskMetaInfo#getParameterMetaInfos()
+	 * @see jadex.tools.bpmn.runtime.task.IEditorTaskMetaInfo#getParameterMetaInfos()
 	 */
 	@Override
-	public IParameterMetaInfo[] getParameterMetaInfos()
+	public IEditorParameterMetaInfo[] getParameterMetaInfos()
 	{
 		return this.parammetainfos;
 	}

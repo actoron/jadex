@@ -6,15 +6,14 @@ package jadex.tools.bpmn.editor.properties;
 import jadex.tools.bpmn.editor.properties.template.AbstractComboPropertySection;
 import jadex.tools.bpmn.editor.properties.template.AbstractParameterTablePropertySection;
 import jadex.tools.bpmn.editor.properties.template.JadexBpmnPropertiesUtil;
-import jadex.tools.bpmn.runtime.task.IJadexTaskProvider;
-import jadex.tools.bpmn.runtime.task.IParameterMetaInfo;
-import jadex.tools.bpmn.runtime.task.ITaskMetaInfo;
+import jadex.tools.bpmn.runtime.task.IEditorTaskProvider;
+import jadex.tools.bpmn.runtime.task.IEditorParameterMetaInfo;
+import jadex.tools.bpmn.runtime.task.IEditorTaskMetaInfo;
 import jadex.tools.bpmn.runtime.task.PreferenceTaskProviderProxy;
 import jadex.tools.model.common.properties.table.MultiColumnTable;
 import jadex.tools.model.common.properties.table.MultiColumnTable.MultiColumnTableRow;
 
 import org.eclipse.emf.ecore.xml.type.internal.RegEx.RegularExpression;
-import org.eclipse.jface.viewers.CellEditor.LayoutData;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.SWT;
@@ -31,6 +30,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Layout;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbenchPart;
@@ -53,7 +53,7 @@ public class JadexUserTaskImplComboSection extends
 	
 	protected Text taskMetaInfoText;
 	
-	protected IJadexTaskProvider taskProvider;
+	protected IEditorTaskProvider taskProvider;
 	
 	/** The table add default parameter button */
 	protected Button addDefaultButton;
@@ -136,16 +136,26 @@ public class JadexUserTaskImplComboSection extends
 				@Override
 				public void widgetSelected(SelectionEvent e)
 				{
-					// TODO:
+					if (taskProvider != null)
+					{
+						cCombo.setEnabled(false);
+						taskProvider.refresh();
+						cCombo.setItems(getComboItems());
+						sectionComposite.changed(new Control[]{cCombo});
+						cCombo.setEnabled(true);
+					}
 				}
 			});
 			super.rightButton = refreshButton;
 			addDisposable(refreshButton);
-			
+
 			oldButton.dispose();
 			oldButton = null;
 			
-			sectionComposite.pack();
+			sectionComposite.pack(true);
+			sectionComposite.layout(true);
+			sectionComposite.redraw();
+
 		}
 		
 		// add the MetaInfo frame
@@ -273,7 +283,7 @@ public class JadexUserTaskImplComboSection extends
 		taskMetaInfoText.setText(metaInfo);
 	}
 	
-	protected String createTaskMetaInfoString(ITaskMetaInfo taskMetaInfo)
+	protected String createTaskMetaInfoString(IEditorTaskMetaInfo taskMetaInfo)
 	{
 		if (taskMetaInfo == null)
 		{
@@ -283,7 +293,7 @@ public class JadexUserTaskImplComboSection extends
 		StringBuffer info = new StringBuffer();
 		info.append(taskMetaInfo.getDescription() + "\n");
 		
-		IParameterMetaInfo[] params = taskMetaInfo.getParameterMetaInfos();
+		IEditorParameterMetaInfo[] params = taskMetaInfo.getParameterMetaInfos();
 		if (params == null)
 			return info.toString();
 		for (int i = 0; i < params.length; i++)
@@ -302,8 +312,8 @@ public class JadexUserTaskImplComboSection extends
 	
 	protected void updateTaskParameterTable(String taskClassName)
 	{
-		ITaskMetaInfo metaInfo = taskProvider.getTaskMetaInfo(taskClassName);
-		IParameterMetaInfo[] taskParameter = metaInfo.getParameterMetaInfos();
+		IEditorTaskMetaInfo metaInfo = taskProvider.getTaskMetaInfo(taskClassName);
+		IEditorParameterMetaInfo[] taskParameter = metaInfo.getParameterMetaInfos();
 
 		MultiColumnTable parameterTable = JadexBpmnPropertiesUtil
 					.getJadexEAnnotationTable(
@@ -342,7 +352,7 @@ public class JadexUserTaskImplComboSection extends
 	 * @param parameterMetaInfo
 	 * @return
 	 */
-	protected MultiColumnTable createNewParameterTable(IParameterMetaInfo[] parameterMetaInfo)
+	protected MultiColumnTable createNewParameterTable(IEditorParameterMetaInfo[] parameterMetaInfo)
 	{
 		MultiColumnTable newTable = new MultiColumnTable(parameterMetaInfo.length, JadexCommonParameterSection.UNIQUE_PARAMETER_ROW_ATTRIBUTE);
 		for (int i = 0; i < parameterMetaInfo.length; i++)
@@ -367,7 +377,7 @@ public class JadexUserTaskImplComboSection extends
 	 * @param table
 	 * @param metaInfo
 	 */
-	protected MultiColumnTable updateTaskParamterTable(MultiColumnTable table, IParameterMetaInfo[] metaInfo)
+	protected MultiColumnTable updateTaskParamterTable(MultiColumnTable table, IEditorParameterMetaInfo[] metaInfo)
 	{
 		MultiColumnTable newTable = createNewParameterTable(metaInfo);
 		int typeIndex = AbstractParameterTablePropertySection.getDefaultIndexForColumn(AbstractParameterTablePropertySection.TYPE_COLUMN);
@@ -399,7 +409,7 @@ public class JadexUserTaskImplComboSection extends
 	 * @param table
 	 * @param metaInfo
 	 */
-	protected MultiColumnTable addTaskParamterTable(MultiColumnTable table, IParameterMetaInfo[] metaInfo)
+	protected MultiColumnTable addTaskParamterTable(MultiColumnTable table, IEditorParameterMetaInfo[] metaInfo)
 	{
 		MultiColumnTable newTable = createNewParameterTable(metaInfo);
 		

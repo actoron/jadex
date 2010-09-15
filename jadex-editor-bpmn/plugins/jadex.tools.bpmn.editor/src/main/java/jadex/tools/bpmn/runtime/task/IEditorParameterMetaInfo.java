@@ -1,6 +1,6 @@
 package jadex.tools.bpmn.runtime.task;
 
-public interface IParameterMetaInfo
+public interface IEditorParameterMetaInfo
 {
 
 	/**

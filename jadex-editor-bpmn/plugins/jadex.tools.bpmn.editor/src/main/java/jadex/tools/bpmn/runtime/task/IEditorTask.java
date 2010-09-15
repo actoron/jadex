@@ -8,14 +8,14 @@ package jadex.tools.bpmn.runtime.task;
  * 
  * @author Claas
  */
-public interface IJadexTask
+public interface IEditorTask
 {
 	/**
 	 * Access the TaskMetaInfo
 	 * @return the TaskMetaInfo  
 	 */
-	public ITaskMetaInfo getTaskMetaInfo();
+	public IEditorTaskMetaInfo getMetaInfo();
 	/** getDescription() method name */
-	public static final String METHOD_IJADEXTASK_GET_TASK_METAINFO = "getTaskMetaInfo";
+	public static final String METHOD_IJADEXTASK_GET_TASK_METAINFO = "getMetaInfo";
 
 }

@@ -35,7 +35,7 @@ public class PackageBasedTaskProvider extends TaskProviderSupport
 	// ---- interface methods ---
 
 	/* (non-Javadoc)
-	 * @see jadex.tools.bpmn.runtime.task.IJadexTaskProvider#dispose()
+	 * @see jadex.tools.bpmn.runtime.task.IEditorTaskProvider#dispose()
 	 */
 	@Override
 	public void dispose()

@@ -39,36 +39,36 @@ public class StaticJadexTaskProvider extends TaskProviderSupport
 
 		// print task.
 		String desc = "The print task can be used for printing out a text on the console.";
-		IParameterMetaInfo textmi = new ParameterMetaInfo(
+		IEditorParameterMetaInfo textmi = new ParameterMetaInfo(
 				ParameterMetaInfo.DIRECTION_IN, String.class, "text", null,
 				"The text parameter should contain the text to be printed.");
 		map.put("jadex.bpmn.runtime.task.PrintTask.class", new TaskMetaInfo(
-				desc, new IParameterMetaInfo[] { textmi }));
+				desc, new IEditorParameterMetaInfo[] { textmi }));
 
 		// store results task.
 		desc = "The store results task can be used for storing values as process results. As"
 				+ "parameters a name, value pair or if more than one results an arbitrary number of name, value"
 				+ "pairs with a postfix number can be used (e.g. name0 and value0, name1 and value1, etc.)";
-		IParameterMetaInfo namemi = new ParameterMetaInfo(
+		IEditorParameterMetaInfo namemi = new ParameterMetaInfo(
 				ParameterMetaInfo.DIRECTION_IN, String.class, "name", null,
 				"The name parameter identifies the name of the result parameter.");
-		IParameterMetaInfo valuemi = new ParameterMetaInfo(
+		IEditorParameterMetaInfo valuemi = new ParameterMetaInfo(
 				ParameterMetaInfo.DIRECTION_IN,
 				Object.class,
 				"value",
 				null,
 				"The value parameter identifies the value of the result parameter belonging to the name.");
-		IParameterMetaInfo namesmi = new ParameterMetaInfo(
+		IEditorParameterMetaInfo namesmi = new ParameterMetaInfo(
 				ParameterMetaInfo.DIRECTION_IN, String.class, "name0[..n]",
 				null,
 				"The name0[..n] parameter(s) identify the name(s) of the result parameter(s).");
-		IParameterMetaInfo valuesmi = new ParameterMetaInfo(
+		IEditorParameterMetaInfo valuesmi = new ParameterMetaInfo(
 				ParameterMetaInfo.DIRECTION_IN,
 				Object.class,
 				"value0[..n]",
 				null,
 				"The value0[..n] parameter(s) identify the value(s) of the result parameter(s) belonging to the name(s).");
-		ITaskMetaInfo tmi = new TaskMetaInfo(desc, new IParameterMetaInfo[] {
+		IEditorTaskMetaInfo tmi = new TaskMetaInfo(desc, new IEditorParameterMetaInfo[] {
 				namemi, valuemi, namesmi, valuesmi });
 		map.put("jadex.bpmn.runtime.task.StoreResultsTask.class", tmi);
 		map.put("StoreResultsTask.class", tmi);
@@ -77,38 +77,38 @@ public class StaticJadexTaskProvider extends TaskProviderSupport
 		desc = "The invoke method task can be used to invoke a mathod on an object or a"
 				+ "static method on a class. It accepts any number of parameters and may store the result"
 				+ "in a specific parameter.";
-		IParameterMetaInfo objectmi = new ParameterMetaInfo(
+		IEditorParameterMetaInfo objectmi = new ParameterMetaInfo(
 				ParameterMetaInfo.DIRECTION_IN, Object.class, "object", null,
 				"The object parameter identifies the object the method should be called on.");
-		IParameterMetaInfo classmi = new ParameterMetaInfo(
+		IEditorParameterMetaInfo classmi = new ParameterMetaInfo(
 				ParameterMetaInfo.DIRECTION_IN,
 				Class.class,
 				"class",
 				null,
 				"The class parameter identifies the class the method should be called on (alternativly to object).");
-		IParameterMetaInfo methodnamemi = new ParameterMetaInfo(
+		IEditorParameterMetaInfo methodnamemi = new ParameterMetaInfo(
 				ParameterMetaInfo.DIRECTION_IN, String.class, "methodname",
 				null,
 				"The methodname parameter identifies the method to be called.");
-		IParameterMetaInfo parammi = new ParameterMetaInfo(
+		IEditorParameterMetaInfo parammi = new ParameterMetaInfo(
 				ParameterMetaInfo.DIRECTION_IN,
 				Object.class,
 				"param",
 				null,
 				"The param parameter stores the value for an input parameter of the methodcall.");
-		IParameterMetaInfo paramsmi = new ParameterMetaInfo(
+		IEditorParameterMetaInfo paramsmi = new ParameterMetaInfo(
 				ParameterMetaInfo.DIRECTION_IN,
 				Object.class,
 				"param0[..n]",
 				null,
 				"The param0[..n] parameter(s) stores the value(s) for input parameter(s) of the methodcall.");
-		IParameterMetaInfo retmi = new ParameterMetaInfo(
+		IEditorParameterMetaInfo retmi = new ParameterMetaInfo(
 				ParameterMetaInfo.DIRECTION_IN,
 				String.class,
 				"returnname",
 				null,
 				"The returnname parameter identifies the result task parameter for storing the result of the call.");
-		tmi = new TaskMetaInfo(desc, new IParameterMetaInfo[] { objectmi,
+		tmi = new TaskMetaInfo(desc, new IEditorParameterMetaInfo[] { objectmi,
 				classmi, methodnamemi, parammi, paramsmi, retmi });
 		map.put("jadex.bpmn.runtime.task.InvokeMethodTask.class", tmi);
 		map.put("InvokeMethodTask.class", tmi);
@@ -119,55 +119,55 @@ public class StaticJadexTaskProvider extends TaskProviderSupport
 		namemi = new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_IN,
 				String.class, "name", null,
 				"The name parameter identifies the name of new component instance.");
-		IParameterMetaInfo modelmi = new ParameterMetaInfo(
+		IEditorParameterMetaInfo modelmi = new ParameterMetaInfo(
 				ParameterMetaInfo.DIRECTION_IN, String.class, "model", null,
 				"The model parameter contains the filename of the component to start.");
-		IParameterMetaInfo confmi = new ParameterMetaInfo(
+		IEditorParameterMetaInfo confmi = new ParameterMetaInfo(
 				ParameterMetaInfo.DIRECTION_IN,
 				String.class,
 				"configuration",
 				null,
 				"The configuration parameter defines the configuration the component should be started in.");
-		IParameterMetaInfo suspendmi = new ParameterMetaInfo(
+		IEditorParameterMetaInfo suspendmi = new ParameterMetaInfo(
 				ParameterMetaInfo.DIRECTION_IN, boolean.class, "suspend", null,
 				"The suspend parameter can be used to create the component in suspended mode.");
-		IParameterMetaInfo subcommi = new ParameterMetaInfo(
+		IEditorParameterMetaInfo subcommi = new ParameterMetaInfo(
 				ParameterMetaInfo.DIRECTION_IN,
 				boolean.class,
 				"subcomponent",
 				null,
 				"The subcomponent parameter decides if the new component is considered as subcomponent.");
-		IParameterMetaInfo killimi = new ParameterMetaInfo(
+		IEditorParameterMetaInfo killimi = new ParameterMetaInfo(
 				ParameterMetaInfo.DIRECTION_IN,
 				Object.class,
 				"killlistener",
 				null,
 				"The killlistener parameter can be used to be notified when the component terminates.");
-		IParameterMetaInfo resultmapmi = new ParameterMetaInfo(
+		IEditorParameterMetaInfo resultmapmi = new ParameterMetaInfo(
 				ParameterMetaInfo.DIRECTION_IN,
 				String[].class,
 				"resultmapping",
 				null,
 				"The resultmapping parameter defines the mapping of result to context parameters. "
 						+ "The string array structure is 0: first result name, 1: first context parameter name, 2: second result name, etc.");
-		IParameterMetaInfo waitmi = new ParameterMetaInfo(
+		IEditorParameterMetaInfo waitmi = new ParameterMetaInfo(
 				ParameterMetaInfo.DIRECTION_IN,
 				boolean.class,
 				"wait",
 				null,
 				"The wait parameter specifies is the activity should wait for the completeion of the started component."
 						+ "This is e.g. necessary if the return values should be used.");
-		IParameterMetaInfo mastermi = new ParameterMetaInfo(
+		IEditorParameterMetaInfo mastermi = new ParameterMetaInfo(
 				ParameterMetaInfo.DIRECTION_IN,
 				boolean.class,
 				"master",
 				null,
 				"The master parameter decides if the component is considered as master for its parent. The parent"
 						+ "can implement special logic when a master dies, e.g. an application terminates itself.");
-		IParameterMetaInfo argumentsmi = new ParameterMetaInfo(
+		IEditorParameterMetaInfo argumentsmi = new ParameterMetaInfo(
 				ParameterMetaInfo.DIRECTION_IN, Map.class, "arguments", null,
 				"The arguments parameter allows passing an argument map of name value pairs.");
-		tmi = new TaskMetaInfo(desc, new IParameterMetaInfo[] { namemi, modelmi,
+		tmi = new TaskMetaInfo(desc, new IEditorParameterMetaInfo[] { namemi, modelmi,
 				confmi, suspendmi, subcommi, killimi, resultmapmi, waitmi,
 				mastermi, argumentsmi });
 		map.put("jadex.bpmn.runtime.task.CreateComponentTask.class", tmi);
@@ -175,7 +175,7 @@ public class StaticJadexTaskProvider extends TaskProviderSupport
 
 		// destroy component task.
 		desc = "The destroy component task can be used for killing a specific component.";
-		IParameterMetaInfo cidmi = new ParameterMetaInfo(
+		IEditorParameterMetaInfo cidmi = new ParameterMetaInfo(
 				ParameterMetaInfo.DIRECTION_IN, Object.class, "componentid",
 				null,
 				"The componentid parameter serves for specifying the component id.");
@@ -185,7 +185,7 @@ public class StaticJadexTaskProvider extends TaskProviderSupport
 				"name",
 				null,
 				"The name parameter serves for specifying the local component name (if id not available).");
-		IParameterMetaInfo lismi = new ParameterMetaInfo(
+		IEditorParameterMetaInfo lismi = new ParameterMetaInfo(
 				ParameterMetaInfo.DIRECTION_IN,
 				Object.class,
 				"resultlistener",
@@ -198,7 +198,7 @@ public class StaticJadexTaskProvider extends TaskProviderSupport
 				null,
 				"The wait parameter specifies is the activity should wait for the component being killed."
 						+ "This is e.g. necessary if the return values should be used.");
-		tmi = new TaskMetaInfo(desc, new IParameterMetaInfo[] { cidmi, namemi,
+		tmi = new TaskMetaInfo(desc, new IEditorParameterMetaInfo[] { cidmi, namemi,
 				lismi, waitmi });
 		map.put("jadex.bpmn.runtime.task.DestroyComponentTask.class", tmi);
 		map.put("DestroyComponentTask.class", tmi);
@@ -216,29 +216,29 @@ public class StaticJadexTaskProvider extends TaskProviderSupport
 		// dispatch goal task.
 		desc = "The dispatch goal task can be used for dipatching a goal as top-level "
 				+ " or subgoal and optinally wait for the result (available only in bdibpmnplans).";
-		IParameterMetaInfo typemi = new ParameterMetaInfo(
+		IEditorParameterMetaInfo typemi = new ParameterMetaInfo(
 				ParameterMetaInfo.DIRECTION_IN, String.class, "type", null,
 				"The type parameter identifies the user goal type.");
 		paramsmi = new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_IN,
 				Map.class, "parameters", null,
 				"The 'parameter' parameter allows to specify the goal parameters.");
-		IParameterMetaInfo subgoal = new ParameterMetaInfo(
+		IEditorParameterMetaInfo subgoal = new ParameterMetaInfo(
 				ParameterMetaInfo.DIRECTION_IN, boolean.class, "subgoal", null,
 				"The subgoal parameter for dispatching as top-level or subgoal.");
-		IParameterMetaInfo wait = new ParameterMetaInfo(
+		IEditorParameterMetaInfo wait = new ParameterMetaInfo(
 				ParameterMetaInfo.DIRECTION_IN, boolean.class, "wait", null,
 				"The wait parameter to wait for the results.");
-		tmi = new TaskMetaInfo(desc, new IParameterMetaInfo[] { typemi,
+		tmi = new TaskMetaInfo(desc, new IEditorParameterMetaInfo[] { typemi,
 				paramsmi, subgoal, wait });
 		map.put("jadex.bdibpmn.task.DispatchGoalTask.class", tmi);
 		map.put("DispatchGoalTask.class", tmi);
 
 		// wait for goal task.
 		desc = "The wait for goal task can be used to wait for an existing goal (available only in bbdibpmnlans).";
-		IParameterMetaInfo goalmi = new ParameterMetaInfo(
+		IEditorParameterMetaInfo goalmi = new ParameterMetaInfo(
 				ParameterMetaInfo.DIRECTION_IN, Object.class, "goal", null,
 				"The goal parameter identifies the goal to be waited for.");
-		tmi = new TaskMetaInfo(desc, new IParameterMetaInfo[] { goalmi });
+		tmi = new TaskMetaInfo(desc, new IEditorParameterMetaInfo[] { goalmi });
 		map.put("jadex.bdibpmn.task.WaitForGoalTask.class", tmi);
 		map.put("WaitForGoalTask.class", tmi);
 
@@ -251,29 +251,29 @@ public class StaticJadexTaskProvider extends TaskProviderSupport
 				Map.class, "parameters", null,
 				"The 'parameter' parameter allows to specify the goal parameters.");
 		tmi = new TaskMetaInfo(desc,
-				new IParameterMetaInfo[] { typemi, paramsmi });
+				new IEditorParameterMetaInfo[] { typemi, paramsmi });
 		map.put("jadex.bdibpmn.task.DispatchInternalEventTask.class", tmi);
 		map.put("DispatchInternalEventTask.class", tmi);
 
 		// write belief task.
 		desc = "The write belief task can be used for setting a value to a belief or"
 				+ "for adding/removing a value to/from a beliefset (available only in bdibdibpmnns).";
-		IParameterMetaInfo belnamemi = new ParameterMetaInfo(
+		IEditorParameterMetaInfo belnamemi = new ParameterMetaInfo(
 				ParameterMetaInfo.DIRECTION_IN, String.class, "beliefname",
 				null, "The beliefname parameter identifies the belief.");
-		IParameterMetaInfo belsetnamemi = new ParameterMetaInfo(
+		IEditorParameterMetaInfo belsetnamemi = new ParameterMetaInfo(
 				ParameterMetaInfo.DIRECTION_IN, String.class, "beliefsetname",
 				null, "The beliefsetname parameter identifies the beliefset.");
 		valuemi = new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_IN,
 				Object.class, "value", null,
 				"The value parameter identifies the value to set/add/remove.");
-		IParameterMetaInfo modemi = new ParameterMetaInfo(
+		IEditorParameterMetaInfo modemi = new ParameterMetaInfo(
 				ParameterMetaInfo.DIRECTION_IN,
 				String.class,
 				"mode",
 				null,
 				"The mode parameter identifies the beliefset mode (add, remove, or remove all).");
-		tmi = new TaskMetaInfo(desc, new IParameterMetaInfo[] { belnamemi,
+		tmi = new TaskMetaInfo(desc, new IEditorParameterMetaInfo[] { belnamemi,
 				belsetnamemi, valuemi, modemi });
 		map.put("jadex.bdibpmn.task.WriteBeliefTask.class", tmi);
 		map.put("WriteBeliefTask.class", tmi);
@@ -281,10 +281,10 @@ public class StaticJadexTaskProvider extends TaskProviderSupport
 		// write parameter task.
 		desc = "The write parameter task can be used for setting a value to a parameter or"
 				+ "for adding/removing a value to/from a parameterset (available only in bdibbdibpmns).";
-		IParameterMetaInfo paramnamnmi = new ParameterMetaInfo(
+		IEditorParameterMetaInfo paramnamnmi = new ParameterMetaInfo(
 				ParameterMetaInfo.DIRECTION_IN, String.class, "parametername",
 				null, "The parametername parameter identifies the parameter.");
-		IParameterMetaInfo paramsetnamemi = new ParameterMetaInfo(
+		IEditorParameterMetaInfo paramsetnamemi = new ParameterMetaInfo(
 				ParameterMetaInfo.DIRECTION_IN, String.class,
 				"parametersetname", null,
 				"The parametersetname parameter identifies the parameterset.");
@@ -297,7 +297,7 @@ public class StaticJadexTaskProvider extends TaskProviderSupport
 				"mode",
 				null,
 				"The mode parameter identifies the parameterset mode (add, remove, or remove all).");
-		tmi = new TaskMetaInfo(desc, new IParameterMetaInfo[] { paramnamnmi,
+		tmi = new TaskMetaInfo(desc, new IEditorParameterMetaInfo[] { paramnamnmi,
 				paramsetnamemi, valuemi, modemi });
 		map.put("jadex.bdibpmn.task.WriteParameterTask.class", tmi);
 		map.put("WriteParameterTask.class", tmi);
@@ -310,22 +310,22 @@ public class StaticJadexTaskProvider extends TaskProviderSupport
 		typemi = new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_IN,
 				String.class, "type", null,
 				"The type parameter identifies the space object task type.");
-		IParameterMetaInfo spacemi = new ParameterMetaInfo(
+		IEditorParameterMetaInfo spacemi = new ParameterMetaInfo(
 				ParameterMetaInfo.DIRECTION_IN, Object.class, "space", null,
 				"The space parameter defines the space.");
-		IParameterMetaInfo objectid = new ParameterMetaInfo(
+		IEditorParameterMetaInfo objectid = new ParameterMetaInfo(
 				ParameterMetaInfo.DIRECTION_IN, Object.class, "objectid", null,
 				"The objectid parameter for identifying the space object.");
-		IParameterMetaInfo propsmi = new ParameterMetaInfo(
+		IEditorParameterMetaInfo propsmi = new ParameterMetaInfo(
 				ParameterMetaInfo.DIRECTION_IN, Map.class, "properties", null,
 				"The properties parameter to specify a map of properties for the task.");
-		IParameterMetaInfo taskidmi = new ParameterMetaInfo(
+		IEditorParameterMetaInfo taskidmi = new ParameterMetaInfo(
 				ParameterMetaInfo.DIRECTION_OUT, Object.class, "taskid", null,
 				"The taskid parameter for the return value, i.e. the id of the created task.");
 		waitmi = new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_IN,
 				boolean.class, "wait", null,
 				"The wait parameter to wait for the task.");
-		tmi = new TaskMetaInfo(desc, new IParameterMetaInfo[] { typemi, spacemi,
+		tmi = new TaskMetaInfo(desc, new IEditorParameterMetaInfo[] { typemi, spacemi,
 				objectid, propsmi, taskidmi, waitmi });
 		map.put("jadex.bdibpmn.task.CreateSpaceObjectTaskTask.class", tmi);
 		map.put("CreateSpaceObjectTaskTask.class", tmi);
@@ -342,7 +342,7 @@ public class StaticJadexTaskProvider extends TaskProviderSupport
 		taskidmi = new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_OUT,
 				Object.class, "taskid", null,
 				"The taskid parameter for the return value, i.e. the id of the created task.");
-		tmi = new TaskMetaInfo(desc, new IParameterMetaInfo[] { spacemi,
+		tmi = new TaskMetaInfo(desc, new IEditorParameterMetaInfo[] { spacemi,
 				objectid, taskidmi });
 		map.put("jadex.bdibpmn.task.WaitForSpaceObjectTaskTask.class", tmi);
 		map.put("WaitForSpaceObjectTaskTask.class", tmi);
@@ -359,7 +359,7 @@ public class StaticJadexTaskProvider extends TaskProviderSupport
 		taskidmi = new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_OUT,
 				Object.class, "taskid", null,
 				"The taskid parameter for identifying the task.");
-		tmi = new TaskMetaInfo(desc, new IParameterMetaInfo[] { spacemi,
+		tmi = new TaskMetaInfo(desc, new IEditorParameterMetaInfo[] { spacemi,
 				objectid, taskidmi });
 		map.put("jadex.bdibpmn.task.RemoveSpaceObjectTaskTask.class", tmi);
 		map.put("RemoveSpaceObjectTaskTask.class", tmi);

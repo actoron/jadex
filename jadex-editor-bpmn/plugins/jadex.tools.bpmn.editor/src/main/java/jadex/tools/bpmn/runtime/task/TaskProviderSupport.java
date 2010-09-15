@@ -14,13 +14,13 @@ import org.eclipse.core.runtime.IStatus;
  * @author Claas
  *
  */
-public abstract class TaskProviderSupport implements IJadexTaskProvider
+public abstract class TaskProviderSupport implements IEditorTaskProvider
 {
 
 	// ---- constants ----
 	
 	/** The default meta info if class not found */
-	static final ITaskMetaInfo NO_TASK_META_INFO_PROVIDED = new TaskMetaInfo("No TaskMetaInfo provided", new IParameterMetaInfo[0]);
+	static final IEditorTaskMetaInfo NO_TASK_META_INFO_PROVIDED = new TaskMetaInfo("No TaskMetaInfo provided", new IEditorParameterMetaInfo[0]);
 
 	/**
 	 * The provided task implementation classes for this {@link IRuntimeTaskProvider}
@@ -31,7 +31,7 @@ public abstract class TaskProviderSupport implements IJadexTaskProvider
 	 * Map for provided runtime classes<p>
 	 * Map(ClassName, TaskMetaInfo)
 	 */
-	protected Map<String, ITaskMetaInfo> metaInfoMap;
+	protected Map<String, IEditorTaskMetaInfo> metaInfoMap;
 
 
 	// ---- constructor ----
@@ -46,7 +46,7 @@ public abstract class TaskProviderSupport implements IJadexTaskProvider
 		//System.out.println(classPackage.toString());
 		
 		taskImplementations = new String[]{""};
-		metaInfoMap = new HashMap<String, ITaskMetaInfo>();
+		metaInfoMap = new HashMap<String, IEditorTaskMetaInfo>();
 	}
 
 	/**
@@ -54,7 +54,7 @@ public abstract class TaskProviderSupport implements IJadexTaskProvider
 	 * @param metaInfoMap
 	 */
 	public TaskProviderSupport(String[] taskImplementations,
-			HashMap<String, ITaskMetaInfo> metaInfoMap)
+			HashMap<String, IEditorTaskMetaInfo> metaInfoMap)
 	{
 		super();
 		this.taskImplementations = taskImplementations;
@@ -65,7 +65,7 @@ public abstract class TaskProviderSupport implements IJadexTaskProvider
 	// ---- interface methods ----
 
 	/* (non-Javadoc)
-	 * @see jadex.tools.bpmn.runtime.task.IJadexTaskProvider#dispose()
+	 * @see jadex.tools.bpmn.runtime.task.IEditorTaskProvider#dispose()
 	 */
 	@Override
 	public void dispose()
@@ -78,7 +78,7 @@ public abstract class TaskProviderSupport implements IJadexTaskProvider
 	}
 
 	/* (non-Javadoc)
-	 * @see jadex.tools.bpmn.runtime.task.IJadexTaskProvider#refresh()
+	 * @see jadex.tools.bpmn.runtime.task.IEditorTaskProvider#refresh()
 	 */
 	@Override
 	public void refresh()
@@ -104,13 +104,13 @@ public abstract class TaskProviderSupport implements IJadexTaskProvider
 	 * Get {@link TaskMetaInfo} for provided task implementation.
 	 * @see jadex.tools.bpmn.runtime.task.IRuntimeTaskProvider#getTaskMetaInfo(java.lang.String)
 	 */
-	public ITaskMetaInfo getTaskMetaInfo(String className)
+	public IEditorTaskMetaInfo getTaskMetaInfo(String className)
 	{
 		if (className != null && !className.trim().isEmpty())
 		{
 			if (metaInfoMap != null)
 			{
-				ITaskMetaInfo info;
+				IEditorTaskMetaInfo info;
 				if (metaInfoMap.containsKey(className))
 				{
 					info = metaInfoMap.get(className);
@@ -139,7 +139,7 @@ public abstract class TaskProviderSupport implements IJadexTaskProvider
 	 * @param className to load and call getMetaInfo() on
 	 * @return TaskMetaInfo for class if provided, else null
 	 */
-	private ITaskMetaInfo loadMetaInfo(String className) {
+	private IEditorTaskMetaInfo loadMetaInfo(String className) {
 		
 		ClassLoader classLoader = WorkspaceClassLoaderHelper
 				.getWorkspaceClassLoader(false);
@@ -161,11 +161,11 @@ public abstract class TaskProviderSupport implements IJadexTaskProvider
 			Object returnValue = WorkspaceClassLoaderHelper
 			.callUnparametrizedReflectionMethod(
 				taskInstance,
-				IJadexTask.METHOD_IJADEXTASK_GET_TASK_METAINFO);
+				IEditorTask.METHOD_IJADEXTASK_GET_TASK_METAINFO);
 
-			if (returnValue instanceof ITaskMetaInfo)
+			if (returnValue instanceof IEditorTaskMetaInfo)
 			{
-				return (ITaskMetaInfo) returnValue;
+				return (IEditorTaskMetaInfo) returnValue;
 			}
 			else if (returnValue != null)
 			{

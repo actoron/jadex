@@ -1,6 +1,6 @@
 package jadex.tools.bpmn.runtime.task;
 
-public interface ITaskMetaInfo
+public interface IEditorTaskMetaInfo
 {
 
 	/**
@@ -16,7 +16,7 @@ public interface ITaskMetaInfo
 	 *  Get the parameters.
 	 *  @return The parameters.
 	 */
-	public abstract IParameterMetaInfo[] getParameterMetaInfos();
+	public abstract IEditorParameterMetaInfo[] getParameterMetaInfos();
 	/** getParameterMetaInfos() method name */
 	public static final String METHOD_ITASKMETAINFO_GET_PARAMETER_METAINFOS = "getParameterMetaInfos";
 

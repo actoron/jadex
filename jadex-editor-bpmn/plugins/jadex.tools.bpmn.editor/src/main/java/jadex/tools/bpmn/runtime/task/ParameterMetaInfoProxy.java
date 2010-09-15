@@ -7,7 +7,7 @@ package jadex.tools.bpmn.runtime.task;
  * @author claas
  * 
  */
-public class ParameterMetaInfoProxy implements IParameterMetaInfo
+public class ParameterMetaInfoProxy implements IEditorParameterMetaInfo
 {
 
 	Object parameterMetaInfo;
@@ -24,7 +24,7 @@ public class ParameterMetaInfoProxy implements IParameterMetaInfo
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see jadex.tools.bpmn.runtime.task.IParameterMetaInfo#getDirection()
+	 * @see jadex.tools.bpmn.runtime.task.IEditorParameterMetaInfo#getDirection()
 	 */
 	@Override
 	public String getDirection()
@@ -37,7 +37,7 @@ public class ParameterMetaInfoProxy implements IParameterMetaInfo
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see jadex.tools.bpmn.runtime.task.IParameterMetaInfo#getClazz()
+	 * @see jadex.tools.bpmn.runtime.task.IEditorParameterMetaInfo#getClazz()
 	 */
 	@Override
 	public Class<?> getClazz()
@@ -49,7 +49,7 @@ public class ParameterMetaInfoProxy implements IParameterMetaInfo
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see jadex.tools.bpmn.runtime.task.IParameterMetaInfo#getName()
+	 * @see jadex.tools.bpmn.runtime.task.IEditorParameterMetaInfo#getName()
 	 */
 	@Override
 	public String getName()
@@ -61,7 +61,7 @@ public class ParameterMetaInfoProxy implements IParameterMetaInfo
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see jadex.tools.bpmn.runtime.task.IParameterMetaInfo#getInitialValue()
+	 * @see jadex.tools.bpmn.runtime.task.IEditorParameterMetaInfo#getInitialValue()
 	 */
 	@Override
 	public String getInitialValue()
@@ -74,7 +74,7 @@ public class ParameterMetaInfoProxy implements IParameterMetaInfo
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see jadex.tools.bpmn.runtime.task.IParameterMetaInfo#getDescription()
+	 * @see jadex.tools.bpmn.runtime.task.IEditorParameterMetaInfo#getDescription()
 	 */
 	@Override
 	public String getDescription()

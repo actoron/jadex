@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.net.JarURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -240,12 +241,14 @@ class WorkspaceClassLoaderHelper
 					// we are only interested in .class files with specific suffix
 					if (file.endsWith(classSuffix)) {
 						// remove .class extension
-						classes.add(classLoader.loadClass(pkgName + '.'
-								+ file.substring(0, file.length() - 6)));
-								/*
-								Class.forName(pkgName + '.'
-								+ file.substring(0, file.length() - 6)));
-								*/
+						Class<?> clazz = classLoader.loadClass(pkgName + '.'
+								+ file.substring(0, file.length() - 6));
+						// don't add abstract classes or interfaces to this list
+						if (!Modifier.isAbstract(clazz.getModifiers())
+								&& !Modifier.isInterface(clazz.getModifiers()))
+						{
+							classes.add(clazz);
+						}
 					}
 				}
 			} else {
@@ -265,11 +268,11 @@ class WorkspaceClassLoaderHelper
 	 * @param classInterface The interface class
 	 * @return List of matching classes
 	 */
-	public static List<Class<?>> getClassessOfInterface(String pkgName,
+	public static List<Class<?>> getClassesOfInterface(String pkgName,
 			Class<?> classInterface)
 	{
-		return getClassessOfInterface(pkgName, ".class", classInterface);
-	}	
+		return getClassesOfInterface(pkgName, ".class", classInterface);
+	}
 	
 	/**
 	 * Get all classes with the suffix (e.g. <code>.class</code>) in a package implementing a specific interface
@@ -279,7 +282,7 @@ class WorkspaceClassLoaderHelper
 	 * @param classInterface The interface class
 	 * @return List of matching classes
 	 */
-	public static List<Class<?>> getClassessOfInterface(String pkgName,
+	public static List<Class<?>> getClassesOfInterface(String pkgName,
 			String classSuffix, Class<?> classInterface)
 	{
 		List<Class<?>> classList = new UniqueEList<Class<?>>();
@@ -315,6 +318,10 @@ class WorkspaceClassLoaderHelper
 		{
 			return (String) returnValue;
 		}
+		else if (returnValue == null)
+		{
+			return null;
+		}
 		else
 		{
 			JadexBpmnEditor.log("Wrong return value from method", new UnsupportedOperationException(
@@ -333,6 +340,10 @@ class WorkspaceClassLoaderHelper
 		if (returnValue instanceof Class<?>)
 		{
 			return (Class<?>) returnValue;
+		}
+		else if (returnValue == null)
+		{
+			return null;
 		}
 		else
 		{

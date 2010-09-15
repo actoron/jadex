@@ -4,14 +4,14 @@ import jadex.tools.bpmn.editor.JadexBpmnEditor;
 
 import org.eclipse.core.runtime.IStatus;
 
-public class TaskProviderProxy implements IJadexTaskProvider
+public class TaskProviderProxy implements IEditorTaskProvider
 {
 
 	Object provider;
 	
 	/**
 	 * Create a TaskProviderProxy for the given provider not 
-	 * implementing the {@link IJadexTaskProvider} interface.
+	 * implementing the {@link IEditorTaskProvider} interface.
 	 * 
 	 * @param provider to proxy for
 	 */
@@ -22,7 +22,7 @@ public class TaskProviderProxy implements IJadexTaskProvider
 	}
 	
 	/* (non-Javadoc)
-	 * @see jadex.tools.bpmn.runtime.task.IJadexTaskProvider#dispose()
+	 * @see jadex.tools.bpmn.runtime.task.IEditorTaskProvider#dispose()
 	 */
 	@Override
 	public void dispose()
@@ -32,7 +32,7 @@ public class TaskProviderProxy implements IJadexTaskProvider
 	}
 
 	/* (non-Javadoc)
-	 * @see jadex.tools.bpmn.runtime.task.IJadexTaskProvider#refresh()
+	 * @see jadex.tools.bpmn.runtime.task.IEditorTaskProvider#refresh()
 	 */
 	@Override
 	public void refresh()
@@ -48,7 +48,7 @@ public class TaskProviderProxy implements IJadexTaskProvider
 		Object returnValue = WorkspaceClassLoaderHelper
 			.callUnparametrizedReflectionMethod(
 				provider,
-				IJadexTaskProvider.METHOD_IJADEXTASKPROVIDER_GET_AVAILABLE_TASK_IMPLEMENTATIONS);
+				IEditorTaskProvider.METHOD_IJADEXTASKPROVIDER_GET_AVAILABLE_TASK_IMPLEMENTATIONS);
 
 		// check the return value
 		if (returnValue != null && returnValue instanceof String[])
@@ -64,19 +64,19 @@ public class TaskProviderProxy implements IJadexTaskProvider
 	}
 
 	@Override
-	public ITaskMetaInfo getTaskMetaInfo(String fqClassName)
+	public IEditorTaskMetaInfo getTaskMetaInfo(String fqClassName)
 	{
 		try
 		{
 			Object returnValue = WorkspaceClassLoaderHelper
 			.callUnparametrizedReflectionMethod(
 					provider,
-					IJadexTaskProvider.METHOD_IJADEXTASKPROVIDER_GET_TASK_META_INFO);
+					IEditorTaskProvider.METHOD_IJADEXTASKPROVIDER_GET_TASK_META_INFO);
 			
 			// check the return value
-			if (returnValue instanceof ITaskMetaInfo)
+			if (returnValue instanceof IEditorTaskMetaInfo)
 			{
-				return (ITaskMetaInfo) returnValue;
+				return (IEditorTaskMetaInfo) returnValue;
 			}
 			else if (returnValue != null)
 			{

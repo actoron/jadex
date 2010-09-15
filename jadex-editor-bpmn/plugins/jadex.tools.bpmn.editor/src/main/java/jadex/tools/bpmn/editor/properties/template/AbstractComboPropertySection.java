@@ -182,17 +182,17 @@ public abstract class AbstractComboPropertySection extends AbstractBpmnPropertyS
 		GridLayout layout = new GridLayout(3, false);
 		sectionComposite.setLayout(layout);
 
-		GridData labelGridData = new GridData();
+		GridData labelGridData = new GridData(SWT.LEFT, SWT.CENTER, false, false);
 		labelGridData.minimumWidth = 60;
 		labelGridData.widthHint = 60;
 		
-		GridData comboGridData = new GridData(SWT.FILL);
+		GridData comboGridData = new GridData(SWT.LEFT, SWT.CENTER, true, false);
 		comboGridData.minimumWidth = 500;
 		comboGridData.widthHint = 500;
 		
-		GridData buttonGridData = new GridData();
-		labelGridData.minimumWidth = 60;
-		labelGridData.widthHint = 60;
+		GridData buttonGridData = new GridData(SWT.CENTER, SWT.CENTER, false, false);
+		buttonGridData.minimumWidth = 60;
+		buttonGridData.widthHint = 60;
 		
 		CLabel cLabel = getWidgetFactory().createCLabel(sectionComposite, cComboLabel+":"); // //$NON-NLS-1$
 		addDisposable(cLabel);
