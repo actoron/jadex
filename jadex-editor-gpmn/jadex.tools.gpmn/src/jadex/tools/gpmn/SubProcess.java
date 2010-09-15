@@ -19,6 +19,7 @@ package jadex.tools.gpmn;
  * The following features are supported:
  * <ul>
  *   <li>{@link jadex.tools.gpmn.SubProcess#getProcessref <em>Processref</em>}</li>
+ *   <li>{@link jadex.tools.gpmn.SubProcess#isInternal <em>Internal</em>}</li>
  *   <li>{@link jadex.tools.gpmn.SubProcess#getGpmnDiagram <em>Gpmn Diagram</em>}</li>
  * </ul>
  * </p>
@@ -89,6 +90,34 @@ public interface SubProcess extends AbstractNode, Activatable
 	 * @generated
 	 */
 	boolean isSetProcessref();
+
+	/**
+	 * Returns the value of the '<em><b>Internal</b></em>' attribute.
+	 * The default value is <code>"false"</code>.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Internal</em>' attribute isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Internal</em>' attribute.
+	 * @see #setInternal(boolean)
+	 * @see jadex.tools.gpmn.GpmnPackage#getSubProcess_Internal()
+	 * @model default="false" dataType="org.eclipse.emf.ecore.xml.type.Boolean"
+	 *        extendedMetaData="kind='attribute' name='internal'"
+	 * @generated
+	 */
+	boolean isInternal();
+
+	/**
+	 * Sets the value of the '{@link jadex.tools.gpmn.SubProcess#isInternal <em>Internal</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Internal</em>' attribute.
+	 * @see #isInternal()
+	 * @generated
+	 */
+	void setInternal(boolean value);
 
 	/**
 	 * Returns the value of the '<em><b>Gpmn Diagram</b></em>' container reference.

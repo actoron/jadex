@@ -31,8 +31,7 @@ import org.eclipse.swt.widgets.Display;
  * @generated
  */
 public class ActivationEdgeEditPart extends ConnectionNodeEditPart implements
-		ITreeBranchEditPart
-{
+		ITreeBranchEditPart {
 
 	/**
 	 * @generated
@@ -42,16 +41,14 @@ public class ActivationEdgeEditPart extends ConnectionNodeEditPart implements
 	/**
 	 * @generated
 	 */
-	public ActivationEdgeEditPart(View view)
-	{
+	public ActivationEdgeEditPart(View view) {
 		super(view);
 	}
 
 	/**
 	 * @generated
 	 */
-	protected void createDefaultEditPolicies()
-	{
+	protected void createDefaultEditPolicies() {
 		super.createDefaultEditPolicies();
 		installEditPolicy(EditPolicyRoles.SEMANTIC_ROLE,
 				new ActivationEdgeItemSemanticEditPolicy());
@@ -60,10 +57,8 @@ public class ActivationEdgeEditPart extends ConnectionNodeEditPart implements
 	/**
 	 * @generated
 	 */
-	protected boolean addFixedChild(EditPart childEditPart)
-	{
-		if (childEditPart instanceof ActivationEdgeOrderEditPart)
-		{
+	protected boolean addFixedChild(EditPart childEditPart) {
+		if (childEditPart instanceof ActivationEdgeOrderEditPart) {
 			((ActivationEdgeOrderEditPart) childEditPart)
 					.setLabel(getPrimaryShape()
 							.getFigureActivationEdgeOrderFigure());
@@ -75,10 +70,8 @@ public class ActivationEdgeEditPart extends ConnectionNodeEditPart implements
 	/**
 	 * @generated
 	 */
-	protected void addChildVisual(EditPart childEditPart, int index)
-	{
-		if (addFixedChild(childEditPart))
-		{
+	protected void addChildVisual(EditPart childEditPart, int index) {
+		if (addFixedChild(childEditPart)) {
 			return;
 		}
 		super.addChildVisual(childEditPart, -1);
@@ -87,10 +80,8 @@ public class ActivationEdgeEditPart extends ConnectionNodeEditPart implements
 	/**
 	 * @generated
 	 */
-	protected boolean removeFixedChild(EditPart childEditPart)
-	{
-		if (childEditPart instanceof ActivationEdgeOrderEditPart)
-		{
+	protected boolean removeFixedChild(EditPart childEditPart) {
+		if (childEditPart instanceof ActivationEdgeOrderEditPart) {
 			return true;
 		}
 		return false;
@@ -99,10 +90,8 @@ public class ActivationEdgeEditPart extends ConnectionNodeEditPart implements
 	/**
 	 * @generated
 	 */
-	protected void removeChildVisual(EditPart childEditPart)
-	{
-		if (removeFixedChild(childEditPart))
-		{
+	protected void removeChildVisual(EditPart childEditPart) {
+		if (removeFixedChild(childEditPart)) {
 			return;
 		}
 		super.removeChildVisual(childEditPart);
@@ -117,24 +106,21 @@ public class ActivationEdgeEditPart extends ConnectionNodeEditPart implements
 	 * @generated
 	 */
 
-	protected Connection createConnectionFigure()
-	{
+	protected Connection createConnectionFigure() {
 		return new ActivationEdgeFigure();
 	}
 
 	/**
 	 * @generated
 	 */
-	public ActivationEdgeFigure getPrimaryShape()
-	{
+	public ActivationEdgeFigure getPrimaryShape() {
 		return (ActivationEdgeFigure) getFigure();
 	}
 
 	/**
 	 * @generated
 	 */
-	public class ActivationEdgeFigure extends PolylineConnectionEx
-	{
+	public class ActivationEdgeFigure extends PolylineConnectionEx {
 
 		/**
 		 * @generated
@@ -144,8 +130,7 @@ public class ActivationEdgeEditPart extends ConnectionNodeEditPart implements
 		/**
 		 * @generated
 		 */
-		public ActivationEdgeFigure()
-		{
+		public ActivationEdgeFigure() {
 			this.setLineWidth(1);
 			this.setForegroundColor(ColorConstants.black);
 
@@ -156,8 +141,7 @@ public class ActivationEdgeEditPart extends ConnectionNodeEditPart implements
 		/**
 		 * @generated
 		 */
-		private void createContents()
-		{
+		private void createContents() {
 
 			fFigureActivationEdgeOrderFigure = new WrappingLabel();
 			fFigureActivationEdgeOrderFigure.setText("");
@@ -169,8 +153,7 @@ public class ActivationEdgeEditPart extends ConnectionNodeEditPart implements
 		/**
 		 * @generated
 		 */
-		private RotatableDecoration createTargetDecoration()
-		{
+		private RotatableDecoration createTargetDecoration() {
 			PolylineDecoration df = new PolylineDecoration();
 			df.setLineWidth(1);
 			df.setForegroundColor(ColorConstants.black);
@@ -180,8 +163,7 @@ public class ActivationEdgeEditPart extends ConnectionNodeEditPart implements
 		/**
 		 * @generated
 		 */
-		public WrappingLabel getFigureActivationEdgeOrderFigure()
-		{
+		public WrappingLabel getFigureActivationEdgeOrderFigure() {
 			return fFigureActivationEdgeOrderFigure;
 		}
 

@@ -56,8 +56,7 @@ public class GpmnSwitch<T>
 	 */
 	public GpmnSwitch()
 	{
-		if (modelPackage == null)
-		{
+		if (modelPackage == null) {
 			modelPackage = GpmnPackage.eINSTANCE;
 		}
 	}
@@ -83,12 +82,10 @@ public class GpmnSwitch<T>
 	 */
 	protected T doSwitch(EClass theEClass, EObject theEObject)
 	{
-		if (theEClass.eContainer() == modelPackage)
-		{
+		if (theEClass.eContainer() == modelPackage) {
 			return doSwitch(theEClass.getClassifierID(), theEObject);
 		}
-		else
-		{
+		else {
 			List<EClass> eSuperTypes = theEClass.getESuperTypes();
 			return
 				eSuperTypes.isEmpty() ?
@@ -106,10 +103,8 @@ public class GpmnSwitch<T>
 	 */
 	protected T doSwitch(int classifierID, EObject theEObject)
 	{
-		switch (classifierID)
-		{
-			case GpmnPackage.ABSTRACT_EDGE:
-			{
+		switch (classifierID) {
+			case GpmnPackage.ABSTRACT_EDGE: {
 				AbstractEdge abstractEdge = (AbstractEdge)theEObject;
 				T result = caseAbstractEdge(abstractEdge);
 				if (result == null) result = caseIdentifiable(abstractEdge);
@@ -117,8 +112,7 @@ public class GpmnSwitch<T>
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
-			case GpmnPackage.ABSTRACT_NODE:
-			{
+			case GpmnPackage.ABSTRACT_NODE: {
 				AbstractNode abstractNode = (AbstractNode)theEObject;
 				T result = caseAbstractNode(abstractNode);
 				if (result == null) result = caseIdentifiable(abstractNode);
@@ -127,8 +121,7 @@ public class GpmnSwitch<T>
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
-			case GpmnPackage.ABSTRACT_PLAN:
-			{
+			case GpmnPackage.ABSTRACT_PLAN: {
 				AbstractPlan abstractPlan = (AbstractPlan)theEObject;
 				T result = caseAbstractPlan(abstractPlan);
 				if (result == null) result = caseAbstractNode(abstractPlan);
@@ -138,16 +131,14 @@ public class GpmnSwitch<T>
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
-			case GpmnPackage.ACTIVATABLE:
-			{
+			case GpmnPackage.ACTIVATABLE: {
 				Activatable activatable = (Activatable)theEObject;
 				T result = caseActivatable(activatable);
 				if (result == null) result = caseEModelElement(activatable);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
-			case GpmnPackage.ACTIVATION_EDGE:
-			{
+			case GpmnPackage.ACTIVATION_EDGE: {
 				ActivationEdge activationEdge = (ActivationEdge)theEObject;
 				T result = caseActivationEdge(activationEdge);
 				if (result == null) result = caseAbstractEdge(activationEdge);
@@ -156,8 +147,7 @@ public class GpmnSwitch<T>
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
-			case GpmnPackage.BPMN_PLAN:
-			{
+			case GpmnPackage.BPMN_PLAN: {
 				BpmnPlan bpmnPlan = (BpmnPlan)theEObject;
 				T result = caseBpmnPlan(bpmnPlan);
 				if (result == null) result = caseAbstractPlan(bpmnPlan);
@@ -168,24 +158,21 @@ public class GpmnSwitch<T>
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
-			case GpmnPackage.CONTEXT:
-			{
+			case GpmnPackage.CONTEXT: {
 				Context context = (Context)theEObject;
 				T result = caseContext(context);
 				if (result == null) result = caseEModelElement(context);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
-			case GpmnPackage.CONTEXT_ELEMENT:
-			{
+			case GpmnPackage.CONTEXT_ELEMENT: {
 				ContextElement contextElement = (ContextElement)theEObject;
 				T result = caseContextElement(contextElement);
 				if (result == null) result = caseEModelElement(contextElement);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
-			case GpmnPackage.GOAL:
-			{
+			case GpmnPackage.GOAL: {
 				Goal goal = (Goal)theEObject;
 				T result = caseGoal(goal);
 				if (result == null) result = caseAbstractNode(goal);
@@ -196,8 +183,7 @@ public class GpmnSwitch<T>
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
-			case GpmnPackage.GPMN_DIAGRAM:
-			{
+			case GpmnPackage.GPMN_DIAGRAM: {
 				GpmnDiagram gpmnDiagram = (GpmnDiagram)theEObject;
 				T result = caseGpmnDiagram(gpmnDiagram);
 				if (result == null) result = caseNamedObject(gpmnDiagram);
@@ -205,16 +191,14 @@ public class GpmnSwitch<T>
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
-			case GpmnPackage.IDENTIFIABLE:
-			{
+			case GpmnPackage.IDENTIFIABLE: {
 				Identifiable identifiable = (Identifiable)theEObject;
 				T result = caseIdentifiable(identifiable);
 				if (result == null) result = caseEModelElement(identifiable);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
-			case GpmnPackage.ACTIVATION_PLAN:
-			{
+			case GpmnPackage.ACTIVATION_PLAN: {
 				ActivationPlan activationPlan = (ActivationPlan)theEObject;
 				T result = caseActivationPlan(activationPlan);
 				if (result == null) result = caseAbstractPlan(activationPlan);
@@ -225,32 +209,28 @@ public class GpmnSwitch<T>
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
-			case GpmnPackage.NAMED_OBJECT:
-			{
+			case GpmnPackage.NAMED_OBJECT: {
 				NamedObject namedObject = (NamedObject)theEObject;
 				T result = caseNamedObject(namedObject);
 				if (result == null) result = caseEModelElement(namedObject);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
-			case GpmnPackage.PARAMETER:
-			{
+			case GpmnPackage.PARAMETER: {
 				Parameter parameter = (Parameter)theEObject;
 				T result = caseParameter(parameter);
 				if (result == null) result = caseEModelElement(parameter);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
-			case GpmnPackage.PARAMETER_MAPPING:
-			{
+			case GpmnPackage.PARAMETER_MAPPING: {
 				ParameterMapping parameterMapping = (ParameterMapping)theEObject;
 				T result = caseParameterMapping(parameterMapping);
 				if (result == null) result = caseEModelElement(parameterMapping);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
-			case GpmnPackage.PLAN_EDGE:
-			{
+			case GpmnPackage.PLAN_EDGE: {
 				PlanEdge planEdge = (PlanEdge)theEObject;
 				T result = casePlanEdge(planEdge);
 				if (result == null) result = caseAbstractEdge(planEdge);
@@ -259,8 +239,7 @@ public class GpmnSwitch<T>
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
-			case GpmnPackage.SUB_PROCESS:
-			{
+			case GpmnPackage.SUB_PROCESS: {
 				SubProcess subProcess = (SubProcess)theEObject;
 				T result = caseSubProcess(subProcess);
 				if (result == null) result = caseAbstractNode(subProcess);
@@ -271,8 +250,7 @@ public class GpmnSwitch<T>
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
-			case GpmnPackage.SUPPRESSION_EDGE:
-			{
+			case GpmnPackage.SUPPRESSION_EDGE: {
 				SuppressionEdge suppressionEdge = (SuppressionEdge)theEObject;
 				T result = caseSuppressionEdge(suppressionEdge);
 				if (result == null) result = caseAbstractEdge(suppressionEdge);

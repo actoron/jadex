@@ -26,8 +26,7 @@ import org.eclipse.gmf.runtime.notation.View;
  * @generated
  */
 public class SuppressionEdgeEditPart extends ConnectionNodeEditPart implements
-		ITreeBranchEditPart
-{
+		ITreeBranchEditPart {
 
 	/**
 	 * @generated
@@ -37,16 +36,14 @@ public class SuppressionEdgeEditPart extends ConnectionNodeEditPart implements
 	/**
 	 * @generated
 	 */
-	public SuppressionEdgeEditPart(View view)
-	{
+	public SuppressionEdgeEditPart(View view) {
 		super(view);
 	}
 
 	/**
 	 * @generated
 	 */
-	protected void createDefaultEditPolicies()
-	{
+	protected void createDefaultEditPolicies() {
 		super.createDefaultEditPolicies();
 		installEditPolicy(EditPolicyRoles.SEMANTIC_ROLE,
 				new SuppressionEdgeItemSemanticEditPolicy());
@@ -61,30 +58,26 @@ public class SuppressionEdgeEditPart extends ConnectionNodeEditPart implements
 	 * @generated
 	 */
 
-	protected Connection createConnectionFigure()
-	{
+	protected Connection createConnectionFigure() {
 		return new SuppressionEdgeFigure();
 	}
 
 	/**
 	 * @generated
 	 */
-	public SuppressionEdgeFigure getPrimaryShape()
-	{
+	public SuppressionEdgeFigure getPrimaryShape() {
 		return (SuppressionEdgeFigure) getFigure();
 	}
 
 	/**
 	 * @generated
 	 */
-	public class SuppressionEdgeFigure extends PolylineConnectionEx
-	{
+	public class SuppressionEdgeFigure extends PolylineConnectionEx {
 
 		/**
 		 * @generated
 		 */
-		public SuppressionEdgeFigure()
-		{
+		public SuppressionEdgeFigure() {
 			this.setLineWidth(1);
 			this.setLineStyle(Graphics.LINE_DASH);
 			this.setForegroundColor(ColorConstants.black);
@@ -95,8 +88,7 @@ public class SuppressionEdgeEditPart extends ConnectionNodeEditPart implements
 		/**
 		 * @generated
 		 */
-		private RotatableDecoration createTargetDecoration()
-		{
+		private RotatableDecoration createTargetDecoration() {
 			SuppressionEdgeTargetDecoration df = new SuppressionEdgeTargetDecoration();
 
 			return df;

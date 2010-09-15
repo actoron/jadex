@@ -16,31 +16,25 @@ import org.eclipse.gmf.runtime.notation.View;
 /**
  * @generated
  */
-public class GpmnNavigatorItem extends GpmnAbstractNavigatorItem
-{
+public class GpmnNavigatorItem extends GpmnAbstractNavigatorItem {
 
 	/**
 	 * @generated
 	 */
-	static
-	{
+	static {
 		final Class[] supportedTypes = new Class[] { View.class, EObject.class };
-		Platform.getAdapterManager().registerAdapters(new IAdapterFactory()
-		{
+		Platform.getAdapterManager().registerAdapters(new IAdapterFactory() {
 
-			public Object getAdapter(Object adaptableObject, Class adapterType)
-			{
+			public Object getAdapter(Object adaptableObject, Class adapterType) {
 				if (adaptableObject instanceof jadex.tools.gpmn.diagram.navigator.GpmnNavigatorItem
-						&& (adapterType == View.class || adapterType == EObject.class))
-				{
+						&& (adapterType == View.class || adapterType == EObject.class)) {
 					return ((jadex.tools.gpmn.diagram.navigator.GpmnNavigatorItem) adaptableObject)
 							.getView();
 				}
 				return null;
 			}
 
-			public Class[] getAdapterList()
-			{
+			public Class[] getAdapterList() {
 				return supportedTypes;
 			}
 		}, jadex.tools.gpmn.diagram.navigator.GpmnNavigatorItem.class);
@@ -59,8 +53,7 @@ public class GpmnNavigatorItem extends GpmnAbstractNavigatorItem
 	/**
 	 * @generated
 	 */
-	public GpmnNavigatorItem(View view, Object parent, boolean isLeaf)
-	{
+	public GpmnNavigatorItem(View view, Object parent, boolean isLeaf) {
 		super(parent);
 		myView = view;
 		myLeaf = isLeaf;
@@ -69,26 +62,22 @@ public class GpmnNavigatorItem extends GpmnAbstractNavigatorItem
 	/**
 	 * @generated
 	 */
-	public View getView()
-	{
+	public View getView() {
 		return myView;
 	}
 
 	/**
 	 * @generated
 	 */
-	public boolean isLeaf()
-	{
+	public boolean isLeaf() {
 		return myLeaf;
 	}
 
 	/**
 	 * @generated
 	 */
-	public boolean equals(Object obj)
-	{
-		if (obj instanceof jadex.tools.gpmn.diagram.navigator.GpmnNavigatorItem)
-		{
+	public boolean equals(Object obj) {
+		if (obj instanceof jadex.tools.gpmn.diagram.navigator.GpmnNavigatorItem) {
 			return EcoreUtil
 					.getURI(getView())
 					.equals(
@@ -102,8 +91,7 @@ public class GpmnNavigatorItem extends GpmnAbstractNavigatorItem
 	/**
 	 * @generated
 	 */
-	public int hashCode()
-	{
+	public int hashCode() {
 		return EcoreUtil.getURI(getView()).hashCode();
 	}
 

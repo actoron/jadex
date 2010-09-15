@@ -35,39 +35,33 @@ import org.eclipse.gmf.runtime.notation.View;
 /**
  * @generated
  */
-public class GoalItemSemanticEditPolicy extends GpmnBaseItemSemanticEditPolicy
-{
+public class GoalItemSemanticEditPolicy extends GpmnBaseItemSemanticEditPolicy {
 
 	/**
 	 * @generated
 	 */
-	public GoalItemSemanticEditPolicy()
-	{
+	public GoalItemSemanticEditPolicy() {
 		super(GpmnElementTypes.Goal_2004);
 	}
 
 	/**
 	 * @generated
 	 */
-	protected Command getDestroyElementCommand(DestroyElementRequest req)
-	{
+	protected Command getDestroyElementCommand(DestroyElementRequest req) {
 		View view = (View) getHost().getModel();
 		CompositeTransactionalCommand cmd = new CompositeTransactionalCommand(
 				getEditingDomain(), null);
 		cmd.setTransactionNestingEnabled(false);
-		for (Iterator it = view.getTargetEdges().iterator(); it.hasNext();)
-		{
+		for (Iterator it = view.getTargetEdges().iterator(); it.hasNext();) {
 			Edge incomingLink = (Edge) it.next();
-			if (GpmnVisualIDRegistry.getVisualID(incomingLink) == ActivationEdgeEditPart.VISUAL_ID)
-			{
+			if (GpmnVisualIDRegistry.getVisualID(incomingLink) == ActivationEdgeEditPart.VISUAL_ID) {
 				DestroyElementRequest r = new DestroyElementRequest(
 						incomingLink.getElement(), false);
 				cmd.add(new DestroyElementCommand(r));
 				cmd.add(new DeleteCommand(getEditingDomain(), incomingLink));
 				continue;
 			}
-			if (GpmnVisualIDRegistry.getVisualID(incomingLink) == SuppressionEdgeEditPart.VISUAL_ID)
-			{
+			if (GpmnVisualIDRegistry.getVisualID(incomingLink) == SuppressionEdgeEditPart.VISUAL_ID) {
 				DestroyElementRequest r = new DestroyElementRequest(
 						incomingLink.getElement(), false);
 				cmd.add(new DestroyElementCommand(r));
@@ -75,19 +69,16 @@ public class GoalItemSemanticEditPolicy extends GpmnBaseItemSemanticEditPolicy
 				continue;
 			}
 		}
-		for (Iterator it = view.getSourceEdges().iterator(); it.hasNext();)
-		{
+		for (Iterator it = view.getSourceEdges().iterator(); it.hasNext();) {
 			Edge outgoingLink = (Edge) it.next();
-			if (GpmnVisualIDRegistry.getVisualID(outgoingLink) == PlanEdgeEditPart.VISUAL_ID)
-			{
+			if (GpmnVisualIDRegistry.getVisualID(outgoingLink) == PlanEdgeEditPart.VISUAL_ID) {
 				DestroyElementRequest r = new DestroyElementRequest(
 						outgoingLink.getElement(), false);
 				cmd.add(new DestroyElementCommand(r));
 				cmd.add(new DeleteCommand(getEditingDomain(), outgoingLink));
 				continue;
 			}
-			if (GpmnVisualIDRegistry.getVisualID(outgoingLink) == SuppressionEdgeEditPart.VISUAL_ID)
-			{
+			if (GpmnVisualIDRegistry.getVisualID(outgoingLink) == SuppressionEdgeEditPart.VISUAL_ID) {
 				DestroyElementRequest r = new DestroyElementRequest(
 						outgoingLink.getElement(), false);
 				cmd.add(new DestroyElementCommand(r));
@@ -96,15 +87,12 @@ public class GoalItemSemanticEditPolicy extends GpmnBaseItemSemanticEditPolicy
 			}
 		}
 		EAnnotation annotation = view.getEAnnotation("Shortcut"); //$NON-NLS-1$
-		if (annotation == null)
-		{
+		if (annotation == null) {
 			// there are indirectly referenced children, need extra commands: false
 			addDestroyShortcutsCommand(cmd, view);
 			// delete host element
 			cmd.add(new DestroyElementCommand(req));
-		}
-		else
-		{
+		} else {
 			cmd.add(new DeleteCommand(getEditingDomain(), view));
 		}
 		return getGEFWrapper(cmd.reduce());
@@ -113,8 +101,7 @@ public class GoalItemSemanticEditPolicy extends GpmnBaseItemSemanticEditPolicy
 	/**
 	 * @generated
 	 */
-	protected Command getCreateRelationshipCommand(CreateRelationshipRequest req)
-	{
+	protected Command getCreateRelationshipCommand(CreateRelationshipRequest req) {
 		Command command = req.getTarget() == null ? getStartCreateRelationshipCommand(req)
 				: getCompleteCreateRelationshipCommand(req);
 		return command != null ? command : super
@@ -125,19 +112,15 @@ public class GoalItemSemanticEditPolicy extends GpmnBaseItemSemanticEditPolicy
 	 * @generated
 	 */
 	protected Command getStartCreateRelationshipCommand(
-			CreateRelationshipRequest req)
-	{
-		if (GpmnElementTypes.ActivationEdge_4001 == req.getElementType())
-		{
+			CreateRelationshipRequest req) {
+		if (GpmnElementTypes.ActivationEdge_4001 == req.getElementType()) {
 			return null;
 		}
-		if (GpmnElementTypes.PlanEdge_4002 == req.getElementType())
-		{
+		if (GpmnElementTypes.PlanEdge_4002 == req.getElementType()) {
 			return getGEFWrapper(new PlanEdgeCreateCommand(req,
 					req.getSource(), req.getTarget()));
 		}
-		if (GpmnElementTypes.SuppressionEdge_4004 == req.getElementType())
-		{
+		if (GpmnElementTypes.SuppressionEdge_4004 == req.getElementType()) {
 			return getGEFWrapper(new SuppressionEdgeCreateCommand(req, req
 					.getSource(), req.getTarget()));
 		}
@@ -148,19 +131,15 @@ public class GoalItemSemanticEditPolicy extends GpmnBaseItemSemanticEditPolicy
 	 * @generated
 	 */
 	protected Command getCompleteCreateRelationshipCommand(
-			CreateRelationshipRequest req)
-	{
-		if (GpmnElementTypes.ActivationEdge_4001 == req.getElementType())
-		{
+			CreateRelationshipRequest req) {
+		if (GpmnElementTypes.ActivationEdge_4001 == req.getElementType()) {
 			return getGEFWrapper(new ActivationEdgeCreateCommand(req, req
 					.getSource(), req.getTarget()));
 		}
-		if (GpmnElementTypes.PlanEdge_4002 == req.getElementType())
-		{
+		if (GpmnElementTypes.PlanEdge_4002 == req.getElementType()) {
 			return null;
 		}
-		if (GpmnElementTypes.SuppressionEdge_4004 == req.getElementType())
-		{
+		if (GpmnElementTypes.SuppressionEdge_4004 == req.getElementType()) {
 			return getGEFWrapper(new SuppressionEdgeCreateCommand(req, req
 					.getSource(), req.getTarget()));
 		}
@@ -174,16 +153,14 @@ public class GoalItemSemanticEditPolicy extends GpmnBaseItemSemanticEditPolicy
 	 * @generated
 	 */
 	protected Command getReorientRelationshipCommand(
-			ReorientRelationshipRequest req)
-	{
-		switch (getVisualID(req))
-		{
-			case ActivationEdgeEditPart.VISUAL_ID:
-				return getGEFWrapper(new ActivationEdgeReorientCommand(req));
-			case PlanEdgeEditPart.VISUAL_ID:
-				return getGEFWrapper(new PlanEdgeReorientCommand(req));
-			case SuppressionEdgeEditPart.VISUAL_ID:
-				return getGEFWrapper(new SuppressionEdgeReorientCommand(req));
+			ReorientRelationshipRequest req) {
+		switch (getVisualID(req)) {
+		case ActivationEdgeEditPart.VISUAL_ID:
+			return getGEFWrapper(new ActivationEdgeReorientCommand(req));
+		case PlanEdgeEditPart.VISUAL_ID:
+			return getGEFWrapper(new PlanEdgeReorientCommand(req));
+		case SuppressionEdgeEditPart.VISUAL_ID:
+			return getGEFWrapper(new SuppressionEdgeReorientCommand(req));
 		}
 		return super.getReorientRelationshipCommand(req);
 	}

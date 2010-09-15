@@ -24,36 +24,29 @@ import org.eclipse.gmf.runtime.emf.type.core.requests.DuplicateElementsRequest;
  * @generated
  */
 public class GpmnDiagramItemSemanticEditPolicy extends
-		GpmnBaseItemSemanticEditPolicy
-{
+		GpmnBaseItemSemanticEditPolicy {
 
 	/**
 	 * @generated
 	 */
-	public GpmnDiagramItemSemanticEditPolicy()
-	{
+	public GpmnDiagramItemSemanticEditPolicy() {
 		super(GpmnElementTypes.GpmnDiagram_1000);
 	}
 
 	/**
 	 * @generated
 	 */
-	protected Command getCreateCommand(CreateElementRequest req)
-	{
-		if (GpmnElementTypes.ActivationPlan_2001 == req.getElementType())
-		{
+	protected Command getCreateCommand(CreateElementRequest req) {
+		if (GpmnElementTypes.ActivationPlan_2001 == req.getElementType()) {
 			return getGEFWrapper(new ActivationPlanCreateCommand(req));
 		}
-		if (GpmnElementTypes.SubProcess_2002 == req.getElementType())
-		{
+		if (GpmnElementTypes.SubProcess_2002 == req.getElementType()) {
 			return getGEFWrapper(new SubProcessCreateCommand(req));
 		}
-		if (GpmnElementTypes.BpmnPlan_2003 == req.getElementType())
-		{
+		if (GpmnElementTypes.BpmnPlan_2003 == req.getElementType()) {
 			return getGEFWrapper(new BpmnPlanCreateCommand(req));
 		}
-		if (GpmnElementTypes.Goal_2004 == req.getElementType())
-		{
+		if (GpmnElementTypes.Goal_2004 == req.getElementType()) {
 			return getGEFWrapper(new GoalCreateCommand(req));
 		}
 		return super.getCreateCommand(req);
@@ -62,8 +55,7 @@ public class GpmnDiagramItemSemanticEditPolicy extends
 	/**
 	 * @generated
 	 */
-	protected Command getDuplicateCommand(DuplicateElementsRequest req)
-	{
+	protected Command getDuplicateCommand(DuplicateElementsRequest req) {
 		TransactionalEditingDomain editingDomain = ((IGraphicalEditPart) getHost())
 				.getEditingDomain();
 		return getGEFWrapper(new DuplicateAnythingCommand(editingDomain, req));
@@ -73,16 +65,14 @@ public class GpmnDiagramItemSemanticEditPolicy extends
 	 * @generated
 	 */
 	private static class DuplicateAnythingCommand extends
-			DuplicateEObjectsCommand
-	{
+			DuplicateEObjectsCommand {
 
 		/**
 		 * @generated
 		 */
 		public DuplicateAnythingCommand(
 				TransactionalEditingDomain editingDomain,
-				DuplicateElementsRequest req)
-		{
+				DuplicateElementsRequest req) {
 			super(editingDomain, req.getLabel(), req
 					.getElementsToBeDuplicated(), req
 					.getAllDuplicatedElementsMap());

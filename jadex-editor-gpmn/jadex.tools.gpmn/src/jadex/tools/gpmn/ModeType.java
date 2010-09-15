@@ -90,8 +90,7 @@ public enum ModeType implements Enumerator
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	private static final ModeType[] VALUES_ARRAY = new ModeType[]
-		{
+	private static final ModeType[] VALUES_ARRAY = new ModeType[] {
 			PARALLEL,
 			SEQUENTIAL,
 		};
@@ -112,11 +111,9 @@ public enum ModeType implements Enumerator
 	 */
 	public static ModeType get(String literal)
 	{
-		for (int i = 0; i < VALUES_ARRAY.length; ++i)
-		{
+		for (int i = 0; i < VALUES_ARRAY.length; ++i) {
 			ModeType result = VALUES_ARRAY[i];
-			if (result.toString().equals(literal))
-			{
+			if (result.toString().equals(literal)) {
 				return result;
 			}
 		}
@@ -131,11 +128,9 @@ public enum ModeType implements Enumerator
 	 */
 	public static ModeType getByName(String name)
 	{
-		for (int i = 0; i < VALUES_ARRAY.length; ++i)
-		{
+		for (int i = 0; i < VALUES_ARRAY.length; ++i) {
 			ModeType result = VALUES_ARRAY[i];
-			if (result.getName().equals(name))
-			{
+			if (result.getName().equals(name)) {
 				return result;
 			}
 		}
@@ -150,8 +145,7 @@ public enum ModeType implements Enumerator
 	 */
 	public static ModeType get(int value)
 	{
-		switch (value)
-		{
+		switch (value) {
 			case PARALLEL_VALUE: return PARALLEL;
 			case SEQUENTIAL_VALUE: return SEQUENTIAL;
 		}

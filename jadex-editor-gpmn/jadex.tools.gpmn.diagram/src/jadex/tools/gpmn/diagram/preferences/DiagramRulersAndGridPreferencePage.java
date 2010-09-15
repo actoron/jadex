@@ -14,14 +14,12 @@ import org.eclipse.gmf.runtime.diagram.ui.preferences.RulerGridPreferencePage;
 /**
  * @generated
  */
-public class DiagramRulersAndGridPreferencePage extends RulerGridPreferencePage
-{
+public class DiagramRulersAndGridPreferencePage extends RulerGridPreferencePage {
 
 	/**
 	 * @generated
 	 */
-	public DiagramRulersAndGridPreferencePage()
-	{
+	public DiagramRulersAndGridPreferencePage() {
 		setPreferenceStore(GpmnDiagramEditorPlugin.getInstance()
 				.getPreferenceStore());
 	}

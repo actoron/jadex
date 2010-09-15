@@ -65,18 +65,15 @@ import org.eclipse.ui.part.FileEditorInput;
  * @generated
  */
 public class GpmnDocumentProvider extends AbstractDocumentProvider implements
-		IDiagramDocumentProvider
-{
+		IDiagramDocumentProvider {
 
 	/**
 	 * @generated
 	 */
 	protected ElementInfo createElementInfo(Object element)
-			throws CoreException
-	{
+			throws CoreException {
 		if (false == element instanceof FileEditorInput
-				&& false == element instanceof URIEditorInput)
-		{
+				&& false == element instanceof URIEditorInput) {
 			throw new CoreException(
 					new Status(
 							IStatus.ERROR,
@@ -102,11 +99,9 @@ public class GpmnDocumentProvider extends AbstractDocumentProvider implements
 	/**
 	 * @generated
 	 */
-	protected IDocument createDocument(Object element) throws CoreException
-	{
+	protected IDocument createDocument(Object element) throws CoreException {
 		if (false == element instanceof FileEditorInput
-				&& false == element instanceof URIEditorInput)
-		{
+				&& false == element instanceof URIEditorInput) {
 			throw new CoreException(
 					new Status(
 							IStatus.ERROR,
@@ -135,30 +130,23 @@ public class GpmnDocumentProvider extends AbstractDocumentProvider implements
 	 * @param document the document to set up
 	 * @generated
 	 */
-	protected void setupDocument(Object element, IDocument document)
-	{
+	protected void setupDocument(Object element, IDocument document) {
 		// for subclasses
 	}
 
 	/**
 	 * @generated
 	 */
-	private long computeModificationStamp(ResourceSetInfo info)
-	{
+	private long computeModificationStamp(ResourceSetInfo info) {
 		int result = 0;
 		for (Iterator/*<org.eclipse.emf.ecore.resource.Resource>*/it = info
-				.getLoadedResourcesIterator(); it.hasNext();)
-		{
+				.getLoadedResourcesIterator(); it.hasNext();) {
 			Resource nextResource = (Resource) it.next();
 			IFile file = WorkspaceSynchronizer.getFile(nextResource);
-			if (file != null)
-			{
-				if (file.getLocation() != null)
-				{
+			if (file != null) {
+				if (file.getLocation() != null) {
 					result += file.getLocation().toFile().lastModified();
-				}
-				else
-				{
+				} else {
 					result += file.getModificationStamp();
 				}
 			}
@@ -169,8 +157,7 @@ public class GpmnDocumentProvider extends AbstractDocumentProvider implements
 	/**
 	 * @generated
 	 */
-	protected IDocument createEmptyDocument()
-	{
+	protected IDocument createEmptyDocument() {
 		DiagramDocument document = new DiagramDocument();
 		document.setEditingDomain(createEditingDomain());
 		return document;
@@ -179,8 +166,7 @@ public class GpmnDocumentProvider extends AbstractDocumentProvider implements
 	/**
 	 * @generated
 	 */
-	private TransactionalEditingDomain createEditingDomain()
-	{
+	private TransactionalEditingDomain createEditingDomain() {
 		TransactionalEditingDomain editingDomain = DiagramEditingDomainFactory
 				.getInstance().createEditingDomain();
 		editingDomain.setID("jadex.tools.gpmn.diagram.EditingDomain"); //$NON-NLS-1$
@@ -191,35 +177,28 @@ public class GpmnDocumentProvider extends AbstractDocumentProvider implements
 						NotificationFilter.createFeatureFilter(
 								ResourceSet.class,
 								ResourceSet.RESOURCE_SET__RESOURCES));
-		editingDomain.getResourceSet().eAdapters().add(new Adapter()
-		{
+		editingDomain.getResourceSet().eAdapters().add(new Adapter() {
 
 			private Notifier myTarger;
 
-			public Notifier getTarget()
-			{
+			public Notifier getTarget() {
 				return myTarger;
 			}
 
-			public boolean isAdapterForType(Object type)
-			{
+			public boolean isAdapterForType(Object type) {
 				return false;
 			}
 
-			public void notifyChanged(Notification notification)
-			{
-				if (diagramResourceModifiedFilter.matches(notification))
-				{
+			public void notifyChanged(Notification notification) {
+				if (diagramResourceModifiedFilter.matches(notification)) {
 					Object value = notification.getNewValue();
-					if (value instanceof Resource)
-					{
+					if (value instanceof Resource) {
 						((Resource) value).setTrackingModification(true);
 					}
 				}
 			}
 
-			public void setTarget(Notifier newTarget)
-			{
+			public void setTarget(Notifier newTarget) {
 				myTarger = newTarget;
 			}
 
@@ -232,63 +211,47 @@ public class GpmnDocumentProvider extends AbstractDocumentProvider implements
 	 * @generated
 	 */
 	protected void setDocumentContent(IDocument document, IEditorInput element)
-			throws CoreException
-	{
+			throws CoreException {
 		IDiagramDocument diagramDocument = (IDiagramDocument) document;
 		TransactionalEditingDomain domain = diagramDocument.getEditingDomain();
-		if (element instanceof FileEditorInput)
-		{
+		if (element instanceof FileEditorInput) {
 			IStorage storage = ((FileEditorInput) element).getStorage();
 			Diagram diagram = DiagramIOUtil.load(domain, storage, true,
 					getProgressMonitor());
 			document.setContent(diagram);
-		}
-		else if (element instanceof URIEditorInput)
-		{
+		} else if (element instanceof URIEditorInput) {
 			URI uri = ((URIEditorInput) element).getURI();
 			Resource resource = null;
-			try
-			{
+			try {
 				resource = domain.getResourceSet().getResource(
 						uri.trimFragment(), false);
-				if (resource == null)
-				{
+				if (resource == null) {
 					resource = domain.getResourceSet().createResource(
 							uri.trimFragment());
 				}
-				if (!resource.isLoaded())
-				{
-					try
-					{
+				if (!resource.isLoaded()) {
+					try {
 						Map options = new HashMap(GMFResourceFactory
 								.getDefaultLoadOptions());
 						// @see 171060 
 						// options.put(org.eclipse.emf.ecore.xmi.XMLResource.OPTION_RECORD_UNKNOWN_FEATURE, Boolean.TRUE);
 						resource.load(options);
-					}
-					catch (IOException e)
-					{
+					} catch (IOException e) {
 						resource.unload();
 						throw e;
 					}
 				}
-				if (uri.fragment() != null)
-				{
+				if (uri.fragment() != null) {
 					EObject rootElement = resource.getEObject(uri.fragment());
-					if (rootElement instanceof Diagram)
-					{
+					if (rootElement instanceof Diagram) {
 						document.setContent((Diagram) rootElement);
 						return;
 					}
-				}
-				else
-				{
+				} else {
 					for (Iterator it = resource.getContents().iterator(); it
-							.hasNext();)
-					{
+							.hasNext();) {
 						Object rootElement = it.next();
-						if (rootElement instanceof Diagram)
-						{
+						if (rootElement instanceof Diagram) {
 							document.setContent((Diagram) rootElement);
 							return;
 						}
@@ -296,16 +259,11 @@ public class GpmnDocumentProvider extends AbstractDocumentProvider implements
 				}
 				throw new RuntimeException(
 						Messages.GpmnDocumentProvider_NoDiagramInResourceError);
-			}
-			catch (Exception e)
-			{
+			} catch (Exception e) {
 				CoreException thrownExcp = null;
-				if (e instanceof CoreException)
-				{
+				if (e instanceof CoreException) {
 					thrownExcp = (CoreException) e;
-				}
-				else
-				{
+				} else {
 					String msg = e.getLocalizedMessage();
 					thrownExcp = new CoreException(
 							new Status(
@@ -318,9 +276,7 @@ public class GpmnDocumentProvider extends AbstractDocumentProvider implements
 				}
 				throw thrownExcp;
 			}
-		}
-		else
-		{
+		} else {
 			throw new CoreException(
 					new Status(
 							IStatus.ERROR,
@@ -339,11 +295,9 @@ public class GpmnDocumentProvider extends AbstractDocumentProvider implements
 	/**
 	 * @generated
 	 */
-	public long getModificationStamp(Object element)
-	{
+	public long getModificationStamp(Object element) {
 		ResourceSetInfo info = getResourceSetInfo(element);
-		if (info != null)
-		{
+		if (info != null) {
 			return computeModificationStamp(info);
 		}
 		return super.getModificationStamp(element);
@@ -352,14 +306,11 @@ public class GpmnDocumentProvider extends AbstractDocumentProvider implements
 	/**
 	 * @generated
 	 */
-	public boolean isDeleted(Object element)
-	{
+	public boolean isDeleted(Object element) {
 		IDiagramDocument document = getDiagramDocument(element);
-		if (document != null)
-		{
+		if (document != null) {
 			Resource diagramResource = document.getDiagram().eResource();
-			if (diagramResource != null)
-			{
+			if (diagramResource != null) {
 				IFile file = WorkspaceSynchronizer.getFile(diagramResource);
 				return file == null || file.getLocation() == null
 						|| !file.getLocation().toFile().exists();
@@ -371,18 +322,15 @@ public class GpmnDocumentProvider extends AbstractDocumentProvider implements
 	/**
 	 * @generated
 	 */
-	public ResourceSetInfo getResourceSetInfo(Object editorInput)
-	{
+	public ResourceSetInfo getResourceSetInfo(Object editorInput) {
 		return (ResourceSetInfo) super.getElementInfo(editorInput);
 	}
 
 	/**
 	 * @generated
 	 */
-	protected void disposeElementInfo(Object element, ElementInfo info)
-	{
-		if (info instanceof ResourceSetInfo)
-		{
+	protected void disposeElementInfo(Object element, ElementInfo info) {
+		if (info instanceof ResourceSetInfo) {
 			ResourceSetInfo resourceSetInfo = (ResourceSetInfo) info;
 			resourceSetInfo.dispose();
 		}
@@ -393,19 +341,15 @@ public class GpmnDocumentProvider extends AbstractDocumentProvider implements
 	 * @generated
 	 */
 	protected void doValidateState(Object element, Object computationContext)
-			throws CoreException
-	{
+			throws CoreException {
 		ResourceSetInfo info = getResourceSetInfo(element);
-		if (info != null)
-		{
+		if (info != null) {
 			Collection/*<org.eclipse.core.resources.IFile>*/files2Validate = new ArrayList/*<org.eclipse.core.resources.IFile>*/();
 			for (Iterator/*<org.eclipse.emf.ecore.resource.Resource>*/it = info
-					.getLoadedResourcesIterator(); it.hasNext();)
-			{
+					.getLoadedResourcesIterator(); it.hasNext();) {
 				Resource nextResource = (Resource) it.next();
 				IFile file = WorkspaceSynchronizer.getFile(nextResource);
-				if (file != null && file.isReadOnly())
-				{
+				if (file != null && file.isReadOnly()) {
 					files2Validate.add(file);
 				}
 			}
@@ -420,19 +364,13 @@ public class GpmnDocumentProvider extends AbstractDocumentProvider implements
 	/**
 	 * @generated
 	 */
-	public boolean isReadOnly(Object element)
-	{
+	public boolean isReadOnly(Object element) {
 		ResourceSetInfo info = getResourceSetInfo(element);
-		if (info != null)
-		{
-			if (info.isUpdateCache())
-			{
-				try
-				{
+		if (info != null) {
+			if (info.isUpdateCache()) {
+				try {
 					updateCache(element);
-				}
-				catch (CoreException ex)
-				{
+				} catch (CoreException ex) {
 					GpmnDiagramEditorPlugin.getInstance().logError(
 							Messages.GpmnDocumentProvider_isModifiable, ex);
 					// Error message to log was initially taken from org.eclipse.gmf.runtime.diagram.ui.resources.editor.ide.internal.l10n.EditorMessages.StorageDocumentProvider_isModifiable
@@ -446,27 +384,19 @@ public class GpmnDocumentProvider extends AbstractDocumentProvider implements
 	/**
 	 * @generated
 	 */
-	public boolean isModifiable(Object element)
-	{
-		if (!isStateValidated(element))
-		{
+	public boolean isModifiable(Object element) {
+		if (!isStateValidated(element)) {
 			if (element instanceof FileEditorInput
-					|| element instanceof URIEditorInput)
-			{
+					|| element instanceof URIEditorInput) {
 				return true;
 			}
 		}
 		ResourceSetInfo info = getResourceSetInfo(element);
-		if (info != null)
-		{
-			if (info.isUpdateCache())
-			{
-				try
-				{
+		if (info != null) {
+			if (info.isUpdateCache()) {
+				try {
 					updateCache(element);
-				}
-				catch (CoreException ex)
-				{
+				} catch (CoreException ex) {
 					GpmnDiagramEditorPlugin.getInstance().logError(
 							Messages.GpmnDocumentProvider_isModifiable, ex);
 					// Error message to log was initially taken from org.eclipse.gmf.runtime.diagram.ui.resources.editor.ide.internal.l10n.EditorMessages.StorageDocumentProvider_isModifiable
@@ -480,18 +410,14 @@ public class GpmnDocumentProvider extends AbstractDocumentProvider implements
 	/**
 	 * @generated
 	 */
-	protected void updateCache(Object element) throws CoreException
-	{
+	protected void updateCache(Object element) throws CoreException {
 		ResourceSetInfo info = getResourceSetInfo(element);
-		if (info != null)
-		{
+		if (info != null) {
 			for (Iterator/*<org.eclipse.emf.ecore.resource.Resource>*/it = info
-					.getLoadedResourcesIterator(); it.hasNext();)
-			{
+					.getLoadedResourcesIterator(); it.hasNext();) {
 				Resource nextResource = (Resource) it.next();
 				IFile file = WorkspaceSynchronizer.getFile(nextResource);
-				if (file != null && file.isReadOnly())
-				{
+				if (file != null && file.isReadOnly()) {
 					info.setReadOnly(true);
 					info.setModifiable(false);
 					return;
@@ -506,11 +432,9 @@ public class GpmnDocumentProvider extends AbstractDocumentProvider implements
 	/**
 	 * @generated
 	 */
-	protected void doUpdateStateCache(Object element) throws CoreException
-	{
+	protected void doUpdateStateCache(Object element) throws CoreException {
 		ResourceSetInfo info = getResourceSetInfo(element);
-		if (info != null)
-		{
+		if (info != null) {
 			info.setUpdateCache(true);
 		}
 		super.doUpdateStateCache(element);
@@ -519,11 +443,9 @@ public class GpmnDocumentProvider extends AbstractDocumentProvider implements
 	/**
 	 * @generated
 	 */
-	public boolean isSynchronized(Object element)
-	{
+	public boolean isSynchronized(Object element) {
 		ResourceSetInfo info = getResourceSetInfo(element);
-		if (info != null)
-		{
+		if (info != null) {
 			return info.isSynchronized();
 		}
 		return super.isSynchronized(element);
@@ -532,19 +454,15 @@ public class GpmnDocumentProvider extends AbstractDocumentProvider implements
 	/**
 	 * @generated
 	 */
-	protected ISchedulingRule getResetRule(Object element)
-	{
+	protected ISchedulingRule getResetRule(Object element) {
 		ResourceSetInfo info = getResourceSetInfo(element);
-		if (info != null)
-		{
+		if (info != null) {
 			Collection/*<org.eclipse.core.runtime.jobs.ISchedulingRule>*/rules = new ArrayList/*<org.eclipse.core.runtime.jobs.ISchedulingRule>*/();
 			for (Iterator/*<org.eclipse.emf.ecore.resource.Resource>*/it = info
-					.getLoadedResourcesIterator(); it.hasNext();)
-			{
+					.getLoadedResourcesIterator(); it.hasNext();) {
 				Resource nextResource = (Resource) it.next();
 				IFile file = WorkspaceSynchronizer.getFile(nextResource);
-				if (file != null)
-				{
+				if (file != null) {
 					rules.add(ResourcesPlugin.getWorkspace().getRuleFactory()
 							.modifyRule(file));
 				}
@@ -558,19 +476,15 @@ public class GpmnDocumentProvider extends AbstractDocumentProvider implements
 	/**
 	 * @generated
 	 */
-	protected ISchedulingRule getSaveRule(Object element)
-	{
+	protected ISchedulingRule getSaveRule(Object element) {
 		ResourceSetInfo info = getResourceSetInfo(element);
-		if (info != null)
-		{
+		if (info != null) {
 			Collection/*<org.eclipse.core.runtime.jobs.ISchedulingRule>*/rules = new ArrayList/*<org.eclipse.core.runtime.jobs.ISchedulingRule>*/();
 			for (Iterator/*<org.eclipse.emf.ecore.resource.Resource>*/it = info
-					.getLoadedResourcesIterator(); it.hasNext();)
-			{
+					.getLoadedResourcesIterator(); it.hasNext();) {
 				Resource nextResource = (Resource) it.next();
 				IFile file = WorkspaceSynchronizer.getFile(nextResource);
-				if (file != null)
-				{
+				if (file != null) {
 					rules.add(computeSchedulingRule(file));
 				}
 			}
@@ -583,19 +497,15 @@ public class GpmnDocumentProvider extends AbstractDocumentProvider implements
 	/**
 	 * @generated
 	 */
-	protected ISchedulingRule getSynchronizeRule(Object element)
-	{
+	protected ISchedulingRule getSynchronizeRule(Object element) {
 		ResourceSetInfo info = getResourceSetInfo(element);
-		if (info != null)
-		{
+		if (info != null) {
 			Collection/*<org.eclipse.core.runtime.jobs.ISchedulingRule>*/rules = new ArrayList/*<org.eclipse.core.runtime.jobs.ISchedulingRule>*/();
 			for (Iterator/*<org.eclipse.emf.ecore.resource.Resource>*/it = info
-					.getLoadedResourcesIterator(); it.hasNext();)
-			{
+					.getLoadedResourcesIterator(); it.hasNext();) {
 				Resource nextResource = (Resource) it.next();
 				IFile file = WorkspaceSynchronizer.getFile(nextResource);
-				if (file != null)
-				{
+				if (file != null) {
 					rules.add(ResourcesPlugin.getWorkspace().getRuleFactory()
 							.refreshRule(file));
 				}
@@ -609,19 +519,15 @@ public class GpmnDocumentProvider extends AbstractDocumentProvider implements
 	/**
 	 * @generated
 	 */
-	protected ISchedulingRule getValidateStateRule(Object element)
-	{
+	protected ISchedulingRule getValidateStateRule(Object element) {
 		ResourceSetInfo info = getResourceSetInfo(element);
-		if (info != null)
-		{
+		if (info != null) {
 			Collection/*<org.eclipse.core.runtime.jobs.ISchedulingRule>*/files = new ArrayList/*<org.eclipse.core.runtime.jobs.ISchedulingRule>*/();
 			for (Iterator/*<org.eclipse.emf.ecore.resource.Resource>*/it = info
-					.getLoadedResourcesIterator(); it.hasNext();)
-			{
+					.getLoadedResourcesIterator(); it.hasNext();) {
 				Resource nextResource = (Resource) it.next();
 				IFile file = WorkspaceSynchronizer.getFile(nextResource);
-				if (file != null)
-				{
+				if (file != null) {
 					files.add(file);
 				}
 			}
@@ -635,15 +541,13 @@ public class GpmnDocumentProvider extends AbstractDocumentProvider implements
 	/**
 	 * @generated
 	 */
-	private ISchedulingRule computeSchedulingRule(IResource toCreateOrModify)
-	{
+	private ISchedulingRule computeSchedulingRule(IResource toCreateOrModify) {
 		if (toCreateOrModify.exists())
 			return ResourcesPlugin.getWorkspace().getRuleFactory().modifyRule(
 					toCreateOrModify);
 
 		IResource parent = toCreateOrModify;
-		do
-		{
+		do {
 			/*
 			 * XXX This is a workaround for
 			 * https://bugs.eclipse.org/bugs/show_bug.cgi?id=67601
@@ -652,8 +556,7 @@ public class GpmnDocumentProvider extends AbstractDocumentProvider implements
 			 */
 			toCreateOrModify = parent;
 			parent = toCreateOrModify.getParent();
-		}
-		while (parent != null && !parent.exists());
+		} while (parent != null && !parent.exists());
 
 		return ResourcesPlugin.getWorkspace().getRuleFactory().createRule(
 				toCreateOrModify);
@@ -663,14 +566,11 @@ public class GpmnDocumentProvider extends AbstractDocumentProvider implements
 	 * @generated
 	 */
 	protected void doSynchronize(Object element, IProgressMonitor monitor)
-			throws CoreException
-	{
+			throws CoreException {
 		ResourceSetInfo info = getResourceSetInfo(element);
-		if (info != null)
-		{
+		if (info != null) {
 			for (Iterator/*<org.eclipse.emf.ecore.resource.Resource>*/it = info
-					.getLoadedResourcesIterator(); it.hasNext();)
-			{
+					.getLoadedResourcesIterator(); it.hasNext();) {
 				Resource nextResource = (Resource) it.next();
 				handleElementChanged(info, nextResource, monitor);
 			}
@@ -683,13 +583,10 @@ public class GpmnDocumentProvider extends AbstractDocumentProvider implements
 	 * @generated
 	 */
 	protected void doSaveDocument(IProgressMonitor monitor, Object element,
-			IDocument document, boolean overwrite) throws CoreException
-	{
+			IDocument document, boolean overwrite) throws CoreException {
 		ResourceSetInfo info = getResourceSetInfo(element);
-		if (info != null)
-		{
-			if (!overwrite && !info.isSynchronized())
-			{
+		if (info != null) {
+			if (!overwrite && !info.isSynchronized()) {
 				throw new CoreException(
 						new Status(
 								IStatus.ERROR,
@@ -700,29 +597,23 @@ public class GpmnDocumentProvider extends AbstractDocumentProvider implements
 			}
 			info.stopResourceListening();
 			fireElementStateChanging(element);
-			try
-			{
+			try {
 				monitor.beginTask(
 						Messages.GpmnDocumentProvider_SaveDiagramTask, info
 								.getResourceSet().getResources().size() + 1); //"Saving diagram"
 				for (Iterator/*<org.eclipse.emf.ecore.resource.Resource>*/it = info
-						.getLoadedResourcesIterator(); it.hasNext();)
-				{
+						.getLoadedResourcesIterator(); it.hasNext();) {
 					Resource nextResource = (Resource) it.next();
 					monitor.setTaskName(NLS.bind(
 							Messages.GpmnDocumentProvider_SaveNextResourceTask,
 							nextResource.getURI()));
 					if (nextResource.isLoaded()
 							&& !info.getEditingDomain()
-									.isReadOnly(nextResource))
-					{
-						try
-						{
+									.isReadOnly(nextResource)) {
+						try {
 							nextResource.save(GpmnDiagramEditorUtil
 									.getSaveOptions());
-						}
-						catch (IOException e)
-						{
+						} catch (IOException e) {
 							fireElementStateChangeFailed(element);
 							throw new CoreException(new Status(IStatus.ERROR,
 									GpmnDiagramEditorPlugin.ID,
@@ -734,34 +625,23 @@ public class GpmnDocumentProvider extends AbstractDocumentProvider implements
 				}
 				monitor.done();
 				info.setModificationStamp(computeModificationStamp(info));
-			}
-			catch (RuntimeException x)
-			{
+			} catch (RuntimeException x) {
 				fireElementStateChangeFailed(element);
 				throw x;
-			}
-			finally
-			{
+			} finally {
 				info.startResourceListening();
 			}
-		}
-		else
-		{
+		} else {
 			URI newResoruceURI;
 			List affectedFiles = null;
-			if (element instanceof FileEditorInput)
-			{
+			if (element instanceof FileEditorInput) {
 				IFile newFile = ((FileEditorInput) element).getFile();
 				affectedFiles = Collections.singletonList(newFile);
 				newResoruceURI = URI.createPlatformResourceURI(newFile
 						.getFullPath().toString(), true);
-			}
-			else if (element instanceof URIEditorInput)
-			{
+			} else if (element instanceof URIEditorInput) {
 				newResoruceURI = ((URIEditorInput) element).getURI();
-			}
-			else
-			{
+			} else {
 				fireElementStateChangeFailed(element);
 				throw new CoreException(
 						new Status(
@@ -776,8 +656,7 @@ public class GpmnDocumentProvider extends AbstractDocumentProvider implements
 														"org.eclipse.ui.part.FileEditorInput", "org.eclipse.emf.common.ui.URIEditorInput" }), //$NON-NLS-1$ //$NON-NLS-2$ 
 								null));
 			}
-			if (false == document instanceof IDiagramDocument)
-			{
+			if (false == document instanceof IDiagramDocument) {
 				fireElementStateChangeFailed(element);
 				throw new CoreException(
 						new Status(
@@ -791,32 +670,25 @@ public class GpmnDocumentProvider extends AbstractDocumentProvider implements
 					.getResourceSet().createResource(newResoruceURI);
 			final Diagram diagramCopy = (Diagram) EcoreUtil
 					.copy(diagramDocument.getDiagram());
-			try
-			{
+			try {
 				new AbstractTransactionalCommand(diagramDocument
 						.getEditingDomain(), NLS.bind(
 						Messages.GpmnDocumentProvider_SaveAsOperation,
-						diagramCopy.getName()), affectedFiles)
-				{
+						diagramCopy.getName()), affectedFiles) {
 					protected CommandResult doExecuteWithResult(
 							IProgressMonitor monitor, IAdaptable info)
-							throws ExecutionException
-					{
+							throws ExecutionException {
 						newResource.getContents().add(diagramCopy);
 						return CommandResult.newOKCommandResult();
 					}
 				}.execute(monitor, null);
 				newResource.save(GpmnDiagramEditorUtil.getSaveOptions());
-			}
-			catch (ExecutionException e)
-			{
+			} catch (ExecutionException e) {
 				fireElementStateChangeFailed(element);
 				throw new CoreException(new Status(IStatus.ERROR,
 						GpmnDiagramEditorPlugin.ID, 0, e.getLocalizedMessage(),
 						null));
-			}
-			catch (IOException e)
-			{
+			} catch (IOException e) {
 				fireElementStateChangeFailed(element);
 				throw new CoreException(new Status(IStatus.ERROR,
 						GpmnDiagramEditorPlugin.ID, 0, e.getLocalizedMessage(),
@@ -830,17 +702,12 @@ public class GpmnDocumentProvider extends AbstractDocumentProvider implements
 	 * @generated
 	 */
 	protected void handleElementChanged(ResourceSetInfo info,
-			Resource changedResource, IProgressMonitor monitor)
-	{
+			Resource changedResource, IProgressMonitor monitor) {
 		IFile file = WorkspaceSynchronizer.getFile(changedResource);
-		if (file != null)
-		{
-			try
-			{
+		if (file != null) {
+			try {
 				file.refreshLocal(IResource.DEPTH_INFINITE, monitor);
-			}
-			catch (CoreException ex)
-			{
+			} catch (CoreException ex) {
 				GpmnDiagramEditorPlugin
 						.getInstance()
 						.logError(
@@ -854,16 +721,12 @@ public class GpmnDocumentProvider extends AbstractDocumentProvider implements
 		fireElementContentAboutToBeReplaced(info.getEditorInput());
 		removeUnchangedElementListeners(info.getEditorInput(), info);
 		info.fStatus = null;
-		try
-		{
+		try {
 			setDocumentContent(info.fDocument, info.getEditorInput());
-		}
-		catch (CoreException e)
-		{
+		} catch (CoreException e) {
 			info.fStatus = e.getStatus();
 		}
-		if (!info.fCanBeSaved)
-		{
+		if (!info.fCanBeSaved) {
 			info.setModificationStamp(computeModificationStamp(info));
 		}
 		addUnchangedElementListeners(info.getEditorInput(), info);
@@ -873,10 +736,8 @@ public class GpmnDocumentProvider extends AbstractDocumentProvider implements
 	/**
 	 * @generated
 	 */
-	protected void handleElementMoved(IEditorInput input, URI uri)
-	{
-		if (input instanceof FileEditorInput)
-		{
+	protected void handleElementMoved(IEditorInput input, URI uri) {
+		if (input instanceof FileEditorInput) {
 			IFile newFile = ResourcesPlugin.getWorkspace().getRoot().getFile(
 					new Path(URI.decode(uri.path())).removeFirstSegments(1));
 			fireElementMoved(input, newFile == null ? null
@@ -891,19 +752,16 @@ public class GpmnDocumentProvider extends AbstractDocumentProvider implements
 	 * @generated
 	 */
 	public IEditorInput createInputWithEditingDomain(IEditorInput editorInput,
-			TransactionalEditingDomain domain)
-	{
+			TransactionalEditingDomain domain) {
 		return editorInput;
 	}
 
 	/**
 	 * @generated
 	 */
-	public IDiagramDocument getDiagramDocument(Object element)
-	{
+	public IDiagramDocument getDiagramDocument(Object element) {
 		IDocument doc = getDocument(element);
-		if (doc instanceof IDiagramDocument)
-		{
+		if (doc instanceof IDiagramDocument) {
 			return (IDiagramDocument) doc;
 		}
 		return null;
@@ -912,16 +770,14 @@ public class GpmnDocumentProvider extends AbstractDocumentProvider implements
 	/**
 	 * @generated
 	 */
-	protected IRunnableContext getOperationRunner(IProgressMonitor monitor)
-	{
+	protected IRunnableContext getOperationRunner(IProgressMonitor monitor) {
 		return null;
 	}
 
 	/**
 	 * @generated
 	 */
-	protected class ResourceSetInfo extends ElementInfo
-	{
+	protected class ResourceSetInfo extends ElementInfo {
 
 		/**
 		 * @generated
@@ -972,8 +828,7 @@ public class GpmnDocumentProvider extends AbstractDocumentProvider implements
 		 * @generated
 		 */
 		public ResourceSetInfo(IDiagramDocument document,
-				IEditorInput editorInput)
-		{
+				IEditorInput editorInput) {
 			super(document);
 			myDocument = document;
 			myEditorInput = editorInput;
@@ -985,40 +840,35 @@ public class GpmnDocumentProvider extends AbstractDocumentProvider implements
 		/**
 		 * @generated
 		 */
-		public long getModificationStamp()
-		{
+		public long getModificationStamp() {
 			return myModificationStamp;
 		}
 
 		/**
 		 * @generated
 		 */
-		public void setModificationStamp(long modificationStamp)
-		{
+		public void setModificationStamp(long modificationStamp) {
 			myModificationStamp = modificationStamp;
 		}
 
 		/**
 		 * @generated
 		 */
-		public TransactionalEditingDomain getEditingDomain()
-		{
+		public TransactionalEditingDomain getEditingDomain() {
 			return myDocument.getEditingDomain();
 		}
 
 		/**
 		 * @generated
 		 */
-		public ResourceSet getResourceSet()
-		{
+		public ResourceSet getResourceSet() {
 			return getEditingDomain().getResourceSet();
 		}
 
 		/**
 		 * @generated
 		 */
-		public Iterator/*<org.eclipse.emf.ecore.resource.Resource>*/getLoadedResourcesIterator()
-		{
+		public Iterator/*<org.eclipse.emf.ecore.resource.Resource>*/getLoadedResourcesIterator() {
 			return new ArrayList/*<org.eclipse.emf.ecore.resource.Resource>*/(
 					getResourceSet().getResources()).iterator();
 		}
@@ -1026,21 +876,18 @@ public class GpmnDocumentProvider extends AbstractDocumentProvider implements
 		/**
 		 * @generated
 		 */
-		public IEditorInput getEditorInput()
-		{
+		public IEditorInput getEditorInput() {
 			return myEditorInput;
 		}
 
 		/**
 		 * @generated
 		 */
-		public void dispose()
-		{
+		public void dispose() {
 			stopResourceListening();
 			getResourceSet().eAdapters().remove(myResourceSetListener);
 			for (Iterator/*<org.eclipse.emf.ecore.resource.Resource>*/it = getLoadedResourcesIterator(); it
-					.hasNext();)
-			{
+					.hasNext();) {
 				Resource resource = (Resource) it.next();
 				resource.unload();
 			}
@@ -1050,32 +897,28 @@ public class GpmnDocumentProvider extends AbstractDocumentProvider implements
 		/**
 		 * @generated
 		 */
-		public boolean isSynchronized()
-		{
+		public boolean isSynchronized() {
 			return myUnSynchronizedResources.size() == 0;
 		}
 
 		/**
 		 * @generated
 		 */
-		public void setUnSynchronized(Resource resource)
-		{
+		public void setUnSynchronized(Resource resource) {
 			myUnSynchronizedResources.add(resource);
 		}
 
 		/**
 		 * @generated
 		 */
-		public void setSynchronized(Resource resource)
-		{
+		public void setSynchronized(Resource resource) {
 			myUnSynchronizedResources.remove(resource);
 		}
 
 		/**
 		 * @generated
 		 */
-		public final void stopResourceListening()
-		{
+		public final void stopResourceListening() {
 			mySynchronizer.dispose();
 			mySynchronizer = null;
 		}
@@ -1083,8 +926,7 @@ public class GpmnDocumentProvider extends AbstractDocumentProvider implements
 		/**
 		 * @generated
 		 */
-		public final void startResourceListening()
-		{
+		public final void startResourceListening() {
 			mySynchronizer = new WorkspaceSynchronizer(getEditingDomain(),
 					new SynchronizerDelegate());
 		}
@@ -1092,48 +934,42 @@ public class GpmnDocumentProvider extends AbstractDocumentProvider implements
 		/**
 		 * @generated
 		 */
-		public boolean isUpdateCache()
-		{
+		public boolean isUpdateCache() {
 			return myUpdateCache;
 		}
 
 		/**
 		 * @generated
 		 */
-		public void setUpdateCache(boolean update)
-		{
+		public void setUpdateCache(boolean update) {
 			myUpdateCache = update;
 		}
 
 		/**
 		 * @generated
 		 */
-		public boolean isModifiable()
-		{
+		public boolean isModifiable() {
 			return myModifiable;
 		}
 
 		/**
 		 * @generated
 		 */
-		public void setModifiable(boolean modifiable)
-		{
+		public void setModifiable(boolean modifiable) {
 			myModifiable = modifiable;
 		}
 
 		/**
 		 * @generated
 		 */
-		public boolean isReadOnly()
-		{
+		public boolean isReadOnly() {
 			return myReadOnly;
 		}
 
 		/**
 		 * @generated
 		 */
-		public void setReadOnly(boolean readOnly)
-		{
+		public void setReadOnly(boolean readOnly) {
 			myReadOnly = readOnly;
 		}
 
@@ -1141,33 +977,26 @@ public class GpmnDocumentProvider extends AbstractDocumentProvider implements
 		 * @generated
 		 */
 		private class SynchronizerDelegate implements
-				WorkspaceSynchronizer.Delegate
-		{
+				WorkspaceSynchronizer.Delegate {
 
 			/**
 			 * @generated
 			 */
-			public void dispose()
-			{
+			public void dispose() {
 			}
 
 			/**
 			 * @generated
 			 */
-			public boolean handleResourceChanged(final Resource resource)
-			{
-				synchronized (ResourceSetInfo.this)
-				{
-					if (ResourceSetInfo.this.fCanBeSaved)
-					{
+			public boolean handleResourceChanged(final Resource resource) {
+				synchronized (ResourceSetInfo.this) {
+					if (ResourceSetInfo.this.fCanBeSaved) {
 						ResourceSetInfo.this.setUnSynchronized(resource);
 						return true;
 					}
 				}
-				Display.getDefault().asyncExec(new Runnable()
-				{
-					public void run()
-					{
+				Display.getDefault().asyncExec(new Runnable() {
+					public void run() {
 						handleElementChanged(ResourceSetInfo.this, resource,
 								null);
 					}
@@ -1178,20 +1007,15 @@ public class GpmnDocumentProvider extends AbstractDocumentProvider implements
 			/**
 			 * @generated
 			 */
-			public boolean handleResourceDeleted(Resource resource)
-			{
-				synchronized (ResourceSetInfo.this)
-				{
-					if (ResourceSetInfo.this.fCanBeSaved)
-					{
+			public boolean handleResourceDeleted(Resource resource) {
+				synchronized (ResourceSetInfo.this) {
+					if (ResourceSetInfo.this.fCanBeSaved) {
 						ResourceSetInfo.this.setUnSynchronized(resource);
 						return true;
 					}
 				}
-				Display.getDefault().asyncExec(new Runnable()
-				{
-					public void run()
-					{
+				Display.getDefault().asyncExec(new Runnable() {
+					public void run() {
 						fireElementDeleted(ResourceSetInfo.this
 								.getEditorInput());
 					}
@@ -1203,29 +1027,21 @@ public class GpmnDocumentProvider extends AbstractDocumentProvider implements
 			 * @generated
 			 */
 			public boolean handleResourceMoved(Resource resource,
-					final URI newURI)
-			{
-				synchronized (ResourceSetInfo.this)
-				{
-					if (ResourceSetInfo.this.fCanBeSaved)
-					{
+					final URI newURI) {
+				synchronized (ResourceSetInfo.this) {
+					if (ResourceSetInfo.this.fCanBeSaved) {
 						ResourceSetInfo.this.setUnSynchronized(resource);
 						return true;
 					}
 				}
-				if (myDocument.getDiagram().eResource() == resource)
-				{
-					Display.getDefault().asyncExec(new Runnable()
-					{
-						public void run()
-						{
+				if (myDocument.getDiagram().eResource() == resource) {
+					Display.getDefault().asyncExec(new Runnable() {
+						public void run() {
 							handleElementMoved(ResourceSetInfo.this
 									.getEditorInput(), newURI);
 						}
 					});
-				}
-				else
-				{
+				} else {
 					handleResourceDeleted(resource);
 				}
 				return true;
@@ -1238,8 +1054,7 @@ public class GpmnDocumentProvider extends AbstractDocumentProvider implements
 	/**
 	 * @generated
 	 */
-	private class ResourceSetModificationListener extends EContentAdapter
-	{
+	private class ResourceSetModificationListener extends EContentAdapter {
 
 		/**
 		 * @generated
@@ -1254,8 +1069,7 @@ public class GpmnDocumentProvider extends AbstractDocumentProvider implements
 		/**
 		 * @generated
 		 */
-		public ResourceSetModificationListener(ResourceSetInfo info)
-		{
+		public ResourceSetModificationListener(ResourceSetInfo info) {
 			myInfo = info;
 			myModifiedFilter = NotificationFilter.createEventTypeFilter(
 					Notification.SET).or(
@@ -1268,51 +1082,39 @@ public class GpmnDocumentProvider extends AbstractDocumentProvider implements
 		/**
 		 * @generated
 		 */
-		public void notifyChanged(Notification notification)
-		{
-			if (notification.getNotifier() instanceof ResourceSet)
-			{
+		public void notifyChanged(Notification notification) {
+			if (notification.getNotifier() instanceof ResourceSet) {
 				super.notifyChanged(notification);
 			}
 			if (!notification.isTouch()
-					&& myModifiedFilter.matches(notification))
-			{
-				if (notification.getNotifier() instanceof Resource)
-				{
+					&& myModifiedFilter.matches(notification)) {
+				if (notification.getNotifier() instanceof Resource) {
 					Resource resource = (Resource) notification.getNotifier();
-					if (resource.isLoaded())
-					{
+					if (resource.isLoaded()) {
 						boolean modified = false;
 						for (Iterator/*<org.eclipse.emf.ecore.resource.Resource>*/it = myInfo
 								.getLoadedResourcesIterator(); it.hasNext()
-								&& !modified;)
-						{
+								&& !modified;) {
 							Resource nextResource = (Resource) it.next();
-							if (nextResource.isLoaded())
-							{
+							if (nextResource.isLoaded()) {
 								modified = nextResource.isModified();
 							}
 						}
 						boolean dirtyStateChanged = false;
-						synchronized (myInfo)
-						{
-							if (modified != myInfo.fCanBeSaved)
-							{
+						synchronized (myInfo) {
+							if (modified != myInfo.fCanBeSaved) {
 								myInfo.fCanBeSaved = modified;
 								dirtyStateChanged = true;
 							}
-							if (!resource.isModified())
-							{
+							if (!resource.isModified()) {
 								myInfo.setSynchronized(resource);
 							}
 						}
-						if (dirtyStateChanged)
-						{
+						if (dirtyStateChanged) {
 							fireElementDirtyStateChanged(myInfo
 									.getEditorInput(), modified);
 
-							if (!modified)
-							{
+							if (!modified) {
 								myInfo
 										.setModificationStamp(computeModificationStamp(myInfo));
 							}

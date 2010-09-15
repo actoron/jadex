@@ -14,20 +14,15 @@ import jadex.tools.gpmn.diagram.part.GpmnDiagramEditorPlugin;
 /**
  * @generated
  */
-public class ElementInitializers
-{
+public class ElementInitializers {
 
 	/**
 	 * @generated
 	 */
-	public static void init_Goal_2004(Goal instance)
-	{
-		try
-		{
+	public static void init_Goal_2004(Goal instance) {
+		try {
 			instance.setGoalType(GoalType.ACHIEVE_GOAL);
-		}
-		catch (RuntimeException e)
-		{
+		} catch (RuntimeException e) {
 			GpmnDiagramEditorPlugin.getInstance().logError(
 					"Element initialization failed", e); //$NON-NLS-1$						
 		}

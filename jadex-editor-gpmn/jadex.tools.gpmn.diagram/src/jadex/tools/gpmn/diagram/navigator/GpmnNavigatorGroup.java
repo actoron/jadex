@@ -13,8 +13,7 @@ import java.util.LinkedList;
 /**
  * @generated
  */
-public class GpmnNavigatorGroup extends GpmnAbstractNavigatorItem
-{
+public class GpmnNavigatorGroup extends GpmnAbstractNavigatorItem {
 
 	/**
 	 * @generated
@@ -34,8 +33,7 @@ public class GpmnNavigatorGroup extends GpmnAbstractNavigatorItem
 	/**
 	 * @generated
 	 */
-	GpmnNavigatorGroup(String groupName, String icon, Object parent)
-	{
+	GpmnNavigatorGroup(String groupName, String icon, Object parent) {
 		super(parent);
 		myGroupName = groupName;
 		myIcon = icon;
@@ -44,61 +42,52 @@ public class GpmnNavigatorGroup extends GpmnAbstractNavigatorItem
 	/**
 	 * @generated
 	 */
-	public String getGroupName()
-	{
+	public String getGroupName() {
 		return myGroupName;
 	}
 
 	/**
 	 * @generated
 	 */
-	public String getIcon()
-	{
+	public String getIcon() {
 		return myIcon;
 	}
 
 	/**
 	 * @generated
 	 */
-	public Object[] getChildren()
-	{
+	public Object[] getChildren() {
 		return myChildren.toArray();
 	}
 
 	/**
 	 * @generated
 	 */
-	public void addChildren(Collection children)
-	{
+	public void addChildren(Collection children) {
 		myChildren.addAll(children);
 	}
 
 	/**
 	 * @generated
 	 */
-	public void addChild(Object child)
-	{
+	public void addChild(Object child) {
 		myChildren.add(child);
 	}
 
 	/**
 	 * @generated
 	 */
-	public boolean isEmpty()
-	{
+	public boolean isEmpty() {
 		return myChildren.size() == 0;
 	}
 
 	/**
 	 * @generated
 	 */
-	public boolean equals(Object obj)
-	{
-		if (obj instanceof jadex.tools.gpmn.diagram.navigator.GpmnNavigatorGroup)
-		{
+	public boolean equals(Object obj) {
+		if (obj instanceof jadex.tools.gpmn.diagram.navigator.GpmnNavigatorGroup) {
 			jadex.tools.gpmn.diagram.navigator.GpmnNavigatorGroup anotherGroup = (jadex.tools.gpmn.diagram.navigator.GpmnNavigatorGroup) obj;
-			if (getGroupName().equals(anotherGroup.getGroupName()))
-			{
+			if (getGroupName().equals(anotherGroup.getGroupName())) {
 				return getParent().equals(anotherGroup.getParent());
 			}
 		}
@@ -108,8 +97,7 @@ public class GpmnNavigatorGroup extends GpmnAbstractNavigatorItem
 	/**
 	 * @generated
 	 */
-	public int hashCode()
-	{
+	public int hashCode() {
 		return getGroupName().hashCode();
 	}
 

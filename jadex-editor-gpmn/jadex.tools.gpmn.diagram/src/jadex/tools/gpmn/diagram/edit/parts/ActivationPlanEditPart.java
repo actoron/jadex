@@ -58,8 +58,7 @@ import org.eclipse.swt.widgets.Display;
 /**
  * @generated
  */
-public class ActivationPlanEditPart extends ShapeNodeEditPart
-{
+public class ActivationPlanEditPart extends ShapeNodeEditPart {
 
 	/**
 	 * @generated
@@ -79,16 +78,14 @@ public class ActivationPlanEditPart extends ShapeNodeEditPart
 	/**
 	 * @generated
 	 */
-	public ActivationPlanEditPart(View view)
-	{
+	public ActivationPlanEditPart(View view) {
 		super(view);
 	}
 
 	/**
 	 * @generated
 	 */
-	protected void createDefaultEditPoliciesGen()
-	{
+	protected void createDefaultEditPoliciesGen() {
 		super.createDefaultEditPolicies();
 		installEditPolicy(EditPolicyRoles.SEMANTIC_ROLE,
 				new ActivationPlanItemSemanticEditPolicy());
@@ -100,8 +97,7 @@ public class ActivationPlanEditPart extends ShapeNodeEditPart
 	/**
 	 * @generated NOT, use custom edit policies
 	 */
-	protected void createDefaultEditPolicies()
-	{
+	protected void createDefaultEditPolicies() {
 		this.createDefaultEditPoliciesGen();
 
 		// use custom connection handle and tool
@@ -113,29 +109,23 @@ public class ActivationPlanEditPart extends ShapeNodeEditPart
 	/**
 	 * @generated
 	 */
-	protected LayoutEditPolicy createLayoutEditPolicy()
-	{
-		LayoutEditPolicy lep = new LayoutEditPolicy()
-		{
+	protected LayoutEditPolicy createLayoutEditPolicy() {
+		LayoutEditPolicy lep = new LayoutEditPolicy() {
 
-			protected EditPolicy createChildEditPolicy(EditPart child)
-			{
+			protected EditPolicy createChildEditPolicy(EditPart child) {
 				EditPolicy result = child
 						.getEditPolicy(EditPolicy.PRIMARY_DRAG_ROLE);
-				if (result == null)
-				{
+				if (result == null) {
 					result = new NonResizableEditPolicy();
 				}
 				return result;
 			}
 
-			protected Command getMoveChildrenCommand(Request request)
-			{
+			protected Command getMoveChildrenCommand(Request request) {
 				return null;
 			}
 
-			protected Command getCreateCommand(CreateRequest request)
-			{
+			protected Command getCreateCommand(CreateRequest request) {
 				return null;
 			}
 		};
@@ -145,8 +135,7 @@ public class ActivationPlanEditPart extends ShapeNodeEditPart
 	/**
 	 * @generated
 	 */
-	protected IFigure createNodeShape()
-	{
+	protected IFigure createNodeShape() {
 		ActivationPlanFigure figure = new ActivationPlanFigure();
 		return primaryShape = figure;
 	}
@@ -154,8 +143,7 @@ public class ActivationPlanEditPart extends ShapeNodeEditPart
 	/**
 	 * @generated NOT
 	 */
-	public DragTracker getDragTracker(Request req)
-	{
+	public DragTracker getDragTracker(Request req) {
 		if (req instanceof SelectionRequest)
 			return new ActivationPlanSelectToolEx(this);
 		return super.getDragTracker(req);
@@ -164,18 +152,15 @@ public class ActivationPlanEditPart extends ShapeNodeEditPart
 	/**
 	 * @generated
 	 */
-	public ActivationPlanFigure getPrimaryShape()
-	{
+	public ActivationPlanFigure getPrimaryShape() {
 		return (ActivationPlanFigure) primaryShape;
 	}
 
 	/**
 	 * @generated
 	 */
-	protected boolean addFixedChild(EditPart childEditPart)
-	{
-		if (childEditPart instanceof ActivationPlanNameEditPart)
-		{
+	protected boolean addFixedChild(EditPart childEditPart) {
+		if (childEditPart instanceof ActivationPlanNameEditPart) {
 			((ActivationPlanNameEditPart) childEditPart)
 					.setLabel(getPrimaryShape()
 							.getFigureActivationPlanNameFigure());
@@ -187,10 +172,8 @@ public class ActivationPlanEditPart extends ShapeNodeEditPart
 	/**
 	 * @generated
 	 */
-	protected boolean removeFixedChild(EditPart childEditPart)
-	{
-		if (childEditPart instanceof ActivationPlanNameEditPart)
-		{
+	protected boolean removeFixedChild(EditPart childEditPart) {
+		if (childEditPart instanceof ActivationPlanNameEditPart) {
 			return true;
 		}
 		return false;
@@ -199,10 +182,8 @@ public class ActivationPlanEditPart extends ShapeNodeEditPart
 	/**
 	 * @generated
 	 */
-	protected void addChildVisual(EditPart childEditPart, int index)
-	{
-		if (addFixedChild(childEditPart))
-		{
+	protected void addChildVisual(EditPart childEditPart, int index) {
+		if (addFixedChild(childEditPart)) {
 			return;
 		}
 		super.addChildVisual(childEditPart, -1);
@@ -211,10 +192,8 @@ public class ActivationPlanEditPart extends ShapeNodeEditPart
 	/**
 	 * @generated
 	 */
-	protected void removeChildVisual(EditPart childEditPart)
-	{
-		if (removeFixedChild(childEditPart))
-		{
+	protected void removeChildVisual(EditPart childEditPart) {
+		if (removeFixedChild(childEditPart)) {
 			return;
 		}
 		super.removeChildVisual(childEditPart);
@@ -223,16 +202,14 @@ public class ActivationPlanEditPart extends ShapeNodeEditPart
 	/**
 	 * @generated
 	 */
-	protected IFigure getContentPaneFor(IGraphicalEditPart editPart)
-	{
+	protected IFigure getContentPaneFor(IGraphicalEditPart editPart) {
 		return getContentPane();
 	}
 
 	/**
 	 * @generated
 	 */
-	protected NodeFigure createNodePlate()
-	{
+	protected NodeFigure createNodePlate() {
 		DefaultSizeNodeFigure result = new DefaultSizeNodeFigure(40, 40);
 		return result;
 	}
@@ -245,8 +222,7 @@ public class ActivationPlanEditPart extends ShapeNodeEditPart
 	 * 
 	 * @generated NOT
 	 */
-	protected NodeFigure createNodeFigure()
-	{
+	protected NodeFigure createNodeFigure() {
 		NodeFigure figure = createNodePlate();
 		figure.setLayoutManager(new StackLayout());
 		IFigure shape = createNodeShape();
@@ -265,8 +241,7 @@ public class ActivationPlanEditPart extends ShapeNodeEditPart
 	 * @param shape
 	 * @generated NOT
 	 */
-	private void setDecoratorAndLabel(ActivationPlanFigure shape)
-	{
+	private void setDecoratorAndLabel(ActivationPlanFigure shape) {
 
 		ActivationPlan plan = (ActivationPlan) getPrimaryView().getElement();
 		shape.setShowPlanModeDecorator(ModeType.SEQUENTIAL.equals(plan
@@ -286,10 +261,8 @@ public class ActivationPlanEditPart extends ShapeNodeEditPart
 	 * @param nodeShape instance of generated figure class
 	 * @generated
 	 */
-	protected IFigure setupContentPane(IFigure nodeShape)
-	{
-		if (nodeShape.getLayoutManager() == null)
-		{
+	protected IFigure setupContentPane(IFigure nodeShape) {
+		if (nodeShape.getLayoutManager() == null) {
 			ConstrainedToolbarLayout layout = new ConstrainedToolbarLayout();
 			layout.setSpacing(5);
 			nodeShape.setLayoutManager(layout);
@@ -300,10 +273,8 @@ public class ActivationPlanEditPart extends ShapeNodeEditPart
 	/**
 	 * @generated
 	 */
-	public IFigure getContentPane()
-	{
-		if (contentPane != null)
-		{
+	public IFigure getContentPane() {
+		if (contentPane != null) {
 			return contentPane;
 		}
 		return super.getContentPane();
@@ -312,10 +283,8 @@ public class ActivationPlanEditPart extends ShapeNodeEditPart
 	/**
 	 * @generated
 	 */
-	protected void setForegroundColor(Color color)
-	{
-		if (primaryShape != null)
-		{
+	protected void setForegroundColor(Color color) {
+		if (primaryShape != null) {
 			primaryShape.setForegroundColor(color);
 		}
 	}
@@ -323,10 +292,8 @@ public class ActivationPlanEditPart extends ShapeNodeEditPart
 	/**
 	 * @generated
 	 */
-	protected void setBackgroundColor(Color color)
-	{
-		if (primaryShape != null)
-		{
+	protected void setBackgroundColor(Color color) {
+		if (primaryShape != null) {
 			primaryShape.setBackgroundColor(color);
 		}
 	}
@@ -334,10 +301,8 @@ public class ActivationPlanEditPart extends ShapeNodeEditPart
 	/**
 	 * @generated
 	 */
-	protected void setLineWidth(int width)
-	{
-		if (primaryShape instanceof Shape)
-		{
+	protected void setLineWidth(int width) {
+		if (primaryShape instanceof Shape) {
 			((Shape) primaryShape).setLineWidth(width);
 		}
 	}
@@ -345,10 +310,8 @@ public class ActivationPlanEditPart extends ShapeNodeEditPart
 	/**
 	 * @generated
 	 */
-	protected void setLineType(int style)
-	{
-		if (primaryShape instanceof Shape)
-		{
+	protected void setLineType(int style) {
+		if (primaryShape instanceof Shape) {
 			((Shape) primaryShape).setLineStyle(style);
 		}
 	}
@@ -356,8 +319,7 @@ public class ActivationPlanEditPart extends ShapeNodeEditPart
 	/**
 	 * @generated
 	 */
-	public EditPart getPrimaryChildEditPart()
-	{
+	public EditPart getPrimaryChildEditPart() {
 		return getChildBySemanticHint(GpmnVisualIDRegistry
 				.getType(ActivationPlanNameEditPart.VISUAL_ID));
 	}
@@ -365,8 +327,7 @@ public class ActivationPlanEditPart extends ShapeNodeEditPart
 	/**
 	 * @generated
 	 */
-	public List/*<org.eclipse.gmf.runtime.emf.type.core.IElementType>*/getMARelTypesOnSource()
-	{
+	public List/*<org.eclipse.gmf.runtime.emf.type.core.IElementType>*/getMARelTypesOnSource() {
 		List/*<org.eclipse.gmf.runtime.emf.type.core.IElementType>*/types = new ArrayList/*<org.eclipse.gmf.runtime.emf.type.core.IElementType>*/();
 		types.add(GpmnElementTypes.ActivationEdge_4001);
 		return types;
@@ -376,15 +337,12 @@ public class ActivationPlanEditPart extends ShapeNodeEditPart
 	 * @generated
 	 */
 	public List/*<org.eclipse.gmf.runtime.emf.type.core.IElementType>*/getMARelTypesOnSourceAndTarget(
-			IGraphicalEditPart targetEditPart)
-	{
+			IGraphicalEditPart targetEditPart) {
 		List/*<org.eclipse.gmf.runtime.emf.type.core.IElementType>*/types = new ArrayList/*<org.eclipse.gmf.runtime.emf.type.core.IElementType>*/();
-		if (targetEditPart instanceof SubProcessEditPart)
-		{
+		if (targetEditPart instanceof SubProcessEditPart) {
 			types.add(GpmnElementTypes.ActivationEdge_4001);
 		}
-		if (targetEditPart instanceof GoalEditPart)
-		{
+		if (targetEditPart instanceof GoalEditPart) {
 			types.add(GpmnElementTypes.ActivationEdge_4001);
 		}
 		return types;
@@ -394,15 +352,12 @@ public class ActivationPlanEditPart extends ShapeNodeEditPart
 	 * @generated
 	 */
 	public List/*<org.eclipse.gmf.runtime.emf.type.core.IElementType>*/getMATypesForTarget(
-			IElementType relationshipType)
-	{
+			IElementType relationshipType) {
 		List/*<org.eclipse.gmf.runtime.emf.type.core.IElementType>*/types = new ArrayList/*<org.eclipse.gmf.runtime.emf.type.core.IElementType>*/();
-		if (relationshipType == GpmnElementTypes.ActivationEdge_4001)
-		{
+		if (relationshipType == GpmnElementTypes.ActivationEdge_4001) {
 			types.add(GpmnElementTypes.SubProcess_2002);
 		}
-		if (relationshipType == GpmnElementTypes.ActivationEdge_4001)
-		{
+		if (relationshipType == GpmnElementTypes.ActivationEdge_4001) {
 			types.add(GpmnElementTypes.Goal_2004);
 		}
 		return types;
@@ -411,8 +366,7 @@ public class ActivationPlanEditPart extends ShapeNodeEditPart
 	/**
 	 * @generated
 	 */
-	public List/*<org.eclipse.gmf.runtime.emf.type.core.IElementType>*/getMARelTypesOnTarget()
-	{
+	public List/*<org.eclipse.gmf.runtime.emf.type.core.IElementType>*/getMARelTypesOnTarget() {
 		List/*<org.eclipse.gmf.runtime.emf.type.core.IElementType>*/types = new ArrayList/*<org.eclipse.gmf.runtime.emf.type.core.IElementType>*/();
 		types.add(GpmnElementTypes.PlanEdge_4002);
 		return types;
@@ -422,11 +376,9 @@ public class ActivationPlanEditPart extends ShapeNodeEditPart
 	 * @generated
 	 */
 	public List/*<org.eclipse.gmf.runtime.emf.type.core.IElementType>*/getMATypesForSource(
-			IElementType relationshipType)
-	{
+			IElementType relationshipType) {
 		List/*<org.eclipse.gmf.runtime.emf.type.core.IElementType>*/types = new ArrayList/*<org.eclipse.gmf.runtime.emf.type.core.IElementType>*/();
-		if (relationshipType == GpmnElementTypes.PlanEdge_4002)
-		{
+		if (relationshipType == GpmnElementTypes.PlanEdge_4002) {
 			types.add(GpmnElementTypes.Goal_2004);
 		}
 		return types;
@@ -435,15 +387,12 @@ public class ActivationPlanEditPart extends ShapeNodeEditPart
 	/**
 	 * @generated NOT
 	 */
-	protected void handleNotificationEvent(Notification notification)
-	{
+	protected void handleNotificationEvent(Notification notification) {
 
 		if (notification.getEventType() == Notification.SET
-				|| notification.getEventType() == Notification.UNSET)
-		{
+				|| notification.getEventType() == Notification.UNSET) {
 			if (GpmnPackage.eINSTANCE.getActivationPlan_Mode().equals(
-					notification.getFeature()))
-			{
+					notification.getFeature())) {
 				// orderedMode changed
 				final boolean showDecoratorAndLabels = ModeType.SEQUENTIAL
 						.equals(notification.getNewValue());
@@ -461,8 +410,7 @@ public class ActivationPlanEditPart extends ShapeNodeEditPart
 	 * @generated NOT
 	 */
 	public ConnectionAnchor getTargetConnectionAnchor(
-			final ConnectionEditPart connEditPart)
-	{
+			final ConnectionEditPart connEditPart) {
 		ConnectionAnchor anchor = new SlidableRoundedRectangleAnchor(
 				(ShadowedRoundedRectangleFigure) primaryShape);
 		return anchor;
@@ -472,8 +420,7 @@ public class ActivationPlanEditPart extends ShapeNodeEditPart
 	 * @generated NOT
 	 */
 	public ConnectionAnchor getSourceConnectionAnchor(
-			ConnectionEditPart connEditPart)
-	{
+			ConnectionEditPart connEditPart) {
 		return getTargetConnectionAnchor(connEditPart);
 	}
 
@@ -484,24 +431,19 @@ public class ActivationPlanEditPart extends ShapeNodeEditPart
 	 *            to show/hide the labels
 	 * @generated NOT
 	 */
-	protected void toggleActivationConnectionLabels(boolean showConnectionLabels)
-	{
+	protected void toggleActivationConnectionLabels(boolean showConnectionLabels) {
 		CompoundCommand cc = new CompoundCommand(
 				"Toggle source connections labels");
-		for (Object e : getSourceConnections())
-		{
-			if (e instanceof ConnectionEditPart)
-			{
+		for (Object e : getSourceConnections()) {
+			if (e instanceof ConnectionEditPart) {
 				final ConnectionEditPart cep = (ConnectionEditPart) e;
 				final ToggleConnectionLabelsRequest tclr = new ToggleConnectionLabelsRequest(
 						showConnectionLabels);
 
 				// toggle connection label
-				Display.getCurrent().asyncExec(new Runnable()
-				{
+				Display.getCurrent().asyncExec(new Runnable() {
 					@Override
-					public void run()
-					{
+					public void run() {
 						cep.performRequest(tclr);
 					}
 				});
@@ -514,8 +456,7 @@ public class ActivationPlanEditPart extends ShapeNodeEditPart
 	 * @generated
 	 */
 	public class ActivationPlanFigure extends
-			jadex.tools.gpmn.diagram.ui.figures.ActivationPlanFigure
-	{
+			jadex.tools.gpmn.diagram.ui.figures.ActivationPlanFigure {
 
 		/**
 		 * @generated
@@ -525,8 +466,7 @@ public class ActivationPlanEditPart extends ShapeNodeEditPart
 		/**
 		 * @generated
 		 */
-		public ActivationPlanFigure()
-		{
+		public ActivationPlanFigure() {
 
 			GridLayout layoutThis = new GridLayout();
 			layoutThis.numColumns = 1;
@@ -542,8 +482,7 @@ public class ActivationPlanEditPart extends ShapeNodeEditPart
 		/**
 		 * @generated
 		 */
-		private void createContents()
-		{
+		private void createContents() {
 
 			fFigureActivationPlanNameFigure = new WrappingLabel();
 			fFigureActivationPlanNameFigure.setText("Plan");
@@ -569,24 +508,21 @@ public class ActivationPlanEditPart extends ShapeNodeEditPart
 		/**
 		 * @generated
 		 */
-		protected boolean useLocalCoordinates()
-		{
+		protected boolean useLocalCoordinates() {
 			return myUseLocalCoordinates;
 		}
 
 		/**
 		 * @generated
 		 */
-		protected void setUseLocalCoordinates(boolean useLocalCoordinates)
-		{
+		protected void setUseLocalCoordinates(boolean useLocalCoordinates) {
 			myUseLocalCoordinates = useLocalCoordinates;
 		}
 
 		/**
 		 * @generated
 		 */
-		public WrappingLabel getFigureActivationPlanNameFigure()
-		{
+		public WrappingLabel getFigureActivationPlanNameFigure() {
 			return fFigureActivationPlanNameFigure;
 		}
 

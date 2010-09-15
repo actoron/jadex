@@ -51,8 +51,7 @@ import org.eclipse.gmf.runtime.notation.View;
  * @generated
  */
 public class GpmnDiagramCanonicalEditPolicy extends
-		CanonicalConnectionEditPolicy
-{
+		CanonicalConnectionEditPolicy {
 
 	/**
 	 * @generated
@@ -62,14 +61,12 @@ public class GpmnDiagramCanonicalEditPolicy extends
 	/**
 	 * @generated
 	 */
-	protected List getSemanticChildrenList()
-	{
+	protected List getSemanticChildrenList() {
 		View viewObject = (View) getHost().getModel();
 		List result = new LinkedList();
 		for (Iterator it = GpmnDiagramUpdater
 				.getGpmnDiagram_1000SemanticChildren(viewObject).iterator(); it
-				.hasNext();)
-		{
+				.hasNext();) {
 			result.add(((GpmnNodeDescriptor) it.next()).getModelElement());
 		}
 		return result;
@@ -78,27 +75,23 @@ public class GpmnDiagramCanonicalEditPolicy extends
 	/**
 	 * @generated
 	 */
-	protected boolean shouldDeleteView(View view)
-	{
+	protected boolean shouldDeleteView(View view) {
 		return true;
 	}
 
 	/**
 	 * @generated
 	 */
-	protected boolean isOrphaned(Collection semanticChildren, final View view)
-	{
+	protected boolean isOrphaned(Collection semanticChildren, final View view) {
 		int visualID = GpmnVisualIDRegistry.getVisualID(view);
-		switch (visualID)
-		{
-			case ActivationPlanEditPart.VISUAL_ID:
-			case SubProcessEditPart.VISUAL_ID:
-			case BpmnPlanEditPart.VISUAL_ID:
-			case GoalEditPart.VISUAL_ID:
-				if (!semanticChildren.contains(view.getElement()))
-				{
-					return true;
-				}
+		switch (visualID) {
+		case ActivationPlanEditPart.VISUAL_ID:
+		case SubProcessEditPart.VISUAL_ID:
+		case BpmnPlanEditPart.VISUAL_ID:
+		case GoalEditPart.VISUAL_ID:
+			if (!semanticChildren.contains(view.getElement())) {
+				return true;
+			}
 		}
 		return false;
 	}
@@ -106,18 +99,15 @@ public class GpmnDiagramCanonicalEditPolicy extends
 	/**
 	 * @generated
 	 */
-	protected String getDefaultFactoryHint()
-	{
+	protected String getDefaultFactoryHint() {
 		return null;
 	}
 
 	/**
 	 * @generated
 	 */
-	protected Set getFeaturesToSynchronize()
-	{
-		if (myFeaturesToSynchronize == null)
-		{
+	protected Set getFeaturesToSynchronize() {
+		if (myFeaturesToSynchronize == null) {
 			myFeaturesToSynchronize = new HashSet();
 			myFeaturesToSynchronize.add(GpmnPackage.eINSTANCE
 					.getGpmnDiagram_Plans());
@@ -132,24 +122,21 @@ public class GpmnDiagramCanonicalEditPolicy extends
 	/**
 	 * @generated
 	 */
-	protected List getSemanticConnectionsList()
-	{
+	protected List getSemanticConnectionsList() {
 		return Collections.EMPTY_LIST;
 	}
 
 	/**
 	 * @generated
 	 */
-	protected EObject getSourceElement(EObject relationship)
-	{
+	protected EObject getSourceElement(EObject relationship) {
 		return null;
 	}
 
 	/**
 	 * @generated
 	 */
-	protected EObject getTargetElement(EObject relationship)
-	{
+	protected EObject getTargetElement(EObject relationship) {
 		return null;
 	}
 
@@ -157,24 +144,21 @@ public class GpmnDiagramCanonicalEditPolicy extends
 	 * @generated
 	 */
 	protected boolean shouldIncludeConnection(Edge connector,
-			Collection children)
-	{
+			Collection children) {
 		return false;
 	}
 
 	/**
 	 * @generated
 	 */
-	protected void refreshSemantic()
-	{
+	protected void refreshSemantic() {
 		List createdViews = new LinkedList();
 		createdViews.addAll(refreshSemanticChildren());
 		List createdConnectionViews = new LinkedList();
 		createdConnectionViews.addAll(refreshSemanticConnections());
 		createdConnectionViews.addAll(refreshConnections());
 
-		if (createdViews.size() > 1)
-		{
+		if (createdViews.size() > 1) {
 			// perform a layout of the container
 			DeferredLayoutCommand layoutCmd = new DeferredLayoutCommand(host()
 					.getEditingDomain(), createdViews, host());
@@ -188,32 +172,27 @@ public class GpmnDiagramCanonicalEditPolicy extends
 	/**
 	 * @generated
 	 */
-	private Diagram getDiagram()
-	{
+	private Diagram getDiagram() {
 		return ((View) getHost().getModel()).getDiagram();
 	}
 
 	/**
 	 * @generated
 	 */
-	private Collection refreshConnections()
-	{
+	private Collection refreshConnections() {
 		Map domain2NotationMap = new HashMap();
 		Collection linkDescriptors = collectAllLinks(getDiagram(),
 				domain2NotationMap);
 		Collection existingLinks = new LinkedList(getDiagram().getEdges());
 		for (Iterator linksIterator = existingLinks.iterator(); linksIterator
-				.hasNext();)
-		{
+				.hasNext();) {
 			Edge nextDiagramLink = (Edge) linksIterator.next();
 			int diagramLinkVisualID = GpmnVisualIDRegistry
 					.getVisualID(nextDiagramLink);
 			if (diagramLinkVisualID == -1
-					|| diagramLinkVisualID == VirtualActivationEdgeEditPart.VISUAL_ID)
-			{
+					|| diagramLinkVisualID == VirtualActivationEdgeEditPart.VISUAL_ID) {
 				if (nextDiagramLink.getSource() != null
-						&& nextDiagramLink.getTarget() != null)
-				{
+						&& nextDiagramLink.getTarget() != null) {
 					linksIterator.remove();
 				}
 				continue;
@@ -222,8 +201,7 @@ public class GpmnDiagramCanonicalEditPolicy extends
 			EObject diagramLinkSrc = nextDiagramLink.getSource().getElement();
 			EObject diagramLinkDst = nextDiagramLink.getTarget().getElement();
 			for (Iterator linkDescriptorsIterator = linkDescriptors.iterator(); linkDescriptorsIterator
-					.hasNext();)
-			{
+					.hasNext();) {
 				GpmnLinkDescriptor nextLinkDescriptor = (GpmnLinkDescriptor) linkDescriptorsIterator
 						.next();
 				if (diagramLinkObject == nextLinkDescriptor.getModelElement()
@@ -231,8 +209,7 @@ public class GpmnDiagramCanonicalEditPolicy extends
 						&& diagramLinkDst == nextLinkDescriptor
 								.getDestination()
 						&& diagramLinkVisualID == nextLinkDescriptor
-								.getVisualID())
-				{
+								.getVisualID()) {
 					linksIterator.remove();
 					linkDescriptorsIterator.remove();
 					break;
@@ -246,129 +223,108 @@ public class GpmnDiagramCanonicalEditPolicy extends
 	/**
 	 * @generated
 	 */
-	private Collection collectAllLinks(View view, Map domain2NotationMap)
-	{
+	private Collection collectAllLinks(View view, Map domain2NotationMap) {
 		if (!GpmnDiagramEditPart.MODEL_ID.equals(GpmnVisualIDRegistry
-				.getModelID(view)))
-		{
+				.getModelID(view))) {
 			return Collections.EMPTY_LIST;
 		}
 		Collection result = new LinkedList();
-		switch (GpmnVisualIDRegistry.getVisualID(view))
-		{
-			case GpmnDiagramEditPart.VISUAL_ID:
-			{
-				if (!domain2NotationMap.containsKey(view.getElement()))
-				{
-					result.addAll(GpmnDiagramUpdater
-							.getGpmnDiagram_1000ContainedLinks(view));
-				}
-				if (!domain2NotationMap.containsKey(view.getElement())
-						|| view.getEAnnotation("Shortcut") == null) { //$NON-NLS-1$
-					domain2NotationMap.put(view.getElement(), view);
-				}
-				break;
+		switch (GpmnVisualIDRegistry.getVisualID(view)) {
+		case GpmnDiagramEditPart.VISUAL_ID: {
+			if (!domain2NotationMap.containsKey(view.getElement())) {
+				result.addAll(GpmnDiagramUpdater
+						.getGpmnDiagram_1000ContainedLinks(view));
 			}
-			case ActivationPlanEditPart.VISUAL_ID:
-			{
-				if (!domain2NotationMap.containsKey(view.getElement()))
-				{
-					result.addAll(GpmnDiagramUpdater
-							.getActivationPlan_2001ContainedLinks(view));
-				}
-				if (!domain2NotationMap.containsKey(view.getElement())
-						|| view.getEAnnotation("Shortcut") == null) { //$NON-NLS-1$
-					domain2NotationMap.put(view.getElement(), view);
-				}
-				break;
+			if (!domain2NotationMap.containsKey(view.getElement())
+					|| view.getEAnnotation("Shortcut") == null) { //$NON-NLS-1$
+				domain2NotationMap.put(view.getElement(), view);
 			}
-			case SubProcessEditPart.VISUAL_ID:
-			{
-				if (!domain2NotationMap.containsKey(view.getElement()))
-				{
-					result.addAll(GpmnDiagramUpdater
-							.getSubProcess_2002ContainedLinks(view));
-				}
-				if (!domain2NotationMap.containsKey(view.getElement())
-						|| view.getEAnnotation("Shortcut") == null) { //$NON-NLS-1$
-					domain2NotationMap.put(view.getElement(), view);
-				}
-				break;
+			break;
+		}
+		case ActivationPlanEditPart.VISUAL_ID: {
+			if (!domain2NotationMap.containsKey(view.getElement())) {
+				result.addAll(GpmnDiagramUpdater
+						.getActivationPlan_2001ContainedLinks(view));
 			}
-			case BpmnPlanEditPart.VISUAL_ID:
-			{
-				if (!domain2NotationMap.containsKey(view.getElement()))
-				{
-					result.addAll(GpmnDiagramUpdater
-							.getBpmnPlan_2003ContainedLinks(view));
-				}
-				if (!domain2NotationMap.containsKey(view.getElement())
-						|| view.getEAnnotation("Shortcut") == null) { //$NON-NLS-1$
-					domain2NotationMap.put(view.getElement(), view);
-				}
-				break;
+			if (!domain2NotationMap.containsKey(view.getElement())
+					|| view.getEAnnotation("Shortcut") == null) { //$NON-NLS-1$
+				domain2NotationMap.put(view.getElement(), view);
 			}
-			case GoalEditPart.VISUAL_ID:
-			{
-				if (!domain2NotationMap.containsKey(view.getElement()))
-				{
-					result.addAll(GpmnDiagramUpdater
-							.getGoal_2004ContainedLinks(view));
-				}
-				if (!domain2NotationMap.containsKey(view.getElement())
-						|| view.getEAnnotation("Shortcut") == null) { //$NON-NLS-1$
-					domain2NotationMap.put(view.getElement(), view);
-				}
-				break;
+			break;
+		}
+		case SubProcessEditPart.VISUAL_ID: {
+			if (!domain2NotationMap.containsKey(view.getElement())) {
+				result.addAll(GpmnDiagramUpdater
+						.getSubProcess_2002ContainedLinks(view));
 			}
-			case ActivationEdgeEditPart.VISUAL_ID:
-			{
-				if (!domain2NotationMap.containsKey(view.getElement()))
-				{
-					result.addAll(GpmnDiagramUpdater
-							.getActivationEdge_4001ContainedLinks(view));
-				}
-				if (!domain2NotationMap.containsKey(view.getElement())
-						|| view.getEAnnotation("Shortcut") == null) { //$NON-NLS-1$
-					domain2NotationMap.put(view.getElement(), view);
-				}
-				break;
+			if (!domain2NotationMap.containsKey(view.getElement())
+					|| view.getEAnnotation("Shortcut") == null) { //$NON-NLS-1$
+				domain2NotationMap.put(view.getElement(), view);
 			}
-			case PlanEdgeEditPart.VISUAL_ID:
-			{
-				if (!domain2NotationMap.containsKey(view.getElement()))
-				{
-					result.addAll(GpmnDiagramUpdater
-							.getPlanEdge_4002ContainedLinks(view));
-				}
-				if (!domain2NotationMap.containsKey(view.getElement())
-						|| view.getEAnnotation("Shortcut") == null) { //$NON-NLS-1$
-					domain2NotationMap.put(view.getElement(), view);
-				}
-				break;
+			break;
+		}
+		case BpmnPlanEditPart.VISUAL_ID: {
+			if (!domain2NotationMap.containsKey(view.getElement())) {
+				result.addAll(GpmnDiagramUpdater
+						.getBpmnPlan_2003ContainedLinks(view));
 			}
-			case SuppressionEdgeEditPart.VISUAL_ID:
-			{
-				if (!domain2NotationMap.containsKey(view.getElement()))
-				{
-					result.addAll(GpmnDiagramUpdater
-							.getSuppressionEdge_4004ContainedLinks(view));
-				}
-				if (!domain2NotationMap.containsKey(view.getElement())
-						|| view.getEAnnotation("Shortcut") == null) { //$NON-NLS-1$
-					domain2NotationMap.put(view.getElement(), view);
-				}
-				break;
+			if (!domain2NotationMap.containsKey(view.getElement())
+					|| view.getEAnnotation("Shortcut") == null) { //$NON-NLS-1$
+				domain2NotationMap.put(view.getElement(), view);
 			}
+			break;
+		}
+		case GoalEditPart.VISUAL_ID: {
+			if (!domain2NotationMap.containsKey(view.getElement())) {
+				result.addAll(GpmnDiagramUpdater
+						.getGoal_2004ContainedLinks(view));
+			}
+			if (!domain2NotationMap.containsKey(view.getElement())
+					|| view.getEAnnotation("Shortcut") == null) { //$NON-NLS-1$
+				domain2NotationMap.put(view.getElement(), view);
+			}
+			break;
+		}
+		case ActivationEdgeEditPart.VISUAL_ID: {
+			if (!domain2NotationMap.containsKey(view.getElement())) {
+				result.addAll(GpmnDiagramUpdater
+						.getActivationEdge_4001ContainedLinks(view));
+			}
+			if (!domain2NotationMap.containsKey(view.getElement())
+					|| view.getEAnnotation("Shortcut") == null) { //$NON-NLS-1$
+				domain2NotationMap.put(view.getElement(), view);
+			}
+			break;
+		}
+		case PlanEdgeEditPart.VISUAL_ID: {
+			if (!domain2NotationMap.containsKey(view.getElement())) {
+				result.addAll(GpmnDiagramUpdater
+						.getPlanEdge_4002ContainedLinks(view));
+			}
+			if (!domain2NotationMap.containsKey(view.getElement())
+					|| view.getEAnnotation("Shortcut") == null) { //$NON-NLS-1$
+				domain2NotationMap.put(view.getElement(), view);
+			}
+			break;
+		}
+		case SuppressionEdgeEditPart.VISUAL_ID: {
+			if (!domain2NotationMap.containsKey(view.getElement())) {
+				result.addAll(GpmnDiagramUpdater
+						.getSuppressionEdge_4004ContainedLinks(view));
+			}
+			if (!domain2NotationMap.containsKey(view.getElement())
+					|| view.getEAnnotation("Shortcut") == null) { //$NON-NLS-1$
+				domain2NotationMap.put(view.getElement(), view);
+			}
+			break;
+		}
 		}
 		for (Iterator children = view.getChildren().iterator(); children
-				.hasNext();)
-		{
+				.hasNext();) {
 			result.addAll(collectAllLinks((View) children.next(),
 					domain2NotationMap));
 		}
-		for (Iterator edges = view.getSourceEdges().iterator(); edges.hasNext();)
-		{
+		for (Iterator edges = view.getSourceEdges().iterator(); edges.hasNext();) {
 			result.addAll(collectAllLinks((View) edges.next(),
 					domain2NotationMap));
 		}
@@ -379,20 +335,17 @@ public class GpmnDiagramCanonicalEditPolicy extends
 	 * @generated
 	 */
 	private Collection createConnections(Collection linkDescriptors,
-			Map domain2NotationMap)
-	{
+			Map domain2NotationMap) {
 		List adapters = new LinkedList();
 		for (Iterator linkDescriptorsIterator = linkDescriptors.iterator(); linkDescriptorsIterator
-				.hasNext();)
-		{
+				.hasNext();) {
 			final GpmnLinkDescriptor nextLinkDescriptor = (GpmnLinkDescriptor) linkDescriptorsIterator
 					.next();
 			EditPart sourceEditPart = getEditPart(nextLinkDescriptor
 					.getSource(), domain2NotationMap);
 			EditPart targetEditPart = getEditPart(nextLinkDescriptor
 					.getDestination(), domain2NotationMap);
-			if (sourceEditPart == null || targetEditPart == null)
-			{
+			if (sourceEditPart == null || targetEditPart == null) {
 				continue;
 			}
 			CreateConnectionViewRequest.ConnectionViewDescriptor descriptor = new CreateConnectionViewRequest.ConnectionViewDescriptor(
@@ -408,12 +361,10 @@ public class GpmnDiagramCanonicalEditPolicy extends
 			ccr.setTargetEditPart(targetEditPart);
 			ccr.setType(RequestConstants.REQ_CONNECTION_END);
 			Command cmd = targetEditPart.getCommand(ccr);
-			if (cmd != null && cmd.canExecute())
-			{
+			if (cmd != null && cmd.canExecute()) {
 				executeCommand(cmd);
 				IAdaptable viewAdapter = (IAdaptable) ccr.getNewObject();
-				if (viewAdapter != null)
-				{
+				if (viewAdapter != null) {
 					adapters.add(viewAdapter);
 				}
 			}
@@ -425,11 +376,9 @@ public class GpmnDiagramCanonicalEditPolicy extends
 	 * @generated
 	 */
 	private EditPart getEditPart(EObject domainModelElement,
-			Map domain2NotationMap)
-	{
+			Map domain2NotationMap) {
 		View view = (View) domain2NotationMap.get(domainModelElement);
-		if (view != null)
-		{
+		if (view != null) {
 			return (EditPart) getHost().getViewer().getEditPartRegistry().get(
 					view);
 		}

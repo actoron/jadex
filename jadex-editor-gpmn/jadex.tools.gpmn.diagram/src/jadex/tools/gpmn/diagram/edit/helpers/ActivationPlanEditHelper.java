@@ -10,6 +10,5 @@ package jadex.tools.gpmn.diagram.edit.helpers;
 /**
  * @generated
  */
-public class ActivationPlanEditHelper extends GpmnBaseEditHelper
-{
+public class ActivationPlanEditHelper extends GpmnBaseEditHelper {
 }

@@ -240,8 +240,7 @@ public abstract class AbstractPlanImpl extends AbstractNodeImpl implements
 	 */
 	public EList<PlanEdge> getPlanEdges()
 	{
-		if (planEdges == null)
-		{
+		if (planEdges == null) {
 			planEdges = new EObjectWithInverseEList.Unsettable<PlanEdge>(PlanEdge.class, this, GpmnPackage.ABSTRACT_PLAN__PLAN_EDGES, GpmnPackage.PLAN_EDGE__TARGET);
 		}
 		return planEdges;
@@ -549,8 +548,7 @@ public abstract class AbstractPlanImpl extends AbstractNodeImpl implements
 	 */
 	public void setGpmnDiagram(GpmnDiagram newGpmnDiagram)
 	{
-		if (newGpmnDiagram != eInternalContainer() || (eContainerFeatureID() != GpmnPackage.ABSTRACT_PLAN__GPMN_DIAGRAM && newGpmnDiagram != null))
-		{
+		if (newGpmnDiagram != eInternalContainer() || (eContainerFeatureID() != GpmnPackage.ABSTRACT_PLAN__GPMN_DIAGRAM && newGpmnDiagram != null)) {
 			if (EcoreUtil.isAncestor(this, newGpmnDiagram))
 				throw new IllegalArgumentException("Recursive containment not allowed for " + toString()); //$NON-NLS-1$
 			NotificationChain msgs = null;
@@ -575,8 +573,7 @@ public abstract class AbstractPlanImpl extends AbstractNodeImpl implements
 	public NotificationChain eInverseAdd(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs)
 	{
-		switch (featureID)
-		{
+		switch (featureID) {
 			case GpmnPackage.ABSTRACT_PLAN__PLAN_EDGES:
 				return ((InternalEList<InternalEObject>)(InternalEList<?>)getPlanEdges()).basicAdd(otherEnd, msgs);
 			case GpmnPackage.ABSTRACT_PLAN__GPMN_DIAGRAM:
@@ -596,8 +593,7 @@ public abstract class AbstractPlanImpl extends AbstractNodeImpl implements
 	public NotificationChain eInverseRemove(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs)
 	{
-		switch (featureID)
-		{
+		switch (featureID) {
 			case GpmnPackage.ABSTRACT_PLAN__PLAN_EDGES:
 				return ((InternalEList<?>)getPlanEdges()).basicRemove(otherEnd, msgs);
 			case GpmnPackage.ABSTRACT_PLAN__GPMN_DIAGRAM:
@@ -615,8 +611,7 @@ public abstract class AbstractPlanImpl extends AbstractNodeImpl implements
 	public NotificationChain eBasicRemoveFromContainerFeature(
 			NotificationChain msgs)
 	{
-		switch (eContainerFeatureID())
-		{
+		switch (eContainerFeatureID()) {
 			case GpmnPackage.ABSTRACT_PLAN__GPMN_DIAGRAM:
 				return eInternalContainer().eInverseRemove(this, GpmnPackage.GPMN_DIAGRAM__PLANS, GpmnDiagram.class, msgs);
 		}
@@ -631,8 +626,7 @@ public abstract class AbstractPlanImpl extends AbstractNodeImpl implements
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType)
 	{
-		switch (featureID)
-		{
+		switch (featureID) {
 			case GpmnPackage.ABSTRACT_PLAN__PLAN_EDGES:
 				return getPlanEdges();
 			case GpmnPackage.ABSTRACT_PLAN__CONTEXTCONDITION:
@@ -660,8 +654,7 @@ public abstract class AbstractPlanImpl extends AbstractNodeImpl implements
 	@Override
 	public void eSet(int featureID, Object newValue)
 	{
-		switch (featureID)
-		{
+		switch (featureID) {
 			case GpmnPackage.ABSTRACT_PLAN__PLAN_EDGES:
 				getPlanEdges().clear();
 				getPlanEdges().addAll((Collection<? extends PlanEdge>)newValue);
@@ -696,8 +689,7 @@ public abstract class AbstractPlanImpl extends AbstractNodeImpl implements
 	@Override
 	public void eUnset(int featureID)
 	{
-		switch (featureID)
-		{
+		switch (featureID) {
 			case GpmnPackage.ABSTRACT_PLAN__PLAN_EDGES:
 				unsetPlanEdges();
 				return;
@@ -731,8 +723,7 @@ public abstract class AbstractPlanImpl extends AbstractNodeImpl implements
 	@Override
 	public boolean eIsSet(int featureID)
 	{
-		switch (featureID)
-		{
+		switch (featureID) {
 			case GpmnPackage.ABSTRACT_PLAN__PLAN_EDGES:
 				return isSetPlanEdges();
 			case GpmnPackage.ABSTRACT_PLAN__CONTEXTCONDITION:

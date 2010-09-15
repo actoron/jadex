@@ -26,14 +26,12 @@ import org.eclipse.gmf.runtime.notation.View;
 /**
  * @generated
  */
-public class ActivationPlanCreateCommand extends EditElementCommand
-{
+public class ActivationPlanCreateCommand extends EditElementCommand {
 
 	/**
 	 * @generated
 	 */
-	public ActivationPlanCreateCommand(CreateElementRequest req)
-	{
+	public ActivationPlanCreateCommand(CreateElementRequest req) {
 		super(req.getLabel(), null, req);
 	}
 
@@ -41,12 +39,10 @@ public class ActivationPlanCreateCommand extends EditElementCommand
 	 * FIXME: replace with setElementToEdit()
 	 * @generated
 	 */
-	protected EObject getElementToEdit()
-	{
+	protected EObject getElementToEdit() {
 		EObject container = ((CreateElementRequest) getRequest())
 				.getContainer();
-		if (container instanceof View)
-		{
+		if (container instanceof View) {
 			container = ((View) container).getElement();
 		}
 		return container;
@@ -55,8 +51,7 @@ public class ActivationPlanCreateCommand extends EditElementCommand
 	/**
 	 * @generated
 	 */
-	public boolean canExecute()
-	{
+	public boolean canExecute() {
 		return true;
 
 	}
@@ -65,8 +60,7 @@ public class ActivationPlanCreateCommand extends EditElementCommand
 	 * @generated
 	 */
 	protected CommandResult doExecuteWithResult(IProgressMonitor monitor,
-			IAdaptable info) throws ExecutionException
-	{
+			IAdaptable info) throws ExecutionException {
 		ActivationPlan newElement = GpmnFactory.eINSTANCE
 				.createActivationPlan();
 
@@ -84,8 +78,7 @@ public class ActivationPlanCreateCommand extends EditElementCommand
 	 */
 	protected void doConfigure(ActivationPlan newElement,
 			IProgressMonitor monitor, IAdaptable info)
-			throws ExecutionException
-	{
+			throws ExecutionException {
 		IElementType elementType = ((CreateElementRequest) getRequest())
 				.getElementType();
 		ConfigureRequest configureRequest = new ConfigureRequest(
@@ -95,8 +88,7 @@ public class ActivationPlanCreateCommand extends EditElementCommand
 		configureRequest.addParameters(getRequest().getParameters());
 		ICommand configureCommand = elementType
 				.getEditCommand(configureRequest);
-		if (configureCommand != null && configureCommand.canExecute())
-		{
+		if (configureCommand != null && configureCommand.canExecute()) {
 			configureCommand.execute(monitor, info);
 		}
 	}

@@ -89,8 +89,7 @@ public class ContextImpl extends EModelElementImpl implements Context
 	 */
 	public EList<ContextElement> getElements()
 	{
-		if (elements == null)
-		{
+		if (elements == null) {
 			elements = new EObjectContainmentWithInverseEList.Unsettable<ContextElement>(ContextElement.class, this, GpmnPackage.CONTEXT__ELEMENTS, GpmnPackage.CONTEXT_ELEMENT__CONTEXT);
 		}
 		return elements;
@@ -145,8 +144,7 @@ public class ContextImpl extends EModelElementImpl implements Context
 	 */
 	public void setGpmnDiagram(GpmnDiagram newGpmnDiagram)
 	{
-		if (newGpmnDiagram != eInternalContainer() || (eContainerFeatureID() != GpmnPackage.CONTEXT__GPMN_DIAGRAM && newGpmnDiagram != null))
-		{
+		if (newGpmnDiagram != eInternalContainer() || (eContainerFeatureID() != GpmnPackage.CONTEXT__GPMN_DIAGRAM && newGpmnDiagram != null)) {
 			if (EcoreUtil.isAncestor(this, newGpmnDiagram))
 				throw new IllegalArgumentException("Recursive containment not allowed for " + toString()); //$NON-NLS-1$
 			NotificationChain msgs = null;
@@ -171,8 +169,7 @@ public class ContextImpl extends EModelElementImpl implements Context
 	public NotificationChain eInverseAdd(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs)
 	{
-		switch (featureID)
-		{
+		switch (featureID) {
 			case GpmnPackage.CONTEXT__ELEMENTS:
 				return ((InternalEList<InternalEObject>)(InternalEList<?>)getElements()).basicAdd(otherEnd, msgs);
 			case GpmnPackage.CONTEXT__GPMN_DIAGRAM:
@@ -192,8 +189,7 @@ public class ContextImpl extends EModelElementImpl implements Context
 	public NotificationChain eInverseRemove(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs)
 	{
-		switch (featureID)
-		{
+		switch (featureID) {
 			case GpmnPackage.CONTEXT__ELEMENTS:
 				return ((InternalEList<?>)getElements()).basicRemove(otherEnd, msgs);
 			case GpmnPackage.CONTEXT__GPMN_DIAGRAM:
@@ -210,8 +206,7 @@ public class ContextImpl extends EModelElementImpl implements Context
 	@Override
 	public NotificationChain eBasicRemoveFromContainerFeature(NotificationChain msgs)
 	{
-		switch (eContainerFeatureID())
-		{
+		switch (eContainerFeatureID()) {
 			case GpmnPackage.CONTEXT__GPMN_DIAGRAM:
 				return eInternalContainer().eInverseRemove(this, GpmnPackage.GPMN_DIAGRAM__CONTEXT, GpmnDiagram.class, msgs);
 		}
@@ -226,8 +221,7 @@ public class ContextImpl extends EModelElementImpl implements Context
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType)
 	{
-		switch (featureID)
-		{
+		switch (featureID) {
 			case GpmnPackage.CONTEXT__ELEMENTS:
 				return getElements();
 			case GpmnPackage.CONTEXT__GPMN_DIAGRAM:
@@ -245,8 +239,7 @@ public class ContextImpl extends EModelElementImpl implements Context
 	@Override
 	public void eSet(int featureID, Object newValue)
 	{
-		switch (featureID)
-		{
+		switch (featureID) {
 			case GpmnPackage.CONTEXT__ELEMENTS:
 				getElements().clear();
 				getElements().addAll((Collection<? extends ContextElement>)newValue);
@@ -266,8 +259,7 @@ public class ContextImpl extends EModelElementImpl implements Context
 	@Override
 	public void eUnset(int featureID)
 	{
-		switch (featureID)
-		{
+		switch (featureID) {
 			case GpmnPackage.CONTEXT__ELEMENTS:
 				unsetElements();
 				return;
@@ -286,8 +278,7 @@ public class ContextImpl extends EModelElementImpl implements Context
 	@Override
 	public boolean eIsSet(int featureID)
 	{
-		switch (featureID)
-		{
+		switch (featureID) {
 			case GpmnPackage.CONTEXT__ELEMENTS:
 				return isSetElements();
 			case GpmnPackage.CONTEXT__GPMN_DIAGRAM:

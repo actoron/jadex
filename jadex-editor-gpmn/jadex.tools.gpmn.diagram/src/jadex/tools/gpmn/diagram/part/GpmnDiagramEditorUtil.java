@@ -63,14 +63,12 @@ import org.eclipse.ui.part.FileEditorInput;
 /**
  * @generated
  */
-public class GpmnDiagramEditorUtil
-{
+public class GpmnDiagramEditorUtil {
 
 	/**
 	 * @generated
 	 */
-	public static Map getSaveOptions()
-	{
+	public static Map getSaveOptions() {
 		Map saveOptions = new HashMap();
 		saveOptions.put(XMLResource.OPTION_ENCODING, "UTF-8"); //$NON-NLS-1$
 		saveOptions.put(Resource.OPTION_SAVE_ONLY_IF_CHANGED,
@@ -82,13 +80,11 @@ public class GpmnDiagramEditorUtil
 	 * @generated
 	 */
 	public static boolean openDiagram(Resource diagram)
-			throws PartInitException
-	{
+			throws PartInitException {
 		String path = diagram.getURI().toPlatformString(true);
 		IResource workspaceResource = ResourcesPlugin.getWorkspace().getRoot()
 				.findMember(new Path(path));
-		if (workspaceResource instanceof IFile)
-		{
+		if (workspaceResource instanceof IFile) {
 			IWorkbenchPage page = PlatformUI.getWorkbench()
 					.getActiveWorkbenchWindow().getActivePage();
 			return null != page.openEditor(new FileEditorInput(
@@ -100,18 +96,13 @@ public class GpmnDiagramEditorUtil
 	/**
 	 * @generated
 	 */
-	public static void setCharset(IFile file)
-	{
-		if (file == null)
-		{
+	public static void setCharset(IFile file) {
+		if (file == null) {
 			return;
 		}
-		try
-		{
+		try {
 			file.setCharset("UTF-8", new NullProgressMonitor()); //$NON-NLS-1$
-		}
-		catch (CoreException e)
-		{
+		} catch (CoreException e) {
 			GpmnDiagramEditorPlugin.getInstance().logError(
 					"Unable to set charset for file " + file.getFullPath(), e); //$NON-NLS-1$
 		}
@@ -121,30 +112,24 @@ public class GpmnDiagramEditorUtil
 	 * @generated
 	 */
 	public static String getUniqueFileName(IPath containerFullPath,
-			String fileName, String extension)
-	{
-		if (containerFullPath == null)
-		{
+			String fileName, String extension) {
+		if (containerFullPath == null) {
 			containerFullPath = new Path(""); //$NON-NLS-1$
 		}
-		if (fileName == null || fileName.trim().length() == 0)
-		{
+		if (fileName == null || fileName.trim().length() == 0) {
 			fileName = "default"; //$NON-NLS-1$
 		}
 		IPath filePath = containerFullPath.append(fileName);
-		if (extension != null && !extension.equals(filePath.getFileExtension()))
-		{
+		if (extension != null && !extension.equals(filePath.getFileExtension())) {
 			filePath = filePath.addFileExtension(extension);
 		}
 		extension = filePath.getFileExtension();
 		fileName = filePath.removeFileExtension().lastSegment();
 		int i = 1;
-		while (ResourcesPlugin.getWorkspace().getRoot().exists(filePath))
-		{
+		while (ResourcesPlugin.getWorkspace().getRoot().exists(filePath)) {
 			i++;
 			filePath = containerFullPath.append(fileName + i);
-			if (extension != null)
-			{
+			if (extension != null) {
 				filePath = filePath.addFileExtension(extension);
 			}
 		}
@@ -156,14 +141,12 @@ public class GpmnDiagramEditorUtil
 	 * 
 	 * @generated
 	 */
-	public static void runWizard(Shell shell, Wizard wizard, String settingsKey)
-	{
+	public static void runWizard(Shell shell, Wizard wizard, String settingsKey) {
 		IDialogSettings pluginDialogSettings = GpmnDiagramEditorPlugin
 				.getInstance().getDialogSettings();
 		IDialogSettings wizardDialogSettings = pluginDialogSettings
 				.getSection(settingsKey);
-		if (wizardDialogSettings == null)
-		{
+		if (wizardDialogSettings == null) {
 			wizardDialogSettings = pluginDialogSettings
 					.addNewSection(settingsKey);
 		}
@@ -180,8 +163,7 @@ public class GpmnDiagramEditorUtil
 	 * @generated
 	 */
 	public static Resource createDiagram(URI diagramURI, URI modelURI,
-			IProgressMonitor progressMonitor)
-	{
+			IProgressMonitor progressMonitor) {
 		TransactionalEditingDomain editingDomain = GMFEditingDomainFactory.INSTANCE
 				.createEditingDomain();
 		progressMonitor.beginTask(
@@ -194,36 +176,30 @@ public class GpmnDiagramEditorUtil
 		AbstractTransactionalCommand command = new AbstractTransactionalCommand(
 				editingDomain,
 				Messages.GpmnDiagramEditorUtil_CreateDiagramCommandLabel,
-				Collections.EMPTY_LIST)
-		{
+				Collections.EMPTY_LIST) {
 			protected CommandResult doExecuteWithResult(
 					IProgressMonitor monitor, IAdaptable info)
-					throws ExecutionException
-			{
+					throws ExecutionException {
 				GpmnDiagram model = createInitialModel();
 				attachModelToResource(model, modelResource);
 
 				Diagram diagram = ViewService.createDiagram(model,
 						GpmnDiagramEditPart.MODEL_ID,
 						GpmnDiagramEditorPlugin.DIAGRAM_PREFERENCES_HINT);
-				if (diagram != null)
-				{
+				if (diagram != null) {
 					diagramResource.getContents().add(diagram);
 					diagram.setName(diagramName);
 					diagram.setElement(model);
 				}
 
-				try
-				{
+				try {
 					modelResource
 							.save(jadex.tools.gpmn.diagram.part.GpmnDiagramEditorUtil
 									.getSaveOptions());
 					diagramResource
 							.save(jadex.tools.gpmn.diagram.part.GpmnDiagramEditorUtil
 									.getSaveOptions());
-				}
-				catch (IOException e)
-				{
+				} catch (IOException e) {
 
 					GpmnDiagramEditorPlugin.getInstance().logError(
 							"Unable to store model and diagram resources", e); //$NON-NLS-1$
@@ -231,13 +207,10 @@ public class GpmnDiagramEditorUtil
 				return CommandResult.newOKCommandResult();
 			}
 		};
-		try
-		{
+		try {
 			OperationHistoryFactory.getOperationHistory().execute(command,
 					new SubProgressMonitor(progressMonitor, 1), null);
-		}
-		catch (ExecutionException e)
-		{
+		} catch (ExecutionException e) {
 			GpmnDiagramEditorPlugin.getInstance().logError(
 					"Unable to create model and diagram", e); //$NON-NLS-1$
 		}
@@ -253,8 +226,7 @@ public class GpmnDiagramEditorUtil
 	 * @generated NOT, set default version value
 	 * 
 	 */
-	private static GpmnDiagram createInitialModel()
-	{
+	private static GpmnDiagram createInitialModel() {
 		GpmnDiagram diagram = GpmnFactory.eINSTANCE.createGpmnDiagram();
 		// FIXME: Use gmfmap model abilities when available! 
 		// TODO: Use preference page value
@@ -269,8 +241,7 @@ public class GpmnDiagramEditorUtil
 	 * @generated
 	 */
 	private static void attachModelToResource(GpmnDiagram model,
-			Resource resource)
-	{
+			Resource resource) {
 		resource.getContents().add(model);
 	}
 
@@ -278,23 +249,19 @@ public class GpmnDiagramEditorUtil
 	 * @generated
 	 */
 	public static void selectElementsInDiagram(
-			IDiagramWorkbenchPart diagramPart, List/*EditPart*/editParts)
-	{
+			IDiagramWorkbenchPart diagramPart, List/*EditPart*/editParts) {
 		diagramPart.getDiagramGraphicalViewer().deselectAll();
 
 		EditPart firstPrimary = null;
-		for (Iterator it = editParts.iterator(); it.hasNext();)
-		{
+		for (Iterator it = editParts.iterator(); it.hasNext();) {
 			EditPart nextPart = (EditPart) it.next();
 			diagramPart.getDiagramGraphicalViewer().appendSelection(nextPart);
-			if (firstPrimary == null && nextPart instanceof IPrimaryEditPart)
-			{
+			if (firstPrimary == null && nextPart instanceof IPrimaryEditPart) {
 				firstPrimary = nextPart;
 			}
 		}
 
-		if (!editParts.isEmpty())
-		{
+		if (!editParts.isEmpty()) {
 			diagramPart.getDiagramGraphicalViewer().reveal(
 					firstPrimary != null ? firstPrimary : (EditPart) editParts
 							.get(0));
@@ -305,18 +272,15 @@ public class GpmnDiagramEditorUtil
 	 * @generated
 	 */
 	private static int findElementsInDiagramByID(DiagramEditPart diagramPart,
-			EObject element, List editPartCollector)
-	{
+			EObject element, List editPartCollector) {
 		IDiagramGraphicalViewer viewer = (IDiagramGraphicalViewer) diagramPart
 				.getViewer();
 		final int intialNumOfEditParts = editPartCollector.size();
 
-		if (element instanceof View)
-		{ // support notation element lookup
+		if (element instanceof View) { // support notation element lookup
 			EditPart editPart = (EditPart) viewer.getEditPartRegistry().get(
 					element);
-			if (editPart != null)
-			{
+			if (editPart != null) {
 				editPartCollector.add(editPart);
 				return 1;
 			}
@@ -327,30 +291,22 @@ public class GpmnDiagramEditorUtil
 				IGraphicalEditPart.class);
 		// perform the possible hierarchy disjoint -> take the top-most parts only
 		for (Iterator editPartIt = associatedParts.iterator(); editPartIt
-				.hasNext();)
-		{
+				.hasNext();) {
 			EditPart nextPart = (EditPart) editPartIt.next();
 			EditPart parentPart = nextPart.getParent();
-			while (parentPart != null && !associatedParts.contains(parentPart))
-			{
+			while (parentPart != null && !associatedParts.contains(parentPart)) {
 				parentPart = parentPart.getParent();
 			}
-			if (parentPart == null)
-			{
+			if (parentPart == null) {
 				editPartCollector.add(nextPart);
 			}
 		}
 
-		if (intialNumOfEditParts == editPartCollector.size())
-		{
-			if (!associatedParts.isEmpty())
-			{
+		if (intialNumOfEditParts == editPartCollector.size()) {
+			if (!associatedParts.isEmpty()) {
 				editPartCollector.add(associatedParts.iterator().next());
-			}
-			else
-			{
-				if (element.eContainer() != null)
-				{
+			} else {
+				if (element.eContainer() != null) {
 					return findElementsInDiagramByID(diagramPart, element
 							.eContainer(), editPartCollector);
 				}
@@ -363,25 +319,20 @@ public class GpmnDiagramEditorUtil
 	 * @generated
 	 */
 	public static View findView(DiagramEditPart diagramEditPart,
-			EObject targetElement, LazyElement2ViewMap lazyElement2ViewMap)
-	{
+			EObject targetElement, LazyElement2ViewMap lazyElement2ViewMap) {
 		boolean hasStructuralURI = false;
-		if (targetElement.eResource() instanceof XMLResource)
-		{
+		if (targetElement.eResource() instanceof XMLResource) {
 			hasStructuralURI = ((XMLResource) targetElement.eResource())
 					.getID(targetElement) == null;
 		}
 
 		View view = null;
 		if (hasStructuralURI
-				&& !lazyElement2ViewMap.getElement2ViewMap().isEmpty())
-		{
+				&& !lazyElement2ViewMap.getElement2ViewMap().isEmpty()) {
 			view = (View) lazyElement2ViewMap.getElement2ViewMap().get(
 					targetElement);
-		}
-		else if (findElementsInDiagramByID(diagramEditPart, targetElement,
-				lazyElement2ViewMap.editPartTmpHolder) > 0)
-		{
+		} else if (findElementsInDiagramByID(diagramEditPart, targetElement,
+				lazyElement2ViewMap.editPartTmpHolder) > 0) {
 			EditPart editPart = (EditPart) lazyElement2ViewMap.editPartTmpHolder
 					.get(0);
 			lazyElement2ViewMap.editPartTmpHolder.clear();
@@ -395,8 +346,7 @@ public class GpmnDiagramEditorUtil
 	/**
 	 * @generated
 	 */
-	public static class LazyElement2ViewMap
-	{
+	public static class LazyElement2ViewMap {
 		/**
 		 * @generated
 		 */
@@ -420,8 +370,7 @@ public class GpmnDiagramEditorUtil
 		/**
 		 * @generated
 		 */
-		public LazyElement2ViewMap(View scope, Set elements)
-		{
+		public LazyElement2ViewMap(View scope, Set elements) {
 			this.scope = scope;
 			this.elementSet = elements;
 		}
@@ -429,20 +378,15 @@ public class GpmnDiagramEditorUtil
 		/**
 		 * @generated
 		 */
-		public final Map getElement2ViewMap()
-		{
-			if (element2ViewMap == null)
-			{
+		public final Map getElement2ViewMap() {
+			if (element2ViewMap == null) {
 				element2ViewMap = new HashMap();
 				// map possible notation elements to itself as these can't be found by view.getElement()
-				for (Iterator it = elementSet.iterator(); it.hasNext();)
-				{
+				for (Iterator it = elementSet.iterator(); it.hasNext();) {
 					EObject element = (EObject) it.next();
-					if (element instanceof View)
-					{
+					if (element instanceof View) {
 						View view = (View) element;
-						if (view.getDiagram() == scope.getDiagram())
-						{
+						if (view.getDiagram() == scope.getDiagram()) {
 							element2ViewMap.put(element, element); // take only those that part of our diagram
 						}
 					}
@@ -457,39 +401,34 @@ public class GpmnDiagramEditorUtil
 		 * @generated
 		 */
 		static Map buildElement2ViewMap(View parentView, Map element2ViewMap,
-				Set elements)
-		{
+				Set elements) {
 			if (elements.size() == element2ViewMap.size())
 				return element2ViewMap;
 
 			if (parentView.isSetElement()
 					&& !element2ViewMap.containsKey(parentView.getElement())
-					&& elements.contains(parentView.getElement()))
-			{
+					&& elements.contains(parentView.getElement())) {
 				element2ViewMap.put(parentView.getElement(), parentView);
 				if (elements.size() == element2ViewMap.size())
 					return element2ViewMap;
 			}
 
 			for (Iterator it = parentView.getChildren().iterator(); it
-					.hasNext();)
-			{
+					.hasNext();) {
 				buildElement2ViewMap((View) it.next(), element2ViewMap,
 						elements);
 				if (elements.size() == element2ViewMap.size())
 					return element2ViewMap;
 			}
 			for (Iterator it = parentView.getSourceEdges().iterator(); it
-					.hasNext();)
-			{
+					.hasNext();) {
 				buildElement2ViewMap((View) it.next(), element2ViewMap,
 						elements);
 				if (elements.size() == element2ViewMap.size())
 					return element2ViewMap;
 			}
 			for (Iterator it = parentView.getSourceEdges().iterator(); it
-					.hasNext();)
-			{
+					.hasNext();) {
 				buildElement2ViewMap((View) it.next(), element2ViewMap,
 						elements);
 				if (elements.size() == element2ViewMap.size())

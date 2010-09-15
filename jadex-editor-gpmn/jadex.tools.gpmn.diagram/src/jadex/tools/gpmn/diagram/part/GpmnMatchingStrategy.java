@@ -16,31 +16,24 @@ import org.eclipse.ui.PartInitException;
 /**
  * @generated
  */
-public class GpmnMatchingStrategy implements IEditorMatchingStrategy
-{
+public class GpmnMatchingStrategy implements IEditorMatchingStrategy {
 
 	/**
 	 * @generated
 	 */
-	public boolean matches(IEditorReference editorRef, IEditorInput input)
-	{
+	public boolean matches(IEditorReference editorRef, IEditorInput input) {
 		IEditorInput editorInput;
-		try
-		{
+		try {
 			editorInput = editorRef.getEditorInput();
-		}
-		catch (PartInitException e)
-		{
+		} catch (PartInitException e) {
 			return false;
 		}
 
-		if (editorInput.equals(input))
-		{
+		if (editorInput.equals(input)) {
 			return true;
 		}
 		if (editorInput instanceof URIEditorInput
-				&& input instanceof URIEditorInput)
-		{
+				&& input instanceof URIEditorInput) {
 			return ((URIEditorInput) editorInput).getURI().equals(
 					((URIEditorInput) input).getURI());
 		}

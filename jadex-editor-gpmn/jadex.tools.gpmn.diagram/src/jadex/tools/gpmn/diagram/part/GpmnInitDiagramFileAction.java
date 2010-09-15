@@ -30,8 +30,7 @@ import org.eclipse.ui.IWorkbenchPart;
 /**
  * @generated
  */
-public class GpmnInitDiagramFileAction implements IObjectActionDelegate
-{
+public class GpmnInitDiagramFileAction implements IObjectActionDelegate {
 
 	/**
 	 * @generated
@@ -46,21 +45,18 @@ public class GpmnInitDiagramFileAction implements IObjectActionDelegate
 	/**
 	 * @generated
 	 */
-	public void setActivePart(IAction action, IWorkbenchPart targetPart)
-	{
+	public void setActivePart(IAction action, IWorkbenchPart targetPart) {
 		this.targetPart = targetPart;
 	}
 
 	/**
 	 * @generated
 	 */
-	public void selectionChanged(IAction action, ISelection selection)
-	{
+	public void selectionChanged(IAction action, ISelection selection) {
 		domainModelURI = null;
 		action.setEnabled(false);
 		if (selection instanceof IStructuredSelection == false
-				|| selection.isEmpty())
-		{
+				|| selection.isEmpty()) {
 			return;
 		}
 		IFile file = (IFile) ((IStructuredSelection) selection)
@@ -73,32 +69,26 @@ public class GpmnInitDiagramFileAction implements IObjectActionDelegate
 	/**
 	 * @generated
 	 */
-	private Shell getShell()
-	{
+	private Shell getShell() {
 		return targetPart.getSite().getShell();
 	}
 
 	/**
 	 * @generated
 	 */
-	public void run(IAction action)
-	{
+	public void run(IAction action) {
 		TransactionalEditingDomain editingDomain = GMFEditingDomainFactory.INSTANCE
 				.createEditingDomain();
 		ResourceSet resourceSet = editingDomain.getResourceSet();
 		EObject diagramRoot = null;
-		try
-		{
+		try {
 			Resource resource = resourceSet.getResource(domainModelURI, true);
 			diagramRoot = (EObject) resource.getContents().get(0);
-		}
-		catch (WrappedException ex)
-		{
+		} catch (WrappedException ex) {
 			GpmnDiagramEditorPlugin.getInstance().logError(
 					"Unable to load resource: " + domainModelURI, ex); //$NON-NLS-1$
 		}
-		if (diagramRoot == null)
-		{
+		if (diagramRoot == null) {
 			MessageDialog.openError(getShell(),
 					Messages.InitDiagramFile_ResourceErrorDialogTitle,
 					Messages.InitDiagramFile_ResourceErrorDialogMessage);

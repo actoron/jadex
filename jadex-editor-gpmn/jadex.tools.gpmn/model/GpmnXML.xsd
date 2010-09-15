@@ -295,6 +295,7 @@
     <xsd:complexContent>
       <xsd:extension base="gpmn:AbstractNode">
         <xsd:attribute name="processref" type="xsd:string"/>
+        <xsd:attribute default="false" name="internal" type="xsd:string"/>
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>

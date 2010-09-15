@@ -68,29 +68,21 @@ import org.eclipse.swt.graphics.FontData;
 /**
  * @generated
  */
-public class GpmnViewProvider extends AbstractProvider implements IViewProvider
-{
+public class GpmnViewProvider extends AbstractProvider implements IViewProvider {
 
 	/**
 	 * @generated
 	 */
-	public final boolean provides(IOperation operation)
-	{
-		if (operation instanceof CreateViewForKindOperation)
-		{
+	public final boolean provides(IOperation operation) {
+		if (operation instanceof CreateViewForKindOperation) {
 			return provides((CreateViewForKindOperation) operation);
 		}
 		assert operation instanceof CreateViewOperation;
-		if (operation instanceof CreateDiagramViewOperation)
-		{
+		if (operation instanceof CreateDiagramViewOperation) {
 			return provides((CreateDiagramViewOperation) operation);
-		}
-		else if (operation instanceof CreateEdgeViewOperation)
-		{
+		} else if (operation instanceof CreateEdgeViewOperation) {
 			return provides((CreateEdgeViewOperation) operation);
-		}
-		else if (operation instanceof CreateNodeViewOperation)
-		{
+		} else if (operation instanceof CreateNodeViewOperation) {
 			return provides((CreateNodeViewOperation) operation);
 		}
 		return false;
@@ -99,8 +91,7 @@ public class GpmnViewProvider extends AbstractProvider implements IViewProvider
 	/**
 	 * @generated
 	 */
-	protected boolean provides(CreateViewForKindOperation op)
-	{
+	protected boolean provides(CreateViewForKindOperation op) {
 		/*
 		 if (op.getViewKind() == Node.class)
 		 return getNodeViewClass(op.getSemanticAdapter(), op.getContainerView(), op.getSemanticHint()) != null;
@@ -113,8 +104,7 @@ public class GpmnViewProvider extends AbstractProvider implements IViewProvider
 	/**
 	 * @generated
 	 */
-	protected boolean provides(CreateDiagramViewOperation op)
-	{
+	protected boolean provides(CreateDiagramViewOperation op) {
 		return GpmnDiagramEditPart.MODEL_ID.equals(op.getSemanticHint())
 				&& GpmnVisualIDRegistry
 						.getDiagramVisualID(getSemanticElement(op
@@ -124,74 +114,59 @@ public class GpmnViewProvider extends AbstractProvider implements IViewProvider
 	/**
 	 * @generated
 	 */
-	protected boolean provides(CreateNodeViewOperation op)
-	{
-		if (op.getContainerView() == null)
-		{
+	protected boolean provides(CreateNodeViewOperation op) {
+		if (op.getContainerView() == null) {
 			return false;
 		}
 		IElementType elementType = getSemanticElementType(op
 				.getSemanticAdapter());
 		EObject domainElement = getSemanticElement(op.getSemanticAdapter());
 		int visualID;
-		if (op.getSemanticHint() == null)
-		{
+		if (op.getSemanticHint() == null) {
 			// Semantic hint is not specified. Can be a result of call from CanonicalEditPolicy.
 			// In this situation there should be NO elementType, visualID will be determined
 			// by VisualIDRegistry.getNodeVisualID() for domainElement.
-			if (elementType != null || domainElement == null)
-			{
+			if (elementType != null || domainElement == null) {
 				return false;
 			}
 			visualID = GpmnVisualIDRegistry.getNodeVisualID(op
 					.getContainerView(), domainElement);
-		}
-		else
-		{
+		} else {
 			visualID = GpmnVisualIDRegistry.getVisualID(op.getSemanticHint());
-			if (elementType != null)
-			{
+			if (elementType != null) {
 				if (!GpmnElementTypes.isKnownElementType(elementType)
-						|| (!(elementType instanceof IHintedType)))
-				{
+						|| (!(elementType instanceof IHintedType))) {
 					return false; // foreign element type
 				}
 				String elementTypeHint = ((IHintedType) elementType)
 						.getSemanticHint();
-				if (!op.getSemanticHint().equals(elementTypeHint))
-				{
+				if (!op.getSemanticHint().equals(elementTypeHint)) {
 					return false; // if semantic hint is specified it should be the same as in element type
 				}
 				if (domainElement != null
 						&& visualID != GpmnVisualIDRegistry.getNodeVisualID(op
-								.getContainerView(), domainElement))
-				{
+								.getContainerView(), domainElement)) {
 					return false; // visual id for node EClass should match visual id from element type
 				}
-			}
-			else
-			{
+			} else {
 				if (!GpmnDiagramEditPart.MODEL_ID.equals(GpmnVisualIDRegistry
-						.getModelID(op.getContainerView())))
-				{
+						.getModelID(op.getContainerView()))) {
 					return false; // foreign diagram
 				}
-				switch (visualID)
-				{
-					case ActivationPlanEditPart.VISUAL_ID:
-					case SubProcessEditPart.VISUAL_ID:
-					case BpmnPlanEditPart.VISUAL_ID:
-					case GoalEditPart.VISUAL_ID:
-						if (domainElement == null
-								|| visualID != GpmnVisualIDRegistry
-										.getNodeVisualID(op.getContainerView(),
-												domainElement))
-						{
-							return false; // visual id in semantic hint should match visual id for domain element
-						}
-						break;
-					default:
-						return false;
+				switch (visualID) {
+				case ActivationPlanEditPart.VISUAL_ID:
+				case SubProcessEditPart.VISUAL_ID:
+				case BpmnPlanEditPart.VISUAL_ID:
+				case GoalEditPart.VISUAL_ID:
+					if (domainElement == null
+							|| visualID != GpmnVisualIDRegistry
+									.getNodeVisualID(op.getContainerView(),
+											domainElement)) {
+						return false; // visual id in semantic hint should match visual id for domain element
+					}
+					break;
+				default:
+					return false;
 				}
 			}
 		}
@@ -204,28 +179,24 @@ public class GpmnViewProvider extends AbstractProvider implements IViewProvider
 	/**
 	 * @generated
 	 */
-	protected boolean provides(CreateEdgeViewOperation op)
-	{
+	protected boolean provides(CreateEdgeViewOperation op) {
 		IElementType elementType = getSemanticElementType(op
 				.getSemanticAdapter());
 		if (!GpmnElementTypes.isKnownElementType(elementType)
-				|| (!(elementType instanceof IHintedType)))
-		{
+				|| (!(elementType instanceof IHintedType))) {
 			return false; // foreign element type
 		}
 		String elementTypeHint = ((IHintedType) elementType).getSemanticHint();
 		if (elementTypeHint == null
 				|| (op.getSemanticHint() != null && !elementTypeHint.equals(op
-						.getSemanticHint())))
-		{
+						.getSemanticHint()))) {
 			return false; // our hint is visual id and must be specified, and it should be the same as in element type
 		}
 		int visualID = GpmnVisualIDRegistry.getVisualID(elementTypeHint);
 		EObject domainElement = getSemanticElement(op.getSemanticAdapter());
 		if (domainElement != null
 				&& visualID != GpmnVisualIDRegistry
-						.getLinkWithClassVisualID(domainElement))
-		{
+						.getLinkWithClassVisualID(domainElement)) {
 			return false; // visual id for link EClass should match visual id from element type
 		}
 		return true;
@@ -235,8 +206,7 @@ public class GpmnViewProvider extends AbstractProvider implements IViewProvider
 	 * @generated
 	 */
 	public Diagram createDiagram(IAdaptable semanticAdapter,
-			String diagramKind, PreferencesHint preferencesHint)
-	{
+			String diagramKind, PreferencesHint preferencesHint) {
 		Diagram diagram = NotationFactory.eINSTANCE.createDiagram();
 		diagram.getStyles().add(NotationFactory.eINSTANCE.createDiagramStyle());
 		diagram.setType(GpmnDiagramEditPart.MODEL_ID);
@@ -250,33 +220,28 @@ public class GpmnViewProvider extends AbstractProvider implements IViewProvider
 	 */
 	public Node createNode(IAdaptable semanticAdapter, View containerView,
 			String semanticHint, int index, boolean persisted,
-			PreferencesHint preferencesHint)
-	{
+			PreferencesHint preferencesHint) {
 		final EObject domainElement = getSemanticElement(semanticAdapter);
 		final int visualID;
-		if (semanticHint == null)
-		{
+		if (semanticHint == null) {
 			visualID = GpmnVisualIDRegistry.getNodeVisualID(containerView,
 					domainElement);
-		}
-		else
-		{
+		} else {
 			visualID = GpmnVisualIDRegistry.getVisualID(semanticHint);
 		}
-		switch (visualID)
-		{
-			case ActivationPlanEditPart.VISUAL_ID:
-				return createActivationPlan_2001(domainElement, containerView,
-						index, persisted, preferencesHint);
-			case SubProcessEditPart.VISUAL_ID:
-				return createSubProcess_2002(domainElement, containerView,
-						index, persisted, preferencesHint);
-			case BpmnPlanEditPart.VISUAL_ID:
-				return createBpmnPlan_2003(domainElement, containerView, index,
-						persisted, preferencesHint);
-			case GoalEditPart.VISUAL_ID:
-				return createGoal_2004(domainElement, containerView, index,
-						persisted, preferencesHint);
+		switch (visualID) {
+		case ActivationPlanEditPart.VISUAL_ID:
+			return createActivationPlan_2001(domainElement, containerView,
+					index, persisted, preferencesHint);
+		case SubProcessEditPart.VISUAL_ID:
+			return createSubProcess_2002(domainElement, containerView, index,
+					persisted, preferencesHint);
+		case BpmnPlanEditPart.VISUAL_ID:
+			return createBpmnPlan_2003(domainElement, containerView, index,
+					persisted, preferencesHint);
+		case GoalEditPart.VISUAL_ID:
+			return createGoal_2004(domainElement, containerView, index,
+					persisted, preferencesHint);
 		}
 		// can't happen, provided #provides(CreateNodeViewOperation) is correct
 		return null;
@@ -287,26 +252,24 @@ public class GpmnViewProvider extends AbstractProvider implements IViewProvider
 	 */
 	public Edge createEdge(IAdaptable semanticAdapter, View containerView,
 			String semanticHint, int index, boolean persisted,
-			PreferencesHint preferencesHint)
-	{
+			PreferencesHint preferencesHint) {
 		IElementType elementType = getSemanticElementType(semanticAdapter);
 		String elementTypeHint = ((IHintedType) elementType).getSemanticHint();
-		switch (GpmnVisualIDRegistry.getVisualID(elementTypeHint))
-		{
-			case ActivationEdgeEditPart.VISUAL_ID:
-				return createActivationEdge_4001(
-						getSemanticElement(semanticAdapter), containerView,
-						index, persisted, preferencesHint);
-			case PlanEdgeEditPart.VISUAL_ID:
-				return createPlanEdge_4002(getSemanticElement(semanticAdapter),
-						containerView, index, persisted, preferencesHint);
-			case SuppressionEdgeEditPart.VISUAL_ID:
-				return createSuppressionEdge_4004(
-						getSemanticElement(semanticAdapter), containerView,
-						index, persisted, preferencesHint);
-			case VirtualActivationEdgeEditPart.VISUAL_ID:
-				return createLink_4003(containerView, index, persisted,
-						preferencesHint);
+		switch (GpmnVisualIDRegistry.getVisualID(elementTypeHint)) {
+		case ActivationEdgeEditPart.VISUAL_ID:
+			return createActivationEdge_4001(
+					getSemanticElement(semanticAdapter), containerView, index,
+					persisted, preferencesHint);
+		case PlanEdgeEditPart.VISUAL_ID:
+			return createPlanEdge_4002(getSemanticElement(semanticAdapter),
+					containerView, index, persisted, preferencesHint);
+		case SuppressionEdgeEditPart.VISUAL_ID:
+			return createSuppressionEdge_4004(
+					getSemanticElement(semanticAdapter), containerView, index,
+					persisted, preferencesHint);
+		case VirtualActivationEdgeEditPart.VISUAL_ID:
+			return createLink_4003(containerView, index, persisted,
+					preferencesHint);
 		}
 		// can never happen, provided #provides(CreateEdgeViewOperation) is correct
 		return null;
@@ -317,8 +280,7 @@ public class GpmnViewProvider extends AbstractProvider implements IViewProvider
 	 */
 	public Node createActivationPlan_2001(EObject domainElement,
 			View containerView, int index, boolean persisted,
-			PreferencesHint preferencesHint)
-	{
+			PreferencesHint preferencesHint) {
 		Node node = NotationFactory.eINSTANCE.createNode();
 		node.getStyles()
 				.add(NotationFactory.eINSTANCE.createDescriptionStyle());
@@ -335,8 +297,7 @@ public class GpmnViewProvider extends AbstractProvider implements IViewProvider
 				.getPreferenceStore();
 		FontStyle nodeFontStyle = (FontStyle) node
 				.getStyle(NotationPackage.Literals.FONT_STYLE);
-		if (nodeFontStyle != null)
-		{
+		if (nodeFontStyle != null) {
 			FontData fontData = PreferenceConverter.getFontData(prefStore,
 					IPreferenceConstants.PREF_DEFAULT_FONT);
 			nodeFontStyle.setFontName(fontData.getName());
@@ -363,8 +324,7 @@ public class GpmnViewProvider extends AbstractProvider implements IViewProvider
 	 */
 	public Node createSubProcess_2002(EObject domainElement,
 			View containerView, int index, boolean persisted,
-			PreferencesHint preferencesHint)
-	{
+			PreferencesHint preferencesHint) {
 		Node node = NotationFactory.eINSTANCE.createNode();
 		node.getStyles()
 				.add(NotationFactory.eINSTANCE.createDescriptionStyle());
@@ -382,8 +342,7 @@ public class GpmnViewProvider extends AbstractProvider implements IViewProvider
 				.getPreferenceStore();
 		FontStyle nodeFontStyle = (FontStyle) node
 				.getStyle(NotationPackage.Literals.FONT_STYLE);
-		if (nodeFontStyle != null)
-		{
+		if (nodeFontStyle != null) {
 			FontData fontData = PreferenceConverter.getFontData(prefStore,
 					IPreferenceConstants.PREF_DEFAULT_FONT);
 			nodeFontStyle.setFontName(fontData.getName());
@@ -409,8 +368,7 @@ public class GpmnViewProvider extends AbstractProvider implements IViewProvider
 	 * @generated
 	 */
 	public Node createBpmnPlan_2003(EObject domainElement, View containerView,
-			int index, boolean persisted, PreferencesHint preferencesHint)
-	{
+			int index, boolean persisted, PreferencesHint preferencesHint) {
 		Node node = NotationFactory.eINSTANCE.createNode();
 		node.getStyles()
 				.add(NotationFactory.eINSTANCE.createDescriptionStyle());
@@ -426,8 +384,7 @@ public class GpmnViewProvider extends AbstractProvider implements IViewProvider
 				.getPreferenceStore();
 		FontStyle nodeFontStyle = (FontStyle) node
 				.getStyle(NotationPackage.Literals.FONT_STYLE);
-		if (nodeFontStyle != null)
-		{
+		if (nodeFontStyle != null) {
 			FontData fontData = PreferenceConverter.getFontData(prefStore,
 					IPreferenceConstants.PREF_DEFAULT_FONT);
 			nodeFontStyle.setFontName(fontData.getName());
@@ -453,8 +410,7 @@ public class GpmnViewProvider extends AbstractProvider implements IViewProvider
 	 * @generated
 	 */
 	public Node createGoal_2004(EObject domainElement, View containerView,
-			int index, boolean persisted, PreferencesHint preferencesHint)
-	{
+			int index, boolean persisted, PreferencesHint preferencesHint) {
 		Node node = NotationFactory.eINSTANCE.createNode();
 		node.getStyles()
 				.add(NotationFactory.eINSTANCE.createDescriptionStyle());
@@ -470,8 +426,7 @@ public class GpmnViewProvider extends AbstractProvider implements IViewProvider
 				.getPreferenceStore();
 		FontStyle nodeFontStyle = (FontStyle) node
 				.getStyle(NotationPackage.Literals.FONT_STYLE);
-		if (nodeFontStyle != null)
-		{
+		if (nodeFontStyle != null) {
 			FontData fontData = PreferenceConverter.getFontData(prefStore,
 					IPreferenceConstants.PREF_DEFAULT_FONT);
 			nodeFontStyle.setFontName(fontData.getName());
@@ -498,8 +453,7 @@ public class GpmnViewProvider extends AbstractProvider implements IViewProvider
 	 */
 	public Edge createActivationEdge_4001(EObject domainElement,
 			View containerView, int index, boolean persisted,
-			PreferencesHint preferencesHint)
-	{
+			PreferencesHint preferencesHint) {
 		Edge edge = NotationFactory.eINSTANCE.createEdge();
 		edge.getStyles().add(NotationFactory.eINSTANCE.createRoutingStyle());
 		edge.getStyles().add(NotationFactory.eINSTANCE.createFontStyle());
@@ -519,8 +473,7 @@ public class GpmnViewProvider extends AbstractProvider implements IViewProvider
 				.getPreferenceStore();
 		FontStyle edgeFontStyle = (FontStyle) edge
 				.getStyle(NotationPackage.Literals.FONT_STYLE);
-		if (edgeFontStyle != null)
-		{
+		if (edgeFontStyle != null) {
 			FontData fontData = PreferenceConverter.getFontData(prefStore,
 					IPreferenceConstants.PREF_DEFAULT_FONT);
 			edgeFontStyle.setFontName(fontData.getName());
@@ -534,8 +487,7 @@ public class GpmnViewProvider extends AbstractProvider implements IViewProvider
 		}
 		Routing routing = Routing.get(prefStore
 				.getInt(IPreferenceConstants.PREF_LINE_STYLE));
-		if (routing != null)
-		{
+		if (routing != null) {
 			ViewUtil.setStructuralFeatureValue(edge, NotationPackage.eINSTANCE
 					.getRoutingStyle_Routing(), routing);
 		}
@@ -553,8 +505,7 @@ public class GpmnViewProvider extends AbstractProvider implements IViewProvider
 	 * @generated
 	 */
 	public Edge createPlanEdge_4002(EObject domainElement, View containerView,
-			int index, boolean persisted, PreferencesHint preferencesHint)
-	{
+			int index, boolean persisted, PreferencesHint preferencesHint) {
 		Edge edge = NotationFactory.eINSTANCE.createEdge();
 		edge.getStyles().add(NotationFactory.eINSTANCE.createRoutingStyle());
 		edge.getStyles().add(NotationFactory.eINSTANCE.createFontStyle());
@@ -573,8 +524,7 @@ public class GpmnViewProvider extends AbstractProvider implements IViewProvider
 				.getPreferenceStore();
 		FontStyle edgeFontStyle = (FontStyle) edge
 				.getStyle(NotationPackage.Literals.FONT_STYLE);
-		if (edgeFontStyle != null)
-		{
+		if (edgeFontStyle != null) {
 			FontData fontData = PreferenceConverter.getFontData(prefStore,
 					IPreferenceConstants.PREF_DEFAULT_FONT);
 			edgeFontStyle.setFontName(fontData.getName());
@@ -588,8 +538,7 @@ public class GpmnViewProvider extends AbstractProvider implements IViewProvider
 		}
 		Routing routing = Routing.get(prefStore
 				.getInt(IPreferenceConstants.PREF_LINE_STYLE));
-		if (routing != null)
-		{
+		if (routing != null) {
 			ViewUtil.setStructuralFeatureValue(edge, NotationPackage.eINSTANCE
 					.getRoutingStyle_Routing(), routing);
 		}
@@ -601,8 +550,7 @@ public class GpmnViewProvider extends AbstractProvider implements IViewProvider
 	 */
 	public Edge createSuppressionEdge_4004(EObject domainElement,
 			View containerView, int index, boolean persisted,
-			PreferencesHint preferencesHint)
-	{
+			PreferencesHint preferencesHint) {
 		Edge edge = NotationFactory.eINSTANCE.createEdge();
 		edge.getStyles().add(NotationFactory.eINSTANCE.createRoutingStyle());
 		edge.getStyles().add(NotationFactory.eINSTANCE.createFontStyle());
@@ -622,8 +570,7 @@ public class GpmnViewProvider extends AbstractProvider implements IViewProvider
 				.getPreferenceStore();
 		FontStyle edgeFontStyle = (FontStyle) edge
 				.getStyle(NotationPackage.Literals.FONT_STYLE);
-		if (edgeFontStyle != null)
-		{
+		if (edgeFontStyle != null) {
 			FontData fontData = PreferenceConverter.getFontData(prefStore,
 					IPreferenceConstants.PREF_DEFAULT_FONT);
 			edgeFontStyle.setFontName(fontData.getName());
@@ -637,8 +584,7 @@ public class GpmnViewProvider extends AbstractProvider implements IViewProvider
 		}
 		Routing routing = Routing.get(prefStore
 				.getInt(IPreferenceConstants.PREF_LINE_STYLE));
-		if (routing != null)
-		{
+		if (routing != null) {
 			ViewUtil.setStructuralFeatureValue(edge, NotationPackage.eINSTANCE
 					.getRoutingStyle_Routing(), routing);
 		}
@@ -649,8 +595,7 @@ public class GpmnViewProvider extends AbstractProvider implements IViewProvider
 	 * @generated
 	 */
 	public Edge createLink_4003(View containerView, int index,
-			boolean persisted, PreferencesHint preferencesHint)
-	{
+			boolean persisted, PreferencesHint preferencesHint) {
 		Edge edge = NotationFactory.eINSTANCE.createEdge();
 		edge.getStyles().add(NotationFactory.eINSTANCE.createRoutingStyle());
 		edge.getStyles().add(NotationFactory.eINSTANCE.createFontStyle());
@@ -670,8 +615,7 @@ public class GpmnViewProvider extends AbstractProvider implements IViewProvider
 				.getPreferenceStore();
 		FontStyle edgeFontStyle = (FontStyle) edge
 				.getStyle(NotationPackage.Literals.FONT_STYLE);
-		if (edgeFontStyle != null)
-		{
+		if (edgeFontStyle != null) {
 			FontData fontData = PreferenceConverter.getFontData(prefStore,
 					IPreferenceConstants.PREF_DEFAULT_FONT);
 			edgeFontStyle.setFontName(fontData.getName());
@@ -685,8 +629,7 @@ public class GpmnViewProvider extends AbstractProvider implements IViewProvider
 		}
 		Routing routing = Routing.get(prefStore
 				.getInt(IPreferenceConstants.PREF_LINE_STYLE));
-		if (routing != null)
-		{
+		if (routing != null) {
 			ViewUtil.setStructuralFeatureValue(edge, NotationPackage.eINSTANCE
 					.getRoutingStyle_Routing(), routing);
 		}
@@ -703,11 +646,9 @@ public class GpmnViewProvider extends AbstractProvider implements IViewProvider
 	/**
 	 * @generated
 	 */
-	private void stampShortcut(View containerView, Node target)
-	{
+	private void stampShortcut(View containerView, Node target) {
 		if (!GpmnDiagramEditPart.MODEL_ID.equals(GpmnVisualIDRegistry
-				.getModelID(containerView)))
-		{
+				.getModelID(containerView))) {
 			EAnnotation shortcutAnnotation = EcoreFactory.eINSTANCE
 					.createEAnnotation();
 			shortcutAnnotation.setSource("Shortcut"); //$NON-NLS-1$
@@ -720,8 +661,7 @@ public class GpmnViewProvider extends AbstractProvider implements IViewProvider
 	/**
 	 * @generated
 	 */
-	private Node createLabel(View owner, String hint)
-	{
+	private Node createLabel(View owner, String hint) {
 		DecorationNode rv = NotationFactory.eINSTANCE.createDecorationNode();
 		rv.setType(hint);
 		ViewUtil.insertChildView(owner, rv, ViewUtil.APPEND, true);
@@ -731,15 +671,12 @@ public class GpmnViewProvider extends AbstractProvider implements IViewProvider
 	/**
 	 * @generated
 	 */
-	private EObject getSemanticElement(IAdaptable semanticAdapter)
-	{
-		if (semanticAdapter == null)
-		{
+	private EObject getSemanticElement(IAdaptable semanticAdapter) {
+		if (semanticAdapter == null) {
 			return null;
 		}
 		EObject eObject = (EObject) semanticAdapter.getAdapter(EObject.class);
-		if (eObject != null)
-		{
+		if (eObject != null) {
 			return EMFCoreUtil.resolve(TransactionUtil
 					.getEditingDomain(eObject), eObject);
 		}
@@ -749,10 +686,8 @@ public class GpmnViewProvider extends AbstractProvider implements IViewProvider
 	/**
 	 * @generated
 	 */
-	private IElementType getSemanticElementType(IAdaptable semanticAdapter)
-	{
-		if (semanticAdapter == null)
-		{
+	private IElementType getSemanticElementType(IAdaptable semanticAdapter) {
+		if (semanticAdapter == null) {
 			return null;
 		}
 		return (IElementType) semanticAdapter.getAdapter(IElementType.class);

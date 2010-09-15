@@ -39,18 +39,15 @@ import org.eclipse.ui.dialogs.ElementListSelectionDialog;
 /**
  * @generated
  */
-public class GpmnModelingAssistantProvider extends ModelingAssistantProvider
-{
+public class GpmnModelingAssistantProvider extends ModelingAssistantProvider {
 
 	/**
 	 * @generated
 	 */
-	public List getTypesForPopupBar(IAdaptable host)
-	{
+	public List getTypesForPopupBar(IAdaptable host) {
 		IGraphicalEditPart editPart = (IGraphicalEditPart) host
 				.getAdapter(IGraphicalEditPart.class);
-		if (editPart instanceof GpmnDiagramEditPart)
-		{
+		if (editPart instanceof GpmnDiagramEditPart) {
 			ArrayList types = new ArrayList(4);
 			types.add(GpmnElementTypes.ActivationPlan_2001);
 			types.add(GpmnElementTypes.SubProcess_2002);
@@ -64,17 +61,14 @@ public class GpmnModelingAssistantProvider extends ModelingAssistantProvider
 	/**
 	 * @generated
 	 */
-	public List getRelTypesOnSource(IAdaptable source)
-	{
+	public List getRelTypesOnSource(IAdaptable source) {
 		IGraphicalEditPart sourceEditPart = (IGraphicalEditPart) source
 				.getAdapter(IGraphicalEditPart.class);
-		if (sourceEditPart instanceof ActivationPlanEditPart)
-		{
+		if (sourceEditPart instanceof ActivationPlanEditPart) {
 			return ((ActivationPlanEditPart) sourceEditPart)
 					.getMARelTypesOnSource();
 		}
-		if (sourceEditPart instanceof GoalEditPart)
-		{
+		if (sourceEditPart instanceof GoalEditPart) {
 			return ((GoalEditPart) sourceEditPart).getMARelTypesOnSource();
 		}
 		return Collections.EMPTY_LIST;
@@ -83,26 +77,21 @@ public class GpmnModelingAssistantProvider extends ModelingAssistantProvider
 	/**
 	 * @generated
 	 */
-	public List getRelTypesOnTarget(IAdaptable target)
-	{
+	public List getRelTypesOnTarget(IAdaptable target) {
 		IGraphicalEditPart targetEditPart = (IGraphicalEditPart) target
 				.getAdapter(IGraphicalEditPart.class);
-		if (targetEditPart instanceof ActivationPlanEditPart)
-		{
+		if (targetEditPart instanceof ActivationPlanEditPart) {
 			return ((ActivationPlanEditPart) targetEditPart)
 					.getMARelTypesOnTarget();
 		}
-		if (targetEditPart instanceof SubProcessEditPart)
-		{
+		if (targetEditPart instanceof SubProcessEditPart) {
 			return ((SubProcessEditPart) targetEditPart)
 					.getMARelTypesOnTarget();
 		}
-		if (targetEditPart instanceof BpmnPlanEditPart)
-		{
+		if (targetEditPart instanceof BpmnPlanEditPart) {
 			return ((BpmnPlanEditPart) targetEditPart).getMARelTypesOnTarget();
 		}
-		if (targetEditPart instanceof GoalEditPart)
-		{
+		if (targetEditPart instanceof GoalEditPart) {
 			return ((GoalEditPart) targetEditPart).getMARelTypesOnTarget();
 		}
 		return Collections.EMPTY_LIST;
@@ -112,19 +101,16 @@ public class GpmnModelingAssistantProvider extends ModelingAssistantProvider
 	 * @generated
 	 */
 	public List getRelTypesOnSourceAndTarget(IAdaptable source,
-			IAdaptable target)
-	{
+			IAdaptable target) {
 		IGraphicalEditPart sourceEditPart = (IGraphicalEditPart) source
 				.getAdapter(IGraphicalEditPart.class);
 		IGraphicalEditPart targetEditPart = (IGraphicalEditPart) target
 				.getAdapter(IGraphicalEditPart.class);
-		if (sourceEditPart instanceof ActivationPlanEditPart)
-		{
+		if (sourceEditPart instanceof ActivationPlanEditPart) {
 			return ((ActivationPlanEditPart) sourceEditPart)
 					.getMARelTypesOnSourceAndTarget(targetEditPart);
 		}
-		if (sourceEditPart instanceof GoalEditPart)
-		{
+		if (sourceEditPart instanceof GoalEditPart) {
 			return ((GoalEditPart) sourceEditPart)
 					.getMARelTypesOnSourceAndTarget(targetEditPart);
 		}
@@ -135,27 +121,22 @@ public class GpmnModelingAssistantProvider extends ModelingAssistantProvider
 	 * @generated
 	 */
 	public List getTypesForSource(IAdaptable target,
-			IElementType relationshipType)
-	{
+			IElementType relationshipType) {
 		IGraphicalEditPart targetEditPart = (IGraphicalEditPart) target
 				.getAdapter(IGraphicalEditPart.class);
-		if (targetEditPart instanceof ActivationPlanEditPart)
-		{
+		if (targetEditPart instanceof ActivationPlanEditPart) {
 			return ((ActivationPlanEditPart) targetEditPart)
 					.getMATypesForSource(relationshipType);
 		}
-		if (targetEditPart instanceof SubProcessEditPart)
-		{
+		if (targetEditPart instanceof SubProcessEditPart) {
 			return ((SubProcessEditPart) targetEditPart)
 					.getMATypesForSource(relationshipType);
 		}
-		if (targetEditPart instanceof BpmnPlanEditPart)
-		{
+		if (targetEditPart instanceof BpmnPlanEditPart) {
 			return ((BpmnPlanEditPart) targetEditPart)
 					.getMATypesForSource(relationshipType);
 		}
-		if (targetEditPart instanceof GoalEditPart)
-		{
+		if (targetEditPart instanceof GoalEditPart) {
 			return ((GoalEditPart) targetEditPart)
 					.getMATypesForSource(relationshipType);
 		}
@@ -166,17 +147,14 @@ public class GpmnModelingAssistantProvider extends ModelingAssistantProvider
 	 * @generated
 	 */
 	public List getTypesForTarget(IAdaptable source,
-			IElementType relationshipType)
-	{
+			IElementType relationshipType) {
 		IGraphicalEditPart sourceEditPart = (IGraphicalEditPart) source
 				.getAdapter(IGraphicalEditPart.class);
-		if (sourceEditPart instanceof ActivationPlanEditPart)
-		{
+		if (sourceEditPart instanceof ActivationPlanEditPart) {
 			return ((ActivationPlanEditPart) sourceEditPart)
 					.getMATypesForTarget(relationshipType);
 		}
-		if (sourceEditPart instanceof GoalEditPart)
-		{
+		if (sourceEditPart instanceof GoalEditPart) {
 			return ((GoalEditPart) sourceEditPart)
 					.getMATypesForTarget(relationshipType);
 		}
@@ -187,8 +165,7 @@ public class GpmnModelingAssistantProvider extends ModelingAssistantProvider
 	 * @generated
 	 */
 	public EObject selectExistingElementForSource(IAdaptable target,
-			IElementType relationshipType)
-	{
+			IElementType relationshipType) {
 		return selectExistingElement(target, getTypesForSource(target,
 				relationshipType));
 	}
@@ -197,8 +174,7 @@ public class GpmnModelingAssistantProvider extends ModelingAssistantProvider
 	 * @generated
 	 */
 	public EObject selectExistingElementForTarget(IAdaptable source,
-			IElementType relationshipType)
-	{
+			IElementType relationshipType) {
 		return selectExistingElement(source, getTypesForTarget(source,
 				relationshipType));
 	}
@@ -206,30 +182,24 @@ public class GpmnModelingAssistantProvider extends ModelingAssistantProvider
 	/**
 	 * @generated
 	 */
-	protected EObject selectExistingElement(IAdaptable host, Collection types)
-	{
-		if (types.isEmpty())
-		{
+	protected EObject selectExistingElement(IAdaptable host, Collection types) {
+		if (types.isEmpty()) {
 			return null;
 		}
 		IGraphicalEditPart editPart = (IGraphicalEditPart) host
 				.getAdapter(IGraphicalEditPart.class);
-		if (editPart == null)
-		{
+		if (editPart == null) {
 			return null;
 		}
 		Diagram diagram = (Diagram) editPart.getRoot().getContents().getModel();
 		Collection elements = new HashSet();
-		for (Iterator it = diagram.getElement().eAllContents(); it.hasNext();)
-		{
+		for (Iterator it = diagram.getElement().eAllContents(); it.hasNext();) {
 			EObject element = (EObject) it.next();
-			if (isApplicableElement(element, types))
-			{
+			if (isApplicableElement(element, types)) {
 				elements.add(element);
 			}
 		}
-		if (elements.isEmpty())
-		{
+		if (elements.isEmpty()) {
 			return null;
 		}
 		return selectElement((EObject[]) elements.toArray(new EObject[elements
@@ -239,8 +209,7 @@ public class GpmnModelingAssistantProvider extends ModelingAssistantProvider
 	/**
 	 * @generated
 	 */
-	protected boolean isApplicableElement(EObject element, Collection types)
-	{
+	protected boolean isApplicableElement(EObject element, Collection types) {
 		IElementType type = ElementTypeRegistry.getInstance().getElementType(
 				element);
 		return types.contains(type);
@@ -249,8 +218,7 @@ public class GpmnModelingAssistantProvider extends ModelingAssistantProvider
 	/**
 	 * @generated
 	 */
-	protected EObject selectElement(EObject[] elements)
-	{
+	protected EObject selectElement(EObject[] elements) {
 		Shell shell = Display.getCurrent().getActiveShell();
 		ILabelProvider labelProvider = new AdapterFactoryLabelProvider(
 				GpmnDiagramEditorPlugin.getInstance()
@@ -262,8 +230,7 @@ public class GpmnModelingAssistantProvider extends ModelingAssistantProvider
 		dialog.setMultipleSelection(false);
 		dialog.setElements(elements);
 		EObject selected = null;
-		if (dialog.open() == Window.OK)
-		{
+		if (dialog.open() == Window.OK) {
 			selected = (EObject) dialog.getFirstResult();
 		}
 		return selected;

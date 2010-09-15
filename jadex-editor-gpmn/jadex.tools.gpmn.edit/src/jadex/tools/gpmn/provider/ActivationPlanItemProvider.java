@@ -72,8 +72,7 @@ public class ActivationPlanItemProvider
 	@Override
 	public List<IItemPropertyDescriptor> getPropertyDescriptors(Object object)
 	{
-		if (itemPropertyDescriptors == null)
-		{
+		if (itemPropertyDescriptors == null) {
 			super.getPropertyDescriptors(object);
 
 			addModePropertyDescriptor(object);
@@ -143,8 +142,7 @@ public class ActivationPlanItemProvider
 	{
 		updateChildren(notification);
 
-		switch (notification.getFeatureID(ActivationPlan.class))
-		{
+		switch (notification.getFeatureID(ActivationPlan.class)) {
 			case GpmnPackage.ACTIVATION_PLAN__MODE:
 				fireNotifyChanged(new ViewerNotification(notification, notification.getNotifier(), false, true));
 				return;

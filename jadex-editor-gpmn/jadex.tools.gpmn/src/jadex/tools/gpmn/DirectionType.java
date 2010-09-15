@@ -115,8 +115,7 @@ public enum DirectionType implements Enumerator
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	private static final DirectionType[] VALUES_ARRAY = new DirectionType[]
-		{
+	private static final DirectionType[] VALUES_ARRAY = new DirectionType[] {
 			IN,
 			OUT,
 			INOUT,
@@ -158,11 +157,9 @@ public enum DirectionType implements Enumerator
 	 */
 	public static DirectionType get(String literal)
 	{
-		for (int i = 0; i < VALUES_ARRAY.length; ++i)
-		{
+		for (int i = 0; i < VALUES_ARRAY.length; ++i) {
 			DirectionType result = VALUES_ARRAY[i];
-			if (result.toString().equals(literal))
-			{
+			if (result.toString().equals(literal)) {
 				return result;
 			}
 		}
@@ -177,11 +174,9 @@ public enum DirectionType implements Enumerator
 	 */
 	public static DirectionType getByName(String name)
 	{
-		for (int i = 0; i < VALUES_ARRAY.length; ++i)
-		{
+		for (int i = 0; i < VALUES_ARRAY.length; ++i) {
 			DirectionType result = VALUES_ARRAY[i];
-			if (result.getName().equals(name))
-			{
+			if (result.getName().equals(name)) {
 				return result;
 			}
 		}
@@ -196,8 +191,7 @@ public enum DirectionType implements Enumerator
 	 */
 	public static DirectionType get(int value)
 	{
-		switch (value)
-		{
+		switch (value) {
 			case IN_VALUE: return IN;
 			case OUT_VALUE: return OUT;
 			case INOUT_VALUE: return INOUT;

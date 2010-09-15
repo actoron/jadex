@@ -14,8 +14,7 @@ import org.eclipse.jface.viewers.ViewerSorter;
 /**
  * @generated
  */
-public class GpmnNavigatorSorter extends ViewerSorter
-{
+public class GpmnNavigatorSorter extends ViewerSorter {
 
 	/**
 	 * @generated
@@ -25,10 +24,8 @@ public class GpmnNavigatorSorter extends ViewerSorter
 	/**
 	 * @generated
 	 */
-	public int category(Object element)
-	{
-		if (element instanceof GpmnNavigatorItem)
-		{
+	public int category(Object element) {
+		if (element instanceof GpmnNavigatorItem) {
 			GpmnNavigatorItem item = (GpmnNavigatorItem) element;
 			return GpmnVisualIDRegistry.getVisualID(item.getView());
 		}

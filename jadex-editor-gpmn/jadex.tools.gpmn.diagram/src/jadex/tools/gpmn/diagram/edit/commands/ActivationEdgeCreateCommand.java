@@ -31,8 +31,7 @@ import org.eclipse.gmf.runtime.emf.type.core.requests.CreateRelationshipRequest;
 /**
  * @generated
  */
-public class ActivationEdgeCreateCommand extends EditElementCommand
-{
+public class ActivationEdgeCreateCommand extends EditElementCommand {
 
 	/**
 	 * @generated
@@ -53,8 +52,7 @@ public class ActivationEdgeCreateCommand extends EditElementCommand
 	 * @generated
 	 */
 	public ActivationEdgeCreateCommand(CreateRelationshipRequest request,
-			EObject source, EObject target)
-	{
+			EObject source, EObject target) {
 		super(request.getLabel(), null, request);
 		this.source = source;
 		this.target = target;
@@ -64,27 +62,21 @@ public class ActivationEdgeCreateCommand extends EditElementCommand
 	/**
 	 * @generated
 	 */
-	public boolean canExecute()
-	{
-		if (source == null && target == null)
-		{
+	public boolean canExecute() {
+		if (source == null && target == null) {
 			return false;
 		}
-		if (source != null && false == source instanceof ActivationPlan)
-		{
+		if (source != null && false == source instanceof ActivationPlan) {
 			return false;
 		}
-		if (target != null && false == target instanceof Activatable)
-		{
+		if (target != null && false == target instanceof Activatable) {
 			return false;
 		}
-		if (getSource() == null)
-		{
+		if (getSource() == null) {
 			return true; // link creation is in progress; source is not defined yet
 		}
 		// target may be null here but it's possible to check constraint
-		if (getContainer() == null)
-		{
+		if (getContainer() == null) {
 			return false;
 		}
 		return GpmnBaseItemSemanticEditPolicy.LinkConstraints
@@ -96,10 +88,8 @@ public class ActivationEdgeCreateCommand extends EditElementCommand
 	 * @generated NOT, update the sequentialOrder dependent on source
 	 */
 	protected CommandResult doExecuteWithResult(IProgressMonitor monitor,
-			IAdaptable info) throws ExecutionException
-	{
-		if (!canExecute())
-		{
+			IAdaptable info) throws ExecutionException {
+		if (!canExecute()) {
 			throw new ExecutionException(
 					"Invalid arguments in create link command"); //$NON-NLS-1$
 		}
@@ -128,12 +118,10 @@ public class ActivationEdgeCreateCommand extends EditElementCommand
 	 * @return next order number (max order +1)
 	 * @generated NOT
 	 */
-	protected int calculateSequentialOrder(List<ActivationEdge> edges)
-	{
+	protected int calculateSequentialOrder(List<ActivationEdge> edges) {
 		// int order = getSource().getOutgoingEdges().size()
 		int order = 0;
-		for (ActivationEdge edge : edges)
-		{
+		for (ActivationEdge edge : edges) {
 
 			order = Math.max(order, ((ActivationEdge) edge).getOrder());
 		}
@@ -145,8 +133,7 @@ public class ActivationEdgeCreateCommand extends EditElementCommand
 	 */
 	protected void doConfigure(ActivationEdge newElement,
 			IProgressMonitor monitor, IAdaptable info)
-			throws ExecutionException
-	{
+			throws ExecutionException {
 		IElementType elementType = ((CreateElementRequest) getRequest())
 				.getElementType();
 		ConfigureRequest configureRequest = new ConfigureRequest(
@@ -160,8 +147,7 @@ public class ActivationEdgeCreateCommand extends EditElementCommand
 				getTarget());
 		ICommand configureCommand = elementType
 				.getEditCommand(configureRequest);
-		if (configureCommand != null && configureCommand.canExecute())
-		{
+		if (configureCommand != null && configureCommand.canExecute()) {
 			configureCommand.execute(monitor, info);
 		}
 	}
@@ -169,32 +155,28 @@ public class ActivationEdgeCreateCommand extends EditElementCommand
 	/**
 	 * @generated
 	 */
-	protected void setElementToEdit(EObject element)
-	{
+	protected void setElementToEdit(EObject element) {
 		throw new UnsupportedOperationException();
 	}
 
 	/**
 	 * @generated
 	 */
-	protected ActivationPlan getSource()
-	{
+	protected ActivationPlan getSource() {
 		return (ActivationPlan) source;
 	}
 
 	/**
 	 * @generated
 	 */
-	protected Activatable getTarget()
-	{
+	protected Activatable getTarget() {
 		return (Activatable) target;
 	}
 
 	/**
 	 * @generated
 	 */
-	public GpmnDiagram getContainer()
-	{
+	public GpmnDiagram getContainer() {
 		return container;
 	}
 
@@ -203,16 +185,13 @@ public class ActivationEdgeCreateCommand extends EditElementCommand
 	 * Modify with appropriate logic.
 	 * @generated
 	 */
-	private static GpmnDiagram deduceContainer(EObject source, EObject target)
-	{
+	private static GpmnDiagram deduceContainer(EObject source, EObject target) {
 		// Find container element for the new link.
 		// Climb up by containment hierarchy starting from the source
 		// and return the first element that is instance of the container class.
 		for (EObject element = source; element != null; element = element
-				.eContainer())
-		{
-			if (element instanceof GpmnDiagram)
-			{
+				.eContainer()) {
+			if (element instanceof GpmnDiagram) {
 				return (GpmnDiagram) element;
 			}
 		}

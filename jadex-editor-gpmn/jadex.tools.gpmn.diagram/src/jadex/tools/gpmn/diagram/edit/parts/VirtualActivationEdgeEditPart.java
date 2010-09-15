@@ -28,8 +28,7 @@ import org.eclipse.gmf.runtime.notation.View;
  * @generated
  */
 public class VirtualActivationEdgeEditPart extends ConnectionNodeEditPart
-		implements ITreeBranchEditPart
-{
+		implements ITreeBranchEditPart {
 
 	/**
 	 * @generated
@@ -39,16 +38,14 @@ public class VirtualActivationEdgeEditPart extends ConnectionNodeEditPart
 	/**
 	 * @generated
 	 */
-	public VirtualActivationEdgeEditPart(View view)
-	{
+	public VirtualActivationEdgeEditPart(View view) {
 		super(view);
 	}
 
 	/**
 	 * @generated NOT
 	 */
-	protected void createDefaultEditPolicies()
-	{
+	protected void createDefaultEditPolicies() {
 		super.createDefaultEditPolicies();
 		installEditPolicy(EditPolicy.COMPONENT_ROLE,
 				new ViewComponentEditPolicy());
@@ -60,10 +57,8 @@ public class VirtualActivationEdgeEditPart extends ConnectionNodeEditPart
 	/**
 	 * @generated
 	 */
-	protected boolean addFixedChild(EditPart childEditPart)
-	{
-		if (childEditPart instanceof VirtualActivationOrderEditPart)
-		{
+	protected boolean addFixedChild(EditPart childEditPart) {
+		if (childEditPart instanceof VirtualActivationOrderEditPart) {
 			((VirtualActivationOrderEditPart) childEditPart)
 					.setLabel(getPrimaryShape()
 							.getFigureVirtualActivationEdgeOrderFigure());
@@ -75,10 +70,8 @@ public class VirtualActivationEdgeEditPart extends ConnectionNodeEditPart
 	/**
 	 * @generated
 	 */
-	protected void addChildVisual(EditPart childEditPart, int index)
-	{
-		if (addFixedChild(childEditPart))
-		{
+	protected void addChildVisual(EditPart childEditPart, int index) {
+		if (addFixedChild(childEditPart)) {
 			return;
 		}
 		super.addChildVisual(childEditPart, -1);
@@ -87,10 +80,8 @@ public class VirtualActivationEdgeEditPart extends ConnectionNodeEditPart
 	/**
 	 * @generated
 	 */
-	protected boolean removeFixedChild(EditPart childEditPart)
-	{
-		if (childEditPart instanceof VirtualActivationOrderEditPart)
-		{
+	protected boolean removeFixedChild(EditPart childEditPart) {
+		if (childEditPart instanceof VirtualActivationOrderEditPart) {
 			return true;
 		}
 		return false;
@@ -99,10 +90,8 @@ public class VirtualActivationEdgeEditPart extends ConnectionNodeEditPart
 	/**
 	 * @generated
 	 */
-	protected void removeChildVisual(EditPart childEditPart)
-	{
-		if (removeFixedChild(childEditPart))
-		{
+	protected void removeChildVisual(EditPart childEditPart) {
+		if (removeFixedChild(childEditPart)) {
 			return;
 		}
 		super.removeChildVisual(childEditPart);
@@ -117,16 +106,14 @@ public class VirtualActivationEdgeEditPart extends ConnectionNodeEditPart
 	 * @generated
 	 */
 
-	protected Connection createConnectionFigure()
-	{
+	protected Connection createConnectionFigure() {
 		return new VirtualActivationEdgeFigure();
 	}
 
 	/**
 	 * @generated NOT
 	 */
-	public DragTracker getDragTracker(Request req)
-	{
+	public DragTracker getDragTracker(Request req) {
 		if (req instanceof SelectionRequest)
 			return new VirtualActivationEdgeSelectToolEx(this);
 		return super.getDragTracker(req);
@@ -135,8 +122,7 @@ public class VirtualActivationEdgeEditPart extends ConnectionNodeEditPart
 	/**
 	 * @generated
 	 */
-	public VirtualActivationEdgeFigure getPrimaryShape()
-	{
+	public VirtualActivationEdgeFigure getPrimaryShape() {
 		return (VirtualActivationEdgeFigure) getFigure();
 	}
 
@@ -144,8 +130,7 @@ public class VirtualActivationEdgeEditPart extends ConnectionNodeEditPart
 	 * @generated
 	 */
 	public class VirtualActivationEdgeFigure extends
-			jadex.tools.gpmn.diagram.ui.figures.VirtualActivationEdgeFigure
-	{
+			jadex.tools.gpmn.diagram.ui.figures.VirtualActivationEdgeFigure {
 
 		/**
 		 * @generated
@@ -155,8 +140,7 @@ public class VirtualActivationEdgeEditPart extends ConnectionNodeEditPart
 		/**
 		 * @generated
 		 */
-		public VirtualActivationEdgeFigure()
-		{
+		public VirtualActivationEdgeFigure() {
 
 			this.setForegroundColor(ColorConstants.black);
 			createContents();
@@ -165,8 +149,7 @@ public class VirtualActivationEdgeEditPart extends ConnectionNodeEditPart
 		/**
 		 * @generated
 		 */
-		private void createContents()
-		{
+		private void createContents() {
 
 			fFigureVirtualActivationEdgeOrderFigure = new WrappingLabel();
 			fFigureVirtualActivationEdgeOrderFigure.setText("");
@@ -183,24 +166,21 @@ public class VirtualActivationEdgeEditPart extends ConnectionNodeEditPart
 		/**
 		 * @generated
 		 */
-		protected boolean useLocalCoordinates()
-		{
+		protected boolean useLocalCoordinates() {
 			return myUseLocalCoordinates;
 		}
 
 		/**
 		 * @generated
 		 */
-		protected void setUseLocalCoordinates(boolean useLocalCoordinates)
-		{
+		protected void setUseLocalCoordinates(boolean useLocalCoordinates) {
 			myUseLocalCoordinates = useLocalCoordinates;
 		}
 
 		/**
 		 * @generated
 		 */
-		public WrappingLabel getFigureVirtualActivationEdgeOrderFigure()
-		{
+		public WrappingLabel getFigureVirtualActivationEdgeOrderFigure() {
 			return fFigureVirtualActivationEdgeOrderFigure;
 		}
 

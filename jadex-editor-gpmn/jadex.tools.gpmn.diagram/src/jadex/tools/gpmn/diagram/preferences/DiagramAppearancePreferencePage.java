@@ -14,14 +14,12 @@ import org.eclipse.gmf.runtime.diagram.ui.preferences.AppearancePreferencePage;
 /**
  * @generated
  */
-public class DiagramAppearancePreferencePage extends AppearancePreferencePage
-{
+public class DiagramAppearancePreferencePage extends AppearancePreferencePage {
 
 	/**
 	 * @generated
 	 */
-	public DiagramAppearancePreferencePage()
-	{
+	public DiagramAppearancePreferencePage() {
 		setPreferenceStore(GpmnDiagramEditorPlugin.getInstance()
 				.getPreferenceStore());
 	}

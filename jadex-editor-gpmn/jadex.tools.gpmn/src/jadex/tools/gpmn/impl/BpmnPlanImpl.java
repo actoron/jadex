@@ -147,8 +147,7 @@ public class BpmnPlanImpl extends AbstractPlanImpl implements BpmnPlan
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType)
 	{
-		switch (featureID)
-		{
+		switch (featureID) {
 			case GpmnPackage.BPMN_PLAN__PLANREF:
 				return getPlanref();
 		}
@@ -163,8 +162,7 @@ public class BpmnPlanImpl extends AbstractPlanImpl implements BpmnPlan
 	@Override
 	public void eSet(int featureID, Object newValue)
 	{
-		switch (featureID)
-		{
+		switch (featureID) {
 			case GpmnPackage.BPMN_PLAN__PLANREF:
 				setPlanref((String)newValue);
 				return;
@@ -180,8 +178,7 @@ public class BpmnPlanImpl extends AbstractPlanImpl implements BpmnPlan
 	@Override
 	public void eUnset(int featureID)
 	{
-		switch (featureID)
-		{
+		switch (featureID) {
 			case GpmnPackage.BPMN_PLAN__PLANREF:
 				unsetPlanref();
 				return;
@@ -197,8 +194,7 @@ public class BpmnPlanImpl extends AbstractPlanImpl implements BpmnPlan
 	@Override
 	public boolean eIsSet(int featureID)
 	{
-		switch (featureID)
-		{
+		switch (featureID) {
 			case GpmnPackage.BPMN_PLAN__PLANREF:
 				return isSetPlanref();
 		}

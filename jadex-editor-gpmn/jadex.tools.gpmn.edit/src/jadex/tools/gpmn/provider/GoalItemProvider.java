@@ -65,8 +65,7 @@ public class GoalItemProvider extends AbstractNodeItemProvider implements
 	@Override
 	public List<IItemPropertyDescriptor> getPropertyDescriptors(Object object)
 	{
-		if (itemPropertyDescriptors == null)
-		{
+		if (itemPropertyDescriptors == null) {
 			super.getPropertyDescriptors(object);
 
 			addSuppressionEdgePropertyDescriptor(object);
@@ -712,8 +711,7 @@ public class GoalItemProvider extends AbstractNodeItemProvider implements
 	{
 		updateChildren(notification);
 
-		switch (notification.getFeatureID(Goal.class))
-		{
+		switch (notification.getFeatureID(Goal.class)) {
 			case GpmnPackage.GOAL__UNIQUE:
 			case GpmnPackage.GOAL__CREATIONCONDITION:
 			case GpmnPackage.GOAL__CREATIONCONDITION_LANGUAGE:

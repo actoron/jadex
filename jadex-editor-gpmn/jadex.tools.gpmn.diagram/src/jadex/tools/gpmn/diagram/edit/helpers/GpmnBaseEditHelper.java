@@ -22,8 +22,7 @@ import org.eclipse.gmf.runtime.emf.type.core.requests.IEditCommandRequest;
 /**
  * @generated
  */
-public class GpmnBaseEditHelper extends AbstractEditHelper
-{
+public class GpmnBaseEditHelper extends AbstractEditHelper {
 
 	/**
 	 * @generated
@@ -38,10 +37,8 @@ public class GpmnBaseEditHelper extends AbstractEditHelper
 	/**
 	 * @generated
 	 */
-	protected IEditHelperAdvice[] getEditHelperAdvice(IEditCommandRequest req)
-	{
-		if (req.getParameter(CONTEXT_ELEMENT_TYPE) instanceof IElementType)
-		{
+	protected IEditHelperAdvice[] getEditHelperAdvice(IEditCommandRequest req) {
+		if (req.getParameter(CONTEXT_ELEMENT_TYPE) instanceof IElementType) {
 			return ElementTypeRegistry.getInstance().getEditHelperAdvice(
 					(IElementType) req.getParameter(CONTEXT_ELEMENT_TYPE));
 		}
@@ -51,17 +48,14 @@ public class GpmnBaseEditHelper extends AbstractEditHelper
 	/**
 	 * @generated
 	 */
-	protected ICommand getInsteadCommand(IEditCommandRequest req)
-	{
+	protected ICommand getInsteadCommand(IEditCommandRequest req) {
 		ICommand epCommand = (ICommand) req.getParameter(EDIT_POLICY_COMMAND);
 		req.setParameter(EDIT_POLICY_COMMAND, null);
 		ICommand ehCommand = super.getInsteadCommand(req);
-		if (epCommand == null)
-		{
+		if (epCommand == null) {
 			return ehCommand;
 		}
-		if (ehCommand == null)
-		{
+		if (ehCommand == null) {
 			return epCommand;
 		}
 		CompositeCommand command = new CompositeCommand(null);
@@ -73,8 +67,7 @@ public class GpmnBaseEditHelper extends AbstractEditHelper
 	/**
 	 * @generated
 	 */
-	protected ICommand getCreateCommand(CreateElementRequest req)
-	{
+	protected ICommand getCreateCommand(CreateElementRequest req) {
 		return null;
 	}
 
@@ -82,24 +75,21 @@ public class GpmnBaseEditHelper extends AbstractEditHelper
 	 * @generated
 	 */
 	protected ICommand getCreateRelationshipCommand(
-			CreateRelationshipRequest req)
-	{
+			CreateRelationshipRequest req) {
 		return null;
 	}
 
 	/**
 	 * @generated
 	 */
-	protected ICommand getDestroyElementCommand(DestroyElementRequest req)
-	{
+	protected ICommand getDestroyElementCommand(DestroyElementRequest req) {
 		return null;
 	}
 
 	/**
 	 * @generated
 	 */
-	protected ICommand getDestroyReferenceCommand(DestroyReferenceRequest req)
-	{
+	protected ICommand getDestroyReferenceCommand(DestroyReferenceRequest req) {
 		return null;
 	}
 }

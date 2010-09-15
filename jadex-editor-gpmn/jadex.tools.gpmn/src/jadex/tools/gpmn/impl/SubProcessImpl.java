@@ -37,6 +37,7 @@ import org.eclipse.emf.ecore.util.InternalEList;
  * <ul>
  *   <li>{@link jadex.tools.gpmn.impl.SubProcessImpl#getActivationEdges <em>Activation Edges</em>}</li>
  *   <li>{@link jadex.tools.gpmn.impl.SubProcessImpl#getProcessref <em>Processref</em>}</li>
+ *   <li>{@link jadex.tools.gpmn.impl.SubProcessImpl#isInternal <em>Internal</em>}</li>
  *   <li>{@link jadex.tools.gpmn.impl.SubProcessImpl#getGpmnDiagram <em>Gpmn Diagram</em>}</li>
  * </ul>
  * </p>
@@ -92,6 +93,26 @@ public class SubProcessImpl extends AbstractNodeImpl implements SubProcess
 	protected boolean processrefESet;
 
 	/**
+	 * The default value of the '{@link #isInternal() <em>Internal</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #isInternal()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final boolean INTERNAL_EDEFAULT = false;
+
+	/**
+	 * The cached value of the '{@link #isInternal() <em>Internal</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #isInternal()
+	 * @generated
+	 * @ordered
+	 */
+	protected boolean internal = INTERNAL_EDEFAULT;
+
+	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
@@ -119,8 +140,7 @@ public class SubProcessImpl extends AbstractNodeImpl implements SubProcess
 	 */
 	public EList<ActivationEdge> getActivationEdges()
 	{
-		if (activationEdges == null)
-		{
+		if (activationEdges == null) {
 			activationEdges = new EObjectWithInverseEList.Unsettable<ActivationEdge>(ActivationEdge.class, this, GpmnPackage.SUB_PROCESS__ACTIVATION_EDGES, GpmnPackage.ACTIVATION_EDGE__TARGET);
 		}
 		return activationEdges;
@@ -201,6 +221,27 @@ public class SubProcessImpl extends AbstractNodeImpl implements SubProcess
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public boolean isInternal() {
+		return internal;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setInternal(boolean newInternal) {
+		boolean oldInternal = internal;
+		internal = newInternal;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, GpmnPackage.SUB_PROCESS__INTERNAL, oldInternal, internal));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public GpmnDiagram getGpmnDiagram()
 	{
 		if (eContainerFeatureID() != GpmnPackage.SUB_PROCESS__GPMN_DIAGRAM) return null;
@@ -226,8 +267,7 @@ public class SubProcessImpl extends AbstractNodeImpl implements SubProcess
 	 */
 	public void setGpmnDiagram(GpmnDiagram newGpmnDiagram)
 	{
-		if (newGpmnDiagram != eInternalContainer() || (eContainerFeatureID() != GpmnPackage.SUB_PROCESS__GPMN_DIAGRAM && newGpmnDiagram != null))
-		{
+		if (newGpmnDiagram != eInternalContainer() || (eContainerFeatureID() != GpmnPackage.SUB_PROCESS__GPMN_DIAGRAM && newGpmnDiagram != null)) {
 			if (EcoreUtil.isAncestor(this, newGpmnDiagram))
 				throw new IllegalArgumentException("Recursive containment not allowed for " + toString()); //$NON-NLS-1$
 			NotificationChain msgs = null;
@@ -252,8 +292,7 @@ public class SubProcessImpl extends AbstractNodeImpl implements SubProcess
 	public NotificationChain eInverseAdd(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs)
 	{
-		switch (featureID)
-		{
+		switch (featureID) {
 			case GpmnPackage.SUB_PROCESS__ACTIVATION_EDGES:
 				return ((InternalEList<InternalEObject>)(InternalEList<?>)getActivationEdges()).basicAdd(otherEnd, msgs);
 			case GpmnPackage.SUB_PROCESS__GPMN_DIAGRAM:
@@ -273,8 +312,7 @@ public class SubProcessImpl extends AbstractNodeImpl implements SubProcess
 	public NotificationChain eInverseRemove(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs)
 	{
-		switch (featureID)
-		{
+		switch (featureID) {
 			case GpmnPackage.SUB_PROCESS__ACTIVATION_EDGES:
 				return ((InternalEList<?>)getActivationEdges()).basicRemove(otherEnd, msgs);
 			case GpmnPackage.SUB_PROCESS__GPMN_DIAGRAM:
@@ -292,8 +330,7 @@ public class SubProcessImpl extends AbstractNodeImpl implements SubProcess
 	public NotificationChain eBasicRemoveFromContainerFeature(
 			NotificationChain msgs)
 	{
-		switch (eContainerFeatureID())
-		{
+		switch (eContainerFeatureID()) {
 			case GpmnPackage.SUB_PROCESS__GPMN_DIAGRAM:
 				return eInternalContainer().eInverseRemove(this, GpmnPackage.GPMN_DIAGRAM__SUB_PROCESSES, GpmnDiagram.class, msgs);
 		}
@@ -308,12 +345,13 @@ public class SubProcessImpl extends AbstractNodeImpl implements SubProcess
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType)
 	{
-		switch (featureID)
-		{
+		switch (featureID) {
 			case GpmnPackage.SUB_PROCESS__ACTIVATION_EDGES:
 				return getActivationEdges();
 			case GpmnPackage.SUB_PROCESS__PROCESSREF:
 				return getProcessref();
+			case GpmnPackage.SUB_PROCESS__INTERNAL:
+				return isInternal();
 			case GpmnPackage.SUB_PROCESS__GPMN_DIAGRAM:
 				return getGpmnDiagram();
 		}
@@ -329,14 +367,16 @@ public class SubProcessImpl extends AbstractNodeImpl implements SubProcess
 	@Override
 	public void eSet(int featureID, Object newValue)
 	{
-		switch (featureID)
-		{
+		switch (featureID) {
 			case GpmnPackage.SUB_PROCESS__ACTIVATION_EDGES:
 				getActivationEdges().clear();
 				getActivationEdges().addAll((Collection<? extends ActivationEdge>)newValue);
 				return;
 			case GpmnPackage.SUB_PROCESS__PROCESSREF:
 				setProcessref((String)newValue);
+				return;
+			case GpmnPackage.SUB_PROCESS__INTERNAL:
+				setInternal((Boolean)newValue);
 				return;
 			case GpmnPackage.SUB_PROCESS__GPMN_DIAGRAM:
 				setGpmnDiagram((GpmnDiagram)newValue);
@@ -353,13 +393,15 @@ public class SubProcessImpl extends AbstractNodeImpl implements SubProcess
 	@Override
 	public void eUnset(int featureID)
 	{
-		switch (featureID)
-		{
+		switch (featureID) {
 			case GpmnPackage.SUB_PROCESS__ACTIVATION_EDGES:
 				unsetActivationEdges();
 				return;
 			case GpmnPackage.SUB_PROCESS__PROCESSREF:
 				unsetProcessref();
+				return;
+			case GpmnPackage.SUB_PROCESS__INTERNAL:
+				setInternal(INTERNAL_EDEFAULT);
 				return;
 			case GpmnPackage.SUB_PROCESS__GPMN_DIAGRAM:
 				setGpmnDiagram((GpmnDiagram)null);
@@ -376,12 +418,13 @@ public class SubProcessImpl extends AbstractNodeImpl implements SubProcess
 	@Override
 	public boolean eIsSet(int featureID)
 	{
-		switch (featureID)
-		{
+		switch (featureID) {
 			case GpmnPackage.SUB_PROCESS__ACTIVATION_EDGES:
 				return isSetActivationEdges();
 			case GpmnPackage.SUB_PROCESS__PROCESSREF:
 				return isSetProcessref();
+			case GpmnPackage.SUB_PROCESS__INTERNAL:
+				return internal != INTERNAL_EDEFAULT;
 			case GpmnPackage.SUB_PROCESS__GPMN_DIAGRAM:
 				return getGpmnDiagram() != null;
 		}
@@ -396,10 +439,8 @@ public class SubProcessImpl extends AbstractNodeImpl implements SubProcess
 	@Override
 	public int eBaseStructuralFeatureID(int derivedFeatureID, Class<?> baseClass)
 	{
-		if (baseClass == Activatable.class)
-		{
-			switch (derivedFeatureID)
-			{
+		if (baseClass == Activatable.class) {
+			switch (derivedFeatureID) {
 				case GpmnPackage.SUB_PROCESS__ACTIVATION_EDGES: return GpmnPackage.ACTIVATABLE__ACTIVATION_EDGES;
 				default: return -1;
 			}
@@ -415,10 +456,8 @@ public class SubProcessImpl extends AbstractNodeImpl implements SubProcess
 	@Override
 	public int eDerivedStructuralFeatureID(int baseFeatureID, Class<?> baseClass)
 	{
-		if (baseClass == Activatable.class)
-		{
-			switch (baseFeatureID)
-			{
+		if (baseClass == Activatable.class) {
+			switch (baseFeatureID) {
 				case GpmnPackage.ACTIVATABLE__ACTIVATION_EDGES: return GpmnPackage.SUB_PROCESS__ACTIVATION_EDGES;
 				default: return -1;
 			}
@@ -439,6 +478,8 @@ public class SubProcessImpl extends AbstractNodeImpl implements SubProcess
 		StringBuffer result = new StringBuffer(super.toString());
 		result.append(" (processref: "); //$NON-NLS-1$
 		if (processrefESet) result.append(processref); else result.append("<unset>"); //$NON-NLS-1$
+		result.append(", internal: "); //$NON-NLS-1$
+		result.append(internal);
 		result.append(')');
 		return result.toString();
 	}

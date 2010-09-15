@@ -10,6 +10,5 @@ package jadex.tools.gpmn.diagram.edit.helpers;
 /**
  * @generated
  */
-public class SubProcessEditHelper extends GpmnBaseEditHelper
-{
+public class SubProcessEditHelper extends GpmnBaseEditHelper {
 }

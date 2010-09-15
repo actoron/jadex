@@ -21,8 +21,7 @@ import org.eclipse.swt.widgets.Display;
 /**
  * @generated
  */
-public class GpmnDiagramEditPart extends DiagramEditPart
-{
+public class GpmnDiagramEditPart extends DiagramEditPart {
 
 	/**
 	 * @generated
@@ -40,16 +39,14 @@ public class GpmnDiagramEditPart extends DiagramEditPart
 	 * FIXME: Use create command / model feature initializer if available in future version
 	 * 
 	 */
-	public GpmnDiagramEditPart(View view)
-	{
+	public GpmnDiagramEditPart(View view) {
 		super(view);
 	}
 
 	/**
 	 * @generated
 	 */
-	protected void createDefaultEditPolicies()
-	{
+	protected void createDefaultEditPolicies() {
 		super.createDefaultEditPolicies();
 		installEditPolicy(EditPolicyRoles.SEMANTIC_ROLE,
 				new GpmnDiagramItemSemanticEditPolicy());

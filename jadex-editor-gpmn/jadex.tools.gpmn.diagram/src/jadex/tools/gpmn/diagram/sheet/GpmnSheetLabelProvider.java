@@ -23,17 +23,14 @@ import org.eclipse.swt.graphics.Image;
  * @generated
  */
 public class GpmnSheetLabelProvider extends BaseLabelProvider implements
-		ILabelProvider
-{
+		ILabelProvider {
 
 	/**
 	 * @generated
 	 */
-	public String getText(Object element)
-	{
+	public String getText(Object element) {
 		element = unwrap(element);
-		if (element instanceof GpmnNavigatorGroup)
-		{
+		if (element instanceof GpmnNavigatorGroup) {
 			return ((GpmnNavigatorGroup) element).getGroupName();
 		}
 		IElementType etype = getElementType(getView(element));
@@ -43,8 +40,7 @@ public class GpmnSheetLabelProvider extends BaseLabelProvider implements
 	/**
 	 * @generated
 	 */
-	public Image getImage(Object element)
-	{
+	public Image getImage(Object element) {
 		IElementType etype = getElementType(getView(unwrap(element)));
 		return etype == null ? null : GpmnElementTypes.getImage(etype);
 	}
@@ -52,10 +48,8 @@ public class GpmnSheetLabelProvider extends BaseLabelProvider implements
 	/**
 	 * @generated
 	 */
-	private Object unwrap(Object element)
-	{
-		if (element instanceof IStructuredSelection)
-		{
+	private Object unwrap(Object element) {
+		if (element instanceof IStructuredSelection) {
 			return ((IStructuredSelection) element).getFirstElement();
 		}
 		return element;
@@ -64,14 +58,11 @@ public class GpmnSheetLabelProvider extends BaseLabelProvider implements
 	/**
 	 * @generated
 	 */
-	private View getView(Object element)
-	{
-		if (element instanceof View)
-		{
+	private View getView(Object element) {
+		if (element instanceof View) {
 			return (View) element;
 		}
-		if (element instanceof IAdaptable)
-		{
+		if (element instanceof IAdaptable) {
 			return (View) ((IAdaptable) element).getAdapter(View.class);
 		}
 		return null;
@@ -80,15 +71,12 @@ public class GpmnSheetLabelProvider extends BaseLabelProvider implements
 	/**
 	 * @generated
 	 */
-	private IElementType getElementType(View view)
-	{
+	private IElementType getElementType(View view) {
 		// For intermediate views climb up the containment hierarchy to find the one associated with an element type.
-		while (view != null)
-		{
+		while (view != null) {
 			int vid = GpmnVisualIDRegistry.getVisualID(view);
 			IElementType etype = GpmnElementTypes.getElementType(vid);
-			if (etype != null)
-			{
+			if (etype != null) {
 				return etype;
 			}
 			view = view.eContainer() instanceof View ? (View) view.eContainer()

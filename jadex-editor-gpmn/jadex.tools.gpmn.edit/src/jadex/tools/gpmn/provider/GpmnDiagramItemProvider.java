@@ -67,8 +67,7 @@ public class GpmnDiagramItemProvider extends NamedObjectItemProvider implements
 	@Override
 	public List<IItemPropertyDescriptor> getPropertyDescriptors(Object object)
 	{
-		if (itemPropertyDescriptors == null)
-		{
+		if (itemPropertyDescriptors == null) {
 			super.getPropertyDescriptors(object);
 
 			addPackagePropertyDescriptor(object);
@@ -255,8 +254,7 @@ public class GpmnDiagramItemProvider extends NamedObjectItemProvider implements
 	public Collection<? extends EStructuralFeature> getChildrenFeatures(
 			Object object)
 	{
-		if (childrenFeatures == null)
-		{
+		if (childrenFeatures == null) {
 			super.getChildrenFeatures(object);
 			childrenFeatures.add(GpmnPackage.Literals.GPMN_DIAGRAM__GOALS);
 			childrenFeatures.add(GpmnPackage.Literals.GPMN_DIAGRAM__PLANS);
@@ -321,8 +319,7 @@ public class GpmnDiagramItemProvider extends NamedObjectItemProvider implements
 	{
 		updateChildren(notification);
 
-		switch (notification.getFeatureID(GpmnDiagram.class))
-		{
+		switch (notification.getFeatureID(GpmnDiagram.class)) {
 			case GpmnPackage.GPMN_DIAGRAM__PACKAGE:
 			case GpmnPackage.GPMN_DIAGRAM__IMPORTS:
 			case GpmnPackage.GPMN_DIAGRAM__AUTHOR:

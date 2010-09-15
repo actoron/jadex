@@ -10,6 +10,5 @@ package jadex.tools.gpmn.diagram.edit.helpers;
 /**
  * @generated
  */
-public class SuppressionEdgeEditHelper extends GpmnBaseEditHelper
-{
+public class SuppressionEdgeEditHelper extends GpmnBaseEditHelper {
 }

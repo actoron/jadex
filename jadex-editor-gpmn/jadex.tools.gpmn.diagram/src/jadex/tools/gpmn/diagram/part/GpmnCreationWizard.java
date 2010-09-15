@@ -26,8 +26,7 @@ import org.eclipse.ui.actions.WorkspaceModifyOperation;
 /**
  * @generated
  */
-public class GpmnCreationWizard extends Wizard implements INewWizard
-{
+public class GpmnCreationWizard extends Wizard implements INewWizard {
 
 	/**
 	 * @generated
@@ -62,32 +61,28 @@ public class GpmnCreationWizard extends Wizard implements INewWizard
 	/**
 	 * @generated
 	 */
-	public IWorkbench getWorkbench()
-	{
+	public IWorkbench getWorkbench() {
 		return workbench;
 	}
 
 	/**
 	 * @generated
 	 */
-	public IStructuredSelection getSelection()
-	{
+	public IStructuredSelection getSelection() {
 		return selection;
 	}
 
 	/**
 	 * @generated
 	 */
-	public final Resource getDiagram()
-	{
+	public final Resource getDiagram() {
 		return diagram;
 	}
 
 	/**
 	 * @generated
 	 */
-	public final boolean isOpenNewlyCreatedDiagramEditor()
-	{
+	public final boolean isOpenNewlyCreatedDiagramEditor() {
 		return openNewlyCreatedDiagramEditor;
 	}
 
@@ -95,16 +90,14 @@ public class GpmnCreationWizard extends Wizard implements INewWizard
 	 * @generated
 	 */
 	public void setOpenNewlyCreatedDiagramEditor(
-			boolean openNewlyCreatedDiagramEditor)
-	{
+			boolean openNewlyCreatedDiagramEditor) {
 		this.openNewlyCreatedDiagramEditor = openNewlyCreatedDiagramEditor;
 	}
 
 	/**
 	 * @generated
 	 */
-	public void init(IWorkbench workbench, IStructuredSelection selection)
-	{
+	public void init(IWorkbench workbench, IStructuredSelection selection) {
 		this.workbench = workbench;
 		this.selection = selection;
 		setWindowTitle(Messages.GpmnCreationWizardTitle);
@@ -116,8 +109,7 @@ public class GpmnCreationWizard extends Wizard implements INewWizard
 	/**
 	 * @generated NOT, removed second page for domain model file
 	 */
-	public void addPages()
-	{
+	public void addPages() {
 		diagramModelFilePage = new GpmnCreationWizardPage(
 				"DiagramModelFile", getSelection(), "gpmn_diagram"); //$NON-NLS-1$ //$NON-NLS-2$
 		diagramModelFilePage
@@ -152,28 +144,21 @@ public class GpmnCreationWizard extends Wizard implements INewWizard
 	/**
 	 * @generated NOT, replaced domainModelFilePage with file name of diagram page.
 	 */
-	public boolean performFinish()
-	{
-		IRunnableWithProgress op = new WorkspaceModifyOperation(null)
-		{
+	public boolean performFinish() {
+		IRunnableWithProgress op = new WorkspaceModifyOperation(null) {
 
 			protected void execute(IProgressMonitor monitor)
-					throws CoreException, InterruptedException
-			{
+					throws CoreException, InterruptedException {
 				/*diagram = GpmnDiagramEditorUtil.createDiagram(
 						diagramModelFilePage.getURI(), domainModelFilePage
 								.getURI(), monitor);*/
 				diagram = GpmnDiagramEditorUtil.createDiagram(
 						diagramModelFilePage.getURI(),
 						generateDomainModelFileURI(), monitor);
-				if (isOpenNewlyCreatedDiagramEditor() && diagram != null)
-				{
-					try
-					{
+				if (isOpenNewlyCreatedDiagramEditor() && diagram != null) {
+					try {
 						GpmnDiagramEditorUtil.openDiagram(diagram);
-					}
-					catch (PartInitException e)
-					{
+					} catch (PartInitException e) {
 						ErrorDialog.openError(getContainer().getShell(),
 								Messages.GpmnCreationWizardOpenEditorError,
 								null, e.getStatus());
@@ -181,24 +166,16 @@ public class GpmnCreationWizard extends Wizard implements INewWizard
 				}
 			}
 		};
-		try
-		{
+		try {
 			getContainer().run(false, true, op);
-		}
-		catch (InterruptedException e)
-		{
+		} catch (InterruptedException e) {
 			return false;
-		}
-		catch (InvocationTargetException e)
-		{
-			if (e.getTargetException() instanceof CoreException)
-			{
+		} catch (InvocationTargetException e) {
+			if (e.getTargetException() instanceof CoreException) {
 				ErrorDialog.openError(getContainer().getShell(),
 						Messages.GpmnCreationWizardCreationError, null,
 						((CoreException) e.getTargetException()).getStatus());
-			}
-			else
-			{
+			} else {
 				GpmnDiagramEditorPlugin.getInstance().logError(
 						"Error creating diagram", e.getTargetException()); //$NON-NLS-1$
 			}
@@ -213,8 +190,7 @@ public class GpmnCreationWizard extends Wizard implements INewWizard
 	 * @return URI for domain model file creation
 	 * @generated NOT
 	 */
-	protected URI generateDomainModelFileURI()
-	{
+	protected URI generateDomainModelFileURI() {
 		String diagramModelFileName = diagramModelFilePage.getFileName();
 		diagramModelFileName = diagramModelFileName.substring(0,
 				diagramModelFileName.length() - ".gpmn_diagram".length()); //$NON-NLS-1$

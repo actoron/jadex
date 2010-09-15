@@ -17,22 +17,19 @@ import org.eclipse.gmf.runtime.emf.type.core.requests.DestroyElementRequest;
  * @generated
  */
 public class ActivationEdgeItemSemanticEditPolicy extends
-		GpmnBaseItemSemanticEditPolicy
-{
+		GpmnBaseItemSemanticEditPolicy {
 
 	/**
 	 * @generated
 	 */
-	public ActivationEdgeItemSemanticEditPolicy()
-	{
+	public ActivationEdgeItemSemanticEditPolicy() {
 		super(GpmnElementTypes.ActivationEdge_4001);
 	}
 
 	/**
 	 * @generated
 	 */
-	protected Command getDestroyElementCommand(DestroyElementRequest req)
-	{
+	protected Command getDestroyElementCommand(DestroyElementRequest req) {
 		return getGEFWrapper(new DestroyElementCommand(req));
 	}
 

@@ -22,8 +22,7 @@ import org.eclipse.gmf.runtime.notation.View;
  * @generated
  */
 public class PlanEdgeEditPart extends ConnectionNodeEditPart implements
-		ITreeBranchEditPart
-{
+		ITreeBranchEditPart {
 
 	/**
 	 * @generated
@@ -33,16 +32,14 @@ public class PlanEdgeEditPart extends ConnectionNodeEditPart implements
 	/**
 	 * @generated
 	 */
-	public PlanEdgeEditPart(View view)
-	{
+	public PlanEdgeEditPart(View view) {
 		super(view);
 	}
 
 	/**
 	 * @generated
 	 */
-	protected void createDefaultEditPolicies()
-	{
+	protected void createDefaultEditPolicies() {
 		super.createDefaultEditPolicies();
 		installEditPolicy(EditPolicyRoles.SEMANTIC_ROLE,
 				new PlanEdgeItemSemanticEditPolicy());
@@ -57,30 +54,26 @@ public class PlanEdgeEditPart extends ConnectionNodeEditPart implements
 	 * @generated
 	 */
 
-	protected Connection createConnectionFigure()
-	{
+	protected Connection createConnectionFigure() {
 		return new PlanEdgeFigure();
 	}
 
 	/**
 	 * @generated
 	 */
-	public PlanEdgeFigure getPrimaryShape()
-	{
+	public PlanEdgeFigure getPrimaryShape() {
 		return (PlanEdgeFigure) getFigure();
 	}
 
 	/**
 	 * @generated
 	 */
-	public class PlanEdgeFigure extends PolylineConnectionEx
-	{
+	public class PlanEdgeFigure extends PolylineConnectionEx {
 
 		/**
 		 * @generated
 		 */
-		public PlanEdgeFigure()
-		{
+		public PlanEdgeFigure() {
 			this.setLineWidth(1);
 			this.setLineStyle(Graphics.LINE_DASH);
 			this.setForegroundColor(ColorConstants.lightGray);

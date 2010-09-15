@@ -16,6 +16,7 @@ import jadex.tools.gpmn.diagram.ui.AbstractGpmnFigure;
 
 import org.eclipse.draw2d.ColorConstants;
 import org.eclipse.draw2d.Figure;
+import org.eclipse.draw2d.FigureUtilities;
 import org.eclipse.draw2d.Graphics;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.Shape;
@@ -60,8 +61,7 @@ public class GpmnShapePainter
 	public static void paintCenteredString(Graphics graphics, Rectangle rect, String s)
 	{
 		Point center = rect.getCenter();
-
-		double startX = center.x - graphics.getFontMetrics().getAverageCharWidth() * s.length()/2;
+		double startX = center.x - FigureUtilities.getTextWidth(s, graphics.getFont())/2;
 		double startY = center.y - graphics.getFontMetrics().getAscent()/2;
 		PrecisionPoint pp = new PrecisionPoint(startX, startY);
 		

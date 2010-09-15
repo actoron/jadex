@@ -25,48 +25,40 @@ import org.eclipse.ui.PlatformUI;
 /**
  * @generated
  */
-public class GpmnDiagramUpdateCommand implements IHandler
-{
+public class GpmnDiagramUpdateCommand implements IHandler {
 
 	/**
 	 * @generated
 	 */
-	public void addHandlerListener(IHandlerListener handlerListener)
-	{
+	public void addHandlerListener(IHandlerListener handlerListener) {
 	}
 
 	/**
 	 * @generated
 	 */
-	public void dispose()
-	{
+	public void dispose() {
 	}
 
 	/**
 	 * @generated
 	 */
-	public Object execute(ExecutionEvent event) throws ExecutionException
-	{
+	public Object execute(ExecutionEvent event) throws ExecutionException {
 		ISelection selection = PlatformUI.getWorkbench()
 				.getActiveWorkbenchWindow().getSelectionService()
 				.getSelection();
-		if (selection instanceof IStructuredSelection)
-		{
+		if (selection instanceof IStructuredSelection) {
 			IStructuredSelection structuredSelection = (IStructuredSelection) selection;
-			if (structuredSelection.size() != 1)
-			{
+			if (structuredSelection.size() != 1) {
 				return null;
 			}
 			if (structuredSelection.getFirstElement() instanceof EditPart
 					&& ((EditPart) structuredSelection.getFirstElement())
-							.getModel() instanceof View)
-			{
+							.getModel() instanceof View) {
 				EObject modelElement = ((View) ((EditPart) structuredSelection
 						.getFirstElement()).getModel()).getElement();
 				List editPolicies = CanonicalEditPolicy
 						.getRegisteredEditPolicies(modelElement);
-				for (Iterator it = editPolicies.iterator(); it.hasNext();)
-				{
+				for (Iterator it = editPolicies.iterator(); it.hasNext();) {
 					CanonicalEditPolicy nextEditPolicy = (CanonicalEditPolicy) it
 							.next();
 					nextEditPolicy.refresh();
@@ -80,24 +72,21 @@ public class GpmnDiagramUpdateCommand implements IHandler
 	/**
 	 * @generated
 	 */
-	public boolean isEnabled()
-	{
+	public boolean isEnabled() {
 		return true;
 	}
 
 	/**
 	 * @generated
 	 */
-	public boolean isHandled()
-	{
+	public boolean isHandled() {
 		return true;
 	}
 
 	/**
 	 * @generated
 	 */
-	public void removeHandlerListener(IHandlerListener handlerListener)
-	{
+	public void removeHandlerListener(IHandlerListener handlerListener) {
 	}
 
 }

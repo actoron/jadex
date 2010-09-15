@@ -56,8 +56,7 @@ public class GpmnXMLProcessor extends XMLProcessor
 	@Override
 	protected Map<String, Resource.Factory> getRegistrations()
 	{
-		if (registrations == null)
-		{
+		if (registrations == null) {
 			super.getRegistrations();
 			registrations.put(XML_EXTENSION, new GpmnResourceFactoryImpl());
 			registrations.put(STAR_EXTENSION, new GpmnResourceFactoryImpl());

@@ -67,8 +67,7 @@ public class AbstractNodeItemProvider extends IdentifiableItemProvider
 	@Override
 	public List<IItemPropertyDescriptor> getPropertyDescriptors(Object object)
 	{
-		if (itemPropertyDescriptors == null)
-		{
+		if (itemPropertyDescriptors == null) {
 			super.getPropertyDescriptors(object);
 
 			addDescriptionPropertyDescriptor(object);
@@ -135,8 +134,7 @@ public class AbstractNodeItemProvider extends IdentifiableItemProvider
 	public Collection<? extends EStructuralFeature> getChildrenFeatures(
 			Object object)
 	{
-		if (childrenFeatures == null)
-		{
+		if (childrenFeatures == null) {
 			super.getChildrenFeatures(object);
 			childrenFeatures.add(GpmnPackage.Literals.ABSTRACT_NODE__PARAMETER);
 		}
@@ -184,8 +182,7 @@ public class AbstractNodeItemProvider extends IdentifiableItemProvider
 	{
 		updateChildren(notification);
 
-		switch (notification.getFeatureID(AbstractNode.class))
-		{
+		switch (notification.getFeatureID(AbstractNode.class)) {
 			case GpmnPackage.ABSTRACT_NODE__DESCRIPTION:
 			case GpmnPackage.ABSTRACT_NODE__NAME:
 			case GpmnPackage.ABSTRACT_NODE__NCNAME:

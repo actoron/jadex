@@ -65,11 +65,11 @@ public class SubProcessItemProvider extends AbstractNodeItemProvider implements
 	@Override
 	public List<IItemPropertyDescriptor> getPropertyDescriptors(Object object)
 	{
-		if (itemPropertyDescriptors == null)
-		{
+		if (itemPropertyDescriptors == null) {
 			super.getPropertyDescriptors(object);
 
 			addProcessrefPropertyDescriptor(object);
+			addInternalPropertyDescriptor(object);
 		}
 		return itemPropertyDescriptors;
 	}
@@ -94,6 +94,28 @@ public class SubProcessItemProvider extends AbstractNodeItemProvider implements
 				 false,
 				 ItemPropertyDescriptor.GENERIC_VALUE_IMAGE,
 				 getString("_UI_DefaultPropertyCategory"), //$NON-NLS-1$
+				 null));
+	}
+
+	/**
+	 * This adds a property descriptor for the Internal feature.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected void addInternalPropertyDescriptor(Object object) {
+		itemPropertyDescriptors.add
+			(createItemPropertyDescriptor
+				(((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
+				 getResourceLocator(),
+				 getString("_UI_SubProcess_internal_feature"), //$NON-NLS-1$
+				 getString("_UI_PropertyDescriptor_description", "_UI_SubProcess_internal_feature", "_UI_SubProcess_type"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				 GpmnPackage.Literals.SUB_PROCESS__INTERNAL,
+				 true,
+				 false,
+				 false,
+				 ItemPropertyDescriptor.BOOLEAN_VALUE_IMAGE,
+				 null,
 				 null));
 	}
 
@@ -136,9 +158,9 @@ public class SubProcessItemProvider extends AbstractNodeItemProvider implements
 	{
 		updateChildren(notification);
 
-		switch (notification.getFeatureID(SubProcess.class))
-		{
+		switch (notification.getFeatureID(SubProcess.class)) {
 			case GpmnPackage.SUB_PROCESS__PROCESSREF:
+			case GpmnPackage.SUB_PROCESS__INTERNAL:
 				fireNotifyChanged(new ViewerNotification(notification, notification.getNotifier(), false, true));
 				return;
 		}

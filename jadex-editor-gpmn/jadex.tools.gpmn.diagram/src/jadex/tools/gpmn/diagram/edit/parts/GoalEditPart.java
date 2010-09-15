@@ -65,8 +65,7 @@ import org.eclipse.swt.widgets.Display;
 /**
  * @generated
  */
-public class GoalEditPart extends ShapeNodeEditPart
-{
+public class GoalEditPart extends ShapeNodeEditPart {
 
 	/**
 	 * @generated
@@ -86,16 +85,14 @@ public class GoalEditPart extends ShapeNodeEditPart
 	/**
 	 * @generated
 	 */
-	public GoalEditPart(View view)
-	{
+	public GoalEditPart(View view) {
 		super(view);
 	}
 
 	/**
 	 * @generated
 	 */
-	protected void createDefaultEditPoliciesGen()
-	{
+	protected void createDefaultEditPoliciesGen() {
 		super.createDefaultEditPolicies();
 		installEditPolicy(EditPolicyRoles.SEMANTIC_ROLE,
 				new GoalItemSemanticEditPolicy());
@@ -108,8 +105,7 @@ public class GoalEditPart extends ShapeNodeEditPart
 	 * Ability to override EditPolicies.
 	 * @generated NOT, use custom edit policies
 	 */
-	protected void createDefaultEditPolicies()
-	{
+	protected void createDefaultEditPolicies() {
 		this.createDefaultEditPoliciesGen();
 
 		// use custom connection handle and tool
@@ -121,29 +117,23 @@ public class GoalEditPart extends ShapeNodeEditPart
 	/**
 	 * @generated
 	 */
-	protected LayoutEditPolicy createLayoutEditPolicy()
-	{
-		LayoutEditPolicy lep = new LayoutEditPolicy()
-		{
+	protected LayoutEditPolicy createLayoutEditPolicy() {
+		LayoutEditPolicy lep = new LayoutEditPolicy() {
 
-			protected EditPolicy createChildEditPolicy(EditPart child)
-			{
+			protected EditPolicy createChildEditPolicy(EditPart child) {
 				EditPolicy result = child
 						.getEditPolicy(EditPolicy.PRIMARY_DRAG_ROLE);
-				if (result == null)
-				{
+				if (result == null) {
 					result = new NonResizableEditPolicy();
 				}
 				return result;
 			}
 
-			protected Command getMoveChildrenCommand(Request request)
-			{
+			protected Command getMoveChildrenCommand(Request request) {
 				return null;
 			}
 
-			protected Command getCreateCommand(CreateRequest request)
-			{
+			protected Command getCreateCommand(CreateRequest request) {
 				return null;
 			}
 		};
@@ -153,8 +143,7 @@ public class GoalEditPart extends ShapeNodeEditPart
 	/**
 	 * @generated
 	 */
-	protected IFigure createNodeShape()
-	{
+	protected IFigure createNodeShape() {
 		GoalFigure figure = new GoalFigure();
 		return primaryShape = figure;
 	}
@@ -162,20 +151,18 @@ public class GoalEditPart extends ShapeNodeEditPart
 	/**
 	 * @generated
 	 */
-	public GoalFigure getPrimaryShape()
-	{
+	public GoalFigure getPrimaryShape() {
 		return (GoalFigure) primaryShape;
 	}
 
-	
 	/**
 	 * @generated NOT
 	 */
-	public void refreshModes()
-	{
+	public void refreshModes() {
 		Set modes = new HashSet();
-		
-		List<PlanEdge> edges = ((Goal) getNotationView().getElement()).getPlanEdges();
+
+		List<PlanEdge> edges = ((Goal) getNotationView().getElement())
+				.getPlanEdges();
 		for (PlanEdge edge : edges)
 			if (edge.getTarget() instanceof ActivationPlan)
 				modes.add(((ActivationPlan) edge.getTarget()).getMode());
@@ -190,12 +177,13 @@ public class GoalEditPart extends ShapeNodeEditPart
 			default:
 				((jadex.tools.gpmn.diagram.ui.figures.GoalFigure) primaryShape).setModeType(jadex.tools.gpmn.diagram.ui.figures.GoalFigure.MODE_TYPE_MIXED);
 		}*/
-		
-		((jadex.tools.gpmn.diagram.ui.figures.GoalFigure) primaryShape).setModeTypes(modes);
-		
+
+		((jadex.tools.gpmn.diagram.ui.figures.GoalFigure) primaryShape)
+				.setModeTypes(modes);
+
 		primaryShape.invalidate();
 		primaryShape.repaint();
-		
+
 		//return modes;
 	}
 
@@ -205,8 +193,7 @@ public class GoalEditPart extends ShapeNodeEditPart
 	 * @param shape
 	 * @generated NOT
 	 */
-	private void setGoalTypeAndLabel(GoalFigure shape)
-	{
+	private void setGoalTypeAndLabel(GoalFigure shape) {
 
 		Goal goal = (Goal) getPrimaryView().getElement();
 		shape.setGoalType(goal.getGoalType().getLiteral());
@@ -217,8 +204,7 @@ public class GoalEditPart extends ShapeNodeEditPart
 		wl.setTextJustification(PositionConstants.CENTER);
 
 		// update name label
-		if (goal.getName() == null)
-		{
+		if (goal.getName() == null) {
 			/*if (!goal.getGoalType().getLiteral().equals(wl.getText()))
 			{
 				wl.setText(goal.getGoalType().getLiteral());
@@ -232,10 +218,8 @@ public class GoalEditPart extends ShapeNodeEditPart
 	/**
 	 * @generated
 	 */
-	protected boolean addFixedChild(EditPart childEditPart)
-	{
-		if (childEditPart instanceof GoalNameEditPart)
-		{
+	protected boolean addFixedChild(EditPart childEditPart) {
+		if (childEditPart instanceof GoalNameEditPart) {
 			((GoalNameEditPart) childEditPart).setLabel(getPrimaryShape()
 					.getFigureGoalNameFigure());
 			return true;
@@ -246,10 +230,8 @@ public class GoalEditPart extends ShapeNodeEditPart
 	/**
 	 * @generated
 	 */
-	protected boolean removeFixedChild(EditPart childEditPart)
-	{
-		if (childEditPart instanceof GoalNameEditPart)
-		{
+	protected boolean removeFixedChild(EditPart childEditPart) {
+		if (childEditPart instanceof GoalNameEditPart) {
 			return true;
 		}
 		return false;
@@ -258,10 +240,8 @@ public class GoalEditPart extends ShapeNodeEditPart
 	/**
 	 * @generated
 	 */
-	protected void addChildVisual(EditPart childEditPart, int index)
-	{
-		if (addFixedChild(childEditPart))
-		{
+	protected void addChildVisual(EditPart childEditPart, int index) {
+		if (addFixedChild(childEditPart)) {
 			return;
 		}
 		super.addChildVisual(childEditPart, -1);
@@ -270,10 +250,8 @@ public class GoalEditPart extends ShapeNodeEditPart
 	/**
 	 * @generated
 	 */
-	protected void removeChildVisual(EditPart childEditPart)
-	{
-		if (removeFixedChild(childEditPart))
-		{
+	protected void removeChildVisual(EditPart childEditPart) {
+		if (removeFixedChild(childEditPart)) {
 			return;
 		}
 		super.removeChildVisual(childEditPart);
@@ -282,16 +260,14 @@ public class GoalEditPart extends ShapeNodeEditPart
 	/**
 	 * @generated
 	 */
-	protected IFigure getContentPaneFor(IGraphicalEditPart editPart)
-	{
+	protected IFigure getContentPaneFor(IGraphicalEditPart editPart) {
 		return getContentPane();
 	}
 
 	/**
 	 * @generated
 	 */
-	protected NodeFigure createNodePlate()
-	{
+	protected NodeFigure createNodePlate() {
 		DefaultSizeNodeFigure result = new DefaultSizeNodeFigure(40, 40);
 		return result;
 	}
@@ -304,8 +280,7 @@ public class GoalEditPart extends ShapeNodeEditPart
 	 * 
 	 * @generated NOT, configure shape
 	 */
-	protected NodeFigure createNodeFigure()
-	{
+	protected NodeFigure createNodeFigure() {
 		NodeFigure figure = createNodePlate();
 		figure.setLayoutManager(new StackLayout());
 		IFigure shape = createNodeShape();
@@ -324,10 +299,8 @@ public class GoalEditPart extends ShapeNodeEditPart
 	 * @param nodeShape instance of generated figure class
 	 * @generated
 	 */
-	protected IFigure setupContentPane(IFigure nodeShape)
-	{
-		if (nodeShape.getLayoutManager() == null)
-		{
+	protected IFigure setupContentPane(IFigure nodeShape) {
+		if (nodeShape.getLayoutManager() == null) {
 			ConstrainedToolbarLayout layout = new ConstrainedToolbarLayout();
 			layout.setSpacing(5);
 			nodeShape.setLayoutManager(layout);
@@ -338,10 +311,8 @@ public class GoalEditPart extends ShapeNodeEditPart
 	/**
 	 * @generated
 	 */
-	public IFigure getContentPane()
-	{
-		if (contentPane != null)
-		{
+	public IFigure getContentPane() {
+		if (contentPane != null) {
 			return contentPane;
 		}
 		return super.getContentPane();
@@ -350,10 +321,8 @@ public class GoalEditPart extends ShapeNodeEditPart
 	/**
 	 * @generated
 	 */
-	protected void setForegroundColor(Color color)
-	{
-		if (primaryShape != null)
-		{
+	protected void setForegroundColor(Color color) {
+		if (primaryShape != null) {
 			primaryShape.setForegroundColor(color);
 		}
 	}
@@ -361,10 +330,8 @@ public class GoalEditPart extends ShapeNodeEditPart
 	/**
 	 * @generated
 	 */
-	protected void setBackgroundColor(Color color)
-	{
-		if (primaryShape != null)
-		{
+	protected void setBackgroundColor(Color color) {
+		if (primaryShape != null) {
 			primaryShape.setBackgroundColor(color);
 		}
 	}
@@ -372,10 +339,8 @@ public class GoalEditPart extends ShapeNodeEditPart
 	/**
 	 * @generated
 	 */
-	protected void setLineWidth(int width)
-	{
-		if (primaryShape instanceof Shape)
-		{
+	protected void setLineWidth(int width) {
+		if (primaryShape instanceof Shape) {
 			((Shape) primaryShape).setLineWidth(width);
 		}
 	}
@@ -383,10 +348,8 @@ public class GoalEditPart extends ShapeNodeEditPart
 	/**
 	 * @generated
 	 */
-	protected void setLineType(int style)
-	{
-		if (primaryShape instanceof Shape)
-		{
+	protected void setLineType(int style) {
+		if (primaryShape instanceof Shape) {
 			((Shape) primaryShape).setLineStyle(style);
 		}
 	}
@@ -394,8 +357,7 @@ public class GoalEditPart extends ShapeNodeEditPart
 	/**
 	 * @generated
 	 */
-	public EditPart getPrimaryChildEditPart()
-	{
+	public EditPart getPrimaryChildEditPart() {
 		return getChildBySemanticHint(GpmnVisualIDRegistry
 				.getType(GoalNameEditPart.VISUAL_ID));
 	}
@@ -403,8 +365,7 @@ public class GoalEditPart extends ShapeNodeEditPart
 	/**
 	 * @generated
 	 */
-	public List/*<org.eclipse.gmf.runtime.emf.type.core.IElementType>*/getMARelTypesOnSource()
-	{
+	public List/*<org.eclipse.gmf.runtime.emf.type.core.IElementType>*/getMARelTypesOnSource() {
 		List/*<org.eclipse.gmf.runtime.emf.type.core.IElementType>*/types = new ArrayList/*<org.eclipse.gmf.runtime.emf.type.core.IElementType>*/();
 		types.add(GpmnElementTypes.PlanEdge_4002);
 		types.add(GpmnElementTypes.SuppressionEdge_4004);
@@ -415,19 +376,15 @@ public class GoalEditPart extends ShapeNodeEditPart
 	 * @generated
 	 */
 	public List/*<org.eclipse.gmf.runtime.emf.type.core.IElementType>*/getMARelTypesOnSourceAndTarget(
-			IGraphicalEditPart targetEditPart)
-	{
+			IGraphicalEditPart targetEditPart) {
 		List/*<org.eclipse.gmf.runtime.emf.type.core.IElementType>*/types = new ArrayList/*<org.eclipse.gmf.runtime.emf.type.core.IElementType>*/();
-		if (targetEditPart instanceof ActivationPlanEditPart)
-		{
+		if (targetEditPart instanceof ActivationPlanEditPart) {
 			types.add(GpmnElementTypes.PlanEdge_4002);
 		}
-		if (targetEditPart instanceof BpmnPlanEditPart)
-		{
+		if (targetEditPart instanceof BpmnPlanEditPart) {
 			types.add(GpmnElementTypes.PlanEdge_4002);
 		}
-		if (targetEditPart instanceof jadex.tools.gpmn.diagram.edit.parts.GoalEditPart)
-		{
+		if (targetEditPart instanceof jadex.tools.gpmn.diagram.edit.parts.GoalEditPart) {
 			types.add(GpmnElementTypes.SuppressionEdge_4004);
 		}
 		return types;
@@ -437,19 +394,15 @@ public class GoalEditPart extends ShapeNodeEditPart
 	 * @generated
 	 */
 	public List/*<org.eclipse.gmf.runtime.emf.type.core.IElementType>*/getMATypesForTarget(
-			IElementType relationshipType)
-	{
+			IElementType relationshipType) {
 		List/*<org.eclipse.gmf.runtime.emf.type.core.IElementType>*/types = new ArrayList/*<org.eclipse.gmf.runtime.emf.type.core.IElementType>*/();
-		if (relationshipType == GpmnElementTypes.PlanEdge_4002)
-		{
+		if (relationshipType == GpmnElementTypes.PlanEdge_4002) {
 			types.add(GpmnElementTypes.ActivationPlan_2001);
 		}
-		if (relationshipType == GpmnElementTypes.PlanEdge_4002)
-		{
+		if (relationshipType == GpmnElementTypes.PlanEdge_4002) {
 			types.add(GpmnElementTypes.BpmnPlan_2003);
 		}
-		if (relationshipType == GpmnElementTypes.SuppressionEdge_4004)
-		{
+		if (relationshipType == GpmnElementTypes.SuppressionEdge_4004) {
 			types.add(GpmnElementTypes.Goal_2004);
 		}
 		return types;
@@ -458,8 +411,7 @@ public class GoalEditPart extends ShapeNodeEditPart
 	/**
 	 * @generated
 	 */
-	public List/*<org.eclipse.gmf.runtime.emf.type.core.IElementType>*/getMARelTypesOnTarget()
-	{
+	public List/*<org.eclipse.gmf.runtime.emf.type.core.IElementType>*/getMARelTypesOnTarget() {
 		List/*<org.eclipse.gmf.runtime.emf.type.core.IElementType>*/types = new ArrayList/*<org.eclipse.gmf.runtime.emf.type.core.IElementType>*/();
 		types.add(GpmnElementTypes.ActivationEdge_4001);
 		types.add(GpmnElementTypes.SuppressionEdge_4004);
@@ -470,15 +422,12 @@ public class GoalEditPart extends ShapeNodeEditPart
 	 * @generated
 	 */
 	public List/*<org.eclipse.gmf.runtime.emf.type.core.IElementType>*/getMATypesForSource(
-			IElementType relationshipType)
-	{
+			IElementType relationshipType) {
 		List/*<org.eclipse.gmf.runtime.emf.type.core.IElementType>*/types = new ArrayList/*<org.eclipse.gmf.runtime.emf.type.core.IElementType>*/();
-		if (relationshipType == GpmnElementTypes.ActivationEdge_4001)
-		{
+		if (relationshipType == GpmnElementTypes.ActivationEdge_4001) {
 			types.add(GpmnElementTypes.ActivationPlan_2001);
 		}
-		if (relationshipType == GpmnElementTypes.SuppressionEdge_4004)
-		{
+		if (relationshipType == GpmnElementTypes.SuppressionEdge_4004) {
 			types.add(GpmnElementTypes.Goal_2004);
 		}
 		return types;
@@ -488,14 +437,13 @@ public class GoalEditPart extends ShapeNodeEditPart
 	 * @generated NOT
 	 */
 	public ConnectionAnchor getSourceConnectionAnchor(
-			ConnectionEditPart connEditPart)
-	{
-		ConnectionAnchor anchor = new SlidableOvalAnchor((IOvalAnchorableFigure) primaryShape)
-		{
+			ConnectionEditPart connEditPart) {
+		ConnectionAnchor anchor = new SlidableOvalAnchor(
+				(IOvalAnchorableFigure) primaryShape) {
 			@Override
-			protected Rectangle getBox()
-			{
-				PrecisionRectangle box = new PrecisionRectangle(((IOvalAnchorableFigure) getOwner()).getOvalBounds());
+			protected Rectangle getBox() {
+				PrecisionRectangle box = new PrecisionRectangle(
+						((IOvalAnchorableFigure) getOwner()).getOvalBounds());
 				box.preciseX = box.preciseX - 1.0;
 				box.preciseY = box.preciseY - 1.0;
 				box.preciseWidth += 2;
@@ -511,30 +459,23 @@ public class GoalEditPart extends ShapeNodeEditPart
 	 * @generated NOT
 	 */
 	public ConnectionAnchor getTargetConnectionAnchor(
-			ConnectionEditPart connEditPart)
-	{
+			ConnectionEditPart connEditPart) {
 		return getSourceConnectionAnchor(connEditPart);
 	}
-	
-	
-	
 
 	/**
 	 * @generated NOT
 	 */
-	protected void handleNotificationEvent(Notification notification)
-	{
+	protected void handleNotificationEvent(Notification notification) {
 		if (notification.getEventType() == Notification.SET
-				|| notification.getEventType() == Notification.UNSET)
-		{
+				|| notification.getEventType() == Notification.UNSET) {
 			if (GpmnPackage.eINSTANCE.getGoal_GoalType().equals(
-					notification.getFeature()))
-			{
+					notification.getFeature())) {
 				getPrimaryShape().setGoalType(notification.getNewStringValue());
 			}
 
 		}
-		
+
 		/*if (notification.getEventType() == Notification.ADD
 				|| notification.getEventType() == Notification.REMOVE)
 		{
@@ -556,8 +497,7 @@ public class GoalEditPart extends ShapeNodeEditPart
 	 * @generated
 	 */
 	public class GoalFigure extends
-			jadex.tools.gpmn.diagram.ui.figures.GoalFigure
-	{
+			jadex.tools.gpmn.diagram.ui.figures.GoalFigure {
 
 		/**
 		 * @generated
@@ -567,8 +507,7 @@ public class GoalEditPart extends ShapeNodeEditPart
 		/**
 		 * @generated
 		 */
-		public GoalFigure()
-		{
+		public GoalFigure() {
 
 			GridLayout layoutThis = new GridLayout();
 			layoutThis.numColumns = 1;
@@ -584,8 +523,7 @@ public class GoalEditPart extends ShapeNodeEditPart
 		/**
 		 * @generated
 		 */
-		private void createContents()
-		{
+		private void createContents() {
 
 			fFigureGoalNameFigure = new WrappingLabel();
 			fFigureGoalNameFigure.setText("Goal");
@@ -610,24 +548,21 @@ public class GoalEditPart extends ShapeNodeEditPart
 		/**
 		 * @generated
 		 */
-		protected boolean useLocalCoordinates()
-		{
+		protected boolean useLocalCoordinates() {
 			return myUseLocalCoordinates;
 		}
 
 		/**
 		 * @generated
 		 */
-		protected void setUseLocalCoordinates(boolean useLocalCoordinates)
-		{
+		protected void setUseLocalCoordinates(boolean useLocalCoordinates) {
 			myUseLocalCoordinates = useLocalCoordinates;
 		}
 
 		/**
 		 * @generated
 		 */
-		public WrappingLabel getFigureGoalNameFigure()
-		{
+		public WrappingLabel getFigureGoalNameFigure() {
 			return fFigureGoalNameFigure;
 		}
 

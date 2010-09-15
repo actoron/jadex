@@ -67,8 +67,7 @@ public class ParameterItemProvider extends EModelElementItemProvider implements
 	@Override
 	public List<IItemPropertyDescriptor> getPropertyDescriptors(Object object)
 	{
-		if (itemPropertyDescriptors == null)
-		{
+		if (itemPropertyDescriptors == null) {
 			super.getPropertyDescriptors(object);
 
 			addValuePropertyDescriptor(object);
@@ -210,8 +209,7 @@ public class ParameterItemProvider extends EModelElementItemProvider implements
 	{
 		updateChildren(notification);
 
-		switch (notification.getFeatureID(Parameter.class))
-		{
+		switch (notification.getFeatureID(Parameter.class)) {
 			case GpmnPackage.PARAMETER__VALUE:
 			case GpmnPackage.PARAMETER__DIRECTION:
 			case GpmnPackage.PARAMETER__NAME:

@@ -26,64 +26,60 @@ import org.eclipse.swt.widgets.Text;
 /**
  * @generated
  */
-public class GpmnEditPartFactory implements EditPartFactory
-{
+public class GpmnEditPartFactory implements EditPartFactory {
 
 	/**
 	 * @generated
 	 */
-	public EditPart createEditPart(EditPart context, Object model)
-	{
-		if (model instanceof View)
-		{
+	public EditPart createEditPart(EditPart context, Object model) {
+		if (model instanceof View) {
 			View view = (View) model;
-			switch (GpmnVisualIDRegistry.getVisualID(view))
-			{
+			switch (GpmnVisualIDRegistry.getVisualID(view)) {
 
-				case GpmnDiagramEditPart.VISUAL_ID:
-					return new GpmnDiagramEditPart(view);
+			case GpmnDiagramEditPart.VISUAL_ID:
+				return new GpmnDiagramEditPart(view);
 
-				case ActivationPlanEditPart.VISUAL_ID:
-					return new ActivationPlanEditPart(view);
+			case ActivationPlanEditPart.VISUAL_ID:
+				return new ActivationPlanEditPart(view);
 
-				case ActivationPlanNameEditPart.VISUAL_ID:
-					return new ActivationPlanNameEditPart(view);
+			case ActivationPlanNameEditPart.VISUAL_ID:
+				return new ActivationPlanNameEditPart(view);
 
-				case SubProcessEditPart.VISUAL_ID:
-					return new SubProcessEditPart(view);
+			case SubProcessEditPart.VISUAL_ID:
+				return new SubProcessEditPart(view);
 
-				case SubProcessNameEditPart.VISUAL_ID:
-					return new SubProcessNameEditPart(view);
+			case SubProcessNameEditPart.VISUAL_ID:
+				return new SubProcessNameEditPart(view);
 
-				case BpmnPlanEditPart.VISUAL_ID:
-					return new BpmnPlanEditPart(view);
+			case BpmnPlanEditPart.VISUAL_ID:
+				return new BpmnPlanEditPart(view);
 
-				case BpmnPlanNameEditPart.VISUAL_ID:
-					return new BpmnPlanNameEditPart(view);
+			case BpmnPlanNameEditPart.VISUAL_ID:
+				return new BpmnPlanNameEditPart(view);
 
-				case GoalEditPart.VISUAL_ID:
-					return new GoalEditPart(view);
+			case GoalEditPart.VISUAL_ID:
+				return new GoalEditPart(view);
 
-				case GoalNameEditPart.VISUAL_ID:
-					return new GoalNameEditPart(view);
+			case GoalNameEditPart.VISUAL_ID:
+				return new GoalNameEditPart(view);
 
-				case ActivationEdgeEditPart.VISUAL_ID:
-					return new ActivationEdgeEditPart(view);
+			case ActivationEdgeEditPart.VISUAL_ID:
+				return new ActivationEdgeEditPart(view);
 
-				case ActivationEdgeOrderEditPart.VISUAL_ID:
-					return new ActivationEdgeOrderEditPart(view);
+			case ActivationEdgeOrderEditPart.VISUAL_ID:
+				return new ActivationEdgeOrderEditPart(view);
 
-				case PlanEdgeEditPart.VISUAL_ID:
-					return new PlanEdgeEditPart(view);
+			case PlanEdgeEditPart.VISUAL_ID:
+				return new PlanEdgeEditPart(view);
 
-				case SuppressionEdgeEditPart.VISUAL_ID:
-					return new SuppressionEdgeEditPart(view);
+			case SuppressionEdgeEditPart.VISUAL_ID:
+				return new SuppressionEdgeEditPart(view);
 
-				case VirtualActivationEdgeEditPart.VISUAL_ID:
-					return new VirtualActivationEdgeEditPart(view);
+			case VirtualActivationEdgeEditPart.VISUAL_ID:
+				return new VirtualActivationEdgeEditPart(view);
 
-				case VirtualActivationOrderEditPart.VISUAL_ID:
-					return new VirtualActivationOrderEditPart(view);
+			case VirtualActivationOrderEditPart.VISUAL_ID:
+				return new VirtualActivationOrderEditPart(view);
 
 			}
 		}
@@ -93,8 +89,7 @@ public class GpmnEditPartFactory implements EditPartFactory
 	/**
 	 * @generated
 	 */
-	private EditPart createUnrecognizedEditPart(EditPart context, Object model)
-	{
+	private EditPart createUnrecognizedEditPart(EditPart context, Object model) {
 		// Handle creation of unrecognized child node EditParts here
 		return null;
 	}
@@ -103,12 +98,10 @@ public class GpmnEditPartFactory implements EditPartFactory
 	 * @generated
 	 */
 	public static CellEditorLocator getTextCellEditorLocator(
-			ITextAwareEditPart source)
-	{
+			ITextAwareEditPart source) {
 		if (source.getFigure() instanceof WrappingLabel)
 			return new TextCellEditorLocator((WrappingLabel) source.getFigure());
-		else
-		{
+		else {
 			return new LabelCellEditorLocator((Label) source.getFigure());
 		}
 	}
@@ -116,8 +109,7 @@ public class GpmnEditPartFactory implements EditPartFactory
 	/**
 	 * @generated
 	 */
-	static private class TextCellEditorLocator implements CellEditorLocator
-	{
+	static private class TextCellEditorLocator implements CellEditorLocator {
 
 		/**
 		 * @generated
@@ -127,42 +119,35 @@ public class GpmnEditPartFactory implements EditPartFactory
 		/**
 		 * @generated
 		 */
-		public TextCellEditorLocator(WrappingLabel wrapLabel)
-		{
+		public TextCellEditorLocator(WrappingLabel wrapLabel) {
 			this.wrapLabel = wrapLabel;
 		}
 
 		/**
 		 * @generated
 		 */
-		public WrappingLabel getWrapLabel()
-		{
+		public WrappingLabel getWrapLabel() {
 			return wrapLabel;
 		}
 
 		/**
 		 * @generated
 		 */
-		public void relocate(CellEditor celleditor)
-		{
+		public void relocate(CellEditor celleditor) {
 			Text text = (Text) celleditor.getControl();
 			Rectangle rect = getWrapLabel().getTextBounds().getCopy();
 			getWrapLabel().translateToAbsolute(rect);
 			if (getWrapLabel().isTextWrapOn()
-					&& getWrapLabel().getText().length() > 0)
-			{
+					&& getWrapLabel().getText().length() > 0) {
 				rect.setSize(new Dimension(text.computeSize(rect.width,
 						SWT.DEFAULT)));
-			}
-			else
-			{
+			} else {
 				int avr = FigureUtilities.getFontMetrics(text.getFont())
 						.getAverageCharWidth();
 				rect.setSize(new Dimension(text.computeSize(SWT.DEFAULT,
 						SWT.DEFAULT)).expand(avr * 2, 0));
 			}
-			if (!rect.equals(new Rectangle(text.getBounds())))
-			{
+			if (!rect.equals(new Rectangle(text.getBounds()))) {
 				text.setBounds(rect.x, rect.y, rect.width, rect.height);
 			}
 		}
@@ -171,8 +156,7 @@ public class GpmnEditPartFactory implements EditPartFactory
 	/**
 	 * @generated
 	 */
-	private static class LabelCellEditorLocator implements CellEditorLocator
-	{
+	private static class LabelCellEditorLocator implements CellEditorLocator {
 
 		/**
 		 * @generated
@@ -182,24 +166,21 @@ public class GpmnEditPartFactory implements EditPartFactory
 		/**
 		 * @generated
 		 */
-		public LabelCellEditorLocator(Label label)
-		{
+		public LabelCellEditorLocator(Label label) {
 			this.label = label;
 		}
 
 		/**
 		 * @generated
 		 */
-		public Label getLabel()
-		{
+		public Label getLabel() {
 			return label;
 		}
 
 		/**
 		 * @generated
 		 */
-		public void relocate(CellEditor celleditor)
-		{
+		public void relocate(CellEditor celleditor) {
 			Text text = (Text) celleditor.getControl();
 			Rectangle rect = getLabel().getTextBounds().getCopy();
 			getLabel().translateToAbsolute(rect);
@@ -207,8 +188,7 @@ public class GpmnEditPartFactory implements EditPartFactory
 					.getAverageCharWidth();
 			rect.setSize(new Dimension(text.computeSize(SWT.DEFAULT,
 					SWT.DEFAULT)).expand(avr * 2, 0));
-			if (!rect.equals(new Rectangle(text.getBounds())))
-			{
+			if (!rect.equals(new Rectangle(text.getBounds()))) {
 				text.setBounds(rect.x, rect.y, rect.width, rect.height);
 			}
 		}

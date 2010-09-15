@@ -105,7 +105,7 @@ public class GpmnBDIConverter2
 				state.addAttributeValue(handle, OAVBDIMetaModel.capability_has_imports, imports[i]);
 			}
 		}
-		doConvert(model, classloader, state, handle);
+		doConvert(model, classloader, state, handle, false);
 		state.removeStateListener(listener);
 		agentmodel =  new OAVAgentModel(state, handle, types, model.getModelInfo().getFilename(), model.getLastModified());//, report);
 		try
@@ -123,10 +123,12 @@ public class GpmnBDIConverter2
 	/**
 	 *  Convert all aspects of a process.
 	 */
-	public void doConvert(MGpmnModel model, final ClassLoader classloader, final IOAVState state, final Object scopehandle)
+	public void doConvert(MGpmnModel model, final ClassLoader classloader, final IOAVState state, final Object scopehandle, boolean subprocess)
 	{		
 		// Handle package and imports here?!
 		// TODO:
+		
+		String modelname = model.getModelInfo().getFilename().substring(0, model.getModelInfo().getFilename().length() - 5);
 		
 		// Create default configuration
 		Object confighandle = state.createObject(OAVBDIMetaModel.configuration_type);
@@ -141,13 +143,15 @@ public class GpmnBDIConverter2
 			{
 				MContextElement element = (MContextElement)elements.get(i);
 				
+				String name = subprocess? modelname + "." + element.getName(): element.getName();
+				
 				if(!element.isSet())
 				{
-					createBelief(state, scopehandle, element.getName(), element.getType(), element.getValue());
+					createBelief(state, scopehandle, name, element.getType(), element.getValue());
 				}
 				else
 				{
-					createBeliefSet(state, scopehandle, element.getName(), element.getType(), null, element.getValue());
+					createBeliefSet(state, scopehandle, name, element.getType(), null, element.getValue());
 				}
 			}
 		}
@@ -207,10 +211,12 @@ public class GpmnBDIConverter2
 		for(Iterator it = model.getGoals().values().iterator(); it.hasNext(); )
 		{
 			MGoal goal = (MGoal)it.next();
+			String name = subprocess? modelname + "." + goal.getName(): goal.getName();
+			
 			OAVObjectType goaltype = MGoal.Types.ACHIEVE_GOAL.equals(goal.getGoalType())? OAVBDIMetaModel.achievegoal_type: 
 				MGoal.Types.MAINTAIN_GOAL.equals(goal.getGoalType())? OAVBDIMetaModel.maintaingoal_type:
 				MGoal.Types.PERFORM_GOAL.equals(goal.getGoalType())? OAVBDIMetaModel.performgoal_type: null;
-			Object goalhandle = createGoal(state, scopehandle, goal.getName(), goaltype, goal.getRetry(), 
+			Object goalhandle = createGoal(state, scopehandle, name, goaltype, goal.getRetry(), 
 				goal.getRetryDelay(), goal.getRecur(), goal.getRecurDelay(), goal.getExcludeMode(), 
 				goal.getRetry(), goal.getUnique(), goal.getCreationCondition(), goal.getContextCondition(), 
 				goal.getDropCondition());
@@ -236,7 +242,7 @@ public class GpmnBDIConverter2
 				for(Iterator it2 = activationplans.iterator(); it2.hasNext(); )
 				{
 					MActivationPlan plan = (MActivationPlan) it2.next();
-					String name = "ActivationPlan_Goal:"+goal.getName()+"_"+String.valueOf(plan.getName());
+					String actName = "ActivationPlan_Goal:"+name+"_"+String.valueOf(plan.getName());
 					boolean seq = MActivationPlan.Modes.SEQUENTIAL.equals(plan.getMode());
 						
 					List activationedges = (List) planactivationedges.get(plan.getId());
@@ -257,26 +263,63 @@ public class GpmnBDIConverter2
 					// Create plan
 					// TODO: Handle orphaned activation plans
 					Object planhandle = seq
-						? createPlan(scopehandle, state, name, "jadex.gpmn.runtime.plan.SequentialGoalExecutionPlan", null, null, "bpmn")
-						: createPlan(scopehandle, state, name, "jadex.gpmn.runtime.plan.ParallelGoalExecutionPlan", null, null, "bpmn");
+						? createPlan(scopehandle, state, actName, "jadex.gpmn.runtime.plan.SequentialGoalExecutionPlan", null, null, "bpmn")
+						: createPlan(scopehandle, state, actName, "jadex.gpmn.runtime.plan.ParallelGoalExecutionPlan", null, null, "bpmn");
 					
 					// Create trigger
-					createPlanTrigger(planhandle, state, new String[]{goal.getName()}, null, null);
+					createPlanTrigger(planhandle, state, new String[]{name}, null, null);
 					
 					// Create subgoals parameter set
 					// TODO: Support Subprocesses
-					String[] activationtargets = new String[activationedges.size()];
+					List activationtargets = new ArrayList();
 					for(int j=0; j<activationedges.size(); j++)
 					{
 						MActivationEdge edge = (MActivationEdge)activationedges.get(j);
 						if (model.getGoals().containsKey(edge.getTargetId()))
-							activationtargets[j] = "new jadex.gpmn.runtime.plan.ActivationTarget(jadex.gpmn.runtime.plan.ActivationTarget.Types.GOAL,"+"\""+
-									((MGoal) model.getGoals().get(edge.getTargetId())).getName()+"\")";
+							activationtargets.add("new jadex.gpmn.runtime.plan.ActivationTarget(jadex.gpmn.runtime.plan.ActivationTarget.Types.GOAL,"+"\""+
+									((MGoal) model.getGoals().get(edge.getTargetId())).getName()+"\")");
 						else
-							activationtargets[j] = "new jadex.gpmn.runtime.plan.ActivationTarget(jadex.gpmn.runtime.plan.ActivationTarget.Types.SUBPROCESS,"+"\""+
-									((MSubprocess) model.getSubprocesses().get(edge.getTargetId())).getName()+"\")";
+						{
+							MSubprocess sprocess = (MSubprocess) model.getSubprocesses().get(edge.getTargetId());
+							if (sprocess.isInternal())
+							{
+								GpmnModelLoader loader = new GpmnModelLoader();
+								MGpmnModel submodel = null;
+								try
+								{
+									submodel = (MGpmnModel) loader.loadModel(sprocess.getProcessReference(), null, classloader);
+								}
+								catch (Exception e)
+								{
+									throw new RuntimeException(e);
+								}
+								
+								// TODO: Catch multiple subprocess instances
+								doConvert(submodel, classloader, state, scopehandle, true);
+								
+								Set subacttargets = new HashSet();
+								for (Iterator it3 = submodel.getActivationEdges().iterator(); it3.hasNext(); )
+									subacttargets.add(((MActivationEdge) it3.next()).getTargetId());
+								
+								Set subtargets = (new HashSet(submodel.getGoals().keySet()));
+								subtargets.removeAll(subacttargets);
+								
+								String submodelname = submodel.getModelInfo().getFilename().substring(0, model.getModelInfo().getFilename().length() - 5);
+								for (Iterator it3 = subtargets.iterator(); it3.hasNext(); )
+								{
+									MGoal subprocgoal = (MGoal) submodel.getGoals().get(it3.next());
+									activationtargets.add("new jadex.gpmn.runtime.plan.ActivationTarget(jadex.gpmn.runtime.plan.ActivationTarget.Types.GOAL,"+"\""+
+											submodelname + "." + subprocgoal.getName()+"\")");
+								}
+							}
+							else
+							{
+								activationtargets.add("new jadex.gpmn.runtime.plan.ActivationTarget(jadex.gpmn.runtime.plan.ActivationTarget.Types.SUBPROCESS,"+"\""+
+									sprocess.getName()+"\")");
+							}
+						}
 					}
-					createParameterSet(planhandle, state, "activationtargets", "jadex.gpmn.runtime.plan.ActivationTarget", activationtargets, null, true);
+					createParameterSet(planhandle, state, "activationtargets", "jadex.gpmn.runtime.plan.ActivationTarget", (String[]) activationtargets.toArray(new String[0]), null, true);
 				}
 			}
 		}
@@ -286,56 +329,67 @@ public class GpmnBDIConverter2
 		for(Iterator it = bpmnplans.values().iterator(); it.hasNext(); )
 		{
 			MBpmnPlan plan = (MBpmnPlan)it.next();
-			Object planhandle = createPlan(scopehandle, state, plan.getName(), plan.getPlanref(), plan.getPreCondition(), plan.getContextCondition(), "bpmn");
+			String name = subprocess? modelname + "." + plan.getName(): plan.getName();
+			Object planhandle = createPlan(scopehandle, state, name, plan.getPlanref(), plan.getPreCondition(), plan.getContextCondition(), "bpmn");
 			List goalnames = new ArrayList();
 			List plangoals = (List)userplanmap.get(plan.getId());
 			// null check for orphaned plans
 			if (plangoals != null)
 				for (Iterator it2 = plangoals.iterator(); it2.hasNext(); )
-					goalnames.add(((MGoal) it2.next()).getName());
+				{
+					MGoal goal = (MGoal) it2.next();
+					String goalName = subprocess? modelname + "." + goal.getName(): goal.getName();
+					goalnames.add(goalName);
+				}
 			createPlanTrigger(planhandle, state, (String[])goalnames.toArray(new String[0]), null, null);
 		}
 		
-		// Create plan for starting/monitoring the process.
-		String planname = "startandmonitor_"+model.getModelInfo().getName();//.substring(0, proc.getName().indexOf("."));
-		Object planhandle = createPlan(scopehandle, state, planname, "jadex.gpmn.runtime.plan.StartAndMonitorProcessPlan", null, null, null);
-		
-		// Prepare activated elements set
 		Set activatedElements = new HashSet();
-		for (Iterator it=model.getActivationEdges().iterator(); it.hasNext(); )
-			activatedElements.add(((MActivationEdge)it.next()).getTargetId());
-		
-		// Create achieve_goals maintain_goals parameterset
-		List agoalnames = new ArrayList();
-		List mgoalnames = new ArrayList();
 		Collection goalhandles = state.getAttributeValues(scopehandle, OAVBDIMetaModel.capability_has_goals);
-		for(Iterator it=model.getGoals().values().iterator(); it.hasNext(); )
+		
+		if (!subprocess)
 		{
-			MGoal goal = (MGoal)it.next();
-			if(!activatedElements.contains(goal.getId()))
+			Object startplanhandle = null;
+			// Create plan for starting/monitoring the process.
+			String planname = "startandmonitor_"+model.getModelInfo().getName();//.substring(0, proc.getName().indexOf("."));
+			startplanhandle = createPlan(scopehandle, state, planname, "jadex.gpmn.runtime.plan.StartAndMonitorProcessPlan", null, null, null);
+			
+			// Prepare activated elements set
+			for (Iterator it=model.getActivationEdges().iterator(); it.hasNext(); )
+				activatedElements.add(((MActivationEdge)it.next()).getTargetId());
+		
+		
+			// Create achieve_goals maintain_goals parameterset
+			List agoalnames = new ArrayList();
+			List mgoalnames = new ArrayList();
+			for(Iterator it=model.getGoals().values().iterator(); it.hasNext(); )
 			{
-				Object goalhandle = state.getAttributeValue(scopehandle, OAVBDIMetaModel.capability_has_goals, goal.getName());
-				String goalname = (String)state.getAttributeValue(goalhandle, OAVBDIMetaModel.modelelement_has_name);
-				
-				if(state.getType(goalhandle).isSubtype(OAVBDIMetaModel.achievegoal_type))
+				MGoal goal = (MGoal)it.next();
+				if(!activatedElements.contains(goal.getId()))
 				{
-					agoalnames.add("\""+goalname+"\"");
-				}
-				else if(state.getType(goalhandle).isSubtype(OAVBDIMetaModel.maintaingoal_type))
-				{
-					mgoalnames.add("\""+goalname+"\"");
+					Object goalhandle = state.getAttributeValue(scopehandle, OAVBDIMetaModel.capability_has_goals, goal.getName());
+					String goalname = (String)state.getAttributeValue(goalhandle, OAVBDIMetaModel.modelelement_has_name);
+					
+					if(state.getType(goalhandle).isSubtype(OAVBDIMetaModel.achievegoal_type))
+					{
+						agoalnames.add("\""+goalname+"\"");
+					}
+					else if(state.getType(goalhandle).isSubtype(OAVBDIMetaModel.maintaingoal_type))
+					{
+						mgoalnames.add("\""+goalname+"\"");
+					}
 				}
 			}
+			createParameterSet(startplanhandle, state, "achieve_goals", "String", 
+				agoalnames.size()==0? null: (String[])agoalnames.toArray(new String[agoalnames.size()]), null, true);
+			createParameterSet(startplanhandle, state, "maintain_goals", "String", 
+				mgoalnames.size()==0? null: (String[])mgoalnames.toArray(new String[mgoalnames.size()]), null, true);
+			
+			// Make this plan the initial plan
+			Object iniplanhandle = state.createObject(OAVBDIMetaModel.configelement_type);
+			state.setAttributeValue(iniplanhandle, OAVBDIMetaModel.configelement_has_ref, planname);
+			state.addAttributeValue(confighandle, OAVBDIMetaModel.configuration_has_initialplans, iniplanhandle);
 		}
-		createParameterSet(planhandle, state, "achieve_goals", "String", 
-			agoalnames.size()==0? null: (String[])agoalnames.toArray(new String[agoalnames.size()]), null, true);
-		createParameterSet(planhandle, state, "maintain_goals", "String", 
-			mgoalnames.size()==0? null: (String[])mgoalnames.toArray(new String[mgoalnames.size()]), null, true);
-		
-		// Make this plan the initial plan
-		Object iniplanhandle = state.createObject(OAVBDIMetaModel.configelement_type);
-		state.setAttributeValue(iniplanhandle, OAVBDIMetaModel.configelement_has_ref, planname);
-		state.addAttributeValue(confighandle, OAVBDIMetaModel.configuration_has_initialplans, iniplanhandle);
 
 		// Do second pass post-processing
 		
@@ -433,7 +487,7 @@ public class GpmnBDIConverter2
 		{
 			for(Iterator it = planhandles.iterator(); it.hasNext(); )
 			{
-				planhandle = it.next();
+				Object planhandle = it.next();
 				postProcessParameterElement(context, planhandle, expost, clpost);
 				
 				Object condhandle = state.getAttributeValue(planhandle, OAVBDIMetaModel.plan_has_precondition);

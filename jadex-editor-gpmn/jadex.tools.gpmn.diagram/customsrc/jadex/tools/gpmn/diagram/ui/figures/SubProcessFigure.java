@@ -13,6 +13,7 @@ import jadex.tools.gpmn.diagram.providers.GpmnElementTypes;
 import jadex.tools.gpmn.diagram.ui.ShadowedRoundedRectangleFigure;
 
 import org.eclipse.draw2d.Graphics;
+import org.eclipse.draw2d.geometry.PrecisionRectangle;
 
 /**
  * 
@@ -26,6 +27,9 @@ public abstract class SubProcessFigure extends ShadowedRoundedRectangleFigure {
  
 	/** Flag to indicate that this goal is linked against a process diagram */
 	private boolean isLinked = false;
+	
+	/** Flag to indicate that this subprocess is internal */
+	private boolean internal = false;
 	
 	/**
 	 * Default Constructor
@@ -42,8 +46,19 @@ public abstract class SubProcessFigure extends ShadowedRoundedRectangleFigure {
 		super.paintFigure(graphics);
 
 		// paint static type title in figure
-		GpmnShapePainter.paintCenteredString(graphics, GpmnShapePainter
-				.getTopTitleMarkerBounds(getInnerPaintBounds()), "SubProcess");
+		{
+			PrecisionRectangle bounds = GpmnShapePainter.getTopTitleMarkerBounds(getInnerPaintBounds());
+			if (isInternal())
+				bounds.preciseY = bounds.preciseY - graphics.getFontMetrics().getAscent() / 2.0;
+			GpmnShapePainter.paintCenteredString(graphics, bounds, "SubProcess");
+		}
+		
+		if (isInternal())
+		{
+			PrecisionRectangle bounds = GpmnShapePainter.getTopTitleMarkerBounds(getInnerPaintBounds());
+			bounds.preciseY = bounds.preciseY + graphics.getFontMetrics().getAscent() / 2.0;
+			GpmnShapePainter.paintCenteredString(graphics, bounds, "(internal)");
+		}
 
 		// paint background image
 		GpmnShapePainter.paintTypeImageInFigure(graphics, super
@@ -84,5 +99,24 @@ public abstract class SubProcessFigure extends ShadowedRoundedRectangleFigure {
 		revalidate();
 		repaint();
 	}
-    
+
+	/**
+	 *  Gets the internal flag.
+	 *  @return The internal flag.
+	 */
+	public boolean isInternal()
+	{
+		return internal;
+	}
+
+	/**
+	 *  Sets the internal flag.
+	 *  @param internal The internal to set flag.
+	 */
+	public void setInternal(boolean internal)
+	{
+		this.internal = internal;
+	}
+
+	
 }

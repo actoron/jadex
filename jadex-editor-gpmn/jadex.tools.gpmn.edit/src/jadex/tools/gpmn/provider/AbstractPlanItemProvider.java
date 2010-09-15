@@ -65,8 +65,7 @@ public class AbstractPlanItemProvider extends AbstractNodeItemProvider
 	@Override
 	public List<IItemPropertyDescriptor> getPropertyDescriptors(Object object)
 	{
-		if (itemPropertyDescriptors == null)
-		{
+		if (itemPropertyDescriptors == null) {
 			super.getPropertyDescriptors(object);
 
 			addContextconditionPropertyDescriptor(object);
@@ -220,8 +219,7 @@ public class AbstractPlanItemProvider extends AbstractNodeItemProvider
 	{
 		updateChildren(notification);
 
-		switch (notification.getFeatureID(AbstractPlan.class))
-		{
+		switch (notification.getFeatureID(AbstractPlan.class)) {
 			case GpmnPackage.ABSTRACT_PLAN__CONTEXTCONDITION:
 			case GpmnPackage.ABSTRACT_PLAN__TARGETCONDITION_LANGUAGE:
 			case GpmnPackage.ABSTRACT_PLAN__PRECONDITION:

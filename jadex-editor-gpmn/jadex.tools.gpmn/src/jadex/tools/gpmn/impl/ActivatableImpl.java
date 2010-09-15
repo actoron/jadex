@@ -84,8 +84,7 @@ public class ActivatableImpl extends EModelElementImpl implements Activatable
 	 */
 	public EList<ActivationEdge> getActivationEdges()
 	{
-		if (activationEdges == null)
-		{
+		if (activationEdges == null) {
 			activationEdges = new EObjectWithInverseEList.Unsettable<ActivationEdge>(ActivationEdge.class, this, GpmnPackage.ACTIVATABLE__ACTIVATION_EDGES, GpmnPackage.ACTIVATION_EDGE__TARGET);
 		}
 		return activationEdges;
@@ -121,8 +120,7 @@ public class ActivatableImpl extends EModelElementImpl implements Activatable
 	public NotificationChain eInverseAdd(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs)
 	{
-		switch (featureID)
-		{
+		switch (featureID) {
 			case GpmnPackage.ACTIVATABLE__ACTIVATION_EDGES:
 				return ((InternalEList<InternalEObject>)(InternalEList<?>)getActivationEdges()).basicAdd(otherEnd, msgs);
 		}
@@ -138,8 +136,7 @@ public class ActivatableImpl extends EModelElementImpl implements Activatable
 	public NotificationChain eInverseRemove(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs)
 	{
-		switch (featureID)
-		{
+		switch (featureID) {
 			case GpmnPackage.ACTIVATABLE__ACTIVATION_EDGES:
 				return ((InternalEList<?>)getActivationEdges()).basicRemove(otherEnd, msgs);
 		}
@@ -154,8 +151,7 @@ public class ActivatableImpl extends EModelElementImpl implements Activatable
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType)
 	{
-		switch (featureID)
-		{
+		switch (featureID) {
 			case GpmnPackage.ACTIVATABLE__ACTIVATION_EDGES:
 				return getActivationEdges();
 		}
@@ -171,8 +167,7 @@ public class ActivatableImpl extends EModelElementImpl implements Activatable
 	@Override
 	public void eSet(int featureID, Object newValue)
 	{
-		switch (featureID)
-		{
+		switch (featureID) {
 			case GpmnPackage.ACTIVATABLE__ACTIVATION_EDGES:
 				getActivationEdges().clear();
 				getActivationEdges().addAll((Collection<? extends ActivationEdge>)newValue);
@@ -189,8 +184,7 @@ public class ActivatableImpl extends EModelElementImpl implements Activatable
 	@Override
 	public void eUnset(int featureID)
 	{
-		switch (featureID)
-		{
+		switch (featureID) {
 			case GpmnPackage.ACTIVATABLE__ACTIVATION_EDGES:
 				unsetActivationEdges();
 				return;
@@ -206,8 +200,7 @@ public class ActivatableImpl extends EModelElementImpl implements Activatable
 	@Override
 	public boolean eIsSet(int featureID)
 	{
-		switch (featureID)
-		{
+		switch (featureID) {
 			case GpmnPackage.ACTIVATABLE__ACTIVATION_EDGES:
 				return isSetActivationEdges();
 		}

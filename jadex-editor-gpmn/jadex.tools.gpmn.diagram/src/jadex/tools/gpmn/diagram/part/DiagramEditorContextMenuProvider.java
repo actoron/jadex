@@ -20,8 +20,7 @@ import org.eclipse.ui.IWorkbenchPart;
  * @generated
  */
 public class DiagramEditorContextMenuProvider extends
-		DiagramContextMenuProvider
-{
+		DiagramContextMenuProvider {
 
 	/**
 	 * @generated
@@ -37,8 +36,7 @@ public class DiagramEditorContextMenuProvider extends
 	 * @generated
 	 */
 	public DiagramEditorContextMenuProvider(IWorkbenchPart part,
-			EditPartViewer viewer)
-	{
+			EditPartViewer viewer) {
 		super(part, viewer);
 		this.part = part;
 		deleteAction = new DeleteElementAction(part);
@@ -48,10 +46,8 @@ public class DiagramEditorContextMenuProvider extends
 	/**
 	 * @generated
 	 */
-	public void dispose()
-	{
-		if (deleteAction != null)
-		{
+	public void dispose() {
+		if (deleteAction != null) {
 			deleteAction.dispose();
 			deleteAction = null;
 		}
@@ -61,18 +57,14 @@ public class DiagramEditorContextMenuProvider extends
 	/**
 	 * @generated
 	 */
-	public void buildContextMenu(final IMenuManager menu)
-	{
+	public void buildContextMenu(final IMenuManager menu) {
 		getViewer().flush();
-		try
-		{
+		try {
 			TransactionUtil.getEditingDomain(
 					(EObject) getViewer().getContents().getModel())
-					.runExclusive(new Runnable()
-					{
+					.runExclusive(new Runnable() {
 
-						public void run()
-						{
+						public void run() {
 							ContributionItemService
 									.getInstance()
 									.contributeToPopupMenu(
@@ -82,9 +74,7 @@ public class DiagramEditorContextMenuProvider extends
 							menu.appendToGroup("editGroup", deleteAction);
 						}
 					});
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			GpmnDiagramEditorPlugin.getInstance().logError(
 					"Error building context menu", e);
 		}

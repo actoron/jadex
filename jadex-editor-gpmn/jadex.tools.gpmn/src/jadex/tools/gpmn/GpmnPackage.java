@@ -1721,13 +1721,22 @@ public interface GpmnPackage extends EPackage
 	int SUB_PROCESS__PROCESSREF = ABSTRACT_NODE_FEATURE_COUNT + 1;
 
 	/**
+	 * The feature id for the '<em><b>Internal</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int SUB_PROCESS__INTERNAL = ABSTRACT_NODE_FEATURE_COUNT + 2;
+
+	/**
 	 * The feature id for the '<em><b>Gpmn Diagram</b></em>' container reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int SUB_PROCESS__GPMN_DIAGRAM = ABSTRACT_NODE_FEATURE_COUNT + 2;
+	int SUB_PROCESS__GPMN_DIAGRAM = ABSTRACT_NODE_FEATURE_COUNT + 3;
 
 	/**
 	 * The number of structural features of the '<em>Sub Process</em>' class.
@@ -1736,7 +1745,7 @@ public interface GpmnPackage extends EPackage
 	 * @generated
 	 * @ordered
 	 */
-	int SUB_PROCESS_FEATURE_COUNT = ABSTRACT_NODE_FEATURE_COUNT + 3;
+	int SUB_PROCESS_FEATURE_COUNT = ABSTRACT_NODE_FEATURE_COUNT + 4;
 
 	/**
 	 * The meta object id for the '{@link jadex.tools.gpmn.impl.SuppressionEdgeImpl <em>Suppression Edge</em>}' class.
@@ -2940,6 +2949,17 @@ public interface GpmnPackage extends EPackage
 	EAttribute getSubProcess_Processref();
 
 	/**
+	 * Returns the meta object for the attribute '{@link jadex.tools.gpmn.SubProcess#isInternal <em>Internal</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Internal</em>'.
+	 * @see jadex.tools.gpmn.SubProcess#isInternal()
+	 * @see #getSubProcess()
+	 * @generated
+	 */
+	EAttribute getSubProcess_Internal();
+
+	/**
 	 * Returns the meta object for the container reference '{@link jadex.tools.gpmn.SubProcess#getGpmnDiagram <em>Gpmn Diagram</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -3919,6 +3939,14 @@ public interface GpmnPackage extends EPackage
 		 * @generated
 		 */
 		EAttribute SUB_PROCESS__PROCESSREF = eINSTANCE.getSubProcess_Processref();
+
+		/**
+		 * The meta object literal for the '<em><b>Internal</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute SUB_PROCESS__INTERNAL = eINSTANCE.getSubProcess_Internal();
 
 		/**
 		 * The meta object literal for the '<em><b>Gpmn Diagram</b></em>' container reference feature.

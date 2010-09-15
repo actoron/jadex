@@ -15,14 +15,12 @@ import org.eclipse.jface.preference.IPreferenceStore;
 /**
  * @generated
  */
-public class DiagramPreferenceInitializer extends AbstractPreferenceInitializer
-{
+public class DiagramPreferenceInitializer extends AbstractPreferenceInitializer {
 
 	/**
 	 * @generated
 	 */
-	public void initializeDefaultPreferences()
-	{
+	public void initializeDefaultPreferences() {
 		IPreferenceStore store = getPreferenceStore();
 		DiagramGeneralPreferencePage.initDefaults(store);
 		DiagramAppearancePreferencePage.initDefaults(store);
@@ -35,8 +33,7 @@ public class DiagramPreferenceInitializer extends AbstractPreferenceInitializer
 	/**
 	 * @generated
 	 */
-	protected IPreferenceStore getPreferenceStore()
-	{
+	protected IPreferenceStore getPreferenceStore() {
 		return GpmnDiagramEditorPlugin.getInstance().getPreferenceStore();
 	}
 }

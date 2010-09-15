@@ -14,14 +14,12 @@ import org.eclipse.gmf.runtime.diagram.ui.preferences.ConnectionsPreferencePage;
 /**
  * @generated
  */
-public class DiagramConnectionsPreferencePage extends ConnectionsPreferencePage
-{
+public class DiagramConnectionsPreferencePage extends ConnectionsPreferencePage {
 
 	/**
 	 * @generated
 	 */
-	public DiagramConnectionsPreferencePage()
-	{
+	public DiagramConnectionsPreferencePage() {
 		setPreferenceStore(GpmnDiagramEditorPlugin.getInstance()
 				.getPreferenceStore());
 	}

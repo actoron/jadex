@@ -56,8 +56,7 @@ import org.eclipse.swt.graphics.Color;
 /**
  * @generated
  */
-public class SubProcessEditPart extends ShapeNodeEditPart
-{
+public class SubProcessEditPart extends ShapeNodeEditPart {
 
 	/**
 	 * @generated
@@ -77,16 +76,14 @@ public class SubProcessEditPart extends ShapeNodeEditPart
 	/**
 	 * @generated
 	 */
-	public SubProcessEditPart(View view)
-	{
+	public SubProcessEditPart(View view) {
 		super(view);
 	}
 
 	/**
 	 * @generated
 	 */
-	protected void createDefaultEditPoliciesGen()
-	{
+	protected void createDefaultEditPoliciesGen() {
 		super.createDefaultEditPolicies();
 		installEditPolicy(EditPolicyRoles.SEMANTIC_ROLE,
 				new SubProcessItemSemanticEditPolicy());
@@ -98,8 +95,7 @@ public class SubProcessEditPart extends ShapeNodeEditPart
 	/**
 	 * @generated NOT, use custom edit policies
 	 */
-	protected void createDefaultEditPolicies()
-	{
+	protected void createDefaultEditPolicies() {
 		this.createDefaultEditPoliciesGen();
 
 		//		// use custom connection handle and tool
@@ -111,29 +107,23 @@ public class SubProcessEditPart extends ShapeNodeEditPart
 	/**
 	 * @generated
 	 */
-	protected LayoutEditPolicy createLayoutEditPolicy()
-	{
-		LayoutEditPolicy lep = new LayoutEditPolicy()
-		{
+	protected LayoutEditPolicy createLayoutEditPolicy() {
+		LayoutEditPolicy lep = new LayoutEditPolicy() {
 
-			protected EditPolicy createChildEditPolicy(EditPart child)
-			{
+			protected EditPolicy createChildEditPolicy(EditPart child) {
 				EditPolicy result = child
 						.getEditPolicy(EditPolicy.PRIMARY_DRAG_ROLE);
-				if (result == null)
-				{
+				if (result == null) {
 					result = new NonResizableEditPolicy();
 				}
 				return result;
 			}
 
-			protected Command getMoveChildrenCommand(Request request)
-			{
+			protected Command getMoveChildrenCommand(Request request) {
 				return null;
 			}
 
-			protected Command getCreateCommand(CreateRequest request)
-			{
+			protected Command getCreateCommand(CreateRequest request) {
 				return null;
 			}
 		};
@@ -143,18 +133,17 @@ public class SubProcessEditPart extends ShapeNodeEditPart
 	/**
 	 * @generated NOT, update linked state and label in figure
 	 */
-	protected IFigure createNodeShape()
-	{
+	protected IFigure createNodeShape() {
 		SubProcessFigure figure = new SubProcessFigure();
 		setLinkRefAndLabel(figure);
+		figure.setInternal(((SubProcess) getPrimaryView().getElement()).isInternal());
 		return primaryShape = figure;
 	}
 
 	/**
 	 * @generated
 	 */
-	public SubProcessFigure getPrimaryShape()
-	{
+	public SubProcessFigure getPrimaryShape() {
 		return (SubProcessFigure) primaryShape;
 	}
 
@@ -164,8 +153,7 @@ public class SubProcessEditPart extends ShapeNodeEditPart
 	 * @param figure
 	 * @generated NOT
 	 */
-	private void setLinkRefAndLabel(SubProcessFigure figure)
-	{
+	private void setLinkRefAndLabel(SubProcessFigure figure) {
 
 		SubProcess process = (SubProcess) getPrimaryView().getElement();
 		figure.setLinked(null != process.getProcessref()
@@ -182,10 +170,8 @@ public class SubProcessEditPart extends ShapeNodeEditPart
 	/**
 	 * @generated
 	 */
-	protected boolean addFixedChild(EditPart childEditPart)
-	{
-		if (childEditPart instanceof SubProcessNameEditPart)
-		{
+	protected boolean addFixedChild(EditPart childEditPart) {
+		if (childEditPart instanceof SubProcessNameEditPart) {
 			((SubProcessNameEditPart) childEditPart).setLabel(getPrimaryShape()
 					.getFigureSubProcessNameFigure());
 			return true;
@@ -196,10 +182,8 @@ public class SubProcessEditPart extends ShapeNodeEditPart
 	/**
 	 * @generated
 	 */
-	protected boolean removeFixedChild(EditPart childEditPart)
-	{
-		if (childEditPart instanceof SubProcessNameEditPart)
-		{
+	protected boolean removeFixedChild(EditPart childEditPart) {
+		if (childEditPart instanceof SubProcessNameEditPart) {
 			return true;
 		}
 		return false;
@@ -208,10 +192,8 @@ public class SubProcessEditPart extends ShapeNodeEditPart
 	/**
 	 * @generated
 	 */
-	protected void addChildVisual(EditPart childEditPart, int index)
-	{
-		if (addFixedChild(childEditPart))
-		{
+	protected void addChildVisual(EditPart childEditPart, int index) {
+		if (addFixedChild(childEditPart)) {
 			return;
 		}
 		super.addChildVisual(childEditPart, -1);
@@ -220,10 +202,8 @@ public class SubProcessEditPart extends ShapeNodeEditPart
 	/**
 	 * @generated
 	 */
-	protected void removeChildVisual(EditPart childEditPart)
-	{
-		if (removeFixedChild(childEditPart))
-		{
+	protected void removeChildVisual(EditPart childEditPart) {
+		if (removeFixedChild(childEditPart)) {
 			return;
 		}
 		super.removeChildVisual(childEditPart);
@@ -232,16 +212,14 @@ public class SubProcessEditPart extends ShapeNodeEditPart
 	/**
 	 * @generated
 	 */
-	protected IFigure getContentPaneFor(IGraphicalEditPart editPart)
-	{
+	protected IFigure getContentPaneFor(IGraphicalEditPart editPart) {
 		return getContentPane();
 	}
 
 	/**
 	 * @generated
 	 */
-	protected NodeFigure createNodePlate()
-	{
+	protected NodeFigure createNodePlate() {
 		DefaultSizeNodeFigure result = new DefaultSizeNodeFigure(40, 40);
 		return result;
 	}
@@ -254,8 +232,7 @@ public class SubProcessEditPart extends ShapeNodeEditPart
 	 * 
 	 * @generated
 	 */
-	protected NodeFigure createNodeFigure()
-	{
+	protected NodeFigure createNodeFigure() {
 		NodeFigure figure = createNodePlate();
 		figure.setLayoutManager(new StackLayout());
 		IFigure shape = createNodeShape();
@@ -270,10 +247,8 @@ public class SubProcessEditPart extends ShapeNodeEditPart
 	 * @param nodeShape instance of generated figure class
 	 * @generated
 	 */
-	protected IFigure setupContentPane(IFigure nodeShape)
-	{
-		if (nodeShape.getLayoutManager() == null)
-		{
+	protected IFigure setupContentPane(IFigure nodeShape) {
+		if (nodeShape.getLayoutManager() == null) {
 			ConstrainedToolbarLayout layout = new ConstrainedToolbarLayout();
 			layout.setSpacing(5);
 			nodeShape.setLayoutManager(layout);
@@ -284,10 +259,8 @@ public class SubProcessEditPart extends ShapeNodeEditPart
 	/**
 	 * @generated
 	 */
-	public IFigure getContentPane()
-	{
-		if (contentPane != null)
-		{
+	public IFigure getContentPane() {
+		if (contentPane != null) {
 			return contentPane;
 		}
 		return super.getContentPane();
@@ -296,10 +269,8 @@ public class SubProcessEditPart extends ShapeNodeEditPart
 	/**
 	 * @generated
 	 */
-	protected void setForegroundColor(Color color)
-	{
-		if (primaryShape != null)
-		{
+	protected void setForegroundColor(Color color) {
+		if (primaryShape != null) {
 			primaryShape.setForegroundColor(color);
 		}
 	}
@@ -307,10 +278,8 @@ public class SubProcessEditPart extends ShapeNodeEditPart
 	/**
 	 * @generated
 	 */
-	protected void setBackgroundColor(Color color)
-	{
-		if (primaryShape != null)
-		{
+	protected void setBackgroundColor(Color color) {
+		if (primaryShape != null) {
 			primaryShape.setBackgroundColor(color);
 		}
 	}
@@ -318,10 +287,8 @@ public class SubProcessEditPart extends ShapeNodeEditPart
 	/**
 	 * @generated
 	 */
-	protected void setLineWidth(int width)
-	{
-		if (primaryShape instanceof Shape)
-		{
+	protected void setLineWidth(int width) {
+		if (primaryShape instanceof Shape) {
 			((Shape) primaryShape).setLineWidth(width);
 		}
 	}
@@ -329,10 +296,8 @@ public class SubProcessEditPart extends ShapeNodeEditPart
 	/**
 	 * @generated
 	 */
-	protected void setLineType(int style)
-	{
-		if (primaryShape instanceof Shape)
-		{
+	protected void setLineType(int style) {
+		if (primaryShape instanceof Shape) {
 			((Shape) primaryShape).setLineStyle(style);
 		}
 	}
@@ -340,8 +305,7 @@ public class SubProcessEditPart extends ShapeNodeEditPart
 	/**
 	 * @generated
 	 */
-	public EditPart getPrimaryChildEditPart()
-	{
+	public EditPart getPrimaryChildEditPart() {
 		return getChildBySemanticHint(GpmnVisualIDRegistry
 				.getType(SubProcessNameEditPart.VISUAL_ID));
 	}
@@ -349,8 +313,7 @@ public class SubProcessEditPart extends ShapeNodeEditPart
 	/**
 	 * @generated
 	 */
-	public List/*<org.eclipse.gmf.runtime.emf.type.core.IElementType>*/getMARelTypesOnTarget()
-	{
+	public List/*<org.eclipse.gmf.runtime.emf.type.core.IElementType>*/getMARelTypesOnTarget() {
 		List/*<org.eclipse.gmf.runtime.emf.type.core.IElementType>*/types = new ArrayList/*<org.eclipse.gmf.runtime.emf.type.core.IElementType>*/();
 		types.add(GpmnElementTypes.ActivationEdge_4001);
 		return types;
@@ -360,11 +323,9 @@ public class SubProcessEditPart extends ShapeNodeEditPart
 	 * @generated
 	 */
 	public List/*<org.eclipse.gmf.runtime.emf.type.core.IElementType>*/getMATypesForSource(
-			IElementType relationshipType)
-	{
+			IElementType relationshipType) {
 		List/*<org.eclipse.gmf.runtime.emf.type.core.IElementType>*/types = new ArrayList/*<org.eclipse.gmf.runtime.emf.type.core.IElementType>*/();
-		if (relationshipType == GpmnElementTypes.ActivationEdge_4001)
-		{
+		if (relationshipType == GpmnElementTypes.ActivationEdge_4001) {
 			types.add(GpmnElementTypes.ActivationPlan_2001);
 		}
 		return types;
@@ -377,15 +338,16 @@ public class SubProcessEditPart extends ShapeNodeEditPart
 	 * @see org.eclipse.gmf.runtime.diagram.ui.editparts.GraphicalEditPart
 	 *      #handlePropertyChangeEvent(java.beans.PropertyChangeEvent)
 	 */
-	protected void handleNotificationEvent(Notification notification)
-	{
+	protected void handleNotificationEvent(Notification notification) {
 		if (notification.getEventType() == Notification.SET
-				|| notification.getEventType() == Notification.UNSET)
-		{
+				|| notification.getEventType() == Notification.UNSET) {
 			if (GpmnPackage.eINSTANCE.getSubProcess_Processref().equals(
-					notification.getFeature()))
-			{
+					notification.getFeature())) {
 				getPrimaryShape().setLinked(isProcessrefSet());
+			}
+			else if (GpmnPackage.eINSTANCE.getSubProcess_Internal().equals(
+					notification.getFeature())) {
+				getPrimaryShape().setInternal(((SubProcess) getPrimaryView().getElement()).isInternal());
 			}
 		}
 
@@ -396,8 +358,7 @@ public class SubProcessEditPart extends ShapeNodeEditPart
 	 * @generated NOT
 	 */
 	public ConnectionAnchor getTargetConnectionAnchor(
-			final ConnectionEditPart connEditPart)
-	{
+			final ConnectionEditPart connEditPart) {
 		ConnectionAnchor anchor = new SlidableRoundedRectangleAnchor(
 				(ShadowedRoundedRectangleFigure) primaryShape);
 		return anchor;
@@ -407,8 +368,7 @@ public class SubProcessEditPart extends ShapeNodeEditPart
 	 * @generated NOT
 	 */
 	public ConnectionAnchor getSourceConnectionAnchor(
-			ConnectionEditPart connEditPart)
-	{
+			ConnectionEditPart connEditPart) {
 		return getTargetConnectionAnchor(connEditPart);
 	}
 
@@ -418,8 +378,7 @@ public class SubProcessEditPart extends ShapeNodeEditPart
 	 * Check linking of SubProcess
 	 * @generated NOT
 	 */
-	private boolean isProcessrefSet()
-	{
+	private boolean isProcessrefSet() {
 		SubProcess process = (SubProcess) getPrimaryView().getElement();
 		return process.getProcessref() != null
 				&& !process.getProcessref().trim().isEmpty();
@@ -431,8 +390,7 @@ public class SubProcessEditPart extends ShapeNodeEditPart
 	 * @generated
 	 */
 	public class SubProcessFigure extends
-			jadex.tools.gpmn.diagram.ui.figures.SubProcessFigure
-	{
+			jadex.tools.gpmn.diagram.ui.figures.SubProcessFigure {
 
 		/**
 		 * @generated
@@ -442,8 +400,7 @@ public class SubProcessEditPart extends ShapeNodeEditPart
 		/**
 		 * @generated
 		 */
-		public SubProcessFigure()
-		{
+		public SubProcessFigure() {
 
 			GridLayout layoutThis = new GridLayout();
 			layoutThis.numColumns = 1;
@@ -459,8 +416,7 @@ public class SubProcessEditPart extends ShapeNodeEditPart
 		/**
 		 * @generated
 		 */
-		private void createContents()
-		{
+		private void createContents() {
 
 			fFigureSubProcessNameFigure = new WrappingLabel();
 			fFigureSubProcessNameFigure.setText("SubProcess");
@@ -486,24 +442,21 @@ public class SubProcessEditPart extends ShapeNodeEditPart
 		/**
 		 * @generated
 		 */
-		protected boolean useLocalCoordinates()
-		{
+		protected boolean useLocalCoordinates() {
 			return myUseLocalCoordinates;
 		}
 
 		/**
 		 * @generated
 		 */
-		protected void setUseLocalCoordinates(boolean useLocalCoordinates)
-		{
+		protected void setUseLocalCoordinates(boolean useLocalCoordinates) {
 			myUseLocalCoordinates = useLocalCoordinates;
 		}
 
 		/**
 		 * @generated
 		 */
-		public WrappingLabel getFigureSubProcessNameFigure()
-		{
+		public WrappingLabel getFigureSubProcessNameFigure() {
 			return fFigureSubProcessNameFigure;
 		}
 

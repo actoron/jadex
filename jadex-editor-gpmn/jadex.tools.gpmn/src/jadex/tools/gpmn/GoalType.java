@@ -115,8 +115,7 @@ public enum GoalType implements Enumerator
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	private static final GoalType[] VALUES_ARRAY = new GoalType[]
-		{
+	private static final GoalType[] VALUES_ARRAY = new GoalType[] {
 			MAINTAIN_GOAL,
 			ACHIEVE_GOAL,
 			PERFORM_GOAL,
@@ -138,11 +137,9 @@ public enum GoalType implements Enumerator
 	 */
 	public static GoalType get(String literal)
 	{
-		for (int i = 0; i < VALUES_ARRAY.length; ++i)
-		{
+		for (int i = 0; i < VALUES_ARRAY.length; ++i) {
 			GoalType result = VALUES_ARRAY[i];
-			if (result.toString().equals(literal))
-			{
+			if (result.toString().equals(literal)) {
 				return result;
 			}
 		}
@@ -157,11 +154,9 @@ public enum GoalType implements Enumerator
 	 */
 	public static GoalType getByName(String name)
 	{
-		for (int i = 0; i < VALUES_ARRAY.length; ++i)
-		{
+		for (int i = 0; i < VALUES_ARRAY.length; ++i) {
 			GoalType result = VALUES_ARRAY[i];
-			if (result.getName().equals(name))
-			{
+			if (result.getName().equals(name)) {
 				return result;
 			}
 		}
@@ -176,8 +171,7 @@ public enum GoalType implements Enumerator
 	 */
 	public static GoalType get(int value)
 	{
-		switch (value)
-		{
+		switch (value) {
 			case MAINTAIN_GOAL_VALUE: return MAINTAIN_GOAL;
 			case ACHIEVE_GOAL_VALUE: return ACHIEVE_GOAL;
 			case PERFORM_GOAL_VALUE: return PERFORM_GOAL;
