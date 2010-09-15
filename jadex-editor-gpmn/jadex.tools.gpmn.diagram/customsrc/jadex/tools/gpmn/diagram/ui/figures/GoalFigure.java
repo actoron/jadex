@@ -17,7 +17,11 @@ import jadex.tools.gpmn.diagram.ui.ShadowedOvalFigure;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.swing.plaf.FontUIResource;
+
+import org.eclipse.draw2d.FigureUtilities;
 import org.eclipse.draw2d.Graphics;
+import org.eclipse.draw2d.geometry.PrecisionRectangle;
 import org.eclipse.gmf.runtime.draw2d.ui.figures.WrappingLabel;
 import org.eclipse.swt.graphics.Image;
 
@@ -62,7 +66,37 @@ public abstract class GoalFigure extends ShadowedOvalFigure /*ShadowedRoundedRec
 	{
 		super.paintFigure(graphics);
 
-		GpmnShapePainter.paintTypeImageInFigure(graphics, super.getInnerPaintBounds(), this, getTypeImage());
+		//GpmnShapePainter.paintTypeImageInFigure(graphics, super.getInnerPaintBounds(), this, getTypeImage());
+		
+		{
+			PrecisionRectangle bounds = GpmnShapePainter.getTopTitleMarkerBounds(getInnerPaintBounds());
+			bounds.setY(bounds.preciseY - graphics.getFontMetrics().getAscent() + 1.0);
+			
+			String ts = null;
+			switch(goalType)
+			{
+				case GoalType.MAINTAIN_GOAL_VALUE:
+					ts = "M";
+					break;
+				case GoalType.PERFORM_GOAL_VALUE:
+					ts = "P";
+					break;
+				case GoalType.ACHIEVE_GOAL_VALUE:
+				default:
+					ts = "A";
+			}
+			
+			GpmnShapePainter.paintCenteredString(graphics, bounds, ts);
+			
+			bounds = GpmnShapePainter.getTopTitleMarkerBounds(getInnerPaintBounds());
+			bounds.setX(bounds.getCenter().x - FigureUtilities.getTextWidth(ts, graphics.getFont())/2 - 2.0);
+			bounds.setWidth(FigureUtilities.getTextWidth(ts, graphics.getFont()) + 3.0);
+			bounds.setHeight(graphics.getFontMetrics().getAscent() + 4.0);
+			bounds.setY(bounds.preciseY - (graphics.getFontMetrics().getAscent() / 2.0) - 2.0);
+			//bounds.width = (int) (FigureUtilities.getTextWidth(ts, graphics.getFont()) + 2.0);
+			//bounds.y = (int) (bounds.preciseY); 
+			graphics.drawRectangle(bounds);
+		}
 		
 		if (modeTypes.size() == 1 && modeTypes.contains(ModeType.SEQUENTIAL))
 			GpmnShapePainter.paintModeOrderedInsideFigure(graphics, bounds, this);

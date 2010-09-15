@@ -61,9 +61,9 @@ public abstract class SubProcessFigure extends ShadowedRoundedRectangleFigure {
 		}
 
 		// paint background image
-		GpmnShapePainter.paintTypeImageInFigure(graphics, super
+		/*GpmnShapePainter.paintTypeImageInFigure(graphics, super
 				.getInnerPaintBounds(), this, GpmnShapePainter
-				.getBackgroundImage("SimpleGoalBackground.png"));
+				.getBackgroundImage("SimpleGoalBackground.png"));*/
 		
 		// add some special markers to shape
 		if (isLinked)
