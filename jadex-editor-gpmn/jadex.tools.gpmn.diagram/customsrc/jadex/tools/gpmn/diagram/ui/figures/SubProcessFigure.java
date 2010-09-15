@@ -116,6 +116,8 @@ public abstract class SubProcessFigure extends ShadowedRoundedRectangleFigure {
 	public void setInternal(boolean internal)
 	{
 		this.internal = internal;
+		revalidate();
+		repaint();
 	}
 
 	
