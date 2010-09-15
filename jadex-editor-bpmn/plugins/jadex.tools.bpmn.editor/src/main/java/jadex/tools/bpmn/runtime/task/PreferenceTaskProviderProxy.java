@@ -85,7 +85,7 @@ public class PreferenceTaskProviderProxy implements IEditorTaskProvider
 	public String[] getAvailableTaskImplementations()
 	{
 
-		List<String> preferenceList = JadexTaskProviderTypeListEditor.parseStringList(JadexBpmnPlugin.getDefault().getPreferenceStore().getString(JadexPreferences.PREFERENCE_TASK_PROVIDER_LIST));
+		List<String> preferenceList = JadexTaskProviderTypeListEditor.parseStringList(JadexBpmnPlugin.getDefault().getPreferenceStore().getString(JadexPreferences.PREFERENCE_TASKPROVIDER_STRINGLIST));
 		
 		if (!iTaskProviderCache.equals(preferenceList))
 		{

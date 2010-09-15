@@ -19,9 +19,17 @@ public class JadexPreferences extends FieldEditorPreferencePage implements
 
 	// ---- preference keys ----
 
-	public static final String PREFERENCE_TASK_PROVIDER_LIST = "Task Provider";
+	public static final String PREFERENCE_EDITOR_CONVERT_BPMN_AUTOMATICALLY_BOOLEAN = "Automatically convert BPMN files to new format";
+	
+	
+	public static final String PREFERENCE_EDITOR_REGISTER_AS_DEFAULT_BOOLEAN = "Register as default for *.bpmn files";
+	
+	public static final String PREFERENCE_EDITOR_PREVIEW_DEFAULT_EDITOR_STRINGID = "Preview default *.bpmn editor";
+	
+	
+	public static final String PREFERENCE_TASKPROVIDER_STRINGLIST = "Task Provider";
 
-	public static final String PREFERENCE_TASK_PROVIDER_SEARCH_PACKAGE_LIST = "Search packages";
+	public static final String PREFERENCE_TASKPROVIDER_SEARCH_PACKAGE_STRINGLIST = "Search packages";
 	
 	// ---- interface implementation ----
 	

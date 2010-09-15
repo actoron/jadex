@@ -1,6 +1,11 @@
 package jadex.tools.bpmn.editor;
 
+import jadex.tools.bpmn.editor.preferences.JadexPreferences;
+
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.stp.bpmn.diagram.part.BpmnDiagramEditor;
+import org.eclipse.ui.IEditorDescriptor;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
@@ -28,6 +33,8 @@ public class JadexBpmnPlugin extends AbstractUIPlugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
+		
+		checkDefaultEditorSettings();
 	}
 
 	/*
@@ -57,5 +64,30 @@ public class JadexBpmnPlugin extends AbstractUIPlugin {
 	 */
 	public static ImageDescriptor getImageDescriptor(String path) {
 		return imageDescriptorFromPlugin(ID, path);
+	}
+	
+	/**
+	 * Check and set the default editor setting for *.bpmn_diagram files
+	 */
+	private static void checkDefaultEditorSettings()
+	{
+		if (getDefault()
+				.getPreferenceStore()
+				.getBoolean(JadexPreferences.PREFERENCE_EDITOR_REGISTER_AS_DEFAULT_BOOLEAN)) 
+		{
+			// register jadex editor for bpmn_diagram as default
+			PlatformUI.getWorkbench().getEditorRegistry()
+				.setDefaultEditor("*.bpmn_diagram", JadexBpmnEditor.ID); //$NON-NLS-1$
+		}
+		else 
+		{
+			IEditorDescriptor defaultEditor = PlatformUI.getWorkbench().getEditorRegistry().getDefaultEditor("*.bpmn_diagram");
+			if (defaultEditor.getId().equals(JadexBpmnEditor.ID))
+			{
+				// register the BPMN Editor for bpmn_diagram as default
+				PlatformUI.getWorkbench().getEditorRegistry()
+				.setDefaultEditor("*.bpmn_diagram", BpmnDiagramEditor.ID); //$NON-NLS-1$
+			}
+		}
 	}
 }
