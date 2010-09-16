@@ -1,8 +1,13 @@
 package deco4mas.examples.agentNegotiation.sa.application;
 
+import jadex.application.runtime.IApplicationExternalAccess;
+import jadex.application.space.envsupport.environment.AbstractEnvironmentSpace;
 import jadex.bdi.runtime.Plan;
+import jadex.bridge.IComponentIdentifier;
+
 import java.util.Random;
 import java.util.logging.Logger;
+
 import deco4mas.examples.agentNegotiation.common.dataObjects.ServiceAgentType;
 import deco4mas.examples.agentNegotiation.common.dataObjects.ServiceType;
 import deco4mas.examples.agentNegotiation.evaluate.AgentLogger;
@@ -59,6 +64,26 @@ public class BlackoutPlan extends Plan
 				saLogger.info("blackout for " + waitTime);
 				System.out.println(this.getComponentName() + ": Blackout for " + waitTime);
 
+
+				//HACK: For evaluation via automated simulation component.
+				//*************************************************************
+				// This is a hack for this special application.xml -> AgentNegotiation
+				//: save result also to space in order to enable evaluation by automated simulation component
+				AbstractEnvironmentSpace space = ((AbstractEnvironmentSpace) ((IApplicationExternalAccess) getScope().getParent()).getSpace("mycoordspace"));
+				//substring: geht the "right" part of the id -> only the type: billig, normal, teuer
+				String timeConstant = "BlackoutTIME";
+				String numberConstant = "BlackoutNUMBER";
+				IComponentIdentifier currentSa = this.getComponentIdentifier();
+				String keyOfSA = currentSa.getLocalName().substring(currentSa.getLocalName().indexOf("(")+1, currentSa.getLocalName().lastIndexOf(")"));
+				keyOfSA = keyOfSA.replace("-", "");						
+				//increment blackout counter -> counts the number of blackouts
+				int numberOfBlackouts = (Integer) space.getSpaceObjectsByType("KIVSeval")[0].getProperty(keyOfSA+numberConstant);						
+				space.getSpaceObjectsByType("KIVSeval")[0].setProperty(keyOfSA+numberConstant, numberOfBlackouts+1);
+				//increment blackout time counter -> counts the whole duration (time) of blackouts
+				double timeOfBlackouts = (Double) space.getSpaceObjectsByType("KIVSeval")[0].getProperty(keyOfSA+timeConstant);						
+				space.getSpaceObjectsByType("KIVSeval")[0].setProperty(keyOfSA+timeConstant, timeOfBlackouts+waitTime);										
+				//*******************************************************************************
+				//************************************************************************
 				waitFor(waitTime.longValue());
 
 				param[1] = getTime();

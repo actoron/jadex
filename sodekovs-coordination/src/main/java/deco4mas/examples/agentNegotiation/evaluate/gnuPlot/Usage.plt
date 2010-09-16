@@ -148,5 +148,5 @@ set loadpath
 set fontpath 
 set fit noerrorvariables
 GNUTERM = "wxt"
-plot[0:100][-1:4] "Blackout_Chassisbau.dat" u 1:($2):ytic(3) t "blackout" w l ls 1, "Blackout_Chassisbau.dat" using 4:($5):ytic(6) t "" w l ls 1, "Blackout_Chassisbau.dat" u 7:($8):ytic(9) t "" w l ls 1, "Blackout_Chassisbau.dat" u 10:($11):ytic(12) t "" w l ls 1, "SaUsage(Chassisbau).dat" u 1:2 t "correct execution" w p ls 2, "SaUsage(Chassisbau).dat" u 4:5 t "false execution" w p ls 3
+plot[0:100][-1:4] "Blackout_Chassisbau.dat" u 1:($2):ytic(3) t "blackout" w l ls 1, "Blackout_Chassisbau.dat" using 4:($5):ytic(6) t "" w l ls 1, "Blackout_Chassisbau.dat" u 7:($8):ytic(9) t "" w l ls 1, "Blackout_Chassisbau.dat" u 10:($11):ytic(12) t "" w l ls 1, "SaUsage_Chassisbau.dat" u 1:2 t "correct execution" w p ls 2, "SaUsage_Chassisbau.dat" u 4:5 t "false execution" w p ls 3
 #    EOF

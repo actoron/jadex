@@ -42,6 +42,13 @@
 					<env:property name="ChassisbaubilligTrustValue">0</env:property>
 					<env:property name="ChassisbaunormalTrustValue">0</env:property>
 					<env:property name="ChassisbauteuerTrustValue">0</env:property>
+					<!--  Measure blackout: How long (TIME) (millisec.) was it and how often (NUMBER)? -->
+					<env:property name="ChassisbaubilligBlackoutTIME">0</env:property>
+					<env:property name="ChassisbaunormalBlackoutTIME">0</env:property>
+					<env:property name="ChassisbauteuerBlackoutTIME">0</env:property>					
+					<env:property name="ChassisbaubilligBlackoutNUMBER">0</env:property>
+					<env:property name="ChassisbaunormalBlackoutNUMBER">0</env:property>
+					<env:property name="ChassisbauteuerBlackoutNUMBER">0</env:property>
 				</env:objecttype>					
 			
 			</env:objecttypes>
@@ -101,6 +108,12 @@
 							<env:property name="ChassisbaubilligTrustValue">new Double(30.0)</env:property>
 							<env:property name="ChassisbaunormalTrustValue">new Double(30.0)</env:property>
 							<env:property name="ChassisbauteuerTrustValue">new Double(30.0)</env:property>
+							<env:property name="ChassisbaubilligBlackoutNUMBER">new Integer(0)</env:property>
+							<env:property name="ChassisbaunormalBlackoutNUMBER">new Integer(0)</env:property>
+							<env:property name="ChassisbauteuerBlackoutNUMBER">new Integer(0)</env:property>
+							<env:property name="ChassisbaubilligBlackoutTIME">new Double(0.0)</env:property>
+							<env:property name="ChassisbaunormalBlackoutTIME">new Double(0.0)</env:property>
+							<env:property name="ChassisbauteuerBlackoutTIME">new Double(0.0)</env:property>
 							
 						</env:object>									
 				</env:objects>
@@ -138,7 +151,7 @@
 							new
 							ServiceAgentType("billig",0.3,0.5,0.9),
 							new
-							ServiceAgentType("teuer",0.7,0.5,0.1)
+							ServiceAgentType("teuer",0.7,0.5,0.1)																															
 							<!--
 								new ServiceAgentType("ausfall",0.2,0.2,1.0)
 							-->

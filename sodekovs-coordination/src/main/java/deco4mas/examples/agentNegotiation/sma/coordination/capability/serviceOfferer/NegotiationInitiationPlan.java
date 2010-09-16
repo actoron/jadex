@@ -42,9 +42,9 @@ public class NegotiationInitiationPlan extends Plan
 			utilityFunction.setTrustFunction((ITrustFunction) getBeliefbase().getBelief("trustFunction").getFact());
 
 			// add costs
-			Double costWeight = 0.35;
-			Double durationWeight = 0.35;
-			Double trustWeight = 0.3;
+			Double costWeight = 0.4;
+			Double durationWeight = 0.0;
+			Double trustWeight = 0.6;
 			ServiceType service = (ServiceType) neededService.getServiceType();
 			utilityFunction.addFactor("cost", costWeight, service.getMaxCost(), service.getMinCost(), false);
 			utilityFunction.addFactor("duration", durationWeight, service.getMaxDuration(), service.getMinDuration(), false);
