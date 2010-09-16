@@ -33,6 +33,13 @@
 			<Data name="ChassisbaubilligTrustValue">$kivsEval.ChassisbaubilligTrustValue</Data>
 			<Data name="ChassisbaunormalTrustValue">$kivsEval.ChassisbaunormalTrustValue</Data>
 			<Data name="ChassisbauteuerTrustValue">$kivsEval.ChassisbauteuerTrustValue</Data>
+			<!--  Measure blackout: How long (TIME) (millisec.) was it and how often (NUMBER)? -->
+			<Data name="ChassisbaubilligBlackoutTIME">$kivsEval.ChassisbaubilligBlackoutTIME</Data>
+			<Data name="ChassisbaunormalBlackoutTIME">$kivsEval.ChassisbaunormalBlackoutTIME</Data>
+			<Data name="ChassisbauteuerBlackoutTIME">$kivsEval.ChassisbauteuerBlackoutTIME</Data>
+			<Data name="ChassisbaubilligBlackoutNUMBER">$kivsEval.ChassisbaubilligBlackoutNUMBER</Data>
+			<Data name="ChassisbaunormalBlackoutNUMBER">$kivsEval.ChassisbaunormalBlackoutNUMBER</Data>
+			<Data name="ChassisbauteuerBlackoutNUMBER">$kivsEval.ChassisbauteuerBlackoutNUMBER</Data>
 		</Dataprovider>
 	</Dataproviders>
 
@@ -65,7 +72,13 @@
 				<Property name="ChassisbaubilligTrustValue" filter="last"/>
 				<Property name="ChassisbaunormalTrustValue" filter="last"/>
 				<Property name="ChassisbauteuerTrustValue" filter="last"/>
-		</Dataconsumer>				
+				<Property name="ChassisbaubilligBlackoutTIME" filter="last"/>
+				<Property name="ChassisbaunormalBlackoutTIME" filter="last"/>
+				<Property name="ChassisbauteuerBlackoutTIME" filter="last"/>
+				<Property name="ChassisbaubilligBlackoutNUMBER" filter="last"/>
+				<Property name="ChassisbaunormalBlackoutNUMBER" filter="last"/>
+				<Property name="ChassisbauteuerBlackoutNUMBER" filter="last"/>
+		</Dataconsumer>			
 	</Dataconsumers>
 
 	<DataVisualization>
@@ -124,7 +137,7 @@
 				<Time value="15000" type="absolute" />
 			</TerminateCondition>
 		</General>
-		<Rows experiments="10">
+		<Rows experiments="100">
 			<TerminateCondition>
 				  <Time value="120000" type="relative" />				
 					<!--<TargetFunction function="$object.getProperty(&quot;executedWorkflows&quot;) >=

@@ -105,6 +105,17 @@ public class RowResult extends IResult {
 		buffer.append("Cumulated Stats of Observed Events:");
 		
 		//Print out cumulated stats for each type of observed event
+		//Hack: for agentNegotiation
+		String[] orderOfOutput ={"money_amount","workflows","ChassisbaubilligBlackoutNUMBER","ChassisbaunormalBlackoutNUMBER","ChassisbauteuerBlackoutNUMBER","ChassisbaubilligBlackoutTIME","ChassisbaunormalBlackoutTIME","ChassisbauteuerBlackoutTIME","Chassisbaubillig","Chassisbaunormal","Chassisbauteuer", "ChassisbaubilligTrustValue","ChassisbaunormalTrustValue","ChassisbauteuerTrustValue"};
+		if(true){//hack!!!
+			for (String key : orderOfOutput) {				
+				HashMap<String,String> resForEvent = finalStatsMap.get(key);
+				buffer.append("\n\tName: " + key);
+				buffer.append("\tMeanValue: " + resForEvent.get("MeanValue"));
+//				buffer.append("\tMedianValue: " + resForEvent.get("MedianValue"));
+//				buffer.append("\tSampleVarianceValue: " + resForEvent.get("sampleVarianceValue"));				
+			}	
+		}else{	//for all other applications	
 		for (Iterator it = finalStatsMap.keySet().iterator(); it.hasNext();) {
 			Object key = it.next();
 			HashMap<String,String> resForEvent = finalStatsMap.get(key);
@@ -112,6 +123,7 @@ public class RowResult extends IResult {
 			buffer.append("\tMeanValue: " + resForEvent.get("MeanValue"));
 			buffer.append("\tMedianValue: " + resForEvent.get("MedianValue"));
 			buffer.append("\tSampleVarianceValue: " + resForEvent.get("sampleVarianceValue"));				
+		}
 		}
 		
 		buffer.append("\n");
