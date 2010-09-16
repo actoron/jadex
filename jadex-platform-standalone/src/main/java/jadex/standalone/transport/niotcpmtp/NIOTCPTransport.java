@@ -190,7 +190,7 @@ public class NIOTCPTransport implements ITransport
 										}
 										catch(IOException e)
 										{
-											logger.warning("NIOTCP selector error.");
+//											logger.warning("NIOTCP selector error.");
 											//e.printStackTrace();
 										}
 										
@@ -217,7 +217,7 @@ public class NIOTCPTransport implements ITransport
 												}
 												catch(IOException e)
 												{
-													logger.warning("NIOTCP connection error on receiver side.");
+//													logger.warning("NIOTCP connection error on receiver side.");
 													//e.printStackTrace();
 													key.cancel();
 												}
@@ -253,7 +253,7 @@ public class NIOTCPTransport implements ITransport
 											}
 										}
 									}
-									logger.info("TCPNIO receiver closed.");
+//									logger.info("TCPNIO receiver closed.");
 								}
 							});
 						}

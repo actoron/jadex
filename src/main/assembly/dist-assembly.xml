@@ -32,6 +32,7 @@
 						</includes>
 						<excludes>
 							<exclude>**/dungeonkeeper/</exclude>
+							<exclude>**/disastermanagement/</exclude>
 							<exclude>**/disasterrescue/</exclude>
 							<exclude>**/helpline/</exclude>
 						</excludes>

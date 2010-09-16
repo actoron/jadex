@@ -535,6 +535,9 @@ public class ViewportJOGL extends AbstractViewport
 	{
 		public void display(GLAutoDrawable drawable)
 		{
+			if(canvas_==null)
+				return;
+			
 			synchronized(glQueue_)
 			{
 				for (Iterator it = glQueue_.iterator(); it.hasNext(); )

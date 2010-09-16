@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	<H3>Fire Engine</H3>
+
+	Moves to fires and extinguishes them
+	and clears chemicals.
+-->
+<agent xmlns="http://jadex.sourceforge.net/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-bdi
+	                    http://jadex.sourceforge.net/jadex-bdi-2.0.xsd"
+	name="FireEngine"
+	package="jadex.bdi.examples.disastermanagement.fireengine">
+
+	<imports>
+		<import>java.util.*</import>
+		<import>java.util.logging.*</import>
+		<import>jadex.base.fipa.*</import>
+		<import>jadex.application.space.envsupport.environment.*</import>
+		<import>jadex.bdi.examples.disastermanagement.*</import>
+		<import>jadex.bdi.examples.disastermanagement.movement.*</import>
+	</imports>
+
+	<capabilities>
+		<!-- Include the move capability as move for basic movement. -->
+		<capability name="move" file="Movement" />
+	</capabilities>
+
+	<beliefs>
+		<!-- Environment imported inherited from move capability. -->
+		<beliefref name="environment">
+			<concrete ref="move.environment"/>
+		</beliefref>
+		
+		<!-- Myself belief imported from move capability. -->
+		<beliefref name="myself">
+			<concrete ref="move.myself"/>
+		</beliefref>
+		
+		<!-- Position belief imported from move capability. -->
+		<beliefref name="position">
+			<concrete ref="move.position"/>
+		</beliefref>
+		
+		<!-- Home location belief imported from move capability. -->
+		<beliefref name="home">
+			<concrete ref="move.home"/>
+		</beliefref>
+	</beliefs>
+
+	<goals>
+		<!-- Move goal imported from capability. -->
+		<achievegoalref name="move">
+			<concrete ref="move.move"/>
+		</achievegoalref>
+		
+		<!-- Goal to move home when nothing else to do. -->
+		<achievegoal name="go_home">
+			<creationcondition>
+				$goalbase.getGoals().length==0 &amp;&amp; $beliefbase.home!=null &amp;&amp; $beliefbase.position!=null &amp;&amp;
+				$beliefbase.environment.getDistance($beliefbase.home, $beliefbase.position).getAsDouble()&gt;0.001
+			</creationcondition>
+			<dropcondition>
+				$goalbase.getGoals().length>1
+			</dropcondition>
+		</achievegoal>
+
+		<!-- Goal to extinguish fire. -->
+		<achievegoal name="extinguish_fire" exclude="when_failed">
+			<parameter name="disaster" class="ISpaceObject"/>
+			<targetcondition>
+				$goal.disaster.fire==0
+			</targetcondition>
+		</achievegoal>
+
+		<!-- Goal to clear chemicals. -->
+		<achievegoal name="clear_chemicals" exclude="when_failed">
+			<parameter name="disaster" class="ISpaceObject"/>
+			<targetcondition>
+				$goal.disaster.chemicals==0
+			</targetcondition>
+		</achievegoal>
+	</goals>
+	
+	<plans>
+		<!-- Basic fire engine behavior plan. -->
+		<plan name="fireengine_plan">
+			<body class="FireEnginePlan"/>
+		</plan>
+		
+		<!-- Plan for moving home. -->
+		<plan name="go_home_plan">
+			<parameter name="destination" class="ISpaceObject">
+				<value>$beliefbase.home</value>
+			</parameter>
+			<body class="MoveToLocationPlan"/>
+			<trigger>
+				<goal ref="go_home"/>
+			</trigger>
+		</plan>
+		
+		<!-- Plan for extinguishing fire. -->
+		<plan name="extinguish_fire_plan">
+			<parameter name="disaster" class="ISpaceObject">
+				<goalmapping ref="extinguish_fire.disaster"/>
+			</parameter>
+			<body class="ExtinguishFirePlan"/>
+			<trigger>
+				<goal ref="extinguish_fire"/>
+			</trigger>
+		</plan>
+		
+		<!-- Plan for clearing chemicals. -->
+		<plan name="clear_chemicals_plan">
+			<parameter name="disaster" class="ISpaceObject">
+				<goalmapping ref="clear_chemicals.disaster"/>
+			</parameter>
+			<body class="ClearChemicalsPlan"/>
+			<trigger>
+				<goal ref="clear_chemicals"/>
+			</trigger>
+		</plan>
+	</plans>
+	
+	<services>
+		<service>new ExtinguishFireService($scope.getExternalAccess())</service>
+		<service>new ClearChemicalsService($scope.getExternalAccess())</service>
+	</services>
+	
+	<configurations>
+		<configuration name="do_nothing"/>
+		<configuration name="default">
+			<plans>
+				<!-- Start fire engine plan when agent is born. -->
+				<initialplan ref="fireengine_plan"/>
+			</plans>
+		</configuration>
+	</configurations>
+
+</agent>

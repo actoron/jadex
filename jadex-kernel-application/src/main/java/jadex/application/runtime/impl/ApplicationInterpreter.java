@@ -305,8 +305,15 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 						}, adapter));
 					}
 				};
-
-				if(futures.isEmpty())
+				
+				// Do not use schedule step if waiting not necessary
+				// Required for platform startup as doWakeup must not be called until Starter is done.
+				boolean	alldone	= true;
+				for(int i=0; alldone && i<futures.size(); i++)
+				{
+					alldone	= ((IFuture)futures.get(i)).isDone();
+				}
+				if(alldone)
 				{
 					addStep(init2);
 				}

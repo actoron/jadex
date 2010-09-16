@@ -87,6 +87,7 @@
 				<excludes>
 					<exclude>**/*.java</exclude>
 					<exclude>**/.svn/*</exclude>
+					<exclude>**/disastermanagement/</exclude>
 					<exclude>**/disasterrescue/</exclude>
 				</excludes>
 			</resource>
@@ -100,6 +101,7 @@
 					<source>1.4</source>
 					<target>1.4</target>
 					<excludes>
+						<exclude>**/disastermanagement/</exclude>
 						<exclude>**/disasterrescue/</exclude>
 					</excludes>
 				</configuration>
@@ -119,6 +121,7 @@
 				</executions>
 				<configuration>
 					<excludes>
+						<exclude>**/disastermanagement/</exclude>
 						<exclude>**/disasterrescue/</exclude>
 					</excludes>
 				</configuration>
@@ -137,6 +140,7 @@
 					</execution>
 				</executions>
 				<configuration>
+					<excludePackageNames>*.disastermanagement.*</excludePackageNames>
 					<excludePackageNames>*.disasterrescue.*</excludePackageNames>
 				</configuration>
         	</plugin>

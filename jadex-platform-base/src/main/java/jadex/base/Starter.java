@@ -95,7 +95,7 @@ public class Starter
 		
 			Map cmdargs = new HashMap();
 			Map compargs = new HashMap();
-			for(int i=0; i<args.length; i+=2)
+			for(int i=0; args!=null && i<args.length; i+=2)
 			{
 				String key = args[i].substring(1);
 				Object val = args[i+1];
@@ -202,9 +202,11 @@ public class Starter
 			boolean again = true;
 			while(again)
 			{
-//				System.out.print(".");
+//				Thread.sleep(10000);
+//				System.err.println("Execute step: "+cid);
 				again = afac.executeStep(adapter);
 			}
+//			System.err.println("starting component execution");
 			
 			// Start normal execution of root component (i.e. platform).
 			adapter.wakeup();

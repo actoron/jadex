@@ -489,6 +489,9 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	}
 	
 	//-------- IExecutable interface --------
+	
+	boolean executing;
+	Exception	rte;
 
 	/**
 	 *  Executable code for running the component
@@ -496,6 +499,15 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	 */
 	public boolean	execute()
 	{
+		if(executing)
+		{
+			System.err.println("double execution: "+getComponentIdentifier());
+			rte.printStackTrace();
+			new RuntimeException("executing: "+getComponentIdentifier()).printStackTrace();
+		}
+		rte	= new RuntimeException("executing: "+getComponentIdentifier());
+		rte.fillInStackTrace();
+		executing	= true;
 		wokenup	= false;
 		
 		// Note: wakeup() can be called from arbitrary threads (even when the
@@ -644,7 +656,8 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 		this.componentthread = null;
 		
 //		System.out.println("end: "+getComponentIdentifier());
-		
+		executing	= false;
+
 		return (again && !IComponentDescription.STATE_SUSPENDED.equals(desc.getState())) || extexecuted;
 	}
 

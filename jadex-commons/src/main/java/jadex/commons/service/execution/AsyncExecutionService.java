@@ -92,6 +92,9 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 	public synchronized void execute(final IExecutable task)
 	{	
 		//System.out.println("execute called: "+task);
+		if(!isValid())
+			throw new RuntimeException("Not running: "+task);
+		
 		if(shutdown)
 			throw new RuntimeException("Shutting down: "+task);
 		
@@ -251,6 +254,7 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 						threadpool = (IThreadPoolService)result;
 						
 						running	= true;
+//						new RuntimeException("AsyncExecustionService.start()").printStackTrace();
 						
 						if(!executors.isEmpty())
 						{
