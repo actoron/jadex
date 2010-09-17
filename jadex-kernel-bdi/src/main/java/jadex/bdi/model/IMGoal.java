@@ -55,37 +55,37 @@ public interface IMGoal extends IMProcessableElement
 
 	/**
 	 *  Get the exlcude mode.
-	 *  @retur The exclude mode.
+	 *  @return The exclude mode.
 	 */
 	public String getExcludeMode();
 	
 	/**
 	 *  Test if rebuild APL.
-	 *  @retur True, if rebuild.
+	 *  @return True, if rebuild.
 	 */
 	public boolean isRebuild();
 	
 	/**
 	 *  Test if goal should be unique.
-	 *  @retur True, if unique.
+	 *  @return True, if unique.
 	 */
 	public boolean isUnique();
 	
 	/**
 	 *  Get excluded parameters.
-	 *  @retur The excluded parameters.
+	 *  @return The excluded parameters.
 	 */
-	public IMTypedElement[] getExcludedParameters();
+	public String[] getExcludedParameters();
 	
 	/**
 	 *  Get inhibited goals.
-	 *  @retur The inhibited goals.
+	 *  @return The inhibited goals.
 	 */
 	public IMInhibited[] getInhibitedGoals();
 	
 	/**
 	 *  Get the cardinality.
-	 *  @retur The cardinality.
+	 *  @return The cardinality.
 	 */
 	public int getCardinality();
 }

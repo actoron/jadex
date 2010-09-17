@@ -61,7 +61,18 @@ public class OAVBDIXMLReader
 
 		String uri = "http://jadex.sourceforge.net/jadex-bdi";
 		
-//		typeinfos.add(new TypeInfo("import", OAVJavaType.java_string_type));
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "exclude")),  new ObjectInfo(new IBeanObjectCreator()
+		{
+			public Object createObject(IContext context, Map rawattributes) throws Exception
+			{
+				return rawattributes.get("parameterref");
+			}
+			}), new MappingInfo(null, new AttributeInfo[]
+			{
+				// Using URI doesn't work (bug in reader?)
+				//new AttributeInfo(new AccessInfo(new QName(uri,"parameterref"), null, AccessInfo.IGNORE_READ))
+				new AttributeInfo(new AccessInfo("parameterref", null, AccessInfo.IGNORE_READ))
+			})));
 
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "capabilities"), new QName(uri, "capability")}), new ObjectInfo(OAVBDIMetaModel.capabilityref_type)));
 		
@@ -106,6 +117,10 @@ public class OAVBDIXMLReader
 					return Boolean.TRUE;
 				}
 			})));
+//			}), new MappingInfo(null, new SubobjectInfo[]
+//			{
+//				new SubobjectInfo(new XMLInfo(new QName(uri, "exclude")), new AccessInfo("parameterref"))
+//			})));
 		
 		TypeInfo ti_capability = new TypeInfo(new XMLInfo(new QName(uri, "capability")), new ObjectInfo(OAVBDIMetaModel.capability_type), 
 			new MappingInfo(null, OAVBDIMetaModel.modelelement_has_description, null, 

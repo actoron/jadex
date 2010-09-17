@@ -15,5 +15,11 @@ public interface ITreatVictimsService  extends IService
 	 *  @return Future, null when done.
 	 */
 	public IFuture treatVictims(ISpaceObject disaster);
+
+	/**
+	 *  Abort treating victims.
+	 *  @return Future, null when done.
+	 */
+	public IFuture abort();
 }
 

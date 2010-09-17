@@ -64,12 +64,9 @@
 			</dropcondition>
 		</achievegoal>
 
-		<!-- Goal to treat victims. -->
-		<achievegoal name="treat_victims" exclude="when_failed">
+		<!-- Goal to treat one victim. -->
+		<achievegoal name="treat_victims">
 			<parameter name="disaster" class="ISpaceObject"/>
-			<targetcondition>
-				$goal.disaster.victims==0 &amp;&amp; !$beliefbase.myself.patient
-			</targetcondition>
 		</achievegoal>
 	</goals>
 	

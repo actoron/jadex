@@ -329,7 +329,7 @@ public class GoalLifecycleRules
 			for(Iterator it=mparams.iterator(); it.hasNext(); )
 			{
 				Object	mparam	= it.next();
-				if(excluded==null || !excluded.contains(mparam))
+				if(excluded==null || !excluded.contains(state.getAttributeValue(mparam, OAVBDIMetaModel.modelelement_has_name)))
 				{
 					String	pname	= (String)state.getAttributeValue(mparam, OAVBDIMetaModel.modelelement_has_name);
 					IParsedExpression	pexp	= (IParsedExpression)state.getAttributeValue(state.getAttributeValue(mparam, OAVBDIMetaModel.parameter_has_value), OAVBDIMetaModel.expression_has_content);	// Todo: value-variable attribute???

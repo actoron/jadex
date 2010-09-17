@@ -43,6 +43,66 @@ public class ClearChemicalsService extends BasicService implements IClearChemica
 	{
 		final Future ret = new Future();
 		
+		agent.getGoalbase().getGoals("extinguish_fire").addResultListener(new DefaultResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				IEAGoal[] goals = (IEAGoal[])result;
+				if(goals.length>0)
+				{
+					ret.setException(new IllegalStateException("Can only handle one order at a time. Use abort() first."));
+				}
+				else
+				{
+					agent.getGoalbase().getGoals("clear_chemicals").addResultListener(new DefaultResultListener()
+					{
+						public void resultAvailable(Object source, Object result)
+						{
+							IEAGoal[] goals = (IEAGoal[])result;
+							if(goals.length>0)
+							{
+								ret.setException(new IllegalStateException("Can only handle one order at a time. Use abort() first."));
+							}
+							else
+							{
+								agent.createGoal("clear_chemicals").addResultListener(new DefaultResultListener()
+								{
+									public void resultAvailable(Object source, Object result)
+									{
+										final IEAGoal exfire = (IEAGoal)result;
+										exfire.setParameterValue("disaster", disaster);
+										agent.dispatchTopLevelGoalAndWait(exfire).addResultListener(new IResultListener()
+										{
+											public void resultAvailable(Object source, Object result)
+											{
+												ret.setResult(null);
+											}
+											
+											public void exceptionOccurred(Object source, Exception exception)
+											{
+												ret.setException(exception);
+											}
+										});
+									}
+								});
+							}
+						}
+					});
+				}
+			}
+		});
+		
+		return ret;
+	}
+	
+	/**
+	 *  Abort clearing chemicals.
+	 *  @return Future, null when done.
+	 */
+	public IFuture abort()
+	{
+		final Future ret = new Future();
+		
 		agent.getGoalbase().getGoals("clear_chemicals").addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
@@ -50,30 +110,10 @@ public class ClearChemicalsService extends BasicService implements IClearChemica
 				IEAGoal[] goals = (IEAGoal[])result;
 				for(int i=0; i<goals.length; i++)
 				{
-					System.out.println("Dropping: "+goals[i]);
+//					System.out.println("Dropping: "+goals[i]);
 					goals[i].drop();
 				}
-				
-				agent.createGoal("clear_chemicals").addResultListener(new DefaultResultListener()
-				{
-					public void resultAvailable(Object source, Object result)
-					{
-						final IEAGoal exfire = (IEAGoal)result;
-						exfire.setParameterValue("disaster", disaster);
-						agent.dispatchTopLevelGoalAndWait(exfire).addResultListener(new IResultListener()
-						{
-							public void resultAvailable(Object source, Object result)
-							{
-								ret.setResult(null);
-							}
-							
-							public void exceptionOccurred(Object source, Exception exception)
-							{
-								ret.setException(exception);
-							}
-						});
-					}
-				});
+				ret.setResult(null);
 			}
 		});
 		

@@ -16,4 +16,10 @@ public interface IExtinguishFireService	extends	IService
 	 */
 	public IFuture extinguishFire(ISpaceObject disaster);
 	
+
+	/**
+	 *  Abort extinguishing fire.
+	 *  @return Future, null when done.
+	 */
+	public IFuture abort();
 }

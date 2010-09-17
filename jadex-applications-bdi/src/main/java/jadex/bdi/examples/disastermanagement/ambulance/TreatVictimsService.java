@@ -1,6 +1,7 @@
 package jadex.bdi.examples.disastermanagement.ambulance;
 
 import jadex.application.space.envsupport.environment.ISpaceObject;
+import jadex.bdi.examples.disastermanagement.DeliverPatientTask;
 import jadex.bdi.examples.disastermanagement.ITreatVictimsService;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IEAGoal;
@@ -48,32 +49,72 @@ public class TreatVictimsService extends BasicService implements ITreatVictimsSe
 			public void resultAvailable(Object source, Object result)
 			{
 				IEAGoal[] goals = (IEAGoal[])result;
-				for(int i=0; i<goals.length; i++)
+				if(goals.length>0)
 				{
-					System.out.println("Dropping: "+goals[i]);
-					goals[i].drop();
+					ret.setException(new IllegalStateException("Can only handle one order at a time. Use abort() first."));
 				}
-				
-				agent.createGoal("treat_victims").addResultListener(new DefaultResultListener()
+				else
 				{
-					public void resultAvailable(Object source, Object result)
+					agent.createGoal("treat_victims").addResultListener(new DefaultResultListener()
 					{
-						final IEAGoal exfire = (IEAGoal)result;
-						exfire.setParameterValue("disaster", disaster);
-						agent.dispatchTopLevelGoalAndWait(exfire).addResultListener(new IResultListener()
+						public void resultAvailable(Object source, Object result)
 						{
-							public void resultAvailable(Object source, Object result)
+							final IEAGoal exfire = (IEAGoal)result;
+							exfire.setParameterValue("disaster", disaster);
+							agent.dispatchTopLevelGoalAndWait(exfire).addResultListener(new IResultListener()
 							{
-								ret.setResult(null);
-							}
-							
-							public void exceptionOccurred(Object source, Exception exception)
+								public void resultAvailable(Object source, Object result)
+								{
+									ret.setResult(null);
+								}
+								
+								public void exceptionOccurred(Object source, Exception exception)
+								{
+									ret.setException(exception);
+								}
+							});
+						}
+					});
+				}
+			}
+		});
+		
+		return ret;
+	}
+	
+	/**
+	 *  Abort extinguishing fire.
+	 *  @return Future, null when done.
+	 */
+	public IFuture abort()
+	{
+		final Future ret = new Future();
+		
+		agent.getBeliefbase().getBeliefFact("myself").addResultListener(new DefaultResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				ISpaceObject	myself	= (ISpaceObject)result;
+				if(((Boolean)myself.getProperty(DeliverPatientTask.PROPERTY_PATIENT)).booleanValue())
+				{
+					ret.setException(new IllegalStateException("Can not abort with patient on board."));			
+				}
+				else
+				{
+					agent.getGoalbase().getGoals("treat_victims").addResultListener(new DefaultResultListener()
+					{
+						public void resultAvailable(Object source, Object result)
+						{
+							IEAGoal[] goals = (IEAGoal[])result;
+							for(int i=0; i<goals.length; i++)
 							{
-								ret.setException(exception);
+//								System.out.println("Dropping: "+goals[i]);
+								goals[i].drop();
 							}
-						});
-					}
-				});
+							ret.setResult(null);
+						}
+					});					
+				}
 			}
 		});
 		

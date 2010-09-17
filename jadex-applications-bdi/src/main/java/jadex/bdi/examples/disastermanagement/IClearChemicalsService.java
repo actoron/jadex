@@ -15,4 +15,10 @@ public interface IClearChemicalsService extends IService
 	 *  @return Future, null when done.
 	 */
 	public IFuture clearChemicals(ISpaceObject disaster);
+
+	/**
+	 *  Abort clearing chemicals.
+	 *  @return Future, null when done.
+	 */
+	public IFuture abort();
 }

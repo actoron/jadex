@@ -1,13 +1,12 @@
 package jadex.bdi.model.impl.flyweights;
 
-import jadex.bdi.model.IMBelief;
 import jadex.bdi.model.IMCondition;
 import jadex.bdi.model.IMGoal;
 import jadex.bdi.model.IMInhibited;
-import jadex.bdi.model.IMTypedElement;
 import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.model.editable.IMECondition;
 import jadex.bdi.model.editable.IMEGoal;
+import jadex.commons.SUtil;
 import jadex.rules.state.IOAVState;
 
 import java.util.Collection;
@@ -286,7 +285,7 @@ public class MGoalFlyweight extends MProcessableElementFlyweight implements IMGo
 	
 	/**
 	 *  Test if goal should be unique.
-	 *  @retur True, if unique.
+	 *  @return True, if unique.
 	 */
 	public boolean isUnique()
 	{
@@ -309,9 +308,9 @@ public class MGoalFlyweight extends MProcessableElementFlyweight implements IMGo
 	
 	/**
 	 *  Get excluded parameters.
-	 *  @retur The excluded parameters.
+	 *  @return The excluded parameters.
 	 */
-	public IMTypedElement[] getExcludedParameters()
+	public String[] getExcludedParameters()
 	{
 		if(isExternalThread())
 		{
@@ -320,33 +319,15 @@ public class MGoalFlyweight extends MProcessableElementFlyweight implements IMGo
 				public void run()
 				{
 					Collection params = (Collection)getState().getAttributeValue(getScope(), OAVBDIMetaModel.goal_has_excludedparameter);
-					IMTypedElement[] ret = new IMTypedElement[params==null? 0: params.size()];
-					if(params!=null)
-					{
-						int i=0;
-						for(Iterator it=params.iterator(); it.hasNext(); )
-						{
-							ret[i++] = new MTypedElementFlyweight(getState(), getScope(), it.next());
-						}
-					}
-					object = ret;
+					object = params!=null ? params.toArray(new String[params.size()]) : SUtil.EMPTY_STRING_ARRAY;
 				}
 			};
-			return (IMBelief[])invoc.object;
+			return (String[])invoc.object;
 		}
 		else
 		{
 			Collection params = (Collection)getState().getAttributeValue(getScope(), OAVBDIMetaModel.goal_has_excludedparameter);
-			IMTypedElement[] ret = new IMTypedElement[params==null? 0: params.size()];
-			if(params!=null)
-			{
-				int i=0;
-				for(Iterator it=params.iterator(); it.hasNext(); )
-				{
-					ret[i++] = new MTypedElementFlyweight(getState(), getScope(), it.next());
-				}
-			}
-			return ret;
+			return params!=null ? (String[])params.toArray(new String[params.size()]) : SUtil.EMPTY_STRING_ARRAY;
 		}
 	}
 	
@@ -379,7 +360,7 @@ public class MGoalFlyweight extends MProcessableElementFlyweight implements IMGo
 		}
 		else
 		{
-			Collection params = (Collection)getState().getAttributeValue(getScope(), OAVBDIMetaModel.goal_has_excludedparameter);
+			Collection params = (Collection)getState().getAttributeValue(getScope(), OAVBDIMetaModel.goal_has_inhibits);
 			IMInhibited[] ret = new IMInhibited[params==null? 0: params.size()];
 			if(params!=null)
 			{
@@ -701,7 +682,7 @@ public class MGoalFlyweight extends MProcessableElementFlyweight implements IMGo
 					Object	param	= getState().getAttributeValue(getHandle(), OAVBDIMetaModel.parameterelement_has_parameters, name);
 					if(param==null)
 						throw new RuntimeException("Parameter not found: "+name);
-					getState().addAttributeValue(getHandle(), OAVBDIMetaModel.goal_has_excludedparameter, param);
+					getState().addAttributeValue(getHandle(), OAVBDIMetaModel.goal_has_excludedparameter, name);
 				}
 			};
 		}
@@ -710,7 +691,7 @@ public class MGoalFlyweight extends MProcessableElementFlyweight implements IMGo
 			Object	param	= getState().getAttributeValue(getHandle(), OAVBDIMetaModel.parameterelement_has_parameters, name);
 			if(param==null)
 				throw new RuntimeException("Parameter not found: "+name);
-			getState().addAttributeValue(getHandle(), OAVBDIMetaModel.goal_has_excludedparameter, param);
+			getState().addAttributeValue(getHandle(), OAVBDIMetaModel.goal_has_excludedparameter, name);
 		}
 	}
 	
