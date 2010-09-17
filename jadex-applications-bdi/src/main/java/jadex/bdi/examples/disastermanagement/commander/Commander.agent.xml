@@ -37,16 +37,10 @@
 	</beliefs>
 
 	<goals>
-		<achievegoal name="handle_disaster" exclude="never" retrydelay="1000">
+		<achievegoal name="handle_disaster">
 			<parameter name="disaster" class="ISpaceObject">
 				<value>$disaster</value>
 			</parameter>
-			<!-- Already assigned fire units -->
-			<parameterset name="fireunits" class="IExtinguishFireService" direction="inout"/>
-			<!-- Already assigned chemical units -->
-			<parameterset name="chemicalunits" class="IClearChemicalsService" direction="inout"/>
-			<!-- Already assigned ambulance units -->
-			<parameterset name="ambulanceunits" class="ITreatVictimsService" direction="inout"/>
 			<unique/>
 			<!-- Create one goal for each known disaster. -->
 			<creationcondition language="jcl">
@@ -54,7 +48,7 @@
 			</creationcondition>
 			<deliberation>
 				<inhibits ref="handle_disaster">
-					$goal.disaster.severe &amp;&amp; $goal.disaster.severe!=$ref.disaster.severe
+					$goal.disaster.severe &amp;&amp; $ref.disaster.severe==false
 				</inhibits>
 			</deliberation>
 			<targetcondition>
@@ -72,21 +66,6 @@
 			<body class="HandleDisasterPlan"/>
 			<trigger>
 				<goal ref="handle_disaster"/>
-			</trigger>
-		</plan>
-		
-		<!-- When a goal gets inactive, abort all units. -->
-		<plan name="abort_units">
-			<parameter name="goal" class="IGoal">
-				<value>$goal</value>
-			</parameter>
-			<body class="AbortUnitsPlan"/>
-			<trigger>
-				<condition language="jcl">
-					goal $g &amp;&amp; IGoal $goal &amp;&amp; ((jadex.bdi.runtime.impl.flyweights.GoalFlyweight)$goal).getHandle()==$g
-					&amp;&amp; $g.element_has_model.melement_has_name=="handle_disaster"
-					&amp;&amp; $g.goal_has_lifecyclestate=="option"
-				</condition>
 			</trigger>
 		</plan>
 	</plans>
