@@ -499,6 +499,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	 */
 	public boolean	execute()
 	{
+//		System.out.println("entering exe: "+getComponentIdentifier());
 		if(executing)
 		{
 			System.err.println("double execution: "+getComponentIdentifier());
@@ -508,7 +509,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 		rte	= new RuntimeException("executing: "+getComponentIdentifier());
 		rte.fillInStackTrace();
 		executing	= true;
-		wokenup	= false;
+		wokenup	= false;	
 		
 		// Note: wakeup() can be called from arbitrary threads (even when the
 		// component itself is currently running. I.e. it cannot be ensured easily

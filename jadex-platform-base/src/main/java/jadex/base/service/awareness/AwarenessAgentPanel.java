@@ -587,7 +587,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 		
 		// Set delay.
 		final long delay = ((Number)spdelay.getValue()).longValue()*1000;
-////			System.out.println("cur val: "+delay);
+////	System.out.println("cur val: "+delay);
 		if(delay!=AwarenessAgentPanel.this.delay)
 		{
 			component.scheduleStep(new SetDelayCommand(delay))
@@ -630,7 +630,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 		
 		// Set proxy delay.
 		final long proxydelay = ((Number)spprorefresh.getValue()).longValue()*1000;
-////			System.out.println("cur val: "+delay);
+////	System.out.println("cur val: "+delay);
 		if(proxydelay!=AwarenessAgentPanel.this.proxydelay)
 		{
 			component.scheduleStep(new SetProxyDelayCommand(proxydelay))

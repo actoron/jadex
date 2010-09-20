@@ -203,10 +203,10 @@ public class Starter
 			while(again)
 			{
 //				Thread.sleep(10000);
-//				System.err.println("Execute step: "+cid);
+				System.out.println("Execute step: "+cid);
 				again = afac.executeStep(adapter);
 			}
-//			System.err.println("starting component execution");
+			System.out.println("starting component execution");
 			
 			// Start normal execution of root component (i.e. platform).
 			adapter.wakeup();

@@ -336,10 +336,14 @@ public abstract class ComponentManagementService extends BasicService implements
 								inited.setResult(cid);
 								
 								// Start regular execution of inited component.
-								if(!cinfo.isSuspend())
+								// Note: Do not wakeup the platform because it is executed on main thread
+								// and this thread has to leave first. Platform will we woken up 
+								// in Starter.
+								if(!cinfo.isSuspend() && !root.equals(adapter))
 								{
 									try
 									{
+										System.out.println("cid wakeup: "+cid);
 										adapter.wakeup();
 									}
 									catch(Exception e)

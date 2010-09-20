@@ -1122,13 +1122,26 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 				public void resultAvailable(Object source, Object result)
 				{
 //					System.out.println("Create finished: "+component.getName()+" "+component.getTypeName()+" "+component.getConfiguration()+" "+Thread.currentThread());
-					scheduleStep(new Runnable()
-					{
-						public void run()
+//					if(getParent()==null)
+//					{
+//						addStep(new Runnable()
+//						{
+//							public void run()
+//							{
+//								createComponent(components, cl, ces, i+1, inited);
+//							}
+//						});
+//					}
+//					else
+//					{
+						scheduleStep(new Runnable()
 						{
-							createComponent(components, cl, ces, i+1, inited);
-						}
-					});
+							public void run()
+							{
+								createComponent(components, cl, ces, i+1, inited);
+							}
+						});
+//					}
 				}
 				
 				public void exceptionOccurred(Object source, Exception exception)
