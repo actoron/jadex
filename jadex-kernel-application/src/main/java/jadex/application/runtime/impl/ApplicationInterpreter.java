@@ -292,6 +292,19 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 												
 												final IComponentManagementService ces = (IComponentManagementService)result;
 												createComponent(components, cl, ces, 0, inited);
+												
+												// Block main thread for causing startup bug to appear
+												System.out.println("Blocking main thread for 10 seconds.");
+												try
+												{
+													Thread.sleep(10000);
+												}
+												catch(InterruptedException e)
+												{
+													// TODO Auto-generated catch block
+													e.printStackTrace();
+												}
+												System.out.println("Continuing.");
 											}
 										}));
 									}
