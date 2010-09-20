@@ -47,7 +47,7 @@ public class StandaloneComponentAdapter	extends AbstractComponentAdapter	impleme
 				{
 					if(getComponentIdentifier().toString().indexOf("@")==-1)
 					{
-						System.err.println("doWakeup: "+getComponentIdentifier());
+//						System.err.println("doWakeup: "+getComponentIdentifier());
 //						Thread.dumpStack();
 					}
 					((IExecutionService)result).execute(StandaloneComponentAdapter.this);

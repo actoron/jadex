@@ -115,6 +115,11 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 	/** Stop flag for stopping execution. */
 	protected boolean stop;
 	
+	/** Flag indicating a step is currently executing or scheduled. */
+	// Required for startup bug fix in scheduleStep (synchronization between main thread and executor).
+	// While main is running the root component steps, invoke later must not be called to prevent double execution.
+	protected boolean stepping;
+	
 	//-------- constructors --------
 	
 	/**
@@ -130,8 +135,8 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 		this.results = new HashMap();
 		this.properties = new HashMap();
 		this.ctypes = Collections.synchronizedMap(new HashMap()); 
-		// synchronized because of MicroAgentViewPanel, todo
-		this.steps	= Collections.synchronizedList(new ArrayList());
+		this.steps	= new ArrayList();
+		this.stepping	= true;
 		this.adapter = factory.createComponentAdapter(desc, model.getModelInfo(), this, parent);
 	
 		// Init the arguments with default values.
@@ -180,7 +185,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 		fetcher.setValue("$provider", getServiceProvider());
 		
 		// Schedule the futures (first) init step.
-		addStep(new Runnable()
+		scheduleStep(new Runnable()
 		{
 			public void run()
 			{
@@ -292,19 +297,6 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 												
 												final IComponentManagementService ces = (IComponentManagementService)result;
 												createComponent(components, cl, ces, 0, inited);
-												
-												// Block main thread for causing startup bug to appear
-												System.out.println("Blocking main thread for 10 seconds.");
-												try
-												{
-													Thread.sleep(10000);
-												}
-												catch(InterruptedException e)
-												{
-													// TODO Auto-generated catch block
-													e.printStackTrace();
-												}
-												System.out.println("Continuing.");
 											}
 										}));
 									}
@@ -328,7 +320,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 				}
 				if(alldone)
 				{
-					addStep(init2);
+					scheduleStep(init2);
 				}
 				else
 				{
@@ -349,7 +341,12 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 					}
 				}
 			}	
-		});		
+		});
+		
+		synchronized(steps)
+		{
+			this.stepping	= false;
+		}
 	}
 	
 	/**
@@ -359,34 +356,20 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 	 */
 	public void	scheduleStep(final Runnable step)
 	{
-		adapter.invokeLater(new Runnable()
-		{			
-			public void run()
-			{
-				addStep(step);
-			}
-		});
-	}
-	
-	/**
-	 *  Add a new step.
-	 */
-	protected void addStep(Runnable step)
-	{
-		steps.add(step);
+		boolean dowakeup;
+		synchronized(steps)
+		{
+			steps.add(step);
+			dowakeup	= !stepping;	// only wake up if not already scheduled.
+		}
 //		notifyListeners(new ChangeEvent(this, "addStep", step));
+		
+		if(dowakeup)
+		{
+			adapter.wakeup();
+		}
 	}
 	
-	/**
-	 *  Add a new step.
-	 */
-	protected Object removeStep()
-	{
-		Object ret = steps.remove(0);
-//		notifyListeners(new ChangeEvent(this, "removeStep", new Integer(0)));
-		return ret;
-	}
-
 //	/**
 //	 * Load an component model.
 //	 * @param model The model.
@@ -930,7 +913,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 	}
 	
 	//-------- methods to be called by adapter --------
-
+	
 	/**
 	 *  Can be called on the component thread only.
 	 * 
@@ -947,15 +930,30 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 	{
 		try
 		{
-			if(!steps.isEmpty())
+			Runnable step	= null;
+			synchronized(steps)
 			{
-				Runnable step = (Runnable)removeStep();
+				stepping	= true;
+				if(!steps.isEmpty())
+				{
+					step	= (Runnable)steps.remove(0);
+				}
+			}
+
+			if(step!=null)
+			{
+//				notifyListeners(new ChangeEvent(this, "removeStep", new Integer(0)));
 //				String steptext = ""+step;
 				step.run();
 //				addHistoryEntry(steptext);
 			}
-	
-			boolean ret = !stop && !steps.isEmpty();
+			
+			boolean ret;
+			synchronized(steps)
+			{
+				ret = !stop && !steps.isEmpty();
+				stepping	= ret;
+			}
 			stop = false;
 			return ret;
 		}

@@ -343,7 +343,7 @@ public abstract class ComponentManagementService extends BasicService implements
 								{
 									try
 									{
-										System.out.println("cid wakeup: "+cid);
+//										System.out.println("cid wakeup: "+cid);
 										adapter.wakeup();
 									}
 									catch(Exception e)
