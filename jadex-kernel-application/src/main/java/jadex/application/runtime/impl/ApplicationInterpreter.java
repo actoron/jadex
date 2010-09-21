@@ -115,10 +115,10 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 	/** Stop flag for stopping execution. */
 	protected boolean stop;
 	
-	/** Flag indicating a step is currently executing or scheduled. */
+	/** Flag indicating an added step will be executed without the need for calling wakeup(). */
 	// Required for startup bug fix in scheduleStep (synchronization between main thread and executor).
 	// While main is running the root component steps, invoke later must not be called to prevent double execution.
-	protected boolean stepping;
+	protected boolean willdostep;
 	
 	//-------- constructors --------
 	
@@ -136,7 +136,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 		this.properties = new HashMap();
 		this.ctypes = Collections.synchronizedMap(new HashMap()); 
 		this.steps	= new ArrayList();
-		this.stepping	= true;
+		this.willdostep	= true;
 		this.adapter = factory.createComponentAdapter(desc, model.getModelInfo(), this, parent);
 	
 		// Init the arguments with default values.
@@ -342,11 +342,6 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 				}
 			}	
 		});
-		
-		synchronized(steps)
-		{
-			this.stepping	= false;
-		}
 	}
 	
 	/**
@@ -360,7 +355,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 		synchronized(steps)
 		{
 			steps.add(step);
-			dowakeup	= !stepping;	// only wake up if not already scheduled.
+			dowakeup	= !willdostep;	// only wake up if not already scheduled.
 		}
 //		notifyListeners(new ChangeEvent(this, "addStep", step));
 		
@@ -933,7 +928,6 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 			Runnable step	= null;
 			synchronized(steps)
 			{
-				stepping	= true;
 				if(!steps.isEmpty())
 				{
 					step	= (Runnable)steps.remove(0);
@@ -952,7 +946,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 			synchronized(steps)
 			{
 				ret = !stop && !steps.isEmpty();
-				stepping	= ret;
+				willdostep	= ret;
 			}
 			stop = false;
 			return ret;
