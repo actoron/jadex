@@ -311,34 +311,20 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 					}
 				};
 				
-				// Do not use schedule step if waiting not necessary
-				// Required for platform startup as doWakeup must not be called until Starter is done.
-				boolean	alldone	= true;
-				for(int i=0; alldone && i<futures.size(); i++)
+				IResultListener	crl	= new CounterResultListener(futures.size())
 				{
-					alldone	= ((IFuture)futures.get(i)).isDone();
-				}
-				if(alldone)
-				{
-					scheduleStep(init2);
-				}
-				else
-				{
-					IResultListener	crl	= new CounterResultListener(futures.size())
+					public void finalResultAvailable(Object source, Object result)
 					{
-						public void finalResultAvailable(Object source, Object result)
-						{
-							scheduleStep(init2);
-						}
-						public void exceptionOccurred(Object source, Exception exception)
-						{
-							inited.setException(exception);
-						}
-					};
-					for(int i=0; i<futures.size(); i++)
-					{
-						((IFuture)futures.get(i)).addResultListener(crl);
+						scheduleStep(init2);
 					}
+					public void exceptionOccurred(Object source, Exception exception)
+					{
+						inited.setException(exception);
+					}
+				};
+				for(int i=0; i<futures.size(); i++)
+				{
+					((IFuture)futures.get(i)).addResultListener(crl);
 				}
 			}	
 		});
