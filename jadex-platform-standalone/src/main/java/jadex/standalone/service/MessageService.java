@@ -130,7 +130,10 @@ public class MessageService extends BasicService implements IMessageService
 		
 //		IComponentIdentifier sender = adapter.getComponentIdentifier();
 		if(sender==null)
-			throw new RuntimeException("Sender must not be null: "+msg);
+		{
+			ret.setException(new RuntimeException("Sender must not be null: "+msg));
+			return ret;
+		}
 	
 		final Map msgcopy = new HashMap(msg);
 		

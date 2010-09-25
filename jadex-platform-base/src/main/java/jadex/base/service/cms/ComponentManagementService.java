@@ -365,8 +365,9 @@ public abstract class ComponentManagementService extends BasicService implements
 									{
 										adapters.remove(cid);
 										descs.remove(cid);
-										initinfos.remove(cid);										
-										exceptions.remove(cid);
+										initinfos.remove(cid);		
+										if(exceptions!=null)
+											exceptions.remove(cid);
 										cc	= (CleanupCommand)ccs.remove(cid);										
 									}
 								}
