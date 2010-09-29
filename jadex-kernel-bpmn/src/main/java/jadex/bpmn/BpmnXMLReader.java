@@ -494,7 +494,7 @@ public class BpmnXMLReader
 								{
 									Class clazz = SReflect.findClass(clazzname, dia.getAllImports(), context.getClassLoader());
 									IParsedExpression exp = null;
-									if(val!=null)
+									if(val!=null && val.length()>0)
 									{
 										exp = parser.parseExpression(val, dia.getAllImports(), null, context.getClassLoader());
 									}
@@ -517,7 +517,7 @@ public class BpmnXMLReader
 								
 								// context variable
 								IParsedExpression exp = null;
-								if(val!=null)
+								if(val!=null && val.length()>0)
 								{
 									exp = parser.parseExpression(val, dia.getAllImports(), null, context.getClassLoader());
 								}
@@ -551,7 +551,7 @@ public class BpmnXMLReader
 							
 							// context variable
 							IParsedExpression exp = null;
-							if(val!=null)
+							if(val!=null && val.length()>0)
 							{
 								exp = parser.parseExpression(val, dia.getAllImports(), null, context.getClassLoader());
 							}
@@ -595,7 +595,7 @@ public class BpmnXMLReader
 										{
 											Class clazz = SReflect.findClass(clazzname, dia.getAllImports(), context.getClassLoader());
 											IParsedExpression exp = null;
-											if(val!=null)
+											if(val!=null && val.length()>0)
 											{
 												exp = parser.parseExpression(val, dia.getAllImports(), null, context.getClassLoader());
 											}
@@ -617,7 +617,7 @@ public class BpmnXMLReader
 										
 										// context variable
 										IParsedExpression exp = null;
-										if(val!=null)
+										if(val!=null && val.length()>0)
 										{
 											exp = parser.parseExpression(val, dia.getAllImports(), null, context.getClassLoader());
 										}
@@ -1193,7 +1193,7 @@ public class BpmnXMLReader
 							if(clazz!=null)
 							{
 								
-								if(val!=null)
+								if(val!=null && val.length()>0)
 								{
 									exp = parser.parseExpression(val, model.getAllImports(), null, context.getClassLoader());
 								}
@@ -1284,7 +1284,7 @@ public class BpmnXMLReader
 										if(clazz!=null)
 										{
 											
-											if(val!=null)
+											if(val!=null && val.length()>0)
 											{
 												exp = parser.parseExpression(val, model.getAllImports(), null, context.getClassLoader());
 											}
@@ -1342,7 +1342,7 @@ public class BpmnXMLReader
 										String val = stok2.hasMoreTokens()? stok2.nextToken(): null;
 										IParsedExpression exp = null;
 	
-										if(val!=null)
+										if(val!=null && val.length()>0)
 										{
 											exp = parser.parseExpression(val, model.getAllImports(), null, context.getClassLoader());
 											try
