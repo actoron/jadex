@@ -144,6 +144,13 @@ public class MicroAgentInterpreter implements IComponentInstance
 							stop = true;
 							inited.setResult(new Object[]{MicroAgentInterpreter.this, adapter});
 							
+							Future fut = new Future();
+							fut.addResultListener(new DefaultResultListener(adapter.getLogger())
+							{
+								public void resultAvailable(Object source, Object result)
+								{
+								}
+							});
 							addStep(new Object[]{new ICommand()
 							{
 								public void execute(Object agent)
@@ -154,7 +161,7 @@ public class MicroAgentInterpreter implements IComponentInstance
 								{
 									return "microagent.executeBody()_#"+this.hashCode();
 								}
-							}, new Future()});
+							}, fut});
 						}
 						
 						public void exceptionOccurred(Object source, Exception exception)
