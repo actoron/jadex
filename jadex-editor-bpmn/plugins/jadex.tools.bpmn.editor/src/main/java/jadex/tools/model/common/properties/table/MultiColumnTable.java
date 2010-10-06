@@ -6,6 +6,7 @@ package jadex.tools.model.common.properties.table;
 import jadex.tools.bpmn.editor.properties.template.AbstractBpmnPropertySection;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
@@ -71,14 +72,21 @@ public class MultiColumnTable
 		this.rows = new ArrayList<MultiColumnTableRow>(rowCount);
 	}
 
-
 	// ---- methods ----
 	
+	/**
+	 * Access the back-end row list
+	 * @return the internal list of rows as unmodifiable list
+	 */
 	public List<MultiColumnTableRow> getRowList()
 	{
-		return rows;
+		return Collections.unmodifiableList(rows);
 	}
 	
+	/**
+	 * Get the size of a row element
+	 * @return the number of elements for a row in this table
+	 */
 	public int getRowSize()
 	{
 		if (!rows.isEmpty())
@@ -106,22 +114,24 @@ public class MultiColumnTable
 	
 	/**
 	 * @param index
-	 * @param element
+	 * @param row
 	 * @see java.util.List#add(int, java.lang.Object)
 	 */
-	public void add(int index, MultiColumnTableRow element)
+	public void add(int index, MultiColumnTableRow row)
 	{
-		rows.add(index, element);
+		row.setTable(this);
+		rows.add(index, row);
 	}
 
 	/**
-	 * @param e
+	 * @param row
 	 * @return
 	 * @see java.util.List#add(java.lang.Object)
 	 */
-	public boolean add(MultiColumnTableRow e)
+	public boolean add(MultiColumnTableRow row)
 	{
-		return rows.add(e);
+		row.setTable(this);
+		return rows.add(row);
 	}
 
 	/**
@@ -198,7 +208,7 @@ public class MultiColumnTable
 	 */
 	public Iterator<MultiColumnTableRow> iterator()
 	{
-		return rows.iterator();
+		return Collections.unmodifiableList(rows).iterator();
 	}
 
 	/**
@@ -212,32 +222,15 @@ public class MultiColumnTable
 	}
 
 	/**
-	 * @return
-	 * @see java.util.List#listIterator()
-	 */
-	public ListIterator<MultiColumnTableRow> listIterator()
-	{
-		return rows.listIterator();
-	}
-
-	/**
-	 * @param index
-	 * @return
-	 * @see java.util.List#listIterator(int)
-	 */
-	public ListIterator<MultiColumnTableRow> listIterator(int index)
-	{
-		return rows.listIterator(index);
-	}
-
-	/**
 	 * @param index
 	 * @return
 	 * @see java.util.List#remove(int)
 	 */
 	public MultiColumnTableRow remove(int index)
 	{
-		return rows.remove(index);
+		MultiColumnTableRow row = rows.remove(index);
+		row.setTable(null);
+		return  row;
 	}
 
 	/**
@@ -278,7 +271,7 @@ public class MultiColumnTable
 	 */
 	public List<MultiColumnTableRow> subList(int fromIndex, int toIndex)
 	{
-		return rows.subList(fromIndex, toIndex);
+		return Collections.unmodifiableList(rows.subList(fromIndex, toIndex)); 
 	}
 
 	/**
@@ -306,137 +299,6 @@ public class MultiColumnTable
 	// ---- @deprecated static conversion methods ----
 
 	/**
-	 * Convert a list of MultiColumnTableRow into a string representation using  
-	 * <code>LIST_ELEMENT_DELIMITER</code> from {@link AbstractBpmnPropertySection}
-	 * as delimiter
-	 * 
-	 * @param table (the table)
-	 * @return String representation of rowList
-	 * @deprecated We use a annotation as table now
-	 */
-	public static String convertMultiColumnRowList(MultiColumnTable table)
-	{
-		if (null == table)
-			return null;
-		
-		StringBuffer buffer = new StringBuffer();
-		for (MultiColumnTableRow multiColumnTableRow : table.getRowList())
-		{
-			if (buffer.length() != 0)
-			{
-				buffer.append(LIST_ELEMENT_DELIMITER);
-			}
-	
-			buffer.append(convertMultiColumnRowToString(multiColumnTableRow));
-		}
-		return buffer.toString();
-	}
-
-	/**
-	 * Convert a row of the table to a String representation using 
-	 * <code>LIST_ELEMENT_ATTRIBUTE_DELIMITER</code> from 
-	 * {@link AbstractBpmnPropertySection} as delimiter
-	 * @param row to convert
-	 * @return String representation of row
-	 * @deprecated We use a annotation as table now
-	 */
-	public static String convertMultiColumnRowToString(MultiColumnTableRow row)
-	{
-		StringBuffer buffer = new StringBuffer();
-		for (int i = 0; i < row.getColumnValues().length; i++)
-		{
-			buffer.append(row.getColumnValues()[i]);
-			buffer.append(LIST_ELEMENT_ATTRIBUTE_DELIMITER);
-		}
-		// remove last delimiter
-		buffer.delete(buffer.length()
-				- LIST_ELEMENT_ATTRIBUTE_DELIMITER.length(), buffer.length());
-		//System.out.println(buffer.toString());
-		return buffer.toString();
-	}
-	
-//	/**
-//	 * Convert a string representation of a MultiColumnTableRow list into a
-//	 * MultiColumnTableRow list
-//	 * 
-//	 * @param stringToConvert
-//	 * @param columnCount number of columns to expect in the table (e.g. attribute count)
-//	 * @param uniqueColumn, set to -1 for no unique column (beware, someone could get confused!)
-//	 * @return List of column rows from String, each column rows has set the unique column attribute
-//	 * @deprecated We use a annotation as table now
-//	 */
-//	public static MultiColumnTable convertMultiColumnTableString(
-//			String stringToConvert, int columnCount, int uniqueColumn)
-//	{
-//		// replace the old deprecated delimiter with the new one used
-//		//stringToConvert = convertDeprecatedDelimiter(stringToConvert);
-//		
-//		StringTokenizer listTokens = new StringTokenizer(stringToConvert, LIST_ELEMENT_DELIMITER, false);
-//		
-//		//MultiColumnTable tableRowList = new MultiColumnTable(listTokens.countTokens());
-//		
-//		long countTokens = listTokens.countTokens();
-//		MultiColumnTable tableRowList = new MultiColumnTable((int)countTokens/2, uniqueColumn);
-//		
-//		while (listTokens.hasMoreElements())
-//		{
-//			String parameterElement = listTokens.nextToken();
-//			StringTokenizer parameterTokens = new StringTokenizer(
-//					parameterElement,
-//					LIST_ELEMENT_ATTRIBUTE_DELIMITER, true);
-//	
-//			// number of columns is the index that will be used.
-//			// initialize array with empty strings because we 
-//			// don't check the values
-//			String[] attributes = new String[columnCount];
-//			for (int index = 0; index < attributes.length; index++)
-//			{
-//				attributes[index] = attributes[index] != null ? attributes[index] : "";
-//			}
-//			
-//			int attributeIndexCounter = 0;	
-//			String lastToken = null;
-//	
-//			while (parameterTokens.hasMoreElements())
-//			{
-//				String attributeToken = parameterTokens.nextToken();
-//	
-//				if (!attributeToken.equals(LIST_ELEMENT_ATTRIBUTE_DELIMITER))
-//				{
-//					attributes[attributeIndexCounter] = attributeToken;
-//					attributeIndexCounter++;
-//				}
-//				// we found a delimiter
-//				else
-//				{
-//					if (	// we found a delimiter at the first position
-//							lastToken == null 
-//							// we found a delimiter at the last position, 
-//							|| !parameterTokens.hasMoreElements()
-//							// we found two delimiter without any content between
-//							|| attributeToken.equals(lastToken))
-//					{
-//						attributes[attributeIndexCounter] = "";
-//						attributeIndexCounter++;
-//					}
-//					
-//				}
-//	
-//				// remember last token
-//				lastToken = attributeToken;
-//	
-//			} // end while paramTokens
-//	
-//			MultiColumnTableRow newRow = tableRowList.new MultiColumnTableRow(attributes, uniqueColumn);
-//			//addUniqueRowValue(newRow.getColumnValueAt(uniqueColumnIndex));
-//			tableRowList.add(newRow);
-//	
-//		} // end while listTokens
-//		
-//		return tableRowList;
-//	}
-	
-	/**
 	 * Convert a string representation of a MultiColumnTableRow list into a
 	 * MultiColumnTableRow list
 	 * 
@@ -452,10 +314,8 @@ public class MultiColumnTable
 
 		StringTokenizer listTokens = new StringTokenizer(stringToConvert, LIST_ELEMENT_DELIMITER, false);
 		
-		//MultiColumnTable tableRowList = new MultiColumnTable(listTokens.countTokens());
-		
 		long countRowTokens = listTokens.countTokens();
-		MultiColumnTable tableRowList = new MultiColumnTable((int)countRowTokens/2, uniqueColumn);
+		MultiColumnTable table = new MultiColumnTable((int)countRowTokens/2, uniqueColumn);
 		
 		while (listTokens.hasMoreElements())
 		{
@@ -507,37 +367,13 @@ public class MultiColumnTable
 	
 			} // end while paramTokens
 	
-			MultiColumnTableRow newRow = tableRowList.new MultiColumnTableRow(attributes, uniqueColumn);
+			MultiColumnTableRow newRow = table.new MultiColumnTableRow(attributes, table);
 			//addUniqueRowValue(newRow.getColumnValueAt(uniqueColumnIndex));
-			tableRowList.add(newRow);
+			table.add(newRow);
 	
 		} // end while listTokens
 		
-		return tableRowList;
-	}
-
-	/**
-	 * Convert delimiters in a table string
-	 * @param stringToConvert a String with old delimiters used
-	 * @return toConvert with replaced delimiters
-	 * @deprecated We use a annotation as table now
-	 */
-	public static String convertDeprecatedDelimiter(String stringToConvert)
-	{
-		if (stringToConvert.indexOf(DEPRECATED_LIST_ELEMENT_ATTRIBUTE_DELIMITER) > -1)
-		{
-			stringToConvert = stringToConvert.replaceAll(
-					DEPRECATED_LIST_ELEMENT_ATTRIBUTE_DELIMITER,
-					LIST_ELEMENT_ATTRIBUTE_DELIMITER);
-		}
-
-		if (stringToConvert.indexOf(DEPRECATED_LIST_ELEMENT_DELIMITER) > -1)
-		{
-			stringToConvert = stringToConvert.replaceAll(DEPRECATED_LIST_ELEMENT_DELIMITER,
-					LIST_ELEMENT_DELIMITER);
-		}
-
-		return stringToConvert;
+		return table;
 	}
 	
 	
@@ -551,16 +387,17 @@ public class MultiColumnTable
 		// ---- attributes ----
 
 		private String[] columnValues;
-		private int uniqueColumnIndex;
+		//private int uniqueColumnIndex;
+		private MultiColumnTable table;
 		
 		// ---- constructors ----
-		
+
 		/** default constructor */
-		public MultiColumnTableRow(String[] columnValues, int uniqueColumnIndex)
+		public MultiColumnTableRow(String[] columnValues, MultiColumnTable parent)
 		{
 			super();
 			
-			this.uniqueColumnIndex = uniqueColumnIndex;
+			table = parent;
 			
 			this.columnValues = new String[columnValues.length];
 			for (int i = 0; i < columnValues.length; i++)
@@ -572,14 +409,17 @@ public class MultiColumnTable
 			//this.columnValues = columnValues;
 			
 		}
-		
+
 		// ---- methods ----
 		
 		/** check if the unique column index is valid and can be used */
 		private boolean useUniqueColumn()
 		{
+			int uniqueColumnIndex = getUniqueColumnIndex();
 			return uniqueColumnIndex >= 0 && uniqueColumnIndex < columnValues.length;
 		}
+		
+		
 
 		// ---- overrides ----
 		
@@ -597,7 +437,7 @@ public class MultiColumnTable
 			boolean returnValue = true;
 			if (useUniqueColumn())
 			{
-				returnValue = this.columnValues[uniqueColumnIndex].equals(((MultiColumnTableRow) obj).columnValues[uniqueColumnIndex]);
+				returnValue = this.columnValues[getUniqueColumnIndex()].equals(((MultiColumnTableRow) obj).columnValues[getUniqueColumnIndex()]);
 			}
 			else
 			{
@@ -620,7 +460,7 @@ public class MultiColumnTable
 			
 			if (useUniqueColumn())
 			{
-				returnHash = this.columnValues[uniqueColumnIndex].hashCode();
+				returnHash = this.columnValues[getUniqueColumnIndex()].hashCode();
 			}
 			else
 			{
@@ -644,7 +484,7 @@ public class MultiColumnTable
 			{
 				buffer.append("`");
 				buffer.append(columnValues[i]);
-				buffer.append("Â´" + ", ");
+				buffer.append("´" + ", ");
 			}
 			// remove last delimiter
 			buffer.delete(buffer.length()-", ".length(), buffer.length());
@@ -663,6 +503,24 @@ public class MultiColumnTable
 		}
 		
 		// ---- getter / setter ----
+		
+		/**
+		 * Get the parent for this row
+		 * @return The parent table for this table row
+		 */
+		private MultiColumnTable getTable()
+		{
+			return table;
+		}
+
+		/**
+		 * Set the parent table for this table row
+		 * @param table the parent
+		 */
+		private void setTable(MultiColumnTable table)
+		{
+			this.table = table;
+		}
 		
 		/**
 		 * @return the columnValues
@@ -704,7 +562,7 @@ public class MultiColumnTable
 		 */
 		public int getUniqueColumnIndex()
 		{
-			return uniqueColumnIndex;
+			return getTable().getUniqueColumn();
 		}
 	}
 

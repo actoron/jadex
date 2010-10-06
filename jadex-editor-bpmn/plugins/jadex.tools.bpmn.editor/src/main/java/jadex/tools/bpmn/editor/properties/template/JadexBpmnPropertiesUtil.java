@@ -345,6 +345,7 @@ public class JadexBpmnPropertiesUtil
 					if (table != null && !table.isEmpty())
 					{
 						String tableDimension =  (new TableCellIndex(table.size(), table.getRowSize())).toString();
+						annotation.getDetails().clear();
 						annotation.getDetails().put(JADEX_TABLE_DIMESION_DETAIL, tableDimension);
 						annotation.getDetails().put(JADEX_TABLE_UNIQUE_COLUMN_DETAIL, String.valueOf(table.getUniqueColumn()));
 						int rowIndex = 0;
@@ -413,14 +414,14 @@ public class JadexBpmnPropertiesUtil
 					{
 						newRow[columnIndex] = annotation.getDetails().get((new TableCellIndex(rowIndex, columnIndex)).toString());
 					}
-					newTable.add(newTable.new MultiColumnTableRow(newRow, uniqueColumn));
+					newTable.add(newTable.new MultiColumnTableRow(newRow, newTable));
 				}
 				
 				return newTable;
 			}
 			
 			// fall through
-			MultiColumnTable table = new MultiColumnTable(0,0);
+			MultiColumnTable table = new MultiColumnTable(0,uniqueColumn);
 			// set parameter
 			return table;
 		}

@@ -12,7 +12,6 @@ import java.util.Map;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.emf.ecore.EAnnotation;
 import org.eclipse.emf.ecore.EModelElement;
 import org.eclipse.gmf.runtime.common.core.command.CommandResult;
 import org.eclipse.jface.viewers.CellEditor;
@@ -23,7 +22,6 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.ui.IWorkbenchPart;
 
 /**
@@ -159,7 +157,7 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 					MultiColumnTable table = getTableFromAnnotation();
 					newRow = table.new MultiColumnTableRow(
 							getDefaultListElementAttributeValues(),
-							uniqueColumnIndex);
+							table);
 					String uniqueValue = createUniqueRowValue(newRow, table);
 					newRow.getColumnValues()[uniqueColumnIndex] = uniqueValue;
 					addUniqueRowValue(uniqueValue);
@@ -390,13 +388,13 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 			for (MultiColumnTableRow multiColumnTableRow : table.getRowList())
 			{
 				addUniqueRowValue(multiColumnTableRow
-						.getColumnValueAt(uniqueColumnIndex));
+						.getColumnValueAt(table.getUniqueColumn()));
 			}
 			return table;
 		}
 
 		// fall through
-		return new MultiColumnTable(0, 0);
+		return new MultiColumnTable(0, uniqueColumnIndex);
 	}
 
 	/**

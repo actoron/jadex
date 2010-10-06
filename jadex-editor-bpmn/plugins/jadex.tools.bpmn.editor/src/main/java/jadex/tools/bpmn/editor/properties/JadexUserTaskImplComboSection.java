@@ -6,12 +6,14 @@ package jadex.tools.bpmn.editor.properties;
 import jadex.tools.bpmn.editor.properties.template.AbstractComboPropertySection;
 import jadex.tools.bpmn.editor.properties.template.AbstractParameterTablePropertySection;
 import jadex.tools.bpmn.editor.properties.template.JadexBpmnPropertiesUtil;
-import jadex.tools.bpmn.runtime.task.IEditorTaskProvider;
 import jadex.tools.bpmn.runtime.task.IEditorParameterMetaInfo;
 import jadex.tools.bpmn.runtime.task.IEditorTaskMetaInfo;
+import jadex.tools.bpmn.runtime.task.IEditorTaskProvider;
 import jadex.tools.bpmn.runtime.task.PreferenceTaskProviderProxy;
 import jadex.tools.model.common.properties.table.MultiColumnTable;
 import jadex.tools.model.common.properties.table.MultiColumnTable.MultiColumnTableRow;
+
+import java.util.List;
 
 import org.eclipse.emf.ecore.xml.type.internal.RegEx.RegularExpression;
 import org.eclipse.jface.viewers.ISelection;
@@ -322,8 +324,12 @@ public class JadexUserTaskImplComboSection extends
 									.getTableAnnotationIdentifier(
 											JadexCommonParameterSection.PARAMETER_ANNOTATION_IDENTIFIER,
 											JadexCommonParameterSection.PARAMETER_ANNOTATION_DETAIL_IDENTIFIER)); 
+
 		if (parameterTable != null) 
 		{	
+			// TO DO: remove this BUGFIX in future versions?
+			fixUniqueColumnIndexBugInCorruptedBpmnDiagrams(parameterTable, JadexCommonParameterSection.UNIQUE_PARAMETER_ROW_ATTRIBUTE);
+			
 			parameterTable = addTaskParamterTable(parameterTable, taskParameter);
 		}
 		else
@@ -346,6 +352,8 @@ public class JadexUserTaskImplComboSection extends
 			viewer.refresh();
 		}
 	}
+
+	
 	
 	/**
 	 * Create a new Table for meta info
@@ -364,7 +372,7 @@ public class JadexUserTaskImplComboSection extends
 					parameterMetaInfo[i].getInitialValue() };
 			newTable.add(newTable.new MultiColumnTableRow(
 					columnValues,
-					JadexCommonParameterSection.UNIQUE_PARAMETER_ROW_ATTRIBUTE));
+					newTable));
 
 		}
 		
@@ -421,6 +429,28 @@ public class JadexUserTaskImplComboSection extends
 		return table;
 	}
 	
+	// ---- BUGFIX METHOD ----
 	
+	/**
+	 * Needed to fix legacy BPMN files corrupted through a bug  
+	 * @param parameterTable
+	 * @return
+	 */
+	private MultiColumnTable fixUniqueColumnIndexBugInCorruptedBpmnDiagrams(
+			MultiColumnTable parameterTable, int correctUniqueColumnIndex)
+	{
+		if (parameterTable.getUniqueColumn() != correctUniqueColumnIndex)
+		{
+			List<MultiColumnTableRow> rows = parameterTable.getRowList();
+			parameterTable = new MultiColumnTable(rows.size(), correctUniqueColumnIndex);
+			for (MultiColumnTableRow multiColumnTableRow : rows)
+			{
+				parameterTable.add(multiColumnTableRow);
+			}
+			
+			
+		}
+		return parameterTable;
+	}
 	
 }
