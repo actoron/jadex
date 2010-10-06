@@ -8,10 +8,16 @@ import jadex.bridge.IComponentFactory;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IModelInfo;
 import jadex.commons.Future;
+import jadex.commons.IFuture;
 import jadex.commons.SGUI;
+import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.service.BasicService;
 import jadex.commons.service.IServiceProvider;
+import jadex.commons.service.SServiceProvider;
+import jadex.commons.service.library.ILibraryService;
+import jadex.commons.service.library.ILibraryServiceListener;
 
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -47,6 +53,9 @@ public class BpmnFactory extends BasicService implements IComponentFactory
 	/** The model loader */
 	protected BpmnModelLoader loader;
 	
+	/** The library service listener */
+	protected ILibraryServiceListener libservicelistener;
+	
 	/** The properties. */
 	protected Map properties;
 	
@@ -63,6 +72,27 @@ public class BpmnFactory extends BasicService implements IComponentFactory
 		this.processes = new HashMap();
 		this.loader = new BpmnModelLoader();
 		this.properties	= properties;
+		
+		libservicelistener = new ILibraryServiceListener()
+		{
+			public void urlRemoved(URL url)
+			{
+				loader.clearModelCache();
+			}
+			
+			public void urlAdded(URL url)
+			{
+				loader.clearModelCache();
+			}
+		};
+		SServiceProvider.getService(provider, ILibraryService.class).addResultListener(new DefaultResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				ILibraryService libService = (ILibraryService) result;
+				libService.addLibraryServiceListener(libservicelistener);
+			}
+		});
 	}
 	
 	//-------- methods --------
@@ -78,11 +108,19 @@ public class BpmnFactory extends BasicService implements IComponentFactory
 	/**
 	 *  Shutdown the service.
 	 *  @param listener The listener.
-	 * /
+	 */
 	public synchronized IFuture	shutdownService()
 	{
+		SServiceProvider.getService(provider, ILibraryService.class).addResultListener(new DefaultResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				ILibraryService libService = (ILibraryService) result;
+				libService.removeLibraryServiceListener(libservicelistener);
+			}
+		});
 		return super.shutdownService();
-	}*/
+	}
 	
 	/**
 	 *  Load a  model.

@@ -341,6 +341,14 @@ public abstract class AbstractModelLoader
 	}
 	
 	/**
+	 *  Clears the model cache.
+	 */
+	public void clearModelCache()
+	{
+		modelcache.clear();
+	}
+	
+	/**
 	 *  Get a model from cache (if any).
 	 */
 	protected ICacheableModel	getCachedModel(Object key)

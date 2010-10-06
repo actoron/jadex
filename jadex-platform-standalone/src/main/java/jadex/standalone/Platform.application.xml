@@ -126,7 +126,7 @@
 					MEnvSpaceType.getXMLMapping(),
 					MAGRSpaceType.getXMLMapping()
 				}, 
-				$component.getServiceProvider().getId()
+				$component.getServiceProvider()
 			)		
 		</service>
 	</services>

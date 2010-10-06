@@ -10,15 +10,22 @@ import jadex.bridge.IComponentFactory;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IModelInfo;
 import jadex.commons.Future;
+import jadex.commons.IFuture;
 import jadex.commons.SGUI;
 import jadex.commons.SReflect;
+import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.service.BasicService;
+import jadex.commons.service.IServiceProvider;
+import jadex.commons.service.SServiceProvider;
+import jadex.commons.service.library.ILibraryService;
+import jadex.commons.service.library.ILibraryServiceListener;
 import jadex.javaparser.IExpressionParser;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 import jadex.xml.IContext;
 import jadex.xml.IPostProcessor;
 
+import java.net.URL;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -54,14 +61,31 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 	/** The application model loader. */
 	protected ApplicationModelLoader loader;
 	
+	/** The provider. */
+	protected IServiceProvider provider;
+	
+	/** The library service listener */
+	protected ILibraryServiceListener libservicelistener;
+	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new application factory.
 	 */
+	public ApplicationComponentFactory(IServiceProvider provider)
+	{
+		this(null, provider);
+	}
+	
+	/**
+	 *  Create a new application factory for startup.
+	 *  @param platform	The agent platform.
+	 *  @param mappings	The XML reader mappings of supported spaces (if any).
+	 */
 	public ApplicationComponentFactory(Object providerid)
 	{
-		this(null, providerid);
+		super(providerid, IComponentFactory.class, null);
+		this.loader = new ApplicationModelLoader(null);
 	}
 	
 	/**
@@ -69,10 +93,31 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 	 *  @param platform	The agent platform.
 	 *  @param mappings	The XML reader mappings of supported spaces (if any).
 	 */
-	public ApplicationComponentFactory(Set[] mappings, Object providerid)
+	public ApplicationComponentFactory(Set[] mappings, IServiceProvider provider)
 	{
-		super(providerid, IComponentFactory.class, null);
+		super(provider.getId(), IComponentFactory.class, null);
 		this.loader = new ApplicationModelLoader(mappings);
+		this.provider = provider;
+		this.libservicelistener = new ILibraryServiceListener()
+		{
+			public void urlRemoved(URL url)
+			{
+				loader.clearModelCache();
+			}
+			
+			public void urlAdded(URL url)
+			{
+				loader.clearModelCache();
+			}
+		};
+		SServiceProvider.getService(provider, ILibraryService.class).addResultListener(new DefaultResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				ILibraryService libService = (ILibraryService) result;
+				libService.addLibraryServiceListener(libservicelistener);
+			}
+		});
 	}
 	
 	/**
@@ -86,11 +131,19 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 	/**
 	 *  Shutdown the service.
 	 *  @param listener The listener.
-	 * /
+	 */
 	public synchronized IFuture	shutdownService()
 	{
+		SServiceProvider.getService(provider, ILibraryService.class).addResultListener(new DefaultResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				ILibraryService libService = (ILibraryService) result;
+				libService.removeLibraryServiceListener(libservicelistener);
+			}
+		});
 		return super.shutdownService();
-	}*/
+	}
 	
 	//-------- IComponentFactory interface --------
 	
