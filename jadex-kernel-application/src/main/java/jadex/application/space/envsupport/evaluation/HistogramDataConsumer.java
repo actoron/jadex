@@ -148,6 +148,7 @@ public class HistogramDataConsumer extends AbstractChartDataConsumer
 		catch(Exception e)
 		{
 			System.out.println("Bin problem with value: "+valy);
+			e.printStackTrace();
 		}
 	}
 }

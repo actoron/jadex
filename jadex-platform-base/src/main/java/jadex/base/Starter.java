@@ -163,7 +163,7 @@ public class Starter
 			
 			IComponentIdentifier cid = new ComponentIdentifier(platformname);
 			// Hack!!! Autoshutdown!?
-			CMSComponentDescription desc = new CMSComponentDescription(cid, cfac.getComponentType(
+			final CMSComponentDescription desc = new CMSComponentDescription(cid, cfac.getComponentType(
 				configfile, null, cl), null, false, false, true, model.getFullName());
 			
 			String afclname = (String)cmdargs.get(ADAPTER_FACTORY)!=null? 

@@ -37,8 +37,8 @@
 	<spacetypes>
 		<env:envspacetype name="gc2dspace" width="20" height="20" class="Grid2D">
 			<env:property name="neighborhood">Grid2D.NEIGHBORHOOD_MOORE</env:property>
-			<env:property name="min_ideal_temp">50.0</env:property>
-			<env:property name="max_ideal_temp">100.0</env:property>
+			<env:property name="min_ideal_temp">100.0</env:property>
+			<env:property name="max_ideal_temp">150.0</env:property>
 			<!-- <env:property name="min_ideal_temp">0</env:property>-->
 			<!-- <env:property name="max_ideal_temp">200</env:property>-->
 			<env:property name="min_output_heat">5.0</env:property>

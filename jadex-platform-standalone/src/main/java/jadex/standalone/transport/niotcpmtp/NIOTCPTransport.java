@@ -442,9 +442,9 @@ public class NIOTCPTransport implements ITransport
 		{
 			address = address.toLowerCase();
 			
-			NIOTCPOutputConnection con = (NIOTCPOutputConnection)connections.remove(address);
-			if(con!=null)
-				con.close();
+			Object	con	= connections.remove(address);
+			if(con instanceof NIOTCPOutputConnection)
+				((NIOTCPOutputConnection)con).close();
 		}
 	}
 	

@@ -233,7 +233,7 @@ public abstract class AbstractChartDataConsumer extends SimplePropertyObject imp
 	 */
 	public JPanel getChartPanel()
 	{
-		ChartPanel panel = new ChartPanel(getChart());
+		ChartPanel panel = new ChartPanel(getChart(), false, false, false, false, false);
         panel.setFillZoomRectangle(true);
         return panel;
 	}

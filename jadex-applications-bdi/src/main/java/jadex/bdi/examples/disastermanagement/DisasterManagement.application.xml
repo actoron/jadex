@@ -257,7 +257,7 @@
 						<env:dataconsumer name="statistics_chart" class="XYChartDataConsumer">
 							<env:property name="dataprovider">"statistics"</env:property>
 							<env:property name="title">"Disaster Statistics"</env:property>
-							<!-- <env:property name="maxitemcount">500</env:property> -->
+							<env:property name="maxitemcount">500</env:property>
 							<env:property name="legend">true</env:property>
 							
 							<!-- Define series for victims. -->
