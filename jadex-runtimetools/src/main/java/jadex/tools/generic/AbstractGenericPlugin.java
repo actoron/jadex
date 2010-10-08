@@ -168,7 +168,7 @@ public abstract class AbstractGenericPlugin extends AbstractJCCPlugin
 				{
 					if(panels.containsKey(element))
 					{
-						IComponentViewerPanel panel = (IComponentViewerPanel)panels.get(element);
+						IAbstractViewerPanel panel = (IAbstractViewerPanel)panels.get(element);
 						panel.setProperties(ps);
 					}
 					else
@@ -177,7 +177,7 @@ public abstract class AbstractGenericPlugin extends AbstractJCCPlugin
 						{
 							public void customResultAvailable(Object source, Object result)
 							{
-								IComponentViewerPanel panel = (IComponentViewerPanel)result;
+								IAbstractViewerPanel panel = (IAbstractViewerPanel)result;
 								panel.setProperties(ps);
 							}
 						});
@@ -200,7 +200,7 @@ public abstract class AbstractGenericPlugin extends AbstractJCCPlugin
 			for(Iterator it=panels.keySet().iterator(); it.hasNext(); )
 			{
 				Object element = it.next();
-				IComponentViewerPanel panel = (IComponentViewerPanel)panels.get(element);
+				IAbstractViewerPanel panel = (IAbstractViewerPanel)panels.get(element);
 				if(panel.getProperties()!=null)
 				{
 					addSubproperties(subprops, convertToString(element), panel.getProperties());

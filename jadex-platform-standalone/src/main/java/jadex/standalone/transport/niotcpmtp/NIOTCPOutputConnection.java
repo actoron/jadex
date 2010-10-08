@@ -31,7 +31,7 @@ class NIOTCPOutputConnection
 	protected SocketChannel sc;
 	
 	/** The buffer. */
-	protected ByteBuffer buffer;
+//	protected ByteBuffer buffer;
 	
 	/** The dead connection time. */
 	protected long deadtime;
