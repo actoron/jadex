@@ -123,7 +123,7 @@ public class Starter
 			Class cfclass = SReflect.findClass(cfclname, null, cl);
 			// The providerid for this service is not important as it will be thrown away 
 			// after loading the first component model.
-			IComponentFactory cfac = (IComponentFactory)cfclass.getConstructor(new Class[]{Object.class})
+			IComponentFactory cfac = (IComponentFactory)cfclass.getConstructor(new Class[]{String.class})
 				.newInstance(new Object[]{"rootid"});
 			IModelInfo model = cfac.loadModel(configfile, null, cl);
 	//		System.out.println("Model: "+model);

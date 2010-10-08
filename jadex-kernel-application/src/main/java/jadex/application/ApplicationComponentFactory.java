@@ -82,7 +82,7 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 	 *  @param platform	The agent platform.
 	 *  @param mappings	The XML reader mappings of supported spaces (if any).
 	 */
-	public ApplicationComponentFactory(Object providerid)
+	public ApplicationComponentFactory(String providerid)
 	{
 		super(providerid, IComponentFactory.class, null);
 		this.loader = new ApplicationModelLoader(null);
