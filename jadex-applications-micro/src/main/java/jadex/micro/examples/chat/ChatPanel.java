@@ -9,6 +9,8 @@ import jadex.micro.IMicroExternalAccess;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
@@ -23,6 +25,9 @@ import javax.swing.JTextField;
  */
 public class ChatPanel extends JPanel
 {
+	/** The linefeed separator. */
+	public static final String lf = (String)System.getProperty("line.separator");
+	
 	/** The agent. */
 	protected IMicroExternalAccess agent;
 	
@@ -34,7 +39,7 @@ public class ChatPanel extends JPanel
 		this.agent = agent;
 		
 		JPanel main = new JPanel(new BorderLayout());
-		final JTextArea ta = new JTextArea();
+		final JTextArea ta = new JTextArea(10, 30);
 		main.add(ta, BorderLayout.CENTER);
 		
 		agent.scheduleStep(new ICommand()
@@ -47,7 +52,9 @@ public class ChatPanel extends JPanel
 					public void changeOccurred(ChangeEvent event)
 					{
 						String[] text = (String[])event.getValue();
-						ta.setText(ta.getText()+"\n"+"["+text[0]+"]:"+text[1]);
+						StringBuffer buf = new StringBuffer();
+						buf.append("[").append(text[0]).append("]: ").append(text[1]).append(lf);
+						ta.append(buf.toString());
 					}
 				});
 			}
@@ -59,7 +66,7 @@ public class ChatPanel extends JPanel
 		south.add(tf, BorderLayout.CENTER);
 		south.add(send, BorderLayout.EAST);
 
-		send.addActionListener(new ActionListener()
+		ActionListener al = new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
 			{
@@ -73,7 +80,9 @@ public class ChatPanel extends JPanel
 					}
 				});
 			}
-		});
+		};
+		tf.addActionListener(al);
+		send.addActionListener(al);
 		
 		this.setLayout(new BorderLayout());
 		this.add(main, BorderLayout.CENTER);
