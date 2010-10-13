@@ -72,7 +72,7 @@ public abstract class AbstractMultiTextfieldPropertySection extends
 	{
 		super.createControls(parent, aTabbedPropertySheetPage);
 		
-		GridLayout sectionLayout = new GridLayout(2, true);
+		GridLayout sectionLayout = new GridLayout(1, true);
 		sectionComposite.setLayout(sectionLayout);
 		
 		GridData textGridData = new GridData();
