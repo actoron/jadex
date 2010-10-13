@@ -30,95 +30,114 @@ import org.eclipse.ui.views.properties.IPropertySourceProvider;
  * @generated
  */
 public class GpmnPropertySection extends AdvancedPropertySection implements
-		IPropertySourceProvider {
-
+		IPropertySourceProvider
+{
+	
 	/**
 	 * @generated
 	 */
-	public IPropertySource getPropertySource(Object object) {
-		if (object instanceof IPropertySource) {
+	public IPropertySource getPropertySource(Object object)
+	{
+		if (object instanceof IPropertySource)
+		{
 			return (IPropertySource) object;
 		}
 		AdapterFactory af = getAdapterFactory(object);
-		if (af != null) {
+		if (af != null)
+		{
 			IItemPropertySource ips = (IItemPropertySource) af.adapt(object,
 					IItemPropertySource.class);
-			if (ips != null) {
+			if (ips != null)
+			{
 				return new PropertySource(object, ips);
 			}
 		}
-		if (object instanceof IAdaptable) {
+		if (object instanceof IAdaptable)
+		{
 			return (IPropertySource) ((IAdaptable) object)
 					.getAdapter(IPropertySource.class);
 		}
 		return null;
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	protected IPropertySourceProvider getPropertySourceProvider() {
+	protected IPropertySourceProvider getPropertySourceProvider()
+	{
 		return this;
 	}
-
+	
 	/**
 	 * Modify/unwrap selection.
 	 * @generated
 	 */
-	protected Object transformSelection(Object selected) {
-
-		if (selected instanceof EditPart) {
+	protected Object transformSelection(Object selected)
+	{
+		
+		if (selected instanceof EditPart)
+		{
 			Object model = ((EditPart) selected).getModel();
 			return model instanceof View ? ((View) model).getElement() : null;
 		}
-		if (selected instanceof View) {
+		if (selected instanceof View)
+		{
 			return ((View) selected).getElement();
 		}
-		if (selected instanceof IAdaptable) {
+		if (selected instanceof IAdaptable)
+		{
 			View view = (View) ((IAdaptable) selected).getAdapter(View.class);
-			if (view != null) {
+			if (view != null)
+			{
 				return view.getElement();
 			}
 		}
 		return selected;
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	public void setInput(IWorkbenchPart part, ISelection selection) {
+	public void setInput(IWorkbenchPart part, ISelection selection)
+	{
 		if (selection.isEmpty()
-				|| false == selection instanceof StructuredSelection) {
+				|| false == selection instanceof StructuredSelection)
+		{
 			super.setInput(part, selection);
 			return;
 		}
 		final StructuredSelection structuredSelection = ((StructuredSelection) selection);
 		ArrayList transformedSelection = new ArrayList(structuredSelection
 				.size());
-		for (Iterator it = structuredSelection.iterator(); it.hasNext();) {
+		for (Iterator it = structuredSelection.iterator(); it.hasNext();)
+		{
 			Object r = transformSelection(it.next());
-			if (r != null) {
+			if (r != null)
+			{
 				transformedSelection.add(r);
 			}
 		}
 		super.setInput(part, new StructuredSelection(transformedSelection));
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	protected AdapterFactory getAdapterFactory(Object object) {
-		if (getEditingDomain() instanceof AdapterFactoryEditingDomain) {
+	protected AdapterFactory getAdapterFactory(Object object)
+	{
+		if (getEditingDomain() instanceof AdapterFactoryEditingDomain)
+		{
 			return ((AdapterFactoryEditingDomain) getEditingDomain())
 					.getAdapterFactory();
 		}
 		TransactionalEditingDomain editingDomain = TransactionUtil
 				.getEditingDomain(object);
-		if (editingDomain != null) {
+		if (editingDomain != null)
+		{
 			return ((AdapterFactoryEditingDomain) editingDomain)
 					.getAdapterFactory();
 		}
 		return null;
 	}
-
+	
 }

@@ -33,107 +33,117 @@ import org.osgi.framework.BundleContext;
 /**
  * @generated
  */
-public class GpmnDiagramEditorPlugin extends AbstractUIPlugin {
-
+public class GpmnDiagramEditorPlugin extends AbstractUIPlugin
+{
+	
 	/**
 	 * @generated
 	 */
 	public static final String ID = "jadex.tools.gpmn.diagram"; //$NON-NLS-1$
-
+	
 	/**
 	 * @generated
 	 */
 	public static final PreferencesHint DIAGRAM_PREFERENCES_HINT = new PreferencesHint(
 			ID);
-
+	
 	/**
 	 * @generated
 	 */
 	private static GpmnDiagramEditorPlugin instance;
-
+	
 	/**
 	 * @generated
 	 */
 	private ComposedAdapterFactory adapterFactory;
-
+	
 	/**
 	 * @generated
 	 */
 	private GpmnDocumentProvider documentProvider;
-
+	
 	/**
 	 * @generated
 	 */
-	public GpmnDiagramEditorPlugin() {
+	public GpmnDiagramEditorPlugin()
+	{
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	public void start(BundleContext context) throws Exception {
+	public void start(BundleContext context) throws Exception
+	{
 		super.start(context);
 		instance = this;
 		PreferencesHint.registerPreferenceStore(DIAGRAM_PREFERENCES_HINT,
 				getPreferenceStore());
 		adapterFactory = createAdapterFactory();
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	public void stop(BundleContext context) throws Exception {
+	public void stop(BundleContext context) throws Exception
+	{
 		adapterFactory.dispose();
 		adapterFactory = null;
 		instance = null;
 		super.stop(context);
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	public static GpmnDiagramEditorPlugin getInstance() {
+	public static GpmnDiagramEditorPlugin getInstance()
+	{
 		return instance;
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	protected ComposedAdapterFactory createAdapterFactory() {
+	protected ComposedAdapterFactory createAdapterFactory()
+	{
 		List factories = new ArrayList();
 		fillItemProviderFactories(factories);
 		return new ComposedAdapterFactory(factories);
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	protected void fillItemProviderFactories(List factories) {
+	protected void fillItemProviderFactories(List factories)
+	{
 		factories.add(new GpmnItemProviderAdapterFactory());
 		factories.add(new EcoreItemProviderAdapterFactory());
 		factories.add(new ResourceItemProviderAdapterFactory());
 		factories.add(new ReflectiveItemProviderAdapterFactory());
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	public AdapterFactory getItemProvidersAdapterFactory() {
+	public AdapterFactory getItemProvidersAdapterFactory()
+	{
 		return adapterFactory;
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	public ImageDescriptor getItemImageDescriptor(Object item) {
+	public ImageDescriptor getItemImageDescriptor(Object item)
+	{
 		IItemLabelProvider labelProvider = (IItemLabelProvider) adapterFactory
 				.adapt(item, IItemLabelProvider.class);
-		if (labelProvider != null) {
+		if (labelProvider != null)
+		{
 			return ExtendedImageRegistry.getInstance().getImageDescriptor(
 					labelProvider.getImage(item));
 		}
 		return null;
 	}
-
+	
 	/**
 	 * Returns an image descriptor for the image file at the given
 	 * plug-in relative path.
@@ -142,10 +152,11 @@ public class GpmnDiagramEditorPlugin extends AbstractUIPlugin {
 	 * @param path the path
 	 * @return the image descriptor
 	 */
-	public static ImageDescriptor getBundledImageDescriptor(String path) {
+	public static ImageDescriptor getBundledImageDescriptor(String path)
+	{
 		return AbstractUIPlugin.imageDescriptorFromPlugin(ID, path);
 	}
-
+	
 	/**
 	 * Respects images residing in any plug-in. If path is relative,
 	 * then this bundle is looked up for the image, otherwise, for absolute 
@@ -155,16 +166,20 @@ public class GpmnDiagramEditorPlugin extends AbstractUIPlugin {
 	 * @param path the path to image, either absolute (with plug-in id as first segment), or relative for bundled images
 	 * @return the image descriptor
 	 */
-	public static ImageDescriptor findImageDescriptor(String path) {
+	public static ImageDescriptor findImageDescriptor(String path)
+	{
 		final IPath p = new Path(path);
-		if (p.isAbsolute() && p.segmentCount() > 1) {
+		if (p.isAbsolute() && p.segmentCount() > 1)
+		{
 			return AbstractUIPlugin.imageDescriptorFromPlugin(p.segment(0), p
 					.removeFirstSegments(1).makeAbsolute().toString());
-		} else {
+		}
+		else
+		{
 			return getBundledImageDescriptor(p.makeAbsolute().toString());
 		}
 	}
-
+	
 	/**
 	 * Returns an image for the image file at the given plug-in relative path.
 	 * Client do not need to dispose this image. Images will be disposed automatically.
@@ -173,46 +188,54 @@ public class GpmnDiagramEditorPlugin extends AbstractUIPlugin {
 	 * @param path the path
 	 * @return image instance
 	 */
-	public Image getBundledImage(String path) {
+	public Image getBundledImage(String path)
+	{
 		Image image = getImageRegistry().get(path);
-		if (image == null) {
+		if (image == null)
+		{
 			getImageRegistry().put(path, getBundledImageDescriptor(path));
 			image = getImageRegistry().get(path);
 		}
 		return image;
 	}
-
+	
 	/**
 	 * Returns string from plug-in's resource bundle
 	 *
 	 * @generated
 	 */
-	public static String getString(String key) {
+	public static String getString(String key)
+	{
 		return Platform.getResourceString(getInstance().getBundle(), "%" + key); //$NON-NLS-1$
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	public GpmnDocumentProvider getDocumentProvider() {
-		if (documentProvider == null) {
+	public GpmnDocumentProvider getDocumentProvider()
+	{
+		if (documentProvider == null)
+		{
 			documentProvider = new GpmnDocumentProvider();
 		}
 		return documentProvider;
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	public void logError(String error) {
+	public void logError(String error)
+	{
 		logError(error, null);
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	public void logError(String error, Throwable throwable) {
-		if (error == null && throwable != null) {
+	public void logError(String error, Throwable throwable)
+	{
+		if (error == null && throwable != null)
+		{
 			error = throwable.getMessage();
 		}
 		getLog().log(
@@ -220,19 +243,22 @@ public class GpmnDiagramEditorPlugin extends AbstractUIPlugin {
 						IStatus.OK, error, throwable));
 		debug(error, throwable);
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	public void logInfo(String message) {
+	public void logInfo(String message)
+	{
 		logInfo(message, null);
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	public void logInfo(String message, Throwable throwable) {
-		if (message == null && throwable != null) {
+	public void logInfo(String message, Throwable throwable)
+	{
+		if (message == null && throwable != null)
+		{
 			message = throwable.getMessage();
 		}
 		getLog().log(
@@ -240,18 +266,22 @@ public class GpmnDiagramEditorPlugin extends AbstractUIPlugin {
 						IStatus.OK, message, throwable));
 		debug(message, throwable);
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	private void debug(String message, Throwable throwable) {
-		if (!isDebugging()) {
+	private void debug(String message, Throwable throwable)
+	{
+		if (!isDebugging())
+		{
 			return;
 		}
-		if (message != null) {
+		if (message != null)
+		{
 			System.err.println(message);
 		}
-		if (throwable != null) {
+		if (throwable != null)
+		{
 			throwable.printStackTrace();
 		}
 	}

@@ -21,32 +21,35 @@ import org.eclipse.swt.widgets.Display;
 /**
  * @generated
  */
-public class GpmnDiagramEditPart extends DiagramEditPart {
-
+public class GpmnDiagramEditPart extends DiagramEditPart
+{
+	
 	/**
 	 * @generated
 	 */
 	public final static String MODEL_ID = "Gpmn"; //$NON-NLS-1$
-
+	
 	/**
 	 * @generated
 	 */
 	public static final int VISUAL_ID = 1000;
-
+	
 	/**
 	 * @generated NOT, HACK! Set default version to 2.0 
 	 * 
 	 * FIXME: Use create command / model feature initializer if available in future version
 	 * 
 	 */
-	public GpmnDiagramEditPart(View view) {
+	public GpmnDiagramEditPart(View view)
+	{
 		super(view);
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	protected void createDefaultEditPolicies() {
+	protected void createDefaultEditPolicies()
+	{
 		super.createDefaultEditPolicies();
 		installEditPolicy(EditPolicyRoles.SEMANTIC_ROLE,
 				new GpmnDiagramItemSemanticEditPolicy());

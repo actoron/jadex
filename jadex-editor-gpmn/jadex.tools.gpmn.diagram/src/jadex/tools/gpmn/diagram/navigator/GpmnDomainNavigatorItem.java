@@ -18,89 +18,103 @@ import org.eclipse.ui.views.properties.IPropertySourceProvider;
 /**
  * @generated
  */
-public class GpmnDomainNavigatorItem extends PlatformObject {
-
+public class GpmnDomainNavigatorItem extends PlatformObject
+{
+	
 	/**
 	 * @generated
 	 */
-	static {
+	static
+	{
 		final Class[] supportedTypes = new Class[] { EObject.class,
 				IPropertySource.class };
-		Platform.getAdapterManager().registerAdapters(new IAdapterFactory() {
-
-			public Object getAdapter(Object adaptableObject, Class adapterType) {
-				if (adaptableObject instanceof jadex.tools.gpmn.diagram.navigator.GpmnDomainNavigatorItem) {
+		Platform.getAdapterManager().registerAdapters(new IAdapterFactory()
+		{
+			
+			public Object getAdapter(Object adaptableObject, Class adapterType)
+			{
+				if (adaptableObject instanceof jadex.tools.gpmn.diagram.navigator.GpmnDomainNavigatorItem)
+				{
 					jadex.tools.gpmn.diagram.navigator.GpmnDomainNavigatorItem domainNavigatorItem = (jadex.tools.gpmn.diagram.navigator.GpmnDomainNavigatorItem) adaptableObject;
 					EObject eObject = domainNavigatorItem.getEObject();
-					if (adapterType == EObject.class) {
+					if (adapterType == EObject.class)
+					{
 						return eObject;
 					}
-					if (adapterType == IPropertySource.class) {
+					if (adapterType == IPropertySource.class)
+					{
 						return domainNavigatorItem.getPropertySourceProvider()
 								.getPropertySource(eObject);
 					}
 				}
-
+				
 				return null;
 			}
-
-			public Class[] getAdapterList() {
+			
+			public Class[] getAdapterList()
+			{
 				return supportedTypes;
 			}
 		}, jadex.tools.gpmn.diagram.navigator.GpmnDomainNavigatorItem.class);
 	}
-
+	
 	/**
 	 * @generated
 	 */
 	private Object myParent;
-
+	
 	/**
 	 * @generated
 	 */
 	private EObject myEObject;
-
+	
 	/**
 	 * @generated
 	 */
 	private IPropertySourceProvider myPropertySourceProvider;
-
+	
 	/**
 	 * @generated
 	 */
 	public GpmnDomainNavigatorItem(EObject eObject, Object parent,
-			IPropertySourceProvider propertySourceProvider) {
+			IPropertySourceProvider propertySourceProvider)
+	{
 		myParent = parent;
 		myEObject = eObject;
 		myPropertySourceProvider = propertySourceProvider;
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	public Object getParent() {
+	public Object getParent()
+	{
 		return myParent;
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	public EObject getEObject() {
+	public EObject getEObject()
+	{
 		return myEObject;
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	public IPropertySourceProvider getPropertySourceProvider() {
+	public IPropertySourceProvider getPropertySourceProvider()
+	{
 		return myPropertySourceProvider;
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	public boolean equals(Object obj) {
-		if (obj instanceof jadex.tools.gpmn.diagram.navigator.GpmnDomainNavigatorItem) {
+	public boolean equals(Object obj)
+	{
+		if (obj instanceof jadex.tools.gpmn.diagram.navigator.GpmnDomainNavigatorItem)
+		{
 			return EcoreUtil
 					.getURI(getEObject())
 					.equals(
@@ -110,12 +124,13 @@ public class GpmnDomainNavigatorItem extends PlatformObject {
 		}
 		return super.equals(obj);
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	public int hashCode() {
+	public int hashCode()
+	{
 		return EcoreUtil.getURI(getEObject()).hashCode();
 	}
-
+	
 }

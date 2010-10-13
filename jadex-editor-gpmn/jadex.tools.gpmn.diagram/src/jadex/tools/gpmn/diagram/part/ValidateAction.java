@@ -48,115 +48,142 @@ import org.eclipse.ui.actions.WorkspaceModifyDelegatingOperation;
 /**
  * @generated
  */
-public class ValidateAction extends Action {
-
+public class ValidateAction extends Action
+{
+	
 	/**
 	 * @generated
 	 */
 	private IWorkbenchPage page;
-
+	
 	/**
 	 * @generated
 	 */
-	public ValidateAction(IWorkbenchPage page) {
+	public ValidateAction(IWorkbenchPage page)
+	{
 		setText(Messages.ValidateActionMessage);
 		this.page = page;
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	public void run() {
+	public void run()
+	{
 		IWorkbenchPart workbenchPart = page.getActivePart();
-		if (workbenchPart instanceof IDiagramWorkbenchPart) {
+		if (workbenchPart instanceof IDiagramWorkbenchPart)
+		{
 			final IDiagramWorkbenchPart part = (IDiagramWorkbenchPart) workbenchPart;
-			try {
+			try
+			{
 				new WorkspaceModifyDelegatingOperation(
-						new IRunnableWithProgress() {
-
+						new IRunnableWithProgress()
+						{
+							
 							public void run(IProgressMonitor monitor)
 									throws InterruptedException,
-									InvocationTargetException {
+									InvocationTargetException
+							{
 								runValidation(part.getDiagramEditPart(), part
 										.getDiagram());
 							}
 						}).run(new NullProgressMonitor());
-			} catch (Exception e) {
+			}
+			catch (Exception e)
+			{
 				GpmnDiagramEditorPlugin.getInstance().logError(
 						"Validation action failed", e); //$NON-NLS-1$
 			}
 		}
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	public static void runValidation(View view) {
-		try {
-			if (GpmnDiagramEditorUtil.openDiagram(view.eResource())) {
+	public static void runValidation(View view)
+	{
+		try
+		{
+			if (GpmnDiagramEditorUtil.openDiagram(view.eResource()))
+			{
 				IEditorPart editorPart = PlatformUI.getWorkbench()
 						.getActiveWorkbenchWindow().getActivePage()
 						.getActiveEditor();
-				if (editorPart instanceof IDiagramWorkbenchPart) {
+				if (editorPart instanceof IDiagramWorkbenchPart)
+				{
 					runValidation(((IDiagramWorkbenchPart) editorPart)
 							.getDiagramEditPart(), view);
-				} else {
+				}
+				else
+				{
 					runNonUIValidation(view);
 				}
 			}
-		} catch (Exception e) {
+		}
+		catch (Exception e)
+		{
 			GpmnDiagramEditorPlugin.getInstance().logError(
 					"Validation action failed", e); //$NON-NLS-1$
 		}
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	public static void runNonUIValidation(View view) {
+	public static void runNonUIValidation(View view)
+	{
 		DiagramEditPart diagramEditPart = OffscreenEditPartFactory
 				.getInstance().createDiagramEditPart(view.getDiagram());
 		runValidation(diagramEditPart, view);
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	public static void runValidation(DiagramEditPart diagramEditPart, View view) {
+	public static void runValidation(DiagramEditPart diagramEditPart, View view)
+	{
 		final DiagramEditPart fpart = diagramEditPart;
 		final View fview = view;
 		TransactionalEditingDomain txDomain = TransactionUtil
 				.getEditingDomain(view);
-		GpmnValidationProvider.runWithConstraints(txDomain, new Runnable() {
-
-			public void run() {
+		GpmnValidationProvider.runWithConstraints(txDomain, new Runnable()
+		{
+			
+			public void run()
+			{
 				validate(fpart, fview);
 			}
 		});
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	private static Diagnostic runEMFValidator(View target) {
-		if (target.isSetElement() && target.getElement() != null) {
-			return new Diagnostician() {
-
-				public String getObjectLabel(EObject eObject) {
+	private static Diagnostic runEMFValidator(View target)
+	{
+		if (target.isSetElement() && target.getElement() != null)
+		{
+			return new Diagnostician()
+			{
+				
+				public String getObjectLabel(EObject eObject)
+				{
 					return EMFCoreUtil.getQualifiedName(eObject, true);
 				}
 			}.validate(target.getElement());
 		}
 		return Diagnostic.OK_INSTANCE;
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	private static void validate(DiagramEditPart diagramEditPart, View view) {
+	private static void validate(DiagramEditPart diagramEditPart, View view)
+	{
 		IFile target = view.eResource() != null ? WorkspaceSynchronizer
 				.getFile(view.eResource()) : null;
-		if (target != null) {
+		if (target != null)
+		{
 			GpmnMarkerNavigationProvider.deleteMarkers(target);
 		}
 		Diagnostic diagnostic = runEMFValidator(view);
@@ -164,18 +191,21 @@ public class ValidateAction extends Action {
 		IBatchValidator validator = (IBatchValidator) ModelValidationService
 				.getInstance().newValidator(EvaluationMode.BATCH);
 		validator.setIncludeLiveConstraints(true);
-		if (view.isSetElement() && view.getElement() != null) {
+		if (view.isSetElement() && view.getElement() != null)
+		{
 			IStatus status = validator.validate(view.getElement());
 			createMarkers(target, status, diagramEditPart);
 		}
 	}
-
+	
 	/**
 	 * @generated
 	 */
 	private static void createMarkers(IFile target, IStatus validationStatus,
-			DiagramEditPart diagramEditPart) {
-		if (validationStatus.isOK()) {
+			DiagramEditPart diagramEditPart)
+	{
+		if (validationStatus.isOK())
+		{
 			return;
 		}
 		final IStatus rootStatus = validationStatus;
@@ -183,7 +213,8 @@ public class ValidateAction extends Action {
 		GpmnDiagramEditorUtil.LazyElement2ViewMap element2ViewMap = new GpmnDiagramEditorUtil.LazyElement2ViewMap(
 				diagramEditPart.getDiagramView(), collectTargetElements(
 						rootStatus, new HashSet(), allStatuses));
-		for (Iterator it = allStatuses.iterator(); it.hasNext();) {
+		for (Iterator it = allStatuses.iterator(); it.hasNext();)
+		{
 			IConstraintStatus nextStatus = (IConstraintStatus) it.next();
 			View view = GpmnDiagramEditorUtil.findView(diagramEditPart,
 					nextStatus.getTarget(), element2ViewMap);
@@ -193,13 +224,15 @@ public class ValidateAction extends Action {
 					nextStatus.getSeverity());
 		}
 	}
-
+	
 	/**
 	 * @generated
 	 */
 	private static void createMarkers(IFile target,
-			Diagnostic emfValidationStatus, DiagramEditPart diagramEditPart) {
-		if (emfValidationStatus.getSeverity() == Diagnostic.OK) {
+			Diagnostic emfValidationStatus, DiagramEditPart diagramEditPart)
+	{
+		if (emfValidationStatus.getSeverity() == Diagnostic.OK)
+		{
 			return;
 		}
 		final Diagnostic rootStatus = emfValidationStatus;
@@ -208,11 +241,13 @@ public class ValidateAction extends Action {
 				diagramEditPart.getDiagramView(), collectTargetElements(
 						rootStatus, new HashSet(), allDiagnostics));
 		for (Iterator it = emfValidationStatus.getChildren().iterator(); it
-				.hasNext();) {
+				.hasNext();)
+		{
 			Diagnostic nextDiagnostic = (Diagnostic) it.next();
 			List data = nextDiagnostic.getData();
 			if (data != null && !data.isEmpty()
-					&& data.get(0) instanceof EObject) {
+					&& data.get(0) instanceof EObject)
+			{
 				EObject element = (EObject) data.get(0);
 				View view = GpmnDiagramEditorUtil.findView(diagramEditPart,
 						element, element2ViewMap);
@@ -226,73 +261,91 @@ public class ValidateAction extends Action {
 			}
 		}
 	}
-
+	
 	/**
 	 * @generated
 	 */
 	private static void addMarker(EditPartViewer viewer, IFile target,
 			String elementId, String location, String message,
-			int statusSeverity) {
-		if (target == null) {
+			int statusSeverity)
+	{
+		if (target == null)
+		{
 			return;
 		}
 		GpmnMarkerNavigationProvider.addMarker(target, elementId, location,
 				message, statusSeverity);
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	private static int diagnosticToStatusSeverity(int diagnosticSeverity) {
-		if (diagnosticSeverity == Diagnostic.OK) {
+	private static int diagnosticToStatusSeverity(int diagnosticSeverity)
+	{
+		if (diagnosticSeverity == Diagnostic.OK)
+		{
 			return IStatus.OK;
-		} else if (diagnosticSeverity == Diagnostic.INFO) {
+		}
+		else if (diagnosticSeverity == Diagnostic.INFO)
+		{
 			return IStatus.INFO;
-		} else if (diagnosticSeverity == Diagnostic.WARNING) {
+		}
+		else if (diagnosticSeverity == Diagnostic.WARNING)
+		{
 			return IStatus.WARNING;
-		} else if (diagnosticSeverity == Diagnostic.ERROR
-				|| diagnosticSeverity == Diagnostic.CANCEL) {
+		}
+		else if (diagnosticSeverity == Diagnostic.ERROR
+				|| diagnosticSeverity == Diagnostic.CANCEL)
+		{
 			return IStatus.ERROR;
 		}
 		return IStatus.INFO;
 	}
-
+	
 	/**
 	 * @generated
 	 */
 	private static Set collectTargetElements(IStatus status,
-			Set targetElementCollector, List allConstraintStatuses) {
-		if (status instanceof IConstraintStatus) {
+			Set targetElementCollector, List allConstraintStatuses)
+	{
+		if (status instanceof IConstraintStatus)
+		{
 			targetElementCollector
 					.add(((IConstraintStatus) status).getTarget());
 			allConstraintStatuses.add(status);
 		}
-		if (status.isMultiStatus()) {
+		if (status.isMultiStatus())
+		{
 			IStatus[] children = status.getChildren();
-			for (int i = 0; i < children.length; i++) {
+			for (int i = 0; i < children.length; i++)
+			{
 				collectTargetElements(children[i], targetElementCollector,
 						allConstraintStatuses);
 			}
 		}
 		return targetElementCollector;
 	}
-
+	
 	/**
 	 * @generated
 	 */
 	private static Set collectTargetElements(Diagnostic diagnostic,
-			Set targetElementCollector, List allDiagnostics) {
+			Set targetElementCollector, List allDiagnostics)
+	{
 		List data = diagnostic.getData();
 		EObject target = null;
-		if (data != null && !data.isEmpty() && data.get(0) instanceof EObject) {
+		if (data != null && !data.isEmpty() && data.get(0) instanceof EObject)
+		{
 			target = (EObject) data.get(0);
 			targetElementCollector.add(target);
 			allDiagnostics.add(diagnostic);
 		}
 		if (diagnostic.getChildren() != null
-				&& !diagnostic.getChildren().isEmpty()) {
+				&& !diagnostic.getChildren().isEmpty())
+		{
 			for (Iterator it = diagnostic.getChildren().iterator(); it
-					.hasNext();) {
+					.hasNext();)
+			{
 				collectTargetElements((Diagnostic) it.next(),
 						targetElementCollector, allDiagnostics);
 			}

@@ -19,26 +19,30 @@ import org.eclipse.ui.IWorkbenchPage;
  * @generated
  */
 public class GpmnDiagramActionBarContributor extends
-		DiagramActionBarContributor {
-
+		DiagramActionBarContributor
+{
+	
 	/**
 	 * @generated
 	 */
-	protected Class getEditorClass() {
+	protected Class getEditorClass()
+	{
 		return GpmnDiagramEditor.class;
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	protected String getEditorId() {
+	protected String getEditorId()
+	{
 		return GpmnDiagramEditor.ID;
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	public void init(IActionBars bars, IWorkbenchPage page) {
+	public void init(IActionBars bars, IWorkbenchPage page)
+	{
 		super.init(bars, page);
 		// print preview
 		IMenuManager fileMenu = bars.getMenuManager().findMenuUsingPath(

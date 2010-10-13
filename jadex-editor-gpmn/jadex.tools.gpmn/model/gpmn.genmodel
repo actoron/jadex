@@ -197,6 +197,7 @@
     <genClasses ecoreClass="gpmn.ecore#//SubProcess">
       <genFeatures createChild="false" propertyCategory="Default" propertyDescription=""
           ecoreFeature="ecore:EAttribute gpmn.ecore#//SubProcess/processref"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute gpmn.ecore#//SubProcess/internal"/>
       <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference gpmn.ecore#//SubProcess/gpmnDiagram"/>
     </genClasses>
     <genClasses ecoreClass="gpmn.ecore#//SuppressionEdge">

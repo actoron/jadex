@@ -28,69 +28,79 @@ import org.eclipse.gmf.runtime.emf.type.core.requests.CreateRelationshipRequest;
 /**
  * @generated
  */
-public class SuppressionEdgeCreateCommand extends EditElementCommand {
-
+public class SuppressionEdgeCreateCommand extends EditElementCommand
+{
+	
 	/**
 	 * @generated
 	 */
 	private final EObject source;
-
+	
 	/**
 	 * @generated
 	 */
 	private final EObject target;
-
+	
 	/**
 	 * @generated
 	 */
 	private final GpmnDiagram container;
-
+	
 	/**
 	 * @generated
 	 */
 	public SuppressionEdgeCreateCommand(CreateRelationshipRequest request,
-			EObject source, EObject target) {
+			EObject source, EObject target)
+	{
 		super(request.getLabel(), null, request);
 		this.source = source;
 		this.target = target;
 		container = deduceContainer(source, target);
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	public boolean canExecute() {
-		if (source == null && target == null) {
+	public boolean canExecute()
+	{
+		if (source == null && target == null)
+		{
 			return false;
 		}
-		if (source != null && false == source instanceof Goal) {
+		if (source != null && false == source instanceof Goal)
+		{
 			return false;
 		}
-		if (target != null && false == target instanceof Goal) {
+		if (target != null && false == target instanceof Goal)
+		{
 			return false;
 		}
-		if (getSource() == null) {
+		if (getSource() == null)
+		{
 			return true; // link creation is in progress; source is not defined yet
 		}
 		// target may be null here but it's possible to check constraint
-		if (getContainer() == null) {
+		if (getContainer() == null)
+		{
 			return false;
 		}
 		return GpmnBaseItemSemanticEditPolicy.LinkConstraints
 				.canCreateSuppressionEdge_4004(getContainer(), getSource(),
 						getTarget());
 	}
-
+	
 	/**
 	 * @generated
 	 */
 	protected CommandResult doExecuteWithResult(IProgressMonitor monitor,
-			IAdaptable info) throws ExecutionException {
-		if (!canExecute()) {
+			IAdaptable info) throws ExecutionException
+	{
+		if (!canExecute())
+		{
 			throw new ExecutionException(
 					"Invalid arguments in create link command"); //$NON-NLS-1$
 		}
-
+		
 		SuppressionEdge newElement = GpmnFactory.eINSTANCE
 				.createSuppressionEdge();
 		getContainer().getSuppressionEdges().add(newElement);
@@ -99,15 +109,16 @@ public class SuppressionEdgeCreateCommand extends EditElementCommand {
 		doConfigure(newElement, monitor, info);
 		((CreateElementRequest) getRequest()).setNewElement(newElement);
 		return CommandResult.newOKCommandResult(newElement);
-
+		
 	}
-
+	
 	/**
 	 * @generated
 	 */
 	protected void doConfigure(SuppressionEdge newElement,
 			IProgressMonitor monitor, IAdaptable info)
-			throws ExecutionException {
+			throws ExecutionException
+	{
 		IElementType elementType = ((CreateElementRequest) getRequest())
 				.getElementType();
 		ConfigureRequest configureRequest = new ConfigureRequest(
@@ -121,55 +132,63 @@ public class SuppressionEdgeCreateCommand extends EditElementCommand {
 				getTarget());
 		ICommand configureCommand = elementType
 				.getEditCommand(configureRequest);
-		if (configureCommand != null && configureCommand.canExecute()) {
+		if (configureCommand != null && configureCommand.canExecute())
+		{
 			configureCommand.execute(monitor, info);
 		}
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	protected void setElementToEdit(EObject element) {
+	protected void setElementToEdit(EObject element)
+	{
 		throw new UnsupportedOperationException();
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	protected Goal getSource() {
+	protected Goal getSource()
+	{
 		return (Goal) source;
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	protected Goal getTarget() {
+	protected Goal getTarget()
+	{
 		return (Goal) target;
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	public GpmnDiagram getContainer() {
+	public GpmnDiagram getContainer()
+	{
 		return container;
 	}
-
+	
 	/**
 	 * Default approach is to traverse ancestors of the source to find instance of container.
 	 * Modify with appropriate logic.
 	 * @generated
 	 */
-	private static GpmnDiagram deduceContainer(EObject source, EObject target) {
+	private static GpmnDiagram deduceContainer(EObject source, EObject target)
+	{
 		// Find container element for the new link.
 		// Climb up by containment hierarchy starting from the source
 		// and return the first element that is instance of the container class.
 		for (EObject element = source; element != null; element = element
-				.eContainer()) {
-			if (element instanceof GpmnDiagram) {
+				.eContainer())
+		{
+			if (element instanceof GpmnDiagram)
+			{
 				return (GpmnDiagram) element;
 			}
 		}
 		return null;
 	}
-
+	
 }

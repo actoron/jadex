@@ -28,26 +28,30 @@ import org.eclipse.ui.PlatformUI;
 /**
  * @generated
  */
-public class DeleteElementAction extends AbstractDeleteFromAction {
-
+public class DeleteElementAction extends AbstractDeleteFromAction
+{
+	
 	/**
 	 * @generated
 	 */
-	public DeleteElementAction(IWorkbenchPart part) {
+	public DeleteElementAction(IWorkbenchPart part)
+	{
 		super(part);
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	public DeleteElementAction(IWorkbenchPage workbenchPage) {
+	public DeleteElementAction(IWorkbenchPage workbenchPage)
+	{
 		super(workbenchPage);
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	public void init() {
+	public void init()
+	{
 		super.init();
 		setId(ActionIds.ACTION_DELETE_FROM_MODEL);
 		setText(DiagramUIMessages.DiagramEditor_Delete_from_Model);
@@ -61,33 +65,39 @@ public class DeleteElementAction extends AbstractDeleteFromAction {
 		setDisabledImageDescriptor(workbenchImages
 				.getImageDescriptor(ISharedImages.IMG_TOOL_DELETE_DISABLED));
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	protected String getCommandLabel() {
+	protected String getCommandLabel()
+	{
 		return DiagramUIMessages.DiagramEditor_Delete_from_Model;
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	protected Command getCommand(Request request) {
+	protected Command getCommand(Request request)
+	{
 		List operationSet = getOperationSet();
-		if (operationSet.isEmpty()) {
+		if (operationSet.isEmpty())
+		{
 			return UnexecutableCommand.INSTANCE;
 		}
 		Iterator editParts = operationSet.iterator();
 		CompositeTransactionalCommand command = new CompositeTransactionalCommand(
 				getEditingDomain(), getCommandLabel());
-		while (editParts.hasNext()) {
+		while (editParts.hasNext())
+		{
 			EditPart editPart = (EditPart) editParts.next();
 			Command curCommand = editPart.getCommand(request);
-			if (curCommand != null) {
+			if (curCommand != null)
+			{
 				command.compose(new CommandProxy(curCommand));
 			}
 		}
-		if (command.isEmpty() || command.size() != operationSet.size()) {
+		if (command.isEmpty() || command.size() != operationSet.size())
+		{
 			return UnexecutableCommand.INSTANCE;
 		}
 		return new ICommandProxy(command);

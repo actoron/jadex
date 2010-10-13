@@ -50,12 +50,14 @@ import org.eclipse.ui.navigator.ICommonLabelProvider;
  * @generated
  */
 public class GpmnNavigatorLabelProvider extends LabelProvider implements
-		ICommonLabelProvider, ITreePathLabelProvider {
-
+		ICommonLabelProvider, ITreePathLabelProvider
+{
+	
 	/**
 	 * @generated
 	 */
-	static {
+	static
+	{
 		GpmnDiagramEditorPlugin
 				.getInstance()
 				.getImageRegistry()
@@ -67,351 +69,412 @@ public class GpmnNavigatorLabelProvider extends LabelProvider implements
 				.put(
 						"Navigator?ImageNotFound", ImageDescriptor.getMissingImageDescriptor()); //$NON-NLS-1$
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	public void updateLabel(ViewerLabel label, TreePath elementPath) {
+	public void updateLabel(ViewerLabel label, TreePath elementPath)
+	{
 		Object element = elementPath.getLastSegment();
 		if (element instanceof GpmnNavigatorItem
-				&& !isOwnView(((GpmnNavigatorItem) element).getView())) {
+				&& !isOwnView(((GpmnNavigatorItem) element).getView()))
+		{
 			return;
 		}
 		label.setText(getText(element));
 		label.setImage(getImage(element));
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	public Image getImage(Object element) {
-		if (element instanceof GpmnNavigatorGroup) {
+	public Image getImage(Object element)
+	{
+		if (element instanceof GpmnNavigatorGroup)
+		{
 			GpmnNavigatorGroup group = (GpmnNavigatorGroup) element;
 			return GpmnDiagramEditorPlugin.getInstance().getBundledImage(
 					group.getIcon());
 		}
-
-		if (element instanceof GpmnNavigatorItem) {
+		
+		if (element instanceof GpmnNavigatorItem)
+		{
 			GpmnNavigatorItem navigatorItem = (GpmnNavigatorItem) element;
-			if (!isOwnView(navigatorItem.getView())) {
+			if (!isOwnView(navigatorItem.getView()))
+			{
 				return super.getImage(element);
 			}
 			return getImage(navigatorItem.getView());
 		}
-
+		
 		return super.getImage(element);
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	public Image getImage(View view) {
-		switch (GpmnVisualIDRegistry.getVisualID(view)) {
-		case GpmnDiagramEditPart.VISUAL_ID:
-			return getImage(
-					"Navigator?Diagram?http://jadex.sourceforge.net/gpmn?GpmnDiagram", GpmnElementTypes.GpmnDiagram_1000); //$NON-NLS-1$
-		case ActivationPlanEditPart.VISUAL_ID:
-			return getImage(
-					"Navigator?TopLevelNode?http://jadex.sourceforge.net/gpmn?ActivationPlan", GpmnElementTypes.ActivationPlan_2001); //$NON-NLS-1$
-		case SubProcessEditPart.VISUAL_ID:
-			return getImage(
-					"Navigator?TopLevelNode?http://jadex.sourceforge.net/gpmn?SubProcess", GpmnElementTypes.SubProcess_2002); //$NON-NLS-1$
-		case BpmnPlanEditPart.VISUAL_ID:
-			return getImage(
-					"Navigator?TopLevelNode?http://jadex.sourceforge.net/gpmn?BpmnPlan", GpmnElementTypes.BpmnPlan_2003); //$NON-NLS-1$
-		case GoalEditPart.VISUAL_ID:
-			return getImage(
-					"Navigator?TopLevelNode?http://jadex.sourceforge.net/gpmn?Goal", GpmnElementTypes.Goal_2004); //$NON-NLS-1$
-		case ActivationEdgeEditPart.VISUAL_ID:
-			return getImage(
-					"Navigator?Link?http://jadex.sourceforge.net/gpmn?ActivationEdge", GpmnElementTypes.ActivationEdge_4001); //$NON-NLS-1$
-		case PlanEdgeEditPart.VISUAL_ID:
-			return getImage(
-					"Navigator?Link?http://jadex.sourceforge.net/gpmn?PlanEdge", GpmnElementTypes.PlanEdge_4002); //$NON-NLS-1$
-		case SuppressionEdgeEditPart.VISUAL_ID:
-			return getImage(
-					"Navigator?Link?http://jadex.sourceforge.net/gpmn?SuppressionEdge", GpmnElementTypes.SuppressionEdge_4004); //$NON-NLS-1$
-		case VirtualActivationEdgeEditPart.VISUAL_ID:
-			return getImage(
-					"Navigator?Link?VirtualActivationEdgeFigure", GpmnElementTypes.Link_4003); //$NON-NLS-1$
+	public Image getImage(View view)
+	{
+		switch (GpmnVisualIDRegistry.getVisualID(view))
+		{
+			case GpmnDiagramEditPart.VISUAL_ID:
+				return getImage(
+						"Navigator?Diagram?http://jadex.sourceforge.net/gpmn?GpmnDiagram", GpmnElementTypes.GpmnDiagram_1000); //$NON-NLS-1$
+			case ActivationPlanEditPart.VISUAL_ID:
+				return getImage(
+						"Navigator?TopLevelNode?http://jadex.sourceforge.net/gpmn?ActivationPlan", GpmnElementTypes.ActivationPlan_2001); //$NON-NLS-1$
+			case SubProcessEditPart.VISUAL_ID:
+				return getImage(
+						"Navigator?TopLevelNode?http://jadex.sourceforge.net/gpmn?SubProcess", GpmnElementTypes.SubProcess_2002); //$NON-NLS-1$
+			case BpmnPlanEditPart.VISUAL_ID:
+				return getImage(
+						"Navigator?TopLevelNode?http://jadex.sourceforge.net/gpmn?BpmnPlan", GpmnElementTypes.BpmnPlan_2003); //$NON-NLS-1$
+			case GoalEditPart.VISUAL_ID:
+				return getImage(
+						"Navigator?TopLevelNode?http://jadex.sourceforge.net/gpmn?Goal", GpmnElementTypes.Goal_2004); //$NON-NLS-1$
+			case ActivationEdgeEditPart.VISUAL_ID:
+				return getImage(
+						"Navigator?Link?http://jadex.sourceforge.net/gpmn?ActivationEdge", GpmnElementTypes.ActivationEdge_4001); //$NON-NLS-1$
+			case PlanEdgeEditPart.VISUAL_ID:
+				return getImage(
+						"Navigator?Link?http://jadex.sourceforge.net/gpmn?PlanEdge", GpmnElementTypes.PlanEdge_4002); //$NON-NLS-1$
+			case SuppressionEdgeEditPart.VISUAL_ID:
+				return getImage(
+						"Navigator?Link?http://jadex.sourceforge.net/gpmn?SuppressionEdge", GpmnElementTypes.SuppressionEdge_4004); //$NON-NLS-1$
+			case VirtualActivationEdgeEditPart.VISUAL_ID:
+				return getImage(
+						"Navigator?Link?VirtualActivationEdgeFigure", GpmnElementTypes.Link_4003); //$NON-NLS-1$
 		}
 		return getImage("Navigator?UnknownElement", null); //$NON-NLS-1$
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	private Image getImage(String key, IElementType elementType) {
+	private Image getImage(String key, IElementType elementType)
+	{
 		ImageRegistry imageRegistry = GpmnDiagramEditorPlugin.getInstance()
 				.getImageRegistry();
 		Image image = imageRegistry.get(key);
 		if (image == null && elementType != null
-				&& GpmnElementTypes.isKnownElementType(elementType)) {
+				&& GpmnElementTypes.isKnownElementType(elementType))
+		{
 			image = GpmnElementTypes.getImage(elementType);
 			imageRegistry.put(key, image);
 		}
-
-		if (image == null) {
+		
+		if (image == null)
+		{
 			image = imageRegistry.get("Navigator?ImageNotFound"); //$NON-NLS-1$
 			imageRegistry.put(key, image);
 		}
 		return image;
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	public String getText(Object element) {
-		if (element instanceof GpmnNavigatorGroup) {
+	public String getText(Object element)
+	{
+		if (element instanceof GpmnNavigatorGroup)
+		{
 			GpmnNavigatorGroup group = (GpmnNavigatorGroup) element;
 			return group.getGroupName();
 		}
-
-		if (element instanceof GpmnNavigatorItem) {
+		
+		if (element instanceof GpmnNavigatorItem)
+		{
 			GpmnNavigatorItem navigatorItem = (GpmnNavigatorItem) element;
-			if (!isOwnView(navigatorItem.getView())) {
+			if (!isOwnView(navigatorItem.getView()))
+			{
 				return null;
 			}
 			return getText(navigatorItem.getView());
 		}
-
+		
 		return super.getText(element);
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	public String getText(View view) {
-		if (view.getElement() != null && view.getElement().eIsProxy()) {
+	public String getText(View view)
+	{
+		if (view.getElement() != null && view.getElement().eIsProxy())
+		{
 			return getUnresolvedDomainElementProxyText(view);
 		}
-		switch (GpmnVisualIDRegistry.getVisualID(view)) {
-		case GpmnDiagramEditPart.VISUAL_ID:
-			return getGpmnDiagram_1000Text(view);
-		case ActivationPlanEditPart.VISUAL_ID:
-			return getActivationPlan_2001Text(view);
-		case SubProcessEditPart.VISUAL_ID:
-			return getSubProcess_2002Text(view);
-		case BpmnPlanEditPart.VISUAL_ID:
-			return getBpmnPlan_2003Text(view);
-		case GoalEditPart.VISUAL_ID:
-			return getGoal_2004Text(view);
-		case ActivationEdgeEditPart.VISUAL_ID:
-			return getActivationEdge_4001Text(view);
-		case PlanEdgeEditPart.VISUAL_ID:
-			return getPlanEdge_4002Text(view);
-		case SuppressionEdgeEditPart.VISUAL_ID:
-			return getSuppressionEdge_4004Text(view);
-		case VirtualActivationEdgeEditPart.VISUAL_ID:
-			return getLink_4003Text(view);
+		switch (GpmnVisualIDRegistry.getVisualID(view))
+		{
+			case GpmnDiagramEditPart.VISUAL_ID:
+				return getGpmnDiagram_1000Text(view);
+			case ActivationPlanEditPart.VISUAL_ID:
+				return getActivationPlan_2001Text(view);
+			case SubProcessEditPart.VISUAL_ID:
+				return getSubProcess_2002Text(view);
+			case BpmnPlanEditPart.VISUAL_ID:
+				return getBpmnPlan_2003Text(view);
+			case GoalEditPart.VISUAL_ID:
+				return getGoal_2004Text(view);
+			case ActivationEdgeEditPart.VISUAL_ID:
+				return getActivationEdge_4001Text(view);
+			case PlanEdgeEditPart.VISUAL_ID:
+				return getPlanEdge_4002Text(view);
+			case SuppressionEdgeEditPart.VISUAL_ID:
+				return getSuppressionEdge_4004Text(view);
+			case VirtualActivationEdgeEditPart.VISUAL_ID:
+				return getLink_4003Text(view);
 		}
 		return getUnknownElementText(view);
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	private String getGpmnDiagram_1000Text(View view) {
+	private String getGpmnDiagram_1000Text(View view)
+	{
 		GpmnDiagram domainModelElement = (GpmnDiagram) view.getElement();
-		if (domainModelElement != null) {
+		if (domainModelElement != null)
+		{
 			return String.valueOf(domainModelElement.getName());
-		} else {
+		}
+		else
+		{
 			GpmnDiagramEditorPlugin.getInstance().logError(
 					"No domain element for view with visualID = " + 1000); //$NON-NLS-1$
 			return ""; //$NON-NLS-1$
 		}
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	private String getActivationPlan_2001Text(View view) {
+	private String getActivationPlan_2001Text(View view)
+	{
 		IParser parser = GpmnParserProvider.getParser(
 				GpmnElementTypes.ActivationPlan_2001,
 				view.getElement() != null ? view.getElement() : view,
 				GpmnVisualIDRegistry
 						.getType(ActivationPlanNameEditPart.VISUAL_ID));
-		if (parser != null) {
+		if (parser != null)
+		{
 			return parser.getPrintString(new EObjectAdapter(
 					view.getElement() != null ? view.getElement() : view),
 					ParserOptions.NONE.intValue());
-		} else {
+		}
+		else
+		{
 			GpmnDiagramEditorPlugin.getInstance().logError(
 					"Parser was not found for label " + 5001); //$NON-NLS-1$
 			return ""; //$NON-NLS-1$
 		}
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	private String getSubProcess_2002Text(View view) {
+	private String getSubProcess_2002Text(View view)
+	{
 		IParser parser = GpmnParserProvider.getParser(
 				GpmnElementTypes.SubProcess_2002,
 				view.getElement() != null ? view.getElement() : view,
 				GpmnVisualIDRegistry.getType(SubProcessNameEditPart.VISUAL_ID));
-		if (parser != null) {
+		if (parser != null)
+		{
 			return parser.getPrintString(new EObjectAdapter(
 					view.getElement() != null ? view.getElement() : view),
 					ParserOptions.NONE.intValue());
-		} else {
+		}
+		else
+		{
 			GpmnDiagramEditorPlugin.getInstance().logError(
 					"Parser was not found for label " + 5002); //$NON-NLS-1$
 			return ""; //$NON-NLS-1$
 		}
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	private String getBpmnPlan_2003Text(View view) {
+	private String getBpmnPlan_2003Text(View view)
+	{
 		IParser parser = GpmnParserProvider.getParser(
 				GpmnElementTypes.BpmnPlan_2003,
 				view.getElement() != null ? view.getElement() : view,
 				GpmnVisualIDRegistry.getType(BpmnPlanNameEditPart.VISUAL_ID));
-		if (parser != null) {
+		if (parser != null)
+		{
 			return parser.getPrintString(new EObjectAdapter(
 					view.getElement() != null ? view.getElement() : view),
 					ParserOptions.NONE.intValue());
-		} else {
+		}
+		else
+		{
 			GpmnDiagramEditorPlugin.getInstance().logError(
 					"Parser was not found for label " + 5003); //$NON-NLS-1$
 			return ""; //$NON-NLS-1$
 		}
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	private String getGoal_2004Text(View view) {
+	private String getGoal_2004Text(View view)
+	{
 		IParser parser = GpmnParserProvider.getParser(
 				GpmnElementTypes.Goal_2004, view.getElement() != null ? view
 						.getElement() : view, GpmnVisualIDRegistry
 						.getType(GoalNameEditPart.VISUAL_ID));
-		if (parser != null) {
+		if (parser != null)
+		{
 			return parser.getPrintString(new EObjectAdapter(
 					view.getElement() != null ? view.getElement() : view),
 					ParserOptions.NONE.intValue());
-		} else {
+		}
+		else
+		{
 			GpmnDiagramEditorPlugin.getInstance().logError(
 					"Parser was not found for label " + 5004); //$NON-NLS-1$
 			return ""; //$NON-NLS-1$
 		}
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	private String getActivationEdge_4001Text(View view) {
+	private String getActivationEdge_4001Text(View view)
+	{
 		IParser parser = GpmnParserProvider.getParser(
 				GpmnElementTypes.ActivationEdge_4001,
 				view.getElement() != null ? view.getElement() : view,
 				GpmnVisualIDRegistry
 						.getType(ActivationEdgeOrderEditPart.VISUAL_ID));
-		if (parser != null) {
+		if (parser != null)
+		{
 			return parser.getPrintString(new EObjectAdapter(
 					view.getElement() != null ? view.getElement() : view),
 					ParserOptions.NONE.intValue());
-		} else {
+		}
+		else
+		{
 			GpmnDiagramEditorPlugin.getInstance().logError(
 					"Parser was not found for label " + 6001); //$NON-NLS-1$
 			return ""; //$NON-NLS-1$
 		}
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	private String getPlanEdge_4002Text(View view) {
+	private String getPlanEdge_4002Text(View view)
+	{
 		PlanEdge domainModelElement = (PlanEdge) view.getElement();
-		if (domainModelElement != null) {
+		if (domainModelElement != null)
+		{
 			return String.valueOf(domainModelElement.getId());
-		} else {
+		}
+		else
+		{
 			GpmnDiagramEditorPlugin.getInstance().logError(
 					"No domain element for view with visualID = " + 4002); //$NON-NLS-1$
 			return ""; //$NON-NLS-1$
 		}
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	private String getSuppressionEdge_4004Text(View view) {
+	private String getSuppressionEdge_4004Text(View view)
+	{
 		SuppressionEdge domainModelElement = (SuppressionEdge) view
 				.getElement();
-		if (domainModelElement != null) {
+		if (domainModelElement != null)
+		{
 			return String.valueOf(domainModelElement.getId());
-		} else {
+		}
+		else
+		{
 			GpmnDiagramEditorPlugin.getInstance().logError(
 					"No domain element for view with visualID = " + 4004); //$NON-NLS-1$
 			return ""; //$NON-NLS-1$
 		}
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	private String getLink_4003Text(View view) {
+	private String getLink_4003Text(View view)
+	{
 		IParser parser = GpmnParserProvider.getParser(
 				GpmnElementTypes.Link_4003, view.getElement() != null ? view
 						.getElement() : view, GpmnVisualIDRegistry
 						.getType(VirtualActivationOrderEditPart.VISUAL_ID));
-		if (parser != null) {
+		if (parser != null)
+		{
 			return parser.getPrintString(new EObjectAdapter(
 					view.getElement() != null ? view.getElement() : view),
 					ParserOptions.NONE.intValue());
-		} else {
+		}
+		else
+		{
 			GpmnDiagramEditorPlugin.getInstance().logError(
 					"Parser was not found for label " + 6002); //$NON-NLS-1$
 			return ""; //$NON-NLS-1$
 		}
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	private String getUnknownElementText(View view) {
+	private String getUnknownElementText(View view)
+	{
 		return "<UnknownElement Visual_ID = " + view.getType() + ">"; //$NON-NLS-1$  //$NON-NLS-2$
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	private String getUnresolvedDomainElementProxyText(View view) {
+	private String getUnresolvedDomainElementProxyText(View view)
+	{
 		return "<Unresolved domain element Visual_ID = " + view.getType() + ">"; //$NON-NLS-1$  //$NON-NLS-2$
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	public void init(ICommonContentExtensionSite aConfig) {
+	public void init(ICommonContentExtensionSite aConfig)
+	{
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	public void restoreState(IMemento aMemento) {
+	public void restoreState(IMemento aMemento)
+	{
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	public void saveState(IMemento aMemento) {
+	public void saveState(IMemento aMemento)
+	{
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	public String getDescription(Object anElement) {
+	public String getDescription(Object anElement)
+	{
 		return null;
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	private boolean isOwnView(View view) {
+	private boolean isOwnView(View view)
+	{
 		return GpmnDiagramEditPart.MODEL_ID.equals(GpmnVisualIDRegistry
 				.getModelID(view));
 	}
-
+	
 }

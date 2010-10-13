@@ -21,51 +21,58 @@ import org.eclipse.gmf.runtime.notation.View;
  * @generated
  */
 public class GpmnReorientConnectionViewCommand extends
-		AbstractTransactionalCommand {
-
+		AbstractTransactionalCommand
+{
+	
 	/**
 	 * @generated
 	 */
 	private IAdaptable edgeAdaptor;
-
+	
 	/**
 	 * @generated
 	 */
 	public GpmnReorientConnectionViewCommand(
-			TransactionalEditingDomain editingDomain, String label) {
+			TransactionalEditingDomain editingDomain, String label)
+	{
 		super(editingDomain, label, null);
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	public List getAffectedFiles() {
+	public List getAffectedFiles()
+	{
 		View view = (View) edgeAdaptor.getAdapter(View.class);
-		if (view != null) {
+		if (view != null)
+		{
 			return getWorkspaceFiles(view);
 		}
 		return super.getAffectedFiles();
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	public IAdaptable getEdgeAdaptor() {
+	public IAdaptable getEdgeAdaptor()
+	{
 		return edgeAdaptor;
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	public void setEdgeAdaptor(IAdaptable edgeAdaptor) {
+	public void setEdgeAdaptor(IAdaptable edgeAdaptor)
+	{
 		this.edgeAdaptor = edgeAdaptor;
 	}
-
+	
 	/**
 	 * @generated
 	 */
 	protected CommandResult doExecuteWithResult(
-			IProgressMonitor progressMonitor, IAdaptable info) {
+			IProgressMonitor progressMonitor, IAdaptable info)
+	{
 		assert null != edgeAdaptor : "Null child in GpmnReorientConnectionViewCommand"; //$NON-NLS-1$
 		Edge edge = (Edge) getEdgeAdaptor().getAdapter(Edge.class);
 		assert null != edge : "Null edge in GpmnReorientConnectionViewCommand"; //$NON-NLS-1$

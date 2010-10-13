@@ -15,86 +15,99 @@ import org.eclipse.gmf.runtime.emf.type.core.IElementType;
 /**
  * @generated
  */
-public class GpmnLinkDescriptor extends GpmnNodeDescriptor {
-
+public class GpmnLinkDescriptor extends GpmnNodeDescriptor
+{
+	
 	/**
 	 * @generated
 	 */
 	private EObject mySource;
-
+	
 	/**
 	 * @generated
 	 */
 	private EObject myDestination;
-
+	
 	/**
 	 * @generated
 	 */
 	private IAdaptable mySemanticAdapter;
-
+	
 	/**
 	 * @generated
 	 */
 	private GpmnLinkDescriptor(EObject source, EObject destination,
-			EObject linkElement, int linkVID) {
+			EObject linkElement, int linkVID)
+	{
 		super(linkElement, linkVID);
 		mySource = source;
 		myDestination = destination;
 	}
-
+	
 	/**
 	 * @generated
 	 */
 	public GpmnLinkDescriptor(EObject source, EObject destination,
-			IElementType elementType, int linkVID) {
+			IElementType elementType, int linkVID)
+	{
 		this(source, destination, (EObject) null, linkVID);
 		final IElementType elementTypeCopy = elementType;
-		mySemanticAdapter = new IAdaptable() {
-			public Object getAdapter(Class adapter) {
-				if (IElementType.class.equals(adapter)) {
+		mySemanticAdapter = new IAdaptable()
+		{
+			public Object getAdapter(Class adapter)
+			{
+				if (IElementType.class.equals(adapter))
+				{
 					return elementTypeCopy;
 				}
 				return null;
 			}
 		};
 	}
-
+	
 	/**
 	 * @generated
 	 */
 	public GpmnLinkDescriptor(EObject source, EObject destination,
-			EObject linkElement, IElementType elementType, int linkVID) {
+			EObject linkElement, IElementType elementType, int linkVID)
+	{
 		this(source, destination, linkElement, linkVID);
 		final IElementType elementTypeCopy = elementType;
-		mySemanticAdapter = new EObjectAdapter(linkElement) {
-			public Object getAdapter(Class adapter) {
-				if (IElementType.class.equals(adapter)) {
+		mySemanticAdapter = new EObjectAdapter(linkElement)
+		{
+			public Object getAdapter(Class adapter)
+			{
+				if (IElementType.class.equals(adapter))
+				{
 					return elementTypeCopy;
 				}
 				return super.getAdapter(adapter);
 			}
 		};
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	public EObject getSource() {
+	public EObject getSource()
+	{
 		return mySource;
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	public EObject getDestination() {
+	public EObject getDestination()
+	{
 		return myDestination;
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	public IAdaptable getSemanticAdapter() {
+	public IAdaptable getSemanticAdapter()
+	{
 		return mySemanticAdapter;
 	}
-
+	
 }

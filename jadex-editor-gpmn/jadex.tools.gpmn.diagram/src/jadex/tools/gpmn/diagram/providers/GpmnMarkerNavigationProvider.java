@@ -27,23 +27,26 @@ import org.eclipse.gmf.runtime.emf.ui.providers.marker.AbstractModelMarkerNaviga
  * @generated
  */
 public class GpmnMarkerNavigationProvider extends
-		AbstractModelMarkerNavigationProvider {
-
+		AbstractModelMarkerNavigationProvider
+{
+	
 	/**
 	 * @generated
 	 */
 	public static final String MARKER_TYPE = GpmnDiagramEditorPlugin.ID
 			+ ".diagnostic"; //$NON-NLS-1$
-
+	
 	/**
 	 * @generated
 	 */
-	protected void doGotoMarker(IMarker marker) {
+	protected void doGotoMarker(IMarker marker)
+	{
 		String elementId = marker
 				.getAttribute(
 						org.eclipse.gmf.runtime.common.core.resources.IMarker.ELEMENT_ID,
 						null);
-		if (elementId == null || !(getEditor() instanceof DiagramEditor)) {
+		if (elementId == null || !(getEditor() instanceof DiagramEditor))
+		{
 			return;
 		}
 		DiagramEditor editor = (DiagramEditor) getEditor();
@@ -51,35 +54,43 @@ public class GpmnMarkerNavigationProvider extends
 				.getEditPartRegistry();
 		EObject targetView = editor.getDiagram().eResource().getEObject(
 				elementId);
-		if (targetView == null) {
+		if (targetView == null)
+		{
 			return;
 		}
 		EditPart targetEditPart = (EditPart) editPartRegistry.get(targetView);
-		if (targetEditPart != null) {
+		if (targetEditPart != null)
+		{
 			GpmnDiagramEditorUtil.selectElementsInDiagram(editor, Arrays
 					.asList(new EditPart[] { targetEditPart }));
 		}
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	public static void deleteMarkers(IResource resource) {
-		try {
+	public static void deleteMarkers(IResource resource)
+	{
+		try
+		{
 			resource.deleteMarkers(MARKER_TYPE, true, IResource.DEPTH_ZERO);
-		} catch (CoreException e) {
+		}
+		catch (CoreException e)
+		{
 			GpmnDiagramEditorPlugin.getInstance().logError(
 					"Failed to delete validation markers", e); //$NON-NLS-1$
 		}
 	}
-
+	
 	/**
 	 * @generated
 	 */
 	public static IMarker addMarker(IFile file, String elementId,
-			String location, String message, int statusSeverity) {
+			String location, String message, int statusSeverity)
+	{
 		IMarker marker = null;
-		try {
+		try
+		{
 			marker = file.createMarker(MARKER_TYPE);
 			marker.setAttribute(IMarker.MESSAGE, message);
 			marker.setAttribute(IMarker.LOCATION, location);
@@ -88,14 +99,19 @@ public class GpmnMarkerNavigationProvider extends
 							org.eclipse.gmf.runtime.common.ui.resources.IMarker.ELEMENT_ID,
 							elementId);
 			int markerSeverity = IMarker.SEVERITY_INFO;
-			if (statusSeverity == IStatus.WARNING) {
+			if (statusSeverity == IStatus.WARNING)
+			{
 				markerSeverity = IMarker.SEVERITY_WARNING;
-			} else if (statusSeverity == IStatus.ERROR
-					|| statusSeverity == IStatus.CANCEL) {
+			}
+			else if (statusSeverity == IStatus.ERROR
+					|| statusSeverity == IStatus.CANCEL)
+			{
 				markerSeverity = IMarker.SEVERITY_ERROR;
 			}
 			marker.setAttribute(IMarker.SEVERITY, markerSeverity);
-		} catch (CoreException e) {
+		}
+		catch (CoreException e)
+		{
 			GpmnDiagramEditorPlugin.getInstance().logError(
 					"Failed to create validation marker", e); //$NON-NLS-1$
 		}

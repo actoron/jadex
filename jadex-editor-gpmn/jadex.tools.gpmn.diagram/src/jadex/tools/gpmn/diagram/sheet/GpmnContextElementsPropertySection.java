@@ -43,8 +43,9 @@ import org.eclipse.ui.IWorkbenchPart;
  * @generated NOT
  */
 public class GpmnContextElementsPropertySection extends
-		AbstractCommonTablePropertySection {
-
+		AbstractCommonTablePropertySection
+{
+	
 	/**
 	 * @generated NOT
 	 */
@@ -61,147 +62,175 @@ public class GpmnContextElementsPropertySection extends
 	 * @generated NOT
 	 */
 	private final static String SET_COLUMN = "Set"; //$NON-NLS-1$
-
+	
 	public static final int[] DEFAULT_COLUMN_WEIGHTS = new int[] { 2, 2, 4, 1 };
-
+	
 	public static final String[] BOOLEAN_VALUES = new String[] { "false",
 			"true" };
-
+	
 	/**
 	 * @param tableViewerLabel
 	 */
-	public GpmnContextElementsPropertySection() {
+	public GpmnContextElementsPropertySection()
+	{
 		super("Context Elements");
-
+		
 	}
-
+	
 	@Override
-	public void setInput(IWorkbenchPart part, ISelection selection) {
+	public void setInput(IWorkbenchPart part, ISelection selection)
+	{
 		super.setInput(part, selection);
 		if ((modelElement != null) && (modelElement instanceof GpmnDiagram))
 			modelElement = ((GpmnDiagram) modelElement).getContext();
 	}
-
-	protected int[] getColumnWeights(TableColumn[] columns) {
+	
+	protected int[] getColumnWeights(TableColumn[] columns)
+	{
 		return DEFAULT_COLUMN_WEIGHTS;
 	}
-
+	
 	/**
 	 * Create the edit table
 	 * @param parent
 	 * 
 	 */
 	@Override
-	protected void createColumns(TableViewer viewer) {
-
+	protected void createColumns(TableViewer viewer)
+	{
+		
 		TableViewerColumn column = new TableViewerColumn(viewer, SWT.LEFT);
 		column.getColumn().setText(NAME_COLUMN);
-		column.setEditingSupport(new ContextElementEditingSupport(viewer) {
+		column.setEditingSupport(new ContextElementEditingSupport(viewer)
+		{
 			@Override
-			protected Object getValue(Object element) {
+			protected Object getValue(Object element)
+			{
 				return ((ContextElement) element).getName();
 			}
-
+			
 			@Override
 			protected ModifyEObjectCommand getTransactionalEditCommand(
-					Object element, Object value) {
+					Object element, Object value)
+			{
 				return new ModifyContextElementCommand((EObject) element,
 						NAME_COLUMN, value);
 			}
 		});
-		column.setLabelProvider(new ColumnLabelProvider() {
-			public String getText(Object element) {
+		column.setLabelProvider(new ColumnLabelProvider()
+		{
+			public String getText(Object element)
+			{
 				return ((ContextElement) element).getName();
 			}
 		});
-
+		
 		column = new TableViewerColumn(viewer, SWT.LEFT);
 		column.getColumn().setText(TYPE_COLUMN);
-		column.setEditingSupport(new ContextElementEditingSupport(viewer) {
+		column.setEditingSupport(new ContextElementEditingSupport(viewer)
+		{
 			@Override
-			protected Object getValue(Object element) {
+			protected Object getValue(Object element)
+			{
 				return ((ContextElement) element).getType();
 			}
-
+			
 			@Override
 			protected ModifyEObjectCommand getTransactionalEditCommand(
-					Object element, Object value) {
+					Object element, Object value)
+			{
 				return new ModifyContextElementCommand((EObject) element,
 						TYPE_COLUMN, value);
 			}
 		});
-		column.setLabelProvider(new ColumnLabelProvider() {
-			public String getText(Object element) {
+		column.setLabelProvider(new ColumnLabelProvider()
+		{
+			public String getText(Object element)
+			{
 				return ((ContextElement) element).getType();
 			}
 		});
-
+		
 		column = new TableViewerColumn(viewer, SWT.LEFT);
 		column.getColumn().setText(VALUE_COLUMN);
-		column.setEditingSupport(new ContextElementEditingSupport(viewer) {
+		column.setEditingSupport(new ContextElementEditingSupport(viewer)
+		{
 			@Override
-			protected Object getValue(Object element) {
+			protected Object getValue(Object element)
+			{
 				return ((ContextElement) element).getValue();
 			}
-
+			
 			@Override
 			protected ModifyEObjectCommand getTransactionalEditCommand(
-					Object element, Object value) {
+					Object element, Object value)
+			{
 				return new ModifyContextElementCommand((EObject) element,
 						VALUE_COLUMN, value);
 			}
 		});
-		column.setLabelProvider(new ColumnLabelProvider() {
-			public String getText(Object element) {
+		column.setLabelProvider(new ColumnLabelProvider()
+		{
+			public String getText(Object element)
+			{
 				return ((ContextElement) element).getValue();
 			}
 		});
-
+		
 		column = new TableViewerColumn(viewer, SWT.LEFT);
 		column.getColumn().setText(SET_COLUMN);
 		ComboBoxCellEditor editor = new ComboBoxCellEditor(
 				((TableViewer) viewer).getTable(), BOOLEAN_VALUES);
 		column.setEditingSupport(new ContextElementEditingSupport(viewer,
-				editor) {
+				editor)
+		{
 			@Override
-			protected Object getValue(Object element) {
+			protected Object getValue(Object element)
+			{
 				if (BOOLEAN_VALUES[0].equals(String
-						.valueOf(((ContextElement) element).isSet()))) {
+						.valueOf(((ContextElement) element).isSet())))
+				{
 					return new Integer(0);
 				}
 				return new Integer(1);
 			}
-
+			
 			@Override
 			protected ModifyEObjectCommand getTransactionalEditCommand(
-					Object element, Object value) {
-
+					Object element, Object value)
+			{
+				
 				return new ModifyContextElementCommand((EObject) element,
 						SET_COLUMN,
 						BOOLEAN_VALUES[((Integer) value).intValue()]);
 			}
 		});
-		column.setLabelProvider(new ColumnLabelProvider() {
-			public String getText(Object element) {
+		column.setLabelProvider(new ColumnLabelProvider()
+		{
+			public String getText(Object element)
+			{
 				//return ((ContextElement) element).isSet();
 				return String.valueOf(((ContextElement) element).isSet());
 			}
 		});
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see jadex.tools.gpmn.diagram.sheet.AbstractGpmnTablePropertySection#getAddCommand()
 	 */
 	@Override
-	protected ModifyEObjectCommand getAddCommand() {
+	protected ModifyEObjectCommand getAddCommand()
+	{
 		// modify the ContextElement
 		ModifyEObjectCommand command = new ModifyEObjectCommand(
 				modelElement,
-				GpmnDiagramMessages.GpmnContextElementsListSection_add_element_command_name) {
+				GpmnDiagramMessages.GpmnContextElementsListSection_add_element_command_name)
+		{
 			@Override
 			protected CommandResult doExecuteWithResult(
 					IProgressMonitor monitor, IAdaptable info)
-					throws ExecutionException {
+					throws ExecutionException
+			{
 				ContextElement newElement = GpmnFactory.eINSTANCE
 						.createContextElement();
 				newElement.setName("name");
@@ -211,203 +240,237 @@ public class GpmnContextElementsPropertySection extends
 				return CommandResult.newOKCommandResult(newElement);
 			}
 		};
-
+		
 		return command;
 	}
-
+	
 	/**
 	 * @see jadex.tools.model.common.properties.table.AbstractCommonTablePropertySection#getDeleteCommand()
 	 */
 	@Override
-	protected ModifyEObjectCommand getDeleteCommand() {
+	protected ModifyEObjectCommand getDeleteCommand()
+	{
 		// modify the ContextElement
 		ModifyEObjectCommand command = new ModifyEObjectCommand(
 				modelElement,
-				GpmnDiagramMessages.GpmnContextElementsListSection_remove_element_command_name) {
+				GpmnDiagramMessages.GpmnContextElementsListSection_remove_element_command_name)
+		{
 			@Override
 			protected CommandResult doExecuteWithResult(
 					IProgressMonitor monitor, IAdaptable info)
-					throws ExecutionException {
+					throws ExecutionException
+			{
 				ContextElement element = (ContextElement) ((IStructuredSelection) tableViewer
 						.getSelection()).getFirstElement();
-
+				
 				((Context) modelElement).getElements().remove(element);
 				return CommandResult.newOKCommandResult(null);
 			}
 		};
-
+		
 		return command;
 	}
-
+	
 	/**
 	 * @see jadex.tools.model.common.properties.table.AbstractCommonTablePropertySection#getDeleteCommand()
 	 */
 	@Override
-	protected ModifyEObjectCommand getUpCommand() {
+	protected ModifyEObjectCommand getUpCommand()
+	{
 		// modify the ContextElement
 		ModifyEObjectCommand command = new ModifyEObjectCommand(modelElement,
-				"ContextElement MoveUp command") {
+				"ContextElement MoveUp command")
+		{
 			@Override
 			protected CommandResult doExecuteWithResult(
 					IProgressMonitor monitor, IAdaptable info)
-					throws ExecutionException {
+					throws ExecutionException
+			{
 				ContextElement element = (ContextElement) ((IStructuredSelection) tableViewer
 						.getSelection()).getFirstElement();
-
+				
 				EList<ContextElement> elements = ((Context) modelElement)
 						.getElements();
 				int index = elements.indexOf(element);
-				if (0 < index && index < elements.size()) {
+				if (0 < index && index < elements.size())
+				{
 					elements.move(index - 1, element);
 				}
-
+				
 				((Context) modelElement).getElements().remove(element);
-
+				
 				return CommandResult.newOKCommandResult(null);
 			}
 		};
-
+		
 		return command;
 	}
-
-	protected ModifyEObjectCommand getDownCommand() {
+	
+	protected ModifyEObjectCommand getDownCommand()
+	{
 		// modify the ContextElement
 		ModifyEObjectCommand command = new ModifyEObjectCommand(modelElement,
-				"ContextElement MoveUp command") {
+				"ContextElement MoveUp command")
+		{
 			@Override
 			protected CommandResult doExecuteWithResult(
 					IProgressMonitor monitor, IAdaptable info)
-					throws ExecutionException {
+					throws ExecutionException
+			{
 				ContextElement element = (ContextElement) ((IStructuredSelection) tableViewer
 						.getSelection()).getFirstElement();
-
+				
 				EList<ContextElement> elements = ((Context) modelElement)
 						.getElements();
 				int index = elements.indexOf(element);
-				if (0 <= index && index < elements.size() - 1) {
+				if (0 <= index && index < elements.size() - 1)
+				{
 					elements.move(index + 1, element);
 				}
-
+				
 				((Context) modelElement).getElements().remove(element);
-
+				
 				return CommandResult.newOKCommandResult(null);
 			}
 		};
-
+		
 		return command;
 	}
-
+	
 	/**
 	 * @see jadex.tools.model.common.properties.table.AbstractCommonTablePropertySection#getTableContentProvider()
 	 */
 	@Override
-	protected IStructuredContentProvider getTableContentProvider() {
+	protected IStructuredContentProvider getTableContentProvider()
+	{
 		return new GpmnContextElementsTableContentProvider();
 	}
-
+	
 	@Override
-	protected ModifyEObjectCommand getClearCommand() {
+	protected ModifyEObjectCommand getClearCommand()
+	{
 		return new ModifyEObjectCommand(modelElement,
-				"Clear diagramm context command") {
-
+				"Clear diagramm context command")
+		{
+			
 			@Override
 			protected CommandResult doExecuteWithResult(
 					IProgressMonitor monitor, IAdaptable info)
-					throws ExecutionException {
+					throws ExecutionException
+			{
 				if (modelElement instanceof Context)
 					((Context) modelElement).getElements().clear();
 				return CommandResult.newOKCommandResult();
 			}
 		};
 	}
-
+	
 	protected abstract class ContextElementEditingSupport extends
-			AbstractGpmnEditingSupport {
-
+			AbstractGpmnEditingSupport
+	{
+		
 		/**
 		 * @param viewer
 		 * @param editor
 		 */
 		protected ContextElementEditingSupport(TableViewer viewer,
-				CellEditor editor) {
+				CellEditor editor)
+		{
 			super(viewer, editor);
 		}
-
+		
 		/**
 		 * @param viewer
 		 */
-		protected ContextElementEditingSupport(TableViewer viewer) {
+		protected ContextElementEditingSupport(TableViewer viewer)
+		{
 			super(viewer);
 		}
-
-		protected boolean canEdit(Object element) {
+		
+		protected boolean canEdit(Object element)
+		{
 			return (element instanceof ContextElement);
 		}
-
+		
 	}
-
-	protected class ModifyContextElementCommand extends ModifyEObjectCommand {
-
+	
+	protected class ModifyContextElementCommand extends ModifyEObjectCommand
+	{
+		
 		private EObject elementToUpdate;
 		private String property;
 		private Object value;
-
+		
 		/**
 		 * @param elementToUpdate
 		 * @param property
 		 * @param value
 		 */
 		protected ModifyContextElementCommand(EObject element, String property,
-				Object value) {
+				Object value)
+		{
 			super(
 					element,
 					GpmnDiagramMessages.GpmnContextElementsListSection_update_element_command_name);
-
+			
 			this.elementToUpdate = element;
 			this.property = property;
 			this.value = value;
 		}
-
+		
 		@Override
 		protected CommandResult doExecuteWithResult(IProgressMonitor monitor,
-				IAdaptable info) throws ExecutionException {
-
-			if (NAME_COLUMN.equals(property)) {
+				IAdaptable info) throws ExecutionException
+		{
+			
+			if (NAME_COLUMN.equals(property))
+			{
 				((ContextElement) elementToUpdate).setName((String) value);
-			} else if (TYPE_COLUMN.equals(property)) {
+			}
+			else if (TYPE_COLUMN.equals(property))
+			{
 				((ContextElement) elementToUpdate).setType((String) value);
-			} else if (VALUE_COLUMN.equals(property)) {
+			}
+			else if (VALUE_COLUMN.equals(property))
+			{
 				((ContextElement) elementToUpdate).setValue((String) value);
-			} else if (SET_COLUMN.equals(property)) {
+			}
+			else if (SET_COLUMN.equals(property))
+			{
 				((ContextElement) elementToUpdate).setSet(Boolean
 						.parseBoolean((String) value));
-			} else {
+			}
+			else
+			{
 				throw new UnsupportedOperationException("Invalid edit column: "
 						+ property);
 			}
-
+			
 			return CommandResult.newOKCommandResult();
 		}
-
+		
 	}
-
+	
 	/**
 	 * Simple content provider that reflects the ContextElemnts 
 	 * of an Context given as an input. Marked as dynamic / static.
 	 */
 	public class GpmnContextElementsTableContentProvider implements
-			IStructuredContentProvider {
-
+			IStructuredContentProvider
+	{
+		
 		/**
 		 * Generate the content for the table.
 		 * 
 		 * @return Object[] that contains ContextElement objects.
 		 * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
 		 */
-		public Object[] getElements(Object inputElement) {
+		public Object[] getElements(Object inputElement)
+		{
 			if (inputElement instanceof GpmnDiagram)
 				inputElement = ((GpmnDiagram) inputElement).getContext();
-			if (inputElement instanceof Context) {
+			if (inputElement instanceof Context)
+			{
 				EList<ContextElement> contextElements = ((Context) inputElement)
 						.getElements();
 				return contextElements.toArray(new Object[contextElements
@@ -415,22 +478,24 @@ public class GpmnContextElementsPropertySection extends
 			}
 			return new Object[] { null };
 		}
-
+		
 		/**
 		 * @see org.eclipse.jface.viewers.IContentProvider#dispose()
 		 */
-		public void dispose() {
+		public void dispose()
+		{
 			// nothing to dispose.
 		}
-
+		
 		/**
 		 * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer,
 		 *      java.lang.Object, java.lang.Object)
 		 */
-		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+		public void inputChanged(Viewer viewer, Object oldInput, Object newInput)
+		{
 			// no actions taken.
 		}
-
+		
 	}
-
+	
 }

@@ -36,21 +36,26 @@ import org.eclipse.ui.part.FileEditorInput;
 /**
  * @generated
  */
-public class GpmnNavigatorLinkHelper implements ILinkHelper {
-
+public class GpmnNavigatorLinkHelper implements ILinkHelper
+{
+	
 	/**
 	 * @generated
 	 */
-	private static IEditorInput getEditorInput(Diagram diagram) {
+	private static IEditorInput getEditorInput(Diagram diagram)
+	{
 		Resource diagramResource = diagram.eResource();
 		for (Iterator it = diagramResource.getContents().iterator(); it
-				.hasNext();) {
+				.hasNext();)
+		{
 			EObject nextEObject = (EObject) it.next();
-			if (nextEObject == diagram) {
+			if (nextEObject == diagram)
+			{
 				return new FileEditorInput(WorkspaceSynchronizer
 						.getFile(diagramResource));
 			}
-			if (nextEObject instanceof Diagram) {
+			if (nextEObject instanceof Diagram)
+			{
 				break;
 			}
 		}
@@ -60,76 +65,91 @@ public class GpmnNavigatorLinkHelper implements ILinkHelper {
 		IEditorInput editorInput = new URIEditorInput(uri, editorName);
 		return editorInput;
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	public IStructuredSelection findSelection(IEditorInput anInput) {
+	public IStructuredSelection findSelection(IEditorInput anInput)
+	{
 		IDiagramDocument document = GpmnDiagramEditorPlugin.getInstance()
 				.getDocumentProvider().getDiagramDocument(anInput);
-		if (document == null) {
+		if (document == null)
+		{
 			return StructuredSelection.EMPTY;
 		}
 		Diagram diagram = document.getDiagram();
 		IFile file = WorkspaceSynchronizer.getFile(diagram.eResource());
-		if (file != null) {
+		if (file != null)
+		{
 			GpmnNavigatorItem item = new GpmnNavigatorItem(diagram, file, false);
 			return new StructuredSelection(item);
 		}
 		return StructuredSelection.EMPTY;
 	}
-
+	
 	/**
 	 * @generated
 	 */
 	public void activateEditor(IWorkbenchPage aPage,
-			IStructuredSelection aSelection) {
-		if (aSelection == null || aSelection.isEmpty()) {
+			IStructuredSelection aSelection)
+	{
+		if (aSelection == null || aSelection.isEmpty())
+		{
 			return;
 		}
-		if (false == aSelection.getFirstElement() instanceof GpmnAbstractNavigatorItem) {
+		if (false == aSelection.getFirstElement() instanceof GpmnAbstractNavigatorItem)
+		{
 			return;
 		}
-
+		
 		GpmnAbstractNavigatorItem abstractNavigatorItem = (GpmnAbstractNavigatorItem) aSelection
 				.getFirstElement();
 		View navigatorView = null;
-		if (abstractNavigatorItem instanceof GpmnNavigatorItem) {
+		if (abstractNavigatorItem instanceof GpmnNavigatorItem)
+		{
 			navigatorView = ((GpmnNavigatorItem) abstractNavigatorItem)
 					.getView();
-		} else if (abstractNavigatorItem instanceof GpmnNavigatorGroup) {
+		}
+		else if (abstractNavigatorItem instanceof GpmnNavigatorGroup)
+		{
 			GpmnNavigatorGroup navigatorGroup = (GpmnNavigatorGroup) abstractNavigatorItem;
-			if (navigatorGroup.getParent() instanceof GpmnNavigatorItem) {
+			if (navigatorGroup.getParent() instanceof GpmnNavigatorItem)
+			{
 				navigatorView = ((GpmnNavigatorItem) navigatorGroup.getParent())
 						.getView();
 			}
 		}
-		if (navigatorView == null) {
+		if (navigatorView == null)
+		{
 			return;
 		}
 		IEditorInput editorInput = getEditorInput(navigatorView.getDiagram());
 		IEditorPart editor = aPage.findEditor(editorInput);
-		if (editor == null) {
+		if (editor == null)
+		{
 			return;
 		}
 		aPage.bringToTop(editor);
-		if (editor instanceof DiagramEditor) {
+		if (editor instanceof DiagramEditor)
+		{
 			DiagramEditor diagramEditor = (DiagramEditor) editor;
 			ResourceSet diagramEditorResourceSet = diagramEditor
 					.getEditingDomain().getResourceSet();
 			EObject selectedView = diagramEditorResourceSet.getEObject(
 					EcoreUtil.getURI(navigatorView), true);
-			if (selectedView == null) {
+			if (selectedView == null)
+			{
 				return;
 			}
 			GraphicalViewer graphicalViewer = (GraphicalViewer) diagramEditor
 					.getAdapter(GraphicalViewer.class);
 			EditPart selectedEditPart = (EditPart) graphicalViewer
 					.getEditPartRegistry().get(selectedView);
-			if (selectedEditPart != null) {
+			if (selectedEditPart != null)
+			{
 				graphicalViewer.select(selectedEditPart);
 			}
 		}
 	}
-
+	
 }

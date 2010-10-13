@@ -14,12 +14,14 @@ import org.eclipse.gmf.runtime.diagram.ui.preferences.PrintingPreferencePage;
 /**
  * @generated
  */
-public class DiagramPrintingPreferencePage extends PrintingPreferencePage {
-
+public class DiagramPrintingPreferencePage extends PrintingPreferencePage
+{
+	
 	/**
 	 * @generated
 	 */
-	public DiagramPrintingPreferencePage() {
+	public DiagramPrintingPreferencePage()
+	{
 		setPreferenceStore(GpmnDiagramEditorPlugin.getInstance()
 				.getPreferenceStore());
 	}

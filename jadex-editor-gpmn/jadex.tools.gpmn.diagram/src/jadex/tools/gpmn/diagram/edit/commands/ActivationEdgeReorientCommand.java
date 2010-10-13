@@ -24,147 +24,170 @@ import org.eclipse.gmf.runtime.emf.type.core.requests.ReorientRelationshipReques
 /**
  * @generated
  */
-public class ActivationEdgeReorientCommand extends EditElementCommand {
-
+public class ActivationEdgeReorientCommand extends EditElementCommand
+{
+	
 	/**
 	 * @generated
 	 */
 	private final int reorientDirection;
-
+	
 	/**
 	 * @generated
 	 */
 	private final EObject oldEnd;
-
+	
 	/**
 	 * @generated
 	 */
 	private final EObject newEnd;
-
+	
 	/**
 	 * @generated
 	 */
-	public ActivationEdgeReorientCommand(ReorientRelationshipRequest request) {
+	public ActivationEdgeReorientCommand(ReorientRelationshipRequest request)
+	{
 		super(request.getLabel(), request.getRelationship(), request);
 		reorientDirection = request.getDirection();
 		oldEnd = request.getOldRelationshipEnd();
 		newEnd = request.getNewRelationshipEnd();
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	public boolean canExecute() {
-		if (false == getElementToEdit() instanceof ActivationEdge) {
+	public boolean canExecute()
+	{
+		if (false == getElementToEdit() instanceof ActivationEdge)
+		{
 			return false;
 		}
-		if (reorientDirection == ReorientRelationshipRequest.REORIENT_SOURCE) {
+		if (reorientDirection == ReorientRelationshipRequest.REORIENT_SOURCE)
+		{
 			return canReorientSource();
 		}
-		if (reorientDirection == ReorientRelationshipRequest.REORIENT_TARGET) {
+		if (reorientDirection == ReorientRelationshipRequest.REORIENT_TARGET)
+		{
 			return canReorientTarget();
 		}
 		return false;
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	protected boolean canReorientSource() {
-		if (!(oldEnd instanceof ActivationPlan && newEnd instanceof ActivationPlan)) {
+	protected boolean canReorientSource()
+	{
+		if (!(oldEnd instanceof ActivationPlan && newEnd instanceof ActivationPlan))
+		{
 			return false;
 		}
 		Activatable target = getLink().getTarget();
-		if (!(getLink().eContainer() instanceof GpmnDiagram)) {
+		if (!(getLink().eContainer() instanceof GpmnDiagram))
+		{
 			return false;
 		}
 		GpmnDiagram container = (GpmnDiagram) getLink().eContainer();
 		return GpmnBaseItemSemanticEditPolicy.LinkConstraints
 				.canExistActivationEdge_4001(container, getNewSource(), target);
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	protected boolean canReorientTarget() {
-		if (!(oldEnd instanceof Activatable && newEnd instanceof Activatable)) {
+	protected boolean canReorientTarget()
+	{
+		if (!(oldEnd instanceof Activatable && newEnd instanceof Activatable))
+		{
 			return false;
 		}
 		ActivationPlan source = getLink().getSource();
-		if (!(getLink().eContainer() instanceof GpmnDiagram)) {
+		if (!(getLink().eContainer() instanceof GpmnDiagram))
+		{
 			return false;
 		}
 		GpmnDiagram container = (GpmnDiagram) getLink().eContainer();
 		return GpmnBaseItemSemanticEditPolicy.LinkConstraints
 				.canExistActivationEdge_4001(container, source, getNewTarget());
 	}
-
+	
 	/**
 	 * @generated
 	 */
 	protected CommandResult doExecuteWithResult(IProgressMonitor monitor,
-			IAdaptable info) throws ExecutionException {
-		if (!canExecute()) {
+			IAdaptable info) throws ExecutionException
+	{
+		if (!canExecute())
+		{
 			throw new ExecutionException(
 					"Invalid arguments in reorient link command"); //$NON-NLS-1$
 		}
-		if (reorientDirection == ReorientRelationshipRequest.REORIENT_SOURCE) {
+		if (reorientDirection == ReorientRelationshipRequest.REORIENT_SOURCE)
+		{
 			return reorientSource();
 		}
-		if (reorientDirection == ReorientRelationshipRequest.REORIENT_TARGET) {
+		if (reorientDirection == ReorientRelationshipRequest.REORIENT_TARGET)
+		{
 			return reorientTarget();
 		}
 		throw new IllegalStateException();
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	protected CommandResult reorientSource() throws ExecutionException {
+	protected CommandResult reorientSource() throws ExecutionException
+	{
 		getLink().setSource(getNewSource());
 		return CommandResult.newOKCommandResult(getLink());
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	protected CommandResult reorientTarget() throws ExecutionException {
+	protected CommandResult reorientTarget() throws ExecutionException
+	{
 		getLink().setTarget(getNewTarget());
 		return CommandResult.newOKCommandResult(getLink());
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	protected ActivationEdge getLink() {
+	protected ActivationEdge getLink()
+	{
 		return (ActivationEdge) getElementToEdit();
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	protected ActivationPlan getOldSource() {
+	protected ActivationPlan getOldSource()
+	{
 		return (ActivationPlan) oldEnd;
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	protected ActivationPlan getNewSource() {
+	protected ActivationPlan getNewSource()
+	{
 		return (ActivationPlan) newEnd;
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	protected Activatable getOldTarget() {
+	protected Activatable getOldTarget()
+	{
 		return (Activatable) oldEnd;
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	protected Activatable getNewTarget() {
+	protected Activatable getNewTarget()
+	{
 		return (Activatable) newEnd;
 	}
 }

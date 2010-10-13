@@ -23,147 +23,170 @@ import org.eclipse.gmf.runtime.emf.type.core.requests.ReorientRelationshipReques
 /**
  * @generated
  */
-public class SuppressionEdgeReorientCommand extends EditElementCommand {
-
+public class SuppressionEdgeReorientCommand extends EditElementCommand
+{
+	
 	/**
 	 * @generated
 	 */
 	private final int reorientDirection;
-
+	
 	/**
 	 * @generated
 	 */
 	private final EObject oldEnd;
-
+	
 	/**
 	 * @generated
 	 */
 	private final EObject newEnd;
-
+	
 	/**
 	 * @generated
 	 */
-	public SuppressionEdgeReorientCommand(ReorientRelationshipRequest request) {
+	public SuppressionEdgeReorientCommand(ReorientRelationshipRequest request)
+	{
 		super(request.getLabel(), request.getRelationship(), request);
 		reorientDirection = request.getDirection();
 		oldEnd = request.getOldRelationshipEnd();
 		newEnd = request.getNewRelationshipEnd();
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	public boolean canExecute() {
-		if (false == getElementToEdit() instanceof SuppressionEdge) {
+	public boolean canExecute()
+	{
+		if (false == getElementToEdit() instanceof SuppressionEdge)
+		{
 			return false;
 		}
-		if (reorientDirection == ReorientRelationshipRequest.REORIENT_SOURCE) {
+		if (reorientDirection == ReorientRelationshipRequest.REORIENT_SOURCE)
+		{
 			return canReorientSource();
 		}
-		if (reorientDirection == ReorientRelationshipRequest.REORIENT_TARGET) {
+		if (reorientDirection == ReorientRelationshipRequest.REORIENT_TARGET)
+		{
 			return canReorientTarget();
 		}
 		return false;
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	protected boolean canReorientSource() {
-		if (!(oldEnd instanceof Goal && newEnd instanceof Goal)) {
+	protected boolean canReorientSource()
+	{
+		if (!(oldEnd instanceof Goal && newEnd instanceof Goal))
+		{
 			return false;
 		}
 		Goal target = getLink().getTarget();
-		if (!(getLink().eContainer() instanceof GpmnDiagram)) {
+		if (!(getLink().eContainer() instanceof GpmnDiagram))
+		{
 			return false;
 		}
 		GpmnDiagram container = (GpmnDiagram) getLink().eContainer();
 		return GpmnBaseItemSemanticEditPolicy.LinkConstraints
 				.canExistSuppressionEdge_4004(container, getNewSource(), target);
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	protected boolean canReorientTarget() {
-		if (!(oldEnd instanceof Goal && newEnd instanceof Goal)) {
+	protected boolean canReorientTarget()
+	{
+		if (!(oldEnd instanceof Goal && newEnd instanceof Goal))
+		{
 			return false;
 		}
 		Goal source = getLink().getSource();
-		if (!(getLink().eContainer() instanceof GpmnDiagram)) {
+		if (!(getLink().eContainer() instanceof GpmnDiagram))
+		{
 			return false;
 		}
 		GpmnDiagram container = (GpmnDiagram) getLink().eContainer();
 		return GpmnBaseItemSemanticEditPolicy.LinkConstraints
 				.canExistSuppressionEdge_4004(container, source, getNewTarget());
 	}
-
+	
 	/**
 	 * @generated
 	 */
 	protected CommandResult doExecuteWithResult(IProgressMonitor monitor,
-			IAdaptable info) throws ExecutionException {
-		if (!canExecute()) {
+			IAdaptable info) throws ExecutionException
+	{
+		if (!canExecute())
+		{
 			throw new ExecutionException(
 					"Invalid arguments in reorient link command"); //$NON-NLS-1$
 		}
-		if (reorientDirection == ReorientRelationshipRequest.REORIENT_SOURCE) {
+		if (reorientDirection == ReorientRelationshipRequest.REORIENT_SOURCE)
+		{
 			return reorientSource();
 		}
-		if (reorientDirection == ReorientRelationshipRequest.REORIENT_TARGET) {
+		if (reorientDirection == ReorientRelationshipRequest.REORIENT_TARGET)
+		{
 			return reorientTarget();
 		}
 		throw new IllegalStateException();
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	protected CommandResult reorientSource() throws ExecutionException {
+	protected CommandResult reorientSource() throws ExecutionException
+	{
 		getLink().setSource(getNewSource());
 		return CommandResult.newOKCommandResult(getLink());
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	protected CommandResult reorientTarget() throws ExecutionException {
+	protected CommandResult reorientTarget() throws ExecutionException
+	{
 		getLink().setTarget(getNewTarget());
 		return CommandResult.newOKCommandResult(getLink());
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	protected SuppressionEdge getLink() {
+	protected SuppressionEdge getLink()
+	{
 		return (SuppressionEdge) getElementToEdit();
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	protected Goal getOldSource() {
+	protected Goal getOldSource()
+	{
 		return (Goal) oldEnd;
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	protected Goal getNewSource() {
+	protected Goal getNewSource()
+	{
 		return (Goal) newEnd;
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	protected Goal getOldTarget() {
+	protected Goal getOldTarget()
+	{
 		return (Goal) oldEnd;
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	protected Goal getNewTarget() {
+	protected Goal getNewTarget()
+	{
 		return (Goal) newEnd;
 	}
 }

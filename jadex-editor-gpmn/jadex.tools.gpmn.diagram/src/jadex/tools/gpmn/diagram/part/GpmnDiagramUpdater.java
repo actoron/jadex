@@ -43,138 +43,157 @@ import org.eclipse.gmf.runtime.notation.View;
 /**
  * @generated
  */
-public class GpmnDiagramUpdater {
-
+public class GpmnDiagramUpdater
+{
+	
 	/**
 	 * @generated
 	 */
-	public static List getSemanticChildren(View view) {
-		switch (GpmnVisualIDRegistry.getVisualID(view)) {
-		case GpmnDiagramEditPart.VISUAL_ID:
-			return getGpmnDiagram_1000SemanticChildren(view);
+	public static List getSemanticChildren(View view)
+	{
+		switch (GpmnVisualIDRegistry.getVisualID(view))
+		{
+			case GpmnDiagramEditPart.VISUAL_ID:
+				return getGpmnDiagram_1000SemanticChildren(view);
 		}
 		return Collections.EMPTY_LIST;
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	public static List getGpmnDiagram_1000SemanticChildren(View view) {
-		if (!view.isSetElement()) {
+	public static List getGpmnDiagram_1000SemanticChildren(View view)
+	{
+		if (!view.isSetElement())
+		{
 			return Collections.EMPTY_LIST;
 		}
 		GpmnDiagram modelElement = (GpmnDiagram) view.getElement();
 		List result = new LinkedList();
-		for (Iterator it = modelElement.getPlans().iterator(); it.hasNext();) {
+		for (Iterator it = modelElement.getPlans().iterator(); it.hasNext();)
+		{
 			AbstractPlan childElement = (AbstractPlan) it.next();
 			int visualID = GpmnVisualIDRegistry.getNodeVisualID(view,
 					childElement);
-			if (visualID == ActivationPlanEditPart.VISUAL_ID) {
+			if (visualID == ActivationPlanEditPart.VISUAL_ID)
+			{
 				result.add(new GpmnNodeDescriptor(childElement, visualID));
 				continue;
 			}
-			if (visualID == BpmnPlanEditPart.VISUAL_ID) {
+			if (visualID == BpmnPlanEditPart.VISUAL_ID)
+			{
 				result.add(new GpmnNodeDescriptor(childElement, visualID));
 				continue;
 			}
 		}
 		for (Iterator it = modelElement.getSubProcesses().iterator(); it
-				.hasNext();) {
+				.hasNext();)
+		{
 			SubProcess childElement = (SubProcess) it.next();
 			int visualID = GpmnVisualIDRegistry.getNodeVisualID(view,
 					childElement);
-			if (visualID == SubProcessEditPart.VISUAL_ID) {
+			if (visualID == SubProcessEditPart.VISUAL_ID)
+			{
 				result.add(new GpmnNodeDescriptor(childElement, visualID));
 				continue;
 			}
 		}
-		for (Iterator it = modelElement.getGoals().iterator(); it.hasNext();) {
+		for (Iterator it = modelElement.getGoals().iterator(); it.hasNext();)
+		{
 			Goal childElement = (Goal) it.next();
 			int visualID = GpmnVisualIDRegistry.getNodeVisualID(view,
 					childElement);
-			if (visualID == GoalEditPart.VISUAL_ID) {
+			if (visualID == GoalEditPart.VISUAL_ID)
+			{
 				result.add(new GpmnNodeDescriptor(childElement, visualID));
 				continue;
 			}
 		}
 		return result;
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	public static List getContainedLinks(View view) {
-		switch (GpmnVisualIDRegistry.getVisualID(view)) {
-		case GpmnDiagramEditPart.VISUAL_ID:
-			return getGpmnDiagram_1000ContainedLinks(view);
-		case ActivationPlanEditPart.VISUAL_ID:
-			return getActivationPlan_2001ContainedLinks(view);
-		case SubProcessEditPart.VISUAL_ID:
-			return getSubProcess_2002ContainedLinks(view);
-		case BpmnPlanEditPart.VISUAL_ID:
-			return getBpmnPlan_2003ContainedLinks(view);
-		case GoalEditPart.VISUAL_ID:
-			return getGoal_2004ContainedLinks(view);
-		case ActivationEdgeEditPart.VISUAL_ID:
-			return getActivationEdge_4001ContainedLinks(view);
-		case PlanEdgeEditPart.VISUAL_ID:
-			return getPlanEdge_4002ContainedLinks(view);
-		case SuppressionEdgeEditPart.VISUAL_ID:
-			return getSuppressionEdge_4004ContainedLinks(view);
+	public static List getContainedLinks(View view)
+	{
+		switch (GpmnVisualIDRegistry.getVisualID(view))
+		{
+			case GpmnDiagramEditPart.VISUAL_ID:
+				return getGpmnDiagram_1000ContainedLinks(view);
+			case ActivationPlanEditPart.VISUAL_ID:
+				return getActivationPlan_2001ContainedLinks(view);
+			case SubProcessEditPart.VISUAL_ID:
+				return getSubProcess_2002ContainedLinks(view);
+			case BpmnPlanEditPart.VISUAL_ID:
+				return getBpmnPlan_2003ContainedLinks(view);
+			case GoalEditPart.VISUAL_ID:
+				return getGoal_2004ContainedLinks(view);
+			case ActivationEdgeEditPart.VISUAL_ID:
+				return getActivationEdge_4001ContainedLinks(view);
+			case PlanEdgeEditPart.VISUAL_ID:
+				return getPlanEdge_4002ContainedLinks(view);
+			case SuppressionEdgeEditPart.VISUAL_ID:
+				return getSuppressionEdge_4004ContainedLinks(view);
 		}
 		return Collections.EMPTY_LIST;
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	public static List getIncomingLinks(View view) {
-		switch (GpmnVisualIDRegistry.getVisualID(view)) {
-		case ActivationPlanEditPart.VISUAL_ID:
-			return getActivationPlan_2001IncomingLinks(view);
-		case SubProcessEditPart.VISUAL_ID:
-			return getSubProcess_2002IncomingLinks(view);
-		case BpmnPlanEditPart.VISUAL_ID:
-			return getBpmnPlan_2003IncomingLinks(view);
-		case GoalEditPart.VISUAL_ID:
-			return getGoal_2004IncomingLinks(view);
-		case ActivationEdgeEditPart.VISUAL_ID:
-			return getActivationEdge_4001IncomingLinks(view);
-		case PlanEdgeEditPart.VISUAL_ID:
-			return getPlanEdge_4002IncomingLinks(view);
-		case SuppressionEdgeEditPart.VISUAL_ID:
-			return getSuppressionEdge_4004IncomingLinks(view);
+	public static List getIncomingLinks(View view)
+	{
+		switch (GpmnVisualIDRegistry.getVisualID(view))
+		{
+			case ActivationPlanEditPart.VISUAL_ID:
+				return getActivationPlan_2001IncomingLinks(view);
+			case SubProcessEditPart.VISUAL_ID:
+				return getSubProcess_2002IncomingLinks(view);
+			case BpmnPlanEditPart.VISUAL_ID:
+				return getBpmnPlan_2003IncomingLinks(view);
+			case GoalEditPart.VISUAL_ID:
+				return getGoal_2004IncomingLinks(view);
+			case ActivationEdgeEditPart.VISUAL_ID:
+				return getActivationEdge_4001IncomingLinks(view);
+			case PlanEdgeEditPart.VISUAL_ID:
+				return getPlanEdge_4002IncomingLinks(view);
+			case SuppressionEdgeEditPart.VISUAL_ID:
+				return getSuppressionEdge_4004IncomingLinks(view);
 		}
 		return Collections.EMPTY_LIST;
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	public static List getOutgoingLinks(View view) {
-		switch (GpmnVisualIDRegistry.getVisualID(view)) {
-		case ActivationPlanEditPart.VISUAL_ID:
-			return getActivationPlan_2001OutgoingLinks(view);
-		case SubProcessEditPart.VISUAL_ID:
-			return getSubProcess_2002OutgoingLinks(view);
-		case BpmnPlanEditPart.VISUAL_ID:
-			return getBpmnPlan_2003OutgoingLinks(view);
-		case GoalEditPart.VISUAL_ID:
-			return getGoal_2004OutgoingLinks(view);
-		case ActivationEdgeEditPart.VISUAL_ID:
-			return getActivationEdge_4001OutgoingLinks(view);
-		case PlanEdgeEditPart.VISUAL_ID:
-			return getPlanEdge_4002OutgoingLinks(view);
-		case SuppressionEdgeEditPart.VISUAL_ID:
-			return getSuppressionEdge_4004OutgoingLinks(view);
+	public static List getOutgoingLinks(View view)
+	{
+		switch (GpmnVisualIDRegistry.getVisualID(view))
+		{
+			case ActivationPlanEditPart.VISUAL_ID:
+				return getActivationPlan_2001OutgoingLinks(view);
+			case SubProcessEditPart.VISUAL_ID:
+				return getSubProcess_2002OutgoingLinks(view);
+			case BpmnPlanEditPart.VISUAL_ID:
+				return getBpmnPlan_2003OutgoingLinks(view);
+			case GoalEditPart.VISUAL_ID:
+				return getGoal_2004OutgoingLinks(view);
+			case ActivationEdgeEditPart.VISUAL_ID:
+				return getActivationEdge_4001OutgoingLinks(view);
+			case PlanEdgeEditPart.VISUAL_ID:
+				return getPlanEdge_4002OutgoingLinks(view);
+			case SuppressionEdgeEditPart.VISUAL_ID:
+				return getSuppressionEdge_4004OutgoingLinks(view);
 		}
 		return Collections.EMPTY_LIST;
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	public static List getGpmnDiagram_1000ContainedLinks(View view) {
+	public static List getGpmnDiagram_1000ContainedLinks(View view)
+	{
 		GpmnDiagram modelElement = (GpmnDiagram) view.getElement();
 		List result = new LinkedList();
 		result
@@ -185,60 +204,68 @@ public class GpmnDiagramUpdater {
 				.addAll(getContainedTypeModelFacetLinks_SuppressionEdge_4004(modelElement));
 		return result;
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	public static List getActivationPlan_2001ContainedLinks(View view) {
+	public static List getActivationPlan_2001ContainedLinks(View view)
+	{
 		return Collections.EMPTY_LIST;
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	public static List getSubProcess_2002ContainedLinks(View view) {
+	public static List getSubProcess_2002ContainedLinks(View view)
+	{
 		return Collections.EMPTY_LIST;
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	public static List getBpmnPlan_2003ContainedLinks(View view) {
+	public static List getBpmnPlan_2003ContainedLinks(View view)
+	{
 		return Collections.EMPTY_LIST;
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	public static List getGoal_2004ContainedLinks(View view) {
+	public static List getGoal_2004ContainedLinks(View view)
+	{
 		return Collections.EMPTY_LIST;
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	public static List getActivationEdge_4001ContainedLinks(View view) {
+	public static List getActivationEdge_4001ContainedLinks(View view)
+	{
 		return Collections.EMPTY_LIST;
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	public static List getPlanEdge_4002ContainedLinks(View view) {
+	public static List getPlanEdge_4002ContainedLinks(View view)
+	{
 		return Collections.EMPTY_LIST;
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	public static List getSuppressionEdge_4004ContainedLinks(View view) {
+	public static List getSuppressionEdge_4004ContainedLinks(View view)
+	{
 		return Collections.EMPTY_LIST;
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	public static List getActivationPlan_2001IncomingLinks(View view) {
+	public static List getActivationPlan_2001IncomingLinks(View view)
+	{
 		ActivationPlan modelElement = (ActivationPlan) view.getElement();
 		Map crossReferences = EcoreUtil.CrossReferencer.find(view.eResource()
 				.getResourceSet().getResources());
@@ -247,11 +274,12 @@ public class GpmnDiagramUpdater {
 				modelElement, crossReferences));
 		return result;
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	public static List getSubProcess_2002IncomingLinks(View view) {
+	public static List getSubProcess_2002IncomingLinks(View view)
+	{
 		SubProcess modelElement = (SubProcess) view.getElement();
 		Map crossReferences = EcoreUtil.CrossReferencer.find(view.eResource()
 				.getResourceSet().getResources());
@@ -260,11 +288,12 @@ public class GpmnDiagramUpdater {
 				modelElement, crossReferences));
 		return result;
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	public static List getBpmnPlan_2003IncomingLinks(View view) {
+	public static List getBpmnPlan_2003IncomingLinks(View view)
+	{
 		BpmnPlan modelElement = (BpmnPlan) view.getElement();
 		Map crossReferences = EcoreUtil.CrossReferencer.find(view.eResource()
 				.getResourceSet().getResources());
@@ -273,11 +302,12 @@ public class GpmnDiagramUpdater {
 				modelElement, crossReferences));
 		return result;
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	public static List getGoal_2004IncomingLinks(View view) {
+	public static List getGoal_2004IncomingLinks(View view)
+	{
 		Goal modelElement = (Goal) view.getElement();
 		Map crossReferences = EcoreUtil.CrossReferencer.find(view.eResource()
 				.getResourceSet().getResources());
@@ -288,57 +318,64 @@ public class GpmnDiagramUpdater {
 				modelElement, crossReferences));
 		return result;
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	public static List getActivationEdge_4001IncomingLinks(View view) {
+	public static List getActivationEdge_4001IncomingLinks(View view)
+	{
 		return Collections.EMPTY_LIST;
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	public static List getPlanEdge_4002IncomingLinks(View view) {
+	public static List getPlanEdge_4002IncomingLinks(View view)
+	{
 		return Collections.EMPTY_LIST;
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	public static List getSuppressionEdge_4004IncomingLinks(View view) {
+	public static List getSuppressionEdge_4004IncomingLinks(View view)
+	{
 		return Collections.EMPTY_LIST;
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	public static List getActivationPlan_2001OutgoingLinks(View view) {
+	public static List getActivationPlan_2001OutgoingLinks(View view)
+	{
 		ActivationPlan modelElement = (ActivationPlan) view.getElement();
 		List result = new LinkedList();
 		result
 				.addAll(getOutgoingTypeModelFacetLinks_ActivationEdge_4001(modelElement));
 		return result;
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	public static List getSubProcess_2002OutgoingLinks(View view) {
+	public static List getSubProcess_2002OutgoingLinks(View view)
+	{
 		return Collections.EMPTY_LIST;
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	public static List getBpmnPlan_2003OutgoingLinks(View view) {
+	public static List getBpmnPlan_2003OutgoingLinks(View view)
+	{
 		return Collections.EMPTY_LIST;
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	public static List getGoal_2004OutgoingLinks(View view) {
+	public static List getGoal_2004OutgoingLinks(View view)
+	{
 		Goal modelElement = (Goal) view.getElement();
 		List result = new LinkedList();
 		result
@@ -347,43 +384,50 @@ public class GpmnDiagramUpdater {
 				.addAll(getOutgoingTypeModelFacetLinks_SuppressionEdge_4004(modelElement));
 		return result;
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	public static List getActivationEdge_4001OutgoingLinks(View view) {
+	public static List getActivationEdge_4001OutgoingLinks(View view)
+	{
 		return Collections.EMPTY_LIST;
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	public static List getPlanEdge_4002OutgoingLinks(View view) {
+	public static List getPlanEdge_4002OutgoingLinks(View view)
+	{
 		return Collections.EMPTY_LIST;
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	public static List getSuppressionEdge_4004OutgoingLinks(View view) {
+	public static List getSuppressionEdge_4004OutgoingLinks(View view)
+	{
 		return Collections.EMPTY_LIST;
 	}
-
+	
 	/**
 	 * @generated
 	 */
 	private static Collection getContainedTypeModelFacetLinks_ActivationEdge_4001(
-			GpmnDiagram container) {
+			GpmnDiagram container)
+	{
 		Collection result = new LinkedList();
 		for (Iterator links = container.getActivationEdges().iterator(); links
-				.hasNext();) {
+				.hasNext();)
+		{
 			EObject linkObject = (EObject) links.next();
-			if (false == linkObject instanceof ActivationEdge) {
+			if (false == linkObject instanceof ActivationEdge)
+			{
 				continue;
 			}
 			ActivationEdge link = (ActivationEdge) linkObject;
 			if (ActivationEdgeEditPart.VISUAL_ID != GpmnVisualIDRegistry
-					.getLinkWithClassVisualID(link)) {
+					.getLinkWithClassVisualID(link))
+			{
 				continue;
 			}
 			Activatable dst = link.getTarget();
@@ -394,22 +438,26 @@ public class GpmnDiagramUpdater {
 		}
 		return result;
 	}
-
+	
 	/**
 	 * @generated
 	 */
 	private static Collection getContainedTypeModelFacetLinks_PlanEdge_4002(
-			GpmnDiagram container) {
+			GpmnDiagram container)
+	{
 		Collection result = new LinkedList();
 		for (Iterator links = container.getPlanEdges().iterator(); links
-				.hasNext();) {
+				.hasNext();)
+		{
 			EObject linkObject = (EObject) links.next();
-			if (false == linkObject instanceof PlanEdge) {
+			if (false == linkObject instanceof PlanEdge)
+			{
 				continue;
 			}
 			PlanEdge link = (PlanEdge) linkObject;
 			if (PlanEdgeEditPart.VISUAL_ID != GpmnVisualIDRegistry
-					.getLinkWithClassVisualID(link)) {
+					.getLinkWithClassVisualID(link))
+			{
 				continue;
 			}
 			AbstractPlan dst = link.getTarget();
@@ -421,22 +469,26 @@ public class GpmnDiagramUpdater {
 		}
 		return result;
 	}
-
+	
 	/**
 	 * @generated
 	 */
 	private static Collection getContainedTypeModelFacetLinks_SuppressionEdge_4004(
-			GpmnDiagram container) {
+			GpmnDiagram container)
+	{
 		Collection result = new LinkedList();
 		for (Iterator links = container.getSuppressionEdges().iterator(); links
-				.hasNext();) {
+				.hasNext();)
+		{
 			EObject linkObject = (EObject) links.next();
-			if (false == linkObject instanceof SuppressionEdge) {
+			if (false == linkObject instanceof SuppressionEdge)
+			{
 				continue;
 			}
 			SuppressionEdge link = (SuppressionEdge) linkObject;
 			if (SuppressionEdgeEditPart.VISUAL_ID != GpmnVisualIDRegistry
-					.getLinkWithClassVisualID(link)) {
+					.getLinkWithClassVisualID(link))
+			{
 				continue;
 			}
 			Goal dst = link.getTarget();
@@ -447,25 +499,29 @@ public class GpmnDiagramUpdater {
 		}
 		return result;
 	}
-
+	
 	/**
 	 * @generated
 	 */
 	private static Collection getIncomingTypeModelFacetLinks_ActivationEdge_4001(
-			Activatable target, Map crossReferences) {
+			Activatable target, Map crossReferences)
+	{
 		Collection result = new LinkedList();
 		Collection settings = (Collection) crossReferences.get(target);
-		for (Iterator it = settings.iterator(); it.hasNext();) {
+		for (Iterator it = settings.iterator(); it.hasNext();)
+		{
 			EStructuralFeature.Setting setting = (EStructuralFeature.Setting) it
 					.next();
 			if (setting.getEStructuralFeature() != GpmnPackage.eINSTANCE
 					.getActivationEdge_Target()
-					|| false == setting.getEObject() instanceof ActivationEdge) {
+					|| false == setting.getEObject() instanceof ActivationEdge)
+			{
 				continue;
 			}
 			ActivationEdge link = (ActivationEdge) setting.getEObject();
 			if (ActivationEdgeEditPart.VISUAL_ID != GpmnVisualIDRegistry
-					.getLinkWithClassVisualID(link)) {
+					.getLinkWithClassVisualID(link))
+			{
 				continue;
 			}
 			ActivationPlan src = link.getSource();
@@ -475,25 +531,29 @@ public class GpmnDiagramUpdater {
 		}
 		return result;
 	}
-
+	
 	/**
 	 * @generated
 	 */
 	private static Collection getIncomingTypeModelFacetLinks_PlanEdge_4002(
-			AbstractPlan target, Map crossReferences) {
+			AbstractPlan target, Map crossReferences)
+	{
 		Collection result = new LinkedList();
 		Collection settings = (Collection) crossReferences.get(target);
-		for (Iterator it = settings.iterator(); it.hasNext();) {
+		for (Iterator it = settings.iterator(); it.hasNext();)
+		{
 			EStructuralFeature.Setting setting = (EStructuralFeature.Setting) it
 					.next();
 			if (setting.getEStructuralFeature() != GpmnPackage.eINSTANCE
 					.getPlanEdge_Target()
-					|| false == setting.getEObject() instanceof PlanEdge) {
+					|| false == setting.getEObject() instanceof PlanEdge)
+			{
 				continue;
 			}
 			PlanEdge link = (PlanEdge) setting.getEObject();
 			if (PlanEdgeEditPart.VISUAL_ID != GpmnVisualIDRegistry
-					.getLinkWithClassVisualID(link)) {
+					.getLinkWithClassVisualID(link))
+			{
 				continue;
 			}
 			Goal src = link.getSource();
@@ -504,25 +564,29 @@ public class GpmnDiagramUpdater {
 		}
 		return result;
 	}
-
+	
 	/**
 	 * @generated
 	 */
 	private static Collection getIncomingTypeModelFacetLinks_SuppressionEdge_4004(
-			Goal target, Map crossReferences) {
+			Goal target, Map crossReferences)
+	{
 		Collection result = new LinkedList();
 		Collection settings = (Collection) crossReferences.get(target);
-		for (Iterator it = settings.iterator(); it.hasNext();) {
+		for (Iterator it = settings.iterator(); it.hasNext();)
+		{
 			EStructuralFeature.Setting setting = (EStructuralFeature.Setting) it
 					.next();
 			if (setting.getEStructuralFeature() != GpmnPackage.eINSTANCE
 					.getSuppressionEdge_Target()
-					|| false == setting.getEObject() instanceof SuppressionEdge) {
+					|| false == setting.getEObject() instanceof SuppressionEdge)
+			{
 				continue;
 			}
 			SuppressionEdge link = (SuppressionEdge) setting.getEObject();
 			if (SuppressionEdgeEditPart.VISUAL_ID != GpmnVisualIDRegistry
-					.getLinkWithClassVisualID(link)) {
+					.getLinkWithClassVisualID(link))
+			{
 				continue;
 			}
 			Goal src = link.getSource();
@@ -532,40 +596,48 @@ public class GpmnDiagramUpdater {
 		}
 		return result;
 	}
-
+	
 	/**
 	 * @generated
 	 */
 	private static Collection getOutgoingTypeModelFacetLinks_ActivationEdge_4001(
-			ActivationPlan source) {
+			ActivationPlan source)
+	{
 		GpmnDiagram container = null;
 		// Find container element for the link.
 		// Climb up by containment hierarchy starting from the source
 		// and return the first element that is instance of the container class.
 		for (EObject element = source; element != null && container == null; element = element
-				.eContainer()) {
-			if (element instanceof GpmnDiagram) {
+				.eContainer())
+		{
+			if (element instanceof GpmnDiagram)
+			{
 				container = (GpmnDiagram) element;
 			}
 		}
-		if (container == null) {
+		if (container == null)
+		{
 			return Collections.EMPTY_LIST;
 		}
 		Collection result = new LinkedList();
 		for (Iterator links = container.getActivationEdges().iterator(); links
-				.hasNext();) {
+				.hasNext();)
+		{
 			EObject linkObject = (EObject) links.next();
-			if (false == linkObject instanceof ActivationEdge) {
+			if (false == linkObject instanceof ActivationEdge)
+			{
 				continue;
 			}
 			ActivationEdge link = (ActivationEdge) linkObject;
 			if (ActivationEdgeEditPart.VISUAL_ID != GpmnVisualIDRegistry
-					.getLinkWithClassVisualID(link)) {
+					.getLinkWithClassVisualID(link))
+			{
 				continue;
 			}
 			Activatable dst = link.getTarget();
 			ActivationPlan src = link.getSource();
-			if (src != source) {
+			if (src != source)
+			{
 				continue;
 			}
 			result.add(new GpmnLinkDescriptor(src, dst, link,
@@ -574,40 +646,48 @@ public class GpmnDiagramUpdater {
 		}
 		return result;
 	}
-
+	
 	/**
 	 * @generated
 	 */
 	private static Collection getOutgoingTypeModelFacetLinks_PlanEdge_4002(
-			Goal source) {
+			Goal source)
+	{
 		GpmnDiagram container = null;
 		// Find container element for the link.
 		// Climb up by containment hierarchy starting from the source
 		// and return the first element that is instance of the container class.
 		for (EObject element = source; element != null && container == null; element = element
-				.eContainer()) {
-			if (element instanceof GpmnDiagram) {
+				.eContainer())
+		{
+			if (element instanceof GpmnDiagram)
+			{
 				container = (GpmnDiagram) element;
 			}
 		}
-		if (container == null) {
+		if (container == null)
+		{
 			return Collections.EMPTY_LIST;
 		}
 		Collection result = new LinkedList();
 		for (Iterator links = container.getPlanEdges().iterator(); links
-				.hasNext();) {
+				.hasNext();)
+		{
 			EObject linkObject = (EObject) links.next();
-			if (false == linkObject instanceof PlanEdge) {
+			if (false == linkObject instanceof PlanEdge)
+			{
 				continue;
 			}
 			PlanEdge link = (PlanEdge) linkObject;
 			if (PlanEdgeEditPart.VISUAL_ID != GpmnVisualIDRegistry
-					.getLinkWithClassVisualID(link)) {
+					.getLinkWithClassVisualID(link))
+			{
 				continue;
 			}
 			AbstractPlan dst = link.getTarget();
 			Goal src = link.getSource();
-			if (src != source) {
+			if (src != source)
+			{
 				continue;
 			}
 			result
@@ -617,40 +697,48 @@ public class GpmnDiagramUpdater {
 		}
 		return result;
 	}
-
+	
 	/**
 	 * @generated
 	 */
 	private static Collection getOutgoingTypeModelFacetLinks_SuppressionEdge_4004(
-			Goal source) {
+			Goal source)
+	{
 		GpmnDiagram container = null;
 		// Find container element for the link.
 		// Climb up by containment hierarchy starting from the source
 		// and return the first element that is instance of the container class.
 		for (EObject element = source; element != null && container == null; element = element
-				.eContainer()) {
-			if (element instanceof GpmnDiagram) {
+				.eContainer())
+		{
+			if (element instanceof GpmnDiagram)
+			{
 				container = (GpmnDiagram) element;
 			}
 		}
-		if (container == null) {
+		if (container == null)
+		{
 			return Collections.EMPTY_LIST;
 		}
 		Collection result = new LinkedList();
 		for (Iterator links = container.getSuppressionEdges().iterator(); links
-				.hasNext();) {
+				.hasNext();)
+		{
 			EObject linkObject = (EObject) links.next();
-			if (false == linkObject instanceof SuppressionEdge) {
+			if (false == linkObject instanceof SuppressionEdge)
+			{
 				continue;
 			}
 			SuppressionEdge link = (SuppressionEdge) linkObject;
 			if (SuppressionEdgeEditPart.VISUAL_ID != GpmnVisualIDRegistry
-					.getLinkWithClassVisualID(link)) {
+					.getLinkWithClassVisualID(link))
+			{
 				continue;
 			}
 			Goal dst = link.getTarget();
 			Goal src = link.getSource();
-			if (src != source) {
+			if (src != source)
+			{
 				continue;
 			}
 			result.add(new GpmnLinkDescriptor(src, dst, link,
@@ -659,5 +747,5 @@ public class GpmnDiagramUpdater {
 		}
 		return result;
 	}
-
+	
 }

@@ -37,11 +37,10 @@
         name="PlanEdgeFigure">
       <actualFigure
           xsi:type="gmfgraph:PolylineConnection"
-          name="PlanEdgeFigure"
-          lineKind="LINE_DASH">
+          name="PlanEdgeFigure">
         <foregroundColor
             xsi:type="gmfgraph:ConstantColor"
-            value="lightGray"/>
+            value="black"/>
       </actualFigure>
     </descriptors>
     <descriptors

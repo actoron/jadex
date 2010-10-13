@@ -15,51 +15,61 @@ import org.eclipse.ui.views.properties.tabbed.ITabbedPropertySheetPageContributo
 /**
  * @generated
  */
-public abstract class GpmnAbstractNavigatorItem extends PlatformObject {
-
+public abstract class GpmnAbstractNavigatorItem extends PlatformObject
+{
+	
 	/**
 	 * @generated
 	 */
-	static {
+	static
+	{
 		final Class[] supportedTypes = new Class[] { ITabbedPropertySheetPageContributor.class };
-		final ITabbedPropertySheetPageContributor propertySheetPageContributor = new ITabbedPropertySheetPageContributor() {
-			public String getContributorId() {
+		final ITabbedPropertySheetPageContributor propertySheetPageContributor = new ITabbedPropertySheetPageContributor()
+		{
+			public String getContributorId()
+			{
 				return "jadex.tools.gpmn.diagram"; //$NON-NLS-1$
 			}
 		};
-		Platform.getAdapterManager().registerAdapters(new IAdapterFactory() {
-
-			public Object getAdapter(Object adaptableObject, Class adapterType) {
+		Platform.getAdapterManager().registerAdapters(new IAdapterFactory()
+		{
+			
+			public Object getAdapter(Object adaptableObject, Class adapterType)
+			{
 				if (adaptableObject instanceof jadex.tools.gpmn.diagram.navigator.GpmnAbstractNavigatorItem
-						&& adapterType == ITabbedPropertySheetPageContributor.class) {
+						&& adapterType == ITabbedPropertySheetPageContributor.class)
+				{
 					return propertySheetPageContributor;
 				}
 				return null;
 			}
-
-			public Class[] getAdapterList() {
+			
+			public Class[] getAdapterList()
+			{
 				return supportedTypes;
 			}
 		}, jadex.tools.gpmn.diagram.navigator.GpmnAbstractNavigatorItem.class);
 	}
-
+	
 	/**
 	 * @generated
 	 */
 	private Object myParent;
-
+	
 	/**
 	 * @generated
 	 */
-	protected GpmnAbstractNavigatorItem(Object parent) {
+	protected GpmnAbstractNavigatorItem(Object parent)
+	{
 		myParent = parent;
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	public Object getParent() {
+	public Object getParent()
+	{
 		return myParent;
 	}
-
+	
 }

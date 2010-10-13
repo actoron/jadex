@@ -53,60 +53,69 @@ import org.eclipse.ui.PlatformUI;
  * @generated
  */
 public class GpmnValidationDecoratorProvider extends AbstractProvider implements
-		IDecoratorProvider {
-
+		IDecoratorProvider
+{
+	
 	/**
 	 * @generated
 	 */
 	private static final String KEY = "validationStatus"; //$NON-NLS-1$
-
+	
 	/**
 	 * @generated
 	 */
 	private static final String MARKER_TYPE = GpmnDiagramEditorPlugin.ID
 			+ ".diagnostic"; //$NON-NLS-1$
-
+	
 	/**
 	 * @generated
 	 */
 	private static MarkerObserver fileObserver;
-
+	
 	/**
 	 * @generated
 	 */
 	private static Map/*<String, List<IDecorator>>*/allDecorators = new HashMap();
-
+	
 	/**
 	 * @generated
 	 */
-	public void createDecorators(IDecoratorTarget decoratorTarget) {
+	public void createDecorators(IDecoratorTarget decoratorTarget)
+	{
 		EditPart editPart = (EditPart) decoratorTarget
 				.getAdapter(EditPart.class);
 		if (editPart instanceof GraphicalEditPart
-				|| editPart instanceof AbstractConnectionEditPart) {
+				|| editPart instanceof AbstractConnectionEditPart)
+		{
 			Object model = editPart.getModel();
-			if ((model instanceof View)) {
+			if ((model instanceof View))
+			{
 				View view = (View) model;
-				if (!(view instanceof Edge) && !view.isSetElement()) {
+				if (!(view instanceof Edge) && !view.isSetElement())
+				{
 					return;
 				}
 			}
 			EditDomain ed = editPart.getViewer().getEditDomain();
-			if (!(ed instanceof DiagramEditDomain)) {
+			if (!(ed instanceof DiagramEditDomain))
+			{
 				return;
 			}
-			if (((DiagramEditDomain) ed).getEditorPart() instanceof GpmnDiagramEditor) {
+			if (((DiagramEditDomain) ed).getEditorPart() instanceof GpmnDiagramEditor)
+			{
 				decoratorTarget.installDecorator(KEY, new StatusDecorator(
 						decoratorTarget));
 			}
 		}
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	public boolean provides(IOperation operation) {
-		if (!(operation instanceof CreateDecoratorsOperation)) {
+	public boolean provides(IOperation operation)
+	{
+		if (!(operation instanceof CreateDecoratorsOperation))
+		{
 			return false;
 		}
 		IDecoratorTarget decoratorTarget = ((CreateDecoratorsOperation) operation)
@@ -116,137 +125,170 @@ public class GpmnValidationDecoratorProvider extends AbstractProvider implements
 				&& GpmnDiagramEditPart.MODEL_ID.equals(GpmnVisualIDRegistry
 						.getModelID(view));
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	public static void refreshDecorators(View view) {
+	public static void refreshDecorators(View view)
+	{
 		refreshDecorators(ViewUtil.getIdStr(view), view.getDiagram());
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	private static void refreshDecorators(String viewId, Diagram diagram) {
+	private static void refreshDecorators(String viewId, Diagram diagram)
+	{
 		final List decorators = viewId != null ? (List) allDecorators
 				.get(viewId) : null;
-		if (decorators == null || decorators.isEmpty() || diagram == null) {
+		if (decorators == null || decorators.isEmpty() || diagram == null)
+		{
 			return;
 		}
 		final Diagram fdiagram = diagram;
-		PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
-
-			public void run() {
-				try {
+		PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable()
+		{
+			
+			public void run()
+			{
+				try
+				{
 					TransactionUtil.getEditingDomain(fdiagram).runExclusive(
-							new Runnable() {
-
-								public void run() {
+							new Runnable()
+							{
+								
+								public void run()
+								{
 									for (Iterator it = decorators.iterator(); it
-											.hasNext();) {
+											.hasNext();)
+									{
 										IDecorator decorator = (IDecorator) it
 												.next();
 										decorator.refresh();
 									}
 								}
 							});
-				} catch (Exception e) {
+				}
+				catch (Exception e)
+				{
 					GpmnDiagramEditorPlugin.getInstance().logError(
 							"Decorator refresh failure", e); //$NON-NLS-1$
 				}
 			}
 		});
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	public static class StatusDecorator extends AbstractDecorator {
-
+	public static class StatusDecorator extends AbstractDecorator
+	{
+		
 		/**
 		 * @generated
 		 */
 		private String viewId;
-
+		
 		/**
 		 * @generated
 		 */
-		public StatusDecorator(IDecoratorTarget decoratorTarget) {
+		public StatusDecorator(IDecoratorTarget decoratorTarget)
+		{
 			super(decoratorTarget);
-			try {
+			try
+			{
 				final View view = (View) getDecoratorTarget().getAdapter(
 						View.class);
 				TransactionUtil.getEditingDomain(view).runExclusive(
-						new Runnable() {
-
-							public void run() {
+						new Runnable()
+						{
+							
+							public void run()
+							{
 								StatusDecorator.this.viewId = view != null ? ViewUtil
 										.getIdStr(view)
 										: null;
 							}
 						});
-			} catch (Exception e) {
+			}
+			catch (Exception e)
+			{
 				GpmnDiagramEditorPlugin.getInstance().logError(
 						"ViewID access failure", e); //$NON-NLS-1$			
 			}
 		}
-
+		
 		/**
 		 * @generated
 		 */
-		public void refresh() {
+		public void refresh()
+		{
 			removeDecoration();
 			View view = (View) getDecoratorTarget().getAdapter(View.class);
-			if (view == null || view.eResource() == null) {
+			if (view == null || view.eResource() == null)
+			{
 				return;
 			}
 			EditPart editPart = (EditPart) getDecoratorTarget().getAdapter(
 					EditPart.class);
-			if (editPart == null || editPart.getViewer() == null) {
+			if (editPart == null || editPart.getViewer() == null)
+			{
 				return;
 			}
-
+			
 			// query for all the validation markers of the current resource
 			String elementId = ViewUtil.getIdStr(view);
-			if (elementId == null) {
+			if (elementId == null)
+			{
 				return;
 			}
 			int severity = IMarker.SEVERITY_INFO;
 			IMarker foundMarker = null;
 			IResource resource = WorkspaceSynchronizer
 					.getFile(view.eResource());
-			if (resource == null || !resource.exists()) {
+			if (resource == null || !resource.exists())
+			{
 				return;
 			}
 			IMarker[] markers = null;
-			try {
+			try
+			{
 				markers = resource.findMarkers(MARKER_TYPE, true,
 						IResource.DEPTH_INFINITE);
-			} catch (CoreException e) {
+			}
+			catch (CoreException e)
+			{
 				GpmnDiagramEditorPlugin.getInstance().logError(
 						"Validation markers refresh failure", e); //$NON-NLS-1$
 			}
-			if (markers == null || markers.length == 0) {
+			if (markers == null || markers.length == 0)
+			{
 				return;
 			}
 			Label toolTip = null;
-			for (int i = 0; i < markers.length; i++) {
+			for (int i = 0; i < markers.length; i++)
+			{
 				IMarker marker = markers[i];
 				String attribute = marker
 						.getAttribute(
 								org.eclipse.gmf.runtime.common.ui.resources.IMarker.ELEMENT_ID,
 								""); //$NON-NLS-1$
-				if (attribute.equals(elementId)) {
+				if (attribute.equals(elementId))
+				{
 					int nextSeverity = marker.getAttribute(IMarker.SEVERITY,
 							IMarker.SEVERITY_INFO);
 					Image nextImage = getImage(nextSeverity);
-					if (foundMarker == null) {
+					if (foundMarker == null)
+					{
 						foundMarker = marker;
 						toolTip = new Label(marker.getAttribute(
 								IMarker.MESSAGE, ""), //$NON-NLS-1$
 								nextImage);
-					} else {
-						if (toolTip.getChildren().isEmpty()) {
+					}
+					else
+					{
+						if (toolTip.getChildren().isEmpty())
+						{
 							Label comositeLabel = new Label();
 							FlowLayout fl = new FlowLayout(false);
 							fl.setMinorSpacing(0);
@@ -262,18 +304,24 @@ public class GpmnValidationDecoratorProvider extends AbstractProvider implements
 							: severity;
 				}
 			}
-			if (foundMarker == null) {
+			if (foundMarker == null)
+			{
 				return;
 			}
-
+			
 			// add decoration
-			if (editPart instanceof org.eclipse.gef.GraphicalEditPart) {
-				if (view instanceof Edge) {
+			if (editPart instanceof org.eclipse.gef.GraphicalEditPart)
+			{
+				if (view instanceof Edge)
+				{
 					setDecoration(getDecoratorTarget().addConnectionDecoration(
 							getImage(severity), 50, true));
-				} else {
+				}
+				else
+				{
 					int margin = -1;
-					if (editPart instanceof org.eclipse.gef.GraphicalEditPart) {
+					if (editPart instanceof org.eclipse.gef.GraphicalEditPart)
+					{
 						margin = MapModeUtil.getMapMode(
 								((org.eclipse.gef.GraphicalEditPart) editPart)
 										.getFigure()).DPtoLP(margin);
@@ -286,78 +334,93 @@ public class GpmnValidationDecoratorProvider extends AbstractProvider implements
 				getDecoration().setToolTip(toolTip);
 			}
 		}
-
+		
 		/**
 		 * @generated
 		 */
-		private Image getImage(int severity) {
+		private Image getImage(int severity)
+		{
 			String imageName = ISharedImages.IMG_OBJS_ERROR_TSK;
-			switch (severity) {
-			case IMarker.SEVERITY_ERROR:
-				imageName = ISharedImages.IMG_OBJS_ERROR_TSK;
-				break;
-			case IMarker.SEVERITY_WARNING:
-				imageName = ISharedImages.IMG_OBJS_WARN_TSK;
-				break;
-			default:
-				imageName = ISharedImages.IMG_OBJS_INFO_TSK;
+			switch (severity)
+			{
+				case IMarker.SEVERITY_ERROR:
+					imageName = ISharedImages.IMG_OBJS_ERROR_TSK;
+					break;
+				case IMarker.SEVERITY_WARNING:
+					imageName = ISharedImages.IMG_OBJS_WARN_TSK;
+					break;
+				default:
+					imageName = ISharedImages.IMG_OBJS_INFO_TSK;
 			}
 			return PlatformUI.getWorkbench().getSharedImages().getImage(
 					imageName);
 		}
-
+		
 		/**
 		 * @generated
 		 */
-		public void activate() {
-			if (viewId == null) {
+		public void activate()
+		{
+			if (viewId == null)
+			{
 				return;
 			}
-
+			
 			// add self to global decorators registry
 			List list = (List) allDecorators.get(viewId);
-			if (list == null) {
+			if (list == null)
+			{
 				list = new ArrayList(2);
 				list.add(this);
 				allDecorators.put(viewId, list);
-			} else if (!list.contains(this)) {
+			}
+			else if (!list.contains(this))
+			{
 				list.add(this);
 			}
-
+			
 			// start listening to changes in resources
 			View view = (View) getDecoratorTarget().getAdapter(View.class);
-			if (view == null) {
+			if (view == null)
+			{
 				return;
 			}
 			Diagram diagramView = view.getDiagram();
-			if (diagramView == null) {
+			if (diagramView == null)
+			{
 				return;
 			}
-			if (fileObserver == null) {
+			if (fileObserver == null)
+			{
 				FileChangeManager.getInstance().addFileObserver(
 						fileObserver = new MarkerObserver(diagramView));
 			}
 		}
-
+		
 		/**
 		 * @generated
 		 */
-		public void deactivate() {
-			if (viewId == null) {
+		public void deactivate()
+		{
+			if (viewId == null)
+			{
 				return;
 			}
-
+			
 			// remove self from global decorators registry
 			List list = (List) allDecorators.get(viewId);
-			if (list != null) {
+			if (list != null)
+			{
 				list.remove(this);
-				if (list.isEmpty()) {
+				if (list.isEmpty())
+				{
 					allDecorators.remove(viewId);
 				}
 			}
-
+			
 			// stop listening to changes in resources if there are no more decorators
-			if (fileObserver != null && allDecorators.isEmpty()) {
+			if (fileObserver != null && allDecorators.isEmpty())
+			{
 				FileChangeManager.getInstance()
 						.removeFileObserver(fileObserver);
 				fileObserver = null;
@@ -365,74 +428,85 @@ public class GpmnValidationDecoratorProvider extends AbstractProvider implements
 			super.deactivate();
 		}
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	static class MarkerObserver implements IFileObserver {
-
+	static class MarkerObserver implements IFileObserver
+	{
+		
 		/**
 		 * @generated
 		 */
 		private Diagram diagram;
-
+		
 		/**
 		 * @generated
 		 */
-		private MarkerObserver(Diagram diagram) {
+		private MarkerObserver(Diagram diagram)
+		{
 			this.diagram = diagram;
 		}
-
+		
 		/**
 		 * @generated
 		 */
-		public void handleFileRenamed(IFile oldFile, IFile file) {
+		public void handleFileRenamed(IFile oldFile, IFile file)
+		{
 		}
-
+		
 		/**
 		 * @generated
 		 */
-		public void handleFileMoved(IFile oldFile, IFile file) {
+		public void handleFileMoved(IFile oldFile, IFile file)
+		{
 		}
-
+		
 		/**
 		 * @generated
 		 */
-		public void handleFileDeleted(IFile file) {
+		public void handleFileDeleted(IFile file)
+		{
 		}
-
+		
 		/**
 		 * @generated
 		 */
-		public void handleFileChanged(IFile file) {
+		public void handleFileChanged(IFile file)
+		{
 		}
-
+		
 		/**
 		 * @generated
 		 */
-		public void handleMarkerAdded(IMarker marker) {
+		public void handleMarkerAdded(IMarker marker)
+		{
 			if (marker
 					.getAttribute(
 							org.eclipse.gmf.runtime.common.ui.resources.IMarker.ELEMENT_ID,
-							null) != null) {
+							null) != null)
+			{
 				handleMarkerChanged(marker);
 			}
 		}
-
+		
 		/**
 		 * @generated
 		 */
-		public void handleMarkerDeleted(IMarker marker, Map attributes) {
+		public void handleMarkerDeleted(IMarker marker, Map attributes)
+		{
 			String viewId = (String) attributes
 					.get(org.eclipse.gmf.runtime.common.ui.resources.IMarker.ELEMENT_ID);
 			refreshDecorators(viewId, diagram);
 		}
-
+		
 		/**
 		 * @generated
 		 */
-		public void handleMarkerChanged(IMarker marker) {
-			if (!MARKER_TYPE.equals(getType(marker))) {
+		public void handleMarkerChanged(IMarker marker)
+		{
+			if (!MARKER_TYPE.equals(getType(marker)))
+			{
 				return;
 			}
 			String viewId = marker
@@ -441,14 +515,18 @@ public class GpmnValidationDecoratorProvider extends AbstractProvider implements
 							""); //$NON-NLS-1$
 			refreshDecorators(viewId, diagram);
 		}
-
+		
 		/**
 		 * @generated
 		 */
-		private String getType(IMarker marker) {
-			try {
+		private String getType(IMarker marker)
+		{
+			try
+			{
 				return marker.getType();
-			} catch (CoreException e) {
+			}
+			catch (CoreException e)
+			{
 				GpmnDiagramEditorPlugin.getInstance().logError(
 						"Validation marker refresh failure", e); //$NON-NLS-1$
 				return ""; //$NON-NLS-1$

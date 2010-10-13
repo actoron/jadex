@@ -25,21 +25,24 @@ import org.eclipse.gmf.runtime.diagram.ui.tools.UnspecifiedTypeCreationTool;
 /**
  * @generated
  */
-public class GpmnPaletteFactory {
-
+public class GpmnPaletteFactory
+{
+	
 	/**
 	 * @generated
 	 */
-	public void fillPalette(PaletteRoot paletteRoot) {
+	public void fillPalette(PaletteRoot paletteRoot)
+	{
 		paletteRoot.add(createNodes1Group());
 		paletteRoot.add(createConnectors2Group());
 	}
-
+	
 	/**
 	 * Creates "Nodes" palette tool group
 	 * @generated NOT
 	 */
-	private PaletteContainer createNodes1Group() {
+	private PaletteContainer createNodes1Group()
+	{
 		PaletteDrawer paletteContainer = new PaletteDrawer(
 				Messages.Nodes1Group_title);
 		paletteContainer.setId("createNodes1Group"); //$NON-NLS-1$
@@ -54,15 +57,16 @@ public class GpmnPaletteFactory {
 		paletteContainer.add(createActivationPlan2CreationTool());
 		paletteContainer.add(createBpmnPlan3CreationTool());
 		paletteContainer.add(createSubProcess4CreationTool());
-
+		
 		return paletteContainer;
 	}
-
+	
 	/**
 	 * Creates "Connectors" palette tool group
 	 * @generated NOT
 	 */
-	private PaletteContainer createConnectors2Group() {
+	private PaletteContainer createConnectors2Group()
+	{
 		PaletteDrawer paletteContainer = new PaletteDrawer(
 				Messages.Connectors2Group_title);
 		paletteContainer.setId("createConnectors2Group"); //$NON-NLS-1$
@@ -74,11 +78,12 @@ public class GpmnPaletteFactory {
 		paletteContainer.add(createSuppressionEdge3CreationTool());
 		return paletteContainer;
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	private ToolEntry createAchieveGoal1CreationTool() {
+	private ToolEntry createAchieveGoal1CreationTool()
+	{
 		List/*<IElementType>*/types = new ArrayList/*<IElementType>*/(1);
 		types.add(GpmnElementTypes.Goal_2004);
 		NodeToolEntry entry = new NodeToolEntry(
@@ -90,11 +95,12 @@ public class GpmnPaletteFactory {
 		entry.setLargeIcon(entry.getSmallIcon());
 		return entry;
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	private ToolEntry createActivationPlan2CreationTool() {
+	private ToolEntry createActivationPlan2CreationTool()
+	{
 		List/*<IElementType>*/types = new ArrayList/*<IElementType>*/(1);
 		types.add(GpmnElementTypes.ActivationPlan_2001);
 		NodeToolEntry entry = new NodeToolEntry(
@@ -106,11 +112,12 @@ public class GpmnPaletteFactory {
 		entry.setLargeIcon(entry.getSmallIcon());
 		return entry;
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	private ToolEntry createBpmnPlan3CreationTool() {
+	private ToolEntry createBpmnPlan3CreationTool()
+	{
 		List/*<IElementType>*/types = new ArrayList/*<IElementType>*/(1);
 		types.add(GpmnElementTypes.BpmnPlan_2003);
 		NodeToolEntry entry = new NodeToolEntry(
@@ -122,11 +129,12 @@ public class GpmnPaletteFactory {
 		entry.setLargeIcon(entry.getSmallIcon());
 		return entry;
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	private ToolEntry createSubProcess4CreationTool() {
+	private ToolEntry createSubProcess4CreationTool()
+	{
 		List/*<IElementType>*/types = new ArrayList/*<IElementType>*/(1);
 		types.add(GpmnElementTypes.SubProcess_2002);
 		NodeToolEntry entry = new NodeToolEntry(
@@ -138,23 +146,26 @@ public class GpmnPaletteFactory {
 		entry.setLargeIcon(entry.getSmallIcon());
 		return entry;
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	private ToolEntry createActivationEdge1CreationTool() {
+	private ToolEntry createActivationEdge1CreationTool()
+	{
 		ToolEntry entry = new ToolEntry(
 				Messages.ActivationEdge1CreationTool_title,
-				Messages.ActivationEdge1CreationTool_desc, null, null) {
+				Messages.ActivationEdge1CreationTool_desc, null, null)
+		{
 		};
 		entry.setId("createActivationEdge1CreationTool"); //$NON-NLS-1$
 		return entry;
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	private ToolEntry createPlanEdge2CreationTool() {
+	private ToolEntry createPlanEdge2CreationTool()
+	{
 		List/*<IElementType>*/types = new ArrayList/*<IElementType>*/(1);
 		types.add(GpmnElementTypes.PlanEdge_4002);
 		LinkToolEntry entry = new LinkToolEntry(
@@ -166,11 +177,12 @@ public class GpmnPaletteFactory {
 		entry.setLargeIcon(entry.getSmallIcon());
 		return entry;
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	private ToolEntry createSuppressionEdge3CreationTool() {
+	private ToolEntry createSuppressionEdge3CreationTool()
+	{
 		List/*<IElementType>*/types = new ArrayList/*<IElementType>*/(1);
 		types.add(GpmnElementTypes.SuppressionEdge_4004);
 		LinkToolEntry entry = new LinkToolEntry(
@@ -182,59 +194,65 @@ public class GpmnPaletteFactory {
 		entry.setLargeIcon(entry.getSmallIcon());
 		return entry;
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	private static class NodeToolEntry extends ToolEntry {
-
+	private static class NodeToolEntry extends ToolEntry
+	{
+		
 		/**
 		 * @generated
 		 */
 		private final List elementTypes;
-
+		
 		/**
 		 * @generated
 		 */
 		private NodeToolEntry(String title, String description,
-				List elementTypes) {
+				List elementTypes)
+		{
 			super(title, description, null, null);
 			this.elementTypes = elementTypes;
 		}
-
+		
 		/**
 		 * @generated
 		 */
-		public Tool createTool() {
+		public Tool createTool()
+		{
 			Tool tool = new UnspecifiedTypeCreationTool(elementTypes);
 			tool.setProperties(getToolProperties());
 			return tool;
 		}
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	private static class LinkToolEntry extends ToolEntry {
-
+	private static class LinkToolEntry extends ToolEntry
+	{
+		
 		/**
 		 * @generated
 		 */
 		private final List relationshipTypes;
-
+		
 		/**
 		 * @generated
 		 */
 		private LinkToolEntry(String title, String description,
-				List relationshipTypes) {
+				List relationshipTypes)
+		{
 			super(title, description, null, null);
 			this.relationshipTypes = relationshipTypes;
 		}
-
+		
 		/**
 		 * @generated
 		 */
-		public Tool createTool() {
+		public Tool createTool()
+		{
 			Tool tool = new UnspecifiedTypeConnectionTool(relationshipTypes);
 			tool.setProperties(getToolProperties());
 			return tool;

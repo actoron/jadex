@@ -39,52 +39,66 @@ import org.eclipse.gmf.runtime.notation.View;
  * 
  * @generated
  */
-public class GpmnVisualIDRegistry {
-
+public class GpmnVisualIDRegistry
+{
+	
 	/**
 	 * @generated
 	 */
 	private static final String DEBUG_KEY = "jadex.tools.gpmn.diagram/debug/visualID"; //$NON-NLS-1$
-
+	
 	/**
 	 * @generated
 	 */
-	public static int getVisualID(View view) {
-		if (view instanceof Diagram) {
-			if (GpmnDiagramEditPart.MODEL_ID.equals(view.getType())) {
+	public static int getVisualID(View view)
+	{
+		if (view instanceof Diagram)
+		{
+			if (GpmnDiagramEditPart.MODEL_ID.equals(view.getType()))
+			{
 				return GpmnDiagramEditPart.VISUAL_ID;
-			} else {
+			}
+			else
+			{
 				return -1;
 			}
 		}
 		return jadex.tools.gpmn.diagram.part.GpmnVisualIDRegistry
 				.getVisualID(view.getType());
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	public static String getModelID(View view) {
+	public static String getModelID(View view)
+	{
 		View diagram = view.getDiagram();
-		while (view != diagram) {
+		while (view != diagram)
+		{
 			EAnnotation annotation = view.getEAnnotation("Shortcut"); //$NON-NLS-1$
-			if (annotation != null) {
+			if (annotation != null)
+			{
 				return (String) annotation.getDetails().get("modelID"); //$NON-NLS-1$
 			}
 			view = (View) view.eContainer();
 		}
 		return diagram != null ? diagram.getType() : null;
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	public static int getVisualID(String type) {
-		try {
+	public static int getVisualID(String type)
+	{
+		try
+		{
 			return Integer.parseInt(type);
-		} catch (NumberFormatException e) {
+		}
+		catch (NumberFormatException e)
+		{
 			if (Boolean.TRUE.toString().equalsIgnoreCase(
-					Platform.getDebugOption(DEBUG_KEY))) {
+					Platform.getDebugOption(DEBUG_KEY)))
+			{
 				GpmnDiagramEditorPlugin.getInstance().logError(
 						"Unable to parse view type as a visualID number: "
 								+ type);
@@ -92,174 +106,217 @@ public class GpmnVisualIDRegistry {
 		}
 		return -1;
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	public static String getType(int visualID) {
+	public static String getType(int visualID)
+	{
 		return String.valueOf(visualID);
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	public static int getDiagramVisualID(EObject domainElement) {
-		if (domainElement == null) {
+	public static int getDiagramVisualID(EObject domainElement)
+	{
+		if (domainElement == null)
+		{
 			return -1;
 		}
 		if (GpmnPackage.eINSTANCE.getGpmnDiagram().isSuperTypeOf(
 				domainElement.eClass())
-				&& isDiagram((GpmnDiagram) domainElement)) {
+				&& isDiagram((GpmnDiagram) domainElement))
+		{
 			return GpmnDiagramEditPart.VISUAL_ID;
 		}
 		return -1;
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	public static int getNodeVisualID(View containerView, EObject domainElement) {
-		if (domainElement == null) {
+	public static int getNodeVisualID(View containerView, EObject domainElement)
+	{
+		if (domainElement == null)
+		{
 			return -1;
 		}
 		String containerModelID = jadex.tools.gpmn.diagram.part.GpmnVisualIDRegistry
 				.getModelID(containerView);
-		if (!GpmnDiagramEditPart.MODEL_ID.equals(containerModelID)) {
+		if (!GpmnDiagramEditPart.MODEL_ID.equals(containerModelID))
+		{
 			return -1;
 		}
 		int containerVisualID;
-		if (GpmnDiagramEditPart.MODEL_ID.equals(containerModelID)) {
+		if (GpmnDiagramEditPart.MODEL_ID.equals(containerModelID))
+		{
 			containerVisualID = jadex.tools.gpmn.diagram.part.GpmnVisualIDRegistry
 					.getVisualID(containerView);
-		} else {
-			if (containerView instanceof Diagram) {
+		}
+		else
+		{
+			if (containerView instanceof Diagram)
+			{
 				containerVisualID = GpmnDiagramEditPart.VISUAL_ID;
-			} else {
+			}
+			else
+			{
 				return -1;
 			}
 		}
-		switch (containerVisualID) {
-		case GpmnDiagramEditPart.VISUAL_ID:
-			if (GpmnPackage.eINSTANCE.getActivationPlan().isSuperTypeOf(
-					domainElement.eClass())) {
-				return ActivationPlanEditPart.VISUAL_ID;
-			}
-			if (GpmnPackage.eINSTANCE.getSubProcess().isSuperTypeOf(
-					domainElement.eClass())) {
-				return SubProcessEditPart.VISUAL_ID;
-			}
-			if (GpmnPackage.eINSTANCE.getBpmnPlan().isSuperTypeOf(
-					domainElement.eClass())) {
-				return BpmnPlanEditPart.VISUAL_ID;
-			}
-			if (GpmnPackage.eINSTANCE.getGoal().isSuperTypeOf(
-					domainElement.eClass())) {
-				return GoalEditPart.VISUAL_ID;
-			}
-			break;
+		switch (containerVisualID)
+		{
+			case GpmnDiagramEditPart.VISUAL_ID:
+				if (GpmnPackage.eINSTANCE.getActivationPlan().isSuperTypeOf(
+						domainElement.eClass()))
+				{
+					return ActivationPlanEditPart.VISUAL_ID;
+				}
+				if (GpmnPackage.eINSTANCE.getSubProcess().isSuperTypeOf(
+						domainElement.eClass()))
+				{
+					return SubProcessEditPart.VISUAL_ID;
+				}
+				if (GpmnPackage.eINSTANCE.getBpmnPlan().isSuperTypeOf(
+						domainElement.eClass()))
+				{
+					return BpmnPlanEditPart.VISUAL_ID;
+				}
+				if (GpmnPackage.eINSTANCE.getGoal().isSuperTypeOf(
+						domainElement.eClass()))
+				{
+					return GoalEditPart.VISUAL_ID;
+				}
+				break;
 		}
 		return -1;
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	public static boolean canCreateNode(View containerView, int nodeVisualID) {
+	public static boolean canCreateNode(View containerView, int nodeVisualID)
+	{
 		String containerModelID = jadex.tools.gpmn.diagram.part.GpmnVisualIDRegistry
 				.getModelID(containerView);
-		if (!GpmnDiagramEditPart.MODEL_ID.equals(containerModelID)) {
+		if (!GpmnDiagramEditPart.MODEL_ID.equals(containerModelID))
+		{
 			return false;
 		}
 		int containerVisualID;
-		if (GpmnDiagramEditPart.MODEL_ID.equals(containerModelID)) {
+		if (GpmnDiagramEditPart.MODEL_ID.equals(containerModelID))
+		{
 			containerVisualID = jadex.tools.gpmn.diagram.part.GpmnVisualIDRegistry
 					.getVisualID(containerView);
-		} else {
-			if (containerView instanceof Diagram) {
+		}
+		else
+		{
+			if (containerView instanceof Diagram)
+			{
 				containerVisualID = GpmnDiagramEditPart.VISUAL_ID;
-			} else {
+			}
+			else
+			{
 				return false;
 			}
 		}
-		switch (containerVisualID) {
-		case ActivationPlanEditPart.VISUAL_ID:
-			if (ActivationPlanNameEditPart.VISUAL_ID == nodeVisualID) {
-				return true;
-			}
-			break;
-		case SubProcessEditPart.VISUAL_ID:
-			if (SubProcessNameEditPart.VISUAL_ID == nodeVisualID) {
-				return true;
-			}
-			break;
-		case BpmnPlanEditPart.VISUAL_ID:
-			if (BpmnPlanNameEditPart.VISUAL_ID == nodeVisualID) {
-				return true;
-			}
-			break;
-		case GoalEditPart.VISUAL_ID:
-			if (GoalNameEditPart.VISUAL_ID == nodeVisualID) {
-				return true;
-			}
-			break;
-		case GpmnDiagramEditPart.VISUAL_ID:
-			if (ActivationPlanEditPart.VISUAL_ID == nodeVisualID) {
-				return true;
-			}
-			if (SubProcessEditPart.VISUAL_ID == nodeVisualID) {
-				return true;
-			}
-			if (BpmnPlanEditPart.VISUAL_ID == nodeVisualID) {
-				return true;
-			}
-			if (GoalEditPart.VISUAL_ID == nodeVisualID) {
-				return true;
-			}
-			break;
-		case ActivationEdgeEditPart.VISUAL_ID:
-			if (ActivationEdgeOrderEditPart.VISUAL_ID == nodeVisualID) {
-				return true;
-			}
-			break;
-		case VirtualActivationEdgeEditPart.VISUAL_ID:
-			if (VirtualActivationOrderEditPart.VISUAL_ID == nodeVisualID) {
-				return true;
-			}
-			break;
+		switch (containerVisualID)
+		{
+			case ActivationPlanEditPart.VISUAL_ID:
+				if (ActivationPlanNameEditPart.VISUAL_ID == nodeVisualID)
+				{
+					return true;
+				}
+				break;
+			case SubProcessEditPart.VISUAL_ID:
+				if (SubProcessNameEditPart.VISUAL_ID == nodeVisualID)
+				{
+					return true;
+				}
+				break;
+			case BpmnPlanEditPart.VISUAL_ID:
+				if (BpmnPlanNameEditPart.VISUAL_ID == nodeVisualID)
+				{
+					return true;
+				}
+				break;
+			case GoalEditPart.VISUAL_ID:
+				if (GoalNameEditPart.VISUAL_ID == nodeVisualID)
+				{
+					return true;
+				}
+				break;
+			case GpmnDiagramEditPart.VISUAL_ID:
+				if (ActivationPlanEditPart.VISUAL_ID == nodeVisualID)
+				{
+					return true;
+				}
+				if (SubProcessEditPart.VISUAL_ID == nodeVisualID)
+				{
+					return true;
+				}
+				if (BpmnPlanEditPart.VISUAL_ID == nodeVisualID)
+				{
+					return true;
+				}
+				if (GoalEditPart.VISUAL_ID == nodeVisualID)
+				{
+					return true;
+				}
+				break;
+			case ActivationEdgeEditPart.VISUAL_ID:
+				if (ActivationEdgeOrderEditPart.VISUAL_ID == nodeVisualID)
+				{
+					return true;
+				}
+				break;
+			case VirtualActivationEdgeEditPart.VISUAL_ID:
+				if (VirtualActivationOrderEditPart.VISUAL_ID == nodeVisualID)
+				{
+					return true;
+				}
+				break;
 		}
 		return false;
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	public static int getLinkWithClassVisualID(EObject domainElement) {
-		if (domainElement == null) {
+	public static int getLinkWithClassVisualID(EObject domainElement)
+	{
+		if (domainElement == null)
+		{
 			return -1;
 		}
 		if (GpmnPackage.eINSTANCE.getActivationEdge().isSuperTypeOf(
-				domainElement.eClass())) {
+				domainElement.eClass()))
+		{
 			return ActivationEdgeEditPart.VISUAL_ID;
 		}
 		if (GpmnPackage.eINSTANCE.getPlanEdge().isSuperTypeOf(
-				domainElement.eClass())) {
+				domainElement.eClass()))
+		{
 			return PlanEdgeEditPart.VISUAL_ID;
 		}
 		if (GpmnPackage.eINSTANCE.getSuppressionEdge().isSuperTypeOf(
-				domainElement.eClass())) {
+				domainElement.eClass()))
+		{
 			return SuppressionEdgeEditPart.VISUAL_ID;
 		}
 		return -1;
 	}
-
+	
 	/**
 	 * User can change implementation of this method to handle some specific
 	 * situations not covered by default logic.
 	 * 
 	 * @generated
 	 */
-	private static boolean isDiagram(GpmnDiagram element) {
+	private static boolean isDiagram(GpmnDiagram element)
+	{
 		return true;
 	}
-
+	
 }

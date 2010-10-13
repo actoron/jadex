@@ -30,26 +30,31 @@ import org.eclipse.gmf.runtime.notation.View;
  * @generated
  */
 public class BpmnPlanItemSemanticEditPolicy extends
-		GpmnBaseItemSemanticEditPolicy {
-
+		GpmnBaseItemSemanticEditPolicy
+{
+	
 	/**
 	 * @generated
 	 */
-	public BpmnPlanItemSemanticEditPolicy() {
+	public BpmnPlanItemSemanticEditPolicy()
+	{
 		super(GpmnElementTypes.BpmnPlan_2003);
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	protected Command getDestroyElementCommand(DestroyElementRequest req) {
+	protected Command getDestroyElementCommand(DestroyElementRequest req)
+	{
 		View view = (View) getHost().getModel();
 		CompositeTransactionalCommand cmd = new CompositeTransactionalCommand(
 				getEditingDomain(), null);
 		cmd.setTransactionNestingEnabled(false);
-		for (Iterator it = view.getTargetEdges().iterator(); it.hasNext();) {
+		for (Iterator it = view.getTargetEdges().iterator(); it.hasNext();)
+		{
 			Edge incomingLink = (Edge) it.next();
-			if (GpmnVisualIDRegistry.getVisualID(incomingLink) == PlanEdgeEditPart.VISUAL_ID) {
+			if (GpmnVisualIDRegistry.getVisualID(incomingLink) == PlanEdgeEditPart.VISUAL_ID)
+			{
 				DestroyElementRequest r = new DestroyElementRequest(
 						incomingLink.getElement(), false);
 				cmd.add(new DestroyElementCommand(r));
@@ -58,50 +63,58 @@ public class BpmnPlanItemSemanticEditPolicy extends
 			}
 		}
 		EAnnotation annotation = view.getEAnnotation("Shortcut"); //$NON-NLS-1$
-		if (annotation == null) {
+		if (annotation == null)
+		{
 			// there are indirectly referenced children, need extra commands: false
 			addDestroyShortcutsCommand(cmd, view);
 			// delete host element
 			cmd.add(new DestroyElementCommand(req));
-		} else {
+		}
+		else
+		{
 			cmd.add(new DeleteCommand(getEditingDomain(), view));
 		}
 		return getGEFWrapper(cmd.reduce());
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	protected Command getCreateRelationshipCommand(CreateRelationshipRequest req) {
+	protected Command getCreateRelationshipCommand(CreateRelationshipRequest req)
+	{
 		Command command = req.getTarget() == null ? getStartCreateRelationshipCommand(req)
 				: getCompleteCreateRelationshipCommand(req);
 		return command != null ? command : super
 				.getCreateRelationshipCommand(req);
 	}
-
+	
 	/**
 	 * @generated
 	 */
 	protected Command getStartCreateRelationshipCommand(
-			CreateRelationshipRequest req) {
-		if (GpmnElementTypes.PlanEdge_4002 == req.getElementType()) {
+			CreateRelationshipRequest req)
+	{
+		if (GpmnElementTypes.PlanEdge_4002 == req.getElementType())
+		{
 			return null;
 		}
 		return null;
 	}
-
+	
 	/**
 	 * @generated
 	 */
 	protected Command getCompleteCreateRelationshipCommand(
-			CreateRelationshipRequest req) {
-		if (GpmnElementTypes.PlanEdge_4002 == req.getElementType()) {
+			CreateRelationshipRequest req)
+	{
+		if (GpmnElementTypes.PlanEdge_4002 == req.getElementType())
+		{
 			return getGEFWrapper(new PlanEdgeCreateCommand(req,
 					req.getSource(), req.getTarget()));
 		}
 		return null;
 	}
-
+	
 	/**
 	 * Returns command to reorient EClass based link. New link target or source
 	 * should be the domain model element associated with this node.
@@ -109,12 +122,14 @@ public class BpmnPlanItemSemanticEditPolicy extends
 	 * @generated
 	 */
 	protected Command getReorientRelationshipCommand(
-			ReorientRelationshipRequest req) {
-		switch (getVisualID(req)) {
-		case PlanEdgeEditPart.VISUAL_ID:
-			return getGEFWrapper(new PlanEdgeReorientCommand(req));
+			ReorientRelationshipRequest req)
+	{
+		switch (getVisualID(req))
+		{
+			case PlanEdgeEditPart.VISUAL_ID:
+				return getGEFWrapper(new PlanEdgeReorientCommand(req));
 		}
 		return super.getReorientRelationshipCommand(req);
 	}
-
+	
 }

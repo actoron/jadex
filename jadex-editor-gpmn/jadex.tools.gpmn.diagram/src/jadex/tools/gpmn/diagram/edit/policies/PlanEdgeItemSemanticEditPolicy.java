@@ -17,20 +17,23 @@ import org.eclipse.gmf.runtime.emf.type.core.requests.DestroyElementRequest;
  * @generated
  */
 public class PlanEdgeItemSemanticEditPolicy extends
-		GpmnBaseItemSemanticEditPolicy {
-
+		GpmnBaseItemSemanticEditPolicy
+{
+	
 	/**
 	 * @generated
 	 */
-	public PlanEdgeItemSemanticEditPolicy() {
+	public PlanEdgeItemSemanticEditPolicy()
+	{
 		super(GpmnElementTypes.PlanEdge_4002);
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	protected Command getDestroyElementCommand(DestroyElementRequest req) {
+	protected Command getDestroyElementCommand(DestroyElementRequest req)
+	{
 		return getGEFWrapper(new DestroyElementCommand(req));
 	}
-
+	
 }

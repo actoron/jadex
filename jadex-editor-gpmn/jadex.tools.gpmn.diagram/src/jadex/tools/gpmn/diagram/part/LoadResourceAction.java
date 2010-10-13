@@ -19,11 +19,13 @@ import org.eclipse.ui.handlers.HandlerUtil;
 /**
  * @generated
  */
-public class LoadResourceAction extends AbstractHandler {
+public class LoadResourceAction extends AbstractHandler
+{
 	/**
 	 * @generated
 	 */
-	public Object execute(ExecutionEvent event) throws ExecutionException {
+	public Object execute(ExecutionEvent event) throws ExecutionException
+	{
 		IEditorPart diagramEditor = HandlerUtil.getActiveEditorChecked(event);
 		Shell shell = diagramEditor.getEditorSite().getShell();
 		assert diagramEditor instanceof DiagramEditor;
@@ -34,5 +36,5 @@ public class LoadResourceAction extends AbstractHandler {
 		loadResourceDialog.open();
 		return null;
 	}
-
+	
 }

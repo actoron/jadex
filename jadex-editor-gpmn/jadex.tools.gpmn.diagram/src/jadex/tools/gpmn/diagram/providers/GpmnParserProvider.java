@@ -33,18 +33,21 @@ import org.eclipse.gmf.runtime.notation.View;
  * @generated
  */
 public class GpmnParserProvider extends AbstractProvider implements
-		IParserProvider {
-
+		IParserProvider
+{
+	
 	/**
 	 * @generated
 	 */
 	private IParser activationPlanName_5001Parser;
-
+	
 	/**
 	 * @generated
 	 */
-	private IParser getActivationPlanName_5001Parser() {
-		if (activationPlanName_5001Parser == null) {
+	private IParser getActivationPlanName_5001Parser()
+	{
+		if (activationPlanName_5001Parser == null)
+		{
 			EAttribute[] features = new EAttribute[] { GpmnPackage.eINSTANCE
 					.getNamedObject_Name() };
 			EAttribute[] editableFeatures = new EAttribute[] { GpmnPackage.eINSTANCE
@@ -55,17 +58,19 @@ public class GpmnParserProvider extends AbstractProvider implements
 		}
 		return activationPlanName_5001Parser;
 	}
-
+	
 	/**
 	 * @generated
 	 */
 	private IParser subProcessName_5002Parser;
-
+	
 	/**
 	 * @generated
 	 */
-	private IParser getSubProcessName_5002Parser() {
-		if (subProcessName_5002Parser == null) {
+	private IParser getSubProcessName_5002Parser()
+	{
+		if (subProcessName_5002Parser == null)
+		{
 			EAttribute[] features = new EAttribute[] { GpmnPackage.eINSTANCE
 					.getNamedObject_Name() };
 			EAttribute[] editableFeatures = new EAttribute[] { GpmnPackage.eINSTANCE
@@ -76,17 +81,19 @@ public class GpmnParserProvider extends AbstractProvider implements
 		}
 		return subProcessName_5002Parser;
 	}
-
+	
 	/**
 	 * @generated
 	 */
 	private IParser bpmnPlanName_5003Parser;
-
+	
 	/**
 	 * @generated
 	 */
-	private IParser getBpmnPlanName_5003Parser() {
-		if (bpmnPlanName_5003Parser == null) {
+	private IParser getBpmnPlanName_5003Parser()
+	{
+		if (bpmnPlanName_5003Parser == null)
+		{
 			EAttribute[] features = new EAttribute[] { GpmnPackage.eINSTANCE
 					.getNamedObject_Name() };
 			EAttribute[] editableFeatures = new EAttribute[] { GpmnPackage.eINSTANCE
@@ -97,17 +104,19 @@ public class GpmnParserProvider extends AbstractProvider implements
 		}
 		return bpmnPlanName_5003Parser;
 	}
-
+	
 	/**
 	 * @generated
 	 */
 	private IParser goalName_5004Parser;
-
+	
 	/**
 	 * @generated
 	 */
-	private IParser getGoalName_5004Parser() {
-		if (goalName_5004Parser == null) {
+	private IParser getGoalName_5004Parser()
+	{
+		if (goalName_5004Parser == null)
+		{
 			EAttribute[] features = new EAttribute[] { GpmnPackage.eINSTANCE
 					.getNamedObject_Name() };
 			EAttribute[] editableFeatures = new EAttribute[] { GpmnPackage.eINSTANCE
@@ -118,17 +127,19 @@ public class GpmnParserProvider extends AbstractProvider implements
 		}
 		return goalName_5004Parser;
 	}
-
+	
 	/**
 	 * @generated
 	 */
 	private IParser activationEdgeOrder_6001Parser;
-
+	
 	/**
 	 * @generated
 	 */
-	private IParser getActivationEdgeOrder_6001Parser() {
-		if (activationEdgeOrder_6001Parser == null) {
+	private IParser getActivationEdgeOrder_6001Parser()
+	{
+		if (activationEdgeOrder_6001Parser == null)
+		{
 			EAttribute[] features = new EAttribute[] { GpmnPackage.eINSTANCE
 					.getActivationEdge_Order() };
 			EAttribute[] editableFeatures = new EAttribute[] { GpmnPackage.eINSTANCE
@@ -139,93 +150,106 @@ public class GpmnParserProvider extends AbstractProvider implements
 		}
 		return activationEdgeOrder_6001Parser;
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	protected IParser getParser(int visualID) {
-		switch (visualID) {
-		case ActivationPlanNameEditPart.VISUAL_ID:
-			return getActivationPlanName_5001Parser();
-		case SubProcessNameEditPart.VISUAL_ID:
-			return getSubProcessName_5002Parser();
-		case BpmnPlanNameEditPart.VISUAL_ID:
-			return getBpmnPlanName_5003Parser();
-		case GoalNameEditPart.VISUAL_ID:
-			return getGoalName_5004Parser();
-		case ActivationEdgeOrderEditPart.VISUAL_ID:
-			return getActivationEdgeOrder_6001Parser();
+	protected IParser getParser(int visualID)
+	{
+		switch (visualID)
+		{
+			case ActivationPlanNameEditPart.VISUAL_ID:
+				return getActivationPlanName_5001Parser();
+			case SubProcessNameEditPart.VISUAL_ID:
+				return getSubProcessName_5002Parser();
+			case BpmnPlanNameEditPart.VISUAL_ID:
+				return getBpmnPlanName_5003Parser();
+			case GoalNameEditPart.VISUAL_ID:
+				return getGoalName_5004Parser();
+			case ActivationEdgeOrderEditPart.VISUAL_ID:
+				return getActivationEdgeOrder_6001Parser();
 		}
 		return null;
 	}
-
+	
 	/**
 	 * Utility method that consults ParserService
 	 * @generated
 	 */
 	public static IParser getParser(IElementType type, EObject object,
-			String parserHint) {
+			String parserHint)
+	{
 		return ParserService.getInstance().getParser(
 				new HintAdapter(type, object, parserHint));
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	public IParser getParser(IAdaptable hint) {
+	public IParser getParser(IAdaptable hint)
+	{
 		String vid = (String) hint.getAdapter(String.class);
-		if (vid != null) {
+		if (vid != null)
+		{
 			return getParser(GpmnVisualIDRegistry.getVisualID(vid));
 		}
 		View view = (View) hint.getAdapter(View.class);
-		if (view != null) {
+		if (view != null)
+		{
 			return getParser(GpmnVisualIDRegistry.getVisualID(view));
 		}
 		return null;
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	public boolean provides(IOperation operation) {
-		if (operation instanceof GetParserOperation) {
+	public boolean provides(IOperation operation)
+	{
+		if (operation instanceof GetParserOperation)
+		{
 			IAdaptable hint = ((GetParserOperation) operation).getHint();
-			if (GpmnElementTypes.getElement(hint) == null) {
+			if (GpmnElementTypes.getElement(hint) == null)
+			{
 				return false;
 			}
 			return getParser(hint) != null;
 		}
 		return false;
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	private static class HintAdapter extends ParserHintAdapter {
-
+	private static class HintAdapter extends ParserHintAdapter
+	{
+		
 		/**
 		 * @generated
 		 */
 		private final IElementType elementType;
-
+		
 		/**
 		 * @generated
 		 */
-		public HintAdapter(IElementType type, EObject object, String parserHint) {
+		public HintAdapter(IElementType type, EObject object, String parserHint)
+		{
 			super(object, parserHint);
 			assert type != null;
 			elementType = type;
 		}
-
+		
 		/**
 		 * @generated
 		 */
-		public Object getAdapter(Class adapter) {
-			if (IElementType.class.equals(adapter)) {
+		public Object getAdapter(Class adapter)
+		{
+			if (IElementType.class.equals(adapter))
+			{
 				return elementType;
 			}
 			return super.getAdapter(adapter);
 		}
 	}
-
+	
 }

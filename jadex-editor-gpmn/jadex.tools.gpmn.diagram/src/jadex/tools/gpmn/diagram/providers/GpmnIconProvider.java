@@ -17,20 +17,24 @@ import org.eclipse.swt.graphics.Image;
 /**
  * @generated
  */
-public class GpmnIconProvider extends AbstractProvider implements IIconProvider {
-
+public class GpmnIconProvider extends AbstractProvider implements IIconProvider
+{
+	
 	/**
 	 * @generated
 	 */
-	public Image getIcon(IAdaptable hint, int flags) {
+	public Image getIcon(IAdaptable hint, int flags)
+	{
 		return GpmnElementTypes.getImage(hint);
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	public boolean provides(IOperation operation) {
-		if (operation instanceof GetIconOperation) {
+	public boolean provides(IOperation operation)
+	{
+		if (operation instanceof GetIconOperation)
+		{
 			return ((GetIconOperation) operation).execute(this) != null;
 		}
 		return false;

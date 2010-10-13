@@ -41,32 +41,34 @@ import org.eclipse.ui.dialogs.WizardNewFileCreationPage;
 /**
  * @generated
  */
-public class GpmnNewDiagramFileWizard extends Wizard {
-
+public class GpmnNewDiagramFileWizard extends Wizard
+{
+	
 	/**
 	 * @generated
 	 */
 	private WizardNewFileCreationPage myFileCreationPage;
-
+	
 	/**
 	 * @generated
 	 */
 	private ModelElementSelectionPage diagramRootElementSelectionPage;
-
+	
 	/**
 	 * @generated
 	 */
 	private TransactionalEditingDomain myEditingDomain;
-
+	
 	/**
 	 * @generated
 	 */
 	public GpmnNewDiagramFileWizard(URI domainModelURI, EObject diagramRoot,
-			TransactionalEditingDomain editingDomain) {
+			TransactionalEditingDomain editingDomain)
+	{
 		assert domainModelURI != null : "Domain model uri must be specified"; //$NON-NLS-1$
 		assert diagramRoot != null : "Doagram root element must be specified"; //$NON-NLS-1$
 		assert editingDomain != null : "Editing domain must be specified"; //$NON-NLS-1$
-
+		
 		myFileCreationPage = new WizardNewFileCreationPage(
 				Messages.GpmnNewDiagramFileWizard_CreationPageName,
 				StructuredSelection.EMPTY);
@@ -78,12 +80,17 @@ public class GpmnNewDiagramFileWizard extends Wizard {
 		IPath filePath;
 		String fileName = URI.decode(domainModelURI.trimFileExtension()
 				.lastSegment());
-		if (domainModelURI.isPlatformResource()) {
+		if (domainModelURI.isPlatformResource())
+		{
 			filePath = new Path(domainModelURI.trimSegments(1)
 					.toPlatformString(true));
-		} else if (domainModelURI.isFile()) {
+		}
+		else if (domainModelURI.isFile())
+		{
 			filePath = new Path(domainModelURI.trimSegments(1).toFileString());
-		} else {
+		}
+		else
+		{
 			// TODO : use some default path
 			throw new IllegalArgumentException(
 					"Unsupported URI: " + domainModelURI); //$NON-NLS-1$
@@ -91,7 +98,7 @@ public class GpmnNewDiagramFileWizard extends Wizard {
 		myFileCreationPage.setContainerFullPath(filePath);
 		myFileCreationPage.setFileName(GpmnDiagramEditorUtil.getUniqueFileName(
 				filePath, fileName, "gpmn_diagram")); //$NON-NLS-1$
-
+		
 		diagramRootElementSelectionPage = new DiagramRootElementSelectionPage(
 				Messages.GpmnNewDiagramFileWizard_RootSelectionPageName);
 		diagramRootElementSelectionPage
@@ -99,22 +106,24 @@ public class GpmnNewDiagramFileWizard extends Wizard {
 		diagramRootElementSelectionPage
 				.setDescription(Messages.GpmnNewDiagramFileWizard_RootSelectionPageDescription);
 		diagramRootElementSelectionPage.setModelElement(diagramRoot);
-
+		
 		myEditingDomain = editingDomain;
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	public void addPages() {
+	public void addPages()
+	{
 		addPage(myFileCreationPage);
 		addPage(diagramRootElementSelectionPage);
 	}
-
+	
 	/**
 	 * @generated
 	 */
-	public boolean performFinish() {
+	public boolean performFinish()
+	{
 		List affectedFiles = new LinkedList();
 		IFile diagramFile = myFileCreationPage.createNewFile();
 		GpmnDiagramEditorUtil.setCharset(diagramFile);
@@ -127,15 +136,18 @@ public class GpmnNewDiagramFileWizard extends Wizard {
 		AbstractTransactionalCommand command = new AbstractTransactionalCommand(
 				myEditingDomain,
 				Messages.GpmnNewDiagramFileWizard_InitDiagramCommand,
-				affectedFiles) {
-
+				affectedFiles)
+		{
+			
 			protected CommandResult doExecuteWithResult(
 					IProgressMonitor monitor, IAdaptable info)
-					throws ExecutionException {
+					throws ExecutionException
+			{
 				int diagramVID = GpmnVisualIDRegistry
 						.getDiagramVisualID(diagramRootElementSelectionPage
 								.getModelElement());
-				if (diagramVID != GpmnDiagramEditPart.VISUAL_ID) {
+				if (diagramVID != GpmnDiagramEditPart.VISUAL_ID)
+				{
 					return CommandResult
 							.newErrorCommandResult(Messages.GpmnNewDiagramFileWizard_IncorrectRootError);
 				}
@@ -147,49 +159,61 @@ public class GpmnNewDiagramFileWizard extends Wizard {
 				return CommandResult.newOKCommandResult();
 			}
 		};
-		try {
+		try
+		{
 			OperationHistoryFactory.getOperationHistory().execute(command,
 					new NullProgressMonitor(), null);
 			diagramResource.save(GpmnDiagramEditorUtil.getSaveOptions());
 			GpmnDiagramEditorUtil.openDiagram(diagramResource);
-		} catch (ExecutionException e) {
+		}
+		catch (ExecutionException e)
+		{
 			GpmnDiagramEditorPlugin.getInstance().logError(
 					"Unable to create model and diagram", e); //$NON-NLS-1$
-		} catch (IOException ex) {
+		}
+		catch (IOException ex)
+		{
 			GpmnDiagramEditorPlugin.getInstance().logError(
 					"Save operation failed for: " + diagramModelURI, ex); //$NON-NLS-1$
-		} catch (PartInitException ex) {
+		}
+		catch (PartInitException ex)
+		{
 			GpmnDiagramEditorPlugin.getInstance().logError(
 					"Unable to open editor", ex); //$NON-NLS-1$
 		}
 		return true;
 	}
-
+	
 	/**
 	 * @generated
 	 */
 	private static class DiagramRootElementSelectionPage extends
-			ModelElementSelectionPage {
-
+			ModelElementSelectionPage
+	{
+		
 		/**
 		 * @generated
 		 */
-		protected DiagramRootElementSelectionPage(String pageName) {
+		protected DiagramRootElementSelectionPage(String pageName)
+		{
 			super(pageName);
 		}
-
+		
 		/**
 		 * @generated
 		 */
-		protected String getSelectionTitle() {
+		protected String getSelectionTitle()
+		{
 			return Messages.GpmnNewDiagramFileWizard_RootSelectionPageSelectionTitle;
 		}
-
+		
 		/**
 		 * @generated
 		 */
-		protected boolean validatePage() {
-			if (selectedModelElement == null) {
+		protected boolean validatePage()
+		{
+			if (selectedModelElement == null)
+			{
 				setErrorMessage(Messages.GpmnNewDiagramFileWizard_RootSelectionPageNoSelectionMessage);
 				return false;
 			}
