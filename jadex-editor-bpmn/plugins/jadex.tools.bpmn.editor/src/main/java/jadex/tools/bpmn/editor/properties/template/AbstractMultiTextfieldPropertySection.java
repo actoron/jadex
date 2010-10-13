@@ -80,8 +80,8 @@ public abstract class AbstractMultiTextfieldPropertySection extends
 		textGridData.widthHint = 500;
 		
 		GridData labelGridData = new GridData();
-		labelGridData.minimumWidth = 60;
-		labelGridData.widthHint = 60;
+		labelGridData.minimumWidth = 80;
+		labelGridData.widthHint = 80;
 
 		textFields = new Text[textFieldNames.length];
 		for (int i = 0; i < textFieldNames.length; i++)
