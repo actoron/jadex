@@ -122,7 +122,7 @@ public class Executor implements Runnable
 		if(futures!=null)
 		{
 			for(int i=0; i<futures.length; i++)
-				futures[0].setResult(null);
+				futures[i].setResult(null);
 			
 			synchronized(this)
 			{
