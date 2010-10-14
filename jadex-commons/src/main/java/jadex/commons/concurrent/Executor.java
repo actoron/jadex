@@ -68,7 +68,7 @@ public class Executor implements Runnable
 		
 		this.threadpool = threadpool;
 		this.executable = executable;
-		this.shutdownfutures = Collections.synchronizedList(new ArrayList());
+		this.shutdownfutures = new ArrayList();
 	}
 		
 	//-------- methods --------
@@ -110,16 +110,22 @@ public class Executor implements Runnable
 		}
 
 		// Notify shutdown listeners when execution has ended.
-		synchronized(shutdownfutures)
+		Future[] futures = null;
+		synchronized(this)
 		{
 			if(shutdown)
 			{
-				if(shutdownfutures!=null)
-				{
-					for(int i=0; i<shutdownfutures.size(); i++)
-						((Future)shutdownfutures.get(i)).setResult(null);
-					shutdownfutures.clear();
-				}
+				futures = (Future[])shutdownfutures.toArray(new Future[shutdownfutures.size()]);
+				shutdownfutures.clear();
+			}
+		}
+		if(futures!=null)
+		{
+			for(int i=0; i<futures.length; i++)
+				futures[0].setResult(null);
+			
+			synchronized(this)
+			{
 				shutdowned = true;
 			}
 		}
@@ -164,7 +170,8 @@ public class Executor implements Runnable
 	{
 		Future	ret	= new Future();
 		
-		synchronized(shutdownfutures)
+		boolean directnotify = false;
+		synchronized(this)
 		{
 			shutdown = true;
 			if(!shutdowned)
@@ -173,9 +180,12 @@ public class Executor implements Runnable
 			}
 			else
 			{
-				ret.setResult(null);
+				directnotify = true;
 			}
 		}
+		
+		if(directnotify)
+			ret.setResult(null);
 		
 		return ret;
 	}

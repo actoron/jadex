@@ -181,7 +181,7 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 		}
 		else
 		{
-			Executor exe = (Executor)executors.get(task);
+			final Executor exe = (Executor)executors.get(task);
 			if(exe!=null)
 			{
 				IResultListener lis = new IResultListener()
@@ -194,7 +194,10 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 							ret.setResult(result);
 							
 							if(executors!=null)
+							{
 								executors.remove(task);
+								System.out.println("Removing executor with lis for: "+task+", "+exe);
+							}
 						}
 					}
 	
@@ -206,7 +209,10 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 							ret.setResult(exception);
 							
 							if(executors!=null)
+							{
 								executors.remove(task);
+								System.out.println("Removing executor with lis e for: "+task+", "+exe);
+							}
 						}
 						
 					}
