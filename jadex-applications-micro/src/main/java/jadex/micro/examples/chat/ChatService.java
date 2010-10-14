@@ -3,12 +3,10 @@ package jadex.micro.examples.chat;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IChangeListener;
-import jadex.commons.ICommand;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.service.BasicService;
 import jadex.commons.service.SServiceProvider;
 import jadex.micro.IMicroExternalAccess;
-import jadex.micro.examples.helpline.IHelpline;
 
 import java.util.ArrayList;
 import java.util.Collection;
