@@ -127,7 +127,7 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 								// Do not remove when a new executor has already been added for the task.
 								if(!this.isRunning() && executors!=null && executors.get(task)==this)	
 								{
-//									System.out.println("Removing executor for: "+task+", "+this);
+									System.out.println("Removing executor for: "+task+", "+this);
 									executors.remove(task); // weak for testing
 //									setExecutable(null);
 //									if(executorcache.size()<max)
@@ -159,7 +159,7 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 	
 		if(running)
 		{
-//			System.out.println("Executing for: "+task+", "+exe);
+			System.out.println("Executing for: "+task+", "+exe);
 			exe.execute();
 		}
 	}
@@ -170,7 +170,7 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 	 *  @param task The task to execute.
 	 *  @param listener The listener.
 	 */
-	public IFuture cancel(final IExecutable task)
+	public synchronized IFuture cancel(final IExecutable task)
 	{
 		// todo: repair me: problem is that method can interfere with execute?!
 		final Future ret = new Future();

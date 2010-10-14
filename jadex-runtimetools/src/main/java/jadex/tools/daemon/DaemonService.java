@@ -88,4 +88,13 @@ public class DaemonService implements IDaemonService
 		
 		return ret;
 	}
+	
+	/**
+	 *  Get all platforms.
+	 *  @param The collection of platforms.
+	 */
+	public IFuture getPlatforms(final IComponentIdentifier cid)
+	{
+		return new Future();
+	}
 }

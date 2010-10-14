@@ -6,6 +6,7 @@ import jadex.commons.service.SServiceProvider;
 import jadex.micro.IMicroExternalAccess;
 
 import java.awt.BorderLayout;
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -13,6 +14,7 @@ import java.awt.event.WindowEvent;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JList;
 import javax.swing.JPanel;
 
 /**
@@ -34,7 +36,7 @@ public class DaemonPanel extends JPanel
 		this.agent = agent;
 		this.setLayout(new BorderLayout());
 		
-		JPanel p = new JPanel(new BorderLayout());
+		JPanel p = new JPanel(new FlowLayout());
 		
 		JButton startb = new JButton("Start platform");
 		startb.addActionListener(new ActionListener()
@@ -53,7 +55,27 @@ public class DaemonPanel extends JPanel
 			}
 		});
 		
-		p.add(startb, BorderLayout.CENTER);
+//		JList platforml = new JList();
+//		DefaultListModel 
+		
+//		JButton shutdownb = new JButton("Shudown platform");
+//		shutdownb.addActionListener(new ActionListener()
+//		{
+//			public void actionPerformed(ActionEvent e)
+//			{
+//				SServiceProvider.getService(agent.getServiceProvider(), IDaemonService.class)
+//					.addResultListener(new SwingDefaultResultListener()
+//				{
+//					public void customResultAvailable(Object source, Object result)
+//					{
+//						IDaemonService ds = (IDaemonService)result;
+//						ds.shutdownPlatform();
+//					}
+//				});
+//			}
+//		});
+		
+		p.add(startb);
 		
 		this.add(p, BorderLayout.CENTER);
 	}
