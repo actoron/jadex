@@ -127,7 +127,7 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 								// Do not remove when a new executor has already been added for the task.
 								if(!this.isRunning() && executors!=null && executors.get(task)==this)	
 								{
-									System.out.println("Removing executor for: "+task+", "+this);
+//									System.out.println("Removing executor for: "+task+", "+this);
 									executors.remove(task); // weak for testing
 //									setExecutable(null);
 //									if(executorcache.size()<max)
@@ -159,7 +159,7 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 	
 		if(running)
 		{
-			System.out.println("Executing for: "+task+", "+exe);
+//			System.out.println("Executing for: "+task+", "+exe);
 			exe.execute();
 		}
 	}
@@ -196,7 +196,7 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 							if(executors!=null)
 							{
 								executors.remove(task);
-								System.out.println("Removing executor with lis for: "+task+", "+exe);
+//								System.out.println("Removing executor with lis for: "+task+", "+exe);
 							}
 						}
 					}
@@ -211,7 +211,7 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 							if(executors!=null)
 							{
 								executors.remove(task);
-								System.out.println("Removing executor with lis e for: "+task+", "+exe);
+//								System.out.println("Removing executor with lis e for: "+task+", "+exe);
 							}
 						}
 						
