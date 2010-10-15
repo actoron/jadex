@@ -1,5 +1,8 @@
 package jadex.tools.daemon;
 
+import jadex.bridge.IComponentIdentifier;
+import jadex.commons.ChangeEvent;
+import jadex.commons.IChangeListener;
 import jadex.commons.SGUI;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.commons.service.SServiceProvider;
@@ -12,6 +15,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
+import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JList;
@@ -55,27 +59,56 @@ public class DaemonPanel extends JPanel
 			}
 		});
 		
-//		JList platforml = new JList();
-//		DefaultListModel 
+		final JList platforml = new JList(new DefaultListModel());
 		
-//		JButton shutdownb = new JButton("Shudown platform");
-//		shutdownb.addActionListener(new ActionListener()
-//		{
-//			public void actionPerformed(ActionEvent e)
-//			{
-//				SServiceProvider.getService(agent.getServiceProvider(), IDaemonService.class)
-//					.addResultListener(new SwingDefaultResultListener()
-//				{
-//					public void customResultAvailable(Object source, Object result)
-//					{
-//						IDaemonService ds = (IDaemonService)result;
-//						ds.shutdownPlatform();
-//					}
-//				});
-//			}
-//		});
+		JButton shutdownb = new JButton("Shudown platform");
+		shutdownb.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				SServiceProvider.getService(agent.getServiceProvider(), IDaemonService.class)
+					.addResultListener(new SwingDefaultResultListener()
+				{
+					public void customResultAvailable(Object source, Object result)
+					{
+						IDaemonService ds = (IDaemonService)result;
+						Object[] cids = (Object[])platforml.getSelectedValues();
+						for(int i=0; i<cids.length; i++)
+						{
+							ds.shutdownPlatform(((IComponentIdentifier)cids[i]));
+						}
+							
+					}
+				});
+			}
+		});
+		
+		SServiceProvider.getService(agent.getServiceProvider(), IDaemonService.class)
+			.addResultListener(new SwingDefaultResultListener()
+		{
+			public void customResultAvailable(Object source, Object result)
+			{
+				IDaemonService ds = (IDaemonService)result;
+				ds.addChangeListener(new IChangeListener()
+				{
+					public void changeOccurred(ChangeEvent event)
+					{
+						if(IDaemonService.ADDED.equals(event.getType()))
+						{
+							((DefaultListModel)platforml.getModel()).addElement(event.getValue());
+						}
+						else if(IDaemonService.REMOVED.equals(event.getType()))
+						{
+							((DefaultListModel)platforml.getModel()).removeElement(event.getValue());
+						}
+					}
+				});
+			}
+		});
 		
 		p.add(startb);
+		p.add(platforml);
+		p.add(shutdownb);
 		
 		this.add(p, BorderLayout.CENTER);
 	}

@@ -1,10 +1,11 @@
 package jadex.tools.daemon;
 
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IArgument;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentManagementService;
-import jadex.bridge.IExternalAccess;
+import jadex.commons.ChangeEvent;
 import jadex.commons.Future;
+import jadex.commons.IChangeListener;
 import jadex.commons.IFuture;
 import jadex.commons.SUtil;
 import jadex.commons.StreamCopy;
@@ -16,12 +17,11 @@ import jadex.micro.MicroAgent;
 import jadex.micro.MicroAgentMetaInfo;
 
 import java.io.File;
-import java.io.FilterInputStream;
 import java.io.FilterOutputStream;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,12 +32,15 @@ import javax.swing.SwingUtilities;
  * 
  */
 public class DaemonAgent extends MicroAgent
-{
+{	
 	//-------- attributes --------
 	
 	/** The started platforms. */
 	protected Map platforms; 
 	
+	/** The listeners. */
+	protected List listeners;
+
 	//-------- methods --------
 	
 	/**
@@ -45,7 +48,8 @@ public class DaemonAgent extends MicroAgent
 	 */
 	public void agentCreated()
 	{
-		platforms = new HashMap();
+		platforms = Collections.synchronizedMap(new HashMap());
+		listeners = Collections.synchronizedList(new ArrayList());
 		addService(new DaemonService(getExternalAccess()));
 		SwingUtilities.invokeLater(new Runnable()
 		{
@@ -63,6 +67,16 @@ public class DaemonAgent extends MicroAgent
 	public IFuture startPlatform(StartOptions opt)
 	{
 		final Future ret = new Future();
+		
+		IResultListener lis = new DelegationResultListener(ret)
+		{
+			public void customResultAvailable(Object source, Object result)
+			{
+				Object[] res = (Object[])result;
+				platforms.put(res[0], res[1]);
+				super.customResultAvailable(source, result);
+			}
+		};
 		
 		final StartOptions options = opt==null? new StartOptions(): opt;
 		
@@ -128,17 +142,7 @@ public class DaemonAgent extends MicroAgent
 			
 			System.out.println("Starting process: "+cmd);
 			
-			Process proc = Runtime.getRuntime().exec(options.getStartCommand(), null, newcurdir);
-//			FilterInputStream fis = new FilterInputStream(proc.getInputStream())
-//			{
-//				public int read() throws IOException
-//				{
-//					int ret = super.read();
-//					
-//					return ret;
-//				}
-//			});
-			
+			final Process proc = Runtime.getRuntime().exec(options.getStartCommand(), null, newcurdir);
 
 			FilterOutputStream fos = new FilterOutputStream(System.out)
 			{
@@ -147,19 +151,19 @@ public class DaemonAgent extends MicroAgent
 				
 				public void write(byte[] b) throws IOException
 				{
-					synchronized(this)
+					if(!fin)
 					{
-						if(!fin)
+						buf.append(new String(b));
+						for(int i=0; i<b.length; i++)
 						{
-							buf.append(b);
-							for(int i=0; i<b.length; i++)
+							if(' '==b[i])
 							{
-								if(" ".equals(b[i]))
-								{
-									fin = true;
-									ret.setResult(buf.toString());
-									break;
-								}
+								fin = true;
+								IComponentIdentifier cid = new ComponentIdentifier(buf.toString());
+								platforms.put(cid, proc);
+								notifyListeners(new ChangeEvent(this, IDaemonService.ADDED, cid));
+								ret.setResult(cid);
+								break;
 							}
 						}
 					}
@@ -168,19 +172,19 @@ public class DaemonAgent extends MicroAgent
 				
 				public void write(byte[] b, int off, int len) throws IOException
 				{
-					synchronized(this)
+					if(!fin)
 					{
-						if(!fin)
+						for(int i=0; i<len; i++)
 						{
-							for(int i=0; i<len; i++)
+							buf.append((char)b[i]);
+							if(' '==b[i])
 							{
-								buf.append(b[i]);
-								if(" ".equals(b[i]))
-								{
-									fin = true;
-									ret.setResult(buf.toString());
-									break;
-								}
+								fin = true;
+								IComponentIdentifier cid = new ComponentIdentifier(buf.toString());
+								platforms.put(cid, proc);
+								notifyListeners(new ChangeEvent(this, IDaemonService.ADDED, cid));
+								ret.setResult(cid);
+								break;
 							}
 						}
 					}
@@ -189,16 +193,16 @@ public class DaemonAgent extends MicroAgent
 				
 				public void write(int b) throws IOException
 				{
-					synchronized(this)
+					if(!fin)
 					{
-						if(!fin)
+						buf.append((char)b);
+						if(' '==b)
 						{
-							buf.append(b);
-							if(" ".equals(b))
-							{
-								fin = true;
-								ret.setResult(buf.toString());
-							}
+							fin = true;
+							IComponentIdentifier cid = new ComponentIdentifier(buf.toString());
+							platforms.put(cid, proc);
+							notifyListeners(new ChangeEvent(this, IDaemonService.ADDED, cid));
+							ret.setResult(cid);
 						}
 					}
 					super.write(b);
@@ -206,7 +210,7 @@ public class DaemonAgent extends MicroAgent
 			};
 			
 			new Thread(new StreamCopy(proc.getInputStream(), fos)).start();
-			new Thread(new StreamCopy(proc.getErrorStream(), fos)).start();
+			new Thread(new StreamCopy(proc.getErrorStream(), System.err)).start();
 			
 	//		boolean finished = false;
 	//		while(!finished && !abort)
@@ -269,6 +273,29 @@ public class DaemonAgent extends MicroAgent
 	{
 		final Future ret = new Future();
 		
+		Process proc = (Process)platforms.get(cid);
+		if(proc==null)
+		{
+			ret.setException(new RuntimeException("Platform not found: "+cid));
+		}
+		else
+		{
+			proc.destroy();
+			ret.setResult(null);
+			notifyListeners(new ChangeEvent(this, IDaemonService.REMOVED, cid));
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Shutdown a platform.
+	 *  @param cid The platform id.
+	 * /
+	public IFuture shutdownPlatform(final IComponentIdentifier cid)
+	{
+		final Future ret = new Future();
+		
 		IExternalAccess platform = (IExternalAccess)platforms.get(cid);
 		if(platform==null)
 		{
@@ -293,6 +320,52 @@ public class DaemonAgent extends MicroAgent
 		}
 		
 		return ret;
+	}*/
+	
+	/**
+	 *  Get the component identifiers of all (managed) platforms.
+	 *  @return Collection of platform ids.
+	 */
+	public IFuture getPlatforms()
+	{
+		return new Future(platforms.keySet());
+	}
+		
+	/**
+	 *  Add a change listener.
+	 *  @param listener The change listener.
+	 */
+	public void addChangeListener(IChangeListener listener)
+	{
+		listeners.add(listener);
+	}
+	
+	/**
+	 *  Remove a change listener.
+	 *  @param listener The change listener.
+	 */
+	public void removeChangeListener(IChangeListener listener)
+	{
+		listeners.remove(listener);
+	}
+	
+	/**
+	 *  Notify the listeners.
+	 */
+	protected void notifyListeners(ChangeEvent event)
+	{
+		IChangeListener[] alisteners;
+		synchronized(this)
+		{
+			alisteners	= listeners.isEmpty()? null: (IChangeListener[])listeners.toArray(new IChangeListener[0]);
+		}
+		if(alisteners!=null)
+		{
+			for(int i=0; i<alisteners.length; i++)
+			{
+				alisteners[i].changeOccurred(event);
+			}
+		}
 	}
 	
 	//-------- static methods --------

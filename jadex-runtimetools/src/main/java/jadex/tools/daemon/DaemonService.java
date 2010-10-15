@@ -1,8 +1,11 @@
 package jadex.tools.daemon;
 
+import java.util.List;
+
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.Future;
+import jadex.commons.IChangeListener;
 import jadex.commons.ICommand;
 import jadex.commons.IFuture;
 import jadex.commons.concurrent.DelegationResultListener;
@@ -19,7 +22,7 @@ public class DaemonService extends BasicService implements IDaemonService, IServ
 	
 	/** The agent. */
 	protected IMicroExternalAccess agent;
-	
+		
 	//-------- constructors --------
 	
 	/**
@@ -71,5 +74,57 @@ public class DaemonService extends BasicService implements IDaemonService, IServ
 		});
 		
 		return ret;
+	}
+	
+	/**
+	 *  Get the component identifiers of all (managed) platforms.
+	 *  @return Collection of platform ids.
+	 */
+	public IFuture getPlatforms()
+	{
+		final Future ret = new Future();
+		
+		agent.scheduleStep(new ICommand()
+		{
+			public void execute(Object args)
+			{
+				DaemonAgent agent = (DaemonAgent)args;
+				agent.getPlatforms().addResultListener(new DelegationResultListener(ret));
+			}
+		});
+		
+		return ret;
+	}
+	
+	/**
+	 *  Add a change listener.
+	 *  @param listener The change listener.
+	 */
+	public void addChangeListener(final IChangeListener listener)
+	{
+		agent.scheduleStep(new ICommand()
+		{
+			public void execute(Object args)
+			{
+				DaemonAgent agent = (DaemonAgent)args;
+				agent.addChangeListener(listener);
+			}
+		});
+	}
+	
+	/**
+	 *  Remove a change listener.
+	 *  @param listener The change listener.
+	 */
+	public void removeChangeListener(final IChangeListener listener)
+	{
+		agent.scheduleStep(new ICommand()
+		{
+			public void execute(Object args)
+			{
+				DaemonAgent agent = (DaemonAgent)args;
+				agent.removeChangeListener(listener);
+			}
+		});
 	}
 }
