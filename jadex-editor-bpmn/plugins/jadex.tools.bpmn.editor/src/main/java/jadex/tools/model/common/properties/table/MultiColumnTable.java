@@ -3,13 +3,10 @@
  */
 package jadex.tools.model.common.properties.table;
 
-import jadex.tools.bpmn.editor.properties.template.AbstractBpmnPropertySection;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.StringTokenizer;
 
 /**
@@ -314,18 +311,27 @@ public class MultiColumnTable
 
 		StringTokenizer listTokens = new StringTokenizer(stringToConvert, LIST_ELEMENT_DELIMITER, false);
 		
-		long countRowTokens = listTokens.countTokens();
-		MultiColumnTable table = new MultiColumnTable((int)countRowTokens/2, uniqueColumn);
+//		long countRowTokens = listTokens.countTokens();
+//		MultiColumnTable table = new MultiColumnTable((int)countRowTokens/2, uniqueColumn);
+		int countRowTokens = listTokens.countTokens();
+		MultiColumnTable table = new MultiColumnTable(countRowTokens, uniqueColumn);
 		
 		while (listTokens.hasMoreElements())
 		{
+			
+			
 			String parameterElement = listTokens.nextToken();
+			
+			// calculate the column counter without delimiters
+			int countColumnTokens = new StringTokenizer(
+					parameterElement,
+					LIST_ELEMENT_ATTRIBUTE_DELIMITER, false).countTokens();
+			
+			// we need the delimiters to detect empty values
 			StringTokenizer parameterTokens = new StringTokenizer(
 					parameterElement,
 					LIST_ELEMENT_ATTRIBUTE_DELIMITER, true);
-	
-			// number of columns (tokens / 2 +1) is the index that will be used.
-			int countColumnTokens = ((int)(parameterTokens.countTokens() / 2))+1;
+			
 			// initialize array with empty strings because we 
 			// don't check the values
 			String[] attributes = new String[countColumnTokens];
@@ -368,7 +374,6 @@ public class MultiColumnTable
 			} // end while paramTokens
 	
 			MultiColumnTableRow newRow = table.new MultiColumnTableRow(attributes, table);
-			//addUniqueRowValue(newRow.getColumnValueAt(uniqueColumnIndex));
 			table.add(newRow);
 	
 		} // end while listTokens
