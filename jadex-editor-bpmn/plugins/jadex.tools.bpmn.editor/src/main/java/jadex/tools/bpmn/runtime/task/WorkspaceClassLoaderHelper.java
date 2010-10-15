@@ -211,7 +211,15 @@ class WorkspaceClassLoaderHelper
 							// remove class extension
 							String className = entry.getName().replace("/", ".")
 									.substring(0, entry.getName().length() - 6);
-							classes.add(Class.forName(className));
+
+							// don't add abstract classes or interfaces to this list
+							Class<?> clazz = classLoader.loadClass(className);
+							if (!Modifier.isAbstract(clazz.getModifiers())
+									&& !Modifier.isInterface(clazz.getModifiers()))
+							{
+								classes.add(clazz);
+							}
+							
 						}
 					}
 				} else
