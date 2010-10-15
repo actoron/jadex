@@ -473,8 +473,8 @@ public class BpmnXMLReader
 				{
 					MAnnotation anno = (MAnnotation)annos.get(i);
 					
-					// new jadex parameter handling
-					if("jadex_parameters_table".equals(anno.getSource()))
+					// new jadex parameter handling - we accept ALL "_parameters_table"
+					if(anno.getSource().endsWith("_parameters_table"))
 					{
 						BpmnMultiColumTable table = parseBpmnMultiColumTable(anno
 								.getDetails());
@@ -535,8 +535,10 @@ public class BpmnXMLReader
 						continue;
 					}
 					// new jadex properties handling
-					else if ("jadex_properties_table".equals(anno.getSource()) || 
-								"subProcess_properties_table".equals(anno.getSource()))
+					//else if ("jadex_properties_table".equals(anno.getSource()) || 
+					//			"subProcess_properties_table".equals(anno.getSource()))
+					// we accept ALL "_properties_table"
+					else if (anno.getSource().endsWith("_properties_table"))
 					{
 						BpmnMultiColumTable table = parseBpmnMultiColumTable(anno
 								.getDetails());
@@ -563,104 +565,154 @@ public class BpmnXMLReader
 						continue;
 					}
 					
-					List details = anno.getDetails();
-					if(details!=null)
+					if (!anno.getSource().endsWith("table"))
 					{
-						for(int j=0; j<details.size(); j++)
+						List details = anno.getDetails();
+						if (details != null)
 						{
-							MAnnotationDetail detail = (MAnnotationDetail)details.get(j);
-							
-							String key = detail.getKey();
-							String value = detail.getValue();
-							
-							if("parameters".equals(key))
+							for (int j = 0; j < details.size(); j++)
 							{
-								StringTokenizer stok = new StringTokenizer(value, LIST_ELEMENT_DELIMITER);
-								
-								while(stok.hasMoreTokens())
-								{
-									String paramtext = stok.nextToken();
-									StringTokenizer stok2 = new StringTokenizer(paramtext, LIST_ELEMENT_ATTRIBUTE_DELIMITER);
+								MAnnotationDetail detail = (MAnnotationDetail) details
+										.get(j);
 
-									// Parameters of normal activities have 4 elements
-									int tokcnt = stok2.countTokens();
-									if(tokcnt==3 || tokcnt==4)
+								String key = detail.getKey();
+								String value = detail.getValue();
+
+								// TODO: remove old parameter handling
+								if ("parameters".equals(key))
+								{
+									StringTokenizer stok = new StringTokenizer(
+											value, LIST_ELEMENT_DELIMITER);
+
+									while (stok.hasMoreTokens())
 									{
-										String dir = stok2.nextToken();
-										String name = stok2.nextToken();
-										String clazzname = stok2.nextToken();
-										String val = stok2.hasMoreTokens()? stok2.nextToken(): null;
-										
-										try
+										String paramtext = stok.nextToken();
+										StringTokenizer stok2 = new StringTokenizer(
+												paramtext,
+												LIST_ELEMENT_ATTRIBUTE_DELIMITER);
+
+										// Parameters of normal activities have 4 elements
+										int tokcnt = stok2.countTokens();
+										if (tokcnt == 3 || tokcnt == 4)
 										{
-											Class clazz = SReflect.findClass(clazzname, dia.getAllImports(), context.getClassLoader());
-											IParsedExpression exp = null;
-											if(val!=null && val.length()>0)
+											String dir = stok2.nextToken();
+											String name = stok2.nextToken();
+											String clazzname = stok2
+													.nextToken();
+											String val = stok2.hasMoreTokens() ? stok2
+													.nextToken() : null;
+
+											try
 											{
-												exp = parser.parseExpression(val, dia.getAllImports(), null, context.getClassLoader());
+												Class clazz = SReflect
+														.findClass(
+																clazzname,
+																dia.getAllImports(),
+																context.getClassLoader());
+												IParsedExpression exp = null;
+												if (val != null
+														&& val.length() > 0)
+												{
+													exp = parser
+															.parseExpression(
+																	val,
+																	dia.getAllImports(),
+																	null,
+																	context.getClassLoader());
+												}
+												MParameter param = new MParameter(
+														dir, clazz, name, exp);
+												act.addParameter(param);
+												// System.out.println("Parameter: "+param);
 											}
-											MParameter param = new MParameter(dir, clazz, name, exp);
-											act.addParameter(param);
-//											System.out.println("Parameter: "+param);
+											catch (ClassNotFoundException cnfe)
+											{
+												throw new RuntimeException(cnfe);
+											}
 										}
-										catch(ClassNotFoundException cnfe)
+
+										// Parameters of event handlers have 2 elements = are treated as properties?!
+										else if (tokcnt == 2)
 										{
-											throw new RuntimeException(cnfe);
+											String name = stok2.nextToken();
+											String val = stok2.nextToken();
+
+											// context variable
+											IParsedExpression exp = null;
+											if (val != null && val.length() > 0)
+											{
+												exp = parser
+														.parseExpression(
+																val,
+																dia.getAllImports(),
+																null,
+																context.getClassLoader());
+											}
+											act.setPropertyValue(name, exp);
+											// System.out.println("Parameter/property: "+name+" "+exp);
 										}
-									}
-									
-									// Parameters of event handlers have 2 elements = are treated as properties?!
-									else if(tokcnt==2)
-									{
-										String name = stok2.nextToken();
-										String val = stok2.nextToken();
-										
-										// context variable
-										IParsedExpression exp = null;
-										if(val!=null && val.length()>0)
+										else
 										{
-											exp = parser.parseExpression(val, dia.getAllImports(), null, context.getClassLoader());
+											throw new RuntimeException(
+													"Parameter specification error: "
+															+ stok2.countTokens()
+															+ " " + paramtext);
 										}
-										act.setPropertyValue(name, exp);
-//										System.out.println("Parameter/property: "+name+" "+exp);
-									}
-									else
-									{
-										throw new RuntimeException("Parameter specification error: "+stok2.countTokens()+" "+paramtext);
 									}
 								}
-							}
-							else // property
-							{
-								// Skip empty string (cannot be parsed to anything), for parsing empty string "" need to be used
-								if(!"".equals(value))
+								else
+								// property
 								{
-									if(key.equals("class"))
+									// Skip empty string (cannot be parsed to anything), for parsing empty string "" need to be used
+									if (!"".equals(value))
 									{
-										// Compatibility hack: strip ".class" from value, if present.
-										if(value.endsWith(".class"))
+										if (key.equals("class"))
 										{
-											value	= value.substring(0, value.length()-6);
+											// Compatibility hack: strip ".class" from value, if present.
+											if (value.endsWith(".class"))
+											{
+												value = value.substring(0,
+														value.length() - 6);
+											}
+											try
+											{
+												Class clazz = SReflect
+														.findClass(
+																value,
+																dia.getAllImports(),
+																context.getClassLoader());
+												act.setClazz(clazz);
+											}
+											catch (ClassNotFoundException cnfe)
+											{
+												throw new RuntimeException(cnfe);
+											}
 										}
-										try
+										else if (act instanceof MSubProcess
+												&& "parallel".equals(key))
 										{
-											Class	clazz	= SReflect.findClass(value, dia.getAllImports(), context.getClassLoader());
-											act.setClazz(clazz);
+											IParsedExpression propval = parser
+													.parseExpression(
+															value,
+															dia.getAllImports(),
+															null,
+															context.getClassLoader());
+											((MSubProcess) act)
+													.setSubprocessType(((Boolean) propval
+															.getValue(null))
+															.booleanValue() ? MSubProcess.SUBPROCESSTYPE_PARALLEL
+															: MSubProcess.SUBPROCESSTYPE_NONE);
 										}
-										catch(ClassNotFoundException cnfe)
+										else
 										{
-											throw new RuntimeException(cnfe);
+											IParsedExpression propval = parser
+													.parseExpression(
+															value,
+															dia.getAllImports(),
+															null,
+															context.getClassLoader());
+											act.setPropertyValue(key, propval);
 										}
-									}
-									else if(act	instanceof MSubProcess && "parallel".equals(key))
-									{
-										IParsedExpression propval = parser.parseExpression(value, dia.getAllImports(), null, context.getClassLoader());
-										((MSubProcess)act).setSubprocessType(((Boolean)propval.getValue(null)).booleanValue() ? MSubProcess.SUBPROCESSTYPE_PARALLEL : MSubProcess.SUBPROCESSTYPE_NONE);
-									}
-									else
-									{
-										IParsedExpression propval = parser.parseExpression(value, dia.getAllImports(), null, context.getClassLoader());
-										act.setPropertyValue(key, propval);
 									}
 								}
 							}
@@ -866,9 +918,9 @@ public class BpmnXMLReader
 				{
 					MAnnotation anno = (MAnnotation)annos.get(i);
 					
-					// new mappings parameter handling
+					// new mappings handling - we accept ALL "_mappings_table since a mapping is a mapping :-)
 					// todo: enhance mappings with index?
-					if("sequence_mappings_table".equals(anno.getSource()))
+					if(anno.getSource().endsWith("_mappings_table"))
 					{
 						BpmnMultiColumTable table = parseBpmnMultiColumTable(anno
 								.getDetails());
@@ -899,52 +951,82 @@ public class BpmnXMLReader
 						continue;
 					}
 					
-					List details = anno.getDetails();
-					if(details!=null)
+					if (!anno.getSource().endsWith("table"))
 					{
-						for(int j=0; j<details.size(); j++)
+						List details = anno.getDetails();
+						if (details != null)
 						{
-							MAnnotationDetail detail = (MAnnotationDetail)details.get(j);
-							
-							String key = detail.getKey();
-							String value = detail.getValue();
-							
-							// todo: remove old mappings handling
-							
-							if("mappings".equals(key))
+							for (int j = 0; j < details.size(); j++)
 							{
-								StringTokenizer stok = new StringTokenizer(value, LIST_ELEMENT_DELIMITER);
-								while(stok.hasMoreTokens())
+								MAnnotationDetail detail = (MAnnotationDetail) details
+										.get(j);
+
+								String key = detail.getKey();
+								String value = detail.getValue();
+
+								// TODO: remove old mappings handling
+								if ("mappings".equals(key))
 								{
-									String maptext = stok.nextToken();
-									
-									StringTokenizer stok2 = new StringTokenizer(maptext, LIST_ELEMENT_ATTRIBUTE_DELIMITER);
-									if(stok2.countTokens()==2)
+									StringTokenizer stok = new StringTokenizer(
+											value, LIST_ELEMENT_DELIMITER);
+									while (stok.hasMoreTokens())
 									{
-										String propname = stok2.nextToken();
-										String proptext = stok2.nextToken();
-										
-										IParsedExpression exp = parser.parseExpression(proptext, dia.getAllImports(), null, context.getClassLoader());
-										IParsedExpression iexp	= null;
-	
-										if(propname.endsWith("]") && propname.indexOf("[")!=-1)
+										String maptext = stok.nextToken();
+
+										StringTokenizer stok2 = new StringTokenizer(
+												maptext,
+												LIST_ELEMENT_ATTRIBUTE_DELIMITER);
+										if (stok2.countTokens() == 2)
 										{
-											String	itext	= propname.substring(propname.indexOf("[")+1, propname.length()-1);
-											propname	= propname.substring(0, propname.indexOf("["));
-											iexp	= parser.parseExpression(itext, dia.getAllImports(), null, context.getClassLoader());
+											String propname = stok2.nextToken();
+											String proptext = stok2.nextToken();
+
+											IParsedExpression exp = parser
+													.parseExpression(
+															proptext,
+															dia.getAllImports(),
+															null,
+															context.getClassLoader());
+											IParsedExpression iexp = null;
+
+											if (propname.endsWith("]")
+													&& propname.indexOf("[") != -1)
+											{
+												String itext = propname
+														.substring(
+																propname.indexOf("[") + 1,
+																propname.length() - 1);
+												propname = propname.substring(
+														0,
+														propname.indexOf("["));
+												iexp = parser
+														.parseExpression(
+																itext,
+																dia.getAllImports(),
+																null,
+																context.getClassLoader());
+											}
+
+											edge.addParameterMapping(propname,
+													exp, iexp);
 										}
-	
-										edge.addParameterMapping(propname, exp, iexp);
+										// System.out.println("Mapping: "+propname+" "+exp);
 									}
-//									System.out.println("Mapping: "+propname+" "+exp);
 								}
-							}
-							else if("condition".equals(key) && value!=null && value.length()>0)
-							{
-								IParsedExpression cond = parser.parseExpression(value, dia.getAllImports(), null, context.getClassLoader());
-								edge.setCondition(cond);
-								
-//								System.out.println("Condition: "+key+" "+value);
+								else
+								// todo: remove old mappings handling until here
+
+								if ("condition".equals(key) && value != null
+										&& value.length() > 0)
+								{
+									IParsedExpression cond = parser
+											.parseExpression(value,
+													dia.getAllImports(), null,
+													context.getClassLoader());
+									edge.setCondition(cond);
+
+									// System.out.println("Condition: "+key+" "+value);
+								}
 							}
 						}
 					}
@@ -1113,12 +1195,13 @@ public class BpmnXMLReader
 				{
 					MAnnotation anno = (MAnnotation)annos.get(i);
 					
-					
-					if ("jadex_imports_table".equals(anno.getSource())) {
+					if (anno.getSource().endsWith("_imports_table")) 
+					{
 						BpmnMultiColumTable table = parseBpmnMultiColumTable(anno
 								.getDetails());
 
-						for (int row = 0; row < table.dimension[0]; row++) {
+						for (int row = 0; row < table.dimension[0]; row++) 
+						{
 							// normal import has 1 value
 							assert table.data[row].length == 1;
 
@@ -1137,40 +1220,51 @@ public class BpmnXMLReader
 				{
 					MAnnotation anno = (MAnnotation)annos.get(i);
 
-					List details = anno.getDetails();
-					if(details!=null)
+					if (!anno.getSource().endsWith("table"))
 					{
-						for(int j=0; j<details.size(); j++)
+						List details = anno.getDetails();
+						if (details != null)
 						{
-							MAnnotationDetail detail = (MAnnotationDetail)details.get(j);
-							String key = detail.getKey().toLowerCase();
-							String value = detail.getValue();							
-							// todo: remove old imports handling
-							if("imports".equals(key))
+							for (int j = 0; j < details.size(); j++)
 							{
-								StringTokenizer stok = new StringTokenizer(value, LIST_ELEMENT_DELIMITER);
-								for(int k=0; stok.hasMoreElements(); k++)
+								MAnnotationDetail detail = (MAnnotationDetail) details
+										.get(j);
+								String key = detail.getKey().toLowerCase();
+								String value = detail.getValue();
+								
+								// TODO: remove old imports handling
+								if ("imports".equals(key))
 								{
-									String imp = stok.nextToken().trim();
-									if(imp.length()>0)
-										model.addImport(imp);
+									StringTokenizer stok = new StringTokenizer(
+											value, LIST_ELEMENT_DELIMITER);
+									for (int k = 0; stok.hasMoreElements(); k++)
+									{
+										String imp = stok.nextToken().trim();
+										if (imp.length() > 0)
+											model.addImport(imp);
+									}
+									// System.out.println("Imports: "+SUtil.arrayToString(imps));
 								}
-//								System.out.println("Imports: "+SUtil.arrayToString(imps));
-							}
-							else if("package".equals(key))
-							{
-								model.setPackage(value);
-//								System.out.println("Package: "+value);
+								else 
+								// todo: remove old imports until here
+									
+								if ("package".equals(key))
+								{
+									model.setPackage(value);
+									// System.out.println("Package: "+value);
+								}
 							}
 						}
 					}
 				}
+				
+				
 				for(int i=0; i<annos.size(); i++)
 				{
 					MAnnotation anno = (MAnnotation)annos.get(i);
 					
 					// new jadex arguments handling
-					if("jadex_arguments_table".equals(anno.getSource()))
+					if(anno.getSource().endsWith("_arguments_table"))
 					{
 						BpmnMultiColumTable table = parseBpmnMultiColumTable(anno
 								.getDetails());
@@ -1263,7 +1357,8 @@ public class BpmnXMLReader
 								{
 									throw new RuntimeException("parameters no longer separately");
 								}
-								// todo: remove old arguments handling
+								
+								// TODO: remove old arguments handling
 								else if("arguments".equals(key))
 								{
 									StringTokenizer stok = new StringTokenizer(value, LIST_ELEMENT_DELIMITER);
@@ -1331,6 +1426,8 @@ public class BpmnXMLReader
 								{
 									throw new RuntimeException("results no longer separately");
 								}
+								
+								// TODO: remove old properties handling
 								else if("properties".equals(key))
 								{
 									StringTokenizer stok = new StringTokenizer(value, LIST_ELEMENT_DELIMITER);
