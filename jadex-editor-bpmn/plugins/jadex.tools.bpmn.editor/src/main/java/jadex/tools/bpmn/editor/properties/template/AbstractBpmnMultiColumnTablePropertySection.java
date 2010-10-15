@@ -38,8 +38,10 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 	/** Utility class to hold attribute an element reference */
 	protected JadexBpmnPropertiesUtil util;
 
+	/** The unique column index for this TablePropertySection */
 	private int uniqueColumnIndex;
 
+	/** The table column unique values cache for model elements */
 	private Map<EModelElement, HashSet<String>> uniqueColumnValuesMap;
 
 	// ---- constructor ----
@@ -110,18 +112,18 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 
 		if (modelElement != null)
 		{
-			getUniqueColumnValueCash(modelElement);
+			getUniqueColumnValueCache(modelElement);
 			return;
 		}
 	}
 
 	/**
-	 * Updates the uniqueColumnValueCash for modelElement
+	 * Updates the uniqueColumnValueCache for modelElement
 	 * 
 	 * @param element
 	 * @return
 	 */
-	private HashSet<String> getUniqueColumnValueCash(EModelElement element)
+	private HashSet<String> getUniqueColumnValueCache(EModelElement element)
 	{
 		if (uniqueColumnValuesMap.containsKey(modelElement))
 		{
@@ -151,8 +153,8 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 			{
 
 				MultiColumnTableRow newRow;
-				HashSet<String> uniqueValueCash = getUniqueColumnValueCash(modelElement);
-				synchronized (uniqueValueCash)
+				HashSet<String> uniqueValueCache = getUniqueColumnValueCache(modelElement);
+				synchronized (uniqueValueCache)
 				{
 					MultiColumnTable table = getTableFromAnnotation();
 					newRow = table.new MultiColumnTableRow(
@@ -183,14 +185,14 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 					IProgressMonitor monitor, IAdaptable info)
 					throws ExecutionException
 			{
-				HashSet<String> uniqueValueCash = getUniqueColumnValueCash(modelElement);
-				synchronized (uniqueValueCash)
+				HashSet<String> uniqueValueCache = getUniqueColumnValueCache(modelElement);
+				synchronized (uniqueValueCache)
 				{
 					MultiColumnTableRow rowToRemove = (MultiColumnTableRow) ((IStructuredSelection) tableViewer
 							.getSelection()).getFirstElement();
 
 					MultiColumnTable tableRowList = getTableFromAnnotation();
-					uniqueValueCash
+					uniqueValueCache
 							.remove(rowToRemove.getColumnValues()[uniqueColumnIndex]);
 					tableRowList.remove(rowToRemove);
 					updateTableAnnotation(tableRowList);
@@ -215,8 +217,8 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 					throws ExecutionException
 			{
 
-				HashSet<String> uniqueValueCash = getUniqueColumnValueCash(modelElement);
-				synchronized (uniqueValueCash)
+				HashSet<String> uniqueValueCache = getUniqueColumnValueCache(modelElement);
+				synchronized (uniqueValueCache)
 				{
 					MultiColumnTableRow rowToMove = (MultiColumnTableRow) ((IStructuredSelection) tableViewer
 							.getSelection()).getFirstElement();
@@ -251,8 +253,8 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 					IProgressMonitor monitor, IAdaptable info)
 					throws ExecutionException
 			{
-				HashSet<String> uniqueValueCash = getUniqueColumnValueCash(modelElement);
-				synchronized (uniqueValueCash)
+				HashSet<String> uniqueValueCache = getUniqueColumnValueCache(modelElement);
+				synchronized (uniqueValueCache)
 				{
 					MultiColumnTableRow rowToMove = (MultiColumnTableRow) ((IStructuredSelection) tableViewer
 							.getSelection()).getFirstElement();
@@ -287,11 +289,11 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 					IProgressMonitor monitor, IAdaptable info)
 					throws ExecutionException
 			{
-				HashSet<String> uniqueValueCash = getUniqueColumnValueCash(modelElement);
-				synchronized (uniqueValueCash)
+				HashSet<String> uniqueValueCache = getUniqueColumnValueCache(modelElement);
+				synchronized (uniqueValueCache)
 				{
 					updateTableAnnotation(null);
-					uniqueValueCash.clear();
+					uniqueValueCache.clear();
 				}
 
 				return CommandResult.newOKCommandResult(null);
@@ -333,14 +335,14 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 	{
 		assert (row != null && table != null);
 
-		HashSet<String> uniqueValueCash = getUniqueColumnValueCash(modelElement);
-		synchronized (uniqueValueCash)
+		HashSet<String> uniqueValueCache = getUniqueColumnValueCache(modelElement);
+		synchronized (uniqueValueCache)
 		{
 			String uniqueColumnValue = row.getColumnValues()[uniqueColumnIndex];
 
 			int counter = 1;
 			String uniqueValueToUse = uniqueColumnValue;
-			while (uniqueValueCash.contains(uniqueValueToUse))
+			while (uniqueValueCache.contains(uniqueValueToUse))
 			{
 				uniqueValueToUse = uniqueColumnValue + counter;
 				counter++;
@@ -353,19 +355,19 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 
 	private boolean addUniqueRowValue(String uniqueValue)
 	{
-		HashSet<String> uniqueValueCash = getUniqueColumnValueCash(modelElement);
-		synchronized (uniqueValueCash)
+		HashSet<String> uniqueValueCache = getUniqueColumnValueCache(modelElement);
+		synchronized (uniqueValueCache)
 		{
-			return uniqueValueCash.add(uniqueValue);
+			return uniqueValueCache.add(uniqueValue);
 		}
 	}
 
 	private boolean removeUniqueRowValue(String uniqueValue)
 	{
-		HashSet<String> uniqueValueCash = getUniqueColumnValueCash(modelElement);
-		synchronized (uniqueValueCash)
+		HashSet<String> uniqueValueCache = getUniqueColumnValueCache(modelElement);
+		synchronized (uniqueValueCache)
 		{
-			return uniqueValueCash.remove(uniqueValue);
+			return uniqueValueCache.remove(uniqueValue);
 		}
 	}
 
@@ -553,8 +555,8 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 						if (!newValue
 								.equals(rowToEdit.getColumnValues()[attributeIndex]))
 						{
-							HashSet<String> uniqueValueCash = getUniqueColumnValueCash(modelElement);
-							synchronized (uniqueValueCash)
+							HashSet<String> uniqueValueCache = getUniqueColumnValueCache(modelElement);
+							synchronized (uniqueValueCache)
 							{
 								removeUniqueRowValue(rowToEdit
 										.getColumnValues()[uniqueColumnIndex]);
