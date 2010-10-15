@@ -224,44 +224,71 @@ public class JadexBpmnPropertiesUtil
 		{
 			return false;
 		}
-
-			// update or create the annotation / detail
-			ModifyEObjectCommand command = new ModifyEObjectCommand(
-					element, Messages.JadexCommonPropertySection_update_eannotation_command_name)
+		
+		
+		// update or create the annotation / detail
+		ModifyEObjectCommand command = new ModifyEObjectCommand(
+				element, Messages.JadexCommonPropertySection_update_eannotation_command_name)
+		{
+			@Override
+			protected CommandResult doExecuteWithResult(
+					IProgressMonitor arg0, IAdaptable arg1)
+					throws ExecutionException
 			{
-				@Override
-				protected CommandResult doExecuteWithResult(
-						IProgressMonitor arg0, IAdaptable arg1)
-						throws ExecutionException
+				
+				EAnnotation annotation = element.getEAnnotation(annotationIdentifier);
+
+				// use only lower case identifier strings!
+				String lcAnnotationIdentifier = annotationIdentifier.toLowerCase();
+				String lcAnnotationDetail = annotationDetail.toLowerCase();
+				
+				// change upper case annotation identifier
+				if (!lcAnnotationIdentifier.equals(annotationIdentifier))
 				{
-					
-					EAnnotation annotation = element.getEAnnotation(annotationIdentifier);
-					if (annotation == null)
-					{
-						annotation = EcoreFactory.eINSTANCE.createEAnnotation();
-						annotation.setSource(annotationIdentifier);
-						annotation.setEModelElement(element);
-						// TODO: maybe remove empty string -- see also below
-						annotation.getDetails().put(annotationDetail, ""); //$NON-NLS-1$
-					}
-					
-					// TODO: maybe check isEmpty and remove detail with empty string?
-					if (value != null /*&& !value.isEmpty()*/)
-					{
-						annotation.getDetails().put(annotationDetail, value);
-					}
-					else
-					{
-						annotation.getDetails().removeKey(annotationDetail);
-						if (annotation.getDetails().isEmpty())
-						{
-							element.getEAnnotations().remove(annotation);
-						}
-					}
-					
-					return CommandResult.newOKCommandResult();
+					element.getEAnnotations().remove(annotation);
+					annotation.setSource(lcAnnotationIdentifier);
+					element.getEAnnotations().add(annotation);
 				}
-			};
+				
+				// change upper case annotation identifier
+				if (!lcAnnotationDetail.equals(annotationDetail))
+				{
+					String value = annotation.getDetails().removeKey(annotationDetail);
+					if (value != null)
+					{
+						annotation.getDetails().put(lcAnnotationDetail, value);
+					}
+				}
+				
+				
+				if (annotation == null)
+				{
+					annotation = EcoreFactory.eINSTANCE.createEAnnotation();
+					annotation.setSource(lcAnnotationIdentifier);
+					annotation.setEModelElement(element);
+					// TODO: maybe remove empty string -- see also below
+					annotation.getDetails().put(lcAnnotationDetail, ""); //$NON-NLS-1$
+				}
+				
+				// TODO: maybe check isEmpty and remove detail with empty string?
+				if (value != null /*&& !value.isEmpty()*/)
+				{
+					annotation.getDetails().put(lcAnnotationDetail, value);
+				}
+				else
+				{
+					annotation.getDetails().removeKey(lcAnnotationDetail);
+					if (annotation.getDetails().isEmpty())
+					{
+						element.getEAnnotations().remove(annotation);
+					}
+				}
+				
+				return CommandResult.newOKCommandResult();
+			}
+			
+			
+		};
 
 		
 		// execute command
@@ -293,7 +320,7 @@ public class JadexBpmnPropertiesUtil
 		{
 			return null;
 		}
-	
+		
 		EAnnotation annotation = element.getEAnnotation(annotationIdentifier);
 		if (annotation != null)
 		{
