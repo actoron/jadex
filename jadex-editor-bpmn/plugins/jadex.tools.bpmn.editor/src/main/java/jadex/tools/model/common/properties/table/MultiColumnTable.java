@@ -318,20 +318,17 @@ public class MultiColumnTable
 		
 		while (listTokens.hasMoreElements())
 		{
-			
-			
+
 			String parameterElement = listTokens.nextToken();
-			
-			// calculate the column counter without delimiters
-			int countColumnTokens = new StringTokenizer(
-					parameterElement,
-					LIST_ELEMENT_ATTRIBUTE_DELIMITER, false).countTokens();
-			
-			// we need the delimiters to detect empty values
 			StringTokenizer parameterTokens = new StringTokenizer(
 					parameterElement,
 					LIST_ELEMENT_ATTRIBUTE_DELIMITER, true);
-			
+	
+			// number of columns (tokens / 2 +1) is the index that will be used.
+			// This IS NEEDED due to we have to expect that count tokens without 
+			// delimiter may return one less than needed when the last element of
+			// a line is empty.
+			int countColumnTokens = ((int)(parameterTokens.countTokens() / 2))+1;
 			// initialize array with empty strings because we 
 			// don't check the values
 			String[] attributes = new String[countColumnTokens];
@@ -343,35 +340,42 @@ public class MultiColumnTable
 			int attributeIndexCounter = 0;	
 			String lastToken = null;
 	
-			while (parameterTokens.hasMoreElements())
+			try
 			{
-				String attributeToken = parameterTokens.nextToken();
-	
-				if (!attributeToken.equals(LIST_ELEMENT_ATTRIBUTE_DELIMITER))
+				while (parameterTokens.hasMoreElements())
 				{
-					attributes[attributeIndexCounter] = attributeToken;
-					attributeIndexCounter++;
-				}
-				// we found a delimiter
-				else
-				{
-					if (	// we found a delimiter at the first position
-							lastToken == null 
-							// we found a delimiter at the last position, 
-							|| !parameterTokens.hasMoreElements()
-							// we found two delimiter without any content between
-							|| attributeToken.equals(lastToken))
+					String attributeToken = parameterTokens.nextToken();
+
+					if (!attributeToken.equals(LIST_ELEMENT_ATTRIBUTE_DELIMITER))
 					{
-						attributes[attributeIndexCounter] = "";
+						attributes[attributeIndexCounter] = attributeToken;
 						attributeIndexCounter++;
 					}
-					
-				}
-	
-				// remember last token
-				lastToken = attributeToken;
-	
-			} // end while paramTokens
+					// we found a delimiter
+					else
+					{
+						if (	// we found a delimiter at the first position
+								lastToken == null 
+								// we found a delimiter at the last position, 
+								|| !parameterTokens.hasMoreElements()
+								// we found two delimiter without any content between
+								|| attributeToken.equals(lastToken))
+						{
+							attributes[attributeIndexCounter] = "";
+							attributeIndexCounter++;
+						}
+						
+					}
+
+					// remember last token
+					lastToken = attributeToken;
+
+				} // end while paramTokens
+			}
+			catch (ArrayIndexOutOfBoundsException e)
+			{
+				e.printStackTrace();
+			}
 	
 			MultiColumnTableRow newRow = table.new MultiColumnTableRow(attributes, table);
 			table.add(newRow);
