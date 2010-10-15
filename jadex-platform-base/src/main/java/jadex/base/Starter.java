@@ -54,7 +54,7 @@ public class Starter
 	
 	/** The adapter factory classname. */
 	public static final String ADAPTER_FACTORY = "adapterfactory";
-
+	
 	
 	/** The reserved platform parameters. */
 	public static final Set RESERVED;
@@ -161,7 +161,7 @@ public class Starter
 				}
 			}
 			
-			IComponentIdentifier cid = new ComponentIdentifier(platformname);
+			final IComponentIdentifier cid = new ComponentIdentifier(platformname);
 			// Hack!!! Autoshutdown!?
 			final CMSComponentDescription desc = new CMSComponentDescription(cid, cfac.getComponentType(
 				configfile, null, cl), null, false, false, true, model.getFullName());
@@ -183,7 +183,7 @@ public class Starter
 //					System.out.println("Instance: "+instance);
 					
 					long startup = System.currentTimeMillis() - starttime;
-					System.out.println("Platform startup time: " + startup + " ms.");
+					System.out.println(cid+" platform startup time: " + startup + " ms.");
 			//		platform.logger.info("Platform startup time: " + startup + " ms.");
 					
 					ret.setResult(instance.getExternalAccess());

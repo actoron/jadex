@@ -12,7 +12,7 @@ public interface IDaemonService
 	 *  Start a platform using a configuration.
 	 *  @param args The arguments.
 	 */
-	public IFuture startPlatform(String[] args);
+	public IFuture startPlatform(StartOptions options);
 	
 	/**
 	 *  Shutdown a platform.

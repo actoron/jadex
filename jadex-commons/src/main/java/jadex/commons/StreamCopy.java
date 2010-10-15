@@ -15,10 +15,12 @@ public class StreamCopy	implements Runnable
 
 	/** The source stream. */
 	protected InputStream	source;
+//	protected BufferedReader reader;
 
 	/** The target stream. */
 	protected OutputStream	target;
 
+	
 	//-------- constructors --------
 
 	/**
@@ -28,10 +30,37 @@ public class StreamCopy	implements Runnable
 	{
 		this.source	= source;
 		this.target	= target;
+//		this.reader = new BufferedReader(new InputStreamReader(source));
 	}
 
 	//-------- Runnable interface --------
 
+	/**
+	 *  Copy data from source to target.
+	 * /
+	public void	run()
+	{
+		try
+		{
+			String data;
+			while((data=reader.readLine())!=null)
+			{
+				target.write(data.getBytes());
+			}
+		}
+		catch(IOException e)
+		{
+			StringWriter sw = new StringWriter();
+			e.printStackTrace(new PrintWriter(sw));
+			throw new RuntimeException(sw.toString());
+		}
+		finally
+		{
+			try{reader.close();}catch(Throwable e){}
+			try{target.close();}catch(Throwable e){}
+		}
+	}*/
+	
 	/**
 	 *  Copy data from source to target.
 	 */
@@ -40,7 +69,7 @@ public class StreamCopy	implements Runnable
 		try
 		{
 			int	cnt;
-			byte[]	buf	= new byte[4096];
+			byte[] buf = new byte[4096];
 			while((cnt=source.read(buf))!=-1)
 			{
 				target.write(buf, 0, cnt);
@@ -48,7 +77,7 @@ public class StreamCopy	implements Runnable
 		}
 		catch(IOException e)
 		{
-			StringWriter	sw	= new StringWriter();
+			StringWriter sw = new StringWriter();
 			e.printStackTrace(new PrintWriter(sw));
 			throw new RuntimeException(sw.toString());
 		}

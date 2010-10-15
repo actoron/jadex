@@ -1651,5 +1651,27 @@ public class SUtil
 		return buffer;
 	}
 
+	/**
+	 *  Convert an URL to a local file name.
+	 *  @param url The url.
+	 *  @return The absolute path to the url resource.
+	 */
+	public static String convertURLToString(URL url)
+	{
+		String file = url.getFile();
+		File f = new File(file);
+		
+		// Hack!!! Above code doesnt handle relative url paths. 
+		if(!f.exists())
+		{
+			File newfile = new File(new File("."), file);
+			if(newfile.exists())
+			{
+				f = newfile;
+			}
+		}
+		
+		return f.getAbsolutePath();
+	}
 	
 }

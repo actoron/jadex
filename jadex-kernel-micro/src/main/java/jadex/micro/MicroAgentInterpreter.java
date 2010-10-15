@@ -265,7 +265,7 @@ public class MicroAgentInterpreter implements IComponentInstance
 	public void messageArrived(final IMessageAdapter message)
 	{
 //		System.out.println("msgrec: "+getAgentAdapter().getComponentIdentifier()+" "+message);
-		scheduleStep(new ICommand()
+		IFuture ret = scheduleStep(new ICommand()
 		{
 			public void execute(Object agent)
 			{
@@ -275,6 +275,12 @@ public class MicroAgentInterpreter implements IComponentInstance
 			public String toString()
 			{
 				return "microagent.messageArrived("+message+")_#"+this.hashCode();
+			}
+		});
+		ret.addResultListener(new DefaultResultListener(adapter.getLogger())
+		{
+			public void resultAvailable(Object source, Object result)
+			{
 			}
 		});
 	}
