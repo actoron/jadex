@@ -149,7 +149,7 @@
 							new
 							ServiceAgentType("normal",0.5,0.5,0.5),
 							new
-							ServiceAgentType("billig",0.3,0.5,0.9),
+							ServiceAgentType("billig",0.3,0.5,0.999),
 							new
 							ServiceAgentType("teuer",0.7,0.5,0.1)																															
 							<!--
