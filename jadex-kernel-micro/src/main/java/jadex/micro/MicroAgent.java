@@ -10,6 +10,7 @@ import jadex.bridge.MessageType;
 import jadex.commons.Future;
 import jadex.commons.ICommand;
 import jadex.commons.IFuture;
+import jadex.commons.IResultCommand;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
@@ -455,6 +456,16 @@ public abstract class MicroAgent implements IMicroAgent
 	public void	scheduleStep(ICommand step)
 	{
 		interpreter.scheduleStep(step);
+	}
+	
+	/**
+	 *  Schedule a step of the agent.
+	 *  May safely be called from external threads.
+	 *  @param step	Code to be executed as a step of the agent.
+	 */
+	public IFuture scheduleResultStep(IResultCommand step)
+	{
+		return interpreter.scheduleResultStep(step);		
 	}
 	
 	/**

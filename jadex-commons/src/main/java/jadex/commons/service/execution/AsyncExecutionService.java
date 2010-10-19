@@ -22,6 +22,10 @@ import java.util.Set;
  */
 public class AsyncExecutionService	extends BasicService implements IExecutionService
 {
+//	//-------- static part --------
+//	
+//	public static MultiCollection	DEBUG	= new MultiCollection();
+	
 	//-------- attributes --------
 	
 	/** The threadpool. */
@@ -91,6 +95,10 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 	 */
 	public synchronized void execute(final IExecutable task)
 	{	
+//		synchronized(DEBUG)
+//		{
+//			DEBUG.put(task, "execute called");
+//		}
 		//System.out.println("execute called: "+task);
 		if(!isValid())
 			throw new RuntimeException("Not running: "+task);
@@ -102,6 +110,10 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 
 		if(exe==null)
 		{
+//			synchronized(DEBUG)
+//			{
+//				DEBUG.put(task, "creating executor");
+//			}
 //			System.out.println("Created executor for:"+task);
 //			if(executorcache.size()>0)
 //			{
@@ -112,6 +124,21 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 //			{
 				exe = new Executor(threadpool, task)
 				{
+					// Hack!!! overwritten for debugging.
+					protected boolean code()
+					{
+//						synchronized(DEBUG)
+//						{
+//							DEBUG.put(task, "executing code(): "+this);
+//						}
+						boolean	ret	= super.code();
+//						synchronized(DEBUG)
+//						{						
+//							DEBUG.put(task, "code() finished: "+this);
+//						}
+						return ret;
+					}
+					
 					// Hack!!! overwritten to know, when executor ends.
 					public void run()
 					{
@@ -154,11 +181,19 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 					}					
 				};
 //			}
+//			synchronized(DEBUG)
+//			{
+//				DEBUG.put(task, "new executor: "+exe);
+//			}
 			executors.put(task, exe);
 		}
 	
 		if(running)
 		{
+//			synchronized(DEBUG)
+//			{
+//				DEBUG.put(task, "calling execute(): "+exe);
+//			}
 //			System.out.println("Executing for: "+task+", "+exe);
 			exe.execute();
 		}

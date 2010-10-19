@@ -4,7 +4,6 @@ import jadex.application.model.MApplicationType;
 import jadex.commons.AbstractModelLoader;
 import jadex.commons.ICacheableModel;
 import jadex.commons.ResourceInfo;
-import jadex.commons.service.SServiceProvider;
 
 import java.util.Set;
 

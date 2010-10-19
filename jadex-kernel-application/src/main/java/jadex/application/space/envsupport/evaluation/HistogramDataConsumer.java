@@ -61,7 +61,10 @@ public class HistogramDataConsumer extends AbstractChartDataConsumer
 			double hv = high.doubleValue();
 			double bsize = (hv-lv)/cnt;
 			for(int i=0; i<cnt; i++)
+			{
+				System.out.println("lower: "+lv+(i*bsize)+", upper: "+lv+((i+1)*bsize));
 				dataset.addBin(new SimpleHistogramBin(lv+(i*bsize), lv+((i+1)*bsize), true, false));
+			}
 		}
 		else
 		{

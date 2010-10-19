@@ -140,6 +140,7 @@ public class ConversationPlugin extends AbstractJCCPlugin
 		comptree = new ComponentTreePanel(getJCC().getServiceProvider());
 		comptree.setMinimumSize(new Dimension(0, 0));
 		split.add(comptree);
+		convcenter = new FipaConversationPanel(((AgentControlCenter)getJCC()).getAgent(), comptree);
 		comptree.addNodeHandler(new INodeHandler()
 		{
 			public Action[] getPopupActions(IComponentTreeNode[] nodes)
@@ -193,7 +194,7 @@ public class ConversationPlugin extends AbstractJCCPlugin
 			}
 		});
 
-		split.add(convcenter = new FipaConversationPanel(((AgentControlCenter)getJCC()).getAgent(), comptree));
+		split.add(convcenter);
 
 		SHelp.setupHelp(split, "tools.conversationcenter");
 

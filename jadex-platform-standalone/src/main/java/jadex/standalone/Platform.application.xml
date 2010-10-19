@@ -220,7 +220,11 @@
 			</arguments>
 			<components>
 				<component type="kernel_micro" daemon="true"/>
-				<component type="CreationMicro"/>
+				<component type="CreationMicro">
+					<arguments>
+						<argument name="max">10000</argument>
+					</arguments>
+				</component>
 			</components>
 		</application>
 

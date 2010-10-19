@@ -499,15 +499,23 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	 */
 	public boolean	execute()
 	{
+//		synchronized(AsyncExecutionService.DEBUG)
+//		{
+//			AsyncExecutionService.DEBUG.put(this, "adapter execute()");
+//		}
+		
 //		System.out.println("entering exe: "+getComponentIdentifier());
 		if(executing)
 		{
-			System.err.println("double execution: "+getComponentIdentifier());
-			rte.printStackTrace();
+			System.err.println(getComponentIdentifier()+": double execution");
+//			List	debug	= (List)AsyncExecutionService.DEBUG.getCollection(this);
+//			for(int i=0; i<debug.size(); i++)
+//				System.err.println(getComponentIdentifier()+": "+debug.get(i));
+//			rte.printStackTrace();
 			new RuntimeException("executing: "+getComponentIdentifier()).printStackTrace();
 		}
-		rte	= new RuntimeException("executing: "+getComponentIdentifier());
-		rte.fillInStackTrace();
+//		rte	= new RuntimeException("executing: "+getComponentIdentifier());
+//		rte.fillInStackTrace();
 		executing	= true;
 		wokenup	= false;	
 		
@@ -515,46 +523,66 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 		// component itself is currently running. I.e. it cannot be ensured easily
 		// that an execution task is enqueued and the component has terminated
 		// meanwhile.
-		if(IComponentDescription.STATE_TERMINATED.equals(desc.getState()))
-			return false;
-		
-		if(fatalerror)
-			throw new ComponentTerminatedException(cid.getName());
-
-		// Remember execution thread.
-		this.componentthread	= Thread.currentThread();
-		
-		ClassLoader	cl	= componentthread.getContextClassLoader();
-		componentthread.setContextClassLoader(model.getClassLoader());
-
-		getCMS().addResultListener(new DefaultResultListener()
+		boolean	ret;
+		if(!IComponentDescription.STATE_TERMINATED.equals(desc.getState()))
 		{
-			public void resultAvailable(Object source, Object result)
+			if(fatalerror)
+				throw new ComponentTerminatedException(cid.getName());
+	
+			// Remember execution thread.
+			this.componentthread	= Thread.currentThread();
+			
+			ClassLoader	cl	= componentthread.getContextClassLoader();
+			componentthread.setContextClassLoader(model.getClassLoader());
+	
+			getCMS().addResultListener(new DefaultResultListener()
 			{
-				if(result!=null)	// may be null during platform init 
-					((ComponentManagementService)result).setProcessingState(cid, IComponentDescription.PROCESSINGSTATE_RUNNING);
+				public void resultAvailable(Object source, Object result)
+				{
+					if(result!=null)	// may be null during platform init 
+						((ComponentManagementService)result).setProcessingState(cid, IComponentDescription.PROCESSINGSTATE_RUNNING);
+				}
+			});
+			
+			// Copy actions from external threads into the state.
+			// Is done in before tool check such that tools can see external actions appearing immediately (e.g. in debugger).
+			boolean	extexecuted	= false;
+			Runnable[]	entries	= null;
+			synchronized(ext_entries)
+			{
+				if(!(ext_entries.isEmpty()))
+				{
+					entries	= (Runnable[])ext_entries.toArray(new Runnable[ext_entries.size()]);
+					ext_entries.clear();
+					
+					extexecuted	= true;
+				}
 			}
-		});
-		
-		// Copy actions from external threads into the state.
-		// Is done in before tool check such that tools can see external actions appearing immediately (e.g. in debugger).
-		boolean	extexecuted	= false;
-		Runnable[]	entries	= null;
-		synchronized(ext_entries)
-		{
-			if(!(ext_entries.isEmpty()))
+			for(int i=0; entries!=null && i<entries.length; i++)
 			{
-				entries	= (Runnable[])ext_entries.toArray(new Runnable[ext_entries.size()]);
-				ext_entries.clear();
-				
-				extexecuted	= true;
-			}
-		}
-		for(int i=0; entries!=null && i<entries.length; i++)
-		{
-			if(entries[i] instanceof CheckedAction)
-			{
-				if(((CheckedAction)entries[i]).isValid())
+				if(entries[i] instanceof CheckedAction)
+				{
+					if(((CheckedAction)entries[i]).isValid())
+					{
+						try
+						{
+							entries[i].run();
+						}
+						catch(Exception e)
+						{
+							fatalError(e);
+						}
+					}
+					try
+					{
+						((CheckedAction)entries[i]).cleanup();
+					}
+					catch(Exception e)
+					{
+						fatalError(e);
+					}
+				}
+				else //if(entries[i] instanceof Runnable)
 				{
 					try
 					{
@@ -562,71 +590,15 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 					}
 					catch(Exception e)
 					{
+	//					e.printStackTrace();
 						fatalError(e);
 					}
 				}
-				try
-				{
-					((CheckedAction)entries[i]).cleanup();
-				}
-				catch(Exception e)
-				{
-					fatalError(e);
-				}
 			}
-			else //if(entries[i] instanceof Runnable)
-			{
-				try
-				{
-					entries[i].run();
-				}
-				catch(Exception e)
-				{
-//					e.printStackTrace();
-					fatalError(e);
-				}
-			}
-		}
-
-		// Suspend when breakpoint is triggered.
-		boolean	breakpoint_triggered	= false;
-		if(!dostep && !IComponentDescription.STATE_SUSPENDED.equals(desc.getState()))
-		{
-			if(component.isAtBreakpoint(desc.getBreakpoints()))
-			{
-				breakpoint_triggered	= true;
-				getCMS().addResultListener(new DefaultResultListener()
-				{
-					public void resultAvailable(Object source, Object result)
-					{
-						((IComponentManagementService)result).suspendComponent(cid);
-					}
-				});
-			}
-		}
-		
-		if(!breakpoint_triggered && !extexecuted && (!IComponentDescription.STATE_SUSPENDED.equals(desc.getState()) || dostep))
-		{
-			try
-			{
-//				System.out.println("Executing: "+component);
-				again	= component.executeStep();
-			}
-			catch(Exception e)
-			{
-				fatalError(e);
-			}
-			if(dostep)
-			{
-				dostep	= false;
-				if(stepfuture!=null)
-				{
-					stepfuture.setResult(desc);
-				}
-			}
-			
+	
 			// Suspend when breakpoint is triggered.
-			if(!IComponentDescription.STATE_SUSPENDED.equals(desc.getState()))
+			boolean	breakpoint_triggered	= false;
+			if(!dostep && !IComponentDescription.STATE_SUSPENDED.equals(desc.getState()))
 			{
 				if(component.isAtBreakpoint(desc.getBreakpoints()))
 				{
@@ -640,26 +612,73 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 					});
 				}
 			}
-		}
-		
-		final boolean	ready	= again && !breakpoint_triggered || extexecuted || wokenup;
-		getCMS().addResultListener(new DefaultResultListener()
-		{
-			public void resultAvailable(Object source, Object result)
+			
+			if(!breakpoint_triggered && !extexecuted && (!IComponentDescription.STATE_SUSPENDED.equals(desc.getState()) || dostep))
 			{
-				((ComponentManagementService)result).setProcessingState(cid, ready
-					? IComponentDescription.PROCESSINGSTATE_READY : IComponentDescription.PROCESSINGSTATE_IDLE);
+				try
+				{
+	//				System.out.println("Executing: "+component);
+					again	= component.executeStep();
+				}
+				catch(Exception e)
+				{
+					fatalError(e);
+				}
+				if(dostep)
+				{
+					dostep	= false;
+					if(stepfuture!=null)
+					{
+						stepfuture.setResult(desc);
+					}
+				}
+				
+				// Suspend when breakpoint is triggered.
+				if(!IComponentDescription.STATE_SUSPENDED.equals(desc.getState()))
+				{
+					if(component.isAtBreakpoint(desc.getBreakpoints()))
+					{
+						breakpoint_triggered	= true;
+						getCMS().addResultListener(new DefaultResultListener()
+						{
+							public void resultAvailable(Object source, Object result)
+							{
+								((IComponentManagementService)result).suspendComponent(cid);
+							}
+						});
+					}
+				}
 			}
-		});
+			
+			final boolean	ready	= again && !breakpoint_triggered || extexecuted || wokenup;
+			getCMS().addResultListener(new DefaultResultListener()
+			{
+				public void resultAvailable(Object source, Object result)
+				{
+					((ComponentManagementService)result).setProcessingState(cid, ready
+						? IComponentDescription.PROCESSINGSTATE_READY : IComponentDescription.PROCESSINGSTATE_IDLE);
+				}
+			});
 
-		// Reset execution thread.
-		componentthread.setContextClassLoader(cl);
-		this.componentthread = null;
+			// Reset execution thread.
+			componentthread.setContextClassLoader(cl);
+			this.componentthread = null;		
+
+			ret	= (again && !IComponentDescription.STATE_SUSPENDED.equals(desc.getState())) || extexecuted;
+		}
+		else
+		{
+			ret	= false;
+		}
 		
 //		System.out.println("end: "+getComponentIdentifier());
 		executing	= false;
-
-		return (again && !IComponentDescription.STATE_SUSPENDED.equals(desc.getState())) || extexecuted;
+//		synchronized(AsyncExecutionService.DEBUG)
+//		{
+//			AsyncExecutionService.DEBUG.put(this, "adapter execute() finished");
+//		}
+		
+		return ret;
 	}
 
 	/**
