@@ -1,8 +1,10 @@
 package jadex.tools.daemon;
 
+import jadex.base.Starter;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IArgument;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IExternalAccess;
 import jadex.commons.ChangeEvent;
 import jadex.commons.Future;
 import jadex.commons.IChangeListener;
@@ -68,16 +70,6 @@ public class DaemonAgent extends MicroAgent
 	{
 		final Future ret = new Future();
 		
-		IResultListener lis = new DelegationResultListener(ret)
-		{
-			public void customResultAvailable(Object source, Object result)
-			{
-				Object[] res = (Object[])result;
-				platforms.put(res[0], res[1]);
-				super.customResultAvailable(source, result);
-			}
-		};
-		
 		final StartOptions options = opt==null? new StartOptions(): opt;
 		
 		if(options.getMain()==null)
@@ -123,6 +115,33 @@ public class DaemonAgent extends MicroAgent
 	
 		return ret;
 	}
+	
+	/**
+	 *  Start a platform using a configuration.
+	 *  @param args The arguments.
+	 * /
+	public IFuture startPlatform(StartOptions opt)
+	{
+		final Future ret = new Future();
+		
+		// Start platform in the same VM.
+		Starter.createPlatform(args).addResultListener(new IResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				IExternalAccess platform = (IExternalAccess)result;
+				platforms.put(platform.getComponentIdentifier(), platform);
+				ret.setResult(result);
+			}
+			
+			public void exceptionOccurred(Object source, Exception exception)
+			{
+				ret.setException(exception);
+			}
+		});
+		
+		return ret;
+	}*/
 	
 	/**
 	 * 
@@ -245,22 +264,6 @@ public class DaemonAgent extends MicroAgent
 			ex.printStackTrace();
 			throw new RuntimeException("Could not start process. Reason: "+ex.getMessage());
 		}
-		
-		// Start platform in the same VM.
-	//	Starter.createPlatform(args).addResultListener(new IResultListener()
-	//	{
-	//		public void resultAvailable(Object source, Object result)
-	//		{
-	//			IExternalAccess platform = (IExternalAccess)result;
-	//			platforms.put(platform.getComponentIdentifier(), platform);
-	//			ret.setResult(result);
-	//		}
-	//		
-	//		public void exceptionOccurred(Object source, Exception exception)
-	//		{
-	//			ret.setException(exception);
-	//		}
-	//	});
 		
 		return ret;
 	}

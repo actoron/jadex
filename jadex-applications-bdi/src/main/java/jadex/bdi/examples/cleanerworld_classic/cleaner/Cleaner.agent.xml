@@ -115,7 +115,7 @@
 	</beliefs>
 
 	<goals>
-			<!-- Top-level goals -->
+		<!-- Top-level goals -->
 
 		<!-- Observe the battery state. -->
 		<maintaingoal name="maintainbatteryloaded">
@@ -153,25 +153,10 @@
 			<unique/>
 			<creationcondition language="jcl">
 				Waste $waste
-			
-				// ?rbeliefset = (beliefset (element_has_model ?mbeliefset) (beliefset_has_facts $?x ?waste $?y))
-				// ?mbeliefset = (mbeliefset (melement_has_name "wastes"))
-				// 
-				// // unique (?rcapa and ?mgoal are provided internally)
-				// (not (and
-				// 	?rparam = (parameter (parameter_has_name "waste") (parameter_has_value ?waste))
-				// 	?adopted = (goal (element_has_model ?mgoal) (parameterelement_has_parameters contains ?rparam))
-				// 	?rcapa = (capability (capability_has_goals contains ?adopted))
-				// 	// ?adopted = (goal (element_has_model ?mgoal) (parameterelement_has_parameters $?x ?rparam $?y))
-				// 	//?rparam = (parameter (parameter_has_name "waste") (parameter_has_value ?waste))
-				// ))
 			</creationcondition>
 			<!-- Suspend the goal when it is night. -->
 			<contextcondition language="jcl">
 				$beliefbase.daytime
-				
-				// ?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact true))
-				// ?mbelief = (mbelief (melement_has_name "daytime"))
  			</contextcondition>
 			<!-- The goal will be dropped when
  				the agent currently walks to the waste and the waste has vanished. -->
@@ -180,18 +165,6 @@
 				// !$beliefbase.getBeliefSet("wastes").containsFact($goal.waste)
 				$beliefbase.carriedwaste==null &amp;&amp;
 				!Arrays.asList($beliefbase.wastes).contains($goal.waste)
-				
-				// ?rgoal and ?mgoal are provided internally
-				// ?rparam = (parameter (parameter_has_name "waste") (parameter_has_value ?waste))
-				// ?rgoal = (goal (parameterelement_has_parameters contains ?rparam))
-				//
-				// ?rbeliefset = (beliefset (element_has_model ?mbeliefset) (beliefset_has_facts excludes ?waste))
-				// ?mbeliefset = (mbeliefset (melement_has_name "wastes"))
-				// 
-				// ?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact null))
-				// ?mbelief = (mbelief (melement_has_name "carriedwaste"))
-				
-				// todo: make sure that all elements are in same capa
  			</dropcondition>
 			<deliberation>
 			<!-- <deliberation cardinality="1"> -->
@@ -199,25 +172,6 @@
 				<inhibits ref="achievecleanup" language="jcl">
 					$beliefbase.my_location.getDistance($goal.waste.getLocation())
 					&lt; $beliefbase.my_location.getDistance($ref.waste.getLocation())
-					
-					// ?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact ?myloc))
-					// ?mbelief = (mbelief (melement_has_name "my_location"))
-					//
-					// ?rparam = (parameter (parameter_has_name "waste") (parameter_has_value ?waste))
-					// ?rgoal = (goal (parameterelement_has_parameters contains ?rparam))
-					// ?waste = (jadex.bdi.examples.cleanerworld_classic.Waste (location ?wasteloc))
-					//
-					// ?refparam = (parameter (parameter_has_name "waste") (parameter_has_value ?refwaste))
-					// ?refgoal = (goal (parameterelement_has_parameters contains ?refparam))
-					//
-					// ?refwaste = (Waste (location ?refwasteloc &amp; 
-					// 	:(&lt; (MethodCallFunction "Location" "getDistance" ?myloc ?wasteloc)
-					// 		(MethodCallFunction "Location" "getDistance" ?myloc ?refwasteloc)  
-					// )))
-	
-					// Does not work because Locations are not directly in state.
-					// ?wasteloc = (Location (getDistance(?myloc) ?wastedist))
-					// ?refwasteloc = (Location (getDistance(?myloc) &lt; ?wastedist))				
 				</inhibits>
 			</deliberation>
 			<!-- The goal is achieved when the waste is in some wastebin. - ->
@@ -242,9 +196,6 @@
 		<performgoal name="performpatrol" retry="true" exclude="never">
 			<contextcondition language="jcl">
 				!$beliefbase.daytime
-				
-				// ?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact false))
-				// ?mbelief = (mbelief (melement_has_name "daytime"))
  			</contextcondition>
  		</performgoal>
 

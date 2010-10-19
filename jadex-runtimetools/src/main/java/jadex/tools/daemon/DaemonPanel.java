@@ -1,5 +1,6 @@
 package jadex.tools.daemon;
 
+import jadex.base.gui.componenttree.PropertiesPanel;
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IChangeListener;
@@ -40,7 +41,8 @@ public class DaemonPanel extends JPanel
 		this.agent = agent;
 		this.setLayout(new BorderLayout());
 		
-		JPanel p = new JPanel(new FlowLayout());
+		JPanel p = new JPanel(new BorderLayout());
+		PropertiesPanel pan = new PropertiesPanel("Start Options");
 		
 		JButton startb = new JButton("Start platform");
 		startb.addActionListener(new ActionListener()
@@ -58,6 +60,12 @@ public class DaemonPanel extends JPanel
 				});
 			}
 		});
+		
+		pan.createTextField("Java command");
+		pan.createTextField("VM Options");
+		pan.createTextField("Classpath");
+		pan.createTextField("Main class");
+		pan.createTextField("Start directory");
 		
 		final JList platforml = new JList(new DefaultListModel());
 		
@@ -106,9 +114,10 @@ public class DaemonPanel extends JPanel
 			}
 		});
 		
-		p.add(startb);
-		p.add(platforml);
-		p.add(shutdownb);
+		p.add(pan, BorderLayout.NORTH);
+		p.add(startb,BorderLayout.CENTER);
+		p.add(platforml, BorderLayout.EAST);
+		p.add(shutdownb, BorderLayout.SOUTH);
 		
 		this.add(p, BorderLayout.CENTER);
 	}

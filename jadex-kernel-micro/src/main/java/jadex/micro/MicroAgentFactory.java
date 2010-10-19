@@ -8,12 +8,17 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IModelInfo;
 import jadex.bridge.IErrorReport;
 import jadex.bridge.ModelInfo;
+import jadex.commons.ByteClassLoader;
 import jadex.commons.Future;
 import jadex.commons.SGUI;
 import jadex.commons.SReflect;
 import jadex.commons.service.BasicService;
 import jadex.commons.service.IServiceProvider;
 
+import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,9 +39,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	/** The micro agent file type. */
 	public static final String	FILETYPE_MICROAGENT	= "Micro Agent";
 	
-	/**
-	 * The image icons.
-	 */
+	/** The image icons. */
 	protected static final UIDefaults icons = new UIDefaults(new Object[]
 	{
 		"micro_agent",	SGUI.makeIcon(MicroAgentFactory.class, "/jadex/micro/images/micro_agent.png"),
@@ -71,11 +74,56 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	 *  @param The imports (if any).
 	 *  @return The loaded model.
 	 */
+	public IModelInfo loadModel(InputStream in, String[] imports, ClassLoader classloader)
+	{
+		IModelInfo ret = null;
+		
+		ByteClassLoader cl = new ByteClassLoader(classloader);
+		BufferedInputStream bin = new BufferedInputStream(in);
+		ByteArrayOutputStream bos = new ByteArrayOutputStream();
+
+		try
+		{
+			int d;
+			while((d = bin.read())!=-1)
+				bos.write(d);
+		
+			Class cma = cl.loadClass(null, bos.toByteArray(), true);
+			String model = cma.getName().replace('.', '/');
+			
+			ret = loadModel(model, cma, cl);
+		}
+		catch(Exception e)
+		{
+		}
+		
+		try
+		{
+			bin.close();
+		}
+		catch(IOException e)
+		{
+		}
+		try
+		{
+			bos.close();
+		}
+		catch(IOException e)
+		{
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Load a  model.
+	 *  @param model The model (e.g. file name).
+	 *  @param The imports (if any).
+	 *  @return The loaded model.
+	 */
 	public IModelInfo loadModel(String model, String[] imports, ClassLoader classloader)
 	{
 //		System.out.println("loading micro: "+model);
-		IModelInfo ret = null;
-		
 		String clname = model;
 		
 		// Hack! for extracting clear classname
@@ -84,22 +132,16 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 		clname = clname.replace('\\', '.');
 		clname = clname.replace('/', '.');
 		
-//		ClassLoader	cl	= libservice.getClassLoader();
 		Class cma = getMicroAgentClass(clname, imports, classloader);
-//		Class cma = SReflect.findClass0(clname, imports, classloader);
-////		System.out.println(clname+" "+cma+" "+ret);
-//		int idx;
-//		while(cma==null && (idx=clname.indexOf('.'))!=-1)
-//		{
-//			clname	= clname.substring(idx+1);
-//			cma = SReflect.findClass0(clname, imports, classloader);
-////			System.out.println(clname+" "+cma+" "+ret);
-//		}
-//		if(cma==null)// || !cma.isAssignableFrom(IMicroAgent.class))
-//			throw new RuntimeException("No micro agent file: "+model);
-////		ret = new MicroAgentModel(cma, model, classloader);
 		
-		
+		return loadModel(model, cma, classloader);
+	}
+	
+	/**
+	 * 
+	 */
+	protected IModelInfo loadModel(String model, Class cma, ClassLoader classloader)
+	{
 		// Try to read meta information from class.
 		MicroAgentMetaInfo metainfo = null;
 		try
@@ -132,7 +174,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 		// Exclude getServiceProvider() from remote external access interface
 		addExcludedMethods(properties, new String[]{"getServiceProvider"});
 		
-		ret = new ModelInfo(name, packagename, description, report, 
+		IModelInfo ret = new ModelInfo(name, packagename, description, report, 
 			configurations, arguments, results, true, model, properties, classloader);
 		
 		return ret;
