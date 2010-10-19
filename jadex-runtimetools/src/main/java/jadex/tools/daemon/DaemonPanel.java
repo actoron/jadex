@@ -1,28 +1,30 @@
 package jadex.tools.daemon;
 
-import jadex.base.gui.componenttree.PropertiesPanel;
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IChangeListener;
 import jadex.commons.SGUI;
 import jadex.commons.concurrent.SwingDefaultResultListener;
+import jadex.commons.gui.PropertiesPanel;
+import jadex.commons.jtable.ObjectTableModel;
 import jadex.commons.service.SServiceProvider;
 import jadex.micro.IMicroExternalAccess;
 
 import java.awt.BorderLayout;
-import java.awt.FlowLayout;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
-import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JFrame;
-import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
 
 /**
+ *  Panel for daemon configuration.
  */
 public class DaemonPanel extends JPanel
 {
@@ -43,17 +45,17 @@ public class DaemonPanel extends JPanel
 		
 		JPanel p = new JPanel(new BorderLayout());
 		
-		final PropertiesPanel sop = new PropertiesPanel("Start Options");
-		sop.createTextField("Java command", "java", true);
-		sop.createTextField("VM arguments", null, true);
-		sop.createTextField("Classpath", null, true);
-		sop.createTextField("Main class", "jadex.base.Starter", true);
-		sop.createTextField("Program arguments", null, true);
-		sop.createTextField("Start directory", ".", true);
+		final PropertiesPanel stop = new PropertiesPanel("Start Options");
+		stop.createTextField("Java command", "java", true, 0);
+		stop.createTextField("VM arguments", null, true, 0);
+		stop.createTextField("Classpath", null, true, 0);
+		stop.createTextField("Main class", "jadex.base.Starter", true, 0);
+		stop.createTextField("Program arguments", null, true, 0);
+		stop.createTextField("Start directory", ".", true, 0);
 		
-		JButton[] buts = sop.createButtons(new String[]{"Start", "Reset"});
-		buts[0].setToolTipText("Start a new platform.");
-		buts[0].addActionListener(new ActionListener()
+		JButton[] stobuts = stop.createButtons("stobuts", new String[]{"Start", "Reset"}, 1);
+		stobuts[0].setToolTipText("Start a new platform.");
+		stobuts[0].addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
 			{
@@ -64,54 +66,36 @@ public class DaemonPanel extends JPanel
 					{
 						IDaemonService ds = (IDaemonService)result;
 						StartOptions so = new StartOptions();
-						so.setJavaCommand(sop.getTextField("Java command").getText());
-						so.setVMArguments(sop.getTextField("VM arguments").getText());
-						so.setClassPath(sop.getTextField("Classpath").getText());
-						so.setMain(sop.getTextField("Main class").getText());
-						so.setProgramArguments(sop.getTextField("Program arguments").getText());
-						so.setStartDirectory(sop.getTextField("Start directory").getText());
+						so.setJavaCommand(stop.getTextField("Java command").getText());
+						so.setVMArguments(stop.getTextField("VM arguments").getText());
+						so.setClassPath(stop.getTextField("Classpath").getText());
+						so.setMain(stop.getTextField("Main class").getText());
+						so.setProgramArguments(stop.getTextField("Program arguments").getText());
+						so.setStartDirectory(stop.getTextField("Start directory").getText());
 						ds.startPlatform(so);
 					}
 				});
 			}
 		});
-		buts[1].setToolTipText("Reset the start settings.");
-		buts[1].addActionListener(new ActionListener()
+		stobuts[1].setToolTipText("Reset the start settings.");
+		stobuts[1].addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				sop.getTextField("Java command").setText("java");
-				sop.getTextField("VM arguments").setText("");
-				sop.getTextField("Classpath").setText("");
-				sop.getTextField("Main class").setText("jadex.starter.Main");
-				sop.getTextField("Program arguments").setText("");
-				sop.getTextField("Start directory").setText("");
+				stop.getTextField("Java command").setText("java");
+				stop.getTextField("VM arguments").setText("");
+				stop.getTextField("Classpath").setText("");
+				stop.getTextField("Main class").setText("jadex.base.Starter");
+				stop.getTextField("Program arguments").setText("");
+				stop.getTextField("Start directory").setText("");
 			}
 		});
 		
-		final JList platforml = new JList(new DefaultListModel());
-		
-		JButton shutdownb = new JButton("Shudown platform");
-		shutdownb.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				SServiceProvider.getService(agent.getServiceProvider(), IDaemonService.class)
-					.addResultListener(new SwingDefaultResultListener()
-				{
-					public void customResultAvailable(Object source, Object result)
-					{
-						IDaemonService ds = (IDaemonService)result;
-						Object[] cids = (Object[])platforml.getSelectedValues();
-						for(int i=0; i<cids.length; i++)
-						{
-							ds.shutdownPlatform(((IComponentIdentifier)cids[i]));
-						}
-							
-					}
-				});
-			}
-		});
+		final ObjectTableModel ptm = new ObjectTableModel(new String[]{"Platform Name"});
+		final JTable platformt = new JTable(ptm);
+		platformt.setPreferredScrollableViewportSize(new Dimension(600, 120));
+//		jtdis.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+//		platformt.setDefaultRenderer(IComponentIdentifier.class, new ComponentIdentifierRenderer());
 		
 		SServiceProvider.getService(agent.getServiceProvider(), IDaemonService.class)
 			.addResultListener(new SwingDefaultResultListener()
@@ -125,20 +109,44 @@ public class DaemonPanel extends JPanel
 					{
 						if(IDaemonService.ADDED.equals(event.getType()))
 						{
-							((DefaultListModel)platforml.getModel()).addElement(event.getValue());
+							((ObjectTableModel)platformt.getModel()).addRow(new Object[]{event.getValue()}, event.getValue());
 						}
 						else if(IDaemonService.REMOVED.equals(event.getType()))
 						{
-							((DefaultListModel)platforml.getModel()).removeElement(event.getValue());
+							((ObjectTableModel)platformt.getModel()).removeRow(event.getValue());
 						}
 					}
 				});
 			}
 		});
 		
-		p.add(sop, BorderLayout.NORTH);
-		p.add(platforml, BorderLayout.EAST);
-		p.add(shutdownb, BorderLayout.SOUTH);
+		final PropertiesPanel suop = new PropertiesPanel("Shutdown Options");
+		suop.addFullLineComponent("platformtable", new JScrollPane(platformt), 1);
+		JButton[] suobuts = suop.createButtons("suobuts", new String[]{"Shutdown"}, 0);
+		suobuts[0].setToolTipText("Start a new platform.");
+		suobuts[0].addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				SServiceProvider.getService(agent.getServiceProvider(), IDaemonService.class)
+					.addResultListener(new SwingDefaultResultListener()
+				{
+					public void customResultAvailable(Object source, Object result)
+					{
+						IDaemonService ds = (IDaemonService)result;
+						int[] rows = (int[])platformt.getSelectedRows();
+						for(int i=0; i<rows.length; i++)
+						{
+							IComponentIdentifier cid = (IComponentIdentifier)ptm.getObjectForRow(rows[i]);
+							ds.shutdownPlatform(cid);
+						}
+					}
+				});
+			}
+		});
+		
+		p.add(stop, BorderLayout.NORTH);
+		p.add(suop, BorderLayout.CENTER);
 		
 		this.add(p, BorderLayout.CENTER);
 	}

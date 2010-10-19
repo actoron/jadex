@@ -3,6 +3,7 @@ package jadex.base.gui.componenttree;
 import jadex.bridge.IComponentDescription;
 import jadex.commons.SGUI;
 import jadex.commons.SUtil;
+import jadex.commons.gui.PropertiesPanel;
 
 import javax.swing.JLabel;
 import javax.swing.JTable;

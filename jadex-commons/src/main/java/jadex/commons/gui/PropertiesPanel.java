@@ -1,4 +1,4 @@
-package jadex.base.gui.componenttree;
+package jadex.commons.gui;
 
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -30,10 +30,13 @@ public class PropertiesPanel	extends	JPanel
 	protected GridBagConstraints	gbc;
 	
 	/** The last component for extra space. */
-	protected JComponent	dummy;
+	protected JComponent dummy;
 	
 	/** The created components (name->comp). */
 	protected Map	components;
+
+	/** Add dummy when weighty==0. */
+	protected boolean adddummy;
 	
 	//-------- constructors --------
 	
@@ -48,10 +51,11 @@ public class PropertiesPanel	extends	JPanel
 
 		this.gbc	= new GridBagConstraints();
 		gbc.gridy	= 0;
-		gbc.anchor	= GridBagConstraints.WEST;
+		gbc.anchor	= GridBagConstraints.PAGE_START;
 		gbc.fill	= GridBagConstraints.HORIZONTAL;
 		gbc.insets	= new Insets(1,1,1,1);
 		
+		adddummy = true;
 		dummy	= new JLabel();
 		gbc.weighty	= 1;
 		add(dummy, gbc);
@@ -89,17 +93,17 @@ public class PropertiesPanel	extends	JPanel
 	 */
 	public JTextField createTextField(String name)
 	{
-		return createTextField(name, null, false);
+		return createTextField(name, null, false, 0);
 	}
 	
 	/**
 	 *  Create a text field and add it to the panel.
 	 */
-	public JTextField createTextField(String name, String defvalue, boolean editable)
+	public JTextField createTextField(String name, String defvalue, boolean editable, double weighty)
 	{
 		JTextField	tf	= new JTextField(defvalue);
 		tf.setEditable(editable);
-		addComponent(name, tf);
+		addComponent(name, tf, weighty);
 		return tf;
 	}
 	
@@ -108,25 +112,26 @@ public class PropertiesPanel	extends	JPanel
 	 */
 	public JCheckBox createCheckBox(String name)
 	{
-		return createCheckBox(name, false, false);
+		return createCheckBox(name, false, false, 0);
 	}
 	
 	/**
 	 *  Create a check box and add it to the panel.
 	 */
-	public JCheckBox createCheckBox(String name, boolean selected, boolean enabled)
+	public JCheckBox createCheckBox(String name, boolean selected, boolean enabled, double weighty)
 	{
 		JCheckBox cb = new JCheckBox(name, selected);
 		cb.setMargin(new Insets(0,0,0,0));
 		cb.setEnabled(enabled);
-		addComponent(name, cb);
+		addComponent(name, cb, weighty);
 		return cb;
 	}
 	
 	/**
-	 * 
+	 *  Create several buttons.
+	 *  @param names The button names.
 	 */
-	public JButton[] createButtons(String[] names)
+	public JButton[] createButtons(String groupname, String[] names, double weighty)
 	{
 		JButton[] ret = new JButton[names.length];
 		JPanel p = new JPanel(new GridBagLayout());
@@ -155,7 +160,7 @@ public class PropertiesPanel	extends	JPanel
 			ret[i].setPreferredSize(maxd);
 		}
 		
-		addFullLineComponent("buttons", p);
+		addFullLineComponent(groupname, p, weighty);
 		
 		return ret;
 	}
@@ -163,12 +168,19 @@ public class PropertiesPanel	extends	JPanel
 	/**
 	 *  Add a component
 	 */
-	public void	addComponent(String name, JComponent comp)
+	public void	addComponent(String name, JComponent comp, double weighty)
 	{
 		components.put(name, comp);
 
 		remove(dummy);
 
+		gbc.weighty = weighty;
+		if(weighty>0)
+		{
+			gbc.fill = GridBagConstraints.BOTH;
+			adddummy = false;
+		}
+		
 		gbc.weightx	= 0;
 		gbc.gridwidth	= 1;
 		add(new JLabel(name), gbc);
@@ -177,11 +189,16 @@ public class PropertiesPanel	extends	JPanel
 		add(comp, gbc);
 		gbc.gridy++;
 		
-		gbc.weighty	= 1;
-		gbc.gridwidth	= GridBagConstraints.REMAINDER;
-		add(dummy, gbc);
-		gbc.gridwidth	= 1;
-		gbc.weighty	= 0;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		
+		if(adddummy)
+		{
+			gbc.weighty	= 1;
+			gbc.gridwidth	= GridBagConstraints.REMAINDER;
+			add(dummy, gbc);
+			gbc.gridwidth	= 1;
+			gbc.weighty	= 0;
+		}
 	}
 	
 	/**
@@ -190,18 +207,39 @@ public class PropertiesPanel	extends	JPanel
 	 */
 	public void	addFullLineComponent(String name, JComponent comp)
 	{
+		addFullLineComponent(name, comp, 0);
+	}
+	
+	/**
+	 *  Add a component that spans a full line.
+	 *  No label is rendered.
+	 */
+	public void	addFullLineComponent(String name, JComponent comp, double weighty)
+	{
 		components.put(name, comp);
 
 		remove(dummy);
 
+		gbc.weighty = weighty;
+		if(weighty>0)
+		{
+			gbc.fill = GridBagConstraints.BOTH;
+			adddummy = false;
+		}
+		
 		gbc.weightx	= 1;
 		gbc.gridwidth	= GridBagConstraints.REMAINDER;
 		add(comp, gbc);
 		gbc.gridy++;
 		
-		gbc.weighty	= 1;
-		add(dummy, gbc);
-		gbc.gridwidth	= 1;
-		gbc.weighty	= 0;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		
+		if(adddummy)
+		{
+			gbc.weighty	= 1;
+			add(dummy, gbc);
+			gbc.gridwidth	= 1;
+			gbc.weighty	= 0;
+		}
 	}
 }
