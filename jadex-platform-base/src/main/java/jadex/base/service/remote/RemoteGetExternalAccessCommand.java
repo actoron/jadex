@@ -80,7 +80,7 @@ public class RemoteGetExternalAccessCommand implements IRemoteCommand
 					public void resultAvailable(Object source, Object result)
 					{
 						IExternalAccess exta = (IExternalAccess)result;
-						ProxyInfo pi = getProxyInfo(component.getComponentIdentifier(), exta);
+						ProxyInfo pi = getProxyInfo(component.getComponentIdentifier(), cid, exta);
 						ret.setResult(new RemoteGetResultCommand(pi, null, callid));
 					}
 					
@@ -157,7 +157,7 @@ public class RemoteGetExternalAccessCommand implements IRemoteCommand
 	/**
 	 *  Get a proxy info for a component. 
 	 */
-	protected ProxyInfo getProxyInfo(IComponentIdentifier rms, IExternalAccess target)
+	public static ProxyInfo getProxyInfo(IComponentIdentifier rms, IComponentIdentifier cid, IExternalAccess target)
 	{
 		ProxyInfo ret;
 		
@@ -174,7 +174,7 @@ public class RemoteGetExternalAccessCommand implements IRemoteCommand
 				ret = (ProxyInfo)proxyinfos.get(target);
 				if(ret==null)
 				{
-					ret = createProxyInfo(rms, target);
+					ret = createProxyInfo(rms, cid, target);
 				}
 			}
 		}
@@ -185,7 +185,7 @@ public class RemoteGetExternalAccessCommand implements IRemoteCommand
 	/**
 	 *  Create a proxy info for a service. 
 	 */
-	protected ProxyInfo createProxyInfo(IComponentIdentifier rms, IExternalAccess target)
+	public static ProxyInfo createProxyInfo(IComponentIdentifier rms, IComponentIdentifier cid, IExternalAccess target)
 	{
 		Class targetclass = null;
 		Class[] inter = target.getClass().getInterfaces();

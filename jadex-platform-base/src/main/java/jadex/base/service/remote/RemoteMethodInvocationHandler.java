@@ -52,7 +52,7 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 		
 		// Test if method is excluded.
 		if(pi.isExcluded(method))
-			throw new UnsupportedOperationException("Method is excluded from interface for remote invocations.");
+			throw new UnsupportedOperationException("Method is excluded from interface for remote invocations: "+method.getName());
 		
 		// Test if method is constant and a cache value is available.
 		if(pi.getCache()!=null && !pi.isUncached(method) && !pi.isReplaced(method))
@@ -79,6 +79,15 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 		
 		final IComponentIdentifier compid = component.getComponentIdentifier();
 		final String callid = SUtil.createUniqueId(compid.getLocalName());
+		
+		// Preprocess arguments and make proxyinfos out of IProxyable objects.
+//		for(int i=0; i<args.length; i++)
+//		{
+//			if(args[i] instanceof IProxyable)
+//			{
+//				
+//			}
+//		}
 		
 		RemoteMethodInvocationCommand content;
 		if(pi.getServiceIdentifier()!=null)

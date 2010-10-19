@@ -242,7 +242,7 @@ public class RemoteSearchCommand implements IRemoteCommand
 	/**
 	 *  Get a proxy info for a service. 
 	 */
-	protected ProxyInfo getProxyInfo(IComponentIdentifier rms, IService service)
+	public static ProxyInfo getProxyInfo(IComponentIdentifier rms, IService service)
 	{
 		ProxyInfo ret;
 		
@@ -271,7 +271,7 @@ public class RemoteSearchCommand implements IRemoteCommand
 	/**
 	 *  Create a proxy info for a service. 
 	 */
-	protected ProxyInfo createProxyInfo(IComponentIdentifier rms, IService service)
+	public static ProxyInfo createProxyInfo(IComponentIdentifier rms, IService service)
 	{
 		ProxyInfo ret = new ProxyInfo(rms, service.getServiceIdentifier());
 		fillProxyInfo(ret, service, service.getServiceIdentifier().getServiceType(), service.getPropertyMap());
