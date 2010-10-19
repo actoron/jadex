@@ -42,10 +42,18 @@ public class DaemonPanel extends JPanel
 		this.setLayout(new BorderLayout());
 		
 		JPanel p = new JPanel(new BorderLayout());
-		PropertiesPanel pan = new PropertiesPanel("Start Options");
 		
-		JButton startb = new JButton("Start platform");
-		startb.addActionListener(new ActionListener()
+		final PropertiesPanel sop = new PropertiesPanel("Start Options");
+		sop.createTextField("Java command", "java", true);
+		sop.createTextField("VM arguments", null, true);
+		sop.createTextField("Classpath", null, true);
+		sop.createTextField("Main class", "jadex.base.Starter", true);
+		sop.createTextField("Program arguments", null, true);
+		sop.createTextField("Start directory", ".", true);
+		
+		JButton[] buts = sop.createButtons(new String[]{"Start", "Reset"});
+		buts[0].setToolTipText("Start a new platform.");
+		buts[0].addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
 			{
@@ -55,17 +63,31 @@ public class DaemonPanel extends JPanel
 					public void customResultAvailable(Object source, Object result)
 					{
 						IDaemonService ds = (IDaemonService)result;
-						ds.startPlatform(null);
+						StartOptions so = new StartOptions();
+						so.setJavaCommand(sop.getTextField("Java command").getText());
+						so.setVMArguments(sop.getTextField("VM arguments").getText());
+						so.setClassPath(sop.getTextField("Classpath").getText());
+						so.setMain(sop.getTextField("Main class").getText());
+						so.setProgramArguments(sop.getTextField("Program arguments").getText());
+						so.setStartDirectory(sop.getTextField("Start directory").getText());
+						ds.startPlatform(so);
 					}
 				});
 			}
 		});
-		
-		pan.createTextField("Java command");
-		pan.createTextField("VM Options");
-		pan.createTextField("Classpath");
-		pan.createTextField("Main class");
-		pan.createTextField("Start directory");
+		buts[1].setToolTipText("Reset the start settings.");
+		buts[1].addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				sop.getTextField("Java command").setText("java");
+				sop.getTextField("VM arguments").setText("");
+				sop.getTextField("Classpath").setText("");
+				sop.getTextField("Main class").setText("jadex.starter.Main");
+				sop.getTextField("Program arguments").setText("");
+				sop.getTextField("Start directory").setText("");
+			}
+		});
 		
 		final JList platforml = new JList(new DefaultListModel());
 		
@@ -114,8 +136,7 @@ public class DaemonPanel extends JPanel
 			}
 		});
 		
-		p.add(pan, BorderLayout.NORTH);
-		p.add(startb,BorderLayout.CENTER);
+		p.add(sop, BorderLayout.NORTH);
 		p.add(platforml, BorderLayout.EAST);
 		p.add(shutdownb, BorderLayout.SOUTH);
 		

@@ -1,16 +1,20 @@
 package jadex.base.gui.componenttree;
 
+import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 
@@ -83,22 +87,77 @@ public class PropertiesPanel	extends	JPanel
 	/**
 	 *  Create a text field and add it to the panel.
 	 */
-	public void	createTextField(String name)
+	public JTextField createTextField(String name)
 	{
-		JTextField	tf	= new JTextField();
-		tf.setEditable(false);
+		return createTextField(name, null, false);
+	}
+	
+	/**
+	 *  Create a text field and add it to the panel.
+	 */
+	public JTextField createTextField(String name, String defvalue, boolean editable)
+	{
+		JTextField	tf	= new JTextField(defvalue);
+		tf.setEditable(editable);
 		addComponent(name, tf);
+		return tf;
 	}
 	
 	/**
 	 *  Create a check box and add it to the panel.
 	 */
-	public void	createCheckBox(String name)
+	public JCheckBox createCheckBox(String name)
 	{
-		JCheckBox	cb	= new JCheckBox("");
+		return createCheckBox(name, false, false);
+	}
+	
+	/**
+	 *  Create a check box and add it to the panel.
+	 */
+	public JCheckBox createCheckBox(String name, boolean selected, boolean enabled)
+	{
+		JCheckBox cb = new JCheckBox(name, selected);
 		cb.setMargin(new Insets(0,0,0,0));
-		cb.setEnabled(false);
+		cb.setEnabled(enabled);
 		addComponent(name, cb);
+		return cb;
+	}
+	
+	/**
+	 * 
+	 */
+	public JButton[] createButtons(String[] names)
+	{
+		JButton[] ret = new JButton[names.length];
+		JPanel p = new JPanel(new GridBagLayout());
+		GridBagConstraints con = new GridBagConstraints();
+		con.gridx = 0;
+		con.gridy = 0;
+		con.anchor = GridBagConstraints.EAST;
+		con.fill = GridBagConstraints.NONE;
+		con.insets = new Insets(1,1,1,1);
+		con.weightx = 1;
+		Dimension maxd = null;
+		for(int i=0; i<names.length; i++)
+		{
+			ret[i] = new JButton(names[i]);
+//			ret[i].setMargin(new Insets(0,0,0,0));
+//			ret[i].setBorder(new EmptyBorder(new Insets(0,0,0,3)));
+			p.add(ret[i], con);
+			con.weightx = 0;
+			con.gridx++;
+			Dimension d = ret[i].getPreferredSize();
+			if(maxd==null || d.width>maxd.width)
+				maxd = d;
+		}
+		for(int i=0; i<ret.length; i++)
+		{
+			ret[i].setPreferredSize(maxd);
+		}
+		
+		addFullLineComponent("buttons", p);
+		
+		return ret;
 	}
 	
 	/**

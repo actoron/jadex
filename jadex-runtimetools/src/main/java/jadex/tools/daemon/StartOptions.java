@@ -12,7 +12,7 @@ public class StartOptions
 	protected String javacmd;
 	
 	/** The classpath. */
-	protected String[] classpath;
+	protected String classpath;
 	
 	/** The main class to start. */
 	protected String main;
@@ -48,7 +48,7 @@ public class StartOptions
 	 *  Get the classpath.
 	 *  @return the classpath.
 	 */
-	public String[] getClassPath()
+	public String getClassPath()
 	{
 		return classpath;
 	}
@@ -57,7 +57,7 @@ public class StartOptions
 	 *  Set the classpath.
 	 *  @param classpath The classpath to set.
 	 */
-	public void setClassPath(String[] classpath)
+	public void setClassPath(String classpath)
 	{
 		this.classpath = classpath;
 	}
@@ -142,15 +142,19 @@ public class StartOptions
 		// [path]java 
 		StringBuffer cmd = new StringBuffer().append(getJavaCommand());
 		
-		// -cp 
-		for(int i=0; i<classpath.length; i++)
+		// -cp
+		if(classpath!=null && classpath.length()>0)
 		{
-			if(i==0)
-				cmd.append(" -cp ");
-			else
-				cmd.append(File.pathSeparator);
-			cmd.append("\"").append(classpath[i]).append("\"");
+			cmd.append(" -cp ").append(classpath);
 		}
+//		for(int i=0; i<classpath.length; i++)
+//		{
+//			if(i==0)
+//				cmd.append(" -cp ");
+//			else
+//				cmd.append(File.pathSeparator);
+//			cmd.append("\"").append(classpath[i]).append("\"");
+//		}
 		
 		// additional arguments
 		if(getVMArguments()!=null)

@@ -1,10 +1,8 @@
 package jadex.tools.daemon;
 
-import jadex.base.Starter;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IArgument;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IExternalAccess;
 import jadex.commons.ChangeEvent;
 import jadex.commons.Future;
 import jadex.commons.IChangeListener;
@@ -12,7 +10,6 @@ import jadex.commons.IFuture;
 import jadex.commons.SUtil;
 import jadex.commons.StreamCopy;
 import jadex.commons.concurrent.DelegationResultListener;
-import jadex.commons.concurrent.IResultListener;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.library.ILibraryService;
 import jadex.micro.MicroAgent;
@@ -72,12 +69,12 @@ public class DaemonAgent extends MicroAgent
 		
 		final StartOptions options = opt==null? new StartOptions(): opt;
 		
-		if(options.getMain()==null)
-		{
-			options.setMain("jadex.base.Starter");
-		}
+//		if(options.getMain()==null)
+//		{
+//			options.setMain("jadex.base.Starter");
+//		}
 		
-		if(options.getClassPath()==null)
+		if(options.getClassPath()==null || options.getClassPath().length()==0)
 		{
 			SServiceProvider.getService(getServiceProvider(), ILibraryService.class)
 				.addResultListener(createResultListener(new DelegationResultListener(ret)
@@ -100,7 +97,14 @@ public class DaemonAgent extends MicroAgent
 								else
 									System.out.println("Cannot convert url to file: "+url);
 							}
-							options.setClassPath((String[])res.toArray(new String[res.size()]));
+							StringBuffer buf = new StringBuffer();
+							for(int i=0; i<res.size(); i++)
+							{
+								buf.append(res.get(i));
+								if(i+1<res.size())
+									buf.append(File.pathSeparator);
+							}
+							options.setClassPath(buf.toString());
 							
 							doStartPlatform(options).addResultListener(new DelegationResultListener(ret));
 						}
