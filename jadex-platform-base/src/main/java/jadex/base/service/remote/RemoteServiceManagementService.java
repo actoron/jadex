@@ -1,8 +1,8 @@
 package jadex.base.service.remote;
 
 import jadex.base.fipa.SFipa;
-import jadex.base.service.remote.xml.RMIObjectReaderHandler;
 import jadex.base.service.remote.xml.RMIObjectWriterHandler;
+import jadex.base.service.remote.xml.RMIPostProcessor;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
@@ -25,13 +25,28 @@ import jadex.commons.service.clock.ITimer;
 import jadex.commons.service.library.ILibraryService;
 import jadex.micro.IMicroExternalAccess;
 import jadex.micro.MicroAgent;
+import jadex.xml.AccessInfo;
+import jadex.xml.AttributeConverter;
+import jadex.xml.AttributeInfo;
+import jadex.xml.IContext;
+import jadex.xml.IStringObjectConverter;
+import jadex.xml.MappingInfo;
+import jadex.xml.ObjectInfo;
+import jadex.xml.SXML;
+import jadex.xml.TypeInfo;
+import jadex.xml.XMLInfo;
+import jadex.xml.bean.BeanObjectReaderHandler;
 import jadex.xml.bean.JavaReader;
 import jadex.xml.bean.JavaWriter;
 import jadex.xml.reader.Reader;
 import jadex.xml.writer.Writer;
 
+import java.awt.Color;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+
+import javax.xml.namespace.QName;
 
 /**
  *  The remote service management service is responsible for 
@@ -78,8 +93,12 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		super(component.getServiceProvider().getId(), IRemoteServiceManagementService.class, null);
 
 		this.component = component;
+		Set typeinfos = JavaReader.getTypeInfos();
+		TypeInfo ti_proxyinfo = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"jadex.base.service.remote", "ProxyInfo")}), 
+			new ObjectInfo(ProxyInfo.class, new RMIPostProcessor(component)));
+		typeinfos.add(ti_proxyinfo);
 		this.context = new CallContext(
-			new Reader(new RMIObjectReaderHandler(JavaReader.getTypeInfos(), component)),
+			new Reader(new BeanObjectReaderHandler(typeinfos)),
 			new Writer(new RMIObjectWriterHandler(JavaWriter.getTypeInfos(), component.getComponentIdentifier()))
 		);
 	}
