@@ -27,6 +27,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -545,9 +546,10 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 	{
 		if(entries==null)
 			// Use index map to keep insertion order for elements.
-			this.entries	= new MultiCollection(new IndexMap().getAsMap(), ArrayList.class);
+			this.entries	= new MultiCollection(new IndexMap().getAsMap(), LinkedHashSet.class);
 
-		entries.put(stack, message);
+		if(!entries.getCollection(stack).contains(message))
+			entries.put(stack, message);
 	}
 
 	/**

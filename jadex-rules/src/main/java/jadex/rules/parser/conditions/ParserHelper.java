@@ -20,6 +20,7 @@ import java.util.List;
 
 import org.antlr.runtime.ANTLRStringStream;
 import org.antlr.runtime.CommonTokenStream;
+import org.antlr.runtime.RecognitionException;
 
 /**
  *  The parser helper class for parsing conditions.
@@ -157,7 +158,16 @@ public class ParserHelper
 		ANTLRStringStream exp = new ANTLRStringStream(text);
 		JavaJadexLexer lexer = new JavaJadexLexer(exp);
 		CommonTokenStream tokens = new CommonTokenStream(lexer);
-		JavaJadexParser parser = new JavaJadexParser(tokens);
+		JavaJadexParser parser = new JavaJadexParser(tokens)
+		{
+			public void reportError(RecognitionException e)
+			{
+				String msg	= e.toString();
+				if(e.token!=null && e.token.getText()!=null)
+					msg	= "Unexpected token: "+e.token.getText();
+				throw new RuntimeException(msg);
+			}
+		};
 		try
 		{
 			if(returnvar!=null)

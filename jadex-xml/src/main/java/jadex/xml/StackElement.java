@@ -133,5 +133,74 @@ public class StackElement
 	{
 		return "StackElement(tag="+this.tag+", object=" + this.object + ")";
 	}
+
+	/**
+	 *  Get the hash code.
+	 */
+	public int hashCode()
+	{
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((content == null) ? 0 : content.hashCode());
+		result = prime * result + ((object == null) ? 0 : object.hashCode());
+		result = prime * result
+				+ ((rawattrs == null) ? 0 : rawattrs.hashCode());
+		result = prime * result + ((tag == null) ? 0 : tag.hashCode());
+		result = prime * result
+				+ ((typeinfo == null) ? 0 : typeinfo.hashCode());
+		return result;
+	}
+
+	/**
+	 *  Test if two stack elements are equal.
+	 */
+	public boolean equals(Object obj)
+	{
+		if(this == obj)
+			return true;
+		if(obj == null)
+			return false;
+		if(getClass() != obj.getClass())
+			return false;
+		StackElement other = (StackElement)obj;
+		if(content == null)
+		{
+			if(other.content != null)
+				return false;
+		}
+		else if(!content.equals(other.content))
+			return false;
+		if(object == null)
+		{
+			if(other.object != null)
+				return false;
+		}
+		else if(!object.equals(other.object))
+			return false;
+		if(rawattrs == null)
+		{
+			if(other.rawattrs != null)
+				return false;
+		}
+		else if(!rawattrs.equals(other.rawattrs))
+			return false;
+		if(tag == null)
+		{
+			if(other.tag != null)
+				return false;
+		}
+		else if(!tag.equals(other.tag))
+			return false;
+		if(typeinfo == null)
+		{
+			if(other.typeinfo != null)
+				return false;
+		}
+		else if(!typeinfo.equals(other.typeinfo))
+			return false;
+		return true;
+	}
+	
+	
 	
 }

@@ -48,6 +48,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -151,7 +152,7 @@ public class OAVBDIModelLoader	extends AbstractModelLoader
 		
 		state.addStateListener(listener, false);
 		// Use index map to keep insertion order for elements.
-		MultiCollection	entries	= new MultiCollection(new IndexMap().getAsMap(), ArrayList.class);
+		MultiCollection	entries	= new MultiCollection(new IndexMap().getAsMap(), LinkedHashSet.class);
 		Object handle = reader.read(info.getInputStream(), classloader, new OAVUserContext(state, entries));
 		state.removeStateListener(listener);
 
