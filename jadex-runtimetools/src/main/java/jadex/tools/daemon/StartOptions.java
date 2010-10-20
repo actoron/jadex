@@ -145,7 +145,7 @@ public class StartOptions
 		// -cp
 		if(classpath!=null && classpath.length()>0)
 		{
-			cmd.append(" -cp ").append(classpath);
+			cmd.append(" -cp \"").append(classpath).append("\"");
 		}
 //		for(int i=0; i<classpath.length; i++)
 //		{
