@@ -60,7 +60,7 @@ public class RemoteGetExternalAccessCommand implements IRemoteCommand
 	 *  @return An optional result command that will be 
 	 *  sent back to the command origin. 
 	 */
-	public IFuture execute(final IMicroExternalAccess component, Map waitingcalls)
+	public IFuture execute(final IMicroExternalAccess component, CallContext context)
 	{
 		final Future ret = new Future();
 		
@@ -81,19 +81,19 @@ public class RemoteGetExternalAccessCommand implements IRemoteCommand
 					{
 						IExternalAccess exta = (IExternalAccess)result;
 						ProxyInfo pi = getProxyInfo(component.getComponentIdentifier(), cid, exta);
-						ret.setResult(new RemoteGetResultCommand(pi, null, callid));
+						ret.setResult(new RemoteResultCommand(pi, null, callid));
 					}
 					
 					public void exceptionOccurred(Object source, Exception exception)
 					{
-						ret.setResult(new RemoteGetResultCommand(null, exception, callid));
+						ret.setResult(new RemoteResultCommand(null, exception, callid));
 					}
 				});
 			}
 			
 			public void exceptionOccurred(Object source, Exception exception)
 			{
-				ret.setResult(new RemoteSearchResultCommand(null, exception, callid));
+				ret.setResult(new RemoteResultCommand(null, exception, callid));
 			}
 		});
 		

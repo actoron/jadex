@@ -103,20 +103,21 @@ public class DaemonPanel extends JPanel
 			public void customResultAvailable(Object source, Object result)
 			{
 				IDaemonService ds = (IDaemonService)result;
-				ds.addChangeListener(new IChangeListener()
-				{
-					public void changeOccurred(ChangeEvent event)
-					{
-						if(IDaemonService.ADDED.equals(event.getType()))
-						{
-							((ObjectTableModel)platformt.getModel()).addRow(new Object[]{event.getValue()}, event.getValue());
-						}
-						else if(IDaemonService.REMOVED.equals(event.getType()))
-						{
-							((ObjectTableModel)platformt.getModel()).removeRow(event.getValue());
-						}
-					}
-				});
+				ds.addChangeListener(new DaemonChangeListener(platformt));
+//				ds.addChangeListener(new IChangeListener()
+//				{
+//					public void changeOccurred(ChangeEvent event)
+//					{
+//						if(IDaemonService.ADDED.equals(event.getType()))
+//						{
+//							((ObjectTableModel)platformt.getModel()).addRow(new Object[]{event.getValue()}, event.getValue());
+//						}
+//						else if(IDaemonService.REMOVED.equals(event.getType()))
+//						{
+//							((ObjectTableModel)platformt.getModel()).removeRow(event.getValue());
+//						}
+//					}
+//				});
 			}
 		});
 		

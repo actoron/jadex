@@ -4,11 +4,12 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.commons.IChangeListener;
 import jadex.commons.ICommand;
 import jadex.commons.IFuture;
+import jadex.commons.service.IService;
 
 /**
  * 
  */
-public interface IDaemonService
+public interface IDaemonService extends IService
 {
 	public static String ADDED = "added";
 

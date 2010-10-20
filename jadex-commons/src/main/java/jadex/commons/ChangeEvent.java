@@ -21,6 +21,13 @@ public class ChangeEvent //extends EventObject
 	/**
 	 *  Create a new event.
 	 */
+	public ChangeEvent()
+	{
+	}
+	
+	/**
+	 *  Create a new event.
+	 */
 	public ChangeEvent(Object source, String type)
 	{
 		this(source, type, null);
@@ -46,6 +53,15 @@ public class ChangeEvent //extends EventObject
 	{
 		return this.source;
 	}
+	
+	/**
+	 *  Set the source.
+	 *  @param source The source to set.
+	 */
+	public void setSource(Object source)
+	{
+		this.source = source;
+	}
 
 	/**
 	 *  Get the type.
@@ -54,6 +70,15 @@ public class ChangeEvent //extends EventObject
 	public String getType()
 	{
 		return this.type;
+	}
+	
+	/**
+	 *  Set the type.
+	 *  @param type The type to set.
+	 */
+	public void setType(String type)
+	{
+		this.type = type;
 	}
 
 	/**
@@ -64,7 +89,16 @@ public class ChangeEvent //extends EventObject
 	{
 		return this.value;
 	}
-	
+
+	/**
+	 *  Set the value.
+	 *  @param value The value to set.
+	 */
+	public void setValue(Object value)
+	{
+		this.value = value;
+	}
+
 	/**
 	 *  Get the string respresentation.
 	 *  @return The string representation.

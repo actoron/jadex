@@ -5,6 +5,7 @@ import jadex.commons.SUtil;
 import jadex.xml.AccessInfo;
 import jadex.xml.AttributeInfo;
 import jadex.xml.BasicTypeConverter;
+import jadex.xml.IPostProcessor;
 import jadex.xml.IReturnValueCommand;
 import jadex.xml.IStringObjectConverter;
 import jadex.xml.ISubObjectConverter;
@@ -1351,5 +1352,14 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 		}
 		
 		return ret;
+	}
+	
+	/**
+	 *  Get the post-processor.
+	 *  @return The post-processor
+	 */
+	public IPostProcessor getPostProcessor(Object object, Object typeinfo)
+	{
+		return typeinfo instanceof TypeInfo? ((TypeInfo)typeinfo).getPostProcessor(): null;
 	}
 }

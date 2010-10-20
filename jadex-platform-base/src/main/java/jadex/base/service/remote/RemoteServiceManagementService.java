@@ -1,6 +1,8 @@
 package jadex.base.service.remote;
 
 import jadex.base.fipa.SFipa;
+import jadex.base.service.remote.xml.RMIObjectReaderHandler;
+import jadex.base.service.remote.xml.RMIObjectWriterHandler;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
@@ -23,9 +25,11 @@ import jadex.commons.service.clock.ITimer;
 import jadex.commons.service.library.ILibraryService;
 import jadex.micro.IMicroExternalAccess;
 import jadex.micro.MicroAgent;
+import jadex.xml.bean.JavaReader;
 import jadex.xml.bean.JavaWriter;
+import jadex.xml.reader.Reader;
+import jadex.xml.writer.Writer;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -61,8 +65,8 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	/** The component. */
 	protected IMicroExternalAccess component;
 	
-	/** The waiting futures. */
-	protected Map waitingcalls;
+	/** The call context. */
+	protected CallContext context;
 	
 	//-------- constructors --------
 	
@@ -74,7 +78,10 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		super(component.getServiceProvider().getId(), IRemoteServiceManagementService.class, null);
 
 		this.component = component;
-		this.waitingcalls = Collections.synchronizedMap(new HashMap());
+		this.context = new CallContext(
+			new Reader(new RMIObjectReaderHandler(JavaReader.getTypeInfos(), component)),
+			new Writer(new RMIObjectWriterHandler(JavaWriter.getTypeInfos(), component.getComponentIdentifier()))
+		);
 	}
 	
 	//-------- methods --------
@@ -107,7 +114,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 				RemoteSearchCommand content = new RemoteSearchCommand(cid, manager, 
 					decider, selector, callid);
 				
-				sendMessage(component, rrms, content, callid, -1, waitingcalls, ret);
+				sendMessage(component, rrms, content, callid, -1, context, ret);
 			}
 			public void exceptionOccurred(Object source, Exception exception)
 			{
@@ -182,7 +189,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 				final String callid = SUtil.createUniqueId(component.getComponentIdentifier().getLocalName());
 				RemoteGetExternalAccessCommand content = new RemoteGetExternalAccessCommand(cid, callid);
 				
-				sendMessage(component, rrms, content, callid, -1, waitingcalls, ret);
+				sendMessage(component, rrms, content, callid, -1, context, ret);
 			}
 			public void exceptionOccurred(Object source, Exception exception)
 			{
@@ -206,23 +213,32 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	/**
 	 *  Get the waiting calls.
 	 *  @return the waiting calls.
-	 */
+	 * /
 	public Map getWaitingCalls()
 	{
 		return waitingcalls;
+	}*/
+	
+	/**
+	 *  Get the call context
+	 *  @return The call context.
+	 */
+	public CallContext getCallContext()
+	{
+		return context;
 	}
 	
 //	protected static Map errors = Collections.synchronizedMap(new LRU(200));
 	
 	/**
-	 * final IComponentIdentifier sender,
+	 *  Send the request message of a remote method invocation.
 	 */
 	public static void sendMessage(final IMicroExternalAccess component, IComponentIdentifier receiver, final Object content,
-		final String callid, final long to, final Map waitingcalls, final Future future)
+		final String callid, final long to, final CallContext context, final Future future)
 	{
 		final long timeout = to<=0? DEFAULT_TIMEOUT: to;
 		
-		waitingcalls.put(callid, future);
+		context.putWaitingCall(callid, future);
 //		System.out.println("Waitingcalls: "+waitingcalls.size());
 		
 		final Map msg = new HashMap();
@@ -246,7 +262,9 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 					public void resultAvailable(Object source, Object result)
 					{
 						// Hack!!! Manual encoding for using custom class loader at receiver side.
-						msg.put(SFipa.CONTENT, JavaWriter.objectToXML(content, ls.getClassLoader()));
+//						msg.put(SFipa.CONTENT, JavaWriter.objectToXML(content, ls.getClassLoader()));
+						
+						msg.put(SFipa.CONTENT, Writer.objectToXML(context.getWriter(), content, ls.getClassLoader(), context));
 
 						IMessageService ms = (IMessageService)result;
 						ms.sendMessage(msg, SFipa.FIPA_MESSAGE_TYPE, component.getComponentIdentifier(), ls.getClassLoader())
@@ -266,7 +284,8 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 											public void execute(Object args) 
 											{
 //												System.out.println("timeout triggered: "+msg);
-												waitingcalls.remove(callid);
+												context.removeWaitingCall(callid);
+//												waitingcalls.remove(callid);
 //												System.out.println("Waitingcalls: "+waitingcalls.size());
 												future.setExceptionIfUndone(new RuntimeException("No reply received and timeout occurred: "+callid));
 											}
@@ -281,7 +300,8 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 												{
 													public void resultAvailable(Object source, Object result)
 													{
-														waitingcalls.remove(callid);
+														context.removeWaitingCall(callid);
+//														waitingcalls.remove(callid);
 //														System.out.println("Waitingcalls: "+waitingcalls.size());
 //														System.out.println("Cancel timeout (res): "+callid+" "+future);
 //														errors.put(callid, new Object[]{"Cancel timeout (res)", result});
@@ -290,7 +310,8 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 													
 													public void exceptionOccurred(Object source, Exception exception)
 													{
-														waitingcalls.remove(callid);
+														context.removeWaitingCall(callid);
+//														waitingcalls.remove(callid);
 //														System.out.println("Waitingcalls: "+waitingcalls.size());
 //														System.out.println("Cancel timeout (ex): "+callid+" "+future);
 //														errors.put(callid, new Object[]{"Cancel timeout (ex):", exception});
@@ -308,7 +329,8 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 								// message could not be sent -> fail immediately.
 //								System.out.println("Callee could not be reached: "+exception);
 //								errors.put(callid, new Object[]{"Callee could not be reached", exception});
-								waitingcalls.remove(callid);
+								context.removeWaitingCall(callid);
+//								waitingcalls.remove(callid);
 //								System.out.println("Waitingcalls: "+waitingcalls.size());
 								future.setException(exception);
 							}
@@ -318,7 +340,8 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 					public void exceptionOccurred(Object source, Exception exception)
 					{
 //						errors.put(callid, new Object[]{"No msg service", exception});
-						waitingcalls.remove(callid);
+						context.removeWaitingCall(callid);
+//						waitingcalls.remove(callid);
 //						System.out.println("Waitingcalls: "+waitingcalls.size());
 						future.setException(exception);
 					}
@@ -328,7 +351,8 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 			public void exceptionOccurred(Object source, Exception exception)
 			{
 //				errors.put(callid, new Object[]{"No lib service", exception});
-				waitingcalls.remove(callid);
+				context.removeWaitingCall(callid);
+//				waitingcalls.remove(callid);
 //				System.out.println("Waitingcalls: "+waitingcalls.size());
 				future.setException(exception);
 			}

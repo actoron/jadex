@@ -421,8 +421,7 @@ public class Reader
 				{
 					if(typeinfo!=null && typeinfo.getContentInfo()!=null) 
 					{
-						handler.handleAttributeValue(topse.getObject(), null, null, topse.getContent(), typeinfo.getContentInfo(), 
-							readcontext);
+						handler.handleAttributeValue(topse.getObject(), null, null, topse.getContent(), typeinfo.getContentInfo(), readcontext);
 					}
 					else
 					{
@@ -432,12 +431,12 @@ public class Reader
 				
 				// Handle post-processing
 				
-				if(typeinfo!=null && typeinfo.getPostProcessor()!=null)
+				final IPostProcessor postproc = handler.getPostProcessor(topse.getObject(), typeinfo);
+				if(postproc!=null)
 				{
-					final IPostProcessor postproc = typeinfo.getPostProcessor();
 					if(postproc.getPass()==0)
 					{
-						Object changed = typeinfo.getPostProcessor().postProcess(readcontext, topse.getObject());
+						Object changed = postproc.postProcess(readcontext, topse.getObject());
 						if(changed!=null)
 							topse.setObject(changed);
 					}
@@ -555,12 +554,30 @@ public class Reader
 	 *  @param val The string value.
 	 *  @return The encoded object.
 	 */
+	public static Object objectFromXML(Reader reader, String val, ClassLoader classloader, Object context)
+	{
+		return objectFromByteArray(reader, val.getBytes(), classloader, context);
+	}
+		
+	/**
+	 *  @param val The string value.
+	 *  @return The encoded object.
+	 */
 	public static Object objectFromByteArray(Reader reader, byte[] val, ClassLoader classloader)
+	{
+		return objectFromByteArray(reader, val, classloader, null);
+	}
+	
+	/**
+	 *  @param val The string value.
+	 *  @return The encoded object.
+	 */
+	public static Object objectFromByteArray(Reader reader, byte[] val, ClassLoader classloader, Object context)
 	{
 		try
 		{
 			ByteArrayInputStream bis = new ByteArrayInputStream(val);
-			Object ret = reader.read(bis, classloader, null);
+			Object ret = reader.read(bis, classloader, context);
 			bis.close();
 			return ret;
 		}

@@ -7,6 +7,7 @@ import jadex.rules.state.OAVJavaType;
 import jadex.rules.state.OAVObjectType;
 import jadex.xml.AttributeInfo;
 import jadex.xml.BasicTypeConverter;
+import jadex.xml.IPostProcessor;
 import jadex.xml.IStringObjectConverter;
 import jadex.xml.ObjectInfo;
 import jadex.xml.SXML;
@@ -465,6 +466,15 @@ public class OAVObjectReaderHandler implements IObjectReaderHandler
 		{
 			state.addAttributeValue(object, attrtype, elem);
 		}
+	}
+	
+	/**
+	 *  Get the post-processor.
+	 *  @return The post-processor
+	 */
+	public IPostProcessor getPostProcessor(Object object, Object typeinfo)
+	{
+		return typeinfo instanceof TypeInfo? ((TypeInfo)typeinfo).getPostProcessor(): null;
 	}
 
 }

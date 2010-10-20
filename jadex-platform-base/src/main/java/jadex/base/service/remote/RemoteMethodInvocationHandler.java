@@ -9,7 +9,6 @@ import jadex.micro.IMicroExternalAccess;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
-import java.util.Map;
 
 /**
  *  Class that implements the Java proxy InvocationHandler, which
@@ -25,19 +24,19 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 	/** The proxy info. */
 	protected ProxyInfo pi;
 	
-	/** The waiting calls. */
-	protected Map waitingcalls;
+	/** The call context. */
+	protected CallContext context;
 	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new invocation handler.
 	 */
-	public RemoteMethodInvocationHandler(IMicroExternalAccess component, ProxyInfo pi, Map waitingcalls)
+	public RemoteMethodInvocationHandler(IMicroExternalAccess component, ProxyInfo pi, CallContext context)
 	{
 		this.component = component;
 		this.pi = pi;
-		this.waitingcalls = waitingcalls;
+		this.context = context;
 //		System.out.println("handler: "+pi.getServiceIdentifier().getServiceType()+" "+pi.getCache());
 	}
 	
@@ -80,28 +79,11 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 		final IComponentIdentifier compid = component.getComponentIdentifier();
 		final String callid = SUtil.createUniqueId(compid.getLocalName());
 		
-		// Preprocess arguments and make proxyinfos out of IProxyable objects.
-//		for(int i=0; i<args.length; i++)
-//		{
-//			if(args[i] instanceof IProxyable)
-//			{
-//				
-//			}
-//		}
+		RemoteMethodInvocationCommand content = new RemoteMethodInvocationCommand(
+			pi.getTargetIdentifier(), method.getName(), method.getParameterTypes(), args, callid, compid);
 		
-		RemoteMethodInvocationCommand content;
-		if(pi.getServiceIdentifier()!=null)
-		{
-			content = new RemoteMethodInvocationCommand(pi.getServiceIdentifier(), method.getName(), 
-				method.getParameterTypes(), args, callid, compid);
-		}
-		else
-		{
-			content = new RemoteMethodInvocationCommand(pi.getComponentIdentifier(), method.getName(), 
-				method.getParameterTypes(), args, callid, compid);
-		}
-		
-		RemoteServiceManagementService.sendMessage(component, pi.getRemoteManagementServiceIdentifier(), content, callid, -1, waitingcalls, future);
+		RemoteServiceManagementService.sendMessage(component, pi.getRemoteManagementServiceIdentifier(), 
+			content, callid, -1, context, future);
 		
 		if(method.getReturnType().equals(void.class) && !pi.isSynchronous(method))
 		{

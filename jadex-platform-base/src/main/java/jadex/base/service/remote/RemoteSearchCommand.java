@@ -79,7 +79,7 @@ public class RemoteSearchCommand implements IRemoteCommand
 	 *  @return An optional result command that will be 
 	 *  sent back to the command origin. 
 	 */
-	public IFuture execute(final IMicroExternalAccess component, Map waitingcalls)
+	public IFuture execute(final IMicroExternalAccess component, CallContext context)
 	{
 		final Future ret = new Future();
 			
@@ -123,26 +123,26 @@ public class RemoteSearchCommand implements IRemoteCommand
 									content = getProxyInfo(component.getComponentIdentifier(), tmp);
 								}
 								
-								ret.setResult(new RemoteSearchResultCommand(content, null , callid));
+								ret.setResult(new RemoteResultCommand(content, null , callid));
 							}
 							
 							public void exceptionOccurred(Object source, Exception exception)
 							{
-								ret.setResult(new RemoteSearchResultCommand(null, exception, callid));
+								ret.setResult(new RemoteResultCommand(null, exception, callid));
 							}
 						});
 					}
 					
 					public void exceptionOccurred(Object source, Exception exception)
 					{
-						ret.setResult(new RemoteSearchResultCommand(null, exception, callid));
+						ret.setResult(new RemoteResultCommand(null, exception, callid));
 					}
 				});
 			}
 			
 			public void exceptionOccurred(Object source, Exception exception)
 			{
-				ret.setResult(new RemoteSearchResultCommand(null, exception, callid));
+				ret.setResult(new RemoteResultCommand(null, exception, callid));
 			}
 		});
 		
@@ -273,7 +273,7 @@ public class RemoteSearchCommand implements IRemoteCommand
 	 */
 	public static ProxyInfo createProxyInfo(IComponentIdentifier rms, IService service)
 	{
-		ProxyInfo ret = new ProxyInfo(rms, service.getServiceIdentifier());
+		ProxyInfo ret = new ProxyInfo(rms, service.getServiceIdentifier(), service.getServiceIdentifier().getServiceType());
 		fillProxyInfo(ret, service, service.getServiceIdentifier().getServiceType(), service.getPropertyMap());
 		return ret;
 //		System.out.println("Creating proxy for: "+type);

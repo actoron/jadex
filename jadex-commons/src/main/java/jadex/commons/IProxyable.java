@@ -1,4 +1,4 @@
-package jadex.base.service.remote;
+package jadex.commons;
 
 /**
  *  Marker interface for objects that should be passed as proxy 

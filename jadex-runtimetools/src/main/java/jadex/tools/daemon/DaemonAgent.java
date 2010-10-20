@@ -184,7 +184,7 @@ public class DaemonAgent extends MicroAgent
 								fin = true;
 								IComponentIdentifier cid = new ComponentIdentifier(buf.toString());
 								platforms.put(cid, proc);
-								notifyListeners(new ChangeEvent(this, IDaemonService.ADDED, cid));
+								notifyListeners(new ChangeEvent(null, IDaemonService.ADDED, cid));
 								ret.setResult(cid);
 								break;
 							}
@@ -205,7 +205,7 @@ public class DaemonAgent extends MicroAgent
 								fin = true;
 								IComponentIdentifier cid = new ComponentIdentifier(buf.toString());
 								platforms.put(cid, proc);
-								notifyListeners(new ChangeEvent(this, IDaemonService.ADDED, cid));
+								notifyListeners(new ChangeEvent(null, IDaemonService.ADDED, cid));
 								ret.setResult(cid);
 								break;
 							}
@@ -224,7 +224,7 @@ public class DaemonAgent extends MicroAgent
 							fin = true;
 							IComponentIdentifier cid = new ComponentIdentifier(buf.toString());
 							platforms.put(cid, proc);
-							notifyListeners(new ChangeEvent(this, IDaemonService.ADDED, cid));
+							notifyListeners(new ChangeEvent(null, IDaemonService.ADDED, cid));
 							ret.setResult(cid);
 						}
 					}

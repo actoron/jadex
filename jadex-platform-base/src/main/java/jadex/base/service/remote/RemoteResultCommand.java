@@ -4,6 +4,7 @@ import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.micro.IMicroExternalAccess;
 
+import java.security.AllPermission;
 import java.util.Map;
 
 /**
@@ -50,9 +51,9 @@ public class RemoteResultCommand implements IRemoteCommand
 	 *  @return An optional result command that will be 
 	 *  sent back to the command origin. 
 	 */
-	public IFuture execute(IMicroExternalAccess component, Map waitingcalls)
+	public IFuture execute(IMicroExternalAccess component, CallContext context)
 	{
-		Future future = (Future)waitingcalls.get(callid);
+		Future future = (Future)context.getWaitingCall(callid);
 		
 		if(future==null)
 		{

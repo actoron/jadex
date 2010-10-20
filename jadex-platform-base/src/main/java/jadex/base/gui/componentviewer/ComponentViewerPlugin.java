@@ -410,8 +410,8 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 													}
 													catch(Exception e)
 													{
-//														e.printStackTrace();
-														getJCC().displayError("Error initializing service viewer panel.", "Component viewer panel class: "+classname, e);
+														e.printStackTrace();
+														getJCC().displayError("Error initializing component viewer panel.", "Component viewer panel class: "+classname, e);
 													}
 												}
 											});

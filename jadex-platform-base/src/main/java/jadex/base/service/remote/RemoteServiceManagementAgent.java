@@ -9,6 +9,8 @@ import jadex.commons.service.library.ILibraryService;
 import jadex.micro.MicroAgent;
 import jadex.xml.bean.JavaReader;
 import jadex.xml.bean.JavaWriter;
+import jadex.xml.reader.Reader;
+import jadex.xml.writer.Writer;
 
 import java.util.Map;
 
@@ -60,7 +62,8 @@ public class RemoteServiceManagementAgent extends MicroAgent
 						// Should be ignored or be a warning.
 						try
 						{
-							content = JavaReader.objectFromXML((String)content, ls.getClassLoader());
+//							content = JavaReader.objectFromXML((String)content, ls.getClassLoader());
+							content = Reader.objectFromXML(rms.getCallContext().getReader(), (String)content, ls.getClassLoader(), rms.getCallContext());
 						}
 						catch(Exception e)
 						{
@@ -72,7 +75,7 @@ public class RemoteServiceManagementAgent extends MicroAgent
 					if(content instanceof IRemoteCommand)
 					{
 						final IRemoteCommand com = (IRemoteCommand)content;
-						com.execute(getExternalAccess(), rms.getWaitingCalls()).addResultListener(createResultListener(new DefaultResultListener()
+						com.execute(getExternalAccess(), rms.getCallContext()).addResultListener(createResultListener(new DefaultResultListener()
 						{
 							public void resultAvailable(Object source, Object result)
 							{
@@ -85,7 +88,8 @@ public class RemoteServiceManagementAgent extends MicroAgent
 										public void resultAvailable(Object source, Object result)
 										{
 											Map reply = (Map)result;
-											reply.put(SFipa.CONTENT, JavaWriter.objectToXML(repcontent, ls.getClassLoader()));
+//											reply.put(SFipa.CONTENT, JavaWriter.objectToXML(repcontent, ls.getClassLoader()));
+											reply.put(SFipa.CONTENT, Writer.objectToXML(rms.getCallContext().getWriter(), repcontent, ls.getClassLoader(), rms.getCallContext()));
 											sendMessage(reply, mt);
 										}
 										public void exceptionOccurred(Object source, Exception exception)

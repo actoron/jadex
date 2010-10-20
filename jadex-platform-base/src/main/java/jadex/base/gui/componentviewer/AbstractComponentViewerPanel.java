@@ -73,7 +73,6 @@ public abstract class AbstractComponentViewerPanel implements IComponentViewerPa
 	{
 		return null;
 	}
-
 	
 	/**
 	 *  Get the jcc.

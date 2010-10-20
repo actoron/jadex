@@ -22,9 +22,13 @@ public class ProxyInfo
 	/** The rms. */
 	protected IComponentIdentifier rms;
 	
-	/** The service identifier. */
-	protected IServiceIdentifier sid; 
+	/** The target identifier (sid, cid, or tid). */
+	protected Object targetid;
 	
+	/** The target class. */
+	protected Class targetclass;
+	
+		
 	/** The value cache. */
 	protected Map cache;
 	
@@ -40,14 +44,6 @@ public class ProxyInfo
 	/** The replacements for methods (method-info -> replacement method). */
 	protected Map replacements;
 	
-	// alternaltively to sid we may have cid and targetclass
-	
-	/** The component identifier. */
-	protected IComponentIdentifier cid; 
-	
-	/** The target class. */
-	protected Class targetclass;
-	
 	//-------- constructors --------
 	
 	/**
@@ -60,22 +56,13 @@ public class ProxyInfo
 	/**
 	 *  Create a new proxy info.
 	 */
-	public ProxyInfo(IComponentIdentifier rms, IServiceIdentifier sid)
+	public ProxyInfo(IComponentIdentifier rms, Object targetid, Class targetclass)
 	{
 		this.rms = rms;
-		this.sid = sid;
-	}
-	
-	/**
-	 *  Create a new proxy info.
-	 */
-	public ProxyInfo(IComponentIdentifier rms, IComponentIdentifier cid, Class targetclass)
-	{
-		this.rms = rms;
-		this.cid = cid;
+		this.targetid = targetid;
 		this.targetclass = targetclass;
 	}
-
+	
 	//-------- methods --------
 	
 	/**
@@ -96,24 +83,6 @@ public class ProxyInfo
 		this.rms = rms;
 	}
 
-	/**
-	 *  Get the sid.
-	 *  @return the sid.
-	 */
-	public IServiceIdentifier getServiceIdentifier()
-	{
-		return sid;
-	}
-
-	/**
-	 *  Set the sid.
-	 *  @param sid The sid to set.
-	 */
-	public void setServiceIdentifier(IServiceIdentifier sid)
-	{
-		this.sid = sid;
-	}
-	
 	/**
 	 *  Get the cached values.
 	 *  @return The cached values. 
@@ -195,23 +164,23 @@ public class ProxyInfo
 	}
 	
 	/**
-	 *  Get the cid.
-	 *  @return the cid.
+	 *  Get the target id.
+	 *  @return The target id.
 	 */
-	public IComponentIdentifier getComponentIdentifier()
+	public Object getTargetIdentifier()
 	{
-		return cid;
+		return targetid;
 	}
 
 	/**
-	 *  Set the cid.
-	 *  @param cid The cid to set.
+	 *  Set the target id.
+	 *  @param cid The target id to set.
 	 */
-	public void setComponentIdentifier(IComponentIdentifier cid)
+	public void setTargetIdentifier(Object targetid)
 	{
-		this.cid = cid;
+		this.targetid = targetid;
 	}
-
+	
 	/**
 	 *  Get the targetclass.
 	 *  @return the targetclass.
@@ -353,10 +322,10 @@ public class ProxyInfo
 	 */
 	public String toString()
 	{
-		return "ProxyInfo(rms=" + rms + ", sid=" + sid + ", cache=" + cache
+		return "ProxyInfo(rms=" + rms + ", targetid=" + targetid + ", cache=" + cache
 				+ ", excluded=" + excluded + ", uncached=" + uncached
 				+ ", synchronous=" + synchronous + ", replacements="
-				+ replacements + ", cid=" + cid + ", targetclass="
+				+ replacements + ", targetclass="
 				+ targetclass + ")";
 	}
 	

@@ -172,7 +172,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 		properties.put("debugger.breakpoints", names);
 		
 		// Exclude getServiceProvider() from remote external access interface
-		addExcludedMethods(properties, new String[]{"getServiceProvider"});
+//		addExcludedMethods(properties, new String[]{"getServiceProvider"});
 		
 		IModelInfo ret = new ModelInfo(name, packagename, description, report, 
 			configurations, arguments, results, true, model, properties, classloader);

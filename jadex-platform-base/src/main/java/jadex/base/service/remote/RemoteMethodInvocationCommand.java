@@ -20,11 +20,14 @@ public class RemoteMethodInvocationCommand implements IRemoteCommand
 {
 	//-------- attributes --------
 	
-	/** The service identifier. */
-	protected IServiceIdentifier sid;
+//	/** The service identifier. */
+//	protected IServiceIdentifier sid;
+//	
+//	/** The component identifier (for alternatively invoking method on external access). */
+//	protected IComponentIdentifier cid;
 	
-	/** The component identifier (for alternatively invoking method on external access). */
-	protected IComponentIdentifier cid;
+	/** The target object identifier. */
+	protected Object targetid;
 	
 	/** The methodname. */
 	protected String methodname;
@@ -53,10 +56,10 @@ public class RemoteMethodInvocationCommand implements IRemoteCommand
 	/**
 	 *  Create a new remote method invocation command. 
 	 */
-	public RemoteMethodInvocationCommand(IServiceIdentifier sid, String methodname, 
+	public RemoteMethodInvocationCommand(Object targetid, String methodname, 
 		Class[] parametertypes, Object[] parametervalues, String callid, IComponentIdentifier rms)
 	{
-		this.sid = sid;
+		this.targetid = targetid;
 		this.methodname = methodname;
 		this.parametertypes = parametertypes;
 		this.parametervalues = parametervalues;
@@ -64,19 +67,33 @@ public class RemoteMethodInvocationCommand implements IRemoteCommand
 		this.rms = rms;
 	}
 	
-	/**
-	 *  Create a new remote method invocation command. 
-	 */
-	public RemoteMethodInvocationCommand(IComponentIdentifier cid, String methodname, 
-		Class[] parametertypes, Object[] parametervalues, String callid, IComponentIdentifier rms)
-	{
-		this.cid = cid;
-		this.methodname = methodname;
-		this.parametertypes = parametertypes;
-		this.parametervalues = parametervalues;
-		this.callid = callid;
-		this.rms = rms;
-	}
+//	/**
+//	 *  Create a new remote method invocation command. 
+//	 */
+//	public RemoteMethodInvocationCommand(IServiceIdentifier sid, String methodname, 
+//		Class[] parametertypes, Object[] parametervalues, String callid, IComponentIdentifier rms)
+//	{
+//		this.sid = sid;
+//		this.methodname = methodname;
+//		this.parametertypes = parametertypes;
+//		this.parametervalues = parametervalues;
+//		this.callid = callid;
+//		this.rms = rms;
+//	}
+//	
+//	/**
+//	 *  Create a new remote method invocation command. 
+//	 */
+//	public RemoteMethodInvocationCommand(IComponentIdentifier cid, String methodname, 
+//		Class[] parametertypes, Object[] parametervalues, String callid, IComponentIdentifier rms)
+//	{
+//		this.cid = cid;
+//		this.methodname = methodname;
+//		this.parametertypes = parametertypes;
+//		this.parametervalues = parametervalues;
+//		this.callid = callid;
+//		this.rms = rms;
+//	}
 	
 	//-------- methods --------
 
@@ -86,62 +103,84 @@ public class RemoteMethodInvocationCommand implements IRemoteCommand
 	 *  @return An optional result command that will be 
 	 *  sent back to the command origin. 
 	 */
-	public IFuture execute(IMicroExternalAccess component, Map waitingcalls)
+	public IFuture execute(IMicroExternalAccess component, CallContext context)
 	{
 		final Future ret = new Future();
 		
-		// fetch component via target component id
-		SServiceProvider.getServiceUpwards(component.getServiceProvider(), IComponentManagementService.class)
-			.addResultListener(new IResultListener()
-//			.addResultListener(component.createResultListener(new IResultListener()
+		if(getTargetIdentifier() instanceof String)
 		{
-			public void resultAvailable(Object source, Object result)
+			String tid = (String)getTargetIdentifier();
+			Object target = context.getTargetObject(tid);
+			if(target!=null)
 			{
-				IComponentManagementService cms = (IComponentManagementService)result;
-				
-				cms.getExternalAccess(getTargetId()).addResultListener(new IResultListener()
+				invokeMethod(target, ret);
+			}
+			else
+			{
+				ret.setResult(new RemoteResultCommand(null, new RuntimeException("Target object not found: "+tid), callid));
+			}
+		}
+		else if(getTargetIdentifier() instanceof IServiceIdentifier)
+		{
+			IServiceIdentifier sid = (IServiceIdentifier)getTargetIdentifier();
+			
+			// fetch service via its id
+			SServiceProvider.getService(component.getServiceProvider(), sid)
+				.addResultListener(new IResultListener()
+			{
+				public void resultAvailable(Object source, Object result)
 				{
-					public void resultAvailable(Object source, Object result)
+					invokeMethod(result, ret);
+				}
+				
+				public void exceptionOccurred(Object source, Exception exception)
+				{
+					ret.setResult(new RemoteResultCommand(null, exception, callid));
+				}
+			});
+		}
+		else if(getTargetIdentifier() instanceof IComponentIdentifier)
+		{
+			final IComponentIdentifier cid = (IComponentIdentifier)getTargetIdentifier();
+			
+			// fetch component via target component id
+			SServiceProvider.getServiceUpwards(component.getServiceProvider(), IComponentManagementService.class)
+				.addResultListener(new IResultListener()
+//				.addResultListener(component.createResultListener(new IResultListener()
+			{
+				public void resultAvailable(Object source, Object result)
+				{
+					IComponentManagementService cms = (IComponentManagementService)result;
+					
+					// fetch target component via component identifier.
+					cms.getExternalAccess(cid).addResultListener(new IResultListener()
 					{
-						IExternalAccess exta = (IExternalAccess)result;
-						
-						// fetch service on target component 
-						if(sid!=null)
+						public void resultAvailable(Object source, Object result)
 						{
-							SServiceProvider.getDeclaredService(exta.getServiceProvider(), sid)
-								.addResultListener(new IResultListener()
-							{
-								public void resultAvailable(Object source, Object result)
-								{
-									invokeMethod(result, ret);
-								}
-								
-								public void exceptionOccurred(Object source, Exception exception)
-								{
-									ret.setResult(new RemoteResultCommand(null, exception, callid));
-								}
-							});
-						}
-						// invoke method directly on external access
-						else
-						{
+							IExternalAccess exta = (IExternalAccess)result;
+							
+							// invoke method directly on external access
 							invokeMethod(exta, ret);
 						}
-					}
-					
-					public void exceptionOccurred(Object source, Exception exception)
-					{
-						ret.setResult(new RemoteResultCommand(null, exception, callid));
-					}
-				});
-			}
-			
-			public void exceptionOccurred(Object source, Exception exception)
-			{
-				ret.setResult(new RemoteResultCommand(null, exception, callid));
-			}
-		});
-			
+						
+						public void exceptionOccurred(Object source, Exception exception)
+						{
+							ret.setResult(new RemoteResultCommand(null, exception, callid));
+						}
+					});
+				}
+				
+				public void exceptionOccurred(Object source, Exception exception)
+				{
+					ret.setResult(new RemoteResultCommand(null, exception, callid));
+				}
+			});
+		}
+		else
+		{
+			System.out.println("remote invocation error, not target could be found: "+getTargetIdentifier());
+		}
+		
 		return ret;
 	}
 
@@ -184,14 +223,16 @@ public class RemoteMethodInvocationCommand implements IRemoteCommand
 		}
 	}
 	
-	/**
-	 *  Get the component target id.
-	 *  @return The component id of the target component.
-	 */
-	public IComponentIdentifier getTargetId()
-	{
-		return sid!=null? (IComponentIdentifier)sid.getProviderId(): cid;
-	}
+//	/**
+//	 *  Get the component target id.
+//	 *  @return The component id of the target component.
+//	 */
+//	public IComponentIdentifier getComponentId()
+//	{
+//		return targetid instanceof IComponentIdentifier? (IComponentIdentifier)targetid: targetid instanceof IServiceIdentifier? 
+//			(IComponentIdentifier)((IServiceIdentifier)targetid).getProviderId(): null; 
+////		return sid!=null? (IComponentIdentifier)sid.getProviderId(): cid;
+//	}
 	
 	//-------- getter/setter methods --------
 
@@ -206,23 +247,23 @@ public class RemoteMethodInvocationCommand implements IRemoteCommand
 		return rms;
 	}
 
-	/**
-	 *  Get the component identifier.
-	 *  @return the cid.
-	 */
-	public IComponentIdentifier getComponentIdentifier()
-	{
-		return cid;
-	}
+//	/**
+//	 *  Get the component identifier.
+//	 *  @return the cid.
+//	 */
+//	public IComponentIdentifier getComponentIdentifier()
+//	{
+//		return cid;
+//	}
 
-	/**
-	 *  Set the component identifier.
-	 *  @param cid The cid to set.
-	 */
-	public void setComponentIdentifier(IComponentIdentifier cid)
-	{
-		this.cid = cid;
-	}
+//	/**
+//	 *  Set the component identifier.
+//	 *  @param cid The cid to set.
+//	 */
+//	public void setComponentIdentifier(IComponentIdentifier cid)
+//	{
+//		this.cid = cid;
+//	}
 
 	/**
 	 *  Set the remote management service identifier.
@@ -233,23 +274,23 @@ public class RemoteMethodInvocationCommand implements IRemoteCommand
 		this.rms = rms;
 	}
 	
-	/**
-	 *  Get the service identifier.
-	 *  @return The service identifier.
-	 */
-	public IServiceIdentifier getServiceIdentifier()
-	{
-		return sid;
-	}
+//	/**
+//	 *  Get the service identifier.
+//	 *  @return The service identifier.
+//	 */
+//	public IServiceIdentifier getServiceIdentifier()
+//	{
+//		return sid;
+//	}
 
-	/**
-	 *  Set the service identifier.
-	 *  @param sid The service identifier to set.
-	 */
-	public void setServiceIdentifier(IServiceIdentifier sid)
-	{
-		this.sid = sid;
-	}
+//	/**
+//	 *  Set the service identifier.
+//	 *  @param sid The service identifier to set.
+//	 */
+//	public void setServiceIdentifier(IServiceIdentifier sid)
+//	{
+//		this.sid = sid;
+//	}
 
 	/**
 	 *  Get the methodname.
@@ -324,11 +365,29 @@ public class RemoteMethodInvocationCommand implements IRemoteCommand
 	}
 
 	/**
+	 *  Get the targetid.
+	 *  @return the targetid.
+	 */
+	public Object getTargetIdentifier()
+	{
+		return targetid;
+	}
+
+	/**
+	 *  Set the targetid.
+	 *  @param targetid The targetid to set.
+	 */
+	public void setTargetIdentifier(Object targetid)
+	{
+		this.targetid = targetid;
+	}
+
+	/**
 	 *  Get the string representation.
 	 */
 	public String toString()
 	{
-		return "RemoteMethodInvocationCommand(sid=" + sid + ", methodname="
+		return "RemoteMethodInvocationCommand(tid=" + targetid + ", methodname="
 			+ methodname + ", callid=" + callid + ")";
 	}
 	

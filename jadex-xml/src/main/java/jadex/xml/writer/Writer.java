@@ -310,7 +310,7 @@ public class Writer
 			if(tmp instanceof QName)
 			{
 				QName subtag = (QName)tmp; 
- 
+				
 				writeStartObject(writer, subtag, stack.size());
 				writer.writeCharacters(lf);
 				stack.add(new StackElement(subtag, null));
@@ -472,20 +472,37 @@ public class Writer
 	}
 	
 	/**
+	 *  Convert to a string.
+	 */
+	public static String objectToXML(Writer writer, Object val, ClassLoader classloader, Object context)
+	{
+		return new String(objectToByteArray(writer, val, classloader, context));
+	}
+	
+	/**
 	 *  Convert to a byte array.
 	 */
 	public static byte[] objectToByteArray(Writer writer, Object val, ClassLoader classloader)
 	{
+		return objectToByteArray(writer, val, classloader, null);
+	}
+	
+	/**
+	 *  Convert to a byte array.
+	 */
+	public static byte[] objectToByteArray(Writer writer, Object val, ClassLoader classloader, Object context)
+	{
 		try
 		{
 			ByteArrayOutputStream bos = new ByteArrayOutputStream();
-			writer.write(val, bos, classloader, null);
+			writer.write(val, bos, classloader, context);
 			byte[] ret = bos.toByteArray();
 			bos.close();
 			return ret;
 		}
 		catch(Exception e)
 		{
+			e.printStackTrace();
 //			System.out.println("Exception writing: "+val);
 			throw new RuntimeException(e);
 		}

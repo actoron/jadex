@@ -16,7 +16,7 @@ import jadex.micro.IMicroExternalAccess;
 /**
  * 
  */
-public class DaemonService extends BasicService implements IDaemonService, IService
+public class DaemonService extends BasicService implements IDaemonService
 {
 	//-------- attributes --------
 	

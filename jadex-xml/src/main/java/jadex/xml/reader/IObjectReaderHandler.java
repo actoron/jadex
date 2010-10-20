@@ -1,6 +1,7 @@
 package jadex.xml.reader;
 
 
+import jadex.xml.IPostProcessor;
 import jadex.xml.TypeInfo;
 
 import java.util.List;
@@ -84,4 +85,10 @@ public interface IObjectReaderHandler extends IObjectLinker, IBulkObjectLinker
 	 *  @return The most specific mapping info.
 	 */
 	public TypeInfo getTypeInfo(Object type, QName[] fullpath, ReadContext context);
+	
+	/**
+	 *  Get the post-processor.
+	 *  @return The post-processor
+	 */
+	public IPostProcessor getPostProcessor(Object object, Object typeinfo);
 }
