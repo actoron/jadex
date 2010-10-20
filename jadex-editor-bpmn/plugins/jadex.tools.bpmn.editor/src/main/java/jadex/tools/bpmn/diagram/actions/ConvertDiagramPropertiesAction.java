@@ -160,6 +160,7 @@ public class ConvertDiagramPropertiesAction implements IObjectActionDelegate
 		
 		// add the diagram to the elements to check
 		elementsToCheck.add((EModelElement) diagramEModelElement);
+		
 		// select all elements from diagram and subsequent elements
 		TreeIterator<EObject> contents = diagramEModelElement.eAllContents();
 		while (contents.hasNext())

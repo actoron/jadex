@@ -5,8 +5,8 @@ package jadex.tools.bpmn.editor.properties.template;
 
 import org.eclipse.emf.ecore.EAnnotation;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -96,7 +96,7 @@ public abstract class AbstractMultiTextfieldPropertySection extends
 			Text cTextfield = getWidgetFactory().createText(cComposite, "");
 			addDisposable(cTextfield);
 			textFields[i] = cTextfield;
-			cTextfield.addModifyListener(new ModifyJadexEAnnotation(textFieldNames[i], cTextfield));
+			cTextfield.addFocusListener(new ModifyJadexEAnnotation(textFieldNames[i], cTextfield));
 			cLabel.setLayoutData(labelGridData);
 			cTextfield.setLayoutData(textGridData);
 		}
@@ -119,7 +119,7 @@ public abstract class AbstractMultiTextfieldPropertySection extends
 				{
 					String tmpName = textFieldNames[i];
 					Text tmpField = textFields[i];
-					String tmpValue = (String) ea.getDetails().get(tmpName);
+					String tmpValue = (String) util.getJadexEAnnotationDetail(tmpName);
 					tmpField.setText(tmpValue != null ? tmpValue : "");
 					tmpField.setEnabled(true);
 				}
@@ -151,7 +151,7 @@ public abstract class AbstractMultiTextfieldPropertySection extends
 	/**
 	 * Tracks the change occurring on the text field.
 	 */
-	private class ModifyJadexEAnnotation implements ModifyListener
+	private class ModifyJadexEAnnotation implements FocusListener
 	{
 		private String key;
 		private Text field;
@@ -162,15 +162,25 @@ public abstract class AbstractMultiTextfieldPropertySection extends
 			this.field = field;
 		}
 
-		public void modifyText(ModifyEvent e)
+		@Override
+		public void focusGained(FocusEvent e)
+		{
+			// nothing to to
+		}
+
+		@Override
+		public void focusLost(FocusEvent e)
 		{
 			if (modelElement == null)
 			{ 
 				// the value was just initialized
 				return;
 			}
-			
-			updateJadexEAnnotation(key, field.getText());
+			String value = field.getText();
+			if (value != null)
+			{
+				updateJadexEAnnotation(key, value);
+			}
 		}
 	}
 

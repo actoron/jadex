@@ -135,7 +135,7 @@ public class JadexBpmnPropertiesUtil
 	 */
 	protected boolean updateJadexEAnnotation(final String detail, final String value)
 	{
-		EModelElement modelElement = section.getEModelElement();
+		EModelElement modelElement = getModelElement();
 		if(modelElement == null)
 		{
 			return false;
@@ -152,51 +152,49 @@ public class JadexBpmnPropertiesUtil
 	
 	public EAnnotation getJadexEAnnotation()
 	{
-		EModelElement modelElement = section.getEModelElement();
-		if(modelElement == null)
-		{
-			return null;
-		}
-		
-		EAnnotation annotation = modelElement.getEAnnotation(containerEAnnotationName);
-		if (annotation != null)
-		{
-			return annotation;
-		}
-		
-		return null;
+		return getJadexEAnnotation(getModelElement(), containerEAnnotationName);
 	}
 	
+
 	public String getJadexEAnnotationDetail(String detailID)
 	{
-		EAnnotation annotation = getJadexEAnnotation();
-		if (annotation != null)
-		{
-			return annotation.getDetails().get(detailID);
-		}
-		return null;
+		return getJadexEAnnotationDetail(getModelElement(), containerEAnnotationName, detailID);
+	}
+	
+	public String getJadexEAnnotationDetail()
+	{
+		return getJadexEAnnotationDetail(getModelElement(), containerEAnnotationName, annotationDetailName);
 	}
 	
 	/**
-	 * @return the containerEAnnotationName
+	 * Access the model element
+	 * @return the model element from section
 	 */
-	public String getContainerEAnnotationName()
+	private EModelElement getModelElement()
 	{
-		return containerEAnnotationName;
+		return section.getEModelElement();
 	}
-
-	/**
-	 * @return the annotationDetailName
-	 */
-	public String getAnnotationDetailName()
-	{
-		return annotationDetailName;
-	}
+	
+//	/**
+//	 * @return the containerEAnnotationName
+//	 */
+//	public String getContainerEAnnotationName()
+//	{
+//		return containerEAnnotationName;
+//	}
+//
+//	/**
+//	 * @return the annotationDetailName
+//	 */
+//	public String getAnnotationDetailName()
+//	{
+//		return annotationDetailName;
+//	}
 	
 	// ---- static methods ----
 
 	/**
-	 * Create the annotation identifier from util values
+	 * Create the annotation identifier from util instance values
 	 * 
 	 * @return
 	 */
@@ -209,7 +207,43 @@ public class JadexBpmnPropertiesUtil
 				+ JADEX_TABLE_KEY_EXTENSION;
 	}
 
+	public static EAnnotation getJadexEAnnotation(final EModelElement element, final String annotationIdentifier)
+	{
+		if(element == null)
+		{
+			return null;
+		}
+		
+		String lcAnnotationIdentifier = annotationIdentifier.toLowerCase();
+		EAnnotation annotation = element.getEAnnotation(lcAnnotationIdentifier);
+		
+		// try the upper case value
+		if (annotation == null)
+		{
+			annotation = element.getEAnnotation(annotationIdentifier);
+			
+			// change upper case annotation identifier
+			if (annotation != null /* && !lcAnnotationIdentifier.equals(annotationIdentifier) */)
+			{
+				if (element.getEAnnotations().remove(annotation))
+				{
+					annotation.setSource(lcAnnotationIdentifier);
+					element.getEAnnotations().add(annotation);
+				}
+			}
+		}
+		
+		// create annotation if not found yet
+		if (annotation == null)
+		{
+			annotation = EcoreFactory.eINSTANCE.createEAnnotation();
+			annotation.setSource(lcAnnotationIdentifier);
+			annotation.setEModelElement(element);
+		}
 
+		return annotation;
+	}
+	
 	/**
 	 * Update annotation detail
 	 * @param element
@@ -225,8 +259,7 @@ public class JadexBpmnPropertiesUtil
 			return false;
 		}
 		
-		
-		// update or create the annotation / detail
+		// update or create the annotation detail
 		ModifyEObjectCommand command = new ModifyEObjectCommand(
 				element, Messages.JadexCommonPropertySection_update_eannotation_command_name)
 		{
@@ -235,43 +268,19 @@ public class JadexBpmnPropertiesUtil
 					IProgressMonitor arg0, IAdaptable arg1)
 					throws ExecutionException
 			{
+				EAnnotation annotation = getJadexEAnnotation(element, annotationIdentifier);
 				
-				EAnnotation annotation = element.getEAnnotation(annotationIdentifier);
-
 				// use only lower case identifier strings!
-				String lcAnnotationIdentifier = annotationIdentifier.toLowerCase();
 				String lcAnnotationDetail = annotationDetail.toLowerCase();
-				
-				// change upper case annotation identifier
-				if (!lcAnnotationIdentifier.equals(annotationIdentifier))
-				{
-					element.getEAnnotations().remove(annotation);
-					annotation.setSource(lcAnnotationIdentifier);
-					element.getEAnnotations().add(annotation);
-				}
-				
-				// change upper case annotation identifier
+
+				// remove upper case annotation detail
 				if (!lcAnnotationDetail.equals(annotationDetail))
 				{
-					String value = annotation.getDetails().removeKey(annotationDetail);
-					if (value != null)
-					{
-						annotation.getDetails().put(lcAnnotationDetail, value);
-					}
+					annotation.getDetails().removeKey(annotationDetail);
 				}
-				
-				
-				if (annotation == null)
-				{
-					annotation = EcoreFactory.eINSTANCE.createEAnnotation();
-					annotation.setSource(lcAnnotationIdentifier);
-					annotation.setEModelElement(element);
-					// TODO: maybe remove empty string -- see also below
-					annotation.getDetails().put(lcAnnotationDetail, ""); //$NON-NLS-1$
-				}
-				
-				// we remove empty value strings as well 
-				// as empty annotations
+
+				// add key value pair or remove empty value 
+				// strings as well as empty annotations
 				if (value != null && !value.isEmpty())
 				{
 					annotation.getDetails().put(lcAnnotationDetail, value);
@@ -323,12 +332,29 @@ public class JadexBpmnPropertiesUtil
 		}
 		
 		EAnnotation annotation = element.getEAnnotation(annotationIdentifier);
+		
+		if (annotation == null)
+		{
+			// try the lower case identifier
+			annotation = element.getEAnnotation(annotationIdentifier.toLowerCase());
+		}
+		
 		if (annotation != null)
 		{
 			Object detail = annotation.getDetails().get(annotationDetail);
-			if (detail != null)
-				return detail.toString();
+			if (detail == null)
+			{
+				// try the lower case identifier
+				detail = annotation.getDetails().get(annotationDetail.toLowerCase());
+			}
 			
+			if (detail != null)
+			{
+				return detail.toString();
+			}
+			
+			// fall through, return empty string as detail
+			// TODO: check if this should be removed / return null instead
 			return "";
 		}
 	

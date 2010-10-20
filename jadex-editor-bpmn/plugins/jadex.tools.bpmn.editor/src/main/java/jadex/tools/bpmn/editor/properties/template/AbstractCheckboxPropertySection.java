@@ -110,7 +110,7 @@ public abstract class AbstractCheckboxPropertySection extends
 		super.setInput(part, selection);
 		if (modelElement != null)
 		{
-			String value = util.getJadexEAnnotationDetail(util.getAnnotationDetailName());
+			String value = util.getJadexEAnnotationDetail(util.annotationDetailName);
 			checkbox.setSelection(value != null && Boolean.valueOf(value));
 			checkbox.setEnabled(true);
 		}

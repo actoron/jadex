@@ -134,7 +134,7 @@ public class JadexMessageEventPropertySection extends AbstractBpmnPropertySectio
 		super.setInput(part, selection);
 		if (modelElement != null)
 		{
-			EAnnotation ea = modelElement.getEAnnotation(util.getContainerEAnnotationName());
+			EAnnotation ea = util.getJadexEAnnotation();
 			if (ea != null)
 			{
 				String tmpValue;
