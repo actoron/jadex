@@ -116,7 +116,7 @@ public abstract class SwingDefaultResultListener extends DefaultResultListener
 	{
 		if(parent!=null)
 		{
-//			exception.printStackTrace();
+			exception.printStackTrace();
 			String text = SUtil.wrapText("A problem occurred while performing the requested action: "+exception.getMessage());
 			JOptionPane.showMessageDialog(SGUI.getWindowParent(parent), text,
 				"Problem Occurred", JOptionPane.INFORMATION_MESSAGE);

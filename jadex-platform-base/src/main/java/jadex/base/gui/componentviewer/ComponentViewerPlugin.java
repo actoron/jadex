@@ -289,6 +289,7 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 				if(panels.containsKey(nodeid))
 				{
 					storeCurrentPanelSettings();
+					System.out.println("removeing: "+nodeid+" "+cards.getComponent(nodeid));
 					detail.remove(cards.getComponent(nodeid));
 					IAbstractViewerPanel panel = (IAbstractViewerPanel)panels.remove(nodeid);
 					panel.shutdown();
