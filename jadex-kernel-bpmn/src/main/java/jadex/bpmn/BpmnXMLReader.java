@@ -474,7 +474,7 @@ public class BpmnXMLReader
 					MAnnotation anno = (MAnnotation)annos.get(i);
 					
 					// new jadex parameter handling - we accept ALL "_parameters_table"
-					if(anno.getSource().endsWith("_parameters_table"))
+					if(anno.getSource().toLowerCase().endsWith("_parameters_table"))
 					{
 						BpmnMultiColumTable table = parseBpmnMultiColumTable(anno
 								.getDetails());
@@ -538,7 +538,7 @@ public class BpmnXMLReader
 					//else if ("jadex_properties_table".equals(anno.getSource()) || 
 					//			"subProcess_properties_table".equals(anno.getSource()))
 					// we accept ALL "_properties_table"
-					else if (anno.getSource().endsWith("_properties_table"))
+					else if (anno.getSource().toLowerCase().endsWith("_properties_table"))
 					{
 						BpmnMultiColumTable table = parseBpmnMultiColumTable(anno
 								.getDetails());
@@ -565,7 +565,7 @@ public class BpmnXMLReader
 						continue;
 					}
 					
-					if (!anno.getSource().endsWith("table"))
+					if (!anno.getSource().toLowerCase().endsWith("table"))
 					{
 						List details = anno.getDetails();
 						if (details != null)
@@ -575,7 +575,7 @@ public class BpmnXMLReader
 								MAnnotationDetail detail = (MAnnotationDetail) details
 										.get(j);
 
-								String key = detail.getKey();
+								String key = detail.getKey().toLowerCase();
 								String value = detail.getValue();
 
 								// TODO: remove old parameter handling
@@ -920,7 +920,7 @@ public class BpmnXMLReader
 					
 					// new mappings handling - we accept ALL "_mappings_table since a mapping is a mapping :-)
 					// todo: enhance mappings with index?
-					if(anno.getSource().endsWith("_mappings_table"))
+					if(anno.getSource().toLowerCase().endsWith("_mappings_table"))
 					{
 						BpmnMultiColumTable table = parseBpmnMultiColumTable(anno
 								.getDetails());
@@ -951,7 +951,7 @@ public class BpmnXMLReader
 						continue;
 					}
 					
-					if (!anno.getSource().endsWith("table"))
+					if (!anno.getSource().toLowerCase().endsWith("table"))
 					{
 						List details = anno.getDetails();
 						if (details != null)
@@ -961,7 +961,7 @@ public class BpmnXMLReader
 								MAnnotationDetail detail = (MAnnotationDetail) details
 										.get(j);
 
-								String key = detail.getKey();
+								String key = detail.getKey().toLowerCase();
 								String value = detail.getValue();
 
 								// TODO: remove old mappings handling
@@ -1195,7 +1195,7 @@ public class BpmnXMLReader
 				{
 					MAnnotation anno = (MAnnotation)annos.get(i);
 					
-					if (anno.getSource().endsWith("_imports_table")) 
+					if (anno.getSource().toLowerCase().endsWith("_imports_table")) 
 					{
 						BpmnMultiColumTable table = parseBpmnMultiColumTable(anno
 								.getDetails());
@@ -1220,7 +1220,7 @@ public class BpmnXMLReader
 				{
 					MAnnotation anno = (MAnnotation)annos.get(i);
 
-					if (!anno.getSource().endsWith("table"))
+					if (!anno.getSource().toLowerCase().endsWith("table"))
 					{
 						List details = anno.getDetails();
 						if (details != null)
@@ -1264,7 +1264,7 @@ public class BpmnXMLReader
 					MAnnotation anno = (MAnnotation)annos.get(i);
 					
 					// new jadex arguments handling
-					if(anno.getSource().endsWith("_arguments_table"))
+					if(anno.getSource().toLowerCase().endsWith("_arguments_table"))
 					{
 						BpmnMultiColumTable table = parseBpmnMultiColumTable(anno
 								.getDetails());
@@ -1335,7 +1335,7 @@ public class BpmnXMLReader
 						//continue;
 						
 					} // end new arguments handling
-					else if (!anno.getSource().endsWith("table"))
+					else if (!anno.getSource().toLowerCase().endsWith("table"))
 					{
 						// handle other annotation details here
 					
@@ -1582,9 +1582,13 @@ public class BpmnXMLReader
 		for(int j=0; j<details.size() && table == null; j++)
 		{
 			MAnnotationDetail detail = (MAnnotationDetail)details.get(j);
-			if("dimension".equals(detail.getKey()))
+			
+			String key = detail.getKey().toLowerCase();
+			String value = detail.getValue();
+			
+			if("dimension".equals(key))
 			{
-				table = new BpmnMultiColumTable(detail.getValue());
+				table = new BpmnMultiColumTable(value);
 			}
 		}
 		
@@ -1595,7 +1599,7 @@ public class BpmnXMLReader
 			MAnnotationDetail detail = (MAnnotationDetail) details
 					.get(j);
 
-			String key = detail.getKey();
+			String key = detail.getKey().toLowerCase();
 			String value = detail.getValue();
 
 			if ("dimension".equals(key)
