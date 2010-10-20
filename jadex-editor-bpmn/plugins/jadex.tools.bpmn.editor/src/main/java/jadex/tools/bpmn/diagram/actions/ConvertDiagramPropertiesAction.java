@@ -44,33 +44,66 @@ public class ConvertDiagramPropertiesAction implements IObjectActionDelegate
 	static {
 		toConvert = new ArrayList<TableAnnotationIdentifier>();
 		
+		// ---- parameters ----
 		toConvert
 				.add(new TableAnnotationIdentifier(
 						JadexCommonParameterSection.PARAMETER_ANNOTATION_IDENTIFIER,
 						JadexCommonParameterSection.PARAMETER_ANNOTATION_DETAIL_IDENTIFIER,
 						AbstractParameterTablePropertySection.UNIQUE_PARAMETER_ROW_ATTRIBUTE));
+		
+		// ---- diagram imports ----
 		toConvert.add(new TableAnnotationIdentifier(
 						JadexBpmnPropertiesUtil.JADEX_GLOBAL_ANNOTATION,
 						JadexBpmnPropertiesUtil.JADEX_IMPORT_LIST_DETAIL,
 						JadexBpmnDiagramImportsSection.UNIQUE_COLUMN_INDEX));
+		
+		// ---- diagram arguments ----
 		toConvert
 				.add(new TableAnnotationIdentifier(
 						JadexBpmnPropertiesUtil.JADEX_GLOBAL_ANNOTATION,
 						JadexBpmnPropertiesUtil.JADEX_ARGUMENTS_LIST_DETAIL,
 						JadexBpmnDiagramParameterSection.UNIQUE_LIST_ELEMENT_ATTRIBUTE_INDEX));
-		toConvert
+		
+		// ---- sub process ---
+		toConvert 
 				.add(new TableAnnotationIdentifier(
+						// old diagrams uses "subProcess" as source
 						JadexBpmnPropertiesUtil.JADEX_SUBPROCESS_ANNOTATION,
 						JadexBpmnPropertiesUtil.JADEX_PROPERTIES_LIST_DETAIL,
 						JadexBpmnDiagramPropertiesTableSection.UNIQUE_LIST_ELEMENT_ATTRIBUTE_INDEX));
 		toConvert
 				.add(new TableAnnotationIdentifier(
+						// use "jadex" in newer and converted diagrams
+						JadexBpmnPropertiesUtil.JADEX_GLOBAL_ANNOTATION,
+						JadexBpmnPropertiesUtil.JADEX_PROPERTIES_LIST_DETAIL,
+						JadexBpmnDiagramPropertiesTableSection.UNIQUE_LIST_ELEMENT_ATTRIBUTE_INDEX));
+		
+		// ---- activity ----
+		toConvert
+				.add(new TableAnnotationIdentifier(
+						// old diagrams uses "activity" as source
 						JadexBpmnPropertiesUtil.JADEX_ACTIVITY_ANNOTATION,
 						JadexBpmnPropertiesUtil.JADEX_PARAMETER_LIST_DETAIL,
 						JadexIntermediateEventsParameterSection.UNIQUE_LIST_ELEMENT_ATTRIBUTE_INDEX));
 		toConvert
 				.add(new TableAnnotationIdentifier(
+						// use "jadex" in newer and converted diagrams
+						JadexBpmnPropertiesUtil.JADEX_GLOBAL_ANNOTATION,
+						JadexBpmnPropertiesUtil.JADEX_PARAMETER_LIST_DETAIL,
+						JadexIntermediateEventsParameterSection.UNIQUE_LIST_ELEMENT_ATTRIBUTE_INDEX));
+		
+		
+		// ---- sequence edges ----
+		toConvert
+				.add(new TableAnnotationIdentifier(
+						// old diagrams uses "sequence" as source
 						JadexBpmnPropertiesUtil.JADEX_SEQUENCE_ANNOTATION,
+						JadexBpmnPropertiesUtil.JADEX_MAPPING_LIST_DETAIL,
+						JadexSequenceMappingSection.UNIQUE_LIST_ELEMENT_ATTRIBUTE_INDEX));
+		toConvert
+				.add(new TableAnnotationIdentifier(
+						// use "jadex" in newer and converted diagrams
+						JadexBpmnPropertiesUtil.JADEX_GLOBAL_ANNOTATION,
 						JadexBpmnPropertiesUtil.JADEX_MAPPING_LIST_DETAIL,
 						JadexSequenceMappingSection.UNIQUE_LIST_ELEMENT_ATTRIBUTE_INDEX));
 	}
@@ -99,7 +132,7 @@ public class ConvertDiagramPropertiesAction implements IObjectActionDelegate
 			if (structuredSelection.getFirstElement() instanceof EditPart)
 			{
 				EditPart ep = (EditPart) structuredSelection
-				.getFirstElement();
+					.getFirstElement();
 				
 				while (ep.getParent() != null && !(ep instanceof BpmnDiagramEditPart))
 				{
@@ -123,10 +156,12 @@ public class ConvertDiagramPropertiesAction implements IObjectActionDelegate
 	public void run(IAction action)
 	{
 		List<EModelElement> elementsToCheck = new ArrayList<EModelElement>();
+		EObject diagramEModelElement = ((View) diagramEdidPart.getModel()).getElement();
 		
-		// select all annotations from diagram and subsequent elements
-		EObject element = ((View) diagramEdidPart.getModel()).getElement();
-		TreeIterator<EObject> contents = element.eAllContents();
+		// add the diagram to the elements to check
+		elementsToCheck.add((EModelElement) diagramEModelElement);
+		// select all elements from diagram and subsequent elements
+		TreeIterator<EObject> contents = diagramEModelElement.eAllContents();
 		while (contents.hasNext())
 		{
 			EObject eObject = (EObject) contents.next();
