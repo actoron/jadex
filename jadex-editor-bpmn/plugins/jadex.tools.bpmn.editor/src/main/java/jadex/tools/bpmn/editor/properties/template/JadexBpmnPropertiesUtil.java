@@ -270,8 +270,9 @@ public class JadexBpmnPropertiesUtil
 					annotation.getDetails().put(lcAnnotationDetail, ""); //$NON-NLS-1$
 				}
 				
-				// TODO: maybe check isEmpty and remove detail with empty string?
-				if (value != null /*&& !value.isEmpty()*/)
+				// we remove empty value strings as well 
+				// as empty annotations
+				if (value != null && !value.isEmpty())
 				{
 					annotation.getDetails().put(lcAnnotationDetail, value);
 				}
@@ -467,12 +468,12 @@ public class JadexBpmnPropertiesUtil
 			String annotationId, String detailId, int uniqueColumnIndex)
 	{
 		EAnnotation ea = modelElement.getEAnnotation(annotationId);
-		if (ea == null && annotationId != "jadex")
+		if (ea == null && annotationId != JADEX_GLOBAL_ANNOTATION)
 		{
-			ea = modelElement.getEAnnotation("jadex");
+			ea = modelElement.getEAnnotation(JADEX_GLOBAL_ANNOTATION);
 			
 			assert ea != null : "Can't convert annotation: "+annotationId+":"+detailId+" from '"+modelElement+"'";
-			annotationId = "jadex";
+			annotationId = JADEX_GLOBAL_ANNOTATION;
 		}
 		
 		if (ea != null)
@@ -519,7 +520,7 @@ public class JadexBpmnPropertiesUtil
 				{
 					
 					// move all details into a single "jadex" annotation
-					EAnnotation jadexAnnotation = eModelElement.getEAnnotation("jadex");
+					EAnnotation jadexAnnotation = eModelElement.getEAnnotation(JADEX_GLOBAL_ANNOTATION);
 					EList<EAnnotation> annos = eModelElement.getEAnnotations();
 					
 					// if there is no jadex annotation but another annotation
@@ -527,7 +528,7 @@ public class JadexBpmnPropertiesUtil
 					{
 						// create the jadex annotation
 						jadexAnnotation = EcoreFactory.eINSTANCE.createEAnnotation();
-						jadexAnnotation.setSource("jadex");
+						jadexAnnotation.setSource(JADEX_GLOBAL_ANNOTATION);
 						jadexAnnotation.setEModelElement(eModelElement);
 
 					}
@@ -537,7 +538,7 @@ public class JadexBpmnPropertiesUtil
 					{
 						EAnnotation eAnnotation = annos.get(i);
 						// only convert non-table and none "single jadex" annotations
-						if (!eAnnotation.getSource().equals("jadex") 
+						if (!eAnnotation.getSource().equals(JADEX_GLOBAL_ANNOTATION) 
 								&& !eAnnotation.getSource().endsWith(JADEX_TABLE_KEY_EXTENSION))
 						{
 							jadexAnnotation.getDetails().addAll(eAnnotation.getDetails());

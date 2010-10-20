@@ -189,7 +189,7 @@ public abstract class AbstractParameterTablePropertySection extends
 	@Override
 	public void setInput(IWorkbenchPart part, ISelection selection)
 	{
-		// deregister the old viewer
+		// unregister the old viewer
 		removeParameterTableViewerFor(modelElement, tableViewer);
 		
 		super.setInput(part, selection);
