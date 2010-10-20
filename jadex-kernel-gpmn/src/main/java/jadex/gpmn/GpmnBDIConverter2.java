@@ -19,6 +19,7 @@ import jadex.rules.state.IOAVStateListener;
 import jadex.rules.state.OAVAttributeType;
 import jadex.rules.state.OAVObjectType;
 import jadex.rules.state.OAVTypeModel;
+import jadex.rules.state.io.xml.OAVUserContext;
 import jadex.rules.state.javaimpl.OAVStateFactory;
 import jadex.xml.IContext;
 import jadex.xml.IPostProcessor;
@@ -107,7 +108,7 @@ public class GpmnBDIConverter2
 		}
 		doConvert(model, classloader, state, handle, false);
 		state.removeStateListener(listener);
-		agentmodel =  new OAVAgentModel(state, handle, types, model.getModelInfo().getFilename(), model.getLastModified());//, report);
+		agentmodel =  new OAVAgentModel(state, handle, types, model.getModelInfo().getFilename(), model.getLastModified(), null);
 		try
 		{
 			loader.createAgentModelEntry(agentmodel);//, report);
@@ -740,7 +741,8 @@ public class GpmnBDIConverter2
 	protected void postProcessParameterElement(IContext context, Object paramelem, 
 		IPostProcessor exproc, IPostProcessor clproc)
 	{
-		IOAVState state = (IOAVState)context.getUserContext();
+		OAVUserContext	ouc	= (OAVUserContext)context.getUserContext();
+		IOAVState state = (IOAVState)ouc.getState();
 		Collection paramhandles = state.getAttributeValues(paramelem, OAVBDIMetaModel.parameterelement_has_parameters);
 		if(paramhandles!=null)
 		{

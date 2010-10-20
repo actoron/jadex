@@ -2,9 +2,10 @@ package jadex.bdi.benchmarks;
 
 import jadex.bdi.OAVBDIXMLReader;
 import jadex.bdi.model.OAVBDIMetaModel;
-import jadex.xml.reader.Reader;
 import jadex.rules.state.IOAVState;
+import jadex.rules.state.io.xml.OAVUserContext;
 import jadex.rules.state.javaimpl.OAVStateFactory;
+import jadex.xml.reader.Reader;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -41,7 +42,7 @@ public class ReaderBenchmark
 		Map kernelprops = new HashMap();
 		kernelprops.put("messagetype_fipa", new jadex.base.fipa.FIPAMessageType());
 		
-		Object	obj	= reader.read(new FileInputStream(args[0]), null, state);
+		Object	obj	= reader.read(new FileInputStream(args[0]), null, new OAVUserContext(state, null));
 		
 		// Start tests.
 		int cnt	= 100;
@@ -81,7 +82,7 @@ public class ReaderBenchmark
 		{
 			states[i]	= OAVStateFactory.createOAVState(OAVBDIMetaModel.bdimm_type_model);
 //			states[i]	= new JenaOAVState();
-			reader.read(new FileInputStream(arg), null, states[i]);
+			reader.read(new FileInputStream(arg), null, new OAVUserContext(states[i], null));
 		}
 		return states;
 	}

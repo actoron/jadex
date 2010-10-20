@@ -163,7 +163,7 @@ public class OAVObjectReaderHandler implements IObjectReaderHandler
 	public Object createObject(Object type, boolean root, ReadContext context, Map rawattributes) throws Exception
 	{
 		Object ret = null;
-		IOAVState state = (IOAVState)context.getUserContext();
+		IOAVState state = ((OAVUserContext)context.getUserContext()).getState();
 		
 		if(type instanceof TypeInfo)
 			type =  ((TypeInfo)type).getTypeInfo();
@@ -262,7 +262,7 @@ public class OAVObjectReaderHandler implements IObjectReaderHandler
 		if(attrval==null && !(attrinfo instanceof AttributeInfo && ((AttributeInfo)attrinfo).getAccessInfo().getDefaultValue()!=null))
 			return;
 		
-		IOAVState state = (IOAVState)context.getUserContext();
+		IOAVState state = ((OAVUserContext)context.getUserContext()).getState();
 
 		OAVAttributeType attrtype = null;
 		Object val = attrval;
@@ -348,7 +348,7 @@ public class OAVObjectReaderHandler implements IObjectReaderHandler
 	 */
 	public void linkObject(Object elem, Object parent, Object linkinfo, QName[] pathname, ReadContext context) throws Exception
 	{
-		IOAVState state = (IOAVState)context.getUserContext();
+		IOAVState state = ((OAVUserContext)context.getUserContext()).getState();
 	
 //		int idx = pathname.lastIndexOf("/");
 //		String tagname = idx!=-1? pathname.substring(idx+1): pathname;

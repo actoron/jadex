@@ -369,11 +369,11 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory
 //		Report	report	= new Report();
 		if(state.getType(handle).isSubtype(OAVBDIMetaModel.agent_type))
 		{
-			ret	=  new OAVAgentModel(state, handle, (Set)(types!=null ? types[0] : null), filename, System.currentTimeMillis());//, report);
+			ret	=  new OAVAgentModel(state, handle, (Set)(types!=null ? types[0] : null), filename, System.currentTimeMillis(), null);
 		}
 		else
 		{
-			ret	=  new OAVCapabilityModel(state, handle, (Set)(types!=null ? types[0] : null), filename, System.currentTimeMillis());//, report);
+			ret	=  new OAVCapabilityModel(state, handle, (Set)(types!=null ? types[0] : null), filename, System.currentTimeMillis(), null);
 		}
 		
 		try

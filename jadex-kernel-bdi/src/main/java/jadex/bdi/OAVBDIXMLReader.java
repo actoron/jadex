@@ -2,6 +2,8 @@ package jadex.bdi;
 
 import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.commons.SReflect;
+import jadex.commons.Tuple;
+import jadex.commons.collection.MultiCollection;
 import jadex.javaparser.IExpressionParser;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
@@ -10,6 +12,7 @@ import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVAttributeType;
 import jadex.rules.state.io.xml.OAVObjectReaderHandler;
 import jadex.rules.state.io.xml.OAVObjectWriterHandler;
+import jadex.rules.state.io.xml.OAVUserContext;
 import jadex.xml.AccessInfo;
 import jadex.xml.AttributeConverter;
 import jadex.xml.AttributeInfo;
@@ -23,6 +26,7 @@ import jadex.xml.SubobjectInfo;
 import jadex.xml.TypeInfo;
 import jadex.xml.XMLInfo;
 import jadex.xml.bean.IBeanObjectCreator;
+import jadex.xml.reader.ReadContext;
 import jadex.xml.reader.Reader;
 import jadex.xml.writer.Writer;
 
@@ -410,8 +414,11 @@ public class OAVBDIXMLReader
 		public Object postProcess(IContext context, Object object)
 		{
 			clpost.postProcess(context, object);
+			OAVUserContext	ouc	= (OAVUserContext)context.getUserContext();
+			MultiCollection	report	= (MultiCollection)ouc.getCustom();
+			Object	se	= new Tuple(((ReadContext)context).getStack().toArray());
+			IOAVState state = (IOAVState)ouc.getState();
 			
-			IOAVState state = (IOAVState)context.getUserContext();
 			Object	ret	= null;
 			String	value	= (String)state.getAttributeValue(object, OAVBDIMetaModel.expression_has_content);
 			
@@ -431,7 +438,7 @@ public class OAVBDIXMLReader
 					}
 					else if("clips".equals(lang))
 					{
-						List	errors	= null;//new ArrayList();
+						List	errors	= new ArrayList();
 						try
 						{
 							ret = ParserHelper.parseClipsCondition(value, state.getTypeModel(), 
@@ -439,21 +446,21 @@ public class OAVBDIXMLReader
 						}
 						catch(Exception e)
 						{
-//							report.put(se, e.toString());
-							e.printStackTrace();
+							report.put(se, e.toString());
+//							e.printStackTrace();
 						}
-//						if(!errors.isEmpty())
-//						{
-//							for(int i=0; i<errors.size(); i++)
-//							{
-//								report.put(se, errors.get(i));
-//							}
-//						}
+						if(!errors.isEmpty())
+						{
+							for(int i=0; i<errors.size(); i++)
+							{
+								report.put(se, errors.get(i));
+							}
+						}
 					}
 					else
 					{
-//						report.put(se, "Unknown condition language: "+lang);
-						throw new RuntimeException("Unknown condition language: "+lang);
+						report.put(se, "Unknown condition language: "+lang);
+//						throw new RuntimeException("Unknown condition language: "+lang);
 					}	
 //					System.out.println(ret);
 
@@ -470,8 +477,8 @@ public class OAVBDIXMLReader
 						}
 						catch(Exception e)
 						{
-//							report.put(se, e.toString());
-							e.printStackTrace();
+							report.put(se, e.toString());
+//							e.printStackTrace();
 						}
 					}
 					else if("clips".equals(lang))
@@ -486,16 +493,16 @@ public class OAVBDIXMLReader
 						}
 						catch(Exception e)
 						{
-//							report.put(se, e.toString());
-							e.printStackTrace();
+							report.put(se, e.toString());
+//							e.printStackTrace();
 						}
 						if(!errors.isEmpty())
 						{
-//							for(int i=0; i<errors.size(); i++)
-//							{
-//								report.put(se, errors.get(i));
-//							}
-							throw new RuntimeException("Parse errors: "+value+" "+errors);
+							for(int i=0; i<errors.size(); i++)
+							{
+								report.put(se, errors.get(i));
+							}
+//							throw new RuntimeException("Parse errors: "+value+" "+errors);
 						}
 					}
 					else if(lang.equals("jcl"))
@@ -504,8 +511,8 @@ public class OAVBDIXMLReader
 					}
 					else
 					{
-//						report.put(se, "Unknown condition language: "+lang);
-						throw new RuntimeException("Unknown condition language: "+lang);
+						report.put(se, "Unknown condition language: "+lang);
+//						throw new RuntimeException("Unknown condition language: "+lang);
 					}
 				}
 			}
@@ -557,7 +564,10 @@ public class OAVBDIXMLReader
 		 */
 		public Object postProcess(IContext context, Object object)
 		{
-			IOAVState state = (IOAVState)context.getUserContext();
+			OAVUserContext	ouc	= (OAVUserContext)context.getUserContext();
+			MultiCollection	report	= (MultiCollection)ouc.getCustom();
+			Object	se	= new Tuple(((ReadContext)context).getStack().toArray());
+			IOAVState state = (IOAVState)ouc.getState();
 			String	value	= (String)state.getAttributeValue(object, classnameattr);
 			if(value!=null)
 			{
@@ -569,8 +579,8 @@ public class OAVBDIXMLReader
 				}
 				catch(Exception e)
 				{
-//					report.put(se, e.toString());
-					e.printStackTrace();
+					report.put(se, e.toString());
+//					e.printStackTrace();
 				}
 			}
 			

@@ -3,6 +3,7 @@ package jadex.bdi.model;
 import jadex.bridge.Argument;
 import jadex.bridge.IArgument;
 import jadex.commons.SReflect;
+import jadex.commons.collection.MultiCollection;
 import jadex.rules.rulesystem.IPatternMatcherFunctionality;
 import jadex.rules.rulesystem.IRule;
 import jadex.rules.state.IOAVState;
@@ -33,9 +34,9 @@ public class OAVAgentModel	extends OAVCapabilityModel
 	/**
 	 *  Create a model.
 	 */
-	public OAVAgentModel(IOAVState state, Object handle, Set types, String filename, long lastmod)//, IReport report)
+	public OAVAgentModel(IOAVState state, Object handle, Set types, String filename, long lastmod, MultiCollection entries)
 	{
-		super(state, handle, types, filename, lastmod);//, report);
+		super(state, handle, types, filename, lastmod, entries);
 	}
 	
 	//-------- IAgentModel methods --------

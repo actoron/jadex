@@ -10,6 +10,7 @@ import jadex.commons.ICacheableModel;
 import jadex.commons.IFuture;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
+import jadex.commons.Tuple;
 import jadex.commons.collection.IndexMap;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.collection.SCollection;
@@ -17,12 +18,14 @@ import jadex.javaparser.IParsedExpression;
 import jadex.rules.rulesystem.IRule;
 import jadex.rules.rulesystem.Rulebase;
 import jadex.rules.state.IOAVState;
+import jadex.rules.state.OAVObjectType;
 import jadex.xml.StackElement;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -58,8 +61,7 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 	protected ModelInfo modelinfo;
 	
 	// todo: use some internal report for collecting error stuff?!
-	
-	/** The multicollection holding the report messages. */
+	/** The multi-collection holding the report messages. */
 	protected MultiCollection	entries;
 	
 	/** The documents for external elements (e.g. capabilities). */
@@ -70,18 +72,17 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 	/**
 	 *  Create a model.
 	 */
-	public OAVCapabilityModel(IOAVState state, Object handle, Set types, String filename, long lastmod)//, IErrorReport report)
+	public OAVCapabilityModel(IOAVState state, Object handle, Set types, String filename, long lastmod, MultiCollection entries)
 	{
 		this.state	= state;
 		this.handle	= handle;
 		this.types	= types;
 		this.rulebase	= new Rulebase();
 		this.lastmod	= lastmod;
+		this.entries	= entries;
 	
-		IErrorReport report = entries==null? null: new ErrorReport(generateErrorText(), generateErrorHTML(), externals);
 		boolean startable = !this.getClass().equals(OAVCapabilityModel.class);
-		
-		this.modelinfo = new ModelInfo(getName(), getPackage(), getDescription(), report, getConfigurations(), getArguments(), 
+		this.modelinfo = new ModelInfo(getName(), getPackage(), getDescription(), null, getConfigurations(), getArguments(), 
 			getResults(), startable, filename, getProperties(), getClassLoader());
 	}
 	
@@ -516,6 +517,16 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 	}
 	
 	//-------- error stuff -> move somewhere?! --------
+
+	/**
+	 *  Build the error report (if any).
+	 */
+	public void	buildErrorReport()
+	{
+		IErrorReport report = entries==null || entries.size()==0 ? null
+			: new ErrorReport(generateErrorText(), generateErrorHTML(), externals);
+		modelinfo.setReport(report);
+	}
 	
 	/**
 	 *  Get the error entries.
@@ -527,41 +538,41 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 	
 	/**
 	 *  Add an entry to the report.
-	 *  @param element	The element to which the entry applies.
+	 *  @param stack	The path to the element to which the entry applies.
 	 *  @param message	The problem description. 
 	 */
-	public void	addEntry(StackElement element, String message)
+	public void	addEntry(Tuple stack, String message)
 	{
 		if(entries==null)
 			// Use index map to keep insertion order for elements.
 			this.entries	= new MultiCollection(new IndexMap().getAsMap(), ArrayList.class);
 
-		entries.put(element, message);
+		entries.put(stack, message);
 	}
 
 	/**
 	 *  Get all invalid elements.
 	 */
-	public StackElement[]	getElements()
+	public Tuple[]	getElements()
 	{
 		if(entries==null)
-			return new StackElement[0];
+			return new Tuple[0];
 		else
-			return (StackElement[])entries.getKeys(StackElement.class);
+			return (Tuple[])entries.getKeys(Tuple.class);
 	}
 
 	/**
 	 *  Get the messages for a given element.
 	 */
-	public String[]	getMessages(StackElement element)
+	public String[]	getMessages(Tuple path)
 	{
 		if(entries==null)
 		{
-			return new String[0];
+			return SUtil.EMPTY_STRING_ARRAY;
 		}
 		else
 		{
-			Collection	ret	= entries.getCollection(element);
+			Collection	ret	= entries.getCollection(path);
 			return (String[])ret.toArray(new String[ret.size()]);
 		}
 	}
@@ -585,10 +596,10 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 		
 		buf.append("\n");
 
-		StackElement[]	elements	= getElements();
+		Tuple[]	elements	= getElements();
 		for(int i=0; i<elements.length; i++)
 		{
-//				buf.append(elements[i].path);
+			buf.append(elements[i]);
 			buf.append(":\n");
 			String[]	messages	= 	getMessages(elements[i]);
 			for(int j=0; j<messages.length; j++)
@@ -619,14 +630,26 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 			buf.append("\n");
 		}
 
-//		StackElement[]	capabilities	= getCapabilityErrors();
-		StackElement[]	capabilities	= getOwnedElementErrors("capabilities");
-		StackElement[]	beliefs	= getOwnedElementErrors("beliefs");
-		StackElement[]	goals	= getOwnedElementErrors("goals");
-		StackElement[]	plans	= getOwnedElementErrors("plans");
-		StackElement[]	events	= getOwnedElementErrors("events");
-//		StackElement[]	configs	= getOwnedElementErrors(IMConfigBase.class);
-		StackElement[]	others	= getOtherErrors(new String[]{"capabilities", "beliefs", "goals", "plans", "events"});
+//		Tuple[]	capabilities	= getCapabilityErrors();
+		Set	capabilities	= getOwnedElementErrors(OAVBDIMetaModel.capabilityref_type);
+		Set	beliefs	= getOwnedElementErrors(OAVBDIMetaModel.belief_type);
+		beliefs.addAll(getOwnedElementErrors(OAVBDIMetaModel.beliefset_type));
+		beliefs.addAll(getOwnedElementErrors(OAVBDIMetaModel.beliefreference_type));
+		beliefs.addAll(getOwnedElementErrors(OAVBDIMetaModel.beliefsetreference_type));
+		Set	goals	= getOwnedElementErrors(OAVBDIMetaModel.goal_type);
+		goals.addAll(getOwnedElementErrors(OAVBDIMetaModel.goalreference_type));
+		Set	plans	= getOwnedElementErrors(OAVBDIMetaModel.plan_type);
+		Set	events	= getOwnedElementErrors(OAVBDIMetaModel.event_type);
+		events.addAll(getOwnedElementErrors(OAVBDIMetaModel.internaleventreference_type));
+		events.addAll(getOwnedElementErrors(OAVBDIMetaModel.messageeventreference_type));
+//		Tuple[]	configs	= getOwnedElementErrors(IMConfigBase.class);
+		Set excludes	= new HashSet();
+		excludes.addAll(capabilities);
+		excludes.addAll(beliefs);
+		excludes.addAll(goals);
+		excludes.addAll(plans);
+		excludes.addAll(events);
+		Set	others	= getOtherErrors(excludes);
 
 		
 		// Summaries.
@@ -677,57 +700,95 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 	}*/
 
 	/**
-	 *  Get elements contained in an element of the given ownertag, which have errors, or contain elements with errors.
+	 *  Get elements of the given owner type, which have errors or contain elements with errors.
 	 */
-	public StackElement[]	getOwnedElementErrors(String basetag)
+	public Set	getOwnedElementErrors(OAVObjectType type)
 	{
-		List	errors	= SCollection.createArrayList();
-		StackElement[]	elements	= getElements();			
+		Set	errors	= SCollection.createLinkedHashSet();
+		Tuple[]	elements	= getElements();			
 		for(int i=0; i<elements.length; i++)
 		{
-//			if(elements[i].path.indexOf(basetag)!=-1)
-//			{
-//				errors.add(elements[i]);
-//			}
+			boolean	added	= false;
+			for(int j=0; !added && j<elements[i].getEntities().length; j++)
+			{
+				StackElement	se	= (StackElement)elements[i].getEntity(j);
+				if(se.getObject()!=null)
+				{
+					added	= errors.contains(se.getObject());
+					if(!added && state.getType(se.getObject()).isSubtype(type))
+					{
+						errors.add(se.getObject());
+						added	= true;
+					}
+				}
+			}
 		}
-		return (StackElement[])errors.toArray(new StackElement[errors.size()]);
+		return errors;
 	}
 
 	/**
 	 *  Get other errors, not in the given tags.
 	 */
-	public StackElement[]	getOtherErrors(String[] excludes)
+	public Set	getOtherErrors(Set excludes)
 	{
-		List	errors	= SCollection.createArrayList();
-		StackElement[]	elements	= getElements();			
+		Set	errors	= SCollection.createLinkedHashSet();
+		Tuple[]	elements	= getElements();			
 		for(int i=0; i<elements.length; i++)
 		{
-			boolean	add	= true;
-			for(int j=0; add && j<excludes.length; j++)
+			boolean	excluded	= false;
+			for(int j=0; !excluded && j<elements[i].getEntities().length; j++)
 			{
-//				add	= elements[i].path.indexOf(excludes[j])==-1;
+				StackElement	se	= (StackElement)elements[i].getEntity(j);
+				if(se.getObject()!=null)
+				{
+					excluded	= excludes.contains(se.getObject());
+				}
 			}
-			if(add)
-				errors.add(elements[i]);
+			if(!excluded)
+			{
+				Object	obj	= getObject(elements[i]);
+				if(obj!=null && !errors.contains(obj))
+					errors.add(obj);
+			}
 		}
-		return (StackElement[])errors.toArray(new StackElement[errors.size()]);
+		return errors;
+	}
+
+	protected Object getObject(Tuple element)
+	{
+		Object	ret	= null;
+		for(int j=element.getEntities().length-1; ret==null && j>=0; j--)
+		{
+			StackElement	se	= (StackElement)element.getEntity(j);
+			if(se.getObject()!=null)
+			{
+				ret	= se.getObject();
+			}
+		}
+		return ret;
 	}
 
 	/**
 	 *  Get all elements which have errors and are contained in the given element.
 	 */
-	public StackElement[]	getElementErrors(StackElement ancestor)
+	public Tuple[]	getElementErrors(Object ancestor)
 	{
 		List	errors	= SCollection.createArrayList();
-		StackElement[]	elements	= getElements();			
+		Tuple[]	elements	= getElements();			
 		for(int i=0; i<elements.length; i++)
 		{
-//			if(elements[i].path.startsWith(ancestor.path))
-//			{
-//				errors.add(elements[i]);
-//			}
+			boolean	added	= errors.contains(elements[i]);
+			for(int j=0; !added && j<elements[i].getEntities().length; j++)
+			{
+				StackElement	se	= (StackElement)elements[i].getEntity(j);
+				if(ancestor.equals(se.getObject()))
+				{
+					errors.add(elements[i]);
+					added	= true;
+				}
+			}
 		}
-		return (StackElement[])errors.toArray(new StackElement[errors.size()]);
+		return (Tuple[])errors.toArray(new Tuple[errors.size()]);
 	}
 	
 	//-------- helper methods --------
@@ -735,19 +796,21 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 	/**
 	 *  Generate overview HTML code for the given elements.
 	 */
-	protected void	generateOverview(StringBuffer buf, String type, StackElement[] elements)
+	protected void	generateOverview(StringBuffer buf, String type, Set elements)
 	{
-		if(elements.length>0)
+		if(!elements.isEmpty())
 		{
 			buf.append("<li>");
 			buf.append(type);
 			buf.append(" errors\n<ul>\n");
-			for(int i=0; i<elements.length; i++)
+			for(Iterator it=elements.iterator(); it.hasNext(); )
 			{
+				Object	obj	= it.next();
+				String name = getElementName(obj);
 				buf.append("<li><a href=\"#");
-//				buf.append(SUtil.makeConform(""+elements[i].path));
+				buf.append(SUtil.makeConform(name));
 				buf.append("\">");
-//				buf.append(SUtil.makeConform(""+elements[i].path));
+				buf.append(SUtil.makeConform(name));
 				buf.append("</a> has errors.</li>\n");
 			}
 			buf.append("</ul>\n</li>\n");
@@ -755,21 +818,53 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 	}
 
 	/**
+	 *  Get the name of an element.
+	 */
+	protected String getElementName(Object obj)
+	{
+		String	name	= null;
+		if(state.getType(obj).isSubtype(OAVBDIMetaModel.modelelement_type))
+		{
+			name	= (String)state.getAttributeValue(obj, OAVBDIMetaModel.modelelement_has_name);
+		}
+		
+		if(name==null && state.getType(obj).isSubtype(OAVBDIMetaModel.elementreference_type))
+		{
+			name	= (String)state.getAttributeValue(obj, OAVBDIMetaModel.elementreference_has_concrete);
+		}
+		
+		if(name==null && state.getType(obj).isSubtype(OAVBDIMetaModel.expression_type))
+		{
+			Object	exp	=state.getAttributeValue(obj, OAVBDIMetaModel.expression_has_content);
+			name	= exp!=null ? ""+exp : null;
+		}
+		
+		if(name==null)
+		{
+			name	= ""+obj;
+		}
+		
+		return state.getType(obj).getName().substring(1) + " " + name;
+	}
+
+	/**
 	 *  Generate detail HTML code for the given elements.
 	 */
-	protected void	generateDetails(StringBuffer buf, String type, StackElement[] elements)
+	protected void	generateDetails(StringBuffer buf, String type, Set elements)
 	{
-		if(elements.length>0)
+		if(!elements.isEmpty())
 		{
 			buf.append("<h4>");
 			buf.append(type);
 			buf.append(" details</h4>\n<ul>\n");
-			for(int i=0; i<elements.length; i++)
+			for(Iterator it=elements.iterator(); it.hasNext(); )
 			{
+				Object	obj	= it.next();
+				String name = getElementName(obj);
 				buf.append("<li><a name=\"");
-//				buf.append(SUtil.makeConform(""+elements[i].path));
+				buf.append(SUtil.makeConform(name));
 				buf.append("\">");
-//				buf.append(SUtil.makeConform(""+elements[i].path));
+				buf.append(SUtil.makeConform(name));
 				// Add name of configuration (hack???)
 //				if(elements[i] instanceof IMConfigElement)
 //				{
@@ -782,12 +877,17 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 //				}
 				buf.append("</a> errors:\n");
 
-				StackElement[]	errors	= getElementErrors(elements[i]);
+				Tuple[]	errors	= getElementErrors(obj);
 				buf.append("<dl>\n");
 				for(int j=0; j<errors.length; j++)
 				{
-					buf.append("<dt>");
-//					buf.append(errors[j].path);
+					Object	obj2	= getObject(errors[j]);
+					if(!obj.equals(obj2))
+					{
+						buf.append("<dt>");
+						buf.append(getElementName(obj2));
+						buf.append("</dt>\n");
+					}
 //					SourceLocation	loc	= errors[j].getSourceLocation();
 //					if(loc!=null)
 //					{
@@ -801,7 +901,7 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 //					}
 					
 					String[]	msgs	= getMessages(errors[j]);
-					buf.append("\n<dd>");
+					buf.append("<dd>");
 					for(int k=0; k<msgs.length; k++)
 					{
 						buf.append(msgs[k]);
@@ -812,6 +912,7 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 					buf.append("</dd>\n");
 				}
 				buf.append("</dl>\n</li>\n");
+				
 			}
 			buf.append("</ul>\n");
 		}
