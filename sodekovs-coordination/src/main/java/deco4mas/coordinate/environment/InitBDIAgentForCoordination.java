@@ -7,7 +7,10 @@ import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.commons.IFuture;
+import jadex.commons.ThreadSuspendable;
 import jadex.commons.concurrent.IResultListener;
+import jadex.commons.service.SServiceProvider;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -160,7 +163,7 @@ public class InitBDIAgentForCoordination
 		// decom4MasMap.put(Constants.IOAV_STATE, this.getState());
 		// decom4MasMap.put(Constants.R_CAPABILITY, this.getRCapability());
 
-		System.out.println("#InitBDIAgentCoordinationPlan-" + exta.getAgentName() + "# Completed initialization: "
+		System.out.println("#InitBDIAgentCoordinationPlan-" + exta.getComponentName() + "# Completed initialization: "
 			+ numberOfPublishPercepts + " PublishPercepts and " + numberOfPerceivePercepts + " PerceivePercepts");
 
 		// agentData.put(getAgentType(ai, this.getContext()), res);
@@ -318,15 +321,11 @@ public class InitBDIAgentForCoordination
 
 	private void initExternalAccess()
 	{
-		IComponentManagementService cms = (IComponentManagementService) context.getServiceContainer().getService(
-			IComponentManagementService.class);
-		// IApplicationContext applicationContext = (IApplicationContext)
-		// context;
-		// IComponentManagementService cms =
-		// ((IComponentManagementService)context.getServiceContainer().getService(IComponentManagementService.class)).getExternalAccess(aid,
-		// lis);
-		// IAMS ams = ((IAMS)
-		// applicationContext.getPlatform().getService(IAMS.class));
+		//new
+		IComponentManagementService cms = (IComponentManagementService)SServiceProvider.getServiceUpwards(
+				space.getContext().getServiceProvider(), IComponentManagementService.class).get(new ThreadSuspendable());
+		
+		
 		IFuture fut = cms.getExternalAccess(ai);
 		fut.addResultListener(new IResultListener()
 		{

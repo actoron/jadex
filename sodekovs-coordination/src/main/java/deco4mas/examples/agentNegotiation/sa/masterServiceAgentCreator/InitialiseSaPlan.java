@@ -3,6 +3,9 @@ package deco4mas.examples.agentNegotiation.sa.masterServiceAgentCreator;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentManagementService;
+import jadex.commons.IFuture;
+import jadex.commons.service.SServiceProvider;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -38,8 +41,10 @@ public class InitialiseSaPlan extends Plan
 			ServiceAgentConfiguration[] configs = (ServiceAgentConfiguration[]) getBeliefbase().getBeliefSet("serviceAgentConfigurations")
 				.getFacts();
 
-			IComponentManagementService cms = (IComponentManagementService) interpreter.getAgentAdapter().getServiceContainer().getService(
-				IComponentManagementService.class);
+			IComponentManagementService cms = ((IComponentManagementService)SServiceProvider.getService(
+					getScope().getServiceProvider(), IComponentManagementService.class).get(this));
+			
+					
 
 			for (ServiceAgentConfiguration serviceAgentConfig : configs)
 			{

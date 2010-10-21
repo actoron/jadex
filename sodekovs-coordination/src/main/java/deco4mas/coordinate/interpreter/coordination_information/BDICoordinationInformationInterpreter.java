@@ -3,25 +3,22 @@
  */
 package deco4mas.coordinate.interpreter.coordination_information;
 
-import jadex.application.runtime.ISpace;
 import jadex.application.space.envsupport.environment.AbstractEnvironmentSpace;
 import jadex.application.space.envsupport.environment.IEnvironmentSpace;
 import jadex.application.space.envsupport.environment.ISpaceObject;
 import jadex.bdi.model.OAVBDIMetaModel;
-import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBelief;
-import jadex.bdi.runtime.IBeliefListener;
 import jadex.bdi.runtime.IBeliefSet;
 import jadex.bdi.runtime.IBeliefbase;
 import jadex.bdi.runtime.IEventbase;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IGoalbase;
 import jadex.bdi.runtime.IInternalEvent;
-import jadex.bdi.runtime.impl.BeliefbaseFlyweight;
-import jadex.bdi.runtime.impl.EventbaseFlyweight;
-import jadex.bdi.runtime.impl.ExternalAccessFlyweight;
-import jadex.bdi.runtime.impl.GoalbaseFlyweight;
+import jadex.bdi.runtime.impl.eaflyweights.ExternalAccessFlyweight;
+import jadex.bdi.runtime.impl.flyweights.BeliefbaseFlyweight;
+import jadex.bdi.runtime.impl.flyweights.EventbaseFlyweight;
+import jadex.bdi.runtime.impl.flyweights.GoalbaseFlyweight;
 import jadex.bdi.runtime.interpreter.AgentRules;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bridge.IComponentIdentifier;
@@ -29,21 +26,24 @@ import jadex.bridge.IComponentManagementService;
 import jadex.commons.IFuture;
 import jadex.commons.SUtil;
 import jadex.commons.SimplePropertyObject;
+import jadex.commons.ThreadSuspendable;
 import jadex.commons.concurrent.IResultListener;
+import jadex.commons.service.SServiceProvider;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.IValueFetcher;
 import jadex.javaparser.SimpleValueFetcher;
 import jadex.rules.state.IOAVState;
+
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+
 import deco.lang.dynamics.AgentElementType;
 import deco.lang.dynamics.mechanism.AgentElement;
-import deco4mas.annotation.agent.ParameterMapping;
 import deco4mas.annotation.agent.CoordinationAnnotation.CoordinationType;
+import deco4mas.annotation.agent.ParameterMapping;
 import deco4mas.coordinate.CoordinationInformation;
-import deco4mas.coordinate.DecentralCoordinationInformation;
 import deco4mas.helper.Constants;
 import deco4mas.mechanism.CoordinationInfo;
 
@@ -141,8 +141,8 @@ public class BDICoordinationInformationInterpreter extends SimplePropertyObject 
 		{
 			// IAMS ams = (IAMS) ((IApplicationContext)
 			// space.getContext()).getPlatform().getService(IComponentManagementService.class);
-			IComponentManagementService ams = (IComponentManagementService) ((AbstractEnvironmentSpace) space).getContext()
-				.getServiceContainer().getService(IComponentManagementService.class);
+			IComponentManagementService ams = (IComponentManagementService)SServiceProvider.getServiceUpwards(
+					space.getContext().getServiceProvider(), IComponentManagementService.class).get(new ThreadSuspendable());
 			IFuture fut = ams.getExternalAccess(agent);
 			fut.addResultListener(new IResultListener()
 			{
@@ -179,7 +179,7 @@ public class BDICoordinationInformationInterpreter extends SimplePropertyObject 
 									if (ADD.equals(metainfos[i][0]))
 									{
 										// System.out.println("#BDICoordinationInterpreter # Trying to store belief with meta infos: ");
-										IBeliefSet belset = exta.getBeliefbase().getBeliefSet(metainfos[i][1]);
+										IBeliefSet belset = (IBeliefSet) exta.getBeliefbase().getBeliefSet(metainfos[i][1]).get(new ThreadSuspendable());
 										if (cond != null)
 											fetcher.setValue("$facts", belset.getFacts());
 										if (!belset.containsFact(percept) && (cond == null || evaluate(cond, fetcher)))
@@ -284,7 +284,7 @@ public class BDICoordinationInformationInterpreter extends SimplePropertyObject 
 																		// belset
 																		// =
 																		// exta.getBeliefbase().getBeliefSet(metainfos[i][1]);
-																		IBeliefSet belset = exta.getBeliefbase().getBeliefSet(elementId);
+																		IBeliefSet belset = (IBeliefSet) exta.getBeliefbase().getBeliefSet(elementId).get(new ThreadSuspendable());
 																		Object[] facts = belset.getFacts();
 																		belset.removeFact(facts[facts.length - 1]); // remove
 																		// the
@@ -292,7 +292,7 @@ public class BDICoordinationInformationInterpreter extends SimplePropertyObject 
 																		// fact
 																		System.out
 																			.println("#BDICoordInfInterpreter# Removed last fact from BELIEF_SET: "
-																				+ elementId + " for " + exta.getAgentName());
+																				+ elementId + " for " + exta.getComponentName());
 																	} else
 																	{
 																		// TODO:
@@ -328,7 +328,7 @@ public class BDICoordinationInformationInterpreter extends SimplePropertyObject 
 																		System.out.println("#BDICoordInfInterpreter# Added "
 																			+ coordinationSpaceObj.getProperty(Constants.VALUE).toString()
 																			+ " to BELIEF_SET: " + elementId + " for "
-																			+ exta.getAgentName());
+																			+ exta.getComponentName());
 																	}
 																} else if (elementType.equals(AgentElementType.BDI_BELIEF.toString()))
 																{
@@ -357,7 +357,7 @@ public class BDICoordinationInformationInterpreter extends SimplePropertyObject 
 																		// IBelief
 																		// bel =
 																		// exta.getBeliefbase().getBelief(metainfos[i][1]);
-																		IBelief bel = exta.getBeliefbase().getBelief(elementId);
+																		IBelief bel = (IBelief) exta.getBeliefbase().getBelief(elementId).get(new ThreadSuspendable());
 																		bel.setFact(new Object()); // TODO
 																		// better
 																		// default
@@ -384,7 +384,7 @@ public class BDICoordinationInformationInterpreter extends SimplePropertyObject 
 																		}
 																		System.out.println("#BDICoordInfInterpreter# Added "
 																			+ coordinationSpaceObj.getProperty(Constants.VALUE).toString()
-																			+ " to BELIEF : " + elementId + " for " + exta.getAgentName());
+																			+ " to BELIEF : " + elementId + " for " + exta.getComponentName());
 																	}
 																} else if (elementType.equals(AgentElementType.BDI_GOAL.toString()))
 																{
@@ -408,14 +408,14 @@ public class BDICoordinationInformationInterpreter extends SimplePropertyObject 
 																	// goal
 																	if (dci.getCoordinationType().equals(CoordinationType.NEGATIVE))
 																	{
-																		IGoal[] goals = exta.getGoalbase().getGoals(elementId);
+																		IGoal[] goals = (IGoal[]) exta.getGoalbase().getGoals(elementId).get(new ThreadSuspendable());
 																		goals[goals.length - 1].drop(); // TODO:
 																		// heuristic
 																		// for
 																		// selection
 																		System.out
 																			.println("#BDICoordInfInterpreter# Removed GOAL from GOALBASE : "
-																				+ elementId + " for " + exta.getAgentName());
+																				+ elementId + " for " + exta.getComponentName());
 																	} else
 																	{
 																		ExternalAccessFlyweight extaFly = (ExternalAccessFlyweight) exta;
@@ -444,7 +444,7 @@ public class BDICoordinationInformationInterpreter extends SimplePropertyObject 
 																		.println("#BDICoordInfInterpreter# Error!!! RECEIVED PLAN TO MANIPULATE:  "
 																			+ elementId
 																			+ " for "
-																			+ exta.getAgentName()
+																			+ exta.getComponentName()
 																			+ " Currently unable to process IPlan due limits of used jadex-version");
 
 																	// check
@@ -533,7 +533,7 @@ public class BDICoordinationInformationInterpreter extends SimplePropertyObject 
 																	// removal):
 																	if (dci.getCoordinationType().equals(CoordinationType.NEGATIVE))
 																	{
-																		System.out.println(exta.getAgentName() + ":");
+																		System.out.println(exta.getComponentName() + ":");
 																		System.out
 																			.println("\t ERROR: can not remove internal events from execution context.");
 																		// TODO

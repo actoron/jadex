@@ -4,35 +4,22 @@ package deco4mas.coordinate.interpreter.coordination_information;
  * TODO (4-8-10): Analyse this in order to enable the running of the example with the TupleSapce -> there is a problem with the part (1==1) around 
  */
 
-import jadex.application.runtime.ISpace;
 import jadex.application.space.envsupport.environment.AbstractEnvironmentSpace;
 import jadex.application.space.envsupport.environment.IEnvironmentSpace;
 import jadex.application.space.envsupport.environment.ISpaceObject;
 import jadex.bdi.runtime.IBDIExternalAccess;
-import jadex.bdi.runtime.IBelief;
-import jadex.bdi.runtime.IBeliefSet;
-import jadex.bdi.runtime.IGoal;
-import jadex.bdi.runtime.IInternalEvent;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.commons.IFuture;
 import jadex.commons.SUtil;
 import jadex.commons.SimplePropertyObject;
-import jadex.commons.concurrent.IResultListener;
+import jadex.commons.ThreadSuspendable;
+import jadex.commons.service.SServiceProvider;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.IValueFetcher;
-import jadex.javaparser.SimpleValueFetcher;
+
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
-import deco.lang.dynamics.AgentElementType;
-import deco.lang.dynamics.mechanism.AgentElement;
-import deco4mas.annotation.agent.ParameterMapping;
-import deco4mas.annotation.agent.CoordinationAnnotation.CoordinationType;
-import deco4mas.coordinate.DecentralCoordinationInformation;
-import deco4mas.helper.Constants;
-import deco4mas.mechanism.CoordinationInfo;
 
 /**
  * @author Ante Vilenica & Jan Sudeikat
@@ -128,8 +115,8 @@ public class OLD_BDICoordinInfInterpreter extends SimplePropertyObject implement
 		{
 			// IAMS ams = (IAMS) ((IApplicationContext)
 			// space.getContext()).getPlatform().getService(IComponentManagementService.class);
-			IComponentManagementService ams = (IComponentManagementService) ((AbstractEnvironmentSpace) space).getContext()
-				.getServiceContainer().getService(IComponentManagementService.class);
+			IComponentManagementService ams = (IComponentManagementService)SServiceProvider.getServiceUpwards(
+					space.getContext().getServiceProvider(), IComponentManagementService.class).get(new ThreadSuspendable());
 			IFuture fut = ams.getExternalAccess(agent);
 			fut.addResultListener(new IResultListener()
 			{

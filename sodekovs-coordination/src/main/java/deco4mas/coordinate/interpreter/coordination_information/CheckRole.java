@@ -3,23 +3,22 @@
  */
 package deco4mas.coordinate.interpreter.coordination_information;
 
-import jadex.bdi.runtime.interpreter.OAVBDIFetcher;
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBelief;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IPlan;
-import jadex.bdi.runtime.impl.BeliefFlyweight;
-import jadex.bdi.runtime.impl.BeliefSetFlyweight;
-import jadex.bdi.runtime.impl.ElementFlyweight;
-import jadex.bdi.runtime.impl.GoalFlyweight;
-import jadex.bdi.runtime.impl.InternalEventFlyweight;
-import jadex.bdi.runtime.impl.PlanFlyweight;
+import jadex.bdi.runtime.impl.flyweights.BeliefFlyweight;
+import jadex.bdi.runtime.impl.flyweights.BeliefSetFlyweight;
+import jadex.bdi.runtime.impl.flyweights.ElementFlyweight;
+import jadex.bdi.runtime.impl.flyweights.GoalFlyweight;
+import jadex.bdi.runtime.impl.flyweights.InternalEventFlyweight;
+import jadex.bdi.runtime.impl.flyweights.PlanFlyweight;
+import jadex.bdi.runtime.interpreter.OAVBDIFetcher;
+import jadex.commons.ThreadSuspendable;
 import jadex.rules.state.IOAVState;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 
 import deco.lang.dynamics.AgentElementType;
 import deco.lang.dynamics.mechanism.AgentElement;
@@ -243,7 +242,7 @@ public class CheckRole {
 						return true;
 					}
 				} else {
-					System.out.println("#CheckRole#" + exta.getAgentName() + ":");
+					System.out.println("#CheckRole#" + exta.getComponentName() + ":");
 					System.out.println("\t Could not evaluate rolue due invalid condition:" + expression);
 				}
 			}
@@ -269,7 +268,7 @@ public class CheckRole {
 				for (ElementReference inhib : agentReference.getContraints().getInhibitions()) { // check each inhibition
 
 					if (inhib.getAgent_element_type().toString().equalsIgnoreCase(AgentElementType.BDI_GOAL.toString())) {
-						IGoal[] gs = exta.getGoalbase().getGoals(); // fetch goals:
+						IGoal[] gs = (IGoal[]) exta.getGoalbase().getGoals().get(new ThreadSuspendable()); // fetch goals:
 						for (IGoal g : gs) {
 							if (g.getType().equals(inhib.getElement_id())) {
 								if (g.isActive()) { // TODO: check only active???
@@ -280,7 +279,7 @@ public class CheckRole {
 					}
 
 					if (inhib.getAgent_element_type().toString().equalsIgnoreCase(AgentElementType.BDI_PLAN.toString())) {
-						IPlan[] pl = exta.getPlanbase().getPlans(); // fetch plans:
+						IPlan[] pl = (IPlan[]) exta.getPlanbase().getPlans().get(new ThreadSuspendable()); // fetch plans:
 						for (IPlan p : pl) {
 							if (p.getType().equals(inhib.getElement_id())) {
 								return false;
@@ -289,10 +288,10 @@ public class CheckRole {
 					}
 
 					if (inhib.getAgent_element_type().toString().equalsIgnoreCase(AgentElementType.BDI_BELIEF.toString())) {
-						String[] bs = exta.getBeliefbase().getBeliefNames(); // fetch beliefs:
+						String[] bs = (String[]) exta.getBeliefbase().getBeliefNames().get(new ThreadSuspendable()); // fetch beliefs:
 						for (String b : bs) {
 							if (b.equals(inhib.getElement_id())) {
-								if (exta.getBeliefbase().getBelief(b).getFact() != null) {
+								if (exta.getBeliefbase().getBeliefFact(b).get(new ThreadSuspendable()) != null) {
 									return false;
 								}
 							}
@@ -300,10 +299,10 @@ public class CheckRole {
 					}
 
 					if (inhib.getAgent_element_type().toString().equalsIgnoreCase(AgentElementType.BDI_BELIEFSET.toString())) {
-						String[] bs = exta.getBeliefbase().getBeliefSetNames(); // fetch beliefSets:
+						String[] bs = (String[]) exta.getBeliefbase().getBeliefSetNames().get(new ThreadSuspendable()); // fetch beliefSets:
 						for (String b : bs) {
-							if (b.equals(inhib.getElement_id())) {
-								if (exta.getBeliefbase().getBeliefSet(b).getFacts().length > 0) {
+							if (b.equals(inhib.getElement_id())) {								
+									if ((Integer)exta.getBeliefbase().getBeliefSetSize(b).get(new ThreadSuspendable()) < 0) {																								
 									return false;
 								}
 							}
@@ -371,13 +370,14 @@ public class CheckRole {
 	private static Object getMappedAgentData(DataMapping dm, IBDIExternalAccess exta) {
 		if (dm.getElementType().equals(AgentElementType.BDI_BELIEF.toString())) { // handle belief mapping
 			if (dm.getData_type().equalsIgnoreCase(Constants.BELIEF_UPDATE_IDENTIFIER)) { // when the right content type ("content") has been specified
-				IBelief b = exta.getBeliefbase().getBelief(dm.getElement_name());
+				IBelief b = (IBelief) exta.getBeliefbase().getBelief(dm.getElement_name()).get(new ThreadSuspendable());
 				return b.getFact();
 			} // else ignore as beliefs have not parameters.
 		}
 
 		if (dm.getElementType().equals(AgentElementType.BDI_GOAL.toString())) { // handle goal mapping
-			for (IGoal g : exta.getGoalbase().getGoals()) {
+			IGoal[] goals =  (IGoal[]) exta.getGoalbase().getGoals().get(new ThreadSuspendable());
+			for (IGoal g : goals) {
 				if (g.getType().equalsIgnoreCase(dm.getElement_name())) {
 					if (g.hasParameter(dm.getData_type())) {
 						return g.getParameter(dm.getData_type()).getValue();
@@ -387,7 +387,8 @@ public class CheckRole {
 		}
 
 		if (dm.getElementType().equals(AgentElementType.BDI_PLAN.toString())) { // handle plan mapping
-			for (IPlan p : exta.getPlanbase().getPlans()) {
+			IPlan[] plans = (IPlan[]) exta.getPlanbase().getPlans().get(new ThreadSuspendable());
+			for (IPlan p : plans) {
 				if (p.getType().equalsIgnoreCase(dm.getElement_name())) {
 					if (p.hasParameter(dm.getData_type())) {
 						return p.getParameter(dm.getData_type()).getValue();

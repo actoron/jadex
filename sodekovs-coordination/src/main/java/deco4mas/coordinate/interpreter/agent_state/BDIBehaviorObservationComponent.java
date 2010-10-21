@@ -16,19 +16,22 @@ import jadex.bdi.runtime.IGoalbase;
 import jadex.bdi.runtime.IInternalEventListener;
 import jadex.bdi.runtime.IPlanListener;
 import jadex.bdi.runtime.IPlanbase;
-import jadex.bdi.runtime.impl.BeliefbaseFlyweight;
-import jadex.bdi.runtime.impl.EventbaseFlyweight;
-import jadex.bdi.runtime.impl.ExternalAccessFlyweight;
-import jadex.bdi.runtime.impl.GoalbaseFlyweight;
-import jadex.bdi.runtime.impl.PlanbaseFlyweight;
+import jadex.bdi.runtime.impl.eaflyweights.ExternalAccessFlyweight;
+import jadex.bdi.runtime.impl.flyweights.BeliefbaseFlyweight;
+import jadex.bdi.runtime.impl.flyweights.EventbaseFlyweight;
+import jadex.bdi.runtime.impl.flyweights.GoalbaseFlyweight;
+import jadex.bdi.runtime.impl.flyweights.PlanbaseFlyweight;
 import jadex.bdi.runtime.interpreter.AgentRules;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
+import jadex.commons.ThreadSuspendable;
 import jadex.rules.state.IOAVState;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+
 import deco.lang.dynamics.AgentElementType;
 import deco.lang.dynamics.mechanism.AgentElement;
 import deco.lang.dynamics.properties.AgentReference;
@@ -109,7 +112,7 @@ public class BDIBehaviorObservationComponent
 		coordInfo.addValue(Constants.PARAMETER_DATA_MAPPING, parameterDataMappings);
 		coordInfo.addValue(Constants.DML_REALIZATION_NAME, dmlRealizationName);
 
-		eventPublication.publishEvent(coordInfo, (IEnvironmentSpace) exta.getBeliefbase().getBelief("env").getFact());
+		eventPublication.publishEvent(coordInfo, (IEnvironmentSpace) exta.getBeliefbase().getBeliefFact("env").get(new ThreadSuspendable()));
 	}
 
 	public void initBeliefListener(AgentElement agentElement, String mechanismRealizationId)

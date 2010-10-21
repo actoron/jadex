@@ -1,6 +1,6 @@
 package deco4mas.examples.agentNegotiation.evaluate;
 
-import jadex.service.clock.IClockService;
+import jadex.commons.service.clock.IClockService;
 
 public class ClockTime
 {

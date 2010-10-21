@@ -56,7 +56,7 @@ public class CoordinationSpace extends Grid2D
 
 	}
 
-	@Override
+	//@Override
 	public void initSpace(IApplication context, MSpaceInstance config) throws Exception
 	{
 		super.initSpace(context, config);

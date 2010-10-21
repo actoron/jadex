@@ -1,6 +1,7 @@
 package deco4mas.examples.agentNegotiation.sma.application.workflow.management;
 
 import jadex.bdi.runtime.IBDIExternalAccess;
+import jadex.bdi.runtime.IEAInternalEvent;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IInternalEvent;
 import jadex.bdi.runtime.Plan;
@@ -8,10 +9,14 @@ import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.commons.IFuture;
+import jadex.commons.ThreadSuspendable;
 import jadex.commons.concurrent.IResultListener;
+import jadex.commons.service.SServiceProvider;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
+
 import deco4mas.examples.agentNegotiation.common.dataObjects.WorkflowData;
 import deco4mas.examples.agentNegotiation.evaluate.AgentLogger;
 import deco4mas.examples.agentNegotiation.evaluate.ValueLogger;
@@ -55,7 +60,7 @@ public class ExecuteWorkflowPlan extends Plan
 					// workflow executed -> init InternalEvent
 					try
 					{
-						IInternalEvent workflowExecuted = myExternalAccess.createInternalEvent("workflowExecuted");
+						IEAInternalEvent workflowExecuted = (IEAInternalEvent) myExternalAccess.createInternalEvent("workflowExecuted").get(new ThreadSuspendable());
 						myExternalAccess.dispatchInternalEvent(workflowExecuted);
 					} catch (Exception e)
 					{
@@ -79,9 +84,17 @@ public class ExecuteWorkflowPlan extends Plan
 			// now create workflow component
 			String workflowType = "deco4mas/examples/agentNegotiation/sma/application/workflow/implementation/"
 				+ (String) getBeliefbase().getBelief("workflowName").getFact() + ".bpmn";
-			IFuture workflowFuture = ((IComponentManagementService) interpreter.getAgentAdapter().getServiceContainer().getService(
-				IComponentManagementService.class)).createComponent(workflowName, workflowType, new CreationInfo(null, workflowArgs, this
-				.getComponentIdentifier(), true, false), killListener);
+			
+			IComponentManagementService cms = (IComponentManagementService)SServiceProvider.getServiceUpwards(
+					interpreter.getServiceProvider(), IComponentManagementService.class).get(new ThreadSuspendable());
+			
+			IFuture workflowFuture = cms.createComponent(workflowName, workflowType, new CreationInfo(null, workflowArgs, this
+					.getComponentIdentifier(), true, false), killListener);
+						
+//			IFuture workflowFuture = ((IComponentManagementService) interpreter.getAgentAdapter().getServiceContainer().getService(
+//					IComponentManagementService.class)).createComponent(workflowName, workflowType, new CreationInfo(null, workflowArgs, this
+//					.getComponentIdentifier(), true, false), killListener);
+			
 			IComponentIdentifier workflowIdentifier = (IComponentIdentifier) workflowFuture.get(this);
 			getBeliefbase().getBelief("workflow").setFact(workflowIdentifier);
 			getBeliefbase().getBelief("workflowData").setFact(

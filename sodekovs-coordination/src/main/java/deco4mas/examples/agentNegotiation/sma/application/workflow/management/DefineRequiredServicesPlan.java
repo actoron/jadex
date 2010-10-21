@@ -9,6 +9,7 @@ import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.commons.IFuture;
+import jadex.commons.service.SServiceProvider;
 import jadex.javaparser.SimpleValueFetcher;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -35,8 +36,8 @@ public class DefineRequiredServicesPlan extends Plan
 			Logger smaLogger = AgentLogger.getTimeEvent(this.getComponentName());
 
 			// get Cms
-			IComponentManagementService cms = (IComponentManagementService) interpreter.getAgentAdapter().getServiceContainer().getService(
-				IComponentManagementService.class);
+			IComponentManagementService cms = ((IComponentManagementService)SServiceProvider.getService(
+					getScope().getServiceProvider(), IComponentManagementService.class).get(this));
 
 			// workflow Access
 			IFuture workflowFuture = cms

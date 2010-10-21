@@ -7,6 +7,8 @@ import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.commons.IFuture;
+import jadex.commons.service.SServiceProvider;
+
 import java.util.logging.Logger;
 import deco4mas.examples.agentNegotiation.common.dataObjects.ServiceType;
 import deco4mas.examples.agentNegotiation.evaluate.AgentLogger;
@@ -25,8 +27,12 @@ public class ExecuteTaskPlan extends Plan
 
 			// System.out.println("task(handler) " + taskName + ": start");
 
-			IComponentManagementService cms = (IComponentManagementService) interpreter.getAgentAdapter().getServiceContainer().getService(
-				IComponentManagementService.class);
+//			IFuture fut = ((IComponentManagementService)SServiceProvider.getService(
+//					getScope().getServiceProvider(), IComponentManagementService.class).get(this)).getExternalAccess(aid);
+						
+			IComponentManagementService cms = ((IComponentManagementService)SServiceProvider.getService(
+					getScope().getServiceProvider(), IComponentManagementService.class).get(this));
+						
 			IFuture fut = cms.getExternalAccess((IComponentIdentifier) getBeliefbase().getBelief("workflow").getFact());
 			BpmnInterpreter workflow = (BpmnInterpreter) fut.get(this);
 

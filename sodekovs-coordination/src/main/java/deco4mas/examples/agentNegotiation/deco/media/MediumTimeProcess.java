@@ -3,7 +3,7 @@ package deco4mas.examples.agentNegotiation.deco.media;
 import jadex.application.space.envsupport.environment.IEnvironmentSpace;
 import jadex.application.space.envsupport.environment.ISpaceProcess;
 import jadex.commons.SimplePropertyObject;
-import jadex.service.clock.IClockService;
+import jadex.commons.service.clock.IClockService;
 import deco4mas.coordinate.environment.CoordinationSpace;
 import deco4mas.mechanism.ICoordinationMechanism;
 

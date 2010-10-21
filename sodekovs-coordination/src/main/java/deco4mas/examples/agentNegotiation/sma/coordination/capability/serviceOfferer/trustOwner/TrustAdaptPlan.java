@@ -4,7 +4,8 @@ import jadex.application.runtime.IApplicationExternalAccess;
 import jadex.application.space.envsupport.environment.AbstractEnvironmentSpace;
 import jadex.bdi.runtime.IInternalEvent;
 import jadex.bdi.runtime.Plan;
-import jadex.service.clock.IClockService;
+import jadex.commons.service.SServiceProvider;
+import jadex.commons.service.clock.IClockService;
 
 import java.util.Iterator;
 import java.util.logging.Logger;
@@ -44,10 +45,11 @@ public class TrustAdaptPlan extends Plan
 			//Hack for this special Negotation.application.xml
 			AbstractEnvironmentSpace space = ((AbstractEnvironmentSpace) ((IApplicationExternalAccess) getScope().getParent()).getSpace("mycoordspace"));
 			HistorytimeTrustFunction trustFunction = (HistorytimeTrustFunction) getBeliefbase().getBelief("trustFunction").getFact();
-			Iterator<String> it = trustFunction.getHistory().getSas().iterator();			
-			while (it.hasNext()) {
+			Iterator<String> it = trustFunction.getHistory().getSas().iterator();
+			IClockService clock = (IClockService)SServiceProvider.getServiceUpwards(space.getContext().getServiceProvider(), IClockService.class).get(this);
+			while (it.hasNext()) {				
 				String saId = it.next();
-				double trust = trustFunction.getTrust(saId, ((IClockService)space.getContext().getServiceContainer().getService(IClockService.class)).getTime());				
+				double trust = trustFunction.getTrust(saId, clock.getTime());				
 				//substring: geht the "right" part of the id -> only the type: billig, normal, teuer
 				String keyOfSA = saId.substring(saId.indexOf("(")+1, saId.lastIndexOf(")"));
 				keyOfSA = keyOfSA.replace("-", "");																

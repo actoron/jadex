@@ -1,12 +1,17 @@
 package deco4mas.examples.agentNegotiation.deco.media;
 
-import jadex.service.clock.IClockService;
+import jadex.bridge.IComponentManagementService;
+import jadex.commons.ThreadSuspendable;
+import jadex.commons.service.SServiceProvider;
+import jadex.commons.service.clock.IClockService;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
+
 import deco.lang.dynamics.AgentElementType;
 import deco4mas.coordinate.environment.CoordinationSpace;
 import deco4mas.coordinate.environment.CoordinationSpaceObject;
@@ -330,7 +335,9 @@ public class NegotiationMechanism extends ICoordinationMechanism
 	public void start()
 	{
 		System.out.println("#StartMechanismNegotiation");
-		clock = (IClockService) space.getContext().getServiceContainer().getService(IClockService.class);
+		clock = (IClockService)SServiceProvider.getServiceUpwards(
+				space.getContext().getServiceProvider(), IClockService.class).get(new ThreadSuspendable());	
+	
 		// clock.reset();
 	}
 
