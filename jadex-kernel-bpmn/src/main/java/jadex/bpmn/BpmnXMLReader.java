@@ -575,7 +575,7 @@ public class BpmnXMLReader
 								MAnnotationDetail detail = (MAnnotationDetail) details
 										.get(j);
 
-								String key = detail.getKey().toLowerCase();
+								String key = detail.getKey();
 								String value = detail.getValue();
 
 								// TODO: remove old parameter handling
@@ -689,7 +689,7 @@ public class BpmnXMLReader
 											}
 										}
 										else if (act instanceof MSubProcess
-												&& "parallel".equals(key))
+												&& "parallel".equals(key.toLowerCase()))
 										{
 											IParsedExpression propval = parser
 													.parseExpression(
@@ -927,8 +927,16 @@ public class BpmnXMLReader
 						
 						for (int row = 0; row < table.dimension[0]; row++)
 						{
-							// normal mapping has 2 values
-							assert table.data[row].length == 2;
+							try
+							{
+								// normal mapping has 2 values
+								assert table.data[row].length == 2;
+							}
+							catch (AssertionError e)
+							{
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
 							
 							String propname = table.data[row][0];
 							String proptext = table.data[row][1];
