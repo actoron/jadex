@@ -535,8 +535,6 @@ public class BpmnXMLReader
 						continue;
 					}
 					// new jadex properties handling
-					//else if ("jadex_properties_table".equals(anno.getSource()) || 
-					//			"subProcess_properties_table".equals(anno.getSource()))
 					// we accept ALL "_properties_table"
 					else if (anno.getSource().toLowerCase().endsWith("_properties_table"))
 					{
@@ -969,7 +967,7 @@ public class BpmnXMLReader
 								MAnnotationDetail detail = (MAnnotationDetail) details
 										.get(j);
 
-								String key = detail.getKey().toLowerCase();
+								String key = detail.getKey();
 								String value = detail.getValue();
 
 								// TODO: remove old mappings handling
@@ -1675,17 +1673,9 @@ class BpmnMultiColumTable
 	public void setCellValue(String cellIndex, String value)
 	{
 		int[] index = parseCellIndex(cellIndex);
-		try
-		{
-			assert index[0] != -1 && index[1] != -1;
-			assert index[0] < data.length;
-			assert index[1] < data[index[0]].length;
-		}
-		catch (AssertionError e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		assert index[0] != -1 && index[1] != -1;
+		assert index[0] < data.length;
+		assert index[1] < data[index[0]].length;
 		data[index[0]][index[1]] = value;
 	}
 	
