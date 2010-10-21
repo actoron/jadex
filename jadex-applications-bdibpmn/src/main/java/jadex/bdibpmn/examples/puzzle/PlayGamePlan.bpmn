@@ -28,7 +28,7 @@
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_5YDrURcuEd-xT7_lMByXRg" key="class" value=""/>
       </eAnnotations>
     </vertices>
-    <vertices xmi:type="bpmn:Activity" xmi:id="_igQuAXFHEd63xqPyP8ks8A" iD="_igQuAHFHEd63xqPyP8ks8A" incomingEdges="_igQuCnFHEd63xqPyP8ks8A" name="Kill&#xD;&#xA;class = DestroyComponentTask&#xD;&#xA;in Object componentid = $interpreter.getComponentIdentifier()" activityType="Task">
+    <vertices xmi:type="bpmn:Activity" xmi:id="_igQuAXFHEd63xqPyP8ks8A" iD="_igQuAHFHEd63xqPyP8ks8A" incomingEdges="_igQuCnFHEd63xqPyP8ks8A" name="Kill&#xD;&#xA;class = DestroyComponentTask&#xD;&#xA;in Object componentid = $scope.getComponentIdentifier()" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_bEN5YBcuEd-xT7_lMByXRg" source="jadex">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_bEN5YRcuEd-xT7_lMByXRg" key="class" value=""/>
       </eAnnotations>
