@@ -89,7 +89,9 @@ public class RemoteServiceManagementAgent extends MicroAgent
 										{
 											Map reply = (Map)result;
 //											reply.put(SFipa.CONTENT, JavaWriter.objectToXML(repcontent, ls.getClassLoader()));
-											reply.put(SFipa.CONTENT, Writer.objectToXML(rms.getCallContext().getWriter(), repcontent, ls.getClassLoader(), rms.getCallContext()));
+											String content = Writer.objectToXML(rms.getCallContext().getWriter(), repcontent, ls.getClassLoader(), rms.getCallContext());
+											reply.put(SFipa.CONTENT, content);
+											System.out.println("content: "+content);
 											sendMessage(reply, mt);
 										}
 										public void exceptionOccurred(Object source, Exception exception)

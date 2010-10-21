@@ -26,7 +26,7 @@ public class XMLInfo
 	protected boolean createfromtag;
 
 	/** The preprocessor. */
-//	protected IPreProcessor preprocessor;
+	protected IPreProcessor preprocessor;
 	
 	//-------- constructors --------
 	
@@ -83,9 +83,18 @@ public class XMLInfo
 	 */
 	public XMLInfo(String xmlpath, IFilter filter, boolean createfromtag)
 	{
+		this(xmlpath, filter, createfromtag, null);
+	}
+	
+	/**
+	 *  Create a new xml info.
+	 */
+	public XMLInfo(String xmlpath, IFilter filter, boolean createfromtag, IPreProcessor preprocessor)
+	{
 		setXMLPath(xmlpath);
 		this.filter = filter;
 		this.createfromtag = createfromtag;
+		this.preprocessor = preprocessor;
 	}
 
 	/**
@@ -101,9 +110,18 @@ public class XMLInfo
 	 */
 	public XMLInfo(QName[] xmlpathelements, IFilter filter, boolean createfromtag)
 	{
+		this(xmlpathelements, filter, createfromtag, null);
+	}
+	
+	/**
+	 *  Create a new xml info.
+	 */
+	public XMLInfo(QName[] xmlpathelements, IFilter filter, boolean createfromtag, IPreProcessor preprocessor)
+	{
 		setXMLPathElements(xmlpathelements);
 		this.filter = filter;
 		this.createfromtag = createfromtag;
+		this.preprocessor = preprocessor;
 	}
 
 	//-------- methods --------
@@ -177,5 +195,14 @@ public class XMLInfo
 	public boolean isCreateFromTag()
 	{
 		return createfromtag;
+	}
+
+	/**
+	 *  Get the preprocessor.
+	 *  @return the preprocessor.
+	 */
+	public IPreProcessor getPreProcessor()
+	{
+		return preprocessor;
 	}
 }

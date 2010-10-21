@@ -20,15 +20,9 @@ import java.util.Map;
 public class RemoteGetExternalAccessCommand implements IRemoteCommand
 {
 	//-------- attributes --------
-
-	/** The cache of proxy infos. */
-	protected static Map proxyinfos = Collections.synchronizedMap(new LRU(200));
 	
 	/** The providerid (i.e. the component to start with searching). */
 	protected IComponentIdentifier cid;
-	
-//	/** The target class (if case of external access). */
-//	protected Class targetclass;
 	
 	/** The callid. */
 	protected String callid;
@@ -45,10 +39,9 @@ public class RemoteGetExternalAccessCommand implements IRemoteCommand
 	/**
 	 *  Create a new remote search command.
 	 */
-	public RemoteGetExternalAccessCommand(IComponentIdentifier cid, String callid) //Class targetclass,
+	public RemoteGetExternalAccessCommand(IComponentIdentifier cid, String callid)
 	{
 		this.cid = cid;
-//		this.targetclass = targetclass;
 		this.callid = callid;
 	}
 	
@@ -80,8 +73,8 @@ public class RemoteGetExternalAccessCommand implements IRemoteCommand
 					public void resultAvailable(Object source, Object result)
 					{
 						IExternalAccess exta = (IExternalAccess)result;
-						ProxyInfo pi = getProxyInfo(component.getComponentIdentifier(), cid, exta);
-						ret.setResult(new RemoteResultCommand(pi, null, callid));
+//						ProxyInfo pi = RemoteServiceManagementService.getProxyInfo(component.getComponentIdentifier(), cid, exta);
+						ret.setResult(new RemoteResultCommand(exta, null, callid));
 					}
 					
 					public void exceptionOccurred(Object source, Exception exception)
@@ -153,80 +146,4 @@ public class RemoteGetExternalAccessCommand implements IRemoteCommand
 	{
 		this.targetclass = targetclass;
 	}*/
-
-	/**
-	 *  Get a proxy info for a component. 
-	 */
-	public static ProxyInfo getProxyInfo(IComponentIdentifier rms, IComponentIdentifier cid, IExternalAccess target)
-	{
-		ProxyInfo ret;
-		
-		// This construct ensures
-		// a) fast access to existing proxyinfos in the map
-		// b) creation is performed only once by ordering threads 
-		// via synchronized block and rechecking if proxy was already created.
-		
-		ret = (ProxyInfo)proxyinfos.get(target);
-		if(ret==null)
-		{
-			synchronized(proxyinfos)
-			{
-				ret = (ProxyInfo)proxyinfos.get(target);
-				if(ret==null)
-				{
-					ret = createProxyInfo(rms, cid, target);
-				}
-			}
-		}
-		
-		return ret;
-	}
-	
-	/**
-	 *  Create a proxy info for a service. 
-	 */
-	public static ProxyInfo createProxyInfo(IComponentIdentifier rms, IComponentIdentifier cid, IExternalAccess target)
-	{
-		Class targetclass = null;
-		Class[] inter = target.getClass().getInterfaces();
-		for(int i=0; i<inter.length && targetclass==null; i++)
-		{
-			if(SReflect.isSupertype(IExternalAccess.class, inter[0]));
-				targetclass = inter[i]; 
-		}
-		if(targetclass==null)
-			targetclass = IExternalAccess.class;
-		
-		ProxyInfo ret = new ProxyInfo(rms, cid, targetclass);
-		
-		// todo: Hack!!!
-		// Exclude getServiceProvider() from remote external access interface
-		Map props = target.getModel().getProperties();
-//		if(props==null)
-//		{
-//			props = new HashMap();
-//			props.put("remote_excluded", new String[]{"getServiceProvider"});
-//		}
-//		else
-//		{
-//			Object ex = props.get("remote_excluded");
-//			if(ex!=null)
-//			{
-//				List newex = new ArrayList();
-//				for(Iterator it=SReflect.getIterator(ex); it.hasNext(); )
-//				{
-//					newex.add(it.next());
-//				}
-//				newex.add("getServiceProvider");
-//			}
-//			else
-//			{
-//				props.put("remote_excluded", new String[]{"getServiceProvider"});
-//			}
-//		}
-		
-		RemoteSearchCommand.fillProxyInfo(ret, target, targetclass, props);
-		return ret;
-//		System.out.println("Creating proxy for: "+type);
-	}
 }

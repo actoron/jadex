@@ -2,6 +2,7 @@ package jadex.xml.writer;
 
 import jadex.commons.collection.Tree;
 import jadex.commons.collection.TreeNode;
+import jadex.xml.IPreProcessor;
 import jadex.xml.SXML;
 import jadex.xml.StackElement;
 import jadex.xml.TypeInfo;
@@ -139,6 +140,14 @@ public class Writer
 //			System.out.println("tagname: "+tagname);
 		TypeInfo typeinfo = handler.getTypeInfo(object, getXMLPath(stack), wc); 
 		QName[] path = new QName[0];
+		
+		// Preprocess object.
+		IPreProcessor preproc = typeinfo==null? null: (IPreProcessor)typeinfo.getPreProcessor();
+		if(preproc!=null)
+		{
+//			System.out.println("found: "+object);
+			object = preproc.preProcess(wc, object);
+		}
 		
 		// Only use typeinfo for getting tag (path) when not set in method call (subobject)
 		// Generated tag names (that start with 'protocol typeinfo' are overruled by typeinfo spec.

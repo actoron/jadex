@@ -1,13 +1,14 @@
 package jadex.bridge;
 
 import jadex.commons.IFuture;
+import jadex.commons.IProxyable;
 import jadex.commons.service.IServiceProvider;
 
 /**
  *  The interface for accessing components from the outside.
  *  To be specialized for concrete component types.
  */
-public interface IExternalAccess
+public interface IExternalAccess extends IProxyable
 {
 	//-------- cache --------
 	

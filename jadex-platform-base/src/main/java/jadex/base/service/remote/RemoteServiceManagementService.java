@@ -1,8 +1,8 @@
 package jadex.base.service.remote;
 
 import jadex.base.fipa.SFipa;
-import jadex.base.service.remote.xml.RMIObjectWriterHandler;
 import jadex.base.service.remote.xml.RMIPostProcessor;
+import jadex.base.service.remote.xml.RMIPreProcessor;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
@@ -11,13 +11,17 @@ import jadex.bridge.IRemoteServiceManagementService;
 import jadex.commons.Future;
 import jadex.commons.ICommand;
 import jadex.commons.IFuture;
+import jadex.commons.IProxyable;
+import jadex.commons.SReflect;
 import jadex.commons.SUtil;
+import jadex.commons.collection.LRU;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.service.AnyResultSelector;
 import jadex.commons.service.BasicService;
 import jadex.commons.service.IResultSelector;
 import jadex.commons.service.ISearchManager;
+import jadex.commons.service.IService;
 import jadex.commons.service.IVisitDecider;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.TypeResultSelector;
@@ -25,24 +29,22 @@ import jadex.commons.service.clock.ITimer;
 import jadex.commons.service.library.ILibraryService;
 import jadex.micro.IMicroExternalAccess;
 import jadex.micro.MicroAgent;
-import jadex.xml.AccessInfo;
-import jadex.xml.AttributeConverter;
-import jadex.xml.AttributeInfo;
-import jadex.xml.IContext;
-import jadex.xml.IStringObjectConverter;
-import jadex.xml.MappingInfo;
 import jadex.xml.ObjectInfo;
 import jadex.xml.SXML;
 import jadex.xml.TypeInfo;
 import jadex.xml.XMLInfo;
 import jadex.xml.bean.BeanObjectReaderHandler;
+import jadex.xml.bean.BeanObjectWriterHandler;
 import jadex.xml.bean.JavaReader;
 import jadex.xml.bean.JavaWriter;
 import jadex.xml.reader.Reader;
 import jadex.xml.writer.Writer;
 
-import java.awt.Color;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -75,6 +77,13 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	/** The default timeout. */
 	public static long DEFAULT_TIMEOUT = 10000;
 	
+	
+	/** The cache of proxy infos. */
+	protected static Map proxyinfos = Collections.synchronizedMap(new LRU(200));
+
+	/** The remote interface properties. */
+	protected static Map interfaceproperties = Collections.synchronizedMap(new HashMap());
+	
 	//-------- attributes --------
 	
 	/** The component. */
@@ -93,13 +102,23 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		super(component.getServiceProvider().getId(), IRemoteServiceManagementService.class, null);
 
 		this.component = component;
-		Set typeinfos = JavaReader.getTypeInfos();
-		TypeInfo ti_proxyinfo = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"jadex.base.service.remote", "ProxyInfo")}), 
+		
+		QName[] proxyinfo = new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"jadex.base.service.remote", "ProxyInfo")};
+		
+		Set typeinfosread = JavaReader.getTypeInfos();
+		TypeInfo ti_proxyinfo = new TypeInfo(new XMLInfo(proxyinfo), 
 			new ObjectInfo(ProxyInfo.class, new RMIPostProcessor(component)));
-		typeinfos.add(ti_proxyinfo);
+		typeinfosread.add(ti_proxyinfo);
+		
+		Set typeinfoswrite = JavaWriter.getTypeInfos();
+		TypeInfo ti_proxyable = new TypeInfo(new XMLInfo(proxyinfo, null, false, new RMIPreProcessor(component.getComponentIdentifier())), 
+			new ObjectInfo(IProxyable.class));
+		typeinfoswrite.add(ti_proxyable);
+		
 		this.context = new CallContext(
-			new Reader(new BeanObjectReaderHandler(typeinfos)),
-			new Writer(new RMIObjectWriterHandler(JavaWriter.getTypeInfos(), component.getComponentIdentifier()))
+			new Reader(new BeanObjectReaderHandler(typeinfosread)),
+			new Writer(new BeanObjectWriterHandler(typeinfoswrite, true))
+//			new Writer(new RMIObjectWriterHandler(JavaWriter.getTypeInfos(), component.getComponentIdentifier()))
 		);
 	}
 	
@@ -377,5 +396,374 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 			}
 		});
 	}
+	
+	//-------- management of proxy infos --------
+	
+	/**
+	 *  Get a proxy info for a component. 
+	 */
+	public static ProxyInfo getProxyInfo(IComponentIdentifier rms, Object target, Class[] remoteinterfaces, CallContext context)
+	{
+		ProxyInfo ret;
+		
+		// todo: should all ids of remote objects be saved in table?
+		Object tid;
+		if(target instanceof IExternalAccess)
+		{
+			tid = ((IExternalAccess)target).getComponentIdentifier();
+		}
+		else if(target instanceof IService)
+		{
+			tid = ((IService)target).getServiceIdentifier();
+		}
+		else
+		{
+			tid = context.putTargetObject(target);
+		}
+		
+		// This construct ensures
+		// a) fast access to existing proxyinfos in the map
+		// b) creation is performed only once by ordering threads 
+		// via synchronized block and rechecking if proxy was already created.
+		
+		Class targetclass = target.getClass();
+		ret = (ProxyInfo)proxyinfos.get(targetclass);
+		if(ret==null)
+		{
+			synchronized(proxyinfos)
+			{
+				ret = (ProxyInfo)proxyinfos.get(targetclass);
+				if(ret==null)
+				{
+					ret = createProxyInfo(rms, target, tid, remoteinterfaces);
+				}
+			}
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Create a proxy info for a service. 
+	 */
+	public static ProxyInfo createProxyInfo(IComponentIdentifier rms, Object target, Object tid, Class[] remoteinterfaces)
+	{
+		// todo: dgc, i.e. remember that target is a remote object (for which a proxyinfo is sent away).
+		
+		ProxyInfo ret = new ProxyInfo(rms, tid, remoteinterfaces);
+		for(int i=0; i<remoteinterfaces.length; i++)
+			fillProxyInfo(ret, target, remoteinterfaces[i]);
+		return ret;
+//		System.out.println("Creating proxy for: "+type);
+	}	
+	
+	/**
+	 *  Fill a proxy with method information.
+	 */
+	public static void fillProxyInfo(ProxyInfo pi, final Object target, Class remoteinterface)
+	{
+		Map properties = (Map)interfaceproperties.get(remoteinterface);
+		
+		// Check for excluded and synchronous methods.
+		if(properties!=null)
+		{
+			Object ex = properties.get(RemoteServiceManagementService.REMOTE_EXCLUDED);
+			if(ex!=null)
+			{
+				for(Iterator it = SReflect.getIterator(ex); it.hasNext(); )
+				{
+					MethodInfo[] mis = getMethodInfo(it.next(), remoteinterface, false);
+					for(int i=0; i<mis.length; i++)
+					{
+						pi.addExcludedMethod(mis[i]);
+					}
+				}
+			}
+			Object syn = properties.get(RemoteServiceManagementService.REMOTE_SYNCHRONOUS);
+			if(syn!=null)
+			{
+				for(Iterator it = SReflect.getIterator(syn); it.hasNext(); )
+				{
+					MethodInfo[] mis = getMethodInfo(it.next(), remoteinterface, false);
+					for(int i=0; i<mis.length; i++)
+					{
+						pi.addSynchronousMethod(mis[i]);
+					}
+				}
+			}
+			Object un = properties.get(RemoteServiceManagementService.REMOTE_UNCACHED);
+			if(un!=null)
+			{
+				for(Iterator it = SReflect.getIterator(un); it.hasNext(); )
+				{
+					MethodInfo[] mis = getMethodInfo(it.next(), remoteinterface, false);
+					for(int i=0; i<mis.length; i++)
+					{
+						pi.addUncachedMethod(mis[i]);
+					}
+				}
+			}
+			Object mr = properties.get(RemoteServiceManagementService.REMOTE_METHODREPLACEMENT);
+			if(mr!=null)
+			{
+				for(Iterator it = SReflect.getIterator(mr); it.hasNext(); )
+				{
+					Object[] tmp = (Object[])it.next();
+					MethodInfo[] mis = getMethodInfo(tmp[0], remoteinterface, false);
+					for(int i=0; i<mis.length; i++)
+					{
+						pi.addMethodReplacement(mis[i], (IMethodReplacement)tmp[1]);
+					}
+				}
+			}
+			
+			// Add default replacement for equals() and hashCode().
+			Method	equals	= SReflect.getMethod(Object.class, "equals", new Class[]{Object.class});
+			if(pi.getMethodReplacement(equals)==null)
+			{
+				MethodInfo[] mis = getMethodInfo(equals, remoteinterface, false);
+				for(int i=0; i<mis.length; i++)
+				{
+					pi.addMethodReplacement(mis[i], new DefaultEqualsMethodReplacement());
+				}
+			}
+			Method	hashcode = SReflect.getMethod(Object.class, "hashCode", new Class[0]);
+			if(pi.getMethodReplacement(hashcode)==null)
+			{
+				MethodInfo[] mis = getMethodInfo(hashcode, remoteinterface, true);
+				for(int i=0; i<mis.length; i++)
+				{
+					pi.addMethodReplacement(mis[i], new DefaultHashcodeMethodReplacement());
+				}
+			}
+			// Add getClass as excluded. Otherwise the target class must be present on
+			// the computer which only uses the proxy.
+			Method getclass = SReflect.getMethod(Object.class, "getClass", new Class[0]);
+			if(pi.getMethodReplacement(getclass)==null)
+			{
+				pi.addExcludedMethod(new MethodInfo(getclass));
+			}
+			
+			// Check methods and possibly cache constant calls.
+			Method[] methods = remoteinterface.getMethods();
+			methods	= (Method[])SUtil.joinArrays(methods, Object.class.getMethods());
+			for(int i=0; i<methods.length; i++)
+			{
+				// only cache when not excluded, not cached and not replaced
+				if(!pi.isUncached(methods[i]) && !pi.isExcluded(methods[i]) && !pi.isReplaced(methods[i])) 
+				{
+					Class rt = methods[i].getReturnType();
+					Class[] ar = methods[i].getParameterTypes();
+					
+					if(void.class.equals(rt))
+					{
+	//					System.out.println("Warning, void method call will be executed asynchronously: "+type+" "+methods[i].getName());
+					}
+					else if(!(rt.isAssignableFrom(IFuture.class)))
+					{
+						if(ar.length>0)
+						{
+	//						System.out.println("Warning, service method is blocking: "+type+" "+methods[i].getName());
+						}
+						else
+						{
+							// Invoke method to get constant return value.
+							try
+							{
+	//							System.out.println("Calling for caching: "+methods[i]);
+								Object val = methods[i].invoke(target, new Object[0]);
+								pi.putCache(methods[i].getName(), val);
+							}
+							catch(Exception e)
+							{
+								System.out.println("Warning, constant service method threw exception: "+remoteinterface+" "+methods[i]);
+		//						e.printStackTrace();
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	/**
+	 *  Get method info.
+	 */
+	public static MethodInfo[] getMethodInfo(Object iden, Class targetclass, boolean noargs)
+	{
+		MethodInfo[] ret;
+		
+		if(iden instanceof String)
+		{
+			if(noargs)
+			{
+				Method	method	= SReflect.getMethod(targetclass, (String)iden, new Class[0]);
+				if(method==null)
+					method	= SReflect.getMethod(Object.class, (String)iden, new Class[0]);
+				
+				if(method!=null)
+				{
+					ret = new MethodInfo[]{new MethodInfo(method)};
+				}
+				else
+				{
+					throw new RuntimeException("Method not found: "+iden);
+				}
+			}
+			else
+			{
+				Method[] ms = SReflect.getMethods(targetclass, (String)iden);
+				if(ms.length==0)
+				{
+					ms = SReflect.getMethods(Object.class, (String)iden);
+				}
+				
+				if(ms.length==1)
+				{
+					ret = new MethodInfo[]{new MethodInfo(ms[0])};
+				}
+				else if(ms.length>1)
+				{
+					// Exclude all if more than one fits?!
+					ret = new MethodInfo[ms.length];
+					for(int i=0; i<ret.length; i++)
+						ret[i] = new MethodInfo(ms[i]);
+					
+					// Check if the methods are equal = same signature (e.g. defined in different interfaces)
+//					boolean eq = true;
+//					Method m0 = ms[0];
+//					for(int i=1; i<ms.length && eq; i++)
+//					{
+//						if(!hasEqualSignature(m0, ms[i]))
+//							eq = false;
+//					}
+//					if(!eq)
+//						throw new RuntimeException("More than one method with the name availble: "+tmp);
+//					else
+//						ret = new MethodInfo(m0);
+				}
+				else
+				{
+					throw new RuntimeException("Method not found: "+iden);
+				}
+			}
+		}
+		else
+		{
+			ret = new MethodInfo[]{new MethodInfo((Method)iden)};
+		}
+		
+		return ret;
+	}
+
+	/**
+	 *  Create a proxy info for a service. 
+	 * /
+	public static ProxyInfo createProxyInfoForExternalAccess(IComponentIdentifier rms, IComponentIdentifier cid, IExternalAccess target)
+	{
+		Class targetclass = null;
+		Class[] inter = target.getClass().getInterfaces();
+		for(int i=0; i<inter.length && targetclass==null; i++)
+		{
+			if(SReflect.isSupertype(IExternalAccess.class, inter[0]));
+				targetclass = inter[i]; 
+		}
+		if(targetclass==null)
+			targetclass = IExternalAccess.class;
+		
+		ProxyInfo ret = new ProxyInfo(rms, cid, new Class[]{targetclass});
+		
+		// todo: Hack!!!
+		// Exclude getServiceProvider() from remote external access interface
+		Map props = target.getModel().getProperties();		
+		fillProxyInfo(ret, target, targetclass, props);
+		return ret;
+//		System.out.println("Creating proxy for: "+type);
+	}*/
+	
+	/**
+	 *  Create a proxy info for a service. 
+	 * /
+	public static ProxyInfo createProxyInfoForService(IComponentIdentifier rms, IService service)
+	{
+		ProxyInfo ret = new ProxyInfo(rms, service.getServiceIdentifier(), new Class[]{service.getServiceIdentifier().getServiceType()});
+		fillProxyInfo(ret, service, service.getServiceIdentifier().getServiceType(), service.getPropertyMap());
+		return ret;
+//		System.out.println("Creating proxy for: "+type);
+	}*/
+	
+	/**
+	 *  Get a proxy info for a service. 
+	 * /
+	public static ProxyInfo getProxyInfo(IComponentIdentifier rms, IService service)
+	{
+		ProxyInfo ret;
+		
+		// This construct ensures
+		// a) fast access to existing proxyinfos in the map
+		// b) creation is performed only once by ordering threads 
+		// via synchronized block and rechecking if proxy was already created.
+		
+		ret = (ProxyInfo)proxyinfos.get(service);
+		if(ret==null)
+		{
+			synchronized(proxyinfos)
+			{
+				ret = (ProxyInfo)proxyinfos.get(service);
+				if(ret==null)
+				{
+					ret = createProxyInfo(rms, service);
+					proxyinfos.put(service, ret);
+				}
+			}
+		}
+		
+		return ret;
+	}*/
+	
+	/**
+	 *  Get a proxy info for a component. 
+	 * /
+	public static ProxyInfo getProxyInfo(IComponentIdentifier rms, IComponentIdentifier cid, IExternalAccess target)
+	{
+		ProxyInfo ret;
+		
+		// This construct ensures
+		// a) fast access to existing proxyinfos in the map
+		// b) creation is performed only once by ordering threads 
+		// via synchronized block and rechecking if proxy was already created.
+		
+		ret = (ProxyInfo)proxyinfos.get(target);
+		if(ret==null)
+		{
+			synchronized(proxyinfos)
+			{
+				ret = (ProxyInfo)proxyinfos.get(target);
+				if(ret==null)
+				{
+					ret = createProxyInfo(rms, cid, target);
+				}
+			}
+		}
+		
+		return ret;
+	}*/
+	
+	//-------- management of proxies --------
+
+	/**
+	 *  Get a proxy for a proxy info.
+	 */
+	public static Object getProxy(IMicroExternalAccess rms, ProxyInfo pi, CallContext context)
+	{
+		// todo: check if the rms cid of the proxyinfo is the same as this rms
+		// then it is the local object scope an the original object can be used
+		// todo: table of proxies for remote references
+		// return cached proxies
+		
+		return Proxy.newProxyInstance(rms.getModel().getClassLoader(), pi.getTargetInterfaces(),
+			new RemoteMethodInvocationHandler(rms, pi, context));
+	}
+	
 }
 

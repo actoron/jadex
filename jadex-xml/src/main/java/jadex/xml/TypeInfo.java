@@ -214,6 +214,16 @@ public class TypeInfo	extends AbstractInfo
 		IPostProcessor ret = objectinfo!=null? objectinfo.getPostProcessor(): null;
 		return ret!=null? ret: getSupertype()!=null? getSupertype().getPostProcessor(): null;
 	}
+	
+	/**
+	 *  Get the pre-processor.
+	 *  @return The pre-processor
+	 */
+	public IPreProcessor getPreProcessor()
+	{
+		IPreProcessor ret = xmlinfo!=null? xmlinfo.getPreProcessor(): null;
+		return ret!=null? ret: getSupertype()!=null? getSupertype().getPreProcessor(): null;
+	}
 
 	/**
 	 *  Get the subobject infos. 

@@ -79,8 +79,11 @@ public class SUtil
 															};
 
 	/** An empty string array. */
-	public static final String[]	EMPTY_STRING_ARRAY		= new String[0];
+	public static final String[] EMPTY_STRING_ARRAY	 = new String[0];
 
+	/** An empty class array. */
+	public static final Class[] EMPTY_CLASS_ARRAY = new Class[0];
+	
 	static
 	{
 		htmlwraps = new Hashtable();

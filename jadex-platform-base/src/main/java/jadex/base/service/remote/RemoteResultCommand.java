@@ -38,6 +38,7 @@ public class RemoteResultCommand implements IRemoteCommand
 	 */
 	public RemoteResultCommand(Object result, Exception exception, String callid)
 	{
+//		System.out.println("result command: "+result);
 		this.result = result;
 		this.exceptioninfo = exception!=null? new ExceptionInfo(exception): null;
 		this.callid = callid;

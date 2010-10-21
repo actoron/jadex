@@ -1,11 +1,14 @@
 package jadex.base.service.remote;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.commons.SUtil;
 import jadex.commons.service.IServiceIdentifier;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -25,9 +28,9 @@ public class ProxyInfo
 	/** The target identifier (sid, cid, or tid). */
 	protected Object targetid;
 	
-	/** The target class. */
-	protected Class targetclass;
 	
+	/** The target class. */
+	protected List targetinterfaces;
 		
 	/** The value cache. */
 	protected Map cache;
@@ -56,11 +59,13 @@ public class ProxyInfo
 	/**
 	 *  Create a new proxy info.
 	 */
-	public ProxyInfo(IComponentIdentifier rms, Object targetid, Class targetclass)
+	public ProxyInfo(IComponentIdentifier rms, Object targetid, Class[] targetinterfaces)
 	{
 		this.rms = rms;
 		this.targetid = targetid;
-		this.targetclass = targetclass;
+		setTargetInterfaces(targetinterfaces);
+		
+//		System.out.println("proxy with: "+SUtil.arrayToString(targetinterfaces));
 	}
 	
 	//-------- methods --------
@@ -182,21 +187,40 @@ public class ProxyInfo
 	}
 	
 	/**
-	 *  Get the targetclass.
-	 *  @return the targetclass.
+	 *  Get the target remote interfaces.
+	 *  @return the target remote interfaces.
 	 */
-	public Class getTargetClass()
+	public Class[] getTargetInterfaces()
 	{
-		return targetclass;
+		return targetinterfaces==null? SUtil.EMPTY_CLASS_ARRAY: (Class[])targetinterfaces.toArray(new Class[targetinterfaces.size()]);
 	}
 
 	/**
-	 *  Set the targetclass.
-	 *  @param targetclass The targetclass to set.
+	 *  Set the target remote interfaces.
+	 *  @param targetinterfaces The targetinterfaces to set.
 	 */
-	public void setTargetClass(Class targetclass)
+	public void setTargetInterfaces(Class[] targetinterfaces)
 	{
-		this.targetclass = targetclass;
+		if(this.targetinterfaces!=null)
+			this.targetinterfaces.clear();
+		if(targetinterfaces!=null)
+		{
+			for(int i=0; i<targetinterfaces.length; i++)
+			{
+				addTargetInterface(targetinterfaces[i]);
+			}
+		}
+	}
+	
+	/**
+	 *  Add a target interface.
+	 *  @param targetinterface The target interface.
+	 */
+	public void addTargetInterface(Class targetinterface)
+	{
+		if(targetinterfaces==null)
+			targetinterfaces = new ArrayList();
+		targetinterfaces.add(targetinterface);
 	}
 
 	/**
@@ -325,8 +349,8 @@ public class ProxyInfo
 		return "ProxyInfo(rms=" + rms + ", targetid=" + targetid + ", cache=" + cache
 				+ ", excluded=" + excluded + ", uncached=" + uncached
 				+ ", synchronous=" + synchronous + ", replacements="
-				+ replacements + ", targetclass="
-				+ targetclass + ")";
+				+ replacements + ", targetinterfaces="
+				+ targetinterfaces + ")";
 	}
 	
 	

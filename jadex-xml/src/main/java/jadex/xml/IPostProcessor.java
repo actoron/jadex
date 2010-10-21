@@ -11,7 +11,6 @@ public interface IPostProcessor
 	 *  Post-process an object after an XML has been loaded.
 	 *  @param context The context.
 	 *  @param object The object to post process.
-	 *  @param classloader The classloader.
 	 *  @return A possibly other object for replacing the original. 
 	 *  		Null for no change.
 	 *  		Only possibly when processor is applied in first pass.
