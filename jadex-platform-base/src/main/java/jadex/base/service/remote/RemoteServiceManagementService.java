@@ -453,6 +453,35 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		ProxyInfo ret = new ProxyInfo(rms, tid, remoteinterfaces);
 		for(int i=0; i<remoteinterfaces.length; i++)
 			fillProxyInfo(ret, target, remoteinterfaces[i]);
+		
+		// Add default replacement for equals() and hashCode().
+		Class targetclass = target.getClass();
+		Method	equals	= SReflect.getMethod(Object.class, "equals", new Class[]{Object.class});
+		if(ret.getMethodReplacement(equals)==null)
+		{
+			MethodInfo[] mis = getMethodInfo(equals, targetclass, false);
+			for(int i=0; i<mis.length; i++)
+			{
+				ret.addMethodReplacement(mis[i], new DefaultEqualsMethodReplacement());
+			}
+		}
+		Method	hashcode = SReflect.getMethod(Object.class, "hashCode", new Class[0]);
+		if(ret.getMethodReplacement(hashcode)==null)
+		{
+			MethodInfo[] mis = getMethodInfo(hashcode, targetclass, true);
+			for(int i=0; i<mis.length; i++)
+			{
+				ret.addMethodReplacement(mis[i], new DefaultHashcodeMethodReplacement());
+			}
+		}
+		// Add getClass as excluded. Otherwise the target class must be present on
+		// the computer which only uses the proxy.
+		Method getclass = SReflect.getMethod(Object.class, "getClass", new Class[0]);
+		if(ret.getMethodReplacement(getclass)==null)
+		{
+			ret.addExcludedMethod(new MethodInfo(getclass));
+		}
+		
 		return ret;
 //		System.out.println("Creating proxy for: "+type);
 	}	
@@ -464,6 +493,14 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	{
 		Map properties = (Map)interfaceproperties.get(remoteinterface);
 		
+		// Hack! as long as registry misses
+		if(properties==null && target instanceof IExternalAccess)
+			properties = ((IExternalAccess)target).getModel().getProperties();		
+		else if(properties==null && target instanceof IService)
+			properties = ((IService)target).getPropertyMap();
+		
+		Class targetclass = target.getClass();
+		
 		// Check for excluded and synchronous methods.
 		if(properties!=null)
 		{
@@ -472,7 +509,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 			{
 				for(Iterator it = SReflect.getIterator(ex); it.hasNext(); )
 				{
-					MethodInfo[] mis = getMethodInfo(it.next(), remoteinterface, false);
+					MethodInfo[] mis = getMethodInfo(it.next(), targetclass, false);
 					for(int i=0; i<mis.length; i++)
 					{
 						pi.addExcludedMethod(mis[i]);
@@ -484,7 +521,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 			{
 				for(Iterator it = SReflect.getIterator(syn); it.hasNext(); )
 				{
-					MethodInfo[] mis = getMethodInfo(it.next(), remoteinterface, false);
+					MethodInfo[] mis = getMethodInfo(it.next(), targetclass, false);
 					for(int i=0; i<mis.length; i++)
 					{
 						pi.addSynchronousMethod(mis[i]);
@@ -496,7 +533,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 			{
 				for(Iterator it = SReflect.getIterator(un); it.hasNext(); )
 				{
-					MethodInfo[] mis = getMethodInfo(it.next(), remoteinterface, false);
+					MethodInfo[] mis = getMethodInfo(it.next(), targetclass, false);
 					for(int i=0; i<mis.length; i++)
 					{
 						pi.addUncachedMethod(mis[i]);
@@ -509,39 +546,12 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 				for(Iterator it = SReflect.getIterator(mr); it.hasNext(); )
 				{
 					Object[] tmp = (Object[])it.next();
-					MethodInfo[] mis = getMethodInfo(tmp[0], remoteinterface, false);
+					MethodInfo[] mis = getMethodInfo(tmp[0], targetclass, false);
 					for(int i=0; i<mis.length; i++)
 					{
 						pi.addMethodReplacement(mis[i], (IMethodReplacement)tmp[1]);
 					}
 				}
-			}
-			
-			// Add default replacement for equals() and hashCode().
-			Method	equals	= SReflect.getMethod(Object.class, "equals", new Class[]{Object.class});
-			if(pi.getMethodReplacement(equals)==null)
-			{
-				MethodInfo[] mis = getMethodInfo(equals, remoteinterface, false);
-				for(int i=0; i<mis.length; i++)
-				{
-					pi.addMethodReplacement(mis[i], new DefaultEqualsMethodReplacement());
-				}
-			}
-			Method	hashcode = SReflect.getMethod(Object.class, "hashCode", new Class[0]);
-			if(pi.getMethodReplacement(hashcode)==null)
-			{
-				MethodInfo[] mis = getMethodInfo(hashcode, remoteinterface, true);
-				for(int i=0; i<mis.length; i++)
-				{
-					pi.addMethodReplacement(mis[i], new DefaultHashcodeMethodReplacement());
-				}
-			}
-			// Add getClass as excluded. Otherwise the target class must be present on
-			// the computer which only uses the proxy.
-			Method getclass = SReflect.getMethod(Object.class, "getClass", new Class[0]);
-			if(pi.getMethodReplacement(getclass)==null)
-			{
-				pi.addExcludedMethod(new MethodInfo(getclass));
 			}
 			
 			// Check methods and possibly cache constant calls.
