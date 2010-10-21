@@ -1,7 +1,6 @@
 package jadex.base.service.remote.xml;
 
 import jadex.base.service.remote.CallContext;
-import jadex.base.service.remote.ProxyInfo;
 import jadex.base.service.remote.RemoteServiceManagementService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.IProxyable;
@@ -14,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 
+ *  Preprocessor for RMI. It replaces IProxyable objects with ProxyInfo objects.
  */
 public class RMIPreProcessor implements IPreProcessor
 {
@@ -33,6 +32,8 @@ public class RMIPreProcessor implements IPreProcessor
 		this.rms = rms;
 	}
 	
+	//-------- methods --------
+
 	/**
 	 *  Pre-process an object after an XML has been loaded.
 	 *  @param context The context.
@@ -50,9 +51,6 @@ public class RMIPreProcessor implements IPreProcessor
 			WriteContext wc = (WriteContext)context;
 			CallContext cc = (CallContext)wc.getUserContext();
 			object = RemoteServiceManagementService.getProxyInfo(rms, object, remoteinterfaces, cc);
-		
-			if(((ProxyInfo)object).getTargetInterfaces().length==0)
-				System.out.println("here");
 		}
 		
 		return object;
@@ -67,12 +65,16 @@ public class RMIPreProcessor implements IPreProcessor
 		
 		if(object!=null)
 		{
-			// todo?! search super types etc.
-			Class[] interfaces = object.getClass().getInterfaces();
-			for(int i=0; i<interfaces.length; i++)
+			Class clazz = object.getClass();
+			while(clazz!=null)
 			{
-				if(SReflect.isSupertype(IProxyable.class, interfaces[i]))
-					ret.add(interfaces[i]);
+				Class[] interfaces = clazz.getInterfaces();
+				for(int i=0; i<interfaces.length; i++)
+				{
+					if(SReflect.isSupertype(IProxyable.class, interfaces[i]))
+						ret.add(interfaces[i]);
+				}
+				clazz = clazz.getSuperclass();
 			}
 		}
 		
