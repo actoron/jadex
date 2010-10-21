@@ -1603,7 +1603,7 @@ public class BpmnXMLReader
 			String value = detail.getValue();
 
 			if ("dimension".equals(key)
-					|| "uniqueColumnIndex".equals(key)) 
+					|| "uniquecolumnindex".equals(key)) 
 			{
 				continue;
 			}
@@ -1667,9 +1667,17 @@ class BpmnMultiColumTable
 	public void setCellValue(String cellIndex, String value)
 	{
 		int[] index = parseCellIndex(cellIndex);
-		assert index[0] != -1 && index[1] != -1;
-		assert index[0] < data.length;
-		assert index[1] < data[index[0]].length;
+		try
+		{
+			assert index[0] != -1 && index[1] != -1;
+			assert index[0] < data.length;
+			assert index[1] < data[index[0]].length;
+		}
+		catch (AssertionError e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		data[index[0]][index[1]] = value;
 	}
 	
