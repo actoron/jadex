@@ -217,8 +217,8 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory
 		}
 		catch(Exception e)
 		{
-			System.err.println(filename);
-			throw new RuntimeException(e);
+//			System.err.println(filename);
+			throw e instanceof RuntimeException ? (RuntimeException)e : new RuntimeException(e);
 		}
 	}
 	

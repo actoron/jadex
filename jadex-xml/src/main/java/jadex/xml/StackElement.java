@@ -83,6 +83,7 @@ public class StackElement
 	 */
 	public void setObject(Object object)
 	{
+//		assert !hashcodecalled;
 		this.object = object;
 	}
 
@@ -134,14 +135,18 @@ public class StackElement
 		return "StackElement(tag="+this.tag+", object=" + this.object + ")";
 	}
 
+//	boolean hashcodecalled	= false;
+
 	/**
 	 *  Get the hash code.
 	 */
 	public int hashCode()
 	{
+//		hashcodecalled	= true;
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((content == null) ? 0 : content.hashCode());
+		// Hack!!! Content set afterwards, cannot use for hashcode!
+//		result = prime * result + ((content == null) ? 0 : content.hashCode());
 		result = prime * result + ((object == null) ? 0 : object.hashCode());
 		result = prime * result
 				+ ((rawattrs == null) ? 0 : rawattrs.hashCode());
@@ -163,13 +168,14 @@ public class StackElement
 		if(getClass() != obj.getClass())
 			return false;
 		StackElement other = (StackElement)obj;
-		if(content == null)
-		{
-			if(other.content != null)
-				return false;
-		}
-		else if(!content.equals(other.content))
-			return false;
+		// Hack!!! Content set afterwards, cannot use for equals!
+//		if(content == null)
+//		{
+//			if(other.content != null)
+//				return false;
+//		}
+//		else if(!content.equals(other.content))
+//			return false;
 		if(object == null)
 		{
 			if(other.object != null)

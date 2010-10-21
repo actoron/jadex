@@ -24,7 +24,7 @@
 		<import>jadex.commons.*</import>
 		<import>jadex.rules.rulesystem.rules.functions.*</import>
 		<import>jadex.application.runtime.*</import>
-		<import>jadex.application.space.envsupport.environment.*</import>
+ 		<import>jadex.application.space.envsupport.environment.*</import>
 		<import>jadex.application.space.envsupport.environment.space2d.*</import>
 		<import>jadex.application.space.envsupport.math.*</import>
 		<import>jadex.bdi.examples.cleanerworld.*</import>
