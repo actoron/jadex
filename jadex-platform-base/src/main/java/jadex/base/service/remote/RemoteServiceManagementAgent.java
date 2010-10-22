@@ -44,8 +44,6 @@ public class RemoteServiceManagementAgent extends MicroAgent
 	 */
 	public void messageArrived(final Map msg, final MessageType mt)
 	{
-//		if(msg.toString().indexOf("Shop")!=-1)
-//			System.out.println("received: "+msg);
 		if(SFipa.MESSAGE_TYPE_NAME_FIPA.equals(mt.getName()))
 		{
 			SServiceProvider.getService(getServiceProvider(), ILibraryService.class)
@@ -63,7 +61,7 @@ public class RemoteServiceManagementAgent extends MicroAgent
 						try
 						{
 //							content = JavaReader.objectFromXML((String)content, ls.getClassLoader());
-							content = Reader.objectFromXML(rms.getCallContext().getReader(), (String)content, ls.getClassLoader(), rms.getCallContext());
+							content = Reader.objectFromXML(rms.getReader(), (String)content, ls.getClassLoader());
 						}
 						catch(Exception e)
 						{
@@ -75,7 +73,7 @@ public class RemoteServiceManagementAgent extends MicroAgent
 					if(content instanceof IRemoteCommand)
 					{
 						final IRemoteCommand com = (IRemoteCommand)content;
-						com.execute(getExternalAccess(), rms.getCallContext()).addResultListener(createResultListener(new DefaultResultListener()
+						com.execute(getExternalAccess(), rms).addResultListener(createResultListener(new DefaultResultListener()
 						{
 							public void resultAvailable(Object source, Object result)
 							{
@@ -89,7 +87,7 @@ public class RemoteServiceManagementAgent extends MicroAgent
 										{
 											Map reply = (Map)result;
 //											reply.put(SFipa.CONTENT, JavaWriter.objectToXML(repcontent, ls.getClassLoader()));
-											String content = Writer.objectToXML(rms.getCallContext().getWriter(), repcontent, ls.getClassLoader(), rms.getCallContext());
+											String content = Writer.objectToXML(rms.getWriter(), repcontent, ls.getClassLoader(), rms);
 											reply.put(SFipa.CONTENT, content);
 //											System.out.println("content: "+content);
 											sendMessage(reply, mt);

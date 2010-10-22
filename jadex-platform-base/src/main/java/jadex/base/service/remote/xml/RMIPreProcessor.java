@@ -1,13 +1,10 @@
 package jadex.base.service.remote.xml;
 
-import jadex.base.service.remote.CallContext;
-import jadex.base.service.remote.RemoteServiceManagementService;
-import jadex.bridge.IComponentIdentifier;
+import jadex.base.service.remote.RemoteReferenceModule;
 import jadex.commons.IProxyable;
 import jadex.commons.SReflect;
 import jadex.xml.IContext;
 import jadex.xml.IPreProcessor;
-import jadex.xml.writer.WriteContext;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,17 +16,17 @@ public class RMIPreProcessor implements IPreProcessor
 {
 	//-------- attributes --------
 	
-	/** The rms. */
-	protected IComponentIdentifier rms;
+	/** The remote reference module. */
+	protected RemoteReferenceModule rrm;
 	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new pre processor.
 	 */
-	public RMIPreProcessor(IComponentIdentifier rms)
+	public RMIPreProcessor(RemoteReferenceModule rrm)
 	{
-		this.rms = rms;
+		this.rrm = rrm;
 	}
 	
 	//-------- methods --------
@@ -46,12 +43,10 @@ public class RMIPreProcessor implements IPreProcessor
 	{
 		Class[] remoteinterfaces = getRemoteInterfaces(object);
 		
-		if(remoteinterfaces.length>0)
-		{
-			WriteContext wc = (WriteContext)context;
-			CallContext cc = (CallContext)wc.getUserContext();
-			object = RemoteServiceManagementService.getProxyInfo(rms, object, remoteinterfaces, cc);
-		}
+		if(remoteinterfaces.length==0)
+			throw new RuntimeException("Proxyable object has no remote references: "+object);
+
+		object = rrm.getProxyInfo(object, remoteinterfaces);
 		
 		return object;
 	}

@@ -1,14 +1,9 @@
 package jadex.base.service.remote.xml;
 
-import jadex.base.service.remote.CallContext;
 import jadex.base.service.remote.ProxyInfo;
-import jadex.base.service.remote.RemoteMethodInvocationHandler;
-import jadex.base.service.remote.RemoteServiceManagementService;
-import jadex.micro.IMicroExternalAccess;
+import jadex.base.service.remote.RemoteReferenceModule;
 import jadex.xml.IContext;
 import jadex.xml.IPostProcessor;
-
-import java.lang.reflect.Proxy;
 
 /**
  *  The rmi postprocessor has the task to create a proxy from a proxyinfo.
@@ -17,17 +12,17 @@ public class RMIPostProcessor implements IPostProcessor
 {
 	//-------- attributes --------
 	
-	/** The rms. */
-	protected IMicroExternalAccess rms;
+	/** The remote reference module. */
+	protected RemoteReferenceModule rrm;
 	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new post processor.
 	 */
-	public RMIPostProcessor(IMicroExternalAccess rms)
+	public RMIPostProcessor(RemoteReferenceModule rrm)
 	{
-		this.rms = rms;
+		this.rrm = rrm;
 	}
 	
 	//-------- methods --------
@@ -42,8 +37,7 @@ public class RMIPostProcessor implements IPostProcessor
 	 */
 	public Object postProcess(IContext context, Object object)
 	{
-		ProxyInfo pi = (ProxyInfo)object;	
-		return RemoteServiceManagementService.getProxy(rms, pi, (CallContext)context.getUserContext());
+		return rrm.getProxy((ProxyInfo)object);
 	}
 	
 	/**

@@ -1,18 +1,15 @@
-package jadex.base.service.remote;
+package jadex.base.service.remote.commands;
 
+import jadex.base.service.remote.IRemoteCommand;
+import jadex.base.service.remote.RemoteServiceManagementService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
-import jadex.commons.SReflect;
-import jadex.commons.collection.LRU;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.service.SServiceProvider;
 import jadex.micro.IMicroExternalAccess;
-
-import java.util.Collections;
-import java.util.Map;
 
 /**
  *  Command for getting a remote external access.
@@ -53,7 +50,7 @@ public class RemoteGetExternalAccessCommand implements IRemoteCommand
 	 *  @return An optional result command that will be 
 	 *  sent back to the command origin. 
 	 */
-	public IFuture execute(final IMicroExternalAccess component, CallContext context)
+	public IFuture execute(final IMicroExternalAccess component, RemoteServiceManagementService rsms)
 	{
 		final Future ret = new Future();
 		
@@ -128,22 +125,5 @@ public class RemoteGetExternalAccessCommand implements IRemoteCommand
 	{
 		this.callid = callid;
 	}
-	
-	/**
-	 *  Get the targetclass.
-	 *  @return the targetclass.
-	 * /
-	public Class getTargetClass()
-	{
-		return targetclass;
-	}*/
 
-	/**
-	 *  Set the targetclass.
-	 *  @param targetclass The targetclass to set.
-	 * /
-	public void setTargetClass(Class targetclass)
-	{
-		this.targetclass = targetclass;
-	}*/
 }

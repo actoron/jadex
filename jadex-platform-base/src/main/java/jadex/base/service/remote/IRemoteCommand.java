@@ -17,5 +17,5 @@ public interface IRemoteCommand
 	 *  @return An optional result command that will be 
 	 *  sent back to the command origin. 
 	 */
-	public IFuture execute(IMicroExternalAccess component, CallContext context);
+	public IFuture execute(IMicroExternalAccess component, RemoteServiceManagementService rsms);
 }

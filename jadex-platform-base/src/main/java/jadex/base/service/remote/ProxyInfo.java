@@ -1,8 +1,6 @@
 package jadex.base.service.remote;
 
-import jadex.bridge.IComponentIdentifier;
 import jadex.commons.SUtil;
-import jadex.commons.service.IServiceIdentifier;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -23,11 +21,7 @@ public class ProxyInfo
 	//-------- attributes --------
 	
 	/** The rms. */
-	protected IComponentIdentifier rms;
-	
-	/** The target identifier (sid, cid, or tid). */
-	protected Object targetid;
-	
+	protected RemoteReference rr;
 	
 	/** The target class. */
 	protected List targetinterfaces;
@@ -59,10 +53,10 @@ public class ProxyInfo
 	/**
 	 *  Create a new proxy info.
 	 */
-	public ProxyInfo(IComponentIdentifier rms, Object targetid, Class[] targetinterfaces)
+	public ProxyInfo(RemoteReference rr, Class[] targetinterfaces)
 	{
-		this.rms = rms;
-		this.targetid = targetid;
+		this.rr = rr;
+		addTargetInterface(IFinalize.class);
 		setTargetInterfaces(targetinterfaces);
 		
 //		System.out.println("proxy with: "+SUtil.arrayToString(targetinterfaces));
@@ -71,23 +65,23 @@ public class ProxyInfo
 	//-------- methods --------
 	
 	/**
-	 *  Get the rms.
-	 *  @return the rms.
+	 *  Get the remote reference.
+	 *  @return the remote reference.
 	 */
-	public IComponentIdentifier getRemoteManagementServiceIdentifier()
+	public RemoteReference getRemoteReference()
 	{
-		return rms;
+		return rr;
 	}
 
 	/**
-	 *  Set the rms.
-	 *  @param rms The rms to set.
+	 *  Set the rr.
+	 *  @param rr The rr to set.
 	 */
-	public void setRemoteManagementServiceIdentifier(IComponentIdentifier rms)
+	public void setRemoteReference(RemoteReference rr)
 	{
-		this.rms = rms;
+		this.rr = rr;
 	}
-
+	
 	/**
 	 *  Get the cached values.
 	 *  @return The cached values. 
@@ -96,7 +90,7 @@ public class ProxyInfo
 	{
 		return cache;
 	}
-	
+
 	/**
 	 *  Set the cached values.
 	 *  @param cache The cached values. 
@@ -168,23 +162,7 @@ public class ProxyInfo
 		return replacements!=null && replacements.containsKey(new MethodInfo(m));
 	}
 	
-	/**
-	 *  Get the target id.
-	 *  @return The target id.
-	 */
-	public Object getTargetIdentifier()
-	{
-		return targetid;
-	}
-
-	/**
-	 *  Set the target id.
-	 *  @param cid The target id to set.
-	 */
-	public void setTargetIdentifier(Object targetid)
-	{
-		this.targetid = targetid;
-	}
+	
 	
 	/**
 	 *  Get the target remote interfaces.
@@ -346,12 +324,10 @@ public class ProxyInfo
 	 */
 	public String toString()
 	{
-		return "ProxyInfo(rms=" + rms + ", targetid=" + targetid + ", cache=" + cache
-				+ ", excluded=" + excluded + ", uncached=" + uncached
-				+ ", synchronous=" + synchronous + ", replacements="
-				+ replacements + ", targetinterfaces="
-				+ targetinterfaces + ")";
+		return "ProxyInfo(remotereference=" + rr + ", cache=" + cache
+			+ ", excluded=" + excluded + ", uncached=" + uncached
+			+ ", synchronous=" + synchronous + ", replacements="
+			+ replacements + ", targetinterfaces="
+			+ targetinterfaces + ")";
 	}
-	
-	
 }

@@ -1,11 +1,11 @@
-package jadex.base.service.remote;
+package jadex.base.service.remote.commands;
 
+import jadex.base.service.remote.ExceptionInfo;
+import jadex.base.service.remote.IRemoteCommand;
+import jadex.base.service.remote.RemoteServiceManagementService;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.micro.IMicroExternalAccess;
-
-import java.security.AllPermission;
-import java.util.Map;
 
 /**
  *  Command that represents the result(s) of a remote command.
@@ -52,9 +52,9 @@ public class RemoteResultCommand implements IRemoteCommand
 	 *  @return An optional result command that will be 
 	 *  sent back to the command origin. 
 	 */
-	public IFuture execute(IMicroExternalAccess component, CallContext context)
+	public IFuture execute(IMicroExternalAccess component, RemoteServiceManagementService rsms)
 	{
-		Future future = (Future)context.getWaitingCall(callid);
+		Future future = (Future)rsms.getWaitingCall(callid);
 		
 		if(future==null)
 		{

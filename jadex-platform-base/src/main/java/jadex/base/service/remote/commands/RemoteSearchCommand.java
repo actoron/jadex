@@ -1,13 +1,12 @@
-package jadex.base.service.remote;
+package jadex.base.service.remote.commands;
 
+import jadex.base.service.remote.IRemoteCommand;
+import jadex.base.service.remote.RemoteServiceManagementService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
-import jadex.commons.SReflect;
-import jadex.commons.SUtil;
-import jadex.commons.collection.LRU;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.service.IResultSelector;
 import jadex.commons.service.ISearchManager;
@@ -16,13 +15,10 @@ import jadex.commons.service.IVisitDecider;
 import jadex.commons.service.SServiceProvider;
 import jadex.micro.IMicroExternalAccess;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 /**
  *  Command for performing a remote service search.
@@ -76,7 +72,7 @@ public class RemoteSearchCommand implements IRemoteCommand
 	 *  @return An optional result command that will be 
 	 *  sent back to the command origin. 
 	 */
-	public IFuture execute(final IMicroExternalAccess component, CallContext context)
+	public IFuture execute(final IMicroExternalAccess component, RemoteServiceManagementService rsms)
 	{
 		final Future ret = new Future();
 			
