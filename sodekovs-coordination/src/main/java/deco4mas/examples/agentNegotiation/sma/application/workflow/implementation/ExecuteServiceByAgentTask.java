@@ -5,10 +5,15 @@ import jadex.bpmn.runtime.ITask;
 import jadex.bpmn.runtime.ITaskContext;
 import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentManagementService;
+import jadex.commons.IFuture;
+import jadex.commons.ThreadSuspendable;
 import jadex.commons.concurrent.IResultListener;
+import jadex.commons.service.SServiceProvider;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
+
 import deco4mas.examples.agentNegotiation.common.dataObjects.ServiceType;
 import deco4mas.examples.agentNegotiation.evaluate.AgentLogger;
 
@@ -29,8 +34,8 @@ public class ExecuteServiceByAgentTask implements ITask
 			System.out
 				.println("Bpmn task (" + context.getActivity().getName() + "/" + ((ServiceType)context.getParameterValue("serviceType")).getName() + ") start");
 
-			IComponentManagementService cms = (IComponentManagementService) instance.getComponentAdapter().getServiceContainer()
-				.getService(IComponentManagementService.class);
+			IComponentManagementService cms = (IComponentManagementService)SServiceProvider.getServiceUpwards(
+					instance.getServiceProvider(), IComponentManagementService.class).get(new ThreadSuspendable());
 
 			String name = context.getActivity().getName() + "_ID" + id;
 			id++;
@@ -69,5 +74,5 @@ public class ExecuteServiceByAgentTask implements ITask
 		{
 			e.printStackTrace();
 		}
-	}
+	}	
 }

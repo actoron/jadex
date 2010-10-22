@@ -8,25 +8,18 @@
 
 	<imports>
 		<import>jadex.commons.IFilter</import>
-		
-<!--		<import>jadex.bdi.planlib.protocols.*</import>-->
 		<import>jadex.adapter.base.contextservice.*</import>
 		<import>jadex.adapter.base.appdescriptor.*</import>
-		<import>jadex.application.space.envsupport.environment.space2d.*
-		</import>
+		<import>jadex.application.space.envsupport.environment.space2d.*</import>
 		<import>jadex.application.space.envsupport.environment.*</import>
 		<import>jadex.application.space.envsupport.math.*</import>
 		<import>jadex.application.runtime.*</import>
-<!--		<import>deco4mas.examples.agentNegotiation.decoMAS.*</import>-->
-		<import>deco4mas.examples.agentNegotiation.common.dataObjects.*
-		</import>
-		<import>deco4mas.examples.agentNegotiation.common.trustInformation.*
-		</import>
+		<import>deco4mas.examples.agentNegotiation.common.dataObjects.*</import>
+		<import>deco4mas.examples.agentNegotiation.common.trustInformation.*</import>
 		<import>deco4mas.examples.agentNegotiation.sa.application.*</import>
 		<import>deco4mas.examples.agentNegotiation.sa.coordination.*</import>
 		<import>deco4mas.coordinate.environment.*</import>
-		<import>deco4mas.coordinate.*</import>
-		
+		<import>deco4mas.coordinate.*</import>		
 	</imports>
 
 	<capabilities>

@@ -12,6 +12,7 @@ import jadex.application.space.envsupport.environment.ISpaceObject;
 import jadex.application.space.envsupport.environment.space2d.Grid2D;
 import jadex.application.space.envsupport.math.IVector2;
 import jadex.bridge.IComponentIdentifier;
+import jadex.javaparser.IValueFetcher;
 import jadex.javaparser.SimpleValueFetcher;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -55,11 +56,24 @@ public class CoordinationSpace extends Grid2D
 		super(CoordinationSpace.class.getName(), null);
 
 	}
-
-	//@Override
-	public void initSpace(IApplication context, MSpaceInstance config) throws Exception
+	
+	@Override
+	public void initSpace(IApplication context, MSpaceInstance config, IValueFetcher fetcher) throws Exception
 	{
-		super.initSpace(context, config);
+		super.initSpace(context, config, new IValueFetcher() {
+			
+			@Override
+			public Object fetchValue(String name, Object object) {
+				// TODO Auto-generated method stub
+				return null;
+			}
+			
+			@Override
+			public Object fetchValue(String name) {
+				// TODO Auto-generated method stub
+				return null;
+			}
+		});
 
 		initSpaces();
 		initDeco4mas();
@@ -272,7 +286,7 @@ public class CoordinationSpace extends Grid2D
 				createSpaceObject(objecttype, props, null);
 			} else
 			{
-				String componenttype = context.getComponentType(aid);
+				String componenttype = getContext().getComponentType(aid);
 				if (componenttype != null && avatarmappings.getCollection(componenttype) != null)
 				{
 					for (Iterator it = avatarmappings.getCollection(componenttype).iterator(); it.hasNext();)

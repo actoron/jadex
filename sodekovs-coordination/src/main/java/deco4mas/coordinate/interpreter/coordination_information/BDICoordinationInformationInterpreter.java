@@ -148,16 +148,16 @@ public class BDICoordinationInformationInterpreter extends SimplePropertyObject 
 			{
 				public void exceptionOccurred(Exception exception)
 				{
-					// exception.printStackTrace();
+					 exception.printStackTrace();
 				}
 
 				public void resultAvailable(Object source, Object result)
 				{
 					final IBDIExternalAccess exta = (IBDIExternalAccess) result;
-					exta.invokeLater(new Runnable()
-					{
-						public void run()
-						{
+//					exta.invokeLater(new Runnable()
+//					{
+//						public void run()
+//						{
 							try
 							{
 								for (int i = 0; i < metainfos.length; i++)
@@ -621,8 +621,8 @@ public class BDICoordinationInformationInterpreter extends SimplePropertyObject 
 								// -> AMS should not provide external access to
 								// agent when not yet inited.
 							}
-						}
-					});
+//						}
+//					});
 				}
 
 				@Override

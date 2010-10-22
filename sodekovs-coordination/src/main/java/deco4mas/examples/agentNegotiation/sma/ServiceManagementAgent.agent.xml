@@ -12,17 +12,12 @@
 		<import>jadex.bridge.IComponentIdentifier</import>
 		<import>jadex.commons.IFilter</import>
 		<import>jadex.application.runtime.*</import>
-
 		<import>deco4mas.coordinate.environment.*</import>
 		<import>deco4mas.examples.agentNegotiation.sma.application.*</import>
-		<import>deco4mas.examples.agentNegotiation.sma.application.workflow.management.*
-		</import>
-		<import>deco4mas.examples.agentNegotiation.sma.coordination.capability.serviceOfferer.*
-		</import>
-		<import>deco4mas.examples.agentNegotiation.sma.coordination.capability.trustOwner.*
-		</import>
-		<import>deco4mas.examples.agentNegotiation.common.dataObjects.*
-		</import>
+		<import>deco4mas.examples.agentNegotiation.sma.application.workflow.management.*</import>
+		<import>deco4mas.examples.agentNegotiation.sma.coordination.capability.serviceOfferer.*</import>
+		<import>deco4mas.examples.agentNegotiation.sma.coordination.capability.trustOwner.*</import>
+		<import>deco4mas.examples.agentNegotiation.common.dataObjects.*</import>
 	</imports>
 
 	<capabilities>

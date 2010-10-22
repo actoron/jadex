@@ -14,16 +14,11 @@
 		<import>jadex.base.fipa.*</import>
 		<import>jadex.application.runtime.*</import>
 		<import>jadex.bridge.IComponentIdentifier</import>
-
 		<import>deco4mas.coordinate.environment.*</import>
-		<import>deco4mas.examples.agentNegotiation.common.dataObjects.*
-		</import>
-		<import>deco4mas.examples.agentNegotiation.common.trustInformation.*
-		</import>
-		<import>deco4mas.examples.agentNegotiation.common.negotiationInformation.*
-		</import>
-		<import>deco4mas.examples.agentNegotiation.sma.coordination.negotiationStrategy.*
-		</import>
+		<import>deco4mas.examples.agentNegotiation.common.dataObjects.*</import>
+		<import>deco4mas.examples.agentNegotiation.common.trustInformation.*</import>
+		<import>deco4mas.examples.agentNegotiation.common.negotiationInformation.*</import>
+		<import>deco4mas.examples.agentNegotiation.sma.coordination.negotiationStrategy.*</import>
 		<import>deco4mas.examples.agentNegotiation.sma.application.*</import>
 	</imports>
 	
