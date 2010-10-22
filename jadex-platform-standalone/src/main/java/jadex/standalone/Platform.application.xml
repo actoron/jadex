@@ -34,7 +34,7 @@
 	</imports>
 	
 	<arguments>
-		<argument name="platformname">"lars"</argument>
+		<argument name="platformname">"jadex"</argument>
 		<argument name="simulation">false</argument>
 		<argument name="libpath"></argument>
 		<argument name="tcpport">9876</argument>

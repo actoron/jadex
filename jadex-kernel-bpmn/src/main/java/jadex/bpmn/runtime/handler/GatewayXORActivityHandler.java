@@ -93,7 +93,9 @@ public class GatewayXORActivityHandler implements IActivityHandler
 		boolean ret = false;
 		try
 		{
+//			System.out.println("Evaluating: "+thread.getInstance()+", "+exp.getExpressionText());
 			ret = ((Boolean)exp.getValue(fetcher)).booleanValue();
+//			System.out.println("Evaluated: "+ret);
 		}
 		catch(Exception e)
 		{

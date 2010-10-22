@@ -33,7 +33,8 @@ public class EventIntermediateMessageActivityHandler	extends DefaultActivityHand
 	public void execute(final MActivity activity, final BpmnInterpreter instance, final ProcessThread thread)
 	{
 		boolean	send = thread.hasPropertyValue(PROPERTY_THROWING)? ((Boolean)thread.getPropertyValue(PROPERTY_THROWING)).booleanValue() : false;
-
+//		System.out.println("message: "+instance+", "+send+", "+activity);
+		
 		if(send)
 		{
 			String	type	= (String)thread.getPropertyValue("type", activity);
