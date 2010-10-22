@@ -27,7 +27,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * Space executor that connects to a clock service and reacts on time deltas.
  */
 // Todo: immediate execution of component actions and percepts?
-public class DeltaTimeNEW extends SimplePropertyObject implements ISpaceExecutor
+public class DeltaTimeExecutor4Simulation extends SimplePropertyObject implements ISpaceExecutor
 {
 	//-------- attributes --------
 	
@@ -67,7 +67,7 @@ public class DeltaTimeNEW extends SimplePropertyObject implements ISpaceExecutor
 	 * @param timecoefficient the time coefficient
 	 * @param clockservice the clock service
 	 */
-	public DeltaTimeNEW()
+	public DeltaTimeExecutor4Simulation()
 	{
 	}
 	
@@ -76,7 +76,7 @@ public class DeltaTimeNEW extends SimplePropertyObject implements ISpaceExecutor
 	 * @param timecoefficient the time coefficient
 	 * @param clockservice the clock service
 	 */
-	public DeltaTimeNEW(AbstractEnvironmentSpace space, boolean tick)
+	public DeltaTimeExecutor4Simulation(AbstractEnvironmentSpace space, boolean tick)
 	{
 		setProperty("space", space);
 		setProperty("tick", new Boolean(tick));
