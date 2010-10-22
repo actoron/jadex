@@ -164,7 +164,7 @@ public class ParserHelper
 			{
 				String msg	= e.toString();
 				if(e.token!=null && e.token.getText()!=null)
-					msg	= "Unexpected token: "+e.token.getText();
+					msg	= "Unexpected token: "+e.token.getText()+". Maybe missing import?";
 				throw new RuntimeException(msg);
 			}
 		};
