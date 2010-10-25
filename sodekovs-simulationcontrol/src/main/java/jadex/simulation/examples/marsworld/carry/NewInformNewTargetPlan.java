@@ -59,9 +59,5 @@ public class NewInformNewTargetPlan extends Plan
 
 //		System.out.println("Informing sentries: "+getScope().getAgentName());
 	}
-	
-	private IComponentIdentifier getIComponent(ISpaceObject object, AbstractEnvironmentSpace space){
-		IComponentIdentifier id = space.getOwner(object);
-		return id;
-	}
+
 }

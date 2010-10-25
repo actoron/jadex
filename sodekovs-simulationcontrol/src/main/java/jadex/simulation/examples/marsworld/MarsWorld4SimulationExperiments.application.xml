@@ -29,10 +29,10 @@
 	<import>java.text.SimpleDateFormat</import>
 	<import>java.util.Date</import>
 	<import>jadex.application.space.envsupport.observer.perspective.*</import>
-	<import>jadex.bdi.examples.marsworld.carry.*</import>
-	<import>jadex.bdi.examples.marsworld.producer.*</import>
-	<import>jadex.bdi.examples.marsworld.sentry.*</import>
-	<import>jadex.bdi.examples.marsworld.movement.*</import>
+	<import>jadex.simulation.examples.marsworld.carry.*</import>
+	<import>jadex.simulation.examples.marsworld.producer.*</import>
+	<import>jadex.simulation.examples.marsworld.sentry.*</import>
+	<import>jadex.simulation.examples.marsworld.movement.*</import>
 	<import>jadex.application.space.envsupport.evaluation.*</import>
 	<import>jadex.application.space.envsupport.observer.gui.plugin.*</import>
 	<import>jadex.commons.service.clock.IClockService</import>
@@ -158,7 +158,7 @@
 						</env:ellipse>
 						<env:texturedrectangle layer="1" height="0.5"
 							width="0.25" x="0.11" y="-0.24"
-							imagepath="jadex/bdi/examples/marsworld/images/flag.png">
+							imagepath="jadex/simulation/examples/marsworld/images/flag.png">
 							<env:drawcondition>
 								$object.getProperty("state").equals("analyzed")
 								&amp;&amp;
@@ -174,7 +174,7 @@
 							</env:drawcondition>
 						</env:text>
 						<env:texturedrectangle layer="1" size="oresize"
-							position="oreposition" imagepath="jadex/bdi/examples/marsworld/images/ore.png">
+							position="oreposition" imagepath="jadex/simulation/examples/marsworld/images/ore.png">
 							<env:drawcondition>((Number)$object.getProperty("capacity")).intValue()>0
 							</env:drawcondition>
 						</env:texturedrectangle>
@@ -195,7 +195,7 @@
 						<env:text layer="2" x="-0.07" y="0.09" size="8" font="Arial"
 							abssize="true" text="$text$" align="left" color="black" />
 						<env:texturedrectangle layer="1" size="oresize"
-							position="oreposition" imagepath="jadex/bdi/examples/marsworld/images/ore.png">
+							position="oreposition" imagepath="jadex/simulation/examples/marsworld/images/ore.png">
 							<env:drawcondition>((Number)$object.getProperty("ore")).intValue()>0
 							</env:drawcondition>
 						</env:texturedrectangle>
@@ -209,7 +209,7 @@
 						<env:ellipse layer="1" size="visionsize" abssize="true"
 							color="#FAFA1E32" />
 						<env:texturedrectangle layer="2"
-							imagepath="jadex/bdi/examples/marsworld/images/sentry.png" />
+							imagepath="jadex/simulation/examples/marsworld/images/sentry.png" />
 					</env:drawable>
 
 					<!-- Producer -->
@@ -221,7 +221,7 @@
 						<env:ellipse layer="1" size="visionsize" abssize="true"
 							color="#FAFA1E32" />
 						<env:texturedrectangle layer="2"
-							imagepath="jadex/bdi/examples/marsworld/images/producer.png" />
+							imagepath="jadex/simulation/examples/marsworld/images/producer.png" />
 					</env:drawable>
 
 					<!-- Carry -->
@@ -232,7 +232,7 @@
 						<env:ellipse layer="1" size="visionsize" abssize="true"
 							color="#FAFA1E32" />
 						<env:texturedrectangle layer="2"
-							imagepath="jadex/bdi/examples/marsworld/images/carry.png" />
+							imagepath="jadex/simulation/examples/marsworld/images/carry.png" />
 						<env:property name="oresize" dynamic="true">new
 							Vector2Double(Math.sqrt(((Number)$object.getProperty("ore")).intValue()/200.0))
 						</env:property>
@@ -241,7 +241,7 @@
 							-0.08-Math.sqrt(((Number)$object.getProperty("ore")).intValue()/200.0)/2)
 						</env:property>
 						<env:texturedrectangle layer="1" size="oresize"
-							position="oreposition" imagepath="jadex/bdi/examples/marsworld/images/ore.png">
+							position="oreposition" imagepath="jadex/simulation/examples/marsworld/images/ore.png">
 							<env:drawcondition>((Number)$object.getProperty("ore")).intValue()>0
 							</env:drawcondition>
 						</env:texturedrectangle>
@@ -249,7 +249,7 @@
 
 					<env:prelayers>
 						<env:tiledlayer width="0.6" height="0.6"
-							imagepath="jadex/bdi/examples/marsworld/images/mars.png" />
+							imagepath="jadex/simulation/examples/marsworld/images/mars.png" />
 					</env:prelayers>
 				</env:perspective>
 			</env:perspectives>
@@ -265,11 +265,7 @@
 
 	<componenttypes>
 		<componenttype name="Sentry"
-			filename="jadex/simulation/examples/marsworld/sentry/Sentry.agent.xml" />
-		<!--
-			<componenttype name="Sentry"
-			filename="jadex/bdi/examples/marsworld/sentry/Sentry.agent.xml" />
-		-->
+			filename="jadex/simulation/examples/marsworld/sentry/Sentry.agent.xml" />		
 		<componenttype name="Producer"
 			filename="jadex/simulation/examples/marsworld/producer/Producer.agent.xml" />
 		<componenttype name="Carry"

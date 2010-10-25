@@ -18,11 +18,7 @@
 		<import>jadex.base.fipa.*</import>
 		<import>jadex.application.space.envsupport.environment.*</import>
 		<import>jadex.application.space.envsupport.math.*</import>
-		<import>jadex.bdi.examples.marsworld.*</import>
-		<import>jadex.bdi.examples.marsworld.movement.*</import>
-		<!-- <import>jadex.bdi.examples.marsworld.movement.MoveTask</import> -->
-		<import>jadex.bdi.examples.marsworld.sentry.*</import>
-		<!-- <import>jadex.bdi.examples.marsworld.sentry.AnalyzeTargetTask</import>-->
+		<import>jadex.simulation.examples.marsworld.movement.*</import>
 	</imports>
 
 	<capabilities>

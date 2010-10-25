@@ -28,9 +28,9 @@ public class NewInformNewTargetPlan extends Plan
 		IChangeEvent	reason	= (IChangeEvent)getReason();
 		ISpaceObject	target	= (ISpaceObject)reason.getValue();
 		
-		AGRSpace agrs = (AGRSpace)((IApplicationExternalAccess)getScope().getParent()).getSpace("myagrspace");
-		Group group = agrs.getGroup("mymarsteam");
-		IComponentIdentifier[]	sentries	= group.getAgentsForRole("sentry");
+//		AGRSpace agrs = (AGRSpace)((IApplicationExternalAccess)getScope().getParent()).getSpace("myagrspace");
+//		Group group = agrs.getGroup("mymarsteam");
+//		IComponentIdentifier[]	sentries	= group.getAgentsForRole("sentry");
 		
 		//send only to one sentry: by random
 //		IComponentIdentifier randomSentry = sentries[GetRandom.getRandom(sentries.length)];
