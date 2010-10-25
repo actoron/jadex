@@ -107,7 +107,7 @@ public class RowResult extends IResult {
 		//Print out cumulated stats for each type of observed event
 		//Hack: for agentNegotiation
 		String[] orderOfOutput ={"money_amount","workflows","ChassisbaubilligBlackoutNUMBER","ChassisbaunormalBlackoutNUMBER","ChassisbauteuerBlackoutNUMBER","ChassisbaubilligBlackoutTIME","ChassisbaunormalBlackoutTIME","ChassisbauteuerBlackoutTIME","Chassisbaubillig","Chassisbaunormal","Chassisbauteuer", "ChassisbaubilligTrustValue","ChassisbaunormalTrustValue","ChassisbauteuerTrustValue"};
-		if(true){//hack!!!
+		if(finalStatsMap.get("ChassisbaubilligBlackoutNUMBER") != null){//hack!!!
 			for (String key : orderOfOutput) {				
 				HashMap<String,String> resForEvent = finalStatsMap.get(key);
 				buffer.append("\n\tName: " + key);
