@@ -97,8 +97,8 @@ public abstract class MicroAgent implements IMicroAgent
 	 */
 	public IServiceContainer createServiceContainer()
 	{
-		return new CacheServiceContainer(new ComponentServiceContainer(getAgentAdapter()), 25, 1*30*1000); // 30 secs cache expire
-//		return new ComponentServiceContainer(getAgentAdapter());
+//		return new CacheServiceContainer(new ComponentServiceContainer(getAgentAdapter()), 25, 1*30*1000); // 30 secs cache expire
+		return new ComponentServiceContainer(getAgentAdapter());
 	}
 	
 	/**

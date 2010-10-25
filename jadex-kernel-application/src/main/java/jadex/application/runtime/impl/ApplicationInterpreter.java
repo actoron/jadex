@@ -176,7 +176,8 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 		}
 		else
 		{
-			container = new CacheServiceContainer(new ComponentServiceContainer(getComponentAdapter()), 25, 1*30*1000); // 30 secs cache expire
+//			container = new CacheServiceContainer(new ComponentServiceContainer(getComponentAdapter()), 25, 1*30*1000); // 30 secs cache expire
+			container = new ComponentServiceContainer(getComponentAdapter());
 		}
 		
 		fetcher.setValue("$provider", getServiceProvider());

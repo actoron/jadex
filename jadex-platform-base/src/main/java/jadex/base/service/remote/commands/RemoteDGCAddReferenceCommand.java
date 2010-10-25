@@ -62,6 +62,7 @@ public class RemoteDGCAddReferenceCommand implements IRemoteCommand
 		}
 		catch(Exception e)
 		{
+			e.printStackTrace();
 			ret.setException(e);
 		}
 		return ret;

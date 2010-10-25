@@ -3,6 +3,7 @@ package jadex.base.service.remote;
 import jadex.base.fipa.SFipa;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.MessageType;
+import jadex.commons.ICommand;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.library.ILibraryService;
@@ -35,6 +36,32 @@ public class RemoteServiceManagementAgent extends MicroAgent
 	{
 		rms = new RemoteServiceManagementService(getExternalAccess());
 		addService(rms);
+	}
+	
+	/**
+	 *  Execute the functional body of the agent.
+	 *  Is only called once.
+	 */
+	public void executeBody()
+	{
+		ICommand gcc = new ICommand()
+		{
+			public void execute(Object args)
+			{
+				System.gc();
+				waitFor(5000, this);
+			}
+		};
+		waitFor(5000, gcc);
+	}
+	
+	/**
+	 *  Called just before the agent is removed from the platform.
+	 *  @return The result of the component.
+	 */
+	public void agentKilled()
+	{
+//		rms.getRemoteReferenceModule().shutdown();
 	}
 	
 	/**

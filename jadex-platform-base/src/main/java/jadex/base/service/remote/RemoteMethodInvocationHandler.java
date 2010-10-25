@@ -86,9 +86,8 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 //		if(finalize.equals(method))
 		if(method.getName().startsWith("fin"))
 		{
-			System.out.println("Finalize called on: "+proxy);
+//			System.out.println("Finalize called on: "+proxy);
 			rsms.getRemoteReferenceModule().removeProxy(pi.getRemoteReference());
-//			rsms.getRemoteReferenceModule().sendRemoveRemoteReference(pi.getRemoteReference());
 			return null;
 		}
 		

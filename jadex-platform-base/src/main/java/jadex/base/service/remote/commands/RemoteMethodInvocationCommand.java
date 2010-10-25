@@ -66,15 +66,20 @@ public class RemoteMethodInvocationCommand implements IRemoteCommand
 	{
 		final Future ret = new Future();
 		
-		Object target = rsms.getRemoteReferenceModule().getTargetObject(getRemoteReference());
-		if(target!=null)
+		rsms.getRemoteReferenceModule().getTargetObject(getRemoteReference())
+			.addResultListener(new IResultListener() // todo: createResultListener?!
 		{
-			invokeMethod(target, ret);
-		}
-		else
-		{
-			ret.setResult(new RemoteResultCommand(null, new RuntimeException("Target object not found: "+getRemoteReference()), callid));
-		}
+			public void resultAvailable(Object source, Object result)
+			{
+				invokeMethod(result, ret);
+			}
+			
+			public void exceptionOccurred(Object source, Exception exception)
+			{
+				ret.setResult(new RemoteResultCommand(null, new RuntimeException("Target object not found: "+getRemoteReference()), callid));
+			}
+		});
+		
 		
 //		if(getRemoteReference().getTargetIdentifier() instanceof String)
 //		{

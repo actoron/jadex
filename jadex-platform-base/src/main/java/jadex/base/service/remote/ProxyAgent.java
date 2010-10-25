@@ -2,6 +2,7 @@ package jadex.base.service.remote;
 
 import jadex.bridge.Argument;
 import jadex.bridge.ComponentIdentifier;
+import jadex.bridge.ComponentServiceContainer;
 import jadex.bridge.IArgument;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
@@ -52,8 +53,9 @@ public class ProxyAgent extends MicroAgent
 //		System.out.println("Proxy for: "+getRemotePlatformIdentifier()
 //			+", "+SUtil.arrayToString(getRemotePlatformIdentifier().getAddresses())
 //			+", "+delay+", "+cachesize);
-		return new CacheServiceContainer(new RemoteServiceContainer(
-			getRemotePlatformIdentifier(), getAgentAdapter()), 25, 1*30*1000); // 30 secs cache expire
+//		return new CacheServiceContainer(new RemoteServiceContainer(
+//			getRemotePlatformIdentifier(), getAgentAdapter()), 25, 1*30*1000); // 30 secs cache expire
+		return new RemoteServiceContainer(getRemotePlatformIdentifier(), getAgentAdapter());
 	}
 	
 	/**

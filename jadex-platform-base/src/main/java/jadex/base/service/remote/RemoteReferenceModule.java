@@ -2,7 +2,9 @@ package jadex.base.service.remote;
 
 import jadex.base.service.remote.commands.RemoteDGCAddReferenceCommand;
 import jadex.base.service.remote.commands.RemoteDGCRemoveReferenceCommand;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
@@ -10,7 +12,10 @@ import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.collection.LRU;
 import jadex.commons.concurrent.DefaultResultListener;
+import jadex.commons.concurrent.IResultListener;
 import jadex.commons.service.IService;
+import jadex.commons.service.IServiceIdentifier;
+import jadex.commons.service.SServiceProvider;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
@@ -27,6 +32,8 @@ import java.util.WeakHashMap;
  */
 public class RemoteReferenceModule
 {
+	public static RemoteReference ALL = new RemoteReference(new ComponentIdentifier(), "ALL");
+	
 	/** The remote interface properties. */
 	protected static Map interfaceproperties = Collections.synchronizedMap(new HashMap());
 	
@@ -71,7 +78,7 @@ public class RemoteReferenceModule
 		this.remoterefs = Collections.synchronizedMap(new HashMap());
 		
 		this.proxycount = new HashMap();
-		this.holders = new WeakHashMap();
+		this.holders = new HashMap();
 	}
 	
 	//-------- methods --------
@@ -355,24 +362,55 @@ public class RemoteReferenceModule
 		RemoteReference ret = (RemoteReference)remoterefs.get(target);
 		
 		if(ret==null)
-		{
-			if(target instanceof IExternalAccess)
-			{
-				ret = new RemoteReference(rsms.getRMSComponentIdentifier(), ((IExternalAccess)target).getComponentIdentifier());
-			}
-			else if(target instanceof IService)
-			{
-				ret = new RemoteReference(rsms.getRMSComponentIdentifier(), ((IService)target).getServiceIdentifier());
-			}
-			else
-			{
-				ret = generateRemoteReference();
-//				targetobjects.put(new RemoteReference(rsms.getRMSComponentIdentifier(), ret), target);
-			}
-			
-			targetobjects.put(ret, target);
-		}
+			ret = createRemoteReference(target);
+
 		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	protected RemoteReference createRemoteReference(Object target)
+	{
+		// add lease time watch
+		
+		RemoteReference ret;
+		
+		if(target instanceof IExternalAccess)
+		{
+			ret = new RemoteReference(rsms.getRMSComponentIdentifier(), ((IExternalAccess)target).getComponentIdentifier());
+		}
+		else if(target instanceof IService)
+		{
+			ret = new RemoteReference(rsms.getRMSComponentIdentifier(), ((IService)target).getServiceIdentifier());
+		}
+		else
+		{
+			ret = generateRemoteReference();
+//			targetobjects.put(new RemoteReference(rsms.getRMSComponentIdentifier(), ret), target);
+		}
+		
+		remoterefs.put(target, ret);
+		targetobjects.put(ret, target);
+		
+		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	protected void deleteRemoteReference(RemoteReference rr)
+	{
+		Object target = (RemoteReference)targetobjects.remove(rr);
+		remoterefs.remove(target);
+	}
+	
+	/**
+	 * 
+	 */
+	protected void shutdown()
+	{
+		sendRemoveRemoteReference(ALL);
 	}
 	
 	/**
@@ -380,9 +418,77 @@ public class RemoteReferenceModule
 	 *  @param rr The remote reference.
 	 *  @return The target object.
 	 */
-	public Object getTargetObject(RemoteReference rr)
+	public IFuture getTargetObject(RemoteReference rr)
 	{
-		return targetobjects.get(rr);
+		final Future ret = new Future();
+				
+		if(rr.getTargetIdentifier() instanceof IServiceIdentifier)
+		{
+			IServiceIdentifier sid = (IServiceIdentifier)rr.getTargetIdentifier();
+			
+			// fetch service via its id
+			SServiceProvider.getService(rsms.getComponent().getServiceProvider(), sid)
+				.addResultListener(new IResultListener()
+			{
+				public void resultAvailable(Object source, Object result)
+				{
+					ret.setResult(result);
+				}
+				
+				public void exceptionOccurred(Object source, Exception exception)
+				{
+					ret.setException(exception);
+				}
+			});
+		}
+		else if(rr.getTargetIdentifier() instanceof IComponentIdentifier)
+		{
+			final IComponentIdentifier cid = (IComponentIdentifier)rr.getTargetIdentifier();
+			
+			// fetch component via target component id
+			SServiceProvider.getServiceUpwards(rsms.getComponent().getServiceProvider(), IComponentManagementService.class)
+				.addResultListener(new IResultListener()
+//					.addResultListener(component.createResultListener(new IResultListener()
+			{
+				public void resultAvailable(Object source, Object result)
+				{
+					IComponentManagementService cms = (IComponentManagementService)result;
+					
+					// fetch target component via component identifier.
+					cms.getExternalAccess(cid).addResultListener(new IResultListener()
+					{
+						public void resultAvailable(Object source, Object result)
+						{
+							ret.setResult(result);
+						}
+						
+						public void exceptionOccurred(Object source, Exception exception)
+						{
+							ret.setException(exception);
+						}
+					});
+				}
+				
+				public void exceptionOccurred(Object source, Exception exception)
+				{
+					ret.setException(exception);
+				}
+			});
+		}
+		else //(rr.getTargetIdentifier() instanceof String)
+		{
+			Object o = targetobjects.get(rr.getTargetIdentifier());
+			if(o!=null)
+			{
+				ret.setResult(o);
+			}
+			else
+			{
+				ret.setException(new RuntimeException("Remote object not found: "+rr));
+			}
+		}
+		
+		return ret;
 	}
 	
 	/**
@@ -423,8 +529,15 @@ public class RemoteReferenceModule
 		// Else return new or old proxy.
 		else
 		{
+//			System.out.println("interfaces of proxy: "+SUtil.arrayToString(pi.getTargetInterfaces()));
+			
+			Class[] tmp = pi.getTargetInterfaces();
+			Class[] interfaces = new Class[tmp.length+1];
+			System.arraycopy(tmp, 0, interfaces, 0, tmp.length);
+			interfaces[tmp.length] = IFinalize.class;
+			
 			ret = Proxy.newProxyInstance(rsms.getComponent().getModel().getClassLoader(), 
-				pi.getTargetInterfaces(), new RemoteMethodInvocationHandler(rsms, pi));
+				interfaces, new RemoteMethodInvocationHandler(rsms, pi));
 			
 			addProxy(rr);
 			
@@ -480,7 +593,7 @@ public class RemoteReferenceModule
 	/**
 	 * 
 	 */
-	public void removeProxy(RemoteReference rr)
+	public synchronized void removeProxy(RemoteReference rr)
 	{
 		boolean notify = false;
 		synchronized(this)
@@ -491,13 +604,14 @@ public class RemoteReferenceModule
 			{
 				proxycount.remove(rr);
 				notify = true;
+				System.out.println("Remove proxy: "+rr+" "+nv);
 			}
 			else
 			{
 				proxycount.put(rr, new Integer(nv));
 			}
 			
-			System.out.println("Remove proxy: "+rr+" "+nv);
+//			System.out.println("Remove proxy: "+rr+" "+nv);
 		}
 		if(notify)
 			sendRemoveRemoteReference(rr);
@@ -544,33 +658,62 @@ public class RemoteReferenceModule
 	/**
 	 *  Add a new holder to a remote object.
 	 */
-	public void addRemoteReference(RemoteReference rr, IComponentIdentifier holder)
+	public void addRemoteReference(final RemoteReference rr, final IComponentIdentifier holder)
 	{
-		Object target = getTargetObject(rr);
-		Set hds = (Set)holders.get(target);
-		if(hds==null)
+		getTargetObject(rr).addResultListener(new DefaultResultListener()
 		{
-			hds = new HashSet();
-			holders.put(target, hds);
-		}
-		if(hds.contains(holder))
-			throw new RuntimeException("Holder already contained: "+holder);
-		hds.add(holder);
-		System.out.println("Holders for (add): "+target+" "+holder);
+			public void resultAvailable(Object source, Object result)
+			{
+				Set hds = (Set)holders.get(result);
+				if(hds==null)
+				{
+					hds = new HashSet();
+					holders.put(result, hds);
+				}
+				if(hds.contains(holder))
+					throw new RuntimeException("Holder already contained: "+holder);
+				hds.add(holder);
+				System.out.println("Holders for (add): "+result+" "+holder+" "+hds);
+			}
+		});
 	}
 	
 	/**
 	 *  Remove a new holder from a remote object.
 	 */
-	public void removeRemoteReference(RemoteReference rr, IComponentIdentifier holder)
+	public void removeRemoteReference(final RemoteReference rr, final IComponentIdentifier holder)
 	{
-		Object target = getTargetObject(rr);
-		Set hds = (Set)holders.get(target);
-		if(!hds.contains(holder))
-			throw new RuntimeException("Holder not contained: "+holder);
-		hds.remove(holder);
-		if(hds.size()==0)
-			holders.remove(target);
-		System.out.println("Holders for (rem): "+target+" "+holder);
+//		if(ALL.equals(rr))
+//		{
+//			Object[] targets = holders.keySet().toArray();
+//			for(int i=0; i<targets.length; i++)
+//			{
+//				Set hds = (Set)holders.get(targets[i]);
+//				hds.remove(holder);
+//				if(hds.size()==0)
+//				{
+//					holders.remove(hds);
+//					deleteRemoteReference(rr);
+//				}
+//			}
+//		}
+		
+		getTargetObject(rr).addResultListener(new DefaultResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				Set hds = (Set)holders.get(result);
+				if(!hds.contains(holder))
+					throw new RuntimeException("Holder not contained: "+holder);
+				hds.remove(holder);
+				if(hds.size()==0)
+				{
+					holders.remove(hds);
+					deleteRemoteReference(rr);
+				}
+				System.out.println("Holders for (rem): "+result+" "+holder+" "+hds);
+			}
+		});
 	}
+	
 }
