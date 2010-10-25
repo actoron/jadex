@@ -8,7 +8,7 @@ import jadex.application.space.envsupport.environment.AbstractTask;
 import jadex.application.space.envsupport.environment.IEnvironmentSpace;
 import jadex.application.space.envsupport.environment.ISpaceObject;
 import jadex.application.space.envsupport.environment.space2d.Space2D;
-import jadex.bdi.examples.marsworld.RequestProduction;
+import jadex.simulation.examples.marsworld.RequestProduction;
 import jadex.bdi.planlib.PlanFinishedTaskCondition;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IMessageEvent;

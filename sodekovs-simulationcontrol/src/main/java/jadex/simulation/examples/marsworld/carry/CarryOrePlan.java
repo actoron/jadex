@@ -4,11 +4,11 @@ import jadex.application.space.envsupport.environment.AbstractTask;
 import jadex.application.space.envsupport.environment.IEnvironmentSpace;
 import jadex.application.space.envsupport.environment.ISpaceObject;
 import jadex.application.space.envsupport.environment.space2d.Space2D;
-import jadex.bdi.examples.marsworld.producer.ProduceOreTask;
-import jadex.bdi.examples.marsworld.sentry.AnalyzeTargetTask;
 import jadex.bdi.planlib.PlanFinishedTaskCondition;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
+import jadex.simulation.examples.marsworld.producer.ProduceOreTask;
+import jadex.simulation.examples.marsworld.sentry.AnalyzeTargetTask;
 
 import java.util.HashMap;
 import java.util.Map;

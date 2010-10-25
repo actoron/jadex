@@ -6,8 +6,8 @@ import jadex.application.space.agr.AGRSpace;
 import jadex.application.space.agr.Group;
 import jadex.application.space.envsupport.environment.IEnvironmentSpace;
 import jadex.application.space.envsupport.environment.ISpaceObject;
-import jadex.bdi.examples.marsworld.RequestCarry;
-import jadex.bdi.examples.marsworld.RequestProduction;
+import jadex.simulation.examples.marsworld.RequestCarry;
+import jadex.simulation.examples.marsworld.RequestProduction;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
@@ -40,7 +40,7 @@ public class ProducerPlan extends Plan
 	public void body()
 	{
 		while(true)
-		{
+		{			
 			// Wait for a request.
 			IMessageEvent req = waitForMessageEvent("request_production");
 

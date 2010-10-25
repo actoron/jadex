@@ -5,8 +5,8 @@ import jadex.application.space.envsupport.environment.IEnvironmentSpace;
 import jadex.application.space.envsupport.environment.ISpaceObject;
 import jadex.application.space.envsupport.environment.space2d.Space2D;
 import jadex.application.space.envsupport.math.IVector2;
-import jadex.bdi.examples.marsworld.producer.ProduceOreTask;
-import jadex.bdi.examples.marsworld.sentry.AnalyzeTargetTask;
+import jadex.simulation.examples.marsworld.producer.ProduceOreTask;
+import jadex.simulation.examples.marsworld.sentry.AnalyzeTargetTask;
 import jadex.commons.service.clock.IClockService;
 
 /**

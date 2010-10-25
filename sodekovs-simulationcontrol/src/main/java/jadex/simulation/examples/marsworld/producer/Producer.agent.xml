@@ -16,6 +16,7 @@
 		<import>jadex.base.fipa.*</import>
 		<import>jadex.application.space.envsupport.environment.*</import>
 		<import>jadex.application.space.envsupport.math.*</import>
+		<import>jadex.simulation.examples.marsworld.RequestProduction</import>
 		<import>jadex.simulation.examples.marsworld.*</import>
 		<import>jadex.simulation.examples.marsworld.movement.*</import>		        
 	</imports>
@@ -96,7 +97,7 @@
 			</parameter>
 			<match>$content instanceof RequestProduction</match>
 		</messageevent>
-
+		
 		<!-- Message event for informing sentries about new targets. -->
 		<messageevent name="inform_target" type="fipa" direction="send">
 			<parameter name="performative" class="String" direction="fixed">
@@ -117,7 +118,7 @@
  			</parameter>
 		</messageevent>
 	</events>
-
+	
 	<configurations>
 		<configuration name="default">
 			<goals>

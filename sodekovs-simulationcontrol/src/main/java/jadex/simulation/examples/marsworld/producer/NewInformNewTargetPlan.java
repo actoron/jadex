@@ -1,17 +1,13 @@
 package jadex.simulation.examples.marsworld.producer;
 
-import jadex.base.fipa.SFipa;
 import jadex.application.runtime.IApplicationExternalAccess;
-import jadex.application.space.agr.AGRSpace;
-import jadex.application.space.agr.Group;
 import jadex.application.space.envsupport.environment.ISpaceObject;
 import jadex.application.space.envsupport.environment.space2d.ContinuousSpace2D;
 import jadex.application.space.envsupport.math.IVector2;
+import jadex.base.fipa.SFipa;
 import jadex.bdi.runtime.IChangeEvent;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
-import jadex.bridge.IComponentIdentifier;
-import jadex.simulation.helper.GetRandom;
 
 /**
  *  Inform the sentry agent about a new target.
