@@ -100,11 +100,10 @@ public class MApplicationInstance
 	}
 
 	/**
-	 *  Set the argument default value.
-	 *  @param id The name.
-	 *  @param defval The default value.
+	 *  Add an argument.
+	 *  @param argument The argument.
 	 */
-	public void addMArgument(MArgument argument)
+	public void addArgument(MExpressionType argument)
 	{
 		this.arguments.add(argument);
 	}

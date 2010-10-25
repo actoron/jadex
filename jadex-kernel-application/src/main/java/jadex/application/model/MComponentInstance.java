@@ -1,5 +1,7 @@
 package jadex.application.model;
 
+import jadex.javaparser.IParsedExpression;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,8 +25,7 @@ public class MComponentInstance
 	protected boolean start;
 	
 	/** The number of components. */
-//	protected int number;
-	protected String numbertext;
+	protected IParsedExpression number;
 	
 	/** The master flag. */
 	protected boolean master;
@@ -182,18 +183,18 @@ public class MComponentInstance
 	 *  Set the number text.
 	 *  @param numbertext The number text.
 	 */
-	public void setNumberText(String numbertext)
+	public void setNumber(IParsedExpression number)
 	{
-		this.numbertext = numbertext;
+		this.number = number;
 	}
 	
 	/**
-	 *  Get the number text (expression).
-	 *  @return The number text.
+	 *  Get the number (expression).
+	 *  @return The number.
 	 */
-	public String getNumberText()
+	public IParsedExpression getNumber()
 	{
-		return this.numbertext;
+		return this.number;
 	}
 	
 	/**
@@ -218,7 +219,7 @@ public class MComponentInstance
 	 *  Add an argument.
 	 *  @param arg The argument.
 	 */
-	public void addMArgument(MArgument arg)
+	public void addArgument(MExpressionType arg)
 	{
 		this.arguments.add(arg);
 	}
@@ -227,7 +228,7 @@ public class MComponentInstance
 	 *  Get the list of arguments.
 	 *  @return The arguments.
 	 */
-	public List getMArguments()
+	public List getArguments()
 	{
 		return this.arguments;
 	}
@@ -255,6 +256,7 @@ public class MComponentInstance
 	 */
 	public String toString()
 	{
-		return "MComponentInstance(typename="+typename+", number="+numbertext+")";
+		return "MComponentInstance(typename="+typename+
+			(number!=null ? ", number="+number.getExpressionText(): "")+")";
 	}
 }

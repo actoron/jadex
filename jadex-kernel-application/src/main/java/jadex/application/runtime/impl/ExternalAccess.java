@@ -19,10 +19,10 @@ public class ExternalAccess implements IApplicationExternalAccess
 {
 	//-------- attributes --------
 
-	/** The agent. */
+	/** The application component. */
 	protected ApplicationInterpreter application;
 
-	/** The agent adapter. */
+	/** The component adapter. */
 	protected IComponentAdapter adapter;
 	
 	/** The toString value. */

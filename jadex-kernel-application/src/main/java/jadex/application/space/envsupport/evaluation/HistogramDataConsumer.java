@@ -62,7 +62,7 @@ public class HistogramDataConsumer extends AbstractChartDataConsumer
 			double bsize = (hv-lv)/cnt;
 			for(int i=0; i<cnt; i++)
 			{
-				System.out.println("lower: "+lv+(i*bsize)+", upper: "+lv+((i+1)*bsize));
+//				System.out.println("lower: "+lv+(i*bsize)+", upper: "+lv+((i+1)*bsize));
 				dataset.addBin(new SimpleHistogramBin(lv+(i*bsize), lv+((i+1)*bsize), true, false));
 			}
 		}
@@ -143,15 +143,17 @@ public class HistogramDataConsumer extends AbstractChartDataConsumer
 	 */
 	protected void addValue(Comparable seriesname, Object valx, Object valy, DataTable data, Object[] row)
 	{
-		SimpleHistogramDataset dataset = (SimpleHistogramDataset)((XYPlot)getChart().getPlot()).getDataset();
-		try
+		double	val	= ((Number)valy).doubleValue();
+		Number low = (Number)getProperty("lowvalue");
+		Number high = (Number)getProperty("highvalue");
+		if(val>=low.doubleValue() && val<=high.doubleValue())
 		{
-			dataset.addObservation(((Number)valy).doubleValue());
+			SimpleHistogramDataset dataset = (SimpleHistogramDataset)((XYPlot)getChart().getPlot()).getDataset();
+			dataset.addObservation(val);
 		}
-		catch(Exception e)
-		{
-			System.out.println("Bin problem with value: "+valy);
-			e.printStackTrace();
-		}
+//		else
+//		{
+//			// print out of range warning?
+//		}
 	}
 }

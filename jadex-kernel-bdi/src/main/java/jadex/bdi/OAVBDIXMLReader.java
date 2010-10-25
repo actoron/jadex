@@ -565,8 +565,6 @@ public class OAVBDIXMLReader
 		public Object postProcess(IContext context, Object object)
 		{
 			OAVUserContext	ouc	= (OAVUserContext)context.getUserContext();
-			MultiCollection	report	= (MultiCollection)ouc.getCustom();
-			Object	se	= new Tuple(((ReadContext)context).getStack().toArray());
 			IOAVState state = (IOAVState)ouc.getState();
 			String	value	= (String)state.getAttributeValue(object, classnameattr);
 			if(value!=null)
@@ -579,6 +577,8 @@ public class OAVBDIXMLReader
 				}
 				catch(Exception e)
 				{
+					MultiCollection	report	= (MultiCollection)ouc.getCustom();
+					Object	se	= new Tuple(((ReadContext)context).getStack().toArray());
 					report.put(se, e.toString());
 //					e.printStackTrace();
 				}

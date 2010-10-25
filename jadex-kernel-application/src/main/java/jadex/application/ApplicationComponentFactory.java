@@ -2,7 +2,6 @@ package jadex.application;
 
 import jadex.application.model.MApplicationInstance;
 import jadex.application.model.MApplicationType;
-import jadex.application.model.MExpressionType;
 import jadex.application.runtime.impl.ApplicationInterpreter;
 import jadex.bridge.IComponentAdapterFactory;
 import jadex.bridge.IComponentDescription;
@@ -12,18 +11,12 @@ import jadex.bridge.IModelInfo;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.SGUI;
-import jadex.commons.SReflect;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.service.BasicService;
 import jadex.commons.service.IServiceProvider;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.library.ILibraryService;
 import jadex.commons.service.library.ILibraryServiceListener;
-import jadex.javaparser.IExpressionParser;
-import jadex.javaparser.IParsedExpression;
-import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
-import jadex.xml.IContext;
-import jadex.xml.IPostProcessor;
 
 import java.net.URL;
 import java.util.Collections;
@@ -42,7 +35,7 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 {
 	//-------- constants --------
 	
-	/** The application agent file type. */
+	/** The application component file type. */
 	public static final String	FILETYPE_APPLICATION = "Application";
 	
 //	/** The application file extension. */
@@ -79,7 +72,7 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 	
 	/**
 	 *  Create a new application factory for startup.
-	 *  @param platform	The agent platform.
+	 *  @param platform	The platform.
 	 *  @param mappings	The XML reader mappings of supported spaces (if any).
 	 */
 	public ApplicationComponentFactory(String providerid)
@@ -90,7 +83,7 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 	
 	/**
 	 *  Create a new application factory.
-	 *  @param platform	The agent platform.
+	 *  @param platform	The platform.
 	 *  @param mappings	The XML reader mappings of supported spaces (if any).
 	 */
 	public ApplicationComponentFactory(Set[] mappings, IServiceProvider provider)
@@ -174,7 +167,7 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 	 * @param adapter The component adapter.
 	 * @param model The component model.
 	 * @param config The name of the configuration (or null for default configuration) 
-	 * @param arguments The arguments for the agent as name/value pairs.
+	 * @param arguments The arguments for the component as name/value pairs.
 	 * @param parent The parent component (if any).
 	 * @return An instance of a component.
 	 */
@@ -335,74 +328,5 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 			throw new IOException("File "+xml+" not found in imports: "+SUtil.arrayToString(imports));
 
 		return ret;
-	}	*/
-	
-	//-------- helper classes --------
-	
-	/**
-	 *  Parse expression text.
-	 */
-	public static class ExpressionProcessor	implements IPostProcessor
-	{
-		// Hack!!! Should be configurable.
-		protected static IExpressionParser	exp_parser	= new JavaCCExpressionParser();
-		
-		/**
-		 *  Parse expression text.
-		 */
-		public Object postProcess(IContext context, Object object)
-		{
-			MApplicationType app = (MApplicationType)context.getRootObject();
-			MExpressionType exp = (MExpressionType)object;
-			
-			String classname = exp.getClassName();
-			if(classname!=null)
-			{
-				try
-				{
-					Class clazz = SReflect.findClass(classname, app.getAllImports(), context.getClassLoader());
-					exp.setClazz(clazz);
-				}
-				catch(Exception e)
-				{
-	//					report.put(se, e.toString());
-					e.printStackTrace();
-				}
-			}
-			
-			String lang = exp.getLanguage();
-			String value = exp.getValue(); 
-			if(value!=null)
-			{
-				if(lang==null || "java".equals(lang))
-				{
-					try
-					{
-						IParsedExpression pexp = exp_parser.parseExpression(value, app.getAllImports(), null, context.getClassLoader());
-						exp.setParsedValue(pexp);
-					}
-					catch(Exception e)
-					{
-	//					report.put(se, e.toString());
-						e.printStackTrace();
-					}
-				}	
-				else
-				{
-					throw new RuntimeException("Unknown condition language: "+lang);
-				}
-			}
-			
-			return null;
-		}
-		
-		/**
-		 *  Get the pass number.
-		 *  @return The pass number.
-		 */
-		public int getPass()
-		{
-			return 0;
-		}
-	}
+	}	*/	
 }

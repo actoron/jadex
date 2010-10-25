@@ -1,16 +1,21 @@
 package jadex.application.model;
 
+import jadex.bridge.AbstractErrorReportBuilder;
 import jadex.bridge.Argument;
 import jadex.bridge.ModelInfo;
 import jadex.commons.ICacheableModel;
 import jadex.commons.IFuture;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
+import jadex.commons.Tuple;
+import jadex.commons.collection.MultiCollection;
 import jadex.javaparser.IParsedExpression;
-import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
+import jadex.xml.StackElement;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.xml.namespace.QName;
 
 /**
  *  Application type representation.
@@ -92,7 +97,7 @@ public class MApplicationType implements ICacheableModel
 	/**
 	 *  Init the model info.
 	 */
-	public void initModelInfo()
+	public void initModelInfo(MultiCollection entries)
 	{
 		// todo: breakpoints?!
 //		List names = new ArrayList();
@@ -107,20 +112,30 @@ public class MApplicationType implements ICacheableModel
 		modelinfo.setConfigurations(configs);
 
 		// Init arguments.
-		String[] imports = getAllImports();
-		JavaCCExpressionParser	parser = new JavaCCExpressionParser();
 		for(int i=0; i<apps.size(); i++)
 		{
 			MApplicationInstance mapp = (MApplicationInstance)apps.get(i);
 			List instargs = mapp.getArguments();
 			for(int j=0; j<instargs.size(); j++)
 			{
-				MArgument arg = (MArgument)instargs.get(j);
-				String valtext = arg.getValue();
-				Argument rarg = (Argument)getModelInfo().getArgument(arg.getName());
-				
-				Object val = parser.parseExpression(valtext, imports, null, modelinfo.getClassLoader()).getValue(null);
-				rarg.setDefaultValue(mapp.getName(), val);
+				MExpressionType arg = (MExpressionType)instargs.get(j);
+				try
+				{
+					Argument rarg = (Argument)getModelInfo().getArgument(arg.getName());
+					
+					Object val = arg.getParsedValue().getValue(null);
+					rarg.setDefaultValue(mapp.getName(), val);
+				}
+				catch(Exception e)
+				{
+					Tuple	se	= new Tuple(new Object[]{
+						new StackElement(new QName("applicationtype"), this, null),
+						new StackElement(new QName("applications"), null, null),
+						new StackElement(new QName("application"), mapp, null),
+						new StackElement(new QName("arguments"), null, null),
+						new StackElement(new QName("argument"), arg, null)});
+					entries.put(se, e.toString()+": "+arg.getValue());
+				}
 			}
 		}
 		
@@ -141,15 +156,66 @@ public class MApplicationType implements ICacheableModel
 					}
 					catch(Exception e)
 					{
-						// Hack!!! Exception should be propagated.
-						System.err.println(pex.getExpressionText());
-						e.printStackTrace();
+						Tuple	se	= new Tuple(new Object[]{
+							new StackElement(new QName("applicationtype"), this, null),
+							new StackElement(new QName("properties"), null, null),
+							new StackElement(new QName("property"), mexp, null)});
+						entries.put(se, e.toString()+": "+pex.getExpressionText());
 					}
 				}
 			}
 		}
 		
 		modelinfo.setStartable(true);
+		
+		// Build error report.
+		modelinfo.setReport(new AbstractErrorReportBuilder(modelinfo.getName(), modelinfo.getFilename(),
+			new String[]{"Space", "Component", "Application"}, entries, null)
+		{
+			public boolean isInCategory(Object obj, String category)
+			{
+				return "Space".equals(category) && obj instanceof MSpaceType
+					|| "Component".equals(category) && obj instanceof MComponentType
+					|| "Application".equals(category) && obj instanceof MApplicationInstance;
+			}
+			
+			public Object getPathElementObject(Object element)
+			{
+				return ((StackElement)element).getObject();
+			}
+			
+			public String getObjectName(Object obj)
+			{
+				String	name	= null;
+				String	type	= obj!=null ? SReflect.getInnerClassName(obj.getClass()) : null;
+				if(obj instanceof MSpaceType)
+				{
+					name	= ((MSpaceType)obj).getName();
+				}
+				else if(obj instanceof MComponentType)
+				{
+					name	= ((MComponentType)obj).getName();
+				}
+				else if(obj instanceof MApplicationInstance)
+				{
+					name	= ((MApplicationInstance)obj).getName();
+					type	= "Application";
+				}
+				else if(obj instanceof MExpressionType)
+				{
+					IParsedExpression	pexp	= ((MExpressionType)obj).getParsedValue();
+					String	exp	= pexp!=null ? pexp.getExpressionText() : null;
+					name	= exp!=null ? ""+exp : null;
+				}
+				
+				if(type!=null && type.startsWith("M") && type.endsWith("Type"))
+				{
+					type	= type.substring(1, type.length()-4);
+				}
+				
+				return type!=null ? name!=null ? type+" "+name : type : name!=null ? name : "";
+			}
+		}.buildErrorReport());
 	}
 	
 	//-------- methods --------

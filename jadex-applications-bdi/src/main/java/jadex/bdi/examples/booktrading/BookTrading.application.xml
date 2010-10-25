@@ -12,7 +12,7 @@
 	name="BookTrading" package="jadex.bdi.examples.booktrading">
 	
 	<imports>
-		<import>jadex.bdi.examples.booktrading.common.*</import>
+  		<import>jadex.bdi.examples.booktrading.common.*</import>
 		<import>java.util.*</import>
 		<import>jadex.commons.service.clock.IClockService</import>
 		<import>jadex.commons.service.SServiceProvider</import>

@@ -2,7 +2,6 @@ package jadex.application.runtime.impl;
 
 import jadex.application.model.MApplicationInstance;
 import jadex.application.model.MApplicationType;
-import jadex.application.model.MArgument;
 import jadex.application.model.MComponentInstance;
 import jadex.application.model.MComponentType;
 import jadex.application.model.MExpressionType;
@@ -36,10 +35,8 @@ import jadex.commons.service.CacheServiceContainer;
 import jadex.commons.service.IServiceContainer;
 import jadex.commons.service.IServiceProvider;
 import jadex.commons.service.SServiceProvider;
-import jadex.commons.service.library.ILibraryService;
 import jadex.javaparser.IValueFetcher;
 import jadex.javaparser.SimpleValueFetcher;
-import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -109,7 +106,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 	/** The service container. */
 	protected IServiceContainer container;
 	
-	/** The scheduled steps of the agent. */
+	/** The scheduled steps of the component. */
 	protected List steps;
 	
 	/** Stop flag for stopping execution. */
@@ -274,31 +271,23 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 								}
 
 								final List components = config.getMComponentInstances();
-								SServiceProvider.getService(getServiceProvider(), ILibraryService.class).addResultListener(createResultListener(new DefaultResultListener()
+								SServiceProvider.getServiceUpwards(getServiceProvider(), IComponentManagementService.class).addResultListener(createResultListener(new DefaultResultListener()
 								{
 									public void resultAvailable(Object source, Object result)
 									{
-										final ILibraryService ls = (ILibraryService)result;
-										final ClassLoader cl = ls.getClassLoader();
-										SServiceProvider.getServiceUpwards(getServiceProvider(), IComponentManagementService.class).addResultListener(createResultListener(new DefaultResultListener()
-										{
-											public void resultAvailable(Object source, Object result)
-											{
-												// NOTE: in current implementation application waits for subcomponents
-												// to be finished and cms implements a hack to get the external
-												// access of an uninited parent.
-												
-												// (NOTE1: parent cannot wait for subcomponents to be all created
-												// before setting itself inited=true, because subcomponents need
-												// the parent external access.)
-												
-												// (NOTE2: subcomponents must be created one by one as they
-												// might depend on each other (e.g. bdi factory must be there for jcc)).
-												
-												final IComponentManagementService ces = (IComponentManagementService)result;
-												createComponent(components, cl, ces, 0, inited);
-											}
-										}));
+										// NOTE: in current implementation application waits for subcomponents
+										// to be finished and cms implements a hack to get the external
+										// access of an uninited parent.
+										
+										// (NOTE1: parent cannot wait for subcomponents to be all created
+										// before setting itself inited=true, because subcomponents need
+										// the parent external access.)
+										
+										// (NOTE2: subcomponents must be created one by one as they
+										// might depend on each other (e.g. bdi factory must be there for jcc)).
+										
+										final IComponentManagementService ces = (IComponentManagementService)result;
+										createComponent(components, ces, 0, inited);
 									}
 								}));
 							}
@@ -331,9 +320,9 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 	}
 	
 	/**
-	 *  Schedule a step of the agent.
+	 *  Schedule a step of the component.
 	 *  May safely be called from external threads.
-	 *  @param step	Code to be executed as a step of the agent.
+	 *  @param step	Code to be executed as a step of the component.
 	 */
 	public void	scheduleStep(final Runnable step)
 	{
@@ -1085,7 +1074,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 	}	
 	
 	/**
-	 *  Create a result listener which is executed as an agent step.
+	 *  Create a result listener which is executed as an component step.
 	 *  @param The original listener to be called.
 	 *  @return The listener.
 	 */
@@ -1100,14 +1089,13 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 	 *  because they need the external access of the parent, which is available only
 	 *  after init is finished (otherwise there is a cyclic init dependency between parent and subcomps). 
 	 */
-	protected void createComponent(final List components, final ClassLoader cl, 
-		final IComponentManagementService ces, final int i, final Future inited)
+	protected void createComponent(final List components, final IComponentManagementService ces, final int i, final Future inited)
 	{
 		if(i<components.size())
 		{
 			final MComponentInstance component = (MComponentInstance)components.get(i);
 //			System.out.println("Create: "+component.getName()+" "+component.getTypeName()+" "+component.getConfiguration()+" "+Thread.currentThread());
-			int num = getNumber(component, cl);
+			int num = getNumber(component);
 			IResultListener	crl	= new CollectionResultListener(num, false, new IResultListener()
 			{
 				public void resultAvailable(Object source, Object result)
@@ -1129,7 +1117,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 						{
 							public void run()
 							{
-								createComponent(components, cl, ces, i+1, inited);
+								createComponent(components, ces, i+1, inited);
 							}
 						});
 //					}
@@ -1143,7 +1131,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 			for(int j=0; j<num; j++)
 			{
 				IFuture ret = ces.createComponent(component.getName(), component.getType(model).getFilename(),
-					new CreationInfo(component.getConfiguration(), getArguments(component, cl), adapter.getComponentIdentifier(),
+					new CreationInfo(component.getConfiguration(), getArguments(component), adapter.getComponentIdentifier(),
 					component.isSuspended(), component.isMaster(), component.isDaemon(), model.getAllImports()), null);
 				ret.addResultListener(crl);
 			}
@@ -1189,23 +1177,19 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 	 *  Get the arguments.
 	 *  @return The arguments as a map of name-value pairs.
 	 */
-	public Map getArguments(MComponentInstance component, ClassLoader classloader)
+	public Map getArguments(MComponentInstance component)
 	{
 		Map ret = null;		
-		List	arguments	= component.getMArguments();
+		List	arguments	= component.getArguments();
 
 		if(arguments!=null && !arguments.isEmpty())
 		{
 			ret = new HashMap();
 
-			JavaCCExpressionParser	parser = new JavaCCExpressionParser();
-			String[] imports = getApplicationType().getAllImports();
 			for(int i=0; i<arguments.size(); i++)
 			{
-				MArgument p = (MArgument)arguments.get(i);
-				String valtext = p.getValue();
-				
-				Object val = parser.parseExpression(valtext, imports, null, classloader).getValue(fetcher);
+				MExpressionType p = (MExpressionType)arguments.get(i);
+				Object val = p.getParsedValue().getValue(fetcher);
 				ret.put(p.getName(), val);
 			}
 		}
@@ -1217,19 +1201,9 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 	 *  Get the number of components to start.
 	 *  @return The number.
 	 */
-	// todo: hack, remove clock somehow
-	public int getNumber(MComponentInstance component, ClassLoader classloader)
+	public int getNumber(MComponentInstance component)
 	{
-//		SimpleValueFetcher fetcher = new SimpleValueFetcher();
-//		fetcher.setValue("$provider", context.getServiceContainer());
-//		fetcher.setValue("$args", context.getArguments());
-//		fetcher.setValue("$results", context.getResults());
-//		fetcher.setValue("$clock", clock);
-
-		String[] imports = getApplicationType().getAllImports();
-		JavaCCExpressionParser	parser = new JavaCCExpressionParser();
-			
-		Object val = component.getNumberText()!=null? parser.parseExpression(component.getNumberText(), imports, null, classloader).getValue(fetcher): null;
+		Object val = component.getNumber()!=null? component.getNumber().getValue(fetcher): null;
 		
 		return val instanceof Integer? ((Integer)val).intValue(): 1;
 	}

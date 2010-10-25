@@ -71,10 +71,10 @@
 						<argument name="catalog">
 							new ItemInfo[]
 							{
-								new ItemInfo("Cookies", 0.89),
-								new ItemInfo("Milk", 0.56),
-								new ItemInfo("Bread", 1.09),
-								new ItemInfo("Meat", 2.89)
+								new ItemInfo("Cookies", 0.89, 10),
+								new ItemInfo("Milk", 0.56, 2),
+								new ItemInfo("Bread", 1.09, 8),
+								new ItemInfo("Meat", 2.89, 6)
 							}
 						</argument>
 					</arguments>
