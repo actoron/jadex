@@ -9,7 +9,7 @@ import jadex.commons.IFuture;
 import jadex.micro.IMicroExternalAccess;
 
 /**
- * 
+ *  Distributed garbage collection 'addRef(rr)' command.
  */
 public class RemoteDGCAddReferenceCommand implements IRemoteCommand
 {

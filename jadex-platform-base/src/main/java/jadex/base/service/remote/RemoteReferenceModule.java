@@ -24,14 +24,19 @@ import java.util.Iterator;
 import java.util.Map;
 
 /**
- * 
+ *  This class implements the rmi handling. It mainly supports:
+ *  - remote reference management
+ *  - creation of proxy references for transferring IProxyable objects
+ *  - creation of proxies on the remote side of a target object
+ *  - distributed garbage collection for target (remote) objects using reference counting
+ *  - management of interfaceproperties for metadata such as exclusion or replacement of methods
  */
 public class RemoteReferenceModule
 {
-	/** The remote interface properties. */
-	protected static Map interfaceproperties = Collections.synchronizedMap(new HashMap());
-	
 	//-------- attributes --------
+
+	/** The remote interface properties. */
+	protected Map interfaceproperties;
 
 	/** The remote management service. */
 	protected RemoteServiceManagementService rsms;
@@ -63,6 +68,7 @@ public class RemoteReferenceModule
 	public RemoteReferenceModule(RemoteServiceManagementService rsms)
 	{
 		this.rsms = rsms;
+		this.interfaceproperties = Collections.synchronizedMap(new HashMap());
 		this.proxyinfos = Collections.synchronizedMap(new LRU(200));
 		this.targetobjects = Collections.synchronizedMap(new HashMap());
 		this.remoterefs = Collections.synchronizedMap(new HashMap());
@@ -122,17 +128,6 @@ public class RemoteReferenceModule
 		// todo: dgc, i.e. remember that target is a remote object (for which a proxyinfo is sent away).
 		
 		ProxyInfo ret = new ProxyInfo(remoteinterfaces);
-		fillProxyInfo(ret, target, remoteinterfaces);
-		
-		return ret;
-//		System.out.println("Creating proxy for: "+type);
-	}	
-	
-	/**
-	 *  Fill a proxy with method information.
-	 */
-	public static void fillProxyInfo(ProxyInfo pi, final Object target, Class[] remoteinterfaces)
-	{
 		Map properties = null;
 		
 		// Hack! as long as registry is not there
@@ -163,7 +158,7 @@ public class RemoteReferenceModule
 						MethodInfo[] mis = getMethodInfo(it.next(), targetclass, false);
 						for(int j=0; j<mis.length; j++)
 						{
-							pi.addExcludedMethod(mis[j]);
+							ret.addExcludedMethod(mis[j]);
 						}
 					}
 				}
@@ -175,7 +170,7 @@ public class RemoteReferenceModule
 						MethodInfo[] mis = getMethodInfo(it.next(), targetclass, false);
 						for(int j=0; j<mis.length; j++)
 						{
-							pi.addSynchronousMethod(mis[j]);
+							ret.addSynchronousMethod(mis[j]);
 						}
 					}
 				}
@@ -187,7 +182,7 @@ public class RemoteReferenceModule
 						MethodInfo[] mis = getMethodInfo(it.next(), targetclass, false);
 						for(int j=0; j<mis.length; j++)
 						{
-							pi.addUncachedMethod(mis[j]);
+							ret.addUncachedMethod(mis[j]);
 						}
 					}
 				}
@@ -200,7 +195,7 @@ public class RemoteReferenceModule
 						MethodInfo[] mis = getMethodInfo(tmp[0], targetclass, false);
 						for(int j=0; j<mis.length; j++)
 						{
-							pi.addMethodReplacement(mis[j], (IMethodReplacement)tmp[1]);
+							ret.addMethodReplacement(mis[j], (IMethodReplacement)tmp[1]);
 						}
 					}
 				}
@@ -211,7 +206,7 @@ public class RemoteReferenceModule
 				for(int j=0; j<methods.length; j++)
 				{
 					// only cache when not excluded, not cached and not replaced
-					if(!pi.isUncached(methods[j]) && !pi.isExcluded(methods[j]) && !pi.isReplaced(methods[j])) 
+					if(!ret.isUncached(methods[j]) && !ret.isExcluded(methods[j]) && !ret.isReplaced(methods[j])) 
 					{
 						Class rt = methods[j].getReturnType();
 						Class[] ar = methods[j].getParameterTypes();
@@ -233,7 +228,7 @@ public class RemoteReferenceModule
 								{
 		//							System.out.println("Calling for caching: "+methods[i]);
 									Object val = methods[j].invoke(target, new Object[0]);
-									pi.putCache(methods[j].getName(), val);
+									ret.putCache(methods[j].getName(), val);
 								}
 								catch(Exception e)
 								{
@@ -250,30 +245,32 @@ public class RemoteReferenceModule
 		// Add default replacement for equals() and hashCode().
 		Class targetclass = target.getClass();
 		Method	equals	= SReflect.getMethod(Object.class, "equals", new Class[]{Object.class});
-		if(pi.getMethodReplacement(equals)==null)
+		if(ret.getMethodReplacement(equals)==null)
 		{
 			MethodInfo[] mis = getMethodInfo(equals, targetclass, false);
 			for(int i=0; i<mis.length; i++)
 			{
-				pi.addMethodReplacement(mis[i], new DefaultEqualsMethodReplacement());
+				ret.addMethodReplacement(mis[i], new DefaultEqualsMethodReplacement());
 			}
 		}
 		Method	hashcode = SReflect.getMethod(Object.class, "hashCode", new Class[0]);
-		if(pi.getMethodReplacement(hashcode)==null)
+		if(ret.getMethodReplacement(hashcode)==null)
 		{
 			MethodInfo[] mis = getMethodInfo(hashcode, targetclass, true);
 			for(int i=0; i<mis.length; i++)
 			{
-				pi.addMethodReplacement(mis[i], new DefaultHashcodeMethodReplacement());
+				ret.addMethodReplacement(mis[i], new DefaultHashcodeMethodReplacement());
 			}
 		}
 		// Add getClass as excluded. Otherwise the target class must be present on
 		// the computer which only uses the proxy.
 		Method getclass = SReflect.getMethod(Object.class, "getClass", new Class[0]);
-		if(pi.getMethodReplacement(getclass)==null)
+		if(ret.getMethodReplacement(getclass)==null)
 		{
-			pi.addExcludedMethod(new MethodInfo(getclass));
+			ret.addExcludedMethod(new MethodInfo(getclass));
 		}
+		
+		return ret;
 	}
 	
 	/**
@@ -350,46 +347,36 @@ public class RemoteReferenceModule
 	 *  Get a remote reference.
 	 *  @param target The (local) remote object.
 	 */
-	public RemoteReference getRemoteReference(Object target)
+	protected RemoteReference getRemoteReference(Object target)
 	{
 		RemoteReference ret = (RemoteReference)remoterefs.get(target);
 		
+		// Create a remote reference if not yet available.
 		if(ret==null)
-			ret = createRemoteReference(target);
+		{
+			if(target instanceof IExternalAccess)
+			{
+				ret = new RemoteReference(rsms.getRMSComponentIdentifier(), ((IExternalAccess)target).getComponentIdentifier());
+			}
+			else if(target instanceof IService)
+			{
+				ret = new RemoteReference(rsms.getRMSComponentIdentifier(), ((IService)target).getServiceIdentifier());
+			}
+			else
+			{
+				ret = generateRemoteReference();
+//				System.out.println("Adding rr: "+ret+" "+target);
+				remoterefs.put(target, ret);
+				targetobjects.put(ret, target);
+			}
+		}
 
 		return ret;
 	}
 	
 	/**
-	 * 
-	 */
-	protected RemoteReference createRemoteReference(Object target)
-	{
-		// add lease time watch
-		
-		RemoteReference ret;
-		
-		if(target instanceof IExternalAccess)
-		{
-			ret = new RemoteReference(rsms.getRMSComponentIdentifier(), ((IExternalAccess)target).getComponentIdentifier());
-		}
-		else if(target instanceof IService)
-		{
-			ret = new RemoteReference(rsms.getRMSComponentIdentifier(), ((IService)target).getServiceIdentifier());
-		}
-		else
-		{
-			ret = generateRemoteReference();
-//			System.out.println("Adding rr: "+ret+" "+target);
-			remoterefs.put(target, ret);
-			targetobjects.put(ret, target);
-		}
-		
-		return ret;
-	}
-	
-	/**
-	 * 
+	 *  Delete a remote reference.
+	 *  @param rr The remote reference.
 	 */
 	protected void deleteRemoteReference(RemoteReference rr)
 	{
@@ -399,7 +386,8 @@ public class RemoteReferenceModule
 	}
 	
 	/**
-	 * 
+	 *  Shutdown the module.
+	 *  Sends notifications to all 
 	 */
 	protected void shutdown()
 	{
@@ -493,7 +481,7 @@ public class RemoteReferenceModule
 	 *  @param rr The remote reference.
 	 *  @return The target object.
 	 */
-	public Object removeTargetObject(RemoteReference rr)
+	protected Object removeTargetObject(RemoteReference rr)
 	{
 		return targetobjects.remove(rr);
 	}
@@ -502,7 +490,7 @@ public class RemoteReferenceModule
 	 *  Generate a remote reference.
 	 *  @return The remote reference.
 	 */
-	public synchronized RemoteReference generateRemoteReference()
+	protected synchronized RemoteReference generateRemoteReference()
 	{
 		return new RemoteReference(rsms.getRMSComponentIdentifier(), ""+idcnt++);
 	}
@@ -510,7 +498,8 @@ public class RemoteReferenceModule
 	//-------- management of proxies --------
 
 	/**
-	 *  Get a proxy for a proxy info.
+	 *  Get a proxy for a proxy reference.
+	 *  @param pr The proxy reference.
 	 */
 	public Object getProxy(ProxyReference pr)
 	{
@@ -536,7 +525,7 @@ public class RemoteReferenceModule
 			ret = Proxy.newProxyInstance(rsms.getComponent().getModel().getClassLoader(), 
 				interfaces, new RemoteMethodInvocationHandler(rsms, pr));
 			
-			addProxy(pr.getRemoteReference());
+			incProxyCount(pr.getRemoteReference());
 			
 //			ret = proxies.get(rr);
 //			if(ret==null)
@@ -562,12 +551,14 @@ public class RemoteReferenceModule
 	//-------- dgc --------
 	
 	/**
-	 * 
+	 *  Increment the proxy count for a remote reference.
+	 *  @param rr The remote reference for the proxy.
 	 */
-	public synchronized void addProxy(RemoteReference rr)
+	protected synchronized void incProxyCount(RemoteReference rr)
 	{
 		// Only keep track of proxies for java objects.
 		// Components and services are not subject of gc.
+		
 		if(rr.isObjectReference())
 		{
 			boolean notify = false;
@@ -593,12 +584,14 @@ public class RemoteReferenceModule
 	}
 	
 	/**
-	 * 
+	 *  Decrease the proxy count for a remote reference.
+	 *  @param rr The remote reference for the proxy.
 	 */
-	public synchronized void removeProxy(RemoteReference rr)
+	protected synchronized void decProxyCount(RemoteReference rr)
 	{
 		// Only keep track of proxies for java objects.
 		// Components and services are not subject of gc.
+		
 		if(rr.isObjectReference())
 		{
 			boolean notify = false;
@@ -625,9 +618,10 @@ public class RemoteReferenceModule
 	}
 	
 	/**
-	 * 
+	 *  Send addRef to the origin process of the remote reference.
+	 *  @param rr The remote reference.
 	 */
-	public void sendAddRemoteReference(RemoteReference rr)
+	protected void sendAddRemoteReference(RemoteReference rr)
 	{
 		// DGC: notify rr origin that a new proxy of target object exists
 		// todo: handle failures!
@@ -645,7 +639,8 @@ public class RemoteReferenceModule
 	}
 	
 	/**
-	 * 
+	 *  Send removeRef to the origin process of the remote reference.
+	 *  @param rr The remote reference.
 	 */
 	public void sendRemoveRemoteReference(RemoteReference rr)
 	{
@@ -665,9 +660,11 @@ public class RemoteReferenceModule
 	}
 	
 	/**
-	 *  Add a new holder to a remote object.
+	 *  Add a new temporary holder to a remote object.
+	 *  @param rr The remote reference.
+	 *  @param holder The cid of the holding rms.
 	 */
-	public void addTemporaryRemoteReference(final RemoteReference rr, final IComponentIdentifier holder)
+	protected void addTemporaryRemoteReference(final RemoteReference rr, final IComponentIdentifier holder)
 	{
 //		System.out.println("Coming (temp add): "+rr+" add: "+holder);
 		getTargetObject(rr).addResultListener(new DefaultResultListener()
@@ -681,8 +678,8 @@ public class RemoteReferenceModule
 					holders.put(result, hds);
 				}
 				
-				TemporarayHolder newth = new TemporarayHolder(holder);
-				TemporarayHolder oldth = (TemporarayHolder)hds.get(newth);
+				TemporaryHolder newth = new TemporaryHolder(holder);
+				TemporaryHolder oldth = (TemporaryHolder)hds.get(newth);
 				if(oldth==null)
 				{
 					hds.put(newth, newth);
@@ -698,6 +695,8 @@ public class RemoteReferenceModule
 	
 	/**
 	 *  Add a new holder to a remote object.
+	 *  @param rr The remote reference.
+	 *  @param holder The cid of the holding rms.
 	 */
 	public void addRemoteReference(final RemoteReference rr, final IComponentIdentifier holder)
 	{
@@ -717,7 +716,7 @@ public class RemoteReferenceModule
 //					throw new RuntimeException("Holder already contained: "+holder);
 					hds.put(holder, holder);
 					
-					TemporarayHolder th = (TemporarayHolder)hds.get(new TemporarayHolder(holder));
+					TemporaryHolder th = (TemporaryHolder)hds.get(new TemporaryHolder(holder));
 					if(th!=null)
 					{
 						th.setNumber(th.getNumber()-1);
@@ -735,6 +734,8 @@ public class RemoteReferenceModule
 	
 	/**
 	 *  Remove a new holder from a remote object.
+	 *  @param rr The remote reference.
+	 *  @param holder The cid of the holding rms.
 	 */
 	public void removeRemoteReference(final RemoteReference rr, final IComponentIdentifier holder)
 	{
@@ -759,81 +760,5 @@ public class RemoteReferenceModule
 				}
 			}
 		});
-	}
-	
-	/**
-	 * 
-	 */
-	public static class TemporarayHolder
-	{
-		protected IComponentIdentifier holder;
-		
-		protected int number;
-
-		/**
-		 *  Create a new temporary holder.
-		 */
-		public TemporarayHolder(IComponentIdentifier holder)
-		{
-			this.holder = holder;
-			this.number = 1;
-		}
-
-		/**
-		 *  Get the holder.
-		 *  @return the holder.
-		 */
-		public IComponentIdentifier getHolder()
-		{
-			return holder;
-		}
-
-		/**
-		 *  Set the holder.
-		 *  @param holder The holder to set.
-		 */
-		public void setHolder(IComponentIdentifier holder)
-		{
-			this.holder = holder;
-		}
-
-		/**
-		 *  Get the number.
-		 *  @return the number.
-		 */
-		public int getNumber()
-		{
-			return number;
-		}
-
-		/**
-		 *  Set the number.
-		 *  @param number The number to set.
-		 */
-		public void setNumber(int number)
-		{
-			this.number = number;
-		}
-
-		public int hashCode()
-		{
-			return 31 * holder.hashCode();
-		}
-
-		public boolean equals(Object obj)
-		{
-			boolean ret = false;
-			if(obj instanceof TemporarayHolder)
-			{
-				TemporarayHolder other = (TemporarayHolder)obj;
-				ret = holder.equals(other.holder);
-			}
-			return ret;
-		}
-
-		public String toString()
-		{
-			return "TemporarayHolder(holder=" + holder + ", number=" + number+ ")";
-		}
 	}
 }

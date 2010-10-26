@@ -93,7 +93,7 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 			{
 				public void execute(Object args)
 				{
-					rsms.getRemoteReferenceModule().removeProxy(pr.getRemoteReference());
+					rsms.getRemoteReferenceModule().decProxyCount(pr.getRemoteReference());
 				}
 			});
 			return null;
