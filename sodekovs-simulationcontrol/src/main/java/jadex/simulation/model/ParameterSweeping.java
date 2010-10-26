@@ -107,7 +107,7 @@ public class ParameterSweeping  implements Serializable{
     @XmlTransient
 	private int parameterSweepCounter = 0;
 	@XmlTransient
-	private int currentValue = 0;
+	private String currentValue = "";
 
 	  /**
 	 * Needed, in case the parameter is swept to indicated current value.
@@ -129,11 +129,11 @@ public class ParameterSweeping  implements Serializable{
 	 * Denotes the current value of the parameter that is swept
 	 * @return
 	 */
-	public int getCurrentValue() {
+	public String getCurrentValue() {
 		return currentValue;
 	}
 
-	public void setCurrentValue(int currentValue) {
+	public void setCurrentValue(String currentValue) {
 		this.currentValue = currentValue;
 	}
 }

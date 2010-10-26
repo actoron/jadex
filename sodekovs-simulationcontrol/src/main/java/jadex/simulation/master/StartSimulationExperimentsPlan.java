@@ -187,37 +187,74 @@ public class StartSimulationExperimentsPlan extends Plan {
 	private void sweepParameters(SimulationConfiguration simConf, Map args) {
 		Optimization opt = simConf.getOptimization();
 		String parameterName = opt.getData().getName();
-		int val = -1;
+		String clazz = opt.getParameterSweeping().getConfiguration().getClazz(); //double, int or string
+		int valInt = -1;
+		double valDouble = 0.0;
+		String valString = "";
 
-		// iterate through parameter space with step size
+		// iterate through parameter space with step size; only appropriate to int & double parameter
 		if (opt.getParameterSweeping().getType().equalsIgnoreCase(Constants.OPTIMIZATION_TYPE_SPACE)) {
-			if (opt.getParameterSweeping().getParameterSweepCounter() == 0) {
-				val = opt.getParameterSweeping().getConfiguration().getStart();
-
-			} else {
-				int step = opt.getParameterSweeping().getConfiguration().getStep();
-				int currentVal = opt.getParameterSweeping().getCurrentValue();
-				val = currentVal + step;
-
-			}
-			// iterate through list of parameters
+			if (clazz.equalsIgnoreCase("int")) {
+				if (opt.getParameterSweeping().getParameterSweepCounter() == 0) {
+					valInt = Integer.parseInt(opt.getParameterSweeping().getConfiguration().getStart());
+				} else {
+					int step = Integer.parseInt(opt.getParameterSweeping().getConfiguration().getStep());
+					int currentVal = Integer.parseInt(opt.getParameterSweeping().getCurrentValue());
+					valInt = currentVal + step;
+				} 
+			} else if (clazz.equalsIgnoreCase("double")) {
+				if (opt.getParameterSweeping().getParameterSweepCounter() == 0) {
+					valDouble = Double.parseDouble(opt.getParameterSweeping().getConfiguration().getStart());
+				} else {
+					double step = Double.parseDouble(opt.getParameterSweeping().getConfiguration().getStep());
+					Double currentVal = Double.parseDouble(opt.getParameterSweeping().getCurrentValue());
+					valDouble = currentVal + step;
+				}
+			} else
+				System.err.println("#StartSimulationExperiment# Error on identifying class for sweeping parameter(s): " + clazz);
+		// iterate through list of parameters of type int or double or String
 		} else if (opt.getParameterSweeping().getType().equalsIgnoreCase(Constants.OPTIMIZATION_TYPE_LIST)) {
-			if (opt.getParameterSweeping().getParameterSweepCounter() == 0) {
-				val = Integer.valueOf(opt.getParameterSweeping().getConfiguration().getValuesAsList().get(0));
+			if (clazz.equalsIgnoreCase("int")) {
+				if (opt.getParameterSweeping().getParameterSweepCounter() == 0) {
+					valInt = Integer.valueOf(opt.getParameterSweeping().getConfiguration().getValuesAsList().get(0));
 
+				} else {
+					valInt = Integer.valueOf(opt.getParameterSweeping().getConfiguration().getValuesAsList().get(opt.getParameterSweeping().getParameterSweepCounter()));
+				}
+			} else if (clazz.equalsIgnoreCase("double")) {
+				if (opt.getParameterSweeping().getParameterSweepCounter() == 0) {
+					valDouble = Double.valueOf(opt.getParameterSweeping().getConfiguration().getValuesAsList().get(0));
+
+				} else {
+					valDouble = Double.valueOf(opt.getParameterSweeping().getConfiguration().getValuesAsList().get(opt.getParameterSweeping().getParameterSweepCounter()));
+				}
+			} else if (clazz.equalsIgnoreCase("string")) {
+				if (opt.getParameterSweeping().getParameterSweepCounter() == 0) {
+					valString = String.valueOf(opt.getParameterSweeping().getConfiguration().getValuesAsList().get(0));
+
+				} else {
+					valString = String.valueOf(opt.getParameterSweeping().getConfiguration().getValuesAsList().get(opt.getParameterSweeping().getParameterSweepCounter()));
+				}
 			} else {
-				val = Integer.valueOf(opt.getParameterSweeping().getConfiguration().getValuesAsList().get(opt.getParameterSweeping().getParameterSweepCounter()));
-
+				System.err.println("#StartSimulationExperiment# Error on identifying class for sweeping parameter(s): " + clazz);
 			}
 		} else {
 			System.err.println("#StartSimulationExperiment# Error on identifying type for sweeping parameter(s): " + opt.getParameterSweeping().getType());
 		}
 
+		
 		// update SimulationConf to be up to date
-		opt.getParameterSweeping().setCurrentValue(val);
+		if (clazz.equalsIgnoreCase("int")) {
+			opt.getParameterSweeping().setCurrentValue(String.valueOf(valInt));			
+			// parametrize application-xml
+			args.put(parameterName, new Integer(valInt));
+		} else if (clazz.equalsIgnoreCase("double")) {
+			opt.getParameterSweeping().setCurrentValue(String.valueOf(valDouble));
+			args.put(parameterName, new Double(valDouble));
+		} else if (clazz.equalsIgnoreCase("string")) {
+			opt.getParameterSweeping().setCurrentValue(valString);			
+			args.put(parameterName, new String(valString));
+		}
 		opt.getParameterSweeping().incrementParameterSweepCounter();
-
-		// parametrize application-xml
-		args.put(parameterName, new Integer(val));
 	}
 }

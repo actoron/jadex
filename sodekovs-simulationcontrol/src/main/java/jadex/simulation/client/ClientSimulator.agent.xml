@@ -38,6 +38,10 @@
 		<belief name="observedEventsMap" class="HashMap">
 			<fact>new HashMap()</fact>
 		</belief>
+		
+		<!-- <belief name="testDouble" class="double">
+			<fact>-0.5</fact>
+		</belief> -->
 
 	</beliefs>
 

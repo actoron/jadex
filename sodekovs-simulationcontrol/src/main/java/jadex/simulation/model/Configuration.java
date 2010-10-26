@@ -49,11 +49,11 @@ public class Configuration implements Serializable{
 	 */
 	private static final long serialVersionUID = 5603963875857069542L;
 	@XmlAttribute
-    protected Integer start;
+    protected String start;
     @XmlAttribute
-    protected Integer end;
+    protected String end;
     @XmlAttribute
-    protected Integer step;
+    protected String step;
     @XmlAttribute(name = "class")
     protected String clazz;
     @XmlAttribute
@@ -67,7 +67,7 @@ public class Configuration implements Serializable{
      *     {@link Integer }
      *     
      */
-    public Integer getStart() {
+    public String getStart() {
         return start;
     }
 
@@ -79,7 +79,7 @@ public class Configuration implements Serializable{
      *     {@link Integer }
      *     
      */
-    public void setStart(Integer value) {
+    public void setStart(String value) {
         this.start = value;
     }
 
@@ -91,7 +91,7 @@ public class Configuration implements Serializable{
      *     {@link Integer }
      *     
      */
-    public Integer getEnd() {
+    public String getEnd() {
         return end;
     }
 
@@ -103,7 +103,7 @@ public class Configuration implements Serializable{
      *     {@link Integer }
      *     
      */
-    public void setEnd(Integer value) {
+    public void setEnd(String value) {
         this.end = value;
     }
 
@@ -115,7 +115,7 @@ public class Configuration implements Serializable{
      *     {@link Integer }
      *     
      */
-    public Integer getStep() {
+    public String getStep() {
         return step;
     }
 
@@ -127,7 +127,7 @@ public class Configuration implements Serializable{
      *     {@link Integer }
      *     
      */
-    public void setStep(Integer value) {
+    public void setStep(String value) {
         this.step = value;
     }
 

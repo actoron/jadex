@@ -58,8 +58,14 @@
 		</Dataconsumer>
 		<Dataconsumer name="simConsumer" clazz="SimulationDataConsumer">		
 				<Property name="dataprovider">"homebaselogger2"</Property>
-				<Property name="time" filter="last"/><!-- HACK: Denotes the filter type ->last= only the last value is of interest. -->
-		</Dataconsumer>		
+				<Property name="time" filter="last"/><!-- HACK: Denotes the filter type ->last= only the last value is of interest. --> 
+		</Dataconsumer>
+		 
+		<!--<Dataconsumer name="homebaseConsumer" clazz="SimulationLogger">
+				<Property name="dataprovider">"homebaselogger2"</Property>
+				<Property name="title">"Logging Simulation"</Property>
+				<Property name="filelocation">"C:\simulation\marsworld.log"</Property>
+		</Dataconsumer>-->		
 	</Dataconsumers>
 
 	<DataVisualization>
@@ -70,7 +76,9 @@
 
 	<!-- Optional: -->
 	<Persist>
-		<!-- Options: Wich filenName, Type, DB-Connector etc.-->
+		<!-- Options: Which filenName, Type, DB-Connector etc.-->
+		<!--  type="file"/"DB" -->
+		<!-- File Location -->
 	</Persist>
 
 	<Optimization>
@@ -91,12 +99,12 @@
 		<Data name="NumberOfSentries"> <!-- Referenz to $args.value in application.xml -->
 			<ObjectSource type="BDI_Agent" name="Sentry" />
 			<ElementSource type="AgentNumber" name="AgentNumber"
-				class="Int" /><!-- Add type of element: String, long, int etc.? -->
+				class="Int" /><!-- Add type of element: String, double, int -->
 		</Data>
 		<!-- Important: Number of sweeps has to be equal with number of rows!-->
 		<ParameterSweeping type="space"> <!-- space, list or algorithm (algorithm is not implemented yet!)-->
-			<Configuration start="3" end="5" step="1" class="int" />
-			<!-- 			<Configuration values="12;17;28;33;"/>--> <!-- Has to be comma separated list, with a comma as last character. -->
+			<Configuration start="3" end="15" step="1" class="int" /><!-- Add type of element: String, double, int -->
+			<!-- 			<Configuration values="12;17;28;33;" class="int"/>--> <!-- Has to be comma separated list, with a comma as last character. -->
 		</ParameterSweeping>
 		<Algorithm>
 			<Input></Input>

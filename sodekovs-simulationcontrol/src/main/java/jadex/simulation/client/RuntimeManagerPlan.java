@@ -57,10 +57,11 @@ import java.util.concurrent.ConcurrentHashMap;
 public class RuntimeManagerPlan extends Plan {
 
 	public void body() {
+//		System.out.println("#ClientSim#-> get Belief: " + getBeliefbase().getBelief("testDouble").getFact());		
 		HashMap simFacts = (HashMap) getBeliefbase().getBelief("simulationFacts").getFact();
 		SimulationConfiguration simConf = (SimulationConfiguration) simFacts.get(Constants.SIMULATION_FACTS_FOR_CLIENT);
 		String experimentID = (String) simFacts.get(Constants.EXPERIMENT_ID);
-		double parameterSweepValue = simConf.getOptimization().getParameterSweeping().getCurrentValue();
+		String parameterSweepValue = simConf.getOptimization().getParameterSweeping().getCurrentValue();
 		// String parameterSweepName =
 		// simConf.getOptimization().getData().getName();
 
