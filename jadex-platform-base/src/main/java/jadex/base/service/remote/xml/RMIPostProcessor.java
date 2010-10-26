@@ -1,6 +1,6 @@
 package jadex.base.service.remote.xml;
 
-import jadex.base.service.remote.ProxyInfo;
+import jadex.base.service.remote.ProxyReference;
 import jadex.base.service.remote.RemoteReferenceModule;
 import jadex.xml.IContext;
 import jadex.xml.IPostProcessor;
@@ -37,7 +37,7 @@ public class RMIPostProcessor implements IPostProcessor
 	 */
 	public Object postProcess(IContext context, Object object)
 	{
-		return rrm.getProxy((ProxyInfo)object);
+		return rrm.getProxy((ProxyReference)object);
 	}
 	
 	/**

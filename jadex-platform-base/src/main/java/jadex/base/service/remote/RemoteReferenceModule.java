@@ -2,7 +2,6 @@ package jadex.base.service.remote;
 
 import jadex.base.service.remote.commands.RemoteDGCAddReferenceCommand;
 import jadex.base.service.remote.commands.RemoteDGCRemoveReferenceCommand;
-import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
@@ -21,19 +20,14 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
-import java.util.WeakHashMap;
 
 /**
  * 
  */
 public class RemoteReferenceModule
 {
-	public static RemoteReference ALL = new RemoteReference(new ComponentIdentifier(), "ALL");
-	
 	/** The remote interface properties. */
 	protected static Map interfaceproperties = Collections.synchronizedMap(new HashMap());
 	
@@ -43,11 +37,8 @@ public class RemoteReferenceModule
 	protected RemoteServiceManagementService rsms;
 	
 	/** The cache of proxy infos (class -> proxy info). */
-	protected Map proxyinfos = Collections.synchronizedMap(new LRU(200));
+	protected Map proxyinfos;
 	
-//	/** The map of all locally created proxy objects (rr -> proxy). */
-//	protected Map proxies;
-
 	/** The map of target objects (rr  -> target object). */
 	protected Map targetobjects;
 	
@@ -72,9 +63,8 @@ public class RemoteReferenceModule
 	public RemoteReferenceModule(RemoteServiceManagementService rsms)
 	{
 		this.rsms = rsms;
+		this.proxyinfos = Collections.synchronizedMap(new LRU(200));
 		this.targetobjects = Collections.synchronizedMap(new HashMap());
-//		this.proxies = Collections.synchronizedMap(new HashMap());
-//		this.proxies = new WeakHashMap();
 		this.remoterefs = Collections.synchronizedMap(new HashMap());
 		
 		this.proxycount = new HashMap();
@@ -84,51 +74,54 @@ public class RemoteReferenceModule
 	//-------- methods --------
 	
 	/**
-	 *  Get a proxy info for a component. 
+	 *  Get a remote reference for a component for transport. 
 	 */
-	public ProxyInfo getProxyInfo(Object target, Class[] remoteinterfaces)
+	public ProxyReference getProxyReference(Object target, Class[] remoteinterfaces, IComponentIdentifier tmpholder)
 	{
-		ProxyInfo ret;
-		
 		// todo: should all ids of remote objects be saved in table?
 		
 		// Note: currently agents use model information e.g. componentviewer.viewerclass
 		// to add specific properties, so that proxies are cached per agent model type due
 		// to cached method call getPropertyMap().
+		
 		RemoteReference rr = getRemoteReference(target);
-		Object tcid = target instanceof IExternalAccess? (Object)((IExternalAccess)target).getModel().getFullName(): target.getClass();
+		
+		// Remember that this rr is send to some other process (until the addRef message arrives).
+		if(rr.isObjectReference())
+			addTemporaryRemoteReference(rr, tmpholder);
 		
 		// This construct ensures
 		// a) fast access to existing proxyinfos in the map
 		// b) creation is performed only once by ordering threads 
 		// via synchronized block and rechecking if proxy was already created.
 		
-		ret = (ProxyInfo)proxyinfos.get(tcid);
-		if(ret==null)
+		Object tcid = target instanceof IExternalAccess? (Object)((IExternalAccess)target).getModel().getFullName(): target.getClass();
+		ProxyInfo pi = (ProxyInfo)proxyinfos.get(tcid);
+		if(pi==null)
 		{
 			synchronized(proxyinfos)
 			{
-				ret = (ProxyInfo)proxyinfos.get(tcid);
-				if(ret==null)
+				pi = (ProxyInfo)proxyinfos.get(tcid);
+				if(pi==null)
 				{
-					ret = createProxyInfo(target, rr, remoteinterfaces);
-					proxyinfos.put(tcid, ret);
+					pi = createProxyInfo(target, remoteinterfaces);
+					proxyinfos.put(tcid, pi);
 //					System.out.println("add: "+tcid+" "+ret);
 				}
 			}
 		}
 		
-		return ret;
+		return new ProxyReference(pi, rr);
 	}
 	
 	/**
 	 *  Create a proxy info for a service. 
 	 */
-	public ProxyInfo createProxyInfo(Object target, RemoteReference rr, Class[] remoteinterfaces)
+	public ProxyInfo createProxyInfo(Object target, Class[] remoteinterfaces)
 	{
 		// todo: dgc, i.e. remember that target is a remote object (for which a proxyinfo is sent away).
 		
-		ProxyInfo ret = new ProxyInfo(rr, remoteinterfaces);
+		ProxyInfo ret = new ProxyInfo(remoteinterfaces);
 		fillProxyInfo(ret, target, remoteinterfaces);
 		
 		return ret;
@@ -387,11 +380,10 @@ public class RemoteReferenceModule
 		else
 		{
 			ret = generateRemoteReference();
-//			targetobjects.put(new RemoteReference(rsms.getRMSComponentIdentifier(), ret), target);
+//			System.out.println("Adding rr: "+ret+" "+target);
+			remoterefs.put(target, ret);
+			targetobjects.put(ret, target);
 		}
-		
-		remoterefs.put(target, ret);
-		targetobjects.put(ret, target);
 		
 		return ret;
 	}
@@ -401,8 +393,9 @@ public class RemoteReferenceModule
 	 */
 	protected void deleteRemoteReference(RemoteReference rr)
 	{
-		Object target = (RemoteReference)targetobjects.remove(rr);
+		Object target = targetobjects.remove(rr);
 		remoterefs.remove(target);
+//		System.out.println("Removing rr: "+rr+" "+target);
 	}
 	
 	/**
@@ -410,7 +403,11 @@ public class RemoteReferenceModule
 	 */
 	protected void shutdown()
 	{
-		sendRemoveRemoteReference(ALL);
+		RemoteReference[] rrs = (RemoteReference[])proxycount.keySet().toArray(new RemoteReference[0]);
+		for(int i=0; i<rrs.length; i++)
+		{
+			sendRemoveRemoteReference(rrs[i]);
+		}
 	}
 	
 	/**
@@ -477,7 +474,7 @@ public class RemoteReferenceModule
 		}
 		else //(rr.getTargetIdentifier() instanceof String)
 		{
-			Object o = targetobjects.get(rr.getTargetIdentifier());
+			Object o = targetobjects.get(rr);
 			if(o!=null)
 			{
 				ret.setResult(o);
@@ -515,31 +512,31 @@ public class RemoteReferenceModule
 	/**
 	 *  Get a proxy for a proxy info.
 	 */
-	public Object getProxy(ProxyInfo pi)
+	public Object getProxy(ProxyReference pr)
 	{
 		Object ret;
 		
-		RemoteReference rr = pi.getRemoteReference();
+//		RemoteReference rr = pi.getRemoteReference();
 		
 		// Is is local return local target object.
-		if(rr.getRemoteManagementServiceIdentifier().equals(rsms.getRMSComponentIdentifier()))
+		if(pr.getRemoteReference().getRemoteManagementServiceIdentifier().equals(rsms.getRMSComponentIdentifier()))
 		{
-			ret = targetobjects.get(rr);
+			ret = targetobjects.get(pr.getRemoteReference());
 		}
 		// Else return new or old proxy.
 		else
 		{
 //			System.out.println("interfaces of proxy: "+SUtil.arrayToString(pi.getTargetInterfaces()));
 			
-			Class[] tmp = pi.getTargetInterfaces();
+			Class[] tmp = pr.getProxyInfo().getTargetInterfaces();
 			Class[] interfaces = new Class[tmp.length+1];
 			System.arraycopy(tmp, 0, interfaces, 0, tmp.length);
 			interfaces[tmp.length] = IFinalize.class;
 			
 			ret = Proxy.newProxyInstance(rsms.getComponent().getModel().getClassLoader(), 
-				interfaces, new RemoteMethodInvocationHandler(rsms, pi));
+				interfaces, new RemoteMethodInvocationHandler(rsms, pr));
 			
-			addProxy(rr);
+			addProxy(pr.getRemoteReference());
 			
 //			ret = proxies.get(rr);
 //			if(ret==null)
@@ -569,25 +566,30 @@ public class RemoteReferenceModule
 	 */
 	public synchronized void addProxy(RemoteReference rr)
 	{
-		boolean notify = false;
-		synchronized(this)
+		// Only keep track of proxies for java objects.
+		// Components and services are not subject of gc.
+		if(rr.isObjectReference())
 		{
-			Integer cnt = (Integer)proxycount.get(rr);
-			if(cnt==null)
+			boolean notify = false;
+			synchronized(this)
 			{
-				proxycount.put(rr, new Integer(1));
-				notify = true;
-			}
-			else
-			{
-				proxycount.put(rr, new Integer(cnt.intValue()+1));
+				Integer cnt = (Integer)proxycount.get(rr);
+				if(cnt==null)
+				{
+					proxycount.put(rr, new Integer(1));
+					notify = true;
+				}
+				else
+				{
+					proxycount.put(rr, new Integer(cnt.intValue()+1));
+				}
+				
+	//			System.out.println("Add proxy: "+rr+" "+cnt);
 			}
 			
-//			System.out.println("Add proxy: "+rr+" "+cnt);
+			if(notify)
+				sendAddRemoteReference(rr);
 		}
-		
-		if(notify)
-			sendAddRemoteReference(rr);
 	}
 	
 	/**
@@ -595,26 +597,31 @@ public class RemoteReferenceModule
 	 */
 	public synchronized void removeProxy(RemoteReference rr)
 	{
-		boolean notify = false;
-		synchronized(this)
+		// Only keep track of proxies for java objects.
+		// Components and services are not subject of gc.
+		if(rr.isObjectReference())
 		{
-			Integer cnt = (Integer)proxycount.get(rr);
-			int nv = cnt.intValue()-1;
-			if(nv==0)
+			boolean notify = false;
+			synchronized(this)
 			{
-				proxycount.remove(rr);
-				notify = true;
-				System.out.println("Remove proxy: "+rr+" "+nv);
+				Integer cnt = (Integer)proxycount.get(rr);
+				int nv = cnt.intValue()-1;
+				if(nv==0)
+				{
+					proxycount.remove(rr);
+					notify = true;
+//					System.out.println("Remove proxy: "+rr+" "+nv);
+				}
+				else
+				{
+					proxycount.put(rr, new Integer(nv));
+				}
+				
+	//			System.out.println("Remove proxy: "+rr+" "+nv);
 			}
-			else
-			{
-				proxycount.put(rr, new Integer(nv));
-			}
-			
-//			System.out.println("Remove proxy: "+rr+" "+nv);
+			if(notify)
+				sendRemoveRemoteReference(rr);
 		}
-		if(notify)
-			sendRemoveRemoteReference(rr);
 	}
 	
 	/**
@@ -631,6 +638,7 @@ public class RemoteReferenceModule
 			{
 			}
 		});
+//		System.out.println("send add: "+rr);
 		final String callid = SUtil.createUniqueId(rsms.getRMSComponentIdentifier().getLocalName());
 		RemoteDGCAddReferenceCommand com = new RemoteDGCAddReferenceCommand(rr, rsms.getRMSComponentIdentifier(), callid);
 		rsms.sendMessage(rr.getRemoteManagementServiceIdentifier(), com, callid, -1, future);
@@ -650,9 +658,42 @@ public class RemoteReferenceModule
 			{
 			}
 		});
+//		System.out.println("send rem: "+rr);
 		final String callid = SUtil.createUniqueId(rsms.getRMSComponentIdentifier().getLocalName());
 		RemoteDGCRemoveReferenceCommand com = new RemoteDGCRemoveReferenceCommand(rr, rsms.getRMSComponentIdentifier(), callid);
 		rsms.sendMessage(rr.getRemoteManagementServiceIdentifier(), com, callid, -1, future);
+	}
+	
+	/**
+	 *  Add a new holder to a remote object.
+	 */
+	public void addTemporaryRemoteReference(final RemoteReference rr, final IComponentIdentifier holder)
+	{
+//		System.out.println("Coming (temp add): "+rr+" add: "+holder);
+		getTargetObject(rr).addResultListener(new DefaultResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				Map hds = (Map)holders.get(result);
+				if(hds==null)
+				{
+					hds = new HashMap();
+					holders.put(result, hds);
+				}
+				
+				TemporarayHolder newth = new TemporarayHolder(holder);
+				TemporarayHolder oldth = (TemporarayHolder)hds.get(newth);
+				if(oldth==null)
+				{
+					hds.put(newth, newth);
+				}
+				else
+				{
+					oldth.setNumber(oldth.getNumber()+1);
+				}
+//				System.out.println("Holders for (temp add): "+result+" add: "+holder+" "+hds);
+			}
+		});
 	}
 	
 	/**
@@ -664,16 +705,30 @@ public class RemoteReferenceModule
 		{
 			public void resultAvailable(Object source, Object result)
 			{
-				Set hds = (Set)holders.get(result);
+				Map hds = (Map)holders.get(result);
 				if(hds==null)
 				{
-					hds = new HashSet();
+					hds = new HashMap();
 					holders.put(result, hds);
 				}
-				if(hds.contains(holder))
-					throw new RuntimeException("Holder already contained: "+holder);
-				hds.add(holder);
-				System.out.println("Holders for (add): "+result+" "+holder+" "+hds);
+				
+				if(!hds.containsKey(holder))
+				{
+//					throw new RuntimeException("Holder already contained: "+holder);
+					hds.put(holder, holder);
+					
+					TemporarayHolder th = (TemporarayHolder)hds.get(new TemporarayHolder(holder));
+					if(th!=null)
+					{
+						th.setNumber(th.getNumber()-1);
+						if(th.getNumber()==0)
+						{
+							hds.remove(th);
+						}
+					}
+					
+//					System.out.println("Holders for (add): "+result+" add: "+holder+" "+hds);
+				}
 			}
 		});
 	}
@@ -683,37 +738,102 @@ public class RemoteReferenceModule
 	 */
 	public void removeRemoteReference(final RemoteReference rr, final IComponentIdentifier holder)
 	{
-//		if(ALL.equals(rr))
-//		{
-//			Object[] targets = holders.keySet().toArray();
-//			for(int i=0; i<targets.length; i++)
-//			{
-//				Set hds = (Set)holders.get(targets[i]);
-//				hds.remove(holder);
-//				if(hds.size()==0)
-//				{
-//					holders.remove(hds);
-//					deleteRemoteReference(rr);
-//				}
-//			}
-//		}
-		
 		getTargetObject(rr).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
-				Set hds = (Set)holders.get(result);
-				if(!hds.contains(holder))
-					throw new RuntimeException("Holder not contained: "+holder);
-				hds.remove(holder);
-				if(hds.size()==0)
+				Map hds = (Map)holders.get(result);
+//				if(hds==null || !hds.contains(holder))
+//					throw new RuntimeException("Holder not contained: "+holder);
+
+//				System.out.println("Holders for (rem): "+result+" rem: "+holder+" "+hds);
+				
+				if(hds!=null)
 				{
-					holders.remove(hds);
-					deleteRemoteReference(rr);
+					hds.remove(holder);
+					if(hds.size()==0)
+					{
+						holders.remove(hds);
+						deleteRemoteReference(rr);
+					}
 				}
-				System.out.println("Holders for (rem): "+result+" "+holder+" "+hds);
 			}
 		});
 	}
 	
+	/**
+	 * 
+	 */
+	public static class TemporarayHolder
+	{
+		protected IComponentIdentifier holder;
+		
+		protected int number;
+
+		/**
+		 *  Create a new temporary holder.
+		 */
+		public TemporarayHolder(IComponentIdentifier holder)
+		{
+			this.holder = holder;
+			this.number = 1;
+		}
+
+		/**
+		 *  Get the holder.
+		 *  @return the holder.
+		 */
+		public IComponentIdentifier getHolder()
+		{
+			return holder;
+		}
+
+		/**
+		 *  Set the holder.
+		 *  @param holder The holder to set.
+		 */
+		public void setHolder(IComponentIdentifier holder)
+		{
+			this.holder = holder;
+		}
+
+		/**
+		 *  Get the number.
+		 *  @return the number.
+		 */
+		public int getNumber()
+		{
+			return number;
+		}
+
+		/**
+		 *  Set the number.
+		 *  @param number The number to set.
+		 */
+		public void setNumber(int number)
+		{
+			this.number = number;
+		}
+
+		public int hashCode()
+		{
+			return 31 * holder.hashCode();
+		}
+
+		public boolean equals(Object obj)
+		{
+			boolean ret = false;
+			if(obj instanceof TemporarayHolder)
+			{
+				TemporarayHolder other = (TemporarayHolder)obj;
+				ret = holder.equals(other.holder);
+			}
+			return ret;
+		}
+
+		public String toString()
+		{
+			return "TemporarayHolder(holder=" + holder + ", number=" + number+ ")";
+		}
+	}
 }

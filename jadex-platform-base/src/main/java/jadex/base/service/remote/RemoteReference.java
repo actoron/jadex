@@ -2,6 +2,7 @@ package jadex.base.service.remote;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.SUtil;
+import jadex.commons.service.IServiceIdentifier;
 
 /**
  *  Remote reference for locating a specific target object in another platform.
@@ -74,6 +75,15 @@ public class RemoteReference
 	{
 		this.targetid = targetid;
 	}
+	
+	/**
+	 *  Test if reference is object reference (not service or component).
+	 *  @return True, if object reference.
+	 */
+	public boolean isObjectReference()
+	{
+		return !(targetid instanceof IComponentIdentifier) && !(targetid instanceof IServiceIdentifier);
+	}
 
 	/**
 	 *  Get the hashcode.
@@ -108,7 +118,4 @@ public class RemoteReference
 	{
 		return "RemoteReference(rms=" + rms + ", targetid=" + targetid + ")";
 	}
-	
-	
-	
 }

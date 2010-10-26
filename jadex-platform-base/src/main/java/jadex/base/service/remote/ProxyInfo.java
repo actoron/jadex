@@ -20,8 +20,8 @@ public class ProxyInfo
 {
 	//-------- attributes --------
 	
-	/** The rms. */
-	protected RemoteReference rr;
+//	/** The rms. */
+//	protected RemoteReference rr;
 	
 	/** The target class. */
 	protected List targetinterfaces;
@@ -53,9 +53,10 @@ public class ProxyInfo
 	/**
 	 *  Create a new proxy info.
 	 */
-	public ProxyInfo(RemoteReference rr, Class[] targetinterfaces)
+	public ProxyInfo(Class[] targetinterfaces)
+//	public ProxyInfo(RemoteReference rr, Class[] targetinterfaces)
 	{
-		this.rr = rr;
+//		this.rr = rr;
 		setTargetInterfaces(targetinterfaces);
 		
 //		System.out.println("proxy with: "+SUtil.arrayToString(targetinterfaces));
@@ -63,23 +64,23 @@ public class ProxyInfo
 	
 	//-------- methods --------
 	
-	/**
-	 *  Get the remote reference.
-	 *  @return the remote reference.
-	 */
-	public RemoteReference getRemoteReference()
-	{
-		return rr;
-	}
-
-	/**
-	 *  Set the rr.
-	 *  @param rr The rr to set.
-	 */
-	public void setRemoteReference(RemoteReference rr)
-	{
-		this.rr = rr;
-	}
+//	/**
+//	 *  Get the remote reference.
+//	 *  @return the remote reference.
+//	 */
+//	public RemoteReference getRemoteReference()
+//	{
+//		return rr;
+//	}
+//
+//	/**
+//	 *  Set the rr.
+//	 *  @param rr The rr to set.
+//	 */
+//	public void setRemoteReference(RemoteReference rr)
+//	{
+//		this.rr = rr;
+//	}
 	
 	/**
 	 *  Get the cached values.
@@ -323,7 +324,7 @@ public class ProxyInfo
 	 */
 	public String toString()
 	{
-		return "ProxyInfo(remotereference=" + rr + ", cache=" + cache
+		return "ProxyInfo(cache=" + cache
 			+ ", excluded=" + excluded + ", uncached=" + uncached
 			+ ", synchronous=" + synchronous + ", replacements="
 			+ replacements + ", targetinterfaces="

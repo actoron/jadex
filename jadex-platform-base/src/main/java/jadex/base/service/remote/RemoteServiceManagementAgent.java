@@ -61,7 +61,8 @@ public class RemoteServiceManagementAgent extends MicroAgent
 	 */
 	public void agentKilled()
 	{
-//		rms.getRemoteReferenceModule().shutdown();
+		// Send notifications to other processes that remote references are not needed any longer.
+		rms.getRemoteReferenceModule().shutdown();
 	}
 	
 	/**
@@ -114,9 +115,10 @@ public class RemoteServiceManagementAgent extends MicroAgent
 										{
 											Map reply = (Map)result;
 //											reply.put(SFipa.CONTENT, JavaWriter.objectToXML(repcontent, ls.getClassLoader()));
-											String content = Writer.objectToXML(rms.getWriter(), repcontent, ls.getClassLoader(), rms);
+											String content = Writer.objectToXML(rms.getWriter(), repcontent, ls.getClassLoader(), msg.get(SFipa.SENDER));
 											reply.put(SFipa.CONTENT, content);
 //											System.out.println("content: "+content);
+											
 											sendMessage(reply, mt);
 										}
 										public void exceptionOccurred(Object source, Exception exception)

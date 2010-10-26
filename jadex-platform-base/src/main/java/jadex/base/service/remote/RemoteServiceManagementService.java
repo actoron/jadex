@@ -109,15 +109,15 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		this.rrm = new RemoteReferenceModule(this);
 		this.waitingcalls = Collections.synchronizedMap(new HashMap());
 		
-		QName[] proxyinfo = new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"jadex.base.service.remote", "ProxyInfo")};
+		QName[] pr = new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"jadex.base.service.remote", "ProxyReference")};
 		
 		Set typeinfosread = JavaReader.getTypeInfos();
-		TypeInfo ti_proxyinfo = new TypeInfo(new XMLInfo(proxyinfo), 
-			new ObjectInfo(ProxyInfo.class, new RMIPostProcessor(rrm)));
-		typeinfosread.add(ti_proxyinfo);
+		TypeInfo ti_rr = new TypeInfo(new XMLInfo(pr), 
+			new ObjectInfo(ProxyReference.class, new RMIPostProcessor(rrm)));
+		typeinfosread.add(ti_rr);
 		
 		Set typeinfoswrite = JavaWriter.getTypeInfos();
-		TypeInfo ti_proxyable = new TypeInfo(new XMLInfo(proxyinfo, null, false, new RMIPreProcessor(rrm)), 
+		TypeInfo ti_proxyable = new TypeInfo(new XMLInfo(pr, null, false, new RMIPreProcessor(rrm)), 
 			new ObjectInfo(IProxyable.class));
 		typeinfoswrite.add(ti_proxyable);
 		
@@ -330,7 +330,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	/**
 	 *  Send the request message of a remote method invocation.
 	 */
-	public void sendMessage(IComponentIdentifier receiver, final Object content,
+	public void sendMessage(final IComponentIdentifier receiver, final Object content,
 		final String callid, final long to, final Future future)
 	{
 		final long timeout = to<=0? DEFAULT_TIMEOUT: to;
@@ -361,8 +361,8 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 						// Hack!!! Manual encoding for using custom class loader at receiver side.
 //						msg.put(SFipa.CONTENT, JavaWriter.objectToXML(content, ls.getClassLoader()));
 						
-						msg.put(SFipa.CONTENT, Writer.objectToXML(getWriter(), content, ls.getClassLoader()));
-
+						msg.put(SFipa.CONTENT, Writer.objectToXML(getWriter(), content, ls.getClassLoader(), receiver));
+						
 						IMessageService ms = (IMessageService)result;
 						ms.sendMessage(msg, SFipa.FIPA_MESSAGE_TYPE, component.getComponentIdentifier(), ls.getClassLoader())
 							.addResultListener(new IResultListener()

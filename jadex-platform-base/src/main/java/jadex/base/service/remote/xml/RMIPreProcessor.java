@@ -1,6 +1,7 @@
 package jadex.base.service.remote.xml;
 
 import jadex.base.service.remote.RemoteReferenceModule;
+import jadex.bridge.IComponentIdentifier;
 import jadex.commons.IProxyable;
 import jadex.commons.SReflect;
 import jadex.xml.IContext;
@@ -46,7 +47,7 @@ public class RMIPreProcessor implements IPreProcessor
 		if(remoteinterfaces.length==0)
 			throw new RuntimeException("Proxyable object has no remote references: "+object);
 
-		object = rrm.getProxyInfo(object, remoteinterfaces);
+		object = rrm.getProxyReference(object, remoteinterfaces, (IComponentIdentifier)context.getUserContext());
 		
 		return object;
 	}

@@ -3,6 +3,7 @@ package jadex.base.service.remote;
 import jadex.base.service.remote.commands.RemoteMethodInvocationCommand;
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.Future;
+import jadex.commons.ICommand;
 import jadex.commons.IFuture;
 import jadex.commons.SUtil;
 import jadex.commons.ThreadSuspendable;
@@ -35,18 +36,18 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 	/** The remote service management service. */
 	protected RemoteServiceManagementService rsms;
 
-	/** The proxy info. */
-	protected ProxyInfo pi;
+	/** The proxy reference. */
+	protected ProxyReference pr;
 	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new invocation handler.
 	 */
-	public RemoteMethodInvocationHandler(RemoteServiceManagementService rsms, ProxyInfo pi)
+	public RemoteMethodInvocationHandler(RemoteServiceManagementService rsms, ProxyReference pr)
 	{
 		this.rsms = rsms;
-		this.pi = pi;
+		this.pr = pr;
 //		System.out.println("handler: "+pi.getServiceIdentifier().getServiceType()+" "+pi.getCache());
 	}
 	
@@ -57,6 +58,7 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 	 */
 	public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
 	{
+		ProxyInfo pi = pr.getProxyInfo();
 //		System.out.println("remote method invoc: "+method.getName());
 		
 		// Test if method is excluded.
@@ -83,11 +85,17 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 		}
 		
 		// Test if finalize is called.
-//		if(finalize.equals(method))
-		if(method.getName().startsWith("fin"))
+		if(finalize.equals(method))
+//		if(method.getName().startsWith("fin"))
 		{
 //			System.out.println("Finalize called on: "+proxy);
-			rsms.getRemoteReferenceModule().removeProxy(pi.getRemoteReference());
+			rsms.component.scheduleStep(new ICommand()
+			{
+				public void execute(Object args)
+				{
+					rsms.getRemoteReferenceModule().removeProxy(pr.getRemoteReference());
+				}
+			});
 			return null;
 		}
 		
@@ -98,11 +106,17 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 		final IComponentIdentifier compid = rsms.getRMSComponentIdentifier();
 		final String callid = SUtil.createUniqueId(compid.getLocalName());
 		
-		RemoteMethodInvocationCommand content = new RemoteMethodInvocationCommand(
-			pi.getRemoteReference(), method.getName(), method.getParameterTypes(), args, callid);
+		final RemoteMethodInvocationCommand content = new RemoteMethodInvocationCommand(
+			pr.getRemoteReference(), method.getName(), method.getParameterTypes(), args, callid);
 		
-		rsms.sendMessage(pi.getRemoteReference().getRemoteManagementServiceIdentifier(), 
-			content, callid, -1, future);
+		rsms.component.scheduleStep(new ICommand()
+		{
+			public void execute(Object args)
+			{
+				rsms.sendMessage(pr.getRemoteReference().getRemoteManagementServiceIdentifier(), 
+					content, callid, -1, future);
+			}
+		});
 		
 		if(method.getReturnType().equals(void.class) && !pi.isSynchronous(method))
 		{
