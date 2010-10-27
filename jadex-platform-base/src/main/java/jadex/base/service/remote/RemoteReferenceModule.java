@@ -15,10 +15,10 @@ import jadex.commons.concurrent.IResultListener;
 import jadex.commons.service.IService;
 import jadex.commons.service.IServiceIdentifier;
 import jadex.commons.service.SServiceProvider;
+import jadex.micro.ExternalAccess;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -33,6 +33,8 @@ import java.util.Map;
  */
 public class RemoteReferenceModule
 {
+	public static boolean debug = true;
+	
 	//-------- attributes --------
 
 	/** The remote interface properties. */
@@ -68,10 +70,10 @@ public class RemoteReferenceModule
 	public RemoteReferenceModule(RemoteServiceManagementService rsms)
 	{
 		this.rsms = rsms;
-		this.interfaceproperties = Collections.synchronizedMap(new HashMap());
-		this.proxyinfos = Collections.synchronizedMap(new LRU(200));
-		this.targetobjects = Collections.synchronizedMap(new HashMap());
-		this.remoterefs = Collections.synchronizedMap(new HashMap());
+		this.interfaceproperties = new HashMap();
+		this.proxyinfos = new LRU(200);
+		this.targetobjects = new HashMap();
+		this.remoterefs = new HashMap();
 		
 		this.proxycount = new HashMap();
 		this.holders = new HashMap();
@@ -81,9 +83,12 @@ public class RemoteReferenceModule
 	
 	/**
 	 *  Get a remote reference for a component for transport. 
+	 *  (Called during marshalling from writer).
 	 */
 	public ProxyReference getProxyReference(Object target, Class[] remoteinterfaces, IComponentIdentifier tmpholder)
 	{
+		checkThread();
+		
 		// todo: should all ids of remote objects be saved in table?
 		
 		// Note: currently agents use model information e.g. componentviewer.viewerclass
@@ -100,21 +105,22 @@ public class RemoteReferenceModule
 		// a) fast access to existing proxyinfos in the map
 		// b) creation is performed only once by ordering threads 
 		// via synchronized block and rechecking if proxy was already created.
+		// -> not necessary due to only single threaded access via agent thread
 		
 		Object tcid = target instanceof IExternalAccess? (Object)((IExternalAccess)target).getModel().getFullName(): target.getClass();
 		ProxyInfo pi = (ProxyInfo)proxyinfos.get(tcid);
 		if(pi==null)
 		{
-			synchronized(proxyinfos)
-			{
-				pi = (ProxyInfo)proxyinfos.get(tcid);
-				if(pi==null)
-				{
+//			synchronized(proxyinfos)
+//			{
+//				pi = (ProxyInfo)proxyinfos.get(tcid);
+//				if(pi==null)
+//				{
 					pi = createProxyInfo(target, remoteinterfaces);
 					proxyinfos.put(tcid, pi);
 //					System.out.println("add: "+tcid+" "+ret);
-				}
-			}
+//				}
+//			}
 		}
 		
 		return new ProxyReference(pi, rr);
@@ -123,8 +129,9 @@ public class RemoteReferenceModule
 	/**
 	 *  Create a proxy info for a service. 
 	 */
-	public ProxyInfo createProxyInfo(Object target, Class[] remoteinterfaces)
+	protected ProxyInfo createProxyInfo(Object target, Class[] remoteinterfaces)
 	{
+		checkThread();
 		// todo: dgc, i.e. remember that target is a remote object (for which a proxyinfo is sent away).
 		
 		ProxyInfo ret = new ProxyInfo(remoteinterfaces);
@@ -349,6 +356,7 @@ public class RemoteReferenceModule
 	 */
 	protected RemoteReference getRemoteReference(Object target)
 	{
+		checkThread();
 		RemoteReference ret = (RemoteReference)remoterefs.get(target);
 		
 		// Create a remote reference if not yet available.
@@ -380,6 +388,7 @@ public class RemoteReferenceModule
 	 */
 	protected void deleteRemoteReference(RemoteReference rr)
 	{
+		checkThread();
 		Object target = targetobjects.remove(rr);
 		remoterefs.remove(target);
 //		System.out.println("Removing rr: "+rr+" "+target);
@@ -391,6 +400,7 @@ public class RemoteReferenceModule
 	 */
 	protected void shutdown()
 	{
+		checkThread();
 		RemoteReference[] rrs = (RemoteReference[])proxycount.keySet().toArray(new RemoteReference[0]);
 		for(int i=0; i<rrs.length; i++)
 		{
@@ -405,6 +415,7 @@ public class RemoteReferenceModule
 	 */
 	public IFuture getTargetObject(RemoteReference rr)
 	{
+		checkThread();
 		final Future ret = new Future();
 				
 		if(rr.getTargetIdentifier() instanceof IServiceIdentifier)
@@ -483,6 +494,7 @@ public class RemoteReferenceModule
 	 */
 	protected Object removeTargetObject(RemoteReference rr)
 	{
+		checkThread();
 		return targetobjects.remove(rr);
 	}
 	
@@ -490,8 +502,9 @@ public class RemoteReferenceModule
 	 *  Generate a remote reference.
 	 *  @return The remote reference.
 	 */
-	protected synchronized RemoteReference generateRemoteReference()
+	protected RemoteReference generateRemoteReference()
 	{
+		checkThread();
 		return new RemoteReference(rsms.getRMSComponentIdentifier(), ""+idcnt++);
 	}
 	
@@ -503,6 +516,7 @@ public class RemoteReferenceModule
 	 */
 	public Object getProxy(ProxyReference pr)
 	{
+		checkThread();
 		Object ret;
 		
 //		RemoteReference rr = pi.getRemoteReference();
@@ -554,29 +568,27 @@ public class RemoteReferenceModule
 	 *  Increment the proxy count for a remote reference.
 	 *  @param rr The remote reference for the proxy.
 	 */
-	protected synchronized void incProxyCount(RemoteReference rr)
+	protected void incProxyCount(RemoteReference rr)
 	{
+		checkThread();
 		// Only keep track of proxies for java objects.
 		// Components and services are not subject of gc.
 		
 		if(rr.isObjectReference())
 		{
 			boolean notify = false;
-			synchronized(this)
+			Integer cnt = (Integer)proxycount.get(rr);
+			if(cnt==null)
 			{
-				Integer cnt = (Integer)proxycount.get(rr);
-				if(cnt==null)
-				{
-					proxycount.put(rr, new Integer(1));
-					notify = true;
-				}
-				else
-				{
-					proxycount.put(rr, new Integer(cnt.intValue()+1));
-				}
-				
-	//			System.out.println("Add proxy: "+rr+" "+cnt);
+				proxycount.put(rr, new Integer(1));
+				notify = true;
 			}
+			else
+			{
+				proxycount.put(rr, new Integer(cnt.intValue()+1));
+			}
+				
+	//		System.out.println("Add proxy: "+rr+" "+cnt);
 			
 			if(notify)
 				sendAddRemoteReference(rr);
@@ -587,31 +599,29 @@ public class RemoteReferenceModule
 	 *  Decrease the proxy count for a remote reference.
 	 *  @param rr The remote reference for the proxy.
 	 */
-	protected synchronized void decProxyCount(RemoteReference rr)
+	protected void decProxyCount(RemoteReference rr)
 	{
+		checkThread();
 		// Only keep track of proxies for java objects.
 		// Components and services are not subject of gc.
 		
 		if(rr.isObjectReference())
 		{
 			boolean notify = false;
-			synchronized(this)
+			Integer cnt = (Integer)proxycount.get(rr);
+			int nv = cnt.intValue()-1;
+			if(nv==0)
 			{
-				Integer cnt = (Integer)proxycount.get(rr);
-				int nv = cnt.intValue()-1;
-				if(nv==0)
-				{
-					proxycount.remove(rr);
-					notify = true;
+				proxycount.remove(rr);
+				notify = true;
 //					System.out.println("Remove proxy: "+rr+" "+nv);
-				}
-				else
-				{
-					proxycount.put(rr, new Integer(nv));
-				}
-				
-	//			System.out.println("Remove proxy: "+rr+" "+nv);
 			}
+			else
+			{
+				proxycount.put(rr, new Integer(nv));
+			}
+				
+	//		System.out.println("Remove proxy: "+rr+" "+nv);
 			if(notify)
 				sendRemoveRemoteReference(rr);
 		}
@@ -623,6 +633,7 @@ public class RemoteReferenceModule
 	 */
 	protected void sendAddRemoteReference(RemoteReference rr)
 	{
+		checkThread();
 		// DGC: notify rr origin that a new proxy of target object exists
 		// todo: handle failures!
 		Future future = new Future();
@@ -644,6 +655,7 @@ public class RemoteReferenceModule
 	 */
 	public void sendRemoveRemoteReference(RemoteReference rr)
 	{
+		checkThread();
 		// DGC: notify rr origin that a new proxy of target object exists
 		// todo: handle failures!
 		Future future = new Future();
@@ -666,6 +678,7 @@ public class RemoteReferenceModule
 	 */
 	protected void addTemporaryRemoteReference(final RemoteReference rr, final IComponentIdentifier holder)
 	{
+		checkThread();
 //		System.out.println("Coming (temp add): "+rr+" add: "+holder);
 		getTargetObject(rr).addResultListener(new DefaultResultListener()
 		{
@@ -700,6 +713,7 @@ public class RemoteReferenceModule
 	 */
 	public void addRemoteReference(final RemoteReference rr, final IComponentIdentifier holder)
 	{
+		checkThread();
 		getTargetObject(rr).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
@@ -739,6 +753,7 @@ public class RemoteReferenceModule
 	 */
 	public void removeRemoteReference(final RemoteReference rr, final IComponentIdentifier holder)
 	{
+		checkThread();
 		getTargetObject(rr).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
@@ -760,5 +775,20 @@ public class RemoteReferenceModule
 				}
 			}
 		});
+	}
+	
+	/**
+	 *  Check if correct thread access.
+	 */
+	protected void checkThread()
+	{
+		if(debug)
+		{
+			if(((ExternalAccess)rsms.getComponent()).getInterpreter().isExternalThread())
+			{
+				System.out.println("wrong thread: "+Thread.currentThread());
+				Thread.dumpStack();
+			}
+		}
 	}
 }

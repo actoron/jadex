@@ -109,14 +109,9 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 		final RemoteMethodInvocationCommand content = new RemoteMethodInvocationCommand(
 			pr.getRemoteReference(), method.getName(), method.getParameterTypes(), args, callid);
 		
-		rsms.component.scheduleStep(new ICommand()
-		{
-			public void execute(Object args)
-			{
-				rsms.sendMessage(pr.getRemoteReference().getRemoteManagementServiceIdentifier(), 
-					content, callid, -1, future);
-			}
-		});
+		// Can be invoked directly, because uses internally redirects to agent thread.
+		rsms.sendMessage(pr.getRemoteReference().getRemoteManagementServiceIdentifier(), 
+			content, callid, -1, future);
 		
 		if(method.getReturnType().equals(void.class) && !pi.isSynchronous(method))
 		{
