@@ -96,6 +96,27 @@ public class ExternalAccess implements IMicroExternalAccess
 	{
 		return interpreter.scheduleResultStep(step);
 	}
+	
+	// todo: support with IResultCommand also?!
+	/**
+	 *  Wait for an specified amount of time.
+	 *  @param time The time.
+	 *  @param run The runnable.
+	 */
+	public IFuture waitFor(long time, ICommand run)
+	{
+		return agent.waitFor(time, run);
+	}
+	
+	// todo: support with IResultCommand also?!
+	/**
+	 *  Wait for the next tick.
+	 *  @param time The time.
+	 */
+	public IFuture waitForTick(ICommand run)
+	{
+		return agent.waitForTick(run);
+	}
 
 	/**
 	 *  Get the agent implementation.

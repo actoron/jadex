@@ -6,6 +6,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.Future;
+import jadex.commons.ICommand;
 import jadex.commons.IFuture;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
@@ -15,6 +16,7 @@ import jadex.commons.concurrent.IResultListener;
 import jadex.commons.service.IService;
 import jadex.commons.service.IServiceIdentifier;
 import jadex.commons.service.SServiceProvider;
+import jadex.commons.service.clock.IClockService;
 import jadex.micro.ExternalAccess;
 
 import java.lang.reflect.Method;
@@ -22,6 +24,7 @@ import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.TreeMap;
 
 /**
  *  This class implements the rmi handling. It mainly supports:
@@ -34,6 +37,12 @@ import java.util.Map;
 public class RemoteReferenceModule
 {
 	public static boolean debug = true;
+
+	public static long DEFAULT_LEASETIME = 15000;
+	
+	public static long DEFAULT_BUFFERTIME = 3000;
+	
+	protected static long renewidcnt; 
 	
 	//-------- attributes --------
 
@@ -59,24 +68,35 @@ public class RemoteReferenceModule
 	/** The proxycount count map. (rr -> number of proxies created for rr). */
 	protected Map proxycount;
 	
-	/** The remote reference holders of a object (object -> holder (rms cid)). */
+	/** The remote reference holders of a object (rr -> holder (rms cid)). */
 	protected Map holders;
+	
+	
+	/** The clock. */
+	protected IClockService clock;
+	
+	/** The renew behaviour id. */
+	protected long renewid;
 	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new remote reference module.
 	 */
-	public RemoteReferenceModule(RemoteServiceManagementService rsms)
+	public RemoteReferenceModule(RemoteServiceManagementService rsms, IClockService clock)
 	{
 		this.rsms = rsms;
+		this.clock = clock;
+		
 		this.interfaceproperties = new HashMap();
 		this.proxyinfos = new LRU(200);
 		this.targetobjects = new HashMap();
 		this.remoterefs = new HashMap();
 		
-		this.proxycount = new HashMap();
+		this.proxycount = new TreeMap();
 		this.holders = new HashMap();
+		
+		startRemovalBehaviour();
 	}
 	
 	//-------- methods --------
@@ -582,6 +602,12 @@ public class RemoteReferenceModule
 			{
 				proxycount.put(rr, new Integer(1));
 				notify = true;
+				
+				// todo: transfer lease time interval?!
+				rr.setExpiryDate(clock.getTime()+DEFAULT_LEASETIME);
+				
+				// Initiate check procedure.
+				startRenewalBehaviour();
 			}
 			else
 			{
@@ -593,6 +619,105 @@ public class RemoteReferenceModule
 			if(notify)
 				sendAddRemoteReference(rr);
 		}
+	}
+	
+	/**
+	 * 
+	 */
+	protected void startRenewalBehaviour()
+	{
+		final long renewid = renewidcnt++;
+		this.renewid = renewid;	
+		
+		rsms.getComponent().scheduleStep(new ICommand()
+		{
+			public void execute(Object args)
+			{
+				if(renewid == RemoteReferenceModule.this.renewid)
+				{
+					long diff = 0;
+					for(Iterator it = proxycount.keySet().iterator(); it.hasNext(); )
+					{
+						RemoteReference rr = (RemoteReference)it.next();
+						diff = rr.getExpiryDate()-clock.getTime();
+						if(diff<=0)
+						{
+							System.out.println("renewal sent for: "+rr);
+							sendAddRemoteReference(rr);
+							
+							// todo: use anwer of send for updating expiry date?!
+							Object entry = proxycount.remove(rr);
+							long expirydate = clock.getTime()+DEFAULT_LEASETIME;
+							rr.setExpiryDate(expirydate);
+							proxycount.put(rr, entry);
+							
+							diff = DEFAULT_LEASETIME;
+						}
+						else
+						{
+							break;
+						}
+					}
+					
+					if(proxycount.size()>0 && diff>0)
+					{
+						System.out.println("renewal behaviour waiting: "+diff);
+						rsms.getComponent().waitFor(diff, this);
+					}
+				}
+				
+//				System.out.println("renewal behaviour exit");
+			}
+		});
+	}
+	
+	/**
+	 *  Start removal behavior for expired holders.
+	 */
+	protected void startRemovalBehaviour()
+	{
+		final long renewid = renewidcnt++;
+		this.renewid = renewid;	
+		
+		rsms.getComponent().scheduleStep(new ICommand()
+		{
+			public void execute(Object args)
+			{
+				if(renewid == RemoteReferenceModule.this.renewid)
+				{
+					ICommand gcc = new ICommand()
+					{
+						public void execute(Object args)
+						{
+							if(holders.size()>0)
+								System.out.println("Checking holders: "+holders);
+							
+							for(Iterator it=holders.keySet().iterator(); it.hasNext(); )
+							{
+								RemoteReference rr = (RemoteReference)it.next();
+								Map hds = (Map)holders.get(rr);
+								for(Iterator it2=hds.keySet().iterator(); it2.hasNext(); )
+								{
+									RemoteReferenceHolder rrh = (RemoteReferenceHolder)it2.next();
+									if(clock.getTime() > rrh.getExpiryDate()+DEFAULT_BUFFERTIME)
+									{
+										System.out.println("Removing expired holder: "+rrh);
+										hds.remove(rrh);
+										if(hds.size()==0)
+										{
+											holders.remove(rr);
+											deleteRemoteReference(rr);
+										}
+									}
+								}
+							}
+							rsms.getComponent().waitFor(5000, this);
+						}
+					};
+					rsms.getComponent().waitFor(5000, gcc);
+				}
+			}
+		});
 	}
 	
 	/**
@@ -679,31 +804,27 @@ public class RemoteReferenceModule
 	protected void addTemporaryRemoteReference(final RemoteReference rr, final IComponentIdentifier holder)
 	{
 		checkThread();
-//		System.out.println("Coming (temp add): "+rr+" add: "+holder);
-		getTargetObject(rr).addResultListener(new DefaultResultListener()
+		Map hds = (Map)holders.get(rr);
+		if(hds==null)
 		{
-			public void resultAvailable(Object source, Object result)
-			{
-				Map hds = (Map)holders.get(result);
-				if(hds==null)
-				{
-					hds = new HashMap();
-					holders.put(result, hds);
-				}
-				
-				TemporaryHolder newth = new TemporaryHolder(holder);
-				TemporaryHolder oldth = (TemporaryHolder)hds.get(newth);
-				if(oldth==null)
-				{
-					hds.put(newth, newth);
-				}
-				else
-				{
-					oldth.setNumber(oldth.getNumber()+1);
-				}
-//				System.out.println("Holders for (temp add): "+result+" add: "+holder+" "+hds);
-			}
-		});
+			hds = new HashMap();
+			holders.put(rr, hds);
+		}
+		
+		long expirydate = clock.getTime()+DEFAULT_LEASETIME;
+		TemporaryRemoteReferenceHolder newth = new TemporaryRemoteReferenceHolder(holder, expirydate);
+		TemporaryRemoteReferenceHolder oldth = (TemporaryRemoteReferenceHolder)hds.get(newth);
+		if(oldth==null)
+		{
+			hds.put(newth, newth);
+		}
+		else
+		{
+			// Update existing holder.
+			oldth.setNumber(oldth.getNumber()+1);
+			oldth.setExpiryDate(expirydate);
+		}
+//		System.out.println("Holders for (temp add): "+result+" add: "+holder+" "+hds);
 	}
 	
 	/**
@@ -714,36 +835,45 @@ public class RemoteReferenceModule
 	public void addRemoteReference(final RemoteReference rr, final IComponentIdentifier holder)
 	{
 		checkThread();
-		getTargetObject(rr).addResultListener(new DefaultResultListener()
+		Map hds = (Map)holders.get(rr);
+		if(hds==null)
 		{
-			public void resultAvailable(Object source, Object result)
+			hds = new HashMap();
+			holders.put(rr, hds);
+		}
+		
+		long expirydate = clock.getTime()+DEFAULT_LEASETIME;
+		RemoteReferenceHolder newh = new RemoteReferenceHolder(holder, expirydate);
+		RemoteReferenceHolder oldh = (RemoteReferenceHolder)hds.get(newh);
+		
+		if(oldh==null)
+		{
+//			throw new RuntimeException("Holder already contained: "+holder);
+			hds.put(newh, newh);
+			
+			// Decrement number (and possibly remove) temporary holder.
+			TemporaryRemoteReferenceHolder th = (TemporaryRemoteReferenceHolder)hds.get(new TemporaryRemoteReferenceHolder(holder, 0));
+			if(th!=null)
 			{
-				Map hds = (Map)holders.get(result);
-				if(hds==null)
+				th.setNumber(th.getNumber()-1);
+				if(th.getNumber()==0)
 				{
-					hds = new HashMap();
-					holders.put(result, hds);
-				}
-				
-				if(!hds.containsKey(holder))
-				{
-//					throw new RuntimeException("Holder already contained: "+holder);
-					hds.put(holder, holder);
-					
-					TemporaryHolder th = (TemporaryHolder)hds.get(new TemporaryHolder(holder));
-					if(th!=null)
+					hds.remove(th);
+					if(hds.size()==0)
 					{
-						th.setNumber(th.getNumber()-1);
-						if(th.getNumber()==0)
-						{
-							hds.remove(th);
-						}
+						holders.remove(rr);
+						deleteRemoteReference(rr);
 					}
-					
-//					System.out.println("Holders for (add): "+result+" add: "+holder+" "+hds);
 				}
 			}
-		});
+//			System.out.println("Holders for (add): "+result+" add: "+holder+" "+hds);
+		}
+		else
+		{
+			// Renew expiry date of existing holder.
+			oldh.setExpiryDate(expirydate);
+			System.out.println("renewed lease for: "+rr+" "+oldh);
+		}
 	}
 	
 	/**
@@ -754,27 +884,21 @@ public class RemoteReferenceModule
 	public void removeRemoteReference(final RemoteReference rr, final IComponentIdentifier holder)
 	{
 		checkThread();
-		getTargetObject(rr).addResultListener(new DefaultResultListener()
-		{
-			public void resultAvailable(Object source, Object result)
-			{
-				Map hds = (Map)holders.get(result);
-//				if(hds==null || !hds.contains(holder))
-//					throw new RuntimeException("Holder not contained: "+holder);
+		Map hds = (Map)holders.get(rr);
+//		if(hds==null || !hds.contains(holder))
+//			throw new RuntimeException("Holder not contained: "+holder);
 
-//				System.out.println("Holders for (rem): "+result+" rem: "+holder+" "+hds);
-				
-				if(hds!=null)
-				{
-					hds.remove(holder);
-					if(hds.size()==0)
-					{
-						holders.remove(hds);
-						deleteRemoteReference(rr);
-					}
-				}
+//		System.out.println("Holders for (rem): "+result+" rem: "+holder+" "+hds);
+		
+		if(hds!=null)
+		{
+			hds.remove(new RemoteReferenceHolder(holder, 0));
+			if(hds.size()==0)
+			{
+				holders.remove(rr);
+				deleteRemoteReference(rr);
 			}
-		});
+		}
 	}
 	
 	/**

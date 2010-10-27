@@ -6,6 +6,7 @@ import jadex.bridge.MessageType;
 import jadex.commons.ICommand;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.service.SServiceProvider;
+import jadex.commons.service.clock.IClockService;
 import jadex.commons.service.library.ILibraryService;
 import jadex.micro.MicroAgent;
 import jadex.xml.bean.JavaReader;
@@ -34,26 +35,33 @@ public class RemoteServiceManagementAgent extends MicroAgent
 	 */
 	public void agentCreated()
 	{
-		rms = new RemoteServiceManagementService(getExternalAccess());
-		addService(rms);
+		SServiceProvider.getService(getServiceProvider(), IClockService.class)
+			.addResultListener(createResultListener(new DefaultResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				rms = new RemoteServiceManagementService(getExternalAccess(), (IClockService)result);
+				addService(rms);
+			}
+		}));
 	}
 	
-	/**
-	 *  Execute the functional body of the agent.
-	 *  Is only called once.
-	 */
-	public void executeBody()
-	{
-		ICommand gcc = new ICommand()
-		{
-			public void execute(Object args)
-			{
-				System.gc();
-				waitFor(5000, this);
-			}
-		};
-		waitFor(5000, gcc);
-	}
+//	/**
+//	 *  Execute the functional body of the agent.
+//	 *  Is only called once.
+//	 */
+//	public void executeBody()
+//	{
+//		ICommand gcc = new ICommand()
+//		{
+//			public void execute(Object args)
+//			{
+//				System.gc();
+//				waitFor(5000, this);
+//			}
+//		};
+//		waitFor(5000, gcc);
+//	}
 	
 	/**
 	 *  Called just before the agent is removed from the platform.

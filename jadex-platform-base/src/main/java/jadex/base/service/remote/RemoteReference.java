@@ -7,7 +7,7 @@ import jadex.commons.service.IServiceIdentifier;
 /**
  *  Remote reference for locating a specific target object in another platform.
  */
-public class RemoteReference
+public class RemoteReference implements Comparable
 {
 	//-------- attributes --------
 	
@@ -16,6 +16,9 @@ public class RemoteReference
 	
 	/** The target identifier (sid, cid, or tid). */
 	protected Object targetid;
+	
+	/** The expiry date. */
+	protected long expirydate;
 	
 	//-------- constructors --------
 
@@ -84,6 +87,24 @@ public class RemoteReference
 	{
 		return !(targetid instanceof IComponentIdentifier) && !(targetid instanceof IServiceIdentifier);
 	}
+	
+	/**
+	 *  Get the expirydate.
+	 *  @return The expirydate.
+	 */
+	public long getExpiryDate()
+	{
+		return expirydate;
+	}
+
+	/**
+	 *  Set the expirydate.
+	 *  @param expirydate The expirydate to set.
+	 */
+	public void setExpiryDate(long expirydate)
+	{
+		this.expirydate = expirydate;
+	}
 
 	/**
 	 *  Get the hashcode.
@@ -107,6 +128,18 @@ public class RemoteReference
 			RemoteReference other = (RemoteReference)obj;
 			ret = SUtil.equals(rms, other.rms) && SUtil.equals(targetid, other.targetid);
 		}
+		return ret;
+	}
+	
+	/**
+	 *  Compare to another object.
+	 */
+	public int compareTo(Object obj)
+	{
+		RemoteReference other = (RemoteReference)obj;
+		int ret = (int)(expirydate-other.expirydate);
+		if(ret==0)
+			ret = hashCode()-other.hashCode();
 		return ret;
 	}
 

@@ -1,15 +1,23 @@
 package jadex.base.service.remote;
 
+/**
+ *  A proxy reference is the transfer format of a remote reference which should
+ *  be made to a proxy on the other side.
+ */
 public class ProxyReference
 {
+	//-------- attributes --------
+	
 	/** The proxy info. */
 	protected ProxyInfo pi;
 	
+	/** The remote reference. */
 	protected RemoteReference rr;
 	
+	//-------- constructors --------
 	
 	/**
-	 * 
+	 *  Create a new proxy reference.
 	 */
 	public ProxyReference()
 	{
@@ -17,7 +25,7 @@ public class ProxyReference
 	}
 
 	/**
-	 * 
+	 *  Create a new proxy reference.
 	 */
 	public ProxyReference(ProxyInfo pi, RemoteReference rr)
 	{
@@ -25,6 +33,8 @@ public class ProxyReference
 		this.rr = rr;
 	}
 
+	//-------- methods --------
+	
 	/**
 	 *  Get the proxy info.
 	 *  @return The proxy info.

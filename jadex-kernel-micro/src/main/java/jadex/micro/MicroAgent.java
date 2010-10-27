@@ -221,7 +221,7 @@ public abstract class MicroAgent implements IMicroAgent
 	protected long	longtime	= 0;
 	
 	/**
-	 *  Wait for an secified amount of time.
+	 *  Wait for an specified amount of time.
 	 *  @param time The time.
 	 *  @param run The runnable.
 	 */
@@ -278,10 +278,12 @@ public abstract class MicroAgent implements IMicroAgent
 	 *  Wait for the next tick.
 	 *  @param time The time.
 	 */
-	public void waitForTick(final ICommand run)
+	public IFuture waitForTick(final ICommand run)
 	{
+		final Future ret = new Future();
+		
 		SServiceProvider.getService(getServiceProvider(), IClockService.class)
-			.addResultListener(createResultListener(new DefaultResultListener()
+			.addResultListener(createResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
@@ -307,8 +309,16 @@ public abstract class MicroAgent implements IMicroAgent
 					}
 				});
 				timers.add(ts[0]);
+				ret.setResult(new TimerWrapper(ts[0]));
+			}
+			
+			public void exceptionOccurred(Object source, Exception exception)
+			{
+				ret.setException(exception);
 			}
 		}));
+		
+		return ret;
 	}
 	
 	/**

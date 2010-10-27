@@ -35,4 +35,19 @@ public interface IMicroExternalAccess	extends IExternalAccess
 	 */
 	public IFuture scheduleResultStep(IResultCommand com);
 	
+	// todo: support with IResultCommand also?!
+	/**
+	 *  Wait for an specified amount of time.
+	 *  @param time The time.
+	 *  @param run The runnable.
+	 */
+	public IFuture waitFor(final long time, final ICommand run);
+	
+	// todo: support with IResultCommand also?!
+	/**
+	 *  Wait for the next tick.
+	 *  @param time The time.
+	 */
+	public IFuture waitForTick(final ICommand run);
+	
 }

@@ -30,6 +30,8 @@ import jadex.commons.service.IService;
 import jadex.commons.service.IVisitDecider;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.TypeResultSelector;
+import jadex.commons.service.clock.IClock;
+import jadex.commons.service.clock.IClockService;
 import jadex.commons.service.clock.ITimer;
 import jadex.commons.service.library.ILibraryService;
 import jadex.micro.IMicroExternalAccess;
@@ -104,12 +106,12 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	/**
 	 *  Create a new remote service management service.
 	 */
-	public RemoteServiceManagementService(IMicroExternalAccess component)
+	public RemoteServiceManagementService(IMicroExternalAccess component, IClockService clock)
 	{
 		super(component.getServiceProvider().getId(), IRemoteServiceManagementService.class, null);
 
 		this.component = component;
-		this.rrm = new RemoteReferenceModule(this);
+		this.rrm = new RemoteReferenceModule(this, clock);
 		this.waitingcalls = new HashMap();
 		
 		QName[] pr = new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"jadex.base.service.remote", "ProxyReference")};
@@ -266,7 +268,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	 *  Get the component.
 	 *  @return the component.
 	 */
-	public IExternalAccess getComponent()
+	public IMicroExternalAccess getComponent()
 	{
 		return component;
 	}

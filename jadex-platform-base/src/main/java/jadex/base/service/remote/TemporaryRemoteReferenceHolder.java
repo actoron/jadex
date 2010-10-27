@@ -8,12 +8,9 @@ import jadex.bridge.IComponentIdentifier;
  *  a temporary holder is added until the normal addRef message
  *  arrives from the receiver. 
  */
-public class TemporaryHolder
+public class TemporaryRemoteReferenceHolder extends RemoteReferenceHolder
 {
 	//-------- attributes --------
-	
-	/** The holder cid (of the rms). */
-	protected IComponentIdentifier holder;
 	
 	/** Number of open protocls. */
 	protected int number;
@@ -23,32 +20,14 @@ public class TemporaryHolder
 	/**
 	 *  Create a new temporary holder.
 	 */
-	public TemporaryHolder(IComponentIdentifier holder)
+	public TemporaryRemoteReferenceHolder(IComponentIdentifier holder, long expirydate)
 	{
-		this.holder = holder;
+		super(holder, expirydate);
 		this.number = 1;
 	}
 
 	//-------- methods --------
 	
-	/**
-	 *  Get the holder.
-	 *  @return the holder.
-	 */
-	public IComponentIdentifier getHolder()
-	{
-		return holder;
-	}
-
-	/**
-	 *  Set the holder.
-	 *  @param holder The holder to set.
-	 */
-	public void setHolder(IComponentIdentifier holder)
-	{
-		this.holder = holder;
-	}
-
 	/**
 	 *  Get the number.
 	 *  @return the number.
@@ -73,30 +52,15 @@ public class TemporaryHolder
 	 */
 	public int hashCode()
 	{
-		return 31 * holder.hashCode();
+		return 19 * holder.hashCode();
 	}
-
-	/**
-	 *  Test for equality.
-	 *  @param obj The object to test.
-	 */
-	public boolean equals(Object obj)
-	{
-		boolean ret = false;
-		if(obj instanceof TemporaryHolder)
-		{
-			TemporaryHolder other = (TemporaryHolder)obj;
-			ret = holder.equals(other.holder);
-		}
-		return ret;
-	}
-
+	
 	/**
 	 *  Get the string representation.
 	 *  @return The string representation.
 	 */
 	public String toString()
 	{
-		return "TemporarayHolder(holder=" + holder + ", number=" + number+ ")";
+		return "TemporarayRemoteReferenceHolder(holder=" + holder + ", number=" + number+ " , expirydater=" + expirydate+")";
 	}
 }
