@@ -24,10 +24,12 @@ import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 
-
+/**
+ *  Project builder that loads XML ADFs and adds the errors
+ *  as problem markers in the XML file.
+ */
 public class ADFChecker extends IncrementalProjectBuilder
 {
-
 	class SampleDeltaVisitor implements IResourceDeltaVisitor
 	{
 		/*

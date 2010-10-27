@@ -12,28 +12,38 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
 
-public class ToggleNatureAction implements IObjectActionDelegate {
-
-	private ISelection selection;
+/**
+ *  Menu action to enable/disable the project nature,
+ *  which includes the Jadex ADF check builder.
+ */
+public class ToggleNatureAction implements IObjectActionDelegate
+{
+	private ISelection	selection;
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see org.eclipse.ui.IActionDelegate#run(org.eclipse.jface.action.IAction)
 	 */
-	public void run(IAction action) {
-		if (selection instanceof IStructuredSelection) {
-			for (Iterator it = ((IStructuredSelection) selection).iterator(); it
-					.hasNext();) {
+	public void run(IAction action)
+	{
+		if(selection instanceof IStructuredSelection)
+		{
+			for(Iterator it = ((IStructuredSelection)selection).iterator(); it
+					.hasNext();)
+			{
 				Object element = it.next();
 				IProject project = null;
-				if (element instanceof IProject) {
-					project = (IProject) element;
-				} else if (element instanceof IAdaptable) {
-					project = (IProject) ((IAdaptable) element)
+				if(element instanceof IProject)
+				{
+					project = (IProject)element;
+				}
+				else if(element instanceof IAdaptable)
+				{
+					project = (IProject)((IAdaptable)element)
 							.getAdapter(IProject.class);
 				}
-				if (project != null) {
+				if(project != null)
+				{
 					toggleNature(project);
 				}
 			}
@@ -42,36 +52,41 @@ public class ToggleNatureAction implements IObjectActionDelegate {
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.IActionDelegate#selectionChanged(org.eclipse.jface.action.IAction,
-	 *      org.eclipse.jface.viewers.ISelection)
+	 * @see
+	 * org.eclipse.ui.IActionDelegate#selectionChanged(org.eclipse.jface.action
+	 * .IAction, org.eclipse.jface.viewers.ISelection)
 	 */
-	public void selectionChanged(IAction action, ISelection selection) {
+	public void selectionChanged(IAction action, ISelection selection)
+	{
 		this.selection = selection;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.IObjectActionDelegate#setActivePart(org.eclipse.jface.action.IAction,
-	 *      org.eclipse.ui.IWorkbenchPart)
+	 * @see
+	 * org.eclipse.ui.IObjectActionDelegate#setActivePart(org.eclipse.jface.
+	 * action.IAction, org.eclipse.ui.IWorkbenchPart)
 	 */
-	public void setActivePart(IAction action, IWorkbenchPart targetPart) {
+	public void setActivePart(IAction action, IWorkbenchPart targetPart)
+	{
 	}
 
 	/**
 	 * Toggles sample nature on a project
 	 * 
-	 * @param project
-	 *            to have sample nature added or removed
+	 * @param project to have sample nature added or removed
 	 */
-	private void toggleNature(IProject project) {
-		try {
+	private void toggleNature(IProject project)
+	{
+		try
+		{
 			IProjectDescription description = project.getDescription();
 			String[] natures = description.getNatureIds();
 
-			for (int i = 0; i < natures.length; ++i) {
-				if (JadexNature.NATURE_ID.equals(natures[i])) {
+			for(int i = 0; i < natures.length; ++i)
+			{
+				if(JadexNature.NATURE_ID.equals(natures[i]))
+				{
 					// Remove the nature
 					String[] newNatures = new String[natures.length - 1];
 					System.arraycopy(natures, 0, newNatures, 0, i);
@@ -89,8 +104,9 @@ public class ToggleNatureAction implements IObjectActionDelegate {
 			newNatures[natures.length] = JadexNature.NATURE_ID;
 			description.setNatureIds(newNatures);
 			project.setDescription(description, null);
-		} catch (CoreException e) {
+		}
+		catch(CoreException e)
+		{
 		}
 	}
-
 }
