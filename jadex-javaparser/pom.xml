@@ -151,12 +151,12 @@
 	</build>
 
 	<dependencies>
-		<dependency>
+<!-- 		<dependency>
 			<groupId>net.java.dev.javacc</groupId>
 			<artifactId>javacc</artifactId>
 			<version>4.0</version>
 		</dependency>
-
+ -->
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-commons</artifactId>

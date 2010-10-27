@@ -22,6 +22,7 @@ import jadex.xml.IObjectStringConverter;
 import jadex.xml.IPostProcessor;
 import jadex.xml.MappingInfo;
 import jadex.xml.ObjectInfo;
+import jadex.xml.StackElement;
 import jadex.xml.SubobjectInfo;
 import jadex.xml.TypeInfo;
 import jadex.xml.XMLInfo;
@@ -198,10 +199,6 @@ public class OAVBDIXMLReader
 		
 		typeinfos.add(ti_belset);
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "beliefsetref")), new ObjectInfo(OAVBDIMetaModel.beliefsetreference_type)));
-//		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "fact")), new ObjectInfo(OAVBDIMetaModel.expression_type, expost), 
-//			new MappingInfo(null, null, new AttributeInfo(new AccessInfo((String)null, OAVBDIMetaModel.expression_has_content), exatconv))));
-//		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "facts")), new ObjectInfo(OAVBDIMetaModel.expression_type, expost), 
-//			new MappingInfo(null, null, new AttributeInfo(new AccessInfo((String)null, OAVBDIMetaModel.expression_has_content), exatconv))));
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "fact")), new ObjectInfo(OAVBDIMetaModel.expression_type, expost), 
 			new MappingInfo(ti_expression)));
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "facts")), new ObjectInfo(OAVBDIMetaModel.expression_type, expost), 
@@ -218,10 +215,6 @@ public class OAVBDIXMLReader
 			new MappingInfo(null, new AttributeInfo[]{
 			new AttributeInfo(new AccessInfo("class", OAVBDIMetaModel.body_has_impl, AccessInfo.IGNORE_WRITE)), 
 			new AttributeInfo(new AccessInfo("impl", OAVBDIMetaModel.body_has_impl))}, null)));//, bopost));
-//		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "precondition")), new ObjectInfo(OAVBDIMetaModel.expression_type, expost), 
-//			new MappingInfo(null, null, OAVBDIMetaModel.expression_has_content)));
-//		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "contextcondition")), new ObjectInfo(OAVBDIMetaModel.condition_type, expost), 
-//			new MappingInfo(null, null, OAVBDIMetaModel.expression_has_content)));
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "precondition")), new ObjectInfo(OAVBDIMetaModel.expression_type, expost), 
 			new MappingInfo(ti_expression)));
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "contextcondition")), new ObjectInfo(OAVBDIMetaModel.condition_type, expost), 
@@ -244,9 +237,6 @@ public class OAVBDIXMLReader
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "trigger"), new QName(uri, "messageevent")}), new ObjectInfo(OAVBDIMetaModel.triggerreference_type)));
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "trigger"), new QName(uri, "goalfinished")}), new ObjectInfo(OAVBDIMetaModel.triggerreference_type)));
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "trigger"), new QName(uri, "goal")}), new ObjectInfo(OAVBDIMetaModel.triggerreference_type)));
-//		typeinfos.add(new TypeInfo(null, "trigger/factadded", OAVJavaType.java_string_type));
-//		typeinfos.add(new TypeInfo(null, "trigger/factremoved", OAVJavaType.java_string_type));
-//		typeinfos.add(new TypeInfo(null, "trigger/factchanged", OAVJavaType.java_string_type));
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "waitqueue")), new ObjectInfo(OAVBDIMetaModel.trigger_type)));
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "waitqueue"), new QName(uri, "internalevent")}), new ObjectInfo(OAVBDIMetaModel.triggerreference_type)));
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "waitqueue"), new QName(uri, "messageevent")}), new ObjectInfo(OAVBDIMetaModel.triggerreference_type)));
@@ -259,24 +249,17 @@ public class OAVBDIXMLReader
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "match")), new ObjectInfo(OAVBDIMetaModel.expression_type, expost), 
 			new MappingInfo(ti_expression)));
 		
-//		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "expression")), new ObjectInfo(OAVBDIMetaModel.expression_type, expost),
-//			new MappingInfo(null, null, OAVBDIMetaModel.expression_has_content)));
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "expression")), new ObjectInfo(OAVBDIMetaModel.expression_type, expost),
 			new MappingInfo(ti_expression)));
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "expressionref")), new ObjectInfo(OAVBDIMetaModel.expressionreference_type)));
 
-//		typeinfos.add(new TypeInfo(null, "expression/parameter", OAVBDIMetaModel.expressionparameter_type));
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "condition")), new ObjectInfo(OAVBDIMetaModel.condition_type, expost),
 			new MappingInfo(null, null, OAVBDIMetaModel.expression_has_content)));
 		
-//		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "service")), new ObjectInfo(OAVBDIMetaModel.expression_type, expost),
-//			new MappingInfo(null, null, OAVBDIMetaModel.expression_has_content)));
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "service")), new ObjectInfo(OAVBDIMetaModel.expression_type, expost),
 			new MappingInfo(ti_expression)));
 				
 		
-//		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "property")), new ObjectInfo(OAVBDIMetaModel.expression_type, expost),
-//			new MappingInfo(null, null, OAVBDIMetaModel.expression_has_content)));
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "property")), new ObjectInfo(OAVBDIMetaModel.expression_type, expost),
 			new MappingInfo(ti_expression)));
 		
@@ -311,25 +294,14 @@ public class OAVBDIXMLReader
 			new SubobjectInfo(new AccessInfo(new QName(uri, "values"), OAVBDIMetaModel.parameterset_has_valuesexpression)),	
 			new SubobjectInfo(new AccessInfo(new QName(uri, "value"), OAVBDIMetaModel.parameterset_has_values))	
 			})));
-//		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "value")), new ObjectInfo(OAVBDIMetaModel.expression_type, expost), 
-//			new MappingInfo(null, null, new AttributeInfo(new AccessInfo((String)null, OAVBDIMetaModel.expression_has_content), exatconv))));
-//		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "values")), new ObjectInfo(OAVBDIMetaModel.expression_type, expost), 
-//			new MappingInfo(null, null, new AttributeInfo(new AccessInfo((String)null, OAVBDIMetaModel.expression_has_content), exatconv))));
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "value")), new ObjectInfo(OAVBDIMetaModel.expression_type, expost), 
 			new MappingInfo(ti_expression)));
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "values")), new ObjectInfo(OAVBDIMetaModel.expression_type, expost), 
 			new MappingInfo(ti_expression)));
 
-//		typeinfos.add(new TypeInfo(null, "goalmapping", OAVJavaType.java_string_type));
-//		typeinfos.add(new TypeInfo(null, "messageeventmapping", OAVJavaType.java_string_type));
-//		typeinfos.add(new TypeInfo(null, "internaleventmapping", OAVJavaType.java_string_type));
-//		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "bindingoptions")), new ObjectInfo(OAVBDIMetaModel.expression_type, expost), 
-//			new MappingInfo(null, null, OAVBDIMetaModel.expression_has_content)));
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "bindingoptions")), new ObjectInfo(OAVBDIMetaModel.expression_type, expost), 
 			new MappingInfo(ti_expression)));
 					
-//		typeinfos.add(new TypeInfo(null, "concrete", OAVJavaType.java_string_type));
-
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "configurations")), null, 
 			new MappingInfo(null, new AttributeInfo[]{
 			new AttributeInfo(new AccessInfo("default", OAVBDIMetaModel.capability_has_defaultconfiguration))})));
@@ -396,6 +368,18 @@ public class OAVBDIXMLReader
 		return writer;
 	}
 
+	/**
+	 *  Report an error including the line and column.
+	 */
+	protected static void reportError(IContext context, String error)
+	{
+		MultiCollection	report	= (MultiCollection)((OAVUserContext)context.getUserContext()).getCustom();
+		Tuple	stack	= new Tuple(((ReadContext)context).getStack().toArray());
+		StackElement	se	= (StackElement)stack.get(stack.getEntities().length-1);
+		String	pos	= " (line "+se.getLine()+", column "+se.getColumn()+")"; 
+		report.put(stack, error+pos);
+	}
+	
 	//-------- helper classes --------
 	
 	/**
@@ -415,8 +399,6 @@ public class OAVBDIXMLReader
 		{
 			clpost.postProcess(context, object);
 			OAVUserContext	ouc	= (OAVUserContext)context.getUserContext();
-			MultiCollection	report	= (MultiCollection)ouc.getCustom();
-			Object	se	= new Tuple(((ReadContext)context).getStack().toArray());
 			IOAVState state = (IOAVState)ouc.getState();
 			
 			Object	ret	= null;
@@ -446,21 +428,19 @@ public class OAVBDIXMLReader
 						}
 						catch(Exception e)
 						{
-							report.put(se, e.toString());
-//							e.printStackTrace();
+							reportError(context, e.toString());
 						}
 						if(!errors.isEmpty())
 						{
 							for(int i=0; i<errors.size(); i++)
 							{
-								report.put(se, errors.get(i));
+								reportError(context, (String)errors.get(i));
 							}
 						}
 					}
 					else
 					{
-						report.put(se, "Unknown condition language: "+lang);
-//						throw new RuntimeException("Unknown condition language: "+lang);
+						reportError(context, "Unknown condition language: "+lang);
 					}	
 //					System.out.println(ret);
 
@@ -477,8 +457,7 @@ public class OAVBDIXMLReader
 						}
 						catch(Exception e)
 						{
-							report.put(se, e.toString());
-//							e.printStackTrace();
+							reportError(context, e.toString());
 						}
 					}
 					else if("clips".equals(lang))
@@ -493,16 +472,14 @@ public class OAVBDIXMLReader
 						}
 						catch(Exception e)
 						{
-							report.put(se, e.toString());
-//							e.printStackTrace();
+							reportError(context, e.toString());
 						}
 						if(!errors.isEmpty())
 						{
 							for(int i=0; i<errors.size(); i++)
 							{
-								report.put(se, errors.get(i));
+								reportError(context, (String)errors.get(i));
 							}
-//							throw new RuntimeException("Parse errors: "+value+" "+errors);
 						}
 					}
 					else if(lang.equals("jcl"))
@@ -511,8 +488,7 @@ public class OAVBDIXMLReader
 					}
 					else
 					{
-						report.put(se, "Unknown condition language: "+lang);
-//						throw new RuntimeException("Unknown condition language: "+lang);
+						reportError(context, "Unknown condition language: "+lang);
 					}
 				}
 			}
@@ -577,10 +553,7 @@ public class OAVBDIXMLReader
 				}
 				catch(Exception e)
 				{
-					MultiCollection	report	= (MultiCollection)ouc.getCustom();
-					Object	se	= new Tuple(((ReadContext)context).getStack().toArray());
-					report.put(se, e.toString());
-//					e.printStackTrace();
+					reportError(context, e.toString());
 				}
 			}
 			
@@ -610,12 +583,6 @@ public class OAVBDIXMLReader
 				ret = ((IParsedExpression)val).getExpressionText();
 			}
 			return ret;
-//			return ((IOAVState)context).getAttributeValue(val, OAVBDIMetaModel.expression_has_content);
 		}
-		
-		/*public boolean acceptsInputType(Class inputtype)
-		{
-			return true;
-		}*/
 	}
 }

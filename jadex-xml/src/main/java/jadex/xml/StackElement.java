@@ -28,6 +28,12 @@ public class StackElement
 	/** The type info. */
 	protected TypeInfo typeinfo;
 	
+	/** The line of the start tag. */
+	protected int line;
+	
+	/** The column of the start tag. */
+	protected int column;
+	
 	//-------- constructors --------
 	
 	/**
@@ -43,18 +49,20 @@ public class StackElement
 	 */
 	public StackElement(QName tag, Object object, Map rawattrs)
 	{
-		this(tag, object, rawattrs, null);
+		this(tag, object, rawattrs, null, -1, -1);
 	}
 	
 	/**
 	 *  Create a new stack element.
 	 */
-	public StackElement(QName tag, Object object, Map rawattrs, TypeInfo typeinfo)
+	public StackElement(QName tag, Object object, Map rawattrs, TypeInfo typeinfo, int line, int column)
 	{
 		this.tag = tag;
 		this.object = object;
 		this.rawattrs = rawattrs;
 		this.typeinfo = typeinfo;
+		this.line	= line;
+		this.column	= column;
 	}
 	
 	//-------- methods --------
@@ -112,6 +120,42 @@ public class StackElement
 	public TypeInfo getTypeInfo()
 	{
 		return this.typeinfo;
+	}
+	
+	/**
+	 *  Get the line.
+	 *  @return The line.
+	 */
+	public int getLine()
+	{
+		return this.line;
+	}
+	
+	/**
+	 *  Set the column.
+	 *  @param column The column to set.
+	 */
+	public void setColumn(int column)
+	{
+		this.column = column;
+	}
+	
+	/**
+	 *  Get the column.
+	 *  @return The column.
+	 */
+	public int getColumn()
+	{
+		return this.column;
+	}
+	
+	/**
+	 *  Set the line.
+	 *  @param line The line to set.
+	 */
+	public void setLine(int line)
+	{
+		this.line = line;
 	}
 
 	/**

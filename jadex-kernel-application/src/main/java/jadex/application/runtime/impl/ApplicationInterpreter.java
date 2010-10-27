@@ -31,7 +31,6 @@ import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.service.BasicService;
-import jadex.commons.service.CacheServiceContainer;
 import jadex.commons.service.IServiceContainer;
 import jadex.commons.service.IServiceProvider;
 import jadex.commons.service.SServiceProvider;
@@ -81,7 +80,6 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 	protected IComponentAdapter	adapter;
 	
 	/** The application type. */
-//	protected ApplicationModel model;
 	protected MApplicationType model;
 	
 	/** The parent component. */

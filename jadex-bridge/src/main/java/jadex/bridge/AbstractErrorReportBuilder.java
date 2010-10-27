@@ -145,7 +145,9 @@ public abstract class AbstractErrorReportBuilder
 		Tuple[]	elements	= getElements();
 		for(int i=0; i<elements.length; i++)
 		{
-			buf.append(elements[i]);
+			String	name	= getObjectName(getObject(elements[i]));
+			name	= name.replace("\n", " ");
+			buf.append(name);
 			buf.append(":\n");
 			String[]	messages	= 	getMessages(elements[i]);
 			for(int j=0; j<messages.length; j++)

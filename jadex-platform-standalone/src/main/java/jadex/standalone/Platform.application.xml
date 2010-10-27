@@ -214,6 +214,15 @@
 			</components>
 		</application>
 		
+		<!-- Configuration used by jadex.base.test.ComponentTestSuite -->
+		<application name="testcases">
+			<components>
+				<component name="kernel_micro" type="kernel_micro"/>
+				<component name="kernel_bdibpmn" type="kernel_bdibpmn"/>
+				<component name="kernel_bpmn" type="kernel_bpmn"/>
+			</components>
+		</application>
+		
 		<application name="creation_test_bdi">
 			<arguments>
 				<argument name="libpath">new Object[]{"../jadex-applications-bdi/target/classes"}</argument>

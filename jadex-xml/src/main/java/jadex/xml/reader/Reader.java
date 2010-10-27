@@ -232,7 +232,8 @@ public class Reader
 					if(!readcontext.getReadObjects().containsKey(idref))
 						throw new RuntimeException("idref not contained: "+idref);
 					object = readcontext.getReadObjects().get(idref);
-					StackElement se = new StackElement(localname, object, rawattrs, typeinfo);
+					StackElement se = new StackElement(localname, object, rawattrs, typeinfo,
+						parser.getLocation().getLineNumber(), parser.getLocation().getColumnNumber());
 					stack.add(se);
 				}
 				else
@@ -264,7 +265,8 @@ public class Reader
 						readcontext.getReadObjects().put(id, object);
 					}
 					
-					stack.add(new StackElement(localname, object, rawattrs, typeinfo));
+					stack.add(new StackElement(localname, object, rawattrs, typeinfo,
+						parser.getLocation().getLineNumber(), parser.getLocation().getColumnNumber()));
 					if(stack.size()==1)
 					{
 						readcontext.setRootObject(object);
@@ -397,7 +399,7 @@ public class Reader
 					}
 				}
 				
-				topse = new StackElement(topse.getTag(), val, topse.getRawAttributes());
+				topse = new StackElement(topse.getTag(), val, topse.getRawAttributes(), null, topse.getLine(), topse.getColumn());
 				stack.set(stack.size()-1, topse);
 //				readcontext.setTopse(topse);
 				// If this is the only element on stack, set also root to it

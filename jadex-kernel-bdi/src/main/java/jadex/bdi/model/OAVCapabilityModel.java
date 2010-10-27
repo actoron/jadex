@@ -1,6 +1,7 @@
 package jadex.bdi.model;
 
 import jadex.bdi.runtime.interpreter.AgentRules;
+import jadex.bridge.AbstractErrorReportBuilder;
 import jadex.bridge.Argument;
 import jadex.bridge.IArgument;
 import jadex.bridge.ModelInfo;
@@ -16,6 +17,7 @@ import jadex.javaparser.IParsedExpression;
 import jadex.rules.rulesystem.IRule;
 import jadex.rules.rulesystem.Rulebase;
 import jadex.rules.state.IOAVState;
+import jadex.xml.StackElement;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,6 +28,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import javax.xml.namespace.QName;
 
 /**
  *  The capability model contains the OAV capability model in a state
@@ -76,10 +80,85 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 		this.rulebase	= new Rulebase();
 		this.lastmod	= lastmod;
 		this.entries	= entries;
-	
+
 		boolean startable = !this.getClass().equals(OAVCapabilityModel.class);
 		this.modelinfo = new ModelInfo(getName(), getPackage(), getDescription(), null, getConfigurations(), getArguments(), 
 			getResults(), startable, filename, getProperties(), getClassLoader());
+	}
+	
+	/**
+	 *  Init the model info.
+	 */
+	public void initModelInfo()
+	{
+		// Build error report.
+		getModelInfo().setReport(new AbstractErrorReportBuilder(getModelInfo().getName(), getModelInfo().getFilename(),
+			new String[]{"Capability", "Belief", "Goal", "Plan", "Event"}, entries, getDocuments())
+		{
+			public boolean isInCategory(Object obj, String category)
+			{
+				boolean	ret	= false;
+				if("Capability".equals(category))
+				{
+					ret	= state.getType(obj).isSubtype(OAVBDIMetaModel.capabilityref_type);
+				}
+				else if("Belief".equals(category))
+				{
+					ret	= state.getType(obj).isSubtype(OAVBDIMetaModel.belief_type)
+						|| state.getType(obj).isSubtype(OAVBDIMetaModel.beliefset_type)
+						|| state.getType(obj).isSubtype(OAVBDIMetaModel.beliefreference_type)
+						|| state.getType(obj).isSubtype(OAVBDIMetaModel.beliefsetreference_type);
+				}
+				else if("Goal".equals(category))
+				{
+					ret	= state.getType(obj).isSubtype(OAVBDIMetaModel.goal_type)
+						|| state.getType(obj).isSubtype(OAVBDIMetaModel.goalreference_type);
+				}
+				else if("Plan".equals(category))
+				{
+					ret	= state.getType(obj).isSubtype(OAVBDIMetaModel.plan_type);
+				}
+				else if("Event".equals(category))
+				{
+					ret	= state.getType(obj).isSubtype(OAVBDIMetaModel.event_type)
+						|| state.getType(obj).isSubtype(OAVBDIMetaModel.internaleventreference_type)
+						|| state.getType(obj).isSubtype(OAVBDIMetaModel.messageeventreference_type);
+				}
+				return ret;
+			}
+			
+			public Object getPathElementObject(Object element)
+			{
+				return ((StackElement)element).getObject();
+			}
+			
+			public String getObjectName(Object obj)
+			{
+				String	name	= null;
+				if(state.getType(obj).isSubtype(OAVBDIMetaModel.modelelement_type))
+				{
+					name	= (String)state.getAttributeValue(obj, OAVBDIMetaModel.modelelement_has_name);
+				}
+				
+				if(name==null && state.getType(obj).isSubtype(OAVBDIMetaModel.elementreference_type))
+				{
+					name	= (String)state.getAttributeValue(obj, OAVBDIMetaModel.elementreference_has_concrete);
+				}
+				
+				if(name==null && state.getType(obj).isSubtype(OAVBDIMetaModel.expression_type))
+				{
+					Object	exp	=state.getAttributeValue(obj, OAVBDIMetaModel.expression_has_content);
+					name	= exp!=null ? ""+exp : null;
+				}
+				
+				if(name==null)
+				{
+					name	= ""+obj;
+				}
+				
+				return state.getType(obj).getName().substring(1) + " " + name;
+			}
+		}.buildErrorReport());
 	}
 	
 	//-------- IAgentModel methods --------
@@ -399,9 +478,12 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 					}
 					catch(Exception e)
 					{
-						// Hack!!! Exception should be propagated.
-						System.err.println(pex.getExpressionText());
-						e.printStackTrace();
+						Tuple	se;
+						se	= new Tuple(new Object[]{
+							new StackElement(new QName(state.getType(capa).isSubtype(OAVBDIMetaModel.agent_type) ? "agent" : "capability"), capa, null),
+							new StackElement(new QName("properties"), null, null),				
+							new StackElement(new QName("property"), mexp, null)});				
+						addEntry(se, "Error in property: "+e);
 					}
 				}
 			}

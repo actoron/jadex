@@ -109,8 +109,15 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory
 		{
 			public void resultAvailable(Object source, Object result)
 			{
-				ILibraryService libService = (ILibraryService) result;
-				libService.addLibraryServiceListener(libservicelistener);
+				if(result!=null)
+				{
+					ILibraryService libService = (ILibraryService) result;
+					libService.addLibraryServiceListener(libservicelistener);
+				}
+				else
+				{
+					System.err.println("Warning: No library service found. Cannot clear BDI mode cache.");
+				}
 			}
 		});
 	}

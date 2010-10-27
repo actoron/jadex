@@ -45,7 +45,7 @@ public class ErrorReport implements IErrorReport
 	 */
 	public String getErrorText()
 	{
-		return errhtml;
+		return errtext;
 	}
 	
 	/**
