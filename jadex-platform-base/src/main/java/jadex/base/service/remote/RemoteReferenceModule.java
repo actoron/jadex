@@ -636,20 +636,20 @@ public class RemoteReferenceModule
 				if(renewid == RemoteReferenceModule.this.renewid)
 				{
 					long diff = 0;
-					for(Iterator it = proxycount.keySet().iterator(); it.hasNext(); )
+					RemoteReference[] rrs = (RemoteReference[])proxycount.keySet().toArray(new RemoteReference[proxycount.size()]);
+					for(int i=0; i<rrs.length; i++)
 					{
-						RemoteReference rr = (RemoteReference)it.next();
-						diff = rr.getExpiryDate()-clock.getTime();
+						diff = rrs[i].getExpiryDate()-clock.getTime();
 						if(diff<=0)
 						{
-							System.out.println("renewal sent for: "+rr);
-							sendAddRemoteReference(rr);
+//							System.out.println("renewal sent for: "+rrs[i]);
+							sendAddRemoteReference(rrs[i]);
 							
 							// todo: use anwer of send for updating expiry date?!
-							Object entry = proxycount.remove(rr);
+							Object entry = proxycount.remove(rrs[i]);
 							long expirydate = clock.getTime()+DEFAULT_LEASETIME;
-							rr.setExpiryDate(expirydate);
-							proxycount.put(rr, entry);
+							rrs[i].setExpiryDate(expirydate);
+							proxycount.put(rrs[i], entry);
 							
 							diff = DEFAULT_LEASETIME;
 						}
@@ -661,7 +661,7 @@ public class RemoteReferenceModule
 					
 					if(proxycount.size()>0 && diff>0)
 					{
-						System.out.println("renewal behaviour waiting: "+diff);
+//						System.out.println("renewal behaviour waiting: "+diff);
 						rsms.getComponent().waitFor(diff, this);
 					}
 				}
@@ -689,8 +689,15 @@ public class RemoteReferenceModule
 					{
 						public void execute(Object args)
 						{
-							if(holders.size()>0)
-								System.out.println("Checking holders: "+holders);
+//							if(holders.size()>0)
+//							{
+//								System.out.println("Checking holders: ");
+//								for(Iterator it=holders.keySet().iterator(); it.hasNext(); )
+//								{
+//									Object key = it.next();
+//									System.out.println("\t "+key+" "+((Map)holders.get(key)).keySet());
+//								}
+//							}
 							
 							for(Iterator it=holders.keySet().iterator(); it.hasNext(); )
 							{
@@ -701,7 +708,7 @@ public class RemoteReferenceModule
 									RemoteReferenceHolder rrh = (RemoteReferenceHolder)it2.next();
 									if(clock.getTime() > rrh.getExpiryDate()+DEFAULT_BUFFERTIME)
 									{
-										System.out.println("Removing expired holder: "+rrh);
+//										System.out.println("Removing expired holder: "+rrh);
 										hds.remove(rrh);
 										if(hds.size()==0)
 										{
@@ -824,7 +831,7 @@ public class RemoteReferenceModule
 			oldth.setNumber(oldth.getNumber()+1);
 			oldth.setExpiryDate(expirydate);
 		}
-//		System.out.println("Holders for (temp add): "+result+" add: "+holder+" "+hds);
+//		System.out.println("Holders for (temp add): "+rr+" add: "+holder+" "+hds.keySet());
 	}
 	
 	/**
@@ -850,30 +857,26 @@ public class RemoteReferenceModule
 		{
 //			throw new RuntimeException("Holder already contained: "+holder);
 			hds.put(newh, newh);
-			
-			// Decrement number (and possibly remove) temporary holder.
-			TemporaryRemoteReferenceHolder th = (TemporaryRemoteReferenceHolder)hds.get(new TemporaryRemoteReferenceHolder(holder, 0));
-			if(th!=null)
-			{
-				th.setNumber(th.getNumber()-1);
-				if(th.getNumber()==0)
-				{
-					hds.remove(th);
-					if(hds.size()==0)
-					{
-						holders.remove(rr);
-						deleteRemoteReference(rr);
-					}
-				}
-			}
-//			System.out.println("Holders for (add): "+result+" add: "+holder+" "+hds);
 		}
 		else
 		{
 			// Renew expiry date of existing holder.
 			oldh.setExpiryDate(expirydate);
-			System.out.println("renewed lease for: "+rr+" "+oldh);
+//			System.out.println("renewed lease for: "+rr+" "+oldh);
 		}
+		
+		// Decrement number (and possibly remove) temporary holder.
+		TemporaryRemoteReferenceHolder th = (TemporaryRemoteReferenceHolder)hds.get(new TemporaryRemoteReferenceHolder(holder, 0));
+		if(th!=null)
+		{
+			th.setNumber(th.getNumber()-1);
+			if(th.getNumber()==0)
+			{
+				hds.remove(th); // hds.size() != 0 
+			}
+		}
+
+//		System.out.println("Holders for (add): "+rr+" add: "+holder+" "+hds.keySet());
 	}
 	
 	/**

@@ -61,6 +61,7 @@ public class TemporaryRemoteReferenceHolder extends RemoteReferenceHolder
 	 */
 	public String toString()
 	{
-		return "TemporarayRemoteReferenceHolder(holder=" + holder + ", number=" + number+ " , expirydater=" + expirydate+")";
+		return "TemporaryRemoteReferenceHolder(holder=" + holder + ", number=" + number+ ")";
+//		return "TemporaryRemoteReferenceHolder(holder=" + holder + ", number=" + number+ ", expirydate=" + expirydate+")";
 	}
 }

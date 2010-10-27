@@ -88,6 +88,7 @@ public class RemoteReferenceHolder
 	 */
 	public String toString()
 	{
-		return "RemoteReferenceHolder(holder=" + holder + ", expirydater=" + expirydate+ ")";
+		return "RemoteReferenceHolder(holder=" + holder +")";
+//		return "RemoteReferenceHolder(holder=" + holder + ", expirydater=" + expirydate+ ")";
 	}
 }
