@@ -42,8 +42,6 @@ public class RemoteReferenceModule
 	
 	public static long DEFAULT_BUFFERTIME = 3000;
 	
-	protected static long renewidcnt; 
-	
 	//-------- attributes --------
 
 	/** The remote interface properties. */
@@ -78,6 +76,9 @@ public class RemoteReferenceModule
 	/** The renew behaviour id. */
 	protected long renewid;
 	
+	/** The remove behaviour id. */
+	protected long removeid;
+	
 	//-------- constructors --------
 	
 	/**
@@ -95,8 +96,6 @@ public class RemoteReferenceModule
 		
 		this.proxycount = new TreeMap();
 		this.holders = new HashMap();
-		
-		startRemovalBehaviour();
 	}
 	
 	//-------- methods --------
@@ -622,12 +621,11 @@ public class RemoteReferenceModule
 	}
 	
 	/**
-	 * 
+	 *  Start the removal behavior.
 	 */
 	protected void startRenewalBehaviour()
 	{
-		final long renewid = renewidcnt++;
-		this.renewid = renewid;	
+		final long renewid = ++this.renewid;
 		
 		rsms.getComponent().scheduleStep(new ICommand()
 		{
@@ -635,6 +633,17 @@ public class RemoteReferenceModule
 			{
 				if(renewid == RemoteReferenceModule.this.renewid)
 				{
+//					System.out.println("Starting renewal behavior: "+removeid);
+					if(proxycount.size()>0)
+					{
+						System.out.println("Checking proxies: ");
+						for(Iterator it=proxycount.keySet().iterator(); it.hasNext(); )
+						{
+							RemoteReference key = (RemoteReference)it.next();
+							System.out.println("\t "+key+" "+key.getExpiryDate()+" "+System.currentTimeMillis()+" "+proxycount.get(key));
+						}
+					}
+					
 					long diff = 0;
 					RemoteReference[] rrs = (RemoteReference[])proxycount.keySet().toArray(new RemoteReference[proxycount.size()]);
 					for(int i=0; i<rrs.length; i++)
@@ -658,7 +667,6 @@ public class RemoteReferenceModule
 							break;
 						}
 					}
-					
 					if(proxycount.size()>0 && diff>0)
 					{
 //						System.out.println("renewal behaviour waiting: "+diff);
@@ -676,52 +684,47 @@ public class RemoteReferenceModule
 	 */
 	protected void startRemovalBehaviour()
 	{
-		final long renewid = renewidcnt++;
-		this.renewid = renewid;	
+		final long removeid = ++this.removeid;
 		
 		rsms.getComponent().scheduleStep(new ICommand()
 		{
 			public void execute(Object args)
 			{
-				if(renewid == RemoteReferenceModule.this.renewid)
+				if(removeid == RemoteReferenceModule.this.removeid)
 				{
-					ICommand gcc = new ICommand()
+//					System.out.println("Starting removal behavior: "+removeid);
+//					if(holders.size()>0)
+//					{
+//						System.out.println("Checking holders: ");
+//						for(Iterator it=holders.keySet().iterator(); it.hasNext(); )
+//						{
+//							Object key = it.next();
+//							System.out.println("\t "+key+" "+((Map)holders.get(key)).keySet());
+//						}
+//					}
+					
+					for(Iterator it=holders.keySet().iterator(); it.hasNext(); )
 					{
-						public void execute(Object args)
+						RemoteReference rr = (RemoteReference)it.next();
+						Map hds = (Map)holders.get(rr);
+						for(Iterator it2=hds.keySet().iterator(); it2.hasNext(); )
 						{
-//							if(holders.size()>0)
-//							{
-//								System.out.println("Checking holders: ");
-//								for(Iterator it=holders.keySet().iterator(); it.hasNext(); )
-//								{
-//									Object key = it.next();
-//									System.out.println("\t "+key+" "+((Map)holders.get(key)).keySet());
-//								}
-//							}
-							
-							for(Iterator it=holders.keySet().iterator(); it.hasNext(); )
+							RemoteReferenceHolder rrh = (RemoteReferenceHolder)it2.next();
+							if(clock.getTime() > rrh.getExpiryDate()+DEFAULT_BUFFERTIME)
 							{
-								RemoteReference rr = (RemoteReference)it.next();
-								Map hds = (Map)holders.get(rr);
-								for(Iterator it2=hds.keySet().iterator(); it2.hasNext(); )
+								System.out.println("Removing expired holder: "+rr+" "+rrh+" "+rrh.getExpiryDate()+" "+System.currentTimeMillis());
+								hds.remove(rrh);
+								if(hds.size()==0)
 								{
-									RemoteReferenceHolder rrh = (RemoteReferenceHolder)it2.next();
-									if(clock.getTime() > rrh.getExpiryDate()+DEFAULT_BUFFERTIME)
-									{
-//										System.out.println("Removing expired holder: "+rrh);
-										hds.remove(rrh);
-										if(hds.size()==0)
-										{
-											holders.remove(rr);
-											deleteRemoteReference(rr);
-										}
-									}
+									holders.remove(rr);
+									deleteRemoteReference(rr);
 								}
 							}
-							rsms.getComponent().waitFor(5000, this);
 						}
-					};
-					rsms.getComponent().waitFor(5000, gcc);
+					}
+					
+					if(holders.size()>0)
+						rsms.getComponent().waitFor(5000, this);
 				}
 			}
 		});
@@ -816,6 +819,7 @@ public class RemoteReferenceModule
 		{
 			hds = new HashMap();
 			holders.put(rr, hds);
+			startRemovalBehaviour();
 		}
 		
 		long expirydate = clock.getTime()+DEFAULT_LEASETIME;
@@ -847,6 +851,7 @@ public class RemoteReferenceModule
 		{
 			hds = new HashMap();
 			holders.put(rr, hds);
+			startRemovalBehaviour();
 		}
 		
 		long expirydate = clock.getTime()+DEFAULT_LEASETIME;
@@ -862,7 +867,7 @@ public class RemoteReferenceModule
 		{
 			// Renew expiry date of existing holder.
 			oldh.setExpiryDate(expirydate);
-//			System.out.println("renewed lease for: "+rr+" "+oldh);
+			System.out.println("renewed lease for: "+rr+" "+oldh);
 		}
 		
 		// Decrement number (and possibly remove) temporary holder.
