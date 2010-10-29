@@ -595,7 +595,7 @@ public class RemoteReferenceModule
 	protected void incProxyCount(RemoteReference rr)
 	{
 		if(proxycount.size()!=proxydates.size())
-			System.out.println("here2");
+			System.out.println("ipc start");
 		
 		checkThread();
 		// Only keep track of proxies for java objects.
@@ -630,7 +630,7 @@ public class RemoteReferenceModule
 				sendAddRemoteReference(rr);
 			
 			if(proxycount.size()!=proxydates.size())
-				System.out.println("here");
+				System.out.println("ipc end");
 		}
 	}
 	
@@ -641,7 +641,7 @@ public class RemoteReferenceModule
 	protected void decProxyCount(RemoteReference rr)
 	{
 		if(proxycount.size()!=proxydates.size())
-			System.out.println("here2");
+			System.out.println("dpc start");
 		
 		checkThread();
 		// Only keep track of proxies for java objects.
@@ -671,7 +671,7 @@ public class RemoteReferenceModule
 		}
 		
 		if(proxycount.size()!=proxydates.size())
-			System.out.println("here");
+			System.out.println("dpc end");
 	}
 	
 	/**
@@ -688,7 +688,7 @@ public class RemoteReferenceModule
 				if(renewid == RemoteReferenceModule.this.renewid)
 				{
 					if(proxycount.size()!=proxydates.size())
-						System.out.println("herea");
+						System.out.println("srb start");
 					
 //					System.out.println("Starting renewal behavior: "+removeid);
 //					if(proxydates.size()>0)
@@ -727,7 +727,7 @@ public class RemoteReferenceModule
 //					System.out.println("prxy: "+proxycount);
 					
 					if(proxycount.size()!=proxydates.size())
-						System.out.println("here");
+						System.out.println("srb end");
 					
 					if(proxycount.size()>0 && diff>0)
 					{
