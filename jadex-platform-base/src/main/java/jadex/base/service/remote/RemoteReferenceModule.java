@@ -901,7 +901,8 @@ public class RemoteReferenceModule
 		}
 		
 		// Decrement number (and possibly remove) temporary holder.
-		TemporaryRemoteReferenceHolder th = (TemporaryRemoteReferenceHolder)hds.get(new TemporaryRemoteReferenceHolder(holder, 0));
+		TemporaryRemoteReferenceHolder th = (TemporaryRemoteReferenceHolder)hds.get(
+			new TemporaryRemoteReferenceHolder(holder, 0));
 		if(th!=null)
 		{
 			th.setNumber(th.getNumber()-1);
