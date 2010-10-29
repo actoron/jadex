@@ -596,7 +596,7 @@ public class RemoteReferenceModule
 		if(rr.isObjectReference())
 		{
 			boolean notify = false;
-			Integer cnt = (Integer)proxycount.get(rr);
+			Integer cnt = (Integer)proxycount.remove(rr);
 			if(cnt==null)
 			{
 				proxycount.put(rr, new Integer(1));
@@ -667,6 +667,9 @@ public class RemoteReferenceModule
 							break;
 						}
 					}
+					
+					System.out.println("prxy: "+proxycount);
+					
 					if(proxycount.size()>0 && diff>0)
 					{
 //						System.out.println("renewal behaviour waiting: "+diff);
@@ -743,11 +746,10 @@ public class RemoteReferenceModule
 		if(rr.isObjectReference())
 		{
 			boolean notify = false;
-			Integer cnt = (Integer)proxycount.get(rr);
+			Integer cnt = (Integer)proxycount.remove(rr);
 			int nv = cnt.intValue()-1;
 			if(nv==0)
 			{
-				proxycount.remove(rr);
 				notify = true;
 //					System.out.println("Remove proxy: "+rr+" "+nv);
 			}
@@ -756,7 +758,7 @@ public class RemoteReferenceModule
 				proxycount.put(rr, new Integer(nv));
 			}
 				
-	//		System.out.println("Remove proxy: "+rr+" "+nv);
+			System.out.println("Remove proxy: "+rr+" "+nv+" "+proxycount);
 			if(notify)
 				sendRemoveRemoteReference(rr);
 		}
