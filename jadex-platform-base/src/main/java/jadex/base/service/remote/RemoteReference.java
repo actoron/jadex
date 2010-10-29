@@ -7,7 +7,7 @@ import jadex.commons.service.IServiceIdentifier;
 /**
  *  Remote reference for locating a specific target object in another platform.
  */
-public class RemoteReference implements Comparable
+public class RemoteReference //implements Comparable
 {
 	//-------- attributes --------
 	
@@ -17,8 +17,8 @@ public class RemoteReference implements Comparable
 	/** The target identifier (sid, cid, or tid). */
 	protected Object targetid;
 	
-	/** The expiry date. */
-	protected long expirydate;
+//	/** The expiry date. */
+//	protected long expirydate;
 	
 	//-------- constructors --------
 
@@ -88,23 +88,23 @@ public class RemoteReference implements Comparable
 		return !(targetid instanceof IComponentIdentifier) && !(targetid instanceof IServiceIdentifier);
 	}
 	
-	/**
-	 *  Get the expirydate.
-	 *  @return The expirydate.
-	 */
-	public long getExpiryDate()
-	{
-		return expirydate;
-	}
-
-	/**
-	 *  Set the expirydate.
-	 *  @param expirydate The expirydate to set.
-	 */
-	public void setExpiryDate(long expirydate)
-	{
-		this.expirydate = expirydate;
-	}
+//	/**
+//	 *  Get the expirydate.
+//	 *  @return The expirydate.
+//	 */
+//	public long getExpiryDate()
+//	{
+//		return expirydate;
+//	}
+//
+//	/**
+//	 *  Set the expirydate.
+//	 *  @param expirydate The expirydate to set.
+//	 */
+//	public void setExpiryDate(long expirydate)
+//	{
+//		this.expirydate = expirydate;
+//	}
 
 	/**
 	 *  Get the hashcode.
@@ -131,17 +131,17 @@ public class RemoteReference implements Comparable
 		return ret;
 	}
 	
-	/**
-	 *  Compare to another object.
-	 */
-	public int compareTo(Object obj)
-	{
-		RemoteReference other = (RemoteReference)obj;
-		int ret = (int)(expirydate-other.expirydate);
-		if(ret==0)
-			ret = hashCode()-other.hashCode();
-		return ret;
-	}
+//	/**
+//	 *  Compare to another object.
+//	 */
+//	public int compareTo(Object obj)
+//	{
+//		RemoteReference other = (RemoteReference)obj;
+//		int ret = (int)(expirydate-other.expirydate);
+//		if(ret==0)
+//			ret = hashCode()-other.hashCode();
+//		return ret;
+//	}
 
 	/**
 	 *  Get the string representation.

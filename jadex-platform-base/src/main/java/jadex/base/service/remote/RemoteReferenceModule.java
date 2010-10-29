@@ -65,6 +65,9 @@ public class RemoteReferenceModule
 	
 	/** The proxycount count map. (rr -> number of proxies created for rr). */
 	protected Map proxycount;
+//	protected Map proxycountkeys;
+	protected Map proxydates;
+	
 	
 	/** The remote reference holders of a object (rr -> holder (rms cid)). */
 	protected Map holders;
@@ -94,7 +97,9 @@ public class RemoteReferenceModule
 		this.targetobjects = new HashMap();
 		this.remoterefs = new HashMap();
 		
-		this.proxycount = new TreeMap();
+		this.proxycount = new HashMap();
+		this.proxydates = new TreeMap();
+//		this.proxycountkeys = new HashMap();
 		this.holders = new HashMap();
 	}
 	
@@ -589,6 +594,9 @@ public class RemoteReferenceModule
 	 */
 	protected void incProxyCount(RemoteReference rr)
 	{
+		if(proxycount.size()!=proxydates.size())
+			System.out.println("here2");
+		
 		checkThread();
 		// Only keep track of proxies for java objects.
 		// Components and services are not subject of gc.
@@ -596,14 +604,17 @@ public class RemoteReferenceModule
 		if(rr.isObjectReference())
 		{
 			boolean notify = false;
+//			RemoteReference origrr = (RemoteReference)proxycountkeys.get(rr);
 			Integer cnt = (Integer)proxycount.remove(rr);
 			if(cnt==null)
 			{
+//				proxycountkeys.put(rr, rr);
 				proxycount.put(rr, new Integer(1));
 				notify = true;
 				
 				// todo: transfer lease time interval?!
-				rr.setExpiryDate(clock.getTime()+DEFAULT_LEASETIME);
+//				rr.setExpiryDate(clock.getTime()+DEFAULT_LEASETIME);
+				proxydates.put(new Long(clock.getTime()+DEFAULT_LEASETIME), rr);
 				
 				// Initiate check procedure.
 				startRenewalBehaviour();
@@ -617,7 +628,50 @@ public class RemoteReferenceModule
 			
 			if(notify)
 				sendAddRemoteReference(rr);
+			
+			if(proxycount.size()!=proxydates.size())
+				System.out.println("here");
 		}
+	}
+	
+	/**
+	 *  Decrease the proxy count for a remote reference.
+	 *  @param rr The remote reference for the proxy.
+	 */
+	protected void decProxyCount(RemoteReference rr)
+	{
+		if(proxycount.size()!=proxydates.size())
+			System.out.println("here2");
+		
+		checkThread();
+		// Only keep track of proxies for java objects.
+		// Components and services are not subject of gc.
+		
+		if(rr.isObjectReference())
+		{
+			boolean notify = false;
+//			RemoteReference origrr = (RemoteReference)proxycountkeys.remove(rr);
+			Integer cnt = (Integer)proxycount.remove(rr);
+			int nv = cnt.intValue()-1;
+			if(nv==0)
+			{
+				notify = true;
+				proxydates.values().remove(rr);
+//				System.out.println("Remove proxy: "+rr+" "+nv);
+			}
+			else
+			{
+//				proxycountkeys.put(rr, rr);
+				proxycount.put(rr, new Integer(nv));
+			}
+				
+//			System.out.println("Remove proxy: "+rr+" "+nv+" "+proxycount);
+			if(notify)
+				sendRemoveRemoteReference(rr);
+		}
+		
+		if(proxycount.size()!=proxydates.size())
+			System.out.println("here");
 	}
 	
 	/**
@@ -633,32 +687,34 @@ public class RemoteReferenceModule
 			{
 				if(renewid == RemoteReferenceModule.this.renewid)
 				{
+					if(proxycount.size()!=proxydates.size())
+						System.out.println("herea");
+					
 //					System.out.println("Starting renewal behavior: "+removeid);
-					if(proxycount.size()>0)
-					{
-						System.out.println("Checking proxies: ");
-						for(Iterator it=proxycount.keySet().iterator(); it.hasNext(); )
-						{
-							RemoteReference key = (RemoteReference)it.next();
-							System.out.println("\t "+key+" "+key.getExpiryDate()+" "+System.currentTimeMillis()+" "+proxycount.get(key));
-						}
-					}
+//					if(proxydates.size()>0)
+//					{
+//						System.out.println("Checking proxies: "+proxydates.size()+" "+proxycount.size());
+//						for(Iterator it=proxydates.keySet().iterator(); it.hasNext(); )
+//						{
+//							Long key = (Long)it.next();
+//							System.out.println("\t "+key+" "+" "+System.currentTimeMillis()+" "+proxydates.get(key));
+//						}
+//					}
 					
 					long diff = 0;
-					RemoteReference[] rrs = (RemoteReference[])proxycount.keySet().toArray(new RemoteReference[proxycount.size()]);
-					for(int i=0; i<rrs.length; i++)
+					Long[] dates = (Long[])proxydates.keySet().toArray(new Long[proxydates.size()]);
+					for(int i=0; i<dates.length; i++)
 					{
-						diff = rrs[i].getExpiryDate()-clock.getTime();
+						diff = dates[i].longValue()-clock.getTime();
 						if(diff<=0)
 						{
-//							System.out.println("renewal sent for: "+rrs[i]);
-							sendAddRemoteReference(rrs[i]);
+							RemoteReference rr = (RemoteReference)proxydates.remove(dates[i]);
+//							System.out.println("renewal sent for: "+rr);
+							sendAddRemoteReference(rr);
 							
 							// todo: use anwer of send for updating expiry date?!
-							Object entry = proxycount.remove(rrs[i]);
 							long expirydate = clock.getTime()+DEFAULT_LEASETIME;
-							rrs[i].setExpiryDate(expirydate);
-							proxycount.put(rrs[i], entry);
+							proxydates.put(new Long(expirydate), rr);
 							
 							diff = DEFAULT_LEASETIME;
 						}
@@ -668,7 +724,10 @@ public class RemoteReferenceModule
 						}
 					}
 					
-					System.out.println("prxy: "+proxycount);
+//					System.out.println("prxy: "+proxycount);
+					
+					if(proxycount.size()!=proxydates.size())
+						System.out.println("here");
 					
 					if(proxycount.size()>0 && diff>0)
 					{
@@ -731,37 +790,6 @@ public class RemoteReferenceModule
 				}
 			}
 		});
-	}
-	
-	/**
-	 *  Decrease the proxy count for a remote reference.
-	 *  @param rr The remote reference for the proxy.
-	 */
-	protected void decProxyCount(RemoteReference rr)
-	{
-		checkThread();
-		// Only keep track of proxies for java objects.
-		// Components and services are not subject of gc.
-		
-		if(rr.isObjectReference())
-		{
-			boolean notify = false;
-			Integer cnt = (Integer)proxycount.remove(rr);
-			int nv = cnt.intValue()-1;
-			if(nv==0)
-			{
-				notify = true;
-//					System.out.println("Remove proxy: "+rr+" "+nv);
-			}
-			else
-			{
-				proxycount.put(rr, new Integer(nv));
-			}
-				
-			System.out.println("Remove proxy: "+rr+" "+nv+" "+proxycount);
-			if(notify)
-				sendRemoveRemoteReference(rr);
-		}
 	}
 	
 	/**

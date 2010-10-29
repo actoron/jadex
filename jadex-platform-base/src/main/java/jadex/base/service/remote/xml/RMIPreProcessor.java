@@ -2,7 +2,7 @@ package jadex.base.service.remote.xml;
 
 import jadex.base.service.remote.RemoteReferenceModule;
 import jadex.bridge.IComponentIdentifier;
-import jadex.commons.IProxyable;
+import jadex.commons.IRemotable;
 import jadex.commons.SReflect;
 import jadex.xml.IContext;
 import jadex.xml.IPreProcessor;
@@ -67,7 +67,7 @@ public class RMIPreProcessor implements IPreProcessor
 				Class[] interfaces = clazz.getInterfaces();
 				for(int i=0; i<interfaces.length; i++)
 				{
-					if(SReflect.isSupertype(IProxyable.class, interfaces[i]))
+					if(SReflect.isSupertype(IRemotable.class, interfaces[i]))
 						ret.add(interfaces[i]);
 				}
 				clazz = clazz.getSuperclass();

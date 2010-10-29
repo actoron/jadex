@@ -14,7 +14,7 @@ import jadex.bridge.IRemoteServiceManagementService;
 import jadex.commons.Future;
 import jadex.commons.ICommand;
 import jadex.commons.IFuture;
-import jadex.commons.IProxyable;
+import jadex.commons.IRemotable;
 import jadex.commons.IResultCommand;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
@@ -123,7 +123,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		
 		Set typeinfoswrite = JavaWriter.getTypeInfos();
 		TypeInfo ti_proxyable = new TypeInfo(new XMLInfo(pr, null, false, new RMIPreProcessor(rrm)), 
-			new ObjectInfo(IProxyable.class));
+			new ObjectInfo(IRemotable.class));
 		typeinfoswrite.add(ti_proxyable);
 		
 		this.reader = new Reader(new BeanObjectReaderHandler(typeinfosread));

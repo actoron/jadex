@@ -1,7 +1,7 @@
 package jadex.commons.service;
 
 import jadex.commons.IFuture;
-import jadex.commons.IProxyable;
+import jadex.commons.IRemotable;
 
 import java.util.Map;
 
@@ -9,7 +9,7 @@ import java.util.Map;
 /**
  *  The interface for platform services.
  */
-public interface IService extends IProxyable
+public interface IService extends IRemotable
 {
 	//-------- constants --------
 	
