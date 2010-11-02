@@ -544,8 +544,6 @@ public class OAVBDIModelLoader	extends AbstractModelLoader
 			ReteBuilder builder = pm.getReteNode().getBuilder();
 			if(builder!=null && ReteBuilder.REPORTING)
 				System.out.println(builder.getBuildReport());
-			
-			((OAVAgentModel)model).addAgentProperties();
 		}
 	}
 

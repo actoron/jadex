@@ -398,7 +398,8 @@ public class DaemonAgent extends MicroAgent
 	{
 		return new MicroAgentMetaInfo("This agent offers the daemon service.", null, 
 			new IArgument[]{}//new Argument("infos", "Initial information records.", "InformationEntry[]")}
-			, null, null, SUtil.createHashMap(new String[]{"componentviewer.viewerclass"}, new Object[]{"jadex.tools.daemon.DaemonViewerPanel"}));
+			, null, null, SUtil.createHashMap(new String[]{"componentviewer.viewerclass"}, new Object[]{"jadex.tools.daemon.DaemonViewerPanel"}),
+			new Class[]{ILibraryService.class}, new Class[]{IDaemonService.class});
 	}
 
 }

@@ -48,6 +48,13 @@ public class ModelInfo implements IModelInfo
 	/** The classloader. */
 	protected ClassLoader classloader;
 	
+	/** The used services. */
+	protected Class[] usedservices;
+	
+	/** The offered services. */
+	protected Class[] offeredservices;
+	
+	
 	//-------- constructors --------
 	
 	/**
@@ -55,16 +62,17 @@ public class ModelInfo implements IModelInfo
 	 */
 	public ModelInfo()
 	{
-		this(null, null, null, null, null, null, null, false, null, null, null);
+		this(null, null, null, null, null, null, null, false, null, null, null, null, null);
 	}
 	
 	/**
 	 *  Create a new model info.
 	 */
 	public ModelInfo(String name, String packagename,
-			String description, IErrorReport report, String[] configurations,
-			IArgument[] arguments, IArgument[] results, boolean startable,
-			String filename, Map properties, ClassLoader classloader)
+		String description, IErrorReport report, String[] configurations,
+		IArgument[] arguments, IArgument[] results, boolean startable,
+		String filename, Map properties, ClassLoader classloader, 
+		Class[] usedservices, Class[] offeredservices)
 	{
 		this.name = name;
 		this.packagename = packagename;
@@ -77,6 +85,8 @@ public class ModelInfo implements IModelInfo
 		this.filename = filename;
 		this.properties = properties!=null? properties: new HashMap();
 		this.classloader = classloader;
+		this.usedservices = usedservices;
+		this.offeredservices = offeredservices;
 	}
 
 	//-------- methods --------
@@ -369,4 +379,41 @@ public class ModelInfo implements IModelInfo
 	{
 		this.classloader = classloader;
 	}
+
+	/**
+	 *  Get the usedservices.
+	 *  @return The usedservices.
+	 */
+	public Class[] getUsedServices()
+	{
+		return usedservices==null? SUtil.EMPTY_CLASS_ARRAY: usedservices;
+	}
+
+	/**
+	 *  Set the usedservices.
+	 *  @param usedservices The usedservices to set.
+	 */
+	public void setUsedServices(Class[] usedservices)
+	{
+		this.usedservices = usedservices;
+	}
+
+	/**
+	 *  Get the offeredservices.
+	 *  @return The offeredservices.
+	 */
+	public Class[] getOfferedServices()
+	{
+		return offeredservices==null? SUtil.EMPTY_CLASS_ARRAY: offeredservices;
+	}
+
+	/**
+	 *  Set the offeredservices.
+	 *  @param offeredservices The offeredservices to set.
+	 */
+	public void setOfferedServices(Class[] offeredservices)
+	{
+		this.offeredservices = offeredservices;
+	}
+	
 }

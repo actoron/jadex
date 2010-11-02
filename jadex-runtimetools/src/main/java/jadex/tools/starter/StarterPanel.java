@@ -41,12 +41,14 @@ import java.util.Map;
 import javax.help.CSH;
 import javax.help.HelpBroker;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.DefaultListModel;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
@@ -155,6 +157,12 @@ public class StarterPanel extends JPanel
 
 	/** The spinner for the number of components to start. */
 	protected JSpinner numcomponents;
+
+	/** The used services. */
+	protected JPanel usedservices;
+	
+	/** The offered services. */
+	protected JPanel offeredservices;
 	
 	//-------- constructors --------
 
@@ -220,6 +228,12 @@ public class StarterPanel extends JPanel
 		
 		// The results.
 		results = new JPanel(new GridBagLayout());
+		
+		// The used services.
+		usedservices = new JPanel(new BorderLayout());
+		
+		// The used services.
+		offeredservices = new JPanel(new BorderLayout());
 
 		// The reload button.
 		final JButton reload = new JButton("Reload");
@@ -456,6 +470,12 @@ public class StarterPanel extends JPanel
 		y++;
 		content.add(results, new GridBagConstraints(0, y, 5, 1, 1, 0, GridBagConstraints.WEST,
 			GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+		y++;
+		content.add(usedservices, new GridBagConstraints(0, y, 5, 1, 1, 0, GridBagConstraints.WEST,
+			GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+		y++;
+		content.add(offeredservices, new GridBagConstraints(0, y, 5, 1, 1, 0, GridBagConstraints.WEST,
+			GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 
 		componentnamel.setMinimumSize(confl.getMinimumSize());
 		componentnamel.setPreferredSize(confl.getPreferredSize());
@@ -654,6 +674,8 @@ public class StarterPanel extends JPanel
 		{
 			createArguments();
 			createResults();
+			createUsedServices();
+			createOfferedServices();
 			arguments.setVisible(true);
 			results.setVisible(true);
 			componentpanel.setVisible(true);
@@ -671,6 +693,8 @@ public class StarterPanel extends JPanel
 		}
 		else
 		{
+			createUsedServices();
+			createOfferedServices();
 			arguments.setVisible(false);
 			results.setVisible(false);
 			componentpanel.setVisible(false);
@@ -1115,6 +1139,61 @@ public class StarterPanel extends JPanel
 			GridBagConstraints.BOTH, new Insets(2, 2, 2, 2), 0, 0));
 		y++;
 	}
+	
+	/**
+	 *  Create the used services panel.
+	 */
+	protected void createUsedServices()
+	{
+		usedservices.removeAll();
+		usedservices.setBorder(null);
+		
+		if(model!=null)
+		{
+			Class[] used = model.getUsedServices();
+			
+			if(used.length>0)
+			{
+				JList usedl = new JList(new DefaultListModel());
+				usedservices.add(usedl, BorderLayout.CENTER);
+				for(int i=0; i<used.length; i++)
+				{
+					((DefaultListModel)usedl.getModel()).addElement(used[i].getName());
+				}
+			}
+			
+			if(used.length>0)
+				usedservices.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), " Used Services "));
+		}
+	}
+	
+	/**
+	 *  Create the offered services panel.
+	 */
+	protected void createOfferedServices()
+	{
+		offeredservices.removeAll();
+		offeredservices.setBorder(null);
+		
+		if(model!=null)
+		{
+			Class[] offered = model.getOfferedServices();
+			
+			if(offered.length>0)
+			{
+				JList offeredl = new JList(new DefaultListModel());
+				offeredservices.add(offeredl, BorderLayout.CENTER);
+				for(int i=0; i<offered.length; i++)
+				{
+					((DefaultListModel)offeredl.getModel()).addElement(offered[i].getName());
+				}
+			}
+			
+			if(offered.length>0)
+				offeredservices.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), " Offered Services "));
+		}
+	}
+	
 	
 	/**
 	 *  Set the component name.

@@ -1,5 +1,7 @@
 package jadex.bridge;
 
+import jadex.commons.SUtil;
+
 import java.util.Map;
 
 
@@ -92,4 +94,16 @@ public interface IModelInfo
 	 *  @return The class loader corresponding to the model.
 	 */
 	public ClassLoader getClassLoader();
+	
+	/**
+	 *  Get the usedservices.
+	 *  @return The usedservices.
+	 */
+	public Class[] getUsedServices();
+
+	/**
+	 *  Get the offeredservices.
+	 *  @return The offeredservices.
+	 */
+	public Class[] getOfferedServices();
 }

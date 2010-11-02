@@ -100,7 +100,7 @@
 	</plans>
 	
 	<services>
-		<service>new TreatVictimsService($scope.getExternalAccess())</service>
+		<offeredservice class="ITreatVictimsService">new TreatVictimsService($scope.getExternalAccess())</offeredservice>
 	</services>
 	
 	<configurations>

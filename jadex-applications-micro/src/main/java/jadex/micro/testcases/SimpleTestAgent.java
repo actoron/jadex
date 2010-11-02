@@ -29,6 +29,6 @@ public class SimpleTestAgent extends MicroAgent
 	public static Object getMetaInfo()
 	{
 		return new MicroAgentMetaInfo("A simple test showing how the test center works with micro agents.", 
-			null, null, new IArgument[]{new Argument("testresults", null, "Testcase")}, null, null);
+			null, null, new IArgument[]{new Argument("testresults", null, "Testcase")});
 	}
 }

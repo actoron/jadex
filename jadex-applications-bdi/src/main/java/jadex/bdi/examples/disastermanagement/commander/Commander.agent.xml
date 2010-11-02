@@ -69,4 +69,10 @@
 			</trigger>
 		</plan>
 	</plans>
+	
+	<services>
+		<usedservice class="ITreatVictimsService"/>
+		<usedservice class="IExtinguishFireService"/>
+		<usedservice class="IClearChemicalsService"/>
+	</services>
 </agent>

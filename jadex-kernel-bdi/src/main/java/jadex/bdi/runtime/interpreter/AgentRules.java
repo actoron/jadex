@@ -1167,7 +1167,7 @@ public class AgentRules
 		// Initialize services.
 		
 		// todo: connect services of capabilities, name them accordingly
-		Collection	mservices = state.getAttributeValues(mcapa, OAVBDIMetaModel.capability_has_services);
+		Collection	mservices = state.getAttributeValues(mcapa, OAVBDIMetaModel.capability_has_offeredservices);
 		if(mservices!=null)
 		{
 			for(Iterator it=mservices.iterator(); it.hasNext(); )

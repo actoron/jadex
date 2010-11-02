@@ -158,7 +158,9 @@ public class OAVBDIXMLReader
 			
 			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "properties"), new QName(uri, "property")}), new AccessInfo(new QName(uri, "property"), OAVBDIMetaModel.capability_has_properties)),
 
-			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "services"), new QName(uri, "service")}), new AccessInfo(new QName(uri, "service"), OAVBDIMetaModel.capability_has_services)),
+			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "services"), new QName(uri, "usedservice")}), new AccessInfo(new QName(uri, "usedservice"), OAVBDIMetaModel.capability_has_usedservices)),
+			
+			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "services"), new QName(uri, "offeredservice")}), new AccessInfo(new QName(uri, "offeredservice"), OAVBDIMetaModel.capability_has_offeredservices)),
 
 			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "configurations"), new QName(uri, "configuration")}), new AccessInfo(new QName(uri, "configuration"), OAVBDIMetaModel.capability_has_configurations)),
 			}));
@@ -256,9 +258,11 @@ public class OAVBDIXMLReader
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "condition")), new ObjectInfo(OAVBDIMetaModel.condition_type, expost),
 			new MappingInfo(null, null, OAVBDIMetaModel.expression_has_content)));
 		
-		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "service")), new ObjectInfo(OAVBDIMetaModel.expression_type, expost),
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "usedservice")), new ObjectInfo(OAVBDIMetaModel.expression_type, expost),
 			new MappingInfo(ti_expression)));
-				
+		
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "offeredservice")), new ObjectInfo(OAVBDIMetaModel.expression_type, expost),
+			new MappingInfo(ti_expression)));
 		
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "property")), new ObjectInfo(OAVBDIMetaModel.expression_type, expost),
 			new MappingInfo(ti_expression)));

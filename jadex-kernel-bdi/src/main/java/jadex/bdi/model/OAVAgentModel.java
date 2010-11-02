@@ -80,13 +80,12 @@ public class OAVAgentModel	extends OAVCapabilityModel
 	}
 	
 	/**
-	 *  Get the properties.
-	 *  Arbitrary properties that can e.g. be used to
-	 *  define kernel-specific settings to configure tools. 
-	 *  @return The properties.
+	 *  Init the model info.
 	 */
-	public void	addAgentProperties()
+	public void initModelInfo()
 	{
+		super.initModelInfo();
+		
 		// Hack!!!!! todo: remove
 		// Debugger breakpoints for BDI and user rules.
 		List names = new ArrayList();

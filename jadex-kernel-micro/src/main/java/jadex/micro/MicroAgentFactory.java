@@ -164,6 +164,8 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 		IArgument[] arguments = metainfo!=null? metainfo.getArguments(): null;
 		IArgument[] results = metainfo!=null? metainfo.getResults(): null;
 		Map properties = metainfo!=null && metainfo.getProperties()!=null? new HashMap(metainfo.getProperties()): new HashMap();
+		Class[] used = metainfo!=null? metainfo.getUsedServices(): null;
+		Class[] offered = metainfo!=null? metainfo.getOfferedServices(): null;
 		
 		// Add debugger breakpoints
 		List names = new ArrayList();
@@ -175,7 +177,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 //		addExcludedMethods(properties, new String[]{"getServiceProvider"});
 		
 		IModelInfo ret = new ModelInfo(name, packagename, description, report, 
-			configurations, arguments, results, true, model, properties, classloader);
+			configurations, arguments, results, true, model, properties, classloader, used, offered);
 		
 		return ret;
 	}

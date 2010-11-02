@@ -52,7 +52,8 @@ public class ChatAgent extends MicroAgent
 	{
 		return new MicroAgentMetaInfo("This agent offers a helpline for getting information about missing persons.", null, 
 			new IArgument[]{}//new Argument("infos", "Initial information records.", "InformationEntry[]")}
-			, null, null, SUtil.createHashMap(new String[]{"componentviewer.viewerclass"}, new Object[]{"jadex.micro.examples.chat.ChatPanel"}));
+			, null, null, SUtil.createHashMap(new String[]{"componentviewer.viewerclass"}, new Object[]{"jadex.micro.examples.chat.ChatPanel"}),
+			null, new Class[]{IChatService.class});
 	}
 
 }

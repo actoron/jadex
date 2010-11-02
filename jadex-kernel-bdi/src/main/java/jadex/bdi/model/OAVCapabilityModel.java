@@ -48,6 +48,9 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 	/** The (actual) object types contained in the state. */
 	protected Set	types;
 	
+	/** The filename. */
+	protected String filename;
+	
 	/** The rulebase of the capability (includes type-specific rules, if any). */
 	protected Rulebase rulebase;
 	
@@ -77,13 +80,10 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 		this.state	= state;
 		this.handle	= handle;
 		this.types	= types;
+		this.filename = filename;
 		this.rulebase	= new Rulebase();
 		this.lastmod	= lastmod;
 		this.entries	= entries;
-
-		boolean startable = !this.getClass().equals(OAVCapabilityModel.class);
-		this.modelinfo = new ModelInfo(getName(), getPackage(), getDescription(), null, getConfigurations(), getArguments(), 
-			getResults(), startable, filename, getProperties(), getClassLoader());
 	}
 	
 	/**
@@ -91,6 +91,10 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 	 */
 	public void initModelInfo()
 	{
+		boolean startable = !this.getClass().equals(OAVCapabilityModel.class);
+		this.modelinfo = new ModelInfo(getName(), getPackage(), getDescription(), null, getConfigurations(), getArguments(), 
+			getResults(), startable, filename, getProperties(), getClassLoader(), getUsedServices(), getOfferedServices());
+		
 		// Build error report.
 		getModelInfo().setReport(new AbstractErrorReportBuilder(getModelInfo().getName(), getModelInfo().getFilename(),
 			new String[]{"Capability", "Belief", "Goal", "Plan", "Event"}, entries, getDocuments())
@@ -630,6 +634,78 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 	public Map	getDocuments()
 	{
 		return externals;//==null ? Collections.EMPTY_MAP : externals;
+	}
+	
+	/**
+	 *  Get the used services.
+	 */
+	public Class[] getUsedServices()
+	{
+		List ret = new ArrayList();
+		Collection own = state.getAttributeValues(handle, OAVBDIMetaModel.capability_has_usedservices);
+		if(own!=null)
+		{
+			for(Iterator it=own.iterator(); it.hasNext(); )
+			{
+				ret.add(state.getAttributeValue(it.next(), OAVBDIMetaModel.expression_has_class));
+			}
+		}
+		
+		Collection subcapas = state.getAttributeValues(handle, OAVBDIMetaModel.capability_has_capabilityrefs);
+		if(subcapas!=null)
+		{
+			for(Iterator it=subcapas.iterator(); it.hasNext(); )
+			{
+				Object subcaparef = it.next();
+				Object subcapa  = state.getAttributeValue(subcaparef, OAVBDIMetaModel.capabilityref_has_capability);
+				Collection sub = state.getAttributeValues(subcapa, OAVBDIMetaModel.capability_has_usedservices);
+				if(sub!=null)
+				{
+					for(Iterator it2=sub.iterator(); it2.hasNext(); )
+					{
+						ret.add(state.getAttributeValue(it2.next(), OAVBDIMetaModel.expression_has_class));
+					}
+				}
+			}
+		}
+		
+		return (Class[])ret.toArray(new Class[ret.size()]);
+	}
+	
+	/**
+	 *  Get the offered services.
+	 */
+	public Class[] getOfferedServices()
+	{
+		List ret = new ArrayList();
+		Collection own = state.getAttributeValues(handle, OAVBDIMetaModel.capability_has_offeredservices);
+		if(own!=null)
+		{
+			for(Iterator it=own.iterator(); it.hasNext(); )
+			{
+				ret.add(state.getAttributeValue(it.next(), OAVBDIMetaModel.expression_has_class));
+			}
+		}
+		
+		Collection subcapas = state.getAttributeValues(handle, OAVBDIMetaModel.capability_has_capabilityrefs);
+		if(subcapas!=null)
+		{
+			for(Iterator it=subcapas.iterator(); it.hasNext(); )
+			{
+				Object subcaparef = it.next();
+				Object subcapa  = state.getAttributeValue(subcaparef, OAVBDIMetaModel.capabilityref_has_capability);
+				Collection sub = state.getAttributeValues(subcapa, OAVBDIMetaModel.capability_has_offeredservices);
+				if(sub!=null)
+				{
+					for(Iterator it2=sub.iterator(); it2.hasNext(); )
+					{
+						ret.add(state.getAttributeValue(it2.next(), OAVBDIMetaModel.expression_has_class));
+					}
+				}
+			}
+		}
+		
+		return (Class[])ret.toArray(new Class[ret.size()]);
 	}
 	
 	//-------- helpers --------

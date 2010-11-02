@@ -91,7 +91,8 @@ public class HelplineAgent extends MicroAgent
 	{
 		return new MicroAgentMetaInfo("This agent offers a helpline for getting information about missing persons.", null, 
 			new IArgument[]{new Argument("infos", "Initial information records.", "InformationEntry[]")}
-			, null, null, SUtil.createHashMap(new String[]{"componentviewer.viewerclass"}, new Object[]{"jadex.micro.examples.helpline.HelplineViewerPanel"}));
+			, null, null, SUtil.createHashMap(new String[]{"componentviewer.viewerclass"}, new Object[]{"jadex.micro.examples.helpline.HelplineViewerPanel"}),
+			new Class[]{IClockService.class}, new Class[]{IHelpline.class});
 	}
 
 }

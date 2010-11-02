@@ -119,6 +119,6 @@ public class PingingAgent extends MicroAgent
 				new Argument("timeout", "Timeout for reply", "long", new Long(1000)),
 				new Argument("content", "Ping message content", "String", "ping"),
 				
-			}, null, null, null);
+			}, null);
 	}
 }

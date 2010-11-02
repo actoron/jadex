@@ -37,9 +37,8 @@ public class HelloWorldAgent extends MicroAgent
 	public static MicroAgentMetaInfo getMetaInfo()
 	{
 		return new MicroAgentMetaInfo("This agent prints out a hello message.", 
-			new String[]{"c1", "c2"}, 
-			new IArgument[]{
+			null, new IArgument[]{
 			new Argument("welcome text", "This parameter is the text printed by the agent.", "String", "Hello world, this is a Jadex micro agent."),	
-			}, null, null, null);
+			}, null);
 	}
 }

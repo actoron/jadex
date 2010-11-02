@@ -61,6 +61,6 @@ public class TreeStressTestAgent extends MicroAgent
 	public static Object	getMetaInfo()
 	{
 		return new MicroAgentMetaInfo("<h1>Tree Stress Test</h1>Creates a complex tree structure of sub components.", null,
-			new IArgument[]{new Argument("depth", "Depth of the tree.", "int", new Integer(5))}, null, null, null);
+			new IArgument[]{new Argument("depth", "Depth of the tree.", "int", new Integer(5))}, null);
 	}
 }
