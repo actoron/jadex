@@ -61,6 +61,7 @@ import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -1157,8 +1158,9 @@ public class StarterPanel extends JPanel
 			
 			if(used.length>0)
 			{
-				JTable usedt = new JTable(new DefaultTableModel(0,1));
+				JTable usedt = new JTable(new DefaultTableModel(new String[]{"Interface Name"}, 0));
 				usedt.setEnabled(false);
+//				usedservices.add(usedt.getTableHeader(), BorderLayout.NORTH);
 				usedservices.add(usedt, BorderLayout.CENTER);
 				for(int i=0; i<used.length; i++)
 				{
@@ -1185,8 +1187,12 @@ public class StarterPanel extends JPanel
 			
 			if(offered.length>0)
 			{
-				JTable offeredt = new JTable(new DefaultTableModel(0,1));
+				JTable offeredt = new JTable(new DefaultTableModel(new String[]{"Interface Name"}, 0));
 				offeredt.setEnabled(false);
+//				DefaultTableCellRenderer rend = new DefaultTableCellRenderer();
+//				rend.setHorizontalAlignment(DefaultTableCellRenderer.RIGHT);
+//				offeredt.getColumn("Interface Name").setCellRenderer(rend);
+//				offeredservices.add(offeredt.getTableHeader(), BorderLayout.NORTH);
 				offeredservices.add(offeredt, BorderLayout.CENTER);
 				for(int i=0; i<offered.length; i++)
 				{
