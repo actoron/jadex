@@ -1,20 +1,16 @@
 package jadex.tools.daemon;
 
-import java.util.List;
-
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.Future;
-import jadex.commons.IChangeListener;
 import jadex.commons.ICommand;
 import jadex.commons.IFuture;
 import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.service.BasicService;
-import jadex.commons.service.IService;
 import jadex.micro.IMicroExternalAccess;
 
 /**
- * 
+ *  The daemon service.
  */
 public class DaemonService extends BasicService implements IDaemonService
 {
@@ -100,7 +96,7 @@ public class DaemonService extends BasicService implements IDaemonService
 	 *  Add a change listener.
 	 *  @param listener The change listener.
 	 */
-	public void addChangeListener(final IChangeListener listener)
+	public void addChangeListener(final IRemoteChangeListener listener)
 	{
 		agent.scheduleStep(new ICommand()
 		{
@@ -116,7 +112,7 @@ public class DaemonService extends BasicService implements IDaemonService
 	 *  Remove a change listener.
 	 *  @param listener The change listener.
 	 */
-	public void removeChangeListener(final IChangeListener listener)
+	public void removeChangeListener(final IRemoteChangeListener listener)
 	{
 		agent.scheduleStep(new ICommand()
 		{

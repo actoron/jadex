@@ -19,7 +19,7 @@ public class DaemonViewerPanel extends AbstractComponentViewerPanel
 	//-------- attributes --------
 	
 	/** The panel. */
-	protected JPanel panel;
+	protected DaemonPanel panel;
 	
 	//-------- methods --------
 	
@@ -46,6 +46,14 @@ public class DaemonViewerPanel extends AbstractComponentViewerPanel
 			}
 		});
 		return ret;
+	}
+	
+	/**
+	 *  Informs the panel that it should stop all its computation
+	 */
+	public IFuture shutdown()
+	{
+		return panel.shutdown();
 	}
 	
 	/**

@@ -10,6 +10,7 @@ import jadex.commons.IFuture;
 import jadex.commons.SUtil;
 import jadex.commons.StreamCopy;
 import jadex.commons.concurrent.DelegationResultListener;
+import jadex.commons.concurrent.IResultListener;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.library.ILibraryService;
 import jadex.micro.MicroAgent;
@@ -28,7 +29,7 @@ import java.util.Map;
 import javax.swing.SwingUtilities;
 
 /**
- * 
+ *  Daemon agent provides functionalities for managing platforms.
  */
 public class DaemonAgent extends MicroAgent
 {	
@@ -342,7 +343,7 @@ public class DaemonAgent extends MicroAgent
 	 *  Add a change listener.
 	 *  @param listener The change listener.
 	 */
-	public void addChangeListener(IChangeListener listener)
+	public void addChangeListener(IRemoteChangeListener listener)
 	{
 		listeners.add(listener);
 	}
@@ -351,7 +352,7 @@ public class DaemonAgent extends MicroAgent
 	 *  Remove a change listener.
 	 *  @param listener The change listener.
 	 */
-	public void removeChangeListener(IChangeListener listener)
+	public void removeChangeListener(IRemoteChangeListener listener)
 	{
 		listeners.remove(listener);
 	}
@@ -361,16 +362,29 @@ public class DaemonAgent extends MicroAgent
 	 */
 	protected void notifyListeners(ChangeEvent event)
 	{
-		IChangeListener[] alisteners;
+		IRemoteChangeListener[] alisteners;
 		synchronized(this)
 		{
-			alisteners	= listeners.isEmpty()? null: (IChangeListener[])listeners.toArray(new IChangeListener[0]);
+			alisteners	= listeners.isEmpty()? null: 
+				(IRemoteChangeListener[])listeners.toArray(new IRemoteChangeListener[0]);
 		}
 		if(alisteners!=null)
 		{
 			for(int i=0; i<alisteners.length; i++)
 			{
-				alisteners[i].changeOccurred(event);
+				final IRemoteChangeListener lis = alisteners[i];
+				alisteners[i].changeOccurred(event).addResultListener(createResultListener(new IResultListener()
+				{
+					public void resultAvailable(Object source, Object result)
+					{
+					}
+					
+					public void exceptionOccurred(Object source, Exception exception)
+					{
+//						System.out.println("Removing listener: "+lis);
+						removeChangeListener(lis);
+					}
+				}));
 			}
 		}
 	}

@@ -37,11 +37,11 @@ public interface IDaemonService extends IService
 	 *  Add a change listener.
 	 *  @param listener The change listener.
 	 */
-	public void addChangeListener(final IChangeListener listener);
+	public void addChangeListener(final IRemoteChangeListener listener);
 	
 	/**
 	 *  Remove a change listener.
 	 *  @param listener The change listener.
 	 */
-	public void removeChangeListener(final IChangeListener listener);
+	public void removeChangeListener(final IRemoteChangeListener listener);
 }

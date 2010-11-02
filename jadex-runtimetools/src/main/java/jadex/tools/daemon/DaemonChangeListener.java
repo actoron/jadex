@@ -1,6 +1,8 @@
 package jadex.tools.daemon;
 
 import jadex.commons.ChangeEvent;
+import jadex.commons.Future;
+import jadex.commons.IFuture;
 import jadex.commons.jtable.ObjectTableModel;
 
 import javax.swing.JTable;
@@ -14,7 +16,7 @@ public class DaemonChangeListener implements IRemoteChangeListener
 	protected JTable platformt;
 	
 	/**
-	 * 
+	 *  Create a new change listener.
 	 */
 	public DaemonChangeListener(JTable platformt)
 	{
@@ -22,9 +24,9 @@ public class DaemonChangeListener implements IRemoteChangeListener
 	}
 	
 	/**
-	 * 
+	 *  Invoked when a change occurs.
 	 */
-	public void changeOccurred(ChangeEvent event)
+	public IFuture changeOccurred(ChangeEvent event)
 	{
 		if(IDaemonService.ADDED.equals(event.getType()))
 		{
@@ -34,5 +36,6 @@ public class DaemonChangeListener implements IRemoteChangeListener
 		{
 			((ObjectTableModel)platformt.getModel()).removeRow(event.getValue());
 		}
+		return new Future(null);
 	}
 }

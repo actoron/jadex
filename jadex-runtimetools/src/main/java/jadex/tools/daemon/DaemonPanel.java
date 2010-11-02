@@ -2,8 +2,11 @@ package jadex.tools.daemon;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.ChangeEvent;
+import jadex.commons.Future;
 import jadex.commons.IChangeListener;
+import jadex.commons.IFuture;
 import jadex.commons.SGUI;
+import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.commons.gui.PropertiesPanel;
 import jadex.commons.jtable.ObjectTableModel;
@@ -33,6 +36,9 @@ public class DaemonPanel extends JPanel
 	/** The external access of the agent. */
 	protected IMicroExternalAccess agent;
 	
+	/** The change listener. */
+	protected DaemonChangeListener listener;
+	
 	//-------- constructors --------
 	
 	/**
@@ -41,6 +47,7 @@ public class DaemonPanel extends JPanel
 	public DaemonPanel(final IMicroExternalAccess agent)
 	{
 		this.agent = agent;
+		
 		this.setLayout(new BorderLayout());
 		
 		JPanel p = new JPanel(new BorderLayout());
@@ -97,27 +104,15 @@ public class DaemonPanel extends JPanel
 //		jtdis.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 //		platformt.setDefaultRenderer(IComponentIdentifier.class, new ComponentIdentifierRenderer());
 		
+		this.listener = new DaemonChangeListener(platformt);
+		
 		SServiceProvider.getService(agent.getServiceProvider(), IDaemonService.class)
 			.addResultListener(new SwingDefaultResultListener()
 		{
 			public void customResultAvailable(Object source, Object result)
 			{
 				IDaemonService ds = (IDaemonService)result;
-				ds.addChangeListener(new DaemonChangeListener(platformt));
-//				ds.addChangeListener(new IChangeListener()
-//				{
-//					public void changeOccurred(ChangeEvent event)
-//					{
-//						if(IDaemonService.ADDED.equals(event.getType()))
-//						{
-//							((ObjectTableModel)platformt.getModel()).addRow(new Object[]{event.getValue()}, event.getValue());
-//						}
-//						else if(IDaemonService.REMOVED.equals(event.getType()))
-//						{
-//							((ObjectTableModel)platformt.getModel()).removeRow(event.getValue());
-//						}
-//					}
-//				});
+				ds.addChangeListener(listener);
 			}
 		});
 		
@@ -150,6 +145,39 @@ public class DaemonPanel extends JPanel
 		p.add(suop, BorderLayout.CENTER);
 		
 		this.add(p, BorderLayout.CENTER);
+	}
+	
+	/**
+	 *  Informs the panel that it should stop all its computation
+	 */
+	public IFuture shutdown()
+	{
+		final Future ret = new Future();
+		SServiceProvider.getService(agent.getServiceProvider(), IDaemonService.class)
+			.addResultListener(new IResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				IDaemonService ds = (IDaemonService)result;
+				ds.removeChangeListener(listener);
+				ret.setResult(null);
+			}
+			
+			public void exceptionOccurred(Object source, Exception exception)
+			{
+				ret.setException(exception);
+			}
+		});
+		return ret;
+	}
+	
+	/**
+	 *  Finalize.
+	 */
+	protected void finalize() throws Throwable
+	{
+		shutdown();
+		super.finalize();
 	}
 	
 	/**

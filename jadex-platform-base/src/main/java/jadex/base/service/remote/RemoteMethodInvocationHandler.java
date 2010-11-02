@@ -86,7 +86,6 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 		
 		// Test if finalize is called.
 		if(finalize.equals(method))
-//		if(method.getName().startsWith("fin"))
 		{
 //			System.out.println("Finalize called on: "+proxy);
 			rsms.component.scheduleStep(new ICommand()

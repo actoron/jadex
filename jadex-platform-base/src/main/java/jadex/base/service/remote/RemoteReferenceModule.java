@@ -11,7 +11,6 @@ import jadex.commons.IFuture;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.collection.LRU;
-import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.service.IService;
 import jadex.commons.service.IServiceIdentifier;
@@ -36,11 +35,14 @@ import java.util.TreeMap;
  */
 public class RemoteReferenceModule
 {
-	public static boolean debug = true;
+	/** Debug flag. */
+	public static boolean DEBUG = false;
 
+	/** The default lease time. */
 	public static long DEFAULT_LEASETIME = 15000;
 	
-	public static long DEFAULT_BUFFERTIME = 3000;
+	/** leasetime*factor is used to determine when an entry should be removed. */
+	public static double WAITFACTOR = 2.2;
 	
 	//-------- attributes --------
 
@@ -62,12 +64,9 @@ public class RemoteReferenceModule
 	/** The id counter. */
 	protected long idcnt;
 
-	
 	/** The proxycount count map. (rr -> number of proxies created for rr). */
 	protected Map proxycount;
-//	protected Map proxycountkeys;
 	protected Map proxydates;
-	
 	
 	/** The remote reference holders of a object (rr -> holder (rms cid)). */
 	protected Map holders;
@@ -99,7 +98,6 @@ public class RemoteReferenceModule
 		
 		this.proxycount = new HashMap();
 		this.proxydates = new TreeMap();
-//		this.proxycountkeys = new HashMap();
 		this.holders = new HashMap();
 	}
 	
@@ -135,16 +133,9 @@ public class RemoteReferenceModule
 		ProxyInfo pi = (ProxyInfo)proxyinfos.get(tcid);
 		if(pi==null)
 		{
-//			synchronized(proxyinfos)
-//			{
-//				pi = (ProxyInfo)proxyinfos.get(tcid);
-//				if(pi==null)
-//				{
-					pi = createProxyInfo(target, remoteinterfaces);
-					proxyinfos.put(tcid, pi);
-//					System.out.println("add: "+tcid+" "+ret);
-//				}
-//			}
+			pi = createProxyInfo(target, remoteinterfaces);
+			proxyinfos.put(tcid, pi);
+//			System.out.println("add: "+tcid+" "+ret);
 		}
 		
 		return new ProxyReference(pi, rr);
@@ -233,46 +224,18 @@ public class RemoteReferenceModule
 				
 				// Check methods and possibly cache constant calls.
 				Method[] methods = remoteinterfaces[i].getMethods();
-				methods	= (Method[])SUtil.joinArrays(methods, Object.class.getMethods());
 				for(int j=0; j<methods.length; j++)
 				{
-					// only cache when not excluded, not cached and not replaced
-					if(!ret.isUncached(methods[j]) && !ret.isExcluded(methods[j]) && !ret.isReplaced(methods[j])) 
-					{
-						Class rt = methods[j].getReturnType();
-						Class[] ar = methods[j].getParameterTypes();
-						
-						if(void.class.equals(rt))
-						{
-		//					System.out.println("Warning, void method call will be executed asynchronously: "+type+" "+methods[i].getName());
-						}
-						else if(!(rt.isAssignableFrom(IFuture.class)))
-						{
-							if(ar.length>0)
-							{
-		//						System.out.println("Warning, service method is blocking: "+type+" "+methods[i].getName());
-							}
-							else
-							{
-								// Invoke method to get constant return value.
-								try
-								{
-		//							System.out.println("Calling for caching: "+methods[i]);
-									Object val = methods[j].invoke(target, new Object[0]);
-									ret.putCache(methods[j].getName(), val);
-								}
-								catch(Exception e)
-								{
-									System.out.println("Warning, constant service method threw exception: "+remoteinterfaces[i]+" "+methods[j]);
-			//						e.printStackTrace();
-								}
-							}
-						}
-					}
+					addCachedMethodValue(ret, methods[j], target);
 				}
 			}
 		}
 		
+		Method[] methods = Object.class.getMethods();
+		for(int i=0; i<methods.length; i++)
+		{
+			addCachedMethodValue(ret, methods[i], target);
+		}
 		// Add default replacement for equals() and hashCode().
 		Class targetclass = target.getClass();
 		Method	equals	= SReflect.getMethod(Object.class, "equals", new Class[]{Object.class});
@@ -302,6 +265,46 @@ public class RemoteReferenceModule
 		}
 		
 		return ret;
+	}
+	
+	/**
+	 *  Add a cached method value to the proxy info.
+	 */
+	public static void addCachedMethodValue(ProxyInfo pi, Method m, Object target)
+	{
+		// only cache when not excluded, not cached and not replaced
+		if(!pi.isUncached(m) && !pi.isExcluded(m) && !pi.isReplaced(m)) 
+		{
+			Class rt = m.getReturnType();
+			Class[] ar = m.getParameterTypes();
+			
+			if(void.class.equals(rt))
+			{
+//				System.out.println("Warning, void method call will be executed asynchronously: "+type+" "+methods[i].getName());
+			}
+			else if(!(rt.isAssignableFrom(IFuture.class)))
+			{
+				if(ar.length>0)
+				{
+//					System.out.println("Warning, service method is blocking: "+type+" "+methods[i].getName());
+				}
+				else
+				{
+					// Invoke method to get constant return value.
+					try
+					{
+//						System.out.println("Calling for caching: "+m);
+						Object val = m.invoke(target, new Object[0]);
+						pi.putCache(m.getName(), val);
+					}
+					catch(Exception e)
+					{
+						System.out.println("Warning, constant service method threw exception: "+m);
+//						e.printStackTrace();
+					}
+				}
+			}
+		}
 	}
 	
 	/**
@@ -594,8 +597,11 @@ public class RemoteReferenceModule
 	 */
 	protected void incProxyCount(RemoteReference rr)
 	{
-		if(proxycount.size()!=proxydates.size())
-			System.out.println("ipc start");
+		if(DEBUG)
+		{
+			if(proxycount.size()!=proxydates.size())
+				System.out.println("ipc start");
+		}
 		
 		checkThread();
 		// Only keep track of proxies for java objects.
@@ -629,8 +635,11 @@ public class RemoteReferenceModule
 			if(notify)
 				sendAddRemoteReference(rr);
 			
-			if(proxycount.size()!=proxydates.size())
-				System.out.println("ipc end");
+			if(DEBUG)
+			{
+				if(proxycount.size()!=proxydates.size())
+					System.out.println("ipc end");
+			}
 		}
 	}
 	
@@ -640,8 +649,11 @@ public class RemoteReferenceModule
 	 */
 	protected void decProxyCount(RemoteReference rr)
 	{
-		if(proxycount.size()!=proxydates.size())
-			System.out.println("dpc start");
+		if(DEBUG)
+		{
+			if(proxycount.size()!=proxydates.size())
+				System.out.println("dpc start");
+		}
 		
 		checkThread();
 		// Only keep track of proxies for java objects.
@@ -670,8 +682,11 @@ public class RemoteReferenceModule
 				sendRemoveRemoteReference(rr);
 		}
 		
-		if(proxycount.size()!=proxydates.size())
-			System.out.println("dpc end");
+		if(DEBUG)
+		{
+			if(proxycount.size()!=proxydates.size())
+				System.out.println("dpc end");
+		}
 	}
 	
 	/**
@@ -687,8 +702,13 @@ public class RemoteReferenceModule
 			{
 				if(renewid == RemoteReferenceModule.this.renewid)
 				{
-					if(proxycount.size()!=proxydates.size())
-						System.out.println("srb start");
+					final RemoteServiceManagementAgent agent = (RemoteServiceManagementAgent)args;
+					
+					if(DEBUG)
+					{
+						if(proxycount.size()!=proxydates.size())
+							System.out.println("srb start");
+					}
 					
 //					System.out.println("Starting renewal behavior: "+removeid);
 //					if(proxydates.size()>0)
@@ -708,14 +728,26 @@ public class RemoteReferenceModule
 						diff = dates[i].longValue()-clock.getTime();
 						if(diff<=0)
 						{
-							RemoteReference rr = (RemoteReference)proxydates.remove(dates[i]);
+							final RemoteReference rr = (RemoteReference)proxydates.remove(dates[i]);
 //							System.out.println("renewal sent for: "+rr);
-							sendAddRemoteReference(rr);
+							IResultListener lis = agent.createResultListener(new IResultListener()
+							{
+								public void resultAvailable(Object source, Object result)
+								{
+									if(DEBUG)
+										System.out.println("Renewed successfully lease for: "+rr);
+								}
+								
+								public void exceptionOccurred(Object source, Exception exception)
+								{
+									if(DEBUG)
+										System.out.println("Failed to renew lease for: "+rr);
+								}
+							});
+							sendAddRemoteReference(rr).addResultListener(lis);
 							
-							// todo: use anwer of send for updating expiry date?!
 							long expirydate = clock.getTime()+DEFAULT_LEASETIME;
 							proxydates.put(new Long(expirydate), rr);
-							
 							diff = DEFAULT_LEASETIME;
 						}
 						else
@@ -726,8 +758,11 @@ public class RemoteReferenceModule
 					
 //					System.out.println("prxy: "+proxycount);
 					
-					if(proxycount.size()!=proxydates.size())
-						System.out.println("srb end");
+					if(DEBUG)
+					{
+						if(proxycount.size()!=proxydates.size())
+							System.out.println("srb end");
+					}
 					
 					if(proxycount.size()>0 && diff>0)
 					{
@@ -772,9 +807,10 @@ public class RemoteReferenceModule
 						for(Iterator it2=hds.keySet().iterator(); it2.hasNext(); )
 						{
 							RemoteReferenceHolder rrh = (RemoteReferenceHolder)it2.next();
-							if(clock.getTime() > rrh.getExpiryDate()+DEFAULT_BUFFERTIME)
+							if(clock.getTime() > rrh.getExpiryDate()+DEFAULT_LEASETIME*WAITFACTOR)
 							{
-								System.out.println("Removing expired holder: "+rr+" "+rrh+" "+rrh.getExpiryDate()+" "+System.currentTimeMillis());
+								if(DEBUG)
+									System.out.println("Removing expired holder: "+rr+" "+rrh+" "+rrh.getExpiryDate()+" "+System.currentTimeMillis());
 								hds.remove(rrh);
 								if(hds.size()==0)
 								{
@@ -796,44 +832,34 @@ public class RemoteReferenceModule
 	 *  Send addRef to the origin process of the remote reference.
 	 *  @param rr The remote reference.
 	 */
-	protected void sendAddRemoteReference(RemoteReference rr)
+	protected Future sendAddRemoteReference(final RemoteReference rr)
 	{
 		checkThread();
 		// DGC: notify rr origin that a new proxy of target object exists
 		// todo: handle failures!
 		Future future = new Future();
-		future.addResultListener(new DefaultResultListener()
-		{
-			public void resultAvailable(Object source, Object result)
-			{
-			}
-		});
 //		System.out.println("send add: "+rr);
 		final String callid = SUtil.createUniqueId(rsms.getRMSComponentIdentifier().getLocalName());
 		RemoteDGCAddReferenceCommand com = new RemoteDGCAddReferenceCommand(rr, rsms.getRMSComponentIdentifier(), callid);
 		rsms.sendMessage(rr.getRemoteManagementServiceIdentifier(), com, callid, -1, future);
+		return future;
 	}
 	
 	/**
 	 *  Send removeRef to the origin process of the remote reference.
 	 *  @param rr The remote reference.
 	 */
-	public void sendRemoveRemoteReference(RemoteReference rr)
+	public Future sendRemoveRemoteReference(RemoteReference rr)
 	{
 		checkThread();
 		// DGC: notify rr origin that a new proxy of target object exists
 		// todo: handle failures!
 		Future future = new Future();
-		future.addResultListener(new DefaultResultListener()
-		{
-			public void resultAvailable(Object source, Object result)
-			{
-			}
-		});
 //		System.out.println("send rem: "+rr);
 		final String callid = SUtil.createUniqueId(rsms.getRMSComponentIdentifier().getLocalName());
 		RemoteDGCRemoveReferenceCommand com = new RemoteDGCRemoveReferenceCommand(rr, rsms.getRMSComponentIdentifier(), callid);
 		rsms.sendMessage(rr.getRemoteManagementServiceIdentifier(), com, callid, -1, future);
+		return future;
 	}
 	
 	/**
@@ -897,7 +923,8 @@ public class RemoteReferenceModule
 		{
 			// Renew expiry date of existing holder.
 			oldh.setExpiryDate(expirydate);
-			System.out.println("renewed lease for: "+rr+" "+oldh);
+			if(DEBUG)
+				System.out.println("renewed lease for: "+rr+" "+oldh);
 		}
 		
 		// Decrement number (and possibly remove) temporary holder.
@@ -945,7 +972,7 @@ public class RemoteReferenceModule
 	 */
 	protected void checkThread()
 	{
-		if(debug)
+		if(DEBUG)
 		{
 			if(((ExternalAccess)rsms.getComponent()).getInterpreter().isExternalThread())
 			{
@@ -954,4 +981,32 @@ public class RemoteReferenceModule
 			}
 		}
 	}
+	
+//	Code for retrying a command
+//	rsms.getComponent().scheduleStep(new ICommand()
+//	{
+//		public void execute(Object args)
+//		{
+//			final RemoteServiceManagementAgent agent = (RemoteServiceManagementAgent)args;
+//			final int[] retrycnt = new int[1];
+//			IResultListener lis = agent.createResultListener(new IResultListener()
+//			{
+//				public void resultAvailable(Object source, Object result)
+//				{
+//					long expirydate = clock.getTime()+DEFAULT_LEASETIME;
+//					proxydates.put(new Long(expirydate), rr);
+//				}
+//				
+//				public void exceptionOccurred(Object source, Exception exception)
+//				{
+//					// retry 2 times
+//					if(retrycnt[0]<2)
+//						sendAddRemoteReference(rr).addResultListener(this);
+//					else
+//						System.out.println("Failed to renew lease for: "+rr);
+//					retrycnt[0]++;
+//				}
+//			});
+//		}
+//	});
 }
