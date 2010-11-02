@@ -19,6 +19,7 @@ import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.commons.gui.CombiIcon;
 import jadex.commons.gui.JValidatorTextField;
+import jadex.commons.jtable.ObjectTableModel;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.library.ILibraryService;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
@@ -52,6 +53,7 @@ import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
+import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.UIDefaults;
@@ -59,6 +61,7 @@ import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.table.DefaultTableModel;
 
 /**
  * The starter gui allows for starting components platform independently.
@@ -1154,11 +1157,12 @@ public class StarterPanel extends JPanel
 			
 			if(used.length>0)
 			{
-				JList usedl = new JList(new DefaultListModel());
-				usedservices.add(usedl, BorderLayout.CENTER);
+				JTable usedt = new JTable(new DefaultTableModel(0,1));
+				usedt.setEnabled(false);
+				usedservices.add(usedt, BorderLayout.CENTER);
 				for(int i=0; i<used.length; i++)
 				{
-					((DefaultListModel)usedl.getModel()).addElement(used[i].getName());
+					((DefaultTableModel)usedt.getModel()).addRow(new Object[]{used[i].getName()});
 				}
 			}
 			
@@ -1181,11 +1185,12 @@ public class StarterPanel extends JPanel
 			
 			if(offered.length>0)
 			{
-				JList offeredl = new JList(new DefaultListModel());
-				offeredservices.add(offeredl, BorderLayout.CENTER);
+				JTable offeredt = new JTable(new DefaultTableModel(0,1));
+				offeredt.setEnabled(false);
+				offeredservices.add(offeredt, BorderLayout.CENTER);
 				for(int i=0; i<offered.length; i++)
 				{
-					((DefaultListModel)offeredl.getModel()).addElement(offered[i].getName());
+					((DefaultTableModel)offeredt.getModel()).addRow(new Object[]{offered[i].getName()});
 				}
 			}
 			
