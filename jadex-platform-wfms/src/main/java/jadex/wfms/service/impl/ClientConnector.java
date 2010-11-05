@@ -179,7 +179,8 @@ public class ClientConnector extends BasicService // implements IClientService, 
 	public IFuture deauthenticate(final IClient client)
 	{
 		final Future ret = new Future();
-		SServiceProvider.getService(provider, IAAAService.class).addResultListener(new DelegationResultListener(ret)
+		SServiceProvider.getService(provider, IAAAService.class)
+			.addResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object source, Object result)
 			{
@@ -283,7 +284,8 @@ public class ClientConnector extends BasicService // implements IClientService, 
 		{
 			public void execute(Object args)
 			{
-				SServiceProvider.getService(provider, IAAAService.class).addResultListener(new DelegationResultListener(ret)
+				SServiceProvider.getService(provider, IAAAService.class)
+					.addResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object source, Object result)
 					{

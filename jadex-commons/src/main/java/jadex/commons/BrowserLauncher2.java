@@ -47,7 +47,6 @@ public class BrowserLauncher2
 				{
 					// Use reflection to avoid compile-time dependency to JNLP.
 		
-					// BasicService	basicservice	= (BasicService)ServiceManager.lookup("javax.jnlp.BasicService"); 
 					Class	servicemanagerclass	= Class.forName("javax.jnlp.ServiceManager");
 					Method	lookup	= servicemanagerclass.getMethod("lookup", new Class[]{String.class});
 					Object	basicservice	= lookup.invoke(null, new Object[]{"javax.jnlp.BasicService"});

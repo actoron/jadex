@@ -53,9 +53,9 @@ public class ProxyAgent extends MicroAgent
 //		System.out.println("Proxy for: "+getRemotePlatformIdentifier()
 //			+", "+SUtil.arrayToString(getRemotePlatformIdentifier().getAddresses())
 //			+", "+delay+", "+cachesize);
-//		return new CacheServiceContainer(new RemoteServiceContainer(
-//			getRemotePlatformIdentifier(), getAgentAdapter()), 25, 1*30*1000); // 30 secs cache expire
-		return new RemoteServiceContainer(getRemotePlatformIdentifier(), getAgentAdapter());
+		return new CacheServiceContainer(new RemoteServiceContainer(
+			getRemotePlatformIdentifier(), getAgentAdapter()), 25, 1*30*1000); // 30 secs cache expire
+//		return new RemoteServiceContainer(getRemotePlatformIdentifier(), getAgentAdapter());
 	}
 	
 	/**

@@ -3,6 +3,7 @@ package jadex.commons.service;
 import jadex.commons.IFilter;
 
 import java.lang.reflect.Proxy;
+import java.rmi.server.RemoteObjectInvocationHandler;
 
 /**
  *  Test if a class is a proxy.
@@ -21,7 +22,8 @@ public class ProxyFilter implements IFilter
 	 */
 	public boolean filter(Object obj)
 	{
-		return !Proxy.isProxyClass(obj.getClass());
+		return !Proxy.isProxyClass(obj.getClass()) || 
+			!(Proxy.getInvocationHandler(obj) instanceof RemoteObjectInvocationHandler);
 	}
 	
 	/**

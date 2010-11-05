@@ -35,6 +35,7 @@ public class Future implements IFuture
 	
 	/** The exception (if any). */
 	protected Exception exception;
+//	protected Exception resultex;
 	
 	/** Flag indicating if result is available. */
 	protected boolean resultavailable;
@@ -159,6 +160,11 @@ public class Future implements IFuture
         	{
         		if(this.exception!=null)
         			this.exception.printStackTrace();
+//        		if(resultex!=null)
+//        		{
+//        			System.err.println("Result: "+result);
+//        			resultex.printStackTrace();
+//        		}
         		throw new RuntimeException(this.exception);
         	}	
         	
@@ -206,6 +212,7 @@ public class Future implements IFuture
 //        	System.out.println(this+" setResult: "+result);
         	this.result = result;
         	resultavailable = true;			
+//        	this.resultex = new Exception();
 		}
     	
     	resume();
@@ -302,14 +309,21 @@ public class Future implements IFuture
     protected void notifyListener(IResultListener listener)
     {
     	// todo: source?
-		if(exception!=null)
-		{
-			listener.exceptionOccurred(this, exception);
-		}
-		else
-		{
-			listener.resultAvailable(this, result); 
-		}
+    	try
+    	{
+			if(exception!=null)
+			{
+				listener.exceptionOccurred(this, exception);
+			}
+			else
+			{
+				listener.resultAvailable(this, result); 
+			}
+    	}
+    	catch(Exception e)
+    	{
+    		e.printStackTrace();
+    	}
     }
     
     /**

@@ -14,7 +14,8 @@ import jadex.commons.IResultCommand;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
-import jadex.commons.service.BasicService;
+import jadex.commons.service.CacheServiceContainer;
+import jadex.commons.service.IInternalService;
 import jadex.commons.service.IServiceContainer;
 import jadex.commons.service.IServiceIdentifier;
 import jadex.commons.service.IServiceProvider;
@@ -96,8 +97,8 @@ public abstract class MicroAgent implements IMicroAgent
 	 */
 	public IServiceContainer createServiceContainer()
 	{
-//		return new CacheServiceContainer(new ComponentServiceContainer(getAgentAdapter()), 25, 1*30*1000); // 30 secs cache expire
-		return new ComponentServiceContainer(getAgentAdapter());
+		return new CacheServiceContainer(new ComponentServiceContainer(getAgentAdapter()), 25, 1*30*1000); // 30 secs cache expire
+//		return new ComponentServiceContainer(getAgentAdapter());
 	}
 	
 	/**
@@ -483,7 +484,7 @@ public abstract class MicroAgent implements IMicroAgent
 	 *  the old one is removed and shutdowned.
 	 *  @param service The service.
 	 */
-	public void addService(BasicService service)
+	public void addService(IInternalService service)
 	{
 		((IServiceContainer)interpreter.getServiceProvider()).addService(service);
 	}

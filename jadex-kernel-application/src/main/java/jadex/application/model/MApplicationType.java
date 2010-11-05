@@ -404,7 +404,7 @@ public class MApplicationType implements ICacheableModel
 	 *  Add a service.
 	 *  @param service The service.
 	 */
-	public void addService(MExpressionType service)
+	public void addService(MServiceType service)
 	{
 		this.services.add(service);
 	}

@@ -17,7 +17,7 @@ import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.CounterResultListener;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
-import jadex.commons.service.BasicService;
+import jadex.commons.service.IInternalService;
 import jadex.commons.service.IServiceContainer;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.clock.IClockService;
@@ -1174,7 +1174,7 @@ public class AgentRules
 			{
 				Object mexp = it.next();
 //				String name = (String)state.getAttributeValue(mexp, OAVBDIMetaModel.modelelement_has_name);
-				BasicService val = (BasicService)evaluateExpression(state, mexp, new OAVBDIFetcher(state, rcapa));
+				IInternalService val = (IInternalService)evaluateExpression(state, mexp, new OAVBDIFetcher(state, rcapa));
 //				Class type = (Class)state.getAttributeValue(mexp, OAVBDIMetaModel.expression_has_class);
 				// cast hack?!
 				((IServiceContainer)BDIInterpreter.getInterpreter(state).getServiceProvider()).addService(val);

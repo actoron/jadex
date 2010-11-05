@@ -33,6 +33,7 @@ import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.ISynchronizator;
+import jadex.commons.service.CacheServiceContainer;
 import jadex.commons.service.IServiceContainer;
 import jadex.commons.service.IServiceProvider;
 import jadex.commons.service.SServiceProvider;
@@ -1237,8 +1238,8 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 			}
 			else
 			{
-//				container = new CacheServiceContainer(new ComponentServiceContainer(getAgentAdapter()), 25, 1*30*1000); // 30 secs cache expire
-				container = new ComponentServiceContainer(getAgentAdapter());
+				container = new CacheServiceContainer(new ComponentServiceContainer(getAgentAdapter()), 25, 1*30*1000); // 30 secs cache expire
+//				container = new ComponentServiceContainer(getAgentAdapter());
 			}
 		}
 		return container;

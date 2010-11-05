@@ -5,6 +5,7 @@ import jadex.application.model.MApplicationType;
 import jadex.application.model.MComponentInstance;
 import jadex.application.model.MComponentType;
 import jadex.application.model.MExpressionType;
+import jadex.application.model.MServiceType;
 import jadex.application.model.MSpaceInstance;
 import jadex.application.model.MSpaceType;
 import jadex.bridge.Argument;
@@ -239,7 +240,7 @@ public class ApplicationXMLReader
 				new AttributeInfo(new AccessInfo("class", "className"))
 			}, null)));
 		
-		types.add(new TypeInfo(new XMLInfo(new QName(uri, "service")), new ObjectInfo(MExpressionType.class, new ExpressionProcessor()), 
+		types.add(new TypeInfo(new XMLInfo(new QName(uri, "service")), new ObjectInfo(MServiceType.class, new ExpressionProcessor()), 
 			new MappingInfo(null, null, "value", new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo("class", "className"))
 			}, null)));

@@ -5,8 +5,10 @@ import jadex.application.model.MApplicationType;
 import jadex.application.model.MComponentInstance;
 import jadex.application.model.MComponentType;
 import jadex.application.model.MExpressionType;
+import jadex.application.model.MServiceType;
 import jadex.application.model.MSpaceInstance;
 import jadex.application.runtime.IApplication;
+import jadex.application.runtime.IApplicationExternalAccess;
 import jadex.application.runtime.ISpace;
 import jadex.bridge.ComponentResultListener;
 import jadex.bridge.ComponentServiceContainer;
@@ -25,19 +27,23 @@ import jadex.bridge.IModelInfo;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.SReflect;
+import jadex.commons.collection.MultiCollection;
 import jadex.commons.concurrent.CollectionResultListener;
 import jadex.commons.concurrent.CounterResultListener;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
-import jadex.commons.service.BasicService;
+import jadex.commons.service.CacheServiceContainer;
+import jadex.commons.service.IInternalService;
 import jadex.commons.service.IServiceContainer;
 import jadex.commons.service.IServiceProvider;
 import jadex.commons.service.SServiceProvider;
 import jadex.javaparser.IValueFetcher;
 import jadex.javaparser.SimpleValueFetcher;
 
+import java.lang.reflect.Proxy;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -91,6 +97,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 	
 	/** Component type mapping (cid -> modelname) and (modelname->application component type). */
 	protected Map ctypes;
+	protected MultiCollection instances;
 	
 	/** The arguments. */
 	protected Map arguments;
@@ -130,6 +137,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 		this.results = new HashMap();
 		this.properties = new HashMap();
 		this.ctypes = Collections.synchronizedMap(new HashMap()); 
+		this.instances = new MultiCollection(); 
 		this.steps	= new ArrayList();
 		this.willdostep	= true;
 		this.adapter = factory.createComponentAdapter(desc, model.getModelInfo(), this, parent);
@@ -174,8 +182,8 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 		}
 		else
 		{
-//			container = new CacheServiceContainer(new ComponentServiceContainer(getComponentAdapter()), 25, 1*30*1000); // 30 secs cache expire
-			container = new ComponentServiceContainer(getComponentAdapter());
+			container = new CacheServiceContainer(new ComponentServiceContainer(getComponentAdapter()), 25, 1*30*1000); // 30 secs cache expire
+//			container = new ComponentServiceContainer(getComponentAdapter());
 		}
 		
 		fetcher.setValue("$provider", getServiceProvider());
@@ -190,8 +198,19 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 				{
 					for(int i=0; i<services.size(); i++)
 					{
-						MExpressionType exp = (MExpressionType)services.get(i);
-						BasicService service = (BasicService)exp.getParsedValue().getValue(fetcher);
+						IInternalService service;
+						MServiceType st = (MServiceType)services.get(i);
+						String componenttype = st.getFrom();
+						if(componenttype!=null)
+						{
+							service = (IInternalService)Proxy.newProxyInstance(getClassLoader(), new Class[]{IInternalService.class, st.getClazz()}, 
+								new ServiceInvocationHandler((IApplicationExternalAccess)getExternalAccess(), componenttype, st.getClazz()));
+						}
+						else
+						{
+							service = (IInternalService)st.getParsedValue().getValue(fetcher);
+						}
+//						System.out.println("added: "+service+" "+getComponentIdentifier());
 						container.addService(service);
 					}
 				}
@@ -510,7 +529,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 		
 //		System.out.println("comp created: "+desc.getName()+" "+Application.this.getComponentIdentifier()+" "+children);
 
-		IComponentIdentifier comp = desc.getName();
+		IComponentIdentifier cid = desc.getName();
 		
 		String modelname = model.getFullName();
 		String appctype = (String)ctypes.get(modelname);
@@ -531,7 +550,8 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 		}
 		if(appctype!=null)
 		{
-			ctypes.put(comp, appctype);
+			ctypes.put(cid, appctype);
+			instances.put(appctype, cid);
 		}
 		/* TODO: Check removed because WfMS requires adding arbitrary subcomponents (processes).
 		else if(parent!=null)
@@ -552,7 +572,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 		{
 			for(int i=0; i<aspaces.length; i++)
 			{
-				aspaces[i].componentAdded(comp);
+				aspaces[i].componentAdded(cid);
 			}
 		}
 	}
@@ -565,9 +585,9 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 	 */
 	public void	componentDestroyed(IComponentDescription desc)
 	{
-//		System.out.println("comp removed: "+desc.getName()+" "+Application.this.getComponentIdentifier()+" "+children);
+//		System.out.println("comp removed: "+desc.getName()+" "+this.getComponentIdentifier());
 		
-		IComponentIdentifier comp = desc.getName();
+		IComponentIdentifier cid = desc.getName();
 		ISpace[]	aspaces	= null;
 		synchronized(this)
 		{
@@ -581,13 +601,22 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 		{
 			for(int i=0; i<aspaces.length; i++)
 			{
-				aspaces[i].componentRemoved(comp);
+				aspaces[i].componentRemoved(cid);
 			}
 		}
 		
 		if(ctypes!=null)
 		{
-			ctypes.remove(comp);
+			try
+			{
+				String appctype = (String)ctypes.remove(cid);
+				if(appctype!=null)
+					instances.remove(appctype, cid);
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+			}
 		}
 	}
 	
@@ -1143,6 +1172,24 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 			inited.setResult(new Object[]{ApplicationInterpreter.this, adapter});
 		}
 	}
+	
+	/**
+	 *  Get the file name of a component type.
+	 *  @param ctype The component type.
+	 *  @return The file name of this component type.
+	 */
+	public String getFileName(String ctype)
+	{
+		String ret = null;
+		List componenttypes = model.getMComponentTypes();
+		for(int i=0; ret==null && i<componenttypes.size(); i++)
+		{
+			MComponentType at = (MComponentType)componenttypes.get(i);
+			if(at.getName().equals(ctype))
+				ret = at.getFilename();
+		}
+		return ret;
+	}
 
 	/**
 	 *  Get the arguments.
@@ -1223,5 +1270,14 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 	public IServiceContainer getServiceContainer()
 	{
 		return container;
+	}
+	
+	/**
+	 *  Get the children (if any).
+	 *  @return The children.
+	 */
+	public Collection getChildren(final String type)
+	{
+		return (Collection)instances.get(type);
 	}
 }

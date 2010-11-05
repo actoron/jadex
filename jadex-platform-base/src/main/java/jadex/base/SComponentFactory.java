@@ -25,13 +25,15 @@ public class SComponentFactory
 	{
 		final Future ret = new Future();
 		
-		SServiceProvider.getService(provider, ILibraryService.class).addResultListener(new DelegationResultListener(ret)
+		SServiceProvider.getService(provider, ILibraryService.class)
+			.addResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object source, Object result)
 			{
 				final ILibraryService ls = (ILibraryService)result;
 				
-				SServiceProvider.getService(provider, new ComponentFactorySelector(model, null, ls.getClassLoader())).addResultListener(new DelegationResultListener(ret)
+				SServiceProvider.getService(provider, new ComponentFactorySelector(model, null, ls.getClassLoader()))
+					.addResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object source, Object result)
 					{
@@ -53,13 +55,15 @@ public class SComponentFactory
 	{
 		final Future ret = new Future();
 		
-		SServiceProvider.getService(provider, ILibraryService.class).addResultListener(new DelegationResultListener(ret)
+		SServiceProvider.getService(provider, ILibraryService.class)
+			.addResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object source, Object result)
 			{
 				final ILibraryService ls = (ILibraryService)result;
 				
-				SServiceProvider.getService(provider, new ComponentFactorySelector(model, null, ls.getClassLoader())).addResultListener(new DelegationResultListener(ret)
+				SServiceProvider.getService(provider, new ComponentFactorySelector(model, null, ls.getClassLoader()))
+					.addResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object source, Object result)
 					{
@@ -82,13 +86,15 @@ public class SComponentFactory
 	{
 		final Future ret = new Future();
 		
-		SServiceProvider.getService(provider, ILibraryService.class).addResultListener(new DelegationResultListener(ret)
+		SServiceProvider.getService(provider, ILibraryService.class)
+			.addResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object source, Object result)
 			{
 				final ILibraryService ls = (ILibraryService)result;
 				
-				SServiceProvider.getService(provider, new ComponentFactorySelector(model, null, ls.getClassLoader())).addResultListener(new DelegationResultListener(ret)
+				SServiceProvider.getService(provider, new ComponentFactorySelector(model, null, ls.getClassLoader()))
+					.addResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object source, Object result)
 					{
@@ -109,7 +115,8 @@ public class SComponentFactory
 	{
 		final Future ret = new Future();
 		
-		SServiceProvider.getService(provider, new ComponentFactorySelector(type)).addResultListener(new DelegationResultListener(ret)
+		SServiceProvider.getService(provider, new ComponentFactorySelector(type))
+			.addResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object source, Object result)
 			{
@@ -128,7 +135,8 @@ public class SComponentFactory
 	{
 		final Future ret = new Future();
 		
-		SServiceProvider.getService(provider, new ComponentFactorySelector(type)).addResultListener(new DelegationResultListener(ret)
+		SServiceProvider.getService(provider, new ComponentFactorySelector(type))
+			.addResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object source, Object result)
 			{
@@ -153,7 +161,8 @@ public class SComponentFactory
 			{
 				final ILibraryService ls = (ILibraryService)result;
 				
-				SServiceProvider.getService(provider, new ComponentFactorySelector(model, null, ls.getClassLoader())).addResultListener(new DelegationResultListener(ret)
+				SServiceProvider.getService(provider, new ComponentFactorySelector(model, null, ls.getClassLoader()))
+					.addResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object source, Object result)
 					{

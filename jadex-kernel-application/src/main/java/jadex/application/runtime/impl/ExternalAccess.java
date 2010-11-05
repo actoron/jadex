@@ -5,6 +5,7 @@ import jadex.application.runtime.ISpace;
 import jadex.bridge.ComponentResultListener;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IModelInfo;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
@@ -159,6 +160,73 @@ public class ExternalAccess implements IApplicationExternalAccess
 	public IResultListener createResultListener(IResultListener listener)
 	{
 		return new ComponentResultListener(listener, adapter);
+	}
+	
+	/**
+	 *  Get the children (if any).
+	 *  @return The children.
+	 */
+	public IFuture getChildren(final String type)
+	{
+		final Future ret = new Future();
+		
+		if(adapter.isExternalThread())
+		{
+			try
+			{
+				adapter.invokeLater(new Runnable() 
+				{
+					public void run() 
+					{
+						ret.setResult(application.getChildren(type));
+					}
+				});
+			}
+			catch(Exception e)
+			{
+				ret.setException(e);
+			}
+		}
+		else
+		{
+			ret.setResult(application.getChildren(type));
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Get the file name of a component type.
+	 *  @param ctype The component type.
+	 *  @return The file name of this component type.
+	 */
+	public IFuture getFileName(final String ctype)
+	{
+		final Future ret = new Future();
+		
+		if(adapter.isExternalThread())
+		{
+			try
+			{
+				adapter.invokeLater(new Runnable() 
+				{
+					public void run() 
+					{
+						ret.setResult(application.getFileName(ctype));
+					}
+				});
+			}
+			catch(Exception e)
+			{
+				ret.setException(e);
+			}
+		}
+		else
+		{
+			ret.setResult(application.getFileName(ctype));
+		}
+		
+		return ret;
 	}
 	
 	/**

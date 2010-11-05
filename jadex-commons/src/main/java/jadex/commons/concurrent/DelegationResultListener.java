@@ -37,7 +37,10 @@ public class DelegationResultListener implements IResultListener
 		}
 		catch(Exception e)
 		{
-			future.setException(e);
+			e.printStackTrace();
+			// Could happen that overridden customResultAvailable method
+			// first sets result and then throws exception (listener ex are catched).
+			future.setExceptionIfUndone(e);
 		}
 	}
 	

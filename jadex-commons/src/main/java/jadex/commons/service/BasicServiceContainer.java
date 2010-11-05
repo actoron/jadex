@@ -29,7 +29,7 @@ public class BasicServiceContainer implements  IServiceContainer
 	protected Object id;
 	
 	/** True, if the container is started. */
-	protected boolean	started;
+	protected boolean started;
 
 	//-------- constructors --------
 
@@ -87,7 +87,7 @@ public class BasicServiceContainer implements  IServiceContainer
 	 *  @param id The name.
 	 *  @param service The service.
 	 */
-	public IFuture	addService(BasicService service)
+	public IFuture	addService(IInternalService service)
 	{
 		final Future ret = new Future();
 		
@@ -137,12 +137,12 @@ public class BasicServiceContainer implements  IServiceContainer
 		{
 			Collection tmp = services!=null? (Collection)services.get(sid.getServiceType()): null;
 			
-			BasicService service = null;
+			IInternalService service = null;
 			if(tmp!=null)
 			{
 				for(Iterator it=tmp.iterator(); it.hasNext() && service==null; )
 				{
-					BasicService tst = (BasicService)it.next();
+					IInternalService tst = (IInternalService)it.next();
 					if(tst.getServiceIdentifier().equals(sid))
 					{
 						service = tst;
@@ -205,7 +205,7 @@ public class BasicServiceContainer implements  IServiceContainer
 			};
 			for(Iterator it=allservices.iterator(); it.hasNext(); )
 			{
-				((BasicService)it.next()).startService().addResultListener(crl);
+				((IInternalService)it.next()).startService().addResultListener(crl);
 			}
 		}
 		else
@@ -250,7 +250,7 @@ public class BasicServiceContainer implements  IServiceContainer
 			};
 			for(Iterator it=allservices.iterator(); it.hasNext(); )
 			{
-				((BasicService)it.next()).shutdownService().addResultListener(crl);
+				((IInternalService)it.next()).shutdownService().addResultListener(crl);
 			}
 		}
 		else
@@ -288,7 +288,4 @@ public class BasicServiceContainer implements  IServiceContainer
 	{
 		return obj instanceof IServiceContainer && ((IServiceContainer)obj).getId().equals(getId());
 	}
-	
-	
-	
 }

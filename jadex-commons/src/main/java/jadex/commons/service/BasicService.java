@@ -12,7 +12,7 @@ import java.util.Map;
  *  Basic service provide a simple default isValid() implementation
  *  that returns true after start service and false afterwards.
  */
-public class BasicService implements IService
+public class BasicService implements IInternalService
 {	
 	//-------- attributes --------
 
@@ -193,7 +193,7 @@ public class BasicService implements IService
 	 *  @param servicename The service name.
 	 *  @return A service identifier.
 	 */
-	protected static IServiceIdentifier createServiceIdentifier(Object providerid, Class servicetype, Class serviceimpl)
+	public static IServiceIdentifier createServiceIdentifier(Object providerid, Class servicetype, Class serviceimpl)
 	{
 		return new ServiceIdentifier(providerid, servicetype, generateServiceName(serviceimpl));
 	}

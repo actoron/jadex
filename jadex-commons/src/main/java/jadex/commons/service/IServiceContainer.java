@@ -29,7 +29,7 @@ public interface IServiceContainer extends IServiceProvider
 	 *  The service is started, if the container is already running.
 	 *  @param service The service.
 	 */
-	public IFuture	addService(BasicService service);
+	public IFuture	addService(IInternalService service);
 
 	/**
 	 *  Removes a service from the container (shutdowns also the service if the container is running).
