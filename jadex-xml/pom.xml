@@ -176,5 +176,19 @@
 			<artifactId>jadex-commons</artifactId>
 			<version>2.0-rc5</version>
 		</dependency>
+
+		<!-- todo: remove depency before release -->
+		<dependency>
+		    <groupId>pull-parser</groupId>
+		    <artifactId>pull-parser</artifactId>
+		    <version>2.1.10</version>
+		</dependency>
+		<!-- 
+		<dependency>
+		    <groupId>woodstox</groupId>
+		    <artifactId>wstx-lgpl</artifactId>
+		    <version>3.2.7</version>
+		</dependency>
+		 -->
 	</dependencies>
 </project>

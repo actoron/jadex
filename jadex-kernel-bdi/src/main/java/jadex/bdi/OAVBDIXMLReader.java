@@ -38,6 +38,9 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.xml.namespace.QName;
+import javax.xml.stream.Location;
+import javax.xml.stream.XMLReporter;
+import javax.xml.stream.XMLStreamException;
 
 
 /**
@@ -352,7 +355,15 @@ public class OAVBDIXMLReader
 
 		// Different readers and writers should not work on the same typeinfos
 		// because they may alter them (e.g. add additional array types).
-		reader = new Reader(new OAVObjectReaderHandler(typeinfos));
+		reader = new Reader(new OAVObjectReaderHandler(typeinfos), false, true, new XMLReporter()
+		{
+			public void report(String msg, String type, Object info, Location location) throws XMLStreamException
+			{
+				System.out.println("XML error: "+msg+", "+type+", "+info+", "+location);
+				IContext	context	= (IContext)Reader.READ_CONTEXT.get();
+				reportError(context, msg);
+			}
+		});
 		writer = new Writer(new OAVObjectWriterHandler(new HashSet(typeinfos)));
 	}
 	
@@ -378,9 +389,17 @@ public class OAVBDIXMLReader
 	protected static void reportError(IContext context, String error)
 	{
 		MultiCollection	report	= (MultiCollection)((OAVUserContext)context.getUserContext()).getCustom();
+		String	pos;
 		Tuple	stack	= new Tuple(((ReadContext)context).getStack().toArray());
-		StackElement	se	= (StackElement)stack.get(stack.getEntities().length-1);
-		String	pos	= " (line "+se.getLine()+", column "+se.getColumn()+")"; 
+		if(stack.getEntities().length>0)
+		{
+			StackElement	se	= (StackElement)stack.get(stack.getEntities().length-1);
+			pos	= " (line "+se.getLine()+", column "+se.getColumn()+")";
+		}
+		else
+		{
+			pos	= " (line 0, column 0)";			
+		}
 		report.put(stack, error+pos);
 	}
 	

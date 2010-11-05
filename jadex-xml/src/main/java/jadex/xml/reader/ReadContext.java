@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.stream.XMLReporter;
 import javax.xml.stream.XMLStreamReader;
 
 /**
@@ -20,6 +21,9 @@ public class ReadContext implements IContext
 	
 	/** The parser. */
 	protected XMLStreamReader parser;
+	
+	/** The parser. */
+	protected XMLReporter reporter;
 	
 	/** The classloader. */
 	protected ClassLoader classloader;
@@ -56,9 +60,9 @@ public class ReadContext implements IContext
 	/**
 	 * @param parser
 	 */
-	public ReadContext(XMLStreamReader parser, Object callcontext, ClassLoader classloader)
+	public ReadContext(XMLStreamReader parser, XMLReporter reporter, Object callcontext, ClassLoader classloader)
 	{
-		this(parser, callcontext, classloader, null, new ArrayList(), 
+		this(parser, reporter, callcontext, classloader, null, new ArrayList(), 
 			null, null, new HashMap(), 0, new MultiCollection());
 	}
 	
@@ -71,10 +75,11 @@ public class ReadContext implements IContext
 	 * @param comment
 	 * @param readobjects
 	 */
-	public ReadContext(XMLStreamReader parser, Object callcontext, ClassLoader classloader, Object root, List stack,
+	public ReadContext(XMLStreamReader parser,  XMLReporter reporter, Object callcontext, ClassLoader classloader, Object root, List stack,
 		StackElement topse, String comment, Map readobjects, int readignore, MultiCollection postprocessors)
 	{
 		this.parser = parser;
+		this.reporter = reporter;
 		this.callcontext = callcontext;
 		this.classloader = classloader;
 		this.rootobject = root;
@@ -97,13 +102,22 @@ public class ReadContext implements IContext
 		return parser;
 	}
 
+//	/**
+//	 *  Set the parser.
+//	 *  @param parser The parser to set.
+//	 */
+//	public void setParser(XMLStreamReader parser)
+//	{
+//		this.parser = parser;
+//	}
+
 	/**
-	 *  Set the parser.
-	 *  @param parser The parser to set.
+	 *  Get the reporter.
+	 *  @return The reporter.
 	 */
-	public void setParser(XMLStreamReader parser)
+	public XMLReporter getReporter()
 	{
-		this.parser = parser;
+		return reporter;
 	}
 
 	/**

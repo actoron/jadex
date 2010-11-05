@@ -395,7 +395,10 @@ public class OAVObjectReaderHandler implements IObjectReaderHandler
 		}	
 		
 		if(!linked)
-			throw new RuntimeException("Could not link: "+elem+" "+parent);
+		{
+			context.getReporter().report("Could not link: "+elem+" "+parent, "Could not link", context, context.getParser().getLocation());
+//			throw new RuntimeException("Could not link: "+elem+" "+parent);
+		}
 	}
 	
 	/**

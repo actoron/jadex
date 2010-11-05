@@ -122,7 +122,7 @@ public class ADFChecker extends IncrementalProjectBuilder
 
 	void checkXML(IResource resource)
 	{
-		if(resource instanceof IFile
+		if(!resource.isDerived() &&	resource instanceof IFile
 			&& (resource.getName().endsWith(".agent.xml")
 			|| resource.getName().endsWith(".capability.xml")))
 		{
@@ -157,7 +157,7 @@ public class ADFChecker extends IncrementalProjectBuilder
 				if(info.getReport()!=null)
 				{
 					String	report	= info.getReport().getErrorText();
-					System.out.println(report);
+//					System.out.println(report);
 					StringTokenizer stok	= new StringTokenizer(report, "\n");
 					while(stok.hasMoreTokens())
 					{

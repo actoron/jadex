@@ -1,7 +1,5 @@
 package jadex.bridge;
 
-import jadex.commons.SUtil;
-
 import java.util.Map;
 
 

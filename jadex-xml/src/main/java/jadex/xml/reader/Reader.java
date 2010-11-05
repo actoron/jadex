@@ -22,6 +22,7 @@ import java.util.Set;
 import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLReporter;
 import javax.xml.stream.XMLStreamReader;
 
 /**
@@ -36,9 +37,10 @@ public class Reader
 	
 	/** The string marker object. */
 	public static final Object STRING_MARKER = new String();
-	
-	/** The xml input factory. */
-	protected static final XMLInputFactory	FACTORY	= XMLInputFactory.newInstance();
+
+	/** This thread local variable provides access to the read context,
+	 *  e.g. from the XML reporter, if required. */
+	public static final ThreadLocal	READ_CONTEXT	= new ThreadLocal();
 	
 	//-------- attributes --------
 	
@@ -47,6 +49,9 @@ public class Reader
 	
 	/** The link mode. */
 	protected boolean bulklink;
+	
+	/** The xml input factory. */
+	protected XMLInputFactory	factory;
 	
 	//-------- constructors --------
 
@@ -65,8 +70,32 @@ public class Reader
 	 */
 	public Reader(IObjectReaderHandler handler, boolean bulklink)
 	{
+		this(handler, bulklink, false, null);
+	}
+	
+	/**
+	 *  Create a new reader.
+	 *  @param handler The handler.
+	 */
+	public Reader(IObjectReaderHandler handler, boolean bulklink, boolean validate, XMLReporter reporter)
+	{
 		this.handler = handler;
 		this.bulklink = bulklink;
+		factory	= XMLInputFactory.newInstance();
+		
+		try
+		{
+			factory.setProperty(XMLInputFactory.IS_VALIDATING, validate ? Boolean.TRUE : Boolean.FALSE);
+		}
+		catch(Exception e)
+		{
+			// Validation not supported.
+		}
+		
+		if(reporter!=null)
+		{
+			factory.setProperty(XMLInputFactory.REPORTER, reporter);
+		}
 	}
 	
 	//-------- methods --------
@@ -80,49 +109,57 @@ public class Reader
 	public Object read(InputStream input, final ClassLoader classloader, final Object callcontext) throws Exception
 	{
 		XMLStreamReader	parser;
-		synchronized(FACTORY)
+		synchronized(factory)
 		{
-			parser	= FACTORY.createXMLStreamReader(input);
+			parser	= factory.createXMLStreamReader(input);
 		}
-		ReadContext readcontext = new ReadContext(parser, callcontext, classloader);
-		
-		while(parser.hasNext())
+		XMLReporter	reporter	= factory.getXMLReporter();
+		ReadContext readcontext = new ReadContext(parser, reporter, callcontext, classloader);
+		READ_CONTEXT.set(readcontext);
+		try
 		{
-			int	next = parser.next();
-			
-			if(next==XMLStreamReader.COMMENT)
+			while(parser.hasNext())
 			{
-				handleComment(readcontext);
-			}
-			else if(next==XMLStreamReader.CHARACTERS || next==XMLStreamReader.CDATA)
-			{
-				handleContent(readcontext);
-			}
-			else if(next==XMLStreamReader.START_ELEMENT)
-			{	
-				handleStartElement(readcontext);
-			}
-			else if(next==XMLStreamReader.END_ELEMENT)
-			{
-				handleEndElement(readcontext);
-			}
-		}
-		parser.close();
-		
-		// Handle post-processors.
-		for(int i=1; readcontext.getPostProcessors().size()>0; i++)
-		{
-			List ps = (List)readcontext.getPostProcessors().remove(new Integer(i));
-			if(ps!=null)
-			{
-				for(int j=0; j<ps.size(); j++)
+				int	next = parser.next();
+				
+				if(next==XMLStreamReader.COMMENT)
 				{
-					((Runnable)ps.get(j)).run();
+					handleComment(readcontext);
+				}
+				else if(next==XMLStreamReader.CHARACTERS || next==XMLStreamReader.CDATA)
+				{
+					handleContent(readcontext);
+				}
+				else if(next==XMLStreamReader.START_ELEMENT)
+				{	
+					handleStartElement(readcontext);
+				}
+				else if(next==XMLStreamReader.END_ELEMENT)
+				{
+					handleEndElement(readcontext);
 				}
 			}
-//			System.out.println("i: "+i);
-		}
+			parser.close();
 			
+			// Handle post-processors.
+			for(int i=1; readcontext.getPostProcessors().size()>0; i++)
+			{
+				List ps = (List)readcontext.getPostProcessors().remove(new Integer(i));
+				if(ps!=null)
+				{
+					for(int j=0; j<ps.size(); j++)
+					{
+						((Runnable)ps.get(j)).run();
+					}
+				}
+	//			System.out.println("i: "+i);
+			}
+		}
+		finally
+		{
+			READ_CONTEXT.set(null);
+		}
+
 		return readcontext.rootobject;
 	}
 	
