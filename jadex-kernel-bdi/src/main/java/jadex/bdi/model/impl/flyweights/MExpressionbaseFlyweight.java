@@ -254,7 +254,7 @@ public class MExpressionbaseFlyweight  extends MElementFlyweight implements IMEx
         state.setAttributeValue(mexp, OAVBDIMetaModel.expression_has_language, language);
     
         IParsedExpression pexp = parseExpression(expression, language, state, scope);
-        state.setAttributeValue(mexp, OAVBDIMetaModel.expression_has_content, pexp);
+        state.setAttributeValue(mexp, OAVBDIMetaModel.expression_has_parsed, pexp);
         
         return new MExpressionFlyweight(state, scope, mexp);
     }
@@ -292,7 +292,7 @@ public class MExpressionbaseFlyweight  extends MElementFlyweight implements IMEx
     {
         Object    mcon    = state.createObject(OAVBDIMetaModel.condition_type);
         state.setAttributeValue(mcon, OAVBDIMetaModel.expression_has_language, language);    
-        state.setAttributeValue(mcon, OAVBDIMetaModel.expression_has_content, expression);	// parsed later, when registering model.
+        state.setAttributeValue(mcon, OAVBDIMetaModel.expression_has_text, expression);	// parsed later, when registering model.
         return new MConditionFlyweight(state, scope, mcon);
     }
 }

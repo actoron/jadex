@@ -407,7 +407,7 @@ public class BeliefRules
 						{
 							String name = BDIInterpreter.getInterpreter(state).getAgentAdapter().getComponentIdentifier().getName();
 							BDIInterpreter.getInterpreter(state).getLogger(rcapa).severe("Could not evaluate parameter expression: "+name
-								+" "+state.getAttributeValue(exp, OAVBDIMetaModel.expression_has_content));
+								+" "+state.getAttributeValue(exp, OAVBDIMetaModel.expression_has_parsed));
 						}
 		//					// changed *.class to *.TYPE due to javaflow bug
 						state.setAttributeValue(rparam, OAVBDIRuntimeModel.typedelement_has_timer, 
@@ -479,7 +479,7 @@ public class BeliefRules
 						catch(Exception e)
 						{
 							String name = BDIInterpreter.getInterpreter(state).getAgentAdapter().getComponentIdentifier().getName();
-							BDIInterpreter.getInterpreter(state).getLogger(rcapa).severe("Could not evaluate parameterset expression: "+name+" "+state.getAttributeValue(exp, OAVBDIMetaModel.expression_has_content));
+							BDIInterpreter.getInterpreter(state).getLogger(rcapa).severe("Could not evaluate parameterset expression: "+name+" "+state.getAttributeValue(exp, OAVBDIMetaModel.expression_has_parsed));
 						}
 						// changed *.class to *.TYPE due to javaflow bug
 						state.setAttributeValue(rparamset, OAVBDIRuntimeModel.typedelement_has_timer, 

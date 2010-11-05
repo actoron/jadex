@@ -69,7 +69,7 @@ public class GoalDeliberationRules
 		
 		ObjectCondition	inhicon	= new ObjectCondition(OAVBDIMetaModel.inhibits_type);
 		inhicon.addConstraint(new BoundConstraint(null, inhibits));
-		inhicon.addConstraint(new LiteralConstraint(OAVBDIMetaModel.expression_has_content, null));
+		inhicon.addConstraint(new LiteralConstraint(OAVBDIMetaModel.expression_has_parsed, null));
 		inhicon.addConstraint(new BoundConstraint(OAVBDIMetaModel.inhibits_has_ref, ref));
 		inhicon.addConstraint(new BoundConstraint(OAVBDIMetaModel.inhibits_has_inhibit, inmode));
 	

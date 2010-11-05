@@ -151,8 +151,9 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 				
 				if(name==null && state.getType(obj).isSubtype(OAVBDIMetaModel.expression_type))
 				{
-					Object	exp	=state.getAttributeValue(obj, OAVBDIMetaModel.expression_has_content);
-					name	= exp!=null ? ""+exp : null;
+					IParsedExpression	exp	=(IParsedExpression)state.getAttributeValue(obj, OAVBDIMetaModel.expression_has_parsed);
+					String	text	= (String)state.getAttributeValue(obj, OAVBDIMetaModel.expression_has_text);
+					name	= exp!=null ? exp.getExpressionText() : text!=null ? text.trim() : null;
 				}
 				
 				if(name==null)
@@ -474,20 +475,23 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 				// Ignore future properties, which are evaluated at component instance startup time.
 				if(clazz==null || !SReflect.isSupertype(IFuture.class, clazz))
 				{
-					IParsedExpression	pex = (IParsedExpression)state.getAttributeValue(mexp, OAVBDIMetaModel.expression_has_content);
-					try
+					IParsedExpression	pex = (IParsedExpression)state.getAttributeValue(mexp, OAVBDIMetaModel.expression_has_parsed);
+					if(pex!=null)
 					{
-						Object	value	= pex.getValue(null);
-						props.put(key, value);
-					}
-					catch(Exception e)
-					{
-						Tuple	se;
-						se	= new Tuple(new Object[]{
-							new StackElement(new QName(state.getType(capa).isSubtype(OAVBDIMetaModel.agent_type) ? "agent" : "capability"), capa, null),
-							new StackElement(new QName("properties"), null, null),				
-							new StackElement(new QName("property"), mexp, null)});				
-						addEntry(se, "Error in property: "+e);
+						try
+						{
+							Object	value	= pex.getValue(null);
+							props.put(key, value);
+						}
+						catch(Exception e)
+						{
+							Tuple	se;
+							se	= new Tuple(new Object[]{
+								new StackElement(new QName(state.getType(capa).isSubtype(OAVBDIMetaModel.agent_type) ? "agent" : "capability"), capa, null),
+								new StackElement(new QName("properties"), null, null),				
+								new StackElement(new QName("property"), mexp, null)});				
+							addEntry(se, "Error in property: "+e);
+						}
 					}
 				}
 			}
@@ -813,10 +817,12 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 	
 	/**
 	 *  Find the belief/ref value.
+	 *  Returns the expression text of the default value.
 	 */
-	protected static Object findBeliefDefaultValue(IOAVState state, Object mcapa, Object handle, String configname, String elemname)
+	// Todo: other kernels provide object values!? 
+	protected static String	findBeliefDefaultValue(IOAVState state, Object mcapa, Object handle, String configname, String elemname)
 	{
-		Object ret = null;
+		String ret = null;
 		boolean found = false;
 		
 		// Search initial value in configurations.
@@ -856,10 +862,22 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 					if(Arrays.equals(inibelres, belres))
 					{	
 						Object exp = state.getAttributeValue(inibel, OAVBDIMetaModel.belief_has_fact);
-						// todo: string rep?
-						IParsedExpression parsedexp = (IParsedExpression)state.getAttributeValue(exp, OAVBDIMetaModel.expression_has_content);
-						ret = parsedexp.getExpressionText();
-						found = true;
+						if(exp!=null)
+						{
+							// todo: evaluate expression?
+							IParsedExpression parsedexp = (IParsedExpression)state.getAttributeValue(exp, OAVBDIMetaModel.expression_has_parsed);
+							if(parsedexp!=null)
+							{
+								ret = parsedexp.getExpressionText();
+							}
+							else
+							{
+								ret	= (String)state.getAttributeValue(exp, OAVBDIMetaModel.expression_has_text);
+								if(ret!=null)
+									ret	= ret.trim();
+							}
+							found = true;
+						}
 					}
 				}
 			}
@@ -876,8 +894,18 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 				Object exp = state.getAttributeValue(handle, OAVBDIMetaModel.belief_has_fact);
 				if(exp!=null)
 				{
-					IParsedExpression parsedexp = (IParsedExpression)state.getAttributeValue(exp, OAVBDIMetaModel.expression_has_content);
-					ret = parsedexp.getExpressionText();
+					// todo: evaluate expression?
+					IParsedExpression parsedexp = (IParsedExpression)state.getAttributeValue(exp, OAVBDIMetaModel.expression_has_parsed);
+					if(parsedexp!=null)
+					{
+						ret = parsedexp.getExpressionText();
+					}
+					else
+					{
+						ret	= (String)state.getAttributeValue(exp, OAVBDIMetaModel.expression_has_text);
+						if(ret!=null)
+							ret	= ret.trim();
+					}
 				}
 			}
 			else
@@ -965,9 +993,9 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 	/**
 	 *  Find the beliefset/ref value.
 	 */
-	protected static Object findBeliefSetDefaultValue(IOAVState state, Object mcapa, Object handle, String configname, String elemname)
+	protected static String	findBeliefSetDefaultValue(IOAVState state, Object mcapa, Object handle, String configname, String elemname)
 	{
-		Object ret = null;
+		String ret = null;
 		boolean found = false;
 		
 		// Search initial value in configurations.
@@ -984,10 +1012,10 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 		if(config!=null)
 		{
 			Object[] belsetres;
-			if(OAVBDIMetaModel.beliefreference_type.equals(state.getType(handle)))
+			if(OAVBDIMetaModel.beliefsetreference_type.equals(state.getType(handle)))
 			{
 				String ref = (String)state.getAttributeValue(handle, OAVBDIMetaModel.elementreference_has_concrete);
-				belsetres = AgentRules.resolveMCapability(ref, OAVBDIMetaModel.belief_type, mcapa, state);
+				belsetres = AgentRules.resolveMCapability(ref, OAVBDIMetaModel.beliefset_type, mcapa, state);
 			}
 			else
 			{
@@ -1009,14 +1037,49 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 						if(vals==null)
 						{
 							Object exp = state.getAttributeValue(inibelset, OAVBDIMetaModel.beliefset_has_factsexpression);
-							IParsedExpression parsedexp = (IParsedExpression)state.getAttributeValue(exp, OAVBDIMetaModel.expression_has_content);
-							ret = parsedexp.getExpressionText();
+							if(exp!=null)
+							{
+								// todo: evaluate expression?
+								IParsedExpression parsedexp = (IParsedExpression)state.getAttributeValue(exp, OAVBDIMetaModel.expression_has_parsed);
+								if(parsedexp!=null)
+								{
+									ret = parsedexp.getExpressionText();
+								}
+								else
+								{
+									ret	= (String)state.getAttributeValue(exp, OAVBDIMetaModel.expression_has_text);
+									if(ret!=null)
+										ret	= ret.trim();
+								}
+								found = true;
+							}
 						}
 						else
 						{
-							ret = vals.toString();
+							List	rets	= new ArrayList();
+							for(Iterator vit=vals.iterator(); vit.hasNext(); )
+							{
+								Object exp = state.getAttributeValue(inibelset, OAVBDIMetaModel.beliefset_has_factsexpression);
+								if(exp!=null)
+								{
+									// todo: evaluate expression?
+									IParsedExpression parsedexp = (IParsedExpression)state.getAttributeValue(exp, OAVBDIMetaModel.expression_has_parsed);
+									if(parsedexp!=null)
+									{
+										rets.add(parsedexp.getExpressionText());
+									}
+									else
+									{
+										String	text	= (String)state.getAttributeValue(exp, OAVBDIMetaModel.expression_has_text);
+										if(text!=null)
+											text	= text.trim();
+										rets.add(text);
+									}
+								}
+							}
+							found = true;
+							ret	= rets.toString();
 						}
-						found = true;
 					}
 				}
 			}
@@ -1036,13 +1099,46 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 					Object exp = state.getAttributeValue(handle, OAVBDIMetaModel.beliefset_has_factsexpression);
 					if(exp!=null)
 					{
-						IParsedExpression parsedexp = (IParsedExpression)state.getAttributeValue(exp, OAVBDIMetaModel.expression_has_content);
-						ret = parsedexp.getExpressionText();
+						// todo: evaluate expression?
+						IParsedExpression parsedexp = (IParsedExpression)state.getAttributeValue(exp, OAVBDIMetaModel.expression_has_parsed);
+						if(parsedexp!=null)
+						{
+							ret = parsedexp.getExpressionText();
+						}
+						else
+						{
+							ret	= (String)state.getAttributeValue(exp, OAVBDIMetaModel.expression_has_text);
+							if(ret!=null)
+								ret	= ret.trim();
+						}
+						found = true;
 					}
 				}
 				else
 				{
-					ret = vals.toString();
+					List	rets	= new ArrayList();
+					for(Iterator vit=vals.iterator(); vit.hasNext(); )
+					{
+						Object exp = state.getAttributeValue(handle, OAVBDIMetaModel.beliefset_has_factsexpression);
+						if(exp!=null)
+						{
+							// todo: evaluate expression?
+							IParsedExpression parsedexp = (IParsedExpression)state.getAttributeValue(exp, OAVBDIMetaModel.expression_has_parsed);
+							if(parsedexp!=null)
+							{
+								rets.add(parsedexp.getExpressionText());
+							}
+							else
+							{
+								String	text	= (String)state.getAttributeValue(exp, OAVBDIMetaModel.expression_has_text);
+								if(text!=null)
+									text	= text.trim();
+								rets.add(text);
+							}
+						}
+					}
+					found = true;
+					ret	= rets.toString();
 				}
 			}
 			else

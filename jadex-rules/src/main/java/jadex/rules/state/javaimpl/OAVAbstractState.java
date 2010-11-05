@@ -1049,8 +1049,8 @@ public abstract class OAVAbstractState	implements IOAVState
 	public Object	getAttributeValue(Object id, OAVAttributeType attribute)
 	{
 		// #ifndef MIDP
-		if(!generator.isId(id))
-			System.out.println("not an id: "+id);
+//		if(!generator.isId(id))
+//			System.out.println("not an id: "+id);
 		assert nocheck || generator.isId(id) : id + ", " + attribute;
 		assert nocheck || checkValidStateObjectRead(id) : id;
 		assert nocheck || checkTypeHasAttribute(id, attribute);
@@ -1224,8 +1224,8 @@ public abstract class OAVAbstractState	implements IOAVState
 	 */
 	public Object getAttributeValue(Object id, OAVAttributeType attribute, Object key)
 	{
-		if(!generator.isId(id))
-			System.out.println("not an id: "+id);
+//		if(!generator.isId(id))
+//			System.out.println("not an id: "+id);
 		// #ifndef MIDP
 		assert nocheck || generator.isId(id);
 		assert nocheck || checkValidStateObjectRead(id);
@@ -1277,8 +1277,8 @@ public abstract class OAVAbstractState	implements IOAVState
 	public boolean containsKey(Object id, OAVAttributeType attribute, Object key)
 	{
 		// #ifndef MIDP
-		if(!generator.isId(id))
-			System.out.println("no id: "+id);
+//		if(!generator.isId(id))
+//			System.out.println("no id: "+id);
 		assert nocheck || generator.isId(id);
 		assert nocheck || checkValidStateObjectRead(id);
 		assert nocheck || checkTypeHasAttribute(id, attribute);

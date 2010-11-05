@@ -47,10 +47,10 @@ public class MExpressionFlyweight extends MReferenceableElementFlyweight impleme
 	}
 	
 	/**
-	 *  Get the expression content.
-	 *  @return The content.
+	 *  Get the expression text.
+	 *  @return The text.
 	 */
-	public Object getContent()
+	public String	getText()
 	{
 		if(isExternalThread())
 		{
@@ -58,14 +58,37 @@ public class MExpressionFlyweight extends MReferenceableElementFlyweight impleme
 			{
 				public void run()
 				{
-					object = (String)getState().getAttributeValue(getHandle(), OAVBDIMetaModel.expression_has_content);
+					string = (String)getState().getAttributeValue(getHandle(), OAVBDIMetaModel.expression_has_text);
+				}
+			};
+			return invoc.string;
+		}
+		else
+		{
+			return (String)getState().getAttributeValue(getHandle(), OAVBDIMetaModel.expression_has_text);
+		}
+	}
+	
+	/**
+	 *  Get the parsed expression.
+	 *  @return The parsed expression.
+	 */
+	public Object getParsedExpression()
+	{
+		if(isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					object = getState().getAttributeValue(getHandle(), OAVBDIMetaModel.expression_has_parsed);
 				}
 			};
 			return invoc.object;
 		}
 		else
 		{
-			return getState().getAttributeValue(getHandle(), OAVBDIMetaModel.expression_has_content);
+			return getState().getAttributeValue(getHandle(), OAVBDIMetaModel.expression_has_parsed);
 		}
 	}
 	
@@ -152,7 +175,7 @@ public class MExpressionFlyweight extends MReferenceableElementFlyweight impleme
 				public void run()
 				{
 					IParsedExpression pexp = MExpressionbaseFlyweight.parseExpression(expression, language, getState(), getHandle());
-					getState().setAttributeValue(getHandle(), OAVBDIMetaModel.expression_has_content, pexp);
+					getState().setAttributeValue(getHandle(), OAVBDIMetaModel.expression_has_parsed, pexp);
 					getState().setAttributeValue(getHandle(), OAVBDIMetaModel.expression_has_language, language);
 				}
 			};
@@ -160,7 +183,7 @@ public class MExpressionFlyweight extends MReferenceableElementFlyweight impleme
 		else
 		{
 			IParsedExpression pexp = MExpressionbaseFlyweight.parseExpression(expression, language, getState(), getHandle());
-			getState().setAttributeValue(getHandle(), OAVBDIMetaModel.expression_has_content, pexp);
+			getState().setAttributeValue(getHandle(), OAVBDIMetaModel.expression_has_parsed, pexp);
 			getState().setAttributeValue(getHandle(), OAVBDIMetaModel.expression_has_language, language);
 		}
 	}
@@ -177,13 +200,13 @@ public class MExpressionFlyweight extends MReferenceableElementFlyweight impleme
 			{
 				public void run()
 				{
-					getState().setAttributeValue(getHandle(), OAVBDIMetaModel.expression_has_content, content);
+					getState().setAttributeValue(getHandle(), OAVBDIMetaModel.expression_has_parsed, content);
 				}
 			};
 		}
 		else
 		{
-			getState().setAttributeValue(getHandle(), OAVBDIMetaModel.expression_has_content, content);
+			getState().setAttributeValue(getHandle(), OAVBDIMetaModel.expression_has_parsed, content);
 		}
 		
 	}

@@ -226,14 +226,14 @@ public class GpmnBDIConverter2
 			{
 				Object condhandle = state.createObject(OAVBDIMetaModel.condition_type);
 				state.setAttributeValue(goalhandle, OAVBDIMetaModel.achievegoal_has_targetcondition, condhandle);
-				state.setAttributeValue(condhandle, OAVBDIMetaModel.expression_has_content, goal.getTargetCondition());
+				state.setAttributeValue(condhandle, OAVBDIMetaModel.expression_has_text, goal.getTargetCondition());
 				state.setAttributeValue(condhandle, OAVBDIMetaModel.expression_has_language, "jcl");
 			}
 			else if(MGoal.Types.MAINTAIN_GOAL.equals(goal.getGoalType()) && goal.getMaintainCondition()!=null)
 			{
 				Object condhandle = state.createObject(OAVBDIMetaModel.condition_type);
 				state.setAttributeValue(goalhandle, OAVBDIMetaModel.maintaingoal_has_maintaincondition, condhandle);
-				state.setAttributeValue(condhandle, OAVBDIMetaModel.expression_has_content, goal.getMaintainCondition());
+				state.setAttributeValue(condhandle, OAVBDIMetaModel.expression_has_text, goal.getMaintainCondition());
 				state.setAttributeValue(condhandle, OAVBDIMetaModel.expression_has_language, "jcl");
 			}
 			// Handle activation plans
@@ -527,7 +527,7 @@ public class GpmnBDIConverter2
 		if(inival!=null)
 		{
 			Object facthandle = state.createObject(OAVBDIMetaModel.expression_type);
-			state.setAttributeValue(facthandle, OAVBDIMetaModel.expression_has_content, inival);
+			state.setAttributeValue(facthandle, OAVBDIMetaModel.expression_has_text, inival);
 			state.setAttributeValue(belhandle, OAVBDIMetaModel.belief_has_fact, facthandle);
 		}
 		return belhandle;
@@ -548,14 +548,14 @@ public class GpmnBDIConverter2
 			for(int i=0; i<values.length; i++)
 			{
 				Object valhandle = state.createObject(OAVBDIMetaModel.expression_type);
-				state.setAttributeValue(valhandle, OAVBDIMetaModel.expression_has_content, values[i]);
+				state.setAttributeValue(valhandle, OAVBDIMetaModel.expression_has_text, values[i]);
 				state.addAttributeValue(belsethandle, OAVBDIMetaModel.beliefset_has_facts, valhandle);
 			}
 		}
 		else if(valuesexp!=null)
 		{
 			Object valshandle = state.createObject(OAVBDIMetaModel.expression_type);
-			state.setAttributeValue(valshandle, OAVBDIMetaModel.expression_has_content, valuesexp);
+			state.setAttributeValue(valshandle, OAVBDIMetaModel.expression_has_text, valuesexp);
 			state.setAttributeValue(belsethandle, OAVBDIMetaModel.beliefset_has_factsexpression, valshandle);
 		}
 		
@@ -592,21 +592,21 @@ public class GpmnBDIConverter2
 		{
 			Object condhandle = state.createObject(OAVBDIMetaModel.condition_type);
 			state.setAttributeValue(goalhandle, OAVBDIMetaModel.goal_has_creationcondition, condhandle);
-			state.setAttributeValue(condhandle, OAVBDIMetaModel.expression_has_content, creationcond);
+			state.setAttributeValue(condhandle, OAVBDIMetaModel.expression_has_text, creationcond);
 			state.setAttributeValue(condhandle, OAVBDIMetaModel.expression_has_language, "jcl");
 		}
 		if(contextcond!=null)
 		{
 			Object condhandle = state.createObject(OAVBDIMetaModel.condition_type);
 			state.setAttributeValue(goalhandle, OAVBDIMetaModel.goal_has_contextcondition, condhandle);
-			state.setAttributeValue(condhandle, OAVBDIMetaModel.expression_has_content, contextcond);
+			state.setAttributeValue(condhandle, OAVBDIMetaModel.expression_has_text, contextcond);
 			state.setAttributeValue(condhandle, OAVBDIMetaModel.expression_has_language, "jcl");
 		}
 		if(dropcond!=null)
 		{
 			Object condhandle = state.createObject(OAVBDIMetaModel.condition_type);
 			state.setAttributeValue(goalhandle, OAVBDIMetaModel.goal_has_dropcondition, condhandle);
-			state.setAttributeValue(condhandle, OAVBDIMetaModel.expression_has_content, dropcond);
+			state.setAttributeValue(condhandle, OAVBDIMetaModel.expression_has_text, dropcond);
 			state.setAttributeValue(condhandle, OAVBDIMetaModel.expression_has_language, "jcl");
 		}
 		
@@ -631,7 +631,7 @@ public class GpmnBDIConverter2
 		{
 			Object condhandle = state.createObject(OAVBDIMetaModel.expression_type);
 			state.setAttributeValue(planhandle, OAVBDIMetaModel.plan_has_precondition, condhandle);
-			state.setAttributeValue(condhandle, OAVBDIMetaModel.expression_has_content, precond);
+			state.setAttributeValue(condhandle, OAVBDIMetaModel.expression_has_text, precond);
 			state.setAttributeValue(condhandle, OAVBDIMetaModel.expression_has_language, "java");
 		}
 		
@@ -639,7 +639,7 @@ public class GpmnBDIConverter2
 		{
 			Object condhandle = state.createObject(OAVBDIMetaModel.condition_type);
 			state.setAttributeValue(planhandle, OAVBDIMetaModel.plan_has_contextcondition, condhandle);
-			state.setAttributeValue(condhandle, OAVBDIMetaModel.expression_has_content, contextcond);
+			state.setAttributeValue(condhandle, OAVBDIMetaModel.expression_has_text, contextcond);
 			state.setAttributeValue(condhandle, OAVBDIMetaModel.expression_has_language, "jcl");
 		}
 		
@@ -657,7 +657,7 @@ public class GpmnBDIConverter2
 		state.addAttributeValue(paramelemhandle, OAVBDIMetaModel.parameterelement_has_parameters, paramhandle);
 		state.setAttributeValue(paramhandle, OAVBDIMetaModel.typedelement_has_classname, classname);
 		Object valhandle = state.createObject(OAVBDIMetaModel.expression_type);
-		state.setAttributeValue(valhandle, OAVBDIMetaModel.expression_has_content, value);
+		state.setAttributeValue(valhandle, OAVBDIMetaModel.expression_has_text, value);
 		state.setAttributeValue(paramhandle, OAVBDIMetaModel.parameter_has_value, valhandle);
 		return paramhandle;
 	}
@@ -678,14 +678,14 @@ public class GpmnBDIConverter2
 			for(int i=0; i<values.length; i++)
 			{
 				Object valhandle = state.createObject(OAVBDIMetaModel.expression_type);
-				state.setAttributeValue(valhandle, OAVBDIMetaModel.expression_has_content, values[i]);
+				state.setAttributeValue(valhandle, OAVBDIMetaModel.expression_has_text, values[i]);
 				state.addAttributeValue(paramsethandle, OAVBDIMetaModel.parameterset_has_values, valhandle);
 			}
 		}
 		else if(valuesexp!=null)
 		{
 			Object valshandle = state.createObject(OAVBDIMetaModel.expression_type);
-			state.setAttributeValue(valshandle, OAVBDIMetaModel.expression_has_content, valuesexp);
+			state.setAttributeValue(valshandle, OAVBDIMetaModel.expression_has_text, valuesexp);
 			state.setAttributeValue(paramsethandle, OAVBDIMetaModel.parameterset_has_valuesexpression, valshandle);
 		}
 		

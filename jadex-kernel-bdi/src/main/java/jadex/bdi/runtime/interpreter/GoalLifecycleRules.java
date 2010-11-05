@@ -332,7 +332,7 @@ public class GoalLifecycleRules
 				if(excluded==null || !excluded.contains(state.getAttributeValue(mparam, OAVBDIMetaModel.modelelement_has_name)))
 				{
 					String	pname	= (String)state.getAttributeValue(mparam, OAVBDIMetaModel.modelelement_has_name);
-					IParsedExpression	pexp	= (IParsedExpression)state.getAttributeValue(state.getAttributeValue(mparam, OAVBDIMetaModel.parameter_has_value), OAVBDIMetaModel.expression_has_content);	// Todo: value-variable attribute???
+					IParsedExpression	pexp	= (IParsedExpression)state.getAttributeValue(state.getAttributeValue(mparam, OAVBDIMetaModel.parameter_has_value), OAVBDIMetaModel.expression_has_parsed);	// Todo: value-variable attribute???
 					Class	clazz	= (Class)state.getAttributeValue(mparam, OAVBDIMetaModel.typedelement_has_class);
 					
 					Variable	parvar	= new Variable("?para_"+parcons.size(), OAVBDIRuntimeModel.parameter_type);

@@ -12,10 +12,16 @@ public interface IMExpression extends IMElement
 	public String getLanguage();
 	
 	/**
-	 *  Get the expression content.
-	 *  @return The content.
+	 *  Get the expression text.
+	 *  @return The text.
 	 */
-	public Object getContent();
+	public String	getText();
+	
+	/**
+	 *  Get the parsed expression.
+	 *  @return The parsed expression.
+	 */
+	public Object getParsedExpression();
 	
 	/**
 	 *  Get the clazz.
