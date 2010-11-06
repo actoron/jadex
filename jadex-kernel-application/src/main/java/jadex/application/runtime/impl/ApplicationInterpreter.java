@@ -10,6 +10,7 @@ import jadex.application.model.MSpaceInstance;
 import jadex.application.runtime.IApplication;
 import jadex.application.runtime.IApplicationExternalAccess;
 import jadex.application.runtime.ISpace;
+import jadex.bridge.ComponentFactorySelector;
 import jadex.bridge.ComponentResultListener;
 import jadex.bridge.ComponentServiceContainer;
 import jadex.bridge.ComponentTerminatedException;
@@ -18,6 +19,7 @@ import jadex.bridge.IArgument;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentAdapterFactory;
 import jadex.bridge.IComponentDescription;
+import jadex.bridge.IComponentFactory;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IComponentManagementService;
@@ -27,6 +29,7 @@ import jadex.bridge.IModelInfo;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.concurrent.CollectionResultListener;
 import jadex.commons.concurrent.CounterResultListener;
@@ -38,6 +41,7 @@ import jadex.commons.service.IInternalService;
 import jadex.commons.service.IServiceContainer;
 import jadex.commons.service.IServiceProvider;
 import jadex.commons.service.SServiceProvider;
+import jadex.commons.service.library.ILibraryService;
 import jadex.javaparser.IValueFetcher;
 import jadex.javaparser.SimpleValueFetcher;
 
@@ -193,30 +197,51 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 		{
 			public void run()
 			{
+				final List futures = new ArrayList();
+
 				List services = model.getServices();
 				if(services!=null)
 				{
 					for(int i=0; i<services.size(); i++)
 					{
 						IInternalService service;
-						MServiceType st = (MServiceType)services.get(i);
-						String componenttype = st.getFrom();
-						if(componenttype!=null)
-						{
-							service = (IInternalService)Proxy.newProxyInstance(getClassLoader(), new Class[]{IInternalService.class, st.getClazz()}, 
-								new ServiceInvocationHandler((IApplicationExternalAccess)getExternalAccess(), componenttype, st.getClazz()));
-						}
-						else
+						final MServiceType st = (MServiceType)services.get(i);
+						if(st.getParsedValue()!=null)
 						{
 							service = (IInternalService)st.getParsedValue().getValue(fetcher);
+							container.addService(service);
 						}
+						else 
+						{
+							String componenttype = st.getFrom();
+							
+							if(componenttype==null)
+							{	
+								final Future futu = new Future();
+								futures.add(futu);
+								SServiceProvider.getService(getServiceProvider(), ILibraryService.class)
+									.addResultListener(new DefaultResultListener()
+								{
+									public void resultAvailable(Object source, Object result)
+									{
+										ILibraryService ls = (ILibraryService)result;
+										findComponentType(0, model.getMComponentTypes(), ls, st.getClazz(), futu);
+									}
+								});
+							}
+							else
+							{
+								service = (IInternalService)Proxy.newProxyInstance(getClassLoader(), new Class[]{IInternalService.class, st.getClazz()}, 
+									new ServiceInvocationHandler((IApplicationExternalAccess)getExternalAccess(), componenttype, st.getClazz()));
+								container.addService(service);
+							}
+						}
+						
 //						System.out.println("added: "+service+" "+getComponentIdentifier());
-						container.addService(service);
 					}
 				}
 		
 				// Evaluate (future) properties.
-				List	futures	= new ArrayList();
 				List	props	= model.getPropertyList();
 				if(props!=null)
 				{
@@ -335,6 +360,59 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 				}
 			}	
 		});
+	}
+	
+	/**
+	 * 
+	 */
+	protected void findComponentType(final int i, final List componenttypes, 
+		final ILibraryService ls, final Class servicetype, final Future ret)
+	{
+		final MComponentType ct = (MComponentType)componenttypes.get(i);
+	
+		SServiceProvider.getService(getServiceProvider(), new ComponentFactorySelector(ct.getFilename(), 
+			model.getAllImports(), ls.getClassLoader())).addResultListener(createResultListener(new IResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				System.out.println("create start2: "+ct.getFilename());
+				
+				final IComponentFactory factory = (IComponentFactory)result;
+				if(factory!=null)
+				{
+					final IModelInfo lmodel = factory.loadModel(ct.getFilename(), model.getAllImports(), ls.getClassLoader());
+					Class[] sers = lmodel.getOfferedServices();
+					if(SUtil.arrayContains(sers, servicetype))
+					{
+						IInternalService service = (IInternalService)Proxy.newProxyInstance(getClassLoader(), new Class[]{IInternalService.class, servicetype}, 
+							new ServiceInvocationHandler((IApplicationExternalAccess)getExternalAccess(), ct.getName(), servicetype));
+						container.addService(service);
+						ret.setResult(result);
+					}
+					else if(i+1<componenttypes.size())
+					{
+						findComponentType(i+1, componenttypes, ls, servicetype, ret);
+					}
+					else
+					{
+						ret.setException(new RuntimeException("No component type offers service type: "+servicetype));
+					}
+				}
+			}
+			
+			public void exceptionOccurred(Object source, Exception exception)
+			{
+				System.out.println("No factory found for: "+ct);
+				if(i+1<componenttypes.size())
+				{
+					findComponentType(i+1, componenttypes, ls, servicetype, ret);
+				}
+				else
+				{
+					ret.setException(new RuntimeException("No component type offers service type: "+servicetype));
+				}
+			}
+		}));
 	}
 	
 	/**

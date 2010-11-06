@@ -216,6 +216,8 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 	 */
 	public boolean isLoadable(String model, String[] imports, ClassLoader classloader)
 	{
+		if(model==null)
+			System.out.println("kaks");
 		return model.endsWith(ApplicationModelLoader.FILE_EXTENSION_APPLICATION);
 	}
 	
