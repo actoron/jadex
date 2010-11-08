@@ -15,6 +15,7 @@
 
 	<imports>
 		<import>jadex.application.space.envsupport.environment.*</import>
+		<import>deco4mas.coordinate.environment.CoordinationSpace</import>
 		<import>deco4mas.coordinate.environment.*</import>
 		<import>deco4mas.examples.agentNegotiation.sa.*</import>
 		<import>deco4mas.examples.agentNegotiation.sma.*</import>
@@ -26,8 +27,7 @@
 
 	<spacetypes>
 		<!-- define the coordination space -->
-		<env:envspacetype name="coordspace" width="11"
-			height="11" class="CoordinationSpace">
+		<env:envspacetype name="coordspace" width="11" height="11" class="CoordinationSpace">
 
 			<!-- TMP Object Type: accumalates money bank of SMA -->
 			<env:objecttypes>

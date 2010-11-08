@@ -90,8 +90,8 @@
 	 			</env:envspace>
 			</spaces>
 			<components>
-				<agent type="Sender" number="1"/>
-  				<agent type="Receiver" number="1"/>				
+				<component type="Sender" number="1"/>
+  				<component type="Receiver" number="1"/>				
 			</components>
  		</application>
 
