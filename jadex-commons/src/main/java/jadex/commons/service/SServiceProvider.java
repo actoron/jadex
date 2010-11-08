@@ -10,7 +10,7 @@ import java.util.ArrayList;
  *  Static helper class for searching services.
  */
 public class SServiceProvider
-{
+{	
 	//-------- constants --------
 	
 	/** The sequential search manager. */
@@ -39,7 +39,6 @@ public class SServiceProvider
 	public static IResultSelector contanyselector = new AnyResultSelector(false);
 	public static IResultSelector abortanyselector = new AnyResultSelector(true);
 
-	
 	//-------- methods --------
 
 //	protected static Map	profiling	= new HashMap();

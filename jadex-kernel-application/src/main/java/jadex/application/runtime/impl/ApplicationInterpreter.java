@@ -375,7 +375,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 		{
 			public void resultAvailable(Object source, Object result)
 			{
-				System.out.println("create start2: "+ct.getFilename());
+//				System.out.println("create start2: "+ct.getFilename());
 				
 				final IComponentFactory factory = (IComponentFactory)result;
 				if(factory!=null)

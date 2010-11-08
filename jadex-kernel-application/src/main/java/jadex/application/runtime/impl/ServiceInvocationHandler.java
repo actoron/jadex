@@ -167,7 +167,7 @@ public class ServiceInvocationHandler implements InvocationHandler
 			final Future fut = new Future(); 
 			ret = fut;
 			
-			System.out.println("Invoked: "+method.getName());
+//			System.out.println("Invoked: "+method.getName());
 			
 			// todo: schedluleStep?! -> createResultListener
 			ea.getChildren(componenttype).addResultListener(new DefaultResultListener()

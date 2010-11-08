@@ -101,9 +101,9 @@ public class CacheServiceContainer	implements IServiceContainer
 //						System.out.println("hit: "+data+" "+getId());
 //					}
 					
-					if(data instanceof BasicService)
+					if(data instanceof IInternalService)
 					{
-						if(!((BasicService)data).isValid())
+						if(!((IInternalService)data).isValid())
 						{
 							cache.remove(key);
 							data = null;
@@ -126,7 +126,7 @@ public class CacheServiceContainer	implements IServiceContainer
 						for(Iterator it=coll.iterator(); it.hasNext(); )
 						{
 							Object	next	= it.next();
-							if(next instanceof BasicService)
+							if(next instanceof IInternalService)
 							{
 								if(!((IInternalService)next).isValid())
 								{

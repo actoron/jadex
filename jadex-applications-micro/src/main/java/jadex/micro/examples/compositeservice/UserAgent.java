@@ -28,13 +28,22 @@ public class UserAgent extends MicroAgent
 					{
 						public void resultAvailable(Object source, Object result)
 						{
-							System.out.println("add service result: "+result);
+							System.out.println("add service result: "+result+" "+getComponentIdentifier().getLocalName());
 						}
 					}));
 				}
 				else
 				{
 					System.out.println("Did not find add service: "+getComponentIdentifier());
+					
+					SServiceProvider.getService(getServiceProvider(), IAddService.class)
+						.addResultListener(createResultListener(new DefaultResultListener()
+					{
+						public void resultAvailable(Object source, Object result)
+						{
+							final IAddService as = (IAddService)result;
+						}
+					}));
 				}
 				
 //				SServiceProvider.getService(getServiceProvider(), ISubService.class)

@@ -260,6 +260,9 @@ public class ParallelSearchManager implements ISearchManager
 		return ret;
 	}
 	
+	/**
+	 *  Check if all results are finished and the set the results.
+	 */
 	protected static void	checkAndSetResults(boolean[] finished, Future ret)
 	{
 		synchronized(finished)
