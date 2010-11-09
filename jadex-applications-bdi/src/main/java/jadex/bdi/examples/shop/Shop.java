@@ -1,7 +1,11 @@
 package jadex.bdi.examples.shop;
 
+import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IBDIExternalAccess;
+import jadex.bdi.runtime.ICapability;
 import jadex.bdi.runtime.IEAGoal;
+import jadex.bdi.runtime.IGoal;
+import jadex.bdi.runtime.IGoalListener;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
@@ -18,7 +22,8 @@ public class Shop extends BasicService implements IShop
 	//-------- attributes --------
 	
 	/** The component. */
-	protected IBDIExternalAccess comp;
+//	protected IBDIExternalAccess comp;
+	protected ICapability comp;
 	
 	/** The shop name. */
 	protected String name;
@@ -29,12 +34,14 @@ public class Shop extends BasicService implements IShop
 	 *  Create a new shop service.
 	 *  @param comp The active component.
 	 */
-	public Shop(IExternalAccess comp, String name)
+//	public Shop(IExternalAccess comp, String name)
+	public Shop(ICapability comp, String name)
 	{
 		super(comp.getServiceProvider().getId(), IShop.class, null);
 
 //		System.out.println("created: "+name);
-		this.comp = (IBDIExternalAccess)comp;
+//		this.comp = (IBDIExternalAccess)comp;
+		this.comp = comp;
 		this.name = name;
 	}
 
@@ -57,34 +64,23 @@ public class Shop extends BasicService implements IShop
 	{
 		final Future ret = new Future();
 		
-		if(!isValid())
+		final IGoal sell = comp.getGoalbase().createGoal("sell");
+		sell.getParameter("name").setValue(item);
+		sell.getParameter("price").setValue(new Double(price));
+		sell.addGoalListener(new IGoalListener()
 		{
-			ret.setException(new RuntimeException("Service unavailable."));
-		}
-		else
-		{
-			comp.createGoal("sell").addResultListener(new DefaultResultListener()
+			public void goalFinished(AgentEvent ae)
 			{
-				public void resultAvailable(Object source, Object result)
-				{
-					final IEAGoal buy = (IEAGoal)result;
-					buy.setParameterValue("name", item);
-					buy.setParameterValue("price", new Double(price));
-					comp.dispatchTopLevelGoalAndWait(buy).addResultListener(new IResultListener()
-					{
-						public void resultAvailable(Object source, Object result)
-						{
-							buy.getParameterValue("result").addResultListener(new DelegationResultListener(ret));
-						}
-						
-						public void exceptionOccurred(Object source, Exception exception)
-						{
-							ret.setException(exception);
-						}
-					});
-				}
-			});
-		}
+				if(sell.isSucceeded())
+					ret.setResult(sell.getParameter("result").getValue());
+				else
+					ret.setException(new RuntimeException());
+			}
+			
+			public void goalAdded(AgentEvent ae)
+			{
+			}
+		});
 		
 		return ret;
 	}
@@ -96,16 +92,7 @@ public class Shop extends BasicService implements IShop
 	public IFuture getCatalog()
 	{
 		final Future ret = new Future();
-		
-		if(!isValid())
-		{
-			ret.setException(new RuntimeException("Service unavailable."));
-		}
-		else
-		{
-			comp.getBeliefbase().getBeliefSetFacts("catalog").addResultListener(new DelegationResultListener(ret));
-		}
-		
+		ret.setResult(comp.getBeliefbase().getBeliefSet("catalog").getFacts());
 		return ret;
 	}
 

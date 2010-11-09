@@ -1,6 +1,7 @@
 package jadex.micro.examples.helpline;
 
 import jadex.bridge.Argument;
+import jadex.bridge.DecouplingServiceInvocationInterceptor;
 import jadex.bridge.IArgument;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
@@ -44,7 +45,8 @@ public class HelplineAgent extends MicroAgent
 				infos.put(ie.getName(), ie);
 			}
 		}
-		addService(new HelplineService(getExternalAccess()));
+//		addService(new HelplineService(getExternalAccess()));
+		addDecoupledService(new HelplineService(this));
 		SwingUtilities.invokeLater(new Runnable()
 		{
 			public void run()

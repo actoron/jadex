@@ -27,13 +27,13 @@ public interface IMicroExternalAccess	extends IExternalAccess
 	 */
 	public IFuture scheduleStep(ICommand com);
 	
-	/**
-	 *  Schedule a step of the agent.
-	 *  May safely be called from external threads.
-	 *  @param step	Code to be executed as a step of the agent.
-	 *  @return The result of the step.
-	 */
-	public IFuture scheduleResultStep(IResultCommand com);
+//	/**
+//	 *  Schedule a step of the agent.
+//	 *  May safely be called from external threads.
+//	 *  @param step	Code to be executed as a step of the agent.
+//	 *  @return The result of the step.
+//	 */
+//	public IFuture scheduleResultStep(IResultCommand com);
 	
 	// todo: support with IResultCommand also?!
 	/**

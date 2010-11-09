@@ -17,6 +17,7 @@ import jadex.bridge.ComponentResultListener;
 import jadex.bridge.IModelInfo;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
+import jadex.commons.IResultCommand;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
@@ -1048,6 +1049,43 @@ public class ExternalAccessFlyweight extends EACapabilityFlyweight implements IB
 				}
 			}
 			ret.setResult(res);
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Schedule a step of the agent.
+	 *  May safely be called from external threads.
+	 *  @param step	Code to be executed as a step of the agent.
+	 *  @return The result of the step.
+	 */
+	public IFuture scheduleResultStep(final IResultCommand com)
+	{
+		final Future ret = new Future();
+		
+		if(adapter.isExternalThread())
+		{
+			try
+			{
+				adapter.invokeLater(new Runnable() 
+				{
+					public void run() 
+					{
+						ret.setException(new UnsupportedOperationException());
+//						application.scheduleStep(com).addResultListener(new DelegationResultListener(ret));
+					}
+				});
+			}
+			catch(Exception e)
+			{
+				ret.setException(e);
+			}
+		}
+		else
+		{
+			ret.setException(new UnsupportedOperationException());
+//			application.scheduleStep(com).addResultListener(new DelegationResultListener(ret));
 		}
 		
 		return ret;

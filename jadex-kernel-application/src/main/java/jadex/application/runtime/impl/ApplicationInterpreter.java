@@ -10,6 +10,7 @@ import jadex.application.model.MSpaceInstance;
 import jadex.application.runtime.IApplication;
 import jadex.application.runtime.IApplicationExternalAccess;
 import jadex.application.runtime.ISpace;
+import jadex.bridge.BasicServiceInvocationHandler;
 import jadex.bridge.ComponentFactorySelector;
 import jadex.bridge.ComponentResultListener;
 import jadex.bridge.ComponentServiceContainer;
@@ -28,6 +29,7 @@ import jadex.bridge.IMessageAdapter;
 import jadex.bridge.IModelInfo;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
+import jadex.commons.IResultCommand;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.collection.MultiCollection;
@@ -36,6 +38,7 @@ import jadex.commons.concurrent.CounterResultListener;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
+import jadex.commons.service.BasicService;
 import jadex.commons.service.CacheServiceContainer;
 import jadex.commons.service.IInternalService;
 import jadex.commons.service.IServiceContainer;
@@ -193,9 +196,9 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 		fetcher.setValue("$provider", getServiceProvider());
 		
 		// Schedule the futures (first) init step.
-		scheduleStep(new Runnable()
+		scheduleStep(new IResultCommand()
 		{
-			public void run()
+			public Object execute(Object args)
 			{
 				final List futures = new ArrayList();
 
@@ -231,8 +234,9 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 							}
 							else
 							{
-								service = (IInternalService)Proxy.newProxyInstance(getClassLoader(), new Class[]{IInternalService.class, st.getClazz()}, 
-									new ServiceInvocationHandler((IApplicationExternalAccess)getExternalAccess(), componenttype, st.getClazz()));
+//								service = (IInternalService)Proxy.newProxyInstance(getClassLoader(), new Class[]{IInternalService.class, st.getClazz()}, 
+//									new CompositeServiceInvocationInterceptor((IApplicationExternalAccess)getExternalAccess(), componenttype, st.getClazz()));
+								service = createServiceProxy(st.getClazz(), componenttype);
 								container.addService(service);
 							}
 						}
@@ -283,9 +287,9 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 					}
 				}
 				
-				final Runnable init2 = new Runnable()
+				final IResultCommand init2 = new IResultCommand()
 				{
-					public void run() 
+					public Object execute(Object args)
 					{
 						container.start().addResultListener(new ComponentResultListener(new IResultListener()
 						{
@@ -340,6 +344,8 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 								inited.setException(exception);
 							}
 						}, adapter));
+						
+						return null;
 					}
 				};
 				
@@ -358,6 +364,8 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 				{
 					((IFuture)futures.get(i)).addResultListener(crl);
 				}
+				
+				return null;
 			}	
 		});
 	}
@@ -384,8 +392,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 					Class[] sers = lmodel.getOfferedServices();
 					if(SUtil.arrayContains(sers, servicetype))
 					{
-						IInternalService service = (IInternalService)Proxy.newProxyInstance(getClassLoader(), new Class[]{IInternalService.class, servicetype}, 
-							new ServiceInvocationHandler((IApplicationExternalAccess)getExternalAccess(), ct.getName(), servicetype));
+						IInternalService service = createServiceProxy(servicetype, ct.getName());
 						container.addService(service);
 						ret.setResult(result);
 					}
@@ -416,16 +423,30 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 	}
 	
 	/**
+	 * 
+	 */
+	protected IInternalService createServiceProxy(Class servicetype, String componenttype)
+	{
+		return (IInternalService)Proxy.newProxyInstance(getClassLoader(), new Class[]{IInternalService.class, servicetype}, 
+			new BasicServiceInvocationHandler(BasicService.createServiceIdentifier(getServiceProvider().getId(), servicetype, BasicServiceInvocationHandler.class), 
+			CompositeServiceInvocationInterceptor.getInterceptors(), 
+			new CompositeServiceInvocationInterceptor((IApplicationExternalAccess)getExternalAccess(), componenttype, servicetype)));
+//			new CompositeServiceInvocationInterceptor((IApplicationExternalAccess)getExternalAccess(), ct.getName(), servicetype));
+	}
+	
+	/**
 	 *  Schedule a step of the component.
 	 *  May safely be called from external threads.
 	 *  @param step	Code to be executed as a step of the component.
 	 */
-	public void	scheduleStep(final Runnable step)
+	public IFuture scheduleStep(final IResultCommand step)
 	{
+		Future ret = new Future();
+		
 		boolean dowakeup;
 		synchronized(steps)
 		{
-			steps.add(step);
+			steps.add(new Object[]{step, ret});
 			dowakeup	= !willdostep;	// only wake up if not already scheduled.
 		}
 //		notifyListeners(new ChangeEvent(this, "addStep", step));
@@ -434,6 +455,8 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 		{
 			adapter.wakeup();
 		}
+		
+		return ret;
 	}
 	
 //	/**
@@ -1006,21 +1029,34 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 	{
 		try
 		{
-			Runnable step	= null;
+			Object[] step	= null;
 			synchronized(steps)
 			{
 				if(!steps.isEmpty())
 				{
-					step	= (Runnable)steps.remove(0);
+					step = (Object[])steps.remove(0);
 				}
 			}
 
 			if(step!=null)
 			{
-//				notifyListeners(new ChangeEvent(this, "removeStep", new Integer(0)));
-//				String steptext = ""+step;
-				step.run();
-//				addHistoryEntry(steptext);
+				Future future = (Future)step[1];
+				try
+				{
+					Object res = ((IResultCommand)step[0]).execute(this);
+					if(res instanceof IFuture)
+					{
+						((IFuture)res).addResultListener(new DelegationResultListener(future));
+					}
+					else
+					{
+						future.setResult(res);
+					}
+				}
+				catch(Exception e)
+				{
+					future.setException(e);
+				}
 			}
 			
 			boolean ret;
@@ -1219,11 +1255,12 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 //					}
 //					else
 //					{
-						scheduleStep(new Runnable()
+						scheduleStep(new IResultCommand()
 						{
-							public void run()
+							public Object execute(Object args)
 							{
 								createComponent(components, ces, i+1, inited);
+								return null;
 							}
 						});
 //					}

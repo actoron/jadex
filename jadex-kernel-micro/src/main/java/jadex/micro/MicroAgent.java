@@ -1,6 +1,7 @@
 package jadex.micro;
 
 import jadex.bridge.ComponentServiceContainer;
+import jadex.bridge.DecouplingServiceInvocationInterceptor;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
@@ -487,6 +488,19 @@ public abstract class MicroAgent implements IMicroAgent
 	public void addService(IInternalService service)
 	{
 		((IServiceContainer)interpreter.getServiceProvider()).addService(service);
+	}
+	
+	/**
+	 *  Add a service to the platform. 
+	 *  If under the same name and type a service was contained,
+	 *  the old one is removed and shutdowned.
+	 *  @param service The service.
+	 */
+	public void addDecoupledService(IInternalService service)
+	{
+		IInternalService proxyser = DecouplingServiceInvocationInterceptor
+			.createServiceProxy(getExternalAccess(), getAgentAdapter(), service);
+		((IServiceContainer)interpreter.getServiceProvider()).addService(proxyser);
 	}
 
 	/**

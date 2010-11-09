@@ -22,7 +22,7 @@
 	<services>
 		<service class="IAddService"/>
 		<service class="ISubService"/>
-		<!-- <service class="IAddService" from="Calculator"/>
+		<!-- <service class="IAddService" componenttype="Calculator" componentinstance=""/>
 		<service class="ISubService" from="Calculator"/> -->
 	</services>
 	

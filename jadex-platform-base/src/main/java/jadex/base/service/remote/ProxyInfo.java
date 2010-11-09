@@ -20,9 +20,6 @@ public class ProxyInfo
 {
 	//-------- attributes --------
 	
-//	/** The rms. */
-//	protected RemoteReference rr;
-	
 	/** The target class. */
 	protected List targetinterfaces;
 		

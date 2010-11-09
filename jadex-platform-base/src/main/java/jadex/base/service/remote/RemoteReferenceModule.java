@@ -2,6 +2,8 @@ package jadex.base.service.remote;
 
 import jadex.base.service.remote.commands.RemoteDGCAddReferenceCommand;
 import jadex.base.service.remote.commands.RemoteDGCRemoveReferenceCommand;
+import jadex.base.service.remote.replacements.DefaultEqualsMethodReplacement;
+import jadex.base.service.remote.replacements.DefaultHashcodeMethodReplacement;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
