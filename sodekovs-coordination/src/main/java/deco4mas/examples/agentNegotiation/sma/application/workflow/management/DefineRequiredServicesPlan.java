@@ -1,12 +1,12 @@
 package deco4mas.examples.agentNegotiation.sma.application.workflow.management;
 
-import jadex.application.runtime.impl.ExternalAccess;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.MParameter;
 import jadex.bpmn.runtime.BpmnInterpreter;
+import jadex.bpmn.runtime.ExternalAccess;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.commons.IFuture;
@@ -44,8 +44,11 @@ public class DefineRequiredServicesPlan extends Plan
 
 			// workflow Access
 			IFuture workflowFuture = cms.getExternalAccess((IComponentIdentifier) ((IGoal) getReason()).getParameter("workflow").getValue());
-			BpmnInterpreter workflow = (BpmnInterpreter) workflowFuture.get(this);
-//			ExternalAccess exta = ((ExternalAccess) workflowFuture.get(this));							
+			
+			// get the BPMN(!) ExternalAccess and Interpreter
+			ExternalAccess exta = ((ExternalAccess) workflowFuture.get(this));
+			BpmnInterpreter workflow = (BpmnInterpreter) exta.getInterpreter();
+
 
 			// LOG
 			smaLogger.info("Add new needed Services for " + workflow.getComponentIdentifier().getLocalName());
