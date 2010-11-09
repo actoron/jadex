@@ -3,6 +3,7 @@ package jadex.xml;
 import java.util.Map;
 
 import javax.xml.namespace.QName;
+import javax.xml.stream.Location;
 
 /**
  *  A struct to represent an element on the stack while parsing.
@@ -28,11 +29,8 @@ public class StackElement
 	/** The type info. */
 	protected TypeInfo typeinfo;
 	
-	/** The line of the start tag. */
-	protected int line;
-	
-	/** The column of the start tag. */
-	protected int column;
+	/** The location of the start tag. */
+	protected Location	location;
 	
 	//-------- constructors --------
 	
@@ -49,20 +47,19 @@ public class StackElement
 	 */
 	public StackElement(QName tag, Object object, Map rawattrs)
 	{
-		this(tag, object, rawattrs, null, -1, -1);
+		this(tag, object, rawattrs, null, null);
 	}
 	
 	/**
 	 *  Create a new stack element.
 	 */
-	public StackElement(QName tag, Object object, Map rawattrs, TypeInfo typeinfo, int line, int column)
+	public StackElement(QName tag, Object object, Map rawattrs, TypeInfo typeinfo, Location location)
 	{
 		this.tag = tag;
 		this.object = object;
 		this.rawattrs = rawattrs;
 		this.typeinfo = typeinfo;
-		this.line	= line;
-		this.column	= column;
+		this.location	= location;
 	}
 	
 	//-------- methods --------
@@ -123,41 +120,14 @@ public class StackElement
 	}
 	
 	/**
-	 *  Get the line.
-	 *  @return The line.
+	 *  Get the location.
+	 *  @return The location.
 	 */
-	public int getLine()
+	public Location getLocation()
 	{
-		return this.line;
+		return this.location;
 	}
 	
-	/**
-	 *  Set the column.
-	 *  @param column The column to set.
-	 */
-	public void setColumn(int column)
-	{
-		this.column = column;
-	}
-	
-	/**
-	 *  Get the column.
-	 *  @return The column.
-	 */
-	public int getColumn()
-	{
-		return this.column;
-	}
-	
-	/**
-	 *  Set the line.
-	 *  @param line The line to set.
-	 */
-	public void setLine(int line)
-	{
-		this.line = line;
-	}
-
 	/**
 	 *  Add content to the already collected content (if any).
 	 *  @param content	The content to add.

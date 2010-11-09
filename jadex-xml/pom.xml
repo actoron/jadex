@@ -177,18 +177,23 @@
 			<version>2.0-rc5</version>
 		</dependency>
 
-		<!-- todo: remove depency before release -->
+		<!-- todo: remove depency before release - ->
 		<dependency>
 		    <groupId>pull-parser</groupId>
 		    <artifactId>pull-parser</artifactId>
 		    <version>2.1.10</version>
-		</dependency>
+		</dependency>-->
 		<!-- 
 		<dependency>
-		    <groupId>woodstox</groupId>
-		    <artifactId>wstx-lgpl</artifactId>
-		    <version>3.2.7</version>
-		</dependency>
-		 -->
+			<groupId>xerces</groupId>
+			<artifactId>xercesImpl</artifactId>
+			<version>2.9.1</version>
+		</dependency> -->
+		<!-- 
+		<dependency>
+			<groupId>org.codehaus.woodstox</groupId>
+			<artifactId>woodstox-core-lgpl</artifactId>
+			<version>4.0.9</version>
+		</dependency> -->
 	</dependencies>
 </project>

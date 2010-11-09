@@ -183,7 +183,7 @@ public class ADFChecker extends IncrementalProjectBuilder
 			catch(RuntimeException e1)
 			{
 				e1.printStackTrace();
-				throw e1;
+//				throw e1;
 			}
 		}
 	}

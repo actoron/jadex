@@ -145,10 +145,18 @@ public abstract class AbstractErrorReportBuilder
 		Tuple[]	elements	= getElements();
 		for(int i=0; i<elements.length; i++)
 		{
-			String	name	= getObjectName(getObject(elements[i]));
-			name	= name.replace("\n", " ");
-			buf.append(name);
-			buf.append(":\n");
+			Object	obj	= getObject(elements[i]);
+			if(obj!=null)
+			{
+				String	name	= getObjectName(obj);
+				name	= name.replace("\n", " ");
+				buf.append(name);
+				buf.append(":\n");
+			}
+			else
+			{
+				buf.append("Errors:\n");				
+			}
 			String[]	messages	= 	getMessages(elements[i]);
 			for(int j=0; j<messages.length; j++)
 			{

@@ -90,6 +90,8 @@ public class Reader
 		catch(Exception e)
 		{
 			// Validation not supported.
+			System.err.println("Error setting validation to "+validate);
+			e.printStackTrace();
 		}
 		
 		if(reporter!=null)
@@ -162,7 +164,7 @@ public class Reader
 
 		return readcontext.rootobject;
 	}
-	
+
 	/**
 	 *  Handle the comment.
 	 *  @param readcontext The context for reading with all necessary information.
@@ -269,8 +271,7 @@ public class Reader
 					if(!readcontext.getReadObjects().containsKey(idref))
 						throw new RuntimeException("idref not contained: "+idref);
 					object = readcontext.getReadObjects().get(idref);
-					StackElement se = new StackElement(localname, object, rawattrs, typeinfo,
-						parser.getLocation().getLineNumber(), parser.getLocation().getColumnNumber());
+					StackElement se = new StackElement(localname, object, rawattrs, typeinfo, parser.getLocation());
 					stack.add(se);
 				}
 				else
@@ -302,8 +303,7 @@ public class Reader
 						readcontext.getReadObjects().put(id, object);
 					}
 					
-					stack.add(new StackElement(localname, object, rawattrs, typeinfo,
-						parser.getLocation().getLineNumber(), parser.getLocation().getColumnNumber()));
+					stack.add(new StackElement(localname, object, rawattrs, typeinfo, parser.getLocation()));
 					if(stack.size()==1)
 					{
 						readcontext.setRootObject(object);
@@ -436,7 +436,7 @@ public class Reader
 					}
 				}
 				
-				topse = new StackElement(topse.getTag(), val, topse.getRawAttributes(), null, topse.getLine(), topse.getColumn());
+				topse = new StackElement(topse.getTag(), val, topse.getRawAttributes(), null, topse.getLocation());
 				stack.set(stack.size()-1, topse);
 //				readcontext.setTopse(topse);
 				// If this is the only element on stack, set also root to it

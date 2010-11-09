@@ -355,11 +355,11 @@ public class OAVBDIXMLReader
 
 		// Different readers and writers should not work on the same typeinfos
 		// because they may alter them (e.g. add additional array types).
-		reader = new Reader(new OAVObjectReaderHandler(typeinfos), false, true, new XMLReporter()
+		reader = new Reader(new OAVObjectReaderHandler(typeinfos), false, false, new XMLReporter()
 		{
 			public void report(String msg, String type, Object info, Location location) throws XMLStreamException
 			{
-				System.out.println("XML error: "+msg+", "+type+", "+info+", "+location);
+//				System.out.println("XML error: "+msg+", "+type+", "+info+", "+location);
 				IContext	context	= (IContext)Reader.READ_CONTEXT.get();
 				reportError(context, msg);
 			}
@@ -394,7 +394,7 @@ public class OAVBDIXMLReader
 		if(stack.getEntities().length>0)
 		{
 			StackElement	se	= (StackElement)stack.get(stack.getEntities().length-1);
-			pos	= " (line "+se.getLine()+", column "+se.getColumn()+")";
+			pos	= " (line "+se.getLocation().getLineNumber()+", column "+se.getLocation().getColumnNumber()+")";
 		}
 		else
 		{

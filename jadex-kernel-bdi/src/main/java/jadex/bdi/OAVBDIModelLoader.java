@@ -186,10 +186,10 @@ public class OAVBDIModelLoader	extends AbstractModelLoader
 		Collection mcaparefs = state.getAttributeValues(mcapa, OAVBDIMetaModel.capability_has_capabilityrefs);
 		if(mcaparefs!=null)
 		{
-			for(Iterator it=mcaparefs.iterator(); it.hasNext(); )
+			Object[]	mcrs	= mcaparefs.toArray(); 
+			for(int i=0; i<mcrs.length; i++)
 			{
-				Object mcaparef = it.next();
-				String	file	= (String)state.getAttributeValue(mcaparef, OAVBDIMetaModel.capabilityref_has_file);
+				String	file	= (String)state.getAttributeValue(mcrs[i], OAVBDIMetaModel.capabilityref_has_file);
 				try
 				{
 					OAVCapabilityModel	cmodel	= loadCapabilityModel(file, imports, model.getClassLoader());
@@ -199,23 +199,23 @@ public class OAVBDIModelLoader	extends AbstractModelLoader
 						Tuple	se	= new Tuple(new Object[]{
 							new StackElement(new QName(model instanceof OAVAgentModel ? "agent" : "capability"), mcapa, null),
 							new StackElement(new QName("capabilities"), null, null),
-							new StackElement(new QName("capability"), mcaparef, null)});
+							new StackElement(new QName("capability"), mcrs[i], null)});
 						model.addEntry(se, "Included capability <a href=\"#"+cmodel.getModelInfo().getFilename()+"\">"+cmodel.getName()+"</a> has errors.");
 						model.addDocument(cmodel.getModelInfo().getFilename(), cmodel.getModelInfo().getReport().getErrorHTML());
 					}
 	
-					state.setAttributeValue(mcaparef, OAVBDIMetaModel.capabilityref_has_capability, cmodel.getHandle());
+					state.setAttributeValue(mcrs[i], OAVBDIMetaModel.capabilityref_has_capability, cmodel.getHandle());
 				}
 				catch(Exception e)
 				{
 					// Remove broken capability reference as otherwise nullpointerexceptions will occur.
-					String	name	= (String)state.getAttributeValue(mcaparef, OAVBDIMetaModel.modelelement_has_name);
+					String	name	= (String)state.getAttributeValue(mcrs[i], OAVBDIMetaModel.modelelement_has_name);
 					state.removeAttributeValue(mcapa, OAVBDIMetaModel.capability_has_capabilityrefs, name);
 					
 					Tuple	se	= new Tuple(new Object[]{
 						new StackElement(new QName(model instanceof OAVAgentModel ? "agent" : "capability"), mcapa, null),
 						new StackElement(new QName("capabilities"), null, null),
-						new StackElement(new QName("capability"), mcaparef, null)});	// Todo: mcaparef no longer in state!=
+						new StackElement(new QName("capability"), mcrs[i], null)});	// Todo: mcaparef no longer in state!=
 					model.addEntry(se, "Included capability '"+file+"' cannot be loaded: "+e);
 				}
 			}

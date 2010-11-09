@@ -11,6 +11,7 @@ import jadex.xml.IPostProcessor;
 import jadex.xml.IStringObjectConverter;
 import jadex.xml.ObjectInfo;
 import jadex.xml.SXML;
+import jadex.xml.StackElement;
 import jadex.xml.SubobjectInfo;
 import jadex.xml.TypeInfo;
 import jadex.xml.TypeInfoPathManager;
@@ -325,16 +326,24 @@ public class OAVObjectReaderHandler implements IObjectReaderHandler
 		
 		if(attrtype!=null)
 		{
-			Object arg = val instanceof String && attrtype.getType() instanceof OAVJavaType 
-				&& BasicTypeConverter.isBuiltInType(((OAVJavaType)attrtype.getType()).getClazz())?
-				BasicTypeConverter.getBasicStringConverter((((OAVJavaType)attrtype.getType()).getClazz()))
-					.convertString(attrval, null): val;
-	
-			setAttributeValue(state, object, attrtype, arg);		
+			try
+			{
+				Object arg = val instanceof String && attrtype.getType() instanceof OAVJavaType 
+					&& BasicTypeConverter.isBuiltInType(((OAVJavaType)attrtype.getType()).getClazz())?
+					BasicTypeConverter.getBasicStringConverter((((OAVJavaType)attrtype.getType()).getClazz()))
+						.convertString(attrval, null): val;
+		
+				setAttributeValue(state, object, attrtype, arg);
+			}
+			catch(Exception e)
+			{
+				StackElement	se	= context.getTopStackElement();
+				context.getReporter().report(e.toString(), "attribute error", se, se.getLocation());
+			}
 		}
 		else
 		{
-			System.out.println("Unhandled attribute: "+object+", "+xmlattrname+", "+attrpath);
+			System.err.println("Unhandled attribute: "+object+", "+xmlattrname+", "+attrpath);
 		}
 	}
 	
