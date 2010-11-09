@@ -268,11 +268,17 @@ public class Reader
 				String idref = rawattrs!=null? (String)rawattrs.get(SXML.IDREF): null;
 				if(idref!=null)
 				{
-					if(!readcontext.getReadObjects().containsKey(idref))
-						throw new RuntimeException("idref not contained: "+idref);
-					object = readcontext.getReadObjects().get(idref);
-					StackElement se = new StackElement(localname, object, rawattrs, typeinfo, parser.getLocation());
-					stack.add(se);
+					if(readcontext.getReadObjects().containsKey(idref))
+					{
+						object = readcontext.getReadObjects().get(idref);
+						StackElement se = new StackElement(localname, object, rawattrs, typeinfo, parser.getLocation());
+						stack.add(se);
+					}
+					else
+					{
+						StackElement	se	= readcontext.getTopStackElement();
+						readcontext.getReporter().report("idref not contained: "+idref, "idref error", se, se.getLocation());						
+					}
 				}
 				else
 				{	
@@ -324,51 +330,56 @@ public class Reader
 								attrpath.add(pse.getTag());
 								object = pse.getObject();
 							}
-							
-							if(object==null)
-								throw new RuntimeException("No element on stack for attributes"+stack);
 						}
 						
 						// Handle attributes
-						Set attrs = typeinfo==null? Collections.EMPTY_SET: typeinfo.getXMLAttributeNames();
-						for(int i=0; i<parser.getAttributeCount(); i++)
+						if(object!=null)
 						{
-							QName attrname = parser.getAttributePrefix(i)==null || parser.getAttributePrefix(i)==XMLConstants.DEFAULT_NS_PREFIX? new QName(parser.getAttributeLocalName(i))
-								: new QName(parser.getAttributeNamespace(i), parser.getAttributeLocalName(i), parser.getAttributePrefix(i));
-
-//							System.out.println("here: "+attrname);
-							
-							if(!attrname.getLocalPart().equals(SXML.ID))
-							{	
-								String attrval = parser.getAttributeValue(i);
-								attrs.remove(attrname);
+							Set attrs = typeinfo==null? Collections.EMPTY_SET: typeinfo.getXMLAttributeNames();
+							for(int i=0; i<parser.getAttributeCount(); i++)
+							{
+								QName attrname = parser.getAttributePrefix(i)==null || parser.getAttributePrefix(i)==XMLConstants.DEFAULT_NS_PREFIX? new QName(parser.getAttributeLocalName(i))
+									: new QName(parser.getAttributeNamespace(i), parser.getAttributeLocalName(i), parser.getAttributePrefix(i));
+	
+	//							System.out.println("here: "+attrname);
 								
-								Object attrinfo = typeinfo!=null ? typeinfo.getAttributeInfo(attrname) : null;
-								if(!(attrinfo instanceof AttributeInfo && ((AttributeInfo)attrinfo).isIgnoreRead()))
-								{
-		//							ITypeConverter attrconverter = typeinfo!=null ? typeinfo.getAttributeConverter(attrname) : null;
-		//							Object val = attrconverter!=null? attrconverter.convertObject(attrval, root, classloader): attrval;
+								if(!attrname.getLocalPart().equals(SXML.ID))
+								{	
+									String attrval = parser.getAttributeValue(i);
+									attrs.remove(attrname);
 									
-									handler.handleAttributeValue(object, attrname, attrpath, attrval, attrinfo, 
-										readcontext);
-								
-									if(attrinfo instanceof AttributeInfo && AttributeInfo.ID.equals(((AttributeInfo)attrinfo).getId()))
+									Object attrinfo = typeinfo!=null ? typeinfo.getAttributeInfo(attrname) : null;
+									if(!(attrinfo instanceof AttributeInfo && ((AttributeInfo)attrinfo).isIgnoreRead()))
 									{
-//										System.out.println("ID: "+attrval+", "+object);
-										readcontext.getReadObjects().put(attrval, object);
+			//							ITypeConverter attrconverter = typeinfo!=null ? typeinfo.getAttributeConverter(attrname) : null;
+			//							Object val = attrconverter!=null? attrconverter.convertObject(attrval, root, classloader): attrval;
+										
+										handler.handleAttributeValue(object, attrname, attrpath, attrval, attrinfo, 
+											readcontext);
+									
+										if(attrinfo instanceof AttributeInfo && AttributeInfo.ID.equals(((AttributeInfo)attrinfo).getId()))
+										{
+	//										System.out.println("ID: "+attrval+", "+object);
+											readcontext.getReadObjects().put(attrval, object);
+										}
 									}
 								}
 							}
+							// Handle unset attributes (possibly have default value).
+							for(Iterator it=attrs.iterator(); it.hasNext(); )
+							{
+								QName attrname = (QName)it.next();
+								Object attrinfo = typeinfo.getAttributeInfo(attrname);
+								
+								// Hack. want to read attribute info here
+								handler.handleAttributeValue(object, attrname, attrpath, null, attrinfo, 
+									readcontext);
+							}
 						}
-						// Handle unset attributes (possibly have default value).
-						for(Iterator it=attrs.iterator(); it.hasNext(); )
+						else
 						{
-							QName attrname = (QName)it.next();
-							Object attrinfo = typeinfo.getAttributeInfo(attrname);
-							
-							// Hack. want to read attribute info here
-							handler.handleAttributeValue(object, attrname, attrpath, null, attrinfo, 
-								readcontext);
+							StackElement	se	= readcontext.getTopStackElement();
+							readcontext.getReporter().report("No element on stack for attributes", "stack error", se, se.getLocation());													
 						}
 					}
 					
@@ -464,7 +475,8 @@ public class Reader
 					}
 					else
 					{
-						throw new RuntimeException("No content mapping for: "+topse.getContent()+" tag="+topse.getTag());
+						StackElement	se	= readcontext.getTopStackElement();
+						readcontext.getReporter().report("No content mapping for: "+topse.getContent()+" tag="+topse.getTag(), "link error", se, se.getLocation());													
 					}
 				}
 				
@@ -517,26 +529,31 @@ public class Reader
 						pathname.add(0, ((StackElement)stack.get(i+1)).getTag());
 					}
 					
-					if(pse.getObject()==null)
-						throw new RuntimeException("No parent object found for: "+SUtil.arrayToString(fullpath));
-					
+					if(pse.getObject()!=null)
+					{
 	//						System.out.println("here: "+parser.getLocalName()+" "+getXMLPath(stack)+" "+topse.getRawAttributes());
 					
-					TypeInfo patypeinfo = pse.getTypeInfo();
-					SubobjectInfo linkinfo = getSubobjectInfoRead(localname, fullpath, patypeinfo, topse.getRawAttributes());
-					bulklink = patypeinfo!=null? patypeinfo.isBulkLink(): this.bulklink;
-					
-					if(!bulklink)
-					{
-						IObjectLinker linker = (IObjectLinker)(typeinfo!=null && typeinfo.getLinker()!=null? typeinfo.getLinker(): handler);
-						linker.linkObject(topse.getObject(), pse.getObject(), linkinfo==null? null: linkinfo, 
-							(QName[])pathname.toArray(new QName[pathname.size()]), readcontext);
+						TypeInfo patypeinfo = pse.getTypeInfo();
+						SubobjectInfo linkinfo = getSubobjectInfoRead(localname, fullpath, patypeinfo, topse.getRawAttributes());
+						bulklink = patypeinfo!=null? patypeinfo.isBulkLink(): this.bulklink;
+						
+						if(!bulklink)
+						{
+							IObjectLinker linker = (IObjectLinker)(typeinfo!=null && typeinfo.getLinker()!=null? typeinfo.getLinker(): handler);
+							linker.linkObject(topse.getObject(), pse.getObject(), linkinfo==null? null: linkinfo, 
+								(QName[])pathname.toArray(new QName[pathname.size()]), readcontext);
+						}
+						else
+						{
+							// Save the finished object as child for its parent.
+							readcontext.addChild(pse.getObject(), new LinkData(topse.getObject(), linkinfo==null? null: linkinfo, 
+								(QName[])pathname.toArray(new QName[pathname.size()])));	
+						}
 					}
 					else
 					{
-						// Save the finished object as child for its parent.
-						readcontext.addChild(pse.getObject(), new LinkData(topse.getObject(), linkinfo==null? null: linkinfo, 
-							(QName[])pathname.toArray(new QName[pathname.size()])));	
+						StackElement	se	= readcontext.getTopStackElement();
+						readcontext.getReporter().report("No parent object found for: "+SUtil.arrayToString(fullpath), "link error", se, se.getLocation());													
 					}
 				}
 			}
