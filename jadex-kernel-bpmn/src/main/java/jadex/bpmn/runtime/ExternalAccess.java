@@ -147,8 +147,7 @@ public class ExternalAccess implements IExternalAccess
 				{
 					public void run() 
 					{
-						ret.setException(new UnsupportedOperationException());
-//						application.scheduleStep(com).addResultListener(new DelegationResultListener(ret));
+						interpreter.scheduleResultStep(com);
 					}
 				});
 			}
@@ -159,8 +158,7 @@ public class ExternalAccess implements IExternalAccess
 		}
 		else
 		{
-			ret.setException(new UnsupportedOperationException());
-//			application.scheduleStep(com).addResultListener(new DelegationResultListener(ret));
+			interpreter.scheduleResultStep(com);
 		}
 		
 		return ret;

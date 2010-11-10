@@ -36,6 +36,7 @@ import jadex.commons.Future;
 import jadex.commons.IChangeListener;
 import jadex.commons.IFilter;
 import jadex.commons.IFuture;
+import jadex.commons.IResultCommand;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
@@ -1377,5 +1378,20 @@ public class BpmnInterpreter implements IComponentInstance
 	{
 		for (Iterator it = activitylisteners.iterator(); it.hasNext(); )
 			((IActivityListener) it.next()).activityExecuting(new ChangeEvent(threadid, "Activity Execution", activity));
+	}
+	
+	/**
+	 *  Schedule a step of the agent.
+	 *  May safely be called from external threads.
+	 *  @param step	Code to be executed as a step of the agent.
+	 *  @return The result of the step.
+	 */
+	public IFuture scheduleResultStep(IResultCommand com)
+	{
+		throw new UnsupportedOperationException();
+//		MActivity act = new MActivity();
+//		act.setName("External Step Activity.");
+//		act.setClazz(clazz)
+//		context.addThread(new ProcessThread(, context, this));
 	}
 }
