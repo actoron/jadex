@@ -19,6 +19,7 @@ import jadex.rules.rulesystem.Rulebase;
 import jadex.rules.state.IOAVState;
 import jadex.xml.StackElement;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -97,12 +98,16 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 		
 		// Build error report.
 		getModelInfo().setReport(new AbstractErrorReportBuilder(getModelInfo().getName(), getModelInfo().getFilename(),
-			new String[]{"Capability", "Belief", "Goal", "Plan", "Event"}, entries, getDocuments())
+			new String[]{"XML", "Capability", "Belief", "Goal", "Plan", "Event"}, entries, getDocuments())
 		{
 			public boolean isInCategory(Object obj, String category)
 			{
 				boolean	ret	= false;
-				if("Capability".equals(category))
+				if("XML".equals(category))
+				{
+					ret	= obj instanceof String;
+				}
+				else if("Capability".equals(category))
 				{
 					ret	= state.getType(obj).isSubtype(OAVBDIMetaModel.capabilityref_type);
 				}
@@ -161,7 +166,7 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 					name	= ""+obj;
 				}
 				
-				return state.getType(obj).getName().substring(1) + " " + name;
+				return obj instanceof String ? (String)obj : state.getType(obj).getName().substring(1) + " " + name;
 			}
 		}.buildErrorReport());
 	}
@@ -174,7 +179,26 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 	 */
 	public String getName()
 	{
-		return (String)state.getAttributeValue(handle, OAVBDIMetaModel.modelelement_has_name);
+		String	ret;
+		if(handle!=null)
+		{
+			ret	= (String)state.getAttributeValue(handle, OAVBDIMetaModel.modelelement_has_name);
+		}
+		
+		// For broken XMLs (no handle) try to generate name from filename.
+		else
+		{
+			int idx	= Math.max(filename.lastIndexOf(File.separator), filename.lastIndexOf("/"));
+			if(idx!=-1)
+			{
+				ret	= filename.substring(idx+1);
+			}
+			else
+			{
+				ret	= filename;
+			}
+		}
+		return ret;
 	}
 	
 	/**
@@ -183,7 +207,7 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 	 */
 	public String getPackage()
 	{
-		return (String)state.getAttributeValue(handle, OAVBDIMetaModel.capability_has_package);
+		return handle!=null ? (String)state.getAttributeValue(handle, OAVBDIMetaModel.capability_has_package) : null;
 	}
 	
 	/**
@@ -202,7 +226,7 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 	 */
 	public String getDescription()
 	{
-		String ret = (String)state.getAttributeValue(handle, OAVBDIMetaModel.modelelement_has_description);
+		String ret = handle!=null ? (String)state.getAttributeValue(handle, OAVBDIMetaModel.modelelement_has_description) : null;
 		return ret!=null? ret: "No description available."; 
 	}
 	
@@ -223,7 +247,7 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 	{
 		String[] ret = SUtil.EMPTY_STRING_ARRAY;
 		
-		Collection configs = state.getAttributeValues(handle, OAVBDIMetaModel.capability_has_configurations);
+		Collection configs = handle!=null ? state.getAttributeValues(handle, OAVBDIMetaModel.capability_has_configurations) : null;
 		if(configs!=null)
 		{
 			List tmp = new ArrayList();
@@ -252,7 +276,7 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 	{
 		List ret = new ArrayList();
 		
-		Collection bels = state.getAttributeValues(handle, OAVBDIMetaModel.capability_has_beliefs);
+		Collection bels = handle!=null ? state.getAttributeValues(handle, OAVBDIMetaModel.capability_has_beliefs) : null;
 		if(bels!=null)
 		{
 			for(Iterator it=bels.iterator(); it.hasNext(); )
@@ -267,7 +291,7 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 			}
 		}
 		
-		Collection belrefs = state.getAttributeValues(handle, OAVBDIMetaModel.capability_has_beliefrefs);
+		Collection belrefs = handle!=null ? state.getAttributeValues(handle, OAVBDIMetaModel.capability_has_beliefrefs) : null;
 		if(belrefs!=null)
 		{
 			for(Iterator it=belrefs.iterator(); it.hasNext(); )
@@ -282,7 +306,7 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 			}
 		}
 		
-		Collection belsets = state.getAttributeValues(handle, OAVBDIMetaModel.capability_has_beliefsets);
+		Collection belsets = handle!=null ? state.getAttributeValues(handle, OAVBDIMetaModel.capability_has_beliefsets) : null;
 		if(belsets!=null)
 		{
 			for(Iterator it=belsets.iterator(); it.hasNext(); )
@@ -297,7 +321,7 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 			}
 		}
 		
-		Collection belsetrefs = state.getAttributeValues(handle, OAVBDIMetaModel.capability_has_beliefsetrefs);
+		Collection belsetrefs = handle!=null ? state.getAttributeValues(handle, OAVBDIMetaModel.capability_has_beliefsetrefs) : null;
 		if(belsetrefs!=null)
 		{
 			for(Iterator it=belsetrefs.iterator(); it.hasNext(); )
@@ -323,7 +347,7 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 	{
 		List ret = new ArrayList();
 		
-		Collection bels = state.getAttributeValues(handle, OAVBDIMetaModel.capability_has_beliefs);
+		Collection bels = handle!=null ? state.getAttributeValues(handle, OAVBDIMetaModel.capability_has_beliefs) : null;
 		if(bels!=null)
 		{
 			for(Iterator it=bels.iterator(); it.hasNext(); )
@@ -336,7 +360,7 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 			}
 		}
 		
-		Collection belrefs = state.getAttributeValues(handle, OAVBDIMetaModel.capability_has_beliefrefs);
+		Collection belrefs = handle!=null ? state.getAttributeValues(handle, OAVBDIMetaModel.capability_has_beliefrefs) : null;
 		if(belrefs!=null)
 		{
 			for(Iterator it=belrefs.iterator(); it.hasNext(); )
@@ -349,7 +373,7 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 			}
 		}
 		
-		Collection belsets = state.getAttributeValues(handle, OAVBDIMetaModel.capability_has_beliefsets);
+		Collection belsets = handle!=null ? state.getAttributeValues(handle, OAVBDIMetaModel.capability_has_beliefsets) : null;
 		if(belsets!=null)
 		{
 			for(Iterator it=belsets.iterator(); it.hasNext(); )
@@ -362,7 +386,7 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 			}
 		}
 		
-		Collection belsetrefs = state.getAttributeValues(handle, OAVBDIMetaModel.capability_has_beliefsetrefs);
+		Collection belsetrefs = handle!=null ? state.getAttributeValues(handle, OAVBDIMetaModel.capability_has_beliefsetrefs) : null;
 		if(belsetrefs!=null)
 		{
 			for(Iterator it=belsetrefs.iterator(); it.hasNext(); )
@@ -452,7 +476,8 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 	public Map	getProperties()
 	{
 		Map ret = new HashMap();
-		addCapabilityProperties(ret, handle);
+		if(handle!=null)
+			addCapabilityProperties(ret, handle);
 		return ret;
 	}
 	
@@ -646,7 +671,7 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 	public Class[] getUsedServices()
 	{
 		List ret = new ArrayList();
-		Collection own = state.getAttributeValues(handle, OAVBDIMetaModel.capability_has_usedservices);
+		Collection own = handle!=null ? state.getAttributeValues(handle, OAVBDIMetaModel.capability_has_usedservices) : null;
 		if(own!=null)
 		{
 			for(Iterator it=own.iterator(); it.hasNext(); )
@@ -655,7 +680,7 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 			}
 		}
 		
-		Collection subcapas = state.getAttributeValues(handle, OAVBDIMetaModel.capability_has_capabilityrefs);
+		Collection subcapas = handle!=null ? state.getAttributeValues(handle, OAVBDIMetaModel.capability_has_capabilityrefs) : null;
 		if(subcapas!=null)
 		{
 			for(Iterator it=subcapas.iterator(); it.hasNext(); )
@@ -682,7 +707,7 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 	public Class[] getOfferedServices()
 	{
 		List ret = new ArrayList();
-		Collection own = state.getAttributeValues(handle, OAVBDIMetaModel.capability_has_offeredservices);
+		Collection own = handle!=null ? state.getAttributeValues(handle, OAVBDIMetaModel.capability_has_offeredservices) : null;
 		if(own!=null)
 		{
 			for(Iterator it=own.iterator(); it.hasNext(); )
@@ -691,7 +716,7 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 			}
 		}
 		
-		Collection subcapas = state.getAttributeValues(handle, OAVBDIMetaModel.capability_has_capabilityrefs);
+		Collection subcapas = handle!=null ? state.getAttributeValues(handle, OAVBDIMetaModel.capability_has_capabilityrefs) : null;
 		if(subcapas!=null)
 		{
 			for(Iterator it=subcapas.iterator(); it.hasNext(); )

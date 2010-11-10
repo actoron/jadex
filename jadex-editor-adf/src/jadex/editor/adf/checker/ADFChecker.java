@@ -1,15 +1,5 @@
 package jadex.editor.adf.checker;
 
-import jadex.bdi.BDIAgentFactory;
-import jadex.bridge.IModelInfo;
-import jadex.commons.Future;
-import jadex.commons.IFuture;
-import jadex.commons.service.IResultSelector;
-import jadex.commons.service.ISearchManager;
-import jadex.commons.service.IServiceProvider;
-import jadex.commons.service.IVisitDecider;
-
-import java.util.Collection;
 import java.util.Map;
 import java.util.StringTokenizer;
 
@@ -30,6 +20,16 @@ import org.eclipse.core.runtime.IProgressMonitor;
  */
 public class ADFChecker extends IncrementalProjectBuilder
 {
+	//-------- constants --------
+	
+	/** The factories for corresponding file suffixes. */
+	protected String[]	factories	= new String[]
+	{
+		".agent.xml", "jadex.bdi.BDIAgentFactory",
+		".capability.xml", "jadex.bdi.BDIAgentFactory",
+		".application.xml", "jadex.application.ApplicationComponentFactory"
+	};
+	
 	class SampleDeltaVisitor implements IResourceDeltaVisitor
 	{
 		/*
@@ -122,69 +122,45 @@ public class ADFChecker extends IncrementalProjectBuilder
 
 	void checkXML(IResource resource)
 	{
-		if(!resource.isDerived() &&	resource instanceof IFile
-			&& (resource.getName().endsWith(".agent.xml")
-			|| resource.getName().endsWith(".capability.xml")))
+		if(!resource.isDerived() &&	resource instanceof IFile)
 		{
 			IFile file = (IFile)resource;
-			deleteMarkers(file);
-			try
+			for(int i=0; i<factories.length; i+=2)
 			{
-				IProject	project	= file.getProject();
-				IModelInfo	info	= new BDIAgentFactory(null, new IServiceProvider()
+				if(resource.getName().endsWith(factories[i]))
 				{
-					public IFuture getServices(ISearchManager arg0, IVisitDecider arg1, IResultSelector arg2, Collection arg3)
+					deleteMarkers(file);
+					try
 					{
-						return new Future(null);
-					}
-					
-					public IFuture getParent()
-					{
-						return new Future(null);
-					}
-					
-					public Object getId()
-					{
-						return "id";
-					}
-					
-					public IFuture getChildren()
-					{
-						return new Future(null);
-					}
-				})
-					.loadModel(file.getRawLocation().toPortableString(), null, SClassLoader.getProjectClassLoader(project));
-				if(info.getReport()!=null)
-				{
-					String	report	= info.getReport().getErrorText();
-//					System.out.println(report);
-					StringTokenizer stok	= new StringTokenizer(report, "\n");
-					while(stok.hasMoreTokens())
-					{
-						String	error	= stok.nextToken();
-						if(error.startsWith("\t"))	// Error messages start with tab as they are printed below element name.
+						String	report	= getReport(file, factories[i+1]);
+//						System.out.println(report);
+						StringTokenizer stok	= new StringTokenizer(report, "\n");
+						while(stok.hasMoreTokens())
 						{
-							error	= error.trim();
-							int iline	= error.indexOf("(line ");
-							int icolumn	= error.indexOf(", column ", iline);
-							if(iline!=-1 && icolumn!=-1)
+							String	error	= stok.nextToken();
+							if(error.startsWith("\t"))	// Error messages start with tab as they are printed below element name.
 							{
-								int line	= Integer.parseInt(error.substring(iline+6, icolumn));
-								addMarker(file, error, line, IMarker.SEVERITY_ERROR);
-							}
-							else
-							{
-								addMarker(file, error, -1, IMarker.SEVERITY_ERROR);							
+								error	= error.trim();
+								int iline	= error.indexOf("(line ");
+								int icolumn	= error.indexOf(", column ", iline);
+								if(iline!=-1 && icolumn!=-1)
+								{
+									int line	= Integer.parseInt(error.substring(iline+6, icolumn));
+									addMarker(file, error, line, IMarker.SEVERITY_ERROR);
+								}
+								else
+								{
+									addMarker(file, error, -1, IMarker.SEVERITY_ERROR);							
+								}
 							}
 						}
 					}
+					catch(Exception e)
+					{
+						e.printStackTrace();
+					}
 				}
-			}
-			catch(RuntimeException e1)
-			{
-				e1.printStackTrace();
-//				throw e1;
-			}
+			}			
 		}
 	}
 
@@ -216,5 +192,30 @@ public class ADFChecker extends IncrementalProjectBuilder
 	{
 		// the visitor does the work.
 		delta.accept(new SampleDeltaVisitor());
+	}
+	
+	//-------- helper methods --------
+	
+	/**
+	 *  Get the report for a file.
+	 */
+	protected String	getReport(IFile file, String factoryname)	throws Exception
+	{
+		String	ret	= null;
+		String	filename	= file.getRawLocation().toPortableString();
+		IProject	project	= file.getProject();
+		ClassLoader	cl	= SClassLoader.getProjectClassLoader(project);
+		Class	clazz	= Class.forName(factoryname, true, cl);
+		Object	factory	= clazz.getConstructor(new Class[]{String.class}).newInstance(new Object[]{"dummy"});
+		Object modelinfo	= factory.getClass().getMethod("loadModel", new Class[]{String.class, String[].class, ClassLoader.class})
+			.invoke(factory, new Object[]{filename, null, cl});
+		Object	report	= modelinfo.getClass().getMethod("getReport", new Class[0])
+			.invoke(modelinfo, new Object[0]);
+		if(report!=null)
+		{
+			ret	= (String)report.getClass().getMethod("getErrorText", new Class[0])
+			.invoke(report, new Object[0]);
+		}
+		return ret;
 	}
 }

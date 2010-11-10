@@ -19,7 +19,6 @@ import jadex.bridge.IArgument;
 import jadex.commons.IFilter;
 import jadex.commons.ResourceInfo;
 import jadex.commons.SReflect;
-import jadex.commons.SUtil;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 import jadex.xml.AccessInfo;
@@ -411,7 +410,7 @@ public class BpmnXMLReader
 						String paramclazzname = stok2.nextToken();
 						Class paramclazz = SReflect.findClass0(paramclazzname, dia.getAllImports(), context.getClassLoader());
 						if(paramclazz==null)
-							throw new RuntimeException("Parameter class not found in imports: "+dia+", "+act+", "+paramclazzname+", "+SUtil.arrayToString(dia.getAllImports()));
+							throw new RuntimeException("Parameter class not found in imports: "+dia+", "+act+", "+paramclazzname);//+", "+SUtil.arrayToString(dia.getAllImports()));
 						String paramname = stok2.nextToken();
 						IParsedExpression paramexp = null;
 						if(stok2.hasMoreTokens())

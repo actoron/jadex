@@ -288,7 +288,8 @@ public class OAVObjectReaderHandler implements IObjectReaderHandler
 		}
 		else if(attrinfo!=null)
 		{
-			throw new RuntimeException("Unknown attribute info: "+attrinfo);
+			StackElement	se	= context.getTopStackElement();
+			context.getReporter().report("Unknown attribute info: "+attrinfo, "attribute error", se, se.getLocation());
 		}
 		
 		// Search attribute in type and supertypes.
@@ -343,7 +344,8 @@ public class OAVObjectReaderHandler implements IObjectReaderHandler
 		}
 		else
 		{
-			System.err.println("Unhandled attribute: "+object+", "+xmlattrname+", "+attrpath);
+			StackElement	se	= context.getTopStackElement();
+			context.getReporter().report("Unhandled attribute: "+object+", "+xmlattrname+", "+attrpath, "unhandled attribute", se, se.getLocation());
 		}
 	}
 	

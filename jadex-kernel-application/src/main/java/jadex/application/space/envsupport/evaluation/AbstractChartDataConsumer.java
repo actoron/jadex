@@ -222,7 +222,7 @@ public abstract class AbstractChartDataConsumer extends SimplePropertyObject imp
 		}
 
 		if(ret==null || ret.getInputStream()==null)
-			throw new IOException("File "+name+" not found in imports: "+SUtil.arrayToString(imports));
+			throw new IOException("File "+name+" not found in imports");//: "+SUtil.arrayToString(imports));
 
 		return ret;
 	}

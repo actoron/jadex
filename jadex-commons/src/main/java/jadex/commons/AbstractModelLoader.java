@@ -74,7 +74,7 @@ public abstract class AbstractModelLoader
 			ret = getResourceInfo0(name, imports, classloader);
 	
 			if(ret==null || ret.getInputStream()==null)
-				throw new IOException("File "+name+" not found in imports: "+SUtil.arrayToString(imports));
+				throw new IOException("File "+name+" not found in imports.");//: "+SUtil.arrayToString(imports));
 		}
 
 		return ret;
@@ -171,7 +171,7 @@ public abstract class AbstractModelLoader
 			}
 	
 			if(ret==null || ret.getInputStream()==null)
-				throw new IOException("File "+name+" not found in imports: "+SUtil.arrayToString(imports));
+				throw new IOException("File "+name+" not found in imports");//: "+SUtil.arrayToString(imports));
 		}
 		return ret;
 	}

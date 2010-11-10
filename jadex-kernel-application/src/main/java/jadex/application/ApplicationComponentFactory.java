@@ -327,7 +327,7 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 		}
 
 		if(ret==null || ret.getInputStream()==null)
-			throw new IOException("File "+xml+" not found in imports: "+SUtil.arrayToString(imports));
+			throw new IOException("File "+xml+" not found in imports");//: "+SUtil.arrayToString(imports));
 
 		return ret;
 	}	*/	

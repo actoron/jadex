@@ -35,7 +35,7 @@ public interface IObjectReaderHandler extends IObjectLinker, IBulkObjectLinker
 	/**
 	 *  Convert a content string object to another type of object.
 	 */
-	public Object convertContentObject(String object, QName tag, ReadContext context);
+	public Object convertContentObject(String object, QName tag, ReadContext context) throws Exception;
 	
 	/**
 	 *  Handle the attribute of an object.

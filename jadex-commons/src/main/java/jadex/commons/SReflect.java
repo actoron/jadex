@@ -463,7 +463,7 @@ public class SReflect
 
 		if(clazz==null)
 		{
-			throw new ClassNotFoundException("Class "+clname+" not found in imports: "+SUtil.arrayToString(imports));
+			throw new ClassNotFoundException("Class "+clname+" not found in imports");//: "+SUtil.arrayToString(imports));
 		}
 
 		return clazz;

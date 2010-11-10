@@ -279,48 +279,8 @@ public class JavaReader extends Reader
 				{
 					public Object createObject(IContext context, Map rawattributes) throws Exception
 					{
-						Level ret = null;
 						String name = (String)rawattributes.get("name");
-						if(Level.ALL.getName().equals(name))
-						{
-							ret = Level.ALL;
-						}
-						else if(Level.CONFIG.getName().equals(name))
-						{
-							ret = Level.CONFIG;
-						}
-						else if(Level.FINE.getName().equals(name))
-						{
-							ret = Level.FINE;
-						}
-						else if(Level.FINER.getName().equals(name))
-						{
-							ret = Level.FINER;
-						}
-						else if(Level.FINEST.getName().equals(name))
-						{
-							ret = Level.FINEST;
-						}
-						else if(Level.INFO.getName().equals(name))
-						{
-							ret = Level.INFO;
-						}
-						else if(Level.OFF.getName().equals(name))
-						{
-							ret = Level.OFF;
-						}
-						else if(Level.SEVERE.getName().equals(name))
-						{
-							ret = Level.SEVERE;
-						}
-						else if(Level.WARNING.getName().equals(name))
-						{
-							ret = Level.WARNING;
-						}
-						else
-						{
-							throw new RuntimeException("Unknown logging level: "+name);
-						}
+						Level ret = Level.parse(name);
 						return ret;
 					}
 				}),
@@ -344,8 +304,9 @@ public class JavaReader extends Reader
 			));
 			typeinfos.add(ti_inetaddr);
 		}
-		catch(Exception e)
+		catch(NoSuchMethodException e)
 		{
+			// Shouldn't happen
 			throw new RuntimeException(e);
 		}
 		return typeinfos;

@@ -267,7 +267,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	/**
 	 *  Convert an object to another type of object.
 	 */
-	public Object convertContentObject(String value, QName tag, ReadContext context)
+	public Object convertContentObject(String value, QName tag, ReadContext context) throws Exception
 	{
 		Object ret = value;
 		if(tag.getNamespaceURI().startsWith(SXML.PROTOCOL_TYPEINFO))
@@ -276,9 +276,15 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 			Class clazz = SReflect.classForName0(clazzname, context.getClassLoader());
 			if(clazz!=null)
 			{
-				if(!BasicTypeConverter.isBuiltInType(clazz))
-					throw new RuntimeException("No converter known for: "+clazz);
-				ret = BasicTypeConverter.getBasicStringConverter(clazz).convertString(value, context);
+				if(BasicTypeConverter.isBuiltInType(clazz))
+				{
+					ret = BasicTypeConverter.getBasicStringConverter(clazz).convertString(value, context);
+				}
+				else
+				{
+					ret	= null;
+					context.getReporter().report("No converter known for: "+clazz, "content error", context, context.getParser().getLocation());
+				}
 			}
 		}
 		return ret;
@@ -418,7 +424,9 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 		}
 		
 		if(!linked)
-			throw new RuntimeException("Could not link: "+object+" "+parent);
+		{
+			context.getReporter().report("Could not link: "+object+" "+parent, "link error", context, context.getParser().getLocation());
+		}
 	}
 	
 	/**
@@ -524,7 +532,9 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 		}
 		
 		if(!linked)
-			throw new RuntimeException("Could not bulk link: "+childs+" "+parent);
+		{
+			context.getReporter().report("Could not bulk link: "+childs+" "+parent, "link error", context, context.getParser().getLocation());
+		}
 	}
 	
 	/**
@@ -603,7 +613,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 			}
 			catch(Exception e)
 			{
-				System.out.println("Warning. Bulk link initiated but not successful: "+childs+" "+parent+" "+e);
+				context.getReporter().report("Warning. Bulk link initiated but not successful: "+childs+" "+parent+" "+e, "warning", context, context.getParser().getLocation());
 			
 				for(int i=0; i<childs.size(); i++)
 				{

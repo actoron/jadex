@@ -83,6 +83,16 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory
 	//-------- constructors --------
 	
 	/**
+	 *  Create a stand alone agent factory for checking.
+	 */
+	public BDIAgentFactory(String id)
+	{
+		super(id, IComponentFactory.class, null);
+		this.loader	= new OAVBDIModelLoader();
+		this.mtypes	= Collections.synchronizedMap(new WeakHashMap());
+	}
+		
+	/**
 	 *  Create a new agent factory.
 	 */
 	public BDIAgentFactory(Map props, IServiceProvider provider)

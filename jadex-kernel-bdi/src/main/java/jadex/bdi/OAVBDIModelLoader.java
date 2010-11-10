@@ -121,7 +121,7 @@ public class OAVBDIModelLoader	extends AbstractModelLoader
 	 *  @param name	The original name (i.e. not filename).
 	 *  @param info	The resource info.
 	 */
-	protected ICacheableModel	doLoadModel(String name, ResourceInfo info, ClassLoader classloader) throws Exception
+	protected ICacheableModel	doLoadModel(String name, ResourceInfo info, ClassLoader classloader)
 	{
 		OAVCapabilityModel	ret;
 
@@ -153,19 +153,35 @@ public class OAVBDIModelLoader	extends AbstractModelLoader
 		state.addStateListener(listener, false);
 		// Use index map to keep insertion order for elements.
 		MultiCollection	entries	= new MultiCollection(new IndexMap().getAsMap(), LinkedHashSet.class);
-		Object handle = reader.read(info.getInputStream(), classloader, new OAVUserContext(state, entries));
-		state.removeStateListener(listener);
-
-		if(state.getType(handle).isSubtype(OAVBDIMetaModel.agent_type))
+		Object handle	= null;
+		try
 		{
-			ret	=  new OAVAgentModel(state, handle, types, info.getFilename(), info.getLastModified(), entries);
+			handle = reader.read(info.getInputStream(), classloader, new OAVUserContext(state, entries));
+		}
+		catch(Exception e)
+		{
+			entries.put(new Tuple(new Object[]{new StackElement(new QName("capability"), "XML file")}), e.toString());
+		}
+		state.removeStateListener(listener);
+		
+		if(handle!=null)
+		{
+			if(state.getType(handle).isSubtype(OAVBDIMetaModel.agent_type))
+			{
+				ret	=  new OAVAgentModel(state, handle, types, info.getFilename(), info.getLastModified(), entries);
+			}
+			else
+			{
+				ret	=  new OAVCapabilityModel(state, handle, types, info.getFilename(), info.getLastModified(), entries);
+			}
+			
+			createAgentModelEntry(ret);
 		}
 		else
 		{
+			// Todo: capability or agent?
 			ret	=  new OAVCapabilityModel(state, handle, types, info.getFilename(), info.getLastModified(), entries);
 		}
-		
-		createAgentModelEntry(ret);
 		ret.initModelInfo();
 		
 		return ret;
