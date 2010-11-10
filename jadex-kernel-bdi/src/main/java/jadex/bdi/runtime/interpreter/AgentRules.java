@@ -3,19 +3,23 @@ package jadex.bdi.runtime.interpreter;
 import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.runtime.IPlanExecutor;
 import jadex.bdi.runtime.impl.eaflyweights.ExternalAccessFlyweight;
+import jadex.bdi.runtime.impl.flyweights.CapabilityFlyweight;
 import jadex.bdi.runtime.impl.flyweights.ParameterFlyweight;
 import jadex.bridge.CheckedAction;
 import jadex.bridge.ComponentResultListener;
+import jadex.bridge.DecouplingServiceInvocationInterceptor;
 import jadex.bridge.IArgument;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IMessageService;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
+import jadex.commons.IResultCommand;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.CounterResultListener;
 import jadex.commons.concurrent.DefaultResultListener;
+import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.service.IInternalService;
 import jadex.commons.service.IServiceContainer;
@@ -38,6 +42,7 @@ import jadex.rules.rulesystem.rules.Rule;
 import jadex.rules.rulesystem.rules.Variable;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVAttributeType;
+import jadex.rules.state.OAVJavaType;
 import jadex.rules.state.OAVObjectType;
 
 import java.lang.reflect.Array;
@@ -575,33 +580,58 @@ public class AgentRules
 	 */
 	protected static Rule createExecuteActionRule()
 	{
-		Variable	runnable	= new Variable("?runnable", OAVBDIRuntimeModel.java_runnable_type);
+		Variable	com	= new Variable("?step", OAVJavaType.java_object_type);
 		Variable	ragent	= new Variable("?ragent", OAVBDIRuntimeModel.agent_type);
 		
-		ObjectCondition actioncon = new ObjectCondition(runnable.getType()); 
-		actioncon.addConstraint(new BoundConstraint(null, runnable));
+		ObjectCondition actioncon = new ObjectCondition(com.getType()); 
+		actioncon.addConstraint(new BoundConstraint(null, com));
 		
 		ObjectCondition ragentcon = new ObjectCondition(OAVBDIRuntimeModel.agent_type);
 		ragentcon.addConstraint(new BoundConstraint(null, ragent));
-		ragentcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.agent_has_actions, runnable, IOperator.CONTAINS));
+		ragentcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.agent_has_actions, com, IOperator.CONTAINS));
 		
 		IAction	action	= new IAction()
 		{
 			public void execute(IOAVState state, IVariableAssignments assignments)
 			{
 				Object ragent = assignments.getVariableValue("?ragent");
-				Runnable runnable = (Runnable)assignments.getVariableValue("?runnable");
+				Object[] step = (Object[])assignments.getVariableValue("?step");
 //				System.out.println("Executing external action: "+runnable);
-				state.removeAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_actions, runnable);
-				if(runnable instanceof CheckedAction)
+				state.removeAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_actions, step);
+				
+				Future res = (Future)((Object[])step)[1];
+				try
 				{
-					if(((CheckedAction)runnable).isValid())
-						runnable.run();
-					((CheckedAction)runnable).cleanup();
+					if(step[0] instanceof CheckedAction)
+					{
+						CheckedAction ca = (CheckedAction)step[0];
+						if(ca.isValid())
+							ca.run();
+						ca.cleanup();
+						res.setResult(null);
+					}
+					else if(step[0] instanceof Runnable)
+					{
+						((Runnable)step[0]).run();
+						res.setResult(null);
+					}
+					else if(step[0] instanceof IResultCommand)
+					{
+						IResultCommand com = (IResultCommand)((Object[])step)[0];
+						Object r = com.execute(new CapabilityFlyweight(state, ragent));
+						if(r instanceof IFuture)
+						{
+							((IFuture)r).addResultListener(new DelegationResultListener(res));
+						}
+						else
+						{
+							res.setResult(res);
+						}
+					}
 				}
-				else //if(entries[i] instanceof Runnable)
+				catch(Exception e)
 				{
-					runnable.run();
+					res.setException(e);
 				}
 			}
 		};
@@ -1173,12 +1203,26 @@ public class AgentRules
 			for(Iterator it=mservices.iterator(); it.hasNext(); )
 			{
 				Object mexp = it.next();
-//				String name = (String)state.getAttributeValue(mexp, OAVBDIMetaModel.modelelement_has_name);
-				IInternalService val = (IInternalService)evaluateExpression(state, mexp, new OAVBDIFetcher(state, rcapa));
-//				Class type = (Class)state.getAttributeValue(mexp, OAVBDIMetaModel.expression_has_class);
-				// cast hack?!
-				((IServiceContainer)BDIInterpreter.getInterpreter(state).getServiceProvider()).addService(val);
-//				System.out.println("Service: "+name+" "+val+" "+type);
+				try
+				{
+//					String name = (String)state.getAttributeValue(mexp, OAVBDIMetaModel.modelelement_has_name);
+					IInternalService val = (IInternalService)evaluateExpression(state, mexp, new OAVBDIFetcher(state, rcapa));
+//					Class type = (Class)state.getAttributeValue(mexp, OAVBDIMetaModel.expression_has_class);
+					// cast hack?!
+					Boolean decoupled = (Boolean)state.getAttributeValue(mexp, OAVBDIMetaModel.service_has_decoupled);
+					if(decoupled!=null && decoupled.booleanValue())
+					{
+						val = DecouplingServiceInvocationInterceptor.createServiceProxy(BDIInterpreter.getInterpreter(state).getExternalAccess(), BDIInterpreter.getInterpreter(state).getAgentAdapter(), val);
+//					System.out.println("Created decoupled service: "+val);
+					}
+					((IServiceContainer)BDIInterpreter.getInterpreter(state).getServiceProvider()).addService(val);
+//					System.out.println("Service: "+name+" "+val+" "+type);
+				}
+				catch(Exception e)
+				{
+//					e.printStackTrace();
+					BDIInterpreter.getInterpreter(state).getAgentAdapter().getLogger().warning("Service creation error: "+state.getAttributeValue(mexp, OAVBDIMetaModel.expression_has_text));
+				}
 			}
 		}
 		

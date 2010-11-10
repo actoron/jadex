@@ -688,7 +688,7 @@ public class OAVBDIModelLoader	extends AbstractModelLoader
 				// Only ignore rule, when type is part of agent meta(!) model.
 				OAVObjectType	type	= oc.getObjectType();
 				OAVObjectType	mtype	= (OAVObjectType)OAVBDIRuntimeModel.modelmap.get(type);
-				check	= types.contains(type)
+				check	= type instanceof OAVJavaType || types.contains(type)
 					|| mtype!=null && types.contains(mtype)
 					|| mtype==null && !OAVBDIMetaModel.bdimm_type_model.contains(type);
 				

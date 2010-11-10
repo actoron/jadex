@@ -1062,32 +1062,6 @@ public class ExternalAccessFlyweight extends EACapabilityFlyweight implements IB
 	 */
 	public IFuture scheduleResultStep(final IResultCommand com)
 	{
-		final Future ret = new Future();
-		
-		if(adapter.isExternalThread())
-		{
-			try
-			{
-				adapter.invokeLater(new Runnable() 
-				{
-					public void run() 
-					{
-						ret.setException(new UnsupportedOperationException());
-//						application.scheduleStep(com).addResultListener(new DelegationResultListener(ret));
-					}
-				});
-			}
-			catch(Exception e)
-			{
-				ret.setException(e);
-			}
-		}
-		else
-		{
-			ret.setException(new UnsupportedOperationException());
-//			application.scheduleStep(com).addResultListener(new DelegationResultListener(ret));
-		}
-		
-		return ret;
+		return getInterpreter().scheduleResultStep(com);
 	}
 }

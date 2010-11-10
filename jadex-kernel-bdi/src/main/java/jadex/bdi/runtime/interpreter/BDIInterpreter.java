@@ -27,6 +27,7 @@ import jadex.bridge.IMessageService;
 import jadex.bridge.IModelInfo;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
+import jadex.commons.IResultCommand;
 import jadex.commons.collection.LRU;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.DefaultResultListener;
@@ -967,16 +968,42 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 	 *  May safely be called from external threads.
 	 *  @param step	Code to be executed as a step of the agent.
 	 */
-	public void	scheduleStep(final Runnable step)
+	public IFuture	scheduleResultStep(final Object step)
 	{
-		adapter.invokeLater(new Runnable()
+		final Future ret = new Future();
+		
+		if(adapter.isExternalThread())
 		{
-			public void run()
+			try
 			{
-//				System.out.println("Scheduling step: "+step);
-				state.addAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_actions, step);
+				adapter.invokeLater(new Runnable() 
+				{
+					public void run() 
+					{
+						getState().addAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_actions, new Object[]{step, ret});
+					}
+				});
 			}
-		});
+			catch(Exception e)
+			{
+				ret.setException(e);
+			}
+		}
+		else
+		{
+			getState().addAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_actions, new Object[]{step, ret});
+		}
+
+		return ret;
+		
+//		adapter.invokeLater(new Runnable()
+//		{
+//			public void run()
+//			{
+////				System.out.println("Scheduling step: "+step);
+//				state.addAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_actions, step);
+//			}
+//		});
 	}
 	
 	/**
@@ -1227,14 +1254,14 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 			Object mexp = state.getAttributeValue(model.getHandle(), OAVBDIMetaModel.agent_has_servicecontainer);
 			if(mexp!=null)
 			{
-				try
-				{
+//				try
+//				{
 					container = (IServiceContainer)AgentRules.evaluateExpression(state, mexp, new OAVBDIFetcher(state, ragent));
-				}
-				catch(Exception e)
-				{
-					e.printStackTrace();
-				}
+//				}
+//				catch(Exception e)
+//				{
+//					e.printStackTrace();
+//				}
 			}
 			else
 			{

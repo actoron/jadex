@@ -48,7 +48,7 @@
 	</plans>
 	
 	<services>
-		<offeredservice class="IShop">new Shop($scope.getExternalAccess(), $beliefbase.shopname)</offeredservice>
+		<offeredservice class="IShop" decoupled="true">new Shop($scope, $beliefbase.shopname)</offeredservice>
 	</services>
 	
 </capability>

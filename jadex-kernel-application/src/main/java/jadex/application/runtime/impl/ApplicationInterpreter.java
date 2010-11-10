@@ -211,8 +211,16 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 						final MServiceType st = (MServiceType)services.get(i);
 						if(st.getParsedValue()!=null)
 						{
-							service = (IInternalService)st.getParsedValue().getValue(fetcher);
-							container.addService(service);
+							try
+							{
+								service = (IInternalService)st.getParsedValue().getValue(fetcher);
+								container.addService(service);
+							}
+							catch(Exception e)
+							{
+//								e.printStackTrace();
+								getLogger().warning("Service creation error: "+st.getParsedValue());
+							}
 						}
 						else 
 						{
@@ -1055,6 +1063,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 				}
 				catch(Exception e)
 				{
+					e.printStackTrace();
 					future.setException(e);
 				}
 			}

@@ -50,8 +50,10 @@ public class DecouplingServiceInvocationInterceptor implements IResultCommand
 		Object ret;
 		final ServiceInvocationContext sic = (ServiceInvocationContext)args;
 		Class returntype = sic.getMethod().getReturnType();
+		boolean scheduleable = returntype.equals(IFuture.class) || returntype.equals(void.class);
+		boolean directcall = true;
 		
-		if(!adapter.isExternalThread())
+		if(!adapter.isExternalThread() || (!scheduleable && directcall))
 		{
 			try
 			{
@@ -103,7 +105,7 @@ public class DecouplingServiceInvocationInterceptor implements IResultCommand
 				}
 			});
 			
-			if(returntype.equals(IFuture.class) || returntype.equals(void.class))
+			if(scheduleable)
 			{
 				ret = future;
 				resfut.addResultListener(new DelegationResultListener(future));
@@ -112,6 +114,7 @@ public class DecouplingServiceInvocationInterceptor implements IResultCommand
 			{
 				System.out.println("Warning, blocking call: "+sic.getMethod());
 				ret = resfut.get(new ThreadSuspendable());
+//				ret = new Future(null);
 			}
 		}
 		return ret;

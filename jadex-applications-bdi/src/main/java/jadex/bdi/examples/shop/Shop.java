@@ -44,6 +44,8 @@ public class Shop extends BasicService implements IShop
 	/**
 	 *  Get the shop name. 
 	 *  @return The name.
+	 *  
+	 *  @directcall (Is called on caller thread).
 	 */
 	public String getName()
 	{
@@ -68,13 +70,14 @@ public class Shop extends BasicService implements IShop
 				if(sell.isSucceeded())
 					ret.setResult(sell.getParameter("result").getValue());
 				else
-					ret.setException(new RuntimeException());
+					ret.setException(new RuntimeException("Sell goal failed."));
 			}
 			
 			public void goalAdded(AgentEvent ae)
 			{
 			}
 		});
+		comp.getGoalbase().dispatchTopLevelGoal(sell);
 		
 		return ret;
 	}

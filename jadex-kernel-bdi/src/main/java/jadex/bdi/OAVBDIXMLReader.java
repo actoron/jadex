@@ -176,7 +176,7 @@ public class OAVBDIXMLReader
 			new AttributeInfo(new AccessInfo("class", OAVBDIMetaModel.expression_has_classname)),
 			new AttributeInfo(new AccessInfo((String)null, OAVBDIMetaModel.expression_has_class, AccessInfo.IGNORE_WRITE)),
 			}));
-		
+				
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "agent")), new ObjectInfo(OAVBDIMetaModel.agent_type), 
 			new MappingInfo(ti_capability, OAVBDIMetaModel.modelelement_has_description, null, null, new SubobjectInfo[]{
 			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "services"), new QName(uri, "container")})
@@ -264,8 +264,12 @@ public class OAVBDIXMLReader
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "usedservice")), new ObjectInfo(OAVBDIMetaModel.expression_type, expost),
 			new MappingInfo(ti_expression)));
 		
-		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "offeredservice")), new ObjectInfo(OAVBDIMetaModel.expression_type, expost),
-			new MappingInfo(ti_expression)));
+		TypeInfo ti_service = new TypeInfo(new XMLInfo(new QName(uri, "offeredservice")), new ObjectInfo(OAVBDIMetaModel.service_type, expost), 
+			new MappingInfo(ti_expression, 
+			new AttributeInfo[]{
+			new AttributeInfo(new AccessInfo("decoupled", OAVBDIMetaModel.service_has_decoupled)),
+			}));
+		typeinfos.add(ti_service);
 		
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "property")), new ObjectInfo(OAVBDIMetaModel.expression_type, expost),
 			new MappingInfo(ti_expression)));
