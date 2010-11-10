@@ -144,13 +144,13 @@ public class MicroAgentInterpreter implements IComponentInstance
 							stop = true;
 							inited.setResult(new Object[]{MicroAgentInterpreter.this, adapter});
 							
-							Future fut = new Future();
-							fut.addResultListener(new DefaultResultListener(adapter.getLogger())
-							{
-								public void resultAvailable(Object source, Object result)
-								{
-								}
-							});
+//							Future fut = new Future();
+//							fut.addResultListener(new DefaultResultListener(adapter.getLogger())
+//							{
+//								public void resultAvailable(Object source, Object result)
+//								{
+//								}
+//							});
 							addStep(new Object[]{new ICommand()
 							{
 								public void execute(Object agent)
@@ -161,7 +161,7 @@ public class MicroAgentInterpreter implements IComponentInstance
 								{
 									return "microagent.executeBody()_#"+this.hashCode();
 								}
-							}, fut});
+							}, null});
 						}
 						
 						public void exceptionOccurred(Object source, Exception exception)
@@ -174,7 +174,7 @@ public class MicroAgentInterpreter implements IComponentInstance
 				{
 					return "microagent.init()_#"+this.hashCode();
 				}
-			}, new Future()});
+			}, null});
 		}
 		catch(Exception e)
 		{
@@ -210,17 +210,25 @@ public class MicroAgentInterpreter implements IComponentInstance
 				
 				if(step[0] instanceof ICommand)
 				{
-					try
+					if(future!=null)
+					{
+						try
+						{
+							((ICommand)step[0]).execute(microagent);
+							future.setResult(null);
+						}
+						catch(RuntimeException e)
+						{
+							future.setException(e);
+							throw e;
+						}
+					}
+					else
 					{
 						((ICommand)step[0]).execute(microagent);
-						future.setResult(null);
-					}
-					catch(Exception e)
-					{
-						future.setException(e);
 					}
 				}
-				else 
+				else //if(step[0] instanceof IResultCommand)
 				{
 					try
 					{
@@ -234,9 +242,10 @@ public class MicroAgentInterpreter implements IComponentInstance
 							future.setResult(res);
 						}
 					}
-					catch(Exception e)
+					catch(RuntimeException e)
 					{
 						future.setException(e);
+						throw e;
 					}
 				}
 				
@@ -265,7 +274,8 @@ public class MicroAgentInterpreter implements IComponentInstance
 	public void messageArrived(final IMessageAdapter message)
 	{
 //		System.out.println("msgrec: "+getAgentAdapter().getComponentIdentifier()+" "+message);
-		IFuture ret = scheduleStep(new ICommand()
+//		IFuture ret = scheduleStep(new ICommand()
+		scheduleStep(new ICommand()
 		{
 			public void execute(Object agent)
 			{
@@ -277,12 +287,12 @@ public class MicroAgentInterpreter implements IComponentInstance
 				return "microagent.messageArrived("+message+")_#"+this.hashCode();
 			}
 		});
-		ret.addResultListener(new DefaultResultListener(adapter.getLogger())
-		{
-			public void resultAvailable(Object source, Object result)
-			{
-			}
-		});
+//		ret.addResultListener(new DefaultResultListener(adapter.getLogger())
+//		{
+//			public void resultAvailable(Object source, Object result)
+//			{
+//			}
+//		});
 	}
 
 	/**

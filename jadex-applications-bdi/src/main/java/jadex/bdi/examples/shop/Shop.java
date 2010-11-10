@@ -1,17 +1,11 @@
 package jadex.bdi.examples.shop;
 
 import jadex.bdi.runtime.AgentEvent;
-import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.ICapability;
-import jadex.bdi.runtime.IEAGoal;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IGoalListener;
-import jadex.bridge.IExternalAccess;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
-import jadex.commons.concurrent.DefaultResultListener;
-import jadex.commons.concurrent.DelegationResultListener;
-import jadex.commons.concurrent.IResultListener;
 import jadex.commons.service.BasicService;
 
 /**

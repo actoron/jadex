@@ -5,7 +5,6 @@ import jadex.application.runtime.ISpace;
 import jadex.bridge.ComponentResultListener;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IModelInfo;
 import jadex.commons.Future;
 import jadex.commons.IFuture;

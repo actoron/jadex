@@ -1,7 +1,6 @@
 package jadex.micro.examples.helpline;
 
 import jadex.bridge.Argument;
-import jadex.bridge.DecouplingServiceInvocationInterceptor;
 import jadex.bridge.IArgument;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;

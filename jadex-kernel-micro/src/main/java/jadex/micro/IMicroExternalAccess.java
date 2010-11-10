@@ -4,7 +4,6 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.MessageType;
 import jadex.commons.ICommand;
 import jadex.commons.IFuture;
-import jadex.commons.IResultCommand;
 
 import java.util.Map;
 
