@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
-      id="jadex.tools.model.gpmn.feature"
+      id="jadex.tools.gpmn.feature"
       label="Jadex GPMN model tools"
       version="1.0.0.qualifier"
       provider-name="Jadex GPMN model tools"
       exclusive="true"
-      colocation-affinity="jadex.tools.model.gpmn.feature">
+      colocation-affinity="jadex.tool.gpmn.feature">
 
    <description url="http://jadex.informatik.uni-hamburg.de">
       Model tools for Jadex GPMN runtime
