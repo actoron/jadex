@@ -1,11 +1,21 @@
 package jadex.tools.bpmn.editor.properties.template;
 
 import jadex.tools.bpmn.diagram.Messages;
+import jadex.tools.bpmn.editor.JadexBpmnEditor;
 import jadex.tools.bpmn.editor.JadexBpmnPlugin;
+import jadex.tools.bpmn.editor.properties.JadexBpmnDiagramImportsSection;
+import jadex.tools.bpmn.editor.properties.JadexBpmnDiagramParameterSection;
+import jadex.tools.bpmn.editor.properties.JadexBpmnDiagramPropertiesTableSection;
+import jadex.tools.bpmn.editor.properties.JadexCommonParameterSection;
+import jadex.tools.bpmn.editor.properties.JadexIntermediateEventsParameterSection;
+import jadex.tools.bpmn.editor.properties.JadexSequenceMappingSection;
 import jadex.tools.model.common.properties.AbstractCommonPropertySection;
 import jadex.tools.model.common.properties.ModifyEObjectCommand;
 import jadex.tools.model.common.properties.table.MultiColumnTable;
 import jadex.tools.model.common.properties.table.MultiColumnTable.MultiColumnTableRow;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IAdaptable;
@@ -14,29 +24,110 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.common.util.TreeIterator;
 import org.eclipse.emf.ecore.EAnnotation;
 import org.eclipse.emf.ecore.EModelElement;
+import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EcoreFactory;
 import org.eclipse.gmf.runtime.common.core.command.CommandResult;
+import org.eclipse.gmf.runtime.notation.View;
+import org.eclipse.stp.bpmn.diagram.edit.parts.BpmnDiagramEditPart;
 
 public class JadexBpmnPropertiesUtil
 {
 
 	// ---- constants ----
 	
+	private static List<TableAnnotationIdentifier> toConvert;
+
+	static {
+		toConvert = new ArrayList<TableAnnotationIdentifier>();
+		
+		// ---- parameters ----
+		toConvert
+				.add(new TableAnnotationIdentifier(
+						JadexCommonParameterSection.PARAMETER_ANNOTATION_IDENTIFIER,
+						JadexCommonParameterSection.PARAMETER_ANNOTATION_DETAIL_IDENTIFIER,
+						AbstractParameterTablePropertySection.UNIQUE_PARAMETER_ROW_ATTRIBUTE));
+		
+		// ---- diagram imports ----
+		toConvert.add(new TableAnnotationIdentifier(
+						JadexBpmnPropertiesUtil.JADEX_GLOBAL_ANNOTATION,
+						JadexBpmnPropertiesUtil.JADEX_IMPORT_LIST_DETAIL,
+						JadexBpmnDiagramImportsSection.UNIQUE_COLUMN_INDEX));
+		
+		// ---- diagram arguments ----
+		toConvert
+				.add(new TableAnnotationIdentifier(
+						JadexBpmnPropertiesUtil.JADEX_GLOBAL_ANNOTATION,
+						JadexBpmnPropertiesUtil.JADEX_ARGUMENTS_LIST_DETAIL,
+						JadexBpmnDiagramParameterSection.UNIQUE_LIST_ELEMENT_ATTRIBUTE_INDEX));
+		
+		// ---- sub process ---
+		toConvert 
+				.add(new TableAnnotationIdentifier(
+						// old diagrams uses "subProcess" as source
+						JadexBpmnPropertiesUtil.JADEX_SUBPROCESS_ANNOTATION,
+						JadexBpmnPropertiesUtil.JADEX_PROPERTIES_LIST_DETAIL,
+						JadexBpmnDiagramPropertiesTableSection.UNIQUE_LIST_ELEMENT_ATTRIBUTE_INDEX));
+		toConvert
+				.add(new TableAnnotationIdentifier(
+						// use "jadex" in newer and converted diagrams
+						JadexBpmnPropertiesUtil.JADEX_GLOBAL_ANNOTATION,
+						JadexBpmnPropertiesUtil.JADEX_PROPERTIES_LIST_DETAIL,
+						JadexBpmnDiagramPropertiesTableSection.UNIQUE_LIST_ELEMENT_ATTRIBUTE_INDEX));
+		
+		// ---- activity ----
+		toConvert
+				.add(new TableAnnotationIdentifier(
+						// old diagrams uses "activity" as source
+						JadexBpmnPropertiesUtil.JADEX_ACTIVITY_ANNOTATION,
+						JadexBpmnPropertiesUtil.JADEX_PARAMETER_LIST_DETAIL,
+						JadexIntermediateEventsParameterSection.UNIQUE_LIST_ELEMENT_ATTRIBUTE_INDEX));
+		toConvert
+				.add(new TableAnnotationIdentifier(
+						// use "jadex" in newer and converted diagrams
+						JadexBpmnPropertiesUtil.JADEX_GLOBAL_ANNOTATION,
+						JadexBpmnPropertiesUtil.JADEX_PARAMETER_LIST_DETAIL,
+						JadexIntermediateEventsParameterSection.UNIQUE_LIST_ELEMENT_ATTRIBUTE_INDEX));
+		
+		
+		// ---- sequence edges ----
+		toConvert
+				.add(new TableAnnotationIdentifier(
+						// old diagrams uses "sequence" as source
+						JadexBpmnPropertiesUtil.JADEX_SEQUENCE_ANNOTATION,
+						JadexBpmnPropertiesUtil.JADEX_MAPPING_LIST_DETAIL,
+						JadexSequenceMappingSection.UNIQUE_LIST_ELEMENT_ATTRIBUTE_INDEX));
+		toConvert
+				.add(new TableAnnotationIdentifier(
+						// use "jadex" in newer and converted diagrams
+						JadexBpmnPropertiesUtil.JADEX_GLOBAL_ANNOTATION,
+						JadexBpmnPropertiesUtil.JADEX_MAPPING_LIST_DETAIL,
+						JadexSequenceMappingSection.UNIQUE_LIST_ELEMENT_ATTRIBUTE_INDEX));
+	}
+	
+	
 	/** Key for the global package/import annotations of the BPMN diagram. */
 	public static final String JADEX_GLOBAL_ANNOTATION = "jadex";
 	
+	/** Key for the package of a BPMN diagram. */
+	public static final String JADEX_PROPERTIES_VERSION_DETAIL = "editor_version";
+	
 	/** Key for the common annotations of all shapes. NOT USED? */
+	@Deprecated
 	public static final String JADEX_COMMON_ANNOTATION = "common";
 	
 	/** Key for the annotation from the activity shape. */
+	@Deprecated
 	public static final String JADEX_ACTIVITY_ANNOTATION = "activity";
 	
 	/** Key for the annotation from the flow connector. */
+	@Deprecated
 	public static final String JADEX_SEQUENCE_ANNOTATION = "sequence";
 	
 	/** Key for the annotation from the sub process. */
+	@Deprecated
 	public static final String JADEX_SUBPROCESS_ANNOTATION = "subProcess";
 	
 	/** Key for the package of a BPMN diagram. */
@@ -78,6 +169,9 @@ public class JadexBpmnPropertiesUtil
 	/** Key for the implementing error. */
 	public static final String JADEX_EVENT_ERROR_DETAIL = "error";
 	
+	
+	
+	
 	/** Key for the table unique column index. */
 	public static final String JADEX_TABLE_KEY_EXTENSION = "table";
 	
@@ -91,8 +185,19 @@ public class JadexBpmnPropertiesUtil
 	public static final String JADEX_TABLE_DIMENSION_DELIMITER = ":";
 	
 	
+	
+	
 	/** Delimiter for combined keys (e.g. "annotationIdentifier + annotaionDetailIdentifier" for e.g. tables) */
 	public static final String JADEX_COMBINED_KEY_DELIMITER = "_";
+
+	/** Collection of reserved annotation / detail identifier that must not be changed */
+	private static final List<String> RESERVED_BPMN_ANNOTATIONS = new ArrayList<String>();
+	
+	static {
+		RESERVED_BPMN_ANNOTATIONS.add("isThrowing");
+	}
+	
+	
 	
 	
 	
@@ -152,7 +257,7 @@ public class JadexBpmnPropertiesUtil
 	
 	public EAnnotation getJadexEAnnotation()
 	{
-		return getJadexEAnnotation(getModelElement(), containerEAnnotationName);
+		return getJadexEAnnotation(getModelElement(), containerEAnnotationName, true);
 	}
 	
 
@@ -174,23 +279,7 @@ public class JadexBpmnPropertiesUtil
 	{
 		return section.getEModelElement();
 	}
-	
-//	/**
-//	 * @return the containerEAnnotationName
-//	 */
-//	public String getContainerEAnnotationName()
-//	{
-//		return containerEAnnotationName;
-//	}
-//
-//	/**
-//	 * @return the annotationDetailName
-//	 */
-//	public String getAnnotationDetailName()
-//	{
-//		return annotationDetailName;
-//	}
-	
+
 	// ---- static methods ----
 
 	/**
@@ -207,14 +296,14 @@ public class JadexBpmnPropertiesUtil
 				+ JADEX_TABLE_KEY_EXTENSION;
 	}
 
-	public static EAnnotation getJadexEAnnotation(final EModelElement element, final String annotationIdentifier)
+	public static EAnnotation getJadexEAnnotation(final EModelElement element, final String annotationIdentifier, boolean create)
 	{
 		if(element == null)
 		{
 			return null;
 		}
-		
-		String lcAnnotationIdentifier = annotationIdentifier.toLowerCase();
+	
+		final String lcAnnotationIdentifier = annotationIdentifier.toLowerCase();
 		EAnnotation annotation = element.getEAnnotation(lcAnnotationIdentifier);
 		
 		// try the upper case value
@@ -223,7 +312,7 @@ public class JadexBpmnPropertiesUtil
 			annotation = element.getEAnnotation(annotationIdentifier);
 			
 			// change upper case annotation identifier
-			if (annotation != null /* && !lcAnnotationIdentifier.equals(annotationIdentifier) */)
+			if (annotation != null && !RESERVED_BPMN_ANNOTATIONS.contains(annotationIdentifier))
 			{
 				if (element.getEAnnotations().remove(annotation))
 				{
@@ -234,11 +323,39 @@ public class JadexBpmnPropertiesUtil
 		}
 		
 		// create annotation if not found yet
-		if (annotation == null)
+		if (create && annotation == null)
 		{
-			annotation = EcoreFactory.eINSTANCE.createEAnnotation();
-			annotation.setSource(lcAnnotationIdentifier);
-			annotation.setEModelElement(element);
+			// update or create the annotation detail
+			ModifyEObjectCommand command = new ModifyEObjectCommand(
+					element, Messages.JadexCommonPropertySection_update_eannotation_command_name)
+			{
+				@Override
+				protected CommandResult doExecuteWithResult(
+						IProgressMonitor arg0, IAdaptable arg1)
+						throws ExecutionException
+				{
+					EAnnotation annotation = EcoreFactory.eINSTANCE.createEAnnotation();
+					annotation.setSource(lcAnnotationIdentifier);
+					annotation.setEModelElement(element);
+					return CommandResult.newOKCommandResult();
+				}
+			};
+			
+			// execute command
+			try
+			{
+				IStatus status = command.execute(new NullProgressMonitor(), null);
+				status.isOK();
+				annotation = getJadexEAnnotation(element, annotationIdentifier, true);
+			}
+			catch (ExecutionException exception)
+			{
+				JadexBpmnPlugin.getDefault().getLog().log(
+						new Status(IStatus.ERROR, JadexBpmnPlugin.ID,
+								IStatus.ERROR, exception.getMessage(),
+								exception));
+				
+			}
 		}
 
 		return annotation;
@@ -268,15 +385,25 @@ public class JadexBpmnPropertiesUtil
 					IProgressMonitor arg0, IAdaptable arg1)
 					throws ExecutionException
 			{
-				EAnnotation annotation = getJadexEAnnotation(element, annotationIdentifier);
+				EAnnotation annotation = getJadexEAnnotation(element, annotationIdentifier, true);
 				
 				// use only lower case identifier strings!
 				String lcAnnotationDetail = annotationDetail.toLowerCase();
 
+				
+				
 				// remove upper case annotation detail
 				if (!lcAnnotationDetail.equals(annotationDetail))
 				{
-					annotation.getDetails().removeKey(annotationDetail);
+					if (!RESERVED_BPMN_ANNOTATIONS.contains(annotationDetail))
+					{
+						annotation.getDetails().removeKey(annotationDetail);
+					}
+					else
+					{
+						// use the original annotation id
+						lcAnnotationDetail = annotationDetail;
+					}
 				}
 
 				// add key value pair or remove empty value 
@@ -356,6 +483,7 @@ public class JadexBpmnPropertiesUtil
 			// fall through, return empty string as detail
 			// TODO: check if this should be removed / return null instead
 			return "";
+			
 		}
 	
 		return null;
@@ -494,7 +622,9 @@ public class JadexBpmnPropertiesUtil
 			String annotationId, String detailId, int uniqueColumnIndex)
 	{
 		EAnnotation ea = modelElement.getEAnnotation(annotationId);
-		if (ea == null && annotationId != JADEX_GLOBAL_ANNOTATION)
+		if (ea == null && 
+				annotationId != JADEX_GLOBAL_ANNOTATION && 
+				!RESERVED_BPMN_ANNOTATIONS.contains(annotationId))
 		{
 			ea = modelElement.getEAnnotation(JADEX_GLOBAL_ANNOTATION);
 			
@@ -556,7 +686,6 @@ public class JadexBpmnPropertiesUtil
 						jadexAnnotation = EcoreFactory.eINSTANCE.createEAnnotation();
 						jadexAnnotation.setSource(JADEX_GLOBAL_ANNOTATION);
 						jadexAnnotation.setEModelElement(eModelElement);
-
 					}
 					
 					// remember: index is off by one
@@ -564,8 +693,10 @@ public class JadexBpmnPropertiesUtil
 					{
 						EAnnotation eAnnotation = annos.get(i);
 						// only convert non-table and none "single jadex" annotations
-						if (!eAnnotation.getSource().equals(JADEX_GLOBAL_ANNOTATION) 
-								&& !eAnnotation.getSource().endsWith(JADEX_TABLE_KEY_EXTENSION))
+						String annotationSource = eAnnotation.getSource();
+						if (!annotationSource.equals(JADEX_GLOBAL_ANNOTATION) 
+								&& !annotationSource.endsWith(JADEX_TABLE_KEY_EXTENSION)
+								&& !RESERVED_BPMN_ANNOTATIONS.contains(annotationSource))
 						{
 							jadexAnnotation.getDetails().addAll(eAnnotation.getDetails());
 							annos.remove(i);
@@ -598,11 +729,66 @@ public class JadexBpmnPropertiesUtil
 			
 			return false;
 		}
+
+	}
+	
+	/**
+	 * The static conversion method to sub sequentially 
+	 * convert all known annotation properties
+	 * @param editPart to convert properties for  
+	 */
+	public static void convertDiagramProperties(BpmnDiagramEditPart editPart)
+	{
+	
+		List<EModelElement> elementsToCheck = new ArrayList<EModelElement>();
+		EObject diagramEModelElement = ((View) editPart.getModel()).getElement();
 		
+		// add the diagram to the elements to check
+		elementsToCheck.add((EModelElement) diagramEModelElement);
 		
+		// select all elements from diagram and subsequent elements
+		TreeIterator<EObject> contents = diagramEModelElement.eAllContents();
+		while (contents.hasNext())
+		{
+			EObject eObject = (EObject) contents.next();
+			if (eObject instanceof EModelElement && !(eObject instanceof EAnnotation))
+			{
+				elementsToCheck.add((EModelElement) eObject);
+			}
+		}
+		
+		// check each element for existing annotations to convert
+		for (EModelElement eModelElement : elementsToCheck)
+		{
+			// check annotations and convert to a single jadex annotation
+			JadexBpmnPropertiesUtil.checkAnnotationConversion(eModelElement);
+			
+			// check table conversion
+			for (TableAnnotationIdentifier identifier : toConvert)
+			{
+				JadexBpmnPropertiesUtil.checkAnnotationConversion(
+						eModelElement, identifier.annotationID,
+						identifier.detailID, identifier.uniqueTableColumn);
+			}
+	
+		}
+		
+		updateEditorVersionInfo(editPart);
 		
 	}
+	
+	public static void updateEditorVersionInfo(BpmnDiagramEditPart editPart)
+	{
+		// save diagram version = 2.0
+		EObject diagramEModelElement = ((View) editPart.getModel()).getElement();
+		JadexBpmnPropertiesUtil.updateJadexEAnnotationDetail(
+				(EModelElement) diagramEModelElement, JADEX_GLOBAL_ANNOTATION,
+				JADEX_PROPERTIES_VERSION_DETAIL, new Double(
+						JadexBpmnEditor.EDITOR_VERSION).toString());
+	}
 }
+
+
 
 /**
  * A cell index data type
@@ -679,6 +865,54 @@ class TableCellIndex
 	public void setColumnCount(int columnCount)
 	{
 		this.columnCount = columnCount;
+	}
+
+	
+	
+}
+
+class TableAnnotationIdentifier
+{
+	String annotationID;
+	String detailID;
+	int uniqueTableColumn;
+	
+	/**
+	 * @param annotationID
+	 * @param detailID
+	 * @param uniqueTableColumn
+	 */
+	protected TableAnnotationIdentifier(String annotationID,
+			String detailID, int uniqueTableColumn)
+	{
+		super();
+		this.annotationID = annotationID;
+		this.detailID = detailID;
+		this.uniqueTableColumn = uniqueTableColumn;
+	}
+
+	/**
+	 * @return the annotationID
+	 */
+	public String getAnnotationID()
+	{
+		return annotationID;
+	}
+
+	/**
+	 * @return the detailID
+	 */
+	public String getDetailID()
+	{
+		return detailID;
+	}
+
+	/**
+	 * @return the uniqueTableColumn
+	 */
+	public int getUniqueTableColumn()
+	{
+		return uniqueTableColumn;
 	}
 
 }

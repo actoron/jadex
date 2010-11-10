@@ -1355,7 +1355,12 @@ public class BpmnXMLReader
 								String key = detail.getKey().toLowerCase();
 								String value = detail.getValue();
 								
-								if("description".equals(key))
+								if("editor_version".equals(key))
+								{
+									// currently ignored
+									// todo: maybe add a version attribute to the jadex model?
+								}
+								else if("description".equals(key))
 								{
 									model.setDescription(value);
 								}

@@ -72,13 +72,15 @@ public abstract class AbstractBpmnPropertySection extends AbstractCommonProperty
 	{
 		super.setInput(part, selection);
 		
-		// as from now on, we use only a single "jadex" annotation
-		// we force conversion here!
-		if (!"jadex".equals(util.containerEAnnotationName))
-		{
-			JadexBpmnPropertiesUtil.checkAnnotationConversion(modelElement);
-			util.containerEAnnotationName = "jadex";
-		}
+//		This is now done by the editor class itself
+//		
+//		// as from now on, we use only a single "jadex" annotation
+//		// we force conversion here!
+//		if (!"jadex".equals(util.containerEAnnotationName))
+//		{
+//			JadexBpmnPropertiesUtil.checkAnnotationConversion(modelElement);
+//			util.containerEAnnotationName = "jadex";
+//		}
 	}
 	
 	
