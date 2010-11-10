@@ -10,6 +10,7 @@ import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IChangeListener;
+import jadex.commons.IResultCommand;
 import jadex.commons.SimplePropertyObject;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.service.IServiceProvider;
@@ -111,9 +112,9 @@ public class DeltaTimeExecutor4Simulation extends SimplePropertyObject implement
 					process.start(clockservice, space);
 				}
 
-				final Runnable step	= new Runnable()
+				final IResultCommand step = new IResultCommand()
 				{
-					public void run()
+					public Object execute(Object args)
 					{
 						scheduled	= false;
 						long currenttime = clockservice.getTime();
@@ -286,7 +287,7 @@ public class DeltaTimeExecutor4Simulation extends SimplePropertyObject implement
 							space.getPerceptList().processPercepts(null);
 						}
 						
-						final Runnable	step	= this;
+						final IResultCommand step = this;
 						if(tick)
 						{
 //							System.out.println("tick");
@@ -308,10 +309,12 @@ public class DeltaTimeExecutor4Simulation extends SimplePropertyObject implement
 								}
 							});
 						}
+						
+						return null;
 					}
 				};
 
-				step.run();
+				step.execute(null);
 
 				if(!tick)
 				{
