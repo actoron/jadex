@@ -2,6 +2,8 @@ package jadex.bpmn.runtime;
 
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MBpmnModel;
+import jadex.bpmn.model.MParameter;
+import jadex.bpmn.model.MPool;
 import jadex.bpmn.model.MSequenceEdge;
 import jadex.bpmn.runtime.handler.DefaultActivityHandler;
 import jadex.bpmn.runtime.handler.DefaultStepHandler;
@@ -16,6 +18,7 @@ import jadex.bpmn.runtime.handler.GatewayParallelActivityHandler;
 import jadex.bpmn.runtime.handler.GatewayXORActivityHandler;
 import jadex.bpmn.runtime.handler.SubProcessActivityHandler;
 import jadex.bpmn.runtime.handler.TaskActivityHandler;
+import jadex.bpmn.runtime.task.ExecuteStepTask;
 import jadex.bridge.ComponentResultListener;
 import jadex.bridge.ComponentServiceContainer;
 import jadex.bridge.ComponentTerminatedException;
@@ -74,7 +77,9 @@ public class BpmnInterpreter implements IComponentInstance
 	/** The step execution handlers (activity type -> handler). */
 	public static final Map DEFAULT_STEP_HANDLERS;
 
-
+	/** The flag for all pools. */
+	public static final String ALL = "All";
+	
 	static
 	{
 		Map stephandlers = new HashMap();
@@ -252,7 +257,7 @@ public class BpmnInterpreter implements IComponentInstance
 		this.config = config;
 		
 		// Extract pool/lane from config.
-		if(config==null || "All".equals(config))
+		if(config==null || ALL.equals(config))
 		{
 			this.pool	= null;
 			this.lane	= null;
@@ -1388,10 +1393,17 @@ public class BpmnInterpreter implements IComponentInstance
 	 */
 	public IFuture scheduleResultStep(IResultCommand com)
 	{
-		throw new UnsupportedOperationException();
-//		MActivity act = new MActivity();
-//		act.setName("External Step Activity.");
-//		act.setClazz(clazz)
-//		context.addThread(new ProcessThread(, context, this));
+		Future ret = new Future();
+		MActivity act = new MActivity();
+		act.setName("External Step Activity.");
+		act.setClazz(ExecuteStepTask.class);
+		act.addParameter(new MParameter(MParameter.DIRECTION_IN, Object[].class, "step", null));
+		act.setActivityType(MBpmnModel.TASK);
+		MPool pl = model.getPool(pool);
+		act.setPool(pl);
+		ProcessThread pt = new ProcessThread(act, context, this);
+		pt.setParameterValue("step", new Object[]{com, ret});
+		context.addThread(pt);
+		return ret;
 	}
 }

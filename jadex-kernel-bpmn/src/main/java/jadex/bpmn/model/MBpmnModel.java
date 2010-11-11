@@ -241,6 +241,22 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	}
 	
 	/**
+	 *  Get the pools.
+	 *  @return The pools.
+	 */
+	public MPool getPool(String name)
+	{
+		MPool ret = name==null? (MPool)pools.get(0): null;
+		for(int i=0; i<pools.size() && ret==null; i++)
+		{
+			MPool tmp = (MPool)pools.get(i);
+			if(tmp.getName().equals(name))
+				ret = tmp;
+		}
+		return ret;
+	}
+	
+	/**
 	 *  Get the artifacts.
 	 *  @return The artifacts. 
 	 */

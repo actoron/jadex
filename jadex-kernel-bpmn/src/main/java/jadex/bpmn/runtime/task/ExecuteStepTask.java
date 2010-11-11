@@ -33,7 +33,7 @@ public class ExecuteStepTask extends AbstractTask
 		}
 		catch(Exception e)
 		{
-			
+			ret.setException(e);
 		}
 	}
 	

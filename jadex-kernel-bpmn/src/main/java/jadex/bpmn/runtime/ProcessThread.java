@@ -509,7 +509,7 @@ public class ProcessThread	implements ITaskContext
 	 */
 	public boolean belongsTo(String pool, String lane)
 	{
-		boolean	ret	= pool==null || pool.equals(getActivity().getPool().getName());
+		boolean	ret	= pool==null  || pool.equals(getActivity().getPool().getName());
 		
 		// Test lane
 		if(ret && lane!=null)
