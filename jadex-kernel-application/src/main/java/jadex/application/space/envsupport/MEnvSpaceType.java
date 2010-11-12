@@ -20,6 +20,7 @@ import jadex.application.space.envsupport.observer.graphics.layer.TiledLayer;
 import jadex.application.space.envsupport.observer.perspective.IPerspective;
 import jadex.application.space.envsupport.observer.perspective.Perspective2D;
 import jadex.commons.SReflect;
+import jadex.commons.Tuple;
 import jadex.commons.collection.MultiCollection;
 import jadex.javaparser.IExpressionParser;
 import jadex.javaparser.IParsedExpression;
@@ -38,11 +39,13 @@ import jadex.xml.IStringObjectConverter;
 import jadex.xml.ISubObjectConverter;
 import jadex.xml.MappingInfo;
 import jadex.xml.ObjectInfo;
+import jadex.xml.StackElement;
 import jadex.xml.SubObjectConverter;
 import jadex.xml.SubobjectInfo;
 import jadex.xml.TypeInfo;
 import jadex.xml.XMLInfo;
 import jadex.xml.bean.BeanAccessInfo;
+import jadex.xml.reader.ReadContext;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -171,7 +174,7 @@ public class MEnvSpaceType	extends MSpaceType
 		ISubObjectConverter sunameconv = new SubObjectConverter(nameconv, null);
 		ISubObjectConverter suexconv = new SubObjectConverter(new IObjectObjectConverter() 
 		{
-			public Object convertObject(Object val, IContext context) 
+			public Object convertObject(Object val, IContext context) throws Exception
 			{
 				return expconv.convertString((String)val, context);
 			}
@@ -1215,7 +1218,7 @@ public class MEnvSpaceType	extends MSpaceType
 			}
 			catch(Exception e)
 			{
-				e.printStackTrace();
+				reportError(context, e.toString());
 			}
 			
 			return ret;
@@ -1239,7 +1242,9 @@ public class MEnvSpaceType	extends MSpaceType
 				ret = SReflect.findClass0((String)val, ((MApplicationType)
 					context.getRootObject()).getAllImports(), context.getClassLoader());
 				if(ret==null)
-					throw new RuntimeException("Could not parse class: "+val);
+				{
+					reportError(context, "Class not found: "+val);
+				}
 			}
 			return ret;
 		}
@@ -1378,5 +1383,25 @@ public class MEnvSpaceType	extends MSpaceType
 			}
 			return ret;
 		}
+	}
+
+	/**
+	 *  Report an error including the line and column.
+	 */
+	protected static void reportError(IContext context, String error)
+	{
+		MultiCollection	report	= (MultiCollection)context.getUserContext();
+		String	pos;
+		Tuple	stack	= new Tuple(((ReadContext)context).getStack().toArray());
+		if(stack.getEntities().length>0)
+		{
+			StackElement	se	= (StackElement)stack.get(stack.getEntities().length-1);
+			pos	= " (line "+se.getLocation().getLineNumber()+", column "+se.getLocation().getColumnNumber()+")";
+		}
+		else
+		{
+			pos	= " (line 0, column 0)";			
+		}
+		report.put(stack, error+pos);
 	}
 }

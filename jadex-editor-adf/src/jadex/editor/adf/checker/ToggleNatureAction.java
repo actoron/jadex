@@ -18,19 +18,27 @@ import org.eclipse.ui.IWorkbenchPart;
  */
 public class ToggleNatureAction implements IObjectActionDelegate
 {
-	private ISelection	selection;
+	//-------- attributes --------
+	
+	/** The current selection (e.g. in the project tree). */
+	protected ISelection	selection;
+	
+	//-------- IObjectActionDelegate interface --------
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.IActionDelegate#run(org.eclipse.jface.action.IAction)
+	/**
+	 *  Called when the user changes the selection (e.g. a project in the tree).
 	 */
-	public void run(IAction action)
+	public void selectionChanged(IAction action, ISelection selection)
 	{
+		this.selection = selection;
+		
+		boolean	allset	= false;
 		if(selection instanceof IStructuredSelection)
 		{
-			for(Iterator it = ((IStructuredSelection)selection).iterator(); it
-					.hasNext();)
+			allset	= true;
+			for(Iterator it=((IStructuredSelection)selection).iterator(); allset && it.hasNext();)
 			{
+				// Find project for selection
 				Object element = it.next();
 				IProject project = null;
 				if(element instanceof IProject)
@@ -39,74 +47,102 @@ public class ToggleNatureAction implements IObjectActionDelegate
 				}
 				else if(element instanceof IAdaptable)
 				{
-					project = (IProject)((IAdaptable)element)
-							.getAdapter(IProject.class);
+					project = (IProject)((IAdaptable)element).getAdapter(IProject.class);
 				}
-				if(project != null)
+				
+				// Toggle the project nature (add/remove).
+				if(project!=null)
 				{
-					toggleNature(project);
+					try
+					{
+						boolean	found	= false;
+						IProjectDescription description = project.getDescription();
+						String[] natures = description.getNatureIds();
+
+						for(int i=0; !found && i<natures.length; ++i)
+						{
+							found	= JadexNature.NATURE_ID.equals(natures[i]);
+						}
+
+						allset	= found;
+					}
+					catch(CoreException e)
+					{
+					}
 				}
 			}
 		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see
-	 * org.eclipse.ui.IActionDelegate#selectionChanged(org.eclipse.jface.action
-	 * .IAction, org.eclipse.jface.viewers.ISelection)
-	 */
-	public void selectionChanged(IAction action, ISelection selection)
-	{
-		this.selection = selection;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see
-	 * org.eclipse.ui.IObjectActionDelegate#setActivePart(org.eclipse.jface.
-	 * action.IAction, org.eclipse.ui.IWorkbenchPart)
-	 */
-	public void setActivePart(IAction action, IWorkbenchPart targetPart)
-	{
+		action.setChecked(allset);
 	}
 
 	/**
-	 * Toggles sample nature on a project
-	 * 
-	 * @param project to have sample nature added or removed
+	 *  Called by eclipse when a popup menu is shown.
+	 *  Provides the current workbench part. 
 	 */
-	private void toggleNature(IProject project)
+	public void setActivePart(IAction action, IWorkbenchPart part)
 	{
-		try
-		{
-			IProjectDescription description = project.getDescription();
-			String[] natures = description.getNatureIds();
+		// part not needed for toggling the nature.
+	}
 
-			for(int i = 0; i < natures.length; ++i)
+	/**
+	 *  Called when the action should be performed. 
+	 */
+	public void run(IAction action)
+	{
+		if(selection instanceof IStructuredSelection)
+		{
+			for(Iterator it=((IStructuredSelection)selection).iterator(); it.hasNext();)
 			{
-				if(JadexNature.NATURE_ID.equals(natures[i]))
+				// Find project for selection
+				Object element = it.next();
+				IProject project = null;
+				if(element instanceof IProject)
 				{
-					// Remove the nature
-					String[] newNatures = new String[natures.length - 1];
-					System.arraycopy(natures, 0, newNatures, 0, i);
-					System.arraycopy(natures, i + 1, newNatures, i,
-							natures.length - i - 1);
-					description.setNatureIds(newNatures);
-					project.setDescription(description, null);
-					return;
+					project = (IProject)element;
+				}
+				else if(element instanceof IAdaptable)
+				{
+					project = (IProject)((IAdaptable)element).getAdapter(IProject.class);
+				}
+				
+				// Toggle the project nature (add/remove).
+				if(project!=null)
+				{
+					try
+					{
+						boolean	removed	= false;
+						IProjectDescription description = project.getDescription();
+						String[] natures = description.getNatureIds();
+
+						for(int i=0; !removed && i<natures.length; ++i)
+						{
+							if(JadexNature.NATURE_ID.equals(natures[i]))
+							{
+								// Remove the nature
+								String[] newNatures = new String[natures.length-1];
+								System.arraycopy(natures, 0, newNatures, 0, i);
+								System.arraycopy(natures, i+1, newNatures, i, natures.length-i-1);
+								description.setNatureIds(newNatures);
+								project.setDescription(description, null);
+								removed	= true;
+							}
+						}
+
+						if(!removed)
+						{
+							// Add the nature
+							String[] newNatures = new String[natures.length + 1];
+							System.arraycopy(natures, 0, newNatures, 0, natures.length);
+							newNatures[natures.length] = JadexNature.NATURE_ID;
+							description.setNatureIds(newNatures);
+							project.setDescription(description, null);
+						}
+					}
+					catch(CoreException e)
+					{
+					}
 				}
 			}
-
-			// Add the nature
-			String[] newNatures = new String[natures.length + 1];
-			System.arraycopy(natures, 0, newNatures, 0, natures.length);
-			newNatures[natures.length] = JadexNature.NATURE_ID;
-			description.setNatureIds(newNatures);
-			project.setDescription(description, null);
-		}
-		catch(CoreException e)
-		{
 		}
 	}
 }

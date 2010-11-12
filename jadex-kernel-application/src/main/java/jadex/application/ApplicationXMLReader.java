@@ -26,6 +26,7 @@ import jadex.xml.IPostProcessor;
 import jadex.xml.IStringObjectConverter;
 import jadex.xml.MappingInfo;
 import jadex.xml.ObjectInfo;
+import jadex.xml.StackElement;
 import jadex.xml.SubobjectInfo;
 import jadex.xml.TypeInfo;
 import jadex.xml.XMLInfo;
@@ -43,6 +44,9 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.xml.namespace.QName;
+import javax.xml.stream.Location;
+import javax.xml.stream.XMLReporter;
+import javax.xml.stream.XMLStreamException;
 
 /**
  *  Reader for loading Application XML models into a Java representation states.
@@ -64,7 +68,28 @@ public class ApplicationXMLReader
 	 */
 	public ApplicationXMLReader(Set[] mappings)
 	{
-		this.reader = new Reader(new BeanObjectReaderHandler(getXMLMapping(mappings)));
+		this.reader = new Reader(new BeanObjectReaderHandler(getXMLMapping(mappings)), false, false, new XMLReporter()
+		{
+			public void report(String msg, String type, Object info, Location location) throws XMLStreamException
+			{
+//				System.out.println("XML error: "+msg+", "+type+", "+info+", "+location);
+				IContext	context	= (IContext)Reader.READ_CONTEXT.get();
+				MultiCollection	report	= (MultiCollection)context.getUserContext();
+				String	pos;
+				Tuple	stack	= new Tuple(((ReadContext)context).getStack().toArray());
+				if(stack.getEntities().length>0)
+				{
+					StackElement	se	= (StackElement)stack.get(stack.getEntities().length-1);
+					pos	= " (line "+se.getLocation().getLineNumber()+", column "+se.getLocation().getColumnNumber()+")";
+				}
+				else
+				{
+					pos	= " (line 0, column 0)";			
+				}
+				report.put(stack, msg+pos);
+				report.size();
+			}
+		});
 	}
 	
 	//-------- methods --------

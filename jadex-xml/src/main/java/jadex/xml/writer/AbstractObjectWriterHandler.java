@@ -100,7 +100,7 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 	/**
 	 *  Get write info for an object.
 	 */
-	public WriteObjectInfo getObjectWriteInfo(Object object, TypeInfo typeinfo, IContext context)
+	public WriteObjectInfo getObjectWriteInfo(Object object, TypeInfo typeinfo, IContext context)  throws Exception
 	{
 		// todo: conversion value to string
 		
@@ -414,7 +414,7 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 	/**
 	 *  Get a value from an object.
 	 */
-	protected abstract Object getValue(Object object, Object attr, IContext context, Object info);
+	protected abstract Object getValue(Object object, Object attr, IContext context, Object info) throws Exception;
 	
 	/**
 	 *  Get the property.

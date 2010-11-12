@@ -22,6 +22,7 @@ import jadex.xml.reader.Reader;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,11 +34,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
+
 import javax.xml.namespace.QName;
 
 /**
  *  Handler for reading XML into Java beans.
  */
+// Todo: report warnings when method invocations fail?
 public class BeanObjectReaderHandler implements IObjectReaderHandler
 {
 	//-------- constants --------
@@ -608,8 +611,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 		{
 			try
 			{
-				bulkLinkObjects(childs, parent, ((LinkData)linkdatas.get(startidx)).getLinkinfo(), 
-					pathname, context);
+				bulkLinkObjects(childs, parent, ((LinkData)linkdatas.get(startidx)).getLinkinfo(), pathname, context);
 			}
 			catch(Exception e)
 			{
@@ -617,8 +619,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 			
 				for(int i=0; i<childs.size(); i++)
 				{
-					linkObject(childs.get(i), parent, ((LinkData)linkdatas.get(startidx+i)).getLinkinfo(), 
-						pathname, context);
+					linkObject(childs.get(i), parent, ((LinkData)linkdatas.get(startidx+i)).getLinkinfo(), pathname, context);
 				}
 			}
 		}
@@ -641,7 +642,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	 *  @param root The root object.
 	 *  @param classloader The classloader.
 	 */
-	protected void setElementValue(Object accessinfo, QName xmlname, Object object, Object val, Object converter, String id, ReadContext context)
+	protected void setElementValue(Object accessinfo, QName xmlname, Object object, Object val, Object converter, String id, ReadContext context) throws Exception
 	{
 		if(NULL.equals(val))
 			return;
@@ -670,9 +671,17 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 						{
 							key = ((Method)kh).invoke(targetobj, new Object[0]);
 						}
+						catch(InvocationTargetException e)
+						{
+							// Ignore -> try other way of setting attribute
+//							context.getReporter().report("Failure invoking key getter method: "+e.getTargetException(),
+//								"attribute error", context, context.getParser().getLocation());
+						}
 						catch(Exception e)
 						{
-							e.printStackTrace();
+							// Ignore -> try other way of setting attribute
+//							context.getReporter().report("Failure invoking key getter method: "+e,
+//								"attribute error", context, context.getParser().getLocation());
 						}
 					}
 					else if(kh instanceof Field)
@@ -683,7 +692,9 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 						}
 						catch(Exception e)
 						{
-							e.printStackTrace();
+							// Ignore -> try other way of setting attribute
+//							context.getReporter().report("Failure getting key field: "+e,
+//								"attribute error", context, context.getParser().getLocation());
 						}
 					}
 					else if(kh instanceof IReturnValueCommand)
@@ -692,7 +703,8 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 					}
 					else
 					{
-						throw new RuntimeException("Unknown key help: "+kh); 
+						context.getReporter().report("Unknown key help: "+kh,
+							"attribute error", context, context.getParser().getLocation());
 					}
 				}
 				else
@@ -715,9 +727,17 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 							m.invoke(object, new Object[]{key, arg});
 							set = true;
 						}
+						catch(InvocationTargetException e)
+						{
+							// Ignore -> try other way of setting attribute
+//							context.getReporter().report("Failure invoking setter method: "+e.getTargetException(),
+//								"attribute error", context, context.getParser().getLocation());
+						}
 						catch(Exception e)
 						{
-							e.printStackTrace();
+							// Ignore -> try other way of setting attribute
+//							context.getReporter().report("Failure invoking setter method: "+e,
+//								"attribute error", context, context.getParser().getLocation());
 						}
 					}
 					else if(sh instanceof Field)
@@ -738,7 +758,9 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 						}
 						catch(Exception e)
 						{
-							e.printStackTrace();
+							// Ignore -> try other way of setting attribute
+//							context.getReporter().report("Failure setting field: "+e,
+//								"attribute error", context, context.getParser().getLocation());
 						}
 					}
 					else if(sh instanceof IReturnValueCommand)
@@ -748,7 +770,8 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 					}
 					else
 					{
-						throw new RuntimeException("Unknown map store help: "+sh);
+						context.getReporter().report("Unknown map store help: "+sh,
+							"attribute error", context, context.getParser().getLocation());
 					}
 				}
 				// Set map value with guessing method name.
@@ -773,9 +796,17 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 									ms[j].invoke(object, new Object[]{key, arg});
 									set = true;
 								}
+								catch(InvocationTargetException e)
+								{
+									// Ignore -> try other way of setting attribute
+//									context.getReporter().report("Failure invoking setter method: "+e.getTargetException(),
+//										"attribute error", context, context.getParser().getLocation());
+								}
 								catch(Exception e)
 								{
-									e.printStackTrace();
+									// Ignore -> try other way of setting attribute
+//									context.getReporter().report("Failure invoking setter method: "+e,
+//										"attribute error", context, context.getParser().getLocation());
 								}
 							}
 						}
@@ -800,14 +831,23 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 							m.invoke(object, new Object[]{arg});
 							set = true;
 						}
+						catch(InvocationTargetException e)
+						{
+							// Ignore -> try other way of setting attribute
+//							context.getReporter().report("Failure invoking setter method: "+e.getTargetException(),
+//								"attribute error", context, context.getParser().getLocation());
+						}
 						catch(Exception e)
 						{
-							e.printStackTrace();
+							// Ignore -> try other way of setting attribute
+//							context.getReporter().report("Failure invoking setter method: "+e,
+//								"attribute error", context, context.getParser().getLocation());
 						}
 					}
 					else
 					{
-						throw new RuntimeException("Read method should have one parameter: "+bai+" "+m);
+						context.getReporter().report("Read method should have one parameter: "+bai+" "+m,
+							"attribute error", context, context.getParser().getLocation());
 					}
 				}
 				else if(sh instanceof Field)
@@ -821,7 +861,9 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 					}
 					catch(Exception e)
 					{
-						e.printStackTrace();
+						// Ignore -> try other way of setting attribute
+//						context.getReporter().report("Failure setting field: "+e,
+//							"attribute error", context, context.getParser().getLocation());
 					}
 				}
 				else if(sh instanceof IReturnValueCommand)
@@ -831,7 +873,8 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 				}
 				else
 				{
-					throw new RuntimeException("Unknown store help: "+sh);
+					context.getReporter().report("Unknown store help: "+sh,
+						"attribute error", context, context.getParser().getLocation());
 				}
 			}
 		}
@@ -839,8 +882,6 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 		// Try using object identifier from access info
 		if(!set && accessinfo instanceof AccessInfo)
 		{
-			try
-			{
 			AccessInfo ai = (AccessInfo)accessinfo;
 			
 			String fieldname = ai.getObjectIdentifier()!=null? ((String)ai.getObjectIdentifier()): xmlname.getLocalPart();
@@ -865,11 +906,6 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 					}
 				}
 			}
-			}
-			catch(Exception e)
-			{
-				e.printStackTrace();
-			}
 		}
 		else if(!set) // attribute info is null or string
 		{
@@ -891,9 +927,17 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 						prop.getField().set(object, arg);
 					set = true;
 				}
+				catch(InvocationTargetException e)
+				{
+					// Ignore -> try other way of setting attribute
+//					context.getReporter().report("Failure invoking setter method: "+e.getTargetException(),
+//						"attribute error", context, context.getParser().getLocation());
+				}
 				catch(Exception e)
 				{
-					e.printStackTrace();
+					// Ignore -> try other way of setting attribute
+//					context.getReporter().report("Failure setting attribute: "+e,
+//						"attribute error", context, context.getParser().getLocation());
 				}
 			}
 			
@@ -916,7 +960,10 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 		}
 		
 		if(!set)
-			throw new RuntimeException("Failure in setting attribute: "+xmlname+" on object: "+object);
+		{
+			context.getReporter().report("Failure in setting attribute: "+xmlname+" on object: "+object+" (unknown attribute?)",
+				"attribute error", context, context.getParser().getLocation());
+		}
 	}
 	
 	/**
@@ -930,7 +977,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	 *  @param classloader The classloader.
 	 */
 	protected void setBulkAttributeValues(Object accessinfo, QName xmlattrname, Object object, 
-		List vals, Object converter, String id, ReadContext context)
+		List vals, Object converter, String id, ReadContext context) throws Exception
 	{
 		boolean set = false;
 		
@@ -959,14 +1006,23 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 							m.invoke(object, new Object[]{arg});
 							set = true;
 						}
+						catch(InvocationTargetException e)
+						{
+							// Ignore -> try other way of setting attribute
+//							context.getReporter().report("Failure invoking setter method: "+e.getTargetException(),
+//								"attribute error", context, context.getParser().getLocation());
+						}
 						catch(Exception e)
 						{
-							e.printStackTrace();
+							// Ignore -> try other way of setting attribute
+//							context.getReporter().report("Failure invoking setter method: "+e,
+//								"attribute error", context, context.getParser().getLocation());
 						}
 					}
 					else
 					{
-						throw new RuntimeException("Read method should have one parameter: "+bai+" "+m);
+						context.getReporter().report("Read method should have one parameter: "+bai+" "+m,
+							"attribute error", context, context.getParser().getLocation());
 					}
 				}
 				else if(sh instanceof Field)
@@ -980,12 +1036,15 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 					}
 					catch(Exception e)
 					{
-						e.printStackTrace();
+						// Ignore -> try other way of setting attribute
+//						context.getReporter().report("Failure setting field: "+e,
+//							"attribute error", context, context.getParser().getLocation());
 					}
 				}
 				else
 				{
-					throw new RuntimeException("Unknown store help: "+sh);
+					context.getReporter().report("Unknown store help: "+sh,
+						"attribute error", context, context.getParser().getLocation());
 				}
 			}
 		}
@@ -1027,9 +1086,17 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 						prop.getField().set(object, arg);
 					set = true;
 				}
+				catch(InvocationTargetException e)
+				{
+					// Ignore -> try other way of setting attribute
+//					context.getReporter().report("Failure invoking setter method: "+e.getTargetException(),
+//						"attribute error", context, context.getParser().getLocation());
+				}
 				catch(Exception e)
 				{
-					e.printStackTrace();
+					// Ignore -> try other way of setting attribute
+//					context.getReporter().report("Failure setting attribute: "+e,
+//						"attribute error", context, context.getParser().getLocation());
 				}
 			}
 			
@@ -1042,13 +1109,16 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 		}
 		
 		if(!set)
-			throw new RuntimeException("Failure in setting bulk values: "+xmlattrname+" on object: "+object);
+		{
+			context.getReporter().report("Failure in setting bulk values: "+xmlattrname+" on object: "+object+" (unknown attribute?)",
+				"attribute error", context, context.getParser().getLocation());
+		}
 	}
 	
 	/**
 	 *  Set a value directly on a Java bean.
 	 *  @param prefixes The method prefixes.
-	 *  @param postfix The mothod postfix.
+	 *  @param postfix The method postfix.
 	 *  @param value The attribute value.
 	 *  @param object The object.
 	 *  @param root The root.
@@ -1056,7 +1126,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	 *  @param converter The converter.
 	 */
 	protected boolean invokeSetMethod(String[] prefixes, String postfix, Object value, Object object, 
-		ReadContext context, Object converter, String idref)
+		ReadContext context, Object converter, String idref) throws Exception
 	{
 		boolean set = false;
 				
@@ -1072,21 +1142,22 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 					if(ps.length==1)
 					{
 						Object arg = convertValue(value, ps[0], converter, context, idref);
-						
-						try
-						{
-							ms[j].invoke(object, new Object[]{arg});
-							set = true;
-						}
-						catch(Exception e)
-						{
-						}
+						ms[j].invoke(object, new Object[]{arg});
+						set = true;
 					}
 				}
 			}
+			catch(InvocationTargetException e)
+			{
+				// Ignore -> try other way of setting attribute
+//				context.getReporter().report("Failure invoking setter method: "+e.getTargetException(),
+//					"attribute error", context, context.getParser().getLocation());
+			}
 			catch(Exception e)
 			{
-				e.printStackTrace();
+				// Ignore -> try other way of setting attribute
+//				context.getReporter().report("Failure invoking setter method: "+e,
+//					"attribute error", context, context.getParser().getLocation());
 			}
 		}
 		
@@ -1104,7 +1175,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	 *  @param converter The converter.
 	 */
 	protected boolean invokeBulkSetMethod(String[] prefixes, String postfix, List vals, Object object, 
-		ReadContext context, Object converter, String idref)
+		ReadContext context, Object converter, String idref) throws Exception
 	{
 		boolean set = false;
 				
@@ -1121,20 +1192,22 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 					{
 						Object arg = convertBulkValues(vals, ps[0], converter, context, idref);
 						
-						try
-						{
-							ms[j].invoke(object, new Object[]{arg});
-							set = true;
-						}
-						catch(Exception e)
-						{
-						}
+						ms[j].invoke(object, new Object[]{arg});
+						set = true;
 					}
 				}
 			}
+			catch(InvocationTargetException e)
+			{
+				// Ignore -> try other way of setting attribute
+//				context.getReporter().report("Failure invoking setter method: "+e.getTargetException(),
+//					"attribute error", context, context.getParser().getLocation());
+			}
 			catch(Exception e)
 			{
-				e.printStackTrace();
+				// Ignore -> try other way of setting attribute
+//				context.getReporter().report("Failure invoking setter method: "+e,
+//					"attribute error", context, context.getParser().getLocation());
 			}
 		}
 		
@@ -1145,7 +1218,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	 *  Directly access a field for setting/(adding) the object.
 	 */
 	protected boolean setField(String fieldname, Object parent, Object object, Object converter, 
-		ReadContext context, String idref)
+		ReadContext context, String idref) throws Exception
 	{
 		boolean set = false;
 		try
@@ -1164,6 +1237,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 		}
 		catch(Exception e)
 		{
+			// Ignore -> try other way of setting attribute
 		}
 		
 		return set;
@@ -1173,7 +1247,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	 *  Directly access a field for setting the objects.
 	 */
 	protected boolean setBulkField(String fieldname, Object parent, List objects, Object converter,
-		ReadContext context, String idref)
+		ReadContext context, String idref) throws Exception
 	{
 		boolean set = false;
 		try
@@ -1190,6 +1264,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 		}
 		catch(Exception e)
 		{
+			// Ignore -> try other way of setting attribute
 		}
 		
 		return set;
@@ -1222,9 +1297,17 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 						ms[i].invoke(parent, new Object[]{object});
 						ret	= true;
 					}
+					catch(InvocationTargetException e)
+					{
+						// Ignore -> try other way of setting attribute
+//						context.getReporter().report("Failure invoking link method: "+e.getTargetException(),
+//							"link error", context, context.getParser().getLocation());
+					}
 					catch(Exception e)
 					{
-//						e.printStackTrace();
+						// Ignore -> try other way of setting attribute
+//						context.getReporter().report("Failure invoking link method: "+e,
+//							"link error", context, context.getParser().getLocation());
 					}
 				}
 				else if(object instanceof String)
@@ -1238,8 +1321,17 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 							ms[i].invoke(parent, new Object[]{object});
 							ret	= true;
 						}
+						catch(InvocationTargetException e)
+						{
+							// Ignore -> try other way of setting attribute
+//							context.getReporter().report("Failure invoking link method: "+e.getTargetException(),
+//								"link error", context, context.getParser().getLocation());
+						}
 						catch(Exception e)
 						{
+							// Ignore -> try other way of setting attribute
+//							context.getReporter().report("Failure invoking link method: "+e,
+//								"link error", context, context.getParser().getLocation());
 						}
 					}
 				}
@@ -1275,9 +1367,17 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 					ms[i].invoke(parent, new Object[]{arg});
 					ret	= true;
 				}	
+				catch(InvocationTargetException e)
+				{
+					// Ignore -> try other way of setting attribute
+//					context.getReporter().report("Failure invoking link method: "+e.getTargetException(),
+//						"link error", context, context.getParser().getLocation());
+				}
 				catch(Exception e)
 				{
-					e.printStackTrace();
+					// Ignore -> try other way of setting attribute
+//					context.getReporter().report("Failure invoking link method: "+e,
+//						"link error", context, context.getParser().getLocation());
 				}
 			}
 		}
@@ -1294,7 +1394,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	 *  @param classloader The classloader.
 	 */
 	protected Object convertValue(Object val, Class targetclass, Object converter, 
-		ReadContext context, String id)
+		ReadContext context, String id) throws Exception
 	{
 		Object ret = val;
 
@@ -1322,7 +1422,6 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 			}
 		}
 		
-		
 		return ret;
 	}
 	
@@ -1330,7 +1429,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	 *  Convert a list of values into the target format (list, set, collection, array).
 	 */
 	protected Object convertBulkValues(List vals, Class targetclass, Object converter, 
-		ReadContext context, String id)
+		ReadContext context, String id) throws Exception
 	{
 		// todo: use converter?!
 		
@@ -1358,7 +1457,8 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 		}
 		else
 		{
-			throw new RuntimeException("Converion to target no possible: "+targetclass+" "+vals);
+			context.getReporter().report("Conversion to target no possible: "+targetclass+" "+vals,
+				"convert error", context, context.getParser().getLocation());
 		}
 		
 		return ret;

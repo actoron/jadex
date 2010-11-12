@@ -12,49 +12,58 @@ import org.eclipse.core.runtime.CoreException;
  */
 public class JadexNature implements IProjectNature
 {
-	/**
-	 * ID of this project nature
-	 */
+	//-------- constants --------
+	
+	/** ID of this project nature. */
 	public static final String	NATURE_ID	= "jadex-editor-adf.jadexNature";
+	
+	//-------- attributes --------
+	
+	/** The project to which the nature is added. */ 
+	protected IProject	project;
+	
+	//-------- IProjectNature interface --------
 
-	private IProject			project;
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.core.resources.IProjectNature#configure()
+	/**
+	 *  Called by eclipse, when the nature is added to a project.
 	 */
 	public void configure() throws CoreException
 	{
 		IProjectDescription desc = project.getDescription();
 		ICommand[] commands = desc.getBuildSpec();
 
-		for(int i = 0; i < commands.length; ++i)
+		// Check if ADF builder is already present.
+		boolean	add	= true;
+		for(int i=0; add && i<commands.length; ++i)
 		{
-			if(commands[i].getBuilderName().equals(ADFChecker.BUILDER_ID))
-			{
-				return;
-			}
+			// Do not add when ADF builder already exists.
+			add	= !commands[i].getBuilderName().equals(ADFChecker.BUILDER_ID);
 		}
 
-		ICommand[] newCommands = new ICommand[commands.length + 1];
-		System.arraycopy(commands, 0, newCommands, 0, commands.length);
-		ICommand command = desc.newCommand();
-		command.setBuilderName(ADFChecker.BUILDER_ID);
-		newCommands[newCommands.length - 1] = command;
-		desc.setBuildSpec(newCommands);
-		project.setDescription(desc, null);
+		if(add)
+		{
+			// Add ADF builder to commands array.
+			ICommand[] newCommands = new ICommand[commands.length + 1];
+			System.arraycopy(commands, 0, newCommands, 0, commands.length);
+			ICommand command = desc.newCommand();
+			command.setBuilderName(ADFChecker.BUILDER_ID);
+			newCommands[newCommands.length - 1] = command;
+			desc.setBuildSpec(newCommands);
+			project.setDescription(desc, null);
+		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.core.resources.IProjectNature#deconfigure()
+	/**
+	 *  Called by eclipse, when nature is removed from a project.
 	 */
 	public void deconfigure() throws CoreException
 	{
+		boolean	removed	= false;
 		IProjectDescription description = getProject().getDescription();
 		ICommand[] commands = description.getBuildSpec();
-		for(int i = 0; i < commands.length; ++i)
+		for(int i=0; !removed && i<commands.length; ++i)
 		{
+			// Remove ADF builder if found.
 			if(commands[i].getBuilderName().equals(ADFChecker.BUILDER_ID))
 			{
 				ICommand[] newCommands = new ICommand[commands.length - 1];
@@ -63,25 +72,21 @@ public class JadexNature implements IProjectNature
 						commands.length - i - 1);
 				description.setBuildSpec(newCommands);
 				project.setDescription(description, null);
-				return;
+				removed	= true;
 			}
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.core.resources.IProjectNature#getProject()
+	/**
+	 *  Get the project to which this nature was added.
 	 */
 	public IProject getProject()
 	{
 		return project;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see
-	 * org.eclipse.core.resources.IProjectNature#setProject(org.eclipse.core
-	 * .resources.IProject)
+	/**
+	 *  Called by eclipse, when the nature is added to a project.
 	 */
 	public void setProject(IProject project)
 	{

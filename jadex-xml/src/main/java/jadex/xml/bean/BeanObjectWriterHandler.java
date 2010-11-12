@@ -241,7 +241,7 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 	/**
 	 *  Get a value from an object.
 	 */
-	protected Object getValue(Object object, Object attr, IContext context, Object info)
+	protected Object getValue(Object object, Object attr, IContext context, Object info) throws Exception
 	{
 		if(attr==AccessInfo.THIS)
 			return object;

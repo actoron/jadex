@@ -31,7 +31,7 @@ public class SubObjectConverter implements ISubObjectConverter
 	 *  Convert an object to another object.
 	 *  @param val The value to convert.
 	 */
-	public Object convertObjectForRead(Object val, IContext context)
+	public Object convertObjectForRead(Object val, IContext context) throws Exception
 	{
 		return rconv!=null? rconv.convertObject(val, context): val;
 	}
@@ -40,7 +40,7 @@ public class SubObjectConverter implements ISubObjectConverter
 	 *  Convert an object to another object.
 	 *  @param val The value to convert.
 	 */
-	public Object convertObjectForWrite(Object val, IContext context)
+	public Object convertObjectForWrite(Object val, IContext context) throws Exception
 	{
 		return wconv!=null? wconv.convertObject(val, context): val;
 	}

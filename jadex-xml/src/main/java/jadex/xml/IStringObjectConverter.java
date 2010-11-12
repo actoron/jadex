@@ -11,5 +11,5 @@ public interface IStringObjectConverter
 	 *  Convert a string value to another type.
 	 *  @param val The value to convert.
 	 */
-	public Object convertString(String val, IContext context);
+	public Object convertString(String val, IContext context)	throws Exception;
 }

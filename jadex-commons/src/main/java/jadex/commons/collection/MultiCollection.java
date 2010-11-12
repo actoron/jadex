@@ -74,7 +74,9 @@ public class MultiCollection implements Map, Serializable, Cloneable
 		int	size	= 0;
 		for(Iterator i=map.keySet().iterator(); i.hasNext(); )
 		{
-			size	+= ((Collection)map.get(i.next())).size();
+			Object	key	= i.next();
+			Collection	coll	= (Collection)map.get(key);
+			size	+= coll.size();
 		}
 		return size;
 	}

@@ -10,11 +10,14 @@ import org.osgi.framework.BundleContext;
  */
 public class Activator extends AbstractUIPlugin
 {
-	// The plug-in ID
+	//-------- constants --------
+	/** The plug-in ID. */
 	public static final String	PLUGIN_ID	= "jadex-editor-adf";	//$NON-NLS-1$
 
-	// The shared instance
-	private static Activator	plugin;
+	/** The shared instance. */
+	protected static Activator	plugin;
+	
+	//-------- constructors --------
 
 	/**
 	 * The constructor
@@ -22,12 +25,11 @@ public class Activator extends AbstractUIPlugin
 	public Activator()
 	{
 	}
+	
+	//-------- AbstractUIPlugin methods --------
 
-	/*
-	 * (non-Javadoc)
-	 * @see
-	 * org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext
-	 * )
+	/**
+	 *  Called when the plugin is started.
 	 */
 	public void start(BundleContext context) throws Exception
 	{
@@ -35,11 +37,8 @@ public class Activator extends AbstractUIPlugin
 		plugin = this;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see
-	 * org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext
-	 * )
+	/**
+	 *  Called when the plugin is stopped.
 	 */
 	public void stop(BundleContext context) throws Exception
 	{

@@ -213,7 +213,7 @@ public class OAVObjectReaderHandler implements IObjectReaderHandler
 	/**
 	 *  Convert an object to another type of object.
 	 */
-	public Object convertContentObject(String object, QName tag, ReadContext context)
+	public Object convertContentObject(String object, QName tag, ReadContext context) throws Exception
 	{
 		Object ret = object;
 		if(tag.getNamespaceURI().startsWith(SXML.PROTOCOL_TYPEINFO))

@@ -21,8 +21,10 @@ import java.util.Set;
 
 import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
+import javax.xml.stream.Location;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLReporter;
+import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 /**
@@ -116,6 +118,16 @@ public class Reader
 			parser	= factory.createXMLStreamReader(input);
 		}
 		XMLReporter	reporter	= factory.getXMLReporter();
+		if(reporter==null)
+		{
+			reporter	= new XMLReporter()
+			{
+				public void report(String message, String errorType, Object relatedInformation, Location location) throws XMLStreamException
+				{
+					throw new XMLStreamException(message, location);
+				}
+			};
+		}
 		ReadContext readcontext = new ReadContext(parser, reporter, callcontext, classloader);
 		READ_CONTEXT.set(readcontext);
 		try

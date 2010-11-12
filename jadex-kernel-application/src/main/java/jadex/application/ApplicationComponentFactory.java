@@ -3,6 +3,8 @@ package jadex.application;
 import jadex.application.model.MApplicationInstance;
 import jadex.application.model.MApplicationType;
 import jadex.application.runtime.impl.ApplicationInterpreter;
+import jadex.application.space.agr.MAGRSpaceType;
+import jadex.application.space.envsupport.MEnvSpaceType;
 import jadex.bridge.IComponentAdapterFactory;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentFactory;
@@ -75,10 +77,17 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 	 *  @param platform	The platform.
 	 *  @param mappings	The XML reader mappings of supported spaces (if any).
 	 */
+	// This constructor is used by the Starter class and the ADFChecker plugin. 
 	public ApplicationComponentFactory(String providerid)
 	{
 		super(providerid, IComponentFactory.class, null);
-		this.loader = new ApplicationModelLoader(null);
+		
+		// Todo: hack!!! make mappings configurable also for reflective constructor (how?)
+		this.loader = new ApplicationModelLoader(new Set[]
+		{
+			MEnvSpaceType.getXMLMapping(),
+			MAGRSpaceType.getXMLMapping()
+		});
 	}
 	
 	/**
@@ -153,6 +162,10 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 		try
 		{
 			ret = loader.loadApplicationModel(model, imports, classloader);
+		}
+		catch(RuntimeException e)
+		{
+			throw e;
 		}
 		catch(Exception e)
 		{

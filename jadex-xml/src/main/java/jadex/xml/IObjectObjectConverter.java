@@ -11,5 +11,5 @@ public interface IObjectObjectConverter
 	 *  Convert an object to another object.
 	 *  @param val The value to convert.
 	 */
-	public Object convertObject(Object val, IContext context);
+	public Object convertObject(Object val, IContext context)	throws Exception;
 }

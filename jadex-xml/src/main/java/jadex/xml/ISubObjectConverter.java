@@ -11,11 +11,11 @@ public interface ISubObjectConverter
 	 *  Convert an object to another object.
 	 *  @param val The value to convert.
 	 */
-	public Object convertObjectForRead(Object val, IContext context);
+	public Object convertObjectForRead(Object val, IContext context) throws Exception;
 	
 	/**
 	 *  Convert an object to another object.
 	 *  @param val The value to convert.
 	 */
-	public Object convertObjectForWrite(Object val, IContext context);
+	public Object convertObjectForWrite(Object val, IContext context) throws Exception;
 }

@@ -35,5 +35,5 @@ public interface IObjectWriterHandler
 	 *  @param object The object.
 	 *  @param typeinfo The Typeinfo.
 	 */
-	public WriteObjectInfo getObjectWriteInfo(Object object, TypeInfo typeinfo, IContext context);
+	public WriteObjectInfo getObjectWriteInfo(Object object, TypeInfo typeinfo, IContext context) throws Exception;
 }
