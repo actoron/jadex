@@ -11,9 +11,10 @@ import jadex.commons.service.IServiceIdentifier;
 import java.lang.reflect.Proxy;
 
 /**
- * 
+ *  Invocvation interceptor for executing a call on 
+ *  the underlying component thread. 
  */
-public class DecouplingServiceInvocationInterceptor implements IResultCommand
+public class DecouplingServiceInvocationInterceptor implements IServiceInvocationInterceptor
 {
 	//-------- attributes --------
 	
@@ -45,10 +46,9 @@ public class DecouplingServiceInvocationInterceptor implements IResultCommand
 	 *  @param args The argument(s) for the call.
 	 *  @return The result of the command.
 	 */
-	public Object execute(Object args) 	
+	public void execute(final ServiceInvocationContext sic) 	
 	{
 		Object ret;
-		final ServiceInvocationContext sic = (ServiceInvocationContext)args;
 		Class returntype = sic.getMethod().getReturnType();
 		boolean scheduleable = returntype.equals(IFuture.class) || returntype.equals(void.class);
 		boolean directcall = true;
@@ -117,7 +117,8 @@ public class DecouplingServiceInvocationInterceptor implements IResultCommand
 //				ret = new Future(null);
 			}
 		}
-		return ret;
+		
+		sic.setResult(ret);
 	}
 	
 	/**

@@ -3,7 +3,7 @@ package jadex.javaparser;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 
 /**
- * 
+ *  Static java parser helper.
  */
 public class SJavaParser
 {

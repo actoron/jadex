@@ -6,6 +6,7 @@ import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IServiceInvocationInterceptor;
 import jadex.bridge.ServiceInvocationContext;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
@@ -14,6 +15,7 @@ import jadex.commons.collection.MultiCollection;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
+import jadex.commons.service.BasicService;
 import jadex.commons.service.IInternalService;
 import jadex.commons.service.SServiceProvider;
 
@@ -27,7 +29,7 @@ import java.util.Collection;
  *  directed towards a service implementation of a contained 
  *  component type. It has to lookup or search for a fitting
  */
-public class CompositeServiceInvocationInterceptor implements IResultCommand
+public class CompositeServiceInvocationInterceptor implements IServiceInvocationInterceptor
 {
 	//-------- attributes --------
 	
@@ -57,9 +59,8 @@ public class CompositeServiceInvocationInterceptor implements IResultCommand
 	 *  @param args The argument(s) for the call.
 	 *  @return The result of the command.
 	 */
-	public Object execute(Object args) 	
+	public void execute(final ServiceInvocationContext sic) 	
 	{
-		final ServiceInvocationContext sic = (ServiceInvocationContext)args;
 		final Future fut = new Future(); 
 		Object ret = fut;
 //		System.out.println("Invoked: "+method.getName());
@@ -131,7 +132,7 @@ public class CompositeServiceInvocationInterceptor implements IResultCommand
 			}
 		});
 		
-		return ret;
+		sic.setResult(ret);
 	}
 
 	/**
@@ -287,5 +288,17 @@ public class CompositeServiceInvocationInterceptor implements IResultCommand
 		}
 		
 		return ret;
+	}
+	
+	/**
+	 *  Create a new composite (application) service proxy.
+	 */
+	public static IInternalService createServiceProxy(Class servicetype, String componenttype, IApplicationExternalAccess ea, ClassLoader classloader)
+	{
+		return (IInternalService)Proxy.newProxyInstance(classloader, new Class[]{IInternalService.class, servicetype}, 
+			new BasicServiceInvocationHandler(BasicService.createServiceIdentifier(ea.getServiceProvider().getId(), servicetype, BasicServiceInvocationHandler.class), 
+			CompositeServiceInvocationInterceptor.getInterceptors(), 
+			new CompositeServiceInvocationInterceptor(ea, componenttype, servicetype)));
+//			new CompositeServiceInvocationInterceptor((IApplicationExternalAccess)getExternalAccess(), ct.getName(), servicetype));
 	}
 }

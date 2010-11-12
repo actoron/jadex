@@ -244,7 +244,8 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 							{
 //								service = (IInternalService)Proxy.newProxyInstance(getClassLoader(), new Class[]{IInternalService.class, st.getClazz()}, 
 //									new CompositeServiceInvocationInterceptor((IApplicationExternalAccess)getExternalAccess(), componenttype, st.getClazz()));
-								service = createServiceProxy(st.getClazz(), componenttype);
+								service = CompositeServiceInvocationInterceptor.createServiceProxy(st.getClazz(), componenttype, 
+									(IApplicationExternalAccess)getExternalAccess(), getModel().getClassLoader());
 								container.addService(service);
 							}
 						}
@@ -400,7 +401,8 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 					Class[] sers = lmodel.getOfferedServices();
 					if(SUtil.arrayContains(sers, servicetype))
 					{
-						IInternalService service = createServiceProxy(servicetype, ct.getName());
+						IInternalService service = CompositeServiceInvocationInterceptor.createServiceProxy(servicetype, ct.getName(), 
+							(IApplicationExternalAccess)getExternalAccess(), getModel().getClassLoader());
 						container.addService(service);
 						ret.setResult(result);
 					}
@@ -428,18 +430,6 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 				}
 			}
 		}));
-	}
-	
-	/**
-	 * 
-	 */
-	protected IInternalService createServiceProxy(Class servicetype, String componenttype)
-	{
-		return (IInternalService)Proxy.newProxyInstance(getClassLoader(), new Class[]{IInternalService.class, servicetype}, 
-			new BasicServiceInvocationHandler(BasicService.createServiceIdentifier(getServiceProvider().getId(), servicetype, BasicServiceInvocationHandler.class), 
-			CompositeServiceInvocationInterceptor.getInterceptors(), 
-			new CompositeServiceInvocationInterceptor((IApplicationExternalAccess)getExternalAccess(), componenttype, servicetype)));
-//			new CompositeServiceInvocationInterceptor((IApplicationExternalAccess)getExternalAccess(), ct.getName(), servicetype));
 	}
 	
 	/**

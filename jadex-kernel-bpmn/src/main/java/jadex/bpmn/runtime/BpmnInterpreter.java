@@ -50,6 +50,8 @@ import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.clock.IClockService;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.IValueFetcher;
+import jadex.javaparser.SJavaParser;
+import jadex.javaparser.SimpleValueFetcher;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -1393,15 +1395,25 @@ public class BpmnInterpreter implements IComponentInstance
 	 */
 	public IFuture scheduleResultStep(IResultCommand com)
 	{
+		// To schedule a step an implicit activity is created.
+		// In order to put the step parameter value it is necessary
+		// to have an edge with a mapping. Otherwise the parameter
+		// value with be deleted in process thread updateParametersBeforeStep().
+		
 		Future ret = new Future();
 		MActivity act = new MActivity();
 		act.setName("External Step Activity.");
 		act.setClazz(ExecuteStepTask.class);
 		act.addParameter(new MParameter(MParameter.DIRECTION_IN, Object[].class, "step", null));
 		act.setActivityType(MBpmnModel.TASK);
+		MSequenceEdge edge = new MSequenceEdge();
+		edge.setTarget(act);
+		edge.addParameterMapping("step", SJavaParser.parseExpression("step", null, null), null);
+		act.addIncomingSequenceEdge(edge);
 		MPool pl = model.getPool(pool);
 		act.setPool(pl);
 		ProcessThread pt = new ProcessThread(act, context, this);
+		pt.setLastEdge(edge);
 		pt.setParameterValue("step", new Object[]{com, ret});
 		context.addThread(pt);
 		return ret;

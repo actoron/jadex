@@ -1,6 +1,5 @@
 package jadex.bridge;
 
-import jadex.commons.IResultCommand;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.service.IServiceIdentifier;
 
@@ -10,7 +9,10 @@ import java.util.Collection;
 import java.util.Iterator;
 
 /**
- * 
+ *  Basic service invocation interceptor.
+ *  It has a multi collection of interceptors per method.
+ *  Executes the list of interceptors one by one.
+ *  In case no handler can be found a fallback handler is used.
  */
 public class BasicServiceInvocationHandler implements InvocationHandler
 {
@@ -23,14 +25,14 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 	protected MultiCollection interceptors;
 	
 	/** The fallback invocation interceptor. */
-	protected IResultCommand fallback;
+	protected IServiceInvocationInterceptor fallback;
 
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new invocation handler.
 	 */
-	public BasicServiceInvocationHandler(IServiceIdentifier sid, MultiCollection interceptors, IResultCommand fallback)
+	public BasicServiceInvocationHandler(IServiceIdentifier sid, MultiCollection interceptors, IServiceInvocationInterceptor fallback)
 	{
 		this.sid = sid;
 		this.interceptors = interceptors;
@@ -50,13 +52,12 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 		{
 			for(Iterator it=icps.iterator(); it.hasNext(); )
 			{
-				IResultCommand com = (IResultCommand)it.next();
-				sic.setResult(com.execute(sic));
+				((IServiceInvocationInterceptor)it.next()).equals(sic);
 			}
 		}
 		else
 		{
-			sic.setResult(fallback.execute(sic));
+			fallback.execute(sic);
 		}
 		
 		return sic.getResult();
@@ -70,6 +71,5 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 	{
 		return sid;
 	}
-	
 
 }
