@@ -1,6 +1,7 @@
 package jadex.micro.examples;
 
-import jadex.commons.ICommand;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IInternalAccess;
 import jadex.commons.service.BasicService;
 import jadex.commons.service.IServiceProvider;
 import jadex.micro.MicroAgent;
@@ -15,12 +16,13 @@ public class DynamicServiceAgent extends MicroAgent
 	 */
 	public void executeBody()
 	{
-		ICommand addservice	= new ICommand()
+		IComponentStep addservice = new IComponentStep()
 		{
-			public void execute(Object args)
+			public Object execute(IInternalAccess ia)
 			{
 				addService(new DummyService(getServiceProvider()));
 				waitFor(3000, this);
+				return null;
 			}
 		};
 		

@@ -2,7 +2,6 @@ package jadex.bridge;
 
 import jadex.commons.Future;
 import jadex.commons.IFuture;
-import jadex.commons.IResultCommand;
 import jadex.commons.ThreadSuspendable;
 import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.service.IInternalService;
@@ -77,9 +76,9 @@ public class DecouplingServiceInvocationInterceptor implements IServiceInvocatio
 		{
 			final Future future = new Future();
 			
-			IFuture resfut = ea.scheduleResultStep(new IResultCommand()
+			IFuture resfut = ea.scheduleStep(new IComponentStep()
 			{
-				public Object execute(Object args)
+				public Object execute(IInternalAccess ia)
 				{
 					final Future fut = new Future();
 					

@@ -37,7 +37,7 @@ public class InterpreterTimedObject implements ITimedObject
 	 */
 	public void timeEventOccurred(long currenttime)
 	{
-		interpreter.scheduleResultStep(action);
+		interpreter.scheduleStep(action, null);
 	}
 	
 	/**

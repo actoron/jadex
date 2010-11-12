@@ -5,6 +5,8 @@ import jadex.application.space.envsupport.environment.ComponentActionList.Action
 import jadex.application.space.envsupport.evaluation.ITableDataConsumer;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IInternalAccess;
 import jadex.commons.ICommand;
 import jadex.commons.IResultCommand;
 import jadex.commons.SimplePropertyObject;
@@ -137,11 +139,11 @@ public class RoundBasedExecutor extends SimplePropertyObject implements ISpaceEx
 					process.start(clockservice, space);
 				}
 
-				new IResultCommand()
+				new IComponentStep()
 				{
 					boolean first = true;
-					
-					public Object execute(Object args)
+
+					public Object execute(IInternalAccess ia)
 					{
 		//				System.out.println("---+++--- New round: "+currenttime+" ---+++---");
 						
@@ -197,7 +199,7 @@ public class RoundBasedExecutor extends SimplePropertyObject implements ISpaceEx
 						}
 		//				System.out.println("-------------------------------------------");
 						
-						final IResultCommand step = this;
+						final IComponentStep step = this;
 						timer = clockservice.createTickTimer(new ITimedObject()
 						{
 							public void timeEventOccurred(long currenttime)

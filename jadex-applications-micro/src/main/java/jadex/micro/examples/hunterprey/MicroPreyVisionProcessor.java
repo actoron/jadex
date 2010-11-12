@@ -7,7 +7,8 @@ import jadex.application.space.envsupport.environment.space2d.Space2D;
 import jadex.application.space.envsupport.math.IVector2;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
-import jadex.commons.ICommand;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IInternalAccess;
 import jadex.commons.SimplePropertyObject;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
@@ -46,9 +47,9 @@ public class MicroPreyVisionProcessor	extends	SimplePropertyObject	implements IP
 					{
 						final Space2D	space2d	= (Space2D)space;
 						final IMicroExternalAccess	exta	= (IMicroExternalAccess)result;
-						exta.scheduleStep(new ICommand()
+						exta.scheduleStep(new IComponentStep()
 						{
-							public void execute(Object agent)
+							public Object execute(IInternalAccess ia)
 							{
 								MicroPreyAgent	mp	= (MicroPreyAgent)agent;
 								ISpaceObject	nearfood	= mp.getNearestFood();
@@ -71,6 +72,8 @@ public class MicroPreyVisionProcessor	extends	SimplePropertyObject	implements IP
 								{
 									mp.setNearestFood(null);
 								}
+								
+								return null;
 							}
 						});
 					}

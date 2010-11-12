@@ -29,7 +29,9 @@ import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IComponentManagementService;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.IMessageService;
 import jadex.bridge.IModelInfo;
@@ -39,7 +41,6 @@ import jadex.commons.Future;
 import jadex.commons.IChangeListener;
 import jadex.commons.IFilter;
 import jadex.commons.IFuture;
-import jadex.commons.IResultCommand;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
@@ -51,7 +52,6 @@ import jadex.commons.service.clock.IClockService;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.IValueFetcher;
 import jadex.javaparser.SJavaParser;
-import jadex.javaparser.SimpleValueFetcher;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -69,7 +69,7 @@ import java.util.logging.Logger;
  *  The micro agent interpreter is the connection between the agent platform 
  *  and a user-written micro agent. 
  */
-public class BpmnInterpreter implements IComponentInstance
+public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 {	
 	//-------- static part --------
 
@@ -840,9 +840,9 @@ public class BpmnInterpreter implements IComponentInstance
 	 *  Get the parent component.
 	 *  @return The parent component.
 	 */
-	public IComponentIdentifier getParent()
+	public IExternalAccess getParent()
 	{
-		return parent.getComponentIdentifier();
+		return parent;
 	}
 	
 	/** 
@@ -1393,7 +1393,7 @@ public class BpmnInterpreter implements IComponentInstance
 	 *  @param step	Code to be executed as a step of the agent.
 	 *  @return The result of the step.
 	 */
-	public IFuture scheduleResultStep(IResultCommand com)
+	public IFuture scheduleStep(IComponentStep step)
 	{
 		// To schedule a step an implicit activity is created.
 		// In order to put the step parameter value it is necessary
@@ -1414,8 +1414,18 @@ public class BpmnInterpreter implements IComponentInstance
 		act.setPool(pl);
 		ProcessThread pt = new ProcessThread(act, context, this);
 		pt.setLastEdge(edge);
-		pt.setParameterValue("step", new Object[]{com, ret});
+		pt.setParameterValue("step", new Object[]{step, ret});
 		context.addThread(pt);
 		return ret;
 	}
+	
+	/**
+	 *  Get the children (if any).
+	 *  @return The children.
+	 */
+	public IFuture getChildren()
+	{
+		return adapter.getChildrenAccesses();
+	}
+	
 }

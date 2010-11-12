@@ -8,7 +8,8 @@ import jadex.application.space.envsupport.environment.space2d.Space2D;
 import jadex.application.space.envsupport.environment.space2d.action.GetPosition;
 import jadex.application.space.envsupport.math.IVector2;
 import jadex.application.space.envsupport.math.Vector2Double;
-import jadex.commons.ICommand;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IInternalAccess;
 import jadex.commons.concurrent.IResultListener;
 import jadex.micro.MicroAgent;
 
@@ -30,9 +31,9 @@ public class ImpAgent extends MicroAgent
 		IApplicationExternalAccess	app	= (IApplicationExternalAccess)getParent();
 		final Grid2D space = (Grid2D)app.getSpace("mygc2dspace");
 		
-		ICommand com = new ICommand()
+		IComponentStep com = new IComponentStep()
 		{
-			public void execute(Object args)
+			public Object execute(IInternalAccess ia)
 			{
 				final ISpaceObject avatar = space.getAvatar(getComponentIdentifier());
 				IVector2 mypos = (IVector2)avatar.getProperty(Space2D.PROPERTY_POSITION);
@@ -85,6 +86,8 @@ public class ImpAgent extends MicroAgent
 				}));
 				
 				waitForTick(this);
+				
+				return null;
 			}
 			
 			public String toString()

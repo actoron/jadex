@@ -58,7 +58,7 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	{
 		final Future ret = new Future();
 		
-		adapter.getChildren().addResultListener(new IResultListener()
+		adapter.getChildrenIdentifiers().addResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{

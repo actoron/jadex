@@ -1,5 +1,7 @@
 package jadex.micro.examples;
 
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IInternalAccess;
 import jadex.commons.ICommand;
 import jadex.micro.MicroAgent;
 import jadex.micro.MicroAgentMetaInfo;
@@ -24,23 +26,26 @@ public class CountingAgent extends MicroAgent
 	{
 		cnt	= 1;
 
-		ICommand	step	= new ICommand()
+		IComponentStep step = new IComponentStep()
 		{
-			public void execute(Object agent)
+			public Object execute(IInternalAccess ia)
 			{
-				final ICommand	step	= this;
+				final IComponentStep step = this;
 				System.out.println("Step: "+cnt);
 				
 				cnt++;
 
 				// Hack!!! Blocks jcc without wait, why?
-				waitFor(10, new ICommand()
+				waitFor(10, new IComponentStep()
 				{
-					public void execute(Object args)
+					public Object execute(IInternalAccess ia)
 					{
 						scheduleStep(step);
+						return null;
 					}
 				});
+				
+				return null;
 			}
 			
 			public String toString()

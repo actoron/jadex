@@ -5,6 +5,7 @@ import jadex.application.runtime.ISpace;
 import jadex.bridge.ComponentResultListener;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IModelInfo;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
@@ -108,7 +109,7 @@ public class ExternalAccess implements IApplicationExternalAccess
 	 */
 	public IFuture getChildren()
 	{
-		return adapter.getChildren();
+		return adapter.getChildrenIdentifiers();
 	}
 	
 	/**
@@ -235,7 +236,7 @@ public class ExternalAccess implements IApplicationExternalAccess
 	 *  @param step	Code to be executed as a step of the agent.
 	 *  @return The result of the step.
 	 */
-	public IFuture scheduleResultStep(final IResultCommand com)
+	public IFuture scheduleStep(final IComponentStep step)
 	{
 		final Future ret = new Future();
 		
@@ -247,7 +248,7 @@ public class ExternalAccess implements IApplicationExternalAccess
 				{
 					public void run() 
 					{
-						application.scheduleStep(com).addResultListener(new DelegationResultListener(ret));
+						application.scheduleStep(step).addResultListener(new DelegationResultListener(ret));
 					}
 				});
 			}
@@ -258,7 +259,7 @@ public class ExternalAccess implements IApplicationExternalAccess
 		}
 		else
 		{
-			application.scheduleStep(com).addResultListener(new DelegationResultListener(ret));
+			application.scheduleStep(step).addResultListener(new DelegationResultListener(ret));
 		}
 		
 		return ret;

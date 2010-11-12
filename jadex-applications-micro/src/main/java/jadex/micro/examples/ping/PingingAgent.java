@@ -4,8 +4,9 @@ import jadex.base.fipa.SFipa;
 import jadex.bridge.Argument;
 import jadex.bridge.IArgument;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.MessageType;
-import jadex.commons.ICommand;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.micro.MicroAgent;
@@ -45,9 +46,9 @@ public class PingingAgent extends MicroAgent
 		final Object content = getArgument("content");
 		sent = new HashSet();
 		
-		final ICommand com = new ICommand()
+		final IComponentStep step = new IComponentStep()
 		{
-			public void execute(Object args)
+			public Object execute(IInternalAccess ia)
 			{
 				if(dif>missed_max)
 				{
@@ -68,6 +69,7 @@ public class PingingAgent extends MicroAgent
 					sendMessage(msg, SFipa.FIPA_MESSAGE_TYPE);
 					waitFor(timeout, this);
 				}
+				return null;
 			}
 		};
 		
@@ -79,13 +81,13 @@ public class PingingAgent extends MicroAgent
 				public void resultAvailable(Object source, Object result)
 				{
 					receiver = (IComponentIdentifier)result;
-					scheduleStep(com);
+					scheduleStep(step);
 				}
 			}));
 		}
 		else
 		{
-			scheduleStep(com);
+			scheduleStep(step);
 		}
 
 	}

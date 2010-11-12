@@ -10,10 +10,10 @@ import jadex.bridge.ComponentResultListener;
 import jadex.bridge.DecouplingServiceInvocationInterceptor;
 import jadex.bridge.IArgument;
 import jadex.bridge.IComponentManagementService;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IMessageService;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
-import jadex.commons.IResultCommand;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.collection.SCollection;
@@ -615,10 +615,10 @@ public class AgentRules
 						((Runnable)step[0]).run();
 						res.setResult(null);
 					}
-					else if(step[0] instanceof IResultCommand)
+					else if(step[0] instanceof IComponentStep)
 					{
-						IResultCommand com = (IResultCommand)((Object[])step)[0];
-						Object r = com.execute(new CapabilityFlyweight(state, ragent));
+						IComponentStep st = (IComponentStep)((Object[])step)[0];
+						Object r = st.execute(new CapabilityFlyweight(state, step[2]));
 						if(r instanceof IFuture)
 						{
 							((IFuture)r).addResultListener(new DelegationResultListener(res));

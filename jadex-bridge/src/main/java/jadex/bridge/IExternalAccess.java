@@ -2,7 +2,6 @@ package jadex.bridge;
 
 import jadex.commons.IFuture;
 import jadex.commons.IRemotable;
-import jadex.commons.IResultCommand;
 import jadex.commons.service.IServiceProvider;
 
 /**
@@ -43,7 +42,7 @@ public interface IExternalAccess extends IRemotable
 	 *  @param step	Code to be executed as a step of the agent.
 	 *  @return The result of the step.
 	 */
-	public IFuture scheduleResultStep(IResultCommand com);
+	public IFuture scheduleStep(IComponentStep step);
 	
 	//-------- normal --------
 	

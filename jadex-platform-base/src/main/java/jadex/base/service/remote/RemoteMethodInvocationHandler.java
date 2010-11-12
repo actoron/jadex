@@ -2,6 +2,8 @@ package jadex.base.service.remote;
 
 import jadex.base.service.remote.commands.RemoteMethodInvocationCommand;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IInternalAccess;
 import jadex.commons.Future;
 import jadex.commons.ICommand;
 import jadex.commons.IFuture;
@@ -88,11 +90,12 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 		if(finalize.equals(method))
 		{
 //			System.out.println("Finalize called on: "+proxy);
-			rsms.component.scheduleStep(new ICommand()
+			rsms.component.scheduleStep(new IComponentStep()
 			{
-				public void execute(Object args)
+				public Object execute(IInternalAccess ia)
 				{
 					rsms.getRemoteReferenceModule().decProxyCount(pr.getRemoteReference());
+					return null;
 				}
 			});
 			return null;

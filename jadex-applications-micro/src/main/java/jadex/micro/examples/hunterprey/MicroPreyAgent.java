@@ -7,6 +7,8 @@ import jadex.application.space.envsupport.environment.space2d.Grid2D;
 import jadex.application.space.envsupport.environment.space2d.Space2D;
 import jadex.application.space.envsupport.math.IVector2;
 import jadex.bridge.ComponentTerminatedException;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IInternalAccess;
 import jadex.commons.ICommand;
 import jadex.commons.concurrent.IResultListener;
 import jadex.micro.MicroAgent;
@@ -52,9 +54,9 @@ public class MicroPreyAgent extends MicroAgent
 //				e.printStackTrace();
 				try
 				{
-					getExternalAccess().scheduleStep(new ICommand()
+					getExternalAccess().scheduleStep(new IComponentStep()
 					{
-						public void execute(Object agent)
+						public Object execute(IInternalAccess agent)
 						{
 							// If move failed, forget about food and turn 90°.
 							food	= null;
@@ -70,6 +72,8 @@ public class MicroPreyAgent extends MicroAgent
 							}
 	
 							act();
+							
+							return null;
 						}
 						
 						public String toString()
@@ -85,11 +89,12 @@ public class MicroPreyAgent extends MicroAgent
 			
 			public void resultAvailable(Object source, Object result)
 			{
-				getExternalAccess().scheduleStep(new ICommand()
+				getExternalAccess().scheduleStep(new IComponentStep()
 				{
-					public void execute(Object agent)
+					public Object execute(IInternalAccess ia)
 					{
 						act();
+						return null;
 					}
 					
 					public String toString()

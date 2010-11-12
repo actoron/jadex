@@ -3,7 +3,9 @@ package jadex.base.gui.componenttree;
 import jadex.base.service.remote.ProxyAgent;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentManagementService;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
 import jadex.commons.Future;
 import jadex.commons.ICommand;
 import jadex.commons.concurrent.DelegationResultListener;
@@ -94,11 +96,11 @@ public class VirtualComponentTreeNode extends AbstractComponentTreeNode implemen
 			public void customResultAvailable(Object source, Object result)
 			{
 				final IMicroExternalAccess exta = (IMicroExternalAccess)result;
-				exta.scheduleStep(new ICommand()
+				exta.scheduleStep(new IComponentStep()
 				{
-					public void execute(Object agent)
+					public Object execute(IInternalAccess ia)
 					{
-						ProxyAgent pa = (ProxyAgent)agent;
+						ProxyAgent pa = (ProxyAgent)ia;
 						pa.getRemoteComponentDescription(desc.getName())
 							.addResultListener(new SwingDefaultResultListener()
 						{
@@ -115,6 +117,7 @@ public class VirtualComponentTreeNode extends AbstractComponentTreeNode implemen
 								parent.removeChild(VirtualComponentTreeNode.this);
 							}
 						});
+						return null;
 					}
 				});
 			}

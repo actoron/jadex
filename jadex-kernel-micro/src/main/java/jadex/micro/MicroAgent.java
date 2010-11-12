@@ -5,8 +5,11 @@ import jadex.bridge.DecouplingServiceInvocationInterceptor;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.IMessageService;
+import jadex.bridge.IModelInfo;
 import jadex.bridge.MessageType;
 import jadex.commons.Future;
 import jadex.commons.ICommand;
@@ -33,7 +36,7 @@ import java.util.logging.Logger;
 /**
  *  Base class for application agents.
  */
-public abstract class MicroAgent implements IMicroAgent
+public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 {
 	//-------- attributes --------
 	
@@ -128,7 +131,7 @@ public abstract class MicroAgent implements IMicroAgent
 	/**
 	 *  Get the external access for this agent.
 	 */
-	public IMicroExternalAccess	getExternalAccess()
+	public IExternalAccess	getExternalAccess()
 	{
 		return new ExternalAccess(this, interpreter);
 	}
@@ -227,7 +230,7 @@ public abstract class MicroAgent implements IMicroAgent
 	 *  @param time The time.
 	 *  @param run The runnable.
 	 */
-	public IFuture waitFor(final long time, final ICommand run)
+	public IFuture waitFor(final long time, final IComponentStep run)
 	{
 		longtime	= Math.max(longtime, time);
 		final Future ret = new Future();
@@ -243,12 +246,13 @@ public abstract class MicroAgent implements IMicroAgent
 				{
 					public void timeEventOccurred(long currenttime)
 					{
-						interpreter.scheduleStep(new ICommand()
+						interpreter.scheduleStep(new IComponentStep()
 						{
-							public void execute(Object agent)
+							public Object execute(IInternalAccess ia)
 							{
 								timers.remove(ts[0]);
-								run.execute(agent);
+								run.execute(ia);
+								return null;
 							}
 							
 							public String toString()
@@ -280,7 +284,7 @@ public abstract class MicroAgent implements IMicroAgent
 	 *  Wait for the next tick.
 	 *  @param time The time.
 	 */
-	public IFuture waitForTick(final ICommand run)
+	public IFuture waitForTick(final IComponentStep run)
 	{
 		final Future ret = new Future();
 		
@@ -295,12 +299,13 @@ public abstract class MicroAgent implements IMicroAgent
 				{
 					public void timeEventOccurred(final long currenttime)
 					{
-						interpreter.scheduleStep(new ICommand()
+						interpreter.scheduleStep(new IComponentStep()
 						{
-							public void execute(Object agent)
+							public Object execute(IInternalAccess ia)
 							{
 								timers.remove(ts[0]);
-								run.execute(agent);
+								run.execute(ia);
+								return null;
 							}
 							
 							public String toString()
@@ -335,17 +340,19 @@ public abstract class MicroAgent implements IMicroAgent
 	/**
 	 *  Kill the agent.
 	 */
-	public void killAgent()
+	public IFuture killAgent()
 	{
+		final Future ret = new Future();
 		SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class)
 			.addResultListener(createResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
 				IComponentManagementService cms = (IComponentManagementService)result;
-				cms.destroyComponent(getComponentIdentifier());
+				cms.destroyComponent(getComponentIdentifier()).addResultListener(new DelegationResultListener(ret));
 			}
 		}));
+		return ret;
 	}
 		
 	/**
@@ -463,20 +470,20 @@ public abstract class MicroAgent implements IMicroAgent
 	 *  Schedule a step of the agent.
 	 *  May safely be called from external threads.
 	 *  @param step	Code to be executed as a step of the agent.
-	 */
+	 * /
 	public void	scheduleStep(ICommand step)
 	{
 		interpreter.scheduleStep(step);
-	}
+	}*/
 	
 	/**
 	 *  Schedule a step of the agent.
 	 *  May safely be called from external threads.
 	 *  @param step	Code to be executed as a step of the agent.
 	 */
-	public IFuture scheduleResultStep(IResultCommand step)
+	public IFuture scheduleStep(IComponentStep step)
 	{
-		return interpreter.scheduleResultStep(step);		
+		return interpreter.scheduleStep(step);		
 	}
 	
 	/**
@@ -530,6 +537,32 @@ public abstract class MicroAgent implements IMicroAgent
 	{
 		interpreter.getAgentAdapter().invokeLater(run);
 	}*/
+	
+	/**
+	 *  Get the model of the component.
+	 *  @return	The model.
+	 */
+	public IModelInfo getModel()
+	{
+		return interpreter.getAgentModel();
+	}
+	
+	/**
+	 *  Get the children (if any).
+	 *  @return The children.
+	 */
+	public IFuture getChildren()
+	{
+		return interpreter.getAgentAdapter().getChildrenAccesses();
+	}
+	
+	/**
+	 *  Kill the component.
+	 */
+	public IFuture killComponent()
+	{
+		return killAgent();
+	}
 	
 	//-------- helper classes --------
 	

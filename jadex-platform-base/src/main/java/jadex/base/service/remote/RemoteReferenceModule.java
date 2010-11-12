@@ -6,7 +6,9 @@ import jadex.base.service.remote.replacements.DefaultEqualsMethodReplacement;
 import jadex.base.service.remote.replacements.DefaultHashcodeMethodReplacement;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
 import jadex.commons.Future;
 import jadex.commons.ICommand;
 import jadex.commons.IFuture;
@@ -698,13 +700,13 @@ public class RemoteReferenceModule
 	{
 		final long renewid = ++this.renewid;
 		
-		rsms.getComponent().scheduleStep(new ICommand()
+		rsms.getComponent().scheduleStep(new IComponentStep()
 		{
-			public void execute(Object args)
+			public Object execute(IInternalAccess ia)
 			{
 				if(renewid == RemoteReferenceModule.this.renewid)
 				{
-					final RemoteServiceManagementAgent agent = (RemoteServiceManagementAgent)args;
+					final RemoteServiceManagementAgent agent = (RemoteServiceManagementAgent)ia;
 					
 					if(DEBUG)
 					{
@@ -774,6 +776,7 @@ public class RemoteReferenceModule
 				}
 				
 //				System.out.println("renewal behaviour exit");
+				return null;
 			}
 		});
 	}
@@ -785,9 +788,9 @@ public class RemoteReferenceModule
 	{
 		final long removeid = ++this.removeid;
 		
-		rsms.getComponent().scheduleStep(new ICommand()
+		rsms.getComponent().scheduleStep(new IComponentStep()
 		{
-			public void execute(Object args)
+			public Object execute(IInternalAccess ia)
 			{
 				if(removeid == RemoteReferenceModule.this.removeid)
 				{
@@ -826,6 +829,7 @@ public class RemoteReferenceModule
 					if(holders.size()>0)
 						rsms.getComponent().waitFor(5000, this);
 				}
+				return null;
 			}
 		});
 	}

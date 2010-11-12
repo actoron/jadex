@@ -3,6 +3,8 @@ package jadex.micro.benchmarks;
 import jadex.base.fipa.SFipa;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IArgument;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.MessageType;
 import jadex.commons.ICommand;
 import jadex.commons.concurrent.DefaultResultListener;
@@ -46,9 +48,9 @@ public class MessagePerformanceAgent extends MicroAgent
 				final IComponentIdentifier receiver = getComponentIdentifier();
 				final boolean usecodec = ((Boolean)getArgument("codec")).booleanValue();
 				
-				ICommand send = new ICommand()
+				IComponentStep send = new IComponentStep()
 				{
-					public void execute(Object args)
+					public Object execute(IInternalAccess ia)
 					{
 						if(current==1)
 						{
@@ -92,10 +94,12 @@ public class MessagePerformanceAgent extends MicroAgent
 						{
 							waitFor(0, this);
 						}
+						
+						return null;
 					}
 				};
 				
-				send.execute(this);
+				send.execute(MessagePerformanceAgent.this);
 			}
 		}));
 	}

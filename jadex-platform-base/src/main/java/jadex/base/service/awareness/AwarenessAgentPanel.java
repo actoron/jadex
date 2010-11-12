@@ -4,7 +4,9 @@ import jadex.base.gui.componentviewer.IComponentViewerPanel;
 import jadex.base.gui.jtable.ComponentIdentifierRenderer;
 import jadex.base.gui.plugin.IControlCenter;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
 import jadex.commons.Future;
 import jadex.commons.ICommand;
 import jadex.commons.IFuture;
@@ -281,7 +283,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 					}
 					else
 					{
-						AwarenessAgentPanel.this.component.scheduleResultStep(new CreateProxyCommand(dif.getComponentIdentifier()))
+						AwarenessAgentPanel.this.component.scheduleStep(new CreateProxyCommand(dif.getComponentIdentifier()))
 							.addResultListener(new SwingDefaultResultListener(panel)
 						{
 							public void customResultAvailable(Object source, Object result)
@@ -315,7 +317,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 					}
 					else
 					{
-						AwarenessAgentPanel.this.component.scheduleResultStep(new DeleteProxyCommand(dif.getComponentIdentifier()))
+						AwarenessAgentPanel.this.component.scheduleStep(new DeleteProxyCommand(dif.getComponentIdentifier()))
 							.addResultListener(new SwingDefaultResultListener(panel)
 						{
 							public void customResultAvailable(Object source, Object result)
@@ -439,7 +441,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 	 */
 	protected void updateAddress()
 	{
-		component.scheduleResultStep(new GetAddressCommand())
+		component.scheduleStep(new GetAddressCommand())
 			.addResultListener(new SwingDefaultResultListener(tfipaddress)
 		{
 			public void customResultAvailable(Object source, Object result)
@@ -458,7 +460,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 	 */
 	protected void updateDelay()
 	{
-		component.scheduleResultStep(new GetDelayCommand())
+		component.scheduleStep(new GetDelayCommand())
 			.addResultListener(new SwingDefaultResultListener(spdelay)
 		{
 			public void customResultAvailable(Object source, Object result)
@@ -475,7 +477,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 	 */
 	protected void updateProxyDelay()
 	{
-		component.scheduleResultStep(new GetProxyDelayCommand())
+		component.scheduleStep(new GetProxyDelayCommand())
 			.addResultListener(new SwingDefaultResultListener(spprorefresh)
 		{
 			public void customResultAvailable(Object source, Object result)
@@ -492,7 +494,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 	 */
 	protected void updateAutoCreate(final JCheckBox cbautocreate)
 	{
-		component.scheduleResultStep(new GetAutoCreateProxyCommand())
+		component.scheduleStep(new GetAutoCreateProxyCommand())
 			.addResultListener(new SwingDefaultResultListener(cbautocreate)
 		{
 			public void customResultAvailable(Object source, Object result)
@@ -508,7 +510,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 	 */
 	protected void updateAutoDelete(final JCheckBox cbautodelete)
 	{
-		component.scheduleResultStep(new GetAutoDeleteProxyCommand())
+		component.scheduleStep(new GetAutoDeleteProxyCommand())
 			.addResultListener(new SwingDefaultResultListener(cbautodelete)
 		{
 			public void customResultAvailable(Object source, Object result)
@@ -524,7 +526,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 	 */
 	protected void updateDiscoveryInfos(final JTable jtdis)
 	{
-		component.scheduleResultStep(new GetDiscoveryInfosCommand())
+		component.scheduleStep(new GetDiscoveryInfosCommand())
 			.addResultListener(new SwingDefaultResultListener(jtdis)
 		{
 			public void customResultAvailable(Object source, Object result)
@@ -665,11 +667,11 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 	/**
 	 *  Get delay command.
 	 */
-	public static class GetDelayCommand implements IResultCommand
+	public static class GetDelayCommand implements IComponentStep
 	{
-		public Object execute(Object args)
+		public Object execute(IInternalAccess ia)
 		{
-			AwarenessAgent agent = (AwarenessAgent)args;
+			AwarenessAgent agent = (AwarenessAgent)ia;
 			final long delay = agent.getDelay();
 			return new Long(delay);
 		}
@@ -678,11 +680,11 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 	/**
 	 *  Get proxy delay command.
 	 */
-	public static class GetProxyDelayCommand implements IResultCommand
+	public static class GetProxyDelayCommand implements IComponentStep
 	{
-		public Object execute(Object args)
+		public Object execute(IInternalAccess ia)
 		{
-			AwarenessAgent agent = (AwarenessAgent)args;
+			AwarenessAgent agent = (AwarenessAgent)ia;
 			final long delay = agent.getProxyDelay();
 			return new Long(delay);
 		}
@@ -691,7 +693,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 	/**
 	 *  Set delay command.
 	 */
-	public static class SetDelayCommand implements ICommand
+	public static class SetDelayCommand implements IComponentStep
 	{
 		public static boolean XML_INCLUDE_FIELDS = true;
 		public long delay;
@@ -705,17 +707,18 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 			this.delay = delay;
 		}
 		
-		public void execute(Object args)
+		public Object execute(IInternalAccess ia)
 		{
-			AwarenessAgent agent = (AwarenessAgent)args;
+			AwarenessAgent agent = (AwarenessAgent)ia;
 			agent.setDelay(delay);
+			return null;
 		}
 	};
 	
 	/**
 	 *  Set proxy delay command.
 	 */
-	public static class SetProxyDelayCommand implements ICommand
+	public static class SetProxyDelayCommand implements IComponentStep
 	{
 		public static boolean XML_INCLUDE_FIELDS = true;
 		public long delay;
@@ -729,21 +732,22 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 			this.delay = delay;
 		}
 		
-		public void execute(Object args)
+		public Object execute(IInternalAccess ia)
 		{
-			AwarenessAgent agent = (AwarenessAgent)args;
+			AwarenessAgent agent = (AwarenessAgent)ia;
 			agent.setProxyDelay(delay);
+			return null;
 		}
 	};
 	
 	/**
 	 *  Get address command.
 	 */
-	public static class GetAddressCommand implements IResultCommand
+	public static class GetAddressCommand implements IComponentStep
 	{
-		public Object execute(Object args)
+		public Object execute(IInternalAccess ia)
 		{
-			AwarenessAgent agent = (AwarenessAgent)args;
+			AwarenessAgent agent = (AwarenessAgent)ia;
 			return agent.getAddressInfo();
 		}
 	};
@@ -751,7 +755,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 	/**
 	 *  Set address command.
 	 */
-	public static class SetAddressCommand implements ICommand
+	public static class SetAddressCommand implements IComponentStep
 	{
 		public static boolean XML_INCLUDE_FIELDS = true;
 		public InetAddress address;
@@ -767,21 +771,22 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 			this.port = port;
 		}
 		
-		public void execute(Object args)
+		public Object execute(IInternalAccess ia)
 		{
-			AwarenessAgent agent = (AwarenessAgent)args;
+			AwarenessAgent agent = (AwarenessAgent)ia;
 			agent.setAddressInfo(address, port);
+			return null;
 		}
 	};
 	
 	/**
 	 *  Get auto create command.
 	 */
-	public static class GetAutoCreateProxyCommand implements IResultCommand
+	public static class GetAutoCreateProxyCommand implements IComponentStep
 	{
-		public Object execute(Object args)
+		public Object execute(IInternalAccess ia)
 		{
-			AwarenessAgent agent = (AwarenessAgent)args;
+			AwarenessAgent agent = (AwarenessAgent)ia;
 			boolean auto = agent.isAutoCreateProxy();
 			return auto? Boolean.TRUE: Boolean.FALSE;
 		}
@@ -790,7 +795,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 	/**
 	 *  Set auto create command.
 	 */
-	public static class SetAutoCreateProxyCommand implements ICommand
+	public static class SetAutoCreateProxyCommand implements IComponentStep
 	{
 		public static boolean XML_INCLUDE_FIELDS = true;
 		public boolean autocreate;
@@ -804,21 +809,22 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 			this.autocreate = autocreate;
 		}
 		
-		public void execute(Object args)
+		public Object execute(IInternalAccess ia)
 		{
-			AwarenessAgent agent = (AwarenessAgent)args;
+			AwarenessAgent agent = (AwarenessAgent)ia;
 			agent.setAutoCreateProxy(autocreate);
+			return null;
 		}
 	};
 	
 	/**
 	 *  Get auto delete command.
 	 */
-	public static class GetAutoDeleteProxyCommand implements IResultCommand
+	public static class GetAutoDeleteProxyCommand implements IComponentStep
 	{
-		public Object execute(Object args)
+		public Object execute(IInternalAccess ia)
 		{
-			AwarenessAgent agent = (AwarenessAgent)args;
+			AwarenessAgent agent = (AwarenessAgent)ia;
 			boolean auto = agent.isAutoDeleteProxy();
 			return auto? Boolean.TRUE: Boolean.FALSE;
 		}
@@ -827,7 +833,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 	/**
 	 *  Set auto delete command.
 	 */
-	public static class SetAutoDeleteProxyCommand implements ICommand
+	public static class SetAutoDeleteProxyCommand implements IComponentStep
 	{
 		public static boolean XML_INCLUDE_FIELDS = true;
 		public boolean autodelete;
@@ -841,21 +847,22 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 			this.autodelete = autodelete;
 		}
 		
-		public void execute(Object args)
+		public Object execute(IInternalAccess ia)
 		{
-			AwarenessAgent agent = (AwarenessAgent)args;
+			AwarenessAgent agent = (AwarenessAgent)ia;
 			agent.setAutoDeleteProxy(autodelete);
+			return null;
 		}
 	};
 	
 	/**
 	 *  Get discovery info command.
 	 */
-	public static class GetDiscoveryInfosCommand implements IResultCommand
+	public static class GetDiscoveryInfosCommand implements IComponentStep
 	{
-		public Object execute(Object args)
+		public Object execute(IInternalAccess ia)
 		{
-			AwarenessAgent agent = (AwarenessAgent)args;
+			AwarenessAgent agent = (AwarenessAgent)ia;
 			return agent.getDiscoveryInfos();
 		}
 	}
@@ -863,7 +870,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 	/**
 	 *  Create proxy command.
 	 */
-	public static class CreateProxyCommand implements IResultCommand
+	public static class CreateProxyCommand implements IComponentStep
 	{
 		public static boolean XML_INCLUDE_FIELDS = true;
 		public IComponentIdentifier cid;
@@ -877,9 +884,9 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 			this.cid = cid;
 		}
 		
-		public Object execute(Object args)
+		public Object execute(IInternalAccess ia)
 		{
-			AwarenessAgent agent = (AwarenessAgent)args;
+			AwarenessAgent agent = (AwarenessAgent)ia;
 			return agent.createProxy(cid);
 		}
 	};
@@ -887,7 +894,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 	/**
 	 *  Delete proxy command.
 	 */
-	public static class DeleteProxyCommand implements IResultCommand
+	public static class DeleteProxyCommand implements IComponentStep
 	{
 		public static boolean XML_INCLUDE_FIELDS = true;
 		public IComponentIdentifier cid;
@@ -901,9 +908,9 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 			this.cid = cid;
 		}
 		
-		public Object execute(Object args)
+		public Object execute(IInternalAccess ia)
 		{
-			AwarenessAgent agent = (AwarenessAgent)args;
+			AwarenessAgent agent = (AwarenessAgent)ia;
 			return agent.deleteProxy(cid);
 		}
 	};
@@ -911,7 +918,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 	/**
 	 *  Set exclude command.
 	 */
-	public static class SetExcludedCommand implements ICommand
+	public static class SetExcludedCommand implements IComponentStep
 	{
 		public static boolean XML_INCLUDE_FIELDS = true;
 		public IComponentIdentifier cid;
@@ -927,10 +934,11 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 			this.excluded = excluded;
 		}
 		
-		public void execute(Object args)
+		public Object execute(IInternalAccess ia)
 		{
-			AwarenessAgent agent = (AwarenessAgent)args;
+			AwarenessAgent agent = (AwarenessAgent)ia;
 			agent.setExcluded(cid, excluded);
+			return null;
 		}
 	};
 }

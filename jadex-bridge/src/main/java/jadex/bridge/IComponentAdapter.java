@@ -63,7 +63,13 @@ public interface IComponentAdapter
 	 *  Get the children (if any).
 	 *  @return The children.
 	 */
-	public IFuture getChildren();
+	public IFuture getChildrenIdentifiers();
+	
+	/**
+	 *  Get the children (if any).
+	 *  @return The children.
+	 */
+	public IFuture getChildrenAccesses();
 
 }
 

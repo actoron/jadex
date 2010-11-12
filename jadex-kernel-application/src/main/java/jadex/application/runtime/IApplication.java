@@ -2,8 +2,8 @@ package jadex.application.runtime;
 
 import jadex.application.model.MApplicationType;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentStep;
 import jadex.commons.IFuture;
-import jadex.commons.IResultCommand;
 import jadex.commons.service.IServiceProvider;
 
 import java.util.Map;
@@ -80,5 +80,5 @@ public interface IApplication
 	 *  @param step	Code to be executed as a step.
 	 */
 	// todo: belogs to interface?
-	public IFuture scheduleStep(final IResultCommand step);
+	public IFuture scheduleStep(final IComponentStep step);
 }

@@ -8,7 +8,9 @@ import jadex.base.service.remote.xml.RMIPreProcessor;
 import jadex.bridge.ComponentResultListener;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.IMessageService;
 import jadex.bridge.IRemoteServiceManagementService;
 import jadex.commons.Future;
@@ -146,11 +148,11 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	{
 		Future ret = new Future();
 		
-		component.scheduleResultStep(new IResultCommand()
+		component.scheduleStep(new IComponentStep()
 		{
-			public Object execute(Object args)
+			public Object execute(IInternalAccess ia)
 			{
-				RemoteServiceManagementAgent agent = (RemoteServiceManagementAgent)args;
+				RemoteServiceManagementAgent agent = (RemoteServiceManagementAgent)ia;
 				final Future fut = new Future();
 				SServiceProvider.getService(component.getServiceProvider(), IComponentManagementService.class)
 					.addResultListener(agent.createResultListener(new IResultListener()
@@ -231,12 +233,12 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	{
 		final Future ret = new Future();
 		
-		component.scheduleResultStep(new IResultCommand()
+		component.scheduleStep(new IComponentStep()
 		{
-			public Object execute(Object args)
+			public Object execute(IInternalAccess ia)
 			{
 				final Future fut = new Future();
-				RemoteServiceManagementAgent agent = (RemoteServiceManagementAgent)args;
+				RemoteServiceManagementAgent agent = (RemoteServiceManagementAgent)ia;
 				SServiceProvider.getService(component.getServiceProvider(), IComponentManagementService.class)
 					.addResultListener(agent.createResultListener(new IResultListener()
 				{
@@ -360,11 +362,11 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	public void sendMessage(final IComponentIdentifier receiver, final Object content,
 		final String callid, final long to, final Future future)
 	{
-		component.scheduleStep(new ICommand()
+		component.scheduleStep(new IComponentStep()
 		{
-			public void execute(Object args)
+			public Object execute(IInternalAccess ia)
 			{
-				final RemoteServiceManagementAgent agent = (RemoteServiceManagementAgent)args;
+				final RemoteServiceManagementAgent agent = (RemoteServiceManagementAgent)ia;
 				
 				final long timeout = to<=0? DEFAULT_TIMEOUT: to;
 				
@@ -401,21 +403,22 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 									public void resultAvailable(Object source, Object result)
 									{
 										// ok message could be sent.
-										component.scheduleStep(new ICommand() 
+										component.scheduleStep(new IComponentStep()
 										{
-											public void execute(Object args) 
+											public Object execute(IInternalAccess ia)
 											{
 //												System.out.println("waitfor");
-												MicroAgent pa = (MicroAgent)args;
-												pa.waitFor(timeout, new ICommand() 
+												MicroAgent pa = (MicroAgent)ia;
+												pa.waitFor(timeout, new IComponentStep()
 												{
-													public void execute(Object args) 
+													public Object execute(IInternalAccess ia)
 													{
 //														System.out.println("timeout triggered: "+msg);
 														removeWaitingCall(callid);
 //														waitingcalls.remove(callid);
 //														System.out.println("Waitingcalls: "+waitingcalls.size());
 														future.setExceptionIfUndone(new RuntimeException("No reply received and timeout occurred: "+callid));
+														return null;
 													}
 												}).addResultListener(agent.createResultListener(new DefaultResultListener()
 												{
@@ -447,6 +450,8 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 														}));
 													}
 												}));
+												
+												return null;
 											}
 										});
 									}
@@ -484,6 +489,8 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 						future.setException(exception);
 					}
 				}));
+				
+				return null;
 			}
 		});
 	}

@@ -1,5 +1,7 @@
 package jadex.micro.examples.chat;
 
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IInternalAccess;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IChangeListener;
 import jadex.commons.ICommand;
@@ -40,11 +42,11 @@ public class ChatPanel extends JPanel
 		final JTextArea ta = new JTextArea(10, 30);
 		JScrollPane main = new JScrollPane(ta);
 		
-		agent.scheduleStep(new ICommand()
+		agent.scheduleStep(new IComponentStep()
 		{
-			public void execute(Object args)
+			public Object execute(IInternalAccess ia)
 			{
-				ChatAgent ca = (ChatAgent)args;
+				ChatAgent ca = (ChatAgent)ia;
 				ca.getChatService().addChangeListener(new IChangeListener()
 				{
 					public void changeOccurred(ChangeEvent event)
@@ -55,6 +57,7 @@ public class ChatPanel extends JPanel
 						ta.append(buf.toString());
 					}
 				});
+				return null;
 			}
 		});
 		
@@ -68,13 +71,14 @@ public class ChatPanel extends JPanel
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				agent.scheduleStep(new ICommand()
+				agent.scheduleStep(new IComponentStep()
 				{
-					public void execute(Object args)
+					public Object execute(IInternalAccess ia)
 					{
-						ChatAgent ca = (ChatAgent)args;
+						ChatAgent ca = (ChatAgent)ia;
 						ca.getChatService().tell(""+agent.getComponentIdentifier(), tf.getText());
 						tf.setText("");
+						return null;
 					}
 				});
 			}

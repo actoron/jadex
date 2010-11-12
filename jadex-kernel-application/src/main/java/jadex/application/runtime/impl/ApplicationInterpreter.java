@@ -24,7 +24,9 @@ import jadex.bridge.IComponentFactory;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IComponentManagementService;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.IModelInfo;
 import jadex.commons.Future;
@@ -65,7 +67,7 @@ import java.util.logging.Logger;
  *  When the context is deleted all components will be destroyed.
  *  An component must only be in one application context.
  */
-public class ApplicationInterpreter implements IApplication, IComponentInstance
+public class ApplicationInterpreter implements IApplication, IComponentInstance, IInternalAccess
 {
 	//-------- constants --------
 	
@@ -196,9 +198,9 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 		fetcher.setValue("$provider", getServiceProvider());
 		
 		// Schedule the futures (first) init step.
-		scheduleStep(new IResultCommand()
+		scheduleStep(new IComponentStep()
 		{
-			public Object execute(Object args)
+			public Object execute(IInternalAccess ia)
 			{
 				final List futures = new ArrayList();
 
@@ -296,9 +298,9 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 					}
 				}
 				
-				final IResultCommand init2 = new IResultCommand()
+				final IComponentStep init2 = new IComponentStep()
 				{
-					public Object execute(Object args)
+					public Object execute(IInternalAccess ia)
 					{
 						container.start().addResultListener(new ComponentResultListener(new IResultListener()
 						{
@@ -437,7 +439,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 	 *  May safely be called from external threads.
 	 *  @param step	Code to be executed as a step of the component.
 	 */
-	public IFuture scheduleStep(final IResultCommand step)
+	public IFuture scheduleStep(final IComponentStep step)
 	{
 		Future ret = new Future();
 		
@@ -1041,7 +1043,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 				Future future = (Future)step[1];
 				try
 				{
-					Object res = ((IResultCommand)step[0]).execute(this);
+					Object res = ((IComponentStep)step[0]).execute(this);
 					if(res instanceof IFuture)
 					{
 						((IFuture)res).addResultListener(new DelegationResultListener(future));
@@ -1051,10 +1053,11 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 						future.setResult(res);
 					}
 				}
-				catch(Exception e)
+				catch(RuntimeException e)
 				{
-					e.printStackTrace();
+//					e.printStackTrace();
 					future.setException(e);
+					throw e;
 				}
 			}
 			
@@ -1254,9 +1257,9 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 //					}
 //					else
 //					{
-						scheduleStep(new IResultCommand()
+						scheduleStep(new IComponentStep()
 						{
-							public Object execute(Object args)
+							public Object execute(IInternalAccess ia)
 							{
 								createComponent(components, ces, i+1, inited);
 								return null;
@@ -1394,4 +1397,14 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance
 	{
 		return (Collection)instances.get(type);
 	}
+	
+	/**
+	 *  Get the children (if any).
+	 *  @return The children.
+	 */
+	public IFuture getChildren()
+	{
+		return adapter.getChildrenAccesses();
+	}
+	
 }

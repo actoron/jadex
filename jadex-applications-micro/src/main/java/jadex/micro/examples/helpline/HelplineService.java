@@ -52,7 +52,7 @@ public class HelplineService extends BasicService implements IHelpline
 //	public IFuture getInformation(final String name)
 //	{
 //		final Future ret = new Future();
-//		agent.scheduleResultStep(new IResultCommand()
+//		agent.scheduleStep(new IResultCommand()
 //		{
 //			public Object execute(Object args)
 //			{

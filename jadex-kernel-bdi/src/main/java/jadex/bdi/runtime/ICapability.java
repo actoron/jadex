@@ -3,6 +3,7 @@ package jadex.bdi.runtime;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IModelInfo;
+import jadex.commons.IFuture;
 import jadex.commons.service.IServiceProvider;
 
 import java.util.logging.Logger;
@@ -137,7 +138,7 @@ public interface ICapability	extends IElement
 	/**
 	 *  Kill the agent.
 	 */
-	public void killAgent();
+	public IFuture killAgent();
 	
 //	/**
 //	 *  Get the application context.

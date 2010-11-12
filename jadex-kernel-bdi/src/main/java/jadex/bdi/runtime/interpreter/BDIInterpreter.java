@@ -310,7 +310,6 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 		{
 			// Hack!!! platform should inform about ext entries to update agenda.
 			Activation	act	= rulesystem.getAgenda().getLastActivation();
-//			System.out.println("here: "+act);
 			state.getProfiler().start(IProfiler.TYPE_RULE, act!=null?act.getRule():null);
 			state.expungeStaleObjects();
 			state.notifyEventListeners();
@@ -968,7 +967,7 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 	 *  May safely be called from external threads.
 	 *  @param step	Code to be executed as a step of the agent.
 	 */
-	public IFuture	scheduleResultStep(final Object step)
+	public IFuture	scheduleStep(final Object step, final Object scope)
 	{
 		final Future ret = new Future();
 		
@@ -980,7 +979,7 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 				{
 					public void run() 
 					{
-						getState().addAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_actions, new Object[]{step, ret});
+						getState().addAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_actions, new Object[]{step, ret, scope});
 					}
 				});
 			}
@@ -991,7 +990,7 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 		}
 		else
 		{
-			getState().addAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_actions, new Object[]{step, ret});
+			getState().addAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_actions, new Object[]{step, ret, scope});
 		}
 
 		return ret;

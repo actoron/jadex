@@ -5,7 +5,9 @@ import jadex.bridge.BasicServiceInvocationHandler;
 import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.IServiceInvocationInterceptor;
 import jadex.bridge.ServiceInvocationContext;
 import jadex.commons.Future;
@@ -66,69 +68,78 @@ public class CompositeServiceInvocationInterceptor implements IServiceInvocation
 //		System.out.println("Invoked: "+method.getName());
 	
 		// todo: schedluleStep?! -> createResultListener
-		ea.getChildren(componenttype).addResultListener(new DefaultResultListener()
+		
+		ea.scheduleStep(new IComponentStep()
 		{
-			public void resultAvailable(Object source, Object result)
+			public Object execute(final IInternalAccess ia)
 			{
-				final Collection res = (Collection)result;
-				
-				SServiceProvider.getService(ea.getServiceProvider(), IComponentManagementService.class)
-					.addResultListener(new DelegationResultListener(fut)
+				ea.getChildren(componenttype).addResultListener(ia.createResultListener(new DefaultResultListener()
 				{
-					public void customResultAvailable(Object source, Object result)
+					public void resultAvailable(Object source, Object result)
 					{
-						final IComponentManagementService cms = (IComponentManagementService)result;
-				
-						if(res!=null && res.size()>0)
+						final Collection res = (Collection)result;
+						
+						SServiceProvider.getService(ea.getServiceProvider(), IComponentManagementService.class)
+							.addResultListener(ia.createResultListener(new DelegationResultListener(fut)
 						{
-							final IComponentIdentifier cid = (IComponentIdentifier)res.iterator().next();
-							invokeServiceMethod(cms, cid, sic, fut);
-						}
-						else
-						{
-							final IResultListener lis = new DelegationResultListener(fut)
+							public void customResultAvailable(Object source, Object result)
 							{
-								public void customResultAvailable(Object source, Object result)
+								final IComponentManagementService cms = (IComponentManagementService)result;
+						
+								if(res!=null && res.size()>0)
 								{
-									IComponentIdentifier cid = (IComponentIdentifier)result;
-									invokeServiceMethod(cms, cid, sic, fut);
+									final IComponentIdentifier cid = (IComponentIdentifier)res.iterator().next();
+									invokeServiceMethod(ia, cms, cid, sic, fut);
+								}
+								else
+								{
+									final IResultListener lis = ia.createResultListener(new DelegationResultListener(fut)
+									{
+										public void customResultAvailable(Object source, Object result)
+										{
+											IComponentIdentifier cid = (IComponentIdentifier)result;
+											invokeServiceMethod(ia, cms, cid, sic, fut);
+											
+//											synchronized(ServiceInvocationHandler.this)
+//											{
+//												creating = null;
+//											}
+										}
+									});
 									
+//									boolean addlis = false;
 //									synchronized(ServiceInvocationHandler.this)
 //									{
-//										creating = null;
+//										if(creating!=null)
+//										{
+//											addlis = true;
+//										}
+//									}
+							
+//									if(addlis)
+//									{
+//										creating.addResultListener(lis);
+//									}
+//									else
+//									{
+										ea.getFileName(componenttype).addResultListener(ia.createResultListener(new DelegationResultListener(fut)
+										{
+											public void customResultAvailable(Object source, Object result)
+											{
+												String filename = (String)result;
+												
+												cms.createComponent(null, filename, new CreationInfo(
+													ea.getComponentIdentifier()), null).addResultListener(lis);
+											}
+										}));
 //									}
 								}
-							};
-							
-//							boolean addlis = false;
-//							synchronized(ServiceInvocationHandler.this)
-//							{
-//								if(creating!=null)
-//								{
-//									addlis = true;
-//								}
-//							}
-					
-//							if(addlis)
-//							{
-//								creating.addResultListener(lis);
-//							}
-//							else
-//							{
-								ea.getFileName(componenttype).addResultListener(new DelegationResultListener(fut)
-								{
-									public void customResultAvailable(Object source, Object result)
-									{
-										String filename = (String)result;
-										
-										cms.createComponent(null, filename, new CreationInfo(
-											ea.getComponentIdentifier()), null).addResultListener(lis);
-									}
-								});
-//							}
-						}
+							}
+						}));
 					}
-				});
+				}));
+				
+				return null;
 			}
 		});
 		
@@ -138,10 +149,10 @@ public class CompositeServiceInvocationInterceptor implements IServiceInvocation
 	/**
 	 *  Invoke the service method.
 	 */
-	protected void invokeServiceMethod(final IComponentManagementService cms, final IComponentIdentifier cid,
+	protected void invokeServiceMethod(final IInternalAccess ia, final IComponentManagementService cms, final IComponentIdentifier cid,
 		final ServiceInvocationContext sic, final Future ret)
 	{
-		cms.getExternalAccess(cid).addResultListener(new DelegationResultListener(ret)
+		cms.getExternalAccess(cid).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object source, Object result)
 			{
@@ -149,7 +160,7 @@ public class CompositeServiceInvocationInterceptor implements IServiceInvocation
 
 				IExternalAccess cea = (IExternalAccess)result;
 				SServiceProvider.getService(cea.getServiceProvider(), handler.getServiceIdentifier().getServiceType())
-					.addResultListener(new DelegationResultListener(ret)
+					.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object source, Object result)
 					{
@@ -160,7 +171,7 @@ public class CompositeServiceInvocationInterceptor implements IServiceInvocation
 								Object res = sic.getMethod().invoke(result, sic.getArguments());
 								if(res instanceof IFuture)
 								{
-									((IFuture)res).addResultListener(new DelegationResultListener(ret));
+									((IFuture)res).addResultListener(ia.createResultListener(new DelegationResultListener(ret)));
 								}
 								else
 								{
@@ -173,9 +184,9 @@ public class CompositeServiceInvocationInterceptor implements IServiceInvocation
 							}
 						}
 					}
-				});
+				}));
 			}
-		});
+		}));
 	}
 	
 	/**
@@ -204,80 +215,79 @@ public class CompositeServiceInvocationInterceptor implements IServiceInvocation
 		MultiCollection ret = new MultiCollection();
 		try
 		{
-			ret.put(IInternalService.class.getMethod("getServiceIdentifier", new Class[0]), new IResultCommand()
+			ret.put(IInternalService.class.getMethod("getServiceIdentifier", new Class[0]), new IServiceInvocationInterceptor()
 			{
-				public Object execute(Object args)
+				public void execute(ServiceInvocationContext context)
 				{
-					Object proxy = ((ServiceInvocationContext)args).getProxy();
+					Object proxy = context.getProxy();
 					BasicServiceInvocationHandler handler = (BasicServiceInvocationHandler)Proxy.getInvocationHandler(proxy);
-					return handler.getServiceIdentifier();
+					context.setResult(handler.getServiceIdentifier());
 				}
 			});
 			
 			// todo: implement methods?!
-			ret.put(IInternalService.class.getMethod("getPropertyMap", new Class[0]), new IResultCommand()
+			ret.put(IInternalService.class.getMethod("getPropertyMap", new Class[0]), new IServiceInvocationInterceptor()
 			{
-				public Object execute(Object args)
+				public void execute(ServiceInvocationContext context)
 				{
-					return null;
 				}
 			});
-			ret.put(IInternalService.class.getMethod("signalStarted", new Class[0]), new IResultCommand()
+			ret.put(IInternalService.class.getMethod("signalStarted", new Class[0]), new IServiceInvocationInterceptor()
 			{
-				public Object execute(Object args)
+				public void execute(ServiceInvocationContext context)
 				{
-					return new Future(null);
+					context.setResult(new Future(null));
 				}
 			});
-			ret.put(IInternalService.class.getMethod("startService", new Class[0]), new IResultCommand()
+			ret.put(IInternalService.class.getMethod("startService", new Class[0]), new IServiceInvocationInterceptor()
 			{
-				public Object execute(Object args)
+				public void execute(ServiceInvocationContext context)
 				{
-					return new Future(null);
+					context.setResult(new Future(null));
 				}
 			});
-			ret.put(IInternalService.class.getMethod("shutdownService", new Class[0]), new IResultCommand()
+			ret.put(IInternalService.class.getMethod("shutdownService", new Class[0]), new IServiceInvocationInterceptor()
 			{
-				public Object execute(Object args)
+				public void execute(ServiceInvocationContext context)
 				{
-					return new Future(null);
+					context.setResult(new Future(null));
 				}
 			});
-			ret.put(IInternalService.class.getMethod("isValid", new Class[0]), new IResultCommand()
+			ret.put(IInternalService.class.getMethod("isValid", new Class[0]), new IServiceInvocationInterceptor()
 			{
-				public Object execute(Object args)
+				public void execute(ServiceInvocationContext context)
 				{
-					return true;
+					context.setResult(true);
 				}
 			});
 			
-			ret.put(Object.class.getMethod("toString", new Class[0]), new IResultCommand()
+			ret.put(Object.class.getMethod("toString", new Class[0]), new IServiceInvocationInterceptor()
 			{
-				public Object execute(Object args)
+				public void execute(ServiceInvocationContext context)
 				{
-					Object proxy = ((ServiceInvocationContext)args).getProxy();
+					Object proxy = context.getProxy();
 					InvocationHandler handler = (InvocationHandler)Proxy.getInvocationHandler(proxy);
-					return handler.toString();
+					context.setResult(handler.toString());
 				}
 			});
-			ret.put(Object.class.getMethod("equals", new Class[]{Object.class}), new IResultCommand()
+			ret.put(Object.class.getMethod("equals", new Class[]{Object.class}), new IServiceInvocationInterceptor()
 			{
-				public Object execute(Object as)
+				public void execute(ServiceInvocationContext context)
 				{
-					Object proxy = ((ServiceInvocationContext)as).getProxy();
+					Object proxy = context.getProxy();
 					InvocationHandler handler = (InvocationHandler)Proxy.getInvocationHandler(proxy);
-					Object[] args = (Object[])((ServiceInvocationContext)as).getArguments();
-					return new Boolean(args[0]!=null && Proxy.isProxyClass(args[0].getClass())
-						&& handler.equals(Proxy.getInvocationHandler(args[0])));
+					Object[] args = (Object[])context.getArguments();
+					context.setResult(new Boolean(args[0]!=null && Proxy.isProxyClass(args[0].getClass())
+						&& handler.equals(Proxy.getInvocationHandler(args[0]))));
 				}
 			});
-			ret.put(Object.class.getMethod("hashCode", new Class[0]), new IResultCommand()
+			ret.put(Object.class.getMethod("hashCode", new Class[0]), new IServiceInvocationInterceptor()
 			{
-				public Object execute(Object args)
+				public void execute(ServiceInvocationContext context)
 				{
-					Object proxy = ((ServiceInvocationContext)args).getProxy();
+					Object proxy = context.getProxy();
 					InvocationHandler handler = Proxy.getInvocationHandler(proxy);
-					return new Integer(Proxy.getInvocationHandler(handler).hashCode());
+					context.setResult(new Integer(Proxy.getInvocationHandler(handler).hashCode()));
 				}
 			});
 			// todo: other object methods?!

@@ -8,6 +8,7 @@ import jadex.commons.collection.MultiCollection;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.clock.IClockService;
+import jadex.micro.IMicroExternalAccess;
 import jadex.micro.MicroAgent;
 import jadex.micro.MicroAgentMetaInfo;
 
@@ -50,7 +51,7 @@ public class HelplineAgent extends MicroAgent
 		{
 			public void run()
 			{
-				HelplinePanel.createHelplineGui(getExternalAccess());
+				HelplinePanel.createHelplineGui((IMicroExternalAccess)getExternalAccess());
 			}
 		});
 	}

@@ -14,10 +14,10 @@ import jadex.bdi.runtime.interpreter.MessageEventRules;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bdi.runtime.interpreter.PlanRules;
 import jadex.bridge.ComponentResultListener;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IModelInfo;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
-import jadex.commons.IResultCommand;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
@@ -927,7 +927,7 @@ public class ExternalAccessFlyweight extends EACapabilityFlyweight implements IB
 	 */
 	public IFuture getChildren()
 	{
-		return getInterpreter().getAgentAdapter().getChildren();
+		return getInterpreter().getAgentAdapter().getChildrenIdentifiers();
 	}
 	
 	/**
@@ -938,16 +938,16 @@ public class ExternalAccessFlyweight extends EACapabilityFlyweight implements IB
 		return killAgent();
 	}
 	
-	/**
-	 *  Create a result listener that will be 
-	 *  executed on the component thread.
-	 *  @param listener The result listener.
-	 *  @return A result listener that is called on component thread.
-	 */
-	public IResultListener createResultListener(IResultListener listener)
-	{
-		return new ComponentResultListener(listener, adapter);
-	}
+//	/**
+//	 *  Create a result listener that will be 
+//	 *  executed on the component thread.
+//	 *  @param listener The result listener.
+//	 *  @return A result listener that is called on component thread.
+//	 */
+//	public IResultListener createResultListener(IResultListener listener)
+//	{
+//		return new ComponentResultListener(listener, adapter);
+//	}
 	
 	/**
 	 *  Get external access of subcapability.
@@ -1060,8 +1060,8 @@ public class ExternalAccessFlyweight extends EACapabilityFlyweight implements IB
 	 *  @param step	Code to be executed as a step of the agent.
 	 *  @return The result of the step.
 	 */
-	public IFuture scheduleResultStep(final IResultCommand com)
+	public IFuture scheduleStep(final IComponentStep step)
 	{
-		return getInterpreter().scheduleResultStep(com);
+		return getInterpreter().scheduleStep(step, getHandle());
 	}
 }

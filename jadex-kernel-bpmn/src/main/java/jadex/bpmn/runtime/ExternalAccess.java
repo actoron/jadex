@@ -3,11 +3,11 @@ package jadex.bpmn.runtime;
 import jadex.bridge.ComponentResultListener;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IModelInfo;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
-import jadex.commons.IResultCommand;
 import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.service.IServiceProvider;
@@ -64,7 +64,7 @@ public class ExternalAccess implements IExternalAccess
 	 */
 	public IComponentIdentifier getParent()
 	{
-		return interpreter.getParent();
+		return interpreter.getParent().getComponentIdentifier();
 	}
 	
 	/**
@@ -73,7 +73,7 @@ public class ExternalAccess implements IExternalAccess
 	 */
 	public IFuture getChildren()
 	{
-		return adapter.getChildren();
+		return adapter.getChildrenIdentifiers();
 	}
 
 	/**
@@ -135,7 +135,7 @@ public class ExternalAccess implements IExternalAccess
 	 *  @param step	Code to be executed as a step of the agent.
 	 *  @return The result of the step.
 	 */
-	public IFuture scheduleResultStep(final IResultCommand com)
+	public IFuture scheduleStep(final IComponentStep step)
 	{
 		final Future ret = new Future();
 		
@@ -147,7 +147,7 @@ public class ExternalAccess implements IExternalAccess
 				{
 					public void run() 
 					{
-						interpreter.scheduleResultStep(com).addResultListener(new DelegationResultListener(ret));
+						interpreter.scheduleStep(step).addResultListener(new DelegationResultListener(ret));
 					}
 				});
 			}
@@ -158,7 +158,7 @@ public class ExternalAccess implements IExternalAccess
 		}
 		else
 		{
-			interpreter.scheduleResultStep(com).addResultListener(new DelegationResultListener(ret));
+			interpreter.scheduleStep(step).addResultListener(new DelegationResultListener(ret));
 		}
 		
 		return ret;

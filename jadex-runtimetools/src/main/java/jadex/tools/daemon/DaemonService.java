@@ -1,7 +1,9 @@
 package jadex.tools.daemon;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
 import jadex.commons.Future;
 import jadex.commons.ICommand;
 import jadex.commons.IFuture;
@@ -40,12 +42,13 @@ public class DaemonService extends BasicService implements IDaemonService
 	{
 		final Future ret = new Future();
 		
-		agent.scheduleStep(new ICommand()
+		agent.scheduleStep(new IComponentStep()
 		{
-			public void execute(Object args)
+			public Object execute(IInternalAccess ia)
 			{
-				DaemonAgent agent = (DaemonAgent)args;
+				DaemonAgent agent = (DaemonAgent)ia;
 				agent.startPlatform(opt).addResultListener(new DelegationResultListener(ret));
+				return null;
 			}
 		});
 		
@@ -60,12 +63,13 @@ public class DaemonService extends BasicService implements IDaemonService
 	{
 		final Future ret = new Future();
 		
-		agent.scheduleStep(new ICommand()
+		agent.scheduleStep(new IComponentStep()
 		{
-			public void execute(Object args)
+			public Object execute(IInternalAccess ia)
 			{
-				DaemonAgent agent = (DaemonAgent)args;
+				DaemonAgent agent = (DaemonAgent)ia;
 				agent.shutdownPlatform(cid).addResultListener(new DelegationResultListener(ret));
+				return null;
 			}
 		});
 		
@@ -80,12 +84,13 @@ public class DaemonService extends BasicService implements IDaemonService
 	{
 		final Future ret = new Future();
 		
-		agent.scheduleStep(new ICommand()
+		agent.scheduleStep(new IComponentStep()
 		{
-			public void execute(Object args)
+			public Object execute(IInternalAccess ia)
 			{
-				DaemonAgent agent = (DaemonAgent)args;
+				DaemonAgent agent = (DaemonAgent)ia;
 				agent.getPlatforms().addResultListener(new DelegationResultListener(ret));
+				return null;
 			}
 		});
 		
@@ -98,12 +103,13 @@ public class DaemonService extends BasicService implements IDaemonService
 	 */
 	public void addChangeListener(final IRemoteChangeListener listener)
 	{
-		agent.scheduleStep(new ICommand()
+		agent.scheduleStep(new IComponentStep()
 		{
-			public void execute(Object args)
+			public Object execute(IInternalAccess ia)
 			{
-				DaemonAgent agent = (DaemonAgent)args;
+				DaemonAgent agent = (DaemonAgent)ia;
 				agent.addChangeListener(listener);
+				return null;
 			}
 		});
 	}
@@ -114,12 +120,13 @@ public class DaemonService extends BasicService implements IDaemonService
 	 */
 	public void removeChangeListener(final IRemoteChangeListener listener)
 	{
-		agent.scheduleStep(new ICommand()
+		agent.scheduleStep(new IComponentStep()
 		{
-			public void execute(Object args)
+			public Object execute(IInternalAccess ia)
 			{
-				DaemonAgent agent = (DaemonAgent)args;
+				DaemonAgent agent = (DaemonAgent)ia;
 				agent.removeChangeListener(listener);
+				return null;
 			}
 		});
 	}

@@ -149,7 +149,13 @@ class ComponentAdapter implements IComponentAdapter
 		return null;
 	}
 	
-	public IFuture getChildren()
+	public IFuture getChildrenAccesses()
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	public IFuture getChildrenIdentifiers()
 	{
 		// TODO Auto-generated method stub
 		return null;

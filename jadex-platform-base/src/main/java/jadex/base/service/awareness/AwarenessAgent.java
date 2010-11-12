@@ -5,6 +5,8 @@ import jadex.bridge.CreationInfo;
 import jadex.bridge.IArgument;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IInternalAccess;
 import jadex.commons.Future;
 import jadex.commons.ICommand;
 import jadex.commons.IFuture;
@@ -409,9 +411,9 @@ public class AwarenessAgent extends MicroAgent
 	 */
 	protected void startRemoveBehaviour()
 	{
-		scheduleStep(new ICommand()
+		scheduleStep(new IComponentStep()
 		{
-			public void execute(Object args)
+			public Object execute(IInternalAccess ia)
 			{
 				List todel = autodelete? new ArrayList(): null;
 				synchronized(AwarenessAgent.this)
@@ -455,6 +457,7 @@ public class AwarenessAgent extends MicroAgent
 				}
 				
 				waitFor(5000, this);
+				return null;
 			}
 		});
 	}
@@ -500,9 +503,9 @@ public class AwarenessAgent extends MicroAgent
 		final String sendid = SUtil.createUniqueId(getAgentName());
 		this.sendid = sendid;	
 		
-		scheduleStep(new ICommand()
+		scheduleStep(new IComponentStep()
 		{
-			public void execute(Object args)
+			public Object execute(IInternalAccess ia)
 			{
 				if(sendid.equals(getSendId()))
 				{
@@ -511,6 +514,7 @@ public class AwarenessAgent extends MicroAgent
 					if(delay>0)
 						waitFor(delay, this);
 				}
+				return null;
 			}
 		});
 	}

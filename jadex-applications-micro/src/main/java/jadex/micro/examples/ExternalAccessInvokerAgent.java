@@ -3,8 +3,9 @@ package jadex.micro.examples;
 import jadex.base.gui.ComponentSelectorDialog;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
-import jadex.commons.IResultCommand;
+import jadex.bridge.IInternalAccess;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.service.SServiceProvider;
 import jadex.micro.MicroAgent;
@@ -42,11 +43,11 @@ public class ExternalAccessInvokerAgent extends MicroAgent
 								public void resultAvailable(Object source, Object result)
 								{
 									IExternalAccess ea = (IExternalAccess)result;
-									ea.scheduleResultStep(new IResultCommand()
+									ea.scheduleStep(new IComponentStep()
 									{
-										public Object execute(Object args)
+										public Object execute(IInternalAccess ia)
 										{
-											System.out.println("Executing step on component: "+args);
+											System.out.println("Executing step on component: "+ia);
 											return null;
 										}
 									});

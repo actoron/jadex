@@ -2,6 +2,7 @@ package jadex.micro.examples.chat;
 
 import jadex.bridge.IArgument;
 import jadex.commons.SUtil;
+import jadex.micro.IMicroExternalAccess;
 import jadex.micro.MicroAgent;
 import jadex.micro.MicroAgentMetaInfo;
 
@@ -30,7 +31,7 @@ public class ChatAgent extends MicroAgent
 		{
 			public void run()
 			{
-				ChatPanel.createGui(getExternalAccess());
+				ChatPanel.createGui((IMicroExternalAccess)getExternalAccess());
 			}
 		});
 	}

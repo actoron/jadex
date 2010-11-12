@@ -9,7 +9,9 @@ import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IComponentManagementService;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.IModelInfo;
 import jadex.commons.ChangeEvent;
@@ -131,9 +133,9 @@ public class MicroAgentInterpreter implements IComponentInstance
 			microagent.init(MicroAgentInterpreter.this);
 			
 			// Schedule initial step.
-			addStep(new Object[]{new ICommand()
+			addStep(new Object[]{new IComponentStep()
 			{
-				public void execute(Object agent)
+				public Object execute(IInternalAccess ia)
 				{
 					microagent.agentCreated();
 					getServiceContainer().start().addResultListener(createResultListener(new IResultListener()
@@ -151,17 +153,18 @@ public class MicroAgentInterpreter implements IComponentInstance
 //								{
 //								}
 //							});
-							addStep(new Object[]{new ICommand()
+							addStep(new Object[]{new IComponentStep()
 							{
-								public void execute(Object agent)
+								public Object execute(IInternalAccess ia)
 								{
 									microagent.executeBody();
+									return null;
 								}
 								public String toString()
 								{
 									return "microagent.executeBody()_#"+this.hashCode();
 								}
-							}, null});
+							}, new Future()});
 						}
 						
 						public void exceptionOccurred(Object source, Exception exception)
@@ -169,12 +172,13 @@ public class MicroAgentInterpreter implements IComponentInstance
 							inited.setException(exception);
 						}
 					}));
+					return null;
 				}
 				public String toString()
 				{
 					return "microagent.init()_#"+this.hashCode();
 				}
-			}, null});
+			}, new Future()});
 		}
 		catch(Exception e)
 		{
@@ -208,31 +212,31 @@ public class MicroAgentInterpreter implements IComponentInstance
 				
 				// Correct to execute them in try catch?!
 				
-				if(step[0] instanceof ICommand)
-				{
-					if(future!=null)
-					{
-						try
-						{
-							((ICommand)step[0]).execute(microagent);
-							future.setResult(null);
-						}
-						catch(RuntimeException e)
-						{
-							future.setException(e);
-							throw e;
-						}
-					}
-					else
-					{
-						((ICommand)step[0]).execute(microagent);
-					}
-				}
-				else //if(step[0] instanceof IResultCommand)
-				{
+//				if(step[0] instanceof ICommand)
+//				{
+//					if(future!=null)
+//					{
+//						try
+//						{
+//							((ICommand)step[0]).execute(microagent);
+//							future.setResult(null);
+//						}
+//						catch(RuntimeException e)
+//						{
+//							future.setException(e);
+//							throw e;
+//						}
+//					}
+//					else
+//					{
+//						((ICommand)step[0]).execute(microagent);
+//					}
+//				}
+//				else //if(step[0] instanceof IResultCommand)
+//				{
 					try
 					{
-						Object res = ((IResultCommand)step[0]).execute(microagent);
+						Object res = ((IComponentStep)step[0]).execute(microagent);
 						if(res instanceof IFuture)
 						{
 							((IFuture)res).addResultListener(new DelegationResultListener(future));
@@ -247,7 +251,7 @@ public class MicroAgentInterpreter implements IComponentInstance
 						future.setException(e);
 						throw e;
 					}
-				}
+//				}
 				
 				addHistoryEntry(steptext);
 			}
@@ -275,11 +279,12 @@ public class MicroAgentInterpreter implements IComponentInstance
 	{
 //		System.out.println("msgrec: "+getAgentAdapter().getComponentIdentifier()+" "+message);
 //		IFuture ret = scheduleStep(new ICommand()
-		scheduleStep(new ICommand()
+		scheduleStep(new IComponentStep()
 		{
-			public void execute(Object agent)
+			public Object execute(IInternalAccess ia)
 			{
 				microagent.messageArrived(Collections.unmodifiableMap(message.getParameterMap()), message.getMessageType());
+				return null;
 			}
 			
 			public String toString()
@@ -482,38 +487,38 @@ public class MicroAgentInterpreter implements IComponentInstance
 			history	= null;
 	}
 	
-	/**
-	 *  Schedule a step of the agent.
-	 *  May safely be called from external threads.
-	 *  @param step	Code to be executed as a step of the agent.
-	 */
-	public IFuture scheduleStep(final ICommand step)
-	{
-		final Future ret = new Future();
-//		System.out.println("ss: "+getAgentAdapter().getComponentIdentifier()+" "+Thread.currentThread()+" "+step);
-		try
-		{
-			adapter.invokeLater(new Runnable()
-			{			
-				public void run()
-				{
-					addStep(new Object[]{step, ret});
-				}
-			});
-		}
-		catch(Exception e)
-		{
-			ret.setException(e);
-		}
-		return ret;
-	}
+//	/**
+//	 *  Schedule a step of the agent.
+//	 *  May safely be called from external threads.
+//	 *  @param step	Code to be executed as a step of the agent.
+//	 */
+//	public IFuture scheduleStep(final ICommand step)
+//	{
+//		final Future ret = new Future();
+////		System.out.println("ss: "+getAgentAdapter().getComponentIdentifier()+" "+Thread.currentThread()+" "+step);
+//		try
+//		{
+//			adapter.invokeLater(new Runnable()
+//			{			
+//				public void run()
+//				{
+//					addStep(new Object[]{step, ret});
+//				}
+//			});
+//		}
+//		catch(Exception e)
+//		{
+//			ret.setException(e);
+//		}
+//		return ret;
+//	}
 	
 	/**
 	 *  Schedule a step of the agent.
 	 *  May safely be called from external threads.
 	 *  @param step	Code to be executed as a step of the agent.
 	 */
-	public IFuture scheduleResultStep(final IResultCommand step)
+	public IFuture scheduleStep(final IComponentStep step)
 	{
 		final Future ret = new Future();
 //		System.out.println("ss: "+getAgentAdapter().getComponentIdentifier()+" "+Thread.currentThread()+" "+step);

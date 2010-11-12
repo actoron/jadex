@@ -14,10 +14,14 @@ import jadex.bdi.runtime.IPropertybase;
 import jadex.bdi.runtime.impl.eaflyweights.ExternalAccessFlyweight;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
+import jadex.bridge.ComponentResultListener;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.IModelInfo;
+import jadex.commons.IFuture;
+import jadex.commons.concurrent.IResultListener;
 import jadex.commons.service.IServiceProvider;
 import jadex.rules.state.IOAVState;
 
@@ -26,7 +30,7 @@ import java.util.logging.Logger;
 /**
  *  Flyweight for a capability.
  */
-public class CapabilityFlyweight extends ElementFlyweight implements ICapability
+public class CapabilityFlyweight extends ElementFlyweight implements ICapability, IInternalAccess
 {
 	//-------- attributes --------
 	
@@ -446,11 +450,12 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	/**
 	 *  Kill the agent.
 	 */
-	public void killAgent()
+	public IFuture killAgent()
 	{
+		IFuture ret = null;
 		if(getInterpreter().isExternalThread())
 		{
-			new AgentInvocation()
+			AgentInvocation invoc = new AgentInvocation()
 			{
 				public void run()
 				{
@@ -459,10 +464,11 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 						|| OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_INITING1.equals(cs)
 						|| OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_ALIVE.equals(cs))
 					{
-						getInterpreter().killAgent();
+						object = getInterpreter().killAgent();
 					}
 				}
 			};
+			ret = (IFuture)invoc.object;
 		}
 		else
 		{
@@ -473,10 +479,11 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 			{
 				//	System.out.println("set to terminating");
 				getInterpreter().startMonitorConsequences();
-				getInterpreter().killAgent();
+				ret = getInterpreter().killAgent();
 				getInterpreter().endMonitorConsequences();
 			}
 		}
+		return ret;
 	}
 
 	/**
@@ -530,6 +537,15 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	public IComponentAdapter	getAgentAdapter()
 	{
 		return adapter;
+	}
+	
+	/**
+	 *  Create a result listener that is executed on the
+	 *  component thread.
+	 */
+	public IResultListener createResultListener(IResultListener listener)
+	{
+		return new ComponentResultListener(listener, adapter);
 	}
 	
 //	/**
@@ -594,5 +610,61 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 			Object mscope = getState().getAttributeValue(getScope(), OAVBDIRuntimeModel.element_has_model);
 			return new MCapabilityFlyweight(getState(), mscope);
 		}
+	}
+	
+	/**
+	 *  Get the children (if any).
+	 *  @return The children.
+	 */
+	public IFuture getChildren()
+	{
+		if(getInterpreter().isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					object = getInterpreter().getAgentAdapter().getChildrenAccesses();
+				}
+			};
+			return (IFuture)invoc.object;
+		}
+		else
+		{
+			return getInterpreter().getAgentAdapter().getChildrenAccesses();
+		}
+	}
+	
+	/**
+	 *  Get the model of the component.
+	 *  @return	The model.
+	 */
+	public IModelInfo getModel()
+	{
+		// todo: return fitting capability model info.
+		
+		if(getInterpreter().isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					object = getInterpreter().getModel().getModelInfo();
+				}
+			};
+			return (IModelInfo)invoc.object;
+		}
+		else
+		{
+			return getInterpreter().getModel().getModelInfo();
+		}
+	}
+
+	/**
+	 *  Kill the component.
+	 */
+	public IFuture killComponent()
+	{
+		return killAgent();
 	}
 }

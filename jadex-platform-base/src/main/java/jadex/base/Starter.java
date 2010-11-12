@@ -13,6 +13,7 @@ import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
+import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.javaparser.SJavaParser;
 
@@ -78,7 +79,12 @@ public class Starter
 	 */
 	public static void main(String[] args)
 	{
-		createPlatform(args);
+		createPlatform(args).addResultListener(new DefaultResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+			}
+		});
 	}
 	
 	/**

@@ -4,6 +4,8 @@ import jadex.base.service.remote.ProxyAgent;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IInternalAccess;
 import jadex.commons.Future;
 import jadex.commons.ICommand;
 import jadex.commons.IFuture;
@@ -172,11 +174,11 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 			public void resultAvailable(Object source, Object result)
 			{
 				final IMicroExternalAccess exta = (IMicroExternalAccess)result;
-				exta.scheduleStep(new ICommand()
+				exta.scheduleStep(new IComponentStep()
 				{
-					public void execute(Object agent)
+					public Object execute(IInternalAccess ia)
 					{
-						ProxyAgent pa = (ProxyAgent)agent;
+						ProxyAgent pa = (ProxyAgent)ia;
 						pa.getVirtualChildren(cid, force).addResultListener(new SwingDefaultResultListener()
 						{
 							public void customResultAvailable(Object source, Object result)
@@ -207,14 +209,16 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 								ret.setExceptionIfUndone(exception);
 							}
 						});
+						
+						return null;
 					}
 				});
 				
-				exta.scheduleStep(new ICommand()
+				exta.scheduleStep(new IComponentStep()
 				{
-					public void execute(Object agent)
+					public Object execute(IInternalAccess ia)
 					{
-						ProxyAgent pa = (ProxyAgent)agent;
+						ProxyAgent pa = (ProxyAgent)ia;
 						pa.getRemoteServices(cid).addResultListener(new SwingDefaultResultListener()
 						{
 							public void customResultAvailable(Object source, Object result)
@@ -265,6 +269,8 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 								ret.setExceptionIfUndone(exception);
 							}
 						});
+						
+						return null;
 					}
 				});
 			}
@@ -293,13 +299,14 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 				public void resultAvailable(Object source, Object result)
 				{
 					final IMicroExternalAccess exta = (IMicroExternalAccess)result;
-					exta.scheduleStep(new ICommand()
+					exta.scheduleStep(new IComponentStep()
 					{
-						public void execute(Object agent)
+						public Object execute(IInternalAccess ia)
 						{
-							ProxyAgent pa = (ProxyAgent)agent;
+							ProxyAgent pa = (ProxyAgent)ia;
 							cid = pa.getRemotePlatformIdentifier();
 							ret.setResult(cid);
+							return null;
 						}
 					});
 				}

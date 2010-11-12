@@ -52,7 +52,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 		{
 			for(Iterator it=icps.iterator(); it.hasNext(); )
 			{
-				((IServiceInvocationInterceptor)it.next()).equals(sic);
+				((IServiceInvocationInterceptor)it.next()).execute(sic);
 			}
 		}
 		else

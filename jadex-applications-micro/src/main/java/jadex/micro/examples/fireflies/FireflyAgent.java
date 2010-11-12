@@ -8,6 +8,8 @@ import jadex.application.space.envsupport.environment.space2d.Space2D;
 import jadex.application.space.envsupport.math.IVector2;
 import jadex.application.space.envsupport.math.Vector1Int;
 import jadex.application.space.envsupport.math.Vector2Double;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IInternalAccess;
 import jadex.commons.ICommand;
 import jadex.commons.IFilter;
 import jadex.micro.MicroAgent;
@@ -33,9 +35,9 @@ public class FireflyAgent extends MicroAgent
 	{
 		IApplicationExternalAccess	app	= (IApplicationExternalAccess)getParent();
 		final ContinuousSpace2D space = (ContinuousSpace2D)app.getSpace("mygc2dspace");
-		ICommand com = new ICommand()
+		IComponentStep step = new IComponentStep()
 		{
-			public void execute(Object args)
+			public Object execute(IInternalAccess ia)
 			{
 				ISpaceObject avatar = space.getAvatar(getComponentIdentifier());
 				IVector2 mypos = (IVector2)avatar.getProperty(Space2D.PROPERTY_POSITION);
@@ -107,6 +109,7 @@ public class FireflyAgent extends MicroAgent
 				space.performSpaceAction("move", params, null);
 				
 				waitForTick(this);
+				return null;
 			}
 			
 			public String toString()
@@ -115,7 +118,7 @@ public class FireflyAgent extends MicroAgent
 			}
 		};
 		
-		waitForTick(com);
+		waitForTick(step);
 	}
 	
 	//-------- static methods --------

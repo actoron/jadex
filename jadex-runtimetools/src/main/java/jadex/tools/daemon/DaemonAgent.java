@@ -13,6 +13,7 @@ import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.library.ILibraryService;
+import jadex.micro.IMicroExternalAccess;
 import jadex.micro.MicroAgent;
 import jadex.micro.MicroAgentMetaInfo;
 
@@ -55,7 +56,7 @@ public class DaemonAgent extends MicroAgent
 		{
 			public void run()
 			{
-				DaemonPanel.createGui(getExternalAccess());
+				DaemonPanel.createGui((IMicroExternalAccess)getExternalAccess());
 			}
 		});
 	}

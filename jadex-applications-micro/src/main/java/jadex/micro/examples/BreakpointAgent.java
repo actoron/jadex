@@ -1,6 +1,7 @@
 package jadex.micro.examples;
 
-import jadex.commons.ICommand;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IInternalAccess;
 import jadex.micro.MicroAgent;
 import jadex.micro.MicroAgentMetaInfo;
 
@@ -22,33 +23,39 @@ public class BreakpointAgent extends MicroAgent
 	{
 		step	= "hop";	// first step
 		
-		waitFor(1000, new ICommand()
+		waitFor(1000, new IComponentStep()
 		{			
-			public void execute(Object args)
+			public Object execute(IInternalAccess ia)
 			{
 				System.out.println("Current step: "+step);
 				
 				step	= "step";	// second step
 
-				waitFor(1000, new ICommand()
+				waitFor(1000, new IComponentStep()
 				{			
-					public void execute(Object args)
+					public Object execute(IInternalAccess ia)
 					{
 						System.out.println("Current step: "+step);
 
 						step	= "jump";	// third step
 						
-						waitFor(1000, new ICommand()
+						waitFor(1000, new IComponentStep()
 						{			
-							public void execute(Object args)
+							public Object execute(IInternalAccess ia)
 							{
 								System.out.println("Current step: "+step);
 
 								killAgent();
+								
+								return null;
 							}
 						});
+						
+						return null;
 					}
 				});
+				
+				return null;
 			}
 		});
 	}

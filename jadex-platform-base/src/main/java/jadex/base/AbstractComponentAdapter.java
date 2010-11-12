@@ -16,6 +16,7 @@ import jadex.bridge.MessageType;
 import jadex.commons.Future;
 import jadex.commons.ICommand;
 import jadex.commons.IFuture;
+import jadex.commons.concurrent.CollectionResultListener;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IExecutable;
@@ -327,6 +328,64 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 			public void exceptionOccurred(Object source, Exception exception)
 			{
 				ret.setException(exception);
+			}
+		});
+		
+		return ret;
+	}
+	
+	/**
+	 *  Get the children (if any).
+	 *  @return The children.
+	 */
+	public IFuture getChildrenIdentifiers()
+	{
+		final Future ret = new Future();
+		
+		getCMS().addResultListener(new IResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				final IComponentManagementService cms = (IComponentManagementService)result;
+				cms.getChildren(getComponentIdentifier()).addResultListener(new DelegationResultListener(ret));
+			}
+			
+			public void exceptionOccurred(Object source, Exception exception)
+			{
+				ret.setException(exception);
+			}
+		});
+		
+		return ret;
+	}
+	
+	/**
+	 *  Get the children (if any).
+	 *  @return The children.
+	 */
+	public IFuture getChildrenAccesses()
+	{
+		final Future ret = new Future();
+		
+		SServiceProvider.getServiceUpwards(getServiceContainer(), IComponentManagementService.class)
+			.addResultListener(new DefaultResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				final IComponentManagementService cms = (IComponentManagementService)result;
+				
+				cms.getChildren(getComponentIdentifier()).addResultListener(new DefaultResultListener()
+				{
+					public void resultAvailable(Object source, Object result)
+					{
+						IComponentIdentifier[] childs = (IComponentIdentifier[])result;
+						IResultListener	crl	= new CollectionResultListener(childs.length, true, new DelegationResultListener(ret));
+						for(int i=0; !ret.isDone() && i<childs.length; i++)
+						{
+							cms.getExternalAccess(childs[i]).addResultListener(crl);
+						}
+					}
+				});
 			}
 		});
 		
@@ -687,7 +746,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	 */
 	protected void fatalError(final Exception e)
 	{
-//		e.printStackTrace();
+		e.printStackTrace();
 		
 		// Fatal error!
 		fatalerror	= true;

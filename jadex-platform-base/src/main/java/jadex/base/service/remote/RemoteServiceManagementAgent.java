@@ -8,6 +8,7 @@ import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.clock.IClockService;
 import jadex.commons.service.library.ILibraryService;
+import jadex.micro.IMicroExternalAccess;
 import jadex.micro.MicroAgent;
 import jadex.xml.bean.JavaReader;
 import jadex.xml.bean.JavaWriter;
@@ -40,7 +41,7 @@ public class RemoteServiceManagementAgent extends MicroAgent
 		{
 			public void resultAvailable(Object source, Object result)
 			{
-				rms = new RemoteServiceManagementService(getExternalAccess(), (IClockService)result);
+				rms = new RemoteServiceManagementService((IMicroExternalAccess)getExternalAccess(), (IClockService)result);
 				addService(rms);
 			}
 		}));
@@ -109,7 +110,7 @@ public class RemoteServiceManagementAgent extends MicroAgent
 					if(content instanceof IRemoteCommand)
 					{
 						final IRemoteCommand com = (IRemoteCommand)content;
-						com.execute(getExternalAccess(), rms).addResultListener(createResultListener(new DefaultResultListener()
+						com.execute((IMicroExternalAccess)getExternalAccess(), rms).addResultListener(createResultListener(new DefaultResultListener()
 						{
 							public void resultAvailable(Object source, Object result)
 							{

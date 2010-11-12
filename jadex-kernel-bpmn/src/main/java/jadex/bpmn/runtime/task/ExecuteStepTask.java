@@ -2,9 +2,9 @@ package jadex.bpmn.runtime.task;
 
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ITaskContext;
+import jadex.bridge.IComponentStep;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
-import jadex.commons.IResultCommand;
 import jadex.commons.concurrent.DelegationResultListener;
 
 /**
@@ -21,7 +21,7 @@ public class ExecuteStepTask extends AbstractTask
 		Future ret = (Future)step[1];
 		try
 		{
-			Object res = ((IResultCommand)step[0]).execute(instance); 
+			Object res = ((IComponentStep)step[0]).execute(instance); 
 			if(res instanceof IFuture)
 			{
 				((IFuture)res).addResultListener(new DelegationResultListener(((Future)step[1])));
