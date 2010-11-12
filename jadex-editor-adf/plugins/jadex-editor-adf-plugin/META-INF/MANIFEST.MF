@@ -1,8 +1,8 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Jadex ADF Plugin
-Bundle-SymbolicName: jadex-editor-adf; singleton:=true
-Bundle-Version: 1.0.0.SNAPSHOT
+Bundle-Name: Jadex ADF Checker Plugin
+Bundle-SymbolicName: jadex.editor.adf.plugin;singleton:=true
+Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: jadex.editor.adf.Activator
 Bundle-Vendor: jadex.sourceforge.net
 Require-Bundle: org.eclipse.ui,

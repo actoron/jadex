@@ -28,7 +28,7 @@ public class ADFChecker extends IncrementalProjectBuilder
 	//-------- constants --------
 	
 	/** The builder id used by the Jadex nature to add/remove the builder to/from projects. */
-	public static final String	BUILDER_ID	= "jadex-editor-adf.adfChecker";
+	public static final String	BUILDER_ID	= "jadex.editor.adf.plugin.adfChecker";
 
 	/** The marker type determines how ADF errors appear in the file and the problems view. */
 	protected static final String	MARKER_TYPE	= IMarker.PROBLEM;

@@ -15,7 +15,7 @@ public class JadexNature implements IProjectNature
 	//-------- constants --------
 	
 	/** ID of this project nature. */
-	public static final String	NATURE_ID	= "jadex-editor-adf.jadexNature";
+	public static final String	NATURE_ID	= "jadex.editor.adf.plugin.jadexNature";
 	
 	//-------- attributes --------
 	

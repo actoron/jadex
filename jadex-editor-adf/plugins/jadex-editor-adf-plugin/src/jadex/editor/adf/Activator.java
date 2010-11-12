@@ -11,8 +11,9 @@ import org.osgi.framework.BundleContext;
 public class Activator extends AbstractUIPlugin
 {
 	//-------- constants --------
+	
 	/** The plug-in ID. */
-	public static final String	PLUGIN_ID	= "jadex-editor-adf";	//$NON-NLS-1$
+	public static final String	PLUGIN_ID	= "jadex.editor.adf.plugin";	//$NON-NLS-1$
 
 	/** The shared instance. */
 	protected static Activator	plugin;

@@ -23,7 +23,7 @@
          </run>
       </runtime>
       <builder
-            id="jadex-editor-adf.adfChecker">
+            id="jadex.editor.adf.plugin.adfChecker">
       </builder>
    </extension>
    <extension
@@ -32,7 +32,7 @@
             adaptable="true"
             objectClass="org.eclipse.core.resources.IProject"
             nameFilter="*"
-            id="jadex-editor-adf.contribution1">
+            id="jadex.editor.adf.plugin.contribution1">
          <menu
             id="net.sourceforge.jadexMenu" 
             path="additions" 
@@ -45,7 +45,7 @@
                class="jadex.editor.adf.checker.ToggleNatureAction"
                menubarPath="net.sourceforge.jadexMenu/group1"
                enablesFor="+"
-               id="jadex-editor-adf.addRemoveNatureAction"
+               id="jadex.editor.adf.plugin.addRemoveNatureAction"
                icon="adf_check.png"
                style="toggle">
          </action>
