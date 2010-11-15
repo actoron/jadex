@@ -4,8 +4,13 @@ import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.GoalFailureException;
 import jadex.bdi.runtime.IAgentListener;
 import jadex.bdi.runtime.IBDIExternalAccess;
+import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bdi.runtime.IEAGoal;
+import jadex.bdi.runtime.IGoal;
+import jadex.bdi.runtime.IGoalListener;
 import jadex.bridge.IComponentManagementService;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IInternalAccess;
 import jadex.commons.SGUI;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
@@ -30,7 +35,7 @@ public class EnvironmentGui	extends JFrame
 	public EnvironmentGui(final IBDIExternalAccess agent)
 	{
 		super("Garbage Collector Environment");
-
+		
 		agent.getBeliefbase().getBeliefFact("env").addResultListener(new SwingDefaultResultListener(this)
 		{
 			public void customResultAvailable(Object source, Object result)
@@ -61,6 +66,26 @@ public class EnvironmentGui	extends JFrame
 							if(wobs[i].getType().equals(Environment.BURNER)
 								|| wobs[i].getType().equals(Environment.COLLECTOR))
 							{
+								agent.scheduleStep(new IComponentStep()
+								{
+									public Object execute(IInternalAccess ia)
+									{
+										IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+										IGoal kill = bia.getGoalbase().createGoal("cms_destroy_component");
+										kill.addGoalListener(new IGoalListener()
+										{
+											public void goalFinished(AgentEvent ae)
+											{
+											}
+											
+											public void goalAdded(AgentEvent ae)
+											{
+											}
+										});
+										return null;
+									}
+								});
+								
 								agent.createGoal("cms_destroy_component").addResultListener(new DefaultResultListener()
 								{
 									public void resultAvailable(Object source, Object result)

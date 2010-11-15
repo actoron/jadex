@@ -2,9 +2,12 @@ package jadex.bdi.examples.shop;
 
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IBDIExternalAccess;
+import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bdi.runtime.IBeliefListener;
 import jadex.bdi.runtime.IBeliefSetListener;
 import jadex.bdi.runtime.IEAGoal;
+import jadex.bdi.runtime.IGoal;
+import jadex.bdi.runtime.IGoalListener;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.concurrent.SwingDefaultResultListener;
@@ -255,30 +258,45 @@ public class CustomerPanel extends JPanel
 					{
 						public Object execute(IInternalAccess ia)
 						{
-							// TODO Auto-generated method stub
-							return null;
-						}
-					});
-//					System.out.println("buying: "+name+" at: "+shop.getName());
-					agent.createGoal("buy").addResultListener(new SwingDefaultResultListener(CustomerPanel.this)
-					{
-						public void customResultAvailable(Object source, Object result)
-						{
-							IEAGoal buy = (IEAGoal)result;
-							buy.setParameterValue("name", name);
-							buy.setParameterValue("shop", shop);
-							buy.setParameterValue("price", price);
-							agent.dispatchTopLevelGoalAndWait(buy).addResultListener(new SwingDefaultResultListener(CustomerPanel.this)
+							IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+							IGoal buy = bia.getGoalbase().createGoal("buy");
+							buy.getParameter("name").setValue(name);
+							buy.getParameter("shop").setValue(shop);
+							buy.getParameter("price").setValue(price);
+							buy.addGoalListener(new IGoalListener()
 							{
-								public void customResultAvailable(Object source, Object result)
+								public void goalFinished(AgentEvent ae)
 								{
 									// Update number of available items
 									refresh(shop);
 								}
+								
+								public void goalAdded(AgentEvent ae)
+								{
+								}
 							});
+							return null;
 						}
 					});
-					
+//					System.out.println("buying: "+name+" at: "+shop.getName());
+//					agent.createGoal("buy").addResultListener(new SwingDefaultResultListener(CustomerPanel.this)
+//					{
+//						public void customResultAvailable(Object source, Object result)
+//						{
+//							IEAGoal buy = (IEAGoal)result;
+//							buy.setParameterValue("name", name);
+//							buy.setParameterValue("shop", shop);
+//							buy.setParameterValue("price", price);
+//							agent.dispatchTopLevelGoalAndWait(buy).addResultListener(new SwingDefaultResultListener(CustomerPanel.this)
+//							{
+//								public void customResultAvailable(Object source, Object result)
+//								{
+//									// Update number of available items
+//									refresh(shop);
+//								}
+//							});
+//						}
+//					});
 				}
 			}
 		});

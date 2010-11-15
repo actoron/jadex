@@ -7,7 +7,11 @@ import jadex.bdi.examples.hunterprey_classic.Vision;
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IAgentListener;
 import jadex.bdi.runtime.IBDIExternalAccess;
+import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bdi.runtime.IEAGoal;
+import jadex.bdi.runtime.IGoal;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IInternalAccess;
 import jadex.commons.SGUI;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
@@ -131,13 +135,23 @@ public class EnvironmentGui	extends JFrame
 				
 				dispose();
 				
-				agent.createGoal("end_agent").addResultListener(new SwingDefaultResultListener(EnvironmentGui.this)
+				agent.scheduleStep(new IComponentStep()
 				{
-					public void customResultAvailable(Object source, Object result)
+					public Object execute(IInternalAccess ia)
 					{
-						agent.dispatchTopLevelGoal((IEAGoal)result);
+						IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+						IGoal goal = bia.getGoalbase().createGoal("end_agent");
+						bia.getGoalbase().dispatchTopLevelGoal(goal);
+						return null;
 					}
 				});
+//				agent.createGoal("end_agent").addResultListener(new SwingDefaultResultListener(EnvironmentGui.this)
+//				{
+//					public void customResultAvailable(Object source, Object result)
+//					{
+//						agent.dispatchTopLevelGoal((IEAGoal)result);
+//					}
+//				});
 				
 //				IGoal eg = agent.createGoal("end_agent");
 //				agent.dispatchTopLevelGoal(eg);
