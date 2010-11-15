@@ -9,7 +9,6 @@ import jadex.application.space.envsupport.math.IVector2;
 import jadex.application.space.envsupport.math.Vector1Int;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.commons.ICommand;
 import jadex.micro.MicroAgent;
 
 import java.util.HashMap;

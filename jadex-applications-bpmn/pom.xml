@@ -174,5 +174,11 @@
 			<artifactId>jadex-kernel-bpmn</artifactId>
 			<version>2.0-rc5</version>
 		</dependency>
+
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-kernel-application</artifactId>
+			<version>2.0-rc5</version>
+		</dependency>
 	</dependencies>
 </project>

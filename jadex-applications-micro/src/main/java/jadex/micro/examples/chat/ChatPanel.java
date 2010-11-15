@@ -4,7 +4,6 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IChangeListener;
-import jadex.commons.ICommand;
 import jadex.commons.SGUI;
 import jadex.micro.IMicroExternalAccess;
 

@@ -10,7 +10,6 @@ import jadex.application.space.envsupport.math.Vector1Int;
 import jadex.application.space.envsupport.math.Vector2Double;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.commons.ICommand;
 import jadex.commons.IFilter;
 import jadex.micro.MicroAgent;
 

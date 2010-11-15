@@ -2,7 +2,6 @@ package jadex.micro.examples;
 
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.commons.ICommand;
 import jadex.micro.MicroAgent;
 import jadex.micro.MicroAgentMetaInfo;
 

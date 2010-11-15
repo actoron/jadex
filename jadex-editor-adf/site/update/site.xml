@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
-   <feature url="features/jadex.editor.adf.feature_1.0.0.201011121809.jar" id="jadex.editor.adf.feature" version="1.0.0.201011121809">
+   <feature url="features/jadex.editor.adf.feature_1.0.0.201011151205.jar" id="jadex.editor.adf.feature" version="1.0.0.201011151205">
       <category name="jadex.editor.plugins"/>
    </feature>
    <category-def name="jadex.editor.plugins" label="Jadex Eclipse Plugins">

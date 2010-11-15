@@ -9,7 +9,6 @@ import jadex.application.space.envsupport.math.IVector2;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.commons.ICommand;
 import jadex.commons.concurrent.IResultListener;
 import jadex.micro.MicroAgent;
 

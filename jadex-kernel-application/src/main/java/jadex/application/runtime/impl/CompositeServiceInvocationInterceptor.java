@@ -12,7 +12,6 @@ import jadex.bridge.IServiceInvocationInterceptor;
 import jadex.bridge.ServiceInvocationContext;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
-import jadex.commons.IResultCommand;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.DelegationResultListener;

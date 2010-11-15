@@ -42,6 +42,7 @@ public class UserAgent extends MicroAgent
 						public void resultAvailable(Object source, Object result)
 						{
 							final IAddService as = (IAddService)result;
+							System.out.println("Found add service: "+as);
 						}
 					}));
 				}
