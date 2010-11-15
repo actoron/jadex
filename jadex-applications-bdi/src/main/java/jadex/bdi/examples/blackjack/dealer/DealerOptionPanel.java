@@ -4,7 +4,11 @@ import jadex.bdi.examples.blackjack.GameStatistics;
 import jadex.bdi.examples.blackjack.gui.GUIImageLoader;
 import jadex.bdi.examples.blackjack.gui.StatisticGraph;
 import jadex.bdi.runtime.IBDIExternalAccess;
+import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bdi.runtime.IEAInternalEvent;
+import jadex.bdi.runtime.IInternalEvent;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IInternalAccess;
 import jadex.commons.SGUI;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 
@@ -144,13 +148,23 @@ public class DealerOptionPanel	extends JPanel	//	implements ActionListener, Chan
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				agent.createInternalEvent("step").addResultListener(new SwingDefaultResultListener(DealerOptionPanel.this)
+				agent.scheduleStep(new IComponentStep()
 				{
-					public void customResultAvailable(Object source, Object result)
+					public Object execute(IInternalAccess ia)
 					{
-						agent.dispatchInternalEvent((IEAInternalEvent)result);
+						IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+						IInternalEvent ie = bia.getEventbase().createInternalEvent("step");
+						bia.getEventbase().dispatchInternalEvent(ie);
+						return null;
 					}
 				});
+//				agent.createInternalEvent("step").addResultListener(new SwingDefaultResultListener(DealerOptionPanel.this)
+//				{
+//					public void customResultAvailable(Object source, Object result)
+//					{
+//						agent.dispatchInternalEvent((IEAInternalEvent)result);
+//					}
+//				});
 			}
 		});
 		

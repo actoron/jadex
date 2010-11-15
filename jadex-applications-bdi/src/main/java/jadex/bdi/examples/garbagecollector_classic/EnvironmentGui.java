@@ -70,44 +70,50 @@ public class EnvironmentGui	extends JFrame
 								{
 									public Object execute(IInternalAccess ia)
 									{
-										IBDIInternalAccess bia = (IBDIInternalAccess)ia;
-										IGoal kill = bia.getGoalbase().createGoal("cms_destroy_component");
-										kill.addGoalListener(new IGoalListener()
+										final IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+										final IGoal kill = bia.getGoalbase().createGoal("cms_destroy_component");
+										SServiceProvider.getServiceUpwards(agent.getServiceProvider(), IComponentManagementService.class)
+											.addResultListener(bia.createResultListener(new DefaultResultListener()
 										{
-											public void goalFinished(AgentEvent ae)
-											{
-											}
-											
-											public void goalAdded(AgentEvent ae)
-											{
-											}
-										});
-										return null;
-									}
-								});
-								
-								agent.createGoal("cms_destroy_component").addResultListener(new DefaultResultListener()
-								{
-									public void resultAvailable(Object source, Object result)
-									{
-										final IEAGoal kill = (IEAGoal)result;
-										SServiceProvider.getServiceUpwards(agent.getServiceProvider(), IComponentManagementService.class).addResultListener(new SwingDefaultResultListener(EnvironmentGui.this)
-										{
-											public void customResultAvailable(Object source, Object result)
+											public void resultAvailable(Object source, Object result)
 											{
 												try
 												{
 													IComponentManagementService ces = (IComponentManagementService)result;
-													kill.setParameterValue("componentidentifier", ces.createComponentIdentifier(wobs[num].getName(), true, null));
-													agent.dispatchTopLevelGoalAndWait(kill);
+													kill.getParameter("componentidentifier").setValue(ces.createComponentIdentifier(wobs[num].getName(), true, null));
+													bia.getGoalbase().dispatchTopLevelGoal(kill);
 												}
 												catch(GoalFailureException gfe) 
 												{
 												}
 											}
-										});
+										}));
+										return null;
 									}
 								});
+								
+//								agent.createGoal("cms_destroy_component").addResultListener(new DefaultResultListener()
+//								{
+//									public void resultAvailable(Object source, Object result)
+//									{
+//										final IEAGoal kill = (IEAGoal)result;
+//										SServiceProvider.getServiceUpwards(agent.getServiceProvider(), IComponentManagementService.class).addResultListener(new SwingDefaultResultListener(EnvironmentGui.this)
+//										{
+//											public void customResultAvailable(Object source, Object result)
+//											{
+//												try
+//												{
+//													IComponentManagementService ces = (IComponentManagementService)result;
+//													kill.setParameterValue("componentidentifier", ces.createComponentIdentifier(wobs[num].getName(), true, null));
+//													agent.dispatchTopLevelGoalAndWait(kill);
+//												}
+//												catch(GoalFailureException gfe) 
+//												{
+//												}
+//											}
+//										});
+//									}
+//								});
 							}
 						}
 					}

@@ -6,7 +6,7 @@ import jadex.commons.IFuture;
 /**
  *  The interface for external threads.
  */
-public interface IBDIExternalAccess extends IExternalAccess, IEACapability
+public interface IBDIExternalAccess extends IExternalAccess//, IEACapability
 {
 	//-------- goalbase shortcut methods --------
 

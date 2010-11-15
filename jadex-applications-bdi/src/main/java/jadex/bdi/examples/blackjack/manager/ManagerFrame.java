@@ -7,9 +7,14 @@ import jadex.bdi.examples.blackjack.player.strategies.AbstractStrategy;
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IAgentListener;
 import jadex.bdi.runtime.IBDIExternalAccess;
+import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bdi.runtime.IEAGoal;
+import jadex.bdi.runtime.IGoal;
+import jadex.bdi.runtime.IGoalListener;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IInternalAccess;
 import jadex.commons.SGUI;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
@@ -399,37 +404,65 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 	 */
 	protected void startLocalDealer()
 	{
-		agent.getGoalbase().createGoal("cms_create_component").addResultListener(new DefaultResultListener()
+		agent.scheduleStep(new IComponentStep()
 		{
-			public void resultAvailable(Object source, Object result)
+			public Object execute(IInternalAccess ia)
 			{
-				final IEAGoal start = (IEAGoal)result;
-				
-//					IContextService	cs	= (IContextService)agent.getServiceContainer().getService(IContextService.class);
-//					IContext[]	contexts	= cs.getContexts(agent.getComponentIdentifier(), IApplicationContext.class);
-//					// Hack! remove cast to ApplicationContext
-//					String	type	= ((ApplicationContext)contexts[0]).getApplicationType().getMAgentType("Dealer").getFilename();
-//					start.getParameter("type").setValue(type);
-				start.setParameterValue("type", "jadex/bdi/examples/blackjack/dealer/Dealer.agent.xml");
-				start.setParameterValue("name", "BlackjackDealer");
-				agent.dispatchTopLevelGoalAndWait(start).addResultListener(new DefaultResultListener()
+				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+				final IGoal start = bia.getGoalbase().createGoal("cms_create_component");
+				start.getParameter("type").setValue("jadex/bdi/examples/blackjack/dealer/Dealer.agent.xml");
+				start.getParameter("name").setValue("BlackjackDealer");
+				start.addGoalListener(new IGoalListener()
 				{
-					public void resultAvailable(Object source, Object result)
+					public void goalFinished(AgentEvent ae)
 					{
-						start.getParameterValue("componentidentifier").addResultListener(new DefaultResultListener()
-						{
-							public void resultAvailable(Object source, Object result)
-							{
-								IComponentIdentifier dealer	= (IComponentIdentifier)result;
-								agent.getLogger().info("local DealerAgent started: "+dealer);
-								//access.getBeliefbase().getBelief("localDealerAID").setFact(start.getResult());
-								agent.getBeliefbase().setBeliefFact("localDealerAID", dealer);
-							}
-						});
+						IComponentIdentifier dealer = (IComponentIdentifier)start.getParameter("componentidentifier").getValue();
+						agent.getLogger().info("local DealerAgent started: "+dealer);
+						//access.getBeliefbase().getBelief("localDealerAID").setFact(start.getResult());
+						agent.getBeliefbase().setBeliefFact("localDealerAID", dealer);
+					}
+					
+					public void goalAdded(AgentEvent ae)
+					{
 					}
 				});
+				bia.getGoalbase().dispatchTopLevelGoal(start);
+				return null;
 			}
 		});
+		
+//		agent.getGoalbase().createGoal("cms_create_component").addResultListener(new DefaultResultListener()
+//		{
+//			public void resultAvailable(Object source, Object result)
+//			{
+//				final IEAGoal start = (IEAGoal)result;
+//				
+////					IContextService	cs	= (IContextService)agent.getServiceContainer().getService(IContextService.class);
+////					IContext[]	contexts	= cs.getContexts(agent.getComponentIdentifier(), IApplicationContext.class);
+////					// Hack! remove cast to ApplicationContext
+////					String	type	= ((ApplicationContext)contexts[0]).getApplicationType().getMAgentType("Dealer").getFilename();
+////					start.getParameter("type").setValue(type);
+//				start.setParameterValue("type", "jadex/bdi/examples/blackjack/dealer/Dealer.agent.xml");
+//				start.setParameterValue("name", "BlackjackDealer");
+//				
+//				agent.dispatchTopLevelGoalAndWait(start).addResultListener(new DefaultResultListener()
+//				{
+//					public void resultAvailable(Object source, Object result)
+//					{
+//						start.getParameterValue("componentidentifier").addResultListener(new DefaultResultListener()
+//						{
+//							public void resultAvailable(Object source, Object result)
+//							{
+//								IComponentIdentifier dealer	= (IComponentIdentifier)result;
+//								agent.getLogger().info("local DealerAgent started: "+dealer);
+//								//access.getBeliefbase().getBelief("localDealerAID").setFact(start.getResult());
+//								agent.getBeliefbase().setBeliefFact("localDealerAID", dealer);
+//							}
+//						});
+//					}
+//				});
+//			}
+//		});
 
 		// todo!
 //		// start dealer-agent
@@ -447,6 +480,29 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 	 */
 	protected void stopLocalDealer()
 	{
+		agent.scheduleStep(new IComponentStep()
+		{
+			public Object execute(IInternalAccess ia)
+			{
+				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+				final IComponentIdentifier dealer = (IComponentIdentifier)bia.getBeliefbase().getBelief("localDealerAID").getFact();
+				if(dealer!=null)
+				{
+					agent.getGoalbase().createGoal("cms_destroy_component").addResultListener(new DefaultResultListener()
+					{
+						public void resultAvailable(Object source, Object result)
+						{
+							IEAGoal destroy = (IEAGoal)result;
+							destroy.setParameterValue("componentidentifier", dealer);
+							agent.dispatchTopLevelGoalAndWait(destroy);
+							agent.getBeliefbase().setBeliefFact("localDealerAID", null);
+						}
+					});
+				}
+				return null;
+			}
+		});
+		
 		agent.getBeliefbase().getBeliefFact("localDealerAID").addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
