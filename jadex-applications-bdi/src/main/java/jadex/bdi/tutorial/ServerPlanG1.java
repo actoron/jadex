@@ -2,10 +2,12 @@ package jadex.bdi.tutorial;
 
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IAgentListener;
-import jadex.bdi.runtime.IEAGoal;
-import jadex.bdi.runtime.IEAParameter;
+import jadex.bdi.runtime.IBDIInternalAccess;
+import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
-import jadex.commons.ThreadSuspendable;
+import jadex.bridge.ComponentTerminatedException;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IInternalAccess;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -76,6 +78,7 @@ public class ServerPlanG1 extends Plan	implements Runnable
 		// Start the conmnection listener thread.
 		new Thread(this).start();
 
+		// When the agent dies the listener will shut down the server.
 		getScope().addAgentListener(new IAgentListener()
 		{
 			public void agentTerminating(AgentEvent ae)
@@ -87,22 +90,7 @@ public class ServerPlanG1 extends Plan	implements Runnable
 			{
 			}
 		});
-		
-		// Keep the plan alive and the server is active.
-		// When the agent dies the plan will shut down
-		// the server in the aborted method.
-		// The waitFor will never come back, because the
-		// filter matches no event.
-		//waitFor(IFilter.NEVER);
 	}
-
-	/**
-	 *  Close server when plan is exited.
-	 * /
-	public void aborted()
-	{
-		close();
-	}*/
 	
 	/**
 	 *  The server code.
@@ -112,7 +100,6 @@ public class ServerPlanG1 extends Plan	implements Runnable
 	 */
 	public void	run()
 	{
-		ThreadSuspendable sus = new ThreadSuspendable(new Object());
 		logger.info("Created: "+Thread.currentThread());
 
 		// Repeatedly listen for connections, until the server has been closed.
@@ -121,20 +108,26 @@ public class ServerPlanG1 extends Plan	implements Runnable
 			// Accept connections while server is active.
 			while(true)
 			{
-				Socket	client	= server.accept();
-				IEAGoal goal = (IEAGoal)getExternalAccess().createGoal("translate").get(sus);
-				((IEAParameter)goal.getParameter("client").get(sus)).setValue(client);
-				getExternalAccess().dispatchTopLevelGoal(goal);
+				final Socket	client	= server.accept();
+				getExternalAccess().scheduleStep(new IComponentStep()
+				{
+					public Object execute(IInternalAccess ia)
+					{
+						IBDIInternalAccess	scope	= (IBDIInternalAccess)ia;
+						IGoal goal = scope.getGoalbase().createGoal("translate");
+						goal.getParameter("client").setValue(client);
+						scope.getGoalbase().dispatchTopLevelGoal(goal);
+						return null;
+					}
+				});
 			}
 		}
 		catch(IOException e)
 		{
-			//e.printStackTrace();
 			// Server has been closed.
 			logger.info("Exited: "+Thread.currentThread());
 		}
-		catch(Exception e)
-//		catch(AgentDeathException e)
+		catch(ComponentTerminatedException e)
 		{
 			// Agent has died: close server.
 			close();
