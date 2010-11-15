@@ -4,6 +4,7 @@ import jadex.bdi.model.IMElement;
 import jadex.bdi.model.impl.flyweights.MCapabilityFlyweight;
 import jadex.bdi.runtime.IAgentListener;
 import jadex.bdi.runtime.IBDIExternalAccess;
+import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bdi.runtime.IBeliefbase;
 import jadex.bdi.runtime.ICapability;
 import jadex.bdi.runtime.IEventbase;
@@ -18,7 +19,6 @@ import jadex.bridge.ComponentResultListener;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.IInternalAccess;
 import jadex.bridge.IModelInfo;
 import jadex.commons.IFuture;
 import jadex.commons.concurrent.IResultListener;
@@ -30,7 +30,7 @@ import java.util.logging.Logger;
 /**
  *  Flyweight for a capability.
  */
-public class CapabilityFlyweight extends ElementFlyweight implements ICapability, IInternalAccess
+public class CapabilityFlyweight extends ElementFlyweight implements ICapability, IBDIInternalAccess
 {
 	//-------- attributes --------
 	

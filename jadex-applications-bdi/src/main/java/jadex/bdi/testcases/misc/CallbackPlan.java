@@ -139,7 +139,7 @@ public class CallbackPlan extends Plan
 		final TestReport tr4 = new TestReport("#4", "Test if goal added can be observed in a listener.");
 		final TestReport tr5 = new TestReport("#5", "Test if goal finished can be observed in a listener.");
 		// todo: rename tr6
-		final TestReport tr5b = new TestReport("#5b", "Test if waitFor can be called in async listener.");
+//		final TestReport tr5b = new TestReport("#5b", "Test if waitFor can be called in async listener.");
 		getGoalbase().addGoalListener("goal", new IGoalListener()
 		{
 			public void goalAdded(AgentEvent ae)
@@ -167,15 +167,15 @@ public class CallbackPlan extends Plan
 						logger.info("Goal finished called");
 						getGoalbase().removeGoalListener("goal", t);
 						tr5.setSucceeded(true);
-						try
-						{
-							getExternalAccess().waitFor(100);
-							tr5b.setSucceeded(true);
-						}
-						catch(Exception e)
-						{
-							e.printStackTrace();
-						}
+//						try
+//						{
+//							getExternalAccess().waitFor(100);
+//							tr5b.setSucceeded(true);
+//						}
+//						catch(Exception e)
+//						{
+//							e.printStackTrace();
+//						}
 					}
 				}).start();
 				
@@ -205,9 +205,9 @@ public class CallbackPlan extends Plan
 		if(!tr5.isSucceeded())
 			tr5.setReason("Listener was not notified.");
 		getBeliefbase().getBeliefSet("testcap.reports").addFact(tr5);
-		if(!tr5b.isSucceeded())
-			tr5b.setReason("Could not call waitFor() in listener");
-		getBeliefbase().getBeliefSet("testcap.reports").addFact(tr5b);
+//		if(!tr5b.isSucceeded())
+//			tr5b.setReason("Could not call waitFor() in listener");
+//		getBeliefbase().getBeliefSet("testcap.reports").addFact(tr5b);
 			
 		// Internal event tests
 		

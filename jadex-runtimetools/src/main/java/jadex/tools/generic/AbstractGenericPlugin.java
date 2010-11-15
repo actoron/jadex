@@ -1,7 +1,6 @@
 package jadex.tools.generic;
 
 import jadex.base.gui.componentviewer.IAbstractViewerPanel;
-import jadex.base.gui.componentviewer.IComponentViewerPanel;
 import jadex.base.gui.plugin.AbstractJCCPlugin;
 import jadex.commons.IFuture;
 import jadex.commons.Properties;

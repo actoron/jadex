@@ -4,15 +4,17 @@ import jadex.base.SComponentFactory;
 import jadex.base.gui.ElementPanel;
 import jadex.base.test.Testcase;
 import jadex.bdi.runtime.AgentEvent;
+import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bdi.runtime.IEAGoal;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IGoalListener;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IInternalAccess;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SGUI;
 import jadex.commons.SUtil;
 import jadex.commons.ThreadSuspendable;
-import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.commons.gui.BrowserPane;
 import jadex.commons.gui.EditableList;
@@ -1007,6 +1009,9 @@ public class TestCenterPanel extends JSplitPane
 		/** A set of active goals (to be dropped on abort). */
 		protected Set	goals;
 		
+		/** Flag indicating that the test suite is running. */
+		protected boolean	running;
+		
 		/** Flag indicating that the test suite has been aborted. */
 		protected boolean	aborted;
 		
@@ -1023,6 +1028,7 @@ public class TestCenterPanel extends JSplitPane
 			this.names	= names;
 			this.testcases	= new Testcase[names.length];
 			this.goals	= new HashSet();
+			this.running	= false;
 		}
 		
 		//-------- methods --------
@@ -1032,7 +1038,7 @@ public class TestCenterPanel extends JSplitPane
 		 */
 		public boolean	isRunning()
 		{
-			return !goals.isEmpty();
+			return running;
 		}
 		
 		/**
@@ -1076,8 +1082,6 @@ public class TestCenterPanel extends JSplitPane
 		{
 			this.starttime	= System.currentTimeMillis();
 			startNextTestcases();
-			updateProgress();
-			updateDetails();
 		}
 
 		/**
@@ -1106,30 +1110,37 @@ public class TestCenterPanel extends JSplitPane
 		 */
 		protected void	startNextTestcases()
 		{
-			for(int i=0; i<testcases.length && (concurrency==-1 || goals.size()<concurrency); i++)
+			((AgentControlCenter)plugin.getJCC()).getAgent().scheduleStep(new IComponentStep()
 			{
-				if(testcases[i]==null)
+				public Object execute(IInternalAccess ia)
 				{
-					// Create testcase and dispatch goal.
-					testcases[i]	= new Testcase(names[i]);
-					final int num = i;
-					((AgentControlCenter)plugin.getJCC()).getAgent().createGoal("perform_test").addResultListener(new IResultListener()
+					for(int i=0; i<testcases.length && (concurrency==-1 || goals.size()<concurrency); i++)
 					{
-						public void resultAvailable(Object source, Object result)
+						if(testcases[i]==null)
 						{
-							IEAGoal	pt	= (IEAGoal)result;
-							pt.setParameterValue("testcase", testcases[num]);
+							// Create testcase and dispatch goal.
+							testcases[i]	= new Testcase(names[i]);
+							IGoal	pt	= ((IBDIInternalAccess)ia).getGoalbase().createGoal("perform_test");
+							pt.getParameter("testcase").setValue(testcases[i]);
 							pt.addGoalListener(TestSuite.this);
 							goals.add(pt);
-							((AgentControlCenter)plugin.getJCC()).getAgent().dispatchTopLevelGoal(pt);
-							plugin.getJCC().setStatusText("Performing test "+names[num]);
+							((IBDIInternalAccess)ia).getGoalbase().dispatchTopLevelGoal(pt);
+							plugin.getJCC().setStatusText("Performing test "+names[i]);
 						}
-						public void exceptionOccurred(Object source, Exception exception)
+					}
+
+					running	= !goals.isEmpty();
+					SwingUtilities.invokeLater(new Runnable()
+					{
+						public void run()
 						{
+							updateProgress();
+							updateDetails();
 						}
 					});
+					return null;
 				}
-			}			
+			});					
 		}
 
 		/**
@@ -1157,8 +1168,6 @@ public class TestCenterPanel extends JSplitPane
 						}
 						
 						startNextTestcases();
-						updateProgress();
-						updateDetails();
 					}
 				});
 				
