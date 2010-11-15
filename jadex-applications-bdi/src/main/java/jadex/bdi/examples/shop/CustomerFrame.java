@@ -3,12 +3,16 @@ package jadex.bdi.examples.shop;
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IAgentListener;
 import jadex.bdi.runtime.IBDIExternalAccess;
+import jadex.bdi.runtime.IBDIInternalAccess;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IInternalAccess;
 import jadex.commons.SGUI;
 
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
 
 /**
  *  Frame for displaying of the customer gui.
@@ -29,20 +33,48 @@ public class CustomerFrame extends JFrame
 		{
 			public void windowClosing(WindowEvent e)
 			{
-				agent.killAgent();
+//				agent.killAgent();
+				agent.killComponent();
 			}
 		});
-		agent.addAgentListener(new IAgentListener() 
+		agent.scheduleStep(new IComponentStep()
 		{
-			public void agentTerminating(AgentEvent ae) 
+			public Object execute(IInternalAccess ia)
 			{
-				setVisible(false);
-				dispose();
-			}
-			
-			public void agentTerminated(AgentEvent ae) 
-			{
+				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+				bia.addAgentListener(new IAgentListener() 
+				{
+					public void agentTerminating(AgentEvent ae) 
+					{
+						SwingUtilities.invokeLater(new Runnable()
+						{
+							public void run()
+							{
+								setVisible(false);
+								dispose();
+							}
+						});
+					}
+					
+					public void agentTerminated(AgentEvent ae) 
+					{
+					}
+				});
+				return null;
 			}
 		});
+		
+//		agent.addAgentListener(new IAgentListener() 
+//		{
+//			public void agentTerminating(AgentEvent ae) 
+//			{
+//				setVisible(false);
+//				dispose();
+//			}
+//			
+//			public void agentTerminated(AgentEvent ae) 
+//			{
+//			}
+//		});
 	}
 }

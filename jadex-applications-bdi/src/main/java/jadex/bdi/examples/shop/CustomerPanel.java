@@ -138,28 +138,68 @@ public class CustomerPanel extends JPanel
 		df.setMinimumFractionDigits(2);
 
 		final JTextField money = new JTextField(5);
-		agent.getBeliefbase().getBeliefFact("money")
-			.addResultListener(new SwingDefaultResultListener(CustomerPanel.this)
+		
+		agent.scheduleStep(new IComponentStep()
 		{
-			public void customResultAvailable(Object source, Object result)
+			public Object execute(IInternalAccess ia)
 			{
-				money.setText(df.format(result));
-			}
-		});
-		money.setEditable(false);
-		agent.getBeliefbase().addBeliefListener("money", new IBeliefListener()
-		{
-			public void beliefChanged(final AgentEvent ae)
-			{
+				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+				final Object mon = bia.getBeliefbase().getBelief("money").getFact();
 				SwingUtilities.invokeLater(new Runnable()
 				{
 					public void run()
 					{
-						money.setText(df.format(ae.getValue()));
+						money.setText(df.format(mon));
 					}
 				});
+				return null;
 			}
 		});
+//		agent.getBeliefbase().getBeliefFact("money")
+//			.addResultListener(new SwingDefaultResultListener(CustomerPanel.this)
+//		{
+//			public void customResultAvailable(Object source, Object result)
+//			{
+//				money.setText(df.format(result));
+//			}
+//		});
+		money.setEditable(false);
+		
+		agent.scheduleStep(new IComponentStep()
+		{
+			public Object execute(IInternalAccess ia)
+			{
+				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+				bia.getBeliefbase().getBelief("money").addBeliefListener(new IBeliefListener()
+				{
+					public void beliefChanged(final AgentEvent ae)
+					{
+						SwingUtilities.invokeLater(new Runnable()
+						{
+							public void run()
+							{
+								money.setText(df.format(ae.getValue()));
+							}
+						});
+					}
+				});
+				return null;
+			}
+		});
+		
+//		agent.getBeliefbase().addBeliefListener("money", new IBeliefListener()
+//		{
+//			public void beliefChanged(final AgentEvent ae)
+//			{
+//				SwingUtilities.invokeLater(new Runnable()
+//				{
+//					public void run()
+//					{
+//						money.setText(df.format(ae.getValue()));
+//					}
+//				});
+//			}
+//		});
 		
 		JPanel selpanel = new JPanel(new GridBagLayout());
 		selpanel.setBorder(new TitledBorder(new EtchedBorder(), "Properties"));
@@ -196,45 +236,93 @@ public class CustomerPanel extends JPanel
 		invtable.setPreferredScrollableViewportSize(new Dimension(600, 120));
 		invpanel.add(BorderLayout.CENTER, new JScrollPane(invtable));
 
-		agent.getBeliefbase().addBeliefSetListener("inventory", new IBeliefSetListener()
+		agent.scheduleStep(new IComponentStep()
 		{
-			public void factRemoved(final AgentEvent ae)
+			public Object execute(IInternalAccess ia)
 			{
-				SwingUtilities.invokeLater(new Runnable()
+				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+				bia.getBeliefbase().getBeliefSet("inventory").addBeliefSetListener(new IBeliefSetListener()
 				{
-					public void run()
+					public void factRemoved(final AgentEvent ae)
 					{
-						invlist.remove(ae.getValue());
-						invmodel.fireTableDataChanged();
+						SwingUtilities.invokeLater(new Runnable()
+						{
+							public void run()
+							{
+								invlist.remove(ae.getValue());
+								invmodel.fireTableDataChanged();
+							}
+						});
+					}
+					
+					public void factChanged(final AgentEvent ae)
+					{
+						SwingUtilities.invokeLater(new Runnable()
+						{
+							public void run()
+							{
+								invlist.remove(ae.getValue());
+								invlist.add(ae.getValue());
+								invmodel.fireTableDataChanged();
+							}
+						});
+					}
+					
+					public void factAdded(final AgentEvent ae)
+					{
+						SwingUtilities.invokeLater(new Runnable()
+						{
+							public void run()
+							{
+								invlist.add(ae.getValue());
+								invmodel.fireTableDataChanged();
+							}
+						});
 					}
 				});
-			}
-			
-			public void factChanged(final AgentEvent ae)
-			{
-				SwingUtilities.invokeLater(new Runnable()
-				{
-					public void run()
-					{
-						invlist.remove(ae.getValue());
-						invlist.add(ae.getValue());
-						invmodel.fireTableDataChanged();
-					}
-				});
-			}
-			
-			public void factAdded(final AgentEvent ae)
-			{
-				SwingUtilities.invokeLater(new Runnable()
-				{
-					public void run()
-					{
-						invlist.add(ae.getValue());
-						invmodel.fireTableDataChanged();
-					}
-				});
+				return null;
 			}
 		});
+		
+//		agent.getBeliefbase().addBeliefSetListener("inventory", new IBeliefSetListener()
+//		{
+//			public void factRemoved(final AgentEvent ae)
+//			{
+//				SwingUtilities.invokeLater(new Runnable()
+//				{
+//					public void run()
+//					{
+//						invlist.remove(ae.getValue());
+//						invmodel.fireTableDataChanged();
+//					}
+//				});
+//			}
+//			
+//			public void factChanged(final AgentEvent ae)
+//			{
+//				SwingUtilities.invokeLater(new Runnable()
+//				{
+//					public void run()
+//					{
+//						invlist.remove(ae.getValue());
+//						invlist.add(ae.getValue());
+//						invmodel.fireTableDataChanged();
+//					}
+//				});
+//			}
+//			
+//			public void factAdded(final AgentEvent ae)
+//			{
+//				SwingUtilities.invokeLater(new Runnable()
+//				{
+//					public void run()
+//					{
+//						invlist.add(ae.getValue());
+//						invmodel.fireTableDataChanged();
+//					}
+//				});
+//			}
+//		});
 		
 		JPanel butpanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 //		butpanel.setBorder(new TitledBorder(new EtchedBorder(), "Actions"));

@@ -73,7 +73,7 @@ public class EnvironmentGui	extends JFrame
 	 */
 	public EnvironmentGui(final IBDIExternalAccess agent)
 	{
-		super(agent.getComponentName());
+		super(agent.getComponentIdentifier().getName());
 		
 		// Map panel.
 		this.map	= new MapPanel();
@@ -158,22 +158,47 @@ public class EnvironmentGui	extends JFrame
 			}
 		});
 		
-		agent.addAgentListener(new IAgentListener()
+		agent.scheduleStep(new IComponentStep()
 		{
-			public void agentTerminating(AgentEvent ae)
+			public Object execute(IInternalAccess ia)
 			{
-				SwingUtilities.invokeLater(new Runnable()
+				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+				bia.addAgentListener(new IAgentListener()
 				{
-					public void run()
+					public void agentTerminating(AgentEvent ae)
 					{
-						EnvironmentGui.this.dispose();
+						SwingUtilities.invokeLater(new Runnable()
+						{
+							public void run()
+							{
+								EnvironmentGui.this.dispose();
+							}
+						});
+					}
+					public void agentTerminated(AgentEvent ae)
+					{
 					}
 				});
-			}
-			public void agentTerminated(AgentEvent ae)
-			{
+				return null;
 			}
 		});
+		
+//		agent.addAgentListener(new IAgentListener()
+//		{
+//			public void agentTerminating(AgentEvent ae)
+//			{
+//				SwingUtilities.invokeLater(new Runnable()
+//				{
+//					public void run()
+//					{
+//						EnvironmentGui.this.dispose();
+//					}
+//				});
+//			}
+//			public void agentTerminated(AgentEvent ae)
+//			{
+//			}
+//		});
 	}
 
 	//-------- helper methods --------
@@ -185,28 +210,51 @@ public class EnvironmentGui	extends JFrame
 	{
 		final JPanel options = new JPanel(new GridBagLayout());
 
-		agent.getBeliefbase().getBeliefFact("environment").addResultListener(new SwingDefaultResultListener(this)
+		agent.scheduleStep(new IComponentStep()
 		{
-			public void customResultAvailable(Object source, Object result)
+			public Object execute(IInternalAccess ia)
 			{
-				final Environment env = (Environment)result;
+				// TODO Auto-generated method stub
+				return null;
+			}
+		});
+		
+		agent.scheduleStep(new IComponentStep()
+		{
+			public Object execute(IInternalAccess ia)
+			{
+				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+				final Environment env = (Environment)bia.getBeliefbase().getBelief("environment").getFact();
 				
 				options.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), "Environment Control"));
 				roundcnt = new JLabel("0");
 				final JTextField roundtimetf = new JTextField(5);
-				agent.getBeliefbase().getBeliefFact("roundtime").addResultListener(new DefaultResultListener()
+				final Object rt = bia.getBeliefbase().getBelief("roundtime").getFact();
+				
+				SwingUtilities.invokeLater(new Runnable()
 				{
-					public void resultAvailable(Object source, Object result)
+					public void run()
 					{
-						roundtimetf.setText(""+result);
+						roundtimetf.setText(""+rt);
 					}
 				});
+				
+				
 				roundtimetf.addActionListener(new ActionListener()
 				{
 					public void actionPerformed(ActionEvent e)
 					{
-						Long val = new Long(roundtimetf.getText());
-						agent.getBeliefbase().setBeliefFact("roundtime", val);
+						final Long val = new Long(roundtimetf.getText());
+						agent.scheduleStep(new IComponentStep()
+						{
+							public Object execute(IInternalAccess ia)
+							{
+								IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+								bia.getBeliefbase().getBelief("roundtime").setFact(val);
+								return null;
+							}
+						});
+//						agent.getBeliefbase().setBeliefFact("roundtime", val);
 						//roundtimesl.setValue((int)Math.log(val.intValue()));
 					}
 				});
@@ -257,8 +305,175 @@ public class EnvironmentGui	extends JFrame
 					GridBagConstraints.WEST,  GridBagConstraints.NONE, insets, 0 , 0));
 				options.add(hs, new GridBagConstraints(0, 4, 1, 1, 0, 0,
 						GridBagConstraints.WEST,  GridBagConstraints.NONE, insets, 0 , 0));
+				
+				return null;
 			}
 		});
+		
+		agent.scheduleStep(new IComponentStep()
+		{
+			public Object execute(IInternalAccess ia)
+			{
+				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+				final Environment env = (Environment)bia.getBeliefbase().getBelief("environment").getFact();
+				
+				options.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), "Environment Control"));
+				roundcnt = new JLabel("0");
+				final JTextField roundtimetf = new JTextField(5);
+				final Object rt = bia.getBeliefbase().getBelief("roundtime").getFact();
+				SwingUtilities.invokeLater(new Runnable()
+				{
+					public void run()
+					{
+						roundtimetf.setText(""+rt);
+					}
+				});
+				
+				
+				roundtimetf.addActionListener(new ActionListener()
+				{
+					public void actionPerformed(ActionEvent e)
+					{
+						final Long val = new Long(roundtimetf.getText());
+						agent.scheduleStep(new IComponentStep()
+						{
+							public Object execute(IInternalAccess ia)
+							{
+								IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+								bia.getBeliefbase().getBelief("roundtime").setFact(val);
+								return null;
+							}
+						});
+//						agent.getBeliefbase().setBeliefFact("roundtime", val);
+						//roundtimesl.setValue((int)Math.log(val.intValue()));
+					}
+				});
+				final JTextField saveintervaltf = new JTextField(""+env.getSaveInterval(), 5);
+				saveintervaltf.addActionListener(new ActionListener()
+				{
+					public void actionPerformed(ActionEvent e)
+					{
+						env.setSaveInterval(Long.parseLong(saveintervaltf.getText()));
+					}
+				});
+				final JButton hs = new JButton("Save highscore");
+				hs.addActionListener(new ActionListener()
+				{
+					public void actionPerformed(ActionEvent ae)
+					{
+						//System.out.println("saving highscore: "+SUtil.arrayToString(env.getHighscore()));
+						env.saveHighscore();
+					}
+				});
+				final JTextField foodrate = new JTextField(""+env.getFoodrate(), 4);
+				foodrate.addActionListener(new ActionListener()
+				{
+				    public void actionPerformed(ActionEvent ae)
+				    {
+				        env.setFoodrate(Integer.parseInt(foodrate.getText()));
+				    }
+				}); 
+				
+				Insets insets = new Insets(2, 4, 4, 2);
+				options.add(new JLabel("Round number:"), new GridBagConstraints(0, 0, 1, 1, 0, 0,
+					GridBagConstraints.WEST,  GridBagConstraints.NONE, insets, 0 , 0));
+				options.add(roundcnt, new GridBagConstraints(1, 0, 3, 1, 1, 0,
+					GridBagConstraints.WEST,  GridBagConstraints.NONE, insets, 0 , 0));
+				options.add(new JLabel("Round time [millis]:"), new GridBagConstraints(0, 1, 1, 1, 0, 0,
+					GridBagConstraints.WEST,  GridBagConstraints.NONE, insets, 0 , 0));
+				//options.add(roundtimesl, new GridBagConstraints(1, 1, 1, 1, 0, 0,
+				//	GridBagConstraints.WEST,  GridBagConstraints.NONE, insets, 0 , 0));
+				options.add(roundtimetf, new GridBagConstraints(1, 1, 1, 1, 0, 0,
+					GridBagConstraints.WEST,  GridBagConstraints.NONE, insets, 0 , 0));
+				options.add(new JLabel("Autosave highscore [millis, -1 for off]"), new GridBagConstraints(0, 2, 1, 1, 0, 0,
+					GridBagConstraints.WEST,  GridBagConstraints.NONE, insets, 0 , 0));
+				options.add(saveintervaltf, new GridBagConstraints(1, 2, 3, 1, 1, 0,
+					GridBagConstraints.WEST,  GridBagConstraints.NONE, insets, 0 , 0));
+				options.add(new JLabel("Food rate [every n ticks]"), new GridBagConstraints(0, 3, 1, 1, 0, 0,
+					GridBagConstraints.WEST,  GridBagConstraints.NONE, insets, 0 , 0));
+				options.add(foodrate, new GridBagConstraints(1, 3, 1, 1, 0, 0,
+					GridBagConstraints.WEST,  GridBagConstraints.NONE, insets, 0 , 0));
+				options.add(hs, new GridBagConstraints(0, 4, 1, 1, 0, 0,
+						GridBagConstraints.WEST,  GridBagConstraints.NONE, insets, 0 , 0));
+				
+				return null;
+			}
+		});
+		
+//		agent.getBeliefbase().getBeliefFact("environment").addResultListener(new SwingDefaultResultListener(this)
+//		{
+//			public void customResultAvailable(Object source, Object result)
+//			{
+//				final Environment env = (Environment)result;
+//				
+//				options.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), "Environment Control"));
+//				roundcnt = new JLabel("0");
+//				final JTextField roundtimetf = new JTextField(5);
+//				agent.getBeliefbase().getBeliefFact("roundtime").addResultListener(new DefaultResultListener()
+//				{
+//					public void resultAvailable(Object source, Object result)
+//					{
+//						roundtimetf.setText(""+result);
+//					}
+//				});
+//				roundtimetf.addActionListener(new ActionListener()
+//				{
+//					public void actionPerformed(ActionEvent e)
+//					{
+//						Long val = new Long(roundtimetf.getText());
+//						agent.getBeliefbase().setBeliefFact("roundtime", val);
+//						//roundtimesl.setValue((int)Math.log(val.intValue()));
+//					}
+//				});
+//				final JTextField saveintervaltf = new JTextField(""+env.getSaveInterval(), 5);
+//				saveintervaltf.addActionListener(new ActionListener()
+//				{
+//					public void actionPerformed(ActionEvent e)
+//					{
+//						env.setSaveInterval(Long.parseLong(saveintervaltf.getText()));
+//					}
+//				});
+//				final JButton hs = new JButton("Save highscore");
+//				hs.addActionListener(new ActionListener()
+//				{
+//					public void actionPerformed(ActionEvent ae)
+//					{
+//						//System.out.println("saving highscore: "+SUtil.arrayToString(env.getHighscore()));
+//						env.saveHighscore();
+//					}
+//				});
+//				final JTextField foodrate = new JTextField(""+env.getFoodrate(), 4);
+//				foodrate.addActionListener(new ActionListener()
+//				{
+//				    public void actionPerformed(ActionEvent ae)
+//				    {
+//				        env.setFoodrate(Integer.parseInt(foodrate.getText()));
+//				    }
+//				}); 
+//				
+//				Insets insets = new Insets(2, 4, 4, 2);
+//				options.add(new JLabel("Round number:"), new GridBagConstraints(0, 0, 1, 1, 0, 0,
+//					GridBagConstraints.WEST,  GridBagConstraints.NONE, insets, 0 , 0));
+//				options.add(roundcnt, new GridBagConstraints(1, 0, 3, 1, 1, 0,
+//					GridBagConstraints.WEST,  GridBagConstraints.NONE, insets, 0 , 0));
+//				options.add(new JLabel("Round time [millis]:"), new GridBagConstraints(0, 1, 1, 1, 0, 0,
+//					GridBagConstraints.WEST,  GridBagConstraints.NONE, insets, 0 , 0));
+//				//options.add(roundtimesl, new GridBagConstraints(1, 1, 1, 1, 0, 0,
+//				//	GridBagConstraints.WEST,  GridBagConstraints.NONE, insets, 0 , 0));
+//				options.add(roundtimetf, new GridBagConstraints(1, 1, 1, 1, 0, 0,
+//					GridBagConstraints.WEST,  GridBagConstraints.NONE, insets, 0 , 0));
+//				options.add(new JLabel("Autosave highscore [millis, -1 for off]"), new GridBagConstraints(0, 2, 1, 1, 0, 0,
+//					GridBagConstraints.WEST,  GridBagConstraints.NONE, insets, 0 , 0));
+//				options.add(saveintervaltf, new GridBagConstraints(1, 2, 3, 1, 1, 0,
+//					GridBagConstraints.WEST,  GridBagConstraints.NONE, insets, 0 , 0));
+//				options.add(new JLabel("Food rate [every n ticks]"), new GridBagConstraints(0, 3, 1, 1, 0, 0,
+//					GridBagConstraints.WEST,  GridBagConstraints.NONE, insets, 0 , 0));
+//				options.add(foodrate, new GridBagConstraints(1, 3, 1, 1, 0, 0,
+//					GridBagConstraints.WEST,  GridBagConstraints.NONE, insets, 0 , 0));
+//				options.add(hs, new GridBagConstraints(0, 4, 1, 1, 0, 0,
+//						GridBagConstraints.WEST,  GridBagConstraints.NONE, insets, 0 , 0));
+//			}
+//		});
 
 		return options;
 	}
@@ -268,11 +483,12 @@ public class EnvironmentGui	extends JFrame
 	 */
 	protected void	enableGuiUpdate(IBDIExternalAccess agent)
 	{
-		agent.getBeliefbase().getBeliefFact("environment").addResultListener(new SwingDefaultResultListener(this)
+		agent.scheduleStep(new IComponentStep()
 		{
-			public void customResultAvailable(Object source, Object result)
+			public Object execute(IInternalAccess ia)
 			{
-				final Environment env = (Environment)result;
+				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+				final Environment env = (Environment)bia.getBeliefbase().getBelief("environment").getFact();
 				env.addPropertyChangeListener(new PropertyChangeListener()
 				{
 					// Hack!!! Dummy creature required for world size.
@@ -294,8 +510,38 @@ public class EnvironmentGui	extends JFrame
 						highscore.update(env.getHighscore());
 					}
 				});
+				return null;
 			}
 		});
+		
+//		agent.getBeliefbase().getBeliefFact("environment").addResultListener(new SwingDefaultResultListener(this)
+//		{
+//			public void customResultAvailable(Object source, Object result)
+//			{
+//				final Environment env = (Environment)result;
+//				env.addPropertyChangeListener(new PropertyChangeListener()
+//				{
+//					// Hack!!! Dummy creature required for world size.
+//					protected Creature	dummy	= new Prey();
+//
+//					public void propertyChange(PropertyChangeEvent evt)
+//					{
+//						roundcnt.setText(""+env.getWorldAge());
+//			
+//						dummy.setWorldWidth(env.getWidth());
+//						dummy.setWorldHeight(env.getHeight());
+//			
+//						Vision	vision	= new Vision();
+//						vision.setObjects(env.getAllObjects());
+//			
+//						map.update(new CurrentVision(dummy, vision));
+//						creatures.update(env.getCreatures());
+//						observers.update(env.getCreatures());
+//						highscore.update(env.getHighscore());
+//					}
+//				});
+//			}
+//		});
 		
 	}
 }

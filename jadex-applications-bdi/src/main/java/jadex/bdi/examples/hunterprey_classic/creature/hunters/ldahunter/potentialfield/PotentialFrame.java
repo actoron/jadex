@@ -10,6 +10,9 @@ import jadex.bdi.examples.hunterprey_classic.Location;
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IAgentListener;
 import jadex.bdi.runtime.IBDIExternalAccess;
+import jadex.bdi.runtime.IBDIInternalAccess;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IInternalAccess;
 import jadex.commons.SGUI;
 
 import java.awt.Color;
@@ -44,26 +47,50 @@ public class PotentialFrame extends JFrame
 		{
 			public void windowClosing(WindowEvent e)
 			{
-				agent.killAgent();
+				agent.killComponent();
 			}
 		});
 		
-		agent.addAgentListener(new IAgentListener()
+		agent.scheduleStep(new IComponentStep()
 		{
-			public void agentTerminating(AgentEvent ae)
+			public Object execute(IInternalAccess ia)
 			{
-				SwingUtilities.invokeLater(new Runnable()
+				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+				bia.addAgentListener(new IAgentListener()
 				{
-					public void run()
+					public void agentTerminating(AgentEvent ae)
 					{
-						PotentialFrame.this.dispose();
+						SwingUtilities.invokeLater(new Runnable()
+						{
+							public void run()
+							{
+								PotentialFrame.this.dispose();
+							}
+						});
+					}
+					public void agentTerminated(AgentEvent ae)
+					{
 					}
 				});
-			}
-			public void agentTerminated(AgentEvent ae)
-			{
+				return null;
 			}
 		});
+//		agent.addAgentListener(new IAgentListener()
+//		{
+//			public void agentTerminating(AgentEvent ae)
+//			{
+//				SwingUtilities.invokeLater(new Runnable()
+//				{
+//					public void run()
+//					{
+//						PotentialFrame.this.dispose();
+//					}
+//				});
+//			}
+//			public void agentTerminated(AgentEvent ae)
+//			{
+//			}
+//		});
 		
 		this.setSize(400, 400);
 		this.setBackground(Color.BLACK);

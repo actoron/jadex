@@ -5,7 +5,10 @@ import jadex.bdi.examples.hunterprey_classic.CurrentVision;
 import jadex.bdi.examples.hunterprey_classic.Vision;
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IBDIExternalAccess;
+import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bdi.runtime.IBeliefListener;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IInternalAccess;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.xml.bean.JavaReader;
@@ -93,15 +96,16 @@ public class ObserverGui	extends EnvironmentGui
 	 */
 	protected void	refreshHighscore(IBDIExternalAccess agent)
 	{
-		// Read highscore list from resource.
-		agent.getBeliefbase().getBeliefFact("highscore").addResultListener(new DefaultResultListener()
+		agent.scheduleStep(new IComponentStep()
 		{
-			public void resultAvailable(Object source, Object result)
+			public Object execute(IInternalAccess ia)
 			{
+				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+				String hs = (String)bia.getBeliefbase().getBelief("highscore").getFact();
 				BufferedReader reader = null;
 				try
 				{
-					reader = new BufferedReader(new InputStreamReader(SUtil.getResource((String)result, ObserverGui.class.getClassLoader())));
+					reader = new BufferedReader(new InputStreamReader(SUtil.getResource(hs, ObserverGui.class.getClassLoader())));
 					StringBuffer fileData = new StringBuffer(1000);
 					char[] buf = new char[1024];
 					int numRead=0;
@@ -131,8 +135,50 @@ public class ObserverGui	extends EnvironmentGui
 						}
 					}
 				}
+				return null;
 			}
 		});
+		
+		// Read highscore list from resource.
+//		agent.getBeliefbase().getBeliefFact("highscore").addResultListener(new DefaultResultListener()
+//		{
+//			public void resultAvailable(Object source, Object result)
+//			{
+//				BufferedReader reader = null;
+//				try
+//				{
+//					reader = new BufferedReader(new InputStreamReader(SUtil.getResource((String)result, ObserverGui.class.getClassLoader())));
+//					StringBuffer fileData = new StringBuffer(1000);
+//					char[] buf = new char[1024];
+//					int numRead=0;
+//					while((numRead=reader.read(buf)) != -1){
+//						fileData.append(buf, 0, numRead);
+//					}
+//					reader.close();
+//					Creature[]	hscreatures	= (Creature[]) JavaReader.objectFromXML(fileData.toString(), this.getClass().getClassLoader());
+//				
+//					highscore.update(hscreatures);
+//				}
+//				catch(Exception e)
+//				{
+//					System.out.print("Error loading highscore: ");
+//					e.printStackTrace();
+//				}
+//				finally
+//				{
+//					if(reader!=null)
+//					{
+//						try
+//						{
+//							reader.close();
+//						}
+//						catch(Exception e)
+//						{
+//						}
+//					}
+//				}
+//			}
+//		});
 	}
 
 	/**
@@ -140,16 +186,17 @@ public class ObserverGui	extends EnvironmentGui
 	 */
 	protected void	enableGuiUpdate(final IBDIExternalAccess agent)
 	{
-		agent.getBeliefbase().addBeliefListener("vision", new IBeliefListener()
+		agent.scheduleStep(new IComponentStep()
 		{
-			public void beliefChanged(AgentEvent ae)
+			public Object execute(IInternalAccess ia)
 			{
-				final Vision vision = (Vision)ae.getValue(); 
-				agent.getBeliefbase().getBeliefFact("my_self").addResultListener(new DefaultResultListener()
+				final IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+				bia.getBeliefbase().getBelief("vision").addBeliefListener(new IBeliefListener()
 				{
-					public void resultAvailable(Object source, Object result)
+					public void beliefChanged(AgentEvent ae)
 					{
-						Creature me = (Creature)result;
+						final Vision vision = (Vision)ae.getValue(); 
+						Creature me = (Creature)bia.getBeliefbase().getBelief("my_self").getFact();
 						if(vision!=null)
 						{
 							// Update map and creature list from vision.
@@ -167,8 +214,39 @@ public class ObserverGui	extends EnvironmentGui
 						}
 					}
 				});
+				return null;
 			}
 		});
+		
+//		agent.getBeliefbase().addBeliefListener("vision", new IBeliefListener()
+//		{
+//			public void beliefChanged(AgentEvent ae)
+//			{
+//				final Vision vision = (Vision)ae.getValue(); 
+//				agent.getBeliefbase().getBeliefFact("my_self").addResultListener(new DefaultResultListener()
+//				{
+//					public void resultAvailable(Object source, Object result)
+//					{
+//						Creature me = (Creature)result;
+//						if(vision!=null)
+//						{
+//							// Update map and creature list from vision.
+//							map.update(new CurrentVision(me, vision));
+//							creatures.update(vision.getCreatures());
+//							observers.update(vision.getCreatures());
+//						}
+//
+//						// Refresh highscore.
+//						long	time	= System.currentTimeMillis();
+//						if(refreshinterval>=0 && refreshtime+refreshinterval<=time)
+//						{
+//							refreshHighscore(agent);
+//							refreshtime	= time;
+//						}
+//					}
+//				});
+//			}
+//		});
 	}
 }
 
