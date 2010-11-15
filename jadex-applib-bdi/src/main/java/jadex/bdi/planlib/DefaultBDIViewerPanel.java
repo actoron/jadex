@@ -54,50 +54,43 @@ public class DefaultBDIViewerPanel extends AbstractComponentViewerPanel
 		this.panel = new JPanel(new BorderLayout());
 		final IBDIExternalAccess bdiagent = (IBDIExternalAccess)component;
 		
-		super.init(jcc, component).addResultListener(new IResultListener()
+		// Init interface is asynchronous but super implementation is not.
+		IFuture	fut	= super.init(jcc, component);
+		assert fut.isDone();
+		
+		SServiceProvider.getService(jcc.getServiceProvider(), ILibraryService.class)
+			.addResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
-				SServiceProvider.getService(jcc.getServiceProvider(), ILibraryService.class)
+				final ILibraryService ls = (ILibraryService)result;
+						
+				bdiagent.getPropertybase().getProperty(PROPERTY_INCLUDESUBCAPABILITIES)
 					.addResultListener(new IResultListener()
 				{
 					public void resultAvailable(Object source, Object result)
 					{
-						final ILibraryService ls = (ILibraryService)result;
-						
-						bdiagent.getPropertybase().getProperty(PROPERTY_INCLUDESUBCAPABILITIES)
-							.addResultListener(new IResultListener()
+						if(result!=null)
 						{
-							public void resultAvailable(Object source, Object result)
+							String[] subcapnames = (String[])result;
+							createPanels(subcapnames, ls, ret);
+						}
+						else
+						{
+							bdiagent.getSubcapabilityNames().addResultListener(new IResultListener()
 							{
-								if(result!=null)
+								public void resultAvailable(Object source, Object result)
 								{
 									String[] subcapnames = (String[])result;
 									createPanels(subcapnames, ls, ret);
 								}
-								else
+								
+								public void exceptionOccurred(Object source, Exception exception)
 								{
-									bdiagent.getSubcapabilityNames().addResultListener(new IResultListener()
-									{
-										public void resultAvailable(Object source, Object result)
-										{
-											String[] subcapnames = (String[])result;
-											createPanels(subcapnames, ls, ret);
-										}
-										
-										public void exceptionOccurred(Object source, Exception exception)
-										{
-											ret.setException(exception);
-										}
-									});
+									ret.setException(exception);
 								}
-							}
-							
-							public void exceptionOccurred(Object source, Exception exception)
-							{
-								ret.setException(exception);
-							}
-						});
+							});
+						}
 					}
 					
 					public void exceptionOccurred(Object source, Exception exception)
