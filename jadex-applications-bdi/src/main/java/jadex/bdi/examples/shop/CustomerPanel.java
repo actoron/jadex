@@ -5,6 +5,8 @@ import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBeliefListener;
 import jadex.bdi.runtime.IBeliefSetListener;
 import jadex.bdi.runtime.IEAGoal;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IInternalAccess;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.commons.service.SServiceProvider;
 
@@ -249,6 +251,14 @@ public class CustomerPanel extends JPanel
 					final String name = (String)shopmodel.getValueAt(sel, 0);
 					final Double price = (Double)shopmodel.getValueAt(sel, 1);
 					final IShop shop = (IShop)shops.get(shopscombo.getSelectedItem());
+					agent.scheduleStep(new IComponentStep()
+					{
+						public Object execute(IInternalAccess ia)
+						{
+							// TODO Auto-generated method stub
+							return null;
+						}
+					});
 //					System.out.println("buying: "+name+" at: "+shop.getName());
 					agent.createGoal("buy").addResultListener(new SwingDefaultResultListener(CustomerPanel.this)
 					{
