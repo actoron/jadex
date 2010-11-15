@@ -1,11 +1,15 @@
 package jadex.bdi.planlib.cms;
 
-import jadex.bdi.runtime.IEABeliefSet;
+import jadex.bdi.runtime.AgentEvent;
+import jadex.bdi.runtime.IAgentListener;
+import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentManagementService;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IInternalAccess;
 import jadex.commons.IFuture;
 import jadex.commons.service.SServiceProvider;
 
@@ -26,83 +30,70 @@ public class CMSLocalUpdateComponentsPlan extends Plan
 	 */
 	public void body()
 	{
-		final IEABeliefSet components = (IEABeliefSet)getExternalAccess().getBeliefbase().getBeliefSet("components").get(this);
-		
-//		final IEBeliefSet components = getExternalAccess().getBeliefbase().getBeliefSet("components");
-		
-		final Object mon = new Object();
-		synchronized(mon)
-		{
-			this.listener	= new IComponentListener()
-			{
-				public void componentAdded(final IComponentDescription desc)
-				{
-					try
-					{
-						components.addFact(desc);
-						
-						// Decouple threads to avoid deadlocks (e.g. with sync executor)
-//						getExternalAccess().invokeLater(new Runnable()
-//						{
-//							public void run()
-//							{
-//	//							synchronized(mon)
-//								{
-//									components.addFact(desc);
-//								}
-//							}
-//						});
-					}
-					catch(ComponentTerminatedException ate)
-					{
-					}
-				}
-						
-				public void componentRemoved(final IComponentDescription desc, java.util.Map results)
-				{
-					try
-					{
-						components.removeFact(desc);
-						
-						// Decouple threads to avoid deadlocks (e.g. with sync executor)
-//						getExternalAccess().invokeLater(new Runnable()
-//						{
-//							public void run()
-//							{
-//	//							synchronized(mon)
-//								{
-//									components.removeFact(desc);
-//								}
-//							}
-//						});
-					}
-					catch(ComponentTerminatedException ate)
-					{
-					}
-				}
-
-				public void componentChanged(IComponentDescription desc)
-				{
-				}
-			};
-			
-			IComponentManagementService	ces	= (IComponentManagementService)SServiceProvider.getServiceUpwards(
-				getScope().getServiceProvider(), IComponentManagementService.class).get(this);
-			ces.addComponentListener(null, listener);
-			
-			IFuture fut = ces.getComponentDescriptions();
-			IComponentDescription[] descs = (IComponentDescription[])fut.get(this);
-			getBeliefbase().getBeliefSet("components").addFacts(descs);
-		}
-		
-		// Hack!!! How to remove listener on component exit? Store listener as belief?
-		waitForEver();
-	}
-	
-	public void aborted()
-	{
-		IComponentManagementService	ces	= (IComponentManagementService)SServiceProvider.getServiceUpwards(
+		final IComponentManagementService	ces	= (IComponentManagementService)SServiceProvider.getServiceUpwards(
 			getScope().getServiceProvider(), IComponentManagementService.class).get(this);
-		ces.removeComponentListener(null, listener);
+		this.listener	= new IComponentListener()
+		{
+			public void componentAdded(final IComponentDescription desc)
+			{
+				try
+				{
+					getExternalAccess().scheduleStep(new IComponentStep()
+					{
+						public Object execute(IInternalAccess ia)
+						{
+							((IBDIInternalAccess)ia).getBeliefbase().getBeliefSet("components").addFact(desc);
+							return null;
+						}
+					});
+				}
+				catch(ComponentTerminatedException ate)
+				{
+					ces.removeComponentListener(null, this);
+				}
+			}
+					
+			public void componentRemoved(final IComponentDescription desc, java.util.Map results)
+			{
+				try
+				{
+					getExternalAccess().scheduleStep(new IComponentStep()
+					{
+						public Object execute(IInternalAccess ia)
+						{
+							((IBDIInternalAccess)ia).getBeliefbase().getBeliefSet("components").removeFact(desc);
+							return null;
+						}
+					});
+				}
+				catch(ComponentTerminatedException ate)
+				{
+					ces.removeComponentListener(null, this);
+				}
+			}
+
+			public void componentChanged(IComponentDescription desc)
+			{
+			}
+		};
+		
+		ces.addComponentListener(null, listener);
+		
+		IFuture fut = ces.getComponentDescriptions();
+		IComponentDescription[] descs = (IComponentDescription[])fut.get(this);
+		getBeliefbase().getBeliefSet("components").addFacts(descs);
+		
+		getScope().addAgentListener(new IAgentListener()
+		{
+			
+			public void agentTerminating(AgentEvent ae)
+			{
+				ces.removeComponentListener(null, listener);
+			}
+			
+			public void agentTerminated(AgentEvent ae)
+			{
+			}
+		});
 	}
 }

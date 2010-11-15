@@ -4,19 +4,18 @@ import jadex.base.fipa.FIPAMessageType;
 import jadex.base.fipa.SFipa;
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IBDIExternalAccess;
-import jadex.bdi.runtime.IEAMessageEvent;
+import jadex.bdi.runtime.IBDIInternalAccess;
+import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.IMessageEventListener;
 import jadex.bridge.ContentException;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.MessageType;
 import jadex.bridge.MessageType.ParameterSpecification;
-import jadex.commons.Future;
-import jadex.commons.IFuture;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SGUI;
 import jadex.commons.SUtil;
-import jadex.commons.concurrent.CounterResultListener;
-import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.tools.help.SHelp;
 import jadex.xml.bean.JavaReader;
 import jadex.xml.bean.JavaWriter;
@@ -283,31 +282,26 @@ public class FipaConversationPanel extends JSplitPane
 						{
 							public void actionPerformed(ActionEvent ae)
 							{
-								// Todo: create reply based on map only.
-								createMessageEvent(msg).addResultListener(new SwingDefaultResultListener(FipaConversationPanel.this)
+								agent.scheduleStep(new IComponentStep()
 								{
-									public void customResultAvailable(Object source, Object result)
+									public Object execute(IInternalAccess ia)
 									{
-										IEAMessageEvent	me	= (IEAMessageEvent)result;
-										agent.getEventbase().createReply(me, "fipamsg").addResultListener(new SwingDefaultResultListener(FipaConversationPanel.this) 
+										IBDIInternalAccess	scope	= (IBDIInternalAccess)ia;
+										IMessageEvent	me	= createMessageEvent(scope, msg);
+										IMessageEvent	reply	= scope.getEventbase().createReply(me, "fipamsg");
+										final Map	replymsg	= createMessageMap(scope, reply);
+										SwingUtilities.invokeLater(new Runnable()
 										{
-											public void customResultAvailable(Object source, Object result) 
+											public void run()
 											{
-												final IEAMessageEvent reply = (IEAMessageEvent)result;
-												createMessageMap(reply).addResultListener(new SwingDefaultResultListener(FipaConversationPanel.this)
-												{
-													public void customResultAvailable(Object source, Object result)
-													{
-														Map	replymsg	= (Map)result;
-														replymsg.put(SFipa.SENDER, agent.getComponentIdentifier());
-														sendpanel.setMessage(replymsg);
-														tabs.setSelectedComponent(sendtab);
-													}
-												});
+												replymsg.put(SFipa.SENDER, agent.getComponentIdentifier());
+												sendpanel.setMessage(replymsg);
+												tabs.setSelectedComponent(sendtab);
 											}
 										});
+										return null;
 									}
-								});
+								});								
 							}
 						});
 	
@@ -350,11 +344,19 @@ public class FipaConversationPanel extends JSplitPane
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				for(int i=0; i<regmsgs.size(); i++)
+				final IMessageEvent[]	msgs	= (IMessageEvent[])regmsgs.toArray(new IMessageEvent[regmsgs.size()]);
+				agent.scheduleStep(new IComponentStep()
 				{
-					IEAMessageEvent mevent = (IEAMessageEvent)regmsgs.get(i);
-					agent.getEventbase().deregisterMessageEvent(mevent);
-				}
+					public Object execute(IInternalAccess ia)
+					{
+						for(int i=0; i<msgs.length; i++)
+						{
+							IBDIInternalAccess	scope	= (IBDIInternalAccess)ia;
+							scope.getEventbase().deregisterMessageEvent(msgs[i]);
+						}
+						return null;
+					}
+				});
 				regmsgs.clear();
 				
 				((DefaultListModel)sentmsgs.getModel()).removeAllElements();
@@ -646,23 +648,49 @@ public class FipaConversationPanel extends JSplitPane
 	
 	/**
 	 *  Send a message.
-	 * @param agent
-	 * @param msgevent
 	 */
 	protected void sendMessage(final Map msg)
 	{
-		createMessageEvent(msg).addResultListener(new SwingDefaultResultListener(this)
+		agent.scheduleStep(new IComponentStep()
 		{
-			public void customResultAvailable(Object source, Object result)
+			public Object execute(IInternalAccess ia)
 			{
-				IEAMessageEvent	me	= (IEAMessageEvent)result;
+				final IBDIInternalAccess	scope	= (IBDIInternalAccess)ia;
+				final IMessageEvent	me	= createMessageEvent(scope, msg);
+				scope.getEventbase().sendMessage(me);
+				
 				// Register message for conversations / replies.
 				if(msg.get(SFipa.CONVERSATION_ID)!=null || msg.get(SFipa.REPLY_WITH)!=null)
 				{
-					registerMessage(me);
+					regmsgs.add(me);
+					scope.getEventbase().registerMessageEvent(me);
+					
+					me.addMessageEventListener(new IMessageEventListener()
+					{
+						public void messageEventReceived(AgentEvent ae)
+						{
+							scope.getEventbase().deregisterMessageEvent(me);
+							me.removeMessageEventListener(this);
+						}
+						public void messageEventSent(AgentEvent ae)
+						{
+						}
+					});
 				}
-				agent.getEventbase().sendMessage(me);
-				((DefaultListModel)sentmsgs.getModel()).addElement(cloneMessage(msg));
+				
+				SwingUtilities.invokeLater(new Runnable()
+				{
+					public void run()
+					{
+						// Register message for conversations / replies.
+						if(msg.get(SFipa.CONVERSATION_ID)!=null || msg.get(SFipa.REPLY_WITH)!=null)
+						{
+							regmsgs.add(me);
+						}
+						((DefaultListModel)sentmsgs.getModel()).addElement(cloneMessage(msg));
+					}
+				});
+				return null;
 			}
 		});
 	}
@@ -670,143 +698,54 @@ public class FipaConversationPanel extends JSplitPane
 	/**
 	 *  Create a message event from a message map.
 	 */
-	protected IFuture	createMessageEvent(final Map msg)
+	protected IMessageEvent	createMessageEvent(IBDIInternalAccess scope, Map msg)
 	{
-		final Future	ret	= new Future();
-		
-		agent.getEventbase().createMessageEvent("fipamsg").addResultListener(new SwingDefaultResultListener(this)
+		IMessageEvent	me	= scope.getEventbase().createMessageEvent("fipamsg");
+		MessageType	mt	= new FIPAMessageType();	// (MessageType)msg.get(ConversationPlugin.ENCODED_MESSAGE_TYPE);
+				
+		for(int i=0; i<mt.getParameters().length; i++)
 		{
-			public void customResultAvailable(Object source, Object result)
+			String	name	= mt.getParameters()[i].getName();
+			me.getParameter(name).setValue(msg.get(name));
+		}
+		for(int i=0; i<mt.getParameterSets().length; i++)
+		{
+			String	name	= mt.getParameterSets()[i].getName();
+			if(msg.containsKey(name))
 			{
-				final IEAMessageEvent	me	= (IEAMessageEvent)result;
-				MessageType	mt	= new FIPAMessageType();	// (MessageType)msg.get(ConversationPlugin.ENCODED_MESSAGE_TYPE);
-				
-				final CounterResultListener	crl	= new CounterResultListener(mt.getParameters().length + mt.getParameterSets().length)
+				Object[]	values	= (Object[])msg.get(name);
+				for(int j=0; j<values.length; j++)
 				{
-					public void finalResultAvailable(Object source, Object result)
-					{
-						ret.setResult(me);
-					}
-					
-					public void exceptionOccurred(Object source, Exception exception)
-					{
-						ret.setException(exception);
-					}
-				};
-				
-				for(int i=0; i<mt.getParameters().length; i++)
-				{
-					String	name	= mt.getParameters()[i].getName();
-					me.setParameterValue(name, msg.get(name)).addResultListener(crl);
-				}
-				for(int i=0; i<mt.getParameterSets().length; i++)
-				{
-					String	name	= mt.getParameterSets()[i].getName();
-					if(msg.containsKey(name))
-					{
-						Object[]	values	= (Object[])msg.get(name);
-						CounterResultListener	crl2	= new CounterResultListener(values.length)
-						{
-							public void finalResultAvailable(Object source, Object result)
-							{
-								crl.resultAvailable(this, result);
-							}
-							
-							public void exceptionOccurred(Object source, Exception exception)
-							{
-								crl.exceptionOccurred(source, exception);
-							}
-						};
-						for(int j=0; j<values.length; j++)
-						{
-							me.addParameterSetValue(name, values[j]).addResultListener(crl2);
-						}
-					}
-					else
-					{
-						crl.resultAvailable(this, null);
-					}
+					me.getParameterSet(name).addValue(values[j]);
 				}
 			}
-		});
+		}
 		
-		return ret;
+		return me;
 	}
 	
 	/**
 	 *  Create a map from a message event.
+	 *  @param scope	Used as marker to show that method requires running on component thread.
+	 *  @param message	The message event to convert to a map.
 	 */
-	public IFuture	createMessageMap(final IEAMessageEvent message)
+	public Map	createMessageMap(IBDIInternalAccess scope, IMessageEvent message)
 	{
-		final Future	ret	= new Future();
-		
-		final MessageType	mt	= message.getMessageType();
-		final Map	msg	= new HashMap();
+		MessageType	mt	= message.getMessageType();
+		Map	msg	= new HashMap();
 		
 		for(int i=0; i<mt.getParameters().length; i++)
 		{
-			final int index	= i;
-			message.getParameterValue(mt.getParameters()[i].getName()).addResultListener(new SwingDefaultResultListener(this)
-			{
-				public void customResultAvailable(Object source, Object result)
-				{
-					msg.put(mt.getParameters()[index].getName(), result);
-					
-					// When last listener call, set result.
-					if(mt.getParameterSets().length==0 && index==mt.getParameters().length-1)
-					{
-						ret.setResult(msg);
-					}
-				}
-			});
+			String name	= mt.getParameters()[i].getName();
+			msg.put(name, message.getParameter(name).getValue());
 		}
 		for(int i=0; i<mt.getParameterSets().length; i++)
 		{
-			final int index	= i;
-			message.getParameterSetValues(mt.getParameterSets()[i].getName()).addResultListener(new SwingDefaultResultListener(this)
-			{
-				public void customResultAvailable(Object source, Object result)
-				{
-					msg.put(mt.getParameterSets()[index].getName(), result);
-					
-					// When last listener call, set result.
-					if(index==mt.getParameterSets().length-1)
-					{
-						String onto	= (String)msg.get(SFipa.ONTOLOGY);
-						if(onto==null || !onto.startsWith("jadex.tools"))
-						{
-							ret.setResult(msg);
-						}						
-					}
-				}
-			});
+			String name	= mt.getParameterSets()[i].getName();
+			msg.put(name, message.getParameterSet(name).getValues());
 		}
 		
-		return ret;
-	}
-
-
-	/**
-	 *  Register a message for conversations / replies.
-	 * @param agent
-	 * @param msgevent
-	 */
-	protected void registerMessage(final IEAMessageEvent msgevent)
-	{
-		agent.getEventbase().registerMessageEvent(msgevent);
-		regmsgs.add(msgevent);
-		
-		msgevent.addMessageEventListener(new IMessageEventListener()
-		{
-			public void messageEventReceived(AgentEvent ae)
-			{
-				agent.getEventbase().deregisterMessageEvent(msgevent);
-				msgevent.removeMessageEventListener(this);
-			}
-			public void messageEventSent(AgentEvent ae)
-			{
-			}
-		});
+		return msg;
 	}
 
 	/**
