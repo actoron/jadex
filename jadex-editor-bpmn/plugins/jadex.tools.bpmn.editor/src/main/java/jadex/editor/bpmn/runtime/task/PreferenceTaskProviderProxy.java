@@ -4,7 +4,7 @@
 package jadex.editor.bpmn.runtime.task;
 
 import jadex.editor.bpmn.editor.JadexBpmnEditor;
-import jadex.editor.bpmn.editor.JadexBpmnPlugin;
+import jadex.editor.bpmn.editor.JadexBpmnEditorActivator;
 import jadex.editor.bpmn.editor.preferences.JadexPreferences;
 import jadex.editor.bpmn.editor.preferences.JadexTaskProviderTypeListEditor;
 
@@ -85,7 +85,7 @@ public class PreferenceTaskProviderProxy implements IEditorTaskProvider
 	public String[] getAvailableTaskImplementations()
 	{
 
-		List<String> preferenceList = JadexTaskProviderTypeListEditor.parseStringList(JadexBpmnPlugin.getDefault().getPreferenceStore().getString(JadexPreferences.PREFERENCE_TASKPROVIDER_STRINGLIST));
+		List<String> preferenceList = JadexTaskProviderTypeListEditor.parseStringList(JadexBpmnEditorActivator.getDefault().getPreferenceStore().getString(JadexPreferences.PREFERENCE_TASKPROVIDER_STRINGLIST));
 		
 		if (!iTaskProviderCache.equals(preferenceList))
 		{
@@ -191,7 +191,7 @@ public class PreferenceTaskProviderProxy implements IEditorTaskProvider
 		
 		if (iTaskProviderCache.contains(fullQualifiedClassName))
 		{
-			status = new Status(IStatus.OK, JadexBpmnPlugin.ID, "Already in list");;
+			status = new Status(IStatus.OK, JadexBpmnEditorActivator.ID, "Already in list");;
 		}
 		
 		try
@@ -203,7 +203,7 @@ public class PreferenceTaskProviderProxy implements IEditorTaskProvider
 			if (Arrays.asList(clazz.getInterfaces()).contains(
 					IEditorTaskProvider.class))
 			{
-				status = new Status(IStatus.OK, JadexBpmnPlugin.ID, "Implements IRuntimeTaskProvider");
+				status = new Status(IStatus.OK, JadexBpmnEditorActivator.ID, "Implements IRuntimeTaskProvider");
 				return status;
 			}
 			
@@ -215,7 +215,7 @@ public class PreferenceTaskProviderProxy implements IEditorTaskProvider
 			
 			if (getAvailableTasksMethod != null && getTaskMetaInfoMethod != null)
 			{
-				status = new Status(IStatus.OK, JadexBpmnPlugin.ID, "Implements '"+IEditorTaskProvider.METHOD_IJADEXTASKPROVIDER_GET_AVAILABLE_TASK_IMPLEMENTATIONS+"' and '"+IEditorTaskProvider.METHOD_IJADEXTASKPROVIDER_GET_TASK_META_INFO+"'");
+				status = new Status(IStatus.OK, JadexBpmnEditorActivator.ID, "Implements '"+IEditorTaskProvider.METHOD_IJADEXTASKPROVIDER_GET_AVAILABLE_TASK_IMPLEMENTATIONS+"' and '"+IEditorTaskProvider.METHOD_IJADEXTASKPROVIDER_GET_TASK_META_INFO+"'");
 				return status;
 			}
 		}
@@ -225,7 +225,7 @@ public class PreferenceTaskProviderProxy implements IEditorTaskProvider
 			JadexBpmnEditor.log("Exception during task provider check in "+PreferenceTaskProviderProxy.class.getSimpleName(), e, IStatus.ERROR);
 			status = new Status(
 					IStatus.ERROR,
-					JadexBpmnPlugin.ID,
+					JadexBpmnEditorActivator.ID,
 					IStatus.CANCEL,
 					"Exception checking '"
 							+ fullQualifiedClassName

@@ -4,7 +4,7 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS
 {
-	private static final String BUNDLE_NAME = "jadex.tools.bpmn.diagram.messages"; //$NON-NLS-1$
+	private static final String BUNDLE_NAME = "jadex.editor.bpmn.diagram.messages"; //$NON-NLS-1$
 	
 	public static String JadexActivityAnnotationDecorator_Class_Label;
 	public static String JadexActivityAnnotationDecorator_Parameter_Label;

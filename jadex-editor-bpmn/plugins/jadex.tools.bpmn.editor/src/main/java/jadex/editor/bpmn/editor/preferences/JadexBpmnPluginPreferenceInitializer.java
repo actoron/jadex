@@ -3,7 +3,7 @@
  */
 package jadex.editor.bpmn.editor.preferences;
 
-import jadex.editor.bpmn.editor.JadexBpmnPlugin;
+import jadex.editor.bpmn.editor.JadexBpmnEditorActivator;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -25,7 +25,7 @@ public class JadexBpmnPluginPreferenceInitializer extends
 	@Override
 	public void initializeDefaultPreferences()
 	{
-		IPreferenceStore store = JadexBpmnPlugin.getDefault()
+		IPreferenceStore store = JadexBpmnEditorActivator.getDefault()
 				.getPreferenceStore();
 
 		store.setDefault(JadexPreferences.PREFERENCE_EDITOR_CONVERT_BPMN_AUTOMATICALLY_BOOLEAN, true);
@@ -37,7 +37,7 @@ public class JadexBpmnPluginPreferenceInitializer extends
 		store.setDefault(JadexPreferences.PREFERENCE_TASKPROVIDER_STRINGLIST,
 				AbstractPreferenceListEditor.createStringList(new String[] {
 				/* "jadex.tools.bpmn.runtime.task.StaticJadexTaskProvider" , */
-				"jadex.tools.bpmn.runtime.task.PackageBasedTaskProvider" }));
+				"jadex.editor.bpmn.runtime.task.PackageBasedTaskProvider" }));
 
 		store.setDefault(
 				JadexPreferences.PREFERENCE_TASKPROVIDER_SEARCH_PACKAGE_STRINGLIST,

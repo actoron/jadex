@@ -2,7 +2,7 @@ package jadex.editor.bpmn.editor.properties.template;
 
 import jadex.editor.bpmn.diagram.Messages;
 import jadex.editor.bpmn.editor.JadexBpmnEditor;
-import jadex.editor.bpmn.editor.JadexBpmnPlugin;
+import jadex.editor.bpmn.editor.JadexBpmnEditorActivator;
 import jadex.editor.bpmn.editor.properties.JadexBpmnDiagramImportsSection;
 import jadex.editor.bpmn.editor.properties.JadexBpmnDiagramParameterSection;
 import jadex.editor.bpmn.editor.properties.JadexBpmnDiagramPropertiesTableSection;
@@ -350,8 +350,8 @@ public class JadexBpmnPropertiesUtil
 			}
 			catch (ExecutionException exception)
 			{
-				JadexBpmnPlugin.getDefault().getLog().log(
-						new Status(IStatus.ERROR, JadexBpmnPlugin.ID,
+				JadexBpmnEditorActivator.getDefault().getLog().log(
+						new Status(IStatus.ERROR, JadexBpmnEditorActivator.ID,
 								IStatus.ERROR, exception.getMessage(),
 								exception));
 				
@@ -436,8 +436,8 @@ public class JadexBpmnPropertiesUtil
 		}
 		catch (ExecutionException exception)
 		{
-			JadexBpmnPlugin.getDefault().getLog().log(
-					new Status(IStatus.ERROR, JadexBpmnPlugin.ID,
+			JadexBpmnEditorActivator.getDefault().getLog().log(
+					new Status(IStatus.ERROR, JadexBpmnEditorActivator.ID,
 							IStatus.ERROR, exception.getMessage(),
 							exception));
 			
@@ -558,8 +558,8 @@ public class JadexBpmnPropertiesUtil
 		}
 		catch (ExecutionException exception)
 		{
-			JadexBpmnPlugin.getDefault().getLog().log(
-					new Status(IStatus.ERROR, JadexBpmnPlugin.ID,
+			JadexBpmnEditorActivator.getDefault().getLog().log(
+					new Status(IStatus.ERROR, JadexBpmnEditorActivator.ID,
 							IStatus.ERROR, exception.getMessage(),
 							exception));
 			
@@ -722,8 +722,8 @@ public class JadexBpmnPropertiesUtil
 		}
 		catch (ExecutionException exception)
 		{
-			JadexBpmnPlugin.getDefault().getLog().log(
-					new Status(IStatus.ERROR, JadexBpmnPlugin.ID,
+			JadexBpmnEditorActivator.getDefault().getLog().log(
+					new Status(IStatus.ERROR, JadexBpmnEditorActivator.ID,
 							IStatus.ERROR, exception.getMessage(),
 							exception));
 			

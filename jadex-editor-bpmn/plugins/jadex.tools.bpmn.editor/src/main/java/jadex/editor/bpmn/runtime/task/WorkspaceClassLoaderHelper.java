@@ -1,7 +1,7 @@
 package jadex.editor.bpmn.runtime.task;
 
 import jadex.editor.bpmn.editor.JadexBpmnEditor;
-import jadex.editor.bpmn.editor.JadexBpmnPlugin;
+import jadex.editor.bpmn.editor.JadexBpmnEditorActivator;
 
 import java.io.File;
 import java.io.IOException;
@@ -128,7 +128,7 @@ class WorkspaceClassLoaderHelper
 		}
 
 		// add the plugin path to the search path for new classloader
-		final Bundle bundle = JadexBpmnPlugin.getDefault().getBundle();
+		final Bundle bundle = JadexBpmnEditorActivator.getDefault().getBundle();
 
 		workspaceClassLoader = new URLClassLoader(urls.toArray(new URL[urls
 				.size()])/* , bundle.getClass().getClassLoader() */)

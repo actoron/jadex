@@ -12,18 +12,18 @@ import org.osgi.framework.BundleContext;
 /**
  * The activator class controls the plug-in life cycle
  */
-public class JadexBpmnPlugin extends AbstractUIPlugin {
+public class JadexBpmnEditorActivator extends AbstractUIPlugin {
 
 	/** The plug-in ID, its the same as the editor ID */
 	public static final String ID = JadexBpmnEditor.ID;
 
 	/** The shared instance of this plug-in */
-	private static JadexBpmnPlugin plugin;
+	private static JadexBpmnEditorActivator plugin;
 
 	/**
 	 * The constructor
 	 */
-	public JadexBpmnPlugin() {
+	public JadexBpmnEditorActivator() {
 	}
 
 	/*
@@ -51,7 +51,7 @@ public class JadexBpmnPlugin extends AbstractUIPlugin {
 	 *
 	 * @return the shared instance
 	 */
-	public static JadexBpmnPlugin getDefault() {
+	public static JadexBpmnEditorActivator getDefault() {
 		return plugin;
 	}
 

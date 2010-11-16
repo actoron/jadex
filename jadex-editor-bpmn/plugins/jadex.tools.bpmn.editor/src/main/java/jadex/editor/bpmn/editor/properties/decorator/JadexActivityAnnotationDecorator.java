@@ -33,7 +33,7 @@ public class JadexActivityAnnotationDecorator extends BpmnEAnnotationDecoratorPr
 	{
 		 return PlatformUI.getWorkbench().getSharedImages().
          	getImage(ISharedImages.IMG_OBJ_ELEMENT);
-//		ImageDescriptor desc = JadexBpmnPlugin.imageDescriptorFromPlugin(JadexBpmnPlugin.PLUGIN_ID, "icons/jadex.gif");
+//		ImageDescriptor desc = JadexBpmnEditorActivator.imageDescriptorFromPlugin(JadexBpmnEditorActivator.PLUGIN_ID, "icons/jadex.gif");
 //        return desc == null ? null : desc.createImage();
 	}
 

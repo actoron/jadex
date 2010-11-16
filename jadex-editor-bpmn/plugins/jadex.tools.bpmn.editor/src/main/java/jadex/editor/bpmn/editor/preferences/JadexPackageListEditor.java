@@ -1,6 +1,6 @@
 package jadex.editor.bpmn.editor.preferences;
 
-import jadex.editor.bpmn.editor.JadexBpmnPlugin;
+import jadex.editor.bpmn.editor.JadexBpmnEditorActivator;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -26,11 +26,11 @@ public class JadexPackageListEditor extends AbstractPreferenceListEditor
 					&& (toVerify.getElementType() == IJavaElement.PACKAGE_FRAGMENT 
 							|| toVerify.getElementType() == IJavaElement.PACKAGE_FRAGMENT_ROOT))
 			{
-				return new Status(IStatus.OK, JadexBpmnPlugin.ID, "Is package");
+				return new Status(IStatus.OK, JadexBpmnEditorActivator.ID, "Is package");
 			}
 			else
 			{
-				return new Status(IStatus.ERROR, JadexBpmnPlugin.ID,
+				return new Status(IStatus.ERROR, JadexBpmnEditorActivator.ID,
 						"Not a package declaration");
 			}
 		}

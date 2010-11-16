@@ -3,7 +3,7 @@
  */
 package jadex.editor.bpmn.editor.preferences;
 
-import jadex.editor.bpmn.editor.JadexBpmnPlugin;
+import jadex.editor.bpmn.editor.JadexBpmnEditorActivator;
 
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
@@ -37,7 +37,7 @@ public class JadexBpmnPluginPreferencePage extends FieldEditorPreferencePage
 	@Override
 	public void init(IWorkbench workbench)
 	{
-		setPreferenceStore(JadexBpmnPlugin.getDefault().getPreferenceStore());
+		setPreferenceStore(JadexBpmnEditorActivator.getDefault().getPreferenceStore());
 	}
 
 	/*
