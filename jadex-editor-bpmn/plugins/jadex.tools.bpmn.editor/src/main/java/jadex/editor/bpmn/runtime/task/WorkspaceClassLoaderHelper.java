@@ -27,6 +27,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.emf.common.util.UniqueEList;
 import org.eclipse.jdt.core.IClasspathEntry;
+import org.eclipse.jdt.core.IJavaModel;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
@@ -57,7 +58,8 @@ class WorkspaceClassLoaderHelper
 		URLClassLoader workspaceClassLoader = null;
 
 		final IWorkspace workspace = ResourcesPlugin.getWorkspace();
-		// IJavaModel javaModel = JavaCore.create(ResourcesPlugin.getWorkspace().getRoot());
+		final IPath workspacePath = workspace.getRoot().getLocation();
+		//IJavaModel javaModel = JavaCore.create(ResourcesPlugin.getWorkspace().getRoot());
 
 		// retrieve all (also closed, expect hidden) projects from this root
 		IProject[] workspaceProjects = workspace.getRoot().getProjects();
@@ -111,8 +113,24 @@ class WorkspaceClassLoaderHelper
 					// add libraries to URLs
 					else if (classpathEntry.getEntryKind() == IClasspathEntry.CPE_LIBRARY)
 					{
+						URL jarURL = null;
 						IPath libraryPath = classpathEntry.getPath();
-						urls.add(libraryPath.toFile().toURI().toURL());
+						File jarFile = libraryPath.toFile();
+						if (!jarFile.exists())
+						{
+							IPath workspaceLibraryPath = workspacePath.append(libraryPath);
+							jarFile = workspaceLibraryPath.toFile();
+						}
+						
+						if (jarFile.exists())
+						{
+							urls.add(jarFile.toURI().toURL());
+						}
+						else
+						{
+							JadexBpmnEditor.log("Can't determine jar path for library entry: " + libraryPath, null, IStatus.ERROR);
+						}
+						
 					}
 				}
 			}
