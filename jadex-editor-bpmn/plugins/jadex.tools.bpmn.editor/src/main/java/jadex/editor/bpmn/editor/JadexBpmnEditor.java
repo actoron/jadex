@@ -31,7 +31,7 @@ public class JadexBpmnEditor extends BpmnDiagramEditor
 {
 
 	/** The contributor id for this editor */
-	public static final String ID = "jadex.tools.bpmn.editor.JadexBpmnEditor";
+	public static final String ID = "jadex.editor.bpmn.JadexBpmnEditor";
 
 	/**
 	 * The Version of this editor and its annotation style

@@ -12,7 +12,7 @@
 <booleanAttribute key="clearwslog" value="false"/>
 <stringAttribute key="configLocation" value="${workspace_loc}/.metadata/.plugins/org.eclipse.pde.core/ADF Editor"/>
 <booleanAttribute key="default" value="true"/>
-<stringAttribute key="deselected_workspace_plugins" value="jadex.tools.gpmn,jadex.tools.gpmn.diagram,jadex.tools.gpmn.editor,jadex.tools.gpmn.edit,jadex.tools.bpmn.editor.JadexBpmnEditor"/>
+<stringAttribute key="deselected_workspace_plugins" value="jadex.tools.gpmn,jadex.tools.gpmn.diagram,jadex.tools.gpmn.editor,jadex.tools.gpmn.edit,jadex.editor.bpmn.JadexBpmnEditor"/>
 <stringAttribute key="featureDefaultLocation" value="workspace"/>
 <stringAttribute key="featurePluginResolution" value="workspace"/>
 <booleanAttribute key="includeOptional" value="true"/>

@@ -5,7 +5,7 @@
 </setAttribute>
 <booleanAttribute key="append.args" value="true"/>
 <booleanAttribute key="askclear" value="true"/>
-<booleanAttribute key="automaticAdd" value="true"/>
+<booleanAttribute key="automaticAdd" value="false"/>
 <booleanAttribute key="automaticValidate" value="false"/>
 <stringAttribute key="bad_container_name" value="\jadex.editor.bpmn.feature\launch\jadexeditor_bpmn.launch"/>
 <stringAttribute key="bootstrap" value=""/>
@@ -30,7 +30,7 @@
 <stringAttribute key="pde.version" value="3.3"/>
 <stringAttribute key="product" value="org.eclipse.platform.ide"/>
 <setAttribute key="selected_features">
-<setEntry value=jadex.editor.bpmn.featureefault"/>
+<setEntry value="jadex.editor.bpmn.feature:default"/>
 <setEntry value="org.eclipse.cvs:default"/>
 <setEntry value="org.eclipse.draw2d:default"/>
 <setEntry value="org.eclipse.emf.codegen.ecore.ui:default"/>
@@ -77,7 +77,6 @@
 <setEntry value="org.polarion.eclipse.team.svn.connector:default"/>
 </setAttribute>
 <booleanAttribute key="show_selected_only" value="false"/>
-<stringAttribute key="timestamp" value="1289397305554"/>
 <booleanAttribute key="tracing" value="false"/>
 <booleanAttribute key="useCustomFeatures" value="true"/>
 <booleanAttribute key="useDefaultConfig" value="true"/>

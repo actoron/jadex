@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
-      id="jadex.editor.bpmn.featuree"
+      id="jadex.editor.bpmn.feature"
       label="Jadex BPMN Editor"
       version="1.0.0.qualifier"
       provider-name="Jadex BPMN Editor"
@@ -33,7 +33,7 @@ This means the LGPL does not allow you to develop closed source software product
    </requires>
 
    <plugin
-         id="jadex.tools.bpmn.editor.JadexBpmnEditor"
+         id="jadex.editor.bpmn.JadexBpmnEditor"
          download-size="0"
          install-size="0"
          version="0.0.0"

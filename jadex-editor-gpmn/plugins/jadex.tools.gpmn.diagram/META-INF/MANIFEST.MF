@@ -34,7 +34,7 @@ Require-Bundle: org.eclipse.emf.ecore,
  org.eclipse.stp.bpmn.diagram;bundle-version="1.0.0",
  org.eclipse.jdt.core;bundle-version="3.5.0",
  org.eclipse.ocl.ecore;visibility:=reexport,
- jadex.tools.bpmn.editor.JadexBpmnEditor;bundle-version="0.0.2"
+ jadex.editor.bpmn.JadexBpmnEditor;bundle-version="0.0.2"
 Bundle-ClassPath: .
 Bundle-Activator: jadex.tools.gpmn.diagram.part.GpmnDiagramEditorPlugin
 Bundle-Vendor: %providerName
@@ -43,4 +43,4 @@ Export-Package: jadex.tools.gpmn.diagram.edit.parts,
  jadex.tools.gpmn.diagram.part,
  jadex.tools.gpmn.diagram.providers
 Eclipse-LazyStart: true
-DynamicImport-Package: org.eclipse.stp.*
+DynamicImport-Package: *
