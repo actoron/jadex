@@ -43,3 +43,4 @@ Export-Package: jadex.tools.gpmn.diagram.edit.parts,
  jadex.tools.gpmn.diagram.part,
  jadex.tools.gpmn.diagram.providers
 Eclipse-LazyStart: true
+DynamicImport-Package: org.eclipse.stp.*
