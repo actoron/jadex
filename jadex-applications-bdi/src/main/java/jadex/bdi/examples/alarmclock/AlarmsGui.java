@@ -1,6 +1,9 @@
 package jadex.bdi.examples.alarmclock;
 
 import jadex.bdi.runtime.IBDIExternalAccess;
+import jadex.bdi.runtime.IBDIInternalAccess;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IInternalAccess;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.commons.jtable.ObjectTableModel;
 import jadex.commons.service.SServiceProvider;
@@ -25,6 +28,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
 import javax.swing.table.TableCellRenderer;
 
 /**
@@ -175,20 +179,42 @@ public class AlarmsGui extends JFrame
 //				{
 //					public void run()
 //					{
-						agent.getBeliefbase().getBeliefSetFacts("alarms").addResultListener(new SwingDefaultResultListener(AlarmsGui.this)
+						agent.scheduleStep(new IComponentStep()
 						{
-							public void customResultAvailable(Object source, Object result)
+							public Object execute(IInternalAccess ia)
 							{
-								Alarm[] alarms = (Alarm[])result;
-								for(int i=0; i<alarms.length; i++)
+								IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+								final Alarm[] alarms = (Alarm[])bia.getBeliefbase().getBeliefSet("alarms").getFacts();
+								SwingUtilities.invokeLater(new Runnable()
 								{
-									// Cannot use add row as beliefset already contains alarm.
-									tadata.addRow(new Object[]{alarms[i].getMessage(), alarms[i].getMode(),
-										new Boolean(alarms[i].isActive())}, alarms[i]);
-									alarms[i].addPropertyChangeListener(plis);
-								}
+									public void run()
+									{
+										for(int i=0; i<alarms.length; i++)
+										{
+											// Cannot use add row as beliefset already contains alarm.
+											tadata.addRow(new Object[]{alarms[i].getMessage(), alarms[i].getMode(),
+												new Boolean(alarms[i].isActive())}, alarms[i]);
+											alarms[i].addPropertyChangeListener(plis);
+										}
+									}
+								});
+								return null;
 							}
 						});
+//						agent.getBeliefbase().getBeliefSetFacts("alarms").addResultListener(new SwingDefaultResultListener(AlarmsGui.this)
+//						{
+//							public void customResultAvailable(Object source, Object result)
+//							{
+//								Alarm[] alarms = (Alarm[])result;
+//								for(int i=0; i<alarms.length; i++)
+//								{
+//									// Cannot use add row as beliefset already contains alarm.
+//									tadata.addRow(new Object[]{alarms[i].getMessage(), alarms[i].getMode(),
+//										new Boolean(alarms[i].isActive())}, alarms[i]);
+//									alarms[i].addPropertyChangeListener(plis);
+//								}
+//							}
+//						});
 //					}
 //				});
 				getContentPane().add("Center", pan);
@@ -230,11 +256,21 @@ public class AlarmsGui extends JFrame
 	 *  Adds a property change listener to the alarm.
 	 *  @param alarm The alarm.
 	 */
-	public void addRow(Alarm alarm, int rowcnt)
+	public void addRow(final Alarm alarm, int rowcnt)
 	{
 //		System.out.println("Adding:"+alarm);
 		alarm.addPropertyChangeListener(plis);
-		agent.getBeliefbase().addBeliefSetFact("alarms", alarm);
+		agent.scheduleStep(new IComponentStep()
+		{
+			public Object execute(IInternalAccess ia)
+			{
+				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+				bia.getBeliefbase().getBeliefSet("alarms").addFact(alarm);
+				return null;
+			}
+		});
+		
+//		agent.getBeliefbase().addBeliefSetFact("alarms", alarm);
 		ObjectTableModel tadata = (ObjectTableModel)alarms.getModel();
 		tadata.insertRow(rowcnt, new Object[]{alarm.getMessage(),
 			alarm.getMode(), new Boolean(alarm.isActive())}, alarm);
@@ -247,10 +283,19 @@ public class AlarmsGui extends JFrame
 	 *  Removes a property change listener from the alarm.
 	 *  @param alarm The alarm.
 	 */
-	public void removeRow(Alarm alarm)
+	public void removeRow(final Alarm alarm)
 	{
 //		System.out.println("Removing:"+alarm);
-		agent.getBeliefbase().removeBeliefSetFact("alarms", alarm);
+		agent.scheduleStep(new IComponentStep()
+		{
+			public Object execute(IInternalAccess ia)
+			{
+				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+				bia.getBeliefbase().getBeliefSet("alarms").removeFact(alarm);
+				return null;
+			}
+		});
+//		agent.getBeliefbase().removeBeliefSetFact("alarms", alarm);
 		ObjectTableModel tadata = (ObjectTableModel)alarms.getModel();
 		tadata.removeRow(alarm);
 		alarm.removePropertyChangeListener(plis);

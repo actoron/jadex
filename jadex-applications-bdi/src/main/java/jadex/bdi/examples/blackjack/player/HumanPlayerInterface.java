@@ -8,6 +8,9 @@ import jadex.bdi.examples.blackjack.gui.PlayerPanel;
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IAgentListener;
 import jadex.bdi.runtime.IBDIExternalAccess;
+import jadex.bdi.runtime.IBDIInternalAccess;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IInternalAccess;
 import jadex.commons.SGUI;
 import jadex.commons.SimplePropertyChangeSupport;
 
@@ -63,27 +66,51 @@ public class HumanPlayerInterface extends GameStateFrame
 		{
 			public void windowClosing(WindowEvent e)
 			{
-				agent.killAgent();
+				agent.killComponent();
 			}
 		});
 
 		// Close window on agent death.
-		agent.addAgentListener(new IAgentListener()
+		agent.scheduleStep(new IComponentStep()
 		{
-			public void agentTerminating(AgentEvent e)
+			public Object execute(IInternalAccess ia)
 			{
-				SwingUtilities.invokeLater(new Runnable()
+				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+				bia.addAgentListener(new IAgentListener()
 				{
-					public void run()
+					public void agentTerminating(AgentEvent e)
 					{
-						HumanPlayerInterface.this.dispose();
+						SwingUtilities.invokeLater(new Runnable()
+						{
+							public void run()
+							{
+								HumanPlayerInterface.this.dispose();
+							}
+						});
+					}
+					public void agentTerminated(AgentEvent ae)
+					{
 					}
 				});
-			}
-			public void agentTerminated(AgentEvent ae)
-			{
+				return null;
 			}
 		});
+//		agent.addAgentListener(new IAgentListener()
+//		{
+//			public void agentTerminating(AgentEvent e)
+//			{
+//				SwingUtilities.invokeLater(new Runnable()
+//				{
+//					public void run()
+//					{
+//						HumanPlayerInterface.this.dispose();
+//					}
+//				});
+//			}
+//			public void agentTerminated(AgentEvent ae)
+//			{
+//			}
+//		});
 
 		this.setTitle("Human player: "+player.getName());
 		this.pack();

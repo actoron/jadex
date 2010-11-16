@@ -36,6 +36,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import javax.swing.UIDefaults;
 
 import com.toedter.calendar.JDateChooser;
@@ -182,15 +183,32 @@ public class AlarmSettingsDialog extends JDialog
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				agent.getTime().addResultListener(new SwingDefaultResultListener(AlarmSettingsDialog.this)
+				agent.scheduleStep(new IComponentStep()
 				{
-					public void customResultAvailable(Object source, Object result) 
+					public Object execute(IInternalAccess ia)
 					{
-						Date now = new Date(((Long)result).longValue());
-						date.setDate(now);
-						time.setValue(now);
+						IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+						final Date now = new Date(bia.getTime());
+						SwingUtilities.invokeLater(new Runnable()
+						{
+							public void run()
+							{
+								date.setDate(now);
+								time.setValue(now);								
+							}
+						});
+						return null;
 					}
 				});
+//				agent.getTime().addResultListener(new SwingDefaultResultListener(AlarmSettingsDialog.this)
+//				{
+//					public void customResultAvailable(Object source, Object result) 
+//					{
+//						Date now = new Date(((Long)result).longValue());
+//						date.setDate(now);
+//						time.setValue(now);
+//					}
+//				});
 //				Date now = new Date(agent.getTime());
 //				date.setDate(now);
 //				time.setValue(now);

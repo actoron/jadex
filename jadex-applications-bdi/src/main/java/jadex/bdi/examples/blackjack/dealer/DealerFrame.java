@@ -7,6 +7,9 @@ import jadex.bdi.examples.blackjack.gui.GameStateFrame;
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IAgentListener;
 import jadex.bdi.runtime.IBDIExternalAccess;
+import jadex.bdi.runtime.IBDIInternalAccess;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IInternalAccess;
 import jadex.commons.SGUI;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 
@@ -64,25 +67,49 @@ public class DealerFrame extends GameStateFrame
 		{
 			public void windowClosing(WindowEvent e)
 			{
-				DealerFrame.this.agent.killAgent();
+				DealerFrame.this.agent.killComponent();
 			}
 		});
-		agent.addAgentListener(new IAgentListener()
+		agent.scheduleStep(new IComponentStep()
 		{
-			public void agentTerminating(AgentEvent ae)
+			public Object execute(IInternalAccess ia)
 			{
-				SwingUtilities.invokeLater(new Runnable()
+				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+				bia.addAgentListener(new IAgentListener()
 				{
-					public void run()
+					public void agentTerminating(AgentEvent ae)
 					{
-						DealerFrame.this.dispose();
+						SwingUtilities.invokeLater(new Runnable()
+						{
+							public void run()
+							{
+								DealerFrame.this.dispose();
+							}
+						});
+					}
+					public void agentTerminated(AgentEvent ae)
+					{
 					}
 				});
-			}
-			public void agentTerminated(AgentEvent ae)
-			{
+				return null;
 			}
 		});
+//		agent.addAgentListener(new IAgentListener()
+//		{
+//			public void agentTerminating(AgentEvent ae)
+//			{
+//				SwingUtilities.invokeLater(new Runnable()
+//				{
+//					public void run()
+//					{
+//						DealerFrame.this.dispose();
+//					}
+//				});
+//			}
+//			public void agentTerminated(AgentEvent ae)
+//			{
+//			}
+//		});
 
 		// set the icon to be displayed for the frame
 		setIconImage(GUIImageLoader.getImage("heart_small_d").getImage());
@@ -91,13 +118,29 @@ public class DealerFrame extends GameStateFrame
 		{
 			public void run()
 			{
-				agent.getBeliefbase().getBeliefFact("gamestate").addResultListener(new SwingDefaultResultListener(DealerFrame.this)
+				agent.scheduleStep(new IComponentStep()
 				{
-					public void customResultAvailable(Object source, Object result)
+					public Object execute(IInternalAccess ia)
 					{
-						DealerFrame.this.setGameState((GameState)result);
+						IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+						final GameState gs = (GameState)bia.getBeliefbase().getBelief("gamestate").getFact();
+						SwingUtilities.invokeLater(new Runnable()
+						{
+							public void run()
+							{
+								DealerFrame.this.setGameState(gs);
+							}
+						});
+						return null;
 					}
 				});
+//				agent.getBeliefbase().getBeliefFact("gamestate").addResultListener(new SwingDefaultResultListener(DealerFrame.this)
+//				{
+//					public void customResultAvailable(Object source, Object result)
+//					{
+//						DealerFrame.this.setGameState((GameState)result);
+//					}
+//				});
 			}
 		});
 		setControlPanel(new DealerOptionPanel(agent, DealerFrame.this));

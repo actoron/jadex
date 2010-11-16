@@ -2,10 +2,15 @@ package jadex.bdi.examples.booktrading.common;
 
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IBDIExternalAccess;
+import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bdi.runtime.IBeliefSetListener;
 import jadex.bdi.runtime.IEAExpression;
 import jadex.bdi.runtime.IEAGoal;
+import jadex.bdi.runtime.IExpression;
+import jadex.bdi.runtime.IGoal;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
 import jadex.commons.SGUI;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
@@ -43,6 +48,7 @@ import javax.swing.JSplitPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
@@ -249,46 +255,101 @@ public class GuiPanel extends JPanel
 		add(BorderLayout.CENTER, splitter);
 		add(BorderLayout.SOUTH, south);
 
-		agent.getBeliefbase().addBeliefSetListener("orders", new IBeliefSetListener()
+		agent.scheduleStep(new IComponentStep()
 		{
-			public void factChanged(AgentEvent ae)
+			public Object execute(IInternalAccess ia)
 			{
-//				System.out.println("Changed: "+ae.getValue());
-				refresh();
-			}
-			
-			public void factAdded(AgentEvent ae)
-			{
-//				System.out.println("Added: "+ae.getValue());
-				refresh();
-			}
-			
-			public void factRemoved(AgentEvent ae)
-			{
-//				System.out.println("Removed: "+ae.getValue());
-				refresh();
+				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+				bia.getBeliefbase().getBeliefSet("orders").addBeliefSetListener(new IBeliefSetListener()
+				{
+					public void factChanged(AgentEvent ae)
+					{
+		//				System.out.println("Changed: "+ae.getValue());
+						refresh();
+					}
+					
+					public void factAdded(AgentEvent ae)
+					{
+		//				System.out.println("Added: "+ae.getValue());
+						refresh();
+					}
+					
+					public void factRemoved(AgentEvent ae)
+					{
+		//				System.out.println("Removed: "+ae.getValue());
+						refresh();
+					}
+				});
+				return null;
 			}
 		});
+//		agent.getBeliefbase().addBeliefSetListener("orders", new IBeliefSetListener()
+//		{
+//			public void factChanged(AgentEvent ae)
+//			{
+////				System.out.println("Changed: "+ae.getValue());
+//				refresh();
+//			}
+//			
+//			public void factAdded(AgentEvent ae)
+//			{
+////				System.out.println("Added: "+ae.getValue());
+//				refresh();
+//			}
+//			
+//			public void factRemoved(AgentEvent ae)
+//			{
+////				System.out.println("Removed: "+ae.getValue());
+//				refresh();
+//			}
+//		});
 		
-		agent.getBeliefbase().addBeliefSetListener("negotiation_reports", new IBeliefSetListener()
+		agent.scheduleStep(new IComponentStep()
 		{
-			public void factAdded(AgentEvent ae)
+			public Object execute(IInternalAccess ia)
 			{
-//						System.out.println("a fact was added");
-				refreshDetails();
-			}
+				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+				bia.getBeliefbase().getBeliefSet("negotiation_reports").addBeliefSetListener(new IBeliefSetListener()
+				{
+					public void factAdded(AgentEvent ae)
+					{
+//								System.out.println("a fact was added");
+						refreshDetails();
+					}
 
-			public void factRemoved(AgentEvent ae)
-			{
-//						System.out.println("a fact was removed");
-				refreshDetails();
-			}
+					public void factRemoved(AgentEvent ae)
+					{
+//								System.out.println("a fact was removed");
+						refreshDetails();
+					}
 
-			public void factChanged(AgentEvent ae)
-			{
-				//System.out.println("belset changed");
+					public void factChanged(AgentEvent ae)
+					{
+						//System.out.println("belset changed");
+					}
+				});
+				return null;
 			}
 		});
+//		agent.getBeliefbase().addBeliefSetListener("negotiation_reports", new IBeliefSetListener()
+//		{
+//			public void factAdded(AgentEvent ae)
+//			{
+////						System.out.println("a fact was added");
+//				refreshDetails();
+//			}
+//
+//			public void factRemoved(AgentEvent ae)
+//			{
+////						System.out.println("a fact was removed");
+//				refreshDetails();
+//			}
+//
+//			public void factChanged(AgentEvent ae)
+//			{
+//				//System.out.println("belset changed");
+//			}
+//		});
 		
 		table.addMouseListener(new MouseAdapter()
 		{
@@ -320,15 +381,26 @@ public class GuiPanel extends JPanel
 								Date deadline = dformat.parse(dia.deadline.getText());
 								final Order order = new Order(title, deadline, start, limit, buy, cs);
 								
-								agent.createGoal(goalname).addResultListener(new DefaultResultListener()
+								agent.scheduleStep(new IComponentStep()
 								{
-									public void resultAvailable(Object source, Object result)
+									public Object execute(IInternalAccess ia)
 									{
-										IEAGoal purchase = (IEAGoal)result;
-										purchase.setParameterValue("order", order);
-										agent.dispatchTopLevelGoal(purchase);
+										IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+										IGoal purchase = bia.getGoalbase().createGoal(goalname);
+										purchase.getParameter("order").setValue(order);
+										bia.getGoalbase().dispatchTopLevelGoal(purchase);
+										return null;
 									}
 								});
+//								agent.createGoal(goalname).addResultListener(new DefaultResultListener()
+//								{
+//									public void resultAvailable(Object source, Object result)
+//									{
+//										IEAGoal purchase = (IEAGoal)result;
+//										purchase.setParameterValue("order", order);
+//										agent.dispatchTopLevelGoal(purchase);
+//									}
+//								});
 								orders.add(order);
 								items.fireTableDataChanged();
 								break;
@@ -368,30 +440,50 @@ public class GuiPanel extends JPanel
 				{
 					final Order order = (Order)orders.remove(row);
 					items.fireTableRowsDeleted(row, row);
-					agent.getGoalbase().getGoals(goalname).addResultListener(new DefaultResultListener()
+					
+					agent.scheduleStep(new IComponentStep()
 					{
-						public void resultAvailable(Object source, Object result)
+						public Object execute(IInternalAccess ia)
 						{
-							final IEAGoal[] goals = (IEAGoal[])result;
-//							System.out.println("removing: "+SUtil.arrayToString(goals));
+							IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+							IGoal[] goals = bia.getGoalbase().getGoals(goalname);
 							for(int i=0; i<goals.length; i++)
 							{
-								final int fi = i;
-								goals[i].getParameterValue("order").addResultListener(new DefaultResultListener()
+								Order or = (Order)goals[i].getParameter("order").getValue();
+								if(order.equals(or))
 								{
-									public void resultAvailable(Object source, Object result)
-									{
-										Order or = (Order)result;
-										if(order.equals(or))
-										{
-											or.setState(Order.FAILED);
-											dropGoal(new IEAGoal[]{goals[fi]}, 0, order);
-										}
-									}
-								});
+									or.setState(Order.FAILED);
+									goals[i].drop();
+									break;
+								}
 							}
+							return null;
 						}
 					});
+//					agent.getGoalbase().getGoals(goalname).addResultListener(new DefaultResultListener()
+//					{
+//						public void resultAvailable(Object source, Object result)
+//						{
+//							final IEAGoal[] goals = (IEAGoal[])result;
+////							System.out.println("removing: "+SUtil.arrayToString(goals));
+//							for(int i=0; i<goals.length; i++)
+//							{
+//								final int fi = i;
+//								goals[i].getParameterValue("order").addResultListener(new DefaultResultListener()
+//								{
+//									public void resultAvailable(Object source, Object result)
+//									{
+//										Order or = (Order)result;
+//										if(order.equals(or))
+//										{
+//											or.setState(Order.FAILED);
+//											dropGoal(new IEAGoal[]{goals[fi]}, 0, order);
+//										}
+//									}
+//								});
+//							}
+//						}
+//					});
 				}
 			}
 		});
@@ -432,23 +524,43 @@ public class GuiPanel extends JPanel
 									order.setDeadline(deadline);
 									items.fireTableDataChanged();
 									
-									agent.getGoalbase().getGoals(goalname).addResultListener(new DefaultResultListener()
+									agent.scheduleStep(new IComponentStep()
 									{
-										public void resultAvailable(Object source, Object result)
+										public Object execute(IInternalAccess ia)
 										{
-											IEAGoal[] goals = (IEAGoal[])result;
-											dropGoal(goals, 0, order);
+											IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+											IGoal[] goals = bia.getGoalbase().getGoals(goalname);
+											for(int i=0; i<goals.length; i++)
+											{
+												if(goals[i].getParameter("order").getValue().equals(order))
+												{
+													goals[i].drop();
+												}
+											}
+											
+											IGoal goal = bia.getGoalbase().createGoal(goalname);
+											goal.getParameter("order").setValue(order);
+											bia.getGoalbase().dispatchTopLevelGoal(goal);
+											return null;
 										}
 									});
-									agent.createGoal(goalname).addResultListener(new DefaultResultListener()
-									{
-										public void resultAvailable(Object source, Object result)
-										{
-											IEAGoal goal = (IEAGoal)result;
-											goal.setParameterValue("order", order);
-											agent.dispatchTopLevelGoal(goal);
-										}
-									});
+//									agent.getGoalbase().getGoals(goalname).addResultListener(new DefaultResultListener()
+//									{
+//										public void resultAvailable(Object source, Object result)
+//										{
+//											IEAGoal[] goals = (IEAGoal[])result;
+//											dropGoal(goals, 0, order);
+//										}
+//									});
+//									agent.createGoal(goalname).addResultListener(new DefaultResultListener()
+//									{
+//										public void resultAvailable(Object source, Object result)
+//										{
+//											IEAGoal goal = (IEAGoal)result;
+//											goal.setParameterValue("order", order);
+//											agent.dispatchTopLevelGoal(goal);
+//										}
+//									});
 									break;
 								}
 								catch(NumberFormatException e1)
@@ -469,29 +581,29 @@ public class GuiPanel extends JPanel
 		refresh();
 	}
 
-	/**
-	 *  Helper method for dropping a goal.
-	 *  @param goals
-	 *  @param num
-	 */
-	protected void dropGoal(final IEAGoal[] goals, final int num, final Order order)
-	{
-		goals[num].getParameterValue("order").addResultListener(new DefaultResultListener()
-		{
-			public void resultAvailable(Object source, Object result)
-			{
-				if(order.equals(result))
-				{
-//					System.out.println("Dropping: "+goals[num]);
-					goals[num].drop();
-				}
-				else if(num+1<goals.length)
-				{
-					dropGoal(goals, num+1, order);
-				}
-			}
-		});
-	}
+//	/**
+//	 *  Helper method for dropping a goal.
+//	 *  @param goals
+//	 *  @param num
+//	 */
+//	protected void dropGoal(final IEAGoal[] goals, final int num, final Order order)
+//	{
+//		goals[num].getParameterValue("order").addResultListener(new DefaultResultListener()
+//		{
+//			public void resultAvailable(Object source, Object result)
+//			{
+//				if(order.equals(result))
+//				{
+////					System.out.println("Dropping: "+goals[num]);
+//					goals[num].drop();
+//				}
+//				else if(num+1<goals.length)
+//				{
+//					dropGoal(goals, num+1, order);
+//				}
+//			}
+//		});
+//	}
 	
 	//-------- methods --------
 
@@ -500,23 +612,47 @@ public class GuiPanel extends JPanel
 	 */
 	public void refresh()
 	{
-		agent.getBeliefbase().getBeliefSetFacts("orders")
-			.addResultListener(new SwingDefaultResultListener(GuiPanel.this)
+		agent.scheduleStep(new IComponentStep()
 		{
-			public void customResultAvailable(Object source, final Object result)
+			public Object execute(IInternalAccess ia)
 			{
-				Order[]	aorders = (Order[])result;
-//				System.out.println("refresh: "+SUtil.arrayToString(aorders)+" "+GuiPanel.this);
-				for(int i = 0; i < aorders.length; i++)
+				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+				final Object[] aorders = bia.getBeliefbase().getBeliefSet("orders").getFacts();
+				SwingUtilities.invokeLater(new Runnable()
 				{
-					if(!orders.contains(aorders[i]))
+					public void run()
 					{
-						orders.add(aorders[i]);
+						for(int i = 0; i < aorders.length; i++)
+						{
+							if(!orders.contains(aorders[i]))
+							{
+								orders.add(aorders[i]);
+							}
+						}
+						items.fireTableDataChanged();
 					}
-				}
-				items.fireTableDataChanged();
+				});
+				return null;
 			}
 		});
+		
+//		agent.getBeliefbase().getBeliefSetFacts("orders")
+//			.addResultListener(new SwingDefaultResultListener(GuiPanel.this)
+//		{
+//			public void customResultAvailable(Object source, final Object result)
+//			{
+//				Order[]	aorders = (Order[])result;
+////				System.out.println("refresh: "+SUtil.arrayToString(aorders)+" "+GuiPanel.this);
+//				for(int i = 0; i < aorders.length; i++)
+//				{
+//					if(!orders.contains(aorders[i]))
+//					{
+//						orders.add(aorders[i]);
+//					}
+//				}
+//				items.fireTableDataChanged();
+//			}
+//		});
 	}
 	
 	/**
@@ -528,20 +664,19 @@ public class GuiPanel extends JPanel
 		if(sel!=-1)
 		{
 			final Order order = (Order)orders.get(sel);
-			agent.getExpressionbase().getExpression("search_reports").addResultListener(new DefaultResultListener()
+			
+			agent.scheduleStep(new IComponentStep()
 			{
-				public void resultAvailable(Object source, final Object result)
+				public Object execute(IInternalAccess ia)
 				{
-					IEAExpression exp = (IEAExpression)result;
+					IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+					IExpression exp = bia.getExpressionbase().getExpression("search_reports");
+					final List res = (List)exp.execute("$order", order);
 					
-					exp.execute("$order", order).addResultListener(new SwingDefaultResultListener(GuiPanel.this)
+					SwingUtilities.invokeLater(new Runnable()
 					{
-						public void customResultAvailable(Object source, Object result)
+						public void run()
 						{
-							List res = (List)result;
-//							for(int i=0; i<res.size(); i++)
-//								System.out.println(""+i+res.get(i));
-							
 							while(detailsdm.getRowCount()>0)
 								detailsdm.removeRow(0);
 							for(int i=0; i<res.size(); i++)
@@ -551,8 +686,35 @@ public class GuiPanel extends JPanel
 							}
 						}
 					});
+					return null;
 				}
 			});
+					
+//			agent.getExpressionbase().getExpression("search_reports").addResultListener(new DefaultResultListener()
+//			{
+//				public void resultAvailable(Object source, final Object result)
+//				{
+//					IEAExpression exp = (IEAExpression)result;
+//					
+//					exp.execute("$order", order).addResultListener(new SwingDefaultResultListener(GuiPanel.this)
+//					{
+//						public void customResultAvailable(Object source, Object result)
+//						{
+//							List res = (List)result;
+////							for(int i=0; i<res.size(); i++)
+////								System.out.println(""+i+res.get(i));
+//							
+//							while(detailsdm.getRowCount()>0)
+//								detailsdm.removeRow(0);
+//							for(int i=0; i<res.size(); i++)
+//							{
+//								detailsdm.addRow(new Object[]{res.get(i)});
+//								//System.out.println(""+i+res.get(i));
+//							}
+//						}
+//					});
+//				}
+//			});
 		}
 	}
 

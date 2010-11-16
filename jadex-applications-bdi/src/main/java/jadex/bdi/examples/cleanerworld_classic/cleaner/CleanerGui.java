@@ -44,7 +44,7 @@ public class CleanerGui	extends JFrame
 	 */
 	public CleanerGui(final IBDIExternalAccess agent)
 	{
-		super(agent.getComponentName());
+		super(agent.getComponentIdentifier().getName());
 		final JPanel map = new JPanel()
 		{
 			IEAExpression	query_max_quantity;

@@ -3,6 +3,9 @@ package jadex.bdi.examples.alarmclock;
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IAgentListener;
 import jadex.bdi.runtime.IBDIExternalAccess;
+import jadex.bdi.runtime.IBDIInternalAccess;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IInternalAccess;
 import jadex.commons.SGUI;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
@@ -169,11 +172,14 @@ public class ClockFrame extends JFrame
 				if(alarms_gui!=null)
 					alarms_gui.dispose();
 				dispose();
-				ClockFrame.this.agent.getBeliefbase().getBeliefFact("settings").addResultListener(new SwingDefaultResultListener(ClockFrame.this)
+				
+				ClockFrame.this.agent.scheduleStep(new IComponentStep()
 				{
-					public void customResultAvailable(Object source, Object result)
+					public Object execute(IInternalAccess ia)
 					{
-						Settings sets = (Settings)result;
+						IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+						final Settings sets = (Settings)bia.getBeliefbase().getBelief("settings").getFact();
+						
 						if(sets.isAutosave())
 						{
 							try
@@ -182,15 +188,43 @@ public class ClockFrame extends JFrame
 							}
 							catch(Exception ex)
 							{
-								JOptionPane.showMessageDialog(ClockFrame.this, "Cannot save settings. The file: \n"
-									+sets.getFilename()+"\n could not be written", "Settings error",
-									JOptionPane.ERROR_MESSAGE);
+								SwingUtilities.invokeLater(new Runnable()
+								{
+									public void run()
+									{
+										JOptionPane.showMessageDialog(ClockFrame.this, "Cannot save settings. The file: \n"
+											+sets.getFilename()+"\n could not be written", "Settings error",
+											JOptionPane.ERROR_MESSAGE);
+									}
+								});
 							}
 						}
+						return null;
 					}
 				});
 				
-				ClockFrame.this.agent.killAgent(); // Use -autoshutdown to kill standalone platform as well
+//				ClockFrame.this.agent.getBeliefbase().getBeliefFact("settings").addResultListener(new SwingDefaultResultListener(ClockFrame.this)
+//				{
+//					public void customResultAvailable(Object source, Object result)
+//					{
+//						Settings sets = (Settings)result;
+//						if(sets.isAutosave())
+//						{
+//							try
+//							{
+//								sets.save();
+//							}
+//							catch(Exception ex)
+//							{
+//								JOptionPane.showMessageDialog(ClockFrame.this, "Cannot save settings. The file: \n"
+//									+sets.getFilename()+"\n could not be written", "Settings error",
+//									JOptionPane.ERROR_MESSAGE);
+//							}
+//						}
+//					}
+//				});
+				
+				ClockFrame.this.agent.killComponent(); // Use -autoshutdown to kill standalone platform as well
 				//IGoal kp = agent.createGoal("cms_shutdown_platform");
 				//agent.dispatchTopLevelGoal(kp);
 			}
@@ -288,26 +322,55 @@ public class ClockFrame extends JFrame
 		timer.setRepeats(true);
 		timer.start();
 
-		agent.addAgentListener(new IAgentListener()
+		agent.scheduleStep(new IComponentStep()
 		{
-			public void agentTerminating(AgentEvent ae)
+			public Object execute(IInternalAccess ia)
 			{
-				SwingUtilities.invokeLater(new Runnable()
+				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+				bia.addAgentListener(new IAgentListener()
 				{
-					public void run()
+					public void agentTerminating(AgentEvent ae)
 					{
-						if(tray!=null)
-							tray.remove(ti);
-						timer.stop();
-						dispose();
+						SwingUtilities.invokeLater(new Runnable()
+						{
+							public void run()
+							{
+								if(tray!=null)
+									tray.remove(ti);
+								timer.stop();
+								dispose();
+							}
+						});
+					}
+					
+					public void agentTerminated(AgentEvent ae)
+					{
 					}
 				});
-			}
-			
-			public void agentTerminated(AgentEvent ae)
-			{
+				return null;
 			}
 		});
+		
+//		agent.addAgentListener(new IAgentListener()
+//		{
+//			public void agentTerminating(AgentEvent ae)
+//			{
+//				SwingUtilities.invokeLater(new Runnable()
+//				{
+//					public void run()
+//					{
+//						if(tray!=null)
+//							tray.remove(ti);
+//						timer.stop();
+//						dispose();
+//					}
+//				});
+//			}
+//			
+//			public void agentTerminated(AgentEvent ae)
+//			{
+//			}
+//		});
 	}
 	
 	//-------- methods --------
@@ -320,11 +383,12 @@ public class ClockFrame extends JFrame
 //		final boolean[] firsttime = new boolean[]{true};
 		try
 		{
-			agent.getBeliefbase().getBeliefFact("settings").addResultListener(new DefaultResultListener()
+			agent.scheduleStep(new IComponentStep()
 			{
-				public void resultAvailable(Object source, Object result)
+				public Object execute(IInternalAccess ia)
 				{
-					final Settings sets = (Settings)result;
+					IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+					final Settings sets = (Settings)bia.getBeliefbase().getBelief("settings").getFact();
 					SServiceProvider.getService(agent.getServiceProvider(), IClockService.class)
 						.addResultListener(new SwingDefaultResultListener(ClockFrame.this)
 					{
@@ -355,6 +419,7 @@ public class ClockFrame extends JFrame
 								ti.setToolTip(format.format(current));
 						}
 					});
+					return null;
 				}
 			});
 			

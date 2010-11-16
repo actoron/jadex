@@ -26,6 +26,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JSpinner;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -99,8 +100,9 @@ public class DealerOptionPanel	extends JPanel	//	implements ActionListener, Chan
 		{
 			public void stateChanged(ChangeEvent e)
 			{
-				agent.getBeliefbase().setBeliefFact("singleStepMode", new Boolean(singleStepCheckBox.isSelected()));
-		
+				final Boolean b = new Boolean(singleStepCheckBox.isSelected());
+//				agent.getBeliefbase().setBeliefFact("singleStepMode", new Boolean(singleStepCheckBox.isSelected()));
+
 				// Change state of button and trigger next step, if agent currently waiting.
 				if(singleStepCheckBox.isSelected())
 				{
@@ -111,6 +113,15 @@ public class DealerOptionPanel	extends JPanel	//	implements ActionListener, Chan
 					stepButton.doClick();
 					stepButton.setEnabled(false);
 				}
+				agent.scheduleStep(new IComponentStep()
+				{
+					public Object execute(IInternalAccess ia)
+					{
+						IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+						bia.getBeliefbase().getBelief("singleStepMode").setFact(b);
+						return null;
+					}
+				});
 			}
 		});
 
@@ -119,26 +130,54 @@ public class DealerOptionPanel	extends JPanel	//	implements ActionListener, Chan
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				agent.getBeliefbase().getBeliefFact("statistics").addResultListener(new SwingDefaultResultListener(DealerOptionPanel.this)
+				agent.scheduleStep(new IComponentStep()
 				{
-					public void customResultAvailable(Object source, Object result)
+					public Object execute(IInternalAccess ia)
 					{
-						GameStatistics stats = (GameStatistics)result;
-						
+						IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+						final GameStatistics stats = (GameStatistics)bia.getBeliefbase().getBelief("statistics").getFact();
+				
 						if(stats!=null)
 						{
-							JFrame statsgui	= new JFrame("Blackjack Statistics");
-	
-							// set the icon to be displayed for the frame
-							statsgui.setIconImage(GUIImageLoader.getImage("statistics").getImage());				
-							statsgui.getContentPane().add(new StatisticGraph(stats));
-							statsgui.setSize(400, 300);
-							statsgui.setLocation(SGUI.calculateMiddlePosition(statsgui));
-							statsgui.setVisible(true);
-							frame.addChildWindow(statsgui);
+							SwingUtilities.invokeLater(new Runnable()
+							{
+								public void run()
+								{
+									JFrame statsgui	= new JFrame("Blackjack Statistics");
+									
+									// set the icon to be displayed for the frame
+									statsgui.setIconImage(GUIImageLoader.getImage("statistics").getImage());				
+									statsgui.getContentPane().add(new StatisticGraph(stats));
+									statsgui.setSize(400, 300);
+									statsgui.setLocation(SGUI.calculateMiddlePosition(statsgui));
+									statsgui.setVisible(true);
+									frame.addChildWindow(statsgui);
+								}
+							});
 						}
+						return null;
 					}
 				});
+//				agent.getBeliefbase().getBeliefFact("statistics").addResultListener(new SwingDefaultResultListener(DealerOptionPanel.this)
+//				{
+//					public void customResultAvailable(Object source, Object result)
+//					{
+//						GameStatistics stats = (GameStatistics)result;
+//						
+//						if(stats!=null)
+//						{
+//							JFrame statsgui	= new JFrame("Blackjack Statistics");
+//	
+//							// set the icon to be displayed for the frame
+//							statsgui.setIconImage(GUIImageLoader.getImage("statistics").getImage());				
+//							statsgui.getContentPane().add(new StatisticGraph(stats));
+//							statsgui.setSize(400, 300);
+//							statsgui.setLocation(SGUI.calculateMiddlePosition(statsgui));
+//							statsgui.setVisible(true);
+//							frame.addChildWindow(statsgui);
+//						}
+//					}
+//				});
 			}
 		});
 		
@@ -179,10 +218,20 @@ public class DealerOptionPanel	extends JPanel	//	implements ActionListener, Chan
 		{
 			public void stateChanged(ChangeEvent e)
 			{
-				Integer value = new Integer(Math.max(0, Math.min(MAX_SECONDS,
+				final Integer value = new Integer(Math.max(0, Math.min(MAX_SECONDS,
 					((Integer)cardWaitSpinner.getValue()).intValue())));
 				cardWaitSpinner.setValue(value);
-				agent.getBeliefbase().setBeliefFact("stepdelay", value);
+				
+				agent.scheduleStep(new IComponentStep()
+				{
+					public Object execute(IInternalAccess ia)
+					{
+						IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+						bia.getBeliefbase().getBelief("stepdelay").setFact(value);
+						return null;
+					}
+				});
+//				agent.getBeliefbase().setBeliefFact("stepdelay", value);
 			}
 		});
 		
@@ -191,11 +240,21 @@ public class DealerOptionPanel	extends JPanel	//	implements ActionListener, Chan
 		{
 			public void stateChanged(ChangeEvent e)
 			{
-				int value = Math.max(0, Math.min(MAX_SECONDS,
+				final int value = Math.max(0, Math.min(MAX_SECONDS,
 					((Integer)restartWaitSpinner.getValue()).intValue()));
 				restartWaitSpinner.setValue(new Integer(value));
-
-				agent.getBeliefbase().setBeliefFact("restartdelay", new Integer(value));
+				
+				agent.scheduleStep(new IComponentStep()
+				{
+					public Object execute(IInternalAccess ia)
+					{
+						IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+						bia.getBeliefbase().getBelief("restartdelay").setFact(new Integer(value));
+						return null;
+					}
+				});
+				
+//				agent.getBeliefbase().setBeliefFact("restartdelay", new Integer(value));
 				
 				// todo
 //				IGoal[]	play	= agent.getGoalbase().getGoals("play_game");
@@ -231,27 +290,42 @@ public class DealerOptionPanel	extends JPanel	//	implements ActionListener, Chan
 		this.add(progressPanel, BorderLayout.CENTER);
 		this.add(buttonPanel, BorderLayout.SOUTH);
 
-		agent.getBeliefbase().getBeliefFact("singleStepMode").addResultListener(new SwingDefaultResultListener(DealerOptionPanel.this)
+		agent.scheduleStep(new IComponentStep()
 		{
-			public void customResultAvailable(Object source, Object result)
+			public Object execute(IInternalAccess ia)
 			{
-				singleStepCheckBox.setSelected(((Boolean)result).booleanValue());
+				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+				Boolean sel = (Boolean)bia.getBeliefbase().getBelief("singleStepMode").getFact();
+				Object sd = bia.getBeliefbase().getBelief("stepdelay").getFact();
+				Object rd = bia.getBeliefbase().getBelief("restartdelay").getFact();
+				singleStepCheckBox.setSelected(sel.booleanValue());
+				cardWaitSpinner.setValue(sd);
+				restartWaitSpinner.setValue(rd);
+				return null;
 			}
 		});
-		agent.getBeliefbase().getBeliefFact("stepdelay").addResultListener(new SwingDefaultResultListener(DealerOptionPanel.this)
-		{
-			public void customResultAvailable(Object source, Object result)
-			{
-				cardWaitSpinner.setValue(result);
-			}
-		});
-		agent.getBeliefbase().getBeliefFact("restartdelay").addResultListener(new SwingDefaultResultListener(DealerOptionPanel.this)
-		{
-			public void customResultAvailable(Object source, Object result)
-			{
-				restartWaitSpinner.setValue(result);
-			}
-		});
+		
+//		agent.getBeliefbase().getBeliefFact("singleStepMode").addResultListener(new SwingDefaultResultListener(DealerOptionPanel.this)
+//		{
+//			public void customResultAvailable(Object source, Object result)
+//			{
+//				singleStepCheckBox.setSelected(((Boolean)result).booleanValue());
+//			}
+//		});
+//		agent.getBeliefbase().getBeliefFact("stepdelay").addResultListener(new SwingDefaultResultListener(DealerOptionPanel.this)
+//		{
+//			public void customResultAvailable(Object source, Object result)
+//			{
+//				cardWaitSpinner.setValue(result);
+//			}
+//		});
+//		agent.getBeliefbase().getBeliefFact("restartdelay").addResultListener(new SwingDefaultResultListener(DealerOptionPanel.this)
+//		{
+//			public void customResultAvailable(Object source, Object result)
+//			{
+//				restartWaitSpinner.setValue(result);
+//			}
+//		});
 //				singleStepCheckBox.setSelected(((Boolean)agent.getBeliefbase().getBelief("singleStepMode").getFact()).booleanValue());
 //				cardWaitSpinner.setValue(agent.getBeliefbase().getBelief("stepdelay").getFact());
 //				restartWaitSpinner.setValue((Integer)agent.getBeliefbase().getBelief("restartdelay").getFact());

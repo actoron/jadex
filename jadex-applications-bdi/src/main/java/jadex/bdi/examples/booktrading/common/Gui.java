@@ -3,6 +3,9 @@ package jadex.bdi.examples.booktrading.common;
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IAgentListener;
 import jadex.bdi.runtime.IBDIExternalAccess;
+import jadex.bdi.runtime.IBDIInternalAccess;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IInternalAccess;
 import jadex.commons.SGUI;
 
 import java.awt.BorderLayout;
@@ -25,26 +28,51 @@ public class Gui extends JFrame
 	 */
 	public Gui(final IBDIExternalAccess agent)//, final boolean buy)
 	{
-		super((GuiPanel.isBuyer(agent)? "Buyer: ": "Seller: ")+agent.getComponentName());
+		super((GuiPanel.isBuyer(agent)? "Buyer: ": "Seller: ")+agent.getComponentIdentifier().getName());
 		
 		GuiPanel gp = new GuiPanel(agent);
-		agent.addAgentListener(new IAgentListener()
+		agent.scheduleStep(new IComponentStep()
 		{
-			public void agentTerminating(AgentEvent ae)
+			public Object execute(IInternalAccess ia)
 			{
-				SwingUtilities.invokeLater(new Runnable()
+				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+				bia.addAgentListener(new IAgentListener()
 				{
-					public void run()
+					public void agentTerminating(AgentEvent ae)
 					{
-						dispose();
+						SwingUtilities.invokeLater(new Runnable()
+						{
+							public void run()
+							{
+								dispose();
+							}
+						});
+					}
+					
+					public void agentTerminated(AgentEvent ae)
+					{
 					}
 				});
-			}
-			
-			public void agentTerminated(AgentEvent ae)
-			{
+				return null;
 			}
 		});
+//		agent.addAgentListener(new IAgentListener()
+//		{
+//			public void agentTerminating(AgentEvent ae)
+//			{
+//				SwingUtilities.invokeLater(new Runnable()
+//				{
+//					public void run()
+//					{
+//						dispose();
+//					}
+//				});
+//			}
+//			
+//			public void agentTerminated(AgentEvent ae)
+//			{
+//			}
+//		});
 //		gp.refresh();
 		add(gp, BorderLayout.CENTER);
 		pack();
@@ -54,7 +82,7 @@ public class Gui extends JFrame
 		{
 			public void windowClosing(WindowEvent e)
 			{
-				agent.killAgent();
+				agent.killComponent();
 			}
 		});
 	}
