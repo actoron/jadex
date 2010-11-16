@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
-      id="jadex.tools.bpmn.feature"
+      id="jadex.editor.bpmn.featuree"
       label="Jadex BPMN Editor"
       version="1.0.0.qualifier"
       provider-name="Jadex BPMN Editor"
       exclusive="true"
-      colocation-affinity="jadex.tools.bpmn.feature">
+      colocation-affinity="jadex.editor.bpmn.feature">
 
    <description url="http://jadex-processes.informatik.uni-hamburg.de">
       The Jadex BPMN editor is an extension of the STP BPMN editor that provides an extra tab in the properties view for specifying execution details of a process model.

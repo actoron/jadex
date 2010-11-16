@@ -7,7 +7,7 @@
 <booleanAttribute key="askclear" value="true"/>
 <booleanAttribute key="automaticAdd" value="true"/>
 <booleanAttribute key="automaticValidate" value="false"/>
-<stringAttribute key="bad_container_name" value="\jadex.tools.bpmn.feature\launch\jadexeditor_bpmn.launch"/>
+<stringAttribute key="bad_container_name" value="\jadex.editor.bpmn.feature\launch\jadexeditor_bpmn.launch"/>
 <stringAttribute key="bootstrap" value=""/>
 <stringAttribute key="checked" value="[NONE]"/>
 <booleanAttribute key="clearConfig" value="false"/>
@@ -30,7 +30,7 @@
 <stringAttribute key="pde.version" value="3.3"/>
 <stringAttribute key="product" value="org.eclipse.platform.ide"/>
 <setAttribute key="selected_features">
-<setEntry value="jadex.tools.bpmn.feature:default"/>
+<setEntry value=jadex.editor.bpmn.featureefault"/>
 <setEntry value="org.eclipse.cvs:default"/>
 <setEntry value="org.eclipse.draw2d:default"/>
 <setEntry value="org.eclipse.emf.codegen.ecore.ui:default"/>

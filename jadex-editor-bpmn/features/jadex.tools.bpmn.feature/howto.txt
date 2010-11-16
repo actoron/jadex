@@ -14,10 +14,10 @@ Example for site.xml:
 <?xml version="1.0" encoding="UTF-8"?>
 
 <site>
-  <feature url="features/jadex.tools.bpmn.feature_1.0.0.201006011554.jar" id="jadex.tools.bpmn.feature" version="1.0.0.201006011554">
+  <feature url="features/jadex.editor.bpmn.featuree_1.0.0.201006011554.jar" id=jadex.editor.bpmn.featureversion="1.0.0.201006011554">
     <category name="Jadex"/>
   </feature>
-  <feature url="features/jadex.tools.bpmn.feature_1.0.0.201006021112.jar" id="jadex.tools.bpmn.feature" version="1.0.0.201006021112">
+  <feature url="featurejadex.editor.bpmn.featureure_1.0.0.201006021112.jar" ijadex.editor.bpmn.featureture" version="1.0.0.201006021112">
     <category name="Jadex"/>
   </feature>
   <category-def name="Jadex" label="Jadex"/>

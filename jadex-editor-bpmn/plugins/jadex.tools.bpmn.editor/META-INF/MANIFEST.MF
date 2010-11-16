@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Jadex BPMN Editor
 Bundle-SymbolicName: jadex.tools.bpmn.editor.JadexBpmnEditor;singleton:=true
 Bundle-Version: 0.0.3.qualifier
-Bundle-Activator: jadex.tools.bpmn.editor.JadexBpmnPlugin
+Bundle-Activator: jadex.editor.bpmn.editor.JadexBpmnPlugin
 Require-Bundle: org.eclipse.ui;bundle-version="[3.5.0,3.7.0)",
  org.eclipse.core.runtime;bundle-version="[3.5.0,3.7.0)",
  org.eclipse.stp.bpmn;bundle-version="[1.1.0,2.0.0)",
@@ -15,26 +15,26 @@ Require-Bundle: org.eclipse.ui;bundle-version="[3.5.0,3.7.0)",
  org.eclipse.jdt.ui;bundle-version="[3.5.0,3.7.0]"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Export-Package: jadex.tools.bpmn.diagram,
- jadex.tools.bpmn.diagram.actions,
- jadex.tools.bpmn.diagram.edit.parts,
- jadex.tools.bpmn.diagram.edit.policies,
- jadex.tools.bpmn.diagram.providers,
- jadex.tools.bpmn.editor,
- jadex.tools.bpmn.editor.preferences,
- jadex.tools.bpmn.editor.properties,
- jadex.tools.bpmn.editor.properties.decorator,
- jadex.tools.bpmn.editor.properties.template,
- jadex.tools.bpmn.runtime.task,
- jadex.tools.eclipse.ui,
- jadex.tools.model.common.properties;
+Export-Package: jadex.editor.bpmn.diagram,
+ jadex.editor.bpmn.diagram.actions,
+ jadex.editor.bpmn.diagram.edit.parts,
+ jadex.editor.bpmn.diagram.edit.policies,
+ jadex.editor.bpmn.diagram.providers,
+ jadex.editor.bpmn.editor,
+ jadex.editor.bpmn.editor.preferences,
+ jadex.editor.bpmn.editor.properties,
+ jadex.editor.bpmn.editor.properties.decorator,
+ jadex.editor.bpmn.editor.properties.template,
+ jadex.editor.bpmn.runtime.task,
+ jadex.editor.eclipse.ui,
+ jadex.editor.model.common.properties;
   uses:="org.eclipse.ui.views.properties.tabbed,
    org.eclipse.emf.ecore,
    org.eclipse.gmf.runtime.emf.commands.core.command,
    org.eclipse.ui,
    org.eclipse.jface.viewers,
    org.eclipse.swt.widgets",
- jadex.tools.model.common.properties.table;
+ jadex.editor.model.common.properties.table;
   uses:="org.eclipse.ui.views.properties.tabbed,
    org.eclipse.swt.events,
    org.eclipse.ui,

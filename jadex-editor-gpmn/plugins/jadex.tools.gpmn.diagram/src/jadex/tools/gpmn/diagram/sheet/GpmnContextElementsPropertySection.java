@@ -13,8 +13,8 @@ import jadex.tools.gpmn.ContextElement;
 import jadex.tools.gpmn.GpmnDiagram;
 import jadex.tools.gpmn.GpmnFactory;
 import jadex.tools.gpmn.diagram.part.GpmnDiagramMessages;
-import jadex.tools.model.common.properties.ModifyEObjectCommand;
-import jadex.tools.model.common.properties.table.AbstractCommonTablePropertySection;
+import jadex.editor.model.common.properties.ModifyEObjectCommand;
+import jadex.editor.model.common.properties.table.AbstractCommonTablePropertySection;
 
 import javax.swing.JFrame;
 
@@ -245,7 +245,7 @@ public class GpmnContextElementsPropertySection extends
 	}
 	
 	/**
-	 * @see jadex.tools.model.common.properties.table.AbstractCommonTablePropertySection#getDeleteCommand()
+	 * @see jadex.editor.model.common.properties.table.AbstractCommonTablePropertySection#getDeleteCommand()
 	 */
 	@Override
 	protected ModifyEObjectCommand getDeleteCommand()
@@ -272,7 +272,7 @@ public class GpmnContextElementsPropertySection extends
 	}
 	
 	/**
-	 * @see jadex.tools.model.common.properties.table.AbstractCommonTablePropertySection#getDeleteCommand()
+	 * @see jadex.editor.model.common.properties.table.AbstractCommonTablePropertySection#getDeleteCommand()
 	 */
 	@Override
 	protected ModifyEObjectCommand getUpCommand()
@@ -338,7 +338,7 @@ public class GpmnContextElementsPropertySection extends
 	}
 	
 	/**
-	 * @see jadex.tools.model.common.properties.table.AbstractCommonTablePropertySection#getTableContentProvider()
+	 * @see jadex.editor.model.common.properties.table.AbstractCommonTablePropertySection#getTableContentProvider()
 	 */
 	@Override
 	protected IStructuredContentProvider getTableContentProvider()

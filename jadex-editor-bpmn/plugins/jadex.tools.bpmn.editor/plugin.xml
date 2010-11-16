@@ -4,9 +4,9 @@
 	<extension
          point="org.eclipse.ui.editors">
       <editor
-            class="jadex.tools.bpmn.editor.JadexBpmnEditor"
+            class="jadex.editor.bpmn.editor.JadexBpmnEditor"
             matchingStrategy="org.eclipse.stp.bpmn.diagram.part.BpmnMatchingStrategy"
-            contributorClass="jadex.tools.bpmn.editor.JadexBpmnEditorContributor"
+            contributorClass="jadex.editor.bpmn.editor.JadexBpmnEditorContributor"
             extensions="bpmn_diagram"
             default="true"
             icon="icons/bpmn.png"
@@ -17,7 +17,7 @@
    
    <!-- custom edit part provider -->
    <extension point="org.eclipse.gmf.runtime.diagram.ui.editpartProviders">
-      <editpartProvider class="jadex.tools.bpmn.diagram.providers.JadexEditPartProvider">
+      <editpartProvider class="jadex.editor.bpmn.diagram.providers.JadexEditPartProvider">
          <Priority name="Highest"/>
       </editpartProvider>
    </extension>
@@ -26,12 +26,12 @@
    <extension
          point="org.eclipse.ui.preferencePages">
       <page
-            class="jadex.tools.bpmn.editor.preferences.JadexPreferences"
+            class="jadex.editor.bpmn.editor.preferences.JadexPreferences"
             id="jadex.tools.editor.JadexPreferences"
             name="Jadex">
       </page>
       <page
-            class="jadex.tools.bpmn.editor.preferences.JadexBpmnPluginPreferencePage"
+            class="jadex.editor.bpmn.editor.preferences.JadexBpmnPluginPreferencePage"
             id="jadex.tools.bpmn.editor.preferences.JadexBpmnPluginPreferencePage"
             name="BPMN Editor"
             category="jadex.tools.editor.JadexPreferences">
@@ -42,7 +42,7 @@
    <extension
          point="org.eclipse.core.runtime.preferences">
       <initializer
-            class="jadex.tools.bpmn.editor.preferences.JadexBpmnPluginPreferenceInitializer">
+            class="jadex.editor.bpmn.editor.preferences.JadexBpmnPluginPreferenceInitializer">
       </initializer>
    </extension>
    
@@ -52,7 +52,7 @@
         point="org.eclipse.ui.views.properties.tabbed.propertyContributor">
      <propertyContributor
            contributorId="jadex.tools.bpmn.editor.JadexBpmnEditor"
-           typeMapper="jadex.tools.bpmn.editor.properties.template.EModelTypeMapper">
+           typeMapper="jadex.editor.bpmn.editor.properties.template.EModelTypeMapper">
         <propertyCategory category="Jadex"/>
      </propertyContributor>
   	</extension>
@@ -73,7 +73,7 @@
 	<extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
      <propertySections contributorId="jadex.tools.bpmn.editor.JadexBpmnEditor">
         <propertySection
-              class="jadex.tools.bpmn.editor.properties.JadexCommonPropertySection"
+              class="jadex.editor.bpmn.editor.properties.JadexCommonPropertySection"
               id="jadex.tools.bpmn.editor.properties.JadexCommonPropertySection"
               tab="Jadex">
            <input type="org.eclipse.stp.bpmn.Identifiable"/>
@@ -87,8 +87,8 @@
 	<extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
      <propertySections contributorId="jadex.tools.bpmn.editor.JadexBpmnEditor">
         <propertySection
-              class="jadex.tools.bpmn.editor.properties.JadexUserTaskImplComboSection"
-              filter="jadex.tools.bpmn.editor.properties.JadexUserTaskActivityFilter"
+              class="jadex.editor.bpmn.editor.properties.JadexUserTaskImplComboSection"
+              filter="jadex.editor.bpmn.editor.properties.JadexUserTaskActivityFilter"
               id="jadex.tools.bpmn.editor.properties.JadexUserTaskImplComboSection"
               tab="Jadex"
               afterSection="jadex.tools.bpmn.editor.properties.JadexCommonPropertySection">
@@ -101,8 +101,8 @@
 	<extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
      <propertySections contributorId="jadex.tools.bpmn.editor.JadexBpmnEditor">
         <propertySection
-              class="jadex.tools.bpmn.editor.properties.JadexCommonParameterSection"
-              filter="jadex.tools.bpmn.editor.properties.JadexUserTaskActivityFilter"
+              class="jadex.editor.bpmn.editor.properties.JadexCommonParameterSection"
+              filter="jadex.editor.bpmn.editor.properties.JadexUserTaskActivityFilter"
               id="jadex.tools.bpmn.editor.properties.JadexCommonDiagramParameterSection"
               tab="Jadex"
               afterSection="jadex.tools.bpmn.editor.properties.JadexUserTaskImplComboSection">
@@ -116,7 +116,7 @@
 	<extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
      <propertySections contributorId="jadex.tools.bpmn.editor.JadexBpmnEditor">
         <propertySection
-              class="jadex.tools.bpmn.editor.properties.JadexSubProcessFilePropertySection"
+              class="jadex.editor.bpmn.editor.properties.JadexSubProcessFilePropertySection"
               id="jadex.tools.bpmn.editor.properties.JadexSubProcessPropertySection"
               tab="Jadex"
               afterSection="jadex.tools.bpmn.editor.properties.JadexCommonPropertySection">
@@ -129,7 +129,7 @@
 	<extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
      <propertySections contributorId="jadex.tools.bpmn.editor.JadexBpmnEditor">
         <propertySection
-              class="jadex.tools.bpmn.editor.properties.JadexSubProcessParallelSection"
+              class="jadex.editor.bpmn.editor.properties.JadexSubProcessParallelSection"
               id="jadex.tools.bpmn.editor.properties.JadexSubProcessParallelSection"
               tab="Jadex"
               afterSection="jadex.tools.bpmn.editor.properties.JadexSubProcessPropertySection">
@@ -142,7 +142,7 @@
 	<extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
      <propertySections contributorId="jadex.tools.bpmn.editor.JadexBpmnEditor">
         <propertySection
-              class="jadex.tools.bpmn.editor.properties.JadexSubProcessItemsPropertySection"
+              class="jadex.editor.bpmn.editor.properties.JadexSubProcessItemsPropertySection"
               id="jadex.tools.bpmn.editor.properties.JadexSubProcessItemsPropertySection"
               tab="Jadex"
               afterSection="jadex.tools.bpmn.editor.properties.JadexSubProcessParallelSection">
@@ -155,7 +155,7 @@
 	<extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
      <propertySections contributorId="jadex.tools.bpmn.editor.JadexBpmnEditor">
         <propertySection
-              class="jadex.tools.bpmn.editor.properties.JadexCommonParameterSection"
+              class="jadex.editor.bpmn.editor.properties.JadexCommonParameterSection"
               id="jadex.tools.bpmn.editor.properties.JadexSubProcessParameterSection"
               tab="Jadex"
               afterSection="jadex.tools.bpmn.editor.properties.JadexSubProcessItemsPropertySection">
@@ -170,8 +170,8 @@
 	<extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
      <propertySections contributorId="jadex.tools.bpmn.editor.JadexBpmnEditor">
         <propertySection
-              class="jadex.tools.bpmn.editor.properties.JadexTimerEventPropertySection"
-              filter="jadex.tools.bpmn.editor.properties.JadexTimerEventFilter"
+              class="jadex.editor.bpmn.editor.properties.JadexTimerEventPropertySection"
+              filter="jadex.editor.bpmn.editor.properties.JadexTimerEventFilter"
               id="jadex.tools.bpmn.editor.properties.JadexTimerEventPropertySection"
               tab="Jadex"
               afterSection="jadex.tools.bpmn.editor.properties.JadexCommonPropertySection">
@@ -184,8 +184,8 @@
 	<extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
      <propertySections contributorId="jadex.tools.bpmn.editor.JadexBpmnEditor">
         <propertySection
-              class="jadex.tools.bpmn.editor.properties.JadexIntermediateEventsParameterSection"
-              filter="jadex.tools.bpmn.editor.properties.JadexTimerEventFilter"
+              class="jadex.editor.bpmn.editor.properties.JadexIntermediateEventsParameterSection"
+              filter="jadex.editor.bpmn.editor.properties.JadexTimerEventFilter"
               id="jadex.tools.bpmn.editor.propertySection.JadexTimerParameterSection"
               tab="Jadex"
               afterSection="jadex.tools.bpmn.editor.properties.JadexTimerEventPropertySection">
@@ -200,8 +200,8 @@
 	<extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
      <propertySections contributorId="jadex.tools.bpmn.editor.JadexBpmnEditor">
         <propertySection
-              class="jadex.tools.bpmn.editor.properties.JadexNotificationEventPropertySection"
-              filter="jadex.tools.bpmn.editor.properties.JadexRuleEventFilter"
+              class="jadex.editor.bpmn.editor.properties.JadexNotificationEventPropertySection"
+              filter="jadex.editor.bpmn.editor.properties.JadexRuleEventFilter"
               id="jadex.tools.bpmn.editor.properties.JadexRuleEventPropertySection"
               tab="Jadex"
               afterSection="jadex.tools.bpmn.editor.properties.JadexCommonPropertySection">
@@ -214,8 +214,8 @@
 	<extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
      <propertySections contributorId="jadex.tools.bpmn.editor.JadexBpmnEditor">
         <propertySection
-              class="jadex.tools.bpmn.editor.properties.JadexIntermediateEventsParameterSection"
-              filter="jadex.tools.bpmn.editor.properties.JadexRuleEventFilter"
+              class="jadex.editor.bpmn.editor.properties.JadexIntermediateEventsParameterSection"
+              filter="jadex.editor.bpmn.editor.properties.JadexRuleEventFilter"
               id="jadex.tools.bpmn.editor.propertySection.JadexRuleParameterSection"
               tab="Jadex"
               afterSection="jadex.tools.bpmn.editor.properties.JadexRuleEventPropertySection">
@@ -229,8 +229,8 @@
 	<extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
      <propertySections contributorId="jadex.tools.bpmn.editor.JadexBpmnEditor">
         <propertySection
-              class="jadex.tools.bpmn.editor.properties.JadexNotificationEventPropertySection"
-              filter="jadex.tools.bpmn.editor.properties.JadexSignalEventFilter"
+              class="jadex.editor.bpmn.editor.properties.JadexNotificationEventPropertySection"
+              filter="jadex.editor.bpmn.editor.properties.JadexSignalEventFilter"
               id="jadex.tools.bpmn.editor.properties.JadexSignalEventPropertySection"
               tab="Jadex"
               afterSection="jadex.tools.bpmn.editor.properties.JadexCommonPropertySection">
@@ -243,8 +243,8 @@
 	<extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
      <propertySections contributorId="jadex.tools.bpmn.editor.JadexBpmnEditor">
         <propertySection
-              class="jadex.tools.bpmn.editor.properties.JadexIntermediateEventsParameterSection"
-              filter="jadex.tools.bpmn.editor.properties.JadexSignalEventFilter"
+              class="jadex.editor.bpmn.editor.properties.JadexIntermediateEventsParameterSection"
+              filter="jadex.editor.bpmn.editor.properties.JadexSignalEventFilter"
               id="jadex.tools.bpmn.editor.propertySection.JadexSignalEventParameterSection"
               tab="Jadex"
               afterSection="jadex.tools.bpmn.editor.properties.JadexSignalEventPropertySection">
@@ -258,8 +258,8 @@
 	<extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
      <propertySections contributorId="jadex.tools.bpmn.editor.JadexBpmnEditor">
         <propertySection
-              class="jadex.tools.bpmn.editor.properties.JadexMessageEventPropertySection"
-              filter="jadex.tools.bpmn.editor.properties.JadexMessageEventFilter"
+              class="jadex.editor.bpmn.editor.properties.JadexMessageEventPropertySection"
+              filter="jadex.editor.bpmn.editor.properties.JadexMessageEventFilter"
               id="jadex.tools.bpmn.editor.properties.JadexMessageEventPropertySection"
               tab="Jadex"
               afterSection="jadex.tools.bpmn.editor.properties.JadexCommonPropertySection">
@@ -272,8 +272,8 @@
 	<extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
      <propertySections contributorId="jadex.tools.bpmn.editor.JadexBpmnEditor">
         <propertySection
-              class="jadex.tools.bpmn.editor.properties.JadexIntermediateEventsParameterSection"
-              filter="jadex.tools.bpmn.editor.properties.JadexMessageEventFilter"
+              class="jadex.editor.bpmn.editor.properties.JadexIntermediateEventsParameterSection"
+              filter="jadex.editor.bpmn.editor.properties.JadexMessageEventFilter"
               id="jadex.tools.bpmn.editor.propertySection.JadexMessageEventParameterSection"
               tab="Jadex"
               afterSection="jadex.tools.bpmn.editor.properties.JadexMessageEventPropertySection">
@@ -286,8 +286,8 @@
 	<extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
      <propertySections contributorId="jadex.tools.bpmn.editor.JadexBpmnEditor">
         <propertySection
-              class="jadex.tools.bpmn.editor.properties.JadexErrorEventPropertySection"
-              filter="jadex.tools.bpmn.editor.properties.JadexErrorEventFilter"
+              class="jadex.editor.bpmn.editor.properties.JadexErrorEventPropertySection"
+              filter="jadex.editor.bpmn.editor.properties.JadexErrorEventFilter"
               id="jadex.tools.bpmn.editor.properties.JadexErrorEventPropertySection"
               tab="Jadex"
               afterSection="jadex.tools.bpmn.editor.properties.JadexCommonPropertySection">
@@ -301,7 +301,7 @@
 	<extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
      <propertySections contributorId="jadex.tools.bpmn.editor.JadexBpmnEditor">
         <propertySection
-              class="jadex.tools.bpmn.editor.properties.JadexSequencePropertiesSection"
+              class="jadex.editor.bpmn.editor.properties.JadexSequencePropertiesSection"
               id="jadex.tools.bpmn.editor.properties.JadexSequencePropertiesSection"
               tab="Jadex"
               afterSection="jadex.tools.bpmn.editor.properties.JadexCommonPropertySection">
@@ -314,7 +314,7 @@
 	<extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
      <propertySections contributorId="jadex.tools.bpmn.editor.JadexBpmnEditor">
         <propertySection
-              class="jadex.tools.bpmn.editor.properties.JadexSequenceMappingSection"
+              class="jadex.editor.bpmn.editor.properties.JadexSequenceMappingSection"
               id="jadex.tools.bpmn.editor.properties.JadexSequenceMappingSection"
               tab="Jadex"
               afterSection="jadex.tools.bpmn.editor.properties.JadexSequencePropertiesSection">
@@ -327,7 +327,7 @@
 	<extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
      <propertySections contributorId="jadex.tools.bpmn.editor.JadexBpmnEditor">
         <propertySection
-              class="jadex.tools.bpmn.editor.properties.JadexBpmnDiagramPropertiesSection"
+              class="jadex.editor.bpmn.editor.properties.JadexBpmnDiagramPropertiesSection"
               id="jadex.tools.bpmn.editor.properties.JadexBpmnDiagramPropertiesSection"
               tab="Jadex"
               afterSection="jadex.tools.bpmn.editor.properties.JadexCommonPropertySection">
@@ -340,7 +340,7 @@
 	<extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
      <propertySections contributorId="jadex.tools.bpmn.editor.JadexBpmnEditor">
         <propertySection
-              class="jadex.tools.bpmn.editor.properties.JadexBpmnDiagramImportsSection"
+              class="jadex.editor.bpmn.editor.properties.JadexBpmnDiagramImportsSection"
               id="jadex.tools.bpmn.editor.properties.JadexBpmnDiagramImportsSection"
               tab="Jadex"
               afterSection="jadex.tools.bpmn.editor.properties.JadexBpmnDiagramPropertiesSection">
@@ -353,7 +353,7 @@
 	<extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
      <propertySections contributorId="jadex.tools.bpmn.editor.JadexBpmnEditor">
         <propertySection
-              class="jadex.tools.bpmn.editor.properties.JadexBpmnDiagramParameterSection"
+              class="jadex.editor.bpmn.editor.properties.JadexBpmnDiagramParameterSection"
               id="jadex.tools.bpmn.editor.properties.JadexBpmnDiagramParameterSection"
               tab="Jadex"
               afterSection="jadex.tools.bpmn.editor.properties.JadexBpmnDiagramImportsSection">
@@ -366,7 +366,7 @@
 	<extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
      <propertySections contributorId="jadex.tools.bpmn.editor.JadexBpmnEditor">
         <propertySection
-              class="jadex.tools.bpmn.editor.properties.JadexBpmnDiagramPropertiesTableSection"
+              class="jadex.editor.bpmn.editor.properties.JadexBpmnDiagramPropertiesTableSection"
               id="jadex.tools.bpmn.editor.properties.JadexBpmnDiagramPropertiesTableSection"
               tab="Jadex"
               afterSection="jadex.tools.bpmn.editor.properties.JadexBpmnDiagramParameterSection">
@@ -573,7 +573,7 @@
 		 </menu>
 		 -->
 		 <action
-		       class="jadex.tools.bpmn.diagram.actions.ConvertDiagramPropertiesAction"
+		       class="jadex.editor.bpmn.diagram.actions.ConvertDiagramPropertiesAction"
 		       definitionId="jadex.tools.bpmn.diagram.ui.commands.bpmn.convertTables"
 		       enablesFor="1"
 		       id="jadex.tools.bpmn.diagram.actions.ConvertDiagramPropertiesActionID"
