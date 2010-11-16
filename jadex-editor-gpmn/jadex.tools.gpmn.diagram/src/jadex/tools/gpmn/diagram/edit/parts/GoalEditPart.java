@@ -7,10 +7,12 @@
  */
 package jadex.tools.gpmn.diagram.edit.parts;
 
+import jadex.tools.gpmn.AbstractPlan;
 import jadex.tools.gpmn.ActivationPlan;
+import jadex.tools.gpmn.BpmnPlan;
 import jadex.tools.gpmn.Goal;
-import jadex.tools.gpmn.GpmnDiagram;
 import jadex.tools.gpmn.GpmnPackage;
+import jadex.tools.gpmn.ModeType;
 import jadex.tools.gpmn.PlanEdge;
 import jadex.tools.gpmn.diagram.edit.policies.ConnectionHandleEditPolicyEx;
 import jadex.tools.gpmn.diagram.edit.policies.GoalItemSemanticEditPolicy;
@@ -18,6 +20,7 @@ import jadex.tools.gpmn.diagram.part.GpmnVisualIDRegistry;
 import jadex.tools.gpmn.diagram.providers.GpmnElementTypes;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -36,17 +39,14 @@ import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.PrecisionRectangle;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.emf.common.notify.Notification;
-import org.eclipse.emf.ecore.EReference;
 import org.eclipse.gef.ConnectionEditPart;
 import org.eclipse.gef.EditPart;
 import org.eclipse.gef.EditPolicy;
-import org.eclipse.gef.NodeListener;
 import org.eclipse.gef.Request;
 import org.eclipse.gef.commands.Command;
 import org.eclipse.gef.editpolicies.LayoutEditPolicy;
 import org.eclipse.gef.editpolicies.NonResizableEditPolicy;
 import org.eclipse.gef.requests.CreateRequest;
-import org.eclipse.gmf.runtime.diagram.ui.editparts.DiagramEditPart;
 import org.eclipse.gmf.runtime.diagram.ui.editparts.IGraphicalEditPart;
 import org.eclipse.gmf.runtime.diagram.ui.editparts.ShapeNodeEditPart;
 import org.eclipse.gmf.runtime.diagram.ui.editpolicies.EditPolicyRoles;
@@ -57,10 +57,10 @@ import org.eclipse.gmf.runtime.emf.type.core.IElementType;
 import org.eclipse.gmf.runtime.gef.ui.figures.DefaultSizeNodeFigure;
 import org.eclipse.gmf.runtime.gef.ui.figures.NodeFigure;
 import org.eclipse.gmf.runtime.gef.ui.figures.SlidableOvalAnchor;
-import org.eclipse.gmf.runtime.notation.NotationPackage;
+import org.eclipse.gmf.runtime.notation.Edge;
+import org.eclipse.gmf.runtime.notation.Node;
 import org.eclipse.gmf.runtime.notation.View;
 import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.widgets.Display;
 
 /**
  * @generated
@@ -170,34 +170,93 @@ public class GoalEditPart extends ShapeNodeEditPart
 	/**
 	 * @generated NOT
 	 */
-	public void refreshModes()
+	public void planAdded(AbstractPlan plan)
 	{
 		Set modes = new HashSet();
+		if (plan instanceof ActivationPlan)
+		{
+			Map planModes = getPlanModes();
+			modes.addAll(planModes.values());
+			modes.add(((ActivationPlan) plan).getMode());
+		}
 		
-		List<PlanEdge> edges = ((Goal) getNotationView().getElement())
-				.getPlanEdges();
-		for (PlanEdge edge : edges)
-			if (edge.getTarget() instanceof ActivationPlan)
-				modes.add(((ActivationPlan) edge.getTarget()).getMode());
-		/*if (mode.isEmpty())
-			((jadex.tools.gpmn.diagram.ui.figures.GoalFigure) primaryShape).setModeType(jadex.tools.gpmn.diagram.ui.figures.GoalFigure.MODE_TYPE_NONE);
-			case jadex.tools.gpmn.diagram.ui.figures.GoalFigure.MODE_TYPE_PARALLEL:
-				((jadex.tools.gpmn.diagram.ui.figures.GoalFigure) primaryShape).setModeType(jadex.tools.gpmn.diagram.ui.figures.GoalFigure.MODE_TYPE_PARALLEL);
-				break;
-			case jadex.tools.gpmn.diagram.ui.figures.GoalFigure.MODE_TYPE_SEQUENTIAL:
-				((jadex.tools.gpmn.diagram.ui.figures.GoalFigure) primaryShape).setModeType(jadex.tools.gpmn.diagram.ui.figures.GoalFigure.MODE_TYPE_SEQUENTIAL);
-				break;
-			default:
-				((jadex.tools.gpmn.diagram.ui.figures.GoalFigure) primaryShape).setModeType(jadex.tools.gpmn.diagram.ui.figures.GoalFigure.MODE_TYPE_MIXED);
-		}*/
-
 		((jadex.tools.gpmn.diagram.ui.figures.GoalFigure) primaryShape)
 				.setModeTypes(modes);
 		
 		primaryShape.invalidate();
 		primaryShape.repaint();
+	}
+	
+	/**
+	 * @generated NOT
+	 */
+	public void planRemoved(AbstractPlan plan)
+	{
+		System.out.println("Plan Removed");
+		Map planModes = getPlanModes();
+		planModes.remove(plan.getId());
+		Set modes = new HashSet(planModes.values());
+		
+		((jadex.tools.gpmn.diagram.ui.figures.GoalFigure) primaryShape)
+				.setModeTypes(modes);
+		
+		primaryShape.invalidate();
+		primaryShape.repaint();
+	}
+	
+	/**
+	 * @generated NOT
+	 */
+	public void planModeChanged(ActivationPlan plan, ModeType newMode)
+	{
+		Map planModes = getPlanModes();
+		planModes.remove(plan.getId());
+		planModes.put(plan.getId(), newMode);
+		Set modes = new HashSet(planModes.values());
+		
+		((jadex.tools.gpmn.diagram.ui.figures.GoalFigure) primaryShape)
+				.setModeTypes(modes);
+		
+		primaryShape.invalidate();
+		primaryShape.repaint();
+	}
+	
+	/**
+	 * @generated NOT
+	 */
+	public void refreshModes()
+	{
+		Map modes = getPlanModes();
+		
+		((jadex.tools.gpmn.diagram.ui.figures.GoalFigure) primaryShape)
+				.setModeTypes(new HashSet(modes.values()));
+		
+		primaryShape.invalidate();
+		primaryShape.repaint();
 		
 		//return modes;
+	}
+	
+	protected Map getPlanModes()
+	{
+		Map modes = new HashMap();
+		
+		List<PlanEdge> edges = ((Goal) getNotationView().getElement())
+				.getPlanEdges();
+		for (PlanEdge edge : edges)
+		{
+			AbstractPlan ap = ((AbstractPlan) edge.getTarget());
+			if (ap instanceof ActivationPlan)
+			{
+				modes.put(ap.getId(), ((ActivationPlan) ap).getMode());
+			}
+			else if (edge.getTarget() instanceof BpmnPlan)
+			{
+				modes.put(ap.getId(), ModeType.PARALLEL);
+			}
+		}
+		
+		return modes;
 	}
 	
 	/**
@@ -208,7 +267,6 @@ public class GoalEditPart extends ShapeNodeEditPart
 	 */
 	private void setGoalTypeAndLabel(GoalFigure shape)
 	{
-		
 		Goal goal = (Goal) getPrimaryView().getElement();
 		shape.setGoalType(goal.getGoalType().getLiteral());
 		
@@ -520,6 +578,50 @@ public class GoalEditPart extends ShapeNodeEditPart
 	}
 	
 	/**
+	 * generated NOT
+	 */
+	protected void addSourceConnection(ConnectionEditPart connection, int index)
+	{
+		super.addSourceConnection(connection, index);
+		Node node = ((Node) ((Edge) connection.getModel()).getTarget());
+		if (node != null
+				&& (node.getElement() instanceof ActivationPlan || node
+						.getElement() instanceof BpmnPlan))
+		{
+			AbstractPlan plan = (AbstractPlan) node.getElement();
+			planAdded(plan);
+		}
+	}
+	
+	/**
+	 * generated NOT
+	 */
+	protected void removeSourceConnection(ConnectionEditPart connection)
+	{
+		System.out.println("Removed " + connection.getTarget());
+		super.removeSourceConnection(connection);
+		EditPart target = connection.getTarget();
+		if (target == null)
+		{
+			refreshModes();
+			return;
+		}
+		
+		Node node = ((Node) target.getModel());
+		if (node != null)
+		{
+			if ((node.getElement() instanceof ActivationPlan)
+					|| (node.getElement() instanceof BpmnPlan))
+			{
+				AbstractPlan plan = (AbstractPlan) node.getElement();
+				planRemoved(plan);
+			}
+			else if (node.getElement() == null)
+				refreshModes();
+		}
+	}
+	
+	/**
 	 * @generated NOT
 	 */
 	protected void handleNotificationEvent(Notification notification)
@@ -534,19 +636,29 @@ public class GoalEditPart extends ShapeNodeEditPart
 			}
 			
 		}
-		
-		/*if (notification.getEventType() == Notification.ADD
-				|| notification.getEventType() == Notification.REMOVE)
+		/*else if (notification.getEventType() == Notification.ADD)
 		{
 			if (notification.getFeatureID(EReference.class) == (NotationPackage.NODE__SOURCE_EDGES))
-				Display.getCurrent().asyncExec(new Runnable()
+			{
+				Node node = ((Node) ((Edge) notification.getNewValue()).getTarget());
+				if (node != null && node.getElement() instanceof ActivationPlan)
 				{
-					@Override
-					public void run()
-					{
-						refreshMode();
-					}
-				});
+					ActivationPlan plan = (ActivationPlan) node.getElement();
+					refreshModes(plan.getId(), plan.getMode());
+				}
+			}
+		}
+		else if (notification.getEventType() == Notification.REMOVE)
+		{
+			if (notification.getFeatureID(EReference.class) == (NotationPackage.NODE__SOURCE_EDGES))
+			{
+				Node node = ((Node) ((Edge) notification.getOldValue()).getTarget());
+				if (node != null && node.getElement() instanceof ActivationPlan)
+				{
+					ActivationPlan plan = (ActivationPlan) node.getElement();
+					refreshModes(plan.getId(), null);
+				}
+			}
 		}*/
 
 		super.handleNotificationEvent(notification);

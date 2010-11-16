@@ -15,6 +15,7 @@ import jadex.tools.gpmn.diagram.edit.policies.ConnectionHandleEditPolicyEx;
 import jadex.tools.gpmn.diagram.part.GpmnVisualIDRegistry;
 import jadex.tools.gpmn.diagram.providers.GpmnElementTypes;
 import jadex.tools.gpmn.diagram.tools.ActivationPlanSelectToolEx;
+import jadex.tools.gpmn.diagram.tools.SGpmnUtilities;
 import jadex.tools.gpmn.diagram.ui.ShadowedRoundedRectangleFigure;
 import jadex.tools.gpmn.diagram.ui.SlidableRoundedRectangleAnchor;
 
@@ -31,6 +32,7 @@ import org.eclipse.draw2d.Shape;
 import org.eclipse.draw2d.StackLayout;
 import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.emf.common.notify.Notification;
+import org.eclipse.emf.ecore.EReference;
 import org.eclipse.gef.ConnectionEditPart;
 import org.eclipse.gef.DragTracker;
 import org.eclipse.gef.EditPart;
@@ -42,6 +44,7 @@ import org.eclipse.gef.editpolicies.LayoutEditPolicy;
 import org.eclipse.gef.editpolicies.NonResizableEditPolicy;
 import org.eclipse.gef.requests.CreateRequest;
 import org.eclipse.gef.requests.SelectionRequest;
+import org.eclipse.gmf.runtime.diagram.ui.editparts.DiagramEditPart;
 import org.eclipse.gmf.runtime.diagram.ui.editparts.IGraphicalEditPart;
 import org.eclipse.gmf.runtime.diagram.ui.editparts.ShapeNodeEditPart;
 import org.eclipse.gmf.runtime.diagram.ui.editpolicies.EditPolicyRoles;
@@ -51,6 +54,9 @@ import org.eclipse.gmf.runtime.draw2d.ui.figures.WrappingLabel;
 import org.eclipse.gmf.runtime.emf.type.core.IElementType;
 import org.eclipse.gmf.runtime.gef.ui.figures.DefaultSizeNodeFigure;
 import org.eclipse.gmf.runtime.gef.ui.figures.NodeFigure;
+import org.eclipse.gmf.runtime.notation.Edge;
+import org.eclipse.gmf.runtime.notation.Node;
+import org.eclipse.gmf.runtime.notation.NotationPackage;
 import org.eclipse.gmf.runtime.notation.View;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Display;
@@ -435,9 +441,40 @@ public class ActivationPlanEditPart extends ShapeNodeEditPart
 	/**
 	 * @generated NOT
 	 */
+	protected void addTargetConnection(ConnectionEditPart connection, int index)
+	{
+		super.addTargetConnection(connection, index);
+		EditPart part = connection.getSource();
+		if (part instanceof GoalEditPart)
+		{
+			GoalEditPart goalPart = (GoalEditPart) part;
+			ActivationPlan plan = ((ActivationPlan) getNotationView()
+					.getElement());
+			goalPart.planAdded(plan);
+		}
+	}
+	
+	/**
+	 * @generated NOT
+	 */
+	protected void removeTargetConnection(ConnectionEditPart connection)
+	{
+		super.removeTargetConnection(connection);
+		EditPart part = connection.getSource();
+		if (part instanceof GoalEditPart)
+		{
+			GoalEditPart goalPart = (GoalEditPart) part;
+			ActivationPlan plan = ((ActivationPlan) getNotationView()
+					.getElement());
+			goalPart.planRemoved(plan);
+		}
+	}
+	
+	/**
+	 * @generated NOT
+	 */
 	protected void handleNotificationEvent(Notification notification)
 	{
-		
 		if (notification.getEventType() == Notification.SET
 				|| notification.getEventType() == Notification.UNSET)
 		{
@@ -451,6 +488,20 @@ public class ActivationPlanEditPart extends ShapeNodeEditPart
 				getPrimaryShape().setShowPlanModeDecorator(
 						showDecoratorAndLabels);
 				toggleActivationConnectionLabels(showDecoratorAndLabels);
+				List inEdges = getTargetConnections();
+				for (Object obj : inEdges)
+				{
+					if (obj instanceof PlanEdgeEditPart)
+					{
+						PlanEdgeEditPart edge = (PlanEdgeEditPart) obj;
+						GoalEditPart goal = (GoalEditPart) edge.getSource();
+						//TODO: Remove if it works
+						//goal.refreshModes((ActivationPlan)getNotationView().getElement(), (ModeType) notification.getNewValue(), true);
+						goal.planModeChanged((ActivationPlan) getNotationView()
+								.getElement(), (ModeType) notification
+								.getNewValue());
+					}
+				}
 			}
 		}
 		

@@ -718,6 +718,17 @@
         iD="diagram"/>
     <tabs
         xsi:type="gmfgen:GenCustomPropertyTab"
+        iD="goaltab"
+        label="Goal"
+        className="GpmnGoalPropertySection">
+      <filter
+          xsi:type="gmfgen:TypeTabFilter">
+        <types>jadex.tools.gpmn.diagram.edit.parts.GoalEditPart</types>
+        <generatedTypes>abstractNavigatorItem</generatedTypes>
+      </filter>
+    </tabs>
+    <tabs
+        xsi:type="gmfgen:GenCustomPropertyTab"
         iD="domain"
         label="Advanced">
       <filter
