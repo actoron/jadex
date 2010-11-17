@@ -1,6 +1,7 @@
 package jadex.simulation.remote;
 
 import jadex.bdi.runtime.IBDIExternalAccess;
+import jadex.bdi.runtime.ICapability;
 import jadex.bdi.runtime.IEAGoal;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.Future;
@@ -18,7 +19,7 @@ public class RemoteSimulationExecutionService extends BasicService implements IR
 	//-------- attributes --------
 	
 	/** The component. */
-	protected IBDIExternalAccess comp;
+	protected ICapability comp;
 	
 	/** The name of the platform. */
 	protected String name;
@@ -29,12 +30,12 @@ public class RemoteSimulationExecutionService extends BasicService implements IR
 	 *  Create a new shop service.
 	 *  @param comp The active component.
 	 */
-	public RemoteSimulationExecutionService(IExternalAccess comp, String name)
+	public RemoteSimulationExecutionService(ICapability comp, String name)
 	{
 		super(comp.getServiceProvider().getId(), IRemoteSimulationExecutionService.class, null);
 
 //		System.out.println("created: "+name);
-		this.comp = (IBDIExternalAccess)comp;
+		this.comp = comp;
 		this.name = name;
 	}
 
@@ -65,7 +66,7 @@ public class RemoteSimulationExecutionService extends BasicService implements IR
 		}
 		else
 		{
-			comp.getBeliefbase().getBeliefFact("myName").addResultListener(new DelegationResultListener(ret));
+			ret.setResult(comp.getBeliefbase().getBelief("myName").getFact());
 		}
 		
 		return ret;

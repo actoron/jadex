@@ -1,6 +1,9 @@
 package jadex.simulation.controlcenter;
 
 import jadex.bdi.runtime.IBDIExternalAccess;
+import jadex.bdi.runtime.IBDIInternalAccess;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IInternalAccess;
 import jadex.simulation.model.Dataconsumer;
 import jadex.simulation.model.Dataprovider;
 import jadex.simulation.model.Observer;
@@ -71,8 +74,19 @@ public class ControlCenter extends JFrame {
 	public ControlCenter(final IBDIExternalAccess agent) {
 		super("Automated Simulation Control Center");
 		this.exta = agent;
-		this.simConf = (SimulationConfiguration) exta.getBeliefbase()
-				.getBelief("simulationConf").getFact();
+//		this.simConf = (SimulationConfiguration) exta.getBeliefbase()
+//				.getBelief("simulationConf").getFact();
+		
+		agent.scheduleStep(new IComponentStep()
+		{
+			public Object execute(IInternalAccess ia)
+			{
+				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+				bia.getBeliefbase().getBelief("simulationConf").getFact();
+				return null;
+			}
+		});
+		
 		// this.env = (Environment)
 		// exta.getBeliefbase().getBelief("env").getFact();
 
@@ -119,7 +133,7 @@ public class ControlCenter extends JFrame {
 		setVisible(true);
 		addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
-				exta.killAgent();
+				exta.killComponent();
 			}
 		});
 	}
@@ -281,10 +295,12 @@ public class ControlCenter extends JFrame {
 		JTable ensembleResultsTable = new JTable(ensembleResultsDm);
 		ensembleResultsTable.setPreferredScrollableViewportSize(new Dimension(
 				400, 40));
-		for (Observer obs : simConf.getObservers().getObserver()) {
-			ensembleResultsDm.addRow(new Object[] { obs.getData().getName(),
-					"--", "--", "--" });
-		}
+		
+		//TODO: Change to new structure!!!
+//		for (Observer obs : simConf.getObservers().getObserver()) {
+//			ensembleResultsDm.addRow(new Object[] { obs.getData().getName(),
+//					"--", "--", "--" });
+//		}
 
 		// contains the results of the single experiments
 		singleExperimentsDm = new DefaultTableModel(new String[] { "ID",
