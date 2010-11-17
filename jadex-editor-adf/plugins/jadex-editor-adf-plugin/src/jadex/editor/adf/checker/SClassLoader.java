@@ -1,6 +1,9 @@
 package jadex.editor.adf.checker;
 
+import jadex.editor.adf.ADFCheckerActivator;
+
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -8,7 +11,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
@@ -27,6 +33,8 @@ public class SClassLoader
 	{
 		List urls = new ArrayList();
 		IJavaProject javaproject = JavaCore.create(project);
+		IPath workspacePath = ResourcesPlugin.getWorkspace().getRoot().getLocation();
+		
 		try
 		{
 			urls.add(new File(project.getLocation() + "/" + javaproject.getOutputLocation().removeFirstSegments(1) + "/").toURI().toURL());
@@ -59,8 +67,28 @@ public class SClassLoader
 				// add libraries to URLs
 				else if(entries[i].getEntryKind()==IClasspathEntry.CPE_LIBRARY)
 				{
-					IPath libraryPath = entries[i].getPath();
-					urls.add(libraryPath.toFile().toURI().toURL());
+					File jarFile = entries[i].getPath().toFile();
+					if (!jarFile.exists())
+					{
+						jarFile = workspacePath.append(entries[i].getPath()).toFile();
+					}
+					
+					if (jarFile.exists())
+					{
+						urls.add(jarFile.toURI().toURL());
+					}
+					else
+					{
+						ADFCheckerActivator
+								.getDefault()
+								.getLog()
+								.log(new Status(IStatus.WARNING,
+										ADFCheckerActivator.PLUGIN_ID, IStatus.CANCEL,
+										"Cannot add '" + entries[i].getPath()
+												+ "' to classpath",
+										new FileNotFoundException(jarFile
+												.toURI().toURL().toString())));
+					}
 				}
 			}
 		}

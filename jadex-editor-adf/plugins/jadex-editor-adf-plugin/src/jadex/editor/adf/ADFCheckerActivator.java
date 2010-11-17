@@ -8,7 +8,7 @@ import org.osgi.framework.BundleContext;
 /**
  * The activator class controls the plug-in life cycle
  */
-public class Activator extends AbstractUIPlugin
+public class ADFCheckerActivator extends AbstractUIPlugin
 {
 	//-------- constants --------
 	
@@ -16,14 +16,14 @@ public class Activator extends AbstractUIPlugin
 	public static final String	PLUGIN_ID	= "jadex.editor.adf.plugin";	//$NON-NLS-1$
 
 	/** The shared instance. */
-	protected static Activator	plugin;
+	protected static ADFCheckerActivator	plugin;
 	
 	//-------- constructors --------
 
 	/**
 	 * The constructor
 	 */
-	public Activator()
+	public ADFCheckerActivator()
 	{
 	}
 	
@@ -52,7 +52,7 @@ public class Activator extends AbstractUIPlugin
 	 * 
 	 * @return the shared instance
 	 */
-	public static Activator getDefault()
+	public static ADFCheckerActivator getDefault()
 	{
 		return plugin;
 	}
