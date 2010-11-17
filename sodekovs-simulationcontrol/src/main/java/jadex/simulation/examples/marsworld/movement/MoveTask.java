@@ -7,7 +7,9 @@ import jadex.application.space.envsupport.environment.space2d.Space2D;
 import jadex.application.space.envsupport.math.IVector2;
 import jadex.application.space.envsupport.math.Vector1Double;
 import jadex.bdi.runtime.IBDIExternalAccess;
-import jadex.commons.concurrent.DefaultResultListener;
+import jadex.bdi.runtime.IBDIInternalAccess;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IInternalAccess;
 import jadex.commons.service.clock.IClockService;
 
 import java.util.Iterator;
@@ -47,7 +49,7 @@ public class MoveTask extends AbstractTask
 	public void execute(IEnvironmentSpace space, ISpaceObject obj, long progress, IClockService clock)
 	{
 		IVector2 destination = (IVector2)getProperty(PROPERTY_DESTINATION);
-		final IBDIExternalAccess scope = (IBDIExternalAccess)getProperty(PROPERTY_SCOPE);
+		final IBDIExternalAccess agent = (IBDIExternalAccess)getProperty(PROPERTY_SCOPE);
 
 		double	speed	= ((Number)obj.getProperty(PROPERTY_SPEED)).doubleValue();
 		double	maxdist	= progress*speed*0.001;
@@ -63,40 +65,29 @@ public class MoveTask extends AbstractTask
 		final Set objects	= ((Space2D)space).getNearObjects((IVector2)obj.getProperty(Space2D.PROPERTY_POSITION), new Vector1Double(vision));
 		if(objects!=null)
 		{
-			for(Iterator it=objects.iterator(); it.hasNext(); )
+			agent.scheduleStep(new IComponentStep()
 			{
-				final ISpaceObject so = (ISpaceObject)it.next();
-				if(so.getType().equals("target"))
+				public Object execute(IInternalAccess ia)
 				{
-					scope.getBeliefbase().containsBeliefSetFact("my_targets", so).addResultListener(new DefaultResultListener()
+					IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+					for(Iterator it=objects.iterator(); it.hasNext(); )
 					{
-						public void resultAvailable(Object source, Object result)
+						final ISpaceObject so = (ISpaceObject)it.next();
+						if(so.getType().equals("target"))
 						{
-							if(!((Boolean)result).booleanValue())
-								scope.getBeliefbase().addBeliefSetFact("my_targets", so);
+							if(!bia.getBeliefbase().getBeliefSet("my_targets").containsFact(so))
+							{
+								bia.getBeliefbase().getBeliefSet("my_targets").addFact(so);
+							}
+//							System.out.println("New target seen: "+scope.getAgentName()+", "+objects[i]);
+							
 						}
-					});
-//						System.out.println("New target seen: "+scope.getAgentName()+", "+objects[i]);
-					
+					}
+					return null;
 				}
-			}
-			
-//			scope.invokeLater(new Runnable()
-//			{
-//				public void run()
-//				{
-//					IBeliefSet	targetsbel	= scope.getBeliefbase().getBeliefSet("my_targets");
-//					for(Iterator it=objects.iterator(); it.hasNext(); )
-//					{
-//						ISpaceObject so = (ISpaceObject)it.next();
-//						if(so.getType().equals("target") && !targetsbel.containsFact(so))
-//						{
-////							System.out.println("New target seen: "+scope.getAgentName()+", "+objects[i]);
-//							targetsbel.addFact(so);
-//						}
-//					}
-//				}
-//			});
+			});
+//						System.out.println("New target seen: "+scope.getAgentName()+", "+objects[i]);
+								
 		}
 		
 		if(newloc==destination)
