@@ -1,7 +1,10 @@
 package jadex.bdi.testcases.service;
 
 import jadex.bdi.runtime.IBDIExternalAccess;
+import jadex.bdi.runtime.IBDIInternalAccess;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.concurrent.DelegationResultListener;
@@ -35,10 +38,19 @@ public class BeliefGetter extends BasicService implements IBeliefGetter
 	 *  @param belname The belief name.
 	 *  @return The fact.
 	 */
-	public IFuture getFact(String belname)
+	public IFuture getFact(final String belname)
 	{
 		final Future ret = new Future();
-		agent.getBeliefbase().getBeliefFact(belname).addResultListener(new DelegationResultListener(ret));
+		agent.scheduleStep(new IComponentStep()
+		{
+			public Object execute(IInternalAccess ia)
+			{
+				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+				ret.setResult(bia.getBeliefbase().getBelief(belname).getFact());
+				return null;
+			}
+		});
+//		agent.getBeliefbase().getBeliefFact(belname).addResultListener(new DelegationResultListener(ret));
 		return ret;
 	}
 }

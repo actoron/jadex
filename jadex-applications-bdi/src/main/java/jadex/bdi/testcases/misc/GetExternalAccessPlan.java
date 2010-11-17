@@ -2,11 +2,14 @@ package jadex.bdi.testcases.misc;
 
 import jadex.base.test.TestReport;
 import jadex.bdi.runtime.IBDIExternalAccess;
+import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bdi.runtime.IEABelief;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IInternalAccess;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.concurrent.DefaultResultListener;
@@ -49,19 +52,30 @@ public class GetExternalAccessPlan extends Plan
 				IBDIExternalAccess exta = (IBDIExternalAccess)result;
 				gotexta[0]	= true;
 //				System.out.println("Got external access: "+exta);
-				exta.getBeliefbase().getBelief("test").addResultListener(new DefaultResultListener() 
+				
+				exta.scheduleStep(new IComponentStep()
 				{
-					public void resultAvailable(Object source, Object result) 
+					public Object execute(IInternalAccess ia)
 					{
-						((IEABelief)result).getFact().addResultListener(new DefaultResultListener()
-						{
-							public void resultAvailable(Object source, Object result) 
-							{
-								gotexta[1]	= "testfact".equals(result);
-							}
-						});
+						IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+						Object fact = bia.getBeliefbase().getBelief("test").getFact();
+						gotexta[1]	= "testfact".equals(fact);
+						return null;
 					}
-				}); 
+				});
+//				exta.getBeliefbase().getBelief("test").addResultListener(new DefaultResultListener() 
+//				{
+//					public void resultAvailable(Object source, Object result) 
+//					{
+//						((IEABelief)result).getFact().addResultListener(new DefaultResultListener()
+//						{
+//							public void resultAvailable(Object source, Object result) 
+//							{
+//								gotexta[1]	= "testfact".equals(result);
+//							}
+//						});
+//					}
+//				}); 
 			}
 			
 			public void exceptionOccurred(Object source, Exception exception)
