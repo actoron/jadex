@@ -100,7 +100,7 @@
 	</plans>
 	
 	<services>
-		<offeredservice class="ITreatVictimsService">new TreatVictimsService($scope.getExternalAccess())</offeredservice>
+		<offeredservice class="ITreatVictimsService" decoupled="true">new TreatVictimsService($scope.getExternalAccess())</offeredservice>
 	</services>
 	
 	<configurations>

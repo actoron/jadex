@@ -123,8 +123,8 @@
 	</plans>
 	
 	<services>
-		<offeredservice class="IExtinguishFireService">new ExtinguishFireService($scope.getExternalAccess())</offeredservice>
-		<offeredservice class="IClearChemicalsService">new ClearChemicalsService($scope.getExternalAccess())</offeredservice>
+		<offeredservice class="IExtinguishFireService" decoupled="true">new ExtinguishFireService($scope.getExternalAccess())</offeredservice>
+		<offeredservice class="IClearChemicalsService" decoupled="true">new ClearChemicalsService($scope.getExternalAccess())</offeredservice>
 	</services>
 	
 	<configurations>

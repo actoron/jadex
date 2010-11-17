@@ -3,9 +3,11 @@ package jadex.bdi.examples.disastermanagement.ambulance;
 import jadex.application.space.envsupport.environment.ISpaceObject;
 import jadex.bdi.examples.disastermanagement.DeliverPatientTask;
 import jadex.bdi.examples.disastermanagement.ITreatVictimsService;
-import jadex.bdi.runtime.IBDIExternalAccess;
+import jadex.bdi.runtime.AgentEvent;
+import jadex.bdi.runtime.ICapability;
 import jadex.bdi.runtime.IEAGoal;
-import jadex.bridge.IExternalAccess;
+import jadex.bdi.runtime.IGoal;
+import jadex.bdi.runtime.IGoalListener;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.concurrent.DefaultResultListener;
@@ -20,17 +22,17 @@ public class TreatVictimsService extends BasicService implements ITreatVictimsSe
 	//-------- attributes --------
 	
 	/** The agent. */
-	protected IBDIExternalAccess agent;
+	protected ICapability agent;
 	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new service.
 	 */
-	public TreatVictimsService(IExternalAccess agent)
+	public TreatVictimsService(ICapability agent)
 	{
 		super(agent.getServiceProvider().getId(), ITreatVictimsService.class, null);
-		this.agent = (IBDIExternalAccess)agent;
+		this.agent = agent;
 	}
 	
 	//-------- methods --------
@@ -44,40 +46,31 @@ public class TreatVictimsService extends BasicService implements ITreatVictimsSe
 	{
 		final Future ret = new Future();
 		
-		agent.getGoalbase().getGoals("treat_victims").addResultListener(new DefaultResultListener()
+		IGoal[] goals = (IGoal[])agent.getGoalbase().getGoals("treat_victims");
+		if(goals.length>0)
 		{
-			public void resultAvailable(Object source, Object result)
+			ret.setException(new IllegalStateException("Can only handle one order at a time. Use abort() first."));
+		}
+		else
+		{
+			final IGoal exfire = (IGoal)agent.getGoalbase().createGoal("treat_victims");
+			exfire.getParameter("disaster").setValue(disaster);
+			exfire.addGoalListener(new IGoalListener()
 			{
-				IEAGoal[] goals = (IEAGoal[])result;
-				if(goals.length>0)
+				public void goalFinished(AgentEvent ae)
 				{
-					ret.setException(new IllegalStateException("Can only handle one order at a time. Use abort() first."));
+					if(exfire.isSucceeded())
+						ret.setResult(null);
+					else
+						ret.setException(new RuntimeException("Goal failed"));
 				}
-				else
+				
+				public void goalAdded(AgentEvent ae)
 				{
-					agent.createGoal("treat_victims").addResultListener(new DefaultResultListener()
-					{
-						public void resultAvailable(Object source, Object result)
-						{
-							final IEAGoal exfire = (IEAGoal)result;
-							exfire.setParameterValue("disaster", disaster);
-							agent.dispatchTopLevelGoalAndWait(exfire).addResultListener(new IResultListener()
-							{
-								public void resultAvailable(Object source, Object result)
-								{
-									ret.setResult(null);
-								}
-								
-								public void exceptionOccurred(Object source, Exception exception)
-								{
-									ret.setException(exception);
-								}
-							});
-						}
-					});
 				}
-			}
-		});
+			});
+			agent.getGoalbase().dispatchTopLevelGoal(exfire);
+		}
 		
 		return ret;
 	}
@@ -90,33 +83,21 @@ public class TreatVictimsService extends BasicService implements ITreatVictimsSe
 	{
 		final Future ret = new Future();
 		
-		agent.getBeliefbase().getBeliefFact("myself").addResultListener(new DefaultResultListener()
+		ISpaceObject myself	= (ISpaceObject)agent.getBeliefbase().getBelief("myself").getFact();
+		if(((Boolean)myself.getProperty(DeliverPatientTask.PROPERTY_PATIENT)).booleanValue())
 		{
-			public void resultAvailable(Object source, Object result)
+			ret.setException(new IllegalStateException("Can not abort with patient on board."));			
+		}
+		else
+		{
+			IGoal[] goals = (IGoal[])agent.getGoalbase().getGoals("treat_victims");
+			for(int i=0; i<goals.length; i++)
 			{
-				ISpaceObject	myself	= (ISpaceObject)result;
-				if(((Boolean)myself.getProperty(DeliverPatientTask.PROPERTY_PATIENT)).booleanValue())
-				{
-					ret.setException(new IllegalStateException("Can not abort with patient on board."));			
-				}
-				else
-				{
-					agent.getGoalbase().getGoals("treat_victims").addResultListener(new DefaultResultListener()
-					{
-						public void resultAvailable(Object source, Object result)
-						{
-							IEAGoal[] goals = (IEAGoal[])result;
-							for(int i=0; i<goals.length; i++)
-							{
-//								System.out.println("Dropping: "+goals[i]);
-								goals[i].drop();
-							}
-							ret.setResult(null);
-						}
-					});					
-				}
+//				System.out.println("Dropping: "+goals[i]);
+				goals[i].drop();
 			}
-		});
+			ret.setResult(null);
+		}
 		
 		return ret;
 	}

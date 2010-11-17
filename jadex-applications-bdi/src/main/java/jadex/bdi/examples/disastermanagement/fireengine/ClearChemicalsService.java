@@ -2,8 +2,12 @@ package jadex.bdi.examples.disastermanagement.fireengine;
 
 import jadex.application.space.envsupport.environment.ISpaceObject;
 import jadex.bdi.examples.disastermanagement.IClearChemicalsService;
+import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IBDIExternalAccess;
+import jadex.bdi.runtime.ICapability;
 import jadex.bdi.runtime.IEAGoal;
+import jadex.bdi.runtime.IGoal;
+import jadex.bdi.runtime.IGoalListener;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
@@ -19,17 +23,17 @@ public class ClearChemicalsService extends BasicService implements IClearChemica
 	//-------- attributes --------
 	
 	/** The agent. */
-	protected IBDIExternalAccess agent;
+	protected ICapability agent;
 	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new service.
 	 */
-	public ClearChemicalsService(IExternalAccess agent)
+	public ClearChemicalsService(ICapability agent)
 	{
 		super(agent.getServiceProvider().getId(), IClearChemicalsService.class, null);
-		this.agent = (IBDIExternalAccess)agent;
+		this.agent = agent;
 	}
 	
 	//-------- methods --------
@@ -43,54 +47,38 @@ public class ClearChemicalsService extends BasicService implements IClearChemica
 	{
 		final Future ret = new Future();
 		
-		agent.getGoalbase().getGoals("extinguish_fire").addResultListener(new DefaultResultListener()
+		IGoal[] exgoals = (IGoal[])agent.getGoalbase().getGoals("extinguish_fire");
+		if(exgoals.length>0)
 		{
-			public void resultAvailable(Object source, Object result)
+			ret.setException(new IllegalStateException("Can only handle one order at a time. Use abort() first."));
+		}
+		else
+		{
+			IGoal[] goals = (IGoal[])agent.getGoalbase().getGoals("clear_chemicals");
+			if(goals.length>0)
 			{
-				IEAGoal[] goals = (IEAGoal[])result;
-				if(goals.length>0)
-				{
-					ret.setException(new IllegalStateException("Can only handle one order at a time. Use abort() first."));
-				}
-				else
-				{
-					agent.getGoalbase().getGoals("clear_chemicals").addResultListener(new DefaultResultListener()
-					{
-						public void resultAvailable(Object source, Object result)
-						{
-							IEAGoal[] goals = (IEAGoal[])result;
-							if(goals.length>0)
-							{
-								ret.setException(new IllegalStateException("Can only handle one order at a time. Use abort() first."));
-							}
-							else
-							{
-								agent.createGoal("clear_chemicals").addResultListener(new DefaultResultListener()
-								{
-									public void resultAvailable(Object source, Object result)
-									{
-										final IEAGoal exfire = (IEAGoal)result;
-										exfire.setParameterValue("disaster", disaster);
-										agent.dispatchTopLevelGoalAndWait(exfire).addResultListener(new IResultListener()
-										{
-											public void resultAvailable(Object source, Object result)
-											{
-												ret.setResult(null);
-											}
-											
-											public void exceptionOccurred(Object source, Exception exception)
-											{
-												ret.setException(exception);
-											}
-										});
-									}
-								});
-							}
-						}
-					});
-				}
+				ret.setException(new IllegalStateException("Can only handle one order at a time. Use abort() first."));
 			}
-		});
+			else
+			{
+				final IGoal exfire = agent.getGoalbase().createGoal("clear_chemicals");
+				exfire.getParameter("disaster").setValue(disaster);
+				exfire.addGoalListener(new IGoalListener()
+				{
+					public void goalFinished(AgentEvent ae)
+					{
+						if(exfire.isSucceeded())
+							ret.setResult(null);
+						else
+							ret.setException(new RuntimeException("Goal failure."));
+					}
+					
+					public void goalAdded(AgentEvent ae)
+					{
+					}
+				});
+			}
+		}
 		
 		return ret;
 	}
@@ -103,19 +91,13 @@ public class ClearChemicalsService extends BasicService implements IClearChemica
 	{
 		final Future ret = new Future();
 		
-		agent.getGoalbase().getGoals("clear_chemicals").addResultListener(new DefaultResultListener()
+		IGoal[] goals = (IGoal[])agent.getGoalbase().getGoals("clear_chemicals");
+		for(int i=0; i<goals.length; i++)
 		{
-			public void resultAvailable(Object source, Object result)
-			{
-				IEAGoal[] goals = (IEAGoal[])result;
-				for(int i=0; i<goals.length; i++)
-				{
-//					System.out.println("Dropping: "+goals[i]);
-					goals[i].drop();
-				}
-				ret.setResult(null);
-			}
-		});
+//			System.out.println("Dropping: "+goals[i]);
+			goals[i].drop();
+		}
+		ret.setResult(null);
 		
 		return ret;
 	}
