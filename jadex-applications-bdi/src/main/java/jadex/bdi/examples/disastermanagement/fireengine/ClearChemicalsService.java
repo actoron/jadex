@@ -61,13 +61,13 @@ public class ClearChemicalsService extends BasicService implements IClearChemica
 			}
 			else
 			{
-				final IGoal exfire = agent.getGoalbase().createGoal("clear_chemicals");
-				exfire.getParameter("disaster").setValue(disaster);
-				exfire.addGoalListener(new IGoalListener()
+				final IGoal clearchem = agent.getGoalbase().createGoal("clear_chemicals");
+				clearchem.getParameter("disaster").setValue(disaster);
+				clearchem.addGoalListener(new IGoalListener()
 				{
 					public void goalFinished(AgentEvent ae)
 					{
-						if(exfire.isSucceeded())
+						if(clearchem.isSucceeded())
 							ret.setResult(null);
 						else
 							ret.setException(new RuntimeException("Goal failure."));
@@ -77,6 +77,7 @@ public class ClearChemicalsService extends BasicService implements IClearChemica
 					{
 					}
 				});
+				agent.getGoalbase().dispatchTopLevelGoal(clearchem);
 			}
 		}
 		

@@ -53,13 +53,14 @@ public class TreatVictimsService extends BasicService implements ITreatVictimsSe
 		}
 		else
 		{
-			final IGoal exfire = (IGoal)agent.getGoalbase().createGoal("treat_victims");
-			exfire.getParameter("disaster").setValue(disaster);
-			exfire.addGoalListener(new IGoalListener()
+			final IGoal tv = (IGoal)agent.getGoalbase().createGoal("treat_victims");
+			tv.getParameter("disaster").setValue(disaster);
+			tv.addGoalListener(new IGoalListener()
 			{
 				public void goalFinished(AgentEvent ae)
 				{
-					if(exfire.isSucceeded())
+//					System.out.println("tv fin: "+agent.getAgentName());
+					if(tv.isSucceeded())
 						ret.setResult(null);
 					else
 						ret.setException(new RuntimeException("Goal failed"));
@@ -69,7 +70,8 @@ public class TreatVictimsService extends BasicService implements ITreatVictimsSe
 				{
 				}
 			});
-			agent.getGoalbase().dispatchTopLevelGoal(exfire);
+//			System.out.println("tv start: "+agent.getAgentName());
+			agent.getGoalbase().dispatchTopLevelGoal(tv);
 		}
 		
 		return ret;

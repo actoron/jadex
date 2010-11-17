@@ -82,6 +82,7 @@ public class CleanerGui	extends JFrame
 								{
 									drawdata.dests[i] = (IVector2)goals[i].getParameter("location").getValue();
 								}
+								drawdata.ready = true;
 							}
 							return null;
 						}
@@ -89,6 +90,8 @@ public class CleanerGui	extends JFrame
 					
 					synchronized(drawdata)
 					{
+						if(!drawdata.ready)
+							return;
 						//System.out.println("++++++++++++++ GUI repaint from: "+Thread.currentThread());
 						
 						// As paint components is called on swing thread there is no chance to use
@@ -336,6 +339,7 @@ public class CleanerGui	extends JFrame
 	 */
 	public static class DrawData
 	{
+		public boolean ready;
 		public boolean daytime;
 		public MapPoint[] visited_positions;
 		public double max_quantity;

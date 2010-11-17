@@ -115,7 +115,7 @@ public class OAVBDIXMLReader
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "recurcondition")), new ObjectInfo(OAVBDIMetaModel.condition_type), 
 			new MappingInfo(null, null, OAVBDIMetaModel.expression_has_text)));
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "metagoal"), new QName(uri, "trigger")}), new ObjectInfo(OAVBDIMetaModel.metagoaltrigger_type)));
-		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "inhibits")), new ObjectInfo(OAVBDIMetaModel.inhibits_type), 
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "inhibits")), new ObjectInfo(OAVBDIMetaModel.inhibits_type, expost), 
 			new MappingInfo(null, null, OAVBDIMetaModel.expression_has_text)));
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "deliberation")), null));
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "unique")), new ObjectInfo(new IBeanObjectCreator()
@@ -435,7 +435,7 @@ public class OAVBDIXMLReader
 			{
 				String lang = (String)state.getAttributeValue(object, OAVBDIMetaModel.expression_has_language);
 				
-				if(state.getType(object).isSubtype(OAVBDIMetaModel.condition_type))
+				if(state.getType(object).isSubtype(OAVBDIMetaModel.condition_type) && !state.getType(object).isSubtype(OAVBDIMetaModel.inhibits_type))
 				{
 					// Conditions now parsed in createAgentModelEntry...
 					

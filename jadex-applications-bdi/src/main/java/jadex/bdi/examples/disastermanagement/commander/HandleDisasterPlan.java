@@ -11,6 +11,7 @@ import jadex.commons.service.SServiceProvider;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -33,14 +34,15 @@ public class HandleDisasterPlan extends Plan
 	 *  instantiated plan instance from the scheduler.
 	 */
 	public void	body()
-	{
+	{		
 		// Keep track of assigned units in case plan gets aborted.
 		this.fireunits	= new ArrayList();
 		this.chemicalunits	= new ArrayList();
 		this.ambulanceunits	= new ArrayList();
 		
 		final ISpaceObject disaster = (ISpaceObject)getParameter("disaster").getValue();
-		
+		System.out.println("handle: "+disaster);
+	
 		final IBeliefSet busy = getBeliefbase().getBeliefSet("busy_entities");	
 		
 		// Plan runs in an endless loop until the goal is achieved and the plan is aborted.
@@ -122,6 +124,7 @@ public class HandleDisasterPlan extends Plan
 				}
 			}
 			
+//			System.out.println("vic: "+victims+" "+ambulanceunits.size()+" "+disaster);
 			if(chemicals==0 && victims>ambulanceunits.size())
 			{
 				Collection treatvicser = (Collection)SServiceProvider.getServices(getScope().getServiceProvider(), ITreatVictimsService.class).get(this);
@@ -136,19 +139,20 @@ public class HandleDisasterPlan extends Plan
 						{
 							busy.addFact(provid);
 							ambulanceunits.add(tvs);
-	//						System.out.println("Unit assigned: "+provid);
+//							System.out.println("Unit assigned: "+provid);
 							tvs.treatVictims(disaster).addResultListener(createResultListener(new IResultListener()
 							{
 								public void resultAvailable(Object source, Object result)
 								{
-	//								System.out.println("Unit finished: "+provid+", "+goal.isFinished()+", "+disaster);
+//									int s = ambulanceunits.size();
 									busy.removeFact(provid);
 									ambulanceunits.remove(tvs);
+//									System.out.println("Unit finished: "+provid+", "+disaster+" "+s+" "+ambulanceunits.size());
 								}
 								
 								public void exceptionOccurred(Object source, Exception exception)
 								{
-	//								System.out.println("Unit exception: "+provid);
+//									System.out.println("Unit exception: "+provid);
 									busy.removeFact(provid);
 									ambulanceunits.remove(tvs);
 								}
@@ -168,6 +172,8 @@ public class HandleDisasterPlan extends Plan
 	 */
 	public void	aborted()
 	{
+//		System.out.println("aborted");
+		
 		// Abort all units.
 		// Use arrays, because collection might be altered by abort().
 		

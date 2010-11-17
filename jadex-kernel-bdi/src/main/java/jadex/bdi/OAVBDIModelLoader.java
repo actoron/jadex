@@ -303,7 +303,7 @@ public class OAVBDIModelLoader	extends AbstractModelLoader
 					{
 						Object	inhibit = it2.next();
 						String	text	= (String)state.getAttributeValue(inhibit, OAVBDIMetaModel.expression_has_text);
-						Object	cond	= (String)state.getAttributeValue(inhibit, OAVBDIMetaModel.expression_has_parsed);
+						Object	cond	= state.getAttributeValue(inhibit, OAVBDIMetaModel.expression_has_parsed);
 						if(text!=null || cond!=null)
 						{
 							String	ref	= (String)state.getAttributeValue(inhibit, OAVBDIMetaModel.inhibits_has_ref);

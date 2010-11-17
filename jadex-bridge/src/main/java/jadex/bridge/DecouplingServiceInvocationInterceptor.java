@@ -3,10 +3,12 @@ package jadex.bridge;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.ThreadSuspendable;
+import jadex.commons.collection.MultiCollection;
 import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.service.IInternalService;
 import jadex.commons.service.IServiceIdentifier;
 
+import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
 
 /**
@@ -121,12 +123,59 @@ public class DecouplingServiceInvocationInterceptor implements IServiceInvocatio
 	}
 	
 	/**
+	 *  Get the standard interceptors for composite service proxies;
+	 */
+	public static MultiCollection getInterceptors()
+	{
+		MultiCollection ret = new MultiCollection();
+		try
+		{
+			ret.put(Object.class.getMethod("toString", new Class[0]), new IServiceInvocationInterceptor()
+			{
+				public void execute(ServiceInvocationContext context)
+				{
+					Object proxy = context.getProxy();
+					InvocationHandler handler = (InvocationHandler)Proxy.getInvocationHandler(proxy);
+					context.setResult(handler.toString());
+				}
+			});
+			ret.put(Object.class.getMethod("equals", new Class[]{Object.class}), new IServiceInvocationInterceptor()
+			{
+				public void execute(ServiceInvocationContext context)
+				{
+					Object proxy = context.getProxy();
+					InvocationHandler handler = (InvocationHandler)Proxy.getInvocationHandler(proxy);
+					Object[] args = (Object[])context.getArguments();
+					context.setResult(new Boolean(args[0]!=null && Proxy.isProxyClass(args[0].getClass())
+						&& handler.equals(Proxy.getInvocationHandler(args[0]))));
+				}
+			});
+			ret.put(Object.class.getMethod("hashCode", new Class[0]), new IServiceInvocationInterceptor()
+			{
+				public void execute(ServiceInvocationContext context)
+				{
+					Object proxy = context.getProxy();
+					InvocationHandler handler = Proxy.getInvocationHandler(proxy);
+					context.setResult(new Integer(Proxy.getInvocationHandler(handler).hashCode()));
+				}
+			});
+			// todo: other object methods?!
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		
+		return ret;
+	}
+	
+	/**
 	 *  Static method for creating a service proxy.
 	 */
 	public static IInternalService createServiceProxy(IExternalAccess ea, IComponentAdapter adapter, IInternalService service)
 	{
 		IServiceIdentifier sid = service.getServiceIdentifier();
 		return (IInternalService)Proxy.newProxyInstance(ea.getModel().getClassLoader(), new Class[]{IInternalService.class, sid.getServiceType()}, 
-			new BasicServiceInvocationHandler(sid, null, new DecouplingServiceInvocationInterceptor(ea, adapter, service)));
+			new BasicServiceInvocationHandler(sid, getInterceptors(), new DecouplingServiceInvocationInterceptor(ea, adapter, service)));
 	}
 }
