@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
       id="jadex.tools.gpmn.feature"
-      label="Jadex GPMN model tools"
+      label="Jadex GPMN Editor"
       version="1.0.0.qualifier"
-      provider-name="Jadex GPMN model tools"
+      provider-name="Jadex GPMN Editor"
       exclusive="true"
       colocation-affinity="jadex.tool.gpmn.feature">
 
    <description url="http://jadex.informatik.uni-hamburg.de">
-      Model tools for Jadex GPMN runtime
+      The Jadex GPMN Editor is an GMF based editor to develop GPMN models for the Jadex WfMS
    </description>
 
    <copyright>
@@ -26,7 +26,7 @@ may contact us for obtaining a closed source license.
    </license>
 
    <url>
-      <update label="Jadex" url="http://vsis-www.informatik.uni-hamburg.de/projects/jadex/modeltools/update/"/>
+      <update label="Jadex Eclipse Plugins" url="http://vsis-www.informatik.uni-hamburg.de/projects/jadex/eclipse/update/"/>
    </url>
 
    <requires>

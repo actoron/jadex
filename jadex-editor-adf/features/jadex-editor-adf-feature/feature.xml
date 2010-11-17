@@ -537,6 +537,10 @@ necessary.  Here is a sample; alter the names:
 That&apos;s all there is to it!
    </license>
 
+   <url>
+      <update label="Jadex Eclipse Plugins" url="http://vsis-www.informatik.uni-hamburg.de/projects/jadex/eclipse/update/"/>
+   </url>
+
    <requires>
       <import plugin="org.eclipse.ui"/>
       <import plugin="org.eclipse.core.runtime"/>

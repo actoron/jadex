@@ -21,15 +21,21 @@
 This means the LGPL does not allow you to develop closed source software products based on the Jadex sources. In this case you may contact us for obtaining a closed source license.
    </license>
 
+   <url>
+      <update label="Jadex Eclipse Plugins" url="http://vsis-www.informatik.uni-hamburg.de/projects/jadex/eclipse/update/"/>
+   </url>
+
    <requires>
-      <import plugin="org.eclipse.core.runtime"/>
-      <import plugin="org.eclipse.ui.ide" version="3.5.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.core.resources"/>
       <import plugin="org.eclipse.ui.views.log" version="1.0.100" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.jdt.core" version="3.5.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.jdt.ui" version="3.5.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.stp.bpmn.diagram" version="1.1.0" match="greaterOrEqual"/>
-      <import feature="org.eclipse.stp.bpmn.feature" version="1.2.0.qualifier"/>
+      <import feature="org.eclipse.stp.bpmn.feature" version="1.1.0.qualifier" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.core.runtime" version="3.5.0"/>
+      <import plugin="org.eclipse.core.resources" version="3.5.0"/>
+      <import plugin="org.eclipse.ui" version="3.5.0"/>
+      <import plugin="org.eclipse.ui.ide" version="3.5.0"/>
+      <import plugin="org.eclipse.jdt.core" version="3.5.0"/>
+      <import plugin="org.eclipse.jdt.ui" version="3.5.0"/>
+      <import plugin="org.eclipse.stp.bpmn" version="1.1.0" match="compatible"/>
+      <import plugin="org.eclipse.stp.bpmn.diagram" version="1.1.0" match="compatible"/>
    </requires>
 
    <plugin
