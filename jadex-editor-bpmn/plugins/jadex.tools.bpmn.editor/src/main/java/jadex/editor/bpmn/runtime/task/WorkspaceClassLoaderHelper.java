@@ -4,6 +4,7 @@ import jadex.editor.bpmn.editor.JadexBpmnEditor;
 import jadex.editor.bpmn.editor.JadexBpmnEditorActivator;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Method;
@@ -113,13 +114,10 @@ class WorkspaceClassLoaderHelper
 					// add libraries to URLs
 					else if (classpathEntry.getEntryKind() == IClasspathEntry.CPE_LIBRARY)
 					{
-						URL jarURL = null;
-						IPath libraryPath = classpathEntry.getPath();
-						File jarFile = libraryPath.toFile();
+						File jarFile = classpathEntry.getPath().toFile();
 						if (!jarFile.exists())
 						{
-							IPath workspaceLibraryPath = workspacePath.append(libraryPath);
-							jarFile = workspaceLibraryPath.toFile();
+							jarFile = workspacePath.append(classpathEntry.getPath()).toFile();
 						}
 						
 						if (jarFile.exists())
@@ -128,7 +126,7 @@ class WorkspaceClassLoaderHelper
 						}
 						else
 						{
-							JadexBpmnEditor.log("Can't determine jar path for library entry: " + libraryPath, null, IStatus.ERROR);
+							JadexBpmnEditor.log("Can't determine jar path for library entry: " + classpathEntry.getPath(), new FileNotFoundException(jarFile.toURI().toURL().toString()), IStatus.ERROR);
 						}
 						
 					}
