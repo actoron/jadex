@@ -855,8 +855,8 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 	{
 		if(isExternalThread())
 		{
-//			System.err.println("Unsynchronized internal thread.");
-//			Thread.dumpStack();
+			System.err.println("Unsynchronized internal thread.");
+			Thread.dumpStack();
 
 			final boolean[] notified = new boolean[1];
 			final Throwable[] exception = new Throwable[1];

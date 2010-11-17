@@ -21,10 +21,14 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IModelInfo;
 import jadex.commons.IFuture;
+import jadex.commons.SUtil;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.service.IServiceProvider;
 import jadex.rules.state.IOAVState;
 
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.StringTokenizer;
 import java.util.logging.Logger;
 
 /**
@@ -666,5 +670,102 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	public IFuture killComponent()
 	{
 		return killAgent();
+	}
+
+	/**
+	 *  Get subcapability names.
+	 *  @return The future with array of subcapability names.
+	 */
+	public String[]	getSubcapabilityNames()
+	{
+		if(getInterpreter().isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					String[] res = SUtil.EMPTY_STRING_ARRAY;
+					Collection coll = getState().getAttributeValues(getHandle(), OAVBDIRuntimeModel.capability_has_subcapabilities);
+					if(coll!=null)
+					{
+						res = new String[coll.size()];
+						int i=0;
+						for(Iterator it=coll.iterator(); it.hasNext(); i++)
+						{
+							Object cref = it.next();
+							String name = (String)getState().getAttributeValue(cref, OAVBDIRuntimeModel.capabilityreference_has_name);
+							res[i] = name;
+						}
+					}
+					this.sarray	= res;
+				}
+			};
+			return invoc.sarray;
+		}
+		else
+		{
+			String[] res = SUtil.EMPTY_STRING_ARRAY;
+			Collection coll = getState().getAttributeValues(getHandle(), OAVBDIRuntimeModel.capability_has_subcapabilities);
+			if(coll!=null)
+			{
+				res = new String[coll.size()];
+				int i=0;
+				for(Iterator it=coll.iterator(); it.hasNext(); i++)
+				{
+					Object cref = it.next();
+					String name = (String)getState().getAttributeValue(cref, OAVBDIRuntimeModel.capabilityreference_has_name);
+					res[i] = name;
+				}
+			}
+			return res;
+		}
+	}
+
+	/**
+	 *  Get external access of subcapability.
+	 *  @param name The capability name.
+	 *  @return The future with external access.
+	 */
+	public ICapability	getSubcapability(final String name)
+	{
+		if(getInterpreter().isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					StringTokenizer stok = new StringTokenizer(name, ".");
+					Object handle = getHandle();
+					while(stok.hasMoreTokens())
+					{
+						String subcapname = stok.nextToken();
+						Object subcapref = getState().getAttributeValue(handle, OAVBDIRuntimeModel.capability_has_subcapabilities, subcapname);
+						if(subcapref==null)
+						{
+							throw new RuntimeException("Capability not found: "+subcapname);
+						}
+						handle = getState().getAttributeValue(subcapref, OAVBDIRuntimeModel.capabilityreference_has_capability);
+					}
+					this.object	= new CapabilityFlyweight(getState(), handle);
+				}
+			};
+			return (ICapability)invoc.object;
+		}
+		else
+		{
+			StringTokenizer stok = new StringTokenizer(name, ".");
+			Object handle = getHandle();
+			while(stok.hasMoreTokens())
+			{
+				String subcapname = stok.nextToken();
+				Object subcapref = getState().getAttributeValue(handle, OAVBDIRuntimeModel.capability_has_subcapabilities, subcapname);
+				if(subcapref==null)
+				{
+					throw new RuntimeException("Capability not found: "+subcapname);
+				}
+				handle = getState().getAttributeValue(subcapref, OAVBDIRuntimeModel.capabilityreference_has_capability);
+			}
+			return new CapabilityFlyweight(getState(), handle);
+		}
 	}
 }

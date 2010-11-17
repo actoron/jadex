@@ -158,4 +158,17 @@ public interface ICapability	extends IElement
 	 *  @param listener The listener.
 	 */
 	public void removeAgentListener(IAgentListener listener);
+	
+	/**
+	 *  Get subcapability names.
+	 *  @return The future with array of subcapability names.
+	 */
+	public String[]	getSubcapabilityNames();
+	
+	/**
+	 *  Get a subcapability.
+	 *  @param name The capability name.
+	 *  @return The capability.
+	 */
+	public ICapability	getSubcapability(String name);
 }
