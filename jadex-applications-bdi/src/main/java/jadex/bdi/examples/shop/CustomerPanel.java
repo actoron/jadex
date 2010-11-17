@@ -5,7 +5,6 @@ import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bdi.runtime.IBeliefListener;
 import jadex.bdi.runtime.IBeliefSetListener;
-import jadex.bdi.runtime.IEAGoal;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IGoalListener;
 import jadex.bridge.IComponentStep;
@@ -363,6 +362,7 @@ public class CustomerPanel extends JPanel
 								{
 								}
 							});
+							bia.getGoalbase().dispatchTopLevelGoal(buy);
 							return null;
 						}
 					});
