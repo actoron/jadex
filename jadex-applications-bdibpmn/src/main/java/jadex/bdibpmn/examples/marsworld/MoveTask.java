@@ -7,6 +7,9 @@ import jadex.application.space.envsupport.environment.space2d.Space2D;
 import jadex.application.space.envsupport.math.IVector2;
 import jadex.application.space.envsupport.math.Vector1Double;
 import jadex.bdi.runtime.IBDIExternalAccess;
+import jadex.bdi.runtime.IBDIInternalAccess;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IInternalAccess;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.service.clock.IClockService;
 
@@ -68,17 +71,29 @@ public class MoveTask extends AbstractTask
 				final ISpaceObject so = (ISpaceObject)it.next();
 				if(so.getType().equals("target"))
 				{
-					scope.getBeliefbase().containsBeliefSetFact("my_targets", so).addResultListener(new DefaultResultListener()
+					scope.scheduleStep(new IComponentStep()
 					{
-						public void resultAvailable(Object source, Object result)
+						public Object execute(IInternalAccess ia)
 						{
-							if(!((Boolean)result).booleanValue())
+							IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+							if(bia.getBeliefbase().getBeliefSet("my_targets").containsFact(so))
 							{
-								scope.getBeliefbase().addBeliefSetFact("my_targets", so);
-							//	System.out.println("New target seen: "+scope.getAgentName()+", "+objects[i]);
+								bia.getBeliefbase().getBeliefSet("my_targets").addFact(so);
 							}
+							return null;
 						}
 					});
+//					scope.getBeliefbase().containsBeliefSetFact("my_targets", so).addResultListener(new DefaultResultListener()
+//					{
+//						public void resultAvailable(Object source, Object result)
+//						{
+//							if(!((Boolean)result).booleanValue())
+//							{
+//								scope.getBeliefbase().addBeliefSetFact("my_targets", so);
+//							//	System.out.println("New target seen: "+scope.getAgentName()+", "+objects[i]);
+//							}
+//						}
+//					});
 				}
 			}
 			
