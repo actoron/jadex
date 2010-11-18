@@ -14,8 +14,8 @@ public class CalculatorAgent extends MicroAgent
 	 */
 	public void agentCreated()
 	{
-		addService(new AddService(getServiceProvider()));
-		addService(new SubService(getServiceProvider()));
+		addDirectService(new AddService(getServiceProvider()));
+		addDirectService(new SubService(getServiceProvider()));
 	}
 	
 	//-------- static methods --------

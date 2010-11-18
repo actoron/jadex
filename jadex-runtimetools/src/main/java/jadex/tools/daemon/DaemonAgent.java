@@ -51,7 +51,7 @@ public class DaemonAgent extends MicroAgent
 	{
 		platforms = Collections.synchronizedMap(new HashMap());
 		listeners = Collections.synchronizedList(new ArrayList());
-		addService(new DaemonService(getExternalAccess()));
+		addDirectService(new DaemonService(getExternalAccess()));
 		SwingUtilities.invokeLater(new Runnable()
 		{
 			public void run()

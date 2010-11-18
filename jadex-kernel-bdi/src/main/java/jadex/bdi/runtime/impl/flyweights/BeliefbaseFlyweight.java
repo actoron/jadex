@@ -58,14 +58,14 @@ public class BeliefbaseFlyweight extends ElementFlyweight implements IBeliefbase
 			{
 				public void run()
 				{
-					object = SFlyweightFunctionality.getBelief(getState(), getHandle(), getScope(), name, false);
+					object = SFlyweightFunctionality.getBelief(getState(), getHandle(), getScope(), name);
 				}
 			};
 			return (IBelief)invoc.object;
 		}
 		else
 		{
-			return (IBelief)SFlyweightFunctionality.getBelief(getState(), getHandle(), getScope(), name, false);
+			return (IBelief)SFlyweightFunctionality.getBelief(getState(), getHandle(), getScope(), name);
 		}
 	}
 
@@ -81,14 +81,14 @@ public class BeliefbaseFlyweight extends ElementFlyweight implements IBeliefbase
 			{
 				public void run()
 				{
-					object = SFlyweightFunctionality.getBeliefSet(getState(), getHandle(), getScope(), name, false);
+					object = SFlyweightFunctionality.getBeliefSet(getState(), getHandle(), getScope(), name);
 				}
 			};
 			return (IBeliefSet)invoc.object;
 		}
 		else
 		{
-			return (IBeliefSet)SFlyweightFunctionality.getBeliefSet(getState(), getHandle(), getScope(), name, false);
+			return (IBeliefSet)SFlyweightFunctionality.getBeliefSet(getState(), getHandle(), getScope(), name);
 		}
 	}
 

@@ -46,7 +46,6 @@ public class CleanerGui	extends JFrame
 		super(agent.getComponentIdentifier().getName());
 		final JPanel map = new JPanel()
 		{
-//			protected IEAExpression	query_max_quantity;
 			protected boolean printed;
 			protected DrawData drawdata = new DrawData();
 			

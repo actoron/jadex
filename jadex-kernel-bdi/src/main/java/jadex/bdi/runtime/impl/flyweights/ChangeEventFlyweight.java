@@ -37,14 +37,14 @@ public class ChangeEventFlyweight extends ElementFlyweight implements IChangeEve
 			{
 				public void run()
 				{
-					object = SFlyweightFunctionality.getElement(getState(), getHandle(), getScope(), false);
+					object = SFlyweightFunctionality.getElement(getState(), getHandle(), getScope());
 				}
 			};
 			return (ElementFlyweight)invoc.object;
 		}
 		else
 		{
-			return SFlyweightFunctionality.getElement(getState(), getHandle(), getScope(), false);
+			return SFlyweightFunctionality.getElement(getState(), getHandle(), getScope());
 		}
 	}
 	

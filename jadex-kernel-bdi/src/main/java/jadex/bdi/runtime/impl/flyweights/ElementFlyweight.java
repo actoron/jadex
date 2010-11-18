@@ -1,9 +1,6 @@
 package jadex.bdi.runtime.impl.flyweights;
 
 import jadex.bdi.runtime.IElement;
-import jadex.bdi.runtime.impl.eaflyweights.EAParameterFlyweight;
-import jadex.bdi.runtime.impl.eaflyweights.EAParameterSetFlyweight;
-import jadex.bdi.runtime.impl.eaflyweights.EAProcessableElementFlyweight;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bridge.ComponentTerminatedException;
@@ -51,8 +48,7 @@ public abstract class ElementFlyweight implements IElement
 //		if(handle==null && !(this instanceof ParameterFlyweight || this instanceof ParameterSetFlyweight))
 //			Thread.dumpStack();
 		assert handle!=null || this instanceof ParameterFlyweight || this instanceof ParameterSetFlyweight
-			|| this instanceof EAParameterFlyweight || this instanceof EAParameterSetFlyweight
-			|| this instanceof ProcessableElementFlyweight || this instanceof EAProcessableElementFlyweight: this;
+			|| this instanceof ProcessableElementFlyweight: this;
 		
 		this.state = state;
 		this.scope = scope;

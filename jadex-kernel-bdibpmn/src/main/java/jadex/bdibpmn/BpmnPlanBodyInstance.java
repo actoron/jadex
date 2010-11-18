@@ -20,13 +20,13 @@ import jadex.bdi.runtime.IPropertybase;
 import jadex.bdi.runtime.IWaitqueue;
 import jadex.bdi.runtime.PlanFailureException;
 import jadex.bdi.runtime.impl.SFlyweightFunctionality;
-import jadex.bdi.runtime.impl.eaflyweights.ExternalAccessFlyweight;
 import jadex.bdi.runtime.impl.flyweights.BeliefbaseFlyweight;
 import jadex.bdi.runtime.impl.flyweights.CapabilityFlyweight;
 import jadex.bdi.runtime.impl.flyweights.EventbaseFlyweight;
 import jadex.bdi.runtime.impl.flyweights.ExpressionFlyweight;
 import jadex.bdi.runtime.impl.flyweights.ExpressionNoModel;
 import jadex.bdi.runtime.impl.flyweights.ExpressionbaseFlyweight;
+import jadex.bdi.runtime.impl.flyweights.ExternalAccessFlyweight;
 import jadex.bdi.runtime.impl.flyweights.GoalFlyweight;
 import jadex.bdi.runtime.impl.flyweights.GoalbaseFlyweight;
 import jadex.bdi.runtime.impl.flyweights.InternalEventFlyweight;
@@ -490,7 +490,7 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 		if(elem!=null)
 		{
 			// todo: wrong scope
-			ret = SFlyweightFunctionality.getFlyweight(state, rcapa, elem, false);
+			ret = SFlyweightFunctionality.getFlyweight(state, rcapa, elem);
 		}
 		
 		return ret;
@@ -805,7 +805,7 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 	 */
 	public IGoal createGoal(String type)
 	{
-		return (IGoal)SFlyweightFunctionality.createGoal(state, rcapa, false, type);
+		return (IGoal)SFlyweightFunctionality.createGoal(state, rcapa, type);
 	}
 
 	//-------- eventbase shortcut methods --------
@@ -845,7 +845,7 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 	 */
 	public IMessageEvent createMessageEvent(String type)
 	{
-		return (IMessageEvent)SFlyweightFunctionality.createMessageEvent(state, rcapa, type, false);
+		return (IMessageEvent)SFlyweightFunctionality.createMessageEvent(state, rcapa, type);
 	}
 
 	/**
@@ -854,7 +854,7 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 	 */
 	public IInternalEvent createInternalEvent(String type)
 	{
-		return (IInternalEvent)SFlyweightFunctionality.createInternalEvent(state, rcapa, type, false);
+		return (IInternalEvent)SFlyweightFunctionality.createInternalEvent(state, rcapa, type);
 	}
 
 	/**

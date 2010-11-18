@@ -192,14 +192,14 @@ public class ExpressionFlyweight extends ElementFlyweight implements IExpression
 			{
 				public void run()
 				{
-					object = SFlyweightFunctionality.execute(getState(), getHandle(), getScope(), false, names, values);
+					object = SFlyweightFunctionality.execute(getState(), getHandle(), getScope(), names, values);
 				}
 			};
 			return invoc.object;
 		}
 		else
 		{
-			return SFlyweightFunctionality.execute(getState(), getHandle(), getScope(), false, names, values);
+			return SFlyweightFunctionality.execute(getState(), getHandle(), getScope(), names, values);
 		}
 	}
 	

@@ -123,8 +123,8 @@
 	</plans>
 	
 	<services>
-		<offeredservice class="IExtinguishFireService" decoupled="true">new ExtinguishFireService($scope)</offeredservice>
-		<offeredservice class="IClearChemicalsService" decoupled="true">new ClearChemicalsService($scope)</offeredservice>
+		<providedservice class="IExtinguishFireService">new ExtinguishFireService($scope)</providedservice>
+		<providedservice class="IClearChemicalsService">new ClearChemicalsService($scope)</providedservice>
 	</services>
 	
 	<configurations>

@@ -1,8 +1,5 @@
 package jadex.bdi.examples.cleanerworld_classic.cleaner;
 
-import jadex.application.space.envsupport.environment.ISpaceObject;
-import jadex.application.space.envsupport.math.IVector2;
-import jadex.bdi.examples.cleanerworld.cleaner.CleanerGui.DrawData;
 import jadex.bdi.examples.cleanerworld_classic.Chargingstation;
 import jadex.bdi.examples.cleanerworld_classic.Cleaner;
 import jadex.bdi.examples.cleanerworld_classic.Location;
@@ -13,15 +10,12 @@ import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IAgentListener;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBDIInternalAccess;
-import jadex.bdi.runtime.IEAExpression;
-import jadex.bdi.runtime.IEAGoal;
 import jadex.bdi.runtime.IExpression;
 import jadex.bdi.runtime.IGoal;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.SGUI;
-import jadex.commons.ThreadSuspendable;
 
 import java.awt.BorderLayout;
 import java.awt.Color;

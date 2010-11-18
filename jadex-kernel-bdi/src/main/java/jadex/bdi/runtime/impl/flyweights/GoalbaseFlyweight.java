@@ -99,14 +99,14 @@ public class GoalbaseFlyweight extends ElementFlyweight implements IGoalbase
 			{
 				public void run()
 				{
-					object = SFlyweightFunctionality.getGoals(getState(), getScope(), false, type);
+					object = SFlyweightFunctionality.getGoals(getState(), getScope(), type);
 				}
 			};
 			return (IGoal[])invoc.object;
 		}
 		else
 		{
-			return (IGoal[])SFlyweightFunctionality.getGoals(getState(), getScope(), false, type);
+			return (IGoal[])SFlyweightFunctionality.getGoals(getState(), getScope(), type);
 		}
 	}
 
@@ -122,14 +122,14 @@ public class GoalbaseFlyweight extends ElementFlyweight implements IGoalbase
 			{
 				public void run()
 				{
-					object = (IGoal[])SFlyweightFunctionality.getGoals(getState(), getScope(), false);
+					object = (IGoal[])SFlyweightFunctionality.getGoals(getState(), getScope());
 				}
 			};
 			return (IGoal[])invoc.object;
 		}
 		else
 		{
-			return (IGoal[])SFlyweightFunctionality.getGoals(getState(), getScope(), false);
+			return (IGoal[])SFlyweightFunctionality.getGoals(getState(), getScope());
 		}
 	}
 
@@ -148,14 +148,14 @@ public class GoalbaseFlyweight extends ElementFlyweight implements IGoalbase
 			{
 				public void run()
 				{
-					object = SFlyweightFunctionality.createGoal(getState(), getScope(), false, type);
+					object = SFlyweightFunctionality.createGoal(getState(), getScope(), type);
 				}
 			};
 			return (IGoal)invoc.object;
 		}
 		else
 		{
-			return (IGoal)SFlyweightFunctionality.createGoal(getState(), getScope(), false, type);
+			return (IGoal)SFlyweightFunctionality.createGoal(getState(), getScope(), type);
 		}
 	}
 

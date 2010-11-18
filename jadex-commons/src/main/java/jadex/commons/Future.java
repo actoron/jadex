@@ -124,8 +124,9 @@ public class Future implements IFuture
     		    	if(exception!=null)
     		    	{
     		    		// Nest exception to have both calling and manually set exception stack trace.
-    		    		exception	= new RuntimeException("Exception when evaluating future", exception);
-    		    	}
+//     		    		exception	= new RuntimeException("Exception when evaluating future", exception);
+     		    		exception	= new RuntimeException(exception.getMessage(), exception);
+     		    	    		    	}
 //    				System.out.println(this+" caller awoke: "+caller+" "+mon);
     			}
     			// else already resumed.

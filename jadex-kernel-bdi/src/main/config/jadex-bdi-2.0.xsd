@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- edited with XMLSPY v2004 rel. 3 U (http://www.xmlspy.com) by Lars (RTL) -->
-<xs:schema targetNamespace="http://jadex.sourceforge.net/jadex-bdi" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://jadex.sourceforge.net/jadex-bdi" elementFormDefault="qualified" attributeFormDefault="unqualified" version="2.0">
+<xs:schema targetNamespace="http://jadex.sourceforge.net/jadex-bdi" xmlns="http://jadex.sourceforge.net/jadex-bdi" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified" version="2.0">
 	<xs:element name="agent">
 		<xs:annotation>
 			<xs:documentation>Defines a new agent type.</xs:documentation>
@@ -101,7 +101,11 @@
 							<xs:documentation>In this section predefined expressions and conditions can be declared.  Also references for both can be declared.</xs:documentation>
 						</xs:annotation>
 					</xs:element>
-					<xs:element name="services" type="MServicebase" minOccurs="0"/>
+					<xs:element name="services" type="MServicebase" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>In this section the provided and required services can be declared.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
 					<xs:element name="properties" type="MPropertybase" minOccurs="0">
 						<xs:annotation>
 							<xs:documentation>In this section arbitrary properties can be specified.</xs:documentation>
@@ -1965,56 +1969,30 @@
 		</xs:complexContent>
 	</xs:complexType>
 	<xs:complexType name="MServicebase">
+		<xs:annotation>
+			<xs:documentation>Container for service declarations.</xs:documentation>
+		</xs:annotation>
 		<xs:sequence>
-			<xs:element name="service" type="MExpression" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="providedservice" type="MProvidedService" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="requiredservice" type="MRequiredService" minOccurs="0" maxOccurs="unbounded"/>
 		</xs:sequence>
 	</xs:complexType>
-	<xs:element name="Plan" type="MPlan"/>
-	<xs:complexType name="MPlan_">
+	<xs:complexType name="MProvidedService">
+		<xs:annotation>
+			<xs:documentation>A provided service definition.</xs:documentation>
+		</xs:annotation>
 		<xs:complexContent>
-			<xs:restriction base="MPlan">
-				<xs:sequence>
-					<xs:sequence>
-						<xs:sequence>
-							<xs:element name="parameter" type="MPlanParameter" minOccurs="0" maxOccurs="unbounded">
-								<xs:annotation>
-									<xs:documentation>An arbitrary number of plan parameters.</xs:documentation>
-								</xs:annotation>
-							</xs:element>
-							<xs:element name="parameterset" type="MPlanParameterSet" minOccurs="0" maxOccurs="unbounded">
-								<xs:annotation>
-									<xs:documentation>An arbitrary number of plan parameter sets.</xs:documentation>
-								</xs:annotation>
-							</xs:element>
-						</xs:sequence>
-						<xs:element name="body" type="MPlanBody">
-							<xs:annotation>
-								<xs:documentation>The plan body. If it is a normal plan the body is interpreted as an expression that must be evaluable to a plan object. If it is an inline plan the body (passed, failed, aborted) code is directly contained in this body specification.</xs:documentation>
-							</xs:annotation>
-						</xs:element>
-						<xs:element name="trigger" type="MPlanTrigger" minOccurs="0">
-							<xs:annotation>
-								<xs:documentation>The trigger is used to determine when a plan is applicable for a given event or goal.</xs:documentation>
-							</xs:annotation>
-						</xs:element>
-						<xs:element name="precondition" type="MStaticValue" minOccurs="0">
-							<xs:annotation>
-								<xs:documentation>Only when the precondition holds a plan can be selected for execution. During the execution of the plan the precondition is not checked any more.</xs:documentation>
-							</xs:annotation>
-						</xs:element>
-						<xs:element name="contextcondition" type="MInternalCondition" minOccurs="0">
-							<xs:annotation>
-								<xs:documentation>The context condition of a plan must be valid during the  whole time of plan execution. If it becomes invalid the plan will immediately be aborted.</xs:documentation>
-							</xs:annotation>
-						</xs:element>
-						<xs:element name="waitqueue" type="MTrigger" minOccurs="0">
-							<xs:annotation>
-								<xs:documentation>The waitque allows a plan instance to receive events even if it is currently running. With the waitqueue filter a plan instance can declare general interest in certain kinds of events.</xs:documentation>
-							</xs:annotation>
-						</xs:element>
-					</xs:sequence>
-				</xs:sequence>
-			</xs:restriction>
+			<xs:extension base="MExpression">
+				<xs:attribute name="direct" type="xs:boolean" use="optional" default="false"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="MRequiredService">
+		<xs:annotation>
+			<xs:documentation>A required service definition.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="MExpression"/>
 		</xs:complexContent>
 	</xs:complexType>
 </xs:schema>

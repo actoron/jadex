@@ -139,14 +139,14 @@ public class ExpressionNoModel implements IExpression
 			{
 				public void run()
 				{
-					object = SFlyweightFunctionality.execute(state, expression, scope, true, names, values);
+					object = SFlyweightFunctionality.execute(state, expression, scope, names, values);
 				}
 			};
 			return invoc.object;
 		}
 		else
 		{
-			return SFlyweightFunctionality.execute(state, expression, scope, true, names, values);
+			return SFlyweightFunctionality.execute(state, expression, scope, names, values);
 		}
 	}
 	

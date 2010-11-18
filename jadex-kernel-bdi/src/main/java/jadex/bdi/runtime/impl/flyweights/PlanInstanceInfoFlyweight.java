@@ -67,14 +67,14 @@ public class PlanInstanceInfoFlyweight extends ElementFlyweight implements ICand
 			{
 				public void run()
 				{
-					object = SFlyweightFunctionality.getFlyweight(getState(), getScope(), rpe, false);
+					object = SFlyweightFunctionality.getFlyweight(getState(), getScope(), rpe);
 				}
 			};
 			return (IParameterElement)invoc.object;
 		}
 		else
 		{
-			return SFlyweightFunctionality.getFlyweight(getState(), getScope(), rpe, false);
+			return SFlyweightFunctionality.getFlyweight(getState(), getScope(), rpe);
 		}
 	}
 	

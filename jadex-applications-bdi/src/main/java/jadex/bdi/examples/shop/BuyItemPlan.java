@@ -21,7 +21,7 @@ public class BuyItemPlan extends Plan
 
 		// Check if enough money to buy the item
 		if(money<price)
-			fail(new RuntimeException("Not enough money to buy: "+name));
+			throw new RuntimeException("Not enough money to buy: "+name);
 		
 		// Buy the item at the shop (the shop is a service at another agent)
 //		System.out.println(getComponentName()+" buying item: "+name);

@@ -20,7 +20,7 @@ public class DynamicServiceAgent extends MicroAgent
 		{
 			public Object execute(IInternalAccess ia)
 			{
-				addService(new DummyService(getServiceProvider()));
+				addDirectService(new DummyService(getServiceProvider()));
 				waitFor(3000, this);
 				return null;
 			}

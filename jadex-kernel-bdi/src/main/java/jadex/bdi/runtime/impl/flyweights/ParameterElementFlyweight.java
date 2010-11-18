@@ -45,14 +45,14 @@ public abstract class ParameterElementFlyweight extends ElementFlyweight impleme
 			{
 				public void run()
 				{
-					oarray = SFlyweightFunctionality.getParameters(getState(), getScope(), getHandle(), false);
+					oarray = SFlyweightFunctionality.getParameters(getState(), getScope(), getHandle());
 				}
 			};
 			return (IParameter[])invoc.oarray;
 		}
 		else
 		{
-			return (IParameter[])SFlyweightFunctionality.getParameters(getState(), getScope(), getHandle(), false);
+			return (IParameter[])SFlyweightFunctionality.getParameters(getState(), getScope(), getHandle());
 		}
 	}
 
@@ -68,14 +68,14 @@ public abstract class ParameterElementFlyweight extends ElementFlyweight impleme
 			{
 				public void run()
 				{
-					oarray = (IParameterSet[])SFlyweightFunctionality.getParameterSets(getState(), getScope(), getHandle(), false);
+					oarray = (IParameterSet[])SFlyweightFunctionality.getParameterSets(getState(), getScope(), getHandle());
 				}
 			};
 			return (IParameterSet[])invoc.oarray;
 		}
 		else
 		{
-			return (IParameterSet[])SFlyweightFunctionality.getParameterSets(getState(), getScope(), getHandle(), false);
+			return (IParameterSet[])SFlyweightFunctionality.getParameterSets(getState(), getScope(), getHandle());
 		}
 	}
 

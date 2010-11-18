@@ -3,7 +3,6 @@ package jadex.bdi.testcases.misc;
 import jadex.base.test.TestReport;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBDIInternalAccess;
-import jadex.bdi.runtime.IEABelief;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentIdentifier;

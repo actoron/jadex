@@ -5,11 +5,9 @@ import jadex.bdi.runtime.IAgentListener;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bdi.runtime.IBeliefListener;
-import jadex.bdi.runtime.IEABelief;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.SGUI;
-import jadex.commons.concurrent.IResultListener;
 
 import java.awt.GridLayout;
 

@@ -546,6 +546,13 @@ public class PlanRules
 				catch(Exception e)
 				{
 					state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_exception, e);
+					
+					// todo: currently only remembers last plan exception in goal
+					Object reason = state.getAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_reason);
+					if(state.getType(reason).isSubtype(OAVBDIRuntimeModel.goal_type))
+					{
+						state.setAttributeValue(reason, OAVBDIRuntimeModel.goal_has_exception, e);
+					}
 					StringWriter sw	= new StringWriter();
 					e.printStackTrace(new PrintWriter(sw));
 					//System.out.println(cap.getAgent().getName()+": Exception while executing: "+this);
@@ -557,7 +564,7 @@ public class PlanRules
 //						Level level = (Level)cap.getPropertybase().getProperty(PROPERTY_LOGGING_LEVEL_EXCEPTIONS);
 //						AgentRules.BDIInterpreter.getInterpreter(state).getLogger(rcapa).log(level, ip.getAgentAdapter().getComponentIdentifier()+
 //							": Exception while executing: "+rplan+"\n"+sw);
-						BDIInterpreter.getInterpreter(state).getLogger(rcapa).severe(ip.getAgentAdapter().getComponentIdentifier()+
+						BDIInterpreter.getInterpreter(state).getLogger(rcapa).warning(ip.getAgentAdapter().getComponentIdentifier()+
 							": Exception while executing: "+rplan+" "+state.getAttributeValue(state.getAttributeValue(rplan, OAVBDIRuntimeModel.element_has_model), OAVBDIMetaModel.modelelement_has_name)+"\n"+sw);
 					}
 					else

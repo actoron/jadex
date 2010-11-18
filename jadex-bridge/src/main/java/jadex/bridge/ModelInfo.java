@@ -48,11 +48,11 @@ public class ModelInfo implements IModelInfo
 	/** The classloader. */
 	protected ClassLoader classloader;
 	
-	/** The used services. */
-	protected Class[] usedservices;
+	/** The required services. */
+	protected Class[] requiredservices;
 	
-	/** The offered services. */
-	protected Class[] offeredservices;
+	/** The provided services. */
+	protected Class[] providedservices;
 	
 	
 	//-------- constructors --------
@@ -72,7 +72,7 @@ public class ModelInfo implements IModelInfo
 		String description, IErrorReport report, String[] configurations,
 		IArgument[] arguments, IArgument[] results, boolean startable,
 		String filename, Map properties, ClassLoader classloader, 
-		Class[] usedservices, Class[] offeredservices)
+		Class[] requiredservices, Class[] providedservices)
 	{
 		this.name = name;
 		this.packagename = packagename;
@@ -85,8 +85,8 @@ public class ModelInfo implements IModelInfo
 		this.filename = filename;
 		this.properties = properties!=null? properties: new HashMap();
 		this.classloader = classloader;
-		this.usedservices = usedservices;
-		this.offeredservices = offeredservices;
+		this.requiredservices = requiredservices;
+		this.providedservices = providedservices;
 	}
 
 	//-------- methods --------
@@ -381,39 +381,39 @@ public class ModelInfo implements IModelInfo
 	}
 
 	/**
-	 *  Get the usedservices.
-	 *  @return The usedservices.
+	 *  Get the required services.
+	 *  @return The required services.
 	 */
-	public Class[] getUsedServices()
+	public Class[] getRequiredServices()
 	{
-		return usedservices==null? SUtil.EMPTY_CLASS_ARRAY: usedservices;
+		return requiredservices==null? SUtil.EMPTY_CLASS_ARRAY: requiredservices;
 	}
 
 	/**
-	 *  Set the usedservices.
-	 *  @param usedservices The usedservices to set.
+	 *  Set the required services.
+	 *  @param required services The required services to set.
 	 */
-	public void setUsedServices(Class[] usedservices)
+	public void setRequiredServices(Class[] requiredservices)
 	{
-		this.usedservices = usedservices;
+		this.requiredservices = requiredservices;
 	}
 
 	/**
-	 *  Get the offeredservices.
-	 *  @return The offeredservices.
+	 *  Get the provided services.
+	 *  @return The provided services.
 	 */
-	public Class[] getOfferedServices()
+	public Class[] getProvidedServices()
 	{
-		return offeredservices==null? SUtil.EMPTY_CLASS_ARRAY: offeredservices;
+		return providedservices==null? SUtil.EMPTY_CLASS_ARRAY: providedservices;
 	}
 
 	/**
-	 *  Set the offeredservices.
-	 *  @param offeredservices The offeredservices to set.
+	 *  Set the provided services.
+	 *  @param provided services The provided services to set.
 	 */
-	public void setOfferedServices(Class[] offeredservices)
+	public void setProvidedServices(Class[] providedservices)
 	{
-		this.offeredservices = offeredservices;
+		this.providedservices = providedservices;
 	}
 	
 }

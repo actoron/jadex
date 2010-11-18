@@ -9,6 +9,8 @@ import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IGoalListener;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.commons.SGUI;
+import jadex.commons.SUtil;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.commons.service.SServiceProvider;
 
@@ -36,6 +38,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -73,7 +76,6 @@ public class CustomerPanel extends JPanel
 	 */
 	public CustomerPanel(final IBDIExternalAccess agent)
 	{
-//		super(agent.getComponentName());
 		this.agent = agent;
 		this.shops	= new HashMap();
 		
@@ -154,14 +156,6 @@ public class CustomerPanel extends JPanel
 				return null;
 			}
 		});
-//		agent.getBeliefbase().getBeliefFact("money")
-//			.addResultListener(new SwingDefaultResultListener(CustomerPanel.this)
-//		{
-//			public void customResultAvailable(Object source, Object result)
-//			{
-//				money.setText(df.format(result));
-//			}
-//		});
 		money.setEditable(false);
 		
 		agent.scheduleStep(new IComponentStep()
@@ -185,20 +179,6 @@ public class CustomerPanel extends JPanel
 				return null;
 			}
 		});
-		
-//		agent.getBeliefbase().addBeliefListener("money", new IBeliefListener()
-//		{
-//			public void beliefChanged(final AgentEvent ae)
-//			{
-//				SwingUtilities.invokeLater(new Runnable()
-//				{
-//					public void run()
-//					{
-//						money.setText(df.format(ae.getValue()));
-//					}
-//				});
-//			}
-//		});
 		
 		JPanel selpanel = new JPanel(new GridBagLayout());
 		selpanel.setBorder(new TitledBorder(new EtchedBorder(), "Properties"));
@@ -283,46 +263,6 @@ public class CustomerPanel extends JPanel
 			}
 		});
 		
-//		agent.getBeliefbase().addBeliefSetListener("inventory", new IBeliefSetListener()
-//		{
-//			public void factRemoved(final AgentEvent ae)
-//			{
-//				SwingUtilities.invokeLater(new Runnable()
-//				{
-//					public void run()
-//					{
-//						invlist.remove(ae.getValue());
-//						invmodel.fireTableDataChanged();
-//					}
-//				});
-//			}
-//			
-//			public void factChanged(final AgentEvent ae)
-//			{
-//				SwingUtilities.invokeLater(new Runnable()
-//				{
-//					public void run()
-//					{
-//						invlist.remove(ae.getValue());
-//						invlist.add(ae.getValue());
-//						invmodel.fireTableDataChanged();
-//					}
-//				});
-//			}
-//			
-//			public void factAdded(final AgentEvent ae)
-//			{
-//				SwingUtilities.invokeLater(new Runnable()
-//				{
-//					public void run()
-//					{
-//						invlist.add(ae.getValue());
-//						invmodel.fireTableDataChanged();
-//					}
-//				});
-//			}
-//		});
-		
 		JPanel butpanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 //		butpanel.setBorder(new TitledBorder(new EtchedBorder(), "Actions"));
 		JButton buy = new JButton("Buy");
@@ -356,17 +296,17 @@ public class CustomerPanel extends JPanel
 								{
 									// Update number of available items
 									refresh(shop);
-//									if(!buy.isSucceeded())
-//									{
-//										final String text = SUtil.wrapText("Item could not be bought. "+e.getMessage());
-//										SwingUtilities.invokeLater(new Runnable()
-//										{
-//											public void run()
-//											{
-//												JOptionPane.showMessageDialog(SGUI.getWindowParent(.this), text, "Message problem", JOptionPane.INFORMATION_MESSAGE);
-//											}
-//										});
-//									}
+									if(!buy.isSucceeded())
+									{
+										final String text = SUtil.wrapText("Item could not be bought. "+buy.getException().getMessage());
+										SwingUtilities.invokeLater(new Runnable()
+										{
+											public void run()
+											{
+												JOptionPane.showMessageDialog(SGUI.getWindowParent(CustomerPanel.this), text, "Buy problem", JOptionPane.INFORMATION_MESSAGE);
+											}
+										});
+									}
 								}
 								
 								public void goalAdded(AgentEvent ae)
@@ -377,25 +317,6 @@ public class CustomerPanel extends JPanel
 							return null;
 						}
 					});
-//					System.out.println("buying: "+name+" at: "+shop.getName());
-//					agent.createGoal("buy").addResultListener(new SwingDefaultResultListener(CustomerPanel.this)
-//					{
-//						public void customResultAvailable(Object source, Object result)
-//						{
-//							IEAGoal buy = (IEAGoal)result;
-//							buy.setParameterValue("name", name);
-//							buy.setParameterValue("shop", shop);
-//							buy.setParameterValue("price", price);
-//							agent.dispatchTopLevelGoalAndWait(buy).addResultListener(new SwingDefaultResultListener(CustomerPanel.this)
-//							{
-//								public void customResultAvailable(Object source, Object result)
-//								{
-//									// Update number of available items
-//									refresh(shop);
-//								}
-//							});
-//						}
-//					});
 				}
 			}
 		});

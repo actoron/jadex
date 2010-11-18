@@ -2,8 +2,8 @@ package jadex.bdi.runtime.interpreter;
 
 import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.runtime.IPlanExecutor;
-import jadex.bdi.runtime.impl.eaflyweights.ExternalAccessFlyweight;
 import jadex.bdi.runtime.impl.flyweights.CapabilityFlyweight;
+import jadex.bdi.runtime.impl.flyweights.ExternalAccessFlyweight;
 import jadex.bdi.runtime.impl.flyweights.ParameterFlyweight;
 import jadex.bridge.CheckedAction;
 import jadex.bridge.ComponentResultListener;
@@ -1198,7 +1198,7 @@ public class AgentRules
 		// Initialize services.
 		
 		// todo: connect services of capabilities, name them accordingly
-		Collection	mservices = state.getAttributeValues(mcapa, OAVBDIMetaModel.capability_has_offeredservices);
+		Collection	mservices = state.getAttributeValues(mcapa, OAVBDIMetaModel.capability_has_providedservices);
 		if(mservices!=null)
 		{
 			for(Iterator it=mservices.iterator(); it.hasNext(); )
@@ -1210,11 +1210,11 @@ public class AgentRules
 					IInternalService val = (IInternalService)evaluateExpression(state, mexp, new OAVBDIFetcher(state, rcapa));
 //					Class type = (Class)state.getAttributeValue(mexp, OAVBDIMetaModel.expression_has_class);
 					// cast hack?!
-					Boolean decoupled = (Boolean)state.getAttributeValue(mexp, OAVBDIMetaModel.service_has_decoupled);
-					if(decoupled!=null && decoupled.booleanValue())
+					Boolean direct = (Boolean)state.getAttributeValue(mexp, OAVBDIMetaModel.providedservice_has_direct);
+					if(!direct.booleanValue())
 					{
 						val = DecouplingServiceInvocationInterceptor.createServiceProxy(BDIInterpreter.getInterpreter(state).getExternalAccess(), BDIInterpreter.getInterpreter(state).getAgentAdapter(), val);
-//					System.out.println("Created decoupled service: "+val);
+//						System.out.println("Created decoupled service: "+val);
 					}
 					((IServiceContainer)BDIInterpreter.getInterpreter(state).getServiceProvider()).addService(val);
 //					System.out.println("Service: "+name+" "+val+" "+type);

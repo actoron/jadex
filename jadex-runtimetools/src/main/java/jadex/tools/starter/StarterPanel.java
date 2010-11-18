@@ -159,10 +159,10 @@ public class StarterPanel extends JPanel
 	protected JSpinner numcomponents;
 
 	/** The used services. */
-	protected JPanel usedservices;
+	protected JPanel requiredservices;
 	
-	/** The offered services. */
-	protected JPanel offeredservices;
+	/** The provided services. */
+	protected JPanel providedservices;
 	
 	//-------- constructors --------
 
@@ -229,11 +229,11 @@ public class StarterPanel extends JPanel
 		// The results.
 		results = new JPanel(new GridBagLayout());
 		
-		// The used services.
-		usedservices = new JPanel(new BorderLayout());
+		// The required services.
+		requiredservices = new JPanel(new BorderLayout());
 		
-		// The used services.
-		offeredservices = new JPanel(new BorderLayout());
+		// The provided services.
+		providedservices = new JPanel(new BorderLayout());
 
 		// The reload button.
 		final JButton reload = new JButton("Reload");
@@ -471,10 +471,10 @@ public class StarterPanel extends JPanel
 		content.add(results, new GridBagConstraints(0, y, 5, 1, 1, 0, GridBagConstraints.WEST,
 			GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 		y++;
-		content.add(usedservices, new GridBagConstraints(0, y, 5, 1, 1, 0, GridBagConstraints.WEST,
+		content.add(requiredservices, new GridBagConstraints(0, y, 5, 1, 1, 0, GridBagConstraints.WEST,
 			GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 		y++;
-		content.add(offeredservices, new GridBagConstraints(0, y, 5, 1, 1, 0, GridBagConstraints.WEST,
+		content.add(providedservices, new GridBagConstraints(0, y, 5, 1, 1, 0, GridBagConstraints.WEST,
 			GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 
 		componentnamel.setMinimumSize(confl.getMinimumSize());
@@ -674,8 +674,8 @@ public class StarterPanel extends JPanel
 		{
 			createArguments();
 			createResults();
-			createUsedServices();
-			createOfferedServices();
+			createRequiredServices();
+			createProvidedServices();
 			arguments.setVisible(true);
 			results.setVisible(true);
 			componentpanel.setVisible(true);
@@ -693,8 +693,8 @@ public class StarterPanel extends JPanel
 		}
 		else
 		{
-			createUsedServices();
-			createOfferedServices();
+			createRequiredServices();
+			createProvidedServices();
 			arguments.setVisible(false);
 			results.setVisible(false);
 			componentpanel.setVisible(false);
@@ -1141,63 +1141,63 @@ public class StarterPanel extends JPanel
 	}
 	
 	/**
-	 *  Create the used services panel.
+	 *  Create the required services panel.
 	 */
-	protected void createUsedServices()
+	protected void createRequiredServices()
 	{
-		usedservices.removeAll();
-		usedservices.setBorder(null);
+		requiredservices.removeAll();
+		requiredservices.setBorder(null);
 		
 		if(model!=null)
 		{
-			Class[] used = model.getUsedServices();
+			Class[] required = model.getRequiredServices();
 			
-			if(used.length>0)
+			if(required.length>0)
 			{
-				JTable usedt = new JTable(new DefaultTableModel(new String[]{"Interface Name"}, 0));
-				usedt.setEnabled(false);
-//				usedservices.add(usedt.getTableHeader(), BorderLayout.NORTH);
-				usedservices.add(usedt, BorderLayout.CENTER);
-				for(int i=0; i<used.length; i++)
+				JTable requiredt = new JTable(new DefaultTableModel(new String[]{"Interface Name"}, 0));
+				requiredt.setEnabled(false);
+//				requiredservices.add(requiredt.getTableHeader(), BorderLayout.NORTH);
+				requiredservices.add(requiredt, BorderLayout.CENTER);
+				for(int i=0; i<required.length; i++)
 				{
-					((DefaultTableModel)usedt.getModel()).addRow(new Object[]{used[i].getName()});
+					((DefaultTableModel)requiredt.getModel()).addRow(new Object[]{required[i].getName()});
 				}
 			}
 			
-			if(used.length>0)
-				usedservices.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), " Used Services "));
+			if(required.length>0)
+				requiredservices.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), " Required Services "));
 		}
 	}
 	
 	/**
-	 *  Create the offered services panel.
+	 *  Create the provided services panel.
 	 */
-	protected void createOfferedServices()
+	protected void createProvidedServices()
 	{
-		offeredservices.removeAll();
-		offeredservices.setBorder(null);
+		providedservices.removeAll();
+		providedservices.setBorder(null);
 		
 		if(model!=null)
 		{
-			Class[] offered = model.getOfferedServices();
+			Class[] provided = model.getProvidedServices();
 			
-			if(offered.length>0)
+			if(provided.length>0)
 			{
-				JTable offeredt = new JTable(new DefaultTableModel(new String[]{"Interface Name"}, 0));
-				offeredt.setEnabled(false);
+				JTable providedt = new JTable(new DefaultTableModel(new String[]{"Interface Name"}, 0));
+				providedt.setEnabled(false);
 //				DefaultTableCellRenderer rend = new DefaultTableCellRenderer();
 //				rend.setHorizontalAlignment(DefaultTableCellRenderer.RIGHT);
-//				offeredt.getColumn("Interface Name").setCellRenderer(rend);
-//				offeredservices.add(offeredt.getTableHeader(), BorderLayout.NORTH);
-				offeredservices.add(offeredt, BorderLayout.CENTER);
-				for(int i=0; i<offered.length; i++)
+//				providedt.getColumn("Interface Name").setCellRenderer(rend);
+//				providedservices.add(providedt.getTableHeader(), BorderLayout.NORTH);
+				providedservices.add(providedt, BorderLayout.CENTER);
+				for(int i=0; i<provided.length; i++)
 				{
-					((DefaultTableModel)offeredt.getModel()).addRow(new Object[]{offered[i].getName()});
+					((DefaultTableModel)providedt.getModel()).addRow(new Object[]{provided[i].getName()});
 				}
 			}
 			
-			if(offered.length>0)
-				offeredservices.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), " Offered Services "));
+			if(provided.length>0)
+				providedservices.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), " Provided Services "));
 		}
 	}
 	

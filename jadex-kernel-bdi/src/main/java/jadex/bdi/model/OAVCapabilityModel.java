@@ -94,7 +94,7 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 	{
 		boolean startable = !this.getClass().equals(OAVCapabilityModel.class);
 		this.modelinfo = new ModelInfo(getName(), getPackage(), getDescription(), null, getConfigurations(), getArguments(), 
-			getResults(), startable, filename, getProperties(), getClassLoader(), getUsedServices(), getOfferedServices());
+			getResults(), startable, filename, getProperties(), getClassLoader(), getRequiredServices(), getProvidedServices());
 		
 		// Build error report.
 		getModelInfo().setReport(new AbstractErrorReportBuilder(getModelInfo().getName(), getModelInfo().getFilename(),
@@ -666,12 +666,12 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 	}
 	
 	/**
-	 *  Get the used services.
+	 *  Get the required services.
 	 */
-	public Class[] getUsedServices()
+	public Class[] getRequiredServices()
 	{
 		List ret = new ArrayList();
-		Collection own = handle!=null ? state.getAttributeValues(handle, OAVBDIMetaModel.capability_has_usedservices) : null;
+		Collection own = handle!=null ? state.getAttributeValues(handle, OAVBDIMetaModel.capability_has_requiredservices) : null;
 		if(own!=null)
 		{
 			for(Iterator it=own.iterator(); it.hasNext(); )
@@ -687,7 +687,7 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 			{
 				Object subcaparef = it.next();
 				Object subcapa  = state.getAttributeValue(subcaparef, OAVBDIMetaModel.capabilityref_has_capability);
-				Collection sub = state.getAttributeValues(subcapa, OAVBDIMetaModel.capability_has_usedservices);
+				Collection sub = state.getAttributeValues(subcapa, OAVBDIMetaModel.capability_has_requiredservices);
 				if(sub!=null)
 				{
 					for(Iterator it2=sub.iterator(); it2.hasNext(); )
@@ -702,12 +702,12 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 	}
 	
 	/**
-	 *  Get the offered services.
+	 *  Get the provided services.
 	 */
-	public Class[] getOfferedServices()
+	public Class[] getProvidedServices()
 	{
 		List ret = new ArrayList();
-		Collection own = handle!=null ? state.getAttributeValues(handle, OAVBDIMetaModel.capability_has_offeredservices) : null;
+		Collection own = handle!=null ? state.getAttributeValues(handle, OAVBDIMetaModel.capability_has_providedservices) : null;
 		if(own!=null)
 		{
 			for(Iterator it=own.iterator(); it.hasNext(); )
@@ -723,7 +723,7 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 			{
 				Object subcaparef = it.next();
 				Object subcapa  = state.getAttributeValue(subcaparef, OAVBDIMetaModel.capabilityref_has_capability);
-				Collection sub = state.getAttributeValues(subcapa, OAVBDIMetaModel.capability_has_offeredservices);
+				Collection sub = state.getAttributeValues(subcapa, OAVBDIMetaModel.capability_has_providedservices);
 				if(sub!=null)
 				{
 					for(Iterator it2=sub.iterator(); it2.hasNext(); )

@@ -104,14 +104,14 @@ public class PlanFlyweight extends ParameterElementFlyweight implements IPlan
 			{
 				public void run()
 				{
-					object = SFlyweightFunctionality.getReason(getState(), getScope(), getHandle(), false);
+					object = SFlyweightFunctionality.getReason(getState(), getScope(), getHandle());
 				}
 			};
 			return (IElement) invoc.object;
 		}
 		else
 		{
-			return SFlyweightFunctionality.getReason(getState(), getScope(), getHandle(), false);
+			return SFlyweightFunctionality.getReason(getState(), getScope(), getHandle());
 		}
 	}
 

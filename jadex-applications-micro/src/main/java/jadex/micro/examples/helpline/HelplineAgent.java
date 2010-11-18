@@ -46,7 +46,7 @@ public class HelplineAgent extends MicroAgent
 			}
 		}
 //		addService(new HelplineService(getExternalAccess()));
-		addDecoupledService(new HelplineService(this));
+		addService(new HelplineService(this));
 		SwingUtilities.invokeLater(new Runnable()
 		{
 			public void run()

@@ -32,7 +32,7 @@
 	</plans>
 	
 	<services>
-		<offeredservice>new BeliefGetter($scope.getExternalAccess())</offeredservice>
+		<providedservice class="IBeliefGetter">new BeliefGetter($scope.getExternalAccess())</providedservice>
 	</services>
 	
 	<configurations>

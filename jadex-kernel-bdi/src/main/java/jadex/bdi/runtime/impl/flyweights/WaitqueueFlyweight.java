@@ -84,7 +84,7 @@ public class WaitqueueFlyweight extends WaitAbstractionFlyweight implements IWai
 			{
 				public void run()
 				{
-					oarray = SFlyweightFunctionality.getElements(getState(), getScope(), rplan, false);
+					oarray = SFlyweightFunctionality.getElements(getState(), getScope(), rplan);
 
 				}
 			};
@@ -92,7 +92,7 @@ public class WaitqueueFlyweight extends WaitAbstractionFlyweight implements IWai
 		}
 		else
 		{
-			return SFlyweightFunctionality.getElements(getState(), getScope(), rplan, false);
+			return SFlyweightFunctionality.getElements(getState(), getScope(), rplan);
 		}
 	}
 
@@ -108,14 +108,14 @@ public class WaitqueueFlyweight extends WaitAbstractionFlyweight implements IWai
 			{
 				public void run()
 				{
-					object = SFlyweightFunctionality.removeNextElement(getState(), getScope(), rplan, false);
+					object = SFlyweightFunctionality.removeNextElement(getState(), getScope(), rplan);
 				}
 			};
 			return invoc.object;
 		}
 		else
 		{
-			return SFlyweightFunctionality.removeNextElement(getState(), getScope(), rplan, false);
+			return SFlyweightFunctionality.removeNextElement(getState(), getScope(), rplan);
 		}
 	}
 

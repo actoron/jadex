@@ -378,7 +378,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 	}
 	
 	/**
-	 * 
+	 *  Find component type that provided a specific service.
 	 */
 	protected void findComponentType(final int i, final List componenttypes, 
 		final ILibraryService ls, final Class servicetype, final Future ret)
@@ -396,7 +396,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 				if(factory!=null)
 				{
 					final IModelInfo lmodel = factory.loadModel(ct.getFilename(), model.getAllImports(), ls.getClassLoader());
-					Class[] sers = lmodel.getOfferedServices();
+					Class[] sers = lmodel.getProvidedServices();
 					if(SUtil.arrayContains(sers, servicetype))
 					{
 						IInternalService service = CompositeServiceInvocationInterceptor.createServiceProxy(servicetype, ct.getName(), 

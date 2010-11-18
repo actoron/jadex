@@ -3,16 +3,11 @@ package jadex.bdi.examples.disastermanagement.fireengine;
 import jadex.application.space.envsupport.environment.ISpaceObject;
 import jadex.bdi.examples.disastermanagement.IClearChemicalsService;
 import jadex.bdi.runtime.AgentEvent;
-import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.ICapability;
-import jadex.bdi.runtime.IEAGoal;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IGoalListener;
-import jadex.bridge.IExternalAccess;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
-import jadex.commons.concurrent.DefaultResultListener;
-import jadex.commons.concurrent.IResultListener;
 import jadex.commons.service.BasicService;
 
 /**

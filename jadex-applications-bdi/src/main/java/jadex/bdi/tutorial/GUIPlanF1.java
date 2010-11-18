@@ -2,7 +2,7 @@ package jadex.bdi.tutorial;
 
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IAgentListener;
-import jadex.bdi.runtime.IEAInternalEvent;
+import jadex.bdi.runtime.IInternalEvent;
 import jadex.bdi.runtime.IInternalEventListener;
 import jadex.bdi.runtime.Plan;
 import jadex.commons.concurrent.SwingDefaultResultListener;
@@ -45,13 +45,8 @@ public class GUIPlanF1 extends Plan
 		{
 			public void internalEventOccurred(AgentEvent ae)
 			{
-				((IEAInternalEvent)ae.getSource()).getParameterValue("content").addResultListener(new SwingDefaultResultListener(gui)
-				{
-					public void customResultAvailable(Object source, Object result)
-					{
-						gui.addRow((String[])result);	
-					}
-				});
+				String[] res = (String[])((IInternalEvent)ae.getSource()).getParameter("content").getValue();
+				gui.addRow(res);	
 //				gui.addRow((String[]));
 			}
 		});

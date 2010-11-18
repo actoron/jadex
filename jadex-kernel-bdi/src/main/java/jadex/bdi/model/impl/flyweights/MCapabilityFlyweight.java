@@ -304,7 +304,7 @@ public class MCapabilityFlyweight extends MElementFlyweight implements IMCapabil
 			{
 				public void run()
 				{
-					Collection elems = (Collection)getState().getAttributeValue(getScope(), OAVBDIMetaModel.capability_has_offeredservices);
+					Collection elems = (Collection)getState().getAttributeValue(getScope(), OAVBDIMetaModel.capability_has_providedservices);
 					IMExpression[] ret = new IMExpression[elems==null? 0: elems.size()];
 					if(elems!=null)
 					{
@@ -321,7 +321,7 @@ public class MCapabilityFlyweight extends MElementFlyweight implements IMCapabil
 		}
 		else
 		{
-			Collection elems = (Collection)getState().getAttributeValue(getScope(), OAVBDIMetaModel.capability_has_offeredservices);
+			Collection elems = (Collection)getState().getAttributeValue(getScope(), OAVBDIMetaModel.capability_has_providedservices);
 			IMExpression[] ret = new IMExpression[elems==null? 0: elems.size()];
 			if(elems!=null)
 			{
@@ -601,7 +601,7 @@ public class MCapabilityFlyweight extends MElementFlyweight implements IMCapabil
 					getState().setAttributeValue(mexp.getHandle(), OAVBDIMetaModel.modelelement_has_name, name);
 					getState().setAttributeValue(mexp, OAVBDIMetaModel.expression_has_class, cls);
 					
-					getState().addAttributeValue(getHandle(), OAVBDIMetaModel.capability_has_offeredservices, mexp.getHandle());
+					getState().addAttributeValue(getHandle(), OAVBDIMetaModel.capability_has_providedservices, mexp.getHandle());
 					object	= mexp;
 				}
 			};
@@ -613,7 +613,7 @@ public class MCapabilityFlyweight extends MElementFlyweight implements IMCapabil
 			getState().setAttributeValue(mexp.getHandle(), OAVBDIMetaModel.modelelement_has_name, name);
 			getState().setAttributeValue(mexp, OAVBDIMetaModel.expression_has_class, cls);
 
-			getState().addAttributeValue(getHandle(), OAVBDIMetaModel.capability_has_offeredservices, mexp.getHandle());			
+			getState().addAttributeValue(getHandle(), OAVBDIMetaModel.capability_has_providedservices, mexp.getHandle());			
 			return mexp;
 		}
 	}

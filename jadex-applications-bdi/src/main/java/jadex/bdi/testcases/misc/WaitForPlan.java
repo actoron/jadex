@@ -3,14 +3,10 @@ package jadex.bdi.testcases.misc;
 import jadex.base.fipa.SFipa;
 import jadex.base.test.TestReport;
 import jadex.bdi.runtime.IBDIExternalAccess;
-import jadex.bdi.runtime.IEAGoal;
-import jadex.bdi.runtime.IEAMessageEvent;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
 import jadex.bdi.runtime.TimeoutException;
-import jadex.commons.ISuspendable;
-import jadex.commons.ThreadSuspendable;
 
 import java.util.Arrays;
 

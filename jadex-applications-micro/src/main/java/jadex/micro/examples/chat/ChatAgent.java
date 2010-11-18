@@ -26,7 +26,7 @@ public class ChatAgent extends MicroAgent
 	public void agentCreated()
 	{
 		cs = new ChatService(getExternalAccess());
-		addService(cs);
+		addDirectService(cs);
 		SwingUtilities.invokeLater(new Runnable()
 		{
 			public void run()

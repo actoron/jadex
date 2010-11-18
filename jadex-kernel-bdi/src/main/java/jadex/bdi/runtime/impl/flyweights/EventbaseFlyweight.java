@@ -117,14 +117,14 @@ public class EventbaseFlyweight extends ElementFlyweight implements IEventbase
 			{
 				public void run()
 				{
-					object	= SFlyweightFunctionality.createMessageEvent(getState(), getScope(), (String)arg, false);
+					object	= SFlyweightFunctionality.createMessageEvent(getState(), getScope(), (String)arg);
 				}
 			};
 			return (IMessageEvent)invoc.object;
 		}
 		else
 		{
-			return (IMessageEvent)SFlyweightFunctionality.createMessageEvent(getState(), getScope(), type, false);
+			return (IMessageEvent)SFlyweightFunctionality.createMessageEvent(getState(), getScope(), type);
 		}
 	}
 
@@ -142,7 +142,7 @@ public class EventbaseFlyweight extends ElementFlyweight implements IEventbase
 			{
 				public void run()
 				{
-					ElementFlyweight reply = (ElementFlyweight)SFlyweightFunctionality.createMessageEvent(getState(), getScope(), msgeventtype, false);
+					ElementFlyweight reply = (ElementFlyweight)SFlyweightFunctionality.createMessageEvent(getState(), getScope(), msgeventtype);
 					object = MessageEventFlyweight.getMessageEventFlyweight(getState(), getScope(), MessageEventRules.initializeReply(getState(), getScope(), ((ElementFlyweight)event).getHandle(), ((ElementFlyweight)reply).getHandle()));
 				}
 			};
@@ -150,7 +150,7 @@ public class EventbaseFlyweight extends ElementFlyweight implements IEventbase
 		}
 		else
 		{
-			ElementFlyweight reply = (ElementFlyweight)SFlyweightFunctionality.createMessageEvent(getState(), getScope(), msgeventtype, false);
+			ElementFlyweight reply = (ElementFlyweight)SFlyweightFunctionality.createMessageEvent(getState(), getScope(), msgeventtype);
 			return MessageEventFlyweight.getMessageEventFlyweight(getState(), getScope(), MessageEventRules.initializeReply(getState(), getScope(), ((ElementFlyweight)event).getHandle(), ((ElementFlyweight)reply).getHandle()));
 		}
 	}

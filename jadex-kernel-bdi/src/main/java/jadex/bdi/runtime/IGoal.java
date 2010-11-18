@@ -88,7 +88,7 @@ public interface IGoal	extends IProcessableElement
 	 *  If more than one plan has been executed for a goal
 	 *  only the last exception will be available.
 	 */
-	public Exception	getException();
+	public Exception getException();
 	
 	//-------- parameter handling --------
 

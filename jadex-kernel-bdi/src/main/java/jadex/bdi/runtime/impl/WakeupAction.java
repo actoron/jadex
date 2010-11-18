@@ -3,9 +3,9 @@ package jadex.bdi.runtime.impl;
 import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.runtime.GoalFailureException;
 import jadex.bdi.runtime.TimeoutException;
-import jadex.bdi.runtime.impl.eaflyweights.EAGoalFlyweight;
-import jadex.bdi.runtime.impl.eaflyweights.ExternalAccessFlyweight;
 import jadex.bdi.runtime.impl.flyweights.ChangeEventFlyweight;
+import jadex.bdi.runtime.impl.flyweights.ExternalAccessFlyweight;
+import jadex.bdi.runtime.impl.flyweights.GoalFlyweight;
 import jadex.bdi.runtime.impl.flyweights.InternalEventFlyweight;
 import jadex.bdi.runtime.impl.flyweights.MessageEventFlyweight;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
@@ -105,7 +105,7 @@ public class WakeupAction extends CheckedAction
 							e = new GoalFailureException("Goal failed: "+de+" "+state.getAttributeValue(mgoal, OAVBDIMetaModel.modelelement_has_name));
 						}
 					}
-					ret = EAGoalFlyweight.getGoalFlyweight(state, scope, de);
+					ret = GoalFlyweight.getGoalFlyweight(state, scope, de);
 				}
 				else if(OAVBDIRuntimeModel.internalevent_type.equals(type))
 				{

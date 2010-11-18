@@ -490,7 +490,7 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	 *  the old one is removed and shutdowned.
 	 *  @param service The service.
 	 */
-	public void addService(IInternalService service)
+	public void addDirectService(IInternalService service)
 	{
 		((IServiceContainer)interpreter.getServiceProvider()).addService(service);
 	}
@@ -501,7 +501,7 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	 *  the old one is removed and shutdowned.
 	 *  @param service The service.
 	 */
-	public void addDecoupledService(IInternalService service)
+	public void addService(IInternalService service)
 	{
 		IInternalService proxyser = DecouplingServiceInvocationInterceptor
 			.createServiceProxy(getExternalAccess(), getAgentAdapter(), service);

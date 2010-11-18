@@ -5,12 +5,10 @@ import jadex.bdi.examples.blackjack.gui.GUIImageLoader;
 import jadex.bdi.examples.blackjack.gui.StatisticGraph;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBDIInternalAccess;
-import jadex.bdi.runtime.IEAInternalEvent;
 import jadex.bdi.runtime.IInternalEvent;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.SGUI;
-import jadex.commons.concurrent.SwingDefaultResultListener;
 
 import java.awt.BorderLayout;
 import java.awt.Color;

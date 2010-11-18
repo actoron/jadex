@@ -842,7 +842,7 @@ public class OAVBDIRuntimeModel
 		goal_has_processingstate = goal_type.createAttributeType("goal_has_processingstate", OAVJavaType.java_string_type);
 		goal_has_protected = goal_type.createAttributeType("goal_has_protected", OAVJavaType.java_boolean_type, OAVAttributeType.NONE, Boolean.FALSE);
 		goal_has_parentplan = goal_type.createAttributeType("goal_has_parentplan", plan_type, OAVAttributeType.NONE);
-		goal_has_exception = goal_type.createAttributeType("goal_has_exception", goal_type);
+		goal_has_exception = goal_type.createAttributeType("goal_has_exception", OAVJavaType.java_exception_type);
 		goal_has_triedmplans = goal_type.createAttributeType("goal_has_triedmplans", OAVBDIMetaModel.object_type, OAVAttributeType.LIST);
 		goal_has_retrytimer = goal_type.createAttributeType("goal_has_retrytimer", java_timer_type);
 		goal_has_recurtimer = goal_type.createAttributeType("goal_has_recurtimer", java_timer_type);

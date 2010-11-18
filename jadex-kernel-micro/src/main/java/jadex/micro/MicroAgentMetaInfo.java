@@ -31,11 +31,11 @@ public class MicroAgentMetaInfo
 	/** The property map. */
 	protected Map properties;
 	
-	/** The used services. */
-	protected Class[] usedservices;
+	/** The required services. */
+	protected Class[] requiredservices;
 	
-	/** The offered services. */
-	protected Class[] offeredservices;
+	/** The provided services. */
+	protected Class[] providedservices;
 	
 	//-------- constructors --------
 	
@@ -60,9 +60,9 @@ public class MicroAgentMetaInfo
 	 *  Create a new meta info.
 	 */
 	public MicroAgentMetaInfo(String description, String[] configs, 
-		Class[] usedservices, Class[] offeredservices)
+		Class[] requiredservices, Class[] providedservices)
 	{
-		this(description, configs, null, null, null, null, usedservices, offeredservices);
+		this(description, configs, null, null, null, null, requiredservices, providedservices);
 	}
 	
 	/**
@@ -79,7 +79,7 @@ public class MicroAgentMetaInfo
 	 */
 	public MicroAgentMetaInfo(String description, String[] configs, 
 		IArgument[] args, IArgument[] results, String[] breakpoints, Map properties,
-		Class[] usedservices, Class[] offeredservices)
+		Class[] requiredservices, Class[] providedservices)
 	{
 		this.description = description;
 		this.configs = configs == null? SUtil.EMPTY_STRING_ARRAY: configs;
@@ -87,8 +87,8 @@ public class MicroAgentMetaInfo
 		this.results = results == null? new IArgument[0]: results;
 		this.breakpoints = breakpoints == null? new String[0]: breakpoints;
 		this.properties = properties==null? Collections.EMPTY_MAP: properties;
-		this.usedservices = usedservices==null? SUtil.EMPTY_CLASS_ARRAY: usedservices;
-		this.offeredservices = offeredservices==null? SUtil.EMPTY_CLASS_ARRAY: offeredservices;
+		this.requiredservices = requiredservices==null? SUtil.EMPTY_CLASS_ARRAY: requiredservices;
+		this.providedservices = providedservices==null? SUtil.EMPTY_CLASS_ARRAY: providedservices;
 	}
 
 	//-------- methods --------
@@ -148,20 +148,20 @@ public class MicroAgentMetaInfo
 	}
 
 	/**
-	 *  Get the usedservices.
-	 *  @return The usedservices.
+	 *  Get the required services.
+	 *  @return The required services.
 	 */
-	public Class[] getUsedServices()
+	public Class[] getRequiredServices()
 	{
-		return usedservices;
+		return requiredservices;
 	}
 
 	/**
-	 *  Get the offeredservices.
-	 *  @return The offeredservices.
+	 *  Get the provided services.
+	 *  @return The provided services.
 	 */
-	public Class[] getOfferedServices()
+	public Class[] getProvidedServices()
 	{
-		return offeredservices;
+		return providedservices;
 	}
 }

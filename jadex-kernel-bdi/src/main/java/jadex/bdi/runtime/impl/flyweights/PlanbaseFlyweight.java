@@ -59,14 +59,14 @@ public class PlanbaseFlyweight extends ElementFlyweight implements IPlanbase
 			{
 				public void run()
 				{
-					object = SFlyweightFunctionality.getPlans(getState(), getHandle(), false);
+					object = SFlyweightFunctionality.getPlans(getState(), getHandle());
 				}
 			};
 			return (IPlan[])invoc.object;
 		}
 		else
 		{
-			return (IPlan[])SFlyweightFunctionality.getPlans(getState(), getHandle(), false);
+			return (IPlan[])SFlyweightFunctionality.getPlans(getState(), getHandle());
 		}
 	}
 
@@ -83,14 +83,14 @@ public class PlanbaseFlyweight extends ElementFlyweight implements IPlanbase
 			{
 				public void run()
 				{
-					object = SFlyweightFunctionality.getPlans(getState(), getHandle(), false, type);
+					object = SFlyweightFunctionality.getPlans(getState(), getHandle(), type);
 				}
 			};
 			return (IPlan[])invoc.object;
 		}
 		else
 		{
-			return (IPlan[])SFlyweightFunctionality.getPlans(getState(), getHandle(), false, type);
+			return (IPlan[])SFlyweightFunctionality.getPlans(getState(), getHandle(), type);
 		}
 	}
 

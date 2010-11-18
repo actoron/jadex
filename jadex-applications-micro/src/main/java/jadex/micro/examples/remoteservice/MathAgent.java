@@ -12,6 +12,6 @@ public class MathAgent extends MicroAgent
 	 */
 	public void agentCreated()
 	{
-		addService(new MathService(getServiceProvider()));
+		addDirectService(new MathService(getServiceProvider()));
 	}
 }

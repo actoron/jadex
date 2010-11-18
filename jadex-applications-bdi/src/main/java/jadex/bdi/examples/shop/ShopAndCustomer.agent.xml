@@ -29,4 +29,8 @@
 			<concrete ref="shopcap.catalog"/>
 		</beliefsetref>
 	</beliefs>
+	
+	<properties>
+		<property name="logging.level">java.util.logging.Level.WARNING</property>
+	</properties>
 </agent>

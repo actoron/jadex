@@ -5,13 +5,10 @@ import jadex.bdi.examples.disastermanagement.DeliverPatientTask;
 import jadex.bdi.examples.disastermanagement.ITreatVictimsService;
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.ICapability;
-import jadex.bdi.runtime.IEAGoal;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IGoalListener;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
-import jadex.commons.concurrent.DefaultResultListener;
-import jadex.commons.concurrent.IResultListener;
 import jadex.commons.service.BasicService;
 
 /**

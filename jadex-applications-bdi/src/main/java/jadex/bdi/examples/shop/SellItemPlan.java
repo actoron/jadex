@@ -31,11 +31,11 @@ public class SellItemPlan extends Plan
 		}
 		else if(ii.getQuantity()==0)
 		{
-			fail(new RuntimeException("Item not in store: "+name));
+			throw new RuntimeException("Item not in store: "+name);
 		}
 		else
 		{
-			fail(new RuntimeException("Payment not sufficient: "+price));
+			throw new RuntimeException("Payment not sufficient: "+price);
 		}
 	}
 }

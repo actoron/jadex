@@ -58,6 +58,7 @@
 	
 	<properties>
 		<property name="componentviewer.viewerclass">"jadex.bdi.examples.shop.CustomerViewerPanel"</property>
+		<property name="logging.level">java.util.logging.Level.WARNING</property>
 	</properties>
 	
 </capability>

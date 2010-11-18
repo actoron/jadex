@@ -94,14 +94,14 @@ public interface IModelInfo
 	public ClassLoader getClassLoader();
 	
 	/**
-	 *  Get the usedservices.
-	 *  @return The usedservices.
+	 *  Get the required services.
+	 *  @return The required services.
 	 */
-	public Class[] getUsedServices();
+	public Class[] getRequiredServices();
 
 	/**
-	 *  Get the offeredservices.
-	 *  @return The offeredservices.
+	 *  Get the provided services.
+	 *  @return The provided services.
 	 */
-	public Class[] getOfferedServices();
+	public Class[] getProvidedServices();
 }

@@ -1,27 +1,12 @@
 package jadex.bdi.runtime.impl;
 
 import jadex.bdi.model.OAVBDIMetaModel;
-import jadex.bdi.runtime.IEAGoal;
-import jadex.bdi.runtime.IEAParameter;
-import jadex.bdi.runtime.IEAParameterSet;
-import jadex.bdi.runtime.IEAPlan;
 import jadex.bdi.runtime.IElement;
 import jadex.bdi.runtime.IExternalCondition;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IParameter;
 import jadex.bdi.runtime.IParameterSet;
 import jadex.bdi.runtime.IPlan;
-import jadex.bdi.runtime.impl.eaflyweights.EABeliefFlyweight;
-import jadex.bdi.runtime.impl.eaflyweights.EABeliefSetFlyweight;
-import jadex.bdi.runtime.impl.eaflyweights.EAChangeEventFlyweight;
-import jadex.bdi.runtime.impl.eaflyweights.EAExpressionFlyweight;
-import jadex.bdi.runtime.impl.eaflyweights.EAExpressionNoModel;
-import jadex.bdi.runtime.impl.eaflyweights.EAGoalFlyweight;
-import jadex.bdi.runtime.impl.eaflyweights.EAInternalEventFlyweight;
-import jadex.bdi.runtime.impl.eaflyweights.EAMessageEventFlyweight;
-import jadex.bdi.runtime.impl.eaflyweights.EAParameterFlyweight;
-import jadex.bdi.runtime.impl.eaflyweights.EAParameterSetFlyweight;
-import jadex.bdi.runtime.impl.eaflyweights.EAPlanFlyweight;
 import jadex.bdi.runtime.impl.flyweights.BeliefFlyweight;
 import jadex.bdi.runtime.impl.flyweights.BeliefSetFlyweight;
 import jadex.bdi.runtime.impl.flyweights.ChangeEventFlyweight;
@@ -70,7 +55,7 @@ public class SFlyweightFunctionality
 	/**
 	 * 
 	 */
-	public static ElementFlyweight getBelief(IOAVState state, Object handle, Object scope, String name, boolean ea)
+	public static ElementFlyweight getBelief(IOAVState state, Object handle, Object scope, String name)
 	{
 		ElementFlyweight ret = null;
 		
@@ -87,8 +72,7 @@ public class SFlyweightFunctionality
 			}
 			Object rbel = state.getAttributeValue(rscope[1], OAVBDIRuntimeModel.capability_has_beliefs, mbel);	
 			
-			ret = ea? EABeliefFlyweight.getBeliefFlyweight(state, rscope[1], rbel)
-				: BeliefFlyweight.getBeliefFlyweight(state, rscope[1], rbel);
+			ret = BeliefFlyweight.getBeliefFlyweight(state, rscope[1], rbel);
 		}
 		
 		return ret;
@@ -101,7 +85,7 @@ public class SFlyweightFunctionality
 	 * @param name
 	 * @return
 	 */
-	public static ElementFlyweight getBeliefSet(IOAVState state, Object handle, Object scope, String name, boolean ea)
+	public static ElementFlyweight getBeliefSet(IOAVState state, Object handle, Object scope, String name)
 	{
 		ElementFlyweight ret = null;
 	
@@ -119,8 +103,7 @@ public class SFlyweightFunctionality
 			
 			Object rbelset = state.getAttributeValue(rscope[1], OAVBDIRuntimeModel.capability_has_beliefsets, mbelset);	
 
-			ret = ea? EABeliefSetFlyweight.getBeliefSetFlyweight(state, rscope[1], rbelset)
-				: BeliefSetFlyweight.getBeliefSetFlyweight(state, rscope[1], rbelset);
+			ret = BeliefSetFlyweight.getBeliefSetFlyweight(state, rscope[1], rbelset);
 		}
 		else
 		{
@@ -425,7 +408,7 @@ public class SFlyweightFunctionality
 	/**
 	 * 
 	 */
-	public static ElementFlyweight getElement(IOAVState state, Object handle, Object scope, boolean ea)
+	public static ElementFlyweight getElement(IOAVState state, Object handle, Object scope)
 	{
 		ElementFlyweight ret; 
 		Object elem = state.getAttributeValue(handle, OAVBDIRuntimeModel.changeevent_has_element);
@@ -433,28 +416,23 @@ public class SFlyweightFunctionality
 		
 		if(type.isSubtype(OAVBDIRuntimeModel.goal_type))
 		{
-			ret = ea? EAGoalFlyweight.getGoalFlyweight(state, scope, elem)
-				: GoalFlyweight.getGoalFlyweight(state, scope, elem);
+			ret = GoalFlyweight.getGoalFlyweight(state, scope, elem);
 		}
 		else if(type.isSubtype(OAVBDIRuntimeModel.messageevent_type))
 		{
-			ret = ea? EAMessageEventFlyweight.getMessageEventFlyweight(state, scope, elem)
-				: MessageEventFlyweight.getMessageEventFlyweight(state, scope, elem);
+			ret = MessageEventFlyweight.getMessageEventFlyweight(state, scope, elem);
 		}
 		else if(type.isSubtype(OAVBDIRuntimeModel.internalevent_type))
 		{
-			ret = ea? EAInternalEventFlyweight.getInternalEventFlyweight(state, scope, elem)
-				: InternalEventFlyweight.getInternalEventFlyweight(state, scope, elem);
+			ret = InternalEventFlyweight.getInternalEventFlyweight(state, scope, elem);
 		}
 		else if(type.isSubtype(OAVBDIRuntimeModel.belief_type))
 		{
-			ret = ea? EABeliefFlyweight.getBeliefFlyweight(state, scope, elem)
-				: BeliefFlyweight.getBeliefFlyweight(state, scope, elem);
+			ret = BeliefFlyweight.getBeliefFlyweight(state, scope, elem);
 		}
 		else if(type.isSubtype(OAVBDIRuntimeModel.beliefset_type))
 		{
-			ret = ea? EABeliefSetFlyweight.getBeliefSetFlyweight(state, scope, elem) 
-				: BeliefSetFlyweight.getBeliefSetFlyweight(state, scope, elem);
+			ret = BeliefSetFlyweight.getBeliefSetFlyweight(state, scope, elem);
 		}
 		else
 		{
@@ -483,7 +461,7 @@ public class SFlyweightFunctionality
 	 *  @param rcap The scope.
 	 *  @param type The type.
 	 */
-	public static Object createInternalEvent(IOAVState state, Object rcap, String type, boolean ea)
+	public static Object createInternalEvent(IOAVState state, Object rcap, String type)
 	{
 		Object ret;
 		
@@ -493,8 +471,7 @@ public class SFlyweightFunctionality
 		{
 			Object	mevent = state.getAttributeValue(mscope, OAVBDIMetaModel.capability_has_internalevents, scope[0]);
 			Object	revent = InternalEventRules.instantiateInternalEvent(state, scope[1], mevent, null, null, null, null);
-			ret	= ea? EAInternalEventFlyweight.getInternalEventFlyweight(state, scope[1], revent)
-				: InternalEventFlyweight.getInternalEventFlyweight(state, scope[1], revent);
+			ret	= InternalEventFlyweight.getInternalEventFlyweight(state, scope[1], revent);
 		}
 		else
 		{
@@ -510,7 +487,7 @@ public class SFlyweightFunctionality
 	 *  @param rcap The scope.
 	 *  @param type The type.
 	 */
-	public static Object createMessageEvent(IOAVState state, Object rcap, String type, boolean ea)
+	public static Object createMessageEvent(IOAVState state, Object rcap, String type)
 	{
 		Object ret;
 		
@@ -520,8 +497,7 @@ public class SFlyweightFunctionality
 		{
 			Object	mevent = state.getAttributeValue(mscope, OAVBDIMetaModel.capability_has_messageevents, scope[0]);
 			Object	revent = MessageEventRules.instantiateMessageEvent(state, scope[1], mevent, null, null, null, null);
-			ret	= ea? EAMessageEventFlyweight.getMessageEventFlyweight(state, scope[1], revent)
-				: MessageEventFlyweight.getMessageEventFlyweight(state, scope[1], revent);
+			ret	= MessageEventFlyweight.getMessageEventFlyweight(state, scope[1], revent);
 		}
 		else
 		{
@@ -540,20 +516,20 @@ public class SFlyweightFunctionality
 	 *  @param type The type.
 	 *  @param rplan The plan (if created from plan).
 	 */
-	public static Object createExpression(IOAVState state, Object rcapa, String type, boolean ea)
+	public static Object createExpression(IOAVState state, Object rcapa, String type)
 	{
 		Object mcapa = state.getAttributeValue(rcapa, OAVBDIRuntimeModel.element_has_model);
 		if(!state.containsKey(mcapa, OAVBDIMetaModel.capability_has_expressions, type))
 			throw new RuntimeException("Unknown expression: "+type);
 		Object mexp = state.getAttributeValue(mcapa, OAVBDIMetaModel.capability_has_expressions, type);
-		return ea? EAExpressionFlyweight.getExpressionFlyweight(state, rcapa, mexp)
-			: ExpressionFlyweight.getExpressionFlyweight(state, rcapa, mexp);
+		return ExpressionFlyweight.getExpressionFlyweight(state, rcapa, mexp);
 	}
 	
 	/**
 	 * 
 	 */
-	public static Object createExpression(IOAVState state, Object scope, boolean ea, final String expression, final String[] paramnames, final Class[] paramtypes)
+	public static Object createExpression(IOAVState state, Object scope, 
+		final String expression, final String[] paramnames, final Class[] paramtypes)
 	{
 		// Hack!!! Should be configurable.
 		IExpressionParser	exp_parser	= new JavaCCExpressionParser();
@@ -571,8 +547,7 @@ public class SFlyweightFunctionality
 		}
 		
 		IParsedExpression pex = exp_parser.parseExpression(expression, imports, params, Thread.currentThread().getContextClassLoader());
-		return ea? new EAExpressionNoModel(state, scope, pex): 
-			new ExpressionNoModel(state, scope, pex);
+		return new ExpressionNoModel(state, scope, pex);
 	}
 	
 	//-------- expression --------
@@ -588,7 +563,7 @@ public class SFlyweightFunctionality
 	 *  @param paramnames
 	 *  @param paramtypes
 	 */
-	public static Object execute(IOAVState state, Object handle, Object scope, boolean ea, String[] names, Object[] values)
+	public static Object execute(IOAVState state, Object handle, Object scope, String[] names, Object[] values)
 	{
 		OAVBDIFetcher fetcher = new OAVBDIFetcher(state, scope);
 		for(int i=0; i<names.length; i++)
@@ -606,7 +581,7 @@ public class SFlyweightFunctionality
 	 * @param values
 	 * @return
 	 */
-	public static Object execute(IOAVState state, IParsedExpression exp, Object scope, boolean ea, String[] names, Object[] values)
+	public static Object execute(IOAVState state, IParsedExpression exp, Object scope, String[] names, Object[] values)
 	{
 		OAVBDIFetcher fetcher = new OAVBDIFetcher(state, scope);
 		for(int i=0; i<names.length; i++)
@@ -619,7 +594,7 @@ public class SFlyweightFunctionality
 	/**
 	 * 
 	 */
-	public static Object[] getGoals(IOAVState state, Object scope, boolean ea, final String type)
+	public static Object[] getGoals(IOAVState state, Object scope, final String type)
 	{
 		Object[] rscope	= AgentRules.resolveCapability(type, OAVBDIMetaModel.goal_type, scope, state);
 		
@@ -638,16 +613,14 @@ public class SFlyweightFunctionality
 				Object	rgoal	= it.next();
 				if(mgoal.equals(state.getAttributeValue(rgoal, OAVBDIRuntimeModel.element_has_model)))
 				{
-					matched.add(ea? EAGoalFlyweight.getGoalFlyweight(state, rscope[1], rgoal)
-						:GoalFlyweight.getGoalFlyweight(state, rscope[1], rgoal));
+					matched.add(GoalFlyweight.getGoalFlyweight(state, rscope[1], rgoal));
 				}
 			}
-			ret	= ea? (IEAGoal[])matched.toArray(new IEAGoal[matched.size()])
-				:(IGoal[])matched.toArray(new IGoal[matched.size()]);
+			ret	= (IGoal[])matched.toArray(new IGoal[matched.size()]);
 		}
 		else
 		{
-			ret	= ea? new IEAGoal[0]: new IGoal[0];
+			ret	= new IGoal[0];
 		}
 		
 		return ret;
@@ -656,7 +629,7 @@ public class SFlyweightFunctionality
 	/**
 	 * 
 	 */
-	public static Object[] getGoals(IOAVState state, Object scope, boolean ea)
+	public static Object[] getGoals(IOAVState state, Object scope)
 	{
 		Object[] ret;
 		Collection	goals = state.getAttributeValues(scope, OAVBDIRuntimeModel.capability_has_goals);
@@ -665,15 +638,13 @@ public class SFlyweightFunctionality
 			List flyweights = new ArrayList();
 			for(Iterator it=goals.iterator(); it.hasNext(); )
 			{
-				flyweights.add(ea? EAGoalFlyweight.getGoalFlyweight(state, scope, it.next())
-					:GoalFlyweight.getGoalFlyweight(state, scope, it.next()));
+				flyweights.add(GoalFlyweight.getGoalFlyweight(state, scope, it.next()));
 			}
-			ret	= ea? (IEAGoal[])flyweights.toArray(new IEAGoal[flyweights.size()])
-				:(IGoal[])flyweights.toArray(new IGoal[flyweights.size()]);
+			ret	= (IGoal[])flyweights.toArray(new IGoal[flyweights.size()]);
 		}
 		else
 		{
-			ret	= ea? new IEAGoal[0]: new IGoal[0];
+			ret	= new IGoal[0];
 		}
 		
 		return ret;
@@ -685,12 +656,11 @@ public class SFlyweightFunctionality
 	 *  @param rcapa	The local capability.
 	 *  @param state	The state.
 	 */
-	public static ElementFlyweight createGoal(IOAVState state, Object scope, boolean ea, String ref)
+	public static ElementFlyweight createGoal(IOAVState state, Object scope, String ref)
 	{
 		Object[] rscope = AgentRules.resolveCapability(ref, OAVBDIMetaModel.goal_type, scope, state);
 		Object rgoal = GoalLifecycleRules.createGoal(state, rscope[1], (String)rscope[0]);
-		return ea? EAGoalFlyweight.getGoalFlyweight(state, rscope[1], rgoal)
-			:GoalFlyweight.getGoalFlyweight(state, rscope[1], rgoal);
+		return GoalFlyweight.getGoalFlyweight(state, rscope[1], rgoal);
 	}
 	
 	//-------- goal --------
@@ -749,7 +719,7 @@ public class SFlyweightFunctionality
 	/**
 	 * 
 	 */
-	public static Object[] getParameters(IOAVState state, Object scope, Object handle, boolean ea)
+	public static Object[] getParameters(IOAVState state, Object scope, Object handle)
 	{
 		Object[] ret;
 		
@@ -757,20 +727,19 @@ public class SFlyweightFunctionality
 			OAVBDIRuntimeModel.parameterelement_has_parameters);
 		if(params!=null)
 		{
-			Object[] oarray = ea? new IEAParameter[params.size()]: new IParameter[params.size()];
+			Object[] oarray = new IParameter[params.size()];
 			int i=0;
 			for(Iterator it=params.iterator(); it.hasNext(); i++)
 			{
 				Object param = it.next();
 				String name = (String)state.getAttributeValue(param, OAVBDIRuntimeModel.parameter_has_name);
-				oarray[i] = ea? EAParameterFlyweight.getParameterFlyweight(state, scope, param, name, handle)
-					:ParameterFlyweight.getParameterFlyweight(state, scope, param, name, handle);
+				oarray[i] = ParameterFlyweight.getParameterFlyweight(state, scope, param, name, handle);
 			}
 			ret = oarray;
 		}
 		else
 		{
-			ret = ea? new IEAParameter[0]: new IParameter[0];
+			ret = new IParameter[0];
 		}
 		
 		return ret;
@@ -784,7 +753,7 @@ public class SFlyweightFunctionality
 	 * @param ea
 	 * @return
 	 */
-	public static Object[] getParameterSets(IOAVState state, Object scope, Object handle, boolean ea)
+	public static Object[] getParameterSets(IOAVState state, Object scope, Object handle)
 	{
 		Object[] ret;
 
@@ -792,20 +761,19 @@ public class SFlyweightFunctionality
 			OAVBDIRuntimeModel.parameterelement_has_parametersets);
 		if(paramsets!=null)
 		{
-			Object[] oarray = ea? new IEAParameterSet[paramsets.size()]: new IParameterSet[paramsets.size()];
+			Object[] oarray = new IParameterSet[paramsets.size()];
 			int i=0;
 			for(Iterator it=paramsets.iterator(); it.hasNext(); i++)
 			{
 				Object paramset = it.next();
 				String name = (String)state.getAttributeValue(paramset, OAVBDIRuntimeModel.parameterset_has_name);
-				oarray[i] = ea? EAParameterSetFlyweight.getParameterSetFlyweight(state, scope, paramset, name, handle)
-					:ParameterSetFlyweight.getParameterSetFlyweight(state, scope, paramset, name, handle);
+				oarray[i] = ParameterSetFlyweight.getParameterSetFlyweight(state, scope, paramset, name, handle);
 			}
 			return oarray;
 		}
 		else
 		{
-			ret = ea? new IEAParameterSet[0]: new IParameterSet[0];
+			ret = new IParameterSet[0];
 		}
 		
 		return ret;
@@ -816,12 +784,11 @@ public class SFlyweightFunctionality
 	 *  @param name The name.
 	 *  @return The param.
 	 */
-	public static Object getParameter(IOAVState state, Object scope, Object handle, final String name, boolean ea)
+	public static Object getParameter(IOAVState state, Object scope, Object handle, final String name)
 	{
 		Object param = state.getAttributeValue(handle, 
 			OAVBDIRuntimeModel.parameterelement_has_parameters, name);
-		return ea? EAParameterFlyweight.getParameterFlyweight(state, scope, param, name, handle)
-			: ParameterFlyweight.getParameterFlyweight(state, scope, param, name, handle);
+		return ParameterFlyweight.getParameterFlyweight(state, scope, param, name, handle);
 	}
 	
 	/**
@@ -829,12 +796,11 @@ public class SFlyweightFunctionality
  	 *  @param name The name.
 	 *  @return The param set.
 	 */
-	public static Object getParameterSet(IOAVState state, Object scope, Object handle, final String name, boolean ea)
+	public static Object getParameterSet(IOAVState state, Object scope, Object handle, final String name)
 	{
 		Object paramset = state.getAttributeValue(handle, 
 			OAVBDIRuntimeModel.parameterelement_has_parametersets, name);
-		return ea? EAParameterSetFlyweight.getParameterSetFlyweight(state, scope, paramset, name, handle)
-			: ParameterSetFlyweight.getParameterSetFlyweight(state, scope, paramset, name, handle);
+		return ParameterSetFlyweight.getParameterSetFlyweight(state, scope, paramset, name, handle);
 	}
 	
 	/**
@@ -925,23 +891,22 @@ public class SFlyweightFunctionality
 	/**
 	 * 
 	 */
-	public static Object[] getPlans(IOAVState state, Object handle, boolean ea)
+	public static Object[] getPlans(IOAVState state, Object handle)
 	{
 		Object[] ret;
 		Collection plans = state.getAttributeValues(handle, OAVBDIRuntimeModel.capability_has_plans);
 		if(plans!=null)
 		{
-			ret = ea? new IEAPlan[plans.size()]: new IPlan[plans.size()];
+			ret = new IPlan[plans.size()];
 			int i=0;
 			for(Iterator it=plans.iterator(); it.hasNext(); i++)
 			{
-				ret[i] = ea? EAPlanFlyweight.getPlanFlyweight(state, handle, it.next())
-					:PlanFlyweight.getPlanFlyweight(state, handle, it.next());
+				ret[i] = PlanFlyweight.getPlanFlyweight(state, handle, it.next());
 			}
 		}
 		else
 		{
-			ret	= ea? new IEAPlan[0]: new IPlan[0];
+			ret	= new IPlan[0];
 		}
 		
 		return ret;
@@ -950,7 +915,7 @@ public class SFlyweightFunctionality
 	/**
 	 * 
 	 */
-	public static Object[] getPlans(IOAVState state, Object handle, boolean ea, String type)
+	public static Object[] getPlans(IOAVState state, Object handle, String type)
 	{
 		List ret = null;
 		Collection	plans = state.getAttributeValues(handle, OAVBDIRuntimeModel.capability_has_plans);
@@ -964,14 +929,12 @@ public class SFlyweightFunctionality
 				String tname = (String)state.getAttributeValue(mplan, OAVBDIMetaModel.modelelement_has_name);
 				if(tname.equals(type))
 				{
-					ret.add(ea? EAPlanFlyweight.getPlanFlyweight(state, handle, rplan)
-						:PlanFlyweight.getPlanFlyweight(state, handle, rplan));
+					ret.add(PlanFlyweight.getPlanFlyweight(state, handle, rplan));
 				}
 			}
 		}
 		
-		return ret==null? ea? new IEAPlan[0]: new IPlan[0]: 
-			ea? (IEAPlan[])ret.toArray(new IEAPlan[ret.size()]): (IPlan[])ret.toArray(new IPlan[ret.size()]);
+		return ret==null? new IPlan[0]: (IPlan[])ret.toArray(new IPlan[ret.size()]);
 	}
 	
 	/**
@@ -991,14 +954,14 @@ public class SFlyweightFunctionality
 	/**
 	 * 
 	 */
-	public static IElement getReason(IOAVState state, Object scope, Object handle, boolean ea)
+	public static IElement getReason(IOAVState state, Object scope, Object handle)
 	{
 		Object	elem = state.getAttributeValue(handle, OAVBDIRuntimeModel.plan_has_reason);
 		IElement ret = null;
 		if(elem!=null)
 		{
 			// todo: wrong scope
-			ret = SFlyweightFunctionality.getFlyweight(state, scope, elem, ea);
+			ret = SFlyweightFunctionality.getFlyweight(state, scope, elem);
 		}
 		return ret;
 	}
@@ -1432,7 +1395,7 @@ public class SFlyweightFunctionality
 	 *  Get all elements.
 	 *  @return The elements.
 	 */
-	public static Object[] getElements(IOAVState state, Object scope, Object rplan, boolean ea)
+	public static Object[] getElements(IOAVState state, Object scope, Object rplan)
 	{
 		Object[] ret;
 		Collection coll = state.getAttributeValues(rplan, OAVBDIRuntimeModel.plan_has_waitqueueelements);
@@ -1443,7 +1406,7 @@ public class SFlyweightFunctionality
 			for(Iterator it=coll.iterator(); it.hasNext(); i++)
 			{
 				// todo: wrong scope!
-				ret[i] = getFlyweight(state, scope, it.next(), ea);
+				ret[i] = getFlyweight(state, scope, it.next());
 			}
 		}
 		else
@@ -1457,7 +1420,7 @@ public class SFlyweightFunctionality
 	 *  Get the next element.
 	 *  @return The next element (or null if none).
 	 */
-	public static Object removeNextElement(IOAVState state, Object scope, Object rplan, boolean ea)
+	public static Object removeNextElement(IOAVState state, Object scope, Object rplan)
 	{
 		Object ret = null;
 		Collection coll = state.getAttributeValues(rplan, OAVBDIRuntimeModel.plan_has_waitqueueelements);
@@ -1466,7 +1429,7 @@ public class SFlyweightFunctionality
 			Object pe = coll.iterator().next();
 			state.removeAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_waitqueueelements, pe);
 			// todo: wrong scope!
-			ret = getFlyweight(state, scope, pe, ea);
+			ret = getFlyweight(state, scope, pe);
 		}
 		return ret;
 	}
@@ -1495,38 +1458,33 @@ public class SFlyweightFunctionality
 	 *  @param elem The element.
 	 *  @return The flyweight.
 	 */
-	public static ElementFlyweight getFlyweight(IOAVState state, Object rcapa, Object elem, boolean ea)
+	public static ElementFlyweight getFlyweight(IOAVState state, Object rcapa, Object elem)
 	{
 		ElementFlyweight ret = null;
 		OAVObjectType type = state.getType(elem);
 		
 		if(type.equals(OAVBDIRuntimeModel.goal_type))
 		{
-			ret = ea? EAGoalFlyweight.getGoalFlyweight(state, rcapa, elem)
-				: GoalFlyweight.getGoalFlyweight(state, rcapa, elem);
+			ret = GoalFlyweight.getGoalFlyweight(state, rcapa, elem);
 		}
 		else if(type.equals(OAVBDIRuntimeModel.internalevent_type))
 		{
-			ret = ea? EAInternalEventFlyweight.getInternalEventFlyweight(state, rcapa, elem)
-				: InternalEventFlyweight.getInternalEventFlyweight(state, rcapa, elem);
+			ret = InternalEventFlyweight.getInternalEventFlyweight(state, rcapa, elem);
 		}
 		else if(type.equals(OAVBDIRuntimeModel.messageevent_type))
 		{
-			ret = ea? EAMessageEventFlyweight.getMessageEventFlyweight(state, rcapa, elem)
-				: MessageEventFlyweight.getMessageEventFlyweight(state, rcapa, elem);
+			ret = MessageEventFlyweight.getMessageEventFlyweight(state, rcapa, elem);
 		}
 		else if(type.isSubtype(OAVBDIRuntimeModel.changeevent_type))
 		{
 			String cetype = (String)state.getAttributeValue(elem, OAVBDIRuntimeModel.changeevent_has_type);
 			if(OAVBDIRuntimeModel.CHANGEEVENT_GOALDROPPED.equals(cetype))
 			{
-				ret = ea? EAGoalFlyweight.getGoalFlyweight(state, rcapa, state.getAttributeValue(elem, OAVBDIRuntimeModel.changeevent_has_element))
-					: GoalFlyweight.getGoalFlyweight(state, rcapa, state.getAttributeValue(elem, OAVBDIRuntimeModel.changeevent_has_element));
+				ret = GoalFlyweight.getGoalFlyweight(state, rcapa, state.getAttributeValue(elem, OAVBDIRuntimeModel.changeevent_has_element));
 			}
 			else
 			{
-				ret = ea? new EAChangeEventFlyweight(state, rcapa, elem)
-					: new ChangeEventFlyweight(state, rcapa, elem);
+				ret = new ChangeEventFlyweight(state, rcapa, elem);
 			}
 		}
 		

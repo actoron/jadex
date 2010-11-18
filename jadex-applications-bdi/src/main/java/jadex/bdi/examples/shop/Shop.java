@@ -16,7 +16,6 @@ public class Shop extends BasicService implements IShop
 	//-------- attributes --------
 	
 	/** The component. */
-//	protected IBDIExternalAccess comp;
 	protected ICapability comp;
 	
 	/** The shop name. */
@@ -28,13 +27,11 @@ public class Shop extends BasicService implements IShop
 	 *  Create a new shop service.
 	 *  @param comp The active component.
 	 */
-//	public Shop(IExternalAccess comp, String name)
 	public Shop(ICapability comp, String name)
 	{
 		super(comp.getServiceProvider().getId(), IShop.class, null);
 
 //		System.out.println("created: "+name);
-//		this.comp = (IBDIExternalAccess)comp;
 		this.comp = comp;
 		this.name = name;
 	}
@@ -70,7 +67,7 @@ public class Shop extends BasicService implements IShop
 				if(sell.isSucceeded())
 					ret.setResult(sell.getParameter("result").getValue());
 				else
-					ret.setException(new RuntimeException("Sell goal failed."));
+					ret.setException(sell.getException());
 			}
 			
 			public void goalAdded(AgentEvent ae)

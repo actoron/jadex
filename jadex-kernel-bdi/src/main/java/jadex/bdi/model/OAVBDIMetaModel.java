@@ -322,10 +322,10 @@ public class OAVBDIMetaModel
 	//-------- service --------
 	
 	/** The expression type. */
-	public static OAVObjectType service_type;
+	public static OAVObjectType providedservice_type;
 	
-	/** Service has decoupled attribute. */
-	public static OAVAttributeType service_has_decoupled;
+	/** Service has direct attribute. */
+	public static OAVAttributeType providedservice_has_direct;
 
 	
 //	/** Expression has parameters attribute. */
@@ -447,8 +447,8 @@ public class OAVBDIMetaModel
 	public static OAVAttributeType capability_has_conditions;
 				
 	/** Capability has expressions attribute. */
-	public static OAVAttributeType capability_has_usedservices;
-	public static OAVAttributeType capability_has_offeredservices;
+	public static OAVAttributeType capability_has_requiredservices;
+	public static OAVAttributeType capability_has_providedservices;
 	// todo: servicerefs
 	
 	/** Capability has properties attribute. */
@@ -876,7 +876,7 @@ public class OAVBDIMetaModel
 		expression_type = bdimm_type_model.createType("mexpression", referenceableelement_type);
 		expressionreference_type = bdimm_type_model.createType("mexpressionreference", elementreference_type);
 		condition_type = bdimm_type_model.createType("mcondition", expression_type);
-		service_type = bdimm_type_model.createType("mservice", expression_type);
+		providedservice_type = bdimm_type_model.createType("mservice", expression_type);
 //		relevantbelief_type = bdimm_type_model.createType("mrelevantbelief", expressionrelevant_type);
 //		relevantbeliefset_type = bdimm_type_model.createType("mrelevantbeliefset", expressionrelevant_type);
 //		relevantgoal_type = bdimm_type_model.createType("mrelevantgoal", expressionrelevant_type);
@@ -964,7 +964,7 @@ public class OAVBDIMetaModel
 		expression_has_classname = expression_type.createAttributeType("mexpression_has_classname", OAVJavaType.java_string_type, OAVAttributeType.NONE);
 		expression_has_class = expression_type.createAttributeType("mexpression_has_class", OAVJavaType.java_class_type, OAVAttributeType.NONE, Object.class);
 
-		service_has_decoupled = service_type.createAttributeType("mservice_has_decoupled", OAVJavaType.java_boolean_type, OAVAttributeType.NONE);
+		providedservice_has_direct = providedservice_type.createAttributeType("mservice_has_direct", OAVJavaType.java_boolean_type, OAVAttributeType.NONE, Boolean.FALSE);
 
 		
 //		expression_has_class = expression_type.createAttributeType("mexpression_has_class", OAVJavaType.java_class_type);
@@ -1179,8 +1179,8 @@ public class OAVBDIMetaModel
 		capability_has_expressionrefs = capability_type.createAttributeType("mcapability_has_mexpressionrefs", expressionreference_type, OAVAttributeType.ORDEREDMAP, null, modelelement_has_name);
 		capability_has_expressions = capability_type.createAttributeType("mcapability_has_mexpressions", expression_type, OAVAttributeType.ORDEREDMAP, null, modelelement_has_name);
 		capability_has_conditions = capability_type.createAttributeType("mcapability_has_mconditions", condition_type, OAVAttributeType.ORDEREDMAP, null, modelelement_has_name);
-		capability_has_usedservices = capability_type.createAttributeType("mcapability_has_musedservices", expression_type, OAVAttributeType.LIST);
-		capability_has_offeredservices = capability_type.createAttributeType("mcapability_has_mofferedservices", service_type, OAVAttributeType.LIST);
+		capability_has_requiredservices = capability_type.createAttributeType("mcapability_has_mrequiredservices", expression_type, OAVAttributeType.LIST);
+		capability_has_providedservices = capability_type.createAttributeType("mcapability_has_mprovidedservices", providedservice_type, OAVAttributeType.LIST);
 		capability_has_properties = capability_type.createAttributeType("mcapability_has_mproperties", expression_type, OAVAttributeType.ORDEREDMAP, null, modelelement_has_name);
 		capability_has_defaultconfiguration = capability_type.createAttributeType("mcapability_has_defaultconfiguration", OAVJavaType.java_string_type);
 		capability_has_configurations = capability_type.createAttributeType("mcapability_has_mconfigurations", configuration_type, OAVAttributeType.ORDEREDMAP, null, modelelement_has_name);

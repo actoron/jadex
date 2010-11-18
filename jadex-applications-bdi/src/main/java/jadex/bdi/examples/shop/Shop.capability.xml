@@ -48,7 +48,11 @@
 	</plans>
 	
 	<services>
-		<offeredservice class="IShop" decoupled="true">new Shop($scope, $beliefbase.shopname)</offeredservice>
+		<providedservice class="IShop">new Shop($scope, $beliefbase.shopname)</providedservice>
 	</services>
+	
+	<properties>
+		<property name="logging.level">java.util.logging.Level.WARNING</property>
+	</properties>
 	
 </capability>

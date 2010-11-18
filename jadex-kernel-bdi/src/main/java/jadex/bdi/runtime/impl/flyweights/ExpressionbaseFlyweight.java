@@ -63,7 +63,7 @@ public class ExpressionbaseFlyweight extends ElementFlyweight implements IExpres
 				public void run()
 				{
 					Object[] scope = AgentRules.resolveCapability(name, OAVBDIMetaModel.expression_type, getScope(), getState());
-					object = SFlyweightFunctionality.createExpression(getState(), scope[1], (String)scope[0], false);
+					object = SFlyweightFunctionality.createExpression(getState(), scope[1], (String)scope[0]);
 				}
 			};
 			return (IExpression)invoc.object;
@@ -71,7 +71,7 @@ public class ExpressionbaseFlyweight extends ElementFlyweight implements IExpres
 		else
 		{
 			Object[] scope = AgentRules.resolveCapability(name, OAVBDIMetaModel.expression_type, getScope(), getState());
-			return (IExpression)SFlyweightFunctionality.createExpression(getState(), scope[1], (String)scope[0], false);
+			return (IExpression)SFlyweightFunctionality.createExpression(getState(), scope[1], (String)scope[0]);
 		}
 	}
 
@@ -98,14 +98,14 @@ public class ExpressionbaseFlyweight extends ElementFlyweight implements IExpres
 			{
 				public void run()
 				{
-					object = SFlyweightFunctionality.createExpression(getState(), getScope(), false, expression, paramnames, paramtypes);
+					object = SFlyweightFunctionality.createExpression(getState(), getScope(), expression, paramnames, paramtypes);
 				}
 			};
 			return (IExpression)invoc.object;
 		}
 		else
 		{
-			return (IExpression)SFlyweightFunctionality.createExpression(getState(), getScope(), false, expression, paramnames, paramtypes);
+			return (IExpression)SFlyweightFunctionality.createExpression(getState(), getScope(), expression, paramnames, paramtypes);
 		}
 	}
 	
