@@ -346,7 +346,7 @@ public class CustomerPanel extends JPanel
 						public Object execute(IInternalAccess ia)
 						{
 							IBDIInternalAccess bia = (IBDIInternalAccess)ia;
-							IGoal buy = bia.getGoalbase().createGoal("buy");
+							final IGoal buy = bia.getGoalbase().createGoal("buy");
 							buy.getParameter("name").setValue(name);
 							buy.getParameter("shop").setValue(shop);
 							buy.getParameter("price").setValue(price);
@@ -356,6 +356,17 @@ public class CustomerPanel extends JPanel
 								{
 									// Update number of available items
 									refresh(shop);
+//									if(!buy.isSucceeded())
+//									{
+//										final String text = SUtil.wrapText("Item could not be bought. "+e.getMessage());
+//										SwingUtilities.invokeLater(new Runnable()
+//										{
+//											public void run()
+//											{
+//												JOptionPane.showMessageDialog(SGUI.getWindowParent(.this), text, "Message problem", JOptionPane.INFORMATION_MESSAGE);
+//											}
+//										});
+//									}
 								}
 								
 								public void goalAdded(AgentEvent ae)

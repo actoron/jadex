@@ -156,7 +156,7 @@ public class DecouplingServiceInvocationInterceptor implements IServiceInvocatio
 				{
 					Object proxy = context.getProxy();
 					InvocationHandler handler = Proxy.getInvocationHandler(proxy);
-					context.setResult(new Integer(Proxy.getInvocationHandler(handler).hashCode()));
+					context.setResult(new Integer(handler.hashCode()));
 				}
 			});
 			// todo: other object methods?!
