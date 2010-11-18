@@ -10,7 +10,6 @@ import jadex.bdi.runtime.IBeliefListener;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.SUtil;
-import jadex.commons.concurrent.DefaultResultListener;
 import jadex.xml.bean.JavaReader;
 
 import java.awt.GridBagConstraints;

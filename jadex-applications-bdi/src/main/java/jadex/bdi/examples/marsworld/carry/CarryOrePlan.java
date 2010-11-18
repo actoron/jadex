@@ -1,8 +1,5 @@
 package jadex.bdi.examples.marsworld.carry;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import jadex.application.space.envsupport.environment.AbstractTask;
 import jadex.application.space.envsupport.environment.IEnvironmentSpace;
 import jadex.application.space.envsupport.environment.ISpaceObject;
@@ -12,6 +9,9 @@ import jadex.bdi.examples.marsworld.sentry.AnalyzeTargetTask;
 import jadex.bdi.planlib.PlanFinishedTaskCondition;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
+
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**

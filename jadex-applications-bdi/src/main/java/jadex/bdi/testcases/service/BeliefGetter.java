@@ -7,7 +7,6 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
-import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.service.BasicService;
 
 /**

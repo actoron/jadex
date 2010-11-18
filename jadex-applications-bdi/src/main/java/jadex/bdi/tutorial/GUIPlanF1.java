@@ -5,7 +5,6 @@ import jadex.bdi.runtime.IAgentListener;
 import jadex.bdi.runtime.IInternalEvent;
 import jadex.bdi.runtime.IInternalEventListener;
 import jadex.bdi.runtime.Plan;
-import jadex.commons.concurrent.SwingDefaultResultListener;
 
 import javax.swing.SwingUtilities;
 

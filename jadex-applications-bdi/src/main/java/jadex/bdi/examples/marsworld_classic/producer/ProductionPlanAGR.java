@@ -1,9 +1,9 @@
 package jadex.bdi.examples.marsworld_classic.producer;
 
-import jadex.base.fipa.SFipa;
 import jadex.application.runtime.IApplicationExternalAccess;
 import jadex.application.space.agr.AGRSpace;
 import jadex.application.space.agr.Group;
+import jadex.base.fipa.SFipa;
 import jadex.bdi.examples.marsworld_classic.AgentInfo;
 import jadex.bdi.examples.marsworld_classic.Environment;
 import jadex.bdi.examples.marsworld_classic.Location;

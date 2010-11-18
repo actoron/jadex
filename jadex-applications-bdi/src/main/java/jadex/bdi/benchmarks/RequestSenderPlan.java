@@ -2,8 +2,8 @@ package jadex.bdi.benchmarks;
 
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
-import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentManagementService;
 import jadex.commons.service.SServiceProvider;
 
 /**

@@ -10,8 +10,8 @@ import jadex.bdi.runtime.IEvent;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 import jadex.bdi.runtime.TimeoutException;
-import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentManagementService;
 import jadex.commons.SUtil;
 import jadex.commons.service.SServiceProvider;
 

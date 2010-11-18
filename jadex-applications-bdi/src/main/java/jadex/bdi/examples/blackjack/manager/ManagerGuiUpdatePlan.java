@@ -8,7 +8,6 @@ import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.commons.concurrent.SwingDefaultResultListener;
 
 import java.awt.EventQueue;
 

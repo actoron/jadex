@@ -1,9 +1,9 @@
 package jadex.bdi.testcases.misc;
 
+import jadex.bridge.IContentCodec;
+
 import java.io.Serializable;
 import java.util.Properties;
-
-import jadex.bridge.IContentCodec;
 
 /**
  *  Simple test codec.

@@ -1,9 +1,9 @@
 package jadex.bdi.examples.marsworld_classic.sentry;
 
-import jadex.base.fipa.SFipa;
 import jadex.application.runtime.IApplicationExternalAccess;
 import jadex.application.space.agr.AGRSpace;
 import jadex.application.space.agr.Group;
+import jadex.base.fipa.SFipa;
 import jadex.bdi.examples.marsworld_classic.RequestProduction;
 import jadex.bdi.examples.marsworld_classic.Target;
 import jadex.bdi.runtime.IGoal;
