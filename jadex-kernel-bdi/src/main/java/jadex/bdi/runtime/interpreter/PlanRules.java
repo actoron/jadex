@@ -549,7 +549,7 @@ public class PlanRules
 					
 					// todo: currently only remembers last plan exception in goal
 					Object reason = state.getAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_reason);
-					if(state.getType(reason).isSubtype(OAVBDIRuntimeModel.goal_type))
+					if(reason!=null && state.getType(reason).isSubtype(OAVBDIRuntimeModel.goal_type))
 					{
 						state.setAttributeValue(reason, OAVBDIRuntimeModel.goal_has_exception, e);
 					}

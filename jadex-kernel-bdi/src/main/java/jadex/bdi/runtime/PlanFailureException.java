@@ -34,6 +34,6 @@ public class PlanFailureException	extends BDIFailureException
 	 */
 	public PlanFailureException(String message, Throwable cause)
 	{
-		super(message==null? cause.getMessage(): null, cause);
+		super(message==null? cause!=null?cause.getMessage():null : null, cause);
 	}
 }
