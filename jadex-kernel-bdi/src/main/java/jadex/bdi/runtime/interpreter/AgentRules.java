@@ -629,9 +629,10 @@ public class AgentRules
 						}
 					}
 				}
-				catch(Exception e)
+				catch(RuntimeException e)
 				{
 					res.setException(e);
+					throw e;
 				}
 			}
 		};

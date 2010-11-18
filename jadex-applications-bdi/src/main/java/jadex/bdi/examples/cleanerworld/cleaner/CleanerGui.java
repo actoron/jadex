@@ -65,7 +65,7 @@ public class CleanerGui	extends JFrame
 							{
 								drawdata.daytime = ((Boolean)bia.getBeliefbase().getBelief("daytime").getFact()).booleanValue();
 								drawdata.visited_positions = (MapPoint[])bia.getBeliefbase().getBeliefSet("visited_positions").getFacts();
-								drawdata.max_quantity = ((Double)((IExpression)bia.getExpressionbase().getExpression("query_max_quantity")).execute()).doubleValue();
+								drawdata.max_quantity = ((MapPoint)((IExpression)bia.getExpressionbase().getExpression("query_max_quantity")).execute()).getQuantity();
 								drawdata.xcnt = ((Integer[])bia.getBeliefbase().getBeliefSet("raster").getFacts())[0].intValue();
 								drawdata.ycnt = ((Integer[])bia.getBeliefbase().getBeliefSet("raster").getFacts())[1].intValue();
 								drawdata.cleaners = (ISpaceObject[])bia.getBeliefbase().getBeliefSet("cleaners").getFacts();
@@ -75,7 +75,8 @@ public class CleanerGui	extends JFrame
 								drawdata.my_vision = ((Double)bia.getBeliefbase().getBelief("my_vision").getFact()).doubleValue();
 								drawdata.my_chargestate = ((Double)bia.getBeliefbase().getBelief("my_chargestate").getFact()).doubleValue();
 								drawdata.myself = (ISpaceObject)bia.getBeliefbase().getBelief("myself").getFact();
-								drawdata.my_waste = ((Boolean)drawdata.myself.getProperty("waste")).booleanValue();
+								Boolean ws = (Boolean)drawdata.myself.getProperty("waste");
+								drawdata.my_waste = ws!=null? ws.booleanValue(): false;
 								IGoal[] goals = (IGoal[])bia.getGoalbase().getGoals("achievemoveto");
 								drawdata.dests = new IVector2[goals.length];
 								for(int i=0; i<goals.length; i++)
