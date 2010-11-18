@@ -45,8 +45,6 @@ may contact us for obtaining a closed source license.
       <import plugin="org.eclipse.gmf.runtime.emf.commands.core"/>
       <import plugin="org.eclipse.gmf.runtime.emf.ui.properties"/>
       <import plugin="org.eclipse.gmf.runtime.diagram.ui"/>
-      <import plugin="org.eclipse.gmf.runtime.diagram.ui.printing"/>
-      <import plugin="org.eclipse.gmf.runtime.diagram.ui.printing.render"/>
       <import plugin="org.eclipse.gmf.runtime.diagram.ui.properties"/>
       <import plugin="org.eclipse.gmf.runtime.diagram.ui.providers"/>
       <import plugin="org.eclipse.gmf.runtime.diagram.ui.providers.ide"/>
@@ -56,16 +54,11 @@ may contact us for obtaining a closed source license.
       <import plugin="org.eclipse.draw2d"/>
       <import plugin="org.eclipse.gmf.runtime.draw2d.ui"/>
       <import plugin="org.eclipse.emf.ecore.edit"/>
-      <import plugin="org.eclipse.ocl.ecore"/>
       <import plugin="org.eclipse.emf.validation"/>
       <import plugin="org.eclipse.gef"/>
-      <import plugin="org.eclipse.ui.views.properties.tabbed"/>
-      <import plugin="org.eclipse.ui.workbench"/>
-      <import plugin="org.eclipse.emf.workspace"/>
-      <import plugin="org.eclipse.gmf.runtime.notation"/>
-      <import plugin="org.eclipse.gmf.runtime.notation.edit"/>
       <import plugin="org.eclipse.stp.bpmn.diagram" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.jdt.core" version="3.5.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ocl.ecore"/>
       <import plugin="org.eclipse.emf.edit"/>
       <import plugin="org.eclipse.wst.common.ui" version="1.1.402" match="greaterOrEqual"/>
       <import plugin="org.eclipse.wst.sse.core" version="1.1.401" match="greaterOrEqual"/>
