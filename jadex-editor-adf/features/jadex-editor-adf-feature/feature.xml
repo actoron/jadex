@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
       id="jadex.editor.adf.feature"
-      label="Jadex ADF Checker Feature"
+      label="Jadex ADF Checker"
       version="1.0.0.qualifier"
       provider-name="jadex.sourceforge.net">
 

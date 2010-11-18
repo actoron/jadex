@@ -2,7 +2,7 @@
 <feature
       id="jadex.editor.bpmn.feature"
       label="Jadex BPMN Editor"
-      version="1.0.0.qualifier"
+      version="1.0.1.qualifier"
       provider-name="Jadex BPMN Editor"
       exclusive="true"
       colocation-affinity="jadex.editor.bpmn.feature">
