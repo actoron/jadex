@@ -11,7 +11,6 @@ import jadex.commons.service.SServiceProvider;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -41,7 +40,7 @@ public class HandleDisasterPlan extends Plan
 		this.ambulanceunits	= new ArrayList();
 		
 		final ISpaceObject disaster = (ISpaceObject)getParameter("disaster").getValue();
-		System.out.println("handle: "+disaster);
+//		System.out.println("handle: "+disaster);
 	
 		final IBeliefSet busy = getBeliefbase().getBeliefSet("busy_entities");	
 		

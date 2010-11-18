@@ -153,7 +153,6 @@ public class Reader
 					handleEndElement(readcontext);
 				}
 			}
-			parser.close();
 			
 			// Handle post-processors.
 			for(int i=1; readcontext.getPostProcessors().size()>0; i++)
@@ -169,9 +168,15 @@ public class Reader
 	//			System.out.println("i: "+i);
 			}
 		}
+		catch(RuntimeException e)
+		{
+			Location	loc	= readcontext.getTopStackElement()!=null ? readcontext.getTopStackElement().getLocation() : parser.getLocation();
+			reporter.report(e.toString(), "XML error", readcontext, loc);
+		}
 		finally
 		{
 			READ_CONTEXT.set(null);
+			parser.close();
 		}
 
 		return readcontext.rootobject;

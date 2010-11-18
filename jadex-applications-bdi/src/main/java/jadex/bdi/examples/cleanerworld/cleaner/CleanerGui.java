@@ -7,7 +7,6 @@ import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IAgentListener;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBDIInternalAccess;
-import jadex.bdi.runtime.IEAExpression;
 import jadex.bdi.runtime.IExpression;
 import jadex.bdi.runtime.IGoal;
 import jadex.bridge.ComponentTerminatedException;
@@ -47,7 +46,7 @@ public class CleanerGui	extends JFrame
 		super(agent.getComponentIdentifier().getName());
 		final JPanel map = new JPanel()
 		{
-			protected IEAExpression	query_max_quantity;
+//			protected IEAExpression	query_max_quantity;
 			protected boolean printed;
 			protected DrawData drawdata = new DrawData();
 			
@@ -75,8 +74,7 @@ public class CleanerGui	extends JFrame
 								drawdata.my_vision = ((Double)bia.getBeliefbase().getBelief("my_vision").getFact()).doubleValue();
 								drawdata.my_chargestate = ((Double)bia.getBeliefbase().getBelief("my_chargestate").getFact()).doubleValue();
 								drawdata.myself = (ISpaceObject)bia.getBeliefbase().getBelief("myself").getFact();
-								Boolean ws = (Boolean)drawdata.myself.getProperty("waste");
-								drawdata.my_waste = ws!=null? ws.booleanValue(): false;
+								drawdata.my_waste = drawdata.myself.getProperty("waste")!=null;
 								IGoal[] goals = (IGoal[])bia.getGoalbase().getGoals("achievemoveto");
 								drawdata.dests = new IVector2[goals.length];
 								for(int i=0; i<goals.length; i++)

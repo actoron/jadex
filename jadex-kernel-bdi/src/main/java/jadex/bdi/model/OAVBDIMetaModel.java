@@ -960,7 +960,7 @@ public class OAVBDIMetaModel
 		expression_has_language = expression_type.createAttributeType("mexpression_has_language", OAVJavaType.java_string_type, OAVAttributeType.NONE);//, "java");
 		expression_has_variable = expression_type.createAttributeType("mexpression_has_variable", OAVJavaType.java_string_type, OAVAttributeType.NONE);
 		expression_has_text = expression_type.createAttributeType("expression_has_text", OAVJavaType.java_string_type);
-		expression_has_parsed = expression_type.createAttributeType("mexpression_has_content", OAVJavaType.java_object_type);// java_parsedexpression_type)
+		expression_has_parsed = expression_type.createAttributeType("expression_has_parsed", OAVJavaType.java_object_type);// java_parsedexpression_type)
 		expression_has_classname = expression_type.createAttributeType("mexpression_has_classname", OAVJavaType.java_string_type, OAVAttributeType.NONE);
 		expression_has_class = expression_type.createAttributeType("mexpression_has_class", OAVJavaType.java_class_type, OAVAttributeType.NONE, Object.class);
 

@@ -435,7 +435,7 @@ public class OAVBDIXMLReader
 			{
 				String lang = (String)state.getAttributeValue(object, OAVBDIMetaModel.expression_has_language);
 				
-				if(state.getType(object).isSubtype(OAVBDIMetaModel.condition_type) && !state.getType(object).isSubtype(OAVBDIMetaModel.inhibits_type))
+				if(state.getType(object).isSubtype(OAVBDIMetaModel.condition_type))
 				{
 					// Conditions now parsed in createAgentModelEntry...
 					
