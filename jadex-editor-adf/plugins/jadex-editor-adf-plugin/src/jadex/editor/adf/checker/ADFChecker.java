@@ -43,6 +43,12 @@ public class ADFChecker extends IncrementalProjectBuilder
 		".application.xml", "jadex.application.ApplicationComponentFactory"
 	};
 	
+	//-------- attributes --------
+	
+	/** The map holding the cache. */
+	protected Map	cache;
+
+	
 	//-------- IncrementalProjectBuilder methods --------
 	
 	/**
@@ -50,9 +56,6 @@ public class ADFChecker extends IncrementalProjectBuilder
 	 */
 	protected IProject[] build(int kind, Map args, final IProgressMonitor monitor) throws CoreException
 	{
-		// Clear cache
-		cache	= null;
-		
 //		final int[]	cnt	= new int[2];
 //		long	start	= System.nanoTime();
 		
@@ -116,6 +119,9 @@ public class ADFChecker extends IncrementalProjectBuilder
 		
 //		long	end	= System.nanoTime();
 //		System.out.println("ADFChecker took "+((end-start)/100000000/10.0)+" seconds for checking "+cnt[1]+" of "+cnt[0]+" resources.");
+		
+		// Clear cache
+		cache	= null;
 		
 		// No dependent projects.
 		return null;
@@ -247,9 +253,6 @@ public class ADFChecker extends IncrementalProjectBuilder
 	}
 	
 	//-------- caching for speed --------
-	
-	/** The map holding the cache. */
-	protected Map	cache;
 	
 	/**
 	 *  Get the factory object for the given factory name.
