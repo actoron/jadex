@@ -270,49 +270,40 @@ public class CoordinationSpace extends Grid2D
 	/**
 	 * Called when an component was added.
 	 */
-	public void componentAdded(IComponentIdentifier aid, String type)
+	public void componentAdded(IComponentIdentifier aid)
 	{
-		synchronized (monitor)
+		synchronized(monitor)
 		{
 			// Possibly add or create avatar(s) if any.
-			if (initialavatars != null && initialavatars.containsKey(aid))
+			List ownedobjs = (List)spaceobjectsbyowner.get(aid);
+			if(ownedobjs==null)
 			{
-				Object[] ia = (Object[]) initialavatars.get(aid);
-				String objecttype = (String) ia[0];
-				Map props = (Map) ia[1];
-				if (props == null)
-					props = new HashMap();
-				props.put(ISpaceObject.PROPERTY_OWNER, aid);
-				createSpaceObject(objecttype, props, null);
-			} else
+				createAvatar(aid, null, false);
+			}
+			else
 			{
-				String componenttype = getContext().getComponentType(aid);
-				if (componenttype != null && avatarmappings.getCollection(componenttype) != null)
+				// Init zombie avatars.
+				for(Iterator it=ownedobjs.iterator(); it.hasNext(); )
 				{
-					for (Iterator it = avatarmappings.getCollection(componenttype).iterator(); it.hasNext();)
+					ISpaceObject	obj	= (ISpaceObject)it.next();
+					if(!spaceobjects.containsKey(obj.getId()))
 					{
-						AvatarMapping mapping = (AvatarMapping) it.next();
-						if (mapping.isCreateAvatar())
-						{
-							Map props = new HashMap();
-							props.put(ISpaceObject.PROPERTY_OWNER, aid);
-							createSpaceObject(mapping.getObjectType(), props, null);
-						}
+						initSpaceObject(obj);
 					}
 				}
 			}
-
-			if (perceptgenerators != null)
+			
+			if(perceptgenerators!=null)
 			{
-				for (Iterator it = perceptgenerators.keySet().iterator(); it.hasNext();)
+				for(Iterator it=perceptgenerators.keySet().iterator(); it.hasNext(); )
 				{
-					IPerceptGenerator gen = (IPerceptGenerator) perceptgenerators.get(it.next());
+					IPerceptGenerator gen = (IPerceptGenerator)perceptgenerators.get(it.next());
 					gen.componentAdded(aid, this);
 				}
 			}
 			// init Agent for deco4MAS participation
 			initParticipatingAgent(aid);
-		}
+		}	
 	}
 
 	/**

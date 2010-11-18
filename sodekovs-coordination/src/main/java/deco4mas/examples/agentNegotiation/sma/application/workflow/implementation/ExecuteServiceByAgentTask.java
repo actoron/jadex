@@ -5,6 +5,7 @@ import jadex.bpmn.runtime.ITask;
 import jadex.bpmn.runtime.ITaskContext;
 import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentManagementService;
+import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.ThreadSuspendable;
 import jadex.commons.concurrent.IResultListener;
@@ -20,59 +21,52 @@ import deco4mas.examples.agentNegotiation.evaluate.AgentLogger;
 /**
  * Task executed by agent
  */
-public class ExecuteServiceByAgentTask implements ITask
-{
+public class ExecuteServiceByAgentTask implements ITask {
 	static int id = 0;
 
-	public void execute(final ITaskContext context, BpmnInterpreter instance, final IResultListener listener)
-	{
-		try
-		{
-			final Logger workflowLogger = AgentLogger.getTimeEvent(instance.getComponentIdentifier().getLocalName());
+	public IFuture execute(final ITaskContext context, BpmnInterpreter instance) {
+		final Future fut = new Future();
+		final Logger workflowLogger = AgentLogger.getTimeEvent(instance.getComponentIdentifier().getLocalName());
 
-			workflowLogger.info(context.getActivity().getName() + "[" + context.getParameterValue("serviceType") + "]" + " start");
-			System.out
-				.println("Bpmn task (" + context.getActivity().getName() + "/" + ((ServiceType)context.getParameterValue("serviceType")).getName() + ") start");
+		workflowLogger.info(context.getActivity().getName() + "[" + context.getParameterValue("serviceType") + "]" + " start");
+		System.out
+				.println("Bpmn task (" + context.getActivity().getName() + "/" + ((ServiceType) context.getParameterValue("serviceType")).getName() + ") start");
 
-			IComponentManagementService cms = (IComponentManagementService)SServiceProvider.getServiceUpwards(
+		IComponentManagementService cms = (IComponentManagementService) SServiceProvider.getServiceUpwards(
 					instance.getServiceProvider(), IComponentManagementService.class).get(new ThreadSuspendable());
 
-			String name = context.getActivity().getName() + "_ID" + id;
-			id++;
-			String model = "deco4mas/examples/agentNegotiation/sma/application/workflow/implementation/taskHandler/TaskHandler.agent.xml";
+		String name = context.getActivity().getName() + "_ID" + id;
+		id++;
+		String model = "deco4mas/examples/agentNegotiation/sma/application/workflow/implementation/taskHandler/TaskHandler.agent.xml";
 
-			Map args = new HashMap();
+		Map args = new HashMap();
 
-			IResultListener lis = new IResultListener()
+		IResultListener lis = new IResultListener()
 			{
 				public void resultAvailable(Object source, Object result)
 				{
 					workflowLogger.info(context.getActivity().getName() + "[" + context.getParameterValue("serviceType") + "]" + " end");
 					try
 					{
-						listener.resultAvailable(ExecuteServiceByAgentTask.this, result);
+						fut.setResult(result);
 					} catch (Exception e)
 					{
 						// omit, "may cause exeption at termination"
 					}
-					
+
 				}
 
 				public void exceptionOccurred(Object source, Exception exception)
 				{
-					listener.exceptionOccurred(ExecuteServiceByAgentTask.this, exception);
+					fut.setException(exception);
 				}
 			};
 
-			args.put("taskListener", lis);
-			args.put("taskName", context.getParameterValue("serviceType"));
-			args.put("workflow", instance.getComponentIdentifier());
+		args.put("taskListener", lis);
+		args.put("taskName", context.getParameterValue("serviceType"));
+		args.put("workflow", instance.getComponentIdentifier());
 
-			cms.createComponent(name, model, new CreationInfo(null, args, instance.getComponentIdentifier()), lis);
-
-		} catch (Exception e)
-		{
-			e.printStackTrace();
-		}
-	}	
+		cms.createComponent(name, model, new CreationInfo(null, args, instance.getComponentIdentifier()), lis);
+		return fut;
+	}
 }

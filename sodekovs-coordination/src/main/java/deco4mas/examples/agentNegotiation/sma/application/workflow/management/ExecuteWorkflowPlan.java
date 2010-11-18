@@ -1,13 +1,15 @@
 package deco4mas.examples.agentNegotiation.sma.application.workflow.management;
 
 import jadex.bdi.runtime.IBDIExternalAccess;
-import jadex.bdi.runtime.IEAInternalEvent;
+import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IInternalEvent;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IInternalAccess;
 import jadex.commons.IFuture;
 import jadex.commons.ThreadSuspendable;
 import jadex.commons.concurrent.IResultListener;
@@ -60,8 +62,17 @@ public class ExecuteWorkflowPlan extends Plan
 					// workflow executed -> init InternalEvent
 					try
 					{
-						IEAInternalEvent workflowExecuted = (IEAInternalEvent) myExternalAccess.createInternalEvent("workflowExecuted").get(new ThreadSuspendable());
-						myExternalAccess.dispatchInternalEvent(workflowExecuted);
+						myExternalAccess.scheduleStep(new IComponentStep() {
+							
+							@Override
+							public Object execute(IInternalAccess ia) {
+								IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+								IInternalEvent workflowExecuted = bia.getEventbase().createInternalEvent("workflowExecuted");
+								bia.getEventbase().dispatchInternalEvent(workflowExecuted);
+								return null;
+							}
+						});
+						
 					} catch (Exception e)
 					{
 						//omit

@@ -4,6 +4,7 @@ import jadex.bdi.runtime.GoalFailureException;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 import jadex.bpmn.runtime.BpmnInterpreter;
+import jadex.bpmn.runtime.ExternalAccess;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.commons.IFuture;
@@ -34,7 +35,8 @@ public class ExecuteTaskPlan extends Plan
 					getScope().getServiceProvider(), IComponentManagementService.class).get(this));
 						
 			IFuture fut = cms.getExternalAccess((IComponentIdentifier) getBeliefbase().getBelief("workflow").getFact());
-			BpmnInterpreter workflow = (BpmnInterpreter) fut.get(this);
+			ExternalAccess exta = (ExternalAccess) fut.get(this);
+			BpmnInterpreter workflow = (BpmnInterpreter) exta.getInterpreter();
 
 			IComponentIdentifier sma = (IComponentIdentifier) workflow.getContextVariable("sma");
 //			System.out.println("Task  -> " + sma.getLocalName());

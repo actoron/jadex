@@ -163,7 +163,7 @@ public class InitBDIAgentForCoordination
 		// decom4MasMap.put(Constants.IOAV_STATE, this.getState());
 		// decom4MasMap.put(Constants.R_CAPABILITY, this.getRCapability());
 
-		System.out.println("#InitBDIAgentCoordinationPlan-" + exta.getComponentName() + "# Completed initialization: "
+		System.out.println("#InitBDIAgentCoordinationPlan-" + exta.getComponentIdentifier().getName() + "# Completed initialization: "
 			+ numberOfPublishPercepts + " PublishPercepts and " + numberOfPerceivePercepts + " PerceivePercepts");
 
 		// agentData.put(getAgentType(ai, this.getContext()), res);

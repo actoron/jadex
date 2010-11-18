@@ -7,6 +7,7 @@ import jadex.application.space.envsupport.environment.IEnvironmentSpace;
 import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IBDIExternalAccess;
+import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bdi.runtime.IBeliefListener;
 import jadex.bdi.runtime.IBeliefSetListener;
 import jadex.bdi.runtime.IBeliefbase;
@@ -23,6 +24,9 @@ import jadex.bdi.runtime.impl.flyweights.GoalbaseFlyweight;
 import jadex.bdi.runtime.impl.flyweights.PlanbaseFlyweight;
 import jadex.bdi.runtime.interpreter.AgentRules;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IInternalAccess;
+import jadex.commons.IFuture;
 import jadex.commons.ThreadSuspendable;
 import jadex.rules.state.IOAVState;
 
@@ -100,9 +104,9 @@ public class BDIBehaviorObservationComponent
 	// private void publishEvent(AgentEvent ae, AgentElementType
 	// agentElementType, String agentElementName, Collection toAgents,
 	// HashMap<String, Object> parameterDataMappings) {
-	private void publishEvent(Object value, HashMap<String, Object> parameterDataMappings, String agentElementName, AgentElementType agentElementType, String dmlRealizationName)
+	private void publishEvent(Object value, HashMap<String, Object> parameterDataMappings, String agentElementName, AgentElementType agentElementType, String dmlRealizationName, IBDIInternalAccess bia)
 	{
-		CoordinationInfo coordInfo = new CoordinationInfo();
+		final CoordinationInfo coordInfo = new CoordinationInfo();
 		coordInfo.setName("MediumCoordInfo-" + new Date().getTime());
 		coordInfo.setType(CoordinationSpaceObject.COORDINATION_INFORMATION_TYPE);
 		coordInfo.addValue(CoordinationSpaceObject.AGENT_ARCHITECTURE, "BDI");
@@ -112,7 +116,9 @@ public class BDIBehaviorObservationComponent
 		coordInfo.addValue(Constants.PARAMETER_DATA_MAPPING, parameterDataMappings);
 		coordInfo.addValue(Constants.DML_REALIZATION_NAME, dmlRealizationName);
 
-		eventPublication.publishEvent(coordInfo, (IEnvironmentSpace) exta.getBeliefbase().getBeliefFact("env").get(new ThreadSuspendable()));
+		IEnvironmentSpace space = (IEnvironmentSpace) bia.getBeliefbase().getBelief("env").getFact();
+		eventPublication.publishEvent(coordInfo, space);
+		
 	}
 
 	public void initBeliefListener(AgentElement agentElement, String mechanismRealizationId)
@@ -497,7 +503,7 @@ public class BDIBehaviorObservationComponent
 	 * @return if !=null then applicable. contains then a map of the parameter
 	 *         and data mappings
 	 */
-	private HashMap<String, Object> publishWhenApplicable(String key, AgentEvent ae, AgentElementType agentElementType)
+	private HashMap<String, Object> publishWhenApplicable(String key, AgentEvent ae, AgentElementType agentElementType, IBDIInternalAccess bia)
 	{
 
 		// behObserver.getRoleDefinitions().put(ae.getElement_id() + "::" +
@@ -524,7 +530,7 @@ public class BDIBehaviorObservationComponent
 
 		return CheckRole.checkForPublish(
 			roleDefinitionsForPublish.get(Constants.PUBLISH + "::" + key + "::" + agentElementType.toString()), parameterAndDataMappings
-				.get(Constants.PUBLISH + "::" + key + "::" + agentElementType.toString()), ae, exta);
+				.get(Constants.PUBLISH + "::" + key + "::" + agentElementType.toString()), ae, bia);
 	}
 
 	// /**
@@ -581,26 +587,31 @@ public class BDIBehaviorObservationComponent
 	private String getNameOfAgentElement(AgentEvent ae, AgentElementType agentElementType)
 	{
 
-		if (agentElementType.equals(AgentElementType.BDI_BELIEFSET))
+//		if (agentElementType.equals(AgentElementType.BDI_BELIEFSET))
+//		{
+//			return ae.getSource().toString().substring(ae.getSource().toString().indexOf("BeliefSet(") + 10,
+//				ae.getSource().toString().indexOf("-beliefset_"));
+//		} else if (agentElementType.equals(AgentElementType.BDI_BELIEF))
+//		{
+//			return ae.getSource().toString().substring(ae.getSource().toString().indexOf("Belief(") + 7,
+//				ae.getSource().toString().indexOf("-belief_"));
+//		} else if (agentElementType.equals(AgentElementType.BDI_GOAL))
+//		{
+//			return ae.getSource().toString().substring(ae.getSource().toString().indexOf("Goal(") + 5,
+//				ae.getSource().toString().indexOf("-goal_"));
+//		} else if (agentElementType.equals(AgentElementType.BDI_PLAN))
+//		{
+//			return ae.getSource().toString().substring(ae.getSource().toString().indexOf("Plan(") + 5,
+//				ae.getSource().toString().indexOf("-plan_"));
+//		} else if (agentElementType.equals(AgentElementType.INTERNAL_EVENT))
+//		{
+//			return ae.getSource().toString().substring(ae.getSource().toString().indexOf("InternalEvent(") + 14,
+//				ae.getSource().toString().indexOf("-internalevent_"));
+//		}
+
+		if  (agentElementType != null)
 		{
-			return ae.getSource().toString().substring(ae.getSource().toString().indexOf("BeliefSet(") + 10,
-				ae.getSource().toString().indexOf("-beliefset_"));
-		} else if (agentElementType.equals(AgentElementType.BDI_BELIEF))
-		{
-			return ae.getSource().toString().substring(ae.getSource().toString().indexOf("Belief(") + 7,
-				ae.getSource().toString().indexOf("-belief_"));
-		} else if (agentElementType.equals(AgentElementType.BDI_GOAL))
-		{
-			return ae.getSource().toString().substring(ae.getSource().toString().indexOf("Goal(") + 5,
-				ae.getSource().toString().indexOf("-goal_"));
-		} else if (agentElementType.equals(AgentElementType.BDI_PLAN))
-		{
-			return ae.getSource().toString().substring(ae.getSource().toString().indexOf("Plan(") + 5,
-				ae.getSource().toString().indexOf("-plan_"));
-		} else if (agentElementType.equals(AgentElementType.INTERNAL_EVENT))
-		{
-			return ae.getSource().toString().substring(ae.getSource().toString().indexOf("InternalEvent(") + 14,
-				ae.getSource().toString().indexOf("-internalevent_"));
+			return ae.getSource().getModelElement().getName();
 		}
 		return null;
 	}
@@ -690,25 +701,32 @@ public class BDIBehaviorObservationComponent
 	 * ALL DCM that are interested in this event (i.e. that have registered an
 	 * listener) and dispatch event to medium if role definition is satisfied.
 	 */
-	private void checkAndPublishIfApplicable(AgentEvent ae, AgentElementType agentElementType)
+	private void checkAndPublishIfApplicable(final AgentEvent ae, final AgentElementType agentElementType)
 	{
-
-		String nameOfElement = getNameOfAgentElement(ae, agentElementType);
-		// get all the DCM Realizations that have the current AgentEvent as
-		// initiator for a PUBLISH-Event
-		for (String dmlRealizationName : agentEventDCMRealizationMappings.get(agentElementType.toString() + "::" + nameOfElement))
-		{
-			// Check whether role is active.
-			HashMap<String, Object> parameterDataMappings = publishWhenApplicable(dmlRealizationName + "::" + nameOfElement, ae,
-				agentElementType);
-			if (parameterDataMappings != null)
-			{
-				publishEvent(ae.getValue(), parameterDataMappings, nameOfElement, agentElementType, dmlRealizationName);
-			} else
-			{
-				System.out.println("#BDIBehaviorObservationComponent# Role inactive. Event not published to medium or direct publish.");
+		exta.scheduleStep(new IComponentStep() {
+			
+			@Override
+			public Object execute(IInternalAccess ia) {
+				IBDIInternalAccess bia = (IBDIInternalAccess) ia;
+				String nameOfElement = getNameOfAgentElement(ae, agentElementType);
+				// get all the DCM Realizations that have the current AgentEvent as
+				// initiator for a PUBLISH-Event
+				for (String dmlRealizationName : agentEventDCMRealizationMappings.get(agentElementType.toString() + "::" + nameOfElement))
+				{
+					// Check whether role is active.
+					HashMap<String, Object> parameterDataMappings = publishWhenApplicable(dmlRealizationName + "::" + nameOfElement, ae,
+						agentElementType,bia);
+					if (parameterDataMappings != null)
+					{
+						publishEvent(ae.getValue(), parameterDataMappings, nameOfElement, agentElementType, dmlRealizationName,bia);
+					} else
+					{
+						System.out.println("#BDIBehaviorObservationComponent# Role inactive. Event not published to medium or direct publish.");
+					}
+				}
+				return null;
 			}
-		}
+		});
 	}
 
 	/**
