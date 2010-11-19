@@ -134,6 +134,9 @@ public class Starter
 			IModelInfo model = cfac.loadModel(configfile, null, cl);
 	//		System.out.println("Model: "+model);
 			
+			if(model.getReport()!=null)
+				throw new RuntimeException("Error loading model:\n"+model.getReport().getErrorText());
+			
 			// Create an instance of the component.
 			String configname = (String)cmdargs.get("configname")!=null? (String)cmdargs.get("configname"): 
 				model.getConfigurations().length>0?  model.getConfigurations()[0]: null;
