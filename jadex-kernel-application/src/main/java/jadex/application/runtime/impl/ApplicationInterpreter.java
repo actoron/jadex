@@ -555,7 +555,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 	 *  @param application	The context to be deleted.
 	 *  @param listener	The listener to be notified when deletion is finished (if any).
 	 */
-	public void	deleteContext(final IResultListener listener)
+	public void deleteContext()
 	{
 		this.setTerminating(true);
 //		final IComponentIdentifier[]	components	= getComponents();
@@ -619,9 +619,6 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 				ISpace space = (ISpace)it.next();
 				space.terminate();
 			}
-			
-			if(listener!=null)
-				listener.resultAvailable(this, this);
 		}
 	}
 
@@ -1118,6 +1115,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 		}
 		
 		// todo: call some application functionality for terminating?!
+		deleteContext();
 		
 		if(componentlisteners!=null)
 		{

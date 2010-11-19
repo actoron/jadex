@@ -25,7 +25,7 @@ public interface IService extends IRemotable
 	public IServiceIdentifier getServiceIdentifier();
 	
 	/**
-	 *  Get the map of properties (considered as constant)..
+	 *  Get the map of properties (considered as constant).
 	 *  @return The service property map (if any).
 	 */
 	public Map getPropertyMap();
