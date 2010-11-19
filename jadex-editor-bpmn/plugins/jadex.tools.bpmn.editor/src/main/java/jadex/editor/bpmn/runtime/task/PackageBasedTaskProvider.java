@@ -4,6 +4,9 @@
 package jadex.editor.bpmn.runtime.task;
 
 import jadex.editor.bpmn.editor.JadexBpmnEditor;
+import jadex.editor.bpmn.editor.JadexBpmnEditorActivator;
+import jadex.editor.bpmn.editor.preferences.JadexPackageListEditor;
+import jadex.editor.bpmn.editor.preferences.JadexPreferences;
 
 import java.util.List;
 
@@ -40,8 +43,7 @@ public class PackageBasedTaskProvider extends TaskProviderSupport
 	@Override
 	public void dispose()
 	{
-		// TODO Auto-generated method stub
-		
+		// nothing to dispose
 	}
 
 	/* (non-Javadoc)
@@ -92,12 +94,13 @@ public class PackageBasedTaskProvider extends TaskProviderSupport
 	
 	private void initializeSearchPackages()
 	{
-		searchPackages = new UniqueEList<String>();
-		
-		// TODO: use preference instead of static list
-		searchPackages.add("jadex.bpmn.runtime.task");
-		searchPackages.add("jadex.bdibpmn.task");
-		searchPackages.add("jadex.wfms.client.task");
+		searchPackages = JadexPackageListEditor
+						.parseStringList(JadexBpmnEditorActivator
+								.getDefault()
+								.getPreferenceStore()
+								.getString(
+										JadexPreferences.PREFERENCE_TASKPROVIDER_SEARCH_PACKAGE_STRINGLIST));
+
 	}
 	
 }
