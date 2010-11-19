@@ -1,4 +1,4 @@
-package jadex.bdi.examples.antworld;
+package antworld;
 
 import jadex.application.space.envsupport.environment.IEnvironmentSpace;
 import jadex.application.space.envsupport.environment.ISpaceObject;
@@ -7,8 +7,8 @@ import jadex.application.space.envsupport.environment.space2d.Grid2D;
 import jadex.application.space.envsupport.environment.space2d.Space2D;
 import jadex.application.space.envsupport.math.IVector2;
 import jadex.application.space.envsupport.math.Vector2Int;
-import jadex.service.clock.IClockService;
 import jadex.commons.SimplePropertyObject;
+import jadex.commons.service.clock.IClockService;
 
 import java.util.ArrayList;
 import java.util.Collection;

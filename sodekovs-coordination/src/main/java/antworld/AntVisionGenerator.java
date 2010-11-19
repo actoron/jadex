@@ -1,4 +1,4 @@
-package jadex.bdi.examples.antworld;
+package antworld;
 
 import jadex.application.space.envsupport.environment.AbstractEnvironmentSpace;
 import jadex.application.space.envsupport.environment.EnvironmentEvent;
@@ -148,5 +148,19 @@ public class AntVisionGenerator extends SimplePropertyObject implements IPercept
 			}
 		}
 		return null;
+	}
+
+	@Override
+	public void componentAdded(IComponentIdentifier component,
+			IEnvironmentSpace space) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void componentRemoved(IComponentIdentifier component,
+			IEnvironmentSpace space) {
+		// TODO Auto-generated method stub
+		
 	}
 }

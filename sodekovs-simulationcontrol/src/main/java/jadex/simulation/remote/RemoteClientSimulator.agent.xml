@@ -100,7 +100,7 @@
 	</properties>
 
 	<services>
-		<offeredservice class="IRemoteSimulationExecutionService" decoupled="true">new RemoteSimulationExecutionService($scope, "betaTest01")</offeredservice>
+		<providedservice class="IRemoteSimulationExecutionService">new RemoteSimulationExecutionService($scope, "betaTest01")</providedservice>
 	</services>
 			
 	<configurations>

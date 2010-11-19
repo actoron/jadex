@@ -1,4 +1,4 @@
-package jadex.bdi.examples.antworld;
+package antworld;
 
 import jadex.application.space.envsupport.environment.ISpaceAction;
 import jadex.application.space.envsupport.environment.ISpaceObject;

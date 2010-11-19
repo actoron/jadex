@@ -1,10 +1,10 @@
-package jadex.bdi.examples.antworld.environment;
+package antworld.environment;
 
-import jadex.adapter.base.ISimulationService;
 import jadex.application.space.envsupport.environment.ISpaceObject;
 import jadex.application.space.envsupport.environment.space2d.Space2D;
+import jadex.base.service.simulation.ISimulationService;
 import jadex.bdi.runtime.Plan;
-import jadex.service.IServiceContainer;
+import jadex.commons.service.IServiceContainer;
 
 import java.awt.Color;
 import java.awt.GridLayout;
@@ -80,9 +80,9 @@ public class UpdateEnvironmentPlan extends Plan {
 			dynamicSettingsPanel.add(new JLabel("Simulation End Time: " + String.valueOf(longToDateString(System.currentTimeMillis()))), 1);
 			
 			//Stop Siumlation when target condition true.
-			IServiceContainer container = getExternalAccess().getServiceContainer();
-			ISimulationService simServ = (ISimulationService)container.getService(ISimulationService.class);
-			simServ.pause();
+//			IServiceContainer container = getExternalAccess().getServiceContainer();
+//			ISimulationService simServ = (ISimulationService)container.getService(ISimulationService.class);
+//			simServ.pause();
 		}
 
 		dynamicSettingsPanel.remove(2);

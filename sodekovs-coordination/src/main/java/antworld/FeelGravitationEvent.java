@@ -1,4 +1,4 @@
-package jadex.bdi.examples.antworld;
+package antworld;
 
 import jadex.application.space.envsupport.environment.ObjectEvent;
 import jadex.application.space.envsupport.math.IVector2;
