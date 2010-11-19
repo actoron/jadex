@@ -9,6 +9,7 @@ import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SimpleValueFetcher;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -355,6 +356,22 @@ public class SpaceObject extends SynchronizedPropertyObject implements ISpaceObj
 				}
 			}
 		}
+	}
+	
+	/**
+	 *  Bean accessor.
+	 *  For serializing a space object,
+	 *  replace dynamic expressions with current values.
+	 */
+	public Map getProperties()
+	{
+		Map	ret	= new HashMap();
+		for(Iterator it=getPropertyNames().iterator(); it.hasNext(); )
+		{
+			String	prop	= (String)it.next();
+			ret.put(prop, getProperty(prop));
+		}
+		return ret;
 	}
 	
 	/**

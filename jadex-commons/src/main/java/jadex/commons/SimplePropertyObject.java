@@ -79,7 +79,6 @@ public class SimplePropertyObject implements IPropertyObject
 	 */
 	public Map	getProperties()
 	{
-		
 		return this.properties;
 	}
 
