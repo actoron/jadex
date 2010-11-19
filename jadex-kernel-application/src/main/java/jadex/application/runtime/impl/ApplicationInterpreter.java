@@ -614,10 +614,13 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 //		}
 //		else
 		{
-			for(Iterator it=spaces.values().iterator(); it.hasNext(); )
+			if(spaces!=null && spaces.values()!=null)
 			{
-				ISpace space = (ISpace)it.next();
-				space.terminate();
+				for(Iterator it=spaces.values().iterator(); it.hasNext(); )
+				{
+					ISpace space = (ISpace)it.next();
+					space.terminate();
+				}
 			}
 		}
 	}
