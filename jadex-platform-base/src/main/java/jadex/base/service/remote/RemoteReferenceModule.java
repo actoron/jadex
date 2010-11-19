@@ -815,10 +815,12 @@ public class RemoteReferenceModule
 							{
 								if(DEBUG)
 									System.out.println("Removing expired holder: "+rr+" "+rrh+" "+rrh.getExpiryDate()+" "+System.currentTimeMillis());
-								hds.remove(rrh);
+								it2.remove();
+//								hds.remove(rrh);
 								if(hds.size()==0)
 								{
-									holders.remove(rr);
+									it.remove();
+//									holders.remove(rr);
 									deleteRemoteReference(rr);
 								}
 							}
