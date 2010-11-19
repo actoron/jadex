@@ -5,15 +5,16 @@ import jadex.bdi.examples.blackjack.Player;
 import jadex.bdi.examples.blackjack.gui.GUIImageLoader;
 import jadex.bdi.examples.blackjack.player.strategies.AbstractStrategy;
 import jadex.bdi.runtime.AgentEvent;
-import jadex.bdi.runtime.IAgentListener;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IGoalListener;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.commons.ChangeEvent;
 import jadex.commons.SGUI;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.commons.service.SServiceProvider;
@@ -184,9 +185,9 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 			public Object execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
-				bia.addAgentListener(new IAgentListener()
+				bia.addComponentListener(new IComponentListener()
 				{
-					public void agentTerminating(AgentEvent ae)
+					public void componentTerminating(ChangeEvent ae)
 					{
 						SwingUtilities.invokeLater(new Runnable()
 						{
@@ -197,7 +198,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 						});
 					}
 					
-					public void agentTerminated(AgentEvent ae)
+					public void componentTerminated(ChangeEvent ae)
 					{
 					}
 				});

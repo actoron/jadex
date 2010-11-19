@@ -11,7 +11,7 @@ import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentFactory;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
-import jadex.bridge.IComponentListener;
+import jadex.bridge.ICMSComponentListener;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IMessageService;
@@ -260,7 +260,7 @@ public abstract class ComponentManagementService extends BasicService implements
 							{
 								// Create the component instance.
 								IComponentAdapter adapter;
-								IComponentListener[] alisteners;
+								ICMSComponentListener[] alisteners;
 								
 								synchronized(adapters)
 								{
@@ -313,7 +313,7 @@ public abstract class ComponentManagementService extends BasicService implements
 								{
 									Set	slisteners	= new HashSet(listeners.getCollection(null));
 									slisteners.addAll(listeners.getCollection(cid));
-									alisteners	= (IComponentListener[])slisteners.toArray(new IComponentListener[slisteners.size()]);
+									alisteners	= (ICMSComponentListener[])slisteners.toArray(new ICMSComponentListener[slisteners.size()]);
 								}
 								for(int i=0; i<alisteners.length; i++)
 								{
@@ -763,12 +763,12 @@ public abstract class ComponentManagementService extends BasicService implements
 				}
 			}
 			
-			IComponentListener[]	alisteners;
+			ICMSComponentListener[]	alisteners;
 			synchronized(listeners)
 			{
 				Set	slisteners	= new HashSet(listeners.getCollection(null));
 				slisteners.addAll(listeners.getCollection(cid));
-				alisteners	= (IComponentListener[])slisteners.toArray(new IComponentListener[slisteners.size()]);
+				alisteners	= (ICMSComponentListener[])slisteners.toArray(new ICMSComponentListener[slisteners.size()]);
 			}
 			// todo: can be called after listener has (concurrently) deregistered
 			for(int i=0; i<alisteners.length; i++)
@@ -858,12 +858,12 @@ public abstract class ComponentManagementService extends BasicService implements
 			
 			if(changed)
 			{
-				IComponentListener[]	alisteners;
+				ICMSComponentListener[]	alisteners;
 				synchronized(listeners)
 				{
 					Set	slisteners	= new HashSet(listeners.getCollection(null));
 					slisteners.addAll(listeners.getCollection(cid));
-					alisteners	= (IComponentListener[])slisteners.toArray(new IComponentListener[slisteners.size()]);
+					alisteners	= (ICMSComponentListener[])slisteners.toArray(new ICMSComponentListener[slisteners.size()]);
 				}
 				// todo: can be called after listener has (concurrently) deregistered
 				for(int i=0; i<alisteners.length; i++)
@@ -1004,12 +1004,12 @@ public abstract class ComponentManagementService extends BasicService implements
 				ad.setBreakpoints(breakpoints);
 			}
 			
-			IComponentListener[]	alisteners;
+			ICMSComponentListener[]	alisteners;
 			synchronized(listeners)
 			{
 				Set	slisteners	= new HashSet(listeners.getCollection(null));
 				slisteners.addAll(listeners.getCollection(cid));
-				alisteners	= (IComponentListener[])slisteners.toArray(new IComponentListener[slisteners.size()]);
+				alisteners	= (ICMSComponentListener[])slisteners.toArray(new ICMSComponentListener[slisteners.size()]);
 			}
 			// todo: can be called after listener has (concurrently) deregistered
 			for(int i=0; i<alisteners.length; i++)
@@ -1031,7 +1031,7 @@ public abstract class ComponentManagementService extends BasicService implements
      *  @param comp  The component to be listened on (or null for listening on all components).
      *  @param listener  The listener to be added.
      */
-    public void addComponentListener(IComponentIdentifier comp, IComponentListener listener)
+    public void addComponentListener(IComponentIdentifier comp, ICMSComponentListener listener)
     {
 		synchronized(listeners)
 		{
@@ -1044,7 +1044,7 @@ public abstract class ComponentManagementService extends BasicService implements
      *  @param comp  The component to be listened on (or null for listening on all components).
      *  @param listener  The listener to be removed.
      */
-    public void removeComponentListener(IComponentIdentifier comp, IComponentListener listener)
+    public void removeComponentListener(IComponentIdentifier comp, ICMSComponentListener listener)
     {
 		synchronized(listeners)
 		{
@@ -1132,12 +1132,12 @@ public abstract class ComponentManagementService extends BasicService implements
 			}
 			// else parent has just been killed.
 			
-			IComponentListener[] alisteners;
+			ICMSComponentListener[] alisteners;
 			synchronized(listeners)
 			{
 				Set	slisteners	= new HashSet(listeners.getCollection(null));
 				slisteners.addAll(listeners.getCollection(cid));
-				alisteners	= (IComponentListener[])slisteners.toArray(new IComponentListener[slisteners.size()]);
+				alisteners	= (ICMSComponentListener[])slisteners.toArray(new ICMSComponentListener[slisteners.size()]);
 			}
 			
 			// todo: can be called after listener has (concurrently) deregistered
@@ -1663,12 +1663,12 @@ public abstract class ComponentManagementService extends BasicService implements
 		
 		if(desc!=null)
 		{
-			IComponentListener[]	alisteners;
+			ICMSComponentListener[]	alisteners;
 			synchronized(listeners)
 			{
 				Set	slisteners	= new HashSet(listeners.getCollection(null));
 				slisteners.addAll(listeners.getCollection(comp));
-				alisteners	= (IComponentListener[])slisteners.toArray(new IComponentListener[slisteners.size()]);
+				alisteners	= (ICMSComponentListener[])slisteners.toArray(new ICMSComponentListener[slisteners.size()]);
 			}
 			// todo: can be called after listener has (concurrently) deregistered
 			for(int i=0; i<alisteners.length; i++)
@@ -1702,12 +1702,12 @@ public abstract class ComponentManagementService extends BasicService implements
 			desc.setState(state);			
 		}
 		
-		IComponentListener[]	alisteners;
+		ICMSComponentListener[]	alisteners;
 		synchronized(listeners)
 		{
 			Set	slisteners	= new HashSet(listeners.getCollection(null));
 			slisteners.addAll(listeners.getCollection(comp));
-			alisteners	= (IComponentListener[])slisteners.toArray(new IComponentListener[slisteners.size()]);
+			alisteners	= (ICMSComponentListener[])slisteners.toArray(new ICMSComponentListener[slisteners.size()]);
 		}
 		// todo: can be called after listener has (concurrently) deregistered
 		for(int i=0; i<alisteners.length; i++)

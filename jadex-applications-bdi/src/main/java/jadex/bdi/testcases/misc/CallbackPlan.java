@@ -4,7 +4,6 @@ import jadex.base.fipa.SFipa;
 import jadex.base.test.TestReport;
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.GoalFailureException;
-import jadex.bdi.runtime.IAgentListener;
 import jadex.bdi.runtime.IBeliefListener;
 import jadex.bdi.runtime.IBeliefSetListener;
 import jadex.bdi.runtime.IGoal;
@@ -15,6 +14,8 @@ import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.IMessageEventListener;
 import jadex.bdi.runtime.IPlanListener;
 import jadex.bdi.runtime.Plan;
+import jadex.bridge.IComponentListener;
+import jadex.commons.ChangeEvent;
 
 import java.util.logging.Logger;
 
@@ -378,9 +379,9 @@ public class CallbackPlan extends Plan
 		});
 			
 		final TestReport tr16 = new TestReport("#16", "Test if agent killed can be observed in a listener.");
-		getScope().addAgentListener(new IAgentListener()
+		getScope().addComponentListener(new IComponentListener()
 		{
-			public void agentTerminating(AgentEvent ae)
+			public void componentTerminating(ChangeEvent ae)
 			{
 				logger.info("Agent terminating invoked");
 //				getExternalAccess().removeAgentListener(this);
@@ -389,7 +390,7 @@ public class CallbackPlan extends Plan
 				getBeliefbase().getBeliefSet("testcap.reports").addFact(tr16);
 			}
 			
-			public void agentTerminated(AgentEvent ae)
+			public void componentTerminated(ChangeEvent ae)
 			{
 				logger.info("Agent terminated invoked");
 			}

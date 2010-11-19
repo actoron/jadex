@@ -8,7 +8,7 @@ import jadex.base.gui.plugin.SJCC;
 import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentListener;
+import jadex.bridge.ICMSComponentListener;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IModelInfo;
 import jadex.commons.Properties;
@@ -58,7 +58,7 @@ import javax.swing.event.TreeSelectionListener;
 /**
  *  The starter plugin.
  */
-public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListener
+public class StarterPlugin extends AbstractJCCPlugin	implements ICMSComponentListener
 {
 	//-------- constants --------
 

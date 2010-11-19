@@ -1,15 +1,15 @@
 package jadex.bdi.planlib.cms;
 
-import jadex.bdi.runtime.AgentEvent;
-import jadex.bdi.runtime.IAgentListener;
 import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.ComponentTerminatedException;
+import jadex.bridge.ICMSComponentListener;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.commons.ChangeEvent;
 import jadex.commons.IFuture;
 import jadex.commons.service.SServiceProvider;
 
@@ -21,7 +21,7 @@ public class CMSLocalUpdateComponentsPlan extends Plan
 	//-------- attributes --------
 	
 	/** The listener. */
-	protected IComponentListener	listener;
+	protected ICMSComponentListener	listener;
 	
 	//-------- methods --------
 	
@@ -32,7 +32,7 @@ public class CMSLocalUpdateComponentsPlan extends Plan
 	{
 		final IComponentManagementService	ces	= (IComponentManagementService)SServiceProvider.getServiceUpwards(
 			getScope().getServiceProvider(), IComponentManagementService.class).get(this);
-		this.listener	= new IComponentListener()
+		this.listener	= new ICMSComponentListener()
 		{
 			public void componentAdded(final IComponentDescription desc)
 			{
@@ -83,15 +83,15 @@ public class CMSLocalUpdateComponentsPlan extends Plan
 		IComponentDescription[] descs = (IComponentDescription[])fut.get(this);
 		getBeliefbase().getBeliefSet("components").addFacts(descs);
 		
-		getScope().addAgentListener(new IAgentListener()
+		getScope().addComponentListener(new IComponentListener()
 		{
 			
-			public void agentTerminating(AgentEvent ae)
+			public void componentTerminating(ChangeEvent ae)
 			{
 				ces.removeComponentListener(null, listener);
 			}
 			
-			public void agentTerminated(AgentEvent ae)
+			public void componentTerminated(ChangeEvent ae)
 			{
 			}
 		});

@@ -3,7 +3,7 @@ package jadex.base.gui.componenttree;
 import jadex.base.gui.ObjectInspectorPanel;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentListener;
+import jadex.bridge.ICMSComponentListener;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IRemoteServiceManagementService;
@@ -120,7 +120,7 @@ public class ComponentTreePanel extends JSplitPane
 	private final Action removeservice;
 
 	/** The component listener. */
-	private final IComponentListener	listener;
+	private final ICMSComponentListener	listener;
 	
 	/** The properties panel. */
 	private final JScrollPane	proppanel;
@@ -164,7 +164,7 @@ public class ComponentTreePanel extends JSplitPane
 		this.add(proppanel);
 		this.setResizeWeight(1.0);
 				
-		listener	= new IComponentListener()
+		listener	= new ICMSComponentListener()
 		{
 			public void componentRemoved(final IComponentDescription desc, Map results)
 			{

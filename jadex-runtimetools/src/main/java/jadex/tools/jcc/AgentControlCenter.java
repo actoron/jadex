@@ -1,11 +1,11 @@
 package jadex.tools.jcc;
 
-import jadex.bdi.runtime.AgentEvent;
-import jadex.bdi.runtime.IAgentListener;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBDIInternalAccess;
+import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.commons.ChangeEvent;
 import jadex.commons.service.IServiceProvider;
 
 import javax.swing.SwingUtilities;
@@ -35,9 +35,9 @@ public class AgentControlCenter extends ControlCenter
 		{
 			public Object execute(IInternalAccess ia)
 			{
-				((IBDIInternalAccess)ia).addAgentListener(new IAgentListener()
+				((IBDIInternalAccess)ia).addComponentListener(new IComponentListener()
 				{
-					public void agentTerminating(AgentEvent ae)
+					public void componentTerminating(ChangeEvent ae)
 					{
 						SwingUtilities.invokeLater(new Runnable()
 						{
@@ -56,7 +56,7 @@ public class AgentControlCenter extends ControlCenter
 						});
 					}
 
-					public void agentTerminated(AgentEvent ae)
+					public void componentTerminated(ChangeEvent ae)
 					{
 					}
 				});

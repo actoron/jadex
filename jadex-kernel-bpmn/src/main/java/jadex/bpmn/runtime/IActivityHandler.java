@@ -1,6 +1,7 @@
 package jadex.bpmn.runtime;
 
 import jadex.bpmn.model.MActivity;
+import jadex.commons.IFuture;
 
 /**
  *  Handler for executing a BPMN process activity.

@@ -22,12 +22,14 @@ import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentFactory;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
+import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.IModelInfo;
+import jadex.commons.ChangeEvent;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.SReflect;
@@ -126,6 +128,9 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 	// Required for startup bug fix in scheduleStep (synchronization between main thread and executor).
 	// While main is running the root component steps, invoke later must not be called to prevent double execution.
 	protected boolean willdostep;
+	
+	/** The component listeners. */
+	protected List componentlisteners;
 	
 	//-------- constructors --------
 	
@@ -1097,6 +1102,26 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 	 */
 	public IFuture cleanupComponent()
 	{
+		if(componentlisteners!=null)
+		{
+			for(int i=0; i<componentlisteners.size(); i++)
+			{
+				IComponentListener lis = (IComponentListener)componentlisteners.get(i);
+				lis.componentTerminating(new ChangeEvent(getComponentIdentifier()));
+			}
+		}
+		
+		// todo: call some application functionality for terminating?!
+		
+		if(componentlisteners!=null)
+		{
+			for(int i=0; i<componentlisteners.size(); i++)
+			{
+				IComponentListener lis = (IComponentListener)componentlisteners.get(i);
+				lis.componentTerminated(new ChangeEvent(getComponentIdentifier()));
+			}
+		}
+		
 		return new Future(null);
 //		return adapter.getServiceContainer().shutdown(); // done in adapter
 	}
@@ -1401,6 +1426,27 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 	public IFuture getChildren()
 	{
 		return adapter.getChildrenAccesses();
+	}
+	
+	/**
+	 *  Add an component listener.
+	 *  @param listener The listener.
+	 */
+	public void addComponentListener(IComponentListener listener)
+	{
+		if(componentlisteners==null)
+			componentlisteners = new ArrayList();
+		componentlisteners.add(listener);
+	}
+	
+	/**
+	 *  Remove a component listener.
+	 *  @param listener The listener.
+	 */
+	public void removeComponentListener(IComponentListener listener)
+	{
+		if(componentlisteners!=null)
+			componentlisteners.remove(listener);
 	}
 	
 }

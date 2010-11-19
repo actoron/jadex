@@ -5,12 +5,12 @@ import jadex.bdi.examples.blackjack.Player;
 import jadex.bdi.examples.blackjack.gui.GUIImageLoader;
 import jadex.bdi.examples.blackjack.gui.GameStateFrame;
 import jadex.bdi.examples.blackjack.gui.PlayerPanel;
-import jadex.bdi.runtime.AgentEvent;
-import jadex.bdi.runtime.IAgentListener;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBDIInternalAccess;
+import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.commons.ChangeEvent;
 import jadex.commons.SGUI;
 import jadex.commons.SimplePropertyChangeSupport;
 
@@ -76,9 +76,9 @@ public class HumanPlayerInterface extends GameStateFrame
 			public Object execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
-				bia.addAgentListener(new IAgentListener()
+				bia.addComponentListener(new IComponentListener()
 				{
-					public void agentTerminating(AgentEvent e)
+					public void componentTerminating(ChangeEvent e)
 					{
 						SwingUtilities.invokeLater(new Runnable()
 						{
@@ -88,7 +88,7 @@ public class HumanPlayerInterface extends GameStateFrame
 							}
 						});
 					}
-					public void agentTerminated(AgentEvent ae)
+					public void componentTerminated(ChangeEvent ae)
 					{
 					}
 				});

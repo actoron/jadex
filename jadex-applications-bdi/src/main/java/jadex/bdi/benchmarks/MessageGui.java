@@ -1,12 +1,13 @@
 package jadex.bdi.benchmarks;
 
 import jadex.bdi.runtime.AgentEvent;
-import jadex.bdi.runtime.IAgentListener;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bdi.runtime.IBeliefListener;
+import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.commons.ChangeEvent;
 import jadex.commons.SGUI;
 
 import java.awt.GridLayout;
@@ -48,9 +49,9 @@ public class MessageGui extends JFrame
 						rec.setText("Received: ["+ae.getValue()+"]");
 					}
 				});
-				bia.addAgentListener(new IAgentListener()
+				bia.addComponentListener(new IComponentListener()
 				{
-					public void agentTerminating(AgentEvent ae)
+					public void componentTerminating(ChangeEvent ae)
 					{
 						SwingUtilities.invokeLater(new Runnable()
 						{
@@ -61,7 +62,7 @@ public class MessageGui extends JFrame
 						});
 					}
 					
-					public void agentTerminated(AgentEvent ae)
+					public void componentTerminated(ChangeEvent ae)
 					{
 					}
 				});

@@ -28,6 +28,14 @@ public class ChangeEvent //extends EventObject
 	/**
 	 *  Create a new event.
 	 */
+	public ChangeEvent(Object source)
+	{
+		this(source, null);
+	}
+	
+	/**
+	 *  Create a new event.
+	 */
 	public ChangeEvent(Object source, String type)
 	{
 		this(source, type, null);

@@ -1,13 +1,13 @@
 package jadex.bdi.examples.blackjack.manager;
 
 import jadex.base.fipa.SFipa;
-import jadex.bdi.runtime.AgentEvent;
-import jadex.bdi.runtime.IAgentListener;
 import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
+import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.commons.ChangeEvent;
 
 import java.awt.EventQueue;
 
@@ -41,13 +41,13 @@ public class ManagerGuiUpdatePlan extends Plan
 			}
 		});
 
-		getScope().addAgentListener(new IAgentListener()
+		getScope().addComponentListener(new IComponentListener()
 		{
-			public void agentTerminated(AgentEvent ae)
+			public void componentTerminated(ChangeEvent ae)
 			{
 			}
 			
-			public void agentTerminating(AgentEvent ae)
+			public void componentTerminating(ChangeEvent ae)
 			{
 				closeGui();
 			}

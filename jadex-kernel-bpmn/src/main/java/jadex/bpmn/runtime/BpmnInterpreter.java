@@ -28,6 +28,7 @@ import jadex.bridge.IComponentAdapterFactory;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
+import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -198,6 +199,10 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 	/** Listeners for activities. */
 	protected List activitylisteners;
 	
+	/** The component listeners. */
+	protected List componentlisteners;
+
+	
 	//-------- constructors --------
 	
 	// todo: 
@@ -227,8 +232,6 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 			context.addThread(new ProcessThread((MActivity)startevents.get(i), context, BpmnInterpreter.this));
 		}
 		initedflag = Boolean.TRUE;
-		
-		activitylisteners = new ArrayList();
 	}	
 		
 	/**
@@ -244,8 +247,6 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 		this.inited = inited;
 		this.variables	= new HashMap();
 		construct(model, arguments, config, parent, activityhandlers, stephandlers, fetcher);
-		
-		activitylisteners = new ArrayList();
 	}
 	
 	/**
@@ -549,6 +550,15 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 		final Future ret = new Future();
 		// Todo: cleanup required???
 		
+		if(componentlisteners!=null)
+		{
+			for(int i=0; i<componentlisteners.size(); i++)
+			{
+				IComponentListener lis = (IComponentListener)componentlisteners.get(i);
+				lis.componentTerminating(new ChangeEvent(adapter.getComponentIdentifier()));
+			}
+		}
+		
 		adapter.invokeLater(new Runnable()
 		{
 			public void run()
@@ -561,6 +571,15 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 //					System.out.println("Cancelling: "+pt.getActivity()+" "+pt.getId());
 				}
 				ret.setResult(adapter.getComponentIdentifier());
+				
+				if(componentlisteners!=null)
+				{
+					for(int i=0; i<componentlisteners.size(); i++)
+					{
+						IComponentListener lis = (IComponentListener)componentlisteners.get(i);
+						lis.componentTerminated(new ChangeEvent(adapter.getComponentIdentifier()));
+					}
+				}
 			}
 		});
 		
@@ -934,7 +953,12 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 				throw new UnsupportedOperationException("No handler for activity: "+thread);
 			if(history!=null)
 				history.add(new HistoryEntry(stepnumber++, thread.getId(), thread.getActivity()));
-			fireExecutingActivity(thread.getId(), thread.getActivity());
+
+			if(thread.getLastEdge()!=null && thread.getLastEdge().getSource()!=null)
+				fireEndActivity(thread.getId(), thread.getLastEdge().getSource());
+			
+			fireStartActivity(thread.getId(), thread.getActivity());
+
 //			System.out.println("Step: "+this.getComponentAdapter().getComponentIdentifier().getName()+" "+thread.getActivity()+" "+thread);
 			MActivity act = thread.getActivity();
 			handler.execute(act, this, thread);
@@ -1355,36 +1379,33 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 	}
 	
 	/**
-	 *  Adds an activity listener. The listener will be called
-	 *  once a process thread executes a new activity.
-	 *  
-	 *  @param listener The activity listener.
+	 *  Fires an activity execution event.
+	 *  @param threadid ID of the executing ProcessThread.
+	 *  @param activity The activity being executed.
 	 */
-	public void addActivityListener(IActivityListener listener)
+	protected void fireStartActivity(String threadid, MActivity activity)
 	{
-		activitylisteners.add(listener);
-	}
-	
-	/**
-	 *  Removes an activity listener.
-	 *  
-	 *  @param listener The activity listener.
-	 */
-	public void removeActivityListener(IActivityListener listener)
-	{
-		activitylisteners.remove(listener);
+//		System.out.println("fire start: "+activity);
+		if(activitylisteners!=null)
+		{
+			for(Iterator it = activitylisteners.iterator(); it.hasNext(); )
+				((IActivityListener)it.next()).activityStarted(new ChangeEvent(threadid, null, activity));
+		}
 	}
 	
 	/**
 	 *  Fires an activity execution event.
-	 *  
 	 *  @param threadid ID of the executing ProcessThread.
 	 *  @param activity The activity being executed.
 	 */
-	protected void fireExecutingActivity(String threadid, MActivity activity)
+	protected void fireEndActivity(String threadid, MActivity activity)
 	{
-		for (Iterator it = activitylisteners.iterator(); it.hasNext(); )
-			((IActivityListener) it.next()).activityExecuting(new ChangeEvent(threadid, "Activity Execution", activity));
+//		System.out.println("fire end: "+activity);
+		if(activitylisteners!=null)
+		{
+			for(Iterator it = activitylisteners.iterator(); it.hasNext(); )
+				((IActivityListener)it.next()).activityEnded(new ChangeEvent(threadid, null, activity));
+		}
 	}
 	
 	/**
@@ -1426,6 +1447,49 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 	public IFuture getChildren()
 	{
 		return adapter.getChildrenAccesses();
+	}
+	
+	/**
+	 *  Adds an activity listener. The listener will be called
+	 *  once a process thread executes a new activity.
+	 *  @param listener The activity listener.
+	 */
+	public void addActivityListener(IActivityListener listener)
+	{
+		if(activitylisteners==null)
+			activitylisteners = new ArrayList();
+		activitylisteners.add(listener);
+	}
+	
+	/**
+	 *  Removes an activity listener.
+	 *  @param listener The activity listener.
+	 */
+	public void removeActivityListener(IActivityListener listener)
+	{
+		if(activitylisteners!=null)
+			activitylisteners.remove(listener);
+	}
+	
+	/**
+	 *  Add an component listener.
+	 *  @param listener The listener.
+	 */
+	public void addComponentListener(IComponentListener listener)
+	{
+		if(componentlisteners==null)
+			componentlisteners = new ArrayList();
+		componentlisteners.add(listener);
+	}
+	
+	/**
+	 *  Remove a component listener.
+	 *  @param listener The listener.
+	 */
+	public void removeComponentListener(IComponentListener listener)
+	{
+		if(componentlisteners!=null)
+			componentlisteners.remove(listener);
 	}
 	
 }

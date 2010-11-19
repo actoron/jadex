@@ -1,11 +1,11 @@
 package jadex.bdi.examples.cleanerworld.cleaner;
 
-import jadex.bdi.runtime.AgentEvent;
-import jadex.bdi.runtime.IAgentListener;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBDIInternalAccess;
+import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.commons.ChangeEvent;
 import jadex.commons.SGUI;
 
 import java.awt.BorderLayout;
@@ -53,9 +53,9 @@ public class CleanerGui	extends JFrame
 			public Object execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
-				bia.addAgentListener(new IAgentListener()
+				bia.addComponentListener(new IComponentListener()
 				{
-					public void agentTerminating(AgentEvent ae)
+					public void componentTerminating(ChangeEvent ae)
 					{
 						SwingUtilities.invokeLater(new Runnable()
 						{
@@ -66,7 +66,7 @@ public class CleanerGui	extends JFrame
 						});
 					}
 					
-					public void agentTerminated(AgentEvent ae)
+					public void componentTerminated(ChangeEvent ae)
 					{
 					}
 				});

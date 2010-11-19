@@ -2,7 +2,6 @@ package jadex.bdi.runtime.interpreter;
 
 import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.runtime.AgentEvent;
-import jadex.bdi.runtime.IAgentListener;
 import jadex.bdi.runtime.IBeliefListener;
 import jadex.bdi.runtime.IBeliefSetListener;
 import jadex.bdi.runtime.IGoalListener;
@@ -16,6 +15,8 @@ import jadex.bdi.runtime.impl.flyweights.GoalFlyweight;
 import jadex.bdi.runtime.impl.flyweights.InternalEventFlyweight;
 import jadex.bdi.runtime.impl.flyweights.MessageEventFlyweight;
 import jadex.bdi.runtime.impl.flyweights.PlanFlyweight;
+import jadex.bridge.IComponentListener;
+import jadex.commons.ChangeEvent;
 import jadex.rules.rulesystem.IAction;
 import jadex.rules.rulesystem.ICondition;
 import jadex.rules.rulesystem.IVariableAssignments;
@@ -76,15 +77,15 @@ public class ListenerRules
 				Object le	= assignments.getVariableValue("?listenerentry");
 				Object ce = assignments.getVariableValue("?ce");
 				
-				IAgentListener lis	= (IAgentListener)state.getAttributeValue(le, OAVBDIRuntimeModel.listenerentry_has_listener);
-				AgentEvent	ae	= new AgentEvent(new CapabilityFlyweight(state, ragent), 
+				IComponentListener lis	= (IComponentListener)state.getAttributeValue(le, OAVBDIRuntimeModel.listenerentry_has_listener);
+				ChangeEvent	ae	= new ChangeEvent(BDIInterpreter.getInterpreter(state).getAgentAdapter().getChildrenIdentifiers(), null,
 					state.getAttributeValue(ce, OAVBDIRuntimeModel.changeevent_has_value));
 				
 				String cetype = (String)state.getAttributeValue(ce, OAVBDIRuntimeModel.changeevent_has_type);
 				if(OAVBDIRuntimeModel.CHANGEEVENT_AGENTTERMINATING.equals(cetype))
-					lis.agentTerminating(ae);
+					lis.componentTerminating(ae);
 				else //if(OAVBDIRuntimeModel.CHANGEEVENT_AGENTTERMINATED.equals(cetype))
-					lis.agentTerminated(ae);
+					lis.componentTerminated(ae);
 			}
 		};
 		

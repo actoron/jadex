@@ -57,4 +57,16 @@ public interface IInternalAccess
 	 *  @return The external access.
 	 */
 	public IExternalAccess getExternalAccess();
+	
+	/**
+	 *  Add an component listener.
+	 *  @param listener The listener.
+	 */
+	public void addComponentListener(IComponentListener listener);
+	
+	/**
+	 *  Remove a component listener.
+	 *  @param listener The listener.
+	 */
+	public void removeComponentListener(IComponentListener listener);
 }

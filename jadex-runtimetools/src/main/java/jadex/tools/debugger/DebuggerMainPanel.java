@@ -3,7 +3,7 @@ package jadex.tools.debugger;
 import jadex.base.SComponentFactory;
 import jadex.base.gui.plugin.IControlCenter;
 import jadex.bridge.IComponentDescription;
-import jadex.bridge.IComponentListener;
+import jadex.bridge.ICMSComponentListener;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.IFuture;
@@ -292,7 +292,7 @@ public class DebuggerMainPanel extends JSplitPane
 				
 				updatePanel((IComponentDescription)desc);
 
-				ces.addComponentListener(desc.getName(), new IComponentListener()
+				ces.addComponentListener(desc.getName(), new ICMSComponentListener()
 				{			
 					public void componentChanged(IComponentDescription desc)
 					{

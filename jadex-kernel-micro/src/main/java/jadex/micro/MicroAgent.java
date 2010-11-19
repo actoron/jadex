@@ -4,6 +4,7 @@ import jadex.bridge.ComponentServiceContainer;
 import jadex.bridge.DecouplingServiceInvocationInterceptor;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -560,6 +561,24 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	public IFuture killComponent()
 	{
 		return killAgent();
+	}
+	
+	/**
+	 *  Add an component listener.
+	 *  @param listener The listener.
+	 */
+	public void addComponentListener(IComponentListener listener)
+	{
+		interpreter.addComponentListener(listener);
+	}
+	
+	/**
+	 *  Remove a component listener.
+	 *  @param listener The listener.
+	 */
+	public void removeComponentListener(IComponentListener listener)
+	{
+		interpreter.removeComponentListener(listener);
 	}
 	
 	//-------- helper classes --------

@@ -6,7 +6,7 @@ import jadex.bpmn.runtime.ProcessThread;
 import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentListener;
+import jadex.bridge.ICMSComponentListener;
 import jadex.bridge.IComponentManagementService;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
@@ -113,7 +113,7 @@ public class ExecutionService extends BasicService implements IExecutionService
 					public void customResultAvailable(Object source, Object result)
 					{
 						final IComponentManagementService cms = (IComponentManagementService) result;
-						cms.addComponentListener(id, new IComponentListener()
+						cms.addComponentListener(id, new ICMSComponentListener()
 						{
 							private List currentActivities = new ArrayList();
 							

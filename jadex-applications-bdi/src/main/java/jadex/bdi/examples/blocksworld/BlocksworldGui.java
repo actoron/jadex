@@ -1,11 +1,10 @@
 package jadex.bdi.examples.blocksworld;
 
-import jadex.bdi.runtime.AgentEvent;
-import jadex.bdi.runtime.IAgentListener;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IInternalEvent;
+import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.SGUI;
@@ -476,9 +475,9 @@ public class BlocksworldGui	extends JFrame
 							public Object execute(IInternalAccess ia)
 							{
 								IBDIInternalAccess bia = (IBDIInternalAccess)ia;
-								bia.addAgentListener(new IAgentListener()
+								bia.addComponentListener(new IComponentListener()
 								{
-									public void agentTerminating(AgentEvent ae)
+									public void componentTerminating(jadex.commons.ChangeEvent ce)
 									{
 										SwingUtilities.invokeLater(new Runnable()
 										{
@@ -489,7 +488,7 @@ public class BlocksworldGui	extends JFrame
 										});
 									}
 									
-									public void agentTerminated(AgentEvent ae)
+									public void componentTerminated(jadex.commons.ChangeEvent ce)
 									{
 									}
 								});

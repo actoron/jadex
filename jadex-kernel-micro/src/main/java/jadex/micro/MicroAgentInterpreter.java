@@ -8,6 +8,7 @@ import jadex.bridge.IComponentAdapterFactory;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
+import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -65,7 +66,7 @@ public class MicroAgentInterpreter implements IComponentInstance
 	protected List steps;
 	
 	/** The change listeners. */
-	protected List listeners;
+	protected List changelisteners;
 
 	/** The execution history. */
 	protected List history;
@@ -75,6 +76,9 @@ public class MicroAgentInterpreter implements IComponentInstance
 	
 	/** The stop flag, stops interpreter execution. */
 	protected boolean stop;
+	
+	/** The component listeners. */
+	protected List componentlisteners;
 	
 	//-------- constructors --------
 	
@@ -323,7 +327,23 @@ public class MicroAgentInterpreter implements IComponentInstance
 						timer.cancel();
 					}
 					microagent.timers.clear();
+					if(componentlisteners!=null)
+					{
+						for(int i=0; i<componentlisteners.size(); i++)
+						{
+							IComponentListener lis = (IComponentListener)componentlisteners.get(i);
+							lis.componentTerminating(new ChangeEvent(adapter.getComponentIdentifier()));
+						}
+					}
 					microagent.agentKilled();
+					if(componentlisteners!=null)
+					{
+						for(int i=0; i<componentlisteners.size(); i++)
+						{
+							IComponentListener lis = (IComponentListener)componentlisteners.get(i);
+							lis.componentTerminated(new ChangeEvent(adapter.getComponentIdentifier()));
+						}
+					}
 					IComponentIdentifier cid = adapter.getComponentIdentifier();
 					ret.setResult(cid);
 				}
@@ -829,9 +849,9 @@ public class MicroAgentInterpreter implements IComponentInstance
 	 */
 	public void addChangeListener(IChangeListener listener)
 	{
-		if(listeners==null)
-			listeners = new ArrayList();
-		listeners.add(listener);
+		if(changelisteners==null)
+			changelisteners = new ArrayList();
+		changelisteners.add(listener);
 		
 		// Inform new listener of current state.
 		listener.changeOccurred(new ChangeEvent(this, "initialState", new Object[]{
@@ -845,8 +865,8 @@ public class MicroAgentInterpreter implements IComponentInstance
 	 */
 	public void removeChangeListener(IChangeListener listener)
 	{
-		if(listeners!=null)
-			listeners.remove(listener);
+		if(changelisteners!=null)
+			changelisteners.remove(listener);
 	}
 	
 	/**
@@ -854,12 +874,33 @@ public class MicroAgentInterpreter implements IComponentInstance
 	 */
 	public void notifyListeners(ChangeEvent event)
 	{
-		if(listeners!=null)
+		if(changelisteners!=null)
 		{
-			for(int i=0; i<listeners.size(); i++)
+			for(int i=0; i<changelisteners.size(); i++)
 			{
-				((IChangeListener)listeners.get(i)).changeOccurred(event);
+				((IChangeListener)changelisteners.get(i)).changeOccurred(event);
 			}
 		}
+	}
+	
+	/**
+	 *  Add an component listener.
+	 *  @param listener The listener.
+	 */
+	public void addComponentListener(IComponentListener listener)
+	{
+		if(componentlisteners==null)
+			componentlisteners = new ArrayList();
+		componentlisteners.add(listener);
+	}
+	
+	/**
+	 *  Remove a component listener.
+	 *  @param listener The listener.
+	 */
+	public void removeComponentListener(IComponentListener listener)
+	{
+		if(componentlisteners!=null)
+			componentlisteners.remove(listener);
 	}
 }

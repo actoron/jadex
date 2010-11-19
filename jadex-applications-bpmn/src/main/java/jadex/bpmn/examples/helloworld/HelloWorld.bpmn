@@ -19,7 +19,7 @@
     <vertices xmi:type="bpmn:Activity" xmi:id="_eSQQoRZHEd-yC473XtaJZQ" iD="_eSQQoBZHEd-yC473XtaJZQ" outgoingEdges="_gCmz8RZHEd-yC473XtaJZQ" incomingEdges="_fEUmwRZHEd-yC473XtaJZQ" activityType="EventIntermediateTimer">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_nIO9YBZIEd-yC473XtaJZQ" source="jadex">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_nIO9YRZIEd-yC473XtaJZQ" key="timer" value=""/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_nIO9YhZIEd-yC473XtaJZQ" key="duration" value="100000"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_nIO9YhZIEd-yC473XtaJZQ" key="duration" value="1000"/>
       </eAnnotations>
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_gCdC8RZHEd-yC473XtaJZQ" iD="_gCdC8BZHEd-yC473XtaJZQ" outgoingEdges="_3ZpL0RZHEd-yC473XtaJZQ" incomingEdges="_gCmz8RZHEd-yC473XtaJZQ" name="Print Good Bye" activityType="Task">

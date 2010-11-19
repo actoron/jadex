@@ -7,7 +7,7 @@ import jadex.base.gui.componenttree.INodeHandler;
 import jadex.base.gui.plugin.AbstractJCCPlugin;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentListener;
+import jadex.bridge.ICMSComponentListener;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.IMessageListener;
@@ -546,7 +546,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 					{
 					}
 				});
-				cms.addComponentListener(null, new IComponentListener()
+				cms.addComponentListener(null, new ICMSComponentListener()
 				{
 					public void componentRemoved(IComponentDescription desc, Map results)
 					{

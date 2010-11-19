@@ -23,7 +23,7 @@ import jadex.application.space.envsupport.observer.perspective.IPerspective;
 import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentListener;
+import jadex.bridge.ICMSComponentListener;
 import jadex.bridge.IComponentManagementService;
 import jadex.commons.IFuture;
 import jadex.commons.IPropertyObject;
@@ -571,7 +571,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 						{
 							public void resultAvailable(Object source, final Object result)
 							{
-								((IComponentManagementService)result).addComponentListener(context.getComponentIdentifier(), new IComponentListener()
+								((IComponentManagementService)result).addComponentListener(context.getComponentIdentifier(), new ICMSComponentListener()
 								{
 									public void componentRemoved(IComponentDescription desc, Map results)
 									{

@@ -1,7 +1,7 @@
 package jadex.tools.debugger;
 
 import jadex.bridge.IComponentDescription;
-import jadex.bridge.IComponentListener;
+import jadex.bridge.ICMSComponentListener;
 import jadex.bridge.IComponentManagementService;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IBreakpointPanel;
@@ -86,7 +86,7 @@ public class BreakpointPanel extends JPanel	implements IBreakpointPanel
 			public void customResultAvailable(Object source, Object result)
 			{
 				IComponentManagementService	cms	= (IComponentManagementService)result;
-				cms.addComponentListener(description.getName(), new IComponentListener()
+				cms.addComponentListener(description.getName(), new ICMSComponentListener()
 				{
 					public void componentRemoved(IComponentDescription desc, Map results)
 					{

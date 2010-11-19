@@ -6,10 +6,9 @@ import jadex.bdi.examples.cleanerworld_classic.Environment;
 import jadex.bdi.examples.cleanerworld_classic.Location;
 import jadex.bdi.examples.cleanerworld_classic.Waste;
 import jadex.bdi.examples.cleanerworld_classic.Wastebin;
-import jadex.bdi.runtime.AgentEvent;
-import jadex.bdi.runtime.IAgentListener;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBDIInternalAccess;
+import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.SGUI;
@@ -89,9 +88,9 @@ public class EnvironmentGui	extends JFrame
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
 				
-				bia.addAgentListener(new IAgentListener()
+				bia.addComponentListener(new IComponentListener()
 				{
-					public void agentTerminating(AgentEvent ae)
+					public void componentTerminating(jadex.commons.ChangeEvent ae)
 					{
 						SwingUtilities.invokeLater(new Runnable()
 						{
@@ -102,7 +101,7 @@ public class EnvironmentGui	extends JFrame
 						});
 					}
 					
-					public void agentTerminated(AgentEvent ae)
+					public void componentTerminated(jadex.commons.ChangeEvent ae)
 					{
 					}
 				});

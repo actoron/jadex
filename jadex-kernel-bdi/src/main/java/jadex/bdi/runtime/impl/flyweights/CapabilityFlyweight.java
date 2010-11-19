@@ -2,7 +2,6 @@ package jadex.bdi.runtime.impl.flyweights;
 
 import jadex.bdi.model.IMElement;
 import jadex.bdi.model.impl.flyweights.MCapabilityFlyweight;
-import jadex.bdi.runtime.IAgentListener;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bdi.runtime.IBeliefbase;
@@ -17,6 +16,7 @@ import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bridge.ComponentResultListener;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentListener;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IModelInfo;
 import jadex.commons.IFuture;
@@ -490,10 +490,10 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	}
 
 	/**
-	 *  Add an agent listener
+	 *  Add an component listener
 	 *  @param listener The listener.
 	 */
-	public void addAgentListener(IAgentListener listener)
+	public void addComponentListener(IComponentListener listener)
 	{
 		if(getInterpreter().isExternalThread())
 		{
@@ -514,8 +514,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	 *  Add an agent listener
 	 *  @param listener The listener.
 	 */
-	//public void removeAgentListener(final IAgentListener listener)
-	public void removeAgentListener(IAgentListener listener)
+	public void removeComponentListener(IComponentListener listener)
 	{
 		if(getInterpreter().isExternalThread())
 		{

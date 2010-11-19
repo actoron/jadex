@@ -1,6 +1,7 @@
 package jadex.bdi.runtime;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentListener;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IModelInfo;
 import jadex.commons.IFuture;
@@ -149,15 +150,14 @@ public interface ICapability	extends IElement
 	/**
 	 *  Add an agent listener
 	 *  @param listener The listener.
-	 *  @param async True, if the notification should be done on a separate thread.
 	 */
-	public void addAgentListener(IAgentListener listener);
+	public void addComponentListener(IComponentListener listener);
 	
 	/**
 	 *  Add an agent listener
 	 *  @param listener The listener.
 	 */
-	public void removeAgentListener(IAgentListener listener);
+	public void removeComponentListener(IComponentListener listener);
 	
 	/**
 	 *  Get subcapability names.
