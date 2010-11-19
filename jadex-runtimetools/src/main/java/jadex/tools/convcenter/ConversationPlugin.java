@@ -199,7 +199,7 @@ public class ConversationPlugin extends AbstractJCCPlugin
 
 		split.add(convcenter);
 
-		SHelp.setupHelp(split, "tools.conversationcenter");
+//		SHelp.setupHelp(split, "tools.conversationcenter");
 
 		split.setDividerLocation(150);
 

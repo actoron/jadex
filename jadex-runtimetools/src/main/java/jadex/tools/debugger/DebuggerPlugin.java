@@ -296,7 +296,7 @@ public class DebuggerPlugin extends AbstractJCCPlugin
 		split.add(detail);
 		//split.setResizeWeight(1.0);
 
-		SHelp.setupHelp(split, "tools.debugger");
+//		SHelp.setupHelp(split, "tools.debugger");
 
 		split.setDividerLocation(150);
 
@@ -315,7 +315,7 @@ public class DebuggerPlugin extends AbstractJCCPlugin
 					IActiveComponentTreeNode node = (IActiveComponentTreeNode)paths[i].getLastPathComponent();
 					IComponentDescription desc = node.getDescription();
 					DebuggerMainPanel	panel = new DebuggerMainPanel(getJCC(), desc);
-					SHelp.setupHelp(panel, "tools.debugger");
+//					SHelp.setupHelp(panel, "tools.debugger");
 					detail.add(panel, node.getDescription());
 					comptree.getModel().fireNodeChanged(node);
 				}

@@ -611,8 +611,8 @@ public class ControlCenter implements IControlCenter
 					setPluginProperties(plugin);
 
 				// Todo: move this code to controlcenterwindow!?
-				if(plugin.getHelpID() != null)
-					SHelp.setupHelp(comp, plugin.getHelpID());
+//				if(plugin.getHelpID() != null)
+//					SHelp.setupHelp(comp, plugin.getHelpID());
 
 				window.content.add(comp, plugin.getName());
 //				window.setPerspective(plugin);

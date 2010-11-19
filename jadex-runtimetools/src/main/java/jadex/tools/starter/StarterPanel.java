@@ -519,17 +519,17 @@ public class StarterPanel extends JPanel
 		buts.add(reset, new GridBagConstraints(2, 0, 1, 1, 0, 0, GridBagConstraints.EAST, GridBagConstraints.NONE,
 				new Insets(2, 2, 2, 2), 0, 0));
 
-		HelpBroker hb = SHelp.setupHelp(this, "tools.starter");
-		if(hb!=null)
-		{
-			JButton help = new JButton("Help");
-			help.setToolTipText("Activate JavaHelp system");
-			help.addActionListener(new CSH.DisplayHelpFromSource(hb));
-			help.setMinimumSize(new Dimension(mw, mh));
-			help.setPreferredSize(new Dimension(pw, ph));
-			buts.add(help, new GridBagConstraints(3, 0, 1, 1, 0, 0, GridBagConstraints.EAST, GridBagConstraints.NONE,
-					new Insets(2, 2, 2, 2), 0, 0));
-		}
+//		HelpBroker hb = SHelp.setupHelp(this, "tools.starter");
+//		if(hb!=null)
+//		{
+//			JButton help = new JButton("Help");
+//			help.setToolTipText("Activate JavaHelp system");
+//			help.addActionListener(new CSH.DisplayHelpFromSource(hb));
+//			help.setMinimumSize(new Dimension(mw, mh));
+//			help.setPreferredSize(new Dimension(pw, ph));
+//			buts.add(help, new GridBagConstraints(3, 0, 1, 1, 0, 0, GridBagConstraints.EAST, GridBagConstraints.NONE,
+//					new Insets(2, 2, 2, 2), 0, 0));
+//		}
 
 		//content.add(prodmode, new GridBagConstraints(3, 4, 1, 1, 1, 0,
 		//	GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(2,2,2,2), 0, 0));

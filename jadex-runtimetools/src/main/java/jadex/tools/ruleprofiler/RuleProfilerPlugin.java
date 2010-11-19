@@ -254,7 +254,7 @@ public class RuleProfilerPlugin extends AbstractJCCPlugin	implements ICMSCompone
 		split.add(detail);
 		//split.setResizeWeight(1.0);
 
-		SHelp.setupHelp(split, getHelpID());
+//		SHelp.setupHelp(split, getHelpID());
 
 		split.setDividerLocation(150);
 
@@ -343,7 +343,7 @@ public class RuleProfilerPlugin extends AbstractJCCPlugin	implements ICMSCompone
 					IActiveComponentTreeNode node = (IActiveComponentTreeNode)paths[i].getLastPathComponent();
 					IComponentDescription desc = node.getDescription();
 					RuleProfilerPanel	panel = new RuleProfilerPanel(getJCC().getServiceProvider(), desc.getName());
-					SHelp.setupHelp(panel, getHelpID());
+//					SHelp.setupHelp(panel, getHelpID());
 					detail.add(panel, desc);
 					comptree.getModel().fireNodeChanged(node);
 				}

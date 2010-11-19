@@ -103,7 +103,7 @@ public class SimCenterPlugin extends AbstractJCCPlugin
 		ButtonGroup group = new ButtonGroup();
 		
 		JMenu menu = new JMenu("Time Settings");
-		SHelp.setupHelp(menu, "tools.simcenter");
+//		SHelp.setupHelp(menu, "tools.simcenter");
 
 		JRadioButtonMenuItem time_long = new JRadioButtonMenuItem(new AbstractAction("Long value")
 		{

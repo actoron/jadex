@@ -201,8 +201,8 @@ public class ControlCenterWindow extends JFrame
 	            		button.setIcon(plugin.getToolIcon(button.isSelected()));
 	            	}
 	            });
-	            if(plugins[i].getHelpID()!=null)
-	            	SHelp.setupHelp(button, plugins[i].getHelpID());
+//	            if(plugins[i].getHelpID()!=null)
+//	            	SHelp.setupHelp(button, plugins[i].getHelpID());
 	            
 	            //bg.add(button);
 	     	    toolbar.add(button);
@@ -276,20 +276,20 @@ public class ControlCenterWindow extends JFrame
 		
 		// Help menu.
 		JMenu help = new JMenu("Help");
-		HelpBroker hb = SHelp.setupHelp(this.getContentPane(), "tools.controlcenter");
-		if(hb!=null)
-		{
-			JMenuItem helptopics = new JMenuItem("Help Topics");
-			helptopics.addActionListener(new CSH.DisplayHelpFromSource(hb));
-
-			JMenuItem helptrack = new JMenuItem(new ImageIcon(ControlCenter.class
-				.getResource("/jadex/tools/common/images/help.png"), "Help cursor"));
-
-			helptrack.addActionListener(new CSH.DisplayHelpAfterTracking(hb));
-
-			help.add(helptopics);
-			help.add(helptrack);
-		}
+//		HelpBroker hb = SHelp.setupHelp(this.getContentPane(), "tools.controlcenter");
+//		if(hb!=null)
+//		{
+//			JMenuItem helptopics = new JMenuItem("Help Topics");
+//			helptopics.addActionListener(new CSH.DisplayHelpFromSource(hb));
+//
+//			JMenuItem helptrack = new JMenuItem(new ImageIcon(ControlCenter.class
+//				.getResource("/jadex/tools/common/images/help.png"), "Help cursor"));
+//
+//			helptrack.addActionListener(new CSH.DisplayHelpAfterTracking(hb));
+//
+//			help.add(helptopics);
+//			help.add(helptrack);
+//		}
 		help.add(new JMenuItem(ONLINE_DOC));
 		help.add(new JMenuItem(ABOUT));
 		menubar.add(help);
@@ -728,7 +728,7 @@ public class ControlCenterWindow extends JFrame
 		{
 			try
 			{
-				BrowserLauncher.openURL("http://vsis-www.informatik.uni-hamburg.de/projects/jadex/");
+				BrowserLauncher.openURL("http://jadex-agents.informatik.uni-hamburg.de/xwiki/bin/view/Resources/Online+Documentation");
 			}
 			catch(IOException e)
 			{

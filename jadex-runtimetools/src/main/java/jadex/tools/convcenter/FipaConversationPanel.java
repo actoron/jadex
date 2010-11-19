@@ -167,15 +167,15 @@ public class FipaConversationPanel extends JSplitPane
 		south.add(send);
 		south.add(reset);
 
-		HelpBroker hb = SHelp.setupHelp(FipaConversationPanel.this,  "tools.conversationcenter");
-		if (hb != null)
-		{
-			JButton help = new JButton("Help");
-			help.setToolTipText("Open the Javahelp for the Conversation Center");
-			help.putClientProperty(SGUI.AUTO_ADJUST, Boolean.TRUE);
-			help.addActionListener(new CSH.DisplayHelpFromSource(hb));
-			south.add(help);
-		}
+//		HelpBroker hb = SHelp.setupHelp(FipaConversationPanel.this,  "tools.conversationcenter");
+//		if(hb != null)
+//		{
+//			JButton help = new JButton("Help");
+//			help.setToolTipText("Open the Javahelp for the Conversation Center");
+//			help.putClientProperty(SGUI.AUTO_ADJUST, Boolean.TRUE);
+//			help.addActionListener(new CSH.DisplayHelpFromSource(hb));
+//			south.add(help);
+//		}
 		sendcont.add(BorderLayout.SOUTH, south);
 		final JScrollPane sendtab	= new JScrollPane(sendcont);
 		sendtab.setBorder(null);
