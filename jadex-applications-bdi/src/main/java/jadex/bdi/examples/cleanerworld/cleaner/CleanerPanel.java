@@ -58,7 +58,35 @@ class CleanerPanel extends JPanel
 			updating	= true;
 			try
 			{
-				IFuture	fut	= agent.scheduleStep(new UpdateStep());
+				IFuture	fut	= agent.scheduleStep(new IComponentStep()
+				{
+					public Object execute(IInternalAccess ia)
+					{
+						IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+						DrawData	drawdata	= new DrawData();
+						drawdata.daytime = ((Boolean)bia.getBeliefbase().getBelief("daytime").getFact()).booleanValue();
+						drawdata.visited_positions = (MapPoint[])bia.getBeliefbase().getBeliefSet("visited_positions").getFacts();
+						drawdata.max_quantity = ((MapPoint)((IExpression)bia.getExpressionbase().getExpression("query_max_quantity")).execute()).getQuantity();
+						drawdata.xcnt = ((Integer[])bia.getBeliefbase().getBeliefSet("raster").getFacts())[0].intValue();
+						drawdata.ycnt = ((Integer[])bia.getBeliefbase().getBeliefSet("raster").getFacts())[1].intValue();
+						drawdata.cleaners = (ISpaceObject[])bia.getBeliefbase().getBeliefSet("cleaners").getFacts();
+						drawdata.chargingstations = (ISpaceObject[])bia.getBeliefbase().getBeliefSet("chargingstations").getFacts();
+						drawdata.wastebins = (ISpaceObject[])bia.getBeliefbase().getBeliefSet("wastebins").getFacts();
+						drawdata.wastes = (ISpaceObject[])bia.getBeliefbase().getBeliefSet("wastes").getFacts();
+						drawdata.my_vision = ((Double)bia.getBeliefbase().getBelief("my_vision").getFact()).doubleValue();
+						drawdata.my_chargestate = ((Double)bia.getBeliefbase().getBelief("my_chargestate").getFact()).doubleValue();
+						drawdata.myself = (ISpaceObject)bia.getBeliefbase().getBelief("myself").getFact();
+						drawdata.my_location = (IVector2)drawdata.myself.getProperty("position");
+						drawdata.my_waste = drawdata.myself.getProperty("waste")!=null;
+						IGoal[] goals = (IGoal[])bia.getGoalbase().getGoals("achievemoveto");
+						drawdata.dests = new IVector2[goals.length];
+						for(int i=0; i<goals.length; i++)
+						{
+							drawdata.dests[i] = (IVector2)goals[i].getParameter("location").getValue();
+						}
+						return drawdata;
+					}
+				});
 				fut.addResultListener(new SwingDefaultResultListener()
 				{
 					public void customResultAvailable(Object source, Object result)
@@ -213,38 +241,38 @@ class CleanerPanel extends JPanel
 	
 	//-------- helper classes --------
 	
-	/**
-	 *  Component step to produce an uptodate draw data.
-	 */
-	public static class UpdateStep implements IComponentStep
-	{
-		public Object execute(IInternalAccess ia)
-		{
-			IBDIInternalAccess bia = (IBDIInternalAccess)ia;
-			DrawData	drawdata	= new DrawData();
-			drawdata.daytime = ((Boolean)bia.getBeliefbase().getBelief("daytime").getFact()).booleanValue();
-			drawdata.visited_positions = (MapPoint[])bia.getBeliefbase().getBeliefSet("visited_positions").getFacts();
-			drawdata.max_quantity = ((MapPoint)((IExpression)bia.getExpressionbase().getExpression("query_max_quantity")).execute()).getQuantity();
-			drawdata.xcnt = ((Integer[])bia.getBeliefbase().getBeliefSet("raster").getFacts())[0].intValue();
-			drawdata.ycnt = ((Integer[])bia.getBeliefbase().getBeliefSet("raster").getFacts())[1].intValue();
-			drawdata.cleaners = (ISpaceObject[])bia.getBeliefbase().getBeliefSet("cleaners").getFacts();
-			drawdata.chargingstations = (ISpaceObject[])bia.getBeliefbase().getBeliefSet("chargingstations").getFacts();
-			drawdata.wastebins = (ISpaceObject[])bia.getBeliefbase().getBeliefSet("wastebins").getFacts();
-			drawdata.wastes = (ISpaceObject[])bia.getBeliefbase().getBeliefSet("wastes").getFacts();
-			drawdata.my_vision = ((Double)bia.getBeliefbase().getBelief("my_vision").getFact()).doubleValue();
-			drawdata.my_chargestate = ((Double)bia.getBeliefbase().getBelief("my_chargestate").getFact()).doubleValue();
-			drawdata.myself = (ISpaceObject)bia.getBeliefbase().getBelief("myself").getFact();
-			drawdata.my_location = (IVector2)drawdata.myself.getProperty("position");
-			drawdata.my_waste = drawdata.myself.getProperty("waste")!=null;
-			IGoal[] goals = (IGoal[])bia.getGoalbase().getGoals("achievemoveto");
-			drawdata.dests = new IVector2[goals.length];
-			for(int i=0; i<goals.length; i++)
-			{
-				drawdata.dests[i] = (IVector2)goals[i].getParameter("location").getValue();
-			}
-			return drawdata;
-		}
-	}
+//	/**
+//	 *  Component step to produce an uptodate draw data.
+//	 */
+//	public static class UpdateStep implements IComponentStep
+//	{
+//		public Object execute(IInternalAccess ia)
+//		{
+//			IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+//			DrawData	drawdata	= new DrawData();
+//			drawdata.daytime = ((Boolean)bia.getBeliefbase().getBelief("daytime").getFact()).booleanValue();
+//			drawdata.visited_positions = (MapPoint[])bia.getBeliefbase().getBeliefSet("visited_positions").getFacts();
+//			drawdata.max_quantity = ((MapPoint)((IExpression)bia.getExpressionbase().getExpression("query_max_quantity")).execute()).getQuantity();
+//			drawdata.xcnt = ((Integer[])bia.getBeliefbase().getBeliefSet("raster").getFacts())[0].intValue();
+//			drawdata.ycnt = ((Integer[])bia.getBeliefbase().getBeliefSet("raster").getFacts())[1].intValue();
+//			drawdata.cleaners = (ISpaceObject[])bia.getBeliefbase().getBeliefSet("cleaners").getFacts();
+//			drawdata.chargingstations = (ISpaceObject[])bia.getBeliefbase().getBeliefSet("chargingstations").getFacts();
+//			drawdata.wastebins = (ISpaceObject[])bia.getBeliefbase().getBeliefSet("wastebins").getFacts();
+//			drawdata.wastes = (ISpaceObject[])bia.getBeliefbase().getBeliefSet("wastes").getFacts();
+//			drawdata.my_vision = ((Double)bia.getBeliefbase().getBelief("my_vision").getFact()).doubleValue();
+//			drawdata.my_chargestate = ((Double)bia.getBeliefbase().getBelief("my_chargestate").getFact()).doubleValue();
+//			drawdata.myself = (ISpaceObject)bia.getBeliefbase().getBelief("myself").getFact();
+//			drawdata.my_location = (IVector2)drawdata.myself.getProperty("position");
+//			drawdata.my_waste = drawdata.myself.getProperty("waste")!=null;
+//			IGoal[] goals = (IGoal[])bia.getGoalbase().getGoals("achievemoveto");
+//			drawdata.dests = new IVector2[goals.length];
+//			for(int i=0; i<goals.length; i++)
+//			{
+//				drawdata.dests[i] = (IVector2)goals[i].getParameter("location").getValue();
+//			}
+//			return drawdata;
+//		}
+//	}
 
 	/**
 	 *  Data for drawing.

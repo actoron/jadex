@@ -21,6 +21,7 @@ import jadex.xml.reader.ReadContext;
 import jadex.xml.reader.Reader;
 
 import java.lang.reflect.Array;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -216,8 +217,18 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 					}
 					else if(!BasicTypeConverter.isBuiltInType(clazz))
 					{
-						// Must have empty constructor.
-						ret = clazz.newInstance();
+						if(SReflect.isAnonymousInnerClass(clazz))
+						{
+//							System.out.println("Anonymous: "+clazz);
+							Constructor	c	= clazz.getDeclaredConstructors()[0];
+							c.setAccessible(true);
+							ret	= c.newInstance(new Object[1]);
+						}
+						else
+						{
+							// Must have empty constructor.
+							ret = clazz.newInstance();
+						}
 					}
 					else if(String.class.equals(clazz))
 					{
