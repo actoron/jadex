@@ -22,7 +22,14 @@ public class MapPoint
 	protected double seen;
 
 	//-------- constructors --------
-
+	
+	/**
+	 *  Bean constructor required for remote cleaner GUI.
+	 */
+	public MapPoint()
+	{
+	}
+	
 	/**
 	 *  Create a new map point.
 	 */

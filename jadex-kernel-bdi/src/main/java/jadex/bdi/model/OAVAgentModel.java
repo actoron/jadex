@@ -93,24 +93,24 @@ public class OAVAgentModel	extends OAVCapabilityModel
 			names.add(((IRule)it.next()).getName());
 		modelinfo.addProperty("debugger.breakpoints", names);
 		
-		// Exclude IExternalAccess 
-		// Exclude all IBDIExternalAccess methods! :-( they work on flyweights
-		// Exclude many IEACapability methods
-		addMethodInfos(modelinfo.getProperties(), "remote_excluded", new String[]{
-			"getServiceProvider", 
-			
-			"dispatchTopLevelGoal", "createGoal", "sendMessage",
-			"dispatchInternalEvent", "createMessageEvent", "createInternalEvent",
-			"waitFor", "waitForTick", "waitForInternalEvent", "waitForInternalEvent",
-			"sendMessageAndWait", "waitForMessageEvent", "waitForReply", "waitForGoal",
-			"waitForFactChanged", "waitForFactAdded", "waitForFactRemoved", 
-			"dispatchTopLevelGoalAndWait",
-			
-			"getExternalAccess", "getBeliefbase", "getGoalbase", "getPlanbase",
-			"getEventbase", "getExpressionbase", "getPropertybase", "getLogger", 
-			"getPlatformComponent", "getTime", "getClassLoader", "addAgentListener", 
-			"removeAgentListener"
-			});
+//		// Exclude IExternalAccess 
+//		// Exclude all IBDIExternalAccess methods! :-( they work on flyweights
+//		// Exclude many IEACapability methods
+//		addMethodInfos(modelinfo.getProperties(), "remote_excluded", new String[]{
+//			"getServiceProvider", 
+//			
+//			"dispatchTopLevelGoal", "createGoal", "sendMessage",
+//			"dispatchInternalEvent", "createMessageEvent", "createInternalEvent",
+//			"waitFor", "waitForTick", "waitForInternalEvent", "waitForInternalEvent",
+//			"sendMessageAndWait", "waitForMessageEvent", "waitForReply", "waitForGoal",
+//			"waitForFactChanged", "waitForFactAdded", "waitForFactRemoved", 
+//			"dispatchTopLevelGoalAndWait",
+//			
+//			"getExternalAccess", "getBeliefbase", "getGoalbase", "getPlanbase",
+//			"getEventbase", "getExpressionbase", "getPropertybase", "getLogger", 
+//			"getPlatformComponent", "getTime", "getClassLoader", "addAgentListener", 
+//			"removeAgentListener"
+//			});
 		
 		// Init the arguments.
 		IArgument[] args = getModelInfo().getArguments();
