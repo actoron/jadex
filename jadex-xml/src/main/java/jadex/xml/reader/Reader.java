@@ -170,7 +170,8 @@ public class Reader
 		}
 		catch(RuntimeException e)
 		{
-			Location	loc	= readcontext.getTopStackElement()!=null ? readcontext.getTopStackElement().getLocation() : parser.getLocation();
+			e.printStackTrace();
+			Location	loc	= readcontext.getStack().size()>0 ? readcontext.getTopStackElement().getLocation() : parser.getLocation();
 			reporter.report(e.toString(), "XML error", readcontext, loc);
 		}
 		finally

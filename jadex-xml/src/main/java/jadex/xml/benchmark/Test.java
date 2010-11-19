@@ -1,8 +1,10 @@
 package jadex.xml.benchmark;
 
+import jadex.commons.SReflect;
 import jadex.xml.bean.JavaReader;
 import jadex.xml.bean.JavaWriter;
 
+import java.lang.reflect.Field;
 import java.net.InetAddress;
 import java.net.URL;
 import java.util.ArrayList;
@@ -66,6 +68,7 @@ public class Test //extends TestCase
 				t.testLoggingLevel();
 				t.testInetAddress();
 				t.testBeanWithPublicFields();
+				t.testAnonymousInnerClass();
 			}
 			long dur = System.currentTimeMillis()-start;
 			
@@ -102,7 +105,8 @@ public class Test //extends TestCase
 		
 //		System.out.println("equals: "+wo.equals(ro));
 		if(!wo.equals(ro) && !(wo.getClass().isArray() && Arrays.deepEquals((Object[])wo, (Object[])ro)))
-			System.out.println("Not equal: "+wo.getClass()+" \n"+ro.getClass()+" \n"+xml);
+			System.out.println("Not equal: "+wo+", "+ro+"\n"
+				+wo.getClass()+" \n"+ro.getClass()+" \n"+xml);
 		
 //		assertEquals("Written and read objects should be equal:", wo, ro);
 	}
@@ -324,6 +328,42 @@ public class Test //extends TestCase
 		String str = "ö";
 		
 		doWriteAndRead(str);
+	}
+	
+	/**
+	 *  Test if anonymous inner classes can be transferred.
+	 */
+	protected void testAnonymousInnerClass() throws Exception
+	{
+		// Do not use final directly as compiler optimizes field away.
+		String	tmp	= "hugo";
+		final String	name	= tmp;
+		Object	obj	= new Object()
+		{
+			public boolean equals(Object obj)
+			{
+				String	othername	= null;
+				try
+				{
+					Field	field	= SReflect.getField(obj.getClass(), "val$name");
+					field.setAccessible(true);
+					othername	= (String)field.get(obj);
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+				}
+				
+				return name.equals(othername);
+			}
+						
+			public String toString()
+			{
+				return getClass().getName()+"("+name+")";
+			}
+		};
+		
+		doWriteAndRead(obj);
 	}
 	
 	/**

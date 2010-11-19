@@ -222,7 +222,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 //							System.out.println("Anonymous: "+clazz);
 							Constructor	c	= clazz.getDeclaredConstructors()[0];
 							c.setAccessible(true);
-							ret	= c.newInstance(new Object[1]);
+							ret	= c.newInstance(new Object[c.getParameterTypes().length]);
 						}
 						else
 						{
