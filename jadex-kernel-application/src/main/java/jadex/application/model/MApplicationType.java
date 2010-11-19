@@ -38,10 +38,7 @@ public class MApplicationType implements ICacheableModel
 	
 	/** The list of contained application descriptions. */
 	protected List applications;
-	
-	/** The services. */
-	protected List services;
-	
+		
 	/** The service container. */
 	protected MExpressionType container;
 	
@@ -75,6 +72,13 @@ public class MApplicationType implements ICacheableModel
 	/** The model info. */
 	protected ModelInfo modelinfo;
 	
+	/** The provided services. */
+	protected List providedservices;
+
+	/** The required services. */
+	protected List requiredservices;
+
+	
 	//-------- constructors --------
 	
 	/**
@@ -88,7 +92,8 @@ public class MApplicationType implements ICacheableModel
 		this.applications = new ArrayList();
 //		this.arguments = new ArrayList();
 //		this.results = new ArrayList();
-		this.services = new ArrayList();
+		this.providedservices = new ArrayList();
+		this.requiredservices = new ArrayList();
 //		this.properties = new ArrayList();
 		this.autoshutdown = true;
 		this.modelinfo = new ModelInfo();
@@ -167,6 +172,32 @@ public class MApplicationType implements ICacheableModel
 		}
 		
 		modelinfo.setStartable(true);
+		
+		List reqs = getRequiredServices();
+		if(reqs!=null)
+		{
+			Class[] tmp = new Class[reqs.size()];
+			for(int i=0; i<reqs.size(); i++)
+			{
+				MRequiredServiceType ser = (MRequiredServiceType)reqs.get(i);
+				tmp[i] = ser.getClazz();
+			}
+			
+			modelinfo.setRequiredServices(tmp);
+		}
+		
+		List provs = getProvidedServices();
+		if(provs!=null)
+		{
+			Class[] tmp = new Class[provs.size()];
+			for(int i=0; i<provs.size(); i++)
+			{
+				MProvidedServiceType ser = (MProvidedServiceType)provs.get(i);
+				tmp[i] = ser.getClazz();
+			}
+			
+			modelinfo.setProvidedServices(tmp);
+		}
 		
 		// Build error report.
 		modelinfo.setReport(new AbstractErrorReportBuilder(modelinfo.getName(), modelinfo.getFilename(),
@@ -404,9 +435,18 @@ public class MApplicationType implements ICacheableModel
 	 *  Add a service.
 	 *  @param service The service.
 	 */
-	public void addService(MServiceType service)
+	public void addMProvidedServiceType(MProvidedServiceType service)
 	{
-		this.services.add(service);
+		this.providedservices.add(service);
+	}
+	
+	/**
+	 *  Add a required service.
+	 *  @param service The required service.
+	 */
+	public void addMRequiredServiceType(MRequiredServiceType service)
+	{
+		this.requiredservices.add(service);
 	}
 	
 	/**
@@ -556,12 +596,21 @@ public class MApplicationType implements ICacheableModel
 	}
 	
 	/**
-	 *  Get the services.
+	 *  Get the provided services.
 	 *  @return The services.
 	 */
-	public List getServices()
+	public List getProvidedServices()
 	{
-		return this.services;
+		return this.providedservices;
+	}
+	
+	/**
+	 *  Get the required services.
+	 *  @return The services.
+	 */
+	public List getRequiredServices()
+	{
+		return this.requiredservices;
 	}
 	
 	/**

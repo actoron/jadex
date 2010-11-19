@@ -14,7 +14,7 @@
 	</imports>
 	
 	<services>
-		<service>
+		<providedservice class="IComponentFactory">
 			new MicroAgentFactory($component.getServiceProvider(), SUtil.createHashMap(
 				new String[]
 				{
@@ -25,6 +25,6 @@
 					"jadex.tools.debugger.micro.MicroDebuggerPanel, jadex.tools.debugger.common.ObjectInspectorDebuggerPanel"
 				})
 			)
-		</service>
+		</providedservice>
 	</services>
 </applicationtype>

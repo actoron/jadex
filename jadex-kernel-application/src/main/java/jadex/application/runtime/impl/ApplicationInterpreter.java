@@ -5,7 +5,7 @@ import jadex.application.model.MApplicationType;
 import jadex.application.model.MComponentInstance;
 import jadex.application.model.MComponentType;
 import jadex.application.model.MExpressionType;
-import jadex.application.model.MServiceType;
+import jadex.application.model.MProvidedServiceType;
 import jadex.application.model.MSpaceInstance;
 import jadex.application.runtime.IApplication;
 import jadex.application.runtime.IApplicationExternalAccess;
@@ -15,6 +15,7 @@ import jadex.bridge.ComponentResultListener;
 import jadex.bridge.ComponentServiceContainer;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.CreationInfo;
+import jadex.bridge.DecouplingServiceInvocationInterceptor;
 import jadex.bridge.IArgument;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentAdapterFactory;
@@ -205,18 +206,23 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 			{
 				final List futures = new ArrayList();
 
-				List services = model.getServices();
+				List services = model.getProvidedServices();
 				if(services!=null)
 				{
 					for(int i=0; i<services.size(); i++)
 					{
 						IInternalService service;
-						final MServiceType st = (MServiceType)services.get(i);
+						final MProvidedServiceType st = (MProvidedServiceType)services.get(i);
 						if(st.getParsedValue()!=null)
 						{
 							try
 							{
 								service = (IInternalService)st.getParsedValue().getValue(fetcher);
+								if(!st.isDirect())
+								{
+//									System.out.println("creating decoupled service: "+st.getClassName());
+									service = DecouplingServiceInvocationInterceptor.createServiceProxy(getExternalAccess(), getComponentAdapter(), service);
+								}
 								container.addService(service);
 							}
 							catch(Exception e)
@@ -227,7 +233,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 						}
 						else 
 						{
-							String componenttype = st.getFrom();
+							String componenttype = st.getComponentType();
 							
 							if(componenttype==null)
 							{	

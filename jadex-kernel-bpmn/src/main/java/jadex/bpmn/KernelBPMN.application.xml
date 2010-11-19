@@ -13,7 +13,7 @@
 	</imports>
 	
 	<services>
-		<service>
+		<providedservice class="IComponentFactory">
 			new BpmnFactory($component.getServiceProvider(), SUtil.createHashMap(
 				new String[]
 				{
@@ -24,6 +24,6 @@
 					"jadex.tools.debugger.bpmn.BpmnDebuggerPanel, jadex.tools.debugger.common.ObjectInspectorDebuggerPanel"
 				})
 			)
-		</service>
+		</providedservice>
 	</services>
 </applicationtype>

@@ -20,10 +20,10 @@
 	</componenttypes>
 	
 	<services>
-		<service class="IAddService"/>
-		<service class="ISubService"/>
+		<providedservice class="IAddService"/>
+		<providedservice class="ISubService"/>
 		<!-- <service class="IAddService" componenttype="Calculator" componentinstance=""/>
-		<service class="ISubService" from="Calculator"/> -->
+		<service class="ISubService" componenttype="Calculator"/> -->
 	</services>
 	
 	<applications>
