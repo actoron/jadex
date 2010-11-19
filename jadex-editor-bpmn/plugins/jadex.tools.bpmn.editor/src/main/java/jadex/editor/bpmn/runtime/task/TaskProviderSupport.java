@@ -143,7 +143,7 @@ public abstract class TaskProviderSupport implements IEditorTaskProvider
 		
 		ClassLoader classLoader = WorkspaceClassLoaderHelper
 				.getWorkspaceClassLoader(false);
-
+		
 		if (classLoader == null || className == null || className.trim().isEmpty())
 		{
 			JadexBpmnEditor.log("Method loadMetaInfo('" + className
