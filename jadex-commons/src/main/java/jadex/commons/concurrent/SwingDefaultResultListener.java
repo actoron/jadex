@@ -2,7 +2,6 @@ package jadex.commons.concurrent;
 
 import jadex.commons.SGUI;
 import jadex.commons.SUtil;
-import jadex.commons.concurrent.IResultListener;
 
 import java.awt.Component;
 import java.util.logging.Logger;

@@ -388,6 +388,7 @@
 	<properties>
 		<!--<property name="logging.level">Level.FINE</property>-->
 		<!-- <property name="debugging">true</property>  -->
+		<property name="componentviewer.viewerclass">"jadex.bdi.examples.cleanerworld.cleaner.CleanerViewerPanel"</property>
 	</properties>
 
 	<configurations>

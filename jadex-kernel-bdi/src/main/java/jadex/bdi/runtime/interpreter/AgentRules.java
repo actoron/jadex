@@ -625,7 +625,7 @@ public class AgentRules
 						}
 						else
 						{
-							res.setResult(res);
+							res.setResult(r);
 						}
 					}
 				}
