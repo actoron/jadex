@@ -15,7 +15,7 @@
    <feature url="features/jadex.tools.model.bpmn.feature_1.0.0.201011181333.jar" id="jadex.tools.model.bpmn.feature" version="1.0.0.201011181333">
       <category name="jadex.editor.outdated"/>
    </feature>
-   <feature url="features/jadex.editor.bpmn.feature_1.0.1.201011181333.jar" id="jadex.editor.bpmn.feature" version="1.0.1.201011181333">
+   <feature url="features/jadex.editor.bpmn.feature_1.0.1.201011191052.jar" id="jadex.editor.bpmn.feature" version="1.0.1.201011191052">
       <category name="jadex.editor.xpmn"/>
    </feature>
    <category-def name="jadex.editor.xpmn" label="Jadex Eclipse Model Tools">
