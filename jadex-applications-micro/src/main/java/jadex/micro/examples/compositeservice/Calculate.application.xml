@@ -20,15 +20,18 @@
 	</componenttypes>
 	
 	<services>
-		<providedservice class="IAddService"/>
+		<!-- <providedservice class="IAddService"/>
 		<providedservice class="ISubService"/>
-		<!-- <service class="IAddService" componenttype="Calculator" componentinstance=""/>
-		<service class="ISubService" componenttype="Calculator"/> -->
+		<providedservice class="IAddService" componenttype="Calculator"/>
+		<providedservice class="ISubService" componenttype="Calculator"/> -->
+		<providedservice class="IAddService" componentname="Calculator"/>
+		<providedservice class="ISubService" componentname="Calculator"/>
 	</services>
 	
 	<applications>
 		<application name="User Agent">
 			<components>
+				<component type="Calculator" name="Calculator"/>
 				<component type="User"/>
 			</components>
 		</application>

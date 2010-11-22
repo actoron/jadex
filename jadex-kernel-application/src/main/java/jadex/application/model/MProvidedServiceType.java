@@ -8,12 +8,15 @@ public class MProvidedServiceType extends MExpressionType
 {
 	//-------- attributes --------
 
+	/** The component name. */
+	protected String componentname;
+
 	/** The component type. */
 	protected String componenttype;
 	
 	/** The direct attribute. */
 	protected boolean direct;
-
+	
 	//-------- constructors --------
 
 	/**
@@ -26,6 +29,22 @@ public class MProvidedServiceType extends MExpressionType
 	//-------- methods --------
 	
 	/**
+	 *  Get the componentname.
+	 *  @return the componentname.
+	 */
+	public String getComponentName()
+	{
+		return componentname;
+	}
+
+	/**
+	 *  Set the componentname.
+	 *  @param componentname The componentname to set.
+	 */
+	public void setComponentName(String componentname)
+	{
+		this.componentname = componentname;
+	}
 	
 	/**
 	 *  Get the component type.

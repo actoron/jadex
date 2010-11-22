@@ -11,6 +11,7 @@ import jadex.application.runtime.IApplication;
 import jadex.application.runtime.IApplicationExternalAccess;
 import jadex.application.runtime.ISpace;
 import jadex.bridge.ComponentFactorySelector;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.ComponentResultListener;
 import jadex.bridge.ComponentServiceContainer;
 import jadex.bridge.ComponentTerminatedException;
@@ -202,10 +203,10 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 		// Schedule the futures (first) init step.
 		scheduleStep(new IComponentStep()
 		{
-			public Object execute(IInternalAccess ia)
+			public Object execute(final IInternalAccess ia)
 			{
 				final List futures = new ArrayList();
-
+		
 				List services = model.getProvidedServices();
 				if(services!=null)
 				{
@@ -233,28 +234,44 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 						}
 						else 
 						{
-							String componenttype = st.getComponentType();
-							
-							if(componenttype==null)
+							if(st.getComponentName()!=null)
+							{
+								final Future futu = new Future();
+								futures.add(futu);
+								SServiceProvider.getService(ia.getServiceProvider(), IComponentManagementService.class)
+									.addResultListener(ia.createResultListener(new DelegationResultListener(futu)
+								{
+									public void customResultAvailable(Object source, Object result)
+									{
+										final IComponentManagementService cms = (IComponentManagementService)result;
+										IComponentIdentifier cid = cms.createComponentIdentifier(st.getComponentName(), st.getComponentName().indexOf("@")==-1);
+										IInternalService service = CompositeServiceInvocationInterceptor.createServiceProxy(st.getClazz(), null, 
+											(IApplicationExternalAccess)getExternalAccess(), getModel().getClassLoader(), cid);
+										container.addService(service);
+										futu.setResult(null);
+									}
+								}));
+							}
+							else if(st.getComponentType()==null)
 							{	
 								final Future futu = new Future();
 								futures.add(futu);
 								SServiceProvider.getService(getServiceProvider(), ILibraryService.class)
-									.addResultListener(new DefaultResultListener()
+									.addResultListener(ia.createResultListener(new DefaultResultListener()
 								{
 									public void resultAvailable(Object source, Object result)
 									{
 										ILibraryService ls = (ILibraryService)result;
 										findComponentType(0, model.getMComponentTypes(), ls, st.getClazz(), futu);
 									}
-								});
+								}));
 							}
 							else
 							{
 //								service = (IInternalService)Proxy.newProxyInstance(getClassLoader(), new Class[]{IInternalService.class, st.getClazz()}, 
 //									new CompositeServiceInvocationInterceptor((IApplicationExternalAccess)getExternalAccess(), componenttype, st.getClazz()));
-								service = CompositeServiceInvocationInterceptor.createServiceProxy(st.getClazz(), componenttype, 
-									(IApplicationExternalAccess)getExternalAccess(), getModel().getClassLoader());
+								service = CompositeServiceInvocationInterceptor.createServiceProxy(st.getClazz(), st.getComponentType(), 
+									(IApplicationExternalAccess)getExternalAccess(), getModel().getClassLoader(), null);
 								container.addService(service);
 							}
 						}
@@ -382,7 +399,6 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 				{
 					((IFuture)futures.get(i)).addResultListener(crl);
 				}
-				
 				return null;
 			}	
 		});
@@ -411,7 +427,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 					if(SUtil.arrayContains(sers, servicetype))
 					{
 						IInternalService service = CompositeServiceInvocationInterceptor.createServiceProxy(servicetype, ct.getName(), 
-							(IApplicationExternalAccess)getExternalAccess(), getModel().getClassLoader());
+							(IApplicationExternalAccess)getExternalAccess(), getModel().getClassLoader(), null);
 						container.addService(service);
 						ret.setResult(result);
 					}
@@ -1303,10 +1319,17 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 			});
 			for(int j=0; j<num; j++)
 			{
+//				try
+//				{
 				IFuture ret = ces.createComponent(component.getName(), component.getType(model).getFilename(),
 					new CreationInfo(component.getConfiguration(), getArguments(component), adapter.getComponentIdentifier(),
 					component.isSuspended(), component.isMaster(), component.isDaemon(), model.getAllImports()), null);
 				ret.addResultListener(crl);
+//				}
+//				catch(Exception e)
+//				{
+//					e.printStackTrace();
+//				}
 			}
 		}
 		else

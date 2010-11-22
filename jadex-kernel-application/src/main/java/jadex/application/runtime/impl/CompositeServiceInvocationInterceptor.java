@@ -40,6 +40,9 @@ public class CompositeServiceInvocationInterceptor implements IServiceInvocation
 	/** The component type. */
 	protected String componenttype;
 	
+	/** The component id. */
+	protected IComponentIdentifier cid;
+	
 //	protected Future creating;
 	
 	//-------- constructors --------
@@ -47,10 +50,12 @@ public class CompositeServiceInvocationInterceptor implements IServiceInvocation
 	/**
 	 *  Create a new invocation handler.
 	 */
-	public CompositeServiceInvocationInterceptor(IApplicationExternalAccess ea, String componenttype, final Class servicetype)
+	public CompositeServiceInvocationInterceptor(IApplicationExternalAccess ea, 
+		String componenttype, Class servicetype, IComponentIdentifier cid)
 	{
 		this.ea = ea;
 		this.componenttype = componenttype;
+		this.cid = cid;
 	}
 	
 	//-------- methods --------
@@ -72,55 +77,62 @@ public class CompositeServiceInvocationInterceptor implements IServiceInvocation
 		{
 			public Object execute(final IInternalAccess ia)
 			{
-				ea.getChildren(componenttype).addResultListener(ia.createResultListener(new DefaultResultListener()
+				// A concrete component has been specified.
+				if(cid!=null)
 				{
-					public void resultAvailable(Object source, Object result)
+					invokeServiceMethod(ia, cid, sic, fut);
+				}
+				else
+				{
+					ea.getChildren(componenttype).addResultListener(ia.createResultListener(new DefaultResultListener()
 					{
-						final Collection res = (Collection)result;
-						
-						SServiceProvider.getService(ea.getServiceProvider(), IComponentManagementService.class)
-							.addResultListener(ia.createResultListener(new DelegationResultListener(fut)
+						public void resultAvailable(Object source, Object result)
 						{
-							public void customResultAvailable(Object source, Object result)
+							final Collection res = (Collection)result;
+							
+							
+							if(res!=null && res.size()>0)
 							{
-								final IComponentManagementService cms = (IComponentManagementService)result;
-						
-								if(res!=null && res.size()>0)
+								final IComponentIdentifier cid = (IComponentIdentifier)res.iterator().next();
+								invokeServiceMethod(ia, cid, sic, fut);
+							}
+							else
+							{
+								final IResultListener lis = ia.createResultListener(new DelegationResultListener(fut)
 								{
-									final IComponentIdentifier cid = (IComponentIdentifier)res.iterator().next();
-									invokeServiceMethod(ia, cms, cid, sic, fut);
-								}
-								else
-								{
-									final IResultListener lis = ia.createResultListener(new DelegationResultListener(fut)
+									public void customResultAvailable(Object source, Object result)
 									{
-										public void customResultAvailable(Object source, Object result)
-										{
-											IComponentIdentifier cid = (IComponentIdentifier)result;
-											invokeServiceMethod(ia, cms, cid, sic, fut);
-											
+										IComponentIdentifier cid = (IComponentIdentifier)result;
+										invokeServiceMethod(ia, cid, sic, fut);
+										
 //											synchronized(ServiceInvocationHandler.this)
 //											{
 //												creating = null;
 //											}
-										}
-									});
-									
-//									boolean addlis = false;
-//									synchronized(ServiceInvocationHandler.this)
+									}
+								});
+								
+//								boolean addlis = false;
+//								synchronized(ServiceInvocationHandler.this)
+//								{
+//									if(creating!=null)
 //									{
-//										if(creating!=null)
-//										{
-//											addlis = true;
-//										}
+//										addlis = true;
 //									}
-							
-//									if(addlis)
-//									{
-//										creating.addResultListener(lis);
-//									}
-//									else
-//									{
+//								}
+					
+//								if(addlis)
+//								{
+//									creating.addResultListener(lis);
+//								}
+//								else
+//								{
+								SServiceProvider.getService(ea.getServiceProvider(), IComponentManagementService.class)
+									.addResultListener(ia.createResultListener(new DelegationResultListener(fut)
+								{
+									public void customResultAvailable(Object source, Object result)
+									{
+										final IComponentManagementService cms = (IComponentManagementService)result;
 										ea.getFileName(componenttype).addResultListener(ia.createResultListener(new DelegationResultListener(fut)
 										{
 											public void customResultAvailable(Object source, Object result)
@@ -131,13 +143,13 @@ public class CompositeServiceInvocationInterceptor implements IServiceInvocation
 													ea.getComponentIdentifier()), null).addResultListener(lis);
 											}
 										}));
-//									}
-								}
+									}
+								}));
+//								}
 							}
-						}));
-					}
-				}));
-				
+						}
+					}));
+				}
 				return null;
 			}
 		});
@@ -148,40 +160,49 @@ public class CompositeServiceInvocationInterceptor implements IServiceInvocation
 	/**
 	 *  Invoke the service method.
 	 */
-	protected void invokeServiceMethod(final IInternalAccess ia, final IComponentManagementService cms, final IComponentIdentifier cid,
+	protected void invokeServiceMethod(final IInternalAccess ia, final IComponentIdentifier cid,
 		final ServiceInvocationContext sic, final Future ret)
 	{
-		cms.getExternalAccess(cid).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+		SServiceProvider.getService(ea.getServiceProvider(), IComponentManagementService.class)
+			.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object source, Object result)
 			{
-				final BasicServiceInvocationHandler handler = (BasicServiceInvocationHandler)Proxy.getInvocationHandler(sic.getProxy());
-
-				IExternalAccess cea = (IExternalAccess)result;
-				SServiceProvider.getService(cea.getServiceProvider(), handler.getServiceIdentifier().getServiceType())
-					.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+				final IComponentManagementService cms = (IComponentManagementService)result;
+		
+				cms.getExternalAccess(cid).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object source, Object result)
 					{
-						if(result!=null)
+						final BasicServiceInvocationHandler handler = (BasicServiceInvocationHandler)Proxy.getInvocationHandler(sic.getProxy());
+		
+						IExternalAccess cea = (IExternalAccess)result;
+						SServiceProvider.getService(cea.getServiceProvider(), handler.getServiceIdentifier().getServiceType())
+							.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 						{
-							try
+							public void customResultAvailable(Object source, Object result)
 							{
-								Object res = sic.getMethod().invoke(result, sic.getArguments());
-								if(res instanceof IFuture)
+								if(result!=null)
 								{
-									((IFuture)res).addResultListener(ia.createResultListener(new DelegationResultListener(ret)));
-								}
-								else
-								{
-									ret.setResult(res);
+									try
+									{
+										Object res = sic.getMethod().invoke(result, sic.getArguments());
+										if(res instanceof IFuture)
+										{
+											((IFuture)res).addResultListener(ia.createResultListener(new DelegationResultListener(ret)));
+										}
+										else
+										{
+											ret.setResult(res);
+										}
+									}
+									catch(Exception e)
+									{
+										ret.setException(e);
+									}
 								}
 							}
-							catch(Exception e)
-							{
-								ret.setException(e);
-							}
-						}
+						}));
 					}
 				}));
 			}
@@ -302,12 +323,12 @@ public class CompositeServiceInvocationInterceptor implements IServiceInvocation
 	/**
 	 *  Create a new composite (application) service proxy.
 	 */
-	public static IInternalService createServiceProxy(Class servicetype, String componenttype, IApplicationExternalAccess ea, ClassLoader classloader)
+	public static IInternalService createServiceProxy(Class servicetype, String componenttype, IApplicationExternalAccess ea, ClassLoader classloader, IComponentIdentifier cid)
 	{
 		return (IInternalService)Proxy.newProxyInstance(classloader, new Class[]{IInternalService.class, servicetype}, 
 			new BasicServiceInvocationHandler(BasicService.createServiceIdentifier(ea.getServiceProvider().getId(), servicetype, BasicServiceInvocationHandler.class), 
 			CompositeServiceInvocationInterceptor.getInterceptors(), 
-			new CompositeServiceInvocationInterceptor(ea, componenttype, servicetype)));
+			new CompositeServiceInvocationInterceptor(ea, componenttype, servicetype, cid)));
 //			new CompositeServiceInvocationInterceptor((IApplicationExternalAccess)getExternalAccess(), ct.getName(), servicetype));
 	}
 }
