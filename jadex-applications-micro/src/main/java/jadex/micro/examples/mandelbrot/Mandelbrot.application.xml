@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	<H3></H3>
+-->
+<applicationtype xmlns="http://jadex.sourceforge.net/jadex-application"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-application 
+	                    http://jadex.sourceforge.net/jadex-application-2.0.xsd"
+	name="Mandelbrot" package="jadex.micro.examples.mandelbrot">
+	
+	<imports>
+		<import>jadex.commons.service.clock.IClockService</import>
+		<import>jadex.commons.service.SServiceProvider</import>
+		<import>jadex.commons.IFuture</import>
+	</imports>
+	
+	<componenttypes>
+		<componenttype name="Generator" filename="jadex/micro/examples/mandelbrot/GenerateAgent.class"/>
+		<componenttype name="Calculator" filename="jadex/micro/examples/mandelbrot/CalculateAgent.class"/>
+		<componenttype name="Display" filename="jadex/micro/examples/mandelbrot/DisplayAgent.class"/>
+	</componenttypes>
+	
+	<services>
+		<providedservice class="IGenerateService" componenttype="Generator"/>
+		<providedservice class="ICalculateService" componenttype="Calculator"/>
+		<providedservice class="IDisplayService" componenttype="Display"/>
+	</services>
+	
+	<applications>
+		<application name="All components">
+			<components>
+				<component type="Generator"/>
+				<component type="Calculator"/>
+				<component type="Display"/>
+			</components>
+		</application>
+	</applications>
+	
+</applicationtype>

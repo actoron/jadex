@@ -1,6 +1,7 @@
 package jadex.micro.examples.compositeservice;
 
 import jadex.commons.concurrent.DefaultResultListener;
+import jadex.commons.concurrent.IResultListener;
 import jadex.commons.service.SServiceProvider;
 import jadex.micro.MicroAgent;
 
@@ -22,13 +23,19 @@ public class UserAgent extends MicroAgent
 			{
 				final IAddService as = (IAddService)result;
 				
+				
 				if(as!=null)
 				{
-					as.add(1, 1).addResultListener(createResultListener(new DefaultResultListener()
+					as.add(1, 1).addResultListener(createResultListener(new IResultListener()
 					{
 						public void resultAvailable(Object source, Object result)
 						{
 							System.out.println("add service result: "+result+" "+getComponentIdentifier().getLocalName());
+						}
+						
+						public void exceptionOccurred(Object source, Exception exception)
+						{
+							System.out.println("invocation failed: "+exception);
 						}
 					}));
 				}

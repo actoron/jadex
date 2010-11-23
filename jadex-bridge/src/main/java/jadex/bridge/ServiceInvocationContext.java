@@ -3,15 +3,30 @@ package jadex.bridge;
 import java.lang.reflect.Method;
 
 /**
- * 
+ *  Context for service invocations.
+ *  Contains all method call information. 
  */
 public class ServiceInvocationContext
 {
+	//-------- attributes --------
+	
+	/** The proxy object. */
 	public Object proxy;
+	
+	/** The method to be called. */
 	public Method method;
+	
+	/** The invocation arguments. */
 	public Object[] args;
+	
+	/** The call result. */
 	public Object result;
 
+	//-------- constructors --------
+	
+	/**
+	 *  Create a new context.
+	 */
 	public ServiceInvocationContext(Object proxy, Method method, Object[] args)
 	{
 		this.proxy = proxy;
@@ -19,6 +34,8 @@ public class ServiceInvocationContext
 		this.args = args;
 	}
 
+	//-------- methods --------
+	
 	/**
 	 *  Get the proxy.
 	 *  @return the proxy.

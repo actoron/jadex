@@ -91,7 +91,15 @@ public class PropertiesPanel	extends	JPanel
 	 */
 	public JTextField createTextField(String name)
 	{
-		return createTextField(name, null, false, 0);
+		return createTextField(name, null);
+	}
+	
+	/**
+	 *  Create a text field and add it to the panel.
+	 */
+	public JTextField createTextField(String name, String defvalue)
+	{
+		return createTextField(name, defvalue, false, 0);
 	}
 	
 	/**

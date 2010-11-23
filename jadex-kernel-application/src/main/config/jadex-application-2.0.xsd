@@ -311,6 +311,7 @@
 		<xs:attribute name="language" type="xs:string" use="optional"/>
 		<xs:attribute name="direct" type="xs:boolean" use="optional" default="false"/>
 		<xs:attribute name="componenttype" type="xs:string" use="optional"/>
+		<xs:attribute name="componentname" type="xs:string" use="optional"/>
 	</xs:complexType>
 	<xs:complexType name="requiredservicetype" mixed="true">
 		<xs:annotation>

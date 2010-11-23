@@ -281,7 +281,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 				}
 		
 				// Evaluate (future) properties.
-				List	props	= model.getPropertyList();
+				List props	= model.getPropertyList();
 				if(props!=null)
 				{
 					for(int i=0; i<props.size(); i++)
