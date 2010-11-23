@@ -10,7 +10,6 @@ import jadex.bdi.runtime.IMessageEventListener;
 import jadex.bdi.runtime.IPlanListener;
 import jadex.bdi.runtime.impl.flyweights.BeliefFlyweight;
 import jadex.bdi.runtime.impl.flyweights.BeliefSetFlyweight;
-import jadex.bdi.runtime.impl.flyweights.CapabilityFlyweight;
 import jadex.bdi.runtime.impl.flyweights.GoalFlyweight;
 import jadex.bdi.runtime.impl.flyweights.InternalEventFlyweight;
 import jadex.bdi.runtime.impl.flyweights.MessageEventFlyweight;
@@ -73,7 +72,7 @@ public class ListenerRules
 		{
 			public void execute(IOAVState state, IVariableAssignments assignments)
 			{
-				Object ragent = assignments.getVariableValue("?ragent");
+//				Object ragent = assignments.getVariableValue("?ragent");
 				Object le	= assignments.getVariableValue("?listenerentry");
 				Object ce = assignments.getVariableValue("?ce");
 				

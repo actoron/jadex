@@ -11,7 +11,6 @@ import jadex.application.runtime.IApplication;
 import jadex.application.runtime.IApplicationExternalAccess;
 import jadex.application.runtime.ISpace;
 import jadex.bridge.ComponentFactorySelector;
-import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.ComponentResultListener;
 import jadex.bridge.ComponentServiceContainer;
 import jadex.bridge.ComponentTerminatedException;
