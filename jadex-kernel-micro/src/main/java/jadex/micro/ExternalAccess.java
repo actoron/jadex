@@ -190,13 +190,13 @@ public class ExternalAccess implements IMicroExternalAccess
 			{
 				public void run() 
 				{
-					interpreter.cleanupComponent().addResultListener(new DelegationResultListener(ret));
+					interpreter.killComponent().addResultListener(new DelegationResultListener(ret));
 				}
 			});
 		}
 		else
 		{
-			interpreter.cleanupComponent().addResultListener(new DelegationResultListener(ret));
+			interpreter.killComponent().addResultListener(new DelegationResultListener(ret));
 		}
 		
 		return ret;

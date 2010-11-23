@@ -1,10 +1,17 @@
 package jadex.micro.examples.mandelbrot;
 
+import jadex.bridge.IComponentListener;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
+import jadex.commons.ChangeEvent;
 import jadex.commons.SGUI;
 import jadex.micro.MicroAgent;
 import jadex.micro.MicroAgentMetaInfo;
 
 import java.awt.BorderLayout;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
@@ -31,15 +38,50 @@ public class DisplayAgent extends MicroAgent
 
 		addService(new DisplayService(this));
 		
+		final IExternalAccess	access	= getExternalAccess();
 		SwingUtilities.invokeLater(new Runnable()
 		{
 			public void run()
 			{
-				JFrame	frame	= new JFrame(getAgentName());
+				final JFrame	frame	= new JFrame(getAgentName());
 				frame.getContentPane().add(BorderLayout.CENTER, panel);
 				frame.setSize(500, 500);
 				frame.setLocation(SGUI.calculateMiddlePosition(frame));
 				frame.setVisible(true);
+				
+				frame.addWindowListener(new WindowAdapter()
+				{
+					public void windowClosing(WindowEvent e)
+					{
+						access.killComponent();
+					}
+				});
+				
+				access.scheduleStep(new IComponentStep()
+				{
+					public Object execute(IInternalAccess ia)
+					{
+						ia.addComponentListener(new IComponentListener()
+						{
+							public void componentTerminating(ChangeEvent ce)
+							{
+								SwingUtilities.invokeLater(new Runnable()
+								{
+									public void run()
+									{
+										frame.setVisible(false);
+									}
+								});
+							}
+							
+							public void componentTerminated(ChangeEvent ce)
+							{
+							}
+						});
+						
+						return null;
+					}
+				});
 			}
 		});
 	}
