@@ -71,7 +71,12 @@ public class GeneratePanel extends JPanel
 										{
 											// Distribute to more than one worker.
 											IDisplayService ds = (IDisplayService)result;
-											ds.displayResult(res);
+											ds.displayResult(res).addResultListener(new DefaultResultListener()
+											{
+												public void resultAvailable(Object source, Object result)
+												{
+												}
+											});
 										}
 									});
 								}
