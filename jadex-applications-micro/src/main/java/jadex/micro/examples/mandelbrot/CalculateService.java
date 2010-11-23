@@ -48,6 +48,7 @@ public class CalculateService extends BasicService implements ICalculateService
 	 */
 	protected Integer determineColor(double xn, double yn)
 	{
+		int max = 20;
 		int i = 0;
 		double c = 0;
 		
@@ -60,6 +61,6 @@ public class CalculateService extends BasicService implements ICalculateService
 			c =  Math.sqrt(xn*xn + yn*yn);
 		}
 		
-		return new Integer(i);
+		return new Integer(i==max? -1: i);
 	}
 }
