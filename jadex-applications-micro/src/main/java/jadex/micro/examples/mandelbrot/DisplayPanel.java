@@ -16,13 +16,13 @@ import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-import javax.swing.JPanel;
+import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 
 /**
  *  Panel for displaying calculated results.
  */
-public class DisplayPanel extends JPanel
+public class DisplayPanel extends JComponent
 {
 	//-------- constants --------
 	public static final Color[]	COLORS	= new Color[16];
@@ -54,6 +54,9 @@ public class DisplayPanel extends JPanel
 	/** The current selection range (if any). */
 	protected Rectangle	range;
 	
+	/** Flag indicating that a calculation is in progress. */
+	protected boolean	calculating;
+	
 	//-------- constructors --------
 	
 	/**
@@ -67,6 +70,8 @@ public class DisplayPanel extends JPanel
 			{
 				if(SwingUtilities.isRightMouseButton(e))
 				{
+					DisplayPanel.this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+					calculating	= true;
 					final Rectangle	bounds	= getInnerBounds();
 					SServiceProvider.getService(provider, IGenerateService.class)
 					.addResultListener(new SwingDefaultResultListener()
@@ -80,20 +85,22 @@ public class DisplayPanel extends JPanel
 							{
 								public void customResultAvailable(Object source, Object result)
 								{
+									calculating	= false;
+									DisplayPanel.this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 									DisplayPanel.this.setResults((AreaData)result);
+								}
+								public void customExceptionOccurred(Object source, Exception exception)
+								{
+									calculating	= false;
+									DisplayPanel.this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+									super.customExceptionOccurred(source, exception);
 								}
 							});
 						}
-					});						
-
-					if(range!=null)
-					{
-						range	= null;
-						repaint();
-					}
+					});
 				}
 				
-				else if(range!=null)
+				else if(!calculating && range!=null)
 				{
 					if(e.getX()>=range.x && e.getX()<=range.x+range.width
 						&& e.getY()>=range.y && e.getY()<=range.y+range.height)
@@ -111,6 +118,8 @@ public class DisplayPanel extends JPanel
 						final double	owidth	= data.getXEnd()-data.getXStart();
 						final double	oheight	= data.getYEnd()-data.getYStart();
 						
+						DisplayPanel.this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+						calculating	= true;
 						SServiceProvider.getService(provider, IGenerateService.class)
 							.addResultListener(new SwingDefaultResultListener()
 						{
@@ -123,41 +132,52 @@ public class DisplayPanel extends JPanel
 								{
 									public void customResultAvailable(Object source, Object result)
 									{
+										calculating	= false;
+										DisplayPanel.this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 										DisplayPanel.this.setResults((AreaData)result);
+									}
+									public void customExceptionOccurred(Object source, Exception exception)
+									{
+										calculating	= false;
+										DisplayPanel.this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+										super.customExceptionOccurred(source, exception);
 									}
 								});
 							}
 						});						
 					}
-					
-					range	= null;
-					repaint();
 				}
 			}
 			
 			public void mousePressed(MouseEvent e)
 			{
-				if(SwingUtilities.isRightMouseButton(e))
+				if(!calculating)
 				{
-					DisplayPanel.this.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-				}
-				else
-				{
-					point	= e.getPoint();
-					DisplayPanel.this.setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
+					if(SwingUtilities.isRightMouseButton(e))
+					{
+						DisplayPanel.this.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+					}
+					else
+					{
+						point	= e.getPoint();
+						DisplayPanel.this.setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
+					}
 				}
 			}
 			
 			public void mouseReleased(MouseEvent e)
 			{
-				DisplayPanel.this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+				if(!calculating)
+				{
+					DisplayPanel.this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+				}
 			}
 		});
 		addMouseMotionListener(new MouseAdapter()
 		{
 			public void mouseMoved(MouseEvent e)
 			{
-				if(range!=null)
+				if(!calculating && range!=null)
 				{
 					if(e.getX()>=range.x && e.getX()<=range.x+range.width
 						&& e.getY()>=range.y && e.getY()<=range.y+range.height)
@@ -173,15 +193,15 @@ public class DisplayPanel extends JPanel
 			
 			public void mouseDragged(MouseEvent e)
 			{
-				if(point!=null)
+				if(!calculating && point!=null)
 				{
 					range	= new Rectangle(
 						point.x<e.getX() ? point.x : e.getX(),
 						point.y<e.getY() ? point.y : e.getY(),
 						Math.abs(point.x-e.getX()), Math.abs(point.y-e.getY()));
+					
+					repaint();
 				}
-				
-				repaint();
 			}
 		});
 	}
@@ -221,6 +241,10 @@ public class DisplayPanel extends JPanel
 				getParent().invalidate();
 				getParent().doLayout();
 				getParent().repaint();
+				
+				point	= null;
+				range	= null;
+				DisplayPanel.this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 			}
 		});
 	}
@@ -275,9 +299,10 @@ public class DisplayPanel extends JPanel
 	/**
 	 *  Get the desired size of the panel.
 	 */
-	public Dimension getPreferredSize()
+	public Dimension getMinimumSize()
 	{
-		Dimension	ret	= super.getPreferredSize();
+		Insets	ins	= getInsets();
+		Dimension	ret	= new Dimension(ins!=null ? ins.left+ins.right : 0, ins!=null ? ins.top+ins.bottom : 0);
 		if(image!=null)
 		{
 			ret.width	+= image.getWidth(this);
@@ -289,14 +314,8 @@ public class DisplayPanel extends JPanel
 	/**
 	 *  Get the desired size of the panel.
 	 */
-	public Dimension getMinimumSize()
+	public Dimension getPreferredSize()
 	{
-		Dimension	ret	= super.getMinimumSize();
-		if(image!=null)
-		{
-			ret.width	+= image.getWidth(this);
-			ret.height	+= image.getHeight(this);
-		}
-		return ret;
+		return getMinimumSize();
 	}
 }
