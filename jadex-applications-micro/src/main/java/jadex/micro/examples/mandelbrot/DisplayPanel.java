@@ -66,7 +66,9 @@ public class DisplayPanel extends JPanel
 						g.drawLine(x, y, x, y);
 					}
 				}
-				repaint();
+				getParent().invalidate();
+				getParent().doLayout();
+				getParent().repaint();
 			}
 		});
 	}
@@ -101,6 +103,20 @@ public class DisplayPanel extends JPanel
 	public Dimension getPreferredSize()
 	{
 		Dimension	ret	= super.getPreferredSize();
+		if(image!=null)
+		{
+			ret.width	+= image.getWidth(this);
+			ret.height	+= image.getHeight(this);
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Get the desired size of the panel.
+	 */
+	public Dimension getMinimumSize()
+	{
+		Dimension	ret	= super.getMinimumSize();
 		if(image!=null)
 		{
 			ret.width	+= image.getWidth(this);

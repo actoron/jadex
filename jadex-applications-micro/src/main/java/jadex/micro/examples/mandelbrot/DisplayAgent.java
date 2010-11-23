@@ -14,6 +14,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 import javax.swing.JFrame;
+import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 
 /**
@@ -44,8 +45,9 @@ public class DisplayAgent extends MicroAgent
 			public void run()
 			{
 				final JFrame	frame	= new JFrame(getAgentName());
-				frame.getContentPane().add(BorderLayout.CENTER, panel);
-				frame.setSize(500, 500);
+				JScrollPane	scroll	= new JScrollPane(panel);
+				frame.getContentPane().add(BorderLayout.CENTER, scroll);
+				frame.setSize(500, 400);
 				frame.setLocation(SGUI.calculateMiddlePosition(frame));
 				frame.setVisible(true);
 				
