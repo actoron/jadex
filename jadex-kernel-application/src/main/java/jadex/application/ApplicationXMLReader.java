@@ -270,7 +270,8 @@ public class ApplicationXMLReader
 		types.add(new TypeInfo(new XMLInfo(new QName(uri, "providedservice")), new ObjectInfo(MProvidedServiceType.class, new ExpressionProcessor()), 
 			new MappingInfo(null, null, "value", new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo("class", "className")),
-				new AttributeInfo(new AccessInfo("componentname", "componentName"))
+				new AttributeInfo(new AccessInfo("componentname", "componentName")),
+				new AttributeInfo(new AccessInfo("componenttype", "componentType"))
 			}, null)));
 		
 		types.add(new TypeInfo(new XMLInfo(new QName(uri, "requiredservice")), new ObjectInfo(MRequiredServiceType.class, new ExpressionProcessor()), 

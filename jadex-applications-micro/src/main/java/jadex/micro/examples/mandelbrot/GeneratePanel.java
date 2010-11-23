@@ -1,6 +1,7 @@
 package jadex.micro.examples.mandelbrot;
 
 import jadex.bridge.IExternalAccess;
+import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.gui.PropertiesPanel;
 import jadex.commons.service.SServiceProvider;
 
@@ -37,7 +38,14 @@ public class GeneratePanel extends JPanel
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				SServiceProvider
+				SServiceProvider.getDeclaredService(agent.getServiceProvider(), IGenerateService.class)
+					.addResultListener(new DefaultResultListener()
+				{
+					public void resultAvailable(Object source, Object result)
+					{
+						
+					}
+				});
 			}
 		});
 		

@@ -1,10 +1,7 @@
 package jadex.micro.examples.mandelbrot;
 
-import jadex.commons.Future;
-import jadex.commons.IFuture;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.service.BasicService;
-import jadex.commons.service.IServiceProvider;
 import jadex.commons.service.SServiceProvider;
 import jadex.micro.examples.compositeservice.IAddService;
 
