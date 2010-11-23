@@ -30,16 +30,11 @@
 		<application name="All Components">
 			<components>
 				<component type="Generator"/>
-				<!-- <component type="Calculator"/>  -->
-				<!-- <component type="Display"/> -->
+				<component type="Calculator"/>
+				<component type="Display"/>
 			</components>
 		</application>
 		<application name="Only Generator">
-			<components>
-				<component type="Generator"/>
-			</components>
-		</application>
-		<application name="3">
 			<components>
 				<component type="Generator"/>
 			</components>

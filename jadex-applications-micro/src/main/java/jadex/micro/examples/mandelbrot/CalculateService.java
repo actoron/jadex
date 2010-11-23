@@ -25,7 +25,7 @@ public class CalculateService extends BasicService implements ICalculateService
 	/**
 	 *  Calculate colors for an area of points.
 	 */
-	public IFuture calculateArea(double x1, double y1, double x2, double y2, double stepx, double stepy)
+	public IFuture calculateArea(double x1, double y1, double x2, double y2, double stepx, double stepy, int max)
 	{
 		Future ret = new Future();
 		
@@ -38,11 +38,11 @@ public class CalculateService extends BasicService implements ICalculateService
 		{
 			for(int xi=0; xi<nx; xi++)
 			{
-				res[xi][yi] = determineColor(x1+xi*stepx, y1+yi*stepy);
+				res[xi][yi] = determineColor(x1+xi*stepx, y1+yi*stepy, max);
 			}
 		}
 		
-		ret.setResult(res);
+		ret.setResult(new AreaData(x1, x2, y1, y2, stepx, stepy, res));
 		
 		return ret;
 	}
@@ -50,9 +50,8 @@ public class CalculateService extends BasicService implements ICalculateService
 	/**
 	 *  Determine the color of a point.
 	 */
-	protected int determineColor(double xn, double yn)
+	protected int determineColor(double xn, double yn, int max)
 	{
-		int max = 256;
 		double x0 = xn;
 		double y0 = yn;
 		int i = 0;

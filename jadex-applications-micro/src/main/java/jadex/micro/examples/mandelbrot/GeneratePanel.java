@@ -17,12 +17,12 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 /**
- * 
+ *  The panel for controlling the generator.
  */
 public class GeneratePanel extends JPanel
 {
 	/**
-	 * 
+	 *  Create a new panel.
 	 */
 	public GeneratePanel(final IExternalAccess agent)
 	{
@@ -30,13 +30,14 @@ public class GeneratePanel extends JPanel
 		final PropertiesPanel pp = new PropertiesPanel("Generate Options");
 		
 		pp.createTextField("xmin", "-2", true, 0);
-		pp.createTextField("xmax", "2", true, 0);
-		pp.createTextField("ymin", "-2", true, 0);
-		pp.createTextField("ymax", "2", true, 0);
-		pp.createTextField("sizex", "100", true, 0);
-		pp.createTextField("sizey", "100", true, 0);
+		pp.createTextField("xmax", "1", true, 0);
+		pp.createTextField("ymin", "-1", true, 0);
+		pp.createTextField("ymax", "1", true, 0);
+		pp.createTextField("sizex", "600", true, 0);
+		pp.createTextField("sizey", "600", true, 0);
+		pp.createTextField("max", "256", true, 0);
 		
-		final JButton[] buts = pp.createButtons("buts", new String[]{"Go"}, 1);
+		final JButton[] buts = pp.createButtons("buts", new String[]{"Go"}, 0);
 		
 		buts[0].addActionListener(new ActionListener()
 		{
@@ -50,6 +51,7 @@ public class GeneratePanel extends JPanel
 					final double y2 = Double.parseDouble(pp.getTextField("ymax").getText());
 					final int sizex = Integer.parseInt(pp.getTextField("sizex").getText());
 					final int sizey = Integer.parseInt(pp.getTextField("sizey").getText());
+					final int max = Integer.parseInt(pp.getTextField("max").getText());
 				
 					SServiceProvider.getDeclaredService(agent.getServiceProvider(), IGenerateService.class)
 						.addResultListener(new DefaultResultListener()
@@ -58,11 +60,11 @@ public class GeneratePanel extends JPanel
 						{
 							IGenerateService gs = (IGenerateService)result;
 							
-							gs.generateArea(x1, y1, x2, y2, sizex, sizey).addResultListener(new DefaultResultListener()
+							gs.generateArea(x1, y1, x2, y2, sizex, sizey, max).addResultListener(new DefaultResultListener()
 							{
 								public void resultAvailable(Object source, Object result)
 								{
-									final int[][] res = (int[][])result;
+									final AreaData res = (AreaData)result;
 									
 									SServiceProvider.getService(agent.getServiceProvider(), IDisplayService.class)
 										.addResultListener(new DefaultResultListener()

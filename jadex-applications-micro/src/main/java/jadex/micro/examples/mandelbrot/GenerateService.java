@@ -32,7 +32,7 @@ public class GenerateService extends BasicService implements IGenerateService
 	/**
 	 *  Generate a specific area using a defined x and y size.
 	 */
-	public IFuture generateArea(final double x1, final double y1, final double x2, final double y2, int sizex, int sizey)
+	public IFuture generateArea(final double x1, final double y1, final double x2, final double y2, int sizex, int sizey, final int max)
 	{
 		final Future ret = new Future();
 		
@@ -46,14 +46,13 @@ public class GenerateService extends BasicService implements IGenerateService
 			{
 				// Distribute to more than one worker.
 				ICalculateService cs = (ICalculateService)result;
-				cs.calculateArea(x1, y1, x2, y2, stepx, stepy).addResultListener(
+				
+				cs.calculateArea(x1, y1, x2, y2, stepx, stepy, max).addResultListener(
 					agent.createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object source, Object result)
 					{
-						final int[][] res = (int[][])result;
-						
-						ret.setResult(res);
+						ret.setResult(result);
 					}
 				}));
 			}

@@ -31,9 +31,9 @@ public class DisplayService extends BasicService implements IDisplayService
 	/**
 	 *  Display the result of a calculation.
 	 */
-	public IFuture displayResult(int[][] result)
+	public IFuture displayResult(AreaData result)
 	{
-		agent.getPanel().setResults(result);
+		agent.getPanel().setResults(result.getData());
 		return new Future(null);
 	}
 }

@@ -194,26 +194,30 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 					
 			// Select application instance according to configuration.
 			MApplicationInstance app = null;
-			if(config==null && apps.size()>0)
-				app = (MApplicationInstance)apps.get(0);
-			
-			for(int i=0; app==null && i<apps.size(); i++)
+				
+			if(config!=null)
 			{
-				MApplicationInstance tmp = (MApplicationInstance)apps.get(i);
-				if(config.equals(tmp.getName()))
-					app = tmp;
+				for(int i=0; app==null && i<apps.size(); i++)
+				{
+					MApplicationInstance tmp = (MApplicationInstance)apps.get(i);
+					if(config.equals(tmp.getName()))
+						app = tmp;
+				}
 			}
-			
+			if(app==null && apps.size()>0)
+			{
+				app = (MApplicationInstance)apps.get(0);
+			}
 			if(app==null)
 				app = new MApplicationInstance("default");
 	
 			// Create context for application.
-			ApplicationInterpreter context = new ApplicationInterpreter(desc, apptype, app, factory, parent, arguments, ret);
+			ApplicationInterpreter interpreter = new ApplicationInterpreter(desc, apptype, app, factory, parent, arguments, ret);
 			
 			// todo: result listener?
 			// todo: create application context as return value?!
 					
-			return new Object[]{context, context.getComponentAdapter()};
+			return new Object[]{interpreter, interpreter.getComponentAdapter()};
 		}
 		catch(Exception e)
 		{

@@ -10,5 +10,5 @@ public interface IDisplayService
 	/**
 	 *  Display the result of a calculation.
 	 */
-	public IFuture displayResult(int[][] result);
+	public IFuture displayResult(AreaData result);
 }
