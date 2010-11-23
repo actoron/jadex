@@ -1,11 +1,20 @@
 package jadex.micro.examples.mandelbrot;
 
+import jadex.commons.IFuture;
+import jadex.commons.concurrent.SwingDefaultResultListener;
+import jadex.commons.service.IServiceProvider;
+import jadex.commons.service.SServiceProvider;
+
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Insets;
+import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
@@ -33,20 +42,163 @@ public class DisplayPanel extends JPanel
 	
 	//-------- attributes --------
 	
+	/** The latest area data used for determining original coordinates of painted regions. */
+	protected AreaData	data;
+	
 	/** The current image derived from the results. */
 	protected Image	image;
+	
+	/** The current selection point (if any). */
+	protected Point	point;
+	
+	/** The current selection range (if any). */
+	protected Rectangle	range;
+	
+	//-------- constructors --------
+	
+	/**
+	 *  Create a new display panel.
+	 */
+	public DisplayPanel(final IServiceProvider provider)
+	{
+		addMouseListener(new MouseAdapter()
+		{
+			public void mouseClicked(MouseEvent e)
+			{
+				if(SwingUtilities.isRightMouseButton(e))
+				{
+					final Rectangle	bounds	= getInnerBounds();
+					SServiceProvider.getService(provider, IGenerateService.class)
+					.addResultListener(new SwingDefaultResultListener()
+					{
+						public void customResultAvailable(Object source, Object result)
+						{
+							IGenerateService	gs	= (IGenerateService)result;
+							IFuture	fut	= gs.generateArea(-2, -1, 1, 1,
+								bounds.width, bounds.height, data.getMax());
+							fut.addResultListener(new SwingDefaultResultListener(DisplayPanel.this)
+							{
+								public void customResultAvailable(Object source, Object result)
+								{
+									DisplayPanel.this.setResults((AreaData)result);
+								}
+							});
+						}
+					});						
+
+					if(range!=null)
+					{
+						range	= null;
+						repaint();
+					}
+				}
+				
+				else if(range!=null)
+				{
+					if(e.getX()>=range.x && e.getX()<=range.x+range.width
+						&& e.getY()>=range.y && e.getY()<=range.y+range.height)
+					{
+						// Calculate bounds relative to original image.
+						final Rectangle	bounds	= getInnerBounds();
+						final double	x	= (double)(range.x-bounds.x)/bounds.width;
+						final double	y	= (double)(range.y-bounds.y)/bounds.height;
+						final double	x2	= x + (double)range.width/bounds.width;
+						final double	y2	= y + (double)range.height/bounds.height;
+						
+						// Original bounds
+						final double	ox	= data.getXStart();
+						final double	oy	= data.getYStart();
+						final double	owidth	= data.getXEnd()-data.getXStart();
+						final double	oheight	= data.getYEnd()-data.getYStart();
+						
+						SServiceProvider.getService(provider, IGenerateService.class)
+							.addResultListener(new SwingDefaultResultListener()
+						{
+							public void customResultAvailable(Object source, Object result)
+							{
+								IGenerateService	gs	= (IGenerateService)result;
+								IFuture	fut	= gs.generateArea(ox+owidth*x, oy+oheight*y, ox+owidth*x2, oy+oheight*y2,
+									bounds.width, bounds.height, data.getMax());
+								fut.addResultListener(new SwingDefaultResultListener(DisplayPanel.this)
+								{
+									public void customResultAvailable(Object source, Object result)
+									{
+										DisplayPanel.this.setResults((AreaData)result);
+									}
+								});
+							}
+						});						
+					}
+					
+					range	= null;
+					repaint();
+				}
+			}
+			
+			public void mousePressed(MouseEvent e)
+			{
+				if(SwingUtilities.isRightMouseButton(e))
+				{
+					DisplayPanel.this.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+				}
+				else
+				{
+					point	= e.getPoint();
+					DisplayPanel.this.setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
+				}
+			}
+			
+			public void mouseReleased(MouseEvent e)
+			{
+				DisplayPanel.this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+			}
+		});
+		addMouseMotionListener(new MouseAdapter()
+		{
+			public void mouseMoved(MouseEvent e)
+			{
+				if(range!=null)
+				{
+					if(e.getX()>=range.x && e.getX()<=range.x+range.width
+						&& e.getY()>=range.y && e.getY()<=range.y+range.height)
+					{
+						DisplayPanel.this.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+					}
+					else
+					{
+						DisplayPanel.this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));						
+					}
+				}
+			}
+			
+			public void mouseDragged(MouseEvent e)
+			{
+				if(point!=null)
+				{
+					range	= new Rectangle(
+						point.x<e.getX() ? point.x : e.getX(),
+						point.y<e.getY() ? point.y : e.getY(),
+						Math.abs(point.x-e.getX()), Math.abs(point.y-e.getY()));
+				}
+				
+				repaint();
+			}
+		});
+	}
 	
 	//-------- methods --------
 	
 	/**
 	 *  Set new results.
 	 */
-	public void	setResults(final int[][] results)
+	public void	setResults(final AreaData data)
 	{
 		SwingUtilities.invokeLater(new Runnable()
 		{
 			public void run()
 			{
+				int[][]	results	= data.getData();
+				DisplayPanel.this.data	= data;
 				DisplayPanel.this.image	= createImage(results.length, results[0].length);
 				Graphics	g	= image.getGraphics();
 				for(int x=0; x<results.length; x++)
@@ -84,17 +236,40 @@ public class DisplayPanel extends JPanel
 		
 		if(image!=null)
 		{
-			Rectangle	bounds	= getBounds();
-			Insets	insets	= getInsets();
-			if(insets!=null)
-			{
-				bounds.width	-= insets.left + insets.right;
-				bounds.height	-= insets.top + insets.bottom;
-			}
+			Rectangle bounds = getInnerBounds();
 
-			g.drawImage(image, insets.left, insets.top, insets.left+bounds.width, insets.top+bounds.height,
+			g.drawImage(image, bounds.x, bounds.y, bounds.x+bounds.width, bounds.y+bounds.height,
 				0, 0, image.getWidth(this), image.getHeight(this), this);
 		}
+		
+		if(range!=null)
+		{
+			g.setXORMode(Color.white);
+			g.drawRect(range.x, range.y, range.width, range.height);
+			g.setPaintMode();
+		}
+	}
+
+	/**
+	 *  Get the bounds with respect to insets (if any).
+	 */
+	protected Rectangle getInnerBounds()
+	{
+		Rectangle	bounds	= getBounds();
+		Insets	insets	= getInsets();
+		if(insets!=null)
+		{
+			bounds.x	= insets.left;
+			bounds.y	= insets.top;
+			bounds.width	-= insets.left + insets.right;
+			bounds.height	-= insets.top + insets.bottom;
+		}
+		else
+		{
+			bounds.x	= 0;
+			bounds.y	= 0;
+		}
+		return bounds;
 	}
 	
 	/**

@@ -35,7 +35,7 @@ public class DisplayAgent extends MicroAgent
 	public void agentCreated()
 	{
 		// Hack!!! Swing code not on swing thread!?
-		DisplayAgent.this.panel	= new DisplayPanel();
+		DisplayAgent.this.panel	= new DisplayPanel(getServiceProvider());
 
 		addService(new DisplayService(this));
 		

@@ -23,6 +23,9 @@ public class AreaData
 	/** The y step width. */
 	protected double stepy;
 	
+	/** The max value where iteration is stopped. */
+	protected int max;
+	
 	/** The result data. */
 	protected int[][] data;
 
@@ -31,7 +34,7 @@ public class AreaData
 	 *  Create a new area data.
 	 */
 	public AreaData(double xstart, double xend, double ystart, double yend,
-			double stepx, double stepy, int[][] data)
+			double stepx, double stepy, int max, int[][] data)
 	{
 		this.xstart = xstart;
 		this.xend = xend;
@@ -39,6 +42,7 @@ public class AreaData
 		this.yend = yend;
 		this.stepx = stepx;
 		this.stepy = stepy;
+		this.max = max;
 		this.data = data;
 	}
 
@@ -148,6 +152,24 @@ public class AreaData
 	public void setStepY(double stepy)
 	{
 		this.stepy = stepy;
+	}
+
+	/**
+	 *  Get the max value.
+	 *  @return the max value.
+	 */
+	public int getMax()
+	{
+		return max;
+	}
+
+	/**
+	 *  Set the max value.
+	 *  @param max The max value to set.
+	 */
+	public void setMax(int max)
+	{
+		this.max = max;
 	}
 
 	/**

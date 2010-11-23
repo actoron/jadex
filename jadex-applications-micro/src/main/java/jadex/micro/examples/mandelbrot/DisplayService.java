@@ -33,7 +33,7 @@ public class DisplayService extends BasicService implements IDisplayService
 	 */
 	public IFuture displayResult(AreaData result)
 	{
-		agent.getPanel().setResults(result.getData());
+		agent.getPanel().setResults(result);
 		return new Future(null);
 	}
 }
