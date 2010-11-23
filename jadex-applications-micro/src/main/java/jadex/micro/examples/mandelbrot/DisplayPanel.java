@@ -75,7 +75,7 @@ public class DisplayPanel extends JPanel
 						{
 							IGenerateService	gs	= (IGenerateService)result;
 							IFuture	fut	= gs.generateArea(-2, -1, 1, 1,
-								bounds.width, bounds.height, data.getMax());
+								bounds.width, bounds.height, data.getMax(), data.getParallel());
 							fut.addResultListener(new SwingDefaultResultListener(DisplayPanel.this)
 							{
 								public void customResultAvailable(Object source, Object result)
@@ -118,7 +118,7 @@ public class DisplayPanel extends JPanel
 							{
 								IGenerateService	gs	= (IGenerateService)result;
 								IFuture	fut	= gs.generateArea(ox+owidth*x, oy+oheight*y, ox+owidth*x2, oy+oheight*y2,
-									bounds.width, bounds.height, data.getMax());
+									bounds.width, bounds.height, data.getMax(), data.getParallel());
 								fut.addResultListener(new SwingDefaultResultListener(DisplayPanel.this)
 								{
 									public void customResultAvailable(Object source, Object result)

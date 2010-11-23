@@ -42,7 +42,7 @@ public class CalculateService extends BasicService implements ICalculateService
 			}
 		}
 		
-		ret.setResult(new AreaData(x1, x2, y1, y2, stepx, stepy, max, res));
+		ret.setResult(new AreaData(x1, x2, y1, y2, stepx, stepy, max, 1, res));
 		
 		return ret;
 	}

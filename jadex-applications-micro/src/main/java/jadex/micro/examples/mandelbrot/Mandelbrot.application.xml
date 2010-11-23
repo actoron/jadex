@@ -22,7 +22,7 @@
 	
 	<services>
 		<providedservice class="IGenerateService" componenttype="Generator"/>
-		<providedservice class="ICalculateService" componenttype="Calculator"/>
+		<!-- <providedservice class="ICalculateService" componenttype="Calculator"/> -->
 		<providedservice class="IDisplayService" componenttype="Display"/>
 	</services>
 	

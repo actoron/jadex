@@ -26,6 +26,9 @@ public class AreaData
 	/** The max value where iteration is stopped. */
 	protected int max;
 	
+	/** The number of parallel workers. */
+	protected int par;
+	
 	/** The result data. */
 	protected int[][] data;
 
@@ -34,7 +37,7 @@ public class AreaData
 	 *  Create a new area data.
 	 */
 	public AreaData(double xstart, double xend, double ystart, double yend,
-			double stepx, double stepy, int max, int[][] data)
+			double stepx, double stepy, int max, int par, int[][] data)
 	{
 		this.xstart = xstart;
 		this.xend = xend;
@@ -43,6 +46,7 @@ public class AreaData
 		this.stepx = stepx;
 		this.stepy = stepy;
 		this.max = max;
+		this.par = par;
 		this.data = data;
 	}
 
@@ -189,5 +193,25 @@ public class AreaData
 	{
 		this.data = data;
 	}
+
+	/**
+	 *  Get the par.
+	 *  @return the par.
+	 */
+	public int getParallel()
+	{
+		return par;
+	}
+
+	/**
+	 *  Set the par.
+	 *  @param par The par to set.
+	 */
+	public void setParallel(int par)
+	{
+		this.par = par;
+	}
+	
+	
 	
 }

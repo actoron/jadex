@@ -36,6 +36,7 @@ public class GeneratePanel extends JPanel
 		pp.createTextField("sizex", "600", true, 0);
 		pp.createTextField("sizey", "600", true, 0);
 		pp.createTextField("max", "256", true, 0);
+		pp.createTextField("parallel", "2", true, 0);
 		
 		final JButton[] buts = pp.createButtons("buts", new String[]{"Go"}, 0);
 		
@@ -52,6 +53,7 @@ public class GeneratePanel extends JPanel
 					final int sizex = Integer.parseInt(pp.getTextField("sizex").getText());
 					final int sizey = Integer.parseInt(pp.getTextField("sizey").getText());
 					final int max = Integer.parseInt(pp.getTextField("max").getText());
+					final int par = Integer.parseInt(pp.getTextField("parallel").getText());
 				
 					SServiceProvider.getDeclaredService(agent.getServiceProvider(), IGenerateService.class)
 						.addResultListener(new DefaultResultListener()
@@ -60,7 +62,7 @@ public class GeneratePanel extends JPanel
 						{
 							IGenerateService gs = (IGenerateService)result;
 							
-							gs.generateArea(x1, y1, x2, y2, sizex, sizey, max).addResultListener(new DefaultResultListener()
+							gs.generateArea(x1, y1, x2, y2, sizex, sizey, max, par).addResultListener(new DefaultResultListener()
 							{
 								public void resultAvailable(Object source, Object result)
 								{
