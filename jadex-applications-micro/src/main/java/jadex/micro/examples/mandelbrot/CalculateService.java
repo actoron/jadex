@@ -4,7 +4,6 @@ import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.service.BasicService;
 import jadex.commons.service.IServiceProvider;
-import jadex.micro.examples.compositeservice.IAddService;
 
 /**
  * 
@@ -16,7 +15,7 @@ public class CalculateService extends BasicService implements ICalculateService
 	 */
 	public CalculateService(IServiceProvider provider)
 	{
-		super(provider.getId(), IAddService.class, null);
+		super(provider.getId(), ICalculateService.class, null);
 	}
 	
 	/**
@@ -50,9 +49,9 @@ public class CalculateService extends BasicService implements ICalculateService
 	protected Integer determineColor(double xn, double yn)
 	{
 		int i = 0;
-		double c = Math.sqrt(xn*xn + yn*yn);
+		double c = 0;
 		
-		for(i=0; c<2 && i<0; i++)
+		for(i=0; c<2 && i<20; i++)
 		{
 			double xn1 = xn*xn - yn*yn + xn;
 			double yn1 = 2*xn*yn + yn;

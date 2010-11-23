@@ -18,7 +18,7 @@ public class DisplayAgent extends MicroAgent
 	 */
 	public void agentCreated()
 	{
-		addService(new DisplayService(getServiceProvider()));
+//		addService(new DisplayService(getServiceProvider()));
 	}
 	
 	//-------- static methods --------
