@@ -6,17 +6,21 @@ import jadex.commons.service.BasicService;
 import jadex.commons.service.IServiceProvider;
 
 /**
- * 
+ *  Calculate service implementation.
  */
 public class CalculateService extends BasicService implements ICalculateService
 {
+	//-------- constructors --------
+	
 	/**
-	 * 
+	 *  Create a new service.
 	 */
 	public CalculateService(IServiceProvider provider)
 	{
 		super(provider.getId(), ICalculateService.class, null);
 	}
+	
+	//-------- methods --------
 	
 	/**
 	 *  Calculate colors for an area of points.
@@ -44,7 +48,7 @@ public class CalculateService extends BasicService implements ICalculateService
 	}
 
 	/**
-	 * 
+	 *  Determine the color of a point.
 	 */
 	protected int determineColor(double xn, double yn)
 	{

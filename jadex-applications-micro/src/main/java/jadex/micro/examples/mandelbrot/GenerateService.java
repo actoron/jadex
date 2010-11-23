@@ -7,15 +7,19 @@ import jadex.commons.service.BasicService;
 import jadex.commons.service.SServiceProvider;
 
 /**
- * 
+ *  Generate service implementation. 
  */
 public class GenerateService extends BasicService implements IGenerateService
 {
+	//-------- attributes --------
+	
 	/** The agent. */
 	protected GenerateAgent agent;
 	
+	//-------- constructors --------
+	
 	/**
-	 * 
+	 *  Create a new service.
 	 */
 	public GenerateService(GenerateAgent agent)
 	{
@@ -23,8 +27,10 @@ public class GenerateService extends BasicService implements IGenerateService
 		this.agent = agent;
 	}
 	
+	//-------- methods --------
+	
 	/**
-	 * 
+	 *  Generate a specific area using a defined x and y size.
 	 */
 	public IFuture generateArea(final double x1, final double y1, final double x2, final double y2, int sizex, int sizey)
 	{
