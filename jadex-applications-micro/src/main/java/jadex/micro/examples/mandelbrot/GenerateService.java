@@ -115,6 +115,11 @@ public class GenerateService extends BasicService implements IGenerateService
 		
 		ICalculateService cs = (ICalculateService)services.get(0);
 		
+		int deg = (int)Math.sqrt(services.size());
+		
+		double xs = data.getXEnd()-data.getXStart()/deg;
+		double ys = data.getYEnd()-data.getYStart()/deg;
+		
 		cs.calculateArea(data.getXStart(), data.getYStart(), data.getXEnd(), data.getYEnd(), data.getStepX(), data.getStepY(), data.getMax())
 			.addResultListener(agent.createResultListener(new DelegationResultListener(ret)
 		{
