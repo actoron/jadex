@@ -66,6 +66,7 @@ public class DisplayPanel extends JPanel
 						g.drawLine(x, y, x, y);
 					}
 				}
+				repaint();
 			}
 		});
 	}

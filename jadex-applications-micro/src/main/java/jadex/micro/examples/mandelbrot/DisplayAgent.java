@@ -39,6 +39,7 @@ public class DisplayAgent extends MicroAgent
 				frame.getContentPane().add(BorderLayout.CENTER, panel);
 				frame.setSize(500, 500);
 				frame.setLocation(SGUI.calculateMiddlePosition(frame));
+				frame.setVisible(true);
 			}
 		});
 	}
