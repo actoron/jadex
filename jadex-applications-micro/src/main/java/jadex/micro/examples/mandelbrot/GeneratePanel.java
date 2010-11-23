@@ -58,7 +58,24 @@ public class GeneratePanel extends JPanel
 						{
 							IGenerateService gs = (IGenerateService)result;
 							
-							gs.generateArea(x1, y1, x2, y2, sizex, sizey);
+							gs.generateArea(x1, y1, x2, y2, sizex, sizey).addResultListener(new DefaultResultListener()
+							{
+								public void resultAvailable(Object source, Object result)
+								{
+									final Integer[][] res = (Integer[][])result;
+									
+									SServiceProvider.getService(agent.getServiceProvider(), IDisplayService.class)
+										.addResultListener(new DefaultResultListener()
+									{
+										public void resultAvailable(Object source, Object result)
+										{
+											// Distribute to more than one worker.
+											IDisplayService ds = (IDisplayService)result;
+											ds.displayResult(res);
+										}
+									});
+								}
+							});
 						}
 					});
 				}

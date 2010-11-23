@@ -177,7 +177,7 @@ public class CompositeServiceInvocationInterceptor implements IServiceInvocation
 						final BasicServiceInvocationHandler handler = (BasicServiceInvocationHandler)Proxy.getInvocationHandler(sic.getProxy());
 		
 						IExternalAccess cea = (IExternalAccess)result;
-						SServiceProvider.getService(cea.getServiceProvider(), handler.getServiceIdentifier().getServiceType())
+						SServiceProvider.getDeclaredService(cea.getServiceProvider(), handler.getServiceIdentifier().getServiceType())
 							.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 						{
 							public void customResultAvailable(Object source, Object result)
@@ -200,6 +200,10 @@ public class CompositeServiceInvocationInterceptor implements IServiceInvocation
 									{
 										ret.setException(e);
 									}
+								}
+								else
+								{
+									ret.setException(new RuntimeException("No service found: "+ia.getComponentIdentifier()+" "+handler.getServiceIdentifier().getServiceType()));
 								}
 							}
 						}));

@@ -2,7 +2,6 @@ package jadex.micro.examples.mandelbrot;
 
 import jadex.commons.Future;
 import jadex.commons.IFuture;
-import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.service.BasicService;
 import jadex.commons.service.SServiceProvider;
@@ -35,9 +34,9 @@ public class GenerateService extends BasicService implements IGenerateService
 		final double stepy = (y2-y1)/sizey;
 		
 		SServiceProvider.getService(agent.getServiceProvider(), ICalculateService.class)
-			.addResultListener(agent.createResultListener(new DefaultResultListener()
+			.addResultListener(agent.createResultListener(new DelegationResultListener(ret)
 		{
-			public void resultAvailable(Object source, Object result)
+			public void customResultAvailable(Object source, Object result)
 			{
 				// Distribute to more than one worker.
 				ICalculateService cs = (ICalculateService)result;
