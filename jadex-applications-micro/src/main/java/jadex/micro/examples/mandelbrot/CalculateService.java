@@ -53,13 +53,15 @@ public class CalculateService extends BasicService implements ICalculateService
 	protected int determineColor(double xn, double yn)
 	{
 		int max = 20;
+		double x0 = xn;
+		double y0 = yn;
 		int i = 0;
 		double c = 0;
 		
 		for(i=0; c<2 && i<20; i++)
 		{
-			double xn1 = xn*xn - yn*yn + xn;
-			double yn1 = 2*xn*yn + yn;
+			double xn1 = xn*xn - yn*yn + x0;
+			double yn1 = 2*xn*yn + y0;
 			xn = xn1;
 			yn = yn1;
 			c =  Math.sqrt(xn*xn + yn*yn);
