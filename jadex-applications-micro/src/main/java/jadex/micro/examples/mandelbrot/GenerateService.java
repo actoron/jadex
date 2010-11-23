@@ -45,7 +45,7 @@ public class GenerateService extends BasicService implements IGenerateService
 				{
 					public void customResultAvailable(Object source, Object result)
 					{
-						final Integer[][] res = (Integer[][])result;
+						final int[][] res = (int[][])result;
 						
 						ret.setResult(res);
 					}

@@ -28,7 +28,7 @@ public class CalculateService extends BasicService implements ICalculateService
 		int nx = (int)((x2-x1)/stepx);
 		int ny = (int)((y2-y1)/stepy);
 		
-		Integer[][] res = new Integer[nx][ny];
+		int[][] res = new int[nx][ny];
 		
 		for(int yi=0; yi<ny; yi++)
 		{
@@ -46,7 +46,7 @@ public class CalculateService extends BasicService implements ICalculateService
 	/**
 	 * 
 	 */
-	protected Integer determineColor(double xn, double yn)
+	protected int determineColor(double xn, double yn)
 	{
 		int max = 20;
 		int i = 0;
@@ -61,6 +61,6 @@ public class CalculateService extends BasicService implements ICalculateService
 			c =  Math.sqrt(xn*xn + yn*yn);
 		}
 		
-		return new Integer(i==max? -1: i);
+		return i==max? -1: i;
 	}
 }

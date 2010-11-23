@@ -62,7 +62,7 @@ public class GeneratePanel extends JPanel
 							{
 								public void resultAvailable(Object source, Object result)
 								{
-									final Integer[][] res = (Integer[][])result;
+									final int[][] res = (int[][])result;
 									
 									SServiceProvider.getService(agent.getServiceProvider(), IDisplayService.class)
 										.addResultListener(new DefaultResultListener()
