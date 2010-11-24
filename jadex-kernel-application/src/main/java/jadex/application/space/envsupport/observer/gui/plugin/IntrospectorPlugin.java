@@ -90,7 +90,7 @@ public class IntrospectorPlugin implements IObserverCenterPlugin
 	public IntrospectorPlugin()
 	{
 		mainPane_ = new JTabbedPane();
-		mainPane_.setMinimumSize(new Dimension(250, 400));
+		mainPane_.setMinimumSize(new Dimension(50, 400));
 		
 		JSplitPane spacePane = new JSplitPane();
 		spacePane.setOrientation(JSplitPane.VERTICAL_SPLIT);

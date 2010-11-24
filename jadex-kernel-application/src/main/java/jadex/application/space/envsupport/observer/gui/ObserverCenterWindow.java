@@ -138,7 +138,11 @@ public class ObserverCenterWindow extends JFrame
 	 */
 	public void setPluginView(Component view)
 	{
+		int divloc = mainpane.getLastDividerLocation();
+		if (view.getMinimumSize().getWidth() > divloc)
+			divloc = (int) view.getMinimumSize().getWidth();
 		mainpane.setLeftComponent(view);
+		mainpane.setDividerLocation(divloc);
 	}
 	
 	/** Sets the perspective view.

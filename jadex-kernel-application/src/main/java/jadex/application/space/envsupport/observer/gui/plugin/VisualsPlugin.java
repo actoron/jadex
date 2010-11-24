@@ -87,7 +87,7 @@ public class VisualsPlugin implements IObserverCenterPlugin
 		mainPane.setOneTouchExpandable(true);
 		mainPane.setDividerLocation(160);
 		mainPane.setResizeWeight(0.5);
-		mainPane.setMinimumSize(new Dimension(250, 400));
+		mainPane.setMinimumSize(new Dimension(50, 400));
 		
 		JSplitPane persViewPane = new JSplitPane();
 		persViewPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
