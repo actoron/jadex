@@ -35,6 +35,8 @@ import java.util.List;
 import java.util.Map;
 
 import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.UIManager;
 
 /**
  *  Perspective for viewing in 2D.
@@ -400,7 +402,14 @@ public class Perspective2D extends TypedPropertyObject implements IPerspective
 	public void setBackground(Color bgColor)
 	{
 		if (bgColor == null)
-			bgColor = Color.BLACK;
+		{
+			bgColor = UIManager.getColor("Panel.background");
+			if (bgColor == null)
+				bgColor = (new JPanel()).getBackground();
+			if (bgColor == null)
+				bgColor = Color.BLACK;
+		}
+			
 		this.bgColor = bgColor;
 		if (viewport != null)
 			setBackground(bgColor);

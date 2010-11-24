@@ -264,7 +264,7 @@ public class ViewportJ2D extends AbstractViewport implements ComponentListener
 
 				Graphics2D g = (Graphics2D)backBuffer_.getGraphics();
 				defaultTransform_ = g.getTransform();
-				g.setColor(java.awt.Color.BLACK);
+				g.setColor(bgColor_);
 				g.fillRect(0, 0, getWidth(), getHeight());
 				
 				Rectangle clipRect = getClippingBox();
