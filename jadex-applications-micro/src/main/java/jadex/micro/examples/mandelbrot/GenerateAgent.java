@@ -8,14 +8,13 @@ import jadex.micro.MicroAgentMetaInfo;
  */
 public class GenerateAgent extends MicroAgent
 {
+	
 	/**
 	 *  Called once after agent creation.
 	 */
 	public void agentCreated()
 	{
-		addService(new GenerateService(this));
-		
-		GeneratePanel.createGui(this.getExternalAccess());
+		addService(new GenerateService(this, (GeneratePanel)GeneratePanel.createGui(this.getExternalAccess())[1]));
 	}
 	
 	//-------- static methods --------

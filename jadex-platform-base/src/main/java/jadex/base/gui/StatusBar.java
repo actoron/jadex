@@ -1,4 +1,4 @@
-package jadex.tools.jcc;
+package jadex.base.gui;
 
 import java.awt.Button;
 import java.awt.Component;

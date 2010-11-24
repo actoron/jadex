@@ -1,5 +1,6 @@
 package jadex.micro.examples.mandelbrot;
 
+import jadex.base.gui.StatusBar;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.SGUI;
 import jadex.commons.concurrent.DefaultResultListener;
@@ -21,6 +22,9 @@ import javax.swing.JPanel;
  */
 public class GeneratePanel extends JPanel
 {
+	/** The status bar. */
+	protected StatusBar sb;
+	
 	/**
 	 *  Create a new panel.
 	 */
@@ -98,16 +102,29 @@ public class GeneratePanel extends JPanel
 			}
 		});
 		
+		this.sb = new StatusBar();
+
 		this.add(pp, BorderLayout.CENTER);
+		this.add(sb, BorderLayout.SOUTH);
 	}
 	
 	/**
+	 *  Get the sb.
+	 *  @return the sb.
+	 */
+	public StatusBar getStatusBar()
+	{
+		return sb;
+	}
+
+	/**
 	 *  Create a gui.
 	 */
-	public static void createGui(final IExternalAccess agent)
+	public static Object[] createGui(final IExternalAccess agent)
 	{
 		final JFrame f = new JFrame();
-		f.add(new GeneratePanel(agent));
+		JPanel gp = new GeneratePanel(agent);
+		f.add(gp);
 		f.pack();
 		f.setLocation(SGUI.calculateMiddlePosition(f));
 		f.setVisible(true);
@@ -118,5 +135,7 @@ public class GeneratePanel extends JPanel
 				agent.killComponent();
 			}
 		});
+		
+		return new Object[]{f, gp};
 	}
 }

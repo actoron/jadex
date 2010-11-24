@@ -4,7 +4,6 @@ import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentManagementService;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
-import jadex.commons.SUtil;
 import jadex.commons.concurrent.CollectionResultListener;
 import jadex.commons.concurrent.CounterResultListener;
 import jadex.commons.concurrent.DefaultResultListener;
@@ -14,6 +13,8 @@ import jadex.commons.service.BasicService;
 import jadex.commons.service.SServiceProvider;
 
 import java.util.List;
+
+import javax.swing.SwingUtilities;
 
 /**
  *  Generate service implementation. 
@@ -25,15 +26,19 @@ public class GenerateService extends BasicService implements IGenerateService
 	/** The agent. */
 	protected GenerateAgent agent;
 	
+	/** The generate panel. */
+	protected GeneratePanel panel;
+	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new service.
 	 */
-	public GenerateService(GenerateAgent agent)
+	public GenerateService(GenerateAgent agent, GeneratePanel panel)
 	{
 		super(agent.getServiceProvider().getId(), IGenerateService.class, null);
 		this.agent = agent;
+		this.panel = panel;
 	}
 	
 	//-------- methods --------
@@ -56,6 +61,9 @@ public class GenerateService extends BasicService implements IGenerateService
 				if(sers.size()<data.getParallel())
 				{
 					final int num = data.getParallel()-sers.size();
+					
+//					System.out.println("Starting new calculator agents: "+num);
+					
 					final CollectionResultListener lis = new CollectionResultListener(num, true, agent.createResultListener(new DefaultResultListener()
 					{
 						public void resultAvailable(Object source, Object result)
@@ -107,7 +115,7 @@ public class GenerateService extends BasicService implements IGenerateService
 	protected void distributeWork(final AreaData data, List services, final Future ret)
 	{
 		int num = Math.max(data.getSizeX()*data.getSizeY()/data.getTaskSize(), 1);
-		System.out.println("Number of tasks: "+num);
+//		System.out.println("Number of tasks: "+num);
 		
 		final int xsize = data.getSizeX()/num;
 		final int ysize = data.getSizeY()/num;
@@ -136,6 +144,14 @@ public class GenerateService extends BasicService implements IGenerateService
 				AreaData ad = (AreaData)result;
 				int xs = (int)((int[])ad.getId())[0]*xsize;
 				int ys = (int)((int[])ad.getId())[1]*ysize;
+				
+				SwingUtilities.invokeLater(new Runnable()
+				{
+					public void run()
+					{
+						panel.getStatusBar().setText("Finished: "+getCnt()+"("+getNumber()+")");
+					}
+				});
 				
 //				System.out.println("x:y: end "+xs+" "+ys);
 //				System.out.println("partial: "+SUtil.arrayToString(ad.getData()));

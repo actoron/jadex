@@ -2,6 +2,7 @@ package jadex.tools.jcc;
 
 import jadex.base.gui.AboutDialog;
 import jadex.base.gui.JadexLogoButton;
+import jadex.base.gui.StatusBar;
 import jadex.base.gui.plugin.IControlCenterPlugin;
 import jadex.commons.BrowserLauncher;
 import jadex.commons.SUtil;
