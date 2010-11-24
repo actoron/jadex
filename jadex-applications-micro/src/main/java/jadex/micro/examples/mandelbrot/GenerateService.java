@@ -50,6 +50,14 @@ public class GenerateService extends BasicService implements IGenerateService
 	{
 		final Future ret = new Future();	
 		
+		SwingUtilities.invokeLater(new Runnable()
+		{
+			public void run()
+			{
+				panel.updateProperties(data);
+			}
+		});
+		
 		SServiceProvider.getServices(agent.getServiceProvider(), ICalculateService.class)
 			.addResultListener(agent.createResultListener(new DelegationResultListener(ret)
 		{

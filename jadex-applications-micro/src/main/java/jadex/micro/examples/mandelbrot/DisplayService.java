@@ -2,7 +2,6 @@ package jadex.micro.examples.mandelbrot;
 
 import jadex.commons.Future;
 import jadex.commons.IFuture;
-import jadex.commons.SUtil;
 import jadex.commons.service.BasicService;
 
 /**

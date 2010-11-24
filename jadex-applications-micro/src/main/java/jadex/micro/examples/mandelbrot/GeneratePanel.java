@@ -25,13 +25,16 @@ public class GeneratePanel extends JPanel
 	/** The status bar. */
 	protected StatusBar sb;
 	
+	/** The properties panel. */
+	protected PropertiesPanel pp;
+	
 	/**
 	 *  Create a new panel.
 	 */
 	public GeneratePanel(final IExternalAccess agent)
 	{
 		this.setLayout(new BorderLayout());
-		final PropertiesPanel pp = new PropertiesPanel("Generate Options");
+		this.pp	= new PropertiesPanel("Generate Options");
 		
 		pp.createTextField("xmin", "-2", true, 0);
 		pp.createTextField("xmax", "1", true, 0);
@@ -115,6 +118,22 @@ public class GeneratePanel extends JPanel
 	public StatusBar getStatusBar()
 	{
 		return sb;
+	}
+	
+	/**
+	 *  Update the properties with new area data.
+	 */
+	public void	updateProperties(AreaData data)
+	{
+		pp.getTextField("xmin").setText(Double.toString(data.getXStart()));
+		pp.getTextField("xmax").setText(Double.toString(data.getXEnd()));
+		pp.getTextField("ymin").setText(Double.toString(data.getYStart()));
+		pp.getTextField("ymax").setText(Double.toString(data.getYEnd()));
+		pp.getTextField("sizex").setText(Integer.toString(data.getSizeX()));
+		pp.getTextField("sizey").setText(Integer.toString(data.getSizeY()));
+		pp.getTextField("max").setText(Integer.toString(data.getMax()));
+		pp.getTextField("parallel").setText(Integer.toString(data.getParallel()));
+		pp.getTextField("task size").setText(Integer.toString(data.getTaskSize()));
 	}
 
 	/**

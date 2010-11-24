@@ -58,7 +58,8 @@ public class CalculateService extends BasicService implements ICalculateService
 		double x0 = xn;
 		double y0 = yn;
 		int i = 0;
-		double c = 0;
+		double c =  Math.sqrt(xn*xn + yn*yn);
+
 		
 		for(i=0; c<2 && i<max; i++)
 		{
