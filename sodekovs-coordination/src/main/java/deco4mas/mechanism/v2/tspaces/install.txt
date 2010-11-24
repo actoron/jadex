@@ -16,7 +16,7 @@ Additional notes for the V2-Installation:
 	
 	“mvn install:install-file -Dfile=tspaces.jar -DgroupId=com.tspaces -DartifactId=tspaces2 -Dversion=2.1.2 -Dpackaging=jar –e” --> eventuell auch ohne "-e" versuchen.
 
-2)	Add following piece of code to the pom.file of the jadex.launch project:
+2)	Add following piece of code to the pom.file of the jadex.platform.standalone.launch project:
 			<dependency>
 			<groupId>com.tspaces</groupId>
 			<artifactId>tspaces2</artifactId>
@@ -37,4 +37,5 @@ Additional notes for the V2-Installation:
 			<version>1.2</version>
 			<scope>compile</scope>
 			</dependency>
-  
+
+5) Or, instead of 4: Add the "sodekovs-coordination" project to the classpath of the run configuration in eclipse.

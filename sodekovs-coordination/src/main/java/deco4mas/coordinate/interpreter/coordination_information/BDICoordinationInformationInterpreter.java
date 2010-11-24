@@ -49,6 +49,7 @@ import deco4mas.helper.Constants;
 import deco4mas.mechanism.CoordinationInfo;
 
 /**
+ * HACK: add "1==1 || " in line 204 and 206 for TSpace example.
  * @author Ante Vilenica & Jan Sudeikat
  */
 public class BDICoordinationInformationInterpreter extends SimplePropertyObject

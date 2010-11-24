@@ -420,7 +420,7 @@ public class TSpacesClient {
 //			System.out.println("#TSpaceClient# RegisteredCallback");
 
 		} catch (TupleSpaceException e) {
-			System.err.println("Problem: registering a tuple-sapce event listener");
+			System.err.println("Problem: registering a tuple-space event listener");
 			e.printStackTrace();
 		}
 
