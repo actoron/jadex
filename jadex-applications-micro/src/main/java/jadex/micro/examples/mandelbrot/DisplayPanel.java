@@ -127,7 +127,7 @@ public class DisplayPanel extends JComponent
 							public void customResultAvailable(Object source, Object result)
 							{
 								IGenerateService	gs	= (IGenerateService)result;
-								AreaData ad = new AreaData(ox+owidth*x, oy+oheight*y, ox+owidth*x2, oy+oheight*y2,
+								AreaData ad = new AreaData(ox+owidth*x, ox+owidth*x2, oy+oheight*y, oy+oheight*y2,
 									data.getSizeX(), data.getSizeY(), data.getMax(), data.getParallel(), data.getTaskSize());
 								IFuture	fut	= gs.generateArea(ad);
 								fut.addResultListener(new SwingDefaultResultListener(DisplayPanel.this)
