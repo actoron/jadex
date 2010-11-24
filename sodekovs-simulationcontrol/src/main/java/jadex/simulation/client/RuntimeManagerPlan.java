@@ -23,6 +23,7 @@ import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.IFuture;
 import jadex.commons.SReflect;
+import jadex.commons.ThreadSuspendable;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.clock.IClockService;
 import jadex.commons.service.library.ILibraryService;
@@ -116,9 +117,6 @@ public class RuntimeManagerPlan extends Plan {
 			while (true) {
 				waitFor(1000);
 
-				// Hack:
-				// vis.update();
-
 				// Hack: Works right now only for single objects but not for all
 				// of that type...
 				// Additionally: only one part of the equation can be an
@@ -159,18 +157,6 @@ public class RuntimeManagerPlan extends Plan {
 			System.err.println("#RunTimeManagerPlan# Terminate Condition missing " + simConf);
 		}
 
-		// Get Observed Events from space
-		// space.getDataProvider("dd").get
-
-		// IServiceContainer container =
-		// getExternalAccess().getServiceContainer();
-		// DeltaTimeExecutor4Simulation simServ = (DeltaTimeExecutor4Simulation)
-		// container.getService(DeltaTimeExecutor4Simulation.class);
-		// ConcurrentHashMap<Long, ArrayList<ObservedEvent>> results =
-		// simServ.getAllObservedValues();
-		// ConcurrentHashMap<Long, ArrayList<ObservedEvent>> results =
-		// (ConcurrentHashMap<Long, ArrayList<ObservedEvent>>)
-		// space.getProperty("observedEvents");
 		ConcurrentHashMap<Long, ArrayList<ObservedEvent>> results = getResult(space);
 
 		// Stop Siumlation when target condition true.
@@ -196,9 +182,9 @@ public class RuntimeManagerPlan extends Plan {
 		// getExternalAccess().killAgent();
 		IComponentManagementService ces = (IComponentManagementService)SServiceProvider.getService(getScope().getServiceProvider(), IComponentManagementService.class).get(this);
 			
+		IComponentIdentifier id1  = space.getContext().getComponentIdentifier();
 		
-		
-		ces.destroyComponent(space.getContext().getComponentIdentifier());
+		ces.destroyComponent(space.getContext().getComponentIdentifier()).get(this);
 		// getExternalAccess().getApplicationContext().killComponent(null);
 
 	}
@@ -294,39 +280,14 @@ public class RuntimeManagerPlan extends Plan {
 	}
 
 	private void addDataConsumerAndProvider(SimulationConfiguration simConf) {
-		// IComponentManagementService executionService =
-		// (IComponentManagementService)
-		// getScope().getServiceContainer().getService(IComponentManagementService.class);
+
 		AbstractEnvironmentSpace space = ((AbstractEnvironmentSpace) ((IApplicationExternalAccess) getScope().getParent()).getSpace(simConf.getNameOfSpace()));
-
-		// IFuture fut = executionService.getExternalAccess(space.get);
-		// IApplicationExternalAccess exta = (IApplicationExternalAccess)
-		// fut.get(this);
-		// AbstractEnvironmentSpace space = (AbstractEnvironmentSpace)
-		// exta.getSpace(simConf.getNameOfSpace());
-
-		// Hack: Make sure space has been initialized...
-		// int counterTmp = 0;
-		// executionService.suspendComponent(comp);
-
-		// while (exta.getSpace(simConf.getNameOfSpace()) == null) {
-		// counterTmp++;
-		// waitFor(100);
-		// }
-		// executionService.resumeComponent(comp);
-
-		// AbstractEnvironmentSpace space = (AbstractEnvironmentSpace)
-		// exta.getSpace(simConf.getNameOfSpace());
 		IExpressionParser parser = new JavaCCExpressionParser();
 
 		// add new data provider
 		List<Dataprovider> providers = simConf.getDataproviders().getDataprovider();
 		// List tmp = si.getPropertyList("dataproviders");
 
-		// if(providers==null && tmp!=null)
-		// providers = tmp;
-		// else if(providers!=null && tmp!=null)
-		// providers.addAll(tmp);
 
 		// System.out.println("data providers: "+providers);
 		if (providers != null) {
