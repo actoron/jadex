@@ -4,14 +4,15 @@ import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentManagementService;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
+import jadex.commons.SUtil;
 import jadex.commons.concurrent.CollectionResultListener;
+import jadex.commons.concurrent.CounterResultListener;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.service.BasicService;
 import jadex.commons.service.SServiceProvider;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -40,15 +41,9 @@ public class GenerateService extends BasicService implements IGenerateService
 	/**
 	 *  Generate a specific area using a defined x and y size.
 	 */
-	public IFuture generateArea(final double x1, final double y1, final double x2, final double y2, int sizex, int sizey, final int max, final int par)
+	public IFuture generateArea(final AreaData data)
 	{
-		final Future ret = new Future();
-		
-		final double stepx = (x2-x1)/sizex;
-		final double stepy = (y2-y1)/sizey;
-		
-		final AreaData data = new AreaData(x1, x2, y1, y2, stepx, stepy, max, par, null);		
-		
+		final Future ret = new Future();	
 		
 		SServiceProvider.getServices(agent.getServiceProvider(), ICalculateService.class)
 			.addResultListener(agent.createResultListener(new DelegationResultListener(ret)
@@ -58,9 +53,9 @@ public class GenerateService extends BasicService implements IGenerateService
 				List sers = (List)result;
 				
 				// Start additional components if necessary
-				if(sers.size()<par)
+				if(sers.size()<data.getParallel())
 				{
-					final int num = par-sers.size();
+					final int num = data.getParallel()-sers.size();
 					final CollectionResultListener lis = new CollectionResultListener(num, true, agent.createResultListener(new DefaultResultListener()
 					{
 						public void resultAvailable(Object source, Object result)
@@ -107,26 +102,79 @@ public class GenerateService extends BasicService implements IGenerateService
 	}
 	
 	/**
-	 * 
+	 *  Distribute the work to different worker services.
 	 */
-	protected void distributeWork(AreaData data, List services, final Future ret)
+	protected void distributeWork(final AreaData data, List services, final Future ret)
 	{
-		// Distribute to more than one worker.
+		int num = Math.max(data.getSizeX()*data.getSizeY()/data.getTaskSize(), 1);
+		System.out.println("Number of tasks: "+num);
 		
-		ICalculateService cs = (ICalculateService)services.get(0);
+		final int xsize = data.getSizeX()/num;
+		final int ysize = data.getSizeY()/num;
+		int xrest = data.getSizeX()-num*xsize;
+		int yrest = data.getSizeY()-num*ysize;
 		
-		int deg = (int)Math.sqrt(services.size());
+		final double xdiff = (data.getXEnd()-data.getXStart())/num;
+		final double ydiff = (data.getYEnd()-data.getYStart())/num;
 		
-		double xs = data.getXEnd()-data.getXStart()/deg;
-		double ys = data.getYEnd()-data.getYStart()/deg;
+		double x1 = data.getXStart();
+		double y1 = data.getYStart();
 		
-		cs.calculateArea(data.getXStart(), data.getYStart(), data.getXEnd(), data.getYEnd(), data.getStepX(), data.getStepY(), data.getMax())
-			.addResultListener(agent.createResultListener(new DelegationResultListener(ret)
+		data.setData(new int[data.getSizeX()][data.getSizeY()]);
+		
+		CounterResultListener lis = new CounterResultListener(num*num)
 		{
-			public void customResultAvailable(Object source, Object result)
+			public void finalResultAvailable(Object source, Object result)
 			{
-				ret.setResult(result);
+				intermediateResultAvailable(source, result);
+//				System.out.println("res: "+SUtil.arrayToString(data.getData()));
+				ret.setResult(data);
 			}
-		}));
+			
+			public void intermediateResultAvailable(Object source, Object result)
+			{
+				AreaData ad = (AreaData)result;
+				int xs = (int)((int[])ad.getId())[0]*xsize;
+				int ys = (int)((int[])ad.getId())[1]*ysize;
+				
+//				System.out.println("x:y: end "+xs+" "+ys);
+//				System.out.println("partial: "+SUtil.arrayToString(ad.getData()));
+				for(int yi=0; yi<ad.getSizeY(); yi++)
+				{
+					for(int xi=0; xi<ad.getSizeX(); xi++)
+					{
+						try
+						{
+							data.getData()[xs+xi][ys+yi] = ad.getData()[xi][yi];
+						}
+						catch(Exception e) 
+						{
+							e.printStackTrace();
+						}
+					}
+				}
+			}
+			
+			public void exceptionOccurred(Object source, Exception exception)
+			{
+				System.out.println("todo: handle failure");
+				exception.printStackTrace();
+			}
+		};
+		
+		for(int yi=0; yi<num; yi++)
+		{
+			for(int xi=0; xi<num; xi++)
+			{
+//				System.out.println("x:y: start "+x1+" "+(x1+xdiff)+" "+y1+" "+(y1+ydiff)+" "+xdiff);
+				int idx = (xi+(yi*xi))%services.size();
+				ICalculateService cs = (ICalculateService)services.get(idx);
+				AreaData ad = new AreaData(x1, x1+xdiff, y1, y1+ydiff, xi==num-1? xsize+xrest: xsize, yi==num-1? ysize+yrest: ysize, data.getMax(), 0, 0, new int[]{xi, yi}, null);
+				cs.calculateArea(ad).addResultListener(agent.createResultListener(lis));
+				x1 += xdiff;
+			}
+			x1 = data.getXStart();
+			y1 += ydiff;
+		}
 	}
 }

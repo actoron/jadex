@@ -25,24 +25,27 @@ public class CalculateService extends BasicService implements ICalculateService
 	/**
 	 *  Calculate colors for an area of points.
 	 */
-	public IFuture calculateArea(double x1, double y1, double x2, double y2, double stepx, double stepy, int max)
+	public IFuture calculateArea(AreaData data)
 	{
+//		System.out.println("calc: "+data);
+		
 		Future ret = new Future();
 		
-		int nx = (int)((x2-x1)/stepx);
-		int ny = (int)((y2-y1)/stepy);
+		double stepx = (data.getXEnd()-data.getXStart())/data.getSizeX();
+		double stepy = (data.getYEnd()-data.getYStart())/data.getSizeY();
 		
-		int[][] res = new int[nx][ny];
+		int[][] res = new int[data.getSizeX()][data.getSizeY()];
 		
-		for(int yi=0; yi<ny; yi++)
+		for(int yi=0; yi<data.getSizeY(); yi++)
 		{
-			for(int xi=0; xi<nx; xi++)
+			for(int xi=0; xi<data.getSizeX(); xi++)
 			{
-				res[xi][yi] = determineColor(x1+xi*stepx, y1+yi*stepy, max);
+				res[xi][yi] = determineColor(data.getXStart()+xi*stepx, data.getYStart()+yi*stepy, data.getMax());
 			}
 		}
 		
-		ret.setResult(new AreaData(x1, x2, y1, y2, stepx, stepy, max, 1, res));
+		data.setData(res);
+		ret.setResult(data);
 		
 		return ret;
 	}

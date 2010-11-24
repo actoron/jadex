@@ -33,10 +33,11 @@ public class GeneratePanel extends JPanel
 		pp.createTextField("xmax", "1", true, 0);
 		pp.createTextField("ymin", "-1", true, 0);
 		pp.createTextField("ymax", "1", true, 0);
-		pp.createTextField("sizex", "600", true, 0);
-		pp.createTextField("sizey", "600", true, 0);
+		pp.createTextField("sizex", "100", true, 0);
+		pp.createTextField("sizey", "100", true, 0);
 		pp.createTextField("max", "256", true, 0);
-		pp.createTextField("parallel", "2", true, 0);
+		pp.createTextField("parallel", "10", true, 0);
+		pp.createTextField("task size", "160000", true, 0);
 		
 		final JButton[] buts = pp.createButtons("buts", new String[]{"Go"}, 0);
 		
@@ -54,6 +55,7 @@ public class GeneratePanel extends JPanel
 					final int sizey = Integer.parseInt(pp.getTextField("sizey").getText());
 					final int max = Integer.parseInt(pp.getTextField("max").getText());
 					final int par = Integer.parseInt(pp.getTextField("parallel").getText());
+					final int tasksize = Integer.parseInt(pp.getTextField("task size").getText());
 				
 					SServiceProvider.getDeclaredService(agent.getServiceProvider(), IGenerateService.class)
 						.addResultListener(new DefaultResultListener()
@@ -62,7 +64,8 @@ public class GeneratePanel extends JPanel
 						{
 							IGenerateService gs = (IGenerateService)result;
 							
-							gs.generateArea(x1, y1, x2, y2, sizex, sizey, max, par).addResultListener(new DefaultResultListener()
+							AreaData ad = new AreaData(x1, x2, y1, y2, sizex, sizey, max, par, tasksize);
+							gs.generateArea(ad).addResultListener(new DefaultResultListener()
 							{
 								public void resultAvailable(Object source, Object result)
 								{

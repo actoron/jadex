@@ -74,13 +74,14 @@ public class DisplayPanel extends JComponent
 					calculating	= true;
 					final Rectangle	bounds	= getInnerBounds();
 					SServiceProvider.getService(provider, IGenerateService.class)
-					.addResultListener(new SwingDefaultResultListener()
+						.addResultListener(new SwingDefaultResultListener()
 					{
 						public void customResultAvailable(Object source, Object result)
 						{
 							IGenerateService	gs	= (IGenerateService)result;
-							IFuture	fut	= gs.generateArea(-2, -1, 1, 1,
-								bounds.width, bounds.height, data.getMax(), data.getParallel());
+							AreaData ad = new AreaData(-2, -1, 1, 1,
+								data.getSizeX(), data.getSizeY(), data.getMax(), data.getParallel(), data.getTaskSize());
+							IFuture	fut	= gs.generateArea(ad);
 							fut.addResultListener(new SwingDefaultResultListener(DisplayPanel.this)
 							{
 								public void customResultAvailable(Object source, Object result)
@@ -126,8 +127,9 @@ public class DisplayPanel extends JComponent
 							public void customResultAvailable(Object source, Object result)
 							{
 								IGenerateService	gs	= (IGenerateService)result;
-								IFuture	fut	= gs.generateArea(ox+owidth*x, oy+oheight*y, ox+owidth*x2, oy+oheight*y2,
-									bounds.width, bounds.height, data.getMax(), data.getParallel());
+								AreaData ad = new AreaData(ox+owidth*x, oy+oheight*y, ox+owidth*x2, oy+oheight*y2,
+									data.getSizeX(), data.getSizeY(), data.getMax(), data.getParallel(), data.getTaskSize());
+								IFuture	fut	= gs.generateArea(ad);
 								fut.addResultListener(new SwingDefaultResultListener(DisplayPanel.this)
 								{
 									public void customResultAvailable(Object source, Object result)

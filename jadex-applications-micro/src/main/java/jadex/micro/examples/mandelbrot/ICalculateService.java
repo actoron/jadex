@@ -10,5 +10,5 @@ public interface ICalculateService
 	/**
 	 *  Calculate colors for an area of points.
 	 */
-	public IFuture calculateArea(double x1, double y1, double x2, double y2, double stepx, double stepy, int max);
+	public IFuture calculateArea(AreaData data);
 }
