@@ -90,7 +90,6 @@ public class CompositeServiceInvocationInterceptor implements IServiceInvocation
 						{
 							final Collection res = (Collection)result;
 							
-							
 							if(res!=null && res.size()>0)
 							{
 								final IComponentIdentifier cid = (IComponentIdentifier)res.iterator().next();

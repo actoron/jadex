@@ -72,14 +72,14 @@ public class DisplayPanel extends JComponent
 				{
 					DisplayPanel.this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 					calculating	= true;
-					final Rectangle	bounds	= getInnerBounds();
+//					final Rectangle	bounds	= getInnerBounds();
 					SServiceProvider.getService(provider, IGenerateService.class)
 						.addResultListener(new SwingDefaultResultListener()
 					{
 						public void customResultAvailable(Object source, Object result)
 						{
 							IGenerateService	gs	= (IGenerateService)result;
-							AreaData ad = new AreaData(-2, -1, 1, 1,
+							AreaData ad = new AreaData(-2, 1, -1, 1,
 								data.getSizeX(), data.getSizeY(), data.getMax(), data.getParallel(), data.getTaskSize());
 							IFuture	fut	= gs.generateArea(ad);
 							fut.addResultListener(new SwingDefaultResultListener(DisplayPanel.this)

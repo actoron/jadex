@@ -4,7 +4,7 @@ import jadex.micro.MicroAgent;
 import jadex.micro.MicroAgentMetaInfo;
 
 /**
- * 
+ *  Agent that can process generate requests.
  */
 public class GenerateAgent extends MicroAgent
 {
