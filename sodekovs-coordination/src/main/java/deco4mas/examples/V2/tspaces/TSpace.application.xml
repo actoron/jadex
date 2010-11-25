@@ -33,8 +33,6 @@
 
 			
 	<spacetypes>
-	<env:envspacetype name="2dspace" class="ContinuousSpace2D"
-			width="1" height="1"/>
 		<env:envspacetype name="coordspace" width="11" height="11" class="CoordinationSpace">		
 <env:property name="dynamics_configuration">"deco4mas/examples/V2/tspaces/belief_set.dynamics.xml"</env:property>
 
@@ -96,27 +94,6 @@
   				<component type="Receiver" number="1"/>				
 			</components>
  		</application>
-
-
-
-	<application name="Test2">
-			<spaces>	
-				<env:envspace name="mycoordspace" type="2dspace" width="2" height ="2">					
-	 			</env:envspace>
-			</spaces>
-			<components>
-				<component type="Sender" number="1"/>
-  				<component type="Receiver" number="1"/>				
-			</components>
- 		</application>
-
-
-
-
-
-
-
-
 
 	</applications>
 
