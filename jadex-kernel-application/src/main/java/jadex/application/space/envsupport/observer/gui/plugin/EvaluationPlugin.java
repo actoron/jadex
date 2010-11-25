@@ -82,6 +82,9 @@ public class EvaluationPlugin extends SimplePropertyObject implements IObserverC
 	 */
 	public Component getView()
 	{
+		if (mainpane != null)
+			return mainpane;
+		
 		components = new ArrayList();
 		
 		for(int i=0; ;i++)
@@ -101,7 +104,7 @@ public class EvaluationPlugin extends SimplePropertyObject implements IObserverC
 		}
 		
 		mainpane = new JPanel(new BorderLayout());
-		mainpane.setMinimumSize(new Dimension(200, 200));
+		mainpane.setMinimumSize(new Dimension(50, 200));
 
 		Component parent = mainpane;
 		for(int i=0; i<components.size(); i++)
