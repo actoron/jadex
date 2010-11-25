@@ -12,6 +12,7 @@ import jadex.commons.concurrent.IResultListener;
 import jadex.commons.service.BasicService;
 import jadex.commons.service.SServiceProvider;
 
+import java.awt.Rectangle;
 import java.util.List;
 
 import javax.swing.SwingUtilities;
@@ -58,61 +59,69 @@ public class GenerateService extends BasicService implements IGenerateService
 			}
 		});
 		
-		SServiceProvider.getServices(agent.getServiceProvider(), ICalculateService.class)
-			.addResultListener(agent.createResultListener(new DelegationResultListener(ret)
+		SServiceProvider.getService(agent.getServiceProvider(), IDisplayService.class)
+			.addResultListener(new DefaultResultListener()
 		{
-			public void customResultAvailable(Object source, Object result)
+			public void resultAvailable(Object source, Object result)
 			{
-				List sers = (List)result;
-				
-				// Start additional components if necessary
-				if(sers.size()<data.getParallel())
+				final IDisplayService ds = (IDisplayService)result;
+				SServiceProvider.getServices(agent.getServiceProvider(), ICalculateService.class)
+				.addResultListener(agent.createResultListener(new DelegationResultListener(ret)
 				{
-					final int num = data.getParallel()-sers.size();
-					
-//					System.out.println("Starting new calculator agents: "+num);
-					
-					final CollectionResultListener lis = new CollectionResultListener(num, true, agent.createResultListener(new DefaultResultListener()
+					public void customResultAvailable(Object source, Object result)
 					{
-						public void resultAvailable(Object source, Object result)
+						List sers = (List)result;
+						
+						// Start additional components if necessary
+						if(sers.size()<data.getParallel())
 						{
-							SServiceProvider.getServices(agent.getServiceProvider(), ICalculateService.class)
-								.addResultListener(agent.createResultListener(new DelegationResultListener(ret)
+							final int num = data.getParallel()-sers.size();
+							
+	//						System.out.println("Starting new calculator agents: "+num);
+							
+							final CollectionResultListener lis = new CollectionResultListener(num, true, agent.createResultListener(new DefaultResultListener()
 							{
-								public void customResultAvailable(Object source, Object result)
+								public void resultAvailable(Object source, Object result)
 								{
-									distributeWork(data, (List)result, ret);
+									SServiceProvider.getServices(agent.getServiceProvider(), ICalculateService.class)
+										.addResultListener(agent.createResultListener(new DelegationResultListener(ret)
+									{
+										public void customResultAvailable(Object source, Object result)
+										{
+											distributeWork(data, (List)result, ds, ret);
+										}
+									}));
 								}
 							}));
-						}
-					}));
-					
-					SServiceProvider.getService(agent.getServiceProvider(), IComponentManagementService.class)
-						.addResultListener(agent.createResultListener(agent.createResultListener(new IResultListener()
-					{
-						public void resultAvailable(Object source, Object result)
-						{
-							IComponentManagementService cms = (IComponentManagementService)result;
 							
-							for(int i=0; i<num; i++)
+							SServiceProvider.getService(agent.getServiceProvider(), IComponentManagementService.class)
+								.addResultListener(agent.createResultListener(agent.createResultListener(new IResultListener()
 							{
-								cms.createComponent(null, "jadex/micro/examples/mandelbrot/CalculateAgent.class", new CreationInfo(agent.getParent().getComponentIdentifier()), null)
-									.addResultListener(agent.createResultListener(lis));
-							}
+								public void resultAvailable(Object source, Object result)
+								{
+									IComponentManagementService cms = (IComponentManagementService)result;
+									
+									for(int i=0; i<num; i++)
+									{
+										cms.createComponent(null, "jadex/micro/examples/mandelbrot/CalculateAgent.class", new CreationInfo(agent.getParent().getComponentIdentifier()), null)
+											.addResultListener(agent.createResultListener(lis));
+									}
+								}
+								
+								public void exceptionOccurred(Object source, Exception exception)
+								{
+									exception.printStackTrace();
+								}
+							})));
 						}
-						
-						public void exceptionOccurred(Object source, Exception exception)
+						else
 						{
-							exception.printStackTrace();
+							distributeWork(data, sers, ds, ret);
 						}
-					})));
-				}
-				else
-				{
-					distributeWork(data, sers, ret);
-				}
+					}
+				}));
 			}
-		}));
+		});
 		
 		return ret;
 	}
@@ -120,7 +129,7 @@ public class GenerateService extends BasicService implements IGenerateService
 	/**
 	 *  Distribute the work to different worker services.
 	 */
-	protected void distributeWork(final AreaData data, List services, final Future ret)
+	protected void distributeWork(final AreaData data, List services, final IDisplayService ds, final Future ret)
 	{
 		int num = Math.max(data.getSizeX()*data.getSizeY()/data.getTaskSize(), 1);
 //		System.out.println("Number of tasks: "+num);
@@ -161,6 +170,12 @@ public class GenerateService extends BasicService implements IGenerateService
 					}
 				});
 				
+				if(ds!=null)
+				{
+					ds.displayIntermediateResult(new ProgressData(null,
+						new Rectangle(xs, ys, ad.getSizeX(), ad.getSizeY()), true));
+				}
+				
 //				System.out.println("x:y: end "+xs+" "+ys);
 //				System.out.println("partial: "+SUtil.arrayToString(ad.getData()));
 				for(int yi=0; yi<ad.getSizeY(); yi++)
@@ -195,6 +210,11 @@ public class GenerateService extends BasicService implements IGenerateService
 				ICalculateService cs = (ICalculateService)services.get(idx);
 				AreaData ad = new AreaData(x1, x1+xdiff, y1, y1+ydiff, xi==num-1? xsize+xrest: xsize, yi==num-1? ysize+yrest: ysize, data.getMax(), 0, 0, new int[]{xi, yi}, null);
 				cs.calculateArea(ad).addResultListener(agent.createResultListener(lis));
+				if(ds!=null)
+				{
+					ds.displayIntermediateResult(new ProgressData(cs.getServiceIdentifier().getProviderId(),
+						new Rectangle(xi*xsize, yi*ysize, ad.getSizeX(), ad.getSizeY()), false));
+				}
 				x1 += xdiff;
 			}
 			x1 = data.getXStart();

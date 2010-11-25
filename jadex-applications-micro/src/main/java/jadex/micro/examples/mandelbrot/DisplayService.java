@@ -36,4 +36,14 @@ public class DisplayService extends BasicService implements IDisplayService
 		agent.getPanel().setResults(result);
 		return new Future(null);
 	}
+
+
+	/**
+	 *  Display intermediate calculation results.
+	 */
+	public IFuture displayIntermediateResult(ProgressData progress)
+	{
+		agent.getPanel().addProgress(progress);
+		return new Future(null);
+	}
 }

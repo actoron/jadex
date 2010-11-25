@@ -15,6 +15,9 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
@@ -57,6 +60,9 @@ public class DisplayPanel extends JComponent
 	/** Flag indicating that a calculation is in progress. */
 	protected boolean	calculating;
 	
+	/** Set of progress data objects (if calculating). */
+	protected Set	progressset;
+	
 	//-------- constructors --------
 	
 	/**
@@ -76,18 +82,15 @@ public class DisplayPanel extends JComponent
 					final Rectangle	bounds	= getInnerBounds();
 					double	rratio	= 1;
 					double	bratio	= (double)bounds.width/bounds.height;
-					// Adjust width of area.
+					// Calculate pixel width/height of area.
 					if(rratio<bratio)
 					{
 						int	width	= (int)(bounds.height*rratio);
-						bounds.x += (bounds.width-width)/2;
 						bounds.width	= width;
 					}
-					// Adjust height of area.
 					else if(rratio>bratio)
 					{
 						int	height	= (int)(bounds.width/rratio);
-						bounds.y += (bounds.height-height)/2;
 						bounds.height	= height;
 					}
 					
@@ -104,8 +107,6 @@ public class DisplayPanel extends JComponent
 							{
 								public void customResultAvailable(Object source, Object result)
 								{
-									calculating	= false;
-									DisplayPanel.this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 									DisplayPanel.this.setResults((AreaData)result);
 								}
 								public void customExceptionOccurred(Object source, Exception exception)
@@ -126,10 +127,11 @@ public class DisplayPanel extends JComponent
 					{
 						// Calculate bounds relative to original image.
 						final Rectangle	bounds	= getInnerBounds();
-						final double	x	= (double)(range.x-bounds.x)/bounds.width;
-						final double	y	= (double)(range.y-bounds.y)/bounds.height;
-						final double	x2	= x + (double)range.width/bounds.width;
-						final double	y2	= y + (double)range.height/bounds.height;
+						Rectangle	drawarea	= scaleToFit(bounds, image.getWidth(DisplayPanel.this), image.getHeight(DisplayPanel.this));
+						final double	x	= (double)(range.x-bounds.x-drawarea.x)/drawarea.width;
+						final double	y	= (double)(range.y-bounds.y-drawarea.y)/drawarea.height;
+						final double	x2	= x + (double)range.width/drawarea.width;
+						final double	y2	= y + (double)range.height/drawarea.height;
 						
 						// Original bounds
 						final double	ox	= data.getXStart();
@@ -137,20 +139,17 @@ public class DisplayPanel extends JComponent
 						final double	owidth	= data.getXEnd()-data.getXStart();
 						final double	oheight	= data.getYEnd()-data.getYStart();
 						
+						// Calculate pixel width/height of area.
 						double	rratio	= (double)range.width/range.height;
 						double	bratio	= (double)bounds.width/bounds.height;
-						// Adjust width of area.
 						if(rratio<bratio)
 						{
 							int	width	= (int)(bounds.height*rratio);
-							bounds.x += (bounds.width-width)/2;
 							bounds.width	= width;
 						}
-						// Adjust height of area.
 						else if(rratio>bratio)
 						{
 							int	height	= (int)(bounds.width/rratio);
-							bounds.y += (bounds.height-height)/2;
 							bounds.height	= height;
 						}
 					
@@ -170,8 +169,6 @@ public class DisplayPanel extends JComponent
 								{
 									public void customResultAvailable(Object source, Object result)
 									{
-										calculating	= false;
-										DisplayPanel.this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 										DisplayPanel.this.setResults((AreaData)result);
 									}
 									public void customExceptionOccurred(Object source, Exception exception)
@@ -276,13 +273,35 @@ public class DisplayPanel extends JComponent
 						g.drawLine(x, y, x, y);
 					}
 				}
-				getParent().invalidate();
-				getParent().doLayout();
-				getParent().repaint();
 				
 				point	= null;
 				range	= null;
+				progressset	= null;
+				calculating	= false;
 				DisplayPanel.this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+
+				getParent().invalidate();
+				getParent().doLayout();
+				getParent().repaint();
+			}
+		});
+	}
+	
+	/**
+	 *  Display intermediate calculation results.
+	 */
+	public void addProgress(final ProgressData progress)
+	{		
+		SwingUtilities.invokeLater(new Runnable()
+		{
+			public void run()
+			{
+				if(progressset==null)
+					progressset	= new HashSet();
+				
+				progressset.remove(progress);
+				progressset.add(progress);
+				repaint();
 			}
 		});
 	}
@@ -316,11 +335,35 @@ public class DisplayPanel extends JComponent
 				
 				// Scale again to fit new image size.
 				drawarea = scaleToFit(bounds, iwidth, iheight);
-			}
+				
+				g.drawImage(image, bounds.x+drawarea.x, bounds.y+drawarea.y,
+						bounds.x+drawarea.x+drawarea.width, bounds.y+drawarea.y+drawarea.height,
+						ix, iy, ix+iwidth, iy+iheight, this);
 
-			g.drawImage(image, bounds.x+drawarea.x, bounds.y+drawarea.y,
-				bounds.x+drawarea.x+drawarea.width, bounds.y+drawarea.y+drawarea.height,
-				ix, iy, iwidth, iheight, this);
+				// Draw progress boxes.
+				if(progressset!=null)
+				{
+					for(Iterator it=progressset.iterator(); it.hasNext(); )
+					{
+						ProgressData	progress	= (ProgressData)it.next();
+						if(!progress.isFinished())
+						{
+							g.setColor(new Color(32,32,32,160));
+							g.fillRect(bounds.x+drawarea.x+progress.getArea().x+1, bounds.y+drawarea.y+progress.getArea().y+1,
+								progress.getArea().width-1, progress.getArea().height-1);
+						}
+						g.setColor(Color.white);
+						g.drawRect(bounds.x+drawarea.x+progress.getArea().x, bounds.y+drawarea.y+progress.getArea().y,
+							progress.getArea().width, progress.getArea().height);
+					}
+				}
+			}
+			else
+			{
+				g.drawImage(image, bounds.x+drawarea.x, bounds.y+drawarea.y,
+					bounds.x+drawarea.x+drawarea.width, bounds.y+drawarea.y+drawarea.height,
+					ix, iy, ix+iwidth, iy+iheight, this);
+			}
 		}
 		
 		// Draw range area.
