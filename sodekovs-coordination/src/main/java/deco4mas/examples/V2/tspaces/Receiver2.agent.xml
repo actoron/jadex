@@ -31,8 +31,8 @@
 
 		<!-- Environment. -->
 			<!-- Environment. -->
-		<belief name="env" class="CoordinationSpace">
-			<fact>(CoordinationSpace)((IApplicationExternalAccess)$scope.getParent()).getSpace("mycoordspace")</fact>
+		<belief name="env" class="ContinuousSpace2D">
+			<fact>(ContinuousSpace2D)((IApplicationExternalAccess)$scope.getParent()).getSpace("mycoordspace")</fact>
 		</belief>
 
 		<!-- Myself. -->
@@ -41,37 +41,17 @@
 			</fact>
 		</belief>
 
-		<!-- The actual position on the grid world. -->
-		<belief name="pos" class="IVector2" evaluationmode="push">
-			<fact language="jcl"> $beliefbase.myself.position </fact>
-		</belief>
-
-		<belief name="storedCoordinations" class="ISpaceObject" />
-
-		<belief name="received_coordination_percepts" class="String" />
-
-		<beliefset name="initValues" class="ISpaceObject" />
-
-		<beliefset name="counter" class="ISpaceObject" />
-
+		
 	</beliefs>
 
 <plans>
-		<!-- Used to initialize the agent for participation in the deco4mas coordination.-->
-		<!-- <plan name="initCoordination">		
-			<body class="InitBDIAgentCoordinationPlan"/>
-			<trigger>
-				<internalevent ref="init_deco4mas_coordination">
-				</internalevent>
-			</trigger>
-		</plan> -->
+		<plan name="testPlan2">
+			<body class="TestPlan2"/>			
+		</plan>
 	</plans>
 
 <events>
-	<!-- Used to initialize the agent for participation in the deco4mas coordination.-->
-		<!-- <internalevent name="init_deco4mas_coordination">
-		<parameter name="deco4mas_file_name" class="String"/>
-		</internalevent> -->
+
 		
 		</events>
 		
@@ -93,7 +73,7 @@
 				<!-- <initialgoal ref="countTo10"/> -->
 			</goals>
 			<plans>
-				<!-- <initialplan ref="listenerPlan" />-->
+				<initialplan ref="testPlan2" />
 			</plans>
 		</configuration>
 	</configurations>
