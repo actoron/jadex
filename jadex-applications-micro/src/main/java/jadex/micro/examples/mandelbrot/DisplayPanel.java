@@ -72,15 +72,33 @@ public class DisplayPanel extends JComponent
 				{
 					DisplayPanel.this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 					calculating	= true;
+					repaint();
 					final Rectangle	bounds	= getInnerBounds();
+					double	rratio	= 1;
+					double	bratio	= (double)bounds.width/bounds.height;
+					// Adjust width of area.
+					if(rratio<bratio)
+					{
+						int	width	= (int)(bounds.height*rratio);
+						bounds.x += (bounds.width-width)/2;
+						bounds.width	= width;
+					}
+					// Adjust height of area.
+					else if(rratio>bratio)
+					{
+						int	height	= (int)(bounds.width/rratio);
+						bounds.y += (bounds.height-height)/2;
+						bounds.height	= height;
+					}
+					
 					SServiceProvider.getService(provider, IGenerateService.class)
 						.addResultListener(new SwingDefaultResultListener()
 					{
 						public void customResultAvailable(Object source, Object result)
 						{
 							IGenerateService	gs	= (IGenerateService)result;
-							AreaData ad = new AreaData(-2, 1, -1, 1,
-								bounds.width, bounds.height, data.getMax(), data.getParallel(), data.getTaskSize());
+							AreaData ad = new AreaData(-2, 1, -1.5, 1.5, bounds.width, bounds.height,
+								data!=null ? data.getMax() : 256, data!=null ? data.getParallel() : 10, data!=null ? data.getTaskSize() : 160000);
 							IFuture	fut	= gs.generateArea(ad);
 							fut.addResultListener(new SwingDefaultResultListener(DisplayPanel.this)
 							{
@@ -119,8 +137,26 @@ public class DisplayPanel extends JComponent
 						final double	owidth	= data.getXEnd()-data.getXStart();
 						final double	oheight	= data.getYEnd()-data.getYStart();
 						
+						double	rratio	= (double)range.width/range.height;
+						double	bratio	= (double)bounds.width/bounds.height;
+						// Adjust width of area.
+						if(rratio<bratio)
+						{
+							int	width	= (int)(bounds.height*rratio);
+							bounds.x += (bounds.width-width)/2;
+							bounds.width	= width;
+						}
+						// Adjust height of area.
+						else if(rratio>bratio)
+						{
+							int	height	= (int)(bounds.width/rratio);
+							bounds.y += (bounds.height-height)/2;
+							bounds.height	= height;
+						}
+					
 						DisplayPanel.this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 						calculating	= true;
+						repaint();
 						SServiceProvider.getService(provider, IGenerateService.class)
 							.addResultListener(new SwingDefaultResultListener()
 						{
@@ -260,20 +296,88 @@ public class DisplayPanel extends JComponent
 	{
 		super.paintComponent(g);
 		
+		// Draw image.
 		if(image!=null)
 		{
 			Rectangle bounds = getInnerBounds();
+			int	ix	= 0;
+			int iy	= 0;
+			int	iwidth	= image.getWidth(this);
+			int iheight	= image.getHeight(this);
+			Rectangle drawarea = scaleToFit(bounds, iwidth, iheight);
 
-			g.drawImage(image, bounds.x, bounds.y, bounds.x+bounds.width, bounds.y+bounds.height,
-				0, 0, image.getWidth(this), image.getHeight(this), this);
+			// Zoom into original image while calculating
+			if(calculating && range!=null)
+			{
+				ix	= (range.x-drawarea.x-bounds.x)*iwidth/drawarea.width;
+				iy	= (range.y-drawarea.y-bounds.y)*iheight/drawarea.height;
+				iwidth	= range.width*iwidth/drawarea.width;
+				iheight	= range.height*iheight/drawarea.height;
+				
+				// Scale again to fit new image size.
+				drawarea = scaleToFit(bounds, iwidth, iheight);
+			}
+
+			g.drawImage(image, bounds.x+drawarea.x, bounds.y+drawarea.y,
+				bounds.x+drawarea.x+drawarea.width, bounds.y+drawarea.y+drawarea.height,
+				ix, iy, iwidth, iheight, this);
 		}
 		
-		if(range!=null)
+		// Draw range area.
+		if(!calculating && range!=null)
 		{
-			g.setXORMode(Color.white);
+			Rectangle bounds = getInnerBounds();
+			double	rratio	= (double)range.width/range.height;
+			double	bratio	= (double)bounds.width/bounds.height;
+			
+			// Draw left and right boxes to show unused space
+			if(rratio<bratio)
+			{
+				int	drawwidth	= range.height*bounds.width/bounds.height;
+				int offset = (range.width-drawwidth)/2;
+				g.setColor(new Color(128,128,128,64));
+				g.fillRect(range.x+offset, range.y, -offset, range.height+1);
+				g.fillRect(range.x+range.width, range.y, -offset, range.height+1);
+			}
+			// Draw upper and lower boxes to show unused space
+			else if(rratio>bratio)
+			{
+				int	drawheight	= range.width*bounds.height/bounds.width;
+				int offset = (range.height-drawheight)/2;
+				g.setColor(new Color(128,128,128,64));
+				g.fillRect(range.x, range.y+offset, range.width+1, -offset);
+				g.fillRect(range.x, range.y+range.height, range.width+1, -offset);
+			}
+		
+			g.setColor(Color.white);
 			g.drawRect(range.x, range.y, range.width, range.height);
-			g.setPaintMode();
 		}
+	}
+	
+	/**
+	 *  Calculate draw area for image.
+	 */
+	protected Rectangle scaleToFit(Rectangle bounds, int iwidth, int iheight)
+	{
+		double	iratio	= (double)iwidth/iheight;
+		double	bratio	= (double)bounds.width/bounds.height;
+		Rectangle	drawarea	= new Rectangle(0, 0, bounds.width, bounds.height);
+		
+		// Scale to fit height
+		if(iratio<bratio)
+		{
+			 double	hratio	= (double)bounds.height/iheight;
+			 drawarea.width	= (int)(iwidth*hratio);
+			 drawarea.x	= (bounds.width-drawarea.width)/2;
+		}
+		// Scale to fit width
+		else if(iratio>bratio)
+		{
+			 double	wratio	= (double)bounds.width/iwidth;
+			 drawarea.height	= (int)(iheight*wratio);
+			 drawarea.y	= (bounds.height-drawarea.height)/2;
+		}
+		return drawarea;
 	}
 
 	/**

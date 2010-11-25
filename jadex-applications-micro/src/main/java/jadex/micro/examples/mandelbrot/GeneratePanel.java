@@ -38,8 +38,8 @@ public class GeneratePanel extends JPanel
 		
 		pp.createTextField("xmin", "-2", true, 0);
 		pp.createTextField("xmax", "1", true, 0);
-		pp.createTextField("ymin", "-1", true, 0);
-		pp.createTextField("ymax", "1", true, 0);
+		pp.createTextField("ymin", "-1.5", true, 0);
+		pp.createTextField("ymax", "1.5", true, 0);
 		pp.createTextField("sizex", "100", true, 0);
 		pp.createTextField("sizey", "100", true, 0);
 		pp.createTextField("max", "256", true, 0);
