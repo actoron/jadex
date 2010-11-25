@@ -73,26 +73,34 @@ public class DisplayPanel extends JComponent
 	 */
 	public DisplayPanel(final IServiceProvider provider)
 	{
+		MouseWheelEvent mwe;
+		
 		addMouseWheelListener(new MouseAdapter()
 		{
 			public void mouseWheelMoved(MouseWheelEvent e)
 			{
+				final Rectangle	bounds	= getInnerBounds();
+
 				int sa = e.getScrollAmount();
 				int dir = e.getWheelRotation();
 				double factor = dir==1? (1+sa/10.0): (1-sa/10.0);
 				
-				final double xs = data.getXStart()*factor;
-				final double xe = data.getXEnd()*factor;
-				final double ys = data.getYStart()*factor;
-				final double ye = data.getYEnd()*factor;
+				System.out.println("mx: "+e.getX()+" "+bounds.getX());
+				
+				// Convert mouse position to screen position
+				double xshift = (e.getX()-bounds.getWidth()/2)/bounds.getWidth()/2*(data.getXEnd()-data.getXStart());
+				double yshift = (e.getY()-bounds.getHeight()/2)/bounds.getHeight()/2*(data.getYEnd()-data.getYStart());
+				
+				final double xs = (data.getXStart()+xshift)*factor;
+				final double xe = (data.getXEnd()+xshift)*factor;
+				final double ys = (data.getYStart()+yshift)*factor;
+				final double ye = (data.getYEnd()+yshift)*factor;
 				
 				SServiceProvider.getService(provider, IGenerateService.class)
 					.addResultListener(new SwingDefaultResultListener()
 				{
 					public void customResultAvailable(Object source, Object result)
 					{
-						final Rectangle	bounds	= getInnerBounds();
-						
 						IGenerateService gs	= (IGenerateService)result;
 						
 						AreaData ad = new AreaData(xs, xe, ys, ye, bounds.width, bounds.height,
