@@ -8,6 +8,7 @@ import jadex.commons.service.SServiceProvider;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Insets;
@@ -15,6 +16,7 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.geom.Rectangle2D;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -348,13 +350,27 @@ public class DisplayPanel extends JComponent
 						ProgressData	progress	= (ProgressData)it.next();
 						if(!progress.isFinished())
 						{
-							g.setColor(new Color(32,32,32,160));
+							g.setColor(new Color(0,0,0,160));
 							g.fillRect(bounds.x+drawarea.x+progress.getArea().x+1, bounds.y+drawarea.y+progress.getArea().y+1,
-								progress.getArea().width-1, progress.getArea().height-1);
+								progress.getArea().width-1, progress.getArea().height-1);							
 						}
 						g.setColor(Color.white);
 						g.drawRect(bounds.x+drawarea.x+progress.getArea().x, bounds.y+drawarea.y+progress.getArea().y,
 							progress.getArea().width, progress.getArea().height);
+						
+						// Print provider name.
+						if(progress.getProviderId()!=null)
+						{
+							String	name	= progress.getProviderId().toString();
+							FontMetrics	fm	= g.getFontMetrics();
+							Rectangle2D	sb	= fm.getStringBounds(name, g);
+							if(sb.getWidth()<progress.getArea().getWidth() && sb.getHeight()<progress.getArea().getHeight())
+							{
+								int	x	= bounds.x+drawarea.x+progress.getArea().x+2 + (progress.getArea().width-(int)sb.getWidth())/2;
+								int	y	= bounds.y+drawarea.y+progress.getArea().y+2+(int)sb.getHeight()  + (progress.getArea().height-(int)sb.getHeight())/2;
+								g.drawString(name, x, y);
+							}
+						}
 					}
 				}
 			}
