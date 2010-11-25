@@ -61,6 +61,11 @@ public interface IViewport
 	 * @param areaSize maximum area size.
 	 */
 	public void setAreaSize(IVector2 areaSize);
+	
+	/**
+	 * Refreshes the size of the canvas.
+	 */
+	public void refreshCanvasSize();
 
 	/**
 	 * Sets whether the viewport should preserve the aspect ratio of the size by

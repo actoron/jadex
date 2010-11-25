@@ -322,6 +322,13 @@ public abstract class AbstractViewport implements IViewport
 	}
 	
 	/**
+	 * Refreshes the size of the canvas.
+	 */
+	public void refreshCanvasSize()
+	{
+	}
+	
+	/**
 	 * Gets the position of the viewport.
 	 */
 	public IVector2 getPosition()
