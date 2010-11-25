@@ -16,6 +16,7 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
 import java.awt.geom.Rectangle2D;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -72,6 +73,66 @@ public class DisplayPanel extends JComponent
 	 */
 	public DisplayPanel(final IServiceProvider provider)
 	{
+		addMouseWheelListener(new MouseAdapter()
+		{
+			public void mouseWheelMoved(MouseWheelEvent e)
+			{
+				int sa = e.getScrollAmount();
+				
+				double xs;
+				double xe;
+				double ys;
+				double ye;
+				
+				if(sa>0)
+				{
+					xs = data.getXStart()*1.1;
+					xe = data.getXEnd()*1.1;
+					ys = data.getYStart()*1.1;
+					ye = data.getYEnd()*1.1;
+				}
+				else
+				{
+					xs = data.getXStart()*0.9;
+					xe = data.getXEnd()*0.9;
+					ys = data.getYStart()*0.9;
+					ye = data.getYEnd()*0.9;
+				}
+				
+				final double xsf = xs;
+				final double xef = xe;
+				final double ysf = ys;
+				final double yef = ye;
+				
+				SServiceProvider.getService(provider, IGenerateService.class)
+					.addResultListener(new SwingDefaultResultListener()
+				{
+					public void customResultAvailable(Object source, Object result)
+					{
+						final Rectangle	bounds	= getInnerBounds();
+						
+						IGenerateService	gs	= (IGenerateService)result;
+						
+						AreaData ad = new AreaData(xsf, xef, ysf, yef, bounds.width, bounds.height,
+							data!=null ? data.getMax() : 256, data!=null ? data.getParallel() : 10, data!=null ? data.getTaskSize() : 160000);
+						IFuture	fut	= gs.generateArea(ad);
+						fut.addResultListener(new SwingDefaultResultListener(DisplayPanel.this)
+						{
+							public void customResultAvailable(Object source, Object result)
+							{
+								DisplayPanel.this.setResults((AreaData)result);
+							}
+							public void customExceptionOccurred(Object source, Exception exception)
+							{
+								calculating	= false;
+								DisplayPanel.this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+								super.customExceptionOccurred(source, exception);
+							}
+						});
+					}
+				});
+			}
+		});
 		addMouseListener(new MouseAdapter()
 		{
 			public void mouseClicked(MouseEvent e)

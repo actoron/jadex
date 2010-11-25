@@ -18,7 +18,7 @@ public class SServiceProvider
 	public static ISearchManager sequentialmanagerforced = new SequentialSearchManager(true, true, true);
 
 	/** The parallel search manager. */
-	public static ISearchManager parallelmanager = new ParallelSearchManager();
+	public static ISearchManager parallelmanager = new SequentialSearchManager();//new ParallelSearchManager();
 	public static ISearchManager parallelmanagerforced = new ParallelSearchManager(true, true, true);
 	
 	/** The sequential search manager that searches only upwards. */
@@ -205,6 +205,13 @@ public class SServiceProvider
 			remote? rcontdecider: contdecider, 
 			new TypeResultSelector(type, false, remote), new ArrayList())
 				.addResultListener(new DelegationResultListener(ret));
+//				{
+//					public void customResultAvailable(Object source, Object result)
+//					{
+//						System.out.println(6);
+//						super.customResultAvailable(source, result);
+//					}
+//				});
 		
 		return ret;
 	}

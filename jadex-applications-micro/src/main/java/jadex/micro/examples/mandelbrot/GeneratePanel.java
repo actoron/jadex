@@ -44,7 +44,7 @@ public class GeneratePanel extends JPanel
 		pp.createTextField("sizey", "100", true, 0);
 		pp.createTextField("max", "256", true, 0);
 		pp.createTextField("parallel", "10", true, 0);
-		pp.createTextField("task size", "160000", true, 0);
+		pp.createTextField("task size", "300", true, 0);
 		
 		final JButton[] buts = pp.createButtons("buts", new String[]{"Go"}, 0);
 		
