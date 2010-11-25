@@ -78,31 +78,13 @@ public class DisplayPanel extends JComponent
 			public void mouseWheelMoved(MouseWheelEvent e)
 			{
 				int sa = e.getScrollAmount();
+				int dir = e.getWheelRotation();
+				double factor = dir==1? (1+sa/10.0): (1-sa/10.0);
 				
-				double xs;
-				double xe;
-				double ys;
-				double ye;
-				
-				if(sa>0)
-				{
-					xs = data.getXStart()*1.1;
-					xe = data.getXEnd()*1.1;
-					ys = data.getYStart()*1.1;
-					ye = data.getYEnd()*1.1;
-				}
-				else
-				{
-					xs = data.getXStart()*0.9;
-					xe = data.getXEnd()*0.9;
-					ys = data.getYStart()*0.9;
-					ye = data.getYEnd()*0.9;
-				}
-				
-				final double xsf = xs;
-				final double xef = xe;
-				final double ysf = ys;
-				final double yef = ye;
+				final double xs = data.getXStart()*factor;
+				final double xe = data.getXEnd()*factor;
+				final double ys = data.getYStart()*factor;
+				final double ye = data.getYEnd()*factor;
 				
 				SServiceProvider.getService(provider, IGenerateService.class)
 					.addResultListener(new SwingDefaultResultListener()
@@ -111,9 +93,9 @@ public class DisplayPanel extends JComponent
 					{
 						final Rectangle	bounds	= getInnerBounds();
 						
-						IGenerateService	gs	= (IGenerateService)result;
+						IGenerateService gs	= (IGenerateService)result;
 						
-						AreaData ad = new AreaData(xsf, xef, ysf, yef, bounds.width, bounds.height,
+						AreaData ad = new AreaData(xs, xe, ys, ye, bounds.width, bounds.height,
 							data!=null ? data.getMax() : 256, data!=null ? data.getParallel() : 10, data!=null ? data.getTaskSize() : 160000);
 						IFuture	fut	= gs.generateArea(ad);
 						fut.addResultListener(new SwingDefaultResultListener(DisplayPanel.this)
