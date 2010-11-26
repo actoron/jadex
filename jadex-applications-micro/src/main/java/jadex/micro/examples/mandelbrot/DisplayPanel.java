@@ -98,7 +98,7 @@ public class DisplayPanel extends JComponent
 			{
 				if(enddrag!=null)
 				{
-					System.out.println("dragged: "+startdrag+" "+enddrag);
+//					System.out.println("dragged: "+startdrag+" "+enddrag);
 					
 					final Rectangle	bounds	= getInnerBounds();
 					int xdiff = startdrag.x-enddrag.x;
@@ -151,61 +151,64 @@ public class DisplayPanel extends JComponent
 		{
 			public void mouseWheelMoved(MouseWheelEvent e)
 			{
-				DisplayPanel.this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-				calculating	= true;
-				repaint();
-				
-				final Rectangle	bounds	= getInnerBounds();
-
-				int sa = e.getScrollAmount();
-				int dir = e.getWheelRotation();
-				double factor = 1+dir*sa/10.0;
-				
-				int	iwidth	= image.getWidth(DisplayPanel.this);
-				int iheight	= image.getHeight(DisplayPanel.this);
-				final Rectangle drawarea = scaleToFit(bounds, iwidth, iheight);
-				int mx = Math.min((int)(drawarea.getX()+drawarea.getWidth()), Math.max((int)drawarea.getX(), e.getX()));
-				int my = Math.min((int)(drawarea.getY()+drawarea.getWidth()), Math.max((int)drawarea.getY(), e.getY()));
-				double xrel = ((double)(mx-drawarea.getX()))/drawarea.getWidth();
-				double yrel = ((double)(my-drawarea.getY()))/drawarea.getHeight();
-
-				double wold = data.getXEnd()-data.getXStart();
-				double hold = data.getYEnd()-data.getYStart();
-				double wnew = wold*factor;
-				double hnew = hold*factor;
-				double wd = wold-wnew;
-				double hd = hold-hnew;
-				
-				final double xs = data.getXStart()+wd*xrel;
-				final double xe = xs+wnew;
-				final double ys = data.getYStart()+hd*yrel;
-				final double ye = ys+wnew;
-				
-				SServiceProvider.getService(provider, IGenerateService.class)
-					.addResultListener(new SwingDefaultResultListener()
+				if(!calculating)
 				{
-					public void customResultAvailable(Object source, Object result)
+					DisplayPanel.this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+					calculating	= true;
+					repaint();
+					
+					final Rectangle	bounds	= getInnerBounds();
+	
+					int sa = e.getScrollAmount();
+					int dir = e.getWheelRotation();
+					double factor = 1+dir*sa/10.0;
+					
+					int	iwidth	= image.getWidth(DisplayPanel.this);
+					int iheight	= image.getHeight(DisplayPanel.this);
+					final Rectangle drawarea = scaleToFit(bounds, iwidth, iheight);
+					int mx = Math.min((int)(drawarea.getX()+drawarea.getWidth()), Math.max((int)drawarea.getX(), e.getX()));
+					int my = Math.min((int)(drawarea.getY()+drawarea.getWidth()), Math.max((int)drawarea.getY(), e.getY()));
+					double xrel = ((double)(mx-drawarea.getX()))/drawarea.getWidth();
+					double yrel = ((double)(my-drawarea.getY()))/drawarea.getHeight();
+	
+					double wold = data.getXEnd()-data.getXStart();
+					double hold = data.getYEnd()-data.getYStart();
+					double wnew = wold*factor;
+					double hnew = hold*factor;
+					double wd = wold-wnew;
+					double hd = hold-hnew;
+					
+					final double xs = data.getXStart()+wd*xrel;
+					final double xe = xs+wnew;
+					final double ys = data.getYStart()+hd*yrel;
+					final double ye = ys+wnew;
+					
+					SServiceProvider.getService(provider, IGenerateService.class)
+						.addResultListener(new SwingDefaultResultListener()
 					{
-						IGenerateService gs	= (IGenerateService)result;
-						
-						AreaData ad = new AreaData(xs, xe, ys, ye, data.getSizeX(), data.getSizeY(),
-							data!=null ? data.getMax() : 256, data!=null ? data.getParallel() : 10, data!=null ? data.getTaskSize() : 160000);
-						IFuture	fut	= gs.generateArea(ad);
-						fut.addResultListener(new SwingDefaultResultListener(DisplayPanel.this)
+						public void customResultAvailable(Object source, Object result)
 						{
-							public void customResultAvailable(Object source, Object result)
+							IGenerateService gs	= (IGenerateService)result;
+							
+							AreaData ad = new AreaData(xs, xe, ys, ye, data.getSizeX(), data.getSizeY(),
+								data!=null ? data.getMax() : 256, data!=null ? data.getParallel() : 10, data!=null ? data.getTaskSize() : 160000);
+							IFuture	fut	= gs.generateArea(ad);
+							fut.addResultListener(new SwingDefaultResultListener(DisplayPanel.this)
 							{
-								DisplayPanel.this.setResults((AreaData)result);
-							}
-							public void customExceptionOccurred(Object source, Exception exception)
-							{
-								calculating	= false;
-								DisplayPanel.this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-								super.customExceptionOccurred(source, exception);
-							}
-						});
-					}
-				});
+								public void customResultAvailable(Object source, Object result)
+								{
+									DisplayPanel.this.setResults((AreaData)result);
+								}
+								public void customExceptionOccurred(Object source, Exception exception)
+								{
+									calculating	= false;
+									DisplayPanel.this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+									super.customExceptionOccurred(source, exception);
+								}
+							});
+						}
+					});
+				}
 			}
 		});
 		addMouseListener(new MouseAdapter()
