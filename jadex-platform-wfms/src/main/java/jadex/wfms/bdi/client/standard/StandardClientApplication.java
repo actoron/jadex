@@ -1,13 +1,16 @@
 package jadex.wfms.bdi.client.standard;
 
-import jadex.bdi.runtime.AgentEvent;
+import jadex.bdi.planlib.iasteps.DispatchGoalStep;
+import jadex.bdi.planlib.iasteps.SetBeliefStep;
 import jadex.bdi.runtime.GoalFailureException;
-import jadex.bdi.runtime.IAgentListener;
 import jadex.bdi.runtime.IBDIExternalAccess;
-import jadex.bdi.runtime.IEAGoal;
+import jadex.bridge.IComponentListener;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
+import jadex.commons.ChangeEvent;
 import jadex.commons.SGUI;
-import jadex.wfms.SwingGoalDispatchResultListener;
+import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.wfms.bdi.client.standard.parametergui.ActivityComponent;
 import jadex.wfms.client.IClientActivity;
 import jadex.wfms.client.IWorkitem;
@@ -22,6 +25,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -76,22 +80,30 @@ public class StandardClientApplication
 		connected = false;
 		this.agent = (IBDIExternalAccess) appAgent;
 		
-		agent.addAgentListener(new IAgentListener()
+		agent.scheduleStep(new IComponentStep()
 		{
-			public void agentTerminating(AgentEvent ae)
+			public Object execute(IInternalAccess ia)
 			{
-			}
-			
-			public void agentTerminated(AgentEvent ae)
-			{
-				EventQueue.invokeLater(new Runnable()
+				ia.addComponentListener(new IComponentListener()
 				{
-					
-					public void run()
+					public void componentTerminating(ChangeEvent ce)
 					{
-						mainFrame.dispose();
+					}
+					
+					public void componentTerminated(ChangeEvent ce)
+					{
+						EventQueue.invokeLater(new Runnable()
+						{
+							
+							public void run()
+							{
+								mainFrame.dispose();
+							}
+						});
 					}
 				});
+				
+				return null;
 			}
 		});
 		
@@ -107,7 +119,14 @@ public class StandardClientApplication
 					{
 						if (connected)
 							disconnect();
-						agent.killAgent();
+						agent.scheduleStep(new IComponentStep()
+						{
+							public Object execute(IInternalAccess ia)
+							{
+								ia.killComponent();
+								return null;
+							}
+						});
 						mainFrame.dispose();
 					}
 				});
@@ -204,46 +223,45 @@ public class StandardClientApplication
 	
 	private void connect(final String userName, final Object authToken)
 	{
-		agent.createGoal("clientcap.connect").addResultListener(new SwingGoalDispatchResultListener(agent)
-		{
-			public void configureGoal(IEAGoal goal)
+		agent.scheduleStep(new DispatchGoalStep("clientcap.connect", new HashMap() {{
+			   put("user_name", userName);
+			   put("auth_token", authToken);
+			}})).addResultListener(new SwingDefaultResultListener()
 			{
-				goal.setParameterValue("user_name", userName);
-				goal.setParameterValue("auth_token", authToken);
-			}
-			
-			public void goalResultsAvailable(Map parameters)
-			{
-				capabilities = (Set) parameters.get("capabilities");
-				if (capabilities.containsAll(SCapReqs.ACTIVITY_HANDLING))
-					setupActivityHandling();
 				
-				if (capabilities.containsAll(SCapReqs.WORKITEM_LIST))
+				public void customResultAvailable(Object source, Object result)
 				{
-					toolPane.add(WORKITEM_LIST_TAB_NAME, wlComponent);
-					setupWorkitemListComponent();
+					Map parameters = (Map) result;
+					capabilities = (Set) parameters.get("capabilities");
+					if (capabilities.containsAll(SCapReqs.ACTIVITY_HANDLING))
+						setupActivityHandling();
+					
+					if (capabilities.containsAll(SCapReqs.WORKITEM_LIST))
+					{
+						toolPane.add(WORKITEM_LIST_TAB_NAME, wlComponent);
+						setupWorkitemListComponent();
+					}
+					
+					if (capabilities.containsAll(SCapReqs.PROCESS_LIST))
+					{
+						toolPane.add(PROCESS_MODEL_TAB_NAME, pmComponent);
+						setupProcessModelComponent();
+					}
+					
+					if (capabilities.containsAll(SCapReqs.ADMIN_ACTIVITIES))
+					{
+						toolPane.add(ADMIN_ACTIVITIES_TAB_NAME, aaComponent);
+						setupAdminActivitiesComponent();
+					}
 				}
-				
-				if (capabilities.containsAll(SCapReqs.PROCESS_LIST))
-				{
-					toolPane.add(PROCESS_MODEL_TAB_NAME, pmComponent);
-					setupProcessModelComponent();
-				}
-				
-				if (capabilities.containsAll(SCapReqs.ADMIN_ACTIVITIES))
-				{
-					toolPane.add(ADMIN_ACTIVITIES_TAB_NAME, aaComponent);
-					setupAdminActivitiesComponent();
-				}
-			}
-		});
+			});
 	}
 	
 	private void disconnect()
 	{
-		agent.createGoal("clientcap.disconnect").addResultListener(new SwingGoalDispatchResultListener(agent)
+		agent.scheduleStep(new DispatchGoalStep("clientcap.disconnect")).addResultListener(new SwingDefaultResultListener()
 		{
-			public void goalResultsAvailable(Map parameters)
+			public void customResultAvailable(Object source, Object result)
 			{
 				cleanUp();
 				statusBar.replaceIcon(CONNECT_ICON_NAME, CONNECT_OFF_ICON_PATH);
@@ -280,14 +298,14 @@ public class StandardClientApplication
 				
 				final IClientActivity activity = ac.getActivity();
 				activity.setMultipleParameterValues(ac.getParameterValues());
-				agent.createGoal("clientcap.finish_activity").addResultListener(new SwingGoalDispatchResultListener(agent)
+				
+				agent.scheduleStep(new DispatchGoalStep("clientcap.finish_activity", "activity", activity)).addResultListener(new SwingDefaultResultListener()
 				{
-					public void configureGoal(IEAGoal goal)
+					public void customResultAvailable(Object source, Object result)
 					{
-						goal.setParameterValue("activity", activity);
 					}
 					
-					public void goalExceptionOccurred(
+					public void customExceptionOccurred(Object source,
 							Exception exception)
 					{
 						JOptionPane.showMessageDialog(mainFrame, "Failed finishing activity.");
@@ -315,14 +333,14 @@ public class StandardClientApplication
 	
 	private void cancelActivity(final IClientActivity activity)
 	{
-		agent.createGoal("clientcap.cancel_activity").addResultListener(new SwingGoalDispatchResultListener(agent)
+		agent.scheduleStep(new DispatchGoalStep("clientcap.cancel_activity", "activity", activity)).addResultListener(new SwingDefaultResultListener()
 		{
-			public void configureGoal(IEAGoal goal)
+			public void customResultAvailable(Object source, Object result)
 			{
-				goal.setParameterValue("activity", activity);
 			}
 			
-			public void goalExceptionOccurred(Exception exception)
+			public void customExceptionOccurred(Object source,
+					Exception exception)
 			{
 				JOptionPane.showMessageDialog(mainFrame, "Activity cancelation failed.");
 			}
@@ -339,14 +357,13 @@ public class StandardClientApplication
 				final IWorkitem wi = wlComponent.getSelectedWorkitem();
 				if (wi != null)
 				{
-					agent.createGoal("clientcap.begin_activity").addResultListener(new SwingGoalDispatchResultListener(agent)
+					agent.scheduleStep(new DispatchGoalStep("clientcap.begin_activity", "workitem", wi)).addResultListener(new SwingDefaultResultListener()
 					{
-						public void configureGoal(IEAGoal goal)
+						public void customResultAvailable(Object source, Object result)
 						{
-							goal.setParameterValue("workitem", wi);
 						}
 						
-						public void goalExceptionOccurred(
+						public void customExceptionOccurred(Object source,
 								Exception exception)
 						{
 							JOptionPane.showMessageDialog(mainFrame, "Start of activity failed.");
@@ -364,7 +381,8 @@ public class StandardClientApplication
 				wlComponent.addWorkitem(wi);
 			}
 		};
-		agent.getBeliefbase().setBeliefFact("clientcap.add_workitem_controller", wiAdded);
+		
+		agent.scheduleStep(new SetBeliefStep("clientcap.add_workitem_controller", wiAdded));
 		
 		Action wiRemoved = new AbstractAction()
 		{
@@ -374,9 +392,9 @@ public class StandardClientApplication
 				wlComponent.removeWorkitem(wi);
 			}
 		};
-		agent.getBeliefbase().setBeliefFact("clientcap.remove_workitem_controller", wiRemoved);
+		agent.scheduleStep(new SetBeliefStep("clientcap.remove_workitem_controller", wiRemoved));
 		
-		agent.createGoal("clientcap.start_workitem_subscription").addResultListener(new SwingGoalDispatchResultListener(agent));
+		agent.scheduleStep(new DispatchGoalStep("clientcap.start_workitem_subscription"));
 	}
 	
 	private void setupProcessModelComponent()
@@ -389,7 +407,7 @@ public class StandardClientApplication
 				pmComponent.addProcessModelName(modelName);
 			}
 		};
-		agent.getBeliefbase().setBeliefFact("clientcap.add_process_model_controller", pmAdded);
+		agent.scheduleStep(new SetBeliefStep("clientcap.add_process_model_controller", pmAdded));
 		
 		Action pmRemoved = new AbstractAction()
 		{
@@ -399,9 +417,9 @@ public class StandardClientApplication
 				pmComponent.removeProcessModelName(modelName);
 			}
 		};
-		agent.getBeliefbase().setBeliefFact("clientcap.remove_process_model_controller", pmRemoved);
+		agent.scheduleStep(new SetBeliefStep("clientcap.remove_process_model_controller", pmRemoved));
 		
-		agent.createGoal("clientcap.start_model_repository_subscription").addResultListener(new SwingGoalDispatchResultListener(agent));
+		agent.scheduleStep(new DispatchGoalStep("clientcap.start_model_repository_subscription"));
 		
 		pmComponent.setStartAction(new AbstractAction()
 		{
@@ -410,14 +428,13 @@ public class StandardClientApplication
 				final String processName = pmComponent.getSelectedModelName();
 				if (processName != null)
 				{
-					agent.createGoal("clientcap.start_process").addResultListener(new SwingGoalDispatchResultListener(agent) 
+					agent.scheduleStep(new DispatchGoalStep("clientcap.start_process", "process_name", processName)).addResultListener(new SwingDefaultResultListener()
 					{
-						public void configureGoal(IEAGoal goal)
+						public void customResultAvailable(Object source, Object result)
 						{
-							goal.setParameterValue("process_name", processName);
 						}
 						
-						public void goalExceptionOccurred(
+						public void customExceptionOccurred(Object source,
 								Exception exception)
 						{
 							JOptionPane.showMessageDialog(mainFrame, "Process Start failed.");
@@ -470,13 +487,8 @@ public class StandardClientApplication
 				if (result == JFileChooser.APPROVE_OPTION)
 				{
 					final String path = fileChooser.getSelectedFile().getAbsolutePath();
-					agent.createGoal("clientcap.add_model_resource").addResultListener(new SwingGoalDispatchResultListener(agent)
-					{
-						public void configureGoal(IEAGoal goal)
-						{
-							goal.setParameterValue("resource_path", path);
-						}
-					});
+					
+					agent.scheduleStep(new DispatchGoalStep("clientcap.add_model_resource", "resource_path", path));
 				}
 			}
 		});
@@ -488,17 +500,16 @@ public class StandardClientApplication
 				final String name = pmComponent.getSelectedModelName();
 				if (name != null)
 				{
-					agent.createGoal("clientcap.remove_process").addResultListener(new SwingGoalDispatchResultListener(agent)
+					agent.scheduleStep(new DispatchGoalStep("clientcap.remove_process", "process_name", name)).addResultListener(new SwingDefaultResultListener()
 					{
-						public void configureGoal(IEAGoal goal)
+						public void customResultAvailable(Object source, Object result)
 						{
-							goal.setParameterValue("process_name", name);
-						};
+						}
 						
-						public void goalExceptionOccurred(Exception exception)
+						public void customExceptionOccurred(Object source, Exception exception)
 						{
 							JOptionPane.showMessageDialog(mainFrame, "Removing process failed.");
-						};
+						}
 					});
 				}
 			}
@@ -514,15 +525,13 @@ public class StandardClientApplication
 				final IClientActivity activity = aaComponent.getSelectedActivity();
 				if (activity != null)
 				{
-					agent.createGoal("clientcap.terminate_activity").addResultListener(new SwingGoalDispatchResultListener(agent)
+					agent.scheduleStep(new DispatchGoalStep("clientcap.terminate_activity", "activity", activity)).addResultListener(new SwingDefaultResultListener()
 					{
-						public void configureGoal(IEAGoal goal)
-						{
-							goal.setParameterValue("activity", activity);
+						public void customResultAvailable(Object source, Object result)
+						{							
 						}
 						
-						public void goalExceptionOccurred(
-								Exception exception)
+						public void customExceptionOccurred(Object source, Exception exception)
 						{
 							JOptionPane.showMessageDialog(mainFrame, "Activity termination failed.");
 						}
@@ -538,7 +547,7 @@ public class StandardClientApplication
 				aaComponent.addUserActivity(e.getActionCommand(), (IClientActivity) e.getSource());
 			}
 		};
-		agent.getBeliefbase().setBeliefFact("clientcap.add_user_activity_controller", uacAdded);
+		agent.scheduleStep(new SetBeliefStep("clientcap.add_user_activity_controller", uacAdded));
 		
 		Action uacRemoved = new AbstractAction()
 		{
@@ -547,9 +556,9 @@ public class StandardClientApplication
 				aaComponent.removeUserActivity(e.getActionCommand(), (IClientActivity) e.getSource());
 			}
 		};
-		agent.getBeliefbase().setBeliefFact("clientcap.remove_user_activity_controller", uacRemoved);
+		agent.scheduleStep(new SetBeliefStep("clientcap.remove_user_activity_controller", uacRemoved));
 		
-		agent.createGoal("clientcap.start_user_activities_subscription").addResultListener(new SwingGoalDispatchResultListener(agent));
+		agent.scheduleStep(new DispatchGoalStep("clientcap.start_user_activities_subscription"));
 	}
 	
 	private void setupActivityHandling()
@@ -580,7 +589,7 @@ public class StandardClientApplication
 				}
 			}
 		};
-		agent.getBeliefbase().setBeliefFact("clientcap.add_activity_controller", acAdded);
+		agent.scheduleStep(new SetBeliefStep("clientcap.add_activity_controller", acAdded));
 		
 		Action acRemoved = new AbstractAction()
 		{
@@ -609,7 +618,7 @@ public class StandardClientApplication
 				}
 			}
 		};
-		agent.getBeliefbase().setBeliefFact("clientcap.remove_activity_controller", acRemoved);
+		agent.scheduleStep(new SetBeliefStep("clientcap.remove_activity_controller", acRemoved));
 		
 		//TODO: put somewhere else
 		
@@ -624,9 +633,9 @@ public class StandardClientApplication
 				showConnectDialog();
 			}
 		};
-		agent.getBeliefbase().setBeliefFact("clientcap.lost_connection_controller", lcAction);
+		agent.scheduleStep(new SetBeliefStep("clientcap.lost_connection_controller", lcAction));
 		
-		agent.createGoal("clientcap.start_activity_subscription").addResultListener(new SwingGoalDispatchResultListener(agent));
+		agent.scheduleStep(new DispatchGoalStep("clientcap.start_activity_subscription"));
 	}
 	
 	public void flushActions()
@@ -641,12 +650,22 @@ public class StandardClientApplication
 		pmComponent.setStartAction(emptyAction);
 		aaComponent.setTerminateAction(emptyAction);
 		
-		agent.getBeliefbase().setBeliefFact("clientcap.add_workitem_controller", null);
+		agent.scheduleStep(new SetBeliefStep(new HashMap()
+		{{
+			put("clientcap.add_workitem_controller", null);
+			put("clientcap.remove_workitem_controller", null);
+			put("clientcap.add_user_activity_controller", null);
+			put("clientcap.remove_user_activity_controller", null);
+			put("clientcap.add_process_model_controller", null);
+			put("clientcap.remove_process_model_controller", null);
+		}}));
+		
+		/*agent.getBeliefbase().setBeliefFact("clientcap.add_workitem_controller", null);
 		agent.getBeliefbase().setBeliefFact("clientcap.remove_workitem_controller", null);
 		agent.getBeliefbase().setBeliefFact("clientcap.add_user_activity_controller", null);
 		agent.getBeliefbase().setBeliefFact("clientcap.remove_user_activity_controller", null);
 		agent.getBeliefbase().setBeliefFact("clientcap.add_process_model_controller", null);
-		agent.getBeliefbase().setBeliefFact("clientcap.remove_process_model_controller", null);
+		agent.getBeliefbase().setBeliefFact("clientcap.remove_process_model_controller", null);*/
 	}
 }
 

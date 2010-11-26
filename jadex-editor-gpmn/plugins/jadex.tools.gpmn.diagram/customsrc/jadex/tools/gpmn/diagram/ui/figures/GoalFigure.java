@@ -69,9 +69,6 @@ public abstract class GoalFigure extends ShadowedOvalFigure /*ShadowedRoundedRec
 		//GpmnShapePainter.paintTypeImageInFigure(graphics, super.getInnerPaintBounds(), this, getTypeImage());
 		
 		{
-			PrecisionRectangle bounds = GpmnShapePainter.getTopTitleMarkerBounds(getInnerPaintBounds());
-			bounds.setY(bounds.preciseY - graphics.getFontMetrics().getAscent() + 1.0);
-			
 			String ts = null;
 			switch(goalType)
 			{
@@ -86,15 +83,13 @@ public abstract class GoalFigure extends ShadowedOvalFigure /*ShadowedRoundedRec
 					ts = "A";
 			}
 			
-			GpmnShapePainter.paintCenteredString(graphics, bounds, ts);
-			
-			bounds = GpmnShapePainter.getTopTitleMarkerBounds(getInnerPaintBounds());
-			bounds.setX(bounds.getCenter().x - FigureUtilities.getTextWidth(ts, graphics.getFont())/2 - 2.0);
-			bounds.setWidth(FigureUtilities.getTextWidth(ts, graphics.getFont()) + 3.0);
+			PrecisionRectangle bounds = new PrecisionRectangle();
+			bounds.setX(getBounds().getCenter().preciseX() - (FigureUtilities.getTextWidth(ts, graphics.getFont()) / 2.0) - 4.0);
+			bounds.setY(getBounds().preciseY());
+			bounds.setWidth(FigureUtilities.getTextWidth(ts, graphics.getFont()) + 8.0);
 			bounds.setHeight(graphics.getFontMetrics().getAscent() + 4.0);
-			bounds.setY(bounds.preciseY - (graphics.getFontMetrics().getAscent() / 2.0) - 2.0);
-			//bounds.width = (int) (FigureUtilities.getTextWidth(ts, graphics.getFont()) + 2.0);
-			//bounds.y = (int) (bounds.preciseY); 
+			
+			GpmnShapePainter.paintCenteredString(graphics, bounds, ts);
 			graphics.drawRectangle(bounds);
 		}
 		

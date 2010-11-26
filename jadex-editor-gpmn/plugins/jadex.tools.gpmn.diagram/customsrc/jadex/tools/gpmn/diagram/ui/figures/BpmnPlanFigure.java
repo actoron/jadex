@@ -46,7 +46,7 @@ public abstract class BpmnPlanFigure extends ShadowedRoundedRectangleFigure
 		// paint static type title in figure
 		//GpmnShapePainter.paintCenteredString(graphics, GpmnShapePainter
 				//.getTopTitleMarkerBounds(getInnerPaintBounds()), "Bpmn Plan");
-		{
+		/*{
 			PrecisionRectangle bounds = GpmnShapePainter.getTopTitleMarkerBounds(getInnerPaintBounds());
 			bounds.setY(bounds.preciseY - graphics.getFontMetrics().getAscent() + 1.0);
 			
@@ -59,6 +59,20 @@ public abstract class BpmnPlanFigure extends ShadowedRoundedRectangleFigure
 			bounds.setWidth(FigureUtilities.getTextWidth(bpmnstring, graphics.getFont()) + 3.0);
 			bounds.setHeight(graphics.getFontMetrics().getAscent() + 4.0);
 			bounds.setY(bounds.preciseY - (graphics.getFontMetrics().getAscent() / 2.0) - 2.0);
+			graphics.drawRectangle(bounds);
+		}*/
+		
+		{
+			String bpmnstring = "BPMN";
+			
+			PrecisionRectangle bounds = new PrecisionRectangle();
+			bounds.setX(getBounds().getCenter().preciseX() - (FigureUtilities.getTextWidth(bpmnstring, graphics.getFont()) / 2.0) - 4.0);
+			bounds.setY(getBounds().preciseY());
+			bounds.setWidth(FigureUtilities.getTextWidth(bpmnstring, graphics.getFont()) + 8.0);
+			bounds.setHeight(graphics.getFontMetrics().getAscent() + 4.0);
+			
+			GpmnShapePainter.paintCenteredString(graphics, bounds, bpmnstring);
+			
 			graphics.drawRectangle(bounds);
 		}
 

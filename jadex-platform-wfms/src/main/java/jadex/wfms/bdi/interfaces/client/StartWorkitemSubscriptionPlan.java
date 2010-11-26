@@ -3,7 +3,7 @@ package jadex.wfms.bdi.interfaces.client;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.Plan;
 import jadex.commons.service.SServiceProvider;
-import jadex.wfms.GoalDispatchResultListener;
+import jadex.wfms.UpdateSubscriptionStep;
 import jadex.wfms.bdi.ontology.ComponentClientProxy;
 import jadex.wfms.bdi.ontology.InformWorkitemAdded;
 import jadex.wfms.bdi.ontology.InformWorkitemRemoved;
@@ -31,14 +31,7 @@ public class StartWorkitemSubscriptionPlan extends Plan
 				final InformWorkitemRemoved update = new InformWorkitemRemoved();
 				update.setWorkitem(event.getWorkitem());
 				
-				agent.createGoal("subcap.sp_submit_update").addResultListener(new GoalDispatchResultListener(agent)
-				{
-					public void configureGoal(jadex.bdi.runtime.IEAGoal goal)
-					{
-						goal.setParameterValue("update", update);
-						goal.setParameterValue("subscription_id", subId);
-					}
-				});
+				agent.scheduleStep(new UpdateSubscriptionStep(subId, update));
 			}
 			
 			public void workitemAdded(WorkitemEvent event)
@@ -46,14 +39,7 @@ public class StartWorkitemSubscriptionPlan extends Plan
 				final InformWorkitemAdded update = new InformWorkitemAdded();
 				update.setWorkitem(event.getWorkitem());
 				
-				agent.createGoal("subcap.sp_submit_update").addResultListener(new GoalDispatchResultListener(agent)
-				{
-					public void configureGoal(jadex.bdi.runtime.IEAGoal goal)
-					{
-						goal.setParameterValue("update", update);
-						goal.setParameterValue("subscription_id", subId);
-					}
-				});
+				agent.scheduleStep(new UpdateSubscriptionStep(subId, update));
 			}
 		};
 		cs.addWorkitemListener(proxy, listener);

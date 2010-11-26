@@ -58,13 +58,16 @@ public class GpmnShapePainter
 	 * @param rect the rectangle to center the string
 	 * @param s the string to draw
 	 */
-	public static void paintCenteredString(Graphics graphics, Rectangle rect, String s)
+	public static void paintCenteredString(Graphics graphics, PrecisionRectangle rect, String s)
 	{
-		Point center = rect.getCenter();
-		double startX = center.x - FigureUtilities.getTextWidth(s, graphics.getFont())/2;
-		double startY = center.y - graphics.getFontMetrics().getAscent()/2;
+		PrecisionPoint center = new PrecisionPoint(rect.preciseX + (rect.preciseWidth / 2.0),
+				   rect.preciseY + (rect.preciseHeight / 2.0));
+		double startX = center.preciseX - FigureUtilities.getTextWidth(s, graphics.getFont())/2.0;
+		double startY = center.preciseY - graphics.getFontMetrics().getAscent()/2.0;
 		PrecisionPoint pp = new PrecisionPoint(startX, startY);
-		
+		pp.x = ((int)Math.round(pp.preciseX));
+		pp.y = ((int)Math.round(pp.preciseY));
+
 		graphics.drawString(s, pp);
 	}
 	
@@ -211,7 +214,7 @@ public class GpmnShapePainter
 		
 		graphics.drawRectangle(rect);
 		
-		GpmnShapePainter.paintCenteredString(graphics, rect, "?");
+		GpmnShapePainter.paintCenteredString(graphics, new PrecisionRectangle(rect), "?");
 		
 		graphics.popState();
 	}

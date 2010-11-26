@@ -196,5 +196,10 @@
 			<artifactId>jadex-platform-base</artifactId>
 			<version>2.0-rc5</version>
 		</dependency>
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-applib-bdi</artifactId>
+			<version>2.0-rc5</version>
+		</dependency>
 	</dependencies>
 </project>

@@ -1,23 +1,25 @@
 package jadex.wfms.simulation;
 
-import jadex.bdi.runtime.AgentEvent;
-import jadex.bdi.runtime.IAgentListener;
+import jadex.bdi.planlib.iasteps.DispatchGoalStep;
+import jadex.bdi.planlib.iasteps.SetBeliefStep;
 import jadex.bdi.runtime.IBDIExternalAccess;
-import jadex.bdi.runtime.IEAGoal;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.MParameter;
+import jadex.bridge.IComponentListener;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IInternalAccess;
 import jadex.commons.Future;
 import jadex.commons.ICacheableModel;
 import jadex.commons.IFuture;
 import jadex.commons.SGUI;
+import jadex.commons.ThreadSuspendable;
 import jadex.commons.collection.TreeNode;
 import jadex.commons.concurrent.DefaultResultListener;
+import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.library.ILibraryService;
 import jadex.gpmn.model2.MGpmnModel;
-import jadex.wfms.GoalDispatchResultListener;
-import jadex.wfms.SwingGoalDispatchResultListener;
 import jadex.wfms.client.IClientActivity;
 import jadex.wfms.client.IWorkitem;
 import jadex.wfms.guicomponents.LoginDialog;
@@ -39,6 +41,7 @@ import java.awt.Component;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -119,22 +122,34 @@ public class ClientSimulator
 							public void run()
 							{
 								simWindow = new SimulationWindow(scenarios, libService);
-								agent.addAgentListener(new IAgentListener()
+								
+								agent.scheduleStep(new IComponentStep()
 								{
-									public void agentTerminating(AgentEvent ae)
-									{
-									}
 									
-									public void agentTerminated(AgentEvent ae)
+									public Object execute(IInternalAccess ia)
 									{
-										EventQueue.invokeLater(new Runnable()
+										ia.addComponentListener(new IComponentListener()
 										{
 											
-											public void run()
+											public void componentTerminating(jadex.commons.ChangeEvent ce)
 											{
-												simWindow.dispose();
+												// TODO Auto-generated method stub
+												
+											}
+											
+											public void componentTerminated(jadex.commons.ChangeEvent ce)
+											{
+												EventQueue.invokeLater(new Runnable()
+												{
+													
+													public void run()
+													{
+														simWindow.dispose();
+													}
+												});
 											}
 										});
+										return null;
 									}
 								});
 								
@@ -214,8 +229,7 @@ public class ClientSimulator
 				}
 			}
 		});*/
-		
-		agent.getBeliefbase().setBeliefFact("clientcap.process_finished_controller", new AbstractAction()
+		agent.scheduleStep(new SetBeliefStep("clientcap.process_finished_controller", new AbstractAction()
 		{
 			public void actionPerformed(ActionEvent e)
 			{
@@ -258,27 +272,22 @@ public class ClientSimulator
 					});
 				}
 			}
-		});
-		agent.createGoal("clientcap.start_process_event_subscription").addResultListener(new GoalDispatchResultListener(agent));
+		})).get(new ThreadSuspendable());
 		
-		agent.getBeliefbase().setBeliefFact("clientcap.add_workitem_controller", new AbstractAction()
+		agent.scheduleStep(new DispatchGoalStep("clientcap.start_process_event_subscription"));
+		
+		agent.scheduleStep(new SetBeliefStep("clientcap.add_workitem_controller", new AbstractAction()
 		{
 			public void actionPerformed(ActionEvent e)
 			{
 				final IWorkitem workitem = (IWorkitem) e.getSource();
 				
-				agent.createGoal("clientcap.begin_activity").addResultListener(new GoalDispatchResultListener(agent)
-				{
-					public void configureGoal(IEAGoal goal)
-					{
-						goal.setParameterValue("workitem",workitem);
-					}
-				});
+				agent.scheduleStep(new DispatchGoalStep("clientcap.begin_activity", "workitem",workitem));
 			}
-		});
-		agent.createGoal("clientcap.start_workitem_subscription").addResultListener(new GoalDispatchResultListener(agent));
+		}));
+		agent.scheduleStep(new DispatchGoalStep("clientcap.start_workitem_subscription"));
 		
-		agent.getBeliefbase().setBeliefFact("clientcap.add_activity_controller", new AbstractAction()
+		agent.scheduleStep(new SetBeliefStep("clientcap.add_activity_controller", new AbstractAction()
 		{
 			public void actionPerformed(ActionEvent e)
 			{
@@ -288,16 +297,10 @@ public class ClientSimulator
 				if (parameterStates != null)
 					activity.setMultipleParameterValues(parameterStates);
 				
-				agent.createGoal("clientcap.finish_activity").addResultListener(new GoalDispatchResultListener(agent)
-				{
-					public void configureGoal(IEAGoal goal)
-					{
-						goal.setParameterValue("activity", activity);
-					}
-				});
+				agent.scheduleStep(new DispatchGoalStep("clientcap.finish_activity", "activity", activity));
 			}
-		});
-		agent.createGoal("clientcap.start_activity_subscription").addResultListener(new SwingGoalDispatchResultListener(agent));
+		}));
+		agent.scheduleStep(new DispatchGoalStep("clientcap.start_activity_subscription"));
 		
 		simWindow.setCellRenderer(new DefaultTreeCellRenderer()
 		{
@@ -318,6 +321,7 @@ public class ClientSimulator
 					{
 						setIcon(SimulationWindow.PARAM_ICON);
 						MActivity task = (MActivity) ((ModelTreeNode)((ModelTreeNode)value).getParent()).getData();
+						System.out.println(simWindow);
 						if ((simWindow.getSelectedScenario() == null) || simWindow.getSelectedScenario().getTaskParameter(task.getName(), ((MParameter) data).getName()).getStateCount() == 0)
 							setForeground(new Color(128,128,128));
 					}
@@ -332,29 +336,24 @@ public class ClientSimulator
 		updateGui();
 	}
 	
-	protected IFuture loadModelFromPath(final String path)
+	protected Object loadModelFromPath(final String path)
 	{
 		final Future ret = new Future();
-		agent.createGoal("clientcap.request_model").addResultListener(new GoalDispatchResultListener(agent)
+		agent.scheduleStep(new DispatchGoalStep("clientcap.request_model", new HashMap() {{
+			put("model_name", path);
+			put("model_name_path", Boolean.TRUE);
+		}})).addResultListener(new DefaultResultListener()
 		{
-			public void configureGoal(IEAGoal goal)
-			{
-				goal.setParameterValue("model_name", path);
-				goal.setParameterValue("model_name_path", Boolean.TRUE);
-			}
-			
 			public void resultAvailable(Object source, Object result)
 			{
-				
-			}
-			
-			public void goalResultsAvailable(Map parameters)
-			{
+				Map parameters = (Map) result;
 				ret.setResult(parameters.get("model"));
 			}
 		});
 		
-		return ret;
+		//TODO Futurize!
+		
+		return ret.get(new ThreadSuspendable());
 	}
 	
 	private void updateGui()
@@ -387,20 +386,22 @@ public class ClientSimulator
 		final Future ret = new Future();
 		final String username = loginDialog.getUserName();
 		final String password = loginDialog.getPassword();
-		agent.createGoal("clientcap.connect").addResultListener(new GoalDispatchResultListener(agent)
+		agent.scheduleStep(new DispatchGoalStep("clientcap.connect", new HashMap() {{
+			put("user_name", username);
+			put("auth_token", password);
+		}})).addResultListener(new DefaultResultListener()
 		{
-			public void configureGoal(IEAGoal goal)
+			public void resultAvailable(Object source, Object result)
 			{
-				goal.setParameterValue("user_name", username);
-				goal.setParameterValue("auth_token", password);
 				ret.setResult(null);
 			}
 			
-			public void goalExceptionOccurred(Exception exception)
+			public void exceptionOccurred(Object source, Exception exception)
 			{
 				System.err.println("Login failed");
 			}
 		});
+		
 		return ret;
 	}
 	
@@ -411,32 +412,29 @@ public class ClientSimulator
 			
 			public void actionPerformed(ActionEvent e)
 			{
-				agent.createGoal("clientcap.request_model_names").addResultListener(new SwingGoalDispatchResultListener(agent)
+				agent.scheduleStep(new DispatchGoalStep("clientcap.request_model_names")).addResultListener(new SwingDefaultResultListener()
 				{
-					public void goalResultsAvailable(Map parameters)
+					public void customResultAvailable(Object source, Object result)
 					{
+						Map parameters = (Map) result;
 						Set modelNames = new TreeSet((Set) parameters.get("model_names"));
 						final String modelName = simWindow.showProcessPickerDialog(modelNames);
 						if (modelName == null)
 							return;
 						final ClientMetaProcessModel model = new ClientMetaProcessModel();
 						
-						agent.createGoal("clientcap.request_model").addResultListener(new SwingGoalDispatchResultListener(ClientSimulator.this.agent)
+						agent.scheduleStep(new DispatchGoalStep("clientcap.request_model", "model_name", modelName)).addResultListener(new SwingDefaultResultListener()
 						{
-							public void configureGoal(IEAGoal goal)
+							public void customResultAvailable(Object source, Object result)
 							{
-								goal.setParameterValue("model_name", modelName);
-							}
-							
-							public void goalResultsAvailable(Map parameters)
-							{
+								Map parameters = (Map) result;
 								try
 								{
 									model.setRootModel(ClientSimulator.this, modelName, (ICacheableModel) parameters.get("model"));
 								}
 								catch (Exception e)
 								{
-									goalExceptionOccurred(e);
+									customExceptionOccurred(null, e);
 								}
 								simWindow.setProcessTreeModel(model);
 								clientMetaProcessModel = model;
@@ -445,7 +443,8 @@ public class ClientSimulator
 								updateGui();
 							}
 							
-							public void goalExceptionOccurred(Exception exception)
+							public void customExceptionOccurred(Object source,
+									Exception exception)
 							{
 								exception.printStackTrace();
 								simWindow.showMessage(JOptionPane.ERROR_MESSAGE, "Cannot open the process", "Opening the process failed.");
@@ -634,13 +633,7 @@ public class ClientSimulator
 	
 	private void startProcess()
 	{
-		agent.createGoal("clientcap.start_process").addResultListener(new SwingGoalDispatchResultListener(agent)
-		{
-			public void configureGoal(IEAGoal goal)
-			{
-				goal.setParameterValue("process_name", clientMetaProcessModel.getMainProcessName());
-			}
-		});
+		agent.scheduleStep(new DispatchGoalStep("clientcap.start_process", "process_name", clientMetaProcessModel.getMainProcessName()));
 	}
 	
 	private boolean hasScenario(String name)

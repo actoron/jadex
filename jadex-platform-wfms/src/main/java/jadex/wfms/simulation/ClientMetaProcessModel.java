@@ -5,6 +5,7 @@ import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.MParameter;
 import jadex.bridge.IModelInfo;
 import jadex.commons.ICacheableModel;
+import jadex.commons.ThreadSuspendable;
 import jadex.commons.collection.Tree;
 import jadex.commons.collection.TreeNode;
 import jadex.gpmn.model2.MBpmnPlan;

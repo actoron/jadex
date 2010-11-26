@@ -17,6 +17,7 @@
 	name="WorkflowManagementSystem" package="jadex.wfms">
 	
 	<imports>
+		<import>jadex.wfms.service.*</import>
 		<import>jadex.wfms.service.impl.*</import>
 	</imports>
 
@@ -27,30 +28,30 @@
 	</componenttypes>
 	
 	<services>
-		<service>
+		<providedservice class="IAAAService">
 			jadex.wfms.service.impl.BasicAAAService.getTestService($component.getServiceProvider())
-		</service>
-		<service>
+		</providedservice>
+		<providedservice class="IExecutionService">
 			new ExecutionService($component.getComponentIdentifier(), $component.getServiceProvider())
-		</service>
-		<service>
+		</providedservice>
+		<providedservice class="IAdministrationService">
 			new AdministrationService($component.getServiceProvider())
-		</service>
-		<service>
+		</providedservice>
+		<providedservice class="IProcessDefinitionService">
 			new ProcessDefinitionConnector($component.getServiceProvider())
-		</service>
-		<service>
+		</providedservice>
+		<providedservice class="ClientConnector">
 			new ClientConnector($component.getServiceProvider())
-		</service>
-		<service>
+		</providedservice>
+		<providedservice class="IClientService">
 			new ClientService($component.getServiceProvider())
-		</service>
-		<service>
+		</providedservice>
+		<providedservice class="IWfmsClientService">
 			new WfmsClientService($component.getServiceProvider())
-		</service>
-		<service>
+		</providedservice>
+		<providedservice class="IModelRepositoryService">
 			new LinkedModelRepositoryService($component.getServiceProvider())
-		</service>
+		</providedservice>
 	</services>
 
 	<applications>

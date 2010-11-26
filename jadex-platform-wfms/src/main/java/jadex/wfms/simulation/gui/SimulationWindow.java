@@ -371,6 +371,11 @@ public class SimulationWindow extends JFrame
 		int column = scenarioTable.getSelectedColumn();
 		if (row >= 0 && column >= 0)
 			return (Scenario) scenarioTable.getValueAt(row, column);
+		else if (scenarioTable.getRowCount() > 0)
+		{
+			scenarioTable.getSelectionModel().setSelectionInterval(0, 0);
+			return (Scenario) scenarioTable.getValueAt(0, 0);
+		}
 		return null;
 	}
 	

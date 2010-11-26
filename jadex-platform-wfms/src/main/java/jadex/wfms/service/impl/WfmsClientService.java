@@ -10,6 +10,7 @@ import jadex.commons.service.SServiceProvider;
 import jadex.wfms.client.IClientActivity;
 import jadex.wfms.client.IWorkitem;
 import jadex.wfms.listeners.IActivityListener;
+import jadex.wfms.service.IClientConnector;
 import jadex.wfms.service.IWfmsClientService;
 
 public class WfmsClientService extends BasicService implements IWfmsClientService
@@ -30,11 +31,11 @@ public class WfmsClientService extends BasicService implements IWfmsClientServic
 	public IFuture queueWorkitem(final IWorkitem workitem, final IResultListener listener)
 	{
 		final Future ret = new Future();
-		SServiceProvider.getService(provider, ClientConnector.class).addResultListener(new DelegationResultListener(ret)
+		SServiceProvider.getService(provider, IClientConnector.class).addResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object source, Object result)
 			{
-				((ClientConnector) result).queueWorkitem(workitem, listener);
+				((IClientConnector) result).queueWorkitem(workitem, listener);
 				ret.setResult(null);
 			}
 		});
@@ -50,11 +51,11 @@ public class WfmsClientService extends BasicService implements IWfmsClientServic
 	//public Map getUserActivities()
 	{
 		final Future ret = new Future();
-		SServiceProvider.getService(provider, ClientConnector.class).addResultListener(new DelegationResultListener(ret)
+		SServiceProvider.getService(provider, IClientConnector.class).addResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object source, Object result)
 			{
-				ret.setResult(((ClientConnector) result).getUserActivities());
+				ret.setResult(((IClientConnector) result).getUserActivities());
 			}
 		});
 		return ret;
@@ -68,11 +69,11 @@ public class WfmsClientService extends BasicService implements IWfmsClientServic
 	public IFuture terminateActivity(final IClientActivity activity)
 	{
 		final Future ret = new Future();
-		SServiceProvider.getService(provider, ClientConnector.class).addResultListener(new DelegationResultListener(ret)
+		SServiceProvider.getService(provider, IClientConnector.class).addResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object source, Object result)
 			{
-				((ClientConnector) result).terminateActivity(activity);
+				((IClientConnector) result).terminateActivity(activity);
 				ret.setResult(null);
 			}
 		});
@@ -86,11 +87,11 @@ public class WfmsClientService extends BasicService implements IWfmsClientServic
 	public IFuture addActivityListener(final IActivityListener listener)
 	{
 		final Future ret = new Future();
-		SServiceProvider.getService(provider, ClientConnector.class).addResultListener(new DelegationResultListener(ret)
+		SServiceProvider.getService(provider, IClientConnector.class).addResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object source, Object result)
 			{
-				((ClientConnector) result).addActivityListener(listener);
+				((IClientConnector) result).addActivityListener(listener);
 				ret.setResult(null);
 			}
 		});
@@ -104,11 +105,11 @@ public class WfmsClientService extends BasicService implements IWfmsClientServic
 	public IFuture removeActivityListener(final IActivityListener listener)
 	{
 		final Future ret = new Future();
-		SServiceProvider.getService(provider, ClientConnector.class).addResultListener(new DelegationResultListener(ret)
+		SServiceProvider.getService(provider, IClientConnector.class).addResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object source, Object result)
 			{
-				((ClientConnector) result).removeActivityListener(listener);
+				((IClientConnector) result).removeActivityListener(listener);
 				ret.setResult(null);
 			}
 		});

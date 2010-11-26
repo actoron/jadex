@@ -5,7 +5,7 @@ import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IGoal;
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.service.SServiceProvider;
-import jadex.wfms.GoalDispatchResultListener;
+import jadex.wfms.UpdateSubscriptionStep;
 import jadex.wfms.bdi.client.cap.AbstractWfmsPlan;
 import jadex.wfms.bdi.ontology.InformProcessModelAdded;
 import jadex.wfms.bdi.ontology.InformProcessModelRemoved;
@@ -38,14 +38,7 @@ public class StartProcessRepositorySubscriptionPlan extends AbstractWfmsPlan
 				final InformProcessModelAdded update = new InformProcessModelAdded();
 				update.setModelName(event.getModelName());
 				
-				agent.createGoal("subcap.sp_submit_update").addResultListener(new GoalDispatchResultListener(agent)
-				{
-					public void configureGoal(jadex.bdi.runtime.IEAGoal goal)
-					{
-						goal.setParameterValue("update", update);
-						goal.setParameterValue("subscription_id", subId);
-					}
-				});
+				agent.scheduleStep(new UpdateSubscriptionStep(subId, update));
 			}
 			
 			public void processModelRemoved(ProcessRepositoryEvent event)
@@ -53,14 +46,7 @@ public class StartProcessRepositorySubscriptionPlan extends AbstractWfmsPlan
 				final InformProcessModelRemoved update = new InformProcessModelRemoved();
 				update.setModelName(event.getModelName());
 				
-				agent.createGoal("subcap.sp_submit_update").addResultListener(new GoalDispatchResultListener(agent)
-				{
-					public void configureGoal(jadex.bdi.runtime.IEAGoal goal)
-					{
-						goal.setParameterValue("update", update);
-						goal.setParameterValue("subscription_id", subId);
-					}
-				});
+				agent.scheduleStep(new UpdateSubscriptionStep(subId, update));
 			}
 		};
 		

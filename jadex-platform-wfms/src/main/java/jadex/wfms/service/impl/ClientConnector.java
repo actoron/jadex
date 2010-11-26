@@ -18,6 +18,7 @@ import jadex.wfms.listeners.IWorkitemListener;
 import jadex.wfms.listeners.WorkitemEvent;
 import jadex.wfms.service.AccessControlCheck;
 import jadex.wfms.service.IAAAService;
+import jadex.wfms.service.IClientConnector;
 
 import java.security.AccessControlException;
 import java.util.HashMap;
@@ -29,7 +30,7 @@ import java.util.Set;
 /**
  * 
  */
-public class ClientConnector extends BasicService // implements IClientService, IWfmsClientService
+public class ClientConnector extends BasicService implements IClientConnector // implements IClientService, IWfmsClientService
 {
 	
 	private IServiceContainer provider;
@@ -48,9 +49,9 @@ public class ClientConnector extends BasicService // implements IClientService, 
 	
 	public ClientConnector(IServiceContainer provider)
 	{
-		super(provider.getId(), ClientConnector.class, null);
+		super(provider.getId(), IClientConnector.class, null);
 		//super(BasicService.createServiceIdentifier(provider.getId(), AdministrationService.class));
-
+		System.out.println("Invoked");
 		this.provider = provider;
 		processWorkitemListeners = new HashMap();
 		workitemQueues = new HashMap();
@@ -58,6 +59,7 @@ public class ClientConnector extends BasicService // implements IClientService, 
 		workitemQueueListeners = new HashMap();
 		activityListeners = new HashMap();
 		wfmsActivityListeners = new HashSet();
+		System.out.println("Invoked");
 	}
 	
 	//TODO: Hack!

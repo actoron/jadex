@@ -50,6 +50,7 @@ public class RequestModelPlan extends AbstractWfmsPlan
 				}
 				catch (Exception e)
 				{
+					System.err.println(rqm.getModelName());
 					throw new RuntimeException(e);
 				}
 			}
