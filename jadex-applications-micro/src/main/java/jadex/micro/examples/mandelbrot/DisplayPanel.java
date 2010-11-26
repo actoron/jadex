@@ -96,7 +96,7 @@ public class DisplayPanel extends JComponent
 			
 			public void mouseReleased(MouseEvent e)
 			{
-				if(enddrag!=null)
+				if(startdrag!=null && enddrag!=null)
 				{
 //					System.out.println("dragged: "+startdrag+" "+enddrag);
 					

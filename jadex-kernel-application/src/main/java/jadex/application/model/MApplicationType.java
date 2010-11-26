@@ -194,6 +194,8 @@ public class MApplicationType implements ICacheableModel
 			{
 				MProvidedServiceType ser = (MProvidedServiceType)provs.get(i);
 				tmp[i] = ser.getClazz();
+				if(tmp[i]==null && ser.getParsedValue()!=null)
+					tmp[i] = ser.getParsedValue().getStaticType();
 			}
 			
 			modelinfo.setProvidedServices(tmp);

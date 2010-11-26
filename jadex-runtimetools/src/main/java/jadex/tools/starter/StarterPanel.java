@@ -1192,7 +1192,8 @@ public class StarterPanel extends JPanel
 				providedservices.add(providedt, BorderLayout.CENTER);
 				for(int i=0; i<provided.length; i++)
 				{
-					((DefaultTableModel)providedt.getModel()).addRow(new Object[]{provided[i].getName()});
+					((DefaultTableModel)providedt.getModel()).addRow(new Object[]{
+						provided[i]!=null? provided[i].getName(): "unknown service type (class definition missing)"});
 				}
 			}
 			
