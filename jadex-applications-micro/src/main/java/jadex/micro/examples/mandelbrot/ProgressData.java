@@ -17,6 +17,12 @@ public class ProgressData
 	/** The area. */
 	protected Rectangle	area;
 	
+	/** The image width. */
+	protected int imagewidth;
+	
+	/** The image height. */
+	protected int imageheight;
+	
 	/** The state (finished or not). */
 	protected boolean	finished;
 	
@@ -32,11 +38,13 @@ public class ProgressData
 	/**
 	 *  Create a new ProgressData.
 	 */
-	public ProgressData(Object providerid, Rectangle area, boolean finished)
+	public ProgressData(Object providerid, Rectangle area, boolean finished, int imagewidth, int imageheight)
 	{
 		this.providerid	= providerid;
 		this.area	= area;
 		this.finished	= finished;
+		this.imagewidth = imagewidth;
+		this.imageheight = imageheight;
 	}
 	
 	//-------- methods --------
@@ -87,6 +95,60 @@ public class ProgressData
 	public void setFinished(boolean finished)
 	{
 		this.finished = finished;
+	}
+	
+	/**
+	 *  Get the providerid.
+	 *  @return the providerid.
+	 */
+	public Object getProviderid()
+	{
+		return providerid;
+	}
+
+	/**
+	 *  Set the providerid.
+	 *  @param providerid The providerid to set.
+	 */
+	public void setProviderid(Object providerid)
+	{
+		this.providerid = providerid;
+	}
+
+	/**
+	 *  Get the imagewidth.
+	 *  @return the imagewidth.
+	 */
+	public int getImageWidth()
+	{
+		return imagewidth;
+	}
+
+	/**
+	 *  Set the imagewidth.
+	 *  @param imagewidth The imagewidth to set.
+	 */
+	public void setImageWidth(int imagewidth)
+	{
+		this.imagewidth = imagewidth;
+	}
+
+	/**
+	 *  Get the imageheight.
+	 *  @return the imageheight.
+	 */
+	public int getImageHeight()
+	{
+		return imageheight;
+	}
+
+	/**
+	 *  Set the imageheight.
+	 *  @param imageheight The imageheight to set.
+	 */
+	public void setImageHeight(int imageheight)
+	{
+		this.imageheight = imageheight;
 	}
 
 	/**

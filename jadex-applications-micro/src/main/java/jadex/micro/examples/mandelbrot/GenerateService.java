@@ -65,7 +65,7 @@ public class GenerateService extends BasicService implements IGenerateService
 			public void resultAvailable(Object source, Object result)
 			{
 				final IDisplayService ds = (IDisplayService)result;
-				SServiceProvider.getServices(agent.getServiceProvider(), ICalculateService.class)
+				SServiceProvider.getServices(agent.getServiceProvider(), ICalculateService.class, false, true)
 				.addResultListener(agent.createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object source, Object result)
@@ -94,7 +94,7 @@ public class GenerateService extends BasicService implements IGenerateService
 								}
 							}));
 							
-							SServiceProvider.getService(agent.getServiceProvider(), IComponentManagementService.class)
+							SServiceProvider.getService(agent.getServiceProvider(), IComponentManagementService.class, false, true)
 								.addResultListener(agent.createResultListener(agent.createResultListener(new IResultListener()
 							{
 								public void resultAvailable(Object source, Object result)
@@ -131,23 +131,40 @@ public class GenerateService extends BasicService implements IGenerateService
 	 */
 	protected void distributeWork(final AreaData data, List services, final IDisplayService ds, final Future ret)
 	{
-		int num = Math.max(data.getSizeX()*data.getSizeY()*data.getMax()/(data.getTaskSize()*data.getTaskSize()*256), 1);
+		int numx = Math.max(data.getSizeX()*data.getSizeY()*data.getMax()/(data.getTaskSize()*data.getTaskSize()*256), 1);
+		int numy = numx;
 //		System.out.println("Number of tasks: "+num);
 		
-		final int xsize = data.getSizeX()/num;
-		final int ysize = data.getSizeY()/num;
-		int xrest = data.getSizeX()-num*xsize;
-		int yrest = data.getSizeY()-num*ysize;
+		final int sizex = data.getSizeX()/numx;
+		final int sizey = data.getSizeY()/numy;
+		int restx = data.getSizeX()-numx*sizex;
+		int resty = data.getSizeY()-numy*sizey;
 		
-		final double xdiff = (data.getXEnd()-data.getXStart())/num;
-		final double ydiff = (data.getYEnd()-data.getYStart())/num;
+		// If rest if too large add more chunks
+		numx += restx/sizex;
+		numy += resty/sizey;
+		restx = restx%sizex;
+		resty = resty%sizey;
+		
+		double xdiv = restx==0? numx: ((double)restx)/sizex+numx;
+		double ydiv = resty==0? numy: ((double)resty)/sizey+numy;
+		
+		final double xdiff = (data.getXEnd()-data.getXStart())/xdiv;
+		final double ydiff = (data.getYEnd()-data.getYStart())/ydiv;
+		
+		if(restx>0)
+			numx++;
+		if(resty>0)
+			numy++;
+		
+//		System.out.println("ad: "+data+" "+numx+" "+restx+" "+xdiff);
 		
 		double x1 = data.getXStart();
 		double y1 = data.getYStart();
 		
 		data.setData(new int[data.getSizeX()][data.getSizeY()]);
 		
-		CounterResultListener lis = new CounterResultListener(num*num)
+		CounterResultListener lis = new CounterResultListener(numx*numy)
 		{
 			public void finalResultAvailable(Object source, Object result)
 			{
@@ -159,8 +176,8 @@ public class GenerateService extends BasicService implements IGenerateService
 			public void intermediateResultAvailable(Object source, Object result)
 			{
 				AreaData ad = (AreaData)result;
-				int xs = (int)((int[])ad.getId())[0]*xsize;
-				int ys = (int)((int[])ad.getId())[1]*ysize;
+				int xs = (int)((int[])ad.getId())[0]*sizex;
+				int ys = (int)((int[])ad.getId())[1]*sizey;
 				
 				SwingUtilities.invokeLater(new Runnable()
 				{
@@ -173,7 +190,7 @@ public class GenerateService extends BasicService implements IGenerateService
 				if(ds!=null)
 				{
 					ds.displayIntermediateResult(new ProgressData(null,
-						new Rectangle(xs, ys, ad.getSizeX(), ad.getSizeY()), true));
+						new Rectangle(xs, ys, ad.getSizeX(), ad.getSizeY()), true, data.getSizeX(), data.getSizeY()));
 				}
 				
 //				System.out.println("x:y: end "+xs+" "+ys);
@@ -201,19 +218,21 @@ public class GenerateService extends BasicService implements IGenerateService
 			}
 		};
 		
-		for(int yi=0; yi<num; yi++)
+		for(int yi=0; yi<numy; yi++)
 		{
-			for(int xi=0; xi<num; xi++)
+			for(int xi=0; xi<numx; xi++)
 			{
 //				System.out.println("x:y: start "+x1+" "+(x1+xdiff)+" "+y1+" "+(y1+ydiff)+" "+xdiff);
 				int idx = (xi+(yi*xi))%services.size();
 				ICalculateService cs = (ICalculateService)services.get(idx);
-				AreaData ad = new AreaData(x1, x1+xdiff, y1, y1+ydiff, xi==num-1? xsize+xrest: xsize, yi==num-1? ysize+yrest: ysize, data.getMax(), 0, 0, new int[]{xi, yi}, null);
+				AreaData ad = new AreaData(x1, x1+xdiff, y1, y1+ydiff, xi==numx-1 && restx>0? restx: 
+					sizex, yi==numy-1 && resty>0? resty: sizey, data.getMax(), 0, 0, new int[]{xi, yi}, null);
+//				System.out.println("x:y: "+xi+" "+yi+" "+ad);
 				cs.calculateArea(ad).addResultListener(agent.createResultListener(lis));
 				if(ds!=null)
 				{
 					ds.displayIntermediateResult(new ProgressData(cs.getServiceIdentifier().getProviderId(),
-						new Rectangle(xi*xsize, yi*ysize, ad.getSizeX(), ad.getSizeY()), false));
+						new Rectangle(xi*sizex, yi*sizey, ad.getSizeX(), ad.getSizeY()), false, data.getSizeX(), data.getSizeY()));
 				}
 				x1 += xdiff;
 			}

@@ -1,5 +1,7 @@
 package jadex.micro.examples.mandelbrot;
 
+import jadex.application.space.envsupport.math.IVector2;
+import jadex.application.space.envsupport.math.Vector2Double;
 import jadex.commons.IFuture;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.commons.service.IServiceProvider;
@@ -16,6 +18,7 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.geom.Rectangle2D;
 import java.util.HashSet;
@@ -73,28 +76,110 @@ public class DisplayPanel extends JComponent
 	 */
 	public DisplayPanel(final IServiceProvider provider)
 	{
-		MouseWheelEvent mwe;
+		MouseAdapter ma = new MouseAdapter()
+		{
+			Point startdrag;
+			Point enddrag;
+			
+			public void mousePressed(MouseEvent e)
+			{
+				if(e.getButton()==MouseEvent.BUTTON3 && e.getClickCount()==1)
+				{
+					startdrag = new Point(e.getX(), e.getY());
+				}
+			}
+			
+			public void mouseDragged(MouseEvent e)
+			{
+				enddrag = new Point(e.getX(), e.getY());
+			}
+			
+			public void mouseReleased(MouseEvent e)
+			{
+				if(enddrag!=null)
+				{
+					System.out.println("dragged: "+startdrag+" "+enddrag);
+					
+					final Rectangle	bounds	= getInnerBounds();
+					int xdiff = startdrag.x-enddrag.x;
+					int ydiff = startdrag.y-enddrag.y;
+					double xp = ((double)xdiff)/bounds.width;
+					double yp = ((double)ydiff)/bounds.height;
+					
+					double xm = (data.getXEnd()-data.getXStart())*xp;
+					double ym = (data.getYEnd()-data.getYStart())*yp;
+					final double xs = data.getXStart()+xm;
+					final double xe = data.getXEnd()+xm;
+					final double ys = data.getYStart()+ym;
+					final double ye = data.getYEnd()+ym;
+					
+					startdrag = null;
+					enddrag = null;
+					
+					SServiceProvider.getService(provider, IGenerateService.class)
+						.addResultListener(new SwingDefaultResultListener()
+					{
+						public void customResultAvailable(Object source, Object result)
+						{
+							IGenerateService gs	= (IGenerateService)result;
+							
+							AreaData ad = new AreaData(xs, xe, ys, ye, data.getSizeX(), data.getSizeY(),
+								data!=null ? data.getMax() : 256, data!=null ? data.getParallel() : 10, data!=null ? data.getTaskSize() : 160000);
+							IFuture	fut	= gs.generateArea(ad);
+							fut.addResultListener(new SwingDefaultResultListener(DisplayPanel.this)
+							{
+								public void customResultAvailable(Object source, Object result)
+								{
+									DisplayPanel.this.setResults((AreaData)result);
+								}
+								public void customExceptionOccurred(Object source, Exception exception)
+								{
+									calculating	= false;
+									DisplayPanel.this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+									super.customExceptionOccurred(source, exception);
+								}
+							});
+						}
+					});
+				}
+			}
+		};
+		addMouseMotionListener(ma);
+		addMouseListener(ma);
 		
 		addMouseWheelListener(new MouseAdapter()
 		{
 			public void mouseWheelMoved(MouseWheelEvent e)
 			{
+				DisplayPanel.this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+				calculating	= true;
+				repaint();
+				
 				final Rectangle	bounds	= getInnerBounds();
 
 				int sa = e.getScrollAmount();
 				int dir = e.getWheelRotation();
-				double factor = dir==1? (1+sa/10.0): (1-sa/10.0);
+				double factor = 1+dir*sa/10.0;
 				
-				System.out.println("mx: "+e.getX()+" "+bounds.getX());
+				int	iwidth	= image.getWidth(DisplayPanel.this);
+				int iheight	= image.getHeight(DisplayPanel.this);
+				final Rectangle drawarea = scaleToFit(bounds, iwidth, iheight);
+				int mx = Math.min((int)(drawarea.getX()+drawarea.getWidth()), Math.max((int)drawarea.getX(), e.getX()));
+				int my = Math.min((int)(drawarea.getY()+drawarea.getWidth()), Math.max((int)drawarea.getY(), e.getY()));
+				double xrel = ((double)(mx-drawarea.getX()))/drawarea.getWidth();
+				double yrel = ((double)(my-drawarea.getY()))/drawarea.getHeight();
+
+				double wold = data.getXEnd()-data.getXStart();
+				double hold = data.getYEnd()-data.getYStart();
+				double wnew = wold*factor;
+				double hnew = hold*factor;
+				double wd = wold-wnew;
+				double hd = hold-hnew;
 				
-				// Convert mouse position to screen position
-				double xshift = (e.getX()-bounds.getWidth()/2)/bounds.getWidth()/2*(data.getXEnd()-data.getXStart());
-				double yshift = (e.getY()-bounds.getHeight()/2)/bounds.getHeight()/2*(data.getYEnd()-data.getYStart());
-				
-				final double xs = (data.getXStart()+xshift)*factor;
-				final double xe = (data.getXEnd()+xshift)*factor;
-				final double ys = (data.getYStart()+yshift)*factor;
-				final double ye = (data.getYEnd()+yshift)*factor;
+				final double xs = data.getXStart()+wd*xrel;
+				final double xe = xs+wnew;
+				final double ys = data.getYStart()+hd*yrel;
+				final double ye = ys+wnew;
 				
 				SServiceProvider.getService(provider, IGenerateService.class)
 					.addResultListener(new SwingDefaultResultListener()
@@ -103,7 +188,7 @@ public class DisplayPanel extends JComponent
 					{
 						IGenerateService gs	= (IGenerateService)result;
 						
-						AreaData ad = new AreaData(xs, xe, ys, ye, bounds.width, bounds.height,
+						AreaData ad = new AreaData(xs, xe, ys, ye, data.getSizeX(), data.getSizeY(),
 							data!=null ? data.getMax() : 256, data!=null ? data.getParallel() : 10, data!=null ? data.getTaskSize() : 160000);
 						IFuture	fut	= gs.generateArea(ad);
 						fut.addResultListener(new SwingDefaultResultListener(DisplayPanel.this)
@@ -390,46 +475,52 @@ public class DisplayPanel extends JComponent
 				drawarea = scaleToFit(bounds, iwidth, iheight);
 				
 				g.drawImage(image, bounds.x+drawarea.x, bounds.y+drawarea.y,
-						bounds.x+drawarea.x+drawarea.width, bounds.y+drawarea.y+drawarea.height,
-						ix, iy, ix+iwidth, iy+iheight, this);
-
-				// Draw progress boxes.
-				if(progressset!=null)
-				{
-					for(Iterator it=progressset.iterator(); it.hasNext(); )
-					{
-						ProgressData	progress	= (ProgressData)it.next();
-						if(!progress.isFinished())
-						{
-							g.setColor(new Color(0,0,0,160));
-							g.fillRect(bounds.x+drawarea.x+progress.getArea().x+1, bounds.y+drawarea.y+progress.getArea().y+1,
-								progress.getArea().width-1, progress.getArea().height-1);							
-						}
-						g.setColor(Color.white);
-						g.drawRect(bounds.x+drawarea.x+progress.getArea().x, bounds.y+drawarea.y+progress.getArea().y,
-							progress.getArea().width, progress.getArea().height);
-						
-						// Print provider name.
-						if(progress.getProviderId()!=null)
-						{
-							String	name	= progress.getProviderId().toString();
-							FontMetrics	fm	= g.getFontMetrics();
-							Rectangle2D	sb	= fm.getStringBounds(name, g);
-							if(sb.getWidth()<progress.getArea().getWidth() && sb.getHeight()<progress.getArea().getHeight())
-							{
-								int	x	= bounds.x+drawarea.x+progress.getArea().x+2 + (progress.getArea().width-(int)sb.getWidth())/2;
-								int	y	= bounds.y+drawarea.y+progress.getArea().y+2+(int)sb.getHeight()  + (progress.getArea().height-(int)sb.getHeight())/2;
-								g.drawString(name, x, y);
-							}
-						}
-					}
-				}
+					bounds.x+drawarea.x+drawarea.width, bounds.y+drawarea.y+drawarea.height,
+					ix, iy, ix+iwidth, iy+iheight, this);
 			}
 			else
 			{
 				g.drawImage(image, bounds.x+drawarea.x, bounds.y+drawarea.y,
 					bounds.x+drawarea.x+drawarea.width, bounds.y+drawarea.y+drawarea.height,
 					ix, iy, ix+iwidth, iy+iheight, this);
+			}
+			
+			// Draw progress boxes.
+			if(progressset!=null)
+			{
+				for(Iterator it=progressset.iterator(); it.hasNext(); )
+				{
+					ProgressData	progress	= (ProgressData)it.next();
+					
+					double xf = ((double)drawarea.getWidth())/progress.getImageWidth();
+					double yf = ((double)drawarea.getHeight())/progress.getImageHeight();
+					int corx = (int)(progress.getArea().x*xf);
+					int cory = (int)(progress.getArea().y*yf);
+					int corw = (int)(progress.getArea().width*xf);
+					int corh = (int)(progress.getArea().height*yf);
+					
+					if(!progress.isFinished())
+					{
+						g.setColor(new Color(0,0,0,160));
+						g.fillRect(bounds.x+drawarea.x+corx+1, bounds.y+drawarea.y+cory+1, corw-1, corh-1);							
+					}
+					g.setColor(Color.white);
+					g.drawRect(bounds.x+drawarea.x+corx, bounds.y+drawarea.y+cory, corw, corh);
+					
+					// Print provider name.
+					if(progress.getProviderId()!=null)
+					{
+						String	name	= progress.getProviderId().toString();
+						FontMetrics	fm	= g.getFontMetrics();
+						Rectangle2D	sb	= fm.getStringBounds(name, g);
+						if(sb.getWidth()<corw && sb.getHeight()<corh)
+						{
+							int	x	= bounds.x+drawarea.x+corx+2 + (corw-(int)sb.getWidth())/2;
+							int	y	= bounds.y+drawarea.y+cory+2+(int)sb.getHeight()  + (corh-(int)sb.getHeight())/2;
+							g.drawString(name, x, y);
+						}
+					}
+				}
 			}
 		}
 		
