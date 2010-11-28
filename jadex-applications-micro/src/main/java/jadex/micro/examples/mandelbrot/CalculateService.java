@@ -11,14 +11,20 @@ import jadex.commons.service.IServiceProvider;
  */
 public class CalculateService extends BasicService implements ICalculateService
 {
+	//-------- attributes --------
+	
+	/** The agent. */
+	protected CalculateAgent agent;
+	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new service.
 	 */
-	public CalculateService(IServiceProvider provider)
+	public CalculateService(CalculateAgent agent)
 	{
-		super(provider.getId(), ICalculateService.class, null);
+		super(agent.getServiceProvider().getId(), ICalculateService.class, null);
+		this.agent = agent;
 	}
 	
 	//-------- methods --------
@@ -29,6 +35,8 @@ public class CalculateService extends BasicService implements ICalculateService
 	public IFuture calculateArea(AreaData data)
 	{
 //		System.out.println("calc: "+data);
+		
+		agent.setHadJob(true);
 		
 		// This code iterates over the area in a bounding boxes
 		// If a complete bounding box has is in the set the rest

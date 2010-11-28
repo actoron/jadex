@@ -1,5 +1,7 @@
 package jadex.micro.examples.mandelbrot;
 
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IInternalAccess;
 import jadex.micro.MicroAgent;
 import jadex.micro.MicroAgentMetaInfo;
 
@@ -8,12 +10,54 @@ import jadex.micro.MicroAgentMetaInfo;
  */
 public class CalculateAgent extends MicroAgent
 {
+	//-------- attributes --------
+	
+	/** Flag indicating that the agent had a job. */
+	protected boolean hadjob;
+	
 	/**
 	 *  Called once after agent creation.
 	 */
 	public void agentCreated()
 	{
-		addService(new CalculateService(getServiceProvider()));
+		addService(new CalculateService(this));
+	}
+	
+	/**
+	 *  Execute the body.
+	 */
+	public void executeBody()
+	{
+		IComponentStep step = new IComponentStep()
+		{
+			public Object execute(IInternalAccess ia)
+			{
+				if(!isHadJob())
+					killComponent();
+				setHadJob(false);
+				waitFor(5000, this);
+				return null;
+			}
+		};
+		waitFor(5000, step);
+	}
+	
+	/**
+	 *  Set the hadjob.
+	 *  @param hadjob The hadjob to set.
+	 */
+	public void setHadJob(boolean hadjob)
+	{
+		this.hadjob = hadjob;
+	}
+	
+	/**
+	 *  Get the hadjob.
+	 *  @return The hadjob.
+	 */
+	public boolean isHadJob()
+	{
+		return hadjob;
 	}
 	
 	//-------- static methods --------

@@ -83,7 +83,7 @@ public class GenerateService extends BasicService implements IGenerateService
 							{
 								public void resultAvailable(Object source, Object result)
 								{
-									SServiceProvider.getServices(agent.getServiceProvider(), ICalculateService.class)
+									SServiceProvider.getServices(agent.getServiceProvider(), ICalculateService.class, false, true)
 										.addResultListener(agent.createResultListener(new DelegationResultListener(ret)
 									{
 										public void customResultAvailable(Object source, Object result)
