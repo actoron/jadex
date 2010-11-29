@@ -1,7 +1,6 @@
 package jadex.bdi.planlib.iasteps;
 
 import jadex.bdi.model.IMParameter;
-import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IParameter;

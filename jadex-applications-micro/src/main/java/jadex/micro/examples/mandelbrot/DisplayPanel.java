@@ -1,7 +1,5 @@
 package jadex.micro.examples.mandelbrot;
 
-import jadex.application.space.envsupport.math.IVector2;
-import jadex.application.space.envsupport.math.Vector2Double;
 import jadex.commons.IFuture;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.commons.service.IServiceProvider;
@@ -18,7 +16,6 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.geom.Rectangle2D;
 import java.util.HashSet;
@@ -69,6 +66,12 @@ public class DisplayPanel extends JComponent
 	/** Set of progress data objects (if calculating). */
 	protected Set	progressset;
 	
+	/** Start point for dragging (if any). */
+	protected Point	startdrag;
+	
+	/** End point for dragging (if any). */
+	protected Point	enddrag;
+
 	//-------- constructors --------
 	
 	/**
@@ -78,20 +81,27 @@ public class DisplayPanel extends JComponent
 	{
 		MouseAdapter ma = new MouseAdapter()
 		{
-			Point startdrag;
-			Point enddrag;
-			
 			public void mousePressed(MouseEvent e)
 			{
 				if(e.getButton()==MouseEvent.BUTTON3 && e.getClickCount()==1)
 				{
 					startdrag = new Point(e.getX(), e.getY());
+					range	= null;
+					point	= null;
+				}
+				else
+				{
+					startdrag	= null;
 				}
 			}
 			
 			public void mouseDragged(MouseEvent e)
 			{
-				enddrag = new Point(e.getX(), e.getY());
+				if(startdrag!=null)
+				{
+					enddrag = new Point(e.getX(), e.getY());
+					repaint();
+				}
 			}
 			
 			public void mouseReleased(MouseEvent e)
@@ -116,6 +126,12 @@ public class DisplayPanel extends JComponent
 					startdrag = null;
 					enddrag = null;
 					
+					range	= new Rectangle(bounds.x+xdiff, bounds.y+ydiff, bounds.width, bounds.height);
+
+					DisplayPanel.this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+					calculating	= true;
+					repaint();
+					
 					SServiceProvider.getService(provider, IGenerateService.class)
 						.addResultListener(new SwingDefaultResultListener()
 					{
@@ -124,7 +140,7 @@ public class DisplayPanel extends JComponent
 							IGenerateService gs	= (IGenerateService)result;
 							
 							AreaData ad = new AreaData(xs, xe, ys, ye, data.getSizeX(), data.getSizeY(),
-								data!=null ? data.getMax() : 256, data!=null ? data.getParallel() : 10, data!=null ? data.getTaskSize() : 160000);
+								data!=null ? data.getMax() : 256, data!=null ? data.getParallel() : 10, data!=null ? data.getTaskSize() : 300);
 							IFuture	fut	= gs.generateArea(ad);
 							fut.addResultListener(new SwingDefaultResultListener(DisplayPanel.this)
 							{
@@ -191,7 +207,7 @@ public class DisplayPanel extends JComponent
 							IGenerateService gs	= (IGenerateService)result;
 							
 							AreaData ad = new AreaData(xs, xe, ys, ye, data.getSizeX(), data.getSizeY(),
-								data!=null ? data.getMax() : 256, data!=null ? data.getParallel() : 10, data!=null ? data.getTaskSize() : 160000);
+								data!=null ? data.getMax() : 256, data!=null ? data.getParallel() : 10, data!=null ? data.getTaskSize() : 300);
 							IFuture	fut	= gs.generateArea(ad);
 							fut.addResultListener(new SwingDefaultResultListener(DisplayPanel.this)
 							{
@@ -242,7 +258,7 @@ public class DisplayPanel extends JComponent
 						{
 							IGenerateService	gs	= (IGenerateService)result;
 							AreaData ad = new AreaData(-2, 1, -1.5, 1.5, bounds.width, bounds.height,
-								data!=null ? data.getMax() : 256, data!=null ? data.getParallel() : 10, data!=null ? data.getTaskSize() : 160000);
+								data!=null ? data.getMax() : 256, data!=null ? data.getParallel() : 10, data!=null ? data.getTaskSize() : 300);
 							IFuture	fut	= gs.generateArea(ad);
 							fut.addResultListener(new SwingDefaultResultListener(DisplayPanel.this)
 							{
@@ -481,6 +497,14 @@ public class DisplayPanel extends JComponent
 					bounds.x+drawarea.x+drawarea.width, bounds.y+drawarea.y+drawarea.height,
 					ix, iy, ix+iwidth, iy+iheight, this);
 			}
+			else if(startdrag!=null && enddrag!=null)
+			{
+				int	xoff	= enddrag.x-startdrag.x;
+				int	yoff	= enddrag.y-startdrag.y;
+				g.drawImage(image, bounds.x+drawarea.x+xoff, bounds.y+drawarea.y+yoff,
+					bounds.x+drawarea.x+xoff+drawarea.width, bounds.y+drawarea.y+yoff+drawarea.height,
+					ix, iy, ix+iwidth, iy+iheight, this);
+			}
 			else
 			{
 				g.drawImage(image, bounds.x+drawarea.x, bounds.y+drawarea.y,
@@ -504,7 +528,7 @@ public class DisplayPanel extends JComponent
 					
 					if(!progress.isFinished())
 					{
-						g.setColor(new Color(0,0,0,160));
+						g.setColor(new Color(32,32,32,160));
 						g.fillRect(bounds.x+drawarea.x+corx+1, bounds.y+drawarea.y+cory+1, corw-1, corh-1);							
 					}
 					g.setColor(Color.white);

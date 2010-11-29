@@ -131,9 +131,9 @@ public class GenerateService extends BasicService implements IGenerateService
 	 */
 	protected void distributeWork(final AreaData data, List services, final IDisplayService ds, final Future ret)
 	{
-		int numx = Math.max(data.getSizeX()*data.getSizeY()*data.getMax()/(data.getTaskSize()*data.getTaskSize()*256), 1);
+		int numx = Math.max((int)Math.sqrt((double)data.getSizeX()*data.getSizeY()*data.getMax()/(data.getTaskSize()*data.getTaskSize()*256)), 1);
 		int numy = numx;
-//		System.out.println("Number of tasks: "+num);
+//		System.out.println("Number of tasks: "+numx+", "+numy+", max="+data.getMax()+" tasksize="+data.getTaskSize());
 		
 		final int sizex = data.getSizeX()/numx;
 		final int sizey = data.getSizeY()/numy;

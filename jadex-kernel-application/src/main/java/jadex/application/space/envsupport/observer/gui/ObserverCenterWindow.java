@@ -1,17 +1,11 @@
 package jadex.application.space.envsupport.observer.gui;
 
-import jadex.application.space.envsupport.observer.graphics.AbstractViewport;
 import jadex.commons.SGUI;
 
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Component;
 import java.awt.EventQueue;
-import java.awt.FlowLayout;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
-import java.awt.event.WindowStateListener;
 import java.util.HashSet;
 import java.util.Set;
 

@@ -3,11 +3,8 @@ package jadex.commons.service;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.SUtil;
-import jadex.commons.Tuple;
-import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
