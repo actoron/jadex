@@ -7,7 +7,7 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-application 
 	                    http://jadex.sourceforge.net/jadex-application-2.0.xsd"
-	name="AutomatedSimulationCenter" package="jadex.simulation">
+	name="AutomatedSimulationCenter" package="test.kill">
 
 	<componenttypes>
 		<componenttype name="SimulationManager"
@@ -18,10 +18,8 @@
 		<application name="Default Configuration">
 			<components>
 				<component type="SimulationManager" master="true">
-					<arguments>
-						<argument name="simulationDescriptionFile">"../sodekovs-simulationcontrol/src/main/java/jadex/simulation/Configuration2.xml"</argument>
-						<!--<argument name="simulationDescriptionFile">"../sodekovs-simulationcontrol/src/main/java/jadex/simulation/SpeedOptimization.xml"</argument> -->
-					 	<!-- <argument name="simulationDescriptionFile">"../sodekovs-simulationcontrol/src/main/java/jadex/simulation/TestNegotiationConfiguration.xml"</argument> -->
+					<arguments>						
+					 	 <argument name="simulationDescriptionFile">"../sodekovs-coordination/src/main/java/test/kill/TestNegotiationConfiguration2.xml"</argument>
 					</arguments>
 				</component>
 			</components>

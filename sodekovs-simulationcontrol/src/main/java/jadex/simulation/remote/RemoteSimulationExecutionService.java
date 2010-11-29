@@ -6,7 +6,7 @@ import jadex.commons.IFuture;
 import jadex.commons.service.BasicService;
 
 /**
- *  The shop for buying goods at the shop.
+ *  Implementation of a remote execution service for (single) experiments.
  */
 public class RemoteSimulationExecutionService extends BasicService implements IRemoteSimulationExecutionService
 {

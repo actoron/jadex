@@ -117,10 +117,6 @@
 
 		<!--  Start a new round of experiments. -->
 		<achievegoal name="StartSimulationExperiments">
-			<!--
-				<parameter name="location" class="Location" /> <targetcondition>
-				$beliefbase.my_location.isNear($goal.location) </targetcondition>
-			-->
 		</achievegoal>
 	</goals>
 

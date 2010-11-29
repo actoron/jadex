@@ -1,7 +1,6 @@
 
 	<!--
-		<H3>Environment / Observer Agent</H3> Used to maintain the GUI /
-		Observer.
+		<H3>Responsible for executing a single simulation experiment.</H3>
 	-->
 
 <agent xmlns="http://jadex.sourceforge.net/jadex-bdi" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -42,9 +41,9 @@
 			<fact>new HashMap()</fact>
 		</belief>
 		
-		<belief name="myName" class="String">
+		<!-- <belief name="myName" class="String">
 			<fact>"dellPC"</fact>
-		</belief>
+		</belief> -->
 
 	</beliefs>
 
@@ -53,20 +52,6 @@
 		<achievegoalref name="df_search">
 			<concrete ref="dfcap.df_search" />
 		</achievegoalref>
-
-		<!--
-			Dispatch Goal that creates observers that execute the observation
-			periodically
-		-->
-		<achievegoal name="InitPeriodicalObservers">
-			<parameter name="periodicalObserversList" class="List" />
-		</achievegoal>
-
-		<!-- Dispatch Goal that registers listeners for the objects -->
-		<achievegoal name="InitOnChangeObservers">
-			<parameter name="onChangeObserversList" class="List" />
-		</achievegoal>
-
 	</goals>
 
 	<plans>		<!--			Responsible for all aspects related to the run of the simulation,			especially to monitor the terminate condition.		-->
@@ -103,15 +88,4 @@
 		<providedservice class="IRemoteSimulationExecutionService">new RemoteSimulationExecutionService($scope, "betaTest01")</providedservice>
 	</services>
 			
-	<configurations>
-		<configuration name="default">
-			<goals>
-				<!--  <initialgoal ref="updateEnv" />-->
-			</goals>
-			<plans>
-			<!-- <initialplan ref="runtime_manager" />-->
-				<!-- <initialplan ref="init_observers" /> -->
-			</plans>
-		</configuration>
-	</configurations>
 </agent>

@@ -9,7 +9,7 @@
 	                    http://jadex.sourceforge.net/jadex-application-2.0.xsd
 	                    http://jadex.sourceforge.net/jadex-envspace 
 	                    http://jadex.sourceforge.net/jadex-envspace-2.0.xsd"
-	name="TSpace" package="jadex.bdi.examples.antworld.decoMAS">
+	name="TSpace" package="test>
 
 	<imports>
 		<import>jadex.adapter.base.envsupport.environment.space2d.*</import>

@@ -1,38 +1,28 @@
-
-	<!--
-	Stores only ISpaceObjects where the counter value is odd.
-		<H3>Ato be done.</H3> to be done...
-	-->
-
 <agent xmlns="http://jadex.sourceforge.net/jadex-bdi" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-bdi
 	                    http://jadex.sourceforge.net/jadex-bdi-2.0.xsd"
-	name="Receiver2" package="deco4mas.examples.V2.tspaces">
+	name="Sender2" package="test.kill">
 
 	<imports>
 		<import>jadex.adapter.base.contextservice.*</import>
 		<import>jadex.adapter.base.appdescriptor.*</import>
 		<import>jadex.application.space.envsupport.environment.space2d.*</import>
 		<import>jadex.application.space.envsupport.environment.*</import>
-		<import>jadex.application.space.envsupport.math.*</import>
 		<import>jadex.application.runtime.*</import>
+		<import>jadex.application.space.envsupport.math.*</import>
 		<import>java.util.*</import>
 		<import>deco4mas.coordinate.environment.*</import>
 		<import>deco4mas.coordinate.*</import>
 		<import>jadex.application.space.envsupport.environment.ISpaceObject</import>
 	</imports>
 
-	<capabilities>		
-	<!-- The deco4mas capability. -->
-		<!-- <capability name="deco4mas" file="deco4mas.coordinate.Coordinate"/>-->		
-	</capabilities>
-	
 	<beliefs>
-
+		<!-- mycoordspace -->
+		<!-- Environment. DO NOT CHANGE the name "env". -->
 		<!-- Environment. -->
-			<!-- Environment. -->
-		<belief name="env" class="ContinuousSpace2D">
-			<fact>(ContinuousSpace2D)((IApplicationExternalAccess)$scope.getParent()).getSpace("mycoordspace")</fact>
+		<belief name="env" class="CoordinationSpace">
+			<fact>(CoordinationSpace)((IApplicationExternalAccess)$scope.getParent()).getSpace("mycoordspace")
+			</fact>
 		</belief>
 
 		<!-- Myself. -->
@@ -40,27 +30,18 @@
 			<fact>$beliefbase.env.getAvatar($scope.getComponentIdentifier())
 			</fact>
 		</belief>
-
-		
 	</beliefs>
 
-<plans>
-		<plan name="testPlan2">
-			<body class="TestPlan2"/>			
+	<plans>
+		<plan name="testPlan3">
+			<body class="TestPlan3" />
 		</plan>
 	</plans>
 
-<events>
-
-		
-		</events>
-		
 	<properties>
-		<!--
-			The environment may throw exceptions when executing property
-			listeners and these listeners are not valid any longer. This leads to
-			normal plan failure and can therefore be ignored.
-		-->
+		<!-- The environment may throw exceptions when executing property listeners 
+			and these listeners are not valid any longer. This leads to normal plan failure 
+			and can therefore be ignored. -->
 		<property name="logging.level">java.util.logging.Level.WARNING
 		</property>
 		<property name="debugging">false</property>
@@ -68,12 +49,8 @@
 
 	<configurations>
 		<configuration name="default">
-			<goals>
-				<!-- Initial goal for searching for garbage. -->
-				<!-- <initialgoal ref="countTo10"/> -->
-			</goals>
 			<plans>
-				<initialplan ref="testPlan2" />
+				<initialplan ref="testPlan3" />
 			</plans>
 		</configuration>
 	</configurations>

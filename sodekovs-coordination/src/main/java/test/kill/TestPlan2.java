@@ -1,4 +1,4 @@
-package deco4mas.examples.V2.tspaces;
+package test.kill;
 
 import jadex.bdi.runtime.Plan;
 
@@ -16,8 +16,9 @@ public class TestPlan2 extends Plan {
 
 	public void body() {
 
-		System.out.println("Killing in 3 sec...");
-		waitFor(3000);		
+		waitFor(3000);
+		System.out.println("Killing one agent...");
+				
 		
 		killAgent();
 		System.out.println("Killed myself ...");
