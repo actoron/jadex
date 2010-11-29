@@ -375,8 +375,8 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 		{
 			ret = new QName[xmlpath.length+1];
 			System.arraycopy(xmlpath, 0, ret, 0, xmlpath.length);
-			QName tag = getTagName(value, context);
-			ret[ret.length-1] = tag;
+//			QName tag = getTagName(value, context);
+//			ret[ret.length-1] = tag;
 		}
 		return ret;
 	}

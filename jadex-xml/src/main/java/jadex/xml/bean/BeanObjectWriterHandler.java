@@ -183,8 +183,8 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 			Class clazz = object.getClass();
 			String clazzname = SReflect.getClassName(clazz);
 			int idx = clazzname.lastIndexOf(".");
-			pck = SXML.PROTOCOL_TYPEINFO+clazzname.substring(0, idx);
-			tag = clazzname.substring(idx+1);
+			pck = idx!=-1? SXML.PROTOCOL_TYPEINFO+clazzname.substring(0, idx): SXML.PROTOCOL_TYPEINFO;
+			tag = idx!=-1? clazzname.substring(idx+1): clazzname;
 			
 			// Special case inner class, replace $ with :
 			tag = tag.replace("$", "-");

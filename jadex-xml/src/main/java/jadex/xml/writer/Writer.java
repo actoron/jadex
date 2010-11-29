@@ -115,7 +115,7 @@ public class Writer
 		writer.writeCharacters(lf);
 		
 		WriteContext wc = new WriteContext(writer, context, object, classloader);
-		writeObject(wc, object, null);
+		writeObject(wc, object);
 		writer.writeEndDocument();
 		writer.close();
 	}
@@ -123,7 +123,7 @@ public class Writer
 	/**
 	 *  Write an object to xml.
 	 */
-	public void writeObject(WriteContext wc, Object object, QName tag) throws Exception
+	public void writeObject(WriteContext wc, Object object) throws Exception
 	{
 		XMLStreamWriter writer = wc.getWriter();
 		List stack = wc.getStack();
@@ -131,7 +131,8 @@ public class Writer
 		// Special case null
 		if(object==null)
 		{
-			writeStartObject(writer, tag==null? SXML.NULL: tag, stack.size());
+//			writeStartObject(writer, tag==null? SXML.NULL: tag, stack.size());
+			writeStartObject(writer, SXML.NULL, stack.size());
 			writeEndObject(writer, stack.size());
 			return;
 		}
@@ -148,10 +149,12 @@ public class Writer
 //			System.out.println("found: "+object);
 			object = preproc.preProcess(wc, object);
 		}
-		
+
+		QName tag = null;
 		// Only use typeinfo for getting tag (path) when not set in method call (subobject)
 		// Generated tag names (that start with 'protocol typeinfo' are overruled by typeinfo spec.
-		if((tag==null || tag.getNamespaceURI().startsWith(SXML.PROTOCOL_TYPEINFO)) && typeinfo!=null)
+//		if((tag==null || tag.getNamespaceURI().startsWith(SXML.PROTOCOL_TYPEINFO)) && typeinfo!=null)
+		if(typeinfo!=null)
 		{
 			tag = typeinfo.getXMLTag();
 			if(typeinfo.getXMLInfo()!=null)
@@ -166,16 +169,22 @@ public class Writer
 				}
 			}
 		}
-		
+
 		if(tag==null)
-		{
 			tag = handler.getTagName(object, wc);
-		}
+
 		
 		// Create tag with prefix if it has a namespace but no prefix.
+		try{
+			
 		if(!XMLConstants.NULL_NS_URI.equals(tag.getNamespaceURI()) && XMLConstants.DEFAULT_NS_PREFIX.equals(tag.getPrefix()))
 		{
 			tag = handler.getTagWithPrefix(tag, wc);
+		}
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
 		}
 		
 		if(genids && wc.getWrittenObjects().containsKey(object))
@@ -331,7 +340,8 @@ public class Writer
 			}
 			else
 			{
-				writeObject(wc, ((Object[])tmp)[1], (QName)((Object[])tmp)[0]);
+//				writeObject(wc, ((Object[])tmp)[1], (QName)((Object[])tmp)[0]);
+				writeObject(wc, ((Object[])tmp)[1]);
 			}
 		}
 	}
