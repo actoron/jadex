@@ -2,7 +2,6 @@ package jadex.micro.examples.mandelbrot;
 
 import jadex.commons.Future;
 import jadex.commons.IFuture;
-import jadex.commons.SUtil;
 import jadex.commons.service.BasicService;
 
 /**
@@ -56,6 +55,10 @@ public class CalculateService extends BasicService implements ICalculateService
 		boolean allin = true;
 		boolean justfill = false;
 		int fillcol = -2;
+		boolean	usejustfill	= data.getXStart()<2 && data.getXStart()>-2
+			|| data.getYStart()<2 && data.getYStart()>-2
+			|| data.getXEnd()<2 && data.getXEnd()>-2
+			|| data.getYEnd()<2 && data.getYEnd()>-2;
 		
 		while(true)
 		{
@@ -98,7 +101,7 @@ public class CalculateService extends BasicService implements ICalculateService
 			}
 			xstart++;
 			
-			if(allin)
+			if(allin && usejustfill)
 			{
 				justfill = true;
 //				System.out.println("justfill"+fillcol);

@@ -15,6 +15,7 @@ import java.awt.event.WindowEvent;
 
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
 import javax.swing.SwingUtilities;
 
 /**
@@ -24,7 +25,7 @@ public class DisplayAgent extends MicroAgent
 {
 	//-------- attributes --------
 	
-	/** The gui . */
+	/** The GUI. */
 	protected DisplayPanel	panel;
 	
 	//-------- MicroAgent methods --------
@@ -46,7 +47,9 @@ public class DisplayAgent extends MicroAgent
 			{
 				final JFrame	frame	= new JFrame(getAgentName());
 				JScrollPane	scroll	= new JScrollPane(panel);
-				frame.getContentPane().add(BorderLayout.CENTER, scroll);
+				JSplitPane	split	= new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, scroll, new ColorChooserPanel(panel));
+				split.setOneTouchExpandable(true);
+				frame.getContentPane().add(BorderLayout.CENTER, split);
 				frame.setSize(500, 400);
 				frame.setLocation(SGUI.calculateMiddlePosition(frame));
 				frame.setVisible(true);

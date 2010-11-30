@@ -14,6 +14,7 @@ import java.awt.Image;
 import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.Shape;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
@@ -30,23 +31,10 @@ import javax.swing.SwingUtilities;
  */
 public class DisplayPanel extends JComponent
 {
-	//-------- constants --------
-	public static final Color[]	COLORS	= new Color[16];
-	
-	static
-	{
-		Color	start	= new Color(50, 100, 0);
-		Color	end	= new Color(255, 0, 0);		
-		for(int i=0; i<COLORS.length; i++)
-		{
-			COLORS[i]	= new Color(
-				(int)(start.getRed()+(double)i/COLORS.length*(end.getRed()-start.getRed())),
-				(int)(start.getGreen()+(double)i/COLORS.length*(end.getGreen()-start.getGreen())),
-				(int)(start.getBlue()+(double)i/COLORS.length*(end.getBlue()-start.getBlue()))); 
-		}
-	}
-	
 	//-------- attributes --------
+	
+	/** The colors for drawing. */
+	protected Color[]	colors;
 	
 	/** The latest area data used for determining original coordinates of painted regions. */
 	protected AreaData	data;
@@ -54,7 +42,7 @@ public class DisplayPanel extends JComponent
 	/** The current image derived from the results. */
 	protected Image	image;
 	
-	/** The current selection point (if any). */
+	/** The current selection start point (if any). */
 	protected Point	point;
 	
 	/** The current selection range (if any). */
@@ -79,6 +67,8 @@ public class DisplayPanel extends JComponent
 	 */
 	public DisplayPanel(final IServiceProvider provider)
 	{
+		setColorScheme(new Color[]{new Color(50, 100, 0), Color.red});
+		
 		MouseAdapter ma = new MouseAdapter()
 		{
 			public void mousePressed(MouseEvent e)
@@ -111,10 +101,11 @@ public class DisplayPanel extends JComponent
 //					System.out.println("dragged: "+startdrag+" "+enddrag);
 					
 					final Rectangle	bounds	= getInnerBounds();
+					Rectangle	drawarea	= scaleToFit(bounds, image.getWidth(DisplayPanel.this), image.getHeight(DisplayPanel.this));
 					int xdiff = startdrag.x-enddrag.x;
 					int ydiff = startdrag.y-enddrag.y;
-					double xp = ((double)xdiff)/bounds.width;
-					double yp = ((double)ydiff)/bounds.height;
+					double xp = ((double)xdiff)/drawarea.width;
+					double yp = ((double)ydiff)/drawarea.height;
 					
 					double xm = (data.getXEnd()-data.getXStart())*xp;
 					double ym = (data.getYEnd()-data.getYStart())*yp;
@@ -125,8 +116,7 @@ public class DisplayPanel extends JComponent
 					
 					startdrag = null;
 					enddrag = null;
-					
-					range	= new Rectangle(bounds.x+xdiff, bounds.y+ydiff, bounds.width, bounds.height);
+					range	= new Rectangle(bounds.x+drawarea.x+xdiff, bounds.y+drawarea.y+ydiff, drawarea.width, drawarea.height);
 
 					DisplayPanel.this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 					calculating	= true;
@@ -182,10 +172,10 @@ public class DisplayPanel extends JComponent
 					int	iwidth	= image.getWidth(DisplayPanel.this);
 					int iheight	= image.getHeight(DisplayPanel.this);
 					final Rectangle drawarea = scaleToFit(bounds, iwidth, iheight);
-					int mx = Math.min((int)(drawarea.getX()+drawarea.getWidth()), Math.max((int)drawarea.getX(), e.getX()));
-					int my = Math.min((int)(drawarea.getY()+drawarea.getWidth()), Math.max((int)drawarea.getY(), e.getY()));
-					double xrel = ((double)(mx-drawarea.getX()))/drawarea.getWidth();
-					double yrel = ((double)(my-drawarea.getY()))/drawarea.getHeight();
+					int mx = Math.min(bounds.x+drawarea.x+drawarea.width, Math.max(bounds.x+drawarea.x, e.getX()));
+					int my = Math.min(bounds.y+drawarea.y+drawarea.height, Math.max(bounds.y+drawarea.y, e.getY()));
+					double xrel = ((double)mx-(bounds.x+drawarea.x))/drawarea.width;
+					double yrel = ((double)my-(bounds.y+drawarea.y))/drawarea.height;
 	
 					double wold = data.getXEnd()-data.getXStart();
 					double hold = data.getYEnd()-data.getYStart();
@@ -197,7 +187,7 @@ public class DisplayPanel extends JComponent
 					final double xs = data.getXStart()+wd*xrel;
 					final double xe = xs+wnew;
 					final double ys = data.getYStart()+hd*yrel;
-					final double ye = ys+wnew;
+					final double ye = ys+hnew;
 					
 					SServiceProvider.getService(provider, IGenerateService.class)
 						.addResultListener(new SwingDefaultResultListener()
@@ -424,7 +414,7 @@ public class DisplayPanel extends JComponent
 						}
 						else
 						{
-							c	= COLORS[results[x][y]%COLORS.length];
+							c	= colors[results[x][y]%colors.length];
 						}
 						g.setColor(c);
 						g.drawLine(x, y, x, y);
@@ -497,13 +487,26 @@ public class DisplayPanel extends JComponent
 					bounds.x+drawarea.x+drawarea.width, bounds.y+drawarea.y+drawarea.height,
 					ix, iy, ix+iwidth, iy+iheight, this);
 			}
+			
+			// Offset and clip image and show border while dragging.
 			else if(startdrag!=null && enddrag!=null)
 			{
+				// Draw original image in background
+				g.drawImage(image, bounds.x+drawarea.x, bounds.y+drawarea.y,
+					bounds.x+drawarea.x+drawarea.width, bounds.y+drawarea.y+drawarea.height,
+					ix, iy, ix+iwidth, iy+iheight, this);
+				g.setColor(new Color(32,32,32,160));
+				g.fillRect(bounds.x+drawarea.x, bounds.y+drawarea.y, drawarea.width, drawarea.height);
+
+				// Draw offsetted image in foreground
+				Shape	clip	= g.getClip();
+				g.setClip(bounds.x+drawarea.x, bounds.y+drawarea.y, drawarea.width, drawarea.height);
 				int	xoff	= enddrag.x-startdrag.x;
 				int	yoff	= enddrag.y-startdrag.y;
 				g.drawImage(image, bounds.x+drawarea.x+xoff, bounds.y+drawarea.y+yoff,
 					bounds.x+drawarea.x+xoff+drawarea.width, bounds.y+drawarea.y+yoff+drawarea.height,
 					ix, iy, ix+iwidth, iy+iheight, this);
+				g.setClip(clip);
 			}
 			else
 			{
@@ -651,5 +654,39 @@ public class DisplayPanel extends JComponent
 	public Dimension getPreferredSize()
 	{
 		return getMinimumSize();
+	}
+
+	/**
+	 *  Set the color scheme.
+	 */
+	public void	setColorScheme(Color[] scheme)
+	{
+		if(scheme==null || scheme.length==0)
+		{
+			colors	= new Color[]{Color.white};
+		}
+		else if(scheme.length==1)
+		{
+			colors	= scheme;
+		}
+		else
+		{
+			colors	= new Color[scheme.length*16];
+			for(int i=0; i<colors.length; i++)
+			{
+				int index	= i/16;
+				Color	start	= scheme[index];
+				Color	end	= index+1<scheme.length ? scheme[index+1] : scheme[0];
+				colors[i]	= new Color(
+					(int)(start.getRed()+(double)(i%16)/16*(end.getRed()-start.getRed())),
+					(int)(start.getGreen()+(double)(i%16)/16*(end.getGreen()-start.getGreen())),
+					(int)(start.getBlue()+(double)(i%16)/16*(end.getBlue()-start.getBlue())));
+			}
+		}
+		
+		if(data!=null)
+		{
+			setResults(data);
+		}
 	}
 }

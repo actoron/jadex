@@ -223,10 +223,12 @@ public class GenerateService extends BasicService implements IGenerateService
 			for(int xi=0; xi<numx; xi++)
 			{
 //				System.out.println("x:y: start "+x1+" "+(x1+xdiff)+" "+y1+" "+(y1+ydiff)+" "+xdiff);
-				int idx = (xi+(yi*xi))%services.size();
+				int idx = (xi+(yi*numx))%services.size();
 				ICalculateService cs = (ICalculateService)services.get(idx);
-				AreaData ad = new AreaData(x1, x1+xdiff, y1, y1+ydiff, xi==numx-1 && restx>0? restx: 
-					sizex, yi==numy-1 && resty>0? resty: sizey, data.getMax(), 0, 0, new int[]{xi, yi}, null);
+				AreaData ad = new AreaData(x1, xi==numx-1 && restx>0 ? x1+(xdiff*restx/sizex): x1+xdiff,
+					y1, yi==numy-1 && resty>0 ? y1+(ydiff*resty/sizey) : y1+ydiff,
+					xi==numx-1 && restx>0 ? restx : sizex, yi==numy-1 && resty>0 ? resty : sizey,
+					data.getMax(), 0, 0, new int[]{xi, yi}, null);
 //				System.out.println("x:y: "+xi+" "+yi+" "+ad);
 				cs.calculateArea(ad).addResultListener(agent.createResultListener(lis));
 				if(ds!=null)
