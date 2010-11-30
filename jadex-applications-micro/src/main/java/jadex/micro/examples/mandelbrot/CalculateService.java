@@ -2,6 +2,7 @@ package jadex.micro.examples.mandelbrot;
 
 import jadex.commons.Future;
 import jadex.commons.IFuture;
+import jadex.commons.SUtil;
 import jadex.commons.service.BasicService;
 
 /**
@@ -54,6 +55,7 @@ public class CalculateService extends BasicService implements ICalculateService
 		int yend = data.getSizeY()-1;
 		boolean allin = true;
 		boolean justfill = false;
+		int fillcol = -2;
 		
 		while(true)
 		{
@@ -61,8 +63,10 @@ public class CalculateService extends BasicService implements ICalculateService
 				break;
 			for(int xi=xstart; xi<=xend; xi++)
 			{
-				res[xi][ystart] = justfill? -1: determineColor(data.getXStart()+xi*stepx, data.getYStart()+ystart*stepy, data.getMax());
-				if(allin && res[xi][ystart]!=-1)
+				res[xi][ystart] = justfill? fillcol: determineColor(data.getXStart()+xi*stepx, data.getYStart()+ystart*stepy, data.getMax());
+				if(!justfill && xi==xstart)
+					fillcol = res[xi][ystart];
+				if(allin && res[xi][ystart]!=fillcol)
 					allin = false;
 			}
 			ystart++;
@@ -70,8 +74,8 @@ public class CalculateService extends BasicService implements ICalculateService
 				break;
 			for(int yi=ystart; yi<=yend; yi++)
 			{
-				res[xend][yi] = justfill? -1: determineColor(data.getXStart()+xend*stepx, data.getYStart()+yi*stepy, data.getMax());
-				if(allin && res[xend][yi]!=-1)
+				res[xend][yi] = justfill? fillcol: determineColor(data.getXStart()+xend*stepx, data.getYStart()+yi*stepy, data.getMax());
+				if(allin && res[xend][yi]!=fillcol)
 					allin = false;
 			}
 			xend--;
@@ -79,8 +83,8 @@ public class CalculateService extends BasicService implements ICalculateService
 				break;
 			for(int xi=xend; xi>=xstart; xi--)
 			{
-				res[xi][yend] = justfill? -1: determineColor(data.getXStart()+xi*stepx, data.getYStart()+yend*stepy, data.getMax());
-				if(allin && res[xi][yend]!=-1)
+				res[xi][yend] = justfill? fillcol: determineColor(data.getXStart()+xi*stepx, data.getYStart()+yend*stepy, data.getMax());
+				if(allin && res[xi][yend]!=fillcol)
 					allin = false;
 			}
 			yend--;
@@ -88,8 +92,8 @@ public class CalculateService extends BasicService implements ICalculateService
 				break;
 			for(int yi=yend; yi>=ystart; yi--)
 			{
-				res[xstart][yi] = justfill? -1: determineColor(data.getXStart()+xstart*stepx, data.getYStart()+yi*stepy, data.getMax());
-				if(allin && res[xstart][yi]!=-1)
+				res[xstart][yi] = justfill? fillcol: determineColor(data.getXStart()+xstart*stepx, data.getYStart()+yi*stepy, data.getMax());
+				if(allin && res[xstart][yi]!=fillcol)
 					allin = false;
 			}
 			xstart++;
@@ -97,7 +101,7 @@ public class CalculateService extends BasicService implements ICalculateService
 			if(allin)
 			{
 				justfill = true;
-//				System.out.println("justfill"+SUtil.arrayToString(res));
+//				System.out.println("justfill"+fillcol);
 				allin = false;
 			}
 			else if(!justfill)
