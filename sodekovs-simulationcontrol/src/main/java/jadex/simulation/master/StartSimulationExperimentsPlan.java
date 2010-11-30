@@ -7,7 +7,7 @@ import jadex.bridge.IComponentManagementService;
 import jadex.commons.IFuture;
 import jadex.commons.service.SServiceProvider;
 import jadex.simulation.helper.Constants;
-import jadex.simulation.helper.FileHandler;
+//import jadex.simulation.helper.FileHandler;
 import jadex.simulation.helper.ObjectCloner;
 import jadex.simulation.model.Optimization;
 import jadex.simulation.model.SimulationConfiguration;
@@ -181,35 +181,35 @@ public class StartSimulationExperimentsPlan extends Plan {
 		}
 	}
 	
-	private void startApplicationRemotley(String appName, String fileName, String configName, Map args) {
-
-		try {
-			//read the *.application.xml File
-			BufferedInputStream input = FileHandler.readFromFile(fileName);
-			ArrayList<IRemoteSimulationExecutionService> res = (ArrayList<IRemoteSimulationExecutionService>) SServiceProvider.getServices(getScope().getServiceProvider(), IRemoteSimulationExecutionService.class, true, true).get(this);
-//			res.get(0).startAppl
-			System.out.println("Nr. of found services: " + res.size());
-			
-			IComponentManagementService executionService = (IComponentManagementService)SServiceProvider.getService(getScope().getServiceProvider(), IComponentManagementService.class).get(this);
-			             
-
-			// create application in order to add additional components to application
-//			IFuture fut = executionService.createComponent(appName, fileName, new CreationInfo(configName, args, null, false, false), null);
-//			IComponentIdentifier comp = (IComponentIdentifier) fut.get(this);
-////			IApplicationExternalAccess iap= (IApplicationExternalAccess) executionService.getExternalAccess(comp).get(this);
-////			iap.getSpace(" ->my2dspace").getClass();
-//			FileHandler.readFromFile(fileName);
-//			comp.
-			// add data consumer and provider
-//			addDataConsumerAndProvider(comp, executionService, (SimulationConfiguration) ((Map) args.get(Constants.SIMULATION_FACTS_FOR_CLIENT)).get(Constants.SIMULATION_FACTS_FOR_CLIENT));
-
-		} catch (Exception e) {
-			// JOptionPane.showMessageDialog(SGUI.getWindowParent(StarterPanel.this),
-			// "Could not start application: "+e,
-			// "Application Problem", JOptionPane.INFORMATION_MESSAGE);
-			System.out.println("Could not start simulation experiment for remote execution" + e);
-		}
-	}
+//	private void startApplicationRemotley(String appName, String fileName, String configName, Map args) {
+//
+//		try {
+//			//read the *.application.xml File
+//			BufferedInputStream input = FileHandler.readFromFile(fileName);
+//			ArrayList<IRemoteSimulationExecutionService> res = (ArrayList<IRemoteSimulationExecutionService>) SServiceProvider.getServices(getScope().getServiceProvider(), IRemoteSimulationExecutionService.class, true, true).get(this);
+////			res.get(0).startAppl
+//			System.out.println("Nr. of found services: " + res.size());
+//			
+//			IComponentManagementService executionService = (IComponentManagementService)SServiceProvider.getService(getScope().getServiceProvider(), IComponentManagementService.class).get(this);
+//			             
+//
+//			// create application in order to add additional components to application
+////			IFuture fut = executionService.createComponent(appName, fileName, new CreationInfo(configName, args, null, false, false), null);
+////			IComponentIdentifier comp = (IComponentIdentifier) fut.get(this);
+//////			IApplicationExternalAccess iap= (IApplicationExternalAccess) executionService.getExternalAccess(comp).get(this);
+//////			iap.getSpace(" ->my2dspace").getClass();
+////			FileHandler.readFromFile(fileName);
+////			comp.
+//			// add data consumer and provider
+////			addDataConsumerAndProvider(comp, executionService, (SimulationConfiguration) ((Map) args.get(Constants.SIMULATION_FACTS_FOR_CLIENT)).get(Constants.SIMULATION_FACTS_FOR_CLIENT));
+//
+//		} catch (Exception e) {
+//			// JOptionPane.showMessageDialog(SGUI.getWindowParent(StarterPanel.this),
+//			// "Could not start application: "+e,
+//			// "Application Problem", JOptionPane.INFORMATION_MESSAGE);
+//			System.out.println("Could not start simulation experiment for remote execution" + e);
+//		}
+//	}
 
 	/**
 	 * TODO: differentiate between step and values!!!!
