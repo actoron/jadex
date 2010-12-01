@@ -790,7 +790,10 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 		synchronized(ext_entries)
 		{
 			if(ext_forbidden)
+			{
 				throw new ComponentTerminatedException(cid);
+			}
+			else
 			{
 				ext_entries.add(action);
 			}

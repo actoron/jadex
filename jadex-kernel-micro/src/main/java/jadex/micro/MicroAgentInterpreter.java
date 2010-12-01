@@ -80,8 +80,8 @@ public class MicroAgentInterpreter implements IComponentInstance
 	/** The component listeners. */
 	protected List componentlisteners;
 	
-	/** Flag indicating that no steps may be scheduled any more. */
-	protected boolean nosteps;
+//	/** Flag indicating that no steps may be scheduled any more. */
+//	protected boolean nosteps;
 	
 	//-------- constructors --------
 	
@@ -324,16 +324,18 @@ public class MicroAgentInterpreter implements IComponentInstance
 			{
 				public void run()
 				{	
-					nosteps = true;
-					ComponentTerminatedException ex = new ComponentTerminatedException(getAgentAdapter().getComponentIdentifier());
-					while(!steps.isEmpty())
-					{
-						Object[] step = removeStep();
-						Future future = (Future)step[1];
-						future.setException(ex);
-						System.out.println("Cleaning obsolete step: "+step[0]);
-					}
+//					System.out.println("termi: "+getAgentAdapter().getComponentIdentifier());
+//					nosteps = true;
+//					ComponentTerminatedException ex = new ComponentTerminatedException(getAgentAdapter().getComponentIdentifier());
+//					while(!steps.isEmpty())
+//					{
+//						Object[] step = removeStep();
+//						Future future = (Future)step[1];
+//						future.setException(ex);
+//						System.out.println("Cleaning obsolete step: "+step[0]);
+//					}
 					
+					// Cancel timers from normal execution mode
 					for(int i=0; i<microagent.timers.size(); i++)
 					{
 						ITimer timer = (ITimer)microagent.timers.get(i);
@@ -348,7 +350,9 @@ public class MicroAgentInterpreter implements IComponentInstance
 							lis.componentTerminating(new ChangeEvent(adapter.getComponentIdentifier()));
 						}
 					}
+					
 					microagent.agentKilled();
+					
 					if(componentlisteners!=null)
 					{
 						for(int i=0; i<componentlisteners.size(); i++)
@@ -575,15 +579,15 @@ public class MicroAgentInterpreter implements IComponentInstance
 	 */
 	protected void addStep(Object[] step)
 	{
-		if(nosteps)
-		{
-			((Future)step[1]).setException(new ComponentTerminatedException(getAgentAdapter().getComponentIdentifier()));
-		}
-		else
-		{
+//		if(nosteps)
+//		{
+//			((Future)step[1]).setException(new ComponentTerminatedException(getAgentAdapter().getComponentIdentifier()));
+//		}
+//		else
+//		{
 			steps.add(step);
 			notifyListeners(new ChangeEvent(this, "addStep", step));
-		}
+//		}
 	}
 	
 	/**
