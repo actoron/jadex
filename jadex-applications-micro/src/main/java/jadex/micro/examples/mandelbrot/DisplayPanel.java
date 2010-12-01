@@ -86,7 +86,7 @@ public class DisplayPanel extends JComponent
 		{
 			public void mousePressed(MouseEvent e)
 			{
-				if(e.getButton()==MouseEvent.BUTTON3 && e.getClickCount()==1)
+				if(e.getButton()==MouseEvent.BUTTON3 && e.getClickCount()==1 && image!=null)
 				{
 					startdrag = new Point(e.getX(), e.getY());
 					range	= null;
@@ -476,7 +476,7 @@ public class DisplayPanel extends JComponent
 				
 				if(progressupdate==null)
 				{
-					progressupdate	= new Timer(500, new ActionListener()
+					progressupdate	= new Timer(200, new ActionListener()
 					{
 						public void actionPerformed(ActionEvent e)
 						{
@@ -514,18 +514,38 @@ public class DisplayPanel extends JComponent
 																		Integer	percent	= (Integer)progressdata.get(progress);
 																		if(current.intValue()>percent.intValue())
 																		{
-																			progressdata.put(progress, percent);
+																			progressdata.put(progress, current);
 																			repaint();
 																		}
 																	}
 																}
+
+																public void customExceptionOccurred(Object source, Exception exception)
+																{
+																	// ignore
+																}
 															});
 														}
 													}
+
+													public void customExceptionOccurred(Object source, Exception exception)
+													{
+														// ignore
+													}
 												});
+											}
+
+											public void customExceptionOccurred(Object source, Exception exception)
+											{
+												// ignore
 											}
 										});
 									}									
+								}
+
+								public void customExceptionOccurred(Object source, Exception exception)
+								{
+									// ignore
 								}
 							});
 						}

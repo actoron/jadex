@@ -75,6 +75,8 @@ public class CalculateService extends BasicService implements ICalculateService
 					fillcol = res[xi][ystart];
 				if(allin && res[xi][ystart]!=fillcol)
 					allin = false;
+				cnt++;
+				agent.setProgress(cnt*100/size);
 			}
 			ystart++;
 			if(ystart>yend)
@@ -84,6 +86,8 @@ public class CalculateService extends BasicService implements ICalculateService
 				res[xend][yi] = justfill? fillcol: determineColor(data.getXStart()+xend*stepx, data.getYStart()+yi*stepy, data.getMax());
 				if(allin && res[xend][yi]!=fillcol)
 					allin = false;
+				cnt++;
+				agent.setProgress(cnt*100/size);
 			}
 			xend--;
 			if(xstart>xend)
@@ -93,6 +97,8 @@ public class CalculateService extends BasicService implements ICalculateService
 				res[xi][yend] = justfill? fillcol: determineColor(data.getXStart()+xi*stepx, data.getYStart()+yend*stepy, data.getMax());
 				if(allin && res[xi][yend]!=fillcol)
 					allin = false;
+				cnt++;
+				agent.setProgress(cnt*100/size);
 			}
 			yend--;
 			if(ystart>yend)
@@ -102,6 +108,8 @@ public class CalculateService extends BasicService implements ICalculateService
 				res[xstart][yi] = justfill? fillcol: determineColor(data.getXStart()+xstart*stepx, data.getYStart()+yi*stepy, data.getMax());
 				if(allin && res[xstart][yi]!=fillcol)
 					allin = false;
+				cnt++;
+				agent.setProgress(cnt*100/size);
 			}
 			xstart++;
 			
@@ -115,9 +123,6 @@ public class CalculateService extends BasicService implements ICalculateService
 			{
 				allin = true;
 			}
-			
-			cnt++;
-			agent.setProgress(cnt*100/size);
 		}
 		
 		agent.setTaskId(null);
