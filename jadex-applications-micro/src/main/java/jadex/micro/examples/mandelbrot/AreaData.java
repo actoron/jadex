@@ -275,16 +275,23 @@ public class AreaData
 		this.tasksize = tasksize;
 	}
 
-	/**
-	 *  Get the string representation.
-	 */
 	public String toString()
 	{
-		return "AreaData (xstart=" + xstart + ", xend=" + xend + ", ystart="
-			+ ystart + ", yend=" + yend + ", sizex=" + sizex + ", sizey="
-			+ sizey + ", max=" + max + ", par=" + par + ", id=" + id
-			+ ", tasksize=" + tasksize + ", data="
-			+ (data != null ? Arrays.asList(data) : null) + ")";
+		return "AreaData(id=" + id + ")";
 	}
+
+//	/**
+//	 *  Get the string representation.
+//	 */
+//	public String toString()
+//	{
+//		return "AreaData (xstart=" + xstart + ", xend=" + xend + ", ystart="
+//			+ ystart + ", yend=" + yend + ", sizex=" + sizex + ", sizey="
+//			+ sizey + ", max=" + max + ", par=" + par + ", id=" + id
+//			+ ", tasksize=" + tasksize + ", data="
+//			+ (data != null ? Arrays.asList(data) : null) + ")";
+//	}
+	
+	
 	
 }

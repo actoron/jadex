@@ -119,9 +119,9 @@ public class GenerateService extends BasicService implements IGenerateService
 					}));
 					
 					SServiceProvider.getService(agent.getServiceProvider(), IComponentManagementService.class, false, true)
-						.addResultListener(agent.createResultListener(agent.createResultListener(new IResultListener()
+						.addResultListener(agent.createResultListener(agent.createResultListener(new DelegationResultListener(ret)
 					{
-						public void resultAvailable(Object source, Object result)
+						public void customResultAvailable(Object source, Object result)
 						{
 							IComponentManagementService cms = (IComponentManagementService)result;
 							
@@ -133,11 +133,6 @@ public class GenerateService extends BasicService implements IGenerateService
 									agent.getParent().getComponentIdentifier()), null)
 									.addResultListener(agent.createResultListener(lis));
 							}
-						}
-						
-						public void exceptionOccurred(Object source, Exception exception)
-						{
-							exception.printStackTrace();
 						}
 					})));
 				}
@@ -317,18 +312,21 @@ class CalculateListener implements IResultListener
 	 */
 	public void exceptionOccurred(Object source, Exception exception)
 	{
+		System.out.println("Recal start: "+data.getId());
 		GenerateService.getCalculateServices(agent, 1).addResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
-//				System.out.println("Recalculating: "+data);
+				System.out.println("Recal end: "+data.getId());
 				ICalculateService cs = (ICalculateService)((Collection)result).iterator().next();
 				cs.calculateArea(data).addResultListener(agent.createResultListener(CalculateListener.this));
 			}
 			
 			public void exceptionOccurred(Object source, Exception exception)
 			{
+				System.out.println("Recal no success: "+data.getId());
 				exception.printStackTrace();
+				listener.exceptionOccurred(source, exception);
 			}
 		});
 	}
