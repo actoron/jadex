@@ -16,9 +16,7 @@ import jadex.commons.service.SServiceProvider;
 import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.swing.SwingUtilities;
 
@@ -272,7 +270,7 @@ public class GenerateService extends BasicService implements IGenerateService
 }
 
 /**
- * 
+ *  Listener for calculate service that can reassign a task.
  */
 class CalculateListener implements IResultListener
 {
@@ -316,11 +314,9 @@ class CalculateListener implements IResultListener
 		{
 			public void resultAvailable(Object source, Object result)
 			{
-				if(!(result instanceof Collection))
-					System.out.println("bug");
-				System.out.println("Recalculating: "+data);
+//				System.out.println("Recalculating: "+data);
 				ICalculateService cs = (ICalculateService)((Collection)result).iterator().next();
-				cs.calculateArea(data).addResultListener(agent.createResultListener(this));
+				cs.calculateArea(data).addResultListener(agent.createResultListener(CalculateListener.this));
 			}
 			
 			public void exceptionOccurred(Object source, Exception exception)
