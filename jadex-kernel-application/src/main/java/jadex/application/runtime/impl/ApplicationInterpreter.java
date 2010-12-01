@@ -52,7 +52,6 @@ import jadex.javaparser.SimpleValueFetcher;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -147,7 +146,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 		this.arguments = arguments==null ? new HashMap() : arguments;
 		this.results = new HashMap();
 		this.properties = new HashMap();
-		this.ctypes = Collections.synchronizedMap(new HashMap()); 
+		this.ctypes = new HashMap(); 
 		this.instances = new MultiCollection(); 
 		this.steps	= new ArrayList();
 		this.willdostep	= true;
@@ -650,55 +649,61 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 	public void	componentCreated(final IComponentDescription desc, final IModelInfo model)
 	{
 		// Checks if loaded model is defined in the application component types
+		scheduleStep(new IComponentStep()
+		{
+			public Object execute(IInternalAccess ia)
+			{
+				IComponentIdentifier cid = desc.getName();
+				
+				String modelname = model.getFullName();
+				String appctype = (String)ctypes.get(modelname);
+				if(appctype==null)
+				{
+					List atypes	= ApplicationInterpreter.this.model.getMComponentTypes();
+					for(int i=0; i<atypes.size(); i++)
+					{
+						final MComponentType atype = (MComponentType)atypes.get(i);
+						String tmp = atype.getFilename().replace('/', '.');
+						if(tmp.indexOf(modelname)!=-1)
+						{
+							ctypes.put(modelname, atype.getName());
+							appctype = atype.getName();
+							break;
+						}
+					}
+				}
+				if(appctype!=null)
+				{
+					ctypes.put(cid, appctype);
+					instances.put(appctype, cid);
+				}
+				/* TODO: Check removed because WfMS requires adding arbitrary subcomponents (processes).
+				else if(parent!=null)
+				{
+					throw new RuntimeException("Unknown/undefined component type: "+model);
+				}*/
+				
+				ISpace[]	aspaces	= null;
+				synchronized(this)
+				{
+					if(spaces!=null)
+					{
+						aspaces	= (ISpace[])spaces.values().toArray(new ISpace[spaces.size()]);
+					}
+				}
+
+				if(aspaces!=null)
+				{
+					for(int i=0; i<aspaces.length; i++)
+					{
+						aspaces[i].componentAdded(cid);
+					}
+				}
+				return null;
+			}
+		});
 		
 //		System.out.println("comp created: "+desc.getName()+" "+Application.this.getComponentIdentifier()+" "+children);
-
-		IComponentIdentifier cid = desc.getName();
-		
-		String modelname = model.getFullName();
-		String appctype = (String)ctypes.get(modelname);
-		if(appctype==null)
-		{
-			List atypes	= ApplicationInterpreter.this.model.getMComponentTypes();
-			for(int i=0; i<atypes.size(); i++)
-			{
-				final MComponentType atype = (MComponentType)atypes.get(i);
-				String tmp = atype.getFilename().replace('/', '.');
-				if(tmp.indexOf(modelname)!=-1)
-				{
-					ctypes.put(modelname, atype.getName());
-					appctype = atype.getName();
-					break;
-				}
-			}
-		}
-		if(appctype!=null)
-		{
-			ctypes.put(cid, appctype);
-			instances.put(appctype, cid);
-		}
-		/* TODO: Check removed because WfMS requires adding arbitrary subcomponents (processes).
-		else if(parent!=null)
-		{
-			throw new RuntimeException("Unknown/undefined component type: "+model);
-		}*/
-		
-		ISpace[]	aspaces	= null;
-		synchronized(this)
-		{
-			if(spaces!=null)
-			{
-				aspaces	= (ISpace[])spaces.values().toArray(new ISpace[spaces.size()]);
-			}
-		}
-
-		if(aspaces!=null)
-		{
-			for(int i=0; i<aspaces.length; i++)
-			{
-				aspaces[i].componentAdded(cid);
-			}
-		}
 	}
 	
 	/**
@@ -707,41 +712,47 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 	 *  The current subcomponents can be accessed by IComponentAdapter.getSubcomponents().
 	 *  @param comp	The destroyed component.
 	 */
-	public void	componentDestroyed(IComponentDescription desc)
+	public void	componentDestroyed(final IComponentDescription desc)
 	{
-//		System.out.println("comp removed: "+desc.getName()+" "+this.getComponentIdentifier());
+		scheduleStep(new IComponentStep()
+		{
+			public Object execute(IInternalAccess ia)
+			{
+		//		System.out.println("comp removed: "+desc.getName()+" "+this.getComponentIdentifier());
+				IComponentIdentifier cid = desc.getName();
+				ISpace[]	aspaces	= null;
+				synchronized(this)
+				{
+					if(spaces!=null)
+					{
+						aspaces	= (ISpace[])spaces.values().toArray(new ISpace[spaces.size()]);
+					}
+				}
 		
-		IComponentIdentifier cid = desc.getName();
-		ISpace[]	aspaces	= null;
-		synchronized(this)
-		{
-			if(spaces!=null)
-			{
-				aspaces	= (ISpace[])spaces.values().toArray(new ISpace[spaces.size()]);
+				if(aspaces!=null)
+				{
+					for(int i=0; i<aspaces.length; i++)
+					{
+						aspaces[i].componentRemoved(cid);
+					}
+				}
+				
+				if(ctypes!=null)
+				{
+					try
+					{
+						String appctype = (String)ctypes.remove(cid);
+						if(appctype!=null)
+							instances.remove(appctype, cid);
+					}
+					catch(Exception e)
+					{
+						e.printStackTrace();
+					}
+				}
+				return null;
 			}
-		}
-
-		if(aspaces!=null)
-		{
-			for(int i=0; i<aspaces.length; i++)
-			{
-				aspaces[i].componentRemoved(cid);
-			}
-		}
-		
-		if(ctypes!=null)
-		{
-			try
-			{
-				String appctype = (String)ctypes.remove(cid);
-				if(appctype!=null)
-					instances.remove(appctype, cid);
-			}
-			catch(Exception e)
-			{
-				e.printStackTrace();
-			}
-		}
+		});
 	}
 	
 	/**
