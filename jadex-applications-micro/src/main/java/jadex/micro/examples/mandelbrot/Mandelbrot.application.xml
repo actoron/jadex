@@ -14,6 +14,10 @@
 		<import>jadex.commons.IFuture</import>
 	</imports>
 	
+	<arguments>
+		<argument name="delay">5000L</argument>
+	</arguments>
+	
 	<componenttypes>
 		<componenttype name="Generator" filename="jadex/micro/examples/mandelbrot/GenerateAgent.class"/>
 		<componenttype name="Calculator" filename="jadex/micro/examples/mandelbrot/CalculateAgent.class"/>
@@ -29,14 +33,35 @@
 	<applications>
 		<application name="All Components">
 			<components>
-				<component type="Generator"/>
+				<component type="Generator">
+					<arguments>
+						<argument name="delay">$args.delay</argument>
+					</arguments>
+				</component>
 				<component type="Calculator"/>
 				<component type="Display"/>
 			</components>
 		</application>
 		<application name="Only Generator">
 			<components>
-				<component type="Generator"/>
+				<component type="Generator">
+					<arguments>
+						<argument name="delay">$args.delay</argument>
+					</arguments>
+				</component>
+			</components>
+		</application>
+		<application name="Test Config">
+			<arguments>
+				<argument name="delay">1000L</argument>
+			</arguments>
+			<components>
+				<component type="Generator">
+					<arguments>
+						<argument name="delay">$args.delay</argument>
+					</arguments>
+				</component>
+				<component type="Display"/>
 			</components>
 		</application>
 	</applications>

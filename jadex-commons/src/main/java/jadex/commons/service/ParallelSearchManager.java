@@ -212,19 +212,20 @@ public class ParallelSearchManager implements ISearchManager
 							// Do not go back to where we came from.
 							if(source!=null)
 								coll.remove(source);
-							IResultListener	crl	= new CounterResultListener(coll.size())
+							IResultListener	crl	= new CounterResultListener(coll.size(), new IResultListener()
 							{
-								public void finalResultAvailable(Object source, Object result)
+								public void resultAvailable(Object source, Object result)
 								{
 									finished[2]	= true;
 									checkAndSetResults(finished, ret);
 								}
+								
 								public void exceptionOccurred(Object source, Exception exception)
 								{
 									finished[2]	= true;
 									checkAndSetResults(finished, ret);
 								}
-							};
+							});
 							for(Iterator it=coll.iterator(); it.hasNext(); )
 							{
 								IServiceProvider target = (IServiceProvider)it.next();

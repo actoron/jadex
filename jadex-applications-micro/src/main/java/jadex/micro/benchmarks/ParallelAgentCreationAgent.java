@@ -50,17 +50,10 @@ public class ParallelAgentCreationAgent extends MicroAgent
 							final double[]	dur	= new double[1];
 							final long[]	killstarttime	= new long[1];
 							
-							IResultListener	creationlis	= new CounterResultListener(num)
+							IResultListener	creationlis	= new CounterResultListener(num, new IResultListener()
 							{
-								public void intermediateResultAvailable(Object source, Object result)
+								public void resultAvailable(Object source, Object result)
 								{
-									System.out.println("Created peer: "+cnt);
-								}
-								
-								public void finalResultAvailable(Object source, Object result)
-								{
-									System.out.println("Created peer: "+cnt);
-									
 									scheduleStep(new IComponentStep()
 									{
 										public Object execute(IInternalAccess ia)
@@ -100,19 +93,19 @@ public class ParallelAgentCreationAgent extends MicroAgent
 										}
 									});
 								}
+							})
+							{
+								public void intermediateResultAvailable(Object source, Object result)
+								{
+									System.out.println("Created peer: "+getCnt());
+								}
 							};
 							
-							IResultListener	killlis	= new CounterResultListener(num)
+							
+							IResultListener	killlis	= new CounterResultListener(num, new IResultListener()
 							{
-								public void intermediateResultAvailable(
-										Object source, Object result)
+								public void resultAvailable(Object source, Object result)
 								{
-									System.out.println("Successfully destroyed peer: "+source);
-								}
-								public void finalResultAvailable(Object source, Object result)
-								{
-									System.out.println("Successfully destroyed peer: "+source);
-									
 									scheduleStep(new IComponentStep()
 									{
 										public Object execute(IInternalAccess ia)
@@ -152,6 +145,12 @@ public class ParallelAgentCreationAgent extends MicroAgent
 												throw new RuntimeException(exception);
 										}
 									});
+								}
+							})
+							{
+								public void intermediateResultAvailable(Object source, Object result)
+								{
+									System.out.println("Successfully destroyed peer: "+source);
 								}
 							};
 							

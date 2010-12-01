@@ -3,7 +3,7 @@ package jadex.micro.examples.mandelbrot;
 import java.util.Arrays;
 
 /**
- * 
+ *  Struct for calculation of a specific mandelbrot cutout.
  */
 public class AreaData
 {

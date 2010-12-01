@@ -4,6 +4,7 @@ import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentManagementService;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
+import jadex.commons.SUtil;
 import jadex.commons.concurrent.CollectionResultListener;
 import jadex.commons.concurrent.CounterResultListener;
 import jadex.commons.concurrent.DefaultResultListener;
@@ -13,7 +14,11 @@ import jadex.commons.service.BasicService;
 import jadex.commons.service.SServiceProvider;
 
 import java.awt.Rectangle;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.SwingUtilities;
 
@@ -65,61 +70,18 @@ public class GenerateService extends BasicService implements IGenerateService
 			public void resultAvailable(Object source, Object result)
 			{
 				final IDisplayService ds = (IDisplayService)result;
-				SServiceProvider.getServices(agent.getServiceProvider(), ICalculateService.class, false, true)
-				.addResultListener(agent.createResultListener(new DelegationResultListener(ret)
+				getCalculateServices(agent, data.getParallel()).addResultListener(new IResultListener()
 				{
-					public void customResultAvailable(Object source, Object result)
+					public void resultAvailable(Object source, Object result)
 					{
-						List sers = (List)result;
-						
-						// Start additional components if necessary
-						if(sers.size()<data.getParallel())
-						{
-							final int num = data.getParallel()-sers.size();
-							
-	//						System.out.println("Starting new calculator agents: "+num);
-							
-							final CollectionResultListener lis = new CollectionResultListener(num, true, agent.createResultListener(new DefaultResultListener()
-							{
-								public void resultAvailable(Object source, Object result)
-								{
-									SServiceProvider.getServices(agent.getServiceProvider(), ICalculateService.class, false, true)
-										.addResultListener(agent.createResultListener(new DelegationResultListener(ret)
-									{
-										public void customResultAvailable(Object source, Object result)
-										{
-											distributeWork(data, (List)result, ds, ret);
-										}
-									}));
-								}
-							}));
-							
-							SServiceProvider.getService(agent.getServiceProvider(), IComponentManagementService.class, false, true)
-								.addResultListener(agent.createResultListener(agent.createResultListener(new IResultListener()
-							{
-								public void resultAvailable(Object source, Object result)
-								{
-									IComponentManagementService cms = (IComponentManagementService)result;
-									
-									for(int i=0; i<num; i++)
-									{
-										cms.createComponent(null, "jadex/micro/examples/mandelbrot/CalculateAgent.class", new CreationInfo(agent.getParent().getComponentIdentifier()), null)
-											.addResultListener(agent.createResultListener(lis));
-									}
-								}
-								
-								public void exceptionOccurred(Object source, Exception exception)
-								{
-									exception.printStackTrace();
-								}
-							})));
-						}
-						else
-						{
-							distributeWork(data, sers, ds, ret);
-						}
+						distributeWork(data, (List)result, ds, ret);
 					}
-				}));
+					
+					public void exceptionOccurred(Object source, Exception exception)
+					{
+					}
+				});
+				
 			}
 		});
 		
@@ -127,10 +89,77 @@ public class GenerateService extends BasicService implements IGenerateService
 	}
 	
 	/**
+	 *  Get (and create) the calculate services.
+	 */
+	protected static IFuture getCalculateServices(final GenerateAgent agent, final int par)
+	{
+		final Future ret = new Future();
+		
+		SServiceProvider.getServices(agent.getServiceProvider(), ICalculateService.class, false, true)
+			.addResultListener(agent.createResultListener(new DelegationResultListener(ret)
+		{
+			public void customResultAvailable(Object source, Object result)
+			{
+				List sers = (List)result;
+				
+				// Start additional components if necessary
+				if(sers.size()<par)
+				{
+					final int num = par-sers.size();
+					
+//					System.out.println("Starting new calculator agents: "+num);
+					
+					final CollectionResultListener lis = new CollectionResultListener(num, true, agent.createResultListener(new DefaultResultListener()
+					{
+						public void resultAvailable(Object source, Object result)
+						{
+							SServiceProvider.getServices(agent.getServiceProvider(), ICalculateService.class, false, true)
+								.addResultListener(agent.createResultListener(new DelegationResultListener(ret)));
+						}
+					}));
+					
+					SServiceProvider.getService(agent.getServiceProvider(), IComponentManagementService.class, false, true)
+						.addResultListener(agent.createResultListener(agent.createResultListener(new IResultListener()
+					{
+						public void resultAvailable(Object source, Object result)
+						{
+							IComponentManagementService cms = (IComponentManagementService)result;
+							
+//							System.out.println("test: "+agent.getArgument("delay"));
+							for(int i=0; i<num; i++)
+							{
+								cms.createComponent(null, "jadex/micro/examples/mandelbrot/CalculateAgent.class", 
+									new CreationInfo(SUtil.createHashMap(new String[]{"delay"}, new Object[]{agent.getArgument("delay")}), 
+									agent.getParent().getComponentIdentifier()), null)
+									.addResultListener(agent.createResultListener(lis));
+							}
+						}
+						
+						public void exceptionOccurred(Object source, Exception exception)
+						{
+							exception.printStackTrace();
+						}
+					})));
+				}
+				else
+				{
+					ret.setResult(sers);
+				}
+			}
+		}));
+		
+		return ret;
+	}
+	
+	/**
 	 *  Distribute the work to different worker services.
 	 */
-	protected void distributeWork(final AreaData data, List services, final IDisplayService ds, final Future ret)
+	protected void distributeWork(final AreaData data, Collection sers, final IDisplayService ds, final Future ret)
 	{
+		if(sers==null || sers.size()==0)
+			throw new IllegalArgumentException("Calculate services must not be null");
+		List services = new ArrayList(sers);
+		
 		int numx = Math.max((int)Math.sqrt((double)data.getSizeX()*data.getSizeY()*data.getMax()/(data.getTaskSize()*data.getTaskSize()*256)), 1);
 		int numy = numx;
 //		System.out.println("Number of tasks: "+numx+", "+numy+", max="+data.getMax()+" tasksize="+data.getTaskSize());
@@ -164,15 +193,19 @@ public class GenerateService extends BasicService implements IGenerateService
 		
 		data.setData(new int[data.getSizeX()][data.getSizeY()]);
 		
-		CounterResultListener lis = new CounterResultListener(numx*numy)
+		final CounterResultListener lis = new CounterResultListener(numx*numy, new IResultListener()
 		{
-			public void finalResultAvailable(Object source, Object result)
+			public void resultAvailable(Object source, Object result)
 			{
-				intermediateResultAvailable(source, result);
-//				System.out.println("res: "+SUtil.arrayToString(data.getData()));
 				ret.setResult(data);
 			}
 			
+			public void exceptionOccurred(Object source, Exception exception)
+			{
+				System.out.println("ex: "+exception);
+			}
+		})
+		{
 			public void intermediateResultAvailable(Object source, Object result)
 			{
 				AreaData ad = (AreaData)result;
@@ -193,8 +226,8 @@ public class GenerateService extends BasicService implements IGenerateService
 						new Rectangle(xs, ys, ad.getSizeX(), ad.getSizeY()), true, data.getSizeX(), data.getSizeY()));
 				}
 				
-//				System.out.println("x:y: end "+xs+" "+ys);
-//				System.out.println("partial: "+SUtil.arrayToString(ad.getData()));
+	//			System.out.println("x:y: end "+xs+" "+ys);
+	//			System.out.println("partial: "+SUtil.arrayToString(ad.getData()));
 				for(int yi=0; yi<ad.getSizeY(); yi++)
 				{
 					for(int xi=0; xi<ad.getSizeX(); xi++)
@@ -210,12 +243,6 @@ public class GenerateService extends BasicService implements IGenerateService
 					}
 				}
 			}
-			
-			public void exceptionOccurred(Object source, Exception exception)
-			{
-				System.out.println("todo: handle failure");
-				exception.printStackTrace();
-			}
 		};
 		
 		for(int yi=0; yi<numy; yi++)
@@ -230,7 +257,7 @@ public class GenerateService extends BasicService implements IGenerateService
 					xi==numx-1 && restx>0 ? restx : sizex, yi==numy-1 && resty>0 ? resty : sizey,
 					data.getMax(), 0, 0, new int[]{xi, yi}, null);
 //				System.out.println("x:y: "+xi+" "+yi+" "+ad);
-				cs.calculateArea(ad).addResultListener(agent.createResultListener(lis));
+				cs.calculateArea(ad).addResultListener(agent.createResultListener(new CalculateListener(agent, lis, ad)));
 				if(ds!=null)
 				{
 					ds.displayIntermediateResult(new ProgressData(cs.getServiceIdentifier().getProviderId(),
@@ -241,5 +268,65 @@ public class GenerateService extends BasicService implements IGenerateService
 			x1 = data.getXStart();
 			y1 += ydiff;
 		}
+	}
+}
+
+/**
+ * 
+ */
+class CalculateListener implements IResultListener
+{
+	/** The agent. */
+	protected GenerateAgent agent;
+	
+	/** The listener. */
+	protected IResultListener listener;
+	
+	/** The data. */
+	protected AreaData data;
+	
+	/**
+	 *  Create a new listener.
+	 */
+	public CalculateListener(GenerateAgent agent, IResultListener listener, AreaData data)
+	{
+		this.agent = agent;
+		this.listener = listener;
+		this.data = data;
+	}
+	
+	/**
+	 *  Called when the result is available.
+	 *  @param source The source component.
+	 *  @param result The result.
+	 */
+	public void resultAvailable(Object source, Object result)
+	{
+		listener.resultAvailable(source, result);
+	}
+	
+	/**
+	 *  Called when an exception occurred.
+	 *  @param source The source component.
+	 *  @param exception The exception.
+	 */
+	public void exceptionOccurred(Object source, Exception exception)
+	{
+		GenerateService.getCalculateServices(agent, 1).addResultListener(new IResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				if(!(result instanceof Collection))
+					System.out.println("bug");
+				System.out.println("Recalculating: "+data);
+				ICalculateService cs = (ICalculateService)((Collection)result).iterator().next();
+				cs.calculateArea(data).addResultListener(agent.createResultListener(this));
+			}
+			
+			public void exceptionOccurred(Object source, Exception exception)
+			{
+				exception.printStackTrace();
+			}
+		});
 	}
 }

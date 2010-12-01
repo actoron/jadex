@@ -61,6 +61,7 @@ public interface IExternalAccess extends IRemotable
 	
 	// todo: do we want this? should getArg() deliver only args supplied from
 	// outside or also values that are default/initial values in the model.
+	// problem: this would require to store the arguments for the whole lifetime of the component.
 	/**
 	 *  Get argument value.
 	 *  @param name The argument name.

@@ -57,7 +57,7 @@ public abstract class ElementFlyweight implements IElement
 		
 		this.interpreter = BDIInterpreter.getInterpreter(state);
 		if(interpreter==null)
-			throw new ComponentTerminatedException("Cannot create flyweight for dead agent: "+handle);
+			throw new ComponentTerminatedException(null);
 		setHandle(handle);
 	}
 	

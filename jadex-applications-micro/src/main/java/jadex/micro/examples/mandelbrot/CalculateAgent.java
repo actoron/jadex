@@ -1,5 +1,7 @@
 package jadex.micro.examples.mandelbrot;
 
+import jadex.bridge.Argument;
+import jadex.bridge.IArgument;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.micro.MicroAgent;
@@ -15,6 +17,8 @@ public class CalculateAgent extends MicroAgent
 	/** Flag indicating that the agent had a job. */
 	protected boolean hadjob;
 	
+	//-------- methods --------
+	
 	/**
 	 *  Called once after agent creation.
 	 */
@@ -28,6 +32,7 @@ public class CalculateAgent extends MicroAgent
 	 */
 	public void executeBody()
 	{
+		final long delay = ((Long)getArgument("delay")).longValue();
 		IComponentStep step = new IComponentStep()
 		{
 			public Object execute(IInternalAccess ia)
@@ -35,11 +40,11 @@ public class CalculateAgent extends MicroAgent
 				if(!isHadJob())
 					killComponent();
 				setHadJob(false);
-				waitFor(5000, this);
+				waitFor(delay, this);
 				return null;
 			}
 		};
-		waitFor(5000, step);
+		waitFor(delay, step);
 	}
 	
 	/**
@@ -67,7 +72,8 @@ public class CalculateAgent extends MicroAgent
 	 */
 	public static MicroAgentMetaInfo getMetaInfo()
 	{
-		return new MicroAgentMetaInfo("Agent offering a calculate service.", null, null,
+		return new MicroAgentMetaInfo("Agent offering a calculate service.", null, 
+			new IArgument[]{new Argument("delay", "Agent kills itself when no job arrives in the delay interval.", "Long", new Long(1000))},
 			null, null, null,
 			new Class[]{}, new Class[]{ICalculateService.class});
 	}

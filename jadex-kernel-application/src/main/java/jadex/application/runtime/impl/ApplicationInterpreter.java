@@ -383,17 +383,18 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 					}
 				};
 				
-				IResultListener	crl	= new CounterResultListener(futures.size())
+				IResultListener	crl	= new CounterResultListener(futures.size(), new IResultListener()
 				{
-					public void finalResultAvailable(Object source, Object result)
+					public void resultAvailable(Object source, Object result)
 					{
 						scheduleStep(init2);
 					}
+					
 					public void exceptionOccurred(Object source, Exception exception)
 					{
 						inited.setException(exception);
 					}
-				};
+				});
 				for(int i=0; i<futures.size(); i++)
 				{
 					((IFuture)futures.get(i)).addResultListener(crl);

@@ -479,7 +479,7 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 			Throwable[]	exception	= (Throwable[])it.next();
 			synchronized(exception)
 			{
-				exception[0] = new ComponentTerminatedException(getAgentAdapter().getComponentIdentifier().getName());
+				exception[0] = new ComponentTerminatedException(getAgentAdapter().getComponentIdentifier());
 				exception[0].fillInStackTrace();
 				exception.notify();
 				it.remove();
@@ -913,7 +913,7 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 						}
 						else
 						{
-							throw new ComponentTerminatedException(getAgentAdapter().getComponentIdentifier().getName());
+							throw new ComponentTerminatedException(getAgentAdapter().getComponentIdentifier());
 						}
 					}
 				}

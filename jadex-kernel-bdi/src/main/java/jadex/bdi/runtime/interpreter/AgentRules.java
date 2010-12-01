@@ -149,9 +149,9 @@ public class AgentRules
 				// Start service container.
 				futures.add(ip.getServiceContainer().start());
 				
-				IResultListener	crs	= new CounterResultListener(futures.size())
+				IResultListener	crs	= new CounterResultListener(futures.size(), new IResultListener()
 				{
-					public void finalResultAvailable(Object source, Object result)
+					public void resultAvailable(Object source, Object result)
 					{
 						boolean	startagent;
 						synchronized(services)
@@ -170,10 +170,11 @@ public class AgentRules
 							});
 						}
 					}
+					
 					public void exceptionOccurred(Object source, Exception exception)
 					{
 					}
-				};
+				});
 				if(!futures.isEmpty())
 				{
 					for(int i=0; i<futures.size(); i++)

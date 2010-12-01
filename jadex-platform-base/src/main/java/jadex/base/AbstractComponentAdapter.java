@@ -135,7 +135,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 		wokenup	= true;
 
 		if(IComponentDescription.STATE_TERMINATED.equals(desc.getState()))
-			throw new ComponentTerminatedException(cid.getName());
+			throw new ComponentTerminatedException(cid);
 		
 		// Set processing state to ready if not running.
 		if(IComponentDescription.PROCESSINGSTATE_IDLE.equals(desc.getProcessingState()))
@@ -468,7 +468,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 //		System.out.println("killComponent: "+listener);
 		if(IComponentDescription.STATE_TERMINATED.equals(desc.getState()))
 		{
-			ret.setException(new ComponentTerminatedException(cid.getName()));
+			ret.setException(new ComponentTerminatedException(cid));
 		}
 		else
 		{
@@ -535,7 +535,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	public void	receiveMessage(Map message, MessageType type)
 	{
 		if(IComponentDescription.STATE_TERMINATED.equals(desc.getState()) || fatalerror)
-			throw new ComponentTerminatedException(cid.getName());
+			throw new ComponentTerminatedException(cid);
 
 		// Add optional receival time.
 //		String rd = type.getReceiveDateIdentifier();
@@ -586,7 +586,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 		if(!IComponentDescription.STATE_TERMINATED.equals(desc.getState()))
 		{
 			if(fatalerror)
-				throw new ComponentTerminatedException(cid.getName());
+				throw new ComponentTerminatedException(cid);
 	
 			// Remember execution thread.
 			this.componentthread	= Thread.currentThread();
@@ -785,13 +785,12 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	public void invokeLater(Runnable action)
 	{
 		if(IComponentDescription.STATE_TERMINATED.equals(desc.getState()) || fatalerror)
-			throw new ComponentTerminatedException(cid.getName());
+			throw new ComponentTerminatedException(cid);
 
 		synchronized(ext_entries)
 		{
 			if(ext_forbidden)
-				throw new ComponentTerminatedException("External actions cannot be accepted " +
-					"due to terminated component state: "+this);
+				throw new ComponentTerminatedException(cid);
 			{
 				ext_entries.add(action);
 			}
@@ -818,7 +817,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	{
 		Future ret = new Future();
 		if(IComponentDescription.STATE_TERMINATED.equals(desc.getState()) || fatalerror)
-			ret.setException(new ComponentTerminatedException(cid.getName()));
+			ret.setException(new ComponentTerminatedException(cid));
 		else if(dostep)
 			ret.setException(new RuntimeException("Only one step allowed at a time."));
 			

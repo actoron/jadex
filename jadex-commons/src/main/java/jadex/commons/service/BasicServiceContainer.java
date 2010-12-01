@@ -191,18 +191,7 @@ public class BasicServiceContainer implements  IServiceContainer
 			{
 				allservices.addAll((Collection)it.next());
 			}
-			CounterResultListener	crl	= new CounterResultListener(allservices.size())
-			{
-				public void finalResultAvailable(Object source, Object result)
-				{
-					ret.setResult(result);
-				}
-				
-				public void exceptionOccurred(Object source, Exception exception)
-				{
-					ret.setException(exception);
-				}
-			};
+			CounterResultListener	crl	= new CounterResultListener(allservices.size(), new DelegationResultListener(ret));
 			for(Iterator it=allservices.iterator(); it.hasNext(); )
 			{
 				((IInternalService)it.next()).startService().addResultListener(crl);
@@ -236,18 +225,7 @@ public class BasicServiceContainer implements  IServiceContainer
 			{
 				allservices.addAll((Collection)it.next());
 			}
-			CounterResultListener	crl	= new CounterResultListener(allservices.size())
-			{
-				public void finalResultAvailable(Object source, Object result)
-				{
-					ret.setResult(result);
-				}
-				
-				public void exceptionOccurred(Object source, Exception exception)
-				{
-					ret.setException(exception);
-				}
-			};
+			CounterResultListener	crl	= new CounterResultListener(allservices.size(), new DelegationResultListener(ret));
 			for(Iterator it=allservices.iterator(); it.hasNext(); )
 			{
 				((IInternalService)it.next()).shutdownService().addResultListener(crl);

@@ -5,6 +5,7 @@ import jadex.commons.ICommand;
 import jadex.commons.IFuture;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.CounterResultListener;
+import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.Executor;
 import jadex.commons.concurrent.IExecutable;
 import jadex.commons.concurrent.IResultListener;
@@ -355,19 +356,7 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 			if(keys.length>0)
 			{
 				// One listener counts until all executors have shutdowned.
-				IResultListener lis = new CounterResultListener(keys.length)
-				{
-					public void finalResultAvailable(Object source, Object result)
-					{
-						ret.setResult(result);
-					}
-					
-					public void exceptionOccurred(Object source, Exception exception)
-					{
-						ret.setException(exception);
-					}
-				};
-				
+				IResultListener lis = new CounterResultListener(keys.length, new DelegationResultListener(ret));
 				for(int i=0; i<keys.length; i++)
 				{
 					Executor exe = (Executor)executors.get(keys[i]);
