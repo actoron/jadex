@@ -80,6 +80,9 @@ public class MicroAgentInterpreter implements IComponentInstance
 	/** The component listeners. */
 	protected List componentlisteners;
 	
+	/** Flag indicating that no steps may be scheduled any more. */
+	protected boolean nosteps;
+	
 	//-------- constructors --------
 	
 	/**
@@ -321,6 +324,16 @@ public class MicroAgentInterpreter implements IComponentInstance
 			{
 				public void run()
 				{	
+					nosteps = true;
+					ComponentTerminatedException ex = new ComponentTerminatedException(getAgentAdapter().getComponentIdentifier());
+					while(!steps.isEmpty())
+					{
+						Object[] step = removeStep();
+						Future future = (Future)step[1];
+						future.setException(ex);
+						System.out.println("Cleaning obsolete step: "+step[0]);
+					}
+					
 					for(int i=0; i<microagent.timers.size(); i++)
 					{
 						ITimer timer = (ITimer)microagent.timers.get(i);
@@ -562,8 +575,15 @@ public class MicroAgentInterpreter implements IComponentInstance
 	 */
 	protected void addStep(Object[] step)
 	{
-		steps.add(step);
-		notifyListeners(new ChangeEvent(this, "addStep", step));
+		if(nosteps)
+		{
+			((Future)step[1]).setException(new ComponentTerminatedException(getAgentAdapter().getComponentIdentifier()));
+		}
+		else
+		{
+			steps.add(step);
+			notifyListeners(new ChangeEvent(this, "addStep", step));
+		}
 	}
 	
 	/**
