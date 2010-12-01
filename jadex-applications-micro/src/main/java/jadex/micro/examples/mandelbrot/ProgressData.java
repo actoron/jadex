@@ -1,5 +1,6 @@
 package jadex.micro.examples.mandelbrot;
 
+import jadex.bridge.IComponentIdentifier;
 import jadex.commons.SUtil;
 
 import java.awt.Rectangle;
@@ -12,7 +13,10 @@ public class ProgressData
 	//-------- attributes --------
 	
 	/** The provider id. */
-	protected Object	providerid;
+	protected IComponentIdentifier	providerid;
+	
+	/** The task id. */
+	protected Object	taskid;
 	
 	/** The area. */
 	protected Rectangle	area;
@@ -38,9 +42,12 @@ public class ProgressData
 	/**
 	 *  Create a new ProgressData.
 	 */
-	public ProgressData(Object providerid, Rectangle area, boolean finished, int imagewidth, int imageheight)
+	public ProgressData(IComponentIdentifier providerid, Object taskid, Rectangle area, boolean finished, int imagewidth, int imageheight)
 	{
+		if(taskid==null)
+			System.out.println("sdklfhsdkljbvlk");
 		this.providerid	= providerid;
+		this.taskid	= taskid;
 		this.area	= area;
 		this.finished	= finished;
 		this.imagewidth = imagewidth;
@@ -52,19 +59,35 @@ public class ProgressData
 	/**
 	 *  Get the provider id.
 	 */
-	public Object getProviderId()
+	public IComponentIdentifier getProviderId()
 	{
 		return providerid;
 	}
-
+	
 	/**
 	 *  Set the provider id.
 	 */
-	public void setProviderId(Object providerid)
+	public void setProviderId(IComponentIdentifier providerid)
 	{
 		this.providerid = providerid;
 	}
 
+	/**
+	 *  Get the task id.
+	 */
+	public Object getTaskId()
+	{
+		return taskid;
+	}
+
+	/**
+	 *  Set the task id.
+	 */
+	public void setTaskId(Object taskid)
+	{
+		this.taskid = taskid;
+	}
+	
 	/**
 	 *  Get the area.
 	 */
@@ -97,24 +120,6 @@ public class ProgressData
 		this.finished = finished;
 	}
 	
-	/**
-	 *  Get the providerid.
-	 *  @return the providerid.
-	 */
-	public Object getProviderid()
-	{
-		return providerid;
-	}
-
-	/**
-	 *  Set the providerid.
-	 *  @param providerid The providerid to set.
-	 */
-	public void setProviderid(Object providerid)
-	{
-		this.providerid = providerid;
-	}
-
 	/**
 	 *  Get the imagewidth.
 	 *  @return the imagewidth.

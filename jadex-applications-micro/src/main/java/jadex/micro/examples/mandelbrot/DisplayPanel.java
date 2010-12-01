@@ -1,5 +1,7 @@
 package jadex.micro.examples.mandelbrot;
 
+import jadex.bridge.IComponentManagementService;
+import jadex.bridge.IExternalAccess;
 import jadex.commons.IFuture;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.commons.service.IServiceProvider;
@@ -15,17 +17,20 @@ import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Shape;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.geom.Rectangle2D;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Set;
+import java.util.Map;
 
 import javax.swing.JComponent;
 import javax.swing.JViewport;
 import javax.swing.SwingUtilities;
+import javax.swing.Timer;
 
 /**
  *  Panel for displaying calculated results.
@@ -33,6 +38,9 @@ import javax.swing.SwingUtilities;
 public class DisplayPanel extends JComponent
 {
 	//-------- attributes --------
+	
+	/** The service provider. */
+	protected IServiceProvider	provider;
 	
 	/** The colors for drawing. */
 	protected Color[]	colors;
@@ -52,8 +60,11 @@ public class DisplayPanel extends JComponent
 	/** Flag indicating that a calculation is in progress. */
 	protected boolean	calculating;
 	
-	/** Set of progress data objects (if calculating). */
-	protected Set	progressset;
+	/** Progress data objects, available only when calculating (progress data -> percent finished). */
+	protected Map	progressdata;
+	
+	/** Progress update timer. */
+	protected Timer	progressupdate;
 	
 	/** Start point for dragging (if any). */
 	protected Point	startdrag;
@@ -68,6 +79,7 @@ public class DisplayPanel extends JComponent
 	 */
 	public DisplayPanel(final IServiceProvider provider)
 	{
+		this.provider	= provider;
 		setColorScheme(new Color[]{new Color(50, 100, 0), Color.red});
 		
 		MouseAdapter ma = new MouseAdapter()
@@ -101,7 +113,7 @@ public class DisplayPanel extends JComponent
 				{
 //					System.out.println("dragged: "+startdrag+" "+enddrag);
 					
-					final Rectangle	bounds	= getInnerBounds(false);
+					Rectangle	bounds	= getInnerBounds(true);
 					Rectangle	drawarea	= scaleToFit(bounds, image.getWidth(DisplayPanel.this), image.getHeight(DisplayPanel.this));
 					int xdiff = startdrag.x-enddrag.x;
 					int ydiff = startdrag.y-enddrag.y;
@@ -164,7 +176,7 @@ public class DisplayPanel extends JComponent
 					calculating	= true;
 					repaint();
 					
-					final Rectangle	bounds	= getInnerBounds(false);
+					final Rectangle	bounds	= getInnerBounds(true);
 	
 					int sa = e.getScrollAmount();
 					int dir = e.getWheelRotation();
@@ -276,7 +288,7 @@ public class DisplayPanel extends JComponent
 						&& e.getY()>=range.y && e.getY()<=range.y+range.height)
 					{
 						// Calculate bounds relative to original image.
-						final Rectangle	bounds	= getInnerBounds(false);
+						Rectangle	bounds	= getInnerBounds(true);
 						Rectangle	drawarea	= scaleToFit(bounds, image.getWidth(DisplayPanel.this), image.getHeight(DisplayPanel.this));
 						final double	x	= (double)(range.x-bounds.x-drawarea.x)/drawarea.width;
 						final double	y	= (double)(range.y-bounds.y-drawarea.y)/drawarea.height;
@@ -289,19 +301,19 @@ public class DisplayPanel extends JComponent
 						final double	owidth	= data.getXEnd()-data.getXStart();
 						final double	oheight	= data.getYEnd()-data.getYStart();
 						
-						// Calculate pixel width/height of area.
+						// Calculate pixel width/height of visible area.
+						bounds	= getInnerBounds(false);
 						double	rratio	= (double)range.width/range.height;
 						double	bratio	= (double)bounds.width/bounds.height;
 						if(rratio<bratio)
 						{
-							int	width	= (int)(bounds.height*rratio);
-							bounds.width	= width;
+							bounds.width	= (int)(bounds.height*rratio);
 						}
 						else if(rratio>bratio)
 						{
-							int	height	= (int)(bounds.width/rratio);
-							bounds.height	= height;
+							bounds.height	= (int)(bounds.width/rratio);
 						}
+						final Rectangle	area	= bounds;
 					
 						DisplayPanel.this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 						calculating	= true;
@@ -313,7 +325,7 @@ public class DisplayPanel extends JComponent
 							{
 								IGenerateService	gs	= (IGenerateService)result;
 								AreaData ad = new AreaData(ox+owidth*x, ox+owidth*x2, oy+oheight*y, oy+oheight*y2,
-									bounds.width, bounds.height, data.getMax(), data.getParallel(), data.getTaskSize());
+									area.width, area.height, data.getMax(), data.getParallel(), data.getTaskSize());
 								IFuture	fut	= gs.generateArea(ad);
 								fut.addResultListener(new SwingDefaultResultListener(DisplayPanel.this)
 								{
@@ -426,7 +438,12 @@ public class DisplayPanel extends JComponent
 				
 				point	= null;
 				range	= null;
-				progressset	= null;
+				progressdata	= null;
+				if(progressupdate!=null)
+				{
+					progressupdate.stop();
+					progressupdate	= null;
+				}
 				calculating	= false;
 				DisplayPanel.this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 
@@ -446,12 +463,75 @@ public class DisplayPanel extends JComponent
 		{
 			public void run()
 			{
-				if(progressset==null)
-					progressset	= new HashSet();
+				if(progressdata==null)
+					progressdata	= new HashMap();
 				
-				progressset.remove(progress);
-				progressset.add(progress);
+				Integer	percent	= (Integer)progressdata.remove(progress);
+				if(percent==null || progress.isFinished())
+				{
+					percent	= new Integer(progress.isFinished() ? 100 : 0);
+				}
+				progressdata.put(progress, percent);
 				repaint();
+				
+				if(progressupdate==null)
+				{
+					progressupdate	= new Timer(500, new ActionListener()
+					{
+						public void actionPerformed(ActionEvent e)
+						{
+							SServiceProvider.getService(provider, IComponentManagementService.class)
+								.addResultListener(new SwingDefaultResultListener(DisplayPanel.this)
+							{
+								public void customResultAvailable(Object source, Object result)
+								{
+									IComponentManagementService	cms	= (IComponentManagementService)result;
+									for(Iterator it=progressdata.keySet().iterator(); it.hasNext(); )
+									{
+										final ProgressData	progress	= (ProgressData)it.next();
+										cms.getExternalAccess(progress.getProviderId())
+											.addResultListener(new SwingDefaultResultListener(DisplayPanel.this)
+										{
+											public void customResultAvailable(Object source, Object result)
+											{
+												IExternalAccess	ea	= (IExternalAccess)result;
+												SServiceProvider.getService(ea.getServiceProvider(), IProgressService.class)
+													.addResultListener(new SwingDefaultResultListener(DisplayPanel.this)
+												{
+													public void customResultAvailable(Object source, Object result)
+													{
+														IProgressService	ps	= (IProgressService)result;
+														if(ps!=null)
+														{
+															ps.getProgress(progress.getTaskId())
+																.addResultListener(new SwingDefaultResultListener(DisplayPanel.this)
+															{
+																public void customResultAvailable(Object source, Object result)
+																{
+																	if(progressdata!=null && progressdata.containsKey(progress))
+																	{
+																		Integer	current	= (Integer)result;
+																		Integer	percent	= (Integer)progressdata.get(progress);
+																		if(current.intValue()>percent.intValue())
+																		{
+																			progressdata.put(progress, percent);
+																			repaint();
+																		}
+																	}
+																}
+															});
+														}
+													}
+												});
+											}
+										});
+									}									
+								}
+							});
+						}
+					});
+					progressupdate.start();
+				}
 			}
 		});
 	}
@@ -519,9 +599,9 @@ public class DisplayPanel extends JComponent
 			}
 			
 			// Draw progress boxes.
-			if(progressset!=null)
+			if(progressdata!=null)
 			{
-				for(Iterator it=progressset.iterator(); it.hasNext(); )
+				for(Iterator it=progressdata.keySet().iterator(); it.hasNext(); )
 				{
 					ProgressData	progress	= (ProgressData)it.next();
 					
@@ -544,13 +624,30 @@ public class DisplayPanel extends JComponent
 					if(progress.getProviderId()!=null)
 					{
 						String	name	= progress.getProviderId().toString();
-						FontMetrics	fm	= g.getFontMetrics();
-						Rectangle2D	sb	= fm.getStringBounds(name, g);
-						if(sb.getWidth()<corw && sb.getHeight()<corh)
+						String	provider	= null;
+						String	percent	= progressdata.get(progress).toString()+"%";
+						int index	=	name.indexOf('@');
+						if(index!=-1)
 						{
-							int	x	= bounds.x+drawarea.x+corx+2 + (corw-(int)sb.getWidth())/2;
-							int	y	= bounds.y+drawarea.y+cory+2+(int)sb.getHeight()  + (corh-(int)sb.getHeight())/2;
+							provider	= name.substring(index+1);
+							name	= name.substring(0, index);
+						}
+						provider	= progress.getTaskId().toString();
+						
+						FontMetrics	fm	= g.getFontMetrics();
+						Rectangle2D	sb1	= fm.getStringBounds(name, g);
+						Rectangle2D	sb2	= provider!=null ? fm.getStringBounds(provider, g) : null;
+						Rectangle2D	sb3	= fm.getStringBounds(percent, g);
+						int width	= (int)Math.max(sb1.getWidth(), sb2!=null ? Math.max(sb2.getWidth(), sb3.getWidth()) : sb3.getWidth());
+						int	height	= fm.getHeight()*(sb2!=null ? 3 : 2);
+						if(width<corw && height<corh)
+						{
+							int	x	= bounds.x+drawarea.x+corx+2 + (corw-width)/2;
+							int	y	= bounds.y+drawarea.y+cory+2 + (corh-height)/2 + fm.getAscent() + fm.getLeading()/2;
 							g.drawString(name, x, y);
+							if(sb2!=null)
+								g.drawString(provider, x, y+fm.getHeight());
+							g.drawString(percent, x, y+fm.getHeight()*(sb2!=null?2:1));
 						}
 					}
 				}

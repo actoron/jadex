@@ -17,6 +17,12 @@ public class CalculateAgent extends MicroAgent
 	/** Flag indicating that the agent had a job. */
 	protected boolean hadjob;
 	
+	/** Id of the current job. */
+	protected Object	taskid;
+	
+	/** Progress of the current job. */
+	protected int progress;
+	
 	//-------- methods --------
 	
 	/**
@@ -24,7 +30,12 @@ public class CalculateAgent extends MicroAgent
 	 */
 	public void agentCreated()
 	{
+		// Calculation service runs on component thread.
 		addService(new CalculateService(this));
+		
+		// Progress service runs on separate thread to provide
+		// progress information about running calculations.
+		addDirectService(new ProgressService(this));
 	}
 	
 	/**
@@ -63,6 +74,38 @@ public class CalculateAgent extends MicroAgent
 	public boolean isHadJob()
 	{
 		return hadjob;
+	}
+	
+	/**
+	 *  Get the current task id.
+	 */
+	public Object	getTaskId()
+	{
+		return taskid;
+	}
+	
+	/**
+	 *  Set the current task id.
+	 */
+	public void	setTaskId(Object taskid)
+	{
+		this.taskid	= taskid;
+	}
+	
+	/**
+	 *  Get the current progress.
+	 */
+	public int	getProgress()
+	{
+		return progress;
+	}
+	
+	/**
+	 *  Set the current progress.
+	 */
+	public void	setProgress(int progress)
+	{
+		this.progress	= progress;
 	}
 	
 	//-------- static methods --------

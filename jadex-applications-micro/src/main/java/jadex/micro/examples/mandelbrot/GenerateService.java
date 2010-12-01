@@ -1,10 +1,12 @@
 package jadex.micro.examples.mandelbrot;
 
 import jadex.bridge.CreationInfo;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.SUtil;
+import jadex.commons.Tuple;
 import jadex.commons.concurrent.CollectionResultListener;
 import jadex.commons.concurrent.CounterResultListener;
 import jadex.commons.concurrent.DefaultResultListener;
@@ -207,8 +209,8 @@ public class GenerateService extends BasicService implements IGenerateService
 			public void intermediateResultAvailable(Object source, Object result)
 			{
 				AreaData ad = (AreaData)result;
-				int xs = (int)((int[])ad.getId())[0]*sizex;
-				int ys = (int)((int[])ad.getId())[1]*sizey;
+				int xs = (int)((Number)((Tuple)ad.getId()).getEntity(0)).intValue()*sizex;
+				int ys = (int)((Number)((Tuple)ad.getId()).getEntity(1)).intValue()*sizey;
 				
 				SwingUtilities.invokeLater(new Runnable()
 				{
@@ -220,7 +222,7 @@ public class GenerateService extends BasicService implements IGenerateService
 				
 				if(ds!=null)
 				{
-					ds.displayIntermediateResult(new ProgressData(null,
+					ds.displayIntermediateResult(new ProgressData((IComponentIdentifier)source, ad.getId(),
 						new Rectangle(xs, ys, ad.getSizeX(), ad.getSizeY()), true, data.getSizeX(), data.getSizeY()));
 				}
 				
@@ -253,12 +255,12 @@ public class GenerateService extends BasicService implements IGenerateService
 				AreaData ad = new AreaData(x1, xi==numx-1 && restx>0 ? x1+(xdiff*restx/sizex): x1+xdiff,
 					y1, yi==numy-1 && resty>0 ? y1+(ydiff*resty/sizey) : y1+ydiff,
 					xi==numx-1 && restx>0 ? restx : sizex, yi==numy-1 && resty>0 ? resty : sizey,
-					data.getMax(), 0, 0, new int[]{xi, yi}, null);
+					data.getMax(), 0, 0, new Tuple(new Integer(xi), new Integer(yi)), null);
 //				System.out.println("x:y: "+xi+" "+yi+" "+ad);
-				cs.calculateArea(ad).addResultListener(agent.createResultListener(new CalculateListener(agent, lis, ad)));
+				cs.calculateArea(ad).addResultListener(agent.createResultListener(new CalculateListener(agent, lis, ad, cs.getServiceIdentifier().getProviderId())));
 				if(ds!=null)
 				{
-					ds.displayIntermediateResult(new ProgressData(cs.getServiceIdentifier().getProviderId(),
+					ds.displayIntermediateResult(new ProgressData((IComponentIdentifier)cs.getServiceIdentifier().getProviderId(), ad.getId(),
 						new Rectangle(xi*sizex, yi*sizey, ad.getSizeX(), ad.getSizeY()), false, data.getSizeX(), data.getSizeY()));
 				}
 				x1 += xdiff;
@@ -283,14 +285,18 @@ class CalculateListener implements IResultListener
 	/** The data. */
 	protected AreaData data;
 	
+	/** The provider id. */
+	protected Object providerid;
+	
 	/**
 	 *  Create a new listener.
 	 */
-	public CalculateListener(GenerateAgent agent, IResultListener listener, AreaData data)
+	public CalculateListener(GenerateAgent agent, IResultListener listener, AreaData data, Object providerid)
 	{
 		this.agent = agent;
 		this.listener = listener;
 		this.data = data;
+		this.providerid = providerid;
 	}
 	
 	/**
@@ -300,7 +306,8 @@ class CalculateListener implements IResultListener
 	 */
 	public void resultAvailable(Object source, Object result)
 	{
-		listener.resultAvailable(source, result);
+		// Hack!!! Provide provider id.
+		listener.resultAvailable(providerid, result);
 	}
 	
 	/**

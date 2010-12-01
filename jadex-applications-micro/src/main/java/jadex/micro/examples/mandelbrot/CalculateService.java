@@ -35,6 +35,7 @@ public class CalculateService extends BasicService implements ICalculateService
 //		System.out.println("calc: "+data);
 		
 		agent.setHadJob(true);
+		agent.setTaskId(data.getId());
 		
 		// This code iterates over the area in a bounding boxes
 		// If a complete bounding box has is in the set the rest
@@ -59,6 +60,9 @@ public class CalculateService extends BasicService implements ICalculateService
 			|| data.getYStart()<2 && data.getYStart()>-2
 			|| data.getXEnd()<2 && data.getXEnd()>-2
 			|| data.getYEnd()<2 && data.getYEnd()>-2;
+			
+		int	size	= data.getSizeX()*data.getSizeY();
+		int	cnt	= 0;
 		
 		while(true)
 		{
@@ -111,8 +115,13 @@ public class CalculateService extends BasicService implements ICalculateService
 			{
 				allin = true;
 			}
+			
+			cnt++;
+			agent.setProgress(cnt*100/size);
 		}
 		
+		agent.setTaskId(null);
+		agent.setProgress(0);
 		data.setData(res);
 		ret.setResult(data);
 		
