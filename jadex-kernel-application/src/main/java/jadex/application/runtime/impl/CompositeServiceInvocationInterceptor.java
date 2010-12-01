@@ -40,10 +40,11 @@ public class CompositeServiceInvocationInterceptor implements IServiceInvocation
 	/** The component type. */
 	protected String componenttype;
 	
-	/** The component id. */
+	/** The static component id (if any). */
 	protected IComponentIdentifier cid;
 	
-//	protected Future creating;
+	/** A future of a component currently being created (if any). */
+	protected Future creating;
 	
 	//-------- constructors --------
 	
@@ -70,8 +71,6 @@ public class CompositeServiceInvocationInterceptor implements IServiceInvocation
 		final Future fut = new Future(); 
 		Object ret = fut;
 //		System.out.println("Invoked: "+method.getName());
-	
-		// todo: schedluleStep?! -> createResultListener
 		
 		ea.scheduleStep(new IComponentStep()
 		{
@@ -97,54 +96,48 @@ public class CompositeServiceInvocationInterceptor implements IServiceInvocation
 							}
 							else
 							{
-								final IResultListener lis = ia.createResultListener(new DelegationResultListener(fut)
+								IResultListener	lis	= ia.createResultListener(new DelegationResultListener(fut)
 								{
 									public void customResultAvailable(Object source, Object result)
 									{
 										IComponentIdentifier cid = (IComponentIdentifier)result;
 										invokeServiceMethod(ia, cid, sic, fut);
-										
-//											synchronized(ServiceInvocationHandler.this)
-//											{
-//												creating = null;
-//											}
 									}
 								});
 								
-//								boolean addlis = false;
-//								synchronized(ServiceInvocationHandler.this)
-//								{
-//									if(creating!=null)
-//									{
-//										addlis = true;
-//									}
-//								}
-					
-//								if(addlis)
-//								{
-//									creating.addResultListener(lis);
-//								}
-//								else
-//								{
-								SServiceProvider.getService(ea.getServiceProvider(), IComponentManagementService.class)
-									.addResultListener(ia.createResultListener(new DelegationResultListener(fut)
+								if(creating!=null)
+								{									
+									creating.addResultListener(lis);
+								}
+								else
 								{
-									public void customResultAvailable(Object source, Object result)
+									creating	= new Future();
+									creating.addResultListener(lis);
+									SServiceProvider.getService(ea.getServiceProvider(), IComponentManagementService.class)
+										.addResultListener(ia.createResultListener(new DelegationResultListener(fut)
 									{
-										final IComponentManagementService cms = (IComponentManagementService)result;
-										ea.getFileName(componenttype).addResultListener(ia.createResultListener(new DelegationResultListener(fut)
+										public void customResultAvailable(Object source, Object result)
 										{
-											public void customResultAvailable(Object source, Object result)
+											final IComponentManagementService cms = (IComponentManagementService)result;
+											ea.getFileName(componenttype).addResultListener(ia.createResultListener(new DelegationResultListener(fut)
 											{
-												String filename = (String)result;
-												
-												cms.createComponent(null, filename, new CreationInfo(
-													ea.getComponentIdentifier()), null).addResultListener(lis);
-											}
-										}));
-									}
-								}));
-//								}
+												public void customResultAvailable(Object source, Object result)
+												{
+													String filename = (String)result;
+													cms.createComponent(null, filename, new CreationInfo(ea.getComponentIdentifier()), null)
+														.addResultListener(ia.createResultListener(new DelegationResultListener(fut)
+													{
+														public void customResultAvailable(Object source, Object result)
+														{
+															creating.setResult(result);
+															creating	= null;
+														}
+													}));
+												}
+											}));
+										}
+									}));									
+								}
 							}
 						}
 					}));

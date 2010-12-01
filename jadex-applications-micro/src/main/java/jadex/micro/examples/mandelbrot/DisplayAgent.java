@@ -48,6 +48,7 @@ public class DisplayAgent extends MicroAgent
 				final JFrame	frame	= new JFrame(getAgentName());
 				JScrollPane	scroll	= new JScrollPane(panel);
 				JSplitPane	split	= new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, scroll, new ColorChooserPanel(panel));
+				split.setResizeWeight(1);
 				split.setOneTouchExpandable(true);
 				frame.getContentPane().add(BorderLayout.CENTER, split);
 				frame.setSize(500, 400);

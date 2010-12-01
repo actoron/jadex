@@ -24,6 +24,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 import javax.swing.JComponent;
+import javax.swing.JViewport;
 import javax.swing.SwingUtilities;
 
 /**
@@ -100,7 +101,7 @@ public class DisplayPanel extends JComponent
 				{
 //					System.out.println("dragged: "+startdrag+" "+enddrag);
 					
-					final Rectangle	bounds	= getInnerBounds();
+					final Rectangle	bounds	= getInnerBounds(false);
 					Rectangle	drawarea	= scaleToFit(bounds, image.getWidth(DisplayPanel.this), image.getHeight(DisplayPanel.this));
 					int xdiff = startdrag.x-enddrag.x;
 					int ydiff = startdrag.y-enddrag.y;
@@ -163,7 +164,7 @@ public class DisplayPanel extends JComponent
 					calculating	= true;
 					repaint();
 					
-					final Rectangle	bounds	= getInnerBounds();
+					final Rectangle	bounds	= getInnerBounds(false);
 	
 					int sa = e.getScrollAmount();
 					int dir = e.getWheelRotation();
@@ -224,9 +225,7 @@ public class DisplayPanel extends JComponent
 				if(SwingUtilities.isRightMouseButton(e))
 				{
 					DisplayPanel.this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-					calculating	= true;
-					repaint();
-					final Rectangle	bounds	= getInnerBounds();
+					final Rectangle	bounds	= getInnerBounds(false);
 					double	rratio	= 1;
 					double	bratio	= (double)bounds.width/bounds.height;
 					// Calculate pixel width/height of area.
@@ -240,6 +239,10 @@ public class DisplayPanel extends JComponent
 						int	height	= (int)(bounds.width/rratio);
 						bounds.height	= height;
 					}
+					
+					calculating	= true;
+					DisplayPanel.this.image	= createImage(bounds.width, bounds.height);
+					repaint();
 					
 					SServiceProvider.getService(provider, IGenerateService.class)
 						.addResultListener(new SwingDefaultResultListener()
@@ -273,7 +276,7 @@ public class DisplayPanel extends JComponent
 						&& e.getY()>=range.y && e.getY()<=range.y+range.height)
 					{
 						// Calculate bounds relative to original image.
-						final Rectangle	bounds	= getInnerBounds();
+						final Rectangle	bounds	= getInnerBounds(false);
 						Rectangle	drawarea	= scaleToFit(bounds, image.getWidth(DisplayPanel.this), image.getHeight(DisplayPanel.this));
 						final double	x	= (double)(range.x-bounds.x-drawarea.x)/drawarea.width;
 						final double	y	= (double)(range.y-bounds.y-drawarea.y)/drawarea.height;
@@ -465,7 +468,7 @@ public class DisplayPanel extends JComponent
 		// Draw image.
 		if(image!=null)
 		{
-			Rectangle bounds = getInnerBounds();
+			Rectangle bounds = getInnerBounds(true);
 			int	ix	= 0;
 			int iy	= 0;
 			int	iwidth	= image.getWidth(this);
@@ -557,7 +560,7 @@ public class DisplayPanel extends JComponent
 		// Draw range area.
 		if(!calculating && range!=null)
 		{
-			Rectangle bounds = getInnerBounds();
+			Rectangle bounds = getInnerBounds(false);
 			double	rratio	= (double)range.width/range.height;
 			double	bratio	= (double)bounds.width/bounds.height;
 			
@@ -613,10 +616,22 @@ public class DisplayPanel extends JComponent
 
 	/**
 	 *  Get the bounds with respect to insets (if any).
+	 *  @param scrollarea	True when inner bounds of scroll area instead of visible window space should be considered.
 	 */
-	protected Rectangle getInnerBounds()
+	protected Rectangle getInnerBounds(boolean scrollarea)
 	{
 		Rectangle	bounds	= getBounds();
+
+		if(!scrollarea && getParent() instanceof JViewport)
+		{
+			// Get bounds of outer scroll panel
+			Rectangle	pbounds	= getParent().getParent().getBounds();
+			if(bounds.width>pbounds.width || bounds.height>pbounds.height)
+			{
+				bounds	= pbounds;
+			}
+		}
+		
 		Insets	insets	= getInsets();
 		if(insets!=null)
 		{

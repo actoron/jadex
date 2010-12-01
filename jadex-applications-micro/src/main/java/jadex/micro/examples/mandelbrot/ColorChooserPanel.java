@@ -33,13 +33,12 @@ public class ColorChooserPanel	extends JPanel
 	{
 		super(new GridBagLayout());
 		
-		this.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Colors"));
+		this.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Color Scheme"));
 		
 		GridBagConstraints	gbc	= new GridBagConstraints();
 		gbc.fill	= GridBagConstraints.BOTH;
 		gbc.weightx	= 1;
 		gbc.weighty	= 1;
-		gbc.gridwidth	= 2;
 		gbc.insets	= new Insets(1, 1, 1, 1);
 		
 		final DefaultListModel	lm	= new DefaultListModel();
@@ -96,6 +95,25 @@ public class ColorChooserPanel	extends JPanel
 			}
 		});
 		
+		JButton	remove	= new JButton("remove");
+		remove.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				Object[]	cs	= colors.getSelectedValues();
+				for(int i=0; i<cs.length; i++)
+				{
+					lm.removeElement(cs[i]);
+				}
+				setColorScheme(panel, lm);
+			}
+		});
+		gbc.weighty	= 0;
+		gbc.fill	= GridBagConstraints.NONE;
+		gbc.anchor	= GridBagConstraints.EAST;
+		gbc.gridy	= 2;
+		this.add(remove, gbc);
+
 		JButton	add	= new JButton("add...");
 		add.addActionListener(new ActionListener()
 		{
@@ -109,31 +127,11 @@ public class ColorChooserPanel	extends JPanel
 				}
 			}
 		});
-		gbc.gridwidth	= 1;
-		gbc.gridy	= 2;
-		gbc.weightx	= 1;
-		gbc.weighty	= 0;
-		gbc.fill	= GridBagConstraints.NONE;
-		gbc.anchor	= GridBagConstraints.EAST;
+		gbc.gridy	= 3;
 		this.add(add, gbc);
-		
-		
-		JButton	remove	= new JButton("remove");
-		remove.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				Color	c	= (Color)colors.getSelectedValue();
-				if(c!=null)
-				{
-					lm.removeElement(c);
-					setColorScheme(panel, lm);
-				}
-			}
-		});
-		gbc.weightx	= 0;
-		this.add(remove, gbc);
 
+		add.setMinimumSize(remove.getMinimumSize());
+		add.setPreferredSize(remove.getPreferredSize());
 	}
 
 	/**
@@ -146,3 +144,4 @@ public class ColorChooserPanel	extends JPanel
 		panel.setColorScheme(scheme);
 	}
 }
+
