@@ -478,6 +478,14 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 				{
 					public void resultAvailable(Object source, Object result)
 					{
+						synchronized(ext_entries)
+						{
+							if(!ext_entries.isEmpty())
+							{
+								System.out.println("Ext entries after cleanup: "+cid+", "+ext_entries);
+							}
+						}
+						
 						shutdownContainer().addResultListener(new DelegationResultListener(ret));
 					}
 					

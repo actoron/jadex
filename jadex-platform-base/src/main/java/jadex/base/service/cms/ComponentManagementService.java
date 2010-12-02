@@ -606,32 +606,38 @@ public abstract class ComponentManagementService extends BasicService implements
 					{
 						public void resultAvailable(Object source, Object result)
 						{
-							IComponentAdapter component = (IComponentAdapter)adapters.get(cid);
-							// Component may be already killed (e.g. when autoshutdown).
-							if(component!=null)
+							synchronized(adapters)
 							{
-		//						System.out.println("killing: "+cid+" "+component.getParent().getComponentIdentifier().getLocalName());
-								
-								// todo: does not work always!!! A search could be issued before components had enough time to kill itself!
-								// todo: killcomponent should only be called once for each component?
-								if(!ccs.containsKey(cid))
+								synchronized(descs)
 								{
-		//								System.out.println("killing a: "+cid);
-									
-									CleanupCommand	cc	= new CleanupCommand(cid);
-									ccs.put(cid, cc);
-									cc.addKillFuture(ret);
-									killComponent(component).addResultListener(cc);
-//									component.killComponent(cc);	
-								}
-								else
-								{
-		//								System.out.println("killing b: "+cid);
-									
-									CleanupCommand	cc	= (CleanupCommand)ccs.get(cid);
-									if(cc==null)
-										ret.setException(new RuntimeException("No cleanup command for component "+cid+": "+desc.getState()));
-									cc.addKillFuture(ret);
+									IComponentAdapter component = (IComponentAdapter)adapters.get(cid);
+									// Component may be already killed (e.g. when autoshutdown).
+									if(component!=null)
+									{
+				//						System.out.println("killing: "+cid+" "+component.getParent().getComponentIdentifier().getLocalName());
+										
+										// todo: does not work always!!! A search could be issued before components had enough time to kill itself!
+										// todo: killcomponent should only be called once for each component?
+										if(!ccs.containsKey(cid))
+										{
+				//								System.out.println("killing a: "+cid);
+											
+											CleanupCommand	cc	= new CleanupCommand(cid);
+											ccs.put(cid, cc);
+											cc.addKillFuture(ret);
+											killComponent(component).addResultListener(cc);
+		//									component.killComponent(cc);	
+										}
+										else
+										{
+				//								System.out.println("killing b: "+cid);
+											
+											CleanupCommand	cc	= (CleanupCommand)ccs.get(cid);
+											if(cc==null)
+												ret.setException(new RuntimeException("No cleanup command for component "+cid+": "+desc.getState()));
+											cc.addKillFuture(ret);
+										}
+									}
 								}
 							}
 						}
@@ -1082,7 +1088,7 @@ public abstract class ComponentManagementService extends BasicService implements
 //					System.out.println("CleanupCommand: "+result);
 		//			boolean shutdown = false;
 		
-//					System.out.println("CleanupCommand remove called for: "+cid);
+					System.out.println("CleanupCommand remove called for: "+cid);
 					adapter = (IComponentAdapter)adapters.remove(cid);
 					if(adapter==null)
 						throw new RuntimeException("Component Identifier not registered: "+cid);
