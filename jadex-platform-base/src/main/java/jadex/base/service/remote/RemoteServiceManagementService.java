@@ -96,12 +96,12 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	/**
 	 *  Create a new remote service management service.
 	 */
-	public RemoteServiceManagementService(IMicroExternalAccess component, IClockService clock)
+	public RemoteServiceManagementService(IMicroExternalAccess component, IClockService clock, ILibraryService libservice)
 	{
 		super(component.getServiceProvider().getId(), IRemoteServiceManagementService.class, null);
 
 		this.component = component;
-		this.rrm = new RemoteReferenceModule(this, clock);
+		this.rrm = new RemoteReferenceModule(this, clock, libservice);
 		this.waitingcalls = new HashMap();
 		
 		QName[] pr = new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"jadex.base.service.remote", "ProxyReference")};

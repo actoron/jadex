@@ -1,10 +1,12 @@
 package jadex.micro.examples.chat;
 
+import jadex.commons.service.IService;
+
 
 /**
  *  
  */
-public interface IChatService
+public interface IChatService extends IService
 {
 	/**
 	 *  Tell something.

@@ -51,9 +51,7 @@ public class ProxyInfo
 	 *  Create a new proxy info.
 	 */
 	public ProxyInfo(Class[] targetinterfaces)
-//	public ProxyInfo(RemoteReference rr, Class[] targetinterfaces)
 	{
-//		this.rr = rr;
 		setTargetInterfaces(targetinterfaces);
 		
 //		System.out.println("proxy with: "+SUtil.arrayToString(targetinterfaces));

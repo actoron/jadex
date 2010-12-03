@@ -41,8 +41,17 @@ public class RemoteServiceManagementAgent extends MicroAgent
 		{
 			public void resultAvailable(Object source, Object result)
 			{
-				rms = new RemoteServiceManagementService((IMicroExternalAccess)getExternalAccess(), (IClockService)result);
-				addDirectService(rms);
+				final IClockService clock = (IClockService)result;
+				SServiceProvider.getService(getServiceProvider(), ILibraryService.class)
+					.addResultListener(createResultListener(new DefaultResultListener()
+				{
+					public void resultAvailable(Object source, Object result)
+					{
+						final ILibraryService libservice = (ILibraryService)result;
+						rms = new RemoteServiceManagementService((IMicroExternalAccess)getExternalAccess(), clock, libservice);
+						addDirectService(rms);
+					}
+				}));
 			}
 		}));
 	}

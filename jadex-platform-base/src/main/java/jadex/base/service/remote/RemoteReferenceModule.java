@@ -19,6 +19,7 @@ import jadex.commons.service.IService;
 import jadex.commons.service.IServiceIdentifier;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.clock.IClockService;
+import jadex.commons.service.library.ILibraryService;
 import jadex.micro.ExternalAccess;
 
 import java.lang.reflect.Method;
@@ -78,6 +79,9 @@ public class RemoteReferenceModule
 	/** The clock. */
 	protected IClockService clock;
 	
+	/** The library service. */
+	protected ILibraryService libservice;
+	
 	/** The renew behaviour id. */
 	protected long renewid;
 	
@@ -89,10 +93,11 @@ public class RemoteReferenceModule
 	/**
 	 *  Create a new remote reference module.
 	 */
-	public RemoteReferenceModule(RemoteServiceManagementService rsms, IClockService clock)
+	public RemoteReferenceModule(RemoteServiceManagementService rsms, IClockService clock, ILibraryService libservice)
 	{
 		this.rsms = rsms;
 		this.clock = clock;
+		this.libservice = libservice;
 		
 		this.interfaceproperties = new HashMap();
 		this.proxyinfos = new LRU(200);
@@ -566,7 +571,7 @@ public class RemoteReferenceModule
 			System.arraycopy(tmp, 0, interfaces, 0, tmp.length);
 			interfaces[tmp.length] = IFinalize.class;
 			
-			ret = Proxy.newProxyInstance(rsms.getComponent().getModel().getClassLoader(), 
+			ret = Proxy.newProxyInstance(libservice.getClassLoader(), 
 				interfaces, new RemoteMethodInvocationHandler(rsms, pr));
 			
 			incProxyCount(pr.getRemoteReference());

@@ -59,6 +59,9 @@ public class RMIPreProcessor implements IPreProcessor
 	{
 		List ret = new ArrayList();
 		
+		if(object.getClass().getName().indexOf("Chat")!=-1)
+			System.out.println("here");
+		
 		if(object!=null)
 		{
 			Class clazz = object.getClass();

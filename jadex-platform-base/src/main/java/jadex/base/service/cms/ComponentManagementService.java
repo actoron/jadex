@@ -1202,6 +1202,9 @@ public abstract class ComponentManagementService extends BasicService implements
 			{
 				destroyComponent(pad.getComponentIdentifier());
 			}
+			
+			
+			
 		}
 		
 		public void exceptionOccurred(Object source, Exception exception)
