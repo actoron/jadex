@@ -49,7 +49,10 @@ public class CalculateAgent extends MicroAgent
 			public Object execute(IInternalAccess ia)
 			{
 				if(!isHadJob())
+				{
+					System.out.println("killComponent: "+getComponentIdentifier());
 					killComponent();
+				}
 				setHadJob(false);
 				waitFor(delay, this);
 				return null;

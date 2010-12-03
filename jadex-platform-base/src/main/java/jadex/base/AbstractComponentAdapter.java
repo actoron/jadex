@@ -653,6 +653,10 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 				{
 					try
 					{
+						if(entries[i].toString().indexOf("calc")!=-1)
+						{
+							System.out.println("scheduleStep: "+getComponentIdentifier());
+						}
 						entries[i].run();
 					}
 					catch(Exception e)

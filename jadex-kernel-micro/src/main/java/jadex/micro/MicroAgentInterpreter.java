@@ -324,6 +324,7 @@ public class MicroAgentInterpreter implements IComponentInstance
 			{
 				public void run()
 				{	
+					System.out.println("cleanupComponent: "+getAgentAdapter().getComponentIdentifier());
 					nosteps = true;
 					ComponentTerminatedException ex = new ComponentTerminatedException(getAgentAdapter().getComponentIdentifier());
 					while(!steps.isEmpty())
@@ -560,6 +561,11 @@ public class MicroAgentInterpreter implements IComponentInstance
 				public void run()
 				{
 					addStep(new Object[]{step, ret});
+				}
+				
+				public String toString()
+				{
+					return "invokeLater("+step+")";
 				}
 			});
 		}

@@ -98,7 +98,7 @@ public class DecouplingServiceInvocationInterceptor implements IServiceInvocatio
 			IFuture resfut = ea.scheduleStep(new IComponentStep()
 			{
 				public Object execute(IInternalAccess ia)
-				{
+				{					
 					final Future fut = new Future();
 					
 					try
@@ -120,6 +120,11 @@ public class DecouplingServiceInvocationInterceptor implements IServiceInvocatio
 					}
 					
 					return fut;
+				}
+				
+				public String toString()
+				{
+					return "invokeMethod("+sic.getMethod()+")";
 				}
 			});
 			
