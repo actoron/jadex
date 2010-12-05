@@ -661,19 +661,25 @@ public class DisplayPanel extends JComponent
 						Rectangle2D	sb1	= fm.getStringBounds(name, g);
 						Rectangle2D	sb2	= fm.getStringBounds(provider, g);
 						int width	= (int)Math.max(sb1.getWidth(), sb2.getWidth());
-						int	height	= fm.getHeight()*2+barsize.height;
+						int	height	= fm.getHeight()*2 + barsize.height + 2;
 						if(width<corw-4 && height<corh-4)
 						{
-							bar.setStringPainted(true);
+							// Draw provider id.
 							int	x	= bounds.x+drawarea.x+corx + (corw-width)/2;
-							int	y	= bounds.y+drawarea.y+cory + (corh-height)/2;
-							g.drawString(name, x, y + fm.getAscent() + fm.getLeading()/2);
-							g.drawString(provider, x, y + fm.getAscent() + fm.getLeading()/2 + fm.getHeight());
+							int	y	= bounds.y+drawarea.y+cory + (corh-height)/2 + fm.getLeading()/2;
+							g.drawString(name, x, y + fm.getAscent());
+							g.drawString(provider, x, y + fm.getAscent() + fm.getHeight());
+							
+							// Draw progress bar.
+							bar.setStringPainted(true);
 							bar.setValue(((Number)progressdata.get(progress)).intValue());
+							width	= Math.min(corw-4, barsize.width);
+							x	= bounds.x+drawarea.x+corx + (corw-width)/2;
+							y	= y + fm.getHeight()*2 + 2;
 							bar.setBounds(0, 0, width, barsize.height);
-							g.translate(x, y+fm.getHeight()*2);
+							g.translate(x, y);
 							bar.paint(g);
-							g.translate(-x, -y-fm.getHeight()*2);
+							g.translate(-x, -y);
 						}
 						else if(corw>8 && corh>8)
 						{
