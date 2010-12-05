@@ -28,6 +28,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 import javax.swing.JComponent;
+import javax.swing.JProgressBar;
 import javax.swing.JViewport;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
@@ -550,7 +551,7 @@ public class DisplayPanel extends JComponent
 							});
 						}
 					});
-//					progressupdate.start();
+					progressupdate.start();
 				}
 			}
 		});
@@ -621,12 +622,15 @@ public class DisplayPanel extends JComponent
 			// Draw progress boxes.
 			if(progressdata!=null)
 			{
+				JProgressBar	bar	= new JProgressBar(0, 100);
+				bar.setStringPainted(true);
+				Dimension	barsize	= bar.getPreferredSize();
 				for(Iterator it=progressdata.keySet().iterator(); it.hasNext(); )
 				{
 					ProgressData	progress	= (ProgressData)it.next();
 					
-					double xf = ((double)drawarea.getWidth())/progress.getImageWidth();
-					double yf = ((double)drawarea.getHeight())/progress.getImageHeight();
+					double xf = drawarea.getWidth()/progress.getImageWidth();
+					double yf = drawarea.getHeight()/progress.getImageHeight();
 					int corx = (int)(progress.getArea().x*xf);
 					int cory = (int)(progress.getArea().y*yf);
 					int corw = (int)(progress.getArea().width*xf);
@@ -644,8 +648,7 @@ public class DisplayPanel extends JComponent
 					if(progress.getProviderId()!=null)
 					{
 						String	name	= progress.getProviderId().toString();
-						String	provider	= null;
-						String	percent	= progressdata.get(progress).toString()+"%";
+						String	provider	= "";
 						int index	=	name.indexOf('@');
 						if(index!=-1)
 						{
@@ -656,18 +659,32 @@ public class DisplayPanel extends JComponent
 						
 						FontMetrics	fm	= g.getFontMetrics();
 						Rectangle2D	sb1	= fm.getStringBounds(name, g);
-						Rectangle2D	sb2	= provider!=null ? fm.getStringBounds(provider, g) : null;
-						Rectangle2D	sb3	= fm.getStringBounds(percent, g);
-						int width	= (int)Math.max(sb1.getWidth(), sb2!=null ? Math.max(sb2.getWidth(), sb3.getWidth()) : sb3.getWidth());
-						int	height	= fm.getHeight()*(sb2!=null ? 3 : 2);
-						if(width<corw && height<corh)
+						Rectangle2D	sb2	= fm.getStringBounds(provider, g);
+						int width	= (int)Math.max(sb1.getWidth(), sb2.getWidth());
+						int	height	= fm.getHeight()*2+barsize.height;
+						if(width<corw-4 && height<corh-4)
 						{
-							int	x	= bounds.x+drawarea.x+corx+2 + (corw-width)/2;
-							int	y	= bounds.y+drawarea.y+cory+2 + (corh-height)/2 + fm.getAscent() + fm.getLeading()/2;
-							g.drawString(name, x, y);
-							if(sb2!=null)
-								g.drawString(provider, x, y+fm.getHeight());
-							g.drawString(percent, x, y+fm.getHeight()*(sb2!=null?2:1));
+							bar.setStringPainted(true);
+							int	x	= bounds.x+drawarea.x+corx + (corw-width)/2;
+							int	y	= bounds.y+drawarea.y+cory + (corh-height)/2;
+							g.drawString(name, x, y + fm.getAscent() + fm.getLeading()/2);
+							g.drawString(provider, x, y + fm.getAscent() + fm.getLeading()/2 + fm.getHeight());
+							bar.setValue(((Number)progressdata.get(progress)).intValue());
+							bar.setBounds(0, 0, width, barsize.height);
+							g.translate(x, y+fm.getHeight()*2);
+							bar.paint(g);
+							g.translate(-x, -y-fm.getHeight()*2);
+						}
+						else if(corw>8 && corh>8)
+						{
+							bar.setStringPainted(false);
+							int	x	= bounds.x+drawarea.x+corx + 2;
+							int	y	= bounds.y+drawarea.y+cory + Math.max((corh-barsize.height)/2, 2);
+							bar.setValue(((Number)progressdata.get(progress)).intValue());
+							bar.setBounds(0, 0, corw-4, Math.min(barsize.height, corh-4));
+							g.translate(x, y);
+							bar.paint(g);
+							g.translate(-x, -y);
 						}
 					}
 				}

@@ -480,6 +480,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 					{
 						synchronized(ext_entries)
 						{
+							System.out.println("Checking ext entries after cleanup: "+cid);
 							if(!ext_entries.isEmpty())
 							{
 								System.out.println("Ext entries after cleanup: "+cid+", "+ext_entries);
@@ -801,6 +802,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 
 		synchronized(ext_entries)
 		{
+			System.out.println("Adding to ext entries: "+cid);
 			if(ext_forbidden)
 			{
 				throw new ComponentTerminatedException(cid);
