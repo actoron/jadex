@@ -42,13 +42,13 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 	protected String[] breakpoints;
 	
 	/** The master flag. */
-	protected boolean master;
+	protected Boolean master;
 	
 	/** The daemon flag. */
-	protected boolean daemon;
+	protected Boolean daemon;
 	
 	/** The auto shutdown flag. */
-	protected boolean autoshutdown;
+	protected Boolean autoshutdown;
 	
 	/** The model name. */
 	protected String modelname;
@@ -65,7 +65,8 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 	/**
 	 *  Create a new CESComponentDescription.
 	 */
-	public CMSComponentDescription(IComponentIdentifier cid, String type, IComponentIdentifier parent, boolean master, boolean daemon, boolean autoshutdown, String modelname)
+	public CMSComponentDescription(IComponentIdentifier cid, String type, IComponentIdentifier parent, 
+		Boolean master, Boolean daemon, Boolean autoshutdown, String modelname)
 	{
 		this();
 		setName(cid);
@@ -251,58 +252,58 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 	
 	/**
 	 *  Get the master.
-	 *  @return The master.
+	 *  @return the master.
 	 */
-	public boolean isMaster()
+	public Boolean getMaster()
 	{
-		return this.master;
+		return master;
 	}
 
 	/**
 	 *  Set the master.
 	 *  @param master The master to set.
 	 */
-	public void setMaster(boolean master)
+	public void setMaster(Boolean master)
 	{
 		this.master = master;
 	}
-	
+
 	/**
 	 *  Get the daemon.
-	 *  @return The daemon.
+	 *  @return the daemon.
 	 */
-	public boolean isDaemon()
+	public Boolean getDaemon()
 	{
-		return this.daemon;
+		return daemon;
 	}
 
 	/**
 	 *  Set the daemon.
 	 *  @param daemon The daemon to set.
 	 */
-	public void setDaemon(boolean daemon)
+	public void setDaemon(Boolean daemon)
 	{
 		this.daemon = daemon;
 	}
-	
+
 	/**
-	 *  Get the auto shutdown flag.
-	 *  @return	The flag.
+	 *  Get the autoshutdown.
+	 *  @return the autoshutdown.
 	 */
-	public boolean isAutoShutdown()
+	public Boolean getAutoShutdown()
 	{
 		return autoshutdown;
 	}
-	
+
 	/**
-	 *  Set the auto shutdown flag.
-	 *  @param autoshutdown	The flag.
+	 *  Set the autoshutdown.
+	 *  @param autoshutdown The autoshutdown to set.
 	 */
-	public void	setAutoShutdown(boolean autoshutdown)
+	public void setAutoShutdown(Boolean autoshutdown)
 	{
-		this.autoshutdown	= autoshutdown;
+		this.autoshutdown = autoshutdown;
 	}
-	
+
 	/**
 	 *  Get the model name.
 	 *  @return The name.

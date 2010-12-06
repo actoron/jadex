@@ -90,7 +90,7 @@ public interface IComponentDescription
 	 *  When a master component is killed the parent component will be killed two.
 	 *  @return True, if master component.
 	 */
-	public boolean isMaster();
+	public Boolean getMaster();
 
 	/**
 	 *  Is the component a daemon.
@@ -98,11 +98,11 @@ public interface IComponentDescription
 	 *  the platform will also be shutdowned.
 	 *  @return True, if daemon component.
 	 */
-	public boolean isDaemon();
+	public Boolean getDaemon();
 	
 	/**
 	 *  Get the auto shutdown flag.
 	 *  @return	The flag.
 	 */
-	public boolean isAutoShutdown();
+	public Boolean getAutoShutdown();
 }

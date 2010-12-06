@@ -25,7 +25,7 @@ public class CMSLocalCreateComponentPlan extends Plan
 		String	config	= (String)getParameter("configuration").getValue();
 		Map	args	= (Map)getParameter("arguments").getValue();
 		boolean	suspend	= ((Boolean)getParameter("suspend").getValue()).booleanValue();
-		boolean	master	= ((Boolean)getParameter("master").getValue()).booleanValue();
+		Boolean	master	= (Boolean)getParameter("master").getValue();
 		IComponentIdentifier	parent	= (IComponentIdentifier)getParameter("parent").getValue();
 
 		try

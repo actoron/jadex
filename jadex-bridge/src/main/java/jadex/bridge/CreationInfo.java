@@ -25,13 +25,13 @@ public class CreationInfo
 	protected boolean	suspend;
 
 	/** The master flag (default: false). */
-	protected boolean	master;
+	protected Boolean	master;
 	
 	/** The daemon flag (default: false). */
-	protected boolean daemon;
+	protected Boolean daemon;
 	
 	/** The auto shutdown flag (default: false). */
-	protected boolean autoshutdown;
+	protected Boolean autoshutdown;
 	
 	/** The imports. */
 	protected String[]	imports;
@@ -92,7 +92,7 @@ public class CreationInfo
 	 */
 	public CreationInfo(String config, Map args, IComponentIdentifier parent)
 	{
-		this(config, args, parent, false, false);
+		this(config, args, parent, false, null);
 	}
 	
 	/**
@@ -103,9 +103,9 @@ public class CreationInfo
 	 *  @param suspend	The suspend flag.
 	 *  @param master	The master flag.
 	 */
-	public CreationInfo(String config, Map args, IComponentIdentifier parent, boolean suspend, boolean master)
+	public CreationInfo(String config, Map args, IComponentIdentifier parent, boolean suspend, Boolean master)
 	{
-		this(config, args, parent, suspend, master, false);
+		this(config, args, parent, suspend, master, null);
 	}
 	
 	/**
@@ -116,7 +116,7 @@ public class CreationInfo
 	 *  @param suspend	The suspend flag.
 	 *  @param master	The master flag.
 	 */
-	public CreationInfo(String config, Map args, IComponentIdentifier parent, boolean suspend, boolean master, boolean daemon)
+	public CreationInfo(String config, Map args, IComponentIdentifier parent, boolean suspend, Boolean master, Boolean daemon)
 	{
 		this(config, args, parent, suspend, master, daemon, null);
 	}
@@ -130,7 +130,7 @@ public class CreationInfo
 	 *  @param master	The master flag.
 	 *  @param imports	The imports.
 	 */
-	public CreationInfo(String config, Map args, IComponentIdentifier parent, boolean suspend, boolean master, boolean daemon, String[] imports)
+	public CreationInfo(String config, Map args, IComponentIdentifier parent, boolean suspend, Boolean master, Boolean daemon, String[] imports)
 	{
 		this.config	= config;
 		this.args	= args;
@@ -216,57 +216,57 @@ public class CreationInfo
 	}
 
 	/**
-	 *  Get the master flag.
-	 *  @return the master flag.
+	 *  Get the master.
+	 *  @return The master.
 	 */
-	public boolean isMaster()
+	public Boolean getMaster()
 	{
 		return master;
 	}
 
 	/**
-	 *  Set the master flag.
-	 *  @param master the master to set
+	 *  Set the master.
+	 *  @param master The master to set.
 	 */
-	public void setMaster(boolean master)
+	public void setMaster(Boolean master)
 	{
 		this.master = master;
 	}
-	
+
 	/**
 	 *  Get the daemon.
 	 *  @return The daemon.
 	 */
-	public boolean isDaemon()
+	public Boolean getDaemon()
 	{
-		return this.daemon;
+		return daemon;
 	}
 
 	/**
 	 *  Set the daemon.
 	 *  @param daemon The daemon to set.
 	 */
-	public void setDaemon(boolean daemon)
+	public void setDaemon(Boolean daemon)
 	{
 		this.daemon = daemon;
 	}
-	
+
 	/**
-	 *  Get the auto shutdown flag.
-	 *  @return	The flag.
+	 *  Get the autoshutdown.
+	 *  @return The autoshutdown.
 	 */
-	public boolean isAutoShutdown()
+	public Boolean getAutoShutdown()
 	{
 		return autoshutdown;
 	}
-	
+
 	/**
-	 *  Set the auto shutdown flag.
-	 *  @param autoshutdown	The flag.
+	 *  Set the autoshutdown.
+	 *  @param autoshutdown The autoshutdown to set.
 	 */
-	public void	setAutoShutdown(boolean autoshutdown)
+	public void setAutoshutdown(Boolean autoshutdown)
 	{
-		this.autoshutdown	= autoshutdown;
+		this.autoshutdown = autoshutdown;
 	}
 
 	/**

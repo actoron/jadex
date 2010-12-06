@@ -10,7 +10,7 @@
     <vertices xmi:type="bpmn:Activity" xmi:id="_5q6OSVm7Ed-CVtZr0hfiVg" iD="_5q6OSFm7Ed-CVtZr0hfiVg" outgoingEdges="_eKz52lm8Ed-CVtZr0hfiVg" incomingEdges="_ZHwPqlm8Ed-CVtZr0hfiVg" name="Make Proposal" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_YcGDgFm8Ed-CVtZr0hfiVg" source="jadex">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_YcGDgVm8Ed-CVtZr0hfiVg" key="class" value="jadex.bpmn.runtime.task.WriteContextTask"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_h-mUgFm8Ed-CVtZr0hfiVg" key="parameters" value="in␋name␋Object␋&quot;proposal&quot;␟in␋value␋Object␋&quot;Proposal from &quot;+$interpreter.getParent().getLocalName()"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_h-mUgFm8Ed-CVtZr0hfiVg" key="parameters" value="in␋name␋Object␋&quot;proposal&quot;␟in␋value␋Object␋&quot;Proposal from &quot;+$interpreter.getParent().getComponentIdentifier().getLocalName()"/>
       </eAnnotations>
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_ZHwPoVm8Ed-CVtZr0hfiVg" iD="_ZHwPoFm8Ed-CVtZr0hfiVg" outgoingEdges="_ZHwPqlm8Ed-CVtZr0hfiVg _cpWuKlm8Ed-CVtZr0hfiVg" incomingEdges="_aS2w2lm8Ed-CVtZr0hfiVg" activityType="GatewayDataBasedExclusive"/>

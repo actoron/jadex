@@ -251,7 +251,7 @@ public abstract class ComponentManagementService extends BasicService implements
 						final IComponentAdapter pad = getParentAdapter(cinfo);
 						IExternalAccess parent = getComponentInstance(pad).getExternalAccess();
 						final CMSComponentDescription ad = new CMSComponentDescription(cid, type, 
-							getParentIdentifier(cinfo), cinfo.isMaster(), cinfo.isDaemon(), cinfo.isAutoShutdown(), lmodel.getFullName());
+							getParentIdentifier(cinfo), cinfo.getMaster(), cinfo.getDaemon(), cinfo.getAutoShutdown(), lmodel.getFullName());
 						
 						Future future = new Future();
 						future.addResultListener(new IResultListener()
@@ -279,6 +279,7 @@ public abstract class ComponentManagementService extends BasicService implements
 										
 										// Init successfully finished. Add description and adapter.
 										adapter = (IComponentAdapter)((Object[])result)[1];
+										
 										descs.put(cid, ad);
 //										System.out.println("adding cid: "+cid);
 										adapters.put(cid, adapter);
@@ -296,7 +297,10 @@ public abstract class ComponentManagementService extends BasicService implements
 										}
 										padesc.addChild(cid);
 										
-										if(padesc.isAutoShutdown() && !ad.isDaemon())
+										Boolean pas = padesc.getAutoShutdown();
+										Boolean dae = ad.getDaemon();
+//										if(padesc.isAutoShutdown() && !ad.isDaemon())
+										if(pas!=null && pas.booleanValue() && (dae==null || !dae.booleanValue()))
 										{
 											Integer	childcount	= (Integer)childcounts.get(padesc.getName());
 											childcounts.put(padesc.getName(), new Integer(childcount!=null ? childcount.intValue()+1 : 1));
@@ -1108,12 +1112,16 @@ public abstract class ComponentManagementService extends BasicService implements
 						cancel(adapter);
 //						exeservice.cancel(adapter);
 						
-						killparent	= desc.isMaster();
+//						killparent	= desc.isMaster();
+						killparent = desc.getMaster()!=null && desc.getMaster().booleanValue();
 						CMSComponentDescription padesc = (CMSComponentDescription)descs.get(desc.getParent());
 						if(padesc!=null)
 						{
 							padesc.removeChild(desc.getName());
-							if(padesc.isAutoShutdown() && !desc.isDaemon())
+							Boolean pas = padesc.getAutoShutdown();
+							Boolean dae = desc.getDaemon();
+							if(pas!=null && pas.booleanValue() && (dae==null || !dae.booleanValue()))
+//							if(padesc.isAutoShutdown() && !desc.isDaemon())
 							{
 								Integer	childcount	= (Integer)childcounts.get(padesc.getName());
 								assert childcount!=null && childcount.intValue()>0;
@@ -1415,7 +1423,7 @@ public abstract class ComponentManagementService extends BasicService implements
 	 */
 	public IComponentDescription createComponentDescription(IComponentIdentifier id, String state, String ownership, String type, IComponentIdentifier parent, String modelname)
 	{
-		CMSComponentDescription	ret	= new CMSComponentDescription(id, type, parent, false, false, false, modelname);
+		CMSComponentDescription	ret	= new CMSComponentDescription(id, type, parent, null, null, null, modelname);
 		ret.setState(state);
 		ret.setOwnership(ownership);
 		return ret;
