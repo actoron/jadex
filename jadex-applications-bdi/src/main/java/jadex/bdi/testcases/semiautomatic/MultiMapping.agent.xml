@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+ -->
+<agent xmlns="http://jadex.sourceforge.net/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-bdi
+						http://jadex.sourceforge.net/jadex-bdi-2.0.xsd"
+	name="Test"
+	package="jadex.bdi">
+	
+	<imports>
+		<import>jadex.base.fipa.*</import>
+		<import>jadex.bridge.IComponentIdentifier</import>
+		<import>jadex.base.test.TestReport</import>
+		<import>jadex.bdi.testcases.ResultPlan</import>
+		<import>java.util.*</import>
+	</imports>
+	
+	<plans>
+		<plan name="processEvent">
+			<parameter name="event" class="Object">
+				<internaleventmapping ref="ECA_event.event" />
+				<messageeventmapping ref="property_changed_inform.content" />
+			</parameter>
+			<body class="ProcessEventPlan" />
+			<trigger>
+				<internalevent ref="ECA_event" />
+				<messageevent ref="property_changed_inform" />
+			</trigger>
+		</plan>
+	</plans>
+	
+	<events>
+		<internalevent name="ECA_event">
+			<parameter name="event" class="Object"/>
+		</internalevent>
+		<messageevent name="property_changed_inform" type="fipa" direction="send_receive">
+			<parameter name="performative" class="String" direction="fixed">
+				<value>jadex.base.fipa.SFipa.INFORM</value>
+			</parameter>
+			<parameter name="language" class="String" direction="fixed">
+				<value>jadex.base.fipa.SFipa.JADEX_XML</value>
+			</parameter>
+		</messageevent>
+	</events> 
+	
+	<configurations>
+		<configuration name="test">
+			<events>
+				<initialinternalevent ref="ECA_event">
+					<parameter ref="event"><value>"hello"</value></parameter>
+				</initialinternalevent>
+			</events>
+		</configuration>
+	</configurations>
+	
+</agent>
