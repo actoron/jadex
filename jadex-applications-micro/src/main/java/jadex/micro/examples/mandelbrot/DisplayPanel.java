@@ -141,8 +141,17 @@ public class DisplayPanel extends JComponent
 				if(!calculating)
 				{
 					int sa = e.getScrollAmount();
-					int dir = e.getWheelRotation();
-					double factor = 1+dir*sa/10.0;
+					double	dir = Math.signum(e.getWheelRotation());
+					double	percent	= 10*sa;
+					double	factor;
+					if(dir>0)
+					{
+						factor	= (100+percent)/100;
+					}
+					else
+					{
+						factor	= 100/(100+percent);
+					}
 					zoomImage(e.getX(), e.getY(), factor);
 				}
 			}
@@ -513,17 +522,20 @@ public class DisplayPanel extends JComponent
 							g.drawString(provider, x, y + fm.getAscent() + fm.getHeight());
 							
 							// Draw progress bar.
-							bar.setStringPainted(true);
-							bar.setValue(((Number)progressdata.get(progress)).intValue());
-							width	= Math.min(corw-4, barsize.width);
-							x	= bounds.x+drawarea.x+corx + (corw-width)/2;
-							y	= y + fm.getHeight()*2 + 2;
-							bar.setBounds(0, 0, width, barsize.height);
-							Graphics	g2	= g.create();
-							g2.translate(x, y);
-							bar.paint(g2);
+							if(!progress.isFinished())
+							{
+								bar.setStringPainted(true);
+								bar.setValue(((Number)progressdata.get(progress)).intValue());
+								width	= Math.min(corw-10, barsize.width);
+								x	= bounds.x+drawarea.x+corx + (corw-width)/2;
+								y	= y + fm.getHeight()*2 + 2;
+								bar.setBounds(0, 0, width, barsize.height);
+								Graphics	g2	= g.create();
+								g2.translate(x, y);
+								bar.paint(g2);
+							}
 						}
-						else if(corw>8 && corh>8)
+						else if(!progress.isFinished() && corw>8 && corh>8)
 						{
 							bar.setStringPainted(false);
 							int	x	= bounds.x+drawarea.x+corx + 2;
@@ -742,6 +754,13 @@ public class DisplayPanel extends JComponent
 		final double ys = data.getYStart()+hd*yrel;
 		final double ye = ys+hnew;
 		
+		// Set range for drawing preview of zoom area.
+		double	xdiff	= drawarea.width - drawarea.width*factor;
+		double	ydiff	= drawarea.height - drawarea.height*factor;
+		range	= new Rectangle(bounds.x+drawarea.x+(int)Math.round(xdiff*xrel), bounds.y+drawarea.y+(int)Math.round(ydiff*yrel),
+			(int)Math.round(drawarea.width*factor), (int)Math.round(drawarea.height*factor));
+		
+//		zoomIntoRange();
 		calcArea(xs, xe, ys, ye, data.getSizeX(), data.getSizeY());
 	}
 
@@ -770,6 +789,7 @@ public class DisplayPanel extends JComponent
 			bounds.height	= 100;
 		}
 		
+		// Clear image for painting only background.
 		DisplayPanel.this.image	= createImage(bounds.width, bounds.height);
 		
 		calcArea(-2, 1, -1.5, 1.5, bounds.width, bounds.height);
