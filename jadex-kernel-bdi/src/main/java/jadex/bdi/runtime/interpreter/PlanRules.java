@@ -151,6 +151,12 @@ public class PlanRules
 		// todo: this code is not finished
 		// - must allow multiple goal mapping specifications -> metamodel
 		// - add support for other mappings, internal event, message event
+		
+		
+		boolean iem = reason!=null && state.getType(reason).isSubtype(OAVBDIRuntimeModel.internalevent_type);
+		boolean mem = reason!=null && state.getType(reason).isSubtype(OAVBDIRuntimeModel.messageevent_type);
+		boolean gom = reason!=null && state.getType(reason).isSubtype(OAVBDIRuntimeModel.goal_type);
+		
 		Collection coll = state.getAttributeValues(mplan, OAVBDIMetaModel.parameterelement_has_parameters);
 		if(coll!=null)
 		{
@@ -158,31 +164,38 @@ public class PlanRules
 			{
 				Object mparam = it.next();
 				
-				String	paramref	= (String)state.getAttributeValue(mparam, OAVBDIMetaModel.planparameter_has_goalmapping);
-				if(paramref!=null)
+				if(gom)
 				{
-					int pidx = paramref.lastIndexOf('.');
-					String paramname = paramref.substring(pidx+1);
-					generateParameterMapping(state, rplan, mparam, paramname, reason, rcap);
-					continue;
+					String	paramref	= (String)state.getAttributeValue(mparam, OAVBDIMetaModel.planparameter_has_goalmapping);
+					if(paramref!=null)
+					{
+						int pidx = paramref.lastIndexOf('.');
+						String paramname = paramref.substring(pidx+1);
+						generateParameterMapping(state, rplan, mparam, paramname, reason, rcap);
+						continue;
+					}
 				}
-				
-				paramref	= (String)state.getAttributeValue(mparam, OAVBDIMetaModel.planparameter_has_messageeventmapping);
-				if(paramref!=null)
+				else if(mem)
 				{
-					int pidx = paramref.lastIndexOf('.');
-					String paramname = paramref.substring(pidx+1);
-					generateParameterMapping(state, rplan, mparam, paramname, reason, rcap);
-					continue;
+					String paramref	= (String)state.getAttributeValue(mparam, OAVBDIMetaModel.planparameter_has_messageeventmapping);
+					if(paramref!=null)
+					{
+						int pidx = paramref.lastIndexOf('.');
+						String paramname = paramref.substring(pidx+1);
+						generateParameterMapping(state, rplan, mparam, paramname, reason, rcap);
+						continue;
+					}
 				}
-
-				paramref	= (String)state.getAttributeValue(mparam, OAVBDIMetaModel.planparameter_has_internaleventmapping);
-				if(paramref!=null)
+				else if(iem)
 				{
-					int pidx = paramref.lastIndexOf('.');
-					String paramname = paramref.substring(pidx+1);
-					generateParameterMapping(state, rplan, mparam, paramname, reason, rcap);
-					continue;
+					String paramref	= (String)state.getAttributeValue(mparam, OAVBDIMetaModel.planparameter_has_internaleventmapping);
+					if(paramref!=null)
+					{
+						int pidx = paramref.lastIndexOf('.');
+						String paramname = paramref.substring(pidx+1);
+						generateParameterMapping(state, rplan, mparam, paramname, reason, rcap);
+						continue;
+					}
 				}
 			}
 		}

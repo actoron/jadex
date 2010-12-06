@@ -5,8 +5,8 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-bdi
 						http://jadex.sourceforge.net/jadex-bdi-2.0.xsd"
-	name="Test"
-	package="jadex.bdi">
+	name="MultiMapping"
+	package="jadex.bdi.testcases.plans">
 	
 	<imports>
 		<import>jadex.base.fipa.*</import>
@@ -16,16 +16,42 @@
 		<import>java.util.*</import>
 	</imports>
 	
+	<capabilities>
+		<capability name="testcap" file="jadex.bdi.planlib.test.Test"/>
+	</capabilities>
+
+	<beliefs>
+		<beliefref name="timeout"  exported="true">
+			<concrete ref="testcap.timeout"/>
+		</beliefref>
+		<beliefref name="testresults"  result="true">
+			<concrete ref="testcap.testresults"/>
+		</beliefref>
+		<belief name="cnt" class="int">
+			<fact>0</fact>
+		</belief>
+	</beliefs>
+	
+	<goals>
+		<achievegoal name="somegoal">
+			<parameter name="someparam" class="String">
+				<value>"hello_goal"</value>
+			</parameter>
+		</achievegoal>
+	</goals>
+	
 	<plans>
 		<plan name="processEvent">
 			<parameter name="event" class="Object">
 				<internaleventmapping ref="ECA_event.event" />
 				<messageeventmapping ref="property_changed_inform.content" />
+				<goalmapping ref="somegoal.someparam" />
 			</parameter>
-			<body class="ProcessEventPlan" />
+			<body class="HandlePlan"/>
 			<trigger>
-				<internalevent ref="ECA_event" />
-				<messageevent ref="property_changed_inform" />
+				<internalevent ref="ECA_event"/>
+				<messageevent ref="property_changed_inform"/>
+				<goal ref="somegoal"/>
 			</trigger>
 		</plan>
 	</plans>
@@ -46,10 +72,28 @@
 	
 	<configurations>
 		<configuration name="test">
+			<beliefs>
+				<initialbelief ref="testcap.testcase_cnt">
+					<fact>3</fact>
+				</initialbelief>
+			</beliefs>
+			<goals>
+				<initialgoal ref="somegoal"/>
+			</goals>
 			<events>
 				<initialinternalevent ref="ECA_event">
-					<parameter ref="event"><value>"hello"</value></parameter>
+					<parameter ref="event">
+						<value>"hello_event"</value>
+					</parameter>
 				</initialinternalevent>
+				<initialmessageevent ref="property_changed_inform">
+					<parameterset ref="receivers">
+						<value>$scope.getComponentIdentifier()</value>
+					</parameterset>
+					<parameter ref="content">
+						<value>"hello_msg"</value>
+					</parameter>
+				</initialmessageevent>
 			</events>
 		</configuration>
 	</configurations>
