@@ -14,8 +14,10 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
+import javax.swing.JTextPane;
 import javax.swing.SwingUtilities;
 
 /**
@@ -47,9 +49,19 @@ public class DisplayAgent extends MicroAgent
 			{
 				final JFrame	frame	= new JFrame(getAgentName());
 				JScrollPane	scroll	= new JScrollPane(panel);
-				JSplitPane	split	= new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, scroll, new ColorChooserPanel(panel));
+
+				JTextPane helptext = new JTextPane();
+				helptext.setText(DisplayPanel.HELPTEXT);
+				helptext.setEditable(false);
+				JPanel	right	= new JPanel(new BorderLayout());
+				right.add(new ColorChooserPanel(panel), BorderLayout.CENTER);
+				right.add(helptext, BorderLayout.NORTH);
+
+				
+				JSplitPane	split	= new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, scroll, right);
 				split.setResizeWeight(1);
 				split.setOneTouchExpandable(true);
+				split.setDividerLocation(375);
 				frame.getContentPane().add(BorderLayout.CENTER, split);
 				frame.setSize(500, 400);
 				frame.setLocation(SGUI.calculateMiddlePosition(frame));

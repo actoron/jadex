@@ -37,6 +37,7 @@ public class ColorChooserPanel	extends JPanel
 		
 		GridBagConstraints	gbc	= new GridBagConstraints();
 		gbc.fill	= GridBagConstraints.BOTH;
+		gbc.gridwidth	= GridBagConstraints.REMAINDER;
 		gbc.weightx	= 1;
 		gbc.weighty	= 1;
 		gbc.insets	= new Insets(1, 1, 1, 1);
@@ -95,26 +96,13 @@ public class ColorChooserPanel	extends JPanel
 			}
 		});
 		
-		JButton	remove	= new JButton("remove");
-		remove.addActionListener(new ActionListener()
+		JButton	add	= new JButton("add")
 		{
-			public void actionPerformed(ActionEvent e)
+			public Insets getInsets()
 			{
-				Object[]	cs	= colors.getSelectedValues();
-				for(int i=0; i<cs.length; i++)
-				{
-					lm.removeElement(cs[i]);
-				}
-				setColorScheme(panel, lm);
+				return new Insets(0,3,0,3);
 			}
-		});
-		gbc.weighty	= 0;
-		gbc.fill	= GridBagConstraints.NONE;
-		gbc.anchor	= GridBagConstraints.EAST;
-		gbc.gridy	= 2;
-		this.add(remove, gbc);
-
-		JButton	add	= new JButton("add...");
+		};
 		add.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
@@ -127,8 +115,35 @@ public class ColorChooserPanel	extends JPanel
 				}
 			}
 		});
-		gbc.gridy	= 3;
+		gbc.weighty	= 0;
+		gbc.fill	= GridBagConstraints.NONE;
+		gbc.anchor	= GridBagConstraints.EAST;
+		gbc.gridy	= 1;
+		gbc.gridwidth	= 1;
 		this.add(add, gbc);
+		
+		JButton	remove	= new JButton("rem")
+		{
+			public Insets getInsets()
+			{
+				return new Insets(0,3,0,3);
+			}
+		};
+		remove.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				Object[]	cs	= colors.getSelectedValues();
+				for(int i=0; i<cs.length; i++)
+				{
+					lm.removeElement(cs[i]);
+				}
+				setColorScheme(panel, lm);
+			}
+		});
+		gbc.weightx	= 0;
+		gbc.gridx	= 1;
+		this.add(remove, gbc);
 
 		add.setMinimumSize(remove.getMinimumSize());
 		add.setPreferredSize(remove.getPreferredSize());

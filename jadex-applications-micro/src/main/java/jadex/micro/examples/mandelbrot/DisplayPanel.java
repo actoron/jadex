@@ -19,6 +19,8 @@ import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
@@ -38,6 +40,15 @@ import javax.swing.Timer;
  */
 public class DisplayPanel extends JComponent
 {
+	//-------- constants --------
+	
+	/** The help text. */
+	public static final String	HELPTEXT	=
+		"Use mouse to navigate:\n" +
+		"[wheel] zoom in/out\n" +
+		"[left button] choose and click into area\n" +
+		"[rigth button] drag to move, click for original area.\n";
+	
 	//-------- attributes --------
 	
 	/** The service provider. */
@@ -121,7 +132,7 @@ public class DisplayPanel extends JComponent
 		};
 		addMouseMotionListener(draghandler);
 		addMouseListener(draghandler);
-		
+				
 		// Zooming with mouse wheel.
 		addMouseWheelListener(new MouseAdapter()
 		{
@@ -212,6 +223,24 @@ public class DisplayPanel extends JComponent
 				}
 			}
 		});
+		
+		// ESC stops dragging / range selection
+		setFocusable(true);
+		addKeyListener(new KeyAdapter()
+		{
+			public void keyPressed(KeyEvent e)
+			{
+				if(e.getKeyCode()==KeyEvent.VK_ESCAPE)
+				{
+					range	= null;
+					point	= null;
+					startdrag	= null;
+					enddrag	= null;
+					DisplayPanel.this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));						
+					repaint();
+				}
+			}
+		});
 	}
 	
 	//-------- methods --------
@@ -297,61 +326,64 @@ public class DisplayPanel extends JComponent
 								public void customResultAvailable(Object source, Object result)
 								{
 									IComponentManagementService	cms	= (IComponentManagementService)result;
-									for(Iterator it=progressdata.keySet().iterator(); it.hasNext(); )
+									if(progressdata!=null)
 									{
-										final ProgressData	progress	= (ProgressData)it.next();
-										cms.getExternalAccess(progress.getProviderId())
-											.addResultListener(new SwingDefaultResultListener(DisplayPanel.this)
+										for(Iterator it=progressdata.keySet().iterator(); it.hasNext(); )
 										{
-											public void customResultAvailable(Object source, Object result)
+											final ProgressData	progress	= (ProgressData)it.next();
+											cms.getExternalAccess(progress.getProviderId())
+												.addResultListener(new SwingDefaultResultListener(DisplayPanel.this)
 											{
-												IExternalAccess	ea	= (IExternalAccess)result;
-												SServiceProvider.getService(ea.getServiceProvider(), IProgressService.class)
-													.addResultListener(new SwingDefaultResultListener(DisplayPanel.this)
+												public void customResultAvailable(Object source, Object result)
 												{
-													public void customResultAvailable(Object source, Object result)
+													IExternalAccess	ea	= (IExternalAccess)result;
+													SServiceProvider.getService(ea.getServiceProvider(), IProgressService.class)
+														.addResultListener(new SwingDefaultResultListener(DisplayPanel.this)
 													{
-														IProgressService	ps	= (IProgressService)result;
-														if(ps!=null)
+														public void customResultAvailable(Object source, Object result)
 														{
-															ps.getProgress(progress.getTaskId())
-																.addResultListener(new SwingDefaultResultListener(DisplayPanel.this)
+															IProgressService	ps	= (IProgressService)result;
+															if(ps!=null)
 															{
-																public void customResultAvailable(Object source, Object result)
+																ps.getProgress(progress.getTaskId())
+																	.addResultListener(new SwingDefaultResultListener(DisplayPanel.this)
 																{
-																	if(progressdata!=null && progressdata.containsKey(progress))
+																	public void customResultAvailable(Object source, Object result)
 																	{
-																		Integer	current	= (Integer)result;
-																		Integer	percent	= (Integer)progressdata.get(progress);
-																		if(current.intValue()>percent.intValue())
+																		if(progressdata!=null && progressdata.containsKey(progress))
 																		{
-																			progressdata.put(progress, current);
-																			repaint();
+																			Integer	current	= (Integer)result;
+																			Integer	percent	= (Integer)progressdata.get(progress);
+																			if(current.intValue()>percent.intValue())
+																			{
+																				progressdata.put(progress, current);
+																				repaint();
+																			}
 																		}
 																	}
-																}
-
-																public void customExceptionOccurred(Object source, Exception exception)
-																{
-																	// ignore
-																}
-															});
+	
+																	public void customExceptionOccurred(Object source, Exception exception)
+																	{
+																		// ignore
+																	}
+																});
+															}
 														}
-													}
-
-													public void customExceptionOccurred(Object source, Exception exception)
-													{
-														// ignore
-													}
-												});
-											}
-
-											public void customExceptionOccurred(Object source, Exception exception)
-											{
-												// ignore
-											}
-										});
-									}									
+	
+														public void customExceptionOccurred(Object source, Exception exception)
+														{
+															// ignore
+														}
+													});
+												}
+	
+												public void customExceptionOccurred(Object source, Exception exception)
+												{
+													// ignore
+												}
+											});
+										}
+									}
 								}
 
 								public void customExceptionOccurred(Object source, Exception exception)
