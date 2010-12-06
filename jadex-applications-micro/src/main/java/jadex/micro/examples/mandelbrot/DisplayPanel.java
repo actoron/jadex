@@ -82,12 +82,14 @@ public class DisplayPanel extends JComponent
 	{
 		this.provider	= provider;
 		setColorScheme(new Color[]{new Color(50, 100, 0), Color.red});
+		calcDefaultImage();
 		
-		MouseAdapter ma = new MouseAdapter()
+		// Dragging with right mouse button.
+		MouseAdapter draghandler = new MouseAdapter()
 		{
 			public void mousePressed(MouseEvent e)
 			{
-				if(e.getButton()==MouseEvent.BUTTON3 && e.getClickCount()==1 && image!=null)
+				if(!calculating && e.getButton()==MouseEvent.BUTTON3 && e.getClickCount()==1 && image!=null)
 				{
 					startdrag = new Point(e.getX(), e.getY());
 					range	= null;
@@ -113,174 +115,36 @@ public class DisplayPanel extends JComponent
 				if(startdrag!=null && enddrag!=null)
 				{
 //					System.out.println("dragged: "+startdrag+" "+enddrag);
-					
-					Rectangle	bounds	= getInnerBounds(true);
-					Rectangle	drawarea	= scaleToFit(bounds, image.getWidth(DisplayPanel.this), image.getHeight(DisplayPanel.this));
-					int xdiff = startdrag.x-enddrag.x;
-					int ydiff = startdrag.y-enddrag.y;
-					double xp = ((double)xdiff)/drawarea.width;
-					double yp = ((double)ydiff)/drawarea.height;
-					
-					double xm = (data.getXEnd()-data.getXStart())*xp;
-					double ym = (data.getYEnd()-data.getYStart())*yp;
-					final double xs = data.getXStart()+xm;
-					final double xe = data.getXEnd()+xm;
-					final double ys = data.getYStart()+ym;
-					final double ye = data.getYEnd()+ym;
-					
-					startdrag = null;
-					enddrag = null;
-					range	= new Rectangle(bounds.x+drawarea.x+xdiff, bounds.y+drawarea.y+ydiff, drawarea.width, drawarea.height);
-
-					DisplayPanel.this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-					calculating	= true;
-					repaint();
-					
-					SServiceProvider.getService(provider, IGenerateService.class)
-						.addResultListener(new SwingDefaultResultListener()
-					{
-						public void customResultAvailable(Object source, Object result)
-						{
-							IGenerateService gs	= (IGenerateService)result;
-							
-							AreaData ad = new AreaData(xs, xe, ys, ye, data.getSizeX(), data.getSizeY(),
-								data!=null ? data.getMax() : 256, data!=null ? data.getParallel() : 10, data!=null ? data.getTaskSize() : 300);
-							IFuture	fut	= gs.generateArea(ad);
-							fut.addResultListener(new SwingDefaultResultListener(DisplayPanel.this)
-							{
-								public void customResultAvailable(Object source, Object result)
-								{
-									DisplayPanel.this.setResults((AreaData)result);
-								}
-								public void customExceptionOccurred(Object source, Exception exception)
-								{
-									calculating	= false;
-									DisplayPanel.this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-									super.customExceptionOccurred(source, exception);
-								}
-							});
-						}
-					});
+					dragImage();
 				}
 			}
 		};
-		addMouseMotionListener(ma);
-		addMouseListener(ma);
+		addMouseMotionListener(draghandler);
+		addMouseListener(draghandler);
 		
+		// Zooming with mouse wheel.
 		addMouseWheelListener(new MouseAdapter()
 		{
 			public void mouseWheelMoved(MouseWheelEvent e)
 			{
 				if(!calculating)
 				{
-					DisplayPanel.this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-					calculating	= true;
-					repaint();
-					
-					final Rectangle	bounds	= getInnerBounds(true);
-	
 					int sa = e.getScrollAmount();
 					int dir = e.getWheelRotation();
 					double factor = 1+dir*sa/10.0;
-					
-					int	iwidth	= image.getWidth(DisplayPanel.this);
-					int iheight	= image.getHeight(DisplayPanel.this);
-					final Rectangle drawarea = scaleToFit(bounds, iwidth, iheight);
-					int mx = Math.min(bounds.x+drawarea.x+drawarea.width, Math.max(bounds.x+drawarea.x, e.getX()));
-					int my = Math.min(bounds.y+drawarea.y+drawarea.height, Math.max(bounds.y+drawarea.y, e.getY()));
-					double xrel = ((double)mx-(bounds.x+drawarea.x))/drawarea.width;
-					double yrel = ((double)my-(bounds.y+drawarea.y))/drawarea.height;
-	
-					double wold = data.getXEnd()-data.getXStart();
-					double hold = data.getYEnd()-data.getYStart();
-					double wnew = wold*factor;
-					double hnew = hold*factor;
-					double wd = wold-wnew;
-					double hd = hold-hnew;
-					
-					final double xs = data.getXStart()+wd*xrel;
-					final double xe = xs+wnew;
-					final double ys = data.getYStart()+hd*yrel;
-					final double ye = ys+hnew;
-					
-					SServiceProvider.getService(provider, IGenerateService.class)
-						.addResultListener(new SwingDefaultResultListener()
-					{
-						public void customResultAvailable(Object source, Object result)
-						{
-							IGenerateService gs	= (IGenerateService)result;
-							
-							AreaData ad = new AreaData(xs, xe, ys, ye, data.getSizeX(), data.getSizeY(),
-								data!=null ? data.getMax() : 256, data!=null ? data.getParallel() : 10, data!=null ? data.getTaskSize() : 300);
-							IFuture	fut	= gs.generateArea(ad);
-							fut.addResultListener(new SwingDefaultResultListener(DisplayPanel.this)
-							{
-								public void customResultAvailable(Object source, Object result)
-								{
-									DisplayPanel.this.setResults((AreaData)result);
-								}
-								public void customExceptionOccurred(Object source, Exception exception)
-								{
-									calculating	= false;
-									DisplayPanel.this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-									super.customExceptionOccurred(source, exception);
-								}
-							});
-						}
-					});
+					zoomImage(e.getX(), e.getY(), factor);
 				}
 			}
 		});
+		
+		// Selecting range and default area.
 		addMouseListener(new MouseAdapter()
 		{
 			public void mouseClicked(MouseEvent e)
 			{
 				if(SwingUtilities.isRightMouseButton(e))
 				{
-					DisplayPanel.this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-					final Rectangle	bounds	= getInnerBounds(false);
-					double	rratio	= 1;
-					double	bratio	= (double)bounds.width/bounds.height;
-					// Calculate pixel width/height of area.
-					if(rratio<bratio)
-					{
-						int	width	= (int)(bounds.height*rratio);
-						bounds.width	= width;
-					}
-					else if(rratio>bratio)
-					{
-						int	height	= (int)(bounds.width/rratio);
-						bounds.height	= height;
-					}
-					
-					calculating	= true;
-					DisplayPanel.this.image	= createImage(bounds.width, bounds.height);
-					repaint();
-					
-					SServiceProvider.getService(provider, IGenerateService.class)
-						.addResultListener(new SwingDefaultResultListener()
-					{
-						public void customResultAvailable(Object source, Object result)
-						{
-							IGenerateService	gs	= (IGenerateService)result;
-							AreaData ad = new AreaData(-2, 1, -1.5, 1.5, bounds.width, bounds.height,
-								data!=null ? data.getMax() : 256, data!=null ? data.getParallel() : 10, data!=null ? data.getTaskSize() : 300);
-							IFuture	fut	= gs.generateArea(ad);
-							fut.addResultListener(new SwingDefaultResultListener(DisplayPanel.this)
-							{
-								public void customResultAvailable(Object source, Object result)
-								{
-									DisplayPanel.this.setResults((AreaData)result);
-								}
-								public void customExceptionOccurred(Object source, Exception exception)
-								{
-									calculating	= false;
-									DisplayPanel.this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-									super.customExceptionOccurred(source, exception);
-								}
-							});
-						}
-					});
+					calcDefaultImage();
 				}
 				
 				else if(!calculating && range!=null)
@@ -288,61 +152,7 @@ public class DisplayPanel extends JComponent
 					if(e.getX()>=range.x && e.getX()<=range.x+range.width
 						&& e.getY()>=range.y && e.getY()<=range.y+range.height)
 					{
-						// Calculate bounds relative to original image.
-						Rectangle	bounds	= getInnerBounds(true);
-						Rectangle	drawarea	= scaleToFit(bounds, image.getWidth(DisplayPanel.this), image.getHeight(DisplayPanel.this));
-						final double	x	= (double)(range.x-bounds.x-drawarea.x)/drawarea.width;
-						final double	y	= (double)(range.y-bounds.y-drawarea.y)/drawarea.height;
-						final double	x2	= x + (double)range.width/drawarea.width;
-						final double	y2	= y + (double)range.height/drawarea.height;
-						
-						// Original bounds
-						final double	ox	= data.getXStart();
-						final double	oy	= data.getYStart();
-						final double	owidth	= data.getXEnd()-data.getXStart();
-						final double	oheight	= data.getYEnd()-data.getYStart();
-						
-						// Calculate pixel width/height of visible area.
-						bounds	= getInnerBounds(false);
-						double	rratio	= (double)range.width/range.height;
-						double	bratio	= (double)bounds.width/bounds.height;
-						if(rratio<bratio)
-						{
-							bounds.width	= (int)(bounds.height*rratio);
-						}
-						else if(rratio>bratio)
-						{
-							bounds.height	= (int)(bounds.width/rratio);
-						}
-						final Rectangle	area	= bounds;
-					
-						DisplayPanel.this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-						calculating	= true;
-						repaint();
-						SServiceProvider.getService(provider, IGenerateService.class)
-							.addResultListener(new SwingDefaultResultListener()
-						{
-							public void customResultAvailable(Object source, Object result)
-							{
-								IGenerateService	gs	= (IGenerateService)result;
-								AreaData ad = new AreaData(ox+owidth*x, ox+owidth*x2, oy+oheight*y, oy+oheight*y2,
-									area.width, area.height, data.getMax(), data.getParallel(), data.getTaskSize());
-								IFuture	fut	= gs.generateArea(ad);
-								fut.addResultListener(new SwingDefaultResultListener(DisplayPanel.this)
-								{
-									public void customResultAvailable(Object source, Object result)
-									{
-										DisplayPanel.this.setResults((AreaData)result);
-									}
-									public void customExceptionOccurred(Object source, Exception exception)
-									{
-										calculating	= false;
-										DisplayPanel.this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-										super.customExceptionOccurred(source, exception);
-									}
-								});
-							}
-						});						
+						zoomIntoRange();
 					}
 				}
 			}
@@ -843,5 +653,165 @@ public class DisplayPanel extends JComponent
 		{
 			setResults(data);
 		}
+	}
+	
+	//-------- recalculation methods --------
+	
+	/**
+	 *  Drag the image according to current drag settings.
+	 */
+	protected void dragImage()
+	{
+		Rectangle	bounds	= getInnerBounds(true);
+		Rectangle	drawarea	= scaleToFit(bounds, image.getWidth(DisplayPanel.this), image.getHeight(DisplayPanel.this));
+		int xdiff = startdrag.x-enddrag.x;
+		int ydiff = startdrag.y-enddrag.y;
+		double xp = ((double)xdiff)/drawarea.width;
+		double yp = ((double)ydiff)/drawarea.height;
+		
+		double xm = (data.getXEnd()-data.getXStart())*xp;
+		double ym = (data.getYEnd()-data.getYStart())*yp;
+		final double xs = data.getXStart()+xm;
+		final double xe = data.getXEnd()+xm;
+		final double ys = data.getYStart()+ym;
+		final double ye = data.getYEnd()+ym;
+		
+		startdrag = null;
+		enddrag = null;
+		range	= new Rectangle(bounds.x+drawarea.x+xdiff, bounds.y+drawarea.y+ydiff, drawarea.width, drawarea.height);
+
+		calcArea(xs, xe, ys, ye, data.getSizeX(), data.getSizeY());
+	}
+
+	/**
+	 *  Zoom into the given location by the given factor.
+	 */
+	protected void zoomImage(int x, int y, double factor)
+	{
+		final Rectangle	bounds	= getInnerBounds(true);
+		
+		int	iwidth	= image.getWidth(DisplayPanel.this);
+		int iheight	= image.getHeight(DisplayPanel.this);
+		final Rectangle drawarea = scaleToFit(bounds, iwidth, iheight);
+		int mx = Math.min(bounds.x+drawarea.x+drawarea.width, Math.max(bounds.x+drawarea.x, x));
+		int my = Math.min(bounds.y+drawarea.y+drawarea.height, Math.max(bounds.y+drawarea.y, y));
+		double xrel = ((double)mx-(bounds.x+drawarea.x))/drawarea.width;
+		double yrel = ((double)my-(bounds.y+drawarea.y))/drawarea.height;
+
+		double wold = data.getXEnd()-data.getXStart();
+		double hold = data.getYEnd()-data.getYStart();
+		double wnew = wold*factor;
+		double hnew = hold*factor;
+		double wd = wold-wnew;
+		double hd = hold-hnew;
+		
+		final double xs = data.getXStart()+wd*xrel;
+		final double xe = xs+wnew;
+		final double ys = data.getYStart()+hd*yrel;
+		final double ye = ys+hnew;
+		
+		calcArea(xs, xe, ys, ye, data.getSizeX(), data.getSizeY());
+	}
+
+	/**
+	 *  Set display coordinates to default values.
+	 */
+	protected void calcDefaultImage()
+	{
+		final Rectangle	bounds	= getInnerBounds(false);
+		double	rratio	= 1;
+		double	bratio	= (double)bounds.width/bounds.height;
+		// Calculate pixel width/height of area.
+		if(rratio<bratio)
+		{
+			int	width	= (int)(bounds.height*rratio);
+			bounds.width	= width;
+		}
+		else if(rratio>bratio)
+		{
+			int	height	= (int)(bounds.width/rratio);
+			bounds.height	= height;
+		}
+		else if(bounds.width==0 || bounds.height==0)
+		{
+			bounds.width	= 100;
+			bounds.height	= 100;
+		}
+		
+		DisplayPanel.this.image	= createImage(bounds.width, bounds.height);
+		
+		calcArea(-2, 1, -1.5, 1.5, bounds.width, bounds.height);
+	}
+	
+	/**
+	 *  Zoom into the selected range.
+	 */
+	protected void zoomIntoRange()
+	{
+		// Calculate bounds relative to original image.
+		Rectangle	bounds	= getInnerBounds(true);
+		Rectangle	drawarea	= scaleToFit(bounds, image.getWidth(DisplayPanel.this), image.getHeight(DisplayPanel.this));
+		final double	x	= (double)(range.x-bounds.x-drawarea.x)/drawarea.width;
+		final double	y	= (double)(range.y-bounds.y-drawarea.y)/drawarea.height;
+		final double	x2	= x + (double)range.width/drawarea.width;
+		final double	y2	= y + (double)range.height/drawarea.height;
+		
+		// Original bounds
+		final double	ox	= data.getXStart();
+		final double	oy	= data.getYStart();
+		final double	owidth	= data.getXEnd()-data.getXStart();
+		final double	oheight	= data.getYEnd()-data.getYStart();
+		
+		// Calculate pixel width/height of visible area.
+		bounds	= getInnerBounds(false);
+		double	rratio	= (double)range.width/range.height;
+		double	bratio	= (double)bounds.width/bounds.height;
+		if(rratio<bratio)
+		{
+			bounds.width	= (int)(bounds.height*rratio);
+		}
+		else if(rratio>bratio)
+		{
+			bounds.height	= (int)(bounds.width/rratio);
+		}
+		final Rectangle	area	= bounds;
+
+		calcArea(ox+owidth*x, ox+owidth*x2, oy+oheight*y, oy+oheight*y2, area.width, area.height);
+	}
+
+	/**
+	 *  Calculate the given area.
+	 */
+	protected void calcArea(double x1, double x2, double y1, double y2, int sizex, int sizey)
+	{
+		final AreaData ad	= new AreaData(x1, x2, y1, y2, sizex, sizey,
+			data!=null?data.getMax():256, data!=null?data.getParallel():10, data!=null?data.getTaskSize():300);
+		
+		DisplayPanel.this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+		calculating	= true;
+		repaint();
+		
+		SServiceProvider.getService(provider, IGenerateService.class)
+			.addResultListener(new SwingDefaultResultListener()
+		{
+			public void customResultAvailable(Object source, Object result)
+			{
+				IGenerateService	gs	= (IGenerateService)result;
+				IFuture	fut	= gs.generateArea(ad);
+				fut.addResultListener(new SwingDefaultResultListener(DisplayPanel.this)
+				{
+					public void customResultAvailable(Object source, Object result)
+					{
+						DisplayPanel.this.setResults((AreaData)result);
+					}
+					public void customExceptionOccurred(Object source, Exception exception)
+					{
+						calculating	= false;
+						DisplayPanel.this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+						super.customExceptionOccurred(source, exception);
+					}
+				});
+			}
+		});
 	}
 }
