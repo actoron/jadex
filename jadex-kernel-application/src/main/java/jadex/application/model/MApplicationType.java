@@ -25,7 +25,7 @@ public class MApplicationType implements ICacheableModel
 	//-------- attributes --------
 	
 	/** The autoshutdown flag. */
-	protected boolean autoshutdown;
+	protected Boolean autoshutdown;
 	
 	/** The imports. */
 	protected List imports;
@@ -365,7 +365,7 @@ public class MApplicationType implements ICacheableModel
 	 *  Get the autoshutdown.
 	 *  @return The autoshutdown.
 	 */
-	public boolean isAutoShutdown()
+	public Boolean getAutoShutdown()
 	{
 		return this.autoshutdown;
 	}
@@ -374,7 +374,7 @@ public class MApplicationType implements ICacheableModel
 	 *  Set the autoshutdown.
 	 *  @param autoshutdown The autoshutdown to set.
 	 */
-	public void setAutoShutdown(boolean autoshutdown)
+	public void setAutoShutdown(Boolean autoshutdown)
 	{
 		this.autoshutdown = autoshutdown;
 	}

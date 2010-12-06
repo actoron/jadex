@@ -1348,7 +1348,12 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 			// Init is now finished. Notify cms and stop execution.
 //			System.out.println("Application init finished: "+ApplicationInterpreter.this);
 			stop = true;
-			inited.setResult(new Object[]{ApplicationInterpreter.this, adapter});
+			
+			// master, daemon, autoshutdown
+			Boolean[] bools = new Boolean[3];
+			bools[2] = model.getAutoShutdown();
+			
+			inited.setResult(new Object[]{ApplicationInterpreter.this, adapter, bools});
 		}
 	}
 	

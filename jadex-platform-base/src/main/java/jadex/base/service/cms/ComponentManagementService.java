@@ -268,6 +268,10 @@ public abstract class ComponentManagementService extends BasicService implements
 									{
 //										System.out.println("created: "+ad);
 										
+										// Init successfully finished. Add description and adapter.
+										adapter = (IComponentAdapter)((Object[])result)[1];
+										Boolean[] bools = (Boolean[])((Object[])result)[2];
+										
 										if(isInitSuspend(cinfo, lmodel))
 										{
 											ad.setState(IComponentDescription.STATE_SUSPENDED);
@@ -277,8 +281,16 @@ public abstract class ComponentManagementService extends BasicService implements
 											ad.setState(IComponentDescription.STATE_ACTIVE);
 										}
 										
-										// Init successfully finished. Add description and adapter.
-										adapter = (IComponentAdapter)((Object[])result)[1];
+										// master, daemon, autoshutdown
+										if(bools!=null)
+										{
+											if(ad.getMaster()==null && bools[0]!=null)
+												ad.setMaster(bools[0]);
+											if(ad.getDaemon()==null && bools[1]!=null)
+												ad.setDaemon(bools[1]);
+											if(ad.getAutoShutdown()==null && bools[2]!=null)
+												ad.setAutoShutdown(bools[2]);
+										}
 										
 										descs.put(cid, ad);
 //										System.out.println("adding cid: "+cid);
@@ -300,10 +312,14 @@ public abstract class ComponentManagementService extends BasicService implements
 										Boolean pas = padesc.getAutoShutdown();
 										Boolean dae = ad.getDaemon();
 //										if(padesc.isAutoShutdown() && !ad.isDaemon())
-										if(pas!=null && pas.booleanValue() && (dae==null || !dae.booleanValue()))
+//										if(pas!=null && pas.booleanValue() && (dae==null || !dae.booleanValue()))
+										// cannot check parent shutdown state because could be still uninited
+										if(dae==null || !dae.booleanValue())
 										{
 											Integer	childcount	= (Integer)childcounts.get(padesc.getName());
-											childcounts.put(padesc.getName(), new Integer(childcount!=null ? childcount.intValue()+1 : 1));
+											int cc = childcount!=null ? childcount.intValue()+1 : 1;
+											childcounts.put(padesc.getName(), new Integer(cc));
+//											System.out.println("childcount+:"+padesc.getName()+" "+cc);
 										}
 									}
 								}
@@ -1120,16 +1136,22 @@ public abstract class ComponentManagementService extends BasicService implements
 							padesc.removeChild(desc.getName());
 							Boolean pas = padesc.getAutoShutdown();
 							Boolean dae = desc.getDaemon();
-							if(pas!=null && pas.booleanValue() && (dae==null || !dae.booleanValue()))
+//							if(pas!=null && pas.booleanValue() && (dae==null || !dae.booleanValue()))
+							if(dae==null || !dae.booleanValue())
 //							if(padesc.isAutoShutdown() && !desc.isDaemon())
 							{
 								Integer	childcount	= (Integer)childcounts.get(padesc.getName());
-								assert childcount!=null && childcount.intValue()>0;
-								killparent	= childcount==null || childcount.intValue()<=1;
-								if(!killparent)
+//								assert childcount!=null && childcount.intValue()>0;
+								if(childcount!=null)
 								{
-									childcounts.put(padesc.getName(), new Integer(childcount.intValue()-1));
+									int cc = childcount.intValue()-1;
+									if(cc>0)
+										childcounts.put(padesc.getName(), new Integer(cc));
+									else
+										childcounts.remove(padesc.getName());
+//									System.out.println("childcount-: "+padesc.getName()+" "+cc);
 								}
+								killparent	= childcount==null || childcount.intValue()<=1;
 							}
 						}
 						pad	= (IComponentAdapter)adapters.get(desc.getParent());
@@ -1208,6 +1230,7 @@ public abstract class ComponentManagementService extends BasicService implements
 			// Kill parent is autoshutdown or child was master.
 			if(pad!=null && killparent)
 			{
+				System.out.println("killparent: "+pad.getComponentIdentifier());
 				destroyComponent(pad.getComponentIdentifier());
 			}
 			

@@ -486,7 +486,7 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 				
 				// Set inited to true and notify cms.
 				initedflag = Boolean.TRUE;
-				inited.setResult(new Object[]{BpmnInterpreter.this, adapter});
+				inited.setResult(new Object[]{BpmnInterpreter.this, adapter, null});
 			}
 			
 			public void exceptionOccurred(Object source, Exception exception)

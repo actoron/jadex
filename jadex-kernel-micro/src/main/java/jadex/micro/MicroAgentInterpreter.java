@@ -149,7 +149,8 @@ public class MicroAgentInterpreter implements IComponentInstance
 						{
 							// Init is now finished. Notify cms and stop execution.
 							stop = true;
-							inited.setResult(new Object[]{MicroAgentInterpreter.this, adapter});
+							
+							inited.setResult(new Object[]{MicroAgentInterpreter.this, adapter, null});
 							
 //							Future fut = new Future();
 //							fut.addResultListener(new DefaultResultListener(adapter.getLogger())
