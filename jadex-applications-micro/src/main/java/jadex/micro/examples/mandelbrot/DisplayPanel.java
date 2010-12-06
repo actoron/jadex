@@ -551,7 +551,7 @@ public class DisplayPanel extends JComponent
 							});
 						}
 					});
-//					progressupdate.start();
+					progressupdate.start();
 				}
 			}
 		});
