@@ -1088,7 +1088,7 @@ public abstract class ComponentManagementService extends BasicService implements
 //					System.out.println("CleanupCommand: "+result);
 		//			boolean shutdown = false;
 		
-					System.out.println("CleanupCommand remove called for: "+cid);
+//					System.out.println("CleanupCommand remove called for: "+cid);
 					adapter = (IComponentAdapter)adapters.remove(cid);
 					if(adapter==null)
 						throw new RuntimeException("Component Identifier not registered: "+cid);

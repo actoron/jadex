@@ -744,7 +744,7 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 	 *  the method will directly fail with a runtime exception.
 	 *  Note: 1.4 compliant code.
 	 *  Problem: Deadlocks cannot be detected and no exception is thrown.
-	 */
+	 * /
 	public void invokeSynchronized(final Runnable code)
 	{
 		if(isExternalThread())
@@ -808,7 +808,7 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 			Thread.dumpStack();
 			code.run();
 		}
-	}
+	}*/
 	
 	/**
 	 *  Check if the external thread is accessing.

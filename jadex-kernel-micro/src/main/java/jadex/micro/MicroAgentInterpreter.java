@@ -324,7 +324,7 @@ public class MicroAgentInterpreter implements IComponentInstance
 			{
 				public void run()
 				{	
-					System.out.println("cleanupComponent: "+getAgentAdapter().getComponentIdentifier());
+//					System.out.println("cleanupComponent: "+getAgentAdapter().getComponentIdentifier());
 					nosteps = true;
 					ComponentTerminatedException ex = new ComponentTerminatedException(getAgentAdapter().getComponentIdentifier());
 					while(!steps.isEmpty())
@@ -332,7 +332,7 @@ public class MicroAgentInterpreter implements IComponentInstance
 						Object[] step = removeStep();
 						Future future = (Future)step[1];
 						future.setException(ex);
-						System.out.println("Cleaning obsolete step: "+getAgentAdapter().getComponentIdentifier()+", "+step[0]);
+//						System.out.println("Cleaning obsolete step: "+getAgentAdapter().getComponentIdentifier()+", "+step[0]);
 					}
 					
 					for(int i=0; i<microagent.timers.size(); i++)
@@ -653,7 +653,7 @@ public class MicroAgentInterpreter implements IComponentInstance
 	 *  the method will directly fail with a runtime exception.
 	 *  Note: 1.4 compliant code.
 	 *  Problem: Deadlocks cannot be detected and no exception is thrown.
-	 */
+	 * /
 	public void invokeSynchronized(final Runnable code)
 	{
 		if(isExternalThread())
@@ -717,7 +717,7 @@ public class MicroAgentInterpreter implements IComponentInstance
 			Thread.dumpStack();
 			code.run();
 		}
-	}
+	}*/
 	
 	/**
 	 *  Check if the external thread is accessing.

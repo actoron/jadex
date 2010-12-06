@@ -252,7 +252,7 @@ public class GenerateService extends BasicService implements IGenerateService
 					xi==numx-1 && restx>0 ? restx : sizex, yi==numy-1 && resty>0 ? resty : sizey,
 					data.getMax(), 0, 0, new Tuple(new Integer(xi), new Integer(yi)), null);
 //				System.out.println("x:y: "+xi+" "+yi+" "+ad);
-				System.out.println("calculateArea: "+cs.getServiceIdentifier().getProviderId());
+//				System.out.println("calculateArea: "+cs.getServiceIdentifier().getProviderId());
 				cs.calculateArea(ad).addResultListener(agent.createResultListener(new CalculateListener(agent, lis, ad, cs.getServiceIdentifier().getProviderId())));
 				if(ds!=null)
 				{
@@ -320,7 +320,7 @@ class CalculateListener implements IResultListener
 			{
 //				System.out.println("Recal end: "+data.getId());
 				ICalculateService cs = (ICalculateService)((Collection)result).iterator().next();
-				System.out.println("(re)calculateArea: "+cs.getServiceIdentifier().getProviderId());
+//				System.out.println("(re)calculateArea: "+cs.getServiceIdentifier().getProviderId());
 				cs.calculateArea(data).addResultListener(agent.createResultListener(CalculateListener.this));
 			}
 			

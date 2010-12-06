@@ -480,14 +480,23 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 					{
 						synchronized(ext_entries)
 						{
-							System.out.println("Checking ext entries after cleanup: "+cid);
-							if(!ext_entries.isEmpty())
-							{
-								System.out.println("Ext entries after cleanup: "+cid+", "+ext_entries);
-							}
+							// Do final cleanup step as (last) ext_entry
+							// for allowing previously added entries still be executed.
+							invokeLater(new Runnable()
+							{								
+								public void run()
+								{
+									shutdownContainer().addResultListener(new DelegationResultListener(ret));
+									
+//									System.out.println("Checking ext entries after cleanup: "+cid);
+									assert ext_entries.isEmpty() : "Ext entries after cleanup: "+cid+", "+ext_entries;
+								}
+							});
+							
+							// No more ext entries after cleanup step allowed.
+							ext_forbidden	= true;
 						}
 						
-						shutdownContainer().addResultListener(new DelegationResultListener(ret));
 					}
 					
 					public void exceptionOccurred(Object source, Exception exception)
@@ -654,10 +663,10 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 				{
 					try
 					{
-						if(entries[i].toString().indexOf("calc")!=-1)
-						{
-							System.out.println("scheduleStep: "+getComponentIdentifier());
-						}
+//						if(entries[i].toString().indexOf("calc")!=-1)
+//						{
+//							System.out.println("scheduleStep: "+getComponentIdentifier());
+//						}
 						entries[i].run();
 					}
 					catch(Exception e)
@@ -802,7 +811,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 
 		synchronized(ext_entries)
 		{
-			System.out.println("Adding to ext entries: "+cid);
+//			System.out.println("Adding to ext entries: "+cid);
 			if(ext_forbidden)
 			{
 				throw new ComponentTerminatedException(cid);

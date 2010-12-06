@@ -5,7 +5,6 @@ import jadex.commons.IFuture;
 import jadex.commons.ThreadSuspendable;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.concurrent.DelegationResultListener;
-import jadex.commons.concurrent.IResultListener;
 import jadex.commons.service.IInternalService;
 import jadex.commons.service.IServiceIdentifier;
 
@@ -78,22 +77,22 @@ public class DecouplingServiceInvocationInterceptor implements IServiceInvocatio
 		else
 		{
 			final Future future = new Future();
-			if(sic.getMethod().getName().indexOf("calcu")!=-1)
-			{
-				System.out.println("cal start: "+sic.getArguments()[0]+" "+ea.getComponentIdentifier());
-				future.addResultListener(new IResultListener()
-				{
-					public void resultAvailable(Object source, Object result)
-					{
-						System.out.println("cal end: "+sic.getArguments()[0]+" "+ea.getComponentIdentifier());
-					}
-					
-					public void exceptionOccurred(Object source, Exception exception)
-					{
-						System.out.println("cal ex: "+sic.getArguments()[0]+" "+ea.getComponentIdentifier());
-					}
-				});
-			}
+//			if(sic.getMethod().getName().indexOf("calcu")!=-1)
+//			{
+//				System.out.println("cal start: "+sic.getArguments()[0]+" "+ea.getComponentIdentifier());
+//				future.addResultListener(new IResultListener()
+//				{
+//					public void resultAvailable(Object source, Object result)
+//					{
+//						System.out.println("cal end: "+sic.getArguments()[0]+" "+ea.getComponentIdentifier());
+//					}
+//					
+//					public void exceptionOccurred(Object source, Exception exception)
+//					{
+//						System.out.println("cal ex: "+sic.getArguments()[0]+" "+ea.getComponentIdentifier());
+//					}
+//				});
+//			}
 			
 			IFuture resfut = ea.scheduleStep(new IComponentStep()
 			{

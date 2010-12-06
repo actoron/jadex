@@ -50,7 +50,7 @@ public class CalculateAgent extends MicroAgent
 			{
 				if(!isHadJob())
 				{
-					System.out.println("killComponent: "+getComponentIdentifier());
+//					System.out.println("killComponent: "+getComponentIdentifier());
 					killComponent();
 				}
 				setHadJob(false);

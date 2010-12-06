@@ -551,7 +551,7 @@ public class DisplayPanel extends JComponent
 							});
 						}
 					});
-					progressupdate.start();
+//					progressupdate.start();
 				}
 			}
 		});
@@ -677,9 +677,9 @@ public class DisplayPanel extends JComponent
 							x	= bounds.x+drawarea.x+corx + (corw-width)/2;
 							y	= y + fm.getHeight()*2 + 2;
 							bar.setBounds(0, 0, width, barsize.height);
-							g.translate(x, y);
-							bar.paint(g);
-							g.translate(-x, -y);
+							Graphics	g2	= g.create();
+							g2.translate(x, y);
+							bar.paint(g2);
 						}
 						else if(corw>8 && corh>8)
 						{
@@ -688,9 +688,9 @@ public class DisplayPanel extends JComponent
 							int	y	= bounds.y+drawarea.y+cory + Math.max((corh-barsize.height)/2, 2);
 							bar.setValue(((Number)progressdata.get(progress)).intValue());
 							bar.setBounds(0, 0, corw-4, Math.min(barsize.height, corh-4));
-							g.translate(x, y);
-							bar.paint(g);
-							g.translate(-x, -y);
+							Graphics	g2	= g.create();
+							g2.translate(x, y);
+							bar.paint(g2);
 						}
 					}
 				}
