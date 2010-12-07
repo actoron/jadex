@@ -14,7 +14,7 @@ public class GenerateAgent extends MicroAgent
 	 */
 	public void agentCreated()
 	{
-		addService(new GenerateService(this, (GeneratePanel)GeneratePanel.createGui(this.getExternalAccess())[1]));
+		addService(new GenerateService(this, (GeneratePanel)GeneratePanel.createGui(this.getExternalAccess())[1]));		
 	}
 	
 	//-------- static methods --------

@@ -1330,17 +1330,18 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 			});
 			for(int j=0; j<num; j++)
 			{
-//				try
-//				{
-				IFuture ret = ces.createComponent(component.getName(), component.getType(model).getFilename(),
-					new CreationInfo(component.getConfiguration(), getArguments(component), adapter.getComponentIdentifier(),
-					component.isSuspended(), component.getMaster(), component.getDaemon(), component.getAutoShutdown(), model.getAllImports()), null);
-				ret.addResultListener(crl);
-//				}
-//				catch(Exception e)
-//				{
-//					e.printStackTrace();
-//				}
+				MComponentType	type	= component.getType(model);
+				if(type!=null)
+				{
+					IFuture ret = ces.createComponent(component.getName(), component.getType(model).getFilename(),
+						new CreationInfo(component.getConfiguration(), getArguments(component), adapter.getComponentIdentifier(),
+						component.isSuspended(), component.getMaster(), component.getDaemon(), component.getAutoShutdown(), model.getAllImports()), null);
+					ret.addResultListener(crl);
+				}
+				else
+				{
+					crl.exceptionOccurred(this, new RuntimeException("No such component type: "+component.getTypeName()));
+				}
 			}
 		}
 		else

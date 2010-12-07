@@ -1,7 +1,11 @@
 package jadex.micro.examples.mandelbrot;
 
 import jadex.base.gui.StatusBar;
+import jadex.bridge.IComponentListener;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
+import jadex.commons.ChangeEvent;
 import jadex.commons.SGUI;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.gui.PropertiesPanel;
@@ -16,6 +20,7 @@ import java.awt.event.WindowEvent;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 /**
  *  The panel for controlling the generator.
@@ -154,6 +159,32 @@ public class GeneratePanel extends JPanel
 				agent.killComponent();
 			}
 		});
+		
+		agent.scheduleStep(new IComponentStep()
+		{
+			public Object execute(IInternalAccess ia)
+			{
+				ia.addComponentListener(new IComponentListener()
+				{
+					public void componentTerminating(ChangeEvent ce)
+					{
+						SwingUtilities.invokeLater(new Runnable()
+						{
+							public void run()
+							{
+								f.setVisible(false);
+							}
+						});
+					}
+					
+					public void componentTerminated(ChangeEvent ce)
+					{
+					}
+				});
+				
+				return null;
+			}
+		});		
 		
 		return new Object[]{f, gp};
 	}

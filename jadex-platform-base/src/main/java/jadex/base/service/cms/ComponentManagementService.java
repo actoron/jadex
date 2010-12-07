@@ -5,13 +5,13 @@ import jadex.base.fipa.SearchConstraints;
 import jadex.bridge.ComponentFactorySelector;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.CreationInfo;
+import jadex.bridge.ICMSComponentListener;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentAdapterFactory;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentFactory;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
-import jadex.bridge.ICMSComponentListener;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IMessageService;
@@ -23,6 +23,7 @@ import jadex.commons.IFuture;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.CollectionResultListener;
+import jadex.commons.concurrent.CounterResultListener;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
@@ -370,40 +371,73 @@ public abstract class ComponentManagementService extends BasicService implements
 								}
 							}
 							
-							public void exceptionOccurred(Object source, Exception exception)
+							public void exceptionOccurred(Object source, final Exception exception)
 							{
-//								e.printStackTrace();
+//								exception.printStackTrace();
 //								System.out.println("Ex: "+cid+" "+exception);
-								
-								CleanupCommand	cc	= null;
-								synchronized(adapters)
+								final Runnable	cleanup	= new Runnable()
 								{
-									synchronized(descs)
+									public void run()
 									{
-										adapters.remove(cid);
-										descs.remove(cid);
-										initinfos.remove(cid);		
-										if(exceptions!=null)
-											exceptions.remove(cid);
-										cc	= (CleanupCommand)ccs.remove(cid);										
+										CleanupCommand	cc	= null;
+										synchronized(adapters)
+										{
+											synchronized(descs)
+											{
+												adapters.remove(cid);
+												descs.remove(cid);
+												initinfos.remove(cid);		
+												if(exceptions!=null)
+													exceptions.remove(cid);
+												cc	= (CleanupCommand)ccs.remove(cid);										
+											}
+										}
+										
+										IResultListener reslis = (IResultListener)killresultlisteners.remove(cid);
+										if(reslis!=null)
+										{
+											reslis.exceptionOccurred(cid, exception);
+										}
+										
+										if(cc!=null && cc.killfutures!=null)
+										{
+											for(int i=0; i<cc.killfutures.size(); i++)
+											{
+												((Future)cc.killfutures.get(i)).setException(exception);
+											}
+										}
+										
+										inited.setException(exception);
+									}
+								};
+								
+								IComponentIdentifier[]	children	= ad.getChildren();
+								if(children.length>0)
+								{
+									CounterResultListener	crl	= new CounterResultListener(children.length, true,
+										new IResultListener()
+										{
+											public void resultAvailable(Object source, Object result)
+											{
+												cleanup.run();
+											}
+											
+											public void exceptionOccurred(Object source, Exception exception)
+											{
+												cleanup.run();
+											}
+										}
+									);
+									
+									for(int i=0; i<children.length; i++)
+									{
+										destroyComponent(children[i]).addResultListener(crl);
 									}
 								}
-								
-								IResultListener reslis = (IResultListener)killresultlisteners.remove(cid);
-								if(reslis!=null)
+								else
 								{
-									reslis.exceptionOccurred(cid, exception);
+									cleanup.run();									
 								}
-								
-								if(cc!=null && cc.killfutures!=null)
-								{
-									for(int i=0; i<cc.killfutures.size(); i++)
-									{
-										((Future)cc.killfutures.get(i)).setException(exception);
-									}
-								}
-								
-								inited.setException(exception);
 							}
 						});
 						
