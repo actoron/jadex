@@ -103,7 +103,7 @@ public class ExecutionService extends BasicService implements IExecutionService
 	{
 		final Future ret = new Future();
 		IComponentManagementService ces = (IComponentManagementService) SServiceProvider.getService(provider, IComponentManagementService.class).get(new ThreadSuspendable());
-		ces.createComponent(null, modelname, new CreationInfo(null, arguments, wfms, true, null), null).addResultListener(new DefaultResultListener()
+		ces.createComponent(null, modelname, new CreationInfo(null, arguments, wfms, true), null).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{

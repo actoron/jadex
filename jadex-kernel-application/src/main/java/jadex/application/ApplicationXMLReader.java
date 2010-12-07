@@ -259,6 +259,7 @@ public class ApplicationXMLReader
 		types.add(new TypeInfo(new XMLInfo(new QName(uri, "component")), new ObjectInfo(MComponentInstance.class),
 			new MappingInfo(null, new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo("type", "typeName")),
+				new AttributeInfo(new AccessInfo("autoshutdown", "autoShutdown")),
 				new AttributeInfo(new AccessInfo("number"), new AttributeConverter(pexconv, null))
 			}, null)));
 		

@@ -293,7 +293,7 @@ public abstract class ComponentManagementService extends BasicService implements
 										}
 										
 										descs.put(cid, ad);
-//										System.out.println("adding cid: "+cid);
+//										System.out.println("adding cid: "+cid+" "+ad.getMaster()+" "+ad.getDaemon()+" "+ad.getAutoShutdown());
 										adapters.put(cid, adapter);
 										initinfos.remove(cid);
 										
@@ -1128,7 +1128,6 @@ public abstract class ComponentManagementService extends BasicService implements
 						cancel(adapter);
 //						exeservice.cancel(adapter);
 						
-//						killparent	= desc.isMaster();
 						killparent = desc.getMaster()!=null && desc.getMaster().booleanValue();
 						CMSComponentDescription padesc = (CMSComponentDescription)descs.get(desc.getParent());
 						if(padesc!=null)
@@ -1151,7 +1150,10 @@ public abstract class ComponentManagementService extends BasicService implements
 										childcounts.remove(padesc.getName());
 //									System.out.println("childcount-: "+padesc.getName()+" "+cc);
 								}
-								killparent	= childcount==null || childcount.intValue()<=1;
+								// todo: could fail when parent is still in init phase. 
+								// Should test for init phase and remember that it has to be killed.
+								killparent = killparent || (pas!=null && pas.booleanValue() 
+									&& (childcount==null || childcount.intValue()<=1));
 							}
 						}
 						pad	= (IComponentAdapter)adapters.get(desc.getParent());
@@ -1230,12 +1232,9 @@ public abstract class ComponentManagementService extends BasicService implements
 			// Kill parent is autoshutdown or child was master.
 			if(pad!=null && killparent)
 			{
-				System.out.println("killparent: "+pad.getComponentIdentifier());
+//				System.out.println("killparent: "+pad.getComponentIdentifier());
 				destroyComponent(pad.getComponentIdentifier());
 			}
-			
-			
-			
 		}
 		
 		public void exceptionOccurred(Object source, Exception exception)

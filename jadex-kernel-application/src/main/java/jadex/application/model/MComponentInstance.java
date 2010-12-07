@@ -27,14 +27,17 @@ public class MComponentInstance
 	/** The number of components. */
 	protected IParsedExpression number;
 	
-	/** The master flag. */
-	protected boolean master;
-	
 	/** The suspended flag. */
 	protected boolean suspended;
 	
+	/** The master flag. */
+	protected Boolean master;
+	
 	/** The daemon flag. */
-	protected boolean daemon;
+	protected Boolean daemon;
+	
+	/** The autoshutdown flag. */
+	protected Boolean autoshutdown;
 	
 	/** The list of contained arguments. */
 	protected List arguments;
@@ -126,39 +129,57 @@ public class MComponentInstance
 	}
 	
 	/**
-	 *  Get the master flag.
-	 *  @return True, if master.
+	 *  Get the master.
+	 *  @return the master.
 	 */
-	public boolean isMaster()
+	public Boolean getMaster()
 	{
-		return this.master;
+		return master;
 	}
 
 	/**
-	 *  Set the master flag..
-	 *  @param start The master flag.
+	 *  Set the master.
+	 *  @param master The master to set.
 	 */
-	public void setMaster(boolean master)
+	public void setMaster(Boolean master)
 	{
 		this.master = master;
 	}
-	
+
 	/**
 	 *  Get the daemon.
-	 *  @return The daemon.
+	 *  @return the daemon.
 	 */
-	public boolean isDaemon()
+	public Boolean getDaemon()
 	{
-		return this.daemon;
+		return daemon;
 	}
 
 	/**
 	 *  Set the daemon.
 	 *  @param daemon The daemon to set.
 	 */
-	public void setDaemon(boolean daemon)
+	public void setDaemon(Boolean daemon)
 	{
 		this.daemon = daemon;
+	}
+
+	/**
+	 *  Get the autoshutdown.
+	 *  @return the autoshutdown.
+	 */
+	public Boolean getAutoShutdown()
+	{
+		return autoshutdown;
+	}
+
+	/**
+	 *  Set the autoshutdown.
+	 *  @param autoshutdown The autoshutdown to set.
+	 */
+	public void setAutoShutdown(Boolean autoshutdown)
+	{
+		this.autoshutdown = autoshutdown;
 	}
 
 	/**

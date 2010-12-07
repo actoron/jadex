@@ -92,7 +92,35 @@ public class CreationInfo
 	 */
 	public CreationInfo(String config, Map args, IComponentIdentifier parent)
 	{
-		this(config, args, parent, false, null);
+		this(config, args, parent, false, (String[])null);
+	}
+	
+	/**
+	 *  Create a new creation info.
+	 *  @param config	The configuration.
+	 *  @param args	The arguments.
+	 *  @param parent	The parent of the component to be created.
+	 *  @param suspend	The suspend flag.
+	 *  @param master	The master flag.
+	 *  @param imports	The imports.
+	 */
+	public CreationInfo(String config, Map args, IComponentIdentifier parent, boolean suspend)
+	{
+		this(config, args, parent, suspend, (String[])null);
+	}
+	
+	/**
+	 *  Create a new creation info.
+	 *  @param config	The configuration.
+	 *  @param args	The arguments.
+	 *  @param parent	The parent of the component to be created.
+	 *  @param suspend	The suspend flag.
+	 *  @param master	The master flag.
+	 *  @param imports	The imports.
+	 */
+	public CreationInfo(String config, Map args, IComponentIdentifier parent, boolean suspend, String[] imports)
+	{
+		this(config, args, parent, false, null, null, null, imports);
 	}
 	
 	/**
@@ -128,9 +156,24 @@ public class CreationInfo
 	 *  @param parent	The parent of the component to be created.
 	 *  @param suspend	The suspend flag.
 	 *  @param master	The master flag.
+	 */
+	public CreationInfo(String config, Map args, IComponentIdentifier parent, boolean suspend, 
+		Boolean master, Boolean daemon, Boolean autoshutdown)
+	{
+		this(config, args, parent, suspend, master, daemon, autoshutdown, null);
+	}
+	
+	/**
+	 *  Create a new creation info.
+	 *  @param config	The configuration.
+	 *  @param args	The arguments.
+	 *  @param parent	The parent of the component to be created.
+	 *  @param suspend	The suspend flag.
+	 *  @param master	The master flag.
 	 *  @param imports	The imports.
 	 */
-	public CreationInfo(String config, Map args, IComponentIdentifier parent, boolean suspend, Boolean master, Boolean daemon, String[] imports)
+	public CreationInfo(String config, Map args, IComponentIdentifier parent, boolean suspend, 
+		Boolean master, Boolean daemon, Boolean autoshutdown, String[] imports)
 	{
 		this.config	= config;
 		this.args	= args;

@@ -40,7 +40,7 @@ public class GetExternalAccessPlan extends Plan
 		Map	args	= new HashMap();
 		args.put("future", wait);
 		IFuture init = ces.createComponent(cid.getLocalName(), "jadex/bdi/testcases/misc/ExternalAccessWorker.agent.xml",
-			new CreationInfo(null, args, getComponentIdentifier(), false, null), null);
+			new CreationInfo(null, args, getComponentIdentifier(), false), null);
 		
 		// Get and use external access.
 		final boolean[]	gotexta	= new boolean[3];	// 0: got exception, 1: got access, 2: got belief value.	

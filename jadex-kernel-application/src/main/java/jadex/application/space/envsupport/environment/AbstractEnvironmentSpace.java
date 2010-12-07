@@ -1060,7 +1060,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 							IComponentIdentifier cid = cms.generateComponentIdentifier(ret.getType());
 							setOwner(ret.getId(), cid);
 							IFuture	future	= cms.createComponent(cid.getLocalName(), getContext().getComponentFilename(compotype),
-								new CreationInfo(null, null, getContext().getComponentIdentifier(), false, false, false, getContext().getAllImports()), null);
+								new CreationInfo(null, null, getContext().getComponentIdentifier(), false, getContext().getAllImports()), null);
 							future.addResultListener(new IResultListener()
 							{
 								public void resultAvailable(Object source, Object result)

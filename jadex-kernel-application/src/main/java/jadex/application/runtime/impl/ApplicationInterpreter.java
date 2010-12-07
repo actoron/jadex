@@ -1334,7 +1334,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 //				{
 				IFuture ret = ces.createComponent(component.getName(), component.getType(model).getFilename(),
 					new CreationInfo(component.getConfiguration(), getArguments(component), adapter.getComponentIdentifier(),
-					component.isSuspended(), component.isMaster(), component.isDaemon(), model.getAllImports()), null);
+					component.isSuspended(), component.getMaster(), component.getDaemon(), component.getAutoShutdown(), model.getAllImports()), null);
 				ret.addResultListener(crl);
 //				}
 //				catch(Exception e)

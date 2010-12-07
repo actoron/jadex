@@ -59,8 +59,9 @@ public class CreateComponentTask implements ITask
 				final IResultListener killlistener = (IResultListener)context.getParameterValue("killlistener");
 				final String[] resultmapping = (String[])context.getParameterValue("resultmapping");
 				boolean wait = context.getParameterValue("wait")!=null? ((Boolean)context.getParameterValue("wait")).booleanValue(): resultmapping!=null;
-				boolean master = context.getParameterValue("master")!=null? ((Boolean)context.getParameterValue("master")).booleanValue(): false;
-				boolean daemon = context.getParameterValue("daemon")!=null? ((Boolean)context.getParameterValue("daemon")).booleanValue(): false;
+				Boolean master = context.getParameterValue("master")!=null? (Boolean)context.getParameterValue("master"): null;
+				Boolean daemon = context.getParameterValue("daemon")!=null? (Boolean)context.getParameterValue("daemon"): null;
+				Boolean autoshutdown = context.getParameterValue("autoshutdown")!=null? (Boolean)context.getParameterValue("autoshutdown"): null;
 				
 				Map args = (Map)context.getParameterValue("arguments");
 				if(args==null)
@@ -114,7 +115,7 @@ public class CreateComponentTask implements ITask
 				
 				cms.createComponent(name, model,
 					new CreationInfo(config, args, sub ? instance.getComponentAdapter().getComponentIdentifier() : null, 
-						suspend, master, daemon, instance.getModelElement().getAllImports()), lis);
+						suspend, master, daemon, autoshutdown, instance.getModelElement().getAllImports()), lis);
 
 				if(!wait)
 				{
