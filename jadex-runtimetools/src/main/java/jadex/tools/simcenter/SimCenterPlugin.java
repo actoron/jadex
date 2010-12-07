@@ -2,7 +2,6 @@ package jadex.tools.simcenter;
 
 import jadex.base.gui.plugin.AbstractJCCPlugin;
 import jadex.commons.SGUI;
-import jadex.tools.help.SHelp;
 
 import java.awt.Insets;
 import java.awt.event.ActionEvent;

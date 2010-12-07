@@ -8,7 +8,6 @@ import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.Future;
-import jadex.commons.ICommand;
 import jadex.commons.IFuture;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.DefaultResultListener;

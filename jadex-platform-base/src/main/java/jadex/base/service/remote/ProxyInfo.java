@@ -23,9 +23,6 @@ public class ProxyInfo
 	/** The target class. */
 	protected List targetinterfaces;
 		
-	/** The value cache. */
-	protected Map cache;
-	
 	/** The excluded methods. */
 	protected Set excluded;
 	
@@ -76,36 +73,7 @@ public class ProxyInfo
 //	{
 //		this.rr = rr;
 //	}
-	
-	/**
-	 *  Get the cached values.
-	 *  @return The cached values. 
-	 */
-	public Map getCache()
-	{
-		return cache;
-	}
-
-	/**
-	 *  Set the cached values.
-	 *  @param cache The cached values. 
-	 */
-	public void setCache(Map cache)
-	{
-		this.cache = cache;
-	}
-	
-	/**
-	 *  Get the cached values.
-	 *  @return The cached values. 
-	 */
-	public void putCache(Object key, Object value)
-	{
-		if(cache==null)
-			cache = new HashMap();
-		cache.put(key, value);
-	}
-	
+		
 	/**
 	 *  Get the replacements
 	 *  @return The replacements.
@@ -319,8 +287,7 @@ public class ProxyInfo
 	 */
 	public String toString()
 	{
-		return "ProxyInfo(cache=" + cache
-			+ ", excluded=" + excluded + ", uncached=" + uncached
+		return "ProxyInfo(excluded=" + excluded + ", uncached=" + uncached
 			+ ", synchronous=" + synchronous + ", replacements="
 			+ replacements + ", targetinterfaces="
 			+ targetinterfaces + ")";

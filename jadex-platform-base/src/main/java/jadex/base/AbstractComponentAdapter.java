@@ -604,7 +604,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 		if(!IComponentDescription.STATE_TERMINATED.equals(desc.getState()))
 		{
 			if(fatalerror)
-				throw new ComponentTerminatedException(cid);
+				return false;	// Component already failed: tell executor not to call again. (can happen during failed init)
 	
 			// Remember execution thread.
 			this.componentthread	= Thread.currentThread();

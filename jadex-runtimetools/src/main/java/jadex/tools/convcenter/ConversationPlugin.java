@@ -18,7 +18,6 @@ import jadex.commons.Properties;
 import jadex.commons.SGUI;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.commons.service.SServiceProvider;
-import jadex.tools.help.SHelp;
 import jadex.tools.jcc.AgentControlCenter;
 import jadex.tools.starter.StarterPlugin;
 

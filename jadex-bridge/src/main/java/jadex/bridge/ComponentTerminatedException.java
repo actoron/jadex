@@ -32,5 +32,4 @@ public class ComponentTerminatedException	extends RuntimeException
 	{
 		return cid;
 	}
-	
 }

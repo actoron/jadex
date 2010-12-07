@@ -22,7 +22,6 @@ import jadex.commons.gui.JValidatorTextField;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.library.ILibraryService;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
-import jadex.tools.help.SHelp;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -38,8 +37,6 @@ import java.io.StringWriter;
 import java.util.List;
 import java.util.Map;
 
-import javax.help.CSH;
-import javax.help.HelpBroker;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.Icon;
 import javax.swing.JButton;

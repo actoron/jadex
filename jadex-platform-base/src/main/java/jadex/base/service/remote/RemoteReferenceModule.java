@@ -143,10 +143,28 @@ public class RemoteReferenceModule
 		{
 			pi = createProxyInfo(target, remoteinterfaces);
 			proxyinfos.put(tcid, pi);
-//			System.out.println("add: "+tcid+" "+ret);
+//			System.out.println("add: "+tcid+" "+pi);
 		}
 		
-		return new ProxyReference(pi, rr);
+		ProxyReference	ret	= new ProxyReference(pi, rr);
+
+		// Check interface methods and possibly cache constant calls.
+		for(int i=0; i<remoteinterfaces.length; i++)
+		{
+			Method[] methods = remoteinterfaces[i].getMethods();
+			for(int j=0; j<methods.length; j++)
+			{
+				addCachedMethodValue(ret, pi, methods[j], target);
+			}
+		}
+		// Check object methods and possibly cache constant calls.
+		Method[] methods = Object.class.getMethods();
+		for(int i=0; i<methods.length; i++)
+		{
+			addCachedMethodValue(ret, pi, methods[i], target);
+		}
+		
+		return ret;
 	}
 	
 	/**
@@ -228,22 +246,10 @@ public class RemoteReferenceModule
 							ret.addMethodReplacement(mis[j], (IMethodReplacement)tmp[1]);
 						}
 					}
-				}
-				
-				// Check methods and possibly cache constant calls.
-				Method[] methods = remoteinterfaces[i].getMethods();
-				for(int j=0; j<methods.length; j++)
-				{
-					addCachedMethodValue(ret, methods[j], target);
-				}
+				}				
 			}
 		}
 		
-		Method[] methods = Object.class.getMethods();
-		for(int i=0; i<methods.length; i++)
-		{
-			addCachedMethodValue(ret, methods[i], target);
-		}
 		// Add default replacement for equals() and hashCode().
 		Class targetclass = target.getClass();
 		Method	equals	= SReflect.getMethod(Object.class, "equals", new Class[]{Object.class});
@@ -278,7 +284,7 @@ public class RemoteReferenceModule
 	/**
 	 *  Add a cached method value to the proxy info.
 	 */
-	public static void addCachedMethodValue(ProxyInfo pi, Method m, Object target)
+	public static void addCachedMethodValue(ProxyReference pr, ProxyInfo pi, Method m, Object target)
 	{
 		// only cache when not excluded, not cached and not replaced
 		if(!pi.isUncached(m) && !pi.isExcluded(m) && !pi.isReplaced(m)) 
@@ -303,7 +309,7 @@ public class RemoteReferenceModule
 					{
 //						System.out.println("Calling for caching: "+m);
 						Object val = m.invoke(target, new Object[0]);
-						pi.putCache(m.getName(), val);
+						pr.putCache(m.getName(), val);
 					}
 					catch(Exception e)
 					{

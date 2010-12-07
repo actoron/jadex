@@ -3,7 +3,6 @@ package jadex.base.service.remote;
 import jadex.commons.IFuture;
 import jadex.micro.IMicroExternalAccess;
 
-import java.util.Map;
 
 /**
  *  Remote command interface for commands that the 

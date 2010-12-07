@@ -14,7 +14,6 @@ import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.commons.service.IServiceProvider;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.library.ILibraryService;
-import jadex.tools.help.SHelp;
 import jadex.xml.PropertiesXMLHelper;
 
 import java.awt.Cursor;

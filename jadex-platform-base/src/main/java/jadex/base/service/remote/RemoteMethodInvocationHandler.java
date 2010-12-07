@@ -5,7 +5,6 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.Future;
-import jadex.commons.ICommand;
 import jadex.commons.IFuture;
 import jadex.commons.SUtil;
 import jadex.commons.ThreadSuspendable;
@@ -68,13 +67,13 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 			throw new UnsupportedOperationException("Method is excluded from interface for remote invocations: "+method.getName());
 		
 		// Test if method is constant and a cache value is available.
-		if(pi.getCache()!=null && !pi.isUncached(method) && !pi.isReplaced(method))
+		if(pr.getCache()!=null && !pi.isUncached(method) && !pi.isReplaced(method))
 		{
 			Class rt = method.getReturnType();
 			Class[] ar = method.getParameterTypes();
 			if(!rt.equals(void.class) && !(rt.isAssignableFrom(IFuture.class)) && ar.length==0)
 			{
-				return pi.getCache().get(method.getName());
+				return pr.getCache().get(method.getName());
 			}
 		}
 		

@@ -2,14 +2,12 @@ package jadex.base.service.remote;
 
 import jadex.bridge.Argument;
 import jadex.bridge.ComponentIdentifier;
-import jadex.bridge.ComponentServiceContainer;
 import jadex.bridge.IArgument;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IRemoteServiceManagementService;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
-import jadex.commons.SUtil;
 import jadex.commons.collection.LRU;
 import jadex.commons.concurrent.CollectionResultListener;
 import jadex.commons.concurrent.DelegationResultListener;
@@ -166,14 +164,14 @@ public class ProxyAgent extends MicroAgent
 				{
 					public void resultAvailable(Object source, Object result)
 					{
-						try
-						{
-							IComponentManagementService rcms = (IComponentManagementService)result;
-						}
-						catch(Exception e)
-						{
-							System.out.println("heer: "+SUtil.arrayToString(result.getClass().getInterfaces()));
-						}
+//						try
+//						{
+//							IComponentManagementService rcms = (IComponentManagementService)result;
+//						}
+//						catch(Exception e)
+//						{
+//							System.out.println("heer: "+SUtil.arrayToString(result.getClass().getInterfaces()));
+//						}
 						
 						final IComponentManagementService rcms = (IComponentManagementService)result;
 						rcms.getChildren(cid).addResultListener(createResultListener(new IResultListener()

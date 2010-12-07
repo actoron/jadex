@@ -2,6 +2,7 @@ package jadex.commons.service;
 
 import jadex.commons.Future;
 import jadex.commons.IFuture;
+import jadex.commons.SReflect;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -57,6 +58,8 @@ public class BasicService implements IInternalService
 	 */
 	public BasicService(Object providerid, Class type, Map properties)
 	{
+		if(!SReflect.isSupertype(type, getClass()))
+			throw new RuntimeException("Service must implement provided interface: "+getClass().getName()+", "+type.getName());
 		this.sid = createServiceIdentifier(providerid, type, getClass());
 		this.properties	= properties;
 	}
