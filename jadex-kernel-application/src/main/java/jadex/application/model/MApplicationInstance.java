@@ -6,7 +6,7 @@ import java.util.List;
 /**
  *  Application instance representation.
  */
-public class MApplicationInstance
+public class MApplicationInstance extends MStartable
 {
 	//-------- attributes --------
 	

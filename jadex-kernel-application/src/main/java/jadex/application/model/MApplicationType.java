@@ -3,6 +3,7 @@ package jadex.application.model;
 import jadex.bridge.AbstractErrorReportBuilder;
 import jadex.bridge.Argument;
 import jadex.bridge.ModelInfo;
+import jadex.bridge.ModelValueProvider;
 import jadex.commons.ICacheableModel;
 import jadex.commons.IFuture;
 import jadex.commons.SReflect;
@@ -20,12 +21,9 @@ import javax.xml.namespace.QName;
 /**
  *  Application type representation.
  */
-public class MApplicationType implements ICacheableModel
+public class MApplicationType extends MStartable implements ICacheableModel
 {
 	//-------- attributes --------
-	
-	/** The autoshutdown flag. */
-	protected Boolean autoshutdown;
 	
 	/** The imports. */
 	protected List imports;
@@ -117,6 +115,19 @@ public class MApplicationType implements ICacheableModel
 		modelinfo.setConfigurations(configs);
 
 		// Init arguments.
+		ModelValueProvider master = new ModelValueProvider();
+		ModelValueProvider daemon = new ModelValueProvider();
+		ModelValueProvider autoshutdown = new ModelValueProvider();
+		modelinfo.setMaster(master);
+		modelinfo.setDaemon(daemon);
+		modelinfo.setAutoShutdown(autoshutdown);
+		if(getMaster()!=null)
+			master.setValue(getMaster());
+		if(getDaemon()!=null)
+			daemon.setValue(getDaemon());
+		if(getAutoShutdown()!=null)
+			autoshutdown.setValue(getAutoShutdown());
+		
 		for(int i=0; i<apps.size(); i++)
 		{
 			MApplicationInstance mapp = (MApplicationInstance)apps.get(i);
@@ -142,7 +153,27 @@ public class MApplicationType implements ICacheableModel
 					entries.put(se, e.toString()+": "+arg.getValue());
 				}
 			}
+			
+			Object val = mapp.getMaster();
+			if(val!=null)
+			{
+				master.setValue(mapp.getName(), val);
+				System.out.println("master: "+val+" "+mapp.getName());
+			}
+			val = mapp.getDaemon();
+			if(val!=null)
+			{
+				daemon.setValue(mapp.getName(), val);
+				System.out.println("daemon: "+val+" "+mapp.getName());
+			}
+			val = mapp.getAutoShutdown();
+			if(val!=null)
+			{
+				autoshutdown.setValue(mapp.getName(), val);
+				System.out.println("autoshutdown: "+val+" "+mapp.getName());
+			}
 		}
+		
 		
 		if(propertylist!=null)
 		{
@@ -200,7 +231,7 @@ public class MApplicationType implements ICacheableModel
 			
 			modelinfo.setProvidedServices(tmp);
 		}
-		
+				
 		// Build error report.
 		modelinfo.setReport(new AbstractErrorReportBuilder(modelinfo.getName(), modelinfo.getFilename(),
 			new String[]{"Space", "Component", "Application"}, entries, null)
@@ -359,24 +390,6 @@ public class MApplicationType implements ICacheableModel
 	public void setLastChecked(long lastchecked)
 	{
 		this.lastchecked = lastchecked;
-	}
-
-	/**
-	 *  Get the autoshutdown.
-	 *  @return The autoshutdown.
-	 */
-	public Boolean getAutoShutdown()
-	{
-		return this.autoshutdown;
-	}
-
-	/**
-	 *  Set the autoshutdown.
-	 *  @param autoshutdown The autoshutdown to set.
-	 */
-	public void setAutoShutdown(Boolean autoshutdown)
-	{
-		this.autoshutdown = autoshutdown;
 	}
 
 	/**

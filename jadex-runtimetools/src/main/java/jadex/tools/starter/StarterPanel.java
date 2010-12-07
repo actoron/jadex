@@ -25,6 +25,7 @@ import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -97,13 +98,18 @@ public class StarterPanel extends JPanel
 	/** The configuration. */
 	protected JComboBox config;
 
-	/** The suspend mode. */
-	protected JCheckBox suspend;
-
 	/** The component type. */
 	protected JTextField componentname;
 	protected JLabel componentnamel;
 	protected JTextField parenttf;
+
+	/** The suspend mode. */
+	protected JCheckBox suspend;
+	
+	/** The termination flags. */
+	protected JCheckBox mastercb;
+	protected JCheckBox daemoncb;
+	protected JCheckBox autosdcb;
 
 //	/** The application name. */
 //	protected JComboBox appname;
@@ -195,6 +201,7 @@ public class StarterPanel extends JPanel
 			public void itemStateChanged(ItemEvent e)
 			{
 				refreshArguments();
+				refreshFlags();
 			}
 		});
 
@@ -324,12 +331,18 @@ public class StarterPanel extends JPanel
 									int max = ((Integer)numcomponents.getValue()).intValue();
 									for(int i=0; i<max; i++)
 									{
-										starter.createComponent(typename, an, configname, args, suspend.isSelected(), killlistener);
+										starter.createComponent(typename, an, configname, args, suspend.isSelected(), 
+											mastercb.isSelected()? Boolean.TRUE: Boolean.FALSE, 
+											daemoncb.isSelected()? Boolean.TRUE: Boolean.FALSE, 
+											autosdcb.isSelected()? Boolean.TRUE: Boolean.FALSE, killlistener);
 									}
 								}
 								else
 								{
-									starter.createComponent(typename, an, configname, args, suspend.isSelected(), killlistener);
+									starter.createComponent(typename, an, configname, args, suspend.isSelected(), 
+										mastercb.isSelected()? Boolean.TRUE: Boolean.FALSE, 
+										daemoncb.isSelected()? Boolean.TRUE: Boolean.FALSE, 
+										autosdcb.isSelected()? Boolean.TRUE: Boolean.FALSE, killlistener);
 								}
 							}
 							
@@ -392,11 +405,11 @@ public class StarterPanel extends JPanel
 			
 		componentpanel.add(new JLabel("Parent"), new GridBagConstraints(0, 1, 1, 1, 0, 0, GridBagConstraints.WEST,
 			GridBagConstraints.BOTH, new Insets(2, 0, 0, 2), 0, 0));
-		parenttf	= new JTextField();
+		parenttf = new JTextField();
 		parenttf.setEditable(false);
 		componentpanel.add(parenttf, new GridBagConstraints(1, 1, 2, 1, 1, 0, GridBagConstraints.EAST,
 			GridBagConstraints.BOTH, new Insets(2, 2, 0, 2), 0, 0));
-		
+	
 		JButton	chooseparent	= new JButton(icons.getIcon("Browse"));
 		chooseparent.setMargin(new Insets(0,0,0,0));
 		chooseparent.setToolTipText("Choose parent");
@@ -425,8 +438,50 @@ public class StarterPanel extends JPanel
 				setParent(null);
 			}
 		});
+		
+		JPanel flags = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
+//		Dimension pd = suspend.getPreferredSize();
+//		Dimension md = suspend.getMinimumSize();
+		mastercb = new JCheckBox("Master");
+		mastercb.setToolTipText("If a master component terminates the parent is killed as well");
+//		mastercb.setPreferredSize(pd);
+//		mastercb.setMinimumSize(md);
+		daemoncb = new JCheckBox("Daemon");
+		daemoncb.setToolTipText("A daemon component does not prevent the parent component to terminate");
+//		daemoncb.setPreferredSize(pd);
+//		daemoncb.setMinimumSize(md);
+		autosdcb = new JCheckBox("Auto Shutdown");
+		autosdcb.setToolTipText("Auto shutdown terminates a composite components when all (non daemon) components have terminated");
+//		autosdcb.setPreferredSize(pd);
+//		autosdcb.setMinimumSize(md);
+		
+		flags.add(suspend);
+		flags.add(mastercb);
+		flags.add(daemoncb);
+		flags.add(autosdcb);
+		componentpanel.add(new JLabel("Flags"), new GridBagConstraints(0, 2, 1, 0, 0, 0, GridBagConstraints.WEST,
+			GridBagConstraints.NONE, new Insets(2, 2, 0, 2), 0, 0));
+		componentpanel.add(flags, new GridBagConstraints(1, 2, 4, 0, 0, 0, GridBagConstraints.WEST,
+			GridBagConstraints.BOTH, new Insets(2, 2, 0, 2), 0, 0));
+//		componentpanel.add(new JButton("bla"), new GridBagConstraints(0, 2, 5, 1, 1, 0, GridBagConstraints.EAST,
+//			GridBagConstraints.BOTH, new Insets(2, 2, 0, 2), 0, 0));
 
-			
+		
+//		componentpanel.add(suspend, new GridBagConstraints(5, 1, 1, 1, 1, 0, GridBagConstraints.EAST,
+//			GridBagConstraints.BOTH, new Insets(2, 2, 0, 2), 0, 0));
+//		mastercb = new JCheckBox("Master");
+//		mastercb.setToolTipText("If a master component terminates the parent is killed as well.");
+//		componentpanel.add(mastercb, new GridBagConstraints(5, 1, 1, 1, 1, 0, GridBagConstraints.EAST,
+//			GridBagConstraints.BOTH, new Insets(2, 2, 0, 2), 0, 0));
+//		daemoncb = new JCheckBox("Daemon");
+//		daemoncb.setToolTipText("A daemon component does not prevent the parent component to terminate.");
+//		componentpanel.add(daemoncb, new GridBagConstraints(6, 1, 1, 1, 1, 0, GridBagConstraints.EAST,
+//			GridBagConstraints.BOTH, new Insets(2, 2, 0, 2), 0, 0));
+//		autosdcb = new JCheckBox("Auto Shutdown");
+//		autosdcb.setToolTipText("Auto shutdown terminates a composite components when all (non daemon) components have terminated.");
+//		componentpanel.add(autosdcb, new GridBagConstraints(7, 1, 1, 1, 1, 0, GridBagConstraints.EAST,
+//			GridBagConstraints.BOTH, new Insets(2, 2, 0, 2), 0, 0));
+					
 //		apppanel = new JPanel(new GridBagLayout());
 //		appnamel = new JLabel("Application name");
 //		apppanel.add(appnamel, new GridBagConstraints(0, 0, 1, 1, 0, 0, GridBagConstraints.WEST,
@@ -447,10 +502,10 @@ public class StarterPanel extends JPanel
 		confl = new JLabel("Configuration");
 		upper.add(confl, new GridBagConstraints(0, y, 1, 1, 0, 0, GridBagConstraints.WEST,
 			GridBagConstraints.BOTH, new Insets(2, 2, 2, 2), 0, 0));
-		upper.add(config, new GridBagConstraints(1, y, 1, 1, 1, 0, GridBagConstraints.WEST,
+		upper.add(config, new GridBagConstraints(1, y, 4, 1, 1, 0, GridBagConstraints.WEST,
 			GridBagConstraints.BOTH, new Insets(2, 2, 2, 2), 0, 0));
-		upper.add(suspend, new GridBagConstraints(2, y, 3, 1, 0, 0, GridBagConstraints.WEST,
-			GridBagConstraints.BOTH, new Insets(2, 2, 2, 2), 0, 0));
+//		upper.add(suspend, new GridBagConstraints(2, y, 3, 1, 0, 0, GridBagConstraints.WEST,
+//			GridBagConstraints.BOTH, new Insets(2, 2, 2, 2), 0, 0));
 		y++;
 		upper.add(componentpanel, new GridBagConstraints(0, y, 5, 1, 1, 0, GridBagConstraints.WEST,
 			GridBagConstraints.BOTH, new Insets(2, 2, 2, 2), 0, 0));
@@ -476,7 +531,7 @@ public class StarterPanel extends JPanel
 
 		componentnamel.setMinimumSize(confl.getMinimumSize());
 		componentnamel.setPreferredSize(confl.getPreferredSize());
-
+		
 		/*y++;
 		componentnamel = new JLabel("Component name");
 		content.add(componentnamel, new GridBagConstraints(0, y, 1, 1, 0, 0, GridBagConstraints.WEST,
@@ -706,6 +761,11 @@ public class StarterPanel extends JPanel
 		}
 				
 		filename.setText(adf);
+		
+		if(model!=null)
+		{
+			refreshFlags();
+		}
 
 		final IErrorReport report = model!=null? model.getReport(): null;
 		if(report!=null)
@@ -745,6 +805,25 @@ public class StarterPanel extends JPanel
 	
 		for(int i=0; i<lis.length; i++)
 			config.addItemListener(lis[i]);
+	}
+	
+	/**
+	 *  Refresh the flags. 
+	 */
+	protected void refreshFlags()
+	{
+		// todo: suspend?!
+		if(model!=null)
+		{
+			String c = (String)config.getSelectedItem();
+			boolean m = model.getMaster(c)==null? false: model.getMaster(c).booleanValue();
+			boolean d = model.getDaemon(c)==null? false: model.getDaemon(c).booleanValue();
+			boolean a = model.getAutoShutdown(c)==null? false: model.getAutoShutdown(c).booleanValue();
+			mastercb.setSelected(m);
+			daemoncb.setSelected(d);
+			autosdcb.setSelected(a); 
+			System.out.println("mda: "+m+" "+d+" "+a);
+		}
 	}
 
 	/**

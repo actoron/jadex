@@ -104,4 +104,26 @@ public interface IModelInfo
 	 *  @return The provided services.
 	 */
 	public Class[] getProvidedServices();
+	
+	/**
+	 *  Get the master flag.
+	 *  @param configname The configname.
+	 *  @return The master flag value.
+	 */
+	public Boolean getMaster(String configname);
+	
+	/**
+	 *  Get the daemon flag.
+	 *  @param configname The configname.
+	 *  @return The daemon flag value.
+	 */
+	public Boolean getDaemon(String configname);
+	
+	/**
+	 *  Get the autoshutdown flag.
+	 *  @param configname The configname.
+	 *  @return The autoshutdown flag value.
+	 */
+	public Boolean getAutoShutdown(String configname);
+
 }

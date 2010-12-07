@@ -181,6 +181,7 @@ public class CreationInfo
 		this.suspend	= suspend;
 		this.master = master;
 		this.daemon = daemon;
+		this.autoshutdown = autoshutdown;
 		this.imports	= imports;
 	}
 	

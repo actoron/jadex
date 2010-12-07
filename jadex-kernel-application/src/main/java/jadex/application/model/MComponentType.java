@@ -3,7 +3,7 @@ package jadex.application.model;
 /**
  *  Component type representation.
  */
-public class MComponentType
+public class MComponentType extends MStartable
 {
 	//-------- attributes --------
 

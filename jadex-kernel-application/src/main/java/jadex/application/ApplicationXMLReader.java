@@ -9,6 +9,7 @@ import jadex.application.model.MProvidedServiceType;
 import jadex.application.model.MRequiredServiceType;
 import jadex.application.model.MSpaceInstance;
 import jadex.application.model.MSpaceType;
+import jadex.application.model.MStartable;
 import jadex.bridge.Argument;
 import jadex.commons.ResourceInfo;
 import jadex.commons.SReflect;
@@ -197,6 +198,11 @@ public class ApplicationXMLReader
 		
 		String uri = "http://jadex.sourceforge.net/jadex-application";
 		
+//		TypeInfo satype = new TypeInfo(null, new ObjectInfo(MStartable.class),
+//			new MappingInfo(null, new AttributeInfo[]{
+//				new AttributeInfo(new AccessInfo("autoshutdown", "autoShutdown")),
+//			}, null));
+		
 		types.add(new TypeInfo(new XMLInfo(new QName(uri, "applicationtype")), new ObjectInfo(MApplicationType.class), 
 			new MappingInfo(null, "description", null,
 			new AttributeInfo[]{
@@ -245,7 +251,10 @@ public class ApplicationXMLReader
 				return 0;
 			}
 		}), 
-			new MappingInfo(null, new AttributeInfo[]{new AttributeInfo(new AccessInfo("type", "typeName"))})));
+			new MappingInfo(null, new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("type", "typeName")),
+				new AttributeInfo(new AccessInfo("autoshutdown", "autoShutdown")),
+			})));
 		types.add(new TypeInfo(new XMLInfo(new QName(uri, "space")), new ObjectInfo(MSpaceInstance.class)));
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "applicationtype"), new QName(uri, "arguments"), new QName(uri, "argument")}), new ObjectInfo(Argument.class), 
 			new MappingInfo(null, "description", new AttributeInfo(new AccessInfo((String)null, "defaultValue"), new AttributeConverter(exconv, null)))));
@@ -255,7 +264,10 @@ public class ApplicationXMLReader
 				new AttributeInfo(new AccessInfo("class", "className"))
 			}, null)));
 		
-		types.add(new TypeInfo(new XMLInfo(new QName(uri, "componenttype")), new ObjectInfo(MComponentType.class)));
+		types.add(new TypeInfo(new XMLInfo(new QName(uri, "componenttype")), new ObjectInfo(MComponentType.class),
+			new MappingInfo(null, new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("autoshutdown", "autoShutdown")),
+			}, null)));		
 		types.add(new TypeInfo(new XMLInfo(new QName(uri, "component")), new ObjectInfo(MComponentInstance.class),
 			new MappingInfo(null, new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo("type", "typeName")),

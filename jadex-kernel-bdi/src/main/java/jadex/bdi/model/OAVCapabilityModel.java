@@ -94,7 +94,8 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 	{
 		boolean startable = !this.getClass().equals(OAVCapabilityModel.class);
 		this.modelinfo = new ModelInfo(getName(), getPackage(), getDescription(), null, getConfigurations(), getArguments(), 
-			getResults(), startable, filename, getProperties(), getClassLoader(), getRequiredServices(), getProvidedServices());
+			getResults(), startable, filename, getProperties(), getClassLoader(), getRequiredServices(), getProvidedServices(),
+			null, null, null);
 		
 		// Build error report.
 		getModelInfo().setReport(new AbstractErrorReportBuilder(getModelInfo().getName(), getModelInfo().getFilename(),

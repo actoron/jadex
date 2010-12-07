@@ -54,6 +54,14 @@ public class ModelInfo implements IModelInfo
 	/** The provided services. */
 	protected Class[] providedservices;
 	
+	/** The master flag. */
+	protected IModelValueProvider master;
+	
+	/** The daemon flag. */
+	protected IModelValueProvider daemon;
+
+	/** The autoshutdown flag. */
+	protected IModelValueProvider autoshutdown;
 	
 	//-------- constructors --------
 	
@@ -62,7 +70,8 @@ public class ModelInfo implements IModelInfo
 	 */
 	public ModelInfo()
 	{
-		this(null, null, null, null, null, null, null, false, null, null, null, null, null);
+		this(null, null, null, null, null, null, null, 
+			false, null, null, null, null, null, null, null, null);
 	}
 	
 	/**
@@ -72,7 +81,8 @@ public class ModelInfo implements IModelInfo
 		String description, IErrorReport report, String[] configurations,
 		IArgument[] arguments, IArgument[] results, boolean startable,
 		String filename, Map properties, ClassLoader classloader, 
-		Class[] requiredservices, Class[] providedservices)
+		Class[] requiredservices, Class[] providedservices, 
+		IModelValueProvider master, IModelValueProvider daemon, IModelValueProvider autoshutdown)
 	{
 		this.name = name;
 		this.packagename = packagename;
@@ -87,6 +97,9 @@ public class ModelInfo implements IModelInfo
 		this.classloader = classloader;
 		this.requiredservices = requiredservices;
 		this.providedservices = providedservices;
+		this.master = master;
+		this.daemon = daemon;
+		this.autoshutdown = autoshutdown;
 	}
 
 	//-------- methods --------
@@ -414,6 +427,63 @@ public class ModelInfo implements IModelInfo
 	public void setProvidedServices(Class[] providedservices)
 	{
 		this.providedservices = providedservices;
+	}
+	
+	/**
+	 *  Get the master flag.
+	 *  @param configname The configname.
+	 *  @return The master flag value.
+	 */
+	public Boolean getMaster(String configname)
+	{
+		return master==null? null: (Boolean)master.getValue(configname);
+	}
+	
+	/**
+	 *  Get the daemon flag.
+	 *  @param configname The configname.
+	 *  @return The daemon flag value.
+	 */
+	public Boolean getDaemon(String configname)
+	{
+		return daemon==null? null: (Boolean)daemon.getValue(configname);
+	}
+	
+	/**
+	 *  Get the autoshutdown flag.
+	 *  @param configname The configname.
+	 *  @return The autoshutdown flag value.
+	 */
+	public Boolean getAutoShutdown(String configname)
+	{
+		return autoshutdown==null? null: (Boolean)autoshutdown.getValue(configname);
+	}
+
+	/**
+	 *  Set the master.
+	 *  @param master The master to set.
+	 */
+	public void setMaster(IModelValueProvider master)
+	{
+		this.master = master;
+	}
+
+	/**
+	 *  Set the daemon.
+	 *  @param daemon The daemon to set.
+	 */
+	public void setDaemon(IModelValueProvider daemon)
+	{
+		this.daemon = daemon;
+	}
+
+	/**
+	 *  Set the autoshutdown.
+	 *  @param autoshutdown The autoshutdown to set.
+	 */
+	public void setAutoShutdown(IModelValueProvider autoshutdown)
+	{
+		this.autoshutdown = autoshutdown;
 	}
 	
 }

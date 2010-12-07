@@ -7,6 +7,7 @@ import jadex.bridge.IComponentFactory;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IModelInfo;
 import jadex.bridge.IErrorReport;
+import jadex.bridge.IModelValueProvider;
 import jadex.bridge.ModelInfo;
 import jadex.commons.ByteClassLoader;
 import jadex.commons.Future;
@@ -138,7 +139,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	}
 	
 	/**
-	 * 
+	 *  Load the model.
 	 */
 	protected IModelInfo loadModel(String model, Class cma, ClassLoader classloader)
 	{
@@ -166,6 +167,9 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 		Map properties = metainfo!=null && metainfo.getProperties()!=null? new HashMap(metainfo.getProperties()): new HashMap();
 		Class[] required = metainfo!=null? metainfo.getRequiredServices(): null;
 		Class[] provided = metainfo!=null? metainfo.getProvidedServices(): null;
+		IModelValueProvider master = metainfo!=null? metainfo.getMaster(): null;
+		IModelValueProvider daemon= metainfo!=null? metainfo.getDaemon(): null;
+		IModelValueProvider autosd = metainfo!=null? metainfo.getAutoShutdown(): null;
 		
 		// Add debugger breakpoints
 		List names = new ArrayList();
@@ -177,7 +181,8 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 //		addExcludedMethods(properties, new String[]{"getServiceProvider"});
 		
 		IModelInfo ret = new ModelInfo(name, packagename, description, report, 
-			configurations, arguments, results, true, model, properties, classloader, required, provided);
+			configurations, arguments, results, true, model, properties, classloader, required, provided,
+			master, daemon, autosd);
 		
 		return ret;
 	}

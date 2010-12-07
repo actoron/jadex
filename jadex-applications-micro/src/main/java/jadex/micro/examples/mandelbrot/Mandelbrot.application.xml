@@ -64,7 +64,7 @@
 				<component type="Display"/>
 			</components>
 		</application>
-		<application name="Test Config 2">
+		<application name="Test Config 2" autoshutdown="false">
 			<components>
 				<component type="Generator" master="true">
 					<arguments>
