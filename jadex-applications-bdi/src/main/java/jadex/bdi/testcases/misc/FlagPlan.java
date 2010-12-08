@@ -23,7 +23,7 @@ public class FlagPlan extends Plan
 		
 		TestReport tr = new TestReport("#1", "Start agent as suspended.");
 		CreationInfo ci =  new CreationInfo("donothing", null, getComponentIdentifier());
-		ci.setSuspend(true);
+		ci.setSuspend(Boolean.TRUE);
 		IComponentIdentifier cid = (IComponentIdentifier)cms.createComponent(null, "jadex/bdi/testcases/misc/Flag.agent.xml", ci , null).get(this);
 		IComponentDescription desc = (IComponentDescription)cms.getComponentDescription(cid).get(this);
 		

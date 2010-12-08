@@ -347,7 +347,7 @@ public abstract class ComponentManagementService extends BasicService implements
 								inited.setResult(cid);
 								
 								// Start regular execution of inited component.
-								if(!cinfo.isSuspend())
+								if(cinfo.getSuspend()==null || !cinfo.getSuspend().booleanValue())
 								{
 									try
 									{
@@ -1997,10 +1997,10 @@ public abstract class ComponentManagementService extends BasicService implements
 			pasuspend = IComponentDescription.STATE_SUSPENDED.equals(padesc.getState());
 		}
 		// Suspend when set to suspend or when parent is also suspended or when specified in model.
-//		Object	debugging = lmodel.getProperties().get("debugging");
-		Boolean debugging = lmodel.getSuspend(cinfo.getConfiguration());
-		boolean	suspend	= cinfo.isSuspend() || pasuspend || debugging instanceof Boolean 
-			&& ((Boolean)debugging).booleanValue();
+		boolean	debugging = lmodel.getProperties().get("debugging")==null? false: ((Boolean)lmodel.getProperties().get("debugging")).booleanValue();
+		debugging = debugging || lmodel.getSuspend(cinfo.getConfiguration())==null? false: lmodel.getSuspend(cinfo.getConfiguration()).booleanValue();
+		boolean sus = cinfo.getSuspend()==null? false: cinfo.getSuspend().booleanValue();
+		boolean	suspend	= sus || pasuspend || debugging;
 		return suspend;
 	}
 

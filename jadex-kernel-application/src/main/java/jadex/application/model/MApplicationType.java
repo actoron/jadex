@@ -115,9 +115,11 @@ public class MApplicationType extends MStartable implements ICacheableModel
 		modelinfo.setConfigurations(configs);
 
 		// Init arguments.
+		ModelValueProvider suspend = new ModelValueProvider();
 		ModelValueProvider master = new ModelValueProvider();
 		ModelValueProvider daemon = new ModelValueProvider();
 		ModelValueProvider autoshutdown = new ModelValueProvider();
+		modelinfo.setSuspend(suspend);
 		modelinfo.setMaster(master);
 		modelinfo.setDaemon(daemon);
 		modelinfo.setAutoShutdown(autoshutdown);
@@ -154,26 +156,31 @@ public class MApplicationType extends MStartable implements ICacheableModel
 				}
 			}
 			
-			Object val = mapp.getMaster();
+			Object val = mapp.getSuspend();
+			if(val!=null)
+			{
+				suspend.setValue(mapp.getName(), val);
+//				System.out.println("master: "+val+" "+mapp.getName());
+			}
+			val = mapp.getMaster();
 			if(val!=null)
 			{
 				master.setValue(mapp.getName(), val);
-				System.out.println("master: "+val+" "+mapp.getName());
+//				System.out.println("master: "+val+" "+mapp.getName());
 			}
 			val = mapp.getDaemon();
 			if(val!=null)
 			{
 				daemon.setValue(mapp.getName(), val);
-				System.out.println("daemon: "+val+" "+mapp.getName());
+//				System.out.println("daemon: "+val+" "+mapp.getName());
 			}
 			val = mapp.getAutoShutdown();
 			if(val!=null)
 			{
 				autoshutdown.setValue(mapp.getName(), val);
-				System.out.println("autoshutdown: "+val+" "+mapp.getName());
+//				System.out.println("autoshutdown: "+val+" "+mapp.getName());
 			}
 		}
-		
 		
 		if(propertylist!=null)
 		{

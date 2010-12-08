@@ -7,8 +7,8 @@ public class MStartable
 {
 	//-------- attributes --------
 	
-	/** The suspended flag. */
-	protected boolean suspended;
+	/** The suspend flag. */
+	protected Boolean suspend;
 	
 	/** The master flag. */
 	protected Boolean master;
@@ -76,20 +76,20 @@ public class MStartable
 	}
 
 	/**
-	 *  Get the suspended.
-	 *  @return The suspended.
+	 *  Get the suspend.
+	 *  @return the suspend.
 	 */
-	public boolean isSuspended()
+	public Boolean getSuspend()
 	{
-		return this.suspended;
+		return suspend;
 	}
 
 	/**
-	 *  Set the suspended.
-	 *  @param suspended The suspended to set.
+	 *  Set the suspend.
+	 *  @param suspend The suspend to set.
 	 */
-	public void setSuspended(boolean suspended)
+	public void setSuspend(Boolean suspend)
 	{
-		this.suspended = suspended;
+		this.suspend = suspend;
 	}
 }
