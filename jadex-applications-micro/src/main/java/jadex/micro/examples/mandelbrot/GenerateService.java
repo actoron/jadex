@@ -126,10 +126,13 @@ public class GenerateService extends BasicService implements IGenerateService
 							IComponentManagementService cms = (IComponentManagementService)result;
 							
 //							System.out.println("test: "+agent.getArgument("delay"));
+							Object delay = agent.getArgument("delay");
+							if(delay==null)
+								delay = new Long(5000);
 							for(int i=0; i<num; i++)
 							{
 								cms.createComponent(null, "jadex/micro/examples/mandelbrot/CalculateAgent.class", 
-									new CreationInfo(SUtil.createHashMap(new String[]{"delay"}, new Object[]{agent.getArgument("delay")}), 
+									new CreationInfo(SUtil.createHashMap(new String[]{"delay"}, new Object[]{delay}), 
 									agent.getParent().getComponentIdentifier()), null)
 									.addResultListener(agent.createResultListener(lis));
 							}

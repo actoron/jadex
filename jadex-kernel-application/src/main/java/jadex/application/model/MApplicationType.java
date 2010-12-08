@@ -114,7 +114,7 @@ public class MApplicationType extends MStartable implements ICacheableModel
 		}
 		modelinfo.setConfigurations(configs);
 
-		// Init arguments.
+		// Init flags.
 		ModelValueProvider suspend = new ModelValueProvider();
 		ModelValueProvider master = new ModelValueProvider();
 		ModelValueProvider daemon = new ModelValueProvider();

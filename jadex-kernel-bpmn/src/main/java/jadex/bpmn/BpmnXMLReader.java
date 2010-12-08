@@ -7,6 +7,7 @@ import jadex.bpmn.model.MArtifact;
 import jadex.bpmn.model.MAssociation;
 import jadex.bpmn.model.MAssociationTarget;
 import jadex.bpmn.model.MBpmnModel;
+import jadex.bpmn.model.MConfiguration;
 import jadex.bpmn.model.MLane;
 import jadex.bpmn.model.MMessagingEdge;
 import jadex.bpmn.model.MNamedIdElement;
@@ -45,6 +46,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 
+import javax.security.auth.login.AppConfigurationEntry;
+import javax.security.auth.login.Configuration;
 import javax.xml.namespace.QName;
 
 /**
@@ -773,7 +776,7 @@ public class BpmnXMLReader
 			super.postProcess(context, object);
 			
 			// Set pool of activities.
-			MPool pool = (MPool) object;
+			MPool pool = (MPool)object;
 			setSubActivities(pool, pool);
 			
 			return null;
@@ -1564,7 +1567,23 @@ public class BpmnXMLReader
 					}
 				}
 			}	
-						
+			
+			// Create configurations for each pool.
+			
+			// todo: currently each pool is a config
+			// one could allow arbitrary definitions of configs
+//			Argument[] args = (Argument[])model.getModelInfo().getArguments();
+//			List pools = model.getPools();
+//			for(int i=0; i<pools.size(); i++)
+//			{
+//				MPool pool = (MPool)pools.get(i);
+//				for(int j=0; j<args.length; )
+//				MConfiguration config = new MConfiguration();
+//				config.addPool(pool);
+//				config.setName(pool.getName());
+//				model.addC
+//			}
+			
 			return null;
 		}
 		

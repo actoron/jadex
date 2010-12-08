@@ -179,7 +179,7 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	 */
 	public Object getArgument(String name)
 	{
-		return interpreter.getArguments().get(name);
+		return interpreter.getArguments()==null? null: interpreter.getArguments().get(name);
 	}
 	
 	/**

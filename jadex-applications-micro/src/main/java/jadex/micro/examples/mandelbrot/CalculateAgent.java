@@ -43,7 +43,7 @@ public class CalculateAgent extends MicroAgent
 	 */
 	public void executeBody()
 	{
-		final long delay = ((Long)getArgument("delay")).longValue();
+		final long delay = ((Number)getArgument("delay")).longValue();
 		IComponentStep step = new IComponentStep()
 		{
 			public Object execute(IInternalAccess ia)

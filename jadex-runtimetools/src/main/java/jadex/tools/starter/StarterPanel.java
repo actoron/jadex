@@ -816,9 +816,11 @@ public class StarterPanel extends JPanel
 		if(model!=null)
 		{
 			String c = (String)config.getSelectedItem();
+			boolean s = model.getSuspend(c)==null? false: model.getSuspend(c).booleanValue();
 			boolean m = model.getMaster(c)==null? false: model.getMaster(c).booleanValue();
 			boolean d = model.getDaemon(c)==null? false: model.getDaemon(c).booleanValue();
 			boolean a = model.getAutoShutdown(c)==null? false: model.getAutoShutdown(c).booleanValue();
+			suspend.setSelected(s);
 			mastercb.setSelected(m);
 			daemoncb.setSelected(d);
 			autosdcb.setSelected(a); 
