@@ -66,6 +66,29 @@ public class RuntimeManagerPlan extends Plan {
 		// String parameterSweepName =
 		// simConf.getOptimization().getData().getName();
 
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		IComponentIdentifier comp = (IComponentIdentifier) fut.get(this);
+		
+		IApplicationExternalAccess iap = (IApplicationExternalAccess) executionService.getExternalAccess(comp).get(this);			
+		AbstractEnvironmentSpace space = (AbstractEnvironmentSpace) iap.getSpace(simConf.getNameOfSpace());
+		tmpHelp(simConf, space);
+//		startApplicationRemotley(appName, fileName, configName, args);
+		
+		
+		
+		
+		
+		
+		
+		
 		// testSend(simConf);
 
 		System.out.println("#Client# Started CLIENT Simulation run....: " + simConf.getName() + " - " + experimentID + ", currentVal: " + parameterSweepValue);

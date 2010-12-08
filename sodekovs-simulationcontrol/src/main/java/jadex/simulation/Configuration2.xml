@@ -3,12 +3,12 @@
 	<!--
 		Document : AutomatedSimulation.xml Created on : 17. Dezember 2009,
 		17:25 Updated on: 15-1-10, 19h Author : vilenica Description: Purpose
-		of the document follows.
+		of the document follows. -> "1 Sentry / 2 Producers / 3 Carries" / TestRemote <-
 	-->
 
 <SimulationConfiguration name="MarsWorldExperiments"
 	applicationReference="..\\sodekovs-simulationcontrol\\target\\classes\\jadex\\simulation\\examples\\marsworld\\MarsWorld4SimulationExperiments.application.xml"
-	applicationConfiguration="1 Sentry / 2 Producers / 3 Carries"
+	applicationConfiguration="1 Sentry / 2 Producers / 3 Carries"	 
 	nameOfSpace="my2dspace">
 	<!--
 		<SimulationConfiguration name="MarsWorldExperiments"

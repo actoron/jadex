@@ -1,23 +1,30 @@
 package jadex.simulation.master;
 
+import jadex.application.runtime.IApplicationExternalAccess;
+import jadex.application.space.envsupport.environment.AbstractEnvironmentSpace;
 import jadex.bdi.runtime.Plan;
+import jadex.bdi.runtime.impl.flyweights.ElementFlyweight;
+import jadex.bdi.runtime.interpreter.OAVBDIFetcher;
 import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
+import jadex.bridge.IExternalAccess;
 import jadex.commons.IFuture;
 import jadex.commons.service.SServiceProvider;
+import jadex.rules.state.IOAVState;
+import jadex.simulation.helper.AgentMethods;
 import jadex.simulation.helper.Constants;
+import jadex.simulation.helper.EvaluateExpression;
 import jadex.simulation.helper.FileHandler;
-//import jadex.simulation.helper.FileHandler;
 import jadex.simulation.helper.ObjectCloner;
 import jadex.simulation.model.Optimization;
 import jadex.simulation.model.SimulationConfiguration;
+import jadex.simulation.model.TargetFunction;
 import jadex.simulation.model.result.ExperimentResult;
 import jadex.simulation.model.result.IntermediateResult;
 import jadex.simulation.model.result.RowResult;
 import jadex.simulation.remote.IRemoteSimulationExecutionService;
 
-import java.io.BufferedInputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -89,6 +96,7 @@ public class StartSimulationExperimentsPlan extends Plan {
 			((HashMap) args.get(Constants.SIMULATION_FACTS_FOR_CLIENT)).put(Constants.EXPERIMENT_ID, experimentID);
 
 			startApplication(appName, fileName, configName, args);
+			startApplicationRemotley(appName, fileName, configName, args);
 
 			System.out.println("#*****************************************************************.");
 			System.out.println("Used memory: " + (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1024000);
@@ -166,10 +174,8 @@ public class StartSimulationExperimentsPlan extends Plan {
 		try {
 			IComponentManagementService executionService = (IComponentManagementService)SServiceProvider.getService(getScope().getServiceProvider(), IComponentManagementService.class).get(this);			             
 
-			// create application in order to add additional components to application
+			// create application 
 			IFuture fut = executionService.createComponent(appName, fileName, new CreationInfo(configName, args, null, false, false), null);
-			IComponentIdentifier comp = (IComponentIdentifier) fut.get(this);
-			startApplicationRemotley(appName, fileName, configName, args);
 
 		} catch (Exception e) {
 			System.out.println("Could not start application...." + e);
@@ -185,10 +191,11 @@ public class StartSimulationExperimentsPlan extends Plan {
 			
 			if(services.size() > 0){				
 				
-				//read the *.application.xml File
+				//read the *.application.xml File from the file system
 				String applicationDescription = FileHandler.readFileAsString(fileName);
 				
-				services.get(0).executeExperiment(appName,applicationDescription,configName,args);
+				services.get(0).executeExperiment(appName,applicationDescription,configName,args).get(this);
+				System.out.println("#Master#Result terminated");
 			}
 			else{
 				System.out.println("Error: Could not find remote simulation execution service!");
@@ -277,5 +284,50 @@ public class StartSimulationExperimentsPlan extends Plan {
 			args.put(parameterName, new String(valString));
 		}
 		opt.getParameterSweeping().incrementParameterSweepCounter();
+	}
+	
+	private void tmpHelp(SimulationConfiguration simConf, AbstractEnvironmentSpace space){
+		TargetFunction targetFunct = simConf.getRunConfiguration().getRows().getTerminateCondition().getTargetFunction();
+
+		// HACK: Need a observer / listener instead evaluating expression
+		// every 1000ms
+		while (true) {
+			waitFor(1000);
+
+			// Hack: Works right now only for single objects but not for all
+			// of that type...
+			// Additionally: only one part of the equation can be an
+			// object...
+			if (targetFunct.getObjectSource().getType().equalsIgnoreCase(Constants.ISPACE_OBJECT)) {
+
+				// // String expression =
+				// "$object.getProperty(\"ore\") >= 10";
+
+				boolean res = EvaluateExpression.evaluate(space, targetFunct.getFunction(), targetFunct.getObjectSource().getName(), targetFunct.getObjectSource().getType());
+
+				if (res) {
+					System.out.println("#MASTER#:RuntimeManagerPlan# Terminate experiment: Semantic termination condition has been evaluated being true.");
+					// Experiment has reached Target Function. Terminate
+					break;
+				}
+			} else {
+				IComponentIdentifier agentIdentifier = AgentMethods.getIComponentIdentifier(space, targetFunct.getObjectSource().getName());					
+				IFuture fut = ((IComponentManagementService)SServiceProvider.getService(getScope().getServiceProvider(), IComponentManagementService.class)).getExternalAccess(agentIdentifier);
+				IExternalAccess exta = (IExternalAccess) fut.get(this);
+
+				IOAVState state = ((ElementFlyweight) exta).getState();
+				Object rCapability = ((ElementFlyweight) exta).getScope();
+
+				// Evaluate condition/expression
+				OAVBDIFetcher fetcher = new OAVBDIFetcher(state, rCapability);
+				boolean res = EvaluateExpression.evaluateExpression(fetcher, targetFunct.getFunction());
+
+				if (res) {
+					System.out.println("#MASTER#:RuntimeManagerPlan# Terminate experiment: Semantic termination condition has been evaluated being true.");
+					// Experiment has reached Target Function. Terminate
+					break;
+				}
+			}
+		}
 	}
 }
