@@ -75,11 +75,11 @@ public class RuntimeManagerPlan extends Plan {
 		
 		
 		
-		IComponentIdentifier comp = (IComponentIdentifier) fut.get(this);
-		
-		IApplicationExternalAccess iap = (IApplicationExternalAccess) executionService.getExternalAccess(comp).get(this);			
-		AbstractEnvironmentSpace space = (AbstractEnvironmentSpace) iap.getSpace(simConf.getNameOfSpace());
-		tmpHelp(simConf, space);
+//		IComponentIdentifier comp = (IComponentIdentifier) fut.get(this);
+//		
+//		IApplicationExternalAccess iap = (IApplicationExternalAccess) executionService.getExternalAccess(comp).get(this);			
+//		AbstractEnvironmentSpace space = (AbstractEnvironmentSpace) iap.getSpace(simConf.getNameOfSpace());
+//		tmpHelp(simConf, space);
 //		startApplicationRemotley(appName, fileName, configName, args);
 		
 		

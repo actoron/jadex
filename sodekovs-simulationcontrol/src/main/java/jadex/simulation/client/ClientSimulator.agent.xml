@@ -50,20 +50,6 @@
 		<achievegoalref name="df_search">
 			<concrete ref="dfcap.df_search" />
 		</achievegoalref>
-
-		<!--
-			Dispatch Goal that creates observers that execute the observation
-			periodically
-		-->
-		<achievegoal name="InitPeriodicalObservers">
-			<parameter name="periodicalObserversList" class="List" />
-		</achievegoal>
-
-		<!-- Dispatch Goal that registers listeners for the objects -->
-		<achievegoal name="InitOnChangeObservers">
-			<parameter name="onChangeObserversList" class="List" />
-		</achievegoal>
-
 	</goals>
 
 	<plans>		<!--			Responsible for all aspects related to the run of the simulation,			especially to monitor the terminate condition.		-->
@@ -97,13 +83,9 @@
 	</properties>
 
 	<configurations>
-		<configuration name="default">
-			<goals>
-				<!--  <initialgoal ref="updateEnv" />-->
-			</goals>
+		<configuration name="default">			
 			<plans>
 				<initialplan ref="runtime_manager" />
-				<!-- <initialplan ref="init_observers" /> -->
 			</plans>
 		</configuration>
 	</configurations>

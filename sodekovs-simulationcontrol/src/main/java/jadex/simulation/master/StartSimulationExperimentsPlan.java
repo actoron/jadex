@@ -2,6 +2,8 @@ package jadex.simulation.master;
 
 import jadex.application.runtime.IApplicationExternalAccess;
 import jadex.application.space.envsupport.environment.AbstractEnvironmentSpace;
+import jadex.bdi.examples.shop.CustomerPanel;
+import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.Plan;
 import jadex.bdi.runtime.impl.flyweights.ElementFlyweight;
 import jadex.bdi.runtime.interpreter.OAVBDIFetcher;
@@ -10,6 +12,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.IFuture;
+import jadex.commons.concurrent.IResultListener;
 import jadex.commons.service.SServiceProvider;
 import jadex.rules.state.IOAVState;
 import jadex.simulation.helper.AgentMethods;
@@ -77,7 +80,6 @@ public class StartSimulationExperimentsPlan extends Plan {
 			try {
 				simFacts.put(Constants.SIMULATION_FACTS_FOR_CLIENT, ObjectCloner.deepCopy(simConf));
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 
@@ -95,7 +97,7 @@ public class StartSimulationExperimentsPlan extends Plan {
 			args.put("tmp_start_time", tmp_start_time);
 			((HashMap) args.get(Constants.SIMULATION_FACTS_FOR_CLIENT)).put(Constants.EXPERIMENT_ID, experimentID);
 
-			startApplication(appName, fileName, configName, args);
+//			startApplication(appName, fileName, configName, args);
 			startApplicationRemotley(appName, fileName, configName, args);
 
 			System.out.println("#*****************************************************************.");
@@ -194,8 +196,19 @@ public class StartSimulationExperimentsPlan extends Plan {
 				//read the *.application.xml File from the file system
 				String applicationDescription = FileHandler.readFileAsString(fileName);
 				
-				services.get(0).executeExperiment(appName,applicationDescription,configName,args).get(this);
-				System.out.println("#Master#Result terminated");
+				IFuture fut = services.get(0).executeExperiment(appName,applicationDescription,configName,args);
+				fut.addResultListener(new IResultListener()
+				{
+					public void resultAvailable(Object source, Object result)
+					{
+						System.out.println("#Master#Result terminated");		
+					}
+					
+					public void exceptionOccurred(Object source, Exception exception)
+					{
+						
+					}
+				});				
 			}
 			else{
 				System.out.println("Error: Could not find remote simulation execution service!");
