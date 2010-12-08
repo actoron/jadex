@@ -52,11 +52,15 @@
 		<achievegoalref name="df_search">
 			<concrete ref="dfcap.df_search" />
 		</achievegoalref>
+		<performgoal name="observeExecution" retry="false" exclude="never"/>
 	</goals>
 
 	<plans>		<!--			Responsible for all aspects related to the run of the simulation,			especially to monitor the terminate condition.		-->
 		<plan name="runtime_manager">
 			<body class="RuntimeManagerPlan" />
+			<trigger>
+				<goal ref="observeExecution"/>
+			</trigger>
 		</plan>		
 	</plans>
 

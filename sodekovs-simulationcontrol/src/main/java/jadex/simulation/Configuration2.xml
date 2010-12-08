@@ -8,7 +8,7 @@
 
 <SimulationConfiguration name="MarsWorldExperiments"
 	applicationReference="..\\sodekovs-simulationcontrol\\target\\classes\\jadex\\simulation\\examples\\marsworld\\MarsWorld4SimulationExperiments.application.xml"
-	applicationConfiguration="1 Sentry / 2 Producers / 3 Carries"	 
+	applicationConfiguration="TestRemote"	 
 	nameOfSpace="my2dspace">
 	<!--
 		<SimulationConfiguration name="MarsWorldExperiments"
