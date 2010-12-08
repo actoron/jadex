@@ -4,7 +4,7 @@
 	<groupId>net.sourceforge.jadex</groupId>
 	<artifactId>jadex-kernel-bdi-continuations</artifactId>
 	<packaging>jar</packaging>
-	<version>2.0-rc5</version>
+	<version>2.0-rc6</version>
 	<name>jadex-continuations-javaflow</name>
 	<!-- <url>http://jadex.sourceforge.net</url> -->
 	<properties>
@@ -15,7 +15,7 @@
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-kernel-bdi</artifactId>
-			<version>2.0-rc5</version>
+			<version>2.0-rc6</version>
 		</dependency>
 		<!-- <dependency> <groupId>org.apache.commons</groupId> <artifactId>javaflow</artifactId> 
 			<version>1.0-SNAPSHOT</version> </dependency> -->

@@ -1,6 +1,7 @@
 package jadex.xml.bean;
 
 
+import jadex.commons.SReflect;
 import jadex.commons.collection.LRU;
 
 import java.beans.BeanInfo;
@@ -81,6 +82,24 @@ public class BeanInfoIntrospector implements IBeanIntrospector
 		            	if(!ret.containsKey(property_java_name))
 		            	{
 		            		ret.put(property_java_name, new BeanProperty(property_java_name, fields[i]));
+		            	}
+		            }
+	            }
+	            
+	            // Get final values (val$xyz fields) for anonymous classes.
+	            if(SReflect.isAnonymousInnerClass(clazz))
+	            {
+		            Field[] fields = clazz.getDeclaredFields();
+		            for(int i=0; i<fields.length; i++)
+		            {
+		            	String property_java_name = fields[i].getName();
+		            	if(property_java_name.startsWith("val$"))
+		            	{
+		            		property_java_name	= property_java_name.substring(4);
+			            	if(!ret.containsKey(property_java_name))
+			            	{
+			            		ret.put(property_java_name, new BeanProperty(property_java_name, fields[i]));
+			            	}
 		            	}
 		            }
 	            }

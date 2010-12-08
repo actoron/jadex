@@ -26,6 +26,7 @@ public class BDITest	extends	ComponentTestSuite
 				"BeliefSetChanges",
 				"BeliefSetContains",
 				"MultiplePlanTriggers",
+				"Flag",	// Problem with external actions?
 				"Evaluationmodes",	// Doesn't work in simulation?
 				"UpdatingBelief",	// Doesn't work in simulation?
 				"GUICloser",	// Doesn't work in simulation?

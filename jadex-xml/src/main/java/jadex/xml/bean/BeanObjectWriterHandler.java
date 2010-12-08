@@ -318,7 +318,9 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 		else if(field!=null)
 		{
 			try
-			{	
+			{
+				if((field.getModifiers()&Field.PUBLIC)==0)
+					field.setAccessible(true);
 				value = field.get(object);
 			}
 			catch(Exception e)

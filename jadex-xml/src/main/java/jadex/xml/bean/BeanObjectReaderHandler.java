@@ -219,6 +219,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 					{
 						if(SReflect.isAnonymousInnerClass(clazz))
 						{
+							// Create anonymous class object by supplying null values
 //							System.out.println("Anonymous: "+clazz);
 							Constructor	c	= clazz.getDeclaredConstructors()[0];
 							c.setAccessible(true);
@@ -933,9 +934,15 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 				try
 				{
 					if(prop.getSetter()!=null)
+					{
 						prop.getSetter().invoke(object, new Object[]{arg});
+					}
 					else
+					{
+						if((prop.getField().getModifiers()&Field.PUBLIC)==0)
+							prop.getField().setAccessible(true);
 						prop.getField().set(object, arg);
+					}
 					set = true;
 				}
 				catch(InvocationTargetException e)

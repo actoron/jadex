@@ -597,7 +597,7 @@ public class AgentRules
 			{
 				Object ragent = assignments.getVariableValue("?ragent");
 				Object[] step = (Object[])assignments.getVariableValue("?step");
-//				System.out.println("Executing external action: "+runnable);
+				System.out.println("Executing external action: "+step[0]);
 				state.removeAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_actions, step);
 				
 				Future res = (Future)((Object[])step)[1];
@@ -1732,6 +1732,11 @@ public class AgentRules
 	//					// changed *.class to *.TYPE due to javaflow bug
 					state.setAttributeValue(rbel, OAVBDIRuntimeModel.typedelement_has_timer, 
 						BDIInterpreter.getInterpreter(state).getClockService().createTimer(update.longValue(), to[0]));
+				}
+				
+				public String toString()
+				{
+					return "CheckedAction: initBelief(), "+state.getAttributeValue(mbel, OAVBDIMetaModel.modelelement_has_name)+", "+state.getAttributeValue(rbel, OAVBDIRuntimeModel.belief_has_fact);
 				}
 			});
 			
