@@ -1,7 +1,7 @@
 package jadex.application.model;
 
 /**
- *
+ *  Base class for startable elements.
  */
 public class MStartable
 {

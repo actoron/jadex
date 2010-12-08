@@ -112,7 +112,7 @@
 						<xs:complexType>
 							<xs:sequence>
 								<xs:element name="providedservice" type="providedservicetype" minOccurs="0" maxOccurs="unbounded"/>
-								<xs:element name="requiredservice" minOccurs="0" maxOccurs="unbounded"/>
+								<xs:element name="requiredservice" type="requiredservicetype" minOccurs="0" maxOccurs="unbounded"/>
 							</xs:sequence>
 						</xs:complexType>
 					</xs:element>

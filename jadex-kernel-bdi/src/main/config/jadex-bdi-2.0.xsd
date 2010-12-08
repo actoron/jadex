@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- edited with XMLSPY v2004 rel. 3 U (http://www.xmlspy.com) by Lars (RTL) -->
-<xs:schema targetNamespace="http://jadex.sourceforge.net/jadex-bdi" xmlns="http://jadex.sourceforge.net/jadex-bdi" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified" version="2.0">
+<xs:schema targetNamespace="http://jadex.sourceforge.net/jadex-bdi" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://jadex.sourceforge.net/jadex-bdi" elementFormDefault="qualified" attributeFormDefault="unqualified" version="2.0">
 	<xs:element name="agent">
 		<xs:annotation>
 			<xs:documentation>Defines a new agent type.</xs:documentation>
@@ -33,6 +33,10 @@
 		<xs:complexContent>
 			<xs:extension base="MCapability">
 				<xs:attribute name="propertyfile" type="xs:string" use="optional" default="jadex.config.runtime"/>
+				<xs:attribute name="suspend" type="xs:boolean" use="optional" default="false"/>
+				<xs:attribute name="master" type="xs:boolean" use="optional" default="false"/>
+				<xs:attribute name="daemon" type="xs:boolean" use="optional" default="false"/>
+				<xs:attribute name="autoshutdown" type="xs:boolean" use="optional" default="false"/>
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>
@@ -1570,6 +1574,10 @@
 						</xs:annotation>
 					</xs:element>
 				</xs:sequence>
+				<xs:attribute name="suspend" type="xs:boolean" use="optional" default="false"/>
+				<xs:attribute name="master" type="xs:boolean" use="optional" default="false"/>
+				<xs:attribute name="daemon" type="xs:boolean" use="optional" default="false"/>
+				<xs:attribute name="autoshutdown" type="xs:boolean" use="optional" default="false"/>
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>
@@ -1979,7 +1987,7 @@
 			<xs:documentation>A provided service definition.</xs:documentation>
 		</xs:annotation>
 		<xs:complexContent>
-			<xs:extension base="MExpression">
+			<xs:extension base="MInternalExpression">
 				<xs:attribute name="direct" type="xs:boolean" use="optional" default="false"/>
 			</xs:extension>
 		</xs:complexContent>
@@ -1989,7 +1997,7 @@
 			<xs:documentation>A required service definition.</xs:documentation>
 		</xs:annotation>
 		<xs:complexContent>
-			<xs:extension base="MExpression"/>
+			<xs:extension base="MInternalExpression"/>
 		</xs:complexContent>
 	</xs:complexType>
 	<xs:complexType name="MElementNoName" abstract="true">

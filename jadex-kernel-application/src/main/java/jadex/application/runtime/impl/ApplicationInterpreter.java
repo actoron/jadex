@@ -1351,10 +1351,10 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 			stop = true;
 			
 			// master, daemon, autoshutdown
-			Boolean[] bools = new Boolean[3];
-			bools[2] = model.getAutoShutdown();
+//			Boolean[] bools = new Boolean[3];
+//			bools[2] = model.getAutoShutdown();
 			
-			inited.setResult(new Object[]{ApplicationInterpreter.this, adapter, bools});
+			inited.setResult(new Object[]{ApplicationInterpreter.this, adapter});
 		}
 	}
 	

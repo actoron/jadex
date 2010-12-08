@@ -54,6 +54,9 @@ public class ModelInfo implements IModelInfo
 	/** The provided services. */
 	protected Class[] providedservices;
 	
+	/** The suspend flag. */
+	protected IModelValueProvider suspend;
+	
 	/** The master flag. */
 	protected IModelValueProvider master;
 	
@@ -460,6 +463,16 @@ public class ModelInfo implements IModelInfo
 	}
 
 	/**
+	 *  Get the suspend flag.
+	 *  @param configname The configname.
+	 *  @return The suspend flag value.
+	 */
+	public Boolean getSuspend(String configname)
+	{
+		return suspend==null? null: (Boolean)suspend.getValue(configname);
+	}
+	
+	/**
 	 *  Set the master.
 	 *  @param master The master to set.
 	 */
@@ -485,5 +498,13 @@ public class ModelInfo implements IModelInfo
 	{
 		this.autoshutdown = autoshutdown;
 	}
-	
+
+	/**
+	 *  Set the suspend flag.
+	 *  @param suspend The suspend to set.
+	 */
+	public void setSuspend(IModelValueProvider suspend)
+	{
+		this.suspend = suspend;
+	}
 }

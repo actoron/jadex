@@ -106,6 +106,13 @@ public interface IModelInfo
 	public Class[] getProvidedServices();
 	
 	/**
+	 *  Get the suspend flag.
+	 *  @param configname The configname.
+	 *  @return The suspend flag value.
+	 */
+	public Boolean getSuspend(String configname);
+	
+	/**
 	 *  Get the master flag.
 	 *  @param configname The configname.
 	 *  @return The master flag value.

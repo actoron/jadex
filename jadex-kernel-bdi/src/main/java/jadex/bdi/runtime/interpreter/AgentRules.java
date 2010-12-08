@@ -224,7 +224,7 @@ public class AgentRules
 				
 				// Stop execution when init has finished and notify cms.
 				bdii.stop = true;
-				bdii.inited.setResult(new Object[]{bdii, bdii.getAgentAdapter(), null});
+				bdii.inited.setResult(new Object[]{bdii, bdii.getAgentAdapter()});
 			}
 		};
 		Rule rule = new Rule("agent_init1", ragentcon, action);

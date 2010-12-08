@@ -251,8 +251,11 @@ public abstract class ComponentManagementService extends BasicService implements
 						
 						final IComponentAdapter pad = getParentAdapter(cinfo);
 						IExternalAccess parent = getComponentInstance(pad).getExternalAccess();
+						Boolean master = cinfo.getMaster()!=null? cinfo.getMaster(): lmodel.getMaster(cinfo.getConfiguration());
+						Boolean daemon = cinfo.getDaemon()!=null? cinfo.getDaemon(): lmodel.getDaemon(cinfo.getConfiguration());
+						Boolean autosd = cinfo.getAutoShutdown()!=null? cinfo.getAutoShutdown(): lmodel.getAutoShutdown(cinfo.getConfiguration());
 						final CMSComponentDescription ad = new CMSComponentDescription(cid, type, 
-							getParentIdentifier(cinfo), cinfo.getMaster(), cinfo.getDaemon(), cinfo.getAutoShutdown(), lmodel.getFullName());
+							getParentIdentifier(cinfo), master, daemon, autosd, lmodel.getFullName());
 						
 						Future future = new Future();
 						future.addResultListener(new IResultListener()
@@ -271,7 +274,6 @@ public abstract class ComponentManagementService extends BasicService implements
 										
 										// Init successfully finished. Add description and adapter.
 										adapter = (IComponentAdapter)((Object[])result)[1];
-										Boolean[] bools = (Boolean[])((Object[])result)[2];
 										
 										if(isInitSuspend(cinfo, lmodel))
 										{
@@ -280,17 +282,6 @@ public abstract class ComponentManagementService extends BasicService implements
 										else
 										{
 											ad.setState(IComponentDescription.STATE_ACTIVE);
-										}
-										
-										// master, daemon, autoshutdown
-										if(bools!=null)
-										{
-											if(ad.getMaster()==null && bools[0]!=null)
-												ad.setMaster(bools[0]);
-											if(ad.getDaemon()==null && bools[1]!=null)
-												ad.setDaemon(bools[1]);
-											if(ad.getAutoShutdown()==null && bools[2]!=null)
-												ad.setAutoShutdown(bools[2]);
 										}
 										
 										descs.put(cid, ad);
@@ -2006,7 +1997,8 @@ public abstract class ComponentManagementService extends BasicService implements
 			pasuspend = IComponentDescription.STATE_SUSPENDED.equals(padesc.getState());
 		}
 		// Suspend when set to suspend or when parent is also suspended or when specified in model.
-		Object	debugging 	= lmodel.getProperties().get("debugging");
+//		Object	debugging = lmodel.getProperties().get("debugging");
+		Boolean debugging = lmodel.getSuspend(cinfo.getConfiguration());
 		boolean	suspend	= cinfo.isSuspend() || pasuspend || debugging instanceof Boolean 
 			&& ((Boolean)debugging).booleanValue();
 		return suspend;

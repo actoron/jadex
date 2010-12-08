@@ -822,7 +822,7 @@ public class StarterPanel extends JPanel
 			mastercb.setSelected(m);
 			daemoncb.setSelected(d);
 			autosdcb.setSelected(a); 
-			System.out.println("mda: "+m+" "+d+" "+a);
+//			System.out.println("mda: "+m+" "+d+" "+a);
 		}
 	}
 

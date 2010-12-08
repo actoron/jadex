@@ -384,6 +384,19 @@ public class OAVBDIMetaModel
 	/** The agent has a service container type. */
 	public static OAVAttributeType agent_has_servicecontainer;
 	
+	/** The agent has a suspend attribute. */
+	public static OAVAttributeType agent_has_suspend;
+
+	/** The agent has a master attribute. */
+	public static OAVAttributeType agent_has_master;
+
+	/** The agent has a daemon attribute. */
+	public static OAVAttributeType agent_has_daemon;
+
+	/** The agent has a daemon attribute. */
+	public static OAVAttributeType agent_has_autoshutdown;
+
+	
 //	/** Agent has propertyfile attribute. */
 //	public static OAVAttributeType agent_has_propertyfile;
 
@@ -762,6 +775,18 @@ public class OAVBDIMetaModel
 	
 	/** The configuration type. */
 	public static OAVObjectType configuration_type;
+	
+	/** The agent has a suspend attribute. */
+	public static OAVAttributeType configuration_has_suspend;
+
+	/** The agent has a master attribute. */
+	public static OAVAttributeType configuration_has_master;
+
+	/** The agent has a daemon attribute. */
+	public static OAVAttributeType configuration_has_daemon;
+
+	/** The agent has a daemon attribute. */
+	public static OAVAttributeType configuration_has_autoshutdown;
 	
 	/** Configuration has initial capabilities attribute. */
 	public static OAVAttributeType configuration_has_initialcapabilities;
@@ -1159,7 +1184,11 @@ public class OAVBDIMetaModel
 		configuration_has_initialmessageevents = configuration_type.createAttributeType("mconfiguration_has_initialmessageevents", configelement_type, OAVAttributeType.LIST);
 		configuration_has_endinternalevents = configuration_type.createAttributeType("mconfiguration_has_endinternalevents", configelement_type, OAVAttributeType.LIST);
 		configuration_has_endmessageevents = configuration_type.createAttributeType("mconfiguration_has_endmessageevents", configelement_type, OAVAttributeType.LIST);
-				
+		configuration_has_suspend = configuration_type.createAttributeType("mconfiguration_has_suspend", OAVJavaType.java_boolean_type);
+		configuration_has_master = configuration_type.createAttributeType("mconfiguration_has_master", OAVJavaType.java_boolean_type);
+		configuration_has_daemon = configuration_type.createAttributeType("mconfiguration_has_daemon", OAVJavaType.java_boolean_type);
+		configuration_has_autoshutdown = configuration_type.createAttributeType("mconfiguration_has_autoshutdown", OAVJavaType.java_boolean_type);
+		
 		// capability
 		capability_has_package = capability_type.createAttributeType("mcapability_has_package", OAVJavaType.java_string_type);
 		capability_has_abstract = capability_type.createAttributeType("mcapability_has_abstract", OAVJavaType.java_boolean_type);
@@ -1188,6 +1217,10 @@ public class OAVBDIMetaModel
 		// agent
 //		agent_has_propertyfile	= agent_type.createAttributeType("magent_has_propertyfile", OAVJavaType.java_string_type);
 		agent_has_servicecontainer = agent_type.createAttributeType("magent_has_servicecontainer", expression_type);
+		agent_has_suspend = agent_type.createAttributeType("magent_has_suspend", OAVJavaType.java_boolean_type);
+		agent_has_master = agent_type.createAttributeType("magent_has_master", OAVJavaType.java_boolean_type);
+		agent_has_daemon = agent_type.createAttributeType("magent_has_daemon", OAVJavaType.java_boolean_type);
+		agent_has_autoshutdown = agent_type.createAttributeType("magent_has_autoshutdown", OAVJavaType.java_boolean_type);
 		
 		// propertybase
 		properties_has_properties	= properties_type.createAttributeType("properties_has_properties", properties_type, OAVAttributeType.LIST);

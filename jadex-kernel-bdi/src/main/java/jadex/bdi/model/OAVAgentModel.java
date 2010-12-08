@@ -2,6 +2,7 @@ package jadex.bdi.model;
 
 import jadex.bridge.Argument;
 import jadex.bridge.IArgument;
+import jadex.bridge.ModelValueProvider;
 import jadex.commons.SReflect;
 import jadex.commons.collection.MultiCollection;
 import jadex.rules.rulesystem.IPatternMatcherFunctionality;
@@ -9,6 +10,7 @@ import jadex.rules.rulesystem.IRule;
 import jadex.rules.state.IOAVState;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -124,6 +126,51 @@ public class OAVAgentModel	extends OAVCapabilityModel
 		{
 			OAVCapabilityModel.initArgument(((Argument)ress[i]), state, getHandle());
 		}
+		
+		// Init the flags.
+		ModelValueProvider suspend = new ModelValueProvider();
+		ModelValueProvider master = new ModelValueProvider();
+		ModelValueProvider daemon = new ModelValueProvider();
+		ModelValueProvider autosd = new ModelValueProvider();
+		
+		Boolean val = (Boolean)state.getAttributeValue(getHandle(), OAVBDIMetaModel.agent_has_suspend);
+		if(val!=null)
+			suspend.setValue(val);
+		val = (Boolean)state.getAttributeValue(getHandle(), OAVBDIMetaModel.agent_has_master);
+		if(val!=null)
+			master.setValue(val);
+		val = (Boolean)state.getAttributeValue(getHandle(), OAVBDIMetaModel.agent_has_daemon);
+		if(val!=null)
+			daemon.setValue(val);
+		val = (Boolean)state.getAttributeValue(getHandle(), OAVBDIMetaModel.agent_has_autoshutdown);
+		if(val!=null)
+			autosd.setValue(val);
+
+		Collection confs = state.getAttributeValues(getHandle(), OAVBDIMetaModel.capability_has_configurations);
+		if(confs!=null)
+		{
+			for(Iterator it=confs.iterator(); it.hasNext(); )
+			{
+				Object conf = it.next();
+				val = (Boolean)state.getAttributeValue(conf, OAVBDIMetaModel.configuration_has_suspend);
+				if(val!=null)
+					suspend.setValue((String)state.getAttributeValue(conf, OAVBDIMetaModel.modelelement_has_name), val);
+				val = (Boolean)state.getAttributeValue(conf, OAVBDIMetaModel.configuration_has_master);
+				if(val!=null)
+					master.setValue((String)state.getAttributeValue(conf, OAVBDIMetaModel.modelelement_has_name), val);
+				val = (Boolean)state.getAttributeValue(conf, OAVBDIMetaModel.configuration_has_daemon);
+				if(val!=null)
+					daemon.setValue((String)state.getAttributeValue(conf, OAVBDIMetaModel.modelelement_has_name), val);
+				val = (Boolean)state.getAttributeValue(conf, OAVBDIMetaModel.configuration_has_autoshutdown);
+				if(val!=null)
+					autosd.setValue((String)state.getAttributeValue(conf, OAVBDIMetaModel.modelelement_has_name), val);
+			}
+		}
+		
+		modelinfo.setSuspend(suspend);
+		modelinfo.setMaster(master);
+		modelinfo.setDaemon(daemon);
+		modelinfo.setAutoShutdown(autosd);
 		
 //		Map ret = super.getProperties();
 //		
