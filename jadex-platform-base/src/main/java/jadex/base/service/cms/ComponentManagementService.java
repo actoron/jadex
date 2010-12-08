@@ -310,7 +310,6 @@ public abstract class ComponentManagementService extends BasicService implements
 										}
 										padesc.addChild(cid);
 										
-										Boolean pas = padesc.getAutoShutdown();
 										Boolean dae = ad.getDaemon();
 //										if(padesc.isAutoShutdown() && !ad.isDaemon())
 //										if(pas!=null && pas.booleanValue() && (dae==null || !dae.booleanValue()))

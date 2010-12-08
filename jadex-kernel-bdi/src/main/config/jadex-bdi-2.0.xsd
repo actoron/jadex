@@ -763,7 +763,7 @@
 						</xs:element>
 					</xs:sequence>
 					<xs:choice>
-						<xs:element name="value" type="MStaticValue" minOccurs="0" maxOccurs="unbounded">
+						<xs:element name="value" type="MInternalExpression" minOccurs="0" maxOccurs="unbounded">
 							<xs:annotation>
 								<xs:documentation>An expression that evaluated to a default value. Only static values are allowed, i.e. it is only evaluated once on creation.</xs:documentation>
 							</xs:annotation>
@@ -907,7 +907,7 @@
 		<xs:complexContent mixed="true">
 			<xs:extension base="MTypedElementSet">
 				<xs:choice>
-					<xs:element name="value" type="MStaticValue" minOccurs="0" maxOccurs="unbounded"/>
+					<xs:element name="value" type="MInternalExpression" minOccurs="0" maxOccurs="unbounded"/>
 					<xs:element name="values" type="MInternalExpression" minOccurs="0"/>
 					<xs:sequence>
 						<xs:element name="internaleventmapping" type="MAssign" minOccurs="0" maxOccurs="unbounded"/>

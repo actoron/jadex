@@ -35,7 +35,7 @@ public class HandlePlan extends Plan
 		}
 		
 		Object pv = getParameter("event").getValue();
-		System.out.println(": "+rv+" "+pv);
+//		System.out.println(": "+rv+" "+pv);
 		
 		int testcnt = ((Integer)getBeliefbase().getBelief("cnt").getFact()).intValue();
 		getBeliefbase().getBelief("cnt").setFact(new Integer(testcnt+1));
