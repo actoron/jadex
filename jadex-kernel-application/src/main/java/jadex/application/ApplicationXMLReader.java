@@ -117,8 +117,7 @@ public class ApplicationXMLReader
 			props = new HashMap();
 			ret.getModelInfo().setProperties(props);
 		}
-		addMethodInfos(props, "remote_excluded", new String[]{
-			"getServiceProvider", "getSpace"});
+		addMethodInfos(props, "remote_excluded", new String[]{"getSpace"});
 		
 		rinfo.getInputStream().close();
 		return ret;

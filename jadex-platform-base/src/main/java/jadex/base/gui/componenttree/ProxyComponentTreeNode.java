@@ -87,6 +87,15 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 	}
 	
 	/**
+	 *  Get the cid.
+	 *  @return the cid.
+	 */
+	public IComponentIdentifier getComponentIdentifier()
+	{
+		return cid;
+	}
+
+	/**
 	 *  Get the icon for a node.
 	 */
 	public Icon	getIcon()

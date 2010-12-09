@@ -2,6 +2,7 @@ package jadex.base.gui.componenttree;
 
 import jadex.base.service.remote.ProxyAgent;
 import jadex.bridge.IComponentDescription;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -153,6 +154,14 @@ public class VirtualComponentTreeNode extends AbstractComponentTreeNode implemen
 	public IComponentDescription getDescription()
 	{
 		return desc;
+	}
+	
+	/**
+	 *  Get the component id.
+	 */
+	public IComponentIdentifier getComponentIdentifier()
+	{
+		return desc!=null? desc.getName(): null;
 	}
 	
 	/**

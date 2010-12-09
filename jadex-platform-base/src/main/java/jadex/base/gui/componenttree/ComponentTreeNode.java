@@ -330,6 +330,14 @@ public class ComponentTreeNode	extends AbstractComponentTreeNode implements IAct
 	{
 		return desc;
 	}
+	
+	/**
+	 *  Get the component id.
+	 */
+	public IComponentIdentifier getComponentIdentifier()
+	{
+		return desc!=null? desc.getName(): null;
+	}
 
 	/**
 	 *  Set the component description.

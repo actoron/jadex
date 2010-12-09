@@ -10,6 +10,7 @@ import jadex.commons.SReflect;
 import jadex.commons.concurrent.CollectionResultListener;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.DelegationResultListener;
+import jadex.commons.concurrent.IResultListener;
 import jadex.commons.service.IService;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.library.ILibraryService;
@@ -28,6 +29,11 @@ import javax.swing.JTabbedPane;
 public class DefaultComponentServiceViewerPanel extends AbstractComponentViewerPanel
 {
 	//-------- attributes --------
+
+	/** The constant for the optional component viewerclass. */
+	public static final String PROPERTY_COMPONENTVIEWERCLASS = "viewerpanel.componentviewerclass";
+	
+	//-------- attributes --------
 	
 	/** The panel. */
 	protected JPanel panel;
@@ -40,11 +46,10 @@ public class DefaultComponentServiceViewerPanel extends AbstractComponentViewerP
 	 *  @param jcc	The jcc.
 	 * 	@param component The component.
 	 */
-	public IFuture init(final IControlCenter jcc, IExternalAccess component)
+	public IFuture init(final IControlCenter jcc, final IExternalAccess component)
 	{
-		final Future ret = new Future();
-		
 		this.panel = new JPanel(new BorderLayout());
+		final Future ret = new Future();
 		
 		// Init interface is asynchronous but super implementation is not.
 		IFuture	fut	= super.init(jcc, component);
@@ -54,25 +59,21 @@ public class DefaultComponentServiceViewerPanel extends AbstractComponentViewerP
 		{
 			public Object execute(final IInternalAccess ia)
 			{
-				SServiceProvider.getDeclaredService(ia.getServiceProvider(), ILibraryService.class)
-					.addResultListener(ia.createResultListener(new DefaultResultListener()
-				{
-					public void resultAvailable(Object source, Object result)
-					{
-						final ILibraryService libservice = (ILibraryService)result;
-						SServiceProvider.getDeclaredServices(ia.getServiceProvider())
-							.addResultListener(ia.createResultListener(new DefaultResultListener()
-						{
-							public void resultAvailable(Object source, Object result)
-							{
-								List services = (List)result;
-								createPanels(libservice, ia, services, ret);
-							}
-						}));
-					}
-				}));
-				
-				return null;
+				final Future ret = new Future();
+				SServiceProvider.getDeclaredServices(ia.getServiceProvider())
+					.addResultListener(ia.createResultListener(new DelegationResultListener(ret)));
+				return ret;
+			}
+		}).addResultListener(new IResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				createPanels(component, (List)result).addResultListener(new DelegationResultListener(ret));
+			}
+			
+			public void exceptionOccurred(Object source, Exception exception)
+			{
+				ret.setException(exception);
 			}
 		});
 		
@@ -82,84 +83,95 @@ public class DefaultComponentServiceViewerPanel extends AbstractComponentViewerP
 	/**
 	 *  Create the panels.
 	 */
-	protected void createPanels(ILibraryService libservice, IInternalAccess ia, List services, Future ret)
+	protected IFuture createPanels(final IExternalAccess exta, final List services)
 	{
-		final List panels = new ArrayList();
+		final Future ret = new Future();
 		
-		final CollectionResultListener lis = new CollectionResultListener(
-			//services.size()+1, true, new DelegationResultListener(ret)
-			services.size(), true, new DelegationResultListener(ret)
+		SServiceProvider.getDeclaredService(getJCC().getServiceProvider(), ILibraryService.class)
+			.addResultListener(new DefaultResultListener()
 		{
-			public void customResultAvailable(Object source, Object result) 
+			public void resultAvailable(Object source, Object result)
 			{
-//				if(subpanels.size()==1)
-//				{
-//					Object[] tmp = (Object[])subpanels.get(0);
-//					add(((IComponentViewerPanel)tmp[1]).getComponent(), BorderLayout.CENTER);
-//				}
-//				else if(subpanels.size()>1)
+				final ILibraryService libservice = (ILibraryService)result;
+		
+				final List panels = new ArrayList();
+				
+				final CollectionResultListener lis = new CollectionResultListener(
+					services.size()+1, true, new DelegationResultListener(ret)
 				{
-					JTabbedPane tp = new JTabbedPane();
-					for(int i=0; i<panels.size(); i++)
+					public void customResultAvailable(Object source, Object result) 
 					{
-						Object[] tmp = (Object[])panels.get(i);
-						tp.addTab((String)tmp[0], ((IServiceViewerPanel)tmp[1]).getComponent());
-					}
-					panel.add(tp, BorderLayout.CENTER);
-				}
-				super.customResultAvailable(source, result);
-			}	
-		});
-		
-		// Component panel.
-//		String clname = (String)ia.getModel().getProperties().get(IAbstractViewerPanel.PROPERTY_VIEWERCLASS);
-//		if(clname!=null)
-//		{
-//			try
-//			{
-//				Class clazz	= SReflect.classForName(clname, ia.getModel().getClassLoader());
-//				IComponentViewerPanel panel = (IComponentViewerPanel)clazz.newInstance();
-//				panels.add(new Object[]{"component", panel});
-//				panel.init(jcc, getActiveComponent()).addResultListener(lis);
-//			}
-//			catch(Exception e)
-//			{
-//				lis.exceptionOccurred(this, e);
-//			}
-//		}
-//		else
-//		{
-//			lis.exceptionOccurred(this, new RuntimeException("Could not init viewer class: "+clname));
-//		}
-		
-		// Service panels.
-		if(services!=null)
-		{
-			for(int i=0; i<services.size(); i++)
-			{
-				IService ser = (IService)services.get(i);
-				String clname = (String)ser.getPropertyMap().get(IAbstractViewerPanel.PROPERTY_VIEWERCLASS);
+		//				if(subpanels.size()==1)
+		//				{
+		//					Object[] tmp = (Object[])subpanels.get(0);
+		//					add(((IComponentViewerPanel)tmp[1]).getComponent(), BorderLayout.CENTER);
+		//				}
+		//				else if(subpanels.size()>1)
+						{
+							JTabbedPane tp = new JTabbedPane();
+							for(int i=0; i<panels.size(); i++)
+							{
+								Object[] tmp = (Object[])panels.get(i);
+								tp.addTab((String)tmp[0], ((IServiceViewerPanel)tmp[1]).getComponent());
+							}
+							panel.add(tp, BorderLayout.CENTER);
+						}
+						super.customResultAvailable(source, result);
+					}	
+				});
+				
+				// Component panel.
+				String clname = (String)exta.getModel().getProperties().get(PROPERTY_COMPONENTVIEWERCLASS);
 				if(clname!=null)
 				{
 					try
 					{
 						Class clazz	= SReflect.classForName(clname, libservice.getClassLoader());
-						IServiceViewerPanel panel = (IServiceViewerPanel)clazz.newInstance();
-						panels.add(new Object[]{SReflect.getInnerClassName(ser.getServiceIdentifier().getServiceType()), panel});
-						panel.init(jcc, ser).addResultListener(lis);
+						IComponentViewerPanel panel = (IComponentViewerPanel)clazz.newInstance();
+						panels.add(new Object[]{"component", panel});
+						panel.init(jcc, getActiveComponent()).addResultListener(lis);
 					}
 					catch(Exception e)
 					{
-						e.printStackTrace();
-						lis.exceptionOccurred(null, e);
+						lis.exceptionOccurred(exta.getComponentIdentifier(), e);
 					}
 				}
 				else
 				{
-					lis.exceptionOccurred(null, null);
+					lis.exceptionOccurred(exta.getComponentIdentifier(), new RuntimeException("No viewerclass: "+clname));
+				}
+				
+				// Service panels.
+				if(services!=null)
+				{
+					for(int i=0; i<services.size(); i++)
+					{
+						IService ser = (IService)services.get(i);
+						clname = (String)ser.getPropertyMap().get(IAbstractViewerPanel.PROPERTY_VIEWERCLASS);
+						if(clname!=null)
+						{
+							try
+							{
+								Class clazz	= SReflect.classForName(clname, libservice.getClassLoader());
+								IServiceViewerPanel panel = (IServiceViewerPanel)clazz.newInstance();
+								panels.add(new Object[]{SReflect.getInnerClassName(ser.getServiceIdentifier().getServiceType()), panel});
+								panel.init(jcc, ser).addResultListener(lis);
+							}
+							catch(Exception e)
+							{
+								e.printStackTrace();
+								lis.exceptionOccurred(null, e);
+							}
+						}
+						else
+						{
+							lis.exceptionOccurred(null, null);
+						}
+					}
 				}
 			}
-		}
+		});
+		return ret;
 	}
 	
 	/**

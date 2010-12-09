@@ -5,6 +5,7 @@ import jadex.base.gui.componenttree.IActiveComponentTreeNode;
 import jadex.base.gui.componenttree.IComponentTreeNode;
 import jadex.base.gui.componenttree.INodeHandler;
 import jadex.base.gui.componenttree.INodeListener;
+import jadex.base.gui.componenttree.ProxyComponentTreeNode;
 import jadex.base.gui.componenttree.ServiceNode;
 import jadex.base.gui.plugin.AbstractJCCPlugin;
 import jadex.bridge.IComponentIdentifier;
@@ -363,7 +364,7 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 					else if(tmp instanceof IActiveComponentTreeNode)
 					{
 						final IActiveComponentTreeNode node = (IActiveComponentTreeNode)tmp;
-						final IComponentIdentifier cid = node.getDescription().getName();
+						final IComponentIdentifier cid = node.getComponentIdentifier();
 						
 						SServiceProvider.getService(getJCC().getServiceProvider(), IComponentManagementService.class)
 							.addResultListener(new SwingDefaultResultListener(comptree)
@@ -476,8 +477,7 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 		}
 		else if(node instanceof IActiveComponentTreeNode)
 		{
-			final IComponentIdentifier cid = ((IActiveComponentTreeNode)node).getDescription().getName();
-
+			final IComponentIdentifier cid = ((IActiveComponentTreeNode)node).getComponentIdentifier();
 			Boolean viewable = (Boolean)viewables.get(cid);
 			if(viewable!=null)
 			{
@@ -485,7 +485,7 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 			}
 			else
 			{
-				// Unknown -> start search to find out synchronously
+				// Unknown -> start search to find out asynchronously
 				SServiceProvider.getService(getJCC().getServiceProvider(), IComponentManagementService.class)
 					.addResultListener(new SwingDefaultResultListener(comptree)
 				{
@@ -502,6 +502,11 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 								viewables.put(cid, classname==null? Boolean.FALSE: Boolean.TRUE);
 //								System.out.println("node: "+viewables.get(cid));
 								node.refresh(false, false);
+							}
+							
+							public void customExceptionOccurred(Object source, Exception exception)
+							{
+								exception.printStackTrace();
 							}
 						});
 					}

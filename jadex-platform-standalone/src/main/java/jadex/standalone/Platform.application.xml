@@ -69,19 +69,24 @@
 		</providedservice>
 		<providedservice class="IExecutionService" direct="true">
 			$args.simulation
-			? new SyncExecutionService($component.getServiceProvider(), SUtil.createHashMap(new Object[]{"componentviewer.viewerclass", 
-				RemoteServiceManagementService.REMOTE_UNCACHED}, new Object[]{"jadex.base.gui.componentviewer.executionservice.ExecutionServiceViewer", 
-				new String[]{"isIdle", "getTasks"}}))
-			: new AsyncExecutionService($component.getServiceProvider(), SUtil.createHashMap(new Object[]{"componentviewer.viewerclass", 
-				RemoteServiceManagementService.REMOTE_UNCACHED}, new Object[]{"jadex.base.gui.componentviewer.executionservice.ExecutionServiceViewer", 
-				new String[]{"isIdle", "getTasks"}}))
+			? new SyncExecutionService($component.getServiceProvider(), SUtil.createHashMap(new Object[]{
+				RemoteServiceManagementService.REMOTE_UNCACHED}, new Object[]{new String[]{"isIdle", "getTasks"}}))
+			: new AsyncExecutionService($component.getServiceProvider(), SUtil.createHashMap(new Object[]{
+				RemoteServiceManagementService.REMOTE_UNCACHED}, new Object[]{new String[]{"isIdle", "getTasks"}}))
+			//$args.simulation
+			//? new SyncExecutionService($component.getServiceProvider(), SUtil.createHashMap(new Object[]{"componentviewer.viewerclass", 
+			//	RemoteServiceManagementService.REMOTE_UNCACHED}, new Object[]{"jadex.base.gui.componentviewer.executionservice.ExecutionServiceViewer", 
+			//	new String[]{"isIdle", "getTasks"}}))
+			//: new AsyncExecutionService($component.getServiceProvider(), SUtil.createHashMap(new Object[]{"componentviewer.viewerclass", 
+			//	RemoteServiceManagementService.REMOTE_UNCACHED}, new Object[]{"jadex.base.gui.componentviewer.executionservice.ExecutionServiceViewer", 
+			//	new String[]{"isIdle", "getTasks"}}))
 		</providedservice>
 		<providedservice class="ILibraryService" direct="true">
 			new LibraryService($args.libpath, $component.getComponentIdentifier(), 
 				SUtil.createHashMap(new Object[]{"componentviewer.viewerclass", 
 				RemoteServiceManagementService.REMOTE_UNCACHED, RemoteServiceManagementService.REMOTE_EXCLUDED}, 
 				new Object[]{"jadex.base.gui.componentviewer.libservice.LibServiceBrowser", 
-				new String[]{"getClassLoader", "getURLs"}, new String[]{"addLibraryServiceListener", "removeLibraryServiceListener"}})
+				new String[]{"getURLs"}, new String[]{"getClassLoader", "addLibraryServiceListener", "removeLibraryServiceListener"}})
 				)
 		</providedservice>
 		<providedservice class="IComponentManagementService" direct="true">

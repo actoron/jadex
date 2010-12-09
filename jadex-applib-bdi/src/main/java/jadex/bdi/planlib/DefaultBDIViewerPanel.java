@@ -36,6 +36,8 @@ public class DefaultBDIViewerPanel extends AbstractComponentViewerPanel
 	/** The constant for the agent optional viewerclass. */
 	public static final String PROPERTY_INCLUDESUBCAPABILITIES = "bdiviewerpanel.includesubcapabilities";
 	
+	//-------- attributes --------
+	
 	/** The panel. */
 	protected JPanel panel;
 	
@@ -124,7 +126,7 @@ public class DefaultBDIViewerPanel extends AbstractComponentViewerPanel
 		}
 		else
 		{
-			lis.exceptionOccurred(this, new RuntimeException("Could not init viewer class: "+clname));
+			lis.exceptionOccurred(this, new RuntimeException("No viewerclass: "+clname));
 		}
 		
 		// Capability panels.

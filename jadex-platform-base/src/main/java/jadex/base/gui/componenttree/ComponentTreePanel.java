@@ -253,7 +253,7 @@ public class ComponentTreePanel extends JSplitPane
 					TreePath[]	paths	= tree.getSelectionPaths();
 					for(int i=0; paths!=null && i<paths.length; i++)
 					{
-						final IComponentIdentifier cid = ((IActiveComponentTreeNode)paths[i].getLastPathComponent()).getDescription().getName();
+						final IComponentIdentifier cid = ((IActiveComponentTreeNode)paths[i].getLastPathComponent()).getComponentIdentifier();//.getDescription().getName();
 						final IComponentTreeNode sel = (IComponentTreeNode)paths[i].getLastPathComponent();
 						cms.resumeComponent(cid).addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
 						{
@@ -337,7 +337,7 @@ public class ComponentTreePanel extends JSplitPane
 					TreePath[]	paths	= tree.getSelectionPaths();
 					for(int i=0; paths!=null && i<paths.length; i++)
 					{
-						final IComponentIdentifier cid = ((IActiveComponentTreeNode)paths[i].getLastPathComponent()).getDescription().getName();
+						final IComponentIdentifier cid = ((IActiveComponentTreeNode)paths[i].getLastPathComponent()).getComponentIdentifier();//getDescription().getName();
 						final IComponentTreeNode sel = (IComponentTreeNode)paths[i].getLastPathComponent();
 						cms.suspendComponent(cid).addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
 						{
@@ -363,7 +363,7 @@ public class ComponentTreePanel extends JSplitPane
 					TreePath[]	paths	= tree.getSelectionPaths();
 					for(int i=0; paths!=null && i<paths.length; i++)
 					{
-						final IComponentIdentifier cid = ((IActiveComponentTreeNode)paths[i].getLastPathComponent()).getDescription().getName();
+						final IComponentIdentifier cid = ((IActiveComponentTreeNode)paths[i].getLastPathComponent()).getComponentIdentifier();//getDescription().getName();
 						final IComponentTreeNode sel = (IComponentTreeNode)paths[i].getLastPathComponent();
 						cms.resumeComponent(cid).addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
 						{
@@ -389,7 +389,7 @@ public class ComponentTreePanel extends JSplitPane
 					TreePath[]	paths	= tree.getSelectionPaths();
 					for(int i=0; paths!=null && i<paths.length; i++)
 					{
-						final IComponentIdentifier cid = ((IActiveComponentTreeNode)paths[i].getLastPathComponent()).getDescription().getName();
+						final IComponentIdentifier cid = ((IActiveComponentTreeNode)paths[i].getLastPathComponent()).getComponentIdentifier();//getDescription().getName();
 
 						final IComponentTreeNode sel = (IComponentTreeNode)paths[i].getLastPathComponent();
 						cms.stepComponent(cid).addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
@@ -479,8 +479,9 @@ public class ComponentTreePanel extends JSplitPane
 					}
 					else if(node instanceof IActiveComponentTreeNode)
 					{
-						IComponentDescription desc = ((IActiveComponentTreeNode)node).getDescription();
-						cms.getExternalAccess(desc.getName()).addResultListener(new SwingDefaultResultListener((Component)null)
+						//IComponentDescription desc = ((IActiveComponentTreeNode)node).getDescription();
+						IComponentIdentifier cid = ((IActiveComponentTreeNode)node).getComponentIdentifier();
+						cms.getExternalAccess(cid).addResultListener(new SwingDefaultResultListener((Component)null)
 						{
 							public void customResultAvailable(Object source, Object result)
 							{
