@@ -41,8 +41,8 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 	/** The unique column index for this TablePropertySection */
 	private int uniqueColumnIndex;
 
-	/** The table column unique values cache for model elements */
-	private Map<EModelElement, HashSet<String>> uniqueColumnValuesMap;
+//	/** The table column unique values cache for model elements */
+//	private Map<EModelElement, HashSet<String>> uniqueColumnValuesMap;
 
 	// ---- constructor ----
 
@@ -76,9 +76,9 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 
 		//assert (uniqueColumnIndex != -1 && uniqueColumnIndex < columns.length);
 		
-		this.uniqueColumnValuesMap = new HashMap<EModelElement, HashSet<String>>();
+//		this.uniqueColumnValuesMap = new HashMap<EModelElement, HashSet<String>>();
 
-		this.uniqueColumnIndex = uniqueColumnIndex;
+//		this.uniqueColumnIndex = uniqueColumnIndex;
 
 	}
 
