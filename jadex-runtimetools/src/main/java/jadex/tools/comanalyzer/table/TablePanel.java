@@ -26,8 +26,6 @@ public class TablePanel extends ToolTab
 	/** Icon paths */
 	private static final String COMANALYZER_IMAGES = "/jadex/tools/comanalyzer/images/";
 
-	private static final String COMMON_IMAGES = "/jadex/tools/common/images/";
-
 
 	/** The image icons. */
 	protected static UIDefaults defaults = new UIDefaults(new Object[]{"resize", SGUI.makeIcon(TablePanel.class, COMANALYZER_IMAGES + "resize.png"), "scrolllock",

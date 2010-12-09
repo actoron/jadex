@@ -9,7 +9,6 @@ import jadex.commons.concurrent.IResultListener;
 import jadex.micro.IMicroExternalAccess;
 
 import javax.swing.JComponent;
-import javax.swing.JPanel;
 
 /**
  *  Panel for the helpline view.

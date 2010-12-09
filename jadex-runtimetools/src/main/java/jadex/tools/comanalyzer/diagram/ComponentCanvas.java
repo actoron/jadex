@@ -220,9 +220,7 @@ public class ComponentCanvas extends JPanel {
 			int x2 = DiagramConstants.getTimelineX(i);
 			float[] dotting = {
 					1.0f, 3.0f };
-			float[] dashing = { 5.0f };
 			Stroke DOTTED = new BasicStroke(1.0f, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_BEVEL, 1.0f, dotting, 0f);
-			Stroke DASHED = new BasicStroke(1.0f, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_BEVEL, 1.0f, dashing, 0f);
 			g2d.setStroke(DOTTED);
 			g2d.setColor(DiagramConstants.COLOR_TIMELINE);
 			Line2D l = new Line2D.Double(x2, DiagramConstants.heightComponentbox + DiagramConstants.yOffsetComponentbox + 3, x2,

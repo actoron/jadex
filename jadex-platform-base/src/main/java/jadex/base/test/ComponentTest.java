@@ -52,7 +52,7 @@ public class ComponentTest implements	Test
 		result.startTest(this);
 		
 		// Start the component.
-		System.out.println("Starting test: "+comp);
+//		System.out.println("Starting test: "+comp);
 		TestResultListener	trl	= new TestResultListener();
 		cms.createComponent(null, comp, null, trl);
 
@@ -113,7 +113,7 @@ public class ComponentTest implements	Test
 		{
 			synchronized(this)
 			{
-				System.out.println("Test execution error: "+comp);
+//				System.out.println("Test execution error: "+comp);
 				result	= exception;
 				finished	= true;
 				notify();
@@ -127,7 +127,7 @@ public class ComponentTest implements	Test
 		{
 			synchronized(this)
 			{
-				System.out.println("Test finished: "+comp);
+//				System.out.println("Test finished: "+comp);
 				result	= res;
 				finished	= true;
 				notify();

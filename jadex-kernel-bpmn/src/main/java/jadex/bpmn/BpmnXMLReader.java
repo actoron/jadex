@@ -7,7 +7,6 @@ import jadex.bpmn.model.MArtifact;
 import jadex.bpmn.model.MAssociation;
 import jadex.bpmn.model.MAssociationTarget;
 import jadex.bpmn.model.MBpmnModel;
-import jadex.bpmn.model.MConfiguration;
 import jadex.bpmn.model.MLane;
 import jadex.bpmn.model.MMessagingEdge;
 import jadex.bpmn.model.MNamedIdElement;
@@ -46,8 +45,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 
-import javax.security.auth.login.AppConfigurationEntry;
-import javax.security.auth.login.Configuration;
 import javax.xml.namespace.QName;
 
 /**

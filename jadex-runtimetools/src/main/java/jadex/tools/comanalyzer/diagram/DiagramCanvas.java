@@ -258,9 +258,6 @@ public class DiagramCanvas extends ToolCanvas
 	 */
 	public void repaintCanvas()
 	{
-
-		int horDim = (visible_components.size() * 80);
-		int vertDim = 20 + (visible_messages.size() * 20);
 		header.setPreferredSize();
 		detail.setPreferredSize();
 

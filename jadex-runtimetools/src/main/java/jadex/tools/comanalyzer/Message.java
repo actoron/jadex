@@ -3,7 +3,6 @@ package jadex.tools.comanalyzer;
 import jadex.base.fipa.SFipa;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IMessageAdapter;
-import jadex.bridge.MessageType;
 import jadex.commons.ComposedFilter;
 import jadex.commons.IFilter;
 import jadex.commons.collection.SCollection;
@@ -128,7 +127,7 @@ public class Message extends ParameterElement
 
 		this.uniqueId = sequence;
 
-		MessageType mt = msg.getMessageType();
+//		MessageType mt = msg.getMessageType();
 		//		String[] pnames = mt.getParameterNames();
 		//		for(int i = 0; i < pnames.length; i++)
 		//			this.parameters.put(pnames[i], msg.getValue(pnames[i]));

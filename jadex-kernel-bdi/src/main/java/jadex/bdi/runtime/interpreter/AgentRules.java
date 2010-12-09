@@ -597,7 +597,7 @@ public class AgentRules
 			{
 				Object ragent = assignments.getVariableValue("?ragent");
 				Object[] step = (Object[])assignments.getVariableValue("?step");
-				System.out.println("Executing external action: "+step[0]);
+//				System.out.println("Executing external action: "+step[0]);
 				state.removeAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_actions, step);
 				
 				Future res = (Future)((Object[])step)[1];
@@ -1723,13 +1723,13 @@ public class AgentRules
 //						String name = (String)state.getAttributeValue(agent, OAVBDIRuntimeModel.agent_has_name);
 						Object value = evaluateExpression(state, exp, fet);
 						BeliefRules.setBeliefValue(state, rbel, value);
+//						System.out.println("Updating belief: "+state.getAttributeValue(mbel, OAVBDIMetaModel.modelelement_has_name)+" = "+value+", "+BDIInterpreter.getInterpreter(state).getClockService().getTime());
 					}
 					catch(Exception e)
 					{
 						String name = BDIInterpreter.getInterpreter(state).getAgentAdapter().getComponentIdentifier().getName();
 						BDIInterpreter.getInterpreter(state).getLogger(rcapa).severe("Could not evaluate belief expression: "+name+" "+state.getAttributeValue(exp, OAVBDIMetaModel.expression_has_parsed));
 					}
-	//					// changed *.class to *.TYPE due to javaflow bug
 					state.setAttributeValue(rbel, OAVBDIRuntimeModel.typedelement_has_timer, 
 						BDIInterpreter.getInterpreter(state).getClockService().createTimer(update.longValue(), to[0]));
 				}
@@ -3214,8 +3214,8 @@ public class AgentRules
 			prop	= (Long)state.getAttributeValue(param, OAVBDIRuntimeModel.parameter_has_value);
 		}
 		long tt = prop!=null? prop.longValue(): 10000;
+//		System.out.println("Adding termination timeout: "+interpreter.getAgentAdapter().getComponentIdentifier().getLocalName()+", "+tt);
 		
-		// changed *.class to *.TYPE due to javaflow bug
 		state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_timer, interpreter.getClockService().createTimer(tt, 
 			new InterpreterTimedObject(BDIInterpreter.getInterpreter(state), new CheckedAction()
 			{
@@ -3230,6 +3230,7 @@ public class AgentRules
 //					if(state.containsObject(ragent))
 //					{
 						// todo: cleanup? or in terminated action?
+//						System.out.println("Forcing termination (timeout): "+interpreter.getAgentAdapter().getComponentIdentifier().getLocalName());
 						BDIInterpreter.getInterpreter(state).getLogger(ragent).info("Forcing termination (timeout): "+interpreter.getAgentAdapter().getComponentIdentifier().getLocalName());
 						state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state, 
 							OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_TERMINATED);

@@ -443,8 +443,6 @@ public class ChartCanvas extends ToolCanvas
 	{
 		this.showLegend = showLegend;
 
-		Plot plot = chart.getPlot();
-
 		if(showLegend)
 		{
 			chart.addLegend(createLegend(chart.getPlot()));

@@ -684,6 +684,9 @@ public abstract class ComponentManagementService extends BasicService implements
 									}
 								}
 							}
+							
+							// Resume component to be killed.
+							resumeComponent(cid);
 						}
 						
 						public void exceptionOccurred(Object source, Exception exception)

@@ -177,8 +177,6 @@ public class TitlePopupMenu extends JPopupMenu
 
 			// calculate the position for the title
 			FontMetrics fm = getFontMetrics(font);
-			int fontHeight = fm.getHeight();
-			int descent = fm.getDescent();
 			int ascent = fm.getAscent();
 			int stringWidth = fm.stringWidth(title);
 			Point textLoc = new Point();

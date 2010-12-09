@@ -159,13 +159,11 @@ public class MessageCanvas extends JPanel implements Serializable
 		// add the timelines first (for each component)
 		for(Iterator iter = panelcan.visible_components.iterator(); iter.hasNext();)
 		{
-			Component component = (Component)iter.next();
+			iter.next();
 
 			int x = DiagramConstants.getTimelineX(agntnr++);
 			float[] dotting = {1.0f, 3.0f};
-			float[] dashing = {5.0f};
 			Stroke DOTTED = new BasicStroke(1.0f, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_BEVEL, 1.0f, dotting, 0f);
-			Stroke DASHED = new BasicStroke(1.0f, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_BEVEL, 1.0f, dashing, 0f);
 			g2d.setStroke(DOTTED);
 			g2d.setColor(DiagramConstants.COLOR_TIMELINE);
 			Line2D l = new Line2D.Double(x, 0, x, DiagramConstants.yDistTimeline * (msgcount + 1));
@@ -272,17 +270,17 @@ public class MessageCanvas extends JPanel implements Serializable
 		return s;
 	}
 
-	private String tail(int n, String s)
-	{
-		try
-		{
-			return s.substring(s.length() - n, s.length());
-		}
-		catch(Exception any)
-		{
-			return s;
-		}
-	}
+//	private String tail(int n, String s)
+//	{
+//		try
+//		{
+//			return s.substring(s.length() - n, s.length());
+//		}
+//		catch(Exception any)
+//		{
+//			return s;
+//		}
+//	}
 
 
 	/**

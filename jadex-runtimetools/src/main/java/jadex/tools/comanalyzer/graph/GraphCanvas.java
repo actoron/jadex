@@ -54,8 +54,6 @@ public class GraphCanvas extends ToolCanvas
 	/** Icon paths */
 	private static final String COMANALYZER_IMAGES = "/jadex/tools/comanalyzer/images/";
 
-	private static final String COMMON_IMAGES = "/jadex/tools/common/images/";
-
 	/** The image icons. */
 	protected static UIDefaults icons = new UIDefaults(new Object[]{"agent_standard_big", SGUI.makeIcon(GraphCanvas.class, COMANALYZER_IMAGES + "agent_standard_big.png"), "agent_standard_small",
 			SGUI.makeIcon(GraphCanvas.class, COMANALYZER_IMAGES + "agent_standard_small.png"), "agent_dummy_big", SGUI.makeIcon(GraphCanvas.class, COMANALYZER_IMAGES + "agent_dummy_big.png"),

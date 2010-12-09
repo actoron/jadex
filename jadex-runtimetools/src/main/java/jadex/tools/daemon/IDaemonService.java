@@ -1,8 +1,6 @@
 package jadex.tools.daemon;
 
 import jadex.bridge.IComponentIdentifier;
-import jadex.commons.IChangeListener;
-import jadex.commons.ICommand;
 import jadex.commons.IFuture;
 import jadex.commons.service.IService;
 

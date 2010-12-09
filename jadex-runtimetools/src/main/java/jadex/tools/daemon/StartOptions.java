@@ -1,6 +1,5 @@
 package jadex.tools.daemon;
 
-import java.io.File;
 
 /**
  *   java [ options ] class [ argument ... ]

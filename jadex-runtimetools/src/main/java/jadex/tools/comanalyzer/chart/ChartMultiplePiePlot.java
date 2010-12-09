@@ -250,7 +250,7 @@ public class ChartMultiplePiePlot extends MultiplePiePlot
 		// may not display every key, but we need the coloring to be
 		// consistent...
 
-		PiePlot piePlot = (PiePlot)getPieChart().getPlot();
+//		PiePlot piePlot = (PiePlot)getPieChart().getPlot();
 
 		if(getDataExtractOrder() == TableOrder.BY_ROW)
 		{

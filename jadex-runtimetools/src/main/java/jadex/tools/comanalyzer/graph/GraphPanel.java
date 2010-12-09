@@ -63,8 +63,6 @@ public class GraphPanel extends ToolTab implements ActionListener, ChangeListene
 	/** Icon paths */
 	private static final String COMANALYZER_IMAGES = "/jadex/tools/comanalyzer/images/";
 
-	private static final String COMMON_IMAGES = "/jadex/tools/common/images/";
-
 	/**
 	 * The image icons. 
 	 */

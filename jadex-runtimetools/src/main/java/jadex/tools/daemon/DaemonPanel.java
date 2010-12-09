@@ -1,9 +1,7 @@
 package jadex.tools.daemon;
 
 import jadex.bridge.IComponentIdentifier;
-import jadex.commons.ChangeEvent;
 import jadex.commons.Future;
-import jadex.commons.IChangeListener;
 import jadex.commons.IFuture;
 import jadex.commons.SGUI;
 import jadex.commons.concurrent.IResultListener;

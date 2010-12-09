@@ -29,6 +29,7 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -383,7 +384,7 @@ public class LibraryPlugin extends AbstractJCCPlugin
 			try
 			{
 				
-				File	file = new File(URLDecoder.decode(ps[i].getValue()));
+				File	file = new File(URLDecoder.decode(ps[i].getValue(), Charset.defaultCharset().name()));
 				if(file.exists())
 				{
 					ls.addURL(file.toURI().toURL());

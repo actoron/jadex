@@ -194,10 +194,6 @@ public class MessageFilterMenu extends TitlePopupMenu
 	 */
 	private class KeyMenuItem extends JMenuItem
 	{
-		String key;
-
-		Object value;
-
 		/**
 		 * Creates a disabled menu item for a parameter key. (There are more
 		 * than one values for the key)
@@ -220,8 +216,6 @@ public class MessageFilterMenu extends TitlePopupMenu
 		public KeyMenuItem(final String key, final Object value)
 		{
 			super(key + ": " + value);
-			this.key = key;
-			this.value = value;
 
 			String name = key + ": " + value;
 

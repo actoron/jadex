@@ -1,11 +1,6 @@
 package jadex.tools.comanalyzer.graph;
 
 import java.awt.Dimension;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
 
 import edu.uci.ics.jung.algorithms.layout.CircleLayout;
 import edu.uci.ics.jung.algorithms.layout.util.RandomLocationTransformer;
@@ -34,28 +29,28 @@ public class GraphCircleLayout extends CircleLayout
 
 	// -------- CircleLayout methods --------
 
-	/**
-	 * Specifies the order of vertices. The first element of the specified array
-	 * will be positioned with angle 0 (on the X axis), and the second one will
-	 * be positioned with angle 1/n, and the third one will be positioned with
-	 * angle 2/n, and so on. <p> Ordering (in fact shuffling) is only done for
-	 * not locked vertices.
-	 */
-	public void orderVertices(Object[] vertices)
-	{
-		List list = Arrays.asList(vertices);
-		// order only not locked vertices and append them shuffled
-		List order = new ArrayList();
-		for(Iterator it = order.iterator(); it.hasNext();)
-		{
-			Object o = it.next();
-			if(!isLocked(o))
-			{
-				order.add(o);
-			}
-		}
-		Collections.shuffle(order);
-	}
+//	/**
+//	 * Specifies the order of vertices. The first element of the specified array
+//	 * will be positioned with angle 0 (on the X axis), and the second one will
+//	 * be positioned with angle 1/n, and the third one will be positioned with
+//	 * angle 2/n, and so on. <p> Ordering (in fact shuffling) is only done for
+//	 * not locked vertices.
+//	 */
+//	public void orderVertices(Object[] vertices)
+//	{
+//		List list = Arrays.asList(vertices);
+//		// order only not locked vertices and append them shuffled
+//		List order = new ArrayList();
+//		for(Iterator it = list.iterator(); it.hasNext();)
+//		{
+//			Object o = it.next();
+//			if(!isLocked(o))
+//			{
+//				order.add(o);
+//			}
+//		}
+//		Collections.shuffle(order);
+//	}
 
 	/**
 	 * Initialize with random locations .
