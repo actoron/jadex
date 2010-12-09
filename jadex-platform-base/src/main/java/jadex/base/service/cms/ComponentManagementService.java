@@ -792,7 +792,7 @@ public abstract class ComponentManagementService extends BasicService implements
 	//					IComponentIdentifier	child	= (IComponentIdentifier)it.next();
 						if(IComponentDescription.STATE_ACTIVE.equals(((IComponentDescription)descs.get(achildren[i])).getState()))
 						{
-							suspendComponent(achildren[i]);	// todo: cascading resume with wait.
+							suspendComponent(achildren[i]);	// todo: cascading suspend with wait.
 						}
 					}
 	

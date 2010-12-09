@@ -70,10 +70,10 @@
 		<providedservice class="IExecutionService" direct="true">
 			$args.simulation
 			? new SyncExecutionService($component.getServiceProvider(), SUtil.createHashMap(new Object[]{"componentviewer.viewerclass", 
-				RemoteServiceManagementService.REMOTE_UNCACHED}, new Object[]{"jadex.base.gui.componentviewer.executionservice.Executioncomponentviewer", 
+				RemoteServiceManagementService.REMOTE_UNCACHED}, new Object[]{"jadex.base.gui.componentviewer.executionservice.ExecutionServiceViewer", 
 				new String[]{"isIdle", "getTasks"}}))
 			: new AsyncExecutionService($component.getServiceProvider(), SUtil.createHashMap(new Object[]{"componentviewer.viewerclass", 
-				RemoteServiceManagementService.REMOTE_UNCACHED}, new Object[]{"jadex.base.gui.componentviewer.executionservice.Executioncomponentviewer", 
+				RemoteServiceManagementService.REMOTE_UNCACHED}, new Object[]{"jadex.base.gui.componentviewer.executionservice.ExecutionServiceViewer", 
 				new String[]{"isIdle", "getTasks"}}))
 		</providedservice>
 		<providedservice class="ILibraryService" direct="true">
@@ -130,6 +130,10 @@
 			)		
 		</providedservice>
 	</services>
+
+	<properties>
+		<property name="componentviewer.viewerclass">"jadex.base.gui.componentviewer.DefaultComponentServiceViewerPanel"</property>
+	</properties>
 	
 	<applications>
 		<application name="all_kernels auto (rms, awa, jcc)">

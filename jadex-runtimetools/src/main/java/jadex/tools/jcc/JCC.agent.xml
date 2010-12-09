@@ -155,6 +155,8 @@
 		<!-- Only print severe messages and ignore warnings, e.g. from unhandled messages received by conversation center. -->
 		<property name="logging.level">java.util.logging.Level.SEVERE</property>
 <!--		<property name="debugging">true</property>-->
+		<!-- <property name="componentviewer.viewerclass">"jadex.base.gui.componentviewer.DefaultComponentServiceViewerPanel"</property>-->
+		<!-- <property name="bdiviewerpanel.agentviewerclass">"..."</property> -->
 	</properties>
 
 	<configurations>
