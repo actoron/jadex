@@ -191,7 +191,7 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 	protected IServiceContainer container;
 	
 	/** The flag if is inited. */
-	protected Boolean initedflag;
+	protected boolean initedflag;
 	
 	/** The inited future. */
 	protected Future inited;
@@ -231,7 +231,7 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 		{
 			context.addThread(new ProcessThread((MActivity)startevents.get(i), context, BpmnInterpreter.this));
 		}
-		initedflag = Boolean.TRUE;
+		initedflag = true;	// No further init for BDI plan.
 	}	
 		
 	/**
@@ -303,30 +303,30 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 		}		
 	}
 	
-	//-------- IKernelAgent interface --------
+	//-------- IComponentInstance interface --------
 	
 	/**
-	 *  Can be called on the agent thread only.
+	 *  Can be called on the component thread only.
 	 * 
-	 *  Main method to perform agent execution.
-	 *  Whenever this method is called, the agent performs
+	 *  Main method to perform component execution.
+	 *  Whenever this method is called, the component performs
 	 *  one of its scheduled actions.
-	 *  The platform can provide different execution models for agents
+	 *  The platform can provide different execution models for components
 	 *  (e.g. thread based, or synchronous).
 	 *  To avoid idle waiting, the return value can be checked.
-	 *  The platform guarantees that executeAction() will not be called in parallel. 
+	 *  The platform guarantees that executeStep() will not be called in parallel. 
 	 *  @return True, when there are more actions waiting to be executed. 
 	 */
 	public boolean executeStep()
 	{
 		boolean ret = false;
 		
-		if(initedflag==null)
+		if(!initedflag)
 		{
-			initedflag = Boolean.FALSE;
+			initedflag = true;
 			executeInitStep1();
 		}
-		else if(initedflag.booleanValue())
+		else if(inited.isDone())	// Todo: do we need this?
 		{
 			try
 			{
@@ -355,7 +355,8 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 			}
 			catch(ComponentTerminatedException ate)
 			{
-				// Todo: fix microkernel bug.
+				// Todo: fix kernel bug.
+				ate.printStackTrace();
 			}
 		}
 		
@@ -484,8 +485,7 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 					context.addThread(new ProcessThread((MActivity)startevents.get(i), context, BpmnInterpreter.this));
 				}
 				
-				// Set inited to true and notify cms.
-				initedflag = Boolean.TRUE;
+				// Notify cms that init is finished.
 				inited.setResult(new Object[]{BpmnInterpreter.this, adapter});
 			}
 			
@@ -1356,19 +1356,21 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 	 *  The current subcomponents can be accessed by IComponentAdapter.getSubcomponents().
 	 *  @param comp	The newly created component.
 	 */
-	public void	componentCreated(IComponentDescription desc, IModelInfo model)
+	public IFuture	componentCreated(IComponentDescription desc, IModelInfo model)
 	{
+		return new Future(null);
 	}
-	
+
 	/**
 	 *  Called when a subcomponent of this component has been destroyed.
 	 *  This event may be ignored, if no special reaction  to new or destroyed components is required.
 	 *  The current subcomponents can be accessed by IComponentAdapter.getSubcomponents().
 	 *  @param comp	The destroyed component.
 	 */
-	public void	componentDestroyed(IComponentDescription desc)
+	public IFuture	componentDestroyed(IComponentDescription desc)
 	{
-	}		
+		return new Future(null);
+	}
 	
 	/**
 	 *  Create a component result listener.

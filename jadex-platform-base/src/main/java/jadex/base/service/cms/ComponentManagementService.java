@@ -257,14 +257,17 @@ public abstract class ComponentManagementService extends BasicService implements
 						final CMSComponentDescription ad = new CMSComponentDescription(cid, type, 
 							getParentIdentifier(cinfo), master, daemon, autosd, lmodel.getFullName());
 						
+//						System.err.println("Pre-Init: "+cid);
+						
 						Future future = new Future();
 						future.addResultListener(new IResultListener()
 						{
 							public void resultAvailable(Object source, Object result)
 							{
+//								System.err.println("Post-Init: "+cid);
+
 								// Create the component instance.
-								IComponentAdapter adapter;
-								ICMSComponentListener[] alisteners;
+								final IComponentAdapter adapter;
 								
 								synchronized(adapters)
 								{
@@ -275,14 +278,8 @@ public abstract class ComponentManagementService extends BasicService implements
 										// Init successfully finished. Add description and adapter.
 										adapter = (IComponentAdapter)((Object[])result)[1];
 										
-										if(isInitSuspend(cinfo, lmodel))
-										{
-											ad.setState(IComponentDescription.STATE_SUSPENDED);
-										}
-										else
-										{
-											ad.setState(IComponentDescription.STATE_ACTIVE);
-										}
+										// Init finished. Set to suspended until parent registration is finished.
+										ad.setState(IComponentDescription.STATE_SUSPENDED);
 										
 										descs.put(cid, ad);
 //										System.out.println("adding cid: "+cid+" "+ad.getMaster()+" "+ad.getDaemon()+" "+ad.getAutoShutdown());
@@ -314,51 +311,73 @@ public abstract class ComponentManagementService extends BasicService implements
 										}
 									}
 								}
-								getComponentInstance(pad).componentCreated(ad, lmodel);
 								
 								// Register component at parent.
-								
-								// todo: can be called after listener has (concurrently) deregistered
-								// notify listeners without holding locks
-								synchronized(listeners)
+								getComponentInstance(pad).componentCreated(ad, lmodel).addResultListener(new IResultListener()
 								{
-									Set	slisteners	= new HashSet(listeners.getCollection(null));
-									slisteners.addAll(listeners.getCollection(cid));
-									alisteners	= (ICMSComponentListener[])slisteners.toArray(new ICMSComponentListener[slisteners.size()]);
-								}
-								for(int i=0; i<alisteners.length; i++)
-								{
-									try
+									public void resultAvailable(Object source, Object result)
 									{
-										alisteners[i].componentAdded(ad);
-									}
-									catch(Exception e)
-									{
-										e.printStackTrace();
-									}
-								}
+//										System.err.println("Registered at parent: "+cid);
 										
-//										System.out.println("created: "+cid.getLocalName()+" "+(parent!=null?parent.getComponentIdentifier().getLocalName():"null"));
-//										System.out.println("added: "+descs.size()+", "+aid);
-								
-								if(killlistener!=null)
-									killresultlisteners.put(cid, killlistener);
-								
-								inited.setResult(cid);
-								
-								// Start regular execution of inited component.
-								if(cinfo.getSuspend()==null || !cinfo.getSuspend().booleanValue())
-								{
-									try
-									{
-//										System.out.println("cid wakeup: "+cid);
-										adapter.wakeup();
+										// Registration finished -> reactivate component.
+										if(isInitSuspend(cinfo, lmodel))
+										{
+											ad.setState(IComponentDescription.STATE_SUSPENDED);
+										}
+										else
+										{
+											ad.setState(IComponentDescription.STATE_ACTIVE);
+										}
+										
+										// todo: can be called after listener has (concurrently) deregistered
+										// notify listeners without holding locks
+										ICMSComponentListener[] alisteners;
+										synchronized(listeners)
+										{
+											Set	slisteners	= new HashSet(listeners.getCollection(null));
+											slisteners.addAll(listeners.getCollection(cid));
+											alisteners	= (ICMSComponentListener[])slisteners.toArray(new ICMSComponentListener[slisteners.size()]);
+										}
+										for(int i=0; i<alisteners.length; i++)
+										{
+											try
+											{
+												alisteners[i].componentAdded(ad);
+											}
+											catch(Exception e)
+											{
+												e.printStackTrace();
+											}
+										}
+												
+//												System.out.println("created: "+cid.getLocalName()+" "+(parent!=null?parent.getComponentIdentifier().getLocalName():"null"));
+//												System.out.println("added: "+descs.size()+", "+aid);
+										
+										if(killlistener!=null)
+											killresultlisteners.put(cid, killlistener);
+										
+										inited.setResult(cid);
+										
+										// Start regular execution of inited component.
+										if(cinfo.getSuspend()==null || !cinfo.getSuspend().booleanValue())
+										{
+											try
+											{
+//												System.out.println("cid wakeup: "+cid);
+												adapter.wakeup();
+											}
+											catch(Exception e)
+											{
+												e.printStackTrace();
+											}
+										}
 									}
-									catch(Exception e)
+									
+									public void exceptionOccurred(Object source, Exception exception)
 									{
-										e.printStackTrace();
+										exception.printStackTrace();
 									}
-								}
+								});								
 							}
 							
 							public void exceptionOccurred(Object source, final Exception exception)
@@ -881,15 +900,18 @@ public abstract class ComponentManagementService extends BasicService implements
 				{
 					// Resume subcomponents
 					CMSComponentDescription desc = (CMSComponentDescription)descs.get(cid);
-					IComponentIdentifier[] achildren = desc.getChildren();
-	//				for(Iterator it=children.getCollection(componentid).iterator(); it.hasNext(); )
-					for(int i=0; i<achildren.length; i++)
+					if(desc!=null)
 					{
-	//					IComponentIdentifier	child	= (IComponentIdentifier)it.next();
-//						if(IComponentDescription.STATE_SUSPENDED.equals(((IComponentDescription)descs.get(achildren[i])).getState()))
-//						{
-							resumeComponent(achildren[i]);	// todo: cascading resume with wait.
-//						}
+						IComponentIdentifier[] achildren = desc.getChildren();
+		//				for(Iterator it=children.getCollection(componentid).iterator(); it.hasNext(); )
+						for(int i=0; i<achildren.length; i++)
+						{
+		//					IComponentIdentifier	child	= (IComponentIdentifier)it.next();
+	//						if(IComponentDescription.STATE_SUSPENDED.equals(((IComponentDescription)descs.get(achildren[i])).getState()))
+	//						{
+								resumeComponent(achildren[i]);	// todo: cascading resume with wait.
+	//						}
+						}
 					}
 	
 					IComponentAdapter adapter = (IComponentAdapter)adapters.get(cid);

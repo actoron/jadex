@@ -222,8 +222,7 @@ public class AgentRules
 				// Inform get-external-access listeners (if any). Hack???
 				BDIInterpreter	bdii	= BDIInterpreter.getInterpreter(state);
 				
-				// Stop execution when init has finished and notify cms.
-				bdii.stop = true;
+				// When init has finished -> notify cms.
 				bdii.inited.setResult(new Object[]{bdii, bdii.getAgentAdapter()});
 			}
 		};

@@ -74,9 +74,6 @@ public class MicroAgentInterpreter implements IComponentInstance
 	/** The service container. */
 	protected IServiceContainer container;
 	
-	/** The stop flag, stops interpreter execution. */
-	protected boolean stop;
-	
 	/** The component listeners. */
 	protected List componentlisteners;
 	
@@ -147,18 +144,9 @@ public class MicroAgentInterpreter implements IComponentInstance
 					{
 						public void resultAvailable(Object source, Object result)
 						{
-							// Init is now finished. Notify cms and stop execution.
-							stop = true;
-							
+							// Init is now finished. Notify cms.
 							inited.setResult(new Object[]{MicroAgentInterpreter.this, adapter});
 							
-//							Future fut = new Future();
-//							fut.addResultListener(new DefaultResultListener(adapter.getLogger())
-//							{
-//								public void resultAvailable(Object source, Object result)
-//								{
-//								}
-//							});
 							addStep(new Object[]{new IComponentStep()
 							{
 								public Object execute(IInternalAccess ia)
@@ -262,9 +250,7 @@ public class MicroAgentInterpreter implements IComponentInstance
 				addHistoryEntry(steptext);
 			}
 	
-			boolean ret = !stop && !steps.isEmpty();
-			stop = false;
-			return ret;
+			return !steps.isEmpty();
 		}
 		catch(ComponentTerminatedException ate)
 		{
@@ -454,18 +440,20 @@ public class MicroAgentInterpreter implements IComponentInstance
 	 *  The current subcomponents can be accessed by IComponentAdapter.getSubcomponents().
 	 *  @param comp	The newly created component.
 	 */
-	public void	componentCreated(IComponentDescription desc, IModelInfo model)
+	public IFuture	componentCreated(IComponentDescription desc, IModelInfo model)
 	{
+		return new Future(null);
 	}
-	
+
 	/**
 	 *  Called when a subcomponent of this component has been destroyed.
 	 *  This event may be ignored, if no special reaction  to new or destroyed components is required.
 	 *  The current subcomponents can be accessed by IComponentAdapter.getSubcomponents().
 	 *  @param comp	The destroyed component.
 	 */
-	public void	componentDestroyed(IComponentDescription desc)
+	public IFuture	componentDestroyed(IComponentDescription desc)
 	{
+		return new Future(null);
 	}
 	
 	/**

@@ -80,6 +80,9 @@
 							<env:drawcondition>$object.flashing</env:drawcondition>
 						</env:ellipse> -->
 					</env:drawable>
+					<env:prelayers>
+						<env:colorlayer color="black"/>
+					</env:prelayers>
 				</env:perspective>
 				
 				<env:perspective name="abstract" class="Perspective2D" opengl="true" objectplacement="center">
@@ -93,6 +96,9 @@
 							<env:drawcondition>$space.show_dark_flies || $object.flashing</env:drawcondition>
 						</env:triangle>
 					</env:drawable>
+					<env:prelayers>
+						<env:colorlayer color="black"/>
+					</env:prelayers>
 				</env:perspective>
 			</env:perspectives>
 			

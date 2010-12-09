@@ -15,7 +15,7 @@ public class SubService extends BasicService implements ISubService
 	 */
 	public SubService(IServiceProvider provider)
 	{
-		super(provider.getId(), IAddService.class, null);
+		super(provider.getId(), ISubService.class, null);
 	}
 	
 	/**

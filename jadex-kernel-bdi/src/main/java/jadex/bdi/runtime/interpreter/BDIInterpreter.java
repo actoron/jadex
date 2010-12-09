@@ -180,9 +180,6 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 	/** The service container. */
 	protected IServiceContainer container;
 	
-	/** Flag if component should stop execution. */
-	protected boolean stop;
-
 	/** The cms future for init return. */
 	protected Future inited;
 	
@@ -323,15 +320,7 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 			state.notifyEventListeners();
 			state.getProfiler().stop(IProfiler.TYPE_RULE, act!=null?act.getRule():null);
 
-			if(stop)
-			{
-				stop = false;
-				return false;
-			}
-			else
-			{
-				return !rulesystem.getAgenda().isEmpty(); 
-			}
+			return !rulesystem.getAgenda().isEmpty(); 
 		}
 		catch(Throwable e)
 		{
@@ -494,19 +483,21 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 	 *  The current subcomponents can be accessed by IComponentAdapter.getSubcomponents().
 	 *  @param comp	The newly created component.
 	 */
-	public void	componentCreated(IComponentDescription desc, IModelInfo model)
+	public IFuture	componentCreated(IComponentDescription desc, IModelInfo model)
 	{
+		return new Future(null);
 	}
-	
+
 	/**
 	 *  Called when a subcomponent of this component has been destroyed.
 	 *  This event may be ignored, if no special reaction  to new or destroyed components is required.
 	 *  The current subcomponents can be accessed by IComponentAdapter.getSubcomponents().
 	 *  @param comp	The destroyed component.
 	 */
-	public void	componentDestroyed(IComponentDescription desc)
+	public IFuture	componentDestroyed(IComponentDescription desc)
 	{
-	}	
+		return new Future(null);
+	}
 	
 	/**
 	 *  Test if the component's execution is currently at one of the

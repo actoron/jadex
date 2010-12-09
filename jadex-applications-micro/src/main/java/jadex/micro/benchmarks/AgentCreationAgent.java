@@ -276,7 +276,7 @@ public class AgentCreationAgent extends MicroAgent
 		{
 			public Object getDefaultValue(String configname)
 			{
-				return new Integer(10000);
+				return new Integer(5000);	// Todo: support 10000 with gui.
 			}
 			public String getDescription()
 			{

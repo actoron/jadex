@@ -132,6 +132,8 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	 */
 	public void wakeup()
 	{
+//		System.err.println("wakeup: "+getComponentIdentifier());		
+		
 		wokenup	= true;
 
 		if(IComponentDescription.STATE_TERMINATED.equals(desc.getState()))

@@ -121,9 +121,6 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 	/** The scheduled steps of the component. */
 	protected List steps;
 	
-	/** Stop flag for stopping execution. */
-	protected boolean stop;
-	
 	/** Flag indicating an added step will be executed without the need for calling wakeup(). */
 	// Required for startup bug fix in scheduleStep (synchronization between main thread and executor).
 	// While main is running the root component steps, invoke later must not be called to prevent double execution.
@@ -646,10 +643,12 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 	 *  The current subcomponents can be accessed by IComponentAdapter.getSubcomponents().
 	 *  @param comp	The newly created component.
 	 */
-	public void	componentCreated(final IComponentDescription desc, final IModelInfo model)
+	public IFuture	componentCreated(final IComponentDescription desc, final IModelInfo model)
 	{
+//		System.out.println("comp created: "+desc.getName()+" "+Application.this.getComponentIdentifier()+" "+children);
+
 		// Checks if loaded model is defined in the application component types
-		scheduleStep(new IComponentStep()
+		return scheduleStep(new IComponentStep()
 		{
 			public Object execute(IInternalAccess ia)
 			{
@@ -702,8 +701,6 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 				return null;
 			}
 		});
-		
-//		System.out.println("comp created: "+desc.getName()+" "+Application.this.getComponentIdentifier()+" "+children);
 	}
 	
 	/**
@@ -712,9 +709,9 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 	 *  The current subcomponents can be accessed by IComponentAdapter.getSubcomponents().
 	 *  @param comp	The destroyed component.
 	 */
-	public void	componentDestroyed(final IComponentDescription desc)
+	public IFuture	componentDestroyed(final IComponentDescription desc)
 	{
-		scheduleStep(new IComponentStep()
+		return scheduleStep(new IComponentStep()
 		{
 			public Object execute(IInternalAccess ia)
 			{
@@ -1098,15 +1095,14 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 			boolean ret;
 			synchronized(steps)
 			{
-				ret = !stop && !steps.isEmpty();
+				ret = !steps.isEmpty();
 				willdostep	= ret;
 			}
-			stop = false;
 			return ret;
 		}
 		catch(ComponentTerminatedException ate)
 		{
-			// Todo: fix microkernel bug.
+			// Todo: fix kernel bug.
 			ate.printStackTrace();
 			return false; 
 		}
@@ -1346,10 +1342,9 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 		}
 		else
 		{
-			// Init is now finished. Notify cms and stop execution.
+			// Init is now finished. Notify cms.
 //			System.out.println("Application init finished: "+ApplicationInterpreter.this);
-			stop = true;
-			
+
 			// master, daemon, autoshutdown
 //			Boolean[] bools = new Boolean[3];
 //			bools[2] = model.getAutoShutdown();

@@ -45,7 +45,7 @@ public interface IComponentInstance
 	 *  @param comp	The newly created component.
 	 */
 	// todo: Use parent->child creation config information instead of model (e.g. role in AGR!?)
-	public void	componentCreated(IComponentDescription desc, IModelInfo model);
+	public IFuture	componentCreated(IComponentDescription desc, IModelInfo model);
 
 	/**
 	 *  Called when a subcomponent of this component has been destroyed.
@@ -53,7 +53,7 @@ public interface IComponentInstance
 	 *  The current subcomponents can be accessed by IComponentAdapter.getSubcomponents().
 	 *  @param comp	The destroyed component.
 	 */
-	public void	componentDestroyed(IComponentDescription desc);
+	public IFuture	componentDestroyed(IComponentDescription desc);
 
 	/**
 	 *  Can be called concurrently (also during executeAction()).

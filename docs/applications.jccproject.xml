@@ -12,7 +12,7 @@
 	</p0:properties>
 	<p0:properties __ID="10" type="Starter">
 		<p0:property __ID="11" type="leftsplit_location">331</p0:property>
-		<p0:property __ID="12" type="mainsplit_location">271</p0:property>
+		<p0:property __ID="12" type="mainsplit_location">261</p0:property>
 		<p0:property __ID="13" type="checking">true</p0:property>
 		<p0:properties __ID="14" type="mpanel">
 			<p0:property __ID="15" type="tree"><![CDATA[<?xml version="1.0" encoding="utf-8"?>
@@ -25,15 +25,15 @@
 						<p1:String __ID="3" content="jadex"></p1:String>
 						<p1:String __ID="4" content="bdi"></p1:String>
 						<p1:String __ID="5" content="examples"></p1:String>
-						<p1:String __ID="6" content="blackjack"></p1:String>
-						<p1:String __ID="7" content="BlackJack.application.xml"></p1:String>
+						<p1:String __ID="6" content="disastermanagement"></p1:String>
+						<p1:String __ID="7" content="DisasterManagement.application.xml"></p1:String>
 					</entries>
 				</p1:String__5>
 			</path>
 		</p0:NodePath>
 	</selectedNode>
 	<expandedNodes>
-		<p0:NodePath__5 __ID="8">
+		<p0:NodePath__10 __ID="8">
 			<entries>
 				<p0:NodePath __ID="9" entry="0">
 					<path>
@@ -45,7 +45,7 @@
 						</p1:String__2>
 					</path>
 				</p0:NodePath>
-				<p0:NodePath __ID="13" entry="0">
+				<p0:NodePath __ID="13" entry="3">
 					<path>
 						<p1:String__1 xmlns:p1="typeinfo:java.lang" __ID="14">
 							<entries>
@@ -54,145 +54,105 @@
 						</p1:String__1>
 					</path>
 				</p0:NodePath>
-				<p0:NodePath __ID="16" entry="0">
+				<p0:NodePath __ID="16" entry="3">
 					<path>
-						<p1:String__0 xmlns:p1="typeinfo:java.lang" __ID="17"></p1:String__0>
-					</path>
-				</p0:NodePath>
-				<p0:NodePath __ID="18" entry="0">
-					<path>
-						<p1:String__3 xmlns:p1="typeinfo:java.lang" __ID="19">
+						<p1:String__4 xmlns:p1="typeinfo:java.lang" __ID="17">
 							<entries>
-								<p1:String __ID="20" content="jadex"></p1:String>
-								<p1:String __ID="21" content="bdi"></p1:String>
-								<p1:String __ID="22" content="examples"></p1:String>
-							</entries>
-						</p1:String__3>
-					</path>
-				</p0:NodePath>
-				<p0:NodePath __ID="23" entry="0">
-					<path>
-						<p1:String__4 xmlns:p1="typeinfo:java.lang" __ID="24">
-							<entries>
-								<p1:String __ID="25" content="jadex"></p1:String>
-								<p1:String __ID="26" content="bdi"></p1:String>
-								<p1:String __ID="27" content="examples"></p1:String>
-								<p1:String __ID="28" content="blackjack"></p1:String>
+								<p1:String __ID="18" content="jadex"></p1:String>
+								<p1:String __ID="19" content="micro"></p1:String>
+								<p1:String __ID="20" content="examples"></p1:String>
+								<p1:String __ID="21" content="mandelbrot"></p1:String>
 							</entries>
 						</p1:String__4>
 					</path>
 				</p0:NodePath>
+				<p0:NodePath __ID="22" entry="0">
+					<path>
+						<p1:String__1 xmlns:p1="typeinfo:java.lang" __ID="23">
+							<entries>
+								<p1:String __ID="24" content="jadex"></p1:String>
+							</entries>
+						</p1:String__1>
+					</path>
+				</p0:NodePath>
+				<p0:NodePath __ID="25" entry="3">
+					<path>
+						<p1:String__0 xmlns:p1="typeinfo:java.lang" __ID="26"></p1:String__0>
+					</path>
+				</p0:NodePath>
+				<p0:NodePath __ID="27" entry="0">
+					<path>
+						<p1:String__4 xmlns:p1="typeinfo:java.lang" __ID="28">
+							<entries>
+								<p1:String __ID="29" content="jadex"></p1:String>
+								<p1:String __ID="30" content="bdi"></p1:String>
+								<p1:String __ID="31" content="examples"></p1:String>
+								<p1:String __ID="32" content="disastermanagement"></p1:String>
+							</entries>
+						</p1:String__4>
+					</path>
+				</p0:NodePath>
+				<p0:NodePath __ID="33" entry="0">
+					<path>
+						<p1:String__0 xmlns:p1="typeinfo:java.lang" __ID="34"></p1:String__0>
+					</path>
+				</p0:NodePath>
+				<p0:NodePath __ID="35" entry="3">
+					<path>
+						<p1:String__3 xmlns:p1="typeinfo:java.lang" __ID="36">
+							<entries>
+								<p1:String __ID="37" content="jadex"></p1:String>
+								<p1:String __ID="38" content="micro"></p1:String>
+								<p1:String __ID="39" content="examples"></p1:String>
+							</entries>
+						</p1:String__3>
+					</path>
+				</p0:NodePath>
+				<p0:NodePath __ID="40" entry="0">
+					<path>
+						<p1:String__3 xmlns:p1="typeinfo:java.lang" __ID="41">
+							<entries>
+								<p1:String __ID="42" content="jadex"></p1:String>
+								<p1:String __ID="43" content="bdi"></p1:String>
+								<p1:String __ID="44" content="examples"></p1:String>
+							</entries>
+						</p1:String__3>
+					</path>
+				</p0:NodePath>
+				<p0:NodePath __ID="45" entry="3">
+					<path>
+						<p1:String__2 xmlns:p1="typeinfo:java.lang" __ID="46">
+							<entries>
+								<p1:String __ID="47" content="jadex"></p1:String>
+								<p1:String __ID="48" content="micro"></p1:String>
+							</entries>
+						</p1:String__2>
+					</path>
+				</p0:NodePath>
 			</entries>
-		</p0:NodePath__5>
+		</p0:NodePath__10>
 	</expandedNodes>
 	<rootPathEntries>
-		<p1:String__1 xmlns:p1="typeinfo:java.lang" __ID="29">
+		<p1:String__4 xmlns:p1="typeinfo:java.lang" __ID="49">
 			<entries>
-				<p1:String __ID="30" content="jadex-applications-bdi-2.0-rc6.jar"></p1:String>
+				<p1:String __ID="50" content="jadex-applications-bdi-2.0-rc6.jar"></p1:String>
+				<p1:String __ID="51" content="jadex-applications-bdibpmn-2.0-rc6.jar"></p1:String>
+				<p1:String __ID="52" content="jadex-applications-bpmn-2.0-rc6.jar"></p1:String>
+				<p1:String __ID="53" content="jadex-applications-micro-2.0-rc6.jar"></p1:String>
 			</entries>
-		</p1:String__1>
+		</p1:String__4>
 	</rootPathEntries>
 </p0:ModelExplorerProperties>
 ]]></p0:property>
-			<p0:property __ID="16" type="lastpath">jadex-applications-bdi-2.0-rc6.jar</p0:property>
+			<p0:property __ID="16" type="lastpath">jadex-applications-micro-2.0-rc6.jar</p0:property>
 			<p0:property __ID="17" type="refresh">false</p0:property>
 		</p0:properties>
 		<p0:properties __ID="18" type="spanel">
-			<p0:property __ID="19" type="model">jadex/bdi/examples/blackjack/BlackJack.application.xml</p0:property>
-			<p0:property __ID="20" type="config">Only Manager</p0:property>
+			<p0:property __ID="19" type="model">jadex/bdi/examples/disastermanagement/DisasterManagement.application.xml</p0:property>
+			<p0:property __ID="20" type="config">default</p0:property>
 			<p0:property __ID="21" type="startsuspended">false</p0:property>
 			<p0:property __ID="22" type="autogenerate">false</p0:property>
-			<p0:property __ID="23" type="name">BlackJack</p0:property>
-		</p0:properties>
-	</p0:properties>
-	<p0:properties __ID="24" type="Conversation Center">
-		<p0:properties __ID="25" type="convcenter">
-			<p0:property __ID="26" type="lastmessage"><![CDATA[<?xml version="1.0" encoding="utf-8"?>
-<p0:HashMap xmlns:p0="typeinfo:java.util" __ID="0">
-	<entries>
-		<entry __ID="1">
-			<key>
-				<p1:String xmlns:p1="typeinfo:java.lang" __ID="2" content="reply_with"></p1:String>
-			</key>
-		</entry>
-		<entry __ID="3">
-			<key>
-				<p1:String xmlns:p1="typeinfo:java.lang" __ID="4" content="protocol"></p1:String>
-			</key>
-		</entry>
-		<entry __ID="5">
-			<key>
-				<p1:String xmlns:p1="typeinfo:java.lang" __ID="6" content="reply_to"></p1:String>
-			</key>
-		</entry>
-		<entry __ID="7">
-			<key>
-				<p1:String xmlns:p1="typeinfo:java.lang" __ID="8" content="conversation_id"></p1:String>
-			</key>
-		</entry>
-		<entry __ID="9">
-			<key>
-				<p1:String xmlns:p1="typeinfo:java.lang" __ID="10" content="ontology"></p1:String>
-			</key>
-		</entry>
-		<entry __ID="11">
-			<key>
-				<p1:String xmlns:p1="typeinfo:java.lang" __ID="12" content="in_reply_to"></p1:String>
-			</key>
-		</entry>
-		<entry __ID="13">
-			<key>
-				<p1:String xmlns:p1="typeinfo:java.lang" __ID="14" content="receivers"></p1:String>
-			</key>
-		</entry>
-		<entry __ID="15">
-			<key>
-				<p1:String xmlns:p1="typeinfo:java.lang" __ID="16" content="sender"></p1:String>
-			</key>
-			<value>
-				<p2:ComponentIdentifier xmlns:p2="typeinfo:jadex.bridge" __ID="17" name="jcc@alex_neu_c6c">
-					<resolvers>
-						<p2:ComponentIdentifier__0 __ID="18"></p2:ComponentIdentifier__0>
-					</resolvers>
-					<addresses>
-						<p1:String__2 xmlns:p1="typeinfo:java.lang" __ID="19">
-							<entries>
-								<p1:String __ID="20" content="nio-mtp://alex_neu:2809"></p1:String>
-								<p1:String __ID="21" content="nio-mtp://134.100.11.200:2809"></p1:String>
-							</entries>
-						</p1:String__2>
-					</addresses>
-				</p2:ComponentIdentifier>
-			</value>
-		</entry>
-		<entry __ID="22">
-			<key>
-				<p1:String xmlns:p1="typeinfo:java.lang" __ID="23" content="content"></p1:String>
-			</key>
-		</entry>
-		<entry __ID="24">
-			<key>
-				<p1:String xmlns:p1="typeinfo:java.lang" __ID="25" content="encoding"></p1:String>
-			</key>
-		</entry>
-		<entry __ID="26">
-			<key>
-				<p1:String xmlns:p1="typeinfo:java.lang" __ID="27" content="reply_by"></p1:String>
-			</key>
-		</entry>
-		<entry __ID="28">
-			<key>
-				<p1:String xmlns:p1="typeinfo:java.lang" __ID="29" content="language"></p1:String>
-			</key>
-		</entry>
-		<entry __ID="30">
-			<key>
-				<p1:String xmlns:p1="typeinfo:java.lang" __ID="31" content="performative"></p1:String>
-			</key>
-		</entry>
-	</entries>
-</p0:HashMap>
-]]></p0:property>
+			<p0:property __ID="23" type="name">DisasterManagement</p0:property>
 		</p0:properties>
 	</p0:properties>
 </p0:properties>

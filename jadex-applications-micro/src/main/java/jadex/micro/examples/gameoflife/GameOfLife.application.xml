@@ -47,6 +47,9 @@
 							<env:drawcondition>$object.alive</env:drawcondition> 
 						</env:rectangle>
 					</env:drawable>
+					<env:prelayers>
+						<env:colorlayer color="black"/>
+					</env:prelayers>
 				</env:perspective>
 			</env:perspectives>
 			

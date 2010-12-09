@@ -1,10 +1,7 @@
 package jadex.tools.simcenter;
 
-import jadex.base.service.simulation.ISimulationService;
 import jadex.commons.TimeFormat;
-import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.commons.service.IServiceProvider;
-import jadex.commons.service.SServiceProvider;
 
 import java.awt.BorderLayout;
 import java.text.DateFormat;

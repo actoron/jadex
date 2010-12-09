@@ -9,3 +9,17 @@ jadex.bat
 c) given that you build the project yourself you can directly invoke the platform class
   (classpath needs to be set by your build environment such as eclipse appropriately):
 java jadex.base.Starter
+
+
+In all three cases you can choose to disable the awareness feature,
+which is active by default. The awareness feature will find all
+Jadex platforms in the network, which also have awareness
+activated. The remote platforms can be administered through the JCC,
+e.g. to suspend or kill agents. To disable awareness start the platform
+with the following option:
+-configname "all_kernels (rms, jcc)"
+
+For windows, you can also use the jadex_no_awareness.bat file.
+
+For details see:
+http://jadex-agents.informatik.uni-hamburg.de/xwiki/bin/view/Standalone+Platform+Guide/02+Starting+the+Platform

@@ -104,6 +104,7 @@
 	</plans>
 
 	<properties>
+ 		<property name="logging.level">java.util.logging.Level.SEVERE</property> 
 		<property name="debugging">false</property>
     </properties>
 
