@@ -75,6 +75,7 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 				annotationDetailName, this);
 
 		//assert (uniqueColumnIndex != -1 && uniqueColumnIndex < columns.length);
+		
 		this.uniqueColumnValuesMap = new HashMap<EModelElement, HashSet<String>>();
 
 		this.uniqueColumnIndex = uniqueColumnIndex;
@@ -112,30 +113,30 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 
 		if (modelElement != null)
 		{
-			getUniqueColumnValueCache(modelElement);
+//			getUniqueColumnValueCache(modelElement);
 			return;
 		}
 	}
 
-	/**
-	 * Updates the uniqueColumnValueCache for modelElement
-	 * 
-	 * @param element
-	 * @return
-	 */
-	private HashSet<String> getUniqueColumnValueCache(EModelElement element)
-	{
-		if (uniqueColumnValuesMap.containsKey(modelElement))
-		{
-			return uniqueColumnValuesMap.get(modelElement);
-		}
-		else
-		{
-			HashSet<String> newSet = new HashSet<String>();
-			uniqueColumnValuesMap.put(modelElement, newSet);
-			return newSet;
-		}
-	}
+//	/**
+//	 * Updates the uniqueColumnValueCache for modelElement
+//	 * 
+//	 * @param element
+//	 * @return
+//	 */
+//	private HashSet<String> getUniqueColumnValueCache(EModelElement element)
+//	{
+//		if (uniqueColumnValuesMap.containsKey(modelElement))
+//		{
+//			return uniqueColumnValuesMap.get(modelElement);
+//		}
+//		else
+//		{
+//			HashSet<String> newSet = new HashSet<String>();
+//			uniqueColumnValuesMap.put(modelElement, newSet);
+//			return newSet;
+//		}
+//	}
 
 	// ---- control creation methods ----
 
@@ -153,19 +154,19 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 			{
 
 				MultiColumnTableRow newRow;
-				HashSet<String> uniqueValueCache = getUniqueColumnValueCache(modelElement);
-				synchronized (uniqueValueCache)
-				{
+//				HashSet<String> uniqueValueCache = getUniqueColumnValueCache(modelElement);
+//				synchronized (uniqueValueCache)
+//				{
 					MultiColumnTable table = getTableFromAnnotation();
 					newRow = table.new MultiColumnTableRow(
 							getDefaultListElementAttributeValues(),
 							table);
-					String uniqueValue = createUniqueRowValue(newRow, table);
-					newRow.getColumnValues()[uniqueColumnIndex] = uniqueValue;
-					addUniqueRowValue(uniqueValue);
+//					String uniqueValue = createUniqueRowValue(newRow, table);
+//					newRow.getColumnValues()[uniqueColumnIndex] = uniqueValue;
+//					addUniqueRowValue(uniqueValue);
 					table.add(newRow);
 					updateTableAnnotation(table);
-				}
+//				}
 
 				return CommandResult.newOKCommandResult(newRow);
 			}
@@ -185,18 +186,18 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 					IProgressMonitor monitor, IAdaptable info)
 					throws ExecutionException
 			{
-				HashSet<String> uniqueValueCache = getUniqueColumnValueCache(modelElement);
-				synchronized (uniqueValueCache)
-				{
+//				HashSet<String> uniqueValueCache = getUniqueColumnValueCache(modelElement);
+//				synchronized (uniqueValueCache)
+//				{
 					MultiColumnTableRow rowToRemove = (MultiColumnTableRow) ((IStructuredSelection) tableViewer
 							.getSelection()).getFirstElement();
 
 					MultiColumnTable tableRowList = getTableFromAnnotation();
-					uniqueValueCache
-							.remove(rowToRemove.getColumnValues()[uniqueColumnIndex]);
+//					uniqueValueCache
+//							.remove(rowToRemove.getColumnValues()[uniqueColumnIndex]);
 					tableRowList.remove(rowToRemove);
 					updateTableAnnotation(tableRowList);
-				}
+//				}
 
 				return CommandResult.newOKCommandResult(null);
 			}
@@ -217,9 +218,9 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 					throws ExecutionException
 			{
 
-				HashSet<String> uniqueValueCache = getUniqueColumnValueCache(modelElement);
-				synchronized (uniqueValueCache)
-				{
+//				HashSet<String> uniqueValueCache = getUniqueColumnValueCache(modelElement);
+//				synchronized (uniqueValueCache)
+//				{
 					MultiColumnTableRow rowToMove = (MultiColumnTableRow) ((IStructuredSelection) tableViewer
 							.getSelection()).getFirstElement();
 
@@ -233,7 +234,7 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 						tableRowList.add(index - 1, tableRow);
 						updateTableAnnotation(tableRowList);
 					}
-				}
+//				}
 
 				return CommandResult.newOKCommandResult(null);
 			}
@@ -253,9 +254,9 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 					IProgressMonitor monitor, IAdaptable info)
 					throws ExecutionException
 			{
-				HashSet<String> uniqueValueCache = getUniqueColumnValueCache(modelElement);
-				synchronized (uniqueValueCache)
-				{
+//				HashSet<String> uniqueValueCache = getUniqueColumnValueCache(modelElement);
+//				synchronized (uniqueValueCache)
+//				{
 					MultiColumnTableRow rowToMove = (MultiColumnTableRow) ((IStructuredSelection) tableViewer
 							.getSelection()).getFirstElement();
 
@@ -269,7 +270,7 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 						tableRowList.add(index + 1, tableRow);
 						updateTableAnnotation(tableRowList);
 					}
-				}
+//				}
 
 				return CommandResult.newOKCommandResult(null);
 			}
@@ -289,12 +290,12 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 					IProgressMonitor monitor, IAdaptable info)
 					throws ExecutionException
 			{
-				HashSet<String> uniqueValueCache = getUniqueColumnValueCache(modelElement);
-				synchronized (uniqueValueCache)
-				{
+//				HashSet<String> uniqueValueCache = getUniqueColumnValueCache(modelElement);
+//				synchronized (uniqueValueCache)
+//				{
 					updateTableAnnotation(null);
-					uniqueValueCache.clear();
-				}
+//					uniqueValueCache.clear();
+//				}
 
 				return CommandResult.newOKCommandResult(null);
 			}
@@ -330,46 +331,46 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 
 	}
 
-	private String createUniqueRowValue(MultiColumnTableRow row,
-			MultiColumnTable table)
-	{
-		assert (row != null && table != null);
+//	private String createUniqueRowValue(MultiColumnTableRow row,
+//			MultiColumnTable table)
+//	{
+//		assert (row != null && table != null);
+//
+//		HashSet<String> uniqueValueCache = getUniqueColumnValueCache(modelElement);
+//		synchronized (uniqueValueCache)
+//		{
+//			String uniqueColumnValue = row.getColumnValues()[uniqueColumnIndex];
+//
+//			int counter = 1;
+//			String uniqueValueToUse = uniqueColumnValue;
+//			while (uniqueValueCache.contains(uniqueValueToUse))
+//			{
+//				uniqueValueToUse = uniqueColumnValue + counter;
+//				counter++;
+//			}
+//
+//			return uniqueValueToUse;
+//		}
+//
+//	}
 
-		HashSet<String> uniqueValueCache = getUniqueColumnValueCache(modelElement);
-		synchronized (uniqueValueCache)
-		{
-			String uniqueColumnValue = row.getColumnValues()[uniqueColumnIndex];
+//	private boolean addUniqueRowValue(String uniqueValue)
+//	{
+//		HashSet<String> uniqueValueCache = getUniqueColumnValueCache(modelElement);
+//		synchronized (uniqueValueCache)
+//		{
+//			return uniqueValueCache.add(uniqueValue);
+//		}
+//	}
 
-			int counter = 1;
-			String uniqueValueToUse = uniqueColumnValue;
-			while (uniqueValueCache.contains(uniqueValueToUse))
-			{
-				uniqueValueToUse = uniqueColumnValue + counter;
-				counter++;
-			}
-
-			return uniqueValueToUse;
-		}
-
-	}
-
-	private boolean addUniqueRowValue(String uniqueValue)
-	{
-		HashSet<String> uniqueValueCache = getUniqueColumnValueCache(modelElement);
-		synchronized (uniqueValueCache)
-		{
-			return uniqueValueCache.add(uniqueValue);
-		}
-	}
-
-	private boolean removeUniqueRowValue(String uniqueValue)
-	{
-		HashSet<String> uniqueValueCache = getUniqueColumnValueCache(modelElement);
-		synchronized (uniqueValueCache)
-		{
-			return uniqueValueCache.remove(uniqueValue);
-		}
-	}
+//	private boolean removeUniqueRowValue(String uniqueValue)
+//	{
+//		HashSet<String> uniqueValueCache = getUniqueColumnValueCache(modelElement);
+//		synchronized (uniqueValueCache)
+//		{
+//			return uniqueValueCache.remove(uniqueValue);
+//		}
+//	}
 
 	/**
 	 * Retrieve the EAnnotation from the modelElement and converts it to a
@@ -387,11 +388,11 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 						getTableAnnotationIdentifier());
 		if (table != null)
 		{
-			for (MultiColumnTableRow multiColumnTableRow : table.getRowList())
-			{
-				addUniqueRowValue(multiColumnTableRow
-						.getColumnValueAt(table.getUniqueColumn()));
-			}
+//			for (MultiColumnTableRow multiColumnTableRow : table.getRowList())
+//			{
+//				addUniqueRowValue(multiColumnTableRow
+//						.getColumnValueAt(table.getUniqueColumn()));
+//			}
 			return table;
 		}
 
@@ -546,40 +547,52 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 						throws ExecutionException
 				{
 
-					MultiColumnTable tableRowList = getTableFromAnnotation();
-					MultiColumnTableRow rowToEdit = (MultiColumnTableRow) tableRowList
-							.get(tableRowList.indexOf(tableViewerRow));
+					MultiColumnTable modelTable = getTableFromAnnotation();
+					MultiColumnTableRow rowToEdit = (MultiColumnTableRow) modelTable
+							.get(modelTable.indexOf(tableViewerRow));
 
-					if (attributeIndex == uniqueColumnIndex)
+					if (attributeIndex == modelTable.getUniqueColumn())
 					{
 						if (!newValue
 								.equals(rowToEdit.getColumnValues()[attributeIndex]))
 						{
-							HashSet<String> uniqueValueCache = getUniqueColumnValueCache(modelElement);
-							synchronized (uniqueValueCache)
-							{
-								removeUniqueRowValue(rowToEdit
-										.getColumnValues()[uniqueColumnIndex]);
+							int rowIndex = modelTable.indexOf(rowToEdit);
+							modelTable.remove(rowIndex);
+							rowToEdit.setColumnValueAt(attributeIndex, newValue);
+							modelTable.add(rowIndex, rowToEdit);
+							
+							// update the model annotation
+							updateTableAnnotation(modelTable);
 
-								rowToEdit.getColumnValues()[attributeIndex] = newValue;
-								String newUniqueValue = createUniqueRowValue(
-										rowToEdit, tableRowList);
-								rowToEdit.getColumnValues()[attributeIndex] = newUniqueValue;
-
-								addUniqueRowValue(newUniqueValue);
-
-								updateTableAnnotation(tableRowList);
-
-								// update the corresponding table element
-								tableViewerRow.getColumnValues()[attributeIndex] = newUniqueValue;
-							}
+							// update the corresponding table element
+							tableViewerRow.getColumnValues()[attributeIndex] = rowToEdit.getColumnValueAt(attributeIndex);
+							
+							
+//							HashSet<String> uniqueValueCache = getUniqueColumnValueCache(modelElement);
+//							synchronized (uniqueValueCache)
+//							{
+//								removeUniqueRowValue(rowToEdit
+//										.getColumnValues()[uniqueColumnIndex]);
+//
+//								rowToEdit.getColumnValues()[attributeIndex] = newValue;
+//								String newUniqueValue = createUniqueRowValue(
+//										rowToEdit, tableRowList);
+//								rowToEdit.getColumnValues()[attributeIndex] = newUniqueValue;
+//
+//								addUniqueRowValue(newUniqueValue);
+//
+//								updateTableAnnotation(tableRowList);
+//
+//								// update the corresponding table element
+//								tableViewerRow.getColumnValues()[attributeIndex] = newUniqueValue;
+//							}
 
 							return CommandResult.newOKCommandResult();
 						}
 					}
 
 					rowToEdit.getColumnValues()[attributeIndex] = newValue;
-					updateTableAnnotation(tableRowList);
+					updateTableAnnotation(modelTable);
 
 					// update the corresponding table element
 					tableViewerRow.getColumnValues()[attributeIndex] = newValue;

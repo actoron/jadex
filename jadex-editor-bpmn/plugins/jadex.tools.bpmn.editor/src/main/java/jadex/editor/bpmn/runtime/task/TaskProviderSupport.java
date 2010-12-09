@@ -156,6 +156,7 @@ public abstract class TaskProviderSupport implements IEditorTaskProvider
 		try 
 		{
 			Class<?> taskImpl = classLoader.loadClass(className);
+			//Class<?> taskImpl = Class.forName(className, true, classLoader);
 			Object taskInstance = taskImpl.newInstance();
 			
 			Object returnValue = WorkspaceClassLoaderHelper

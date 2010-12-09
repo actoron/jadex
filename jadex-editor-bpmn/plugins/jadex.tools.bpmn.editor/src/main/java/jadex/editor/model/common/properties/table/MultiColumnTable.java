@@ -5,6 +5,7 @@ package jadex.editor.model.common.properties.table;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -56,6 +57,7 @@ public class MultiColumnTable
 	private List<MultiColumnTableRow> rows;
 	
 	private int uniqueColumn = 0;
+	private HashSet<String> uniqueValues;
 	
 	// ---- constructor ----
 	
@@ -67,6 +69,7 @@ public class MultiColumnTable
 		super();
 		this.uniqueColumn = uniqueColumn;
 		this.rows = new ArrayList<MultiColumnTableRow>(rowCount);
+		this.uniqueValues = new HashSet<String>();
 	}
 
 	// ---- methods ----
@@ -106,6 +109,19 @@ public class MultiColumnTable
 		return uniqueColumn;
 	}
 	
+	public String createUniqueValue(String desiredValue)
+	{
+		int counter = 1;
+		String uniqueValueToUse = desiredValue;
+		while (uniqueValues.contains(uniqueValueToUse))
+		{
+			uniqueValueToUse = desiredValue + counter;
+			counter++;
+		}
+
+		return uniqueValueToUse;
+	}
+	
 	// ---- List delegations ----
 	
 	
@@ -117,18 +133,19 @@ public class MultiColumnTable
 	public void add(int index, MultiColumnTableRow row)
 	{
 		row.setTable(this);
+		String uniqueColumnValue = createUniqueValue(row.getColumnValues()[uniqueColumn]);
+		row.getColumnValues()[uniqueColumn] = uniqueColumnValue;
+		uniqueValues.add(uniqueColumnValue);
 		rows.add(index, row);
 	}
 
 	/**
 	 * @param row
-	 * @return
 	 * @see java.util.List#add(java.lang.Object)
 	 */
-	public boolean add(MultiColumnTableRow row)
+	public void add(MultiColumnTableRow row)
 	{
-		row.setTable(this);
-		return rows.add(row);
+		add(this.rows.size(), row);
 	}
 
 	/**
@@ -138,6 +155,7 @@ public class MultiColumnTable
 	public void clear()
 	{
 		rows.clear();
+		uniqueValues.clear();
 	}
 
 	/**
@@ -157,7 +175,10 @@ public class MultiColumnTable
 	 */
 	public boolean equals(Object o)
 	{
-		return rows.equals(o);
+		return (o instanceof MultiColumnTable) 
+			&& uniqueColumn == (((MultiColumnTable) o).uniqueColumn)
+			&& rows.equals(((MultiColumnTable) o).rows)
+			&& uniqueValues.equals(((MultiColumnTable) o).uniqueValues);
 	}
 
 	/**
@@ -176,7 +197,8 @@ public class MultiColumnTable
 	 */
 	public int hashCode()
 	{
-		return rows.hashCode();
+		return rows.hashCode() 
+			+ uniqueValues.hashCode();
 	}
 
 
@@ -226,7 +248,9 @@ public class MultiColumnTable
 	public MultiColumnTableRow remove(int index)
 	{
 		MultiColumnTableRow row = rows.remove(index);
+		uniqueValues.remove(row.getColumnValues()[uniqueColumn]);
 		row.setTable(null);
+		
 		return  row;
 	}
 
@@ -237,18 +261,31 @@ public class MultiColumnTable
 	 */
 	public boolean remove(Object o)
 	{
-		return rows.remove(o);
+		if (o instanceof MultiColumnTableRow)
+		{
+			int index = rows.indexOf(o);
+			if (index >= 0)
+			{
+				this.remove(index);
+				return true;
+			}
+		}
+		
+		return false;
 	}
 
 	/**
 	 * @param index
-	 * @param element
+	 * @param row
 	 * @return
 	 * @see java.util.List#set(int, java.lang.Object)
 	 */
-	public MultiColumnTableRow set(int index, MultiColumnTableRow element)
+	public MultiColumnTableRow set(int index, MultiColumnTableRow row)
 	{
-		return rows.set(index, element);
+		this.remove(index);
+		this.add(index, row);
+		
+		return row;
 	}
 
 	/**

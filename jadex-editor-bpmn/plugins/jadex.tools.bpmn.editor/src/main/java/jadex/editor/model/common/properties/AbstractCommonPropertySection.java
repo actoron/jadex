@@ -21,6 +21,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.stp.bpmn.diagram.part.BpmnDiagramEditorPlugin;
+import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.graphics.Resource;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -36,6 +37,8 @@ import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 public abstract class AbstractCommonPropertySection extends
 		AbstractPropertySection
 {
+	
+	public static final int PROPERTY_SECTION_SCROLL_INCREMENT = 10;
 
 	/** The composite that holds the section parts */
 	protected Composite sectionComposite;
@@ -48,6 +51,9 @@ public abstract class AbstractCommonPropertySection extends
 	
 	/** The composite that holds the root section composite */
 	private Composite rootComposite;
+	
+	/** The ScrolledComposite for the property section - static because there is only one instance */
+	private static ScrolledComposite propertyComposite;
 	
 
 	// ---- constructor ----
@@ -68,12 +74,43 @@ public abstract class AbstractCommonPropertySection extends
 	{
 		super.createControls(parent, aTabbedPropertySheetPage);
 		
-		sectionComposite = getWidgetFactory().createComposite(parent);
+		sectionComposite = getWidgetFactory().createComposite(parent); //.createScrolledComposite(parent, SWT.DEFAULT); //
 		sectionComposite.setLayout(new FillLayout());
 
 		disposableObjects.add(sectionComposite);
 		// save a reference to the first section composite
 		rootComposite = sectionComposite;
+		
+		increasePropertyViewScrolling(parent);
+				
+	}
+
+	/**
+	 * @param parent
+	 */
+	private void increasePropertyViewScrolling(Composite parent)
+	{
+		if (propertyComposite != null)
+		{
+			if (propertyComposite.getVerticalBar().getIncrement() == PROPERTY_SECTION_SCROLL_INCREMENT)
+				return;
+		}
+		
+		Composite composite = parent;
+		int maxDepth = 10;
+		int depth = 0;
+		while (depth < maxDepth && !(composite instanceof ScrolledComposite))
+		{
+			depth++;
+			composite = composite.getParent();
+		}
+		
+		if (composite instanceof ScrolledComposite)
+		{
+			propertyComposite = (ScrolledComposite) composite;
+			propertyComposite.getVerticalBar().setIncrement(PROPERTY_SECTION_SCROLL_INCREMENT);
+			propertyComposite.getHorizontalBar().setIncrement(PROPERTY_SECTION_SCROLL_INCREMENT);
+		}
 	}
 
 	/**

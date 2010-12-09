@@ -62,12 +62,12 @@ public class JadexUserTaskImplComboSection extends AbstractComboPropertySection
 
 	protected static final String ACTIVITY_TASK_IMPLEMENTATION_GROUP = "Task implementation";
 
-	
-	private static final boolean useStyledText = true;
 
 	// ---- attributes ----
 
-	protected/* Text */StyledText taskMetaInfoText;
+	protected StyledText taskMetaInfoText;
+	
+	protected StyledText taskMetaInfoParameter;
 
 	protected IEditorTaskProvider taskProvider;
 
@@ -281,73 +281,92 @@ public class JadexUserTaskImplComboSection extends AbstractComboPropertySection
 		// taskMetaInfoText = getWidgetFactory().createText(sectionComposite,
 		// "", SWT.READ_ONLY | SWT.MULTI | SWT.V_SCROLL | SWT.WRAP );
 		taskMetaInfoText = new StyledText(sectionComposite, SWT.READ_ONLY
-				| SWT.MULTI | SWT.V_SCROLL | SWT.WRAP);
+				| SWT.MULTI | SWT.NO_SCROLL | SWT.WRAP );
 		addDisposable(taskMetaInfoText);
+		
+		taskMetaInfoParameter = new StyledText(sectionComposite, SWT.READ_ONLY
+				| SWT.MULTI | SWT.V_SCROLL | SWT.WRAP | SWT.BORDER );
+		addDisposable(taskMetaInfoParameter);
 
 		if (sectionLayout instanceof GridLayout)
 		{
-			GridData labelData = new GridData();
+			GridData labelData;
+			
+			labelData = new GridData();
 			labelData.horizontalSpan = ((GridLayout) sectionLayout).numColumns;
-
+			labelData.widthHint = 600;
+			labelData.horizontalAlignment = SWT.FILL;
+			labelData.heightHint = 45;
+			taskMetaInfoText.setLayoutData(labelData);
+			
+			
+			labelData = new GridData();
+			labelData.horizontalSpan = ((GridLayout) sectionLayout).numColumns;
 			labelData.widthHint = 600;
 			labelData.horizontalAlignment = SWT.FILL;
 			labelData.heightHint = 100;
 
-			taskMetaInfoText.setLayoutData(labelData);
+			taskMetaInfoParameter.setLayoutData(labelData);
 		}
 
 		// set text layout options
-		taskMetaInfoText.setTabStops(new int[] { 30, 80, 120, 160 });
+		// since 3.6 :-(
+		//taskMetaInfoText.setTabStops(new int[] { 30, 80, 120, 160 });
 
 	}
 
 	protected void updateTaskMetaInfo(String taskClassName)
 	{
 
-		if (useStyledText)
-		{
-			createTaskMetaInfoStyledString(taskProvider
+			createTaskMetaInfoStyledText(taskProvider
 					.getTaskMetaInfo(taskClassName), taskMetaInfoText);
-		}
-		else
-		{
-			taskMetaInfoText.setText(createTaskMetaInfoString(taskProvider
-					.getTaskMetaInfo(taskClassName)));
-		}
+			
+			createTaskMetaInfoStyledParameter(taskProvider
+					.getTaskMetaInfo(taskClassName), taskMetaInfoParameter);
 
 	}
 
-	protected String createTaskMetaInfoString(IEditorTaskMetaInfo taskMetaInfo)
-	{
+	/**
+	 * Setup the Description StyledText
+	 * 
+	 * @param taskMetaInfo
+	 * @param textfield
+	 */
+	protected void createTaskMetaInfoStyledText(
+			IEditorTaskMetaInfo taskMetaInfo, StyledText textfield)
+	{		
+		
 		if (taskMetaInfo == null)
 		{
-			return "";
+			textfield.setText("");
+			textfield.setStyleRanges(new StyleRange[0]);
+			return;
 		}
+		
+		StyledStringBuffer info = new StyledStringBuffer();
 
-		StringBuffer info = new StringBuffer();
-		info.append(taskMetaInfo.getDescription() + "\n");
+		String description = taskMetaInfo.getDescription() + "\n\n";
+		StyleRange style = new StyleRange();
+		style.fontStyle = SWT.BOLD | SWT.ITALIC;
+		info.append(description, style);
 
-		IEditorParameterMetaInfo[] params = taskMetaInfo.getParameterMetaInfos();
-		if (params == null)
-			return info.toString();
-		for (int i = 0; i < params.length; i++)
+		try {
+			textfield.setText(info.toString());
+			textfield.setStyleRanges(info.getStyleRanges());
+		}
+		catch (IllegalArgumentException iae)
 		{
-			info.append("\n" + PARAMETER + params[i].getName() + "\n");
-			info.append("\t" + DIRECTION + "\t" + params[i].getDirection() + "\n");
-			info.append("\t" + CLASS + "\t" + params[i].getClazz() + "\n");
-			info.append("\t" + INITIAL_VALUE + "\t" + params[i].getInitialValue() + "\n");
-			info.append("\t" + DESCRIPTION + "\t" + params[i].getDescription() + "\n");
-
-			// info.append("\t" + params[i].toString());
+			iae.printStackTrace();
 		}
-
-		return info.toString();
 	}
-
 	
-	
-	
-	protected void createTaskMetaInfoStyledString(
+	/**
+	 * Setup the Parameter StyledText
+	 * 
+	 * @param taskMetaInfo
+	 * @param textfield
+	 */
+	protected void createTaskMetaInfoStyledParameter(
 			IEditorTaskMetaInfo taskMetaInfo, StyledText textfield)
 	{		
 		
@@ -361,12 +380,6 @@ public class JadexUserTaskImplComboSection extends AbstractComboPropertySection
 		StyledStringBuffer info = new StyledStringBuffer();
 		
 		StyleRange style;
-		String string;
-		
-		string = taskMetaInfo.getDescription() + "\n\n";
-		style = new StyleRange();
-		style.fontStyle = SWT.BOLD | SWT.ITALIC;
-		info.append(string, style);
 
 		style = new StyleRange();
 		style.fontStyle = SWT.BOLD | SWT.ITALIC;
@@ -385,7 +398,7 @@ public class JadexUserTaskImplComboSection extends AbstractComboPropertySection
 				info.append("\t" + params[i].getDirection() + "\n", null);
 				
 				info.append("\t" + CLASS, new StyleRange(style));
-				info.append("\t" + params[i].getClazz() + "\n", null);
+				info.append("\t\t" + params[i].getClazz().getName() + "\n", null);
 				
 				info.append("\t" + INITIAL_VALUE, new StyleRange(style));
 				info.append("\t" + params[i].getInitialValue() + "\n", null);
@@ -393,13 +406,18 @@ public class JadexUserTaskImplComboSection extends AbstractComboPropertySection
 				info.append("\t" + DESCRIPTION, new StyleRange(style));
 				info.append("\t" + params[i].getDescription() + "\n", null);
 	
-				// info.append("\t" + params[i].toString(), null);
+				info.append("\n", null);
+				
 			}
 		}
 
 		try {
 			textfield.setText(info.toString());
 			textfield.setStyleRanges(info.getStyleRanges());
+			
+			// set the wrapped line indent
+			// depends on the amount of \t in the generated string
+			textfield.setWrapIndent(85);
 		}
 		catch (IllegalArgumentException iae)
 		{
