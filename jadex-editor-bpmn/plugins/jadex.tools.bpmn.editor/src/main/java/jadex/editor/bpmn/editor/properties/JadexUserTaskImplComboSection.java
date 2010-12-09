@@ -17,6 +17,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.emf.ecore.xml.type.internal.RegEx.RegularExpression;
+import org.eclipse.jface.dialogs.ErrorDialog;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.SWT;
@@ -500,41 +502,41 @@ public class JadexUserTaskImplComboSection extends AbstractComboPropertySection
 		return newTable;
 	}
 
-	/**
-	 * Update the table with meta info
-	 * 
-	 * @param table
-	 * @param metaInfo
-	 */
-	protected MultiColumnTable updateTaskParamterTable(MultiColumnTable table,
-			IEditorParameterMetaInfo[] metaInfo)
-	{
-		MultiColumnTable newTable = createNewParameterTable(metaInfo);
-		int typeIndex = AbstractParameterTablePropertySection
-				.getDefaultIndexForColumn(AbstractParameterTablePropertySection.TYPE_COLUMN);
-		int valueIndex = AbstractParameterTablePropertySection
-				.getDefaultIndexForColumn(AbstractParameterTablePropertySection.VALUE_COLUMN);
-
-		for (MultiColumnTableRow row : table.getRowList())
-		{
-			int rowIndex = newTable.indexOf(row);
-			if (rowIndex > -1)
-			{
-				MultiColumnTableRow newRow = newTable.get(rowIndex);
-
-				if (newRow.getColumnValueAt(typeIndex).equals(
-						row.getColumnValueAt(typeIndex)))
-				{
-					// types are equal (add the old value)
-					newRow.setColumnValueAt(valueIndex,
-							row.getColumnValueAt(valueIndex));
-				}
-
-			}
-		}
-
-		return newTable;
-	}
+//	/**
+//	 * Update the table with meta info
+//	 * 
+//	 * @param table
+//	 * @param metaInfo
+//	 */
+//	protected MultiColumnTable updateTaskParamterTable(MultiColumnTable table,
+//			IEditorParameterMetaInfo[] metaInfo)
+//	{
+//		MultiColumnTable newTable = createNewParameterTable(metaInfo);
+//		int typeIndex = AbstractParameterTablePropertySection
+//				.getDefaultIndexForColumn(AbstractParameterTablePropertySection.TYPE_COLUMN);
+//		int valueIndex = AbstractParameterTablePropertySection
+//				.getDefaultIndexForColumn(AbstractParameterTablePropertySection.VALUE_COLUMN);
+//
+//		for (MultiColumnTableRow row : table.getRowList())
+//		{
+//			int rowIndex = newTable.indexOf(row);
+//			if (rowIndex > -1)
+//			{
+//				MultiColumnTableRow newRow = newTable.get(rowIndex);
+//
+//				if (newRow.getColumnValueAt(typeIndex).equals(
+//						row.getColumnValueAt(typeIndex)))
+//				{
+//					// types are equal (add the old value)
+//					newRow.setColumnValueAt(valueIndex,
+//							row.getColumnValueAt(valueIndex));
+//				}
+//
+//			}
+//		}
+//
+//		return newTable;
+//	}
 
 	/**
 	 * Update the table with meta info
@@ -545,17 +547,52 @@ public class JadexUserTaskImplComboSection extends AbstractComboPropertySection
 	protected MultiColumnTable addTaskParamterTable(MultiColumnTable table,
 			IEditorParameterMetaInfo[] metaInfo)
 	{
+		boolean hasUniqueValueChanged = false;
+		
 		MultiColumnTable newTable = createNewParameterTable(metaInfo);
 
 		for (MultiColumnTableRow row : newTable.getRowList())
 		{
+			// save the original unique value
+			String uniqueColumnValue = row.getColumnValueAt(row.getUniqueColumnIndex());
 			table.add(row);
+			if (!uniqueColumnValue.equals(row.getColumnValueAt(row.getUniqueColumnIndex())));
+			{
+				hasUniqueValueChanged = true;
+			}
 		}
 
+		if (hasUniqueValueChanged)
+		{
+			displayUniqueValueChangedWarning();
+		}
+		
 		return table;
 	}
 
+	/**
+	 * Display a warning message that a unique 
+	 * value has changed during add default
+	 */
+	private void displayUniqueValueChangedWarning()
+	{
+		Display.getCurrent().asyncExec(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				MessageDialog
+						.openWarning(
+								Display.getCurrent().getActiveShell(),
+								"Unique value change",
+								"During the \"Add Default\" action at least one added parameter was changed due to unique value restrictions. Please check the added parameter carefully");
+			}
+		});
+	}
+	
 	// ---- BUGFIX METHOD ----
+
+	
 
 	/**
 	 * Needed to fix legacy BPMN files corrupted through a bug
