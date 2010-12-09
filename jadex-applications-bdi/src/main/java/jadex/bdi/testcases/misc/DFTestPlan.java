@@ -3,7 +3,6 @@ package jadex.bdi.testcases.misc;
 import jadex.base.fipa.IDF;
 import jadex.base.fipa.IDFComponentDescription;
 import jadex.base.fipa.IDFServiceDescription;
-import jadex.base.fipa.SFipa;
 import jadex.base.test.TestReport;
 import jadex.bdi.runtime.GoalFailureException;
 import jadex.bdi.runtime.IEvent;
@@ -11,7 +10,6 @@ import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 import jadex.bdi.runtime.TimeoutException;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentManagementService;
 import jadex.commons.SUtil;
 import jadex.commons.service.SServiceProvider;
 
@@ -34,10 +32,11 @@ public class DFTestPlan extends Plan
 		num	= performInitialTests(num);
 		num = performTests(num, null); // test locally
 		
-		IComponentManagementService ces = (IComponentManagementService)SServiceProvider.getServiceUpwards(
-			getScope().getServiceProvider(), IComponentManagementService.class).get(this);
-		IComponentIdentifier da = ces.createComponentIdentifier(SFipa.DF_COMPONENT, true, null);
-		performTests(num, da); // test remotely
+		// Todo: support remote DF agent!?
+//		IComponentManagementService ces = (IComponentManagementService)SServiceProvider.getServiceUpwards(
+//			getScope().getServiceProvider(), IComponentManagementService.class).get(this);
+//		IComponentIdentifier da = ces.createComponentIdentifier(SFipa.DF_COMPONENT, true, null);
+//		performTests(num, da); // test remotely
 	}
 	
 	/**

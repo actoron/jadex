@@ -664,7 +664,7 @@ public abstract class ComponentManagementService extends BasicService implements
 										// todo: killcomponent should only be called once for each component?
 										if(!ccs.containsKey(cid))
 										{
-				//								System.out.println("killing a: "+cid);
+//											System.out.println("killing a: "+cid);
 											
 											CleanupCommand	cc	= new CleanupCommand(cid);
 											ccs.put(cid, cc);

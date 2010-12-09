@@ -99,7 +99,7 @@ public class ExternalAccess implements IApplicationExternalAccess
 	 */
 	public IComponentIdentifier getParent()
 	{
-		return application.getParent().getComponentIdentifier();
+		return application.getParent()!=null ? application.getParent().getComponentIdentifier() : null;
 	}
 	
 	/**

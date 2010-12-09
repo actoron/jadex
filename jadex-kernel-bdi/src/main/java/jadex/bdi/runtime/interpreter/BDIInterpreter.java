@@ -1003,7 +1003,15 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 				{
 					public void run() 
 					{
-						getState().addAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_actions, new Object[]{step, ret, scope});
+						// Todo: fix termination such that external entries are properly executed!?
+						if(state.containsObject(ragent))
+						{
+							getState().addAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_actions, new Object[]{step, ret, scope});							
+						}
+						else
+						{
+							ret.setException(new ComponentTerminatedException(getAgentAdapter().getComponentIdentifier()));
+						}
 					}
 				});
 			}

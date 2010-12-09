@@ -128,7 +128,7 @@
 	</plans>
 
 	<properties>
-<!--		<property name="logging.level">Level.INFO</property>-->
+		<property name="logging.level">Level.SEVERE</property>
 	</properties>
 
 	<configurations>
@@ -145,9 +145,9 @@
 					</parameter>
 -->					<parameter ref="description">
 						<value>
-							((IDF)$scope.getServiceProvider().getService(IDF.class))
-								.createDFComponentDescription(null, ((IDF)$scope.getServiceProvider().getService(IDF.class))
-									.createDFServiceDescription("dispatch vision", "dispatch vision", "University of Hamburg"))
+							new DFComponentDescription(null, new IDFServiceDescription[]{ 
+								new DFServiceDescription("dispatch vision", "dispatch vision", "University of Hamburg")},
+								null, null, null, null)
 						</value>
 					</parameter>
 				</initialgoal>	

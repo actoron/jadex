@@ -1,6 +1,5 @@
 package jadex.bdi.testcases.misc;
 
-import jadex.base.fipa.SFipa;
 import jadex.base.test.TestReport;
 import jadex.bdi.runtime.GoalFailureException;
 import jadex.bdi.runtime.IBDIExternalAccess;
@@ -26,10 +25,12 @@ public class CMSTestPlan extends Plan
 	{
 		int num=1;
 		num = performTests(num, null); // test locally
-		IComponentManagementService ces = (IComponentManagementService)SServiceProvider.getServiceUpwards(
-			getScope().getServiceProvider(), IComponentManagementService.class).get(this);
-		IComponentIdentifier aa = ces.createComponentIdentifier(SFipa.CMS_COMPONENT, true, null);
-		performTests(num, aa); // test remotely
+		
+		// Todo: support remote CMS agent!?
+//		IComponentManagementService ces = (IComponentManagementService)SServiceProvider.getServiceUpwards(
+//			getScope().getServiceProvider(), IComponentManagementService.class).get(this);
+//		IComponentIdentifier aa = ces.createComponentIdentifier(SFipa.CMS_COMPONENT, true, null);
+//		performTests(num, aa); // test remotely
 	}
 
 	/**
@@ -73,7 +74,7 @@ public class CMSTestPlan extends Plan
 		}
 		catch(GoalFailureException e)
 		{
-			e.printStackTrace();
+//			e.printStackTrace();
 			tr.setReason("Search subgoal failed.");
 		}
 		getBeliefbase().getBeliefSet("testcap.reports").addFact(tr);

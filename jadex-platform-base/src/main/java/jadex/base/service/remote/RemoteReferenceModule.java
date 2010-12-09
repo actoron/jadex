@@ -313,8 +313,8 @@ public class RemoteReferenceModule
 					}
 					catch(Exception e)
 					{
-						System.out.println("Warning, constant service method threw exception: "+m);
-//						e.printStackTrace();
+						System.err.println("Warning, constant service method threw exception: "+m);
+						e.printStackTrace();
 					}
 				}
 			}

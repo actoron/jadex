@@ -152,18 +152,18 @@ public class CallbackPlan extends Plan
 			public void goalFinished(AgentEvent ae)
 			{
 				final IGoalListener t = this;
-				final boolean[]	started	= new boolean[1];
-				new Thread(new Runnable()
-				{
-					public void run()
-					{
-						// Hack!!! Make sure that thread has started before continuing.
-						// (Doesn't solve threading issue, but increases chances of success ;-( )
-						synchronized(started)
-						{
-							started[0]	= true;
-							started.notify();
-						}
+//				final boolean[]	started	= new boolean[1];
+//				new Thread(new Runnable()
+//				{
+//					public void run()
+//					{
+//						// Hack!!! Make sure that thread has started before continuing.
+//						// (Doesn't solve threading issue, but increases chances of success ;-( )
+//						synchronized(started)
+//						{
+//							started[0]	= true;
+//							started.notify();
+//						}
 
 						logger.info("Goal finished called");
 						getGoalbase().removeGoalListener("goal", t);
@@ -177,24 +177,24 @@ public class CallbackPlan extends Plan
 //						{
 //							e.printStackTrace();
 //						}
-					}
-				}).start();
-				
-				// Hack!!! Make sure that thread has started before continuing.
-				// (Doesn't solve threading issue, but increases chances of success ;-( )
-				synchronized(started)
-				{
-					if(!started[0])
-					{
-						try
-						{
-							started.wait();
-						}
-						catch(InterruptedException e)
-						{
-						}
-					}
-				}
+//					}
+//				}).start();
+//				
+//				// Hack!!! Make sure that thread has started before continuing.
+//				// (Doesn't solve threading issue, but increases chances of success ;-( )
+//				synchronized(started)
+//				{
+//					if(!started[0])
+//					{
+//						try
+//						{
+//							started.wait();
+//						}
+//						catch(InterruptedException e)
+//						{
+//						}
+//					}
+//				}
 			}
 		}); // todo: async was true 
 		// Create a goal by setting "bel" to 2

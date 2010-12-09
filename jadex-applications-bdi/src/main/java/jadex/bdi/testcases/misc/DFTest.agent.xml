@@ -44,23 +44,18 @@
 		<configuration name="default">
 			<beliefs>
 				<initialbelief ref="testcap.testcase_cnt">
-					<fact>14</fact>
-					<!-- <fact>8</fact> -->
+					<fact>8</fact>
 				</initialbelief>
 			</beliefs>
 			<goals>
 				<initialgoal name="initial_keep" ref="dfcap.df_keep_registered">
 					<parameter ref="description">
 						<value>
-							((IDF)$scope.getServiceProvider().getService(IDF.class))
-								.createDFComponentDescription(null, new IDFServiceDescription[]
+							new DFComponentDescription(null, new IDFServiceDescription[]
 								{
-									((IDF)$scope.getServiceProvider().getService(IDF.class))
-										.createDFServiceDescription("service_a", "a", "a"),
-									((IDF)$scope.getServiceProvider().getService(IDF.class))
-										.createDFServiceDescription("service_b", "b", "b"),
-									((IDF)$scope.getServiceProvider().getService(IDF.class))
-										.createDFServiceDescription("service_c", "c", "c")
+									new DFServiceDescription("service_a", "a", "a"),
+									new DFServiceDescription("service_b", "b", "b"),
+									new DFServiceDescription("service_c", "c", "c")
 								}, null, null, null, null)
 						</value>
 					</parameter>
