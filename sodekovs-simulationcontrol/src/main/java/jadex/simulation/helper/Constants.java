@@ -62,6 +62,8 @@ public class Constants {
 	// Map that contains the results (= observed events) of the simulation experiments of one row
 //	public static final String RESULTS_OF_ROW = "ResultsOfRow";
 	
+	//The path of a file
+	public static final String FILE_PATH = "FilePath";
 	
 	
 	//-- Constants used in the SimulationConfiguration xml file

@@ -1,7 +1,5 @@
 
-	<!--
-		<H3>Responsible for executing a single simulation experiment.</H3>
-	-->
+<!-- <H3>Responsible for executing a single simulation experiment.</H3> -->
 
 <agent xmlns="http://jadex.sourceforge.net/jadex-bdi" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-bdi
@@ -20,31 +18,20 @@
 		<import>jadex.simulation.model.Observer</import>
 		<import>jadex.simulation.client.*</import>
 		<import>jadex.application.space.envsupport.environment.*</import>
-	</imports>									
+	</imports>
 
 
 	<capabilities>
-		<!--
-			this capability provides easy access to "out-of-the-box"-plans
-			allowing - for example - to register at the DF.
-		-->
+		<!-- this capability provides easy access to "out-of-the-box"-plans allowing 
+			- for example - to register at the DF. -->
 		<capability name="dfcap" file="jadex.bdi.planlib.df.DF" />
 	</capabilities>
 
 	<beliefs>
-		<!-- Map contains all facts related to this simulation run.-->
+		<!-- Map contains all facts related to this simulation run. -->
 		<belief name="simulationFacts" class="Map">
 			<fact>new HashMap()</fact>
 		</belief>
-		
-		<belief name="observedEventsMap" class="HashMap">
-			<fact>new HashMap()</fact>
-		</belief>
-		
-		<!-- <belief name="myName" class="String">
-			<fact>"dellPC"</fact>
-		</belief> -->
-
 	</beliefs>
 
 	<goals>
@@ -52,44 +39,40 @@
 		<achievegoalref name="df_search">
 			<concrete ref="dfcap.df_search" />
 		</achievegoalref>
-		<performgoal name="observeExecution" retry="false" exclude="never"/>
+		<performgoal name="startExecution" retry="false" exclude="never">
+			<!-- Args required to start application -->
+			<parameter name="args" class="Map" />
+			<!-- The name (id) of the application -->
+			<parameter name="appName" class="String" />
+		</performgoal>
 	</goals>
 
-	<plans>		<!--			Responsible for all aspects related to the run of the simulation,			especially to monitor the terminate condition.		-->
+	<plans>		<!-- Responsible for all aspects related to the run of the simulation, especially 			to monitor the terminate condition. -->
 		<plan name="runtime_manager">
 			<body class="RuntimeManagerPlan" />
+			<parameter name="args" class="Map">
+				<goalmapping ref="startExecution.args"/>
+			</parameter>
+			<parameter name="appName" class="String">
+				<goalmapping ref="startExecution.appName"/>
+			</parameter>
 			<trigger>
-				<goal ref="observeExecution"/>
+				<goal ref="startExecution" />
 			</trigger>
-		</plan>		
+		</plan>
 	</plans>
 
-	<events>
-		<!--  Send result of simulation to master agent. -->
-		<messageevent name="inform_master_agent" type="fipa"
-			direction="send">
-			<parameter name="performative" class="String" direction="fixed">
-				<value>SFipa.INFORM</value>
-			</parameter>
-			<parameter name="language" class="String" direction="fixed">
-				<value>SFipa.JADEX_XML</value>
-			</parameter>
-		</messageevent>
-	</events>
-
-
 	<properties>
-		<!--
-			The environment may throw exceptions when executing property
-			listeners and these listeners are not valid any longer. This leads to
-			normal plan failure and can therefore be ignored.
-		-->
+		<!-- The environment may throw exceptions when executing property listeners 
+			and these listeners are not valid any longer. This leads to normal plan failure 
+			and can therefore be ignored. -->
 		<property name="logging.level">java.util.logging.Level.WARNING</property>
 		<property name="debugging">false</property>
 	</properties>
 
 	<services>
-		<providedservice class="IRemoteSimulationExecutionService">new RemoteSimulationExecutionService($scope, "betaTest01")</providedservice>
+		<providedservice class="IRemoteSimulationExecutionService">new
+			RemoteSimulationExecutionService($scope, "betaTest01")</providedservice>
 	</services>
-			
+
 </agent>

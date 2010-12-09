@@ -2,6 +2,8 @@ package jadex.simulation.helper;
 
 import jadex.application.space.envsupport.environment.AbstractEnvironmentSpace;
 import jadex.application.space.envsupport.environment.ISpaceObject;
+import jadex.javaparser.IExpressionParser;
+import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.IValueFetcher;
 import jadex.javaparser.SJavaParser;
 import jadex.javaparser.SimpleValueFetcher;
@@ -62,5 +64,23 @@ public class EvaluateExpression {
 			System.err.println("#EvaluateExpression# Could not evaluate invalid expression: " + val);
 		}
 		return false;
+	}
+	
+	/**
+	 * Helper method to convert string into parsed expression
+	 * 
+	 * @param expression
+	 * @param parser
+	 * @return
+	 */
+	public static IParsedExpression getParsedExpression(String expression, IExpressionParser parser) {
+		// Hack: ***
+		if (expression == null || expression.length() == 0)
+			return null;
+
+
+		// return expression == null ? null : parser.parseExpression(expression,
+		// null, null, null);
+		return parser.parseExpression(expression, null, null, null);
 	}
 }

@@ -4,18 +4,13 @@ import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.ICapability;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IGoalListener;
-import jadex.bridge.CreationInfo;
-import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentManagementService;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
-import jadex.commons.ISuspendable;
-import jadex.commons.ThreadSuspendable;
 import jadex.commons.service.BasicService;
-import jadex.commons.service.SServiceProvider;
 import jadex.simulation.helper.Constants;
 import jadex.simulation.helper.FileHandler;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -71,49 +66,38 @@ public class RemoteSimulationExecutionService extends BasicService implements IR
 			// persist application description
 			String fileName = System.getProperty("user.dir") + "\\ApplicationDescription.application.xml";
 			FileHandler.writeToFile(fileName, applicationDescription);
+			((Map) (args.get(Constants.SIMULATION_FACTS_FOR_CLIENT))).put(Constants.FILE_PATH, fileName);
+			
+			// init agent and store required execution information for client agent			
+			comp.getBeliefbase().getBelief("simulationFacts").setFact(args.get(Constants.SIMULATION_FACTS_FOR_CLIENT));			
+			
 
-			// store required execution information for client agent
-			comp.getBeliefbase().getBelief("simulationFacts").setFact(args.get(Constants.SIMULATION_FACTS_FOR_CLIENT));
-
-			IComponentManagementService executionService = (IComponentManagementService) SServiceProvider.getService(comp.getServiceProvider(), IComponentManagementService.class).get(
-					new ThreadSuspendable());
-
-			// create application
-			executionService.createComponent(appName, fileName, new CreationInfo(configName, args, null, false, false), null).get(new ThreadSuspendable());
-
-
-			// start observation
-			IGoal[] goals = (IGoal[]) comp.getGoalbase().getGoals("observeExecution");
+			// start simulation execution
+			IGoal[] goals = (IGoal[]) comp.getGoalbase().getGoals("startExecution");
 			if (goals.length > 0) {
 				ret.setException(new IllegalStateException("Can only handle one observation at a time."));
 			} else {
-				final IGoal oe = (IGoal) comp.getGoalbase().createGoal("observeExecution");
+				final IGoal oe = (IGoal) comp.getGoalbase().createGoal("startExecution");
+				oe.getParameter("appName").setValue(appName);
+				oe.getParameter("args").setValue(args);
 				oe.addGoalListener(new IGoalListener() {
 					public void goalFinished(AgentEvent ae) {
 						System.out.println("observation finished at: " + comp.getAgentName());
 						if (oe.isSucceeded())
-							ret.setResult(null);
+							ret.setResult(comp.getBeliefbase().getBelief("simulationFacts").getFact());
 						else
 							ret.setException(new RuntimeException("Goal failed"));
 					}
+
 					public void goalAdded(AgentEvent ae) {
 					}
 				});
 				comp.getGoalbase().dispatchTopLevelGoal(oe);
 			}
-			// System.out.println("tv start: "+agent.getAgentName());
-			
-
-			// comp.getPlanbase().getPlans().
-			// IComponentIdentifier comp = (IComponentIdentifier) fut.get(this);
 
 		} catch (Exception e) {
 			System.out.println("Could not start application...." + e);
 		}
-
-		// SIMConf result
-//		ret.setResult(null);
-
 		return ret;
 	}
 

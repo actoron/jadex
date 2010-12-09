@@ -28,9 +28,8 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class ComputeSingleResultPlan extends Plan {
 
-	public void body() {
-		IMessageEvent msg = (IMessageEvent) getReason();
-		HashMap content = (HashMap) msg.getParameter(SFipa.CONTENT).getValue();
+	public void body() {		
+		HashMap content = (HashMap) getParameter("args").getValue();
 
 		HashMap facts = (HashMap) getBeliefbase().getBelief("generalSimulationFacts").getFact();
 		int experimentRow = ((Integer) facts.get(Constants.EXPERIMENT_ROW_COUNTER)).intValue();
@@ -106,7 +105,7 @@ public class ComputeSingleResultPlan extends Plan {
 		// interRes);
 
 		// trigger the start of the next experiment
-		dispatchInternalEvent(createInternalEvent("triggerNewExperiment"));
+		dispatchInternalEvent(createInternalEvent("triggerNextExperiment"));
 
 	}
 

@@ -9,21 +9,15 @@ import jadex.application.space.envsupport.evaluation.IObjectSource;
 import jadex.application.space.envsupport.evaluation.ITableDataConsumer;
 import jadex.application.space.envsupport.evaluation.ITableDataProvider;
 import jadex.application.space.envsupport.evaluation.SpaceObjectSource;
-import jadex.base.fipa.IDF;
-import jadex.base.fipa.IDFComponentDescription;
-import jadex.base.fipa.IDFServiceDescription;
-import jadex.base.fipa.SFipa;
-import jadex.bdi.runtime.IGoal;
-import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
 import jadex.bdi.runtime.impl.flyweights.ElementFlyweight;
 import jadex.bdi.runtime.interpreter.OAVBDIFetcher;
+import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.IFuture;
 import jadex.commons.SReflect;
-import jadex.commons.ThreadSuspendable;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.clock.IClockService;
 import jadex.commons.service.library.ILibraryService;
@@ -57,57 +51,35 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class RuntimeManagerPlan extends Plan {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 6999042052110256441L;
+	
+	
+	/**
+	 * External access of the application that is executed and observed by this
+	 * agent
+	 */
+	private IApplicationExternalAccess exta = null;
+	private IClockService clockservice = (IClockService) SServiceProvider.getService(getScope().getServiceProvider(), IClockService.class).get(this);
+	IComponentManagementService cms = null;
+	private OnlineVisualisation vis = null;
+
 	public void body() {
-//		System.out.println("#ClientSim#-> get Belief: " + getBeliefbase().getBelief("testDouble").getFact());		
+
 		HashMap simFacts = (HashMap) getBeliefbase().getBelief("simulationFacts").getFact();
 		SimulationConfiguration simConf = (SimulationConfiguration) simFacts.get(Constants.SIMULATION_FACTS_FOR_CLIENT);
 		String experimentID = (String) simFacts.get(Constants.EXPERIMENT_ID);
 		String parameterSweepValue = simConf.getOptimization().getParameterSweeping().getCurrentValue();
-		// String parameterSweepName =
-		// simConf.getOptimization().getData().getName();
-
 		
+		cms = (IComponentManagementService) SServiceProvider.getService(getScope().getServiceProvider(), IComponentManagementService.class).get(this);
 		
-		
-		
-		
-		
-		
-		
-		
-//		IComponentIdentifier comp = (IComponentIdentifier) fut.get(this);
-//		
-//		IApplicationExternalAccess iap = (IApplicationExternalAccess) executionService.getExternalAccess(comp).get(this);			
-//		AbstractEnvironmentSpace space = (AbstractEnvironmentSpace) iap.getSpace(simConf.getNameOfSpace());
-//		tmpHelp(simConf, space);
-//		startApplicationRemotley(appName, fileName, configName, args);
-		
-		
-		
-		
-		
-		
-		
-		
-		// testSend(simConf);
+		startApplication((String) getParameter("appName").getValue(), (String) simFacts.get(Constants.FILE_PATH), simConf.getApplicationConfiguration(), (Map) getParameter("args").getValue(), simConf);
 
 		System.out.println("#Client# Started CLIENT Simulation run....: " + simConf.getName() + " - " + experimentID + ", currentVal: " + parameterSweepValue);
 
-		// Get Space
-		AbstractEnvironmentSpace space = (AbstractEnvironmentSpace) ((IApplicationExternalAccess) getScope().getParent()).getSpace(simConf.getNameOfSpace());
-
-		// Init Arguments like StartTime
-		init(simConf);
-
-		// init online visualization
-		ArrayList<AbstractChartDataConsumer> chartDataConsumer = new ArrayList<AbstractChartDataConsumer>();
-		for (Iterator it = space.getDataConsumers().iterator(); it.hasNext();) {
-			Object abstractConsumer = it.next();
-
-			if (abstractConsumer instanceof AbstractChartDataConsumer)
-				chartDataConsumer.add((AbstractChartDataConsumer) abstractConsumer);
-		}
-		OnlineVisualisation vis = new OnlineVisualisation(chartDataConsumer);
+		AbstractEnvironmentSpace space = (AbstractEnvironmentSpace) exta.getSpace(simConf.getNameOfSpace());
 
 		// Determine terminate condition
 		// Time determines termination
@@ -123,7 +95,6 @@ public class RuntimeManagerPlan extends Plan {
 			} else {
 				System.err.println("#RunTimeManagerPlan# Time type missing " + simConf);
 			}
-			System.out.println("#TERMINATION TIME: # " + terminationTime);
 			if (terminationTime.longValue() > -1) {
 				waitFor(terminationTime);
 			} else {
@@ -157,8 +128,8 @@ public class RuntimeManagerPlan extends Plan {
 						break;
 					}
 				} else {
-					IComponentIdentifier agentIdentifier = AgentMethods.getIComponentIdentifier(space, targetFunct.getObjectSource().getName());//					
-					IFuture fut = ((IComponentManagementService)SServiceProvider.getService(getScope().getServiceProvider(), IComponentManagementService.class)).getExternalAccess(agentIdentifier);
+					IComponentIdentifier agentIdentifier = AgentMethods.getIComponentIdentifier(space, targetFunct.getObjectSource().getName());//
+					IFuture fut = cms.getExternalAccess(agentIdentifier);
 					IExternalAccess exta = (IExternalAccess) fut.get(this);
 
 					IOAVState state = ((ElementFlyweight) exta).getState();
@@ -182,105 +153,89 @@ public class RuntimeManagerPlan extends Plan {
 
 		ConcurrentHashMap<Long, ArrayList<ObservedEvent>> results = getResult(space);
 
-		// Stop Siumlation when target condition true.
-		// IServiceContainer container =
-		// getExternalAccess().getServiceContainer();
-		// ISimulationService simServ = (ISimulationService)
-		// container.getService(ISimulationService.class);
-		// waitFor(5000);
-		// simServ.pause();
+		prepareResult(results);
 
-		// exeServ.stop(null);
-		// waitFor(5000);
-		// simServ.start();
-		// exeServ.start();
-
-		sendResult(results);
-		// simServ.start();
-		// waitFor(2000);
-		// simServ.shutdown(null);
-		System.out.println("Trying to kill component....");
+		System.out.println("#Client# Trying to kill executed application....");
 		vis.setExit();
 		vis.dispose();
-		// getExternalAccess().killAgent();
-		IComponentManagementService ces = (IComponentManagementService)SServiceProvider.getService(getScope().getServiceProvider(), IComponentManagementService.class).get(this);
-			
-		IComponentIdentifier id1  = space.getContext().getComponentIdentifier();
-		
-		ces.destroyComponent(space.getContext().getComponentIdentifier()).get(this);
-		// getExternalAccess().getApplicationContext().killComponent(null);
 
+		cms.destroyComponent(exta.getComponentIdentifier());
+		System.out.println("#Client# Goal over???");
 	}
 
-	private void sendResult(ConcurrentHashMap<Long, ArrayList<ObservedEvent>> observedEvents) {
+	private void prepareResult(ConcurrentHashMap<Long, ArrayList<ObservedEvent>> observedEvents) {
 		Map facts = (Map) getBeliefbase().getBelief("simulationFacts").getFact();
-		facts.put(Constants.EXPERIMENT_END_TIME, new Long(getCurrentTime()));
-		// Serialize SimulationConfiguration to enable sending
-		// SimulationConfiguration simConfig = (SimulationConfiguration)
-		// facts.get(Constants.SIMULATION_FACTS_FOR_CLIENT);
-		// does not need to be send back
-		facts.remove(Constants.SIMULATION_FACTS_FOR_CLIENT);
-		// facts.put(Constants.SIMULATION_FACTS_FOR_CLIENT,
-		// XMLHandler.writeXMLToString(facts.get(Constants.SIMULATION_FACTS_FOR_CLIENT),
-		// SimulationConfiguration.class));
-
-		// Hack:
-		// facts.put(Constants.SIMULATION_FACTS_FOR_CLIENT, null);
-		// Get the map of observed events from the beliefbase
-		// HashMap observedEvents = (HashMap)
-		// getBeliefbase().getBelief(Constants.OBSERVED_EVENTS_MAP).getFact();
+		facts.put(Constants.EXPERIMENT_END_TIME, new Long(clockservice.getTime()));
 		facts.put(Constants.OBSERVED_EVENTS_MAP, observedEvents);
-
-		IComponentIdentifier[] receivers = new IComponentIdentifier[1];
-		receivers[0] = getMasterAgent();
-
-		System.out.println("Now sending result message to " + receivers[0]);
-
-		// Send message
-		IMessageEvent inform = createMessageEvent("inform_master_agent");
-		inform.getParameterSet(SFipa.RECEIVERS).addValue(receivers[0]);
-		inform.getParameter(SFipa.CONTENT).setValue(facts);
-
-		try {
-			sendMessage(inform);
-		} catch (Exception e) {
-			System.out.println("#RuntimeManagerPlan# Error on sending result message to Master Simulation Manager");
-		}
+		// does not need to be send back to master agent
+		facts.remove(Constants.SIMULATION_FACTS_FOR_CLIENT);
+		
+		getBeliefbase().getBelief("simulationFacts").setFact(facts);
 	}
 
-	private IComponentIdentifier getMasterAgent() {
-		// Create a service description to search for.		
-		IDF df = (IDF) SServiceProvider.getService(getScope().getServiceProvider(), IDF.class).get(this);
-		IDFServiceDescription sd = df.createDFServiceDescription("master_simulation_agent", null, null);
-		IDFComponentDescription ad = df.createDFComponentDescription(null, sd);
-		// ISearchConstraints sc = df.createSearchConstraints(-1, 0);
+	/**
+	 * Returns the observedEvents from the SimulationDataConsumer Hack: Can only
+	 * process one SimualtioDataConsumer, i.e. it returns the events from the
+	 * FIRST SimulatioDataConsumer
+	 * 
+	 * @param space
+	 * @return
+	 */
+	private ConcurrentHashMap<Long, ArrayList<ObservedEvent>> getResult(AbstractEnvironmentSpace space) {
+		Collection collection = space.getDataConsumers();
 
-		// Use a subgoal to search for a dealer-agent
-		IGoal ft = createGoal("df_search");
-		ft.getParameter("description").setValue(ad);
-		// ft.getParameter("constraints").setValue(sc);
-		dispatchSubgoalAndWait(ft);
-		IDFComponentDescription[] result = (IDFComponentDescription[]) ft.getParameterSet("result").getValues();
+		Iterator itr = collection.iterator();
 
-		if (result == null || result.length == 0) {
-			getLogger().warning("No master simulation agent found.");
-			fail();
-		} else {
-			// at least one matching component found,
-			getLogger().info(result.length + " master simulation agent found");
-
-			IComponentIdentifier masterAgent = result[0].getName();
-			return masterAgent;
+		while (itr.hasNext()) {
+			Object con = itr.next();
+			if (con instanceof SimulationDataConsumer)
+				return ((SimulationDataConsumer) con).getResults();
 		}
 		return null;
 	}
 
 	/**
-	 * Save initial facts of this simulation run.
+	 * Compute Termination: Input: Mode=0 ->relative Time; Mode=1 ->absolute
+	 * Time
+	 * 
+	 * @return the termination time as relative time, e.g. the time the
+	 *         simulation has to run.
 	 */
-	private void init(SimulationConfiguration simConf) {
+	private Long getTerminationTime(int mode, long value) {
+		Long currentTime = new Long(clockservice.getTime());
 
-		IClockService clockservice = (IClockService)SServiceProvider.getService(getScope().getServiceProvider(), IClockService.class).get(this);
+		if (mode == 0) {
+			// Long relativeTime = new Long(10000);
+			Long terminationTime = new Long(value + currentTime.longValue());
+			System.out.println("StartTime: " + TimeConverter.longTime2DateString(currentTime) + "TerminationTime: " + TimeConverter.longTime2DateString(terminationTime));
+			return new Long(value);
+		} else {// TODO: There might be a problem with Day Light Savings Time!
+			Calendar cal = Calendar.getInstance();
+			// Date terminationTime = cal.getTime();
+			Long duration = new Long(value - currentTime.longValue());
+			System.out.println("StartTime: " + TimeConverter.longTime2DateString(currentTime) + "TerminationTime: " + TimeConverter.longTime2DateString(new Long(value)) + ", Duration: "
+					+ duration.longValue());
+			return duration;
+		}
+	}
+
+	private void startApplication(String appName, String fileName, String configName, Map args, SimulationConfiguration simConf) {
+		
+		// create application in suspended modus
+		IFuture fut = cms.createComponent(appName, fileName, new CreationInfo(configName, args, null, true, false), null);
+		IComponentIdentifier cid = (IComponentIdentifier) fut.get(this);
+		this.exta = (IApplicationExternalAccess) cms.getExternalAccess(cid).get(this);
+
+		// add DataConsumer and Provider
+		addDataConsumerAndProvider(simConf);
+		
+		//Start Online Visualization
+		startOnlineVisualization(simConf);
+		
+		//resume application
+		cms.resumeComponent(cid);
+
+		// Save initial facts of this simulation run.
 		long startTime = clockservice.getTime();
 		Map facts = (Map) getBeliefbase().getBelief("simulationFacts").getFact();
 		facts.put(Constants.EXPERIMENT_START_TIME, new Long(startTime));
@@ -288,29 +243,24 @@ public class RuntimeManagerPlan extends Plan {
 
 		// Hack: Synchronize start time!
 		System.out.println("-->StartTime at Client: " + startTime);
-		AbstractEnvironmentSpace space = ((AbstractEnvironmentSpace) ((IApplicationExternalAccess) getScope().getParent()).getSpace(simConf.getNameOfSpace()));
+		AbstractEnvironmentSpace space = ((AbstractEnvironmentSpace) (exta).getSpace(simConf.getNameOfSpace()));
 		space.setProperty("REAL_START_TIME_OF_SIMULATION", startTime);
-		//*************************************************************
+		// *************************************************************
 		// This is a hack for this special application.xml -> MarsWorld
 		if (space.getSpaceObjectsByType("homebase").length > 0) {
 			space.getSpaceObjectsByType("homebase")[0].setProperty("start_time", startTime);
+
 		}
-		//*************************************************************
-		
-		// Hack: This should happen when application is initialized and before
-		// is starts --> when it is suspended
-		addDataConsumerAndProvider(simConf);
 	}
 
 	private void addDataConsumerAndProvider(SimulationConfiguration simConf) {
 
-		AbstractEnvironmentSpace space = ((AbstractEnvironmentSpace) ((IApplicationExternalAccess) getScope().getParent()).getSpace(simConf.getNameOfSpace()));
+		AbstractEnvironmentSpace space = ((AbstractEnvironmentSpace) (exta).getSpace(simConf.getNameOfSpace()));
 		IExpressionParser parser = new JavaCCExpressionParser();
 
 		// add new data provider
 		List<Dataprovider> providers = simConf.getDataproviders().getDataprovider();
 		// List tmp = si.getPropertyList("dataproviders");
-
 
 		// System.out.println("data providers: "+providers);
 		if (providers != null) {
@@ -325,7 +275,7 @@ public class RuntimeManagerPlan extends Plan {
 					String varname = source.getName() != null ? source.getName() : "$object";
 					String objecttype = source.getObjecttype();
 					boolean aggregate = source.isAggregate() == null ? false : source.isAggregate();
-					IParsedExpression dataexp = getParsedExpression(source.getContent(), parser);
+					IParsedExpression dataexp = EvaluateExpression.getParsedExpression(source.getContent(), parser);
 					// Hack: Includeconditon is not implemented, yet.
 					IParsedExpression includeexp = null;
 					provs[j] = new SpaceObjectSource(varname, space, objecttype, aggregate, dataexp, includeexp);
@@ -338,7 +288,7 @@ public class RuntimeManagerPlan extends Plan {
 				for (int j = 0; j < subdatas.size(); j++) {
 					Data subdata = subdatas.get(j);
 					columnnames[j] = subdata.getName();
-					exps[j] = getParsedExpression((String) subdata.getContent().get(0), parser);
+					exps[j] = EvaluateExpression.getParsedExpression((String) subdata.getContent().get(0), parser);
 				}
 
 				ITableDataProvider tprov = new DefaultDataProvider(space, provs, tablename, columnnames, exps);
@@ -359,9 +309,9 @@ public class RuntimeManagerPlan extends Plan {
 				// "clazz");
 				Class clazz = null;
 				try {
-					clazz = SReflect.findClass(dcon.getClazz(), toStringArray((ArrayList<String>) simConf.getImports().getImport()),		
-							((ILibraryService)SServiceProvider.getService(getScope().getServiceProvider(), ILibraryService.class).get(this)).getClassLoader());					
-					
+					clazz = SReflect.findClass(dcon.getClazz(), toStringArray((ArrayList<String>) simConf.getImports().getImport()),
+							((ILibraryService) SServiceProvider.getService(getScope().getServiceProvider(), ILibraryService.class).get(this)).getClassLoader());
+
 				} catch (ClassNotFoundException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -386,12 +336,12 @@ public class RuntimeManagerPlan extends Plan {
 					// dcon.getPropertyList().get(j).getValue());
 					// Hack: has to be "initially" an expression that can be
 					// parsed
-					map.put("value", getParsedExpression(dcon.getProperty().get(j).getContent(), parser));
+					map.put("value", EvaluateExpression.getParsedExpression(dcon.getProperty().get(j).getContent(), parser));
 					tmpPropertyList.add(map);
 				}
 				// MEnvSpaceInstance.setProperties(con,
 				// (List)dcon.get("properties"), fetcher);
-				MEnvSpaceInstance.setProperties(con, tmpPropertyList, space.getFetcher());//				
+				MEnvSpaceInstance.setProperties(con, tmpPropertyList, space.getFetcher());//
 				con.setProperty("envspace", space);
 				space.addDataConsumer(name, con);
 			}
@@ -399,83 +349,20 @@ public class RuntimeManagerPlan extends Plan {
 		// System.out.println("nnnnnnnnnnneded iterations: " + counterTmp);
 	}
 
-	/**
-	 * Helper method to convert string into parsed expression
-	 * 
-	 * @param expression
-	 * @param parser
-	 * @return
-	 */
-	private IParsedExpression getParsedExpression(String expression, IExpressionParser parser) {
-		// Hack: ***
-		if (expression == null || expression.length() == 0)
-			return null;
-		// ***
+	private void startOnlineVisualization(SimulationConfiguration simConf){
+		AbstractEnvironmentSpace space = ((AbstractEnvironmentSpace) (exta).getSpace(simConf.getNameOfSpace()));
 
-		// return expression == null ? null : parser.parseExpression(expression,
-		// null, null, null);
-		return parser.parseExpression(expression, null, null, null);
-	}
+		// init online visualization
+		ArrayList<AbstractChartDataConsumer> chartDataConsumer = new ArrayList<AbstractChartDataConsumer>();
+		for (Iterator it = space.getDataConsumers().iterator(); it.hasNext();) {
+			Object abstractConsumer = it.next();
 
-	/**
-	 * Returns the observedEvents from the SimulationDataConsumer Hack: Can only
-	 * process one SimualtioDataConsumer, i.e. it returns the events from the
-	 * FIRST SimulatioDataConsumer
-	 * 
-	 * @param space
-	 * @return
-	 */
-	private ConcurrentHashMap<Long, ArrayList<ObservedEvent>> getResult(AbstractEnvironmentSpace space) {
-		Collection collection = space.getDataConsumers();
-
-		Iterator itr = collection.iterator();
-
-		while (itr.hasNext()) {
-			Object con = itr.next();
-			// ITableDataConsumer con = (ITableDataConsumer) itr.next();
-			// System.out.println("#consumers# " +
-			// con.getPropertyNames().size());
-			if (con instanceof SimulationDataConsumer)
-				return ((SimulationDataConsumer) con).getResults();
+			if (abstractConsumer instanceof AbstractChartDataConsumer)
+				chartDataConsumer.add((AbstractChartDataConsumer) abstractConsumer);
 		}
-		return null;
+		this.vis =  new OnlineVisualisation(chartDataConsumer);
 	}
-
-	/**
-	 * Compute Termination: Input: Mode=0 ->relative Time; Mode=1 ->absolute
-	 * Time
-	 * 
-	 * @return the termination time as relative time, e.g. the time the
-	 *         simulation has to run.
-	 */
-	private Long getTerminationTime(int mode, long value) {
-		Long currentTime = new Long(getCurrentTime());
-
-		if (mode == 0) {
-			// Long relativeTime = new Long(10000);
-			Long terminationTime = new Long(value + currentTime.longValue());
-			System.out.println("StartTime: " + TimeConverter.longTime2DateString(currentTime) + "TerminationTime: " + TimeConverter.longTime2DateString(terminationTime));
-			return new Long(value);
-		} else {// TODO: There might be a problem with Day Light Savings Time!
-			Calendar cal = Calendar.getInstance();
-			// Date terminationTime = cal.getTime();
-			Long duration = new Long(value - currentTime.longValue());
-			System.out.println("StartTime: " + TimeConverter.longTime2DateString(currentTime) + "TerminationTime: " + TimeConverter.longTime2DateString(new Long(value)) + ", Duration: "
-					+ duration.longValue());
-			return duration;
-		}
-	}
-
-	/**
-	 * Returns current Time using the IClockService
-	 * 
-	 * @return
-	 */
-	private long getCurrentTime() {		
-		IClockService clockservice = (IClockService)SServiceProvider.getService(getScope().getServiceProvider(), IClockService.class).get(this);
-		return clockservice.getTime();
-	}
-
+	
 	/***
 	 * Transforms an ArrayList<String> into String[]
 	 * 
@@ -490,32 +377,5 @@ public class RuntimeManagerPlan extends Plan {
 		}
 
 		return array;
-	}
-
-	private void testSend(SimulationConfiguration simConf) {
-		Map facts = new HashMap();
-
-		facts.put(Constants.EXPERIMENT_END_TIME, new Long(getCurrentTime()));
-		facts.put(Constants.SIMULATION_CONFIGURATION, simConf);
-		// Get the map of observed events from the beliefbase
-		// HashMap observedEvents = (HashMap)
-		// getBeliefbase().getBelief(Constants.OBSERVED_EVENTS_MAP).getFact();
-		// facts.put(Constants.OBSERVED_EVENTS_MAP, observedEvents);
-
-		IComponentIdentifier[] receivers = new IComponentIdentifier[1];
-		receivers[0] = getMasterAgent();
-
-		System.out.println("Now sending result message to " + receivers[0]);
-
-		// Send message
-		IMessageEvent inform = createMessageEvent("inform_master_agent");
-		inform.getParameterSet(SFipa.RECEIVERS).addValue(receivers[0]);
-		inform.getParameter(SFipa.CONTENT).setValue(facts);
-
-		try {
-			sendMessage(inform);
-		} catch (Exception e) {
-			System.out.println("#RuntimeManagerPlan# Error on sending result message to Master Simulation Manager");
-		}
 	}
 }

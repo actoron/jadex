@@ -116,8 +116,12 @@
 		</maintaingoalref>
 
 		<!--  Start a new round of experiments. -->
-		<achievegoal name="StartSimulationExperiments">
-		</achievegoal>
+		<achievegoal name="StartSimulationExperiments"/>
+		
+		<performgoal name="EvaluateSingleResult" retry="false" exclude="never">
+			<!-- Map with results from client -->
+			<parameter name="args" class="Map" />
+		</performgoal>
 	</goals>
 
 	<plans>
@@ -140,8 +144,11 @@
 		-->
 		<plan name="computeSingleResults">
 			<body class="ComputeSingleResultPlan" />
+			<parameter name="args" class="Map">
+				<goalmapping ref="EvaluateSingleResult.args"/>
+			</parameter>
 			<trigger>
-				<messageevent ref="inform_simulation_master" />
+				<goal ref="EvaluateSingleResult" />
 			</trigger>
 		</plan>
 
@@ -167,15 +174,15 @@
 			Message sent by simulation client to inform the manager about the
 			outcome of the simulation.
 		-->
-		<messageevent name="inform_simulation_master" direction="receive"
+		<!-- <messageevent name="inform_simulation_master" direction="receive"
 			type="fipa">
 			<parameter name="performative" class="String" direction="fixed">
 				<value>SFipa.INFORM</value>
 			</parameter>
-		</messageevent>
+		</messageevent> -->
 
 		<!-- Event to trigger a new simulation experiment. -->
-		<internalevent name="triggerNewExperiment" />
+		<internalevent name="triggerNextExperiment" />
 
 		<!-- Event to trigger the evaluation of a simulation row. -->
 		<internalevent name="triggerExperimentRowEvaluation" />
@@ -196,7 +203,7 @@
 
 	<configurations>
 		<configuration name="default">
-			<goals>
+			<!-- <goals>
 				<initialgoal ref="df_keep_registered">
 					<parameter ref="description">
 						<value>
@@ -210,7 +217,7 @@
 						<value>20000</value>
 					</parameter>
 				</initialgoal>				
-			</goals>
+			</goals> -->
 			<plans>
 				<!-- <initialplan ref="start_sim_experiments" />-->
 				<initialplan ref="init_simulation" />
