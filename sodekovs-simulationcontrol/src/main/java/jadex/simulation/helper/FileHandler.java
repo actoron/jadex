@@ -3,6 +3,7 @@ package jadex.simulation.helper;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -26,8 +27,7 @@ public class FileHandler {
 		try {
 
 			// Construct the BufferedInputStream object
-			bufferedInput = new BufferedInputStream(new FileInputStream(
-					filename));
+			bufferedInput = new BufferedInputStream(new FileInputStream(filename));
 
 			int bytesRead = 0;
 
@@ -64,8 +64,7 @@ public class FileHandler {
 		try {
 
 			// Construct the BufferedOutputStream object
-			bufferedOutput = new BufferedOutputStream(new FileOutputStream(
-					filename));
+			bufferedOutput = new BufferedOutputStream(new FileOutputStream(filename));
 
 			// Start writing to the output stream
 			bufferedOutput.write(input.getBytes());
@@ -122,4 +121,31 @@ public class FileHandler {
 		return fileData.toString();
 	}
 
+	/**
+	 * 
+	 * @param fileName
+	 */
+	public static void deleteFile(String fileName) {
+		File f = new File(fileName);
+
+		// Make sure the file or directory exists and isn't write protected
+		if (!f.exists())
+			throw new IllegalArgumentException("Delete: no such file or directory: " + fileName);
+
+		if (!f.canWrite())
+			throw new IllegalArgumentException("Delete: write protected: " + fileName);
+
+		// If it is a directory, make sure it is empty
+		if (f.isDirectory()) {
+			String[] files = f.list();
+			if (files.length > 0)
+				throw new IllegalArgumentException("Delete: directory not empty: " + fileName);
+		}
+
+		// Attempt to delete it
+		boolean success = f.delete();
+
+		if (!success)
+			throw new IllegalArgumentException("Delete: deletion failed");
+	}
 }

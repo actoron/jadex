@@ -64,7 +64,7 @@ public class RemoteSimulationExecutionService extends BasicService implements IR
 
 		try {
 			// persist application description
-			String fileName = System.getProperty("user.dir") + "\\ApplicationDescription.application.xml";
+			final String fileName = System.getProperty("user.dir") + "\\ApplicationDescription.application.xml";
 			FileHandler.writeToFile(fileName, applicationDescription);
 			((Map) (args.get(Constants.SIMULATION_FACTS_FOR_CLIENT))).put(Constants.FILE_PATH, fileName);
 			
@@ -83,6 +83,7 @@ public class RemoteSimulationExecutionService extends BasicService implements IR
 				oe.addGoalListener(new IGoalListener() {
 					public void goalFinished(AgentEvent ae) {
 						System.out.println("observation finished at: " + comp.getAgentName());
+						FileHandler.deleteFile(fileName);
 						if (oe.isSucceeded())
 							ret.setResult(comp.getBeliefbase().getBelief("simulationFacts").getFact());
 						else

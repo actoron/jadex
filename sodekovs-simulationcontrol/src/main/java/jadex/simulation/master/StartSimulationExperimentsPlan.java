@@ -5,6 +5,7 @@ import jadex.bdi.runtime.Plan;
 import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentManagementService;
 import jadex.commons.IFuture;
+import jadex.commons.concurrent.IResultListener;
 import jadex.commons.service.SServiceProvider;
 import jadex.simulation.helper.Constants;
 import jadex.simulation.helper.FileHandler;
@@ -48,7 +49,7 @@ public class StartSimulationExperimentsPlan extends Plan {
 		// Put args into application. This args are passed to the
 		// application.xml to parameterize application.
 		Map args = new HashMap();
-		
+
 		// check, whether parameters have to be swept
 		if (simConf.getOptimization().getParameterSweeping() != null) {
 			sweepParameters(simConf, args);
@@ -60,9 +61,9 @@ public class StartSimulationExperimentsPlan extends Plan {
 		// gui.createNewEnsembleTable(rowCounter);
 
 		for (long i = 0; i < experimentsPerRowToMake; i++) {
-			
-			
-			// Put SimulationConfiguration into the application.xml as parameter for
+
+			// Put SimulationConfiguration into the application.xml as parameter
+			// for
 			// the SimulationClient.
 			Map simFacts = new HashMap();
 			try {
@@ -72,9 +73,8 @@ public class StartSimulationExperimentsPlan extends Plan {
 			}
 
 			args.put(Constants.SIMULATION_FACTS_FOR_CLIENT, simFacts);
-//			args.put(Constants.OBSERVED_EVENTS_MAP, observedEvents);				
+			// args.put(Constants.OBSERVED_EVENTS_MAP, observedEvents);
 
-			
 			String experimentID = rowCounter + "." + expInRow;
 			String appName = simConf.getName() + experimentID;
 
@@ -85,7 +85,7 @@ public class StartSimulationExperimentsPlan extends Plan {
 			args.put("tmp_start_time", tmp_start_time);
 			((HashMap) args.get(Constants.SIMULATION_FACTS_FOR_CLIENT)).put(Constants.EXPERIMENT_ID, experimentID);
 
-//			startApplication(appName, fileName, configName, args);
+			// startApplication(appName, fileName, configName, args);
 			startApplicationRemotley(appName, fileName, configName, args);
 
 			System.out.println("#*****************************************************************.");
@@ -134,19 +134,20 @@ public class StartSimulationExperimentsPlan extends Plan {
 		// System.out.println("#StartSimEx# ttt " + ttt.toString());
 		// XMLHandler.writeXML(ttt, "rowRes.xml", ExperimentResult.class);
 		// }
-		//		
+		//
 		ArrayList<ExperimentResult> experimentList = new ArrayList<ExperimentResult>(experimentResults.values());
 		rowResult.setExperimentsResults(experimentList);
 		rowResult.setEndtime(getClock().getTime());
 		rowResult.setName("Tmp-Test");
 		rowResult.setOptimizationName(experimentList.get(0).getOptimizationParameterName());
 		rowResult.setOptimizationValue(experimentList.get(0).getOptimizationValue());
-		rowResult.setFinalStatsMap( ((IntermediateResult)getBeliefbase().getBelief("intermediateResults").getFact()).getIntermediateStats());
+		rowResult.setFinalStatsMap(((IntermediateResult) getBeliefbase().getBelief("intermediateResults").getFact()).getIntermediateStats());
 
 		rowResults.put(rowResult.getId(), rowResult);
 
 		getBeliefbase().getBelief("experimentResults").setFact(new HashMap());
-//		getBeliefbase().getBelief("intermediateResults").setFact(new IntermediateResult(rowCounter, 0, simConf));
+		// getBeliefbase().getBelief("intermediateResults").setFact(new
+		// IntermediateResult(rowCounter, 0, simConf));
 		getBeliefbase().getBelief("rowResults").setFact(rowResults);
 
 		// System.out.println("#StartSimEx# Try to write RowResult to XML-File.");
@@ -158,59 +159,66 @@ public class StartSimulationExperimentsPlan extends Plan {
 		dispatchInternalEvent(createInternalEvent("triggerExperimentRowEvaluation"));
 	}
 
-
 	private void startApplication(String appName, String fileName, String configName, Map args) {
 
 		try {
-			IComponentManagementService executionService = (IComponentManagementService)SServiceProvider.getService(getScope().getServiceProvider(), IComponentManagementService.class).get(this);			             
+			IComponentManagementService executionService = (IComponentManagementService) SServiceProvider.getService(getScope().getServiceProvider(), IComponentManagementService.class).get(this);
 
-			// create application 
+			// create application
 			IFuture fut = executionService.createComponent(appName, fileName, new CreationInfo(configName, args, null, false, false), null);
 
 		} catch (Exception e) {
 			System.out.println("Could not start application...." + e);
 		}
 	}
-	
+
 	private void startApplicationRemotley(String appName, String fileName, String configName, Map args) {
 
 		try {
-			//find appropriate service
-			ArrayList<IRemoteSimulationExecutionService> services = (ArrayList<IRemoteSimulationExecutionService>) SServiceProvider.getServices(getScope().getServiceProvider(), IRemoteSimulationExecutionService.class, true, true).get(this);
-			System.out.println("Nr. of found remote services: " + services.size());
-			
-			if(services.size() > 0){				
-				
-				//read the *.application.xml File from the file system
+			ArrayList<IRemoteSimulationExecutionService> services = null;
+
+			int counter = 0;
+			do {
+				// find appropriate service
+				services = (ArrayList<IRemoteSimulationExecutionService>) SServiceProvider.getServices(getScope().getServiceProvider(), IRemoteSimulationExecutionService.class, true, true).get(this);
+				System.out.println("#StartSimulationExpPlan#Nr. of found remote services: " + services.size());
+				if (services.size() <= 0) {
+					System.out.println("#StartSimulationExpPlan#Could not find remote simulation execution service! Retry in 5 sec.");
+					waitFor(5000);
+				}
+				counter++;
+			} while (services.size() <= 0 && counter < 5);
+
+			if (services.size() > 0) {
+
+				// read the *.application.xml File from the file system
 				String applicationDescription = FileHandler.readFileAsString(fileName);
-				
-				IFuture fut = services.get(0).executeExperiment(appName,applicationDescription,configName,args);
-//				fut.addResultListener(new IResultListener()
-//				{
-//					public void resultAvailable(Object source, Object result)
-//					{
-//						System.out.println("#Master#Received res from remote simulation execution");
-//						
-//						//Start Evaluation of single experiment result
-//						IGoal eval = (IGoal) getGoalbase().createGoal("EvaluateSingleResult");						
-//						eval.getParameter("args").setValue(result);						
+
+				System.out.println("Waiting for res at Master...");
+				IFuture fut = services.get(0).executeExperiment(appName, applicationDescription, configName, args);
+//				fut.addResultListener(new IResultListener() {
+//					public void resultAvailable(Object source, Object result) {
+//						System.out.println("#StartSimulationExpPlan#Received res from remote simulation execution");
+//
+//						// Start Evaluation of single experiment result
+//						IGoal eval = (IGoal) getGoalbase().createGoal("EvaluateSingleResult");
+//						eval.getParameter("args").setValue(result);
 //						getGoalbase().dispatchTopLevelGoal(eval);
 //					}
-//					
-//					public void exceptionOccurred(Object source, Exception exception)
-//					{
-//						
+//
+//					public void exceptionOccurred(Object source, Exception exception) {
+//						System.out.println("#StartSimulationExpPlan#Error: Remote simulation execution failed!");
 //					}
 //				});
-				System.out.println("Waiting for res at Master...");
-				Map resMap = (Map) fut.get(this);
-				System.out.println("RECEIVED res at Master...");
-				IGoal eval = (IGoal) getGoalbase().createGoal("EvaluateSingleResult");						
-				eval.getParameter("args").setValue(resMap);						
-				getGoalbase().dispatchTopLevelGoal(eval);
-				
-			}
-			else{
+
+				 Map resMap = (Map) fut.get(this);
+				 System.out.println("RECEIVED res at Master...");
+				 IGoal eval = (IGoal)
+				 getGoalbase().createGoal("EvaluateSingleResult");
+				 eval.getParameter("args").setValue(resMap);
+				 getGoalbase().dispatchTopLevelGoal(eval);
+
+			} else {
 				System.out.println("Error: Could not find remote simulation execution service!");
 			}
 
@@ -228,12 +236,16 @@ public class StartSimulationExperimentsPlan extends Plan {
 	private void sweepParameters(SimulationConfiguration simConf, Map args) {
 		Optimization opt = simConf.getOptimization();
 		String parameterName = opt.getData().getName();
-		String clazz = opt.getParameterSweeping().getConfiguration().getClazz(); //double, int or string
+		String clazz = opt.getParameterSweeping().getConfiguration().getClazz(); // double,
+																					// int
+																					// or
+																					// string
 		int valInt = -1;
 		double valDouble = 0.0;
 		String valString = "";
 
-		// iterate through parameter space with step size; only appropriate to int & double parameter
+		// iterate through parameter space with step size; only appropriate to
+		// int & double parameter
 		if (opt.getParameterSweeping().getType().equalsIgnoreCase(Constants.OPTIMIZATION_TYPE_SPACE)) {
 			if (clazz.equalsIgnoreCase("int")) {
 				if (opt.getParameterSweeping().getParameterSweepCounter() == 0) {
@@ -242,7 +254,7 @@ public class StartSimulationExperimentsPlan extends Plan {
 					int step = Integer.parseInt(opt.getParameterSweeping().getConfiguration().getStep());
 					int currentVal = Integer.parseInt(opt.getParameterSweeping().getCurrentValue());
 					valInt = currentVal + step;
-				} 
+				}
 			} else if (clazz.equalsIgnoreCase("double")) {
 				if (opt.getParameterSweeping().getParameterSweepCounter() == 0) {
 					valDouble = Double.parseDouble(opt.getParameterSweeping().getConfiguration().getStart());
@@ -253,7 +265,8 @@ public class StartSimulationExperimentsPlan extends Plan {
 				}
 			} else
 				System.err.println("#StartSimulationExperiment# Error on identifying class for sweeping parameter(s): " + clazz);
-		// iterate through list of parameters of type int or double or String
+			// iterate through list of parameters of type int or double or
+			// String
 		} else if (opt.getParameterSweeping().getType().equalsIgnoreCase(Constants.OPTIMIZATION_TYPE_LIST)) {
 			if (clazz.equalsIgnoreCase("int")) {
 				if (opt.getParameterSweeping().getParameterSweepCounter() == 0) {
@@ -283,17 +296,16 @@ public class StartSimulationExperimentsPlan extends Plan {
 			System.err.println("#StartSimulationExperiment# Error on identifying type for sweeping parameter(s): " + opt.getParameterSweeping().getType());
 		}
 
-		
 		// update SimulationConf to be up to date
 		if (clazz.equalsIgnoreCase("int")) {
-			opt.getParameterSweeping().setCurrentValue(String.valueOf(valInt));			
+			opt.getParameterSweeping().setCurrentValue(String.valueOf(valInt));
 			// parametrize application-xml
 			args.put(parameterName, new Integer(valInt));
 		} else if (clazz.equalsIgnoreCase("double")) {
 			opt.getParameterSweeping().setCurrentValue(String.valueOf(valDouble));
 			args.put(parameterName, new Double(valDouble));
 		} else if (clazz.equalsIgnoreCase("string")) {
-			opt.getParameterSweeping().setCurrentValue(valString);			
+			opt.getParameterSweeping().setCurrentValue(valString);
 			args.put(parameterName, new String(valString));
 		}
 		opt.getParameterSweeping().incrementParameterSweepCounter();
