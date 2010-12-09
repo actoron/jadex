@@ -768,7 +768,7 @@ public class StarterPlugin extends AbstractJCCPlugin	implements ICMSComponentLis
 	 *  Create a new component on the platform.
 	 *  Any errors will be displayed in a dialog to the user.
 	 */
-	public void createComponent(final String type, final String name, final String configname, final Map arguments, final boolean suspend, 
+	public void createComponent(final String type, final String name, final String configname, final Map arguments, final Boolean suspend, 
 		final Boolean master, final Boolean daemon, final Boolean autosd, final IResultListener killlistener)
 	{
 		SServiceProvider.getServiceUpwards(jcc.getServiceProvider(),

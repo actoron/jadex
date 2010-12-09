@@ -8,16 +8,16 @@ public class MStartable
 	//-------- attributes --------
 	
 	/** The suspend flag. */
-	protected Boolean suspend;
+	private Boolean suspend;
 	
 	/** The master flag. */
-	protected Boolean master;
+	private Boolean master;
 	
 	/** The daemon flag. */
-	protected Boolean daemon;
+	private Boolean daemon;
 	
 	/** The autoshutdown flag. */
-	protected Boolean autoshutdown;
+	private Boolean autoshutdown;
 	
 	//-------- methods --------
 	

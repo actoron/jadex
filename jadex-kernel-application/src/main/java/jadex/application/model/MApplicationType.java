@@ -93,7 +93,6 @@ public class MApplicationType extends MStartable implements ICacheableModel
 		this.providedservices = new ArrayList();
 		this.requiredservices = new ArrayList();
 //		this.properties = new ArrayList();
-		this.autoshutdown = true;
 		this.modelinfo = new ModelInfo();
 	}
 	
@@ -123,6 +122,8 @@ public class MApplicationType extends MStartable implements ICacheableModel
 		modelinfo.setMaster(master);
 		modelinfo.setDaemon(daemon);
 		modelinfo.setAutoShutdown(autoshutdown);
+		if(getSuspend()!=null)
+			suspend.setValue(getSuspend());
 		if(getMaster()!=null)
 			master.setValue(getMaster());
 		if(getDaemon()!=null)
@@ -160,7 +161,7 @@ public class MApplicationType extends MStartable implements ICacheableModel
 			if(val!=null)
 			{
 				suspend.setValue(mapp.getName(), val);
-//				System.out.println("master: "+val+" "+mapp.getName());
+//				System.out.println("suspend: "+val+" "+mapp.getName());
 			}
 			val = mapp.getMaster();
 			if(val!=null)

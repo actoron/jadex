@@ -331,7 +331,8 @@ public class StarterPanel extends JPanel
 									int max = ((Integer)numcomponents.getValue()).intValue();
 									for(int i=0; i<max; i++)
 									{
-										starter.createComponent(typename, an, configname, args, suspend.isSelected(), 
+										starter.createComponent(typename, an, configname, args, 
+											suspend.isSelected()? Boolean.TRUE: Boolean.FALSE, 
 											mastercb.isSelected()? Boolean.TRUE: Boolean.FALSE, 
 											daemoncb.isSelected()? Boolean.TRUE: Boolean.FALSE, 
 											autosdcb.isSelected()? Boolean.TRUE: Boolean.FALSE, killlistener);
@@ -339,7 +340,8 @@ public class StarterPanel extends JPanel
 								}
 								else
 								{
-									starter.createComponent(typename, an, configname, args, suspend.isSelected(), 
+									starter.createComponent(typename, an, configname, args, 
+										suspend.isSelected()? Boolean.TRUE: Boolean.FALSE, 
 										mastercb.isSelected()? Boolean.TRUE: Boolean.FALSE, 
 										daemoncb.isSelected()? Boolean.TRUE: Boolean.FALSE, 
 										autosdcb.isSelected()? Boolean.TRUE: Boolean.FALSE, killlistener);
@@ -824,7 +826,7 @@ public class StarterPanel extends JPanel
 			mastercb.setSelected(m);
 			daemoncb.setSelected(d);
 			autosdcb.setSelected(a); 
-//			System.out.println("mda: "+m+" "+d+" "+a);
+//			System.out.println("smda: "+s+" "+m+" "+d+" "+a);
 		}
 	}
 
