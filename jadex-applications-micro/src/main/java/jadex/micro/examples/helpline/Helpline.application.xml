@@ -6,7 +6,8 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-application 
 	                    http://jadex.sourceforge.net/jadex-application-2.0.xsd"
-	name="Helpline" package="jadex.micro.examples.helpline">
+	name="Helpline" package="jadex.micro.examples.helpline"
+	autoshutdown="true">
 	
 	<imports>
 		<import>jadex.commons.service.clock.IClockService</import>

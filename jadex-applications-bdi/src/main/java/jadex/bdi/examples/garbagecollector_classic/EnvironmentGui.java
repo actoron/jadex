@@ -66,45 +66,7 @@ public class EnvironmentGui	extends JFrame
 		{
 			public void windowClosing(WindowEvent e)
 			{
-//				agent.scheduleStep(new IComponentStep()
-//				{
-//					public Object execute(IInternalAccess ia)
-//					{
-//						final IBDIInternalAccess bia = (IBDIInternalAccess)ia;
-//						final Environment env = (Environment)bia.getBeliefbase().getBelief("env").getFact();
-//						final WorldObject[]	wobs = env.getWorldObjects();
-//				
-//						for(int i=0; i<wobs.length; i++)
-//						{
-//							final int num = i;
-//							if(wobs[i].getType().equals(Environment.BURNER)
-//								|| wobs[i].getType().equals(Environment.COLLECTOR))
-//							{
-//								final IGoal kill = bia.getGoalbase().createGoal("cms_destroy_component");
-//								SServiceProvider.getServiceUpwards(agent.getServiceProvider(), IComponentManagementService.class)
-//									.addResultListener(bia.createResultListener(new DefaultResultListener()
-//								{
-//									public void resultAvailable(Object source, Object result)
-//									{
-//										try
-//										{
-//											IComponentManagementService ces = (IComponentManagementService)result;
-//											kill.getParameter("componentidentifier").setValue(ces.createComponentIdentifier(wobs[num].getName(), true, null));
-//											bia.getGoalbase().dispatchTopLevelGoal(kill);
-//										}
-//										catch(GoalFailureException gfe) 
-//										{
-//										}
-//									}
-//								}));
-//								return null;
-//							}
-//						}
-//						return null;
-//					}
-//				});
-				
-				// Finally shutdown environment agent.
+				// Shutdown environment agent to close application (due to master flag).
 				agent.killComponent();
 			}
 		});
@@ -113,8 +75,7 @@ public class EnvironmentGui	extends JFrame
 		{
 			public Object execute(IInternalAccess ia)
 			{
-				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
-				bia.addComponentListener(new IComponentListener()
+				ia.addComponentListener(new IComponentListener()
 				{
 					public void componentTerminating(ChangeEvent ae)
 					{
@@ -134,23 +95,6 @@ public class EnvironmentGui	extends JFrame
 				return null;
 			}
 		});
-//		agent.addAgentListener(new IAgentListener()
-//		{
-//			public void agentTerminating(AgentEvent ae)
-//			{
-//				SwingUtilities.invokeLater(new Runnable()
-//				{
-//					public void run()
-//					{
-//						EnvironmentGui.this.dispose();
-//					}
-//				});
-//			}
-//			
-//			public void agentTerminated(AgentEvent ae)
-//			{
-//			}
-//		});		
 	}
 }
 

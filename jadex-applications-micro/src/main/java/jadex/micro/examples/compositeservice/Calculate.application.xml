@@ -15,7 +15,7 @@
 	</imports>
 	
 	<componenttypes>
-		<componenttype name="Calculator" filename="jadex/micro/examples/compositeservice/CalculatorAgent.class"/>
+		<componenttype name="Calculator" filename="jadex/micro/examples/compositeservice/CalculatorAgent.class" master="true"/>
 		<componenttype name="User" filename="jadex/micro/examples/compositeservice/UserAgent.class"/>
 	</componenttypes>
 	

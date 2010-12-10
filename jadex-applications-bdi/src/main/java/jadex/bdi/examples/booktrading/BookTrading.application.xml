@@ -34,7 +34,7 @@
 	<applications>
 		<application name="One buyer and one seller">
 			<components>
-				<component type="Buyer" >
+				<component type="Buyer">
 					<arguments>
 						<argument name="initial_orders">
 							new Order[]
