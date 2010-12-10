@@ -477,39 +477,47 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 		else if(node instanceof IActiveComponentTreeNode)
 		{
 			final IComponentIdentifier cid = ((IActiveComponentTreeNode)node).getComponentIdentifier();
-			Boolean viewable = (Boolean)viewables.get(cid);
-			if(viewable!=null)
+			
+			// For proxy components the cid could be null if the remote cid has not yet been retrieved
+			// Using a IFuture as return value in not very helpful because this method can't directly
+			// return a result, even if known.
+			// todo: how to initiate a repaint in case the the cid is null
+			if(cid!=null)
 			{
-				ret = viewable.booleanValue();
-			}
-			else
-			{
-				// Unknown -> start search to find out asynchronously
-				SServiceProvider.getService(getJCC().getServiceProvider(), IComponentManagementService.class)
-					.addResultListener(new SwingDefaultResultListener(comptree)
+				Boolean viewable = (Boolean)viewables.get(cid);
+				if(viewable!=null)
 				{
-					public void customResultAvailable(Object source, Object result)
+					ret = viewable.booleanValue();
+				}
+				else
+				{
+					// Unknown -> start search to find out asynchronously
+					SServiceProvider.getService(getJCC().getServiceProvider(), IComponentManagementService.class)
+						.addResultListener(new SwingDefaultResultListener(comptree)
 					{
-						final IComponentManagementService cms = (IComponentManagementService)result;
-						
-						cms.getExternalAccess(cid).addResultListener(new SwingDefaultResultListener(comptree)
+						public void customResultAvailable(Object source, Object result)
 						{
-							public void customResultAvailable(Object source, Object result)
-							{
-								final IExternalAccess exta = (IExternalAccess)result;
-								final String classname = (String)exta.getModel().getProperties().get(IAbstractViewerPanel.PROPERTY_VIEWERCLASS);
-								viewables.put(cid, classname==null? Boolean.FALSE: Boolean.TRUE);
-//								System.out.println("node: "+viewables.get(cid));
-								node.refresh(false, false);
-							}
+							final IComponentManagementService cms = (IComponentManagementService)result;
 							
-							public void customExceptionOccurred(Object source, Exception exception)
+							cms.getExternalAccess(cid).addResultListener(new SwingDefaultResultListener(comptree)
 							{
-								exception.printStackTrace();
-							}
-						});
-					}
-				});
+								public void customResultAvailable(Object source, Object result)
+								{
+									final IExternalAccess exta = (IExternalAccess)result;
+									final String classname = (String)exta.getModel().getProperties().get(IAbstractViewerPanel.PROPERTY_VIEWERCLASS);
+									viewables.put(cid, classname==null? Boolean.FALSE: Boolean.TRUE);
+	//								System.out.println("node: "+viewables.get(cid));
+									node.refresh(false, false);
+								}
+								
+								public void customExceptionOccurred(Object source, Exception exception)
+								{
+									exception.printStackTrace();
+								}
+							});
+						}
+					});
+				}
 			}
 		}
 		return ret;

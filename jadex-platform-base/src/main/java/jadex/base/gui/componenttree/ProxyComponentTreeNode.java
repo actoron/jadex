@@ -92,6 +92,8 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 	 */
 	public IComponentIdentifier getComponentIdentifier()
 	{
+		if(cid==null)
+			getRemoteComponentIdentifier();
 		return cid;
 	}
 
