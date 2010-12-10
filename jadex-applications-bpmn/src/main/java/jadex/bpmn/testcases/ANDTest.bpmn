@@ -141,11 +141,6 @@
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_NVl-0CboEd-LGeDmwCGsJg" source="jadex">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_NVl-0iboEd-LGeDmwCGsJg" key="condition" value=""/>
       </eAnnotations>
-      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_m-Li6wRPEeCnwcpWvxOwkg" source="jadex_mappings_table">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_m-Li7ARPEeCnwcpWvxOwkg" key="dimension" value="1:1"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_m-Li7QRPEeCnwcpWvxOwkg" key="uniqueColumnIndex" value="0"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_m-Li7gRPEeCnwcpWvxOwkg" key="0:0" value=""/>
-      </eAnnotations>
     </sequenceEdges>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_eyEusSbmEd-LGeDmwCGsJg" iD="_eyEusCbmEd-LGeDmwCGsJg"/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_gtJ7USbmEd-LGeDmwCGsJg" iD="_gtJ7UCbmEd-LGeDmwCGsJg"/>
