@@ -284,14 +284,7 @@ public class LibServiceBrowser	extends	JTabbedPane	implements IServiceViewerPane
 				return new Future(null);
 			}
 		};
-		try
-		{
-			libservice.addLibraryServiceListener(listener);
-		}
-		catch(Exception e)
-		{
-			System.out.println("Automatic updates not supported for library service.");
-		}
+		libservice.addLibraryServiceListener(listener);
 		
 		// Todo: remove listener, when tool is closed.
 		

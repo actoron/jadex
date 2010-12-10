@@ -77,7 +77,8 @@ public class LinkedModelRepositoryService extends BasicService implements IModel
 				addModel(path);
 			}
 			
-			((ILibraryService) SServiceProvider.getService(provider, ILibraryService.class).get(new ThreadSuspendable())).addLibraryServiceListener(new ILibraryServiceListener()
+			((ILibraryService)SServiceProvider.getService(provider, ILibraryService.class)
+				.get(new ThreadSuspendable())).addLibraryServiceListener(new ILibraryServiceListener()
 			{
 				public IFuture urlRemoved(URL url)
 				{

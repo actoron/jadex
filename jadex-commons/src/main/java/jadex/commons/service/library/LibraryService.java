@@ -3,6 +3,7 @@ package jadex.commons.service.library;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.SUtil;
+import jadex.commons.concurrent.IResultListener;
 import jadex.commons.service.BasicService;
 
 import java.io.File;
@@ -114,7 +115,19 @@ public class LibraryService extends BasicService implements ILibraryService
 		// Do not notify listeners with lock held!
 		for(int i=0; i<lis.length; i++)
 		{
-			lis[i].urlAdded(url);
+			final ILibraryServiceListener liscopy = lis[i];
+			lis[i].urlAdded(url).addResultListener(new IResultListener()
+			{
+				public void resultAvailable(Object source, Object result)
+				{
+				}
+				
+				public void exceptionOccurred(Object source, Exception exception)
+				{
+					exception.printStackTrace();
+					removeLibraryServiceListener(liscopy);
+				}
+			});
 		}
 		
 //		fireURLAdded(url);
@@ -137,7 +150,19 @@ public class LibraryService extends BasicService implements ILibraryService
 		// Do not notify listeners with lock held!
 		for(int i=0; i<lis.length; i++)
 		{
-			lis[i].urlRemoved(url);
+			final ILibraryServiceListener liscopy = lis[i];
+			lis[i].urlRemoved(url).addResultListener(new IResultListener()
+			{
+				public void resultAvailable(Object source, Object result)
+				{
+				}
+				
+				public void exceptionOccurred(Object source, Exception exception)
+				{
+					exception.printStackTrace();
+					removeLibraryServiceListener(liscopy);
+				}
+			});
 		}
 		
 //		fireURLRemoved(url);
