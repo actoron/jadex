@@ -75,7 +75,7 @@ public class MoveTask extends AbstractTask
 						public Object execute(IInternalAccess ia)
 						{
 							IBDIInternalAccess bia = (IBDIInternalAccess)ia;
-							if(bia.getBeliefbase().getBeliefSet("my_targets").containsFact(so))
+							if(!bia.getBeliefbase().getBeliefSet("my_targets").containsFact(so))
 							{
 								bia.getBeliefbase().getBeliefSet("my_targets").addFact(so);
 							}
