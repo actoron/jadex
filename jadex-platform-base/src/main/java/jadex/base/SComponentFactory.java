@@ -126,20 +126,20 @@ public class SComponentFactory
 						IComponentFactory fac = (IComponentFactory)result;
 						ret.setResult(new Boolean(fac.isStartable(model, null, ls.getClassLoader())));
 					}
+					
+					public void exceptionOccurred(Object source, Exception exception)
+					{
+						if(exception instanceof ServiceNotFoundException)
+						{
+							ret.setResult(Boolean.FALSE);
+						}
+						else
+						{
+							super.exceptionOccurred(source, exception);
+						}
+					}
 				});
-			}
-			
-			public void exceptionOccurred(Object source, Exception exception)
-			{
-				if(exception instanceof ServiceNotFoundException)
-				{
-					ret.setResult(Boolean.FALSE);
-				}
-				else
-				{
-					super.exceptionOccurred(source, exception);
-				}
-			}
+			}			
 		});
 
 		return ret;
