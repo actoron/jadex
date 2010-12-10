@@ -1,16 +1,49 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_QZS7sRcWEd-OSKK6OfNWqA" iD="_QZS7sBcWEd-OSKK6OfNWqA">
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_RzTbkBcWEd-OSKK6OfNWqA" source="jadex">
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_RzTbkRcWEd-OSKK6OfNWqA" key="imports" value="jadex.bpmn.runtime.task.*␟jadex.bpmn.model.*␟jadex.bridge.*"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_RzTbkhcWEd-OSKK6OfNWqA" key="Description" value="Simple process that fowards an argument as its result."/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_RzclgBcWEd-OSKK6OfNWqA" key="Package" value=" jadex.bpmn.examples.testcases"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_w90W0BcWEd-OSKK6OfNWqA" key="arguments" value="in␋true␋String␋Argument value.␋String␋&quot;default value&quot;␟out␋false␋true␋Result value.␋String␋"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_orCtGwRPEeCnwcpWvxOwkg" key="editor_version" value="1.0"/>
+  </eAnnotations>
+  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_oj5jQARPEeCnwcpWvxOwkg" source="jadex_imports_table">
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_oj5jQQRPEeCnwcpWvxOwkg" key="dimension" value="3:1"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_oj5jQgRPEeCnwcpWvxOwkg" key="uniqueColumnIndex" value="0"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_oj5jQwRPEeCnwcpWvxOwkg" key="0:0" value="jadex.bpmn.runtime.task.*"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_oj5jRARPEeCnwcpWvxOwkg" key="1:0" value="jadex.bpmn.model.*"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_oj5jRQRPEeCnwcpWvxOwkg" key="2:0" value="jadex.bridge.*"/>
+  </eAnnotations>
+  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_oj5jRgRPEeCnwcpWvxOwkg" source="jadex_arguments_table">
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_oj5jRwRPEeCnwcpWvxOwkg" key="dimension" value="2:6"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_oj5jSARPEeCnwcpWvxOwkg" key="uniqueColumnIndex" value="0"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_oj5jSQRPEeCnwcpWvxOwkg" key="0:0" value="in"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_oj5jSgRPEeCnwcpWvxOwkg" key="0:1" value="true"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_oj5jSwRPEeCnwcpWvxOwkg" key="0:2" value="String"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_oj5jTARPEeCnwcpWvxOwkg" key="0:3" value="Argument value."/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_oj5jTQRPEeCnwcpWvxOwkg" key="0:4" value="String"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_oj5jTgRPEeCnwcpWvxOwkg" key="0:5" value="&quot;default value&quot;"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_oj5jTwRPEeCnwcpWvxOwkg" key="1:0" value="out"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_oj5jUARPEeCnwcpWvxOwkg" key="1:1" value="false"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_oj5jUQRPEeCnwcpWvxOwkg" key="1:2" value="true"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_oj5jUgRPEeCnwcpWvxOwkg" key="1:3" value="Result value."/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_oj5jUwRPEeCnwcpWvxOwkg" key="1:4" value="String"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_oj5jVARPEeCnwcpWvxOwkg" key="1:5" value=""/>
   </eAnnotations>
   <pools xmi:type="bpmn:Pool" xmi:id="_QZvnoRcWEd-OSKK6OfNWqA" iD="_QZvnoBcWEd-OSKK6OfNWqA" name="Pool">
     <vertices xmi:type="bpmn:Activity" xmi:id="_QZvnoxcWEd-OSKK6OfNWqA" iD="_QZvnohcWEd-OSKK6OfNWqA" outgoingEdges="_lAOuChcXEd-OSKK6OfNWqA" incomingEdges="_kPgbsRcXEd-OSKK6OfNWqA" name="Save the result" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_NAXbkBcXEd-OSKK6OfNWqA" source="jadex">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_NAXbkRcXEd-OSKK6OfNWqA" key="class" value="WriteContextTask"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_b6hRQBcYEd-OSKK6OfNWqA" key="parameters" value="in␋name␋String␋&quot;out&quot;␟in␋value␋Object␋in"/>
+      </eAnnotations>
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_orCtEARPEeCnwcpWvxOwkg" source="jadex_parameters_table">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_orCtEQRPEeCnwcpWvxOwkg" key="dimension" value="2:4"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_orCtEgRPEeCnwcpWvxOwkg" key="uniqueColumnIndex" value="1"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_orCtEwRPEeCnwcpWvxOwkg" key="0:0" value="in"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_orCtFARPEeCnwcpWvxOwkg" key="0:1" value="name"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_orCtFQRPEeCnwcpWvxOwkg" key="0:2" value="String"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_orCtFgRPEeCnwcpWvxOwkg" key="0:3" value="&quot;out&quot;"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_orCtFwRPEeCnwcpWvxOwkg" key="1:0" value="in"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_orCtGARPEeCnwcpWvxOwkg" key="1:1" value="value"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_orCtGQRPEeCnwcpWvxOwkg" key="1:2" value="Object"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_orCtGgRPEeCnwcpWvxOwkg" key="1:3" value="in"/>
       </eAnnotations>
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_jUWbARcXEd-OSKK6OfNWqA" iD="_jUWbABcXEd-OSKK6OfNWqA" outgoingEdges="_kPgbsRcXEd-OSKK6OfNWqA" activityType="EventStartEmpty"/>

@@ -4,6 +4,8 @@ import jadex.bdibpmn.BpmnPlanBodyInstance;
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ITaskContext;
 import jadex.bpmn.runtime.task.AbstractTask;
+import jadex.bpmn.runtime.task.ParameterMetaInfo;
+import jadex.bpmn.runtime.task.TaskMetaInfo;
 
 /**
  *  Write our print used memory for benchmark agent.
@@ -33,5 +35,20 @@ public class BenchmarkMemoryTask extends AbstractTask
 				inst.getBeliefbase().getBelief("endmem").setFact(endmem);
 			}
 		}
+	}
+	
+	/**
+	 *  Get the meta information about the task.
+	 */
+	public static TaskMetaInfo getMetaInfo()
+	{
+		String desc = "Write our print used memory for benchmark agent.";
+		
+		ParameterMetaInfo pmi1 = new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_IN, 
+			boolean.class, "print", null, "Flag to turn on printing.");
+		ParameterMetaInfo pmi2 = new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_IN, 
+			Long.class, "startmem", null, "The initially used memory.");
+
+		return new TaskMetaInfo(desc, new ParameterMetaInfo[]{pmi1, pmi2}); 
 	}
 }

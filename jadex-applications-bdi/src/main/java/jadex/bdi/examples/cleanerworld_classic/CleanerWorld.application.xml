@@ -8,10 +8,6 @@
 	                    http://jadex.sourceforge.net/jadex-application-2.0.xsd"
 	name="CleanerWorld" package="jadex.bdi.examples.cleanerworld">
 	
-	<!-- <structuringtypes>
-		<structuringtype name="env_type" type="continuous_space"/>
-	</structuringtypes> -->
-	
 	<componenttypes>
 		<componenttype name="EnvironmentLocal" filename="jadex/bdi/examples/cleanerworld_classic/environment/EnvironmentLocal.agent.xml"/>
 		<componenttype name="CleanerLocal" filename="jadex/bdi/examples/cleanerworld_classic/cleaner/CleanerLocal.agent.xml"/>
@@ -21,36 +17,24 @@
 	
 	<applications>
 		<application name="Two cleaners local">
-			<!-- <structurings>
-				<structuring name="env" type="env_type"/>
-			</structurings> -->
 			<components>
 				<component type="EnvironmentLocal" master="true"/>
 				<component type="CleanerLocal" number="2"/>
 			</components>
 		</application>
 		<application name="One cleaner local">
-			<!--  <structurings>
-				<structuring name="env" type="env_type"/>
-			</structurings>-->
 			<components>
 				<component type="EnvironmentLocal" master="true"/>
 				<component type="CleanerLocal"/>
 			</components>
 		</application>
 		<application name="Two cleaners remote">
-			<!--  <structurings>
-				<structuring name="env" type="env_type"/>
-			</structurings>-->
 			<components>
 				<component type="EnvironmentRemote" master="true"/>
 				<component type="CleanerRemote" number="2"/>
 			</components>
 		</application>
 		<application name="One cleaner remote">
-			<!--  <structurings>
-				<structuring name="env" type="env_type"/>
-			</structurings>-->
 			<components>
 				<component type="EnvironmentRemote" master="true"/>
 				<component type="CleanerRemote"/>

@@ -22,6 +22,7 @@ import jadex.bdi.runtime.PlanFailureException;
 import jadex.bdi.runtime.impl.SFlyweightFunctionality;
 import jadex.bdi.runtime.impl.flyweights.BeliefbaseFlyweight;
 import jadex.bdi.runtime.impl.flyweights.CapabilityFlyweight;
+import jadex.bdi.runtime.impl.flyweights.ElementFlyweight;
 import jadex.bdi.runtime.impl.flyweights.EventbaseFlyweight;
 import jadex.bdi.runtime.impl.flyweights.ExpressionFlyweight;
 import jadex.bdi.runtime.impl.flyweights.ExpressionNoModel;
@@ -55,8 +56,11 @@ import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ProcessThread;
 import jadex.bpmn.runtime.handler.AbstractEventIntermediateTimerActivityHandler;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentListener;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.IFuture;
+import jadex.commons.service.IServiceProvider;
 import jadex.commons.service.clock.IClockService;
 import jadex.javaparser.IExpressionParser;
 import jadex.javaparser.IParsedExpression;
@@ -1465,5 +1469,45 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 	public boolean isExternalThread()
 	{
 		return interpreter.isExternalThread();
+	}
+	
+	/**
+	 *  Schedule a step of the agent.
+	 *  May safely be called from external threads.
+	 *  @param step	Code to be executed as a step of the agent.
+	 *  @return The result of the step.
+	 */
+	public IFuture scheduleStep(IComponentStep step)
+	{
+		return interpreter.scheduleStep(step, null);
+	}
+	
+	//-------- IInternalAccess interface --------
+	
+	/**
+	 *  Get the service provider.
+	 *  @return The service provider.
+	 */
+	public IServiceProvider getServiceProvider()
+	{
+		return interpreter.getServiceProvider();
+	}
+	
+	/**
+	 *  Add an component listener.
+	 *  @param listener The listener.
+	 */
+	public void addComponentListener(IComponentListener listener)
+	{
+		ElementFlyweight.addEventListener(listener, interpreter.getAgent(), getState(), interpreter.getAgent());
+	}
+	
+	/**
+	 *  Remove a component listener.
+	 *  @param listener The listener.
+	 */
+	public void removeComponentListener(IComponentListener listener)
+	{
+		ElementFlyweight.removeEventListener(listener, interpreter.getAgent(), false, getState(), interpreter.getAgent());
 	}
 }

@@ -3,6 +3,7 @@ package jadex.bpmn.runtime.handler;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ProcessThread;
+import jadex.commons.IFilter;
 
 /**
  *  Abstract handler for timing events.
@@ -29,6 +30,13 @@ public abstract class AbstractEventIntermediateTimerActivityHandler	extends Defa
 		long duration = dur==null? tick? TICK_TIMER: -1: dur.longValue(); 
 //		thread.setWaitingState(ProcessThread.WAITING_FOR_TIME);
 		thread.setWaiting(true);
+		thread.setWaitFilter(new IFilter()
+		{
+			public boolean filter(Object event)
+			{
+				return TIMER_EVENT.equals(event); 
+			}
+		});
 		doWait(activity, instance, thread, duration);
 	}
 	

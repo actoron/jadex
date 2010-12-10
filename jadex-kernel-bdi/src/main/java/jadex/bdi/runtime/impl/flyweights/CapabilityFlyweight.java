@@ -522,13 +522,13 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 			{
 				public void run()
 				{
-					addEventListener(arg, agent);
+					removeEventListener(arg, agent, false);
 				}
 			};
 		}
 		else
 		{
-			addEventListener(listener, agent);
+			removeEventListener(listener, agent, false);
 		}
 	}
 	

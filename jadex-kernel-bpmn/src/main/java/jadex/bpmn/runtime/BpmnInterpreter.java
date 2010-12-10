@@ -225,6 +225,8 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 		// Assign container
 		this.container = container;
 		
+		initContextVariables();
+		
 		// Create initial thread(s). 
 		List	startevents	= model.getStartActivities();
 		for(int i=0; startevents!=null && i<startevents.size(); i++)
@@ -450,28 +452,12 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 		// Initialize context variables.
 		variables.put("$interpreter", this);
 		
-		Set	vars	= model.getContextVariables();
-		for(Iterator it=vars.iterator(); it.hasNext(); )
+		if(getModel().getName().indexOf("AddTargetPlan")!=-1)
 		{
-			String	name	= (String)it.next();
-			if(!variables.containsKey(name))	// Don't overwrite arguments.
-			{
-				Object	value	= null;
-				IParsedExpression	exp	= model.getContextVariableExpression(name);
-				if(exp!=null)
-				{
-					try
-					{
-						value	= exp.getValue(this.fetcher);
-					}
-					catch(RuntimeException e)
-					{
-						throw new RuntimeException("Error parsing context variable: "+this+", "+name+", "+exp, e);
-					}
-				}
-				variables.put(name, value);
-			}
+			System.out.println("debug sdlkhfyg");
 		}
+		
+		initContextVariables();
 
 		// Start the container and notify cms when start has finished.		
 		getServiceContainer().start().addResultListener(createResultListener(new IResultListener()
@@ -494,6 +480,32 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 				inited.setException(exception);
 			}
 		}));
+	}
+
+	protected void initContextVariables()
+	{
+		Set	vars	= model.getContextVariables();
+		for(Iterator it=vars.iterator(); it.hasNext(); )
+		{
+			String	name	= (String)it.next();
+			if(!variables.containsKey(name))	// Don't overwrite arguments.
+			{
+				Object	value	= null;
+				IParsedExpression	exp	= model.getContextVariableExpression(name);
+				if(exp!=null)
+				{
+					try
+					{
+						value	= exp.getValue(this.fetcher);
+					}
+					catch(RuntimeException e)
+					{
+						throw new RuntimeException("Error parsing context variable: "+this+", "+name+", "+exp, e);
+					}
+				}
+				variables.put(name, value);
+			}
+		}
 	}
 	
 	/**

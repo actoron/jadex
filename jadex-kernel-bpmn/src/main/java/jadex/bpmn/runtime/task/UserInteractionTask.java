@@ -5,6 +5,10 @@ import jadex.bpmn.model.MParameter;
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ITask;
 import jadex.bpmn.runtime.ITaskContext;
+import jadex.bridge.IComponentListener;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IInternalAccess;
+import jadex.commons.ChangeEvent;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.SReflect;
@@ -38,15 +42,44 @@ import javax.swing.SwingUtilities;
  */
 public class UserInteractionTask implements ITask
 {
+	//-------- attributes --------
+	
+	/** The dialog. */
+	protected JDialog	dialog;
+
+	//-------- ITask interface --------
+	
 	/**
 	 *  Execute the task.
 	 *  @param context	The accessible values.
 	 *  @param instance	The process instance executing the task.
 	 *  @listener	To be notified, when the task has completed.
 	 */
-	public IFuture execute(final ITaskContext context, BpmnInterpreter instance)
+	public IFuture execute(final ITaskContext context, final BpmnInterpreter instance)
 	{
 		final Future ret = new Future();
+		
+		final IComponentListener	lis	= new IComponentListener()
+		{
+			public void componentTerminating(ChangeEvent ce)
+			{
+			}
+			
+			public void componentTerminated(ChangeEvent ce)
+			{
+				SwingUtilities.invokeLater(new Runnable()
+				{
+					public void run()
+					{
+						if(dialog!=null)
+						{
+							dialog.setVisible(false);
+						}
+					}
+				});
+			}
+		};
+		instance.addComponentListener(lis);
 		
 		SwingUtilities.invokeLater(new Runnable()
 		{
@@ -149,7 +182,7 @@ public class UserInteractionTask implements ITask
 					pane.setValue(JOptionPane.UNINITIALIZED_VALUE);
 				}
 				
-				final JDialog	dialog	= new JDialog((JFrame)null, context.getModelElement().getName());
+				dialog = new JDialog((JFrame)null, context.getModelElement().getName());
 				dialog.getContentPane().setLayout(new BorderLayout());
 				dialog.getContentPane().add(pane, BorderLayout.CENTER);
 
@@ -158,6 +191,15 @@ public class UserInteractionTask implements ITask
 		            public void windowClosing(WindowEvent we)
 		            {
 		                pane.setValue(null);
+		                
+		                instance.scheduleStep(new IComponentStep()
+						{
+							public Object execute(IInternalAccess ia)
+							{
+								ia.removeComponentListener(lis);
+								return null;
+							}
+						});
 		            }
 		        });
 

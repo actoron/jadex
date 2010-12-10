@@ -3,19 +3,38 @@
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_CtA7gCxXEd-fR-V1BYdsIg" source="jadex">
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_CtA7gSxXEd-fR-V1BYdsIg" key="Description" value=""/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_CtDXwCxXEd-fR-V1BYdsIg" key="Package" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_3QZz8ARPEeCnwcpWvxOwkg" key="editor_version" value="1.0"/>
   </eAnnotations>
   <pools xmi:type="bpmn:Pool" xmi:id="_CUGFNSxXEd-fR-V1BYdsIg" iD="_CUGFNCxXEd-fR-V1BYdsIg" name="Body">
     <vertices xmi:type="bpmn:Activity" xmi:id="_CUGsQSxXEd-fR-V1BYdsIg" iD="_CUGsQCxXEd-fR-V1BYdsIg" outgoingEdges="_HYz8QSxXEd-fR-V1BYdsIg" incomingEdges="_EPjFQSxXEd-fR-V1BYdsIg" name="PrintTask" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_C-wy0CxXEd-fR-V1BYdsIg" source="jadex">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_C-wy0SxXEd-fR-V1BYdsIg" key="class" value="jadex.bpmn.runtime.task.PrintTask"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_LWhvACxXEd-fR-V1BYdsIg" key="parameters" value="in␋text␋java.lang.String␋&quot;RepeatedPlan activated by &quot; + String.valueOf($plan.getReason().getType()) + &quot; counter is &quot; + String.valueOf($beliefbase.counter)"/>
+      </eAnnotations>
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_3QQC8ARPEeCnwcpWvxOwkg" source="jadex_parameters_table">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_3QQC8QRPEeCnwcpWvxOwkg" key="dimension" value="1:4"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_3QQC8gRPEeCnwcpWvxOwkg" key="uniqueColumnIndex" value="1"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_3QQC8wRPEeCnwcpWvxOwkg" key="0:0" value="in"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_3QQC9ARPEeCnwcpWvxOwkg" key="0:1" value="text"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_3QQC9QRPEeCnwcpWvxOwkg" key="0:2" value="java.lang.String"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_3QQC9gRPEeCnwcpWvxOwkg" key="0:3" value="&quot;RepeatedPlan activated by &quot; + String.valueOf($plan.getReason().getType()) + &quot; counter is &quot; + String.valueOf($beliefbase.counter)"/>
       </eAnnotations>
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_DwMPwSxXEd-fR-V1BYdsIg" iD="_DwMPwCxXEd-fR-V1BYdsIg" outgoingEdges="_EPjFQSxXEd-fR-V1BYdsIg" activityType="EventStartEmpty"/>
     <vertices xmi:type="bpmn:Activity" xmi:id="_GuOuMSxXEd-fR-V1BYdsIg" iD="_GuOuMCxXEd-fR-V1BYdsIg" outgoingEdges="_XO32ASxXEd-fR-V1BYdsIg" incomingEdges="_HYz8QSxXEd-fR-V1BYdsIg" name="WriteCounter">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_G0B0MCxXEd-fR-V1BYdsIg" source="jadex">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_G0B0MSxXEd-fR-V1BYdsIg" key="class" value="jadex.bdibpmn.task.WriteBeliefTask"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Y5_UACxXEd-fR-V1BYdsIg" key="parameters" value="in␋beliefname␋java.lang.String␋&quot;counter&quot;␟in␋value␋java.lang.Object␋$beliefbase.counter+1"/>
+      </eAnnotations>
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_3QQC9wRPEeCnwcpWvxOwkg" source="jadex_parameters_table">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_3QQC-ARPEeCnwcpWvxOwkg" key="dimension" value="2:4"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_3QQC-QRPEeCnwcpWvxOwkg" key="uniqueColumnIndex" value="1"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_3QQC-gRPEeCnwcpWvxOwkg" key="0:0" value="in"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_3QQC-wRPEeCnwcpWvxOwkg" key="0:1" value="beliefname"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_3QQC_ARPEeCnwcpWvxOwkg" key="0:2" value="java.lang.String"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_3QQC_QRPEeCnwcpWvxOwkg" key="0:3" value="&quot;counter&quot;"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_3QQC_gRPEeCnwcpWvxOwkg" key="1:0" value="in"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_3QQC_wRPEeCnwcpWvxOwkg" key="1:1" value="value"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_3QQDAARPEeCnwcpWvxOwkg" key="1:2" value="java.lang.Object"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_3QQDAQRPEeCnwcpWvxOwkg" key="1:3" value="$beliefbase.counter+1"/>
       </eAnnotations>
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_WpHdkSxXEd-fR-V1BYdsIg" iD="_WpHdkCxXEd-fR-V1BYdsIg" incomingEdges="_XO32ASxXEd-fR-V1BYdsIg" activityType="EventEndEmpty"/>

@@ -3,13 +3,31 @@
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="__EeU4EbsEd-qm5VDdIP35A" source="jadex">
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="__EeU4UbsEd-qm5VDdIP35A" key="Description" value=""/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="__EeU4kbsEd-qm5VDdIP35A" key="Package" value="jadex.bdibpmn.examples.marsworld"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_E-p6sEb1Ed-qm5VDdIP35A" key="imports" value="jadex.bridge.IComponentIdentifier␟jadex.application.space.agr.AGRSpace␟jadex.application.runtime.*"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-T9yyQROEeCnwcpWvxOwkg" key="editor_version" value="1.0"/>
+  </eAnnotations>
+  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_-J_XYAROEeCnwcpWvxOwkg" source="jadex_imports_table">
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-J_XYQROEeCnwcpWvxOwkg" key="dimension" value="3:1"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-J_XYgROEeCnwcpWvxOwkg" key="uniqueColumnIndex" value="0"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-J_XYwROEeCnwcpWvxOwkg" key="0:0" value="jadex.bridge.IComponentIdentifier"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-J_XZAROEeCnwcpWvxOwkg" key="1:0" value="jadex.application.space.agr.AGRSpace"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-J_XZQROEeCnwcpWvxOwkg" key="2:0" value="jadex.application.runtime.*"/>
   </eAnnotations>
   <pools xmi:type="bpmn:Pool" xmi:id="__d4JgYAREd6N8dR31QwQkg" iD="__d4JgIAREd6N8dR31QwQkg" name="Body">
     <vertices xmi:type="bpmn:Activity" xmi:id="__d4Jg4AREd6N8dR31QwQkg" iD="__d4JgoAREd6N8dR31QwQkg" outgoingEdges="_Z_RkmoASEd6N8dR31QwQkg" name="Find Sentries" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_HogR0Eb1Ed-qm5VDdIP35A" source="jadex">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_HogR0Ub1Ed-qm5VDdIP35A" key="class" value=""/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_IlllIEb1Ed-qm5VDdIP35A" key="parameters" value="in␋agrs␋AGRSpace␋((IApplicationExternalAccess)$scope.getParent()).getSpace(&quot;myagrspace&quot;)␟out␋sentries␋IComponentIdentifier[]␋agrs.getGroup(&quot;mymarsteam&quot;).getAgentsForRole(&quot;sentry&quot;)"/>
+      </eAnnotations>
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_-T0o0AROEeCnwcpWvxOwkg" source="jadex_parameters_table">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-T0o0QROEeCnwcpWvxOwkg" key="dimension" value="2:4"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-T0o0gROEeCnwcpWvxOwkg" key="uniqueColumnIndex" value="1"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-T0o0wROEeCnwcpWvxOwkg" key="0:0" value="in"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-T0o1AROEeCnwcpWvxOwkg" key="0:1" value="agrs"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-T0o1QROEeCnwcpWvxOwkg" key="0:2" value="AGRSpace"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-T0o1gROEeCnwcpWvxOwkg" key="0:3" value="((IApplicationExternalAccess)$scope.getParent()).getSpace(&quot;myagrspace&quot;)"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-T0o1wROEeCnwcpWvxOwkg" key="1:0" value="out"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-T0o2AROEeCnwcpWvxOwkg" key="1:1" value="sentries"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-T0o2QROEeCnwcpWvxOwkg" key="1:2" value="IComponentIdentifier[]"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-T0o2gROEeCnwcpWvxOwkg" key="1:3" value="agrs.getGroup(&quot;mymarsteam&quot;).getAgentsForRole(&quot;sentry&quot;)"/>
       </eAnnotations>
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_Z_RkkYASEd6N8dR31QwQkg" iD="_Z_RkkIASEd6N8dR31QwQkg" outgoingEdges="_vmPtAYASEd6N8dR31QwQkg _x02SkYASEd6N8dR31QwQkg" incomingEdges="_Z_RkmoASEd6N8dR31QwQkg" activityType="GatewayDataBasedExclusive"/>
@@ -20,11 +38,18 @@
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_S84wI0b1Ed-qm5VDdIP35A" key="message" value=""/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_S84wJEb1Ed-qm5VDdIP35A" key="filter" value=""/>
       </eAnnotations>
-      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_T_yXkEb1Ed-qm5VDdIP35A" source="activity">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_T_yXkUb1Ed-qm5VDdIP35A" key="parameters" value="receivers␋sentries␟content␋$plan.getReason().getValue()␟type␋&quot;inform_target&quot;"/>
-      </eAnnotations>
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_DTw-IFa3Ed-1RJ7RXx1qjA" source="isThrowing">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_DTw-IVa3Ed-1RJ7RXx1qjA" key="isThrowing" value="true"/>
+      </eAnnotations>
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_-T9ywAROEeCnwcpWvxOwkg" source="jadex_parameters_table">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-T9ywQROEeCnwcpWvxOwkg" key="dimension" value="3:2"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-T9ywgROEeCnwcpWvxOwkg" key="uniqueColumnIndex" value="1"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-T9ywwROEeCnwcpWvxOwkg" key="0:0" value="receivers"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-T9yxAROEeCnwcpWvxOwkg" key="0:1" value="sentries"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-T9yxQROEeCnwcpWvxOwkg" key="1:0" value="content"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-T9yxgROEeCnwcpWvxOwkg" key="1:1" value="$plan.getReason().getValue()"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-T9yxwROEeCnwcpWvxOwkg" key="2:0" value="type"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-T9yyAROEeCnwcpWvxOwkg" key="2:1" value="&quot;inform_target&quot;"/>
       </eAnnotations>
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_u93eYYASEd6N8dR31QwQkg" iD="_u93eYIASEd6N8dR31QwQkg" incomingEdges="_v5n8AYASEd6N8dR31QwQkg _x02SkYASEd6N8dR31QwQkg" activityType="EventEndEmpty"/>

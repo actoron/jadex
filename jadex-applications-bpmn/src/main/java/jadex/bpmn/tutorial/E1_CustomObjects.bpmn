@@ -3,40 +3,92 @@
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_VZYJQEcMEd-EYsKM4dybJQ" source="jadex">
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_VZYJQUcMEd-EYsKM4dybJQ" key="Description" value="&lt;h1>Insurance Contract&lt;/h1> The process sells an insurance contract based on a business rule encoded in a custom Java object.&lt;br/> High risk contracts are sold to single males of age below 40."/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_VZYJQkcMEd-EYsKM4dybJQ" key="Package" value="jadex.bpmn.tutorial"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_lnxfsGKFEd-Q9q1HfsZXQw" key="arguments" value="customer␋false␋false␋The customer.␋Customer␋"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_xLY9rARPEeCnwcpWvxOwkg" key="editor_version" value="1.0"/>
+  </eAnnotations>
+  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_xDpWwARPEeCnwcpWvxOwkg" source="jadex_arguments_table">
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_xDpWwQRPEeCnwcpWvxOwkg" key="dimension" value="1:6"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_xDpWwgRPEeCnwcpWvxOwkg" key="uniqueColumnIndex" value="0"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_xDpWwwRPEeCnwcpWvxOwkg" key="0:0" value="customer"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_xDpWxARPEeCnwcpWvxOwkg" key="0:1" value="false"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_xDpWxQRPEeCnwcpWvxOwkg" key="0:2" value="false"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_xDpWxgRPEeCnwcpWvxOwkg" key="0:3" value="The customer."/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_xDpWxwRPEeCnwcpWvxOwkg" key="0:4" value="Customer"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_xDpWyARPEeCnwcpWvxOwkg" key="0:5" value=""/>
   </eAnnotations>
   <pools xmi:type="bpmn:Pool" xmi:id="_UdVXwUcMEd-EYsKM4dybJQ" iD="_UdVXwEcMEd-EYsKM4dybJQ" name="Pool">
     <vertices xmi:type="bpmn:Activity" xmi:id="_UdVXw0cMEd-EYsKM4dybJQ" iD="_UdVXwkcMEd-EYsKM4dybJQ" outgoingEdges="_s--hmkcMEd-EYsKM4dybJQ" name="Input Customer Data" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_VrZtYEcMEd-EYsKM4dybJQ" source="jadex">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_VrZtYUcMEd-EYsKM4dybJQ" key="class" value="jadex.bpmn.runtime.task.UserInteractionTask"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Z1NbYEcMEd-EYsKM4dybJQ" key="parameters" value="out␋name␋String␋&quot;Hans Wurst&quot;␟out␋gender␋String␋&quot;male&quot;␟out␋age␋int␋43␟out␋married␋boolean␋false"/>
+      </eAnnotations>
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_xLY9gARPEeCnwcpWvxOwkg" source="jadex_parameters_table">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_xLY9gQRPEeCnwcpWvxOwkg" key="dimension" value="4:4"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_xLY9ggRPEeCnwcpWvxOwkg" key="uniqueColumnIndex" value="1"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_xLY9gwRPEeCnwcpWvxOwkg" key="0:0" value="out"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_xLY9hARPEeCnwcpWvxOwkg" key="0:1" value="name"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_xLY9hQRPEeCnwcpWvxOwkg" key="0:2" value="String"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_xLY9hgRPEeCnwcpWvxOwkg" key="0:3" value="&quot;Hans Wurst&quot;"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_xLY9hwRPEeCnwcpWvxOwkg" key="1:0" value="out"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_xLY9iARPEeCnwcpWvxOwkg" key="1:1" value="gender"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_xLY9iQRPEeCnwcpWvxOwkg" key="1:2" value="String"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_xLY9igRPEeCnwcpWvxOwkg" key="1:3" value="&quot;male&quot;"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_xLY9iwRPEeCnwcpWvxOwkg" key="2:0" value="out"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_xLY9jARPEeCnwcpWvxOwkg" key="2:1" value="age"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_xLY9jQRPEeCnwcpWvxOwkg" key="2:2" value="int"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_xLY9jgRPEeCnwcpWvxOwkg" key="2:3" value="43"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_xLY9jwRPEeCnwcpWvxOwkg" key="3:0" value="out"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_xLY9kARPEeCnwcpWvxOwkg" key="3:1" value="married"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_xLY9kQRPEeCnwcpWvxOwkg" key="3:2" value="boolean"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_xLY9kgRPEeCnwcpWvxOwkg" key="3:3" value="false"/>
       </eAnnotations>
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_s--hkUcMEd-EYsKM4dybJQ" iD="_s--hkEcMEd-EYsKM4dybJQ" outgoingEdges="_5yScCkcMEd-EYsKM4dybJQ" incomingEdges="_s--hmkcMEd-EYsKM4dybJQ" name="Create Customer Object" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_0lb8oEcMEd-EYsKM4dybJQ" source="jadex">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_0lb8oUcMEd-EYsKM4dybJQ" key="class" value=""/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_5bNKAEcSEd-EYsKM4dybJQ" key="parameters" value="out␋customer␋Customer␋new Customer(name, gender, age, married)"/>
+      </eAnnotations>
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_xLY9kwRPEeCnwcpWvxOwkg" source="jadex_parameters_table">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_xLY9lARPEeCnwcpWvxOwkg" key="dimension" value="1:4"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_xLY9lQRPEeCnwcpWvxOwkg" key="uniqueColumnIndex" value="1"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_xLY9lgRPEeCnwcpWvxOwkg" key="0:0" value="out"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_xLY9lwRPEeCnwcpWvxOwkg" key="0:1" value="customer"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_xLY9mARPEeCnwcpWvxOwkg" key="0:2" value="Customer"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_xLY9mQRPEeCnwcpWvxOwkg" key="0:3" value="new Customer(name, gender, age, married)"/>
       </eAnnotations>
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_5yScAUcMEd-EYsKM4dybJQ" iD="_5yScAEcMEd-EYsKM4dybJQ" outgoingEdges="_6jTpQUcMEd-EYsKM4dybJQ _7BZ6ikcMEd-EYsKM4dybJQ" incomingEdges="_5yScCkcMEd-EYsKM4dybJQ" activityType="GatewayDataBasedExclusive"/>
     <vertices xmi:type="bpmn:Activity" xmi:id="_6jKfUUcMEd-EYsKM4dybJQ" iD="_6jKfUEcMEd-EYsKM4dybJQ" incomingEdges="_6jTpQUcMEd-EYsKM4dybJQ" name="Sell High Risk Contract" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_7RzG8EcMEd-EYsKM4dybJQ" source="jadex">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_7RzG8UcMEd-EYsKM4dybJQ" key="class" value="jadex.bpmn.runtime.task.UserInteractionTask"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Si1kgEcNEd-EYsKM4dybJQ" key="parameters" value="in␋customer␋Object␋customer"/>
+      </eAnnotations>
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_xLY9mgRPEeCnwcpWvxOwkg" source="jadex_parameters_table">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_xLY9mwRPEeCnwcpWvxOwkg" key="dimension" value="1:4"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_xLY9nARPEeCnwcpWvxOwkg" key="uniqueColumnIndex" value="1"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_xLY9nQRPEeCnwcpWvxOwkg" key="0:0" value="in"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_xLY9ngRPEeCnwcpWvxOwkg" key="0:1" value="customer"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_xLY9nwRPEeCnwcpWvxOwkg" key="0:2" value="Object"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_xLY9oARPEeCnwcpWvxOwkg" key="0:3" value="customer"/>
       </eAnnotations>
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_7BZ6gUcMEd-EYsKM4dybJQ" iD="_7BZ6gEcMEd-EYsKM4dybJQ" incomingEdges="_7BZ6ikcMEd-EYsKM4dybJQ" name="Sell Standard Contract" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_7b7TUEcMEd-EYsKM4dybJQ" source="jadex">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_7b7TUUcMEd-EYsKM4dybJQ" key="class" value="jadex.bpmn.runtime.task.UserInteractionTask"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_TNwJwEcNEd-EYsKM4dybJQ" key="parameters" value="in␋customer␋Object␋customer"/>
+      </eAnnotations>
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_xLY9oQRPEeCnwcpWvxOwkg" source="jadex_parameters_table">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_xLY9ogRPEeCnwcpWvxOwkg" key="dimension" value="1:4"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_xLY9owRPEeCnwcpWvxOwkg" key="uniqueColumnIndex" value="1"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_xLY9pARPEeCnwcpWvxOwkg" key="0:0" value="in"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_xLY9pQRPEeCnwcpWvxOwkg" key="0:1" value="customer"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_xLY9pgRPEeCnwcpWvxOwkg" key="0:2" value="Object"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_xLY9pwRPEeCnwcpWvxOwkg" key="0:3" value="customer"/>
       </eAnnotations>
     </vertices>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_s--hmkcMEd-EYsKM4dybJQ" iD="_s--hmUcMEd-EYsKM4dybJQ">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_tVLbEEcMEd-EYsKM4dybJQ" source="jadex">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_tVLbEUcMEd-EYsKM4dybJQ" key="condition" value=""/>
       </eAnnotations>
-      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_uFTQcEcMEd-EYsKM4dybJQ" source="sequence">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_uFTQcUcMEd-EYsKM4dybJQ" key="mappings" value="␋"/>
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_xLY9qARPEeCnwcpWvxOwkg" source="jadex_mappings_table">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_xLY9qQRPEeCnwcpWvxOwkg" key="dimension" value="1:1"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_xLY9qgRPEeCnwcpWvxOwkg" key="uniqueColumnIndex" value="0"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_xLY9qwRPEeCnwcpWvxOwkg" key="0:0" value=""/>
       </eAnnotations>
     </sequenceEdges>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_5yScCkcMEd-EYsKM4dybJQ" iD="_5yScCUcMEd-EYsKM4dybJQ">

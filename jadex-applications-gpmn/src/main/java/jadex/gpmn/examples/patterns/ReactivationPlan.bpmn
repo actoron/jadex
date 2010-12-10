@@ -3,12 +3,24 @@
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_yeBH4CxXEd-fR-V1BYdsIg" source="jadex">
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_yeBH4SxXEd-fR-V1BYdsIg" key="Description" value=""/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_yeDkICxXEd-fR-V1BYdsIg" key="Package" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_2CqOewRPEeCnwcpWvxOwkg" key="editor_version" value="1.0"/>
   </eAnnotations>
   <pools xmi:type="bpmn:Pool" xmi:id="_x8ZBhSxXEd-fR-V1BYdsIg" iD="_x8ZBhCxXEd-fR-V1BYdsIg" name="Body">
     <vertices xmi:type="bpmn:Activity" xmi:id="_x8aPoCxXEd-fR-V1BYdsIg" iD="_x8ZokCxXEd-fR-V1BYdsIg" outgoingEdges="_1SvSQCxXEd-fR-V1BYdsIg" incomingEdges="_0X1wQSxXEd-fR-V1BYdsIg" name="ReactivationTask" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_yyVyECxXEd-fR-V1BYdsIg" source="jadex">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_yyVyESxXEd-fR-V1BYdsIg" key="class" value="jadex.bdibpmn.task.DispatchGoalTask"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_3nIWwCxXEd-fR-V1BYdsIg" key="parameters" value="in␋type␋java.lang.String␋&quot;RepeatableSubGoal&quot;␟in␋wait␋boolean␋true"/>
+      </eAnnotations>
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_2CqOcARPEeCnwcpWvxOwkg" source="jadex_parameters_table">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_2CqOcQRPEeCnwcpWvxOwkg" key="dimension" value="2:4"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_2CqOcgRPEeCnwcpWvxOwkg" key="uniqueColumnIndex" value="1"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_2CqOcwRPEeCnwcpWvxOwkg" key="0:0" value="in"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_2CqOdARPEeCnwcpWvxOwkg" key="0:1" value="type"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_2CqOdQRPEeCnwcpWvxOwkg" key="0:2" value="java.lang.String"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_2CqOdgRPEeCnwcpWvxOwkg" key="0:3" value="&quot;RepeatableSubGoal&quot;"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_2CqOdwRPEeCnwcpWvxOwkg" key="1:0" value="in"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_2CqOeARPEeCnwcpWvxOwkg" key="1:1" value="wait"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_2CqOeQRPEeCnwcpWvxOwkg" key="1:2" value="boolean"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_2CqOegRPEeCnwcpWvxOwkg" key="1:3" value="true"/>
       </eAnnotations>
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_zecDESxXEd-fR-V1BYdsIg" iD="_zecDECxXEd-fR-V1BYdsIg" outgoingEdges="_0X1wQSxXEd-fR-V1BYdsIg" activityType="EventStartEmpty"/>

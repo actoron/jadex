@@ -39,15 +39,13 @@ public class ExecuteStepTask extends AbstractTask
 	
 	//-------- static methods --------
 	
-//	/**
-//	 *  Get the meta information about the agent.
-//	 */
-//	public static TaskMetaInfo getMetaInfo()
-//	{
-//		String desc = "Task is for executing an externally scheduled action.";
-//		ParameterMetaInfo textmi = new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_IN, 
-//			String.class, "text", null, "The text parameter should contain the text to be printed.");
-//		
-//		return new TaskMetaInfo(desc, new ParameterMetaInfo[]{textmi}); 
-//	}
+	/**
+	 *  Get the meta information about the agent.
+	 */
+	public static TaskMetaInfo getMetaInfo()
+	{
+		String desc = "Task is for executing an externally scheduled action.\nThis task should not be used directly.";
+		
+		return new TaskMetaInfo(desc, new ParameterMetaInfo[0]); 
+	}
 }

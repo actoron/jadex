@@ -4,6 +4,8 @@ import jadex.bdi.runtime.ICandidateInfo;
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ITaskContext;
 import jadex.bpmn.runtime.task.AbstractTask;
+import jadex.bpmn.runtime.task.ParameterMetaInfo;
+import jadex.bpmn.runtime.task.TaskMetaInfo;
 import jadex.commons.SUtil;
 
 import java.util.ArrayList;
@@ -14,6 +16,25 @@ import java.util.List;
  */
 public class ChooseMoveTask extends AbstractTask
 {
+	/**
+	 *  Get the meta information about the task.
+	 */
+	public static TaskMetaInfo getMetaInfo()
+	{
+		String desc = "Write our print used memory for benchmark agent.";
+		
+		ParameterMetaInfo pmi1 = new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_IN, 
+			ICandidateInfo[].class, "applicables", null, "The available move plans.");
+		ParameterMetaInfo pmi2 = new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_IN, 
+			IBoard.class, "board", null, "The game board.");
+		ParameterMetaInfo pmi3 = new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_IN, 
+			String.class, "ml", null, "The meta-level reasoning strategy.");
+		ParameterMetaInfo pmi4 = new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_OUT, 
+			ICandidateInfo.class, "result", null, "The selected plan.");
+
+		return new TaskMetaInfo(desc, new ParameterMetaInfo[]{pmi1, pmi2, pmi3, pmi4}); 
+	}
+	
 	//-------- methods --------
 	
 	public void doExecute(ITaskContext context, BpmnInterpreter instance) throws Exception

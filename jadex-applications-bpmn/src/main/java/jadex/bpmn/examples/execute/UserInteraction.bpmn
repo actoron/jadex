@@ -3,6 +3,7 @@
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="__OVAwDZfEd-GR8OzZk56OA" source="jadex">
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="__OVAwTZfEd-GR8OzZk56OA" key="Description" value=""/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="__OVAwjZfEd-GR8OzZk56OA" key="Package" value="jadex.bpmn.examples.execute"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_iGA50ARPEeCnwcpWvxOwkg" key="editor_version" value="1.0"/>
   </eAnnotations>
   <artifacts xmi:type="bpmn:TextAnnotation" xmi:id="_oCuPIW1kEd6B3oAuT8wltw" iD="_oCuPIG1kEd6B3oAuT8wltw" name="import jadex.bpmn.runtime.task.UserInteractionTask;">
     <associations xmi:type="bpmn:Association" xmi:id="_oC3ZEW1kEd6B3oAuT8wltw"/>

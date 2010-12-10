@@ -3,12 +3,20 @@
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="__GHekEJVEd-lXM2_JTGF5Q" source="jadex">
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="__GHekUJVEd-lXM2_JTGF5Q" key="Description" value="&lt;h1>Message Receival&lt;/h1> This process waits for a request message and then prints the content."/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="__GHekkJVEd-lXM2_JTGF5Q" key="Package" value="jadex.bpmn.tutorial"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wAU4owRPEeCnwcpWvxOwkg" key="editor_version" value="1.0"/>
   </eAnnotations>
   <pools xmi:type="bpmn:Pool" xmi:id="_-wEWF0JVEd-lXM2_JTGF5Q" iD="_-wEWFkJVEd-lXM2_JTGF5Q" name="Pool">
     <vertices xmi:type="bpmn:Activity" xmi:id="_-wEWGUJVEd-lXM2_JTGF5Q" iD="_-wEWGEJVEd-lXM2_JTGF5Q" outgoingEdges="_GvBwukJWEd-lXM2_JTGF5Q" name="Preparation" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="__VBdQEJVEd-lXM2_JTGF5Q" source="jadex">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="__VBdQUJVEd-lXM2_JTGF5Q" key="class" value="jadex.bpmn.runtime.task.PrintTask"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_BuWsIEJWEd-lXM2_JTGF5Q" key="parameters" value="in␋text␋java.lang.String␋&quot;Send this process a message using the conversation center.&quot;"/>
+      </eAnnotations>
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_wAU4kARPEeCnwcpWvxOwkg" source="jadex_parameters_table">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wAU4kQRPEeCnwcpWvxOwkg" key="dimension" value="1:4"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wAU4kgRPEeCnwcpWvxOwkg" key="uniqueColumnIndex" value="1"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wAU4kwRPEeCnwcpWvxOwkg" key="0:0" value="in"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wAU4lARPEeCnwcpWvxOwkg" key="0:1" value="text"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wAU4lQRPEeCnwcpWvxOwkg" key="0:2" value="java.lang.String"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wAU4lgRPEeCnwcpWvxOwkg" key="0:3" value="&quot;Send this process a message using the conversation center.&quot;"/>
       </eAnnotations>
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_GvBwsUJWEd-lXM2_JTGF5Q" iD="_GvBwsEJWEd-lXM2_JTGF5Q" outgoingEdges="_WoxQmkJWEd-lXM2_JTGF5Q" incomingEdges="_GvBwukJWEd-lXM2_JTGF5Q" activityType="EventIntermediateMessage">
@@ -18,14 +26,24 @@
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_HjxnY0JWEd-lXM2_JTGF5Q" key="message" value=""/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_HjxnZEJWEd-lXM2_JTGF5Q" key="filter" value=""/>
       </eAnnotations>
-      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_-TF6YEL-Ed-1Spke1QkQhw" source="activity">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-TF6YUL-Ed-1Spke1QkQhw" key="parameters" value="performative␋&quot;request&quot;"/>
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_wAU4lwRPEeCnwcpWvxOwkg" source="jadex_parameters_table">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wAU4mARPEeCnwcpWvxOwkg" key="dimension" value="1:2"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wAU4mQRPEeCnwcpWvxOwkg" key="uniqueColumnIndex" value="1"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wAU4mgRPEeCnwcpWvxOwkg" key="0:0" value="performative"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wAU4mwRPEeCnwcpWvxOwkg" key="0:1" value="&quot;request&quot;"/>
       </eAnnotations>
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_WoxQkUJWEd-lXM2_JTGF5Q" iD="_WoxQkEJWEd-lXM2_JTGF5Q" incomingEdges="_WoxQmkJWEd-lXM2_JTGF5Q" name="Order Received" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_WxkAMEJWEd-lXM2_JTGF5Q" source="jadex">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_WxkAMUJWEd-lXM2_JTGF5Q" key="class" value="jadex.bpmn.runtime.task.PrintTask"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Z4DQAEJWEd-lXM2_JTGF5Q" key="parameters" value="in␋text␋java.lang.String␋&quot;Received order: &quot;+$event.content"/>
+      </eAnnotations>
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_wAU4nARPEeCnwcpWvxOwkg" source="jadex_parameters_table">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wAU4nQRPEeCnwcpWvxOwkg" key="dimension" value="1:4"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wAU4ngRPEeCnwcpWvxOwkg" key="uniqueColumnIndex" value="1"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wAU4nwRPEeCnwcpWvxOwkg" key="0:0" value="in"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wAU4oARPEeCnwcpWvxOwkg" key="0:1" value="text"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wAU4oQRPEeCnwcpWvxOwkg" key="0:2" value="java.lang.String"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wAU4ogRPEeCnwcpWvxOwkg" key="0:3" value="&quot;Received order: &quot;+$event.content"/>
       </eAnnotations>
     </vertices>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_GvBwukJWEd-lXM2_JTGF5Q" iD="_GvBwuUJWEd-lXM2_JTGF5Q"/>

@@ -13,7 +13,7 @@
 	name="GarbageCollector" package="jadex.bdi.examples.garbagecollector">
 	
 	<componenttypes>
-		<componenttype name="Environment" filename="jadex/bdi/examples/garbagecollector_classic/Environment.agent.xml"/>
+		<componenttype name="Environment" filename="jadex/bdi/examples/garbagecollector_classic/Environment.agent.xml" master="true"/>
 		<componenttype name="Collector" filename="jadex/bdi/examples/garbagecollector_classic/GarbageCollector.agent.xml"/>
 		<componenttype name="Burner" filename="jadex/bdi/examples/garbagecollector_classic/GarbageBurner.agent.xml"/>
 	</componenttypes>
@@ -21,21 +21,21 @@
 	<applications>
 		<application name="Two Burners / Two Collectors">
 			<components>
-				<component type="Environment" master="true"/>
+				<component type="Environment"/>
 				<component type="Collector" number="2"/>
 				<component type="Burner" number="2" />
 			</components>
 		</application>
 		<application name="One Burner / One Collector">
 			<components>
-				<component type="Environment" master="true"/>
+				<component type="Environment"/>
 				<component type="Collector"/>
 				<component type="Burner"/>
 			</components>
 		</application>
 		<application name="Two Burners / Six Collectors">
 			<components>
-				<component type="Environment" master="true"/>
+				<component type="Environment"/>
 				<component type="Collector" number="6"/>
 				<component type="Burner" number="2" />
 			</components>

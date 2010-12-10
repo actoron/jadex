@@ -3,6 +3,7 @@
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_KkF3EEYiEd-3iKqz0F2Flw" source="jadex">
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_KkF3EUYiEd-3iKqz0F2Flw" key="Description" value="&lt;h1>Message Sending Process&lt;/h1> This process sends a message as expected by process D3."/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_KkF3EkYiEd-3iKqz0F2Flw" key="Package" value="jadex.bpmn.tutorial"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wqnyyQRPEeCnwcpWvxOwkg" key="editor_version" value="1.0"/>
   </eAnnotations>
   <pools xmi:type="bpmn:Pool" xmi:id="_-KYIYUYhEd-3iKqz0F2Flw" iD="_-KYIYEYhEd-3iKqz0F2Flw" name="Pool">
     <vertices xmi:type="bpmn:Activity" xmi:id="_p4OoYUYiEd-3iKqz0F2Flw" iD="_p4OoYEYiEd-3iKqz0F2Flw" outgoingEdges="_q6FG-kYiEd-3iKqz0F2Flw" activityType="EventStartEmpty"/>
@@ -13,11 +14,18 @@
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_rVMVo0YiEd-3iKqz0F2Flw" key="message" value=""/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_rVMVpEYiEd-3iKqz0F2Flw" key="filter" value=""/>
       </eAnnotations>
-      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_tjmt8EYiEd-3iKqz0F2Flw" source="activity">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_tjmt8UYiEd-3iKqz0F2Flw" key="parameters" value="performative␋&quot;request&quot;␟content␋&quot;Order sent by D5&quot;␟receivers␋$interpreter.createComponentIdentifier(&quot;D3_MessageReceival&quot;)"/>
-      </eAnnotations>
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_Jxev0Fa0Ed-1RJ7RXx1qjA" source="isThrowing">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Jxev0Va0Ed-1RJ7RXx1qjA" key="isThrowing" value="true"/>
+      </eAnnotations>
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_wqnywARPEeCnwcpWvxOwkg" source="jadex_parameters_table">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wqnywQRPEeCnwcpWvxOwkg" key="dimension" value="3:2"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wqnywgRPEeCnwcpWvxOwkg" key="uniqueColumnIndex" value="1"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wqnywwRPEeCnwcpWvxOwkg" key="0:0" value="performative"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wqnyxARPEeCnwcpWvxOwkg" key="0:1" value="&quot;request&quot;"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wqnyxQRPEeCnwcpWvxOwkg" key="1:0" value="content"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wqnyxgRPEeCnwcpWvxOwkg" key="1:1" value="&quot;Order sent by D5&quot;"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wqnyxwRPEeCnwcpWvxOwkg" key="2:0" value="receivers"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wqnyyARPEeCnwcpWvxOwkg" key="2:1" value="$interpreter.createComponentIdentifier(&quot;D3_MessageReceival&quot;)"/>
       </eAnnotations>
     </vertices>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_q6FG-kYiEd-3iKqz0F2Flw" iD="_q6FG-UYiEd-3iKqz0F2Flw"/>

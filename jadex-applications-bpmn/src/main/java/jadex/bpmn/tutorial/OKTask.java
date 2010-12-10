@@ -32,11 +32,11 @@ public class OKTask extends AbstractTask
 	public static TaskMetaInfo getMetaInfo()
 	{
 		String desc = "A task that displays a message using a JOptionPane.";
-		ParameterMetaInfo textmi	= new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_IN, 
+		ParameterMetaInfo pmi1	= new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_IN, 
 				String.class, "message", null, "The message to be shown.");
-		ParameterMetaInfo levelmi	= new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_IN, 
+		ParameterMetaInfo pmi2	= new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_IN, 
 				String.class, "title", null, "The title of the dialog.");
 		
-		return new TaskMetaInfo(desc, new ParameterMetaInfo[]{textmi, levelmi}); 
+		return new TaskMetaInfo(desc, new ParameterMetaInfo[]{pmi1, pmi2}); 
 	}
 }

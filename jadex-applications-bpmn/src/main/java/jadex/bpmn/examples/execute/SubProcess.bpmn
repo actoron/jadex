@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_I4gXMW1WEd6B3oAuT8wltw" iD="_I4gXMG1WEd6B3oAuT8wltw">
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_j4KuIFdfEd-gpfWhYqU7MQ" source="jadex">
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_j4KuIVdfEd-gpfWhYqU7MQ" key="imports" value=""/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_j4KuIldfEd-gpfWhYqU7MQ" key="Description" value=""/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_j4KuI1dfEd-gpfWhYqU7MQ" key="Package" value="jadex.bpmn.examples.execute"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_hik1kARPEeCnwcpWvxOwkg" key="editor_version" value="1.0"/>
   </eAnnotations>
   <pools xmi:type="bpmn:Pool" xmi:id="_I49DIW1WEd6B3oAuT8wltw" iD="_I49DIG1WEd6B3oAuT8wltw" name="Pool">
     <vertices xmi:type="bpmn:Activity" xmi:id="_I49DI21WEd6B3oAuT8wltw" iD="_I49DIm1WEd6B3oAuT8wltw" outgoingEdges="_Kx9MNm1WEd6B3oAuT8wltw" name="" activityType="EventStartEmpty" looping="false"/>

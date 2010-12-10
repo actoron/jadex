@@ -274,18 +274,29 @@ public abstract class ElementFlyweight implements IElement
 	{
 		assert handle!=null;
 		
-		Object le = getState().getAttributeValue(getScope(), OAVBDIRuntimeModel.capability_has_listeners, listener);
-		if(le==null)
-		{
-			le = getState().createObject(OAVBDIRuntimeModel.listenerentry_type);
-			getState().setAttributeValue(le, OAVBDIRuntimeModel.listenerentry_has_listener, listener);
-			getState().setAttributeValue(le, OAVBDIRuntimeModel.listenerentry_has_scope, getScope());
-			getState().addAttributeValue(getScope(), OAVBDIRuntimeModel.capability_has_listeners, le);
-		}			
-		getState().addAttributeValue(le, OAVBDIRuntimeModel.listenerentry_has_relevants, handle);
-		getInterpreter().getEventReificator().addObservedElement(handle);
+		IOAVState	state	= getState();
+		Object	scope	= getScope();
+		
+		addEventListener(listener, handle, state, scope);
 		
 //		System.out.println("addLis: "+getScope()+" "+listener+" "+handle+" "+getState().getAttributeValues(getScope(), OAVBDIRuntimeModel.capability_has_listeners));
+	}
+
+	/**
+	 *  Add an event listener to the agent.
+	 */
+	public static void addEventListener(Object listener, Object handle, IOAVState state, Object scope)
+	{
+		Object le = state.getAttributeValue(scope, OAVBDIRuntimeModel.capability_has_listeners, listener);
+		if(le==null)
+		{
+			le = state.createObject(OAVBDIRuntimeModel.listenerentry_type);
+			state.setAttributeValue(le, OAVBDIRuntimeModel.listenerentry_has_listener, listener);
+			state.setAttributeValue(le, OAVBDIRuntimeModel.listenerentry_has_scope, scope);
+			state.addAttributeValue(scope, OAVBDIRuntimeModel.capability_has_listeners, le);
+		}			
+		state.addAttributeValue(le, OAVBDIRuntimeModel.listenerentry_has_relevants, handle);
+		BDIInterpreter.getInterpreter(state).getEventReificator().addObservedElement(handle);
 	}
 	
 	/**
@@ -299,26 +310,36 @@ public abstract class ElementFlyweight implements IElement
 		assert handle!=null;
 		
 //		System.out.println("remLis: "+getScope()+" "+listener+" "+getState().getAttributeValues(getScope(), OAVBDIRuntimeModel.capability_has_listeners));
+		IOAVState	state	= getState();
+		Object	scope	= getScope();
 
-		Object le = getState().getAttributeValue(getScope(), OAVBDIRuntimeModel.capability_has_listeners, listener);
+		removeEventListener(listener, handle, failsafe, state, scope);
+	}
+
+	/**
+	 *  Remove an event listener.
+	 */
+	public static void removeEventListener(Object listener, Object handle, boolean failsafe, IOAVState state, Object scope)
+	{
+		Object le = state.getAttributeValue(scope, OAVBDIRuntimeModel.capability_has_listeners, listener);
 		if(le==null && !failsafe)
 		{
 			throw new RuntimeException("Listener not found: "+listener);
 		}
 		else if(le!=null)
 		{
-			Collection coll = getState().getAttributeValues(le, OAVBDIRuntimeModel.listenerentry_has_relevants);
+			Collection coll = state.getAttributeValues(le, OAVBDIRuntimeModel.listenerentry_has_relevants);
 			if(!coll.contains(handle) && !failsafe)
 			{
 				throw new RuntimeException("Listener could not be removed properly: "+listener);
 			}
 			else if(coll.contains(handle))
 			{
-				getState().removeAttributeValue(le, OAVBDIRuntimeModel.listenerentry_has_relevants, handle);
-				coll = getState().getAttributeValues(le, OAVBDIRuntimeModel.listenerentry_has_relevants);
+				state.removeAttributeValue(le, OAVBDIRuntimeModel.listenerentry_has_relevants, handle);
+				coll = state.getAttributeValues(le, OAVBDIRuntimeModel.listenerentry_has_relevants);
 				if(coll==null || coll.isEmpty())
-					getState().removeAttributeValue(getScope(), OAVBDIRuntimeModel.capability_has_listeners, listener);
-				getInterpreter().getEventReificator().removeObservedElement(handle);
+					state.removeAttributeValue(scope, OAVBDIRuntimeModel.capability_has_listeners, listener);
+				BDIInterpreter.getInterpreter(state).getEventReificator().removeObservedElement(handle);
 			}
 		}
 	}

@@ -3,7 +3,17 @@
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_EfIsIHLyEd-fEqakq96uUw" source="jadex">
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_EfIsIXLyEd-fEqakq96uUw" key="Description" value="&lt;h1>Simple Delivery Process&lt;/h1> This process sends payment reminders to the JCC. Try sending the process an 'inform(payment)'."/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_EfJ6QHLyEd-fEqakq96uUw" key="Package" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_6iQEwLtJEd-rNtpDP1AqqQ" key="arguments" value="dunnings␋false␋false␋Number of dunnings sent␋int␋0"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_c89f4ARQEeCnwcpWvxOwkg" key="editor_version" value="1.0"/>
+  </eAnnotations>
+  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_fJxLIARPEeCnwcpWvxOwkg" source="jadex_arguments_table">
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_fJxLIQRPEeCnwcpWvxOwkg" key="dimension" value="1:6"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_fJxLIgRPEeCnwcpWvxOwkg" key="uniqueColumnIndex" value="0"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_fJxLIwRPEeCnwcpWvxOwkg" key="0:0" value="dunnings"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_fJxLJARPEeCnwcpWvxOwkg" key="0:1" value="false"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_fJxLJQRPEeCnwcpWvxOwkg" key="0:2" value="false"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_fJxLJgRPEeCnwcpWvxOwkg" key="0:3" value="Number of dunnings sent"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_fJxLJwRPEeCnwcpWvxOwkg" key="0:4" value="int"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_fJxLKARPEeCnwcpWvxOwkg" key="0:5" value="0"/>
   </eAnnotations>
   <pools xmi:type="bpmn:Pool" xmi:id="_P3gE1XLtEd-fEqakq96uUw" iD="_P3gE1HLtEd-fEqakq96uUw" name="Pool">
     <vertices xmi:type="bpmn:Activity" xmi:id="_P3gr4XLtEd-fEqakq96uUw" iD="_P3gr4HLtEd-fEqakq96uUw" outgoingEdges="_jDbHIXLtEd-fEqakq96uUw" incomingEdges="_9tq00XLwEd-fEqakq96uUw _6-6acHLuEd-fEqakq96uUw" name="Ship  Items" activityType="Task"/>
@@ -18,8 +28,11 @@
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_8Ip6grtMEd-rNtpDP1AqqQ" key="message" value=""/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_8Ip6g7tMEd-rNtpDP1AqqQ" key="match expression" value=""/>
       </eAnnotations>
-      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_9BHzkLtMEd-rNtpDP1AqqQ" source="activity">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_9BHzkbtMEd-rNtpDP1AqqQ" key="parameters" value="performative␋&quot;inform&quot;"/>
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_fUyvYARPEeCnwcpWvxOwkg" source="jadex_parameters_table">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_fUyvYQRPEeCnwcpWvxOwkg" key="dimension" value="1:2"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_fUyvYgRPEeCnwcpWvxOwkg" key="uniqueColumnIndex" value="1"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_fUyvYwRPEeCnwcpWvxOwkg" key="0:0" value="performative"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_fUyvZARPEeCnwcpWvxOwkg" key="0:1" value="&quot;inform&quot;"/>
       </eAnnotations>
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_1t1X0HLtEd-fEqakq96uUw" iD="_1t0wwHLtEd-fEqakq96uUw" outgoingEdges="_wTCGkXLuEd-fEqakq96uUw" incomingEdges="_1t96sXLtEd-fEqakq96uUw" name="Item returned" activityType="EventIntermediateMessage">
@@ -28,8 +41,13 @@
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_KLQSkrtNEd-rNtpDP1AqqQ" key="message" value=""/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_KLQSk7tNEd-rNtpDP1AqqQ" key="match expression" value=""/>
       </eAnnotations>
-      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_Ku2u4LtNEd-rNtpDP1AqqQ" source="activity">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Ku2u4btNEd-rNtpDP1AqqQ" key="parameters" value="performative␋&quot;inform&quot;␟content␋&quot;item&quot;"/>
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_fUyvZQRPEeCnwcpWvxOwkg" source="jadex_parameters_table">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_fUyvZgRPEeCnwcpWvxOwkg" key="dimension" value="2:2"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_fUyvZwRPEeCnwcpWvxOwkg" key="uniqueColumnIndex" value="1"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_fUyvaARPEeCnwcpWvxOwkg" key="0:0" value="performative"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_fUyvaQRPEeCnwcpWvxOwkg" key="0:1" value="&quot;inform&quot;"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_fUyvagRPEeCnwcpWvxOwkg" key="1:0" value="content"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_fUyvawRPEeCnwcpWvxOwkg" key="1:1" value="&quot;item&quot;"/>
       </eAnnotations>
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_9KQtIXLtEd-fEqakq96uUw" iD="_9KQtIHLtEd-fEqakq96uUw" outgoingEdges="_xZ8O0XLvEd-fEqakq96uUw" incomingEdges="_9KYo8XLtEd-fEqakq96uUw" name="Payment target &#xD;&#xA;exceeded" activityType="EventIntermediateTimer">

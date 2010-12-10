@@ -3,7 +3,17 @@
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_o9h3sFdaEd-_rc0-j01YLA" source="jadex">
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_o9h3sVdaEd-_rc0-j01YLA" key="Description" value=""/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_o9h3sldaEd-_rc0-j01YLA" key="Package" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_X3t24GKKEd-Q9q1HfsZXQw" key="arguments" value="result␋false␋false␋The executed pools and lanes.␋String␋"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_oBMe1QRPEeCnwcpWvxOwkg" key="editor_version" value="1.0"/>
+  </eAnnotations>
+  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_n4jgMARPEeCnwcpWvxOwkg" source="jadex_arguments_table">
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_n4jgMQRPEeCnwcpWvxOwkg" key="dimension" value="1:6"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_n4jgMgRPEeCnwcpWvxOwkg" key="uniqueColumnIndex" value="0"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_n4jgMwRPEeCnwcpWvxOwkg" key="0:0" value="result"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_n4jgNARPEeCnwcpWvxOwkg" key="0:1" value="false"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_n4jgNQRPEeCnwcpWvxOwkg" key="0:2" value="false"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_n4jgNgRPEeCnwcpWvxOwkg" key="0:3" value="The executed pools and lanes."/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_n4jgNwRPEeCnwcpWvxOwkg" key="0:4" value="String"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_n4jgOARPEeCnwcpWvxOwkg" key="0:5" value=""/>
   </eAnnotations>
   <pools xmi:type="bpmn:Pool" xmi:id="_oURfVVdaEd-_rc0-j01YLA" iD="_oURfVFdaEd-_rc0-j01YLA" name="Pool1">
     <vertices xmi:type="bpmn:Activity" xmi:id="_--UOUVdaEd-_rc0-j01YLA" iD="_--UOUFdaEd-_rc0-j01YLA" outgoingEdges="__-qRCldaEd-_rc0-j01YLA" lanes="_22t1EVdaEd-_rc0-j01YLA" activityType="EventStartEmpty"/>
@@ -16,8 +26,11 @@
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_AstCwFdbEd-_rc0-j01YLA" source="jadex">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_AstCwVdbEd-_rc0-j01YLA" key="condition" value=""/>
       </eAnnotations>
-      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_BIaHUFdbEd-_rc0-j01YLA" source="sequence">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_BIaHUVdbEd-_rc0-j01YLA" key="mappings" value="result␋result+&quot;A&quot;"/>
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_oBMe0ARPEeCnwcpWvxOwkg" source="jadex_mappings_table">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_oBMe0QRPEeCnwcpWvxOwkg" key="dimension" value="1:2"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_oBMe0gRPEeCnwcpWvxOwkg" key="uniqueColumnIndex" value="0"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_oBMe0wRPEeCnwcpWvxOwkg" key="0:0" value="result"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_oBMe1ARPEeCnwcpWvxOwkg" key="0:1" value="result+&quot;A&quot;"/>
       </eAnnotations>
     </sequenceEdges>
     <lanes xmi:type="bpmn:Lane" xmi:id="_22t1EVdaEd-_rc0-j01YLA" iD="_22t1EFdaEd-_rc0-j01YLA" name="LaneA" activities="_--UOUVdaEd-_rc0-j01YLA __-qRAVdaEd-_rc0-j01YLA"/>
