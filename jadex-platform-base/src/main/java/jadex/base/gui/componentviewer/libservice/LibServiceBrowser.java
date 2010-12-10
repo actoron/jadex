@@ -269,17 +269,19 @@ public class LibServiceBrowser	extends	JTabbedPane	implements IServiceViewerPane
 		// Add a library service listener to be informed about library changes.
 		this.listener	= new ILibraryServiceListener()
 		{
-			public void urlAdded(URL url)
+			public IFuture urlAdded(URL url)
 			{
 				// todo: make synchronized
 				if(!classpaths.containsEntry(url.toString()))
 					classpaths.addEntry(url.toString());
+				return new Future(null);
 			}
-			public void urlRemoved(URL url)
+			public IFuture urlRemoved(URL url)
 			{
 				// todo: make synchronized
 				if(classpaths.containsEntry(url.toString()))
 					classpaths.removeEntry(url.toString());
+				return new Future(null);
 			}
 		};
 		try

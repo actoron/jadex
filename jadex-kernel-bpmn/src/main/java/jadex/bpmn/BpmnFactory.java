@@ -73,16 +73,18 @@ public class BpmnFactory extends BasicService implements IComponentFactory
 		this.loader = new BpmnModelLoader();
 		this.properties	= properties;
 		
-		libservicelistener = new ILibraryServiceListener()
+		this.libservicelistener = new ILibraryServiceListener()
 		{
-			public void urlRemoved(URL url)
+			public IFuture urlRemoved(URL url)
 			{
 				loader.clearModelCache();
+				return new Future(null);
 			}
 			
-			public void urlAdded(URL url)
+			public IFuture urlAdded(URL url)
 			{
 				loader.clearModelCache();
+				return new Future(null);
 			}
 		};
 		SServiceProvider.getService(provider, ILibraryService.class).addResultListener(new DefaultResultListener()

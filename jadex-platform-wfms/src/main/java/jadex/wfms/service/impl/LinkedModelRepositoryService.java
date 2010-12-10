@@ -1,5 +1,6 @@
 package jadex.wfms.service.impl;
 
+import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.ThreadSuspendable;
 import jadex.commons.concurrent.IResultListener;
@@ -78,7 +79,7 @@ public class LinkedModelRepositoryService extends BasicService implements IModel
 			
 			((ILibraryService) SServiceProvider.getService(provider, ILibraryService.class).get(new ThreadSuspendable())).addLibraryServiceListener(new ILibraryServiceListener()
 			{
-				public void urlRemoved(URL url)
+				public IFuture urlRemoved(URL url)
 				{
 					synchronized (modelRefCount)
 					{
@@ -89,13 +90,13 @@ public class LinkedModelRepositoryService extends BasicService implements IModel
 							removeModel(path);
 						}
 					}
+					return new Future(null);
 				}
 				
-				public void urlAdded(URL url)
+				public IFuture urlAdded(URL url)
 				{
 					synchronized (modelRefCount)
 					{
-						
 						File dir = new File(url.getFile());
 						Set modelSet = new HashSet();
 						if (dir.isDirectory())
@@ -106,6 +107,7 @@ public class LinkedModelRepositoryService extends BasicService implements IModel
 							addModel((String) it.next());
 						urlEntries.put(url, modelSet);
 					}
+					return new Future(null);
 				}
 			});
 		}

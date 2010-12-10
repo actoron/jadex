@@ -86,7 +86,7 @@
 				SUtil.createHashMap(new Object[]{"componentviewer.viewerclass", 
 				RemoteServiceManagementService.REMOTE_UNCACHED, RemoteServiceManagementService.REMOTE_EXCLUDED}, 
 				new Object[]{"jadex.base.gui.componentviewer.libservice.LibServiceBrowser", 
-				new String[]{"getURLs"}, new String[]{"getClassLoader", "addLibraryServiceListener", "removeLibraryServiceListener"}})
+				new String[]{"getURLs"}, new String[]{"getClassLoader"}})
 				)
 		</providedservice>
 		<providedservice class="IComponentManagementService" direct="true">

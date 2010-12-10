@@ -124,7 +124,7 @@ public class LibraryService extends BasicService implements ILibraryService
 	 *  Remove a url.
 	 *  @param url The url.
 	 */
-	public synchronized void removeURL(URL url)
+	public void removeURL(URL url)
 	{
 		ILibraryServiceListener[] lis;
 		synchronized(this)

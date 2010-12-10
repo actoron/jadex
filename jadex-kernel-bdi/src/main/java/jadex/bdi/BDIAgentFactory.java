@@ -103,16 +103,18 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory
 		this.loader	= new OAVBDIModelLoader();
 		this.provider = provider;
 		this.mtypes	= Collections.synchronizedMap(new WeakHashMap());
-		libservicelistener = new ILibraryServiceListener()
+		this.libservicelistener = new ILibraryServiceListener()
 		{
-			public void urlRemoved(URL url)
+			public IFuture urlRemoved(URL url)
 			{
 				loader.clearModelCache();
+				return new Future(null);
 			}
 			
-			public void urlAdded(URL url)
+			public IFuture urlAdded(URL url)
 			{
 				loader.clearModelCache();
+				return new Future(null);
 			}
 		};
 		SServiceProvider.getService(provider, ILibraryService.class).addResultListener(new DefaultResultListener()
