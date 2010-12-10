@@ -6,7 +6,6 @@ import jadex.bridge.IRemoteServiceManagementService;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.concurrent.CounterResultListener;
-import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.service.SServiceProvider;

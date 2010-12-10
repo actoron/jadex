@@ -1,14 +1,9 @@
 package jadex.commons.service.library;
 
-import jadex.commons.Future;
 import jadex.commons.IFuture;
-import jadex.commons.concurrent.IResultListener;
 import jadex.commons.service.IService;
 
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
 /** 
  *  Interface for the Library Service. It provides a platform service

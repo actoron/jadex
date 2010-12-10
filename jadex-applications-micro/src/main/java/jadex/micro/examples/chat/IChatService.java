@@ -4,21 +4,14 @@ import jadex.commons.service.IService;
 
 
 /**
- *  
+ *  Service can receive chat messages.
  */
 public interface IChatService extends IService
 {
 	/**
-	 *  Tell something.
-	 *  @param name The name.
-	 *  @param text The text.
-	 */
-	public void tell(String name, String text);
-	
-	/**
 	 *  Hear something.
-	 *  @param name The name.
-	 *  @param text The text.
+	 *  @param name The name of the sender.
+	 *  @param text The text message.
 	 */
 	public void hear(String name, String text);
 		

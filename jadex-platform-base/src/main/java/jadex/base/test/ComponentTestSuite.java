@@ -16,6 +16,8 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import junit.framework.TestSuite;
 
@@ -33,9 +35,32 @@ public class ComponentTestSuite extends TestSuite
 	 * @param root	The classpath root corresponding to the path.
 	 * @param excludes	Files to exclude (if a pattern is contained in file path). 
 	 */
-	public ComponentTestSuite(final File path, final File root, final String[] excludes) throws Exception
+	public ComponentTestSuite(File path, File root, String[] excludes) throws Exception
+	{
+		this(path, root, excludes, 300000);
+	}
+	
+	/**
+	 * Create a component test suite for components contained in a given path.
+	 * @param path	The path to look for test cases in.
+	 * @param root	The classpath root corresponding to the path.
+	 * @param excludes	Files to exclude (if a pattern is contained in file path). 
+	 */
+	public ComponentTestSuite(final File path, final File root, final String[] excludes, final long timeout) throws Exception
 	{
 		super(path.getName());
+		
+		if(timeout>0)
+		{
+			new Timer(true).schedule(new TimerTask()
+			{
+				public void run()
+				{
+					System.out.println("Aborting test suite due to excessive run time (>"+timeout+" ms).");
+					System.exit(0);
+				}
+			}, timeout);
+		}
 		
 		// Tests must be available after constructor execution.
 		// Todo: get rid of thread suspendable!?

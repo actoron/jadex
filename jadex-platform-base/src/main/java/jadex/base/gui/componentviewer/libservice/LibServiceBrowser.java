@@ -6,7 +6,6 @@ import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.Properties;
 import jadex.commons.SGUI;
-import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.commons.gui.EditableList;
 import jadex.commons.gui.EditableListEvent;
@@ -24,8 +23,6 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.DefaultListModel;

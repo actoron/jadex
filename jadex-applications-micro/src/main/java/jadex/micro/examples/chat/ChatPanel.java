@@ -1,5 +1,6 @@
 package jadex.micro.examples.chat;
 
+import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.ChangeEvent;
@@ -108,6 +109,23 @@ public class ChatPanel extends JPanel
 			}
 		});
 		
-		// todo: micro listener
+		agent.scheduleStep(new IComponentStep()
+		{
+			public Object execute(IInternalAccess ia)
+			{
+				ia.addComponentListener(new IComponentListener()
+				{
+					public void componentTerminating(ChangeEvent ce)
+					{
+					}
+					
+					public void componentTerminated(ChangeEvent ce)
+					{
+						f.setVisible(false);
+					}
+				});
+				return null;
+			}
+		});
 	}
 }
