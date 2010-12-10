@@ -48,8 +48,7 @@ public class ComponentTreeNode	extends AbstractComponentTreeNode implements IAct
 	{
 		super(parent, model, tree);
 		
-		if(desc==null)
-			System.out.println("here");
+		assert desc!=null;
 		
 		this.desc	= desc;
 		this.cms	= cms;

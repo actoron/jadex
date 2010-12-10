@@ -253,7 +253,8 @@ public class ComponentTreePanel extends JSplitPane
 					TreePath[]	paths	= tree.getSelectionPaths();
 					for(int i=0; paths!=null && i<paths.length; i++)
 					{
-						final IComponentIdentifier cid = ((IActiveComponentTreeNode)paths[i].getLastPathComponent()).getComponentIdentifier();//.getDescription().getName();
+						// note: cannot use getComponentIdenfier() due to proxy components return their remote cid
+						final IComponentIdentifier cid = ((IActiveComponentTreeNode)paths[i].getLastPathComponent()).getDescription().getName();
 						final IComponentTreeNode sel = (IComponentTreeNode)paths[i].getLastPathComponent();
 						cms.resumeComponent(cid).addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
 						{
@@ -267,6 +268,11 @@ public class ComponentTreePanel extends JSplitPane
 										{
 											((AbstractComponentTreeNode)sel.getParent()).removeChild(sel);
 										}
+									}
+									
+									public void customExceptionOccurred(Object source, Exception exception)
+									{
+										super.customExceptionOccurred(source, new RuntimeException("Could not kill component: "+cid, exception));
 									}
 								});
 							}
@@ -306,6 +312,11 @@ public class ComponentTreePanel extends JSplitPane
 											{
 												final IComponentManagementService rcms = (IComponentManagementService)result;
 												rcms.destroyComponent(cid);
+												if(sel.getParent()!=null)
+												{
+													((AbstractComponentTreeNode)sel.getParent()).removeChild(sel);
+												}
+												
 												// Hack!!! Result will not be received when remote comp is platform. 
 //													.addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
 //												{
@@ -337,7 +348,7 @@ public class ComponentTreePanel extends JSplitPane
 					TreePath[]	paths	= tree.getSelectionPaths();
 					for(int i=0; paths!=null && i<paths.length; i++)
 					{
-						final IComponentIdentifier cid = ((IActiveComponentTreeNode)paths[i].getLastPathComponent()).getComponentIdentifier();//getDescription().getName();
+						final IComponentIdentifier cid = ((IActiveComponentTreeNode)paths[i].getLastPathComponent()).getDescription().getName();
 						final IComponentTreeNode sel = (IComponentTreeNode)paths[i].getLastPathComponent();
 						cms.suspendComponent(cid).addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
 						{
@@ -363,7 +374,7 @@ public class ComponentTreePanel extends JSplitPane
 					TreePath[]	paths	= tree.getSelectionPaths();
 					for(int i=0; paths!=null && i<paths.length; i++)
 					{
-						final IComponentIdentifier cid = ((IActiveComponentTreeNode)paths[i].getLastPathComponent()).getComponentIdentifier();//getDescription().getName();
+						final IComponentIdentifier cid = ((IActiveComponentTreeNode)paths[i].getLastPathComponent()).getDescription().getName();
 						final IComponentTreeNode sel = (IComponentTreeNode)paths[i].getLastPathComponent();
 						cms.resumeComponent(cid).addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
 						{
@@ -389,7 +400,7 @@ public class ComponentTreePanel extends JSplitPane
 					TreePath[]	paths	= tree.getSelectionPaths();
 					for(int i=0; paths!=null && i<paths.length; i++)
 					{
-						final IComponentIdentifier cid = ((IActiveComponentTreeNode)paths[i].getLastPathComponent()).getComponentIdentifier();//getDescription().getName();
+						final IComponentIdentifier cid = ((IActiveComponentTreeNode)paths[i].getLastPathComponent()).getDescription().getName();
 
 						final IComponentTreeNode sel = (IComponentTreeNode)paths[i].getLastPathComponent();
 						cms.stepComponent(cid).addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
@@ -480,7 +491,7 @@ public class ComponentTreePanel extends JSplitPane
 					else if(node instanceof IActiveComponentTreeNode)
 					{
 						//IComponentDescription desc = ((IActiveComponentTreeNode)node).getDescription();
-						IComponentIdentifier cid = ((IActiveComponentTreeNode)node).getComponentIdentifier();
+						IComponentIdentifier cid = ((IActiveComponentTreeNode)node).getDescription().getName();
 						cms.getExternalAccess(cid).addResultListener(new SwingDefaultResultListener((Component)null)
 						{
 							public void customResultAvailable(Object source, Object result)
