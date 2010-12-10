@@ -72,7 +72,7 @@ public abstract class DefaultResultListener implements IResultListener
 	 */
 	public void exceptionOccurred(Object source, Exception exception)
 	{
-		exception.printStackTrace();
+//		exception.printStackTrace();
 		logger.severe(source+" exception occurred: "+exception);
 	}
 }

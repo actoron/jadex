@@ -47,6 +47,10 @@ public class ComponentTreeNode	extends AbstractComponentTreeNode implements IAct
 		IComponentManagementService cms, ComponentIconCache iconcache)
 	{
 		super(parent, model, tree);
+		
+		if(desc==null)
+			System.out.println("here");
+		
 		this.desc	= desc;
 		this.cms	= cms;
 		this.iconcache	= iconcache;

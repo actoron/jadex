@@ -1,9 +1,14 @@
 package jadex.commons.service.library;
 
+import jadex.commons.Future;
 import jadex.commons.IFuture;
+import jadex.commons.concurrent.IResultListener;
 import jadex.commons.service.IService;
 
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /** 
  *  Interface for the Library Service. It provides a platform service
@@ -55,6 +60,18 @@ public interface ILibraryService extends IService
 	 *  @return The list of urls.
 	 */
 	public IFuture getAllURLs();
+	
+	/**
+	 *  Get the non-managed classpath entries as strings.
+	 *  @return Classpath entries as a list of strings.
+	 */
+	public IFuture getURLStrings();
+	
+	/**
+	 *  Get the non-managed classpath entries.
+	 *  @return Classpath entries as a list of strings.
+	 */
+	public IFuture getNonManagedURLStrings();
 	
 	/** 
 	 *  Returns the current ClassLoader.

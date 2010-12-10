@@ -143,7 +143,14 @@ public class LoadManagingExecutionService
 		// Concurrency==0 means not currently running -> start.
 		if(concurrency==0)
 		{
-			executor.execute();
+			try
+			{
+				executor.execute();
+			}
+			catch(Exception e)
+			{
+				// ignore, can only be caused by terminated threadpool service.
+			}
 		}
 	}
 	

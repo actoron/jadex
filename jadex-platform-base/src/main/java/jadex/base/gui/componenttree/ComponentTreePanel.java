@@ -729,18 +729,21 @@ public class ComponentTreePanel extends JSplitPane
 					public void customResultAvailable(Object source, Object result)
 					{
 						IComponentDescription[]	descriptions	= (IComponentDescription[])result;
-						IComponentDescription	root	= null;
-						for(int i=0; root==null && i<descriptions.length; i++)
+						if(descriptions.length!=0)
 						{
-							if(descriptions[i].getParent()==null)
+							IComponentDescription	root	= null;
+							for(int i=0; root==null && i<descriptions.length; i++)
 							{
-								root	= descriptions[i];
+								if(descriptions[i].getParent()==null)
+								{
+									root	= descriptions[i];
+								}
 							}
+							model.setRoot(new ComponentTreeNode(null, model, tree, root, cms, cic));
+							// Expand root node.
+							TreeExpansionHandler	teh	= new TreeExpansionHandler(tree);
+							teh.treeExpanded(new TreeExpansionEvent(tree, new TreePath(model.getRoot())));
 						}
-						model.setRoot(new ComponentTreeNode(null, model, tree, root, cms, cic));
-						// Expand root node.
-						TreeExpansionHandler	teh	= new TreeExpansionHandler(tree);
-						teh.treeExpanded(new TreeExpansionEvent(tree, new TreePath(model.getRoot())));
 					}
 				});
 				

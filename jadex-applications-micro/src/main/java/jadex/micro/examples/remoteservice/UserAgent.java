@@ -3,7 +3,11 @@ package jadex.micro.examples.remoteservice;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IRemoteServiceManagementService;
+import jadex.commons.Future;
+import jadex.commons.IFuture;
+import jadex.commons.concurrent.CounterResultListener;
 import jadex.commons.concurrent.DefaultResultListener;
+import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.service.SServiceProvider;
 import jadex.micro.MicroAgent;
@@ -19,9 +23,22 @@ public class UserAgent extends MicroAgent
 	 */
 	public void executeBody()
 	{
+		final CounterResultListener lis = new CounterResultListener(2, new IResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				killAgent();
+			}
+			
+			public void exceptionOccurred(Object source, Exception exception)
+			{
+				killAgent();
+			}
+		});
+		
 		// get remote management service 
 		SServiceProvider.getServiceUpwards(getServiceProvider(), IComponentManagementService.class)
-			.addResultListener(createResultListener(new DefaultResultListener()
+			.addResultListener(createResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
@@ -29,7 +46,7 @@ public class UserAgent extends MicroAgent
 				
 				// get remote management service and fetch service via rms.getProxy()
 				SServiceProvider.getService(getServiceProvider(), IRemoteServiceManagementService.class)
-					.addResultListener(createResultListener(new DefaultResultListener()
+					.addResultListener(createResultListener(new IResultListener()
 				{
 					public void resultAvailable(Object source, Object result)
 					{
@@ -39,28 +56,45 @@ public class UserAgent extends MicroAgent
 							new String[]{"tcp-mtp://127.0.0.1:11000", "nio-mtp://127.0.0.1:11001"});
 
 						// Search for remote service
-						rms.getServiceProxy(platid, IMathService.class).addResultListener(createResultListener(new DefaultResultListener()
+						rms.getServiceProxy(platid, IMathService.class).addResultListener(createResultListener(new IResultListener()
 						{
 							public void resultAvailable(Object source, Object result)
 							{
 								IMathService service = (IMathService)result;
-								invokeAddService("IMathService searched via rms.", service);
+								invokeAddService("IMathService searched via rms.", service)
+									.addResultListener(createResultListener(lis));
+							}
+							public void exceptionOccurred(Object source, Exception exception)
+							{
+								lis.resultAvailable(null, null);
 							}
 						}));
 					}						
+					public void exceptionOccurred(Object source, Exception exception)
+					{
+						lis.resultAvailable(null, null);
+					}
 				}));
-						
+			}
+			public void exceptionOccurred(Object source, Exception exception)
+			{
+				lis.resultAvailable(null, null);
 			}
 		}));
 		
 		// search on local platform and find service via ProxyAgent to other platform
-		SServiceProvider.getService(getServiceProvider(), IMathService.class, true)
-			.addResultListener(createResultListener(new DefaultResultListener()
+		SServiceProvider.getService(getServiceProvider(), IMathService.class, true, true)
+			.addResultListener(createResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
 				IMathService service = (IMathService)result;
-				invokeAddService("IMathService searched via platform proxy.", service);
+				invokeAddService("IMathService searched via platform proxy.", service)
+					.addResultListener(createResultListener(lis));
+			}
+			public void exceptionOccurred(Object source, Exception exception)
+			{
+				lis.resultAvailable(null, null);
 			}
 		}));
 	}
@@ -68,22 +102,31 @@ public class UserAgent extends MicroAgent
 	/**
 	 *  Invoke some add methods for testing.
 	 */
-	protected void invokeAddService(String info, IMathService service)
+	protected IFuture invokeAddService(String info, IMathService service)
 	{
+		final Future ret = new Future();
+		
 		if(service==null)
 		{
 			System.out.println("No remote add service found: "+info);
+			ret.setResult(null);
 		}
 		else
 		{
+			final CounterResultListener lis = new CounterResultListener(2, new DelegationResultListener(ret));
 			System.out.println("Found service: "+info);
 			// Execute non-blocking method call with future result
 //			System.out.println("Calling non-blocking addNB method.");
-			service.addNB(1, 2).addResultListener(new DefaultResultListener()
+			service.addNB(1, 2).addResultListener(new IResultListener()
 			{
 				public void resultAvailable(Object source, Object result)
 				{
 					System.out.println("Invoked addNB: "+result);
+					lis.resultAvailable(null, null);
+				}
+				public void exceptionOccurred(Object source, Exception exception)
+				{
+					lis.resultAvailable(null, null);
 				}
 			});
 			
@@ -107,14 +150,18 @@ public class UserAgent extends MicroAgent
 				public void resultAvailable(Object source, Object result)
 				{
 					System.out.println("Invoked divZero without exception");
+					lis.resultAvailable(null, null);
 				}
 				
 				public void exceptionOccurred(Object source, Exception exception)
 				{
 					System.out.println("Invoked divZero, expected exception occurred: "+exception);
+					lis.resultAvailable(null, null);
 //					exception.printStackTrace();
 				}
 			});
 		}
+		
+		return ret;
 	}
 }

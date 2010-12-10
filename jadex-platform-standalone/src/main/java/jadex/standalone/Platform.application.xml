@@ -83,10 +83,8 @@
 		</providedservice>
 		<providedservice class="ILibraryService" direct="true">
 			new LibraryService($args.libpath, $component.getComponentIdentifier(), 
-				SUtil.createHashMap(new Object[]{"componentviewer.viewerclass", 
-				RemoteServiceManagementService.REMOTE_UNCACHED, RemoteServiceManagementService.REMOTE_EXCLUDED}, 
-				new Object[]{"jadex.base.gui.componentviewer.libservice.LibServiceBrowser", 
-				new String[]{"getURLs"}, new String[]{"getClassLoader"}})
+				SUtil.createHashMap(new Object[]{"componentviewer.viewerclass", RemoteServiceManagementService.REMOTE_EXCLUDED}, 
+				new Object[]{"jadex.base.gui.componentviewer.libservice.LibServiceBrowser", new String[]{"getClassLoader"}})
 				)
 		</providedservice>
 		<providedservice class="IComponentManagementService" direct="true">
