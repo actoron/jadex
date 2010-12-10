@@ -617,6 +617,8 @@ public class JadexUserTaskImplComboSection extends AbstractComboPropertySection
 		return parameterTable;
 	}
 
+	// ---- internal used styled string buffer ----
+	
 	/**
 	 * Internal used String buffer that use styles for 
 	 * SWT {@link StyledText}

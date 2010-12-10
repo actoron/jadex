@@ -90,7 +90,7 @@ public abstract class AbstractCommonPropertySection extends
 	 */
 	private void increasePropertyViewScrolling(Composite parent)
 	{
-		if (propertyComposite != null)
+		if (propertyComposite != null && !propertyComposite.isDisposed())
 		{
 			if (propertyComposite.getVerticalBar().getIncrement() == PROPERTY_SECTION_SCROLL_INCREMENT)
 				return;
