@@ -6,7 +6,6 @@ Bump Revision:
 - Add tag in SVN
 
 Build Distribution:
-- remove target directories in jadex and all projects (to avoid eclipse generated stuff in classes like .svn dirs)
 (- build jadex maven javadoc) no more!?
 - build jadex distribution with maven
 
