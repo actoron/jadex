@@ -3,12 +3,12 @@ Bump Revision:
 - update maven project configuration for all projects in eclipse
 - rebuild applications.jccproject.xml
 	- check that jcc.project does not contain absolute paths
+- Add tag in SVN
 
 Build Distribution:
 - remove target directories in jadex and all projects (to avoid eclipse generated stuff in classes like .svn dirs)
 (- build jadex maven javadoc) no more!?
-- build jadex distribution
-- zip distribution dir 
+- build jadex distribution with maven
 
 Upload stuff:
 - upload distribution to sourceforge
@@ -20,3 +20,8 @@ Communicate stuff:
 - email to Jadex users on wiki
 - email to Jadex users via jadexlist of VSIS
 - news entry on sourceforge
+
+Maven:
+- deploy artifacts at staging repository using Maven
+- test staging release (stagingpom.xml), find url at https://oss.sonatype.org/index.html
+- close and promote repository to maven central

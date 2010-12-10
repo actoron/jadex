@@ -23,6 +23,7 @@ import jadex.commons.concurrent.IExecutable;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.service.IServiceContainer;
 import jadex.commons.service.SServiceProvider;
+import jadex.commons.service.ServiceNotFoundException;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -618,8 +619,14 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 			{
 				public void resultAvailable(Object source, Object result)
 				{
-					if(result!=null)	// may be null during platform init 
-						((ComponentManagementService)result).setProcessingState(cid, IComponentDescription.PROCESSINGSTATE_RUNNING);
+					((ComponentManagementService)result).setProcessingState(cid, IComponentDescription.PROCESSINGSTATE_RUNNING);
+				}
+				
+				public void exceptionOccurred(Object source, Exception exception)
+				{
+					// CMS may be null during platform init
+					if(!(exception instanceof ServiceNotFoundException))
+						super.exceptionOccurred(source, exception);
 				}
 			});
 			

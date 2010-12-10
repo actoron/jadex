@@ -28,11 +28,11 @@ public class SServiceProvider
 	public static ISearchManager localmanager = new LocalSearchManager();
 	public static ISearchManager localmanagerforced = new LocalSearchManager(true);
 	
-	/** The vsist decider that stops searching after one result has been found. */
+	/** The visit decider that stops searching after one result has been found. */
 	public static IVisitDecider abortdecider = new DefaultVisitDecider();
 	public static IVisitDecider rabortdecider = new DefaultVisitDecider(true, true);
 
-	/** The vsist decider that never stops. */
+	/** The visit decider that never stops. */
 	public static IVisitDecider contdecider = new DefaultVisitDecider(false);
 	public static IVisitDecider rcontdecider = new DefaultVisitDecider(false, true);
 
@@ -96,7 +96,7 @@ public class SServiceProvider
 	 *  @param type The class.
 	 *  @return The corresponding service.
 	 */
-	public static IFuture getService(IServiceProvider provider, Class type, boolean remote, boolean forcedsearch)
+	public static IFuture getService(IServiceProvider provider, final Class type, boolean remote, boolean forcedsearch)
 	{
 //		synchronized(profiling)
 //		{
@@ -112,7 +112,16 @@ public class SServiceProvider
 		provider.getServices(forcedsearch? sequentialmanagerforced: sequentialmanager, 
 			remote? rabortdecider: abortdecider, 
 			new TypeResultSelector(type, true, remote), new ArrayList())
-				.addResultListener(new DelegationResultListener(ret));
+				.addResultListener(new DelegationResultListener(ret)
+		{
+			public void customResultAvailable(Object source, Object result)
+			{
+				if(result==null)
+					exceptionOccurred(source, new ServiceNotFoundException("No matching service found for type: "+type.getName()));
+				else
+					super.customResultAvailable(source, result);
+			}
+		});
 		
 		return ret;
 	}
@@ -122,7 +131,7 @@ public class SServiceProvider
 	 *  @param type The class.
 	 *  @return The corresponding service.
 	 */
-	public static IFuture getService(IServiceProvider provider, IServiceIdentifier sid)
+	public static IFuture getService(IServiceProvider provider, final IServiceIdentifier sid)
 	{
 //		synchronized(profiling)
 //		{
@@ -135,7 +144,16 @@ public class SServiceProvider
 //		IVisitDecider abortdecider = new DefaultVisitDecider();
 		
 		provider.getServices(sequentialmanager, abortdecider, new IdResultSelector(sid), new ArrayList())
-			.addResultListener(new DelegationResultListener(ret));
+			.addResultListener(new DelegationResultListener(ret)
+		{
+			public void customResultAvailable(Object source, Object result)
+			{
+				if(result==null)
+					exceptionOccurred(source, new ServiceNotFoundException("No service found for id: "+sid));
+				else
+					super.customResultAvailable(source, result);
+			}
+		});
 		
 		return ret;
 	}
@@ -145,7 +163,7 @@ public class SServiceProvider
 	 *  @param type The class.
 	 *  @return The corresponding service.
 	 */
-	public static IFuture getService(IServiceProvider provider, IResultSelector selector)
+	public static IFuture getService(IServiceProvider provider, final IResultSelector selector)
 	{
 //		synchronized(profiling)
 //		{
@@ -158,7 +176,16 @@ public class SServiceProvider
 //		IVisitDecider abortdecider = new DefaultVisitDecider();
 		
 		provider.getServices(sequentialmanager, abortdecider, selector, new ArrayList())
-			.addResultListener(new DelegationResultListener(ret));
+			.addResultListener(new DelegationResultListener(ret)
+		{
+			public void customResultAvailable(Object source, Object result)
+			{
+				if(result==null)
+					exceptionOccurred(source, new ServiceNotFoundException("No matching service found for selector: "+selector));
+				else
+					super.customResultAvailable(source, result);
+			}
+		});
 		
 		return ret;
 	}
@@ -221,7 +248,7 @@ public class SServiceProvider
 	 *  @param type The class.
 	 *  @return The corresponding service.
 	 */
-	public static IFuture getServiceUpwards(IServiceProvider provider, Class type)
+	public static IFuture getServiceUpwards(IServiceProvider provider, final Class type)
 	{
 //		synchronized(profiling)
 //		{
@@ -234,7 +261,16 @@ public class SServiceProvider
 //		IVisitDecider abortdecider = new DefaultVisitDecider();
 		
 		provider.getServices(upwardsmanager, abortdecider, new TypeResultSelector(type), new ArrayList())
-			.addResultListener(new DelegationResultListener(ret));
+			.addResultListener(new DelegationResultListener(ret)
+		{
+			public void customResultAvailable(Object source, Object result)
+			{
+				if(result==null)
+					exceptionOccurred(source, new ServiceNotFoundException("No matching service found for type: "+type.getName()));
+				else
+					super.customResultAvailable(source, result);
+			}
+		});
 		
 		return ret;
 	}
@@ -244,7 +280,7 @@ public class SServiceProvider
 	 *  @param type The class.
 	 *  @return The corresponding service.
 	 */
-	public static IFuture getDeclaredService(IServiceProvider provider, Class type)
+	public static IFuture getDeclaredService(IServiceProvider provider, final Class type)
 	{
 //		synchronized(profiling)
 //		{
@@ -257,7 +293,16 @@ public class SServiceProvider
 //		IVisitDecider abortdecider = new DefaultVisitDecider();
 		
 		provider.getServices(localmanager, abortdecider, new TypeResultSelector(type), new ArrayList())
-			.addResultListener(new DelegationResultListener(ret));
+			.addResultListener(new DelegationResultListener(ret)
+		{
+			public void customResultAvailable(Object source, Object result)
+			{
+				if(result==null)
+					exceptionOccurred(source, new ServiceNotFoundException("No matching service found for type: "+type.getName()));
+				else
+					super.customResultAvailable(source, result);
+			}
+		});
 		
 		return ret;
 	}
@@ -335,7 +380,7 @@ public class SServiceProvider
 	 *  @param sid The service identifier.
 	 *  @return The corresponding service.
 	 */
-	public static IFuture getDeclaredService(IServiceProvider provider, IServiceIdentifier sid)
+	public static IFuture getDeclaredService(IServiceProvider provider, final IServiceIdentifier sid)
 	{
 //		synchronized(profiling)
 //		{
@@ -348,40 +393,17 @@ public class SServiceProvider
 //		IVisitDecider abortdecider = new DefaultVisitDecider();
 		
 		provider.getServices(localmanager, abortdecider, new IdResultSelector(sid), new ArrayList())
-			.addResultListener(new DelegationResultListener(ret));
+			.addResultListener(new DelegationResultListener(ret)
+		{
+			public void customResultAvailable(Object source, Object result)
+			{
+				if(result==null)
+					exceptionOccurred(source, new ServiceNotFoundException("No service found for id: "+sid));
+				else
+					super.customResultAvailable(source, result);
+			}
+		});
 		
 		return ret;
 	}
-	
-	/**
-	 *  Get one remote service of a type.
-	 *  @param type The class.
-	 *  @return The corresponding service.
-	 * /
-	public static IFuture getRemoteService(IServiceProvider provider, final IComponentIdentifier platform, final Class type)
-	{
-//		synchronized(profiling)
-//		{
-//			Integer	cnt	= (Integer)profiling.get(type);
-//			profiling.put(type, new Integer(cnt!=null ? cnt.intValue()+1 : 1)); 
-//		}
-		
-		final Future ret = new Future();
-		
-		getService(provider, IRemoteServiceManagementService.class).addResultListener(new IResultListener()
-		{
-			public void resultAvailable(Object source, Object result)
-			{
-				IRemoteServiceManagementService rms = (IRemoteServiceManagementService)result;
-				ret.setResult(rms.getProxy(platform, type));
-			}
-			
-			public void exceptionOccurred(Object source, Exception exception)
-			{
-				ret.setException(exception);
-			}
-		});
-	
-		return ret;
-	}*/
 }

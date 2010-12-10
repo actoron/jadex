@@ -1,5 +1,15 @@
 Jadex Releases Overview
 
+Release 2.0 rc6 (Service release 12/2010)
+	- Improved service model (provided/required services)
+	- Dynamic (lazy) component creation based on provided services
+	- Simplified support for remote GUIs (see e.g. cleaner in cleanerworld)
+	- New mandelbrot application (micro) showing the use of dynamic services.
+	- New disaster management application (BDI)
+	- New helpline application (micro)
+	- Support for ADF checker eclipse plugin
+	- Numerous bug fixes
+
 Release 2.0 rc5 (Bugfix release 09/2010)
 	- Minor bug fixes
 

@@ -1329,9 +1329,13 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 				MComponentType	type	= component.getType(model);
 				if(type!=null)
 				{
+					Boolean	suspend	= component.getSuspend()!=null ? component.getSuspend() : type.getSuspend();
+					Boolean	master	= component.getMaster()!=null ? component.getMaster() : type.getMaster();
+					Boolean	daemon	= component.getDaemon()!=null ? component.getDaemon() : type.getDaemon();
+					Boolean	autoshutdown	= component.getAutoShutdown()!=null ? component.getAutoShutdown() : type.getAutoShutdown();
 					IFuture ret = ces.createComponent(component.getName(), component.getType(model).getFilename(),
 						new CreationInfo(component.getConfiguration(), getArguments(component), adapter.getComponentIdentifier(),
-						component.getSuspend(), component.getMaster(), component.getDaemon(), component.getAutoShutdown(), model.getAllImports()), null);
+						suspend, master, daemon, autoshutdown, model.getAllImports()), null);
 					ret.addResultListener(crl);
 				}
 				else
