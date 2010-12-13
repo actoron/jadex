@@ -63,8 +63,12 @@ public class Constants {
 //	public static final String RESULTS_OF_ROW = "ResultsOfRow";
 	
 	//The path of a file
-	public static final String FILE_PATH = "FilePath";
-	
+	public static final String APPLICATION_FILE_PATH = "FilePath";
+	public static final String CONFIGURATION_FILE_PATH = "ConfigurationPath";
+
+	// XML file as String
+	public static final String APPLICATION_FILE_AS_XML_STRING = "ApplicationFileAsXMLString";
+	public static final String CONFIGURATION_FILE_AS_XML_STRING = "ConfigurationFileAsXMLString";
 	
 	//-- Constants used in the SimulationConfiguration xml file
 	

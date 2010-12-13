@@ -53,23 +53,23 @@ public class RemoteSimulationExecutionService extends BasicService implements IR
 	}
 
 	/**
-	 * Simulate an experiment defined as application.xml
+	 * Simulate an experiment defined as application.xml and configured via an "*.configuration.xml"
 	 * 
 	 * @param item
 	 *            The item.
 	 */
-	public IFuture executeExperiment(String appName, String applicationDescription, String configName, Map args) {
-		System.out.println("Called Remote Service.");
+	public IFuture executeExperiment(Map applicationArgs, HashMap<String,Object> clientArgs) {
+		System.out.println("#ClientService# Called Remote Service.");
 		final Future ret = new Future();
 
 		try {
 			// persist application description
-			final String fileName = System.getProperty("user.dir") + "\\ApplicationDescription.application.xml";
-			FileHandler.writeToFile(fileName, applicationDescription);
-			((Map) (args.get(Constants.SIMULATION_FACTS_FOR_CLIENT))).put(Constants.FILE_PATH, fileName);
-			
-			// init agent and store required execution information for client agent			
-			comp.getBeliefbase().getBelief("simulationFacts").setFact(args.get(Constants.SIMULATION_FACTS_FOR_CLIENT));			
+//			final String fileName = System.getProperty("user.dir") + "\\ApplicationDescription.application.xml";
+//			FileHandler.writeToFile(fileName, applicationDescription);
+//			((Map) (args.get(Constants.SIMULATION_FACTS_FOR_CLIENT))).put(Constants.APPLICATION_FILE_PATH, fileName);
+//			
+//			// init agent and store required execution information for client agent			
+//			comp.getBeliefbase().getBelief("simulationFacts").setFact(args.get(Constants.SIMULATION_FACTS_FOR_CLIENT));			
 			
 
 			// start simulation execution
@@ -78,12 +78,11 @@ public class RemoteSimulationExecutionService extends BasicService implements IR
 				ret.setException(new IllegalStateException("Can only handle one observation at a time."));
 			} else {
 				final IGoal oe = (IGoal) comp.getGoalbase().createGoal("startExecution");
-				oe.getParameter("appName").setValue(appName);
-				oe.getParameter("args").setValue(args);
+				oe.getParameter("applicationConf").setValue(applicationArgs);
+				oe.getParameter("clientConf").setValue(clientArgs);
 				oe.addGoalListener(new IGoalListener() {
 					public void goalFinished(AgentEvent ae) {
-						System.out.println("observation finished at: " + comp.getAgentName());
-						FileHandler.deleteFile(fileName);
+						System.out.println("observation finished at: " + comp.getAgentName());						
 						if (oe.isSucceeded())
 							ret.setResult(comp.getBeliefbase().getBelief("simulationFacts").getFact());
 						else

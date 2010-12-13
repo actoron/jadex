@@ -30,7 +30,9 @@ import jadex.simulation.evaluation.SimulationDataConsumer;
 import jadex.simulation.helper.AgentMethods;
 import jadex.simulation.helper.Constants;
 import jadex.simulation.helper.EvaluateExpression;
+import jadex.simulation.helper.FileHandler;
 import jadex.simulation.helper.TimeConverter;
+import jadex.simulation.helper.XMLHandler;
 import jadex.simulation.model.Data;
 import jadex.simulation.model.Dataconsumer;
 import jadex.simulation.model.Dataprovider;
@@ -65,19 +67,18 @@ public class RuntimeManagerPlan extends Plan {
 	private IClockService clockservice = (IClockService) SServiceProvider.getService(getScope().getServiceProvider(), IClockService.class).get(this);
 	IComponentManagementService cms = null;
 	private OnlineVisualisation vis = null;
+	private String appFilePath = null;
 
 	public void body() {
-
-		HashMap simFacts = (HashMap) getBeliefbase().getBelief("simulationFacts").getFact();
-		SimulationConfiguration simConf = (SimulationConfiguration) simFacts.get(Constants.SIMULATION_FACTS_FOR_CLIENT);
-		String experimentID = (String) simFacts.get(Constants.EXPERIMENT_ID);
-		String parameterSweepValue = simConf.getOptimization().getParameterSweeping().getCurrentValue();
-		
+		HashMap<String,Object> clientConfMap = (HashMap<String, Object>) getParameter("clientConf").getValue();
+		SimulationConfiguration simConf  = (SimulationConfiguration) XMLHandler.parseXMLFromString((String) clientConfMap.get(Constants.CONFIGURATION_FILE_AS_XML_STRING), SimulationConfiguration.class);
 		cms = (IComponentManagementService) SServiceProvider.getService(getScope().getServiceProvider(), IComponentManagementService.class).get(this);
+//		HashMap simFacts = (HashMap) getBeliefbase().getBelief("simulationFacts").getFact();
 		
-		startApplication((String) getParameter("appName").getValue(), (String) simFacts.get(Constants.FILE_PATH), simConf.getApplicationConfiguration(), (Map) getParameter("args").getValue(), simConf);
-
-		System.out.println("#Client# Started CLIENT Simulation run....: " + simConf.getName() + " - " + experimentID + ", currentVal: " + parameterSweepValue);
+		
+		
+		startApplication((Map) getParameter("applicationConf").getValue(), clientConfMap, simConf);
+		System.out.println("#Client# Started CLIENT Simulation run....: " + simConf.getName() + " - " + (String) clientConfMap.get(Constants.EXPERIMENT_ID) + ", currentVal: " + simConf.getOptimization().getParameterSweeping().getCurrentValue());
 
 		AbstractEnvironmentSpace space = (AbstractEnvironmentSpace) exta.getSpace(simConf.getNameOfSpace());
 
@@ -128,7 +129,7 @@ public class RuntimeManagerPlan extends Plan {
 						break;
 					}
 				} else {
-					IComponentIdentifier agentIdentifier = AgentMethods.getIComponentIdentifier(space, targetFunct.getObjectSource().getName());//
+					IComponentIdentifier agentIdentifier = AgentMethods.getIComponentIdentifier(space, targetFunct.getObjectSource().getName());
 					IFuture fut = cms.getExternalAccess(agentIdentifier);
 					IExternalAccess exta = (IExternalAccess) fut.get(this);
 
@@ -158,6 +159,11 @@ public class RuntimeManagerPlan extends Plan {
 		System.out.println("#Client# Trying to kill executed application....");
 		vis.setExit();
 		vis.dispose();
+		
+		
+		FileHandler.deleteFile(appFilePath);
+		appFilePath = null;
+		
 
 		cms.destroyComponent(exta.getComponentIdentifier());
 		System.out.println("#Client# Goal over???");
@@ -168,7 +174,7 @@ public class RuntimeManagerPlan extends Plan {
 		facts.put(Constants.EXPERIMENT_END_TIME, new Long(clockservice.getTime()));
 		facts.put(Constants.OBSERVED_EVENTS_MAP, observedEvents);
 		// does not need to be send back to master agent
-		facts.remove(Constants.SIMULATION_FACTS_FOR_CLIENT);
+//		facts.remove(Constants.SIMULATION_FACTS_FOR_CLIENT);
 		
 		getBeliefbase().getBelief("simulationFacts").setFact(facts);
 	}
@@ -219,10 +225,14 @@ public class RuntimeManagerPlan extends Plan {
 		}
 	}
 
-	private void startApplication(String appName, String fileName, String configName, Map args, SimulationConfiguration simConf) {
+	private void startApplication(Map appConf, HashMap<String,Object> clientConf, SimulationConfiguration simConf) {
+		
+		//store file application.xml
+		appFilePath = System.getProperty("user.dir") + "\\"+ simConf.getName()+ (String) clientConf.get(Constants.EXPERIMENT_ID)+ ".application.xml";
+		FileHandler.writeToFile(appFilePath, (String) clientConf.get(Constants.APPLICATION_FILE_AS_XML_STRING));
 		
 		// create application in suspended modus
-		IFuture fut = cms.createComponent(appName, fileName, new CreationInfo(configName, args, null, true, false), null);
+		IFuture fut = cms.createComponent(simConf.getName() + (String) clientConf.get(Constants.EXPERIMENT_ID), appFilePath, new CreationInfo(simConf.getApplicationConfiguration(), appConf, null, true, false), null);
 		IComponentIdentifier cid = (IComponentIdentifier) fut.get(this);
 		this.exta = (IApplicationExternalAccess) cms.getExternalAccess(cid).get(this);
 
@@ -237,7 +247,7 @@ public class RuntimeManagerPlan extends Plan {
 
 		// Save initial facts of this simulation run.
 		long startTime = clockservice.getTime();
-		Map facts = (Map) getBeliefbase().getBelief("simulationFacts").getFact();
+		Map facts = new HashMap();
 		facts.put(Constants.EXPERIMENT_START_TIME, new Long(startTime));
 		getBeliefbase().getBelief("simulationFacts").setFact(facts);
 

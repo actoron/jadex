@@ -3,7 +3,7 @@ package jadex.simulation.remote;
 import jadex.commons.IFuture;
 import jadex.commons.service.IService;
 
-import java.io.BufferedInputStream;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -18,9 +18,9 @@ public interface IRemoteSimulationExecutionService	extends IService
 	public String getPlatformName();
 	
 	/**
-	 *  Simulate an experiment defined as application.xml
+	 *  Simulate an experiment defined as application.xml and configured via a "*.configuration.xml" file
 	 *  @param item The item.
 	 */
-	public IFuture executeExperiment(String appName, String applicationDescription, String configName, Map args);
+	public IFuture executeExperiment(Map applicationArgs, HashMap<String,Object> clientArgs);
 	
 }

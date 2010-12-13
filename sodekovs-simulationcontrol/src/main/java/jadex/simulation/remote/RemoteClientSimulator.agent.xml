@@ -24,7 +24,7 @@
 	<capabilities>
 		<!-- this capability provides easy access to "out-of-the-box"-plans allowing 
 			- for example - to register at the DF. -->
-		<capability name="dfcap" file="jadex.bdi.planlib.df.DF" />
+		<!-- <capability name="dfcap" file="jadex.bdi.planlib.df.DF" /> -->
 	</capabilities>
 
 	<beliefs>
@@ -36,25 +36,25 @@
 
 	<goals>
 		<!-- Used to search for the masters simulation agent. -->
-		<achievegoalref name="df_search">
+		<!-- <achievegoalref name="df_search">
 			<concrete ref="dfcap.df_search" />
-		</achievegoalref>
+		</achievegoalref>-->
 		<performgoal name="startExecution" retry="false" exclude="never">
 			<!-- Args required to start application -->
-			<parameter name="args" class="Map" />
+			<parameter name="applicationConf" class="Map" />
 			<!-- The name (id) of the application -->
-			<parameter name="appName" class="String" />
+			<parameter name="clientConf" class="HashMap" />
 		</performgoal>
 	</goals>
 
 	<plans>		<!-- Responsible for all aspects related to the run of the simulation, especially 			to monitor the terminate condition. -->
 		<plan name="runtime_manager">
 			<body class="RuntimeManagerPlan" />
-			<parameter name="args" class="Map">
-				<goalmapping ref="startExecution.args"/>
+			<parameter name="applicationConf" class="Map">
+				<goalmapping ref="startExecution.applicationConf"/>
 			</parameter>
-			<parameter name="appName" class="String">
-				<goalmapping ref="startExecution.appName"/>
+			<parameter name="clientConf" class="HashMap">
+				<goalmapping ref="startExecution.clientConf"/>
 			</parameter>
 			<trigger>
 				<goal ref="startExecution" />
