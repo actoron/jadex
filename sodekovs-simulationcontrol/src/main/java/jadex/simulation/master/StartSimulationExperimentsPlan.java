@@ -5,10 +5,10 @@ import jadex.bdi.runtime.Plan;
 import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentManagementService;
 import jadex.commons.IFuture;
+import jadex.commons.concurrent.IResultListener;
 import jadex.commons.service.SServiceProvider;
 import jadex.simulation.helper.Constants;
 import jadex.simulation.helper.FileHandler;
-import jadex.simulation.helper.ObjectCloner;
 import jadex.simulation.model.Optimization;
 import jadex.simulation.model.SimulationConfiguration;
 import jadex.simulation.model.result.ExperimentResult;
@@ -95,7 +95,13 @@ public class StartSimulationExperimentsPlan extends Plan {
 //			((HashMap) applicationArgs.get(Constants.SIMULATION_FACTS_FOR_CLIENT)).put(Constants.EXPERIMENT_ID, experimentID);
 
 			// startApplication(appName, fileName, configName, args);
-			startApplicationRemotley(applicationArgs,clientArgs);
+//			startApplicationRemotley(applicationArgs,clientArgs);
+			
+			// Dispatch separate goal to start distribution of single experiment result
+			IGoal eval = (IGoal) getGoalbase().createGoal("DistributeExperimentGoal");
+			eval.getParameter("applicationArgs").setValue(applicationArgs);
+			eval.getParameter("clientArgs").setValue(clientArgs);
+			getGoalbase().dispatchTopLevelGoal(eval);
 
 			System.out.println("#*****************************************************************.");
 			System.out.println("Used memory: " + (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1024000);
@@ -110,6 +116,8 @@ public class StartSimulationExperimentsPlan extends Plan {
 			// gui.updateStaticTable(rowCounter, expInRow);
 
 			waitForInternalEvent("triggerNextExperiment");
+			
+			
 //			System.out.println("#StartSimulationExpPlan# Received Results of Client!!!!");
 			// HACK: Ein warten scheint notwendig zu sein..., damit Ausführung
 			// korrekt läuft.
@@ -205,27 +213,27 @@ public class StartSimulationExperimentsPlan extends Plan {
 
 				System.out.println("#StartSimulationExpPlan# Distributed Simulation. Waiting for res at Master...");
 				IFuture fut = services.get(0).executeExperiment(applicationArgs, clientArgs);
-//				fut.addResultListener(new IResultListener() {
-//					public void resultAvailable(Object source, Object result) {
-//						System.out.println("#StartSimulationExpPlan#Received res from remote simulation execution");
-//
-//						// Start Evaluation of single experiment result
-//						IGoal eval = (IGoal) getGoalbase().createGoal("EvaluateSingleResult");
-//						eval.getParameter("args").setValue(result);
-//						getGoalbase().dispatchTopLevelGoal(eval);
-//					}
-//
-//					public void exceptionOccurred(Object source, Exception exception) {
-//						System.out.println("#StartSimulationExpPlan#Error: Remote simulation execution failed!");
-//					}
-//				});
+				fut.addResultListener(new IResultListener() {
+					public void resultAvailable(Object source, Object result) {
+						System.out.println("#StartSimulationExpPlan#Received res from remote simulation execution");
 
-				 Map resMap = (Map) fut.get(this);
-				 System.out.println("#StartSimulationExpPlan# RECEIVED res at Master...");
-				 IGoal eval = (IGoal)
-				 getGoalbase().createGoal("EvaluateSingleResult");
-				 eval.getParameter("args").setValue(resMap);
-				 getGoalbase().dispatchTopLevelGoal(eval);
+						// Start Evaluation of single experiment result
+						IGoal eval = (IGoal) getGoalbase().createGoal("EvaluateSingleResult");
+						eval.getParameter("args").setValue(result);
+						getGoalbase().dispatchTopLevelGoal(eval);
+					}
+
+					public void exceptionOccurred(Object source, Exception exception) {
+						System.out.println("#StartSimulationExpPlan#Error: Remote simulation execution failed!");
+					}
+				});
+
+//				 Map resMap = (Map) fut.get(this);
+//				 System.out.println("#StartSimulationExpPlan# RECEIVED res at Master...");
+//				 IGoal eval = (IGoal)
+//				 getGoalbase().createGoal("EvaluateSingleResult");
+//				 eval.getParameter("args").setValue(resMap);
+//				 getGoalbase().dispatchTopLevelGoal(eval);
 
 			} else {
 				System.out.println("Error: Could not find remote simulation execution service!");

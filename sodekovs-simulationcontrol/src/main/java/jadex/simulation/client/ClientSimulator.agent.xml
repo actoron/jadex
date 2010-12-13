@@ -18,16 +18,7 @@
 		<import>jadex.base.fipa.*</import>
 		<import>java.util.*</import>
 		<import>jadex.simulation.model.Observer</import>
-	</imports>
-
-
-	<capabilities>
-		<!--
-			this capability provides easy access to "out-of-the-box"-plans
-			allowing - for example - to register at the DF.
-		-->
-		<capability name="dfcap" file="jadex.bdi.planlib.df.DF" />
-	</capabilities>
+	</imports>	
 
 	<beliefs>
 		<!-- Map contains all facts related to this simulation run.-->
@@ -44,13 +35,6 @@
 		</belief> -->
 
 	</beliefs>
-
-	<goals>
-		<!-- Used to search for the masters simulation agent. -->
-		<achievegoalref name="df_search">
-			<concrete ref="dfcap.df_search" />
-		</achievegoalref>
-	</goals>
 
 	<plans>		<!--			Responsible for all aspects related to the run of the simulation,			especially to monitor the terminate condition.		-->
 		<plan name="runtime_manager">
