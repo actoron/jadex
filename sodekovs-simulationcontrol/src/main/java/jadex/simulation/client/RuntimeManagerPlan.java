@@ -252,15 +252,16 @@ public class RuntimeManagerPlan extends Plan {
 		getBeliefbase().getBelief("simulationFacts").setFact(facts);
 
 		// Hack: Synchronize start time!
+		waitFor(7000);
 		System.out.println("-->StartTime at Client: " + startTime);
 		AbstractEnvironmentSpace space = ((AbstractEnvironmentSpace) (exta).getSpace(simConf.getNameOfSpace()));
 		space.setProperty("REAL_START_TIME_OF_SIMULATION", startTime);
 		// *************************************************************
 		// This is a hack for this special application.xml -> MarsWorld
-		if (space.getSpaceObjectsByType("homebase").length > 0) {
-			space.getSpaceObjectsByType("homebase")[0].setProperty("start_time", startTime);
+//		if (space.getSpaceObjectsByType("homebase").length > 0) {
+//			space.getSpaceObjectsByType("homebase")[0].setProperty("start_time", startTime);
 
-		}
+//		}
 	}
 
 	private void addDataConsumerAndProvider(SimulationConfiguration simConf) {
