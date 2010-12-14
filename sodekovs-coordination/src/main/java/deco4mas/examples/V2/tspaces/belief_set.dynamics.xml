@@ -24,8 +24,7 @@
 			<role_occupation name="sender" multiple="false">
 				<agent id="Sender">
 					<constraints>
-						<condition name="condition_name">$beliefbase.conditionBelief
-						</condition>
+						<condition name="condition_name">$beliefbase.conditionBelief</condition>
 					</constraints>
 					<elements>
 						<element id="testEvent" type="INTERNAL_EVENT" />
@@ -40,8 +39,7 @@
 				</agent>
 				<agent id="Receiver">
 					<constraints>
-						<condition name="condition_name">$beliefbase.conditionBelief
-						</condition>
+						<condition name="condition_name">$beliefbase.conditionBelief</condition>
 					</constraints>
 					<elements>
 						<element id="testGoal" type="BDI_GOAL" />
