@@ -74,7 +74,6 @@ public class RemoteSimulationExecutionService extends BasicService implements IR
 				oe.addGoalListener(new IGoalListener() {
 					public void goalFinished(AgentEvent ae) {
 						System.out.println("#RemoteSimulationExecutionService# Finished service execution at: " + comp.getAgentName());
-						System.out.println("#RemoteSimulationExecutionService# ****************************************************");
 						if (oe.isSucceeded())
 							ret.setResult(comp.getBeliefbase().getBelief("simulationFacts").getFact());
 						else

@@ -19,9 +19,9 @@
 			<components>
 				<component type="SimulationManager" master="true">
 					<arguments>
-						<argument name="simulationDescriptionFile">"../sodekovs-simulationcontrol/src/main/java/jadex/simulation/Configuration2.xml"</argument> 
+						<!-- <argument name="simulationDescriptionFile">"../sodekovs-simulationcontrol/src/main/java/jadex/simulation/Configuration2.xml"</argument> -->
 						<!--<argument name="simulationDescriptionFile">"../sodekovs-simulationcontrol/src/main/java/jadex/simulation/SpeedOptimization.xml"</argument> -->
-					 	<!-- <argument name="simulationDescriptionFile">"../sodekovs-simulationcontrol/src/main/java/jadex/simulation/TestNegotiationConfiguration.xml"</argument>-->
+					 	<argument name="simulationDescriptionFile">"../sodekovs-simulationcontrol/src/main/java/jadex/simulation/TestNegotiationConfiguration.xml"</argument>
 					</arguments>
 				</component>
 			</components>
