@@ -7,8 +7,6 @@ import jadex.bdi.runtime.IGoalListener;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.service.BasicService;
-import jadex.simulation.helper.Constants;
-import jadex.simulation.helper.FileHandler;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -59,19 +57,12 @@ public class RemoteSimulationExecutionService extends BasicService implements IR
 	 *            The item.
 	 */
 	public IFuture executeExperiment(Map applicationArgs, HashMap<String,Object> clientArgs) {
-		System.out.println("#ClientService# Called Remote Service.");
+		System.out.println("#RemoteSimulationExecutionService# ****************************************************");
+		System.out.println("#RemoteSimulationExecutionService# Called Remote Service:  executeExperiment()");
+		
 		final Future ret = new Future();
 
 		try {
-			// persist application description
-//			final String fileName = System.getProperty("user.dir") + "\\ApplicationDescription.application.xml";
-//			FileHandler.writeToFile(fileName, applicationDescription);
-//			((Map) (args.get(Constants.SIMULATION_FACTS_FOR_CLIENT))).put(Constants.APPLICATION_FILE_PATH, fileName);
-//			
-//			// init agent and store required execution information for client agent			
-//			comp.getBeliefbase().getBelief("simulationFacts").setFact(args.get(Constants.SIMULATION_FACTS_FOR_CLIENT));			
-			
-
 			// start simulation execution
 			IGoal[] goals = (IGoal[]) comp.getGoalbase().getGoals("startExecution");
 			if (goals.length > 0) {
@@ -82,7 +73,8 @@ public class RemoteSimulationExecutionService extends BasicService implements IR
 				oe.getParameter("clientConf").setValue(clientArgs);
 				oe.addGoalListener(new IGoalListener() {
 					public void goalFinished(AgentEvent ae) {
-						System.out.println("observation finished at: " + comp.getAgentName());						
+						System.out.println("#RemoteSimulationExecutionService# Finished service execution at: " + comp.getAgentName());
+						System.out.println("#RemoteSimulationExecutionService# ****************************************************");
 						if (oe.isSucceeded())
 							ret.setResult(comp.getBeliefbase().getBelief("simulationFacts").getFact());
 						else
@@ -96,7 +88,7 @@ public class RemoteSimulationExecutionService extends BasicService implements IR
 			}
 
 		} catch (Exception e) {
-			System.out.println("Could not start application...." + e);
+			System.out.println("#RemoteSimulationExecutionService# Could not start application...." + e);
 		}
 		return ret;
 	}

@@ -78,7 +78,6 @@ public class RuntimeManagerPlan extends Plan {
 		
 		
 		startApplication((Map) getParameter("applicationConf").getValue(), clientConfMap, simConf);
-		System.out.println("#Client# Started Simulation run....: " + simConf.getName() + " - " + (String) clientConfMap.get(Constants.EXPERIMENT_ID) + ", currentVal: " + simConf.getOptimization().getParameterSweeping().getCurrentValue());
 
 		AbstractEnvironmentSpace space = (AbstractEnvironmentSpace) exta.getSpace(simConf.getNameOfSpace());
 
@@ -124,7 +123,7 @@ public class RuntimeManagerPlan extends Plan {
 					boolean res = EvaluateExpression.evaluate(space, targetFunct.getFunction(), targetFunct.getObjectSource().getName(), targetFunct.getObjectSource().getType());
 
 					if (res) {
-						System.out.println("#Client:RuntimeManagerPlan# Terminate experiment: Semantic termination condition has been evaluated being true.");
+						System.out.println("#RuntimeManagerPlan# Terminate experiment: Semantic termination condition has been evaluated being true.");
 						// Experiment has reached Target Function. Terminate
 						break;
 					}
@@ -141,7 +140,7 @@ public class RuntimeManagerPlan extends Plan {
 					boolean res = EvaluateExpression.evaluateExpression(fetcher, targetFunct.getFunction());
 
 					if (res) {
-						System.out.println("#Client:RuntimeManagerPlan# Terminate experiment: Semantic termination condition has been evaluated being true.");
+						System.out.println("#RuntimeManagerPlan# Terminate experiment: Semantic termination condition has been evaluated being true.");
 						// Experiment has reached Target Function. Terminate
 						break;
 					}
@@ -156,7 +155,7 @@ public class RuntimeManagerPlan extends Plan {
 
 		prepareResult(results);
 
-		System.out.println("#Client# Trying to kill executed application....");
+		System.out.println("#RuntimeManagerPlan# Killing executed application....");
 		vis.setExit();
 		vis.dispose();
 		
@@ -166,7 +165,7 @@ public class RuntimeManagerPlan extends Plan {
 		
 
 		cms.destroyComponent(exta.getComponentIdentifier());
-		System.out.println("#Client# Goal over???");
+//		System.out.println("#RuntimeManagerPlan# Goal over???");
 	}
 
 	private void prepareResult(ConcurrentHashMap<Long, ArrayList<ObservedEvent>> observedEvents) {
@@ -213,13 +212,13 @@ public class RuntimeManagerPlan extends Plan {
 		if (mode == 0) {
 			// Long relativeTime = new Long(10000);
 			Long terminationTime = new Long(value + currentTime.longValue());
-			System.out.println("StartTime: " + TimeConverter.longTime2DateString(currentTime) + "TerminationTime: " + TimeConverter.longTime2DateString(terminationTime));
+			System.out.println("#RuntimeManagerPlan# StartTime: " + TimeConverter.longTime2DateString(currentTime) + " - TerminationTime: " + TimeConverter.longTime2DateString(terminationTime));
 			return new Long(value);
 		} else {// TODO: There might be a problem with Day Light Savings Time!
 			Calendar cal = Calendar.getInstance();
 			// Date terminationTime = cal.getTime();
 			Long duration = new Long(value - currentTime.longValue());
-			System.out.println("StartTime: " + TimeConverter.longTime2DateString(currentTime) + "TerminationTime: " + TimeConverter.longTime2DateString(new Long(value)) + ", Duration: "
+			System.out.println("#RuntimeManagerPlan# StartTime: " + TimeConverter.longTime2DateString(currentTime) + " TerminationTime: " + TimeConverter.longTime2DateString(new Long(value)) + ", Duration: "
 					+ duration.longValue());
 			return duration;
 		}
@@ -252,7 +251,7 @@ public class RuntimeManagerPlan extends Plan {
 		getBeliefbase().getBelief("simulationFacts").setFact(facts);
 
 		// Hack: Synchronize start time!
-		System.out.println("-->StartTime at Client: " + startTime);
+//		System.out.println("-->StartTime at Client: " + startTime);
 		AbstractEnvironmentSpace space = ((AbstractEnvironmentSpace) (exta).getSpace(simConf.getNameOfSpace()));
 		space.setProperty("REAL_START_TIME_OF_SIMULATION", startTime);
 		
