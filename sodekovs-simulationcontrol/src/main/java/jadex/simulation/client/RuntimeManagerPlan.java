@@ -78,7 +78,7 @@ public class RuntimeManagerPlan extends Plan {
 		
 		
 		startApplication((Map) getParameter("applicationConf").getValue(), clientConfMap, simConf);
-		System.out.println("#Client# Started CLIENT Simulation run....: " + simConf.getName() + " - " + (String) clientConfMap.get(Constants.EXPERIMENT_ID) + ", currentVal: " + simConf.getOptimization().getParameterSweeping().getCurrentValue());
+		System.out.println("#Client# Started Simulation run....: " + simConf.getName() + " - " + (String) clientConfMap.get(Constants.EXPERIMENT_ID) + ", currentVal: " + simConf.getOptimization().getParameterSweeping().getCurrentValue());
 
 		AbstractEnvironmentSpace space = (AbstractEnvironmentSpace) exta.getSpace(simConf.getNameOfSpace());
 

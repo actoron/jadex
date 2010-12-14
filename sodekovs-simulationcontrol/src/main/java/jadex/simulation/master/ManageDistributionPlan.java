@@ -9,6 +9,8 @@ import jadex.bdi.runtime.Plan;
 import jadex.commons.IFuture;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.service.SServiceProvider;
+import jadex.simulation.helper.Constants;
+import jadex.simulation.model.SimulationConfiguration;
 import jadex.simulation.remote.IRemoteSimulationExecutionService;
 
 public class ManageDistributionPlan extends Plan
@@ -41,6 +43,9 @@ public class ManageDistributionPlan extends Plan
 
 	
 	private void startApplicationRemotley(Map applicationArgs, HashMap<String,Object> clientArgs) {
+		
+		SimulationConfiguration simConf = (SimulationConfiguration) getBeliefbase().getBelief("simulationConf").getFact();
+		HashMap beliefbaseFacts = (HashMap) getBeliefbase().getBelief("generalSimulationFacts").getFact();
 
 		try {
 			ArrayList<IRemoteSimulationExecutionService> services = null;
@@ -62,36 +67,38 @@ public class ManageDistributionPlan extends Plan
 				// read the *.application.xml File from the file system
 //				String applicationDescription = FileHandler.readFileAsString(fileName);
 
-				System.out.println("#ManageDistributionPlan# Distributed Simulation. Waiting for res at Master...");
+				System.out.println("#ManageDistributionPlan# Distributed new Simulation Experiment remotely. Nr.:" + clientArgs.get(Constants.EXPERIMENT_ID) + "(" + beliefbaseFacts.get(Constants.TOTAL_EXPERIMENT_COUNTER) + ") with Optimization Values: "
+						+ simConf.getOptimization().getData().getName() + " = " + simConf.getOptimization().getParameterSweeping().getCurrentValue());
+				
 				IFuture fut = services.get(0).executeExperiment(applicationArgs, clientArgs);
-				fut.addResultListener(new IResultListener() {
-					public void resultAvailable(Object source, Object result) {
-						System.out.println("#ManageDistributionPlan#Received res from remote simulation execution");
+//				fut.addResultListener(new IResultListener() {
+//					public void resultAvailable(Object source, Object result) {
+//						System.out.println("#ManageDistributionPlan#Received res from remote simulation execution");
+//
+//						// Start Evaluation of single experiment result
+//						IGoal eval = (IGoal) getGoalbase().createGoal("EvaluateSingleResult");
+//						eval.getParameter("args").setValue(result);
+//						getGoalbase().dispatchTopLevelGoal(eval);
+//					}
+//
+//					public void exceptionOccurred(Object source, Exception exception) {
+//						System.out.println("#ManageDistributionPlan#Error: Remote simulation execution failed! " + exception);
+//					}
+//				});
 
-						// Start Evaluation of single experiment result
-						IGoal eval = (IGoal) getGoalbase().createGoal("EvaluateSingleResult");
-						eval.getParameter("args").setValue(result);
-						getGoalbase().dispatchTopLevelGoal(eval);
-					}
-
-					public void exceptionOccurred(Object source, Exception exception) {
-						System.out.println("#ManageDistributionPlan#Error: Remote simulation execution failed! " + exception);
-					}
-				});
-
-//				 Map resMap = (Map) fut.get(this);
-//				 System.out.println("#StartSimulationExpPlan# RECEIVED res at Master...");
-//				 IGoal eval = (IGoal)
-//				 getGoalbase().createGoal("EvaluateSingleResult");
-//				 eval.getParameter("args").setValue(resMap);
-//				 getGoalbase().dispatchTopLevelGoal(eval);
+				 Map resMap = (Map) fut.get(this);
+				 System.out.println("#StartSimulationExpPlan# RECEIVED res at Master...");
+				 IGoal eval = (IGoal)
+				 getGoalbase().createGoal("EvaluateSingleResult");
+				 eval.getParameter("args").setValue(resMap);
+				 getGoalbase().dispatchTopLevelGoal(eval);
 
 			} else {
 				System.out.println("Error: Could not find remote simulation execution service!");
 			}
 
 		} catch (Exception e) {
-			System.out.println("Could not start simulation experiment for remote execution" + e);
+			System.out.println("Could not start simulation experiment for remote execution. " + e);
 		}
 	}
 }

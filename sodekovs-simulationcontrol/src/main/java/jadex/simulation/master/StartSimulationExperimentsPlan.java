@@ -39,25 +39,18 @@ public class StartSimulationExperimentsPlan extends Plan {
 		// Put args into application. This args are passed to the
 		// application.xml to parameterize application.
 		Map applicationArgs = new HashMap();
-		
-		//Args for the simulation execution service (Client Agent)
-		HashMap<String,Object> clientArgs = new HashMap<String,Object>();
+
+		// Args for the simulation execution service (Client Agent)
+		HashMap<String, Object> clientArgs = new HashMap<String, Object>();
 		// read the *.application.xml file from the file system
 		clientArgs.put(Constants.APPLICATION_FILE_AS_XML_STRING, FileHandler.readFileAsString(simConf.getApplicationReference()));
 		// read the *.configuration.xml file from the file system
 		clientArgs.put(Constants.CONFIGURATION_FILE_AS_XML_STRING, FileHandler.readFileAsString((String) getBeliefbase().getBelief("simulationDescriptionFile").getFact()));
-		
-		// Prepare values for the experiments of this row
-//		String fileName = simConf.getApplicationReference();
-//		String configName = simConf.getApplicationConfiguration();
-//		String configFile = (String) getBeliefbase().getBelief("simulationDescriptionFile").getFact();
 
 		// prepare object that handles the result
 		RowResult rowResult = new RowResult();
 		rowResult.setStarttime(getClock().getTime());
 		rowResult.setId(String.valueOf(rowCounter));
-
-
 
 		// check, whether parameters have to be swept
 		if (simConf.getOptimization().getParameterSweeping() != null) {
@@ -71,44 +64,26 @@ public class StartSimulationExperimentsPlan extends Plan {
 
 		for (long i = 0; i < experimentsPerRowToMake; i++) {
 
-			// Put SimulationConfiguration into the application.xml as parameter
-			// for the (remote) SimulationExecutionService
-//			Map simFacts = new HashMap();
-//			try {
-//				simFacts.put(Constants.SIMULATION_FACTS_FOR_CLIENT, ObjectCloner.deepCopy(simConf));
-//			} catch (Exception e) {
-//				e.printStackTrace();
-//			}
-
-//			args.put(Constants.SIMULATION_FACTS_FOR_CLIENT, simFacts);
-			// args.put(Constants.OBSERVED_EVENTS_MAP, observedEvents);
+			// simFacts.put(Constants.SIMULATION_FACTS_FOR_CLIENT,
+			// ObjectCloner.deepCopy(simConf));
 
 			String experimentID = rowCounter + "." + expInRow;
-//			String appName = simConf.getName() + experimentID;
-
 			clientArgs.put(Constants.EXPERIMENT_ID, experimentID);
-			// put tmp_start_time into args in order to observer duration of
-			// experiment
-//			long tmp_start_time = getClock().getTime();
-//			applicationArgs.put("tmp_start_time", tmp_start_time);
-			
-//			((HashMap) applicationArgs.get(Constants.SIMULATION_FACTS_FOR_CLIENT)).put(Constants.EXPERIMENT_ID, experimentID);
 
 			// startApplication(appName, fileName, configName, args);
-//			startApplicationRemotley(applicationArgs,clientArgs);
-			
-			// Dispatch separate goal to start distribution of single experiment result
+			// startApplicationRemotley(applicationArgs,clientArgs);
+
+			// Dispatch separate goal to start distribution of single experiment
+			// result
 			IGoal eval = (IGoal) getGoalbase().createGoal("DistributeExperimentGoal");
 			eval.getParameter("applicationArgs").setValue(applicationArgs);
 			eval.getParameter("clientArgs").setValue(clientArgs);
 			getGoalbase().dispatchTopLevelGoal(eval);
 
-			System.out.println("#*****************************************************************.");
-			System.out.println("Used memory: " + (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1024000);
-			System.out.println("#*****************************************************************.");
+			System.out.println("#*****************************************************************");
+			System.out.println("#Master#Used memory: " + (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1024000);
+			System.out.println("#*****************************************************************");
 
-			System.out.println("#StartSimulationExpPlan# Started new Simulation Experiment remotely. Nr.:" + experimentID + "(" + totalRuns + ") with Optimization Values: "
-					+ simConf.getOptimization().getData().getName() + " = " + simConf.getOptimization().getParameterSweeping().getCurrentValue());
 			totalRuns++;
 			expInRow++;
 
@@ -116,13 +91,7 @@ public class StartSimulationExperimentsPlan extends Plan {
 			// gui.updateStaticTable(rowCounter, expInRow);
 
 			waitForInternalEvent("triggerNextExperiment");
-			
-			
-//			System.out.println("#StartSimulationExpPlan# Received Results of Client!!!!");
-			// HACK: Ein warten scheint notwendig zu sein..., damit Ausführung
-			// korrekt läuft.
-			// waitFor(2000);
-			// System.out.println("2Received Results!!!!");
+
 			beliefbaseFacts.put(Constants.TOTAL_EXPERIMENT_COUNTER, new Integer(totalRuns));
 			beliefbaseFacts.put(Constants.ROW_EXPERIMENT_COUNTER, new Integer(expInRow));
 			getBeliefbase().getBelief("generalSimulationFacts").setFact(beliefbaseFacts);
@@ -140,18 +109,10 @@ public class StartSimulationExperimentsPlan extends Plan {
 
 		// store results of row
 		HashMap<Integer, ExperimentResult> experimentResults = (HashMap<Integer, ExperimentResult>) getBeliefbase().getBelief("experimentResults").getFact();// contains
-		// the
-		// results of the
-		// experiments done
-		// in this row
+		// the results of the experiments done in this row
 		HashMap rowResults = (HashMap) getBeliefbase().getBelief("rowResults").getFact();
 
-		// System.out.println("#StartSimEx# tttttttttttttttttttttttttt.");
-		// for(ExperimentResult ttt : experimentResults.values()){
-		// System.out.println("#StartSimEx# ttt " + ttt.toString());
-		// XMLHandler.writeXML(ttt, "rowRes.xml", ExperimentResult.class);
-		// }
-		//
+
 		ArrayList<ExperimentResult> experimentList = new ArrayList<ExperimentResult>(experimentResults.values());
 		rowResult.setExperimentsResults(experimentList);
 		rowResult.setEndtime(getClock().getTime());
@@ -163,14 +124,7 @@ public class StartSimulationExperimentsPlan extends Plan {
 		rowResults.put(rowResult.getId(), rowResult);
 
 		getBeliefbase().getBelief("experimentResults").setFact(new HashMap());
-		// getBeliefbase().getBelief("intermediateResults").setFact(new
-		// IntermediateResult(rowCounter, 0, simConf));
 		getBeliefbase().getBelief("rowResults").setFact(rowResults);
-
-		// System.out.println("#StartSimEx# Try to write RowResult to XML-File.");
-
-		// System.out.println("#StartSimExp# Write Row Res to XML");
-		// XMLHandler.writeXML(rowResult, "rowRes" +".xml", RowResult.class);
 
 		// evaluate row
 		dispatchInternalEvent(createInternalEvent("triggerExperimentRowEvaluation"));
@@ -189,7 +143,7 @@ public class StartSimulationExperimentsPlan extends Plan {
 		}
 	}
 
-	private void startApplicationRemotley(Map applicationArgs, HashMap<String,Object> clientArgs) {
+	private void startApplicationRemotley(Map applicationArgs, HashMap<String, Object> clientArgs) {
 
 		try {
 			ArrayList<IRemoteSimulationExecutionService> services = null;
@@ -209,31 +163,33 @@ public class StartSimulationExperimentsPlan extends Plan {
 			if (services.size() > 0) {
 
 				// read the *.application.xml File from the file system
-//				String applicationDescription = FileHandler.readFileAsString(fileName);
+				// String applicationDescription =
+				// FileHandler.readFileAsString(fileName);
 
 				System.out.println("#StartSimulationExpPlan# Distributed Simulation. Waiting for res at Master...");
 				IFuture fut = services.get(0).executeExperiment(applicationArgs, clientArgs);
-				fut.addResultListener(new IResultListener() {
-					public void resultAvailable(Object source, Object result) {
-						System.out.println("#StartSimulationExpPlan#Received res from remote simulation execution");
+				// fut.addResultListener(new IResultListener() {
+				// public void resultAvailable(Object source, Object result) {
+				// System.out.println("#StartSimulationExpPlan#Received res from remote simulation execution");
+				//
+				// // Start Evaluation of single experiment result
+				// IGoal eval = (IGoal)
+				// getGoalbase().createGoal("EvaluateSingleResult");
+				// eval.getParameter("args").setValue(result);
+				// getGoalbase().dispatchTopLevelGoal(eval);
+				// }
+				//
+				// public void exceptionOccurred(Object source, Exception
+				// exception) {
+				// System.out.println("#StartSimulationExpPlan#Error: Remote simulation execution failed!");
+				// }
+				// });
 
-						// Start Evaluation of single experiment result
-						IGoal eval = (IGoal) getGoalbase().createGoal("EvaluateSingleResult");
-						eval.getParameter("args").setValue(result);
-						getGoalbase().dispatchTopLevelGoal(eval);
-					}
-
-					public void exceptionOccurred(Object source, Exception exception) {
-						System.out.println("#StartSimulationExpPlan#Error: Remote simulation execution failed!");
-					}
-				});
-
-//				 Map resMap = (Map) fut.get(this);
-//				 System.out.println("#StartSimulationExpPlan# RECEIVED res at Master...");
-//				 IGoal eval = (IGoal)
-//				 getGoalbase().createGoal("EvaluateSingleResult");
-//				 eval.getParameter("args").setValue(resMap);
-//				 getGoalbase().dispatchTopLevelGoal(eval);
+				Map resMap = (Map) fut.get(this);
+				System.out.println("#StartSimulationExpPlan# RECEIVED res at Master...");
+				IGoal eval = (IGoal) getGoalbase().createGoal("EvaluateSingleResult");
+				eval.getParameter("args").setValue(resMap);
+				getGoalbase().dispatchTopLevelGoal(eval);
 
 			} else {
 				System.out.println("Error: Could not find remote simulation execution service!");
