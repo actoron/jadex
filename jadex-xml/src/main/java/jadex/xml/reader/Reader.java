@@ -361,7 +361,7 @@ public class Reader
 	
 	//							System.out.println("here: "+attrname);
 								
-								if(!attrname.getLocalPart().equals(SXML.ID))
+								if(!SXML.ID.equals(attrname.getLocalPart()) && !SXML.XML_CLASSNAME.equals(attrname.getLocalPart()))
 								{	
 									String attrval = parser.getAttributeValue(i);
 									attrs.remove(attrname);
@@ -372,8 +372,7 @@ public class Reader
 			//							ITypeConverter attrconverter = typeinfo!=null ? typeinfo.getAttributeConverter(attrname) : null;
 			//							Object val = attrconverter!=null? attrconverter.convertObject(attrval, root, classloader): attrval;
 										
-										handler.handleAttributeValue(object, attrname, attrpath, attrval, attrinfo, 
-											readcontext);
+										handler.handleAttributeValue(object, attrname, attrpath, attrval, attrinfo, readcontext);
 									
 										if(attrinfo instanceof AttributeInfo && AttributeInfo.ID.equals(((AttributeInfo)attrinfo).getId()))
 										{
@@ -390,8 +389,7 @@ public class Reader
 								Object attrinfo = typeinfo.getAttributeInfo(attrname);
 								
 								// Hack. want to read attribute info here
-								handler.handleAttributeValue(object, attrname, attrpath, null, attrinfo, 
-									readcontext);
+								handler.handleAttributeValue(object, attrname, attrpath, null, attrinfo, readcontext);
 							}
 						}
 						else

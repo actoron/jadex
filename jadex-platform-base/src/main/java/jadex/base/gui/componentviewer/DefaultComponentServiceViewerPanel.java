@@ -57,7 +57,7 @@ public class DefaultComponentServiceViewerPanel extends AbstractComponentViewerP
 		
 		component.scheduleStep(new IComponentStep()
 		{
-			public String XML_CLASSNAME = "Step"; 
+			public static final String XML_CLASSNAME = "Step"; 
 			public Object execute(final IInternalAccess ia)
 			{
 				final Future ret = new Future();
@@ -67,7 +67,7 @@ public class DefaultComponentServiceViewerPanel extends AbstractComponentViewerP
 			}
 		}).addResultListener(new IResultListener()
 		{
-			public String XML_CLASSNAME = "Listener"; 
+			public static final String XML_CLASSNAME = "Listener"; 
 			public void resultAvailable(Object source, Object result)
 			{
 				createPanels(component, (List)result).addResultListener(new DelegationResultListener(ret));

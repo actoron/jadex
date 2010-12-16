@@ -3,6 +3,7 @@ package jadex.xml.bean;
 
 import jadex.commons.SReflect;
 import jadex.commons.collection.LRU;
+import jadex.xml.SXML;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -117,6 +118,10 @@ public class BeanReflectionIntrospector implements IBeanIntrospector
 		            	{
 		            		ret.put(property_java_name, new BeanProperty(property_java_name, fields[i]));
 		            	}
+	            	}
+	            	else if(SXML.XML_CLASSNAME.equals(property_java_name))
+	            	{
+	            		ret.put(property_java_name, new BeanProperty(property_java_name, fields[i]));
 	            	}
 	            }
             }

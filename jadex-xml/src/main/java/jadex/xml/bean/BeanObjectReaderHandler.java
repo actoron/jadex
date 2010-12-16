@@ -222,11 +222,19 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 							// Create anonymous class object by supplying null values
 //							System.out.println("Anonymous: "+clazz);
 							
+							// Problem: 
 							clazz = getCorrectAnonymousInnerClass(clazz, rawattributes, context.getClassLoader());
 								
-							Constructor	c	= clazz.getDeclaredConstructors()[0];
-							c.setAccessible(true);
-							ret	= c.newInstance(new Object[c.getParameterTypes().length]);
+							if(clazz!=null)
+							{
+								Constructor	c	= clazz.getDeclaredConstructors()[0];
+								c.setAccessible(true);
+								ret	= c.newInstance(new Object[c.getParameterTypes().length]);
+							}
+							else
+							{
+								context.getReporter().report("Anonymous class problem.", "Creation problem.", context, context.getParser().getLocation());
+							}
 						}
 						else
 						{
@@ -283,15 +291,17 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 		{
 			String name = clazz.getName();
 			int	idx	= name.lastIndexOf('$');
-			String start = name.substring(0, idx);
-			String end = name.substring(idx);
+			String start = name.substring(0, idx+1);
+			String end = name.substring(idx+1);
 			int num = Integer.parseInt(end);
-			for(int i=0; ret==null; i++)
+			for(int i=1; ret==null; i++)
 			{
 				if(i!=num)
 				{
 					String clazzname = start+Integer.toString(i);
 					clazz = SReflect.classForName0(clazzname, classloader);
+					if(clazz==null)
+						break; // Break as soon as no further inner class could be found anymore.
 					if(isCorrectAnonymousInnerClass(clazz, rawattributes))
 						ret = clazz;
 				}
@@ -314,12 +324,17 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 			try
 			{
 				Field f = clazz.getField(SXML.XML_CLASSNAME);
+				f.setAccessible(true);
 				String clname = (String)f.get(null);
 				ret = rawclname.equals(clname);
 			}
-			catch(Exception e)
+			catch(NoSuchFieldException e)
 			{
 				// no class field declared
+			}
+			catch(Exception e)
+			{
+				ret = false;
 			}
 		}
 		
