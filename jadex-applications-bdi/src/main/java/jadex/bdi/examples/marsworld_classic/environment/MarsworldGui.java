@@ -104,6 +104,7 @@ public class MarsworldGui	extends JFrame
 		
 		agent.scheduleStep(new IComponentStep()
 		{
+			public static final String XML_CLASSNAME = "dispose"; 
 			public Object execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
@@ -150,6 +151,7 @@ public class MarsworldGui	extends JFrame
 
 		agent.scheduleStep(new IComponentStep()
 		{
+			public static final String XML_CLASSNAME = "env"; 
 			public Object execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;

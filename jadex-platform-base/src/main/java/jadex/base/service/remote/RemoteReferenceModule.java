@@ -712,6 +712,7 @@ public class RemoteReferenceModule
 		
 		rsms.getComponent().scheduleStep(new IComponentStep()
 		{
+			public static final String XML_CLASSNAME = "startRenewal"; 
 			public Object execute(IInternalAccess ia)
 			{
 				if(renewid == RemoteReferenceModule.this.renewid)
@@ -800,6 +801,7 @@ public class RemoteReferenceModule
 		
 		rsms.getComponent().scheduleStep(new IComponentStep()
 		{
+			public static final String XML_CLASSNAME = "startRemoval"; 
 			public Object execute(IInternalAccess ia)
 			{
 				if(removeid == RemoteReferenceModule.this.removeid)

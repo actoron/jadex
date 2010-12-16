@@ -40,6 +40,7 @@ public class CMSLocalUpdateComponentsPlan extends Plan
 				{
 					getExternalAccess().scheduleStep(new IComponentStep()
 					{
+						public static final String XML_CLASSNAME = "addFact"; 
 						public Object execute(IInternalAccess ia)
 						{
 							((IBDIInternalAccess)ia).getBeliefbase().getBeliefSet("components").addFact(desc);
@@ -59,6 +60,7 @@ public class CMSLocalUpdateComponentsPlan extends Plan
 				{
 					getExternalAccess().scheduleStep(new IComponentStep()
 					{
+						public static final String XML_CLASSNAME = "removeFact"; 
 						public Object execute(IInternalAccess ia)
 						{
 							((IBDIInternalAccess)ia).getBeliefbase().getBeliefSet("components").removeFact(desc);
@@ -84,8 +86,7 @@ public class CMSLocalUpdateComponentsPlan extends Plan
 		getBeliefbase().getBeliefSet("components").addFacts(descs);
 		
 		getScope().addComponentListener(new IComponentListener()
-		{
-			
+		{	
 			public void componentTerminating(ChangeEvent ae)
 			{
 				ces.removeComponentListener(null, listener);

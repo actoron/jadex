@@ -186,6 +186,7 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 				final IMicroExternalAccess exta = (IMicroExternalAccess)result;
 				exta.scheduleStep(new IComponentStep()
 				{
+					public static final String XML_CLASSNAME = "update"; 
 					public Object execute(IInternalAccess ia)
 					{
 						ProxyAgent pa = (ProxyAgent)ia;
@@ -226,6 +227,7 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 				
 				exta.scheduleStep(new IComponentStep()
 				{
+					public static final String XML_CLASSNAME = "service"; 
 					public Object execute(IInternalAccess ia)
 					{
 						ProxyAgent pa = (ProxyAgent)ia;
@@ -311,6 +313,7 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 					final IMicroExternalAccess exta = (IMicroExternalAccess)result;
 					exta.scheduleStep(new IComponentStep()
 					{
+						public static final String XML_CLASSNAME = "rem"; 
 						public Object execute(IInternalAccess ia)
 						{
 							ProxyAgent pa = (ProxyAgent)ia;

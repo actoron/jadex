@@ -113,6 +113,7 @@ public class DealerOptionPanel	extends JPanel	//	implements ActionListener, Chan
 				}
 				agent.scheduleStep(new IComponentStep()
 				{
+					public static final String XML_CLASSNAME = "singleStep"; 
 					public Object execute(IInternalAccess ia)
 					{
 						IBDIInternalAccess bia = (IBDIInternalAccess)ia;
@@ -130,6 +131,7 @@ public class DealerOptionPanel	extends JPanel	//	implements ActionListener, Chan
 			{
 				agent.scheduleStep(new IComponentStep()
 				{
+					public static final String XML_CLASSNAME = "statistics"; 
 					public Object execute(IInternalAccess ia)
 					{
 						IBDIInternalAccess bia = (IBDIInternalAccess)ia;
@@ -187,6 +189,7 @@ public class DealerOptionPanel	extends JPanel	//	implements ActionListener, Chan
 			{
 				agent.scheduleStep(new IComponentStep()
 				{
+					public static final String XML_CLASSNAME = "step"; 
 					public Object execute(IInternalAccess ia)
 					{
 						IBDIInternalAccess bia = (IBDIInternalAccess)ia;
@@ -222,6 +225,7 @@ public class DealerOptionPanel	extends JPanel	//	implements ActionListener, Chan
 				
 				agent.scheduleStep(new IComponentStep()
 				{
+					public static final String XML_CLASSNAME = "stepDelay"; 
 					public Object execute(IInternalAccess ia)
 					{
 						IBDIInternalAccess bia = (IBDIInternalAccess)ia;
@@ -244,6 +248,7 @@ public class DealerOptionPanel	extends JPanel	//	implements ActionListener, Chan
 				
 				agent.scheduleStep(new IComponentStep()
 				{
+					public static final String XML_CLASSNAME = "restartDelay"; 
 					public Object execute(IInternalAccess ia)
 					{
 						IBDIInternalAccess bia = (IBDIInternalAccess)ia;
@@ -290,6 +295,7 @@ public class DealerOptionPanel	extends JPanel	//	implements ActionListener, Chan
 
 		agent.scheduleStep(new IComponentStep()
 		{
+			public static final String XML_CLASSNAME = "ref"; 
 			public Object execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;

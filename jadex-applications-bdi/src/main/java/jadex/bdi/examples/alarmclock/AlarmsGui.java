@@ -181,6 +181,7 @@ public class AlarmsGui extends JFrame
 //					{
 						agent.scheduleStep(new IComponentStep()
 						{
+							public static final String XML_CLASSNAME = "alarms"; 
 							public Object execute(IInternalAccess ia)
 							{
 								IBDIInternalAccess bia = (IBDIInternalAccess)ia;
@@ -262,6 +263,7 @@ public class AlarmsGui extends JFrame
 		alarm.addPropertyChangeListener(plis);
 		agent.scheduleStep(new IComponentStep()
 		{
+			public static final String XML_CLASSNAME = "addAlarm"; 
 			public Object execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
@@ -288,6 +290,7 @@ public class AlarmsGui extends JFrame
 //		System.out.println("Removing:"+alarm);
 		agent.scheduleStep(new IComponentStep()
 		{
+			public static final String XML_CLASSNAME = "removeAlarm"; 
 			public Object execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;

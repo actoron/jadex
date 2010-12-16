@@ -60,6 +60,7 @@ class CleanerPanel extends JPanel
 			{
 				IFuture	fut	= agent.scheduleStep(new IComponentStep()
 				{
+					public static final String XML_CLASSNAME = "copy"; 
 					public Object execute(IInternalAccess ia)
 					{
 						IBDIInternalAccess bia = (IBDIInternalAccess)ia;

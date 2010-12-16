@@ -67,6 +67,7 @@ public class MoveTask extends AbstractTask
 		{
 			agent.scheduleStep(new IComponentStep()
 			{
+				public static final String XML_CLASSNAME = "add"; 
 				public Object execute(IInternalAccess ia)
 				{
 					IBDIInternalAccess bia = (IBDIInternalAccess)ia;

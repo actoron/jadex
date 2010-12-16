@@ -82,6 +82,7 @@ public class StandardClientApplication
 		
 		agent.scheduleStep(new IComponentStep()
 		{
+			public static final String XML_CLASSNAME = "dispose"; 
 			public Object execute(IInternalAccess ia)
 			{
 				ia.addComponentListener(new IComponentListener()
@@ -121,6 +122,7 @@ public class StandardClientApplication
 							disconnect();
 						agent.scheduleStep(new IComponentStep()
 						{
+							public static final String XML_CLASSNAME = "kill"; 
 							public Object execute(IInternalAccess ia)
 							{
 								ia.killComponent();

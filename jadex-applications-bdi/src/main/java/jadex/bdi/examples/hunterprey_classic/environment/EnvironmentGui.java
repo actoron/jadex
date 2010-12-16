@@ -134,6 +134,7 @@ public class EnvironmentGui	extends JFrame
 				
 				agent.scheduleStep(new IComponentStep()
 				{
+					public static final String XML_CLASSNAME = "end"; 
 					public Object execute(IInternalAccess ia)
 					{
 						IBDIInternalAccess bia = (IBDIInternalAccess)ia;
@@ -157,6 +158,7 @@ public class EnvironmentGui	extends JFrame
 		
 		agent.scheduleStep(new IComponentStep()
 		{
+			public static final String XML_CLASSNAME = "dispose"; 
 			public Object execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
@@ -209,15 +211,7 @@ public class EnvironmentGui	extends JFrame
 
 		agent.scheduleStep(new IComponentStep()
 		{
-			public Object execute(IInternalAccess ia)
-			{
-				// TODO Auto-generated method stub
-				return null;
-			}
-		});
-		
-		agent.scheduleStep(new IComponentStep()
-		{
+			public static final String XML_CLASSNAME = "env"; 
 			public Object execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
@@ -244,6 +238,7 @@ public class EnvironmentGui	extends JFrame
 						final Long val = new Long(roundtimetf.getText());
 						agent.scheduleStep(new IComponentStep()
 						{
+							public static final String XML_CLASSNAME = "roundtime"; 
 							public Object execute(IInternalAccess ia)
 							{
 								IBDIInternalAccess bia = (IBDIInternalAccess)ia;
@@ -309,6 +304,7 @@ public class EnvironmentGui	extends JFrame
 		
 		agent.scheduleStep(new IComponentStep()
 		{
+			public static final String XML_CLASSNAME = "roundcnt"; 
 			public Object execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
@@ -334,6 +330,7 @@ public class EnvironmentGui	extends JFrame
 						final Long val = new Long(roundtimetf.getText());
 						agent.scheduleStep(new IComponentStep()
 						{
+							public static final String XML_CLASSNAME = "rt"; 
 							public Object execute(IInternalAccess ia)
 							{
 								IBDIInternalAccess bia = (IBDIInternalAccess)ia;
@@ -482,6 +479,7 @@ public class EnvironmentGui	extends JFrame
 	{
 		agent.scheduleStep(new IComponentStep()
 		{
+			public static final String XML_CLASSNAME = "dummy"; 
 			public Object execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;

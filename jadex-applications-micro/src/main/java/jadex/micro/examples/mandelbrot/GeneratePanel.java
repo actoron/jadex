@@ -162,6 +162,7 @@ public class GeneratePanel extends JPanel
 		
 		agent.scheduleStep(new IComponentStep()
 		{
+			public static final String XML_CLASSNAME = "dispose"; 
 			public Object execute(IInternalAccess ia)
 			{
 				ia.addComponentListener(new IComponentListener()

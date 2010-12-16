@@ -49,6 +49,7 @@ public class MicroPreyVisionProcessor	extends	SimplePropertyObject	implements IP
 						final IMicroExternalAccess	exta	= (IMicroExternalAccess)result;
 						exta.scheduleStep(new IComponentStep()
 						{
+							public static final String XML_CLASSNAME = "food"; 
 							public Object execute(IInternalAccess ia)
 							{
 								MicroPreyAgent	mp	= (MicroPreyAgent)agent;

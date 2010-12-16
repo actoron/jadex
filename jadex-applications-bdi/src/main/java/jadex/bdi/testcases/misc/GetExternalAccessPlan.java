@@ -54,6 +54,7 @@ public class GetExternalAccessPlan extends Plan
 				
 				exta.scheduleStep(new IComponentStep()
 				{
+					public static final String XML_CLASSNAME = "test"; 
 					public Object execute(IInternalAccess ia)
 					{
 						IBDIInternalAccess bia = (IBDIInternalAccess)ia;

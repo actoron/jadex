@@ -96,6 +96,7 @@ public class DecouplingServiceInvocationInterceptor implements IServiceInvocatio
 			
 			IFuture resfut = ea.scheduleStep(new IComponentStep()
 			{
+				public static final String XML_CLASSNAME = "invoc"; 
 				public Object execute(IInternalAccess ia)
 				{					
 					final Future fut = new Future();

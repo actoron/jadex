@@ -33,6 +33,7 @@ public class Gui extends JFrame
 		GuiPanel gp = new GuiPanel(agent);
 		agent.scheduleStep(new IComponentStep()
 		{
+			public static final String XML_CLASSNAME = "dispose"; 
 			public Object execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;

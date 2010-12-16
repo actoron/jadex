@@ -247,6 +247,7 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 					{
 						interpreter.scheduleStep(new IComponentStep()
 						{
+							public static final String XML_CLASSNAME = "teo1"; 
 							public Object execute(IInternalAccess ia)
 							{
 								timers.remove(ts[0]);
@@ -300,6 +301,7 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 					{
 						interpreter.scheduleStep(new IComponentStep()
 						{
+							public static final String XML_CLASSNAME = "teo2"; 
 							public Object execute(IInternalAccess ia)
 							{
 								timers.remove(ts[0]);

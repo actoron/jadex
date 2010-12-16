@@ -74,6 +74,7 @@ public class CompositeServiceInvocationInterceptor implements IServiceInvocation
 		
 		ea.scheduleStep(new IComponentStep()
 		{
+			public static final String XML_CLASSNAME = "invoc"; 
 			public Object execute(final IInternalAccess ia)
 			{
 				// A concrete component has been specified.

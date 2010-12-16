@@ -197,6 +197,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 		// Schedule the futures (first) init step.
 		scheduleStep(new IComponentStep()
 		{
+			public static final String XML_CLASSNAME = "init"; 
 			public Object execute(final IInternalAccess ia)
 			{
 				final List futures = new ArrayList();
@@ -640,6 +641,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 		// Checks if loaded model is defined in the application component types
 		return scheduleStep(new IComponentStep()
 		{
+			public static final String XML_CLASSNAME = "created"; 
 			public Object execute(IInternalAccess ia)
 			{
 				IComponentIdentifier cid = desc.getName();
@@ -703,6 +705,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 	{
 		return scheduleStep(new IComponentStep()
 		{
+			public static final String XML_CLASSNAME = "destroyed"; 
 			public Object execute(IInternalAccess ia)
 			{
 		//		System.out.println("comp removed: "+desc.getName()+" "+this.getComponentIdentifier());
@@ -1300,6 +1303,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 //					{
 						scheduleStep(new IComponentStep()
 						{
+							public static final String XML_CLASSNAME = "createChild"; 
 							public Object execute(IInternalAccess ia)
 							{
 								createComponent(components, ces, i+1, inited);

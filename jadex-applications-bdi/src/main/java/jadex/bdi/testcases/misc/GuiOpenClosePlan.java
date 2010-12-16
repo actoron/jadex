@@ -48,6 +48,7 @@ public class GuiOpenClosePlan extends Plan
 				{
 					getExternalAccess().scheduleStep(new IComponentStep()
 					{
+						public static final String XML_CLASSNAME = "closed"; 
 						public Object execute(IInternalAccess ia)
 						{
 							IBDIInternalAccess	scope	= (IBDIInternalAccess)ia;

@@ -72,6 +72,7 @@ public class MoveTask extends AbstractTask
 				{
 					scope.scheduleStep(new IComponentStep()
 					{
+						public static final String XML_CLASSNAME = "addTarget"; 
 						public Object execute(IInternalAccess ia)
 						{
 							IBDIInternalAccess bia = (IBDIInternalAccess)ia;

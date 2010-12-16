@@ -73,6 +73,7 @@ public class HumanPlayerInterface extends GameStateFrame
 		// Close window on agent death.
 		agent.scheduleStep(new IComponentStep()
 		{
+			public static final String XML_CLASSNAME = "human"; 
 			public Object execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;

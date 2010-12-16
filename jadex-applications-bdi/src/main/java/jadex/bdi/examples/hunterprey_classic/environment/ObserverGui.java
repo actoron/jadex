@@ -97,6 +97,7 @@ public class ObserverGui	extends EnvironmentGui
 	{
 		agent.scheduleStep(new IComponentStep()
 		{
+			public static final String XML_CLASSNAME = "highscore"; 
 			public Object execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
@@ -187,6 +188,7 @@ public class ObserverGui	extends EnvironmentGui
 	{
 		agent.scheduleStep(new IComponentStep()
 		{
+			public static final String XML_CLASSNAME = "update"; 
 			public Object execute(IInternalAccess ia)
 			{
 				final IBDIInternalAccess bia = (IBDIInternalAccess)ia;

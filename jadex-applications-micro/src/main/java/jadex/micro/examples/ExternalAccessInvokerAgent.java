@@ -45,6 +45,7 @@ public class ExternalAccessInvokerAgent extends MicroAgent
 									IExternalAccess ea = (IExternalAccess)result;
 									ea.scheduleStep(new IComponentStep()
 									{
+										public static final String XML_CLASSNAME = "exe"; 
 										public Object execute(IInternalAccess ia)
 										{
 											System.out.println("Executing step on component: "+ia);

@@ -55,6 +55,7 @@ public class MicroPreyAgent extends MicroAgent
 				{
 					getExternalAccess().scheduleStep(new IComponentStep()
 					{
+						public static final String XML_CLASSNAME = "act"; 
 						public Object execute(IInternalAccess agent)
 						{
 							// If move failed, forget about food and turn 90°.
@@ -90,6 +91,7 @@ public class MicroPreyAgent extends MicroAgent
 			{
 				getExternalAccess().scheduleStep(new IComponentStep()
 				{
+					public static final String XML_CLASSNAME = "act2"; 
 					public Object execute(IInternalAccess ia)
 					{
 						act();

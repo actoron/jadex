@@ -217,6 +217,7 @@ public class ConversationPlugin extends AbstractJCCPlugin
 		
 		((AgentControlCenter)getJCC()).getAgent().scheduleStep(new IComponentStep()
 		{
+			public static final String XML_CLASSNAME = "fipamsg"; 
 			public Object execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess	scope	= (IBDIInternalAccess)ia;
@@ -240,6 +241,7 @@ public class ConversationPlugin extends AbstractJCCPlugin
 	{
 		((AgentControlCenter)getJCC()).getAgent().scheduleStep(new IComponentStep()
 		{
+			public static final String XML_CLASSNAME = "process"; 
 			public Object execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess	scope	= (IBDIInternalAccess)ia;

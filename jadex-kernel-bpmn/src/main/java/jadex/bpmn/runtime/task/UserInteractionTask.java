@@ -194,6 +194,7 @@ public class UserInteractionTask implements ITask
 		                
 		                instance.scheduleStep(new IComponentStep()
 						{
+		                	public static final String XML_CLASSNAME = "rem"; 
 							public Object execute(IInternalAccess ia)
 							{
 								ia.removeComponentListener(lis);

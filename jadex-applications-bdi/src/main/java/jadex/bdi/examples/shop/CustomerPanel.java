@@ -142,6 +142,7 @@ public class CustomerPanel extends JPanel
 		
 		agent.scheduleStep(new IComponentStep()
 		{
+			public static final String XML_CLASSNAME = "initialMoney"; 
 			public Object execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
@@ -160,6 +161,7 @@ public class CustomerPanel extends JPanel
 		
 		agent.scheduleStep(new IComponentStep()
 		{
+			public static final String XML_CLASSNAME = "money"; 
 			public Object execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
@@ -217,6 +219,7 @@ public class CustomerPanel extends JPanel
 
 		agent.scheduleStep(new IComponentStep()
 		{
+			public static final String XML_CLASSNAME = "inventory"; 
 			public Object execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
@@ -283,6 +286,7 @@ public class CustomerPanel extends JPanel
 					final IShop shop = (IShop)shops.get(shopscombo.getSelectedItem());
 					agent.scheduleStep(new IComponentStep()
 					{
+						public static final String XML_CLASSNAME = "buy"; 
 						public Object execute(IInternalAccess ia)
 						{
 							IBDIInternalAccess bia = (IBDIInternalAccess)ia;

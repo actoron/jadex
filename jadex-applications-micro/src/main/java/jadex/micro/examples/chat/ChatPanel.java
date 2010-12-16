@@ -44,6 +44,7 @@ public class ChatPanel extends JPanel
 		
 		agent.scheduleStep(new IComponentStep()
 		{
+			public static final String XML_CLASSNAME = "update"; 
 			public Object execute(IInternalAccess ia)
 			{
 				ChatAgent ca = (ChatAgent)ia;
@@ -73,6 +74,7 @@ public class ChatPanel extends JPanel
 			{
 				agent.scheduleStep(new IComponentStep()
 				{
+					public static final String XML_CLASSNAME = "tell"; 
 					public Object execute(IInternalAccess ia)
 					{
 						ChatAgent ca = (ChatAgent)ia;
@@ -111,6 +113,7 @@ public class ChatPanel extends JPanel
 		
 		agent.scheduleStep(new IComponentStep()
 		{
+			public static final String XML_CLASSNAME = "dispose"; 
 			public Object execute(IInternalAccess ia)
 			{
 				ia.addComponentListener(new IComponentListener()

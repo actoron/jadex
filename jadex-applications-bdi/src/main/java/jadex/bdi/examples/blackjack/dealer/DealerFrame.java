@@ -71,6 +71,7 @@ public class DealerFrame extends GameStateFrame
 		});
 		agent.scheduleStep(new IComponentStep()
 		{
+			public static final String XML_CLASSNAME = "dispose"; 
 			public Object execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
@@ -119,6 +120,7 @@ public class DealerFrame extends GameStateFrame
 			{
 				agent.scheduleStep(new IComponentStep()
 				{
+					public static final String XML_CLASSNAME = "gamestate"; 
 					public Object execute(IInternalAccess ia)
 					{
 						IBDIInternalAccess bia = (IBDIInternalAccess)ia;

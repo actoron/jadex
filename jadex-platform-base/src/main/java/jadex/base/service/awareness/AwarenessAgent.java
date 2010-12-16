@@ -402,6 +402,7 @@ public class AwarenessAgent extends MicroAgent
 	{
 		scheduleStep(new IComponentStep()
 		{
+			public static final String XML_CLASSNAME = "rem"; 
 			public Object execute(IInternalAccess ia)
 			{
 				List todel = autodelete? new ArrayList(): null;
@@ -494,6 +495,7 @@ public class AwarenessAgent extends MicroAgent
 		
 		scheduleStep(new IComponentStep()
 		{
+			public static final String XML_CLASSNAME = "send"; 
 			public Object execute(IInternalAccess ia)
 			{
 				if(sendid.equals(getSendId()))

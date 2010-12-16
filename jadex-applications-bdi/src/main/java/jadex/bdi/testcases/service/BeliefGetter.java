@@ -42,6 +42,7 @@ public class BeliefGetter extends BasicService implements IBeliefGetter
 		final Future ret = new Future();
 		agent.scheduleStep(new IComponentStep()
 		{
+			public static final String XML_CLASSNAME = "getter"; 
 			public Object execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;

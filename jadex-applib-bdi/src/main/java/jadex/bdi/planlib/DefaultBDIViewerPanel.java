@@ -61,6 +61,7 @@ public class DefaultBDIViewerPanel extends AbstractComponentViewerPanel
 		
 		component.scheduleStep(new IComponentStep()
 		{
+			public static final String XML_CLASSNAME = "createPanels"; 
 			public Object execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess	scope	= (IBDIInternalAccess)ia;

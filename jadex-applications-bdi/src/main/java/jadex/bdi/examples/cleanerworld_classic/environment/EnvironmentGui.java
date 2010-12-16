@@ -84,6 +84,7 @@ public class EnvironmentGui	extends JFrame
 
 		agent.scheduleStep(new IComponentStep()
 		{
+			public static final String XML_CLASSNAME = "disp"; 
 			public Object execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
@@ -391,6 +392,7 @@ public class EnvironmentGui	extends JFrame
 
 								agent.scheduleStep(new IComponentStep()
 								{
+									public static final String XML_CLASSNAME = "mouse"; 
 									public Object execute(IInternalAccess ia)
 									{
 										IBDIInternalAccess bia = (IBDIInternalAccess)ia;

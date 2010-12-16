@@ -75,6 +75,7 @@ public class ManagerGuiUpdatePlan extends Plan
 		
 		getExternalAccess().scheduleStep(new IComponentStep()
 		{
+			public static final String XML_CLASSNAME = "guidispose"; 
 			public Object execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;

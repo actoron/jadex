@@ -88,6 +88,7 @@ public class BlocksworldGui	extends JFrame
 		
 		agent.scheduleStep(new IComponentStep()
 		{
+			public static final String XML_CLASSNAME = "start"; 
 			public Object execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
@@ -180,6 +181,7 @@ public class BlocksworldGui	extends JFrame
 								newblocks.removeAllElements();
 								agent.scheduleStep(new IComponentStep()
 								{
+									public static final String XML_CLASSNAME = "clear"; 
 									public Object execute(IInternalAccess ia)
 									{
 										IBDIInternalAccess bia = (IBDIInternalAccess)ia;
@@ -219,6 +221,7 @@ public class BlocksworldGui	extends JFrame
 							{
 								agent.scheduleStep(new IComponentStep()
 								{
+									public static final String XML_CLASSNAME = "configure"; 
 									public Object execute(IInternalAccess ia)
 									{
 										IBDIInternalAccess bia = (IBDIInternalAccess)ia;
@@ -281,6 +284,7 @@ public class BlocksworldGui	extends JFrame
 							{
 								agent.scheduleStep(new IComponentStep()
 								{
+									public static final String XML_CLASSNAME = "createBlock"; 
 									public Object execute(IInternalAccess ia)
 									{
 										IBDIInternalAccess bia = (IBDIInternalAccess)ia;
@@ -343,6 +347,7 @@ public class BlocksworldGui	extends JFrame
 								delblocks.removeElement(block);
 								agent.scheduleStep(new IComponentStep()
 								{
+									public static final String XML_CLASSNAME = "deleteBlock"; 
 									public Object execute(IInternalAccess ia)
 									{
 										IBDIInternalAccess bia = (IBDIInternalAccess)ia;
@@ -377,6 +382,7 @@ public class BlocksworldGui	extends JFrame
 								final Object sel = mode.getSelectedItem();
 								agent.scheduleStep(new IComponentStep()
 								{
+									public static final String XML_CLASSNAME = "mode"; 
 									public Object execute(IInternalAccess ia)
 									{
 										IBDIInternalAccess bia = (IBDIInternalAccess)ia;
@@ -393,6 +399,7 @@ public class BlocksworldGui	extends JFrame
 							{
 								agent.scheduleStep(new IComponentStep()
 								{
+									public static final String XML_CLASSNAME = "step"; 
 									public Object execute(IInternalAccess ia)
 									{
 										IBDIInternalAccess bia = (IBDIInternalAccess)ia;
@@ -472,6 +479,7 @@ public class BlocksworldGui	extends JFrame
 						
 						agent.scheduleStep(new IComponentStep()
 						{
+							public static final String XML_CLASSNAME = "disp"; 
 							public Object execute(IInternalAccess ia)
 							{
 								IBDIInternalAccess bia = (IBDIInternalAccess)ia;

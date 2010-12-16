@@ -125,6 +125,7 @@ public class DefaultBDIVisionProcessor extends SimplePropertyObject implements I
 						{
 							exta.scheduleStep(new IComponentStep()
 							{
+								public static final String XML_CLASSNAME = "add"; 
 								public Object execute(IInternalAccess ia)
 								{
 									IBDIInternalAccess	scope	= (IBDIInternalAccess)ia;
@@ -145,6 +146,7 @@ public class DefaultBDIVisionProcessor extends SimplePropertyObject implements I
 						{
 							exta.scheduleStep(new IComponentStep()
 							{
+								public static final String XML_CLASSNAME = "remove"; 
 								public Object execute(IInternalAccess ia)
 								{
 									IBDIInternalAccess	scope	= (IBDIInternalAccess)ia;
@@ -165,6 +167,7 @@ public class DefaultBDIVisionProcessor extends SimplePropertyObject implements I
 						{
 							exta.scheduleStep(new IComponentStep()
 							{
+								public static final String XML_CLASSNAME = "set"; 
 								public Object execute(IInternalAccess ia)
 								{
 									IBDIInternalAccess	scope	= (IBDIInternalAccess)ia;
@@ -185,6 +188,7 @@ public class DefaultBDIVisionProcessor extends SimplePropertyObject implements I
 						{
 							exta.scheduleStep(new IComponentStep()
 							{
+								public static final String XML_CLASSNAME = "unset"; 
 								public Object execute(IInternalAccess ia)
 								{
 									IBDIInternalAccess	scope	= (IBDIInternalAccess)ia;
@@ -205,6 +209,7 @@ public class DefaultBDIVisionProcessor extends SimplePropertyObject implements I
 						{
 							exta.scheduleStep(new IComponentStep()
 							{
+								public static final String XML_CLASSNAME = "removeoutdated"; 
 								public Object execute(IInternalAccess ia)
 								{
 									IBDIInternalAccess	scope	= (IBDIInternalAccess)ia;

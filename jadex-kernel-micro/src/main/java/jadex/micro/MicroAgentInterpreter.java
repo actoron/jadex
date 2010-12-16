@@ -273,6 +273,7 @@ public class MicroAgentInterpreter implements IComponentInstance
 //		IFuture ret = scheduleStep(new ICommand()
 		scheduleStep(new IComponentStep()
 		{
+			public static final String XML_CLASSNAME = "msg"; 
 			public Object execute(IInternalAccess ia)
 			{
 				microagent.messageArrived(Collections.unmodifiableMap(message.getParameterMap()), message.getMessageType());

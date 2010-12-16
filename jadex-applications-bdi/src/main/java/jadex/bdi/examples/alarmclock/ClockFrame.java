@@ -174,6 +174,7 @@ public class ClockFrame extends JFrame
 				
 				ClockFrame.this.agent.scheduleStep(new IComponentStep()
 				{
+					public static final String XML_CLASSNAME = "settings"; 
 					public Object execute(IInternalAccess ia)
 					{
 						IBDIInternalAccess bia = (IBDIInternalAccess)ia;
@@ -323,6 +324,7 @@ public class ClockFrame extends JFrame
 
 		agent.scheduleStep(new IComponentStep()
 		{
+			public static final String XML_CLASSNAME = "tray"; 
 			public Object execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
@@ -384,6 +386,7 @@ public class ClockFrame extends JFrame
 		{
 			agent.scheduleStep(new IComponentStep()
 			{
+				public static final String XML_CLASSNAME = "refresh"; 
 				public Object execute(IInternalAccess ia)
 				{
 					IBDIInternalAccess bia = (IBDIInternalAccess)ia;

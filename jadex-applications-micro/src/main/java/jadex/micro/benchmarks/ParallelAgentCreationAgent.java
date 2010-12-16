@@ -56,6 +56,7 @@ public class ParallelAgentCreationAgent extends MicroAgent
 								{
 									scheduleStep(new IComponentStep()
 									{
+										public static final String XML_CLASSNAME = "destroy1"; 
 										public Object execute(IInternalAccess ia)
 										{
 											long used = Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory();
@@ -84,6 +85,7 @@ public class ParallelAgentCreationAgent extends MicroAgent
 								{
 									scheduleStep(new IComponentStep()
 									{
+										public static final String XML_CLASSNAME = "destroy2"; 
 										public Object execute(IInternalAccess ia)
 										{
 											if(exception instanceof RuntimeException)
@@ -108,6 +110,7 @@ public class ParallelAgentCreationAgent extends MicroAgent
 								{
 									scheduleStep(new IComponentStep()
 									{
+										public static final String XML_CLASSNAME = "last"; 
 										public Object execute(IInternalAccess ia)
 										{
 											long killend = clock.getTime();
@@ -137,6 +140,7 @@ public class ParallelAgentCreationAgent extends MicroAgent
 								{
 									scheduleStep(new IComponentStep()
 									{
+										public static final String XML_CLASSNAME = "destroyMe"; 
 										public Object execute(IInternalAccess ia)
 										{
 											if(exception instanceof RuntimeException)

@@ -138,6 +138,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		
 		component.scheduleStep(new IComponentStep()
 		{
+			public static final String XML_CLASSNAME = "getServiceProxies"; 
 			public Object execute(IInternalAccess ia)
 			{
 				RemoteServiceManagementAgent agent = (RemoteServiceManagementAgent)ia;
@@ -223,6 +224,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		
 		component.scheduleStep(new IComponentStep()
 		{
+			public static final String XML_CLASSNAME = "getExternalAccessProxy"; 
 			public Object execute(IInternalAccess ia)
 			{
 				final Future fut = new Future();
@@ -352,6 +354,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	{
 		component.scheduleStep(new IComponentStep()
 		{
+			public static final String XML_CLASSNAME = "sendMessage"; 
 			public Object execute(IInternalAccess ia)
 			{
 				final RemoteServiceManagementAgent agent = (RemoteServiceManagementAgent)ia;
@@ -393,6 +396,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 										// ok message could be sent.
 										component.scheduleStep(new IComponentStep()
 										{
+											public static final String XML_CLASSNAME = "oksent"; 
 											public Object execute(IInternalAccess ia)
 											{
 //												System.out.println("waitfor");

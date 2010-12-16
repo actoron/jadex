@@ -112,6 +112,7 @@ public class CreateCollectionTruckProcess extends SimplePropertyObject implement
 										IBDIExternalAccess ex = (IBDIExternalAccess)result;
 										ex.scheduleStep(new IComponentStep()
 										{
+											public static final String XML_CLASSNAME = "rem"; 
 											public Object execute(IInternalAccess ia)
 											{
 												IBDIInternalAccess bia = (IBDIInternalAccess)ia;

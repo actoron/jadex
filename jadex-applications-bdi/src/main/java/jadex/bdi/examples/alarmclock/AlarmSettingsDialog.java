@@ -183,6 +183,7 @@ public class AlarmSettingsDialog extends JDialog
 			{
 				agent.scheduleStep(new IComponentStep()
 				{
+					public static final String XML_CLASSNAME = "setTime"; 
 					public Object execute(IInternalAccess ia)
 					{
 						IBDIInternalAccess bia = (IBDIInternalAccess)ia;
@@ -243,6 +244,7 @@ public class AlarmSettingsDialog extends JDialog
 						
 						agent.scheduleStep(new IComponentStep()
 						{
+							public static final String XML_CLASSNAME = "play"; 
 							public Object execute(IInternalAccess ia)
 							{
 								IBDIInternalAccess bia = (IBDIInternalAccess)ia;

@@ -33,6 +33,7 @@ public class AgentControlCenter extends ControlCenter
 
 		agent.scheduleStep(new IComponentStep()
 		{
+			public static final String XML_CLASSNAME = "kill"; 
 			public Object execute(IInternalAccess ia)
 			{
 				((IBDIInternalAccess)ia).addComponentListener(new IComponentListener()

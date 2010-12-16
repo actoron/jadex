@@ -169,6 +169,7 @@ public class AgentCreationAgent extends MicroAgent
 			{
 				exta.scheduleStep(new IComponentStep()
 				{
+					public static final String XML_CLASSNAME = "destroy1"; 
 					public Object execute(IInternalAccess ia)
 					{
 						IComponentManagementService cms = (IComponentManagementService)result;
@@ -179,6 +180,7 @@ public class AgentCreationAgent extends MicroAgent
 							{
 								exta.scheduleStep(new IComponentStep()
 								{
+									public static final String XML_CLASSNAME = "destroy2"; 
 									public Object execute(IInternalAccess ia)
 									{
 										System.out.println("Successfully destroyed peer: "+name);
@@ -224,6 +226,7 @@ public class AgentCreationAgent extends MicroAgent
 			{
 				exta.scheduleStep(new IComponentStep()
 				{
+					public static final String XML_CLASSNAME = "last"; 
 					public Object execute(IInternalAccess ia)
 					{
 						IClockService cs = (IClockService)result;
@@ -248,6 +251,7 @@ public class AgentCreationAgent extends MicroAgent
 							{
 								exta.scheduleStep(new IComponentStep()
 								{
+									public static final String XML_CLASSNAME = "destroyMe"; 
 									public Object execute(IInternalAccess ia)
 									{
 										IComponentManagementService cms = (IComponentManagementService)result;

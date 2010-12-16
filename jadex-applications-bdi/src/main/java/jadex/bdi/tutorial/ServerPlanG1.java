@@ -111,6 +111,7 @@ public class ServerPlanG1 extends Plan	implements Runnable
 				final Socket	client	= server.accept();
 				getExternalAccess().scheduleStep(new IComponentStep()
 				{
+					public static final String XML_CLASSNAME = "translate"; 
 					public Object execute(IInternalAccess ia)
 					{
 						IBDIInternalAccess	scope	= (IBDIInternalAccess)ia;

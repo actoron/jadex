@@ -1,5 +1,7 @@
 package jadex.bridge;
 
+import java.util.logging.Logger;
+
 import jadex.commons.IFuture;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.service.IServiceProvider;
@@ -57,6 +59,12 @@ public interface IInternalAccess
 	 *  @return The external access.
 	 */
 	public IExternalAccess getExternalAccess();
+	
+	/**
+	 *  Get the logger.
+	 *  @return The logger.
+	 */
+	public Logger getLogger();
 	
 	/**
 	 *  Add an component listener.

@@ -125,23 +125,20 @@ public class ClientSimulator
 								
 								agent.scheduleStep(new IComponentStep()
 								{
-									
+									public static final String XML_CLASSNAME = "dispose"; 
 									public Object execute(IInternalAccess ia)
 									{
 										ia.addComponentListener(new IComponentListener()
 										{
 											
 											public void componentTerminating(jadex.commons.ChangeEvent ce)
-											{
-												// TODO Auto-generated method stub
-												
+											{	
 											}
 											
 											public void componentTerminated(jadex.commons.ChangeEvent ce)
 											{
 												EventQueue.invokeLater(new Runnable()
 												{
-													
 													public void run()
 													{
 														simWindow.dispose();

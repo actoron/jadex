@@ -91,6 +91,7 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 //			System.out.println("Finalize called on: "+proxy);
 			rsms.component.scheduleStep(new IComponentStep()
 			{
+				public static final String XML_CLASSNAME = "fin"; 
 				public Object execute(IInternalAccess ia)
 				{
 					rsms.getRemoteReferenceModule().decProxyCount(pr.getRemoteReference());

@@ -43,6 +43,7 @@ public class DaemonService extends BasicService implements IDaemonService
 		
 		agent.scheduleStep(new IComponentStep()
 		{
+			public static final String XML_CLASSNAME = "startPlatform"; 
 			public Object execute(IInternalAccess ia)
 			{
 				DaemonAgent agent = (DaemonAgent)ia;
@@ -64,6 +65,7 @@ public class DaemonService extends BasicService implements IDaemonService
 		
 		agent.scheduleStep(new IComponentStep()
 		{
+			public static final String XML_CLASSNAME = "shutdownPlatform"; 
 			public Object execute(IInternalAccess ia)
 			{
 				DaemonAgent agent = (DaemonAgent)ia;
@@ -85,6 +87,7 @@ public class DaemonService extends BasicService implements IDaemonService
 		
 		agent.scheduleStep(new IComponentStep()
 		{
+			public static final String XML_CLASSNAME = "getPlatforms"; 
 			public Object execute(IInternalAccess ia)
 			{
 				DaemonAgent agent = (DaemonAgent)ia;
@@ -104,6 +107,7 @@ public class DaemonService extends BasicService implements IDaemonService
 	{
 		agent.scheduleStep(new IComponentStep()
 		{
+			public static final String XML_CLASSNAME = "addChangeListener"; 
 			public Object execute(IInternalAccess ia)
 			{
 				DaemonAgent agent = (DaemonAgent)ia;
@@ -121,6 +125,7 @@ public class DaemonService extends BasicService implements IDaemonService
 	{
 		agent.scheduleStep(new IComponentStep()
 		{
+			public static final String XML_CLASSNAME = "removeChangeListener"; 
 			public Object execute(IInternalAccess ia)
 			{
 				DaemonAgent agent = (DaemonAgent)ia;

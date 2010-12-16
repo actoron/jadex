@@ -281,6 +281,7 @@ public class FipaConversationPanel extends JSplitPane
 							{
 								agent.scheduleStep(new IComponentStep()
 								{
+									public static final String XML_CLASSNAME = "reply"; 
 									public Object execute(IInternalAccess ia)
 									{
 										IBDIInternalAccess	scope	= (IBDIInternalAccess)ia;
@@ -344,6 +345,7 @@ public class FipaConversationPanel extends JSplitPane
 				final IMessageEvent[]	msgs	= (IMessageEvent[])regmsgs.toArray(new IMessageEvent[regmsgs.size()]);
 				agent.scheduleStep(new IComponentStep()
 				{
+					public static final String XML_CLASSNAME = "deregister"; 
 					public Object execute(IInternalAccess ia)
 					{
 						for(int i=0; i<msgs.length; i++)
@@ -650,6 +652,7 @@ public class FipaConversationPanel extends JSplitPane
 	{
 		agent.scheduleStep(new IComponentStep()
 		{
+			public static final String XML_CLASSNAME = "sendM"; 
 			public Object execute(IInternalAccess ia)
 			{
 				final IBDIInternalAccess	scope	= (IBDIInternalAccess)ia;

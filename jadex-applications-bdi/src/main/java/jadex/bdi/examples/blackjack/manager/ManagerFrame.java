@@ -182,6 +182,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 
 		agent.scheduleStep(new IComponentStep()
 		{
+			public static final String XML_CLASSNAME = "dispose"; 
 			public Object execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
@@ -251,6 +252,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 		
 		agent.scheduleStep(new IComponentStep()
 		{
+			public static final String XML_CLASSNAME = "players"; 
 			public Object execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
@@ -458,6 +460,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 	{
 		agent.scheduleStep(new IComponentStep()
 		{
+			public static final String XML_CLASSNAME = "startDealer"; 
 			public Object execute(IInternalAccess ia)
 			{
 				final IBDIInternalAccess bia = (IBDIInternalAccess)ia;
@@ -532,33 +535,34 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 	 */
 	protected void stopLocalDealer()
 	{
-		agent.scheduleStep(new IComponentStep()
-		{
-			public Object execute(IInternalAccess ia)
-			{
-				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
-				final IComponentIdentifier dealer = (IComponentIdentifier)bia.getBeliefbase().getBelief("localDealerAID").getFact();
-				if(dealer!=null)
-				{
-					agent.scheduleStep(new IComponentStep()
-					{
-						public Object execute(IInternalAccess ia)
-						{
-							IBDIInternalAccess bia = (IBDIInternalAccess)ia;
-							IGoal destroy = bia.getGoalbase().createGoal("cms_destroy_component");
-							destroy.getParameter("componentidentifier").setValue(dealer);
-							bia.getGoalbase().dispatchTopLevelGoal(destroy);
-							bia.getBeliefbase().getBelief("localDealerAID").setFact(null);
-							return null;
-						}
-					});
-				}
-				return null;
-			}
-		});
+//		agent.scheduleStep(new IComponentStep()
+//		{
+//			public Object execute(IInternalAccess ia)
+//			{
+//				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+//				final IComponentIdentifier dealer = (IComponentIdentifier)bia.getBeliefbase().getBelief("localDealerAID").getFact();
+//				if(dealer!=null)
+//				{
+//					agent.scheduleStep(new IComponentStep()
+//					{
+//						public Object execute(IInternalAccess ia)
+//						{
+//							IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+//							IGoal destroy = bia.getGoalbase().createGoal("cms_destroy_component");
+//							destroy.getParameter("componentidentifier").setValue(dealer);
+//							bia.getGoalbase().dispatchTopLevelGoal(destroy);
+//							bia.getBeliefbase().getBelief("localDealerAID").setFact(null);
+//							return null;
+//						}
+//					});
+//				}
+//				return null;
+//			}
+//		});
 		
 		agent.scheduleStep(new IComponentStep()
 		{
+			public static final String XML_CLASSNAME = "destroy"; 
 			public Object execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
@@ -768,23 +772,17 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 		{
 			// try to start player-Agent.
 			
-			agent.scheduleStep(new IComponentStep()
-			{
-				public Object execute(IInternalAccess ia)
-				{
-					IBDIInternalAccess bia = (IBDIInternalAccess)ia;
-					bia.getLogger().info("starting playerAgent: "+player.getName());
-					return null;
-				}
-			});
 //			agent.getLogger().info("starting playerAgent: "+player.getName());
 			agent.scheduleStep(new IComponentStep()
 			{
+				public static final String XML_CLASSNAME = "start"; 
 				public Object execute(IInternalAccess ia)
 				{
 					try
 					{
 						IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+						bia.getLogger().info("starting playerAgent: "+player.getName());
+						
 						final IGoal start = bia.getGoalbase().createGoal("cms_create_component");
 						start.getParameter("type").setValue("jadex/bdi/examples/blackjack/player/Player.agent.xml");
 						start.getParameter("name").setValue(player.getName());
@@ -876,6 +874,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 		{
 			agent.scheduleStep(new IComponentStep()
 			{
+				public static final String XML_CLASSNAME = "stop"; 
 				public Object execute(IInternalAccess ia)
 				{
 					IBDIInternalAccess bia = (IBDIInternalAccess)ia;

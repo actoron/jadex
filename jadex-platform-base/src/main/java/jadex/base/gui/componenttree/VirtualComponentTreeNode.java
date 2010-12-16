@@ -98,6 +98,7 @@ public class VirtualComponentTreeNode extends AbstractComponentTreeNode implemen
 				final IMicroExternalAccess exta = (IMicroExternalAccess)result;
 				exta.scheduleStep(new IComponentStep()
 				{
+					public static final String XML_CLASSNAME = "changed"; 
 					public Object execute(IInternalAccess ia)
 					{
 						ProxyAgent pa = (ProxyAgent)ia;

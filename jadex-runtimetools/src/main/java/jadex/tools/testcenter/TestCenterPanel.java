@@ -883,6 +883,7 @@ public class TestCenterPanel extends JSplitPane
 			
 			((AgentControlCenter)plugin.getJCC()).getAgent().scheduleStep(new IComponentStep()
 			{
+				public static final String XML_CLASSNAME = "setTimeout"; 
 				public Object execute(IInternalAccess ia)
 				{
 					IBDIInternalAccess	scope	= (IBDIInternalAccess)ia;
@@ -1095,6 +1096,7 @@ public class TestCenterPanel extends JSplitPane
 		{
 			((AgentControlCenter)plugin.getJCC()).getAgent().scheduleStep(new IComponentStep()
 			{
+				public static final String XML_CLASSNAME = "startNext"; 
 				public Object execute(IInternalAccess ia)
 				{
 					for(int i=0; i<testcases.length && (concurrency==-1 || goals.size()<concurrency); i++)
