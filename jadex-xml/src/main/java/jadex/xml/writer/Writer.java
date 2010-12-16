@@ -81,7 +81,6 @@ public class Writer
 		this.handler = handler;
 		this.genids = genids;
 		this.indent = indent;
-//		this.id = new ThreadLocal();
 	}
 	
 	//-------- methods --------

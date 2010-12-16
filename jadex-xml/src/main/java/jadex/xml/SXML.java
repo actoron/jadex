@@ -20,4 +20,8 @@ public class SXML
 
 	/** The null tag. */
 	public static QName NULL = new QName(SXML.PROTOCOL_TYPEINFO, "null");
+	
+	/** Constant for anonymous inner classes. */
+	public static final String XML_CLASSNAME = "XML_CLASSNAME";
+
 }

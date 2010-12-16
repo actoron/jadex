@@ -221,6 +221,9 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 						{
 							// Create anonymous class object by supplying null values
 //							System.out.println("Anonymous: "+clazz);
+							
+							clazz = getCorrectAnonymousInnerClass(clazz, rawattributes, context.getClassLoader());
+								
 							Constructor	c	= clazz.getDeclaredConstructors()[0];
 							c.setAccessible(true);
 							ret	= c.newInstance(new Object[c.getParameterTypes().length]);
@@ -265,6 +268,60 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 			ret = ((IBeanObjectCreator)type).createObject(context, rawattributes);
 		}
 		
+		
+		return ret;
+	}
+	
+	/**
+	 *  Bug with Java compilers that enumerate anonymous inner classes as they like. 
+	 */
+	protected Class getCorrectAnonymousInnerClass(Class clazz, Map rawattributes, ClassLoader classloader)
+	{
+		Class ret = isCorrectAnonymousInnerClass(clazz, rawattributes)? clazz: null;
+		
+		if(ret==null)
+		{
+			String name = clazz.getName();
+			int	idx	= name.lastIndexOf('$');
+			String start = name.substring(0, idx);
+			String end = name.substring(idx);
+			int num = Integer.parseInt(end);
+			for(int i=0; ret==null; i++)
+			{
+				if(i!=num)
+				{
+					String clazzname = start+Integer.toString(i);
+					clazz = SReflect.classForName0(clazzname, classloader);
+					if(isCorrectAnonymousInnerClass(clazz, rawattributes))
+						ret = clazz;
+				}
+			}
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Test if a class is the correct inner class.
+	 */
+	protected boolean isCorrectAnonymousInnerClass(Class clazz, Map rawattributes)
+	{
+		boolean ret = true;
+		
+		String rawclname = (String)rawattributes.get(SXML.XML_CLASSNAME);
+		if(rawclname!=null)
+		{
+			try
+			{
+				Field f = clazz.getField(SXML.XML_CLASSNAME);
+				String clname = (String)f.get(null);
+				ret = rawclname.equals(clname);
+			}
+			catch(Exception e)
+			{
+				// no class field declared
+			}
+		}
 		
 		return ret;
 	}

@@ -186,7 +186,7 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 			pck = idx!=-1? SXML.PROTOCOL_TYPEINFO+clazzname.substring(0, idx): SXML.PROTOCOL_TYPEINFO;
 			tag = idx!=-1? clazzname.substring(idx+1): clazzname;
 			
-			// Special case inner class, replace $ with :
+			// Special case inner class, replace $ with -
 			tag = tag.replace("$", "-");
 			
 			// Special case array, replace [] with __ and length 
