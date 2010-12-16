@@ -46,7 +46,6 @@ import jadex.commons.service.IInternalService;
 import jadex.commons.service.IServiceContainer;
 import jadex.commons.service.IServiceProvider;
 import jadex.commons.service.SServiceProvider;
-import jadex.commons.service.library.ILibraryService;
 import jadex.javaparser.IValueFetcher;
 import jadex.javaparser.SimpleValueFetcher;
 
@@ -251,15 +250,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 							{	
 								final Future futu = new Future();
 								futures.add(futu);
-								SServiceProvider.getService(getServiceProvider(), ILibraryService.class)
-									.addResultListener(ia.createResultListener(new DefaultResultListener()
-								{
-									public void resultAvailable(Object source, Object result)
-									{
-										ILibraryService ls = (ILibraryService)result;
-										findComponentType(0, model.getMComponentTypes(), ls, st.getClazz(), futu);
-									}
-								}));
+								findComponentType(0, model.getMComponentTypes(), st.getClazz(), futu);
 							}
 							else
 							{
@@ -403,13 +394,12 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 	/**
 	 *  Find component type that provided a specific service.
 	 */
-	protected void findComponentType(final int i, final List componenttypes, 
-		final ILibraryService ls, final Class servicetype, final Future ret)
+	protected void findComponentType(final int i, final List componenttypes, final Class servicetype, final Future ret)
 	{
 		final MComponentType ct = (MComponentType)componenttypes.get(i);
 	
 		SServiceProvider.getService(getServiceProvider(), new ComponentFactorySelector(ct.getFilename(), 
-			model.getAllImports(), ls.getClassLoader())).addResultListener(createResultListener(new IResultListener()
+			model.getAllImports(), model.getModelInfo().getClassLoader())).addResultListener(createResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
@@ -418,7 +408,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 				final IComponentFactory factory = (IComponentFactory)result;
 				if(factory!=null)
 				{
-					final IModelInfo lmodel = factory.loadModel(ct.getFilename(), model.getAllImports(), ls.getClassLoader());
+					final IModelInfo lmodel = factory.loadModel(ct.getFilename(), model.getAllImports(), model.getModelInfo().getClassLoader());
 					Class[] sers = lmodel.getProvidedServices();
 					if(SUtil.arrayContains(sers, servicetype))
 					{
@@ -429,7 +419,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 					}
 					else if(i+1<componenttypes.size())
 					{
-						findComponentType(i+1, componenttypes, ls, servicetype, ret);
+						findComponentType(i+1, componenttypes, servicetype, ret);
 					}
 					else
 					{
@@ -443,7 +433,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 				System.out.println("No factory found for: "+ct);
 				if(i+1<componenttypes.size())
 				{
-					findComponentType(i+1, componenttypes, ls, servicetype, ret);
+					findComponentType(i+1, componenttypes, servicetype, ret);
 				}
 				else
 				{

@@ -5,7 +5,6 @@ import jadex.application.space.envsupport.math.Vector2Double;
 import jadex.application.space.envsupport.math.Vector2Int;
 import jadex.application.space.envsupport.observer.graphics.layer.Layer;
 import jadex.application.space.envsupport.observer.perspective.IPerspective;
-import jadex.commons.service.library.ILibraryService;
 
 import java.awt.Canvas;
 import java.awt.Color;
@@ -34,9 +33,6 @@ public abstract class AbstractViewport implements IViewport
 	/** Canvas for graphical output. */
 	protected Canvas			canvas_;
 
-	/** Library service for loading resources. */
-	protected ILibraryService	libService_;
-	
 	/** The background color. */
 	protected Color bgColor_;
 

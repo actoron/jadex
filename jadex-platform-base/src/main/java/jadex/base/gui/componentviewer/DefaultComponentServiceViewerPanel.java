@@ -1,5 +1,6 @@
 package jadex.base.gui.componentviewer;
 
+import jadex.base.SComponentFactory;
 import jadex.base.gui.plugin.IControlCenter;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -13,7 +14,6 @@ import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.service.IService;
 import jadex.commons.service.SServiceProvider;
-import jadex.commons.service.library.ILibraryService;
 
 import java.awt.BorderLayout;
 import java.util.ArrayList;
@@ -89,12 +89,12 @@ public class DefaultComponentServiceViewerPanel extends AbstractComponentViewerP
 	{
 		final Future ret = new Future();
 		
-		SServiceProvider.getDeclaredService(getJCC().getServiceProvider(), ILibraryService.class)
+		SComponentFactory.getClassLoader(exta.getComponentIdentifier(), jcc)
 			.addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
-				final ILibraryService libservice = (ILibraryService)result;
+				final ClassLoader cl = (ClassLoader)result;
 		
 				final List panels = new ArrayList();
 				
@@ -128,7 +128,7 @@ public class DefaultComponentServiceViewerPanel extends AbstractComponentViewerP
 				{
 					try
 					{
-						Class clazz	= SReflect.classForName(clname, libservice.getClassLoader());
+						Class clazz	= SReflect.classForName(clname, cl);
 						IComponentViewerPanel panel = (IComponentViewerPanel)clazz.newInstance();
 						panels.add(new Object[]{"component", panel});
 						panel.init(jcc, getActiveComponent()).addResultListener(lis);
@@ -154,7 +154,7 @@ public class DefaultComponentServiceViewerPanel extends AbstractComponentViewerP
 						{
 							try
 							{
-								Class clazz	= SReflect.classForName(clname, libservice.getClassLoader());
+								Class clazz	= SReflect.classForName(clname, cl);
 								IServiceViewerPanel panel = (IServiceViewerPanel)clazz.newInstance();
 								panels.add(new Object[]{SReflect.getInnerClassName(ser.getServiceIdentifier().getServiceType()), panel});
 								panel.init(jcc, ser).addResultListener(lis);

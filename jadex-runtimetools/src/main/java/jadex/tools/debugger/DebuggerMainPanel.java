@@ -1,9 +1,10 @@
 package jadex.tools.debugger;
 
 import jadex.base.SComponentFactory;
+import jadex.base.gui.plugin.AbstractJCCPlugin;
 import jadex.base.gui.plugin.IControlCenter;
-import jadex.bridge.IComponentDescription;
 import jadex.bridge.ICMSComponentListener;
+import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.IFuture;
@@ -11,7 +12,6 @@ import jadex.commons.SReflect;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.commons.service.SServiceProvider;
-import jadex.commons.service.library.ILibraryService;
 import jadex.tools.debugger.common.ObjectInspectorDebuggerPanel;
 
 import java.awt.GridBagConstraints;
@@ -126,12 +126,11 @@ public class DebuggerMainPanel extends JSplitPane
 										final Map props2 = (Map)result;
 										if(props2!=null && props2.containsKey(KEY_DEBUGGER_PANELS))
 										{
-											SServiceProvider.getService(DebuggerMainPanel.this.jcc.getServiceProvider(), ILibraryService.class)
-												.addResultListener(new SwingDefaultResultListener(DebuggerMainPanel.this)
+											AbstractJCCPlugin.getClassLoader(desc.getName(), jcc).addResultListener(new SwingDefaultResultListener(DebuggerMainPanel.this)
 											{
 												public void customResultAvailable(Object source, Object result)
 												{
-													final ILibraryService	libservice	= (ILibraryService)result;
+													final ClassLoader	cl	= (ClassLoader)result;
 													String	panels	= (String)props2.get(KEY_DEBUGGER_PANELS);
 													StringTokenizer	stok	= new StringTokenizer(panels, ", \t\n\r\f");
 													while(stok.hasMoreTokens())
@@ -139,7 +138,7 @@ public class DebuggerMainPanel extends JSplitPane
 														String classname	= stok.nextToken();
 														try
 														{
-															Class clazz	= SReflect.classForName(classname, libservice.getClassLoader());
+															Class clazz	= SReflect.classForName(classname, cl);
 															IDebuggerPanel	panel	= (IDebuggerPanel)clazz.newInstance();
 															panel.init(DebuggerMainPanel.this.jcc, leftpanel[0], DebuggerMainPanel.this.desc.getName(), exta);
 															tabs.addTab(panel.getTitle(), panel.getIcon(), panel.getComponent(), panel.getTooltipText());

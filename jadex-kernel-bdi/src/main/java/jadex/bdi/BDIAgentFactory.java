@@ -70,10 +70,7 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory
 	
 	/** The provider. */
 	protected IServiceProvider provider;
-	
-	/** The library service. */
-	protected ILibraryService libservice;
-	
+		
 	/** The types of a manually edited agent model. */
 	protected Map mtypes;
 	

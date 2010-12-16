@@ -8,7 +8,6 @@ import jadex.application.space.envsupport.observer.graphics.drawable.Primitive;
 import jadex.application.space.envsupport.observer.graphics.layer.Layer;
 import jadex.application.space.envsupport.observer.perspective.IPerspective;
 import jadex.commons.SUtil;
-import jadex.commons.service.library.ILibraryService;
 
 import java.awt.AlphaComposite;
 import java.awt.Color;
@@ -89,6 +88,9 @@ public class ViewportJOGL extends AbstractViewport
 	/** Current OpenGL rendering context */
 	private GL context_;
 	
+	/** The class loader. */
+	private ClassLoader	classloader;
+	
 	/** The text renderers */
 	private Map textRenderers_;
 	
@@ -123,10 +125,10 @@ public class ViewportJOGL extends AbstractViewport
 	 * @param layerObject object holding properties for pre/postlayers
 	 * @param libService library service for loading resources.
 	 */
-	public ViewportJOGL(IPerspective persp, ILibraryService libService)
+	public ViewportJOGL(IPerspective persp, ClassLoader classloader)
 	{
 		super(persp);
-		libService_ = libService;
+		this.classloader	= classloader;
 		uninitialized_ = true;
 		valid_ = false;
 		npot_ = false;
@@ -429,13 +431,10 @@ public class ViewportJOGL extends AbstractViewport
 	 */
 	private synchronized Integer loadTexture(GL gl, String path, int ipMode)
 	{
-		// Load image
-		ClassLoader cl = libService_.getClassLoader();
-
 		BufferedImage tmpImage = null;
 		try
 		{
-			tmpImage = ImageIO.read(SUtil.getResource(path, cl));
+			tmpImage = ImageIO.read(SUtil.getResource(path, classloader));
 			/*AffineTransform tf = AffineTransform.getScaleInstance(1, -1);
 			tf.translate(0, -tmpImage.getHeight());
 			AffineTransformOp op = new AffineTransformOp(tf,

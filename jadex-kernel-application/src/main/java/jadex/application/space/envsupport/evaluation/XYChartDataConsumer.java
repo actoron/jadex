@@ -2,9 +2,6 @@ package jadex.application.space.envsupport.evaluation;
 
 import jadex.application.runtime.IApplication;
 import jadex.commons.ResourceInfo;
-import jadex.commons.ThreadSuspendable;
-import jadex.commons.service.SServiceProvider;
-import jadex.commons.service.library.ILibraryService;
 
 import java.awt.Image;
 import java.util.HashMap;
@@ -68,8 +65,7 @@ public class XYChartDataConsumer extends AbstractChartDataConsumer
 			try
 			{
 				IApplication app = getSpace().getContext();
-				ClassLoader cl = ((ILibraryService)SServiceProvider.getService(
-					app.getServiceProvider(), ILibraryService.class).get(new ThreadSuspendable())).getClassLoader();
+				ClassLoader cl = app.getApplicationType().getModelInfo().getClassLoader();
 				ResourceInfo rinfo = getResourceInfo(bgimagefn, app.getApplicationType().getAllImports(), cl);
 				Image image = ImageIO.read(rinfo.getInputStream());
 				rinfo.getInputStream().close();

@@ -21,9 +21,9 @@ import jadex.application.space.envsupport.math.Vector2Double;
 import jadex.application.space.envsupport.observer.gui.ObserverCenter;
 import jadex.application.space.envsupport.observer.perspective.IPerspective;
 import jadex.bridge.CreationInfo;
+import jadex.bridge.ICMSComponentListener;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.ICMSComponentListener;
 import jadex.bridge.IComponentManagementService;
 import jadex.commons.IFuture;
 import jadex.commons.IPropertyObject;
@@ -33,7 +33,6 @@ import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.meta.IPropertyMetaDataSet;
 import jadex.commons.service.SServiceProvider;
-import jadex.commons.service.library.ILibraryService;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.IValueFetcher;
 import jadex.javaparser.SimpleValueFetcher;
@@ -560,60 +559,55 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 					}
 				}
 				
-				SServiceProvider.getService(context.getServiceProvider(), ILibraryService.class).addResultListener(new DefaultResultListener()
+				final ObserverCenter oc = new ObserverCenter(title, AbstractEnvironmentSpace.this,
+					getContext().getApplicationType().getModelInfo().getClassLoader(), plugins,
+					killonexit!=null ? killonexit.booleanValue() : true);
+								
+				SServiceProvider.getServiceUpwards(context.getServiceProvider(), IComponentManagementService.class).addResultListener(new DefaultResultListener()
 				{
-					public void resultAvailable(Object source, Object result)
+					public void resultAvailable(Object source, final Object result)
 					{
-						final ObserverCenter oc = new ObserverCenter(title, AbstractEnvironmentSpace.this, (ILibraryService)result, plugins,
-								killonexit!=null ? killonexit.booleanValue() : true);
-										
-						SServiceProvider.getServiceUpwards(context.getServiceProvider(), IComponentManagementService.class).addResultListener(new DefaultResultListener()
+						((IComponentManagementService)result).addComponentListener(context.getComponentIdentifier(), new ICMSComponentListener()
 						{
-							public void resultAvailable(Object source, final Object result)
+							public void componentRemoved(IComponentDescription desc, Map results)
 							{
-								((IComponentManagementService)result).addComponentListener(context.getComponentIdentifier(), new ICMSComponentListener()
-								{
-									public void componentRemoved(IComponentDescription desc, Map results)
-									{
-										((IComponentManagementService)result).removeComponentListener(context.getComponentIdentifier(), this);
-										oc.dispose();
-									}
-									
-									public void componentChanged(IComponentDescription desc)
-									{
-									}
-									
-									public void componentAdded(IComponentDescription desc)
-									{
-									}
-								});
+								((IComponentManagementService)result).removeComponentListener(context.getComponentIdentifier(), this);
+								oc.dispose();
+							}
+							
+							public void componentChanged(IComponentDescription desc)
+							{
+							}
+							
+							public void componentAdded(IComponentDescription desc)
+							{
 							}
 						});
-
-						List perspectives = mspacetype.getPropertyList("perspectives");
-						for(int j=0; j<perspectives.size(); j++)
-						{
-							Map sourcepers = (Map)perspectives.get(j);
-							Map args = new HashMap();
-							args.put("object", sourcepers);
-							args.put("fetcher", fetcher);
-							try
-							{
-								IPerspective persp	= (IPerspective)((IObjectCreator)MEnvSpaceInstance.getProperty(sourcepers, "creator")).createObject(args);
-								
-								List props = (List)sourcepers.get("properties");
-								MEnvSpaceInstance.setProperties(persp, props, fetcher);
-								
-								oc.addPerspective((String)MEnvSpaceInstance.getProperty(sourcepers, "name"), persp);
-							}
-							catch(Exception e)
-							{
-								System.out.println("Exception while creating perspective: "+sourcepers);
-								e.printStackTrace();
-							}
-						}
 					}
-				});				
+				});
+
+				List perspectives = mspacetype.getPropertyList("perspectives");
+				for(int j=0; j<perspectives.size(); j++)
+				{
+					Map sourcepers = (Map)perspectives.get(j);
+					Map args = new HashMap();
+					args.put("object", sourcepers);
+					args.put("fetcher", fetcher);
+					try
+					{
+						IPerspective persp	= (IPerspective)((IObjectCreator)MEnvSpaceInstance.getProperty(sourcepers, "creator")).createObject(args);
+						
+						List props = (List)sourcepers.get("properties");
+						MEnvSpaceInstance.setProperties(persp, props, fetcher);
+						
+						oc.addPerspective((String)MEnvSpaceInstance.getProperty(sourcepers, "name"), persp);
+					}
+					catch(Exception e)
+					{
+						System.out.println("Exception while creating perspective: "+sourcepers);
+						e.printStackTrace();
+					}
+				}
 			}
 		}
 		

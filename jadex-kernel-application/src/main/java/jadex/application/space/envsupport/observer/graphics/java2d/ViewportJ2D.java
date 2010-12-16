@@ -6,7 +6,6 @@ import jadex.application.space.envsupport.observer.graphics.drawable.DrawableCom
 import jadex.application.space.envsupport.observer.graphics.drawable.Primitive;
 import jadex.application.space.envsupport.observer.graphics.layer.Layer;
 import jadex.application.space.envsupport.observer.perspective.IPerspective;
-import jadex.commons.service.library.ILibraryService;
 
 import java.awt.Canvas;
 import java.awt.Dimension;
@@ -40,6 +39,9 @@ public class ViewportJ2D extends AbstractViewport implements ComponentListener
 	/** The current draw context */
 	private Graphics2D context_;
 	
+	/** The class loader. */
+	private ClassLoader classloader;
+	
 	/** The default transform */
 	private AffineTransform defaultTransform_;
 	
@@ -70,11 +72,11 @@ public class ViewportJ2D extends AbstractViewport implements ComponentListener
 	 * @param layerObject object holding properties for pre/postlayers
 	 * @param libService the library service
 	 */
-	public ViewportJ2D(IPerspective persp, ILibraryService libService)
+	public ViewportJ2D(IPerspective persp, ClassLoader classloader)
 	{
 		super(persp);
 
-		libService_ = libService;
+		this.classloader = classloader;
 		imageCache_ = Collections.synchronizedMap(new HashMap());
 		
 		canvas_ = new ViewportCanvas();
@@ -202,12 +204,10 @@ public class ViewportJ2D extends AbstractViewport implements ComponentListener
 	 */
 	private BufferedImage loadImage(String path)
 	{
-		ClassLoader cl = libService_.getClassLoader();
-
 		BufferedImage image = null;
 		try
 		{
-			image = ImageIO.read(cl.getResource(path));
+			image = ImageIO.read(classloader.getResource(path));
 			AffineTransform tf = AffineTransform.getScaleInstance(1, -1);
 			tf.translate(0, -image.getHeight());
 			AffineTransformOp op = new AffineTransformOp(tf,

@@ -192,13 +192,13 @@ public abstract class ComponentManagementService extends BasicService implements
 		}
 
 		// Load the model with fitting factory.
-		SServiceProvider.getService(provider, ILibraryService.class).addResultListener(new DefaultResultListener()
+		getClassLoader(info).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
-				final ILibraryService ls = (ILibraryService)result;
+				final ClassLoader	cl = (ClassLoader)result;
 				
-				SServiceProvider.getService(provider, new ComponentFactorySelector(model, cinfo.getImports(), ls.getClassLoader()))
+				SServiceProvider.getService(provider, new ComponentFactorySelector(model, cinfo.getImports(), cl))
 					.addResultListener(new IResultListener()
 				{
 					public void resultAvailable(Object source, Object result)
@@ -212,8 +212,8 @@ public abstract class ComponentManagementService extends BasicService implements
 							inited.setException(new RuntimeException("No factory found for component: "+model));
 							return;
 						}
-						final IModelInfo lmodel = factory.loadModel(model, cinfo.getImports(), ls.getClassLoader());
-						final String type = factory.getComponentType(model, cinfo.getImports(), ls.getClassLoader());
+						final IModelInfo lmodel = factory.loadModel(model, cinfo.getImports(), cl);
+						final String type = factory.getComponentType(model, cinfo.getImports(), cl);
 		
 						// Create id and adapter.
 						
@@ -1370,6 +1370,55 @@ public abstract class ComponentManagementService extends BasicService implements
 		
 		return ret;
 	}
+	
+	/**
+	 *  Find the class loader for a new (local) component.
+	 *  Use parent component class loader for local parents
+	 *  and current platform class loader for remote or no parents.
+	 *  @param cid	The component id.
+	 *  @return	The class loader.
+	 */
+	protected IFuture getClassLoader(final CreationInfo ci)
+	{
+		final Future	ret	= new Future();
+		
+		// Local parent (does not work during init as external access is not available).
+		if(ci.getParent()!=null && !isRemoteComponent(ci.getParent()) && !initinfos.containsKey(ci.getParent()))
+		{
+			SServiceProvider.getService(provider, IComponentManagementService.class)
+				.addResultListener(new DelegationResultListener(ret)
+			{
+				public void customResultAvailable(Object source, Object result)
+				{
+					IComponentManagementService	cms	= (IComponentManagementService)result;
+					cms.getExternalAccess(ci.getParent()).addResultListener(new DelegationResultListener(ret)
+					{
+						public void customResultAvailable(Object source, Object result)
+						{
+							IExternalAccess	ea	= (IExternalAccess)result;
+							ret.setResult(ea.getModel().getClassLoader());
+						}
+					});
+				}
+			});
+		}
+		
+		// Remote or no parent
+		else
+		{
+			SServiceProvider.getService(provider, ILibraryService.class)
+				.addResultListener(new DelegationResultListener(ret)
+			{
+				public void customResultAvailable(Object source, Object result)
+				{
+					ILibraryService	ls	= (ILibraryService)result;
+					ret.setResult(ls.getClassLoader());
+				}
+			});
+		}
+		return ret;
+	}
+
 	
 	//-------- parent/child component accessors --------
 	

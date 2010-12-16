@@ -14,7 +14,6 @@ import jadex.commons.IChangeListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.clock.IClockService;
-import jadex.commons.service.library.ILibraryService;
 
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
@@ -66,8 +65,8 @@ public class ObserverCenter
 	/** Plugin refresh timer. */
 	private Timer plugintimer;
 	
-	/** The library service */
-	private ILibraryService libservice;
+	/** The class loader */
+	private ClassLoader classloader;
 	
 	/** Additional IDataView objects */
 	private Map externaldataviews;
@@ -101,10 +100,10 @@ public class ObserverCenter
 	 *  
 	 *  @param title title of the observer window
 	 *  @param space the space being observed
-	 *  @param libSrvc the platform library service for loading resources (images etc.)
+	 *  @param classloader the application class loader for loading resources (images etc.)
 	 *  @param plugins custom plugins used in the observer
 	 */
-	public ObserverCenter(final String title, final IEnvironmentSpace space, ILibraryService libSrvc, List plugins, boolean killonexit)
+	public ObserverCenter(final String title, final IEnvironmentSpace space, ClassLoader classloader, List plugins, boolean killonexit)
 	{
 		selectedObjectListeners = Collections.synchronizedList(new ArrayList());
 		this.space = (Space2D) space;
@@ -112,7 +111,7 @@ public class ObserverCenter
 		perspectives = Collections.synchronizedMap(new HashMap());
 		externaldataviews = Collections.synchronizedMap(new HashMap());
 		final List cplugins = plugins == null? new ArrayList(): plugins;
-		this.libservice = libSrvc;
+		this.classloader = classloader;
 		Map spaceviews = space.getDataViews();
 		if(!spaceviews.isEmpty())
 			selecteddataviewname = (String)spaceviews.keySet().iterator().next();
@@ -346,16 +345,6 @@ public class ObserverCenter
 	}
 	
 	/**
-	 * Returns access to the library service
-	 * 
-	 *  @return the library service
-	 */
-	public ILibraryService getLibraryService()
-	{
-		return libservice;
-	}
-	
-	/**
 	 * Returns the available perspectives.
 	 * 
 	 *  @return the available perspectives
@@ -553,12 +542,11 @@ public class ObserverCenter
 		}
 		else
 		{
-			ClassLoader cl = libservice.getClassLoader();
 			try
 			{
 //				System.out.println(iconPath);
 //				System.out.println(cl.getResource(iconPath));
-				BufferedImage image = ImageIO.read(cl.getResource(iconPath));
+				BufferedImage image = ImageIO.read(classloader.getResource(iconPath));
 				ImageIcon icon = new ImageIcon(image);
 				mainwindow.addToolbarItem(plugin.getName(), icon, new PluginAction(plugin));
 			}

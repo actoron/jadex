@@ -15,7 +15,6 @@ import jadex.application.space.envsupport.observer.graphics.layer.Layer;
 import jadex.application.space.envsupport.observer.gui.ObserverCenter;
 import jadex.application.space.envsupport.observer.gui.SObjectInspector;
 import jadex.commons.meta.TypedPropertyObject;
-import jadex.commons.service.library.ILibraryService;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SimpleValueFetcher;
 
@@ -305,7 +304,8 @@ public class Perspective2D extends TypedPropertyObject implements IPerspective
 				marker.addPrimitive(markerPrimitive, Integer.MAX_VALUE);
 			}
 //			System.out.println("Persp: "+name+" opengl="+tryopengl);
-			viewport = createViewport(this, obscenter.getLibraryService(), bgColor, tryopengl);
+			ClassLoader	cl	= obscenter.getSpace().getContext().getApplicationType().getModelInfo().getClassLoader();
+			viewport = createViewport(this, cl, bgColor, tryopengl);
 			viewport.setAreaSize(obscenter.getAreaSize());
 			viewport.addViewportListener(selectioncontroller);
 			viewport.setZoomLimit(zoomlimit);
@@ -642,7 +642,7 @@ public class Perspective2D extends TypedPropertyObject implements IPerspective
 		}
 	}
 	
-	private static final IViewport createViewport(IPerspective persp, ILibraryService libService, Color bgColor, boolean tryopengl)
+	private static final IViewport createViewport(IPerspective persp, ClassLoader cl, Color bgColor, boolean tryopengl)
 	{
 		final JFrame frame = new JFrame("");
 		frame.setLayout(new BorderLayout());
@@ -658,8 +658,8 @@ public class Perspective2D extends TypedPropertyObject implements IPerspective
 				Constructor con = Class.forName("jadex.application.space.envsupport.observer.graphics.opengl.ViewportJOGL",
 												true,
 												Thread.currentThread().getContextClassLoader())
-													.getConstructor(new Class[] {IPerspective.class, ILibraryService.class});
-				IViewport vp =  (IViewport) con.newInstance(new Object[] {persp, libService});
+													.getConstructor(new Class[] {IPerspective.class, ClassLoader.class});
+				IViewport vp =  (IViewport) con.newInstance(new Object[] {persp, cl});
 				//new ViewportJOGL(persp, libService);
 				frame.add(vp.getCanvas());
 				frame.setVisible(true);
@@ -712,8 +712,8 @@ public class Perspective2D extends TypedPropertyObject implements IPerspective
 				Constructor con = Class.forName("jadex.application.space.envsupport.observer.graphics.opengl.ViewportJOGL",
 												true,
 												Thread.currentThread().getContextClassLoader())
-													.getConstructor(new Class[] {IPerspective.class, ILibraryService.class});
-				viewport = (IViewport) con.newInstance(new Object[] {persp, libService});
+													.getConstructor(new Class[] {IPerspective.class, ClassLoader.class});
+				viewport = (IViewport) con.newInstance(new Object[] {persp, cl});
 			}
 			catch (Exception e0)
 			{
@@ -721,7 +721,7 @@ public class Perspective2D extends TypedPropertyObject implements IPerspective
 		}
 		else
 		{
-			viewport = new ViewportJ2D(persp, libService);
+			viewport = new ViewportJ2D(persp, cl);
 		}
 		
 		viewport.setBackground(bgColor);

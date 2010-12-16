@@ -1,5 +1,6 @@
 package jadex.base.gui.componentviewer;
 
+import jadex.base.SComponentFactory;
 import jadex.base.gui.componenttree.ComponentTreePanel;
 import jadex.base.gui.componenttree.IActiveComponentTreeNode;
 import jadex.base.gui.componenttree.IComponentTreeNode;
@@ -18,7 +19,6 @@ import jadex.commons.gui.CombiIcon;
 import jadex.commons.gui.ObjectCardLayout;
 import jadex.commons.service.IService;
 import jadex.commons.service.SServiceProvider;
-import jadex.commons.service.library.ILibraryService;
 
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -324,16 +324,16 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 						
 						if(classname!=null)
 						{
-							SServiceProvider.getService(getJCC().getServiceProvider(), ILibraryService.class)
+							SComponentFactory.getClassLoader(((IActiveComponentTreeNode)node.getParent().getParent()).getComponentIdentifier(), getJCC())
 								.addResultListener(new SwingDefaultResultListener(comptree)
 							{
 								public void customResultAvailable(Object source, Object result)
 								{
-									ILibraryService	libservice	= (ILibraryService)result;
+									ClassLoader	cl	= (ClassLoader)result;
 									try
 									{
 										storeCurrentPanelSettings();
-										Class clazz	= SReflect.classForName(classname, libservice.getClassLoader());
+										Class clazz	= SReflect.classForName(classname, cl);
 										final IServiceViewerPanel	panel = (IServiceViewerPanel)clazz.newInstance();
 										panel.init(getJCC(), service).addResultListener(new SwingDefaultResultListener(comptree)
 										{
@@ -383,16 +383,15 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 										
 										if(classname!=null)
 										{
-											SServiceProvider.getService(getJCC().getServiceProvider(), ILibraryService.class)
-												.addResultListener(new SwingDefaultResultListener(comptree)
+											SComponentFactory.getClassLoader(cid, getJCC()).addResultListener(new SwingDefaultResultListener(comptree)
 											{
 												public void customResultAvailable(Object source, Object result)
 												{
-													ILibraryService	libservice	= (ILibraryService)result;
+													ClassLoader	cl	= (ClassLoader)result;
 													try
 													{
 														storeCurrentPanelSettings();
-														Class clazz	= SReflect.classForName(classname, libservice.getClassLoader());
+														Class clazz	= SReflect.classForName(classname, cl);
 														final IComponentViewerPanel panel = (IComponentViewerPanel)clazz.newInstance();
 														panel.init(getJCC(), exta).addResultListener(new SwingDefaultResultListener(comptree)
 														{
@@ -461,7 +460,7 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 	{
 		return "tools.componentviewer";
 	}
-
+	
 	/**
 	 *  Test if a node is viewable.
 	 *  @param node	The node.

@@ -1,7 +1,15 @@
 package jadex.base.gui.plugin;
 
 
+import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentManagementService;
+import jadex.bridge.IExternalAccess;
+import jadex.commons.Future;
+import jadex.commons.IFuture;
 import jadex.commons.Properties;
+import jadex.commons.concurrent.DelegationResultListener;
+import jadex.commons.service.SServiceProvider;
+import jadex.commons.service.library.ILibraryService;
 
 import javax.swing.JComponent;
 import javax.swing.JMenu;
@@ -145,6 +153,54 @@ public abstract class AbstractJCCPlugin implements IControlCenterPlugin
 	}
 
 	//-------- helper methods --------
+	
+	/**
+	 *  Find the class loader for a component.
+	 *  Use component class loader for local components
+	 *  and current platform class loader for remote components.
+	 *  @param cid	The component id.
+	 *  @return	The class loader.
+	 */
+	public static IFuture getClassLoader(final IComponentIdentifier cid, final IControlCenter jcc)
+	{
+		final Future	ret	= new Future();
+		
+		// Local component when platform name is same as JCC platform name
+		if(cid.getPlatformName().equals(jcc.getComponentIdentifier().getPlatformName()))
+		{
+			SServiceProvider.getService(jcc.getServiceProvider(), IComponentManagementService.class)
+				.addResultListener(new DelegationResultListener(ret)
+			{
+				public void customResultAvailable(Object source, Object result)
+				{
+					IComponentManagementService	cms	= (IComponentManagementService)result;
+					cms.getExternalAccess(cid).addResultListener(new DelegationResultListener(ret)
+					{
+						public void customResultAvailable(Object source, Object result)
+						{
+							IExternalAccess	ea	= (IExternalAccess)result;
+							ret.setResult(ea.getModel().getClassLoader());
+						}
+					});
+				}
+			});
+		}
+		
+		// Remote component
+		else
+		{
+			SServiceProvider.getService(jcc.getServiceProvider(), ILibraryService.class)
+				.addResultListener(new DelegationResultListener(ret)
+			{
+				public void customResultAvailable(Object source, Object result)
+				{
+					ILibraryService	ls	= (ILibraryService)result;
+					ret.setResult(ls.getClassLoader());
+				}
+			});
+		}
+		return ret;
+	}
 	
 	/**
 	 *  Add a subproperties to a properties.
