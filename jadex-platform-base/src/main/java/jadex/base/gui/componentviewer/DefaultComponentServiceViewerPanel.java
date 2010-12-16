@@ -67,7 +67,6 @@ public class DefaultComponentServiceViewerPanel extends AbstractComponentViewerP
 			}
 		}).addResultListener(new IResultListener()
 		{
-			public static final String XML_CLASSNAME = "Listener"; 
 			public void resultAvailable(Object source, Object result)
 			{
 				createPanels(component, (List)result).addResultListener(new DelegationResultListener(ret));
