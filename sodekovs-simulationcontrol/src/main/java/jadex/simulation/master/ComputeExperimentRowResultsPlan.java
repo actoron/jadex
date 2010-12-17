@@ -31,7 +31,7 @@ public class ComputeExperimentRowResultsPlan extends Plan {
 		int rowCounter = ((Integer) facts.get(Constants.EXPERIMENT_ROW_COUNTER)).intValue();
 		int rowsDoTo = ((Integer) facts.get(Constants.ROWS_TO_DO)).intValue();
 		IntermediateResult interRes = (IntermediateResult) getBeliefbase().getBelief("intermediateResults").getFact();
-		// check terminate condition: time or counter or semantic
+		// check terminate condition:  time or counter or semantic
 		if (rowCounter == rowsDoTo) {
 
 			// store result as XML-File
