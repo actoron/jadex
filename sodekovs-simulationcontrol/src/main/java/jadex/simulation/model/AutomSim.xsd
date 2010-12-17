@@ -11,6 +11,8 @@
 	</xs:element>
 	<xs:element name="Configuration">
 		<xs:complexType>
+			<xs:attribute name="type" type="xs:string"/>
+			<xs:attribute name="name" type="xs:string"/>
 			<xs:attribute name="start" type="xs:string"/>
 			<xs:attribute name="end" type="xs:string"/>
 			<xs:attribute name="step" type="xs:string"/>
@@ -159,8 +161,8 @@
 		<xs:complexType>
 			<xs:sequence>
 				<xs:element ref="Configuration"/>
-			</xs:sequence>
-			<xs:attribute name="type" type="xs:string" use="required"/>
+			</xs:sequence>			
+			<xs:attribute name="strategy" type="xs:string" use="required"/>
 		</xs:complexType>
 	</xs:element>
 	<xs:element name="Persist">

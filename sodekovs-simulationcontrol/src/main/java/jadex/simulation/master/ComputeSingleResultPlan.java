@@ -1,7 +1,5 @@
 package jadex.simulation.master;
 
-import jadex.base.fipa.SFipa;
-import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
 import jadex.simulation.evaluation.IntermediateEvaluation;
 import jadex.simulation.helper.Constants;
@@ -96,7 +94,7 @@ public class ComputeSingleResultPlan extends Plan {
 		// HACK! - 26-5-10
 		// experimentRes.setEvents(new ArrayList<ObservedEvent> ());
 
-		IntermediateResult interRes = IntermediateEvaluation.updateIntermediateResults(simConf, (IntermediateResult) getBeliefbase().getBelief("intermediateResults").getFact(), experimentRes);
+		IntermediateResult interRes = IntermediateEvaluation.updateIntermediateResults((IntermediateResult) getBeliefbase().getBelief("intermediateResults").getFact(), experimentRes);
 		getBeliefbase().getBelief("intermediateResults").setFact(interRes);
 
 		// ControlCenter gui = (ControlCenter)
@@ -146,8 +144,7 @@ public class ComputeSingleResultPlan extends Plan {
 		// apply filter on selected events
 		result = filterResults(result, eventsToFilter);
 
-		return new ExperimentResult(startTime, endTime, experimentId, simConf.getName(), String.valueOf(simConf.getOptimization().getParameterSweeping().getCurrentValue()), simConf.getOptimization()
-				.getData().getName(), result);
+		return new ExperimentResult(startTime, endTime, experimentId, simConf.getName(), String.valueOf(simConf.getOptimization().getParameterSweeping().getCurrentConfiguration()), result);
 	}
 
 	/**

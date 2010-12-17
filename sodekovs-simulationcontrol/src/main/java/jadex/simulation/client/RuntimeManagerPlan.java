@@ -79,7 +79,7 @@ public class RuntimeManagerPlan extends Plan {
 		
 		startApplication((Map) getParameter("applicationConf").getValue(), clientConfMap, simConf);
 		System.out.println("#RumtimeManagerPlan# Startet Simulation Experiment Nr.:" + clientConfMap.get(Constants.EXPERIMENT_ID) + ") with Optimization Values: "
-				+ simConf.getOptimization().getParameterSweeping().getCurrentConfiguration());
+				+ clientConfMap.get(Constants.CURRENT_PARAMETER_CONFIGURATION));
 
 		AbstractEnvironmentSpace space = (AbstractEnvironmentSpace) exta.getSpace(simConf.getNameOfSpace());
 
@@ -155,7 +155,7 @@ public class RuntimeManagerPlan extends Plan {
 
 		ConcurrentHashMap<Long, ArrayList<ObservedEvent>> results = getResult(space);
 
-		prepareResult(results);
+		prepareResult(results,(String) clientConfMap.get(Constants.EXPERIMENT_ID));
 
 		System.out.println("#RuntimeManagerPlan# Killing executed application....");
 		vis.setExit();
@@ -170,10 +170,11 @@ public class RuntimeManagerPlan extends Plan {
 //		System.out.println("#RuntimeManagerPlan# Goal over???");
 	}
 
-	private void prepareResult(ConcurrentHashMap<Long, ArrayList<ObservedEvent>> observedEvents) {
+	private void prepareResult(ConcurrentHashMap<Long, ArrayList<ObservedEvent>> observedEvents, String experimentID) {
 		Map facts = (Map) getBeliefbase().getBelief("simulationFacts").getFact();
 		facts.put(Constants.EXPERIMENT_END_TIME, new Long(clockservice.getTime()));
 		facts.put(Constants.OBSERVED_EVENTS_MAP, observedEvents);
+		facts.put(Constants.EXPERIMENT_ID, experimentID);
 		// does not need to be send back to master agent
 //		facts.remove(Constants.SIMULATION_FACTS_FOR_CLIENT);
 		

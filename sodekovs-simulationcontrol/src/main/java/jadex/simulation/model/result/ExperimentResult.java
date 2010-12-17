@@ -20,21 +20,21 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "ExperimentResults")
 public class ExperimentResult extends IResult{
 		
-	private String optimizationValue;
-	private String optimizationParameterName;
+	private String optimizationConfiguration;
+	//private String optimizationParameterName;
 	private ArrayList<ObservedEvent> events = new ArrayList<ObservedEvent>();
 	
 	public ExperimentResult(){
 		super();
 	}
 	
-	public ExperimentResult(long startTime, long endTime, String experimentID, String name, String optimizationValue, String optimizationParameterName, ArrayList<ObservedEvent> observedEvents){
+	public ExperimentResult(long startTime, long endTime, String experimentID, String name, String optimizationConfiguration, ArrayList<ObservedEvent> observedEvents){
 		this.starttime = startTime;
 		this.endtime = endTime;
 		this.id = experimentID;
 		this.name = name;
-		this.optimizationValue = optimizationValue;
-		this.optimizationParameterName = optimizationParameterName;
+		this.optimizationConfiguration = optimizationConfiguration;
+		//this.optimizationParameterName = optimizationParameterName;
 		this.events = observedEvents;
 	}
 	
@@ -53,18 +53,13 @@ public class ExperimentResult extends IResult{
 		this.events.add(event);
 	}			
 	
-	public String getOptimizationValue() {
-		return optimizationValue;
+	public String getOptimizationConfiguration() {
+		return optimizationConfiguration;
 	}
-	public void setOptimizationValue(String optimizationValue) {
-		this.optimizationValue = optimizationValue;
+	public void setOptimizationConfiguration(String optimizationConfiguration) {
+		this.optimizationConfiguration = optimizationConfiguration;
 	}
-	public String getOptimizationParameterName() {
-		return optimizationParameterName;
-	}
-	public void setOptimizationParameterName(String optimizationParameterName) {
-		this.optimizationParameterName = optimizationParameterName;
-	}
+	
 	
 	/**
 	 * Returns the duration of the experiment
@@ -106,10 +101,7 @@ public class ExperimentResult extends IResult{
 		buffer.append(" sec");
 		buffer.append("\n");
 		buffer.append("Optimization: Parameter Name and Value: ");
-		buffer.append(getOptimizationParameterName());
-		buffer.append(" - ");
-		buffer.append(getOptimizationValue());
-				
+		buffer.append(getOptimizationConfiguration());			
 		return buffer.toString();
 		
 	}

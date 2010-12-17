@@ -9,6 +9,7 @@
 package jadex.simulation.model;
 
 import java.io.Serializable;
+import java.util.List;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -52,7 +53,7 @@ public class Optimization implements Serializable{
 	 */
 	private static final long serialVersionUID = 239646997645144477L;
 	@XmlElement(name = "Data", required = true)
-    protected Data data;
+   protected List<Data> data;
     @XmlElement(name = "ParameterSweeping", required = true)
     protected ParameterSweeping parameterSweeping;
     @XmlElement(name = "Algorithm", required = true)
@@ -66,7 +67,7 @@ public class Optimization implements Serializable{
      *     {@link Data }
      *     
      */
-    public Data getData() {
+    public List<Data> getData() {
         return data;
     }
 
@@ -78,8 +79,8 @@ public class Optimization implements Serializable{
      *     {@link Data }
      *     
      */
-    public void setData(Data value) {
-        this.data = value;
+    public void setData(List<Data> data) {
+        this.data = data;
     }
 
     /**

@@ -9,6 +9,8 @@ import jadex.commons.concurrent.IResultListener;
 import jadex.commons.service.SServiceProvider;
 import jadex.simulation.helper.Constants;
 import jadex.simulation.helper.FileHandler;
+import jadex.simulation.model.Configuration;
+import jadex.simulation.model.Data;
 import jadex.simulation.model.Optimization;
 import jadex.simulation.model.SimulationConfiguration;
 import jadex.simulation.model.result.ExperimentResult;
@@ -18,6 +20,9 @@ import jadex.simulation.remote.IRemoteSimulationExecutionService;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 
 public class StartSimulationExperimentsPlan extends Plan {
@@ -52,10 +57,20 @@ public class StartSimulationExperimentsPlan extends Plan {
 		rowResult.setStarttime(getClock().getTime());
 		rowResult.setId(String.valueOf(rowCounter));
 
+		// Contains the current values of the parameters that are iterated through
+//		String currentParamterValues = "";
+		
 		// check, whether parameters have to be swept
 		if (simConf.getOptimization().getParameterSweeping() != null) {
-			sweepParameters(simConf, applicationArgs);
+			if(simConf.getOptimization().getParameterSweeping().getStrategy().equals("linear"))
+				sweepParameters(simConf, applicationArgs);
+			else
+				recusivelySweepParameter(simConf, applicationArgs);
 		}
+		
+		//store simConf since it contains the current configuration of the parameters that are swept through
+		getBeliefbase().getBelief("simulationConf").setFact(simConf);
+		clientArgs.put(Constants.CURRENT_PARAMETER_CONFIGURATION, simConf.getOptimization().getParameterSweeping().getCurrentConfiguration());
 
 		// update GUI: create new panel/table for new ensemble
 		// ControlCenter gui = (ControlCenter)
@@ -83,7 +98,7 @@ public class StartSimulationExperimentsPlan extends Plan {
 			System.out.println("#*****************************************************************");
 			System.out.println("#Master#Used memory: " + (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1024000);
 			System.out.println("#*****************************************************************");
-
+			
 			totalRuns++;
 			expInRow++;
 
@@ -117,8 +132,9 @@ public class StartSimulationExperimentsPlan extends Plan {
 		rowResult.setExperimentsResults(experimentList);
 		rowResult.setEndtime(getClock().getTime());
 		rowResult.setName("Tmp-Test");
-		rowResult.setOptimizationName(experimentList.get(0).getOptimizationParameterName());
-		rowResult.setOptimizationValue(experimentList.get(0).getOptimizationValue());
+		rowResult.setOptimizationConfiguration(simConf.getOptimization().getParameterSweeping().getCurrentConfiguration());
+		//rowResult.setOptimizationName(experimentList.get(0).getOptimizationParameterName());
+		//rowResult.setOptimizationValue(experimentList.get(0).getOptimizationValue());
 		rowResult.setFinalStatsMap(((IntermediateResult) getBeliefbase().getBelief("intermediateResults").getFact()).getIntermediateStats());
 
 		rowResults.put(rowResult.getId(), rowResult);
@@ -130,6 +146,7 @@ public class StartSimulationExperimentsPlan extends Plan {
 		dispatchInternalEvent(createInternalEvent("triggerExperimentRowEvaluation"));
 	}
 
+	
 	private void startApplication(String appName, String fileName, String configName, Map args) {
 
 		try {
@@ -207,80 +224,144 @@ public class StartSimulationExperimentsPlan extends Plan {
 	 * @param args
 	 */
 	private void sweepParameters(SimulationConfiguration simConf, Map args) {
+		String currentParameterValues = "";
 		Optimization opt = simConf.getOptimization();
-		String parameterName = opt.getData().getName();
-		String clazz = opt.getParameterSweeping().getConfiguration().getClazz(); // double,
-																					// int
-																					// or
-																					// string
+		List<Data> data = opt.getData();
+		//String parameterName = opt.getData().getName();
+		//String clazz = opt.getParameterSweeping().getConfiguration().getClazz(); //double, int or string
 		int valInt = -1;
-		double valDouble = 0.0;
-		String valString = "";
+		//double valDouble = 0.0;
+		//String valString = "";
 
-		// iterate through parameter space with step size; only appropriate to
-		// int & double parameter
-		if (opt.getParameterSweeping().getType().equalsIgnoreCase(Constants.OPTIMIZATION_TYPE_SPACE)) {
-			if (clazz.equalsIgnoreCase("int")) {
-				if (opt.getParameterSweeping().getParameterSweepCounter() == 0) {
-					valInt = Integer.parseInt(opt.getParameterSweeping().getConfiguration().getStart());
+		Iterator<Configuration> confIterator = opt.getParameterSweeping().getConfiguration().iterator();
+		for(Iterator<Data> i =  data.iterator(); i.hasNext(); )
+		{
+			Data dt = i.next();
+			Configuration conf = confIterator.next();
+			// iterate through parameter space with step size; only appropriate to int & double parameter
+			if (conf.getType().equalsIgnoreCase(Constants.OPTIMIZATION_TYPE_SPACE)) {
+				if (conf.getParameterSweepCounter()== 0) {
+					valInt = Integer.parseInt(conf.getStart());
 				} else {
-					int step = Integer.parseInt(opt.getParameterSweeping().getConfiguration().getStep());
-					int currentVal = Integer.parseInt(opt.getParameterSweeping().getCurrentValue());
+					int step = Integer.parseInt(conf.getStep());
+					int currentVal = Integer.parseInt(conf.getCurrentValue());
 					valInt = currentVal + step;
-				}
-			} else if (clazz.equalsIgnoreCase("double")) {
-				if (opt.getParameterSweeping().getParameterSweepCounter() == 0) {
-					valDouble = Double.parseDouble(opt.getParameterSweeping().getConfiguration().getStart());
+				} 
+			} else if (conf.getType().equalsIgnoreCase(Constants.OPTIMIZATION_TYPE_LIST)) {
+				if (conf.getParameterSweepCounter() == 0) {
+					valInt = Integer.valueOf(conf.getValuesAsList().get(0));
 				} else {
-					double step = Double.parseDouble(opt.getParameterSweeping().getConfiguration().getStep());
-					Double currentVal = Double.parseDouble(opt.getParameterSweeping().getCurrentValue());
-					valDouble = currentVal + step;
-				}
-			} else
-				System.err.println("#StartSimulationExperiment# Error on identifying class for sweeping parameter(s): " + clazz);
-			// iterate through list of parameters of type int or double or
-			// String
-		} else if (opt.getParameterSweeping().getType().equalsIgnoreCase(Constants.OPTIMIZATION_TYPE_LIST)) {
-			if (clazz.equalsIgnoreCase("int")) {
-				if (opt.getParameterSweeping().getParameterSweepCounter() == 0) {
-					valInt = Integer.valueOf(opt.getParameterSweeping().getConfiguration().getValuesAsList().get(0));
-
-				} else {
-					valInt = Integer.valueOf(opt.getParameterSweeping().getConfiguration().getValuesAsList().get(opt.getParameterSweeping().getParameterSweepCounter()));
-				}
-			} else if (clazz.equalsIgnoreCase("double")) {
-				if (opt.getParameterSweeping().getParameterSweepCounter() == 0) {
-					valDouble = Double.valueOf(opt.getParameterSweeping().getConfiguration().getValuesAsList().get(0));
-
-				} else {
-					valDouble = Double.valueOf(opt.getParameterSweeping().getConfiguration().getValuesAsList().get(opt.getParameterSweeping().getParameterSweepCounter()));
-				}
-			} else if (clazz.equalsIgnoreCase("string")) {
-				if (opt.getParameterSweeping().getParameterSweepCounter() == 0) {
-					valString = String.valueOf(opt.getParameterSweeping().getConfiguration().getValuesAsList().get(0));
-
-				} else {
-					valString = String.valueOf(opt.getParameterSweeping().getConfiguration().getValuesAsList().get(opt.getParameterSweeping().getParameterSweepCounter()));
+					valInt = Integer.valueOf(conf.getValuesAsList().get(conf.getParameterSweepCounter()));
 				}
 			} else {
-				System.err.println("#StartSimulationExperiment# Error on identifying class for sweeping parameter(s): " + clazz);
+				System.err.println("#StartSimulationExperiment# Error on identifying type for sweeping parameter(s): " + opt.getParameterSweeping().getCurrentConfiguration());
 			}
-		} else {
-			System.err.println("#StartSimulationExperiment# Error on identifying type for sweeping parameter(s): " + opt.getParameterSweeping().getType());
-		}
+			conf.incrementParameterSweepCounter();
 
-		// update SimulationConf to be up to date
-		if (clazz.equalsIgnoreCase("int")) {
-			opt.getParameterSweeping().setCurrentValue(String.valueOf(valInt));
+
+			// update SimulationConf to be up to date
+			conf.setCurrentValue(String.valueOf(valInt));			
 			// parametrize application-xml
-			args.put(parameterName, new Integer(valInt));
-		} else if (clazz.equalsIgnoreCase("double")) {
-			opt.getParameterSweeping().setCurrentValue(String.valueOf(valDouble));
-			args.put(parameterName, new Double(valDouble));
-		} else if (clazz.equalsIgnoreCase("string")) {
-			opt.getParameterSweeping().setCurrentValue(valString);
-			args.put(parameterName, new String(valString));
+			args.put(dt.getName(), new Integer(valInt));
+			currentParameterValues += dt.getName() + " = " + conf.getCurrentValue() + " ";
+			opt.getParameterSweeping().setCurrentConfiguration(currentParameterValues);
+			
 		}
-		opt.getParameterSweeping().incrementParameterSweepCounter();
+//		return currentParameterValues;
 	}
+	
+	private void recusivelySweepParameter(SimulationConfiguration simConf, Map args) {
+		String parametersConfiguration = "";
+		Optimization opt = simConf.getOptimization();
+		List<Data> data = opt.getData();
+		List<Configuration> parameterConf = opt.getParameterSweeping().getConfiguration();
+		
+		for(int i = parameterConf.size() - 1; i >= 0; i--)
+		{
+			Data dt = data.get(i);
+			Configuration conf = parameterConf.get(i);
+			int currentValue = Integer.parseInt(conf.getCurrentValue());;
+			int endValue = 0;
+			int stepValue = 0;
+			int startValue = 0;
+			
+			//loop only if lower configuration has reached the end and backed to "end";the lowest configuraion loops for always
+			if((i == parameterConf.size()-1) || conf.getParameterSweepCounter() ==0 || (parameterConf.get(parameterConf.size()-1).atEnd() && parameterConf.get(i+1).atEnd()))			
+			{
+				if (conf.getType().equalsIgnoreCase(Constants.OPTIMIZATION_TYPE_SPACE)) {
+					endValue = Integer.parseInt(conf.getEnd());
+					stepValue = Integer.parseInt(conf.getStep());
+					startValue = Integer.parseInt(conf.getStart());
+					
+					if (conf.getParameterSweepCounter() == 0) {
+						currentValue = startValue;
+						conf.incrementParameterSweepCounter();
+					} 
+					else 
+					{
+						if (currentValue < endValue)
+						{
+							//reset all lower level
+							if(i < parameterConf.size() - 1 && parameterConf.get(i+1).atEnd()) {
+								for(int j = i+1; j <= parameterConf.size()- 1; j++) {
+									parameterConf.get(j).setParameterSweepCounter(1);
+								}
+							}
+							
+							currentValue += stepValue;
+							conf.incrementParameterSweepCounter();
+							//parameterConf.get(i).setStatus("on running");
+						}
+						else
+						{
+							//value like a indicator for higher configuration whether loop or not
+							//conf.setValues("end");
+							currentValue = startValue;
+							conf.incrementParameterSweepCounter();
+						}
+					}
+				}  else if (conf.getType().equalsIgnoreCase(Constants.OPTIMIZATION_TYPE_LIST)) {
+					if (conf.getParameterSweepCounter() == 0) {
+						currentValue = Integer.valueOf(conf.getValuesAsList().get(0));
+						conf.incrementParameterSweepCounter();
+					} else {
+						if(conf.getParameterSweepCounter() >= conf.getValuesAsList().size())
+							currentValue = Integer.valueOf(conf.getValuesAsList().get(0));
+						else {
+							currentValue = Integer.valueOf(conf.getValuesAsList().get(conf.getParameterSweepCounter()));
+							//reset all lower level
+							if(i < parameterConf.size() - 1 && parameterConf.get(i+1).atEnd()) {
+								for(int j = i+1; j <= parameterConf.size()- 1; j++) {
+									parameterConf.get(j).setParameterSweepCounter(1);
+								}
+							}
+						}
+						conf.incrementParameterSweepCounter();
+					}
+				} else {
+					System.err.println("#StartSimulationExperiment# Error on identifying type for sweeping parameter(s): " + opt.getParameterSweeping().getCurrentConfiguration());
+				}
+			} else
+			{
+				if(conf.getParameterSweepCounter() == 0)
+				{
+					currentValue = startValue;
+				}
+			}
+			
+			conf.setCurrentValue(String.valueOf(currentValue));
+			args.put(dt.getName(), new Integer(currentValue));
+			parametersConfiguration = dt.getName() + " = " + currentValue + " " + parametersConfiguration;	
+			opt.getParameterSweeping().setCurrentConfiguration(parametersConfiguration);
+		}
+		
+		//reach the end of recusion when first parameter and last parameter reach maximum at the sametime = SPACE
+		if(parameterConf.get(0).atEnd()
+				&& parameterConf.get(parameterConf.size()-1).atEnd()) {
+			System.out.println("********************RECURSION END*************************");
+		}
+		
+//		return parametersConfiguration;
+	}
+
 }

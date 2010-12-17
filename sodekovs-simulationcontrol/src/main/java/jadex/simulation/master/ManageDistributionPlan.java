@@ -64,11 +64,9 @@ public class ManageDistributionPlan extends Plan
 
 			if (services.size() > 0) {
 
-				// read the *.application.xml File from the file system
-//				String applicationDescription = FileHandler.readFileAsString(fileName);
 
 				System.out.println("#ManageDistributionPlan# Distributed new Simulation Experiment remotely. Nr.:" + clientArgs.get(Constants.EXPERIMENT_ID) + "(" + beliefbaseFacts.get(Constants.TOTAL_EXPERIMENT_COUNTER) + ") with Optimization Values: "
-						+ simConf.getOptimization().getData().getName() + " = " + simConf.getOptimization().getParameterSweeping().getCurrentValue());
+						+ simConf.getOptimization().getParameterSweeping().getCurrentConfiguration());
 				
 				IFuture fut = services.get(0).executeExperiment(applicationArgs, clientArgs);
 //				fut.addResultListener(new IResultListener() {

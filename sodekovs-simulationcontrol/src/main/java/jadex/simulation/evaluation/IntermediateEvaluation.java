@@ -22,7 +22,7 @@ public class IntermediateEvaluation {
 	 * @param experimentRes
 	 * @return
 	 */
-	public static IntermediateResult updateIntermediateResults(SimulationConfiguration simConf, IntermediateResult intermediateRes, ExperimentResult experimentRes) {
+	public static IntermediateResult updateIntermediateResults(IntermediateResult intermediateRes, ExperimentResult experimentRes) {
 		
 		//clean up old values:
 		intermediateRes.reInitSomeHashMaps();

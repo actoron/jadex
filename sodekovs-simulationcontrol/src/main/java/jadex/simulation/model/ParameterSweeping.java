@@ -9,6 +9,7 @@
 package jadex.simulation.model;
 
 import java.io.Serializable;
+import java.util.List;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -51,9 +52,9 @@ public class ParameterSweeping  implements Serializable{
 	 */
 	private static final long serialVersionUID = -1812957806499367443L;
 	@XmlElement(name = "Configuration", required = true)
-    protected Configuration configuration;
+    protected List<Configuration> configuration;
     @XmlAttribute(required = true)
-    protected String type;
+    protected String strategy;
 
     /**
      * Gets the value of the configuration property.
@@ -63,7 +64,7 @@ public class ParameterSweeping  implements Serializable{
      *     {@link Configuration }
      *     
      */
-    public Configuration getConfiguration() {
+    public List<Configuration> getConfiguration() {
         return configuration;
     }
 
@@ -75,65 +76,48 @@ public class ParameterSweeping  implements Serializable{
      *     {@link Configuration }
      *     
      */
-    public void setConfiguration(Configuration value) {
+    public void setConfiguration(List<Configuration> value) {
         this.configuration = value;
     }
 
+
     /**
-     * Gets the value of the type property.
+     * Gets the value of the strategy property.
      * 
      * @return
      *     possible object is
      *     {@link String }
      *     
      */
-    public String getType() {
-        return type;
+    public String getStrategy() {
+        return strategy;
     }
 
     /**
-     * Sets the value of the type property.
+     * Sets the value of the strategy property.
      * 
      * @param value
      *     allowed object is
      *     {@link String }
      *     
      */
-    public void setType(String value) {
-        this.type = value;
+    public void setStrategy(String value) {
+        this.strategy = value;
     }
 
-    
-    @XmlTransient
-	private int parameterSweepCounter = 0;
+   
+	public void setCurrentConfiguration(String currentConfiguration) {
+		this.currentConfiguration = currentConfiguration;
+	}
+
+	public String getCurrentConfiguration() {
+		return currentConfiguration;
+	}
+
+
+
 	@XmlTransient
-	private String currentValue = "";
+	private String currentConfiguration = "";
 
-	  /**
-	 * Needed, in case the parameter is swept to indicated current value.
-	 * @return
-	 */
-	public int getParameterSweepCounter() {
-		return parameterSweepCounter;
-	}
-
-	public void setParameterSweepCounter(int parameterSweepCounter) {
-		this.parameterSweepCounter = parameterSweepCounter;
-	}
 	
-	public void incrementParameterSweepCounter(){
-		this.parameterSweepCounter++;
-	}
-
-	/**
-	 * Denotes the current value of the parameter that is swept
-	 * @return
-	 */
-	public String getCurrentValue() {
-		return currentValue;
-	}
-
-	public void setCurrentValue(String currentValue) {
-		this.currentValue = currentValue;
-	}
 }

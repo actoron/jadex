@@ -47,8 +47,7 @@
 		<argument name="al" typename="Int">new Integer(258)</argument>
 		<argument name="simulationFacts" typename="Map" />
 		<!-- <argument name="nrr" typename="Int">new Integer(10)</argument> -->
-		<argument name="SentryNumber" typename="Int">new Integer(10)
-		</argument>
+		<argument name="SentryNumber" typename="Int">new Integer(10)</argument>
 		<argument name="Experiment_id" typename="String">"not set"</argument>
 	</arguments>
 
@@ -323,8 +322,8 @@
 			</spaces>
 			<components>
 				<component type="Sentry" number="$args.NumberOfSentries" />
-				<component type="Producer" number="1" />
-				<component type="Carry" number="1" />
+				<component type="Producer" number="$args.NumberOfProducers" />
+				<component type="Carry" number="$args.NumberOfCarries" />
 				<component type="ClientSimulator">
 					<arguments>
 						<!-- The mission time. -->
@@ -411,8 +410,8 @@
 			</spaces>
 			<components>
 				<component type="Sentry" number="$args.NumberOfSentries" />
-				<component type="Producer" number="1" />
-				<component type="Carry" number="1" />				
+				<component type="Producer" number="$args.NumberOfProducers" />
+				<component type="Carry" number="$args.NumberOfCarries" />			
 			</components>
 		</application>
 
@@ -433,8 +432,7 @@
 							<env:property name="space">$space</env:property>
 							<!-- hack!!! -->
 							<env:property name="missiontime">
-								300000 +
-								$properties.clock.getTime()
+								300000 + $properties.clock.getTime()
 							</env:property>
 						</env:object>
 						<env:object type="target" number="20">

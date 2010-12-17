@@ -15,6 +15,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
 
@@ -49,6 +50,8 @@ public class Configuration implements Serializable{
 	 */
 	private static final long serialVersionUID = 5603963875857069542L;
 	@XmlAttribute
+    protected String name;
+	@XmlAttribute
     protected String start;
     @XmlAttribute
     protected String end;
@@ -58,8 +61,44 @@ public class Configuration implements Serializable{
     protected String clazz;
     @XmlAttribute
     protected String values;
+    @XmlAttribute
+    protected String type;
+   
+    
+    
+	/**
+     * Gets the value of the type property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getType() {
+        return type;
+    }
 
     /**
+     * Sets the value of the type property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setType(String value) {
+        this.type = value;
+    }
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	/**
      * Gets the value of the start property.
      * 
      * @return
@@ -197,5 +236,61 @@ public class Configuration implements Serializable{
    		}
    		return this.valuesAsList;	
    	}
+   	
+    @XmlTransient
+	private int parameterSweepCounter = 0;
+	@XmlTransient
+	private String currentValue = "";
+
+	  /**
+	 * Needed, in case the parameter is swept to indicated current value.
+	 * @return
+	 */
+	public int getParameterSweepCounter() {
+		return parameterSweepCounter;
+	}
+
+	public void setParameterSweepCounter(int parameterSweepCounter) {
+		this.parameterSweepCounter = parameterSweepCounter;
+	}
+	
+	public void incrementParameterSweepCounter(){
+		this.parameterSweepCounter++;
+	}
+
+	/**
+	 * Denotes the current value of the parameter that is swept
+	 * @return
+	 */
+	public String getCurrentValue() {
+		return currentValue;
+	}
+
+	public void setCurrentValue(String currentValue) {
+		this.currentValue = currentValue;
+	}
+	
+	public boolean atEnd() {
+		if(this.type.equalsIgnoreCase("space"))
+		{
+			if(this.getParameterSweepCounter() > ((Integer.parseInt(end) - Integer.parseInt(start)))/(Integer.parseInt(currentValue))+1)
+				return true;
+		}
+		else if(this.type.equalsIgnoreCase("list"))
+		{
+			if(valuesAsList == null){
+				this.getValuesAsList();
+			}
+			if(this.getParameterSweepCounter() > valuesAsList.size())
+				return true;
+			else
+				return false;
+		}
+		else {
+			System.err.println("Wrong configuration type");
+		}
+		return false;
+		
+	}
 
 }

@@ -9,10 +9,13 @@ import jadex.simulation.model.result.EvaluationResult;
 import jadex.simulation.model.result.IntermediateResult;
 import jadex.simulation.model.result.RowResult;
 import jadex.simulation.model.result.SimulationResult;
+import jadex.simulation.persist.LogWriter;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -31,7 +34,7 @@ public class ComputeExperimentRowResultsPlan extends Plan {
 		int rowCounter = ((Integer) facts.get(Constants.EXPERIMENT_ROW_COUNTER)).intValue();
 		int rowsDoTo = ((Integer) facts.get(Constants.ROWS_TO_DO)).intValue();
 		IntermediateResult interRes = (IntermediateResult) getBeliefbase().getBelief("intermediateResults").getFact();
-		// check terminate condition:  time or counter or semantic
+		// check terminate condition: time or counter or semantic
 		if (rowCounter == rowsDoTo) {
 
 			// store result as XML-File
@@ -45,14 +48,25 @@ public class ComputeExperimentRowResultsPlan extends Plan {
 
 			System.out.println("#ComputeExperimentRowResultsPlan# Simulation finished. Write Res of Simulation to XML!");
 			XMLHandler.writeXMLToFile(result, "SimRes" + result.getStarttime() + ".xml", SimulationResult.class);
-
-			doShortEvaluation(rowResults, interRes,  "Final");
+			
+			
+			try {
+				doShortEvaluation(rowResults, interRes,  "Final");
+			} catch (UnsupportedEncodingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 
 		} else {
 			
 			//Print and persist intermediateResults
 			System.out.println("#ComputeExperimentRowResultsPlan# Printing intermediate results!");
-			doShortEvaluation((HashMap) getBeliefbase().getBelief("rowResults").getFact(), interRes, "Intermediate");
+			try {
+				doShortEvaluation((HashMap) getBeliefbase().getBelief("rowResults").getFact(), interRes, "Intermediate");
+			} catch (UnsupportedEncodingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 
 			// optimize --> put new parameters
 			// Start new Row
@@ -73,8 +87,9 @@ public class ComputeExperimentRowResultsPlan extends Plan {
 	 * Do short evaluation to see the most important results of the simulation
 	 * 
 	 * @param rowResults
+	 * @throws UnsupportedEncodingException 
 	 */
-	private void doShortEvaluation(HashMap rowResults, IntermediateResult interRes, String fileAppendix) {
+	private void doShortEvaluation(HashMap rowResults, IntermediateResult interRes, String fileAppendix) throws UnsupportedEncodingException {
 
 		SimulationConfiguration simConf = (SimulationConfiguration) getBeliefbase().getBelief("simulationConf").getFact();
 		HashMap facts = (HashMap) getBeliefbase().getBelief("generalSimulationFacts").getFact();
@@ -87,12 +102,27 @@ public class ComputeExperimentRowResultsPlan extends Plan {
 		evalRes.setRowResults(new ArrayList<RowResult>(rowResults.values()));
 
 		System.out.println(evalRes.toString());
+//		LogWriter logWriter = new LogWriter();
+//		logWriter.log(evalRes.toString());
+	
 		try {
 			BufferedWriter out = new BufferedWriter(new FileWriter("SimRes"  + evalRes.getSimulationStartime() + "-" + fileAppendix + ".txt"));
 			out.write(evalRes.toString());
 			out.close();
 		} catch (IOException e) {
 		}
+		/*
+		try {
+			System.out.println("******Fetching from DB*****");
+			logWriter.logReader();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		*/
 
 	}
 }

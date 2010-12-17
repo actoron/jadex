@@ -20,6 +20,7 @@ public class RowResult extends IResult {
 	private ArrayList<ExperimentResult> experimentResults = new ArrayList<ExperimentResult>();
 	private String optimizationName;
 	private String optimizationValue;
+	private String optimizationConfiguration;
 	
 	// --- contains the FINAL results of the statistical evaluation for
 	// each observer type, i.e. the statics for each observed type for this row.
@@ -98,9 +99,10 @@ public class RowResult extends IResult {
 		buffer.append(getId());
 		buffer.append("\n");
 		buffer.append("Optimization: Parameter Name and Value: ");
-		buffer.append(getOptimizationName());
+		buffer.append(getOptimizationConfiguration());
+		/*buffer.append(getOptimizationName());
 		buffer.append(" - ");
-		buffer.append(getOptimizationValue());
+		buffer.append(getOptimizationValue());*/
 		buffer.append("\n\n");
 		buffer.append("Cumulated Stats of Observed Events:");
 		
@@ -172,5 +174,14 @@ public class RowResult extends IResult {
 		buffer.append("\n");
 		return buffer.toString();
 	}
+
+	public void setOptimizationConfiguration(String optimizationConfiguration) {
+		this.optimizationConfiguration = optimizationConfiguration;
+	}
+
+	public String getOptimizationConfiguration() {
+		return optimizationConfiguration;
+	}
+
 	
 }

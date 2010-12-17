@@ -69,7 +69,9 @@ public class Constants {
 	// XML file as String
 	public static final String APPLICATION_FILE_AS_XML_STRING = "ApplicationFileAsXMLString";
 	public static final String CONFIGURATION_FILE_AS_XML_STRING = "ConfigurationFileAsXMLString";
-	
+
+	// Current Configuration of the parameter values to be iterated
+	public static final String CURRENT_PARAMETER_CONFIGURATION = "CurrentParameterConfiguration";
 	//-- Constants used in the SimulationConfiguration xml file
 	
 	
