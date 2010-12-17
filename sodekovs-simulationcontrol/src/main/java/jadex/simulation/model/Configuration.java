@@ -60,7 +60,7 @@ public class Configuration implements Serializable{
     @XmlAttribute(name = "class")
     protected String clazz;
     @XmlAttribute
-    protected String values;
+    protected String values; 
     @XmlAttribute
     protected String type;
    
@@ -240,7 +240,7 @@ public class Configuration implements Serializable{
     @XmlTransient
 	private int parameterSweepCounter = 0;
 	@XmlTransient
-	private String currentValue = "";
+	private String currentValue = "0";
 
 	  /**
 	 * Needed, in case the parameter is swept to indicated current value.
