@@ -12,20 +12,38 @@
 	<componenttypes>
 		<componenttype name="SimulationManager"
 			filename="jadex/simulation/master/SimulationManager.agent.xml" />
+			<componenttype name="RemoteSimulationClient"
+			filename="jadex/simulation/remote/RemoteClientSimulator.agent.xml" />
 	</componenttypes>
 	
 	<applications>
-		<application name="Default Configuration">
+		<application name="Simulate MarsWorld">
 			<components>
 				<component type="SimulationManager" master="true">
 					<arguments>
-						<!-- <argument name="simulationDescriptionFile">"../sodekovs-simulationcontrol/src/main/java/jadex/simulation/Configuration2.xml"</argument> -->
-						<!--<argument name="simulationDescriptionFile">"../sodekovs-simulationcontrol/src/main/java/jadex/simulation/SpeedOptimization.xml"</argument> -->
-					 	<argument name="simulationDescriptionFile">"../sodekovs-simulationcontrol/src/main/java/jadex/simulation/TestNegotiationConfiguration.xml"</argument>
+						<argument name="simulationDescriptionFile">"../sodekovs-simulationcontrol/src/main/java/jadex/simulation/Configuration2.xml"</argument>
+					</arguments>
+				</component>
+			</components>
+		</application>
+		<application name="Simulate MarsWorld with included Remote Client">
+			<components>
+				<component type="SimulationManager" master="true">
+					<arguments>
+						<argument name="simulationDescriptionFile">"../sodekovs-simulationcontrol/src/main/java/jadex/simulation/Configuration2.xml"</argument>			
+					</arguments>
+				</component>
+			<component type="RemoteSimulationClient" master="false"/>
+			</components>
+		</application>
+		<application name="Simulate AgentNegotiation">
+			<components>
+				<component type="SimulationManager" master="true">
+					<arguments>
+						<argument name="simulationDescriptionFile">"../sodekovs-simulationcontrol/src/main/java/jadex/simulation/TestNegotiationConfiguration.xml"</argument>			
 					</arguments>
 				</component>
 			</components>
 		</application>
 	</applications>
-
 </applicationtype>
