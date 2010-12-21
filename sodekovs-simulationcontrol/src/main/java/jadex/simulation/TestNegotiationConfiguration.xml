@@ -113,9 +113,11 @@
 				class="Int" /><!-- Add type of element: String, long, int etc.? -->
 		</Data>
 		<!-- Important: Number of sweeps has to be equal with number of rows!-->
-		<ParameterSweeping type="space"> <!-- space, list or algorithm (algorithm is not implemented yet!)-->
-			<Configuration start="0" end="2" step="1" class="int" />
-			<!-- 			<Configuration values="12;17;28;33;"/>--> <!-- Has to be comma separated list, with a comma as last character. -->
+		<ParameterSweeping strategy="recursively"> <!-- space, list or algorithm (algorithm is not implemented yet!)-->
+			<Configuration type="list" name="NumberOfSentries" values="1;" class="int" />
+			<Configuration type="list" name="NumberOfProducers" values="2;3;" class="int" />
+			<!-- <Configuration type="list" name="NumberOfProducers" values="1;2;" class="int" />--><!-- Has to be comma separated list, with a comma as last character. -->
+			<Configuration type="space" name="NumberOfCarries" start="1" end="4" step="1" class="int" />
 		</ParameterSweeping>
 		<Algorithm>
 			<Input></Input>
