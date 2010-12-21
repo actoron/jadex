@@ -1,6 +1,7 @@
 package jadex.micro.examples.chat;
 
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IChangeListener;
 import jadex.commons.concurrent.DefaultResultListener;
@@ -21,7 +22,7 @@ public class ChatService extends BasicService implements IChatService
 	//-------- attributes --------
 	
 	/** The agent. */
-	protected IMicroExternalAccess agent;
+	protected IInternalAccess agent;
 	
 	/** The listeners. */
 	protected List listeners;
@@ -31,10 +32,10 @@ public class ChatService extends BasicService implements IChatService
 	/**
 	 *  Create a new helpline service.
 	 */
-	public ChatService(IExternalAccess agent)
+	public ChatService(IInternalAccess agent)
 	{
 		super(agent.getServiceProvider().getId(), IChatService.class, null);
-		this.agent = (IMicroExternalAccess)agent;
+		this.agent = agent;
 		this.listeners = Collections.synchronizedList(new ArrayList());
 	}
 	
@@ -47,7 +48,8 @@ public class ChatService extends BasicService implements IChatService
 	 */
 	public void tell(final String name, final String text)
 	{
-		SServiceProvider.getServices(agent.getServiceProvider(), IChatService.class, true, true)
+//		SServiceProvider.getServices(agent.getServiceProvider(), IChatService.class, true, true)
+		agent.getRequiredServices("chatservices")
 			.addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
