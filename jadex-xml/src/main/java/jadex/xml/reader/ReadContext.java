@@ -167,11 +167,20 @@ public class ReadContext implements IContext
 
 	/**
 	 *  Get the top stack element.
-	 *  @return The top stack element.
+	 *  @return The top stack element (if any).
 	 */
 	public StackElement getTopStackElement()
 	{
-		return (StackElement)stack.get(stack.size()-1);
+		StackElement	ret;
+		if(stack.isEmpty())
+		{
+			ret	= null;
+		}
+		else
+		{
+			ret	= (StackElement)stack.get(stack.size()-1);
+		}
+		return ret;
 	}
 
 	/**

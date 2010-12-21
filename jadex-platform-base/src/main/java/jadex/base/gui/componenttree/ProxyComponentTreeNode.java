@@ -277,8 +277,23 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 							
 							public void customExceptionOccurred(Object source, Exception exception)
 							{
-								// 2 parallel search branches, i.e. one may fail first
-								ret.setExceptionIfUndone(exception);
+								// When service search fails, display broken service container node.
+								ServiceContainerNode scn = (ServiceContainerNode)proxy.getModel().getNode(desc.getName().getName()+"ServiceContainer");
+								if(scn==null)
+									scn	= new ServiceContainerNode(parentnode, proxy.getModel(), proxy.getTree(), null);
+								children.add(0, scn);
+								scn.setBroken(true);
+
+								ready[1] = true;
+								if(ready[0] &&  ready[1])
+								{
+									ret.setResult(children);
+								}
+
+
+							
+//								// 2 parallel search branches, i.e. one may fail first
+//								ret.setExceptionIfUndone(exception);
 							}
 						});
 						

@@ -1,6 +1,7 @@
 package jadex.base.service.remote;
 
 import jadex.base.fipa.SFipa;
+import jadex.base.service.remote.commands.RemoteResultCommand;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.MessageType;
 import jadex.commons.concurrent.DefaultResultListener;
@@ -12,6 +13,8 @@ import jadex.micro.MicroAgent;
 import jadex.xml.reader.Reader;
 import jadex.xml.writer.Writer;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -104,7 +107,23 @@ public class RemoteServiceManagementAgent extends MicroAgent
 						try
 						{
 //							content = JavaReader.objectFromXML((String)content, ls.getClassLoader());
-							content = Reader.objectFromXML(rms.getReader(), (String)content, ls.getClassLoader());
+							List	errors	= new ArrayList();
+							content = Reader.objectFromByteArray(rms.getReader(), ((String)content).getBytes(), ls.getClassLoader(), errors);
+							
+							// For corrupt result (e.g. if class not found) set exception to clean up waiting call.
+							if(!errors.isEmpty())
+							{
+								if(content instanceof RemoteResultCommand)
+								{
+//									System.out.println("corrupt content: "+content);
+//									System.out.println("errors: "+errors);
+									((RemoteResultCommand)content).setExceptionInfo(new ExceptionInfo(new RuntimeException("Errors during XML decoding: "+errors)));
+								}
+								else
+								{
+									content	= null;
+								}
+							}
 						}
 						catch(Exception e)
 						{

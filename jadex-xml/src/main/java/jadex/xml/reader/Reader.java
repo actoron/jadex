@@ -162,7 +162,15 @@ public class Reader
 				{
 					for(int j=0; j<ps.size(); j++)
 					{
-						((Runnable)ps.get(j)).run();
+						try
+						{
+							((Runnable)ps.get(j)).run();
+						}
+						catch(RuntimeException e)
+						{
+							StackElement	se	= readcontext.getTopStackElement();
+							readcontext.getReporter().report("Error during postprocessing: "+e, "postprocessor error", se, se.getLocation());																				
+						}
 					}
 				}
 	//			System.out.println("i: "+i);
@@ -208,6 +216,9 @@ public class Reader
 			System.out.println("Ignoring: "+readcontext.getParser().getText());
 //		System.out.println("content: "+parser.getLocalName()+" "+content);
 	}
+	
+	// For debugging: ReadContext -> Integer.
+	private static Map	stackdepth	= Collections.synchronizedMap(new HashMap());
 	
 	/**
 	 *  Handle the start element.
@@ -294,7 +305,8 @@ public class Reader
 					}
 					else
 					{
-						StackElement	se	= readcontext.getTopStackElement();
+						StackElement se = new StackElement(localname, null, rawattrs, typeinfo, parser.getLocation());
+						stack.add(se);
 						readcontext.getReporter().report("idref not contained: "+idref, "idref error", se, se.getLocation());						
 					}
 				}
@@ -308,8 +320,17 @@ public class Reader
 					{
 						ti = localname;
 					}
-					object = handler.createObject(ti, readcontext.getStack().isEmpty(), 
-						readcontext, rawattrs);
+					
+					try
+					{
+						object = handler.createObject(ti, readcontext.getStack().isEmpty(), 
+								readcontext, rawattrs);
+					}
+					catch(Exception e)
+					{
+						readcontext.getReporter().report(e.toString(), "creation error", readcontext, parser.getLocation());
+					}
+					
 					if(DEBUG && object==null)
 						System.out.println("No mapping found: "+localname);
 					
@@ -503,9 +524,17 @@ public class Reader
 				{
 					if(postproc.getPass()==0)
 					{
-						Object changed = postproc.postProcess(readcontext, topse.getObject());
-						if(changed!=null)
-							topse.setObject(changed);
+						try
+						{
+							Object changed = postproc.postProcess(readcontext, topse.getObject());
+							if(changed!=null)
+								topse.setObject(changed);
+						}
+						catch(RuntimeException e)
+						{
+							StackElement	se	= readcontext.getTopStackElement();
+							readcontext.getReporter().report("Error during postprocessing: "+e, "postprocessor error", se, se.getLocation());																				
+						}
 					}
 					else
 					{
@@ -655,8 +684,8 @@ public class Reader
 		}
 		catch(Throwable t)
 		{
-			t.printStackTrace();
-			System.out.println("problem: "+new String(val));
+//			t.printStackTrace();
+//			System.out.println("problem: "+new String(val));
 			throw new RuntimeException(t);
 		}
 	}

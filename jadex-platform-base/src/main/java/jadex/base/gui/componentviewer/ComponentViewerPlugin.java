@@ -320,7 +320,7 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 					{
 						final ServiceNode node = (ServiceNode)tmp;
 						final IService service = node.getService();
-						final String classname = (String)service.getPropertyMap().get(IAbstractViewerPanel.PROPERTY_VIEWERCLASS);
+						final String classname = service.getPropertyMap()!=null ? (String)service.getPropertyMap().get(IAbstractViewerPanel.PROPERTY_VIEWERCLASS) : null;
 						
 						if(classname!=null)
 						{
@@ -410,7 +410,7 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 													}
 													catch(Exception e)
 													{
-														e.printStackTrace();
+//														e.printStackTrace();
 														getJCC().displayError("Error initializing component viewer panel.", "Component viewer panel class: "+classname, e);
 													}
 												}
@@ -471,7 +471,8 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 		boolean ret = false;
 		if(node instanceof ServiceNode)
 		{
-			ret = ((ServiceNode)node).getService().getPropertyMap().get(IAbstractViewerPanel.PROPERTY_VIEWERCLASS)!=null;
+			Map	props	= ((ServiceNode)node).getService().getPropertyMap();
+			ret = props!=null && props.get(IAbstractViewerPanel.PROPERTY_VIEWERCLASS)!=null;
 		}
 		else if(node instanceof IActiveComponentTreeNode)
 		{
@@ -511,7 +512,8 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 								
 								public void customExceptionOccurred(Object source, Exception exception)
 								{
-									exception.printStackTrace();
+									// Happens e.g. when remote classes not locally available.
+//									exception.printStackTrace();
 								}
 							});
 						}

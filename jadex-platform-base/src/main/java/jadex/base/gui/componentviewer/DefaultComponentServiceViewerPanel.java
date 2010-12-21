@@ -148,7 +148,7 @@ public class DefaultComponentServiceViewerPanel extends AbstractComponentViewerP
 					for(int i=0; i<services.size(); i++)
 					{
 						IService ser = (IService)services.get(i);
-						clname = (String)ser.getPropertyMap().get(IAbstractViewerPanel.PROPERTY_VIEWERCLASS);
+						clname = ser.getPropertyMap()!=null ? (String)ser.getPropertyMap().get(IAbstractViewerPanel.PROPERTY_VIEWERCLASS) : null;
 						if(clname!=null)
 						{
 							try

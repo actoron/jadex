@@ -1,6 +1,10 @@
 package jadex.base.gui.componenttree;
 
+import java.util.List;
+
+import jadex.commons.IFuture;
 import jadex.commons.SGUI;
+import jadex.commons.gui.CombiIcon;
 import jadex.commons.service.IServiceContainer;
 
 import javax.swing.Icon;
@@ -17,13 +21,17 @@ public class ServiceContainerNode	extends AbstractComponentTreeNode
 	/** The service container icon. */
 	protected static final UIDefaults icons = new UIDefaults(new Object[]
 	{
-		"service-container", SGUI.makeIcon(ServiceContainerNode.class, "/jadex/base/gui/images/services.png")
+		"service-container", SGUI.makeIcon(ServiceContainerNode.class, "/jadex/base/gui/images/services.png"),
+		"overlay_broken", SGUI.makeIcon(ServiceContainerNode.class, "/jadex/base/gui/images/overlay_check.png")
 	});
 	
 	//-------- attributes --------
 	
 	/** The service container. */
 	protected IServiceContainer container;
+	
+	/** Flag to indicate a broken service container (i.e. remote lookup failed due to class not found). */
+	protected boolean	broken;
 	
 	//-------- constructors --------
 	
@@ -53,7 +61,12 @@ public class ServiceContainerNode	extends AbstractComponentTreeNode
 	 */
 	public Icon	getIcon()
 	{
-		return icons.getIcon("service-container");
+		Icon	ret	= icons.getIcon("service-container");
+		if(broken)
+		{
+			ret	= new CombiIcon(new Icon[]{ret, icons.getIcon("overlay_broken")}); 
+		}
+		return ret;
 	}
 
 	/**
@@ -81,5 +94,22 @@ public class ServiceContainerNode	extends AbstractComponentTreeNode
 	public String toString()
 	{
 		return "ServiceContainer";
+	}
+
+	/**
+	 *  Set the children.
+	 */
+	protected IFuture setChildren(List children)
+	{
+		this.broken	= false;
+		return super.setChildren(children);
+	}
+	
+	/**
+	 *  Set the broken flag.
+	 */
+	public void	setBroken(boolean broken)
+	{
+		this.broken	= broken;
 	}
 }

@@ -177,13 +177,7 @@
 						<env:object type="firestation">
 							<env:property name="position">new Vector2Double(0.8, 0.4)</env:property>
 						</env:object>
-						<env:object type="fireengine">
-							<env:property name="position">new Vector2Double(0.8, 0.4)</env:property>
-						</env:object>
-						<env:object type="fireengine">
-							<env:property name="position">new Vector2Double(0.8, 0.4)</env:property>
-						</env:object>
-						<env:object type="fireengine">
+						<env:object type="fireengine" number="3">
 							<env:property name="position">new Vector2Double(0.8, 0.4)</env:property>
 						</env:object>
 						
@@ -191,13 +185,7 @@
 						<env:object type="firestation">
 							<env:property name="position">new Vector2Double(0.2, 0.7)</env:property>
 						</env:object>
-						<env:object type="fireengine">
-							<env:property name="position">new Vector2Double(0.2, 0.7)</env:property>
-						</env:object>
-						<env:object type="fireengine">
-							<env:property name="position">new Vector2Double(0.2, 0.7)</env:property>
-						</env:object>
-						<env:object type="fireengine">
+						<env:object type="fireengine" number="3">
 							<env:property name="position">new Vector2Double(0.2, 0.7)</env:property>
 						</env:object>
 						
@@ -205,39 +193,15 @@
 						<env:object type="hospital">
 							<env:property name="position">new Vector2Double(0.3, 0.3)</env:property>
 						</env:object>
-						<env:object type="ambulance">
-							<env:property name="position">new Vector2Double(0.3, 0.3)</env:property>
-						</env:object>
-						<env:object type="ambulance">
-							<env:property name="position">new Vector2Double(0.3, 0.3)</env:property>
-						</env:object>
-						<env:object type="ambulance">
-							<env:property name="position">new Vector2Double(0.3, 0.3)</env:property>
-						</env:object>
-						<env:object type="ambulance">
-							<env:property name="position">new Vector2Double(0.3, 0.3)</env:property>
-						</env:object>
-						<env:object type="ambulance">
+						<env:object type="ambulance" number="5">
 							<env:property name="position">new Vector2Double(0.3, 0.3)</env:property>
 						</env:object>
 						
 						<!-- Hospital with 5 ambulances -->
-						<env:object type="hospital">
+						<env:object type="hospital" >
 							<env:property name="position">new Vector2Double(0.7, 0.7)</env:property>
 						</env:object>
-						<env:object type="ambulance">
-							<env:property name="position">new Vector2Double(0.7, 0.7)</env:property>
-						</env:object>
-						<env:object type="ambulance">
-							<env:property name="position">new Vector2Double(0.7, 0.7)</env:property>
-						</env:object>
-						<env:object type="ambulance">
-							<env:property name="position">new Vector2Double(0.7, 0.7)</env:property>
-						</env:object>
-						<env:object type="ambulance">
-							<env:property name="position">new Vector2Double(0.7, 0.7)</env:property>
-						</env:object>
-						<env:object type="ambulance">
+						<env:object type="ambulance" number="5">
 							<env:property name="position">new Vector2Double(0.7, 0.7)</env:property>
 						</env:object>
 						

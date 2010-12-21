@@ -15,6 +15,7 @@ import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.IRemotable;
 import jadex.commons.SUtil;
+import jadex.commons.Tuple;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
@@ -38,14 +39,19 @@ import jadex.xml.bean.BeanObjectReaderHandler;
 import jadex.xml.bean.BeanObjectWriterHandler;
 import jadex.xml.bean.JavaReader;
 import jadex.xml.bean.JavaWriter;
+import jadex.xml.reader.ReadContext;
 import jadex.xml.reader.Reader;
 import jadex.xml.writer.Writer;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import javax.xml.namespace.QName;
+import javax.xml.stream.Location;
+import javax.xml.stream.XMLReporter;
+import javax.xml.stream.XMLStreamException;
 
 /**
  *  The remote service management service is responsible for 
@@ -116,7 +122,15 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 			new ObjectInfo(IRemotable.class));
 		typeinfoswrite.add(ti_proxyable);
 		
-		this.reader = new Reader(new BeanObjectReaderHandler(typeinfosread));
+		this.reader = new Reader(new BeanObjectReaderHandler(typeinfosread), false, false, new XMLReporter()
+		{
+			public void report(String message, String error, Object info, Location location)
+				throws XMLStreamException
+			{
+				List	errors	= (List)((ReadContext)Reader.READ_CONTEXT.get()).getUserContext();
+				errors.add(new Tuple(new Object[]{message, error, info, location}));
+			}
+		});
 		this.writer = new Writer(new BeanObjectWriterHandler(typeinfoswrite, true));
 	}
 	

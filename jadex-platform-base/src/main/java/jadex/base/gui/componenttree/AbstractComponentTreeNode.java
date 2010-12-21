@@ -198,16 +198,16 @@ public abstract class AbstractComponentTreeNode	implements IComponentTreeNode
 	{
 		final Future	ret	= new Future();
 		
-		// For debugging: todo:remove
-		final	RuntimeException	rte;
-		try
-		{
-			throw new RuntimeException();
-		}
-		catch (RuntimeException e)
-		{
-			rte	= e;
-		}
+//		// For debugging: todo:remove
+//		final	RuntimeException	rte;
+//		try
+//		{
+//			throw new RuntimeException();
+//		}
+//		catch (RuntimeException e)
+//		{
+//			rte	= e;
+//		}
 		
 //		System.err.println(""+model.hashCode()+" setChildren queued: "+children);
 		SwingUtilities.invokeLater(new Runnable()
@@ -235,59 +235,58 @@ public abstract class AbstractComponentTreeNode	implements IComponentTreeNode
 					added.removeAll(oldcs);
 				}
 
-				try
-				{
-					
-				if(!added.isEmpty() && !removed.isEmpty())
-				{
-					for(int i=0; oldcs!=null && i<oldcs.size(); i++)
+//				try
+//				{
+					/*if(!added.isEmpty() && !removed.isEmpty())
 					{
-						model.deregisterNode((IComponentTreeNode)oldcs.get(i));
-					}
-					for(int i=0; children!=null && i<children.size(); i++)
+						for(int i=0; oldcs!=null && i<oldcs.size(); i++)
+						{
+							model.deregisterNode((IComponentTreeNode)oldcs.get(i));
+						}
+						for(int i=0; children!=null && i<children.size(); i++)
+						{
+							model.addNode((IComponentTreeNode)children.get(i));
+						}
+//						System.err.println(""+model.hashCode()+" tree change: "+AbstractComponentTreeNode.this+"#"+AbstractComponentTreeNode.this.hashCode());
+//						System.err.println(""+model.hashCode()+" added: "+added);
+//						System.err.println(""+model.hashCode()+" removed: "+removed);
+//						System.err.println(""+model.hashCode()+" children: "+children);
+//						System.err.println(""+model.hashCode()+" oldcs: "+oldcs);
+//						rte.printStackTrace();
+						model.fireTreeChanged(AbstractComponentTreeNode.this);
+					}*/
+					/*else*/ if(!removed.isEmpty())
 					{
-						model.addNode((IComponentTreeNode)children.get(i));
+						for(int i=removed.size()-1; i>=0; i--)
+						{
+							IComponentTreeNode	node	= (IComponentTreeNode)removed.get(i);
+							model.deregisterNode(node);
+							model.fireNodeRemoved(AbstractComponentTreeNode.this, node, oldcs.indexOf(node));
+						}
+						if(added.isEmpty())
+							model.fireNodeChanged(AbstractComponentTreeNode.this);
 					}
-//					System.err.println(""+model.hashCode()+" tree change: "+AbstractComponentTreeNode.this+"#"+AbstractComponentTreeNode.this.hashCode());
-//					System.err.println(""+model.hashCode()+" added: "+added);
-//					System.err.println(""+model.hashCode()+" removed: "+removed);
-//					System.err.println(""+model.hashCode()+" children: "+children);
-//					System.err.println(""+model.hashCode()+" oldcs: "+oldcs);
-					model.fireTreeChanged(AbstractComponentTreeNode.this);			
-				}
-				else if(!added.isEmpty())
-				{
-					for(int i=0; i<added.size(); i++)
+					/*else*/ if(!added.isEmpty())
 					{
-						IComponentTreeNode	node	= (IComponentTreeNode)added.get(i);
-						model.addNode(node);
-//						System.err.println(""+model.hashCode()+" setChildren->fireNodeAdded: "+node+", "+added);
-						model.fireNodeAdded(AbstractComponentTreeNode.this, node, children.indexOf(node));
+						for(int i=0; i<added.size(); i++)
+						{
+							IComponentTreeNode	node	= (IComponentTreeNode)added.get(i);
+							model.addNode(node);
+							model.fireNodeAdded(AbstractComponentTreeNode.this, node, children.indexOf(node));
+						}
+						model.fireNodeChanged(AbstractComponentTreeNode.this);
 					}
-					model.fireNodeChanged(AbstractComponentTreeNode.this);
-				}
-				else if(!removed.isEmpty())
-				{
-					for(int i=removed.size()-1; i>=0; i--)
-					{
-						IComponentTreeNode	node	= (IComponentTreeNode)removed.get(i);
-						model.deregisterNode(node);
-						model.fireNodeRemoved(AbstractComponentTreeNode.this, node, oldcs.indexOf(node));
-					}
-					model.fireNodeChanged(AbstractComponentTreeNode.this);
-				}
-				
-				}
-				catch(RuntimeException e)
-				{
-					System.err.println("node problem: "+AbstractComponentTreeNode.this+"#"+AbstractComponentTreeNode.this.hashCode());
-					System.err.println("added: "+added);
-					System.err.println("removed: "+removed);
-					System.err.println("children: "+children);
-					System.err.println("oldcs: "+oldcs);
-					rte.printStackTrace();
-					throw e;
-				}
+//				}
+//				catch(RuntimeException e)
+//				{
+//					System.err.println("node problem: "+AbstractComponentTreeNode.this+"#"+AbstractComponentTreeNode.this.hashCode());
+//					System.err.println("added: "+added);
+//					System.err.println("removed: "+removed);
+//					System.err.println("children: "+children);
+//					System.err.println("oldcs: "+oldcs);
+//					rte.printStackTrace();
+//					throw e;
+//				}
 				
 				if(dorecurse && tree.isExpanded(new TreePath(model.buildTreePath(AbstractComponentTreeNode.this).toArray())))
 				{
