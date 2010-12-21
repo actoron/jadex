@@ -10,6 +10,7 @@ import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple;
 import jadex.commons.collection.MultiCollection;
+import jadex.commons.service.RequiredServiceInfo;
 import jadex.javaparser.IParsedExpression;
 import jadex.xml.StackElement;
 
@@ -215,11 +216,11 @@ public class MApplicationType extends MStartable implements ICacheableModel
 		List reqs = getRequiredServices();
 		if(reqs!=null)
 		{
-			Class[] tmp = new Class[reqs.size()];
+			RequiredServiceInfo[] tmp = new RequiredServiceInfo[reqs.size()];
 			for(int i=0; i<reqs.size(); i++)
 			{
 				MRequiredServiceType ser = (MRequiredServiceType)reqs.get(i);
-				tmp[i] = ser.getClazz();
+				tmp[i] = new RequiredServiceInfo(ser.getName(), ser.getClazz(), ser.isDynamic(), ser.isMultiple());
 			}
 			
 			modelinfo.setRequiredServices(tmp);

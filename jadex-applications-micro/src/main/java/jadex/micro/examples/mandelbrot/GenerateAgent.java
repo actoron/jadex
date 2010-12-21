@@ -26,6 +26,6 @@ public class GenerateAgent extends MicroAgent
 	{
 		return new MicroAgentMetaInfo("Agent offering a generate service.", null, null,
 			null, null, null,
-			new Class[]{}, new Class[]{IGenerateService.class});
+			null, new Class[]{IGenerateService.class});
 	}
 }

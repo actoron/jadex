@@ -124,6 +124,6 @@ public class DisplayAgent extends MicroAgent
 	{
 		return new MicroAgentMetaInfo("Agent offering a display service.", null, null,
 			null, null, null,
-			new Class[]{}, new Class[]{IDisplayService.class});
+			null, new Class[]{IDisplayService.class});
 	}
 }

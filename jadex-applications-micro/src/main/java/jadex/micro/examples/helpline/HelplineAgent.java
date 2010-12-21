@@ -6,6 +6,7 @@ import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.concurrent.DefaultResultListener;
+import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.clock.IClockService;
 import jadex.micro.IMicroExternalAccess;
@@ -63,7 +64,8 @@ public class HelplineAgent extends MicroAgent
 	 */
 	public void addInformation(final String name, final String info)
 	{
-		SServiceProvider.getService(getServiceProvider(), IClockService.class)
+//		SServiceProvider.getService(getServiceProvider(), IClockService.class)
+		getRequiredService("clockservice")
 			.addResultListener(createResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
@@ -94,7 +96,10 @@ public class HelplineAgent extends MicroAgent
 		return new MicroAgentMetaInfo("This agent offers a helpline for getting information about missing persons.", null, 
 			new IArgument[]{new Argument("infos", "Initial information records.", "InformationEntry[]")}
 			, null, null, SUtil.createHashMap(new String[]{"componentviewer.viewerclass"}, new Object[]{"jadex.micro.examples.helpline.HelplineViewerPanel"}),
-			new Class[]{IClockService.class}, new Class[]{IHelpline.class});
+			new RequiredServiceInfo[]{new RequiredServiceInfo("clockservice", IClockService.class),
+			new RequiredServiceInfo("remotehelplineservices", IHelpline.class, true, true, true, true),
+			new RequiredServiceInfo("localhelplineservices", IHelpline.class, true, true, true, false)}, 
+			new Class[]{IHelpline.class});
 	}
 
 }

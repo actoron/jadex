@@ -1,6 +1,7 @@
 package jadex.commons.concurrent;
 
 import jadex.commons.SGUI;
+import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 
 import java.awt.Component;
@@ -115,8 +116,9 @@ public abstract class SwingDefaultResultListener extends DefaultResultListener
 	{
 		if(parent!=null)
 		{
-//			exception.printStackTrace();
-			String text = SUtil.wrapText("A problem occurred while performing the requested action: "+exception.getMessage());
+			exception.printStackTrace();
+			String text = SUtil.wrapText("A problem occurred while performing the requested action: "
+				+SReflect.getInnerClassName(exception.getClass())+" "+exception.getMessage());
 			JOptionPane.showMessageDialog(SGUI.getWindowParent(parent), text,
 				"Problem Occurred", JOptionPane.INFORMATION_MESSAGE);
 		}

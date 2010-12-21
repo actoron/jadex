@@ -36,4 +36,16 @@ public interface IServiceContainer extends IServiceProvider
 	 *  @param service The service identifier.
 	 */
 	public IFuture	removeService(IServiceIdentifier sid);
+	
+	/**
+	 *  Get a required service.
+	 *  @return The service.
+	 */
+	public IFuture getRequiredService(RequiredServiceInfo info);
+	
+	/**
+	 *  Get required services.
+	 *  @return The collection of services.
+	 */
+	public IFuture getRequiredServices(RequiredServiceInfo info);
 }

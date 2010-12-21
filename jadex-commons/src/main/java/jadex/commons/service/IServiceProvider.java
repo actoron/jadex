@@ -34,4 +34,5 @@ public interface IServiceProvider extends IRemotable
 	 *  @return The id of this provider.
 	 */
 	public Object	getId();
+
 }

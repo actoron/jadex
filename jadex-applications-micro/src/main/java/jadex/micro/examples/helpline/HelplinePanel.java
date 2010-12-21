@@ -1,10 +1,13 @@
 package jadex.micro.examples.helpline;
 
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IInternalAccess;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.SGUI;
 import jadex.commons.concurrent.CollectionResultListener;
 import jadex.commons.concurrent.DefaultResultListener;
+import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.commons.jtable.DateTimeRenderer;
@@ -208,21 +211,30 @@ public class HelplinePanel extends JPanel
 	 */
 	protected void refreshServicesCombo(final JComboBox selcb, boolean remote)
 	{
-		SServiceProvider.getServices(agent.getServiceProvider(), IHelpline.class, remote, true)
-			.addResultListener(new SwingDefaultResultListener(HelplinePanel.this) 
+//		SServiceProvider.getServices(agent.getServiceProvider(), IHelpline.class, remote, true)
+//			.addResultListener(new SwingDefaultResultListener(HelplinePanel.this)
+//			(agent.getServiceProvider(), IHelpline.class, remote, true)
+		agent.scheduleStep(new IComponentStep()
 		{
-			public void customResultAvailable(Object source, Object result) 
+			public Object execute(IInternalAccess ia)
 			{
-				Collection newservices = (Collection)result;
-				
-				selcb.removeAllItems();
-				if(newservices!=null)
+				ia.getRequiredServices("localhelplineservices").addResultListener(new SwingDefaultResultListener(HelplinePanel.this) 
 				{
-					for(Iterator it=newservices.iterator(); it.hasNext(); )
+					public void customResultAvailable(Object source, Object result) 
 					{
-						selcb.addItem(it.next());
+						Collection newservices = (Collection)result;
+						
+						selcb.removeAllItems();
+						if(newservices!=null)
+						{
+							for(Iterator it=newservices.iterator(); it.hasNext(); )
+							{
+								selcb.addItem(it.next());
+							}
+						}
 					}
-				}
+				});
+				return null;
 			}
 		});
 	}
@@ -232,12 +244,31 @@ public class HelplinePanel extends JPanel
 	 *  @param name The person's name.
 	 *  @return Future that contains the information.
 	 */
-	public IFuture getInformation(final String name, boolean remote)
+	public IFuture getInformation(final String name, final boolean remote)
 	{
+//		SServiceProvider.getServices(agent.getServiceProvider(), IHelpline.class, remote, true)
 		final Future ret = new Future();
 		
-		SServiceProvider.getServices(agent.getServiceProvider(), IHelpline.class, remote, true)
-			.addResultListener(new IResultListener()
+		IFuture fut = agent.scheduleStep(new IComponentStep()
+		{
+			public Object execute(IInternalAccess ia)
+			{
+				Future ret = new Future();
+				if(remote)
+				{
+					ia.getRequiredServices("remotehelplineservices")
+						.addResultListener(new DelegationResultListener(ret));
+				}
+				else
+				{
+					ia.getRequiredServices("localhelplineservices")
+						.addResultListener(new DelegationResultListener(ret));
+				}
+				return ret;
+			}
+		});
+		
+		fut.addResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{

@@ -19,6 +19,7 @@ import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.commons.gui.CombiIcon;
 import jadex.commons.gui.JValidatorTextField;
+import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.library.ILibraryService;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
@@ -1230,17 +1231,18 @@ public class StarterPanel extends JPanel
 		
 		if(model!=null)
 		{
-			Class[] required = model.getRequiredServices();
+			RequiredServiceInfo[] required = model.getRequiredServices();
 			
 			if(required.length>0)
 			{
-				JTable requiredt = new JTable(new DefaultTableModel(new String[]{"Interface Name"}, 0));
+				JTable requiredt = new JTable(new DefaultTableModel(new String[]{"Interface Name", "Type", "Multiple"}, 0));
 				requiredt.setEnabled(false);
-//				requiredservices.add(requiredt.getTableHeader(), BorderLayout.NORTH);
+				requiredservices.add(requiredt.getTableHeader(), BorderLayout.NORTH);
 				requiredservices.add(requiredt, BorderLayout.CENTER);
 				for(int i=0; i<required.length; i++)
 				{
-					((DefaultTableModel)requiredt.getModel()).addRow(new Object[]{required[i].getName()});
+					((DefaultTableModel)requiredt.getModel()).addRow(new Object[]{required[i].getName(), 
+						required[i].getClass(), required[i].isMultiple()});
 				}
 			}
 			

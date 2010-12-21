@@ -10,6 +10,7 @@ import jadex.commons.SUtil;
 import jadex.commons.StreamCopy;
 import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
+import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.library.ILibraryService;
 import jadex.micro.IMicroExternalAccess;
@@ -399,7 +400,8 @@ public class DaemonAgent extends MicroAgent
 		return new MicroAgentMetaInfo("This agent offers the daemon service.", null, 
 			new IArgument[]{}//new Argument("infos", "Initial information records.", "InformationEntry[]")}
 			, null, null, SUtil.createHashMap(new String[]{"componentviewer.viewerclass"}, new Object[]{"jadex.tools.daemon.DaemonViewerPanel"}),
-			new Class[]{ILibraryService.class}, new Class[]{IDaemonService.class});
+			new RequiredServiceInfo[]{new RequiredServiceInfo("libservice", ILibraryService.class)}
+			, new Class[]{IDaemonService.class});
 	}
 
 }

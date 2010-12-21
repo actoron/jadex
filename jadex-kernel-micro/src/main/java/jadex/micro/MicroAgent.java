@@ -13,16 +13,21 @@ import jadex.bridge.IMessageService;
 import jadex.bridge.IModelInfo;
 import jadex.bridge.MessageType;
 import jadex.commons.Future;
+import jadex.commons.ICommand;
 import jadex.commons.IFuture;
+import jadex.commons.IResultCommand;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.service.CacheServiceContainer;
 import jadex.commons.service.IInternalService;
+import jadex.commons.service.IService;
 import jadex.commons.service.IServiceContainer;
 import jadex.commons.service.IServiceIdentifier;
 import jadex.commons.service.IServiceProvider;
+import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
+import jadex.commons.service.ServiceNotFoundException;
 import jadex.commons.service.clock.IClockService;
 import jadex.commons.service.clock.ITimedObject;
 import jadex.commons.service.clock.ITimer;
@@ -581,6 +586,46 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	public void removeComponentListener(IComponentListener listener)
 	{
 		interpreter.removeComponentListener(listener);
+	}
+	
+	/**
+	 *  Get a required service of a given name.
+	 *  @param name The service name.
+	 *  @return The service.
+	 */
+	public IFuture getRequiredService(String name)
+	{
+		RequiredServiceInfo info = getModel().getRequiredService(name);
+		if(info==null)
+		{
+			Future ret = new Future();
+			ret.setException(new ServiceNotFoundException(name));
+			return ret;
+		}
+		else
+		{
+			return interpreter.getServiceContainer().getRequiredService(info);
+		}
+	}
+	
+	/**
+	 *  Get a required services of a given name.
+	 *  @param name The services name.
+	 *  @return The service.
+	 */
+	public IFuture getRequiredServices(String name)
+	{
+		RequiredServiceInfo info = getModel().getRequiredService(name);
+		if(info==null)
+		{
+			Future ret = new Future();
+			ret.setException(new ServiceNotFoundException(name));
+			return ret;
+		}
+		else
+		{
+			return interpreter.getServiceContainer().getRequiredServices(info);
+		}
 	}
 	
 	//-------- helper classes --------

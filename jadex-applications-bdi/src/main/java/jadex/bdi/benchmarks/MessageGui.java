@@ -32,6 +32,7 @@ public class MessageGui extends JFrame
 		
 		agent.scheduleStep(new IComponentStep()
 		{
+			public static final String XML_CLASSNAME = "addListener"; 
 			public Object execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;

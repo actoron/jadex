@@ -1,5 +1,7 @@
 package jadex.bridge;
 
+import jadex.commons.service.RequiredServiceInfo;
+
 import java.util.Map;
 
 
@@ -97,8 +99,14 @@ public interface IModelInfo
 	 *  Get the required services.
 	 *  @return The required services.
 	 */
-	public Class[] getRequiredServices();
+	public RequiredServiceInfo[] getRequiredServices();
 
+	/**
+	 *  Get the required service.
+	 *  @return The required service.
+	 */
+	public RequiredServiceInfo getRequiredService(String name);
+	
 	/**
 	 *  Get the provided services.
 	 *  @return The provided services.

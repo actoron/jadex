@@ -48,7 +48,9 @@ import jadex.commons.concurrent.IResultListener;
 import jadex.commons.service.CacheServiceContainer;
 import jadex.commons.service.IServiceContainer;
 import jadex.commons.service.IServiceProvider;
+import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
+import jadex.commons.service.ServiceNotFoundException;
 import jadex.commons.service.clock.IClockService;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.IValueFetcher;
@@ -1504,6 +1506,46 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 	{
 		if(componentlisteners!=null)
 			componentlisteners.remove(listener);
+	}
+	
+	/**
+	 *  Get a required service of a given name.
+	 *  @param name The service name.
+	 *  @return The service.
+	 */
+	public IFuture getRequiredService(String name)
+	{
+		RequiredServiceInfo info = getModel().getRequiredService(name);
+		if(info==null)
+		{
+			Future ret = new Future();
+			ret.setException(new ServiceNotFoundException(name));
+			return ret;
+		}
+		else
+		{
+			return getServiceContainer().getRequiredService(info);
+		}
+	}
+	
+	/**
+	 *  Get a required services of a given name.
+	 *  @param name The services name.
+	 *  @return The service.
+	 */
+	public IFuture getRequiredServices(String name)
+	{
+		RequiredServiceInfo info = getModel().getRequiredService(name);
+		if(info==null)
+		{
+			Future ret = new Future();
+			ret.setException(new ServiceNotFoundException(name));
+			return ret;
+		}
+		else
+		{
+			return getServiceContainer().getRequiredServices(info);
+		}
 	}
 	
 }

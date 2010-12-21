@@ -3,6 +3,7 @@ package jadex.micro;
 import jadex.bridge.IArgument;
 import jadex.bridge.IModelValueProvider;
 import jadex.commons.SUtil;
+import jadex.commons.service.RequiredServiceInfo;
 
 import java.util.Collections;
 import java.util.Map;
@@ -33,7 +34,7 @@ public class MicroAgentMetaInfo
 	protected Map properties;
 	
 	/** The required services. */
-	protected Class[] requiredservices;
+	protected RequiredServiceInfo[] requiredservices;
 	
 	/** The provided services. */
 	protected Class[] providedservices;
@@ -70,7 +71,7 @@ public class MicroAgentMetaInfo
 	 *  Create a new meta info.
 	 */
 	public MicroAgentMetaInfo(String description, String[] configs, 
-		Class[] requiredservices, Class[] providedservices)
+		RequiredServiceInfo[] requiredservices, Class[] providedservices)
 	{
 		this(description, configs, null, null, null, null, requiredservices, providedservices);
 	}
@@ -89,9 +90,9 @@ public class MicroAgentMetaInfo
 	 */
 	public MicroAgentMetaInfo(String description, String[] configs, 
 		IArgument[] args, IArgument[] results, String[] breakpoints, Map properties,
-		Class[] requiredservices, Class[] providedservices)
+		RequiredServiceInfo[] requiredservices, Class[] providedservices)
 	{
-		this(description, configs, args, results, breakpoints, properties, null, null, null, null, null);
+		this(description, configs, args, results, breakpoints, properties, requiredservices, providedservices, null, null, null);
 	}
 	
 	/**
@@ -99,7 +100,7 @@ public class MicroAgentMetaInfo
 	 */
 	public MicroAgentMetaInfo(String description, String[] configs, 
 		IArgument[] args, IArgument[] results, String[] breakpoints, Map properties,
-		Class[] requiredservices, Class[] providedservices, 
+		RequiredServiceInfo[] requiredservices, Class[] providedservices, 
 		IModelValueProvider master, IModelValueProvider daemon, IModelValueProvider autoshutdown)
 	{
 		this.description = description;
@@ -108,7 +109,7 @@ public class MicroAgentMetaInfo
 		this.results = results == null? new IArgument[0]: results;
 		this.breakpoints = breakpoints == null? new String[0]: breakpoints;
 		this.properties = properties==null? Collections.EMPTY_MAP: properties;
-		this.requiredservices = requiredservices==null? SUtil.EMPTY_CLASS_ARRAY: requiredservices;
+		this.requiredservices = requiredservices==null? new RequiredServiceInfo[0]: requiredservices;
 		this.providedservices = providedservices==null? SUtil.EMPTY_CLASS_ARRAY: providedservices;
 		this.master = master;
 		this.daemon = daemon;
@@ -175,7 +176,7 @@ public class MicroAgentMetaInfo
 	 *  Get the required services.
 	 *  @return The required services.
 	 */
-	public Class[] getRequiredServices()
+	public RequiredServiceInfo[] getRequiredServices()
 	{
 		return requiredservices;
 	}

@@ -15,6 +15,7 @@ import jadex.commons.SGUI;
 import jadex.commons.SReflect;
 import jadex.commons.service.BasicService;
 import jadex.commons.service.IServiceProvider;
+import jadex.commons.service.RequiredServiceInfo;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
@@ -165,7 +166,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 		IArgument[] arguments = metainfo!=null? metainfo.getArguments(): null;
 		IArgument[] results = metainfo!=null? metainfo.getResults(): null;
 		Map properties = metainfo!=null && metainfo.getProperties()!=null? new HashMap(metainfo.getProperties()): new HashMap();
-		Class[] required = metainfo!=null? metainfo.getRequiredServices(): null;
+		RequiredServiceInfo[] required = metainfo!=null? metainfo.getRequiredServices(): null;
 		Class[] provided = metainfo!=null? metainfo.getProvidedServices(): null;
 		IModelValueProvider master = metainfo!=null? metainfo.getMaster(): null;
 		IModelValueProvider daemon= metainfo!=null? metainfo.getDaemon(): null;

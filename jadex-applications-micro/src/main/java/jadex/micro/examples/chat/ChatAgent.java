@@ -2,6 +2,7 @@ package jadex.micro.examples.chat;
 
 import jadex.bridge.IArgument;
 import jadex.commons.SUtil;
+import jadex.commons.service.RequiredServiceInfo;
 import jadex.micro.IMicroExternalAccess;
 import jadex.micro.MicroAgent;
 import jadex.micro.MicroAgentMetaInfo;
@@ -54,7 +55,7 @@ public class ChatAgent extends MicroAgent
 		return new MicroAgentMetaInfo("This agent offers a helpline for getting information about missing persons.", null, 
 			new IArgument[]{}//new Argument("infos", "Initial information records.", "InformationEntry[]")}
 			, null, null, SUtil.createHashMap(new String[]{"componentviewer.viewerclass"}, new Object[]{"jadex.micro.examples.chat.ChatPanel"}),
-			null, new Class[]{IChatService.class});
+			new RequiredServiceInfo[]{new RequiredServiceInfo("chatservices", IChatService.class, true, true)}, new Class[]{IChatService.class});
 	}
 
 }

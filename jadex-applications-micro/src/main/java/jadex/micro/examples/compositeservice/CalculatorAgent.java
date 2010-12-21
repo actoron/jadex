@@ -27,6 +27,6 @@ public class CalculatorAgent extends MicroAgent
 	{
 		return new MicroAgentMetaInfo("This agent is a minimal calculator.", null, null,
 			null, null, SUtil.createHashMap(new String[]{"componentviewer.viewerclass"}, new Object[]{"jadex.micro.examples.helpline.HelplineViewerPanel"}),
-			new Class[]{}, new Class[]{IAddService.class, ISubService.class});
+			null, new Class[]{IAddService.class, ISubService.class});
 	}
 }

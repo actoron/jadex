@@ -293,6 +293,23 @@ public class CacheServiceContainer	implements IServiceContainer
 		return container.removeService(sid);
 	}
 
+	/**
+	 *  Get a required service.
+	 *  @return The service.
+	 */
+	public IFuture getRequiredService(RequiredServiceInfo info)
+	{
+		return container.getRequiredService(info);
+	}
+	
+	/**
+	 *  Get a required service.
+	 *  @return The service.
+	 */
+	public IFuture getRequiredServices(RequiredServiceInfo info)
+	{
+		return container.getRequiredServices(info);
+	}
 	
 	/**
 	 *  Get the string representation.

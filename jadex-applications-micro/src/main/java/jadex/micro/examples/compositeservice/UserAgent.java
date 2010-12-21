@@ -1,12 +1,17 @@
 package jadex.micro.examples.compositeservice;
 
+import jadex.bridge.IArgument;
+import jadex.commons.SUtil;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
+import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
 import jadex.micro.MicroAgent;
+import jadex.micro.MicroAgentMetaInfo;
+import jadex.micro.examples.chat.IChatService;
 
 /**
- * 
+ *  The user agent uses services.
  */
 public class UserAgent extends MicroAgent
 {
@@ -16,53 +21,36 @@ public class UserAgent extends MicroAgent
 	 */
 	public void executeBody()
 	{
-		SServiceProvider.getService(getServiceProvider(), IAddService.class)
-			.addResultListener(createResultListener(new DefaultResultListener()
+		getRequiredService("addservice").addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
-				final IAddService as = (IAddService)result;
-				
-				
-				if(as!=null)
+				IAddService addser = (IAddService)result;
+				addser.add(1, 1).addResultListener(createResultListener(new IResultListener()
 				{
-					as.add(1, 1).addResultListener(createResultListener(new IResultListener()
+					public void resultAvailable(Object source, Object result)
 					{
-						public void resultAvailable(Object source, Object result)
-						{
-							System.out.println("add service result: "+result+" "+getComponentIdentifier().getLocalName());
-						}
-						
-						public void exceptionOccurred(Object source, Exception exception)
-						{
-							System.out.println("invocation failed: "+exception);
-						}
-					}));
-				}
-				else
-				{
-					System.out.println("Did not find add service: "+getComponentIdentifier());
+						System.out.println("add service result: "+result+" "+getComponentIdentifier().getLocalName());
+					}
 					
-					SServiceProvider.getService(getServiceProvider(), IAddService.class)
-						.addResultListener(createResultListener(new DefaultResultListener()
+					public void exceptionOccurred(Object source, Exception exception)
 					{
-						public void resultAvailable(Object source, Object result)
-						{
-							final IAddService as = (IAddService)result;
-							System.out.println("Found add service: "+as);
-						}
-					}));
-				}
-				
-//				SServiceProvider.getService(getServiceProvider(), ISubService.class)
-//					.addResultListener(createResultListener(new DefaultResultListener()
-//				{
-//					public void resultAvailable(Object source, Object result)
-//					{
-						
-//					}
-//				}));
+						System.out.println("invocation failed: "+exception);
+					}
+				}));
 			}
-		}));
+		});
+	}
+	
+	//-------- static methods --------
+
+	/**
+	 *  Get the meta information about the agent.
+	 */
+	public static MicroAgentMetaInfo getMetaInfo()
+	{
+		return new MicroAgentMetaInfo("This agent uses an add service.", null, 
+			new IArgument[]{}, null, null, SUtil.createHashMap(new String[]{"componentviewer.viewerclass"}, new Object[]{"jadex.micro.examples.chat.ChatPanel"}),
+			new RequiredServiceInfo[]{new RequiredServiceInfo("addservice", IAddService.class)}, new Class[]{IChatService.class});
 	}
 }

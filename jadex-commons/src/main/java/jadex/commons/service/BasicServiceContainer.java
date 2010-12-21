@@ -4,10 +4,13 @@ import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.concurrent.CounterResultListener;
 import jadex.commons.concurrent.DelegationResultListener;
+import jadex.commons.service.fetcher.DynamicServiceFetcher;
+import jadex.commons.service.fetcher.StaticServiceFetcher;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -31,6 +34,10 @@ public class BasicServiceContainer implements  IServiceContainer
 	/** True, if the container is started. */
 	protected boolean started;
 
+	
+	/** The service fetch method table (name -> fetcher). */
+	protected Map reqservicefetchers;
+	
 	//-------- constructors --------
 
 	/**
@@ -235,6 +242,69 @@ public class BasicServiceContainer implements  IServiceContainer
 		{
 			ret.setResult(null);
 		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Get a required service.
+	 *  @return The service.
+	 */
+	public IFuture getRequiredService(RequiredServiceInfo info)
+	{
+		if(info==null)
+		{
+			Future ret = new Future();
+			ret.setException(new IllegalArgumentException("Info must not null."));
+			return ret;
+		}
+		
+		IRequiredServiceFetcher fetcher = getRequiredServiceFetcher(info);
+		return fetcher.getService(info, this);
+	}
+	
+	/**
+	 *  Get a required services.
+	 *  @return The services.
+	 */
+	public IFuture getRequiredServices(RequiredServiceInfo info)
+	{
+		if(info==null)
+		{
+			Future ret = new Future();
+			ret.setException(new IllegalArgumentException("Info must not null."));
+			return ret;
+		}
+		
+		IRequiredServiceFetcher fetcher = getRequiredServiceFetcher(info);
+		return fetcher.getServices(info, this);
+	}
+	
+	/**
+	 *  Get a required service fetcher.
+	 *  @param name The required service name.
+	 *  @return The service fetcher.
+	 */
+	protected IRequiredServiceFetcher getRequiredServiceFetcher(RequiredServiceInfo info)
+	{
+		IRequiredServiceFetcher ret = reqservicefetchers!=null? (IRequiredServiceFetcher)reqservicefetchers.get(info.getName()): null;
+		if(ret==null)
+			ret = createServiceFetcher(info);
+		return ret;
+	}
+		
+	/**
+	 *  Create a service fetcher.
+	 */
+	protected IRequiredServiceFetcher createServiceFetcher(RequiredServiceInfo info)
+	{
+		IRequiredServiceFetcher ret;
+		
+		if(reqservicefetchers==null)
+			reqservicefetchers = new HashMap();
+
+		ret = info.isDynamic()? new StaticServiceFetcher(): DynamicServiceFetcher.INSTANCE;
+		reqservicefetchers.put(info.getName(), ret);
 		
 		return ret;
 	}

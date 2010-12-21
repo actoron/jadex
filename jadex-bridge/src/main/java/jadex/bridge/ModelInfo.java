@@ -1,6 +1,7 @@
 package jadex.bridge;
 
 import jadex.commons.SUtil;
+import jadex.commons.service.RequiredServiceInfo;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -49,7 +50,7 @@ public class ModelInfo implements IModelInfo
 	protected ClassLoader classloader;
 	
 	/** The required services. */
-	protected Class[] requiredservices;
+	protected Map requiredservices;
 	
 	/** The provided services. */
 	protected Class[] providedservices;
@@ -84,7 +85,7 @@ public class ModelInfo implements IModelInfo
 		String description, IErrorReport report, String[] configurations,
 		IArgument[] arguments, IArgument[] results, boolean startable,
 		String filename, Map properties, ClassLoader classloader, 
-		Class[] requiredservices, Class[] providedservices, 
+		RequiredServiceInfo[] requiredservices, Class[] providedservices, 
 		IModelValueProvider master, IModelValueProvider daemon, IModelValueProvider autoshutdown)
 	{
 		this.name = name;
@@ -98,11 +99,11 @@ public class ModelInfo implements IModelInfo
 		this.filename = filename;
 		this.properties = properties!=null? properties: new HashMap();
 		this.classloader = classloader;
-		this.requiredservices = requiredservices;
 		this.providedservices = providedservices;
 		this.master = master;
 		this.daemon = daemon;
 		this.autoshutdown = autoshutdown;
+		setRequiredServices(requiredservices);
 	}
 
 	//-------- methods --------
@@ -400,18 +401,35 @@ public class ModelInfo implements IModelInfo
 	 *  Get the required services.
 	 *  @return The required services.
 	 */
-	public Class[] getRequiredServices()
+	public RequiredServiceInfo[] getRequiredServices()
 	{
-		return requiredservices==null? SUtil.EMPTY_CLASS_ARRAY: requiredservices;
+		return requiredservices==null? new RequiredServiceInfo[0]: 
+			(RequiredServiceInfo[])requiredservices.values().toArray(new RequiredServiceInfo[requiredservices.size()]);
 	}
 
 	/**
 	 *  Set the required services.
 	 *  @param required services The required services to set.
 	 */
-	public void setRequiredServices(Class[] requiredservices)
+	public void setRequiredServices(RequiredServiceInfo[] requiredservices)
 	{
-		this.requiredservices = requiredservices;
+		if(requiredservices!=null && requiredservices.length>0)
+		{
+			this.requiredservices = new HashMap();
+			for(int i=0; i<requiredservices.length; i++)
+			{
+				this.requiredservices.put(requiredservices[i].getName(), requiredservices[i]);
+			}
+		}
+	}
+	
+	/**
+	 *  Get the required service.
+	 *  @return The required service.
+	 */
+	public RequiredServiceInfo getRequiredService(String name)
+	{
+		return requiredservices!=null? (RequiredServiceInfo)requiredservices.get(name): null;
 	}
 
 	/**

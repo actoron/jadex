@@ -19,10 +19,12 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentListener;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IModelInfo;
+import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.service.IServiceProvider;
+import jadex.commons.service.RequiredServiceInfo;
 import jadex.rules.state.IOAVState;
 
 import java.util.Collection;
@@ -764,6 +766,96 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 				handle = getState().getAttributeValue(subcapref, OAVBDIRuntimeModel.capabilityreference_has_capability);
 			}
 			return new CapabilityFlyweight(getState(), handle);
+		}
+	}
+	
+	/**
+	 *  Get a required service.
+	 *  @return The service.
+	 */
+	public IFuture getRequiredService(final String name)
+	{
+		if(getInterpreter().isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					RequiredServiceInfo info = getInterpreter().getModel().getModelInfo().getRequiredService(name);
+					if(info==null)
+					{
+						Future ret = new Future();
+						ret.setException(new IllegalArgumentException("Info must not null."));
+						object = ret;
+					}
+					else
+					{
+						object = getInterpreter().getServiceContainer().getRequiredService(info);
+					}
+				}
+			};
+			return (IFuture)invoc.object;
+		}
+		else
+		{
+			IFuture ret;
+			RequiredServiceInfo info = getInterpreter().getModel().getModelInfo().getRequiredService(name);
+			if(info==null)
+			{
+				Future fut = new Future();
+				fut.setException(new IllegalArgumentException("Info must not null."));
+				ret = fut;
+			}
+			else
+			{
+				ret = getInterpreter().getServiceContainer().getRequiredService(info);
+			}
+			return ret;
+		}
+	}
+	
+	/**
+	 *  Get a required services.
+	 *  @return The services.
+	 */
+	public IFuture getRequiredServices(final String name)
+	{
+		if(getInterpreter().isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					RequiredServiceInfo info = getInterpreter().getModel().getModelInfo().getRequiredService(name);
+					if(info==null)
+					{
+						Future ret = new Future();
+						ret.setException(new IllegalArgumentException("Info must not null."));
+						object = ret;
+					}
+					else
+					{
+						object = getInterpreter().getServiceContainer().getRequiredServices(info);
+					}
+				}
+			};
+			return (IFuture)invoc.object;
+		}
+		else
+		{
+			IFuture ret;
+			RequiredServiceInfo info = getInterpreter().getModel().getModelInfo().getRequiredService(name);
+			if(info==null)
+			{
+				Future fut = new Future();
+				fut.setException(new IllegalArgumentException("Info must not null."));
+				ret = fut;
+			}
+			else
+			{
+				ret = getInterpreter().getServiceContainer().getRequiredServices(info);
+			}
+			return ret;
 		}
 	}
 }
