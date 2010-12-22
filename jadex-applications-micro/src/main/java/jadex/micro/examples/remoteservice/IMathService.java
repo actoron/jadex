@@ -16,6 +16,7 @@ public interface IMathService extends IService
 	 *  @param b Second number.
 	 *  @return Future that will deliver the sum of a and b.
 	 */
+//	@Timeout(1234567)
 	public IFuture addNB(int a, int b);
 	
 	/**
@@ -26,7 +27,17 @@ public interface IMathService extends IService
 	 *  @param b Second number.
 	 *  @return The sum of a and b.
 	 */
+//	@Replacement("jadex.micro.examples.remoteservice.IMathService$AddBReplacement")
 	public int addB(int a, int b);
+	
+//	public static class AddBReplacement	implements IMethodReplacement
+//	{
+//		public Object invoke(Object obj, Object[] args)
+//		{
+//			System.out.println("replaced: "+obj+", "+SUtil.arrayToString(args));
+//			return new Integer(((Number)args[0]).intValue() + ((Number)args[1]).intValue());
+//		}
+//	}
 	
 	/**
 	 *  Tests a constant call, i.e. call without 
@@ -35,6 +46,7 @@ public interface IMathService extends IService
 	 *   
 	 *  Get the PI value.
 	 */
+//	@Uncached @Timeout(100)
 	public double getPi();
 	
 	/**
@@ -43,6 +55,7 @@ public interface IMathService extends IService
 	 *  Print out some message.
 	 *  @param message The message.
 	 */
+//	@Synchronous
 	public void printMessage(String message);
 	
 	/**
@@ -50,5 +63,6 @@ public interface IMathService extends IService
 	 *  
 	 *  Does a divide by zero operation and causes an exception.
 	 */
+//	@Excluded
 	public IFuture divZero();
 }

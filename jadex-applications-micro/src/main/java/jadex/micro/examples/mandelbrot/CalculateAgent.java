@@ -58,7 +58,8 @@ public class CalculateAgent extends MicroAgent
 				return null;
 			}
 		};
-		waitFor(delay, step);
+		if(delay>0)
+			waitFor(delay, step);
 	}
 	
 	/**

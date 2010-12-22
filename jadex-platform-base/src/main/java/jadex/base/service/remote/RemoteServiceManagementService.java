@@ -77,6 +77,9 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	/** Replacement methods to be executed instead of remote method invocation. */
 	public static String REMOTE_METHODREPLACEMENT = "remote_methodreplacement";
 
+	/** Timeout for remote method invocation. */
+	public static String REMOTE_TIMEOUT = "remote_timeout";
+
 	/** The default timeout. */
 	public static long DEFAULT_TIMEOUT = 10000;
 		

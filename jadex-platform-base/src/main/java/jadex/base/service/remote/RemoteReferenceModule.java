@@ -1,5 +1,10 @@
 package jadex.base.service.remote;
 
+import jadex.base.service.remote.annotation.Excluded;
+import jadex.base.service.remote.annotation.Replacement;
+import jadex.base.service.remote.annotation.Synchronous;
+import jadex.base.service.remote.annotation.Timeout;
+import jadex.base.service.remote.annotation.Uncached;
 import jadex.base.service.remote.commands.RemoteDGCAddReferenceCommand;
 import jadex.base.service.remote.commands.RemoteDGCRemoveReferenceCommand;
 import jadex.base.service.remote.replacements.DefaultEqualsMethodReplacement;
@@ -50,9 +55,6 @@ public class RemoteReferenceModule
 	
 	//-------- attributes --------
 
-	/** The remote interface properties. */
-	protected Map interfaceproperties;
-
 	/** The remote management service. */
 	protected RemoteServiceManagementService rsms;
 	
@@ -99,7 +101,6 @@ public class RemoteReferenceModule
 		this.clock = clock;
 		this.libservice = libservice;
 		
-		this.interfaceproperties = new HashMap();
 		this.proxyinfos = new LRU(200);
 		this.targetobjects = new HashMap();
 		this.remoterefs = new HashMap();
@@ -188,70 +189,155 @@ public class RemoteReferenceModule
 			properties = ((IService)target).getPropertyMap();
 		}
 		
-		for(int i=0; i<remoteinterfaces.length+1; i++)
+		Class targetclass = target.getClass();
+		
+		// Check for excluded and synchronous methods.
+		if(properties!=null)
 		{
-			if(i>0)
-				properties = (Map)interfaceproperties.get(remoteinterfaces[i-1]);
-			
-			Class targetclass = target.getClass();
-			
-			// Check for excluded and synchronous methods.
-			if(properties!=null)
+			Object ex = properties.get(RemoteServiceManagementService.REMOTE_EXCLUDED);
+			if(ex!=null)
 			{
-				Object ex = properties.get(RemoteServiceManagementService.REMOTE_EXCLUDED);
-				if(ex!=null)
+				for(Iterator it = SReflect.getIterator(ex); it.hasNext(); )
 				{
-					for(Iterator it = SReflect.getIterator(ex); it.hasNext(); )
+					MethodInfo[] mis = getMethodInfo(it.next(), targetclass, false);
+					for(int j=0; j<mis.length; j++)
 					{
-						MethodInfo[] mis = getMethodInfo(it.next(), targetclass, false);
-						for(int j=0; j<mis.length; j++)
-						{
-							ret.addExcludedMethod(mis[j]);
-						}
+						ret.addExcludedMethod(mis[j]);
 					}
 				}
-				Object syn = properties.get(RemoteServiceManagementService.REMOTE_SYNCHRONOUS);
-				if(syn!=null)
+			}
+			Object syn = properties.get(RemoteServiceManagementService.REMOTE_SYNCHRONOUS);
+			if(syn!=null)
+			{
+				for(Iterator it = SReflect.getIterator(syn); it.hasNext(); )
 				{
-					for(Iterator it = SReflect.getIterator(syn); it.hasNext(); )
+					MethodInfo[] mis = getMethodInfo(it.next(), targetclass, false);
+					for(int j=0; j<mis.length; j++)
 					{
-						MethodInfo[] mis = getMethodInfo(it.next(), targetclass, false);
-						for(int j=0; j<mis.length; j++)
-						{
-							ret.addSynchronousMethod(mis[j]);
-						}
+						ret.addSynchronousMethod(mis[j]);
 					}
 				}
-				Object un = properties.get(RemoteServiceManagementService.REMOTE_UNCACHED);
-				if(un!=null)
+			}
+			Object un = properties.get(RemoteServiceManagementService.REMOTE_UNCACHED);
+			if(un!=null)
+			{
+				for(Iterator it = SReflect.getIterator(un); it.hasNext(); )
 				{
-					for(Iterator it = SReflect.getIterator(un); it.hasNext(); )
+					MethodInfo[] mis = getMethodInfo(it.next(), targetclass, false);
+					for(int j=0; j<mis.length; j++)
 					{
-						MethodInfo[] mis = getMethodInfo(it.next(), targetclass, false);
-						for(int j=0; j<mis.length; j++)
-						{
-							ret.addUncachedMethod(mis[j]);
-						}
+						ret.addUncachedMethod(mis[j]);
 					}
 				}
-				Object mr = properties.get(RemoteServiceManagementService.REMOTE_METHODREPLACEMENT);
-				if(mr!=null)
+			}
+			Object mr = properties.get(RemoteServiceManagementService.REMOTE_METHODREPLACEMENT);
+			if(mr!=null)
+			{
+				for(Iterator it = SReflect.getIterator(mr); it.hasNext(); )
 				{
-					for(Iterator it = SReflect.getIterator(mr); it.hasNext(); )
+					Object[] tmp = (Object[])it.next();
+					MethodInfo[] mis = getMethodInfo(tmp[0], targetclass, false);
+					for(int j=0; j<mis.length; j++)
 					{
-						Object[] tmp = (Object[])it.next();
-						MethodInfo[] mis = getMethodInfo(tmp[0], targetclass, false);
-						for(int j=0; j<mis.length; j++)
+						ret.addMethodReplacement(mis[j], (IMethodReplacement)tmp[1]);
+					}
+				}
+			}
+			Object to = properties.get(RemoteServiceManagementService.REMOTE_TIMEOUT);
+			if(to!=null)
+			{
+				for(Iterator it = SReflect.getIterator(to); it.hasNext(); )
+				{
+					Object[] tmp = (Object[])it.next();
+					MethodInfo[] mis = getMethodInfo(tmp[0], targetclass, false);
+					for(int j=0; j<mis.length; j++)
+					{
+						ret.addMethodTimeout(mis[j], ((Number)tmp[1]).longValue());
+					}
+				}
+			}
+		}
+		
+		// Add properties from annotations.
+		// Todo: merge with external properties (which precedence?)
+		for(int i=0; i<remoteinterfaces.length; i++)
+		{
+			Method[]	methods	= remoteinterfaces[i].getDeclaredMethods();
+			for(int j=0; j<methods.length; j++)
+			{
+				// Excluded
+				if(methods[j].isAnnotationPresent(Excluded.class))
+				{
+					ret.addExcludedMethod(new MethodInfo(methods[j]));
+				}
+				
+				// Uncached
+				if(methods[j].isAnnotationPresent(Uncached.class))
+				{
+					if(methods[j].getParameterTypes().length>0)
+					{
+						System.err.println("Warning: Uncached property is only applicable to methods without parameters: "+methods[j]);						
+					}
+					else if(void.class.equals(methods[j].getReturnType()))
+					{
+						System.err.println("Warning: Uncached property is not applicable to void methods: "+methods[j]);						
+					}
+					else if(methods[j].getReturnType().isAssignableFrom(IFuture.class))
+					{
+						System.err.println("Warning: Uncached property is not applicable to IFuture methods: "+methods[j]);						
+					}
+					else
+					{
+						ret.addUncachedMethod(new MethodInfo(methods[j]));
+					}
+				}
+				
+				// Synchronous
+				if(methods[j].isAnnotationPresent(Synchronous.class))
+				{
+					if(!void.class.equals(methods[j].getReturnType()))
+					{
+						System.err.println("Warning: Uncached property is only applicable to void methods: "+methods[j]);						
+					}
+					else
+					{
+						ret.addSynchronousMethod(new MethodInfo(methods[j]));
+					}
+				}
+				
+				// Replacement
+				if(methods[j].isAnnotationPresent(Replacement.class))
+				{
+					Replacement	ra	= methods[j].getAnnotation(Replacement.class);
+					Class	rep	= SReflect.findClass0(ra.value(), null, libservice.getClassLoader());
+					if(rep!=null)
+					{
+						try
 						{
-							ret.addMethodReplacement(mis[j], (IMethodReplacement)tmp[1]);
+							IMethodReplacement	mr	= (IMethodReplacement)rep.newInstance();
+							ret.addMethodReplacement(new MethodInfo(methods[j]), mr);
+						}
+						catch(Exception e)
+						{
+							System.err.println("Warning: Replacement class "+rep.getName()+" could not be instantiated: "+e);
 						}
 					}
-				}				
+					else
+					{
+						System.err.println("Warning: Replacement class not found: "+ra.value());
+					}
+				}
+				
+				// Timeout
+				if(methods[j].isAnnotationPresent(Timeout.class))
+				{
+					Timeout	ta	= methods[j].getAnnotation(Timeout.class);
+					ret.addMethodTimeout(new MethodInfo(methods[j]), ta.value());
+				}
 			}
 		}
 		
 		// Add default replacement for equals() and hashCode().
-		Class targetclass = target.getClass();
 		Method	equals	= SReflect.getMethod(Object.class, "equals", new Class[]{Object.class});
 		if(ret.getMethodReplacement(equals)==null)
 		{

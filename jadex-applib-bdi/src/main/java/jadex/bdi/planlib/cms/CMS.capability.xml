@@ -56,10 +56,8 @@
 			<parameter name="master" class="boolean">
 				<value>false</value>
 			</parameter>
-			<!-- Context the component should be started in (defaults to starting component's parent). -->
-			<parameter name="parent" class="jadex.bridge.IComponentIdentifier">
-				<value>$scope.getParent()!=null ? $scope.getParent().getComponentIdentifier() : null</value>
-			</parameter>
+			<!-- Context the component should be started in. -->
+			<parameter name="parent" class="jadex.bridge.IComponentIdentifier"/>
 			
 		</achievegoal>
 

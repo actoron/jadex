@@ -1383,7 +1383,7 @@ public abstract class ComponentManagementService extends BasicService implements
 		final Future	ret	= new Future();
 		
 		// Local parent (does not work during init as external access is not available).
-		if(ci.getParent()!=null && !isRemoteComponent(ci.getParent()) && !initinfos.containsKey(ci.getParent()))
+		if(ci!=null && ci.getParent()!=null && !isRemoteComponent(ci.getParent()) && !initinfos.containsKey(ci.getParent()))
 		{
 			SServiceProvider.getService(provider, IComponentManagementService.class)
 				.addResultListener(new DelegationResultListener(ret)
@@ -1396,6 +1396,7 @@ public abstract class ComponentManagementService extends BasicService implements
 						public void customResultAvailable(Object source, Object result)
 						{
 							IExternalAccess	ea	= (IExternalAccess)result;
+//							System.err.println("Model class loader: "+ea.getModel().getName()+", "+ea.getModel().getClassLoader());
 							ret.setResult(ea.getModel().getClassLoader());
 						}
 					});
@@ -1412,6 +1413,7 @@ public abstract class ComponentManagementService extends BasicService implements
 				public void customResultAvailable(Object source, Object result)
 				{
 					ILibraryService	ls	= (ILibraryService)result;
+//					System.err.println("Libservice class loader: "+ls.getClassLoader());
 					ret.setResult(ls.getClassLoader());
 				}
 			});

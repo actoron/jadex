@@ -35,6 +35,9 @@ public class ProxyInfo
 	/** The replacements for methods (method-info -> replacement method). */
 	protected Map replacements;
 	
+	/** The timeouts for methods (method-info -> long). */
+	protected Map timeouts;
+	
 	//-------- constructors --------
 	
 	/**
@@ -73,6 +76,54 @@ public class ProxyInfo
 //	{
 //		this.rr = rr;
 //	}
+	
+	
+	/**
+	 *  Get the timeouts
+	 *  @return The timeouts.
+	 */
+	public Map getMethodTimeouts()
+	{
+		return timeouts;
+	}
+	
+	/**
+	 *  Set the timeouts.
+	 *  @param timeouts	The timeouts.
+	 */
+	public void setMethodTimeouts(Map timeouts)
+	{
+		this.timeouts = timeouts;
+	}
+	
+	/**
+	 *  Get a timeout.
+	 *  @param method	The method.
+	 *  @return	The timeout or -1 if none.
+	 */
+	public long	getMethodTimeout(Method method)
+	{
+		long	ret	= -1;
+		MethodInfo	key	= new MethodInfo(method);
+		if(timeouts!=null && timeouts.containsKey(key))
+		{
+			ret	= ((Number)timeouts.get(key)).longValue();
+		}
+		return ret;
+	}
+
+
+	/**
+	 *  Add a timeout for a method.
+	 *  @param m	The method info.
+	 *  @param timeout	The timeout.
+	 */
+	public void addMethodTimeout(MethodInfo m, long timeout)
+	{
+		if(timeouts==null)
+			timeouts = new HashMap();
+		timeouts.put(m, new Long(timeout));
+	}
 		
 	/**
 	 *  Get the replacements

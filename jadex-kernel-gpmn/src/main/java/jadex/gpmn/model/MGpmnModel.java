@@ -72,8 +72,6 @@ public class MGpmnModel extends MProcess implements ICacheableModel//, IModelInf
 		
 		if(getModelInfo().getProperties()==null)
 			getModelInfo().setProperties(new HashMap());
-		
-		addMethodInfos(getModelInfo().getProperties(), "remote_excluded", new String[]{"getServiceProvider"});
 	}
 	
 	/**

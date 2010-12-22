@@ -88,8 +88,6 @@ public class MGpmnModel implements ICacheableModel//, IModelInfo
 		
 		if(getModelInfo().getProperties()==null)
 			getModelInfo().setProperties(new HashMap());
-		
-		addMethodInfos(getModelInfo().getProperties(), "remote_excluded", new String[]{"getServiceProvider"});
 	}
 	
 	/**

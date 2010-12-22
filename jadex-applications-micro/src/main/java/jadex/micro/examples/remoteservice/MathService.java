@@ -32,7 +32,7 @@ public class MathService extends BasicService implements IMathService
 	 */
 	public IFuture addNB(int a, int b)
 	{
-//		System.out.println("addNB: "+a+" "+b);
+		System.out.println("addNB: "+a+" "+b);
 		return new Future(new Integer(a+b));
 	}
 	
@@ -46,7 +46,7 @@ public class MathService extends BasicService implements IMathService
 	 */
 	public int addB(int a, int b)
 	{
-//		System.out.println("addB: "+a+" "+b);
+		System.out.println("addB: "+a+" "+b);
 		return a+b;
 	}
 	
@@ -59,7 +59,7 @@ public class MathService extends BasicService implements IMathService
 	 */
 	public double getPi()
 	{
-//		System.out.println("getPi");
+		System.out.println("getPi");
 		return Math.PI;
 	}
 	

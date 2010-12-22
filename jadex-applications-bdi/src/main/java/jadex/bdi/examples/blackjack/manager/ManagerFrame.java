@@ -467,6 +467,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 				final IGoal start = bia.getGoalbase().createGoal("cms_create_component");
 				start.getParameter("type").setValue("jadex/bdi/examples/blackjack/dealer/Dealer.agent.xml");
 				start.getParameter("name").setValue("BlackjackDealer");
+				start.getParameter("parent").setValue(ia.getParent().getComponentIdentifier());
 				start.addGoalListener(new IGoalListener()
 				{
 					public void goalFinished(AgentEvent ae)
@@ -786,6 +787,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 						final IGoal start = bia.getGoalbase().createGoal("cms_create_component");
 						start.getParameter("type").setValue("jadex/bdi/examples/blackjack/player/Player.agent.xml");
 						start.getParameter("name").setValue(player.getName());
+						start.getParameter("parent").setValue(ia.getParent().getComponentIdentifier());
 						Map args = new HashMap();
 						args.put("myself", player);
 						args.put("dealer", dealeraid);
