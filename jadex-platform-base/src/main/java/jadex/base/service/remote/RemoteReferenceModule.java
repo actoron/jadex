@@ -262,6 +262,14 @@ public class RemoteReferenceModule
 		// Todo: merge with external properties (which precedence?)
 		for(int i=0; i<remoteinterfaces.length; i++)
 		{
+			// Default timeout for interface
+			Long	deftimeout	= null;
+			if(remoteinterfaces[i].isAnnotationPresent(Timeout.class))
+			{
+				Timeout	ta	= (Timeout)remoteinterfaces[i].getAnnotation(Timeout.class);
+				deftimeout	= new Long(ta.value());
+			}
+			
 			Method[]	methods	= remoteinterfaces[i].getDeclaredMethods();
 			for(int j=0; j<methods.length; j++)
 			{
@@ -333,6 +341,10 @@ public class RemoteReferenceModule
 				{
 					Timeout	ta	= methods[j].getAnnotation(Timeout.class);
 					ret.addMethodTimeout(new MethodInfo(methods[j]), ta.value());
+				}
+				else if(deftimeout!=null)
+				{
+					ret.addMethodTimeout(new MethodInfo(methods[j]), deftimeout.longValue());					
 				}
 			}
 		}

@@ -6,6 +6,7 @@ import jadex.commons.service.IService;
 /**
  *  Simple interface for a component service.
  */
+//@Timeout(4321)
 public interface IMathService extends IService
 {
 	/**

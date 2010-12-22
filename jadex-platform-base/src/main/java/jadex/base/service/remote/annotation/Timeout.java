@@ -9,9 +9,11 @@ import java.lang.annotation.Target;
  *  Specify a timeout period after which the remote invocation
  *  is aborted when no result is received.
  *  
- *  Applicable to all methods.
+ *  Applicable to all methods or an interface as a whole.
+ *  Interface specific settings apply to all methods without
+ *  explicit timeout specifications.
  */
-@Target(ElementType.METHOD)
+@Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Timeout
 {
