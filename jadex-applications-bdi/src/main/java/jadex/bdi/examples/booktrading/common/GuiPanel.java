@@ -364,58 +364,67 @@ public class GuiPanel extends JPanel
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				SServiceProvider.getService(agent.getServiceProvider(), IClockService.class)
-					.addResultListener(new SwingDefaultResultListener(GuiPanel.this)
+				agent.scheduleStep(new IComponentStep()
 				{
-					public void customResultAvailable(Object source, Object result)
+					public Object execute(IInternalAccess ia)
 					{
-						IClockService cs = (IClockService)result;
-						while(dia.requestInput(cs.getTime()))
+//						SServiceProvider.getService(agent.getServiceProvider(), IClockService.class)
+						ia.getRequiredService("clockservice")
+							.addResultListener(new SwingDefaultResultListener(GuiPanel.this)
 						{
-							try
+							public void customResultAvailable(Object source, Object result)
 							{
-								String title = dia.title.getText();
-								int limit = Integer.parseInt(dia.limit.getText());
-								int start = Integer.parseInt(dia.start.getText());
-								Date deadline = dformat.parse(dia.deadline.getText());
-								final Order order = new Order(title, deadline, start, limit, buy, cs);
-								
-								agent.scheduleStep(new IComponentStep()
+								IClockService cs = (IClockService)result;
+								while(dia.requestInput(cs.getTime()))
 								{
-									public static final String XML_CLASSNAME = "add"; 
-									public Object execute(IInternalAccess ia)
+									try
 									{
-										IBDIInternalAccess bia = (IBDIInternalAccess)ia;
-										IGoal purchase = bia.getGoalbase().createGoal(goalname);
-										purchase.getParameter("order").setValue(order);
-										bia.getGoalbase().dispatchTopLevelGoal(purchase);
-										return null;
+										String title = dia.title.getText();
+										int limit = Integer.parseInt(dia.limit.getText());
+										int start = Integer.parseInt(dia.start.getText());
+										Date deadline = dformat.parse(dia.deadline.getText());
+										final Order order = new Order(title, deadline, start, limit, buy, cs);
+										
+										agent.scheduleStep(new IComponentStep()
+										{
+											public static final String XML_CLASSNAME = "add"; 
+											public Object execute(IInternalAccess ia)
+											{
+												IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+												IGoal purchase = bia.getGoalbase().createGoal(goalname);
+												purchase.getParameter("order").setValue(order);
+												bia.getGoalbase().dispatchTopLevelGoal(purchase);
+												return null;
+											}
+										});
+	//									agent.createGoal(goalname).addResultListener(new DefaultResultListener()
+	//									{
+	//										public void resultAvailable(Object source, Object result)
+	//										{
+	//											IEAGoal purchase = (IEAGoal)result;
+	//											purchase.setParameterValue("order", order);
+	//											agent.dispatchTopLevelGoal(purchase);
+	//										}
+	//									});
+										orders.add(order);
+										items.fireTableDataChanged();
+										break;
 									}
-								});
-//								agent.createGoal(goalname).addResultListener(new DefaultResultListener()
-//								{
-//									public void resultAvailable(Object source, Object result)
-//									{
-//										IEAGoal purchase = (IEAGoal)result;
-//										purchase.setParameterValue("order", order);
-//										agent.dispatchTopLevelGoal(purchase);
-//									}
-//								});
-								orders.add(order);
-								items.fireTableDataChanged();
-								break;
+									catch(NumberFormatException e1)
+									{
+										JOptionPane.showMessageDialog(GuiPanel.this, "Price limit must be integer.", "Input error", JOptionPane.ERROR_MESSAGE);
+									}
+									catch(ParseException e1)
+									{
+										JOptionPane.showMessageDialog(GuiPanel.this, "Wrong date format, use YYYY/MM/DD hh:mm.", "Input error", JOptionPane.ERROR_MESSAGE);
+									}
+								}
 							}
-							catch(NumberFormatException e1)
-							{
-								JOptionPane.showMessageDialog(GuiPanel.this, "Price limit must be integer.", "Input error", JOptionPane.ERROR_MESSAGE);
-							}
-							catch(ParseException e1)
-							{
-								JOptionPane.showMessageDialog(GuiPanel.this, "Wrong date format, use YYYY/MM/DD hh:mm.", "Input error", JOptionPane.ERROR_MESSAGE);
-							}
-						}
+						});
+						return null;
 					}
 				});
+				
 			}
 		});
 
@@ -492,91 +501,99 @@ public class GuiPanel extends JPanel
 		final InputDialog edit_dialog = new InputDialog(buy);
 		edit.addActionListener(new ActionListener()
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
-				SServiceProvider.getService(agent.getServiceProvider(), IClockService.class)
-					.addResultListener(new SwingDefaultResultListener(GuiPanel.this)
+				agent.scheduleStep(new IComponentStep()
 				{
-					public void customResultAvailable(Object source, Object result)
+					public Object execute(IInternalAccess ia)
 					{
-						IClockService cs = (IClockService)result;
-				
-						int row = table.getSelectedRow();
-						if(row >= 0 && row < orders.size())
+//						SServiceProvider.getService(agent.getServiceProvider(), IClockService.class)
+						ia.getRequiredService("clockservice")
+							.addResultListener(new SwingDefaultResultListener(GuiPanel.this)
 						{
-							final Order order = (Order)orders.get(row);
-							edit_dialog.title.setText(order.getTitle());
-							edit_dialog.limit.setText(Integer.toString(order.getLimit()));
-							edit_dialog.start.setText(Integer.toString(order.getStartPrice()));
-							edit_dialog.deadline.setText(dformat.format(order.getDeadline()));
-		
-							while(edit_dialog.requestInput(cs.getTime()))
+							public void customResultAvailable(Object source, Object result)
 							{
-								try
+								IClockService cs = (IClockService)result;
+						
+								int row = table.getSelectedRow();
+								if(row >= 0 && row < orders.size())
 								{
-									String title = edit_dialog.title.getText();
-									int limit = Integer.parseInt(edit_dialog.limit.getText());
-									int start = Integer.parseInt(edit_dialog.start.getText());
-									Date deadline = dformat.parse(edit_dialog.deadline.getText());
-									order.setTitle(title);
-									order.setLimit(limit);
-									order.setStartPrice(start);
-									order.setDeadline(deadline);
-									items.fireTableDataChanged();
-									
-									agent.scheduleStep(new IComponentStep()
+									final Order order = (Order)orders.get(row);
+									edit_dialog.title.setText(order.getTitle());
+									edit_dialog.limit.setText(Integer.toString(order.getLimit()));
+									edit_dialog.start.setText(Integer.toString(order.getStartPrice()));
+									edit_dialog.deadline.setText(dformat.format(order.getDeadline()));
+				
+									while(edit_dialog.requestInput(cs.getTime()))
 									{
-										public static final String XML_CLASSNAME = "drop"; 
-										public Object execute(IInternalAccess ia)
+										try
 										{
-											IBDIInternalAccess bia = (IBDIInternalAccess)ia;
-											IGoal[] goals = bia.getGoalbase().getGoals(goalname);
-											for(int i=0; i<goals.length; i++)
-											{
-												if(goals[i].getParameter("order").getValue().equals(order))
-												{
-													goals[i].drop();
-												}
-											}
+											String title = edit_dialog.title.getText();
+											int limit = Integer.parseInt(edit_dialog.limit.getText());
+											int start = Integer.parseInt(edit_dialog.start.getText());
+											Date deadline = dformat.parse(edit_dialog.deadline.getText());
+											order.setTitle(title);
+											order.setLimit(limit);
+											order.setStartPrice(start);
+											order.setDeadline(deadline);
+											items.fireTableDataChanged();
 											
-											IGoal goal = bia.getGoalbase().createGoal(goalname);
-											goal.getParameter("order").setValue(order);
-											bia.getGoalbase().dispatchTopLevelGoal(goal);
-											return null;
+											agent.scheduleStep(new IComponentStep()
+											{
+												public static final String XML_CLASSNAME = "drop"; 
+												public Object execute(IInternalAccess ia)
+												{
+													IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+													IGoal[] goals = bia.getGoalbase().getGoals(goalname);
+													for(int i=0; i<goals.length; i++)
+													{
+														if(goals[i].getParameter("order").getValue().equals(order))
+														{
+															goals[i].drop();
+														}
+													}
+													
+													IGoal goal = bia.getGoalbase().createGoal(goalname);
+													goal.getParameter("order").setValue(order);
+													bia.getGoalbase().dispatchTopLevelGoal(goal);
+													return null;
+												}
+											});
+	//										agent.getGoalbase().getGoals(goalname).addResultListener(new DefaultResultListener()
+	//										{
+	//											public void resultAvailable(Object source, Object result)
+	//											{
+	//												IEAGoal[] goals = (IEAGoal[])result;
+	//												dropGoal(goals, 0, order);
+	//											}
+	//										});
+	//										agent.createGoal(goalname).addResultListener(new DefaultResultListener()
+	//										{
+	//											public void resultAvailable(Object source, Object result)
+	//											{
+	//												IEAGoal goal = (IEAGoal)result;
+	//												goal.setParameterValue("order", order);
+	//												agent.dispatchTopLevelGoal(goal);
+	//											}
+	//										});
+											break;
 										}
-									});
-//									agent.getGoalbase().getGoals(goalname).addResultListener(new DefaultResultListener()
-//									{
-//										public void resultAvailable(Object source, Object result)
-//										{
-//											IEAGoal[] goals = (IEAGoal[])result;
-//											dropGoal(goals, 0, order);
-//										}
-//									});
-//									agent.createGoal(goalname).addResultListener(new DefaultResultListener()
-//									{
-//										public void resultAvailable(Object source, Object result)
-//										{
-//											IEAGoal goal = (IEAGoal)result;
-//											goal.setParameterValue("order", order);
-//											agent.dispatchTopLevelGoal(goal);
-//										}
-//									});
-									break;
-								}
-								catch(NumberFormatException e1)
-								{
-									JOptionPane.showMessageDialog(GuiPanel.this, "Price limit must be integer.", "Input error", JOptionPane.ERROR_MESSAGE);
-								}
-								catch(ParseException e1)
-								{
-									JOptionPane.showMessageDialog(GuiPanel.this, "Wrong date format, use YYYY/MM/DD hh:mm.", "Input error", JOptionPane.ERROR_MESSAGE);
+										catch(NumberFormatException e1)
+										{
+											JOptionPane.showMessageDialog(GuiPanel.this, "Price limit must be integer.", "Input error", JOptionPane.ERROR_MESSAGE);
+										}
+										catch(ParseException e1)
+										{
+											JOptionPane.showMessageDialog(GuiPanel.this, "Wrong date format, use YYYY/MM/DD hh:mm.", "Input error", JOptionPane.ERROR_MESSAGE);
+										}
+									}
 								}
 							}
-						}
+						});
+						return null;
 					}
 				});
+				
 			}
 		});
 		
@@ -753,114 +770,124 @@ public class GuiPanel extends JPanel
 
 			// Add some default entry for easy testing of the gui.
 			// This order are not added to the agent (see manager.agent.xml).
-			SServiceProvider.getService(agent.getServiceProvider(), IClockService.class).addResultListener(new SwingDefaultResultListener(GuiPanel.this)
+			agent.scheduleStep(new IComponentStep()
 			{
-				
-				public void customResultAvailable(Object source, Object result)
+				public Object execute(IInternalAccess ia)
 				{
-					IClockService clock = (IClockService)result;
-					if(buy)
+//					SServiceProvider.getService(agent.getServiceProvider(), IClockService.class)
+					ia.getRequiredService("clockservice")
+						.addResultListener(new SwingDefaultResultListener(GuiPanel.this)
 					{
-						orders.addItem(new Order("All about agents", null, 100, 120, buy, clock));
-						orders.addItem(new Order("All about web services", null, 40, 60, buy, clock));
-						orders.addItem(new Order("Harry Potter", null, 5, 10, buy, clock));
-						orders.addItem(new Order("Agents in the real world", null, 30, 65, buy, clock));
-					}
-					else
-					{
-						orders.addItem(new Order("All about agents", null, 130, 110, buy, clock));
-						orders.addItem(new Order("All about web services", null, 50, 30, buy, clock));
-						orders.addItem(new Order("Harry Potter", null, 15, 9, buy, clock));
-						orders.addItem(new Order("Agents in the real world", null, 100, 60, buy, clock));
-					}
-					
-					JPanel center = new JPanel(new GridBagLayout());
-					center.setBorder(new EmptyBorder(5, 5, 5, 5));
-					getContentPane().add(BorderLayout.CENTER, center);
-
-					JLabel label;
-					Dimension labeldim = new JLabel("Preset orders ").getPreferredSize();
-					int row = 0;
-					GridBagConstraints leftcons = new GridBagConstraints(0, 0, 1, 1, 0, 0,
-							GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(1, 1, 1, 1), 0, 0);
-					GridBagConstraints rightcons = new GridBagConstraints(1, 0, GridBagConstraints.REMAINDER, 1, 1, 0,
-							GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(1, 1, 1, 1), 0, 0);
-
-					leftcons.gridy = rightcons.gridy = row++;
-					label = new JLabel("Preset orders");
-					label.setMinimumSize(labeldim);
-					label.setPreferredSize(labeldim);
-					center.add(label, leftcons);
-					center.add(orders, rightcons);
-
-					leftcons.gridy = rightcons.gridy = row++;
-					label = new JLabel("Title");
-					label.setMinimumSize(labeldim);
-					label.setPreferredSize(labeldim);
-					center.add(label, leftcons);
-					center.add(title, rightcons);
-
-					leftcons.gridy = rightcons.gridy = row++;
-					label = new JLabel("Start price");
-					label.setMinimumSize(labeldim);
-					label.setPreferredSize(labeldim);
-					center.add(label, leftcons);
-					center.add(start, rightcons);
-
-					leftcons.gridy = rightcons.gridy = row++;
-					label = new JLabel("Price limit");
-					label.setMinimumSize(labeldim);
-					label.setPreferredSize(labeldim);
-					center.add(label, leftcons);
-					center.add(limit, rightcons);
-
-					leftcons.gridy = rightcons.gridy = row++;
-					label = new JLabel("Deadline");
-					label.setMinimumSize(labeldim);
-					label.setPreferredSize(labeldim);
-					center.add(label, leftcons);
-					center.add(deadline, rightcons);
-
-
-					JPanel south = new JPanel();
-					// south.setBorder(new TitledBorder(new EtchedBorder(), " Control "));
-					getContentPane().add(BorderLayout.SOUTH, south);
-
-					JButton ok = new JButton("Ok");
-					JButton cancel = new JButton("Cancel");
-					ok.setMinimumSize(cancel.getMinimumSize());
-					ok.setPreferredSize(cancel.getPreferredSize());
-					south.add(ok);
-					south.add(cancel);
-
-					ok.addActionListener(new ActionListener()
-					{
-						public void actionPerformed(ActionEvent e)
+						
+						public void customResultAvailable(Object source, Object result)
 						{
-							aborted = false;
-							setVisible(false);
+							IClockService clock = (IClockService)result;
+							if(buy)
+							{
+								orders.addItem(new Order("All about agents", null, 100, 120, buy, clock));
+								orders.addItem(new Order("All about web services", null, 40, 60, buy, clock));
+								orders.addItem(new Order("Harry Potter", null, 5, 10, buy, clock));
+								orders.addItem(new Order("Agents in the real world", null, 30, 65, buy, clock));
+							}
+							else
+							{
+								orders.addItem(new Order("All about agents", null, 130, 110, buy, clock));
+								orders.addItem(new Order("All about web services", null, 50, 30, buy, clock));
+								orders.addItem(new Order("Harry Potter", null, 15, 9, buy, clock));
+								orders.addItem(new Order("Agents in the real world", null, 100, 60, buy, clock));
+							}
+							
+							JPanel center = new JPanel(new GridBagLayout());
+							center.setBorder(new EmptyBorder(5, 5, 5, 5));
+							getContentPane().add(BorderLayout.CENTER, center);
+	
+							JLabel label;
+							Dimension labeldim = new JLabel("Preset orders ").getPreferredSize();
+							int row = 0;
+							GridBagConstraints leftcons = new GridBagConstraints(0, 0, 1, 1, 0, 0,
+									GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(1, 1, 1, 1), 0, 0);
+							GridBagConstraints rightcons = new GridBagConstraints(1, 0, GridBagConstraints.REMAINDER, 1, 1, 0,
+									GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(1, 1, 1, 1), 0, 0);
+	
+							leftcons.gridy = rightcons.gridy = row++;
+							label = new JLabel("Preset orders");
+							label.setMinimumSize(labeldim);
+							label.setPreferredSize(labeldim);
+							center.add(label, leftcons);
+							center.add(orders, rightcons);
+	
+							leftcons.gridy = rightcons.gridy = row++;
+							label = new JLabel("Title");
+							label.setMinimumSize(labeldim);
+							label.setPreferredSize(labeldim);
+							center.add(label, leftcons);
+							center.add(title, rightcons);
+	
+							leftcons.gridy = rightcons.gridy = row++;
+							label = new JLabel("Start price");
+							label.setMinimumSize(labeldim);
+							label.setPreferredSize(labeldim);
+							center.add(label, leftcons);
+							center.add(start, rightcons);
+	
+							leftcons.gridy = rightcons.gridy = row++;
+							label = new JLabel("Price limit");
+							label.setMinimumSize(labeldim);
+							label.setPreferredSize(labeldim);
+							center.add(label, leftcons);
+							center.add(limit, rightcons);
+	
+							leftcons.gridy = rightcons.gridy = row++;
+							label = new JLabel("Deadline");
+							label.setMinimumSize(labeldim);
+							label.setPreferredSize(labeldim);
+							center.add(label, leftcons);
+							center.add(deadline, rightcons);
+	
+	
+							JPanel south = new JPanel();
+							// south.setBorder(new TitledBorder(new EtchedBorder(), " Control "));
+							getContentPane().add(BorderLayout.SOUTH, south);
+	
+							JButton ok = new JButton("Ok");
+							JButton cancel = new JButton("Cancel");
+							ok.setMinimumSize(cancel.getMinimumSize());
+							ok.setPreferredSize(cancel.getPreferredSize());
+							south.add(ok);
+							south.add(cancel);
+	
+							ok.addActionListener(new ActionListener()
+							{
+								public void actionPerformed(ActionEvent e)
+								{
+									aborted = false;
+									setVisible(false);
+								}
+							});
+							cancel.addActionListener(new ActionListener()
+							{
+								public void actionPerformed(ActionEvent e)
+								{
+									setVisible(false);
+								}
+							});
+	
+							orders.addActionListener(new ActionListener()
+							{
+								public void actionPerformed(ActionEvent e)
+								{
+									Order order = (Order)orders.getSelectedItem();
+									title.setText(order.getTitle());
+									limit.setText("" + order.getLimit());
+									start.setText("" + order.getStartPrice());
+								}
+							});
 						}
 					});
-					cancel.addActionListener(new ActionListener()
-					{
-						public void actionPerformed(ActionEvent e)
-						{
-							setVisible(false);
-						}
-					});
-
-					orders.addActionListener(new ActionListener()
-					{
-						public void actionPerformed(ActionEvent e)
-						{
-							Order order = (Order)orders.getSelectedItem();
-							title.setText(order.getTitle());
-							limit.setText("" + order.getLimit());
-							start.setText("" + order.getStartPrice());
-						}
-					});
+					return null;
 				}
 			});
+			
 		}
 
 		public boolean requestInput(long currenttime)

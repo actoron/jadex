@@ -24,8 +24,9 @@
 		<import>jadex.bdi.runtime.*</import>
 		<import>jadex.commons.*</import>
 		<import>jadex.commons.service.*</import>
+		<import>jadex.commons.service.clock.*</import>
 	</imports>
-
+		
 	<capabilities>
 		<capability name="procap" file="jadex.bdi.planlib.protocols.contractnet.ContractNet"/>
 		<capability name="dfcap" file="jadex.bdi.planlib.df.DF"/>
@@ -143,6 +144,11 @@
 			<!-- <parameter name="$order" class="Order"/> -->
 		</expression>
 	</expressions>
+
+	<services>
+		<requiredservice name="dfservice" class="IDF"/>
+		<requiredservice name="clockservice" class="IClockService"/>
+	</services>
 
 	<properties>
 		<!-- Seller generates warning about unhandled (passive) sell_book goals. -->

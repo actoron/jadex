@@ -45,7 +45,7 @@ public class PlaySongPlan extends Plan
 		final SyncResultListener lis = new SyncResultListener();
 		
 //		IThreadPoolService tp = (IThreadPoolService)SServiceProvider.getService(getScope().getServiceProvider(), IThreadPoolService.class).get(this);
-		IThreadPoolService tp = (IThreadPoolService)getScope().getRequiredService("tpservice");
+		IThreadPoolService tp = (IThreadPoolService)getScope().getRequiredService("tpservice").get(this);
 		tp.execute(new Runnable()
 		{
 			public void run()

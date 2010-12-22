@@ -23,6 +23,7 @@
 		<import>jadex.bdi.planlib.protocols.*</import>
 		<import>jadex.bdi.runtime.*</import>
 		<import>jadex.rules.rulesystem.rules.functions.*</import>
+		<import>jadex.commons.service.clock.*</import>
 	</imports>
 
 	<capabilities>
@@ -126,6 +127,11 @@
 			<!-- <parameter name="$order" class="Order"/> -->
 		</expression>
 	</expressions>
+
+	<services>
+		<requiredservice name="dfservice" class="IDF"/>
+		<requiredservice name="clockservice" class="IClockService"/>
+	</services>
 
 	<properties>
 		<!-- <property name="logging.level">java.util.logging.Level.FINE</property> -->
