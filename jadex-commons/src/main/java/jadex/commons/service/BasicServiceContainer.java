@@ -303,7 +303,7 @@ public class BasicServiceContainer implements  IServiceContainer
 		if(reqservicefetchers==null)
 			reqservicefetchers = new HashMap();
 
-		ret = info.isDynamic()? new StaticServiceFetcher(): DynamicServiceFetcher.INSTANCE;
+		ret = info.isDynamic()? DynamicServiceFetcher.INSTANCE: new StaticServiceFetcher();
 		reqservicefetchers.put(info.getName(), ret);
 		
 		return ret;

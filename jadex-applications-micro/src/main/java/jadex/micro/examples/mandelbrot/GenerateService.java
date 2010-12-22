@@ -64,7 +64,8 @@ public class GenerateService extends BasicService implements IGenerateService
 			}
 		});
 		
-		SServiceProvider.getService(agent.getServiceProvider(), IDisplayService.class)
+		agent.getRequiredService("displayservice")
+//		SServiceProvider.getService(agent.getServiceProvider(), IDisplayService.class)
 			.addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
@@ -95,7 +96,8 @@ public class GenerateService extends BasicService implements IGenerateService
 	{
 		final Future ret = new Future();
 		
-		SServiceProvider.getServices(agent.getServiceProvider(), ICalculateService.class, false, true)
+//		SServiceProvider.getServices(agent.getServiceProvider(), ICalculateService.class, false, true)
+		agent.getRequiredServices("calculateservices")
 			.addResultListener(agent.createResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object source, Object result)
@@ -113,12 +115,14 @@ public class GenerateService extends BasicService implements IGenerateService
 					{
 						public void resultAvailable(Object source, Object result)
 						{
-							SServiceProvider.getServices(agent.getServiceProvider(), ICalculateService.class, false, true)
+//							SServiceProvider.getServices(agent.getServiceProvider(), ICalculateService.class, false, true)
+							agent.getRequiredServices("calculateservices")	
 								.addResultListener(agent.createResultListener(new DelegationResultListener(ret)));
 						}
 					}));
 					
-					SServiceProvider.getService(agent.getServiceProvider(), IComponentManagementService.class, false, true)
+//					SServiceProvider.getService(agent.getServiceProvider(), IComponentManagementService.class, false, true)
+					agent.getRequiredService("cmsservice")
 						.addResultListener(agent.createResultListener(agent.createResultListener(new DelegationResultListener(ret)
 					{
 						public void customResultAvailable(Object source, Object result)
@@ -316,6 +320,8 @@ class CalculateListener implements IResultListener
 	 */
 	public void exceptionOccurred(Object source, Exception exception)
 	{
+		exception.printStackTrace();
+		
 //		System.out.println("Recal start: "+data.getId());
 		GenerateService.getCalculateServices(agent, 1).addResultListener(new IResultListener()
 		{

@@ -12,6 +12,7 @@ import jadex.commons.FixedJComboBox;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SGUI;
+import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.collection.SCollection;
@@ -19,12 +20,14 @@ import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.commons.gui.CombiIcon;
 import jadex.commons.gui.JValidatorTextField;
+import jadex.commons.jtable.ClassRenderer;
 import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.library.ILibraryService;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
@@ -34,8 +37,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.MouseEvent;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -57,6 +62,7 @@ import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -1235,15 +1241,17 @@ public class StarterPanel extends JPanel
 			
 			if(required.length>0)
 			{
-				JTable requiredt = new JTable(new DefaultTableModel(new String[]{"Interface Name", "Type", "Multiple"}, 0));
+				final JTable requiredt = new JTable(new DefaultTableModel(new String[]{"Name", "Interface", "Multiple"}, 0));
 				requiredt.setEnabled(false);
 				requiredservices.add(requiredt.getTableHeader(), BorderLayout.NORTH);
 				requiredservices.add(requiredt, BorderLayout.CENTER);
 				for(int i=0; i<required.length; i++)
 				{
 					((DefaultTableModel)requiredt.getModel()).addRow(new Object[]{required[i].getName(), 
-						required[i].getClass(), required[i].isMultiple()});
+						required[i].getType(), required[i].isMultiple()});
 				}
+				requiredt.getColumn("Interface").setCellRenderer(new ClassRenderer());
+
 			}
 			
 			if(required.length>0)

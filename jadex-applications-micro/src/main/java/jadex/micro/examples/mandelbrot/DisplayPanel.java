@@ -1,7 +1,10 @@
 package jadex.micro.examples.mandelbrot;
 
+import jadex.application.runtime.impl.ExternalAccess;
 import jadex.bridge.IComponentManagementService;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
 import jadex.commons.IFuture;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.commons.service.IServiceProvider;
@@ -52,7 +55,7 @@ public class DisplayPanel extends JComponent
 	//-------- attributes --------
 	
 	/** The service provider. */
-	protected IServiceProvider	provider;
+	protected IExternalAccess agent;
 	
 	/** The colors for drawing. */
 	protected Color[]	colors;
@@ -89,9 +92,9 @@ public class DisplayPanel extends JComponent
 	/**
 	 *  Create a new display panel.
 	 */
-	public DisplayPanel(final IServiceProvider provider)
+	public DisplayPanel(final IExternalAccess agent)
 	{
-		this.provider	= provider;
+		this.agent	= agent;
 		setColorScheme(new Color[]{new Color(50, 100, 0), Color.red});
 		calcDefaultImage();
 		
@@ -329,75 +332,84 @@ public class DisplayPanel extends JComponent
 					{
 						public void actionPerformed(ActionEvent e)
 						{
-							SServiceProvider.getService(provider, IComponentManagementService.class)
-								.addResultListener(new SwingDefaultResultListener(DisplayPanel.this)
+							agent.scheduleStep(new IComponentStep()
 							{
-								public void customResultAvailable(Object source, Object result)
+								public Object execute(IInternalAccess ia)
 								{
-									IComponentManagementService	cms	= (IComponentManagementService)result;
-									if(progressdata!=null)
+//									SServiceProvider.getService(provider, IComponentManagementService.class)
+									ia.getRequiredService("cmsservice")
+										.addResultListener(new SwingDefaultResultListener(DisplayPanel.this)
 									{
-										for(Iterator it=progressdata.keySet().iterator(); it.hasNext(); )
+										public void customResultAvailable(Object source, Object result)
 										{
-											final ProgressData	progress	= (ProgressData)it.next();
-											cms.getExternalAccess(progress.getProviderId())
-												.addResultListener(new SwingDefaultResultListener(DisplayPanel.this)
+											IComponentManagementService	cms	= (IComponentManagementService)result;
+											if(progressdata!=null)
 											{
-												public void customResultAvailable(Object source, Object result)
+												for(Iterator it=progressdata.keySet().iterator(); it.hasNext(); )
 												{
-													IExternalAccess	ea	= (IExternalAccess)result;
-													SServiceProvider.getService(ea.getServiceProvider(), IProgressService.class)
+													final ProgressData	progress	= (ProgressData)it.next();
+													cms.getExternalAccess(progress.getProviderId())
 														.addResultListener(new SwingDefaultResultListener(DisplayPanel.this)
 													{
 														public void customResultAvailable(Object source, Object result)
 														{
-															IProgressService	ps	= (IProgressService)result;
-															if(ps!=null)
+															IExternalAccess	ea	= (IExternalAccess)result;
+															// It is not really possible to define the progress services as required service.
+															SServiceProvider.getService(ea.getServiceProvider(), IProgressService.class)
+																.addResultListener(new SwingDefaultResultListener(DisplayPanel.this)
 															{
-																ps.getProgress(progress.getTaskId())
-																	.addResultListener(new SwingDefaultResultListener(DisplayPanel.this)
+																public void customResultAvailable(Object source, Object result)
 																{
-																	public void customResultAvailable(Object source, Object result)
+																	IProgressService	ps	= (IProgressService)result;
+																	if(ps!=null)
 																	{
-																		if(progressdata!=null && progressdata.containsKey(progress))
+																		ps.getProgress(progress.getTaskId())
+																			.addResultListener(new SwingDefaultResultListener(DisplayPanel.this)
 																		{
-																			Integer	current	= (Integer)result;
-																			Integer	percent	= (Integer)progressdata.get(progress);
-																			if(current.intValue()>percent.intValue())
+																			public void customResultAvailable(Object source, Object result)
 																			{
-																				progressdata.put(progress, current);
-																				repaint();
+																				if(progressdata!=null && progressdata.containsKey(progress))
+																				{
+																					Integer	current	= (Integer)result;
+																					Integer	percent	= (Integer)progressdata.get(progress);
+																					if(current.intValue()>percent.intValue())
+																					{
+																						progressdata.put(progress, current);
+																						repaint();
+																					}
+																				}
 																			}
-																		}
+			
+																			public void customExceptionOccurred(Object source, Exception exception)
+																			{
+																				// ignore
+																			}
+																		});
 																	}
-	
-																	public void customExceptionOccurred(Object source, Exception exception)
-																	{
-																		// ignore
-																	}
-																});
-															}
+																}
+			
+																public void customExceptionOccurred(Object source, Exception exception)
+																{
+																	// ignore
+																}
+															});
 														}
-	
+			
 														public void customExceptionOccurred(Object source, Exception exception)
 														{
 															// ignore
 														}
 													});
 												}
-	
-												public void customExceptionOccurred(Object source, Exception exception)
-												{
-													// ignore
-												}
-											});
+											}
 										}
-									}
-								}
-
-								public void customExceptionOccurred(Object source, Exception exception)
-								{
-									// ignore
+	
+										public void customExceptionOccurred(Object source, Exception exception)
+										{
+											// ignore
+										}
+									});
+									return null;
 								}
 							});
 						}
@@ -843,26 +855,34 @@ public class DisplayPanel extends JComponent
 		calculating	= true;
 		repaint();
 		
-		SServiceProvider.getService(provider, IGenerateService.class)
-			.addResultListener(new SwingDefaultResultListener()
+		agent.scheduleStep(new IComponentStep()
 		{
-			public void customResultAvailable(Object source, Object result)
+			public Object execute(IInternalAccess ia)
 			{
-				IGenerateService	gs	= (IGenerateService)result;
-				IFuture	fut	= gs.generateArea(ad);
-				fut.addResultListener(new SwingDefaultResultListener(DisplayPanel.this)
+//				SServiceProvider.getService(ia.getServiceProvider(), IGenerateService.class)
+				ia.getRequiredService("generateservice")
+					.addResultListener(new SwingDefaultResultListener()
 				{
 					public void customResultAvailable(Object source, Object result)
 					{
-						DisplayPanel.this.setResults((AreaData)result);
-					}
-					public void customExceptionOccurred(Object source, Exception exception)
-					{
-						calculating	= false;
-						DisplayPanel.this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-						super.customExceptionOccurred(source, exception);
+						IGenerateService	gs	= (IGenerateService)result;
+						IFuture	fut	= gs.generateArea(ad);
+						fut.addResultListener(new SwingDefaultResultListener(DisplayPanel.this)
+						{
+							public void customResultAvailable(Object source, Object result)
+							{
+								DisplayPanel.this.setResults((AreaData)result);
+							}
+							public void customExceptionOccurred(Object source, Exception exception)
+							{
+								calculating	= false;
+								DisplayPanel.this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+								super.customExceptionOccurred(source, exception);
+							}
+						});
 					}
 				});
+				return null;
 			}
 		});
 	}

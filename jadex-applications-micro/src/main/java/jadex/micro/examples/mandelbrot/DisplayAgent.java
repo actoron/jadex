@@ -1,11 +1,13 @@
 package jadex.micro.examples.mandelbrot;
 
 import jadex.bridge.IComponentListener;
+import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.ChangeEvent;
 import jadex.commons.SGUI;
+import jadex.commons.service.RequiredServiceInfo;
 import jadex.micro.MicroAgent;
 import jadex.micro.MicroAgentMetaInfo;
 
@@ -38,7 +40,7 @@ public class DisplayAgent extends MicroAgent
 	public void agentCreated()
 	{
 		// Hack!!! Swing code not on swing thread!?
-		DisplayAgent.this.panel	= new DisplayPanel(getServiceProvider());
+		DisplayAgent.this.panel	= new DisplayPanel(getExternalAccess());
 
 		addService(new DisplayService(this));
 		
@@ -124,6 +126,11 @@ public class DisplayAgent extends MicroAgent
 	{
 		return new MicroAgentMetaInfo("Agent offering a display service.", null, null,
 			null, null, null,
-			null, new Class[]{IDisplayService.class});
+			new RequiredServiceInfo[]{
+				new RequiredServiceInfo("generateservice", IGenerateService.class), 
+				new RequiredServiceInfo("cmsservice", IComponentManagementService.class),
+				new RequiredServiceInfo("progressservice", IProgressService.class), // not used
+						},
+			new Class[]{IDisplayService.class});
 	}
 }

@@ -69,39 +69,49 @@ public class GeneratePanel extends JPanel
 					final int par = Integer.parseInt(pp.getTextField("parallel").getText());
 					final int tasksize = Integer.parseInt(pp.getTextField("task size").getText());
 				
-					SServiceProvider.getDeclaredService(agent.getServiceProvider(), IGenerateService.class)
-						.addResultListener(new DefaultResultListener()
+					agent.scheduleStep(new IComponentStep()
 					{
-						public void resultAvailable(Object source, Object result)
+						public Object execute(final IInternalAccess ia)
 						{
-							IGenerateService gs = (IGenerateService)result;
-							
-							AreaData ad = new AreaData(x1, x2, y1, y2, sizex, sizey, max, par, tasksize);
-							gs.generateArea(ad).addResultListener(new DefaultResultListener()
+//							SServiceProvider.getDeclaredService(agent.getServiceProvider(), IGenerateService.class)
+							ia.getRequiredService("generateservice")	
+								.addResultListener(ia.createResultListener(new DefaultResultListener()
 							{
 								public void resultAvailable(Object source, Object result)
 								{
-									final AreaData res = (AreaData)result;
+									IGenerateService gs = (IGenerateService)result;
 									
-									SServiceProvider.getService(agent.getServiceProvider(), IDisplayService.class)
-										.addResultListener(new DefaultResultListener()
+									AreaData ad = new AreaData(x1, x2, y1, y2, sizex, sizey, max, par, tasksize);
+									gs.generateArea(ad).addResultListener(ia.createResultListener(new DefaultResultListener()
 									{
 										public void resultAvailable(Object source, Object result)
 										{
-											// Distribute to more than one worker.
-											IDisplayService ds = (IDisplayService)result;
-											ds.displayResult(res).addResultListener(new DefaultResultListener()
+											final AreaData res = (AreaData)result;
+											
+//											SServiceProvider.getService(agent.getServiceProvider(), IDisplayService.class)
+											ia.getRequiredService("displayservice")	
+												.addResultListener(new DefaultResultListener()
 											{
 												public void resultAvailable(Object source, Object result)
 												{
+													// Distribute to more than one worker.
+													IDisplayService ds = (IDisplayService)result;
+													ds.displayResult(res).addResultListener(new DefaultResultListener()
+													{
+														public void resultAvailable(Object source, Object result)
+														{
+														}
+													});
 												}
 											});
 										}
-									});
+									}));
 								}
-							});
+							}));
+							return null;
 						}
 					});
+					
 				}
 				catch(Exception e)
 				{

@@ -98,7 +98,7 @@ public class HelplineAgent extends MicroAgent
 			, null, null, SUtil.createHashMap(new String[]{"componentviewer.viewerclass"}, new Object[]{"jadex.micro.examples.helpline.HelplineViewerPanel"}),
 			new RequiredServiceInfo[]{new RequiredServiceInfo("clockservice", IClockService.class),
 			new RequiredServiceInfo("remotehelplineservices", IHelpline.class, true, true, true, true),
-			new RequiredServiceInfo("localhelplineservices", IHelpline.class, true, true, true, false)}, 
+			new RequiredServiceInfo("localhelplineservices", IHelpline.class, true, true, false, true)}, 
 			new Class[]{IHelpline.class});
 	}
 

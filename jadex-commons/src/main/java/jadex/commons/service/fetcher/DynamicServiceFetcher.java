@@ -23,7 +23,9 @@ public class DynamicServiceFetcher implements IRequiredServiceFetcher
 	 */
 	public IFuture getService(RequiredServiceInfo info, IServiceProvider provider)
 	{
-		return SServiceProvider.getService(provider, info.getType());
+		return info.isDeclared()?
+			SServiceProvider.getDeclaredService(provider, info.getType()):
+			SServiceProvider.getService(provider, info.getType(), info.isRemote(), info.isForced());
 	}
 	
 	/**
@@ -31,6 +33,8 @@ public class DynamicServiceFetcher implements IRequiredServiceFetcher
 	 */
 	public IFuture getServices(RequiredServiceInfo info, IServiceProvider provider)
 	{
-		return SServiceProvider.getServices(provider, info.getType());
+		return info.isDeclared()?
+			SServiceProvider.getDeclaredServices(provider, info.getType()):
+			SServiceProvider.getServices(provider, info.getType(), info.isRemote(), info.isForced());
 	}
 }

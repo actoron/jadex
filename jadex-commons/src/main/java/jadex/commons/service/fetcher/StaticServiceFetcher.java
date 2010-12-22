@@ -28,14 +28,30 @@ public class StaticServiceFetcher implements IRequiredServiceFetcher
 		final Future ret = new Future();
 		if(result==null)
 		{
-			SServiceProvider.getService(provider, info.getType()).addResultListener(new DelegationResultListener(ret)
+			if(info.isDeclared())
 			{
-				public void customResultAvailable(Object source, Object result)
+				SServiceProvider.getDeclaredService(provider, info.getType())
+					.addResultListener(new DelegationResultListener(ret)
 				{
-					StaticServiceFetcher.this.result = result;
-					super.customResultAvailable(source, result);
-				}
-			});
+					public void customResultAvailable(Object source, Object result)
+					{
+						StaticServiceFetcher.this.result = result;
+						super.customResultAvailable(source, result);
+					}
+				});
+			}
+			else
+			{
+				SServiceProvider.getService(provider, info.getType(), info.isRemote(), info.isForced())
+					.addResultListener(new DelegationResultListener(ret)
+				{
+					public void customResultAvailable(Object source, Object result)
+					{
+						StaticServiceFetcher.this.result = result;
+						super.customResultAvailable(source, result);
+					}
+				});
+			}
 		}
 		else
 		{
@@ -52,14 +68,31 @@ public class StaticServiceFetcher implements IRequiredServiceFetcher
 		final Future ret = new Future();
 		if(result==null)
 		{
-			SServiceProvider.getServices(provider, info.getType()).addResultListener(new DelegationResultListener(ret)
+//			System.out.println("static: "+info.getType()+" "+info.isForced());
+			if(info.isDeclared())
 			{
-				public void customResultAvailable(Object source, Object result)
+				SServiceProvider.getDeclaredServices(provider, info.getType())
+					.addResultListener(new DelegationResultListener(ret)
 				{
-					StaticServiceFetcher.this.result = result;
-					super.customResultAvailable(source, result);
-				}
-			});
+					public void customResultAvailable(Object source, Object result)
+					{
+						StaticServiceFetcher.this.result = result;
+						super.customResultAvailable(source, result);
+					}
+				});
+			}
+			else
+			{
+				SServiceProvider.getServices(provider, info.getType(), info.isRemote(), info.isForced())
+					.addResultListener(new DelegationResultListener(ret)
+				{
+					public void customResultAvailable(Object source, Object result)
+					{
+						StaticServiceFetcher.this.result = result;
+						super.customResultAvailable(source, result);
+					}
+				});
+			}
 		}
 		else
 		{

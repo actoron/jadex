@@ -24,6 +24,10 @@ public class RequiredServiceInfo
 
 	/** Flag to indicate if remote search should be performed. */
 	protected boolean remote;
+	
+	/** Flag to indicate only a declared (local) service should be used. */
+	protected boolean declared;
+
 		
 	//-------- constructors --------
 	
@@ -47,13 +51,31 @@ public class RequiredServiceInfo
 	 */
 	public RequiredServiceInfo(String name, Class type, boolean dynamic, boolean multiple)
 	{
-		this(name, type, false, false, false, false);
+		this(name, type, dynamic, multiple, false, false, false);
 	}
 	
 	/**
 	 *  Create a new service info.
 	 */
-	public RequiredServiceInfo(String name, Class type, boolean dynamic, boolean multiple, boolean forced, boolean remote)
+	public RequiredServiceInfo(String name, Class type, boolean dynamic, boolean multiple, boolean declared)
+	{
+		this(name, type, dynamic, multiple, false, false, declared);
+	}
+	
+	/**
+	 *  Create a new service info.
+	 */
+	public RequiredServiceInfo(String name, Class type, boolean dynamic, boolean multiple, 
+		boolean remote, boolean forced)
+	{
+		this(name, type, dynamic, multiple, remote, forced, false);
+	}
+	
+	/**
+	 *  Create a new service info.
+	 */
+	public RequiredServiceInfo(String name, Class type, boolean dynamic, boolean multiple, 
+		boolean remote, boolean forced, boolean declared)
 	{
 		this.name = name;
 		this.type = type;
@@ -61,6 +83,7 @@ public class RequiredServiceInfo
 		this.multiple = multiple;
 		this.forced = forced;
 		this.remote = remote;
+		this.declared = declared;
 	}
 
 	//-------- methods --------
@@ -173,4 +196,21 @@ public class RequiredServiceInfo
 		this.remote = remote;
 	}
 
+	/**
+	 *  Get the declared.
+	 *  @return the declared.
+	 */
+	public boolean isDeclared()
+	{
+		return declared;
+	}
+
+	/**
+	 *  Set the declared.
+	 *  @param declared The declared to set.
+	 */
+	public void setDeclared(boolean declared)
+	{
+		this.declared = declared;
+	}
 }
