@@ -402,16 +402,25 @@ public class AlarmSettingsDialog extends JDialog
 		if(alarm==null)
 		{
 			final Alarm al = new Alarm();
-			SServiceProvider.getService(agent.getServiceProvider(), IClockService.class)
-				.addResultListener(new SwingDefaultResultListener(AlarmSettingsDialog.this)
+			agent.scheduleStep(new IComponentStep()
 			{
-				public void customResultAvailable(Object source, Object result)
+				public Object execute(IInternalAccess ia)
 				{
-					IClockService cs = (IClockService)result;
-					al.setTime(new Time(new Date(cs.getTime())));
-					setAlarm(al);
+//					SServiceProvider.getService(agent.getServiceProvider(), IClockService.class)
+					ia.getRequiredService("clockservice")
+						.addResultListener(new SwingDefaultResultListener(AlarmSettingsDialog.this)
+					{
+						public void customResultAvailable(Object source, Object result)
+						{
+							IClockService cs = (IClockService)result;
+							al.setTime(new Time(new Date(cs.getTime())));
+							setAlarm(al);
+						}
+					});
+					return null;
 				}
 			});
+
 //			alarm.setClock((IClockService)agent.getServiceContainer().getService(IClockService.class));
 		}
 		else

@@ -331,19 +331,19 @@ public class OAVBDIMetaModel
 	public static OAVObjectType requiredservice_type;
 
 	/** Required service has dynamic flag. */
-	public static OAVObjectType requiredservice_has_dynamic;
+	public static OAVAttributeType requiredservice_has_dynamic;
 
 	/** Required service has multiple flag. */
-	public static OAVObjectType requiredservice_has_multiple;
+	public static OAVAttributeType requiredservice_has_multiple;
 
 	/** Required service has forced flag. */
-	public static OAVObjectType requiredservice_has_forced;
+	public static OAVAttributeType requiredservice_has_forced;
 
 	/** Required service has remote flag. */
-	public static OAVObjectType requiredservice_has_remote;
+	public static OAVAttributeType requiredservice_has_remote;
 
 	/** Required service has declared flag. */
-	public static OAVObjectType requiredservice_has_declared;
+	public static OAVAttributeType requiredservice_has_declared;
 	
 	
 //	/** Expression has parameters attribute. */
@@ -919,7 +919,8 @@ public class OAVBDIMetaModel
 		expression_type = bdimm_type_model.createType("mexpression", referenceableelement_type);
 		expressionreference_type = bdimm_type_model.createType("mexpressionreference", elementreference_type);
 		condition_type = bdimm_type_model.createType("mcondition", expression_type);
-		providedservice_type = bdimm_type_model.createType("mservice", expression_type);
+		providedservice_type = bdimm_type_model.createType("mprovidedservice", expression_type);
+		requiredservice_type = bdimm_type_model.createType("mrequiredservice", expression_type);
 //		relevantbelief_type = bdimm_type_model.createType("mrelevantbelief", expressionrelevant_type);
 //		relevantbeliefset_type = bdimm_type_model.createType("mrelevantbeliefset", expressionrelevant_type);
 //		relevantgoal_type = bdimm_type_model.createType("mrelevantgoal", expressionrelevant_type);
@@ -1007,8 +1008,13 @@ public class OAVBDIMetaModel
 		expression_has_classname = expression_type.createAttributeType("mexpression_has_classname", OAVJavaType.java_string_type, OAVAttributeType.NONE);
 		expression_has_class = expression_type.createAttributeType("mexpression_has_class", OAVJavaType.java_class_type, OAVAttributeType.NONE, Object.class);
 
-		providedservice_has_direct = providedservice_type.createAttributeType("mservice_has_direct", OAVJavaType.java_boolean_type, OAVAttributeType.NONE, Boolean.FALSE);
+		providedservice_has_direct = providedservice_type.createAttributeType("mprovidedservice_has_direct", OAVJavaType.java_boolean_type, OAVAttributeType.NONE, Boolean.FALSE);
 
+		requiredservice_has_dynamic = requiredservice_type.createAttributeType("mrequiredservice_has_dynamic", OAVJavaType.java_boolean_type, OAVAttributeType.NONE, Boolean.FALSE);
+		requiredservice_has_multiple = requiredservice_type.createAttributeType("mrequiredservice_has_multiple", OAVJavaType.java_boolean_type, OAVAttributeType.NONE, Boolean.FALSE);
+		requiredservice_has_forced = requiredservice_type.createAttributeType("mrequiredservice_has_forced", OAVJavaType.java_boolean_type, OAVAttributeType.NONE, Boolean.FALSE);
+		requiredservice_has_remote = requiredservice_type.createAttributeType("mrequiredservice_has_remote", OAVJavaType.java_boolean_type, OAVAttributeType.NONE, Boolean.FALSE);
+		requiredservice_has_declared = requiredservice_type.createAttributeType("mrequiredservice_has_declared", OAVJavaType.java_boolean_type, OAVAttributeType.NONE, Boolean.FALSE);
 		
 //		expression_has_class = expression_type.createAttributeType("mexpression_has_class", OAVJavaType.java_class_type);
 //		expression_has_parameters = expression_type.createAttributeType("mexpression_has_parameters",  expressionparameter_type, OAVAttributeType.LIST);

@@ -80,148 +80,157 @@ public class AlarmsGui extends JFrame
 		tadata.setColumnClass(Boolean.class, 2);
 		tadata.setColumnEditable(true, 2);
 		
-		SServiceProvider.getService(agent.getServiceProvider(), IClockService.class)
-			.addResultListener(new SwingDefaultResultListener(AlarmsGui.this)
+		agent.scheduleStep(new IComponentStep()
 		{
-			public void customResultAvailable(Object source, Object result)
+			public Object execute(IInternalAccess ia)
 			{
-				final IClockService cs = (IClockService)result;
-				alarms = new JTable(tadata)
+//				SServiceProvider.getService(agent.getServiceProvider(), IClockService.class)
+				ia.getRequiredService("clockservice")
+					.addResultListener(new SwingDefaultResultListener(AlarmsGui.this)
 				{
-					public Component prepareRenderer(
-						TableCellRenderer renderer, int row, int column)
+					public void customResultAvailable(Object source, Object result)
 					{
-						Component c = super.prepareRenderer(renderer, row, column);
-
-						if(!isRowSelected(row))
+						final IClockService cs = (IClockService)result;
+						alarms = new JTable(tadata)
 						{
-							Alarm alarm = (Alarm)tadata.getObjectForRow(row);
-//							IClockService cs = (IClockService)agent.getServiceContainer().getService(IClockService.class);
-							if(alarm.getAlarmtime(cs.getTime())<cs.getTime())
+							public Component prepareRenderer(
+								TableCellRenderer renderer, int row, int column)
 							{
-								c.setBackground(new Color(255, 211, 156));
-							}
-							else
-							{
-								c.setBackground(AlarmsGui.this.alarms.getBackground());
-							}
-						}
-
-						//if(isRowSelected(row) && isColumnSelected(column))
-						//	((JComponent)c).setBorder(new LineBorder(Color.red));
-
-						return c;
-					}
-
-				};
-				alarms.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-				JScrollPane	scroll	= new JScrollPane(alarms);
-				alarms.setPreferredScrollableViewportSize(new Dimension(400, 200)); // todo: hack
-
-				JButton add = new JButton("Add...");
-				JButton edit = new JButton("Edit...");
-				JButton remove = new JButton("Remove");
-				Dimension md = remove.getMinimumSize();
-				Dimension pd = remove.getPreferredSize();
-				add.setMinimumSize(md);
-				add.setPreferredSize(pd);
-				edit.setMinimumSize(md);
-				edit.setPreferredSize(pd);
-
-				JPanel pan = new JPanel(new GridBagLayout());
-				pan.add(scroll, new GridBagConstraints(0,0,3,1,1,1,GridBagConstraints.NORTHEAST,
-					GridBagConstraints.BOTH, new Insets(4,2,2,4),0,0));
-				pan.add(add, new GridBagConstraints(0,1,1,1,1,0,GridBagConstraints.NORTHEAST,
-					GridBagConstraints.NONE, new Insets(4,2,2,4),0,0));
-				pan.add(edit, new GridBagConstraints(1,1,1,1,0,0,GridBagConstraints.NORTHEAST,
-					GridBagConstraints.NONE, new Insets(4,2,2,4),0,0));
-				pan.add(remove, new GridBagConstraints(2,1,1,1,0,0,GridBagConstraints.NORTHEAST,
-					GridBagConstraints.NONE, new Insets(4,2,2,4),0,0));
-
-				alarms.addMouseListener(new MouseAdapter()
-				{
-					public void mouseClicked(MouseEvent e)
-					{
-						if(e.getClickCount()==2)
-							handleEdit(alarms, alarms.rowAtPoint(e.getPoint()), agent);
-					}
-				});
-				add.addActionListener(new ActionListener()
-				{
-					public void actionPerformed(ActionEvent e)
-					{
-						Alarm alarm = AlarmSettingsDialog.showDialog(agent, AlarmsGui.this, null);
-						if(alarm!=null && agent!=null)
-							addRow(alarm, tadata.getRowCount());
-					}
-				});
-				edit.addActionListener(new ActionListener()
-				{
-					public void actionPerformed(ActionEvent e)
-					{
-						handleEdit(alarms, alarms.getSelectedRow(), agent);
-					}
-				});
-				remove.addActionListener(new ActionListener()
-				{
-					public void actionPerformed(ActionEvent e)
-					{
-						int sel = alarms.getSelectedRow();
-						if(sel!=-1)
-						{
-							Alarm alarm = (Alarm)tadata.getObjectForRow(sel);
-							removeRow(alarm);
-						}
-					}
-				});
-
-//				SwingUtilities.invokeLater(new Runnable()
-//				{
-//					public void run()
-//					{
-						agent.scheduleStep(new IComponentStep()
-						{
-							public static final String XML_CLASSNAME = "alarms"; 
-							public Object execute(IInternalAccess ia)
-							{
-								IBDIInternalAccess bia = (IBDIInternalAccess)ia;
-								final Alarm[] alarms = (Alarm[])bia.getBeliefbase().getBeliefSet("alarms").getFacts();
-								SwingUtilities.invokeLater(new Runnable()
+								Component c = super.prepareRenderer(renderer, row, column);
+	
+								if(!isRowSelected(row))
 								{
-									public void run()
+									Alarm alarm = (Alarm)tadata.getObjectForRow(row);
+	//								IClockService cs = (IClockService)agent.getServiceContainer().getService(IClockService.class);
+									if(alarm.getAlarmtime(cs.getTime())<cs.getTime())
 									{
-										for(int i=0; i<alarms.length; i++)
-										{
-											// Cannot use add row as beliefset already contains alarm.
-											tadata.addRow(new Object[]{alarms[i].getMessage(), alarms[i].getMode(),
-												new Boolean(alarms[i].isActive())}, alarms[i]);
-											alarms[i].addPropertyChangeListener(plis);
-										}
+										c.setBackground(new Color(255, 211, 156));
 									}
-								});
-								return null;
+									else
+									{
+										c.setBackground(AlarmsGui.this.alarms.getBackground());
+									}
+								}
+	
+								//if(isRowSelected(row) && isColumnSelected(column))
+								//	((JComponent)c).setBorder(new LineBorder(Color.red));
+	
+								return c;
+							}
+	
+						};
+						alarms.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+						JScrollPane	scroll	= new JScrollPane(alarms);
+						alarms.setPreferredScrollableViewportSize(new Dimension(400, 200)); // todo: hack
+	
+						JButton add = new JButton("Add...");
+						JButton edit = new JButton("Edit...");
+						JButton remove = new JButton("Remove");
+						Dimension md = remove.getMinimumSize();
+						Dimension pd = remove.getPreferredSize();
+						add.setMinimumSize(md);
+						add.setPreferredSize(pd);
+						edit.setMinimumSize(md);
+						edit.setPreferredSize(pd);
+	
+						JPanel pan = new JPanel(new GridBagLayout());
+						pan.add(scroll, new GridBagConstraints(0,0,3,1,1,1,GridBagConstraints.NORTHEAST,
+							GridBagConstraints.BOTH, new Insets(4,2,2,4),0,0));
+						pan.add(add, new GridBagConstraints(0,1,1,1,1,0,GridBagConstraints.NORTHEAST,
+							GridBagConstraints.NONE, new Insets(4,2,2,4),0,0));
+						pan.add(edit, new GridBagConstraints(1,1,1,1,0,0,GridBagConstraints.NORTHEAST,
+							GridBagConstraints.NONE, new Insets(4,2,2,4),0,0));
+						pan.add(remove, new GridBagConstraints(2,1,1,1,0,0,GridBagConstraints.NORTHEAST,
+							GridBagConstraints.NONE, new Insets(4,2,2,4),0,0));
+	
+						alarms.addMouseListener(new MouseAdapter()
+						{
+							public void mouseClicked(MouseEvent e)
+							{
+								if(e.getClickCount()==2)
+									handleEdit(alarms, alarms.rowAtPoint(e.getPoint()), agent);
 							}
 						});
-//						agent.getBeliefbase().getBeliefSetFacts("alarms").addResultListener(new SwingDefaultResultListener(AlarmsGui.this)
-//						{
-//							public void customResultAvailable(Object source, Object result)
-//							{
-//								Alarm[] alarms = (Alarm[])result;
-//								for(int i=0; i<alarms.length; i++)
-//								{
-//									// Cannot use add row as beliefset already contains alarm.
-//									tadata.addRow(new Object[]{alarms[i].getMessage(), alarms[i].getMode(),
-//										new Boolean(alarms[i].isActive())}, alarms[i]);
-//									alarms[i].addPropertyChangeListener(plis);
-//								}
-//							}
-//						});
-//					}
-//				});
-				getContentPane().add("Center", pan);
-				pack();
+						add.addActionListener(new ActionListener()
+						{
+							public void actionPerformed(ActionEvent e)
+							{
+								Alarm alarm = AlarmSettingsDialog.showDialog(agent, AlarmsGui.this, null);
+								if(alarm!=null && agent!=null)
+									addRow(alarm, tadata.getRowCount());
+							}
+						});
+						edit.addActionListener(new ActionListener()
+						{
+							public void actionPerformed(ActionEvent e)
+							{
+								handleEdit(alarms, alarms.getSelectedRow(), agent);
+							}
+						});
+						remove.addActionListener(new ActionListener()
+						{
+							public void actionPerformed(ActionEvent e)
+							{
+								int sel = alarms.getSelectedRow();
+								if(sel!=-1)
+								{
+									Alarm alarm = (Alarm)tadata.getObjectForRow(sel);
+									removeRow(alarm);
+								}
+							}
+						});
+	
+	//					SwingUtilities.invokeLater(new Runnable()
+	//					{
+	//						public void run()
+	//						{
+								agent.scheduleStep(new IComponentStep()
+								{
+									public static final String XML_CLASSNAME = "alarms"; 
+									public Object execute(IInternalAccess ia)
+									{
+										IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+										final Alarm[] alarms = (Alarm[])bia.getBeliefbase().getBeliefSet("alarms").getFacts();
+										SwingUtilities.invokeLater(new Runnable()
+										{
+											public void run()
+											{
+												for(int i=0; i<alarms.length; i++)
+												{
+													// Cannot use add row as beliefset already contains alarm.
+													tadata.addRow(new Object[]{alarms[i].getMessage(), alarms[i].getMode(),
+														new Boolean(alarms[i].isActive())}, alarms[i]);
+													alarms[i].addPropertyChangeListener(plis);
+												}
+											}
+										});
+										return null;
+									}
+								});
+	//							agent.getBeliefbase().getBeliefSetFacts("alarms").addResultListener(new SwingDefaultResultListener(AlarmsGui.this)
+	//							{
+	//								public void customResultAvailable(Object source, Object result)
+	//								{
+	//									Alarm[] alarms = (Alarm[])result;
+	//									for(int i=0; i<alarms.length; i++)
+	//									{
+	//										// Cannot use add row as beliefset already contains alarm.
+	//										tadata.addRow(new Object[]{alarms[i].getMessage(), alarms[i].getMode(),
+	//											new Boolean(alarms[i].isActive())}, alarms[i]);
+	//										alarms[i].addPropertyChangeListener(plis);
+	//									}
+	//								}
+	//							});
+	//						}
+	//					});
+						getContentPane().add("Center", pan);
+						pack();
+					}
+				});
+				return null;
 			}
 		});
+		
 		
 	}
 

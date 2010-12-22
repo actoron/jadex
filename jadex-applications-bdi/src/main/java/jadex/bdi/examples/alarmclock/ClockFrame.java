@@ -391,7 +391,8 @@ public class ClockFrame extends JFrame
 				{
 					IBDIInternalAccess bia = (IBDIInternalAccess)ia;
 					final Settings sets = (Settings)bia.getBeliefbase().getBelief("settings").getFact();
-					SServiceProvider.getService(agent.getServiceProvider(), IClockService.class)
+//					SServiceProvider.getService(agent.getServiceProvider(), IClockService.class)
+					ia.getRequiredService("clockservice")
 						.addResultListener(new SwingDefaultResultListener(ClockFrame.this)
 					{
 						public void customResultAvailable(Object source, Object result)

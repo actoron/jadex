@@ -261,7 +261,7 @@ public class OAVBDIXMLReader
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "condition")), new ObjectInfo(OAVBDIMetaModel.condition_type, expost),
 			new MappingInfo(null, null, OAVBDIMetaModel.expression_has_text)));
 		
-		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "requiredservice")), new ObjectInfo(OAVBDIMetaModel.expression_type, expost),
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "requiredservice")), new ObjectInfo(OAVBDIMetaModel.requiredservice_type, expost),
 			new MappingInfo(ti_expression)));
 		
 		TypeInfo ti_service = new TypeInfo(new XMLInfo(new QName(uri, "providedservice")), new ObjectInfo(OAVBDIMetaModel.providedservice_type, expost), 

@@ -14,6 +14,7 @@
 		<import>java.util.*</import>
 		<import>jadex.bridge.*</import>
 		<import>jadex.commons.service.clock.IClockService</import>
+		<import>jadex.commons.service.threadpool.IThreadPoolService</import>
 	</imports>
 
 	<capabilities>
@@ -119,6 +120,11 @@
 		</plan>
 	</plans>
 
+	<services>
+		<requiredservice name="clockservice" class="IClockService"/>
+		<requiredservice name="tpservice" class="IThreadPoolService"/>
+	</services>
+	
 	<properties>
 		<!-- <property name="logging.level">java.util.logging.Level.INFO</property> -->
 		<property name="debugging">false</property>

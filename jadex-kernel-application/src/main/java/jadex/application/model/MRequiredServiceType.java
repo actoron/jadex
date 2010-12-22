@@ -71,6 +71,59 @@ public class MRequiredServiceType extends MExpressionType
 	{
 		this.multiple = multiple;
 	}
-	
+
+	/**
+	 *  Get the forced.
+	 *  @return the forced.
+	 */
+	public boolean isForced()
+	{
+		return forced;
+	}
+
+	/**
+	 *  Set the forced.
+	 *  @param forced The forced to set.
+	 */
+	public void setForced(boolean forced)
+	{
+		this.forced = forced;
+	}
+
+	/**
+	 *  Get the remote.
+	 *  @return the remote.
+	 */
+	public boolean isRemote()
+	{
+		return remote;
+	}
+
+	/**
+	 *  Set the remote.
+	 *  @param remote The remote to set.
+	 */
+	public void setRemote(boolean remote)
+	{
+		this.remote = remote;
+	}
+
+	/**
+	 *  Get the declared.
+	 *  @return the declared.
+	 */
+	public boolean isDeclared()
+	{
+		return declared;
+	}
+
+	/**
+	 *  Set the declared.
+	 *  @param declared The declared to set.
+	 */
+	public void setDeclared(boolean declared)
+	{
+		this.declared = declared;
+	}
 }
 

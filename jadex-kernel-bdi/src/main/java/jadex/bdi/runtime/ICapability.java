@@ -1,11 +1,14 @@
 package jadex.bdi.runtime;
 
+import jadex.bdi.runtime.impl.flyweights.ElementFlyweight.AgentInvocation;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentListener;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IModelInfo;
+import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.service.IServiceProvider;
+import jadex.commons.service.RequiredServiceInfo;
 
 import java.util.logging.Logger;
 
@@ -171,4 +174,16 @@ public interface ICapability	extends IElement
 	 *  @return The capability.
 	 */
 	public ICapability	getSubcapability(String name);
+	
+	/**
+	 *  Get a required service.
+	 *  @return The service.
+	 */
+	public IFuture getRequiredService(final String name);
+	
+	/**
+	 *  Get a required services.
+	 *  @return The services.
+	 */
+	public IFuture getRequiredServices(final String name);
 }

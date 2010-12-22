@@ -220,7 +220,8 @@ public class MApplicationType extends MStartable implements ICacheableModel
 			for(int i=0; i<reqs.size(); i++)
 			{
 				MRequiredServiceType ser = (MRequiredServiceType)reqs.get(i);
-				tmp[i] = new RequiredServiceInfo(ser.getName(), ser.getClazz(), ser.isDynamic(), ser.isMultiple());
+				tmp[i] = new RequiredServiceInfo(ser.getName(), ser.getClazz(), ser.isDynamic(), 
+					ser.isMultiple(), ser.isRemote(), ser.isForced(), ser.isDeclared());
 			}
 			
 			modelinfo.setRequiredServices(tmp);
