@@ -321,12 +321,30 @@ public class OAVBDIMetaModel
 
 	//-------- service --------
 	
-	/** The expression type. */
+	/** The provided service type. */
 	public static OAVObjectType providedservice_type;
 	
-	/** Service has direct attribute. */
+	/** Provided service has direct attribute. */
 	public static OAVAttributeType providedservice_has_direct;
 
+	/** The required service type. */
+	public static OAVObjectType requiredservice_type;
+
+	/** Required service has dynamic flag. */
+	public static OAVObjectType requiredservice_has_dynamic;
+
+	/** Required service has multiple flag. */
+	public static OAVObjectType requiredservice_has_multiple;
+
+	/** Required service has forced flag. */
+	public static OAVObjectType requiredservice_has_forced;
+
+	/** Required service has remote flag. */
+	public static OAVObjectType requiredservice_has_remote;
+
+	/** Required service has declared flag. */
+	public static OAVObjectType requiredservice_has_declared;
+	
 	
 //	/** Expression has parameters attribute. */
 //	public static OAVAttributeType expression_has_parameters;

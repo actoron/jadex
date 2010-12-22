@@ -13,6 +13,15 @@ public class MRequiredServiceType extends MExpressionType
 	/** Flag if multiple services should be returned. */
 	protected boolean multiple;
 
+	/** Flag if search is forced. */
+	protected boolean forced;
+	
+	/** Flag if search is forced. */
+	protected boolean remote;
+	
+	/** Flag if search is declared. */
+	protected boolean declared;
+	
 	//-------- constructors --------
 
 	/**
