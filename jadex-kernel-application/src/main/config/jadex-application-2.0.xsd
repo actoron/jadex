@@ -296,7 +296,13 @@
 		<xs:annotation>
 			<xs:documentation>Defines a required service type.</xs:documentation>
 		</xs:annotation>
+		<xs:attribute name="name" type="xs:string" use="required"/>
 		<xs:attribute name="class" type="xs:string" use="required"/>
+		<xs:attribute name="dynamic" type="xs:boolean" use="optional" default="false"/>
+		<xs:attribute name="multiple" type="xs:boolean" use="optional" default="false"/>
+		<xs:attribute name="forced" type="xs:boolean" use="optional" default="false"/>
+		<xs:attribute name="remote" type="xs:boolean" use="optional" default="false"/>
+		<xs:attribute name="declared" type="xs:boolean" use="optional" default="false"/>
 	</xs:complexType>
 	<xs:complexType name="startabletype">
 		<xs:attribute name="suspend" type="xs:boolean" use="optional" default="false"/>
