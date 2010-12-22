@@ -616,7 +616,7 @@
 							<xs:documentation>The trigger is used to determine when a plan is applicable for a given event or goal.</xs:documentation>
 						</xs:annotation>
 					</xs:element>
-					<xs:element name="precondition" type="MStaticValue" minOccurs="0">
+					<xs:element name="precondition" type="MInternalExpression" minOccurs="0">
 						<xs:annotation>
 							<xs:documentation>Only when the precondition holds a plan can be selected for execution. During the execution of the plan the precondition is not checked any more.</xs:documentation>
 						</xs:annotation>
@@ -975,6 +975,37 @@
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>
+	<xs:complexType name="MInternalExpression" mixed="true">
+		<xs:annotation>
+			<xs:documentation>A piece a program code that is evaluated.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent mixed="true">
+			<xs:extension base="MElementNoName">
+				<xs:attribute name="class" type="xs:string" use="optional">
+					<xs:annotation>
+						<xs:documentation>
+																									The
+																									required
+																									Java
+																									class
+																									of
+																									the
+																									expression.
+																									Used
+																									for
+																									type
+																									checking
+																									the
+																									evaluation
+																									result.
+																					</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name="language" type="xs:string" use="optional"/>
+				<xs:attribute name="variable" type="xs:string" use="optional"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
 	<xs:complexType name="MExpressionParameter">
 		<xs:annotation>
 			<xs:documentation>A user-defined parameter for an expression, e.g. for parametrized queries.</xs:documentation>
@@ -987,17 +1018,6 @@
 					</xs:annotation>
 				</xs:attribute>
 			</xs:extension>
-		</xs:complexContent>
-	</xs:complexType>
-	<xs:complexType name="MInternalExpression" mixed="true">
-		<xs:annotation>
-			<xs:documentation>For expressions that are not conatined in the expressionbase. Cannot be exported.</xs:documentation>
-		</xs:annotation>
-		<xs:complexContent mixed="true">
-			<xs:restriction base="MExpression">
-				<xs:attribute name="exported" use="prohibited"/>
-				<xs:attribute name="name" use="prohibited"/>
-			</xs:restriction>
 		</xs:complexContent>
 	</xs:complexType>
 	<xs:complexType name="MCondition" mixed="true">
@@ -1013,11 +1033,7 @@
 			<xs:documentation>For conditions that are not conatined in the expressionbase. Cannot be exported.</xs:documentation>
 		</xs:annotation>
 		<xs:complexContent mixed="true">
-			<xs:restriction base="MCondition">
-				<xs:attribute name="exported" use="prohibited"/>
-				<xs:attribute name="class" use="prohibited"/>
-				<xs:attribute name="name" use="prohibited"/>
-			</xs:restriction>
+			<xs:extension base="MInternalExpression"/>
 		</xs:complexContent>
 	</xs:complexType>
 	<xs:complexType name="MCapabilityReference">
@@ -1180,7 +1196,7 @@
 							</xs:annotation>
 						</xs:element>
 					</xs:choice>
-					<xs:element name="filter" type="MStaticValue" minOccurs="0">
+					<xs:element name="filter" type="MInternalExpression" minOccurs="0">
 						<xs:annotation>
 							<xs:documentation>
 								Deprecated. Can be used to specify an
@@ -1218,7 +1234,7 @@
 		<xs:complexContent>
 			<xs:extension base="MElement">
 				<xs:choice>
-					<xs:element name="value" type="MStaticValue">
+					<xs:element name="value" type="MInternalExpression">
 						<xs:annotation>
 							<xs:documentation>The value is matched against the parameter value of the event/goal.</xs:documentation>
 						</xs:annotation>
@@ -1681,7 +1697,7 @@
 		<xs:complexContent>
 			<xs:extension base="MConfigReferenceableElement">
 				<xs:choice>
-					<xs:element name="fact" type="MStaticValue" maxOccurs="unbounded">
+					<xs:element name="fact" type="MInternalExpression" maxOccurs="unbounded">
 						<xs:annotation>
 							<xs:documentation>An expression that is once evaluated to the initial belief value.</xs:documentation>
 						</xs:annotation>
@@ -1836,7 +1852,7 @@
 		<xs:complexContent>
 			<xs:extension base="MConfigReferenceableElement">
 				<xs:choice>
-					<xs:element name="value" type="MStaticValue" maxOccurs="unbounded">
+					<xs:element name="value" type="MInternalExpression" maxOccurs="unbounded">
 						<xs:annotation>
 							<xs:documentation>An expression that evaluates to a single value.</xs:documentation>
 						</xs:annotation>
