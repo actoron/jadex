@@ -13,16 +13,14 @@ import jadex.bridge.IMessageService;
 import jadex.bridge.IModelInfo;
 import jadex.bridge.MessageType;
 import jadex.commons.Future;
-import jadex.commons.ICommand;
 import jadex.commons.IFuture;
 import jadex.commons.IIntermediateFuture;
-import jadex.commons.IResultCommand;
+import jadex.commons.IntermediateFuture;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.service.CacheServiceContainer;
 import jadex.commons.service.IInternalService;
-import jadex.commons.service.IService;
 import jadex.commons.service.IServiceContainer;
 import jadex.commons.service.IServiceIdentifier;
 import jadex.commons.service.IServiceProvider;
@@ -619,7 +617,7 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 		RequiredServiceInfo info = getModel().getRequiredService(name);
 		if(info==null)
 		{
-			Future ret = new Future();
+			IntermediateFuture ret = new IntermediateFuture();
 			ret.setException(new ServiceNotFoundException(name));
 			return ret;
 		}

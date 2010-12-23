@@ -1,6 +1,7 @@
 package jadex.micro.examples.helpline;
 
 import jadex.commons.IFuture;
+import jadex.commons.IIntermediateFuture;
 
 /**
  *  Basic interface for helpline.
@@ -14,7 +15,7 @@ public interface IHelpline
 	 *  @param name The person's name.
 	 *  @return Future that contains all information records as collection.
 	 */
-	public IFuture getInformation(String name);
+	public IIntermediateFuture getInformation(String name);
 	
 	/**
 	 *  Add an information about a person.

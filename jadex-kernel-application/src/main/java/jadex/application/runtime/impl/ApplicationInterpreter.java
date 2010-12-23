@@ -34,6 +34,7 @@ import jadex.commons.ChangeEvent;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.IIntermediateFuture;
+import jadex.commons.IntermediateFuture;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.collection.MultiCollection;
@@ -1522,7 +1523,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 		RequiredServiceInfo info = getModel().getRequiredService(name);
 		if(info==null)
 		{
-			Future ret = new Future();
+			IntermediateFuture ret = new IntermediateFuture();
 			ret.setException(new ServiceNotFoundException(name));
 			return ret;
 		}

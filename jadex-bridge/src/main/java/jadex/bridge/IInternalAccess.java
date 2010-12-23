@@ -1,13 +1,11 @@
 package jadex.bridge;
 
-import java.util.logging.Logger;
-
-import jadex.commons.Future;
 import jadex.commons.IFuture;
+import jadex.commons.IIntermediateFuture;
 import jadex.commons.concurrent.IResultListener;
-import jadex.commons.service.IRequiredServiceFetcher;
 import jadex.commons.service.IServiceProvider;
-import jadex.commons.service.RequiredServiceInfo;
+
+import java.util.logging.Logger;
 
 /**
  *  Common interface for all component types. Is used when
@@ -79,7 +77,7 @@ public interface IInternalAccess
 	 *  Get a required services.
 	 *  @return The services.
 	 */
-	public IFuture getRequiredServices(String name);
+	public IIntermediateFuture getRequiredServices(String name);
 	
 	/**
 	 *  Add an component listener.

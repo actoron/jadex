@@ -22,6 +22,7 @@ import jadex.bridge.IModelInfo;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.IIntermediateFuture;
+import jadex.commons.IntermediateFuture;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.service.IServiceProvider;
@@ -830,7 +831,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 					RequiredServiceInfo info = getInterpreter().getModel().getModelInfo().getRequiredService(name);
 					if(info==null)
 					{
-						Future ret = new Future();
+						IntermediateFuture ret = new IntermediateFuture();
 						ret.setException(new IllegalArgumentException("Info must not null."));
 						object = ret;
 					}
@@ -840,15 +841,15 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 					}
 				}
 			};
-			return (IFuture)invoc.object;
+			return (IIntermediateFuture)invoc.object;
 		}
 		else
 		{
-			IFuture ret;
+			IIntermediateFuture ret;
 			RequiredServiceInfo info = getInterpreter().getModel().getModelInfo().getRequiredService(name);
 			if(info==null)
 			{
-				Future fut = new Future();
+				IntermediateFuture fut = new IntermediateFuture();
 				fut.setException(new IllegalArgumentException("Info must not null."));
 				ret = fut;
 			}
