@@ -56,6 +56,11 @@
 		</plan>
 	</plans>
 	
+	<services>
+		<requiredservice name="localshopservices" class="IShop" remote="true" forced="true"/>
+		<requiredservice name="remoteshopservices" class="IShop" remote="false" forced="true"/>
+	</services>
+	
 	<properties>
 		<property name="componentviewer.viewerclass">"jadex.bdi.examples.shop.CustomerViewerPanel"</property>
 		<property name="logging.level">java.util.logging.Level.SEVERE</property>

@@ -9,8 +9,12 @@ import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IGoalListener;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.commons.Future;
+import jadex.commons.IFuture;
 import jadex.commons.SGUI;
 import jadex.commons.SUtil;
+import jadex.commons.concurrent.DelegationResultListener;
+import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.commons.service.SServiceProvider;
 
@@ -100,8 +104,28 @@ public class CustomerPanel extends JPanel
 		    public void actionPerformed(ActionEvent e)
 		    {
 		    	searchbut.setEnabled(false);
-		    	SServiceProvider.getServices(agent.getServiceProvider(), IShop.class, remote.isSelected(), true)
-					.addResultListener(new SwingDefaultResultListener(CustomerPanel.this)
+		    	
+//		    	SServiceProvider.getServices(agent.getServiceProvider(), IShop.class, remote.isSelected(), true)
+				IFuture ret = agent.scheduleStep(new IComponentStep()
+				{
+					public Object execute(IInternalAccess ia)
+					{
+						Future ret = new Future();
+						if(remote.isSelected())
+						{
+							ia.getRequiredServices("remoteshopservices")
+								.addResultListener(new DelegationResultListener(ret));
+						}
+						else
+						{
+							ia.getRequiredServices("localshopservices")
+								.addResultListener(new DelegationResultListener(ret));
+						}
+						return ret;
+					}
+				});
+				
+				ret.addResultListener(new SwingDefaultResultListener(CustomerPanel.this)
 				{
 					public void customResultAvailable(Object source, Object result)
 					{

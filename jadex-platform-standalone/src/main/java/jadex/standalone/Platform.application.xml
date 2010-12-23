@@ -82,7 +82,7 @@
 			//	new String[]{"isIdle", "getTasks"}}))
 		</providedservice>
 		<providedservice class="ILibraryService" direct="true">
-			new LibraryService($args.libpath, $component.getComponentIdentifier(), 
+			new LibraryService($args.libpath, $component.getServiceProvider(), 
 				SUtil.createHashMap(new Object[]{"componentviewer.viewerclass", RemoteServiceManagementService.REMOTE_EXCLUDED}, 
 				new Object[]{"jadex.base.gui.componentviewer.libservice.LibServiceBrowser", new String[]{"getClassLoader"}})
 				)

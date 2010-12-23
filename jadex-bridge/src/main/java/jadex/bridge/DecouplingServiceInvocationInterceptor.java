@@ -70,7 +70,9 @@ public class DecouplingServiceInvocationInterceptor implements IServiceInvocatio
 				}
 				else
 				{
+					e.printStackTrace();
 					throw new RuntimeException(e);
+					
 				}
 			}
 		}

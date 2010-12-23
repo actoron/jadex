@@ -2,11 +2,15 @@ package jadex.commons.service.library;
 
 import jadex.commons.Future;
 import jadex.commons.IFuture;
+import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.service.BasicService;
+import jadex.commons.service.IServiceProvider;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.ObjectOutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -25,26 +29,29 @@ public class LibraryService extends BasicService implements ILibraryService
 {
 	//-------- attributes --------
 	
+	/** The provider. */
+	protected IServiceProvider provider;
+	
 	/** LibraryService listeners. */
-	private Set listeners;
+	protected Set listeners;
 
 	/** The initial parent ClassLoader. */
-	private ClassLoader basecl;
+	protected ClassLoader basecl;
 	
 	/** The urls. */
-	private List urls;
+	protected List urls;
 
 	/** Current ClassLoader. */
-	private ClassLoader	libcl;
+	protected ClassLoader	libcl;
 
 	//-------- constructors --------
 	
 	/** 
 	 *  Creates a new LibraryService.
 	 */ 
-	public LibraryService(Object providerid)
+	public LibraryService(IServiceProvider provider)
 	{
-		this(null, providerid);
+		this(null, provider);
 	}
 	
 	/** 
@@ -53,9 +60,9 @@ public class LibraryService extends BasicService implements ILibraryService
 	 *  	Strings are interpreted as relative files (relative to current directory),
 	 *  	absolute files or URLs (whatever can be found). 
 	 */ 
-	public LibraryService(Object[] urls, Object providerid)
+	public LibraryService(Object[] urls, IServiceProvider provider)
 	{
-		this(urls, providerid, null);
+		this(urls, provider, null);
 	}
 	
 	/** 
@@ -64,13 +71,14 @@ public class LibraryService extends BasicService implements ILibraryService
 	 *  	Strings are interpreted as relative files (relative to current directory),
 	 *  	absolute files or URLs (whatever can be found). 
 	 */ 
-	public LibraryService(Object[] urls, Object providerid, Map properties)
+	public LibraryService(Object[] urls, IServiceProvider provider, Map properties)
 	{
 		// Hack!!! Should not reference gui???
-		super(providerid, ILibraryService.class, properties);
+		super(provider.getId(), ILibraryService.class, properties);
 		
-		basecl = Thread.currentThread().getContextClassLoader();
-		libcl = basecl;
+		this.provider = provider;
+		this.basecl = Thread.currentThread().getContextClassLoader();
+		this.libcl = basecl;
 		
 		listeners	= Collections.synchronizedSet(new HashSet());
 		synchronized(this)
@@ -110,6 +118,7 @@ public class LibraryService extends BasicService implements ILibraryService
 		{
 			urls.add(url);
 			libcl = new URLClassLoader((URL[])urls.toArray(new URL[urls.size()]), basecl);
+//			libcl = new LibraryClassLoader((URL[])urls.toArray(new URL[urls.size()]), basecl, provider);
 			lis = (ILibraryServiceListener[])listeners.toArray(new ILibraryServiceListener[listeners.size()]);
 		}
 		
@@ -145,6 +154,7 @@ public class LibraryService extends BasicService implements ILibraryService
 		{
 			urls.remove(url);
 			libcl = new URLClassLoader((URL[])urls.toArray(new URL[urls.size()]), basecl);
+//			libcl = new LibraryClassLoader((URL[])urls.toArray(new URL[urls.size()]), basecl, provider);
 			lis = (ILibraryServiceListener[])listeners.toArray(new ILibraryServiceListener[listeners.size()]);
 		}
 		
@@ -474,6 +484,41 @@ public class LibraryService extends BasicService implements ILibraryService
 //		}
 //		
 //		return ret;
+	}
+	
+	/**
+	 *  Get a class definition.
+	 *  @param name The class name.
+	 *  @return The class definition as byte array.
+	 */
+	public IFuture getClassDefinition(String name)
+	{
+		Future ret = new Future();
+		
+		Class clazz = SReflect.findClass0(name, null, libcl);
+		if(clazz!=null)
+		{
+			try
+			{
+				ByteArrayOutputStream bos = new ByteArrayOutputStream();
+				ObjectOutputStream oos = new ObjectOutputStream(bos);
+				oos.writeObject(clazz);
+				oos.close();
+				bos.close();
+				byte[] data = bos.toByteArray();
+				ret.setResult(data);
+			}
+			catch(Exception e)
+			{
+				ret.setResult(null);
+			}
+		}
+		else
+		{
+			ret.setResult(null);
+		}
+		
+		return ret;
 	}
 }
 

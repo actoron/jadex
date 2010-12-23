@@ -33,7 +33,7 @@ public class ByteClassLoader extends ClassLoader
 	 */
 	public Class loadClass(String classname) throws ClassNotFoundException 
 	{
-		return (loadClass(classname, true));
+		return loadClass(classname, true);
 	}
 
 	/**

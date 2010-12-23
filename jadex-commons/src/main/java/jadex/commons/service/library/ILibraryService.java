@@ -68,6 +68,13 @@ public interface ILibraryService extends IService
 	 */
 	public IFuture getNonManagedURLStrings();
 	
+	/**
+	 *  Get a class definition.
+	 *  @param name The class name.
+	 *  @return The class definition as byte array.
+	 */
+	public IFuture getClassDefinition(String name);
+	
 	/** 
 	 *  Returns the current ClassLoader.
 	 *  @return the current ClassLoader
