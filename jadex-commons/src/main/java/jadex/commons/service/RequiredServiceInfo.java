@@ -27,6 +27,10 @@ public class RequiredServiceInfo
 	
 	/** Flag to indicate only a declared (local) service should be used. */
 	protected boolean declared;
+	
+	/** Flag to indicate that only upwards search should be used. */
+	protected boolean upwards;
+
 
 		
 	//-------- constructors --------
@@ -49,9 +53,17 @@ public class RequiredServiceInfo
 	/**
 	 *  Create a new service info.
 	 */
+	public RequiredServiceInfo(String name, Class type, boolean upwards)
+	{
+		this(name, type, false, false, false, false, false, upwards);
+	}
+	
+	/**
+	 *  Create a new service info.
+	 */
 	public RequiredServiceInfo(String name, Class type, boolean dynamic, boolean multiple)
 	{
-		this(name, type, dynamic, multiple, false, false, false);
+		this(name, type, dynamic, multiple, false, false, false, false);
 	}
 	
 	/**
@@ -59,7 +71,7 @@ public class RequiredServiceInfo
 	 */
 	public RequiredServiceInfo(String name, Class type, boolean dynamic, boolean multiple, boolean declared)
 	{
-		this(name, type, dynamic, multiple, false, false, declared);
+		this(name, type, dynamic, multiple, false, false, declared, false);
 	}
 	
 	/**
@@ -68,7 +80,7 @@ public class RequiredServiceInfo
 	public RequiredServiceInfo(String name, Class type, boolean dynamic, boolean multiple, 
 		boolean remote, boolean forced)
 	{
-		this(name, type, dynamic, multiple, remote, forced, false);
+		this(name, type, dynamic, multiple, remote, forced, false, false);
 	}
 	
 	/**
@@ -77,6 +89,15 @@ public class RequiredServiceInfo
 	public RequiredServiceInfo(String name, Class type, boolean dynamic, boolean multiple, 
 		boolean remote, boolean forced, boolean declared)
 	{
+		this(name, type, dynamic, multiple, remote, forced, false, false);
+	}
+	
+	/**
+	 *  Create a new service info.
+	 */
+	public RequiredServiceInfo(String name, Class type, boolean dynamic, boolean multiple, 
+		boolean remote, boolean forced, boolean declared, boolean upwards)
+	{
 		this.name = name;
 		this.type = type;
 		this.dynamic = dynamic;
@@ -84,6 +105,7 @@ public class RequiredServiceInfo
 		this.forced = forced;
 		this.remote = remote;
 		this.declared = declared;
+		this.upwards = upwards;
 	}
 
 	//-------- methods --------

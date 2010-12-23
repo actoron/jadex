@@ -6,6 +6,7 @@ import jadex.commons.Tuple;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -154,8 +155,8 @@ public class BasicResultSelector implements IResultSelector
 		}
 		else if(results.size()>0)
 		{
-			ret = new ArrayList();
-			ret.add(results.iterator().next());
+			Object o = results.iterator().next();
+			ret = Collections.singletonList(o);
 		}
 		return ret;
 	}

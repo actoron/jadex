@@ -88,7 +88,7 @@ public class ParallelSearchManager implements ISearchManager
 		{
 			public void resultAvailable(Object result)
 			{
-				Collection res = (Collection)selector.getResult(results);
+				Collection res = selector.getResult(results);
 //				if(res.size()>2 && res.iterator().next().getClass().toString().indexOf("Directory")!=-1)
 //					System.out.println("here: "+res.size());
 				ret.setResult(res);

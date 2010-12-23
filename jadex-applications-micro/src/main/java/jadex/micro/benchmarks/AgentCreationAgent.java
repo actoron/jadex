@@ -11,6 +11,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.commons.IFuture;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
+import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.clock.IClockService;
 import jadex.micro.IMicroExternalAccess;
@@ -39,7 +40,9 @@ public class AgentCreationAgent extends MicroAgent
 		
 		if(args.get("num")==null)
 		{
-			SServiceProvider.getService(getServiceProvider(), IClockService.class).addResultListener(new ComponentResultListener(new DefaultResultListener()
+//			SServiceProvider.getService(getServiceProvider(), IClockService.class)
+			getRequiredService("clockservice")
+				.addResultListener(new ComponentResultListener(new DefaultResultListener()
 			{
 				public void resultAvailable(Object result)
 				{
@@ -162,7 +165,8 @@ public class AgentCreationAgent extends MicroAgent
 	{
 		final String name = createPeerName(cnt, exta.getComponentIdentifier());
 //		System.out.println("Destroying peer: "+name);
-		SServiceProvider.getService(exta.getServiceProvider(), IComponentManagementService.class)
+//		SServiceProvider.getService(exta.getServiceProvider(), IComponentManagementService.class)
+		getRequiredService("cmsservice")	
 			.addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(final Object result)
@@ -219,7 +223,8 @@ public class AgentCreationAgent extends MicroAgent
 	protected void killLastPeer(final int max, final long killstarttime, final double dur, final double pera, 
 		final long omem, final double upera, final IMicroExternalAccess exta)
 	{
-		SServiceProvider.getService(exta.getServiceProvider(), IClockService.class)
+//		SServiceProvider.getService(exta.getServiceProvider(), IClockService.class)
+		getRequiredService("clockservice")
 			.addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(final Object result)
@@ -307,6 +312,9 @@ public class AgentCreationAgent extends MicroAgent
 				}
 				return ret;
 			}
-		}, new Argument("nested", "If true, each agent is created as a subcomponent of the previous agent.", "boolean", Boolean.FALSE)}, null, null, null);
+		}, new Argument("nested", "If true, each agent is created as a subcomponent of the previous agent.", "boolean", Boolean.FALSE)}, 
+		null, null, null, new RequiredServiceInfo[]{
+			new RequiredServiceInfo("clockservice", IClockService.class),
+			new RequiredServiceInfo("cmsservice", IComponentManagementService.class)}, null);
 	}
 }
