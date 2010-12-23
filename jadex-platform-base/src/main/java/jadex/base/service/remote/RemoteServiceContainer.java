@@ -5,6 +5,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IRemoteServiceManagementService;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
+import jadex.commons.IIntermediateFuture;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.service.BasicServiceContainer;
 import jadex.commons.service.IResultSelector;
@@ -51,7 +52,7 @@ public class RemoteServiceContainer extends BasicServiceContainer
 	 *  @param type The class.
 	 *  @return The corresponding services.
 	 */
-	public IFuture	getServices(final ISearchManager manager, final IVisitDecider decider, final IResultSelector selector, final Collection results)
+	public IIntermediateFuture	getServices(final ISearchManager manager, final IVisitDecider decider, final IResultSelector selector, final Collection results)
 	{
 		final Future ret = new Future();
 		

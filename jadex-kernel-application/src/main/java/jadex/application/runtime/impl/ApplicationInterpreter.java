@@ -33,6 +33,7 @@ import jadex.bridge.IModelInfo;
 import jadex.commons.ChangeEvent;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
+import jadex.commons.IIntermediateFuture;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.collection.MultiCollection;
@@ -1516,7 +1517,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 	 *  @param name The services name.
 	 *  @return The service.
 	 */
-	public IFuture getRequiredServices(String name)
+	public IIntermediateFuture getRequiredServices(String name)
 	{
 		RequiredServiceInfo info = getModel().getRequiredService(name);
 		if(info==null)

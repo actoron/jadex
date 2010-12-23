@@ -21,6 +21,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IModelInfo;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
+import jadex.commons.IIntermediateFuture;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.service.IServiceProvider;
@@ -818,7 +819,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	 *  Get a required services.
 	 *  @return The services.
 	 */
-	public IFuture getRequiredServices(final String name)
+	public IIntermediateFuture getRequiredServices(final String name)
 	{
 		if(getInterpreter().isExternalThread())
 		{

@@ -264,7 +264,7 @@ public class BasicServiceContainer implements  IServiceContainer
 	}
 	
 	/**
-	 *  Get a required services.
+	 *  Get required services.
 	 *  @return The services.
 	 */
 	public IFuture getRequiredServices(RequiredServiceInfo info)

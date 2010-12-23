@@ -4,6 +4,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
+import jadex.commons.IIntermediateFuture;
 import jadex.commons.SGUI;
 import jadex.commons.concurrent.CollectionResultListener;
 import jadex.commons.concurrent.DefaultResultListener;
@@ -244,7 +245,7 @@ public class HelplinePanel extends JPanel
 	 *  @param name The person's name.
 	 *  @return Future that contains the information.
 	 */
-	public IFuture getInformation(final String name, final boolean remote)
+	public IIntermediateFuture getInformation(final String name, final boolean remote)
 	{
 //		SServiceProvider.getServices(agent.getServiceProvider(), IHelpline.class, remote, true)
 		final Future ret = new Future();

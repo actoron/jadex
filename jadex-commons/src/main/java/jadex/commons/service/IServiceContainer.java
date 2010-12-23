@@ -1,6 +1,7 @@
 package jadex.commons.service;
 
 import jadex.commons.IFuture;
+import jadex.commons.IIntermediateFuture;
 
 /**
  *  Internal interface for a service container. Allows
@@ -47,5 +48,5 @@ public interface IServiceContainer extends IServiceProvider
 	 *  Get required services.
 	 *  @return The collection of services.
 	 */
-	public IFuture getRequiredServices(RequiredServiceInfo info);
+	public IIntermediateFuture getRequiredServices(RequiredServiceInfo info);
 }

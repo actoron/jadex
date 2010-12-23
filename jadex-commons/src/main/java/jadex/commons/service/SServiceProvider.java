@@ -336,7 +336,7 @@ public class SServiceProvider
 	 *  Get all declared services of the given provider.
 	 *  @return The corresponding services.
 	 */
-	public static IFuture getDeclaredServices(IServiceProvider provider)
+	public static IIntermediateFuture getDeclaredServices(IServiceProvider provider)
 	{
 //		synchronized(profiling)
 //		{

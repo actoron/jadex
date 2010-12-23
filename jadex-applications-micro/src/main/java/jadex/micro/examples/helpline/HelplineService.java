@@ -2,6 +2,7 @@ package jadex.micro.examples.helpline;
 
 import jadex.commons.Future;
 import jadex.commons.IFuture;
+import jadex.commons.IIntermediateFuture;
 import jadex.commons.service.BasicService;
 
 /**
@@ -77,7 +78,7 @@ public class HelplineService extends BasicService implements IHelpline
 	 *  @param name The person's name.
 	 *  @return Future that contains the information.
 	 */
-	public IFuture getInformation(final String name)
+	public IIntermediateFuture getInformation(final String name)
 	{
 		return new Future(agent.getInformation(name));
 	}

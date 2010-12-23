@@ -42,6 +42,7 @@ import jadex.commons.Future;
 import jadex.commons.IChangeListener;
 import jadex.commons.IFilter;
 import jadex.commons.IFuture;
+import jadex.commons.IIntermediateFuture;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
@@ -1533,7 +1534,7 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 	 *  @param name The services name.
 	 *  @return The service.
 	 */
-	public IFuture getRequiredServices(String name)
+	public IIntermediateFuture getRequiredServices(String name)
 	{
 		RequiredServiceInfo info = getModel().getRequiredService(name);
 		if(info==null)

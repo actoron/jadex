@@ -1,6 +1,7 @@
 package jadex.commons.service;
 
 import jadex.commons.IFuture;
+import jadex.commons.IIntermediateFuture;
 import jadex.commons.IRemotable;
 
 import java.util.Collection;
@@ -15,7 +16,7 @@ public interface IServiceProvider extends IRemotable
 	 *  @param type The class.
 	 *  @return The corresponding services.
 	 */
-	public IFuture	getServices(ISearchManager manager, IVisitDecider decider, IResultSelector selector, Collection results);
+	public IIntermediateFuture	getServices(ISearchManager manager, IVisitDecider decider, IResultSelector selector, Collection results);
 	
 	/**
 	 *  Get the parent service container.
