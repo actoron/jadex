@@ -1,6 +1,7 @@
 package jadex.commons.service;
 
 import jadex.commons.IFuture;
+import jadex.commons.IIntermediateFuture;
 
 /**
  * 
@@ -15,5 +16,5 @@ public interface IRequiredServiceFetcher
 	/**
 	 *  Get a required multi service.
 	 */
-	public IFuture getServices(RequiredServiceInfo info, IServiceProvider provider);
+	public IIntermediateFuture getServices(RequiredServiceInfo info, IServiceProvider provider);
 }

@@ -3,6 +3,7 @@ package jadex.commons.service;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.IIntermediateFuture;
+import jadex.commons.IntermediateDelegationResultListener;
 import jadex.commons.IntermediateFuture;
 import jadex.commons.concurrent.DelegationResultListener;
 
@@ -314,14 +315,14 @@ public class SServiceProvider
 	 *  @param type The class.
 	 *  @return The corresponding services.
 	 */
-	public static IIntermediateFuture getDeclaredServices(IServiceProvider provider, Class type)
+	public static IFuture getDeclaredServices(IServiceProvider provider, Class type)
 	{
 //		synchronized(profiling)
 //		{
 //			Integer	cnt	= (Integer)profiling.get(type);
 //			profiling.put(type, new Integer(cnt!=null ? cnt.intValue()+1 : 1)); 
 //		}
-		final IntermediateFuture ret = new IntermediateFuture();
+		final Future ret = new Future();
 		
 		// Hack->remove
 //		IVisitDecider abortdecider = new DefaultVisitDecider();

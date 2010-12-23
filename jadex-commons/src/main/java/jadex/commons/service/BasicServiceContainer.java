@@ -2,6 +2,7 @@ package jadex.commons.service;
 
 import jadex.commons.Future;
 import jadex.commons.IFuture;
+import jadex.commons.IIntermediateFuture;
 import jadex.commons.concurrent.CounterResultListener;
 import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.service.fetcher.DynamicServiceFetcher;
@@ -55,7 +56,7 @@ public class BasicServiceContainer implements  IServiceContainer
 	 *  @param type The class.
 	 *  @return The corresponding services.
 	 */
-	public IFuture	getServices(ISearchManager manager, IVisitDecider decider, IResultSelector selector, Collection results)
+	public IIntermediateFuture	getServices(ISearchManager manager, IVisitDecider decider, IResultSelector selector, Collection results)
 	{
 		return manager.searchServices(this, decider, selector, services!=null ? services : Collections.EMPTY_MAP, results);
 	}
@@ -267,7 +268,7 @@ public class BasicServiceContainer implements  IServiceContainer
 	 *  Get required services.
 	 *  @return The services.
 	 */
-	public IFuture getRequiredServices(RequiredServiceInfo info)
+	public IIntermediateFuture getRequiredServices(RequiredServiceInfo info)
 	{
 		if(info==null)
 		{
