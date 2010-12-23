@@ -13,7 +13,18 @@ public class IntermediateFuture extends Future	implements	IIntermediateFuture
 	//-------- attributes --------
 	
 	/** The intermediate results. */
-	protected List	results;
+	protected Collection results;
+	
+	//-------- constructors--------
+	
+	/**
+	 *  Create a future that is already done.
+	 *  @param result	The result, if any.
+	 */
+	public IntermediateFuture(Collection results)
+	{
+		super(results);
+	}
 	
 	//-------- IIntermediateFuture interface --------
 		
@@ -65,4 +76,36 @@ public class IntermediateFuture extends Future	implements	IIntermediateFuture
 			}
 		}
 	}
+	
+	/**
+     *  Set the result. 
+     *  Listener notifications occur on calling thread of this method.
+     *  @param result The result.
+     */
+    public void	setResult(Object result)
+    {
+    	boolean ex = false;
+    	synchronized(this)
+		{
+    		if(results!=null)
+    			ex = true;
+		}
+    	if(ex)
+    	{
+    		setException(new RuntimeException("setResult() only allowed without intermediate results:"+results));
+    	}
+    	else
+    	{
+    		this.results = (Collection)result;
+    		super.setResult(result);
+    	}
+    }
+    
+    /**
+     *  Declare that the future is finished.
+     */
+    public void setFinished()
+    {
+    	super.setResult(getIntermediateResults());
+    }
 }

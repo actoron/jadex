@@ -61,7 +61,6 @@ public class Future implements IFuture
 	 */
 	public Future(Object result)
 	{
-		this();
 		setResult(result);
 	}
 	
