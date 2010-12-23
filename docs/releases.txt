@@ -1,5 +1,10 @@
 Jadex Releases Overview
 
+Current
+	- Annotations for remote method invocations (jadex.base.service.remote.annotation)
+	- Example project for use with eclipse/Maven
+	- Minor bug fixes
+
 Release 2.0 rc6 (Service release 12/2010)
 	- Improved service model (provided/required services)
 	- Simplified service programming through automatic thread correction

@@ -101,6 +101,10 @@
 			<outputDirectory>/</outputDirectory>
 		</file>
 		<file>
+			<source>docs/jadex-example-project.zip</source>
+			<outputDirectory>/</outputDirectory>
+		</file>
+		<file>
 			<source>docs/howtostart.txt</source>
 			<outputDirectory>/</outputDirectory>
 		</file><!-- 
