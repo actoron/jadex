@@ -9,6 +9,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IErrorReport;
 import jadex.bridge.IModelInfo;
 import jadex.commons.FixedJComboBox;
+import jadex.commons.Future;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SGUI;
@@ -16,6 +17,7 @@ import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.collection.SCollection;
+import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.commons.gui.CombiIcon;
@@ -312,25 +314,8 @@ public class StarterPanel extends JPanel
 							{
 								String typename = /*ac!=null? ac.getComponentType(filename.getText()):*/ filename.getText();
 								final String fullname = model.getPackage()+"."+model.getName();
-								IResultListener killlistener = null;
 								final IModelInfo mymodel = model;
-								if(storeresults!=null && storeresults.isSelected())
-								{
-									killlistener = new SwingDefaultResultListener(StarterPanel.this)
-									{
-										public void customResultAvailable(Object result)
-										{
-//											System.out.println("fullname: "+fullname+" "+model.getFilename());
-//											String tmp = (String)mymodel.getFullName();
-//											resultsets.put(tmp, new Object[]{source, result});
-//											if(model!=null && fullname.equals(model.getFullName()))
-//											{
-//												selectavail.addItem(source);
-//												refreshResults();
-//											}
-										}
-									};
-								}
+								boolean dokilllis = storeresults!=null && storeresults.isSelected();
 										
 								String an = genname.isSelected()?  null: componentname.getText();
 								if(an==null) // i.e. name auto generate
@@ -338,20 +323,26 @@ public class StarterPanel extends JPanel
 									int max = ((Integer)numcomponents.getValue()).intValue();
 									for(int i=0; i<max; i++)
 									{
+										Future fut = new Future();
+										IResultListener killlistener = dokilllis? new KillListener(mymodel, fullname, fut, StarterPanel.this): null;
 										starter.createComponent(typename, an, configname, args, 
 											suspend.isSelected()? Boolean.TRUE: Boolean.FALSE, 
 											mastercb.isSelected()? Boolean.TRUE: Boolean.FALSE, 
 											daemoncb.isSelected()? Boolean.TRUE: Boolean.FALSE, 
-											autosdcb.isSelected()? Boolean.TRUE: Boolean.FALSE, killlistener);
+											autosdcb.isSelected()? Boolean.TRUE: Boolean.FALSE, killlistener)
+										.addResultListener(new DelegationResultListener(fut));
 									}
 								}
 								else
 								{
+									Future fut = new Future();
+									IResultListener killlistener = dokilllis? new KillListener(mymodel, fullname, fut, StarterPanel.this): null;
 									starter.createComponent(typename, an, configname, args, 
 										suspend.isSelected()? Boolean.TRUE: Boolean.FALSE, 
 										mastercb.isSelected()? Boolean.TRUE: Boolean.FALSE, 
 										daemoncb.isSelected()? Boolean.TRUE: Boolean.FALSE, 
-										autosdcb.isSelected()? Boolean.TRUE: Boolean.FALSE, killlistener);
+										autosdcb.isSelected()? Boolean.TRUE: Boolean.FALSE, killlistener)
+									.addResultListener(new DelegationResultListener(fut));
 								}
 							}
 							
@@ -1364,6 +1355,65 @@ public class StarterPanel extends JPanel
 		this.parent	= parent;
 		parenttf.setText(parent!=null ? parent.getName() : "");
 	}
+	
+	/**
+	 *  Listener that is called on component kill.
+	 */
+	public class KillListener extends SwingDefaultResultListener
+	{
+		/** The model info. */
+		protected IModelInfo model;
+		
+		/** The fullname. */
+		protected String fullname;
+		
+		/** The source cid. */
+		protected IComponentIdentifier cid;
+		
+		/**
+		 *  Create a new listener.
+		 */
+		public KillListener(IModelInfo model, String fullname, Future fut, Component parent)
+		{
+			super(parent);
+			this.model = model;
+			this.fullname = fullname;
+			fut.addResultListener(new IResultListener()
+			{
+				public void resultAvailable(Object result)
+				{
+					cid = (IComponentIdentifier)result;
+				}
+				
+				public void exceptionOccurred(Exception exception)
+				{
+					KillListener.this.exceptionOccurred(exception);
+				}
+			});
+		}
+		
+		/**
+		 *  Called when result is available.
+		 */
+		public void customResultAvailable(Object result)
+		{
+//			System.out.println("fullname: "+fullname+" "+model.getFilename());
+			if(cid!=null)
+			{
+				String tmp = (String)model.getFullName();
+				resultsets.put(tmp, new Object[]{cid, result});
+				if(model!=null && fullname.equals(model.getFullName()))
+				{
+					selectavail.addItem(cid);
+					refreshResults();
+				}
+			}
+			else
+			{
+				exceptionOccurred(new RuntimeException("Unknown component identifier."));
+			}
+		}
+	};
 }
 
 

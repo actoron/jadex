@@ -6,11 +6,13 @@ import jadex.base.gui.componenttree.ComponentTreePanel;
 import jadex.base.gui.plugin.AbstractJCCPlugin;
 import jadex.base.gui.plugin.SJCC;
 import jadex.bridge.CreationInfo;
+import jadex.bridge.ICMSComponentListener;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.ICMSComponentListener;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IModelInfo;
+import jadex.commons.Future;
+import jadex.commons.IFuture;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SGUI;
@@ -768,28 +770,33 @@ public class StarterPlugin extends AbstractJCCPlugin	implements ICMSComponentLis
 	 *  Create a new component on the platform.
 	 *  Any errors will be displayed in a dialog to the user.
 	 */
-	public void createComponent(final String type, final String name, final String configname, final Map arguments, final Boolean suspend, 
+	public IFuture createComponent(final String type, final String name, final String configname, final Map arguments, final Boolean suspend, 
 		final Boolean master, final Boolean daemon, final Boolean autosd, final IResultListener killlistener)
 	{
+		final Future ret = new Future(); 
 		SServiceProvider.getServiceUpwards(jcc.getServiceProvider(),
 			IComponentManagementService.class).addResultListener(new SwingDefaultResultListener(spanel)
 		{
 			public void customResultAvailable(Object result)
 			{
 				IComponentManagementService cms = (IComponentManagementService)result;
-				cms.createComponent(name, type, new CreationInfo(configname, arguments, spanel.parent, suspend, master, daemon, autosd), killlistener).addResultListener(new IResultListener()
+				cms.createComponent(name, type, new CreationInfo(configname, arguments, spanel.parent, suspend, master, daemon, autosd), killlistener)
+					.addResultListener(new IResultListener()
 				{
 					public void resultAvailable(Object result)
 					{
+						ret.setResult(result);
 						getJCC().setStatusText("Created component: " + ((IComponentIdentifier)result).getLocalName());
 					}
 					
 					public void exceptionOccurred(Exception exception)
 					{
+						ret.setException(exception);
 						getJCC().displayError("Problem Starting Component", "Component could not be started.", exception);
 					}
 				});
 			}
 		});		
+		return ret;
 	}
 }
