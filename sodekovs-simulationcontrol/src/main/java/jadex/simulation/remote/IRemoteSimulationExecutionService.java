@@ -1,5 +1,6 @@
 package jadex.simulation.remote;
 
+import jadex.base.service.remote.annotation.Timeout;
 import jadex.commons.IFuture;
 import jadex.commons.service.IService;
 
@@ -9,6 +10,7 @@ import java.util.Map;
 /**
  *  The simulation execution interface for executing (single) experiments.
  */
+@Timeout(1000000000)
 public interface IRemoteSimulationExecutionService	extends IService
 {
 	/**
