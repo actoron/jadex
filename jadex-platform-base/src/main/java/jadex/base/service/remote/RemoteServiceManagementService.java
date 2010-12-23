@@ -43,11 +43,13 @@ import jadex.xml.reader.ReadContext;
 import jadex.xml.reader.Reader;
 import jadex.xml.writer.Writer;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.management.ServiceNotFoundException;
 import javax.xml.namespace.QName;
 import javax.xml.stream.Location;
 import javax.xml.stream.XMLReporter;
@@ -196,10 +198,21 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	 *  @param service The service type.
 	 *  @return The service proxy.
 	 */
-	public IFuture getServiceProxy(IComponentIdentifier cid, final Class service)
+	public IFuture getServiceProxy(final IComponentIdentifier cid, final Class service)
 	{
-		return getServiceProxies(cid, SServiceProvider.sequentialmanager, SServiceProvider.abortdecider, 
-			new TypeResultSelector(service, true));
+		Future	ret	= new Future();
+		getServiceProxies(cid, SServiceProvider.sequentialmanager, SServiceProvider.abortdecider, 
+			new TypeResultSelector(service, true)).addResultListener(new DelegationResultListener(ret)
+		{
+			public void customResultAvailable(Object result)
+			{
+				if(result!=null && !((Collection)result).isEmpty())
+					super.customResultAvailable(((Collection)result).iterator().next());
+				else
+					super.exceptionOccurred(new ServiceNotFoundException("No proxy for service found: "+cid+", "+service.getName()));
+			}
+		});
+		return ret;
 	}
 	
 	/**

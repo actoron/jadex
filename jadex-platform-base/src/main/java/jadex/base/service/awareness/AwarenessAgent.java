@@ -558,6 +558,7 @@ public class AwarenessAgent extends MicroAgent
 						public void exceptionOccurred(Exception exception)
 						{
 //							getLogger().warning("Proxy was killed: "+exception);
+							exception.printStackTrace();
 						}
 					})).addResultListener(createResultListener(new IResultListener()
 					{
