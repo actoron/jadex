@@ -53,6 +53,7 @@ public class ManageDistributionPlan extends Plan
 			int counter = 0;
 			do {
 				// find appropriate service
+				System.out.println("#ManageDistributionPlan# Searching for remote simulation services.");
 				services = (ArrayList<IRemoteSimulationExecutionService>) SServiceProvider.getServices(getScope().getServiceProvider(), IRemoteSimulationExecutionService.class, true, true).get(this);
 				System.out.println("#ManageDistributionPlan# Nr. of found remote services: " + services.size());
 				if (services.size() <= 0) {

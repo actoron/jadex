@@ -117,10 +117,10 @@
 		
 		<!-- Important: Number of sweeps has to be equal with number of rows!-->
 		<ParameterSweeping strategy="recursively"> <!-- space, list or algorithm (algorithm is not implemented yet!)-->
+			<Configuration type="space" name="NumberOfCarries" start="1" end="4" step="1" class="int" />
 			<Configuration type="list" name="NumberOfSentries" values="1;" class="int" />
 			<Configuration type="list" name="NumberOfProducers" values="2;3;" class="int" />
-			<!-- <Configuration type="list" name="NumberOfProducers" values="1;2;" class="int" />--><!-- Has to be comma separated list, with a comma as last character. -->
-			<Configuration type="space" name="NumberOfCarries" start="1" end="4" step="1" class="int" />
+			<!-- <Configuration type="list" name="NumberOfProducers" values="1;2;" class="int" />--><!-- Has to be comma separated list, with a comma as last character. -->			
 		</ParameterSweeping>
 		<Algorithm>
 			<Input></Input>
@@ -144,7 +144,7 @@
 		</General>
 		<Rows experiments="2">
 			<TerminateCondition>
-				   <Time value="8000" type="relative" />
+				   <Time value="3000" type="relative" />
 				  				
 					<TargetFunction function="$object.getProperty(&quot;ore&quot;) >=
 					55">	<ObjectSource type="ISpaceObject" name="homebase" /> </TargetFunction>
