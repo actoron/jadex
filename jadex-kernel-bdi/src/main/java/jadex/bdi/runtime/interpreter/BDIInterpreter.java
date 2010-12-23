@@ -802,7 +802,7 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 		
 		SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class).addResultListener(new DefaultResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				((IComponentManagementService)result).destroyComponent(adapter.getComponentIdentifier())
 					.addResultListener(new DelegationResultListener(ret));

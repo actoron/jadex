@@ -284,7 +284,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 						AwarenessAgentPanel.this.component.scheduleStep(new CreateProxyCommand(dif.getComponentIdentifier()))
 							.addResultListener(new SwingDefaultResultListener(panel)
 						{
-							public void customResultAvailable(Object source, Object result)
+							public void customResultAvailable(Object result)
 							{
 								updateDiscoveryInfos(jtdis);
 							}
@@ -318,7 +318,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 						AwarenessAgentPanel.this.component.scheduleStep(new DeleteProxyCommand(dif.getComponentIdentifier()))
 							.addResultListener(new SwingDefaultResultListener(panel)
 						{
-							public void customResultAvailable(Object source, Object result)
+							public void customResultAvailable(Object result)
 							{
 								updateDiscoveryInfos(jtdis);
 							}
@@ -346,7 +346,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 					AwarenessAgentPanel.this.component.scheduleStep(new SetExcludedCommand(dif.getComponentIdentifier(), !dif.isExcluded()))
 						.addResultListener(new SwingDefaultResultListener(panel)
 					{
-						public void customResultAvailable(Object source, Object result)
+						public void customResultAvailable(Object result)
 						{
 							updateDiscoveryInfos(jtdis);
 						}
@@ -442,7 +442,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 		component.scheduleStep(new GetAddressCommand())
 			.addResultListener(new SwingDefaultResultListener(tfipaddress)
 		{
-			public void customResultAvailable(Object source, Object result)
+			public void customResultAvailable(Object result)
 			{
 				Object[] ai = (Object[])result;
 				address = (InetAddress)ai[0];
@@ -461,7 +461,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 		component.scheduleStep(new GetDelayCommand())
 			.addResultListener(new SwingDefaultResultListener(spdelay)
 		{
-			public void customResultAvailable(Object source, Object result)
+			public void customResultAvailable(Object result)
 			{
 				delay = ((Number)result).longValue();
 	//			System.out.println("delay is: "+delay);
@@ -478,7 +478,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 		component.scheduleStep(new GetProxyDelayCommand())
 			.addResultListener(new SwingDefaultResultListener(spprorefresh)
 		{
-			public void customResultAvailable(Object source, Object result)
+			public void customResultAvailable(Object result)
 			{
 				proxydelay = ((Number)result).longValue();
 	//			System.out.println("delay is: "+delay);
@@ -495,7 +495,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 		component.scheduleStep(new GetAutoCreateProxyCommand())
 			.addResultListener(new SwingDefaultResultListener(cbautocreate)
 		{
-			public void customResultAvailable(Object source, Object result)
+			public void customResultAvailable(Object result)
 			{
 				autocreate = ((Boolean)result).booleanValue();
 				cbautocreate.setSelected(autocreate);
@@ -511,7 +511,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 		component.scheduleStep(new GetAutoDeleteProxyCommand())
 			.addResultListener(new SwingDefaultResultListener(cbautodelete)
 		{
-			public void customResultAvailable(Object source, Object result)
+			public void customResultAvailable(Object result)
 			{
 				autodelete = ((Boolean)result).booleanValue();
 				cbautodelete.setSelected(autodelete);
@@ -527,7 +527,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 		component.scheduleStep(new GetDiscoveryInfosCommand())
 			.addResultListener(new SwingDefaultResultListener(jtdis)
 		{
-			public void customResultAvailable(Object source, Object result)
+			public void customResultAvailable(Object result)
 			{
 				DiscoveryInfo[] ds = (DiscoveryInfo[])result;
 				
@@ -549,7 +549,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 					((DefaultListSelectionModel)jtdis.getSelectionModel()).setSelectionInterval(sel, sel);
 			}
 			
-			public void customExceptionOccurred(Object source, Exception exception)
+			public void customExceptionOccurred(Exception exception)
 			{
 				sprefresh.setValue(new Integer(0));
 			}
@@ -572,7 +572,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 				component.scheduleStep(new SetAddressCommand(address, port))
 					.addResultListener(new SwingDefaultResultListener(ui)
 				{
-					public void customResultAvailable(Object source, Object result)
+					public void customResultAvailable(Object result)
 					{
 						AwarenessAgentPanel.this.address = address;
 						AwarenessAgentPanel.this.port = port;
@@ -593,7 +593,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 			component.scheduleStep(new SetDelayCommand(delay))
 				.addResultListener(new SwingDefaultResultListener(ui)
 			{
-				public void customResultAvailable(Object source, Object result)
+				public void customResultAvailable(Object result)
 				{
 					AwarenessAgentPanel.this.delay = delay;
 				}
@@ -607,7 +607,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 			component.scheduleStep(new SetAutoCreateProxyCommand())
 				.addResultListener(new SwingDefaultResultListener(ui)
 			{
-				public void customResultAvailable(Object source, Object result)
+				public void customResultAvailable(Object result)
 				{
 					AwarenessAgentPanel.this.autocreate = autocreate;
 				}
@@ -621,7 +621,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 			component.scheduleStep(new SetAutoDeleteProxyCommand())
 				.addResultListener(new SwingDefaultResultListener(ui)
 			{
-				public void customResultAvailable(Object source, Object result)
+				public void customResultAvailable(Object result)
 				{
 					AwarenessAgentPanel.this.autodelete = autodelete;
 				}
@@ -636,7 +636,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 			component.scheduleStep(new SetProxyDelayCommand(proxydelay))
 				.addResultListener(new SwingDefaultResultListener(ui)
 			{
-				public void customResultAvailable(Object source, Object result)
+				public void customResultAvailable(Object result)
 				{
 					AwarenessAgentPanel.this.proxydelay = proxydelay;
 				}

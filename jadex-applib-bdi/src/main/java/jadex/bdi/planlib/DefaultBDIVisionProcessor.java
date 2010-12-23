@@ -96,11 +96,11 @@ public class DefaultBDIVisionProcessor extends SimplePropertyObject implements I
 			IFuture fut = ces.getExternalAccess(agent);
 			fut.addResultListener(new IResultListener()
 			{
-				public void exceptionOccurred(Object source, Exception exception)
+				public void exceptionOccurred(Exception exception)
 				{
 	//				exception.printStackTrace();
 				}
-				public void resultAvailable(Object source, Object result)
+				public void resultAvailable(Object result)
 				{
 					final IBDIExternalAccess exta = (IBDIExternalAccess)result;
 					

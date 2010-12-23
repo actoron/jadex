@@ -64,7 +64,7 @@ public class MainValidationPanel extends JPanel implements IStatePanel
 			}
 		}).addResultListener(new SwingDefaultResultListener(this)
 		{
-			public void customResultAvailable(Object source, Object result)
+			public void customResultAvailable(Object result)
 			{
 				Set fileSet = (Set) result;
 				classList.addItem("");

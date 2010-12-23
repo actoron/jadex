@@ -202,7 +202,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 	{
 		SServiceProvider.getService(getJCC().getServiceProvider(), IMessageService.class).addResultListener(new DefaultResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				IMessageService ms = (IMessageService)result;
 				ms.removeMessageListener(ComanalyzerPlugin.this);
@@ -528,20 +528,20 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 		
 		SServiceProvider.getService(getJCC().getServiceProvider(), IComponentManagementService.class).addResultListener(new DefaultResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				IComponentManagementService cms = (IComponentManagementService)result;
 				
 				cms.getComponentDescriptions().addResultListener(new IResultListener()
 				{
-					public void resultAvailable(Object source, Object result)
+					public void resultAvailable(Object result)
 					{
 						IComponentDescription[] res = (IComponentDescription[])result;
 						for(int i=0; i<res.length; i++)
 							agentBorn(res[i]);
 					}
 					
-					public void exceptionOccurred(Object source, Exception exception)
+					public void exceptionOccurred(Exception exception)
 					{
 					}
 				});
@@ -581,7 +581,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 		SServiceProvider.getService(getJCC().getServiceProvider(), IMessageService.class).addResultListener(new DefaultResultListener()
 		{
 			
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				IMessageService ms = (IMessageService)result;
 				ms.addMessageListener(ComanalyzerPlugin.this);
@@ -1449,7 +1449,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 
 				SServiceProvider.getService(jcc.getServiceProvider(), ILibraryService.class).addResultListener(new SwingDefaultResultListener(comptree)
 				{
-					public void customResultAvailable(Object source, Object result)
+					public void customResultAvailable(Object result)
 					{
 						ClassLoader cl = ((ILibraryService)result).getClassLoader();
 						String xml = JavaWriter.objectToXML(new Object[]{componentlist.getAgents(), messagelist.getMessages()}, cl);
@@ -1552,7 +1552,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 				final String sxml = xml;
 				SServiceProvider.getService(jcc.getServiceProvider(), ILibraryService.class).addResultListener(new SwingDefaultResultListener(comptree)
 				{
-					public void customResultAvailable(Object source, Object result)
+					public void customResultAvailable(Object result)
 					{
 						ClassLoader cl = ((ILibraryService)result).getClassLoader();
 						

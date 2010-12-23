@@ -60,7 +60,7 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 		
 		adapter.getChildrenIdentifiers().addResultListener(new IResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				if(result!=null)
 				{
@@ -71,15 +71,15 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 					{
 						cms.getExternalAccess(childs[i]).addResultListener(new IResultListener()
 						{
-							public void resultAvailable(Object source, Object result)
+							public void resultAvailable(Object result)
 							{
 								IExternalAccess exta = (IExternalAccess)result;
-								lis.resultAvailable(null, exta.getServiceProvider());
+								lis.resultAvailable(exta.getServiceProvider());
 							}
 							
-							public void exceptionOccurred(Object source, Exception exception)
+							public void exceptionOccurred(Exception exception)
 							{
-								lis.exceptionOccurred(null, exception);
+								lis.exceptionOccurred(exception);
 							}
 						});
 					}
@@ -89,7 +89,7 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 					ret.setResult(Collections.EMPTY_LIST);
 				}
 			}
-			public void exceptionOccurred(Object source, Exception exception)
+			public void exceptionOccurred(Exception exception)
 			{
 				ret.setException(exception);
 			}
@@ -109,7 +109,7 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 //		System.out.println("search clock: "+getId());
 		SServiceProvider.getServiceUpwards(ComponentServiceContainer.this, IComponentManagementService.class).addResultListener(new IResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				cms = (IComponentManagementService)result;
 //				System.out.println("Has cms: "+getId()+" "+cms);
@@ -119,7 +119,7 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 				ComponentServiceContainer.super.start().addResultListener(new DelegationResultListener(ret));
 			}
 			
-			public void exceptionOccurred(Object source, Exception exception)
+			public void exceptionOccurred(Exception exception)
 			{
 				ret.setException(exception);
 			}

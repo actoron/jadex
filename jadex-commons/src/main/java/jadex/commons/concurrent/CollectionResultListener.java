@@ -48,7 +48,7 @@ public class CollectionResultListener	implements IResultListener
 		{
 			this.notified	= true;
 //			System.out.println("collecting finished: "+this+", "+this.sresults.size());
-			delegate.resultAvailable(null, results);
+			delegate.resultAvailable(results);
 		}
 	}
 	
@@ -56,9 +56,9 @@ public class CollectionResultListener	implements IResultListener
 	
 	/**
 	 *  Called when some result is available.
-	 *  @param result The result.
+	 * @param result The result.
 	 */
-	public void resultAvailable(Object source, Object result)
+	public void resultAvailable(Object result)
 	{
 		boolean	notify	= false;
 		synchronized(this)
@@ -75,15 +75,15 @@ public class CollectionResultListener	implements IResultListener
 		if(notify)
 		{
 //			System.out.println("collecting finished: "+this+", "+this.sresults.size());
-			delegate.resultAvailable(null, results);
+			delegate.resultAvailable(results);
 		}
 	}
 	
 	/**
 	 *  Called when an exception occurred.
-	 *  @param exception The exception.
+	 * @param exception The exception.
 	 */
-	public void exceptionOccurred(Object source, Exception exception)
+	public void exceptionOccurred(Exception exception)
 	{
 		boolean	notify	= false;
 		synchronized(this)
@@ -107,11 +107,11 @@ public class CollectionResultListener	implements IResultListener
 //			
 			if(ignorefailures)
 			{
-				delegate.resultAvailable(source, results);
+				delegate.resultAvailable(results);
 			}
 			else
 			{
-				delegate.exceptionOccurred(null, exception);
+				delegate.exceptionOccurred(exception);
 			}
 		}
 	}

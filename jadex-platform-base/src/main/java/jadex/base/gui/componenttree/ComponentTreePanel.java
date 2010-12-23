@@ -212,7 +212,7 @@ public class ComponentTreePanel extends JSplitPane
 						{
 							parentnode.createComponentNode(desc).addResultListener(new SwingDefaultResultListener()
 							{
-								public void customResultAvailable(Object source, Object result)
+								public void customResultAvailable(Object result)
 								{
 									IComponentTreeNode	node = (IComponentTreeNode)result;
 //									System.out.println("addChild: "+parentnode+", "+node);
@@ -233,7 +233,7 @@ public class ComponentTreePanel extends JSplitPane
 									}
 								}
 								
-								public void customExceptionOccurred(Object source, Exception exception)
+								public void customExceptionOccurred(Exception exception)
 								{
 									// May happen, when component removed in mean time.
 								}										
@@ -258,11 +258,11 @@ public class ComponentTreePanel extends JSplitPane
 						final IComponentTreeNode sel = (IComponentTreeNode)paths[i].getLastPathComponent();
 						cms.resumeComponent(cid).addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
 						{
-							public void customResultAvailable(Object source, Object result)
+							public void customResultAvailable(Object result)
 							{
 								cms.destroyComponent(cid).addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
 								{
-									public void customResultAvailable(Object source, Object result)
+									public void customResultAvailable(Object result)
 									{
 										if(sel instanceof VirtualComponentTreeNode && sel.getParent()!=null)
 										{
@@ -270,9 +270,9 @@ public class ComponentTreePanel extends JSplitPane
 										}
 									}
 									
-									public void customExceptionOccurred(Object source, Exception exception)
+									public void customExceptionOccurred(Exception exception)
 									{
-										super.customExceptionOccurred(source, new RuntimeException("Could not kill component: "+cid, exception));
+										super.customExceptionOccurred(new RuntimeException("Could not kill component: "+cid, exception));
 									}
 								});
 							}
@@ -295,20 +295,20 @@ public class ComponentTreePanel extends JSplitPane
 						
 						sel.getRemoteComponentIdentifier().addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
 						{
-							public void customResultAvailable(Object source, Object result)
+							public void customResultAvailable(Object result)
 							{
 								final IComponentIdentifier cid = (IComponentIdentifier)result;
 								
 								SServiceProvider.getService(provider, IRemoteServiceManagementService.class)
 									.addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
 								{
-									public void customResultAvailable(Object source, Object result)
+									public void customResultAvailable(Object result)
 									{
 										IRemoteServiceManagementService rms = (IRemoteServiceManagementService)result;
 										
 										rms.getServiceProxy(cid, IComponentManagementService.class).addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
 										{
-											public void customResultAvailable(Object source, Object result)
+											public void customResultAvailable(Object result)
 											{
 												final IComponentManagementService rcms = (IComponentManagementService)result;
 												rcms.destroyComponent(cid);
@@ -352,7 +352,7 @@ public class ComponentTreePanel extends JSplitPane
 						final IComponentTreeNode sel = (IComponentTreeNode)paths[i].getLastPathComponent();
 						cms.suspendComponent(cid).addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
 						{
-							public void customResultAvailable(Object source, Object result)
+							public void customResultAvailable(Object result)
 							{
 								if(sel instanceof VirtualComponentTreeNode)
 								{
@@ -378,7 +378,7 @@ public class ComponentTreePanel extends JSplitPane
 						final IComponentTreeNode sel = (IComponentTreeNode)paths[i].getLastPathComponent();
 						cms.resumeComponent(cid).addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
 						{
-							public void customResultAvailable(Object source, Object result)
+							public void customResultAvailable(Object result)
 							{
 								if(sel instanceof VirtualComponentTreeNode)
 								{
@@ -405,7 +405,7 @@ public class ComponentTreePanel extends JSplitPane
 						final IComponentTreeNode sel = (IComponentTreeNode)paths[i].getLastPathComponent();
 						cms.stepComponent(cid).addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
 						{
-							public void customResultAvailable(Object source, Object result)
+							public void customResultAvailable(Object result)
 							{
 								if(sel instanceof VirtualComponentTreeNode)
 								{
@@ -465,7 +465,7 @@ public class ComponentTreePanel extends JSplitPane
 					final ServiceNode sn = (ServiceNode)path.getLastPathComponent();
 					scn.getContainer().removeService(sn.getService().getServiceIdentifier()).addResultListener(new SwingDefaultResultListener(proppanel)
 					{
-						public void customResultAvailable(Object source, Object result)
+						public void customResultAvailable(Object result)
 						{
 							scn.removeChild(sn);
 						}
@@ -494,7 +494,7 @@ public class ComponentTreePanel extends JSplitPane
 						IComponentIdentifier cid = ((IActiveComponentTreeNode)node).getDescription().getName();
 						cms.getExternalAccess(cid).addResultListener(new SwingDefaultResultListener((Component)null)
 						{
-							public void customResultAvailable(Object source, Object result)
+							public void customResultAvailable(Object result)
 							{
 								IExternalAccess	ea	= (IExternalAccess)result;
 								JPanel panel = new ObjectInspectorPanel(ea);
@@ -730,14 +730,14 @@ public class ComponentTreePanel extends JSplitPane
 
 		SServiceProvider.getServiceUpwards(provider, IComponentManagementService.class).addResultListener(new SwingDefaultResultListener(this)
 		{
-			public void customResultAvailable(Object source, Object result)
+			public void customResultAvailable(Object result)
 			{
 				cms	= (IComponentManagementService)result;
 				
 				// Hack!!! How to find root node?
 				cms.getComponentDescriptions().addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
 				{
-					public void customResultAvailable(Object source, Object result)
+					public void customResultAvailable(Object result)
 					{
 						IComponentDescription[]	descriptions	= (IComponentDescription[])result;
 						if(descriptions.length!=0)
@@ -873,12 +873,12 @@ public class ComponentTreePanel extends JSplitPane
 	{
 		SServiceProvider.getServiceUpwards(provider, IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
 		{
-			public void customResultAvailable(Object source, Object result)
+			public void customResultAvailable(Object result)
 			{
 				cms	= (IComponentManagementService)result;
 				cms.removeComponentListener(null, listener);				
 			}
-			public void customExceptionOccurred(Object source, Exception exception)
+			public void customExceptionOccurred(Exception exception)
 			{
 				// ignore
 			}

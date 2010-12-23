@@ -87,7 +87,7 @@ public class ProxyAgent extends MicroAgent
 			SServiceProvider.getService(getServiceProvider(), IClockService.class)
 				.addResultListener(createResultListener(new IResultListener()
 			{
-				public void resultAvailable(Object source, Object result)
+				public void resultAvailable(Object result)
 				{
 					IClockService cs = (IClockService)result;
 					long time = cs.getTime();
@@ -97,7 +97,7 @@ public class ProxyAgent extends MicroAgent
 					ret.setResult(time>lastaccess+delay? Boolean.TRUE: Boolean.FALSE);
 				}
 				
-				public void exceptionOccurred(Object source, Exception exception)
+				public void exceptionOccurred(Exception exception)
 				{
 					ret.setException(exception);
 				}
@@ -122,7 +122,7 @@ public class ProxyAgent extends MicroAgent
 		{
 			isInvalid(cid).addResultListener(createResultListener(new IResultListener()
 			{
-				public void resultAvailable(Object source, Object result)
+				public void resultAvailable(Object result)
 				{
 					if(((Boolean)result).booleanValue())
 					{
@@ -136,7 +136,7 @@ public class ProxyAgent extends MicroAgent
 					}
 				}
 				
-				public void exceptionOccurred(Object source, Exception exception)
+				public void exceptionOccurred(Exception exception)
 				{
 					ret.setException(exception);
 				}
@@ -156,13 +156,13 @@ public class ProxyAgent extends MicroAgent
 		SServiceProvider.getService(getServiceProvider(), IRemoteServiceManagementService.class)
 			.addResultListener(createResultListener(new IResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				IRemoteServiceManagementService rms = (IRemoteServiceManagementService)result;
 				
 				rms.getServiceProxy(cid, IComponentManagementService.class).addResultListener(createResultListener(new IResultListener()
 				{
-					public void resultAvailable(Object source, Object result)
+					public void resultAvailable(Object result)
 					{
 //						try
 //						{
@@ -176,20 +176,20 @@ public class ProxyAgent extends MicroAgent
 						final IComponentManagementService rcms = (IComponentManagementService)result;
 						rcms.getChildren(cid).addResultListener(createResultListener(new IResultListener()
 						{
-							public void resultAvailable(Object source, Object result)
+							public void resultAvailable(Object result)
 							{
 	//							System.out.println("Found children: "+SUtil.arrayToString(result));
 								IComponentIdentifier[] tmp = (IComponentIdentifier[])result;
 								
 								CollectionResultListener crl = new CollectionResultListener(tmp.length, false, new DelegationResultListener(ret)
 								{
-									public void customResultAvailable(Object source, Object result)
+									public void customResultAvailable(Object result)
 									{
 										final Collection vcs = (Collection)result; 
 										SServiceProvider.getService(getServiceProvider(), IClockService.class)
 											.addResultListener(createResultListener(new IResultListener()
 										{
-											public void resultAvailable(Object source, Object result)
+											public void resultAvailable(Object result)
 											{
 												IClockService cs = (IClockService)result;
 												long lastaccess = cs.getTime();
@@ -198,7 +198,7 @@ public class ProxyAgent extends MicroAgent
 												ret.setResult(vcs);
 											}
 											
-											public void exceptionOccurred(Object source, Exception exception)
+											public void exceptionOccurred(Exception exception)
 											{
 												ret.setException(exception);
 											}
@@ -212,7 +212,7 @@ public class ProxyAgent extends MicroAgent
 								}
 							}
 							
-							public void exceptionOccurred(Object source, Exception exception)
+							public void exceptionOccurred(Exception exception)
 							{
 	//							System.out.println("Children exception: "+getComponentIdentifier());
 								ret.setException(exception);
@@ -220,7 +220,7 @@ public class ProxyAgent extends MicroAgent
 						}));
 					}
 					
-					public void exceptionOccurred(Object source, Exception exception)
+					public void exceptionOccurred(Exception exception)
 					{
 	//					System.out.println("No remote cms found: "+getComponentIdentifier());
 						ret.setException(exception);
@@ -228,7 +228,7 @@ public class ProxyAgent extends MicroAgent
 				}));
 			}
 			
-			public void exceptionOccurred(Object source, Exception exception)
+			public void exceptionOccurred(Exception exception)
 			{
 	//			System.out.println("No rms found: "+getComponentIdentifier());
 				ret.setException(exception);
@@ -248,26 +248,26 @@ public class ProxyAgent extends MicroAgent
 		SServiceProvider.getService(getServiceProvider(), IRemoteServiceManagementService.class)
 			.addResultListener(createResultListener(new IResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				IRemoteServiceManagementService rms = (IRemoteServiceManagementService)result;
 				
 				rms.getServiceProxy(cid, IComponentManagementService.class).addResultListener(createResultListener(new IResultListener()
 				{
-					public void resultAvailable(Object source, Object result)
+					public void resultAvailable(Object result)
 					{
 						final IComponentManagementService rcms = (IComponentManagementService)result;
 						rcms.getComponentDescription(cid).addResultListener(createResultListener(new DelegationResultListener(ret)));
 					}
 					
-					public void exceptionOccurred(Object source, Exception exception)
+					public void exceptionOccurred(Exception exception)
 					{
 						ret.setException(exception);
 					}
 				}));
 			}
 			
-			public void exceptionOccurred(Object source, Exception exception)
+			public void exceptionOccurred(Exception exception)
 			{
 				ret.setException(exception);
 			}
@@ -286,13 +286,13 @@ public class ProxyAgent extends MicroAgent
 		SServiceProvider.getService(getServiceProvider(), IRemoteServiceManagementService.class)
 			.addResultListener(createResultListener(new IResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				IRemoteServiceManagementService rms = (IRemoteServiceManagementService)result;
 				rms.getDeclaredServiceProxies(cid).addResultListener(createResultListener(new DelegationResultListener(ret)));
 			}
 			
-			public void exceptionOccurred(Object source, Exception exception)
+			public void exceptionOccurred(Exception exception)
 			{
 				ret.setException(exception);
 			}

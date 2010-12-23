@@ -33,17 +33,17 @@ public class MicroPreyVisionProcessor	extends	SimplePropertyObject	implements IP
 	{
 		SServiceProvider.getServiceUpwards(space.getContext().getServiceProvider(), IComponentManagementService.class).addResultListener(new DefaultResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				IComponentManagementService ces = (IComponentManagementService)result;
 				ces.getExternalAccess(agent).addResultListener(new IResultListener()
 				{
-					public void exceptionOccurred(Object source, Exception exception)
+					public void exceptionOccurred(Exception exception)
 					{
 						// May happen when agent has been killed concurrently.
 //						exception.printStackTrace();
 					}
-					public void resultAvailable(Object source, Object result)
+					public void resultAvailable(Object result)
 					{
 						final Space2D	space2d	= (Space2D)space;
 						final IMicroExternalAccess	exta	= (IMicroExternalAccess)result;

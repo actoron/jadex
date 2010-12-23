@@ -77,7 +77,7 @@ public class LibServiceBrowser	extends	JTabbedPane	implements IServiceViewerPane
 		this.classpaths = new EditableList("Class Paths", true);
 		libservice.getURLStrings().addResultListener(new SwingDefaultResultListener(LibServiceBrowser.this)
 		{
-			public void customResultAvailable(Object source, Object result)
+			public void customResultAvailable(Object result)
 			{
 				List entries = (List)result;
 				for(int i=0; i<entries.size(); i++)
@@ -175,7 +175,7 @@ public class LibServiceBrowser	extends	JTabbedPane	implements IServiceViewerPane
 			{
 				libservice.getURLStrings().addResultListener(new SwingDefaultResultListener(LibServiceBrowser.this)
 				{
-					public void customResultAvailable(Object source, Object result)
+					public void customResultAvailable(Object result)
 					{
 						classpaths.removeEntries();
 						List entries = (List)result;
@@ -224,7 +224,7 @@ public class LibServiceBrowser	extends	JTabbedPane	implements IServiceViewerPane
 		final DefaultListModel dlm = new DefaultListModel();
 		libservice.getNonManagedURLs().addResultListener(new SwingDefaultResultListener(LibServiceBrowser.this)
 		{
-			public void customResultAvailable(Object source, Object result)
+			public void customResultAvailable(Object result)
 			{
 				List entries = (List)result;
 				for(int i=0; i<entries.size(); i++)
@@ -244,7 +244,7 @@ public class LibServiceBrowser	extends	JTabbedPane	implements IServiceViewerPane
 			{
 				libservice.getNonManagedURLs().addResultListener(new SwingDefaultResultListener(LibServiceBrowser.this)
 				{
-					public void customResultAvailable(Object source, Object result)
+					public void customResultAvailable(Object result)
 					{
 						List entries = (List)result;
 						DefaultListModel dlm = (DefaultListModel)otherlist.getModel();

@@ -163,14 +163,14 @@ public class SequentialSearchManager implements ISearchManager
 				{
 					future.addResultListener(new IResultListener()
 					{
-						public void resultAvailable(Object src, Object result)
+						public void resultAvailable(Object result)
 						{
 //							if(res!=null)
 //								found.addAll(context.results);
 							processParent(source, provider, context, ret, up, 0);//, res);
 						}
 						
-						public void exceptionOccurred(Object source, Exception exception)
+						public void exceptionOccurred(Exception exception)
 						{
 							ret.setException(exception);
 						}
@@ -222,7 +222,7 @@ public class SequentialSearchManager implements ISearchManager
 			{
 				future.addResultListener(new IResultListener()
 				{
-					public void resultAvailable(Object src, Object result)
+					public void resultAvailable(Object result)
 					{
 						// Cut search if parent was already visisted.
 						if(SUtil.equals(source, result))
@@ -230,7 +230,7 @@ public class SequentialSearchManager implements ISearchManager
 						processNode(provider, (IServiceProvider)result, context, ret, up, 0);//, res);
 					}
 					
-					public void exceptionOccurred(Object source, Exception exception)
+					public void exceptionOccurred(Exception exception)
 					{
 						ret.setException(exception);
 					}
@@ -305,12 +305,12 @@ public class SequentialSearchManager implements ISearchManager
 			{
 				future.addResultListener(new IResultListener()
 				{
-					public void resultAvailable(Object source, Object result)
+					public void resultAvailable(Object result)
 					{
 						addChildren(src, provi, context, ret, (Collection)result, 0);//, res);
 					}
 					
-					public void exceptionOccurred(Object source, Exception exception)
+					public void exceptionOccurred(Exception exception)
 					{
 						ret.setException(exception);
 					}

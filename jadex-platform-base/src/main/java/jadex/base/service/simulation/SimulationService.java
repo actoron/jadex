@@ -157,13 +157,13 @@ public class SimulationService extends BasicService implements ISimulationServic
 		
 		super.startService().addResultListener(new IResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				final boolean[]	services	= new boolean[2];
 
 				SServiceProvider.getService(provider, IExecutionService.class).addResultListener(new DefaultResultListener()
 				{
-					public void resultAvailable(Object source, Object result)
+					public void resultAvailable(Object result)
 					{
 						exeservice = (IExecutionService)result;
 						boolean	setresult;
@@ -182,7 +182,7 @@ public class SimulationService extends BasicService implements ISimulationServic
 						
 				SServiceProvider.getService(provider, IClockService.class).addResultListener(new DefaultResultListener()
 				{
-					public void resultAvailable(Object source, Object result)
+					public void resultAvailable(Object result)
 					{
 						clockservice = (IClockService)result;
 
@@ -201,7 +201,7 @@ public class SimulationService extends BasicService implements ISimulationServic
 				});
 			}
 			
-			public void exceptionOccurred(Object source, Exception exception)
+			public void exceptionOccurred(Exception exception)
 			{
 				ret.setException(exception);
 			}

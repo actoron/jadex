@@ -565,7 +565,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 								
 				SServiceProvider.getServiceUpwards(context.getServiceProvider(), IComponentManagementService.class).addResultListener(new DefaultResultListener()
 				{
-					public void resultAvailable(Object source, final Object result)
+					public void resultAvailable(final Object result)
 					{
 						((IComponentManagementService)result).addComponentListener(context.getComponentIdentifier(), new ICMSComponentListener()
 						{
@@ -1048,7 +1048,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 					final String compotype = componenttype;
 					SServiceProvider.getServiceUpwards(application.getServiceProvider(), IComponentManagementService.class).addResultListener(new DefaultResultListener()
 					{
-						public void resultAvailable(Object source, Object result)
+						public void resultAvailable(Object result)
 						{
 							IComponentManagementService cms = (IComponentManagementService)result;
 							IComponentIdentifier cid = cms.generateComponentIdentifier(ret.getType());
@@ -1057,11 +1057,11 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 								new CreationInfo(null, null, getContext().getComponentIdentifier(), false, getContext().getAllImports()), null);
 							future.addResultListener(new IResultListener()
 							{
-								public void resultAvailable(Object source, Object result)
+								public void resultAvailable(Object result)
 								{
 								}
 								
-								public void exceptionOccurred(Object source, Exception exception)
+								public void exceptionOccurred(Exception exception)
 								{
 									// Todo: propagate exception: kills application!?
 									exception.printStackTrace();
@@ -1176,7 +1176,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 					SServiceProvider.getServiceUpwards(getContext().getServiceProvider(), IComponentManagementService.class)
 						.addResultListener(new DefaultResultListener()
 					{
-						public void resultAvailable(Object source, Object result)
+						public void resultAvailable(Object result)
 						{
 							((IComponentManagementService)result).destroyComponent(component);
 						}

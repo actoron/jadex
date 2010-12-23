@@ -63,7 +63,7 @@ public class PlaySongPlan extends Plan
 					}
 					catch(Exception ex)
 					{
-						lis.exceptionOccurred(PlaySongPlan.this, e);
+						lis.exceptionOccurred(e);
 					}
 				}
 					
@@ -74,12 +74,12 @@ public class PlaySongPlan extends Plan
 						AudioDevice dev = FactoryRegistry.systemRegistry().createAudioDevice();
 						player = new Player(in, dev);
 						player.play();
-						lis.resultAvailable(PlaySongPlan.this, null);
+						lis.resultAvailable(null);
 					}
 					catch(Exception e)
 					{
 //						e.printStackTrace();
-						lis.exceptionOccurred(PlaySongPlan.this, e);
+						lis.exceptionOccurred(e);
 					}
 				}
 			}

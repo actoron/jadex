@@ -730,7 +730,7 @@ public class MessageEventRules
 				SServiceProvider.getService(interpreter.getServiceProvider(), IMessageService.class)
 					.addResultListener(interpreter.createResultListener(new IResultListener()
 					{
-						public void resultAvailable(Object source, Object result)
+						public void resultAvailable(Object result)
 						{
 							IFuture	sent	= ((IMessageService)result).sendMessage(msg.getParameterMap(), msg.getMessageType(), 
 								interpreter.getAgentAdapter().getComponentIdentifier(), interpreter.getModel().getState().getTypeModel().getClassLoader());
@@ -740,7 +740,7 @@ public class MessageEventRules
 								sent.addResultListener(new DelegationResultListener(ret));
 						}
 						
-						public void exceptionOccurred(Object source,Exception exception)
+						public void exceptionOccurred(Exception exception)
 						{
 							// ret may be null for initial events.
 							if(ret!=null)

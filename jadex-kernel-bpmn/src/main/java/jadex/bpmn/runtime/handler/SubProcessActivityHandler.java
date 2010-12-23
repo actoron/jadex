@@ -143,14 +143,14 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 			SServiceProvider.getService(instance.getServiceProvider(), IComponentManagementService.class)
 				.addResultListener(instance.createResultListener(new DefaultResultListener()
 			{
-				public void resultAvailable(Object source, Object result)
+				public void resultAvailable(Object result)
 				{
 					IComponentManagementService cms = (IComponentManagementService)result;
 					IFuture ret = cms.createComponent(null, file,
 						new CreationInfo(null, args, instance.getComponentIdentifier(), false, instance.getModelElement().getAllImports()), 
 						new IResultListener()
 						{
-							public void resultAvailable(Object source, final Object result)
+							public void resultAvailable(final Object result)
 							{
 								instance.getComponentAdapter().invokeLater(new Runnable()
 								{
@@ -195,7 +195,7 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 								});
 							}
 							
-							public void exceptionOccurred(Object source, final Exception exception)
+							public void exceptionOccurred(final Exception exception)
 							{
 								instance.getComponentAdapter().invokeLater(new Runnable()
 								{
@@ -217,12 +217,12 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 					
 					IResultListener lis = new IResultListener()
 					{
-						public void resultAvailable(Object source, Object result)
+						public void resultAvailable(Object result)
 						{
 							// todo: save component id
 						}
 						
-						public void exceptionOccurred(Object source, Exception exception)
+						public void exceptionOccurred(Exception exception)
 						{
 						}
 					};

@@ -174,7 +174,7 @@ public abstract class AbstractGenericPlugin extends AbstractJCCPlugin
 					{
 						createPanel(element).addResultListener(new SwingDefaultResultListener(centerp)
 						{
-							public void customResultAvailable(Object source, Object result)
+							public void customResultAvailable(Object result)
 							{
 								IAbstractViewerPanel panel = (IAbstractViewerPanel)result;
 								panel.setProperties(ps);

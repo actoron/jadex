@@ -19,18 +19,18 @@ public class SJCC
 		SServiceProvider.getService(jcc.getServiceProvider(), IComponentManagementService.class)
 			.addResultListener(new SwingDefaultResultListener(ui)
 		{
-			public void customResultAvailable(Object source, Object result)
+			public void customResultAvailable(Object result)
 			{
 				final IComponentManagementService cms = (IComponentManagementService)result;
 				Future ret = new Future();
 				ret.addResultListener(new SwingDefaultResultListener(ui)
 				{
-					public void customResultAvailable(Object source, Object result)
+					public void customResultAvailable(Object result)
 					{
 						final IComponentIdentifier root = (IComponentIdentifier)result;
 						cms.resumeComponent(root).addResultListener(new SwingDefaultResultListener(ui)
 						{
-							public void customResultAvailable(Object source, Object result)
+							public void customResultAvailable(Object result)
 							{
 								cms.destroyComponent(root);
 							}
@@ -49,7 +49,7 @@ public class SJCC
 	{
 		cms.getParent(cid).addResultListener(new IResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				if(result==null)
 				{
@@ -61,7 +61,7 @@ public class SJCC
 				}
 			}
 			
-			public void exceptionOccurred(Object source, Exception exception)
+			public void exceptionOccurred(Exception exception)
 			{
 				future.setException(exception);
 			}

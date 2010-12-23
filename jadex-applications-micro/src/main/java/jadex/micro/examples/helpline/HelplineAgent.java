@@ -68,7 +68,7 @@ public class HelplineAgent extends MicroAgent
 		getRequiredService("clockservice")
 			.addResultListener(createResultListener(new DefaultResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				IClockService cs = (IClockService)result;
 				infos.put(name, new InformationEntry(name, info, cs.getTime()));

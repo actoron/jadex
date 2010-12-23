@@ -90,7 +90,7 @@ public class ComponentIdentifierPanel extends JPanel
 				//System.out.println("event: "+e);
 				SServiceProvider.getService(provider, IComponentManagementService.class).addResultListener(new SwingDefaultResultListener(ComponentIdentifierPanel.this)
 				{
-					public void customResultAvailable(Object source, Object result)
+					public void customResultAvailable(Object result)
 					{
 						IComponentManagementService cms = (IComponentManagementService)result;
 						ComponentIdentifierPanel.this.cid = cms.createComponentIdentifier(ComponentIdentifierPanel.this.cid.getName(), false, taddresses.getEntries());
@@ -141,7 +141,7 @@ public class ComponentIdentifierPanel extends JPanel
 		
 		SServiceProvider.getService(provider, IMessageService.class).addResultListener(new SwingDefaultResultListener(ComponentIdentifierPanel.this)
 		{
-			public void customResultAvailable(Object source, Object result)
+			public void customResultAvailable(Object result)
 			{
 				IMessageService ms = (IMessageService)result;
 				String[] ss = ms.getAddressSchemes();
@@ -240,7 +240,7 @@ public class ComponentIdentifierPanel extends JPanel
 		{
 			SServiceProvider.getService(provider, IComponentManagementService.class).addResultListener(new SwingDefaultResultListener(ComponentIdentifierPanel.this)
 			{
-				public void customResultAvailable(Object source, Object result)
+				public void customResultAvailable(Object result)
 				{
 					IComponentManagementService cms = (IComponentManagementService)result;
 					nameediting	= true;

@@ -26,7 +26,7 @@ public class TreeStressTestAgent extends MicroAgent
 		SServiceProvider.getServiceUpwards(getServiceProvider(), IComponentManagementService.class)
 			.addResultListener(createResultListener(new IResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				IComponentManagementService	cms	= (IComponentManagementService)result;
 				int	depth	= ((Number)getArgument("depth")).intValue();
@@ -40,7 +40,7 @@ public class TreeStressTestAgent extends MicroAgent
 						cms.createComponent(null, TreeStressTestAgent.this.getClass().getName()+".class", ci, null)
 							.addResultListener(new DefaultResultListener()
 						{
-							public void resultAvailable(Object source, Object result)
+							public void resultAvailable(Object result)
 							{
 							}
 						});
@@ -48,7 +48,7 @@ public class TreeStressTestAgent extends MicroAgent
 				}
 			}
 			
-			public void exceptionOccurred(Object source, Exception exception)
+			public void exceptionOccurred(Exception exception)
 			{
 				exception.printStackTrace();
 			}

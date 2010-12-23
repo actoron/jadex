@@ -125,7 +125,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 		dealerpan.setBackground(Color.WHITE);
 		SServiceProvider.getService(access.getServiceProvider(), IComponentManagementService.class).addResultListener(new SwingDefaultResultListener(ManagerFrame.this)
 		{
-			public void customResultAvailable(Object source, Object result)
+			public void customResultAvailable(Object result)
 			{
 				final IComponentManagementService ces = (IComponentManagementService)result;
 				dealeraid = ces.createComponentIdentifier(LOCAL_DEALER, true, null);
@@ -140,7 +140,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 			{
 				SServiceProvider.getService(access.getServiceProvider(), IComponentManagementService.class).addResultListener(new SwingDefaultResultListener(ManagerFrame.this)
 				{
-					public void customResultAvailable(Object source, Object result)
+					public void customResultAvailable(Object result)
 					{
 						final IComponentManagementService ces = (IComponentManagementService)result;
 						dealeraid = ces.createComponentIdentifier(dealertf.getText(), false, null);
@@ -370,7 +370,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 				SServiceProvider.getService(agent.getServiceProvider(), IComponentManagementService.class)
 					.addResultListener(new SwingDefaultResultListener(this)
 				{
-					public void customResultAvailable(Object source, Object result)
+					public void customResultAvailable(Object result)
 					{
 						final IComponentManagementService	cms	= (IComponentManagementService)result;
 						cms.destroyComponent(agent.getParent());

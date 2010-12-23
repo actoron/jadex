@@ -204,13 +204,13 @@ public class StarterNodeFunctionality extends DefaultNodeFunctionality
 					
 					SComponentFactory.isLoadable(jcc.getServiceProvider(), file).addResultListener(new DefaultResultListener()
 					{
-						public void resultAvailable(Object source, Object result)
+						public void resultAvailable(Object result)
 						{
 							if(((Boolean)result).booleanValue())
 							{
 								SComponentFactory.loadModel(jcc.getServiceProvider(), file).addResultListener(new SwingDefaultResultListener(checkcomp)
 								{
-									public void customResultAvailable(Object source, Object result)
+									public void customResultAvailable(Object result)
 									{
 										boolean newvalid = false;
 										IModelInfo model = (IModelInfo)result;
@@ -222,7 +222,7 @@ public class StarterNodeFunctionality extends DefaultNodeFunctionality
 										renew(fn, oldvalid, newvalid);
 									}
 									
-									public void customExceptionOccurred(Object source, Exception exception)
+									public void customExceptionOccurred(Exception exception)
 									{
 										renew(fn, oldvalid, false);
 									}

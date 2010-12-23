@@ -275,7 +275,7 @@ public class StarterPanel extends JPanel
 					SServiceProvider.getService(starter.getJCC().getServiceProvider(),
 						ILibraryService.class).addResultListener(new SwingDefaultResultListener(StarterPanel.this)
 					{
-						public void customResultAvailable(Object source, Object result)
+						public void customResultAvailable(Object result)
 						{
 							ILibraryService ls = (ILibraryService)result;
 							String configname = (String)config.getModel().getSelectedItem();
@@ -318,16 +318,16 @@ public class StarterPanel extends JPanel
 								{
 									killlistener = new SwingDefaultResultListener(StarterPanel.this)
 									{
-										public void customResultAvailable(Object source, Object result)
+										public void customResultAvailable(Object result)
 										{
 //											System.out.println("fullname: "+fullname+" "+model.getFilename());
-											String tmp = (String)mymodel.getFullName();
-											resultsets.put(tmp, new Object[]{source, result});
-											if(model!=null && fullname.equals(model.getFullName()))
-											{
-												selectavail.addItem(source);
-												refreshResults();
-											}
+//											String tmp = (String)mymodel.getFullName();
+//											resultsets.put(tmp, new Object[]{source, result});
+//											if(model!=null && fullname.equals(model.getFullName()))
+//											{
+//												selectavail.addItem(source);
+//												refreshResults();
+//											}
 										}
 									};
 								}
@@ -638,41 +638,41 @@ public class StarterPanel extends JPanel
 		{
 			SComponentFactory.isLoadable(starter.getJCC().getServiceProvider(), adf).addResultListener(new SwingDefaultResultListener(StarterPanel.this)
 			{
-				public void customResultAvailable(Object source, Object result)
+				public void customResultAvailable(Object result)
 				{
 					if(((Boolean)result).booleanValue())
 					{
 						SComponentFactory.loadModel(starter.getJCC().getServiceProvider(), adf).addResultListener(new SwingDefaultResultListener(StarterPanel.this)
 						{
-							public void customResultAvailable(Object source, Object result)
+							public void customResultAvailable(Object result)
 							{
 								model = (IModelInfo)result;
 								SComponentFactory.getFileType(starter.getJCC().getServiceProvider(), adf).addResultListener(new SwingDefaultResultListener(StarterPanel.this)
 								{
-									public void customResultAvailable(Object source, Object result)
+									public void customResultAvailable(Object result)
 									{
 										SComponentFactory.getFileTypeIcon(starter.getJCC().getServiceProvider(), (String)result).addResultListener(new SwingDefaultResultListener(StarterPanel.this)
 										{
-											public void customResultAvailable(Object source, Object result)
+											public void customResultAvailable(Object result)
 											{
 												updateGuiForNewModel(adf, (Icon)result);
 											}
 											
-											public void customExceptionOccurred(Object source, Exception exception)
+											public void customExceptionOccurred(Exception exception)
 											{
 												updateGuiForNewModel(adf, null);
 											}
 										});								
 									}
 									
-									public void customExceptionOccurred(Object source, Exception exception)
+									public void customExceptionOccurred(Exception exception)
 									{
 										updateGuiForNewModel(adf, null);
 									}
 								});								
 							}
 							
-							public void customExceptionOccurred(Object source, Exception exception)
+							public void customExceptionOccurred(Exception exception)
 							{
 								model = null;
 								StringWriter sw = new StringWriter();
@@ -985,7 +985,7 @@ public class StarterPanel extends JPanel
 		SServiceProvider.getService(starter.getJCC().getServiceProvider(),
 			ILibraryService.class).addResultListener(new SwingDefaultResultListener(StarterPanel.this)		
 		{
-			public void customResultAvailable(Object source, Object result)
+			public void customResultAvailable(Object result)
 			{
 				ILibraryService ls = (ILibraryService)result;
 				argelems = SCollection.createArrayList();

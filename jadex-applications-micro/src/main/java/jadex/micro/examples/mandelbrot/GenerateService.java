@@ -68,17 +68,17 @@ public class GenerateService extends BasicService implements IGenerateService
 //		SServiceProvider.getService(agent.getServiceProvider(), IDisplayService.class)
 			.addResultListener(new DefaultResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				final IDisplayService ds = (IDisplayService)result;
 				getCalculateServices(agent, data.getParallel()).addResultListener(new IResultListener()
 				{
-					public void resultAvailable(Object source, Object result)
+					public void resultAvailable(Object result)
 					{
 						distributeWork(data, (List)result, ds, ret);
 					}
 					
-					public void exceptionOccurred(Object source, Exception exception)
+					public void exceptionOccurred(Exception exception)
 					{
 					}
 				});
@@ -100,7 +100,7 @@ public class GenerateService extends BasicService implements IGenerateService
 		agent.getRequiredServices("calculateservices")
 			.addResultListener(agent.createResultListener(new DelegationResultListener(ret)
 		{
-			public void customResultAvailable(Object source, Object result)
+			public void customResultAvailable(Object result)
 			{
 				List sers = (List)result;
 				
@@ -113,7 +113,7 @@ public class GenerateService extends BasicService implements IGenerateService
 					
 					final CollectionResultListener lis = new CollectionResultListener(num, true, agent.createResultListener(new DefaultResultListener()
 					{
-						public void resultAvailable(Object source, Object result)
+						public void resultAvailable(Object result)
 						{
 //							SServiceProvider.getServices(agent.getServiceProvider(), ICalculateService.class, false, true)
 							agent.getRequiredServices("calculateservices")	
@@ -125,7 +125,7 @@ public class GenerateService extends BasicService implements IGenerateService
 					agent.getRequiredService("cmsservice")
 						.addResultListener(agent.createResultListener(agent.createResultListener(new DelegationResultListener(ret)
 					{
-						public void customResultAvailable(Object source, Object result)
+						public void customResultAvailable(Object result)
 						{
 							IComponentManagementService cms = (IComponentManagementService)result;
 							
@@ -197,18 +197,18 @@ public class GenerateService extends BasicService implements IGenerateService
 		
 		final CounterResultListener lis = new CounterResultListener(numx*numy, new IResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				ret.setResult(data);
 			}
 			
-			public void exceptionOccurred(Object source, Exception exception)
+			public void exceptionOccurred(Exception exception)
 			{
 				System.out.println("ex: "+exception);
 			}
 		})
 		{
-			public void intermediateResultAvailable(Object source, Object result)
+			public void intermediateResultAvailable(Object result)
 			{
 				AreaData ad = (AreaData)result;
 				int xs = (int)((Number)((Tuple)ad.getId()).getEntity(0)).intValue()*sizex;
@@ -304,28 +304,26 @@ class CalculateListener implements IResultListener
 	
 	/**
 	 *  Called when the result is available.
-	 *  @param source The source component.
-	 *  @param result The result.
+	 * @param result The result.
 	 */
-	public void resultAvailable(Object source, Object result)
+	public void resultAvailable(Object result)
 	{
 		// Hack!!! Provide provider id.
-		listener.resultAvailable(providerid, result);
+		listener.resultAvailable(result);
 	}
 	
 	/**
 	 *  Called when an exception occurred.
-	 *  @param source The source component.
-	 *  @param exception The exception.
+	 * @param exception The exception.
 	 */
-	public void exceptionOccurred(Object source, Exception exception)
+	public void exceptionOccurred(Exception exception)
 	{
 		exception.printStackTrace();
 		
 //		System.out.println("Recal start: "+data.getId());
 		GenerateService.getCalculateServices(agent, 1).addResultListener(new IResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 //				System.out.println("Recal end: "+data.getId());
 				ICalculateService cs = (ICalculateService)((Collection)result).iterator().next();
@@ -333,11 +331,11 @@ class CalculateListener implements IResultListener
 				cs.calculateArea(data).addResultListener(agent.createResultListener(CalculateListener.this));
 			}
 			
-			public void exceptionOccurred(Object source, Exception exception)
+			public void exceptionOccurred(Exception exception)
 			{
 				System.out.println("Recal no success: "+data.getId());
 				exception.printStackTrace();
-				listener.exceptionOccurred(source, exception);
+				listener.exceptionOccurred(exception);
 			}
 		});
 	}

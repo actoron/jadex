@@ -24,12 +24,12 @@ public class UserAgent extends MicroAgent
 	{
 		final CounterResultListener lis = new CounterResultListener(2, new IResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				killAgent();
 			}
 			
-			public void exceptionOccurred(Object source, Exception exception)
+			public void exceptionOccurred(Exception exception)
 			{
 				killAgent();
 			}
@@ -39,7 +39,7 @@ public class UserAgent extends MicroAgent
 		SServiceProvider.getServiceUpwards(getServiceProvider(), IComponentManagementService.class)
 			.addResultListener(createResultListener(new IResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				final IComponentManagementService cms = (IComponentManagementService)result;
 				
@@ -47,7 +47,7 @@ public class UserAgent extends MicroAgent
 				SServiceProvider.getService(getServiceProvider(), IRemoteServiceManagementService.class)
 					.addResultListener(createResultListener(new IResultListener()
 				{
-					public void resultAvailable(Object source, Object result)
+					public void resultAvailable(Object result)
 					{
 						IRemoteServiceManagementService rms = (IRemoteServiceManagementService)result;
 
@@ -57,27 +57,27 @@ public class UserAgent extends MicroAgent
 						// Search for remote service
 						rms.getServiceProxy(platid, IMathService.class).addResultListener(createResultListener(new IResultListener()
 						{
-							public void resultAvailable(Object source, Object result)
+							public void resultAvailable(Object result)
 							{
 								IMathService service = (IMathService)result;
 								invokeAddService("IMathService searched via rms.", service)
 									.addResultListener(createResultListener(lis));
 							}
-							public void exceptionOccurred(Object source, Exception exception)
+							public void exceptionOccurred(Exception exception)
 							{
-								lis.resultAvailable(null, null);
+								lis.resultAvailable(null);
 							}
 						}));
 					}						
-					public void exceptionOccurred(Object source, Exception exception)
+					public void exceptionOccurred(Exception exception)
 					{
-						lis.resultAvailable(null, null);
+						lis.resultAvailable(null);
 					}
 				}));
 			}
-			public void exceptionOccurred(Object source, Exception exception)
+			public void exceptionOccurred(Exception exception)
 			{
-				lis.resultAvailable(null, null);
+				lis.resultAvailable(null);
 			}
 		}));
 		
@@ -85,15 +85,15 @@ public class UserAgent extends MicroAgent
 		SServiceProvider.getService(getServiceProvider(), IMathService.class, true, true)
 			.addResultListener(createResultListener(new IResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				IMathService service = (IMathService)result;
 				invokeAddService("IMathService searched via platform proxy.", service)
 					.addResultListener(createResultListener(lis));
 			}
-			public void exceptionOccurred(Object source, Exception exception)
+			public void exceptionOccurred(Exception exception)
 			{
-				lis.resultAvailable(null, null);
+				lis.resultAvailable(null);
 			}
 		}));
 	}
@@ -118,14 +118,14 @@ public class UserAgent extends MicroAgent
 //			System.out.println("Calling non-blocking addNB method.");
 			service.addNB(1, 2).addResultListener(new IResultListener()
 			{
-				public void resultAvailable(Object source, Object result)
+				public void resultAvailable(Object result)
 				{
 					System.out.println("Invoked addNB: "+result);
-					lis.resultAvailable(null, null);
+					lis.resultAvailable(null);
 				}
-				public void exceptionOccurred(Object source, Exception exception)
+				public void exceptionOccurred(Exception exception)
 				{
-					lis.resultAvailable(null, null);
+					lis.resultAvailable(null);
 				}
 			});
 			
@@ -146,16 +146,16 @@ public class UserAgent extends MicroAgent
 			System.out.println("Calling (non-blocking) exception throwing divZero method.");
 			service.divZero().addResultListener(new IResultListener()
 			{
-				public void resultAvailable(Object source, Object result)
+				public void resultAvailable(Object result)
 				{
 					System.out.println("Invoked divZero without exception");
-					lis.resultAvailable(null, null);
+					lis.resultAvailable(null);
 				}
 				
-				public void exceptionOccurred(Object source, Exception exception)
+				public void exceptionOccurred(Exception exception)
 				{
 					System.out.println("Invoked divZero, expected exception occurred: "+exception);
-					lis.resultAvailable(null, null);
+					lis.resultAvailable(null);
 //					exception.printStackTrace();
 				}
 			});

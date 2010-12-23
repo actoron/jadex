@@ -128,11 +128,11 @@ public class LibraryService extends BasicService implements ILibraryService
 			final ILibraryServiceListener liscopy = lis[i];
 			lis[i].urlAdded(url).addResultListener(new IResultListener()
 			{
-				public void resultAvailable(Object source, Object result)
+				public void resultAvailable(Object result)
 				{
 				}
 				
-				public void exceptionOccurred(Object source, Exception exception)
+				public void exceptionOccurred(Exception exception)
 				{
 					exception.printStackTrace();
 					removeLibraryServiceListener(liscopy);
@@ -164,11 +164,11 @@ public class LibraryService extends BasicService implements ILibraryService
 			final ILibraryServiceListener liscopy = lis[i];
 			lis[i].urlRemoved(url).addResultListener(new IResultListener()
 			{
-				public void resultAvailable(Object source, Object result)
+				public void resultAvailable(Object result)
 				{
 				}
 				
-				public void exceptionOccurred(Object source, Exception exception)
+				public void exceptionOccurred(Exception exception)
 				{
 					exception.printStackTrace();
 					removeLibraryServiceListener(liscopy);
@@ -369,7 +369,7 @@ public class LibraryService extends BasicService implements ILibraryService
 		
 		getURLs().addResultListener(new IResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				List urls = (List)result;
 				// TODO Auto-generated method stub
@@ -399,7 +399,7 @@ public class LibraryService extends BasicService implements ILibraryService
 				ret.setResult(tmp);
 			}
 			
-			public void exceptionOccurred(Object source, Exception exception)
+			public void exceptionOccurred(Exception exception)
 			{
 				ret.setException(exception);
 			}
@@ -418,7 +418,7 @@ public class LibraryService extends BasicService implements ILibraryService
 		
 		getNonManagedURLs().addResultListener(new IResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				List urls = (List)result;
 				List tmp = new ArrayList();
@@ -447,7 +447,7 @@ public class LibraryService extends BasicService implements ILibraryService
 				ret.setResult(tmp);
 			}
 			
-			public void exceptionOccurred(Object source, Exception exception)
+			public void exceptionOccurred(Exception exception)
 			{
 				ret.setException(exception);
 			}

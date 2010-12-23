@@ -25,14 +25,13 @@ public class IntermediateDelegationResultListener implements IIntermediateResult
 	
 	/**
 	 *  Called when the result is available.
-	 *  @param source The source component.
-	 *  @param result The result.
+	 * @param result The result.
 	 */
-	public final void resultAvailable(Object source, Object result)
+	public final void resultAvailable(Object result)
 	{
 		try
 		{
-			customResultAvailable(source, result);
+			customResultAvailable(result);
 		}
 		catch(Exception e)
 		{
@@ -45,14 +44,13 @@ public class IntermediateDelegationResultListener implements IIntermediateResult
 	
 	/**
 	 *  Called when an intermediate result is available.
-	 *  @param source The source component.
-	 *  @param result The result.
+	 * @param result The result.
 	 */
-	public void intermediateResultAvailable(Object source, Object result)
+	public void intermediateResultAvailable(Object result)
 	{
 		try
 		{
-			customIntermediateResultAvailable(source, result);
+			customIntermediateResultAvailable(result);
 		}
 		catch(Exception e)
 		{
@@ -65,30 +63,27 @@ public class IntermediateDelegationResultListener implements IIntermediateResult
 	
 	/**
 	 *  Called when the result is available.
-	 *  @param source The source component.
-	 *  @param result The result.
+	 * @param result The result.
 	 */
-	public void customResultAvailable(Object source, Object result)
+	public void customResultAvailable(Object result)
 	{
 		future.setResult(result);
 	}
 
 	/**
 	 *  Called when an exception occurred.
-	 *  @param source The source component.
-	 *  @param exception The exception.
+	 * @param exception The exception.
 	 */
-	public void exceptionOccurred(Object source, Exception exception)
+	public void exceptionOccurred(Exception exception)
 	{
 		future.setException(exception);
 	}
 	
 	/**
 	 *  Called when an intermediate result is available.
-	 *  @param source The source component.
-	 *  @param result The result.
+	 * @param result The result.
 	 */
-	public void customIntermediateResultAvailable(Object source, Object result)
+	public void customIntermediateResultAvailable(Object result)
 	{
 		future.addIntermediateResult(result);
 	}

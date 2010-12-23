@@ -47,7 +47,7 @@ public abstract class DefaultResultListener implements IResultListener
 		{
 			instance = new DefaultResultListener(Logger.getLogger("default"))
 			{
-				public void resultAvailable(Object source, Object result)
+				public void resultAvailable(Object result)
 				{
 				}
 			};
@@ -68,11 +68,11 @@ public abstract class DefaultResultListener implements IResultListener
 	
 	/**
 	 *  Called when an exception occurred.
-	 *  @param exception The exception.
+	 * @param exception The exception.
 	 */
-	public void exceptionOccurred(Object source, Exception exception)
+	public void exceptionOccurred(Exception exception)
 	{
 //		exception.printStackTrace();
-		logger.severe(source+" exception occurred: "+exception);
+		logger.severe("Exception occurred: "+exception);
 	}
 }

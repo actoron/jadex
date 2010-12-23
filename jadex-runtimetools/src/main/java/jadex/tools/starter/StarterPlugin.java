@@ -290,7 +290,7 @@ public class StarterPlugin extends AbstractJCCPlugin	implements ICMSComponentLis
 //					if(getJCC().getComponent().getPlatform().getComponentFactory().isLoadable(model))
 					SComponentFactory.isLoadable(getJCC().getServiceProvider(), model).addResultListener(new SwingDefaultResultListener(spanel)
 					{
-						public void customResultAvailable(Object source, Object result)
+						public void customResultAvailable(Object result)
 						{
 							if(((Boolean)result).booleanValue())
 								loadModel(model);
@@ -321,7 +321,7 @@ public class StarterPlugin extends AbstractJCCPlugin	implements ICMSComponentLis
 							// todo: resultcollect = false?
 							SComponentFactory.isStartable(getJCC().getServiceProvider(), type).addResultListener(new SwingDefaultResultListener(spanel)
 							{
-								public void customResultAvailable(Object source, Object result)
+								public void customResultAvailable(Object result)
 								{
 									if(((Boolean)result).booleanValue())
 										createComponent(type, null, null, null, false, null, null, null, null);
@@ -356,12 +356,12 @@ public class StarterPlugin extends AbstractJCCPlugin	implements ICMSComponentLis
 		SServiceProvider.getServiceUpwards(jcc.getServiceProvider(),
 			IComponentManagementService.class).addResultListener(new DefaultResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				IComponentManagementService ces = (IComponentManagementService)result;
 				ces.getComponentDescriptions().addResultListener(new DefaultResultListener()
 				{
-					public void resultAvailable(Object source, Object result)
+					public void resultAvailable(Object result)
 					{
 						IComponentDescription[] res = (IComponentDescription[])result;
 						for(int i=0; i<res.length; i++)
@@ -546,7 +546,7 @@ public class StarterPlugin extends AbstractJCCPlugin	implements ICMSComponentLis
 			SServiceProvider.getServiceUpwards(jcc.getServiceProvider(),
 				IComponentManagementService.class).addResultListener(new DefaultResultListener()		
 			{
-				public void resultAvailable(Object source, Object result)
+				public void resultAvailable(Object result)
 				{
 					ComponentIdentifierDialog dia = new ComponentIdentifierDialog(spanel, jcc.getServiceProvider());
 					IComponentIdentifier cid = dia.getComponentIdentifier(null);
@@ -774,17 +774,17 @@ public class StarterPlugin extends AbstractJCCPlugin	implements ICMSComponentLis
 		SServiceProvider.getServiceUpwards(jcc.getServiceProvider(),
 			IComponentManagementService.class).addResultListener(new SwingDefaultResultListener(spanel)
 		{
-			public void customResultAvailable(Object source, Object result)
+			public void customResultAvailable(Object result)
 			{
 				IComponentManagementService cms = (IComponentManagementService)result;
 				cms.createComponent(name, type, new CreationInfo(configname, arguments, spanel.parent, suspend, master, daemon, autosd), killlistener).addResultListener(new IResultListener()
 				{
-					public void resultAvailable(Object source, Object result)
+					public void resultAvailable(Object result)
 					{
 						getJCC().setStatusText("Created component: " + ((IComponentIdentifier)result).getLocalName());
 					}
 					
-					public void exceptionOccurred(Object source, Exception exception)
+					public void exceptionOccurred(Exception exception)
 					{
 						getJCC().displayError("Problem Starting Component", "Component could not be started.", exception);
 					}

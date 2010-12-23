@@ -194,14 +194,14 @@ public abstract class ComponentManagementService extends BasicService implements
 		// Load the model with fitting factory.
 		getClassLoader(info).addResultListener(new DefaultResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				final ClassLoader	cl = (ClassLoader)result;
 				
 				SServiceProvider.getService(provider, new ComponentFactorySelector(model, cinfo.getImports(), cl))
 					.addResultListener(new IResultListener()
 				{
-					public void resultAvailable(Object source, Object result)
+					public void resultAvailable(Object result)
 					{
 //						System.out.println("create start2: "+model+" "+cinfo.getParent());
 						
@@ -237,7 +237,7 @@ public abstract class ComponentManagementService extends BasicService implements
 									// todo: hmm adresses may be set too late? use cached message service?
 									SServiceProvider.getService(provider, IMessageService.class).addResultListener(new DefaultResultListener()
 									{
-										public void resultAvailable(Object source, Object result)
+										public void resultAvailable(Object result)
 										{
 											IMessageService	ms	= (IMessageService)result;
 											if(ms!=null)
@@ -262,7 +262,7 @@ public abstract class ComponentManagementService extends BasicService implements
 						Future future = new Future();
 						future.addResultListener(new IResultListener()
 						{
-							public void resultAvailable(Object source, Object result)
+							public void resultAvailable(Object result)
 							{
 //								System.err.println("Post-Init: "+cid);
 
@@ -315,7 +315,7 @@ public abstract class ComponentManagementService extends BasicService implements
 								// Register component at parent.
 								getComponentInstance(pad).componentCreated(ad, lmodel).addResultListener(new IResultListener()
 								{
-									public void resultAvailable(Object source, Object result)
+									public void resultAvailable(Object result)
 									{
 //										System.err.println("Registered at parent: "+cid);
 										
@@ -373,14 +373,14 @@ public abstract class ComponentManagementService extends BasicService implements
 										}
 									}
 									
-									public void exceptionOccurred(Object source, Exception exception)
+									public void exceptionOccurred(Exception exception)
 									{
 										exception.printStackTrace();
 									}
 								});								
 							}
 							
-							public void exceptionOccurred(Object source, final Exception exception)
+							public void exceptionOccurred(final Exception exception)
 							{
 //								exception.printStackTrace();
 //								System.out.println("Ex: "+cid+" "+exception);
@@ -405,7 +405,7 @@ public abstract class ComponentManagementService extends BasicService implements
 										IResultListener reslis = (IResultListener)killresultlisteners.remove(cid);
 										if(reslis!=null)
 										{
-											reslis.exceptionOccurred(cid, exception);
+											reslis.exceptionOccurred(exception);
 										}
 										
 										if(cc!=null && cc.killfutures!=null)
@@ -426,12 +426,12 @@ public abstract class ComponentManagementService extends BasicService implements
 									CounterResultListener	crl	= new CounterResultListener(children.length, true,
 										new IResultListener()
 										{
-											public void resultAvailable(Object source, Object result)
+											public void resultAvailable(Object result)
 											{
 												cleanup.run();
 											}
 											
-											public void exceptionOccurred(Object source, Exception exception)
+											public void exceptionOccurred(Exception exception)
 											{
 												cleanup.run();
 											}
@@ -478,7 +478,7 @@ public abstract class ComponentManagementService extends BasicService implements
 						}
 					}
 					
-					public void exceptionOccurred(Object source, Exception exception)
+					public void exceptionOccurred(Exception exception)
 					{
 						inited.setException(exception);
 					}
@@ -625,18 +625,18 @@ public abstract class ComponentManagementService extends BasicService implements
 			SServiceProvider.getService(provider, IRemoteServiceManagementService.class)
 				.addResultListener(new IResultListener()
 			{
-				public void resultAvailable(Object source, Object result)
+				public void resultAvailable(Object result)
 				{
 					IRemoteServiceManagementService rms = (IRemoteServiceManagementService)result;
 					
 					rms.getServiceProxy(cid, IComponentManagementService.class).addResultListener(new IResultListener()
 					{
-						public void resultAvailable(Object source, Object result)
+						public void resultAvailable(Object result)
 						{
 							final IComponentManagementService rcms = (IComponentManagementService)result;
 							rcms.destroyComponent(cid).addResultListener(new DelegationResultListener(ret));
 						}
-						public void exceptionOccurred(Object source, Exception exception)
+						public void exceptionOccurred(Exception exception)
 						{
 							ret.setException(exception);
 						}
@@ -644,7 +644,7 @@ public abstract class ComponentManagementService extends BasicService implements
 					
 				}
 				
-				public void exceptionOccurred(Object source, Exception exception)
+				public void exceptionOccurred(Exception exception)
 				{
 					ret.setException(exception);
 				}
@@ -667,7 +667,7 @@ public abstract class ComponentManagementService extends BasicService implements
 					
 					destroyComponentLoop(cid, achildren, 0).addResultListener(new IResultListener()
 					{
-						public void resultAvailable(Object source, Object result)
+						public void resultAvailable(Object result)
 						{
 							synchronized(adapters)
 							{
@@ -708,7 +708,7 @@ public abstract class ComponentManagementService extends BasicService implements
 							resumeComponent(cid);
 						}
 						
-						public void exceptionOccurred(Object source, Exception exception)
+						public void exceptionOccurred(Exception exception)
 						{
 							ret.setException(exception);
 						}
@@ -731,7 +731,7 @@ public abstract class ComponentManagementService extends BasicService implements
 		{
 			destroyComponent(achildren[i]).addResultListener(new IResultListener()
 			{
-				public void resultAvailable(Object source, Object result)
+				public void resultAvailable(Object result)
 				{
 					if(i+1<achildren.length)
 					{
@@ -743,7 +743,7 @@ public abstract class ComponentManagementService extends BasicService implements
 					}
 				}
 				
-				public void exceptionOccurred(Object source, Exception exception)
+				public void exceptionOccurred(Exception exception)
 				{
 					ret.setException(exception);
 				}
@@ -770,18 +770,18 @@ public abstract class ComponentManagementService extends BasicService implements
 			SServiceProvider.getService(provider, IRemoteServiceManagementService.class)
 				.addResultListener(new IResultListener()
 			{
-				public void resultAvailable(Object source, Object result)
+				public void resultAvailable(Object result)
 				{
 					IRemoteServiceManagementService rms = (IRemoteServiceManagementService)result;
 					
 					rms.getServiceProxy(cid, IComponentManagementService.class).addResultListener(new IResultListener()
 					{
-						public void resultAvailable(Object source, Object result)
+						public void resultAvailable(Object result)
 						{
 							final IComponentManagementService rcms = (IComponentManagementService)result;
 							rcms.suspendComponent(cid).addResultListener(new DelegationResultListener(ret));
 						}
-						public void exceptionOccurred(Object source, Exception exception)
+						public void exceptionOccurred(Exception exception)
 						{
 							ret.setException(exception);
 						}
@@ -789,7 +789,7 @@ public abstract class ComponentManagementService extends BasicService implements
 					
 				}
 				
-				public void exceptionOccurred(Object source, Exception exception)
+				public void exceptionOccurred(Exception exception)
 				{
 					ret.setException(exception);
 				}
@@ -865,18 +865,18 @@ public abstract class ComponentManagementService extends BasicService implements
 			SServiceProvider.getService(provider, IRemoteServiceManagementService.class)
 				.addResultListener(new IResultListener()
 			{
-				public void resultAvailable(Object source, Object result)
+				public void resultAvailable(Object result)
 				{
 					IRemoteServiceManagementService rms = (IRemoteServiceManagementService)result;
 					
 					rms.getServiceProxy(cid, IComponentManagementService.class).addResultListener(new IResultListener()
 					{
-						public void resultAvailable(Object source, Object result)
+						public void resultAvailable(Object result)
 						{
 							final IComponentManagementService rcms = (IComponentManagementService)result;
 							rcms.resumeComponent(cid).addResultListener(new DelegationResultListener(ret));
 						}
-						public void exceptionOccurred(Object source, Exception exception)
+						public void exceptionOccurred(Exception exception)
 						{
 							ret.setException(exception);
 						}
@@ -884,7 +884,7 @@ public abstract class ComponentManagementService extends BasicService implements
 					
 				}
 				
-				public void exceptionOccurred(Object source, Exception exception)
+				public void exceptionOccurred(Exception exception)
 				{
 					ret.setException(exception);
 				}
@@ -967,25 +967,25 @@ public abstract class ComponentManagementService extends BasicService implements
 			SServiceProvider.getService(provider, IRemoteServiceManagementService.class)
 				.addResultListener(new IResultListener()
 			{
-				public void resultAvailable(Object source, Object result)
+				public void resultAvailable(Object result)
 				{
 					IRemoteServiceManagementService rms = (IRemoteServiceManagementService)result;
 					
 					rms.getServiceProxy(cid, IComponentManagementService.class).addResultListener(new IResultListener()
 					{
-						public void resultAvailable(Object source, Object result)
+						public void resultAvailable(Object result)
 						{
 							final IComponentManagementService rcms = (IComponentManagementService)result;
 							rcms.stepComponent(cid).addResultListener(new DelegationResultListener(ret));
 						}
-						public void exceptionOccurred(Object source, Exception exception)
+						public void exceptionOccurred(Exception exception)
 						{
 							ret.setException(exception);
 						}
 					});
 				}
 				
-				public void exceptionOccurred(Object source, Exception exception)
+				public void exceptionOccurred(Exception exception)
 				{
 					ret.setException(exception);
 				}
@@ -1046,25 +1046,25 @@ public abstract class ComponentManagementService extends BasicService implements
 			SServiceProvider.getService(provider, IRemoteServiceManagementService.class)
 				.addResultListener(new IResultListener()
 			{
-				public void resultAvailable(Object source, Object result)
+				public void resultAvailable(Object result)
 				{
 					IRemoteServiceManagementService rms = (IRemoteServiceManagementService)result;
 					
 					rms.getServiceProxy(cid, IComponentManagementService.class).addResultListener(new IResultListener()
 					{
-						public void resultAvailable(Object source, Object result)
+						public void resultAvailable(Object result)
 						{
 							final IComponentManagementService rcms = (IComponentManagementService)result;
 							rcms.setComponentBreakpoints(cid, breakpoints).addResultListener(new DelegationResultListener(ret));
 						}
-						public void exceptionOccurred(Object source, Exception exception)
+						public void exceptionOccurred(Exception exception)
 						{
 							ret.setException(exception);
 						}
 					});
 				}
 				
-				public void exceptionOccurred(Object source, Exception exception)
+				public void exceptionOccurred(Exception exception)
 				{
 					ret.setException(exception);
 				}
@@ -1143,7 +1143,7 @@ public abstract class ComponentManagementService extends BasicService implements
 			this.cid = cid;
 		}
 		
-		public void resultAvailable(Object source, Object result)
+		public void resultAvailable(Object result)
 		{
 			boolean	killparent	= false;
 			IComponentAdapter adapter = null;
@@ -1253,11 +1253,11 @@ public abstract class ComponentManagementService extends BasicService implements
 //				System.out.println("kill lis: "+cid+" "+results+" "+ex);
 				if(ex!=null)
 				{
-					reslis.exceptionOccurred(cid, ex);
+					reslis.exceptionOccurred(ex);
 				}
 				else
 				{
-					reslis.resultAvailable(cid, results);
+					reslis.resultAvailable(results);
 				}
 			}
 			else if(ex!=null)
@@ -1286,9 +1286,9 @@ public abstract class ComponentManagementService extends BasicService implements
 			}
 		}
 		
-		public void exceptionOccurred(Object source, Exception exception)
+		public void exceptionOccurred(Exception exception)
 		{
-			resultAvailable(source, cid);
+			resultAvailable(cid);
 		}
 		
 		/**
@@ -1325,24 +1325,24 @@ public abstract class ComponentManagementService extends BasicService implements
 			SServiceProvider.getService(provider, IRemoteServiceManagementService.class)
 				.addResultListener(new IResultListener()
 			{
-				public void resultAvailable(Object source, Object result)
+				public void resultAvailable(Object result)
 				{
 					IRemoteServiceManagementService rms = (IRemoteServiceManagementService)result;
 					
 					rms.getExternalAccessProxy(cid).addResultListener(new IResultListener()
 					{
-						public void resultAvailable(Object source, Object result)
+						public void resultAvailable(Object result)
 						{
 							ret.setResult(result);
 						}
-						public void exceptionOccurred(Object source, Exception exception)
+						public void exceptionOccurred(Exception exception)
 						{
 							ret.setException(exception);
 						}
 					});
 				}
 				
-				public void exceptionOccurred(Object source, Exception exception)
+				public void exceptionOccurred(Exception exception)
 				{
 					ret.setException(exception);
 				}
@@ -1388,12 +1388,12 @@ public abstract class ComponentManagementService extends BasicService implements
 			SServiceProvider.getService(provider, IComponentManagementService.class)
 				.addResultListener(new DelegationResultListener(ret)
 			{
-				public void customResultAvailable(Object source, Object result)
+				public void customResultAvailable(Object result)
 				{
 					IComponentManagementService	cms	= (IComponentManagementService)result;
 					cms.getExternalAccess(ci.getParent()).addResultListener(new DelegationResultListener(ret)
 					{
-						public void customResultAvailable(Object source, Object result)
+						public void customResultAvailable(Object result)
 						{
 							IExternalAccess	ea	= (IExternalAccess)result;
 //							System.err.println("Model class loader: "+ea.getModel().getName()+", "+ea.getModel().getClassLoader());
@@ -1410,7 +1410,7 @@ public abstract class ComponentManagementService extends BasicService implements
 			SServiceProvider.getService(provider, ILibraryService.class)
 				.addResultListener(new DelegationResultListener(ret)
 			{
-				public void customResultAvailable(Object source, Object result)
+				public void customResultAvailable(Object result)
 				{
 					ILibraryService	ls	= (ILibraryService)result;
 //					System.err.println("Libservice class loader: "+ls.getClassLoader());
@@ -1697,14 +1697,14 @@ public abstract class ComponentManagementService extends BasicService implements
 		{
 			SServiceProvider.getServices(provider, IComponentManagementService.class, true, true).addResultListener(new IResultListener()
 			{
-				public void resultAvailable(Object source, Object result)
+				public void resultAvailable(Object result)
 				{
 					Collection coll = (Collection)result;
 //					System.out.println("cms: "+coll);
 					// Ignore search failures of remote dfs
 					CollectionResultListener lis = new CollectionResultListener(coll.size(), true, new IResultListener()
 					{
-						public void resultAvailable(Object source, Object result)
+						public void resultAvailable(Object result)
 						{
 							// Add all services of all remote dfs
 							for(Iterator it=((Collection)result).iterator(); it.hasNext(); )
@@ -1723,7 +1723,7 @@ public abstract class ComponentManagementService extends BasicService implements
 							fut.setResult(ret.toArray(new CMSComponentDescription[ret.size()]));
 						}
 						
-						public void exceptionOccurred(Object source, Exception exception)
+						public void exceptionOccurred(Exception exception)
 						{
 //							open.remove(fut);
 							fut.setException(exception);
@@ -1739,12 +1739,12 @@ public abstract class ComponentManagementService extends BasicService implements
 						}
 						else
 						{
-							lis.resultAvailable(null, null);
+							lis.resultAvailable(null);
 						}
 					}
 				}
 				
-				public void exceptionOccurred(Object source, Exception exception)
+				public void exceptionOccurred(Exception exception)
 				{
 //					open.remove(fut);
 					fut.setResult(ret.toArray(new CMSComponentDescription[ret.size()]));
@@ -1896,13 +1896,13 @@ public abstract class ComponentManagementService extends BasicService implements
 		
 		super.startService().addResultListener(new IResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				final boolean[]	services = new boolean[2];
 				
 				SServiceProvider.getService(provider, IExecutionService.class).addResultListener(new DefaultResultListener()
 				{
-					public void resultAvailable(Object source, Object result)
+					public void resultAvailable(Object result)
 					{
 						exeservice	= (IExecutionService)result;
 						boolean	setresult;
@@ -1918,7 +1918,7 @@ public abstract class ComponentManagementService extends BasicService implements
 				
 				SServiceProvider.getService(provider, IMessageService.class).addResultListener(new DefaultResultListener()
 				{
-					public void resultAvailable(Object source, Object result)
+					public void resultAvailable(Object result)
 					{
 						msgservice	= (IMessageService)result;
 						
@@ -1936,7 +1936,7 @@ public abstract class ComponentManagementService extends BasicService implements
 							{
 								msgservice.signalStarted().addResultListener(new IResultListener()
 								{
-									public void resultAvailable(Object source, Object result)
+									public void resultAvailable(Object result)
 									{
 										synchronized(adapters)
 										{
@@ -1954,7 +1954,7 @@ public abstract class ComponentManagementService extends BasicService implements
 										}
 									}
 									
-									public void exceptionOccurred(Object source, Exception exception)
+									public void exceptionOccurred(Exception exception)
 									{
 									}
 								});
@@ -1979,7 +1979,7 @@ public abstract class ComponentManagementService extends BasicService implements
 				});
 			}
 			
-			public void exceptionOccurred(Object source, Exception exception)
+			public void exceptionOccurred(Exception exception)
 			{
 				ret.setException(exception);
 			}

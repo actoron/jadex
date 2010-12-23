@@ -410,7 +410,7 @@ public class AlarmSettingsDialog extends JDialog
 					ia.getRequiredService("clockservice")
 						.addResultListener(new SwingDefaultResultListener(AlarmSettingsDialog.this)
 					{
-						public void customResultAvailable(Object source, Object result)
+						public void customResultAvailable(Object result)
 						{
 							IClockService cs = (IClockService)result;
 							al.setTime(new Time(new Date(cs.getTime())));

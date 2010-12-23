@@ -340,7 +340,7 @@ public class DisplayPanel extends JComponent
 									ia.getRequiredService("cmsservice")
 										.addResultListener(new SwingDefaultResultListener(DisplayPanel.this)
 									{
-										public void customResultAvailable(Object source, Object result)
+										public void customResultAvailable(Object result)
 										{
 											IComponentManagementService	cms	= (IComponentManagementService)result;
 											if(progressdata!=null)
@@ -351,14 +351,14 @@ public class DisplayPanel extends JComponent
 													cms.getExternalAccess(progress.getProviderId())
 														.addResultListener(new SwingDefaultResultListener(DisplayPanel.this)
 													{
-														public void customResultAvailable(Object source, Object result)
+														public void customResultAvailable(Object result)
 														{
 															IExternalAccess	ea	= (IExternalAccess)result;
 															// It is not really possible to define the progress services as required service.
 															SServiceProvider.getService(ea.getServiceProvider(), IProgressService.class)
 																.addResultListener(new SwingDefaultResultListener(DisplayPanel.this)
 															{
-																public void customResultAvailable(Object source, Object result)
+																public void customResultAvailable(Object result)
 																{
 																	IProgressService	ps	= (IProgressService)result;
 																	if(ps!=null)
@@ -366,7 +366,7 @@ public class DisplayPanel extends JComponent
 																		ps.getProgress(progress.getTaskId())
 																			.addResultListener(new SwingDefaultResultListener(DisplayPanel.this)
 																		{
-																			public void customResultAvailable(Object source, Object result)
+																			public void customResultAvailable(Object result)
 																			{
 																				if(progressdata!=null && progressdata.containsKey(progress))
 																				{
@@ -380,7 +380,7 @@ public class DisplayPanel extends JComponent
 																				}
 																			}
 			
-																			public void customExceptionOccurred(Object source, Exception exception)
+																			public void customExceptionOccurred(Exception exception)
 																			{
 																				// ignore
 																			}
@@ -388,14 +388,14 @@ public class DisplayPanel extends JComponent
 																	}
 																}
 			
-																public void customExceptionOccurred(Object source, Exception exception)
+																public void customExceptionOccurred(Exception exception)
 																{
 																	// ignore
 																}
 															});
 														}
 			
-														public void customExceptionOccurred(Object source, Exception exception)
+														public void customExceptionOccurred(Exception exception)
 														{
 															// ignore
 														}
@@ -404,7 +404,7 @@ public class DisplayPanel extends JComponent
 											}
 										}
 	
-										public void customExceptionOccurred(Object source, Exception exception)
+										public void customExceptionOccurred(Exception exception)
 										{
 											// ignore
 										}
@@ -863,21 +863,21 @@ public class DisplayPanel extends JComponent
 				ia.getRequiredService("generateservice")
 					.addResultListener(new SwingDefaultResultListener()
 				{
-					public void customResultAvailable(Object source, Object result)
+					public void customResultAvailable(Object result)
 					{
 						IGenerateService	gs	= (IGenerateService)result;
 						IFuture	fut	= gs.generateArea(ad);
 						fut.addResultListener(new SwingDefaultResultListener(DisplayPanel.this)
 						{
-							public void customResultAvailable(Object source, Object result)
+							public void customResultAvailable(Object result)
 							{
 								DisplayPanel.this.setResults((AreaData)result);
 							}
-							public void customExceptionOccurred(Object source, Exception exception)
+							public void customExceptionOccurred(Exception exception)
 							{
 								calculating	= false;
 								DisplayPanel.this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-								super.customExceptionOccurred(source, exception);
+								super.customExceptionOccurred(exception);
 							}
 						});
 					}

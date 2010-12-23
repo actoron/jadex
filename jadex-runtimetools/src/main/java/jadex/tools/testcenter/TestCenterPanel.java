@@ -320,7 +320,7 @@ public class TestCenterPanel extends JSplitPane
 					SServiceProvider.getService(plugin.getJCC().getServiceProvider(),
 						ILibraryService.class).addResultListener(new SwingDefaultResultListener(TestCenterPanel.this)
 					{
-						public void customResultAvailable(Object source, Object result)
+						public void customResultAvailable(Object result)
 						{
 							try
 							{
@@ -359,7 +359,7 @@ public class TestCenterPanel extends JSplitPane
 					SServiceProvider.getServiceUpwards(plugin.getJCC().getServiceProvider(),
 						ILibraryService.class).addResultListener(new SwingDefaultResultListener(TestCenterPanel.this)
 					{
-						public void customResultAvailable(Object source, Object result) 
+						public void customResultAvailable(Object result) 
 						{
 							File file = loadsavechooser.getSelectedFile();
 							if(file!=null)

@@ -147,7 +147,7 @@ public class ModelExplorer extends JTree
 	
 		SServiceProvider.getService(container, IThreadPoolService.class).addResultListener(new DefaultResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				worker	= new LoadManagingExecutionService((IThreadPoolService)result);
 			}
@@ -535,7 +535,7 @@ public class ModelExplorer extends JTree
 		{
 			SServiceProvider.getService(provider, ILibraryService.class).addResultListener(new SwingDefaultResultListener(this)
 			{
-				public void customResultAvailable(Object source, Object result)
+				public void customResultAvailable(Object result)
 				{
 					ILibraryService ls = (ILibraryService)result;
 					for(int i=0; i<cs.length; i++)
@@ -814,7 +814,7 @@ public class ModelExplorer extends JTree
 		
 			ret.addResultListener(new IResultListener()
 			{
-				public void resultAvailable(Object source, Object result)
+				public void resultAvailable(Object result)
 				{
 					// Check if the node that was saved as selected is added.
 					if(lastselected!=null && lastselected.equals(path.getLastPathComponent()))
@@ -834,7 +834,7 @@ public class ModelExplorer extends JTree
 					}
 				}
 				
-				public void exceptionOccurred(Object source, Exception exception)
+				public void exceptionOccurred(Exception exception)
 				{
 					// Shouldn't happen
 					exception.printStackTrace();
@@ -991,7 +991,7 @@ public class ModelExplorer extends JTree
 						final File fcopy = file;
 						SServiceProvider.getService(provider, ILibraryService.class).addResultListener(new DefaultResultListener()
 						{
-							public void resultAvailable(Object source, Object result)
+							public void resultAvailable(Object result)
 							{
 								ILibraryService ls = (ILibraryService)result;
 								File f = new File(fcopy.getParentFile(), fcopy.getName());
@@ -1051,7 +1051,7 @@ public class ModelExplorer extends JTree
 				// todo: jars
 				SServiceProvider.getService(provider, ILibraryService.class).addResultListener(new SwingDefaultResultListener(ModelExplorer.this)
 				{
-					public void customResultAvailable(Object source, Object result)
+					public void customResultAvailable(Object result)
 					{
 						ILibraryService ls = (ILibraryService)result;
 						File file = node.getFile();

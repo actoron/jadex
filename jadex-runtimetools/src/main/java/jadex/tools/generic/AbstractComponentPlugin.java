@@ -56,13 +56,13 @@ public abstract class AbstractComponentPlugin extends AbstractGenericPlugin
 		SServiceProvider.getService(getJCC().getServiceProvider(), IComponentManagementService.class)
 			.addResultListener(new SwingDefaultResultListener(centerp) 
 		{
-			public void customResultAvailable(Object source, Object result) 
+			public void customResultAvailable(Object result) 
 			{
 				IComponentManagementService cms = (IComponentManagementService)result;
 				IComponentDescription adesc = cms.createComponentDescription(null, null, null, null, null, getModelName());
 				cms.searchComponents(adesc, null, remotecb.isSelected()).addResultListener(new SwingDefaultResultListener(centerp)
 				{
-					public void customResultAvailable(Object source, Object result)
+					public void customResultAvailable(Object result)
 					{
 						IComponentDescription[] descs = (IComponentDescription[])result;
 //						System.out.println("descs: "+SUtil.arrayToString(descs)+" "+remotecb.isSelected());
@@ -107,18 +107,18 @@ public abstract class AbstractComponentPlugin extends AbstractGenericPlugin
 		SServiceProvider.getService(getJCC().getServiceProvider(), IComponentManagementService.class)
 			.addResultListener(new SwingDefaultResultListener(centerp)
 		{
-			public void customResultAvailable(Object source, Object result)
+			public void customResultAvailable(Object result)
 			{
 				IComponentManagementService cms = (IComponentManagementService)result;
 				cms.getExternalAccess((IComponentIdentifier)cid)
 					.addResultListener(new SwingDefaultResultListener(centerp)
 				{
-					public void customResultAvailable(Object source, Object result)
+					public void customResultAvailable(Object result)
 					{
 						IExternalAccess exta = (IExternalAccess)result;
 						createComponentPanel(exta).addResultListener(new SwingDefaultResultListener(centerp)
 						{
-							public void customResultAvailable(Object source, Object result)
+							public void customResultAvailable(Object result)
 							{
 	//							System.out.println("add: "+result+" "+sel);
 								IComponentViewerPanel panel = (IComponentViewerPanel)result;
@@ -127,20 +127,20 @@ public abstract class AbstractComponentPlugin extends AbstractGenericPlugin
 								ret.setResult(panel);
 							}
 							
-							public void customExceptionOccurred(Object source, Exception exception)
+							public void customExceptionOccurred(Exception exception)
 							{
 								ret.setException(exception);
 							}
 						});
 					}
-					public void customExceptionOccurred(Object source, Exception exception)
+					public void customExceptionOccurred(Exception exception)
 					{
 						ret.setException(exception);
 					}
 				});
 			}
 			
-			public void customExceptionOccurred(Object source, Exception exception)
+			public void customExceptionOccurred(Exception exception)
 			{
 				ret.setException(exception);
 			}

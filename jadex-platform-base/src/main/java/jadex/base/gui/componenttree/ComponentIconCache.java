@@ -61,7 +61,7 @@ public class ComponentIconCache
 //			System.out.println("getIcon: "+type);
 			SServiceProvider.getService(provider, new ComponentFactorySelector(type)).addResultListener(new SwingDefaultResultListener()
 			{
-				public void customResultAvailable(Object source, Object result)
+				public void customResultAvailable(Object result)
 				{
 					IComponentFactory	fac	= (IComponentFactory)result;
 					icons.put(type, fac.getComponentTypeIcon(type));
@@ -75,7 +75,7 @@ public class ComponentIconCache
 						tree.repaint();
 					}
 				}
-				public void customExceptionOccurred(Object source, Exception exception)
+				public void customExceptionOccurred(Exception exception)
 				{
 					// ignore
 				}

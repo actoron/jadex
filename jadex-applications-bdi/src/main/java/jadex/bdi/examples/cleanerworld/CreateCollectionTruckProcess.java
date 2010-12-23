@@ -88,7 +88,7 @@ public class CreateCollectionTruckProcess extends SimplePropertyObject implement
 				SServiceProvider.getServiceUpwards(app.getServiceProvider(), IComponentManagementService.class)
 					.addResultListener(new DefaultResultListener()
 				{
-					public void resultAvailable(Object source, Object result)
+					public void resultAvailable(Object result)
 					{
 						final IComponentManagementService cms	= (IComponentManagementService)result;
 						IFuture ret = cms.createComponent(null, app.getComponentFilename("Truck"),
@@ -96,18 +96,18 @@ public class CreateCollectionTruckProcess extends SimplePropertyObject implement
 						
 						IResultListener lis = new IResultListener()
 						{
-							public void exceptionOccurred(Object source, Exception exception)
+							public void exceptionOccurred(Exception exception)
 							{
 							}
-							public void resultAvailable(Object source, Object result)
+							public void resultAvailable(Object result)
 							{
 								IComponentIdentifier truck = (IComponentIdentifier)result;
 								cms.getExternalAccess(truck).addResultListener(new IResultListener()
 								{
-									public void exceptionOccurred(Object source, Exception exception)
+									public void exceptionOccurred(Exception exception)
 									{
 									}
-									public void resultAvailable(Object source, Object result)
+									public void resultAvailable(Object result)
 									{
 										IBDIExternalAccess ex = (IBDIExternalAccess)result;
 										ex.scheduleStep(new IComponentStep()

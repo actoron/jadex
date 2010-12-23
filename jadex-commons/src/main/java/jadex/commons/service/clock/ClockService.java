@@ -247,26 +247,26 @@ public class ClockService extends BasicService implements IClockService
 		SServiceProvider.getServiceUpwards(provider, IThreadPoolService.class)
 			.addResultListener(new IResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				threadpool = (IThreadPoolService)result;
 				clock = createClock(cinfo, threadpool);
 				clock.start();
 				ClockService.super.startService().addResultListener(new IResultListener()
 				{
-					public void resultAvailable(Object source, Object result)
+					public void resultAvailable(Object result)
 					{
 						ret.setResult(ClockService.this);
 					}
 					
-					public void exceptionOccurred(Object source, Exception exception)
+					public void exceptionOccurred(Exception exception)
 					{
 						ret.setException(exception);
 					}
 				});
 			}
 			
-			public void exceptionOccurred(Object source, Exception exception)
+			public void exceptionOccurred(Exception exception)
 			{
 				ret.setException(exception);
 			}

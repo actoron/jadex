@@ -66,12 +66,12 @@ public class InterpreterTest
 			Future ret = new Future();
 			ret.addResultListener(new IResultListener()
 			{
-				public void resultAvailable(Object source, Object result)
+				public void resultAvailable(Object result)
 				{
 //					interpreter.getAgentAdapter().wakeup();
 				}
 				
-				public void exceptionOccurred(Object source, Exception exception)
+				public void exceptionOccurred(Exception exception)
 				{
 				}
 			});

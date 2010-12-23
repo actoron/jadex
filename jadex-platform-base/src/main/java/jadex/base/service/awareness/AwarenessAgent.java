@@ -120,13 +120,13 @@ public class AwarenessAgent extends MicroAgent
 	{
 		SServiceProvider.getService(getServiceProvider(), IClockService.class).addResultListener(createResultListener(new IResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				clock = (IClockService)result;
 				
 				getRootIdentifier().addResultListener(createResultListener(new IResultListener()
 				{
-					public void resultAvailable(Object source, Object result)
+					public void resultAvailable(Object result)
 					{
 						root = (IComponentIdentifier)result;
 						discovered.put(root, new DiscoveryInfo(root, false, false, clock.getTime(), delay));
@@ -136,14 +136,14 @@ public class AwarenessAgent extends MicroAgent
 						startReceiving();
 					}
 					
-					public void exceptionOccurred(Object source, Exception exception)
+					public void exceptionOccurred(Exception exception)
 					{
 						throw new RuntimeException(exception);
 					}
 				}));
 			}
 			
-			public void exceptionOccurred(Object source, Exception exception)
+			public void exceptionOccurred(Exception exception)
 			{
 				throw new RuntimeException(exception);
 			}
@@ -211,12 +211,12 @@ public class AwarenessAgent extends MicroAgent
 		SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class)
 			.addResultListener(createResultListener(new IResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				getRootIdentifier(getComponentIdentifier(), (IComponentManagementService)result, ret);
 			}
 			
-			public void exceptionOccurred(Object source, Exception exception)
+			public void exceptionOccurred(Exception exception)
 			{
 				ret.setException(exception);
 			}
@@ -239,7 +239,7 @@ public class AwarenessAgent extends MicroAgent
 	{
 		cms.getParent(cid).addResultListener(createResultListener(new IResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				if(result==null)
 				{
@@ -251,7 +251,7 @@ public class AwarenessAgent extends MicroAgent
 				}
 			}
 			
-			public void exceptionOccurred(Object source, Exception exception)
+			public void exceptionOccurred(Exception exception)
 			{
 				future.setException(exception);
 			}
@@ -436,10 +436,10 @@ public class AwarenessAgent extends MicroAgent
 						// Ignore deletion failures
 						deleteProxy(cid).addResultListener(new IResultListener()
 						{
-							public void resultAvailable(Object source, Object result)
+							public void resultAvailable(Object result)
 							{
 							}
-							public void exceptionOccurred(Object source, Exception exception)
+							public void exceptionOccurred(Exception exception)
 							{
 							}
 						});
@@ -460,24 +460,24 @@ public class AwarenessAgent extends MicroAgent
 		SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class)
 		.addResultListener(createResultListener(new IResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				final IComponentManagementService cms = (IComponentManagementService)result;
 				
 				IComponentIdentifier lcid = cms.createComponentIdentifier(dif.getComponentIdentifier().getLocalName(), true);
 				cms.getComponentDescription(lcid).addResultListener(new IResultListener()
 				{
-					public void resultAvailable(Object source, Object result)
+					public void resultAvailable(Object result)
 					{
 					}
 					
-					public void exceptionOccurred(Object source, Exception exception)
+					public void exceptionOccurred(Exception exception)
 					{
 						dif.setProxy(false);
 					}
 				});
 			}
-			public void exceptionOccurred(Object source, Exception exception) 
+			public void exceptionOccurred(Exception exception) 
 			{
 				getLogger().warning("Could not get cms: "+exception);
 			}
@@ -532,7 +532,7 @@ public class AwarenessAgent extends MicroAgent
 		SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class)
 			.addResultListener(createResultListener(new IResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				final IComponentManagementService cms = (IComponentManagementService)result;
 				
@@ -546,7 +546,7 @@ public class AwarenessAgent extends MicroAgent
 					cms.createComponent(cid.getLocalName(), "jadex/base/service/remote/ProxyAgent.class", ci, 
 						createResultListener(new IResultListener()
 					{
-						public void resultAvailable(Object source, Object result)
+						public void resultAvailable(Object result)
 						{
 							// todo: do not use source for cid?!
 			//				System.out.println("Proxy killed: "+source);
@@ -555,21 +555,21 @@ public class AwarenessAgent extends MicroAgent
 								dif.setProxy(false);
 						}
 						
-						public void exceptionOccurred(Object source, Exception exception)
+						public void exceptionOccurred(Exception exception)
 						{
 //							getLogger().warning("Proxy was killed: "+exception);
 						}
 					})).addResultListener(createResultListener(new IResultListener()
 					{
 						
-						public void resultAvailable(Object source, Object result)
+						public void resultAvailable(Object result)
 						{
 							DiscoveryInfo dif = getDiscoveryInfo(cid);
 							dif.setProxy(true);
 							ret.setResult(result);
 						}
 						
-						public void exceptionOccurred(Object source, Exception exception)
+						public void exceptionOccurred(Exception exception)
 						{
 	//						getLogger().warning("Exception during proxy creation: "+exception);
 							ret.setException(exception);
@@ -578,7 +578,7 @@ public class AwarenessAgent extends MicroAgent
 				}
 			}
 			
-			public void exceptionOccurred(Object source, Exception exception)
+			public void exceptionOccurred(Exception exception)
 			{
 				ret.setException(exception);
 			}
@@ -597,7 +597,7 @@ public class AwarenessAgent extends MicroAgent
 		SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class)
 			.addResultListener(createResultListener(new IResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				final IComponentManagementService cms = (IComponentManagementService)result;
 				
@@ -606,7 +606,7 @@ public class AwarenessAgent extends MicroAgent
 				
 				cms.destroyComponent(pcid).addResultListener(createResultListener(new IResultListener()
 				{
-					public void resultAvailable(Object source, Object result)
+					public void resultAvailable(Object result)
 					{
 						DiscoveryInfo dif = getDiscoveryInfo(cid);
 						if(dif!=null)
@@ -614,7 +614,7 @@ public class AwarenessAgent extends MicroAgent
 						ret.setResult(result);
 					}
 					
-					public void exceptionOccurred(Object source, Exception exception)
+					public void exceptionOccurred(Exception exception)
 					{
 //						getLogger().warning("Exception during proxy creation: "+exception);
 						ret.setException(exception);
@@ -622,7 +622,7 @@ public class AwarenessAgent extends MicroAgent
 				}));
 			}
 			
-			public void exceptionOccurred(Object source, Exception exception)
+			public void exceptionOccurred(Exception exception)
 			{
 				ret.setException(exception);
 			}
@@ -640,7 +640,7 @@ public class AwarenessAgent extends MicroAgent
 		SServiceProvider.getService(getServiceProvider(), IThreadPoolService.class)
 			.addResultListener(createResultListener(new IResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				final IThreadPoolService tp = (IThreadPoolService)result;
 				
@@ -751,7 +751,7 @@ public class AwarenessAgent extends MicroAgent
 				});
 			}
 			
-			public void exceptionOccurred(Object source, Exception exception)
+			public void exceptionOccurred(Exception exception)
 			{
 				getLogger().warning("Awareness agent problem, could not get threadpool service: "+exception);
 //				exception.printStackTrace();

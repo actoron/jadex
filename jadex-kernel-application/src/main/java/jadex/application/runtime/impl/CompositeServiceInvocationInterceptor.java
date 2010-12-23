@@ -86,7 +86,7 @@ public class CompositeServiceInvocationInterceptor implements IServiceInvocation
 				{
 					ea.getChildren(componenttype).addResultListener(ia.createResultListener(new DefaultResultListener()
 					{
-						public void resultAvailable(Object source, Object result)
+						public void resultAvailable(Object result)
 						{
 							final Collection res = (Collection)result;
 							
@@ -99,7 +99,7 @@ public class CompositeServiceInvocationInterceptor implements IServiceInvocation
 							{
 								IResultListener	lis	= ia.createResultListener(new DelegationResultListener(fut)
 								{
-									public void customResultAvailable(Object source, Object result)
+									public void customResultAvailable(Object result)
 									{
 										IComponentIdentifier cid = (IComponentIdentifier)result;
 										invokeServiceMethod(ia, cid, sic, fut);
@@ -117,18 +117,18 @@ public class CompositeServiceInvocationInterceptor implements IServiceInvocation
 									SServiceProvider.getService(ea.getServiceProvider(), IComponentManagementService.class)
 										.addResultListener(ia.createResultListener(new DelegationResultListener(fut)
 									{
-										public void customResultAvailable(Object source, Object result)
+										public void customResultAvailable(Object result)
 										{
 											final IComponentManagementService cms = (IComponentManagementService)result;
 											ea.getFileName(componenttype).addResultListener(ia.createResultListener(new DelegationResultListener(fut)
 											{
-												public void customResultAvailable(Object source, Object result)
+												public void customResultAvailable(Object result)
 												{
 													String filename = (String)result;
 													cms.createComponent(null, filename, new CreationInfo(ea.getComponentIdentifier()), null)
 														.addResultListener(ia.createResultListener(new DelegationResultListener(fut)
 													{
-														public void customResultAvailable(Object source, Object result)
+														public void customResultAvailable(Object result)
 														{
 															creating.setResult(result);
 															creating	= null;
@@ -159,13 +159,13 @@ public class CompositeServiceInvocationInterceptor implements IServiceInvocation
 		SServiceProvider.getService(ea.getServiceProvider(), IComponentManagementService.class)
 			.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 		{
-			public void customResultAvailable(Object source, Object result)
+			public void customResultAvailable(Object result)
 			{
 				final IComponentManagementService cms = (IComponentManagementService)result;
 		
 				cms.getExternalAccess(cid).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 				{
-					public void customResultAvailable(Object source, Object result)
+					public void customResultAvailable(Object result)
 					{
 						final BasicServiceInvocationHandler handler = (BasicServiceInvocationHandler)Proxy.getInvocationHandler(sic.getProxy());
 		
@@ -173,7 +173,7 @@ public class CompositeServiceInvocationInterceptor implements IServiceInvocation
 						SServiceProvider.getDeclaredService(cea.getServiceProvider(), handler.getServiceIdentifier().getServiceType())
 							.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 						{
-							public void customResultAvailable(Object source, Object result)
+							public void customResultAvailable(Object result)
 							{
 								if(result!=null)
 								{

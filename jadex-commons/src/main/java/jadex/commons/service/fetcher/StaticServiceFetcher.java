@@ -33,10 +33,10 @@ public class StaticServiceFetcher implements IRequiredServiceFetcher
 				SServiceProvider.getDeclaredService(provider, info.getType())
 					.addResultListener(new DelegationResultListener(ret)
 				{
-					public void customResultAvailable(Object source, Object result)
+					public void customResultAvailable(Object result)
 					{
 						StaticServiceFetcher.this.result = result;
-						super.customResultAvailable(source, result);
+						super.customResultAvailable(result);
 					}
 				});
 			}
@@ -45,10 +45,10 @@ public class StaticServiceFetcher implements IRequiredServiceFetcher
 				SServiceProvider.getService(provider, info.getType(), info.isRemote(), info.isForced())
 					.addResultListener(new DelegationResultListener(ret)
 				{
-					public void customResultAvailable(Object source, Object result)
+					public void customResultAvailable(Object result)
 					{
 						StaticServiceFetcher.this.result = result;
-						super.customResultAvailable(source, result);
+						super.customResultAvailable(result);
 					}
 				});
 			}
@@ -74,10 +74,10 @@ public class StaticServiceFetcher implements IRequiredServiceFetcher
 				SServiceProvider.getDeclaredServices(provider, info.getType())
 					.addResultListener(new DelegationResultListener(ret)
 				{
-					public void customResultAvailable(Object source, Object result)
+					public void customResultAvailable(Object result)
 					{
 						StaticServiceFetcher.this.result = result;
-						super.customResultAvailable(source, result);
+						super.customResultAvailable(result);
 					}
 				});
 			}
@@ -86,10 +86,10 @@ public class StaticServiceFetcher implements IRequiredServiceFetcher
 				SServiceProvider.getServices(provider, info.getType(), info.isRemote(), info.isForced())
 					.addResultListener(new DelegationResultListener(ret)
 				{
-					public void customResultAvailable(Object source, Object result)
+					public void customResultAvailable(Object result)
 					{
 						StaticServiceFetcher.this.result = result;
-						super.customResultAvailable(source, result);
+						super.customResultAvailable(result);
 					}
 				});
 			}

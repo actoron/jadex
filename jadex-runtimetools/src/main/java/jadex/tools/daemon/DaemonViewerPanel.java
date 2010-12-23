@@ -33,13 +33,13 @@ public class DaemonViewerPanel extends AbstractComponentViewerPanel
 		final Future ret = new Future();
 		super.init(jcc, component).addResultListener(new IResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				panel = new DaemonPanel((IMicroExternalAccess)component);
 				ret.setResult(result);
 			}
 			
-			public void exceptionOccurred(Object source, Exception exception)
+			public void exceptionOccurred(Exception exception)
 			{
 				ret.setException(exception);
 			}

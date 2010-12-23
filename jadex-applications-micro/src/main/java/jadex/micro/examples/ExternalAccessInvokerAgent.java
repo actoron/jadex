@@ -35,12 +35,12 @@ public class ExternalAccessInvokerAgent extends MicroAgent
 					SServiceProvider.getService(getExternalAccess().getServiceProvider(), IComponentManagementService.class)
 						.addResultListener(new DefaultResultListener()
 					{
-						public void resultAvailable(Object source, Object result)
+						public void resultAvailable(Object result)
 						{
 							IComponentManagementService cms = (IComponentManagementService)result;
 							cms.getExternalAccess(cid).addResultListener(new DefaultResultListener()
 							{
-								public void resultAvailable(Object source, Object result)
+								public void resultAvailable(Object result)
 								{
 									IExternalAccess ea = (IExternalAccess)result;
 									ea.scheduleStep(new IComponentStep()

@@ -69,11 +69,11 @@ public class ImpAgent extends MicroAgent
 				params.put(GetPosition.PARAMETER_POSITION, newpos);
 				space.performSpaceAction("move", params, createResultListener(new IResultListener()
 				{
-					public void resultAvailable(Object source, Object result)
+					public void resultAvailable(Object result)
 					{
 					}
 					
-					public void exceptionOccurred(Object source, Exception exception)
+					public void exceptionOccurred(Exception exception)
 					{
 						// change direction
 						double dir = ((Number)avatar.getProperty("direction")).doubleValue();

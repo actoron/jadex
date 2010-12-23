@@ -175,7 +175,7 @@ public class CacheServiceContainer	implements IServiceContainer
 		{
 			container.getServices(manager, decider, selector, results).addResultListener(new IResultListener()
 			{
-				public void resultAvailable(Object source, Object result)
+				public void resultAvailable(Object result)
 				{	
 					if(key!=null && result!=null)
 					{
@@ -195,7 +195,7 @@ public class CacheServiceContainer	implements IServiceContainer
 					ret.setResult(result);
 				}
 				
-				public void exceptionOccurred(Object source, Exception exception)
+				public void exceptionOccurred(Exception exception)
 				{
 					ret.setException(exception);
 				}
@@ -243,7 +243,7 @@ public class CacheServiceContainer	implements IServiceContainer
 //		System.out.println("search clock: "+getId());
 		SServiceProvider.getServiceUpwards(this, IClockService.class).addResultListener(new IResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				clock = (IClockService)result;
 //				System.out.println("Has clock: "+getId()+" "+clock);
@@ -253,7 +253,7 @@ public class CacheServiceContainer	implements IServiceContainer
 				container.start().addResultListener(new DelegationResultListener(ret));
 			}
 			
-			public void exceptionOccurred(Object source, Exception exception)
+			public void exceptionOccurred(Exception exception)
 			{
 				ret.setException(exception);
 			}

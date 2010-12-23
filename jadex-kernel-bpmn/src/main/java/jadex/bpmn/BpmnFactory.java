@@ -89,7 +89,7 @@ public class BpmnFactory extends BasicService implements IComponentFactory
 		};
 		SServiceProvider.getService(provider, ILibraryService.class).addResultListener(new DefaultResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				ILibraryService libService = (ILibraryService) result;
 				libService.addLibraryServiceListener(libservicelistener);
@@ -115,7 +115,7 @@ public class BpmnFactory extends BasicService implements IComponentFactory
 	{
 		SServiceProvider.getService(provider, ILibraryService.class).addResultListener(new DefaultResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				ILibraryService libService = (ILibraryService) result;
 				libService.removeLibraryServiceListener(libservicelistener);

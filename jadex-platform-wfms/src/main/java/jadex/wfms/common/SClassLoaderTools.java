@@ -25,7 +25,7 @@ public class SClassLoaderTools
 		
 		libService.getURLs().addResultListener(new DelegationResultListener(ret)
 		{
-			public void customResultAvailable(Object source, Object result)
+			public void customResultAvailable(Object result)
 			{
 				List urls = (List) result;
 				Set fileSet = new HashSet();

@@ -32,10 +32,9 @@ public class ComponentResultListener implements IResultListener
 	
 	/**
 	 *  Called when the result is available.
-	 *  @param source The source component.
-	 *  @param result The result.
+	 * @param result The result.
 	 */
-	public void resultAvailable(final Object source, final Object result)
+	public void resultAvailable(final Object result)
 	{
 		if(adapter.isExternalThread())
 		{
@@ -45,7 +44,7 @@ public class ComponentResultListener implements IResultListener
 				{
 					public void run()
 					{
-						listener.resultAvailable(source, result);
+						listener.resultAvailable(result);
 					}
 					
 					public String toString()
@@ -56,22 +55,21 @@ public class ComponentResultListener implements IResultListener
 			}
 			catch(Exception e)
 			{
-				listener.exceptionOccurred(source, e);
+				listener.exceptionOccurred(e);
 			}
 		}
 		else
 		{
-			listener.resultAvailable(source, result);
+			listener.resultAvailable(result);
 		}
 		
 	}
 	
 	/**
 	 *  Called when an exception occurred.
-	 *  @param source The source component.
-	 *  @param exception The exception.
+	 * @param exception The exception.
 	 */
-	public void exceptionOccurred(final Object source, final Exception exception)
+	public void exceptionOccurred(final Exception exception)
 	{
 		if(adapter.isExternalThread())
 		{
@@ -81,7 +79,7 @@ public class ComponentResultListener implements IResultListener
 				{
 					public void run()
 					{
-						listener.exceptionOccurred(source, exception);
+						listener.exceptionOccurred(exception);
 					}
 					
 					public String toString()
@@ -92,12 +90,12 @@ public class ComponentResultListener implements IResultListener
 			}
 			catch(Exception e)
 			{
-				listener.exceptionOccurred(source, e);
+				listener.exceptionOccurred(e);
 			}
 		}
 		else
 		{
-			listener.exceptionOccurred(source, exception);
+			listener.exceptionOccurred(exception);
 		}
 	}
 }

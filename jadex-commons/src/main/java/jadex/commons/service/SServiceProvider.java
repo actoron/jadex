@@ -116,12 +116,12 @@ public class SServiceProvider
 			new TypeResultSelector(type, true, remote), new ArrayList())
 				.addResultListener(new DelegationResultListener(ret)
 		{
-			public void customResultAvailable(Object source, Object result)
+			public void customResultAvailable(Object result)
 			{
 				if(result==null)
-					exceptionOccurred(source, new ServiceNotFoundException("No matching service found for type: "+type.getName()));
+					exceptionOccurred(new ServiceNotFoundException("No matching service found for type: "+type.getName()));
 				else
-					super.customResultAvailable(source, result);
+					super.customResultAvailable(result);
 			}
 		});
 		
@@ -148,12 +148,12 @@ public class SServiceProvider
 		provider.getServices(sequentialmanager, abortdecider, new IdResultSelector(sid), new ArrayList())
 			.addResultListener(new DelegationResultListener(ret)
 		{
-			public void customResultAvailable(Object source, Object result)
+			public void customResultAvailable(Object result)
 			{
 				if(result==null)
-					exceptionOccurred(source, new ServiceNotFoundException("No service found for id: "+sid));
+					exceptionOccurred(new ServiceNotFoundException("No service found for id: "+sid));
 				else
-					super.customResultAvailable(source, result);
+					super.customResultAvailable(result);
 			}
 		});
 		
@@ -180,12 +180,12 @@ public class SServiceProvider
 		provider.getServices(sequentialmanager, abortdecider, selector, new ArrayList())
 			.addResultListener(new DelegationResultListener(ret)
 		{
-			public void customResultAvailable(Object source, Object result)
+			public void customResultAvailable(Object result)
 			{
 				if(result==null)
-					exceptionOccurred(source, new ServiceNotFoundException("No matching service found for selector: "+selector));
+					exceptionOccurred(new ServiceNotFoundException("No matching service found for selector: "+selector));
 				else
-					super.customResultAvailable(source, result);
+					super.customResultAvailable(result);
 			}
 		});
 		
@@ -265,12 +265,12 @@ public class SServiceProvider
 		provider.getServices(upwardsmanager, abortdecider, new TypeResultSelector(type), new ArrayList())
 			.addResultListener(new DelegationResultListener(ret)
 		{
-			public void customResultAvailable(Object source, Object result)
+			public void customResultAvailable(Object result)
 			{
 				if(result==null)
-					exceptionOccurred(source, new ServiceNotFoundException("No matching service found for type: "+type.getName()));
+					exceptionOccurred(new ServiceNotFoundException("No matching service found for type: "+type.getName()));
 				else
-					super.customResultAvailable(source, result);
+					super.customResultAvailable(result);
 			}
 		});
 		
@@ -297,12 +297,12 @@ public class SServiceProvider
 		provider.getServices(localmanager, abortdecider, new TypeResultSelector(type), new ArrayList())
 			.addResultListener(new DelegationResultListener(ret)
 		{
-			public void customResultAvailable(Object source, Object result)
+			public void customResultAvailable(Object result)
 			{
 				if(result==null)
-					exceptionOccurred(source, new ServiceNotFoundException("No matching service found for type: "+type.getName()));
+					exceptionOccurred(new ServiceNotFoundException("No matching service found for type: "+type.getName()));
 				else
-					super.customResultAvailable(source, result);
+					super.customResultAvailable(result);
 			}
 		});
 		
@@ -397,12 +397,12 @@ public class SServiceProvider
 		provider.getServices(localmanager, abortdecider, new IdResultSelector(sid), new ArrayList())
 			.addResultListener(new DelegationResultListener(ret)
 		{
-			public void customResultAvailable(Object source, Object result)
+			public void customResultAvailable(Object result)
 			{
 				if(result==null)
-					exceptionOccurred(source, new ServiceNotFoundException("No service found for id: "+sid));
+					exceptionOccurred(new ServiceNotFoundException("No service found for id: "+sid));
 				else
-					super.customResultAvailable(source, result);
+					super.customResultAvailable(result);
 			}
 		});
 		

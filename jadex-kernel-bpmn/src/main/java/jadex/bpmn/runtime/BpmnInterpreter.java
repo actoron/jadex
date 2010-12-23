@@ -381,7 +381,7 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 		SServiceProvider.getServiceUpwards(getServiceProvider(), IComponentManagementService.class)
 			.addResultListener(createResultListener(new DefaultResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				variables.put("$cms", result);
 				boolean init2;
@@ -395,7 +395,7 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 					executeInitStep2();
 				}
 			}
-			public void exceptionOccurred(Object source, Exception exception)
+			public void exceptionOccurred(Exception exception)
 			{
 				inited.setException(exception);
 			}
@@ -403,7 +403,7 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 		SServiceProvider.getService(getServiceProvider(), IClockService.class)
 			.addResultListener(createResultListener(new DefaultResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				variables.put("$clock", result);
 				boolean init2;
@@ -417,7 +417,7 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 					executeInitStep2();
 				}
 			}
-			public void exceptionOccurred(Object source, Exception exception)
+			public void exceptionOccurred(Exception exception)
 			{
 				inited.setException(exception);
 			}
@@ -425,7 +425,7 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 		SServiceProvider.getService(getServiceProvider(), IMessageService.class)
 			.addResultListener(createResultListener(new IResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				variables.put("$msgservice", result);
 				boolean init2;
@@ -439,7 +439,7 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 					executeInitStep2();
 				}
 			} 
-			public void exceptionOccurred(Object source, Exception exception)
+			public void exceptionOccurred(Exception exception)
 			{
 				inited.setException(exception);
 			}
@@ -464,7 +464,7 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 		// Start the container and notify cms when start has finished.		
 		getServiceContainer().start().addResultListener(createResultListener(new IResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				// Create initial thread(s). 
 				List	startevents	= model.getStartActivities();
@@ -477,7 +477,7 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 				inited.setResult(new Object[]{BpmnInterpreter.this, adapter});
 			}
 			
-			public void exceptionOccurred(Object source, Exception exception)
+			public void exceptionOccurred(Exception exception)
 			{
 				inited.setException(exception);
 			}
@@ -610,7 +610,7 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 		SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class)
 			.addResultListener(createResultListener(new DefaultResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				((IComponentManagementService)result).destroyComponent(adapter.getComponentIdentifier())
 					.addResultListener(new DelegationResultListener(ret));

@@ -38,7 +38,7 @@ public class MessagePerformanceAgent extends MicroAgent
 	{
 		getTime().addResultListener(createResultListener(new DefaultResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				current = 1;
 				starttime = ((Long)result).longValue();
@@ -114,7 +114,7 @@ public class MessagePerformanceAgent extends MicroAgent
 		{
 			getTime().addResultListener(createResultListener(new DefaultResultListener()
 			{
-				public void resultAvailable(Object source, Object result)
+				public void resultAvailable(Object result)
 				{
 					long dur = ((Long)result).longValue() - starttime;
 					System.out.println("Sending/receiving " + msgcnt + " messages took: " + dur + " milliseconds.");

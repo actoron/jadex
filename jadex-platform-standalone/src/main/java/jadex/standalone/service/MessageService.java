@@ -154,7 +154,7 @@ public class MessageService extends BasicService implements IMessageService
 		// External access of sender required for content encoding etc.
 		cms.getExternalAccess(sender).addResultListener(new IResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				IExternalAccess exta = (IExternalAccess)result;
 				if(senddate==null)
@@ -178,7 +178,7 @@ public class MessageService extends BasicService implements IMessageService
 				}
 			}
 			
-			public void exceptionOccurred(Object source, Exception exception)
+			public void exceptionOccurred(Exception exception)
 			{
 				ret.setException(exception);
 			}
@@ -540,25 +540,25 @@ public class MessageService extends BasicService implements IMessageService
 		{
 			SServiceProvider.getService(provider, IClockService.class).addResultListener(new IResultListener()
 			{
-				public void resultAvailable(Object source, Object result)
+				public void resultAvailable(Object result)
 				{
 					clockservice = (IClockService)result;
 					SServiceProvider.getServiceUpwards(provider, IComponentManagementService.class).addResultListener(new IResultListener()
 					{
-						public void resultAvailable(Object source, Object result)
+						public void resultAvailable(Object result)
 						{
 							cms = (IComponentManagementService)result;
 							MessageService.super.startService().addResultListener(new DelegationResultListener(ret));
 						}
 						
-						public void exceptionOccurred(Object source, Exception exception)
+						public void exceptionOccurred(Exception exception)
 						{
 							ret.setException(exception);
 						}
 					});
 				}
 				
-				public void exceptionOccurred(Object source, Exception exception)
+				public void exceptionOccurred(Exception exception)
 				{
 					ret.setException(exception);
 				}
@@ -623,7 +623,7 @@ public class MessageService extends BasicService implements IMessageService
 		
 		SServiceProvider.getServiceUpwards(provider, IComponentManagementService.class).addResultListener(new DefaultResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				for(int i = 0; i < receivers.length; i++)
 				{
@@ -854,7 +854,7 @@ public class MessageService extends BasicService implements IMessageService
 			
 			SServiceProvider.getService(provider, IExecutionService.class).addResultListener(new DefaultResultListener()
 			{
-				public void resultAvailable(Object source, Object result)
+				public void resultAvailable(Object result)
 				{
 					try
 					{
@@ -926,7 +926,7 @@ public class MessageService extends BasicService implements IMessageService
 			
 			SServiceProvider.getService(provider, IExecutionService.class).addResultListener(new DefaultResultListener()
 			{
-				public void resultAvailable(Object source, Object result)
+				public void resultAvailable(Object result)
 				{
 					try
 					{

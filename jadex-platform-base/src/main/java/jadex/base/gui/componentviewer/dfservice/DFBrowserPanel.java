@@ -288,7 +288,7 @@ public class DFBrowserPanel	extends JPanel implements IServiceViewerPanel
 //		df.search(df.createDFComponentDescription(null, null), null).addResultListener(new SwingDefaultResultListener(this)
 		df.search(new DFComponentDescription(null), null, remotecb.isSelected()).addResultListener(new SwingDefaultResultListener(this)
 		{
-			public void customResultAvailable(Object source, Object result) 
+			public void customResultAvailable(Object result) 
 			{
 				IDFComponentDescription[] ads = (IDFComponentDescription[])result;
 //				System.out.println("Found: "+SUtil.arrayToString(ads));
@@ -332,7 +332,7 @@ public class DFBrowserPanel	extends JPanel implements IServiceViewerPanel
 	{
 		df.deregister(description).addResultListener(new SwingDefaultResultListener(this)
 		{
-			public void customResultAvailable(Object source, Object result) 
+			public void customResultAvailable(Object result) 
 			{
 				refresh();
 			}

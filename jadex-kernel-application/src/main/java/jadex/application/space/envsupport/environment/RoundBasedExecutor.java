@@ -89,7 +89,7 @@ public class RoundBasedExecutor extends SimplePropertyObject implements ISpaceEx
 
 		SServiceProvider.getService(provider, IClockService.class).addResultListener(new DefaultResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				final IClockService clockservice = (IClockService)result;
 

@@ -669,7 +669,7 @@ public class ObserverCenter
 				SServiceProvider.getService(space.getContext().getServiceProvider(), IClockService.class)
 					.addResultListener(new SwingDefaultResultListener(mainwindow)
 				{
-					public void customResultAvailable(Object source, Object result)
+					public void customResultAvailable(Object result)
 					{
 						vptimer.stop();
 						IClockService	clock	= (IClockService)result;
@@ -682,7 +682,7 @@ public class ObserverCenter
 				SServiceProvider.getService(space.getContext().getServiceProvider(), IClockService.class)
 					.addResultListener(new SwingDefaultResultListener(mainwindow)
 				{
-					public void customResultAvailable(Object source, Object result)
+					public void customResultAvailable(Object result)
 					{
 						vptimer.stop();
 						IClockService	clock	= (IClockService)result;
@@ -695,7 +695,7 @@ public class ObserverCenter
 				SServiceProvider.getService(space.getContext().getServiceProvider(), IClockService.class)
 					.addResultListener(new SwingDefaultResultListener(mainwindow)
 				{
-					public void customResultAvailable(Object source, Object result)
+					public void customResultAvailable(Object result)
 					{
 						IClockService	clock	= (IClockService)result;
 						clock.removeChangeListener(clocklistener);
@@ -725,7 +725,7 @@ public class ObserverCenter
 				SServiceProvider.getServiceUpwards(space.getContext().getServiceProvider(), IComponentManagementService.class)
 					.addResultListener(new SwingDefaultResultListener(mainwindow)
 				{
-					public void customResultAvailable(Object source, Object result)
+					public void customResultAvailable(Object result)
 					{
 						IComponentManagementService	cms = (IComponentManagementService)result;
 						cms.destroyComponent(space.getContext().getComponentIdentifier());
@@ -770,7 +770,7 @@ public class ObserverCenter
 			SServiceProvider.getService(space.getContext().getServiceProvider(), IClockService.class)
 			.addResultListener(new SwingDefaultResultListener(mainwindow)
 			{
-				public void customResultAvailable(Object source, Object result)
+				public void customResultAvailable(Object result)
 				{
 					IClockService	clock	= (IClockService)result;
 					clock.removeChangeListener(clocklistener);

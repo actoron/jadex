@@ -33,7 +33,7 @@ public class WfmsClientService extends BasicService implements IWfmsClientServic
 		final Future ret = new Future();
 		SServiceProvider.getService(provider, IClientConnector.class).addResultListener(new DelegationResultListener(ret)
 		{
-			public void customResultAvailable(Object source, Object result)
+			public void customResultAvailable(Object result)
 			{
 				((IClientConnector) result).queueWorkitem(workitem, listener);
 				ret.setResult(null);
@@ -53,7 +53,7 @@ public class WfmsClientService extends BasicService implements IWfmsClientServic
 		final Future ret = new Future();
 		SServiceProvider.getService(provider, IClientConnector.class).addResultListener(new DelegationResultListener(ret)
 		{
-			public void customResultAvailable(Object source, Object result)
+			public void customResultAvailable(Object result)
 			{
 				ret.setResult(((IClientConnector) result).getUserActivities());
 			}
@@ -71,7 +71,7 @@ public class WfmsClientService extends BasicService implements IWfmsClientServic
 		final Future ret = new Future();
 		SServiceProvider.getService(provider, IClientConnector.class).addResultListener(new DelegationResultListener(ret)
 		{
-			public void customResultAvailable(Object source, Object result)
+			public void customResultAvailable(Object result)
 			{
 				((IClientConnector) result).terminateActivity(activity);
 				ret.setResult(null);
@@ -89,7 +89,7 @@ public class WfmsClientService extends BasicService implements IWfmsClientServic
 		final Future ret = new Future();
 		SServiceProvider.getService(provider, IClientConnector.class).addResultListener(new DelegationResultListener(ret)
 		{
-			public void customResultAvailable(Object source, Object result)
+			public void customResultAvailable(Object result)
 			{
 				((IClientConnector) result).addActivityListener(listener);
 				ret.setResult(null);
@@ -107,7 +107,7 @@ public class WfmsClientService extends BasicService implements IWfmsClientServic
 		final Future ret = new Future();
 		SServiceProvider.getService(provider, IClientConnector.class).addResultListener(new DelegationResultListener(ret)
 		{
-			public void customResultAvailable(Object source, Object result)
+			public void customResultAvailable(Object result)
 			{
 				((IClientConnector) result).removeActivityListener(listener);
 				ret.setResult(null);

@@ -200,11 +200,11 @@ public class SpaceObject extends SynchronizedPropertyObject implements ISpaceObj
 				{
 					if(e==null)
 					{
-						((IResultListener)it.next()).resultAvailable(getId(), taskid);
+						((IResultListener)it.next()).resultAvailable(taskid);
 					}
 					else
 					{
-						((IResultListener)it.next()).exceptionOccurred(getId(), e);
+						((IResultListener)it.next()).exceptionOccurred(e);
 					}
 				}
 				tasklisteners.remove(taskid);
@@ -288,7 +288,7 @@ public class SpaceObject extends SynchronizedPropertyObject implements ISpaceObj
 			}
 			else
 			{
-				listener.resultAvailable(getId(), taskid);
+				listener.resultAvailable(taskid);
 			}
 		}
 	}
@@ -344,7 +344,7 @@ public class SpaceObject extends SynchronizedPropertyObject implements ISpaceObj
 						Collection	listeners	= tasklisteners.getCollection(atasks[i].getProperty(IObjectTask.PROPERTY_ID));
 						for(Iterator it=listeners.iterator(); it.hasNext(); )
 						{
-							((IResultListener)it.next()).exceptionOccurred(getId(), e);
+							((IResultListener)it.next()).exceptionOccurred(e);
 						}
 						tasklisteners.remove(atasks[i].getProperty(IObjectTask.PROPERTY_ID));				
 						if(tasklisteners.isEmpty())

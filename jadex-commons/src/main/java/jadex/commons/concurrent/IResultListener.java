@@ -7,15 +7,13 @@ public interface IResultListener
 {
 	/**
 	 *  Called when the result is available.
-	 *  @param source The source component.
-	 *  @param result The result.
+	 * @param result The result.
 	 */
-	public void resultAvailable(Object source, Object result);
+	public void resultAvailable(Object result);
 	
 	/**
 	 *  Called when an exception occurred.
-	 *  @param source The source component.
-	 *  @param exception The exception.
+	 * @param exception The exception.
 	 */
-	public void exceptionOccurred(Object source, Exception exception);
+	public void exceptionOccurred(Exception exception);
 }

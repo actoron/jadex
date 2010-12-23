@@ -88,7 +88,7 @@ public class DefaultBDIViewerPanel extends AbstractComponentViewerPanel
 		final CollectionResultListener lis = new CollectionResultListener(
 			subcapnames.length+1, true, new DelegationResultListener(ret)
 		{
-			public void customResultAvailable(Object source, Object result) 
+			public void customResultAvailable(Object result) 
 			{
 //				if(subpanels.size()==1)
 //				{
@@ -105,7 +105,7 @@ public class DefaultBDIViewerPanel extends AbstractComponentViewerPanel
 					}
 					panel.add(tp, BorderLayout.CENTER);
 				}
-				super.customResultAvailable(source, result);
+				super.customResultAvailable(result);
 			}	
 		});
 		
@@ -122,12 +122,12 @@ public class DefaultBDIViewerPanel extends AbstractComponentViewerPanel
 			}
 			catch(Exception e)
 			{
-				lis.exceptionOccurred(this, e);
+				lis.exceptionOccurred(e);
 			}
 		}
 		else
 		{
-			lis.exceptionOccurred(this, new RuntimeException("No viewerclass: "+clname));
+			lis.exceptionOccurred(new RuntimeException("No viewerclass: "+clname));
 		}
 		
 		// Capability panels.
@@ -146,7 +146,7 @@ public class DefaultBDIViewerPanel extends AbstractComponentViewerPanel
 				}
 				catch(Exception e)
 				{
-					lis.exceptionOccurred(this, e);
+					lis.exceptionOccurred(e);
 				}
 			}
 		}

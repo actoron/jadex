@@ -41,7 +41,7 @@ public class StartScenario
 		Starter.createPlatform(createArguments(defargs, libpaths))
 			.addResultListener(new DefaultResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				final IExternalAccess lplat = (IExternalAccess)result;
 				String[] defargs = new String[]{"-platformname", "remote", "-tcpport", "11000", "-niotcpport", "11001"};
@@ -49,28 +49,28 @@ public class StartScenario
 				Starter.createPlatform(createArguments(defargs, libpaths))
 					.addResultListener(new DefaultResultListener()
 				{
-					public void resultAvailable(Object source, Object result)
+					public void resultAvailable(Object result)
 					{
 						final IExternalAccess rplat = (IExternalAccess)result;
 						
 						SServiceProvider.getServiceUpwards(lplat.getServiceProvider(), IComponentManagementService.class)
 							.addResultListener(new DefaultResultListener()
 						{
-							public void resultAvailable(Object source, Object result)
+							public void resultAvailable(Object result)
 							{
 								final IComponentManagementService lcms = (IComponentManagementService)result;
 					
 								SServiceProvider.getServiceUpwards(rplat.getServiceProvider(), IComponentManagementService.class)
 									.addResultListener(new DefaultResultListener()
 								{
-									public void resultAvailable(Object source, Object result)
+									public void resultAvailable(Object result)
 									{
 										IComponentManagementService rcms = (IComponentManagementService)result;
 										
 										rcms.createComponent("math", "jadex.micro.examples.remoteservice.MathAgent.class", null, null)
 											.addResultListener(new DefaultResultListener()
 										{
-											public void resultAvailable(Object source, Object result)
+											public void resultAvailable(Object result)
 											{
 	//											System.out.println("started remote: "+result);
 												
@@ -81,11 +81,11 @@ public class StartScenario
 													new CreationInfo(SUtil.createHashMap(new String[]{"componentid"}, new Object[]{rrms})), null)
 													.addResultListener(new DefaultResultListener()
 												{
-													public void resultAvailable(Object source, Object result)
+													public void resultAvailable(Object result)
 													{
 														lcms.createComponent("user", "jadex.micro.examples.remoteservice.UserAgent.class", null, new DefaultResultListener()
 														{
-															public void resultAvailable(Object source, Object result)
+															public void resultAvailable(Object result)
 															{
 																//System.out.println("killed local user: "+result);
 															

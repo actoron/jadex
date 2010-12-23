@@ -93,7 +93,7 @@ public class HelplinePanel extends JPanel
 				bsearchinfo.setEnabled(false);
 				getInformation(tfname.getText(), cbremoteinfo.isSelected()).addResultListener(new SwingDefaultResultListener()
 				{
-					public void customResultAvailable(Object source, Object result)
+					public void customResultAvailable(Object result)
 					{
 						infolist.clear();
 						if(result!=null)
@@ -102,9 +102,9 @@ public class HelplinePanel extends JPanel
 						bsearchinfo.setEnabled(true);
 					}
 					
-					public void customExceptionOccurred(Object source, Exception exception)
+					public void customExceptionOccurred(Exception exception)
 					{
-						super.customExceptionOccurred(source, exception);
+						super.customExceptionOccurred(exception);
 						bsearchinfo.setEnabled(true);
 					}
 				});
@@ -220,7 +220,7 @@ public class HelplinePanel extends JPanel
 			{
 				ia.getRequiredServices("localhelplineservices").addResultListener(new SwingDefaultResultListener(HelplinePanel.this) 
 				{
-					public void customResultAvailable(Object source, Object result) 
+					public void customResultAvailable(Object result) 
 					{
 						Collection newservices = (Collection)result;
 						
@@ -270,7 +270,7 @@ public class HelplinePanel extends JPanel
 		
 		fut.addResultListener(new IResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				if(result!=null)
 				{
@@ -278,7 +278,7 @@ public class HelplinePanel extends JPanel
 					CollectionResultListener crl = new CollectionResultListener(
 						coll.size(), true, new DefaultResultListener()
 					{
-						public void resultAvailable(Object source, Object result)
+						public void resultAvailable(Object result)
 						{
 							if(result!=null)
 							{
@@ -314,7 +314,7 @@ public class HelplinePanel extends JPanel
 				}
 			}
 			
-			public void exceptionOccurred(Object source, Exception exception)
+			public void exceptionOccurred(Exception exception)
 			{
 				ret.setException(exception);
 			}

@@ -110,13 +110,13 @@ public abstract class AbstractTimePanel extends JPanel
 				SServiceProvider.getService(getServiceProvider(),
 					ISimulationService.class).addResultListener(new SwingDefaultResultListener(AbstractTimePanel.this)
 				{
-					public void customResultAvailable(Object source, Object result)
+					public void customResultAvailable(Object result)
 					{
 						((ISimulationService)result).addChangeListener(contextlistener);
 						SServiceProvider.getService(getServiceProvider(),
 							IClockService.class).addResultListener(new SwingDefaultResultListener(AbstractTimePanel.this)
 						{
-							public void customResultAvailable(Object source, Object result)
+							public void customResultAvailable(Object result)
 							{
 								((IClockService)result).addChangeListener(clocklistener);
 								updateView();
@@ -130,13 +130,13 @@ public abstract class AbstractTimePanel extends JPanel
 				SServiceProvider.getService(getServiceProvider(),
 					ISimulationService.class).addResultListener(new SwingDefaultResultListener(AbstractTimePanel.this)
 				{
-					public void customResultAvailable(Object source, Object result)
+					public void customResultAvailable(Object result)
 					{
 						((ISimulationService)result).removeChangeListener(contextlistener);
 						SServiceProvider.getService(getServiceProvider(),
 								IClockService.class).addResultListener(new SwingDefaultResultListener(AbstractTimePanel.this)
 						{
-							public void customResultAvailable(Object source, Object result)
+							public void customResultAvailable(Object result)
 							{
 								((IClockService)result).removeChangeListener(clocklistener);
 							}
@@ -216,7 +216,7 @@ public abstract class AbstractTimePanel extends JPanel
 			SServiceProvider.getService(getServiceProvider(),
 					IClockService.class).addResultListener(new DefaultResultListener()
 			{
-				public void resultAvailable(Object source, Object result)
+				public void resultAvailable(Object result)
 				{
 					clock = (IClockService)result;
 				}
@@ -228,7 +228,7 @@ public abstract class AbstractTimePanel extends JPanel
 			SServiceProvider.getService(getServiceProvider(),
 				IClockService.class).addResultListener(new DefaultResultListener()
 			{
-				public void resultAvailable(Object source, Object result)
+				public void resultAvailable(Object result)
 				{
 					IClockService newclock = (IClockService)result;//getClockService();
 					if(clock!=newclock)

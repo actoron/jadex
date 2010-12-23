@@ -163,7 +163,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 				SServiceProvider.getService(component.getServiceProvider(), IComponentManagementService.class)
 					.addResultListener(agent.createResultListener(new IResultListener()
 				{
-					public void resultAvailable(Object source, Object result)
+					public void resultAvailable(Object result)
 					{
 						IComponentManagementService cms = (IComponentManagementService)result;
 						
@@ -175,7 +175,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 						
 						sendMessage(rrms, content, callid, -1, fut);
 					}
-					public void exceptionOccurred(Object source, Exception exception)
+					public void exceptionOccurred(Exception exception)
 					{
 						fut.setException(exception);
 					}
@@ -249,7 +249,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 				SServiceProvider.getService(component.getServiceProvider(), IComponentManagementService.class)
 					.addResultListener(agent.createResultListener(new IResultListener()
 				{
-					public void resultAvailable(Object source, Object result)
+					public void resultAvailable(Object result)
 					{
 						IComponentManagementService cms = (IComponentManagementService)result;
 						
@@ -260,7 +260,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 						
 						sendMessage(rrms, content, callid, -1, fut);
 					}
-					public void exceptionOccurred(Object source, Exception exception)
+					public void exceptionOccurred(Exception exception)
 					{
 						fut.setException(exception);
 					}
@@ -390,14 +390,14 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 				SServiceProvider.getService(component.getServiceProvider(), ILibraryService.class)
 					.addResultListener(agent.createResultListener(new IResultListener()
 				{
-					public void resultAvailable(Object source, Object result)
+					public void resultAvailable(Object result)
 					{
 						final ILibraryService ls = (ILibraryService)result;
 						
 						SServiceProvider.getService(component.getServiceProvider(), IMessageService.class)
 							.addResultListener(agent.createResultListener(new IResultListener()
 						{
-							public void resultAvailable(Object source, Object result)
+							public void resultAvailable(Object result)
 							{
 								// Hack!!! Manual encoding for using custom class loader at receiver side.
 //								msg.put(SFipa.CONTENT, JavaWriter.objectToXML(content, ls.getClassLoader()));
@@ -408,7 +408,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 								ms.sendMessage(msg, SFipa.FIPA_MESSAGE_TYPE, component.getComponentIdentifier(), ls.getClassLoader())
 									.addResultListener(agent.createResultListener(new IResultListener()
 								{
-									public void resultAvailable(Object source, Object result)
+									public void resultAvailable(Object result)
 									{
 										// ok message could be sent.
 										component.scheduleStep(new IComponentStep()
@@ -431,13 +431,13 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 													}
 												}).addResultListener(agent.createResultListener(new DefaultResultListener()
 												{
-													public void resultAvailable(Object source, Object result)
+													public void resultAvailable(Object result)
 													{
 														// cancel timer when future is finished before. 
 														final ITimer timer = (ITimer)result;
 														future.addResultListener(agent.createResultListener(new IResultListener()
 														{
-															public void resultAvailable(Object source, Object result)
+															public void resultAvailable(Object result)
 															{
 																removeWaitingCall(callid);
 //																waitingcalls.remove(callid);
@@ -447,7 +447,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 																timer.cancel();
 															}
 															
-															public void exceptionOccurred(Object source, Exception exception)
+															public void exceptionOccurred(Exception exception)
 															{
 																removeWaitingCall(callid);
 //																waitingcalls.remove(callid);
@@ -465,7 +465,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 										});
 									}
 									
-									public void exceptionOccurred(Object source, Exception exception)
+									public void exceptionOccurred(Exception exception)
 									{
 										// message could not be sent -> fail immediately.
 //										System.out.println("Callee could not be reached: "+exception);
@@ -478,7 +478,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 								}));
 							}
 							
-							public void exceptionOccurred(Object source, Exception exception)
+							public void exceptionOccurred(Exception exception)
 							{
 //								errors.put(callid, new Object[]{"No msg service", exception});
 								removeWaitingCall(callid);
@@ -489,7 +489,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 						}));
 					}
 					
-					public void exceptionOccurred(Object source, Exception exception)
+					public void exceptionOccurred(Exception exception)
 					{
 //						errors.put(callid, new Object[]{"No lib service", exception});
 						removeWaitingCall(callid);

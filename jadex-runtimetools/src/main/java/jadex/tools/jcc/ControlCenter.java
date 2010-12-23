@@ -103,7 +103,7 @@ public class ControlCenter implements IControlCenter
 		SServiceProvider.getService(container, ILibraryService.class)
 			.addResultListener(new SwingDefaultResultListener(window)
 		{
-			public void customResultAvailable(Object source, Object result)
+			public void customResultAvailable(Object result)
 			{
 				ClassLoader cl = ((ILibraryService)result).getClassLoader();
 	
@@ -414,7 +414,7 @@ public class ControlCenter implements IControlCenter
 			SServiceProvider.getService(container, ILibraryService.class)
 				.addResultListener(new SwingDefaultResultListener(window)
 			{
-				public void customResultAvailable(Object source, Object result)
+				public void customResultAvailable(Object result)
 				{
 					try
 					{

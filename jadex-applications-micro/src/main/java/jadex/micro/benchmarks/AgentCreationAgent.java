@@ -41,7 +41,7 @@ public class AgentCreationAgent extends MicroAgent
 		{
 			SServiceProvider.getService(getServiceProvider(), IClockService.class).addResultListener(new ComponentResultListener(new DefaultResultListener()
 			{
-				public void resultAvailable(Object source, Object result)
+				public void resultAvailable(Object result)
 				{
 					args.put("num", new Integer(1));
 					Long startmem = new Long(Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory());
@@ -77,7 +77,7 @@ public class AgentCreationAgent extends MicroAgent
 
 			SServiceProvider.getServiceUpwards(getServiceProvider(), IComponentManagementService.class).addResultListener(createResultListener(new DefaultResultListener()
 			{
-				public void resultAvailable(Object source, Object result)
+				public void resultAvailable(Object result)
 				{
 					((IComponentManagementService)result).createComponent(createPeerName(num+1, getComponentIdentifier()), AgentCreationAgent.this.getClass().getName()+".class",
 						new CreationInfo(args, nested ? getComponentIdentifier() : null), null);
@@ -95,7 +95,7 @@ public class AgentCreationAgent extends MicroAgent
 
 			getTime().addResultListener(createResultListener(new DefaultResultListener()
 			{
-				public void resultAvailable(Object source, Object result)
+				public void resultAvailable(Object result)
 				{
 					final long end = ((Long)result).longValue();
 					System.out.println("Last peer created. "+max+" agents started.");
@@ -114,14 +114,14 @@ public class AgentCreationAgent extends MicroAgent
 					{
 						SServiceProvider.getServiceUpwards(getServiceProvider(), IComponentManagementService.class).addResultListener(createResultListener(new DefaultResultListener()
 						{
-							public void resultAvailable(Object source, Object result)
+							public void resultAvailable(Object result)
 							{
 								IComponentManagementService	cms	= (IComponentManagementService)result;
 								String	initial	= createPeerName(1, getComponentIdentifier());
 								IComponentIdentifier	cid	= cms.createComponentIdentifier(initial, true);
 								cms.getExternalAccess(cid).addResultListener(createResultListener(new DefaultResultListener()
 								{
-									public void resultAvailable(Object source, Object result)
+									public void resultAvailable(Object result)
 									{
 										IMicroExternalAccess	exta	= (IMicroExternalAccess)result;
 										deletePeers(max, end, dur, pera, omem, upera, max, exta, nested);
@@ -165,7 +165,7 @@ public class AgentCreationAgent extends MicroAgent
 		SServiceProvider.getService(exta.getServiceProvider(), IComponentManagementService.class)
 			.addResultListener(new DefaultResultListener()
 		{
-			public void resultAvailable(Object source, final Object result)
+			public void resultAvailable(final Object result)
 			{
 				exta.scheduleStep(new IComponentStep()
 				{
@@ -176,7 +176,7 @@ public class AgentCreationAgent extends MicroAgent
 						IComponentIdentifier aid = cms.createComponentIdentifier(name, true, null);
 						IResultListener lis = new IResultListener()
 						{
-							public void resultAvailable(Object source, Object result)
+							public void resultAvailable(Object result)
 							{
 								exta.scheduleStep(new IComponentStep()
 								{
@@ -198,7 +198,7 @@ public class AgentCreationAgent extends MicroAgent
 									}
 								});
 							}
-							public void exceptionOccurred(Object source, Exception exception)
+							public void exceptionOccurred(Exception exception)
 							{
 								exception.printStackTrace();
 							}
@@ -222,7 +222,7 @@ public class AgentCreationAgent extends MicroAgent
 		SServiceProvider.getService(exta.getServiceProvider(), IClockService.class)
 			.addResultListener(new DefaultResultListener()
 		{
-			public void resultAvailable(Object source, final Object result)
+			public void resultAvailable(final Object result)
 			{
 				exta.scheduleStep(new IComponentStep()
 				{
@@ -247,7 +247,7 @@ public class AgentCreationAgent extends MicroAgent
 						SServiceProvider.getService(exta.getServiceProvider(), IComponentManagementService.class)
 							.addResultListener(new DefaultResultListener()
 						{
-							public void resultAvailable(Object source, final Object result)
+							public void resultAvailable(final Object result)
 							{
 								exta.scheduleStep(new IComponentStep()
 								{

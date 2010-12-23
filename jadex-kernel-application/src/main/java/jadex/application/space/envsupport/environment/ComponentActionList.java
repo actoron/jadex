@@ -154,7 +154,7 @@ public class ComponentActionList
 								{
 									if(wakeup)
 									{
-										entry.listener.resultAvailable(this, ret);
+										entry.listener.resultAvailable(ret);
 									}
 									else
 									{
@@ -172,7 +172,7 @@ public class ComponentActionList
 									Exception e = new RuntimeException("Invalid action.");
 									if(wakeup)
 									{
-										entry.listener.exceptionOccurred(this, e);
+										entry.listener.exceptionOccurred(e);
 									}
 									else
 									{
@@ -190,7 +190,7 @@ public class ComponentActionList
 							{
 								if(wakeup)
 								{
-									entry.listener.exceptionOccurred(this, e);
+									entry.listener.exceptionOccurred(e);
 								}
 								else
 								{
@@ -230,11 +230,11 @@ public class ComponentActionList
 						it.remove();
 						if(entry.exception==null)
 						{
-							entry.listener.resultAvailable(this, entry.result);
+							entry.listener.resultAvailable(entry.result);
 						}
 						else
 						{
-							entry.listener.exceptionOccurred(this, entry.exception);
+							entry.listener.exceptionOccurred(entry.exception);
 						}
 					}
 				}

@@ -41,7 +41,7 @@ public class StandaloneComponentAdapter	extends AbstractComponentAdapter	impleme
 	{
 		SServiceProvider.getService(getServiceContainer(), IExecutionService.class).addResultListener(new DefaultResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				try
 				{

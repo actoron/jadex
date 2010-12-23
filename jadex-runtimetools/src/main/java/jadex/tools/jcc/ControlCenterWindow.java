@@ -631,7 +631,7 @@ public class ControlCenterWindow extends JFrame
 			SServiceProvider.getService(controlcenter.getServiceProvider(), ILibraryService.class)
 				.addResultListener(new SwingDefaultResultListener(ControlCenterWindow.this)
 			{
-				public void customResultAvailable(Object source, Object result)
+				public void customResultAvailable(Object result)
 				{
 					ClassLoader cl = ((ILibraryService)result).getClassLoader();
 			

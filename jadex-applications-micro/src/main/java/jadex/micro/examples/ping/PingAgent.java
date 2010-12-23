@@ -25,7 +25,7 @@ public class PingAgent extends MicroAgent
 		{
 			createReply(msg, mt).addResultListener(createResultListener(new DefaultResultListener()
 			{
-				public void resultAvailable(Object source, Object result)
+				public void resultAvailable(Object result)
 				{
 					Map reply = (Map)result;
 					reply.put(SFipa.CONTENT, "alive");

@@ -565,12 +565,12 @@ public class RemoteReferenceModule
 			SServiceProvider.getService(rsms.getComponent().getServiceProvider(), sid)
 				.addResultListener(new IResultListener()
 			{
-				public void resultAvailable(Object source, Object result)
+				public void resultAvailable(Object result)
 				{
 					ret.setResult(result);
 				}
 				
-				public void exceptionOccurred(Object source, Exception exception)
+				public void exceptionOccurred(Exception exception)
 				{
 					ret.setException(exception);
 				}
@@ -585,26 +585,26 @@ public class RemoteReferenceModule
 				.addResultListener(new IResultListener()
 //					.addResultListener(component.createResultListener(new IResultListener()
 			{
-				public void resultAvailable(Object source, Object result)
+				public void resultAvailable(Object result)
 				{
 					IComponentManagementService cms = (IComponentManagementService)result;
 					
 					// fetch target component via component identifier.
 					cms.getExternalAccess(cid).addResultListener(new IResultListener()
 					{
-						public void resultAvailable(Object source, Object result)
+						public void resultAvailable(Object result)
 						{
 							ret.setResult(result);
 						}
 						
-						public void exceptionOccurred(Object source, Exception exception)
+						public void exceptionOccurred(Exception exception)
 						{
 							ret.setException(exception);
 						}
 					});
 				}
 				
-				public void exceptionOccurred(Object source, Exception exception)
+				public void exceptionOccurred(Exception exception)
 				{
 					ret.setException(exception);
 				}
@@ -845,13 +845,13 @@ public class RemoteReferenceModule
 //							System.out.println("renewal sent for: "+rr);
 							IResultListener lis = agent.createResultListener(new IResultListener()
 							{
-								public void resultAvailable(Object source, Object result)
+								public void resultAvailable(Object result)
 								{
 									if(DEBUG)
 										System.out.println("Renewed successfully lease for: "+rr);
 								}
 								
-								public void exceptionOccurred(Object source, Exception exception)
+								public void exceptionOccurred(Exception exception)
 								{
 									if(DEBUG)
 										System.out.println("Failed to renew lease for: "+rr);

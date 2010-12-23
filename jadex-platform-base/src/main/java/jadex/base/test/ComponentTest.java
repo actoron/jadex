@@ -109,7 +109,7 @@ public class ComponentTest implements	Test
 		/**
 		 *  Called when an exception occurred during component execution.
 		 */
-		public void exceptionOccurred(Object source, Exception exception)
+		public void exceptionOccurred(Exception exception)
 		{
 			synchronized(this)
 			{
@@ -123,7 +123,7 @@ public class ComponentTest implements	Test
 		/**
 		 *  Called when the component has terminated.
 		 */
-		public void resultAvailable(Object source, Object res)
+		public void resultAvailable(Object res)
 		{
 			synchronized(this)
 			{

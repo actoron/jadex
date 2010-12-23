@@ -48,7 +48,7 @@ public class MicroPreyAgent extends MicroAgent
 		this.myself	= env.getAvatar(getComponentIdentifier());
 		this.listener	= new IResultListener()
 		{
-			public void exceptionOccurred(Object source, Exception e)
+			public void exceptionOccurred(Exception e)
 			{
 //				e.printStackTrace();
 				try
@@ -87,7 +87,7 @@ public class MicroPreyAgent extends MicroAgent
 				}
 			}
 			
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				getExternalAccess().scheduleStep(new IComponentStep()
 				{

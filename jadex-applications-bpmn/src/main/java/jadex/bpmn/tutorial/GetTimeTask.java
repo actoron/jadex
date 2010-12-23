@@ -23,7 +23,7 @@ public class GetTimeTask	 implements ITask
 		SServiceProvider.getService(process.getServiceProvider(), IClockService.class)
 			.addResultListener(new IResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				final IClockService	clock	= (IClockService)result;
 				process.getComponentAdapter().invokeLater(new Runnable()
@@ -36,7 +36,7 @@ public class GetTimeTask	 implements ITask
 				});
 			}
 			
-			public void exceptionOccurred(Object source, Exception exception)
+			public void exceptionOccurred(Exception exception)
 			{
 				ret.setException(exception);
 			}

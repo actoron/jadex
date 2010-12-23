@@ -122,7 +122,7 @@ public class LinkedModelRepositoryService extends BasicService implements IModel
 	public void shutdownService(IResultListener listener)
 	{
 		if(listener!=null)
-			listener.resultAvailable(this, null);
+			listener.resultAvailable(null);
 	}
 	
 	/**

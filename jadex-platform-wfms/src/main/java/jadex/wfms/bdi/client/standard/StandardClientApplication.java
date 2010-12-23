@@ -231,7 +231,7 @@ public class StandardClientApplication
 			}})).addResultListener(new SwingDefaultResultListener()
 			{
 				
-				public void customResultAvailable(Object source, Object result)
+				public void customResultAvailable(Object result)
 				{
 					Map parameters = (Map) result;
 					capabilities = (Set) parameters.get("capabilities");
@@ -263,7 +263,7 @@ public class StandardClientApplication
 	{
 		agent.scheduleStep(new DispatchGoalStep("clientcap.disconnect")).addResultListener(new SwingDefaultResultListener()
 		{
-			public void customResultAvailable(Object source, Object result)
+			public void customResultAvailable(Object result)
 			{
 				cleanUp();
 				statusBar.replaceIcon(CONNECT_ICON_NAME, CONNECT_OFF_ICON_PATH);
@@ -303,12 +303,11 @@ public class StandardClientApplication
 				
 				agent.scheduleStep(new DispatchGoalStep("clientcap.finish_activity", "activity", activity)).addResultListener(new SwingDefaultResultListener()
 				{
-					public void customResultAvailable(Object source, Object result)
+					public void customResultAvailable(Object result)
 					{
 					}
 					
-					public void customExceptionOccurred(Object source,
-							Exception exception)
+					public void customExceptionOccurred(Exception exception)
 					{
 						JOptionPane.showMessageDialog(mainFrame, "Failed finishing activity.");
 					}
@@ -337,12 +336,11 @@ public class StandardClientApplication
 	{
 		agent.scheduleStep(new DispatchGoalStep("clientcap.cancel_activity", "activity", activity)).addResultListener(new SwingDefaultResultListener()
 		{
-			public void customResultAvailable(Object source, Object result)
+			public void customResultAvailable(Object result)
 			{
 			}
 			
-			public void customExceptionOccurred(Object source,
-					Exception exception)
+			public void customExceptionOccurred(Exception exception)
 			{
 				JOptionPane.showMessageDialog(mainFrame, "Activity cancelation failed.");
 			}
@@ -361,12 +359,11 @@ public class StandardClientApplication
 				{
 					agent.scheduleStep(new DispatchGoalStep("clientcap.begin_activity", "workitem", wi)).addResultListener(new SwingDefaultResultListener()
 					{
-						public void customResultAvailable(Object source, Object result)
+						public void customResultAvailable(Object result)
 						{
 						}
 						
-						public void customExceptionOccurred(Object source,
-								Exception exception)
+						public void customExceptionOccurred(Exception exception)
 						{
 							JOptionPane.showMessageDialog(mainFrame, "Start of activity failed.");
 						}
@@ -432,12 +429,11 @@ public class StandardClientApplication
 				{
 					agent.scheduleStep(new DispatchGoalStep("clientcap.start_process", "process_name", processName)).addResultListener(new SwingDefaultResultListener()
 					{
-						public void customResultAvailable(Object source, Object result)
+						public void customResultAvailable(Object result)
 						{
 						}
 						
-						public void customExceptionOccurred(Object source,
-								Exception exception)
+						public void customExceptionOccurred(Exception exception)
 						{
 							JOptionPane.showMessageDialog(mainFrame, "Process Start failed.");
 						}
@@ -504,11 +500,11 @@ public class StandardClientApplication
 				{
 					agent.scheduleStep(new DispatchGoalStep("clientcap.remove_process", "process_name", name)).addResultListener(new SwingDefaultResultListener()
 					{
-						public void customResultAvailable(Object source, Object result)
+						public void customResultAvailable(Object result)
 						{
 						}
 						
-						public void customExceptionOccurred(Object source, Exception exception)
+						public void customExceptionOccurred(Exception exception)
 						{
 							JOptionPane.showMessageDialog(mainFrame, "Removing process failed.");
 						}
@@ -529,11 +525,11 @@ public class StandardClientApplication
 				{
 					agent.scheduleStep(new DispatchGoalStep("clientcap.terminate_activity", "activity", activity)).addResultListener(new SwingDefaultResultListener()
 					{
-						public void customResultAvailable(Object source, Object result)
+						public void customResultAvailable(Object result)
 						{							
 						}
 						
-						public void customExceptionOccurred(Object source, Exception exception)
+						public void customExceptionOccurred(Exception exception)
 						{
 							JOptionPane.showMessageDialog(mainFrame, "Activity termination failed.");
 						}

@@ -222,7 +222,7 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 			{
 				IResultListener lis = new IResultListener()
 				{
-					public void resultAvailable(Object source, Object result)
+					public void resultAvailable(Object result)
 					{
 						// todo: do not call listener with holding lock
 						synchronized(AsyncExecutionService.this)
@@ -237,7 +237,7 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 						}
 					}
 	
-					public void exceptionOccurred(Object source, Exception exception)
+					public void exceptionOccurred(Exception exception)
 					{
 						// todo: do not call future with holding lock
 						synchronized(AsyncExecutionService.this)
@@ -289,7 +289,7 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 		{
 			SServiceProvider.getService(provider, IThreadPoolService.class).addResultListener(new IResultListener()
 			{
-				public void resultAvailable(Object source, Object result)
+				public void resultAvailable(Object result)
 				{
 					try
 					{
@@ -324,7 +324,7 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 					}
 				}
 				
-				public void exceptionOccurred(Object source, Exception exception)
+				public void exceptionOccurred(Exception exception)
 				{
 					ret.setException(exception);
 				}

@@ -52,7 +52,7 @@ public abstract class AbstractServicePlugin extends AbstractGenericPlugin
 		SServiceProvider.getServices(getJCC().getServiceProvider(), getServiceType(), remotecb.isSelected(), true)
 			.addResultListener(new SwingDefaultResultListener(getView()) 
 		{
-			public void customResultAvailable(Object source, Object result) 
+			public void customResultAvailable(Object result) 
 			{
 				Collection newservices = (Collection)result;
 				
@@ -88,7 +88,7 @@ public abstract class AbstractServicePlugin extends AbstractGenericPlugin
 		
 		createServicePanel(service).addResultListener(new SwingDefaultResultListener(centerp)
 		{
-			public void customResultAvailable(Object source, Object result)
+			public void customResultAvailable(Object result)
 			{
 //				System.out.println("add: "+result+" "+sel);
 				IServiceViewerPanel panel = (IServiceViewerPanel)result;
@@ -97,7 +97,7 @@ public abstract class AbstractServicePlugin extends AbstractGenericPlugin
 				ret.setResult(panel);
 			}
 			
-			public void customExceptionOccurred(Object source, Exception exception)
+			public void customExceptionOccurred(Exception exception)
 			{
 				ret.setException(exception);
 			}

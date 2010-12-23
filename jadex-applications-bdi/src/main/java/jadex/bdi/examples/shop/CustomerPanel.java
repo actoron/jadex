@@ -127,7 +127,7 @@ public class CustomerPanel extends JPanel
 				
 				ret.addResultListener(new SwingDefaultResultListener(CustomerPanel.this)
 				{
-					public void customResultAvailable(Object source, Object result)
+					public void customResultAvailable(Object result)
 					{
 				    	searchbut.setEnabled(true);
 //						System.out.println("Customer search result: "+result);
@@ -149,10 +149,10 @@ public class CustomerPanel extends JPanel
 						}					
 					}
 					
-					public void customExceptionOccurred(Object source, Exception exception)
+					public void customExceptionOccurred(Exception exception)
 					{
 				    	searchbut.setEnabled(true);
-						super.customExceptionOccurred(source, exception);
+						super.customExceptionOccurred(exception);
 					}
 				});
 		    }
@@ -416,7 +416,7 @@ public class CustomerPanel extends JPanel
 		{
 			shop.getCatalog().addResultListener(new SwingDefaultResultListener(CustomerPanel.this)
 			{
-				public void customResultAvailable(Object source, Object result)
+				public void customResultAvailable(Object result)
 				{
 					int sel = shoptable.getSelectedRow();
 					ItemInfo[] aitems = (ItemInfo[])result;

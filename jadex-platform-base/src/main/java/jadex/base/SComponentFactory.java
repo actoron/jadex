@@ -33,20 +33,20 @@ public class SComponentFactory
 		SServiceProvider.getService(provider, ILibraryService.class)
 			.addResultListener(new DelegationResultListener(ret)
 		{
-			public void customResultAvailable(Object source, Object result)
+			public void customResultAvailable(Object result)
 			{
 				final ILibraryService ls = (ILibraryService)result;
 				
 				SServiceProvider.getService(provider, new ComponentFactorySelector(model, null, ls.getClassLoader()))
 					.addResultListener(new DelegationResultListener(ret)
 				{
-					public void customResultAvailable(Object source, Object result)
+					public void customResultAvailable(Object result)
 					{
 						IComponentFactory fac = (IComponentFactory)result;
 						ret.setResult(fac.loadModel(model, null, ls.getClassLoader()));
 					}
 					
-					public void exceptionOccurred(Object source, Exception exception)
+					public void exceptionOccurred(Exception exception)
 					{
 						if(exception instanceof ServiceNotFoundException)
 						{
@@ -54,7 +54,7 @@ public class SComponentFactory
 						}
 						else
 						{
-							super.exceptionOccurred(source, exception);
+							super.exceptionOccurred(exception);
 						}
 					}
 				});
@@ -75,20 +75,20 @@ public class SComponentFactory
 		SServiceProvider.getService(provider, ILibraryService.class)
 			.addResultListener(new DelegationResultListener(ret)
 		{
-			public void customResultAvailable(Object source, Object result)
+			public void customResultAvailable(Object result)
 			{
 				final ILibraryService ls = (ILibraryService)result;
 				
 				SServiceProvider.getService(provider, new ComponentFactorySelector(model, null, ls.getClassLoader()))
 					.addResultListener(new DelegationResultListener(ret)
 				{
-					public void customResultAvailable(Object source, Object result)
+					public void customResultAvailable(Object result)
 					{
 						IComponentFactory fac = (IComponentFactory)result;
 						ret.setResult(new Boolean(fac.isLoadable(model, null, ls.getClassLoader())));
 					}
 					
-					public void exceptionOccurred(Object source, Exception exception)
+					public void exceptionOccurred(Exception exception)
 					{
 						if(exception instanceof ServiceNotFoundException)
 						{
@@ -96,7 +96,7 @@ public class SComponentFactory
 						}
 						else
 						{
-							super.exceptionOccurred(source, exception);
+							super.exceptionOccurred(exception);
 						}
 					}
 				});
@@ -118,20 +118,20 @@ public class SComponentFactory
 		SServiceProvider.getService(provider, ILibraryService.class)
 			.addResultListener(new DelegationResultListener(ret)
 		{
-			public void customResultAvailable(Object source, Object result)
+			public void customResultAvailable(Object result)
 			{
 				final ILibraryService ls = (ILibraryService)result;
 				
 				SServiceProvider.getService(provider, new ComponentFactorySelector(model, null, ls.getClassLoader()))
 					.addResultListener(new DelegationResultListener(ret)
 				{
-					public void customResultAvailable(Object source, Object result)
+					public void customResultAvailable(Object result)
 					{
 						IComponentFactory fac = (IComponentFactory)result;
 						ret.setResult(new Boolean(fac.isStartable(model, null, ls.getClassLoader())));
 					}
 					
-					public void exceptionOccurred(Object source, Exception exception)
+					public void exceptionOccurred(Exception exception)
 					{
 						if(exception instanceof ServiceNotFoundException)
 						{
@@ -139,7 +139,7 @@ public class SComponentFactory
 						}
 						else
 						{
-							super.exceptionOccurred(source, exception);
+							super.exceptionOccurred(exception);
 						}
 					}
 				});
@@ -159,13 +159,13 @@ public class SComponentFactory
 		SServiceProvider.getService(provider, new ComponentFactorySelector(type))
 			.addResultListener(new DelegationResultListener(ret)
 		{
-			public void customResultAvailable(Object source, Object result)
+			public void customResultAvailable(Object result)
 			{
 				IComponentFactory fac = (IComponentFactory)result;
 				ret.setResult(fac.getComponentTypeIcon(type));
 			}
 			
-			public void exceptionOccurred(Object source, Exception exception)
+			public void exceptionOccurred(Exception exception)
 			{
 				if(exception instanceof ServiceNotFoundException)
 				{
@@ -173,7 +173,7 @@ public class SComponentFactory
 				}
 				else
 				{
-					super.exceptionOccurred(source, exception);
+					super.exceptionOccurred(exception);
 				}
 			}
 		});
@@ -191,13 +191,13 @@ public class SComponentFactory
 		SServiceProvider.getService(provider, new ComponentFactorySelector(type))
 			.addResultListener(new DelegationResultListener(ret)
 		{
-			public void customResultAvailable(Object source, Object result)
+			public void customResultAvailable(Object result)
 			{
 				IComponentFactory fac = (IComponentFactory)result;
 				ret.setResult(fac.getProperties(type));
 			}
 			
-			public void exceptionOccurred(Object source, Exception exception)
+			public void exceptionOccurred(Exception exception)
 			{
 				if(exception instanceof ServiceNotFoundException)
 				{
@@ -205,7 +205,7 @@ public class SComponentFactory
 				}
 				else
 				{
-					super.exceptionOccurred(source, exception);
+					super.exceptionOccurred(exception);
 				}
 			}
 		});
@@ -222,20 +222,20 @@ public class SComponentFactory
 		
 		SServiceProvider.getService(provider, ILibraryService.class).addResultListener(new DelegationResultListener(ret)
 		{
-			public void customResultAvailable(Object source, Object result)
+			public void customResultAvailable(Object result)
 			{
 				final ILibraryService ls = (ILibraryService)result;
 				
 				SServiceProvider.getService(provider, new ComponentFactorySelector(model, null, ls.getClassLoader()))
 					.addResultListener(new DelegationResultListener(ret)
 				{
-					public void customResultAvailable(Object source, Object result)
+					public void customResultAvailable(Object result)
 					{
 						IComponentFactory fac = (IComponentFactory)result;
 						ret.setResult(fac.getComponentType(model, null, ls.getClassLoader()));
 					}
 					
-					public void exceptionOccurred(Object source, Exception exception)
+					public void exceptionOccurred(Exception exception)
 					{
 						if(exception instanceof ServiceNotFoundException)
 						{
@@ -243,7 +243,7 @@ public class SComponentFactory
 						}
 						else
 						{
-							super.exceptionOccurred(source, exception);
+							super.exceptionOccurred(exception);
 						}
 					}
 				});
@@ -270,12 +270,12 @@ public class SComponentFactory
 			SServiceProvider.getService(jcc.getServiceProvider(), IComponentManagementService.class)
 				.addResultListener(new DelegationResultListener(ret)
 			{
-				public void customResultAvailable(Object source, Object result)
+				public void customResultAvailable(Object result)
 				{
 					IComponentManagementService	cms	= (IComponentManagementService)result;
 					cms.getExternalAccess(cid).addResultListener(new DelegationResultListener(ret)
 					{
-						public void customResultAvailable(Object source, Object result)
+						public void customResultAvailable(Object result)
 						{
 							IExternalAccess	ea	= (IExternalAccess)result;
 							ret.setResult(ea.getModel().getClassLoader());
@@ -291,7 +291,7 @@ public class SComponentFactory
 			SServiceProvider.getService(jcc.getServiceProvider(), ILibraryService.class)
 				.addResultListener(new DelegationResultListener(ret)
 			{
-				public void customResultAvailable(Object source, Object result)
+				public void customResultAvailable(Object result)
 				{
 					ILibraryService	ls	= (ILibraryService)result;
 					ret.setResult(ls.getClassLoader());

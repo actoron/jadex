@@ -78,7 +78,7 @@ public class PingingAgent extends MicroAgent
 			createComponentIdentifier("Ping").addResultListener(
 				createResultListener(new DefaultResultListener()
 			{
-				public void resultAvailable(Object source, Object result)
+				public void resultAvailable(Object result)
 				{
 					receiver = (IComponentIdentifier)result;
 					scheduleStep(step);

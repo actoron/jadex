@@ -175,7 +175,7 @@ public class SyncExecutionService extends BasicService implements IExecutionServ
 		
 		SServiceProvider.getService(provider, IThreadPoolService.class).addResultListener(new IResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				executor = new Executor((IThreadPoolService)result, new IExecutable()
 				{
@@ -261,7 +261,7 @@ public class SyncExecutionService extends BasicService implements IExecutionServ
 							// todo: extract call from synchronized block
 							if(stoplistener!=null)
 							{
-								stoplistener.resultAvailable(this, null);
+								stoplistener.resultAvailable(null);
 								stoplistener = null;
 							}
 							
@@ -273,7 +273,7 @@ public class SyncExecutionService extends BasicService implements IExecutionServ
 				ret.setResult(SyncExecutionService.this);
 			}
 			
-			public void exceptionOccurred(Object source, Exception exception)
+			public void exceptionOccurred(Exception exception)
 			{
 				ret.setException(exception);
 			}

@@ -327,7 +327,7 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 							SComponentFactory.getClassLoader(((IActiveComponentTreeNode)node.getParent().getParent()).getComponentIdentifier(), getJCC())
 								.addResultListener(new SwingDefaultResultListener(comptree)
 							{
-								public void customResultAvailable(Object source, Object result)
+								public void customResultAvailable(Object result)
 								{
 									ClassLoader	cl	= (ClassLoader)result;
 									try
@@ -337,7 +337,7 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 										final IServiceViewerPanel	panel = (IServiceViewerPanel)clazz.newInstance();
 										panel.init(getJCC(), service).addResultListener(new SwingDefaultResultListener(comptree)
 										{
-											public void customResultAvailable(Object source, Object result)
+											public void customResultAvailable(Object result)
 											{
 												Properties	sub	= props!=null ? props.getSubproperty(panel.getId()) : null;
 												panel.setProperties(sub);
@@ -368,13 +368,13 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 						SServiceProvider.getService(getJCC().getServiceProvider(), IComponentManagementService.class)
 							.addResultListener(new SwingDefaultResultListener(comptree)
 						{
-							public void customResultAvailable(Object source, Object result)
+							public void customResultAvailable(Object result)
 							{
 								final IComponentManagementService cms = (IComponentManagementService)result;
 								
 								cms.getExternalAccess(cid).addResultListener(new SwingDefaultResultListener(comptree)
 								{
-									public void customResultAvailable(Object source, Object result)
+									public void customResultAvailable(Object result)
 									{
 										final IExternalAccess exta = (IExternalAccess)result;
 										final String classname = (String)exta.getModel().getProperties().get(IAbstractViewerPanel.PROPERTY_VIEWERCLASS);
@@ -385,7 +385,7 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 										{
 											SComponentFactory.getClassLoader(cid, getJCC()).addResultListener(new SwingDefaultResultListener(comptree)
 											{
-												public void customResultAvailable(Object source, Object result)
+												public void customResultAvailable(Object result)
 												{
 													ClassLoader	cl	= (ClassLoader)result;
 													try
@@ -395,7 +395,7 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 														final IComponentViewerPanel panel = (IComponentViewerPanel)clazz.newInstance();
 														panel.init(getJCC(), exta).addResultListener(new SwingDefaultResultListener(comptree)
 														{
-															public void customResultAvailable(Object source, Object result)
+															public void customResultAvailable(Object result)
 															{
 																Properties	sub	= props!=null ? props.getSubproperty(panel.getId()) : null;
 																panel.setProperties(sub);
@@ -442,7 +442,7 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 					IAbstractViewerPanel panel = (IAbstractViewerPanel)panels.remove(nodeid);
 					panel.shutdown().addResultListener(new SwingDefaultResultListener(comptree)
 					{
-						public void customResultAvailable(Object source, Object result)
+						public void customResultAvailable(Object result)
 						{
 							comptree.getModel().fireNodeChanged(node);
 						}
@@ -495,13 +495,13 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 					SServiceProvider.getService(getJCC().getServiceProvider(), IComponentManagementService.class)
 						.addResultListener(new SwingDefaultResultListener(comptree)
 					{
-						public void customResultAvailable(Object source, Object result)
+						public void customResultAvailable(Object result)
 						{
 							final IComponentManagementService cms = (IComponentManagementService)result;
 							
 							cms.getExternalAccess(cid).addResultListener(new SwingDefaultResultListener(comptree)
 							{
-								public void customResultAvailable(Object source, Object result)
+								public void customResultAvailable(Object result)
 								{
 									final IExternalAccess exta = (IExternalAccess)result;
 									final String classname = (String)exta.getModel().getProperties().get(IAbstractViewerPanel.PROPERTY_VIEWERCLASS);
@@ -510,7 +510,7 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 									node.refresh(false, false);
 								}
 								
-								public void customExceptionOccurred(Object source, Exception exception)
+								public void customExceptionOccurred(Exception exception)
 								{
 									// Happens e.g. when remote classes not locally available.
 //									exception.printStackTrace();

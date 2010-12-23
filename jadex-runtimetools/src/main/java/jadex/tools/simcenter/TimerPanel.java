@@ -148,7 +148,7 @@ public class TimerPanel extends AbstractTimePanel
 		SServiceProvider.getService(getServiceProvider(),
 			IClockService.class).addResultListener(new SwingDefaultResultListener(TimerPanel.this)
 		{
-			public void customResultAvailable(Object source, Object result)
+			public void customResultAvailable(Object result)
 			{
 				if(!active)
 					return;

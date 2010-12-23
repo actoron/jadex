@@ -93,7 +93,7 @@ public class AgentRules
 				SServiceProvider.getService(ip.getServiceProvider(), IClockService.class).addResultListener(new ComponentResultListener(new DefaultResultListener()
 	//			SServiceProvider.getService(getServiceProvider(), IClockService.class).addResultListener(new DefaultResultListener()
 				{
-					public void resultAvailable(Object source, Object result)
+					public void resultAvailable(Object result)
 					{
 						ip.clockservice	= (IClockService)result;
 						boolean	startagent;
@@ -111,7 +111,7 @@ public class AgentRules
 				SServiceProvider.getService(ip.getServiceProvider(), IComponentManagementService.class).addResultListener(new ComponentResultListener(new DefaultResultListener()
 	//			SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class).addResultListener(new DefaultResultListener()
 				{
-					public void resultAvailable(Object source, Object result)
+					public void resultAvailable(Object result)
 					{
 						ip.cms	= (IComponentManagementService)result;
 						boolean	startagent;
@@ -127,7 +127,7 @@ public class AgentRules
 				SServiceProvider.getService(ip.getServiceProvider(), IMessageService.class).addResultListener(new ComponentResultListener(new DefaultResultListener()
 	//			SServiceProvider.getService(getServiceProvider(), IMessageService.class).addResultListener(new DefaultResultListener()
 				{
-					public void resultAvailable(Object source, Object result)
+					public void resultAvailable(Object result)
 					{
 						ip.msgservice	= (IMessageService)result;
 						boolean	startagent;
@@ -151,7 +151,7 @@ public class AgentRules
 				
 				IResultListener	crs	= new CounterResultListener(futures.size(), new IResultListener()
 				{
-					public void resultAvailable(Object source, Object result)
+					public void resultAvailable(Object result)
 					{
 						boolean	startagent;
 						synchronized(services)
@@ -171,7 +171,7 @@ public class AgentRules
 						}
 					}
 					
-					public void exceptionOccurred(Object source, Exception exception)
+					public void exceptionOccurred(Exception exception)
 					{
 					}
 				});
@@ -466,7 +466,7 @@ public class AgentRules
 				{
 					for(Iterator it=killlisteners.iterator(); it.hasNext(); )
 					{
-						((IResultListener)it.next()).resultAvailable(interpreter.getAgentAdapter().getComponentIdentifier(), interpreter.getAgentAdapter().getComponentIdentifier());
+						((IResultListener)it.next()).resultAvailable(interpreter.getAgentAdapter().getComponentIdentifier());
 					}
 				}
 				
@@ -1148,7 +1148,7 @@ public class AgentRules
 						final Future	ret	= new Future();
 						((IFuture)val).addResultListener(new ComponentResultListener(new IResultListener()
 						{
-							public void resultAvailable(Object source, Object result)
+							public void resultAvailable(Object result)
 							{
 //								System.out.println("Setting future property: "+name+" "+result);
 								Object param = state.createObject(OAVBDIRuntimeModel.parameter_type);	
@@ -1158,7 +1158,7 @@ public class AgentRules
 								ret.setResult(result);
 							}
 
-							public void exceptionOccurred(Object source, Exception exception)
+							public void exceptionOccurred(Exception exception)
 							{
 								throw new RuntimeException(exception);
 							}

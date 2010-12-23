@@ -32,7 +32,7 @@ public class EventIntermediateTimerActivityHandler extends	AbstractEventIntermed
 		SServiceProvider.getService(instance.getServiceProvider(), IClockService.class)
 			.addResultListener(instance.createResultListener(new IResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				ITimedObject	to	= new ITimedObject()
 				{
@@ -54,7 +54,7 @@ public class EventIntermediateTimerActivityHandler extends	AbstractEventIntermed
 				}
 				wifuture.setResult(waitinfo);
 			}
-			public void exceptionOccurred(Object source, Exception exception)
+			public void exceptionOccurred(Exception exception)
 			{
 				wifuture.setException(exception);
 			}
@@ -74,7 +74,7 @@ public class EventIntermediateTimerActivityHandler extends	AbstractEventIntermed
 	{
 		((IFuture)thread.getWaitInfo()).addResultListener(new DefaultResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				if(result instanceof ITimer)
 				{

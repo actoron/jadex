@@ -216,7 +216,7 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 		SServiceProvider.getService(getServiceProvider(), IClockService.class)
 			.addResultListener(createResultListener(new DefaultResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				IClockService cs = (IClockService)result;
 				ret.setResult(new Long(cs.getTime()));
@@ -242,7 +242,7 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 		SServiceProvider.getService(getServiceProvider(), IClockService.class)
 			.addResultListener(createResultListener(new IResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				IClockService cs = (IClockService)result;
 				final ITimer[] ts = new ITimer[1];
@@ -276,7 +276,7 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 				ret.setResult(new TimerWrapper(ts[0]));
 			}
 			
-			public void exceptionOccurred(Object source, Exception exception)
+			public void exceptionOccurred(Exception exception)
 			{
 				ret.setException(exception);
 			}
@@ -296,7 +296,7 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 		SServiceProvider.getService(getServiceProvider(), IClockService.class)
 			.addResultListener(createResultListener(new IResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				IClockService cs = (IClockService)result;
 				final ITimer[] ts = new ITimer[1];
@@ -325,7 +325,7 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 				ret.setResult(new TimerWrapper(ts[0]));
 			}
 			
-			public void exceptionOccurred(Object source, Exception exception)
+			public void exceptionOccurred(Exception exception)
 			{
 				ret.setException(exception);
 			}
@@ -352,7 +352,7 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 		SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class)
 			.addResultListener(createResultListener(new DefaultResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				IComponentManagementService cms = (IComponentManagementService)result;
 				cms.destroyComponent(getComponentIdentifier()).addResultListener(new DelegationResultListener(ret));
@@ -373,7 +373,7 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 		SServiceProvider.getService(getServiceProvider(), IMessageService.class)
 			.addResultListener(createResultListener(new DefaultResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				IMessageService ms = (IMessageService)result;
 				ms.sendMessage(me, mt, interpreter.getAgentAdapter().getComponentIdentifier(),
@@ -423,7 +423,7 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 		SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class)
 			.addResultListener(createResultListener(new DefaultResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				IComponentManagementService cms = (IComponentManagementService)result;
 				ret.setResult(cms.createComponentIdentifier(name, local, addresses));
@@ -444,7 +444,7 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 		SServiceProvider.getService(getServiceProvider(), IMessageService.class)
 			.addResultListener(createResultListener(new DefaultResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				IMessageService ms = (IMessageService)result;
 				ret.setResult(ms.createReply(msg, mt));

@@ -482,25 +482,25 @@ public class MessageService  extends BasicService implements IMessageService
 		
 		SServiceProvider.getService(provider, IClockService.class).addResultListener(new IResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				clockservice = (IClockService)result;
 				SServiceProvider.getServiceUpwards(provider, IComponentManagementService.class).addResultListener(new IResultListener()
 				{
-					public void resultAvailable(Object source, Object result)
+					public void resultAvailable(Object result)
 					{
 						cms = (IComponentManagementService)result;
 						MessageService.super.startService().addResultListener(new DelegationResultListener(ret));
 					}
 					
-					public void exceptionOccurred(Object source, Exception exception)
+					public void exceptionOccurred(Exception exception)
 					{
 						ret.setException(exception);
 					}
 				});
 			}
 			
-			public void exceptionOccurred(Object source, Exception exception)
+			public void exceptionOccurred(Exception exception)
 			{
 				ret.setException(exception);
 			}

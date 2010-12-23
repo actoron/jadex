@@ -77,14 +77,14 @@ public class DispatchSubprocessTask	implements ITask
 		private boolean unfinished = true;
 		private Object result;
 		
-		public synchronized void resultAvailable(Object source, Object result)
+		public synchronized void resultAvailable(Object result)
 		{
 			this.result = result;
 			unfinished = false;
 			notifyAll();
 		}
 		
-		public synchronized void exceptionOccurred(Object source, Exception exception)
+		public synchronized void exceptionOccurred(Exception exception)
 		{
 			result = exception;
 			unfinished = false;

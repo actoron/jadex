@@ -36,12 +36,12 @@ public class ParallelAgentCreationAgent extends MicroAgent
 		{
 			SServiceProvider.getServiceUpwards(getServiceProvider(), IComponentManagementService.class).addResultListener(new ComponentResultListener(new DefaultResultListener()
 			{
-				public void resultAvailable(Object source, Object result)
+				public void resultAvailable(Object result)
 				{
 					final IComponentManagementService	cms	= (IComponentManagementService)result;
 					SServiceProvider.getService(getServiceProvider(), IClockService.class).addResultListener(createResultListener(new DefaultResultListener()
 					{
-						public void resultAvailable(Object source, Object result)
+						public void resultAvailable(Object result)
 						{
 							final IClockService	clock	= (IClockService)result;
 							final long	startmem	= Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory();
@@ -52,7 +52,7 @@ public class ParallelAgentCreationAgent extends MicroAgent
 							
 							IResultListener	creationlis	= new CounterResultListener(num, new IResultListener()
 							{
-								public void resultAvailable(Object source, Object result)
+								public void resultAvailable(Object result)
 								{
 									scheduleStep(new IComponentStep()
 									{
@@ -81,7 +81,7 @@ public class ParallelAgentCreationAgent extends MicroAgent
 									});
 								}
 								
-								public void exceptionOccurred(Object source, final Exception exception)
+								public void exceptionOccurred(final Exception exception)
 								{
 									scheduleStep(new IComponentStep()
 									{
@@ -97,7 +97,7 @@ public class ParallelAgentCreationAgent extends MicroAgent
 								}
 							})
 							{
-								public void intermediateResultAvailable(Object source, Object result)
+								public void intermediateResultAvailable(Object result)
 								{
 									System.out.println("Created peer: "+getCnt());
 								}
@@ -106,7 +106,7 @@ public class ParallelAgentCreationAgent extends MicroAgent
 							
 							IResultListener	killlis	= new CounterResultListener(num, new IResultListener()
 							{
-								public void resultAvailable(Object source, Object result)
+								public void resultAvailable(Object result)
 								{
 									scheduleStep(new IComponentStep()
 									{
@@ -136,7 +136,7 @@ public class ParallelAgentCreationAgent extends MicroAgent
 									});
 								}
 								
-								public void exceptionOccurred(Object source, final Exception exception)
+								public void exceptionOccurred(final Exception exception)
 								{
 									scheduleStep(new IComponentStep()
 									{
@@ -152,9 +152,10 @@ public class ParallelAgentCreationAgent extends MicroAgent
 								}
 							})
 							{
-								public void intermediateResultAvailable(Object source, Object result)
+								public void intermediateResultAvailable(Object result)
 								{
-									System.out.println("Successfully destroyed peer: "+source);
+									// todo: result?! = cid
+									System.out.println("Successfully destroyed peer: "+result);
 								}
 							};
 							

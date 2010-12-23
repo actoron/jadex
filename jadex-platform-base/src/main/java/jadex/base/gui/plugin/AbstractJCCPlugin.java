@@ -171,12 +171,12 @@ public abstract class AbstractJCCPlugin implements IControlCenterPlugin
 			SServiceProvider.getService(jcc.getServiceProvider(), IComponentManagementService.class)
 				.addResultListener(new DelegationResultListener(ret)
 			{
-				public void customResultAvailable(Object source, Object result)
+				public void customResultAvailable(Object result)
 				{
 					IComponentManagementService	cms	= (IComponentManagementService)result;
 					cms.getExternalAccess(cid).addResultListener(new DelegationResultListener(ret)
 					{
-						public void customResultAvailable(Object source, Object result)
+						public void customResultAvailable(Object result)
 						{
 							IExternalAccess	ea	= (IExternalAccess)result;
 							ret.setResult(ea.getModel().getClassLoader());
@@ -192,7 +192,7 @@ public abstract class AbstractJCCPlugin implements IControlCenterPlugin
 			SServiceProvider.getService(jcc.getServiceProvider(), ILibraryService.class)
 				.addResultListener(new DelegationResultListener(ret)
 			{
-				public void customResultAvailable(Object source, Object result)
+				public void customResultAvailable(Object result)
 				{
 					ILibraryService	ls	= (ILibraryService)result;
 					ret.setResult(ls.getClassLoader());

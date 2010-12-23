@@ -395,7 +395,7 @@ public class ClockFrame extends JFrame
 					ia.getRequiredService("clockservice")
 						.addResultListener(new SwingDefaultResultListener(ClockFrame.this)
 					{
-						public void customResultAvailable(Object source, Object result)
+						public void customResultAvailable(Object result)
 						{
 							IClockService cs = (IClockService)result;
 							Date current = new Date(cs.getTime());

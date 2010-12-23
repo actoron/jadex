@@ -88,7 +88,7 @@ public class AlarmsGui extends JFrame
 				ia.getRequiredService("clockservice")
 					.addResultListener(new SwingDefaultResultListener(AlarmsGui.this)
 				{
-					public void customResultAvailable(Object source, Object result)
+					public void customResultAvailable(Object result)
 					{
 						final IClockService cs = (IClockService)result;
 						alarms = new JTable(tadata)

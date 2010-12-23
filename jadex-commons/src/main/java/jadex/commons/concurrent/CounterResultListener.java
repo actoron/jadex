@@ -48,7 +48,7 @@ public class CounterResultListener implements IResultListener
 		if(num==0)
 		{
 			this.notified = true;
-			delegate.resultAvailable(null, null);
+			delegate.resultAvailable(null);
 		}
 	}
 	
@@ -56,9 +56,9 @@ public class CounterResultListener implements IResultListener
 	
 	/**
 	 *  Called when the result is available.
-	 *  @param result The result.
+	 * @param result The result.
 	 */
-	public final void resultAvailable(Object source, Object result)
+	public final void resultAvailable(Object result)
 	{
 //		System.out.println("here: "+cnt+" "+num);
 		boolean	notify	= false;
@@ -75,26 +75,26 @@ public class CounterResultListener implements IResultListener
 		if(notify)
 		{
 //			System.out.println("!!!");
-			intermediateResultAvailable(source, result);
-			delegate.resultAvailable(source, result);
+			intermediateResultAvailable(result);
+			delegate.resultAvailable(result);
 		}
 		else if(!notified)
 		{
-			intermediateResultAvailable(source, result);
+			intermediateResultAvailable(result);
 		}
 	}
 	
 	/**
 	 *  Called when an exception occurred.
-	 *  @param exception The exception.
+	 * @param exception The exception.
 	 */
-	public final void exceptionOccurred(Object source, Exception exception)
+	public final void exceptionOccurred(Exception exception)
 	{
 		boolean	notify	= false;
 		
 		boolean inc = true;
 		if(!notified)
-			inc = intermediateExceptionOccurred(source, exception);
+			inc = intermediateExceptionOccurred(exception);
 		
 		synchronized(this)
 		{
@@ -122,11 +122,11 @@ public class CounterResultListener implements IResultListener
 //				System.out.println("!!!");
 				// todo: what about aggregated result?
 //				listener.resultAvailable(source, result);
-				delegate.resultAvailable(source, null);
+				delegate.resultAvailable(null);
 			}
 			else
 			{
-				delegate.exceptionOccurred(source, exception);
+				delegate.exceptionOccurred(exception);
 			}
 		}
 	}
@@ -135,7 +135,7 @@ public class CounterResultListener implements IResultListener
 	 *  Method that can be overridden to do sth. on each
 	 *  result available call. 
 	 */
-	public void intermediateResultAvailable(Object source, Object result)
+	public void intermediateResultAvailable(Object result)
 	{
 	}
 	
@@ -144,7 +144,7 @@ public class CounterResultListener implements IResultListener
 	 *  exception that occurs. 
 	 *  @retrun True, for retry the task (cnt is not increased);
 	 */
-	public boolean intermediateExceptionOccurred(Object source, Exception exception)
+	public boolean intermediateExceptionOccurred(Exception exception)
 	{
 		return false;
 	}

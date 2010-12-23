@@ -65,12 +65,12 @@ class CleanerPanel extends JPanel
 				IFuture	fut	= agent.scheduleStep(new UpdateStep());
 				fut.addResultListener(new SwingDefaultResultListener()
 				{
-					public void customResultAvailable(Object source, Object result)
+					public void customResultAvailable(Object result)
 					{
 						CleanerPanel.this.drawdata	= (DrawData)result;
 						updating	= false;
 					}
-					public void customExceptionOccurred(Object source, Exception exception)
+					public void customExceptionOccurred(Exception exception)
 					{
 //						exception.printStackTrace();
 //						updating	= false;	// Keep to false to disable any more updates

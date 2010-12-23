@@ -473,20 +473,20 @@ public class JadeAgentAdapter extends Agent implements IComponentAdapter, Serial
 		{
 			agent.killComponent(new IResultListener()
 			{
-				public void resultAvailable(Object source, Object result)
+				public void resultAvailable(Object result)
 				{
-					listener.resultAvailable(this, getComponentIdentifier());
+					listener.resultAvailable(getComponentIdentifier());
 				}
 				
-				public void exceptionOccurred(Object source, Exception exception)
+				public void exceptionOccurred(Exception exception)
 				{
-					listener.resultAvailable(this, getComponentIdentifier());
+					listener.resultAvailable(getComponentIdentifier());
 				}
 			});
 		}
 		else if(listener!=null)
 		{
-			listener.resultAvailable(this, getComponentIdentifier());
+			listener.resultAvailable(getComponentIdentifier());
 		}
 			
 		// LogManager causes memory leak till Java 7
@@ -656,11 +656,11 @@ public class JadeAgentAdapter extends Agent implements IComponentAdapter, Serial
 		// super.doDelete() would interrupt agent thread (while e.g. waiting for plan).
 		agent.killComponent(new IResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				JadeAgentAdapter.super.doDelete();
 			}
-			public void exceptionOccurred(Object source, Exception e)
+			public void exceptionOccurred(Exception e)
 			{
 				e.printStackTrace();
 			}
@@ -1223,7 +1223,7 @@ public class JadeAgentAdapter extends Agent implements IComponentAdapter, Serial
 			throw new ComponentTerminatedException(cid.getName());
 
 		if(dostep)
-			listener.exceptionOccurred(this, new RuntimeException("Only one step allowed at a time."));
+			listener.exceptionOccurred(new RuntimeException("Only one step allowed at a time."));
 			
 		this.dostep	= true;		
 		this.steplistener	= listener;
@@ -1466,7 +1466,7 @@ public class JadeAgentAdapter extends Agent implements IComponentAdapter, Serial
 				}
 				again	= again && IComponentDescription.STATE_ACTIVE.equals(desc.getState());
 				if(steplistener!=null)
-					steplistener.resultAvailable(this, desc);
+					steplistener.resultAvailable(desc);
 			}
 		}
 

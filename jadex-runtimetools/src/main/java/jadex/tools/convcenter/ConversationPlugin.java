@@ -104,7 +104,7 @@ public class ConversationPlugin extends AbstractJCCPlugin
 					// Use clone, as added component id might be modified by user.
 					SServiceProvider.getServiceUpwards(jcc.getServiceProvider(), IComponentManagementService.class).addResultListener(new SwingDefaultResultListener(comptree)
 					{
-						public void customResultAvailable(Object source, Object result)
+						public void customResultAvailable(Object result)
 						{
 							IComponentManagementService cms  = (IComponentManagementService)result;
 							IComponentIdentifier receiver = cms.createComponentIdentifier(rec.getName(), false, rec.getAddresses());

@@ -129,7 +129,7 @@ public class LibraryPlugin extends AbstractJCCPlugin
 		this.classpaths = new EditableList("Class Paths", true);
 		fetchManagedClasspathEntries().addResultListener(new SwingDefaultResultListener(classview)
 		{
-			public void customResultAvailable(Object source, Object result)
+			public void customResultAvailable(Object result)
 			{
 				List entries = (List)result;
 				for(int i=0; i<entries.size(); i++)
@@ -182,7 +182,7 @@ public class LibraryPlugin extends AbstractJCCPlugin
 					SServiceProvider.getService(getJCC().getServiceProvider(), ILibraryService.class)
 						.addResultListener(new SwingDefaultResultListener(cchooser)
 					{
-						public void customResultAvailable(Object source, Object result)
+						public void customResultAvailable(Object result)
 						{
 							ILibraryService ls = (ILibraryService)result;
 							for(int i=0; i<files.length; i++)
@@ -213,7 +213,7 @@ public class LibraryPlugin extends AbstractJCCPlugin
 				SServiceProvider.getService(getJCC().getServiceProvider(), ILibraryService.class)
 					.addResultListener(new SwingDefaultResultListener(remove)
 				{
-					public void customResultAvailable(Object source, Object result)
+					public void customResultAvailable(Object result)
 					{
 						ILibraryService ls = (ILibraryService)result;
 						
@@ -259,7 +259,7 @@ public class LibraryPlugin extends AbstractJCCPlugin
 					SServiceProvider.getService(getJCC().getServiceProvider(), ILibraryService.class)
 						.addResultListener(new SwingDefaultResultListener(classpaths)
 					{
-						public void customResultAvailable(Object source, Object result)
+						public void customResultAvailable(Object result)
 						{
 							ILibraryService ls = (ILibraryService)result;
 							for(int i=0; i<=end-start; i++)
@@ -291,11 +291,11 @@ public class LibraryPlugin extends AbstractJCCPlugin
 		SServiceProvider.getService(getJCC().getServiceProvider(), ILibraryService.class)
 			.addResultListener(new SwingDefaultResultListener(otherview)
 		{
-			public void customResultAvailable(Object source, Object result)
+			public void customResultAvailable(Object result)
 			{
 				fetchOtherClasspathEntries((ILibraryService)result).addResultListener(new SwingDefaultResultListener(otherview)
 				{
-					public void customResultAvailable(Object source, Object result)
+					public void customResultAvailable(Object result)
 					{
 						List entries = (List)result; 
 						for(int i=0; i<entries.size(); i++)
@@ -318,11 +318,11 @@ public class LibraryPlugin extends AbstractJCCPlugin
 				SServiceProvider.getService(getJCC().getServiceProvider(), ILibraryService.class)
 					.addResultListener(new SwingDefaultResultListener(refresh)
 				{
-					public void customResultAvailable(Object source, Object result)
+					public void customResultAvailable(Object result)
 					{
 						fetchOtherClasspathEntries((ILibraryService)result).addResultListener(new SwingDefaultResultListener(refresh)
 						{
-							public void customResultAvailable(Object source, Object result)
+							public void customResultAvailable(Object result)
 							{
 								List entries = (List)result;
 								DefaultListModel dlm = (DefaultListModel)otherlist.getModel();
@@ -346,7 +346,7 @@ public class LibraryPlugin extends AbstractJCCPlugin
 		// Add a library service listener to be informed about library changes.
 		SServiceProvider.getService(getJCC().getServiceProvider(), ILibraryService.class)
 			.addResultListener(new DefaultResultListener(){
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				ILibraryService ls = (ILibraryService)result;
 				ls.addLibraryServiceListener(new ILibraryServiceListener()
@@ -452,12 +452,12 @@ public class LibraryPlugin extends AbstractJCCPlugin
 		SServiceProvider.getService(getJCC().getServiceProvider(), ILibraryService.class)
 			.addResultListener(new DefaultResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				final ILibraryService ls = (ILibraryService)result;
 				ls.getURLs().addResultListener(new SwingDefaultResultListener(classpaths)
 				{
-					public void customResultAvailable(Object source, Object result)
+					public void customResultAvailable(Object result)
 					{
 						URL[]	urls	= (URL[])((List)result).toArray(new URL[0]);
 						for(int i=0; i<urls.length; i++)
@@ -481,13 +481,13 @@ public class LibraryPlugin extends AbstractJCCPlugin
 		SServiceProvider.getService(getJCC().getServiceProvider(), 
 			ILibraryService.class).addResultListener(new IResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				ILibraryService ls = (ILibraryService)result;
 				
 				ls.getURLs().addResultListener(new IResultListener()
 				{
-					public void resultAvailable(Object source, Object result)
+					public void resultAvailable(Object result)
 					{
 						List urls = (List)result;
 						List res = new ArrayList();
@@ -514,7 +514,7 @@ public class LibraryPlugin extends AbstractJCCPlugin
 						ret.setResult(res);
 					}
 					
-					public void exceptionOccurred(Object source, Exception exception)
+					public void exceptionOccurred(Exception exception)
 					{
 						ret.setException(exception);
 					}
@@ -522,7 +522,7 @@ public class LibraryPlugin extends AbstractJCCPlugin
 				
 			}
 				
-			public void exceptionOccurred(Object source, Exception exception)
+			public void exceptionOccurred(Exception exception)
 			{
 				ret.setException(exception);
 			}
@@ -542,13 +542,13 @@ public class LibraryPlugin extends AbstractJCCPlugin
 		SServiceProvider.getService(getJCC().getServiceProvider(), 
 			ILibraryService.class).addResultListener(new IResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				ILibraryService ls = (ILibraryService)result;
 				
 				ls.getNonManagedURLs().addResultListener(new IResultListener()
 				{
-					public void resultAvailable(Object source, Object result)
+					public void resultAvailable(Object result)
 					{
 						List urls = (List)result;
 						List res = new ArrayList();
@@ -575,7 +575,7 @@ public class LibraryPlugin extends AbstractJCCPlugin
 						ret.setResult(res);
 					}
 					
-					public void exceptionOccurred(Object source, Exception exception)
+					public void exceptionOccurred(Exception exception)
 					{
 						ret.setException(exception);
 					}
@@ -583,7 +583,7 @@ public class LibraryPlugin extends AbstractJCCPlugin
 				
 			}
 				
-			public void exceptionOccurred(Object source, Exception exception)
+			public void exceptionOccurred(Exception exception)
 			{
 				ret.setException(exception);
 			}

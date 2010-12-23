@@ -66,7 +66,7 @@ public class ClientService extends BasicService implements IClientService
 			{
 				SServiceProvider.getService(provider, IAdministrationService.class).addResultListener(new DelegationResultListener(ret)
 				{
-					public void customResultAvailable(Object source, Object result)
+					public void customResultAvailable(Object result)
 					{
 						ret.setResult(result);
 					}
@@ -87,7 +87,7 @@ public class ClientService extends BasicService implements IClientService
 		final Future ret = new Future();
 		SServiceProvider.getService(provider, IClientConnector.class).addResultListener(new DelegationResultListener(ret)
 		{
-			public void customResultAvailable(Object source, Object result)
+			public void customResultAvailable(Object result)
 			{
 				((IClientConnector) result).authenticate(client).addResultListener(new DelegationResultListener(ret));
 			}
@@ -105,7 +105,7 @@ public class ClientService extends BasicService implements IClientService
 		final Future ret = new Future();
 		SServiceProvider.getService(provider, IClientConnector.class).addResultListener(new DelegationResultListener(ret)
 		{
-			public void customResultAvailable(Object source, Object result)
+			public void customResultAvailable(Object result)
 			{
 				((IClientConnector) result).deauthenticate(client).addResultListener(new DelegationResultListener(ret));
 			}
@@ -124,7 +124,7 @@ public class ClientService extends BasicService implements IClientService
 		final Future ret = new Future();
 		SServiceProvider.getService(provider, IAAAService.class).addResultListener(new DelegationResultListener(ret)
 		{
-			public void customResultAvailable(Object source, Object result)
+			public void customResultAvailable(Object result)
 			{
 				IAAAService as = (IAAAService) result;
 				ret.setResult(as.getCapabilities(as.getSecurityRole(client.getUserName())));
@@ -147,13 +147,12 @@ public class ClientService extends BasicService implements IClientService
 			{
 				SServiceProvider.getService(provider, IModelRepositoryService.class).addResultListener(new DelegationResultListener(ret)
 				{
-					public void customResultAvailable(Object source, Object result)
+					public void customResultAvailable(Object result)
 					{
 						final String filename = ((IModelRepositoryService) result).getProcessFileName(name);
 						SServiceProvider.getService(provider, IExecutionService.class).addResultListener(new DelegationResultListener(ret)
 						{
-							public void customResultAvailable(Object source,
-									Object result)
+							public void customResultAvailable(Object result)
 							{
 								((IExecutionService) result).startProcess(filename, null, null).addResultListener(new DelegationResultListener(ret));
 							}
@@ -180,7 +179,7 @@ public class ClientService extends BasicService implements IClientService
 			{
 				SServiceProvider.getService(provider, IModelRepositoryService.class).addResultListener(new DelegationResultListener(ret)
 				{
-					public void customResultAvailable(Object source, Object result)
+					public void customResultAvailable(Object result)
 					{
 						ret.setResult(((IModelRepositoryService) result).getModelNames());
 					}
@@ -201,7 +200,7 @@ public class ClientService extends BasicService implements IClientService
 		final Future ret = new Future();
 		SServiceProvider.getService(provider, IClientConnector.class).addResultListener(new DelegationResultListener(ret)
 		{
-			public void customResultAvailable(Object source, Object result)
+			public void customResultAvailable(Object result)
 			{
 				((IClientConnector) result).finishActivity(client, activity);
 				ret.setResult(null);
@@ -221,7 +220,7 @@ public class ClientService extends BasicService implements IClientService
 		final Future ret = new Future();
 		SServiceProvider.getService(provider, IClientConnector.class).addResultListener(new DelegationResultListener(ret)
 		{
-			public void customResultAvailable(Object source, Object result)
+			public void customResultAvailable(Object result)
 			{
 				((IClientConnector) result).beginActivity(client, workitem);
 				ret.setResult(null);
@@ -241,7 +240,7 @@ public class ClientService extends BasicService implements IClientService
 		final Future ret = new Future();
 		SServiceProvider.getService(provider, IClientConnector.class).addResultListener(new DelegationResultListener(ret)
 		{
-			public void customResultAvailable(Object source, Object result)
+			public void customResultAvailable(Object result)
 			{
 				((IClientConnector) result).cancelActivity(client, activity);
 				ret.setResult(null);
@@ -261,7 +260,7 @@ public class ClientService extends BasicService implements IClientService
 		final Future ret = new Future();
 		SServiceProvider.getService(provider, IClientConnector.class).addResultListener(new DelegationResultListener(ret)
 		{
-			public void customResultAvailable(Object source, Object result)
+			public void customResultAvailable(Object result)
 			{
 				((IClientConnector) result).getAvailableWorkitems(client).addResultListener(new DelegationResultListener(ret));
 			}
@@ -281,7 +280,7 @@ public class ClientService extends BasicService implements IClientService
 		final Future ret = new Future();
 		SServiceProvider.getService(provider, IClientConnector.class).addResultListener(new DelegationResultListener(ret)
 		{
-			public void customResultAvailable(Object source, Object result)
+			public void customResultAvailable(Object result)
 			{
 				((IClientConnector) result).getAvailableActivities(client).addResultListener(new DelegationResultListener(ret));
 			}
@@ -300,7 +299,7 @@ public class ClientService extends BasicService implements IClientService
 		final Future ret = new Future();
 		SServiceProvider.getService(provider, IClientConnector.class).addResultListener(new DelegationResultListener(ret)
 		{
-			public void customResultAvailable(Object source, Object result)
+			public void customResultAvailable(Object result)
 			{
 				((IClientConnector) result).addWorkitemListener(client, listener).addResultListener(new DelegationResultListener(ret));
 			}
@@ -318,7 +317,7 @@ public class ClientService extends BasicService implements IClientService
 		final Future ret = new Future();
 		SServiceProvider.getService(provider, IClientConnector.class).addResultListener(new DefaultResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				((IClientConnector) result).removeWorkitemListener(client, listener).addResultListener(new DelegationResultListener(ret));
 			}
@@ -336,7 +335,7 @@ public class ClientService extends BasicService implements IClientService
 		final Future ret = new Future();
 		SServiceProvider.getService(provider, IClientConnector.class).addResultListener(new DefaultResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				((IClientConnector) result).addActivityListener(client, listener).addResultListener(new DelegationResultListener(ret));
 			}
@@ -354,7 +353,7 @@ public class ClientService extends BasicService implements IClientService
 		final Future ret = new Future();
 		SServiceProvider.getService(provider, IClientConnector.class).addResultListener(new DefaultResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				((IClientConnector) result).removeActivityListener(client, listener).addResultListener(new DelegationResultListener(ret));
 			}

@@ -236,7 +236,7 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 //						if(SXML.isAgentFilename(model))
 						SComponentFactory.isStartable(getJCC().getServiceProvider(), model).addResultListener(new SwingDefaultResultListener(mpanel)
 						{
-							public void customResultAvailable(Object source, Object result)
+							public void customResultAvailable(Object result)
 							{
 								if(((Boolean)result).booleanValue())
 									tcpanel.getTestList().addEntry(model);
@@ -342,7 +342,7 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 					final String model = ((FileNode)n).getRelativePath();
 					SComponentFactory.isStartable(getJCC().getServiceProvider(), model).addResultListener(new SwingDefaultResultListener(mpanel)
 					{
-						public void customResultAvailable(Object source, Object result)
+						public void customResultAvailable(Object result)
 						{
 							if(((Boolean)result).booleanValue()
 								&& nof.isTestcase((IExplorerTreeNode) n))
@@ -360,7 +360,7 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 //			if(SXML.isAgentFilename(model) && ((FileNode)node).isValid())
 			SComponentFactory.isStartable(getJCC().getServiceProvider(), model).addResultListener(new SwingDefaultResultListener(mpanel)
 			{
-				public void customResultAvailable(Object source, Object result)
+				public void customResultAvailable(Object result)
 				{
 					if(((Boolean)result).booleanValue()
 						&& nof.isTestcase((IExplorerTreeNode)node))

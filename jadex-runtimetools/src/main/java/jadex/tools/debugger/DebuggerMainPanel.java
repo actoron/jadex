@@ -80,7 +80,7 @@ public class DebuggerMainPanel extends JSplitPane
 		
 		SServiceProvider.getServiceUpwards(jcc.getServiceProvider(), IComponentManagementService.class).addResultListener(new SwingDefaultResultListener(DebuggerMainPanel.this)
 		{
-			public void customResultAvailable(Object source, Object result)
+			public void customResultAvailable(Object result)
 			{
 				IComponentManagementService	ces	= (IComponentManagementService)result;
 				// The right panel (step & custom tabs)
@@ -92,7 +92,7 @@ public class DebuggerMainPanel extends JSplitPane
 				IFuture ret = ces.getExternalAccess(desc.getName());
 				ret.addResultListener(new IResultListener()
 				{			
-					public void resultAvailable(Object source, final Object result)
+					public void resultAvailable(final Object result)
 					{
 						// The left panel (breakpoints)
 						final IExternalAccess exta = (IExternalAccess)result;
@@ -121,14 +121,14 @@ public class DebuggerMainPanel extends JSplitPane
 								SComponentFactory.getProperties(DebuggerMainPanel.this.jcc.getServiceProvider(), DebuggerMainPanel.this.desc.getType())
 									.addResultListener(new SwingDefaultResultListener(DebuggerMainPanel.this)
 								{
-									public void customResultAvailable(Object source, Object result)
+									public void customResultAvailable(Object result)
 									{
 										final Map props2 = (Map)result;
 										if(props2!=null && props2.containsKey(KEY_DEBUGGER_PANELS))
 										{
 											AbstractJCCPlugin.getClassLoader(desc.getName(), jcc).addResultListener(new SwingDefaultResultListener(DebuggerMainPanel.this)
 											{
-												public void customResultAvailable(Object source, Object result)
+												public void customResultAvailable(Object result)
 												{
 													final ClassLoader	cl	= (ClassLoader)result;
 													String	panels	= (String)props2.get(KEY_DEBUGGER_PANELS);
@@ -163,7 +163,7 @@ public class DebuggerMainPanel extends JSplitPane
 							}
 						});
 					}
-					public void exceptionOccurred(Object source, Exception exception)
+					public void exceptionOccurred(Exception exception)
 					{
 						DebuggerMainPanel.this.jcc.displayError("Error initializing debugger panels.", null, exception);
 					}
@@ -180,18 +180,18 @@ public class DebuggerMainPanel extends JSplitPane
 						SServiceProvider.getServiceUpwards(DebuggerMainPanel.this.jcc.getServiceProvider(), IComponentManagementService.class)
 							.addResultListener(new SwingDefaultResultListener(DebuggerMainPanel.this)
 						{
-							public void customResultAvailable(Object source, Object result)
+							public void customResultAvailable(Object result)
 							{
 								IComponentManagementService	ces	= (IComponentManagementService)result;
 								IFuture ret = ces.stepComponent(DebuggerMainPanel.this.desc.getName());
 								ret.addResultListener(new IResultListener()
 								{
-									public void resultAvailable(Object source, Object result)
+									public void resultAvailable(Object result)
 									{
 										updatePanel((IComponentDescription)result);
 									}
 									
-									public void exceptionOccurred(Object source, Exception exception)
+									public void exceptionOccurred(Exception exception)
 									{
 										// Hack!!! keep tool reactive in case of error!?
 										step.setEnabled(true);
@@ -214,23 +214,23 @@ public class DebuggerMainPanel extends JSplitPane
 						SServiceProvider.getServiceUpwards(DebuggerMainPanel.this.jcc.getServiceProvider(), IComponentManagementService.class)
 							.addResultListener(new SwingDefaultResultListener(DebuggerMainPanel.this)
 						{
-							public void customResultAvailable(Object source, Object result)
+							public void customResultAvailable(Object result)
 							{
 								final IComponentManagementService	ces	= (IComponentManagementService)result;
 								IFuture ret = ces.stepComponent(DebuggerMainPanel.this.desc.getName());
 								ret.addResultListener(new IResultListener()
 								{
-									public void resultAvailable(Object source, Object result)
+									public void resultAvailable(Object result)
 									{
 										IFuture ret = ces.resumeComponent(DebuggerMainPanel.this.desc.getName()); 
 										ret.addResultListener(new IResultListener()
 										{
-											public void resultAvailable(Object source, Object result)
+											public void resultAvailable(Object result)
 											{
 												updatePanel((IComponentDescription)result);
 											}
 											
-											public void exceptionOccurred(Object source, Exception exception)
+											public void exceptionOccurred(Exception exception)
 											{
 												step.setEnabled(true);
 												run.setEnabled(true);
@@ -239,7 +239,7 @@ public class DebuggerMainPanel extends JSplitPane
 										});
 									}
 									
-									public void exceptionOccurred(Object source, Exception exception)
+									public void exceptionOccurred(Exception exception)
 									{
 										step.setEnabled(true);
 										run.setEnabled(true);
@@ -259,7 +259,7 @@ public class DebuggerMainPanel extends JSplitPane
 						SServiceProvider.getServiceUpwards(DebuggerMainPanel.this.jcc.getServiceProvider(), IComponentManagementService.class)
 							.addResultListener(new SwingDefaultResultListener(DebuggerMainPanel.this)
 						{
-							public void customResultAvailable(Object source, Object result)
+							public void customResultAvailable(Object result)
 							{
 								IComponentManagementService	ces	= (IComponentManagementService)result;
 								if(stepmode.isSelected())

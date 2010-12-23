@@ -48,7 +48,7 @@ public class CreateComponentTask implements ITask
 		
 		SServiceProvider.getService(instance.getServiceProvider(), IComponentManagementService.class).addResultListener(new ComponentResultListener(new IResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				IComponentManagementService	cms	= (IComponentManagementService)result;
 				String name = (String)context.getParameterValue("name");
@@ -84,7 +84,7 @@ public class CreateComponentTask implements ITask
 				{
 					lis = new IResultListener()
 					{
-						public void resultAvailable(Object source, Object result)
+						public void resultAvailable(Object result)
 						{
 							if(result!=null)
 							{
@@ -98,15 +98,15 @@ public class CreateComponentTask implements ITask
 								}
 							}
 							if(killlistener!=null)
-								killlistener.resultAvailable(CreateComponentTask.this, result);
+								killlistener.resultAvailable(result);
 //							listener.resultAvailable(CreateComponentTask.this, null);
 							ret.setResult(null);
 						}
 						
-						public void exceptionOccurred(Object source, Exception exception)
+						public void exceptionOccurred(Exception exception)
 						{
 							if(killlistener!=null)
-								killlistener.exceptionOccurred(CreateComponentTask.this, exception);
+								killlistener.exceptionOccurred(exception);
 //							listener.exceptionOccurred(CreateComponentTask.this, exception);
 							ret.setException(exception);
 						}
@@ -124,7 +124,7 @@ public class CreateComponentTask implements ITask
 				}
 			}
 			
-			public void exceptionOccurred(Object source, Exception exception)
+			public void exceptionOccurred(Exception exception)
 			{
 				ret.setException(exception);
 //				listener.exceptionOccurred(source, exception);

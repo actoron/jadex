@@ -261,13 +261,13 @@ public class RuleProfilerPlugin extends AbstractJCCPlugin	implements ICMSCompone
 		SServiceProvider.getServiceUpwards(jcc.getServiceProvider(),
 			IComponentManagementService.class).addResultListener(new SwingDefaultResultListener(comptree)
 		{
-			public void customResultAvailable(Object source, Object result)
+			public void customResultAvailable(Object result)
 			{
 				IComponentManagementService cms = (IComponentManagementService)result;
 				cms.addComponentListener(null, RuleProfilerPlugin.this);
 				cms.getComponentDescriptions().addResultListener(new SwingDefaultResultListener(comptree)
 				{
-					public void customResultAvailable(Object source, Object result)
+					public void customResultAvailable(Object result)
 					{
 						IComponentDescription[] res = (IComponentDescription[])result;
 						for(int i=0; i<res.length; i++)

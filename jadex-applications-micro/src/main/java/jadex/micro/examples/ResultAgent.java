@@ -34,30 +34,30 @@ public class ResultAgent extends MicroAgent
 			SServiceProvider.getServiceUpwards(getServiceProvider(), IComponentManagementService.class)
 				.addResultListener(createResultListener(new DefaultResultListener()
 			{
-				public void resultAvailable(Object source, Object result)
+				public void resultAvailable(Object result)
 				{
 					IComponentManagementService cms = (IComponentManagementService)result;
 				
 					cms.createComponent(null, ResultAgent.this.getClass().getName()+".class", new CreationInfo(getComponentIdentifier()), createResultListener(new IResultListener()
 					{
-						public void resultAvailable(Object source, Object result)
+						public void resultAvailable(Object result)
 						{
 							System.out.println(getAgentName()+" got result: "+result);
 							killAgent();
 						}
 						
-						public void exceptionOccurred(Object source, Exception exception)
+						public void exceptionOccurred(Exception exception)
 						{
 							System.out.println("exception occurred: "+exception);
 							killAgent();
 						}
 					})).addResultListener(new IResultListener()
 					{
-						public void resultAvailable(Object source, Object result)
+						public void resultAvailable(Object result)
 						{
 						}
 						
-						public void exceptionOccurred(Object source, Exception exception)
+						public void exceptionOccurred(Exception exception)
 						{
 							System.out.println("Could not create agent: "+exception);
 							killAgent();

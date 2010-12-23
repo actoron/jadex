@@ -21,17 +21,17 @@ public class ScenarioAgent extends MicroAgent
 		SServiceProvider.getService(getServiceProvider(), ILibraryService.class)
 			.addResultListener(createResultListener(new DefaultResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				ILibraryService libservice = (ILibraryService)result;
 				libservice.getURLStrings().addResultListener(createResultListener(new DefaultResultListener()
 				{
-					public void resultAvailable(Object source, Object result)
+					public void resultAvailable(Object result)
 					{
 						String[] libpaths = (String[])((List)result).toArray(new String[0]);
 						StartScenario.startScenario(libpaths).addResultListener(createResultListener(new DefaultResultListener()
 						{
-							public void resultAvailable(Object source, Object result)
+							public void resultAvailable(Object result)
 							{
 								System.out.println("Killing platforms");
 								IExternalAccess[] platforms = (IExternalAccess[])result;

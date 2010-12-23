@@ -68,14 +68,14 @@ public class HandleDisasterPlan extends Plan
 	//						System.out.println("Unit assigned: "+provid);
 							ccs.clearChemicals(disaster).addResultListener(createResultListener(new IResultListener()
 							{
-								public void resultAvailable(Object source, Object result)
+								public void resultAvailable(Object result)
 								{
 	//								System.out.println("Unit finished: "+provid);
 									busy.removeFact(provid);
 									chemicalunits.remove(ccs);
 								}
 								
-								public void exceptionOccurred(Object source, Exception exception)
+								public void exceptionOccurred(Exception exception)
 								{
 	//								System.out.println("Unit exception: "+provid);
 									busy.removeFact(provid);
@@ -104,14 +104,14 @@ public class HandleDisasterPlan extends Plan
 	//						System.out.println("Unit assigned: "+provid);
 							fes.extinguishFire(disaster).addResultListener(createResultListener(new IResultListener()
 							{
-								public void resultAvailable(Object source, Object result)
+								public void resultAvailable(Object result)
 								{
 	//								System.out.println("Unit finished: "+provid);
 									busy.removeFact(provid);
 									fireunits.remove(fes);
 								}
 								
-								public void exceptionOccurred(Object source, Exception exception)
+								public void exceptionOccurred(Exception exception)
 								{
 	//								System.out.println("Unit exception: "+provid);
 									busy.removeFact(provid);
@@ -141,7 +141,7 @@ public class HandleDisasterPlan extends Plan
 //							System.out.println("Unit assigned: "+provid);
 							tvs.treatVictims(disaster).addResultListener(createResultListener(new IResultListener()
 							{
-								public void resultAvailable(Object source, Object result)
+								public void resultAvailable(Object result)
 								{
 //									int s = ambulanceunits.size();
 									busy.removeFact(provid);
@@ -149,7 +149,7 @@ public class HandleDisasterPlan extends Plan
 //									System.out.println("Unit finished: "+provid+", "+disaster+" "+s+" "+ambulanceunits.size());
 								}
 								
-								public void exceptionOccurred(Object source, Exception exception)
+								public void exceptionOccurred(Exception exception)
 								{
 //									System.out.println("Unit exception: "+provid);
 									busy.removeFact(provid);

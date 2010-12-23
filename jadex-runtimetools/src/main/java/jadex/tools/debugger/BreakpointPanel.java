@@ -83,7 +83,7 @@ public class BreakpointPanel extends JPanel	implements IBreakpointPanel
 				
 		SServiceProvider.getServiceUpwards(container, IComponentManagementService.class).addResultListener(new SwingDefaultResultListener(BreakpointPanel.this)
 		{
-			public void customResultAvailable(Object source, Object result)
+			public void customResultAvailable(Object result)
 			{
 				IComponentManagementService	cms	= (IComponentManagementService)result;
 				cms.addComponentListener(description.getName(), new ICMSComponentListener()

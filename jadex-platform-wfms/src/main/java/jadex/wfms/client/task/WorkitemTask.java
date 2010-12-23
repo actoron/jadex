@@ -38,7 +38,7 @@ public class WorkitemTask implements ITask
 		SServiceProvider.getService(wfms, IWfmsClientService.class).addResultListener(new DefaultResultListener()
 		{
 			
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				IWfmsClientService wiq = (IWfmsClientService) result;
 				wiq.queueWorkitem(createWorkitem(Workitem.GENERIC_WORKITEM_TYPE, context), createListener(context, ret));
@@ -146,7 +146,7 @@ public class WorkitemTask implements ITask
 		IResultListener redirListener = new IResultListener()
 		{
 			
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				Workitem wi = (Workitem) result;
 				Map parameterValues = wi.getParameterValues();
@@ -164,7 +164,7 @@ public class WorkitemTask implements ITask
 				//listener.resultAvailable(source, result);
 			}
 			
-			public void exceptionOccurred(Object source, Exception exception)
+			public void exceptionOccurred(Exception exception)
 			{
 				//listener.exceptionOccurred(source, exception);
 				future.setException(exception);

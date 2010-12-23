@@ -116,7 +116,7 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory
 		};
 		SServiceProvider.getService(provider, ILibraryService.class).addResultListener(new DefaultResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				if(result!=null)
 				{
@@ -147,7 +147,7 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory
 	{
 		SServiceProvider.getService(provider, ILibraryService.class).addResultListener(new DefaultResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				ILibraryService libService = (ILibraryService) result;
 				libService.removeLibraryServiceListener(libservicelistener);

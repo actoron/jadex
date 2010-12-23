@@ -67,7 +67,7 @@ public class DaemonPanel extends JPanel
 				SServiceProvider.getService(agent.getServiceProvider(), IDaemonService.class)
 					.addResultListener(new SwingDefaultResultListener()
 				{
-					public void customResultAvailable(Object source, Object result)
+					public void customResultAvailable(Object result)
 					{
 						IDaemonService ds = (IDaemonService)result;
 						StartOptions so = new StartOptions();
@@ -107,7 +107,7 @@ public class DaemonPanel extends JPanel
 		SServiceProvider.getService(agent.getServiceProvider(), IDaemonService.class)
 			.addResultListener(new SwingDefaultResultListener()
 		{
-			public void customResultAvailable(Object source, Object result)
+			public void customResultAvailable(Object result)
 			{
 				IDaemonService ds = (IDaemonService)result;
 				ds.addChangeListener(listener);
@@ -125,7 +125,7 @@ public class DaemonPanel extends JPanel
 				SServiceProvider.getService(agent.getServiceProvider(), IDaemonService.class)
 					.addResultListener(new SwingDefaultResultListener()
 				{
-					public void customResultAvailable(Object source, Object result)
+					public void customResultAvailable(Object result)
 					{
 						IDaemonService ds = (IDaemonService)result;
 						int[] rows = (int[])platformt.getSelectedRows();
@@ -154,14 +154,14 @@ public class DaemonPanel extends JPanel
 		SServiceProvider.getService(agent.getServiceProvider(), IDaemonService.class)
 			.addResultListener(new IResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				IDaemonService ds = (IDaemonService)result;
 				ds.removeChangeListener(listener);
 				ret.setResult(null);
 			}
 			
-			public void exceptionOccurred(Object source, Exception exception)
+			public void exceptionOccurred(Exception exception)
 			{
 				ret.setException(exception);
 			}

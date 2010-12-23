@@ -77,14 +77,14 @@ public class GeneratePanel extends JPanel
 							ia.getRequiredService("generateservice")	
 								.addResultListener(ia.createResultListener(new DefaultResultListener()
 							{
-								public void resultAvailable(Object source, Object result)
+								public void resultAvailable(Object result)
 								{
 									IGenerateService gs = (IGenerateService)result;
 									
 									AreaData ad = new AreaData(x1, x2, y1, y2, sizex, sizey, max, par, tasksize);
 									gs.generateArea(ad).addResultListener(ia.createResultListener(new DefaultResultListener()
 									{
-										public void resultAvailable(Object source, Object result)
+										public void resultAvailable(Object result)
 										{
 											final AreaData res = (AreaData)result;
 											
@@ -92,13 +92,13 @@ public class GeneratePanel extends JPanel
 											ia.getRequiredService("displayservice")	
 												.addResultListener(new DefaultResultListener()
 											{
-												public void resultAvailable(Object source, Object result)
+												public void resultAvailable(Object result)
 												{
 													// Distribute to more than one worker.
 													IDisplayService ds = (IDisplayService)result;
 													ds.displayResult(res).addResultListener(new DefaultResultListener()
 													{
-														public void resultAvailable(Object source, Object result)
+														public void resultAvailable(Object result)
 														{
 														}
 													});

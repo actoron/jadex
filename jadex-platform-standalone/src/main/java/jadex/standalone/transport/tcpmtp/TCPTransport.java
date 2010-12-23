@@ -181,13 +181,13 @@ public class TCPTransport implements ITransport
 			// Start the receiver thread.
 			SServiceProvider.getService(container, ILibraryService.class).addResultListener(new DefaultResultListener()
 			{
-				public void resultAvailable(Object source, Object result)
+				public void resultAvailable(Object result)
 				{
 					libservice = (ILibraryService)result;
 
 					SServiceProvider.getService(container, IThreadPoolService.class).addResultListener(new DefaultResultListener()
 					{
-						public void resultAvailable(Object source, Object result)
+						public void resultAvailable(Object result)
 						{
 							final IThreadPoolService tp = (IThreadPoolService)result;
 							tp.execute(new Runnable()
@@ -431,7 +431,7 @@ public class TCPTransport implements ITransport
 	{
 		SServiceProvider.getService(container, IMessageService.class).addResultListener(new DefaultResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				IMessageService ms = (IMessageService)result;
 				try
@@ -499,7 +499,7 @@ public class TCPTransport implements ITransport
 			SServiceProvider.getService(container, IClockService.class).addResultListener(new DefaultResultListener()
 			{
 				// Todo: synchronize?
-				public void resultAvailable(Object source, Object result)
+				public void resultAvailable(Object result)
 				{
 					long time = ((IClockService)result).getTime()+MAX_KEEPALIVE;
 					if(timer==null)

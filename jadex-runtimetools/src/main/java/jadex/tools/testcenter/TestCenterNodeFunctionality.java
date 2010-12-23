@@ -201,13 +201,13 @@ public class TestCenterNodeFunctionality extends DefaultNodeFunctionality
 					final String file	= fn.getFile().getAbsolutePath();
 					SComponentFactory.isLoadable(jcc.getServiceProvider(), file).addResultListener(new DefaultResultListener()
 					{
-						public void resultAvailable(Object source, Object result)
+						public void resultAvailable(Object result)
 						{
 							if(((Boolean)result).booleanValue())
 							{
 								SComponentFactory.loadModel(jcc.getServiceProvider(), file).addResultListener(new DefaultResultListener()
 								{
-									public void resultAvailable(Object source, Object result)
+									public void resultAvailable(Object result)
 									{
 										boolean	newtest	= false;
 										IModelInfo model = (IModelInfo)result;
@@ -224,7 +224,7 @@ public class TestCenterNodeFunctionality extends DefaultNodeFunctionality
 										renew(fn, oldtest, newtest);
 									}
 									
-									public void exceptionOccurred(Object source, Exception exception)
+									public void exceptionOccurred(Exception exception)
 									{
 										renew(fn, oldtest, false);
 									}

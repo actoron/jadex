@@ -67,12 +67,12 @@ public class VirtualComponentTreeNode extends AbstractComponentTreeNode implemen
 		ProxyComponentTreeNode.searchChildren(cms, this, desc, desc.getName(), iconcache, future, force)
 			.addResultListener(new SwingDefaultResultListener()
 		{
-			public void customResultAvailable(Object source, Object result)
+			public void customResultAvailable(Object result)
 			{
 				setChildren((List)result).addResultListener(new DelegationResultListener(future));
 			}
 			
-			public void customExceptionOccurred(Object source, Exception exception)
+			public void customExceptionOccurred(Exception exception)
 			{
 				setChildren(Collections.EMPTY_LIST);
 			}
@@ -93,7 +93,7 @@ public class VirtualComponentTreeNode extends AbstractComponentTreeNode implemen
 		cms.getExternalAccess(proxy.getDescription().getName())
 			.addResultListener(new SwingDefaultResultListener()
 		{
-			public void customResultAvailable(Object source, Object result)
+			public void customResultAvailable(Object result)
 			{
 				final IMicroExternalAccess exta = (IMicroExternalAccess)result;
 				exta.scheduleStep(new IComponentStep()
@@ -105,14 +105,14 @@ public class VirtualComponentTreeNode extends AbstractComponentTreeNode implemen
 						pa.getRemoteComponentDescription(desc.getName())
 							.addResultListener(new SwingDefaultResultListener()
 						{
-							public void customResultAvailable(Object source, Object result)
+							public void customResultAvailable(Object result)
 							{
 								setDescription((IComponentDescription)result);
 								getModel().fireNodeChanged(VirtualComponentTreeNode.this);
 //								System.out.println("refreshed: "+desc);
 							}
 							
-							public void customExceptionOccurred(Object source, Exception exception)
+							public void customExceptionOccurred(Exception exception)
 							{
 								AbstractComponentTreeNode parent = (AbstractComponentTreeNode)getParent();
 								parent.removeChild(VirtualComponentTreeNode.this);
@@ -123,7 +123,7 @@ public class VirtualComponentTreeNode extends AbstractComponentTreeNode implemen
 				});
 			}
 			
-			public void customExceptionOccurred(Object source, Exception exception)
+			public void customExceptionOccurred(Exception exception)
 			{
 				AbstractComponentTreeNode parent = (AbstractComponentTreeNode)getParent();
 				parent.removeChild(VirtualComponentTreeNode.this);

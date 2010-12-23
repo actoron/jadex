@@ -81,7 +81,7 @@ public class Starter
 	{
 		createPlatform(args).addResultListener(new DefaultResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 			}
 		});
@@ -184,7 +184,7 @@ public class Starter
 			final Future ret = new Future();
 			future.addResultListener(new IResultListener()
 			{
-				public void resultAvailable(Object source, Object result)
+				public void resultAvailable(Object result)
 				{
 					Object[] root = (Object[])result;
 					IComponentInstance instance = (IComponentInstance)root[0];
@@ -198,7 +198,7 @@ public class Starter
 					ret.setResult(instance.getExternalAccess());
 				}
 				
-				public void exceptionOccurred(Object source, Exception exception)
+				public void exceptionOccurred(Exception exception)
 				{
 					ret.setException(exception);
 				}

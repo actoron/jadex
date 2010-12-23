@@ -9,9 +9,8 @@ public interface IIntermediateResultListener extends IResultListener
 {
 	/**
 	 *  Called when an intermediate result is available.
-	 *  @param source The source component.
-	 *  @param result The result.
+	 * @param result The result.
 	 */
-	public void intermediateResultAvailable(Object source, Object result);
+	public void intermediateResultAvailable(Object result);
 
 }

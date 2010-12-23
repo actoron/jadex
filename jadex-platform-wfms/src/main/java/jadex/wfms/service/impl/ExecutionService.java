@@ -105,12 +105,12 @@ public class ExecutionService extends BasicService implements IExecutionService
 		IComponentManagementService ces = (IComponentManagementService) SServiceProvider.getService(provider, IComponentManagementService.class).get(new ThreadSuspendable());
 		ces.createComponent(null, modelname, new CreationInfo(null, arguments, wfms, true), null).addResultListener(new DefaultResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				final IComponentIdentifier id = ((IComponentIdentifier) result);
 				SServiceProvider.getService(provider, IComponentManagementService.class).addResultListener(new DelegationResultListener(ret)
 				{
-					public void customResultAvailable(Object source, Object result)
+					public void customResultAvailable(Object result)
 					{
 						final IComponentManagementService cms = (IComponentManagementService) result;
 						cms.addComponentListener(id, new ICMSComponentListener()
@@ -133,7 +133,7 @@ public class ExecutionService extends BasicService implements IExecutionService
 								{
 									cms.getExternalAccess(id).addResultListener(new DefaultResultListener()
 									{
-										public void resultAvailable(Object source, Object result)
+										public void resultAvailable(Object result)
 										{
 											final jadex.bpmn.runtime.ExternalAccess ea = (jadex.bpmn.runtime.ExternalAccess) result;
 											List newStates = new ArrayList();
@@ -196,7 +196,7 @@ public class ExecutionService extends BasicService implements IExecutionService
 				ret.setResult(id);
 			}
 			
-			public void exceptionOccurred(Object source, Exception exception)
+			public void exceptionOccurred(Exception exception)
 			{
 				ret.setException(exception);
 			}

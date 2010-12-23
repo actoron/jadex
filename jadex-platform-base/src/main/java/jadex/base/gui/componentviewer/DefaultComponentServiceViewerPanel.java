@@ -67,12 +67,12 @@ public class DefaultComponentServiceViewerPanel extends AbstractComponentViewerP
 			}
 		}).addResultListener(new IResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				createPanels(component, (List)result).addResultListener(new DelegationResultListener(ret));
 			}
 			
-			public void exceptionOccurred(Object source, Exception exception)
+			public void exceptionOccurred(Exception exception)
 			{
 				ret.setException(exception);
 			}
@@ -91,7 +91,7 @@ public class DefaultComponentServiceViewerPanel extends AbstractComponentViewerP
 		SComponentFactory.getClassLoader(exta.getComponentIdentifier(), jcc)
 			.addResultListener(new DefaultResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				final ClassLoader cl = (ClassLoader)result;
 		
@@ -100,7 +100,7 @@ public class DefaultComponentServiceViewerPanel extends AbstractComponentViewerP
 				final CollectionResultListener lis = new CollectionResultListener(
 					services.size()+1, true, new DelegationResultListener(ret)
 				{
-					public void customResultAvailable(Object source, Object result) 
+					public void customResultAvailable(Object result) 
 					{
 		//				if(subpanels.size()==1)
 		//				{
@@ -117,7 +117,7 @@ public class DefaultComponentServiceViewerPanel extends AbstractComponentViewerP
 							}
 							panel.add(tp, BorderLayout.CENTER);
 						}
-						super.customResultAvailable(source, result);
+						super.customResultAvailable(result);
 					}	
 				});
 				
@@ -134,12 +134,12 @@ public class DefaultComponentServiceViewerPanel extends AbstractComponentViewerP
 					}
 					catch(Exception e)
 					{
-						lis.exceptionOccurred(exta.getComponentIdentifier(), e);
+						lis.exceptionOccurred(e);
 					}
 				}
 				else
 				{
-					lis.exceptionOccurred(exta.getComponentIdentifier(), new RuntimeException("No viewerclass: "+clname));
+					lis.exceptionOccurred(new RuntimeException("No viewerclass: "+clname));
 				}
 				
 				// Service panels.
@@ -161,12 +161,12 @@ public class DefaultComponentServiceViewerPanel extends AbstractComponentViewerP
 							catch(Exception e)
 							{
 								e.printStackTrace();
-								lis.exceptionOccurred(null, e);
+								lis.exceptionOccurred(e);
 							}
 						}
 						else
 						{
-							lis.exceptionOccurred(null, null);
+							lis.exceptionOccurred(null);
 						}
 					}
 				}

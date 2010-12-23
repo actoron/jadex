@@ -61,7 +61,7 @@ public abstract class SwingDefaultResultListener extends DefaultResultListener
 		{
 			instance = new SwingDefaultResultListener((Component)null)
 			{
-				public void customResultAvailable(Object source, Object result)
+				public void customResultAvailable(Object result)
 				{
 				}
 			};
@@ -73,46 +73,46 @@ public abstract class SwingDefaultResultListener extends DefaultResultListener
 	
 	/**
 	 *  Called when the result is available.
-	 *  @param result The result.
+	 * @param result The result.
 	 */
-	final public void resultAvailable(final Object source, final Object result)
+	final public void resultAvailable(final Object result)
 	{
 		SwingUtilities.invokeLater(new Runnable()
 		{
 			public void run()
 			{
-				customResultAvailable(source, result);
+				customResultAvailable(result);
 			}
 		});
 	}
 	
 	/**
 	 *  Called when an exception occurred.
-	 *  @param exception The exception.
+	 * @param exception The exception.
 	 */
-	final public void exceptionOccurred(final Object source, final Exception exception)
+	final public void exceptionOccurred(final Exception exception)
 	{
 //		exception.printStackTrace();
 		SwingUtilities.invokeLater(new Runnable()
 		{
 			public void run()
 			{
-				customExceptionOccurred(source, exception);
+				customExceptionOccurred(exception);
 			}
 		});
 	}
 	
 	/**
 	 *  Called when the result is available.
-	 *  @param result The result.
+	 * @param result The result.
 	 */
-	public abstract void customResultAvailable(Object source, Object result);
+	public abstract void customResultAvailable(Object result);
 	
 	/**
 	 *  Called when an exception occurred.
-	 *  @param exception The exception.
+	 * @param exception The exception.
 	 */
-	public void customExceptionOccurred(Object source, Exception exception)
+	public void customExceptionOccurred(Exception exception)
 	{
 		if(parent!=null)
 		{
@@ -124,7 +124,7 @@ public abstract class SwingDefaultResultListener extends DefaultResultListener
 		}
 		else
 		{
-			super.exceptionOccurred(source, exception);
+			super.exceptionOccurred(exception);
 		}
 	}
 }

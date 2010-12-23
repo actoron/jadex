@@ -79,7 +79,7 @@ public class GpmnFactory extends BasicService implements IComponentFactory
 		
 		SServiceProvider.getService(provider, new ComponentFactorySelector(BDIAgentFactory.FILETYPE_BDIAGENT)).addResultListener(new DefaultResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				factory = (BDIAgentFactory)result;
 				if(factory == null)

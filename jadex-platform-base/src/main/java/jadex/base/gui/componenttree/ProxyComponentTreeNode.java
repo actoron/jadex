@@ -121,19 +121,19 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 	{
 		getRemoteComponentIdentifier().addResultListener(new SwingDefaultResultListener()
 		{
-			public void customResultAvailable(Object source, Object result)
+			public void customResultAvailable(Object result)
 			{
 				final Future	future	= new Future();
 				searchChildren(cms, ProxyComponentTreeNode.this, desc, cid, iconcache, future, force)
 					.addResultListener(new SwingDefaultResultListener()
 				{
-					public void customResultAvailable(Object source, Object result)
+					public void customResultAvailable(Object result)
 					{
 						setChildren((List)result).addResultListener(new DelegationResultListener(future));
 						connected = true;
 					}
 					
-					public void customExceptionOccurred(Object source, Exception exception)
+					public void customExceptionOccurred(Exception exception)
 					{
 						setChildren(Collections.EMPTY_LIST);
 						connected = false;
@@ -142,7 +142,7 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 				});
 			}
 			
-			public void customExceptionOccurred(Object source, Exception exception)
+			public void customExceptionOccurred(Exception exception)
 			{
 				setChildren(Collections.EMPTY_LIST);
 				connected = false;
@@ -181,7 +181,7 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 		
 		cms.getExternalAccess(proxy.getDescription().getName()).addResultListener(new IResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				final IMicroExternalAccess exta = (IMicroExternalAccess)result;
 				exta.scheduleStep(new IComponentStep()
@@ -192,7 +192,7 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 						ProxyAgent pa = (ProxyAgent)ia;
 						pa.getVirtualChildren(cid, force).addResultListener(new SwingDefaultResultListener()
 						{
-							public void customResultAvailable(Object source, Object result)
+							public void customResultAvailable(Object result)
 							{
 								IComponentDescription[] descs = (IComponentDescription[])
 									((Collection)result).toArray(new IComponentDescription[((Collection)result).size()]);
@@ -214,7 +214,7 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 								}
 							}
 							
-							public void customExceptionOccurred(Object source, Exception exception)
+							public void customExceptionOccurred(Exception exception)
 							{
 								// 2 parallel search branches, i.e. one may fail first
 								ret.setExceptionIfUndone(exception);
@@ -233,7 +233,7 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 						ProxyAgent pa = (ProxyAgent)ia;
 						pa.getRemoteServices(cid).addResultListener(new SwingDefaultResultListener()
 						{
-							public void customResultAvailable(Object source, Object result)
+							public void customResultAvailable(Object result)
 							{
 								List services = (List)result;
 								if(services!=null && !services.isEmpty())
@@ -257,11 +257,11 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 									final ServiceContainerNode	node	= scn;
 									future.addResultListener(new SwingDefaultResultListener()
 									{
-										public void customResultAvailable(Object source, Object result)
+										public void customResultAvailable(Object result)
 										{
 											node.setChildren(subchildren);
 										}
-										public void customExceptionOccurred(Object source, Exception exception)
+										public void customExceptionOccurred(Exception exception)
 										{
 											// Shouldn't happen
 										}
@@ -275,7 +275,7 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 								}
 							}
 							
-							public void customExceptionOccurred(Object source, Exception exception)
+							public void customExceptionOccurred(Exception exception)
 							{
 								// When service search fails, display broken service container node.
 								ServiceContainerNode scn = (ServiceContainerNode)proxy.getModel().getNode(desc.getName().getName()+"ServiceContainer");
@@ -302,7 +302,7 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 				});
 			}
 			
-			public void exceptionOccurred(Object source, Exception exception)
+			public void exceptionOccurred(Exception exception)
 			{
 				ret.setException(exception);
 			}
@@ -323,7 +323,7 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 		{
 			cms.getExternalAccess(desc.getName()).addResultListener(new IResultListener()
 			{
-				public void resultAvailable(Object source, Object result)
+				public void resultAvailable(Object result)
 				{
 					final IMicroExternalAccess exta = (IMicroExternalAccess)result;
 					exta.scheduleStep(new IComponentStep()
@@ -339,7 +339,7 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 					});
 				}
 				
-				public void exceptionOccurred(Object source, Exception exception)
+				public void exceptionOccurred(Exception exception)
 				{
 					ret.setException(exception);
 				}

@@ -72,13 +72,13 @@ public class EatAction extends SimplePropertyObject implements ISpaceAction
 //			System.err.println("Destroying: "+target.getProperty(ISpaceObject.PROPERTY_OWNER));
 			SServiceProvider.getServiceUpwards(space.getContext().getServiceProvider(), IComponentManagementService.class).addResultListener(new IResultListener()
 			{
-				public void resultAvailable(Object source, Object result)
+				public void resultAvailable(Object result)
 				{
 					IComponentManagementService cms = (IComponentManagementService)result;
 					cms.destroyComponent((IComponentIdentifier)target.getProperty(ISpaceObject.PROPERTY_OWNER));
 				}
 				
-				public void exceptionOccurred(Object source, Exception exception)
+				public void exceptionOccurred(Exception exception)
 				{
 				}
 			});

@@ -23,17 +23,17 @@ public class UserAgent extends MicroAgent
 	{
 		getRequiredService("addservice").addResultListener(new DefaultResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				IAddService addser = (IAddService)result;
 				addser.add(1, 1).addResultListener(createResultListener(new IResultListener()
 				{
-					public void resultAvailable(Object source, Object result)
+					public void resultAvailable(Object result)
 					{
 						System.out.println("add service result: "+result+" "+getComponentIdentifier().getLocalName());
 					}
 					
-					public void exceptionOccurred(Object source, Exception exception)
+					public void exceptionOccurred(Exception exception)
 					{
 						System.out.println("invocation failed: "+exception);
 					}

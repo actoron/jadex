@@ -146,7 +146,7 @@ public class MicroAgentInterpreter implements IComponentInstance
 					microagent.agentCreated();
 					getServiceContainer().start().addResultListener(createResultListener(new IResultListener()
 					{
-						public void resultAvailable(Object source, Object result)
+						public void resultAvailable(Object result)
 						{
 							// Init is now finished. Notify cms.
 							inited.setResult(new Object[]{MicroAgentInterpreter.this, adapter});
@@ -165,7 +165,7 @@ public class MicroAgentInterpreter implements IComponentInstance
 							}, new Future()});
 						}
 						
-						public void exceptionOccurred(Object source, Exception exception)
+						public void exceptionOccurred(Exception exception)
 						{
 							inited.setException(exception);
 						}
@@ -377,7 +377,7 @@ public class MicroAgentInterpreter implements IComponentInstance
 		
 		SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class).addResultListener(new DefaultResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				((IComponentManagementService)result).destroyComponent(adapter.getComponentIdentifier())
 					.addResultListener(new DelegationResultListener(ret));

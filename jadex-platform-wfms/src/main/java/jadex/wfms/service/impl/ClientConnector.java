@@ -153,7 +153,7 @@ public class ClientConnector extends BasicService implements IClientConnector //
 		final Future ret = new Future();
 		SServiceProvider.getService(provider, IAAAService.class).addResultListener(new DelegationResultListener(ret)
 		{
-			public void customResultAvailable(Object source, Object result)
+			public void customResultAvailable(Object result)
 			{
 				boolean auth = ((IAAAService) result).authenticate(client);
 				if (auth)
@@ -184,7 +184,7 @@ public class ClientConnector extends BasicService implements IClientConnector //
 		SServiceProvider.getService(provider, IAAAService.class)
 			.addResultListener(new DelegationResultListener(ret)
 		{
-			public void customResultAvailable(Object source, Object result)
+			public void customResultAvailable(Object result)
 			{
 				synchronized(ClientConnector.this)
 				{
@@ -243,7 +243,7 @@ public class ClientConnector extends BasicService implements IClientConnector //
 		IResultListener listener = (IResultListener) processWorkitemListeners.remove(activity);
 		((HashSet) userActivities.get(client.getUserName())).remove(activity);
 		fireActivityRemovedEvent(client.getUserName(), activity);
-		listener.resultAvailable(this, activity);
+		listener.resultAvailable(activity);
 	}
 	
 	/**
@@ -289,7 +289,7 @@ public class ClientConnector extends BasicService implements IClientConnector //
 				SServiceProvider.getService(provider, IAAAService.class)
 					.addResultListener(new DelegationResultListener(ret)
 				{
-					public void customResultAvailable(Object source, Object result)
+					public void customResultAvailable(Object result)
 					{
 						Set roles = ((IAAAService) result).getRoles(client.getUserName());
 						Set workitems = new HashSet();
@@ -358,7 +358,7 @@ public class ClientConnector extends BasicService implements IClientConnector //
 			{
 				getAvailableWorkitems(client).addResultListener(new DelegationResultListener(ret)
 				{
-					public void customResultAvailable(Object source, Object result)
+					public void customResultAvailable(Object result)
 					{
 						synchronized(ClientConnector.this)
 						{

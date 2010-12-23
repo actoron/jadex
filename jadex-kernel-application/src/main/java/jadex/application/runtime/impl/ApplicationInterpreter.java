@@ -238,7 +238,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 								SServiceProvider.getService(ia.getServiceProvider(), IComponentManagementService.class)
 									.addResultListener(ia.createResultListener(new DelegationResultListener(futu)
 								{
-									public void customResultAvailable(Object source, Object result)
+									public void customResultAvailable(Object result)
 									{
 										final IComponentManagementService cms = (IComponentManagementService)result;
 										IComponentIdentifier cid = cms.createComponentIdentifier(st.getComponentName(), st.getComponentName().indexOf("@")==-1);
@@ -286,7 +286,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 								final Future retu = new Future();
 								((IFuture)val).addResultListener(new ComponentResultListener(new DefaultResultListener()
 								{
-									public void resultAvailable(Object source, Object result)
+									public void resultAvailable(Object result)
 									{
 										synchronized(properties)
 										{
@@ -317,7 +317,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 					{
 						container.start().addResultListener(new ComponentResultListener(new IResultListener()
 						{
-							public void resultAvailable(Object source, Object result)
+							public void resultAvailable(Object result)
 							{
 								// Create spaces for context.
 //								System.out.println("comp services start finished: "+getComponentIdentifier());
@@ -344,7 +344,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 								final List components = config.getMComponentInstances();
 								SServiceProvider.getServiceUpwards(getServiceProvider(), IComponentManagementService.class).addResultListener(createResultListener(new DefaultResultListener()
 								{
-									public void resultAvailable(Object source, Object result)
+									public void resultAvailable(Object result)
 									{
 										// NOTE: in current implementation application waits for subcomponents
 										// to be finished and cms implements a hack to get the external
@@ -363,7 +363,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 								}));
 							}
 							
-							public void exceptionOccurred(Object source, Exception exception)
+							public void exceptionOccurred(Exception exception)
 							{
 								inited.setException(exception);
 							}
@@ -375,12 +375,12 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 				
 				IResultListener	crl	= new CounterResultListener(futures.size(), new IResultListener()
 				{
-					public void resultAvailable(Object source, Object result)
+					public void resultAvailable(Object result)
 					{
 						scheduleStep(init2);
 					}
 					
-					public void exceptionOccurred(Object source, Exception exception)
+					public void exceptionOccurred(Exception exception)
 					{
 						inited.setException(exception);
 					}
@@ -404,7 +404,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 		SServiceProvider.getService(getServiceProvider(), new ComponentFactorySelector(ct.getFilename(), 
 			model.getAllImports(), model.getModelInfo().getClassLoader())).addResultListener(createResultListener(new IResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 //				System.out.println("create start2: "+ct.getFilename());
 				
@@ -431,7 +431,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 				}
 			}
 			
-			public void exceptionOccurred(Object source, Exception exception)
+			public void exceptionOccurred(Exception exception)
 			{
 				System.out.println("No factory found for: "+ct);
 				if(i+1<componenttypes.size())
@@ -1160,7 +1160,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 		
 		SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class).addResultListener(new DefaultResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				((IComponentManagementService)result).destroyComponent(adapter.getComponentIdentifier())
 					.addResultListener(new DelegationResultListener(ret));
@@ -1288,7 +1288,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 			int num = getNumber(component);
 			IResultListener	crl	= new CollectionResultListener(num, false, new IResultListener()
 			{
-				public void resultAvailable(Object source, Object result)
+				public void resultAvailable(Object result)
 				{
 //					System.out.println("Create finished: "+component.getName()+" "+component.getTypeName()+" "+component.getConfiguration()+" "+Thread.currentThread());
 //					if(getParent()==null)
@@ -1315,7 +1315,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 //					}
 				}
 				
-				public void exceptionOccurred(Object source, Exception exception)
+				public void exceptionOccurred(Exception exception)
 				{
 					inited.setException(exception);
 				}
@@ -1336,7 +1336,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 				}
 				else
 				{
-					crl.exceptionOccurred(this, new RuntimeException("No such component type: "+component.getTypeName()));
+					crl.exceptionOccurred(new RuntimeException("No such component type: "+component.getTypeName()));
 				}
 			}
 		}

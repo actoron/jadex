@@ -72,13 +72,13 @@ public class EventIntermediateMessageActivityHandler	extends DefaultActivityHand
 		SServiceProvider.getService(instance.getServiceProvider(), IMessageService.class)
 			.addResultListener(instance.createResultListener(new DefaultResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				final IMessageService	ms	= (IMessageService)result;
 				SServiceProvider.getService(instance.getServiceProvider(), IComponentManagementService.class)
 					.addResultListener(instance.createResultListener(new DefaultResultListener()
 				{
-					public void resultAvailable(Object source, Object result)
+					public void resultAvailable(Object result)
 					{
 						IComponentManagementService cms = (IComponentManagementService)result;
 						String mtname = (String)thread.getPropertyValue(PROPERTY_MESSAGETYPE, activity);
@@ -152,12 +152,12 @@ public class EventIntermediateMessageActivityHandler	extends DefaultActivityHand
 						ms.sendMessage(msg, mt, instance.getComponentAdapter().getComponentIdentifier(), instance.getClassLoader())
 							.addResultListener(new IResultListener()
 						{
-							public void resultAvailable(Object source, Object result)
+							public void resultAvailable(Object result)
 							{
 								instance.notify(activity, thread, null);
 							}
 							
-							public void exceptionOccurred(Object source, Exception exception)
+							public void exceptionOccurred(Exception exception)
 							{
 								thread.setException(exception);
 								instance.notify(activity, thread, null);

@@ -52,7 +52,7 @@ public class ChatService extends BasicService implements IChatService
 		agent.getRequiredServices("chatservices")
 			.addResultListener(new DefaultResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				if(result!=null)
 				{

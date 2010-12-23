@@ -233,14 +233,14 @@ public class DirectoryFacilitatorService extends BasicService implements IDF
 		{
 			SServiceProvider.getServices(provider, IDF.class, true).addResultListener(new IResultListener()
 			{
-				public void resultAvailable(Object source, Object result)
+				public void resultAvailable(Object result)
 				{
 					Collection coll = (Collection)result;
 //					System.out.println("dfs: "+coll);
 					// Ignore search failures of remote dfs
 					CollectionResultListener lis = new CollectionResultListener(coll.size(), true, new IResultListener()
 					{
-						public void resultAvailable(Object source, Object result)
+						public void resultAvailable(Object result)
 						{
 							// Add all services of all remote dfs
 							for(Iterator it=((Collection)result).iterator(); it.hasNext(); )
@@ -259,7 +259,7 @@ public class DirectoryFacilitatorService extends BasicService implements IDF
 							fut.setResult(ret.toArray(new DFComponentDescription[ret.size()]));
 						}
 						
-						public void exceptionOccurred(Object source, Exception exception)
+						public void exceptionOccurred(Exception exception)
 						{
 //							open.remove(fut);
 							fut.setException(exception);
@@ -275,12 +275,12 @@ public class DirectoryFacilitatorService extends BasicService implements IDF
 						}
 						else
 						{
-							lis.resultAvailable(null, null);
+							lis.resultAvailable(null);
 						}
 					}
 				}
 				
-				public void exceptionOccurred(Object source, Exception exception)
+				public void exceptionOccurred(Exception exception)
 				{
 //					open.remove(fut);
 					fut.setResult(ret.toArray(new DFComponentDescription[ret.size()]));
@@ -430,12 +430,12 @@ public class DirectoryFacilitatorService extends BasicService implements IDF
 		
 		super.startService().addResultListener(new IResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				final boolean[]	services	= new boolean[2];
 				SServiceProvider.getServiceUpwards(provider, IComponentManagementService.class).addResultListener(new IResultListener()
 				{
-					public void resultAvailable(Object source, Object result)
+					public void resultAvailable(Object result)
 					{
 						cms	= (IComponentManagementService)result;
 						boolean	setresult;
@@ -448,14 +448,14 @@ public class DirectoryFacilitatorService extends BasicService implements IDF
 							ret.setResult(DirectoryFacilitatorService.this);
 					}
 					
-					public void exceptionOccurred(Object source, Exception exception)
+					public void exceptionOccurred(Exception exception)
 					{
 						ret.setException(exception);
 					}
 				});
 				SServiceProvider.getService(provider, IClockService.class).addResultListener(new IResultListener()
 				{
-					public void resultAvailable(Object source, Object result)
+					public void resultAvailable(Object result)
 					{
 						clockservice	= (IClockService)result;
 						boolean	setresult;
@@ -468,7 +468,7 @@ public class DirectoryFacilitatorService extends BasicService implements IDF
 							ret.setResult(DirectoryFacilitatorService.this);
 					}
 					
-					public void exceptionOccurred(Object source, Exception exception)
+					public void exceptionOccurred(Exception exception)
 					{
 						ret.setException(exception);
 					}
@@ -476,7 +476,7 @@ public class DirectoryFacilitatorService extends BasicService implements IDF
 				
 			}
 			
-			public void exceptionOccurred(Object source, Exception exception)
+			public void exceptionOccurred(Exception exception)
 			{
 				ret.setException(exception);
 			}

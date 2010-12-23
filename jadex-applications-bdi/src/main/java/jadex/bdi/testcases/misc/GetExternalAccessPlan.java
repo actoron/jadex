@@ -46,7 +46,7 @@ public class GetExternalAccessPlan extends Plan
 		final boolean[]	gotexta	= new boolean[3];	// 0: got exception, 1: got access, 2: got belief value.	
 		IResultListener	lis	= new DefaultResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				IBDIExternalAccess exta = (IBDIExternalAccess)result;
 				gotexta[0]	= true;
@@ -78,7 +78,7 @@ public class GetExternalAccessPlan extends Plan
 //				}); 
 			}
 			
-			public void exceptionOccurred(Object source, Exception exception)
+			public void exceptionOccurred(Exception exception)
 			{
 				// Expected on first call.
 			}

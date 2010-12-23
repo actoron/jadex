@@ -81,12 +81,12 @@ public class DaemonAgent extends MicroAgent
 			SServiceProvider.getService(getServiceProvider(), ILibraryService.class)
 				.addResultListener(createResultListener(new DelegationResultListener(ret)
 			{
-				public void customResultAvailable(Object source, Object result)
+				public void customResultAvailable(Object result)
 				{
 					ILibraryService ls = (ILibraryService)result;
 					ls.getAllURLs().addResultListener(createResultListener(new DelegationResultListener(ret)
 					{
-						public void customResultAvailable(Object source, Object result)
+						public void customResultAvailable(Object result)
 						{
 							List urls = (List)result;
 							List res = new ArrayList();
@@ -376,11 +376,11 @@ public class DaemonAgent extends MicroAgent
 				final IRemoteChangeListener lis = alisteners[i];
 				alisteners[i].changeOccurred(event).addResultListener(createResultListener(new IResultListener()
 				{
-					public void resultAvailable(Object source, Object result)
+					public void resultAvailable(Object result)
 					{
 					}
 					
-					public void exceptionOccurred(Object source, Exception exception)
+					public void exceptionOccurred(Exception exception)
 					{
 //						System.out.println("Removing listener: "+lis);
 						removeChangeListener(lis);

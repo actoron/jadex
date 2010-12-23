@@ -372,7 +372,7 @@ public class GuiPanel extends JPanel
 						ia.getRequiredService("clockservice")
 							.addResultListener(new SwingDefaultResultListener(GuiPanel.this)
 						{
-							public void customResultAvailable(Object source, Object result)
+							public void customResultAvailable(Object result)
 							{
 								IClockService cs = (IClockService)result;
 								while(dia.requestInput(cs.getTime()))
@@ -511,7 +511,7 @@ public class GuiPanel extends JPanel
 						ia.getRequiredService("clockservice")
 							.addResultListener(new SwingDefaultResultListener(GuiPanel.this)
 						{
-							public void customResultAvailable(Object source, Object result)
+							public void customResultAvailable(Object result)
 							{
 								IClockService cs = (IClockService)result;
 						
@@ -779,7 +779,7 @@ public class GuiPanel extends JPanel
 						.addResultListener(new SwingDefaultResultListener(GuiPanel.this)
 					{
 						
-						public void customResultAvailable(Object source, Object result)
+						public void customResultAvailable(Object result)
 						{
 							IClockService clock = (IClockService)result;
 							if(buy)

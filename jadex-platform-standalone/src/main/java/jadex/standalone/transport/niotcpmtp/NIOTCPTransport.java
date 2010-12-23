@@ -167,12 +167,12 @@ public class NIOTCPTransport implements ITransport
 			
 			SServiceProvider.getService(container, ILibraryService.class).addResultListener(new DefaultResultListener()
 			{
-				public void resultAvailable(Object source, Object result)
+				public void resultAvailable(Object result)
 				{
 					libservice = (ILibraryService)result;
 					SServiceProvider.getService(container, IThreadPoolService.class).addResultListener(new DefaultResultListener()
 					{
-						public void resultAvailable(Object source, Object result)
+						public void resultAvailable(Object result)
 						{
 							IThreadPoolService tp = (IThreadPoolService)result;
 							tp.execute(new Runnable()
@@ -227,7 +227,7 @@ public class NIOTCPTransport implements ITransport
 												final NIOTCPInputConnection con = (NIOTCPInputConnection)key.attachment();
 												SServiceProvider.getService(container, IMessageService.class).addResultListener(new DefaultResultListener()
 												{
-													public void resultAvailable(Object source, Object result)
+													public void resultAvailable(Object result)
 													{
 														try
 														{
@@ -541,7 +541,7 @@ public class NIOTCPTransport implements ITransport
 			timer = platform.getClock().createTimer(System.currentTimeMillis()+MAX_KEEPALIVE, this);*/
 			SServiceProvider.getService(container, IClockService.class).addResultListener(new DefaultResultListener()
 			{
-				public void resultAvailable(Object source, Object result)
+				public void resultAvailable(Object result)
 				{
 					IClockService clock = (IClockService)result;
 					long time = clock.getTime()+MAX_KEEPALIVE;

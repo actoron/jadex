@@ -49,12 +49,12 @@ public class BasicAAAService extends BasicService implements IAAAService
 			}
 		}, true)).addResultListener(new DefaultResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				if (result == null)
 					SServiceProvider.getService(provider, IComponentManagementService.class).addResultListener(new DefaultResultListener()
 					{
-						public void resultAvailable(Object source, Object result)
+						public void resultAvailable(Object result)
 						{
 							IComponentManagementService cms = (IComponentManagementService) result;
 							try

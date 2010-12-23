@@ -83,12 +83,12 @@ public class ComponentTreeNode	extends AbstractComponentTreeNode implements IAct
 	{
 		cms.getComponentDescription(desc.getName()).addResultListener(new SwingDefaultResultListener()
 		{
-			public void customResultAvailable(Object source, Object result)
+			public void customResultAvailable(Object result)
 			{
 				ComponentTreeNode.this.desc	= (IComponentDescription)result;
 				getModel().fireNodeChanged(ComponentTreeNode.this);
 			}
-			public void customExceptionOccurred(Object source, Exception exception)
+			public void customExceptionOccurred(Exception exception)
 			{
 				// ignore
 			}
@@ -109,7 +109,7 @@ public class ComponentTreeNode	extends AbstractComponentTreeNode implements IAct
 
 		cms.getChildren(desc.getName()).addResultListener(new SwingDefaultResultListener()
 		{
-			public void customResultAvailable(Object source, Object result)
+			public void customResultAvailable(Object result)
 			{
 				final IComponentIdentifier[] achildren = (IComponentIdentifier[])result;
 				final int[]	childcnt	= new int[]{0};
@@ -119,7 +119,7 @@ public class ComponentTreeNode	extends AbstractComponentTreeNode implements IAct
 					{
 						cms.getComponentDescription(achildren[i]).addResultListener(new SwingDefaultResultListener()
 						{
-							public void customResultAvailable(Object source, Object result)
+							public void customResultAvailable(Object result)
 							{
 								IComponentDescription	desc	= (IComponentDescription)result;
 								IComponentTreeNode	node	= getModel().getNode(desc.getName());
@@ -127,7 +127,7 @@ public class ComponentTreeNode	extends AbstractComponentTreeNode implements IAct
 								{
 									createComponentNode(desc).addResultListener(new SwingDefaultResultListener()
 									{
-										public void customResultAvailable(Object source, Object result)
+										public void customResultAvailable(Object result)
 										{
 //											System.err.println(getModel().hashCode()+", "+ready.hashCode()+" searchChildren.add "+result);
 											children.add(result);
@@ -144,7 +144,7 @@ public class ComponentTreeNode	extends AbstractComponentTreeNode implements IAct
 											}
 										}
 										
-										public void customExceptionOccurred(Object source, Exception exception)
+										public void customExceptionOccurred(Exception exception)
 										{
 											// May happen, when component removed in mean time.
 											childcnt[0]++;
@@ -178,7 +178,7 @@ public class ComponentTreeNode	extends AbstractComponentTreeNode implements IAct
 									}
 								}
 							}
-							public void customExceptionOccurred(Object source, Exception exception)
+							public void customExceptionOccurred(Exception exception)
 							{
 								childcnt[0]++;
 								
@@ -204,7 +204,7 @@ public class ComponentTreeNode	extends AbstractComponentTreeNode implements IAct
 					}
 				}
 			}
-			public void customExceptionOccurred(Object source, Exception exception)
+			public void customExceptionOccurred(Exception exception)
 			{
 				// ignore
 			}
@@ -214,12 +214,12 @@ public class ComponentTreeNode	extends AbstractComponentTreeNode implements IAct
 		// Search services and only add container node when services are found.
 		cms.getExternalAccess(desc.getName()).addResultListener(new SwingDefaultResultListener()
 		{
-			public void customResultAvailable(Object source, Object result)
+			public void customResultAvailable(Object result)
 			{
 				final IExternalAccess	ea	= (IExternalAccess)result;
 				SServiceProvider.getDeclaredServices(ea.getServiceProvider()).addResultListener(new SwingDefaultResultListener()
 				{
-					public void customResultAvailable(Object source, Object result)
+					public void customResultAvailable(Object result)
 					{
 						List	services	= (List)result;
 						if(services!=null && !services.isEmpty())
@@ -243,11 +243,11 @@ public class ComponentTreeNode	extends AbstractComponentTreeNode implements IAct
 							final ServiceContainerNode	node	= scn;
 							future.addResultListener(new SwingDefaultResultListener()
 							{
-								public void customResultAvailable(Object source, Object result)
+								public void customResultAvailable(Object result)
 								{
 									node.setChildren(subchildren);
 								}
-								public void customExceptionOccurred(Object source, Exception exception)
+								public void customExceptionOccurred(Exception exception)
 								{
 									// Shouldn't happen???
 								}
@@ -260,7 +260,7 @@ public class ComponentTreeNode	extends AbstractComponentTreeNode implements IAct
 							setChildren(children).addResultListener(new DelegationResultListener(future));
 						}
 					}
-					public void customExceptionOccurred(Object source, Exception exception)
+					public void customExceptionOccurred(Exception exception)
 					{
 						ready[1]	= true;
 						if(ready[0] &&  ready[1])
@@ -271,7 +271,7 @@ public class ComponentTreeNode	extends AbstractComponentTreeNode implements IAct
 				});
 			}
 
-			public void customExceptionOccurred(Object source, Exception exception)
+			public void customExceptionOccurred(Exception exception)
 			{
 				// May happen, when components already removed.
 			}
@@ -290,7 +290,7 @@ public class ComponentTreeNode	extends AbstractComponentTreeNode implements IAct
 		
 		cms.getExternalAccess(desc.getName()).addResultListener(new SwingDefaultResultListener()
 		{
-			public void customResultAvailable(Object source, Object result)
+			public void customResultAvailable(Object result)
 			{
 				IComponentTreeNode node	= getModel().getNode(desc.getName());
 				if(node==null)
@@ -309,7 +309,7 @@ public class ComponentTreeNode	extends AbstractComponentTreeNode implements IAct
 				ret.setResult(node);
 			}
 			
-			public void customExceptionOccurred(Object source, Exception exception)
+			public void customExceptionOccurred(Exception exception)
 			{
 				ret.setException(exception);
 			}

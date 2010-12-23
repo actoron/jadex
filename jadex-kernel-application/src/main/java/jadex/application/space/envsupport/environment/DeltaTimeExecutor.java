@@ -80,7 +80,7 @@ public class DeltaTimeExecutor extends SimplePropertyObject implements ISpaceExe
 		
 		SServiceProvider.getService(container, IClockService.class).addResultListener(new DefaultResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				final IClockService clockservice = (IClockService)result;
 				
@@ -210,7 +210,7 @@ public class DeltaTimeExecutor extends SimplePropertyObject implements ISpaceExe
 		terminated = true;
 		SServiceProvider.getService(container, IClockService.class).addResultListener(new DefaultResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				IClockService clockservice = (IClockService)result;
 				if(clocklistener!=null)

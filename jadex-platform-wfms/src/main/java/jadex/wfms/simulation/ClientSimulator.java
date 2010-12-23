@@ -113,7 +113,7 @@ public class ClientSimulator
 				});
 				SServiceProvider.getService(agent.getServiceProvider(), ILibraryService.class).addResultListener(new DefaultResultListener()
 				{
-					public void resultAvailable(Object source, Object result)
+					public void resultAvailable(Object result)
 					{
 						final ILibraryService libService = (ILibraryService) result;
 						EventQueue.invokeLater(new Runnable()
@@ -152,7 +152,7 @@ public class ClientSimulator
 								
 								login(showLoginDialog()).addResultListener(new DefaultResultListener()
 								{
-									public void resultAvailable(Object source, Object result)
+									public void resultAvailable(Object result)
 									{
 										continueInit();
 									}
@@ -341,7 +341,7 @@ public class ClientSimulator
 			put("model_name_path", Boolean.TRUE);
 		}})).addResultListener(new DefaultResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				Map parameters = (Map) result;
 				ret.setResult(parameters.get("model"));
@@ -388,12 +388,12 @@ public class ClientSimulator
 			put("auth_token", password);
 		}})).addResultListener(new DefaultResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				ret.setResult(null);
 			}
 			
-			public void exceptionOccurred(Object source, Exception exception)
+			public void exceptionOccurred(Exception exception)
 			{
 				System.err.println("Login failed");
 			}
@@ -411,7 +411,7 @@ public class ClientSimulator
 			{
 				agent.scheduleStep(new DispatchGoalStep("clientcap.request_model_names")).addResultListener(new SwingDefaultResultListener()
 				{
-					public void customResultAvailable(Object source, Object result)
+					public void customResultAvailable(Object result)
 					{
 						Map parameters = (Map) result;
 						Set modelNames = new TreeSet((Set) parameters.get("model_names"));
@@ -422,7 +422,7 @@ public class ClientSimulator
 						
 						agent.scheduleStep(new DispatchGoalStep("clientcap.request_model", "model_name", modelName)).addResultListener(new SwingDefaultResultListener()
 						{
-							public void customResultAvailable(Object source, Object result)
+							public void customResultAvailable(Object result)
 							{
 								Map parameters = (Map) result;
 								try
@@ -431,7 +431,7 @@ public class ClientSimulator
 								}
 								catch (Exception e)
 								{
-									customExceptionOccurred(null, e);
+									customExceptionOccurred(e);
 								}
 								simWindow.setProcessTreeModel(model);
 								clientMetaProcessModel = model;
@@ -440,8 +440,7 @@ public class ClientSimulator
 								updateGui();
 							}
 							
-							public void customExceptionOccurred(Object source,
-									Exception exception)
+							public void customExceptionOccurred(Exception exception)
 							{
 								exception.printStackTrace();
 								simWindow.showMessage(JOptionPane.ERROR_MESSAGE, "Cannot open the process", "Opening the process failed.");

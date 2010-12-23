@@ -26,13 +26,13 @@ public class HelloWorldAgentCreator
 	{
 		Starter.createPlatform(args).addResultListener(new DefaultResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				final IExternalAccess plat = (IExternalAccess)result;
 				SServiceProvider.getService(plat.getServiceProvider(), new ComponentFactorySelector(BDIAgentFactory.FILETYPE_BDIAGENT))
 					.addResultListener(new DefaultResultListener()
 				{
-					public void resultAvailable(Object source, Object result)
+					public void resultAvailable(Object result)
 					{
 						BDIAgentFactory fac = (BDIAgentFactory)result;
 						
@@ -51,12 +51,12 @@ public class HelloWorldAgentCreator
 						SServiceProvider.getServiceUpwards(plat.getServiceProvider(), IComponentManagementService.class)
 							.addResultListener(new DefaultResultListener()
 						{
-							public void resultAvailable(Object source, Object result)
+							public void resultAvailable(Object result)
 							{
 								IComponentManagementService cms = (IComponentManagementService)result;
 								cms.createComponent("hw1", "helloagent.agent.xml", null, new DefaultResultListener()
 								{
-									public void resultAvailable(Object source, Object result)
+									public void resultAvailable(Object result)
 									{
 										System.out.println("finished.");
 									}

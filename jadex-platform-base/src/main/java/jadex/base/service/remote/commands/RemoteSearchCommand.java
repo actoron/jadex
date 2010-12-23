@@ -80,12 +80,12 @@ public class RemoteSearchCommand implements IRemoteCommand
 			.addResultListener(new IResultListener()
 //			.addResultListener(component.createResultListener(new IResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				IComponentManagementService cms = (IComponentManagementService)result;
 				cms.getExternalAccess((IComponentIdentifier)providerid).addResultListener(new IResultListener()
 				{
-					public void resultAvailable(Object source, Object result)
+					public void resultAvailable(Object result)
 					{
 						IExternalAccess exta = (IExternalAccess)result;
 						
@@ -94,7 +94,7 @@ public class RemoteSearchCommand implements IRemoteCommand
 						exta.getServiceProvider().getServices(manager, decider, selector, new ArrayList())
 							.addResultListener(new IResultListener()
 						{
-							public void resultAvailable(Object source, Object result)
+							public void resultAvailable(Object result)
 							{
 //								System.out.println("rem search end: "+manager+" "+decider+" "+selector+" "+result);
 								// Create proxy info(s) for service(s)
@@ -123,21 +123,21 @@ public class RemoteSearchCommand implements IRemoteCommand
 								ret.setResult(new RemoteResultCommand(content, null , callid));
 							}
 							
-							public void exceptionOccurred(Object source, Exception exception)
+							public void exceptionOccurred(Exception exception)
 							{
 								ret.setResult(new RemoteResultCommand(null, exception, callid));
 							}
 						});
 					}
 					
-					public void exceptionOccurred(Object source, Exception exception)
+					public void exceptionOccurred(Exception exception)
 					{
 						ret.setResult(new RemoteResultCommand(null, exception, callid));
 					}
 				});
 			}
 			
-			public void exceptionOccurred(Object source, Exception exception)
+			public void exceptionOccurred(Exception exception)
 			{
 				ret.setResult(new RemoteResultCommand(null, exception, callid));
 			}

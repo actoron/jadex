@@ -58,7 +58,7 @@ public class LocalTransport implements ITransport
 	{
 		SServiceProvider.getService(container, IMessageService.class).addResultListener(new DefaultResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				msgservice = (IMessageService)result;
 			}

@@ -314,11 +314,11 @@ public class Future implements IFuture
     	{
 			if(exception!=null)
 			{
-				listener.exceptionOccurred(this, exception);
+				listener.exceptionOccurred(exception);
 			}
 			else
 			{
-				listener.resultAvailable(this, result); 
+				listener.resultAvailable(result); 
 			}
     	}
     	catch(Exception e)
@@ -336,12 +336,12 @@ public class Future implements IFuture
     
     	f.addResultListener(new IResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				System.out.println(Thread.currentThread().getName()+": listener: "+result);
 			}
 			
-			public void exceptionOccurred(Object source, Exception exception)
+			public void exceptionOccurred(Exception exception)
 			{
 			}
 		});

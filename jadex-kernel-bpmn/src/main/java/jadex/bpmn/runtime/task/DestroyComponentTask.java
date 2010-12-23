@@ -26,7 +26,7 @@ public class DestroyComponentTask implements ITask
 		SServiceProvider.getService(instance.getServiceProvider(), IComponentManagementService.class)
 			.addResultListener(instance.createResultListener(new DefaultResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				IComponentManagementService ces = (IComponentManagementService)result;
 				final IResultListener resultlistener = (IResultListener)context.getParameterValue("resultlistener");
@@ -44,10 +44,10 @@ public class DestroyComponentTask implements ITask
 				{
 					tmp.addResultListener(new IResultListener()
 					{
-						public void resultAvailable(Object source, Object result)
+						public void resultAvailable(Object result)
 						{
 							if(resultlistener!=null)
-								resultlistener.resultAvailable(DestroyComponentTask.this, result);
+								resultlistener.resultAvailable(result);
 							if(wait)
 							{
 								ret.setResult(result);
@@ -55,10 +55,10 @@ public class DestroyComponentTask implements ITask
 							}
 						}
 						
-						public void exceptionOccurred(Object source, Exception exception)
+						public void exceptionOccurred(Exception exception)
 						{
 							if(resultlistener!=null)
-								resultlistener.exceptionOccurred(DestroyComponentTask.this, exception);
+								resultlistener.exceptionOccurred(exception);
 							if(wait)
 							{
 								ret.setException(exception);

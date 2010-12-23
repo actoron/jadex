@@ -59,7 +59,7 @@ public class DFTestAgent extends MicroAgent
 		SServiceProvider.getService(getServiceProvider(), IDF.class).addResultListener(
 			createResultListener(new DefaultResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				IDF df = (IDF)result;
 				IDFComponentDescription ad = df.createDFComponentDescription(getComponentIdentifier(), null);
@@ -79,7 +79,7 @@ public class DFTestAgent extends MicroAgent
 		SServiceProvider.getService(getServiceProvider(), IDF.class).addResultListener(
 			createResultListener(new DefaultResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				IDF df = (IDF)result;
 				IDFServiceDescription sd = df.createDFServiceDescription(null, "testType", null);
@@ -88,14 +88,14 @@ public class DFTestAgent extends MicroAgent
 				IFuture ret = df.register(ad); 
 				ret.addResultListener(createResultListener(new IResultListener()
 				{
-					public void resultAvailable(Object source, Object result)
+					public void resultAvailable(Object result)
 					{
 						// Set test success and continue test.
 						tr.setSucceeded(true);
 						searchDF();
 					}
 					
-					public void exceptionOccurred(Object source, Exception e)
+					public void exceptionOccurred(Exception e)
 					{
 						// Set test failure and kill agent.
 						tr.setFailed(e.toString());
@@ -118,7 +118,7 @@ public class DFTestAgent extends MicroAgent
 		SServiceProvider.getService(getServiceProvider(), IDF.class).addResultListener(
 			createResultListener(new DefaultResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				IDF df = (IDF)result;
 				IDFServiceDescription sd = df.createDFServiceDescription(null, "testType", null);
@@ -128,7 +128,7 @@ public class DFTestAgent extends MicroAgent
 				IFuture ret = df.search(ad, cons); 
 				ret.addResultListener(createResultListener(new IResultListener() 
 				{
-					public void resultAvailable(Object sourcem, Object result)
+					public void resultAvailable(Object result)
 					{
 						IDFComponentDescription[] agentDesc = (IDFComponentDescription[])result;
 						if(agentDesc.length != 0)
@@ -146,7 +146,7 @@ public class DFTestAgent extends MicroAgent
 						}
 					}
 					
-					public void exceptionOccurred(Object source, Exception e)
+					public void exceptionOccurred(Exception e)
 					{
 						// Set test failure and kill agent.
 						tr.setFailed(e.toString());

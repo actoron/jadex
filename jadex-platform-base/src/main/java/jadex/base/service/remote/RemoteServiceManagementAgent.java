@@ -39,13 +39,13 @@ public class RemoteServiceManagementAgent extends MicroAgent
 		SServiceProvider.getService(getServiceProvider(), IClockService.class)
 			.addResultListener(createResultListener(new DefaultResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				final IClockService clock = (IClockService)result;
 				SServiceProvider.getService(getServiceProvider(), ILibraryService.class)
 					.addResultListener(createResultListener(new DefaultResultListener()
 				{
-					public void resultAvailable(Object source, Object result)
+					public void resultAvailable(Object result)
 					{
 						final ILibraryService libservice = (ILibraryService)result;
 						rms = new RemoteServiceManagementService((IMicroExternalAccess)getExternalAccess(), clock, libservice);
@@ -95,7 +95,7 @@ public class RemoteServiceManagementAgent extends MicroAgent
 			SServiceProvider.getService(getServiceProvider(), ILibraryService.class)
 				.addResultListener(createResultListener(new DefaultResultListener()
 			{
-				public void resultAvailable(Object source, Object result)
+				public void resultAvailable(Object result)
 				{
 					// Hack!!! Manual decoding for using custom class loader.
 					final ILibraryService ls = (ILibraryService)result;
@@ -137,7 +137,7 @@ public class RemoteServiceManagementAgent extends MicroAgent
 						final IRemoteCommand com = (IRemoteCommand)content;
 						com.execute((IMicroExternalAccess)getExternalAccess(), rms).addResultListener(createResultListener(new DefaultResultListener()
 						{
-							public void resultAvailable(Object source, Object result)
+							public void resultAvailable(Object result)
 							{
 		//						System.out.println("result of command: "+com+" "+result);
 								if(result!=null)
@@ -145,7 +145,7 @@ public class RemoteServiceManagementAgent extends MicroAgent
 									final Object repcontent = result;
 									createReply(msg, mt).addResultListener(createResultListener(new DefaultResultListener()
 									{
-										public void resultAvailable(Object source, Object result)
+										public void resultAvailable(Object result)
 										{
 											Map reply = (Map)result;
 //											reply.put(SFipa.CONTENT, JavaWriter.objectToXML(repcontent, ls.getClassLoader()));
@@ -155,23 +155,23 @@ public class RemoteServiceManagementAgent extends MicroAgent
 											
 											sendMessage(reply, mt);
 										}
-										public void exceptionOccurred(Object source, Exception exception)
+										public void exceptionOccurred(Exception exception)
 										{
 											// Terminated, when rms killed in mean time
 											if(!(exception instanceof ComponentTerminatedException))
 											{
-												super.exceptionOccurred(source, exception);
+												super.exceptionOccurred(exception);
 											}
 										}
 									}));
 								}
 							}
-							public void exceptionOccurred(Object source, Exception exception)
+							public void exceptionOccurred(Exception exception)
 							{
 								// Terminated, when rms killed in mean time
 								if(!(exception instanceof ComponentTerminatedException))
 								{
-									super.exceptionOccurred(source, exception);
+									super.exceptionOccurred(exception);
 								}
 							}
 						}));

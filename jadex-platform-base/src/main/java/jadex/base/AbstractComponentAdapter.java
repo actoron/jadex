@@ -145,7 +145,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 		{
 			getCMS().addResultListener(new DefaultResultListener()
 			{
-				public void resultAvailable(Object source, Object result)
+				public void resultAvailable(Object result)
 				{
 					((ComponentManagementService)result).setProcessingState(cid, IComponentDescription.PROCESSINGSTATE_READY);
 				}
@@ -322,13 +322,13 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 		
 		getCMS().addResultListener(new IResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				final IComponentManagementService cms = (IComponentManagementService)result;
 				cms.getChildren(getComponentIdentifier()).addResultListener(new DelegationResultListener(ret));
 			}
 			
-			public void exceptionOccurred(Object source, Exception exception)
+			public void exceptionOccurred(Exception exception)
 			{
 				ret.setException(exception);
 			}
@@ -347,13 +347,13 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 		
 		getCMS().addResultListener(new IResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				final IComponentManagementService cms = (IComponentManagementService)result;
 				cms.getChildren(getComponentIdentifier()).addResultListener(new DelegationResultListener(ret));
 			}
 			
-			public void exceptionOccurred(Object source, Exception exception)
+			public void exceptionOccurred(Exception exception)
 			{
 				ret.setException(exception);
 			}
@@ -373,13 +373,13 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 		SServiceProvider.getServiceUpwards(getServiceContainer(), IComponentManagementService.class)
 			.addResultListener(new DefaultResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				final IComponentManagementService cms = (IComponentManagementService)result;
 				
 				cms.getChildren(getComponentIdentifier()).addResultListener(new DefaultResultListener()
 				{
-					public void resultAvailable(Object source, Object result)
+					public void resultAvailable(Object result)
 					{
 						IComponentIdentifier[] childs = (IComponentIdentifier[])result;
 						IResultListener	crl	= new CollectionResultListener(childs.length, true, new DelegationResultListener(ret));
@@ -479,7 +479,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 			{
 				component.cleanupComponent().addResultListener(new IResultListener()
 				{
-					public void resultAvailable(Object source, Object result)
+					public void resultAvailable(Object result)
 					{
 						synchronized(ext_entries)
 						{
@@ -502,7 +502,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 						
 					}
 					
-					public void exceptionOccurred(Object source, Exception exception)
+					public void exceptionOccurred(Exception exception)
 					{
 						getLogger().warning("Exception during component cleanup: "+exception);
 						shutdownContainer().addResultListener(new DelegationResultListener(ret));
@@ -531,13 +531,13 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 		
 		getServiceContainer().shutdown().addResultListener(new IResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				ret.setResult(getComponentIdentifier());
 //				listener.resultAvailable(this, getComponentIdentifier());
 			}
 			
-			public void exceptionOccurred(Object source, Exception exception)
+			public void exceptionOccurred(Exception exception)
 			{
 				getLogger().warning("Exception during service container shutdown: "+exception);
 //				listener.resultAvailable(this, getComponentIdentifier());
@@ -617,16 +617,16 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	
 			getCMS().addResultListener(new DefaultResultListener()
 			{
-				public void resultAvailable(Object source, Object result)
+				public void resultAvailable(Object result)
 				{
 					((ComponentManagementService)result).setProcessingState(cid, IComponentDescription.PROCESSINGSTATE_RUNNING);
 				}
 				
-				public void exceptionOccurred(Object source, Exception exception)
+				public void exceptionOccurred(Exception exception)
 				{
 					// CMS may be null during platform init
 					if(!(exception instanceof ServiceNotFoundException))
-						super.exceptionOccurred(source, exception);
+						super.exceptionOccurred(exception);
 				}
 			});
 			
@@ -695,7 +695,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 					breakpoint_triggered	= true;
 					getCMS().addResultListener(new DefaultResultListener()
 					{
-						public void resultAvailable(Object source, Object result)
+						public void resultAvailable(Object result)
 						{
 							((IComponentManagementService)result).suspendComponent(cid);
 						}
@@ -731,7 +731,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 						breakpoint_triggered	= true;
 						getCMS().addResultListener(new DefaultResultListener()
 						{
-							public void resultAvailable(Object source, Object result)
+							public void resultAvailable(Object result)
 							{
 								((IComponentManagementService)result).suspendComponent(cid);
 							}
@@ -743,7 +743,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 			final boolean	ready	= again && !breakpoint_triggered || extexecuted || wokenup;
 			getCMS().addResultListener(new DefaultResultListener()
 			{
-				public void resultAvailable(Object source, Object result)
+				public void resultAvailable(Object result)
 				{
 					((ComponentManagementService)result).setProcessingState(cid, ready
 						? IComponentDescription.PROCESSINGSTATE_READY : IComponentDescription.PROCESSINGSTATE_IDLE);
@@ -785,7 +785,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 		// Remove component from platform.
 		getCMS().addResultListener(new DefaultResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				ComponentManagementService	cms	= (ComponentManagementService)result;
 				cms.setComponentException(cid, e);

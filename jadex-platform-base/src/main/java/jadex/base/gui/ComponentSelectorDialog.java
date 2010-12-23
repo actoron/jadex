@@ -236,7 +236,7 @@ public class ComponentSelectorDialog
 							// Use clone to keep original aid unchanged.
 							SServiceProvider.getServiceUpwards(provider, IComponentManagementService.class).addResultListener(new SwingDefaultResultListener(parent)
 							{
-								public void customResultAvailable(Object source, Object result)
+								public void customResultAvailable(Object result)
 								{
 									IComponentManagementService cms = (IComponentManagementService)result;
 									IComponentIdentifier id	= ((IActiveComponentTreeNode)node).getDescription().getName();
@@ -362,7 +362,7 @@ public class ComponentSelectorDialog
 					{
 						SServiceProvider.getServiceUpwards(provider, IComponentManagementService.class).addResultListener(new SwingDefaultResultListener(parent)
 						{
-							public void customResultAvailable(Object source, Object result)
+							public void customResultAvailable(Object result)
 							{
 								IComponentManagementService cms = (IComponentManagementService)result;
 								IComponentIdentifier id	= ((IActiveComponentTreeNode)node).getDescription().getName();
@@ -379,7 +379,7 @@ public class ComponentSelectorDialog
 			{
 				SServiceProvider.getServiceUpwards(provider, IComponentManagementService.class).addResultListener(new SwingDefaultResultListener(parent)
 				{
-					public void customResultAvailable(Object source, Object result)
+					public void customResultAvailable(Object result)
 					{
 						IComponentManagementService cms = (IComponentManagementService)result;
 						addSelectedAgent(cms.createComponentIdentifier("", true, null), list);

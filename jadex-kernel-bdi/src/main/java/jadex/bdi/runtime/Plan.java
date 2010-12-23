@@ -542,7 +542,7 @@ public abstract class Plan extends AbstractPlan implements ISuspendable//, IExte
 	public void resume()
 	{
 //		System.out.println(this+"resume");
-		lis.resultAvailable(this, null);
+		lis.resultAvailable(null);
 //	   	pcs.firePropertyChange("true", Boolean.FALSE, Boolean.TRUE);
 	}
 	
@@ -610,9 +610,9 @@ public abstract class Plan extends AbstractPlan implements ISuspendable//, IExte
 		
 		/**
 		 *  Called when the result is available.
-		 *  @param result The result.
+		 * @param result The result.
 		 */
-		public void resultAvailable(Object source, Object result)
+		public void resultAvailable(Object result)
 		{
 //			System.out.println("resultAvailable: "+this+", "+result);
 			SyncResultListener.this.result = result;
@@ -622,9 +622,9 @@ public abstract class Plan extends AbstractPlan implements ISuspendable//, IExte
 
 		/**
 		 *  Called when an exception occurred.
-		 *  @param exception The exception.
+		 * @param exception The exception.
 		 */
-		public void exceptionOccurred(Object source, Exception exception)
+		public void exceptionOccurred(Exception exception)
 		{
 //			System.out.println("exeception: "+this+", "+exception);
 //			exception.printStackTrace();

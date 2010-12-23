@@ -122,12 +122,12 @@ public class TreeExpansionHandler	implements TreeExpansionListener, TreeModelLis
 				
 				handlePath(path).addResultListener(new IResultListener()
 				{
-					public void resultAvailable(Object source, Object result)
+					public void resultAvailable(Object result)
 					{
 						handleTreeStructureChanged(event, root, i+1);
 					}
 					
-					public void exceptionOccurred(Object source, Exception exception)
+					public void exceptionOccurred(Exception exception)
 					{
 						// Shouldn't happen.
 						exception.printStackTrace();

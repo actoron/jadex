@@ -84,7 +84,7 @@ public class ParallelSearchManager implements ISearchManager
 		final Future	ret	= new Future();
 		processNode(null, provider, decider, selector, services, results, up).addResultListener(new IResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				Collection res = (Collection)selector.getResult(results);
 //				if(res.size()>2 && res.iterator().next().getClass().toString().indexOf("Directory")!=-1)
@@ -92,7 +92,7 @@ public class ParallelSearchManager implements ISearchManager
 				ret.setResult(res);
 			}
 			
-			public void exceptionOccurred(Object source, Exception exception)
+			public void exceptionOccurred(Exception exception)
 			{
 				ret.setException(exception);
 			}
@@ -146,13 +146,13 @@ public class ParallelSearchManager implements ISearchManager
 			
 			provider.getServices(lsm, decider, selector, results).addResultListener(new IResultListener()
 			{
-				public void resultAvailable(Object source, Object result)
+				public void resultAvailable(Object result)
 				{
 					finished[0]	= true;
 					checkAndSetResults(finished, ret);
 				}
 				
-				public void exceptionOccurred(Object source, Exception exception)
+				public void exceptionOccurred(Exception exception)
 				{
 					finished[0]	= true;
 					checkAndSetResults(finished, ret);
@@ -163,7 +163,7 @@ public class ParallelSearchManager implements ISearchManager
 			{
 				provider.getParent().addResultListener(new IResultListener()
 				{
-					public void resultAvailable(Object source, Object result)
+					public void resultAvailable(Object result)
 					{
 						IServiceProvider target = (IServiceProvider)result;
 						// Do not go back to where we came from.
@@ -172,13 +172,13 @@ public class ParallelSearchManager implements ISearchManager
 							processNode(provider, target, decider, selector, services, results, up)
 								.addResultListener(new IResultListener()
 							{
-								public void resultAvailable(Object source, Object result)
+								public void resultAvailable(Object result)
 								{
 									finished[1]	= true;
 									checkAndSetResults(finished, ret);
 								}
 								
-								public void exceptionOccurred(Object source, Exception exception)
+								public void exceptionOccurred(Exception exception)
 								{
 									finished[1]	= true;
 									checkAndSetResults(finished, ret);
@@ -187,7 +187,7 @@ public class ParallelSearchManager implements ISearchManager
 						}
 					}
 					
-					public void exceptionOccurred(Object source, Exception exception)
+					public void exceptionOccurred(Exception exception)
 					{
 						finished[1]	= true;
 						checkAndSetResults(finished, ret);
@@ -204,7 +204,7 @@ public class ParallelSearchManager implements ISearchManager
 			{
 				provider.getChildren().addResultListener(new IResultListener()
 				{
-					public void resultAvailable(Object src, Object result)
+					public void resultAvailable(Object result)
 					{
 						if(result!=null)
 						{
@@ -214,13 +214,13 @@ public class ParallelSearchManager implements ISearchManager
 								coll.remove(source);
 							IResultListener	crl	= new CounterResultListener(coll.size(), new IResultListener()
 							{
-								public void resultAvailable(Object source, Object result)
+								public void resultAvailable(Object result)
 								{
 									finished[2]	= true;
 									checkAndSetResults(finished, ret);
 								}
 								
-								public void exceptionOccurred(Object source, Exception exception)
+								public void exceptionOccurred(Exception exception)
 								{
 									finished[2]	= true;
 									checkAndSetResults(finished, ret);
@@ -240,7 +240,7 @@ public class ParallelSearchManager implements ISearchManager
 						}
 					}
 					
-					public void exceptionOccurred(Object source, Exception exception)
+					public void exceptionOccurred(Exception exception)
 					{
 						finished[2]	= true;
 						checkAndSetResults(finished, ret);

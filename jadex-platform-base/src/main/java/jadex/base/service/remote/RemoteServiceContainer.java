@@ -57,7 +57,7 @@ public class RemoteServiceContainer extends BasicServiceContainer
 		
 		super.getServices(manager, decider, selector, results).addResultListener(new IResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				// If should not search remotely or not inited (no rms)
 				
@@ -75,7 +75,7 @@ public class RemoteServiceContainer extends BasicServiceContainer
 					rms.getServiceProxies(componentid, SServiceProvider.sequentialmanager, decider, selector)
 						.addResultListener(new IResultListener()
 					{
-						public void resultAvailable(Object source, Object res)
+						public void resultAvailable(Object res)
 						{
 							if(res instanceof Collection)
 							{
@@ -96,7 +96,7 @@ public class RemoteServiceContainer extends BasicServiceContainer
 							ret.setResult(selector.getResult(results));
 						}
 						
-						public void exceptionOccurred(Object source, Exception exception)
+						public void exceptionOccurred(Exception exception)
 						{
 							ret.setException(exception);
 						}
@@ -104,7 +104,7 @@ public class RemoteServiceContainer extends BasicServiceContainer
 				}
 			}
 			
-			public void exceptionOccurred(Object source, Exception exception)
+			public void exceptionOccurred(Exception exception)
 			{
 				ret.setException(exception);
 			}
@@ -171,13 +171,13 @@ public class RemoteServiceContainer extends BasicServiceContainer
 		SServiceProvider.getService(this, IRemoteServiceManagementService.class)
 			.addResultListener(new IResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 //				System.out.println("Found rms: "+getId()+result);
 				rms = (IRemoteServiceManagementService)result;	
 				ret.setResult(null);
 			}
-			public void exceptionOccurred(Object source, Exception exception) 
+			public void exceptionOccurred(Exception exception) 
 			{
 				ret.setException(exception);
 			}

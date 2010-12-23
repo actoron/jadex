@@ -62,26 +62,26 @@ public class RemoteGetExternalAccessCommand implements IRemoteCommand
 			.addResultListener(new IResultListener()
 //			.addResultListener(component.createResultListener(new IResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				IComponentManagementService cms = (IComponentManagementService)result;
 				cms.getExternalAccess(compid).addResultListener(new IResultListener()
 				{
-					public void resultAvailable(Object source, Object result)
+					public void resultAvailable(Object result)
 					{
 						IExternalAccess exta = (IExternalAccess)result;
 //						ProxyInfo pi = RemoteServiceManagementService.getProxyInfo(component.getComponentIdentifier(), cid, exta);
 						ret.setResult(new RemoteResultCommand(exta, null, callid));
 					}
 					
-					public void exceptionOccurred(Object source, Exception exception)
+					public void exceptionOccurred(Exception exception)
 					{
 						ret.setResult(new RemoteResultCommand(null, exception, callid));
 					}
 				});
 			}
 			
-			public void exceptionOccurred(Object source, Exception exception)
+			public void exceptionOccurred(Exception exception)
 			{
 				ret.setResult(new RemoteResultCommand(null, exception, callid));
 			}
