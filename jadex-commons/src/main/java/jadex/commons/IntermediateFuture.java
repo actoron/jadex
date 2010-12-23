@@ -21,6 +21,14 @@ public class IntermediateFuture extends Future	implements	IIntermediateFuture
 	 *  Create a future that is already done.
 	 *  @param result	The result, if any.
 	 */
+	public IntermediateFuture()
+	{
+	}
+	
+	/**
+	 *  Create a future that is already done.
+	 *  @param result	The result, if any.
+	 */
 	public IntermediateFuture(Collection results)
 	{
 		super(results);
