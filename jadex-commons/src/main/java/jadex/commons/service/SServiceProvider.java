@@ -119,6 +119,7 @@ public class SServiceProvider
 		{
 			public void customResultAvailable(Object result)
 			{
+//				System.out.println("Search result: "+result);
 				Collection res = (Collection)result;
 				if(res==null || res.size()==0)
 					exceptionOccurred(new ServiceNotFoundException("No matching service found for type: "+type.getName()));
