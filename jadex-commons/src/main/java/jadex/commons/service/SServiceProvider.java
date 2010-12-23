@@ -2,6 +2,8 @@ package jadex.commons.service;
 
 import jadex.commons.Future;
 import jadex.commons.IFuture;
+import jadex.commons.IIntermediateFuture;
+import jadex.commons.IntermediateFuture;
 import jadex.commons.concurrent.DelegationResultListener;
 
 import java.util.ArrayList;
@@ -195,7 +197,7 @@ public class SServiceProvider
 	 *  @param type The class.
 	 *  @return The corresponding services.
 	 */
-	public static IFuture getServices(IServiceProvider provider, Class type)
+	public static IIntermediateFuture getServices(IServiceProvider provider, Class type)
 	{
 		return getServices(provider, type, false);
 	}
@@ -205,7 +207,7 @@ public class SServiceProvider
 	 *  @param type The class.
 	 *  @return The corresponding services.
 	 */
-	public static IFuture getServices(IServiceProvider provider, Class type, boolean remote)
+	public static IIntermediateFuture getServices(IServiceProvider provider, Class type, boolean remote)
 	{
 		return getServices(provider, type, remote, false);
 	}
@@ -215,14 +217,14 @@ public class SServiceProvider
 	 *  @param type The class.
 	 *  @return The corresponding services.
 	 */
-	public static IFuture getServices(IServiceProvider provider, Class type, boolean remote, boolean forcedsearch)
+	public static IIntermediateFuture getServices(IServiceProvider provider, Class type, boolean remote, boolean forcedsearch)
 	{
 //		synchronized(profiling)
 //		{
 //			Integer	cnt	= (Integer)profiling.get(type);
 //			profiling.put(type, new Integer(cnt!=null ? cnt.intValue()+1 : 1)); 
 //		}
-		final Future ret = new Future();
+		final IntermediateFuture ret = new IntermediateFuture();
 		
 		// Hack->remove
 //		IVisitDecider contdecider = new DefaultVisitDecider(false);
@@ -312,14 +314,14 @@ public class SServiceProvider
 	 *  @param type The class.
 	 *  @return The corresponding services.
 	 */
-	public static IFuture getDeclaredServices(IServiceProvider provider, Class type)
+	public static IIntermediateFuture getDeclaredServices(IServiceProvider provider, Class type)
 	{
 //		synchronized(profiling)
 //		{
 //			Integer	cnt	= (Integer)profiling.get(type);
 //			profiling.put(type, new Integer(cnt!=null ? cnt.intValue()+1 : 1)); 
 //		}
-		final Future ret = new Future();
+		final IntermediateFuture ret = new IntermediateFuture();
 		
 		// Hack->remove
 //		IVisitDecider abortdecider = new DefaultVisitDecider();
@@ -341,7 +343,7 @@ public class SServiceProvider
 //			Integer	cnt	= (Integer)profiling.get(type);
 //			profiling.put(type, new Integer(cnt!=null ? cnt.intValue()+1 : 1)); 
 //		}
-		final Future ret = new Future();
+		final IntermediateFuture ret = new IntermediateFuture();
 		
 		// Hack->remove
 //		IVisitDecider contdecider = new DefaultVisitDecider(false);
@@ -356,14 +358,14 @@ public class SServiceProvider
 	 *  Get all declared services of the given provider.
 	 *  @return The corresponding services.
 	 */
-	public static IFuture getDeclaredServices(IServiceProvider provider, boolean forcedsearch)
+	public static IIntermediateFuture getDeclaredServices(IServiceProvider provider, boolean forcedsearch)
 	{
 //		synchronized(profiling)
 //		{
 //			Integer	cnt	= (Integer)profiling.get(type);
 //			profiling.put(type, new Integer(cnt!=null ? cnt.intValue()+1 : 1)); 
 //		}
-		final Future ret = new Future();
+		final IntermediateFuture ret = new IntermediateFuture();
 		
 		// Hack->remove
 //		IVisitDecider contdecider = new DefaultVisitDecider(false);

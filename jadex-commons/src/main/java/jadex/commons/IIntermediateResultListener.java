@@ -13,11 +13,5 @@ public interface IIntermediateResultListener extends IResultListener
 	 *  @param result The result.
 	 */
 	public void intermediateResultAvailable(Object source, Object result);
-	
-	/**
-	 *  Called when an intermediate exception occurred.
-	 *  @param source The source component.
-	 *  @param exception The exception.
-	 */
-	public void intermediateExceptionOccurred(Object source, Exception exception);
+
 }
