@@ -1,66 +1,74 @@
 package jadex.micro.examples.mandelbrot;
 
+import jadex.bridge.IComponentIdentifier;
+
+
 /**
- *  Struct for calculation of a specific mandelbrot cutout.
+ * Struct for calculation of a specific mandelbrot cutout.
  */
 public class AreaData
 {
 	/** The x start. */
-	protected double xstart;
-	
+	protected double				xstart;
+
 	/** The x end. */
-	protected double xend;
-	
+	protected double				xend;
+
 	/** The y start. */
-	protected double ystart;
-	
+	protected double				ystart;
+
 	/** The y end. */
-	protected double yend;
-	
+	protected double				yend;
+
 	/** The x size. */
-	protected int sizex;
-	
+	protected int					sizex;
+
 	/** The y size. */
-	protected int sizey;
-	
+	protected int					sizey;
+
 	/** The max value where iteration is stopped. */
-	protected int max;
-	
+	protected int					max;
+
 	/** The number of parallel workers. */
-	protected int par;
-	
+	protected int					par;
+
 	/** The id. */
-	protected Object id;
-	
+	protected Object				id;
+
+	/** The calculator service provider id. */
+	protected IComponentIdentifier	cid;
+
 	/** The tasksize of a task (in pixel/points). */
-	protected int tasksize; 
-	
+	protected int					tasksize;
+
 	/** The result data. */
-	protected int[][] data;
-	
+	protected int[][]				data;
+
 	/**
-	 *  Create a new area data.
+	 * Create a new area data.
 	 */
 	public AreaData(double xstart, double xend, double ystart, double yend,
-		int sizex, int sizey, int max)
+			int sizex, int sizey, int max)
 	{
-		this(xstart, xend, ystart, yend, sizex, sizey, max, 0, 0, null, null);
+		this(xstart, xend, ystart, yend, sizex, sizey, max, 0, 0, null, null, null);
 	}
-	
+
 	/**
-	 *  Create a new area data.
+	 * Create a new area data.
 	 */
 	public AreaData(double xstart, double xend, double ystart, double yend,
-		int sizex, int sizey, int max, int par, int tasksize)
+			int sizex, int sizey, int max, int par, int tasksize)
 	{
-		this(xstart, xend, ystart, yend, sizex, sizey, max, par, tasksize, null, null);
+		this(xstart, xend, ystart, yend, sizex, sizey, max, par, tasksize,
+				null, null, null);
 	}
-	
+
 	/**
-	 *  Create a new area data.
+	 * Create a new area data.
 	 */
 	public AreaData(double xstart, double xend, double ystart, double yend,
-		int sizex, int sizey, int max, int par, int tasksize, Object id, int[][] data)
+			int sizex, int sizey, int max, int par, int tasksize, Object id,
+			IComponentIdentifier cid, int[][] data)
 	{
 		this.xstart = xstart;
 		this.xend = xend;
@@ -72,12 +80,14 @@ public class AreaData
 		this.par = par;
 		this.tasksize = tasksize;
 		this.id = id;
+		this.cid = cid;
 		this.data = data;
 	}
 
 	/**
-	 *  Get the xstart.
-	 *  @return the xstart.
+	 * Get the xstart.
+	 * 
+	 * @return the xstart.
 	 */
 	public double getXStart()
 	{
@@ -85,8 +95,9 @@ public class AreaData
 	}
 
 	/**
-	 *  Set the xstart.
-	 *  @param xstart The xstart to set.
+	 * Set the xstart.
+	 * 
+	 * @param xstart The xstart to set.
 	 */
 	public void setXStart(double xstart)
 	{
@@ -94,8 +105,9 @@ public class AreaData
 	}
 
 	/**
-	 *  Get the xend.
-	 *  @return the xend.
+	 * Get the xend.
+	 * 
+	 * @return the xend.
 	 */
 	public double getXEnd()
 	{
@@ -103,8 +115,9 @@ public class AreaData
 	}
 
 	/**
-	 *  Set the xend.
-	 *  @param xend The xend to set.
+	 * Set the xend.
+	 * 
+	 * @param xend The xend to set.
 	 */
 	public void setXEnd(double xend)
 	{
@@ -112,8 +125,9 @@ public class AreaData
 	}
 
 	/**
-	 *  Get the ystart.
-	 *  @return the ystart.
+	 * Get the ystart.
+	 * 
+	 * @return the ystart.
 	 */
 	public double getYStart()
 	{
@@ -121,8 +135,9 @@ public class AreaData
 	}
 
 	/**
-	 *  Set the ystart.
-	 *  @param ystart The ystart to set.
+	 * Set the ystart.
+	 * 
+	 * @param ystart The ystart to set.
 	 */
 	public void setYStart(double ystart)
 	{
@@ -130,8 +145,9 @@ public class AreaData
 	}
 
 	/**
-	 *  Get the yend.
-	 *  @return the yend.
+	 * Get the yend.
+	 * 
+	 * @return the yend.
 	 */
 	public double getYEnd()
 	{
@@ -139,8 +155,9 @@ public class AreaData
 	}
 
 	/**
-	 *  Set the yend.
-	 *  @param yend The yend to set.
+	 * Set the yend.
+	 * 
+	 * @param yend The yend to set.
 	 */
 	public void setYEnd(double yend)
 	{
@@ -148,8 +165,9 @@ public class AreaData
 	}
 
 	/**
-	 *  Get the sizex.
-	 *  @return the sizex.
+	 * Get the sizex.
+	 * 
+	 * @return the sizex.
 	 */
 	public int getSizeX()
 	{
@@ -157,8 +175,9 @@ public class AreaData
 	}
 
 	/**
-	 *  Set the sizex.
-	 *  @param sizex The sizex to set.
+	 * Set the sizex.
+	 * 
+	 * @param sizex The sizex to set.
 	 */
 	public void setSizeX(int sizex)
 	{
@@ -166,8 +185,9 @@ public class AreaData
 	}
 
 	/**
-	 *  Get the sizey.
-	 *  @return the sizey.
+	 * Get the sizey.
+	 * 
+	 * @return the sizey.
 	 */
 	public int getSizeY()
 	{
@@ -175,8 +195,9 @@ public class AreaData
 	}
 
 	/**
-	 *  Set the sizey.
-	 *  @param sizey The sizey to set.
+	 * Set the sizey.
+	 * 
+	 * @param sizey The sizey to set.
 	 */
 	public void setSizeY(int sizey)
 	{
@@ -184,8 +205,9 @@ public class AreaData
 	}
 
 	/**
-	 *  Get the max value.
-	 *  @return the max value.
+	 * Get the max value.
+	 * 
+	 * @return the max value.
 	 */
 	public int getMax()
 	{
@@ -193,8 +215,9 @@ public class AreaData
 	}
 
 	/**
-	 *  Set the max value.
-	 *  @param max The max value to set.
+	 * Set the max value.
+	 * 
+	 * @param max The max value to set.
 	 */
 	public void setMax(int max)
 	{
@@ -202,8 +225,9 @@ public class AreaData
 	}
 
 	/**
-	 *  Get the data.
-	 *  @return the data.
+	 * Get the data.
+	 * 
+	 * @return the data.
 	 */
 	public int[][] getData()
 	{
@@ -211,8 +235,9 @@ public class AreaData
 	}
 
 	/**
-	 *  Set the data.
-	 *  @param data The data to set.
+	 * Set the data.
+	 * 
+	 * @param data The data to set.
 	 */
 	public void setData(int[][] data)
 	{
@@ -220,8 +245,9 @@ public class AreaData
 	}
 
 	/**
-	 *  Get the par.
-	 *  @return the par.
+	 * Get the par.
+	 * 
+	 * @return the par.
 	 */
 	public int getParallel()
 	{
@@ -229,17 +255,19 @@ public class AreaData
 	}
 
 	/**
-	 *  Set the par.
-	 *  @param par The par to set.
+	 * Set the par.
+	 * 
+	 * @param par The par to set.
 	 */
 	public void setParallel(int par)
 	{
 		this.par = par;
 	}
-	
+
 	/**
-	 *  Get the id.
-	 *  @return the id.
+	 * Get the id.
+	 * 
+	 * @return the id.
 	 */
 	public Object getId()
 	{
@@ -247,17 +275,39 @@ public class AreaData
 	}
 
 	/**
-	 *  Set the id.
-	 *  @param id The id to set.
+	 * Set the id.
+	 * 
+	 * @param id The id to set.
 	 */
 	public void setId(Object id)
 	{
 		this.id = id;
 	}
-	
+
 	/**
-	 *  Get the tasksize.
-	 *  @return the tasksize.
+	 * Get the calculator id.
+	 * 
+	 * @return the calculator id.
+	 */
+	public IComponentIdentifier getCalculatorId()
+	{
+		return cid;
+	}
+
+	/**
+	 * Set the calculatorid.
+	 * 
+	 * @param id The calculator id to set.
+	 */
+	public void setCalculatorId(IComponentIdentifier cid)
+	{
+		this.cid = cid;
+	}
+
+	/**
+	 * Get the tasksize.
+	 * 
+	 * @return the tasksize.
 	 */
 	public int getTaskSize()
 	{
@@ -265,8 +315,9 @@ public class AreaData
 	}
 
 	/**
-	 *  Set the tasksize.
-	 *  @param tasksize The tasksize to set.
+	 * Set the tasksize.
+	 * 
+	 * @param tasksize The tasksize to set.
 	 */
 	public void setTaskSize(int tasksize)
 	{
@@ -278,18 +329,17 @@ public class AreaData
 		return "AreaData(id=" + id + ")";
 	}
 
-//	/**
-//	 *  Get the string representation.
-//	 */
-//	public String toString()
-//	{
-//		return "AreaData (xstart=" + xstart + ", xend=" + xend + ", ystart="
-//			+ ystart + ", yend=" + yend + ", sizex=" + sizex + ", sizey="
-//			+ sizey + ", max=" + max + ", par=" + par + ", id=" + id
-//			+ ", tasksize=" + tasksize + ", data="
-//			+ (data != null ? Arrays.asList(data) : null) + ")";
-//	}
-	
-	
-	
+	// /**
+	// * Get the string representation.
+	// */
+	// public String toString()
+	// {
+	// return "AreaData (xstart=" + xstart + ", xend=" + xend + ", ystart="
+	// + ystart + ", yend=" + yend + ", sizex=" + sizex + ", sizey="
+	// + sizey + ", max=" + max + ", par=" + par + ", id=" + id
+	// + ", tasksize=" + tasksize + ", data="
+	// + (data != null ? Arrays.asList(data) : null) + ")";
+	// }
+
+
 }

@@ -33,14 +33,36 @@ public class IntermediateFuture extends Future	implements	IIntermediateFuture
 	 */
 	public void	addIntermediateResult(Object result)
 	{
+		List	ilisteners	= null;
 		synchronized(this)
 		{
 			if(results==null)
 				results	= new ArrayList();
 			
 			results.add(result);
+			
+			// Find intermediate listeners to be notified.
+			for(int i=0; i<listeners.size(); i++)
+			{
+				if(listeners.get(i) instanceof IIntermediateResultListener)
+				{
+					if(ilisteners==null)
+						ilisteners	= new ArrayList();
+					ilisteners.add(listeners.get(i));
+				}
+			}
 		}
-		
-		// Todo: notify listeners
+
+		for(int i=0; ilisteners!=null && i<ilisteners.size(); i++)
+		{
+			try
+			{
+				((IIntermediateResultListener)ilisteners.get(i)).intermediateResultAvailable(result);
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+			}
+		}
 	}
 }

@@ -518,7 +518,7 @@ public class DisplayPanel extends JComponent
 							provider	= name.substring(index+1);
 							name	= name.substring(0, index);
 						}
-						provider	= progress.getTaskId().toString();
+//						provider	= progress.getTaskId().toString();
 						
 						FontMetrics	fm	= g.getFontMetrics();
 						Rectangle2D	sb1	= fm.getStringBounds(name, g);

@@ -224,7 +224,7 @@ public class GenerateService extends BasicService implements IGenerateService
 				
 				if(ds!=null)
 				{
-					ds.displayIntermediateResult(new ProgressData((IComponentIdentifier)source, ad.getId(),
+					ds.displayIntermediateResult(new ProgressData(ad.getCalculatorId(), ad.getId(),
 						new Rectangle(xs, ys, ad.getSizeX(), ad.getSizeY()), true, data.getSizeX(), data.getSizeY()));
 				}
 				
@@ -257,10 +257,11 @@ public class GenerateService extends BasicService implements IGenerateService
 				AreaData ad = new AreaData(x1, xi==numx-1 && restx>0 ? x1+(xdiff*restx/sizex): x1+xdiff,
 					y1, yi==numy-1 && resty>0 ? y1+(ydiff*resty/sizey) : y1+ydiff,
 					xi==numx-1 && restx>0 ? restx : sizex, yi==numy-1 && resty>0 ? resty : sizey,
-					data.getMax(), 0, 0, new Tuple(new Integer(xi), new Integer(yi)), null);
+					data.getMax(), 0, 0, new Tuple(new Integer(xi), new Integer(yi)),
+					(IComponentIdentifier)cs.getServiceIdentifier().getProviderId(), null);
 //				System.out.println("x:y: "+xi+" "+yi+" "+ad);
 //				System.out.println("calculateArea: "+cs.getServiceIdentifier().getProviderId());
-				cs.calculateArea(ad).addResultListener(agent.createResultListener(new CalculateListener(agent, lis, ad, cs.getServiceIdentifier().getProviderId())));
+				cs.calculateArea(ad).addResultListener(agent.createResultListener(new CalculateListener(agent, lis, ad)));
 				if(ds!=null)
 				{
 					ds.displayIntermediateResult(new ProgressData((IComponentIdentifier)cs.getServiceIdentifier().getProviderId(), ad.getId(),
@@ -288,18 +289,14 @@ class CalculateListener implements IResultListener
 	/** The data. */
 	protected AreaData data;
 	
-	/** The provider id. */
-	protected Object providerid;
-	
 	/**
 	 *  Create a new listener.
 	 */
-	public CalculateListener(GenerateAgent agent, IResultListener listener, AreaData data, Object providerid)
+	public CalculateListener(GenerateAgent agent, IResultListener listener, AreaData data)
 	{
 		this.agent = agent;
 		this.listener = listener;
 		this.data = data;
-		this.providerid = providerid;
 	}
 	
 	/**
