@@ -3,6 +3,7 @@ package jadex.commons.service;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.IIntermediateFuture;
+import jadex.commons.IntermediateFuture;
 import jadex.commons.concurrent.CounterResultListener;
 import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.service.fetcher.DynamicServiceFetcher;
@@ -272,7 +273,7 @@ public class BasicServiceContainer implements  IServiceContainer
 	{
 		if(info==null)
 		{
-			Future ret = new Future();
+			IntermediateFuture ret = new IntermediateFuture();
 			ret.setException(new IllegalArgumentException("Info must not null."));
 			return ret;
 		}

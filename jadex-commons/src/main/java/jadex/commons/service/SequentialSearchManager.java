@@ -2,6 +2,8 @@ package jadex.commons.service;
 
 import jadex.commons.Future;
 import jadex.commons.IFuture;
+import jadex.commons.IIntermediateFuture;
+import jadex.commons.IntermediateFuture;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.IResultListener;
 
@@ -81,10 +83,10 @@ public class SequentialSearchManager implements ISearchManager
 	 *  @param selector	The result selector to select matching services and produce the final result. 
 	 *  @param services	The local services of the provider (class->list of services).
 	 */
-	public IFuture	searchServices(IServiceProvider provider, IVisitDecider decider, final IResultSelector selector, Map services, Collection results)
+	public IIntermediateFuture	searchServices(IServiceProvider provider, IVisitDecider decider, final IResultSelector selector, Map services, Collection results)
 	{
 //		System.out.println("search: "+selector+" "+provider.getId());
-		Future	ret	= new Future();
+		IntermediateFuture	ret	= new IntermediateFuture();
 		Map	todo	= new LinkedHashMap(); // Nodes of which children still to be processed (id->provider).
 		SearchContext	context	= new SearchContext(decider, selector, results, todo);
 //		final List res = new ArrayList();

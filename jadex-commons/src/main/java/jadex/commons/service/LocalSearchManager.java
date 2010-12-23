@@ -1,9 +1,10 @@
 package jadex.commons.service;
 
-import jadex.commons.Future;
 import jadex.commons.IIntermediateFuture;
+import jadex.commons.IntermediateFuture;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 
 /**
@@ -60,7 +61,8 @@ public class LocalSearchManager implements ISearchManager
 		}
 //		if(selector instanceof TypeResultSelector && results.toString().indexOf("Add")!=-1)
 //			System.out.println("lsm: "+provider+" "+results);
-		return new Future(selector.getResult(results));
+		Object	result	= selector.getResult(results);
+		return new IntermediateFuture(result instanceof Collection ? (Collection)result : Collections.singletonList(result));
 	}
 	
 	/**

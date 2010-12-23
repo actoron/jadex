@@ -2,6 +2,8 @@ package jadex.commons.service;
 
 import jadex.commons.Future;
 import jadex.commons.IFuture;
+import jadex.commons.IIntermediateFuture;
+import jadex.commons.IntermediateFuture;
 import jadex.commons.Tuple;
 import jadex.commons.collection.Cache;
 import jadex.commons.concurrent.DelegationResultListener;
@@ -56,9 +58,9 @@ public class CacheServiceContainer	implements IServiceContainer
 	 *  @param type The class.
 	 *  @return The corresponding services.
 	 */
-	public IFuture getServices(final ISearchManager manager, final IVisitDecider decider, final IResultSelector selector, Collection results)
+	public IIntermediateFuture getServices(final ISearchManager manager, final IVisitDecider decider, final IResultSelector selector, Collection results)
 	{
-		final Future ret = new Future();
+		final IntermediateFuture ret = new IntermediateFuture();
 		
 //		final Tuple key = manager.getCacheKey()!=null && decider.getCacheKey()!=null && selector.getCacheKey()!=null
 //			? new Tuple(manager.getCacheKey(), decider.getCacheKey(), selector.getCacheKey()) : null;
@@ -306,7 +308,7 @@ public class CacheServiceContainer	implements IServiceContainer
 	 *  Get a required service.
 	 *  @return The service.
 	 */
-	public IFuture getRequiredServices(RequiredServiceInfo info)
+	public IIntermediateFuture getRequiredServices(RequiredServiceInfo info)
 	{
 		return container.getRequiredServices(info);
 	}

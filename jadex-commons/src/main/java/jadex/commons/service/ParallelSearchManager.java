@@ -2,6 +2,8 @@ package jadex.commons.service;
 
 import jadex.commons.Future;
 import jadex.commons.IFuture;
+import jadex.commons.IIntermediateFuture;
+import jadex.commons.IntermediateFuture;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.CounterResultListener;
 import jadex.commons.concurrent.IResultListener;
@@ -78,10 +80,10 @@ public class ParallelSearchManager implements ISearchManager
 	 *  @param selector	The result selector to select matching services and produce the final result. 
 	 *  @param services	The local services of the provider (class->list of services).
 	 */
-	public IFuture	searchServices(IServiceProvider provider, IVisitDecider decider, 
+	public IIntermediateFuture	searchServices(IServiceProvider provider, IVisitDecider decider, 
 		final IResultSelector selector, Map services, final Collection results)
 	{
-		final Future	ret	= new Future();
+		final IntermediateFuture	ret	= new IntermediateFuture();
 		processNode(null, provider, decider, selector, services, results, up).addResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)

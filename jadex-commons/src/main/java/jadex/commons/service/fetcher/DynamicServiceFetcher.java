@@ -1,6 +1,9 @@
 package jadex.commons.service.fetcher;
 
 import jadex.commons.IFuture;
+import jadex.commons.IIntermediateFuture;
+import jadex.commons.IntermediateFuture;
+import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.service.IRequiredServiceFetcher;
 import jadex.commons.service.IServiceProvider;
 import jadex.commons.service.RequiredServiceInfo;
@@ -31,10 +34,21 @@ public class DynamicServiceFetcher implements IRequiredServiceFetcher
 	/**
 	 *  Get a required multi service.
 	 */
-	public IFuture getServices(RequiredServiceInfo info, IServiceProvider provider)
+	public IIntermediateFuture getServices(RequiredServiceInfo info, IServiceProvider provider)
 	{
-		return info.isDeclared()?
-			SServiceProvider.getDeclaredServices(provider, info.getType()):
-			SServiceProvider.getServices(provider, info.getType(), info.isRemote(), info.isForced());
+		IIntermediateFuture	ret;
+		if(info.isDeclared())
+		{
+			IntermediateFuture	fut	= new IntermediateFuture();
+			SServiceProvider.getDeclaredServices(provider, info.getType())
+				.addResultListener(new DelegationResultListener(fut));
+			ret	= fut;
+		}
+		else
+		{
+			ret	= SServiceProvider.getServices(provider, info.getType(), info.isRemote(), info.isForced());
+		}
+		
+		return ret;
 	}
 }

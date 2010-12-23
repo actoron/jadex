@@ -1,8 +1,7 @@
 package jadex.micro.examples.helpline;
 
-import jadex.commons.Future;
-import jadex.commons.IFuture;
 import jadex.commons.IIntermediateFuture;
+import jadex.commons.IntermediateFuture;
 import jadex.commons.service.BasicService;
 
 /**
@@ -80,7 +79,7 @@ public class HelplineService extends BasicService implements IHelpline
 	 */
 	public IIntermediateFuture getInformation(final String name)
 	{
-		return new Future(agent.getInformation(name));
+		return new IntermediateFuture(agent.getInformation(name));
 	}
 
 	/**

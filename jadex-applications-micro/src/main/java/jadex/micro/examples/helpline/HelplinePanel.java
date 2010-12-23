@@ -5,6 +5,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.IIntermediateFuture;
+import jadex.commons.IntermediateFuture;
 import jadex.commons.SGUI;
 import jadex.commons.concurrent.CollectionResultListener;
 import jadex.commons.concurrent.DefaultResultListener;
@@ -12,7 +13,6 @@ import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.commons.jtable.DateTimeRenderer;
-import jadex.commons.service.SServiceProvider;
 import jadex.micro.IMicroExternalAccess;
 
 import java.awt.BorderLayout;
@@ -248,7 +248,7 @@ public class HelplinePanel extends JPanel
 	public IIntermediateFuture getInformation(final String name, final boolean remote)
 	{
 //		SServiceProvider.getServices(agent.getServiceProvider(), IHelpline.class, remote, true)
-		final Future ret = new Future();
+		final IntermediateFuture ret = new IntermediateFuture();
 		
 		IFuture fut = agent.scheduleStep(new IComponentStep()
 		{

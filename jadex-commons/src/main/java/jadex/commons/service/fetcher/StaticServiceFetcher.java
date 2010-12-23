@@ -3,6 +3,7 @@ package jadex.commons.service.fetcher;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.IIntermediateFuture;
+import jadex.commons.IntermediateFuture;
 import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.service.IRequiredServiceFetcher;
 import jadex.commons.service.IServiceProvider;
@@ -66,7 +67,7 @@ public class StaticServiceFetcher implements IRequiredServiceFetcher
 	 */
 	public IIntermediateFuture getServices(RequiredServiceInfo info, IServiceProvider provider)
 	{
-		final Future ret = new Future();
+		final IntermediateFuture ret = new IntermediateFuture();
 		if(result==null)
 		{
 //			System.out.println("static: "+info.getType()+" "+info.isForced());
