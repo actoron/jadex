@@ -3,11 +3,11 @@ package jadex.commons.service;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.IIntermediateFuture;
-import jadex.commons.IntermediateDelegationResultListener;
 import jadex.commons.IntermediateFuture;
 import jadex.commons.concurrent.DelegationResultListener;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  *  Static helper class for searching services.
@@ -119,10 +119,11 @@ public class SServiceProvider
 		{
 			public void customResultAvailable(Object result)
 			{
-				if(result==null)
+				Collection res = (Collection)result;
+				if(res==null || res.size()==0)
 					exceptionOccurred(new ServiceNotFoundException("No matching service found for type: "+type.getName()));
 				else
-					super.customResultAvailable(result);
+					super.customResultAvailable(res.iterator().next());
 			}
 		});
 		
@@ -151,10 +152,11 @@ public class SServiceProvider
 		{
 			public void customResultAvailable(Object result)
 			{
-				if(result==null)
+				Collection res = (Collection)result;
+				if(res==null || res.size()==0)
 					exceptionOccurred(new ServiceNotFoundException("No service found for id: "+sid));
 				else
-					super.customResultAvailable(result);
+					super.customResultAvailable(res.iterator().next());
 			}
 		});
 		
@@ -183,10 +185,11 @@ public class SServiceProvider
 		{
 			public void customResultAvailable(Object result)
 			{
-				if(result==null)
-					exceptionOccurred(new ServiceNotFoundException("No matching service found for selector: "+selector));
+				Collection res = (Collection)result;
+				if(res==null || res.size()==0)
+					exceptionOccurred(new ServiceNotFoundException("No matching service found for: "+selector));
 				else
-					super.customResultAvailable(result);
+					super.customResultAvailable(res.iterator().next());
 			}
 		});
 		
@@ -268,10 +271,11 @@ public class SServiceProvider
 		{
 			public void customResultAvailable(Object result)
 			{
-				if(result==null)
+				Collection res = (Collection)result;
+				if(res==null || res.size()==0)
 					exceptionOccurred(new ServiceNotFoundException("No matching service found for type: "+type.getName()));
 				else
-					super.customResultAvailable(result);
+					super.customResultAvailable(res.iterator().next());
 			}
 		});
 		
@@ -300,10 +304,11 @@ public class SServiceProvider
 		{
 			public void customResultAvailable(Object result)
 			{
-				if(result==null)
+				Collection res = (Collection)result;
+				if(res==null || res.size()==0)
 					exceptionOccurred(new ServiceNotFoundException("No matching service found for type: "+type.getName()));
 				else
-					super.customResultAvailable(result);
+					super.customResultAvailable(res.iterator().next());
 			}
 		});
 		
@@ -400,10 +405,11 @@ public class SServiceProvider
 		{
 			public void customResultAvailable(Object result)
 			{
-				if(result==null)
-					exceptionOccurred(new ServiceNotFoundException("No service found for id: "+sid));
+				Collection res = (Collection)result;
+				if(res==null || res.size()==0)
+					exceptionOccurred(new ServiceNotFoundException("No matching service found for type: "+sid));
 				else
-					super.customResultAvailable(result);
+					super.customResultAvailable(res.iterator().next());
 			}
 		});
 		

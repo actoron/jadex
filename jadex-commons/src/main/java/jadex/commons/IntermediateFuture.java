@@ -104,8 +104,15 @@ public class IntermediateFuture extends Future	implements	IIntermediateFuture
     	}
     	else
     	{
-    		this.results = (Collection)result;
-    		super.setResult(result);
+    		if(result!=null && !(result instanceof Collection))
+    		{
+    			setException(new IllegalArgumentException("Result must be collection: "+result));
+    		}
+    		else
+    		{
+    			this.results = (Collection)result;
+    			super.setResult(result);
+    		}
     	}
     }
     

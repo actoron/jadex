@@ -2,6 +2,7 @@ package jadex.commons.service;
 
 import jadex.commons.ComposedFilter;
 import jadex.commons.IFilter;
+import jadex.commons.SUtil;
 import jadex.commons.Tuple;
 
 import java.util.ArrayList;
@@ -145,9 +146,18 @@ public class BasicResultSelector implements IResultSelector
 	 *  @param results	The collection of selected services.
 	 *  @return A single service or a list of services.
 	 */
-	public Object getResult(Collection results)
+	public Collection getResult(Collection results)
 	{
-		Object	ret	= oneresult? results.size()>0? results.toArray()[0]: null: results;
+		Collection ret = null;
+		if(!oneresult)
+		{
+			ret = results;
+		}
+		else if(results.size()>0)
+		{
+			ret = new ArrayList();
+			ret.add(results.iterator().next());
+		}
 		return ret;
 	}
 	

@@ -21,7 +21,7 @@ public interface IResultSelector
 	 *  @param results	The collection of selected services.
 	 *  @return A single service or a list of services.
 	 */
-	public Object	getResult(Collection results);
+	public Collection getResult(Collection results);
 	
 	/**
 	 *  Test if the search result is sufficient to stop the search.

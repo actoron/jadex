@@ -118,7 +118,7 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 		{
 			public void resultAvailable(Object result)
 			{
-				ILibraryService libService = (ILibraryService) result;
+				ILibraryService libService = (ILibraryService)result;
 				libService.addLibraryServiceListener(libservicelistener);
 			}
 		});
