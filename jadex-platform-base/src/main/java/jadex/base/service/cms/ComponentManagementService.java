@@ -1382,8 +1382,11 @@ public abstract class ComponentManagementService extends BasicService implements
 	{
 		final Future	ret	= new Future();
 		
-		// Local parent (does not work during init as external access is not available).
-		if(ci!=null && ci.getParent()!=null && !isRemoteComponent(ci.getParent()) && !initinfos.containsKey(ci.getParent()))
+		// Local parent but not platform (does not work during init as external access is not available).
+		if(ci!=null && ci.getParent()!=null
+			&& !ci.getParent().equals(root.getComponentIdentifier())
+			&& !isRemoteComponent(ci.getParent())
+			&& !initinfos.containsKey(ci.getParent()))
 		{
 			SServiceProvider.getService(provider, IComponentManagementService.class)
 				.addResultListener(new DelegationResultListener(ret)
@@ -1404,7 +1407,7 @@ public abstract class ComponentManagementService extends BasicService implements
 			});
 		}
 		
-		// Remote or no parent
+		// Remote or no parent or platform as parent
 		else
 		{
 			SServiceProvider.getService(provider, ILibraryService.class)
