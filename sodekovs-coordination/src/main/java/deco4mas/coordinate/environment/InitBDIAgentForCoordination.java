@@ -6,6 +6,8 @@ import jadex.application.space.envsupport.environment.ISpaceObject;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IInternalAccess;
 import jadex.commons.IFuture;
 import jadex.commons.ThreadSuspendable;
 import jadex.commons.concurrent.IResultListener;
@@ -64,8 +66,7 @@ public class InitBDIAgentForCoordination
 		this.context = context;
 
 		boolean exeption = initAvatar();
-		if (!exeption)
-			initExternalAccess();
+		if (!exeption)	initExternalAccess();
 	}
 
 	/**
@@ -334,19 +335,20 @@ public class InitBDIAgentForCoordination
 				exception.printStackTrace();
 			}
 
-			public void resultAvailable(Object source, Object result)
-			{
-				exta = (IBDIExternalAccess) result;
-				behObserver = new BDIBehaviorObservationComponent(exta);
-				// agentType = exta.getApplicationContext().getAgentType(ai);
-				agentType = context.getComponentType(ai);
-				initPublishAndPercept();
-			}
-
 			@Override
-			public void exceptionOccurred(Object source, Exception exception)
-			{
-				// TODO Auto-generated method stub
+			public void resultAvailable(Object result) {
+				exta = (IBDIExternalAccess) result;
+				exta.scheduleStep(new IComponentStep() {
+					
+					@Override
+					public Object execute(IInternalAccess ia) {
+						behObserver = new BDIBehaviorObservationComponent(exta);
+						// agentType = exta.getApplicationContext().getAgentType(ai);
+						agentType = context.getComponentType(ai);
+						initPublishAndPercept();
+						return null;
+					}
+				});
 
 			}
 

@@ -43,7 +43,7 @@ public class ExecuteServiceByAgentTask implements ITask {
 
 		IResultListener lis = new IResultListener()
 			{
-				public void resultAvailable(Object source, Object result)
+				public void resultAvailable(Object result)
 				{
 					workflowLogger.info(context.getActivity().getName() + "[" + context.getParameterValue("serviceType") + "]" + " end");
 					try
@@ -56,7 +56,7 @@ public class ExecuteServiceByAgentTask implements ITask {
 
 				}
 
-				public void exceptionOccurred(Object source, Exception exception)
+				public void exceptionOccurred(Exception exception)
 				{
 					fut.setException(exception);
 				}
