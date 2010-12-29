@@ -99,7 +99,7 @@ public class DeltaTimeExecutor4Simulation extends SimplePropertyObject implement
 		
 		SServiceProvider.getService(container, IClockService.class).addResultListener(new DefaultResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				final IClockService clockservice = (IClockService)result;
 				
@@ -353,7 +353,7 @@ public class DeltaTimeExecutor4Simulation extends SimplePropertyObject implement
 		terminated = true;
 		SServiceProvider.getService(container, IClockService.class).addResultListener(new DefaultResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void resultAvailable(Object result)
 			{
 				IClockService clockservice = (IClockService)result;
 				if(clocklistener!=null)
