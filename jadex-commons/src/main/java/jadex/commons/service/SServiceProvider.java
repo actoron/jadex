@@ -21,8 +21,8 @@ public class SServiceProvider
 	public static ISearchManager sequentialmanagerforced = new SequentialSearchManager(true, true, true);
 
 	/** The parallel search manager. */
-	public static ISearchManager parallelmanager = new ParallelSearchManager();
-	public static ISearchManager parallelmanagerforced = new ParallelSearchManager(true, true, true);
+	public static ISearchManager parallelmanager = new SequentialSearchManager();//new ParallelSearchManager();
+	public static ISearchManager parallelmanagerforced = new SequentialSearchManager(true, true, true);//new ParallelSearchManager(true, true, true);
 	
 	/** The sequential search manager that searches only upwards. */
 	public static ISearchManager upwardsmanager = new SequentialSearchManager(true, false);

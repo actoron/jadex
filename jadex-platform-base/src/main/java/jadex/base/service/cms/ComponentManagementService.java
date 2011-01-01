@@ -2,7 +2,6 @@ package jadex.base.service.cms;
 
 import jadex.base.fipa.CMSComponentDescription;
 import jadex.base.fipa.SearchConstraints;
-import jadex.bridge.ComponentFactorySelector;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.CreationInfo;
 import jadex.bridge.ICMSComponentListener;
@@ -13,7 +12,9 @@ import jadex.bridge.IComponentFactory;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IComponentManagementService;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.IMessageService;
 import jadex.bridge.IModelInfo;
 import jadex.bridge.IRemoteServiceManagementService;
@@ -28,7 +29,6 @@ import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.service.BasicService;
-import jadex.commons.service.IServiceProvider;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.execution.IExecutionService;
 import jadex.commons.service.library.ILibraryService;
@@ -57,7 +57,7 @@ public abstract class ComponentManagementService extends BasicService implements
 	//-------- attributes --------
 
 	/** The service provider. */
-	protected IServiceProvider provider;
+	protected IExternalAccess exta;
 
 	/** The components (id->component adapter). */
 	protected Map adapters;
@@ -102,31 +102,34 @@ public abstract class ComponentManagementService extends BasicService implements
 	/** Number of non-daemon children for each autoshutdown component (cid->Integer). */
 	protected Map childcounts;
 	
+	/** The cached factories. */
+	protected Collection factories;
+	
     //-------- constructors --------
 
 	 /**
      *  Create a new component execution service.
      *  @param provider	The service provider.
      */
-    public ComponentManagementService(IServiceProvider provider)
+    public ComponentManagementService(IExternalAccess provider)
 	{
     	this(provider, null);
 	}
 	
     /**
      *  Create a new component execution service.
-     *  @param provider	The service provider.
+     *  @param exta	The service provider.
      */
-    public ComponentManagementService(IServiceProvider provider, IComponentAdapter root)
+    public ComponentManagementService(IExternalAccess exta, IComponentAdapter root)
 	{
-		super(provider.getId(), IComponentManagementService.class, null);
+		super(exta.getServiceProvider().getId(), IComponentManagementService.class, null);
 
-		this.provider = provider;
+		this.exta = exta;
 		this.adapters = Collections.synchronizedMap(SCollection.createHashMap());
 		this.descs = Collections.synchronizedMap(SCollection.createLinkedHashMap());
 		this.ccs = SCollection.createLinkedHashMap();
 //		this.children	= SCollection.createMultiCollection();
-		this.logger = Logger.getLogger(provider.getId()+".cms");
+		this.logger = Logger.getLogger(exta.getServiceProvider().getId()+".cms");
 		this.listeners = SCollection.createMultiCollection();
 		this.killresultlisteners = Collections.synchronizedMap(SCollection.createHashMap());
 //		this.initfutures = Collections.synchronizedMap(SCollection.createHashMap());
@@ -198,20 +201,12 @@ public abstract class ComponentManagementService extends BasicService implements
 			{
 				final ClassLoader	cl = (ClassLoader)result;
 				
-				SServiceProvider.getService(provider, new ComponentFactorySelector(model, cinfo.getImports(), cl))
-					.addResultListener(new IResultListener()
+				getComponentFactory(model, cinfo, cl).addResultListener(new IResultListener()
 				{
 					public void resultAvailable(Object result)
 					{
-//						System.out.println("create start2: "+model+" "+cinfo.getParent());
-						
-						final IComponentFactory factory = (IComponentFactory)result;
-						if(factory==null)
-						{
-//							throw new RuntimeException("No factory found for component: "+model);
-							inited.setException(new RuntimeException("No factory found for component: "+model));
-							return;
-						}
+						IComponentFactory factory = (IComponentFactory)result;
+					
 						final IModelInfo lmodel = factory.loadModel(model, cinfo.getImports(), cl);
 						final String type = factory.getComponentType(model, cinfo.getImports(), cl);
 		
@@ -228,14 +223,16 @@ public abstract class ComponentManagementService extends BasicService implements
 								}
 								else
 								{
-									cid = new ComponentIdentifier(name+"@"+((IComponentIdentifier)provider.getId()).getPlatformName()); // Hack?!
+									cid = new ComponentIdentifier(name+"@"+((IComponentIdentifier)
+										exta.getServiceProvider().getId()).getPlatformName()); // Hack?!
 									if(adapters.containsKey(cid) || initinfos.containsKey(cid))
 									{
 										inited.setException(new RuntimeException("Component name already exists on platform: "+cid));
 										return;
 									}
 									// todo: hmm adresses may be set too late? use cached message service?
-									SServiceProvider.getService(provider, IMessageService.class).addResultListener(new DefaultResultListener()
+									SServiceProvider.getService(exta.getServiceProvider(), IMessageService.class)
+										.addResultListener(new DefaultResultListener()
 									{
 										public void resultAvailable(Object result)
 										{
@@ -313,7 +310,8 @@ public abstract class ComponentManagementService extends BasicService implements
 								}
 								
 								// Register component at parent.
-								getComponentInstance(pad).componentCreated(ad, lmodel).addResultListener(new IResultListener()
+								getComponentInstance(pad).componentCreated(ad, lmodel)
+									.addResultListener(new IResultListener()
 								{
 									public void resultAvailable(Object result)
 									{
@@ -382,7 +380,7 @@ public abstract class ComponentManagementService extends BasicService implements
 							
 							public void exceptionOccurred(final Exception exception)
 							{
-//								exception.printStackTrace();
+								exception.printStackTrace();
 //								System.out.println("Ex: "+cid+" "+exception);
 								final Runnable	cleanup	= new Runnable()
 								{
@@ -480,6 +478,7 @@ public abstract class ComponentManagementService extends BasicService implements
 					
 					public void exceptionOccurred(Exception exception)
 					{
+						exception.printStackTrace();
 						inited.setException(exception);
 					}
 				});
@@ -487,6 +486,115 @@ public abstract class ComponentManagementService extends BasicService implements
 		});
 		
 		return inited;
+	}
+	
+	/**
+	 *  Get a fitting component factory for a specific model.
+	 *  Searches the cached factories for the one that fits
+	 *  the model and returns it. Possibly reevaluates the
+	 *  cache when no factory was found.
+	 *  @param model The model file name.
+	 *  @param cinfo The creaion info.
+	 *  @param cl The classloader.
+	 *  @return The component factory.
+	 */
+	protected IFuture getComponentFactory(final String model, 
+		final CreationInfo cinfo, final ClassLoader cl)
+	{
+		final Future ret = new Future();
+		
+		boolean nofac = false;
+		synchronized(this)
+		{
+			if(factories==null)
+			{
+				nofac = true;
+			}
+		}
+		
+		if(nofac)
+		{
+			SServiceProvider.getServices(exta.getServiceProvider(), IComponentFactory.class, false, true)
+				.addResultListener(new IResultListener()
+			{
+				public void resultAvailable(Object result)
+				{
+					factories = (Collection)result;
+					getComponentFactory(model, cinfo, cl).addResultListener(new DelegationResultListener(ret));
+				}
+				
+				public void exceptionOccurred(Exception exception) 
+				{
+					ret.setException(exception);
+				}
+			});
+		}
+		else
+		{
+//			System.out.println("create start2: "+model+" "+cinfo.getParent());
+			IComponentFactory factory = selectComponentFactory(factories, model, cinfo, cl);
+
+			if(factory==null)
+			{
+				SServiceProvider.getServices(exta.getServiceProvider(), IComponentFactory.class, false, true)
+					.addResultListener(new IResultListener()
+				{
+					public void resultAvailable(Object result)
+					{	
+						factories = (Collection)result;
+						IComponentFactory factory = selectComponentFactory((Collection)result, model, cinfo, cl);
+						if(factory==null)
+						{
+							ret.setException(new RuntimeException("No factory found for component: "+model));
+						}
+						else
+						{
+							ret.setResult(factory);
+						}
+					}
+					public void exceptionOccurred(Exception exception)
+					{
+						ret.setException(exception);
+					}
+				});
+			}
+			else
+			{
+				ret.setResult(factory);
+			}
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Selects a component factory from a collection of factories.
+	 *  Uses the isLoadable factory method to determine if the
+	 *  model can be loaded.
+	 *  @param factories The collection of factories.
+	 *  @param model The model file name.
+	 *  @param cinfo The creaion info.
+	 *  @param cl The classloader.
+	 *  @return The component factory.
+	 */
+	protected IComponentFactory selectComponentFactory(Collection factories, 
+		String model, CreationInfo cinfo, ClassLoader cl)
+	{
+		IComponentFactory ret = null;
+		
+		if(factories!=null)
+		{
+			for(Iterator it=factories.iterator(); it.hasNext(); )
+			{
+				IComponentFactory fac = (IComponentFactory)it.next();
+				if(fac.isLoadable(model, cinfo.getImports(), cl))
+				{
+					ret = fac;
+					break;
+				}
+			}
+		}
+		
+		return ret;
 	}
 
 	/**
@@ -622,7 +730,7 @@ public abstract class ComponentManagementService extends BasicService implements
 		
 		if(isRemoteComponent(cid))
 		{
-			SServiceProvider.getService(provider, IRemoteServiceManagementService.class)
+			SServiceProvider.getService(exta.getServiceProvider(), IRemoteServiceManagementService.class)
 				.addResultListener(new IResultListener()
 			{
 				public void resultAvailable(Object result)
@@ -767,7 +875,7 @@ public abstract class ComponentManagementService extends BasicService implements
 		
 		if(isRemoteComponent(cid))
 		{
-			SServiceProvider.getService(provider, IRemoteServiceManagementService.class)
+			SServiceProvider.getService(exta.getServiceProvider(), IRemoteServiceManagementService.class)
 				.addResultListener(new IResultListener()
 			{
 				public void resultAvailable(Object result)
@@ -862,7 +970,7 @@ public abstract class ComponentManagementService extends BasicService implements
 		
 		if(isRemoteComponent(cid))
 		{
-			SServiceProvider.getService(provider, IRemoteServiceManagementService.class)
+			SServiceProvider.getService(exta.getServiceProvider(), IRemoteServiceManagementService.class)
 				.addResultListener(new IResultListener()
 			{
 				public void resultAvailable(Object result)
@@ -964,7 +1072,7 @@ public abstract class ComponentManagementService extends BasicService implements
 		
 		if(isRemoteComponent(cid))
 		{
-			SServiceProvider.getService(provider, IRemoteServiceManagementService.class)
+			SServiceProvider.getService(exta.getServiceProvider(), IRemoteServiceManagementService.class)
 				.addResultListener(new IResultListener()
 			{
 				public void resultAvailable(Object result)
@@ -1043,7 +1151,7 @@ public abstract class ComponentManagementService extends BasicService implements
 		
 		if(isRemoteComponent(cid))
 		{
-			SServiceProvider.getService(provider, IRemoteServiceManagementService.class)
+			SServiceProvider.getService(exta.getServiceProvider(), IRemoteServiceManagementService.class)
 				.addResultListener(new IResultListener()
 			{
 				public void resultAvailable(Object result)
@@ -1322,7 +1430,7 @@ public abstract class ComponentManagementService extends BasicService implements
 		
 		if(isRemoteComponent(cid))
 		{
-			SServiceProvider.getService(provider, IRemoteServiceManagementService.class)
+			SServiceProvider.getService(exta.getServiceProvider(), IRemoteServiceManagementService.class)
 				.addResultListener(new IResultListener()
 			{
 				public void resultAvailable(Object result)
@@ -1388,7 +1496,7 @@ public abstract class ComponentManagementService extends BasicService implements
 			&& !isRemoteComponent(ci.getParent())
 			&& !initinfos.containsKey(ci.getParent()))
 		{
-			SServiceProvider.getService(provider, IComponentManagementService.class)
+			SServiceProvider.getService(exta.getServiceProvider(), IComponentManagementService.class)
 				.addResultListener(new DelegationResultListener(ret)
 			{
 				public void customResultAvailable(Object result)
@@ -1410,7 +1518,7 @@ public abstract class ComponentManagementService extends BasicService implements
 		// Remote or no parent or platform as parent
 		else
 		{
-			SServiceProvider.getService(provider, ILibraryService.class)
+			SServiceProvider.getService(exta.getServiceProvider(), ILibraryService.class)
 				.addResultListener(new DelegationResultListener(ret)
 			{
 				public void customResultAvailable(Object result)
@@ -1519,7 +1627,7 @@ public abstract class ComponentManagementService extends BasicService implements
 	public IComponentIdentifier createComponentIdentifier(String name, boolean local, String[] addresses)
 	{
 		if(local)
-			name = name + "@" + ((IComponentIdentifier)provider.getId()).getPlatformName(); // Hack?!
+			name = name + "@" + ((IComponentIdentifier)exta.getServiceProvider().getId()).getPlatformName(); // Hack?!
 		return new ComponentIdentifier(name, addresses, null);		
 	}
 
@@ -1698,7 +1806,7 @@ public abstract class ComponentManagementService extends BasicService implements
 //		open.add(fut);
 		if(remote)
 		{
-			SServiceProvider.getServices(provider, IComponentManagementService.class, true, true).addResultListener(new IResultListener()
+			SServiceProvider.getServices(exta.getServiceProvider(), IComponentManagementService.class, true, true).addResultListener(new IResultListener()
 			{
 				public void resultAvailable(Object result)
 				{
@@ -1777,7 +1885,8 @@ public abstract class ComponentManagementService extends BasicService implements
 		{
 			do
 			{
-				ret = new ComponentIdentifier(name+(compcnt++)+"@"+((IComponentIdentifier)provider.getId()).getPlatformName()); // Hack?!
+				ret = new ComponentIdentifier(name+(compcnt++)+"@"+(
+					(IComponentIdentifier)exta.getServiceProvider().getId()).getPlatformName()); // Hack?!
 			}
 			while(adapters.containsKey(ret));
 		}
@@ -1903,7 +2012,7 @@ public abstract class ComponentManagementService extends BasicService implements
 			{
 				final boolean[]	services = new boolean[2];
 				
-				SServiceProvider.getService(provider, IExecutionService.class).addResultListener(new DefaultResultListener()
+				SServiceProvider.getService(exta.getServiceProvider(), IExecutionService.class).addResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object result)
 					{
@@ -1919,7 +2028,7 @@ public abstract class ComponentManagementService extends BasicService implements
 					}
 				});
 				
-				SServiceProvider.getService(provider, IMessageService.class).addResultListener(new DefaultResultListener()
+				SServiceProvider.getService(exta.getServiceProvider(), IMessageService.class).addResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object result)
 					{

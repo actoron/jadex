@@ -5,6 +5,7 @@ import jadex.bridge.IComponentAdapterFactory;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
+import jadex.bridge.IExternalAccess;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.concurrent.DelegationResultListener;
@@ -26,20 +27,20 @@ public class ComponentManagementService extends jadex.base.service.cms.Component
 
 	/**
 	 *  Create a new component execution service.
-	 *  @param provider	The service provider.
+	 *  @param exta	The service provider.
 	 */
-	public ComponentManagementService(IServiceProvider provider)
+	public ComponentManagementService(IExternalAccess exta)
 	{
-		super(provider);
+		super(exta);
 	}
 	
 	/**
 	 *  Create a new component execution service.
-	 *  @param provider	The service provider.
+	 *  @param exta	The service provider.
 	 */
-	public ComponentManagementService(IServiceProvider provider, IComponentAdapter root)
+	public ComponentManagementService(IExternalAccess exta, IComponentAdapter root)
 	{
-		super(provider, root);
+		super(exta, root);
 	}
 	
 	/**

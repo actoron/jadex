@@ -299,18 +299,18 @@ public class CacheServiceContainer	implements IServiceContainer
 	 *  Get a required service.
 	 *  @return The service.
 	 */
-	public IFuture getRequiredService(RequiredServiceInfo info)
+	public IFuture getRequiredService(RequiredServiceInfo info, boolean rebind)
 	{
-		return container.getRequiredService(info);
+		return container.getRequiredService(info, rebind);
 	}
 	
 	/**
 	 *  Get a required service.
 	 *  @return The service.
 	 */
-	public IIntermediateFuture getRequiredServices(RequiredServiceInfo info)
+	public IIntermediateFuture getRequiredServices(RequiredServiceInfo info, boolean rebind)
 	{
-		return container.getRequiredServices(info);
+		return container.getRequiredServices(info, rebind);
 	}
 	
 	/**

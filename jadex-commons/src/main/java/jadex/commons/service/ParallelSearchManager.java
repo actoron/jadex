@@ -143,8 +143,8 @@ public class ParallelSearchManager implements ISearchManager
 		
 		if(!selector.isFinished(results) && provider!=null && decider.searchNode(source, provider, results))
 		{
-//			if(provider!=null)
-//				System.out.println("from: "+(source!=null?source.getId():"null")+" proc: "+provider.getId());
+			if(provider!=null)
+				System.out.println("from: "+(source!=null?source.getId():"null")+" proc: "+provider.getId());
 			
 			provider.getServices(lsm, decider, selector, results).addResultListener(new IResultListener()
 			{

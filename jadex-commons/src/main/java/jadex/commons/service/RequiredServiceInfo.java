@@ -235,4 +235,24 @@ public class RequiredServiceInfo
 	{
 		this.declared = declared;
 	}
+
+	/**
+	 *  Get the upwards.
+	 *  @return The upwards.
+	 */
+	public boolean isUpwards()
+	{
+		return upwards;
+	}
+
+	/**
+	 *  Set the upwards.
+	 *  @param upwards The upwards to set.
+	 */
+	public void setUpwards(boolean upwards)
+	{
+		this.upwards = upwards;
+	}
+	
+	
 }

@@ -84,6 +84,9 @@ public class MicroAgentInterpreter implements IComponentInstance
 	/** Flag indicating that no steps may be scheduled any more. */
 	protected boolean nosteps;
 	
+	/** The external access. */
+	protected IExternalAccess access;
+
 	//-------- constructors --------
 	
 	/**
@@ -397,8 +400,19 @@ public class MicroAgentInterpreter implements IComponentInstance
 	 */
 	public IExternalAccess getExternalAccess()
 	{
-		return microagent.getExternalAccess();
+		if(access==null)
+		{
+			synchronized(this)
+			{
+				if(access==null)
+				{
+					access = new ExternalAccess(microagent, this);
+				}
+			}
+		}
+		return access;
 		
+//		return microagent.getExternalAccess();
 //		final Future ret = new Future();
 //		
 //		getAgentAdapter().invokeLater(new Runnable()

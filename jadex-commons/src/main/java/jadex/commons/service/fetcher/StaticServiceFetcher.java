@@ -25,10 +25,10 @@ public class StaticServiceFetcher implements IRequiredServiceFetcher
 	/**
 	 *  Get a required service.
 	 */
-	public IFuture getService(RequiredServiceInfo info, IServiceProvider provider)
+	public IFuture getService(RequiredServiceInfo info, IServiceProvider provider, boolean rebind)
 	{
 		final Future ret = new Future();
-		if(result==null)
+		if(result==null || rebind)
 		{
 			if(info.isDeclared())
 			{
@@ -42,9 +42,21 @@ public class StaticServiceFetcher implements IRequiredServiceFetcher
 					}
 				});
 			}
+			else if(info.isUpwards())
+			{
+				SServiceProvider.getServiceUpwards(provider, info.getType())
+					.addResultListener(new DelegationResultListener(ret)
+				{
+					public void customResultAvailable(Object result)
+					{
+						StaticServiceFetcher.this.result = result;
+						super.customResultAvailable(result);
+					}
+				});
+			}
 			else
 			{
-				SServiceProvider.getService(provider, info.getType(), info.isRemote(), info.isForced())
+				SServiceProvider.getService(provider, info.getType(), info.isRemote(), info.isForced() || rebind)
 					.addResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
@@ -65,10 +77,10 @@ public class StaticServiceFetcher implements IRequiredServiceFetcher
 	/**
 	 *  Get a required multi service.
 	 */
-	public IIntermediateFuture getServices(RequiredServiceInfo info, IServiceProvider provider)
+	public IIntermediateFuture getServices(RequiredServiceInfo info, IServiceProvider provider, boolean rebind)
 	{
 		final IntermediateFuture ret = new IntermediateFuture();
-		if(result==null)
+		if(result==null || rebind)
 		{
 //			System.out.println("static: "+info.getType()+" "+info.isForced());
 			if(info.isDeclared())
@@ -85,7 +97,7 @@ public class StaticServiceFetcher implements IRequiredServiceFetcher
 			}
 			else
 			{
-				SServiceProvider.getServices(provider, info.getType(), info.isRemote(), info.isForced())
+				SServiceProvider.getServices(provider, info.getType(), info.isRemote(), info.isForced() || rebind)
 					.addResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)

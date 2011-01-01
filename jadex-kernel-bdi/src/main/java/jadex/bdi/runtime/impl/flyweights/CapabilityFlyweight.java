@@ -775,7 +775,25 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	 *  Get a required service.
 	 *  @return The service.
 	 */
-	public IFuture getRequiredService(final String name)
+	public IFuture getRequiredService(String name)
+	{
+		return getRequiredService(name, false);
+	}
+	
+	/**
+	 *  Get a required services.
+	 *  @return The services.
+	 */
+	public IIntermediateFuture getRequiredServices(String name)
+	{
+		return getRequiredServices(name, false);
+	}
+	
+	/**
+	 *  Get a required service.
+	 *  @return The service.
+	 */
+	public IFuture getRequiredService(final String name, final boolean rebind)
 	{
 		if(getInterpreter().isExternalThread())
 		{
@@ -792,7 +810,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 					}
 					else
 					{
-						object = getInterpreter().getServiceContainer().getRequiredService(info);
+						object = getInterpreter().getServiceContainer().getRequiredService(info, rebind);
 					}
 				}
 			};
@@ -810,7 +828,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 			}
 			else
 			{
-				ret = getInterpreter().getServiceContainer().getRequiredService(info);
+				ret = getInterpreter().getServiceContainer().getRequiredService(info, rebind);
 			}
 			return ret;
 		}
@@ -820,7 +838,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	 *  Get a required services.
 	 *  @return The services.
 	 */
-	public IIntermediateFuture getRequiredServices(final String name)
+	public IIntermediateFuture getRequiredServices(final String name, final boolean rebind)
 	{
 		if(getInterpreter().isExternalThread())
 		{
@@ -837,7 +855,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 					}
 					else
 					{
-						object = getInterpreter().getServiceContainer().getRequiredServices(info);
+						object = getInterpreter().getServiceContainer().getRequiredServices(info, rebind);
 					}
 				}
 			};
@@ -855,7 +873,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 			}
 			else
 			{
-				ret = getInterpreter().getServiceContainer().getRequiredServices(info);
+				ret = getInterpreter().getServiceContainer().getRequiredServices(info, rebind);
 			}
 			return ret;
 		}

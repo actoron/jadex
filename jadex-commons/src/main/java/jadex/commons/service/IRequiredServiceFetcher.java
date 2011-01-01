@@ -11,10 +11,10 @@ public interface IRequiredServiceFetcher
 	/**
 	 *  Get a required service.
 	 */
-	public IFuture getService(RequiredServiceInfo info, IServiceProvider provider);
+	public IFuture getService(RequiredServiceInfo info, IServiceProvider provider, boolean rebind);
 	
 	/**
 	 *  Get a required multi service.
 	 */
-	public IIntermediateFuture getServices(RequiredServiceInfo info, IServiceProvider provider);
+	public IIntermediateFuture getServices(RequiredServiceInfo info, IServiceProvider provider, boolean rebind);
 }

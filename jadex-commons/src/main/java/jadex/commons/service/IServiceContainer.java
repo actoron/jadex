@@ -42,11 +42,11 @@ public interface IServiceContainer extends IServiceProvider
 	 *  Get a required service.
 	 *  @return The service.
 	 */
-	public IFuture getRequiredService(RequiredServiceInfo info);
+	public IFuture getRequiredService(RequiredServiceInfo info, boolean rebind);
 	
 	/**
 	 *  Get required services.
 	 *  @return The collection of services.
 	 */
-	public IIntermediateFuture getRequiredServices(RequiredServiceInfo info);
+	public IIntermediateFuture getRequiredServices(RequiredServiceInfo info, boolean rebind);
 }

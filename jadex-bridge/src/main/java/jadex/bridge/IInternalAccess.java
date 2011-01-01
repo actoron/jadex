@@ -78,6 +78,19 @@ public interface IInternalAccess
 	 *  @return The services.
 	 */
 	public IIntermediateFuture getRequiredServices(String name);
+
+	/**
+	 *  Get a required service.
+	 *  @return The service.
+	 */
+	public IFuture getRequiredService(String name, boolean rebind);
+	
+	/**
+	 *  Get a required services.
+	 *  @return The services.
+	 */
+	public IIntermediateFuture getRequiredServices(String name, boolean rebind);
+
 	
 	/**
 	 *  Add an component listener.

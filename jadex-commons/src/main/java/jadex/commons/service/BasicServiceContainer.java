@@ -254,6 +254,24 @@ public class BasicServiceContainer implements  IServiceContainer
 	 */
 	public IFuture getRequiredService(RequiredServiceInfo info)
 	{
+		return getRequiredService(info, false);
+	}
+	
+	/**
+	 *  Get required services.
+	 *  @return The services.
+	 */
+	public IIntermediateFuture getRequiredServices(RequiredServiceInfo info)
+	{
+		return getRequiredServices(info, false);
+	}
+	
+	/**
+	 *  Get a required service.
+	 *  @return The service.
+	 */
+	public IFuture getRequiredService(RequiredServiceInfo info, boolean rebind)
+	{
 		if(info==null)
 		{
 			Future ret = new Future();
@@ -262,14 +280,14 @@ public class BasicServiceContainer implements  IServiceContainer
 		}
 		
 		IRequiredServiceFetcher fetcher = getRequiredServiceFetcher(info);
-		return fetcher.getService(info, this);
+		return fetcher.getService(info, this, rebind);
 	}
 	
 	/**
 	 *  Get required services.
 	 *  @return The services.
 	 */
-	public IIntermediateFuture getRequiredServices(RequiredServiceInfo info)
+	public IIntermediateFuture getRequiredServices(RequiredServiceInfo info, boolean rebind)
 	{
 		if(info==null)
 		{
@@ -279,7 +297,7 @@ public class BasicServiceContainer implements  IServiceContainer
 		}
 		
 		IRequiredServiceFetcher fetcher = getRequiredServiceFetcher(info);
-		return fetcher.getServices(info, this);
+		return fetcher.getServices(info, this, rebind);
 	}
 	
 	/**

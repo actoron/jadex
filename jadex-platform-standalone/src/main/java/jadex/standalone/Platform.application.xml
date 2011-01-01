@@ -88,7 +88,7 @@
 				)
 		</providedservice>
 		<providedservice class="IComponentManagementService" direct="true">
-			new ComponentManagementService($component.getServiceProvider(), $component.getComponentAdapter())
+			new ComponentManagementService($component.getExternalAccess(), $component.getComponentAdapter())
 		</providedservice>
 		<providedservice class="IDF" direct="true">
 			new DirectoryFacilitatorService($component.getServiceProvider(), SUtil.createHashMap(
@@ -132,6 +132,8 @@
 				$component.getServiceProvider()
 			)		
 		</providedservice>
+		
+		<requiredservice name="factoryservices" class="IComponentFactory" multiple="true"/>
 	</services>
 
 	<properties>

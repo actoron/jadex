@@ -24,17 +24,18 @@ public class DynamicServiceFetcher implements IRequiredServiceFetcher
 	/**
 	 *  Get a required service.
 	 */
-	public IFuture getService(RequiredServiceInfo info, IServiceProvider provider)
+	public IFuture getService(RequiredServiceInfo info, IServiceProvider provider, boolean rebind)
 	{
 		return info.isDeclared()?
 			SServiceProvider.getDeclaredService(provider, info.getType()):
+			info.isUpwards()? SServiceProvider.getServiceUpwards(provider, info.getType()):
 			SServiceProvider.getService(provider, info.getType(), info.isRemote(), info.isForced());
 	}
 	
 	/**
 	 *  Get a required multi service.
 	 */
-	public IIntermediateFuture getServices(RequiredServiceInfo info, IServiceProvider provider)
+	public IIntermediateFuture getServices(RequiredServiceInfo info, IServiceProvider provider, boolean rebind)
 	{
 		IIntermediateFuture	ret;
 		if(info.isDeclared())

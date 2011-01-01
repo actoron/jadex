@@ -1287,8 +1287,8 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 			}
 			else
 			{
-				container = new CacheServiceContainer(new ComponentServiceContainer(getAgentAdapter()), 25, 1*30*1000); // 30 secs cache expire
-//				container = new ComponentServiceContainer(getAgentAdapter());
+//				container = new CacheServiceContainer(new ComponentServiceContainer(getAgentAdapter()), 25, 1*30*1000); // 30 secs cache expire
+				container = new ComponentServiceContainer(getAgentAdapter());
 			}
 		}
 		return container;

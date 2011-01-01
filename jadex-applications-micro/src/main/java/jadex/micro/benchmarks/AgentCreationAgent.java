@@ -12,7 +12,6 @@ import jadex.commons.IFuture;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.service.RequiredServiceInfo;
-import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.clock.IClockService;
 import jadex.micro.IMicroExternalAccess;
 import jadex.micro.MicroAgent;
@@ -78,7 +77,9 @@ public class AgentCreationAgent extends MicroAgent
 			args.put("num", new Integer(num+1));
 //			System.out.println("Args: "+num+" "+args);
 
-			SServiceProvider.getServiceUpwards(getServiceProvider(), IComponentManagementService.class).addResultListener(createResultListener(new DefaultResultListener()
+//			SServiceProvider.getServiceUpwards(getServiceProvider(), IComponentManagementService.class)
+			getRequiredService("cmsservice")
+				.addResultListener(createResultListener(new DefaultResultListener()
 			{
 				public void resultAvailable(Object result)
 				{
@@ -115,7 +116,9 @@ public class AgentCreationAgent extends MicroAgent
 					// If nested, use initial component to kill others
 					else
 					{
-						SServiceProvider.getServiceUpwards(getServiceProvider(), IComponentManagementService.class).addResultListener(createResultListener(new DefaultResultListener()
+//						SServiceProvider.getServiceUpwards(getServiceProvider(), IComponentManagementService.class)
+						getRequiredService("cmsservice")
+							.addResultListener(createResultListener(new DefaultResultListener()
 						{
 							public void resultAvailable(Object result)
 							{
@@ -249,8 +252,9 @@ public class AgentCreationAgent extends MicroAgent
 						System.out.println("Overall memory usage: "+omem+"kB. Per agent: "+upera+" kB.");
 						System.out.println("Still used memory: "+stillused+"kB.");
 				
-						SServiceProvider.getService(exta.getServiceProvider(), IComponentManagementService.class)
-							.addResultListener(new DefaultResultListener()
+//						SServiceProvider.getServiceUpwards(exta.getServiceProvider(), IComponentManagementService.class)
+						getRequiredService("cmsservice")
+							.addResultListener(createResultListener(new DefaultResultListener()
 						{
 							public void resultAvailable(final Object result)
 							{
@@ -265,7 +269,7 @@ public class AgentCreationAgent extends MicroAgent
 									}
 								});
 							}
-						});
+						}));
 						
 						return null;
 					}
@@ -315,6 +319,6 @@ public class AgentCreationAgent extends MicroAgent
 		}, new Argument("nested", "If true, each agent is created as a subcomponent of the previous agent.", "boolean", Boolean.FALSE)}, 
 		null, null, null, new RequiredServiceInfo[]{
 			new RequiredServiceInfo("clockservice", IClockService.class),
-			new RequiredServiceInfo("cmsservice", IComponentManagementService.class)}, null);
+			new RequiredServiceInfo("cmsservice", IComponentManagementService.class, true)}, null);
 	}
 }

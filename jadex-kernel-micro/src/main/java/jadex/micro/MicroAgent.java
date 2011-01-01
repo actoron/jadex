@@ -104,8 +104,8 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	 */
 	public IServiceContainer createServiceContainer()
 	{
-		return new CacheServiceContainer(new ComponentServiceContainer(getAgentAdapter()), 25, 1*30*1000); // 30 secs cache expire
-//		return new ComponentServiceContainer(getAgentAdapter());
+//		return new CacheServiceContainer(new ComponentServiceContainer(getAgentAdapter()), 25, 1*30*1000); // 30 secs cache expire
+		return new ComponentServiceContainer(getAgentAdapter());
 	}
 	
 	/**
@@ -136,7 +136,8 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	 */
 	public IExternalAccess	getExternalAccess()
 	{
-		return new ExternalAccess(this, interpreter);
+		return interpreter.getExternalAccess();
+//		return new ExternalAccess(this, interpreter);
 	}
 
 	/**
@@ -594,6 +595,25 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	 */
 	public IFuture getRequiredService(String name)
 	{
+		return getRequiredService(name, false);
+	}
+	
+	/**
+	 *  Get a required services of a given name.
+	 *  @param name The services name.
+	 *  @return The service.
+	 */
+	public IIntermediateFuture getRequiredServices(String name)
+	{
+		return getRequiredServices(name, false);
+	}
+	
+	/**
+	 *  Get a required service.
+	 *  @return The service.
+	 */
+	public IFuture getRequiredService(String name, boolean rebind)
+	{
 		RequiredServiceInfo info = getModel().getRequiredService(name);
 		if(info==null)
 		{
@@ -603,16 +623,15 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 		}
 		else
 		{
-			return interpreter.getServiceContainer().getRequiredService(info);
+			return interpreter.getServiceContainer().getRequiredService(info, rebind);
 		}
 	}
 	
 	/**
-	 *  Get a required services of a given name.
-	 *  @param name The services name.
-	 *  @return The service.
+	 *  Get a required services.
+	 *  @return The services.
 	 */
-	public IIntermediateFuture getRequiredServices(String name)
+	public IIntermediateFuture getRequiredServices(String name, boolean rebind)
 	{
 		RequiredServiceInfo info = getModel().getRequiredService(name);
 		if(info==null)
@@ -623,9 +642,10 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 		}
 		else
 		{
-			return interpreter.getServiceContainer().getRequiredServices(info);
+			return interpreter.getServiceContainer().getRequiredServices(info, rebind);
 		}
 	}
+
 	
 	//-------- helper classes --------
 	

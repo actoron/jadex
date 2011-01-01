@@ -192,8 +192,8 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 		}
 		else
 		{
-			container = new CacheServiceContainer(new ComponentServiceContainer(getComponentAdapter()), 25, 1*30*1000); // 30 secs cache expire
-//			container = new ComponentServiceContainer(getComponentAdapter());
+//			container = new CacheServiceContainer(new ComponentServiceContainer(getComponentAdapter()), 25, 1*30*1000); // 30 secs cache expire
+			container = new ComponentServiceContainer(getComponentAdapter());
 		}
 		
 		fetcher.setValue("$provider", getServiceProvider());
@@ -1500,6 +1500,25 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 	 */
 	public IFuture getRequiredService(String name)
 	{
+		return getRequiredService(name, false);
+	}
+	
+	/**
+	 *  Get a required services of a given name.
+	 *  @param name The services name.
+	 *  @return The service.
+	 */
+	public IIntermediateFuture getRequiredServices(String name)
+	{
+		return getRequiredServices(name, false);
+	}
+	
+	/**
+	 *  Get a required service.
+	 *  @return The service.
+	 */
+	public IFuture getRequiredService(String name, boolean rebind)
+	{
 		RequiredServiceInfo info = getModel().getRequiredService(name);
 		if(info==null)
 		{
@@ -1509,16 +1528,15 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 		}
 		else
 		{
-			return getServiceContainer().getRequiredService(info);
+			return getServiceContainer().getRequiredService(info, rebind);
 		}
 	}
 	
 	/**
-	 *  Get a required services of a given name.
-	 *  @param name The services name.
-	 *  @return The service.
+	 *  Get a required services.
+	 *  @return The services.
 	 */
-	public IIntermediateFuture getRequiredServices(String name)
+	public IIntermediateFuture getRequiredServices(String name, boolean rebind)
 	{
 		RequiredServiceInfo info = getModel().getRequiredService(name);
 		if(info==null)
@@ -1529,7 +1547,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 		}
 		else
 		{
-			return getServiceContainer().getRequiredServices(info);
+			return getServiceContainer().getRequiredServices(info, rebind);
 		}
 	}
 	
