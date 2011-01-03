@@ -18,6 +18,7 @@ import jadex.bridge.IModelInfo;
 import jadex.commons.ChangeEvent;
 import jadex.commons.Future;
 import jadex.commons.IChangeListener;
+import jadex.commons.IFilter;
 import jadex.commons.IFuture;
 import jadex.commons.IResultCommand;
 import jadex.commons.concurrent.DefaultResultListener;
@@ -86,6 +87,9 @@ public class MicroAgentInterpreter implements IComponentInstance
 	
 	/** The external access. */
 	protected IExternalAccess access;
+	
+	/** The list of message handlers. */
+	protected List messagehandlers;
 
 	//-------- constructors --------
 	
@@ -283,7 +287,28 @@ public class MicroAgentInterpreter implements IComponentInstance
 			public static final String XML_CLASSNAME = "msg"; 
 			public Object execute(IInternalAccess ia)
 			{
-				microagent.messageArrived(Collections.unmodifiableMap(message.getParameterMap()), message.getMessageType());
+				boolean done = false;
+				if(messagehandlers!=null)
+				{
+					for(int i=0; i<messagehandlers.size(); i++)
+					{
+						IMessageHandler mh = (IMessageHandler)messagehandlers.get(i);
+						if(mh.getFilter().filter(message))
+						{
+							mh.handleMessage(ia, message.getParameterMap(), message.getMessageType());
+							if(mh.isRemove())
+							{
+								messagehandlers.remove(i);
+							}
+							done = true;
+						}
+					}
+				}
+				
+				if(!done)
+				{
+					microagent.messageArrived(Collections.unmodifiableMap(message.getParameterMap()), message.getMessageType());
+				}
 				return null;
 			}
 			
@@ -292,12 +317,6 @@ public class MicroAgentInterpreter implements IComponentInstance
 				return "microagent.messageArrived("+message+")_#"+this.hashCode();
 			}
 		});
-//		ret.addResultListener(new DefaultResultListener(adapter.getLogger())
-//		{
-//			public void resultAvailable(Object source, Object result)
-//			{
-//			}
-//		});
 	}
 
 	/**
@@ -737,15 +756,6 @@ public class MicroAgentInterpreter implements IComponentInstance
 	}
 	
 	/**
-	 *  Get the logger.
-	 *  @return The logger.
-	 * /
-	public Logger getLogger()
-	{
-		return adapter.getLogger();
-	}*/
-
-	/**
 	 *  Get the agent adapter.
 	 *  @return The agent adapter.
 	 */
@@ -834,50 +844,6 @@ public class MicroAgentInterpreter implements IComponentInstance
 	}
 	
 	/**
-	 *  The micro listener for executing listener invocations as an agent step.
-	 * /
-	class MicroListener implements IResultListener
-	{
-		protected IResultListener listener;
-		
-		public MicroListener(IResultListener listener)
-		{
-			this.listener = listener;
-		}
-		
-		public void resultAvailable(final Object source, final Object result)
-		{
-			scheduleStep(new Runnable()
-			{
-				public void run()
-				{
-					listener.resultAvailable(source, result);
-				}
-				
-				public String toString()
-				{
-					return "resultAvailable("+result+")_#"+this.hashCode();
-				}
-			});
-		}
-		public void exceptionOccurred(final Object source, final Exception exception)
-		{
-			scheduleStep(new Runnable()
-			{
-				public void run()
-				{
-					listener.exceptionOccurred(source, exception);
-				}
-				
-				public String toString()
-				{
-					return "exceptionOccurred("+exception+")_#"+this.hashCode();
-				}
-			});
-		}
-	}*/
-	
-	/**
 	 *  Add a change listener.
 	 *  @param listener The listener.
 	 */
@@ -937,5 +903,25 @@ public class MicroAgentInterpreter implements IComponentInstance
 		if(componentlisteners!=null)
 			componentlisteners.remove(listener);
 	}
-
+	
+	/**
+	 *  Add a message handler.
+	 *  @param  The handler.
+	 */
+	public void addMessageHandler(IMessageHandler handler)
+	{
+		if(messagehandlers==null)
+			messagehandlers = new ArrayList();
+		messagehandlers.add(handler);
+	}
+	
+	/**
+	 *  Remove a message handler.
+	 *  @param handler The handler.
+	 */
+	public void removeMessageHandler(IMessageHandler handler)
+	{
+		if(messagehandlers!=null)
+			messagehandlers.remove(handler);
+	}
 }

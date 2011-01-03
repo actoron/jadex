@@ -386,6 +386,35 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	}
 	
 	/**
+	 *  Send a message and wait for a reply.
+	 *  @param me	The message content (name value pairs).
+	 *  @param mt	The message type describing the content.
+	 */
+	public IFuture sendMessageAndWait(final Map me, final MessageType mt, IMessageHandler handler)
+	{
+		addMessageHandler(handler);
+		return sendMessage(me, mt);
+	}
+	
+	/**
+	 *  Add a message handler.
+	 *  @param  The handler.
+	 */
+	public void addMessageHandler(IMessageHandler handler)
+	{
+		interpreter.addMessageHandler(handler);
+	}
+	
+	/**
+	 *  Remove a message handler.
+	 *  @param handler The handler.
+	 */
+	public void removeMessageHandler(IMessageHandler handler)
+	{
+		interpreter.removeMessageHandler(handler);
+	}
+	
+	/**
 	 *  Create component identifier.
 	 *  @param name The name.
 	 *  @param local True for local name.
