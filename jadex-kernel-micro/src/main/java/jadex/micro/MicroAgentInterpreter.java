@@ -910,6 +910,9 @@ public class MicroAgentInterpreter implements IComponentInstance
 	 */
 	public void addMessageHandler(final IMessageHandler handler)
 	{
+		if(handler.getFilter()==null)
+			throw new RuntimeException("Filter must not null in handler: "+handler);
+			
 		if(messagehandlers==null)
 			messagehandlers = new ArrayList();
 		if(handler.getTimeout()>0)
