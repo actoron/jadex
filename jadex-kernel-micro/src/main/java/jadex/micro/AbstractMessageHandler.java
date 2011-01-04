@@ -130,6 +130,13 @@ public abstract class AbstractMessageHandler implements IMessageHandler
 	}
 
 	/**
+	 *  Timeout occurred.
+	 */
+	public void timeoutOccurred() 
+	{ 
+	}
+	
+	/**
 	 *  Handle the message.
 	 */
 	public abstract void handleMessage(Map msg, MessageType type);
