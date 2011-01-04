@@ -1,6 +1,5 @@
 package jadex.micro;
 
-import jadex.bridge.IInternalAccess;
 import jadex.bridge.MessageType;
 import jadex.commons.IFilter;
 
@@ -23,6 +22,30 @@ public abstract class AbstractMessageHandler implements IMessageHandler
 	protected boolean remove;
 	
 	//-------- constructors --------
+	
+	/**
+	 *  Create a new message handler.
+	 */
+	public AbstractMessageHandler()
+	{
+		this(-1, true);
+	}
+	
+	/**
+	 *  Create a new message handler.
+	 */
+	public AbstractMessageHandler(long timeout)
+	{
+		this(timeout, true);
+	}
+	
+	/**
+	 *  Create a new message handler.
+	 */
+	public AbstractMessageHandler(long timeout, boolean remove)
+	{
+		this(null, timeout, remove);
+	}
 	
 	/**
 	 *  Create a new message handler.
@@ -109,5 +132,5 @@ public abstract class AbstractMessageHandler implements IMessageHandler
 	/**
 	 *  Handle the message.
 	 */
-	public abstract void handleMessage(IInternalAccess ia, Map msg, MessageType type);
+	public abstract void handleMessage(Map msg, MessageType type);
 }
