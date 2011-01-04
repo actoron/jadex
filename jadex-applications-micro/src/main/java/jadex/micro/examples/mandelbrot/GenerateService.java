@@ -13,8 +13,6 @@ import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.service.BasicService;
-import jadex.commons.service.SServiceProvider;
-
 import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.Collection;

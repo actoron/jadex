@@ -12,7 +12,6 @@ import jadex.commons.collection.LRU;
 import jadex.commons.concurrent.CollectionResultListener;
 import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
-import jadex.commons.service.CacheServiceContainer;
 import jadex.commons.service.IServiceContainer;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.clock.IClockService;

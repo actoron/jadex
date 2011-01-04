@@ -11,7 +11,6 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.SGUI;
 import jadex.commons.concurrent.SwingDefaultResultListener;
-import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.clock.IClockService;
 
 import java.awt.BorderLayout;

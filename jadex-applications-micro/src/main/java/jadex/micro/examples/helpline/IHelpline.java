@@ -1,6 +1,5 @@
 package jadex.micro.examples.helpline;
 
-import jadex.commons.IFuture;
 import jadex.commons.IIntermediateFuture;
 
 /**

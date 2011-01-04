@@ -1,14 +1,10 @@
 package jadex.micro.examples.chat;
 
-import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IChangeListener;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.service.BasicService;
-import jadex.commons.service.SServiceProvider;
-import jadex.micro.IMicroExternalAccess;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;

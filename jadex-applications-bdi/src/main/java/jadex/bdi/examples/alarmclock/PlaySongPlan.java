@@ -2,7 +2,6 @@ package jadex.bdi.examples.alarmclock;
 
 import jadex.bdi.runtime.Plan;
 import jadex.commons.SUtil;
-import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.threadpool.IThreadPoolService;
 
 import java.io.BufferedInputStream;

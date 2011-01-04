@@ -9,7 +9,7 @@ import jadex.commons.service.IServiceContainer;
 /**
  *  Built-in JADE platform.
  */
-public class Platform extends jadex.base.Platform
+public class Platform
 {
 	//-------- constants --------
 
@@ -23,40 +23,6 @@ public class Platform extends jadex.base.Platform
 	
 	/** The platform agent. */
 	protected AID platformagent;
-	
-	//-------- constructors --------
-
-	/**
-	 *  Create a new Platform.
-	 */
-	public Platform(String conffile, ClassLoader classloader) throws Exception
-	{
-		this(new String[]{conffile}, classloader);
-	}
-	
-	/**
-	 *  Create a new Platform.
-	 */
-	public Platform(String[] conffiles, ClassLoader classloader) throws Exception
-	{
-		this(readProperties(conffiles, classloader));
-	}
-	
-	/**
-	 *  Create a new Platform.
-	 */
-	public Platform(Properties[] configurations)
-	{
-		this(configurations, null);
-	}
-	
-	/**
-	 *  Create a new Platform.
-	 */
-	public Platform(Properties[] configurations, IServiceContainer parent)
-	{
-		super(configurations, parent);
-	}
 
 	//-------- methods --------
 	
@@ -67,7 +33,7 @@ public class Platform extends jadex.base.Platform
 	{		
 		// Start Jade platform with platform agent
 		// This agent make accessible the platform controller
-		new Boot(new String[]{"-gui", "platform:jadex.jade.PlatformAgent"});
+		Boot.main(new String[]{"-gui", "platform:jadex.jade.PlatformAgent"});
 		// Hack! Busy waiting for platform agent init finished.
 		while(platformagent==null)
 		{

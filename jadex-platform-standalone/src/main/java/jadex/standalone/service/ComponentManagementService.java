@@ -9,7 +9,6 @@ import jadex.bridge.IExternalAccess;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.concurrent.DelegationResultListener;
-import jadex.commons.service.IServiceProvider;
 import jadex.standalone.ComponentAdapterFactory;
 import jadex.standalone.StandaloneComponentAdapter;
 

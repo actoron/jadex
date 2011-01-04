@@ -5,7 +5,6 @@ import jadex.commons.SUtil;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.service.RequiredServiceInfo;
-import jadex.commons.service.SServiceProvider;
 import jadex.micro.MicroAgent;
 import jadex.micro.MicroAgentMetaInfo;
 import jadex.micro.examples.chat.IChatService;

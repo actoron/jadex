@@ -6,7 +6,6 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.commons.jtable.ObjectTableModel;
-import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.clock.IClockService;
 
 import java.awt.Color;

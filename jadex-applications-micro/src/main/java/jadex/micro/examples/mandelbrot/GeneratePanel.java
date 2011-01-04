@@ -9,8 +9,6 @@ import jadex.commons.ChangeEvent;
 import jadex.commons.SGUI;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.gui.PropertiesPanel;
-import jadex.commons.service.SServiceProvider;
-
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;

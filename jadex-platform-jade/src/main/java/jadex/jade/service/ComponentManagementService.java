@@ -6,19 +6,19 @@ import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IComponentManagementService;
+import jadex.bridge.IExternalAccess;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.service.IService;
-import jadex.commons.service.IServiceProvider;
 import jadex.jade.ComponentAdapterFactory;
 import jadex.jade.JadeComponentAdapter;
 
 /**
- *  Built-in standalone agent platform, with only basic features.
- *  // todo: what about this property change support? where used?
+ *  JADE-specific component management service. 
  */
-public class ComponentManagementService extends jadex.base.service.cms.ComponentManagementService implements IComponentManagementService, IService
+public class ComponentManagementService extends jadex.base.service.cms.ComponentManagementService
+	implements IComponentManagementService, IService
 {
 	//-------- constructors --------
 
@@ -26,7 +26,7 @@ public class ComponentManagementService extends jadex.base.service.cms.Component
 	 *  Create a new component execution service.
 	 *  @param provider	The service provider.
 	 */
-	public ComponentManagementService(IServiceProvider provider)
+	public ComponentManagementService(IExternalAccess provider)
 	{
 		super(provider);
 	}
@@ -35,10 +35,12 @@ public class ComponentManagementService extends jadex.base.service.cms.Component
 	 *  Create a new component execution service.
 	 *  @param provider	The service provider.
 	 */
-	public ComponentManagementService(IServiceProvider provider, IComponentAdapter root)
+	public ComponentManagementService(IExternalAccess provider, IComponentAdapter root)
 	{
 		super(provider, root);
 	}
+	
+	//-------- IComponentManagementService  interface --------
 	
 	/**
 	 *  Get the component instance from an adapter.

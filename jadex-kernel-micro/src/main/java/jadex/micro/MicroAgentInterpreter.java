@@ -20,18 +20,13 @@ import jadex.commons.Future;
 import jadex.commons.IChangeListener;
 import jadex.commons.IFilter;
 import jadex.commons.IFuture;
-import jadex.commons.IResultCommand;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
-import jadex.commons.service.IRequiredServiceFetcher;
-import jadex.commons.service.IService;
 import jadex.commons.service.IServiceContainer;
 import jadex.commons.service.IServiceProvider;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.clock.ITimer;
-import jadex.commons.service.fetcher.DynamicServiceFetcher;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;

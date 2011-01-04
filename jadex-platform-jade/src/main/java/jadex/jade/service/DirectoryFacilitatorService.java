@@ -23,19 +23,14 @@ import jadex.base.fipa.IProperty;
 import jadex.base.fipa.SearchConstraints;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
-import jadex.bridge.IMessageService;
 import jadex.bridge.ISearchConstraints;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.SUtil;
-import jadex.commons.concurrent.DefaultResultListener;
-import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.service.BasicService;
-import jadex.commons.service.IService;
 import jadex.commons.service.IServiceProvider;
 import jadex.commons.service.SServiceProvider;
-import jadex.commons.service.clock.IClockService;
 import jadex.jade.Platform;
 import jadex.jade.SJade;
 
@@ -44,7 +39,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- *  Directory facilitator implementation for standalone platform.
+ *  Directory facilitator implementation for JADE platform.
  */
 public class DirectoryFacilitatorService extends BasicService implements IDF
 {
@@ -164,7 +159,7 @@ public class DirectoryFacilitatorService extends BasicService implements IDF
 		
 		try
 		{
-			platform.getPlatformController().getAgent("platform").putO2AObject(e, AgentController.ASYNC);
+			Platform.getPlatform().getPlatformController().getAgent("platform").putO2AObject(e, AgentController.ASYNC);
 		}
 		catch(Exception ex)
 		{
@@ -257,7 +252,7 @@ public class DirectoryFacilitatorService extends BasicService implements IDF
 		
 		try
 		{
-			platform.getPlatformController().getAgent("platform").putO2AObject(e, AgentController.ASYNC);
+			Platform.getPlatform().getPlatformController().getAgent("platform").putO2AObject(e, AgentController.ASYNC);
 		}
 		catch(Exception ex)
 		{
@@ -354,7 +349,7 @@ public class DirectoryFacilitatorService extends BasicService implements IDF
 		
 		try
 		{
-			platform.getPlatformController().getAgent("platform").putO2AObject(e, AgentController.ASYNC);
+			Platform.getPlatform().getPlatformController().getAgent("platform").putO2AObject(e, AgentController.ASYNC);
 		}
 		catch(Exception ex)
 		{
@@ -363,14 +358,33 @@ public class DirectoryFacilitatorService extends BasicService implements IDF
 		
 		return ret;
 	}
+	
+
 
 	/**
 	 *  Search for components matching the given description.
 	 *  @return An array of matching component descriptions. 
 	 */
-	public IFuture search(final IDFComponentDescription adesc, final ISearchConstraints con)
+	public IFuture search(IDFComponentDescription adesc, ISearchConstraints con)
+	{
+		return search(adesc, con, false);
+	}
+
+	/**
+	 *  Search for components matching the given description.
+	 *  @return An array of matching component descriptions. 
+	 */
+	public IFuture search(final IDFComponentDescription adesc, final ISearchConstraints con, boolean remote)
 	{
 		final Future ret	= new Future();
+		
+		// Todo: remote search!?
+		if(remote)
+		{
+			ret.setException(new UnsupportedOperationException("Remote DF search not supported in JADE."));
+			return ret;
+		}
+		
 		
 		Event e = new Event(-1, new SimpleBehaviour()
 		{
@@ -458,7 +472,7 @@ public class DirectoryFacilitatorService extends BasicService implements IDF
 		
 		try
 		{
-			platform.getPlatformController().getAgent("platform").putO2AObject(e, AgentController.ASYNC);
+			Platform.getPlatform().getPlatformController().getAgent("platform").putO2AObject(e, AgentController.ASYNC);
 		}
 		catch(Exception ex)
 		{
@@ -566,7 +580,7 @@ public class DirectoryFacilitatorService extends BasicService implements IDF
 	 *  @param name The name.
 	 *  @param local True for local name ().
 	 *  @return The new agent identifier.
-	 */
+	 * /
 	public IComponentIdentifier createComponentIdentifier(String name, boolean local)
 	{
 		return cms.createComponentIdentifier(name, local, null);
@@ -574,14 +588,14 @@ public class DirectoryFacilitatorService extends BasicService implements IDF
 //		if(local)
 //			name = name + "@" + platform.getName();
 //		return new AgentIdentifier(name);
-	}
+	}*/
 	
 	/**
 	 *  Create an agent identifier.
 	 *  @param name The name.
 	 *  @param local True for local name.
 	 *  @param addresses The addresses.
-	 */
+	 * /
 	public IComponentIdentifier createComponentIdentifier(String name, boolean local, String[] addresses)
 	{
 		return cms.createComponentIdentifier(name, local, addresses);
@@ -589,7 +603,7 @@ public class DirectoryFacilitatorService extends BasicService implements IDF
 //		if(local)
 //			name = name + "@" + platform.getName();
 //		return new AgentIdentifier(name, addresses, null);
-	}
+	}*/
 	
 	//-------- helper methods --------
 
