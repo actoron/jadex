@@ -12,7 +12,9 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.IMessageService;
 import jadex.bridge.IModelInfo;
 import jadex.bridge.MessageType;
+import jadex.commons.ComposedFilter;
 import jadex.commons.Future;
+import jadex.commons.IFilter;
 import jadex.commons.IFuture;
 import jadex.commons.IIntermediateFuture;
 import jadex.commons.IntermediateFuture;
@@ -390,9 +392,39 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	 *  @param me	The message content (name value pairs).
 	 *  @param mt	The message type describing the content.
 	 */
-	public IFuture sendMessageAndWait(final Map me, final MessageType mt, IMessageHandler handler)
+	public IFuture sendMessageAndWait(final Map me, final MessageType mt, final IMessageHandler handler)
 	{
-		addMessageHandler(handler);
+		addMessageHandler(new IMessageHandler()
+		{
+			IFilter filter = handler.getFilter()==null? 
+				(IFilter)new MessageConversationFilter(me, mt):
+				new ComposedFilter(new IFilter[]{new MessageConversationFilter(me, mt), handler.getFilter()});
+				
+			public long getTimeout()
+			{
+				return handler.getTimeout();
+			}	
+				
+			public boolean isRemove()
+			{
+				return handler.isRemove();
+			}
+			
+			public void handleMessage(Map msg, MessageType type)
+			{
+				handler.handleMessage(me, mt);
+			}
+			
+			public void timeoutOccurred()
+			{
+				handler.timeoutOccurred();
+			}
+			
+			public IFilter getFilter()
+			{
+				return filter;
+			}
+		});
 		return sendMessage(me, mt);
 	}
 	

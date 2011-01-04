@@ -38,6 +38,7 @@ public class ComposedFilter implements IFilter,	Serializable
 	 */
 	public ComposedFilter(IFilter[] filters)
 	{
+		this(filters, AND);
 	}
 	
 	/**

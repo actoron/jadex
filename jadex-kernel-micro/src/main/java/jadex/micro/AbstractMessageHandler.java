@@ -16,6 +16,9 @@ public abstract class AbstractMessageHandler implements IMessageHandler
 	/** The filter. */
 	protected IFilter filter;
 	
+	/** The timeout. */
+	protected long timeout;
+	
 	/** Flag if should be removed. */
 	protected boolean remove;
 	
@@ -26,17 +29,28 @@ public abstract class AbstractMessageHandler implements IMessageHandler
 	 */
 	public AbstractMessageHandler(IFilter filter)
 	{
-		this(filter, true);
+		this(filter, -1, true);
 	}
 	
 	/**
 	 *  Create a new message handler.
 	 */
-	public AbstractMessageHandler(IFilter filter, boolean remove)
+	public AbstractMessageHandler(IFilter filter, long timeout)
+	{
+		this(filter, timeout, true);
+	}
+	
+	/**
+	 *  Create a new message handler.
+	 */
+	public AbstractMessageHandler(IFilter filter, long timeout, boolean remove)
 	{
 		this.filter = filter;
+		this.timeout = timeout;
 		this.remove = remove;
 	}
+	
+	//-------- methods --------
 	
 	/**
 	 *  Get the filter.
@@ -46,7 +60,16 @@ public abstract class AbstractMessageHandler implements IMessageHandler
 	{
 		return filter;
 	}
-		
+	
+	/**
+	 *  Set the filter.
+	 *  @param filter The filter to set.
+	 */
+	public void setFilter(IFilter filter)
+	{
+		this.filter = filter;
+	}
+
 	/**
 	 *  Test if handler should be removed.
 	 *  @return True if it should be removed. 
@@ -56,6 +79,33 @@ public abstract class AbstractMessageHandler implements IMessageHandler
 		return remove;
 	}
 	
+	/**
+	 *  Set the remove.
+	 *  @param remove The remove to set.
+	 */
+	public void setRemove(boolean remove)
+	{
+		this.remove = remove;
+	}
+	
+	/**
+	 *  Get the timeout.
+	 *  @return the timeout.
+	 */
+	public long getTimeout()
+	{
+		return timeout;
+	}
+
+	/**
+	 *  Set the timeout.
+	 *  @param timeout The timeout to set.
+	 */
+	public void setTimeout(long timeout)
+	{
+		this.timeout = timeout;
+	}
+
 	/**
 	 *  Handle the message.
 	 */

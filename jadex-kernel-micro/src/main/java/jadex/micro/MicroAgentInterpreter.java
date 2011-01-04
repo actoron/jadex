@@ -295,7 +295,7 @@ public class MicroAgentInterpreter implements IComponentInstance
 						IMessageHandler mh = (IMessageHandler)messagehandlers.get(i);
 						if(mh.getFilter().filter(message))
 						{
-							mh.handleMessage(ia, message.getParameterMap(), message.getMessageType());
+							mh.handleMessage(message.getParameterMap(), message.getMessageType());
 							if(mh.isRemove())
 							{
 								messagehandlers.remove(i);
@@ -908,10 +908,25 @@ public class MicroAgentInterpreter implements IComponentInstance
 	 *  Add a message handler.
 	 *  @param  The handler.
 	 */
-	public void addMessageHandler(IMessageHandler handler)
+	public void addMessageHandler(final IMessageHandler handler)
 	{
 		if(messagehandlers==null)
 			messagehandlers = new ArrayList();
+		if(handler.getTimeout()>0)
+		{
+			microagent.waitFor(handler.getTimeout(), new IComponentStep()
+			{
+				public Object execute(IInternalAccess ia)
+				{
+					handler.timeoutOccurred();
+					if(handler.isRemove())
+					{
+						removeMessageHandler(handler);
+					}
+					return null;
+				}
+			});
+		}
 		messagehandlers.add(handler);
 	}
 	

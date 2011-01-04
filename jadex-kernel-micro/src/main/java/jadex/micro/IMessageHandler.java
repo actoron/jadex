@@ -1,6 +1,5 @@
 package jadex.micro;
 
-import jadex.bridge.IInternalAccess;
 import jadex.bridge.MessageType;
 import jadex.commons.IFilter;
 
@@ -18,6 +17,12 @@ public interface IMessageHandler
 	public IFilter getFilter();
 	
 	/**
+	 *  Get the timeout.
+	 *  @return The timeout.
+	 */
+	public long getTimeout();
+	
+	/**
 	 *  Test if handler should be removed.
 	 *  @return True if it should be removed. 
 	 */
@@ -29,6 +34,11 @@ public interface IMessageHandler
 	 *  @param msg The message.
 	 *  @param type The message type.
 	 */
-	public void handleMessage(IInternalAccess ia, Map msg, MessageType type);
+	public void handleMessage(Map msg, MessageType type);
+	
+	/**
+	 *  Timeout occurred.
+	 */
+	public void timeoutOccurred();
 
 }
