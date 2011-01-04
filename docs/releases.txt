@@ -2,6 +2,7 @@ Jadex Releases Overview
 
 Current
 	- Annotations for remote method invocations (jadex.base.service.remote.annotation)
+	- Message handlers and sendMessageAndWait() for micro agents
 	- Example project for use with eclipse/Maven
 	- Minor bug fixes
 
