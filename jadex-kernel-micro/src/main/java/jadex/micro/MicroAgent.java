@@ -12,6 +12,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.IMessageService;
 import jadex.bridge.IModelInfo;
 import jadex.bridge.MessageType;
+import jadex.bridge.MessageType.ParameterSpecification;
 import jadex.commons.ComposedFilter;
 import jadex.commons.Future;
 import jadex.commons.IFilter;
@@ -393,6 +394,16 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	 */
 	public IFuture sendMessageAndWait(final Map me, final MessageType mt, final IMessageHandler handler)
 	{
+		boolean hasconvid = false;
+		ParameterSpecification[] ps = mt.getConversationIdentifiers();
+		for(int i=0; i<ps.length && !hasconvid; i++)
+		{
+			if(me.get(ps[i].getName())!=null)
+				hasconvid = true;
+		}
+		if(!hasconvid)
+			throw new RuntimeException("Message has no conversation identifier set: "+me);
+		
 		addMessageHandler(new IMessageHandler()
 		{
 			IFilter filter = handler.getFilter()==null? 

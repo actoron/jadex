@@ -49,7 +49,7 @@ public class MessageConversationFilter implements IFilter
 				String scid = (String)message.get(ps[i].getSource());
 				if(scid!=null)
 				{
-					String rcid = (String)message.get(ps[i].getName());
+					String rcid = (String)reply.getValue(ps[i].getName());
 					ret = scid.equals(rcid);
 				}
 			}
