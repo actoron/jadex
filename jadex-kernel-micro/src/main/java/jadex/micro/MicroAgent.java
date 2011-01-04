@@ -412,7 +412,7 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 			
 			public void handleMessage(Map msg, MessageType type)
 			{
-				handler.handleMessage(me, mt);
+				handler.handleMessage(msg, type);
 			}
 			
 			public void timeoutOccurred()
