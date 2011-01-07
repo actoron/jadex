@@ -3,7 +3,6 @@ package jadex.standalone.service;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentAdapterFactory;
 import jadex.bridge.IComponentDescription;
-import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.Future;
@@ -97,16 +96,5 @@ public class ComponentManagementService extends jadex.base.service.cms.Component
 	public IComponentDescription getDescription(IComponentAdapter adapter)
 	{
 		return ((StandaloneComponentAdapter)adapter).getDescription();
-	}
-	
-	/**
-	 *  Get the component adapter for a component identifier.
-	 *  @param aid The component identifier.
-	 *  @param listener The result listener.
-	 */
-    // Todo: Hack!!! remove?
-	public StandaloneComponentAdapter getComponentAdapter(IComponentIdentifier cid)
-	{
-		return (StandaloneComponentAdapter)adapters.get(cid);
 	}
 }

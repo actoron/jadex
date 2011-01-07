@@ -1,5 +1,6 @@
 package jadex.base.service.cms;
 
+import jadex.base.AbstractComponentAdapter;
 import jadex.base.fipa.CMSComponentDescription;
 import jadex.base.fipa.SearchConstraints;
 import jadex.bridge.ComponentIdentifier;
@@ -43,7 +44,7 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 /**
- *  Standalone implementation of component execution service.
+ *  Abstract default implementation of component management service.
  */
 public abstract class ComponentManagementService extends BasicService implements IComponentManagementService
 {
@@ -1531,6 +1532,17 @@ public abstract class ComponentManagementService extends BasicService implements
 	}
 
 	
+	/**
+	 *  Get the component adapter for a component identifier.
+	 *  @param aid The component identifier.
+	 *  @param listener The result listener.
+	 */
+    // Todo: Hack!!! remove?
+	public AbstractComponentAdapter getComponentAdapter(IComponentIdentifier cid)
+	{
+		return (AbstractComponentAdapter)adapters.get(cid);
+	}
+
 	//-------- parent/child component accessors --------
 	
 	/**
