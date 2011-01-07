@@ -31,7 +31,7 @@ public interface IExecutionService	extends IService
 	 *  Cancel a task. Triggers the task to
 	 *  be not executed in future. 
 	 *  @param task The task to execute.
-	 *  @return Future signaling calcellation.
+	 *  @return Future signaling cancellation.
 	 */
 	public IFuture cancel(IExecutable task);
 	

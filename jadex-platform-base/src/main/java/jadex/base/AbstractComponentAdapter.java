@@ -421,6 +421,10 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	protected IFuture getCMS()
 	{
 		// Change comments below to test performance of cached cms vs. direct access.
+		if(getServiceContainer()==null)
+		{
+			System.out.println("container is null: "+component+", "+getComponentIdentifier());
+		}
 		return SServiceProvider.getServiceUpwards(getServiceContainer(), IComponentManagementService.class);
 //		final Future	ret	= new Future();
 //		if(cms==null)
@@ -462,7 +466,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	 *  Gracefully terminate the component.
 	 *  This method is called from ams and delegated to the reasoning engine,
 	 *  which might perform arbitrary cleanup actions, goals, etc.
-	 *  @param listener	When cleanup of the component is finished, the listener must be notified.
+	 *  @return A future top indicate, when cleanup of the component is finished.
 	 */
 	public IFuture killComponent()
 	{

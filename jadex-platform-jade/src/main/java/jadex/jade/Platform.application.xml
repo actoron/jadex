@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Bootstrap platform properties.
+  JADE platform properties.
 -->
 <applicationtype xmlns="http://jadex.sourceforge.net/jadex-application"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -10,8 +10,19 @@
 	
 	<imports>
 		<import>jadex.jade.service.*</import>
+		<import>java.util.*</import>
+		<import>jadex.commons.*</import>
 		<import>jadex.commons.service.library.*</import>
+		<import>jadex.commons.service.clock.*</import>
+		<import>jadex.commons.service.threadpool.*</import>
+		<import>jadex.commons.service.execution.*</import>
+		<import>jadex.commons.concurrent.*</import>
 		<import>jadex.application.*</import>
+		<import>jadex.application.space.envsupport.*</import>
+		<import>jadex.application.space.agr.*</import>
+		<import>jadex.bridge.*</import>
+		<import>jadex.base.fipa.*</import>
+		<import>jadex.base.service.remote.*</import>
 	</imports>
 	
 	<componenttypes>
@@ -23,35 +34,54 @@
 		<componenttype filename="jadex/base/service/awareness/AwarenessAgent.class" name="awa"/>
 
 		<componenttype filename="jadex/tools/jcc/JCC.agent.xml" name="jcc"/>
-		<componenttype filename="jadex/bdi/benchmarks/AgentCreation.agent.xml" name="CreationBDI"/>
-		<componenttype filename="jadex/micro/benchmarks/AgentCreationAgent.class" name="CreationMicro"/>
-		<componenttype filename="jadex/bpmn/benchmarks/AgentCreation2.bpmn" name="CreationBPMN"/>
 	</componenttypes>
 	
 	<services>
-		<service>
-			new LibraryService($args.libpath, $component.getComponentIdentifier(), null)
-				//SUtil.createHashMap(new Object[]{"componentviewer.viewerclass", 
-				//RemoteServiceManagementService.REMOTE_UNCACHED, RemoteServiceManagementService.REMOTE_EXCLUDED}, 
-				//new Object[]{"jadex.base.gui.componentviewer.libservice.LibServiceBrowser", 
-				//new String[]{"getClassLoader", "getURLs"}, new String[]{"addLibraryServiceListener", "removeLibraryServiceListener"}})
-				//)
-		</service>
+		<providedservice class="ILibraryService" direct="true">
+			new LibraryService($args.libpath, $component.getServiceProvider(), 
+				SUtil.createHashMap(new Object[]{"componentviewer.viewerclass", RemoteServiceManagementService.REMOTE_EXCLUDED}, 
+				new Object[]{"jadex.base.gui.componentviewer.libservice.LibServiceBrowser", new String[]{"getClassLoader"}})
+				)
+		</providedservice>
 	
-		<service>
-			new ComponentManagementService($component.getServiceProvider(), $component.getComponentAdapter())
-		</service>
+		<providedservice  class="IComponentManagementService" direct="true">
+			new ComponentManagementService($component.getExternalAccess(), $component.getComponentAdapter())
+		</providedservice>
 		
-		<service>
-			new ApplicationComponentFactory(null,
-				// new Set[]
-				// {
-				// 	MEnvSpaceType.getXMLMapping(),
-				// 	MAGRSpaceType.getXMLMapping()
-				// }, 
-				$component.getServiceProvider().getId()
+		<providedservice class="IComponentFactory" direct="true">
+			new ApplicationComponentFactory(
+				new Set[]
+				{
+					MEnvSpaceType.getXMLMapping(),
+					MAGRSpaceType.getXMLMapping()
+				}, 
+				$component.getServiceProvider()
 			)		
-		</service>
+		</providedservice>
+		
+		<providedservice class="IMessageService" direct="true">
+			new MessageService($component.getServiceProvider(),
+				new MessageType[]
+				{
+					new FIPAMessageType()
+				})
+		</providedservice>
+		
+		<providedservice class="IThreadPool" direct="true">
+			new ThreadPoolService(new ThreadPool(new DefaultThreadPoolStrategy(0, 20, 30000, 0)), $component.getServiceProvider())
+		</providedservice>
+		
+		<providedservice class="IClockService" direct="true">
+			 new ClockService(new ClockCreationInfo(IClock.TYPE_SYSTEM, "simulation_clock", System.currentTimeMillis(), 100), $component.getServiceProvider(),
+				SUtil.createHashMap(new Object[]{RemoteServiceManagementService.REMOTE_UNCACHED}, 
+				new Object[]{new String[]{"getState", "getTime", "getTick", "getStarttime", "getDelta", "getDilation", "getNextTimer", "getTimers", "getClockType", "advanceEvent"}}))
+		</providedservice>
+		
+		<providedservice class="IExecutionService" direct="true">
+			 new ExecutionService($component.getServiceProvider(), SUtil.createHashMap(new Object[]{
+				RemoteServiceManagementService.REMOTE_UNCACHED}, new Object[]{new String[]{"isIdle", "getTasks"}}))
+		</providedservice>
+		
 	</services>
 	
 	<applications>

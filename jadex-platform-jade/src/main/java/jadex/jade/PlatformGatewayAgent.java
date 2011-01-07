@@ -11,7 +11,7 @@ import jade.wrapper.gateway.GatewayAgent;
  *  agent-related functionalities like message sending.
  *  Is used via the JADE gateway method.
  */
-public class PlatformAgent extends GatewayAgent
+public class PlatformGatewayAgent extends GatewayAgent
 {
 	
     public void setup() 
@@ -27,8 +27,7 @@ public class PlatformAgent extends GatewayAgent
     	try
     	{
    			ComponentAdapterFactory.getInstance().setPlatformController(getContainerController().getPlatformController());
-   			Platform.getPlatform().setPlatformAgentController(getContainerController().getAgent(getLocalName()));
-   			ComponentAdapterFactory.getInstance().setPlatformAgent(getAID());
+   			ComponentAdapterFactory.getInstance().setGatewayAgent(getAID());
   	   	}
     	catch(Exception e)
     	{

@@ -181,20 +181,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 		fetcher.setValue("$properties", properties);
 		fetcher.setValue("$results", getResults());
 		fetcher.setValue("$component", ApplicationInterpreter.this);
-		ApplicationInterpreter.this.fetcher = fetcher;
-		
-		// Init service container.
-		MExpressionType mex = model.getContainer();
-		if(mex!=null)
-		{
-			container = (IServiceContainer)mex.getParsedValue().getValue(fetcher);
-		}
-		else
-		{
-//			container = new CacheServiceContainer(new ComponentServiceContainer(getComponentAdapter()), 25, 1*30*1000); // 30 secs cache expire
-			container = new ComponentServiceContainer(getComponentAdapter());
-		}
-		
+		ApplicationInterpreter.this.fetcher = fetcher;		
 		fetcher.setValue("$provider", getServiceProvider());
 		
 		// Schedule the futures (first) init step.
@@ -222,7 +209,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 //									System.out.println("creating decoupled service: "+st.getClassName());
 									service = DecouplingServiceInvocationInterceptor.createServiceProxy(getExternalAccess(), getComponentAdapter(), service);
 								}
-								container.addService(service);
+								getServiceContainer().addService(service);
 							}
 							catch(Exception e)
 							{
@@ -245,7 +232,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 										IComponentIdentifier cid = cms.createComponentIdentifier(st.getComponentName(), st.getComponentName().indexOf("@")==-1);
 										IInternalService service = CompositeServiceInvocationInterceptor.createServiceProxy(st.getClazz(), null, 
 											(IApplicationExternalAccess)getExternalAccess(), getModel().getClassLoader(), cid);
-										container.addService(service);
+										getServiceContainer().addService(service);
 										futu.setResult(null);
 									}
 								}));
@@ -262,7 +249,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 //									new CompositeServiceInvocationInterceptor((IApplicationExternalAccess)getExternalAccess(), componenttype, st.getClazz()));
 								service = CompositeServiceInvocationInterceptor.createServiceProxy(st.getClazz(), st.getComponentType(), 
 									(IApplicationExternalAccess)getExternalAccess(), getModel().getClassLoader(), null);
-								container.addService(service);
+								getServiceContainer().addService(service);
 							}
 						}
 						
@@ -316,7 +303,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 				{
 					public Object execute(IInternalAccess ia)
 					{
-						container.start().addResultListener(new ComponentResultListener(new IResultListener()
+						getServiceContainer().start().addResultListener(new ComponentResultListener(new IResultListener()
 						{
 							public void resultAvailable(Object result)
 							{
@@ -418,7 +405,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 					{
 						IInternalService service = CompositeServiceInvocationInterceptor.createServiceProxy(servicetype, ct.getName(), 
 							(IApplicationExternalAccess)getExternalAccess(), getModel().getClassLoader(), null);
-						container.addService(service);
+						getServiceContainer().addService(service);
 						ret.setResult(result);
 					}
 					else if(i+1<componenttypes.size())
@@ -1441,7 +1428,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 	 */
 	public IServiceProvider getServiceProvider()
 	{
-		return container;
+		return getServiceContainer();
 	}
 	
 	/**
@@ -1450,6 +1437,20 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 	 */
 	public IServiceContainer getServiceContainer()
 	{
+		if(container==null)
+		{
+			// Init service container.
+			MExpressionType mex = model.getContainer();
+			if(mex!=null)
+			{
+				container = (IServiceContainer)mex.getParsedValue().getValue(fetcher);
+			}
+			else
+			{
+//				container = new CacheServiceContainer(new ComponentServiceContainer(getComponentAdapter()), 25, 1*30*1000); // 30 secs cache expire
+				container = new ComponentServiceContainer(getComponentAdapter());
+			}			
+		}
 		return container;
 	}
 	

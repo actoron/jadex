@@ -11,7 +11,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IModelInfo;
 
 /**
- *  Standalone version of the adapter factory.
+ *  JADE version of the adapter factory.
  */
 public class ComponentAdapterFactory implements IComponentAdapterFactory
 {
@@ -23,8 +23,8 @@ public class ComponentAdapterFactory implements IComponentAdapterFactory
 	
 	//-------- attributes --------
 	
-	/** The platform agent. */
-	protected AID platformagent;
+	/** The gateway agent. */
+	protected AID gatewayagent;
 	
 	/** The container controller. */
 	protected PlatformController controller;
@@ -42,11 +42,11 @@ public class ComponentAdapterFactory implements IComponentAdapterFactory
 			FACTORY	= this;
 		}
 		
-		// Start Jade platform with platform agent
-		// This agent make accessible the platform controller
-		Boot.main(new String[]{"-gui", "platform:jadex.jade.PlatformAgent"});
-		// Hack! Busy waiting for platform agent init finished.
-		while(platformagent==null)
+		// Start Jade platform with gateway agent
+		// This agent makes accessible the platform controller
+		Boot.main(new String[]{"-gui", "jadexgateway:jadex.jade.PlatformGatewayAgent"});
+		// Hack! Busy waiting for gateway agent init finished.
+		while(gatewayagent==null)
 		{
 			System.out.print(".");
 			try
@@ -81,10 +81,21 @@ public class ComponentAdapterFactory implements IComponentAdapterFactory
 	 */
 	public boolean executeStep(IComponentAdapter adapter)
 	{
-		return ((JadeComponentAdapter)adapter).execute();
+//		return ((JadeComponentAdapter)adapter).execute();
+		// Automatically executed by JADE agent.
+		return false;
 	}
 	
 	//-------- methods --------
+	
+	/**
+	 *  Set the platform controller.
+	 *  @param controller The platform controller.
+	 */
+	protected void setPlatformController(PlatformController controller)
+	{
+		this.controller = controller;
+	}
 	
 	/**
 	 *  Get the platform controller.
@@ -95,31 +106,21 @@ public class ComponentAdapterFactory implements IComponentAdapterFactory
 	}
 	
 	/**
-	 *  Set the platform agent.
+	 *  Set the platform gateway agent.
 	 */
-	protected void	setPlatformAgent(AID platformagent)
+	protected void	setGatewayAgent(AID gatewayagent)
 	{
-		this.platformagent	= platformagent;
+		this.gatewayagent	= gatewayagent;
 	}
 	
 	/**
-	 *  Get the platformagent.
-	 *  @return the platformagent.
+	 *  Get the gatewayagent.
+	 *  @return the gatewayagent.
 	 */
-	public AID getPlatformAgent()
+	public AID getGatewayAgent()
 	{
-		return platformagent;
+		return gatewayagent;
 	}
-
-	/**
-	 *  Set the platform controller.
-	 *  @param controller The platform controller.
-	 */
-	protected void setPlatformController(PlatformController controller)
-	{
-		this.controller = controller;
-	}
-
 	
 	/**
 	 *  Get the global factory.

@@ -10,6 +10,7 @@ import jade.lang.acl.ACLMessage;
 import jadex.base.fipa.CMSComponentDescription;
 import jadex.base.fipa.DFComponentDescription;
 import jadex.base.fipa.SFipa;
+import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.MessageType;
@@ -133,26 +134,26 @@ public class SJade
 		
 		STATES_MAP_TO_FIPA = SCollection.createHashMap();
 		STATES_MAP_TO_FIPA.put(jade.domain.FIPAAgentManagement.AMSAgentDescription.ACTIVE, 
-			CMSComponentDescription.STATE_ACTIVE);
+			IComponentDescription.STATE_ACTIVE);
 		STATES_MAP_TO_FIPA.put(jade.domain.FIPAAgentManagement.AMSAgentDescription.SUSPENDED, 
-			CMSComponentDescription.STATE_SUSPENDED);
+			IComponentDescription.STATE_SUSPENDED);
 		STATES_MAP_TO_FIPA.put(jade.domain.FIPAAgentManagement.AMSAgentDescription.INITIATED, 
-			CMSComponentDescription.STATE_INITIATED);
-		STATES_MAP_TO_FIPA.put(jade.domain.FIPAAgentManagement.AMSAgentDescription.WAITING, 
-			CMSComponentDescription.STATE_WAITING);
+			IComponentDescription.STATE_INITIATED);
+//		STATES_MAP_TO_FIPA.put(jade.domain.FIPAAgentManagement.AMSAgentDescription.WAITING, 
+//			IComponentDescription.STATE_WAITING);
 		STATES_MAP_TO_FIPA.put(jade.domain.FIPAAgentManagement.AMSAgentDescription.TRANSIT, 
-			CMSComponentDescription.STATE_TRANSIT);
+			IComponentDescription.STATE_TRANSIT);
 		
 		STATES_MAP_TO_JADE = SCollection.createHashMap();
-		STATES_MAP_TO_JADE.put(CMSComponentDescription.STATE_ACTIVE, 
+		STATES_MAP_TO_JADE.put(IComponentDescription.STATE_ACTIVE, 
 			jade.domain.FIPAAgentManagement.AMSAgentDescription.ACTIVE);
-		STATES_MAP_TO_JADE.put(CMSComponentDescription.STATE_SUSPENDED,
+		STATES_MAP_TO_JADE.put(IComponentDescription.STATE_SUSPENDED,
 			jade.domain.FIPAAgentManagement.AMSAgentDescription.SUSPENDED);
-		STATES_MAP_TO_JADE.put(CMSComponentDescription.STATE_INITIATED,
+		STATES_MAP_TO_JADE.put(IComponentDescription.STATE_INITIATED,
 			jade.domain.FIPAAgentManagement.AMSAgentDescription.INITIATED);
-		STATES_MAP_TO_JADE.put(CMSComponentDescription.STATE_WAITING,
-			jade.domain.FIPAAgentManagement.AMSAgentDescription.WAITING);
-		STATES_MAP_TO_JADE.put(CMSComponentDescription.STATE_TRANSIT,
+//		STATES_MAP_TO_JADE.put(CMSComponentDescription.STATE_WAITING,
+//			jade.domain.FIPAAgentManagement.AMSAgentDescription.WAITING);
+		STATES_MAP_TO_JADE.put(IComponentDescription.STATE_TRANSIT,
 			jade.domain.FIPAAgentManagement.AMSAgentDescription.TRANSIT);
 	}
 	

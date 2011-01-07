@@ -33,20 +33,15 @@ public class MoveTask extends AbstractTask
 	 */
 	public void execute(IEnvironmentSpace space, ISpaceObject obj, long progress, IClockService clock)
 	{
-		IVector2 destination = (IVector2)getProperty(PROPERTY_DESTINATION);
-
-		double	speed	= ((Number)obj.getProperty(PROPERTY_SPEED)).doubleValue();
-		double	maxdist	= progress*speed*0.001;
+		IVector2	destination	= (IVector2)getProperty("destination");
 		IVector2	loc	= (IVector2)obj.getProperty(Space2D.PROPERTY_POSITION);
-		// Todo: how to handle border conditions!?
+		double	speed	= ((Number)obj.getProperty("speed")).doubleValue();
 		IVector2	direction	= destination.copy().subtract(loc).normalize();
-		IVector2	newloc	= ((Space2D)space).getDistance(loc, destination).getAsDouble()<=maxdist
-			? destination : direction.multiply(maxdist).add(loc);
-
-//		System.out.println("Move task: "+destination+", "+newloc+", "+destination.hashCode()+", "+newloc.hashCode());
-
-		((Space2D)space).setPosition(obj.getId(), newloc);
-		
+		double	dist	= ((Space2D)space).getDistance(loc,destination).getAsDouble();
+		double	maxdist	= progress*speed*0.001;
+		IVector2	newloc	= dist<=maxdist ? destination
+			: direction.multiply(maxdist).add(loc);
+		((Space2D)space).setPosition(obj.getId(), newloc);		
 		if(newloc==destination)
 			setFinished(space, obj, true);
 	}

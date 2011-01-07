@@ -33,7 +33,7 @@ public class ClearChemicalsTask extends AbstractTask
 	 */
 	public void execute(IEnvironmentSpace space, ISpaceObject obj, long progress, IClockService clock)
 	{
-		// Check if engine object is in range of chemicals.
+		// Check if brigade object is in range of chemicals.
 		Space2D	space2d	= (Space2D)space;
 		ISpaceObject	disaster	= (ISpaceObject)getProperty(PROPERTY_DISASTER);
 		double	range	= ((Number)disaster.getProperty("size")).intValue()/2 * 0.005;	// 0.005 = scale of drawsize in application.xml

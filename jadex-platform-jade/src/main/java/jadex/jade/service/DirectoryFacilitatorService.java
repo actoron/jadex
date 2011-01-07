@@ -31,7 +31,7 @@ import jadex.commons.concurrent.IResultListener;
 import jadex.commons.service.BasicService;
 import jadex.commons.service.IServiceProvider;
 import jadex.commons.service.SServiceProvider;
-import jadex.jade.Platform;
+import jadex.jade.ComponentAdapterFactory;
 import jadex.jade.SJade;
 
 import java.util.Date;
@@ -159,7 +159,7 @@ public class DirectoryFacilitatorService extends BasicService implements IDF
 		
 		try
 		{
-			Platform.getPlatform().getPlatformController().getAgent("platform").putO2AObject(e, AgentController.ASYNC);
+			ComponentAdapterFactory.getInstance().getPlatformController().getAgent("platform").putO2AObject(e, AgentController.ASYNC);
 		}
 		catch(Exception ex)
 		{
@@ -252,7 +252,7 @@ public class DirectoryFacilitatorService extends BasicService implements IDF
 		
 		try
 		{
-			Platform.getPlatform().getPlatformController().getAgent("platform").putO2AObject(e, AgentController.ASYNC);
+			ComponentAdapterFactory.getInstance().getPlatformController().getAgent("platform").putO2AObject(e, AgentController.ASYNC);
 		}
 		catch(Exception ex)
 		{
@@ -349,7 +349,7 @@ public class DirectoryFacilitatorService extends BasicService implements IDF
 		
 		try
 		{
-			Platform.getPlatform().getPlatformController().getAgent("platform").putO2AObject(e, AgentController.ASYNC);
+			ComponentAdapterFactory.getInstance().getPlatformController().getAgent("platform").putO2AObject(e, AgentController.ASYNC);
 		}
 		catch(Exception ex)
 		{
@@ -472,7 +472,7 @@ public class DirectoryFacilitatorService extends BasicService implements IDF
 		
 		try
 		{
-			Platform.getPlatform().getPlatformController().getAgent("platform").putO2AObject(e, AgentController.ASYNC);
+			ComponentAdapterFactory.getInstance().getPlatformController().getAgent("platform").putO2AObject(e, AgentController.ASYNC);
 		}
 		catch(Exception ex)
 		{

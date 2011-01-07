@@ -1,5 +1,6 @@
 package jadex.jade;
 
+import jade.wrapper.AgentController;
 import jade.wrapper.ControllerException;
 import jadex.base.AbstractComponentAdapter;
 import jadex.bridge.IComponentAdapter;
@@ -7,6 +8,9 @@ import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IModelInfo;
+import jadex.commons.Future;
+import jadex.commons.IFuture;
+import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IExecutable;
 
 import java.io.Serializable;
@@ -33,7 +37,8 @@ public class JadeComponentAdapter	extends AbstractComponentAdapter	implements IC
 		
 		try
 		{
-			factory.getPlatformController().createNewAgent(desc.getName().getLocalName(), ComponentAgent.class.getName(), new Object[]{this});
+			AgentController	ac	= factory.getPlatformController().createNewAgent(desc.getName().getLocalName(), ComponentAgent.class.getName(), new Object[]{this});
+			ac.start();
 		}
 		catch(ControllerException e)
 		{
@@ -46,11 +51,32 @@ public class JadeComponentAdapter	extends AbstractComponentAdapter	implements IC
 	/**
 	 *  Wake up this component.
 	 */
-	protected void	doWakeup()
+	public void	doWakeup()
 	{
 		// Todo: What if agent isn't yet available!? 
 		if(agent!=null)
 			agent.wakeup();
+	}
+	
+	/**
+	 *  Gracefully terminate the component.
+	 *  This method is called from ams and delegated to the reasoning engine,
+	 *  which might perform arbitrary cleanup actions, goals, etc.
+	 *  @return A future top indicate, when cleanup of the component is finished.
+	 */
+	public IFuture killComponent()
+	{
+		// Overridden to kill JADE agent, when component has terminated.
+		Future	ret	= new Future();
+		super.killComponent().addResultListener(new DelegationResultListener(ret)
+		{
+			public void customResultAvailable(Object result)
+			{
+				agent.doDelete();
+				super.customResultAvailable(result);
+			}
+		});
+		return ret;
 	}
 	
 	//-------- methods --------
@@ -60,7 +86,6 @@ public class JadeComponentAdapter	extends AbstractComponentAdapter	implements IC
 	 */
 	protected void setJadeAgent(ComponentAgent agent)
 	{
-		System.out.println("Agent is: "+agent);
 		this.agent	= agent;
 	}
 

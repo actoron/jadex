@@ -33,7 +33,7 @@ public class ExtinguishFireTask extends AbstractTask
 	 */
 	public void execute(IEnvironmentSpace space, ISpaceObject obj, long progress, IClockService clock)
 	{
-		// Check if engine object is in range of fire.
+		// Check if brigade object is in range of fire.
 		Space2D	space2d	= (Space2D)space;
 		ISpaceObject	disaster	= (ISpaceObject)getProperty(PROPERTY_DISASTER);
 		double	range	= ((Number)disaster.getProperty("size")).intValue()/2 * 0.005;	// 0.005 = scale of drawsize in application.xml

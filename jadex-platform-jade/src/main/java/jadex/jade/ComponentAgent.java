@@ -36,6 +36,15 @@ public class ComponentAgent extends Agent
 	 */
 	public void	wakeup()
 	{
-		execution.restart();
+		if(execution!=null)
+			execution.restart();
+	}
+
+	/**
+	 *  Cancel agent execution.
+	 */
+	public void cancel()
+	{
+		execution.cancel();
 	}
 }

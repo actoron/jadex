@@ -48,7 +48,7 @@ import jadex.commons.service.IServiceProvider;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.clock.IClockService;
 import jadex.jade.ComponentAdapterFactory;
-import jadex.jade.JadeAgentAdapter;
+import jadex.jade.ComponentAgent;
 import jadex.jade.JadeComponentAdapter;
 import jadex.jade.SJade;
 
@@ -237,7 +237,7 @@ public class MessageService  extends BasicService implements IMessageService
 					create.addArguments(aca.getConfiguration()!=null ? aca.getConfiguration() : "");
 					if(aca.getArguments()!=null)
 						create.addArguments(aca.getArguments());
-					create.setClassName(JadeAgentAdapter.class.getName());
+					create.setClassName(ComponentAgent.class.getName());
 					if(aca.isSuspend())
 						throw new RuntimeException("Delayed agent start not yet supported.");
 
@@ -426,7 +426,7 @@ public class MessageService  extends BasicService implements IMessageService
 	public String[] getAddresses()
 	{
 		// Hack! Should be looked up dynamically.
-		return ComponentAdapterFactory.getInstance().getPlatformAgent().getAddressesArray();
+		return ComponentAdapterFactory.getInstance().getGatewayAgent().getAddressesArray();
 	}
 	
 	/**

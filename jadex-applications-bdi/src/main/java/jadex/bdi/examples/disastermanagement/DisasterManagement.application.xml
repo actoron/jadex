@@ -40,7 +40,7 @@
 				</env:objecttype>
 
 				<env:objecttype name="firestation"/>
-				<env:objecttype name="fireengine">
+				<env:objecttype name="firebrigade">
 					<env:property name="speed" class="double">0.05</env:property>
 					<env:property name="extinguished" class="double">0</env:property>
 					<env:property name="cleared" class="double">0</env:property>
@@ -79,7 +79,7 @@
 			</env:dataviews>
 			
 			<env:avatarmappings>
-				<env:avatarmapping objecttype="fireengine" componenttype="FireEngine" createavatar="false" createcomponent="true"/>
+				<env:avatarmapping objecttype="firebrigade" componenttype="FireBrigade" createavatar="false" createcomponent="true"/>
 				<env:avatarmapping objecttype="ambulance" componenttype="Ambulance" createavatar="false" createcomponent="true"/>
 			</env:avatarmappings>
 			
@@ -112,8 +112,8 @@
 						<env:texturedrectangle layer="4" height="1" width="1" imagepath="jadex/bdi/examples/disastermanagement/images/firestation.png"/>
 					</env:drawable>
 					
-					<env:drawable objecttype="fireengine" width="0.05" height="0.05">
-						<env:texturedrectangle layer="3" height="1" width="1" imagepath="jadex/bdi/examples/disastermanagement/images/fireengine.png"/>
+					<env:drawable objecttype="firebrigade" width="0.05" height="0.05">
+						<env:texturedrectangle layer="3" height="1" width="1" imagepath="jadex/bdi/examples/disastermanagement/images/firebrigade.png"/>
 						<env:texturedrectangle layer="3" height="0.4" width="0.4" x="-0.2" y="-0.35" imagepath="jadex/bdi/examples/disastermanagement/images/beacon.png">
 							<env:drawcondition>"moving_to_disaster".equals($object.getProperty("state"))</env:drawcondition>
 						</env:texturedrectangle>
@@ -163,9 +163,9 @@
 	</spacetypes>
 	
 	<componenttypes>
-		<componenttype name="FireEngine" filename="jadex/bdi/examples/disastermanagement/fireengine/FireEngine.agent.xml"/>
-		<componenttype name="Commander" filename="jadex/bdi/examples/disastermanagement/commander/Commander.agent.xml"/>
-		<componenttype name="Ambulance" filename="jadex/bdi/examples/disastermanagement/ambulance/Ambulance.agent.xml"/>
+		<componenttype name="FireBrigade" filename="firebrigade/FireBrigade.agent.xml"/>
+		<componenttype name="Commander" filename="commander/Commander.agent.xml"/>
+		<componenttype name="Ambulance" filename="ambulance/Ambulance.agent.xml"/>
 	</componenttypes>
 
 	<applications>
@@ -173,19 +173,19 @@
 			<spaces>
 				<env:envspace name="my2dspace" type="2dspace">
 					<env:objects>
-						<!-- Firestation with 3 engines -->
+						<!-- Firestation with 3 brigades -->
 						<env:object type="firestation">
 							<env:property name="position">new Vector2Double(0.8, 0.4)</env:property>
 						</env:object>
-						<env:object type="fireengine" number="3">
+						<env:object type="firebrigade" number="3">
 							<env:property name="position">new Vector2Double(0.8, 0.4)</env:property>
 						</env:object>
 						
-						<!-- Firestation with 3 engines -->
+						<!-- Firestation with 3 brigades -->
 						<env:object type="firestation">
 							<env:property name="position">new Vector2Double(0.2, 0.7)</env:property>
 						</env:object>
-						<env:object type="fireengine" number="3">
+						<env:object type="firebrigade" number="3">
 							<env:property name="position">new Vector2Double(0.2, 0.7)</env:property>
 						</env:object>
 						

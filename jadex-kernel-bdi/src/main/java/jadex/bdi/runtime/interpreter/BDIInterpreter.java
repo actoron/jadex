@@ -202,7 +202,6 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 	{	
 		this.initthread = Thread.currentThread();
 		
-		this.adapter = factory.createComponentAdapter(desc, model.getModelInfo(), this, parent);
 		this.state = state;
 		this.model = model;
 		this.parent	= parent;
@@ -263,8 +262,6 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 		
 		// Set up initial state of agent
 		ragent = state.createRootObject(OAVBDIRuntimeModel.agent_type);
-		state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_name, adapter.getComponentIdentifier().getName());
-		state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_localname, adapter.getComponentIdentifier().getLocalName());
 		state.setAttributeValue(ragent, OAVBDIRuntimeModel.element_has_model, model.getHandle());
 		state.setAttributeValue(ragent, OAVBDIRuntimeModel.capability_has_configuration, config);
 		if(arguments!=null && !arguments.isEmpty())
@@ -284,6 +281,10 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 			if(mps!=null)
 				microplansteps = mps.booleanValue();
 		}
+		
+		this.adapter = factory.createComponentAdapter(desc, model.getModelInfo(), this, parent);
+//		state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_name, adapter.getComponentIdentifier().getName());
+//		state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_localname, adapter.getComponentIdentifier().getLocalName());
 		
 		this.initthread = null;
 	}

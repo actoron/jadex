@@ -93,8 +93,10 @@ public abstract class AbstractModelLoader
 
 		for(int ex=0; (ret==null || ret.getInputStream()==null) && ex<extensions.length; ex++)
 		{
+			// Strip extension if present.
+			String	tname	= name.endsWith(extensions[ex]) ? name.substring(0, name.length()-extensions[ex].length()) : name;
 			// Fully qualified package name? Can also be full package name with empty package ;-)
-			String	resstr	= SUtil.replace(name, ".", "/") + extensions[ex];
+			String resstr	= SUtil.replace(tname, ".", "/") + extensions[ex];
 			ret	= SUtil.getResourceInfo0(resstr, classloader);
 
 			// Try to find in imports.
@@ -104,11 +106,11 @@ public abstract class AbstractModelLoader
 				if(imports[i].endsWith(".*"))
 				{
 					resstr = SUtil.replace(imports[i].substring(0,
-						imports[i].length()-1), ".", "/") + name + extensions[ex];
+						imports[i].length()-1), ".", "/") + tname + extensions[ex];
 					ret	= SUtil.getResourceInfo0(resstr, classloader);
 				}
 				// Direct import
-				else if(imports[i].endsWith(name))
+				else if(imports[i].endsWith(tname))
 				{
 					resstr = SUtil.replace(imports[i], ".", "/") + extensions[ex];
 					ret	= SUtil.getResourceInfo0(resstr, classloader);
