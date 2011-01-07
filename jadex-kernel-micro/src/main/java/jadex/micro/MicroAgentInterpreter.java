@@ -18,7 +18,6 @@ import jadex.bridge.IModelInfo;
 import jadex.commons.ChangeEvent;
 import jadex.commons.Future;
 import jadex.commons.IChangeListener;
-import jadex.commons.IFilter;
 import jadex.commons.IFuture;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.DelegationResultListener;
@@ -103,7 +102,6 @@ public class MicroAgentInterpreter implements IComponentInstance
 		this.parent = parent;
 		// synchronized because of MicroAgentViewPanel, todo
 		this.steps	= Collections.synchronizedList(new ArrayList());
-		this.adapter = factory.createComponentAdapter(desc, model, this, parent);
 		
 		// Init the arguments with default values.
 		IArgument[] args = model.getArguments();
@@ -139,6 +137,8 @@ public class MicroAgentInterpreter implements IComponentInstance
 //			microagent = (MicroAgent)model.getMicroAgentClass().newInstance();
 			microagent = (MicroAgent)microclass.newInstance();
 			microagent.init(MicroAgentInterpreter.this);
+
+			this.adapter = factory.createComponentAdapter(desc, model, this, parent);
 			
 			// Schedule initial step.
 			addStep(new Object[]{new IComponentStep()

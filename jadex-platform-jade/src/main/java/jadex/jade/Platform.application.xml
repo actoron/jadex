@@ -85,9 +85,14 @@
 	</services>
 	
 	<applications>
-		<application name="test">
+		<application name="all kernels">
 			<components>
+				<component name="kernel_micro" type="kernel_micro" daemon="true"/>
+				<!-- <component type="kernel_bdi" daemon="true"/> -->
 				<component name="kernel_bdibpmn" type="kernel_bdibpmn" daemon="true"/>
+				<component name="kernel_bpmn" type="kernel_bpmn" daemon="true"/>
+				<component name="rms" type="rms" daemon="true"/>
+				<component name="awa" type="awa"/>
 				<component name="jcc" type="jcc"/>
 			</components>
 		</application>

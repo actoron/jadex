@@ -154,7 +154,7 @@ public class JadeMessageAdapter implements IMessageAdapter
 	 */
 	public Map getParameterMap()
 	{
-		Map ret = (Map)((HashMap)decvals).clone();
+		Map ret = decvals!=null ? (Map)((HashMap)decvals).clone() : new HashMap();
 		if(!ret.containsKey(SFipa.ENCODING))
 		{
 			ret.put(SFipa.ENCODING, message.getEncoding());
