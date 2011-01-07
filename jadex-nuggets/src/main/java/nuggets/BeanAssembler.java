@@ -314,7 +314,7 @@ public class BeanAssembler implements IAssembler
 		}
 		try
 		{
-			if(pack != null && tag.indexOf('.') < 0)
+			if(pack != null)// && tag.indexOf('.') < 0)
 				return Class.forName(pack + '.' + tag, true, classloader);
 //				return classloader.loadClass(pack + '.' + tag); 
 		}
