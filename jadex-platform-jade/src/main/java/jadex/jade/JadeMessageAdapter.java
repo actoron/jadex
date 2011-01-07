@@ -3,7 +3,6 @@ package jadex.jade;
 import jade.core.AID;
 import jade.lang.acl.ACLMessage;
 import jadex.base.fipa.SFipa;
-import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.MessageType;
 
@@ -23,8 +22,6 @@ public class JadeMessageAdapter implements IMessageAdapter
 	/** The message. */
 	protected ACLMessage message;
 	
-	protected IComponentManagementService ams;
-	
 	protected Map decvals;
 
 	//-------- constructors --------
@@ -32,10 +29,9 @@ public class JadeMessageAdapter implements IMessageAdapter
 	/**
 	 *  Create a new message adapter.
 	 */
-	public JadeMessageAdapter(ACLMessage message, IComponentManagementService ams)//, IJadexAgent agent)
+	public JadeMessageAdapter(ACLMessage message)
 	{
 		this.message = message;
-		this.ams = ams;
 	}
 
 	//-------- methods --------
@@ -115,13 +111,13 @@ public class JadeMessageAdapter implements IMessageAdapter
 		}
 		else if(name.equals(SFipa.SENDER))
 		{
-			ret = SJade.convertAIDtoFipa(message.getSender(), ams);
+			ret = SJade.convertAIDtoFipa(message.getSender());
 		}
 		else if(name.equals(SFipa.REPLY_TO))
 		{
 			Iterator	it	= message.getAllReplyTo();
 			if(it.hasNext())
-				ret	= SJade.convertAIDtoFipa((AID)it.next(), ams);
+				ret	= SJade.convertAIDtoFipa((AID)it.next());
 			if(it.hasNext())
 				System.out.println("Ignoring additional reply tos of message: "+message);
 				//jadexagent.getLogger().warning("Ignoring additional reply tos of message: "+message);
@@ -139,7 +135,7 @@ public class JadeMessageAdapter implements IMessageAdapter
 					}
 					public Object next()
 					{
-						return SJade.convertAIDtoFipa((AID)it.next(), ams);
+						return SJade.convertAIDtoFipa((AID)it.next());
 					}
 					public void remove()
 					{
@@ -201,14 +197,14 @@ public class JadeMessageAdapter implements IMessageAdapter
 		}
 		if(!ret.containsKey(SFipa.SENDER))
 		{
-			ret.put(SFipa.SENDER, SJade.convertAIDtoFipa(message.getSender(), ams));
+			ret.put(SFipa.SENDER, SJade.convertAIDtoFipa(message.getSender()));
 		}
 		if(!ret.containsKey(SFipa.REPLY_TO))
 		{
 			List repto = new ArrayList();
 			Iterator	it	= message.getAllReplyTo();
 			if(it.hasNext())
-				repto.add(SJade.convertAIDtoFipa((AID)it.next(), ams));
+				repto.add(SJade.convertAIDtoFipa((AID)it.next()));
 			
 			if(repto.size()>0)
 				ret.put(SFipa.REPLY_TO, repto);
@@ -218,7 +214,7 @@ public class JadeMessageAdapter implements IMessageAdapter
 			List recs = new ArrayList();
 			Iterator	it	= message.getAllReceiver();
 			if(it.hasNext())
-				recs.add(SJade.convertAIDtoFipa((AID)it.next(), ams));
+				recs.add(SJade.convertAIDtoFipa((AID)it.next()));
 			
 			if(recs.size()>0)
 				ret.put(SFipa.RECEIVERS, recs);

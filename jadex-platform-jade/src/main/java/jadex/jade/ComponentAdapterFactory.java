@@ -3,6 +3,8 @@ package jadex.jade;
 import jade.Boot;
 import jade.core.AID;
 import jade.wrapper.PlatformController;
+import jadex.base.fipa.CMSComponentDescription;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentAdapterFactory;
 import jadex.bridge.IComponentDescription;
@@ -71,6 +73,12 @@ public class ComponentAdapterFactory implements IComponentAdapterFactory
 	 */
 	public IComponentAdapter createComponentAdapter(IComponentDescription desc, IModelInfo model, IComponentInstance instance, IExternalAccess parent)
 	{
+		// Change name of root component to match JADE platform name (hack!!!).
+		if(desc.getParent()==null)
+		{
+			((CMSComponentDescription)desc).setName(new ComponentIdentifier(gatewayagent.getHap()));
+		}
+		
 		return new JadeComponentAdapter(desc, model, instance, parent, this);
 	}
 	

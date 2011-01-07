@@ -22,15 +22,12 @@ import jadex.base.fipa.IDFServiceDescription;
 import jadex.base.fipa.IProperty;
 import jadex.base.fipa.SearchConstraints;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentManagementService;
 import jadex.bridge.ISearchConstraints;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.SUtil;
-import jadex.commons.concurrent.IResultListener;
 import jadex.commons.service.BasicService;
 import jadex.commons.service.IServiceProvider;
-import jadex.commons.service.SServiceProvider;
 import jadex.jade.ComponentAdapterFactory;
 import jadex.jade.SJade;
 
@@ -50,13 +47,6 @@ public class DirectoryFacilitatorService extends BasicService implements IDF
 	
 	/** The logger. */
 	//protected Logger logger;
-	
-	
-//	/** The cashed clock service. */
-//	protected IClockService	clockservice;
-	
-	/** The cashed clock service. */
-	protected IComponentManagementService cms;
 	
 	//-------- constructors --------
 
@@ -104,8 +94,7 @@ public class DirectoryFacilitatorService extends BasicService implements IDF
 								Done done = (Done)myAgent.getContentManager().extractContent(reply);
 								Register reg = (Register)((Action)done.getAction()).getAction();
 								ret.setResult(SJade.convertAgentDescriptiontoFipa(
-									(jade.domain.FIPAAgentManagement.DFAgentDescription)reg.getDescription(), 
-									(IComponentManagementService)cms));
+									(jade.domain.FIPAAgentManagement.DFAgentDescription)reg.getDescription()));
 							}
 							catch(Exception e)
 							{
@@ -294,8 +283,7 @@ public class DirectoryFacilitatorService extends BasicService implements IDF
 								Done done = (Done)myAgent.getContentManager().extractContent(reply);
 								Modify mod = (Modify)((Action)done.getAction()).getAction();
 								ret.setResult(SJade.convertAgentDescriptiontoFipa(
-									(jade.domain.FIPAAgentManagement.DFAgentDescription)mod.getDescription(), 
-									(IComponentManagementService)cms));
+									(jade.domain.FIPAAgentManagement.DFAgentDescription)mod.getDescription()));
 							}
 							catch(Exception e)
 							{
@@ -414,7 +402,7 @@ public class DirectoryFacilitatorService extends BasicService implements IDF
 								for(int i=0; i<cret.length; i++)
 								{
 									cret[i] = SJade.convertAgentDescriptiontoFipa(
-										(jade.domain.FIPAAgentManagement.DFAgentDescription)descs.get(i), cms);
+										(jade.domain.FIPAAgentManagement.DFAgentDescription)descs.get(i));
 								}
 								ret.setResult(cret);
 							}
@@ -671,29 +659,13 @@ public class DirectoryFacilitatorService extends BasicService implements IDF
 		return entries.isEmpty();
 	}
 	
-//-------- IPlatformService interface --------
+	//-------- IPlatformService interface --------
 	
 	/**
 	 *  Start the service.
 	 */
 	public IFuture startService()
 	{
-		final Future ret = new Future();
-		
-		SServiceProvider.getServiceUpwards(provider, IComponentManagementService.class).addResultListener(new IResultListener()
-		{
-			public void resultAvailable(Object result)
-			{
-				cms = (IComponentManagementService)result;
-				ret.setResult(null);
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				ret.setException(exception);
-			}
-		});
-		
-		return ret;
+		return new Future(null);
 	}
 }

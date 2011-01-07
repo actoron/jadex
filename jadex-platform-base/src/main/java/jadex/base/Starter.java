@@ -192,7 +192,7 @@ public class Starter
 //					System.out.println("Instance: "+instance);
 					
 					long startup = System.currentTimeMillis() - starttime;
-					System.out.println(cid+" platform startup time: " + startup + " ms.");
+					System.out.println(desc.getName()+" platform startup time: " + startup + " ms.");
 			//		platform.logger.info("Platform startup time: " + startup + " ms.");
 					
 					ret.setResult(instance.getExternalAccess());

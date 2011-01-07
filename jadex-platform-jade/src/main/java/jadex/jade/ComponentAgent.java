@@ -27,6 +27,8 @@ public class ComponentAgent extends Agent
 		
 		execution	= new ActionExecutionBehaviour(adapter); 
 		addBehaviour(execution);
+
+		addBehaviour(new MessageReceiverBehaviour(adapter.getComponentInstance()));
 	}
 	
 	//-------- methods --------

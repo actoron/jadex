@@ -35,7 +35,6 @@ import jadex.base.fipa.IDFComponentDescription;
 import jadex.base.fipa.SFipa;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentInstance;
-import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IContentCodec;
 import jadex.jade.service.MessageService;
 
@@ -48,33 +47,10 @@ import jadex.jade.service.MessageService;
  */
 public class MessageReceiverBehaviour extends CyclicBehaviour
 {
-	// -------- constants --------
-
-	/** The jadefilter property identifier. */
-//	public static final String	PROPERTY_JADEFILTER		= "jadefilter";
-
-	/** The message preprocessors property identifier. */
-//	public static final String	PROPERTY_TOOL_ADAPTERS	= "tooladapter";
-
 	// -------- attributes --------
-
-	/** The platform. */
-	protected Platform platform;
 	
 	/** The jadex agent. */
 	protected IComponentInstance		agent;
-
-	/** The ams. */
-	protected IComponentManagementService ams;
-	
-	/** The positive Jadex filter. Those messages that are forwarded to the Jadex system. */
-//	protected MessageTemplate	antiposfilter;
-
-	/** The tool adapters for managing communication with tool agents (tooltype -> adapter). */
-//	protected List				tooladapters;
-
-	/** The tool message template. */
-//	protected MessageTemplate	toolmsg;
 
 	// -------- constructors --------
 
@@ -82,48 +58,19 @@ public class MessageReceiverBehaviour extends CyclicBehaviour
 	 * Create the message receiver behaviour.
 	 * @param agent The bdi agent.
 	 */
-	public MessageReceiverBehaviour(Platform platform, IComponentInstance agent, IComponentManagementService ams)
+	public MessageReceiverBehaviour(IComponentInstance agent)
 	{
-		this.platform = platform;
 		this.agent = agent;
-		this.ams = ams;
-
-		// Get the JADE filter when specified.
-//		MessageTemplate posfilter = (MessageTemplate)agent.getProperty(PROPERTY_JADEFILTER);
-//		if(posfilter != null) this.antiposfilter = MessageTemplate.not(posfilter);
-		// System.out.println("jadefilter: "+posfilter);
-
-		// Get all declared tool adapters, that have to be added.
-//		this.toolmsg = MessageTemplate.and(new MessageTemplate(new MatchExpression()
-//		{
-//			public boolean match(ACLMessage arg0)
-//			{
-//				String o = arg0.getOntology();
-//				return o != null && o.toLowerCase().startsWith("jadex.tools");
-//			}
-//		}), MessageTemplate.MatchPerformative(ACLMessage.REQUEST));
-//		
-//		this.tooladapters = SCollection.createArrayList();
-//		String[] keys = agent.getPropertyNames(PROPERTY_TOOL_ADAPTERS);
-//		for(int i = 0; i < keys.length; i++)
-//		{
-//			IToolAdapter adapter = (IToolAdapter)agent.getProperty(keys[i]);
-//			tooladapters.add(adapter);
-//		}
 	}
 
 	// -------- methods --------
 
 	/**
-	 * The behaviour implementation. When a message is received notify
-	 * dispatcher. When no message is received wait for one;-)
+	 *  The behavior implementation. When a message is received dispatch it.
+	 *  When no message is received wait for one. ;-)
 	 */
 	public void action()
 	{
-		// agent.invokeSynchronized(code);
-		// Get the next message.
-		// todo: implement a negative filter (all wait-filters from jadex) ?!
-//		ACLMessage msg = myAgent.receive(antiposfilter);
 		ACLMessage msg = myAgent.receive();
 
 		if(msg == null)
@@ -133,252 +80,153 @@ public class MessageReceiverBehaviour extends CyclicBehaviour
 		}
 		else
 		{
-			// Check for tool message.
-//			if(toolmsg.match(msg))
-//			{
-//				handleToolMessage(msg);
-				// todo:
-//			}
-
 			// Otherwise dispatch message to agent.
-//			else
+			JadeMessageAdapter ma = new JadeMessageAdapter(msg);
+				
+			// Conversion via platform specific codecs
+			String[] params = ma.getMessageType().getParameterNames();
+			for(int i=0; i<params.length; i++)
 			{
-				
-//				IMessageAdapter ma = new DefaultMessageAdapter();
-//				agent.messageArrived(ma);
-				
-				JadeMessageAdapter ma = new JadeMessageAdapter(msg, ams);
-				
-				// Conversion via platform specific codecs
-				String[] params = ma.getMessageType().getParameterNames();
-				for(int i=0; i<params.length; i++)
+				IContentCodec codec = ma.getMessageType().findContentCodec(MessageService.DEFCODECS, ma, params[i]);
+				if(codec!=null)
 				{
-					IContentCodec codec = ma.getMessageType().findContentCodec(MessageService.DEFCODECS, ma, params[i]);
-					if(codec!=null)
+					try
 					{
-						try
+						String	val	= (String)ma.getValue(params[i]);
+						if(val!=null)
 						{
-							String	val	= (String)ma.getValue(params[i]);
-							if(val!=null)
-							{
-								ClassLoader	cl	= agent.getClassLoader();
-								ma.setDecodedValue(params[i], codec.decode(val, cl));
-							}
-						}
-						catch(Exception e)
-						{
-							e.printStackTrace();
+							ClassLoader	cl	= agent.getClassLoader();
+							ma.setDecodedValue(params[i], codec.decode(val, cl));
 						}
 					}
-				}
-				// todo: sets?
-
-				// Hack!!! Convert FIPA AMS/DF messages to Jadex/Nuggets
-				if(ma.getMessageType().equals(SFipa.FIPA_MESSAGE_TYPE))
-				{
-					if(FIPAManagementOntology.NAME.equals(ma.getValue(SFipa.ONTOLOGY)) || JADEManagementOntology.NAME.equals(ma.getValue(SFipa.ONTOLOGY)))
+					catch(Exception e)
 					{
-						ContentManager	cm	= new ContentManager();
-						cm.registerLanguage(new SLCodec(0));
-						cm.registerOntology(FIPAManagementOntology.getInstance());
-						cm.registerOntology(JADEManagementOntology.getInstance());
-						try
+						e.printStackTrace();
+					}
+				}
+			}
+			// todo: sets?
+
+			// Hack!!! Convert FIPA AMS/DF messages to Jadex/Nuggets
+			if(ma.getMessageType().equals(SFipa.FIPA_MESSAGE_TYPE))
+			{
+				if(FIPAManagementOntology.NAME.equals(ma.getValue(SFipa.ONTOLOGY)) || JADEManagementOntology.NAME.equals(ma.getValue(SFipa.ONTOLOGY)))
+				{
+					ContentManager	cm	= new ContentManager();
+					cm.registerLanguage(new SLCodec(0));
+					cm.registerOntology(FIPAManagementOntology.getInstance());
+					cm.registerOntology(JADEManagementOntology.getInstance());
+					try
+					{
+						Object	content	= cm.extractContent(msg);
+						Object	jadexcontent	= null;
+						if(content instanceof Done)
 						{
-							Object	content	= cm.extractContent(msg);
-							Object	jadexcontent	= null;
-							if(content instanceof Done)
+							Action	action	= (Action)((Done)content).getAction();
+							Concept	request	= action.getAction();
+							IComponentAction	jadexaction	= null;
+							if(request instanceof Register)
 							{
-								Action	action	= (Action)((Done)content).getAction();
-								Concept	request	= action.getAction();
-								IComponentAction	jadexaction	= null;
-								if(request instanceof Register)
+								IDFComponentDescription	dfadesc	= SJade.convertAgentDescriptiontoFipa((DFAgentDescription)((Register)request).getDescription());
+								jadexaction	= new DFRegister(dfadesc, dfadesc);
+							}
+							else if(request instanceof Deregister)
+							{
+								IDFComponentDescription	dfadesc	= SJade.convertAgentDescriptiontoFipa((DFAgentDescription)((Deregister)request).getDescription());
+								jadexaction	= new DFDeregister(dfadesc);
+							}
+							else if(request instanceof Modify)
+							{
+								if(msg.getSender().getLocalName().toLowerCase().indexOf("cms")!=-1)
 								{
-									IDFComponentDescription	dfadesc	= SJade.convertAgentDescriptiontoFipa((DFAgentDescription)((Register)request).getDescription(), ams);
-									jadexaction	= new DFRegister(dfadesc, dfadesc);
-								}
-								else if(request instanceof Deregister)
-								{
-									IDFComponentDescription	dfadesc	= SJade.convertAgentDescriptiontoFipa((DFAgentDescription)((Deregister)request).getDescription(), ams);
-									jadexaction	= new DFDeregister(dfadesc);
-								}
-								else if(request instanceof Modify)
-								{
-									if(msg.getSender().getLocalName().toLowerCase().indexOf("cms")!=-1)
-									{
-										IComponentDescription	amsadesc	= SJade.convertAMSAgentDescriptiontoFipa((AMSAgentDescription)((Modify)request).getDescription(), ams);
-										if(AMSAgentDescription.SUSPENDED.equals(amsadesc.getState()))
-											jadexaction	= new CMSSuspendComponent(amsadesc.getName());
-										else
-											jadexaction	= new CMSResumeComponent(amsadesc.getName());
-										// todo: AMSStartAgent ???
-									}
+									IComponentDescription	amsadesc	= SJade.convertAMSAgentDescriptiontoFipa((AMSAgentDescription)((Modify)request).getDescription());
+									if(AMSAgentDescription.SUSPENDED.equals(amsadesc.getState()))
+										jadexaction	= new CMSSuspendComponent(amsadesc.getName());
 									else
-									{
-										IDFComponentDescription	dfadesc	= SJade.convertAgentDescriptiontoFipa((DFAgentDescription) ((Modify)request).getDescription(), ams);
-										jadexaction	= new DFModify(dfadesc, dfadesc);
-									}
-								}
-								else if(request instanceof CreateAgent)
-								{
-									// Hack!!! Bug in JADE not returning created agent's AID.
-									// Should do ams_search do get correct AID?
-									AID tmp = (AID)msg.getSender();
-									int idx = tmp.getName().indexOf("@");
-									tmp.setName(((CreateAgent)request).getAgentName() + tmp.getName().substring(idx));
-									jadexaction	= new CMSCreateComponent(SJade.convertAIDtoFipa(tmp, ams));
-								}
-								else if(request instanceof KillAgent)
-								{
-									jadexaction	= new CMSDestroyComponent(SJade.convertAIDtoFipa(((KillAgent)request).getAgent(), ams));
+										jadexaction	= new CMSResumeComponent(amsadesc.getName());
+									// todo: AMSStartAgent ???
 								}
 								else
 								{
-									throw new RuntimeException("Action not supported: "+request);
+									IDFComponentDescription	dfadesc	= SJade.convertAgentDescriptiontoFipa((DFAgentDescription) ((Modify)request).getDescription());
+									jadexaction	= new DFModify(dfadesc, dfadesc);
 								}
-								jadexcontent	= new jadex.base.fipa.Done(jadexaction);
 							}
-							else if(content instanceof Result)
+							else if(request instanceof CreateAgent)
 							{
-								Action	action	= (Action)((Result)content).getAction();
-								Concept	request	= action.getAction();
-								IComponentAction	jadexaction	= null;
-								if(request instanceof Search)
-								{
-									if(msg.getSender().getLocalName().toLowerCase().indexOf("cms")!=-1)
-									{
-										IComponentDescription	amsadesc	= SJade.convertAMSAgentDescriptiontoFipa((AMSAgentDescription)((Search)request).getDescription(), ams);
-										List	items	= ((Result)content).getItems();
-										IComponentDescription[]	results	= new IComponentDescription[items.size()];
-										for(int i=0; i<results.length; i++)
-											results[i]	= SJade.convertAMSAgentDescriptiontoFipa((AMSAgentDescription) items.get(i), ams);
-										jadexaction	= new CMSSearchComponents(amsadesc, results);
-									}
-									else
-									{
-										IDFComponentDescription	dfadesc	= SJade.convertAgentDescriptiontoFipa((DFAgentDescription) ((Search)request).getDescription(), ams);
-										List	items	= ((Result)content).getItems();
-										IDFComponentDescription[]	results	= new IDFComponentDescription[items.size()];
-										for(int i=0; i<results.length; i++)
-											results[i]	= SJade.convertAgentDescriptiontoFipa((DFAgentDescription) items.get(i), ams);
-										jadexaction	= new DFSearch(dfadesc, results);
-									}
-								}
-								else
-								{
-									throw new RuntimeException("Action not supported: "+request);
-								}
-								jadexcontent	= new jadex.base.fipa.Done(jadexaction);
+								// Hack!!! Bug in JADE not returning created agent's AID.
+								// Should do ams_search do get correct AID?
+								AID tmp = (AID)msg.getSender();
+								int idx = tmp.getName().indexOf("@");
+								tmp.setName(((CreateAgent)request).getAgentName() + tmp.getName().substring(idx));
+								jadexaction	= new CMSCreateComponent(SJade.convertAIDtoFipa(tmp));
 							}
-							else if(content instanceof ContentElementList)
+							else if(request instanceof KillAgent)
 							{
-								// CEL is used to provide information about failures in the form {action, failure-reason}
-								// Todo: Failure reasons currently not used in Jadex
-//								Action	action	= (Action)((ContentElementList)content).get(0);
-//								Predicate	reason	= (Predicate)((ContentElementList)content).get(1);
-//								jadexcontent	= ...
+								jadexaction	= new CMSDestroyComponent(SJade.convertAIDtoFipa(((KillAgent)request).getAgent()));
 							}
 							else
 							{
-								throw new RuntimeException("Content not supported: "+content);
+								throw new RuntimeException("Action not supported: "+request);
 							}
-							
-//							System.out.println("Converted: "+jadexcontent+", "+msg.getContent());
-							ma.setDecodedValue(SFipa.CONTENT, jadexcontent);
+							jadexcontent	= new jadex.base.fipa.Done(jadexaction);
 						}
-						catch(Exception e)
+						else if(content instanceof Result)
 						{
-							e.printStackTrace();
+							Action	action	= (Action)((Result)content).getAction();
+							Concept	request	= action.getAction();
+							IComponentAction	jadexaction	= null;
+							if(request instanceof Search)
+							{
+								if(msg.getSender().getLocalName().toLowerCase().indexOf("cms")!=-1)
+								{
+									IComponentDescription	amsadesc	= SJade.convertAMSAgentDescriptiontoFipa((AMSAgentDescription)((Search)request).getDescription());
+									List	items	= ((Result)content).getItems();
+									IComponentDescription[]	results	= new IComponentDescription[items.size()];
+									for(int i=0; i<results.length; i++)
+										results[i]	= SJade.convertAMSAgentDescriptiontoFipa((AMSAgentDescription) items.get(i));
+									jadexaction	= new CMSSearchComponents(amsadesc, results);
+								}
+								else
+								{
+									IDFComponentDescription	dfadesc	= SJade.convertAgentDescriptiontoFipa((DFAgentDescription) ((Search)request).getDescription());
+									List	items	= ((Result)content).getItems();
+									IDFComponentDescription[]	results	= new IDFComponentDescription[items.size()];
+									for(int i=0; i<results.length; i++)
+										results[i]	= SJade.convertAgentDescriptiontoFipa((DFAgentDescription) items.get(i));
+									jadexaction	= new DFSearch(dfadesc, results);
+								}
+							}
+							else
+							{
+								throw new RuntimeException("Action not supported: "+request);
+							}
+							jadexcontent	= new jadex.base.fipa.Done(jadexaction);
 						}
+						else if(content instanceof ContentElementList)
+						{
+							// CEL is used to provide information about failures in the form {action, failure-reason}
+							// Todo: Failure reasons currently not used in Jadex
+//								Action	action	= (Action)((ContentElementList)content).get(0);
+//								Predicate	reason	= (Predicate)((ContentElementList)content).get(1);
+//								jadexcontent	= ...
+						}
+						else
+						{
+							throw new RuntimeException("Content not supported: "+content);
+						}
+						
+//							System.out.println("Converted: "+jadexcontent+", "+msg.getContent());
+						ma.setDecodedValue(SFipa.CONTENT, jadexcontent);
+					}
+					catch(Exception e)
+					{
+						e.printStackTrace();
 					}
 				}
-				
-				agent.messageArrived(ma);
 			}
+			
+			agent.messageArrived(ma);
 		}
 	}
-
-	// -------- tool message handling --------
-
-	/**
-	 * Handle a tool message.
-	 * /
-	public void handleToolMessage(final ACLMessage msg)
-	{
-		// Hack!!! JADE Bug sending AMS failure with Tools ontology
-		if(msg.getPerformative() == ACLMessage.FAILURE) return;
-
-		AgentIdentifier sender = SJade.convertAIDtoFipa(msg.getSender());
-		AgentAction request = (AgentAction)Nuggets.objectFromXML(msg.getContent());
-		boolean processed = false;
-		int i = tooladapters.size();
-		while(i>0)
-		{
-			IToolAdapter adapter = (IToolAdapter)tooladapters.get(--i);
-			if(adapter.getMessageClass().isInstance(request))
-			{
-				try
-				{
-					adapter.handleToolRequest(sender, request, new JadeToolReply(msg));
-					processed = true;
-				}
-				catch(RuntimeException e)
-				{
-					//agent.getLogger().severe("Tool adapter " + adapter + "threw exception " + e);
-					e.printStackTrace();
-				}
-			}
-		}
-		if(!processed)
-		{
-			//agent.getLogger().warning("No tool adapter to handle: " + request);
-		}
-
-	}*/
-
-	/*private final class JadeToolReply implements IToolReply
-	{
-		private final ACLMessage	msg;
-
-		private JadeToolReply(ACLMessage msg)
-		{
-			super();
-			this.msg = msg;
-		}
-
-		public void sendInform(Object content, boolean sync)
-		{
-			sendNative(ACLMessage.INFORM, content, sync);
-		}
-
-		public void sendFailure(Object content, boolean sync)
-		{
-			sendNative(ACLMessage.FAILURE, content, sync);
-		}
-		
-		public void	cleanup()
-		{
-			// Todo: How to interrupt blocking receive?
-		}
-
-		protected void sendNative(int performative, Object content, boolean sync)
-		{			
-			ACLMessage reply = this.msg.createReply();
-			reply.setPerformative(performative);
-			reply.setContent(Nuggets.objectToXML(content));
-			myAgent.send(reply);
-			if(sync)
-			{
-				// Hack!!! Shouldn't use blockingReceive.
-				// Todo: wait also for failure from AMS
-				// todo: make timeout explicit
-				ACLMessage rcv = myAgent.blockingReceive(MessageTemplate.and(MessageTemplate
-						.MatchSender(this.msg.getSender()), MessageTemplate
-						.MatchPerformative(ACLMessage.INFORM)), 10000);
-				if(rcv == null)
-				{
-					throw new TimeoutException("Cannot send message to " + this.msg.getSender());
-				}
-			}
-		}
-	}*/
 }

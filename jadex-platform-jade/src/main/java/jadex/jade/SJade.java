@@ -10,9 +10,9 @@ import jade.lang.acl.ACLMessage;
 import jadex.base.fipa.CMSComponentDescription;
 import jadex.base.fipa.DFComponentDescription;
 import jadex.base.fipa.SFipa;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentManagementService;
 import jadex.bridge.MessageType;
 import jadex.commons.collection.SCollection;
 
@@ -274,11 +274,11 @@ public class SJade
 	/**
 	 *  Convert a Jade AID to a Fipa aid.
 	 */
-	public static IComponentIdentifier convertAIDtoFipa(AID aid, IComponentManagementService ams)
+	public static IComponentIdentifier convertAIDtoFipa(AID aid)
 //	public static AgentIdentifier convertAIDtoFipa(AID aid)
 	{
 //		AgentIdentifier ret = new AgentIdentifier(aid.getName(), false);
-		IComponentIdentifier ret = ams.createComponentIdentifier(aid.getName(), false, aid.getAddressesArray());
+		IComponentIdentifier ret = new ComponentIdentifier(aid.getName(), aid.getAddressesArray());
 		
 //		String[] addresses = aid.getAddressesArray();
 //		for(int i=0; i<addresses.length; i++)
@@ -357,9 +357,9 @@ public class SJade
 	/**
 	 *  Convert a Jade AID to a Fipa aid.
 	 */
-	public static DFComponentDescription convertAgentDescriptiontoFipa(DFAgentDescription desc, IComponentManagementService ams)
+	public static DFComponentDescription convertAgentDescriptiontoFipa(DFAgentDescription desc)
 	{
-		IComponentIdentifier	aid	= desc.getName()!=null ? SJade.convertAIDtoFipa(desc.getName(), ams) : null;
+		IComponentIdentifier	aid	= desc.getName()!=null ? SJade.convertAIDtoFipa(desc.getName()) : null;
 		DFComponentDescription ret = new DFComponentDescription(aid);
 		Iterator it = desc.getAllLanguages();
 		while(it.hasNext())
@@ -471,11 +471,11 @@ public class SJade
 	/**
 	 *  Convert an AMS AD to FIPA.
 	 */
-	public static CMSComponentDescription  convertAMSAgentDescriptiontoFipa(AMSAgentDescription desc, IComponentManagementService ams)
+	public static CMSComponentDescription  convertAMSAgentDescriptiontoFipa(AMSAgentDescription desc)
 	{
 		CMSComponentDescription ret = new CMSComponentDescription();
 		if(desc.getName()!=null)
-			ret.setName(SJade.convertAIDtoFipa(desc.getName(), ams));
+			ret.setName(SJade.convertAIDtoFipa(desc.getName()));
 		ret.setOwnership(desc.getOwnership());
 		ret.setState((String)STATES_MAP_TO_FIPA.get(desc.getState()));
 		return ret;
