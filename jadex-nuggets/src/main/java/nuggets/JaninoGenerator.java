@@ -171,6 +171,8 @@ public class JaninoGenerator implements IDelegateGenerator
 			classbody += "\npublic Object getInstance(Class clazz, " + IASSEMBLER_INTERFACE
 					+ " asm) throws Exception {\n" + "   return new " + clazzname + "();\n}\n";
 
+			System.out.println("class: "+classbody);
+			
 			return classbody;
 
 		}

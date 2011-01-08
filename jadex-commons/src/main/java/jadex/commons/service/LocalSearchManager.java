@@ -43,15 +43,17 @@ public class LocalSearchManager implements ISearchManager
 	 *  @param selector	The result selector to select matching services and produce the final result. 
 	 *  @param services	The local services of the provider (class->list of services).
 	 */
-	public IIntermediateFuture	searchServices(IServiceProvider provider, IVisitDecider decider, IResultSelector selector, Map services, Collection results)
+	public IIntermediateFuture	searchServices(IServiceProvider provider, IVisitDecider decider, IResultSelector selector, Map services)
 	{
+		Collection ret = null;
+			
 		// local search is always allowed?!
 		// problem: first gsm searches a node, then lsm searches the same node = double visit
-		if(!selector.isFinished(results))// && decider.searchNode(null, provider, results))
+//		if(!selector.isFinished(results))// && decider.searchNode(null, provider, results))
 		{
 			try
 			{
-				selector.selectServices(services, results);
+				ret = selector.selectServices(services);
 			}
 			catch(Exception e)
 			{
@@ -60,7 +62,8 @@ public class LocalSearchManager implements ISearchManager
 		}
 //		if(selector instanceof TypeResultSelector && results.toString().indexOf("Add")!=-1)
 //			System.out.println("lsm: "+provider+" "+results);
-		return new IntermediateFuture(selector.getResult(results));
+//		return new IntermediateFuture(selector.getResult(results));
+		return new IntermediateFuture(ret);
 	}
 	
 	/**

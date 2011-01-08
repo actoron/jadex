@@ -16,7 +16,7 @@ public interface IServiceProvider extends IRemotable
 	 *  @param type The class.
 	 *  @return The corresponding services.
 	 */
-	public IIntermediateFuture	getServices(ISearchManager manager, IVisitDecider decider, IResultSelector selector, Collection results);
+	public IIntermediateFuture	getServices(ISearchManager manager, IVisitDecider decider, IResultSelector selector);
 	
 	/**
 	 *  Get the parent service container.

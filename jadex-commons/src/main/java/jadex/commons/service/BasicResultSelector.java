@@ -7,8 +7,10 @@ import jadex.commons.Tuple;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  *  Select one or more services according to a filter.
@@ -68,8 +70,10 @@ public class BasicResultSelector implements IResultSelector
 	 *  @param services	The provided services (class->list of services).
 	 *  @param results	The collection to which results should be added.
 	 */
-	public void	selectServices(Map servicemap, Collection results)
+	public Collection selectServices(Map servicemap)
 	{
+		List results = new ArrayList();
+		
 		IFilter fil = filter;
 		if(!remote)
 		{
@@ -115,6 +119,8 @@ public class BasicResultSelector implements IResultSelector
 				}
 			}
 		}
+		
+		return results;
 	}
 	
 	/**
@@ -140,26 +146,26 @@ public class BasicResultSelector implements IResultSelector
 		return (IService[])ret.toArray(new IService[ret.size()]);
 	}
 	
-	/**
-	 *  Get the result.
-	 *  Called once after search is finished.
-	 *  @param results	The collection of selected services.
-	 *  @return A single service or a list of services.
-	 */
-	public Collection getResult(Collection results)
-	{
-		Collection ret = null;
-		if(!oneresult)
-		{
-			ret = results;
-		}
-		else if(results.size()>0)
-		{
-			Object o = results.iterator().next();
-			ret = Collections.singletonList(o);
-		}
-		return ret;
-	}
+//	/**
+//	 *  Get the result.
+//	 *  Called once after search is finished.
+//	 *  @param results	The collection of selected services.
+//	 *  @return A single service or a list of services.
+//	 */
+//	public Collection getResult(Collection results)
+//	{
+//		Collection ret = null;
+//		if(!oneresult)
+//		{
+//			ret = results;
+//		}
+//		else if(results.size()>0)
+//		{
+//			Object o = results.iterator().next();
+//			ret = Collections.singletonList(o);
+//		}
+//		return ret;
+//	}
 	
 	/**
 	 *  Test if the search result is sufficient to stop the search.

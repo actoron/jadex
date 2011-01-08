@@ -57,7 +57,7 @@ public class RemoteServiceContainer extends BasicServiceContainer
 	{
 		final IntermediateFuture ret = new IntermediateFuture();
 		
-		super.getServices(manager, decider, selector, results).addResultListener(new IResultListener()
+		super.getServices(manager, decider, selector).addResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
@@ -69,7 +69,8 @@ public class RemoteServiceContainer extends BasicServiceContainer
 				if(!decider.searchNode(null, RemoteServiceContainer.this, results)
 					|| rms==null || componentid==null)// || selector instanceof ComponentFactorySelector)
 				{
-					ret.setResult(selector.getResult(results));
+//					ret.setResult(selector.getResult(results));
+					ret.setResult(results);
 				}
 				else
 				{
@@ -95,7 +96,8 @@ public class RemoteServiceContainer extends BasicServiceContainer
 								if(!results.contains(res))
 									results.add(res);
 							}
-							ret.setResult(selector.getResult(results));
+//							ret.setResult(selector.getResult(results));
+							ret.setResult(results);
 						}
 						
 						public void exceptionOccurred(Exception exception)

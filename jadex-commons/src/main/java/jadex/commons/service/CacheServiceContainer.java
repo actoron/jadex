@@ -58,7 +58,7 @@ public class CacheServiceContainer	implements IServiceContainer
 	 *  @param type The class.
 	 *  @return The corresponding services.
 	 */
-	public IIntermediateFuture getServices(final ISearchManager manager, final IVisitDecider decider, final IResultSelector selector, Collection results)
+	public IIntermediateFuture getServices(final ISearchManager manager, final IVisitDecider decider, final IResultSelector selector)
 	{
 		final IntermediateFuture ret = new IntermediateFuture();
 		
@@ -112,14 +112,15 @@ public class CacheServiceContainer	implements IServiceContainer
 						}
 						else
 						{
-							if(!results.contains(data))
+							if(!ret.getIntermediateResults().contains(data))
 							{
 //								if(data.getClass().getName().indexOf("Shop")!=-1)
 //									System.out.println("cache add: "+data+" to: "+results);
 
-								results.add(data);
+								ret.addIntermediateResult(data);
 							}
 						}
+						ret.setFinished();
 					}
 					else if(data instanceof Collection)
 					{
@@ -143,15 +144,16 @@ public class CacheServiceContainer	implements IServiceContainer
 							for(Iterator it=coll.iterator(); it.hasNext(); )
 							{
 								Object	next	= it.next();
-								if(!results.contains(next))
+								if(!ret.getIntermediateResults().contains(next))
 								{
 //									if(data.getClass().getName().indexOf("Shop")!=-1)
 //										System.out.println("cache add: "+data+" to: "+results);
 
-									results.add(next);
+									ret.addIntermediateResult(next);
 								}
 							}
 						}
+						ret.setFinished();
 					}
 					else if(data!=null)
 					{
@@ -175,7 +177,7 @@ public class CacheServiceContainer	implements IServiceContainer
 		}
 		else
 		{
-			container.getServices(manager, decider, selector, results).addResultListener(new IResultListener()
+			container.getServices(manager, decider, selector).addResultListener(new IResultListener()
 			{
 				public void resultAvailable(Object result)
 				{	

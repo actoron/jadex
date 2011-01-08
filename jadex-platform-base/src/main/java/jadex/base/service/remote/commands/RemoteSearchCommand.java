@@ -91,7 +91,7 @@ public class RemoteSearchCommand implements IRemoteCommand
 						
 						// start search on target component
 //						System.out.println("rem search start: "+manager+" "+decider+" "+selector);
-						exta.getServiceProvider().getServices(manager, decider, selector, new ArrayList())
+						exta.getServiceProvider().getServices(manager, decider, selector)
 							.addResultListener(new IResultListener()
 						{
 							public void resultAvailable(Object result)

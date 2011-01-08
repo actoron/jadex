@@ -8,6 +8,7 @@ import jadex.commons.SUtil;
 import jadex.commons.concurrent.IResultListener;
 
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -84,12 +85,12 @@ public class SequentialSearchManager implements ISearchManager
 	 *  @param services	The local services of the provider (class->list of services).
 	 */
 	public IIntermediateFuture	searchServices(IServiceProvider provider, IVisitDecider decider, 
-		final IResultSelector selector, Map services, Collection results)
+		final IResultSelector selector, Map services)
 	{
 //		System.out.println("search: "+selector+" "+provider.getId());
 		IntermediateFuture	ret	= new IntermediateFuture();
 		Map	todo	= new LinkedHashMap(); // Nodes of which children still to be processed (id->provider).
-		SearchContext	context	= new SearchContext(decider, selector, results, todo);
+		SearchContext	context	= new SearchContext(decider, selector, todo);
 //		final List res = new ArrayList();
 		processNode(null, provider, context, ret, up, 0);//, res);
 //		ret.addResultListener(new DefaultResultListener()
@@ -118,7 +119,7 @@ public class SequentialSearchManager implements ISearchManager
 	 *  Process a single node (provider).
 	 */
 	protected void processNode(final IServiceProvider source, final IServiceProvider provider,
-		final SearchContext context, final Future ret, final boolean up, final int callstack)//, final List res)
+		final SearchContext context, final IntermediateFuture ret, final boolean up, final int callstack)//, final List res)
 	{
 		// Hack!!! Break call stack when it becomes too large.
 		if(callstack>1000)
@@ -150,7 +151,7 @@ public class SequentialSearchManager implements ISearchManager
 //				System.out.println("here");
 //			}
 //		}
-		if(!context.selector.isFinished(context.results) && provider!=null)
+		if(!context.selector.isFinished(ret.getIntermediateResults()) && provider!=null)
 		{
 			if(down)
 			{
@@ -158,18 +159,24 @@ public class SequentialSearchManager implements ISearchManager
 				context.todo.put(provider.getId(), new Object[]{provider, source});
 			}
 			
-			if(context.decider.searchNode(source, provider, context.results))
+			if(context.decider.searchNode(source, provider, ret.getIntermediateResults()))
 			{
 				// Use fut.isDone() to reduce stack depth
-				IFuture future = provider.getServices(lsm, context.decider, context.selector, context.results);
+				IFuture future = provider.getServices(lsm, context.decider, context.selector);
 				if(!future.isDone())
 				{
 					future.addResultListener(new IResultListener()
 					{
 						public void resultAvailable(Object result)
 						{
-//							if(res!=null)
-//								found.addAll(context.results);
+							if(result!=null)
+							{
+								Collection res = (Collection)result;
+								for(Iterator it=res.iterator(); it.hasNext(); )
+								{
+									ret.addIntermediateResult(it.next());
+								}
+							}
 							processParent(source, provider, context, ret, up, 0);//, res);
 						}
 						
@@ -183,6 +190,14 @@ public class SequentialSearchManager implements ISearchManager
 				{
 //					if(res!=null)
 //						found.addAll(context.results);
+					Collection res = (Collection)future.get(null);
+					if(res!=null)
+					{
+						for(Iterator it=res.iterator(); it.hasNext(); )
+						{
+							ret.addIntermediateResult(it.next());
+						}
+					}
 					processParent(source, provider, context, ret, up, callstack+1);//, res);
 				}
 			}
@@ -212,12 +227,12 @@ public class SequentialSearchManager implements ISearchManager
 	 *  Continue search with the parent of the current node (if any).
 	 */
 	protected void processParent(final IServiceProvider source, final IServiceProvider provider,
-		final SearchContext context, final Future ret, final boolean up, final int callstack)//, final List res)
+		final SearchContext context, final IntermediateFuture ret, final boolean up, final int callstack)//, final List res)
 	{
 		context.callstack++;
 
 		// When searching upwards, continue with parent.
-		if(!context.selector.isFinished(context.results) && up)
+		if(!context.selector.isFinished(ret.getIntermediateResults()) && up)
 		{
 			// Use fut.isDone() to reduce stack depth
 			IFuture	future	= provider.getParent();
@@ -270,14 +285,16 @@ public class SequentialSearchManager implements ISearchManager
 	 *  Process child nodes from the todo list.
 	 */
 	protected void processChildNodes(final IServiceProvider provider,
-		final SearchContext context, final Future ret, final int callstack)//, final List res)
+		final SearchContext context, final IntermediateFuture ret, final int callstack)//, final List res)
 	{
 		context.callstack++;
 		
 		// Finished, when no more todo nodes.
-		if(context.selector.isFinished(context.results) || context.todo.isEmpty())
+		if(context.selector.isFinished(ret.getIntermediateResults()) || context.todo.isEmpty())
 		{
-			ret.setResult(context.selector.getResult(context.results));
+//			ret.setResult(context.selector.getResult(context.results));
+//			ret.setResult(context.results);
+			ret.setFinished();
 		}
 		
 		// Continue with current list of children (if any)
@@ -340,11 +357,11 @@ public class SequentialSearchManager implements ISearchManager
 	 *  Add children to the current search.
 	 */
 	protected void addChildren(IServiceProvider source, IServiceProvider provider,
-		SearchContext context, Future ret, Collection children, int callstack)//, List res)
+		SearchContext context, IntermediateFuture ret, Collection children, int callstack)//, List res)
 	{
 		context.callstack++;
 		
-		if(!context.selector.isFinished(context.results) && children!=null && !children.isEmpty())
+		if(!context.selector.isFinished(ret.getIntermediateResults()) && children!=null && !children.isEmpty())
 		{
 			List	ccs	= new LinkedList(children);
 			ccs.remove(source);
@@ -423,15 +440,15 @@ public class SequentialSearchManager implements ISearchManager
 	{
 		public IVisitDecider	decider;
 		public IResultSelector	selector;
-		public Collection	results;
+//		public Collection	results;
 		public Map	todo;
 		public int	callstack;
 		
-		public SearchContext(IVisitDecider decider, IResultSelector selector, Collection results, Map todo)
+		public SearchContext(IVisitDecider decider, IResultSelector selector, Map todo)
 		{
 			this.decider	= decider;
 			this.selector	= selector;
-			this.results	= results;
+//			this.results	= results;
 			this.todo	= todo;
 		}
 	}

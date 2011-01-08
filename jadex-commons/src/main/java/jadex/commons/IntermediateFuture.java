@@ -60,14 +60,17 @@ public class IntermediateFuture extends Future	implements	IIntermediateFuture
 			
 			results.add(result);
 			
-			// Find intermediate listeners to be notified.
-			for(int i=0; i<listeners.size(); i++)
+			if(listeners!=null)
 			{
-				if(listeners.get(i) instanceof IIntermediateResultListener)
+				// Find intermediate listeners to be notified.
+				for(int i=0; i<listeners.size(); i++)
 				{
-					if(ilisteners==null)
-						ilisteners	= new ArrayList();
-					ilisteners.add(listeners.get(i));
+					if(listeners.get(i) instanceof IIntermediateResultListener)
+					{
+						if(ilisteners==null)
+							ilisteners	= new ArrayList();
+						ilisteners.add(listeners.get(i));
+					}
 				}
 			}
 		}

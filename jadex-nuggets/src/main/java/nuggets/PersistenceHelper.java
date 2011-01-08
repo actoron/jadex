@@ -162,8 +162,8 @@ public class PersistenceHelper
 	{
 		try 
 		{
-			return(IDelegateGenerator)Class.forName("nuggets.JaninoGenerator"
-				/*, true, Thread.currentThread().getContextClassLoader()*/).newInstance();
+//			return(IDelegateGenerator)Class.forName("nuggets.JaninoGenerator"
+//				/*, true, Thread.currentThread().getContextClassLoader()*/).newInstance();
 		}
 		catch(Exception e)
 		{ 

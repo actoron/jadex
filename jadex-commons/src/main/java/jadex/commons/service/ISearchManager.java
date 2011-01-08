@@ -18,7 +18,7 @@ public interface ISearchManager
 	 *  @param services	The local services of the provider (class->list of services).
 	 */
 	public IIntermediateFuture	searchServices(IServiceProvider provider, IVisitDecider decider, 
-		IResultSelector selector, Map services, Collection results);
+		IResultSelector selector, Map services);
 
 	/**
 	 *  Get the cache key.

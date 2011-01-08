@@ -13,15 +13,15 @@ public interface IResultSelector
 	 *  @param services	The provided services (class->list of services).
 	 *  @param results	The collection to which results should be added.
 	 */
-	public void	selectServices(Map services, Collection results);
+	public Collection selectServices(Map services);
 	
-	/**
-	 *  Get the result.
-	 *  Called once after search is finished.
-	 *  @param results	The collection of selected services.
-	 *  @return A single service or a list of services.
-	 */
-	public Collection getResult(Collection results);
+//	/**
+//	 *  Get the result.
+//	 *  Called once after search is finished.
+//	 *  @param results	The collection of selected services.
+//	 *  @return A single service or a list of services.
+//	 */
+//	public Collection getResult(Collection results);
 	
 	/**
 	 *  Test if the search result is sufficient to stop the search.

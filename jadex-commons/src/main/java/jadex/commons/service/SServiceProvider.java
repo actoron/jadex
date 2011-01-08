@@ -114,7 +114,7 @@ public class SServiceProvider
 		
 		provider.getServices(forcedsearch? sequentialmanagerforced: sequentialmanager, 
 			remote? rabortdecider: abortdecider, 
-			new TypeResultSelector(type, true, remote), new ArrayList())
+			new TypeResultSelector(type, true, remote))
 				.addResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
@@ -148,7 +148,7 @@ public class SServiceProvider
 		// Hack->remove
 //		IVisitDecider abortdecider = new DefaultVisitDecider();
 		
-		provider.getServices(sequentialmanager, abortdecider, new IdResultSelector(sid), new ArrayList())
+		provider.getServices(sequentialmanager, abortdecider, new IdResultSelector(sid))
 			.addResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
@@ -181,7 +181,7 @@ public class SServiceProvider
 		// Hack->remove
 //		IVisitDecider abortdecider = new DefaultVisitDecider();
 		
-		provider.getServices(sequentialmanager, abortdecider, selector, new ArrayList())
+		provider.getServices(sequentialmanager, abortdecider, selector)
 			.addResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
@@ -237,7 +237,7 @@ public class SServiceProvider
 		
 		provider.getServices(forcedsearch? parallelmanagerforced: parallelmanager, 
 			remote? rcontdecider: contdecider, 
-			new TypeResultSelector(type, false, remote), new ArrayList())
+			new TypeResultSelector(type, false, remote))
 				.addResultListener(new DelegationResultListener(ret));
 //				{
 //					public void customResultAvailable(Object source, Object result)
@@ -267,7 +267,7 @@ public class SServiceProvider
 		// Hack->remove
 //		IVisitDecider abortdecider = new DefaultVisitDecider();
 		
-		provider.getServices(upwardsmanager, abortdecider, new TypeResultSelector(type), new ArrayList())
+		provider.getServices(upwardsmanager, abortdecider, new TypeResultSelector(type))
 			.addResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
@@ -300,7 +300,7 @@ public class SServiceProvider
 		// Hack->remove
 //		IVisitDecider abortdecider = new DefaultVisitDecider();
 		
-		provider.getServices(localmanager, abortdecider, new TypeResultSelector(type), new ArrayList())
+		provider.getServices(localmanager, abortdecider, new TypeResultSelector(type))
 			.addResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
@@ -333,7 +333,7 @@ public class SServiceProvider
 		// Hack->remove
 //		IVisitDecider abortdecider = new DefaultVisitDecider();
 		
-		provider.getServices(localmanager, abortdecider, new TypeResultSelector(type), new ArrayList())
+		provider.getServices(localmanager, abortdecider, new TypeResultSelector(type))
 			.addResultListener(new DelegationResultListener(ret));
 		
 		return ret;
@@ -355,7 +355,7 @@ public class SServiceProvider
 		// Hack->remove
 //		IVisitDecider contdecider = new DefaultVisitDecider(false);
 		
-		provider.getServices(localmanager, contdecider, contanyselector, new ArrayList())
+		provider.getServices(localmanager, contdecider, contanyselector)
 			.addResultListener(new DelegationResultListener(ret));
 		
 		return ret;
@@ -378,7 +378,7 @@ public class SServiceProvider
 //		IVisitDecider contdecider = new DefaultVisitDecider(false);
 		
 		provider.getServices(forcedsearch? localmanagerforced: localmanager, 
-			contdecider, contanyselector, new ArrayList())
+			contdecider, contanyselector)
 				.addResultListener(new DelegationResultListener(ret));
 		
 		return ret;
@@ -401,7 +401,7 @@ public class SServiceProvider
 		// Hack->remove
 //		IVisitDecider abortdecider = new DefaultVisitDecider();
 		
-		provider.getServices(localmanager, abortdecider, new IdResultSelector(sid), new ArrayList())
+		provider.getServices(localmanager, abortdecider, new IdResultSelector(sid))
 			.addResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
