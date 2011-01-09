@@ -182,7 +182,10 @@ public class SequentialSearchManager implements ISearchManager
 						
 						public void exceptionOccurred(Exception exception)
 						{
-							ret.setException(exception);
+							// do not terminate serach when one node fails
+							// what to do with exception?
+							resultAvailable(null);
+//							ret.setException(exception);
 						}
 					});
 				}
@@ -190,7 +193,15 @@ public class SequentialSearchManager implements ISearchManager
 				{
 //					if(res!=null)
 //						found.addAll(context.results);
-					Collection res = (Collection)future.get(null);
+					Collection res = null;
+					try
+					{
+						res = (Collection)future.get(null);
+					}
+					catch(Exception e)
+					{
+						// what to do with exception?
+					}
 					if(res!=null)
 					{
 						for(Iterator it=res.iterator(); it.hasNext(); )

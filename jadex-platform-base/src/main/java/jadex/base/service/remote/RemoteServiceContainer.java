@@ -105,9 +105,9 @@ public class RemoteServiceContainer extends BasicServiceContainer
 						
 						public void exceptionOccurred(Exception exception)
 						{
-							ret.setFinished();
+//							ret.setFinished();
 							// todo: notify exception?
-//							ret.setException(exception);
+							ret.setException(exception);
 						}
 					});
 				}
