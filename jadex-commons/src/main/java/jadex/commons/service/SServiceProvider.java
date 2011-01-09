@@ -3,10 +3,11 @@ package jadex.commons.service;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.IIntermediateFuture;
+import jadex.commons.IntermediateDelegationResultListener;
 import jadex.commons.IntermediateFuture;
+import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.DelegationResultListener;
 
-import java.util.ArrayList;
 import java.util.Collection;
 
 /**
@@ -99,7 +100,7 @@ public class SServiceProvider
 	 *  @param type The class.
 	 *  @return The corresponding service.
 	 */
-	public static IFuture getService(IServiceProvider provider, final Class type, boolean remote, boolean forcedsearch)
+	public static IFuture getService(final IServiceProvider provider, final Class type, final boolean remote, final boolean forcedsearch)
 	{
 //		synchronized(profiling)
 //		{
@@ -122,7 +123,16 @@ public class SServiceProvider
 //				System.out.println("Search result: "+result);
 				Collection res = (Collection)result;
 				if(res==null || res.size()==0)
+				{
+					getService(provider, type, remote, forcedsearch).addResultListener(new DefaultResultListener()
+					{
+						public void resultAvailable(Object result)
+						{
+							System.out.println("rrr: "+result);
+						}
+					});
 					exceptionOccurred(new ServiceNotFoundException("No matching service found for type: "+type.getName()));
+				}
 				else
 					super.customResultAvailable(res.iterator().next());
 			}
@@ -238,7 +248,7 @@ public class SServiceProvider
 		provider.getServices(forcedsearch? parallelmanagerforced: parallelmanager, 
 			remote? rcontdecider: contdecider, 
 			new TypeResultSelector(type, false, remote))
-				.addResultListener(new DelegationResultListener(ret));
+				.addResultListener(new IntermediateDelegationResultListener(ret));
 //				{
 //					public void customResultAvailable(Object source, Object result)
 //					{
@@ -255,7 +265,7 @@ public class SServiceProvider
 	 *  @param type The class.
 	 *  @return The corresponding service.
 	 */
-	public static IFuture getServiceUpwards(IServiceProvider provider, final Class type)
+	public static IFuture getServiceUpwards(final IServiceProvider provider, final Class type)
 	{
 //		synchronized(profiling)
 //		{
@@ -274,7 +284,17 @@ public class SServiceProvider
 			{
 				Collection res = (Collection)result;
 				if(res==null || res.size()==0)
+				{
+//					provider.getServices(upwardsmanager, abortdecider, new TypeResultSelector(type))
+//						.addResultListener(new DefaultResultListener()
+//					{
+//						public void resultAvailable(Object result)
+//						{
+//							System.out.println("service not found: "+result);
+//						}
+//					});
 					exceptionOccurred(new ServiceNotFoundException("No matching service found for type: "+type.getName()));
+				}
 				else
 					super.customResultAvailable(res.iterator().next());
 			}
@@ -356,7 +376,7 @@ public class SServiceProvider
 //		IVisitDecider contdecider = new DefaultVisitDecider(false);
 		
 		provider.getServices(localmanager, contdecider, contanyselector)
-			.addResultListener(new DelegationResultListener(ret));
+			.addResultListener(new IntermediateDelegationResultListener(ret));
 		
 		return ret;
 	}
@@ -379,7 +399,7 @@ public class SServiceProvider
 		
 		provider.getServices(forcedsearch? localmanagerforced: localmanager, 
 			contdecider, contanyselector)
-				.addResultListener(new DelegationResultListener(ret));
+				.addResultListener(new IntermediateDelegationResultListener(ret));
 		
 		return ret;
 	}

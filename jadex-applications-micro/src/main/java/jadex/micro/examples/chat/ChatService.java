@@ -3,8 +3,11 @@ package jadex.micro.examples.chat;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IChangeListener;
+import jadex.commons.IIntermediateResultListener;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.service.BasicService;
+import jadex.commons.service.SServiceProvider;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -44,12 +47,13 @@ public class ChatService extends BasicService implements IChatService
 	 */
 	public void tell(final String name, final String text)
 	{
-//		SServiceProvider.getServices(agent.getServiceProvider(), IChatService.class, true, true)
-		agent.getRequiredServices("chatservices")
-			.addResultListener(new DefaultResultListener()
+		SServiceProvider.getServices(agent.getServiceProvider(), IChatService.class, true, true)
+//		agent.getRequiredServices("chatservices")
+			.addResultListener(new IIntermediateResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
+				System.out.println("bulk");
 				if(result!=null)
 				{
 					for(Iterator it=((Collection)result).iterator(); it.hasNext(); )
@@ -58,6 +62,23 @@ public class ChatService extends BasicService implements IChatService
 						cs.hear(name, text);
 					}
 				}
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				System.out.println("Chat service exception.");
+//				exception.printStackTrace();
+			}
+			
+			public void intermediateResultAvailable(Object result)
+			{
+				System.out.println("intermediate");
+				((IChatService)result).hear(name, text);
+			}
+			
+			public void setFinished()
+			{
+				System.out.println("end");
 			}
 		});
 	}

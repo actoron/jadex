@@ -308,7 +308,6 @@ public class Future implements IFuture
      */
     protected void notifyListener(IResultListener listener)
     {
-    	// todo: source?
     	try
     	{
 			if(exception!=null)

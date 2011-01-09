@@ -193,6 +193,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 				final List futures = new ArrayList();
 		
 				List services = model.getProvidedServices();
+//				System.out.println("init sers: "+services);
 				if(services!=null)
 				{
 					for(int i=0; i<services.size(); i++)

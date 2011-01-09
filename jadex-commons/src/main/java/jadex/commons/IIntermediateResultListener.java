@@ -12,5 +12,9 @@ public interface IIntermediateResultListener extends IResultListener
 	 * @param result The result.
 	 */
 	public void intermediateResultAvailable(Object result);
-
+	
+	/**
+     *  Declare that the future is finished.
+     */
+    public void setFinished();
 }

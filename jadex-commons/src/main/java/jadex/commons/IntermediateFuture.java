@@ -1,5 +1,7 @@
 package jadex.commons;
 
+import jadex.commons.concurrent.IResultListener;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -125,5 +127,78 @@ public class IntermediateFuture extends Future	implements	IIntermediateFuture
     public void setFinished()
     {
     	super.setResult(getIntermediateResults());
+    }
+    
+    /**
+     *  Add a result listener.
+     *  @param listsner The listener.
+     */
+    public void	addResultListener(IResultListener listener)
+    {
+    	if(listener==null)
+    		throw new RuntimeException();
+    	
+    	boolean	notify	= false;
+    	Object[] inter = null;
+    	synchronized(this)
+    	{
+	    	if(resultavailable)
+	    	{
+	    		notify	= true;
+	    	}
+	    	
+    		if(listener instanceof IIntermediateResultListener && results!=null)
+    		{
+    			inter = results.toArray();
+    		}
+    		
+    		if(listeners==null)
+    			listeners	= new ArrayList();
+    		listeners.add(listener);
+    	}
+    	
+    	if(inter!=null)
+    	{
+    		IIntermediateResultListener lis =(IIntermediateResultListener)listener;
+    		for(int i=0; i<inter.length; i++)
+    		{
+    			lis.intermediateResultAvailable(inter[i]);
+    		}
+    	}
+    	if(notify)
+    	{
+    		notifyListener(listener);
+    	}
+    		
+    }
+    
+    /**
+     *  Notify a result listener.
+     *  @param listener The listener.
+     */
+    protected void notifyListener(IResultListener listener)
+    {
+    	try
+    	{
+			if(exception!=null)
+			{
+				listener.exceptionOccurred(exception);
+			}
+			else
+			{
+				if(results!=null && listener instanceof IIntermediateResultListener)
+				{
+					((IIntermediateResultListener)listener).setFinished();
+				}
+				else
+				{
+					listener.resultAvailable(results); 
+				}
+			}
+    	}
+    	catch(Exception e)
+    	{
+    		e.printStackTrace();
+    	}
     }
 }

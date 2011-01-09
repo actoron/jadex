@@ -62,6 +62,14 @@ public class IntermediateDelegationResultListener implements IIntermediateResult
 	}
 	
 	/**
+     *  Declare that the future is finished.
+     */
+    public void setFinished()
+    {
+    	future.setFinished();
+    }
+	
+	/**
 	 *  Called when the result is available.
 	 * @param result The result.
 	 */

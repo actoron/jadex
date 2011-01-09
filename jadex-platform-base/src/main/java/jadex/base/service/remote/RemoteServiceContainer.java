@@ -7,6 +7,7 @@ import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.IIntermediateFuture;
 import jadex.commons.IntermediateFuture;
+import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.service.BasicServiceContainer;
 import jadex.commons.service.IResultSelector;
@@ -15,6 +16,7 @@ import jadex.commons.service.IVisitDecider;
 import jadex.commons.service.SServiceProvider;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 
 /**
@@ -53,7 +55,7 @@ public class RemoteServiceContainer extends BasicServiceContainer
 	 *  @param type The class.
 	 *  @return The corresponding services.
 	 */
-	public IIntermediateFuture	getServices(final ISearchManager manager, final IVisitDecider decider, final IResultSelector selector, final Collection results)
+	public IIntermediateFuture	getServices(final ISearchManager manager, final IVisitDecider decider, final IResultSelector selector)
 	{
 		final IntermediateFuture ret = new IntermediateFuture();
 		
@@ -66,11 +68,11 @@ public class RemoteServiceContainer extends BasicServiceContainer
 				// Problem that the container calls itself the decider, could already
 				// be done in search manager when this call is part of a search
 				// But could also be called directly :-(
-				if(!decider.searchNode(null, RemoteServiceContainer.this, results)
+				if(!decider.searchNode(null, RemoteServiceContainer.this, (Collection)result)
 					|| rms==null || componentid==null)// || selector instanceof ComponentFactorySelector)
 				{
 //					ret.setResult(selector.getResult(results));
-					ret.setResult(results);
+					ret.setResult(result);
 				}
 				else
 				{
@@ -86,23 +88,26 @@ public class RemoteServiceContainer extends BasicServiceContainer
 								{
 									Object next = it.next();
 //									System.out.println("add rem: "+next);
-									if(!results.contains(next))
-										results.add(next);
+									if(!ret.getIntermediateResults().contains(next))
+										ret.addIntermediateResult(next);
 								}
 							}
 							else if(res!=null)
 							{
 //								System.out.println("add rem: "+res);
-								if(!results.contains(res))
-									results.add(res);
+								if(!ret.getIntermediateResults().contains(res))
+									ret.addIntermediateResult(res);
 							}
 //							ret.setResult(selector.getResult(results));
-							ret.setResult(results);
+//							ret.setResult(results);
+							ret.setFinished();
 						}
 						
 						public void exceptionOccurred(Exception exception)
 						{
-							ret.setException(exception);
+							ret.setFinished();
+							// todo: notify exception?
+//							ret.setException(exception);
 						}
 					});
 				}
