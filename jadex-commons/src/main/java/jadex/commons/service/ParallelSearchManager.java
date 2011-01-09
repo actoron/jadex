@@ -146,13 +146,24 @@ public class ParallelSearchManager implements ISearchManager
 		if(!selector.isFinished(endret.getIntermediateResults()) && provider!=null 
 			&& decider.searchNode(source, provider, endret.getIntermediateResults()))
 		{
-			if(provider!=null)
-				System.out.println("from: "+(source!=null?source.getId():"null")+" proc: "+provider.getId());
+//			if(provider!=null)
+//				System.out.println("from: "+(source!=null?source.getId():"null")+" proc: "+provider.getId());
 			
 			provider.getServices(lsm, decider, selector).addResultListener(new IResultListener()
 			{
 				public void resultAvailable(Object result)
 				{
+					if(result!=null)
+					{
+						for(Iterator it=((Collection)result).iterator(); it.hasNext(); )
+						{
+							Object next = it.next();
+							if(!endret.getIntermediateResults().contains(next))
+							{
+								endret.addIntermediateResult(next);
+							}
+						}
+					}
 					finished[0]	= true;
 					checkAndSetResults(finished, ret);
 				}
@@ -189,6 +200,11 @@ public class ParallelSearchManager implements ISearchManager
 									checkAndSetResults(finished, ret);
 								}
 							});
+						}
+						else
+						{
+							finished[1]	= true;
+							checkAndSetResults(finished, ret);
 						}
 					}
 					
