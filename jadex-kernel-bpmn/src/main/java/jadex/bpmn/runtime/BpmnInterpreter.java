@@ -36,6 +36,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.IMessageService;
 import jadex.bridge.IModelInfo;
+import jadex.bridge.IntermediateComponentResultListener;
 import jadex.bridge.MessageType;
 import jadex.commons.ChangeEvent;
 import jadex.commons.Future;
@@ -43,6 +44,7 @@ import jadex.commons.IChangeListener;
 import jadex.commons.IFilter;
 import jadex.commons.IFuture;
 import jadex.commons.IIntermediateFuture;
+import jadex.commons.IIntermediateResultListener;
 import jadex.commons.IntermediateFuture;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.DelegationResultListener;
@@ -1394,6 +1396,14 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 	public IResultListener createResultListener(IResultListener listener)
 	{
 		return new ComponentResultListener(listener, adapter);
+	}
+	
+	/**
+	 *  Create a component result listener.
+	 */
+	public IIntermediateResultListener createResultListener(IIntermediateResultListener listener)
+	{
+		return new IntermediateComponentResultListener(listener, adapter);
 	}
 	
 	/**

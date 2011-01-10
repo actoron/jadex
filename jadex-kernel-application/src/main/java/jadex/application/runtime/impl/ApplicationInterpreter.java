@@ -30,10 +30,12 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.IModelInfo;
+import jadex.bridge.IntermediateComponentResultListener;
 import jadex.commons.ChangeEvent;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.IIntermediateFuture;
+import jadex.commons.IIntermediateResultListener;
 import jadex.commons.IntermediateFuture;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
@@ -273,7 +275,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 							{
 								// Use second future to start component only when value has already been set.
 								final Future retu = new Future();
-								((IFuture)val).addResultListener(new ComponentResultListener(new DefaultResultListener()
+								((IFuture)val).addResultListener(createResultListener(new DefaultResultListener()
 								{
 									public void resultAvailable(Object result)
 									{
@@ -284,7 +286,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 										}
 										retu.setResult(result);
 									}
-								}, getComponentAdapter()));
+								}));
 								futures.add(retu);
 							}
 							else if(val!=null)
@@ -304,7 +306,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 				{
 					public Object execute(IInternalAccess ia)
 					{
-						getServiceContainer().start().addResultListener(new ComponentResultListener(new IResultListener()
+						getServiceContainer().start().addResultListener(createResultListener(new IResultListener()
 						{
 							public void resultAvailable(Object result)
 							{
@@ -356,7 +358,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 							{
 								inited.setException(exception);
 							}
-						}, adapter));
+						}));
 						
 						return null;
 					}
@@ -1260,6 +1262,16 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 	public IResultListener createResultListener(IResultListener listener)
 	{
 		return new ComponentResultListener(listener, adapter);
+	}
+
+	/**
+	 *  Create a result listener which is executed as an component step.
+	 *  @param The original listener to be called.
+	 *  @return The listener.
+	 */
+	public IIntermediateResultListener createResultListener(IIntermediateResultListener listener)
+	{
+		return new IntermediateComponentResultListener(listener, adapter);
 	}
 
 	/**

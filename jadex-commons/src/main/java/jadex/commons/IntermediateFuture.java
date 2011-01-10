@@ -126,7 +126,18 @@ public class IntermediateFuture extends Future	implements	IIntermediateFuture
      */
     public void setFinished()
     {
-    	super.setResult(getIntermediateResults());
+    	Collection	res;
+    	synchronized(this)
+    	{
+    		res	= getIntermediateResults();
+			// Hack!!! Set results to avoid inconsistencies between super.result and this.results,
+    		// because getIntermediateResults() returns empty list when results==null.
+    		if(results==null)
+    		{
+    			results	= res;
+    		}
+    	}
+    	super.setResult(res);
     }
     
     /**
@@ -186,7 +197,7 @@ public class IntermediateFuture extends Future	implements	IIntermediateFuture
 			}
 			else
 			{
-				if(results!=null && listener instanceof IIntermediateResultListener)
+				if(listener instanceof IIntermediateResultListener)
 				{
 					((IIntermediateResultListener)listener).setFinished();
 				}

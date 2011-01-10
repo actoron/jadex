@@ -224,10 +224,9 @@ public class ExternalAccess implements IMicroExternalAccess
 	 *  executed on the component thread.
 	 *  @param listener The result listener.
 	 *  @return A result listener that is called on component thread.
-	 */
+	 * /
 	public IResultListener createResultListener(IResultListener listener)
 	{
 		return new ComponentResultListener(listener, adapter);
-	}
-	
+	}*/
 }

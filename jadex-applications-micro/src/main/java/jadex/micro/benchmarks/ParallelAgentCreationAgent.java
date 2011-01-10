@@ -1,6 +1,5 @@
 package jadex.micro.benchmarks;
 
-import jadex.bridge.ComponentResultListener;
 import jadex.bridge.CreationInfo;
 import jadex.bridge.IArgument;
 import jadex.bridge.IComponentIdentifier;
@@ -34,7 +33,7 @@ public class ParallelAgentCreationAgent extends MicroAgent
 		final int num	= ((Integer)arguments.get("num")).intValue();
 		if(num>0)
 		{
-			SServiceProvider.getServiceUpwards(getServiceProvider(), IComponentManagementService.class).addResultListener(new ComponentResultListener(new DefaultResultListener()
+			SServiceProvider.getServiceUpwards(getServiceProvider(), IComponentManagementService.class).addResultListener(createResultListener(new DefaultResultListener()
 			{
 				public void resultAvailable(Object result)
 				{
@@ -170,8 +169,7 @@ public class ParallelAgentCreationAgent extends MicroAgent
 						}
 					}));
 				}
-			}, getAgentAdapter()));
-
+			}));
 		}
 	}
 

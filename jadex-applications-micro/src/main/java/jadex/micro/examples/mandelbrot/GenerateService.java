@@ -62,9 +62,7 @@ public class GenerateService extends BasicService implements IGenerateService
 			}
 		});
 		
-		agent.getRequiredService("displayservice")
-//		SServiceProvider.getService(agent.getServiceProvider(), IDisplayService.class)
-			.addResultListener(new DefaultResultListener()
+		agent.getRequiredService("displayservice").addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
 			{

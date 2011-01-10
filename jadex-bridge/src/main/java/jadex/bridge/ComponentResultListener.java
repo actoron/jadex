@@ -61,8 +61,7 @@ public class ComponentResultListener implements IResultListener
 		else
 		{
 			listener.resultAvailable(result);
-		}
-		
+		}		
 	}
 	
 	/**

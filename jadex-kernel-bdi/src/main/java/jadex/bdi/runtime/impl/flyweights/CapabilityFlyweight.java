@@ -13,7 +13,6 @@ import jadex.bdi.runtime.IPlanbase;
 import jadex.bdi.runtime.IPropertybase;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
-import jadex.bridge.ComponentResultListener;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentListener;
@@ -22,6 +21,7 @@ import jadex.bridge.IModelInfo;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.IIntermediateFuture;
+import jadex.commons.IIntermediateResultListener;
 import jadex.commons.IntermediateFuture;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.IResultListener;
@@ -551,7 +551,16 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	 */
 	public IResultListener createResultListener(IResultListener listener)
 	{
-		return new ComponentResultListener(listener, adapter);
+		return getInterpreter().createResultListener(listener);
+	}
+	
+	/**
+	 *  Create a result listener that is executed on the
+	 *  component thread.
+	 */
+	public IIntermediateResultListener createResultListener(IIntermediateResultListener listener)
+	{
+		return getInterpreter().createResultListener(listener);
 	}
 	
 //	/**

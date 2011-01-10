@@ -41,9 +41,9 @@ import jadex.bdi.runtime.interpreter.GoalLifecycleRules;
 import jadex.bdi.runtime.interpreter.InternalEventRules;
 import jadex.bdi.runtime.interpreter.MessageEventRules;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
-import jadex.bridge.ComponentResultListener;
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.IFuture;
+import jadex.commons.IIntermediateResultListener;
 import jadex.commons.SReflect;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.IResultListener;
@@ -971,7 +971,15 @@ public abstract class AbstractPlan implements java.io.Serializable //, IPlan
 	 */
 	public IResultListener createResultListener(IResultListener listener)
 	{
-		return new ComponentResultListener(listener, interpreter.getAgentAdapter());
+		return interpreter.createResultListener(listener);
+	}
+	
+	/**
+	 *  Create a component result listener.
+	 */
+	public IIntermediateResultListener createResultListener(IIntermediateResultListener listener)
+	{
+		return interpreter.createResultListener(listener);
 	}
 	
 	//-------- static part -------

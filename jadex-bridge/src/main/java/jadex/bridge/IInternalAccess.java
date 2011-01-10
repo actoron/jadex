@@ -2,6 +2,7 @@ package jadex.bridge;
 
 import jadex.commons.IFuture;
 import jadex.commons.IIntermediateFuture;
+import jadex.commons.IIntermediateResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.service.IServiceProvider;
 
@@ -54,6 +55,12 @@ public interface IInternalAccess
 	 *  component thread.
 	 */
 	public IResultListener createResultListener(IResultListener listener);
+	
+	/**
+	 *  Create a result listener that is executed on the
+	 *  component thread.
+	 */
+	public IIntermediateResultListener createResultListener(IIntermediateResultListener listener);
 	
 	/**
 	 *  Get the external access.

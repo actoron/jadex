@@ -4,7 +4,6 @@ import jadex.bpmn.model.MParameter;
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ITask;
 import jadex.bpmn.runtime.ITaskContext;
-import jadex.bridge.ComponentResultListener;
 import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentManagementService;
 import jadex.commons.Future;
@@ -46,7 +45,7 @@ public class CreateComponentTask implements ITask
 	{
 		final Future ret = new Future();
 		
-		SServiceProvider.getService(instance.getServiceProvider(), IComponentManagementService.class).addResultListener(new ComponentResultListener(new IResultListener()
+		SServiceProvider.getService(instance.getServiceProvider(), IComponentManagementService.class).addResultListener(instance.createResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
@@ -129,7 +128,7 @@ public class CreateComponentTask implements ITask
 				ret.setException(exception);
 //				listener.exceptionOccurred(source, exception);
 			}
-		}, instance.getComponentAdapter()));
+		}));
 		
 		return ret;
 	}

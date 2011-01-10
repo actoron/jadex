@@ -90,7 +90,7 @@ public class AgentRules
 				
 				// Get the services.
 				final boolean services[]	= new boolean[4];
-				SServiceProvider.getService(ip.getServiceProvider(), IClockService.class).addResultListener(new ComponentResultListener(new DefaultResultListener()
+				SServiceProvider.getService(ip.getServiceProvider(), IClockService.class).addResultListener(ip.createResultListener(new DefaultResultListener()
 	//			SServiceProvider.getService(getServiceProvider(), IClockService.class).addResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object result)
@@ -107,8 +107,8 @@ public class AgentRules
 							ip.state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state,OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_INITING1);							
 						}
 					}
-				}, ip.getAgentAdapter()));
-				SServiceProvider.getService(ip.getServiceProvider(), IComponentManagementService.class).addResultListener(new ComponentResultListener(new DefaultResultListener()
+				}));
+				SServiceProvider.getService(ip.getServiceProvider(), IComponentManagementService.class).addResultListener(ip.createResultListener(new DefaultResultListener()
 	//			SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class).addResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object result)
@@ -123,8 +123,8 @@ public class AgentRules
 						if(startagent)
 							ip.state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state,OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_INITING1);
 					}
-				}, ip.getAgentAdapter()));
-				SServiceProvider.getService(ip.getServiceProvider(), IMessageService.class).addResultListener(new ComponentResultListener(new DefaultResultListener()
+				}));
+				SServiceProvider.getService(ip.getServiceProvider(), IMessageService.class).addResultListener(ip.createResultListener(new DefaultResultListener()
 	//			SServiceProvider.getService(getServiceProvider(), IMessageService.class).addResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object result)
@@ -139,7 +139,7 @@ public class AgentRules
 						if(startagent)
 							ip.state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state,OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_INITING1);
 					}
-				}, ip.getAgentAdapter()));
+				}));
 	
 				// Previously done in createStartAgentRule
 				Map parents = new HashMap(); 
@@ -1146,7 +1146,7 @@ public class AgentRules
 					{
 						// Use second future to start agent only when value has already been set.
 						final Future	ret	= new Future();
-						((IFuture)val).addResultListener(new ComponentResultListener(new IResultListener()
+						((IFuture)val).addResultListener(BDIInterpreter.getInterpreter(state).createResultListener(new IResultListener()
 						{
 							public void resultAvailable(Object result)
 							{
@@ -1162,7 +1162,7 @@ public class AgentRules
 							{
 								throw new RuntimeException(exception);
 							}
-						}, BDIInterpreter.getInterpreter(state).getAgentAdapter()));
+						}));
 						futures.add(ret);
 					}
 					else if(val!=null)

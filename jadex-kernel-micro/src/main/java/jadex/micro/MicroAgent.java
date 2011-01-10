@@ -18,6 +18,7 @@ import jadex.commons.Future;
 import jadex.commons.IFilter;
 import jadex.commons.IFuture;
 import jadex.commons.IIntermediateFuture;
+import jadex.commons.IIntermediateResultListener;
 import jadex.commons.IntermediateFuture;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.DelegationResultListener;
@@ -203,6 +204,15 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	 *  @param listener The listener to be executed as an agent step.
 	 */
 	public IResultListener createResultListener(IResultListener listener)
+	{
+		return interpreter.createResultListener(listener);
+	}
+	
+	/**
+	 *  Create a result listener that is executed as an agent step.
+	 *  @param listener The listener to be executed as an agent step.
+	 */
+	public IIntermediateResultListener createResultListener(IIntermediateResultListener listener)
 	{
 		return interpreter.createResultListener(listener);
 	}

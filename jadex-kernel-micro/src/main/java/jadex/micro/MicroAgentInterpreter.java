@@ -15,10 +15,12 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.IModelInfo;
+import jadex.bridge.IntermediateComponentResultListener;
 import jadex.commons.ChangeEvent;
 import jadex.commons.Future;
 import jadex.commons.IChangeListener;
 import jadex.commons.IFuture;
+import jadex.commons.IIntermediateResultListener;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
@@ -26,6 +28,7 @@ import jadex.commons.service.IServiceContainer;
 import jadex.commons.service.IServiceProvider;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.clock.ITimer;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -836,6 +839,16 @@ public class MicroAgentInterpreter implements IComponentInstance
 	public IResultListener createResultListener(IResultListener listener)
 	{
 		return new ComponentResultListener(listener, adapter);
+	}
+
+	/**
+	 *  Create a result listener which is executed as an agent step.
+	 *  @param The original listener to be called.
+	 *  @return The listener.
+	 */
+	public IIntermediateResultListener createResultListener(IIntermediateResultListener listener)
+	{
+		return new IntermediateComponentResultListener(listener, adapter);
 	}
 	
 	/**

@@ -1,7 +1,6 @@
 package jadex.micro.benchmarks;
 
 import jadex.bridge.Argument;
-import jadex.bridge.ComponentResultListener;
 import jadex.bridge.CreationInfo;
 import jadex.bridge.IArgument;
 import jadex.bridge.IComponentIdentifier;
@@ -41,7 +40,7 @@ public class AgentCreationAgent extends MicroAgent
 		{
 //			SServiceProvider.getService(getServiceProvider(), IClockService.class)
 			getRequiredService("clockservice")
-				.addResultListener(new ComponentResultListener(new DefaultResultListener()
+				.addResultListener(createResultListener(new DefaultResultListener()
 			{
 				public void resultAvailable(Object result)
 				{
@@ -53,7 +52,7 @@ public class AgentCreationAgent extends MicroAgent
 					
 					step1(args);
 				}
-			}, getAgentAdapter()));
+			}));
 		}
 		else
 		{

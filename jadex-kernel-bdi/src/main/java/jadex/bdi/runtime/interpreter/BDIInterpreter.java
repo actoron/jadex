@@ -25,8 +25,10 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.IMessageService;
 import jadex.bridge.IModelInfo;
+import jadex.bridge.IntermediateComponentResultListener;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
+import jadex.commons.IIntermediateResultListener;
 import jadex.commons.collection.LRU;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.DefaultResultListener;
@@ -1300,6 +1302,14 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 	public IResultListener createResultListener(IResultListener listener)
 	{
 		return new ComponentResultListener(listener, adapter);
+	}
+	
+	/**
+	 *  Create a component result listener.
+	 */
+	public IIntermediateResultListener createResultListener(IIntermediateResultListener listener)
+	{
+		return new IntermediateComponentResultListener(listener, adapter);
 	}
 	
 	//-------- helper methods --------
