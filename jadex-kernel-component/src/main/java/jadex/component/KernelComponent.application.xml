@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Component kernel.
+-->
+<applicationtype xmlns="http://jadex.sourceforge.net/jadex-application"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-application
+						http://jadex.sourceforge.net/jadex-application-2.0.xsd"
+	name="kernel_component" package="jadex.component">
+	
+	<imports>
+		<import>jadex.commons.*</import>
+		<import>jadex.bridge.*</import>
+	</imports>
+	
+	<services>
+		<providedservice class="IComponentFactory">
+			new ComponentComponentFactory($component.getServiceProvider())
+		</providedservice>
+	</services>
+</applicationtype>
