@@ -216,7 +216,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 							}
 							catch(Exception e)
 							{
-//								e.printStackTrace();
+								e.printStackTrace();
 								getLogger().warning("Service creation error: "+st.getParsedValue());
 							}
 						}

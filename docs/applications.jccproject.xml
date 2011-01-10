@@ -135,16 +135,16 @@
 	<rootPathEntries>
 		<p1:String__4 xmlns:p1="typeinfo:java.lang" __ID="49">
 			<entries>
-				<p1:String __ID="50" content="jadex-applications-bdi-2.0-rc6.jar"></p1:String>
-				<p1:String __ID="51" content="jadex-applications-bdibpmn-2.0-rc6.jar"></p1:String>
-				<p1:String __ID="52" content="jadex-applications-bpmn-2.0-rc6.jar"></p1:String>
-				<p1:String __ID="53" content="jadex-applications-micro-2.0-rc6.jar"></p1:String>
+				<p1:String __ID="50" content="jadex-applications-bdi-2.0-rc7.jar"></p1:String>
+				<p1:String __ID="51" content="jadex-applications-bdibpmn-2.0-rc7.jar"></p1:String>
+				<p1:String __ID="52" content="jadex-applications-bpmn-2.0-rc7.jar"></p1:String>
+				<p1:String __ID="53" content="jadex-applications-micro-2.0-rc7.jar"></p1:String>
 			</entries>
 		</p1:String__4>
 	</rootPathEntries>
 </p0:ModelExplorerProperties>
 ]]></p0:property>
-			<p0:property __ID="16" type="lastpath">jadex-applications-micro-2.0-rc6.jar</p0:property>
+			<p0:property __ID="16" type="lastpath">jadex-applications-micro-2.0-rc7.jar</p0:property>
 			<p0:property __ID="17" type="refresh">false</p0:property>
 		</p0:properties>
 		<p0:properties __ID="18" type="spanel">

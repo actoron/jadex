@@ -22,18 +22,24 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
 /**
- * 
+ *  Panel for displaying the chat.
  */
 public class ChatPanel extends JPanel
 {
+	//-------- constants --------
+	
 	/** The linefeed separator. */
 	public static final String lf = (String)System.getProperty("line.separator");
+	
+	//-------- attributes --------
 	
 	/** The agent. */
 	protected IMicroExternalAccess agent;
 	
+	//-------- constructors --------
+	
 	/**
-	 * 
+	 *  Create a new chat panel.
 	 */
 	public ChatPanel(final IMicroExternalAccess agent)
 	{
@@ -98,7 +104,7 @@ public class ChatPanel extends JPanel
 	 */
 	public static void createGui(final IMicroExternalAccess agent)
 	{
-		final JFrame f = new JFrame();
+		final JFrame f = new JFrame(agent.getComponentIdentifier().getName());
 		f.add(new ChatPanel(agent));
 		f.pack();
 		f.setLocation(SGUI.calculateMiddlePosition(f));

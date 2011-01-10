@@ -2,7 +2,7 @@ package jadex.commons;
 
 
 /**
- * 
+ *  Intermediate version of the delegation result listener.
  */
 public class IntermediateDelegationResultListener implements IIntermediateResultListener
 {
@@ -44,7 +44,7 @@ public class IntermediateDelegationResultListener implements IIntermediateResult
 	
 	/**
 	 *  Called when an intermediate result is available.
-	 * @param result The result.
+	 *  @param result The result.
 	 */
 	public void intermediateResultAvailable(Object result)
 	{
@@ -64,7 +64,7 @@ public class IntermediateDelegationResultListener implements IIntermediateResult
 	/**
      *  Declare that the future is finished.
      */
-    public void setFinished()
+    public void finished()
     {
     	future.setFinished();
     }

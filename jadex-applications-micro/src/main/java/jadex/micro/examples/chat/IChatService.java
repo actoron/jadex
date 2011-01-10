@@ -9,7 +9,7 @@ import jadex.commons.service.IService;
 public interface IChatService extends IService
 {
 	/**
-	 *  Hear something.
+	 *  Hear a new message.
 	 *  @param name The name of the sender.
 	 *  @param text The text message.
 	 */

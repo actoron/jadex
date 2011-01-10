@@ -4,9 +4,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IChangeListener;
 import jadex.commons.IIntermediateResultListener;
-import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.service.BasicService;
-import jadex.commons.service.SServiceProvider;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -15,6 +13,7 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
+ *  Chat service implementation.
  */
 public class ChatService extends BasicService implements IChatService
 {
@@ -47,8 +46,8 @@ public class ChatService extends BasicService implements IChatService
 	 */
 	public void tell(final String name, final String text)
 	{
-		SServiceProvider.getServices(agent.getServiceProvider(), IChatService.class, true, true)
-//		agent.getRequiredServices("chatservices")
+//		SServiceProvider.getServices(agent.getServiceProvider(), IChatService.class, true, true)
+		agent.getRequiredServices("chatservices")
 			.addResultListener(new IIntermediateResultListener()
 		{
 			public void resultAvailable(Object result)
@@ -76,7 +75,7 @@ public class ChatService extends BasicService implements IChatService
 				((IChatService)result).hear(name, text);
 			}
 			
-			public void setFinished()
+			public void finished()
 			{
 				System.out.println("end");
 			}

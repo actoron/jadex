@@ -8,6 +8,7 @@ import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IRemoteServiceManagementService;
 import jadex.commons.SGUI;
+import jadex.commons.SUtil;
 import jadex.commons.TreeExpansionHandler;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.commons.gui.CombiIcon;
@@ -750,6 +751,8 @@ public class ComponentTreePanel extends JSplitPane
 									root	= descriptions[i];
 								}
 							}
+							if(root==null)
+								throw new RuntimeException("No root node found: "+SUtil.arrayToString(descriptions));
 							model.setRoot(new ComponentTreeNode(null, model, tree, root, cms, cic));
 							// Expand root node.
 							TreeExpansionHandler	teh	= new TreeExpansionHandler(tree);

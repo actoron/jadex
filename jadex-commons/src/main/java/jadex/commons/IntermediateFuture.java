@@ -199,7 +199,7 @@ public class IntermediateFuture extends Future	implements	IIntermediateFuture
 			{
 				if(listener instanceof IIntermediateResultListener)
 				{
-					((IIntermediateResultListener)listener).setFinished();
+					((IIntermediateResultListener)listener).finished();
 				}
 				else
 				{

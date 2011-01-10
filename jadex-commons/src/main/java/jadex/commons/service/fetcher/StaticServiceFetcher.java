@@ -3,6 +3,7 @@ package jadex.commons.service.fetcher;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.IIntermediateFuture;
+import jadex.commons.IntermediateDelegationResultListener;
 import jadex.commons.IntermediateFuture;
 import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.service.IRequiredServiceFetcher;
@@ -86,7 +87,7 @@ public class StaticServiceFetcher implements IRequiredServiceFetcher
 			if(info.isDeclared())
 			{
 				SServiceProvider.getDeclaredServices(provider, info.getType())
-					.addResultListener(new DelegationResultListener(ret)
+					.addResultListener(new IntermediateDelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
@@ -98,7 +99,7 @@ public class StaticServiceFetcher implements IRequiredServiceFetcher
 			else
 			{
 				SServiceProvider.getServices(provider, info.getType(), info.isRemote(), info.isForced() || rebind)
-					.addResultListener(new DelegationResultListener(ret)
+					.addResultListener(new IntermediateDelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{

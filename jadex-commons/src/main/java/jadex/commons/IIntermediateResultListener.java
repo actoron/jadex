@@ -16,5 +16,5 @@ public interface IIntermediateResultListener extends IResultListener
 	/**
      *  Declare that the future is finished.
      */
-    public void setFinished();
+    public void finished();
 }

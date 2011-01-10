@@ -118,6 +118,9 @@ public class SReflect
 		if(name==null)
 			throw new IllegalArgumentException("Class name must not be null.");
 		
+//		if(name.indexOf("diplomarbeit.env.MTransportSpaceType")!=-1)
+//			System.out.println("+++fC: "+name+" "+classloader);
+		
 		Object ret = basictypes.get(name);
 			
 		//		System.out.println("cFN0 cache: "+clazz);
@@ -480,7 +483,9 @@ public class SReflect
 	public static Class	findClass0(String clname, String[] imports, ClassLoader classloader)
 	{
 		Class	clazz	= null;
-//		System.out.println("+++fC: "+clname+" "+imports);
+		
+//		if(clname.indexOf("MTransport")!=-1)
+//			System.out.println("+++fC: "+clname+" "+imports);
 	
 		// Try to find in cache.
 		boolean	cachemiss	= false;
