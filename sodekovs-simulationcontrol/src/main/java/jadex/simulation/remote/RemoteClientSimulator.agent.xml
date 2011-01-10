@@ -71,8 +71,7 @@
 	</properties>
 
 	<services>
-		<providedservice class="IRemoteSimulationExecutionService">new
-			RemoteSimulationExecutionService($scope, "betaTest01")</providedservice>
-	</services>
+		<providedservice class="IRemoteSimulationExecutionService">new RemoteSimulationExecutionService($scope, "betaTest01")</providedservice>
+	</services>	
 
 </agent>
