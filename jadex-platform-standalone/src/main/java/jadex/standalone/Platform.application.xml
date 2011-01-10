@@ -47,6 +47,7 @@
 	</arguments>
 	
 	<componenttypes>
+		<componenttype filename="jadex/component/KernelComponent.application.xml" name="kernel_component"/>
 		<componenttype filename="jadex/micro/KernelMicro.application.xml" name="kernel_micro"/>
 		<componenttype filename="jadex/bdi/KernelBDI.application.xml" name="kernel_bdi"/>
 		<componenttype filename="jadex/bdibpmn/KernelBDIBPMN.application.xml" name="kernel_bdibpmn"/>
@@ -148,6 +149,7 @@
 				<argument name="platformname">null</argument>
 			</arguments>
 			<components>
+				<component name="kernel_component" type="kernel_component" daemon="true"/>
 				<component name="kernel_micro" type="kernel_micro" daemon="true"/>
 				<!-- <component type="kernel_bdi" daemon="true"/> -->
 				<component name="kernel_bdibpmn" type="kernel_bdibpmn" daemon="true"/>

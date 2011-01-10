@@ -2,6 +2,9 @@ package jadex.bridge;
 
 import jadex.commons.IIntermediateResultListener;
 
+/**
+ * 
+ */
 public class IntermediateComponentResultListener extends ComponentResultListener implements IIntermediateResultListener
 {
 	//-------- constructors --------
@@ -55,7 +58,7 @@ public class IntermediateComponentResultListener extends ComponentResultListener
 	/**
      *  Declare that the future is finished.
      */
-    public void setFinished()
+    public void finished()
     {
 		if(adapter.isExternalThread())
 		{
@@ -65,7 +68,7 @@ public class IntermediateComponentResultListener extends ComponentResultListener
 				{
 					public void run()
 					{
-						((IIntermediateResultListener)listener).setFinished();
+						((IIntermediateResultListener)listener).finished();
 					}
 					
 					public String toString()
@@ -81,7 +84,7 @@ public class IntermediateComponentResultListener extends ComponentResultListener
 		}
 		else
 		{
-			((IIntermediateResultListener)listener).setFinished();
+			((IIntermediateResultListener)listener).finished();
 		}
     }
 }
