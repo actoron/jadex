@@ -4,7 +4,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.commons.IFuture;
 import jadex.commons.service.IServiceProvider;
-import jadex.component.model.MApplicationType;
+import jadex.component.model.MComponentType;
 
 import java.util.Map;
 
@@ -72,7 +72,7 @@ public interface IComponent
 	 *  Get the application type.
 	 */
 	// todo: remove? replace with getModel()?
-	public MApplicationType	getApplicationType();
+	public MComponentType	getApplicationType();
 	
 	/**
 	 *  Schedule a step of the application component.

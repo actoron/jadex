@@ -390,6 +390,12 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 	 */
 	protected void findComponentType(final int i, final List componenttypes, final Class servicetype, final Future ret)
 	{
+		if(componenttypes==null || componenttypes.size()==0)
+		{
+			ret.setException(new RuntimeException("No component types found for service: "+servicetype));
+			return;
+		}
+		
 		final MComponentType ct = (MComponentType)componenttypes.get(i);
 	
 		SServiceProvider.getService(getServiceProvider(), new ComponentFactorySelector(ct.getFilename(), 

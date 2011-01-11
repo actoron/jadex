@@ -3,7 +3,7 @@ package jadex.component;
 import jadex.commons.AbstractModelLoader;
 import jadex.commons.ICacheableModel;
 import jadex.commons.ResourceInfo;
-import jadex.component.model.MApplicationType;
+import jadex.component.model.MComponentType;
 
 import java.util.Set;
 
@@ -14,8 +14,8 @@ public class ComponentModelLoader extends AbstractModelLoader
 {
 	//-------- constants --------
 	
-	/** The application file extension. */
-	public static final String	FILE_EXTENSION_APPLICATION = ".application.xml";
+	/** The component file extension. */
+	public static final String	FILE_EXTENSION_COMPONENT = ".component.xml";
 	
 	//-------- attributes --------
 	
@@ -29,20 +29,20 @@ public class ComponentModelLoader extends AbstractModelLoader
 	 */
 	public  ComponentModelLoader(Set[] mappings)
 	{
-		super(new String[]{FILE_EXTENSION_APPLICATION});
+		super(new String[]{FILE_EXTENSION_COMPONENT});
 		this.reader = new ComponentXMLReader(mappings);
 	}
 
 	//-------- methods --------
 	
 	/**
-	 *  Load a BPMN model.
+	 *  Load a component model.
 	 *  @param name	The filename or logical name (resolved via imports and extensions).
 	 *  @param imports	The imports, if any.
 	 */
-	public MApplicationType loadApplicationModel(String name, String[] imports, ClassLoader classloader) throws Exception
+	public MComponentType loadComponentModel(String name, String[] imports, ClassLoader classloader) throws Exception
 	{
-		return (MApplicationType)loadModel(name, FILE_EXTENSION_APPLICATION, imports, classloader);
+		return (MComponentType)loadModel(name, FILE_EXTENSION_COMPONENT, imports, classloader);
 	}
 	
 	//-------- AbstractModelLoader methods --------

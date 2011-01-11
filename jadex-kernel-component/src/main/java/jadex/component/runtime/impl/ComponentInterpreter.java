@@ -41,13 +41,12 @@ import jadex.commons.service.IServiceProvider;
 import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.ServiceNotFoundException;
-import jadex.component.model.MApplicationInstance;
-import jadex.component.model.MApplicationType;
-import jadex.component.model.MComponentInstance;
+import jadex.component.model.MConfiguration;
 import jadex.component.model.MComponentType;
+import jadex.component.model.MComponentInstance;
+import jadex.component.model.MSubcomponentType;
 import jadex.component.model.MExpressionType;
 import jadex.component.model.MProvidedServiceType;
-import jadex.component.model.MSpaceInstance;
 import jadex.component.runtime.IComponent;
 import jadex.component.runtime.IComponentExternalAccess;
 import jadex.javaparser.IValueFetcher;
@@ -84,7 +83,7 @@ public class ComponentInterpreter implements IComponent, IComponentInstance, IIn
 	//-------- attributes --------
 	
 	/** The application configuration. */
-	protected MApplicationInstance	config;
+	protected MConfiguration	config;
 	
 	/** The contained spaces. */
 	protected Map spaces;
@@ -96,7 +95,7 @@ public class ComponentInterpreter implements IComponent, IComponentInstance, IIn
 	protected IComponentAdapter	adapter;
 	
 	/** The application type. */
-	protected MApplicationType model;
+	protected MComponentType model;
 	
 	/** The parent component. */
 	protected IExternalAccess parent;
@@ -137,7 +136,7 @@ public class ComponentInterpreter implements IComponent, IComponentInstance, IIn
 	/**
 	 *  Create a new context.
 	 */
-	public ComponentInterpreter(final IComponentDescription desc, final MApplicationType model, final MApplicationInstance config, 
+	public ComponentInterpreter(final IComponentDescription desc, final MComponentType model, final MConfiguration config, 
 		final IComponentAdapterFactory factory, final IExternalAccess parent, final Map arguments, final Future inited)
 	{
 		this.config	= config;
@@ -201,8 +200,10 @@ public class ComponentInterpreter implements IComponent, IComponentInstance, IIn
 					{
 						IInternalService service;
 						final MProvidedServiceType st = (MProvidedServiceType)services.get(i);
-						if(st.getParsedValue()!=null)
+						if(st.getValue()!=null)
 						{
+							if(st.getParsedValue()==null)
+								throw new RuntimeException("Could not parse: "+st.getValue());
 							try
 							{
 								service = (IInternalService)st.getParsedValue().getValue(fetcher);
@@ -389,7 +390,13 @@ public class ComponentInterpreter implements IComponent, IComponentInstance, IIn
 	 */
 	protected void findComponentType(final int i, final List componenttypes, final Class servicetype, final Future ret)
 	{
-		final MComponentType ct = (MComponentType)componenttypes.get(i);
+		if(componenttypes==null || componenttypes.size()==0)
+		{
+			ret.setException(new RuntimeException("No component types found for service: "+servicetype));
+			return;
+		}
+		
+		final MSubcomponentType ct = (MSubcomponentType)componenttypes.get(i);
 	
 		SServiceProvider.getService(getServiceProvider(), new ComponentFactorySelector(ct.getFilename(), 
 			model.getAllImports(), model.getModelInfo().getClassLoader())).addResultListener(createResultListener(new IResultListener()
@@ -853,7 +860,7 @@ public class ComponentInterpreter implements IComponent, IComponentInstance, IIn
 	/**
 	 *  Get the application type.
 	 */
-	public MApplicationType	getApplicationType()
+	public MComponentType	getApplicationType()
 	{
 		return model;
 	}
@@ -1328,7 +1335,7 @@ public class ComponentInterpreter implements IComponent, IComponentInstance, IIn
 			});
 			for(int j=0; j<num; j++)
 			{
-				MComponentType	type	= component.getType(model);
+				MSubcomponentType	type	= component.getType(model);
 				if(type!=null)
 				{
 					Boolean	suspend	= component.getSuspend()!=null ? component.getSuspend() : type.getSuspend();
@@ -1370,7 +1377,7 @@ public class ComponentInterpreter implements IComponent, IComponentInstance, IIn
 		List componenttypes = model.getMComponentTypes();
 		for(int i=0; ret==null && i<componenttypes.size(); i++)
 		{
-			MComponentType at = (MComponentType)componenttypes.get(i);
+			MSubcomponentType at = (MSubcomponentType)componenttypes.get(i);
 			if(at.getName().equals(ctype))
 				ret = at.getFilename();
 		}

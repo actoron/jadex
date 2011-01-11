@@ -15,8 +15,8 @@ import jadex.commons.service.IServiceProvider;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.library.ILibraryService;
 import jadex.commons.service.library.ILibraryServiceListener;
-import jadex.component.model.MApplicationInstance;
-import jadex.component.model.MApplicationType;
+import jadex.component.model.MConfiguration;
+import jadex.component.model.MComponentType;
 import jadex.component.runtime.impl.ComponentInterpreter;
 
 import java.net.URL;
@@ -36,8 +36,8 @@ public class ComponentComponentFactory extends BasicService implements IComponen
 {
 	//-------- constants --------
 	
-	/** The application component file type. */
-	public static final String	FILETYPE_APPLICATION = "Component";
+	/** The component component file type. */
+	public static final String	FILETYPE_COMPONENT = "Component";
 	
 //	/** The application file extension. */
 //	public static final String	FILE_EXTENSION_APPLICATION	= ".application.xml";
@@ -158,11 +158,11 @@ public class ComponentComponentFactory extends BasicService implements IComponen
 	 */
 	public IModelInfo loadModel(String model, String[] imports, ClassLoader classloader)
 	{
-		MApplicationType ret = null;
+		MComponentType ret = null;
 //		System.out.println("filename: "+filename);
 		try
 		{
-			ret = loader.loadApplicationModel(model, imports, classloader);
+			ret = loader.loadComponentModel(model, imports, classloader);
 		}
 		catch(RuntimeException e)
 		{
@@ -190,27 +190,27 @@ public class ComponentComponentFactory extends BasicService implements IComponen
 	{
 		try
 		{
-			MApplicationType apptype = loader.loadApplicationModel(modelinfo.getFilename(), null, modelinfo.getClassLoader());
-			List apps = apptype.getMApplicationInstances();
+			MComponentType apptype = loader.loadComponentModel(modelinfo.getFilename(), null, modelinfo.getClassLoader());
+			List apps = apptype.getConfigurations();
 					
 			// Select application instance according to configuration.
-			MApplicationInstance app = null;
+			MConfiguration app = null;
 				
 			if(config!=null)
 			{
 				for(int i=0; app==null && i<apps.size(); i++)
 				{
-					MApplicationInstance tmp = (MApplicationInstance)apps.get(i);
+					MConfiguration tmp = (MConfiguration)apps.get(i);
 					if(config.equals(tmp.getName()))
 						app = tmp;
 				}
 			}
 			if(app==null && apps.size()>0)
 			{
-				app = (MApplicationInstance)apps.get(0);
+				app = (MConfiguration)apps.get(0);
 			}
 			if(app==null)
-				app = new MApplicationInstance("default");
+				app = new MConfiguration("default");
 	
 			// Create context for application.
 			ComponentInterpreter interpreter = new ComponentInterpreter(desc, apptype, app, factory, parent, arguments, ret);
@@ -234,7 +234,7 @@ public class ComponentComponentFactory extends BasicService implements IComponen
 	 */
 	public boolean isLoadable(String model, String[] imports, ClassLoader classloader)
 	{
-		return model.endsWith(ComponentModelLoader.FILE_EXTENSION_APPLICATION);
+		return model.endsWith(ComponentModelLoader.FILE_EXTENSION_COMPONENT);
 	}
 	
 	/**
@@ -245,7 +245,7 @@ public class ComponentComponentFactory extends BasicService implements IComponen
 	 */
 	public boolean isStartable(String model, String[] imports, ClassLoader classloader)
 	{
-		return model.endsWith(ComponentModelLoader.FILE_EXTENSION_APPLICATION);
+		return model.endsWith(ComponentModelLoader.FILE_EXTENSION_COMPONENT);
 	}
 
 	/**
@@ -253,7 +253,7 @@ public class ComponentComponentFactory extends BasicService implements IComponen
 	 */
 	public String[] getComponentTypes()
 	{
-		return new String[]{FILETYPE_APPLICATION};
+		return new String[]{FILETYPE_COMPONENT};
 	}
 
 	/**
@@ -261,7 +261,7 @@ public class ComponentComponentFactory extends BasicService implements IComponen
 	 */
 	public Icon getComponentTypeIcon(String type)
 	{
-		return type.equals(FILETYPE_APPLICATION)? icons.getIcon("application"): null;
+		return type.equals(FILETYPE_COMPONENT)? icons.getIcon("component"): null;
 	}
 
 	/**
@@ -271,7 +271,7 @@ public class ComponentComponentFactory extends BasicService implements IComponen
 	 */
 	public String getComponentType(String model, String[] imports, ClassLoader classloader)
 	{
-		return model.toLowerCase().endsWith(ComponentModelLoader.FILE_EXTENSION_APPLICATION)? FILETYPE_APPLICATION: null;
+		return model.toLowerCase().endsWith(ComponentModelLoader.FILE_EXTENSION_COMPONENT)? FILETYPE_COMPONENT: null;
 	}
 
 	/**
@@ -283,7 +283,7 @@ public class ComponentComponentFactory extends BasicService implements IComponen
 	 */
 	public Map	getProperties(String type)
 	{
-		return FILETYPE_APPLICATION.equals(type)
+		return FILETYPE_COMPONENT.equals(type)
 			? Collections.EMPTY_MAP : null;
 	}
 

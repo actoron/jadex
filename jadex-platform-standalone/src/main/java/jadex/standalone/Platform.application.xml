@@ -26,6 +26,7 @@
 		<import>jadex.standalone.transport.localmtp.*</import>
 		<import>jadex.standalone.transport.tcpmtp.*</import>
 		<import>jadex.standalone.transport.niotcpmtp.*</import>
+		<import>jadex.component.*</import>
 		<import>jadex.application.*</import>
 		<import>jadex.application.space.envsupport.*</import>
 		<import>jadex.application.space.agr.*</import>
@@ -47,11 +48,11 @@
 	</arguments>
 	
 	<componenttypes>
-		<componenttype filename="jadex/component/KernelComponent.application.xml" name="kernel_component"/>
-		<componenttype filename="jadex/micro/KernelMicro.application.xml" name="kernel_micro"/>
-		<componenttype filename="jadex/bdi/KernelBDI.application.xml" name="kernel_bdi"/>
-		<componenttype filename="jadex/bdibpmn/KernelBDIBPMN.application.xml" name="kernel_bdibpmn"/>
-		<componenttype filename="jadex/bpmn/KernelBPMN.application.xml" name="kernel_bpmn"/>
+		<componenttype filename="jadex/application/KernelApplication.component.xml" name="kernel_application"/>
+		<componenttype filename="jadex/micro/KernelMicro.component.xml" name="kernel_micro"/>
+		<componenttype filename="jadex/bdi/KernelBDI.component.xml" name="kernel_bdi"/>
+		<componenttype filename="jadex/bdibpmn/KernelBDIBPMN.component.xml" name="kernel_bdibpmn"/>
+		<componenttype filename="jadex/bpmn/KernelBPMN.component.xml" name="kernel_bpmn"/>
 		<componenttype filename="jadex/base/service/remote/RemoteServiceManagementAgent.class" name="rms"/>
 		<componenttype filename="jadex/base/service/awareness/AwarenessAgent.class" name="awa"/>
 
@@ -124,6 +125,9 @@
 				new Object[]{new String[]{"getMode", "isExecuting"}}))
 		</providedservice>
 		<providedservice class="IComponentFactory" direct="true">
+			new ComponentComponentFactory($component.getServiceProvider())		
+		</providedservice>
+		<!-- <providedservice class="IComponentFactory" direct="true">
 			new ApplicationComponentFactory(
 				new Set[]
 				{
@@ -132,7 +136,7 @@
 				}, 
 				$component.getServiceProvider()
 			)		
-		</providedservice>
+		</providedservice> -->
 		
 		<requiredservice name="factoryservices" class="IComponentFactory" multiple="true"/>
 	</services>
@@ -149,7 +153,8 @@
 				<argument name="platformname">null</argument>
 			</arguments>
 			<components>
-				<component name="kernel_component" type="kernel_component" daemon="true"/>
+				<!-- <component name="kernel_component" type="kernel_component" daemon="true"/> -->
+				<component name="kernel_application" type="kernel_application" daemon="true"/>
 				<component name="kernel_micro" type="kernel_micro" daemon="true"/>
 				<!-- <component type="kernel_bdi" daemon="true"/> -->
 				<component name="kernel_bdibpmn" type="kernel_bdibpmn" daemon="true"/>

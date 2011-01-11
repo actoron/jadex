@@ -6,15 +6,12 @@ import java.util.List;
 /**
  *  Application instance representation.
  */
-public class MApplicationInstance extends MStartable
+public class MConfiguration extends MStartable
 {
 	//-------- attributes --------
 	
 	/** The name. */
 	protected String name;
-	
-	/** The list of spaces. */
-	protected List spaces;
 	
 	/** The list of contained components. */
 	protected List components;
@@ -27,7 +24,7 @@ public class MApplicationInstance extends MStartable
 	/**
 	 *  Create a new application.
 	 */
-	public MApplicationInstance()
+	public MConfiguration()
 	{
 		this(null);
 	}
@@ -35,33 +32,14 @@ public class MApplicationInstance extends MStartable
 	/**
 	 *  Create a new application.
 	 */
-	public MApplicationInstance(String name)
+	public MConfiguration(String name)
 	{
 		this.name = name;
-		this.spaces = new ArrayList();
 		this.components = new ArrayList();
 		this.arguments = new ArrayList();
 	}
 	
 	//-------- methods --------
-	
-	/**
-	 *  Add an space.
-	 *  @param space The space.
-	 */
-	public void addMSpaceInstance(MSpaceInstance space)
-	{
-		this.spaces.add(space);
-	}
-	
-	/**
-	 *  Get all spaces.
-	 *  @return The spaces.
-	 */
-	public List getMSpaceInstances()
-	{
-		return spaces;
-	}
 	
 	/**
 	 *  Add an component.
@@ -106,15 +84,6 @@ public class MApplicationInstance extends MStartable
 	public void addArgument(MExpressionType argument)
 	{
 		this.arguments.add(argument);
-	}
-
-	/**
-	 *  Get the spaces.
-	 *  @return The spaces.
-	 */
-	public List getSpaces()
-	{
-		return this.spaces;
 	}
 
 	/**

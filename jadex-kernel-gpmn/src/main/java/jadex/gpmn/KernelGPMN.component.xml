@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  GPMN kernel application.
+  GPMN kernel component.
 -->
-<applicationtype xmlns="http://jadex.sourceforge.net/jadex-application"
+<componenttype xmlns="http://jadex.sourceforge.net/jadex-component"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-application
-						http://jadex.sourceforge.net/jadex-application-2.0.xsd"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-component
+						http://jadex.sourceforge.net/jadex-component-2.0.xsd"
 	name="kernel_gpmn" package="jadex.gpmn">
 	
 	<imports>
@@ -17,4 +17,4 @@
 			new GpmnFactory($component.getServiceProvider(), new java.util.HashMap())
 		</service>
 	</services>
-</applicationtype>
+</componenttype>

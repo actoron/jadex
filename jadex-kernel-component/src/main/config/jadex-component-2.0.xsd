@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- edited with XMLSPY v2004 rel. 3 U (http://www.xmlspy.com) by Lars (RTL) -->
 <xs:schema targetNamespace="http://jadex.sourceforge.net/jadex-application" xmlns="http://jadex.sourceforge.net/jadex-application" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified" version="2.0">
-	<xs:element name="componenttype" type="componenttyperef">
+	<xs:element name="componenttype" type="subcomponenttype">
 		<xs:annotation>
 			<xs:documentation>An application type specifies the structure and content of a agent application.</xs:documentation>
 		</xs:annotation>
@@ -132,7 +132,7 @@
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>
-	<xs:complexType name="componenttyperef">
+	<xs:complexType name="subcomponenttype">
 		<xs:annotation>
 			<xs:documentation>Defines an agent type.</xs:documentation>
 		</xs:annotation>

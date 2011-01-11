@@ -6,15 +6,13 @@ import jadex.commons.SReflect;
 import jadex.commons.Tuple;
 import jadex.commons.collection.IndexMap;
 import jadex.commons.collection.MultiCollection;
-import jadex.component.model.MApplicationInstance;
-import jadex.component.model.MApplicationType;
-import jadex.component.model.MComponentInstance;
+import jadex.component.model.MConfiguration;
 import jadex.component.model.MComponentType;
+import jadex.component.model.MComponentInstance;
+import jadex.component.model.MSubcomponentType;
 import jadex.component.model.MExpressionType;
 import jadex.component.model.MProvidedServiceType;
 import jadex.component.model.MRequiredServiceType;
-import jadex.component.model.MSpaceInstance;
-import jadex.component.model.MSpaceType;
 import jadex.javaparser.IExpressionParser;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SJavaParser;
@@ -50,7 +48,7 @@ import javax.xml.stream.XMLReporter;
 import javax.xml.stream.XMLStreamException;
 
 /**
- *  Reader for loading Application XML models into a Java representation states.
+ *  Reader for loading component XML models into a Java representation states.
  */
 public class ComponentXMLReader
 {
@@ -100,26 +98,36 @@ public class ComponentXMLReader
 	 *  @param info	The resource info.
 	 *  @param classloader The classloader.
  	 */
-	public MApplicationType read(ResourceInfo rinfo, ClassLoader classloader) throws Exception
+	public MComponentType read(ResourceInfo rinfo, ClassLoader classloader) throws Exception
 	{
 		MultiCollection	report	= new MultiCollection(new IndexMap().getAsMap(), LinkedHashSet.class);
-		MApplicationType ret = (MApplicationType)reader.read(rinfo.getInputStream(), classloader, report);
+		MComponentType ret = (MComponentType)reader.read(rinfo.getInputStream(), classloader, report);
 		
-		ret.setFilename(rinfo.getFilename());
-		ret.setLastModified(rinfo.getLastModified());
-		ret.setClassloader(classloader);
-		ret.initModelInfo(report);
-		
-		// Exclude IApplicationExternalAccess 
-		Map props = ret.getModelInfo().getProperties();
-		if(props==null)
+		if(ret!=null)
 		{
-			props = new HashMap();
-			ret.getModelInfo().setProperties(props);
+			ret.setFilename(rinfo.getFilename());
+			ret.setLastModified(rinfo.getLastModified());
+			ret.setClassloader(classloader);
+			ret.initModelInfo(report);
+			
+			// Exclude IComponentExternalAccess 
+			Map props = ret.getModelInfo().getProperties();
+			if(props==null)
+			{
+				props = new HashMap();
+				ret.getModelInfo().setProperties(props);
+			}
+			addMethodInfos(props, "remote_excluded", new String[]{"getSpace"});
+			
+			rinfo.getInputStream().close();
 		}
-		addMethodInfos(props, "remote_excluded", new String[]{"getSpace"});
-		
-		rinfo.getInputStream().close();
+		else
+		{
+//			System.out.println("Error loading model: "+rinfo.getFilename()+" "+report);
+			String errtext = MComponentType.buildReport(rinfo.getFilename(), rinfo.getFilename(),
+				new String[]{"Component", "Configuration"}, report, null).getErrorText();
+			throw new RuntimeException("Model error: "+errtext);
+		}
 		return ret;
 	}
 	
@@ -162,7 +170,7 @@ public class ComponentXMLReader
 				Object	ret	= null;
 				try
 				{
-					ret	= SJavaParser.evaluateExpression((String)val, ((MApplicationType)context.getRootObject()).getAllImports(), null, context.getClassLoader());
+					ret	= SJavaParser.evaluateExpression((String)val, ((MComponentType)context.getRootObject()).getAllImports(), null, context.getClassLoader());
 				}
 				catch(RuntimeException e)
 				{
@@ -182,7 +190,7 @@ public class ComponentXMLReader
 				Object	ret	= null;
 				try
 				{
-					ret	= SJavaParser.parseExpression((String)val, ((MApplicationType)context.getRootObject()).getAllImports(), context.getClassLoader());
+					ret	= SJavaParser.parseExpression((String)val, ((MComponentType)context.getRootObject()).getAllImports(), context.getClassLoader());
 				}
 				catch(RuntimeException e)
 				{
@@ -194,14 +202,14 @@ public class ComponentXMLReader
 			}
 		};
 		
-		String uri = "http://jadex.sourceforge.net/jadex-application";
+		String uri = "http://jadex.sourceforge.net/jadex-component";
 		
 //		TypeInfo satype = new TypeInfo(null, new ObjectInfo(MStartable.class),
 //			new MappingInfo(null, new AttributeInfo[]{
 //				new AttributeInfo(new AccessInfo("autoshutdown", "autoShutdown")),
 //			}, null));
 		
-		types.add(new TypeInfo(new XMLInfo(new QName(uri, "applicationtype")), new ObjectInfo(MApplicationType.class), 
+		types.add(new TypeInfo(new XMLInfo(new QName(uri, "componenttype")), new ObjectInfo(MComponentType.class), 
 			new MappingInfo(null, "description", null,
 			new AttributeInfo[]{
 			new AttributeInfo(new AccessInfo("autoshutdown", "autoShutdown")),
@@ -212,13 +220,13 @@ public class ComponentXMLReader
 			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "arguments"), new QName(uri, "result")}), new AccessInfo(new QName(uri, "result"), "result")),
 			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "services"), new QName(uri, "container")}), new AccessInfo(new QName(uri, "container"), "container"))
 			})));
-		types.add(new TypeInfo(new XMLInfo(new QName(uri, "spacetype")), new ObjectInfo(MSpaceType.class)));
-		types.add(new TypeInfo(new XMLInfo(new QName(uri, "application")), new ObjectInfo(MApplicationInstance.class, new IPostProcessor()
+//		types.add(new TypeInfo(new XMLInfo(new QName(uri, "spacetype")), new ObjectInfo(MSpaceType.class)));
+		types.add(new TypeInfo(new XMLInfo(new QName(uri, "configuration")), new ObjectInfo(MConfiguration.class, new IPostProcessor()
 		{
 			public Object postProcess(IContext context, Object object)
 			{
-				MApplicationInstance app = (MApplicationInstance)object;
-				MApplicationType mapp = (MApplicationType)context.getRootObject();
+				MConfiguration app = (MConfiguration)object;
+				MComponentType mapp = (MComponentType)context.getRootObject();
 				
 				List margs = app.getArguments();
 				for(int i=0; i<margs.size(); i++)
@@ -228,7 +236,7 @@ public class ComponentXMLReader
 						MExpressionType overridenarg = (MExpressionType)margs.get(i);
 						Argument arg = (Argument)mapp.getModelInfo().getArgument(overridenarg.getName());
 						if(arg==null)
-							throw new RuntimeException("Overridden argument not declared in application type: "+overridenarg.getName());
+							throw new RuntimeException("Overridden argument not declared in component type: "+overridenarg.getName());
 						
 						Object val = overridenarg.getParsedValue().getValue(null);
 						arg.setDefaultValue(app.getName(), val);
@@ -253,16 +261,15 @@ public class ComponentXMLReader
 				new AttributeInfo(new AccessInfo("type", "typeName")),
 				new AttributeInfo(new AccessInfo("autoshutdown", "autoShutdown")),
 			})));
-		types.add(new TypeInfo(new XMLInfo(new QName(uri, "space")), new ObjectInfo(MSpaceInstance.class)));
-		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "applicationtype"), new QName(uri, "arguments"), new QName(uri, "argument")}), new ObjectInfo(Argument.class), 
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "componenttype"), new QName(uri, "arguments"), new QName(uri, "argument")}), new ObjectInfo(Argument.class), 
 			new MappingInfo(null, "description", new AttributeInfo(new AccessInfo((String)null, "defaultValue"), new AttributeConverter(exconv, null)))));
 		types.add(new TypeInfo(new XMLInfo(new QName(uri, "import")), new ObjectInfo(String.class)));
-		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "application"), new QName(uri, "arguments"), new QName(uri, "argument")}), new ObjectInfo(MExpressionType.class, new ExpressionProcessor()), 
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "configuration"), new QName(uri, "arguments"), new QName(uri, "argument")}), new ObjectInfo(MExpressionType.class, new ExpressionProcessor()), 
 			new MappingInfo(null, null, "value", new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo("class", "className"))
 			}, null)));
 		
-		types.add(new TypeInfo(new XMLInfo(new QName(uri, "componenttype")), new ObjectInfo(MComponentType.class),
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "componenttypes"), new QName(uri, "componenttype")}), new ObjectInfo(MSubcomponentType.class),
 			new MappingInfo(null, new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo("autoshutdown", "autoShutdown")),
 			}, null)));		
@@ -323,7 +330,7 @@ public class ComponentXMLReader
 		 */
 		public Object postProcess(IContext context, Object object)
 		{
-			MApplicationType app = (MApplicationType)context.getRootObject();
+			MComponentType app = (MComponentType)context.getRootObject();
 			MExpressionType exp = (MExpressionType)object;
 			
 			String classname = exp.getClassName();

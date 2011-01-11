@@ -1,20 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  BDI kernel application.
+  BDIBPMN kernel component.
 -->
-<applicationtype xmlns="http://jadex.sourceforge.net/jadex-application"
+<componenttype xmlns="http://jadex.sourceforge.net/jadex-component"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-application
-						http://jadex.sourceforge.net/jadex-application-2.0.xsd"
-	name="kernel_bdi" package="jadex.bdi">
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-component
+						http://jadex.sourceforge.net/jadex-component-2.0.xsd"
+	name="kernel_bdibpmn" package="jadex.bdibpmn">
 	
 	<imports>
 		<import>jadex.commons.*</import>
+		<import>jadex.commons.concurrent.*</import>
 		<import>jadex.bridge.*</import>
 		<import>jadex.base.fipa.*</import>
 		<import>jadex.commons.service.*</import>
 		<import>jadex.commons.service.threadpool.*</import>
 		<import>jadex.bdi.runtime.impl.*</import>
+		<import>jadex.bdi.*</import>
+		<import>jadex.commons.service.*</import>
 	</imports>
 	
 	<services>
@@ -27,19 +30,19 @@
 					"planexecutor_standard", 
 					"standard.timeout", 
 					"microplansteps",
-					//"planexecutor_bpmn",
+					"planexecutor_bpmn",
 					"debugger.panels"
 				},
 				new Object[]
 				{
 					new FIPAMessageType(), 
-					new JavaStandardPlanExecutor((IThreadPoolService)
-						SServiceProvider.getService($component.getServiceProvider(), IThreadPoolService.class).get(new ThreadSuspendable())),
-					new java.lang.Long(10000),
+					new JavaStandardPlanExecutor((IThreadPoolService)SServiceProvider.getService($component.getServiceProvider(), IThreadPoolService.class).get(new ThreadSuspendable())),
+					new Long(10000),
 					Boolean.TRUE,
+					new BpmnPlanExecutor(),
 					"jadex.tools.debugger.bdi.BDIAgentInspectorDebuggerPanel, jadex.tools.debugger.bdi.BDIAgentRuleEngineDebuggerPanel"
 				}
 			), $component.getServiceProvider())
 		</providedservice>
 	</services>
-</applicationtype>
+</componenttype>

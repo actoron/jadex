@@ -39,7 +39,6 @@ public class MComponentInstance extends MStartable
 	{
 		this.arguments = new ArrayList();
 		this.start = true;
-//		this.number = 1;
 	}
 	
 	//-------- methods --------
@@ -175,13 +174,13 @@ public class MComponentInstance extends MStartable
 	 *  @param apptype The application type this component is used in.
 	 *  @return The name of the component type.
 	 */
-	public MComponentType getType(MApplicationType apptype)
+	public MSubcomponentType getType(MComponentType apptype)
 	{
-		MComponentType ret = null;
+		MSubcomponentType ret = null;
 		List componenttypes = apptype.getMComponentTypes();
 		for(int i=0; ret==null && i<componenttypes.size(); i++)
 		{
-			MComponentType at = (MComponentType)componenttypes.get(i);
+			MSubcomponentType at = (MSubcomponentType)componenttypes.get(i);
 			if(at.getName().equals(getTypeName()))
 				ret = at;
 		}
