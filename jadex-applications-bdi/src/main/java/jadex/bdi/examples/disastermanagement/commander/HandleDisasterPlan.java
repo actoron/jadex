@@ -53,7 +53,8 @@ public class HandleDisasterPlan extends Plan
 
 			if(chemicals>chemicalunits.size())
 			{
-				Collection clearchemser = (Collection)SServiceProvider.getServices(getScope().getServiceProvider(), IClearChemicalsService.class).get(this);
+//				Collection clearchemser = (Collection)SServiceProvider.getServices(getScope().getServiceProvider(), IClearChemicalsService.class).get(this);
+				Collection clearchemser = (Collection)getScope().getRequiredServices("clearchemicalsservices").get(this);
 				if(clearchemser.size()>0)
 				{
 					Iterator it=clearchemser.iterator();
@@ -89,7 +90,8 @@ public class HandleDisasterPlan extends Plan
 			
 			if(fire>fireunits.size())
 			{
-				Collection exfireser = (Collection)SServiceProvider.getServices(getScope().getServiceProvider(), IExtinguishFireService.class).get(this);
+//				Collection exfireser = (Collection)SServiceProvider.getServices(getScope().getServiceProvider(), IExtinguishFireService.class).get(this);
+				Collection exfireser = (Collection)getScope().getRequiredServices("extinguishfireservices").get(this);
 				if(exfireser.size()>0)
 				{
 					Iterator it=exfireser.iterator();
@@ -126,7 +128,8 @@ public class HandleDisasterPlan extends Plan
 //			System.out.println("vic: "+victims+" "+ambulanceunits.size()+" "+disaster);
 			if(chemicals==0 && victims>ambulanceunits.size())
 			{
-				Collection treatvicser = (Collection)SServiceProvider.getServices(getScope().getServiceProvider(), ITreatVictimsService.class).get(this);
+//				Collection treatvicser = (Collection)SServiceProvider.getServices(getScope().getServiceProvider(), ITreatVictimsService.class).get(this);
+				Collection treatvicser = (Collection)getScope().getRequiredServices("treatvictimservices").get(this);
 				if(treatvicser.size()>0)
 				{
 					Iterator it=treatvicser.iterator();

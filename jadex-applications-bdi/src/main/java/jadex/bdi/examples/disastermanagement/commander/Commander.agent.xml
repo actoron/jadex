@@ -71,8 +71,8 @@
 	</plans>
 	
 	<services>
-		<requiredservice class="ITreatVictimsService"/>
-		<requiredservice class="IExtinguishFireService"/>
-		<requiredservice class="IClearChemicalsService"/>
+		<requiredservice name="treatvictimservices" class="ITreatVictimsService" multiple="true"/>
+		<requiredservice name="extinguishfireservices" class="IExtinguishFireService" multiple="true"/>
+		<requiredservice name="clearchemicalsservices" class="IClearChemicalsService" multiple="true"/>
 	</services>
 </agent>
