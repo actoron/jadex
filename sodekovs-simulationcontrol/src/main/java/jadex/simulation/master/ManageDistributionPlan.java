@@ -1,17 +1,16 @@
 package jadex.simulation.master;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 import jadex.commons.IFuture;
-import jadex.commons.concurrent.IResultListener;
 import jadex.commons.service.SServiceProvider;
 import jadex.simulation.helper.Constants;
 import jadex.simulation.model.SimulationConfiguration;
 import jadex.simulation.remote.IRemoteSimulationExecutionService;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ManageDistributionPlan extends Plan
 {
@@ -23,21 +22,7 @@ public class ManageDistributionPlan extends Plan
 
 
 	@Override
-	public void body() {
-//		// TODO Auto-generated method stub
-//		System.out.println("Startet Simple Plan");
-//		
-//		for(int i=0; i< 4; i++){
-//			System.out.println("Simple Plan running...");
-//			waitFor(2500);
-//		}
-//		
-//		System.out.println("Simple Plan --> 10sec");
-//		waitFor(10000);
-//		System.out.println("Simple Plan:  Dispatch Event");
-//		dispatchInternalEvent(createInternalEvent("triggerNextExperiment"));
-//		System.out.println("Simple Plan terminated");
-		
+	public void body() {		
 		startApplicationRemotley((Map) getParameter("applicationArgs").getValue(), (HashMap<String,Object>) getParameter("clientArgs").getValue());
 	}
 
@@ -48,13 +33,13 @@ public class ManageDistributionPlan extends Plan
 		HashMap beliefbaseFacts = (HashMap) getBeliefbase().getBelief("generalSimulationFacts").getFact();
 
 		try {
-			ArrayList<IRemoteSimulationExecutionService> services = null;
+			Collection<IRemoteSimulationExecutionService> services = null;
 
 			int counter = 0;
 			do {
 				// find appropriate service
 				System.out.println("#ManageDistributionPlan# Searching for remote simulation services.");
-				services = (ArrayList<IRemoteSimulationExecutionService>) SServiceProvider.getServices(getScope().getServiceProvider(), IRemoteSimulationExecutionService.class, true, true).get(this);
+				services = (Collection<IRemoteSimulationExecutionService>) SServiceProvider.getServices(getScope().getServiceProvider(), IRemoteSimulationExecutionService.class, true, true).get(this);
 				System.out.println("#ManageDistributionPlan# Nr. of found remote services: " + services.size());
 				if (services.size() <= 0) {
 					System.out.println("#ManageDistributionPlan# Could not find remote simulation execution service! Retry in 5 sec.");
@@ -69,7 +54,7 @@ public class ManageDistributionPlan extends Plan
 				System.out.println("#ManageDistributionPlan# Distributed new Simulation Experiment remotely. Nr.:" + clientArgs.get(Constants.EXPERIMENT_ID) + "(" + beliefbaseFacts.get(Constants.TOTAL_EXPERIMENT_COUNTER) + ") with Optimization Values: "
 						+ simConf.getOptimization().getParameterSweeping().getCurrentConfiguration());
 				
-				IFuture fut = services.get(0).executeExperiment(applicationArgs, clientArgs);
+				IFuture fut = services.iterator().next().executeExperiment(applicationArgs, clientArgs);
 //				fut.addResultListener(new IResultListener() {
 //					public void resultAvailable(Object source, Object result) {
 //						System.out.println("#ManageDistributionPlan#Received res from remote simulation execution");
@@ -97,7 +82,7 @@ public class ManageDistributionPlan extends Plan
 			}
 
 		} catch (Exception e) {
-			System.out.println("Could not start simulation experiment for remote execution. " + e);
+			System.out.println("Could not start simulation experiment for remote execution. " + e.toString());
 		}
 	}
 }
