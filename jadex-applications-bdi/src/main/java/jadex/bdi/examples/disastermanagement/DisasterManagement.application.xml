@@ -66,7 +66,7 @@
 						
 			<env:processtypes>
 				<env:processtype name="create" class="DefaultObjectCreationProcess">
-					<env:property name="timerate">30000</env:property>
+					<env:property name="timerate" dynamic="true">DisasterType.getExponentialSample(30000)</env:property>
 					<env:property name="type">"disaster"</env:property>
 					<env:property name="properties" dynamic="true">
 						DisasterType.generateDisaster()

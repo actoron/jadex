@@ -258,4 +258,12 @@ public class DisasterType
 		
 		return new Vector2Double(x, y);
 	}
+	
+	/**
+	 *  Get an exponential sample value.
+	 */
+	public static double getExponentialSample(double mean)
+	{
+		return -Math.log(1-Math.random()) * mean;
+	}
 }

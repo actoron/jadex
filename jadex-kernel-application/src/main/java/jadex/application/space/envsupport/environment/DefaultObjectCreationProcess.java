@@ -110,6 +110,7 @@ public class DefaultObjectCreationProcess extends SimplePropertyObject implement
 //					Object	obj	= space.createSpaceObject(type, props, null);
 //					System.out.println("Created: "+obj);
 				}
+				rate = ((Number)getProperty("tickrate")).doubleValue();
 			}
 		}
 	
@@ -134,6 +135,7 @@ public class DefaultObjectCreationProcess extends SimplePropertyObject implement
 //					Object	obj	= space.createSpaceObject(type, props, null);
 //					System.out.println("Created: "+obj);
 				}
+				rate = ((Number)getProperty("timerate")).doubleValue();
 			}
 		}
 	}
