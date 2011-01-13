@@ -26,11 +26,14 @@ public class DefaultObjectCreationProcess extends SimplePropertyObject implement
 	//-------- attributes --------
 	
 	/** The last executed tick. */
-	protected double	lasttick;
+	protected double lasttick;
 
 	/** The last executed time. */
-	protected double	lasttime;
+	protected double lasttime;
 
+	/** The last rate. */
+	protected double lastrate;
+	
 	/** The fetcher. */
 	protected SimpleValueFetcher fetcher;
 
@@ -62,13 +65,13 @@ public class DefaultObjectCreationProcess extends SimplePropertyObject implement
 		// Set back counters to trigger immediate object creation at startup.
 		if(getProperty("tickrate")!=null)
 		{
-			double	rate	= ((Number)getProperty("tickrate")).doubleValue();
-			lasttick	-= rate;
+			this.lastrate	= ((Number)getProperty("tickrate")).doubleValue();
+			lasttick	-= lastrate;
 		}
-		if(getProperty("timerate")!=null)
+		else if(getProperty("timerate")!=null)
 		{
-			double	rate	= ((Number)getProperty("timerate")).doubleValue();
-			lasttime	-= rate;
+			this.lastrate	= ((Number)getProperty("timerate")).doubleValue();
+			lasttime	-= lastrate;
 		}
 	}
 
@@ -91,9 +94,9 @@ public class DefaultObjectCreationProcess extends SimplePropertyObject implement
 	{
 		if(getProperty("tickrate")!=null)
 		{
-			double	rate	= ((Number)getProperty("tickrate")).doubleValue();
+//			double	rate	= ((Number)getProperty("tickrate")).doubleValue();
 			double	current	= clock.getTick();
-			while(rate>0 && lasttick+rate<current)
+			while(lastrate>0 && lasttick+lastrate<current)
 			{
 				Boolean	cond	= (Boolean)getProperty("condition");
 				if(cond!=null && !cond.booleanValue())
@@ -102,7 +105,7 @@ public class DefaultObjectCreationProcess extends SimplePropertyObject implement
 				}
 				else
 				{
-					lasttick	+= rate;
+					lasttick	+= lastrate;
 					String	type	= (String)getProperty("type");
 					Map	props	= (Map)getProperty("properties");
 					props	= props!=null ? new HashMap(props) : null;
@@ -110,15 +113,15 @@ public class DefaultObjectCreationProcess extends SimplePropertyObject implement
 //					Object	obj	= space.createSpaceObject(type, props, null);
 //					System.out.println("Created: "+obj);
 				}
-				rate = ((Number)getProperty("tickrate")).doubleValue();
+				this.lastrate	= ((Number)getProperty("tickrate")).doubleValue();
 			}
 		}
 	
 		if(getProperty("timerate")!=null)
 		{
-			double	rate	= ((Number)getProperty("timerate")).doubleValue();
+//			double	rate	= ((Number)getProperty("timerate")).doubleValue();
 			double	current	= clock.getTime();
-			while(rate>0 && lasttime+rate<current)
+			while(lastrate>0 && lasttime+lastrate<current)
 			{
 				Boolean	cond	= (Boolean)getProperty("condition");
 				if(cond!=null && !cond.booleanValue())
@@ -127,7 +130,7 @@ public class DefaultObjectCreationProcess extends SimplePropertyObject implement
 				}
 				else
 				{
-					lasttime	+= rate;
+					lasttime	+= lastrate;
 					String	type	= (String)getProperty("type");
 					Map	props	= (Map)getProperty("properties");
 					props	= props!=null ? new HashMap(props) : null;
@@ -135,7 +138,7 @@ public class DefaultObjectCreationProcess extends SimplePropertyObject implement
 //					Object	obj	= space.createSpaceObject(type, props, null);
 //					System.out.println("Created: "+obj);
 				}
-				rate = ((Number)getProperty("timerate")).doubleValue();
+				this.lastrate	= ((Number)getProperty("timerate")).doubleValue();
 			}
 		}
 	}
