@@ -106,7 +106,16 @@
 			<parameter name="disaster" class="ISpaceObject">
 				<goalmapping ref="clear_chemicals.disaster"/>
 			</parameter>
-			<body class="ClearChemicalsPlan"/>
+			<parameter name="number" class="int">
+				<goalmapping ref="handle_disaster.number"/>
+			</parameter>
+			<parameter name="forces" class="Collection">
+				<goalmapping ref="handle_disaster.forces"/>
+			</parameter>
+			<parameterset name="units" class="IService" direction="inout">
+				<goalmapping ref="handle_disaster.forces"/>
+			</parameterset>
+			<body class="HandleForcesPlan"/>
 			<trigger>
 				<goal ref="clear_chemicals"/>
 			</trigger>
@@ -116,7 +125,16 @@
 			<parameter name="disaster" class="ISpaceObject">
 				<goalmapping ref="extinguish_fire.disaster"/>
 			</parameter>
-			<body class="ExtinguishFirePlan"/>
+			<parameter name="number" class="int">
+				<goalmapping ref="handle_disaster.number"/>
+			</parameter>
+			<parameter name="forces" class="Collection">
+				<goalmapping ref="handle_disaster.forces"/>
+			</parameter>
+			<parameterset name="units" class="IService" direction="inout">
+				<goalmapping ref="handle_disaster.forces"/>
+			</parameterset>
+			<body class="HandleForcesPlan"/>
 			<trigger>
 				<goal ref="extinguish_fires"/>
 			</trigger>
@@ -126,7 +144,16 @@
 			<parameter name="disaster" class="ISpaceObject">
 				<goalmapping ref="extinguish_fire.disaster"/>
 			</parameter>
-			<body class="TreatVictimsPlan"/>
+			<parameter name="number" class="int">
+				<goalmapping ref="handle_disaster.number"/>
+			</parameter>
+			<parameter name="forces" class="Collection">
+				<goalmapping ref="handle_disaster.forces"/>
+			</parameter>
+			<parameterset name="units" class="IService" direction="inout">
+				<goalmapping ref="handle_disaster.forces"/>
+			</parameterset>
+			<body class="HandleForcesPlan"/>
 			<trigger>
 				<goal ref="treat_victims"/>
 			</trigger>

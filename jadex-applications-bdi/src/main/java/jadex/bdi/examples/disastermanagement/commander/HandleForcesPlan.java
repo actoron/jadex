@@ -60,7 +60,7 @@ public class HandleForcesPlan extends Plan
 				catch(Exception e)
 				{
 				}
-				IService force = (IService)goal.getParameter("rescueforce");
+				IService force = (IService)goal.getParameter("rescueforce").getValue();
 				busy.removeFact(force.getServiceIdentifier().getProviderId());
 				getParameterSet("units").removeValue(force);
 			}
