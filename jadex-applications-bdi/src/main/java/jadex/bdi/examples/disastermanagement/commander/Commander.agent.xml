@@ -172,7 +172,7 @@
 			<trigger>
 				<goal ref="send_rescueforce"/>
 			</trigger>
-			<precondition>$rescueforce instanceof IClearChemicalsService</precondition>
+			<precondition>$goal.rescueforce instanceof IClearChemicalsService</precondition>
 		</plan>
 		
 		<plan name="send_firebrigade_extinguish_fire_plan">
@@ -186,7 +186,7 @@
 			<trigger>
 				<goal ref="send_rescueforce"/>
 			</trigger>
-			<precondition>$rescueforce instanceof IExtinguishFireService</precondition>
+			<precondition>$goal.rescueforce instanceof IExtinguishFireService</precondition>
 		</plan>
 		
 		<plan name="send_firebrigade_extinguish_fire_plan">
@@ -200,7 +200,7 @@
 			<trigger>
 				<goal ref="send_rescueforce"/>
 			</trigger>
-			<precondition>$rescueforce instanceof ITreatVictimsService</precondition>
+			<precondition>$goal.rescueforce instanceof ITreatVictimsService</precondition>
 		</plan>
 		
 		<plan name="free_units_plan">
