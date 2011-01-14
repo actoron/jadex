@@ -7,7 +7,6 @@ import jadex.bdi.examples.disastermanagement.ITreatVictimsService;
 import jadex.bdi.runtime.IBeliefSet;
 import jadex.bdi.runtime.Plan;
 import jadex.commons.concurrent.IResultListener;
-import jadex.commons.service.SServiceProvider;
 
 import java.util.ArrayList;
 import java.util.Collection;

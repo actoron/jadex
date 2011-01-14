@@ -60,7 +60,7 @@ public class TreatVictimsService extends BasicService implements ITreatVictimsSe
 					if(tv.isSucceeded())
 						ret.setResult(null);
 					else
-						ret.setException(new RuntimeException("Goal failed"));
+						ret.setException(tv.getException());
 				}
 				
 				public void goalAdded(AgentEvent ae)
