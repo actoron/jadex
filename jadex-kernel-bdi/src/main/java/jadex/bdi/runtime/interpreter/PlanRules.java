@@ -1942,6 +1942,12 @@ public class PlanRules
 			Object mplan = assignments.getVariableValue("?mplan");
 			Object change = assignments.getVariableValue("?change");
 			
+			String cetype = (String)state.getAttributeValue(change, OAVBDIRuntimeModel.changeevent_has_type);
+			if(OAVBDIRuntimeModel.CHANGEEVENT_GOALDROPPED.equals(cetype))
+			{
+				change = state.getAttributeValue(change, OAVBDIRuntimeModel.changeevent_has_element);
+			}
+			
 			// Create fetcher with binding values.
 			OAVBDIFetcher fetcher = new OAVBDIFetcher(state, rcapa);
 			String[] varnames = assignments.getVariableNames();
