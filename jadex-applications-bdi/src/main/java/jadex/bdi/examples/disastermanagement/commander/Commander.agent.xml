@@ -113,7 +113,7 @@
 				<goalmapping ref="handle_disaster.forces"/>
 			</parameter>
 			<parameterset name="units" class="IService" direction="inout">
-				<goalmapping ref="handle_disaster.forces"/>
+				<goalmapping ref="handle_disaster.units"/>
 			</parameterset>
 			<body class="HandleForcesPlan"/>
 			<trigger>
@@ -132,7 +132,7 @@
 				<goalmapping ref="handle_disaster.forces"/>
 			</parameter>
 			<parameterset name="units" class="IService" direction="inout">
-				<goalmapping ref="handle_disaster.forces"/>
+				<goalmapping ref="handle_disaster.units"/>
 			</parameterset>
 			<body class="HandleForcesPlan"/>
 			<trigger>
@@ -151,7 +151,7 @@
 				<goalmapping ref="handle_disaster.forces"/>
 			</parameter>
 			<parameterset name="units" class="IService" direction="inout">
-				<goalmapping ref="handle_disaster.forces"/>
+				<goalmapping ref="handle_disaster.units"/>
 			</parameterset>
 			<body class="HandleForcesPlan"/>
 			<trigger>

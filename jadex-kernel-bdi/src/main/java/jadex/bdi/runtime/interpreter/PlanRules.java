@@ -1276,6 +1276,8 @@ public class PlanRules
 									if(roparamset==null)
 									{
 										Object mgoalparamset = state.getAttributeValue(mreason, OAVBDIMetaModel.parameterelement_has_parametersets, paramname);
+										if(mgoalparamset==null)
+											System.out.println("abc");
 										Class clazz = (Class)state.getAttributeValue(mgoalparamset, OAVBDIMetaModel.typedelement_has_class);
 										roparamset = BeliefRules.createParameterSet(state, paramname, null, clazz, reason, mgoalparamset, rcapa);
 								
