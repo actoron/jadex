@@ -2,10 +2,7 @@ package jadex.bdi.examples.disastermanagement.commander;
 
 import jadex.application.space.envsupport.environment.ISpaceObject;
 import jadex.bdi.examples.disastermanagement.IClearChemicalsService;
-import jadex.bdi.examples.disastermanagement.IExtinguishFireService;
-import jadex.bdi.runtime.IBeliefSet;
 import jadex.bdi.runtime.Plan;
-import jadex.commons.concurrent.IResultListener;
 
 /**
  * 

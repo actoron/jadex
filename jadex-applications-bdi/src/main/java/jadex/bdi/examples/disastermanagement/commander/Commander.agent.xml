@@ -71,7 +71,7 @@
 			<parameter name="number" class="int"/>
 			<parameter name="forces" class="Collection"/>
 			<parameterset name="units" class="IService"/>
-			<targetcondition>$goal.disaster.getProperty("fires")==0</targetcondition>
+			<targetcondition>$goal.disaster.getProperty("fire")==0</targetcondition>
 		</achievegoal>
 		
 		<achievegoal name="treat_victims" exclude="never" retrydelay="1000">
@@ -79,7 +79,7 @@
 			<parameter name="number" class="int"/>
 			<parameter name="forces" class="Collection"/>
 			<parameterset name="units" class="IService"/>
-			<targetcondition>$goal.disaster.getProperty("fires")==0</targetcondition>
+			<targetcondition>$goal.disaster.getProperty("victims")==0</targetcondition>
 		</achievegoal>
 		
 		<achievegoal name="send_rescueforce">
@@ -189,7 +189,7 @@
 			<precondition>$goal.rescueforce instanceof IExtinguishFireService</precondition>
 		</plan>
 		
-		<plan name="send_firebrigade_extinguish_fire_plan">
+		<plan name="send_ambulance_treat_victims_plan">
 			<parameter name="disaster" class="ISpaceObject">
 				<goalmapping ref="send_rescueforce.disaster"/>
 			</parameter>
@@ -204,7 +204,7 @@
 		</plan>
 		
 		<plan name="free_units_plan">
-			<parameterset name="units" class="IService">
+ 			<parameterset name="units" class="IService">
 				<goalmapping ref="clear_chemicals.units"/>
 				<goalmapping ref="extinguish_fires.units"/>
 				<goalmapping ref="treat_victims.units"/>

@@ -43,7 +43,7 @@ public class HandleDisasterPlan extends Plan
 			ef.getParameter("disaster").setValue(disaster);
 			Collection forces = (Collection)getScope().getRequiredServices("extinguishfireservices").get(this);
 			ef.getParameter("forces").setValue(forces);
-			ef.getParameter("number").setValue(disaster.getProperty("fires"));
+			ef.getParameter("number").setValue(disaster.getProperty("fire"));
 			dispatchSubgoal(ef);
 		}
 		IGoal tv = null;

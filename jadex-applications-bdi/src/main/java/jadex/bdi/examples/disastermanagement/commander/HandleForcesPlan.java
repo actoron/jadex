@@ -4,7 +4,6 @@ import jadex.application.space.envsupport.environment.ISpaceObject;
 import jadex.bdi.runtime.IBeliefSet;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
-import jadex.commons.concurrent.IResultListener;
 import jadex.commons.service.IService;
 
 import java.util.ArrayList;
