@@ -8,10 +8,8 @@ import jadex.bdi.runtime.IGoalListener;
 import jadex.bdi.runtime.Plan;
 import jadex.commons.service.IService;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
 
 /**
  *  Handle forces by sending an appropriate number to the disaster site..

@@ -19,4 +19,13 @@ public class ClearChemicalsPlan extends Plan
 		IClearChemicalsService force = (IClearChemicalsService)getParameter("rescueforce").getValue();
 		force.clearChemicals(disaster).get(this);
 	}
+	
+	/**
+	 *  Called when the plan is aborted.
+	 */
+	public void aborted()
+	{
+		IClearChemicalsService force = (IClearChemicalsService)getParameter("rescueforce").getValue();
+		force.abort().get(this);
+	}
 }

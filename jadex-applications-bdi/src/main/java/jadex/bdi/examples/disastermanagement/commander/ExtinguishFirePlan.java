@@ -19,4 +19,13 @@ public class ExtinguishFirePlan extends Plan
 		IExtinguishFireService force = (IExtinguishFireService)getParameter("rescueforce").getValue();
 		force.extinguishFire(disaster).get(this);
 	}
+	
+	/**
+	 *  Called when the plan is aborted.
+	 */
+	public void aborted()
+	{
+		IExtinguishFireService force = (IExtinguishFireService)getParameter("rescueforce").getValue();
+		force.abort().get(this);
+	}
 }

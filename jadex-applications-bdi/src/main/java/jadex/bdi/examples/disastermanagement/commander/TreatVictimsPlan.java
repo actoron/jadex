@@ -34,8 +34,18 @@ public class TreatVictimsPlan extends Plan
 	 */
 	public void aborted()
 	{
-		// Wait until service is finished before superordinated goal is dropped.
-		if(tv!=null && ! tv.isDone())
-			tv.get(this);
+		if(tv!=null && !tv.isDone())
+		{
+			ITreatVictimsService force = (ITreatVictimsService)getParameter("rescueforce").getValue();
+			try
+			{
+				force.abort().get(this);
+			}
+			catch(Exception e)
+			{
+				// Wait until service is finished before superordinated goal is dropped.
+				tv.get(this);
+			}
+		}
 	}
 }

@@ -4,8 +4,6 @@ import jadex.application.space.envsupport.environment.ISpaceObject;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 
-import java.util.Collection;
-
 /**
  *  Handle a disaster by assigning units.
  */
