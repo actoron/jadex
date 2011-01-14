@@ -53,6 +53,7 @@ public class HandleForcesPlan extends Plan
 						{
 							public void goalFinished(AgentEvent ae)
 							{
+								// The plans ensure that the force is guaranteed to be not duty when the goal is finished.
 								busy.removeFact(provid);
 							}
 							
@@ -60,7 +61,6 @@ public class HandleForcesPlan extends Plan
 							{
 							}
 						});
-//						goals.add(sendforce);
 					}
 				}
 			}
@@ -69,18 +69,15 @@ public class HandleForcesPlan extends Plan
 		}
 	}
 	
-//	for(int i=0; i<goals.size(); i++)
-//	{
-//		IGoal goal = (IGoal)goals.get(i);
-//		try
-//		{
-//			waitForGoal(goal);
-//		}
-//		catch(Exception e)
-//		{
-//		}
-//		IService force = (IService)goal.getParameter("rescueforce").getValue();
-//		busy.removeFact(force.getServiceIdentifier().getProviderId());
-//		getParameterSet("units").removeValue(force);
-//	}
+	public void aborted()
+	{
+		if(getException()!=null)
+		{
+			System.out.println("aborted: "+getException());
+		}
+	}
+	public void failed()
+	{
+		System.out.println("failed");
+	}
 }
