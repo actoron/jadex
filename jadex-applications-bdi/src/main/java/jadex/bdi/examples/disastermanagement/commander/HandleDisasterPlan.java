@@ -31,9 +31,8 @@ public class HandleDisasterPlan extends Plan
 		{
 			IGoal cc = createGoal("clear_chemicals"); 
 			cc.getParameter("disaster").setValue(disaster);
-			Collection forces = (Collection)getScope().getRequiredServices("clearchemicalsservices").get(this);
-			cc.getParameter("forces").setValue(forces);
-			cc.getParameter("number").setValue(disaster.getProperty("chemicals"));
+			cc.getParameter("servicename").setValue("clearchemicalsservices");
+			cc.getParameter("typename").setValue("chemicals");
 			dispatchSubgoalAndWait(cc);
 		}
 		IGoal ef = null;
@@ -41,9 +40,8 @@ public class HandleDisasterPlan extends Plan
 		{
 			ef = createGoal("extinguish_fires"); 
 			ef.getParameter("disaster").setValue(disaster);
-			Collection forces = (Collection)getScope().getRequiredServices("extinguishfireservices").get(this);
-			ef.getParameter("forces").setValue(forces);
-			ef.getParameter("number").setValue(disaster.getProperty("fire"));
+			ef.getParameter("servicename").setValue("extinguishfireservices");
+			ef.getParameter("typename").setValue("fire");
 			dispatchSubgoal(ef);
 		}
 		IGoal tv = null;
@@ -51,9 +49,8 @@ public class HandleDisasterPlan extends Plan
 		{
 			tv = createGoal("treat_victims"); 
 			tv.getParameter("disaster").setValue(disaster);
-			Collection forces = (Collection)getScope().getRequiredServices("treatvictimservices").get(this);
-			tv.getParameter("forces").setValue(forces);
-			tv.getParameter("number").setValue(disaster.getProperty("victims"));
+			tv.getParameter("servicename").setValue("treatvictimservices");
+			tv.getParameter("typename").setValue("victims");
 			dispatchSubgoal(tv);
 		}
 		

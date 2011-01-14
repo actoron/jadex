@@ -24,12 +24,14 @@ public class HandleForcesPlan extends Plan
 	 */
 	public void	body()
 	{		
-		final ISpaceObject disaster = (ISpaceObject)getParameter("disaster").getValue();
-		int number = ((Integer)getParameter("number").getValue()).intValue();
-		Collection forces = (Collection)getParameter("forces").getValue();
-		
 		while(true)
 		{
+			final ISpaceObject disaster = (ISpaceObject)getParameter("disaster").getValue();
+			String servicename = (String)getParameter("servicename").getValue();
+			String typename = (String)getParameter("typename").getValue();
+			Collection forces = (Collection)getScope().getRequiredServices(servicename).get(this);
+			int number = ((Integer)disaster.getProperty(typename)).intValue();
+			
 			if(forces.size()>0)
 			{
 				final IBeliefSet busy = getBeliefbase().getBeliefSet("busy_entities");	
