@@ -23,7 +23,6 @@ public class HandleDisasterPlan extends Plan
 		int chemicals = ((Integer)disaster.getProperty("chemicals")).intValue();
 		int fire = ((Integer)disaster.getProperty("fire")).intValue();
 		int victims = ((Integer)disaster.getProperty("victims")).intValue();
-
 		
 		if(chemicals>0)
 		{
@@ -56,6 +55,19 @@ public class HandleDisasterPlan extends Plan
 			waitForGoal(ef);
 		if(tv!=null)
 			waitForGoal(tv);
+	}
+	
+	public void aborted()
+	{
+		if(getException()!=null)
+		{
+			System.out.println("aborted: "+getException()+" "+this);
+		}
+	}
+	
+	public void failed()
+	{
+		System.out.println("failed: "+this);
 	}
 	
 //	/** The already assigned fire units. */

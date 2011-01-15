@@ -39,7 +39,7 @@
 	</beliefs>
 
 	<goals>
-		<achievegoal name="handle_disaster">
+		<achievegoal name="handle_disaster" exclude="never">
 			<parameter name="disaster" class="ISpaceObject">
 				<value>$disaster</value>
 			</parameter>
@@ -58,7 +58,7 @@
 			</targetcondition>
 		</achievegoal>
 		
-		<achievegoal name="clear_chemicals" exclude="never" retrydelay="1000">
+		<achievegoal name="clear_chemicals" exclude="never">
 			<parameter name="disaster" class="ISpaceObject"/>
 			<parameter name="typename" class="String"/>
 			<parameter name="servicename" class="String"/>
@@ -66,7 +66,7 @@
 			<targetcondition>$goal.disaster.getProperty("chemicals")==0</targetcondition>
 		</achievegoal>
 		
-		<achievegoal name="extinguish_fires" exclude="never" retrydelay="1000">
+		<achievegoal name="extinguish_fires" exclude="never">
 			<parameter name="disaster" class="ISpaceObject"/>
 			<parameter name="typename" class="String"/>
 			<parameter name="servicename" class="String"/>
@@ -74,7 +74,7 @@
 			<targetcondition>$goal.disaster.getProperty("fire")==0</targetcondition>
 		</achievegoal>
 		
-		<achievegoal name="treat_victims" exclude="never" retrydelay="1000">
+		<achievegoal name="treat_victims" exclude="never">
 			<parameter name="disaster" class="ISpaceObject"/>
 			<parameter name="typename" class="String"/>
 			<parameter name="servicename" class="String"/>

@@ -6,10 +6,13 @@ import jadex.bdi.runtime.IBeliefSet;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IGoalListener;
 import jadex.bdi.runtime.Plan;
+import jadex.commons.SUtil;
 import jadex.commons.service.IService;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  *  Handle forces by sending an appropriate number to the disaster site..
@@ -29,19 +32,22 @@ public class HandleForcesPlan extends Plan
 			String typename = (String)getParameter("typename").getValue();
 			Collection forces = (Collection)getScope().getRequiredServices(servicename).get(this);
 			int number = ((Integer)disaster.getProperty(typename)).intValue();
-			
+			final IBeliefSet busy = getBeliefbase().getBeliefSet("busy_entities");	
+							
+			int as = 0;
 			if(forces.size()>0)
 			{
-				final IBeliefSet busy = getBeliefbase().getBeliefSet("busy_entities");	
+				List fs = new ArrayList(forces);
 				Iterator it = forces.iterator();
 				
 //				List goals = new ArrayList();
 				while(number>getParameterSet("units").size() && it.hasNext())
 				{
-					IService force = (IService)it.next();
+					final IService force = (IService)it.next();
 					final Object provid = force.getServiceIdentifier().getProviderId();
 					if(!busy.containsFact(provid))
 					{
+						as++;
 						busy.addFact(provid);
 						getParameterSet("units").addValue(force);
 					
@@ -54,6 +60,7 @@ public class HandleForcesPlan extends Plan
 							public void goalFinished(AgentEvent ae)
 							{
 								// The plans ensure that the force is guaranteed to be not duty when the goal is finished.
+								getParameterSet("units").removeValue(force);
 								busy.removeFact(provid);
 							}
 							
@@ -65,19 +72,22 @@ public class HandleForcesPlan extends Plan
 				}
 			}
 			
+			System.out.println("hf: "+disaster.getId()+" "+number+" "+getParameterSet("units").getValues().length+" "+as+" "+busy.size()+" "+SUtil.arrayToString(busy.getFacts()));
+			
 			waitFor(1000);
 		}
 	}
 	
-	public void aborted()
-	{
-		if(getException()!=null)
-		{
-			System.out.println("aborted: "+getException());
-		}
-	}
-	public void failed()
-	{
-		System.out.println("failed");
-	}
+//	public void aborted()
+//	{
+//		if(getException()!=null)
+//		{
+//			System.out.println("aborted: "+getException());
+//		}
+//	}
+//	
+//	public void failed()
+//	{
+//		System.out.println("failed");
+//	}
 }
