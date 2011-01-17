@@ -28,8 +28,6 @@ public class HandleDisasterPlan extends Plan
 		{
 			IGoal cc = createGoal("clear_chemicals"); 
 			cc.getParameter("disaster").setValue(disaster);
-			cc.getParameter("servicename").setValue("clearchemicalsservices");
-			cc.getParameter("typename").setValue("chemicals");
 			dispatchSubgoalAndWait(cc);
 		}
 		IGoal ef = null;
@@ -37,8 +35,6 @@ public class HandleDisasterPlan extends Plan
 		{
 			ef = createGoal("extinguish_fires"); 
 			ef.getParameter("disaster").setValue(disaster);
-			ef.getParameter("servicename").setValue("extinguishfireservices");
-			ef.getParameter("typename").setValue("fire");
 			dispatchSubgoal(ef);
 		}
 		IGoal tv = null;
@@ -46,8 +42,6 @@ public class HandleDisasterPlan extends Plan
 		{
 			tv = createGoal("treat_victims"); 
 			tv.getParameter("disaster").setValue(disaster);
-			tv.getParameter("servicename").setValue("treatvictimservices");
-			tv.getParameter("typename").setValue("victims");
 			dispatchSubgoal(tv);
 		}
 		

@@ -60,24 +60,18 @@
 		
 		<achievegoal name="clear_chemicals" exclude="never">
 			<parameter name="disaster" class="ISpaceObject"/>
-			<parameter name="typename" class="String"/>
-			<parameter name="servicename" class="String"/>
 			<parameterset name="units" class="IService"/>
 			<targetcondition>$goal.disaster.getProperty("chemicals")==0</targetcondition>
 		</achievegoal>
 		
 		<achievegoal name="extinguish_fires" exclude="never">
 			<parameter name="disaster" class="ISpaceObject"/>
-			<parameter name="typename" class="String"/>
-			<parameter name="servicename" class="String"/>
 			<parameterset name="units" class="IService"/>
 			<targetcondition>$goal.disaster.getProperty("fire")==0</targetcondition>
 		</achievegoal>
 		
 		<achievegoal name="treat_victims" exclude="never">
 			<parameter name="disaster" class="ISpaceObject"/>
-			<parameter name="typename" class="String"/>
-			<parameter name="servicename" class="String"/>
 			<parameterset name="units" class="IService"/>
 			<targetcondition>$goal.disaster.getProperty("victims")==0</targetcondition>
 		</achievegoal>
@@ -106,16 +100,10 @@
 			<parameter name="disaster" class="ISpaceObject">
 				<goalmapping ref="clear_chemicals.disaster"/>
 			</parameter>
-			<parameter name="typename" class="String">
-				<goalmapping ref="handle_disaster.typename"/>
-			</parameter>
-			<parameter name="servicename" class="String">
-				<goalmapping ref="handle_disaster.servicename"/>
-			</parameter>
 			<parameterset name="units" class="IService" direction="inout">
 				<goalmapping ref="handle_disaster.units"/>
 			</parameterset>
-			<body class="HandleForcesPlan"/>
+			<body class="HandleFireBrigadesClearChemicalsPlan"/>
 			<trigger>
 				<goal ref="clear_chemicals"/>
 			</trigger>
@@ -125,16 +113,10 @@
 			<parameter name="disaster" class="ISpaceObject">
 				<goalmapping ref="extinguish_fire.disaster"/>
 			</parameter>
-			<parameter name="typename" class="String">
-				<goalmapping ref="handle_disaster.typename"/>
-			</parameter>
-			<parameter name="servicename" class="String">
-				<goalmapping ref="handle_disaster.servicename"/>
-			</parameter>
 			<parameterset name="units" class="IService" direction="inout">
 				<goalmapping ref="handle_disaster.units"/>
 			</parameterset>
-			<body class="HandleForcesPlan"/>
+			<body class="HandleFireBrigadesExtinguishFiresPlan"/>
 			<trigger>
 				<goal ref="extinguish_fires"/>
 			</trigger>
@@ -144,16 +126,10 @@
 			<parameter name="disaster" class="ISpaceObject">
 				<goalmapping ref="extinguish_fire.disaster"/>
 			</parameter>
-			<parameter name="typename" class="String">
-				<goalmapping ref="handle_disaster.typename"/>
-			</parameter>
-			<parameter name="servicename" class="String">
-				<goalmapping ref="handle_disaster.servicename"/>
-			</parameter>
 			<parameterset name="units" class="IService" direction="inout">
 				<goalmapping ref="handle_disaster.units"/>
 			</parameterset>
-			<body class="HandleForcesPlan"/>
+			<body class="HandleAmbulancesPlan"/>
 			<trigger>
 				<goal ref="treat_victims"/>
 			</trigger>
