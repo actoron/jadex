@@ -204,7 +204,7 @@ public class BDICoordinationInformationInterpreter extends SimplePropertyObject
 												if ((coordinationSpaceObj.getProperty(CoordinationInfo.AGENT_ELEMENT_TYPE)).equals(elementType)
 														|| coordinationSpaceObj.getProperty(CoordinationInfo.AGENT_ELEMENT_TYPE) == null) { // when
 													if (((String) coordinationSpaceObj.getProperty(CoordinationInfo.AGENT_ELEMENT_NAME)).equals(elementId)
-															|| coordinationSpaceObj.getProperty(CoordinationInfo.AGENT_ELEMENT_TYPE) == null) {
+															|| coordinationSpaceObj.getProperty(CoordinationInfo.AGENT_ELEMENT_NAME) == null) {
 														HashMap<String, Object> receivedParamDataMappings = (HashMap<String, Object>) coordinationSpaceObj
 																.getProperty(Constants.PARAMETER_DATA_MAPPING);
 														if (elementType.equals(AgentElementType.BDI_BELIEFSET.toString())) {

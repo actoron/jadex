@@ -139,7 +139,7 @@
 		</General>
 		<Rows experiments="10">
 			<TerminateCondition>
-				  <Time value="5000" type="relative" />				
+				  <Time value="10000" type="relative" />				
 					<!--<TargetFunction function="$object.getProperty(&quot;executedWorkflows&quot;) >=
 					50">	<ObjectSource type="ISpaceObject" name="moneyBankOfSMA" /> </TargetFunction>
 														-->					

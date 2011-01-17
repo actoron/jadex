@@ -84,9 +84,6 @@
 		<componenttype
 			filename="deco4mas/examples/agentNegotiation/sma/ServiceManagementAgent.agent.xml"
 			name="ServiceManagementAgent" />
-		<!-- ClientSimulator -->
-		<componenttype filename="jadex/simulation/client/ClientSimulator.agent.xml"
-			name="ClientSimulator" />
 	</componenttypes>
 
 	<applications>

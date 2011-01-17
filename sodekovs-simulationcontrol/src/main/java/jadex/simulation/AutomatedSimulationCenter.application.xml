@@ -45,5 +45,15 @@
 				</component>
 			</components>
 		</application>
+		<application name="Simulate AgentNegotiation with included Remote Client">
+			<components>
+				<component type="SimulationManager" master="true">
+					<arguments>
+						<argument name="simulationDescriptionFile">"../sodekovs-simulationcontrol/src/main/java/jadex/simulation/TestNegotiationConfiguration.xml"</argument>			
+					</arguments>
+				</component>
+				<component type="RemoteSimulationClient" master="false"/>
+			</components>
+		</application>
 	</applications>
 </applicationtype>
