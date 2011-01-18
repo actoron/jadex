@@ -26,10 +26,8 @@ public class DynamicServiceFetcher implements IRequiredServiceFetcher
 	 */
 	public IFuture getService(RequiredServiceInfo info, IServiceProvider provider, boolean rebind)
 	{
-		return info.isDeclared()?
-			SServiceProvider.getDeclaredService(provider, info.getType()):
-			info.isUpwards()? SServiceProvider.getServiceUpwards(provider, info.getType()):
-			SServiceProvider.getService(provider, info.getType(), info.isRemote(), info.isForced());
+		return info.isUpwards()? SServiceProvider.getServiceUpwards(provider, info.getType()):
+			SServiceProvider.getService(provider, info.getType(), info.getScope());
 	}
 	
 	/**
@@ -37,19 +35,6 @@ public class DynamicServiceFetcher implements IRequiredServiceFetcher
 	 */
 	public IIntermediateFuture getServices(RequiredServiceInfo info, IServiceProvider provider, boolean rebind)
 	{
-		IIntermediateFuture	ret;
-		if(info.isDeclared())
-		{
-			IntermediateFuture	fut	= new IntermediateFuture();
-			SServiceProvider.getDeclaredServices(provider, info.getType())
-				.addResultListener(new DelegationResultListener(fut));
-			ret	= fut;
-		}
-		else
-		{
-			ret	= SServiceProvider.getServices(provider, info.getType(), info.isRemote(), info.isForced());
-		}
-		
-		return ret;
+		return SServiceProvider.getServices(provider, info.getType(), info.getScope());
 	}
 }

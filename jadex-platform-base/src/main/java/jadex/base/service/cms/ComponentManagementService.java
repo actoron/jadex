@@ -28,6 +28,7 @@ import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.service.BasicService;
+import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.execution.IExecutionService;
 import jadex.commons.service.library.ILibraryService;
@@ -513,7 +514,7 @@ public abstract class ComponentManagementService extends BasicService implements
 		
 		if(nofac)
 		{
-			SServiceProvider.getServices(exta.getServiceProvider(), IComponentFactory.class, false, true)
+			SServiceProvider.getServices(exta.getServiceProvider(), IComponentFactory.class)
 				.addResultListener(new IResultListener()
 			{
 				public void resultAvailable(Object result)
@@ -535,7 +536,7 @@ public abstract class ComponentManagementService extends BasicService implements
 
 			if(factory==null)
 			{
-				SServiceProvider.getServices(exta.getServiceProvider(), IComponentFactory.class, false, true)
+				SServiceProvider.getServices(exta.getServiceProvider(), IComponentFactory.class)
 					.addResultListener(new IResultListener()
 				{
 					public void resultAvailable(Object result)
@@ -1816,7 +1817,7 @@ public abstract class ComponentManagementService extends BasicService implements
 //		open.add(fut);
 		if(remote)
 		{
-			SServiceProvider.getServices(exta.getServiceProvider(), IComponentManagementService.class, true, true).addResultListener(new IResultListener()
+			SServiceProvider.getServices(exta.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.GLOBAL_SCOPE).addResultListener(new IResultListener()
 			{
 				public void resultAvailable(Object result)
 				{

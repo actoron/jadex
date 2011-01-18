@@ -60,19 +60,19 @@
 		
 		<achievegoal name="clear_chemicals" exclude="never">
 			<parameter name="disaster" class="ISpaceObject"/>
-			<parameterset name="units" class="IService"/>
+			<parameterset name="units" class="Object"/>
 			<targetcondition>$goal.disaster.getProperty("chemicals")==0</targetcondition>
 		</achievegoal>
 		
 		<achievegoal name="extinguish_fires" exclude="never">
 			<parameter name="disaster" class="ISpaceObject"/>
-			<parameterset name="units" class="IService"/>
+			<parameterset name="units" class="Object"/>
 			<targetcondition>$goal.disaster.getProperty("fire")==0</targetcondition>
 		</achievegoal>
 		
 		<achievegoal name="treat_victims" exclude="never">
 			<parameter name="disaster" class="ISpaceObject"/>
-			<parameterset name="units" class="IService"/>
+			<parameterset name="units" class="Object"/>
 			<targetcondition>$goal.disaster.getProperty("victims")==0</targetcondition>
 		</achievegoal>
 		

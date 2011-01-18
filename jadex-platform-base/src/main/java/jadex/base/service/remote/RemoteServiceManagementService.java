@@ -201,7 +201,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	public IFuture getServiceProxy(final IComponentIdentifier cid, final Class service)
 	{
 		Future	ret	= new Future();
-		getServiceProxies(cid, SServiceProvider.sequentialmanager, SServiceProvider.abortdecider, 
+		getServiceProxies(cid, SServiceProvider.sequentialmanager, SServiceProvider.getVisitDecider(true), 
 			new TypeResultSelector(service, true)).addResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)

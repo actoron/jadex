@@ -16,19 +16,19 @@ public class HandleDisasterPlan extends Plan
 	 */
 	public void	body()
 	{		
-		final ISpaceObject disaster = (ISpaceObject)getParameter("disaster").getValue();
+		ISpaceObject disaster = (ISpaceObject)getParameter("disaster").getValue();
 //		System.out.println("handle: "+disaster);
 	
-		// Plan runs in an endless loop until the goal is achieved and the plan is aborted.
 		int chemicals = ((Integer)disaster.getProperty("chemicals")).intValue();
 		int fire = ((Integer)disaster.getProperty("fire")).intValue();
 		int victims = ((Integer)disaster.getProperty("victims")).intValue();
 		
+		IGoal cc = null;
 		if(chemicals>0)
 		{
-			IGoal cc = createGoal("clear_chemicals"); 
+			cc = createGoal("clear_chemicals"); 
 			cc.getParameter("disaster").setValue(disaster);
-			dispatchSubgoalAndWait(cc);
+			dispatchSubgoal(cc);
 		}
 		IGoal ef = null;
 		if(fire>0)
@@ -37,6 +37,8 @@ public class HandleDisasterPlan extends Plan
 			ef.getParameter("disaster").setValue(disaster);
 			dispatchSubgoal(ef);
 		}
+		if(cc!=null)
+			waitForGoal(cc);
 		IGoal tv = null;
 		if(victims>0)
 		{
@@ -51,18 +53,18 @@ public class HandleDisasterPlan extends Plan
 			waitForGoal(tv);
 	}
 	
-	public void aborted()
-	{
-		if(getException()!=null)
-		{
-			System.out.println("aborted: "+getException()+" "+this);
-		}
-	}
-	
-	public void failed()
-	{
-		System.out.println("failed: "+this);
-	}
+//	public void aborted()
+//	{
+//		if(getException()!=null)
+//		{
+//			System.out.println("aborted: "+getException()+" "+this);
+//		}
+//	}
+//	
+//	public void failed()
+//	{
+//		System.out.println("failed: "+this);
+//	}
 	
 //	/** The already assigned fire units. */
 //	protected List	fireunits;

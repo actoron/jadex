@@ -40,7 +40,7 @@ public class ChatAgent extends MicroAgent
 			new IArgument[]{}//new Argument("infos", "Initial information records.", "InformationEntry[]")}
 			, null, null, SUtil.createHashMap(new String[]{"componentviewer.viewerclass"}, new Object[]{"jadex.micro.examples.chat.ChatPanel"}),
 			new RequiredServiceInfo[]{
-				new RequiredServiceInfo("chatservices", IChatService.class, true, true, true, true), 
+				new RequiredServiceInfo("chatservices", IChatService.class, true, true, RequiredServiceInfo.GLOBAL_SCOPE), 
 				}, new Class[]{IChatService.class});
 	}
 

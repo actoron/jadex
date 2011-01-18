@@ -31,19 +31,20 @@ public class StaticServiceFetcher implements IRequiredServiceFetcher
 		final Future ret = new Future();
 		if(result==null || rebind)
 		{
-			if(info.isDeclared())
-			{
-				SServiceProvider.getDeclaredService(provider, info.getType())
-					.addResultListener(new DelegationResultListener(ret)
-				{
-					public void customResultAvailable(Object result)
-					{
-						StaticServiceFetcher.this.result = result;
-						super.customResultAvailable(result);
-					}
-				});
-			}
-			else if(info.isUpwards())
+//			if(info.isDeclared())
+//			{
+//				SServiceProvider.getDeclaredService(provider, info.getType())
+//					.addResultListener(new DelegationResultListener(ret)
+//				{
+//					public void customResultAvailable(Object result)
+//					{
+//						StaticServiceFetcher.this.result = result;
+//						super.customResultAvailable(result);
+//					}
+//				});
+//			}
+//			else 
+			if(info.isUpwards())
 			{
 				SServiceProvider.getServiceUpwards(provider, info.getType())
 					.addResultListener(new DelegationResultListener(ret)
@@ -57,7 +58,7 @@ public class StaticServiceFetcher implements IRequiredServiceFetcher
 			}
 			else
 			{
-				SServiceProvider.getService(provider, info.getType(), info.isRemote(), info.isForced() || rebind)
+				SServiceProvider.getService(provider, info.getType(), info.getScope())
 					.addResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
@@ -84,9 +85,21 @@ public class StaticServiceFetcher implements IRequiredServiceFetcher
 		if(result==null || rebind)
 		{
 //			System.out.println("static: "+info.getType()+" "+info.isForced());
-			if(info.isDeclared())
-			{
-				SServiceProvider.getDeclaredServices(provider, info.getType())
+//			if(info.isDeclared())
+//			{
+//				SServiceProvider.getDeclaredServices(provider, info.getType())
+//					.addResultListener(new IntermediateDelegationResultListener(ret)
+//				{
+//					public void customResultAvailable(Object result)
+//					{
+//						StaticServiceFetcher.this.result = result;
+//						super.customResultAvailable(result);
+//					}
+//				});
+//			}
+//			else
+//			{
+				SServiceProvider.getServices(provider, info.getType(), info.getScope())
 					.addResultListener(new IntermediateDelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
@@ -95,19 +108,7 @@ public class StaticServiceFetcher implements IRequiredServiceFetcher
 						super.customResultAvailable(result);
 					}
 				});
-			}
-			else
-			{
-				SServiceProvider.getServices(provider, info.getType(), info.isRemote(), info.isForced() || rebind)
-					.addResultListener(new IntermediateDelegationResultListener(ret)
-				{
-					public void customResultAvailable(Object result)
-					{
-						StaticServiceFetcher.this.result = result;
-						super.customResultAvailable(result);
-					}
-				});
-			}
+//			}
 		}
 		else
 		{

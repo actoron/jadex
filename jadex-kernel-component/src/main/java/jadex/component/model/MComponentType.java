@@ -202,7 +202,7 @@ public class MComponentType extends MStartable implements ICacheableModel
 			{
 				MRequiredServiceType ser = (MRequiredServiceType)reqs.get(i);
 				tmp[i] = new RequiredServiceInfo(ser.getName(), ser.getClazz(), ser.isDynamic(), 
-					ser.isMultiple(), ser.isRemote(), ser.isForced(), ser.isDeclared());
+					ser.isMultiple(), ser.getScope());
 			}
 			
 			modelinfo.setRequiredServices(tmp);

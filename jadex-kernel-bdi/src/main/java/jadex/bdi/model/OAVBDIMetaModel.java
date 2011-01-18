@@ -336,14 +336,21 @@ public class OAVBDIMetaModel
 	/** Required service has multiple flag. */
 	public static OAVAttributeType requiredservice_has_multiple;
 
-	/** Required service has forced flag. */
-	public static OAVAttributeType requiredservice_has_forced;
+//	/** Required service has forced flag. */
+//	public static OAVAttributeType requiredservice_has_forced;
+//
+//	/** Required service has remote flag. */
+//	public static OAVAttributeType requiredservice_has_remote;
+//
+//	/** Required service has declared flag. */
+//	public static OAVAttributeType requiredservice_has_declared;
+	
+	/** Required service has multiple flag. */
+	public static OAVAttributeType requiredservice_has_upwards;
+	
+	/** Required service has scope. */
+	public static OAVAttributeType requiredservice_has_scope;
 
-	/** Required service has remote flag. */
-	public static OAVAttributeType requiredservice_has_remote;
-
-	/** Required service has declared flag. */
-	public static OAVAttributeType requiredservice_has_declared;
 	
 	
 //	/** Expression has parameters attribute. */
@@ -1012,9 +1019,11 @@ public class OAVBDIMetaModel
 
 		requiredservice_has_dynamic = requiredservice_type.createAttributeType("mrequiredservice_has_dynamic", OAVJavaType.java_boolean_type, OAVAttributeType.NONE, Boolean.FALSE);
 		requiredservice_has_multiple = requiredservice_type.createAttributeType("mrequiredservice_has_multiple", OAVJavaType.java_boolean_type, OAVAttributeType.NONE, Boolean.FALSE);
-		requiredservice_has_forced = requiredservice_type.createAttributeType("mrequiredservice_has_forced", OAVJavaType.java_boolean_type, OAVAttributeType.NONE, Boolean.FALSE);
-		requiredservice_has_remote = requiredservice_type.createAttributeType("mrequiredservice_has_remote", OAVJavaType.java_boolean_type, OAVAttributeType.NONE, Boolean.FALSE);
-		requiredservice_has_declared = requiredservice_type.createAttributeType("mrequiredservice_has_declared", OAVJavaType.java_boolean_type, OAVAttributeType.NONE, Boolean.FALSE);
+//		requiredservice_has_forced = requiredservice_type.createAttributeType("mrequiredservice_has_forced", OAVJavaType.java_boolean_type, OAVAttributeType.NONE, Boolean.FALSE);
+//		requiredservice_has_remote = requiredservice_type.createAttributeType("mrequiredservice_has_remote", OAVJavaType.java_boolean_type, OAVAttributeType.NONE, Boolean.FALSE);
+//		requiredservice_has_declared = requiredservice_type.createAttributeType("mrequiredservice_has_declared", OAVJavaType.java_boolean_type, OAVAttributeType.NONE, Boolean.FALSE);
+		requiredservice_has_upwards = requiredservice_type.createAttributeType("mrequiredservice_has_upwards", OAVJavaType.java_boolean_type, OAVAttributeType.NONE, Boolean.FALSE);
+		requiredservice_has_scope = requiredservice_type.createAttributeType("mrequiredservice_has_scope", OAVJavaType.java_string_type, OAVAttributeType.NONE);
 		
 //		expression_has_class = expression_type.createAttributeType("mexpression_has_class", OAVJavaType.java_class_type);
 //		expression_has_parameters = expression_type.createAttributeType("mexpression_has_parameters",  expressionparameter_type, OAVAttributeType.LIST);

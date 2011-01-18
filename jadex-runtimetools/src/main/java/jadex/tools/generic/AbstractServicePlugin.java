@@ -6,6 +6,7 @@ import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.commons.service.IService;
+import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
 
 import java.util.Collection;
@@ -49,7 +50,7 @@ public abstract class AbstractServicePlugin extends AbstractGenericPlugin
 	 */
 	public void refreshCombo()
 	{
-		SServiceProvider.getServices(getJCC().getServiceProvider(), getServiceType(), remotecb.isSelected(), true)
+		SServiceProvider.getServices(getJCC().getServiceProvider(), getServiceType(), remotecb.isSelected()? RequiredServiceInfo.GLOBAL_SCOPE: RequiredServiceInfo.PLATFORM_SCOPE)
 			.addResultListener(new SwingDefaultResultListener(getView()) 
 		{
 			public void customResultAvailable(Object result) 

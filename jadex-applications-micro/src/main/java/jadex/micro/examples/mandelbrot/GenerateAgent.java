@@ -30,9 +30,9 @@ public class GenerateAgent extends MicroAgent
 			null, null, null,
 			new RequiredServiceInfo[]{
 				new RequiredServiceInfo("displayservice", IDisplayService.class), 
-				new RequiredServiceInfo("calculateservices", ICalculateService.class, true, true, false, true),
+				new RequiredServiceInfo("calculateservices", ICalculateService.class, true, true),
 				new RequiredServiceInfo("cmsservice", IComponentManagementService.class),
-				new RequiredServiceInfo("generateservice", IGenerateService.class, false, false, true)
+				new RequiredServiceInfo("generateservice", IGenerateService.class, false, false)
 			},
 		new Class[]{IGenerateService.class});
 	}

@@ -5,6 +5,23 @@ package jadex.commons.service;
  */
 public class RequiredServiceInfo
 {
+	//-------- constants --------
+	
+	/** Local component scope. */
+	public static final String LOCAL_SCOPE = "local";
+	
+	/** Component scope. */
+	public static final String COMPONENT_SCOPE = "component";
+	
+	/** Application scope. */
+	public static final String APPLICATION_SCOPE = "application";
+
+	/** Platform scope. */
+	public static final String PLATFORM_SCOPE = "platform";
+
+	/** Global scope. */
+	public static final String GLOBAL_SCOPE = "global";
+	
 	//-------- attributes --------
 	
 	/** The component internal service name. */
@@ -19,20 +36,13 @@ public class RequiredServiceInfo
 	/** Flag if multiple services should be returned. */
 	protected boolean multiple;
 
-	/** Flag to indicate if cached results are allowed. */
-	protected boolean forced;
-
-	/** Flag to indicate if remote search should be performed. */
-	protected boolean remote;
-	
-	/** Flag to indicate only a declared (local) service should be used. */
-	protected boolean declared;
+	/** The search scope. */
+	protected String scope;
 	
 	/** Flag to indicate that only upwards search should be used. */
 	protected boolean upwards;
 
-
-		
+	
 	//-------- constructors --------
 	
 	/**
@@ -47,7 +57,7 @@ public class RequiredServiceInfo
 	 */
 	public RequiredServiceInfo(String name, Class type)
 	{
-		this(name, type, false, false);
+		this(name, type, false);
 	}
 
 	/**
@@ -55,7 +65,7 @@ public class RequiredServiceInfo
 	 */
 	public RequiredServiceInfo(String name, Class type, boolean upwards)
 	{
-		this(name, type, false, false, false, false, false, upwards);
+		this(name, type, false, false, APPLICATION_SCOPE, upwards);
 	}
 	
 	/**
@@ -63,48 +73,27 @@ public class RequiredServiceInfo
 	 */
 	public RequiredServiceInfo(String name, Class type, boolean dynamic, boolean multiple)
 	{
-		this(name, type, dynamic, multiple, false, false, false, false);
+		this(name, type, dynamic, multiple, APPLICATION_SCOPE);
 	}
 	
 	/**
 	 *  Create a new service info.
 	 */
-	public RequiredServiceInfo(String name, Class type, boolean dynamic, boolean multiple, boolean declared)
+	public RequiredServiceInfo(String name, Class type, boolean dynamic, boolean multiple, String scope)
 	{
-		this(name, type, dynamic, multiple, false, false, declared, false);
+		this(name, type, dynamic, multiple, scope, false);
 	}
 	
 	/**
 	 *  Create a new service info.
 	 */
-	public RequiredServiceInfo(String name, Class type, boolean dynamic, boolean multiple, 
-		boolean remote, boolean forced)
-	{
-		this(name, type, dynamic, multiple, remote, forced, false, false);
-	}
-	
-	/**
-	 *  Create a new service info.
-	 */
-	public RequiredServiceInfo(String name, Class type, boolean dynamic, boolean multiple, 
-		boolean remote, boolean forced, boolean declared)
-	{
-		this(name, type, dynamic, multiple, remote, forced, false, false);
-	}
-	
-	/**
-	 *  Create a new service info.
-	 */
-	public RequiredServiceInfo(String name, Class type, boolean dynamic, boolean multiple, 
-		boolean remote, boolean forced, boolean declared, boolean upwards)
+	public RequiredServiceInfo(String name, Class type, boolean dynamic, boolean multiple, String scope, boolean upwards)
 	{
 		this.name = name;
 		this.type = type;
 		this.dynamic = dynamic;
 		this.multiple = multiple;
-		this.forced = forced;
-		this.remote = remote;
-		this.declared = declared;
+		this.scope = scope;
 		this.upwards = upwards;
 	}
 
@@ -183,60 +172,6 @@ public class RequiredServiceInfo
 	}
 
 	/**
-	 *  Get the forced.
-	 *  @return the forced.
-	 */
-	public boolean isForced()
-	{
-		return forced;
-	}
-
-	/**
-	 *  Set the forced.
-	 *  @param forced The forced to set.
-	 */
-	public void setForced(boolean forced)
-	{
-		this.forced = forced;
-	}
-
-	/**
-	 *  Get the remote.
-	 *  @return the remote.
-	 */
-	public boolean isRemote()
-	{
-		return remote;
-	}
-
-	/**
-	 *  Set the remote.
-	 *  @param remote The remote to set.
-	 */
-	public void setRemote(boolean remote)
-	{
-		this.remote = remote;
-	}
-
-	/**
-	 *  Get the declared.
-	 *  @return the declared.
-	 */
-	public boolean isDeclared()
-	{
-		return declared;
-	}
-
-	/**
-	 *  Set the declared.
-	 *  @param declared The declared to set.
-	 */
-	public void setDeclared(boolean declared)
-	{
-		this.declared = declared;
-	}
-
-	/**
 	 *  Get the upwards.
 	 *  @return The upwards.
 	 */
@@ -254,5 +189,21 @@ public class RequiredServiceInfo
 		this.upwards = upwards;
 	}
 	
-	
+	/**
+	 *  Get the scope.
+	 *  @return the scope.
+	 */
+	public String getScope()
+	{
+		return scope;
+	}
+
+	/**
+	 *  Set the scope.
+	 *  @param scope The scope to set.
+	 */
+	public void setScope(String scope)
+	{
+		this.scope = scope;
+	}
 }

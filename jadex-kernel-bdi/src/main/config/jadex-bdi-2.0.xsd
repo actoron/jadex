@@ -2016,10 +2016,8 @@
 			<xs:extension base="MInternalExpression">
 				<xs:attribute name="dynamic" type="xs:boolean" use="optional" default="false"/>
 				<xs:attribute name="multiple" type="xs:boolean" use="optional" default="false"/>
-				<xs:attribute name="forced" type="xs:boolean" use="optional" default="false"/>
-				<xs:attribute name="remote" type="xs:boolean" use="optional" default="false"/>
-				<xs:attribute name="declared" type="xs:boolean" use="optional" default="false"/>
 				<xs:attribute name="name" type="xs:string" use="required"/>
+				<xs:attribute name="scope" type="xs:string" use="optional" default="application"/>
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>

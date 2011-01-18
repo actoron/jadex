@@ -18,6 +18,7 @@ import jadex.commons.concurrent.CollectionResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.service.BasicService;
 import jadex.commons.service.IServiceProvider;
+import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.clock.IClockService;
 
@@ -231,7 +232,7 @@ public class DirectoryFacilitatorService extends BasicService implements IDF
 //		open.add(fut);
 		if(remote)
 		{
-			SServiceProvider.getServices(provider, IDF.class, true).addResultListener(new IResultListener()
+			SServiceProvider.getServices(provider, IDF.class, RequiredServiceInfo.GLOBAL_SCOPE).addResultListener(new IResultListener()
 			{
 				public void resultAvailable(Object result)
 				{
