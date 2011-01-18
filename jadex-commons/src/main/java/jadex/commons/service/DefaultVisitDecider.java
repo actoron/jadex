@@ -65,6 +65,37 @@ public class DefaultVisitDecider implements IVisitDecider
 		boolean ret = !(abort && results.size()>0);
 		
 		// todo: support other search scopes!!!
+//		if(ret)
+//		{
+//			if(RequiredServiceInfo.LOCAL_SCOPE.equals(scope))
+//			{
+//				// Ok when on start component.
+//				ret = source==null;
+//			}
+//			else if(RequiredServiceInfo.COMPONENT_SCOPE.equals(scope))
+//			{
+//				// Ok when target is child of source.
+//				ret = !up && !isRemoteComponent(target);
+//			}
+//			else if(RequiredServiceInfo.APPLICATION_SCOPE.equals(scope))
+//			{
+//				// Ok when does not cross application boundry.
+//				ret = (!isApplication(source) || !up) && !isRemoteComponent(target);
+//			}
+//			else if(RequiredServiceInfo.PLATFORM_SCOPE.equals(scope))
+//			{
+//				// Ok when does not cross application boundry.
+//				ret = !isRemoteComponent(target);
+//			}
+//			else if(RequiredServiceInfo.GLOBAL_SCOPE.equals(scope))
+//			{
+//				// Always true if global scope.
+//			}
+//			else
+//			{
+//				throw new RuntimeException("Unknown search scope: "+scope);
+//			}
+//		}
 		
 		// Hack!!!
 		if(ret && !RequiredServiceInfo.GLOBAL_SCOPE.equals(scope) && target!=null && target.getClass().getName().indexOf("RemoteServiceContainer")!=-1)
@@ -137,5 +168,21 @@ public class DefaultVisitDecider implements IVisitDecider
 	public Object getCacheKey()
 	{
 		return this.getClass().getName()+abort+scope;
+	}
+	
+//	/**
+//	 *  Test if a target is a remote component.
+//	 */
+//	protected boolean isApplication(IServiceProvider target)
+//	{
+//		return ?;
+//	}
+	
+	/**
+	 *  Test if a target is a remote component.
+	 */
+	protected boolean isRemoteComponent(IServiceProvider target)
+	{
+		return target!=null && target.getClass().getName().indexOf("RemoteServiceContainer")!=-1;
 	}
 }
