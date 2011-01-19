@@ -207,10 +207,13 @@ public abstract class AbstractJCCPlugin implements IControlCenterPlugin
 	 */
 	public static void	addSubproperties(Properties props, String type, Properties subproperties)
 	{
-		if(subproperties.getType()!=null && !subproperties.getType().equals(type))
-			throw new RuntimeException("Incompatible types: "+subproperties.getType()+", "+type);
-		
-		subproperties.setType(type);
-		props.addSubproperties(subproperties);
+		if(subproperties!=null)
+		{
+			if(subproperties.getType()!=null && !subproperties.getType().equals(type))
+				throw new RuntimeException("Incompatible types: "+subproperties.getType()+", "+type);
+			
+			subproperties.setType(type);
+			props.addSubproperties(subproperties);
+		}
 	}
 }

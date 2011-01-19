@@ -39,6 +39,9 @@ public abstract class AbstractGenericPlugin extends AbstractJCCPlugin
 	{
 		"viewer_empty", SGUI.makeIcon(AbstractGenericPlugin.class, "/jadex/tools/common/images/viewer_empty.png"),
 	});
+	
+	/** The panel properties name. */
+	public final String PANELPROPERTIES = "panelproperties";
 
 	//-------- attributes --------
 	
@@ -56,6 +59,9 @@ public abstract class AbstractGenericPlugin extends AbstractJCCPlugin
 	
 	/** The map of component viewer panels (cid->panel). */
 	protected Map panels;
+	
+	/** The set properties. */
+	protected Properties props;
 	
 	//-------- methods --------
 	
@@ -151,37 +157,30 @@ public abstract class AbstractGenericPlugin extends AbstractJCCPlugin
 	/**
 	 *  Set properties loaded from project.
 	 */
-	public void setProperties(Properties props)
+	public void setProperties(final Properties props)
 	{
-		if(props.getSubproperty(getName())!=null)
+		this.props = props;
+		
+//		System.out.println("set props: "+props);
+		int sel = selcb.getSelectedIndex();
+		if(sel!=-1)
 		{
-			Properties subprops = props.getSubproperty(getName());
-			
-//			System.out.println("set props: "+subprops);
-			for(int i=0; i<selcb.getItemCount(); i++)
+			Object element =  selcb.getItemAt(sel);
+			if(panels.containsKey(element))
 			{
-				Object element =  selcb.getItemAt(i);
-				
-				final Properties ps = subprops.getSubproperty(convertToString(element));
-				if(ps!=null)
+				IAbstractViewerPanel panel = (IAbstractViewerPanel)panels.get(element);
+				panel.setProperties(props.getSubproperty(PANELPROPERTIES));
+			}
+			else
+			{
+				createPanel(element).addResultListener(new SwingDefaultResultListener(centerp)
 				{
-					if(panels.containsKey(element))
+					public void customResultAvailable(Object result)
 					{
-						IAbstractViewerPanel panel = (IAbstractViewerPanel)panels.get(element);
-						panel.setProperties(ps);
+						IAbstractViewerPanel panel = (IAbstractViewerPanel)result;
+						panel.setProperties(props);
 					}
-					else
-					{
-						createPanel(element).addResultListener(new SwingDefaultResultListener(centerp)
-						{
-							public void customResultAvailable(Object result)
-							{
-								IAbstractViewerPanel panel = (IAbstractViewerPanel)result;
-								panel.setProperties(ps);
-							}
-						});
-					}
-				}
+				});
 			}
 		}
 	}
@@ -191,27 +190,43 @@ public abstract class AbstractGenericPlugin extends AbstractJCCPlugin
 	 */
 	public Properties	getProperties()
 	{
-		Properties	props	= new Properties();
+		Properties	props	= new Properties(null, getName(), null);
 		if(panels.size()>0)
 		{
-			Properties subprops = new Properties(null, getName(), null);
-			
-			for(Iterator it=panels.keySet().iterator(); it.hasNext(); )
+			int sel = selcb.getSelectedIndex();
+			if(sel!=-1)
 			{
-				Object element = it.next();
-				IAbstractViewerPanel panel = (IAbstractViewerPanel)panels.get(element);
-				if(panel.getProperties()!=null)
+				Object element =  selcb.getItemAt(sel);
+			
+				if(panels.containsKey(element))
 				{
-					addSubproperties(subprops, convertToString(element), panel.getProperties());
+					IAbstractViewerPanel panel = (IAbstractViewerPanel)panels.get(element);
+					Properties subprops = panel.getProperties();
+					addSubproperties(props, PANELPROPERTIES, subprops);
 				}
 			}
-			addSubproperties(props, getName(), subprops);
 		}
 		
 //		System.out.println("props: "+props);
 		return props;
 	}
 
+	/**
+	 *  Get the plugin properties.
+	 */
+	public Properties getPluginProperties()
+	{
+		return props;
+	}
+	
+	/**
+	 *  Get the panel properties.
+	 */
+	public Properties getPanelProperties()
+	{
+		return props!=null? props.getSubproperty(PANELPROPERTIES): null;
+	}
+	
 	/**
 	 *  Get the help id.
 	 */

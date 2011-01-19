@@ -4,6 +4,7 @@ import jadex.base.gui.componentviewer.IComponentViewerPanel;
 import jadex.base.gui.componentviewer.IServiceViewerPanel;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
+import jadex.commons.SReflect;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.commons.service.IService;
 import jadex.commons.service.RequiredServiceInfo;
@@ -95,6 +96,8 @@ public abstract class AbstractServicePlugin extends AbstractGenericPlugin
 				IServiceViewerPanel panel = (IServiceViewerPanel)result;
 				panels.put(service, panel);
 				centerp.add(panel.getComponent(), service);
+				if(getPanelProperties()!=null)
+					panel.setProperties(getPanelProperties());
 				ret.setResult(panel);
 			}
 			
@@ -113,6 +116,7 @@ public abstract class AbstractServicePlugin extends AbstractGenericPlugin
 	 */
 	public String getName()
 	{
-		return getServiceType().getName();
+		// dots not allowed in property names!
+		return SReflect.getInnerClassName(getServiceType());
 	}
 }

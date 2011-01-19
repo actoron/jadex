@@ -31,19 +31,6 @@ public class StaticServiceFetcher implements IRequiredServiceFetcher
 		final Future ret = new Future();
 		if(result==null || rebind)
 		{
-//			if(info.isDeclared())
-//			{
-//				SServiceProvider.getDeclaredService(provider, info.getType())
-//					.addResultListener(new DelegationResultListener(ret)
-//				{
-//					public void customResultAvailable(Object result)
-//					{
-//						StaticServiceFetcher.this.result = result;
-//						super.customResultAvailable(result);
-//					}
-//				});
-//			}
-//			else 
 			SServiceProvider.getService(provider, info.getType(), info.getScope())
 				.addResultListener(new DelegationResultListener(ret)
 			{
@@ -69,31 +56,15 @@ public class StaticServiceFetcher implements IRequiredServiceFetcher
 		final IntermediateFuture ret = new IntermediateFuture();
 		if(result==null || rebind)
 		{
-//			System.out.println("static: "+info.getType()+" "+info.isForced());
-//			if(info.isDeclared())
-//			{
-//				SServiceProvider.getDeclaredServices(provider, info.getType())
-//					.addResultListener(new IntermediateDelegationResultListener(ret)
-//				{
-//					public void customResultAvailable(Object result)
-//					{
-//						StaticServiceFetcher.this.result = result;
-//						super.customResultAvailable(result);
-//					}
-//				});
-//			}
-//			else
-//			{
-				SServiceProvider.getServices(provider, info.getType(), info.getScope())
-					.addResultListener(new IntermediateDelegationResultListener(ret)
+			SServiceProvider.getServices(provider, info.getType(), info.getScope())
+				.addResultListener(new IntermediateDelegationResultListener(ret)
+			{
+				public void customResultAvailable(Object result)
 				{
-					public void customResultAvailable(Object result)
-					{
-						StaticServiceFetcher.this.result = result;
-						super.customResultAvailable(result);
-					}
-				});
-//			}
+					StaticServiceFetcher.this.result = result;
+					super.customResultAvailable(result);
+				}
+			});
 		}
 		else
 		{
