@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Chat component.
+-->
+<componenttype xmlns="http://jadex.sourceforge.net/jadex-component"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-component
+						http://jadex.sourceforge.net/jadex-component-2.0.xsd"
+	name="chat" package="jadex.micro.examples.chat">
+	
+	<imports>
+		<import>jadex.commons.service.*</import>
+	</imports>
+	
+	<services>
+		<providedservice class="IChatService">
+			new ChatService($component)	
+		</providedservice>
+		<requiredservice name="chatservices" class="IChatService" multiple="true" dynamic="true" scope="global"/>
+	</services>
+	
+	<!-- <behavior file="jadex.micro.examples.chat.ChatAgent"/> -->
+	
+</componenttype>

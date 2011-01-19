@@ -3,6 +3,7 @@ package jadex.commons.service;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.SReflect;
+import jadex.commons.service.annotation.Gui;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -62,6 +63,19 @@ public class BasicService implements IInternalService
 			throw new RuntimeException("Service must implement provided interface: "+getClass().getName()+", "+type.getName());
 		this.sid = createServiceIdentifier(providerid, type, getClass());
 		this.properties	= properties;
+		
+		// todo: move to be able to use the constant
+		// jadex.base.gui.componentviewer.IAbstractViewerPanel.PROPERTY_VIEWERCLASS
+		Object guiclazz = properties!=null? properties.get("componentviewer.viewerclass"): null;
+		
+		if(guiclazz==null && type.isAnnotationPresent(Gui.class))
+		{
+			Gui gui = (Gui)type.getAnnotation(Gui.class);
+			guiclazz = gui.clazz();
+			if(this.properties==null)
+				this.properties = new HashMap();
+			this.properties.put("componentviewer.viewerclass", guiclazz);
+		}
 	}
 	
 	//-------- methods --------

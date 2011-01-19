@@ -122,12 +122,12 @@ public class DefaultComponentServiceViewerPanel extends AbstractComponentViewerP
 				});
 				
 				// Component panel.
-				String clname = (String)exta.getModel().getProperties().get(PROPERTY_COMPONENTVIEWERCLASS);
-				if(clname!=null)
+				Object clid = exta.getModel().getProperties().get(PROPERTY_COMPONENTVIEWERCLASS);
+				Class clazz = clid instanceof Class? (Class)clid: clid instanceof String? SReflect.classForName0((String)clid, cl): null;
+				if(clid!=null)
 				{
 					try
 					{
-						Class clazz	= SReflect.classForName(clname, cl);
 						IComponentViewerPanel panel = (IComponentViewerPanel)clazz.newInstance();
 						panels.add(new Object[]{"component", panel});
 						panel.init(jcc, getActiveComponent()).addResultListener(lis);
@@ -137,9 +137,9 @@ public class DefaultComponentServiceViewerPanel extends AbstractComponentViewerP
 						lis.exceptionOccurred(e);
 					}
 				}
-				else
+				else 
 				{
-					lis.exceptionOccurred(new RuntimeException("No viewerclass: "+clname));
+					lis.exceptionOccurred(new RuntimeException("No viewerclass: "+clid));
 				}
 				
 				// Service panels.
@@ -148,12 +148,12 @@ public class DefaultComponentServiceViewerPanel extends AbstractComponentViewerP
 					for(int i=0; i<services.size(); i++)
 					{
 						IService ser = (IService)services.get(i);
-						clname = ser.getPropertyMap()!=null ? (String)ser.getPropertyMap().get(IAbstractViewerPanel.PROPERTY_VIEWERCLASS) : null;
-						if(clname!=null)
+						clid = ser.getPropertyMap()!=null ? ser.getPropertyMap().get(IAbstractViewerPanel.PROPERTY_VIEWERCLASS) : null;
+						clazz = clid instanceof Class? (Class)clid: clid instanceof String? SReflect.classForName0((String)clid, cl): null;
+						if(clid!=null)
 						{
 							try
 							{
-								Class clazz	= SReflect.classForName(clname, cl);
 								IServiceViewerPanel panel = (IServiceViewerPanel)clazz.newInstance();
 								panels.add(new Object[]{SReflect.getInnerClassName(ser.getServiceIdentifier().getServiceType()), panel});
 								panel.init(jcc, ser).addResultListener(lis);

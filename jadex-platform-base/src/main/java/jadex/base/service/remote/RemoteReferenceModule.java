@@ -1,10 +1,5 @@
 package jadex.base.service.remote;
 
-import jadex.base.service.remote.annotation.Excluded;
-import jadex.base.service.remote.annotation.Replacement;
-import jadex.base.service.remote.annotation.Synchronous;
-import jadex.base.service.remote.annotation.Timeout;
-import jadex.base.service.remote.annotation.Uncached;
 import jadex.base.service.remote.commands.RemoteDGCAddReferenceCommand;
 import jadex.base.service.remote.commands.RemoteDGCRemoveReferenceCommand;
 import jadex.base.service.remote.replacements.DefaultEqualsMethodReplacement;
@@ -23,6 +18,11 @@ import jadex.commons.concurrent.IResultListener;
 import jadex.commons.service.IService;
 import jadex.commons.service.IServiceIdentifier;
 import jadex.commons.service.SServiceProvider;
+import jadex.commons.service.annotation.Excluded;
+import jadex.commons.service.annotation.Replacement;
+import jadex.commons.service.annotation.Synchronous;
+import jadex.commons.service.annotation.Timeout;
+import jadex.commons.service.annotation.Uncached;
 import jadex.commons.service.clock.IClockService;
 import jadex.commons.service.library.ILibraryService;
 import jadex.micro.ExternalAccess;

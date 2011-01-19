@@ -320,20 +320,22 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 					{
 						final ServiceNode node = (ServiceNode)tmp;
 						final IService service = node.getService();
-						final String classname = service.getPropertyMap()!=null ? (String)service.getPropertyMap().get(IAbstractViewerPanel.PROPERTY_VIEWERCLASS) : null;
-						
-						if(classname!=null)
+
+						SComponentFactory.getClassLoader(((IActiveComponentTreeNode)node.getParent().getParent()).getComponentIdentifier(), getJCC())
+							.addResultListener(new SwingDefaultResultListener(comptree)
 						{
-							SComponentFactory.getClassLoader(((IActiveComponentTreeNode)node.getParent().getParent()).getComponentIdentifier(), getJCC())
-								.addResultListener(new SwingDefaultResultListener(comptree)
+							public void customResultAvailable(Object result)
 							{
-								public void customResultAvailable(Object result)
+								ClassLoader	cl	= (ClassLoader)result;
+								
+								final Object clid = service.getPropertyMap()!=null? service.getPropertyMap().get(IAbstractViewerPanel.PROPERTY_VIEWERCLASS) : null;
+								final Class clazz = clid instanceof Class? (Class)clid: clid instanceof String? SReflect.classForName0((String)clid, cl): null;
+								
+								if(clid!=null)
 								{
-									ClassLoader	cl	= (ClassLoader)result;
 									try
 									{
 										storeCurrentPanelSettings();
-										Class clazz	= SReflect.classForName(classname, cl);
 										final IServiceViewerPanel	panel = (IServiceViewerPanel)clazz.newInstance();
 										panel.init(getJCC(), service).addResultListener(new SwingDefaultResultListener(comptree)
 										{
@@ -354,11 +356,11 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 									catch(Exception e)
 									{
 										e.printStackTrace();
-										getJCC().displayError("Error initializing service viewer panel.", "Component viewer panel class: "+classname, e);
+										getJCC().displayError("Error initializing service viewer panel.", "Component viewer panel class: "+clid, e);
 									}
 								}
-							});
-						}
+							}
+						});
 					}
 					else if(tmp instanceof IActiveComponentTreeNode)
 					{
@@ -377,44 +379,25 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 									public void customResultAvailable(Object result)
 									{
 										final IExternalAccess exta = (IExternalAccess)result;
-										final String classname = (String)exta.getModel().getProperties().get(IAbstractViewerPanel.PROPERTY_VIEWERCLASS);
+										final Object clid = (String)exta.getModel().getProperties().get(IAbstractViewerPanel.PROPERTY_VIEWERCLASS);
 									
 //										System.out.println("classname for comp: "+classname);
 										
-										if(classname!=null)
+										if(clid instanceof String)
 										{
 											SComponentFactory.getClassLoader(cid, getJCC()).addResultListener(new SwingDefaultResultListener(comptree)
 											{
 												public void customResultAvailable(Object result)
 												{
 													ClassLoader	cl	= (ClassLoader)result;
-													try
-													{
-														storeCurrentPanelSettings();
-														Class clazz	= SReflect.classForName(classname, cl);
-														final IComponentViewerPanel panel = (IComponentViewerPanel)clazz.newInstance();
-														panel.init(getJCC(), exta).addResultListener(new SwingDefaultResultListener(comptree)
-														{
-															public void customResultAvailable(Object result)
-															{
-																Properties	sub	= props!=null ? props.getSubproperty(panel.getId()) : null;
-																panel.setProperties(sub);
-																JComponent comp = panel.getComponent();
-																// todo: help
-																//SHelp.setupHelp(comp, getHelpID());
-																panels.put(exta.getComponentIdentifier(), panel);
-																detail.add(comp, exta.getComponentIdentifier());
-																comptree.getModel().fireNodeChanged(node);
-															}
-														});
-													}
-													catch(Exception e)
-													{
-//														e.printStackTrace();
-														getJCC().displayError("Error initializing component viewer panel.", "Component viewer panel class: "+classname, e);
-													}
+													Class clazz	= SReflect.classForName0((String)clid, cl);
+													createPanel(clazz, exta, node);
 												}
 											});
+										}
+										else if(clid instanceof Class)
+										{
+											createPanel((Class)clid, exta, node);
 										}
 									}
 								});
@@ -425,6 +408,37 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 			}
 		}
 	};
+	
+	/**
+	 * 
+	 */
+	protected void createPanel(Class clazz, final IExternalAccess exta, final IActiveComponentTreeNode node)
+	{
+		try
+		{
+			storeCurrentPanelSettings();
+			final IComponentViewerPanel panel = (IComponentViewerPanel)clazz.newInstance();
+			panel.init(getJCC(), exta).addResultListener(new SwingDefaultResultListener(comptree)
+			{
+				public void customResultAvailable(Object result)
+				{
+					Properties	sub	= props!=null ? props.getSubproperty(panel.getId()) : null;
+					panel.setProperties(sub);
+					JComponent comp = panel.getComponent();
+					// todo: help
+					//SHelp.setupHelp(comp, getHelpID());
+					panels.put(exta.getComponentIdentifier(), panel);
+					detail.add(comp, exta.getComponentIdentifier());
+					comptree.getModel().fireNodeChanged(node);
+				}
+			});
+		}
+		catch(Exception e)
+		{
+//			e.printStackTrace();
+			getJCC().displayError("Error initializing component viewer panel.", "Component viewer panel class: "+clazz, e);
+		}
+	}
 
 	final AbstractAction STOP_VIEWER = new AbstractAction("Close service viewer", icons.getIcon("close_viewer"))
 	{

@@ -1,9 +1,11 @@
 package jadex.base.fipa;
 
+import jadex.base.gui.componentviewer.dfservice.DFBrowserPanel;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.ISearchConstraints;
 import jadex.commons.IFuture;
 import jadex.commons.service.IService;
+import jadex.commons.service.annotation.Gui;
 
 import java.util.Date;
 
@@ -11,6 +13,7 @@ import java.util.Date;
  *  Interface for the directory facilitator (DF). Provides services for registering,
  *  modifying, deregistering and searching of component resp. service descriptions.
  */
+@Gui(clazz=DFBrowserPanel.class)
 public interface IDF	extends IService
 {
 	/**

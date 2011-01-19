@@ -136,10 +136,10 @@ public class DefaultBDIViewerPanel extends AbstractComponentViewerPanel
 			for(int i=0; i<subcapnames.length; i++)
 			{
 				ICapability subcap = (ICapability)scope.getSubcapability(subcapnames[i]);
-				String sclname = (String)subcap.getPropertybase().getProperty(IAbstractViewerPanel.PROPERTY_VIEWERCLASS);
+				Object clid = subcap.getPropertybase().getProperty(IAbstractViewerPanel.PROPERTY_VIEWERCLASS);
+				Class clazz = clid instanceof Class? (Class)clid: clid instanceof String? SReflect.classForName0((String)clid, subcap.getClassLoader()): null;
 				try
 				{
-					Class clazz	= SReflect.classForName(sclname, subcap.getClassLoader());
 					IComponentViewerPanel panel = (IComponentViewerPanel)clazz.newInstance();
 					panels.add(new Object[]{subcapnames[i], panel});
 					panel.init(jcc, subcap.getExternalAccess()).addResultListener(lis);

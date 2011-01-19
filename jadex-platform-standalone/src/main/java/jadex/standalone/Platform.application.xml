@@ -92,10 +92,13 @@
 		<providedservice class="IComponentManagementService" direct="true">
 			new ComponentManagementService($component.getExternalAccess(), $component.getComponentAdapter())
 		</providedservice>
-		<providedservice class="IDF" direct="true">
+		<!-- <providedservice class="IDF" direct="true">
 			new DirectoryFacilitatorService($component.getServiceProvider(), SUtil.createHashMap(
 				new Object[]{"componentviewer.viewerclass"}, 
 				new Object[]{"jadex.base.gui.componentviewer.dfservice.DFBrowserPanel"}))
+		</providedservice> -->
+		<providedservice class="IDF" direct="true">
+			new DirectoryFacilitatorService($component.getServiceProvider())
 		</providedservice>
 		<providedservice class="IMessageService" direct="true">
 			new MessageService($component.getServiceProvider(),
