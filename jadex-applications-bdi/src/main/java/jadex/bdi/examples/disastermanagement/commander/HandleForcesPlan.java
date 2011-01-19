@@ -6,7 +6,6 @@ import jadex.bdi.runtime.IBeliefSet;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IGoalListener;
 import jadex.bdi.runtime.Plan;
-import jadex.commons.SUtil;
 import jadex.commons.service.IService;
 
 import java.util.ArrayList;
@@ -36,7 +35,7 @@ public abstract class HandleForcesPlan extends Plan
 			if(forces.size()>0)
 			{
 				List fs = new ArrayList(forces);
-				Iterator it = forces.iterator();
+				Iterator it = fs.iterator();
 				
 //				List goals = new ArrayList();
 				while(number>getParameterSet("units").size() && it.hasNext())

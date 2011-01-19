@@ -318,6 +318,6 @@ public class AgentCreationAgent extends MicroAgent
 		}, new Argument("nested", "If true, each agent is created as a subcomponent of the previous agent.", "boolean", Boolean.FALSE)}, 
 		null, null, null, new RequiredServiceInfo[]{
 			new RequiredServiceInfo("clockservice", IClockService.class),
-			new RequiredServiceInfo("cmsservice", IComponentManagementService.class, true)}, null);
+			new RequiredServiceInfo("cmsservice", IComponentManagementService.class, RequiredServiceInfo.SCOPE_UPWARDS)}, null);
 	}
 }

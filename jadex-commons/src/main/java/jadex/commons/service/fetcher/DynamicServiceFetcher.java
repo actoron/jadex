@@ -2,8 +2,6 @@ package jadex.commons.service.fetcher;
 
 import jadex.commons.IFuture;
 import jadex.commons.IIntermediateFuture;
-import jadex.commons.IntermediateFuture;
-import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.service.IRequiredServiceFetcher;
 import jadex.commons.service.IServiceProvider;
 import jadex.commons.service.RequiredServiceInfo;
@@ -26,8 +24,7 @@ public class DynamicServiceFetcher implements IRequiredServiceFetcher
 	 */
 	public IFuture getService(RequiredServiceInfo info, IServiceProvider provider, boolean rebind)
 	{
-		return info.isUpwards()? SServiceProvider.getServiceUpwards(provider, info.getType()):
-			SServiceProvider.getService(provider, info.getType(), info.getScope());
+		return SServiceProvider.getService(provider, info.getType(), info.getScope());
 	}
 	
 	/**

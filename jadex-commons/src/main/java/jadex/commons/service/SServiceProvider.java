@@ -5,7 +5,6 @@ import jadex.commons.IFuture;
 import jadex.commons.IIntermediateFuture;
 import jadex.commons.IntermediateDelegationResultListener;
 import jadex.commons.IntermediateFuture;
-import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.DelegationResultListener;
 
 import java.util.Collection;
@@ -21,18 +20,18 @@ public class SServiceProvider
 	
 	/** The sequential search manager. */
 	public static ISearchManager sequentialmanager = new SequentialSearchManager();
-	public static ISearchManager sequentialmanagerforced = new SequentialSearchManager(true, true, true);
+//	public static ISearchManager sequentialmanagerforced = new SequentialSearchManager(true, true, true);
 
 	/** The parallel search manager. */
 	public static ISearchManager parallelmanager = new ParallelSearchManager();
-	public static ISearchManager parallelmanagerforced = new ParallelSearchManager(true, true, true);
+//	public static ISearchManager parallelmanagerforced = new ParallelSearchManager(true, true, true);
 	
 	/** The sequential search manager that searches only upwards. */
 	public static ISearchManager upwardsmanager = new SequentialSearchManager(true, false);
 
 	/** The sequential search manager that searches only locally. */
 	public static ISearchManager localmanager = new LocalSearchManager();
-	public static ISearchManager localmanagerforced = new LocalSearchManager(true);
+//	public static ISearchManager localmanagerforced = new LocalSearchManager(true);
 	
 	/** The visit decider that stops searching after one result has been found. */
 //	public static IVisitDecider abortdecider = new DefaultVisitDecider();
@@ -40,7 +39,7 @@ public class SServiceProvider
 
 	/** The visit decider that never stops. */
 	public static IVisitDecider contdecider = new DefaultVisitDecider(false);
-	public static IVisitDecider rcontdecider = new DefaultVisitDecider(false, RequiredServiceInfo.GLOBAL_SCOPE);
+	public static IVisitDecider rcontdecider = new DefaultVisitDecider(false, RequiredServiceInfo.SCOPE_GLOBAL);
 
 	public static IResultSelector contanyselector = new AnyResultSelector(false);
 	public static IResultSelector abortanyselector = new AnyResultSelector(true);
@@ -51,18 +50,18 @@ public class SServiceProvider
 	static
 	{
 		avisitdeciders = new HashMap();
-		avisitdeciders.put(RequiredServiceInfo.LOCAL_SCOPE, new DefaultVisitDecider(true, RequiredServiceInfo.LOCAL_SCOPE));
-		avisitdeciders.put(RequiredServiceInfo.COMPONENT_SCOPE, new DefaultVisitDecider(true, RequiredServiceInfo.COMPONENT_SCOPE));
-		avisitdeciders.put(RequiredServiceInfo.APPLICATION_SCOPE, new DefaultVisitDecider(true, RequiredServiceInfo.APPLICATION_SCOPE));
-		avisitdeciders.put(RequiredServiceInfo.PLATFORM_SCOPE, new DefaultVisitDecider(true, RequiredServiceInfo.PLATFORM_SCOPE));
-		avisitdeciders.put(RequiredServiceInfo.GLOBAL_SCOPE, new DefaultVisitDecider(true, RequiredServiceInfo.GLOBAL_SCOPE));
+		avisitdeciders.put(RequiredServiceInfo.SCOPE_LOCAL, new DefaultVisitDecider(true, RequiredServiceInfo.SCOPE_LOCAL));
+		avisitdeciders.put(RequiredServiceInfo.SCOPE_COMPONENT, new DefaultVisitDecider(true, RequiredServiceInfo.SCOPE_COMPONENT));
+		avisitdeciders.put(RequiredServiceInfo.SCOPE_APPLICATION, new DefaultVisitDecider(true, RequiredServiceInfo.SCOPE_APPLICATION));
+		avisitdeciders.put(RequiredServiceInfo.SCOPE_PLATFORM, new DefaultVisitDecider(true, RequiredServiceInfo.SCOPE_PLATFORM));
+		avisitdeciders.put(RequiredServiceInfo.SCOPE_GLOBAL, new DefaultVisitDecider(true, RequiredServiceInfo.SCOPE_GLOBAL));
 		
 		visitdeciders = new HashMap();
-		visitdeciders.put(RequiredServiceInfo.LOCAL_SCOPE, new DefaultVisitDecider(false, RequiredServiceInfo.LOCAL_SCOPE));
-		visitdeciders.put(RequiredServiceInfo.COMPONENT_SCOPE, new DefaultVisitDecider(false, RequiredServiceInfo.COMPONENT_SCOPE));
-		visitdeciders.put(RequiredServiceInfo.APPLICATION_SCOPE, new DefaultVisitDecider(false, RequiredServiceInfo.APPLICATION_SCOPE));
-		visitdeciders.put(RequiredServiceInfo.PLATFORM_SCOPE, new DefaultVisitDecider(false, RequiredServiceInfo.PLATFORM_SCOPE));
-		visitdeciders.put(RequiredServiceInfo.GLOBAL_SCOPE, new DefaultVisitDecider(false, RequiredServiceInfo.GLOBAL_SCOPE));
+		visitdeciders.put(RequiredServiceInfo.SCOPE_LOCAL, new DefaultVisitDecider(false, RequiredServiceInfo.SCOPE_LOCAL));
+		visitdeciders.put(RequiredServiceInfo.SCOPE_COMPONENT, new DefaultVisitDecider(false, RequiredServiceInfo.SCOPE_COMPONENT));
+		visitdeciders.put(RequiredServiceInfo.SCOPE_APPLICATION, new DefaultVisitDecider(false, RequiredServiceInfo.SCOPE_APPLICATION));
+		visitdeciders.put(RequiredServiceInfo.SCOPE_PLATFORM, new DefaultVisitDecider(false, RequiredServiceInfo.SCOPE_PLATFORM));
+		visitdeciders.put(RequiredServiceInfo.SCOPE_GLOBAL, new DefaultVisitDecider(false, RequiredServiceInfo.SCOPE_GLOBAL));
 
 	}
 	
@@ -182,8 +181,8 @@ public class SServiceProvider
 //		IVisitDecider abortdecider = new DefaultVisitDecider();
 //		IVisitDecider rabortdecider = new DefaultVisitDecider(true, false);
 		
-		provider.getServices(sequentialmanager, getVisitDecider(true, scope), 
-			new TypeResultSelector(type, true, RequiredServiceInfo.GLOBAL_SCOPE.equals(scope)))
+		provider.getServices(getSearchManager(false, scope), getVisitDecider(true, scope), 
+			new TypeResultSelector(type, true, RequiredServiceInfo.SCOPE_GLOBAL.equals(scope)))
 				.addResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
@@ -192,13 +191,13 @@ public class SServiceProvider
 				Collection res = (Collection)result;
 				if(res==null || res.size()==0)
 				{
-					getService(provider, type, scope).addResultListener(new DefaultResultListener()
-					{
-						public void resultAvailable(Object result)
-						{
-							System.out.println("rrr: "+result);
-						}
-					});
+//					getService(provider, type, scope).addResultListener(new DefaultResultListener()
+//					{
+//						public void resultAvailable(Object result)
+//						{
+//							System.out.println("rrr: "+result);
+//						}
+//					});
 					exceptionOccurred(new ServiceNotFoundException("No matching service found for type: "+type.getName()));
 				}
 				else
@@ -226,7 +225,7 @@ public class SServiceProvider
 		// Hack->remove
 //		IVisitDecider abortdecider = new DefaultVisitDecider();
 		
-		provider.getServices(sequentialmanager, getVisitDecider(true), new IdResultSelector(sid))
+		provider.getServices(getSearchManager(false), getVisitDecider(true), new IdResultSelector(sid))
 			.addResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
@@ -259,7 +258,7 @@ public class SServiceProvider
 		// Hack->remove
 //		IVisitDecider abortdecider = new DefaultVisitDecider();
 		
-		provider.getServices(sequentialmanager, getVisitDecider(true), selector)
+		provider.getServices(getSearchManager(false), getVisitDecider(true), selector)
 			.addResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
@@ -313,9 +312,9 @@ public class SServiceProvider
 //		IVisitDecider contdecider = new DefaultVisitDecider(false);
 //		IVisitDecider rcontdecider = new DefaultVisitDecider(false, false);
 		
-		provider.getServices(parallelmanager, 
+		provider.getServices(getSearchManager(true, scope), 
 			getVisitDecider(false, scope),
-			new TypeResultSelector(type, false, RequiredServiceInfo.GLOBAL_SCOPE.equals(scope)))
+			new TypeResultSelector(type, false, RequiredServiceInfo.SCOPE_GLOBAL.equals(scope)))
 				.addResultListener(new IntermediateDelegationResultListener(ret));
 //				{
 //					public void customResultAvailable(Object source, Object result)
@@ -327,49 +326,59 @@ public class SServiceProvider
 		
 		return ret;
 	}
-
+	
 	/**
 	 *  Get one service of a type and only search upwards (parents).
 	 *  @param type The class.
 	 *  @return The corresponding service.
 	 */
-	public static IFuture getServiceUpwards(final IServiceProvider provider, final Class type)
+	public static IFuture getServiceUpwards(IServiceProvider provider, Class type)
 	{
-//		synchronized(profiling)
-//		{
-//			Integer	cnt	= (Integer)profiling.get(type);
-//			profiling.put(type, new Integer(cnt!=null ? cnt.intValue()+1 : 1)); 
-//		}
-		final Future ret = new Future();
-		
-		// Hack->remove
-//		IVisitDecider abortdecider = new DefaultVisitDecider();
-		
-		provider.getServices(upwardsmanager, getVisitDecider(true, RequiredServiceInfo.PLATFORM_SCOPE), new TypeResultSelector(type))
-			.addResultListener(new DelegationResultListener(ret)
-		{
-			public void customResultAvailable(Object result)
-			{
-				Collection res = (Collection)result;
-				if(res==null || res.size()==0)
-				{
-//					provider.getServices(upwardsmanager, abortdecider, new TypeResultSelector(type))
-//						.addResultListener(new DefaultResultListener()
-//					{
-//						public void resultAvailable(Object result)
-//						{
-//							System.out.println("service not found: "+result);
-//						}
-//					});
-					exceptionOccurred(new ServiceNotFoundException("No matching service found for type: "+type.getName()));
-				}
-				else
-					super.customResultAvailable(res.iterator().next());
-			}
-		});
-		
-		return ret;
+		return getService(provider, type, RequiredServiceInfo.SCOPE_UPWARDS);
 	}
+	
+//	/**
+//	 *  Get one service of a type and only search upwards (parents).
+//	 *  @param type The class.
+//	 *  @return The corresponding service.
+//	 */
+//	public static IFuture getServiceUpwards(final IServiceProvider provider, final Class type)
+//	{
+////		synchronized(profiling)
+////		{
+////			Integer	cnt	= (Integer)profiling.get(type);
+////			profiling.put(type, new Integer(cnt!=null ? cnt.intValue()+1 : 1)); 
+////		}
+//		final Future ret = new Future();
+//		
+//		// Hack->remove
+////		IVisitDecider abortdecider = new DefaultVisitDecider();
+//		
+//		provider.getServices(upwardsmanager, getVisitDecider(true, RequiredServiceInfo.PLATFORM_SCOPE), new TypeResultSelector(type))
+//			.addResultListener(new DelegationResultListener(ret)
+//		{
+//			public void customResultAvailable(Object result)
+//			{
+//				Collection res = (Collection)result;
+//				if(res==null || res.size()==0)
+//				{
+////					provider.getServices(upwardsmanager, abortdecider, new TypeResultSelector(type))
+////						.addResultListener(new DefaultResultListener()
+////					{
+////						public void resultAvailable(Object result)
+////						{
+////							System.out.println("service not found: "+result);
+////						}
+////					});
+//					exceptionOccurred(new ServiceNotFoundException("No matching service found for type: "+type.getName()));
+//				}
+//				else
+//					super.customResultAvailable(res.iterator().next());
+//			}
+//		});
+//		
+//		return ret;
+//	}
 	
 //	/**
 //	 *  Get the declared service of a type and only search the current provider.
@@ -443,7 +452,7 @@ public class SServiceProvider
 		// Hack->remove
 //		IVisitDecider contdecider = new DefaultVisitDecider(false);
 		
-		provider.getServices(localmanager, contdecider, contanyselector)
+		provider.getServices(getSearchManager(false, RequiredServiceInfo.SCOPE_LOCAL), contdecider, contanyselector)
 			.addResultListener(new IntermediateDelegationResultListener(ret));
 		
 		return ret;
@@ -519,8 +528,51 @@ public class SServiceProvider
 	 */
 	public static IVisitDecider getVisitDecider(boolean abort, String scope)
 	{
-		scope = scope==null? RequiredServiceInfo.APPLICATION_SCOPE: scope;
+		// Use application scope as default, use platform scope visit decider for upwards search
+		scope = scope==null? RequiredServiceInfo.SCOPE_APPLICATION
+			: RequiredServiceInfo.SCOPE_UPWARDS.equals(scope) ? RequiredServiceInfo.SCOPE_PLATFORM : scope;
 		return (IVisitDecider)(abort? avisitdeciders.get(scope): visitdeciders.get(scope));
 	}
 	
+	/**
+	 *  Get the fitting search manager.
+	 *  @param multiple	The multiple flag (i.e. one vs. multiple services required)
+	 */
+	public static ISearchManager	getSearchManager(boolean multiple)
+	{
+		return getSearchManager(multiple, null);
+	}
+	
+	/**
+	 *  Get the fitting search manager.
+	 *  @param multiple	The multiple flag (i.e. one vs. multiple services required)
+	 *  @param scope	The search scope.
+	 */
+	public static ISearchManager	getSearchManager(boolean multiple, String scope)
+	{
+		// Use application scope as default
+		scope = scope==null? RequiredServiceInfo.SCOPE_APPLICATION : scope;
+
+		ISearchManager	ret;
+		
+		if(RequiredServiceInfo.SCOPE_UPWARDS.equals(scope))
+		{
+			ret	= upwardsmanager;
+		}
+		else if(RequiredServiceInfo.SCOPE_LOCAL.equals(scope))
+		{
+			ret	= localmanager;
+		}
+		else if(multiple)
+		{
+			ret	= parallelmanager;
+		}
+		else
+		{
+			// Todo: use parallel also for single searches?
+			ret	= sequentialmanager;
+		}
+		
+		return ret;
+	}
 }

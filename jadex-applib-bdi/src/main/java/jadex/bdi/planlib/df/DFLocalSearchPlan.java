@@ -26,7 +26,7 @@ public class DFLocalSearchPlan extends Plan
 			((Boolean)getParameter("remote").getValue()).booleanValue(): false;
 
 		IFuture ret = ((IDF)SServiceProvider.getService(getScope().getServiceProvider(), IDF.class, 
-			remote? RequiredServiceInfo.GLOBAL_SCOPE: RequiredServiceInfo.PLATFORM_SCOPE).get(this)).search(desc, con);
+			remote? RequiredServiceInfo.SCOPE_GLOBAL: RequiredServiceInfo.SCOPE_PLATFORM).get(this)).search(desc, con);
 		IDFComponentDescription[] result = (IDFComponentDescription[])ret.get(this);
 		
 		getParameterSet("result").addValues(result);

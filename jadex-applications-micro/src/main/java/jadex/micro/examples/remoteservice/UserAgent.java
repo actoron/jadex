@@ -83,7 +83,7 @@ public class UserAgent extends MicroAgent
 		}));
 		
 		// search on local platform and find service via ProxyAgent to other platform
-		SServiceProvider.getService(getServiceProvider(), IMathService.class, RequiredServiceInfo.GLOBAL_SCOPE)
+		SServiceProvider.getService(getServiceProvider(), IMathService.class, RequiredServiceInfo.SCOPE_GLOBAL)
 			.addResultListener(createResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)

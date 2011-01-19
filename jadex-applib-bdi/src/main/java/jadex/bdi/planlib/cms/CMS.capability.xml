@@ -388,10 +388,14 @@
 		</condition>
 	</expressions> -->
 
+	<services>
+		<requiredservice name="cms" class="IComponentManagementService" scope="platform"/>
+	</services>
+
 	<properties>
 		<!-- <property name="logging.level.exceptions">java.util.logging.Level.INFO</property>-->
 	</properties>
-
+	
  	<configurations>
 		<configuration name="default"/>
 		<configuration name="componentlist">

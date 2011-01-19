@@ -44,30 +44,15 @@ public class StaticServiceFetcher implements IRequiredServiceFetcher
 //				});
 //			}
 //			else 
-			if(info.isUpwards())
+			SServiceProvider.getService(provider, info.getType(), info.getScope())
+				.addResultListener(new DelegationResultListener(ret)
 			{
-				SServiceProvider.getServiceUpwards(provider, info.getType())
-					.addResultListener(new DelegationResultListener(ret)
+				public void customResultAvailable(Object result)
 				{
-					public void customResultAvailable(Object result)
-					{
-						StaticServiceFetcher.this.result = result;
-						super.customResultAvailable(result);
-					}
-				});
-			}
-			else
-			{
-				SServiceProvider.getService(provider, info.getType(), info.getScope())
-					.addResultListener(new DelegationResultListener(ret)
-				{
-					public void customResultAvailable(Object result)
-					{
-						StaticServiceFetcher.this.result = result;
-						super.customResultAvailable(result);
-					}
-				});
-			}
+					StaticServiceFetcher.this.result = result;
+					super.customResultAvailable(result);
+				}
+			});
 		}
 		else
 		{

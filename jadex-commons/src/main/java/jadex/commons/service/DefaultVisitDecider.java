@@ -39,7 +39,7 @@ public class DefaultVisitDecider implements IVisitDecider
 	 */
 	public DefaultVisitDecider(boolean abort)
 	{
-		this(abort, RequiredServiceInfo.APPLICATION_SCOPE);
+		this(abort, RequiredServiceInfo.SCOPE_APPLICATION);
 	}
 	
 	/**
@@ -67,12 +67,12 @@ public class DefaultVisitDecider implements IVisitDecider
 		// todo: support other search scopes!!!
 		if(ret)
 		{
-			if(RequiredServiceInfo.LOCAL_SCOPE.equals(scope))
+			if(RequiredServiceInfo.SCOPE_LOCAL.equals(scope))
 			{
 				// Ok when on start component.
 				ret = source==null;
 			}
-			else if(RequiredServiceInfo.COMPONENT_SCOPE.equals(scope))
+			else if(RequiredServiceInfo.SCOPE_COMPONENT.equals(scope))
 			{
 				// Ok when target is child of source.
 				ret = ischild && !isRemoteComponent(target);
@@ -82,12 +82,12 @@ public class DefaultVisitDecider implements IVisitDecider
 //				// Ok when does not cross application boundry.
 //				ret = (!isApplication(source) || ischild) && !isRemoteComponent(target);
 //			}
-			else if(RequiredServiceInfo.APPLICATION_SCOPE.equals(scope) || RequiredServiceInfo.PLATFORM_SCOPE.equals(scope))
+			else if(RequiredServiceInfo.SCOPE_APPLICATION.equals(scope) || RequiredServiceInfo.SCOPE_PLATFORM.equals(scope))
 			{
 				// Ok when does not cross application boundry.
 				ret = !isRemoteComponent(target);
 			}
-			else if(RequiredServiceInfo.GLOBAL_SCOPE.equals(scope))
+			else if(RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
 			{
 				// Always true if global scope.
 			}

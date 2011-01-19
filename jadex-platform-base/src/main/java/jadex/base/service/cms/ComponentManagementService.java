@@ -1817,7 +1817,7 @@ public abstract class ComponentManagementService extends BasicService implements
 //		open.add(fut);
 		if(remote)
 		{
-			SServiceProvider.getServices(exta.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.GLOBAL_SCOPE).addResultListener(new IResultListener()
+			SServiceProvider.getServices(exta.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_GLOBAL).addResultListener(new IResultListener()
 			{
 				public void resultAvailable(Object result)
 				{

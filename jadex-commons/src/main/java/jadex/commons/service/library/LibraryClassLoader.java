@@ -58,7 +58,7 @@ public class LibraryClassLoader extends URLClassLoader
 	    		// Try to find classes via library services.
 	    		System.out.println("in: "+Thread.currentThread().getName());
 				Collection libservices = (Collection)SServiceProvider.getServices(provider, 
-					ILibraryService.class, RequiredServiceInfo.GLOBAL_SCOPE).get(new ThreadSuspendable());
+					ILibraryService.class, RequiredServiceInfo.SCOPE_GLOBAL).get(new ThreadSuspendable());
 				System.out.println("libs: "+Thread.currentThread().getName()+" "+libservices);
 				byte[] data = null;
 				for(Iterator it=libservices.iterator(); it.hasNext() && data==null; )

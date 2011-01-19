@@ -171,7 +171,7 @@ public class CompositeServiceInvocationInterceptor implements IServiceInvocation
 						final BasicServiceInvocationHandler handler = (BasicServiceInvocationHandler)Proxy.getInvocationHandler(sic.getProxy());
 		
 						IExternalAccess cea = (IExternalAccess)result;
-						SServiceProvider.getService(cea.getServiceProvider(), handler.getServiceIdentifier().getServiceType(), RequiredServiceInfo.LOCAL_SCOPE)
+						SServiceProvider.getService(cea.getServiceProvider(), handler.getServiceIdentifier().getServiceType(), RequiredServiceInfo.SCOPE_LOCAL)
 //						SServiceProvider.getDeclaredService(cea.getServiceProvider(), handler.getServiceIdentifier().getServiceType())
 							.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 						{

@@ -8,19 +8,22 @@ public class RequiredServiceInfo
 	//-------- constants --------
 	
 	/** Local component scope. */
-	public static final String LOCAL_SCOPE = "local";
+	public static final String SCOPE_LOCAL = "local";
 	
 	/** Component scope. */
-	public static final String COMPONENT_SCOPE = "component";
+	public static final String SCOPE_COMPONENT = "component";
 	
 	/** Application scope. */
-	public static final String APPLICATION_SCOPE = "application";
+	public static final String SCOPE_APPLICATION = "application";
 
 	/** Platform scope. */
-	public static final String PLATFORM_SCOPE = "platform";
+	public static final String SCOPE_PLATFORM = "platform";
 
 	/** Global scope. */
-	public static final String GLOBAL_SCOPE = "global";
+	public static final String SCOPE_GLOBAL = "global";
+	
+	/** Upwards scope. */
+	public static final String SCOPE_UPWARDS = "upwards";
 	
 	//-------- attributes --------
 	
@@ -39,10 +42,6 @@ public class RequiredServiceInfo
 	/** The search scope. */
 	protected String scope;
 	
-	/** Flag to indicate that only upwards search should be used. */
-	protected boolean upwards;
-
-	
 	//-------- constructors --------
 	
 	/**
@@ -50,6 +49,7 @@ public class RequiredServiceInfo
 	 */
 	public RequiredServiceInfo()
 	{
+		// bean constructor
 	}
 	
 	/**
@@ -57,15 +57,15 @@ public class RequiredServiceInfo
 	 */
 	public RequiredServiceInfo(String name, Class type)
 	{
-		this(name, type, false);
+		this(name, type, false, false);
 	}
-
+	
 	/**
 	 *  Create a new service info.
 	 */
-	public RequiredServiceInfo(String name, Class type, boolean upwards)
+	public RequiredServiceInfo(String name, Class type, String scope)
 	{
-		this(name, type, false, false, APPLICATION_SCOPE, upwards);
+		this(name, type, false, false, scope);
 	}
 	
 	/**
@@ -73,7 +73,7 @@ public class RequiredServiceInfo
 	 */
 	public RequiredServiceInfo(String name, Class type, boolean dynamic, boolean multiple)
 	{
-		this(name, type, dynamic, multiple, APPLICATION_SCOPE);
+		this(name, type, dynamic, multiple, SCOPE_APPLICATION);
 	}
 	
 	/**
@@ -81,20 +81,11 @@ public class RequiredServiceInfo
 	 */
 	public RequiredServiceInfo(String name, Class type, boolean dynamic, boolean multiple, String scope)
 	{
-		this(name, type, dynamic, multiple, scope, false);
-	}
-	
-	/**
-	 *  Create a new service info.
-	 */
-	public RequiredServiceInfo(String name, Class type, boolean dynamic, boolean multiple, String scope, boolean upwards)
-	{
 		this.name = name;
 		this.type = type;
 		this.dynamic = dynamic;
 		this.multiple = multiple;
 		this.scope = scope;
-		this.upwards = upwards;
 	}
 
 	//-------- methods --------
@@ -169,24 +160,6 @@ public class RequiredServiceInfo
 	public void setMultiple(boolean multiple)
 	{
 		this.multiple = multiple;
-	}
-
-	/**
-	 *  Get the upwards.
-	 *  @return The upwards.
-	 */
-	public boolean isUpwards()
-	{
-		return upwards;
-	}
-
-	/**
-	 *  Set the upwards.
-	 *  @param upwards The upwards to set.
-	 */
-	public void setUpwards(boolean upwards)
-	{
-		this.upwards = upwards;
 	}
 	
 	/**

@@ -232,7 +232,7 @@ public class DirectoryFacilitatorService extends BasicService implements IDF
 //		open.add(fut);
 		if(remote)
 		{
-			SServiceProvider.getServices(provider, IDF.class, RequiredServiceInfo.GLOBAL_SCOPE).addResultListener(new IResultListener()
+			SServiceProvider.getServices(provider, IDF.class, RequiredServiceInfo.SCOPE_GLOBAL).addResultListener(new IResultListener()
 			{
 				public void resultAvailable(Object result)
 				{

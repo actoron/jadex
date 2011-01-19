@@ -60,6 +60,7 @@ public class OAVBDIXMLReader
 		// Post processors.
 		IPostProcessor expost = new ExpressionProcessor();
 		IPostProcessor tepost = new ClassPostProcessor(OAVBDIMetaModel.typedelement_has_classname, OAVBDIMetaModel.typedelement_has_class); 
+		IPostProcessor rspost = new ClassPostProcessor(OAVBDIMetaModel.requiredservice_has_classname, OAVBDIMetaModel.requiredservice_has_class); 
 //		IPostProcessor bopost = new ClassPostProcessor(OAVBDIMetaModel.body_has_classname, OAVBDIMetaModel.body_has_class); 
 		IObjectStringConverter exconv = new ExpressionToStringConverter();
 		
@@ -261,8 +262,11 @@ public class OAVBDIXMLReader
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "condition")), new ObjectInfo(OAVBDIMetaModel.condition_type, expost),
 			new MappingInfo(null, null, OAVBDIMetaModel.expression_has_text)));
 		
-		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "requiredservice")), new ObjectInfo(OAVBDIMetaModel.requiredservice_type, expost),
-			new MappingInfo(ti_expression)));
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "requiredservice")), new ObjectInfo(OAVBDIMetaModel.requiredservice_type, rspost),
+			new MappingInfo(null, new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("class", OAVBDIMetaModel.requiredservice_has_classname)),
+				new AttributeInfo(new AccessInfo((String)null, OAVBDIMetaModel.requiredservice_has_class, AccessInfo.IGNORE_WRITE))
+			})));
 		
 		TypeInfo ti_service = new TypeInfo(new XMLInfo(new QName(uri, "providedservice")), new ObjectInfo(OAVBDIMetaModel.providedservice_type, expost), 
 			new MappingInfo(ti_expression) 

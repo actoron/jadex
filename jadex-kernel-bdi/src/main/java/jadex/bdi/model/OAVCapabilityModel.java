@@ -680,15 +680,15 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 			{
 				Object req = it.next();
 				String name = (String)state.getAttributeValue(req, OAVBDIMetaModel.modelelement_has_name);
-				Class clazz = (Class)state.getAttributeValue(req, OAVBDIMetaModel.expression_has_class);
+				Class clazz = (Class)state.getAttributeValue(req, OAVBDIMetaModel.requiredservice_has_class);
 				boolean dynamic = ((Boolean)state.getAttributeValue(req, OAVBDIMetaModel.requiredservice_has_dynamic));
 				boolean multiple = ((Boolean)state.getAttributeValue(req, OAVBDIMetaModel.requiredservice_has_multiple));
 //				boolean forced = ((Boolean)state.getAttributeValue(req, OAVBDIMetaModel.requiredservice_has_forced));
 //				boolean remote = ((Boolean)state.getAttributeValue(req, OAVBDIMetaModel.requiredservice_has_remote));
 //				boolean declared = ((Boolean)state.getAttributeValue(req, OAVBDIMetaModel.requiredservice_has_declared));
-				boolean upwards = ((Boolean)state.getAttributeValue(req, OAVBDIMetaModel.requiredservice_has_upwards));
+//				boolean upwards = ((Boolean)state.getAttributeValue(req, OAVBDIMetaModel.requiredservice_has_upwards));
 				String scope = ((String)state.getAttributeValue(req, OAVBDIMetaModel.requiredservice_has_scope));
-					ret.add(new RequiredServiceInfo(name, clazz, dynamic, multiple, scope, upwards));
+				ret.add(new RequiredServiceInfo(name, clazz, dynamic, multiple, scope));
 //				ret.add(state.getAttributeValue(it.next(), OAVBDIMetaModel.expression_has_class));
 			}
 		}
@@ -707,15 +707,15 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 					{
 						Object req = it2.next();
 						String name = (String)state.getAttributeValue(req, OAVBDIMetaModel.modelelement_has_name);
-						Class clazz = (Class)state.getAttributeValue(req, OAVBDIMetaModel.expression_has_class);
+						Class clazz = (Class)state.getAttributeValue(req, OAVBDIMetaModel.requiredservice_has_class);
 						boolean dynamic = ((Boolean)state.getAttributeValue(req, OAVBDIMetaModel.requiredservice_has_dynamic));
 						boolean multiple = ((Boolean)state.getAttributeValue(req, OAVBDIMetaModel.requiredservice_has_multiple));
 //						boolean forced = ((Boolean)state.getAttributeValue(req, OAVBDIMetaModel.requiredservice_has_forced));
 //						boolean remote = ((Boolean)state.getAttributeValue(req, OAVBDIMetaModel.requiredservice_has_remote));
 //						boolean declared = ((Boolean)state.getAttributeValue(req, OAVBDIMetaModel.requiredservice_has_declared));
-						boolean upwards = ((Boolean)state.getAttributeValue(req, OAVBDIMetaModel.requiredservice_has_upwards));
+//						boolean upwards = ((Boolean)state.getAttributeValue(req, OAVBDIMetaModel.requiredservice_has_upwards));
 						String scope = ((String)state.getAttributeValue(req, OAVBDIMetaModel.requiredservice_has_scope));
-						ret.add(new RequiredServiceInfo(name, clazz, dynamic, multiple, scope, upwards));
+						ret.add(new RequiredServiceInfo(name, clazz, dynamic, multiple, scope));
 					}
 				}
 			}

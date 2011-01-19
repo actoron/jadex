@@ -300,7 +300,18 @@
 		<xs:attribute name="class" type="xs:string" use="required"/>
 		<xs:attribute name="dynamic" type="xs:boolean" use="optional" default="false"/>
 		<xs:attribute name="multiple" type="xs:boolean" use="optional" default="false"/>
-		<xs:attribute name="scope" type="xs:string" use="optional" default="application"/>
+		<xs:attribute name="scope" use="optional" default="application">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="local"></xs:enumeration>
+					<xs:enumeration value="component"></xs:enumeration>
+					<xs:enumeration value="application"></xs:enumeration>
+					<xs:enumeration value="platform"></xs:enumeration>
+					<xs:enumeration value="global"></xs:enumeration>
+					<xs:enumeration value="upwards"></xs:enumeration>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
 	</xs:complexType>
 	<xs:complexType name="startabletype">
 		<xs:attribute name="suspend" type="xs:boolean" use="optional" default="false"/>
