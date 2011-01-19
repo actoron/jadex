@@ -152,7 +152,9 @@ public class LibraryService extends BasicService implements ILibraryService
 		ILibraryServiceListener[] lis;
 		synchronized(this)
 		{
-			urls.remove(url);
+			if(!urls.remove(url))
+				throw new RuntimeException("Unknown URL: "+url);
+			
 			libcl = new URLClassLoader((URL[])urls.toArray(new URL[urls.size()]), basecl);
 //			libcl = new LibraryClassLoader((URL[])urls.toArray(new URL[urls.size()]), basecl, provider);
 			lis = (ILibraryServiceListener[])listeners.toArray(new ILibraryServiceListener[listeners.size()]);

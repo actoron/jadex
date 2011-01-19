@@ -164,9 +164,10 @@ public class LibServiceBrowser	extends	JTabbedPane	implements IServiceViewerPane
 					classpaths.removeEntry(entries[sel[i]]);
 					try
 					{
-						libservice.removeURL(new URL("file:///"+entries[sel[i]]));
+//						libservice.removeURL(new URL("file:///"+entries[sel[i]]));
+						libservice.removeURL(new URL(entries[sel[i]]));
 					}
-					catch(MalformedURLException ex)
+					catch(Exception ex)
 					{
 						jcc.displayError("Library error", "Could not remove url", ex);
 //						System.out.println(entries[sel[i]]);
