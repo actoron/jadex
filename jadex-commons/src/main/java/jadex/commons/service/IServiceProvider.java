@@ -4,8 +4,6 @@ import jadex.commons.IFuture;
 import jadex.commons.IIntermediateFuture;
 import jadex.commons.IRemotable;
 
-import java.util.Collection;
-
 /**
  *  Interface for service providers.
  */

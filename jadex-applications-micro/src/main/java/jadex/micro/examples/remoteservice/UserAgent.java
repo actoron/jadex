@@ -8,6 +8,7 @@ import jadex.commons.IFuture;
 import jadex.commons.concurrent.CounterResultListener;
 import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
+import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
 import jadex.micro.MicroAgent;
 
@@ -82,7 +83,7 @@ public class UserAgent extends MicroAgent
 		}));
 		
 		// search on local platform and find service via ProxyAgent to other platform
-		SServiceProvider.getService(getServiceProvider(), IMathService.class, true, true)
+		SServiceProvider.getService(getServiceProvider(), IMathService.class, RequiredServiceInfo.GLOBAL_SCOPE)
 			.addResultListener(createResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)

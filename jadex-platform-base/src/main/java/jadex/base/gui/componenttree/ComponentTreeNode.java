@@ -10,6 +10,7 @@ import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.commons.service.IService;
 import jadex.commons.service.IServiceContainer;
+import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
 
 import java.util.ArrayList;
@@ -219,7 +220,8 @@ public class ComponentTreeNode	extends AbstractComponentTreeNode implements IAct
 			public void customResultAvailable(Object result)
 			{
 				final IExternalAccess	ea	= (IExternalAccess)result;
-				SServiceProvider.getDeclaredServices(ea.getServiceProvider()).addResultListener(new SwingDefaultResultListener()
+				SServiceProvider.getDeclaredServices(ea.getServiceProvider())
+					.addResultListener(new SwingDefaultResultListener()
 				{
 					public void customResultAvailable(Object result)
 					{

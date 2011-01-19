@@ -105,64 +105,64 @@ public class SServiceProvider
 	 */
 	public static IFuture getService(IServiceProvider provider, Class type)
 	{
-		return getService(provider, type, false);
+		return getService(provider, type, null);
 	}
 	
-	/**
-	 *  Get one service of a type.
-	 *  @param type The class.
-	 *  @return The corresponding service.
-	 */
-	public static IFuture getService(IServiceProvider provider, Class type, boolean remote)
-	{
-		return getService(provider, type, false, false);
-	}
+//	/**
+//	 *  Get one service of a type.
+//	 *  @param type The class.
+//	 *  @return The corresponding service.
+//	 */
+//	public static IFuture getService(IServiceProvider provider, Class type, boolean remote)
+//	{
+//		return getService(provider, type, false, false);
+//	}
 	
-	/**
-	 *  Get one service of a type.
-	 *  @param type The class.
-	 *  @return The corresponding service.
-	 */
-	public static IFuture getService(final IServiceProvider provider, final Class type, final boolean remote, final boolean forcedsearch)
-	{
-//		synchronized(profiling)
+//	/**
+//	 *  Get one service of a type.
+//	 *  @param type The class.
+//	 *  @return The corresponding service.
+//	 */
+//	public static IFuture getService(final IServiceProvider provider, final Class type, final boolean remote, final boolean forcedsearch)
+//	{
+////		synchronized(profiling)
+////		{
+////			Integer	cnt	= (Integer)profiling.get(type);
+////			profiling.put(type, new Integer(cnt!=null ? cnt.intValue()+1 : 1)); 
+////		}
+//		final Future ret = new Future();
+//		
+//		// Hack->remove
+////		IVisitDecider abortdecider = new DefaultVisitDecider();
+////		IVisitDecider rabortdecider = new DefaultVisitDecider(true, false);
+//		
+//		provider.getServices(forcedsearch? sequentialmanagerforced: sequentialmanager, 
+//			remote? getVisitDecider(true, RequiredServiceInfo.GLOBAL_SCOPE): getVisitDecider(true), 
+//			new TypeResultSelector(type, true, remote))
+//				.addResultListener(new DelegationResultListener(ret)
 //		{
-//			Integer	cnt	= (Integer)profiling.get(type);
-//			profiling.put(type, new Integer(cnt!=null ? cnt.intValue()+1 : 1)); 
-//		}
-		final Future ret = new Future();
-		
-		// Hack->remove
-//		IVisitDecider abortdecider = new DefaultVisitDecider();
-//		IVisitDecider rabortdecider = new DefaultVisitDecider(true, false);
-		
-		provider.getServices(forcedsearch? sequentialmanagerforced: sequentialmanager, 
-			remote? getVisitDecider(true, RequiredServiceInfo.GLOBAL_SCOPE): getVisitDecider(true), 
-			new TypeResultSelector(type, true, remote))
-				.addResultListener(new DelegationResultListener(ret)
-		{
-			public void customResultAvailable(Object result)
-			{
-//				System.out.println("Search result: "+result);
-				Collection res = (Collection)result;
-				if(res==null || res.size()==0)
-				{
-					getService(provider, type, remote, forcedsearch).addResultListener(new DefaultResultListener()
-					{
-						public void resultAvailable(Object result)
-						{
-							System.out.println("rrr: "+result);
-						}
-					});
-					exceptionOccurred(new ServiceNotFoundException("No matching service found for type: "+type.getName()));
-				}
-				else
-					super.customResultAvailable(res.iterator().next());
-			}
-		});
-		
-		return ret;
-	}
+//			public void customResultAvailable(Object result)
+//			{
+////				System.out.println("Search result: "+result);
+//				Collection res = (Collection)result;
+//				if(res==null || res.size()==0)
+//				{
+//					getService(provider, type, remote, forcedsearch).addResultListener(new DefaultResultListener()
+//					{
+//						public void resultAvailable(Object result)
+//						{
+//							System.out.println("rrr: "+result);
+//						}
+//					});
+//					exceptionOccurred(new ServiceNotFoundException("No matching service found for type: "+type.getName()));
+//				}
+//				else
+//					super.customResultAvailable(res.iterator().next());
+//			}
+//		});
+//		
+//		return ret;
+//	}
 	
 	/**
 	 *  Get one service of a type.
@@ -182,8 +182,7 @@ public class SServiceProvider
 //		IVisitDecider abortdecider = new DefaultVisitDecider();
 //		IVisitDecider rabortdecider = new DefaultVisitDecider(true, false);
 		
-		provider.getServices(sequentialmanager, 
-			getVisitDecider(true, scope), 
+		provider.getServices(sequentialmanager, getVisitDecider(true, scope), 
 			new TypeResultSelector(type, true, RequiredServiceInfo.GLOBAL_SCOPE.equals(scope)))
 				.addResultListener(new DelegationResultListener(ret)
 		{
@@ -372,61 +371,61 @@ public class SServiceProvider
 		return ret;
 	}
 	
-	/**
-	 *  Get the declared service of a type and only search the current provider.
-	 *  @param type The class.
-	 *  @return The corresponding service.
-	 */
-	public static IFuture getDeclaredService(IServiceProvider provider, final Class type)
-	{
-//		synchronized(profiling)
+//	/**
+//	 *  Get the declared service of a type and only search the current provider.
+//	 *  @param type The class.
+//	 *  @return The corresponding service.
+//	 */
+//	public static IFuture getDeclaredService(IServiceProvider provider, final Class type)
+//	{
+////		synchronized(profiling)
+////		{
+////			Integer	cnt	= (Integer)profiling.get(type);
+////			profiling.put(type, new Integer(cnt!=null ? cnt.intValue()+1 : 1)); 
+////		}
+//		final Future ret = new Future();
+//		
+//		// Hack->remove
+////		IVisitDecider abortdecider = new DefaultVisitDecider();
+//		
+//		provider.getServices(localmanager, getVisitDecider(true, RequiredServiceInfo.LOCAL_SCOPE), new TypeResultSelector(type))
+//			.addResultListener(new DelegationResultListener(ret)
 //		{
-//			Integer	cnt	= (Integer)profiling.get(type);
-//			profiling.put(type, new Integer(cnt!=null ? cnt.intValue()+1 : 1)); 
-//		}
-		final Future ret = new Future();
-		
-		// Hack->remove
-//		IVisitDecider abortdecider = new DefaultVisitDecider();
-		
-		provider.getServices(localmanager, getVisitDecider(true, RequiredServiceInfo.LOCAL_SCOPE), new TypeResultSelector(type))
-			.addResultListener(new DelegationResultListener(ret)
-		{
-			public void customResultAvailable(Object result)
-			{
-				Collection res = (Collection)result;
-				if(res==null || res.size()==0)
-					exceptionOccurred(new ServiceNotFoundException("No matching service found for type: "+type.getName()));
-				else
-					super.customResultAvailable(res.iterator().next());
-			}
-		});
-		
-		return ret;
-	}
+//			public void customResultAvailable(Object result)
+//			{
+//				Collection res = (Collection)result;
+//				if(res==null || res.size()==0)
+//					exceptionOccurred(new ServiceNotFoundException("No matching service found for type: "+type.getName()));
+//				else
+//					super.customResultAvailable(res.iterator().next());
+//			}
+//		});
+//		
+//		return ret;
+//	}
 	
-	/**
-	 *  Get the declared services of a type and only search the current provider.
-	 *  @param type The class.
-	 *  @return The corresponding services.
-	 */
-	public static IFuture getDeclaredServices(IServiceProvider provider, Class type)
-	{
-//		synchronized(profiling)
-//		{
-//			Integer	cnt	= (Integer)profiling.get(type);
-//			profiling.put(type, new Integer(cnt!=null ? cnt.intValue()+1 : 1)); 
-//		}
-		final Future ret = new Future();
-		
-		// Hack->remove
-//		IVisitDecider abortdecider = new DefaultVisitDecider();
-		
-		provider.getServices(localmanager, getVisitDecider(false, RequiredServiceInfo.LOCAL_SCOPE), new TypeResultSelector(type))
-			.addResultListener(new DelegationResultListener(ret));
-		
-		return ret;
-	}
+//	/**
+//	 *  Get the declared services of a type and only search the current provider.
+//	 *  @param type The class.
+//	 *  @return The corresponding services.
+//	 */
+//	public static IFuture getDeclaredServices(IServiceProvider provider, Class type)
+//	{
+////		synchronized(profiling)
+////		{
+////			Integer	cnt	= (Integer)profiling.get(type);
+////			profiling.put(type, new Integer(cnt!=null ? cnt.intValue()+1 : 1)); 
+////		}
+//		final Future ret = new Future();
+//		
+//		// Hack->remove
+////		IVisitDecider abortdecider = new DefaultVisitDecider();
+//		
+//		provider.getServices(localmanager, getVisitDecider(false, RequiredServiceInfo.LOCAL_SCOPE), new TypeResultSelector(type))
+//			.addResultListener(new DelegationResultListener(ret));
+//		
+//		return ret;
+//	}
 	
 	/**
 	 *  Get all declared services of the given provider.
@@ -473,39 +472,39 @@ public class SServiceProvider
 //		return ret;
 //	}
 	
-	/**
-	 *  Get the declared service with id and only search the current provider.
-	 *  @param sid The service identifier.
-	 *  @return The corresponding service.
-	 */
-	public static IFuture getDeclaredService(IServiceProvider provider, final IServiceIdentifier sid)
-	{
-//		synchronized(profiling)
+//	/**
+//	 *  Get the declared service with id and only search the current provider.
+//	 *  @param sid The service identifier.
+//	 *  @return The corresponding service.
+//	 */
+//	public static IFuture getDeclaredService(IServiceProvider provider, final IServiceIdentifier sid)
+//	{
+////		synchronized(profiling)
+////		{
+////			Integer	cnt	= (Integer)profiling.get(type);
+////			profiling.put(type, new Integer(cnt!=null ? cnt.intValue()+1 : 1)); 
+////		}
+//		final Future ret = new Future();
+//		
+//		// Hack->remove
+////		IVisitDecider abortdecider = new DefaultVisitDecider();
+//		
+////		provider.getServices(localmanager, abortdecider, new IdResultSelector(sid))
+//		provider.getServices(localmanager, getVisitDecider(true, RequiredServiceInfo.LOCAL_SCOPE), new IdResultSelector(sid))
+//			.addResultListener(new DelegationResultListener(ret)
 //		{
-//			Integer	cnt	= (Integer)profiling.get(type);
-//			profiling.put(type, new Integer(cnt!=null ? cnt.intValue()+1 : 1)); 
-//		}
-		final Future ret = new Future();
-		
-		// Hack->remove
-//		IVisitDecider abortdecider = new DefaultVisitDecider();
-		
-//		provider.getServices(localmanager, abortdecider, new IdResultSelector(sid))
-		provider.getServices(localmanager, getVisitDecider(true, RequiredServiceInfo.LOCAL_SCOPE), new IdResultSelector(sid))
-			.addResultListener(new DelegationResultListener(ret)
-		{
-			public void customResultAvailable(Object result)
-			{
-				Collection res = (Collection)result;
-				if(res==null || res.size()==0)
-					exceptionOccurred(new ServiceNotFoundException("No matching service found for type: "+sid));
-				else
-					super.customResultAvailable(res.iterator().next());
-			}
-		});
-		
-		return ret;
-	}
+//			public void customResultAvailable(Object result)
+//			{
+//				Collection res = (Collection)result;
+//				if(res==null || res.size()==0)
+//					exceptionOccurred(new ServiceNotFoundException("No matching service found for type: "+sid));
+//				else
+//					super.customResultAvailable(res.iterator().next());
+//			}
+//		});
+//		
+//		return ret;
+//	}
 	
 	/**
 	 *  Get the fitting visit decider.

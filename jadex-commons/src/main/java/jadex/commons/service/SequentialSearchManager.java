@@ -92,7 +92,7 @@ public class SequentialSearchManager implements ISearchManager
 		Map	todo	= new LinkedHashMap(); // Nodes of which children still to be processed (id->provider).
 		SearchContext	context	= new SearchContext(decider, selector, todo);
 //		final List res = new ArrayList();
-		processNode(null, provider, context, ret, up, 0);//, res);
+		processNode(null, provider, context, ret, up, 0, false);//, res);
 //		ret.addResultListener(new DefaultResultListener()
 //		{
 //			public void resultAvailable(Object source, Object result)
@@ -119,7 +119,7 @@ public class SequentialSearchManager implements ISearchManager
 	 *  Process a single node (provider).
 	 */
 	protected void processNode(final IServiceProvider source, final IServiceProvider provider,
-		final SearchContext context, final IntermediateFuture ret, final boolean up, final int callstack)//, final List res)
+		final SearchContext context, final IntermediateFuture ret, final boolean up, final int callstack, final boolean ischild)//, final List res)
 	{
 		// Hack!!! Break call stack when it becomes too large.
 		if(callstack>1000)
@@ -128,7 +128,7 @@ public class SequentialSearchManager implements ISearchManager
 			{
 				public void run()
 				{
-					processNode(source, provider, context, ret, up, 0);//, res);
+					processNode(source, provider, context, ret, up, 0, ischild);//, res);
 				}
 			}).start();
 			return;
@@ -159,7 +159,7 @@ public class SequentialSearchManager implements ISearchManager
 				context.todo.put(provider.getId(), new Object[]{provider, source});
 			}
 			
-			if(context.decider.searchNode(source, provider, ret.getIntermediateResults()))
+			if(context.decider.searchNode(source, provider, ischild, ret.getIntermediateResults()))
 			{
 				// Use fut.isDone() to reduce stack depth
 				IFuture future = provider.getServices(lsm, context.decider, context.selector);
@@ -256,7 +256,7 @@ public class SequentialSearchManager implements ISearchManager
 						// Cut search if parent was already visisted.
 						if(SUtil.equals(source, result))
 							result = null;
-						processNode(provider, (IServiceProvider)result, context, ret, up, 0);//, res);
+						processNode(provider, (IServiceProvider)result, context, ret, up, 0, false);
 					}
 					
 					public void exceptionOccurred(Exception exception)
@@ -273,7 +273,7 @@ public class SequentialSearchManager implements ISearchManager
 					Object	result	= future.get(null);
 					if(SUtil.equals(source, result))
 						result = null;
-					processNode(provider, (IServiceProvider)result, context, ret, up, callstack+1);//, res);
+					processNode(provider, (IServiceProvider)result, context, ret, up, callstack+1, false);
 					
 				}
 				catch(Exception exception)
@@ -319,7 +319,7 @@ public class SequentialSearchManager implements ISearchManager
 			}
 			
 			// Set 'up' to false, once traversing children has started.
-			processNode(provider, child, context, ret, false, callstack+1);//, res);
+			processNode(provider, child, context, ret, false, callstack+1, true);
 		}
 
 		// Else pick entry from todo list and continue with its children.

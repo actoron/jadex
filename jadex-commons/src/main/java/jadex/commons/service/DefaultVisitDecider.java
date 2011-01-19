@@ -60,46 +60,46 @@ public class DefaultVisitDecider implements IVisitDecider
 	 *  @param target The target data provider.
 	 *  @param results The preliminary results.
 	 */
-	public synchronized boolean searchNode(IServiceProvider source, IServiceProvider target, Collection results)
+	public synchronized boolean searchNode(IServiceProvider source, IServiceProvider target, boolean ischild, Collection results)
 	{
 		boolean ret = !(abort && results.size()>0);
 		
 		// todo: support other search scopes!!!
-//		if(ret)
-//		{
-//			if(RequiredServiceInfo.LOCAL_SCOPE.equals(scope))
-//			{
-//				// Ok when on start component.
-//				ret = source==null;
-//			}
-//			else if(RequiredServiceInfo.COMPONENT_SCOPE.equals(scope))
-//			{
-//				// Ok when target is child of source.
-//				ret = !up && !isRemoteComponent(target);
-//			}
+		if(ret)
+		{
+			if(RequiredServiceInfo.LOCAL_SCOPE.equals(scope))
+			{
+				// Ok when on start component.
+				ret = source==null;
+			}
+			else if(RequiredServiceInfo.COMPONENT_SCOPE.equals(scope))
+			{
+				// Ok when target is child of source.
+				ret = ischild && !isRemoteComponent(target);
+			}
 //			else if(RequiredServiceInfo.APPLICATION_SCOPE.equals(scope))
 //			{
 //				// Ok when does not cross application boundry.
-//				ret = (!isApplication(source) || !up) && !isRemoteComponent(target);
+//				ret = (!isApplication(source) || ischild) && !isRemoteComponent(target);
 //			}
-//			else if(RequiredServiceInfo.PLATFORM_SCOPE.equals(scope))
-//			{
-//				// Ok when does not cross application boundry.
-//				ret = !isRemoteComponent(target);
-//			}
-//			else if(RequiredServiceInfo.GLOBAL_SCOPE.equals(scope))
-//			{
-//				// Always true if global scope.
-//			}
-//			else
-//			{
-//				throw new RuntimeException("Unknown search scope: "+scope);
-//			}
-//		}
+			else if(RequiredServiceInfo.APPLICATION_SCOPE.equals(scope) || RequiredServiceInfo.PLATFORM_SCOPE.equals(scope))
+			{
+				// Ok when does not cross application boundry.
+				ret = !isRemoteComponent(target);
+			}
+			else if(RequiredServiceInfo.GLOBAL_SCOPE.equals(scope))
+			{
+				// Always true if global scope.
+			}
+			else
+			{
+				throw new RuntimeException("Unknown search scope: "+scope);
+			}
+		}
 		
 		// Hack!!!
-		if(ret && !RequiredServiceInfo.GLOBAL_SCOPE.equals(scope) && target!=null && target.getClass().getName().indexOf("RemoteServiceContainer")!=-1)
-			ret = false;
+//		if(ret && !RequiredServiceInfo.GLOBAL_SCOPE.equals(scope) && target!=null && target.getClass().getName().indexOf("RemoteServiceContainer")!=-1)
+//			ret = false;
 		
 //		if(visited.contains(target.getId()))
 //			System.out.println("rattenkack");

@@ -84,7 +84,7 @@ public class ParallelSearchManager implements ISearchManager
 		final IResultSelector selector, Map services)
 	{
 		final IntermediateFuture	ret	= new IntermediateFuture();
-		processNode(null, provider, decider, selector, services, up, ret).addResultListener(new IResultListener()
+		processNode(null, provider, decider, selector, services, up, false, ret).addResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
@@ -138,13 +138,13 @@ public class ParallelSearchManager implements ISearchManager
 	 *  Process a single node (provider).
 	 */
 	protected IFuture processNode(final IServiceProvider source, final IServiceProvider provider, final IVisitDecider decider, 
-		final IResultSelector selector, final Map services, final boolean up, final IntermediateFuture endret)
+		final IResultSelector selector, final Map services, final boolean up, boolean ischild, final IntermediateFuture endret)
 	{
 		final Future ret	= new Future();
 		final boolean[]	finished	= new boolean[3];
 		
 		if(!selector.isFinished(endret.getIntermediateResults()) && provider!=null 
-			&& decider.searchNode(source, provider, endret.getIntermediateResults()))
+			&& decider.searchNode(source, provider, ischild, endret.getIntermediateResults()))
 		{
 //			if(provider!=null)
 //				System.out.println("from: "+(source!=null?source.getId():"null")+" proc: "+provider.getId());
@@ -185,7 +185,7 @@ public class ParallelSearchManager implements ISearchManager
 						// Do not go back to where we came from.
 						if(!SUtil.equals(source, target))
 						{
-							processNode(provider, target, decider, selector, services, up, endret)
+							processNode(provider, target, decider, selector, services, up, false, endret)
 								.addResultListener(new IResultListener()
 							{
 								public void resultAvailable(Object result)
@@ -250,7 +250,7 @@ public class ParallelSearchManager implements ISearchManager
 							for(Iterator it=coll.iterator(); it.hasNext(); )
 							{
 								IServiceProvider target = (IServiceProvider)it.next();
-								processNode(provider, target, decider, selector, services, false, endret)
+								processNode(provider, target, decider, selector, services, false, true, endret)
 									.addResultListener(crl);
 							}
 						}

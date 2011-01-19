@@ -5,6 +5,7 @@ import jadex.base.fipa.IDFComponentDescription;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.ISearchConstraints;
 import jadex.commons.IFuture;
+import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
 
 
@@ -24,7 +25,8 @@ public class DFLocalSearchPlan extends Plan
 		boolean remote = getParameter("remote").getValue()!=null? 
 			((Boolean)getParameter("remote").getValue()).booleanValue(): false;
 
-		IFuture ret = ((IDF)SServiceProvider.getService(getScope().getServiceProvider(), IDF.class, remote).get(this)).search(desc, con);
+		IFuture ret = ((IDF)SServiceProvider.getService(getScope().getServiceProvider(), IDF.class, 
+			remote? RequiredServiceInfo.GLOBAL_SCOPE: RequiredServiceInfo.PLATFORM_SCOPE).get(this)).search(desc, con);
 		IDFComponentDescription[] result = (IDFComponentDescription[])ret.get(this);
 		
 		getParameterSet("result").addValues(result);

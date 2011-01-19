@@ -14,7 +14,7 @@ public interface IVisitDecider
 	 *  @param target The target data provider.
 	 *  @param results The collection of preliminary results.
 	 */
-	public boolean searchNode(IServiceProvider source, IServiceProvider target, Collection results);
+	public boolean searchNode(IServiceProvider source, IServiceProvider target, boolean ischild, Collection results);
 	
 	/**
 	 *  Get the cache key.

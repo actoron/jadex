@@ -18,6 +18,7 @@ import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.service.BasicService;
 import jadex.commons.service.IInternalService;
+import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
 
 import java.lang.reflect.InvocationHandler;
@@ -170,7 +171,8 @@ public class CompositeServiceInvocationInterceptor implements IServiceInvocation
 						final BasicServiceInvocationHandler handler = (BasicServiceInvocationHandler)Proxy.getInvocationHandler(sic.getProxy());
 		
 						IExternalAccess cea = (IExternalAccess)result;
-						SServiceProvider.getDeclaredService(cea.getServiceProvider(), handler.getServiceIdentifier().getServiceType())
+//						SServiceProvider.getDeclaredService(cea.getServiceProvider(), handler.getServiceIdentifier().getServiceType())
+						SServiceProvider.getService(cea.getServiceProvider(), handler.getServiceIdentifier().getServiceType(), RequiredServiceInfo.LOCAL_SCOPE)
 							.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 						{
 							public void customResultAvailable(Object result)
