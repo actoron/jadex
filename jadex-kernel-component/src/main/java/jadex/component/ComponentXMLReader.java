@@ -110,15 +110,6 @@ public class ComponentXMLReader
 			ret.setClassloader(classloader);
 			ret.initModelInfo(report);
 			
-			// Exclude IComponentExternalAccess 
-			Map props = ret.getModelInfo().getProperties();
-			if(props==null)
-			{
-				props = new HashMap();
-				ret.getModelInfo().setProperties(props);
-			}
-			addMethodInfos(props, "remote_excluded", new String[]{"getSpace"});
-			
 			rinfo.getInputStream().close();
 		}
 		else
