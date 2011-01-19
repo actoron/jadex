@@ -3,6 +3,7 @@ package jadex.simulation.master;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 import jadex.commons.IFuture;
+import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
 import jadex.simulation.helper.Constants;
 import jadex.simulation.model.SimulationConfiguration;
@@ -39,7 +40,7 @@ public class ManageDistributionPlan extends Plan
 			do {
 				// find appropriate service
 				System.out.println("#ManageDistributionPlan# Searching for remote simulation services.");
-				services = (Collection<IRemoteSimulationExecutionService>) SServiceProvider.getServices(getScope().getServiceProvider(), IRemoteSimulationExecutionService.class, true, true).get(this);
+				services = (Collection<IRemoteSimulationExecutionService>) SServiceProvider.getServices(getScope().getServiceProvider(), IRemoteSimulationExecutionService.class, RequiredServiceInfo.SCOPE_GLOBAL).get(this);
 				System.out.println("#ManageDistributionPlan# Nr. of found remote services: " + services.size());
 				if (services.size() <= 0) {
 					System.out.println("#ManageDistributionPlan# Could not find remote simulation execution service! Retry in 5 sec.");

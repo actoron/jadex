@@ -5,6 +5,7 @@ import jadex.bdi.runtime.Plan;
 import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentManagementService;
 import jadex.commons.IFuture;
+import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
 import jadex.simulation.helper.Constants;
 import jadex.simulation.helper.FileHandler;
@@ -164,7 +165,7 @@ public class StartSimulationExperimentsPlan extends Plan {
 			int counter = 0;
 			do {
 				// find appropriate service
-				services = (ArrayList<IRemoteSimulationExecutionService>) SServiceProvider.getServices(getScope().getServiceProvider(), IRemoteSimulationExecutionService.class, true, true).get(this);
+				services = (ArrayList<IRemoteSimulationExecutionService>) SServiceProvider.getServices(getScope().getServiceProvider(), IRemoteSimulationExecutionService.class, RequiredServiceInfo.SCOPE_GLOBAL).get(this);
 				System.out.println("#StartSimulationExpPlan# Nr. of found remote services: " + services.size());
 				if (services.size() <= 0) {
 					System.out.println("#StartSimulationExpPlan# Could not find remote simulation execution service! Retry in 5 sec.");
