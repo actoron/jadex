@@ -22,10 +22,11 @@
 		<import>jadex.base.service.remote.*</import>
 		<import>jadex.commons.concurrent.*</import>
 		<import>jadex.standalone.service.*</import>
-		<import>jadex.standalone.transport.*</import>
-		<import>jadex.standalone.transport.localmtp.*</import>
-		<import>jadex.standalone.transport.tcpmtp.*</import>
-		<import>jadex.standalone.transport.niotcpmtp.*</import>
+		<import>jadex.base.service.message.*</import>
+		<import>jadex.base.service.message.transport.*</import>
+		<import>jadex.base.service.message.transport.localmtp.*</import>
+		<import>jadex.base.service.message.transport.tcpmtp.*</import>
+		<import>jadex.base.service.message.transport.niotcpmtp.*</import>
 		<import>jadex.component.*</import>
 		<import>jadex.application.*</import>
 		<import>jadex.application.space.envsupport.*</import>
