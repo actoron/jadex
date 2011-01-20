@@ -15,6 +15,7 @@ import jadex.commons.Future;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SGUI;
+import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.collection.SCollection;
@@ -24,6 +25,7 @@ import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.commons.gui.CombiIcon;
 import jadex.commons.gui.JValidatorTextField;
 import jadex.commons.jtable.ClassRenderer;
+import jadex.commons.service.ProvidedServiceInfo;
 import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.library.ILibraryService;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
@@ -1271,22 +1273,24 @@ public class StarterPanel extends JPanel
 		
 		if(model!=null)
 		{
-			Class[] provided = model.getProvidedServices();
+			ProvidedServiceInfo[] provided = model.getProvidedServices();
 			
 			if(provided.length>0)
 			{
-				JTable providedt = new JTable(new DefaultTableModel(new String[]{"Interface Name"}, 0));
+				JTable providedt = new JTable(new DefaultTableModel(new String[]{"Interface", "Creation Expression"}, 0));
 				providedt.setEnabled(false);
 //				DefaultTableCellRenderer rend = new DefaultTableCellRenderer();
 //				rend.setHorizontalAlignment(DefaultTableCellRenderer.RIGHT);
 //				providedt.getColumn("Interface Name").setCellRenderer(rend);
-//				providedservices.add(providedt.getTableHeader(), BorderLayout.NORTH);
+				providedservices.add(providedt.getTableHeader(), BorderLayout.NORTH);
 				providedservices.add(providedt, BorderLayout.CENTER);
 				for(int i=0; i<provided.length; i++)
 				{
 					((DefaultTableModel)providedt.getModel()).addRow(new Object[]{
-						provided[i]!=null? provided[i].getName(): "unknown service type (class definition missing)"});
+						provided[i]!=null? provided[i].getType(): "unknown service type (class definition missing)",
+						provided[i]!=null? provided[i].getExpression(): ""});
 				}
+				providedt.getColumn("Interface").setCellRenderer(new ClassRenderer());
 			}
 			
 			if(provided.length>0)

@@ -1,6 +1,7 @@
 package jadex.micro.examples.compositeservice;
 
 import jadex.commons.SUtil;
+import jadex.commons.service.ProvidedServiceInfo;
 import jadex.micro.MicroAgent;
 import jadex.micro.MicroAgentMetaInfo;
 
@@ -27,6 +28,6 @@ public class CalculatorAgent extends MicroAgent
 	{
 		return new MicroAgentMetaInfo("This agent is a minimal calculator.", null, null,
 			null, null, SUtil.createHashMap(new String[]{"componentviewer.viewerclass"}, new Object[]{"jadex.micro.examples.helpline.HelplineViewerPanel"}),
-			null, new Class[]{IAddService.class, ISubService.class});
+			null, new ProvidedServiceInfo[]{new ProvidedServiceInfo(IAddService.class), new ProvidedServiceInfo(ISubService.class)});
 	}
 }

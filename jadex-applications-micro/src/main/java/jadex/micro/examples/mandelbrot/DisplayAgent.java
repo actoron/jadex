@@ -7,6 +7,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.ChangeEvent;
 import jadex.commons.SGUI;
+import jadex.commons.service.ProvidedServiceInfo;
 import jadex.commons.service.RequiredServiceInfo;
 import jadex.micro.MicroAgent;
 import jadex.micro.MicroAgentMetaInfo;
@@ -131,6 +132,6 @@ public class DisplayAgent extends MicroAgent
 				new RequiredServiceInfo("cmsservice", IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM),
 				new RequiredServiceInfo("progressservice", IProgressService.class), // not used
 						},
-			new Class[]{IDisplayService.class});
+			new ProvidedServiceInfo[]{new ProvidedServiceInfo(IDisplayService.class)});
 	}
 }

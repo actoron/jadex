@@ -1,6 +1,7 @@
 package jadex.bridge;
 
 import jadex.commons.SUtil;
+import jadex.commons.service.ProvidedServiceInfo;
 import jadex.commons.service.RequiredServiceInfo;
 
 import java.util.ArrayList;
@@ -53,7 +54,7 @@ public class ModelInfo implements IModelInfo
 	protected Map requiredservices;
 	
 	/** The provided services. */
-	protected Class[] providedservices;
+	protected ProvidedServiceInfo[] providedservices;
 	
 	/** The suspend flag. */
 	protected IModelValueProvider suspend;
@@ -85,7 +86,7 @@ public class ModelInfo implements IModelInfo
 		String description, IErrorReport report, String[] configurations,
 		IArgument[] arguments, IArgument[] results, boolean startable,
 		String filename, Map properties, ClassLoader classloader, 
-		RequiredServiceInfo[] requiredservices, Class[] providedservices, 
+		RequiredServiceInfo[] requiredservices, ProvidedServiceInfo[] providedservices, 
 		IModelValueProvider master, IModelValueProvider daemon, IModelValueProvider autoshutdown)
 	{
 		this.name = name;
@@ -436,16 +437,16 @@ public class ModelInfo implements IModelInfo
 	 *  Get the provided services.
 	 *  @return The provided services.
 	 */
-	public Class[] getProvidedServices()
+	public ProvidedServiceInfo[] getProvidedServices()
 	{
-		return providedservices==null? SUtil.EMPTY_CLASS_ARRAY: providedservices;
+		return providedservices==null? new ProvidedServiceInfo[0]: providedservices;
 	}
 
 	/**
 	 *  Set the provided services.
 	 *  @param provided services The provided services to set.
 	 */
-	public void setProvidedServices(Class[] providedservices)
+	public void setProvidedServices(ProvidedServiceInfo[] providedservices)
 	{
 		this.providedservices = providedservices;
 	}

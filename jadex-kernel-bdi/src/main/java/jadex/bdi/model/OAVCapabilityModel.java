@@ -13,6 +13,7 @@ import jadex.commons.Tuple;
 import jadex.commons.collection.IndexMap;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.collection.SCollection;
+import jadex.commons.service.ProvidedServiceInfo;
 import jadex.commons.service.RequiredServiceInfo;
 import jadex.javaparser.IParsedExpression;
 import jadex.rules.rulesystem.IRule;
@@ -727,7 +728,7 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 	/**
 	 *  Get the provided services.
 	 */
-	public Class[] getProvidedServices()
+	public ProvidedServiceInfo[] getProvidedServices()
 	{
 		List ret = new ArrayList();
 		Collection own = handle!=null ? state.getAttributeValues(handle, OAVBDIMetaModel.capability_has_providedservices) : null;
@@ -751,13 +752,15 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 				{
 					for(Iterator it2=sub.iterator(); it2.hasNext(); )
 					{
-						ret.add(state.getAttributeValue(it2.next(), OAVBDIMetaModel.expression_has_class));
+						ProvidedServiceInfo psi = new ProvidedServiceInfo((Class)state.getAttributeValue(it2.next(), OAVBDIMetaModel.expression_has_class), 
+							(String)state.getAttributeValue(it2.next(), OAVBDIMetaModel.expression_has_text));
+						ret.add(psi);
 					}
 				}
 			}
 		}
 		
-		return (Class[])ret.toArray(new Class[ret.size()]);
+		return (ProvidedServiceInfo[])ret.toArray(new ProvidedServiceInfo[ret.size()]);
 	}
 	
 	//-------- helpers --------

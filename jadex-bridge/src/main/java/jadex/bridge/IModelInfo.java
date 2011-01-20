@@ -1,5 +1,6 @@
 package jadex.bridge;
 
+import jadex.commons.service.ProvidedServiceInfo;
 import jadex.commons.service.RequiredServiceInfo;
 
 import java.util.Map;
@@ -111,7 +112,7 @@ public interface IModelInfo
 	 *  Get the provided services.
 	 *  @return The provided services.
 	 */
-	public Class[] getProvidedServices();
+	public ProvidedServiceInfo[] getProvidedServices();
 	
 	/**
 	 *  Get the suspend flag.

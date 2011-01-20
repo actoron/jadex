@@ -1,11 +1,9 @@
 package jadex.commons;
 
-/** Base64<br>
+/** 
+ * Base64<br>
  * Contains lots of utilities for coding and decoding text and character arrays fore
  * and back to the Base64 encoding. It is quite the fastest that I know.
- * @author Walczak
- * @since Sep 8, 2005
- * @version 1.1
  */
 public final class Base64
 {
@@ -252,7 +250,6 @@ public final class Base64
     * @param llen the length of line (without CRLF) must be a multiple of 4
     * @return an encoded byte array from the text
     */
-
    public final static byte[] encode(final byte[] text, final int llen)
    {
       final byte[] code;
@@ -303,11 +300,9 @@ public final class Base64
 
       while (ci > 00)
       {
-
          if (li > 0)
          {
             --li;
-
          }
          else
          {
@@ -383,7 +378,8 @@ public final class Base64
       return text;
    }
 
-   /** This is a wrapper to <code>decode(final byte[] code, final int from, final int len)</code>
+   /** 
+    * This is a wrapper to <code>decode(final byte[] code, final int from, final int len)</code>
     * @param code
     * @return a byte array holding encoded char data
     */
@@ -392,7 +388,8 @@ public final class Base64
       return decode(code, 0, code.length);
    }
 
-   /** a copy of the char part
+   /** 
+    * a copy of the char part
     * @param src
     * @param from
     * @param len
@@ -440,7 +437,8 @@ public final class Base64
       return text;
    }
 
-   /** <code>decodeCRLF(code, 0, code.length, 76)</code>
+   /** 
+    * <code>decodeCRLF(code, 0, code.length, 76)</code>
     * @param code
     * @return the encoded text;
     */
@@ -515,7 +513,8 @@ public final class Base64
       return text;
    }
 
-   /** This will decode base64 data with CRLF at 4 character boundary.<br>
+   /** 
+    * This will decode base64 data with CRLF at 4 character boundary.<br>
     * The sequence may look like:<p>
     * ABCDABCD\r\nABCDABCD or even ABCDABCD#####ABCD###ABCD#ABCD.</p>
     * <p>
@@ -565,7 +564,8 @@ public final class Base64
       return decodeFailSafe(code, 0, code.length);
    }
 
-   /** This removes all bad characters from the char array. It modifies the array
+   /** 
+    * This removes all bad characters from the char array. It modifies the array
     * in the scope of the process !!! Than simply calls decode;
     * @param code
     * @param from

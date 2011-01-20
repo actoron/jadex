@@ -4,6 +4,7 @@ import jadex.bridge.IArgument;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
+import jadex.commons.service.ProvidedServiceInfo;
 import jadex.commons.service.RequiredServiceInfo;
 import jadex.micro.MicroAgent;
 import jadex.micro.MicroAgentMetaInfo;
@@ -50,6 +51,6 @@ public class UserAgent extends MicroAgent
 	{
 		return new MicroAgentMetaInfo("This agent uses an add service.", null, 
 			new IArgument[]{}, null, null, SUtil.createHashMap(new String[]{"componentviewer.viewerclass"}, new Object[]{"jadex.micro.examples.chat.ChatPanel"}),
-			new RequiredServiceInfo[]{new RequiredServiceInfo("addservice", IAddService.class)}, new Class[]{IChatService.class});
+			new RequiredServiceInfo[]{new RequiredServiceInfo("addservice", IAddService.class)}, new ProvidedServiceInfo[]{new ProvidedServiceInfo(IChatService.class)});
 	}
 }

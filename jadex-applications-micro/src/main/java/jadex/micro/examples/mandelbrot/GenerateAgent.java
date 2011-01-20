@@ -3,6 +3,7 @@ package jadex.micro.examples.mandelbrot;
 import jadex.bridge.Argument;
 import jadex.bridge.IArgument;
 import jadex.bridge.IComponentManagementService;
+import jadex.commons.service.ProvidedServiceInfo;
 import jadex.commons.service.RequiredServiceInfo;
 import jadex.micro.MicroAgent;
 import jadex.micro.MicroAgentMetaInfo;
@@ -37,6 +38,6 @@ public class GenerateAgent extends MicroAgent
 				new RequiredServiceInfo("cmsservice", IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM),
 				new RequiredServiceInfo("generateservice", IGenerateService.class, false, false)
 			},
-		new Class[]{IGenerateService.class});
+		new ProvidedServiceInfo[]{new ProvidedServiceInfo(IGenerateService.class)});
 	}
 }

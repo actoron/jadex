@@ -10,6 +10,7 @@ import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple;
 import jadex.commons.collection.MultiCollection;
+import jadex.commons.service.ProvidedServiceInfo;
 import jadex.commons.service.RequiredServiceInfo;
 import jadex.javaparser.IParsedExpression;
 import jadex.xml.StackElement;
@@ -230,13 +231,14 @@ public class MApplicationType extends MStartable implements ICacheableModel
 		List provs = getProvidedServices();
 		if(provs!=null)
 		{
-			Class[] tmp = new Class[provs.size()];
+			ProvidedServiceInfo[] tmp = new ProvidedServiceInfo[provs.size()];
 			for(int i=0; i<provs.size(); i++)
 			{
 				MProvidedServiceType ser = (MProvidedServiceType)provs.get(i);
-				tmp[i] = ser.getClazz();
-				if(tmp[i]==null && ser.getParsedValue()!=null)
-					tmp[i] = ser.getParsedValue().getStaticType();
+				Class type = ser.getClazz()!=null? ser.getClazz(): 
+					tmp[i]==null && ser.getParsedValue()!=null? 
+					ser.getParsedValue().getStaticType(): null;
+				tmp[i] = new ProvidedServiceInfo(type, ser.getParsedValue().getExpressionText());
 			}
 			
 			modelinfo.setProvidedServices(tmp);

@@ -4,6 +4,7 @@ import jadex.bridge.Argument;
 import jadex.bridge.IArgument;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.commons.service.ProvidedServiceInfo;
 import jadex.micro.MicroAgent;
 import jadex.micro.MicroAgentMetaInfo;
 
@@ -122,6 +123,6 @@ public class CalculateAgent extends MicroAgent
 		return new MicroAgentMetaInfo("Agent offering a calculate service.", null, 
 			new IArgument[]{new Argument("delay", "Agent kills itself when no job arrives in the delay interval.", "Long", new Long(1000))},
 			null, null, null,
-			null, new Class[]{ICalculateService.class});
+			null, new ProvidedServiceInfo[]{new ProvidedServiceInfo(ICalculateService.class)});
 	}
 }

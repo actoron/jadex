@@ -6,6 +6,7 @@ import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.concurrent.DefaultResultListener;
+import jadex.commons.service.ProvidedServiceInfo;
 import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.clock.IClockService;
 import jadex.micro.IMicroExternalAccess;
@@ -98,7 +99,7 @@ public class HelplineAgent extends MicroAgent
 			new RequiredServiceInfo[]{new RequiredServiceInfo("clockservice", IClockService.class),
 			new RequiredServiceInfo("remotehelplineservices", IHelpline.class, true, true, RequiredServiceInfo.SCOPE_GLOBAL),
 			new RequiredServiceInfo("localhelplineservices", IHelpline.class, true, true, RequiredServiceInfo.SCOPE_PLATFORM)}, 
-			new Class[]{IHelpline.class});
+			new ProvidedServiceInfo[]{new ProvidedServiceInfo(IHelpline.class)});
 	}
 
 }

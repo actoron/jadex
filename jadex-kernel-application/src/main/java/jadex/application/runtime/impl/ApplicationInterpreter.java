@@ -49,6 +49,7 @@ import jadex.commons.concurrent.IResultListener;
 import jadex.commons.service.IInternalService;
 import jadex.commons.service.IServiceContainer;
 import jadex.commons.service.IServiceProvider;
+import jadex.commons.service.ProvidedServiceInfo;
 import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.ServiceNotFoundException;
@@ -58,9 +59,11 @@ import jadex.javaparser.SimpleValueFetcher;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 
 /**
@@ -410,8 +413,13 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 				if(factory!=null)
 				{
 					final IModelInfo lmodel = factory.loadModel(ct.getFilename(), model.getAllImports(), model.getModelInfo().getClassLoader());
-					Class[] sers = lmodel.getProvidedServices();
-					if(SUtil.arrayContains(sers, servicetype))
+					ProvidedServiceInfo[] services = lmodel.getProvidedServices();
+					Set sers = new HashSet();
+					for(int i=0; i<services.length; i++)
+					{
+						sers.add(services[i].getType());
+					}
+					if(sers.contains(servicetype))
 					{
 						IInternalService service = CompositeServiceInvocationInterceptor.createServiceProxy(servicetype, ct.getName(), 
 							(IApplicationExternalAccess)getExternalAccess(), getModel().getClassLoader(), null);

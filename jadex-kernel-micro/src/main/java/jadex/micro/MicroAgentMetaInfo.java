@@ -3,6 +3,7 @@ package jadex.micro;
 import jadex.bridge.IArgument;
 import jadex.bridge.IModelValueProvider;
 import jadex.commons.SUtil;
+import jadex.commons.service.ProvidedServiceInfo;
 import jadex.commons.service.RequiredServiceInfo;
 
 import java.util.Collections;
@@ -37,7 +38,7 @@ public class MicroAgentMetaInfo
 	protected RequiredServiceInfo[] requiredservices;
 	
 	/** The provided services. */
-	protected Class[] providedservices;
+	protected ProvidedServiceInfo[] providedservices;
 	
 	/** The master flag provider. */
 	protected IModelValueProvider master;
@@ -78,7 +79,7 @@ public class MicroAgentMetaInfo
 	 *  Create a new meta info.
 	 */
 	public MicroAgentMetaInfo(String description, String[] configs, 
-		RequiredServiceInfo[] requiredservices, Class[] providedservices)
+		RequiredServiceInfo[] requiredservices, ProvidedServiceInfo[] providedservices)
 	{
 		this(description, configs, null, null, null, null, requiredservices, providedservices);
 	}
@@ -97,7 +98,7 @@ public class MicroAgentMetaInfo
 	 */
 	public MicroAgentMetaInfo(String description, String[] configs, 
 		IArgument[] args, IArgument[] results, String[] breakpoints, Map properties,
-		RequiredServiceInfo[] requiredservices, Class[] providedservices)
+		RequiredServiceInfo[] requiredservices, ProvidedServiceInfo[] providedservices)
 	{
 		this(description, configs, args, results, breakpoints, properties, requiredservices, providedservices, null, null, null);
 	}
@@ -107,7 +108,7 @@ public class MicroAgentMetaInfo
 	 */
 	public MicroAgentMetaInfo(String description, String[] configs, 
 		IArgument[] args, IArgument[] results, String[] breakpoints, Map properties,
-		RequiredServiceInfo[] requiredservices, Class[] providedservices, 
+		RequiredServiceInfo[] requiredservices, ProvidedServiceInfo[] providedservices, 
 		IModelValueProvider master, IModelValueProvider daemon, IModelValueProvider autoshutdown)
 	{
 		this.description = description;
@@ -192,9 +193,9 @@ public class MicroAgentMetaInfo
 	 *  Get the provided services.
 	 *  @return The provided services.
 	 */
-	public Class[] getProvidedServices()
+	public ProvidedServiceInfo[] getProvidedServices()
 	{
-		return providedservices==null? SUtil.EMPTY_CLASS_ARRAY: providedservices;
+		return providedservices==null? new ProvidedServiceInfo[0]: providedservices;
 	}
 
 	/**
@@ -291,7 +292,7 @@ public class MicroAgentMetaInfo
 	 *  Set the providedservices.
 	 *  @param providedservices The providedservices to set.
 	 */
-	public void setProvidedServices(Class[] providedservices)
+	public void setProvidedServices(ProvidedServiceInfo[] providedservices)
 	{
 		this.providedservices = providedservices;
 	}
