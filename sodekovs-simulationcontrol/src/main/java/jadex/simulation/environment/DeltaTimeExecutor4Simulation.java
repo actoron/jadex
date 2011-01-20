@@ -15,6 +15,7 @@ import jadex.commons.IChangeListener;
 import jadex.commons.SimplePropertyObject;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.service.IServiceProvider;
+import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.clock.IClockService;
 import jadex.commons.service.clock.ITimedObject;
@@ -97,7 +98,7 @@ public class DeltaTimeExecutor4Simulation extends SimplePropertyObject implement
 		final boolean tick = getProperty("tick")!=null && ((Boolean)getProperty("tick")).booleanValue();
 		this.container	= space.getContext().getServiceProvider();
 		
-		SServiceProvider.getService(container, IClockService.class).addResultListener(new DefaultResultListener()
+		SServiceProvider.getService(container, IClockService.class,RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
@@ -351,7 +352,7 @@ public class DeltaTimeExecutor4Simulation extends SimplePropertyObject implement
 	public void terminate()
 	{
 		terminated = true;
-		SServiceProvider.getService(container, IClockService.class).addResultListener(new DefaultResultListener()
+		SServiceProvider.getService(container, IClockService.class,RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
