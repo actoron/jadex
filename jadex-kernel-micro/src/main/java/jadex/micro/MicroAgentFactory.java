@@ -199,8 +199,9 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 			if(metainfo==null)
 				metainfo = new MicroAgentMetaInfo();
 			ProvidedServices val = (ProvidedServices)cma.getAnnotation(ProvidedServices.class);
-			Class[] vals = val.value();
-			metainfo.setProvidedServices(vals);
+			// todo!
+//			Class[] vals = val.value();
+//			metainfo.setProvidedServices(vals);
 		}
 		Map argsmap = new HashMap();
 		if(cma.isAnnotationPresent(Arguments.class))

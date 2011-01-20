@@ -12,5 +12,5 @@ public @interface ProvidedServices
 	/**
 	 * 
 	 */
-	public Class[] value();
+	public ProvidedService[] value();
 }
