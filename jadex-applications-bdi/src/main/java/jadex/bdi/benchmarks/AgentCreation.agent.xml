@@ -11,6 +11,9 @@
 	name="AgentCreation"
 	package="jadex.bdi.benchmarks">
 
+	<imports>
+		<import>jadex.bridge.*</import>
+	</imports>
 <!--
  	<capabilities>
 		<capability name="cmscap" file="jadex.bdi.planlib.cms.CMS"/>
@@ -51,6 +54,10 @@
 			<body class="StartPeerPlan" />
 		</plan>
 	</plans>
+	
+	<services>
+		<requiredservice name="cms" class="IComponentManagementService" scope="platform"/>
+	</services>
 	
 	<properties>
 		<!-- <property name="logging.level">java.util.logging.Level.WARNING</property> -->

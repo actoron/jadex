@@ -14,6 +14,7 @@ import jadex.commons.SUtil;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
+import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
 import jadex.javaparser.IValueFetcher;
 import jadex.rules.rulesystem.IAction;
@@ -727,7 +728,7 @@ public class MessageEventRules
 				
 				final IMessageAdapter msg = new DefaultMessageAdapter(message, mtype);
 				
-				SServiceProvider.getService(interpreter.getServiceProvider(), IMessageService.class)
+				SServiceProvider.getService(interpreter.getServiceProvider(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 					.addResultListener(interpreter.createResultListener(new IResultListener()
 					{
 						public void resultAvailable(Object result)

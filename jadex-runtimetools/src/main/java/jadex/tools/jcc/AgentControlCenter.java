@@ -25,9 +25,9 @@ public class AgentControlCenter extends ControlCenter
 	/**
 	 * Create a control center.
 	 */
-	public AgentControlCenter(IServiceProvider provider, String plugins_prop, final IBDIExternalAccess agent)
+	public AgentControlCenter(IBDIExternalAccess agent, String plugins_prop)
 	{
-		super(provider, agent.getComponentIdentifier(), plugins_prop);
+		super(agent, plugins_prop);
 		
 		this.agent = agent;
 
@@ -36,7 +36,7 @@ public class AgentControlCenter extends ControlCenter
 			public static final String XML_CLASSNAME = "kill"; 
 			public Object execute(IInternalAccess ia)
 			{
-				((IBDIInternalAccess)ia).addComponentListener(new IComponentListener()
+				ia.addComponentListener(new IComponentListener()
 				{
 					public void componentTerminating(ChangeEvent ae)
 					{

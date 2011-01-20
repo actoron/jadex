@@ -2,7 +2,6 @@ package jadex.commons.service;
 
 import jadex.commons.IIntermediateFuture;
 
-import java.util.Collection;
 import java.util.Map;
 
 /**

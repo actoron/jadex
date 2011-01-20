@@ -25,6 +25,7 @@ import jadex.commons.concurrent.IExecutable;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.service.BasicService;
 import jadex.commons.service.IServiceProvider;
+import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.clock.IClockService;
 import jadex.commons.service.execution.IExecutionService;
@@ -538,7 +539,7 @@ public class MessageService extends BasicService implements IMessageService
 		}
 		else
 		{
-			SServiceProvider.getService(provider, IClockService.class).addResultListener(new IResultListener()
+			SServiceProvider.getService(provider, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new IResultListener()
 			{
 				public void resultAvailable(Object result)
 				{
@@ -852,7 +853,7 @@ public class MessageService extends BasicService implements IMessageService
 				messages.add(new Object[]{task, ret});
 			}
 			
-			SServiceProvider.getService(provider, IExecutionService.class).addResultListener(new DefaultResultListener()
+			SServiceProvider.getService(provider, IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
 			{
 				public void resultAvailable(Object result)
 				{
@@ -924,7 +925,7 @@ public class MessageService extends BasicService implements IMessageService
 				messages.add(new Object[]{message, type, receivers});
 			}
 			
-			SServiceProvider.getService(provider, IExecutionService.class).addResultListener(new DefaultResultListener()
+			SServiceProvider.getService(provider, IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
 			{
 				public void resultAvailable(Object result)
 				{

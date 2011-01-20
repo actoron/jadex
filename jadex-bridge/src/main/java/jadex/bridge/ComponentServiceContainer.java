@@ -23,16 +23,20 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	/** The cms. */
 	protected IComponentManagementService cms;
 	
+	/** The component type. */
+	protected String type;
+	
 	
 	//-------- constructors --------
 
 	/**
 	 *  Create a new service container.
 	 */
-	public ComponentServiceContainer(IComponentAdapter adapter)
+	public ComponentServiceContainer(IComponentAdapter adapter, String type)
 	{
 		super(adapter.getComponentIdentifier());
 		this.adapter = adapter;
+		this.type	= type;
 	}
 	
 	//-------- interface methods --------
@@ -98,6 +102,16 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 		return ret;
 	}
 	
+	
+	/**
+	 *  Get the type of the service provider (e.g. enclosing component type).
+	 *  @return The type of this provider.
+	 */
+	public String	getType()
+	{
+		return type;
+	}	
+	
 	/**
 	 *  Start the service.
 	 *  @return A future that is done when the service has completed starting.  
@@ -107,21 +121,16 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 		final Future ret = new Future();
 		
 //		System.out.println("search clock: "+getId());
-		SServiceProvider.getServiceUpwards(ComponentServiceContainer.this, IComponentManagementService.class).addResultListener(new IResultListener()
+		SServiceProvider.getServiceUpwards(ComponentServiceContainer.this, IComponentManagementService.class).addResultListener(new DelegationResultListener(ret)
 		{
-			public void resultAvailable(Object result)
+			public void customResultAvailable(Object result)
 			{
 				cms = (IComponentManagementService)result;
 //				System.out.println("Has cms: "+getId()+" "+cms);
-				
+
 				// Services may need other services and thus need to be able to search
 				// the container.
 				ComponentServiceContainer.super.start().addResultListener(new DelegationResultListener(ret));
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				ret.setException(exception);
 			}
 		});
 		

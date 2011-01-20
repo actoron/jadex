@@ -78,7 +78,7 @@ public class DebuggerMainPanel extends JSplitPane
 		this.setOneTouchExpandable(true);
 		setDividerLocation(150);
 		
-		SServiceProvider.getServiceUpwards(jcc.getServiceProvider(), IComponentManagementService.class).addResultListener(new SwingDefaultResultListener(DebuggerMainPanel.this)
+		SServiceProvider.getServiceUpwards(jcc.getExternalAccess().getServiceProvider(), IComponentManagementService.class).addResultListener(new SwingDefaultResultListener(DebuggerMainPanel.this)
 		{
 			public void customResultAvailable(Object result)
 			{
@@ -105,7 +105,7 @@ public class DebuggerMainPanel extends JSplitPane
 								if(props!=null && props.containsKey(KEY_DEBUGGER_BREAKPOINTS))
 								{
 									Collection	breakpoints	= (Collection)props.get(KEY_DEBUGGER_BREAKPOINTS);
-									leftpanel[0] = new BreakpointPanel(breakpoints, desc, jcc.getServiceProvider());
+									leftpanel[0] = new BreakpointPanel(breakpoints, desc, jcc.getExternalAccess().getServiceProvider());
 									DebuggerMainPanel.this.setLeftComponent(leftpanel[0]);
 									DebuggerMainPanel.this.setDividerLocation(150);	// Hack???
 								}
@@ -118,7 +118,7 @@ public class DebuggerMainPanel extends JSplitPane
 								}
 								
 								// Sub panels of right panel.
-								SComponentFactory.getProperties(DebuggerMainPanel.this.jcc.getServiceProvider(), DebuggerMainPanel.this.desc.getType())
+								SComponentFactory.getProperties(DebuggerMainPanel.this.jcc.getExternalAccess().getServiceProvider(), DebuggerMainPanel.this.desc.getType())
 									.addResultListener(new SwingDefaultResultListener(DebuggerMainPanel.this)
 								{
 									public void customResultAvailable(Object result)
@@ -177,7 +177,7 @@ public class DebuggerMainPanel extends JSplitPane
 					{
 						step.setEnabled(false);
 						run.setEnabled(false);
-						SServiceProvider.getServiceUpwards(DebuggerMainPanel.this.jcc.getServiceProvider(), IComponentManagementService.class)
+						SServiceProvider.getServiceUpwards(DebuggerMainPanel.this.jcc.getExternalAccess().getServiceProvider(), IComponentManagementService.class)
 							.addResultListener(new SwingDefaultResultListener(DebuggerMainPanel.this)
 						{
 							public void customResultAvailable(Object result)
@@ -211,7 +211,7 @@ public class DebuggerMainPanel extends JSplitPane
 						step.setEnabled(false);
 						run.setEnabled(false);
 						stepmode.setSelected(false);
-						SServiceProvider.getServiceUpwards(DebuggerMainPanel.this.jcc.getServiceProvider(), IComponentManagementService.class)
+						SServiceProvider.getServiceUpwards(DebuggerMainPanel.this.jcc.getExternalAccess().getServiceProvider(), IComponentManagementService.class)
 							.addResultListener(new SwingDefaultResultListener(DebuggerMainPanel.this)
 						{
 							public void customResultAvailable(Object result)
@@ -256,7 +256,7 @@ public class DebuggerMainPanel extends JSplitPane
 				{
 					public void actionPerformed(ActionEvent e)
 					{
-						SServiceProvider.getServiceUpwards(DebuggerMainPanel.this.jcc.getServiceProvider(), IComponentManagementService.class)
+						SServiceProvider.getServiceUpwards(DebuggerMainPanel.this.jcc.getExternalAccess().getServiceProvider(), IComponentManagementService.class)
 							.addResultListener(new SwingDefaultResultListener(DebuggerMainPanel.this)
 						{
 							public void customResultAvailable(Object result)

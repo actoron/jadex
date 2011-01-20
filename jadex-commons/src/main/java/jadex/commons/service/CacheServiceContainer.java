@@ -237,6 +237,15 @@ public class CacheServiceContainer	implements IServiceContainer
 	}
 	
 	/**
+	 *  Get the type of the service provider (e.g. enclosing component type).
+	 *  @return The type of this provider.
+	 */
+	public String	getType()
+	{
+		return container.getType();
+	}
+	
+	/**
 	 *  Start the service.
 	 *  @return A future that is done when the service has completed starting.  
 	 */

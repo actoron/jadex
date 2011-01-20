@@ -33,5 +33,10 @@ public interface IServiceProvider extends IRemotable
 	 *  @return The id of this provider.
 	 */
 	public Object	getId();
-
+	
+	/**
+	 *  Get the type of the service provider (e.g. enclosing component type).
+	 *  @return The type of this provider.
+	 */
+	public String	getType();
 }

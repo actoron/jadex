@@ -5,8 +5,6 @@ import jadex.base.fipa.IDFComponentDescription;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.ISearchConstraints;
 import jadex.commons.IFuture;
-import jadex.commons.service.RequiredServiceInfo;
-import jadex.commons.service.SServiceProvider;
 
 
 /**
@@ -25,8 +23,10 @@ public class DFLocalSearchPlan extends Plan
 		boolean remote = getParameter("remote").getValue()!=null? 
 			((Boolean)getParameter("remote").getValue()).booleanValue(): false;
 
-		IFuture ret = ((IDF)SServiceProvider.getService(getScope().getServiceProvider(), IDF.class, 
-			remote? RequiredServiceInfo.SCOPE_GLOBAL: RequiredServiceInfo.SCOPE_PLATFORM).get(this)).search(desc, con);
+		// todo: support remote search (search on all DFs on remote platforms also).
+		if(remote)
+			throw new UnsupportedOperationException("Remote DF search not yet implemented.");
+		IFuture ret = ((IDF)getScope().getRequiredService("df").get(this)).search(desc, con);
 		IDFComponentDescription[] result = (IDFComponentDescription[])ret.get(this);
 		
 		getParameterSet("result").addValues(result);

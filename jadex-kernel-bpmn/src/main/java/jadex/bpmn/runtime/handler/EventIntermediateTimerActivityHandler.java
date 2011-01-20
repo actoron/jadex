@@ -7,6 +7,7 @@ import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
+import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.clock.IClockService;
 import jadex.commons.service.clock.ITimedObject;
@@ -29,7 +30,7 @@ public class EventIntermediateTimerActivityHandler extends	AbstractEventIntermed
 	public void	doWait(final MActivity activity, final BpmnInterpreter instance, final ProcessThread thread, final long duration)
 	{
 		final Future	wifuture	= new Future(); 
-		SServiceProvider.getService(instance.getServiceProvider(), IClockService.class)
+		SServiceProvider.getService(instance.getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(instance.createResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)

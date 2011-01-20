@@ -12,6 +12,7 @@ import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
+import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
 
 import java.util.ArrayList;
@@ -69,13 +70,13 @@ public class EventIntermediateMessageActivityHandler	extends DefaultActivityHand
 	 */
 	protected void sendMessage(final MActivity activity, final BpmnInterpreter instance, final ProcessThread thread)
 	{
-		SServiceProvider.getService(instance.getServiceProvider(), IMessageService.class)
+		SServiceProvider.getService(instance.getServiceProvider(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(instance.createResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
 				final IMessageService	ms	= (IMessageService)result;
-				SServiceProvider.getService(instance.getServiceProvider(), IComponentManagementService.class)
+				SServiceProvider.getService(instance.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 					.addResultListener(instance.createResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object result)

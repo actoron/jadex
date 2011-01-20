@@ -8,10 +8,10 @@ import jadex.bridge.IModelInfo;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.SGUI;
-import jadex.commons.SUtil;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.service.BasicService;
 import jadex.commons.service.IServiceProvider;
+import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.library.ILibraryService;
 import jadex.commons.service.library.ILibraryServiceListener;
@@ -113,7 +113,7 @@ public class ComponentComponentFactory extends BasicService implements IComponen
 				return new Future(null);
 			}
 		};
-		SServiceProvider.getService(provider, ILibraryService.class).addResultListener(new DefaultResultListener()
+		SServiceProvider.getService(provider, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
@@ -137,7 +137,7 @@ public class ComponentComponentFactory extends BasicService implements IComponen
 	 */
 	public synchronized IFuture	shutdownService()
 	{
-		SServiceProvider.getService(provider, ILibraryService.class).addResultListener(new DefaultResultListener()
+		SServiceProvider.getService(provider, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
 			{

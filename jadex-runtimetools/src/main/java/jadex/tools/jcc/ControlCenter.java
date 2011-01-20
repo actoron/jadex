@@ -5,6 +5,9 @@ import jadex.base.gui.plugin.IControlCenter;
 import jadex.base.gui.plugin.IControlCenterPlugin;
 import jadex.base.gui.plugin.SJCC;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.IVersionInfo;
 import jadex.commons.Properties;
 import jadex.commons.Property;
@@ -12,7 +15,6 @@ import jadex.commons.SGUI;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.commons.service.IServiceProvider;
-import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.library.ILibraryService;
 import jadex.xml.PropertiesXMLHelper;
 
@@ -63,11 +65,8 @@ public class ControlCenter implements IControlCenter
 
 	// -------- attributes --------
 
-	/** The service container. */
-	protected IServiceProvider container;
-	
-	/** The component id. */
-	protected IComponentIdentifier cid;
+	/** The jcc component. */
+	protected IExternalAccess access;
 	
 	/** The plugins (plugin->panel). */
 	protected Map					plugins;
@@ -92,128 +91,134 @@ public class ControlCenter implements IControlCenter
 	/**
 	 * Create a control center.
 	 */
-	public ControlCenter(IServiceProvider container, IComponentIdentifier cid, final String plugins_prop)
+	public ControlCenter(IExternalAccess access, final String plugins_prop)
 	{
-		this.container = container;
-		this.cid	= cid;
+		this.access = access;
 		this.plugins = new LinkedHashMap();
 
 		assert Thread.currentThread().getContextClassLoader() != null;
 
-		SServiceProvider.getService(container, ILibraryService.class)
-			.addResultListener(new SwingDefaultResultListener(window)
+		access.scheduleStep(new IComponentStep()
 		{
-			public void customResultAvailable(Object result)
+			public static final String XML_CLASSNAME = "open-window"; 
+			public Object execute(IInternalAccess ia)
 			{
-				ClassLoader cl = ((ILibraryService)result).getClassLoader();
-	
-				window = new ControlCenterWindow(ControlCenter.this);
-
-				// Load plugins.
-				if(plugins_prop != null)
+				ia.getRequiredService("libservice")			.addResultListener(new SwingDefaultResultListener(window)
 				{
-					Set plugin_set = new HashSet();
-					StringTokenizer tokenizer = new StringTokenizer(plugins_prop, ", ");
-					while(tokenizer.hasMoreTokens())
+					public void customResultAvailable(Object result)
 					{
-						Class plugin_class = null;
-						try
+						ClassLoader cl = ((ILibraryService)result).getClassLoader();
+			
+						window = new ControlCenterWindow(ControlCenter.this);
+
+						// Load plugins.
+						if(plugins_prop != null)
 						{
-							String	plugin_string	= tokenizer.nextToken().trim();
-							plugin_class = SUtil.class.getClassLoader().loadClass(plugin_string);
-							if(!plugin_set.contains(plugin_class))
+							Set plugin_set = new HashSet();
+							StringTokenizer tokenizer = new StringTokenizer(plugins_prop, ", ");
+							while(tokenizer.hasMoreTokens())
 							{
-								IControlCenterPlugin p = (IControlCenterPlugin)plugin_class.newInstance();
-								plugins.put(p, null);
-								plugin_set.add(plugin_class);
-								setStatusText("Plugin loaded successfully: "+ p.getName());
-								
-								// Init non lazy plugin
-								if(!p.isLazy())
+								Class plugin_class = null;
+								try
 								{
-									initPlugin(p);
+									String	plugin_string	= tokenizer.nextToken().trim();
+									plugin_class = SUtil.class.getClassLoader().loadClass(plugin_string);
+									if(!plugin_set.contains(plugin_class))
+									{
+										IControlCenterPlugin p = (IControlCenterPlugin)plugin_class.newInstance();
+										plugins.put(p, null);
+										plugin_set.add(plugin_class);
+										setStatusText("Plugin loaded successfully: "+ p.getName());
+										
+										// Init non lazy plugin
+										if(!p.isLazy())
+										{
+											initPlugin(p);
+										}
+									}
+								}
+								catch(Throwable e)
+								{
+									// e.printStackTrace();
+									String text = SUtil.wrapText("Plugin("+ plugin_class + ") could not be loaded: "+ e.getMessage());
+									// JOptionPane.showMessageDialog(window, text,
+									// "Plugin Error", JOptionPane.INFORMATION_MESSAGE);
+									System.out.println(text);
 								}
 							}
 						}
-						catch(Throwable e)
+
+						if(!plugins.isEmpty())
 						{
-							// e.printStackTrace();
-							String text = SUtil.wrapText("Plugin("+ plugin_class + ") could not be loaded: "+ e.getMessage());
-							// JOptionPane.showMessageDialog(window, text,
-							// "Plugin Error", JOptionPane.INFORMATION_MESSAGE);
-							System.out.println(text);
+							// load project
+							String proj = null;
+							try
+							{
+								StringBuffer sbuf = new StringBuffer();
+								Reader r = new FileReader(JCC_PROJECT);
+								char[] cbuf = new char[256];
+								int len;
+								while((len = r.read(cbuf)) != -1)
+									sbuf.append(cbuf, 0, len);
+								proj = sbuf.toString();
+								r.close();
+							}
+							catch(IOException e)
+							{
+							}
+
+							if(proj != null && proj.length()>0)
+							{
+								try
+								{
+									File project = new File(proj);
+									openProject(project, cl);// , false);
+									window.filechooser.setCurrentDirectory(project.getParentFile());
+									window.filechooser.setSelectedFile(project);
+									window.setVisible(true);
+								}
+								catch(Exception e)
+								{
+									proj = null;
+								}
+							}
+
+							if(proj==null || proj.length()==0)
+							{
+								// Use default title, location and plugin
+								setCurrentProject(null);
+								Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+								window.setSize(new Dimension((int)(dim.width * 0.6),((int)(dim.height * 0.6))));
+								window.setLocation(SGUI.calculateMiddlePosition(window));
+								activatePlugin((IControlCenterPlugin)plugins.keySet().iterator().next());
+								window.setVisible(true);
+								window.setCenterSplit(-1);
+							}
+
+							// // Print out startup time (for testing purposes).
+							// if(Configuration.getConfiguration().getProperty(Configuration.STARTTIME)!=null)
+							// {
+							// // Use invokeLater to make sure time is calculated after
+							// window is initialized.
+							// SwingUtilities.invokeLater(new Runnable()
+							// {
+							// public void run()
+							// {
+							// agent.getLogger().info("Platform + JCC total start time: "+(System.currentTimeMillis()
+							// -
+							// Long.parseLong(Configuration.getConfiguration().getProperty(Configuration.STARTTIME)))+"ms.");
+							// }
+							// });
+							// }
+						}
+						else
+						{
+							JOptionPane.showMessageDialog(null, "No plugins found.",
+								"No plugins found.", JOptionPane.ERROR_MESSAGE);
 						}
 					}
-				}
-
-				if(!plugins.isEmpty())
-				{
-					// load project
-					String proj = null;
-					try
-					{
-						StringBuffer sbuf = new StringBuffer();
-						Reader r = new FileReader(JCC_PROJECT);
-						char[] cbuf = new char[256];
-						int len;
-						while((len = r.read(cbuf)) != -1)
-							sbuf.append(cbuf, 0, len);
-						proj = sbuf.toString();
-						r.close();
-					}
-					catch(IOException e)
-					{
-					}
-
-					if(proj != null && proj.length()>0)
-					{
-						try
-						{
-							File project = new File(proj);
-							openProject(project, cl);// , false);
-							window.filechooser.setCurrentDirectory(project.getParentFile());
-							window.filechooser.setSelectedFile(project);
-							window.setVisible(true);
-						}
-						catch(Exception e)
-						{
-							proj = null;
-						}
-					}
-
-					if(proj==null || proj.length()==0)
-					{
-						// Use default title, location and plugin
-						setCurrentProject(null);
-						Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-						window.setSize(new Dimension((int)(dim.width * 0.6),((int)(dim.height * 0.6))));
-						window.setLocation(SGUI.calculateMiddlePosition(window));
-						activatePlugin((IControlCenterPlugin)plugins.keySet().iterator().next());
-						window.setVisible(true);
-						window.setCenterSplit(-1);
-					}
-
-					// // Print out startup time (for testing purposes).
-					// if(Configuration.getConfiguration().getProperty(Configuration.STARTTIME)!=null)
-					// {
-					// // Use invokeLater to make sure time is calculated after
-					// window is initialized.
-					// SwingUtilities.invokeLater(new Runnable()
-					// {
-					// public void run()
-					// {
-					// agent.getLogger().info("Platform + JCC total start time: "+(System.currentTimeMillis()
-					// -
-					// Long.parseLong(Configuration.getConfiguration().getProperty(Configuration.STARTTIME)))+"ms.");
-					// }
-					// });
-					// }
-				}
-				else
-				{
-					JOptionPane.showMessageDialog(null, "No plugins found.",
-						"No plugins found.", JOptionPane.ERROR_MESSAGE);
-				}
+				});
+				return null;
 			}
 		});
 	}
@@ -411,26 +416,34 @@ public class ControlCenter implements IControlCenter
 
 			final File	project	= this.project;
 			final Properties	props	= this.props;
-			SServiceProvider.getService(container, ILibraryService.class)
-				.addResultListener(new SwingDefaultResultListener(window)
+			access.scheduleStep(new IComponentStep()
 			{
-				public void customResultAvailable(Object result)
+				public static final String XML_CLASSNAME = "svae-project";
+				public Object execute(IInternalAccess ia)
 				{
-					try
+					ia.getRequiredService("libservice")
+						.addResultListener(new SwingDefaultResultListener(window)
 					{
-						FileOutputStream os = new FileOutputStream(project);
-						PropertiesXMLHelper.getPropertyWriter().write(props, os, ((ILibraryService)result).getClassLoader(), null);
-						os.close();
-						setStatusText("Project saved successfully: "+ project.getAbsolutePath());
-					}
-					catch(Exception e)
-					{
-						e.printStackTrace();
-						String failed = SUtil
-							.wrapText("Could not save data in properties file\n\n"+ e.getMessage());
-						JOptionPane.showMessageDialog(window, failed,
-									"Properties Error", JOptionPane.ERROR_MESSAGE);
-					}
+						public void customResultAvailable(Object result)
+						{
+							try
+							{
+								FileOutputStream os = new FileOutputStream(project);
+								PropertiesXMLHelper.getPropertyWriter().write(props, os, ((ILibraryService)result).getClassLoader(), null);
+								os.close();
+								setStatusText("Project saved successfully: "+ project.getAbsolutePath());
+							}
+							catch(Exception e)
+							{
+								e.printStackTrace();
+								String failed = SUtil
+									.wrapText("Could not save data in properties file\n\n"+ e.getMessage());
+								JOptionPane.showMessageDialog(window, failed,
+											"Properties Error", JOptionPane.ERROR_MESSAGE);
+							}
+						}
+					});
+					return null;
 				}
 			});
 		}
@@ -886,12 +899,12 @@ public class ControlCenter implements IControlCenter
 	}
 	
 	/**
-	 *  Get the service container.
-	 *  @return The service container.
+	 *  Get the external access.
+	 *  @return The external access.
 	 */
-	public IServiceProvider getServiceProvider()
+	public IExternalAccess getExternalAccess()
 	{
-		return container;
+		return access;
 	}
 	
 	/**
@@ -900,7 +913,7 @@ public class ControlCenter implements IControlCenter
 	 */
 	public IComponentIdentifier	getComponentIdentifier()
 	{
-		return cid;
+		return access.getComponentIdentifier();
 	}
 
 }

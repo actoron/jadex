@@ -8,6 +8,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IModelInfo;
 import jadex.commons.ISuspendable;
 import jadex.commons.ThreadSuspendable;
+import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.library.ILibraryService;
 
@@ -68,7 +69,7 @@ public class ComponentTestSuite extends TestSuite
 		
 		IExternalAccess	rootcomp	= (IExternalAccess)Starter.createPlatform(new String[]{"-configname", "testcases", "-simulation", "true"}).get(ts);
 		IComponentManagementService cms = (IComponentManagementService)SServiceProvider.getServiceUpwards(rootcomp.getServiceProvider(), IComponentManagementService.class).get(ts);
-		ILibraryService libsrv	= (ILibraryService)SServiceProvider.getService(rootcomp.getServiceProvider(), ILibraryService.class).get(ts);
+		ILibraryService libsrv	= (ILibraryService)SServiceProvider.getService(rootcomp.getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(ts);
 		
 		try
 		{

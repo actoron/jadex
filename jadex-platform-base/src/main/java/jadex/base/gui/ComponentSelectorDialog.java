@@ -6,9 +6,11 @@ import jadex.base.gui.componenttree.IComponentTreeNode;
 import jadex.base.gui.componenttree.INodeHandler;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
 import jadex.commons.SGUI;
 import jadex.commons.concurrent.SwingDefaultResultListener;
-import jadex.commons.service.IServiceProvider;
 import jadex.commons.service.SServiceProvider;
 
 import java.awt.BorderLayout;
@@ -64,7 +66,7 @@ public class ComponentSelectorDialog
 	protected Component	parent;
 	
 	/** The service provider. */
-	protected IServiceProvider provider;
+	protected IExternalAccess access;
 	
 	/** The selected agents. */
 	protected DefaultListModel	sels;
@@ -93,10 +95,10 @@ public class ComponentSelectorDialog
 	/**
 	 *  Create a new AgentSelectorDialog.
 	 */
-	public ComponentSelectorDialog(Component parent, IServiceProvider provider)
+	public ComponentSelectorDialog(Component parent, IExternalAccess access)
 	{
 		this.parent	= parent;
-		this.provider	= provider;
+		this.access	= access;
 	}
 
 	//-------- methods --------
@@ -201,7 +203,7 @@ public class ComponentSelectorDialog
 		
 		final JList	list = new JList(sels);
 		
-		this.comptree = new ComponentTreePanel(provider);
+		this.comptree = new ComponentTreePanel(access);
 		comptree.setPreferredSize(new Dimension(200, 100));
 		comptree.addNodeHandler(new INodeHandler()
 		{
@@ -234,14 +236,23 @@ public class ComponentSelectorDialog
 						public void actionPerformed(ActionEvent e)
 						{
 							// Use clone to keep original aid unchanged.
-							SServiceProvider.getServiceUpwards(provider, IComponentManagementService.class).addResultListener(new SwingDefaultResultListener(parent)
+							access.scheduleStep(new IComponentStep()
 							{
-								public void customResultAvailable(Object result)
+								public static final String XML_CLASSNAME = "node-handler";
+								public Object execute(IInternalAccess ia)
 								{
-									IComponentManagementService cms = (IComponentManagementService)result;
-									IComponentIdentifier id	= ((IActiveComponentTreeNode)node).getDescription().getName();
-									addSelectedAgent(cms.createComponentIdentifier(id.getName(), false, id.getAddresses()), list);
-									comptree.getModel().fireNodeChanged(node);
+									ia.getRequiredService("cms")
+										.addResultListener(new SwingDefaultResultListener(parent)
+									{
+										public void customResultAvailable(Object result)
+										{
+											IComponentManagementService cms = (IComponentManagementService)result;
+											IComponentIdentifier id	= ((IActiveComponentTreeNode)node).getDescription().getName();
+											addSelectedAgent(cms.createComponentIdentifier(id.getName(), false, id.getAddresses()), list);
+											comptree.getModel().fireNodeChanged(node);
+										}
+									});
+									return null;
 								}
 							});
 						}
@@ -255,7 +266,7 @@ public class ComponentSelectorDialog
 		JScrollPane	sp	= new JScrollPane(list);
 		sp.setPreferredSize(new Dimension(200, 100));
 		final boolean[]	editing	= new boolean[1];
-		final ComponentIdentifierPanel	aidpanel = new ComponentIdentifierPanel(null, provider)
+		final ComponentIdentifierPanel	aidpanel = new ComponentIdentifierPanel(null, access.getServiceProvider())
 		{
 			protected void cidChanged()
 			{
@@ -360,13 +371,21 @@ public class ComponentSelectorDialog
 					final Object node = comptree.getTree().getLastSelectedPathComponent();
 					if(node instanceof IActiveComponentTreeNode)
 					{
-						SServiceProvider.getServiceUpwards(provider, IComponentManagementService.class).addResultListener(new SwingDefaultResultListener(parent)
+						access.scheduleStep(new IComponentStep()
 						{
-							public void customResultAvailable(Object result)
+							public static final String XML_CLASSNAME = "select";
+							public Object execute(IInternalAccess ia)
 							{
-								IComponentManagementService cms = (IComponentManagementService)result;
-								IComponentIdentifier id	= ((IActiveComponentTreeNode)node).getDescription().getName();
-								addSelectedAgent(cms.createComponentIdentifier(id.getName(), false, id.getAddresses()), list);
+								ia.getRequiredService("cms").addResultListener(new SwingDefaultResultListener(parent)
+								{
+									public void customResultAvailable(Object result)
+									{
+										IComponentManagementService cms = (IComponentManagementService)result;
+										IComponentIdentifier id	= ((IActiveComponentTreeNode)node).getDescription().getName();
+										addSelectedAgent(cms.createComponentIdentifier(id.getName(), false, id.getAddresses()), list);
+									}
+								});
+								return null;
 							}
 						});
 					}
@@ -377,12 +396,20 @@ public class ComponentSelectorDialog
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				SServiceProvider.getServiceUpwards(provider, IComponentManagementService.class).addResultListener(new SwingDefaultResultListener(parent)
+				access.scheduleStep(new IComponentStep()
 				{
-					public void customResultAvailable(Object result)
+					public static final String XML_CLASSNAME = "new-aid";
+					public Object execute(IInternalAccess ia)
 					{
-						IComponentManagementService cms = (IComponentManagementService)result;
-						addSelectedAgent(cms.createComponentIdentifier("", true, null), list);
+						ia.getRequiredService("cms").addResultListener(new SwingDefaultResultListener(parent)
+						{
+							public void customResultAvailable(Object result)
+							{
+								IComponentManagementService cms = (IComponentManagementService)result;
+								addSelectedAgent(cms.createComponentIdentifier("", true, null), list);
+							}
+						});
+						return null;
 					}
 				});
 			}

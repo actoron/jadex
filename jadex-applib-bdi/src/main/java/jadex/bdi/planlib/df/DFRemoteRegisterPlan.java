@@ -1,14 +1,13 @@
 package jadex.bdi.planlib.df;
 
+import jadex.base.fipa.DFComponentDescription;
 import jadex.base.fipa.DFRegister;
 import jadex.base.fipa.Done;
-import jadex.base.fipa.IDF;
 import jadex.base.fipa.IDFComponentDescription;
 import jadex.base.fipa.SFipa;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
-import jadex.commons.service.SServiceProvider;
 
 import java.util.Date;
 
@@ -19,7 +18,7 @@ public class DFRemoteRegisterPlan extends Plan
 {
 	/**
 	 * The body method is called on the
-	 * instatiated plan instance from the scheduler.
+	 * instantiated plan instance from the scheduler.
 	 */
 	public void body()
 	{
@@ -30,10 +29,9 @@ public class DFRemoteRegisterPlan extends Plan
 		// When AID is omitted, enter self. Hack???
 		if(desc.getName()==null || lt!=null)
 		{
-			IDF	dfservice	= (IDF)SServiceProvider.getService(getScope().getServiceProvider(), IDF.class).get(this);
 			IComponentIdentifier	bid	= desc.getName()!=null ? desc.getName() : getScope().getComponentIdentifier();
 			Date	leasetime	= lt==null ? desc.getLeaseTime() : new Date(getTime()+lt.longValue());
-			desc	= dfservice.createDFComponentDescription(bid, desc.getServices(), desc.getLanguages(), desc.getOntologies(), desc.getProtocols(), leasetime);
+			desc	= new DFComponentDescription(bid, desc.getServices(), desc.getProtocols(), desc.getOntologies(), desc.getLanguages(), leasetime);
 		}
 		
 		re.setComponentDescription(desc);

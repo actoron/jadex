@@ -218,7 +218,7 @@ public class Reader
 	}
 	
 	// For debugging: ReadContext -> Integer.
-	private static Map	stackdepth	= Collections.synchronizedMap(new HashMap());
+//	private static Map	stackdepth	= Collections.synchronizedMap(new HashMap());
 	
 	/**
 	 *  Handle the start element.

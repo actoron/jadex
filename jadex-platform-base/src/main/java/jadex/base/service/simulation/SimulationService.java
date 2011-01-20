@@ -11,6 +11,7 @@ import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.IThreadPool;
 import jadex.commons.service.BasicService;
 import jadex.commons.service.IServiceProvider;
+import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.clock.ClockService;
 import jadex.commons.service.clock.IClock;
@@ -161,7 +162,7 @@ public class SimulationService extends BasicService implements ISimulationServic
 			{
 				final boolean[]	services	= new boolean[2];
 
-				SServiceProvider.getService(provider, IExecutionService.class).addResultListener(new DefaultResultListener()
+				SServiceProvider.getService(provider, IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object result)
 					{
@@ -180,7 +181,7 @@ public class SimulationService extends BasicService implements ISimulationServic
 					}
 				});
 						
-				SServiceProvider.getService(provider, IClockService.class).addResultListener(new DefaultResultListener()
+				SServiceProvider.getService(provider, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object result)
 					{

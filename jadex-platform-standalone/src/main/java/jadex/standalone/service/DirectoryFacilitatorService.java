@@ -454,7 +454,7 @@ public class DirectoryFacilitatorService extends BasicService implements IDF
 						ret.setException(exception);
 					}
 				});
-				SServiceProvider.getService(provider, IClockService.class).addResultListener(new IResultListener()
+				SServiceProvider.getService(provider, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new IResultListener()
 				{
 					public void resultAvailable(Object result)
 					{

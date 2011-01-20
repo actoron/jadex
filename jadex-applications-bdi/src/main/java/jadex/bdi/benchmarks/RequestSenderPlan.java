@@ -52,7 +52,7 @@ public class RequestSenderPlan extends Plan
 		System.out.println("Issued "+max+" protocols in "+time+" millis.");
 		
 		// Kill the receiver (i.e. the request performance master agent.
-		IComponentManagementService	ces	= (IComponentManagementService)SServiceProvider.getService(getScope().getServiceProvider(), IComponentManagementService.class).get(this);
+		IComponentManagementService	ces	= (IComponentManagementService)getScope().getRequiredService("cms").get(this);
 		ces.destroyComponent(receiver);
 	}
 }

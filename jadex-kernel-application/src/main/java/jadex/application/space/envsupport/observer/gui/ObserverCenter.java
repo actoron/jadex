@@ -12,6 +12,7 @@ import jadex.application.space.envsupport.observer.perspective.Perspective2D;
 import jadex.bridge.IComponentManagementService;
 import jadex.commons.IChangeListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
+import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.clock.IClockService;
 
@@ -666,7 +667,7 @@ public class ObserverCenter
 		{
 			if(delay==-1)
 			{
-				SServiceProvider.getService(space.getContext().getServiceProvider(), IClockService.class)
+				SServiceProvider.getService(space.getContext().getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 					.addResultListener(new SwingDefaultResultListener(mainwindow)
 				{
 					public void customResultAvailable(Object result)
@@ -679,7 +680,7 @@ public class ObserverCenter
 			}
 			else if(delay==0)
 			{
-				SServiceProvider.getService(space.getContext().getServiceProvider(), IClockService.class)
+				SServiceProvider.getService(space.getContext().getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 					.addResultListener(new SwingDefaultResultListener(mainwindow)
 				{
 					public void customResultAvailable(Object result)
@@ -692,7 +693,7 @@ public class ObserverCenter
 			}
 			else
 			{
-				SServiceProvider.getService(space.getContext().getServiceProvider(), IClockService.class)
+				SServiceProvider.getService(space.getContext().getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 					.addResultListener(new SwingDefaultResultListener(mainwindow)
 				{
 					public void customResultAvailable(Object result)
@@ -767,7 +768,7 @@ public class ObserverCenter
 		
 		if(clocklistener != null)
 		{
-			SServiceProvider.getService(space.getContext().getServiceProvider(), IClockService.class)
+			SServiceProvider.getService(space.getContext().getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new SwingDefaultResultListener(mainwindow)
 			{
 				public void customResultAvailable(Object result)

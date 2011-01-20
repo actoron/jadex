@@ -81,7 +81,10 @@
 			</trigger>
 		</plan>
 	</plans>
-
+	
+	<services>
+		<requiredservice name="cms" class="IComponentManagementService" scope="platform"/>
+	</services>
 
 	<properties>
         <!-- <property name="debugging">true</property> -->

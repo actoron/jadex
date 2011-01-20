@@ -6,7 +6,6 @@ import jadex.bdi.runtime.impl.flyweights.CapabilityFlyweight;
 import jadex.bdi.runtime.impl.flyweights.ExternalAccessFlyweight;
 import jadex.bdi.runtime.impl.flyweights.ParameterFlyweight;
 import jadex.bridge.CheckedAction;
-import jadex.bridge.ComponentResultListener;
 import jadex.bridge.DecouplingServiceInvocationInterceptor;
 import jadex.bridge.IArgument;
 import jadex.bridge.IComponentManagementService;
@@ -23,6 +22,7 @@ import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.service.IInternalService;
 import jadex.commons.service.IServiceContainer;
+import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.clock.IClockService;
 import jadex.commons.service.clock.ITimedObject;
@@ -90,7 +90,7 @@ public class AgentRules
 				
 				// Get the services.
 				final boolean services[]	= new boolean[4];
-				SServiceProvider.getService(ip.getServiceProvider(), IClockService.class).addResultListener(ip.createResultListener(new DefaultResultListener()
+				SServiceProvider.getService(ip.getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(ip.createResultListener(new DefaultResultListener()
 	//			SServiceProvider.getService(getServiceProvider(), IClockService.class).addResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object result)
@@ -108,7 +108,7 @@ public class AgentRules
 						}
 					}
 				}));
-				SServiceProvider.getService(ip.getServiceProvider(), IComponentManagementService.class).addResultListener(ip.createResultListener(new DefaultResultListener()
+				SServiceProvider.getService(ip.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(ip.createResultListener(new DefaultResultListener()
 	//			SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class).addResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object result)
@@ -124,7 +124,7 @@ public class AgentRules
 							ip.state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state,OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_INITING1);
 					}
 				}));
-				SServiceProvider.getService(ip.getServiceProvider(), IMessageService.class).addResultListener(ip.createResultListener(new DefaultResultListener()
+				SServiceProvider.getService(ip.getServiceProvider(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(ip.createResultListener(new DefaultResultListener()
 	//			SServiceProvider.getService(getServiceProvider(), IMessageService.class).addResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object result)

@@ -27,9 +27,5 @@
 			<concrete ref="shopcap.catalog"/>
 		</beliefsetref>
 	</beliefs>
-	
-	<!-- <services>
-		<container>new jadex.bridge.ComponentServiceContainer($scope.getAgentAdapter())</container>
-	</services> -->
-	
+
 </agent>

@@ -24,6 +24,7 @@ import jadex.commons.service.BasicService;
 import jadex.commons.service.IResultSelector;
 import jadex.commons.service.ISearchManager;
 import jadex.commons.service.IVisitDecider;
+import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.TypeResultSelector;
 import jadex.commons.service.clock.IClockService;
@@ -162,7 +163,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 			{
 				RemoteServiceManagementAgent agent = (RemoteServiceManagementAgent)ia;
 				final Future fut = new Future();
-				SServiceProvider.getService(component.getServiceProvider(), IComponentManagementService.class)
+				SServiceProvider.getService(component.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 					.addResultListener(agent.createResultListener(new IResultListener()
 				{
 					public void resultAvailable(Object result)
@@ -259,7 +260,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 			{
 				final Future fut = new Future();
 				RemoteServiceManagementAgent agent = (RemoteServiceManagementAgent)ia;
-				SServiceProvider.getService(component.getServiceProvider(), IComponentManagementService.class)
+				SServiceProvider.getService(component.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 					.addResultListener(agent.createResultListener(new IResultListener()
 				{
 					public void resultAvailable(Object result)
@@ -400,14 +401,14 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 				msg.put(SFipa.CONVERSATION_ID, callid);
 //				msg.put(SFipa.LANGUAGE, SFipa.JADEX_XML);
 				
-				SServiceProvider.getService(component.getServiceProvider(), ILibraryService.class)
+				SServiceProvider.getService(component.getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 					.addResultListener(agent.createResultListener(new IResultListener()
 				{
 					public void resultAvailable(Object result)
 					{
 						final ILibraryService ls = (ILibraryService)result;
 						
-						SServiceProvider.getService(component.getServiceProvider(), IMessageService.class)
+						SServiceProvider.getService(component.getServiceProvider(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 							.addResultListener(agent.createResultListener(new IResultListener()
 						{
 							public void resultAvailable(Object result)

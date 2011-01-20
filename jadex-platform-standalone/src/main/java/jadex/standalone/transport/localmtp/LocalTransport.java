@@ -6,6 +6,7 @@ import jadex.bridge.IMessageService;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.service.IServiceProvider;
+import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
 import jadex.standalone.transport.ITransport;
 
@@ -56,7 +57,7 @@ public class LocalTransport implements ITransport
 	 */
 	public void start()
 	{
-		SServiceProvider.getService(container, IMessageService.class).addResultListener(new DefaultResultListener()
+		SServiceProvider.getService(container, IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
 			{

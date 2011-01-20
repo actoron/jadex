@@ -7,6 +7,7 @@ import jadex.bridge.IMessageService;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.commons.gui.EditableList;
 import jadex.commons.service.IServiceProvider;
+import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
 
 import java.awt.BorderLayout;
@@ -88,7 +89,7 @@ public class ComponentIdentifierPanel extends JPanel
 			public void tableChanged(TableModelEvent e)
 			{
 				//System.out.println("event: "+e);
-				SServiceProvider.getService(provider, IComponentManagementService.class).addResultListener(new SwingDefaultResultListener(ComponentIdentifierPanel.this)
+				SServiceProvider.getService(provider, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new SwingDefaultResultListener(ComponentIdentifierPanel.this)
 				{
 					public void customResultAvailable(Object result)
 					{
@@ -139,7 +140,7 @@ public class ComponentIdentifierPanel extends JPanel
 		add(content, BorderLayout.CENTER);
 		add(help, BorderLayout.SOUTH);
 		
-		SServiceProvider.getService(provider, IMessageService.class).addResultListener(new SwingDefaultResultListener(ComponentIdentifierPanel.this)
+		SServiceProvider.getService(provider, IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new SwingDefaultResultListener(ComponentIdentifierPanel.this)
 		{
 			public void customResultAvailable(Object result)
 			{
@@ -238,7 +239,7 @@ public class ComponentIdentifierPanel extends JPanel
 		
 		protected void	update()
 		{
-			SServiceProvider.getService(provider, IComponentManagementService.class).addResultListener(new SwingDefaultResultListener(ComponentIdentifierPanel.this)
+			SServiceProvider.getService(provider, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new SwingDefaultResultListener(ComponentIdentifierPanel.this)
 			{
 				public void customResultAvailable(Object result)
 				{

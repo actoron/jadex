@@ -11,6 +11,7 @@ import jadex.commons.ICommand;
 import jadex.commons.SimplePropertyObject;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.service.IServiceProvider;
+import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.clock.IClockService;
 import jadex.commons.service.clock.ITimedObject;
@@ -87,7 +88,7 @@ public class RoundBasedExecutor extends SimplePropertyObject implements ISpaceEx
 		final AbstractEnvironmentSpace space = (AbstractEnvironmentSpace)getProperty("space");
 		final IServiceProvider provider	= space.getContext().getServiceProvider();
 
-		SServiceProvider.getService(provider, IClockService.class).addResultListener(new DefaultResultListener()
+		SServiceProvider.getService(provider, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
 			{

@@ -1,34 +1,32 @@
-<!--
-	<H3>The control center agent</H3>
-
-	Main platform administration user interface.
--->
-<agent xmlns="http://jadex.sourceforge.net/jadex-bdi"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<!-- <H3>The control center agent</H3> Main platform administration user 
+	interface. -->
+<agent xmlns="http://jadex.sourceforge.net/jadex-bdi" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-bdi
 	                    http://jadex.sourceforge.net/jadex-bdi-2.0.xsd"
 	name="JCC" package="jadex.tools.jcc">
 
-   <imports>
-      <import>jadex.base.fipa.*</import>
-   </imports>
+	<imports>
+		<import>jadex.base.fipa.*</import>
+		<import>jadex.bridge.*</import>
+		<import>jadex.commons.service.library.*</import>
+	</imports>
 
 	<capabilities>
 		<capability name="cms" file="jadex.bdi.planlib.cms.CMS" />
 		<capability name="df" file="jadex.bdi.planlib.df.DF" />
 		<!-- <capability name="loggercap" file="jadex.tools.logger.Logger"/> -->
-		<capability name="testcentercap" file="jadex.tools.testcenter.TestCenter"/>
+		<capability name="testcentercap" file="jadex.tools.testcenter.TestCenter" />
 	</capabilities>
 
 	<beliefs>
 		<belief name="jcc" class="AgentControlCenter" />
 
 		<beliefsetref name="agents">
-			<concrete ref="cms.agents"/>
+			<concrete ref="cms.agents" />
 		</beliefsetref>
 
 		<beliefref name="testcase_timeout">
-			<concrete ref="testcentercap.timeout"/>
+			<concrete ref="testcentercap.timeout" />
 		</beliefref>
 	</beliefs>
 
@@ -40,11 +38,11 @@
 		<achievegoalref name="cms_destroy_component">
 			<concrete ref="cms.cms_destroy_component" />
 		</achievegoalref>
-		
+
 		<achievegoalref name="cms_suspend_component">
 			<concrete ref="cms.cms_suspend_component" />
 		</achievegoalref>
-		
+
 		<achievegoalref name="cms_resume_component">
 			<concrete ref="cms.cms_resume_component" />
 		</achievegoalref>
@@ -56,56 +54,39 @@
 		<achievegoalref name="cms_search_components">
 			<concrete ref="cms.cms_search_components" />
 		</achievegoalref>
-      
-        <achievegoalref name="df_register">
-            <concrete ref="df.df_register"/>
-        </achievegoalref>
-        
-        <achievegoalref name="df_deregister">
-            <concrete ref="df.df_deregister"/>
-        </achievegoalref>
-        
-        <achievegoalref name="df_search">
-            <concrete ref="df.df_search"/>
-        </achievegoalref>
-      
-		<!-- <achievegoalref name="logger_tool_request">
-			<concrete ref="loggercap.tool_request" />
+
+		<achievegoalref name="df_register">
+			<concrete ref="df.df_register" />
 		</achievegoalref>
-		
-		<performgoalref name="logger_manage_tool">
-			<concrete ref="loggercap.manage_tool" />
-		</performgoalref> -->
+
+		<achievegoalref name="df_deregister">
+			<concrete ref="df.df_deregister" />
+		</achievegoalref>
+
+		<achievegoalref name="df_search">
+			<concrete ref="df.df_search" />
+		</achievegoalref>
+
+		<!-- <achievegoalref name="logger_tool_request"> <concrete ref="loggercap.tool_request" 
+			/> </achievegoalref> <performgoalref name="logger_manage_tool"> <concrete 
+			ref="loggercap.manage_tool" /> </performgoalref> -->
 
 		<performgoalref name="perform_test">
-			<concrete ref="testcentercap.perform_test"/>
+			<concrete ref="testcentercap.perform_test" />
 		</performgoalref>
 	</goals>
 
 	<plans>
-		<!-- <plan name="agent_list_update">
-			<body class="AgentListUpdatePlan" />
-			<trigger>
-				<factadded ref="agents"/>
-				<factremoved ref="agents"/>
-			</trigger>
-		</plan> -->
-		
-		<!-- <plan name="agent_list_update">
-			<body class="AgentListUpdatePlan" />
-			<!- - <waitqueue>
-				<factadded ref="agents"/>
-				<factremoved ref="agents"/>
-			</waitqueue> - ->
-		</plan> -->
+		<!-- <plan name="agent_list_update"> <body class="AgentListUpdatePlan" 
+			/> <trigger> <factadded ref="agents"/> <factremoved ref="agents"/> </trigger> 
+			</plan> -->
 
-		<!-- <plan name="receiver">
-			<body class="MailPlan" />
-			<trigger>
-				<messageevent ref="fipcmsg" />
-				<messageevent ref="agent_inform"/>
-			</trigger>
-		</plan> -->
+		<!-- <plan name="agent_list_update"> <body class="AgentListUpdatePlan" 
+			/> <!- - <waitqueue> <factadded ref="agents"/> <factremoved ref="agents"/> 
+			</waitqueue> - -> </plan> -->
+
+		<!-- <plan name="receiver"> <body class="MailPlan" /> <trigger> <messageevent 
+			ref="fipcmsg" /> <messageevent ref="agent_inform"/> </trigger> </plan> -->
 	</plans>
 
 	<events>
@@ -123,64 +104,69 @@
 				<value>SFipa.JADEX_XML</value>
 			</parameter>
 		</messageevent>
-		
+
 		<!-- Message to issue a log request to an component. -->
-		<!-- <messageevent name="logger_tool_request" type="fipa" 	direction="send">
-			<parameter name="performative" class="String" 		direction="fixed">
-				<value>"request"</value>
-			</parameter>
-			<parameter name="ontology" class="String" 			direction="fixed">
-				<value>"jadex.tools.logger"</value>
-			</parameter>
-			<parameter name="language" class="String" 			direction="fixed">
-				<value>SFipa.JADEX_XML</value>
-			</parameter>
-		</messageevent> -->
-		
-      <messageevent name="component_inform" type="fipa" direction="receive">
+		<!-- <messageevent name="logger_tool_request" type="fipa" direction="send"> 
+			<parameter name="performative" class="String" direction="fixed"> <value>"request"</value> 
+			</parameter> <parameter name="ontology" class="String" direction="fixed"> 
+			<value>"jadex.tools.logger"</value> </parameter> <parameter name="language" 
+			class="String" direction="fixed"> <value>SFipa.JADEX_XML</value> </parameter> 
+			</messageevent> -->
+
+		<messageevent name="component_inform" type="fipa"
+			direction="receive">
 			<parameter name="performative" class="String" direction="fixed">
 				<value>"inform"</value>
 			</parameter>
-            <parameter name="ontology" class="String" direction="fixed">
-                <value>"jadex.tools"</value>
-            </parameter>
+			<parameter name="ontology" class="String" direction="fixed">
+				<value>"jadex.tools"</value>
+			</parameter>
 			<parameter name="language" class="String" direction="fixed">
 				<value>SFipa.JADEX_XML</value>
 			</parameter>
-		</messageevent> 
+		</messageevent>
 
 	</events>
 
+	<services>
+		<requiredservice name="libservice" class="ILibraryService"
+			scope="platform" />
+		<requiredservice name="cms" class="IComponentManagementService"
+			scope="platform" />
+		<requiredservice name="rms" class="IRemoteServiceManagementService"
+			scope="platform" />
+	</services>
+
 	<properties>
-		<!-- Only print severe messages and ignore warnings, e.g. from unhandled messages received by conversation center. -->
+		<!-- Only print severe messages and ignore warnings, e.g. from unhandled 
+			messages received by conversation center. -->
 		<property name="logging.level">java.util.logging.Level.SEVERE</property>
-<!--		<property name="debugging">true</property>-->
-		<!-- <property name="componentviewer.viewerclass">"jadex.base.gui.componentviewer.DefaultComponentServiceViewerPanel"</property>-->
+		<!-- <property name="debugging">true</property> -->
+		<!-- <property name="componentviewer.viewerclass">"jadex.base.gui.componentviewer.DefaultComponentServiceViewerPanel"</property> -->
 		<!-- <property name="bdiviewerpanel.agentviewerclass">"..."</property> -->
 	</properties>
 
 	<configurations>
 		<configuration name="default">
 			<capabilities>
-				<initialcapability ref="cms" configuration="componentlist"/>
+				<initialcapability ref="cms" configuration="componentlist" />
 			</capabilities>
 			<beliefs>
 				<initialbelief ref="jcc">
 					<fact>
-						new AgentControlCenter($scope.getServiceProvider(),
-						"jadex.tools.starter.StarterPlugin"
+						new AgentControlCenter($scope.getExternalAccess(),
+						" jadex.tools.starter.StarterPlugin"
 						+ " jadex.tools.generic.DFServicePlugin"
 						+ " jadex.tools.convcenter.ConversationPlugin"
 						+ " jadex.tools.comanalyzer.ComanalyzerPlugin"
 						+ " jadex.tools.testcenter.TestCenterPlugin"
-					//	+ " jadex.tools.jadexdoc.JadexdocPlugin"
+						// + " jadex.tools.jadexdoc.JadexdocPlugin"
 						+ " jadex.tools.simcenter.SimCenterPlugin"
 						+ " jadex.tools.debugger.DebuggerPlugin"
-					//	+ " jadex.tools.ruleprofiler.RuleProfilerPlugin"
+						// + " jadex.tools.ruleprofiler.RuleProfilerPlugin"
 						+ " jadex.tools.generic.LibraryServicePlugin"
 						+ " jadex.tools.generic.AwarenessComponentPlugin"
-						+ " jadex.base.gui.componentviewer.ComponentViewerPlugin",
-						$scope.getExternalAccess())
+						+ " jadex.base.gui.componentviewer.ComponentViewerPlugin")
 					</fact>
 				</initialbelief>
 			</beliefs>

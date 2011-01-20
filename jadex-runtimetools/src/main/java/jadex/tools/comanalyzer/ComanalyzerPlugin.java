@@ -200,7 +200,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 	 */
 	public void shutdown()
 	{
-		SServiceProvider.getService(getJCC().getServiceProvider(), IMessageService.class).addResultListener(new DefaultResultListener()
+		SServiceProvider.getService(getJCC().getExternalAccess().getServiceProvider(), IMessageService.class).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
@@ -394,7 +394,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 		split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true);
 		split.setOneTouchExpandable(true);
 
-		comptree = new ComponentTreePanel(getJCC().getServiceProvider());
+		comptree = new ComponentTreePanel(getJCC().getExternalAccess());
 		comptree.setMinimumSize(new Dimension(0, 0));
 		split.add(comptree);
 		
@@ -526,7 +526,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 
 //		jcc.addAgentListListener(this);
 		
-		SServiceProvider.getService(getJCC().getServiceProvider(), IComponentManagementService.class).addResultListener(new DefaultResultListener()
+		SServiceProvider.getService(getJCC().getExternalAccess().getServiceProvider(), IComponentManagementService.class).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
@@ -578,7 +578,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 		applyAgentFilter(dummy);
 		componentlist.addAgent(dummy);
 		
-		SServiceProvider.getService(getJCC().getServiceProvider(), IMessageService.class).addResultListener(new DefaultResultListener()
+		SServiceProvider.getService(getJCC().getExternalAccess().getServiceProvider(), IMessageService.class).addResultListener(new DefaultResultListener()
 		{
 			
 			public void resultAvailable(Object result)
@@ -1063,7 +1063,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 	 */
 	protected boolean isDuplicate(IMessageAdapter newmsg, IComponentIdentifier rec)
 	{
-		IClockService cs = (IClockService)SServiceProvider.getService(getJCC().getServiceProvider(), IClockService.class).get(new ThreadSuspendable());
+		IClockService cs = (IClockService)SServiceProvider.getService(getJCC().getExternalAccess().getServiceProvider(), IClockService.class).get(new ThreadSuspendable());
 		
 		boolean ret = false;
 		Message[] messages = messagelist.getMessages();
@@ -1117,7 +1117,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 		{
 			// add to agent tree table
 			IComponentManagementService ces = (IComponentManagementService)SServiceProvider
-				.getService(jcc.getServiceProvider(), IComponentManagementService.class).get(new ThreadSuspendable());
+				.getService(jcc.getExternalAccess().getServiceProvider(), IComponentManagementService.class).get(new ThreadSuspendable());
 			sender = new Component(ces.createComponentDescription(sid, null, null, "unknown-component-type", null, null));
 			sender.setState(Component.STATE_DEAD);
 			sender.addMessage(message);
@@ -1136,7 +1136,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 		if(receiver == null)
 		{
 			IComponentManagementService ces = (IComponentManagementService)SServiceProvider
-				.getService(jcc.getServiceProvider(), IComponentManagementService.class).get(new ThreadSuspendable());
+				.getService(jcc.getExternalAccess().getServiceProvider(), IComponentManagementService.class).get(new ThreadSuspendable());
 			receiver = new Component(ces.createComponentDescription(rid, null, null, "unknown-component-type", null, null));
 			receiver.setState(Component.STATE_DEAD);
 			receiver.addMessage(message);
@@ -1447,7 +1447,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 //					message_maps.add(messages[i].getParameters());
 //				}
 
-				SServiceProvider.getService(jcc.getServiceProvider(), ILibraryService.class).addResultListener(new SwingDefaultResultListener(comptree)
+				SServiceProvider.getService(jcc.getExternalAccess().getServiceProvider(), ILibraryService.class).addResultListener(new SwingDefaultResultListener(comptree)
 				{
 					public void customResultAvailable(Object result)
 					{
@@ -1550,7 +1550,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 //					}
 //				}
 				final String sxml = xml;
-				SServiceProvider.getService(jcc.getServiceProvider(), ILibraryService.class).addResultListener(new SwingDefaultResultListener(comptree)
+				SServiceProvider.getService(jcc.getExternalAccess().getServiceProvider(), ILibraryService.class).addResultListener(new SwingDefaultResultListener(comptree)
 				{
 					public void customResultAvailable(Object result)
 					{

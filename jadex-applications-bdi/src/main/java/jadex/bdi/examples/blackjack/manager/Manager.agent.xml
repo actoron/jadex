@@ -18,6 +18,7 @@
 		<import>jadex.commons.*</import>
 		<import>jadex.base.fipa.*</import>
 		<import>java.util.logging.*</import>
+		<import>jadex.bridge.*</import>
 	</imports>
 	
 	<capabilities>
@@ -116,6 +117,10 @@
 			<match>$content instanceof String &amp;&amp; ((String)$content).startsWith("playerPlaying")</match>
 		</messageevent>
 	</events>
+	
+	<services>
+		<requiredservice name="cms" class="IComponentManagementService" scope="platform"/>
+	</services>
 	
 	<!-- 
 	     logging-properties, needed to debug the application.

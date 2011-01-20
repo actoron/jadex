@@ -108,7 +108,7 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	public IServiceContainer createServiceContainer()
 	{
 //		return new CacheServiceContainer(new ComponentServiceContainer(getAgentAdapter()), 25, 1*30*1000); // 30 secs cache expire
-		return new ComponentServiceContainer(getAgentAdapter());
+		return new ComponentServiceContainer(getAgentAdapter(), MicroAgentFactory.FILETYPE_MICROAGENT);
 	}
 	
 	/**
@@ -225,7 +225,7 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	{
 		final Future ret = new Future();
 		
-		SServiceProvider.getService(getServiceProvider(), IClockService.class)
+		SServiceProvider.getService(getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(createResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
@@ -251,7 +251,7 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 		longtime	= Math.max(longtime, time);
 		final Future ret = new Future();
 		
-		SServiceProvider.getService(getServiceProvider(), IClockService.class)
+		SServiceProvider.getService(getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(createResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
@@ -305,7 +305,7 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	{
 		final Future ret = new Future();
 		
-		SServiceProvider.getService(getServiceProvider(), IClockService.class)
+		SServiceProvider.getService(getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(createResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
@@ -361,7 +361,7 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	public IFuture killAgent()
 	{
 		final Future ret = new Future();
-		SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class)
+		SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(createResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
@@ -382,7 +382,7 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	{
 		final Future ret = new Future();
 		
-		SServiceProvider.getService(getServiceProvider(), IMessageService.class)
+		SServiceProvider.getService(getServiceProvider(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(createResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
@@ -501,7 +501,7 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	{
 		final Future ret = new Future();
 		
-		SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class)
+		SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(createResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
@@ -522,7 +522,7 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	public IFuture createReply(final Map msg, final MessageType mt)
 	{
 		final Future ret = new Future();
-		SServiceProvider.getService(getServiceProvider(), IMessageService.class)
+		SServiceProvider.getService(getServiceProvider(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(createResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)

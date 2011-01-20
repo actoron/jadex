@@ -9,6 +9,7 @@ import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
+import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
 
 /**
@@ -23,7 +24,7 @@ public class DestroyComponentTask implements ITask
 	{
 		final Future ret = new Future();
 		
-		SServiceProvider.getService(instance.getServiceProvider(), IComponentManagementService.class)
+		SServiceProvider.getService(instance.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(instance.createResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)

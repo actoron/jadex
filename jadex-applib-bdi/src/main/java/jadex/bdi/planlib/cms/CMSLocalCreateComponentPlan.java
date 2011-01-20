@@ -5,7 +5,6 @@ import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.commons.IFuture;
-import jadex.commons.service.SServiceProvider;
 
 import java.util.Map;
 
@@ -31,8 +30,7 @@ public class CMSLocalCreateComponentPlan extends Plan
 		try
 		{
 			// todo: support parent/master etc.
-			IFuture ret = ((IComponentManagementService)SServiceProvider.getServiceUpwards(getScope()
-				.getServiceProvider(), IComponentManagementService.class).get(this))
+			IFuture ret = ((IComponentManagementService)getScope().getRequiredService("cms").get(this))
 				.createComponent(name, type, new CreationInfo(config, args, parent, suspend, master), null);
 			IComponentIdentifier aid = (IComponentIdentifier)ret.get(this);
 			getParameter("componentidentifier").setValue(aid);

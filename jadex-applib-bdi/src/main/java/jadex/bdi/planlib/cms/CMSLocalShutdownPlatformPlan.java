@@ -3,7 +3,6 @@ package jadex.bdi.planlib.cms;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
-import jadex.commons.service.SServiceProvider;
 
 /**
  *  Shutdown the platform.
@@ -16,8 +15,7 @@ public class CMSLocalShutdownPlatformPlan extends Plan
 	 */
 	public void body()
 	{
-		IComponentManagementService	cms	= (IComponentManagementService)SServiceProvider
-			.getService(getScope().getServiceProvider(), IComponentManagementService.class).get(this);
+		IComponentManagementService	cms	= (IComponentManagementService)getScope().getRequiredService("cms").get(this);
 		IComponentIdentifier	root	= getScope().getComponentIdentifier();
 		boolean	foundroot	= false;
 		while(!foundroot)

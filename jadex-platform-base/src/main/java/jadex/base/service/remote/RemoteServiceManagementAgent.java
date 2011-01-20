@@ -5,6 +5,7 @@ import jadex.base.service.remote.commands.RemoteResultCommand;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.MessageType;
 import jadex.commons.concurrent.DefaultResultListener;
+import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.clock.IClockService;
 import jadex.commons.service.library.ILibraryService;
@@ -36,13 +37,13 @@ public class RemoteServiceManagementAgent extends MicroAgent
 	 */
 	public void agentCreated()
 	{
-		SServiceProvider.getService(getServiceProvider(), IClockService.class)
+		SServiceProvider.getService(getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(createResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
 				final IClockService clock = (IClockService)result;
-				SServiceProvider.getService(getServiceProvider(), ILibraryService.class)
+				SServiceProvider.getService(getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 					.addResultListener(createResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object result)
@@ -92,7 +93,7 @@ public class RemoteServiceManagementAgent extends MicroAgent
 	{
 		if(SFipa.MESSAGE_TYPE_NAME_FIPA.equals(mt.getName()))
 		{
-			SServiceProvider.getService(getServiceProvider(), ILibraryService.class)
+			SServiceProvider.getService(getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 				.addResultListener(createResultListener(new DefaultResultListener()
 			{
 				public void resultAvailable(Object result)

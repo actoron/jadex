@@ -3,9 +3,9 @@ package jadex.tools.convcenter;
 import jadex.base.fipa.SFipa;
 import jadex.base.gui.ComponentSelectorDialog;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IExternalAccess;
 import jadex.commons.SGUI;
 import jadex.commons.SUtil;
-import jadex.commons.service.IServiceProvider;
 
 import java.awt.Component;
 import java.awt.Dimension;
@@ -89,7 +89,7 @@ public class FipaMessagePanel extends JPanel
 	 *  @param agent	The agent.
 	 *  @param comptree	The comptree (if any) will be repainted when new receivers are set in the panel.
 	 */
-	public FipaMessagePanel(Map message, final IServiceProvider provider, final Component comptree)
+	public FipaMessagePanel(Map message, final IExternalAccess access, final Component comptree)
 	{
 		super(new GridBagLayout());
 		this.editable	= true;
@@ -295,7 +295,7 @@ public class FipaMessagePanel extends JPanel
 
 
 		// Actions for agent selection.
-		final ComponentSelectorDialog	agentselector	= new ComponentSelectorDialog(this, provider);
+		final ComponentSelectorDialog	agentselector	= new ComponentSelectorDialog(this, access);
 		setsender.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)

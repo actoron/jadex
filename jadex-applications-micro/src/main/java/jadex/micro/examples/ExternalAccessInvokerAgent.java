@@ -28,7 +28,7 @@ public class ExternalAccessInvokerAgent extends MicroAgent
 		{
 			public void run()
 			{
-				final ComponentSelectorDialog agentselector	= new ComponentSelectorDialog(null, getServiceProvider());
+				final ComponentSelectorDialog agentselector	= new ComponentSelectorDialog(null, getExternalAccess());
 				final IComponentIdentifier cid = agentselector.selectAgent(null);
 				if(cid!=null)
 				{

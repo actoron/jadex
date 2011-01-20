@@ -202,13 +202,13 @@ public class StarterNodeFunctionality extends DefaultNodeFunctionality
 				{
 					final String	file	= fn.getFile().getAbsolutePath();
 					
-					SComponentFactory.isLoadable(jcc.getServiceProvider(), file).addResultListener(new DefaultResultListener()
+					SComponentFactory.isLoadable(jcc.getExternalAccess().getServiceProvider(), file).addResultListener(new DefaultResultListener()
 					{
 						public void resultAvailable(Object result)
 						{
 							if(((Boolean)result).booleanValue())
 							{
-								SComponentFactory.loadModel(jcc.getServiceProvider(), file).addResultListener(new SwingDefaultResultListener(checkcomp)
+								SComponentFactory.loadModel(jcc.getExternalAccess().getServiceProvider(), file).addResultListener(new SwingDefaultResultListener(checkcomp)
 								{
 									public void customResultAvailable(Object result)
 									{

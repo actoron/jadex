@@ -115,7 +115,7 @@ public class CompositeServiceInvocationInterceptor implements IServiceInvocation
 								{
 									creating	= new Future();
 									creating.addResultListener(lis);
-									SServiceProvider.getService(ea.getServiceProvider(), IComponentManagementService.class)
+									SServiceProvider.getService(ea.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 										.addResultListener(ia.createResultListener(new DelegationResultListener(fut)
 									{
 										public void customResultAvailable(Object result)
@@ -157,7 +157,7 @@ public class CompositeServiceInvocationInterceptor implements IServiceInvocation
 	protected void invokeServiceMethod(final IInternalAccess ia, final IComponentIdentifier cid,
 		final ServiceInvocationContext sic, final Future ret)
 	{
-		SServiceProvider.getService(ea.getServiceProvider(), IComponentManagementService.class)
+		SServiceProvider.getService(ea.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)

@@ -4,7 +4,6 @@ import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.commons.IFuture;
-import jadex.commons.service.SServiceProvider;
 
 
 /**
@@ -21,8 +20,7 @@ public class CMSLocalDestroyComponentPlan extends Plan
 
 		try
 		{
-			IFuture ret = ((IComponentManagementService)SServiceProvider.getService(
-				getScope().getServiceProvider(), IComponentManagementService.class).get(this)).destroyComponent(cid);
+			IFuture ret = ((IComponentManagementService)getScope().getRequiredService("cms").get(this)).destroyComponent(cid);
 			ret.get(this);
 		}
 		catch(Exception e)

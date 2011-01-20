@@ -9,6 +9,7 @@ import jadex.commons.concurrent.IExecutable;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.service.BasicService;
 import jadex.commons.service.IServiceProvider;
+import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.threadpool.IThreadPoolService;
 
@@ -173,7 +174,7 @@ public class SyncExecutionService extends BasicService implements IExecutionServ
 			return ret;
 		}
 		
-		SServiceProvider.getService(provider, IThreadPoolService.class).addResultListener(new IResultListener()
+		SServiceProvider.getService(provider, IThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
 			{

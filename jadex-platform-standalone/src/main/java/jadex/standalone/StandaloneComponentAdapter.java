@@ -8,6 +8,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IModelInfo;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IExecutable;
+import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.execution.IExecutionService;
 
@@ -39,7 +40,7 @@ public class StandaloneComponentAdapter	extends AbstractComponentAdapter	impleme
 	 */
 	protected void	doWakeup()
 	{
-		SServiceProvider.getService(getServiceContainer(), IExecutionService.class).addResultListener(new DefaultResultListener()
+		SServiceProvider.getService(getServiceContainer(), IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
 			{

@@ -5,6 +5,7 @@ import jadex.commons.IFuture;
 import jadex.commons.IIntermediateFuture;
 import jadex.commons.IntermediateDelegationResultListener;
 import jadex.commons.IntermediateFuture;
+import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.DelegationResultListener;
 
 import java.util.Collection;
@@ -191,7 +192,9 @@ public class SServiceProvider
 				Collection res = (Collection)result;
 				if(res==null || res.size()==0)
 				{
-//					getService(provider, type, scope).addResultListener(new DefaultResultListener()
+//					provider.getServices(getSearchManager(false, scope), getVisitDecider(true, scope), 
+//						new TypeResultSelector(type, true, RequiredServiceInfo.SCOPE_GLOBAL.equals(scope)))
+//						.addResultListener(new DefaultResultListener()
 //					{
 //						public void resultAvailable(Object result)
 //						{
@@ -225,7 +228,8 @@ public class SServiceProvider
 		// Hack->remove
 //		IVisitDecider abortdecider = new DefaultVisitDecider();
 		
-		provider.getServices(getSearchManager(false), getVisitDecider(true), new IdResultSelector(sid))
+		provider.getServices(getSearchManager(false, RequiredServiceInfo.SCOPE_PLATFORM),
+			getVisitDecider(true, RequiredServiceInfo.SCOPE_PLATFORM), new IdResultSelector(sid))
 			.addResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
@@ -258,7 +262,8 @@ public class SServiceProvider
 		// Hack->remove
 //		IVisitDecider abortdecider = new DefaultVisitDecider();
 		
-		provider.getServices(getSearchManager(false), getVisitDecider(true), selector)
+		provider.getServices(getSearchManager(false, RequiredServiceInfo.SCOPE_PLATFORM),
+			getVisitDecider(true, RequiredServiceInfo.SCOPE_PLATFORM), selector)
 			.addResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)

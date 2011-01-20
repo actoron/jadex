@@ -10,6 +10,7 @@ import jadex.commons.collection.MultiCollection;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.service.IServiceProvider;
+import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.clock.IClockService;
 import jadex.commons.service.clock.ITimedObject;
@@ -165,12 +166,12 @@ public class NIOTCPTransport implements ITransport
 			
 			// Start receiver thread.
 			
-			SServiceProvider.getService(container, ILibraryService.class).addResultListener(new DefaultResultListener()
+			SServiceProvider.getService(container, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
 			{
 				public void resultAvailable(Object result)
 				{
 					libservice = (ILibraryService)result;
-					SServiceProvider.getService(container, IThreadPoolService.class).addResultListener(new DefaultResultListener()
+					SServiceProvider.getService(container, IThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
 					{
 						public void resultAvailable(Object result)
 						{
@@ -225,7 +226,7 @@ public class NIOTCPTransport implements ITransport
 											else if(key.isValid() && key.isReadable())
 											{
 												final NIOTCPInputConnection con = (NIOTCPInputConnection)key.attachment();
-												SServiceProvider.getService(container, IMessageService.class).addResultListener(new DefaultResultListener()
+												SServiceProvider.getService(container, IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
 												{
 													public void resultAvailable(Object result)
 													{
@@ -539,7 +540,7 @@ public class NIOTCPTransport implements ITransport
 			/*if(timer!=null)
 				timer.cancel();
 			timer = platform.getClock().createTimer(System.currentTimeMillis()+MAX_KEEPALIVE, this);*/
-			SServiceProvider.getService(container, IClockService.class).addResultListener(new DefaultResultListener()
+			SServiceProvider.getService(container, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
 			{
 				public void resultAvailable(Object result)
 				{

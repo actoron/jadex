@@ -10,6 +10,8 @@ import jadex.bridge.ICMSComponentListener;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.IModelInfo;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
@@ -257,7 +259,7 @@ public class StarterPlugin extends AbstractJCCPlugin	implements ICMSComponentLis
 		lsplit.setOneTouchExpandable(true);
 		lsplit.setResizeWeight(0.7);
 
-		mpanel = new ModelExplorer(getJCC().getServiceProvider(), new StarterNodeFunctionality(this));
+		mpanel = new ModelExplorer(getJCC().getExternalAccess().getServiceProvider(), new StarterNodeFunctionality(this));
 //		mpanel.setAction(FileNode.class, new INodeAction()
 //		{
 //			public void validStateChanged(TreeNode node, boolean valid)
@@ -290,7 +292,7 @@ public class StarterPlugin extends AbstractJCCPlugin	implements ICMSComponentLis
 
 					final String model = ((FileNode)node).getRelativePath();
 //					if(getJCC().getComponent().getPlatform().getComponentFactory().isLoadable(model))
-					SComponentFactory.isLoadable(getJCC().getServiceProvider(), model).addResultListener(new SwingDefaultResultListener(spanel)
+					SComponentFactory.isLoadable(getJCC().getExternalAccess().getServiceProvider(), model).addResultListener(new SwingDefaultResultListener(spanel)
 					{
 						public void customResultAvailable(Object result)
 						{
@@ -321,7 +323,7 @@ public class StarterPlugin extends AbstractJCCPlugin	implements ICMSComponentLis
 							final String type = ((FileNode)node).getFile().getAbsolutePath();
 //							if(getJCC().getComponent().getPlatform().getComponentFactory().isStartable(type))
 							// todo: resultcollect = false?
-							SComponentFactory.isStartable(getJCC().getServiceProvider(), type).addResultListener(new SwingDefaultResultListener(spanel)
+							SComponentFactory.isStartable(getJCC().getExternalAccess().getServiceProvider(), type).addResultListener(new SwingDefaultResultListener(spanel)
 							{
 								public void customResultAvailable(Object result)
 								{
@@ -337,7 +339,7 @@ public class StarterPlugin extends AbstractJCCPlugin	implements ICMSComponentLis
   		};
   		mpanel.addMouseListener(ml);
 
-		comptree = new ComponentTreePanel(getJCC().getServiceProvider(), JSplitPane.HORIZONTAL_SPLIT);
+		comptree = new ComponentTreePanel(getJCC().getExternalAccess(), JSplitPane.HORIZONTAL_SPLIT);
 		comptree.setMinimumSize(new Dimension(0, 0));
 		
 		lsplit.add(new JScrollPane(mpanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
@@ -355,22 +357,29 @@ public class StarterPlugin extends AbstractJCCPlugin	implements ICMSComponentLis
 		
 		// todo: ?! is this ok?
 		
-		SServiceProvider.getServiceUpwards(jcc.getServiceProvider(),
-			IComponentManagementService.class).addResultListener(new DefaultResultListener()
+		jcc.getExternalAccess().scheduleStep(new IComponentStep()
 		{
-			public void resultAvailable(Object result)
+			public static final String XML_CLASSNAME = "add-component-listener";
+			public Object execute(IInternalAccess ia)
 			{
-				IComponentManagementService ces = (IComponentManagementService)result;
-				ces.getComponentDescriptions().addResultListener(new DefaultResultListener()
+				ia.getRequiredService("cms").addResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object result)
 					{
-						IComponentDescription[] res = (IComponentDescription[])result;
-						for(int i=0; i<res.length; i++)
-							componentAdded(res[i]);
+						IComponentManagementService ces = (IComponentManagementService)result;
+						ces.getComponentDescriptions().addResultListener(new DefaultResultListener()
+						{
+							public void resultAvailable(Object result)
+							{
+								IComponentDescription[] res = (IComponentDescription[])result;
+								for(int i=0; i<res.length; i++)
+									componentAdded(res[i]);
+							}
+						});
+						ces.addComponentListener(null, StarterPlugin.this);
 					}
 				});
-				ces.addComponentListener(null, StarterPlugin.this);
+				return null;
 			}
 		});
 		
@@ -545,20 +554,26 @@ public class StarterPlugin extends AbstractJCCPlugin	implements ICMSComponentLis
 	{
 		public void actionPerformed(ActionEvent e)
 		{
-			SServiceProvider.getServiceUpwards(jcc.getServiceProvider(),
-				IComponentManagementService.class).addResultListener(new DefaultResultListener()		
+			jcc.getExternalAccess().scheduleStep(new IComponentStep()
 			{
-				public void resultAvailable(Object result)
+				public Object execute(IInternalAccess ia)
 				{
-					ComponentIdentifierDialog dia = new ComponentIdentifierDialog(spanel, jcc.getServiceProvider());
-					IComponentIdentifier cid = dia.getComponentIdentifier(null);
-					
-					if(cid!=null)
+					ia.getRequiredService("cms").addResultListener(new DefaultResultListener()		
 					{
-						Map args = new HashMap();
-						args.put("component", cid);
-						createComponent("jadex/base/service/remote/ProxyAgent.class", cid.getLocalName(), null, args, false, null, null, null, null);
-					}
+						public void resultAvailable(Object result)
+						{
+							ComponentIdentifierDialog dia = new ComponentIdentifierDialog(spanel, jcc.getExternalAccess().getServiceProvider());
+							IComponentIdentifier cid = dia.getComponentIdentifier(null);
+							
+							if(cid!=null)
+							{
+								Map args = new HashMap();
+								args.put("component", cid);
+								createComponent("jadex/base/service/remote/ProxyAgent.class", cid.getLocalName(), null, args, false, null, null, null, null);
+							}
+						}
+					});
+					return null;
 				}
 			});
 		}
@@ -629,12 +644,12 @@ public class StarterPlugin extends AbstractJCCPlugin	implements ICMSComponentLis
 				{
 					final String type = ((FileNode)node).getFile().getAbsolutePath();
 					
-					if(((Boolean)SComponentFactory.isStartable(getJCC().getServiceProvider(), type).get(new ThreadSuspendable())).booleanValue())//&& ((FileNode)node).isValid())
+					if(((Boolean)SComponentFactory.isStartable(getJCC().getExternalAccess().getServiceProvider(), type).get(new ThreadSuspendable())).booleanValue())//&& ((FileNode)node).isValid())
 					{
 						try
 						{
 //							IComponentFactory componentfactory = getJCC().getComponent().getPlatform().getComponentFactory();
-							IModelInfo model = (IModelInfo)SComponentFactory.loadModel(getJCC().getServiceProvider(), type).get(new ThreadSuspendable());
+							IModelInfo model = (IModelInfo)SComponentFactory.loadModel(getJCC().getExternalAccess().getServiceProvider(), type).get(new ThreadSuspendable());
 							String[] inistates = model.getConfigurations();
 //							IMBDIComponent model = SXML.loadComponentModel(type, null);
 //							final IMConfiguration[] inistates = model.getConfigurationbase().getConfigurations();
@@ -707,7 +722,7 @@ public class StarterPlugin extends AbstractJCCPlugin	implements ICMSComponentLis
 			if(node instanceof FileNode)
 			{
 				String type = ((FileNode)node).getFile().getAbsolutePath();
-				if(((Boolean)SComponentFactory.isStartable(getJCC().getServiceProvider(), type).get(new ThreadSuspendable())))
+				if(((Boolean)SComponentFactory.isStartable(getJCC().getExternalAccess().getServiceProvider(), type).get(new ThreadSuspendable())))
 					ret = true;
 			}
 			return ret;
@@ -774,29 +789,36 @@ public class StarterPlugin extends AbstractJCCPlugin	implements ICMSComponentLis
 		final Boolean master, final Boolean daemon, final Boolean autosd, final IResultListener killlistener)
 	{
 		final Future ret = new Future(); 
-		SServiceProvider.getServiceUpwards(jcc.getServiceProvider(),
-			IComponentManagementService.class).addResultListener(new SwingDefaultResultListener(spanel)
+		jcc.getExternalAccess().scheduleStep(new IComponentStep()
 		{
-			public void customResultAvailable(Object result)
+			public static final String XML_CLASSNAME = "create-component";
+			public Object execute(IInternalAccess ia)
 			{
-				IComponentManagementService cms = (IComponentManagementService)result;
-				cms.createComponent(name, type, new CreationInfo(configname, arguments, spanel.parent, suspend, master, daemon, autosd), killlistener)
-					.addResultListener(new IResultListener()
+				ia.getRequiredService("cms").addResultListener(new SwingDefaultResultListener(spanel)
 				{
-					public void resultAvailable(Object result)
+					public void customResultAvailable(Object result)
 					{
-						ret.setResult(result);
-						getJCC().setStatusText("Created component: " + ((IComponentIdentifier)result).getLocalName());
-					}
-					
-					public void exceptionOccurred(Exception exception)
-					{
-						ret.setException(exception);
-						getJCC().displayError("Problem Starting Component", "Component could not be started.", exception);
+						IComponentManagementService cms = (IComponentManagementService)result;
+						cms.createComponent(name, type, new CreationInfo(configname, arguments, spanel.parent, suspend, master, daemon, autosd), killlistener)
+							.addResultListener(new IResultListener()
+						{
+							public void resultAvailable(Object result)
+							{
+								ret.setResult(result);
+								getJCC().setStatusText("Created component: " + ((IComponentIdentifier)result).getLocalName());
+							}
+							
+							public void exceptionOccurred(Exception exception)
+							{
+								ret.setException(exception);
+								getJCC().displayError("Problem Starting Component", "Component could not be started.", exception);
+							}
+						});
 					}
 				});
+				return null;
 			}
-		});		
+		});
 		return ret;
 	}
 }

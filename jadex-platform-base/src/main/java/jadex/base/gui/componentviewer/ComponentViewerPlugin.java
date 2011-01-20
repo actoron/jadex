@@ -1,6 +1,5 @@
 package jadex.base.gui.componentviewer;
 
-import jadex.base.SComponentFactory;
 import jadex.base.gui.componenttree.ComponentTreePanel;
 import jadex.base.gui.componenttree.IActiveComponentTreeNode;
 import jadex.base.gui.componenttree.IComponentTreeNode;
@@ -10,7 +9,9 @@ import jadex.base.gui.componenttree.ServiceNode;
 import jadex.base.gui.plugin.AbstractJCCPlugin;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
 import jadex.commons.Properties;
 import jadex.commons.SGUI;
 import jadex.commons.SReflect;
@@ -18,7 +19,6 @@ import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.commons.gui.CombiIcon;
 import jadex.commons.gui.ObjectCardLayout;
 import jadex.commons.service.IService;
-import jadex.commons.service.SServiceProvider;
 
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -147,7 +147,7 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 		this.split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true);
 		split.setOneTouchExpandable(true);
 
-		comptree = new ComponentTreePanel(getJCC().getServiceProvider());
+		comptree = new ComponentTreePanel(getJCC().getExternalAccess());
 		comptree.setMinimumSize(new Dimension(0, 0));
 		split.add(comptree);
 
@@ -321,7 +321,7 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 						final ServiceNode node = (ServiceNode)tmp;
 						final IService service = node.getService();
 
-						SComponentFactory.getClassLoader(((IActiveComponentTreeNode)node.getParent().getParent()).getComponentIdentifier(), getJCC())
+						AbstractJCCPlugin.getClassLoader(((IActiveComponentTreeNode)node.getParent().getParent()).getComponentIdentifier(), getJCC())
 							.addResultListener(new SwingDefaultResultListener(comptree)
 						{
 							public void customResultAvailable(Object result)
@@ -367,40 +367,44 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 						final IActiveComponentTreeNode node = (IActiveComponentTreeNode)tmp;
 						final IComponentIdentifier cid = node.getComponentIdentifier();
 						
-						SServiceProvider.getService(getJCC().getServiceProvider(), IComponentManagementService.class)
-							.addResultListener(new SwingDefaultResultListener(comptree)
+						getJCC().getExternalAccess().scheduleStep(new IComponentStep()
 						{
-							public void customResultAvailable(Object result)
+							public static final String XML_CLASSNAME = "init";
+							public Object execute(IInternalAccess ia)
 							{
-								final IComponentManagementService cms = (IComponentManagementService)result;
-								
-								cms.getExternalAccess(cid).addResultListener(new SwingDefaultResultListener(comptree)
+								ia.getRequiredService("cms").addResultListener(new SwingDefaultResultListener(comptree)
 								{
 									public void customResultAvailable(Object result)
 									{
-										final IExternalAccess exta = (IExternalAccess)result;
-										final Object clid = (String)exta.getModel().getProperties().get(IAbstractViewerPanel.PROPERTY_VIEWERCLASS);
-									
-//										System.out.println("classname for comp: "+classname);
-										
-										if(clid instanceof String)
+										final IComponentManagementService cms = (IComponentManagementService)result;
+										cms.getExternalAccess(cid).addResultListener(new SwingDefaultResultListener(comptree)
 										{
-											SComponentFactory.getClassLoader(cid, getJCC()).addResultListener(new SwingDefaultResultListener(comptree)
+											public void customResultAvailable(Object result)
 											{
-												public void customResultAvailable(Object result)
+												final IExternalAccess exta = (IExternalAccess)result;
+												final Object clid = (String)exta.getModel().getProperties().get(IAbstractViewerPanel.PROPERTY_VIEWERCLASS);
+											
+												if(clid instanceof String)
 												{
-													ClassLoader	cl	= (ClassLoader)result;
-													Class clazz	= SReflect.classForName0((String)clid, cl);
-													createPanel(clazz, exta, node);
+													AbstractJCCPlugin.getClassLoader(cid, getJCC()).addResultListener(new SwingDefaultResultListener(comptree)
+													{
+														public void customResultAvailable(Object result)
+														{
+															ClassLoader	cl	= (ClassLoader)result;
+															Class clazz	= SReflect.classForName0((String)clid, cl);
+															createPanel(clazz, exta, node);
+														}
+													});
 												}
-											});
-										}
-										else if(clid instanceof Class)
-										{
-											createPanel((Class)clid, exta, node);
-										}
+												else if(clid instanceof Class)
+												{
+													createPanel((Class)clid, exta, node);
+												}
+											}
+										});
 									}
 								});
+								return null;
 							}
 						});
 					}
@@ -506,30 +510,37 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 				else
 				{
 					// Unknown -> start search to find out asynchronously
-					SServiceProvider.getService(getJCC().getServiceProvider(), IComponentManagementService.class)
-						.addResultListener(new SwingDefaultResultListener(comptree)
+					jcc.getExternalAccess().scheduleStep(new IComponentStep()
 					{
-						public void customResultAvailable(Object result)
+						public static final String XML_CLASSNAME = "is-node-viewable"; 
+						public Object execute(IInternalAccess ia)
 						{
-							final IComponentManagementService cms = (IComponentManagementService)result;
-							
-							cms.getExternalAccess(cid).addResultListener(new SwingDefaultResultListener(comptree)
+							ia.getRequiredService("cms").addResultListener(new SwingDefaultResultListener(comptree)
 							{
 								public void customResultAvailable(Object result)
 								{
-									final IExternalAccess exta = (IExternalAccess)result;
-									final String classname = (String)exta.getModel().getProperties().get(IAbstractViewerPanel.PROPERTY_VIEWERCLASS);
-									viewables.put(cid, classname==null? Boolean.FALSE: Boolean.TRUE);
-	//								System.out.println("node: "+viewables.get(cid));
-									node.refresh(false, false);
-								}
-								
-								public void customExceptionOccurred(Exception exception)
-								{
-									// Happens e.g. when remote classes not locally available.
-//									exception.printStackTrace();
+									final IComponentManagementService cms = (IComponentManagementService)result;
+									
+									cms.getExternalAccess(cid).addResultListener(new SwingDefaultResultListener(comptree)
+									{
+										public void customResultAvailable(Object result)
+										{
+											final IExternalAccess exta = (IExternalAccess)result;
+											final String classname = (String)exta.getModel().getProperties().get(IAbstractViewerPanel.PROPERTY_VIEWERCLASS);
+											viewables.put(cid, classname==null? Boolean.FALSE: Boolean.TRUE);
+			//								System.out.println("node: "+viewables.get(cid));
+											node.refresh(false, false);
+										}
+										
+										public void customExceptionOccurred(Exception exception)
+										{
+											// Happens e.g. when remote classes not locally available.
+//											exception.printStackTrace();
+										}
+									});
 								}
 							});
+							return null;
 						}
 					});
 				}

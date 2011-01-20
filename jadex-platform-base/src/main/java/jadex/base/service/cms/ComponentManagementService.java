@@ -96,7 +96,7 @@ public abstract class ComponentManagementService extends BasicService implements
 //	protected Map initfutures;
 	
 	/** The init adapters and descriptions, i.e. adapters and desc of initing components, 
-	 *  are only visible for child components in their init. */
+	 *  are only visible for the component and child components in their init. */
 	protected Map initinfos;
 	
 	/** Number of non-daemon children for each autoshutdown component (cid->Integer). */
@@ -231,7 +231,7 @@ public abstract class ComponentManagementService extends BasicService implements
 										return;
 									}
 									// todo: hmm adresses may be set too late? use cached message service?
-									SServiceProvider.getService(exta.getServiceProvider(), IMessageService.class)
+									SServiceProvider.getService(exta.getServiceProvider(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 										.addResultListener(new DefaultResultListener()
 									{
 										public void resultAvailable(Object result)
@@ -514,7 +514,7 @@ public abstract class ComponentManagementService extends BasicService implements
 		
 		if(nofac)
 		{
-			SServiceProvider.getServices(exta.getServiceProvider(), IComponentFactory.class)
+			SServiceProvider.getServices(exta.getServiceProvider(), IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM)
 				.addResultListener(new IResultListener()
 			{
 				public void resultAvailable(Object result)
@@ -536,7 +536,7 @@ public abstract class ComponentManagementService extends BasicService implements
 
 			if(factory==null)
 			{
-				SServiceProvider.getServices(exta.getServiceProvider(), IComponentFactory.class)
+				SServiceProvider.getServices(exta.getServiceProvider(), IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM)
 					.addResultListener(new IResultListener()
 				{
 					public void resultAvailable(Object result)
@@ -730,7 +730,7 @@ public abstract class ComponentManagementService extends BasicService implements
 		
 		if(isRemoteComponent(cid))
 		{
-			SServiceProvider.getService(exta.getServiceProvider(), IRemoteServiceManagementService.class)
+			SServiceProvider.getService(exta.getServiceProvider(), IRemoteServiceManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 				.addResultListener(new IResultListener()
 			{
 				public void resultAvailable(Object result)
@@ -875,7 +875,7 @@ public abstract class ComponentManagementService extends BasicService implements
 		
 		if(isRemoteComponent(cid))
 		{
-			SServiceProvider.getService(exta.getServiceProvider(), IRemoteServiceManagementService.class)
+			SServiceProvider.getService(exta.getServiceProvider(), IRemoteServiceManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 				.addResultListener(new IResultListener()
 			{
 				public void resultAvailable(Object result)
@@ -970,7 +970,7 @@ public abstract class ComponentManagementService extends BasicService implements
 		
 		if(isRemoteComponent(cid))
 		{
-			SServiceProvider.getService(exta.getServiceProvider(), IRemoteServiceManagementService.class)
+			SServiceProvider.getService(exta.getServiceProvider(), IRemoteServiceManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 				.addResultListener(new IResultListener()
 			{
 				public void resultAvailable(Object result)
@@ -1072,7 +1072,7 @@ public abstract class ComponentManagementService extends BasicService implements
 		
 		if(isRemoteComponent(cid))
 		{
-			SServiceProvider.getService(exta.getServiceProvider(), IRemoteServiceManagementService.class)
+			SServiceProvider.getService(exta.getServiceProvider(), IRemoteServiceManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 				.addResultListener(new IResultListener()
 			{
 				public void resultAvailable(Object result)
@@ -1151,7 +1151,7 @@ public abstract class ComponentManagementService extends BasicService implements
 		
 		if(isRemoteComponent(cid))
 		{
-			SServiceProvider.getService(exta.getServiceProvider(), IRemoteServiceManagementService.class)
+			SServiceProvider.getService(exta.getServiceProvider(), IRemoteServiceManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 				.addResultListener(new IResultListener()
 			{
 				public void resultAvailable(Object result)
@@ -1430,7 +1430,7 @@ public abstract class ComponentManagementService extends BasicService implements
 		
 		if(isRemoteComponent(cid))
 		{
-			SServiceProvider.getService(exta.getServiceProvider(), IRemoteServiceManagementService.class)
+			SServiceProvider.getService(exta.getServiceProvider(), IRemoteServiceManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 				.addResultListener(new IResultListener()
 			{
 				public void resultAvailable(Object result)
@@ -1496,7 +1496,7 @@ public abstract class ComponentManagementService extends BasicService implements
 			&& !isRemoteComponent(ci.getParent())
 			&& !initinfos.containsKey(ci.getParent()))
 		{
-			SServiceProvider.getService(exta.getServiceProvider(), IComponentManagementService.class)
+			SServiceProvider.getService(exta.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 				.addResultListener(new DelegationResultListener(ret)
 			{
 				public void customResultAvailable(Object result)
@@ -1518,7 +1518,7 @@ public abstract class ComponentManagementService extends BasicService implements
 		// Remote or no parent or platform as parent
 		else
 		{
-			SServiceProvider.getService(exta.getServiceProvider(), ILibraryService.class)
+			SServiceProvider.getService(exta.getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 				.addResultListener(new DelegationResultListener(ret)
 			{
 				public void customResultAvailable(Object result)
@@ -2023,7 +2023,7 @@ public abstract class ComponentManagementService extends BasicService implements
 			{
 				final boolean[]	services = new boolean[2];
 				
-				SServiceProvider.getService(exta.getServiceProvider(), IExecutionService.class).addResultListener(new DefaultResultListener()
+				SServiceProvider.getService(exta.getServiceProvider(), IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object result)
 					{
@@ -2039,7 +2039,7 @@ public abstract class ComponentManagementService extends BasicService implements
 					}
 				});
 				
-				SServiceProvider.getService(exta.getServiceProvider(), IMessageService.class).addResultListener(new DefaultResultListener()
+				SServiceProvider.getService(exta.getServiceProvider(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object result)
 					{

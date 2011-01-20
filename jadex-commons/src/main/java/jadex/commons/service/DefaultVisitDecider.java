@@ -77,14 +77,14 @@ public class DefaultVisitDecider implements IVisitDecider
 				// Ok when target is child of source.
 				ret = ischild && !isRemoteComponent(target);
 			}
-//			else if(RequiredServiceInfo.APPLICATION_SCOPE.equals(scope))
-//			{
-//				// Ok when does not cross application boundry.
-//				ret = (!isApplication(source) || ischild) && !isRemoteComponent(target);
-//			}
-			else if(RequiredServiceInfo.SCOPE_APPLICATION.equals(scope) || RequiredServiceInfo.SCOPE_PLATFORM.equals(scope))
+			else if(RequiredServiceInfo.SCOPE_APPLICATION.equals(scope))
 			{
-				// Ok when does not cross application boundry.
+				// Ok when does not cross application boundary.
+				ret = (!isApplication(source) || ischild) && !isRemoteComponent(target);
+			}
+			else if(RequiredServiceInfo.SCOPE_PLATFORM.equals(scope))
+			{
+				// Ok when does not cross application boundary.
 				ret = !isRemoteComponent(target);
 			}
 			else if(RequiredServiceInfo.SCOPE_GLOBAL.equals(scope))
@@ -170,13 +170,13 @@ public class DefaultVisitDecider implements IVisitDecider
 		return this.getClass().getName()+abort+scope;
 	}
 	
-//	/**
-//	 *  Test if a target is a remote component.
-//	 */
-//	protected boolean isApplication(IServiceProvider target)
-//	{
-//		return ?;
-//	}
+	/**
+	 *  Test if a target is an application component.
+	 */
+	protected boolean isApplication(IServiceProvider source)
+	{
+		return source!=null && source.getType()!=null && source.getType().toLowerCase().indexOf("application")!=-1;
+	}
 	
 	/**
 	 *  Test if a target is a remote component.

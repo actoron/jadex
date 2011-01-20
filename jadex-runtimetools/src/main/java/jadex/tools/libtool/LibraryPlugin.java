@@ -179,7 +179,7 @@ public class LibraryPlugin extends AbstractJCCPlugin
 					, "Load")==JFileChooser.APPROVE_OPTION)
 				{
 					final File[] files = cchooser.getSelectedFiles();
-					SServiceProvider.getService(getJCC().getServiceProvider(), ILibraryService.class)
+					SServiceProvider.getService(getJCC().getExternalAccess().getServiceProvider(), ILibraryService.class)
 						.addResultListener(new SwingDefaultResultListener(cchooser)
 					{
 						public void customResultAvailable(Object result)
@@ -210,7 +210,7 @@ public class LibraryPlugin extends AbstractJCCPlugin
 				final int[] sel = classpaths.getSelectedRows();
 				final String[] entries = classpaths.getEntries();
 				
-				SServiceProvider.getService(getJCC().getServiceProvider(), ILibraryService.class)
+				SServiceProvider.getService(getJCC().getExternalAccess().getServiceProvider(), ILibraryService.class)
 					.addResultListener(new SwingDefaultResultListener(remove)
 				{
 					public void customResultAvailable(Object result)
@@ -256,7 +256,7 @@ public class LibraryPlugin extends AbstractJCCPlugin
 					final int start = e.getFirstRow();
 					final int end = e.getLastRow();
 
-					SServiceProvider.getService(getJCC().getServiceProvider(), ILibraryService.class)
+					SServiceProvider.getService(getJCC().getExternalAccess().getServiceProvider(), ILibraryService.class)
 						.addResultListener(new SwingDefaultResultListener(classpaths)
 					{
 						public void customResultAvailable(Object result)
@@ -288,7 +288,7 @@ public class LibraryPlugin extends AbstractJCCPlugin
 		
 		final JPanel otherview = new JPanel(new BorderLayout());
 		final DefaultListModel dlm = new DefaultListModel();
-		SServiceProvider.getService(getJCC().getServiceProvider(), ILibraryService.class)
+		SServiceProvider.getService(getJCC().getExternalAccess().getServiceProvider(), ILibraryService.class)
 			.addResultListener(new SwingDefaultResultListener(otherview)
 		{
 			public void customResultAvailable(Object result)
@@ -315,7 +315,7 @@ public class LibraryPlugin extends AbstractJCCPlugin
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				SServiceProvider.getService(getJCC().getServiceProvider(), ILibraryService.class)
+				SServiceProvider.getService(getJCC().getExternalAccess().getServiceProvider(), ILibraryService.class)
 					.addResultListener(new SwingDefaultResultListener(refresh)
 				{
 					public void customResultAvailable(Object result)
@@ -344,7 +344,7 @@ public class LibraryPlugin extends AbstractJCCPlugin
 		lists.add("System Classpath Entries", otherview);
 
 		// Add a library service listener to be informed about library changes.
-		SServiceProvider.getService(getJCC().getServiceProvider(), ILibraryService.class)
+		SServiceProvider.getService(getJCC().getExternalAccess().getServiceProvider(), ILibraryService.class)
 			.addResultListener(new DefaultResultListener(){
 			public void resultAvailable(Object result)
 			{
@@ -380,7 +380,7 @@ public class LibraryPlugin extends AbstractJCCPlugin
 		Property[] ps = props.getProperties("cp");
 		// Hack: todo!?
 		ILibraryService ls = (ILibraryService)SServiceProvider.getService(getJCC()
-			.getServiceProvider(), ILibraryService.class).get(new ThreadSuspendable());
+			.getExternalAccess().getServiceProvider(), ILibraryService.class).get(new ThreadSuspendable());
 		for(int i=0; i<ps.length; i++)
 		{
 			try
@@ -412,7 +412,7 @@ public class LibraryPlugin extends AbstractJCCPlugin
 		Properties	props	= new Properties();
 		// Hack: todo!?
 		ILibraryService ls = (ILibraryService)SServiceProvider.getService(getJCC()
-			.getServiceProvider(), ILibraryService.class).get(new ThreadSuspendable());
+			.getExternalAccess().getServiceProvider(), ILibraryService.class).get(new ThreadSuspendable());
 		
 		// todo: hack remove thread suspendable
 		List urls = (List)ls.getURLs().get(new ThreadSuspendable());
@@ -449,7 +449,7 @@ public class LibraryPlugin extends AbstractJCCPlugin
 	 */
 	public void	reset()
 	{
-		SServiceProvider.getService(getJCC().getServiceProvider(), ILibraryService.class)
+		SServiceProvider.getService(getJCC().getExternalAccess().getServiceProvider(), ILibraryService.class)
 			.addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
@@ -478,7 +478,7 @@ public class LibraryPlugin extends AbstractJCCPlugin
 	{
 		final Future ret = new Future();
 		
-		SServiceProvider.getService(getJCC().getServiceProvider(), 
+		SServiceProvider.getService(getJCC().getExternalAccess().getServiceProvider(), 
 			ILibraryService.class).addResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
@@ -539,7 +539,7 @@ public class LibraryPlugin extends AbstractJCCPlugin
 	{
 		final Future ret = new Future();
 		
-		SServiceProvider.getService(getJCC().getServiceProvider(), 
+		SServiceProvider.getService(getJCC().getExternalAccess().getServiceProvider(), 
 			ILibraryService.class).addResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)

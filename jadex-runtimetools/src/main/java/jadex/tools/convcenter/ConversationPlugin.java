@@ -102,7 +102,7 @@ public class ConversationPlugin extends AbstractJCCPlugin
 					final IActiveComponentTreeNode node = (IActiveComponentTreeNode)paths[i].getLastPathComponent();
 					final IComponentIdentifier rec = node.getDescription().getName();
 					// Use clone, as added component id might be modified by user.
-					SServiceProvider.getServiceUpwards(jcc.getServiceProvider(), IComponentManagementService.class).addResultListener(new SwingDefaultResultListener(comptree)
+					SServiceProvider.getServiceUpwards(jcc.getExternalAccess().getServiceProvider(), IComponentManagementService.class).addResultListener(new SwingDefaultResultListener(comptree)
 					{
 						public void customResultAvailable(Object result)
 						{
@@ -139,7 +139,7 @@ public class ConversationPlugin extends AbstractJCCPlugin
 		JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true);
 		split.setOneTouchExpandable(true);
 
-		comptree = new ComponentTreePanel(getJCC().getServiceProvider());
+		comptree = new ComponentTreePanel(getJCC().getExternalAccess());
 		comptree.setMinimumSize(new Dimension(0, 0));
 		split.add(comptree);
 		convcenter = new FipaConversationPanel(((AgentControlCenter)getJCC()).getAgent(), comptree);

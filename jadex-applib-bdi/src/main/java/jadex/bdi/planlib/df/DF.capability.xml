@@ -272,6 +272,10 @@
 			<precondition>$goal.df!=null</precondition>
 		</plan>
 	</plans>
+	
+	<services>
+		<requiredservice name="df" class="IDF" scope="platform"/>
+	</services>
 
 	<configurations>
 		<configuration name="default">

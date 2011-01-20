@@ -4,10 +4,11 @@ import jadex.base.gui.AboutDialog;
 import jadex.base.gui.JadexLogoButton;
 import jadex.base.gui.StatusBar;
 import jadex.base.gui.plugin.IControlCenterPlugin;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IInternalAccess;
 import jadex.commons.BrowserLauncher;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.SwingDefaultResultListener;
-import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.library.ILibraryService;
 
 import java.awt.BorderLayout;
@@ -627,41 +628,49 @@ public class ControlCenterWindow extends JFrame
 		if(filechooser.showDialog(this, "Open Project")==JFileChooser.APPROVE_OPTION)
 		{
 			final File file = filechooser.getSelectedFile();
-
-			SServiceProvider.getService(controlcenter.getServiceProvider(), ILibraryService.class)
-				.addResultListener(new SwingDefaultResultListener(ControlCenterWindow.this)
-			{
-				public void customResultAvailable(Object result)
-				{
-					ClassLoader cl = ((ILibraryService)result).getClassLoader();
 			
-					boolean canopen = file!=null && file.canWrite() && file.getName().toLowerCase().endsWith(ControlCenter.JCCPROJECT_EXTENSION);
-					if(canopen)
+			controlcenter.access.scheduleStep(new IComponentStep()
+			{
+				public static final String XML_CLASSNAME = "open-project";
+				public Object execute(IInternalAccess ia)
+				{
+					ia.getRequiredService("libservice")
+						.addResultListener(new SwingDefaultResultListener(ControlCenterWindow.this)
 					{
-						controlcenter.saveProject();
-						controlcenter.closeProject();
-						try
+						public void customResultAvailable(Object result)
 						{
-							controlcenter.openProject(file, cl);//, true);
-						}
-						catch(Exception e)
-						{
-							canopen = false;
-						}
-					}
+							ClassLoader cl = ((ILibraryService)result).getClassLoader();
 					
-					if(!canopen)
-					{
-						SwingUtilities.invokeLater(new Runnable()
-						{
-							public void run()
+							boolean canopen = file!=null && file.canWrite() && file.getName().toLowerCase().endsWith(ControlCenter.JCCPROJECT_EXTENSION);
+							if(canopen)
 							{
-								String	msg	= SUtil.wrapText("Cannot open the project from file:\n"+file);
-								JOptionPane.showMessageDialog(ControlCenterWindow.this, msg, "Cannot open the project",
-									JOptionPane.ERROR_MESSAGE);
+								controlcenter.saveProject();
+								controlcenter.closeProject();
+								try
+								{
+									controlcenter.openProject(file, cl);//, true);
+								}
+								catch(Exception e)
+								{
+									canopen = false;
+								}
 							}
-						});
-					}
+							
+							if(!canopen)
+							{
+								SwingUtilities.invokeLater(new Runnable()
+								{
+									public void run()
+									{
+										String	msg	= SUtil.wrapText("Cannot open the project from file:\n"+file);
+										JOptionPane.showMessageDialog(ControlCenterWindow.this, msg, "Cannot open the project",
+											JOptionPane.ERROR_MESSAGE);
+									}
+								});
+							}
+						}
+					});
+					return null;
 				}
 			});
 		}

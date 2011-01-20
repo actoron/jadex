@@ -1,6 +1,6 @@
 package jadex.base.gui.componentviewer;
 
-import jadex.base.SComponentFactory;
+import jadex.base.gui.plugin.AbstractJCCPlugin;
 import jadex.base.gui.plugin.IControlCenter;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -88,7 +88,7 @@ public class DefaultComponentServiceViewerPanel extends AbstractComponentViewerP
 	{
 		final Future ret = new Future();
 		
-		SComponentFactory.getClassLoader(exta.getComponentIdentifier(), jcc)
+		AbstractJCCPlugin.getClassLoader(exta.getComponentIdentifier(), jcc)
 			.addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)

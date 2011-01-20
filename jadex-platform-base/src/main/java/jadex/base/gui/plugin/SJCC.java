@@ -2,10 +2,11 @@ package jadex.base.gui.plugin;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IInternalAccess;
 import jadex.commons.Future;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
-import jadex.commons.service.SServiceProvider;
 
 import java.awt.Component;
 
@@ -16,28 +17,35 @@ public class SJCC
 {
 	public static void	killPlattform(final IControlCenter jcc, final Component ui)
 	{
-		SServiceProvider.getService(jcc.getServiceProvider(), IComponentManagementService.class)
-			.addResultListener(new SwingDefaultResultListener(ui)
+		jcc.getExternalAccess().scheduleStep(new IComponentStep()
 		{
-			public void customResultAvailable(Object result)
+			public static final String XML_CLASSNAME = "kill-platform";
+			public Object execute(IInternalAccess ia)
 			{
-				final IComponentManagementService cms = (IComponentManagementService)result;
-				Future ret = new Future();
-				ret.addResultListener(new SwingDefaultResultListener(ui)
+				ia.getRequiredService("cms").addResultListener(new SwingDefaultResultListener(ui)
 				{
 					public void customResultAvailable(Object result)
 					{
-						final IComponentIdentifier root = (IComponentIdentifier)result;
-						cms.resumeComponent(root).addResultListener(new SwingDefaultResultListener(ui)
+						final IComponentManagementService cms = (IComponentManagementService)result;
+						Future ret = new Future();
+						ret.addResultListener(new SwingDefaultResultListener(ui)
 						{
 							public void customResultAvailable(Object result)
 							{
-								cms.destroyComponent(root);
+								final IComponentIdentifier root = (IComponentIdentifier)result;
+								cms.resumeComponent(root).addResultListener(new SwingDefaultResultListener(ui)
+								{
+									public void customResultAvailable(Object result)
+									{
+										cms.destroyComponent(root);
+									}
+								});
 							}
 						});
+						getRootIdentifier(jcc.getComponentIdentifier(), cms, ret);
 					}
 				});
-				getRootIdentifier(jcc.getComponentIdentifier(), cms, ret);
+				return null;
 			}
 		});
 	}

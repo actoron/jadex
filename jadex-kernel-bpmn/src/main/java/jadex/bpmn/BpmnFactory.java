@@ -13,6 +13,7 @@ import jadex.commons.SGUI;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.service.BasicService;
 import jadex.commons.service.IServiceProvider;
+import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.library.ILibraryService;
 import jadex.commons.service.library.ILibraryServiceListener;
@@ -87,7 +88,7 @@ public class BpmnFactory extends BasicService implements IComponentFactory
 				return new Future(null);
 			}
 		};
-		SServiceProvider.getService(provider, ILibraryService.class).addResultListener(new DefaultResultListener()
+		SServiceProvider.getService(provider, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
@@ -113,7 +114,7 @@ public class BpmnFactory extends BasicService implements IComponentFactory
 	 */
 	public synchronized IFuture	shutdownService()
 	{
-		SServiceProvider.getService(provider, ILibraryService.class).addResultListener(new DefaultResultListener()
+		SServiceProvider.getService(provider, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
 			{

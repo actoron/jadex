@@ -10,7 +10,6 @@ import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.commons.service.IService;
 import jadex.commons.service.IServiceContainer;
-import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
 
 import java.util.ArrayList;

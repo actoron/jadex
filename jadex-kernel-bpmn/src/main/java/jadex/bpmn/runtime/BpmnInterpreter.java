@@ -1,5 +1,6 @@
 package jadex.bpmn.runtime;
 
+import jadex.bpmn.BpmnFactory;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.MParameter;
@@ -403,7 +404,7 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 				inited.setException(exception);
 			}
 		}));
-		SServiceProvider.getService(getServiceProvider(), IClockService.class)
+		SServiceProvider.getService(getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(createResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
@@ -425,7 +426,7 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 				inited.setException(exception);
 			}
 		}));
-		SServiceProvider.getService(getServiceProvider(), IMessageService.class)
+		SServiceProvider.getService(getServiceProvider(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(createResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
@@ -610,7 +611,7 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 	{
 		final Future ret = new Future();
 		
-		SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class)
+		SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(createResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
@@ -899,7 +900,7 @@ public class BpmnInterpreter implements IComponentInstance, IInternalAccess
 		{
 			// todo: support container customization via bpmn file
 //			container = new CacheServiceContainer(new ComponentServiceContainer(getComponentAdapter()), 25, 1*30*1000); // 30 secs cache expire
-			container = new ComponentServiceContainer(getComponentAdapter());
+			container = new ComponentServiceContainer(getComponentAdapter(), BpmnFactory.FILETYPE_BPMNPROCESS);
 		}
 		return container;
 	}

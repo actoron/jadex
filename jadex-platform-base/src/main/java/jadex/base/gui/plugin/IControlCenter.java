@@ -1,7 +1,7 @@
 package jadex.base.gui.plugin;
 
 import jadex.bridge.IComponentIdentifier;
-import jadex.commons.service.IServiceProvider;
+import jadex.bridge.IExternalAccess;
 
 import javax.swing.JComponent;
 
@@ -12,10 +12,10 @@ import javax.swing.JComponent;
 public interface IControlCenter
 {
 	/**
-	 *  Get the service container.
-	 *  @return The service container.
+	 *  Get the external access.
+	 *  @return The external access.
 	 */
-	public IServiceProvider	getServiceProvider();
+	public IExternalAccess	getExternalAccess();
 	
 	/**
 	 *  Get the component id of the component executing the JCC.

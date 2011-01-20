@@ -2,6 +2,9 @@ package jadex.bridge;
 
 /**
  *  Interface for a component step.
+ *  
+ *  For making steps properly serializable a static field for the name has to be declared:<br>
+ *  public static final String XML_CLASSNAME = ...; 
  */
 public interface IComponentStep
 {

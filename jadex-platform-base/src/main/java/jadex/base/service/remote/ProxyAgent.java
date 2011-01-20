@@ -13,6 +13,7 @@ import jadex.commons.concurrent.CollectionResultListener;
 import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.service.IServiceContainer;
+import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.clock.IClockService;
 import jadex.micro.MicroAgent;
@@ -83,7 +84,7 @@ public class ProxyAgent extends MicroAgent
 		}
 		else
 		{
-			SServiceProvider.getService(getServiceProvider(), IClockService.class)
+			SServiceProvider.getService(getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 				.addResultListener(createResultListener(new IResultListener()
 			{
 				public void resultAvailable(Object result)
@@ -152,7 +153,7 @@ public class ProxyAgent extends MicroAgent
 	{
 		final Future ret = new Future();
 		
-		SServiceProvider.getService(getServiceProvider(), IRemoteServiceManagementService.class)
+		SServiceProvider.getService(getServiceProvider(), IRemoteServiceManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(createResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
@@ -185,7 +186,7 @@ public class ProxyAgent extends MicroAgent
 									public void customResultAvailable(Object result)
 									{
 										final Collection vcs = (Collection)result; 
-										SServiceProvider.getService(getServiceProvider(), IClockService.class)
+										SServiceProvider.getService(getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 											.addResultListener(createResultListener(new IResultListener()
 										{
 											public void resultAvailable(Object result)
@@ -244,7 +245,7 @@ public class ProxyAgent extends MicroAgent
 	{
 		final Future ret = new Future();
 		
-		SServiceProvider.getService(getServiceProvider(), IRemoteServiceManagementService.class)
+		SServiceProvider.getService(getServiceProvider(), IRemoteServiceManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(createResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
@@ -282,7 +283,7 @@ public class ProxyAgent extends MicroAgent
 	{
 		final Future ret = new Future();
 		
-		SServiceProvider.getService(getServiceProvider(), IRemoteServiceManagementService.class)
+		SServiceProvider.getService(getServiceProvider(), IRemoteServiceManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(createResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)

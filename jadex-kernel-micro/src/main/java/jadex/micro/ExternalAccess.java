@@ -1,6 +1,5 @@
 package jadex.micro;
 
-import jadex.bridge.ComponentResultListener;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
@@ -9,7 +8,6 @@ import jadex.bridge.MessageType;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.concurrent.DelegationResultListener;
-import jadex.commons.concurrent.IResultListener;
 import jadex.commons.service.IServiceProvider;
 
 import java.util.Map;

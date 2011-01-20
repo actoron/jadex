@@ -3,12 +3,13 @@ package jadex.base.gui.plugin;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.Properties;
 import jadex.commons.concurrent.DelegationResultListener;
-import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.library.ILibraryService;
 
 import javax.swing.JComponent;
@@ -168,20 +169,27 @@ public abstract class AbstractJCCPlugin implements IControlCenterPlugin
 		// Local component when platform name is same as JCC platform name
 		if(cid.getPlatformName().equals(jcc.getComponentIdentifier().getPlatformName()))
 		{
-			SServiceProvider.getService(jcc.getServiceProvider(), IComponentManagementService.class)
-				.addResultListener(new DelegationResultListener(ret)
+			jcc.getExternalAccess().scheduleStep(new IComponentStep()
 			{
-				public void customResultAvailable(Object result)
+				public static final String XML_CLASSNAME = "get-classloader";
+				public Object execute(IInternalAccess ia)
 				{
-					IComponentManagementService	cms	= (IComponentManagementService)result;
-					cms.getExternalAccess(cid).addResultListener(new DelegationResultListener(ret)
+					ia.getRequiredService("cms").addResultListener(new DelegationResultListener(ret)
 					{
 						public void customResultAvailable(Object result)
 						{
-							IExternalAccess	ea	= (IExternalAccess)result;
-							ret.setResult(ea.getModel().getClassLoader());
+							IComponentManagementService	cms	= (IComponentManagementService)result;
+							cms.getExternalAccess(cid).addResultListener(new DelegationResultListener(ret)
+							{
+								public void customResultAvailable(Object result)
+								{
+									IExternalAccess	ea	= (IExternalAccess)result;
+									ret.setResult(ea.getModel().getClassLoader());
+								}
+							});
 						}
 					});
+					return null;
 				}
 			});
 		}
@@ -189,13 +197,20 @@ public abstract class AbstractJCCPlugin implements IControlCenterPlugin
 		// Remote component
 		else
 		{
-			SServiceProvider.getService(jcc.getServiceProvider(), ILibraryService.class)
-				.addResultListener(new DelegationResultListener(ret)
+			jcc.getExternalAccess().scheduleStep(new IComponentStep()
 			{
-				public void customResultAvailable(Object result)
+				public static final String XML_CLASSNAME = "get-libraryservice";
+				public Object execute(IInternalAccess ia)
 				{
-					ILibraryService	ls	= (ILibraryService)result;
-					ret.setResult(ls.getClassLoader());
+					ia.getRequiredService("libservice").addResultListener(new DelegationResultListener(ret)
+					{
+						public void customResultAvailable(Object result)
+						{
+							ILibraryService	ls	= (ILibraryService)result;
+							ret.setResult(ls.getClassLoader());
+						}
+					});
+					return null;
 				}
 			});
 		}

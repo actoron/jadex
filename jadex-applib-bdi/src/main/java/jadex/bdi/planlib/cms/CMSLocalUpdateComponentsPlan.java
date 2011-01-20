@@ -11,7 +11,6 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IFuture;
-import jadex.commons.service.SServiceProvider;
 
 /**
  *  Update the belief set containing the local components.
@@ -30,8 +29,7 @@ public class CMSLocalUpdateComponentsPlan extends Plan
 	 */
 	public void body()
 	{
-		final IComponentManagementService	ces	= (IComponentManagementService)SServiceProvider.getServiceUpwards(
-			getScope().getServiceProvider(), IComponentManagementService.class).get(this);
+		final IComponentManagementService	ces	= (IComponentManagementService)getScope().getRequiredService("cms").get(this);
 		this.listener	= new ICMSComponentListener()
 		{
 			public void componentAdded(final IComponentDescription desc)

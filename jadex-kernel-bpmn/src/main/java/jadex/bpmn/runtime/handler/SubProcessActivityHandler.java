@@ -13,6 +13,7 @@ import jadex.commons.IFuture;
 import jadex.commons.SReflect;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
+import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
 import jadex.javaparser.IValueFetcher;
 
@@ -140,7 +141,7 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 
 			thread.setWaiting(true);
 			
-			SServiceProvider.getService(instance.getServiceProvider(), IComponentManagementService.class)
+			SServiceProvider.getService(instance.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 				.addResultListener(instance.createResultListener(new DefaultResultListener()
 			{
 				public void resultAvailable(Object result)

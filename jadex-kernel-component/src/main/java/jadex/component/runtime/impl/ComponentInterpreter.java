@@ -41,6 +41,7 @@ import jadex.commons.service.IServiceProvider;
 import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.ServiceNotFoundException;
+import jadex.component.ComponentComponentFactory;
 import jadex.component.model.MConfiguration;
 import jadex.component.model.MComponentType;
 import jadex.component.model.MComponentInstance;
@@ -55,7 +56,6 @@ import jadex.javaparser.SimpleValueFetcher;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -226,7 +226,7 @@ public class ComponentInterpreter implements IComponent, IComponentInstance, IIn
 							{
 								final Future futu = new Future();
 								futures.add(futu);
-								SServiceProvider.getService(ia.getServiceProvider(), IComponentManagementService.class)
+								SServiceProvider.getService(ia.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 									.addResultListener(ia.createResultListener(new DelegationResultListener(futu)
 								{
 									public void customResultAvailable(Object result)
@@ -1161,7 +1161,7 @@ public class ComponentInterpreter implements IComponent, IComponentInstance, IIn
 	{
 		final Future ret = new Future();
 		
-		SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class).addResultListener(new DefaultResultListener()
+		SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
@@ -1473,7 +1473,7 @@ public class ComponentInterpreter implements IComponent, IComponentInstance, IIn
 			else
 			{
 //				container = new CacheServiceContainer(new ComponentServiceContainer(getComponentAdapter()), 25, 1*30*1000); // 30 secs cache expire
-				container = new ComponentServiceContainer(getComponentAdapter());
+				container = new ComponentServiceContainer(getComponentAdapter(), ComponentComponentFactory.FILETYPE_COMPONENT);
 			}			
 		}
 		return container;

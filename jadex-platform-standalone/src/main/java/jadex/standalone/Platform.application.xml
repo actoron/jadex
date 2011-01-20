@@ -63,9 +63,6 @@
 	</componenttypes>
 	
 	<services>
-		<!-- Using no cached container for root makes creation tests very slow. -->
-		<!-- <container class="IServiceContainer">new ComponentServiceContainer($component.getComponentAdapter())</container>-->
-		
 		<providedservice class="IThreadPool" direct="true">
 			new ThreadPoolService(new ThreadPool(new DefaultThreadPoolStrategy(0, 20, 30000, 0)), $component.getServiceProvider())
 		</providedservice>

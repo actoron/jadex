@@ -1,12 +1,11 @@
 package jadex.bdi.planlib.df;
 
+import jadex.base.fipa.DFComponentDescription;
 import jadex.base.fipa.DFDeregister;
-import jadex.base.fipa.IDF;
 import jadex.base.fipa.IDFComponentDescription;
 import jadex.base.fipa.SFipa;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
-import jadex.commons.service.SServiceProvider;
 
 /**
  *  Register on a remote platform.
@@ -15,15 +14,14 @@ public class DFRemoteDeregisterPlan extends Plan
 {
 	/**
 	 * The body method is called on the
-	 * instatiated plan instance from the scheduler.
+	 * instantiated plan instance from the scheduler.
 	 */
 	public void body()
 	{
 		IDFComponentDescription desc = (IDFComponentDescription)getParameter("description").getValue();
 		if(desc==null || desc.getName()==null)
 		{
-			IDF df = (IDF)SServiceProvider.getService(getScope().getServiceProvider(), IDF.class).get(this);
-			desc = df.createDFComponentDescription(getScope().getComponentIdentifier(), null);
+			desc = new DFComponentDescription(getScope().getComponentIdentifier());
 		}
 
 		DFDeregister dre = new DFDeregister();

@@ -123,13 +123,21 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 		dealerpan = new JPanel();
 		dealerpan.setBorder(BorderFactory.createTitledBorder(" Dealer "));
 		dealerpan.setBackground(Color.WHITE);
-		SServiceProvider.getService(access.getServiceProvider(), IComponentManagementService.class).addResultListener(new SwingDefaultResultListener(ManagerFrame.this)
+		access.scheduleStep(new IComponentStep()
 		{
-			public void customResultAvailable(Object result)
+			public static final String XML_CLASSNAME = "dealerpan";
+			public Object execute(IInternalAccess ia)
 			{
-				final IComponentManagementService ces = (IComponentManagementService)result;
-				dealeraid = ces.createComponentIdentifier(LOCAL_DEALER, true, null);
-				dealertf.setText(dealeraid.getName());
+				ia.getRequiredService("cms").addResultListener(new SwingDefaultResultListener(ManagerFrame.this)
+				{
+					public void customResultAvailable(Object result)
+					{
+						final IComponentManagementService ces = (IComponentManagementService)result;
+						dealeraid = ces.createComponentIdentifier(LOCAL_DEALER, true, null);
+						dealertf.setText(dealeraid.getName());
+					}
+				});
+				return null;
 			}
 		});
 		
@@ -138,18 +146,26 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 		{
 			public void actionPerformed(ActionEvent ae)
 			{
-				SServiceProvider.getService(access.getServiceProvider(), IComponentManagementService.class).addResultListener(new SwingDefaultResultListener(ManagerFrame.this)
+				access.scheduleStep(new IComponentStep()
 				{
-					public void customResultAvailable(Object result)
+					public static final String XML_CLASSNAME = "dealertf";
+					public Object execute(IInternalAccess ia)
 					{
-						final IComponentManagementService ces = (IComponentManagementService)result;
-						dealeraid = ces.createComponentIdentifier(dealertf.getText(), false, null);
+						ia.getRequiredService("cms").addResultListener(new SwingDefaultResultListener(ManagerFrame.this)
+						{
+							public void customResultAvailable(Object result)
+							{
+								final IComponentManagementService ces = (IComponentManagementService)result;
+								dealeraid = ces.createComponentIdentifier(dealertf.getText(), false, null);
+							}
+						});
+						return null;
 					}
 				});
 			}
 		});
 		
-		final	ComponentSelectorDialog	csd	= new ComponentSelectorDialog(ManagerFrame.this, access.getServiceProvider());
+		final	ComponentSelectorDialog	csd	= new ComponentSelectorDialog(ManagerFrame.this, access);
 		JButton	dealerbut	= new JButton("...");
 		dealerbut.addActionListener(new ActionListener()
 		{
@@ -367,13 +383,21 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 		{
 			if(n==JOptionPane.YES_OPTION)
 			{
-				SServiceProvider.getService(agent.getServiceProvider(), IComponentManagementService.class)
-					.addResultListener(new SwingDefaultResultListener(this)
+				agent.scheduleStep(new IComponentStep()
 				{
-					public void customResultAvailable(Object result)
+					public static final String XML_CLASSNAME = "close"; 
+					public Object execute(IInternalAccess ia)
 					{
-						final IComponentManagementService	cms	= (IComponentManagementService)result;
-						cms.destroyComponent(agent.getParent());
+						ia.getRequiredService("cms").addResultListener(new SwingDefaultResultListener(ManagerFrame.this)
+						{
+							public void customResultAvailable(Object result)
+							{
+								final IComponentManagementService	cms	= (IComponentManagementService)result;
+								cms.destroyComponent(agent.getParent());
+							}
+						});
+
+						return null;
 					}
 				});
 			}

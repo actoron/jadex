@@ -16,8 +16,8 @@ import jadex.bridge.IInternalAccess;
 import jadex.commons.IFuture;
 import jadex.commons.SUtil;
 import jadex.commons.SimplePropertyObject;
-import jadex.commons.ThreadSuspendable;
 import jadex.commons.concurrent.IResultListener;
+import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.IValueFetcher;
@@ -91,155 +91,165 @@ public class DefaultBDIVisionProcessor extends SimplePropertyObject implements I
 		if(invoke)
 		{
 			// HACK!!! todo
-			IComponentManagementService ces = (IComponentManagementService)SServiceProvider.getService(
-				space.getContext().getServiceProvider(), IComponentManagementService.class).get(new ThreadSuspendable());
-			IFuture fut = ces.getExternalAccess(agent);
-			fut.addResultListener(new IResultListener()
+			SServiceProvider.getService(space.getContext().getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				.addResultListener(new IResultListener()
 			{
-				public void exceptionOccurred(Exception exception)
-				{
-	//				exception.printStackTrace();
-				}
 				public void resultAvailable(Object result)
 				{
-					final IBDIExternalAccess exta = (IBDIExternalAccess)result;
-					
-					for(int i=0; i<metainfos.length; i++)
+					IFuture fut = ((IComponentManagementService)result).getExternalAccess(agent);
+					fut.addResultListener(new IResultListener()
 					{
-						final IParsedExpression	cond	= metainfos[i].length==2 ? null
-							: (IParsedExpression)getProperty(metainfos[i][2]);
-						final SimpleValueFetcher fetcher = new SimpleValueFetcher();
-						if(cond!=null)
+						public void exceptionOccurred(Exception exception)
 						{
-//							fetcher	= new SimpleValueFetcher();
-							fetcher.setValue("$space", space);
-							fetcher.setValue("$percept", percept);
-							fetcher.setValue("$avatar", avatar);
-							fetcher.setValue("$type", type);
-							fetcher.setValue("$aid", agent);
-							fetcher.setValue("$scope", exta);
+							exception.printStackTrace();
 						}
-						final String name = metainfos[i][1];
+						public void resultAvailable(Object result)
+						{
+							final IBDIExternalAccess exta = (IBDIExternalAccess)result;
+							
+							for(int i=0; i<metainfos.length; i++)
+							{
+								final IParsedExpression	cond	= metainfos[i].length==2 ? null
+									: (IParsedExpression)getProperty(metainfos[i][2]);
+								final SimpleValueFetcher fetcher = new SimpleValueFetcher();
+								if(cond!=null)
+								{
+//									fetcher	= new SimpleValueFetcher();
+									fetcher.setValue("$space", space);
+									fetcher.setValue("$percept", percept);
+									fetcher.setValue("$avatar", avatar);
+									fetcher.setValue("$type", type);
+									fetcher.setValue("$aid", agent);
+									fetcher.setValue("$scope", exta);
+								}
+								final String name = metainfos[i][1];
 
-						if(ADD.equals(metainfos[i][0]))
-						{
-							exta.scheduleStep(new IComponentStep()
-							{
-								public static final String XML_CLASSNAME = "add"; 
-								public Object execute(IInternalAccess ia)
+								if(ADD.equals(metainfos[i][0]))
 								{
-									IBDIInternalAccess	scope	= (IBDIInternalAccess)ia;
-									Object[]	facts	= scope.getBeliefbase().getBeliefSet(name).getFacts();
-									if(cond!=null)
-										fetcher.setValue("$facts", facts);
-									
-									if(!SUtil.arrayContains(facts, percept) && (cond==null || evaluate(cond, fetcher)))
+									exta.scheduleStep(new IComponentStep()
 									{
-										scope.getBeliefbase().getBeliefSet(name).addFact(percept);
-//										System.out.println("added: "+percept+" to: "+belset);
-									}
-									return null;
-								}
-							});
-						}
-						else if(REMOVE.equals(metainfos[i][0]))
-						{
-							exta.scheduleStep(new IComponentStep()
-							{
-								public static final String XML_CLASSNAME = "remove"; 
-								public Object execute(IInternalAccess ia)
-								{
-									IBDIInternalAccess	scope	= (IBDIInternalAccess)ia;
-									Object[]	facts	= scope.getBeliefbase().getBeliefSet(name).getFacts();
-									if(cond!=null)
-										fetcher.setValue("$facts", facts);
-									
-									if(SUtil.arrayContains(facts, percept) && (cond==null || evaluate(cond, fetcher)))
-									{
-										scope.getBeliefbase().getBeliefSet(name).removeFact(percept);
-//										System.out.println("removed: "+percept+" from: "+belset);
-									}
-									return null;
-								}
-							});
-						}
-						else if(SET.equals(metainfos[i][0]))
-						{
-							exta.scheduleStep(new IComponentStep()
-							{
-								public static final String XML_CLASSNAME = "set"; 
-								public Object execute(IInternalAccess ia)
-								{
-									IBDIInternalAccess	scope	= (IBDIInternalAccess)ia;
-									Object	fact	= scope.getBeliefbase().getBelief(name).getFact();
-									if(cond!=null)
-										fetcher.setValue("$fact", fact);
-									
-									if(cond==null || evaluate(cond, fetcher))
-									{
-										scope.getBeliefbase().getBelief(name).setFact(percept);
-//										System.out.println("set: "+percept+" on: "+belset);
-									}
-									return null;
-								}
-							});
-						}
-						else if(UNSET.equals(metainfos[i][0]))
-						{
-							exta.scheduleStep(new IComponentStep()
-							{
-								public static final String XML_CLASSNAME = "unset"; 
-								public Object execute(IInternalAccess ia)
-								{
-									IBDIInternalAccess	scope	= (IBDIInternalAccess)ia;
-									Object	fact	= scope.getBeliefbase().getBelief(name).getFact();
-									if(cond!=null)
-										fetcher.setValue("$fact", fact);
-									
-									if(cond==null || evaluate(cond, fetcher))
-									{
-										scope.getBeliefbase().getBelief(name).setFact(null);
-//										System.out.println("unset: "+percept+" on: "+belset);
-									}
-									return null;
-								}
-							});
-						}
-						else if(REMOVE_OUTDATED.equals(metainfos[i][0]) && percept.equals(avatar))
-						{
-							exta.scheduleStep(new IComponentStep()
-							{
-								public static final String XML_CLASSNAME = "removeoutdated"; 
-								public Object execute(IInternalAccess ia)
-								{
-									IBDIInternalAccess	scope	= (IBDIInternalAccess)ia;
-									Object[]	facts	= scope.getBeliefbase().getBeliefSet(name).getFacts();
-									if(cond!=null)
-										fetcher.setValue("$facts", facts);
-									
-									if(cond==null || evaluate(cond, fetcher))
-									{
-										IVector1 vision	= getRange(avatar);
-										Space2D	space2d	= (Space2D)space;
-										IVector2	mypos	= (IVector2)avatar.getProperty(Space2D.PROPERTY_POSITION);
-										ISpaceObject[]	known	= (ISpaceObject[])facts;
-										Set	seen = space2d.getNearObjects(mypos, vision);
-										for(int j=0; j<known.length; j++)
+										public static final String XML_CLASSNAME = "add"; 
+										public Object execute(IInternalAccess ia)
 										{
-											IVector2	knownpos	= (IVector2)known[j].getProperty(Space2D.PROPERTY_POSITION);
-											// Hack!!! Shouldn't react to knownpos==null
-											if(!seen.contains(known[j]) && (knownpos==null || !vision.less(space2d.getDistance(mypos, knownpos))))
+											IBDIInternalAccess	scope	= (IBDIInternalAccess)ia;
+											Object[]	facts	= scope.getBeliefbase().getBeliefSet(name).getFacts();
+											if(cond!=null)
+												fetcher.setValue("$facts", facts);
+											
+											if(!SUtil.arrayContains(facts, percept) && (cond==null || evaluate(cond, fetcher)))
 											{
-//												System.out.println("Removing disappeared object: "+percept+", "+known[j]);
-												scope.getBeliefbase().getBeliefSet(name).removeFact(known[j]);
+												scope.getBeliefbase().getBeliefSet(name).addFact(percept);
+//												System.out.println("added: "+percept+" to: "+belset);
 											}
+											return null;
 										}
-									}
-									return null;
+									});
 								}
-							});
+								else if(REMOVE.equals(metainfos[i][0]))
+								{
+									exta.scheduleStep(new IComponentStep()
+									{
+										public static final String XML_CLASSNAME = "remove"; 
+										public Object execute(IInternalAccess ia)
+										{
+											IBDIInternalAccess	scope	= (IBDIInternalAccess)ia;
+											Object[]	facts	= scope.getBeliefbase().getBeliefSet(name).getFacts();
+											if(cond!=null)
+												fetcher.setValue("$facts", facts);
+											
+											if(SUtil.arrayContains(facts, percept) && (cond==null || evaluate(cond, fetcher)))
+											{
+												scope.getBeliefbase().getBeliefSet(name).removeFact(percept);
+//												System.out.println("removed: "+percept+" from: "+belset);
+											}
+											return null;
+										}
+									});
+								}
+								else if(SET.equals(metainfos[i][0]))
+								{
+									exta.scheduleStep(new IComponentStep()
+									{
+										public static final String XML_CLASSNAME = "set"; 
+										public Object execute(IInternalAccess ia)
+										{
+											IBDIInternalAccess	scope	= (IBDIInternalAccess)ia;
+											Object	fact	= scope.getBeliefbase().getBelief(name).getFact();
+											if(cond!=null)
+												fetcher.setValue("$fact", fact);
+											
+											if(cond==null || evaluate(cond, fetcher))
+											{
+												scope.getBeliefbase().getBelief(name).setFact(percept);
+//												System.out.println("set: "+percept+" on: "+belset);
+											}
+											return null;
+										}
+									});
+								}
+								else if(UNSET.equals(metainfos[i][0]))
+								{
+									exta.scheduleStep(new IComponentStep()
+									{
+										public static final String XML_CLASSNAME = "unset"; 
+										public Object execute(IInternalAccess ia)
+										{
+											IBDIInternalAccess	scope	= (IBDIInternalAccess)ia;
+											Object	fact	= scope.getBeliefbase().getBelief(name).getFact();
+											if(cond!=null)
+												fetcher.setValue("$fact", fact);
+											
+											if(cond==null || evaluate(cond, fetcher))
+											{
+												scope.getBeliefbase().getBelief(name).setFact(null);
+//												System.out.println("unset: "+percept+" on: "+belset);
+											}
+											return null;
+										}
+									});
+								}
+								else if(REMOVE_OUTDATED.equals(metainfos[i][0]) && percept.equals(avatar))
+								{
+									exta.scheduleStep(new IComponentStep()
+									{
+										public static final String XML_CLASSNAME = "removeoutdated"; 
+										public Object execute(IInternalAccess ia)
+										{
+											IBDIInternalAccess	scope	= (IBDIInternalAccess)ia;
+											Object[]	facts	= scope.getBeliefbase().getBeliefSet(name).getFacts();
+											if(cond!=null)
+												fetcher.setValue("$facts", facts);
+											
+											if(cond==null || evaluate(cond, fetcher))
+											{
+												IVector1 vision	= getRange(avatar);
+												Space2D	space2d	= (Space2D)space;
+												IVector2	mypos	= (IVector2)avatar.getProperty(Space2D.PROPERTY_POSITION);
+												ISpaceObject[]	known	= (ISpaceObject[])facts;
+												Set	seen = space2d.getNearObjects(mypos, vision);
+												for(int j=0; j<known.length; j++)
+												{
+													IVector2	knownpos	= (IVector2)known[j].getProperty(Space2D.PROPERTY_POSITION);
+													// Hack!!! Shouldn't react to knownpos==null
+													if(!seen.contains(known[j]) && (knownpos==null || !vision.less(space2d.getDistance(mypos, knownpos))))
+													{
+//														System.out.println("Removing disappeared object: "+percept+", "+known[j]);
+														scope.getBeliefbase().getBeliefSet(name).removeFact(known[j]);
+													}
+												}
+											}
+											return null;
+										}
+									});
+								}
+							}
 						}
-					}
+					});
+				}
+				
+				public void exceptionOccurred(Exception exception)
+				{
+					exception.printStackTrace();
 				}
 			});
 		}

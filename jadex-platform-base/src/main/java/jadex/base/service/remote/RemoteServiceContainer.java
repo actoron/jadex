@@ -7,16 +7,15 @@ import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.IIntermediateFuture;
 import jadex.commons.IntermediateFuture;
-import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.service.BasicServiceContainer;
 import jadex.commons.service.IResultSelector;
 import jadex.commons.service.ISearchManager;
 import jadex.commons.service.IVisitDecider;
+import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 
 /**
@@ -168,6 +167,15 @@ public class RemoteServiceContainer extends BasicServiceContainer
 	}
 	
 	/**
+	 *  Get the type of the service provider (e.g. enclosing component type).
+	 *  @return The type of this provider.
+	 */
+	public String	getType()
+	{
+		return "remote"; 
+	}
+	
+	/**
 	 *  Start the service.
 	 *  @return A future that is done when the service has completed starting.  
 	 */
@@ -176,7 +184,7 @@ public class RemoteServiceContainer extends BasicServiceContainer
 		final Future ret = new Future();
 		
 //		System.out.println("Searching rms: "+getId());
-		SServiceProvider.getService(this, IRemoteServiceManagementService.class)
+		SServiceProvider.getService(this, IRemoteServiceManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)

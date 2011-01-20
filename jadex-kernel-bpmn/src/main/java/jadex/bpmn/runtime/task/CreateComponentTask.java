@@ -9,6 +9,7 @@ import jadex.bridge.IComponentManagementService;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.concurrent.IResultListener;
+import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
 
 import java.util.HashMap;
@@ -45,7 +46,7 @@ public class CreateComponentTask implements ITask
 	{
 		final Future ret = new Future();
 		
-		SServiceProvider.getService(instance.getServiceProvider(), IComponentManagementService.class).addResultListener(instance.createResultListener(new IResultListener()
+		SServiceProvider.getService(instance.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(instance.createResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
 			{

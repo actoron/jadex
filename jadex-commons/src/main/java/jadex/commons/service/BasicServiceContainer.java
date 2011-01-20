@@ -89,6 +89,15 @@ public class BasicServiceContainer implements  IServiceContainer
 		return id;
 	}
 	
+	/**
+	 *  Get the type of the service provider (e.g. enclosing component type).
+	 *  @return The type of this provider.
+	 */
+	public String	getType()
+	{
+		return "basic"; 
+	}
+
 	//-------- methods --------
 	
 	/**

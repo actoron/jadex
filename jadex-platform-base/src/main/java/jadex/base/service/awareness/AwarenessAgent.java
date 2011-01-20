@@ -11,6 +11,7 @@ import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.IResultListener;
+import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.clock.IClockService;
 import jadex.commons.service.threadpool.IThreadPoolService;
@@ -118,7 +119,7 @@ public class AwarenessAgent extends MicroAgent
 	 */
 	public void executeBody()
 	{
-		SServiceProvider.getService(getServiceProvider(), IClockService.class).addResultListener(createResultListener(new IResultListener()
+		SServiceProvider.getService(getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(createResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
@@ -208,7 +209,7 @@ public class AwarenessAgent extends MicroAgent
 	{
 		final Future ret = new Future();
 		
-		SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class)
+		SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(createResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
@@ -457,7 +458,7 @@ public class AwarenessAgent extends MicroAgent
 	 */
 	public void checkProxy(final DiscoveryInfo dif)
 	{
-		SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class)
+		SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 		.addResultListener(createResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
@@ -529,7 +530,7 @@ public class AwarenessAgent extends MicroAgent
 		
 		final Future ret = new Future();
 		
-		SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class)
+		SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(createResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
@@ -595,7 +596,7 @@ public class AwarenessAgent extends MicroAgent
 	{
 		final Future ret = new Future();
 		
-		SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class)
+		SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(createResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
@@ -638,7 +639,7 @@ public class AwarenessAgent extends MicroAgent
 	public void startReceiving()
 	{
 		// Start the receiver thread.
-		SServiceProvider.getService(getServiceProvider(), IThreadPoolService.class)
+		SServiceProvider.getService(getServiceProvider(), IThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(createResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
