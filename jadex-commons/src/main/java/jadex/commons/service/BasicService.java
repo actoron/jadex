@@ -3,7 +3,8 @@ package jadex.commons.service;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.SReflect;
-import jadex.commons.service.annotation.Gui;
+import jadex.commons.service.annotation.GuiClass;
+import jadex.commons.service.annotation.GuiClassName;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -68,10 +69,18 @@ public class BasicService implements IInternalService
 		// jadex.base.gui.componentviewer.IAbstractViewerPanel.PROPERTY_VIEWERCLASS
 		Object guiclazz = properties!=null? properties.get("componentviewer.viewerclass"): null;
 		
-		if(guiclazz==null && type.isAnnotationPresent(Gui.class))
+		if(guiclazz==null && type.isAnnotationPresent(GuiClass.class))
 		{
-			Gui gui = (Gui)type.getAnnotation(Gui.class);
-			guiclazz = gui.clazz();
+			GuiClass gui = (GuiClass)type.getAnnotation(GuiClass.class);
+			guiclazz = gui.value();
+			if(this.properties==null)
+				this.properties = new HashMap();
+			this.properties.put("componentviewer.viewerclass", guiclazz);
+		}
+		else if(guiclazz==null && type.isAnnotationPresent(GuiClassName.class))
+		{
+			GuiClassName gui = (GuiClassName)type.getAnnotation(GuiClassName.class);
+			guiclazz = gui.value();
 			if(this.properties==null)
 				this.properties = new HashMap();
 			this.properties.put("componentviewer.viewerclass", guiclazz);

@@ -9,6 +9,7 @@ import jadex.bridge.IModelInfo;
 import jadex.bridge.IErrorReport;
 import jadex.bridge.IModelValueProvider;
 import jadex.bridge.ModelInfo;
+import jadex.bridge.ModelValueProvider;
 import jadex.commons.ByteClassLoader;
 import jadex.commons.Future;
 import jadex.commons.SGUI;
@@ -16,11 +17,23 @@ import jadex.commons.SReflect;
 import jadex.commons.service.BasicService;
 import jadex.commons.service.IServiceProvider;
 import jadex.commons.service.RequiredServiceInfo;
+import jadex.micro.annotation.Argument;
+import jadex.micro.annotation.Arguments;
+import jadex.micro.annotation.Configuration;
+import jadex.micro.annotation.Configurations;
+import jadex.micro.annotation.Description;
+import jadex.micro.annotation.NameValue;
+import jadex.micro.annotation.Properties;
+import jadex.micro.annotation.ProvidedServices;
+import jadex.micro.annotation.RequiredService;
+import jadex.micro.annotation.RequiredServices;
+import jadex.micro.annotation.Results;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -146,16 +159,141 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	{
 		// Try to read meta information from class.
 		MicroAgentMetaInfo metainfo = null;
-		try
+		
+		if(cma.isAnnotationPresent(Description.class))
 		{
-			Method m = cma.getMethod("getMetaInfo", new Class[0]);
-			if(m!=null)
-				metainfo = (MicroAgentMetaInfo)m.invoke(null, new Object[0]);
+			if(metainfo==null)
+				metainfo = new MicroAgentMetaInfo();
+			Description val = (Description)cma.getAnnotation(Description.class);
+			metainfo.setDescription(val.value());
 		}
-		catch(Exception e)
+		if(cma.isAnnotationPresent(Properties.class))
 		{
-//			e.printStackTrace();
+			if(metainfo==null)
+				metainfo = new MicroAgentMetaInfo();
+			Properties val = (Properties)cma.getAnnotation(Properties.class);
+			NameValue[] vals = val.value();
+			Map props = new HashMap();
+			for(int i=0; i<vals.length; i++)
+			{
+				props.put(vals[i].name(), vals[i].value());
+			}
+			metainfo.setProperties(props);
 		}
+		if(cma.isAnnotationPresent(RequiredServices.class))
+		{
+			if(metainfo==null)
+				metainfo = new MicroAgentMetaInfo();
+			RequiredServices val = (RequiredServices)cma.getAnnotation(RequiredServices.class);
+			RequiredService[] vals = val.value();
+			RequiredServiceInfo[] rsis = new RequiredServiceInfo[vals.length];
+			for(int i=0; i<vals.length; i++)
+			{
+				rsis[i] = new RequiredServiceInfo(vals[i].name(), vals[i].type(), 
+					vals[i].dynamic(), vals[i].multiple(), vals[i].scope());
+			}
+			metainfo.setRequiredServices(rsis);
+		}
+		if(cma.isAnnotationPresent(ProvidedServices.class))
+		{
+			if(metainfo==null)
+				metainfo = new MicroAgentMetaInfo();
+			ProvidedServices val = (ProvidedServices)cma.getAnnotation(ProvidedServices.class);
+			Class[] vals = val.value();
+			metainfo.setProvidedServices(vals);
+		}
+		Map argsmap = new HashMap();
+		if(cma.isAnnotationPresent(Arguments.class))
+		{
+			if(metainfo==null)
+				metainfo = new MicroAgentMetaInfo();
+			Arguments val = (Arguments)cma.getAnnotation(Arguments.class);
+			Argument[] vals = val.value();
+			IArgument[] tmpargs = new IArgument[vals.length];
+			for(int i=0; i<vals.length; i++)
+			{
+				tmpargs[i] = new jadex.bridge.Argument(vals[i].name(), 
+					vals[i].description(), vals[i].typename(), vals[i].defaultvalue());
+				argsmap.put(tmpargs[i].getName(), tmpargs[i]);
+			}
+			metainfo.setArguments(tmpargs);
+		}
+		Map resmap = new HashMap();
+		if(cma.isAnnotationPresent(Results.class))
+		{
+			if(metainfo==null)
+				metainfo = new MicroAgentMetaInfo();
+			Results val = (Results)cma.getAnnotation(Results.class);
+			Argument[] vals = val.value();
+			IArgument[] tmpresults = new IArgument[vals.length];
+			for(int i=0; i<vals.length; i++)
+			{
+				tmpresults[i] = new jadex.bridge.Argument(vals[i].name(), 
+					vals[i].description(), vals[i].typename(), vals[i].defaultvalue());
+				resmap.put(tmpresults[i].getName(), tmpresults[i]);
+			}
+			metainfo.setResults(tmpresults);
+		}
+		Configuration[] configs = null;
+		if(cma.isAnnotationPresent(Configurations.class))
+		{
+			if(metainfo==null)
+				metainfo = new MicroAgentMetaInfo();
+			Configurations val = (Configurations)cma.getAnnotation(Configurations.class);
+			configs = val.value();
+		}
+		else if(cma.isAnnotationPresent(Configuration.class))
+		{
+			if(metainfo==null)
+				metainfo = new MicroAgentMetaInfo();
+			Configuration val = (Configuration)cma.getAnnotation(Configuration.class);
+			configs = new Configuration[]{val};
+		}
+		if(configs!=null)
+		{
+			String[] confignames = new String[configs.length];
+			Map master = new HashMap();
+			Map daemon = new HashMap();
+			Map autosd = new HashMap();
+			for(int i=0; i<configs.length; i++)
+			{
+				confignames[i] = configs[i].name();
+				master.put(confignames[i], configs[i].master());
+				daemon.put(confignames[i], configs[i].daemon());
+				autosd.put(confignames[i], configs[i].autoshutdown());
+				
+				NameValue[] argvals = configs[i].arguments();
+				for(int j=0; j<argvals.length; j++)
+				{
+					jadex.bridge.Argument arg = (jadex.bridge.Argument)argsmap.get(argvals[j].name());
+					arg.setDefaultValue(confignames[i], argvals[j].value());
+				}
+				NameValue[] resvals = configs[i].results();
+				for(int j=0; j<resvals.length; j++)
+				{
+					jadex.bridge.Argument arg = (jadex.bridge.Argument)resmap.get(resvals[j].name());
+					arg.setDefaultValue(confignames[i], resvals[j].value());
+				}
+			}
+			metainfo.setMaster(new ModelValueProvider(master));
+			metainfo.setDaemon(new ModelValueProvider(daemon));
+			metainfo.setAutoShutdown(new ModelValueProvider(autosd));
+		}
+		
+		if(metainfo==null)
+		{
+			try
+			{
+				Method m = cma.getMethod("getMetaInfo", new Class[0]);
+				if(m!=null)
+					metainfo = (MicroAgentMetaInfo)m.invoke(null, new Object[0]);
+			}
+			catch(Exception e)
+			{
+	//			e.printStackTrace();
+			}
+		}
+		
 		String name = SReflect.getUnqualifiedClassName(cma);
 		if(name.endsWith("Agent"))
 			name = name.substring(0, name.lastIndexOf("Agent"));

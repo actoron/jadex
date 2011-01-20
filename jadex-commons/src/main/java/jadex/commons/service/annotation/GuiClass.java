@@ -12,15 +12,10 @@ import java.lang.annotation.Target;
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Gui
-{
-//	/**
-//	 *  Supply a class name of a class implementing the gui.
-//	 */
-//	public String value();
-	
+public @interface GuiClass
+{	
 	/**
 	 *  Supply a class implementing the gui.
 	 */
-	public Class clazz();
+	public Class value();
 }

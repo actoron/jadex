@@ -1,14 +1,19 @@
 package jadex.micro.examples.chat;
 
-import jadex.bridge.IArgument;
-import jadex.commons.SUtil;
 import jadex.commons.service.RequiredServiceInfo;
+import jadex.commons.service.annotation.GuiClass;
 import jadex.micro.MicroAgent;
-import jadex.micro.MicroAgentMetaInfo;
+import jadex.micro.annotation.Description;
+import jadex.micro.annotation.RequiredService;
+import jadex.micro.annotation.RequiredServices;
 
 /**
  *  Chat micro agent. 
  */
+@Description("This agent offers a chat service.")
+@RequiredServices(@RequiredService(name="chatservices", type=IChatService.class, 
+	multiple=true, scope=RequiredServiceInfo.SCOPE_GLOBAL))
+@GuiClass(ChatPanel.class)
 public class ChatAgent extends MicroAgent
 {
 	//-------- methods --------
@@ -20,28 +25,21 @@ public class ChatAgent extends MicroAgent
 	{
 		ChatService cs = new ChatService(this);
 		addDirectService(cs);
-//		SwingUtilities.invokeLater(new Runnable()
-//		{
-//			public void run()
-//			{
-//				ChatPanel.createGui((IMicroExternalAccess)getExternalAccess());
-//			}
-//		});
 	}
 	
 	//-------- static methods --------
 
-	/**
-	 *  Get the meta information about the agent.
-	 */
-	public static MicroAgentMetaInfo getMetaInfo()
-	{
-		return new MicroAgentMetaInfo("This agent offers a helpline for getting information about missing persons.", null, 
-			new IArgument[]{}//new Argument("infos", "Initial information records.", "InformationEntry[]")}
-			, null, null, SUtil.createHashMap(new String[]{"componentviewer.viewerclass"}, new Object[]{"jadex.micro.examples.chat.ChatPanel"}),
-			new RequiredServiceInfo[]{
-				new RequiredServiceInfo("chatservices", IChatService.class, true, true, RequiredServiceInfo.SCOPE_GLOBAL), 
-				}, new Class[]{IChatService.class});
-	}
+//	/**
+//	 *  Get the meta information about the agent.
+//	 */
+//	public static MicroAgentMetaInfo getMetaInfo()
+//	{
+//		return new MicroAgentMetaInfo("This agent offers a chat service.", null, 
+//			new IArgument[]{}//new Argument("infos", "Initial information records.", "InformationEntry[]")}
+//			, null, null, SUtil.createHashMap(new String[]{"componentviewer.viewerclass"}, new Object[]{"jadex.micro.examples.chat.ChatPanel"}),
+//			new RequiredServiceInfo[]{
+//				new RequiredServiceInfo("chatservices", IChatService.class, true, true, RequiredServiceInfo.SCOPE_GLOBAL), 
+//				}, new Class[]{IChatService.class});
+//	}
 
 }

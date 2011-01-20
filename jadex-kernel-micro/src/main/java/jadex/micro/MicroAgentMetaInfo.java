@@ -53,6 +53,13 @@ public class MicroAgentMetaInfo
 	/**
 	 *  Create a new meta info.
 	 */
+	public MicroAgentMetaInfo()
+	{
+	}
+	
+	/**
+	 *  Create a new meta info.
+	 */
 	public MicroAgentMetaInfo(String description, String[] configs)
 	{
 		this(description, configs, (IArgument[])null, null);
@@ -104,13 +111,13 @@ public class MicroAgentMetaInfo
 		IModelValueProvider master, IModelValueProvider daemon, IModelValueProvider autoshutdown)
 	{
 		this.description = description;
-		this.configs = configs == null? SUtil.EMPTY_STRING_ARRAY: configs;
-		this.args = args == null? new IArgument[0]: args;
-		this.results = results == null? new IArgument[0]: results;
-		this.breakpoints = breakpoints == null? new String[0]: breakpoints;
-		this.properties = properties==null? Collections.EMPTY_MAP: properties;
-		this.requiredservices = requiredservices==null? new RequiredServiceInfo[0]: requiredservices;
-		this.providedservices = providedservices==null? SUtil.EMPTY_CLASS_ARRAY: providedservices;
+		this.configs = configs;
+		this.args = args;
+		this.results = results;
+		this.breakpoints = breakpoints;
+		this.properties = properties;
+		this.requiredservices = requiredservices;
+		this.providedservices = providedservices;
 		this.master = master;
 		this.daemon = daemon;
 		this.autoshutdown = autoshutdown;
@@ -124,7 +131,7 @@ public class MicroAgentMetaInfo
 	 */
 	public String[] getConfigurations()
 	{
-		return configs;
+		return configs==null? SUtil.EMPTY_STRING_ARRAY: configs;
 	}
 
 	/**
@@ -133,7 +140,7 @@ public class MicroAgentMetaInfo
 	 */
 	public IArgument[] getArguments()
 	{
-		return args;
+		return args==null? new IArgument[0]: args;
 	}
 	
 	/**
@@ -142,7 +149,7 @@ public class MicroAgentMetaInfo
 	 */
 	public IArgument[] getResults()
 	{
-		return results;
+		return results==null? new IArgument[0]: results;
 	}
 
 	/**
@@ -160,7 +167,7 @@ public class MicroAgentMetaInfo
 	 */
 	public String[] getBreakpoints()
 	{
-		return breakpoints;
+		return breakpoints==null? SUtil.EMPTY_STRING_ARRAY: breakpoints;
 	}
 	
 	/**
@@ -169,7 +176,7 @@ public class MicroAgentMetaInfo
 	 */
 	public Map getProperties()
 	{
-		return properties;
+		return properties==null? Collections.EMPTY_MAP: properties;
 	}
 
 	/**
@@ -178,7 +185,7 @@ public class MicroAgentMetaInfo
 	 */
 	public RequiredServiceInfo[] getRequiredServices()
 	{
-		return requiredservices;
+		return requiredservices==null? new RequiredServiceInfo[0]: requiredservices;
 	}
 
 	/**
@@ -187,7 +194,7 @@ public class MicroAgentMetaInfo
 	 */
 	public Class[] getProvidedServices()
 	{
-		return providedservices;
+		return providedservices==null? SUtil.EMPTY_CLASS_ARRAY: providedservices;
 	}
 
 	/**
@@ -215,6 +222,105 @@ public class MicroAgentMetaInfo
 	public IModelValueProvider getAutoShutdown()
 	{
 		return autoshutdown;
+	}
+
+	/**
+	 *  Set the description.
+	 *  @param description The description to set.
+	 */
+	public void setDescription(String description)
+	{
+		this.description = description;
+	}
+
+	/**
+	 *  Set the configs.
+	 *  @param configs The configs to set.
+	 */
+	public void setConfigs(String[] configs)
+	{
+		this.configs = configs;
+	}
+
+	/**
+	 *  Set the args.
+	 *  @param args The args to set.
+	 */
+	public void setArguments(IArgument[] args)
+	{
+		this.args = args;
+	}
+
+	/**
+	 *  Set the results.
+	 *  @param results The results to set.
+	 */
+	public void setResults(IArgument[] results)
+	{
+		this.results = results;
+	}
+
+	/**
+	 *  Set the breakpoints.
+	 *  @param breakpoints The breakpoints to set.
+	 */
+	public void setBreakpoints(String[] breakpoints)
+	{
+		this.breakpoints = breakpoints;
+	}
+
+	/**
+	 *  Set the properties.
+	 *  @param properties The properties to set.
+	 */
+	public void setProperties(Map properties)
+	{
+		this.properties = properties;
+	}
+
+	/**
+	 *  Set the requiredservices.
+	 *  @param requiredservices The requiredservices to set.
+	 */
+	public void setRequiredServices(RequiredServiceInfo[] requiredservices)
+	{
+		this.requiredservices = requiredservices;
+	}
+
+	/**
+	 *  Set the providedservices.
+	 *  @param providedservices The providedservices to set.
+	 */
+	public void setProvidedServices(Class[] providedservices)
+	{
+		this.providedservices = providedservices;
+	}
+
+	/**
+	 *  Set the master.
+	 *  @param master The master to set.
+	 */
+	public void setMaster(IModelValueProvider master)
+	{
+		this.master = master;
+	}
+
+	/**
+	 *  Set the daemon.
+	 *  @param daemon The daemon to set.
+	 */
+	public void setDaemon(IModelValueProvider daemon)
+	{
+		this.daemon = daemon;
+	}
+
+	/**
+	 *  Set the autoshutdown.
+	 *  @param autoshutdown The autoshutdown to set.
+	 */
+	public void setAutoShutdown(IModelValueProvider autoshutdown)
+	{
+		this.autoshutdown = autoshutdown;
 	}
 	
 }
