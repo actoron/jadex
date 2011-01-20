@@ -168,6 +168,7 @@
 	
 		<application name="all_kernels (rms, awa, jcc)">
 			<components>
+				<component name="kernel_application" type="kernel_application" daemon="true"/>
 				<component name="kernel_micro" type="kernel_micro" daemon="true"/>
 				<!-- <component type="kernel_bdi" daemon="true"/> -->
 				<component name="kernel_bdibpmn" type="kernel_bdibpmn" daemon="true"/>
@@ -180,6 +181,7 @@
 		
 		<application name="all_kernels (rms, jcc)">
 			<components>
+				<component name="kernel_application" type="kernel_application" daemon="true"/>
 				<component name="kernel_micro" type="kernel_micro" daemon="true"/>
 				<!-- <component type="kernel_bdi" daemon="true"/> -->
 				<component name="kernel_bdibpmn" type="kernel_bdibpmn" daemon="true"/>
@@ -191,6 +193,7 @@
 		
 		<application name="all_kernels (rms, awa)">
 			<components>
+				<component name="kernel_application" type="kernel_application" daemon="true"/>
 				<component name="kernel_micro" type="kernel_micro" daemon="true"/>
 				<!-- <component type="kernel_bdi" daemon="true"/> -->
 				<component name="kernel_bdibpmn" type="kernel_bdibpmn" daemon="true"/>
@@ -202,6 +205,7 @@
 		
 		<application name="all_kernels (rms)">
 			<components>
+				<component name="kernel_application" type="kernel_application" daemon="true"/>
 				<component name="kernel_micro" type="kernel_micro" daemon="true"/>
 				<!-- <component type="kernel_bdi" daemon="true"/> -->
 				<component name="kernel_bdibpmn" type="kernel_bdibpmn" daemon="true"/>
@@ -212,6 +216,7 @@
 		
 		<application name="all_kernels (jcc)">
 			<components>
+				<component name="kernel_application" type="kernel_application" daemon="true"/>
 				<component name="kernel_micro" type="kernel_micro" daemon="true"/>
 				<!-- <component type="kernel_bdi" daemon="true"/> -->
 				<component name="kernel_bdibpmn" type="kernel_bdibpmn" daemon="true"/>
@@ -223,6 +228,7 @@
 		<!-- todo remove: support autoshutdown as instance level flag. -->
 		<application name="all_kernels_no_daemons">
 			<components>
+				<component name="kernel_application" type="kernel_application" daemon="true"/>
 				<component name="kernel_micro" type="kernel_micro"/>
 				<!-- <component type="kernel_bdi"/> -->
 				<component name="kernel_bdibpmn" type="kernel_bdibpmn"/>
@@ -234,6 +240,7 @@
 		<!-- Configuration used by jadex.base.test.ComponentTestSuite -->
 		<application name="testcases">
 			<components>
+				<component name="kernel_application" type="kernel_application" daemon="true"/>
 				<component name="kernel_micro" type="kernel_micro"/>
 				<component name="kernel_bdibpmn" type="kernel_bdibpmn"/>
 				<component name="kernel_bpmn" type="kernel_bpmn"/>
