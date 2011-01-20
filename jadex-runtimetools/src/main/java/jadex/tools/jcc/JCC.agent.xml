@@ -129,12 +129,9 @@
 	</events>
 
 	<services>
-		<requiredservice name="libservice" class="ILibraryService"
-			scope="platform" />
-		<requiredservice name="cms" class="IComponentManagementService"
-			scope="platform" />
-		<requiredservice name="rms" class="IRemoteServiceManagementService"
-			scope="platform" />
+		<requiredservice name="libservice" class="ILibraryService" scope="platform" />
+		<requiredservice name="cms" class="IComponentManagementService"	scope="platform" />
+		<requiredservice name="rms" class="IRemoteServiceManagementService"	scope="platform" />
 	</services>
 
 	<properties>

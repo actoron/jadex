@@ -128,7 +128,7 @@ public class DisplayAgent extends MicroAgent
 			null, null, null,
 			new RequiredServiceInfo[]{
 				new RequiredServiceInfo("generateservice", IGenerateService.class), 
-				new RequiredServiceInfo("cmsservice", IComponentManagementService.class),
+				new RequiredServiceInfo("cmsservice", IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM),
 				new RequiredServiceInfo("progressservice", IProgressService.class), // not used
 						},
 			new Class[]{IDisplayService.class});

@@ -5,11 +5,8 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.ChangeEvent;
-import jadex.commons.IChangeListener;
 import jadex.commons.IIntermediateResultListener;
 import jadex.commons.SGUI;
-import jadex.commons.concurrent.DefaultResultListener;
-import jadex.micro.IMicroExternalAccess;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;

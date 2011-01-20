@@ -334,7 +334,6 @@ public class DisplayPanel extends JComponent
 							{
 								public Object execute(IInternalAccess ia)
 								{
-//									SServiceProvider.getService(provider, IComponentManagementService.class)
 									ia.getRequiredService("cmsservice")
 										.addResultListener(new SwingDefaultResultListener(DisplayPanel.this)
 									{
@@ -381,6 +380,7 @@ public class DisplayPanel extends JComponent
 																			public void customExceptionOccurred(Exception exception)
 																			{
 																				// ignore
+																				exception.printStackTrace();
 																			}
 																		});
 																	}
@@ -389,6 +389,7 @@ public class DisplayPanel extends JComponent
 																public void customExceptionOccurred(Exception exception)
 																{
 																	// ignore
+																	exception.printStackTrace();
 																}
 															});
 														}
@@ -396,6 +397,7 @@ public class DisplayPanel extends JComponent
 														public void customExceptionOccurred(Exception exception)
 														{
 															// ignore
+															exception.printStackTrace();
 														}
 													});
 												}
@@ -405,6 +407,7 @@ public class DisplayPanel extends JComponent
 										public void customExceptionOccurred(Exception exception)
 										{
 											// ignore
+											exception.printStackTrace();
 										}
 									});
 									return null;
@@ -857,7 +860,6 @@ public class DisplayPanel extends JComponent
 		{
 			public Object execute(IInternalAccess ia)
 			{
-//				SServiceProvider.getService(ia.getServiceProvider(), IGenerateService.class)
 				ia.getRequiredService("generateservice")
 					.addResultListener(new SwingDefaultResultListener()
 				{
