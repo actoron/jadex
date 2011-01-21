@@ -736,7 +736,12 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 		{
 			for(Iterator it=own.iterator(); it.hasNext(); )
 			{
-				ret.add(state.getAttributeValue(it.next(), OAVBDIMetaModel.expression_has_class));
+				Object ob = it.next();
+				Class clazz = (Class)state.getAttributeValue(ob, OAVBDIMetaModel.expression_has_class);
+				String text = (String)state.getAttributeValue(ob, OAVBDIMetaModel.expression_has_text);
+				Boolean direct = (Boolean)state.getAttributeValue(ob, OAVBDIMetaModel.providedservice_has_direct);
+				ProvidedServiceInfo psi = new ProvidedServiceInfo(clazz, text, direct!=null? direct.booleanValue(): false); 
+				ret.add(psi);
 			}
 		}
 		

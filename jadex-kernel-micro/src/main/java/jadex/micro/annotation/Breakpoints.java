@@ -11,7 +11,7 @@ import java.lang.annotation.Target;
 public @interface Breakpoints
 {
 	/**
-	 * 
+	 *  The breakpoint names.
 	 */
 	public String[] value();
 }

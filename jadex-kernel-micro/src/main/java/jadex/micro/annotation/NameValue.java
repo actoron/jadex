@@ -5,17 +5,20 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ *  Name, value pair.
+ */
 @Target(ElementType.ANNOTATION_TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface NameValue
 {
 	/**
-	 * 
+	 *  The name.
 	 */
 	public String name();
 	
 	/**
-	 * 
+	 *  The value as string, will be parsed.
 	 */
 	public String value();
 }

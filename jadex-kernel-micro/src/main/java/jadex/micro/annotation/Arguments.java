@@ -11,7 +11,7 @@ import java.lang.annotation.Target;
 public @interface Arguments
 {
 	/**
-	 * 
+	 *  The arguments.
 	 */
 	public Argument[] value() default {};
 }

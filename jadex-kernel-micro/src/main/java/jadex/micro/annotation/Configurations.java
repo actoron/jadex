@@ -14,7 +14,7 @@ import java.lang.annotation.Target;
 public @interface Configurations
 {
 	/**
-	 * 
+	 *  The configurations.
 	 */
 	public Configuration[] value() default {};
 }
