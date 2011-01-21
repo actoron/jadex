@@ -25,6 +25,13 @@
 		<import>jadex.simulation.environment.DeltaTimeExecutor4Simulation</import>
 	</imports>
 
+	<arguments>
+		<!-- The initial weights for the utility function of the SMA. -->		
+		<argument name="TrustWeight" typename="Double">-2.0</argument>
+		<argument name="CostWeight" typename="Double">-2.1</argument>
+		<argument name="DurationWeight" typename="Double">-2.3</argument>
+	</arguments>
+	
 	<spacetypes>
 		<!-- define the coordination space -->
 		<env:envspacetype name="coordspace" width="11" height="11" class="CoordinationSpace">
@@ -194,6 +201,9 @@
 						<argument name="negotiationCosts">
 							new Double(800.0)
 						</argument>
+					<argument name="TrustWeight">$args.TrustWeight</argument>
+					<argument name="CostWeight">$args.CostWeight</argument>
+					<argument name="DurationWeight">$args.DurationWeight</argument>
 					</arguments>
 				</component>
 				<!--<component type="ClientSimulator">

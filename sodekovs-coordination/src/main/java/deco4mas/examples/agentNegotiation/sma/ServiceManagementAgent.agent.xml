@@ -32,8 +32,7 @@
 	<beliefs>
 		<!-- coordinationSpace (needed by deco implementation) -->
 		<belief name="env" class="CoordinationSpace">
-			<fact>(CoordinationSpace)((IApplicationExternalAccess)$scope.getParent()).getSpace("mycoordspace")
-			</fact>
+			<fact>(CoordinationSpace)((IApplicationExternalAccess)$scope.getParent()).getSpace("mycoordspace")</fact>
 		</belief>
 
 		<!-- negotiation types witch should be used -->
@@ -70,6 +69,21 @@
 		<belief name="moneyBank" class="Double">
 			<fact>0.0</fact>
 		</belief>
+		
+		<!-- (Initial) Configuration of the weights of the utility function -->
+		<belief name="DurationWeight" class="Double">
+			<fact>true</fact>
+			<assignto ref="socap.DurationWeight" />
+		</belief>
+		<belief name="CostWeight" class="Double">
+			<fact>-1.0</fact>
+			<assignto ref="socap.CostWeight" />
+		</belief>
+		<belief name="TrustWeight" class="Double">
+			<fact>-1.0</fact>
+			<assignto ref="socap.TrustWeight" />
+		</belief>
+		
 	</beliefs>
 
 	<goals>

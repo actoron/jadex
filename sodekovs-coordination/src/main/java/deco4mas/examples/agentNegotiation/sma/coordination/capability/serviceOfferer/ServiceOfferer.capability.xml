@@ -38,6 +38,16 @@
 		<beliefsetref name="negTypes">
 			<abstract />
 		</beliefsetref>
+		<!-- (Initial) Configuration of the weights of the utility function -->
+		<beliefref name="DurationWeight">
+			<abstract />
+		</beliefref>
+		<beliefref name="CostWeight">
+			<abstract/>
+		</beliefref>
+		<beliefref name="TrustWeight">
+			<abstract/>
+		</beliefref>
 
 		<!--  REFERENCES of capability	-->
 		<!-- trustFunction of trust capability ( null, if useTrust == false ) -->
@@ -45,6 +55,8 @@
 			<concrete ref="tocap.trustFunction">
 			</concrete>
 		</beliefref>
+		
+		
 	</beliefs>
 
 	<goals>
