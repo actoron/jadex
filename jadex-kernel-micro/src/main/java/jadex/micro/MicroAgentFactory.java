@@ -15,9 +15,13 @@ import jadex.commons.Future;
 import jadex.commons.SGUI;
 import jadex.commons.SReflect;
 import jadex.commons.service.BasicService;
+import jadex.commons.service.IInternalService;
 import jadex.commons.service.IServiceProvider;
 import jadex.commons.service.ProvidedServiceInfo;
 import jadex.commons.service.RequiredServiceInfo;
+import jadex.javaparser.IParsedExpression;
+import jadex.javaparser.SJavaParser;
+import jadex.javaparser.SimpleValueFetcher;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Configuration;
@@ -25,6 +29,7 @@ import jadex.micro.annotation.Configurations;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.NameValue;
 import jadex.micro.annotation.Properties;
+import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
@@ -200,9 +205,13 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 			if(metainfo==null)
 				metainfo = new MicroAgentMetaInfo();
 			ProvidedServices val = (ProvidedServices)cma.getAnnotation(ProvidedServices.class);
-			// todo!
-//			Class[] vals = val.value();
-//			metainfo.setProvidedServices(vals);
+			ProvidedService[] vals = val.value();
+			ProvidedServiceInfo[] psis = new ProvidedServiceInfo[vals.length];
+			for(int i=0; i<vals.length; i++)
+			{
+				psis[i] = new ProvidedServiceInfo(vals[i].type(), vals[i].expression(), vals[i].direct());
+			}
+			metainfo.setProvidedServices(psis);
 		}
 		Map argsmap = new HashMap();
 		if(cma.isAnnotationPresent(Arguments.class))

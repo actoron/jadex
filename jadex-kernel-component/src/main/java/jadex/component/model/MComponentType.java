@@ -219,7 +219,7 @@ public class MComponentType extends MStartable implements ICacheableModel
 				Class type = ser.getClazz()!=null? ser.getClazz(): 
 					tmp[i]==null && ser.getParsedValue()!=null? 
 					ser.getParsedValue().getStaticType(): null;
-				tmp[i] = new ProvidedServiceInfo(type, ser.getParsedValue().getExpressionText());
+				tmp[i] = new ProvidedServiceInfo(type, ser.getParsedValue().getExpressionText(), ser.isDirect());
 			}
 			
 			modelinfo.setProvidedServices(tmp);

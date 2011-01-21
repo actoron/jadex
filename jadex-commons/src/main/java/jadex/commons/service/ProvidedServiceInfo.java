@@ -13,6 +13,9 @@ public class ProvidedServiceInfo
 	/** The creation expression. */
 	protected String expression;
 	
+	/** The direct flag. */
+	protected boolean direct;
+	
 	//-------- constructors --------
 	
 	/**
@@ -36,8 +39,17 @@ public class ProvidedServiceInfo
 	 */
 	public ProvidedServiceInfo(Class type, String expression)
 	{
+		this(type, expression, false);
+	}
+	
+	/**
+	 *  Create a new service info.
+	 */
+	public ProvidedServiceInfo(Class type, String expression, boolean direct)
+	{
 		this.type = type;
 		this.expression = expression;
+		this.direct = direct;
 	}
 
 	//-------- methods --------
@@ -76,5 +88,23 @@ public class ProvidedServiceInfo
 	public void setExpression(String expression)
 	{
 		this.expression = expression;
+	}
+
+	/**
+	 *  Get the direct.
+	 *  @return the direct.
+	 */
+	public boolean isDirect()
+	{
+		return direct;
+	}
+
+	/**
+	 *  Set the direct.
+	 *  @param direct The direct to set.
+	 */
+	public void setDirect(boolean direct)
+	{
+		this.direct = direct;
 	}
 }

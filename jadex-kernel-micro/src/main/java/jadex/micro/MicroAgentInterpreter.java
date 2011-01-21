@@ -24,11 +24,15 @@ import jadex.commons.IIntermediateResultListener;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
+import jadex.commons.service.IInternalService;
 import jadex.commons.service.IServiceContainer;
 import jadex.commons.service.IServiceProvider;
+import jadex.commons.service.ProvidedServiceInfo;
 import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.clock.ITimer;
+import jadex.javaparser.SJavaParser;
+import jadex.javaparser.SimpleValueFetcher;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -150,6 +154,46 @@ public class MicroAgentInterpreter implements IComponentInstance
 				public Object execute(IInternalAccess ia)
 				{
 					microagent.agentCreated();
+					// Create provided services
+					ProvidedServiceInfo[] services = model.getProvidedServices();
+//					System.out.println("init sers: "+services);
+					if(services!=null)
+					{
+						final SimpleValueFetcher fetcher = new SimpleValueFetcher();
+						fetcher.setValue("$args", getArguments());
+						fetcher.setValue("$properties", model.getProperties());
+						fetcher.setValue("$results", getResults());
+						fetcher.setValue("$component", microagent);
+						fetcher.setValue("$provider", getServiceProvider());
+						for(int i=0; i<services.length; i++)
+						{
+							IInternalService service;
+							if(services[i].getExpression()!=null)
+							{
+								try
+								{
+									// todo: other Class imports, how can be found out?
+									String[] imports = new String[]{microagent.getClass().getPackage().getName()+".*"};
+									service = (IInternalService)SJavaParser.evaluateExpression(services[i].getExpression(), imports, fetcher, model.getClassLoader());
+									if(services[i].isDirect())
+									{
+										microagent.addDirectService(service);
+									}
+									else
+									{
+										microagent.addService(service);
+									}
+//									System.out.println("added: "+service+" "+getAgentAdapter().getComponentIdentifier());
+								}
+								catch(Exception e)
+								{
+									e.printStackTrace();
+									microagent.getLogger().warning("Service creation error: "+services[i].getExpression());
+								}
+							}
+						}
+					}
+					
 					getServiceContainer().start().addResultListener(createResultListener(new IResultListener()
 					{
 						public void resultAvailable(Object result)
