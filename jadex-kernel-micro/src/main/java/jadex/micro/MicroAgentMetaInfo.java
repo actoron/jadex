@@ -7,6 +7,7 @@ import jadex.commons.service.ProvidedServiceInfo;
 import jadex.commons.service.RequiredServiceInfo;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -178,6 +179,18 @@ public class MicroAgentMetaInfo
 	public Map getProperties()
 	{
 		return properties==null? Collections.EMPTY_MAP: properties;
+	}
+	
+	/**
+	 *  Put a property in.
+	 *  @param name The property name.
+	 *  @param value The value.
+	 */
+	public void putPropertyValue(String name, Object value)
+	{
+		if(properties==null)
+			properties = new HashMap();
+		properties.put(name, value);
 	}
 
 	/**

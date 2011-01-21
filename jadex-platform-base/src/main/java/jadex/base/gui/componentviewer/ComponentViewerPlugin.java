@@ -382,7 +382,7 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 											public void customResultAvailable(Object result)
 											{
 												final IExternalAccess exta = (IExternalAccess)result;
-												final Object clid = (String)exta.getModel().getProperties().get(IAbstractViewerPanel.PROPERTY_VIEWERCLASS);
+												final Object clid = exta.getModel().getProperties().get(IAbstractViewerPanel.PROPERTY_VIEWERCLASS);
 											
 												if(clid instanceof String)
 												{
@@ -439,7 +439,7 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 		}
 		catch(Exception e)
 		{
-//			e.printStackTrace();
+			e.printStackTrace();
 			getJCC().displayError("Error initializing component viewer panel.", "Component viewer panel class: "+clazz, e);
 		}
 	}
@@ -526,8 +526,8 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 										public void customResultAvailable(Object result)
 										{
 											final IExternalAccess exta = (IExternalAccess)result;
-											final String classname = (String)exta.getModel().getProperties().get(IAbstractViewerPanel.PROPERTY_VIEWERCLASS);
-											viewables.put(cid, classname==null? Boolean.FALSE: Boolean.TRUE);
+											final Object clid = exta.getModel().getProperties().get(IAbstractViewerPanel.PROPERTY_VIEWERCLASS);
+											viewables.put(cid, clid==null? Boolean.FALSE: Boolean.TRUE);
 			//								System.out.println("node: "+viewables.get(cid));
 											node.refresh(false, false);
 										}

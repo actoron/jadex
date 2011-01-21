@@ -19,6 +19,8 @@ import jadex.commons.service.IInternalService;
 import jadex.commons.service.IServiceProvider;
 import jadex.commons.service.ProvidedServiceInfo;
 import jadex.commons.service.RequiredServiceInfo;
+import jadex.commons.service.annotation.GuiClass;
+import jadex.commons.service.annotation.GuiClassName;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SJavaParser;
 import jadex.javaparser.SimpleValueFetcher;
@@ -294,6 +296,25 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 			metainfo.setAutoShutdown(new ModelValueProvider(autosd));
 		}
 		
+		// todo: move to be able to use the constant
+		// jadex.base.gui.componentviewer.IAbstractViewerPanel.PROPERTY_VIEWERCLASS
+		if(cma.isAnnotationPresent(GuiClass.class))
+		{
+			if(metainfo==null)
+				metainfo = new MicroAgentMetaInfo();
+			GuiClass gui = (GuiClass)cma.getAnnotation(GuiClass.class);
+			Class clazz = gui.value();
+			metainfo.putPropertyValue("componentviewer.viewerclass", clazz);
+		}
+		else if(cma.isAnnotationPresent(GuiClassName.class))
+		{
+			if(metainfo==null)
+				metainfo = new MicroAgentMetaInfo();
+			GuiClassName gui = (GuiClassName)cma.getAnnotation(GuiClassName.class);
+			String clazzname = gui.value();
+			metainfo.putPropertyValue("componentviewer.viewerclass", clazzname);
+		}
+
 		if(metainfo==null)
 		{
 			try
