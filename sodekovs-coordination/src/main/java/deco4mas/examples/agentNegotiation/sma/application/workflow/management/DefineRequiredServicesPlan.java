@@ -10,6 +10,7 @@ import jadex.bpmn.runtime.ExternalAccess;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.commons.IFuture;
+import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
 import jadex.javaparser.SimpleValueFetcher;
 
@@ -40,7 +41,7 @@ public class DefineRequiredServicesPlan extends Plan
 
 			// get Cms
 			IComponentManagementService cms = ((IComponentManagementService)SServiceProvider.getService(
-					getScope().getServiceProvider(), IComponentManagementService.class).get(this));
+					getScope().getServiceProvider(), IComponentManagementService.class,RequiredServiceInfo.SCOPE_PLATFORM).get(this));
 
 			// workflow Access
 			IFuture workflowFuture = cms.getExternalAccess((IComponentIdentifier) ((IGoal) getReason()).getParameter("workflow").getValue());

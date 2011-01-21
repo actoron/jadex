@@ -8,6 +8,7 @@ import jadex.bpmn.runtime.ExternalAccess;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.commons.IFuture;
+import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
 
 import java.util.logging.Logger;
@@ -32,7 +33,7 @@ public class ExecuteTaskPlan extends Plan
 //					getScope().getServiceProvider(), IComponentManagementService.class).get(this)).getExternalAccess(aid);
 						
 			IComponentManagementService cms = ((IComponentManagementService)SServiceProvider.getService(
-					getScope().getServiceProvider(), IComponentManagementService.class).get(this));
+					getScope().getServiceProvider(), IComponentManagementService.class,RequiredServiceInfo.SCOPE_PLATFORM).get(this));
 						
 			IFuture fut = cms.getExternalAccess((IComponentIdentifier) getBeliefbase().getBelief("workflow").getFact());
 			ExternalAccess exta = (ExternalAccess) fut.get(this);

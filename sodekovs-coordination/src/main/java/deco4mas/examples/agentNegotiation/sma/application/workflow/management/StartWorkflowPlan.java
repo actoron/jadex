@@ -3,6 +3,7 @@ package deco4mas.examples.agentNegotiation.sma.application.workflow.management;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
+import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
 
 import java.util.logging.Logger;
@@ -34,7 +35,7 @@ public class StartWorkflowPlan extends Plan
 
 			// start workflow
 			IComponentManagementService cms = ((IComponentManagementService)SServiceProvider.getService(
-					getScope().getServiceProvider(), IComponentManagementService.class).get(this));
+					getScope().getServiceProvider(), IComponentManagementService.class,RequiredServiceInfo.SCOPE_PLATFORM).get(this));
 			cms.resumeComponent((IComponentIdentifier) getBeliefbase().getBelief("workflow").getFact());
 		} catch (Exception e)
 		{

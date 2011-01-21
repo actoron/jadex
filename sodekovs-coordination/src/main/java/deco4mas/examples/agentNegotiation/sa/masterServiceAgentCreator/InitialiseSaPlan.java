@@ -4,6 +4,7 @@ import jadex.bdi.runtime.Plan;
 import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentManagementService;
 import jadex.commons.IFuture;
+import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
 
 import java.util.HashMap;
@@ -42,7 +43,7 @@ public class InitialiseSaPlan extends Plan
 				.getFacts();
 
 			IComponentManagementService cms = ((IComponentManagementService)SServiceProvider.getService(
-					getScope().getServiceProvider(), IComponentManagementService.class).get(this));
+					getScope().getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(this));
 			
 					
 
