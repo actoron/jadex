@@ -49,7 +49,7 @@ public class ChatService extends BasicService implements IChatService
 	{
 		for(int i=0; i<listeners.size(); i++)
 		{
-			System.out.println("listeners: "+listeners);
+//			System.out.println("listeners: "+listeners);
 			final IRemoteChangeListener lis = (IRemoteChangeListener)listeners.get(i);
 			lis.changeOccurred(new ChangeEvent(name, null, text))
 				.addResultListener(agent.createResultListener(new IResultListener()
@@ -60,6 +60,7 @@ public class ChatService extends BasicService implements IChatService
 				
 				public void exceptionOccurred(Exception exception)
 				{
+//					exception.printStackTrace();
 					listeners.remove(lis);
 				}
 			}));

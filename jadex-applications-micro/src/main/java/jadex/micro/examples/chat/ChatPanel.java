@@ -69,6 +69,7 @@ public class ChatPanel extends JPanel
 			public void actionPerformed(ActionEvent e)
 			{
 				tell(""+agent.getComponentIdentifier(), tf.getText());
+				tf.setText("");
 			}
 		};
 		tf.addActionListener(al);
@@ -91,10 +92,19 @@ public class ChatPanel extends JPanel
 				IChatService cs = (IChatService)result;
 				cs.addChangeListener(new IRemoteChangeListener()
 				{
-					public IFuture changeOccurred(ChangeEvent event)
+					public IFuture changeOccurred(final ChangeEvent event)
 					{
-						addMessage((String)event.getSource(), (String)event.getValue());
-						return new Future(null);
+						Future ret = new Future();
+						if(!isVisible())
+						{
+							ret.setException(new RuntimeException("Gui closed."));
+						}
+						else
+						{
+							addMessage((String)event.getSource(), (String)event.getValue());
+							ret.setResult(null);
+						}
+						return ret;
 					}
 				});
 			}

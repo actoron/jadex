@@ -17,6 +17,7 @@
 			new ChatService($component)	
 		</providedservice>
 		<requiredservice name="chatservices" class="IChatService" multiple="true" dynamic="true" scope="global"/>
+		<requiredservice name="mychatservice" class="IChatService" scope="local"/>
 	</services>
 	
 	<!-- <behavior file="jadex.micro.examples.chat.ChatAgent"/> -->
