@@ -7,6 +7,9 @@ import java.lang.annotation.Target;
 
 import jadex.commons.service.RequiredServiceInfo;
 
+/**
+ *  Required service data.
+ */
 @Target(ElementType.ANNOTATION_TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface RequiredService

@@ -7,7 +7,7 @@ import java.lang.annotation.Target;
 
 
 /**
- *  Description of the 
+ *  Configurations annotation. 
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)

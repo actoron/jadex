@@ -7,9 +7,7 @@ import java.lang.annotation.Target;
 
 
 /**
- *  Description of the 
- *  
- *  Applicable the type.
+ *  Configuration annotation.
  */
 @Target({ElementType.TYPE, ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)
