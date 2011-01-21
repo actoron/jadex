@@ -1,5 +1,6 @@
 package jadex.micro.examples.compositeservice;
 
+import jadex.bridge.IInternalAccess;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.service.BasicService;
@@ -13,9 +14,9 @@ public class AddService extends BasicService implements IAddService
 	/**
 	 * 
 	 */
-	public AddService(IServiceProvider provider)
+	public AddService(IInternalAccess comp)
 	{
-		super(provider.getId(), IAddService.class, null);
+		super(comp.getServiceProvider().getId(), IAddService.class, null);
 	}
 	
 	/**
@@ -23,11 +24,6 @@ public class AddService extends BasicService implements IAddService
 	 */
 	public IFuture add(double a, double b)
 	{
-		if(!isValid())
-			throw new RuntimeException();
-			
-		Future ret = new Future();
-		ret.setResult(new Double(a+b));
-		return ret;
+		return new Future(new Double(a+b));
 	}
 }

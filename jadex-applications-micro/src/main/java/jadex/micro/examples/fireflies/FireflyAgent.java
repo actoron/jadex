@@ -119,13 +119,4 @@ public class FireflyAgent extends MicroAgent
 		
 		waitForTick(step);
 	}
-	
-	//-------- static methods --------
-	
-	/**
-	 *  Get the meta information about the agent.
-	 * /
-	public static Object getMetaInfo()
-	{
-	}*/
 }

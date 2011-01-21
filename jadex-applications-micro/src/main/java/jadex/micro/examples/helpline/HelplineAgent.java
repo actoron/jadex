@@ -1,17 +1,18 @@
 package jadex.micro.examples.helpline;
 
-import jadex.bridge.Argument;
-import jadex.bridge.IArgument;
 import jadex.commons.SReflect;
-import jadex.commons.SUtil;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.concurrent.DefaultResultListener;
-import jadex.commons.service.ProvidedServiceInfo;
 import jadex.commons.service.RequiredServiceInfo;
+import jadex.commons.service.annotation.GuiClass;
 import jadex.commons.service.clock.IClockService;
 import jadex.micro.IMicroExternalAccess;
 import jadex.micro.MicroAgent;
-import jadex.micro.MicroAgentMetaInfo;
+import jadex.micro.annotation.Description;
+import jadex.micro.annotation.ProvidedService;
+import jadex.micro.annotation.ProvidedServices;
+import jadex.micro.annotation.RequiredService;
+import jadex.micro.annotation.RequiredServices;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -22,14 +23,14 @@ import javax.swing.SwingUtilities;
 /**
  *  Helpline micro agent. 
  */
-//@Description("This agent offers a helpline for getting information about missing persons.")
-//@RequiredServices({
-//	@RequiredService(name="clockservice", type=IClockService.class, scope=RequiredServiceInfo.SCOPE_PLATFORM),
-//	@RequiredService(name="remotehelplineservices", type=IHelpline.class, multiple=true, scope=RequiredServiceInfo.SCOPE_GLOBAL),
-//	@RequiredService(name="localhelplineservices", type=IHelpline.class, multiple=true, scope=RequiredServiceInfo.SCOPE_PLATFORM),
-//})
-//@ProvidedServices(@ProvidedService(type=IHelpline.class, expression="new HelplineService($component)"))
-//@GuiClass(HelplineViewerPanel.class)
+@Description("This agent offers a helpline for getting information about missing persons.")
+@RequiredServices({
+	@RequiredService(name="clockservice", type=IClockService.class, scope=RequiredServiceInfo.SCOPE_PLATFORM),
+	@RequiredService(name="remotehelplineservices", type=IHelpline.class, multiple=true, scope=RequiredServiceInfo.SCOPE_GLOBAL),
+	@RequiredService(name="localhelplineservices", type=IHelpline.class, multiple=true, scope=RequiredServiceInfo.SCOPE_PLATFORM),
+})
+@ProvidedServices(@ProvidedService(type=IHelpline.class, expression="new HelplineService($component)"))
+@GuiClass(HelplineViewerPanel.class)
 public class HelplineAgent extends MicroAgent
 {
 	//-------- attributes --------
@@ -97,17 +98,17 @@ public class HelplineAgent extends MicroAgent
 	
 	//-------- static methods --------
 
-	/**
-	 *  Get the meta information about the agent.
-	 */
-	public static MicroAgentMetaInfo getMetaInfo()
-	{
-		return new MicroAgentMetaInfo("This agent offers a helpline for getting information about missing persons.", null, 
-			new IArgument[]{new Argument("infos", "Initial information records.", "InformationEntry[]")}
-			, null, null, SUtil.createHashMap(new String[]{"componentviewer.viewerclass"}, new Object[]{"jadex.micro.examples.helpline.HelplineViewerPanel"}),
-			new RequiredServiceInfo[]{new RequiredServiceInfo("clockservice", IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM),
-			new RequiredServiceInfo("remotehelplineservices", IHelpline.class, true, true, RequiredServiceInfo.SCOPE_GLOBAL),
-			new RequiredServiceInfo("localhelplineservices", IHelpline.class, true, true, RequiredServiceInfo.SCOPE_PLATFORM)}, 
-			new ProvidedServiceInfo[]{new ProvidedServiceInfo(IHelpline.class)});
-	}
+//	/**
+//	 *  Get the meta information about the agent.
+//	 */
+//	public static MicroAgentMetaInfo getMetaInfo()
+//	{
+//		return new MicroAgentMetaInfo("This agent offers a helpline for getting information about missing persons.", null, 
+//			new IArgument[]{new Argument("infos", "Initial information records.", "InformationEntry[]")}
+//			, null, null, SUtil.createHashMap(new String[]{"componentviewer.viewerclass"}, new Object[]{"jadex.micro.examples.helpline.HelplineViewerPanel"}),
+//			new RequiredServiceInfo[]{new RequiredServiceInfo("clockservice", IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM),
+//			new RequiredServiceInfo("remotehelplineservices", IHelpline.class, true, true, RequiredServiceInfo.SCOPE_GLOBAL),
+//			new RequiredServiceInfo("localhelplineservices", IHelpline.class, true, true, RequiredServiceInfo.SCOPE_PLATFORM)}, 
+//			new ProvidedServiceInfo[]{new ProvidedServiceInfo(IHelpline.class)});
+//	}
 }
