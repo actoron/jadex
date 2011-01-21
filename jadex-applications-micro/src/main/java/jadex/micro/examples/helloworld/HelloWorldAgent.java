@@ -1,15 +1,18 @@
 package jadex.micro.examples.helloworld;
 
-import jadex.bridge.Argument;
-import jadex.bridge.IArgument;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.micro.MicroAgent;
-import jadex.micro.MicroAgentMetaInfo;
+import jadex.micro.annotation.Argument;
+import jadex.micro.annotation.Arguments;
+import jadex.micro.annotation.Description;
 
 /**
  *  The micro version of the hello world agent.
  */
+@Description("This agent prints out a hello message.")
+@Arguments(@Argument(name="welcome text", description= "This parameter is the text printed by the agent.", 
+	typename="String", defaultvalue="\"Hello world, this is a Jadex micro agent.\""))
 public class HelloWorldAgent extends MicroAgent
 {
 	//-------- methods --------
@@ -33,14 +36,14 @@ public class HelloWorldAgent extends MicroAgent
 	
 	//-------- static methods --------
 	
-	/**
-	 *  Get the meta information about the agent.
-	 */
-	public static MicroAgentMetaInfo getMetaInfo()
-	{
-		return new MicroAgentMetaInfo("This agent prints out a hello message.", 
-			null, new IArgument[]{
-			new Argument("welcome text", "This parameter is the text printed by the agent.", "String", "Hello world, this is a Jadex micro agent."),	
-			}, null);
-	}
+//	/**
+//	 *  Get the meta information about the agent.
+//	 */
+//	public static MicroAgentMetaInfo getMetaInfo()
+//	{
+//		return new MicroAgentMetaInfo("This agent prints out a hello message.", 
+//			null, new IArgument[]{
+//			new Argument("welcome text", "This parameter is the text printed by the agent.", "String", "Hello world, this is a Jadex micro agent."),	
+//			}, null);
+//	}
 }
