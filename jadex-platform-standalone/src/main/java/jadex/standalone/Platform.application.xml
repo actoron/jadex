@@ -144,6 +144,7 @@
 
 	<properties>
 		<property name="componentviewer.viewerclass">"jadex.base.gui.componentviewer.DefaultComponentServiceViewerPanel"</property>
+		<!-- <property name="viewerpanel.componentviewerclass">""</property> -->
 	</properties>
 	
 	<applications>
