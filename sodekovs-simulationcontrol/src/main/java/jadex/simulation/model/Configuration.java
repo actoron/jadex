@@ -273,7 +273,7 @@ public class Configuration implements Serializable{
 	public boolean atEnd() {
 		if(this.type.equalsIgnoreCase("space"))
 		{
-			if(this.getParameterSweepCounter() > ((Integer.parseInt(end) - Integer.parseInt(start)))/(Integer.parseInt(currentValue))+1)
+			if(this.getParameterSweepCounter() > ((Double.parseDouble(end) - Double.parseDouble(start)))/(Double.parseDouble(currentValue))+1)
 				return true;
 		}
 		else if(this.type.equalsIgnoreCase("list"))
