@@ -39,12 +39,14 @@ public class ProgressService extends BasicService implements IProgressService
 		// Task in progress.
 		if(taskid.equals(agent.getTaskId()))
 		{
+//			System.out.println("progress: "+agent.getProgress());
 			ret	= agent.getProgress();
 		}
 		
 		// Task not yet started.
 		else
 		{
+//			System.out.println("no progress: "+taskid+", "+agent.getTaskId());
 			ret	= 0;
 		}
 		

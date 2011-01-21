@@ -330,89 +330,97 @@ public class DisplayPanel extends JComponent
 					{
 						public void actionPerformed(ActionEvent e)
 						{
-							agent.scheduleStep(new IComponentStep()
+							if(calculating)
 							{
-								public Object execute(IInternalAccess ia)
+								agent.scheduleStep(new IComponentStep()
 								{
-									ia.getRequiredService("cmsservice")
-										.addResultListener(new SwingDefaultResultListener(DisplayPanel.this)
+									public Object execute(IInternalAccess ia)
 									{
-										public void customResultAvailable(Object result)
+										ia.getRequiredService("cmsservice")
+											.addResultListener(new SwingDefaultResultListener(DisplayPanel.this)
 										{
-											IComponentManagementService	cms	= (IComponentManagementService)result;
-											if(progressdata!=null)
+											public void customResultAvailable(Object result)
 											{
-												for(Iterator it=progressdata.keySet().iterator(); it.hasNext(); )
+												IComponentManagementService	cms	= (IComponentManagementService)result;
+												if(progressdata!=null)
 												{
-													final ProgressData	progress	= (ProgressData)it.next();
-													cms.getExternalAccess(progress.getProviderId())
-														.addResultListener(new SwingDefaultResultListener(DisplayPanel.this)
+													for(Iterator it=progressdata.keySet().iterator(); it.hasNext(); )
 													{
-														public void customResultAvailable(Object result)
+														final ProgressData	progress	= (ProgressData)it.next();
+														cms.getExternalAccess(progress.getProviderId())
+															.addResultListener(new SwingDefaultResultListener(DisplayPanel.this)
 														{
-															IExternalAccess	ea	= (IExternalAccess)result;
-															// It is not really possible to define the progress services as required service.
-															SServiceProvider.getService(ea.getServiceProvider(), IProgressService.class)
-																.addResultListener(new SwingDefaultResultListener(DisplayPanel.this)
+															public void customResultAvailable(Object result)
 															{
-																public void customResultAvailable(Object result)
+																IExternalAccess	ea	= (IExternalAccess)result;
+																// It is not really possible to define the progress services as required service.
+																SServiceProvider.getService(ea.getServiceProvider(), IProgressService.class)
+																	.addResultListener(new SwingDefaultResultListener(DisplayPanel.this)
 																{
-																	IProgressService	ps	= (IProgressService)result;
-																	if(ps!=null)
+																	public void customResultAvailable(Object result)
 																	{
-																		ps.getProgress(progress.getTaskId())
-																			.addResultListener(new SwingDefaultResultListener(DisplayPanel.this)
+																		IProgressService	ps	= (IProgressService)result;
+																		if(ps!=null)
 																		{
-																			public void customResultAvailable(Object result)
+																			ps.getProgress(progress.getTaskId())
+																				.addResultListener(new SwingDefaultResultListener(DisplayPanel.this)
 																			{
-																				if(progressdata!=null && progressdata.containsKey(progress))
+																				public void customResultAvailable(Object result)
 																				{
-																					Integer	current	= (Integer)result;
-																					Integer	percent	= (Integer)progressdata.get(progress);
-																					if(current.intValue()>percent.intValue())
+																					if(progressdata!=null && progressdata.containsKey(progress))
 																					{
-																						progressdata.put(progress, current);
-																						repaint();
+																						Integer	current	= (Integer)result;
+																						Integer	percent	= (Integer)progressdata.get(progress);
+																						if(current.intValue()>percent.intValue())
+																						{
+																							progressdata.put(progress, current);
+																							repaint();
+																						}
 																					}
 																				}
-																			}
-			
-																			public void customExceptionOccurred(Exception exception)
-																			{
-																				// ignore
-																				exception.printStackTrace();
-																			}
-																		});
+				
+																				public void customExceptionOccurred(Exception exception)
+																				{
+																					// ignore
+																					exception.printStackTrace();
+																				}
+																			});
+																		}
 																	}
-																}
-			
-																public void customExceptionOccurred(Exception exception)
-																{
-																	// ignore
-																	exception.printStackTrace();
-																}
-															});
-														}
-			
-														public void customExceptionOccurred(Exception exception)
-														{
-															// ignore
-															exception.printStackTrace();
-														}
-													});
+				
+																	public void customExceptionOccurred(Exception exception)
+																	{
+																		// ignore
+																		exception.printStackTrace();
+																	}
+																});
+															}
+				
+															public void customExceptionOccurred(Exception exception)
+															{
+																// ignore
+																exception.printStackTrace();
+															}
+														});
+													}
 												}
 											}
-										}
-	
-										public void customExceptionOccurred(Exception exception)
-										{
-											// ignore
-											exception.printStackTrace();
-										}
-									});
-									return null;
-								}
-							});
+		
+											public void customExceptionOccurred(Exception exception)
+											{
+												// ignore
+												exception.printStackTrace();
+											}
+										});
+										return null;
+									}
+								});
+							}
+							else
+							{
+								progressupdate.stop();
+								progressupdate	= null;
+							}
 						}
 					});
 					progressupdate.start();

@@ -68,12 +68,13 @@ public class ServicePoolManager
 	 *  Perform the given tasks using available or newly created services.
 	 *  @param tasks	The set of tasks to be performed.
 	 *  @param retry	True, when failed tasks should be retried.
+	 *  @param user	User data that is provided for service selection, creation, invocation (if any).
 	 *  @return	A future with intermediate and final results. 
 	 */
-	public IIntermediateFuture	performTasks(Set tasks, boolean retry)
+	public IIntermediateFuture	performTasks(Set tasks, boolean retry, Object user)
 	{
 		// Allocation data binds tasks together to a single result future.
-		AllocationData	ad	= new AllocationData(tasks.size(), retry);
+		AllocationData	ad	= new AllocationData(tasks.size(), retry, user);
 		
 		boolean	allassigned	= true;
 		for(Iterator it=tasks.iterator(); it.hasNext(); )
@@ -200,7 +201,7 @@ public class ServicePoolManager
 			final AllocationData	ad	= (AllocationData)this.tasks.remove(task);
 			System.out.println("busy service: "+service.getServiceIdentifier()+", "+task);
 			
-			handler.invokeService(service, task).addResultListener(
+			handler.invokeService(service, task, ad.getUserData()).addResultListener(
 				component.createResultListener(new IResultListener()
 			{
 				public void resultAvailable(Object result)
@@ -276,6 +277,9 @@ public class ServicePoolManager
 		/** The retry flag, i.e. if failed tasks should be assigned again. */
 		protected boolean	retry;
 		
+		/** The user data (if any). */
+		protected Object	user;
+		
 		/** The result future. */
 		protected IntermediateFuture	result;
 		
@@ -284,14 +288,24 @@ public class ServicePoolManager
 		/**
 		 *  Create a new allocation data.
 		 */
-		public AllocationData(int open, boolean retry)
+		public AllocationData(int open, boolean retry, Object user)
 		{
 			this.open	= open;
 			this.retry	= retry;
+			this.user	= user;
 			this.result	= new IntermediateFuture();
 		}
 		
 		//-------- methods --------
+		
+		/**
+		 *  Get the user data.
+		 *  @return The user data (if any).
+		 */
+		public Object	getUserData()
+		{
+			return user;
+		}
 		
 		/**
 		 *  Get the result.

@@ -44,8 +44,6 @@ public class ProgressData
 	 */
 	public ProgressData(IComponentIdentifier providerid, Object taskid, Rectangle area, boolean finished, int imagewidth, int imageheight)
 	{
-		if(taskid==null)
-			System.out.println("sdklfhsdkljbvlk");
 		this.providerid	= providerid;
 		this.taskid	= taskid;
 		this.area	= area;

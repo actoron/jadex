@@ -10,6 +10,7 @@ import jadex.commons.IIntermediateResultListener;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.DelegationResultListener;
+import jadex.commons.concurrent.IResultListener;
 import jadex.commons.service.BasicService;
 import jadex.commons.service.IService;
 import jadex.commons.service.RequiredServiceInfo;
@@ -54,11 +55,68 @@ public class GenerateService extends BasicService implements IGenerateService
 				return true;
 			}
 			
-			public IFuture invokeService(IService service, Object task)
+			public IFuture invokeService(final IService service, Object task, Object user)
 			{
-				AreaData	ad	= (AreaData)task;
+				final Future	ret	= new Future();
+				
+				final AreaData	ad	= (AreaData)task;	// single cutout of area
+				final AreaData	data	= (AreaData)user;	// global area
 				ad.setCalculatorId((IComponentIdentifier)service.getServiceIdentifier().getProviderId());
-				return ((ICalculateService)service).calculateArea(ad);
+				
+				agent.getRequiredService("displayservice").addResultListener(
+					agent.createResultListener(new DefaultResultListener()
+				{
+					public void resultAvailable(Object result)
+					{
+						final IDisplayService	ds	= (IDisplayService)result;
+						final ProgressData	pd	= new ProgressData(ad.getCalculatorId(), ad.getId(),
+							new Rectangle(ad.getXOffset(), ad.getYOffset(), ad.getSizeX(), ad.getSizeY()),
+							false, data.getSizeX(), data.getSizeY());
+						ds.displayIntermediateResult(pd).addResultListener(
+							agent.createResultListener(new DefaultResultListener()
+						{
+							public void resultAvailable(Object result)
+							{
+								((ICalculateService)service).calculateArea(ad).addResultListener(
+									agent.createResultListener(new DelegationResultListener(ret)
+								{
+									public void customResultAvailable(final Object calcresult)
+									{
+										pd.setFinished(true);
+										ds.displayIntermediateResult(pd).addResultListener(
+											agent.createResultListener(new IResultListener()
+										{
+											public void resultAvailable(Object result)
+											{
+												// Use result from calculation service instead of result from display service.
+												ret.setResult(calcresult);
+											}
+											
+											public void exceptionOccurred(Exception exception)
+											{
+												// Use result from calculation service instead of exception from display service.
+												ret.setResult(calcresult);
+											}
+										}));
+									}
+								}));
+							}
+							public void exceptionOccurred(Exception exception)
+							{
+								((ICalculateService)service).calculateArea(ad).addResultListener(
+									agent.createResultListener(new DelegationResultListener(ret)));
+							}
+						}));
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						((ICalculateService)service).calculateArea(ad).addResultListener(
+							agent.createResultListener(new DelegationResultListener(ret)));
+					}
+				}));
+				
+				return ret;
 			}
 			
 			public IFuture createService()
@@ -111,8 +169,6 @@ public class GenerateService extends BasicService implements IGenerateService
 	 */
 	public IFuture generateArea(final AreaData data)
 	{
-		final Future ret = new Future();	
-		
 		SwingUtilities.invokeLater(new Runnable()
 		{
 			public void run()
@@ -121,28 +177,16 @@ public class GenerateService extends BasicService implements IGenerateService
 			}
 		});
 		
-		agent.getRequiredService("displayservice").addResultListener(
-			agent.createResultListener(new DefaultResultListener()
-		{
-			public void resultAvailable(Object result)
-			{
-				IDisplayService ds = (IDisplayService)result;
-				distributeWork(data, ds, ret);
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				distributeWork(data, null, ret);
-			}
-		}));
-		return ret;
+		return distributeWork(data);
 	}
 	
 	/**
 	 *  Distribute the work to available or newly created calculation services.
 	 */
-	protected void	distributeWork(final AreaData data, final IDisplayService ds, final Future ret)
+	protected IFuture	distributeWork(final AreaData data)
 	{
+		final Future ret = new Future();	
+
 		// Split area into work units.
 		final Set	areas	= new HashSet();	// {AreaData}
 		int numx = Math.max((int)Math.sqrt((double)data.getSizeX()*data.getSizeY()*data.getMax()/(data.getTaskSize()*data.getTaskSize()*256)), 1);
@@ -183,7 +227,7 @@ public class GenerateService extends BasicService implements IGenerateService
 //				System.out.println("x:y: start "+x1+" "+(x1+xdiff)+" "+y1+" "+(y1+ydiff)+" "+xdiff);
 				areas.add(new AreaData(x1, xi==numx-1 && restx>0 ? x1+(xdiff*restx/sizex): x1+xdiff,
 					y1, yi==numy-1 && resty>0 ? y1+(ydiff*resty/sizey) : y1+ydiff,
-					xi, yi, xi==numx-1 && restx>0 ? restx : sizex, yi==numy-1 && resty>0 ? resty : sizey,
+					xi*sizex, yi*sizey, xi==numx-1 && restx>0 ? restx : sizex, yi==numy-1 && resty>0 ? resty : sizey,
 					data.getMax(), 0, 0, null, null));
 //				System.out.println("x:y: "+xi+" "+yi+" "+ad);
 				x1 += xdiff;
@@ -198,7 +242,7 @@ public class GenerateService extends BasicService implements IGenerateService
 		// Assign tasks to service pool.
 		final int number	= areas.size();
 		manager.setMax(data.getParallel());
-		manager.performTasks(areas, true).addResultListener(agent.createResultListener(
+		manager.performTasks(areas, true, data).addResultListener(agent.createResultListener(
 			new IIntermediateResultListener()
 		{
 			int	cnt	= 0;
@@ -217,8 +261,8 @@ public class GenerateService extends BasicService implements IGenerateService
 			public void intermediateResultAvailable(Object result)
 			{
 				AreaData ad = (AreaData)result;
-				int xs = ad.getXOffset()*sizex;
-				int ys = ad.getYOffset()*sizey;
+				int xs = ad.getXOffset();
+				int ys = ad.getYOffset();
 				
 				SwingUtilities.invokeLater(new Runnable()
 				{
@@ -227,12 +271,6 @@ public class GenerateService extends BasicService implements IGenerateService
 						panel.getStatusBar().setText("Finished: "+(++cnt)+"("+number+")");
 					}
 				});
-				
-				if(ds!=null)
-				{
-					ds.displayIntermediateResult(new ProgressData(ad.getCalculatorId(), ad.getId(),
-						new Rectangle(xs, ys, ad.getSizeX(), ad.getSizeY()), true, data.getSizeX(), data.getSizeY()));
-				}
 				
 	//			System.out.println("x:y: end "+xs+" "+ys);
 	//			System.out.println("partial: "+SUtil.arrayToString(ad.getData()));
@@ -257,5 +295,7 @@ public class GenerateService extends BasicService implements IGenerateService
 				ret.setResult(data);
 			}
 		}));
+		
+		return ret;
 	}
 }
