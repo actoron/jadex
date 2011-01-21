@@ -189,7 +189,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	//			System.out.println("here: "+typeinfo);
 				
 				String pck = tag.getNamespaceURI().substring(SXML.PROTOCOL_TYPEINFO.length());
-				String clazzname = pck+"."+tag.getLocalPart().replace("-", "$");
+				String clazzname = pck.length()>0? pck+"."+tag.getLocalPart().replace("-", "$"): tag.getLocalPart().replace("-", "$");
 //				System.out.println("Clazzname: "+clazzname);
 				
 				// Special case array

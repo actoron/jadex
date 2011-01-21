@@ -9,7 +9,7 @@ import jadex.commons.SUtil;
 public class ArrayHolder
 {
 	/** The array data. */
-	protected int[]				data;
+	protected int[] data;
 	
 	/**
 	 *  Create an empty array holder.
@@ -52,6 +52,6 @@ public class ArrayHolder
 	 */
 	public boolean equals(Object obj)
 	{
-		return obj instanceof ArrayHolder && SUtil.equals(data, ((ArrayHolder)obj).getData());
+		return obj instanceof ArrayHolder && SUtil.arrayEquals(data, ((ArrayHolder)obj).getData());
 	}
 }
