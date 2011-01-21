@@ -1,24 +1,28 @@
-package jadex.tools.daemon;
+package jadex.micro.examples.chat;
 
 import jadex.base.gui.componentviewer.AbstractComponentViewerPanel;
 import jadex.base.gui.plugin.IControlCenter;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
+import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
-import jadex.micro.IMicroExternalAccess;
+import jadex.commons.service.SServiceProvider;
 
 import javax.swing.JComponent;
+import javax.swing.JPanel;
 
 /**
- *  Panel for the daemon view.
+ *  Panel for the chat view.
  */
-public class DaemonViewerPanel extends AbstractComponentViewerPanel
+public class ChatViewerPanel extends AbstractComponentViewerPanel
 {
 	//-------- attributes --------
 	
 	/** The panel. */
-	protected DaemonPanel panel;
+	protected JPanel panel;
 	
 	//-------- methods --------
 	
@@ -35,7 +39,7 @@ public class DaemonViewerPanel extends AbstractComponentViewerPanel
 		{
 			public void resultAvailable(Object result)
 			{
-				panel = new DaemonPanel((IMicroExternalAccess)component);
+				panel = new ChatPanel((IExternalAccess)component);
 				ret.setResult(result);
 			}
 			
@@ -45,14 +49,6 @@ public class DaemonViewerPanel extends AbstractComponentViewerPanel
 			}
 		});
 		return ret;
-	}
-	
-	/**
-	 *  Informs the panel that it should stop all its computation
-	 */
-	public IFuture shutdown()
-	{
-		return panel.shutdown();
 	}
 	
 	/**

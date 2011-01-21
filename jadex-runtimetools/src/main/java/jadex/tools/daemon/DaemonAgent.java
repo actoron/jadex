@@ -6,6 +6,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.commons.ChangeEvent;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
+import jadex.commons.IRemoteChangeListener;
 import jadex.commons.SUtil;
 import jadex.commons.StreamCopy;
 import jadex.commons.concurrent.DelegationResultListener;

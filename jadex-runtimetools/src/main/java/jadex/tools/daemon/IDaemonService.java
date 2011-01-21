@@ -2,6 +2,7 @@ package jadex.tools.daemon;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.IFuture;
+import jadex.commons.IRemoteChangeListener;
 import jadex.commons.service.IService;
 
 /**

@@ -14,9 +14,12 @@ import jadex.micro.annotation.RequiredServices;
  */
 @Description("This agent offers a chat service.")
 @ProvidedServices(@ProvidedService(type=IChatService.class, expression="new ChatService($component)"))
-@RequiredServices(@RequiredService(name="chatservices", type=IChatService.class, 
-	multiple=true, scope=RequiredServiceInfo.SCOPE_GLOBAL))
-@GuiClass(ChatPanel.class)
+@RequiredServices({
+	@RequiredService(name="chatservices", type=IChatService.class, 
+	multiple=true, scope=RequiredServiceInfo.SCOPE_GLOBAL),
+	@RequiredService(name="mychatservice", type=IChatService.class, scope=RequiredServiceInfo.SCOPE_LOCAL)
+})
+@GuiClass(ChatViewerPanel.class)
 public class ChatAgent extends MicroAgent
 {
 }

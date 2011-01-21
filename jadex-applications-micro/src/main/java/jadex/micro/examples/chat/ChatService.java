@@ -1,7 +1,13 @@
 package jadex.micro.examples.chat;
 
 import jadex.bridge.IInternalAccess;
+import jadex.commons.ChangeEvent;
+import jadex.commons.IRemoteChangeListener;
+import jadex.commons.concurrent.IResultListener;
 import jadex.commons.service.BasicService;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *  Chat service implementation.
@@ -12,6 +18,9 @@ public class ChatService extends BasicService implements IChatService
 	
 	/** The agent. */
 	protected IInternalAccess agent;
+	
+	/** The listeners. */
+	protected List listeners;
 	
 	/** The chat gui. */
 	protected ChatPanel chatpanel;
@@ -25,6 +34,7 @@ public class ChatService extends BasicService implements IChatService
 	{
 		super(agent.getServiceProvider().getId(), IChatService.class, null);
 		this.agent = agent;
+		this.listeners = new ArrayList();
 		this.chatpanel = ChatPanel.createGui(agent.getExternalAccess());
 	}
 	
@@ -37,8 +47,39 @@ public class ChatService extends BasicService implements IChatService
 	 */
 	public void hear(String name, String text)
 	{
-		chatpanel.addMessage(name, text);
-		
+		for(int i=0; i<listeners.size(); i++)
+		{
+			System.out.println("listeners: "+listeners);
+			final IRemoteChangeListener lis = (IRemoteChangeListener)listeners.get(i);
+			lis.changeOccurred(new ChangeEvent(name, null, text))
+				.addResultListener(agent.createResultListener(new IResultListener()
+			{
+				public void resultAvailable(Object result)
+				{
+				}
+				
+				public void exceptionOccurred(Exception exception)
+				{
+					listeners.remove(lis);
+				}
+			}));
+		}
+	}
+	
+	/**
+	 *  Add a local listener.
+	 */
+	public void addChangeListener(IRemoteChangeListener listener)
+	{
+		listeners.add(listener);
+	}
+	
+	/**
+	 *  Remove a local listener.
+	 */
+	public void removeChangeListener(IRemoteChangeListener listener)
+	{
+		listeners.remove(listener);
 	}
 	
 	/**

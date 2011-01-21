@@ -5,8 +5,13 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.ChangeEvent;
+import jadex.commons.Future;
+import jadex.commons.IFuture;
 import jadex.commons.IIntermediateResultListener;
+import jadex.commons.IRemoteChangeListener;
 import jadex.commons.SGUI;
+import jadex.commons.concurrent.DefaultResultListener;
+import jadex.commons.concurrent.DelegationResultListener;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
@@ -68,6 +73,32 @@ public class ChatPanel extends JPanel
 		};
 		tf.addActionListener(al);
 		send.addActionListener(al);
+		
+		agent.scheduleStep(new IComponentStep()
+		{
+			public static final String XML_CLASSNAME = "addlistener"; 
+			public Object execute(IInternalAccess ia)
+			{
+				final Future ret = new Future();
+				ia.getRequiredService("mychatservice").addResultListener(
+					ia.createResultListener(new DelegationResultListener(ret)));
+				return ret;
+			}
+		}).addResultListener(new DefaultResultListener()
+		{
+			public void resultAvailable(Object result)
+			{
+				IChatService cs = (IChatService)result;
+				cs.addChangeListener(new IRemoteChangeListener()
+				{
+					public IFuture changeOccurred(ChangeEvent event)
+					{
+						addMessage((String)event.getSource(), (String)event.getValue());
+						return new Future(null);
+					}
+				});
+			}
+		});
 		
 		this.setLayout(new BorderLayout());
 		this.add(main, BorderLayout.CENTER);
