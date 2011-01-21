@@ -1,16 +1,23 @@
 package jadex.micro.examples.mandelbrot;
 
-import jadex.bridge.Argument;
-import jadex.bridge.IArgument;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.commons.service.ProvidedServiceInfo;
 import jadex.micro.MicroAgent;
-import jadex.micro.MicroAgentMetaInfo;
+import jadex.micro.annotation.Argument;
+import jadex.micro.annotation.Arguments;
+import jadex.micro.annotation.Description;
+import jadex.micro.annotation.ProvidedService;
+import jadex.micro.annotation.ProvidedServices;
 
 /**
  *  Calculate agent allows calculating the colors of an area using a calculate service.
  */
+@Description("Agent offering a calculate service.")
+@ProvidedServices({
+	@ProvidedService(type=ICalculateService.class, expression="new CalculateService($component)"),
+	@ProvidedService(type=IProgressService.class, expression="new ProgressService($component)", direct=true)
+	})
+@Arguments(@Argument(name="delay", description="Agent kills itself when no job arrives in the delay interval.", typename="Long", defaultvalue="new Long(1000)"))
 public class CalculateAgent extends MicroAgent
 {
 	//-------- attributes --------
@@ -26,18 +33,18 @@ public class CalculateAgent extends MicroAgent
 	
 	//-------- methods --------
 	
-	/**
-	 *  Called once after agent creation.
-	 */
-	public void agentCreated()
-	{
-		// Calculation service runs on component thread.
-		addService(new CalculateService(this));
-		
-		// Progress service runs on separate thread to provide
-		// progress information about running calculations.
-		addDirectService(new ProgressService(this));
-	}
+//	/**
+//	 *  Called once after agent creation.
+//	 */
+//	public void agentCreated()
+//	{
+//		// Calculation service runs on component thread.
+//		addService(new CalculateService(this));
+//		
+//		// Progress service runs on separate thread to provide
+//		// progress information about running calculations.
+//		addDirectService(new ProgressService(this));
+//	}
 	
 	/**
 	 *  Execute the body.
@@ -115,14 +122,14 @@ public class CalculateAgent extends MicroAgent
 	
 	//-------- static methods --------
 
-	/**
-	 *  Get the meta information about the agent.
-	 */
-	public static MicroAgentMetaInfo getMetaInfo()
-	{
-		return new MicroAgentMetaInfo("Agent offering a calculate service.", null, 
-			new IArgument[]{new Argument("delay", "Agent kills itself when no job arrives in the delay interval.", "Long", new Long(1000))},
-			null, null, null,
-			null, new ProvidedServiceInfo[]{new ProvidedServiceInfo(ICalculateService.class)});
-	}
+//	/**
+//	 *  Get the meta information about the agent.
+//	 */
+//	public static MicroAgentMetaInfo getMetaInfo()
+//	{
+//		return new MicroAgentMetaInfo("Agent offering a calculate service.", null, 
+//			new IArgument[]{new Argument("delay", "Agent kills itself when no job arrives in the delay interval.", "Long", new Long(1000))},
+//			null, null, null,
+//			null, new ProvidedServiceInfo[]{new ProvidedServiceInfo(ICalculateService.class)});
+//	}
 }

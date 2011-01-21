@@ -165,6 +165,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	{
 		// Try to read meta information from class.
 		MicroAgentMetaInfo metainfo = null;
+		String[] imports = new String[]{cma.getClass().getPackage().getName()+".*"};
 		
 		if(cma.isAnnotationPresent(Description.class))
 		{
@@ -223,8 +224,9 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 			IArgument[] tmpargs = new IArgument[vals.length];
 			for(int i=0; i<vals.length; i++)
 			{
+				Object arg = SJavaParser.evaluateExpression(vals[i].defaultvalue(), imports, null, classloader);
 				tmpargs[i] = new jadex.bridge.Argument(vals[i].name(), 
-					vals[i].description(), vals[i].typename(), vals[i].defaultvalue());
+					vals[i].description(), vals[i].typename(), arg);
 				argsmap.put(tmpargs[i].getName(), tmpargs[i]);
 			}
 			metainfo.setArguments(tmpargs);
@@ -239,8 +241,9 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 			IArgument[] tmpresults = new IArgument[vals.length];
 			for(int i=0; i<vals.length; i++)
 			{
+				Object res = SJavaParser.evaluateExpression(vals[i].defaultvalue(), imports, null, classloader);
 				tmpresults[i] = new jadex.bridge.Argument(vals[i].name(), 
-					vals[i].description(), vals[i].typename(), vals[i].defaultvalue());
+					vals[i].description(), vals[i].typename(), res);
 				resmap.put(tmpresults[i].getName(), tmpresults[i]);
 			}
 			metainfo.setResults(tmpresults);

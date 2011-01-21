@@ -11,6 +11,11 @@ import jadex.commons.service.ProvidedServiceInfo;
 import jadex.commons.service.RequiredServiceInfo;
 import jadex.micro.MicroAgent;
 import jadex.micro.MicroAgentMetaInfo;
+import jadex.micro.annotation.Description;
+import jadex.micro.annotation.ProvidedService;
+import jadex.micro.annotation.ProvidedServices;
+import jadex.micro.annotation.RequiredService;
+import jadex.micro.annotation.RequiredServices;
 
 import java.awt.BorderLayout;
 import java.awt.event.WindowAdapter;
@@ -26,6 +31,13 @@ import javax.swing.SwingUtilities;
 /**
  *  Agent offering a display service.
  */
+@Description("Agent offering a display service.")
+@ProvidedServices(@ProvidedService(type=IDisplayService.class, expression="new DisplayService($component)"))
+@RequiredServices({
+	@RequiredService(name="generateservice", type=IGenerateService.class),
+	@RequiredService(name="progressservice", type=IProgressService.class),
+	@RequiredService(name="cmsservice", type=IComponentManagementService.class, scope=RequiredServiceInfo.SCOPE_PLATFORM)
+})
 public class DisplayAgent extends MicroAgent
 {
 	//-------- attributes --------
@@ -43,7 +55,7 @@ public class DisplayAgent extends MicroAgent
 		// Hack!!! Swing code not on swing thread!?
 		DisplayAgent.this.panel	= new DisplayPanel(getExternalAccess());
 
-		addService(new DisplayService(this));
+//		addService(new DisplayService(this));
 		
 		final IExternalAccess	access	= getExternalAccess();
 		SwingUtilities.invokeLater(new Runnable()
@@ -120,18 +132,18 @@ public class DisplayAgent extends MicroAgent
 	
 	//-------- static methods --------
 
-	/**
-	 *  Get the meta information about the agent.
-	 */
-	public static MicroAgentMetaInfo getMetaInfo()
-	{
-		return new MicroAgentMetaInfo("Agent offering a display service.", null, null,
-			null, null, null,
-			new RequiredServiceInfo[]{
-				new RequiredServiceInfo("generateservice", IGenerateService.class), 
-				new RequiredServiceInfo("cmsservice", IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM),
-				new RequiredServiceInfo("progressservice", IProgressService.class), // not used
-						},
-			new ProvidedServiceInfo[]{new ProvidedServiceInfo(IDisplayService.class)});
-	}
+//	/**
+//	 *  Get the meta information about the agent.
+//	 */
+//	public static MicroAgentMetaInfo getMetaInfo()
+//	{
+//		return new MicroAgentMetaInfo("Agent offering a display service.", null, null,
+//			null, null, null,
+//			new RequiredServiceInfo[]{
+//				new RequiredServiceInfo("generateservice", IGenerateService.class), 
+//				new RequiredServiceInfo("cmsservice", IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM),
+//				new RequiredServiceInfo("progressservice", IProgressService.class), // not used
+//						},
+//			new ProvidedServiceInfo[]{new ProvidedServiceInfo(IDisplayService.class)});
+//	}
 }
