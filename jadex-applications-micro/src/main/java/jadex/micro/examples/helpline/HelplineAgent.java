@@ -14,6 +14,7 @@ import jadex.micro.MicroAgent;
 import jadex.micro.MicroAgentMetaInfo;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 
 import javax.swing.SwingUtilities;
@@ -90,7 +91,8 @@ public class HelplineAgent extends MicroAgent
 	 */
 	public Collection getInformation(String name)
 	{
-		return (Collection)infos.get(name);
+		Collection ret	= (Collection)infos.get(name); 
+		return ret!=null ? ret : Collections.EMPTY_LIST;
 	}
 	
 	//-------- static methods --------
