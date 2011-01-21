@@ -63,7 +63,8 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 		Object ret = future;
 		
 		ProxyInfo pi = pr.getProxyInfo();
-//		System.out.println("remote method invoc: "+method.getName());
+		if(method.getName().indexOf("calc")!=-1)
+			System.out.println("remote method invoc: "+method.getName());
 		
 		// Test if method is excluded.
 		if(pi.isExcluded(method))

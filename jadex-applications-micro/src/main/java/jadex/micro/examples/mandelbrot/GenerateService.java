@@ -8,7 +8,6 @@ import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.IIntermediateResultListener;
 import jadex.commons.SUtil;
-import jadex.commons.Tuple;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.service.BasicService;
@@ -184,9 +183,8 @@ public class GenerateService extends BasicService implements IGenerateService
 //				System.out.println("x:y: start "+x1+" "+(x1+xdiff)+" "+y1+" "+(y1+ydiff)+" "+xdiff);
 				areas.add(new AreaData(x1, xi==numx-1 && restx>0 ? x1+(xdiff*restx/sizex): x1+xdiff,
 					y1, yi==numy-1 && resty>0 ? y1+(ydiff*resty/sizey) : y1+ydiff,
-					xi==numx-1 && restx>0 ? restx : sizex, yi==numy-1 && resty>0 ? resty : sizey,
-					data.getMax(), 0, 0, new Tuple(new Integer(xi), new Integer(yi)),
-					null, null));
+					xi, yi, xi==numx-1 && restx>0 ? restx : sizex, yi==numy-1 && resty>0 ? resty : sizey,
+					data.getMax(), 0, 0, null, null));
 //				System.out.println("x:y: "+xi+" "+yi+" "+ad);
 				x1 += xdiff;
 			}
@@ -219,8 +217,8 @@ public class GenerateService extends BasicService implements IGenerateService
 			public void intermediateResultAvailable(Object result)
 			{
 				AreaData ad = (AreaData)result;
-				int xs = (int)((Number)((Tuple)ad.getId()).getEntity(0)).intValue()*sizex;
-				int ys = (int)((Number)((Tuple)ad.getId()).getEntity(1)).intValue()*sizey;
+				int xs = ad.getXOffset()*sizex;
+				int ys = ad.getYOffset()*sizey;
 				
 				SwingUtilities.invokeLater(new Runnable()
 				{

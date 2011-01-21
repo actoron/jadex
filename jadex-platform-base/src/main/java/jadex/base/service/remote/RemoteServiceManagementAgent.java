@@ -1,6 +1,7 @@
 package jadex.base.service.remote;
 
 import jadex.base.fipa.SFipa;
+import jadex.base.service.remote.commands.RemoteMethodInvocationCommand;
 import jadex.base.service.remote.commands.RemoteResultCommand;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.MessageType;
@@ -101,6 +102,12 @@ public class RemoteServiceManagementAgent extends MicroAgent
 					// Hack!!! Manual decoding for using custom class loader.
 					final ILibraryService ls = (ILibraryService)result;
 					Object	content	= msg.get(SFipa.CONTENT);
+					
+					if(content.toString().indexOf("calc")!=-1)
+					{
+						System.out.println("com: "+content);
+					}
+
 					if(content instanceof String)
 					{
 						// Catch decode problems.
@@ -123,19 +130,26 @@ public class RemoteServiceManagementAgent extends MicroAgent
 								else
 								{
 									content	= null;
+									getLogger().warning("Remote service management service could not decode message."+content);
 								}
 							}
 						}
 						catch(Exception e)
 						{
 							content	= null;
-//							getLogger().warning("Remote service management service could not decode message."+content);
+							getLogger().warning("Remote service management service could not decode message."+content);
 						}
 					}
 					
 					if(content instanceof IRemoteCommand)
 					{
 						final IRemoteCommand com = (IRemoteCommand)content;
+						if(com instanceof RemoteMethodInvocationCommand
+							&& ((RemoteMethodInvocationCommand)com).getMethodName().indexOf("calc")!=-1)
+						{
+							System.out.println("com: "+com);
+						}
+						
 						com.execute((IMicroExternalAccess)getExternalAccess(), rms).addResultListener(createResultListener(new DefaultResultListener()
 						{
 							public void resultAvailable(Object result)

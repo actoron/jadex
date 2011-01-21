@@ -61,7 +61,7 @@ public class JavaCCExpressionParser	implements IExpressionParser, Serializable
 //		}
 		catch(Throwable e)
 		{
-			e.printStackTrace();
+//			e.printStackTrace();
 			String	msg	= e.getMessage();
 			int	index	= msg.indexOf("Was expecting one of");
 			if(index!=-1)

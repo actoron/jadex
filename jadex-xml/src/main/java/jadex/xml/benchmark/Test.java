@@ -55,6 +55,7 @@ public class Test //extends TestCase
 				t.testEmptyArray();
 				t.testArrayOrder();
 				t.testMultiArray();
+				t.testMultiArrayAttribute();
 				t.testVectorModel();
 				t.testClass();
 				t.testDate();
@@ -165,6 +166,22 @@ public class Test //extends TestCase
 		data[0][7] = new Long(2);
 		
 		doWriteAndRead(data);
+	}
+	
+	/**
+	 *  Test if multi array attribute transfer works.
+	 */
+	public void testMultiArrayAttribute() throws Exception
+	{
+//		int[][]	data	= new int[][]
+//		{
+//			{1, 2, 3},
+//			{4, 5, 6}
+//		};
+		ArrayHolder	ad	= new ArrayHolder();
+		ad.setData(new int[]{1,2,3});
+		
+		doWriteAndRead(ad);
 	}
 	
 	/**

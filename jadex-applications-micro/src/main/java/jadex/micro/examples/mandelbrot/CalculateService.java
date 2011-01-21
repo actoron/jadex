@@ -32,7 +32,7 @@ public class CalculateService extends BasicService implements ICalculateService
 	 */
 	public IFuture calculateArea(AreaData data)
 	{
-//		System.out.println("calc: "+data.getId()+" "+agent.getComponentIdentifier());
+		System.out.println("calc: "+data.getId()+" "+agent.getComponentIdentifier());
 		
 		agent.setHadJob(true);
 		agent.setTaskId(data.getId());

@@ -20,6 +20,12 @@ public class AreaData
 	/** The y end. */
 	protected double				yend;
 
+	/** The x offset. */
+	protected int					xoff;
+
+	/** The y offset. */
+	protected int					yoff;
+
 	/** The x size. */
 	protected int					sizex;
 
@@ -32,9 +38,6 @@ public class AreaData
 	/** The number of parallel workers. */
 	protected int					par;
 
-	/** The id. */
-	protected Object				id;
-
 	/** The calculator service provider id. */
 	protected IComponentIdentifier	cid;
 
@@ -43,43 +46,42 @@ public class AreaData
 
 	/** The result data. */
 	protected int[][]				data;
-
+	
 	/**
-	 * Create a new area data.
+	 *  Create an empty area data.
 	 */
-	public AreaData(double xstart, double xend, double ystart, double yend,
-			int sizex, int sizey, int max)
+	public AreaData()
 	{
-		this(xstart, xend, ystart, yend, sizex, sizey, max, 0, 0, null, null, null);
+		// bean constructor
 	}
-
+	
 	/**
 	 * Create a new area data.
 	 */
 	public AreaData(double xstart, double xend, double ystart, double yend,
 			int sizex, int sizey, int max, int par, int tasksize)
 	{
-		this(xstart, xend, ystart, yend, sizex, sizey, max, par, tasksize,
-				null, null, null);
+		this(xstart, xend, ystart, yend, 0, 0, sizex, sizey, max, par, tasksize, null, null);
 	}
 
 	/**
 	 * Create a new area data.
 	 */
 	public AreaData(double xstart, double xend, double ystart, double yend,
-			int sizex, int sizey, int max, int par, int tasksize, Object id,
+			int xoff, int yoff, int sizex, int sizey, int max, int par, int tasksize,
 			IComponentIdentifier cid, int[][] data)
 	{
 		this.xstart = xstart;
 		this.xend = xend;
 		this.ystart = ystart;
 		this.yend = yend;
+		this.xoff = xoff;
+		this.yoff = yoff;
 		this.sizex = sizex;
 		this.sizey = sizey;
 		this.max = max;
 		this.par = par;
 		this.tasksize = tasksize;
-		this.id = id;
 		this.cid = cid;
 		this.data = data;
 	}
@@ -162,6 +164,46 @@ public class AreaData
 	public void setYEnd(double yend)
 	{
 		this.yend = yend;
+	}
+
+	/**
+	 * Get the x offset.
+	 * 
+	 * @return the x offset.
+	 */
+	public int getXOffset()
+	{
+		return xoff;
+	}
+
+	/**
+	 * Set the x offset.
+	 * 
+	 * @param xoff The x offset to set.
+	 */
+	public void setXOffset(int xoff)
+	{
+		this.xoff = xoff;
+	}
+
+	/**
+	 * Get the y offset.
+	 * 
+	 * @return the y offset.
+	 */
+	public int getYOffset()
+	{
+		return yoff;
+	}
+
+	/**
+	 * Set the y offset.
+	 * 
+	 * @param yoff The y offset to set.
+	 */
+	public void setYOffset(int yoff)
+	{
+		this.yoff = yoff;
 	}
 
 	/**
@@ -265,26 +307,6 @@ public class AreaData
 	}
 
 	/**
-	 * Get the id.
-	 * 
-	 * @return the id.
-	 */
-	public Object getId()
-	{
-		return id;
-	}
-
-	/**
-	 * Set the id.
-	 * 
-	 * @param id The id to set.
-	 */
-	public void setId(Object id)
-	{
-		this.id = id;
-	}
-
-	/**
 	 * Get the calculator id.
 	 * 
 	 * @return the calculator id.
@@ -295,7 +317,7 @@ public class AreaData
 	}
 
 	/**
-	 * Set the calculatorid.
+	 * Set the calculator id.
 	 * 
 	 * @param id The calculator id to set.
 	 */
@@ -326,7 +348,15 @@ public class AreaData
 
 	public String toString()
 	{
-		return "AreaData(id=" + id + ")";
+		return "AreaData(x="+xoff+", y="+yoff+")";
+	}
+	
+	/**
+	 *	Value for identifying this area data. 
+	 */
+	public Object getId()
+	{
+		return toString();
 	}
 
 	// /**
