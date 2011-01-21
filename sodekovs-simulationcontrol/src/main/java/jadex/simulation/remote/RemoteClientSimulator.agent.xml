@@ -7,11 +7,6 @@
 	name="RemoteClientSimulator" package="jadex.simulation.remote">
 
 	<imports>
-		<import>jadex.base.contextservice.*</import>
-		<import>jadex.base.appdescriptor.*</import>
-		<import>jadex.base.envsupport.environment.space2d.*</import>
-		<import>jadex.base.envsupport.environment.*</import>
-		<import>jadex.base.envsupport.math.*</import>
 		<import>jadex.base.fipa.*</import>
 		<import>java.util.*</import>
 		<import>java.util.logging.*</import>
@@ -71,7 +66,7 @@
 	</properties>
 
 	<services>
-		<providedservice class="IRemoteSimulationExecutionService">new RemoteSimulationExecutionService($scope, "betaTest01")</providedservice>
+		<providedservice class="IRemoteSimulationExecutionService">new RemoteSimulationExecutionService($scope)</providedservice>
 	</services>	
 
 </agent>

@@ -18,6 +18,7 @@ import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.IFuture;
 import jadex.commons.SReflect;
+import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.clock.IClockService;
 import jadex.commons.service.library.ILibraryService;
@@ -64,7 +65,7 @@ public class RuntimeManagerPlan extends Plan {
 	 * agent
 	 */
 	private IApplicationExternalAccess exta = null;
-	private IClockService clockservice = (IClockService) SServiceProvider.getService(getScope().getServiceProvider(), IClockService.class).get(this);
+	private IClockService clockservice = (IClockService) SServiceProvider.getService(getScope().getServiceProvider(), IClockService.class,RequiredServiceInfo.SCOPE_PLATFORM).get(this);
 	IComponentManagementService cms = null;
 	private OnlineVisualisation vis = null;
 	private String appFilePath = null;
@@ -72,7 +73,7 @@ public class RuntimeManagerPlan extends Plan {
 	public void body() {
 		HashMap<String,Object> clientConfMap = (HashMap<String, Object>) getParameter("clientConf").getValue();
 		SimulationConfiguration simConf  = (SimulationConfiguration) XMLHandler.parseXMLFromString((String) clientConfMap.get(Constants.CONFIGURATION_FILE_AS_XML_STRING), SimulationConfiguration.class);
-		cms = (IComponentManagementService) SServiceProvider.getService(getScope().getServiceProvider(), IComponentManagementService.class).get(this);
+		cms = (IComponentManagementService) SServiceProvider.getService(getScope().getServiceProvider(), IComponentManagementService.class,RequiredServiceInfo.SCOPE_PLATFORM).get(this);
 //		HashMap simFacts = (HashMap) getBeliefbase().getBelief("simulationFacts").getFact();
 		
 		
@@ -322,7 +323,7 @@ public class RuntimeManagerPlan extends Plan {
 				Class clazz = null;
 				try {
 					clazz = SReflect.findClass(dcon.getClazz(), toStringArray((ArrayList<String>) simConf.getImports().getImport()),
-							((ILibraryService) SServiceProvider.getService(getScope().getServiceProvider(), ILibraryService.class).get(this)).getClassLoader());
+							((ILibraryService) SServiceProvider.getService(getScope().getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(this)).getClassLoader());
 
 				} catch (ClassNotFoundException e) {
 					// TODO Auto-generated catch block

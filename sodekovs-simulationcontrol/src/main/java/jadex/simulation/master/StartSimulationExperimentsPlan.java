@@ -147,7 +147,7 @@ public class StartSimulationExperimentsPlan extends Plan {
 	private void startApplication(String appName, String fileName, String configName, Map args) {
 
 		try {
-			IComponentManagementService executionService = (IComponentManagementService) SServiceProvider.getService(getScope().getServiceProvider(), IComponentManagementService.class).get(this);
+			IComponentManagementService executionService = (IComponentManagementService) SServiceProvider.getService(getScope().getServiceProvider(), IComponentManagementService.class,RequiredServiceInfo.SCOPE_PLATFORM).get(this);
 
 			// create application
 			IFuture fut = executionService.createComponent(appName, fileName, new CreationInfo(configName, args, null, false, false), null);

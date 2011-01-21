@@ -20,9 +20,6 @@ public class RemoteSimulationExecutionService extends BasicService implements IR
 	/** The component. */
 	protected ICapability comp;
 
-	/** The name of the platform. */
-	protected String name;
-
 	// -------- constructors --------
 
 	/**
@@ -31,12 +28,11 @@ public class RemoteSimulationExecutionService extends BasicService implements IR
 	 * @param comp
 	 *            The active component.
 	 */
-	public RemoteSimulationExecutionService(ICapability comp, String name) {
+	public RemoteSimulationExecutionService(ICapability comp) {
 		super(comp.getServiceProvider().getId(), IRemoteSimulationExecutionService.class, null);
 
 		// System.out.println("created: "+name);
 		this.comp = comp;
-		this.name = name;
 	}
 
 	// -------- methods --------
@@ -46,9 +42,9 @@ public class RemoteSimulationExecutionService extends BasicService implements IR
 	 * 
 	 * @return The name.
 	 */
-	public String getPlatformName() {
-		return name;
-	}
+//	public String getPlatformName() {
+//		return name;
+//	}
 
 	/**
 	 * Simulate an experiment defined as application.xml and configured via an "*.configuration.xml"
@@ -92,12 +88,12 @@ public class RemoteSimulationExecutionService extends BasicService implements IR
 		return ret;
 	}
 
-	/**
-	 * Get the string representation.
-	 * 
-	 * @return The string representation.
-	 */
-	public String toString() {
-		return name;
-	}
+//	/**
+//	 * Get the string representation.
+//	 * 
+//	 * @return The string representation.
+//	 */
+//	public String toString() {
+//		return name;
+//	}
 }

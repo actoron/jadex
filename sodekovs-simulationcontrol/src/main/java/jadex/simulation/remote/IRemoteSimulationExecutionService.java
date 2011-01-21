@@ -14,11 +14,11 @@ import java.util.Map;
 @Timeout(1000000000)
 public interface IRemoteSimulationExecutionService	extends IService
 {
-	/**
-	 *  Get the name of the platform. 
-	 *  @return The name of the platform.
-	 */
-	public String getPlatformName();
+//	/**
+//	 *  Get the name of the platform. 
+//	 *  @return The name of the platform.
+//	 */
+//	public String getPlatformName();
 	
 	/**
 	 *  Simulate an experiment defined as application.xml and configured via a "*.configuration.xml" file

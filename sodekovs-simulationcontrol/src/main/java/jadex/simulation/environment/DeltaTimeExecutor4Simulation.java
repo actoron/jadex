@@ -376,7 +376,7 @@ public class DeltaTimeExecutor4Simulation extends SimplePropertyObject implement
 //		}
 //	
 //		IFuture fut = ((IComponentManagementService) space.getContext().getServiceContainer().getService(IComponentManagementService.class)).getExternalAccess(clientSimulationAgent);
-//		IFuture fut = ((IComponentManagementService)SServiceProvider.getService(getScope().getServiceProvider(), IComponentManagementService.class)).getExternalAccess(clientSimulationAgent);
+//		IFuture fut = ((IComponentManagementService)SServiceProvider.getService(getScope().getServiceProvider(), IComponentManagementService.class,RequiredServiceInfo.SCOPE_PLATFORM)).getExternalAccess(clientSimulationAgent);
 //		fut.addResultListener(new IResultListener() {
 //
 //			@Override

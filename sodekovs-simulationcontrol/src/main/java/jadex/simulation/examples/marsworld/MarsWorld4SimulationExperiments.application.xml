@@ -33,7 +33,7 @@
 		<import>jadex.application.space.envsupport.evaluation.*</import>
 		<import>jadex.application.space.envsupport.observer.gui.plugin.*</import>
 		<import>jadex.commons.service.clock.IClockService</import>
-		<import>jadex.commons.service.SServiceProvider</import>
+		<import>jadex.commons.service.*</import>
 		<import>jadex.commons.IFuture</import>
 		<import>jadex.simulation.environment.*</import>
 		<import>jadex.application.space.envsupport.evaluation.*</import>
@@ -241,7 +241,7 @@
 	<properties>
 		<property name="clock" class="IFuture">
 			SServiceProvider.getService($component.getServiceProvider(),
-			IClockService.class)
+			IClockService.class,RequiredServiceInfo.SCOPE_PLATFORM)
 		</property>
 	</properties>
 
