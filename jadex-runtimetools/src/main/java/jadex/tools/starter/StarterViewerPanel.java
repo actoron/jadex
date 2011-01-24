@@ -2,6 +2,7 @@ package jadex.tools.starter;
 
 import jadex.base.gui.componentviewer.AbstractServiceViewerPanel;
 import jadex.base.gui.plugin.IControlCenter;
+import jadex.bridge.IComponentManagementService;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.concurrent.IResultListener;
@@ -34,7 +35,7 @@ public class StarterViewerPanel extends AbstractServiceViewerPanel
 		{
 			public void resultAvailable(Object result)
 			{
-				panel = new StarterServicePanel(jcc);
+				panel = new StarterServicePanel(jcc, (IComponentManagementService)service);
 				ret.setResult(result);
 			}
 			

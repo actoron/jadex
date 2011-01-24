@@ -5,7 +5,6 @@ import jadex.commons.IFuture;
 import jadex.commons.IIntermediateFuture;
 import jadex.commons.IntermediateDelegationResultListener;
 import jadex.commons.IntermediateFuture;
-import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.DelegationResultListener;
 
 import java.util.Collection;

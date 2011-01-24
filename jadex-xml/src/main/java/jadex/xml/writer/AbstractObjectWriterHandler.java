@@ -361,10 +361,10 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 //				System.out.println("Special case for content: "+object+" "+object.getClass());
 				wi.setContent(object.toString());
 			}
-			else
-			{
-				throw new RuntimeException("Unhandled object: "+object);
-			}
+//			else
+//			{
+//				throw new RuntimeException("Unhandled object: "+object);
+//			}
 		}
 		
 //		System.out.println("wi: "+object+" "+wi.getContent()+" "+wi.getSubobjects());

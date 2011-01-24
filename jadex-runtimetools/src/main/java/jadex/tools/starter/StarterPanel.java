@@ -11,6 +11,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IErrorReport;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IModelInfo;
 import jadex.commons.FixedJComboBox;
@@ -333,7 +334,7 @@ public class StarterPanel extends JPanel
 											{
 												Future fut = new Future();
 												IResultListener killlistener = dokilllis? new KillListener(mymodel, fullname, fut, StarterPanel.this): null;
-												createComponent(StarterPanel.this.jcc, typename, an, configname, args, 
+												createComponent(StarterPanel.this.jcc.getExternalAccess(), StarterPanel.this.jcc, typename, an, configname, args, 
 													suspend.isSelected()? Boolean.TRUE: Boolean.FALSE, 
 													mastercb.isSelected()? Boolean.TRUE: Boolean.FALSE, 
 													daemoncb.isSelected()? Boolean.TRUE: Boolean.FALSE, 
@@ -345,7 +346,7 @@ public class StarterPanel extends JPanel
 										{
 											Future fut = new Future();
 											IResultListener killlistener = dokilllis? new KillListener(mymodel, fullname, fut, StarterPanel.this): null;
-											createComponent(StarterPanel.this.jcc, typename, an, configname, args, 
+											createComponent(StarterPanel.this.jcc.getExternalAccess(), StarterPanel.this.jcc, typename, an, configname, args, 
 												suspend.isSelected()? Boolean.TRUE: Boolean.FALSE, 
 												mastercb.isSelected()? Boolean.TRUE: Boolean.FALSE, 
 												daemoncb.isSelected()? Boolean.TRUE: Boolean.FALSE, 
@@ -1439,11 +1440,11 @@ public class StarterPanel extends JPanel
 	 *  Create a new component on the platform.
 	 *  Any errors will be displayed in a dialog to the user.
 	 */
-	public static IFuture createComponent(final IControlCenter jcc, final String type, final String name, final String configname, final Map arguments, final Boolean suspend, 
+	public static IFuture createComponent(final IExternalAccess exta, final IControlCenter jcc, final String type, final String name, final String configname, final Map arguments, final Boolean suspend, 
 		final Boolean master, final Boolean daemon, final Boolean autosd, final IResultListener killlistener, final IComponentIdentifier parco, final JComponent panel)
 	{
 		final Future ret = new Future(); 
-		jcc.getExternalAccess().scheduleStep(new IComponentStep()
+		exta.scheduleStep(new IComponentStep()
 		{
 			public static final String XML_CLASSNAME = "create-component";
 			public Object execute(IInternalAccess ia)

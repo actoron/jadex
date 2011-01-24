@@ -5,16 +5,25 @@ import jadex.base.gui.componenttree.ComponentTreePanel;
 import jadex.base.gui.plugin.IControlCenter;
 import jadex.bridge.ICMSComponentListener;
 import jadex.bridge.IComponentDescription;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IModelInfo;
+import jadex.commons.Future;
+import jadex.commons.IFuture;
 import jadex.commons.SGUI;
 import jadex.commons.ThreadSuspendable;
 import jadex.commons.concurrent.DefaultResultListener;
+import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.commons.gui.IMenuItemConstructor;
 import jadex.commons.gui.PopupBuilder;
+import jadex.commons.service.IService;
+import jadex.commons.service.IServiceProvider;
+import jadex.commons.service.RequiredServiceInfo;
+import jadex.commons.service.SServiceProvider;
 import jadex.tools.common.modeltree.FileNode;
 import jadex.tools.common.modeltree.IExplorerTreeNode;
 import jadex.tools.common.modeltree.ModelExplorer;
@@ -79,151 +88,165 @@ public class StarterServicePanel extends JPanel implements ICMSComponentListener
     /** The jcc. */
     protected IControlCenter jcc;
     
+    /** The service. */
+    protected IComponentManagementService cms;
+    
+    /** The component. */
+    protected IExternalAccess exta;
+    
 	//-------- constructors --------
 
 	/**
 	 * Open the GUI.
 	 * @param starter The starter.
 	 */
-	public StarterServicePanel(final IControlCenter jcc)
+	public StarterServicePanel(final IControlCenter jcc, IComponentManagementService cms)
 	{
 		super(new BorderLayout());
-		this.jcc	= jcc;
+		this.jcc = jcc;
+		this.cms = (IComponentManagementService)cms;
 		
-		System.out.println("jcc: "+jcc);
+		getComponentForService(jcc.getExternalAccess().getServiceProvider(), cms)
+			.addResultListener(new SwingDefaultResultListener()
+		{
+			public void customResultAvailable(Object result)
+			{				
+				exta = (IExternalAccess)result;
+				
+				csplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true);
+				csplit.setOneTouchExpandable(true);
 		
-		csplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true);
-		csplit.setOneTouchExpandable(true);
-
-		lsplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, true);
-		lsplit.setOneTouchExpandable(true);
-		lsplit.setResizeWeight(0.7);
-
-		mpanel = new ModelExplorer(jcc.getExternalAccess().getServiceProvider(), new StarterNodeFunctionality(jcc));
-//		mpanel.setAction(FileNode.class, new INodeAction()
-//		{
-//			public void validStateChanged(TreeNode node, boolean valid)
-//			{
-//				String file1 = ((FileNode)node).getFile().getAbsolutePath();
-//				String file2 = spanel.getFilename();
-//				//System.out.println(file1+" "+file2);
-//				if(file1!=null && file1.equals(file2))
-//				{
-//					spanel.reloadModel(file1);
-//				}
-//			}
-//		});
-		mpanel.setPopupBuilder(new PopupBuilder(new Object[]{new StartComponentMenuItemConstructor(), mpanel.ADD_PATH,
-			mpanel.REMOVE_PATH, mpanel.REFRESH}));
-		mpanel.addTreeSelectionListener(new TreeSelectionListener()
-		{
-			public void valueChanged(TreeSelectionEvent e)
-			{
-				Object	node = mpanel.getLastSelectedPathComponent();
-				if(node instanceof FileNode)
+				lsplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, true);
+				lsplit.setOneTouchExpandable(true);
+				lsplit.setResizeWeight(0.7);
+		
+				mpanel = new ModelExplorer(jcc.getExternalAccess().getServiceProvider(), new StarterNodeFunctionality(jcc));
+		//		mpanel.setAction(FileNode.class, new INodeAction()
+		//		{
+		//			public void validStateChanged(TreeNode node, boolean valid)
+		//			{
+		//				String file1 = ((FileNode)node).getFile().getAbsolutePath();
+		//				String file2 = spanel.getFilename();
+		//				//System.out.println(file1+" "+file2);
+		//				if(file1!=null && file1.equals(file2))
+		//				{
+		//					spanel.reloadModel(file1);
+		//				}
+		//			}
+		//		});
+				mpanel.setPopupBuilder(new PopupBuilder(new Object[]{new StartComponentMenuItemConstructor(), mpanel.ADD_PATH,
+					mpanel.REMOVE_PATH, mpanel.REFRESH}));
+				mpanel.addTreeSelectionListener(new TreeSelectionListener()
 				{
-					// Models have to be loaded with absolute path.
-					// An example to facilitate understanding:
-					// root
-					//  +-classes1
-					//  |  +- MyComponent.component.xml
-					//  +-classes2
-					//  |  +- MyComponent.component.xml
-
-					final String model = ((FileNode)node).getRelativePath();
-//					if(getJCC().getComponent().getPlatform().getComponentFactory().isLoadable(model))
-					SComponentFactory.isLoadable(jcc.getExternalAccess().getServiceProvider(), model).addResultListener(new SwingDefaultResultListener(spanel)
-					{
-						public void customResultAvailable(Object result)
-						{
-							if(((Boolean)result).booleanValue())
-								loadModel(model);
-						}
-					});
-//					else if(getJCC().getComponent().getPlatform().getApplicationFactory().isLoadable(model))
-//					{
-//						loadModel(model);
-//					}
-				}
-			}
-		});
-		MouseListener ml = new MouseAdapter()
-		{
-			public void mousePressed(MouseEvent e)
-			{
-				int row = mpanel.getRowForLocation(e.getX(), e.getY());
-				if(row != -1)
-				{
-					if(e.getClickCount() == 2)
+					public void valueChanged(TreeSelectionEvent e)
 					{
 						Object	node = mpanel.getLastSelectedPathComponent();
 						if(node instanceof FileNode)
 						{
-							mpanel.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-							final String type = ((FileNode)node).getFile().getAbsolutePath();
-//							if(getJCC().getComponent().getPlatform().getComponentFactory().isStartable(type))
-							// todo: resultcollect = false?
-							SComponentFactory.isStartable(jcc.getExternalAccess().getServiceProvider(), type).addResultListener(new SwingDefaultResultListener(spanel)
+							// Models have to be loaded with absolute path.
+							// An example to facilitate understanding:
+							// root
+							//  +-classes1
+							//  |  +- MyComponent.component.xml
+							//  +-classes2
+							//  |  +- MyComponent.component.xml
+		
+							final String model = ((FileNode)node).getRelativePath();
+		//					if(getJCC().getComponent().getPlatform().getComponentFactory().isLoadable(model))
+							SComponentFactory.isLoadable(jcc.getExternalAccess().getServiceProvider(), model).addResultListener(new SwingDefaultResultListener(spanel)
 							{
 								public void customResultAvailable(Object result)
 								{
 									if(((Boolean)result).booleanValue())
-										StarterPanel.createComponent(jcc, type, null, null, null, false, null, null, null, null, null, StarterServicePanel.this);
-									mpanel.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+										loadModel(model);
 								}
 							});
+		//					else if(getJCC().getComponent().getPlatform().getApplicationFactory().isLoadable(model))
+		//					{
+		//						loadModel(model);
+		//					}
 						}
 					}
-				}
-      		}
-  		};
-  		mpanel.addMouseListener(ml);
-
-		comptree = new ComponentTreePanel(jcc.getExternalAccess(), JSplitPane.HORIZONTAL_SPLIT);
-		comptree.setMinimumSize(new Dimension(0, 0));
-		
-		lsplit.add(new JScrollPane(mpanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-			JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED));
-//		lsplit.add(tp);
-		lsplit.add(comptree);
-		lsplit.setDividerLocation(300);
-
-		csplit.add(lsplit);
-		spanel = new StarterPanel(jcc);
-		csplit.add(spanel);
-		csplit.setDividerLocation(180);
-            			
-//		jcc.addComponentListListener(this);
-		
-		// todo: ?! is this ok?
-		
-		jcc.getExternalAccess().scheduleStep(new IComponentStep()
-		{
-			public static final String XML_CLASSNAME = "add-component-listener";
-			public Object execute(IInternalAccess ia)
-			{
-				ia.getRequiredService("cms").addResultListener(new DefaultResultListener()
+				});
+				MouseListener ml = new MouseAdapter()
 				{
-					public void resultAvailable(Object result)
+					public void mousePressed(MouseEvent e)
 					{
-						IComponentManagementService ces = (IComponentManagementService)result;
-						ces.getComponentDescriptions().addResultListener(new DefaultResultListener()
+						int row = mpanel.getRowForLocation(e.getX(), e.getY());
+						if(row != -1)
+						{
+							if(e.getClickCount() == 2)
+							{
+								Object	node = mpanel.getLastSelectedPathComponent();
+								if(node instanceof FileNode)
+								{
+									mpanel.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+									final String type = ((FileNode)node).getFile().getAbsolutePath();
+		//							if(getJCC().getComponent().getPlatform().getComponentFactory().isStartable(type))
+									// todo: resultcollect = false?
+									SComponentFactory.isStartable(jcc.getExternalAccess().getServiceProvider(), type).addResultListener(new SwingDefaultResultListener(spanel)
+									{
+										public void customResultAvailable(Object result)
+										{
+											if(((Boolean)result).booleanValue())
+												StarterPanel.createComponent(exta, jcc, type, null, null, null, false, null, null, null, null, null, StarterServicePanel.this);
+											mpanel.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+										}
+									});
+								}
+							}
+						}
+		      		}
+		  		};
+		  		mpanel.addMouseListener(ml);
+		
+				comptree = new ComponentTreePanel(jcc.getExternalAccess(), JSplitPane.HORIZONTAL_SPLIT);
+				comptree.setMinimumSize(new Dimension(0, 0));
+				
+				lsplit.add(new JScrollPane(mpanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+					JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED));
+		//		lsplit.add(tp);
+				lsplit.add(comptree);
+				lsplit.setDividerLocation(300);
+		
+				csplit.add(lsplit);
+				spanel = new StarterPanel(jcc);
+				csplit.add(spanel);
+				csplit.setDividerLocation(180);
+		            			
+		//		jcc.addComponentListListener(this);
+				
+				// todo: ?! is this ok?
+				
+				jcc.getExternalAccess().scheduleStep(new IComponentStep()
+				{
+					public static final String XML_CLASSNAME = "add-component-listener";
+					public Object execute(IInternalAccess ia)
+					{
+						ia.getRequiredService("cms").addResultListener(new DefaultResultListener()
 						{
 							public void resultAvailable(Object result)
 							{
-								IComponentDescription[] res = (IComponentDescription[])result;
-								for(int i=0; i<res.length; i++)
-									componentAdded(res[i]);
+								IComponentManagementService ces = (IComponentManagementService)result;
+								ces.getComponentDescriptions().addResultListener(new DefaultResultListener()
+								{
+									public void resultAvailable(Object result)
+									{
+										IComponentDescription[] res = (IComponentDescription[])result;
+										for(int i=0; i<res.length; i++)
+											componentAdded(res[i]);
+									}
+								});
+								ces.addComponentListener(null, StarterServicePanel.this);
 							}
 						});
-						ces.addComponentListener(null, StarterServicePanel.this);
+						return null;
 					}
 				});
-				return null;
+				
+				add(csplit, BorderLayout.CENTER);
 			}
 		});
-		
-		this.add(csplit, BorderLayout.CENTER);
 	}
 	
 	/**
@@ -283,76 +306,76 @@ public class StarterServicePanel extends JPanel implements ICMSComponentListener
 		{
 			JMenuItem ret = null;
 
-//			if(isEnabled())
-//			{
-//				IExplorerTreeNode node = (IExplorerTreeNode)mpanel.getLastSelectedPathComponent();
-//				if(node instanceof FileNode)
-//				{
-//					final String type = ((FileNode)node).getFile().getAbsolutePath();
-//					
-//					if(((Boolean)SComponentFactory.isStartable(jcc.getExternalAccess().getServiceProvider(), type).get(new ThreadSuspendable())).booleanValue())//&& ((FileNode)node).isValid())
-//					{
-//						try
-//						{
-////							IComponentFactory componentfactory = getJCC().getComponent().getPlatform().getComponentFactory();
-//							IModelInfo model = (IModelInfo)SComponentFactory.loadModel(jcc.getExternalAccess().getServiceProvider(), type).get(new ThreadSuspendable());
-//							String[] inistates = model.getConfigurations();
-////							IMBDIComponent model = SXML.loadComponentModel(type, null);
-////							final IMConfiguration[] inistates = model.getConfigurationbase().getConfigurations();
-//							
-//							if(inistates.length>1)
-//							{
-//								JMenu re = new JMenu("Start Component");
-//								re.setIcon(icons.getIcon("start_component"));
-//								for(int i=0; i<inistates.length; i++)
-//								{
-//									final String config = inistates[i];
-//									JMenuItem me = new JMenuItem(config);
-//									re.add(me);
-//									me.addActionListener(new ActionListener()
-//									{
-//										public void actionPerformed(ActionEvent e)
-//										{
-//											// todo: collectresults = false?
-//											StarterPanel.createComponent(jcc, type, null, config, null, false, null, null, null, null, null, spanel);
-//										}
-//									});
-//									me.setToolTipText("Start in configuration: "+config);
-//
-//								}
-//								ret = re;
-//								ret.setToolTipText("Start component in selectable configuration");
-//							}
-//							else
-//							{
-//								if(inistates.length==1)
-//								{
-//									ret = new JMenuItem("Start Component ("+inistates[0]+")");
-//									ret.setToolTipText("Start component in configuration:"+inistates[0]);
-//								}
-//								else
-//								{
-//									ret = new JMenuItem("Start Component");
-//									ret.setToolTipText("Start component without explicit initial state");
-//								}
-//								ret.setIcon(icons.getIcon("start_component"));
-//								ret.addActionListener(new ActionListener()
-//								{
-//									public void actionPerformed(ActionEvent e)
-//									{
-//										// todo: collectresults = false?
-//										StarterPanel.createComponent(jcc, type, null, null, null, false, null, null, null, null, null, spanel);
-//									}
-//								});
-//							}
-//						}
-//						catch(Exception e)
-//						{
-//							// NOP
-//						}
-//					}
-//				}
-//			}
+			if(isEnabled())
+			{
+				IExplorerTreeNode node = (IExplorerTreeNode)mpanel.getLastSelectedPathComponent();
+				if(node instanceof FileNode)
+				{
+					final String type = ((FileNode)node).getFile().getAbsolutePath();
+					
+					if(((Boolean)SComponentFactory.isStartable(exta.getServiceProvider(), type).get(new ThreadSuspendable())).booleanValue())//&& ((FileNode)node).isValid())
+					{
+						try
+						{
+//							IComponentFactory componentfactory = getJCC().getComponent().getPlatform().getComponentFactory();
+							IModelInfo model = (IModelInfo)SComponentFactory.loadModel(exta.getServiceProvider(), type).get(new ThreadSuspendable());
+							String[] inistates = model.getConfigurations();
+//							IMBDIComponent model = SXML.loadComponentModel(type, null);
+//							final IMConfiguration[] inistates = model.getConfigurationbase().getConfigurations();
+							
+							if(inistates.length>1)
+							{
+								JMenu re = new JMenu("Start Component");
+								re.setIcon(icons.getIcon("start_component"));
+								for(int i=0; i<inistates.length; i++)
+								{
+									final String config = inistates[i];
+									JMenuItem me = new JMenuItem(config);
+									re.add(me);
+									me.addActionListener(new ActionListener()
+									{
+										public void actionPerformed(ActionEvent e)
+										{
+											// todo: collectresults = false?
+											StarterPanel.createComponent(exta, jcc, type, null, config, null, false, null, null, null, null, null, spanel);
+										}
+									});
+									me.setToolTipText("Start in configuration: "+config);
+
+								}
+								ret = re;
+								ret.setToolTipText("Start component in selectable configuration");
+							}
+							else
+							{
+								if(inistates.length==1)
+								{
+									ret = new JMenuItem("Start Component ("+inistates[0]+")");
+									ret.setToolTipText("Start component in configuration:"+inistates[0]);
+								}
+								else
+								{
+									ret = new JMenuItem("Start Component");
+									ret.setToolTipText("Start component without explicit initial state");
+								}
+								ret.setIcon(icons.getIcon("start_component"));
+								ret.addActionListener(new ActionListener()
+								{
+									public void actionPerformed(ActionEvent e)
+									{
+										// todo: collectresults = false?
+										StarterPanel.createComponent(exta, jcc, type, null, null, null, false, null, null, null, null, null, spanel);
+									}
+								});
+							}
+						}
+						catch(Exception e)
+						{
+							// NOP
+						}
+					}
+				}
+			}
 
 			return ret;
 		}
@@ -368,10 +391,38 @@ public class StarterServicePanel extends JPanel implements ICMSComponentListener
 			if(node instanceof FileNode)
 			{
 				String type = ((FileNode)node).getFile().getAbsolutePath();
-				if(((Boolean)SComponentFactory.isStartable(jcc.getExternalAccess().getServiceProvider(), type).get(new ThreadSuspendable())))
+				if(((Boolean)SComponentFactory.isStartable(exta.getServiceProvider(), type).get(new ThreadSuspendable())))
 					ret = true;
 			}
 			return ret;
 		}
+	}
+	
+	
+	/**
+	 *  Get the host component of a service. 
+	 */
+	public IFuture getComponentForService(IServiceProvider provider, final IService service)
+	{
+		final Future ret = new Future();
+		
+		SServiceProvider.getService(provider, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(new DelegationResultListener(ret)
+		{
+			public void customResultAvailable(Object result)
+			{
+				IComponentManagementService	cms	= (IComponentManagementService)result;
+				cms.getExternalAccess((IComponentIdentifier)service.getServiceIdentifier().getProviderId())
+					.addResultListener(new DelegationResultListener(ret)
+				{
+					public void customResultAvailable(Object result)
+					{
+						ret.setResult(result);
+					}
+				});
+			}
+		});
+		
+		return ret;
 	}
 }
