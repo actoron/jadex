@@ -112,8 +112,8 @@ public class DeltaTimeExecutor4Simulation extends SimplePropertyObject implement
 				{
 					ISpaceProcess process = (ISpaceProcess) procs[i];
 					process.start(clockservice, space);
-				}
-
+				}					
+				
 				final IComponentStep step = new IComponentStep()
 				{
 					public Object execute(IInternalAccess ia)
@@ -164,12 +164,7 @@ public class DeltaTimeExecutor4Simulation extends SimplePropertyObject implement
 							dilationCounter += progress;
 
 							if (dilationCounter >= 1000) {
-								
-								
-								
-								
-								
-								
+																
 								
 								// Execute the data consumers.
 								for (Iterator it = space.getDataConsumers().iterator(); it.hasNext();) {
@@ -187,100 +182,7 @@ public class DeltaTimeExecutor4Simulation extends SimplePropertyObject implement
 									}
 									consumer.consumeData(currenttime, (currenttime - (Long)space.getProperty("REAL_START_TIME_OF_SIMULATION"))/1000);
 								}
-								
-								
-								
-								
-								
-								
-								
-								
-								
-								
-								
-								
-								
-//								
-//								final String experimentId = (String) space.getContext().getArguments().get(Constants.EXPERIMENT_ID);
-//								final String appName = space.getContext().getComponentIdentifier().getLocalName();
-//								final ArrayList<ObservedEvent> observedEvents = new ArrayList<ObservedEvent>();
-		//
-//								// System.out.println("#Executor# ID: " + appName +
-//								// " - Dilation: " + dilationCounter + " timestamp: " +
-//								// timestamp);
-		//
-//								// Observe elements: ISpaceObjects, BDI-Agents,
-//								// MicroAgents
-//								// Handle BDI-Agents separate due asyn call
-//								// TODO: Differentiate between periodical and onChange
-//								// Evaluation
-		//
-//								for (final Observer obs : observerList) {
-		//
-//									if (obs.getData().getObjectSource().getType().equals(Constants.BDI_AGENT)) {
-//										String agentType = obs.getData().getObjectSource().getName();
-		//
-//										// for(IComponentIdentifier agentIdentifier :
-//										// space.getAgents()){
-//										// for (IComponentIdentifier agentIdentifier :
-//										// space.getAgents()) {
-//										// if
-//										// (space.getContext().getComponentType(agentIdentifier).equals(agentType))
-//										// {
-//										IComponentIdentifier agentIdentifier = AgentMethods.getIComponentIdentifier(space, agentType);
-//										// if (agentIdentifier != null) {
-//										// TODO: Apply / Check if filter has been set on
-//										// this observer data
-//										// System.out.println("#DeltaTime4Exec# Starting get result for BDIAgent.");
-		//
-//										IFuture fut = ((IComponentManagementService) space.getContext().getServiceContainer().getService(IComponentManagementService.class)).getExternalAccess(agentIdentifier);
-//										fut.addResultListener(new IResultListener() {
-		//
-//											@Override
-//											public void resultAvailable(Object source, Object result) {
-//												ExternalAccessFlyweight exta = (ExternalAccessFlyweight) result;
-//												// Get Fact from Beliefbase
-//												// TODO: Not only for Strings meaning:
-//												// read the right class from the
-//												// data-field!
-//												String currentValue = exta.getBeliefbase().getBelief(obs.getData().getElementSource().getName()).getFact().toString();
-//												// System.out.println("MayValue: " +
-//												// currentValue);
-//												observedEvents.add(new ObservedEvent(appName, experimentId, timestamp, obs.getData(), currentValue));
-		//
-//											}
-		//
-//											@Override
-//											public void exceptionOccurred(Object source, Exception exception) {
-//												// TODO Auto-generated method stub
-//											}
-//										});
-		//
-//										// Observe ISpaceObject
-//									} else if (obs.getData().getObjectSource().getType().equals(Constants.ISPACE_OBJECT)) {
-//										ISpaceObject[] targets = space.getSpaceObjectsByType(obs.getData().getObjectSource().getName());
-//										// TODO: Handle multiple occurrences of that
-//										// ISpaceObject
-//										String currentValue = targets[0].getProperty(obs.getData().getElementSource().getName()).toString();
-//										observedEvents.add(new ObservedEvent(appName, experimentId, timestamp, obs.getData(), currentValue));
-		//
-//									} else {
-//										System.err.println("#DeltaTimeExecutor4Simulation# Error on setting type of ObjectSource " + simConf);
-//									}
-		//
-//								}
-		//
-//								// // write result to beliefbase of client simulation
-//								// agent
-//								// addToBeliefBase(space, observedEvents, timestamp);
-//								
-//								
-//								// write result to hashmap that holds all events - HAS
-//								// to happen outside the for-loop to get the values for
-//								// all observer at that timestamp
-//								allObservedEventsMap.put(timestamp, observedEvents);
-//								space.setProperty("observedEvents", allObservedEventsMap);
-		//
+																							
 								// reset dilationCounter
 								dilationCounter = 0;
 							}
@@ -340,9 +242,10 @@ public class DeltaTimeExecutor4Simulation extends SimplePropertyObject implement
 						}
 					};
 					clockservice.addChangeListener(clocklistener);
-				}
+				}				
 			}
 		});
+		
 	}
 	
 	/**
@@ -369,28 +272,4 @@ public class DeltaTimeExecutor4Simulation extends SimplePropertyObject implement
 			}
 		});
 	}
-	
-//	private void addToBeliefBase(final AbstractEnvironmentSpace space, final ArrayList<ObservedEvent> observedEvents, final long timestamp) {
-//		if (clientSimulationAgent == null) {
-//			clientSimulationAgent = AgentMethods.getIComponentIdentifier(space, Constants.CLIENT_SIMULATION_AGENT);
-//		}
-//	
-//		IFuture fut = ((IComponentManagementService) space.getContext().getServiceContainer().getService(IComponentManagementService.class)).getExternalAccess(clientSimulationAgent);
-//		IFuture fut = ((IComponentManagementService)SServiceProvider.getService(getScope().getServiceProvider(), IComponentManagementService.class,RequiredServiceInfo.SCOPE_PLATFORM)).getExternalAccess(clientSimulationAgent);
-//		fut.addResultListener(new IResultListener() {
-//
-//			@Override
-//			public void resultAvailable(Object source, Object result) {
-//				ExternalAccessFlyweight exta = (ExternalAccessFlyweight) result;
-//				HashMap resultsMap = (HashMap) exta.getBeliefbase().getBelief(Constants.OBSERVED_EVENTS_MAP).getFact();
-//				resultsMap.put(timestamp, observedEvents);
-//
-//				exta.getBeliefbase().getBelief(Constants.OBSERVED_EVENTS_MAP).setFact(resultsMap);
-//			}
-//			@Override
-//			public void exceptionOccurred(Object source, Exception exception) {
-//				// TODO Auto-generated method stub
-//			}
-//		});
-//	}
 }
