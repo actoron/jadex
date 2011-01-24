@@ -199,13 +199,13 @@ public class TestCenterNodeFunctionality extends DefaultNodeFunctionality
 				else
 				{
 					final String file	= fn.getFile().getAbsolutePath();
-					SComponentFactory.isLoadable(jcc.getExternalAccess().getServiceProvider(), file).addResultListener(new DefaultResultListener()
+					SComponentFactory.isLoadable(jcc.getExternalAccess(), file).addResultListener(new DefaultResultListener()
 					{
 						public void resultAvailable(Object result)
 						{
 							if(((Boolean)result).booleanValue())
 							{
-								SComponentFactory.loadModel(jcc.getExternalAccess().getServiceProvider(), file).addResultListener(new DefaultResultListener()
+								SComponentFactory.loadModel(jcc.getExternalAccess(), file).addResultListener(new DefaultResultListener()
 								{
 									public void resultAvailable(Object result)
 									{

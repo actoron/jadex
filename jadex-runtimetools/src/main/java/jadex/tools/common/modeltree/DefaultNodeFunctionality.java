@@ -179,7 +179,7 @@ public class	DefaultNodeFunctionality
 //				String	type = agfac.getFileType(fn.getFile().getAbsolutePath());
 				
 				// todo: todo: replace null with classloader
-				String type = (String)SComponentFactory.getFileType(jcc.getExternalAccess().getServiceProvider(), fn.getFile().getAbsolutePath()).get(new ThreadSuspendable());
+				String type = (String)SComponentFactory.getFileType(jcc.getExternalAccess(), fn.getFile().getAbsolutePath()).get(new ThreadSuspendable());
 				if(type!=null)
 					icon = (Icon)SComponentFactory.getFileTypeIcon(jcc.getExternalAccess().getServiceProvider(), type).get(new ThreadSuspendable());
 				
@@ -188,7 +188,7 @@ public class	DefaultNodeFunctionality
 //					IApplicationFactory apfac = jcc.getAgent().getPlatform().getApplicationFactory();
 					
 					// todo: todo: replace null with classloader
-					type = (String)SComponentFactory.getFileType(jcc.getExternalAccess().getServiceProvider(), fn.getFile().getAbsolutePath()).get(new ThreadSuspendable());
+					type = (String)SComponentFactory.getFileType(jcc.getExternalAccess(), fn.getFile().getAbsolutePath()).get(new ThreadSuspendable());
 					if(type!=null)
 						icon = (Icon)SComponentFactory.getFileTypeIcon(jcc.getExternalAccess().getServiceProvider(), type).get(new ThreadSuspendable());
 				}

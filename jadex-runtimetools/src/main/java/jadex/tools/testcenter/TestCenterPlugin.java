@@ -203,7 +203,7 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 //		});
 
 		nof	= new TestCenterNodeFunctionality(this);
-		mpanel = new ModelExplorer(getJCC().getExternalAccess().getServiceProvider(), nof);
+		mpanel = new ModelExplorer(getJCC().getExternalAccess(), nof);
 		mpanel.setPopupBuilder(new PopupBuilder(new Object[]{mpanel.ADD_PATH, mpanel.REMOVE_PATH, mpanel.REFRESH,
 			ADD_TESTCASE, ADD_TESTCASES, REMOVE_TESTCASE, REMOVE_TESTCASES}));
 

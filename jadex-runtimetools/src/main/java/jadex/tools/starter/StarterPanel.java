@@ -32,6 +32,7 @@ import jadex.commons.gui.JValidatorTextField;
 import jadex.commons.jtable.ClassRenderer;
 import jadex.commons.service.ProvidedServiceInfo;
 import jadex.commons.service.RequiredServiceInfo;
+import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.library.ILibraryService;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 
@@ -169,6 +170,9 @@ public class StarterPanel extends JPanel
 //	/** The application specific panel. */
 //	protected JPanel apppanel;
 	
+	/** The external access. */
+	protected IExternalAccess exta;
+	
 	/** The jcc. */
 	protected IControlCenter jcc;
 
@@ -187,10 +191,11 @@ public class StarterPanel extends JPanel
 	 * Open the GUI.
 	 * @param starter The starter.
 	 */
-	public StarterPanel(IControlCenter jcc)
+	public StarterPanel(final IExternalAccess exta, IControlCenter jcc)
 	{
 		super(new BorderLayout());
-		this.jcc	= jcc;
+		this.exta = exta;
+		this.jcc = jcc;
 		this.resultsets = new MultiCollection();
 		
 		JPanel content = new JPanel(new GridBagLayout());
@@ -279,12 +284,14 @@ public class StarterPanel extends JPanel
 			{
 				if(model!=null)
 				{
-					StarterPanel.this.jcc.getExternalAccess().scheduleStep(new IComponentStep()
+					exta.scheduleStep(new IComponentStep()
 					{
 						public static final String XML_CLASSNAME = "start";
 						public Object execute(IInternalAccess ia)
 						{
-							ia.getRequiredService("libservice").addResultListener(new SwingDefaultResultListener(StarterPanel.this)
+							SServiceProvider.getService(ia.getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//							ia.getRequiredService("libservice")
+								.addResultListener(new SwingDefaultResultListener(StarterPanel.this)
 							{
 								public void customResultAvailable(Object result)
 								{
@@ -334,7 +341,7 @@ public class StarterPanel extends JPanel
 											{
 												Future fut = new Future();
 												IResultListener killlistener = dokilllis? new KillListener(mymodel, fullname, fut, StarterPanel.this): null;
-												createComponent(StarterPanel.this.jcc.getExternalAccess(), StarterPanel.this.jcc, typename, an, configname, args, 
+												createComponent(exta, StarterPanel.this.jcc, typename, an, configname, args, 
 													suspend.isSelected()? Boolean.TRUE: Boolean.FALSE, 
 													mastercb.isSelected()? Boolean.TRUE: Boolean.FALSE, 
 													daemoncb.isSelected()? Boolean.TRUE: Boolean.FALSE, 
@@ -346,7 +353,7 @@ public class StarterPanel extends JPanel
 										{
 											Future fut = new Future();
 											IResultListener killlistener = dokilllis? new KillListener(mymodel, fullname, fut, StarterPanel.this): null;
-											createComponent(StarterPanel.this.jcc.getExternalAccess(), StarterPanel.this.jcc, typename, an, configname, args, 
+											createComponent(exta, StarterPanel.this.jcc, typename, an, configname, args, 
 												suspend.isSelected()? Boolean.TRUE: Boolean.FALSE, 
 												mastercb.isSelected()? Boolean.TRUE: Boolean.FALSE, 
 												daemoncb.isSelected()? Boolean.TRUE: Boolean.FALSE, 
@@ -639,22 +646,23 @@ public class StarterPanel extends JPanel
 		
 		if(adf!=null)
 		{
-			SComponentFactory.isLoadable(jcc.getExternalAccess().getServiceProvider(), adf).addResultListener(new SwingDefaultResultListener(StarterPanel.this)
+			SComponentFactory.isLoadable(exta, adf).addResultListener(new SwingDefaultResultListener(StarterPanel.this)
 			{
 				public void customResultAvailable(Object result)
 				{
 					if(((Boolean)result).booleanValue())
 					{
-						SComponentFactory.loadModel(jcc.getExternalAccess().getServiceProvider(), adf).addResultListener(new SwingDefaultResultListener(StarterPanel.this)
+						SComponentFactory.loadModel(exta, adf).addResultListener(new SwingDefaultResultListener(StarterPanel.this)
 						{
 							public void customResultAvailable(Object result)
 							{
 								model = (IModelInfo)result;
-								SComponentFactory.getFileType(jcc.getExternalAccess().getServiceProvider(), adf).addResultListener(new SwingDefaultResultListener(StarterPanel.this)
+								SComponentFactory.getFileType(exta, adf).addResultListener(new SwingDefaultResultListener(StarterPanel.this)
 								{
 									public void customResultAvailable(Object result)
 									{
-										SComponentFactory.getFileTypeIcon(jcc.getExternalAccess().getServiceProvider(), (String)result).addResultListener(new SwingDefaultResultListener(StarterPanel.this)
+										SComponentFactory.getFileTypeIcon(exta.getServiceProvider(), (String)result)
+											.addResultListener(new SwingDefaultResultListener(StarterPanel.this)
 										{
 											public void customResultAvailable(Object result)
 											{
@@ -985,12 +993,14 @@ public class StarterPanel extends JPanel
 	 */
 	protected void createArguments()
 	{
-		jcc.getExternalAccess().scheduleStep(new IComponentStep()
+		exta.scheduleStep(new IComponentStep()
 		{
 			public static final String XML_CLASSNAME = "create-arguments";
 			public Object execute(IInternalAccess ia)
 			{
-				ia.getRequiredService("libservice").addResultListener(new SwingDefaultResultListener(StarterPanel.this)		
+				SServiceProvider.getService(ia.getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//				ia.getRequiredService("libservice")
+					.addResultListener(new SwingDefaultResultListener(StarterPanel.this)		
 				{
 					public void customResultAvailable(Object result)
 					{
@@ -1362,7 +1372,7 @@ public class StarterPanel extends JPanel
 	public static void main(String[] args)
 	{
 		JFrame f = new JFrame();
-		f.getContentPane().add(new StarterPanel(null));
+		f.getContentPane().add(new StarterPanel(null, null));
 		f.pack();
 		f.setVisible(true);
 	}
@@ -1449,7 +1459,9 @@ public class StarterPanel extends JPanel
 			public static final String XML_CLASSNAME = "create-component";
 			public Object execute(IInternalAccess ia)
 			{
-				ia.getRequiredService("cms").addResultListener(new SwingDefaultResultListener(panel)
+				SServiceProvider.getService(ia.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//				ia.getRequiredService("cms")
+					.addResultListener(new SwingDefaultResultListener(panel)
 				{
 					public void customResultAvailable(Object result)
 					{

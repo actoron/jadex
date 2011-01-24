@@ -120,7 +120,7 @@ public class StarterServicePanel extends JPanel implements ICMSComponentListener
 				lsplit.setOneTouchExpandable(true);
 				lsplit.setResizeWeight(0.7);
 		
-				mpanel = new ModelExplorer(jcc.getExternalAccess().getServiceProvider(), new StarterNodeFunctionality(jcc));
+				mpanel = new ModelExplorer(jcc.getExternalAccess(), new StarterNodeFunctionality(jcc));
 		//		mpanel.setAction(FileNode.class, new INodeAction()
 		//		{
 		//			public void validStateChanged(TreeNode node, boolean valid)
@@ -153,7 +153,7 @@ public class StarterServicePanel extends JPanel implements ICMSComponentListener
 		
 							final String model = ((FileNode)node).getRelativePath();
 		//					if(getJCC().getComponent().getPlatform().getComponentFactory().isLoadable(model))
-							SComponentFactory.isLoadable(jcc.getExternalAccess().getServiceProvider(), model).addResultListener(new SwingDefaultResultListener(spanel)
+							SComponentFactory.isLoadable(jcc.getExternalAccess(), model).addResultListener(new SwingDefaultResultListener(spanel)
 							{
 								public void customResultAvailable(Object result)
 								{
@@ -210,7 +210,7 @@ public class StarterServicePanel extends JPanel implements ICMSComponentListener
 				lsplit.setDividerLocation(300);
 		
 				csplit.add(lsplit);
-				spanel = new StarterPanel(jcc);
+				spanel = new StarterPanel(exta, jcc);
 				csplit.add(spanel);
 				csplit.setDividerLocation(180);
 		            			
@@ -318,7 +318,7 @@ public class StarterServicePanel extends JPanel implements ICMSComponentListener
 						try
 						{
 //							IComponentFactory componentfactory = getJCC().getComponent().getPlatform().getComponentFactory();
-							IModelInfo model = (IModelInfo)SComponentFactory.loadModel(exta.getServiceProvider(), type).get(new ThreadSuspendable());
+							IModelInfo model = (IModelInfo)SComponentFactory.loadModel(exta, type).get(new ThreadSuspendable());
 							String[] inistates = model.getConfigurations();
 //							IMBDIComponent model = SXML.loadComponentModel(type, null);
 //							final IMConfiguration[] inistates = model.getConfigurationbase().getConfigurations();

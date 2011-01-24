@@ -103,9 +103,9 @@ public class ComponentTestSuite extends TestSuite
 				}
 				else
 				{
-					if(((Boolean)SComponentFactory.isLoadable(rootcomp.getServiceProvider(), abspath).get(ts)).booleanValue())
+					if(((Boolean)SComponentFactory.isLoadable(rootcomp, abspath).get(ts)).booleanValue())
 					{
-						IModelInfo model = (IModelInfo)SComponentFactory.loadModel(rootcomp.getServiceProvider(), abspath).get(ts);
+						IModelInfo model = (IModelInfo)SComponentFactory.loadModel(rootcomp, abspath).get(ts);
 						boolean istest = false;
 						if(model!=null && model.getReport()==null)
 						{

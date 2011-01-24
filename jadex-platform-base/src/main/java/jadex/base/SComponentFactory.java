@@ -29,40 +29,51 @@ public class SComponentFactory
 	 * @param model The model.
 	 * @return The loaded model.
 	 */
-	public static IFuture loadModel(final IServiceProvider provider, final String model)
+	public static IFuture loadModel(IExternalAccess exta, final String model)
 	{
 		final Future ret = new Future();
 		
-		SServiceProvider.getService(provider, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new DelegationResultListener(ret)
+		exta.scheduleStep(new IComponentStep()
 		{
-			public void customResultAvailable(Object result)
+			public Object execute(final IInternalAccess ia)
 			{
-				final ILibraryService ls = (ILibraryService)result;
+				final Future ret = new Future();
 				
-				SServiceProvider.getService(provider, new ComponentFactorySelector(model, null, ls.getClassLoader()))
-					.addResultListener(new DelegationResultListener(ret)
+				SServiceProvider.getService(ia.getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+					.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
-						IComponentFactory fac = (IComponentFactory)result;
-						ret.setResult(fac.loadModel(model, null, ls.getClassLoader()));
-					}
-					
-					public void exceptionOccurred(Exception exception)
-					{
-						if(exception instanceof ServiceNotFoundException)
+						final ILibraryService ls = (ILibraryService)result;
+						
+						SServiceProvider.getService(ia.getServiceProvider(), new ComponentFactorySelector(model, null, ls.getClassLoader()))
+							.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 						{
-							ret.setResult(null);
-						}
-						else
-						{
-							super.exceptionOccurred(exception);
-						}
+							public void customResultAvailable(Object result)
+							{
+								IComponentFactory fac = (IComponentFactory)result;
+								ret.setResult(fac.loadModel(model, null, ls.getClassLoader()));
+							}
+							
+							public void exceptionOccurred(Exception exception)
+							{
+								if(exception instanceof ServiceNotFoundException)
+								{
+									ret.setResult(null);
+								}
+								else
+								{
+									super.exceptionOccurred(exception);
+								}
+							}
+						}));
 					}
-				});
+				}));
+				
+				return ret;
 			}
-		});
+		}).addResultListener(new DelegationResultListener(ret));
+		
 		return ret;
 	}
 
@@ -71,40 +82,48 @@ public class SComponentFactory
 	 * @param model The model.
 	 * @return True, if model can be loaded.
 	 */
-	public static IFuture isLoadable(final IServiceProvider provider, final String model)
+	public static IFuture isLoadable(IExternalAccess exta, final String model)
 	{
 		final Future ret = new Future();
 		
-		SServiceProvider.getService(provider, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new DelegationResultListener(ret)
+		exta.scheduleStep(new IComponentStep()
 		{
-			public void customResultAvailable(Object result)
+			public Object execute(final IInternalAccess ia)
 			{
-				final ILibraryService ls = (ILibraryService)result;
-				
-				SServiceProvider.getService(provider, new ComponentFactorySelector(model, null, ls.getClassLoader()))
-					.addResultListener(new DelegationResultListener(ret)
+				final Future ret = new Future();
+				SServiceProvider.getService(ia.getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+					.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
-						IComponentFactory fac = (IComponentFactory)result;
-						ret.setResult(new Boolean(fac.isLoadable(model, null, ls.getClassLoader())));
-					}
-					
-					public void exceptionOccurred(Exception exception)
-					{
-						if(exception instanceof ServiceNotFoundException)
+						final ILibraryService ls = (ILibraryService)result;
+						
+						SServiceProvider.getService(ia.getServiceProvider(), new ComponentFactorySelector(model, null, ls.getClassLoader()))
+							.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 						{
-							ret.setResult(Boolean.FALSE);
-						}
-						else
-						{
-							super.exceptionOccurred(exception);
-						}
+							public void customResultAvailable(Object result)
+							{
+								IComponentFactory fac = (IComponentFactory)result;
+								ret.setResult(new Boolean(fac.isLoadable(model, null, ls.getClassLoader())));
+							}
+							
+							public void exceptionOccurred(Exception exception)
+							{
+								if(exception instanceof ServiceNotFoundException)
+								{
+									ret.setResult(Boolean.FALSE);
+								}
+								else
+								{
+									super.exceptionOccurred(exception);
+								}
+							}
+						}));
 					}
-				});
+				}));
+				return ret;
 			}
-		});
+		}).addResultListener(new DelegationResultListener(ret));
 
 		return ret;
 	}
@@ -219,39 +238,48 @@ public class SComponentFactory
 	/**
 	 * Get the file type of a model.
 	 */
-	public static IFuture getFileType(final IServiceProvider provider, final String model)
+	public static IFuture getFileType(IExternalAccess exta, final String model)
 	{
 		final Future ret = new Future();
 		
-		SServiceProvider.getService(provider, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DelegationResultListener(ret)
+		exta.scheduleStep(new IComponentStep()
 		{
-			public void customResultAvailable(Object result)
+			public Object execute(final IInternalAccess ia)
 			{
-				final ILibraryService ls = (ILibraryService)result;
-				
-				SServiceProvider.getService(provider, new ComponentFactorySelector(model, null, ls.getClassLoader()))
-					.addResultListener(new DelegationResultListener(ret)
+				final Future ret = new Future();
+				SServiceProvider.getService(ia.getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+					.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
-						IComponentFactory fac = (IComponentFactory)result;
-						ret.setResult(fac.getComponentType(model, null, ls.getClassLoader()));
-					}
-					
-					public void exceptionOccurred(Exception exception)
-					{
-						if(exception instanceof ServiceNotFoundException)
+						final ILibraryService ls = (ILibraryService)result;
+						
+						SServiceProvider.getService(ia.getServiceProvider(), new ComponentFactorySelector(model, null, ls.getClassLoader()))
+							.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 						{
-							ret.setResult(null);
-						}
-						else
-						{
-							super.exceptionOccurred(exception);
-						}
+							public void customResultAvailable(Object result)
+							{
+								IComponentFactory fac = (IComponentFactory)result;
+								ret.setResult(fac.getComponentType(model, null, ls.getClassLoader()));
+							}
+							
+							public void exceptionOccurred(Exception exception)
+							{
+								if(exception instanceof ServiceNotFoundException)
+								{
+									ret.setResult(null);
+								}
+								else
+								{
+									super.exceptionOccurred(exception);
+								}
+							}
+						}));
 					}
-				});
+				}));
+				return ret;
 			}
-		});
+		}).addResultListener(new DelegationResultListener(ret));
 		
 		return ret;
 	}

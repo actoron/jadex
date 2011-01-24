@@ -2,6 +2,7 @@ package jadex.tools.common.modeltree;
 
 import jadex.base.SComponentFactory;
 import jadex.bridge.IComponentFactory;
+import jadex.bridge.IExternalAccess;
 import jadex.commons.IFuture;
 import jadex.commons.Properties;
 import jadex.commons.Property;
@@ -88,6 +89,7 @@ public class ModelExplorer extends JTree
 	//-------- attributes --------
 
 	/** The service container. */
+	protected IExternalAccess exta;
 	protected IServiceProvider provider;
 
 	/** The root node. */
@@ -131,10 +133,11 @@ public class ModelExplorer extends JTree
 	/**
 	 *  Create a new ModelExplorer.
 	 */
-	public ModelExplorer(IServiceProvider container, DefaultNodeFunctionality nof)
+	public ModelExplorer(IExternalAccess exta, DefaultNodeFunctionality nof)
 	{
 		super(new ModelExplorerTreeModel(new RootNode(), nof));
-		this.provider = container;
+		this.exta = exta;
+		this.provider = exta.getServiceProvider();
 		this.nof = nof;
 		nof.setModelExplorer(this);
 		this.root = (RootNode)getModel().getRoot();
@@ -146,7 +149,7 @@ public class ModelExplorer extends JTree
 //		this.worker	= new LoadManagingExecutionService(
 //			((IThreadPool)container.getService(ThreadPoolService.class)));
 	
-		SServiceProvider.getService(container, IThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
+		SServiceProvider.getService(provider, IThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
@@ -729,7 +732,7 @@ public class ModelExplorer extends JTree
 						{
 							return file.isDirectory() 
 								|| ((Boolean)SComponentFactory.isLoadable(
-									provider, file.getAbsolutePath()).get(new ThreadSuspendable())).booleanValue();
+									exta, file.getAbsolutePath()).get(new ThreadSuspendable())).booleanValue();
 						}
 					};
 				}

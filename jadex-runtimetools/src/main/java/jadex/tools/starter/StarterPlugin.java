@@ -271,7 +271,7 @@ public class StarterPlugin extends AbstractJCCPlugin	implements ICMSComponentLis
 		lsplit.setResizeWeight(0.7);
 
 		snf = new StarterNodeFunctionality(jcc);
-		mpanel = new ModelExplorer(getJCC().getExternalAccess().getServiceProvider(), snf);
+		mpanel = new ModelExplorer(getJCC().getExternalAccess(), snf);
 //		mpanel.setAction(FileNode.class, new INodeAction()
 //		{
 //			public void validStateChanged(TreeNode node, boolean valid)
@@ -304,7 +304,7 @@ public class StarterPlugin extends AbstractJCCPlugin	implements ICMSComponentLis
 
 					final String model = ((FileNode)node).getRelativePath();
 //					if(getJCC().getComponent().getPlatform().getComponentFactory().isLoadable(model))
-					SComponentFactory.isLoadable(getJCC().getExternalAccess().getServiceProvider(), model).addResultListener(new SwingDefaultResultListener(spanel)
+					SComponentFactory.isLoadable(getJCC().getExternalAccess(), model).addResultListener(new SwingDefaultResultListener(spanel)
 					{
 						public void customResultAvailable(Object result)
 						{
@@ -361,7 +361,7 @@ public class StarterPlugin extends AbstractJCCPlugin	implements ICMSComponentLis
 		lsplit.setDividerLocation(300);
 
 		csplit.add(lsplit);
-		spanel = new StarterPanel(getJCC());
+		spanel = new StarterPanel(getJCC().getExternalAccess(), getJCC());
 		csplit.add(spanel);
 		csplit.setDividerLocation(180);
             			
@@ -661,7 +661,7 @@ public class StarterPlugin extends AbstractJCCPlugin	implements ICMSComponentLis
 						try
 						{
 //							IComponentFactory componentfactory = getJCC().getComponent().getPlatform().getComponentFactory();
-							IModelInfo model = (IModelInfo)SComponentFactory.loadModel(getJCC().getExternalAccess().getServiceProvider(), type).get(new ThreadSuspendable());
+							IModelInfo model = (IModelInfo)SComponentFactory.loadModel(getJCC().getExternalAccess(), type).get(new ThreadSuspendable());
 							String[] inistates = model.getConfigurations();
 //							IMBDIComponent model = SXML.loadComponentModel(type, null);
 //							final IMConfiguration[] inistates = model.getConfigurationbase().getConfigurations();
