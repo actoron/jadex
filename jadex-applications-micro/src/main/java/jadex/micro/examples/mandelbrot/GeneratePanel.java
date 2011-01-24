@@ -63,7 +63,7 @@ public class GeneratePanel extends JPanel
 					final double y2 = Double.parseDouble(pp.getTextField("ymax").getText());
 					final int sizex = Integer.parseInt(pp.getTextField("sizex").getText());
 					final int sizey = Integer.parseInt(pp.getTextField("sizey").getText());
-					final int max = Integer.parseInt(pp.getTextField("max").getText());
+					final short max = Short.parseShort(pp.getTextField("max").getText());
 					final int par = Integer.parseInt(pp.getTextField("parallel").getText());
 					final int tasksize = Integer.parseInt(pp.getTextField("task size").getText());
 				

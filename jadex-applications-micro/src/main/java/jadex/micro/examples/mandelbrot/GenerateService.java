@@ -237,7 +237,7 @@ public class GenerateService extends BasicService implements IGenerateService
 		}
 
 		// Create array for holding results.
-		data.setData(new int[data.getSizeX()][data.getSizeY()]);
+		data.setData(new short[data.getSizeX()][data.getSizeY()]);
 		
 		// Assign tasks to service pool.
 		final int number	= areas.size();

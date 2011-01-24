@@ -1,8 +1,7 @@
 package jadex.micro.examples.mandelbrot;
 
 import jadex.bridge.IComponentIdentifier;
-
-import java.util.StringTokenizer;
+import jadex.commons.Base64;
 
 
 /**
@@ -35,7 +34,7 @@ public class AreaData
 	protected int					sizey;
 
 	/** The max value where iteration is stopped. */
-	protected int					max;
+	protected short					max;
 
 	/** The number of parallel workers. */
 	protected int					par;
@@ -47,7 +46,7 @@ public class AreaData
 	protected int					tasksize;
 
 	/** The result data. */
-	protected int[][]				data;
+	protected short[][]				data;
 	
 	/**
 	 *  Create an empty area data.
@@ -61,7 +60,7 @@ public class AreaData
 	 * Create a new area data.
 	 */
 	public AreaData(double xstart, double xend, double ystart, double yend,
-			int sizex, int sizey, int max, int par, int tasksize)
+			int sizex, int sizey, short max, int par, int tasksize)
 	{
 		this(xstart, xend, ystart, yend, 0, 0, sizex, sizey, max, par, tasksize, null, null);
 	}
@@ -70,8 +69,8 @@ public class AreaData
 	 * Create a new area data.
 	 */
 	public AreaData(double xstart, double xend, double ystart, double yend,
-			int xoff, int yoff, int sizex, int sizey, int max, int par, int tasksize,
-			IComponentIdentifier cid, int[][] data)
+			int xoff, int yoff, int sizex, int sizey, short max, int par, int tasksize,
+			IComponentIdentifier cid, short[][] data)
 	{
 		this.xstart = xstart;
 		this.xend = xend;
@@ -253,7 +252,7 @@ public class AreaData
 	 * 
 	 * @return the max value.
 	 */
-	public int getMax()
+	public short getMax()
 	{
 		return max;
 	}
@@ -263,7 +262,7 @@ public class AreaData
 	 * 
 	 * @param max The max value to set.
 	 */
-	public void setMax(int max)
+	public void setMax(short max)
 	{
 		this.max = max;
 	}
@@ -275,7 +274,7 @@ public class AreaData
 	 */
 	// Not called getData as it should not be serialized in XML.
 	// todo: support @XMLExclude
-	public int[][] fetchData()
+	public short[][] fetchData()
 	{
 		return data;
 	}
@@ -285,7 +284,7 @@ public class AreaData
 	 * 
 	 * @param data The data to set.
 	 */
-	public void setData(int[][] data)
+	public void setData(short[][] data)
 	{
 		this.data = data;
 	}
@@ -300,24 +299,7 @@ public class AreaData
 		String	ret	= null;
 		if(data!=null)
 		{
-			// create string in form of "rows cols\n1 2\n4 5\n7 8"
-			StringBuffer	sbuf	= new StringBuffer();
-			sbuf.append(data.length);
-			sbuf.append(" ");
-			sbuf.append(data[0].length);
-			sbuf.append("\n");
-			for(int i=0; i<data.length; i++)
-			{
-				if(i>0)
-					sbuf.append("\n");
-				for(int j=0; j<data[i].length; j++)
-				{
-					if(j>0)
-						sbuf.append(" ");
-					sbuf.append(data[i][j]);
-				}
-			}
-			ret	= sbuf.toString();
+			ret	= new String(Base64.encode(ArrayTest.shortToByte(data)));
 		}
 		return ret;
 	}
@@ -329,17 +311,7 @@ public class AreaData
 	 */
 	public void setDataString(String sdata)
 	{
-		StringTokenizer	stok	= new StringTokenizer(sdata);
-		int	rows	= Integer.parseInt(stok.nextToken());
-		int	cols	= Integer.parseInt(stok.nextToken());
-		this.data	= new int[rows][cols];
-		for(int i=0; i<data.length; i++)
-		{
-			for(int j=0; j<data[i].length; j++)
-			{
-				data[i][j]	= Integer.parseInt(stok.nextToken());
-			}
-		}
+		this.data	= ArrayTest.byteToshort(Base64.decode(sdata.getBytes()));
 	}
 
 	/**

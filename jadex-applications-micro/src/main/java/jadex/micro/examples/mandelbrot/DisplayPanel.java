@@ -264,7 +264,7 @@ public class DisplayPanel extends JComponent
 		{
 			public void run()
 			{
-				int[][]	results	= data.fetchData();
+				short[][]	results	= data.fetchData();
 				DisplayPanel.this.data	= data;
 				DisplayPanel.this.image	= createImage(results.length, results[0].length);
 				Graphics	g	= image.getGraphics();
@@ -347,91 +347,91 @@ public class DisplayPanel extends JComponent
 													for(Iterator it=progressdata.keySet().iterator(); it.hasNext(); )
 													{
 														final ProgressData	progress	= (ProgressData)it.next();
-														cms.getExternalAccess(progress.getProviderId())
-															.addResultListener(new SwingDefaultResultListener(DisplayPanel.this)
+														if(!progress.isFinished())
 														{
-															public void customResultAvailable(Object result)
+															cms.getExternalAccess(progress.getProviderId())
+																.addResultListener(new SwingDefaultResultListener(DisplayPanel.this)
 															{
-																IExternalAccess	ea	= (IExternalAccess)result;
-																// It is not really possible to define the progress services as required service.
-																SServiceProvider.getService(ea.getServiceProvider(), IProgressService.class)
-																	.addResultListener(new SwingDefaultResultListener(DisplayPanel.this)
+																public void customResultAvailable(Object result)
 																{
-																	public void customResultAvailable(Object result)
+																	IExternalAccess	ea	= (IExternalAccess)result;
+																	// It is not really possible to define the progress services as required service.
+																	SServiceProvider.getService(ea.getServiceProvider(), IProgressService.class)
+																		.addResultListener(new SwingDefaultResultListener(DisplayPanel.this)
 																	{
-																		IProgressService	ps	= (IProgressService)result;
-																		if(ps!=null)
+																		public void customResultAvailable(Object result)
 																		{
-																			ps.getProgress(progress.getTaskId())
-																				.addResultListener(new SwingDefaultResultListener(DisplayPanel.this)
+																			IProgressService	ps	= (IProgressService)result;
+																			if(ps!=null)
 																			{
-																				public void customResultAvailable(Object result)
+																				ps.getProgress(progress.getTaskId())
+																					.addResultListener(new SwingDefaultResultListener(DisplayPanel.this)
 																				{
-																					if(progressdata!=null && progressdata.containsKey(progress))
+																					public void customResultAvailable(Object result)
 																					{
-																						Integer	current	= (Integer)result;
-																						Integer	percent	= (Integer)progressdata.get(progress);
-																						if(current.intValue()>percent.intValue())
+																						if(progressdata!=null && progressdata.containsKey(progress))
 																						{
-																							progressdata.put(progress, current);
-																							repaint();
+																							Integer	current	= (Integer)result;
+																							Integer	percent	= (Integer)progressdata.get(progress);
+																							if(current.intValue()>percent.intValue())
+																							{
+																								progressdata.put(progress, current);
+																								repaint();
+																							}
 																						}
 																					}
-																				}
-				
-																				public void customExceptionOccurred(Exception exception)
-																				{
-																					// Component removed.
-//																					if(progressdata!=null)
-//																					{
-//																						progressdata.remove(progress);
-//																					}
-//																					else
+					
+																					public void customExceptionOccurred(Exception exception)
 																					{
-																						Thread.dumpStack();
-																						exception.printStackTrace();
-																						progressupdate.stop();
-																						progressupdate	= null;
+																						// Component removed.
+																						if(progressdata!=null)
+																						{
+																							progressdata.remove(progress);
+																						}
+																						else
+																						{
+	//																						exception.printStackTrace();
+																							progressupdate.stop();
+																							progressupdate	= null;
+																						}
 																					}
-																				}
-																			});
+																				});
+																			}
 																		}
-																	}
-				
-																	public void customExceptionOccurred(Exception exception)
-																	{
-																		// Component removed.
-//																		if(progressdata!=null)
-//																		{
-//																			progressdata.remove(progress);
-//																		}
-//																		else
+					
+																		public void customExceptionOccurred(Exception exception)
 																		{
-																			Thread.dumpStack();
-																			exception.printStackTrace();
-																			progressupdate.stop();
-																			progressupdate	= null;
+																			// Component removed.
+																			if(progressdata!=null)
+																			{
+																				progressdata.remove(progress);
+																			}
+																			else
+																			{
+	//																			exception.printStackTrace();
+																				progressupdate.stop();
+																				progressupdate	= null;
+																			}
 																		}
-																	}
-																});
-															}
-				
-															public void customExceptionOccurred(Exception exception)
-															{
-																// Component removed.
-//																if(progressdata!=null)
-//																{
-//																	progressdata.remove(progress);
-//																}
-//																else
-																{
-																	Thread.dumpStack();
-																	exception.printStackTrace();
-																	progressupdate.stop();
-																	progressupdate	= null;
+																	});
 																}
-															}
-														});
+					
+																public void customExceptionOccurred(Exception exception)
+																{
+																	// Component removed.
+																	if(progressdata!=null)
+																	{
+																		progressdata.remove(progress);
+																	}
+																	else
+																	{
+	//																	exception.printStackTrace();
+																		progressupdate.stop();
+																		progressupdate	= null;
+																	}
+																}
+															});
+														}
 													}
 												}
 											}

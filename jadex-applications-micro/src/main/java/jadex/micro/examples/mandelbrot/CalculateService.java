@@ -47,7 +47,7 @@ public class CalculateService extends BasicService implements ICalculateService
 		double stepx = (data.getXEnd()-data.getXStart())/data.getSizeX();
 		double stepy = (data.getYEnd()-data.getYStart())/data.getSizeY();
 		
-		int[][] res = new int[data.getSizeX()][data.getSizeY()];
+		short[][] res = new short[data.getSizeX()][data.getSizeY()];
 		
 		int xstart = 0;
 		int xend = data.getSizeX()-1;
@@ -55,7 +55,7 @@ public class CalculateService extends BasicService implements ICalculateService
 		int yend = data.getSizeY()-1;
 		boolean allin = true;
 		boolean justfill = false;
-		int fillcol = -2;
+		short fillcol = -2;
 		boolean	usejustfill	= data.getXStart()<2 && data.getXStart()>-2
 			|| data.getYStart()<2 && data.getYStart()>-2
 			|| data.getXEnd()<2 && data.getXEnd()>-2
@@ -164,11 +164,11 @@ public class CalculateService extends BasicService implements ICalculateService
 	/**
 	 *  Determine the color of a point.
 	 */
-	protected int determineColor(double xn, double yn, int max)
+	protected short determineColor(double xn, double yn, short max)
 	{
 		double x0 = xn;
 		double y0 = yn;
-		int i = 0;
+		short i = 0;
 		double c =  Math.sqrt(xn*xn + yn*yn);
 		
 		for(i=0; c<2 && i<max; i++)
