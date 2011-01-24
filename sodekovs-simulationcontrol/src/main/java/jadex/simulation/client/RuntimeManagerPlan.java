@@ -245,19 +245,22 @@ public class RuntimeManagerPlan extends Plan {
 		//Start Online Visualization
 		startOnlineVisualization(simConf);
 		
+		// Hack: Synchronize start time!
+//		System.out.println("-->StartTime at Client: " + startTime);
+		long startTime = clockservice.getTime();
+		AbstractEnvironmentSpace space = ((AbstractEnvironmentSpace) (exta).getSpace(simConf.getNameOfSpace()));
+		space.setProperty("REAL_START_TIME_OF_SIMULATION", startTime);
+
+		
 		//resume application
 		cms.resumeComponent(cid);
 
 		// Save initial facts of this simulation run.
-		long startTime = clockservice.getTime();
 		Map facts = new HashMap();
 		facts.put(Constants.EXPERIMENT_START_TIME, new Long(startTime));
 		getBeliefbase().getBelief("simulationFacts").setFact(facts);
 
-		// Hack: Synchronize start time!
-//		System.out.println("-->StartTime at Client: " + startTime);
-		AbstractEnvironmentSpace space = ((AbstractEnvironmentSpace) (exta).getSpace(simConf.getNameOfSpace()));
-		space.setProperty("REAL_START_TIME_OF_SIMULATION", startTime);
+
 		
 		// *************************************************************
 		// This is a hack for this special application.xml -> MarsWorld
