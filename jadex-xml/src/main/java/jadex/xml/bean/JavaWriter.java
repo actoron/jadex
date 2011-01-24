@@ -150,10 +150,10 @@ public class JavaWriter extends Writer
 			typeinfos.add(ti_class);
 			
 			// java.lang.String
-			TypeInfo ti_string = new TypeInfo(null, new ObjectInfo(String.class), new MappingInfo(null, new AttributeInfo[]{
-				new AttributeInfo(new AccessInfo("content", AccessInfo.THIS))}));
-//			TypeInfo ti_string = new TypeInfo(null, new ObjectInfo(String.class), new MappingInfo(null, null,
-//				new AttributeInfo(new AccessInfo((String)null, AccessInfo.THIS))));
+//			TypeInfo ti_string = new TypeInfo(null, new ObjectInfo(String.class), new MappingInfo(null, new AttributeInfo[]{
+//				new AttributeInfo(new AccessInfo("content", AccessInfo.THIS))}));
+			TypeInfo ti_string = new TypeInfo(null, new ObjectInfo(String.class), new MappingInfo(null, null,
+				new AttributeInfo(new AccessInfo((String)null, AccessInfo.THIS))));
 			typeinfos.add(ti_string);
 			
 			// java.lang.Boolean

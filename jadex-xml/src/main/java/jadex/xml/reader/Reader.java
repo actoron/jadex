@@ -489,68 +489,67 @@ public class Reader
 //				readcontext.setTopse(topse);
 				// If this is the only element on stack, set also root to it
 				if(stack.size()==1)
-					readcontext.setRootObject(topse.getObject());
-	
-				// If object has internal id save it in the readobjects map.
-				String id = topse.getRawAttributes()!=null? (String)topse.getRawAttributes().get(SXML.ID): null;
-				if(id!=null && val!=null)
-				{
-	//				System.out.println("ID: "+id+", "+val.getClass());
-					readcontext.getReadObjects().put(id, val);
-				}	
+					readcontext.setRootObject(topse.getObject());	
 			}
 			
+			// Handle content.
+			if(topse.getObject()!=null && topse.getContent()!=null && topse.getContent().trim().length()>0)
+			{
+				if(typeinfo!=null && typeinfo.getContentInfo()!=null) 
+				{
+					handler.handleAttributeValue(topse.getObject(), null, null, topse.getContent(), typeinfo.getContentInfo(), readcontext);
+				}
+				else
+				{
+					StackElement	se	= readcontext.getTopStackElement();
+					readcontext.getReporter().report("No content mapping for: "+topse.getContent()+" tag="+topse.getTag(), "link error", se, se.getLocation());													
+				}
+			}
+				
+			// Handle post-processing			
+			final IPostProcessor postproc = handler.getPostProcessor(topse.getObject(), typeinfo);
+			if(postproc!=null)
+			{
+				if(postproc.getPass()==0)
+				{
+					try
+					{
+						Object changed = postproc.postProcess(readcontext, topse.getObject());
+						if(changed!=null)
+							topse.setObject(changed);
+					}
+					catch(RuntimeException e)
+					{
+						StackElement	se	= readcontext.getTopStackElement();
+						readcontext.getReporter().report("Error during postprocessing: "+e, "postprocessor error", se, se.getLocation());																				
+					}
+				}
+				else
+				{
+					final Object object = topse.getObject();
+					readcontext.getPostProcessors().put(new Integer(postproc.getPass()), new Runnable()
+					{
+						public void run()
+						{
+							Object check = postproc.postProcess(readcontext, object);
+							if(check!=null)
+								throw new RuntimeException("Object replacement only possible in first pass.");
+						}
+					});
+				}
+			}
+			
+			// If object has internal id save it in the readobjects map.
+			String id = topse.getRawAttributes()!=null? (String)topse.getRawAttributes().get(SXML.ID): null;
+			if(id!=null && topse.getObject()!=null)
+			{
+//				System.out.println("ID: "+id+", "+val.getClass());
+				readcontext.getReadObjects().put(id, topse.getObject());
+			}				
+	
 			// Link current object to parent
 			if(topse.getObject()!=null)
 			{					
-				// Handle content.
-				if(topse.getContent()!=null && topse.getContent().trim().length()>0)
-				{
-					if(typeinfo!=null && typeinfo.getContentInfo()!=null) 
-					{
-						handler.handleAttributeValue(topse.getObject(), null, null, topse.getContent(), typeinfo.getContentInfo(), readcontext);
-					}
-					else
-					{
-						StackElement	se	= readcontext.getTopStackElement();
-						readcontext.getReporter().report("No content mapping for: "+topse.getContent()+" tag="+topse.getTag(), "link error", se, se.getLocation());													
-					}
-				}
-				
-				// Handle post-processing
-				
-				final IPostProcessor postproc = handler.getPostProcessor(topse.getObject(), typeinfo);
-				if(postproc!=null)
-				{
-					if(postproc.getPass()==0)
-					{
-						try
-						{
-							Object changed = postproc.postProcess(readcontext, topse.getObject());
-							if(changed!=null)
-								topse.setObject(changed);
-						}
-						catch(RuntimeException e)
-						{
-							StackElement	se	= readcontext.getTopStackElement();
-							readcontext.getReporter().report("Error during postprocessing: "+e, "postprocessor error", se, se.getLocation());																				
-						}
-					}
-					else
-					{
-						final Object object = topse.getObject();
-						readcontext.getPostProcessors().put(new Integer(postproc.getPass()), new Runnable()
-						{
-							public void run()
-							{
-								Object check = postproc.postProcess(readcontext, object);
-								if(check!=null)
-									throw new RuntimeException("Object replacement only possible in first pass.");
-							}
-						});
-					}
-				}
-	
 				// Handle linking
 				boolean bulklink = typeinfo!=null? typeinfo.isBulkLink(): this.bulklink;
 				if(stack.size()>0 && bulklink)

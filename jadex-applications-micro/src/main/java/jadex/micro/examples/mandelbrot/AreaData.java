@@ -2,6 +2,8 @@ package jadex.micro.examples.mandelbrot;
 
 import jadex.bridge.IComponentIdentifier;
 
+import java.util.StringTokenizer;
+
 
 /**
  * Struct for calculation of a specific mandelbrot cutout.
@@ -271,7 +273,9 @@ public class AreaData
 	 * 
 	 * @return the data.
 	 */
-	public int[][] getData()
+	// Not called getData as it should not be serialized in XML.
+	// todo: support @XMLExclude
+	public int[][] fetchData()
 	{
 		return data;
 	}
@@ -284,6 +288,58 @@ public class AreaData
 	public void setData(int[][] data)
 	{
 		this.data = data;
+	}
+
+	/**
+	 * Get the data as a transferable string.
+	 * 
+	 * @return the data string.
+	 */
+	public String getDataString()
+	{
+		String	ret	= null;
+		if(data!=null)
+		{
+			// create string in form of "rows cols\n1 2\n4 5\n7 8"
+			StringBuffer	sbuf	= new StringBuffer();
+			sbuf.append(data.length);
+			sbuf.append(" ");
+			sbuf.append(data[0].length);
+			sbuf.append("\n");
+			for(int i=0; i<data.length; i++)
+			{
+				if(i>0)
+					sbuf.append("\n");
+				for(int j=0; j<data[i].length; j++)
+				{
+					if(j>0)
+						sbuf.append(" ");
+					sbuf.append(data[i][j]);
+				}
+			}
+			ret	= sbuf.toString();
+		}
+		return ret;
+	}
+
+	/**
+	 * Set the data.
+	 * 
+	 * @param data The data to set.
+	 */
+	public void setDataString(String sdata)
+	{
+		StringTokenizer	stok	= new StringTokenizer(sdata);
+		int	rows	= Integer.parseInt(stok.nextToken());
+		int	cols	= Integer.parseInt(stok.nextToken());
+		this.data	= new int[rows][cols];
+		for(int i=0; i<data.length; i++)
+		{
+			for(int j=0; j<data[i].length; j++)
+			{
+				data[i][j]	= Integer.parseInt(stok.nextToken());
+			}
+		}
 	}
 
 	/**

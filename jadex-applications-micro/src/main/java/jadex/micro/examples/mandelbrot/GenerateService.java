@@ -280,7 +280,7 @@ public class GenerateService extends BasicService implements IGenerateService
 					{
 						try
 						{
-							data.getData()[xs+xi][ys+yi] = ad.getData()[xi][yi];
+							data.fetchData()[xs+xi][ys+yi] = ad.fetchData()[xi][yi];
 						}
 						catch(Exception e) 
 						{

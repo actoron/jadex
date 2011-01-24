@@ -54,7 +54,8 @@ public class PropertiesXMLHelper
 		
 //		typeinfos.add(new TypeInfo(null, new QName[]{new QName("http://jadex.sourceforge.net/jadexconf", "property")}, Property.class, null, new BeanAttributeInfo(null, "value")));
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "property")), 
-			new ObjectInfo(Property.class), new MappingInfo(null, null, new AttributeInfo(new AccessInfo((String)null, "value")))));
+			new ObjectInfo(Property.class), new MappingInfo(null, null, new AttributeInfo(new AccessInfo((String)null, "value")),
+				new AttributeInfo[]{new AttributeInfo(new AccessInfo("name")), new AttributeInfo(new AccessInfo("type"))})));
 	}
 	
 	/**

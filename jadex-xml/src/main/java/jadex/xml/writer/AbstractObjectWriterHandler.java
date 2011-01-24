@@ -358,7 +358,7 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 			if(isBasicType(null, object))
 			{
 				// todo: use prewriter
-				System.out.println("Special case for content: "+object+" "+object.getClass());
+//				System.out.println("Special case for content: "+object+" "+object.getClass());
 				wi.setContent(object.toString());
 			}
 			else

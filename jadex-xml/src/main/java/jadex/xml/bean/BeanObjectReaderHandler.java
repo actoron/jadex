@@ -396,11 +396,21 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 		
 		if(attrval!=null)
 		{
-			setElementValue(accessinfo, xmlattrname, object, attrval, converter, id, context);
+			boolean	set	= setElementValue(accessinfo, xmlattrname, object, attrval, converter, id, context);
+			if(!set)
+			{
+				context.getReporter().report("Failure in setting attribute: "+xmlattrname+" on object: "+object+" (unknown attribute?)",
+					"attribute error", context, context.getParser().getLocation());
+			}
 		}
 		else if(accessinfo instanceof AccessInfo && ((AccessInfo)accessinfo).getDefaultValue()!=null)
 		{
-			setElementValue(accessinfo, xmlattrname, object, ((AccessInfo)accessinfo).getDefaultValue(), converter, id, context);
+			boolean	set	= setElementValue(accessinfo, xmlattrname, object, ((AccessInfo)accessinfo).getDefaultValue(), converter, id, context);
+			if(!set)
+			{
+				context.getReporter().report("Failure in setting attribute: "+xmlattrname+" on object: "+object+" (unknown attribute?)",
+					"attribute error", context, context.getParser().getLocation());
+			}
 		}
 	}
 		
@@ -424,8 +434,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 		if(linkinfo instanceof SubobjectInfo)
 		{
 			SubobjectInfo sinfo = (SubobjectInfo)linkinfo;
-			setElementValue(sinfo.getAccessInfo(), tag, parent, object, sinfo.getConverter(), null, context);
-			linked = true;
+			linked	= setElementValue(sinfo.getAccessInfo(), tag, parent, object, sinfo.getConverter(), null, context);
 		}
 		
 		// Special case array
@@ -441,70 +450,36 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 		}
 		else
 		{
-			List classes	= new LinkedList();
-			classes.add(object.getClass());
-			
-			String[] plunames = new String[pathname.length];
-			String[] sinnames = new String[pathname.length];
-			String[] fieldnames = new String[pathname.length];
-			for(int i=0; i<pathname.length; i++)
+			// Try linking via tag name.
+			for(int i=pathname.length-1; !linked && i>=0; i--)
 			{
-				String name = pathname[i].getLocalPart().substring(0, 1).toUpperCase()+pathname[i].getLocalPart().substring(1);
-				plunames[i] = name;
-				sinnames[i] = SUtil.getSingular(name);
-				fieldnames[i] = pathname[i].getLocalPart();
-			}
-			
-			// Try via fieldname
-			
-			for(int i=0; i<fieldnames.length && !linked; i++)
-			{
-				linked = setField(fieldnames[i], parent, object, null, context, null);
+				linked	= setElementValue(null, pathname[i], parent, object, null, null, context);
 			}
 			
 			// Try name guessing via class/superclass/interface names of object to add
-			while(!linked && !classes.isEmpty())
+			if(!linked)
 			{
-				Class clazz = (Class)classes.remove(0);
-				
-				for(int i=0; i<plunames.length && !linked; i++)
+				List classes	= new LinkedList();
+				classes.add(object.getClass());
+			
+				while(!linked && !classes.isEmpty())
 				{
-					linked = internalLinkObjects(clazz, "set"+plunames[i], object, parent, context);
-					if(!linked)
+					Class clazz = (Class)classes.remove(0);
+					if(!BasicTypeConverter.isBuiltInType(clazz))
 					{
-						linked = internalLinkObjects(clazz, "add"+sinnames[i], object, parent, context);
-						if(!linked && !sinnames[i].equals(plunames[i]))
-						{	
-							linked = internalLinkObjects(clazz, "add"+plunames[i], object, parent, context);
-						}
+						String name = SReflect.getInnerClassName(clazz);
+						linked	= setElementValue(name, null, parent, object, null, null, context);
 					}
-				}
-				
-				// Try classname of object to add
-				if(!linked && !BasicTypeConverter.isBuiltInType(clazz))
-				{
-					String name = SReflect.getInnerClassName(clazz);
-					linked = internalLinkObjects(clazz, "set"+name, object, parent, context);
+					
 					if(!linked)
 					{
-						linked = internalLinkObjects(clazz, "add"+name, object, parent, context);
-						if(!linked)
+						if(clazz.getSuperclass()!=null)
+							classes.add(clazz.getSuperclass());
+						Class[]	ifs	= clazz.getInterfaces();
+						for(int i=0; i<ifs.length; i++)
 						{
-							String sinname = SUtil.getSingular(name);
-							if(!name.equals(sinname))
-								linked = internalLinkObjects(clazz, "add"+sinname, object, parent, context);
+							classes.add(ifs[i]);
 						}
-					}
-				}
-				
-				if(!linked)
-				{
-					if(clazz.getSuperclass()!=null)
-						classes.add(clazz.getSuperclass());
-					Class[]	ifs	= clazz.getInterfaces();
-					for(int i=0; i<ifs.length; i++)
-					{
-						classes.add(ifs[i]);
 					}
 				}
 			}
@@ -535,8 +510,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 		if(linkinfo!=null)
 		{
 			// converter and id null?!
-			setBulkAttributeValues(linkinfo, tag, parent, childs, null, null, context);
-			linked = true;
+			linked	= setBulkAttributeValues(linkinfo, tag, parent, childs, null, null, context);
 		}
 		
 		// Special case array
@@ -553,70 +527,108 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 			
 			linked = true;
 		}
-		
-		// Try linking via field/method searching by name guessing.
 		else
 		{
-			List classes	= new LinkedList();
-			classes.add(childs.get(0).getClass());
-			
-			String[] orignames = new String[pathname.length];
-			String[] plunames = new String[pathname.length];
-			String[] origfieldnames = new String[pathname.length];
-			String[] plufieldnames = new String[pathname.length];
-			for(int i=0; i<pathname.length; i++)
+			// Try linking via tag name.
+			for(int i=pathname.length-1; !linked && i>=0; i--)
 			{
-				String origname = pathname[i].getLocalPart();
-				String pluname =  SUtil.getPlural(pathname[i].getLocalPart());
-				plunames[i] = pluname.substring(0, 1).toUpperCase()+pluname.substring(1);
-				orignames[i] = origname.substring(0, 1).toUpperCase()+origname.substring(1);
-				plufieldnames[i] = pluname;
-				origfieldnames[i] = origname;
+				linked	= setBulkAttributeValues(null, pathname[i], parent, childs, null, null, context);
 			}
 			
-			// Try via fieldname
-			for(int i=0; i<plufieldnames.length && !linked; i++)
+			// Try name guessing via class/superclass/interface names of objects to add
+			if(!linked)
 			{
-				linked = setBulkField(plufieldnames[i], parent, childs, null, context, null);
-				if(!linked && !origfieldnames[i].equals(plufieldnames[i]))
-				{
-					linked = setBulkField(origfieldnames[i], parent, childs, null, context, null);
-				}
-			}
+				List classes	= new LinkedList();
+				classes.add(childs.get(0).getClass());
 			
-			// Try name guessing via class/superclass/interface names of object to add
-			while(!linked && !classes.isEmpty())
-			{
-				Class clazz = (Class)classes.remove(0);
-				
-				for(int i=0; i<plunames.length && !linked; i++)
+				while(!linked && !classes.isEmpty())
 				{
-					linked = internalBulkLinkObjects(clazz, "set"+plunames[i], childs, parent, context);
-					if(!linked && !orignames[i].equals(plunames[i]))
+					Class clazz = (Class)classes.remove(0);
+					if(!BasicTypeConverter.isBuiltInType(clazz))
 					{
-						linked = internalBulkLinkObjects(clazz, "set"+orignames[i], childs, parent, context);
+						String name = SReflect.getInnerClassName(clazz);
+						linked	= setBulkAttributeValues(name, null, parent, childs, null, null, context);
 					}
-				}
-				
-				// Try classname of object to add
-				if(!linked && !BasicTypeConverter.isBuiltInType(clazz))
-				{
-					String name = SReflect.getInnerClassName(clazz);
-					linked = internalBulkLinkObjects(clazz, "set"+name, childs, parent, context);
-				}
-				
-				if(!linked)
-				{
-					if(clazz.getSuperclass()!=null)
-						classes.add(clazz.getSuperclass());
-					Class[]	ifs	= clazz.getInterfaces();
-					for(int i=0; i<ifs.length; i++)
+					
+					if(!linked)
 					{
-						classes.add(ifs[i]);
+						if(clazz.getSuperclass()!=null)
+							classes.add(clazz.getSuperclass());
+						Class[]	ifs	= clazz.getInterfaces();
+						for(int i=0; i<ifs.length; i++)
+						{
+							classes.add(ifs[i]);
+						}
 					}
 				}
 			}
+			
 		}
+
+		
+//		// Try linking via field/method searching by name guessing.
+//		else
+//		{
+//			List classes	= new LinkedList();
+//			classes.add(childs.get(0).getClass());
+//			
+//			String[] orignames = new String[pathname.length];
+//			String[] plunames = new String[pathname.length];
+//			String[] origfieldnames = new String[pathname.length];
+//			String[] plufieldnames = new String[pathname.length];
+//			for(int i=0; i<pathname.length; i++)
+//			{
+//				String origname = pathname[i].getLocalPart();
+//				String pluname =  SUtil.getPlural(pathname[i].getLocalPart());
+//				plunames[i] = pluname.substring(0, 1).toUpperCase()+pluname.substring(1);
+//				orignames[i] = origname.substring(0, 1).toUpperCase()+origname.substring(1);
+//				plufieldnames[i] = pluname;
+//				origfieldnames[i] = origname;
+//			}
+//			
+//			// Try via fieldname
+//			for(int i=0; i<plufieldnames.length && !linked; i++)
+//			{
+//				linked = setBulkField(plufieldnames[i], parent, childs, null, context, null);
+//				if(!linked && !origfieldnames[i].equals(plufieldnames[i]))
+//				{
+//					linked = setBulkField(origfieldnames[i], parent, childs, null, context, null);
+//				}
+//			}
+//			
+//			// Try name guessing via class/superclass/interface names of object to add
+//			while(!linked && !classes.isEmpty())
+//			{
+//				Class clazz = (Class)classes.remove(0);
+//				
+//				for(int i=0; i<plunames.length && !linked; i++)
+//				{
+//					linked = internalBulkLinkObjects(clazz, "set"+plunames[i], childs, parent, context);
+//					if(!linked && !orignames[i].equals(plunames[i]))
+//					{
+//						linked = internalBulkLinkObjects(clazz, "set"+orignames[i], childs, parent, context);
+//					}
+//				}
+//				
+//				// Try classname of object to add
+//				if(!linked && !BasicTypeConverter.isBuiltInType(clazz))
+//				{
+//					String name = SReflect.getInnerClassName(clazz);
+//					linked = internalBulkLinkObjects(clazz, "set"+name, childs, parent, context);
+//				}
+//				
+//				if(!linked)
+//				{
+//					if(clazz.getSuperclass()!=null)
+//						classes.add(clazz.getSuperclass());
+//					Class[]	ifs	= clazz.getInterfaces();
+//					for(int i=0; i<ifs.length; i++)
+//					{
+//						classes.add(ifs[i]);
+//					}
+//				}
+//			}
+//		}
 		
 		if(!linked)
 		{
@@ -726,15 +738,17 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	 *  @param root The root object.
 	 *  @param classloader The classloader.
 	 */
-	protected void setElementValue(Object accessinfo, QName xmlname, Object object, Object val, Object converter, String id, ReadContext context) throws Exception
+	protected boolean setElementValue(Object accessinfo, QName xmlname, Object object, Object val, Object converter, String id, ReadContext context) throws Exception
 	{
-		if(NULL.equals(val))
-			return;
+		boolean	set	= false;
 		
-		boolean set = false;
+		if(NULL.equals(val))
+		{
+			set	= true;
+		}
 		
 		// Write to a map.
-		if(accessinfo instanceof AccessInfo && ((AccessInfo)accessinfo).getExtraInfo() instanceof BeanAccessInfo)
+		else if(accessinfo instanceof AccessInfo && ((AccessInfo)accessinfo).getExtraInfo() instanceof BeanAccessInfo)
 		{	
 			AccessInfo ai = (AccessInfo)accessinfo;
 			BeanAccessInfo bai = (BeanAccessInfo)ai.getExtraInfo();
@@ -1031,29 +1045,31 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 				}
 			}
 			
+			// Try to guess field or method.
 			if(!set)
 			{
-				String postfix = accessinfo instanceof String? ((String)accessinfo).substring(0,1).toUpperCase()+((String)accessinfo).substring(1)
-					: xmlname.getLocalPart().substring(0,1).toUpperCase()+xmlname.getLocalPart().substring(1);
-				set = invokeSetMethod(new String[]{"set", "add"}, postfix, val, object, context, null, null);
-			
+				String fieldname = accessinfo instanceof String? (String)accessinfo : xmlname.getLocalPart();
+				set	= setField(fieldname, object, val, converter, context, id);
+				
 				if(!set)
 				{
-					String oldpostfix = postfix;
-					postfix = SUtil.getSingular(postfix);
-					if(!postfix.equals(oldpostfix))
+					String postfix = fieldname.substring(0,1).toUpperCase()+fieldname.substring(1);
+					set = invokeSetMethod(new String[]{"set", "add"}, postfix, val, object, context, converter, id);
+					
+					if(!set)
 					{
-						set = invokeSetMethod(new String[]{"set", "add"}, postfix, val, object, context, null, null);
+						String oldpostfix = postfix;
+						postfix = SUtil.getSingular(postfix);
+						if(!postfix.equals(oldpostfix))
+						{
+							set = invokeSetMethod(new String[]{"set", "add"}, postfix, val, object, context, converter, id);
+						}
 					}
 				}
 			}
 		}
 		
-		if(!set)
-		{
-			context.getReporter().report("Failure in setting attribute: "+xmlname+" on object: "+object+" (unknown attribute?)",
-				"attribute error", context, context.getParser().getLocation());
-		}
+		return set;
 	}
 	
 	/**
@@ -1066,7 +1082,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	 *  @param root The root object.
 	 *  @param classloader The classloader.
 	 */
-	protected void setBulkAttributeValues(Object accessinfo, QName xmlattrname, Object object, 
+	protected boolean	setBulkAttributeValues(Object accessinfo, QName xmlattrname, Object object, 
 		List vals, Object converter, String id, ReadContext context) throws Exception
 	{
 		boolean set = false;
@@ -1190,19 +1206,38 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 				}
 			}
 			
+			// Try to guess field or method name.
 			if(!set)
 			{
-				String postfix = accessinfo instanceof String? ((String)accessinfo).substring(0,1).toUpperCase()+((String)accessinfo).substring(1)
-					: xmlattrname.getLocalPart().substring(0,1).toUpperCase()+xmlattrname.getLocalPart().substring(1);
-				set = invokeBulkSetMethod(new String[]{"set"}, postfix, vals, object, context, null, null);
+				String fieldname = accessinfo instanceof String? (String)accessinfo: xmlattrname.getLocalPart();
+				set	= setBulkField(fieldname, object, vals, converter, context, id);
+				if(!set)
+				{
+					String	plufieldname	= SUtil.getPlural(fieldname);
+					if(!fieldname.equals(plufieldname))
+					{
+						set	= setBulkField(plufieldname, object, vals, converter, context, id);
+					}
+				}
+				
+				if(!set)
+				{
+					String postfix = fieldname.substring(0,1).toUpperCase()+fieldname.substring(1);
+					set = invokeBulkSetMethod(new String[]{"set"}, postfix, vals, object, context, null, null);
+
+					if(!set)
+					{
+						String	plupostfix	= SUtil.getPlural(postfix);
+						if(!postfix.equals(plupostfix))
+						{
+							set = invokeBulkSetMethod(new String[]{"set"}, plupostfix, vals, object, context, null, null);
+						}
+					}
+				}
 			}
 		}
 		
-		if(!set)
-		{
-			context.getReporter().report("Failure in setting bulk values: "+xmlattrname+" on object: "+object+" (unknown attribute?)",
-				"attribute error", context, context.getParser().getLocation());
-		}
+		return set;
 	}
 	
 	/**
@@ -1360,120 +1395,120 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 		return set;
 	}
 	
-	/**
-	 *  Internal link objects method.
-	 *  @param clazz The clazz.
-	 *  @param name The name.
-	 *  @param object The object.
-	 *  @param parent The parent.
-	 *  @param root The root.
-	 *  @param classloader classloader.
-	 */
-	protected boolean internalLinkObjects(Class clazz, String name, Object object, 
-		Object parent, ReadContext context) throws Exception
-	{
-		boolean ret = false;
-			
-		Method[] ms = SReflect.getMethods(parent.getClass(), name);
-		for(int i=0; !ret && i<ms.length; i++)
-		{
-			Class[] ps = ms[i].getParameterTypes();
-			if(ps.length==1)
-			{
-				if(SReflect.getWrappedType(ps[0]).isAssignableFrom(clazz))
-				{
-					try
-					{
-						ms[i].invoke(parent, new Object[]{object});
-						ret	= true;
-					}
-					catch(InvocationTargetException e)
-					{
-						// Ignore -> try other way of setting attribute
-//						context.getReporter().report("Failure invoking link method: "+e.getTargetException(),
-//							"link error", context, context.getParser().getLocation());
-					}
-					catch(Exception e)
-					{
-						// Ignore -> try other way of setting attribute
-//						context.getReporter().report("Failure invoking link method: "+e,
-//							"link error", context, context.getParser().getLocation());
-					}
-				}
-				else if(object instanceof String)
-				{
-					IStringObjectConverter converter = BasicTypeConverter.getBasicStringConverter(ps[0]);
-					if(converter != null)
-					{
-						try
-						{
-							object = converter.convertString((String)object, context);
-							ms[i].invoke(parent, new Object[]{object});
-							ret	= true;
-						}
-						catch(InvocationTargetException e)
-						{
-							// Ignore -> try other way of setting attribute
-//							context.getReporter().report("Failure invoking link method: "+e.getTargetException(),
-//								"link error", context, context.getParser().getLocation());
-						}
-						catch(Exception e)
-						{
-							// Ignore -> try other way of setting attribute
-//							context.getReporter().report("Failure invoking link method: "+e,
-//								"link error", context, context.getParser().getLocation());
-						}
-					}
-				}
-			}
-		}
-		
-		return ret;
-	}
+//	/**
+//	 *  Internal link objects method.
+//	 *  @param clazz The clazz.
+//	 *  @param name The name.
+//	 *  @param object The object.
+//	 *  @param parent The parent.
+//	 *  @param root The root.
+//	 *  @param classloader classloader.
+//	 */
+//	protected boolean internalLinkObjects(Class clazz, String name, Object object, 
+//		Object parent, ReadContext context) throws Exception
+//	{
+//		boolean ret = false;
+//			
+//		Method[] ms = SReflect.getMethods(parent.getClass(), name);
+//		for(int i=0; !ret && i<ms.length; i++)
+//		{
+//			Class[] ps = ms[i].getParameterTypes();
+//			if(ps.length==1)
+//			{
+//				if(SReflect.getWrappedType(ps[0]).isAssignableFrom(clazz))
+//				{
+//					try
+//					{
+//						ms[i].invoke(parent, new Object[]{object});
+//						ret	= true;
+//					}
+//					catch(InvocationTargetException e)
+//					{
+//						// Ignore -> try other way of setting attribute
+////						context.getReporter().report("Failure invoking link method: "+e.getTargetException(),
+////							"link error", context, context.getParser().getLocation());
+//					}
+//					catch(Exception e)
+//					{
+//						// Ignore -> try other way of setting attribute
+////						context.getReporter().report("Failure invoking link method: "+e,
+////							"link error", context, context.getParser().getLocation());
+//					}
+//				}
+//				else if(object instanceof String)
+//				{
+//					IStringObjectConverter converter = BasicTypeConverter.getBasicStringConverter(ps[0]);
+//					if(converter != null)
+//					{
+//						try
+//						{
+//							object = converter.convertString((String)object, context);
+//							ms[i].invoke(parent, new Object[]{object});
+//							ret	= true;
+//						}
+//						catch(InvocationTargetException e)
+//						{
+//							// Ignore -> try other way of setting attribute
+////							context.getReporter().report("Failure invoking link method: "+e.getTargetException(),
+////								"link error", context, context.getParser().getLocation());
+//						}
+//						catch(Exception e)
+//						{
+//							// Ignore -> try other way of setting attribute
+////							context.getReporter().report("Failure invoking link method: "+e,
+////								"link error", context, context.getParser().getLocation());
+//						}
+//					}
+//				}
+//			}
+//		}
+//		
+//		return ret;
+//	}
 	
-	/**
-	 *  Internal bulk link objects method.
-	 *  @param clazz The clazz.
-	 *  @param name The name.
-	 *  @param object The object.
-	 *  @param parent The parent.
-	 *  @param root The root.
-	 *  @param classloader classloader.
-	 */
-	protected boolean internalBulkLinkObjects(Class clazz, String name, List childs, 
-		Object parent, ReadContext context) throws Exception
-	{
-		boolean ret = false;
-			
-		Method[] ms = SReflect.getMethods(parent.getClass(), name);
-		for(int i=0; !ret && i<ms.length; i++)
-		{
-			Class[] ps = ms[i].getParameterTypes();
-			if(ps.length==1)
-			{
-				try
-				{
-					Object arg = convertBulkValues(childs, ps[0], null, context, null);
-					ms[i].invoke(parent, new Object[]{arg});
-					ret	= true;
-				}	
-				catch(InvocationTargetException e)
-				{
-					// Ignore -> try other way of setting attribute
-//					context.getReporter().report("Failure invoking link method: "+e.getTargetException(),
-//						"link error", context, context.getParser().getLocation());
-				}
-				catch(Exception e)
-				{
-					// Ignore -> try other way of setting attribute
-//					context.getReporter().report("Failure invoking link method: "+e,
-//						"link error", context, context.getParser().getLocation());
-				}
-			}
-		}
-		
-		return ret;
-	}
+//	/**
+//	 *  Internal bulk link objects method.
+//	 *  @param clazz The clazz.
+//	 *  @param name The name.
+//	 *  @param object The object.
+//	 *  @param parent The parent.
+//	 *  @param root The root.
+//	 *  @param classloader classloader.
+//	 */
+//	protected boolean internalBulkLinkObjects(Class clazz, String name, List childs, 
+//		Object parent, ReadContext context) throws Exception
+//	{
+//		boolean ret = false;
+//			
+//		Method[] ms = SReflect.getMethods(parent.getClass(), name);
+//		for(int i=0; !ret && i<ms.length; i++)
+//		{
+//			Class[] ps = ms[i].getParameterTypes();
+//			if(ps.length==1)
+//			{
+//				try
+//				{
+//					Object arg = convertBulkValues(childs, ps[0], null, context, null);
+//					ms[i].invoke(parent, new Object[]{arg});
+//					ret	= true;
+//				}	
+//				catch(InvocationTargetException e)
+//				{
+//					// Ignore -> try other way of setting attribute
+////					context.getReporter().report("Failure invoking link method: "+e.getTargetException(),
+////						"link error", context, context.getParser().getLocation());
+//				}
+//				catch(Exception e)
+//				{
+//					// Ignore -> try other way of setting attribute
+////					context.getReporter().report("Failure invoking link method: "+e,
+////						"link error", context, context.getParser().getLocation());
+//				}
+//			}
+//		}
+//		
+//		return ret;
+//	}
 	
 	/**
 	 *  Convert a value by using a converter.

@@ -403,6 +403,8 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 	 */
 	protected boolean isBasicType(Object property, Object value)
 	{
+//		if(value.getClass().equals(String.class))
+//			System.out.println("string sdklhgb");
 		return BasicTypeConverter.isBuiltInType(value.getClass());
 	}
 	
@@ -466,7 +468,8 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 		if(value!=null)
 		{
 			BeanProperty prop = (BeanProperty)property;
-			ret = value.getClass().equals(SReflect.getWrappedType(prop.getSetterType()));
+			// Do not allow strings -> avoids strings being written as attributes by default.
+			ret = !(value instanceof String) && value.getClass().equals(SReflect.getWrappedType(prop.getSetterType()));
 		}
 		return ret;
 	}

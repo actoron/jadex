@@ -6,6 +6,7 @@ import jadex.xml.AttributeConverter;
 import jadex.xml.AttributeInfo;
 import jadex.xml.IContext;
 import jadex.xml.IObjectObjectConverter;
+import jadex.xml.IPostProcessor;
 import jadex.xml.IStringObjectConverter;
 import jadex.xml.MappingInfo;
 import jadex.xml.ObjectInfo;
@@ -139,15 +140,30 @@ public class JavaReader extends Reader
 			
 			// java.lang.String
 			TypeInfo ti_string = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.lang", "String")}),
-				new ObjectInfo(new IBeanObjectCreator()
+				new ObjectInfo(null, new IPostProcessor()
 				{
-					public Object createObject(IContext context, Map rawattributes) throws Exception
+					public Object postProcess(IContext context, Object object)
 					{
-						return (String)rawattributes.get("content");
+//						System.err.println("postprocess: "+object);
+						return object!=null ? object : "";
 					}
-				}),
-				new MappingInfo(null, new AttributeInfo[]{new AttributeInfo(new AccessInfo("content", null, AccessInfo.IGNORE_READWRITE))}
-			));
+					
+					public int getPass()
+					{
+						return 0;
+					}
+				})
+//				new ObjectInfo(new IBeanObjectCreator()
+//				{
+//					public Object createObject(IContext context, Map rawattributes) throws Exception
+//					{
+//						return "";//(String)rawattributes.get("content");
+//					}
+//				}),
+//				new MappingInfo(null, null, new AttributeInfo(new AccessInfo(AccessInfo.THIS)))
+//				new MappingInfo(null, new AttributeInfo[]{new AttributeInfo(new AccessInfo("content", null, AccessInfo.IGNORE_READWRITE))}
+//			));
+			);
 			typeinfos.add(ti_string);
 			
 			// java.lang.Boolean

@@ -16,6 +16,15 @@ public class InvoiceList
 	//-------- methods --------
 	
 	/**
+	 *  Get the invoicelist.
+	 *  @return The invoicelist.
+	 */
+	public List getItems()
+	{
+		return invoicelist;
+	}
+	
+	/**
 	 *  Set the invoice items.
 	 *  @param invoices The invoice items.
 	 */

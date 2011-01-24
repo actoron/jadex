@@ -264,7 +264,7 @@ public class DisplayPanel extends JComponent
 		{
 			public void run()
 			{
-				int[][]	results	= data.getData();
+				int[][]	results	= data.fetchData();
 				DisplayPanel.this.data	= data;
 				DisplayPanel.this.image	= createImage(results.length, results[0].length);
 				Graphics	g	= image.getGraphics();

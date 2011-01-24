@@ -332,7 +332,7 @@ public class Test //extends TestCase
 	 */
 	public void testBeanWithPublicFields() throws Exception
 	{
-		C c = new C("test", 23);
+		C c = new C("test\n", 23);
 		
 		doWriteAndRead(c);
 	}
@@ -342,7 +342,7 @@ public class Test //extends TestCase
 	 */
 	protected void testSpecialCharacter() throws Exception
 	{
-		String str = "ö";
+		String str = "ö\n";
 		
 		doWriteAndRead(str);
 	}

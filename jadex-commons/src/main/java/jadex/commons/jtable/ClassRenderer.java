@@ -19,7 +19,7 @@ public class ClassRenderer extends DefaultTableCellRenderer
 	{
 		super.getTableCellRendererComponent(table, null, isSelected, hasFocus, row, column);
 		Class val = (Class)value;
-		String content = SReflect.getInnerClassName(val);
+		String content = val!=null ? SReflect.getInnerClassName(val) : "";
 		setText(content);
 		if(val!=null)
 			setToolTipText(val.getName());
