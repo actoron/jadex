@@ -6,6 +6,8 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
+import jadex.commons.IIntermediateFuture;
+import jadex.commons.IntermediateFuture;
 import jadex.commons.SUtil;
 import jadex.commons.ThreadSuspendable;
 
@@ -59,12 +61,13 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 	 */
 	public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
 	{
-		final Future future = new Future();
+		final Future future = IIntermediateFuture.class.isAssignableFrom(method.getReturnType())
+			? new IntermediateFuture() : new Future();
 		Object ret = future;
 		
 		ProxyInfo pi = pr.getProxyInfo();
-		if(method.getName().indexOf("calc")!=-1)
-			System.out.println("remote method invoc: "+method.getName());
+//		if(method.getName().indexOf("calc")!=-1)
+//			System.out.println("remote method invoc: "+method.getName());
 		
 		// Test if method is excluded.
 		if(pi.isExcluded(method))

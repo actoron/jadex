@@ -381,8 +381,11 @@ public class DisplayPanel extends JComponent
 				
 																				public void customExceptionOccurred(Exception exception)
 																				{
-																					// ignore
-																					exception.printStackTrace();
+																					// Component removed.
+																					if(progressdata!=null)
+																						progressdata.remove(progress);
+																					else
+																						exception.printStackTrace();
 																				}
 																			});
 																		}
@@ -390,8 +393,11 @@ public class DisplayPanel extends JComponent
 				
 																	public void customExceptionOccurred(Exception exception)
 																	{
-																		// ignore
-																		exception.printStackTrace();
+																		// Component removed.
+																		if(progressdata!=null)
+																			progressdata.remove(progress);
+																		else
+																			exception.printStackTrace();
 																	}
 																});
 															}
@@ -399,7 +405,7 @@ public class DisplayPanel extends JComponent
 															public void customExceptionOccurred(Exception exception)
 															{
 																// ignore
-																exception.printStackTrace();
+//																exception.printStackTrace();
 															}
 														});
 													}
@@ -409,7 +415,7 @@ public class DisplayPanel extends JComponent
 											public void customExceptionOccurred(Exception exception)
 											{
 												// ignore
-												exception.printStackTrace();
+//												exception.printStackTrace();
 											}
 										});
 										return null;

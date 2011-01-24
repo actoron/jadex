@@ -103,10 +103,10 @@ public class RemoteServiceManagementAgent extends MicroAgent
 					final ILibraryService ls = (ILibraryService)result;
 					Object	content	= msg.get(SFipa.CONTENT);
 					
-					if(content.toString().indexOf("calc")!=-1)
-					{
-						System.out.println("com: "+content);
-					}
+//					if(content.toString().indexOf("calc")!=-1)
+//					{
+//						System.out.println("com: "+content);
+//					}
 
 					if(content instanceof String)
 					{
@@ -144,11 +144,11 @@ public class RemoteServiceManagementAgent extends MicroAgent
 					if(content instanceof IRemoteCommand)
 					{
 						final IRemoteCommand com = (IRemoteCommand)content;
-						if(com instanceof RemoteMethodInvocationCommand
-							&& ((RemoteMethodInvocationCommand)com).getMethodName().indexOf("calc")!=-1)
-						{
-							System.out.println("com: "+com);
-						}
+//						if(com instanceof RemoteMethodInvocationCommand
+//							&& ((RemoteMethodInvocationCommand)com).getMethodName().indexOf("calc")!=-1)
+//						{
+//							System.out.println("com: "+com);
+//						}
 						
 						com.execute((IMicroExternalAccess)getExternalAccess(), rms).addResultListener(createResultListener(new DefaultResultListener()
 						{
