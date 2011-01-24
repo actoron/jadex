@@ -77,7 +77,7 @@ public class StarterServicePanel extends JPanel implements ICMSComponentListener
     protected JSplitPane csplit;
 	
     /** The jcc. */
-//    protected IControlCenter jcc;
+    protected IControlCenter jcc;
     
 	//-------- constructors --------
 
@@ -283,76 +283,76 @@ public class StarterServicePanel extends JPanel implements ICMSComponentListener
 		{
 			JMenuItem ret = null;
 
-			if(isEnabled())
-			{
-				IExplorerTreeNode node = (IExplorerTreeNode)mpanel.getLastSelectedPathComponent();
-				if(node instanceof FileNode)
-				{
-					final String type = ((FileNode)node).getFile().getAbsolutePath();
-					
-					if(((Boolean)SComponentFactory.isStartable(jcc.getExternalAccess().getServiceProvider(), type).get(new ThreadSuspendable())).booleanValue())//&& ((FileNode)node).isValid())
-					{
-						try
-						{
-//							IComponentFactory componentfactory = getJCC().getComponent().getPlatform().getComponentFactory();
-							IModelInfo model = (IModelInfo)SComponentFactory.loadModel(jcc.getExternalAccess().getServiceProvider(), type).get(new ThreadSuspendable());
-							String[] inistates = model.getConfigurations();
-//							IMBDIComponent model = SXML.loadComponentModel(type, null);
-//							final IMConfiguration[] inistates = model.getConfigurationbase().getConfigurations();
-							
-							if(inistates.length>1)
-							{
-								JMenu re = new JMenu("Start Component");
-								re.setIcon(icons.getIcon("start_component"));
-								for(int i=0; i<inistates.length; i++)
-								{
-									final String config = inistates[i];
-									JMenuItem me = new JMenuItem(config);
-									re.add(me);
-									me.addActionListener(new ActionListener()
-									{
-										public void actionPerformed(ActionEvent e)
-										{
-											// todo: collectresults = false?
-											StarterPanel.createComponent(jcc, type, null, config, null, false, null, null, null, null, null, spanel);
-										}
-									});
-									me.setToolTipText("Start in configuration: "+config);
-
-								}
-								ret = re;
-								ret.setToolTipText("Start component in selectable configuration");
-							}
-							else
-							{
-								if(inistates.length==1)
-								{
-									ret = new JMenuItem("Start Component ("+inistates[0]+")");
-									ret.setToolTipText("Start component in configuration:"+inistates[0]);
-								}
-								else
-								{
-									ret = new JMenuItem("Start Component");
-									ret.setToolTipText("Start component without explicit initial state");
-								}
-								ret.setIcon(icons.getIcon("start_component"));
-								ret.addActionListener(new ActionListener()
-								{
-									public void actionPerformed(ActionEvent e)
-									{
-										// todo: collectresults = false?
-										StarterPanel.createComponent(jcc, type, null, null, null, false, null, null, null, null, null, spanel);
-									}
-								});
-							}
-						}
-						catch(Exception e)
-						{
-							// NOP
-						}
-					}
-				}
-			}
+//			if(isEnabled())
+//			{
+//				IExplorerTreeNode node = (IExplorerTreeNode)mpanel.getLastSelectedPathComponent();
+//				if(node instanceof FileNode)
+//				{
+//					final String type = ((FileNode)node).getFile().getAbsolutePath();
+//					
+//					if(((Boolean)SComponentFactory.isStartable(jcc.getExternalAccess().getServiceProvider(), type).get(new ThreadSuspendable())).booleanValue())//&& ((FileNode)node).isValid())
+//					{
+//						try
+//						{
+////							IComponentFactory componentfactory = getJCC().getComponent().getPlatform().getComponentFactory();
+//							IModelInfo model = (IModelInfo)SComponentFactory.loadModel(jcc.getExternalAccess().getServiceProvider(), type).get(new ThreadSuspendable());
+//							String[] inistates = model.getConfigurations();
+////							IMBDIComponent model = SXML.loadComponentModel(type, null);
+////							final IMConfiguration[] inistates = model.getConfigurationbase().getConfigurations();
+//							
+//							if(inistates.length>1)
+//							{
+//								JMenu re = new JMenu("Start Component");
+//								re.setIcon(icons.getIcon("start_component"));
+//								for(int i=0; i<inistates.length; i++)
+//								{
+//									final String config = inistates[i];
+//									JMenuItem me = new JMenuItem(config);
+//									re.add(me);
+//									me.addActionListener(new ActionListener()
+//									{
+//										public void actionPerformed(ActionEvent e)
+//										{
+//											// todo: collectresults = false?
+//											StarterPanel.createComponent(jcc, type, null, config, null, false, null, null, null, null, null, spanel);
+//										}
+//									});
+//									me.setToolTipText("Start in configuration: "+config);
+//
+//								}
+//								ret = re;
+//								ret.setToolTipText("Start component in selectable configuration");
+//							}
+//							else
+//							{
+//								if(inistates.length==1)
+//								{
+//									ret = new JMenuItem("Start Component ("+inistates[0]+")");
+//									ret.setToolTipText("Start component in configuration:"+inistates[0]);
+//								}
+//								else
+//								{
+//									ret = new JMenuItem("Start Component");
+//									ret.setToolTipText("Start component without explicit initial state");
+//								}
+//								ret.setIcon(icons.getIcon("start_component"));
+//								ret.addActionListener(new ActionListener()
+//								{
+//									public void actionPerformed(ActionEvent e)
+//									{
+//										// todo: collectresults = false?
+//										StarterPanel.createComponent(jcc, type, null, null, null, false, null, null, null, null, null, spanel);
+//									}
+//								});
+//							}
+//						}
+//						catch(Exception e)
+//						{
+//							// NOP
+//						}
+//					}
+//				}
+//			}
 
 			return ret;
 		}

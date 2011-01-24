@@ -47,7 +47,7 @@ public class Main
 		
 		// Create an xml reader with standard bean object reader and the
 		// custom typeinfos
-		Reader xmlreader = new Reader(new BeanObjectReaderHandler(JavaReader.joinTypeInfos(typeinfos)));
+		Reader xmlreader = new Reader(new BeanObjectReaderHandler(typeinfos));
 		InputStream is = SUtil.getResource("jadex/xml/tutorial/example10/data.xml", null);
 		Object object = xmlreader.read(is, null, null);
 		is.close();
@@ -63,7 +63,7 @@ public class Main
 			})));
 		
 		// Write the xml to the output file.
-		Writer xmlwriter = new Writer(new BeanObjectWriterHandler(JavaWriter.joinTypeInfos(typeinfos), false, true), false);
+		Writer xmlwriter = new Writer(new BeanObjectWriterHandler(typeinfos, false, true), false);
 		String xml = Writer.objectToXML(xmlwriter, object, null);
 //		OutputStream os = new FileOutputStream("out.xml");
 //		xmlwriter.write(object, os, null, null);
