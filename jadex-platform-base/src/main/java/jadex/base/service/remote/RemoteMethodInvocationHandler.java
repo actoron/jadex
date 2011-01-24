@@ -56,13 +56,17 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 	
 	//-------- methods --------
 	
+//	public static Object debugcallid	= null;	
+	
+	
 	/**
 	 *  Invoke a method.
 	 */
 	public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
 	{
 		final Future future = IIntermediateFuture.class.isAssignableFrom(method.getReturnType())
-			? new IntermediateFuture() : new Future();
+			? new IntermediateFuture()
+			: new Future();
 		Object ret = future;
 		
 		ProxyInfo pi = pr.getProxyInfo();
@@ -120,6 +124,8 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 			// Call remote method using invocation command.	
 			final IComponentIdentifier compid = rsms.getRMSComponentIdentifier();
 			final String callid = SUtil.createUniqueId(compid.getLocalName());
+//			if("getServices".equals(method.getName()))
+//				debugcallid	= callid;
 			final RemoteMethodInvocationCommand content = new RemoteMethodInvocationCommand(
 				pr.getRemoteReference(), method.getName(), method.getParameterTypes(), args, callid);
 			

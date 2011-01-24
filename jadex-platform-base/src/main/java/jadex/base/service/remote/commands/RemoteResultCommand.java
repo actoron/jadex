@@ -2,6 +2,7 @@ package jadex.base.service.remote.commands;
 
 import jadex.base.service.remote.ExceptionInfo;
 import jadex.base.service.remote.IRemoteCommand;
+import jadex.base.service.remote.RemoteMethodInvocationHandler;
 import jadex.base.service.remote.RemoteServiceManagementService;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
@@ -54,6 +55,9 @@ public class RemoteResultCommand implements IRemoteCommand
 	 */
 	public IFuture execute(IMicroExternalAccess component, RemoteServiceManagementService rsms)
 	{
+//		if(callid.equals(RemoteMethodInvocationHandler.debugcallid))
+//			System.out.println("debuggcallid");
+		
 		Future future = (Future)rsms.getWaitingCall(callid);
 		
 		if(future==null)

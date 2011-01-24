@@ -121,6 +121,37 @@ public class IntermediateFuture extends Future	implements	IIntermediateFuture
     	}
     }
     
+	/**
+     *  Set the result. 
+     *  Listener notifications occur on calling thread of this method.
+     *  @param result The result.
+     */
+    public void	setResultIfUndone(Object result)
+    {
+    	boolean ex = false;
+    	synchronized(this)
+		{
+    		if(results!=null)
+    			ex = true;
+		}
+    	if(ex)
+    	{
+    		setException(new RuntimeException("setResultIfUndone() only allowed without intermediate results:"+results));
+    	}
+    	else
+    	{
+    		if(result!=null && !(result instanceof Collection))
+    		{
+    			setException(new IllegalArgumentException("Result must be collection: "+result));
+    		}
+    		else
+    		{
+    			this.results = (Collection)result;
+    			super.setResultIfUndone(result);
+    		}
+    	}
+    }
+    
     /**
      *  Declare that the future is finished.
      */
