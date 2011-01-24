@@ -8,23 +8,29 @@ import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.IModelInfo;
 import jadex.commons.SGUI;
+import jadex.commons.ThreadSuspendable;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
+import jadex.commons.gui.IMenuItemConstructor;
 import jadex.commons.gui.PopupBuilder;
 import jadex.tools.common.modeltree.FileNode;
+import jadex.tools.common.modeltree.IExplorerTreeNode;
 import jadex.tools.common.modeltree.ModelExplorer;
-import jadex.tools.starter.StarterPlugin.StartComponentMenuItemConstructor;
 
 import java.awt.BorderLayout;
 import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.Map;
 
-import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
@@ -71,7 +77,7 @@ public class StarterServicePanel extends JPanel implements ICMSComponentListener
     protected JSplitPane csplit;
 	
     /** The jcc. */
-    protected IControlCenter jcc;
+//    protected IControlCenter jcc;
     
 	//-------- constructors --------
 
@@ -84,6 +90,8 @@ public class StarterServicePanel extends JPanel implements ICMSComponentListener
 		super(new BorderLayout());
 		this.jcc	= jcc;
 		
+		System.out.println("jcc: "+jcc);
+		
 		csplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true);
 		csplit.setOneTouchExpandable(true);
 
@@ -91,7 +99,7 @@ public class StarterServicePanel extends JPanel implements ICMSComponentListener
 		lsplit.setOneTouchExpandable(true);
 		lsplit.setResizeWeight(0.7);
 
-//		mpanel = new ModelExplorer(jcc.getExternalAccess().getServiceProvider(), new StarterNodeFunctionality(this));
+		mpanel = new ModelExplorer(jcc.getExternalAccess().getServiceProvider(), new StarterNodeFunctionality(jcc));
 //		mpanel.setAction(FileNode.class, new INodeAction()
 //		{
 //			public void validStateChanged(TreeNode node, boolean valid)
@@ -105,8 +113,8 @@ public class StarterServicePanel extends JPanel implements ICMSComponentListener
 //				}
 //			}
 //		});
-//		mpanel.setPopupBuilder(new PopupBuilder(new Object[]{new StartComponentMenuItemConstructor(), mpanel.ADD_PATH,
-//			mpanel.REMOVE_PATH, mpanel.REFRESH}));
+		mpanel.setPopupBuilder(new PopupBuilder(new Object[]{new StartComponentMenuItemConstructor(), mpanel.ADD_PATH,
+			mpanel.REMOVE_PATH, mpanel.REFRESH}));
 		mpanel.addTreeSelectionListener(new TreeSelectionListener()
 		{
 			public void valueChanged(TreeSelectionEvent e)
@@ -260,5 +268,110 @@ public class StarterServicePanel extends JPanel implements ICMSComponentListener
 		csplit.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 		spanel.loadModel(model);
 		csplit.setCursor(Cursor.getDefaultCursor());
+	}
+	
+	/**
+	 *  Dynamically create a new menu item structure for starting components.
+	 */
+	class StartComponentMenuItemConstructor implements IMenuItemConstructor
+	{
+		/**
+		 *  Get or create a new menu item (struture).
+		 *  @return The menu item (structure).
+		 */
+		public JMenuItem getMenuItem()
+		{
+			JMenuItem ret = null;
+
+			if(isEnabled())
+			{
+				IExplorerTreeNode node = (IExplorerTreeNode)mpanel.getLastSelectedPathComponent();
+				if(node instanceof FileNode)
+				{
+					final String type = ((FileNode)node).getFile().getAbsolutePath();
+					
+					if(((Boolean)SComponentFactory.isStartable(jcc.getExternalAccess().getServiceProvider(), type).get(new ThreadSuspendable())).booleanValue())//&& ((FileNode)node).isValid())
+					{
+						try
+						{
+//							IComponentFactory componentfactory = getJCC().getComponent().getPlatform().getComponentFactory();
+							IModelInfo model = (IModelInfo)SComponentFactory.loadModel(jcc.getExternalAccess().getServiceProvider(), type).get(new ThreadSuspendable());
+							String[] inistates = model.getConfigurations();
+//							IMBDIComponent model = SXML.loadComponentModel(type, null);
+//							final IMConfiguration[] inistates = model.getConfigurationbase().getConfigurations();
+							
+							if(inistates.length>1)
+							{
+								JMenu re = new JMenu("Start Component");
+								re.setIcon(icons.getIcon("start_component"));
+								for(int i=0; i<inistates.length; i++)
+								{
+									final String config = inistates[i];
+									JMenuItem me = new JMenuItem(config);
+									re.add(me);
+									me.addActionListener(new ActionListener()
+									{
+										public void actionPerformed(ActionEvent e)
+										{
+											// todo: collectresults = false?
+											StarterPanel.createComponent(jcc, type, null, config, null, false, null, null, null, null, null, spanel);
+										}
+									});
+									me.setToolTipText("Start in configuration: "+config);
+
+								}
+								ret = re;
+								ret.setToolTipText("Start component in selectable configuration");
+							}
+							else
+							{
+								if(inistates.length==1)
+								{
+									ret = new JMenuItem("Start Component ("+inistates[0]+")");
+									ret.setToolTipText("Start component in configuration:"+inistates[0]);
+								}
+								else
+								{
+									ret = new JMenuItem("Start Component");
+									ret.setToolTipText("Start component without explicit initial state");
+								}
+								ret.setIcon(icons.getIcon("start_component"));
+								ret.addActionListener(new ActionListener()
+								{
+									public void actionPerformed(ActionEvent e)
+									{
+										// todo: collectresults = false?
+										StarterPanel.createComponent(jcc, type, null, null, null, false, null, null, null, null, null, spanel);
+									}
+								});
+							}
+						}
+						catch(Exception e)
+						{
+							// NOP
+						}
+					}
+				}
+			}
+
+			return ret;
+		}
+
+		/**
+		 *  Test if action is available in current context.
+		 *  @return True, if available.
+		 */
+		public boolean isEnabled()
+		{
+			boolean ret = false;
+			IExplorerTreeNode node = (IExplorerTreeNode)mpanel.getLastSelectedPathComponent();
+			if(node instanceof FileNode)
+			{
+				String type = ((FileNode)node).getFile().getAbsolutePath();
+				if(((Boolean)SComponentFactory.isStartable(jcc.getExternalAccess().getServiceProvider(), type).get(new ThreadSuspendable())))
+					ret = true;
+			}
+			return ret;
+		}
 	}
 }

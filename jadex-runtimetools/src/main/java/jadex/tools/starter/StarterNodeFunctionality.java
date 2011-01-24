@@ -1,6 +1,7 @@
 package jadex.tools.starter;
 
 import jadex.base.SComponentFactory;
+import jadex.base.gui.plugin.IControlCenter;
 import jadex.bridge.IModelInfo;
 import jadex.commons.SGUI;
 import jadex.commons.concurrent.DefaultResultListener;
@@ -46,21 +47,20 @@ public class StarterNodeFunctionality extends DefaultNodeFunctionality
 	
 	//-------- attributes --------
 
-	/** The starter plugin. */
-	protected StarterPlugin	starter;
-	
 	/** The check indicator for the status bar. */
-	protected JLabel	checkcomp;
+	protected JLabel checkcomp;
+	
+	/** The checking property. */
+	protected boolean checking;
 
 	//-------- constructors --------
 	
 	/**
 	 *  Create a starter node functionality.
 	 */
-	public StarterNodeFunctionality(StarterPlugin starter)
+	public StarterNodeFunctionality(IControlCenter jcc)
 	{
-		super(starter.getJCC());
-		this.starter	= starter;
+		super(jcc);
 		checkcomp	= new JLabel(icons.getIcon("checking_on"));
 		checkcomp.setToolTipText("Checking validity of componentomponent models.");
 	}
@@ -92,8 +92,7 @@ public class StarterNodeFunctionality extends DefaultNodeFunctionality
 	{
 //		System.out.println("isValid: "+node.getToolTipText());
 		boolean	ret	= true;	// Unknown node types are valid by default
-		if(node instanceof FileNode && starter.getCheckingMenu()!=null
-			&& starter.getCheckingMenu().isSelected())
+		if(node instanceof FileNode && isChecking())
 		{
 			FileNode fn = (FileNode)node;
 			Date	filedate	= getLastModified(fn);
@@ -150,9 +149,27 @@ public class StarterNodeFunctionality extends DefaultNodeFunctionality
 //		System.out.println("childrenChanged("+node.getToolTipText()+")");
 		isValid(node);
 	}
-
-	//-------- helper classes --------
 	
+	/**
+	 *  Get the checking.
+	 *  @return the checking.
+	 */
+	public boolean isChecking()
+	{
+		return checking;
+	}
+
+	/**
+	 *  Set the checking.
+	 *  @param checking The checking to set.
+	 */
+	public void setChecking(boolean checking)
+	{
+		this.checking = checking;
+	}
+	
+	//-------- helper classes --------
+
 	/**
 	 *  A task to check a file.
 	 */

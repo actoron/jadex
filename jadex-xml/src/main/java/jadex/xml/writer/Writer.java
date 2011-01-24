@@ -114,15 +114,19 @@ public class Writer
 		writer.writeCharacters(lf);
 		
 		WriteContext wc = new WriteContext(writer, context, object, classloader);
-		writeObject(wc, object);
+		writeObject(wc, object, null);
 		writer.writeEndDocument();
 		writer.close();
 	}
 	
 	/**
 	 *  Write an object to xml.
+	 *  
+	 *  Note:
+	 *  Must have tag parameter to support writing an object using an arbitrary tag.
+	 *  Cannot write tag in beforehand, because it must be written in one pass. 
 	 */
-	public void writeObject(WriteContext wc, Object object) throws Exception
+	public void writeObject(WriteContext wc, Object object, QName tag) throws Exception
 	{
 		XMLStreamWriter writer = wc.getWriter();
 		List stack = wc.getStack();
@@ -149,11 +153,10 @@ public class Writer
 			object = preproc.preProcess(wc, object);
 		}
 
-		QName tag = null;
 		// Only use typeinfo for getting tag (path) when not set in method call (subobject)
 		// Generated tag names (that start with 'protocol typeinfo' are overruled by typeinfo spec.
-//		if((tag==null || tag.getNamespaceURI().startsWith(SXML.PROTOCOL_TYPEINFO)) && typeinfo!=null)
-		if(typeinfo!=null)
+		if((tag==null || tag.getNamespaceURI().startsWith(SXML.PROTOCOL_TYPEINFO)) && typeinfo!=null)
+//		if(typeinfo!=null)
 		{
 			tag = typeinfo.getXMLTag();
 			if(typeinfo.getXMLInfo()!=null)
@@ -171,19 +174,11 @@ public class Writer
 
 		if(tag==null)
 			tag = handler.getTagName(object, wc);
-
 		
 		// Create tag with prefix if it has a namespace but no prefix.
-		try{
-			
 		if(!XMLConstants.NULL_NS_URI.equals(tag.getNamespaceURI()) && XMLConstants.DEFAULT_NS_PREFIX.equals(tag.getPrefix()))
 		{
 			tag = handler.getTagWithPrefix(tag, wc);
-		}
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
 		}
 		
 		if(genids && wc.getWrittenObjects().containsKey(object))
@@ -339,8 +334,8 @@ public class Writer
 			}
 			else
 			{
-//				writeObject(wc, ((Object[])tmp)[1], (QName)((Object[])tmp)[0]);
-				writeObject(wc, ((Object[])tmp)[1]);
+				writeObject(wc, ((Object[])tmp)[1], (QName)((Object[])tmp)[0]);
+//				writeObject(wc, ((Object[])tmp)[1]);
 			}
 		}
 	}

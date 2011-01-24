@@ -10,6 +10,8 @@ import jadex.xml.TypeInfo;
 import jadex.xml.XMLInfo;
 import jadex.xml.bean.BeanObjectReaderHandler;
 import jadex.xml.bean.BeanObjectWriterHandler;
+import jadex.xml.bean.JavaReader;
+import jadex.xml.bean.JavaWriter;
 import jadex.xml.reader.Reader;
 import jadex.xml.tutorial.example09.Invoice;
 import jadex.xml.tutorial.example09.InvoiceList;
@@ -45,7 +47,7 @@ public class Main
 		
 		// Create an xml reader with standard bean object reader and the
 		// custom typeinfos
-		Reader xmlreader = new Reader(new BeanObjectReaderHandler(typeinfos));
+		Reader xmlreader = new Reader(new BeanObjectReaderHandler(JavaReader.joinTypeInfos(typeinfos)));
 		InputStream is = SUtil.getResource("jadex/xml/tutorial/example10/data.xml", null);
 		Object object = xmlreader.read(is, null, null);
 		is.close();
@@ -61,7 +63,7 @@ public class Main
 			})));
 		
 		// Write the xml to the output file.
-		Writer xmlwriter = new Writer(new BeanObjectWriterHandler(typeinfos, false, true), false);
+		Writer xmlwriter = new Writer(new BeanObjectWriterHandler(JavaWriter.joinTypeInfos(typeinfos), false, true), false);
 		String xml = Writer.objectToXML(xmlwriter, object, null);
 //		OutputStream os = new FileOutputStream("out.xml");
 //		xmlwriter.write(object, os, null, null);

@@ -163,8 +163,8 @@
 						// + " jadex.tools.ruleprofiler.RuleProfilerPlugin"
 						+ " jadex.tools.generic.LibraryServicePlugin"
 						+ " jadex.tools.generic.AwarenessComponentPlugin"
-						+ " jadex.base.gui.componentviewer.ComponentViewerPlugin")
-						//+ " jadex.tools.generic.StarterServicePlugin")
+						+ " jadex.base.gui.componentviewer.ComponentViewerPlugin"
+						+ " jadex.tools.generic.StarterServicePlugin")
 					</fact>
 				</initialbelief>
 			</beliefs>

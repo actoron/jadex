@@ -86,9 +86,12 @@ public class StarterPlugin extends AbstractJCCPlugin	implements ICMSComponentLis
 
 	/** The panel showing the classpath models. */
 	private ModelExplorer mpanel;
+	
+	/** The starter node functionality. */
+	protected StarterNodeFunctionality snf;
 
 	/** The menu item for enabling/disabling component model checking. */
-	private JCheckBoxMenuItem	checkingmenu;
+	private JCheckBoxMenuItem checkingmenu;
 	
 	/** The component instances in a tree. */
 	private ComponentTreePanel comptree;
@@ -243,6 +246,14 @@ public class StarterPlugin extends AbstractJCCPlugin	implements ICMSComponentLis
 		this.checkingmenu = new JCheckBoxMenuItem(TOGGLE_CHECKING);
 		this.checkingmenu.setSelected(true);	// Default: on
 		menu[0].insert(checkingmenu, 1);	// Hack??? Should not assume position.
+		checkingmenu.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				System.out.println("turn: "+checkingmenu.isSelected());
+				snf.setChecking(checkingmenu.isSelected());
+			}
+		});
 		return menu;
 	}
 	
@@ -259,7 +270,8 @@ public class StarterPlugin extends AbstractJCCPlugin	implements ICMSComponentLis
 		lsplit.setOneTouchExpandable(true);
 		lsplit.setResizeWeight(0.7);
 
-		mpanel = new ModelExplorer(getJCC().getExternalAccess().getServiceProvider(), new StarterNodeFunctionality(this));
+		snf = new StarterNodeFunctionality(jcc);
+		mpanel = new ModelExplorer(getJCC().getExternalAccess().getServiceProvider(), snf);
 //		mpanel.setAction(FileNode.class, new INodeAction()
 //		{
 //			public void validStateChanged(TreeNode node, boolean valid)

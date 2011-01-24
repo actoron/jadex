@@ -44,7 +44,7 @@ public class JavaWriter extends Writer
 	{
 		super(new BeanObjectWriterHandler(joinTypeInfos(typeinfos), true));
 	}
-
+	
 	//-------- methods --------
 	
 	/**
