@@ -4,14 +4,18 @@ import jadex.base.SComponentFactory;
 import jadex.base.gui.ComponentSelectorDialog;
 import jadex.base.gui.ElementPanel;
 import jadex.base.gui.ParserValidator;
+import jadex.base.gui.plugin.IControlCenter;
+import jadex.bridge.CreationInfo;
 import jadex.bridge.IArgument;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IErrorReport;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IModelInfo;
 import jadex.commons.FixedJComboBox;
 import jadex.commons.Future;
+import jadex.commons.IFuture;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SGUI;
@@ -51,6 +55,7 @@ import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -163,8 +168,8 @@ public class StarterPanel extends JPanel
 //	/** The application specific panel. */
 //	protected JPanel apppanel;
 	
-	/** The starter plugin. */
-	protected StarterPlugin	starter;
+	/** The jcc. */
+	protected IControlCenter jcc;
 
 	/** The spinner for the number of components to start. */
 	protected JSpinner numcomponents;
@@ -181,10 +186,10 @@ public class StarterPanel extends JPanel
 	 * Open the GUI.
 	 * @param starter The starter.
 	 */
-	public StarterPanel(final StarterPlugin starter)
+	public StarterPanel(IControlCenter jcc)
 	{
 		super(new BorderLayout());
-		this.starter	= starter;
+		this.jcc	= jcc;
 		this.resultsets = new MultiCollection();
 		
 		JPanel content = new JPanel(new GridBagLayout());
@@ -273,7 +278,7 @@ public class StarterPanel extends JPanel
 			{
 				if(model!=null)
 				{
-					starter.getJCC().getExternalAccess().scheduleStep(new IComponentStep()
+					StarterPanel.this.jcc.getExternalAccess().scheduleStep(new IComponentStep()
 					{
 						public static final String XML_CLASSNAME = "start";
 						public Object execute(IInternalAccess ia)
@@ -328,11 +333,11 @@ public class StarterPanel extends JPanel
 											{
 												Future fut = new Future();
 												IResultListener killlistener = dokilllis? new KillListener(mymodel, fullname, fut, StarterPanel.this): null;
-												starter.createComponent(typename, an, configname, args, 
+												createComponent(StarterPanel.this.jcc, typename, an, configname, args, 
 													suspend.isSelected()? Boolean.TRUE: Boolean.FALSE, 
 													mastercb.isSelected()? Boolean.TRUE: Boolean.FALSE, 
 													daemoncb.isSelected()? Boolean.TRUE: Boolean.FALSE, 
-													autosdcb.isSelected()? Boolean.TRUE: Boolean.FALSE, killlistener)
+													autosdcb.isSelected()? Boolean.TRUE: Boolean.FALSE, killlistener, StarterPanel.this.parent, StarterPanel.this)
 												.addResultListener(new DelegationResultListener(fut));
 											}
 										}
@@ -340,11 +345,11 @@ public class StarterPanel extends JPanel
 										{
 											Future fut = new Future();
 											IResultListener killlistener = dokilllis? new KillListener(mymodel, fullname, fut, StarterPanel.this): null;
-											starter.createComponent(typename, an, configname, args, 
+											createComponent(StarterPanel.this.jcc, typename, an, configname, args, 
 												suspend.isSelected()? Boolean.TRUE: Boolean.FALSE, 
 												mastercb.isSelected()? Boolean.TRUE: Boolean.FALSE, 
 												daemoncb.isSelected()? Boolean.TRUE: Boolean.FALSE, 
-												autosdcb.isSelected()? Boolean.TRUE: Boolean.FALSE, killlistener)
+												autosdcb.isSelected()? Boolean.TRUE: Boolean.FALSE, killlistener, StarterPanel.this.parent, StarterPanel.this)
 											.addResultListener(new DelegationResultListener(fut));
 										}
 									}
@@ -421,7 +426,7 @@ public class StarterPanel extends JPanel
 		chooseparent.setToolTipText("Choose parent");
 		componentpanel.add(chooseparent, new GridBagConstraints(3, 1, 1, 1, 0, 0, GridBagConstraints.EAST,
 			GridBagConstraints.BOTH, new Insets(2, 2, 0, 2), 0, 0));
-		final ComponentSelectorDialog	agentselector = new ComponentSelectorDialog(this, starter.getJCC().getExternalAccess());
+		final ComponentSelectorDialog	agentselector = new ComponentSelectorDialog(this, jcc.getExternalAccess());
 		chooseparent.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
@@ -633,22 +638,22 @@ public class StarterPanel extends JPanel
 		
 		if(adf!=null)
 		{
-			SComponentFactory.isLoadable(starter.getJCC().getExternalAccess().getServiceProvider(), adf).addResultListener(new SwingDefaultResultListener(StarterPanel.this)
+			SComponentFactory.isLoadable(jcc.getExternalAccess().getServiceProvider(), adf).addResultListener(new SwingDefaultResultListener(StarterPanel.this)
 			{
 				public void customResultAvailable(Object result)
 				{
 					if(((Boolean)result).booleanValue())
 					{
-						SComponentFactory.loadModel(starter.getJCC().getExternalAccess().getServiceProvider(), adf).addResultListener(new SwingDefaultResultListener(StarterPanel.this)
+						SComponentFactory.loadModel(jcc.getExternalAccess().getServiceProvider(), adf).addResultListener(new SwingDefaultResultListener(StarterPanel.this)
 						{
 							public void customResultAvailable(Object result)
 							{
 								model = (IModelInfo)result;
-								SComponentFactory.getFileType(starter.getJCC().getExternalAccess().getServiceProvider(), adf).addResultListener(new SwingDefaultResultListener(StarterPanel.this)
+								SComponentFactory.getFileType(jcc.getExternalAccess().getServiceProvider(), adf).addResultListener(new SwingDefaultResultListener(StarterPanel.this)
 								{
 									public void customResultAvailable(Object result)
 									{
-										SComponentFactory.getFileTypeIcon(starter.getJCC().getExternalAccess().getServiceProvider(), (String)result).addResultListener(new SwingDefaultResultListener(StarterPanel.this)
+										SComponentFactory.getFileTypeIcon(jcc.getExternalAccess().getServiceProvider(), (String)result).addResultListener(new SwingDefaultResultListener(StarterPanel.this)
 										{
 											public void customResultAvailable(Object result)
 											{
@@ -979,7 +984,7 @@ public class StarterPanel extends JPanel
 	 */
 	protected void createArguments()
 	{
-		starter.getJCC().getExternalAccess().scheduleStep(new IComponentStep()
+		jcc.getExternalAccess().scheduleStep(new IComponentStep()
 		{
 			public static final String XML_CLASSNAME = "create-arguments";
 			public Object execute(IInternalAccess ia)
@@ -1429,6 +1434,47 @@ public class StarterPanel extends JPanel
 			}
 		}
 	};
+	
+	/**
+	 *  Create a new component on the platform.
+	 *  Any errors will be displayed in a dialog to the user.
+	 */
+	public static IFuture createComponent(final IControlCenter jcc, final String type, final String name, final String configname, final Map arguments, final Boolean suspend, 
+		final Boolean master, final Boolean daemon, final Boolean autosd, final IResultListener killlistener, final IComponentIdentifier parco, final JComponent panel)
+	{
+		final Future ret = new Future(); 
+		jcc.getExternalAccess().scheduleStep(new IComponentStep()
+		{
+			public static final String XML_CLASSNAME = "create-component";
+			public Object execute(IInternalAccess ia)
+			{
+				ia.getRequiredService("cms").addResultListener(new SwingDefaultResultListener(panel)
+				{
+					public void customResultAvailable(Object result)
+					{
+						IComponentManagementService cms = (IComponentManagementService)result;
+						cms.createComponent(name, type, new CreationInfo(configname, arguments, parco, suspend, master, daemon, autosd), killlistener)
+							.addResultListener(new IResultListener()
+						{
+							public void resultAvailable(Object result)
+							{
+								ret.setResult(result);
+								jcc.setStatusText("Created component: " + ((IComponentIdentifier)result).getLocalName());
+							}
+							
+							public void exceptionOccurred(Exception exception)
+							{
+								ret.setException(exception);
+								jcc.displayError("Problem Starting Component", "Component could not be started.", exception);
+							}
+						});
+					}
+				});
+				return null;
+			}
+		});
+		return ret;
+	}
 }
 
 

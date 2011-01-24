@@ -1,17 +1,264 @@
 package jadex.tools.starter;
 
+import jadex.base.SComponentFactory;
+import jadex.base.gui.componenttree.ComponentTreePanel;
+import jadex.base.gui.plugin.IControlCenter;
+import jadex.bridge.ICMSComponentListener;
+import jadex.bridge.IComponentDescription;
+import jadex.bridge.IComponentManagementService;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IInternalAccess;
+import jadex.commons.SGUI;
+import jadex.commons.concurrent.DefaultResultListener;
+import jadex.commons.concurrent.SwingDefaultResultListener;
+import jadex.commons.gui.PopupBuilder;
+import jadex.tools.common.modeltree.FileNode;
+import jadex.tools.common.modeltree.ModelExplorer;
+import jadex.tools.starter.StarterPlugin.StartComponentMenuItemConstructor;
+
 import java.awt.BorderLayout;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.util.Map;
 
-import javax.swing.JButton;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
+import javax.swing.SwingUtilities;
+import javax.swing.UIDefaults;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
 
-public class StarterServicePanel extends JPanel
+/**
+ * The starter gui allows for starting components platform independently.
+ */
+public class StarterServicePanel extends JPanel implements ICMSComponentListener
 {
+	//-------- static part --------
+
 	/**
-	 * 
+	 * The image icons.
 	 */
-	public StarterServicePanel()
+	protected static final UIDefaults icons = new UIDefaults(new Object[]
 	{
-		this.add(new JButton("button"), BorderLayout.CENTER);
+		"add_remote_component", SGUI.makeIcon(StarterPlugin.class, "/jadex/tools/common/images/add_remote_component.png"),
+		"kill_platform", SGUI.makeIcon(StarterPlugin.class, "/jadex/tools/common/images/new_killplatform.png"),
+		"starter", SGUI.makeIcon(StarterPlugin.class, "/jadex/tools/common/images/new_starter.png"),
+		"starter_sel", SGUI.makeIcon(StarterPlugin.class, "/jadex/tools/common/images/new_starter_sel.png"),
+		"start_component",	SGUI.makeIcon(StarterPlugin.class, "/jadex/tools/common/images/start.png"),
+		"checking_menu",	SGUI.makeIcon(StarterPlugin.class, "/jadex/tools/common/images/new_agent_broken.png")
+	});
+
+	//-------- attributes --------
+
+	/** The starter panel. */
+	protected StarterPanel spanel;
+
+	/** The panel showing the classpath models. */
+	protected ModelExplorer mpanel;
+
+	/** The component instances in a tree. */
+	protected ComponentTreePanel comptree;
+	
+	/** A split panel. */
+	protected JSplitPane lsplit;
+
+	/** A split panel. */
+    protected JSplitPane csplit;
+	
+    /** The jcc. */
+    protected IControlCenter jcc;
+    
+	//-------- constructors --------
+
+	/**
+	 * Open the GUI.
+	 * @param starter The starter.
+	 */
+	public StarterServicePanel(final IControlCenter jcc)
+	{
+		super(new BorderLayout());
+		this.jcc	= jcc;
+		
+		csplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true);
+		csplit.setOneTouchExpandable(true);
+
+		lsplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, true);
+		lsplit.setOneTouchExpandable(true);
+		lsplit.setResizeWeight(0.7);
+
+//		mpanel = new ModelExplorer(jcc.getExternalAccess().getServiceProvider(), new StarterNodeFunctionality(this));
+//		mpanel.setAction(FileNode.class, new INodeAction()
+//		{
+//			public void validStateChanged(TreeNode node, boolean valid)
+//			{
+//				String file1 = ((FileNode)node).getFile().getAbsolutePath();
+//				String file2 = spanel.getFilename();
+//				//System.out.println(file1+" "+file2);
+//				if(file1!=null && file1.equals(file2))
+//				{
+//					spanel.reloadModel(file1);
+//				}
+//			}
+//		});
+//		mpanel.setPopupBuilder(new PopupBuilder(new Object[]{new StartComponentMenuItemConstructor(), mpanel.ADD_PATH,
+//			mpanel.REMOVE_PATH, mpanel.REFRESH}));
+		mpanel.addTreeSelectionListener(new TreeSelectionListener()
+		{
+			public void valueChanged(TreeSelectionEvent e)
+			{
+				Object	node = mpanel.getLastSelectedPathComponent();
+				if(node instanceof FileNode)
+				{
+					// Models have to be loaded with absolute path.
+					// An example to facilitate understanding:
+					// root
+					//  +-classes1
+					//  |  +- MyComponent.component.xml
+					//  +-classes2
+					//  |  +- MyComponent.component.xml
+
+					final String model = ((FileNode)node).getRelativePath();
+//					if(getJCC().getComponent().getPlatform().getComponentFactory().isLoadable(model))
+					SComponentFactory.isLoadable(jcc.getExternalAccess().getServiceProvider(), model).addResultListener(new SwingDefaultResultListener(spanel)
+					{
+						public void customResultAvailable(Object result)
+						{
+							if(((Boolean)result).booleanValue())
+								loadModel(model);
+						}
+					});
+//					else if(getJCC().getComponent().getPlatform().getApplicationFactory().isLoadable(model))
+//					{
+//						loadModel(model);
+//					}
+				}
+			}
+		});
+		MouseListener ml = new MouseAdapter()
+		{
+			public void mousePressed(MouseEvent e)
+			{
+				int row = mpanel.getRowForLocation(e.getX(), e.getY());
+				if(row != -1)
+				{
+					if(e.getClickCount() == 2)
+					{
+						Object	node = mpanel.getLastSelectedPathComponent();
+						if(node instanceof FileNode)
+						{
+							mpanel.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+							final String type = ((FileNode)node).getFile().getAbsolutePath();
+//							if(getJCC().getComponent().getPlatform().getComponentFactory().isStartable(type))
+							// todo: resultcollect = false?
+							SComponentFactory.isStartable(jcc.getExternalAccess().getServiceProvider(), type).addResultListener(new SwingDefaultResultListener(spanel)
+							{
+								public void customResultAvailable(Object result)
+								{
+									if(((Boolean)result).booleanValue())
+										StarterPanel.createComponent(jcc, type, null, null, null, false, null, null, null, null, null, StarterServicePanel.this);
+									mpanel.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+								}
+							});
+						}
+					}
+				}
+      		}
+  		};
+  		mpanel.addMouseListener(ml);
+
+		comptree = new ComponentTreePanel(jcc.getExternalAccess(), JSplitPane.HORIZONTAL_SPLIT);
+		comptree.setMinimumSize(new Dimension(0, 0));
+		
+		lsplit.add(new JScrollPane(mpanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+			JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED));
+//		lsplit.add(tp);
+		lsplit.add(comptree);
+		lsplit.setDividerLocation(300);
+
+		csplit.add(lsplit);
+		spanel = new StarterPanel(jcc);
+		csplit.add(spanel);
+		csplit.setDividerLocation(180);
+            			
+//		jcc.addComponentListListener(this);
+		
+		// todo: ?! is this ok?
+		
+		jcc.getExternalAccess().scheduleStep(new IComponentStep()
+		{
+			public static final String XML_CLASSNAME = "add-component-listener";
+			public Object execute(IInternalAccess ia)
+			{
+				ia.getRequiredService("cms").addResultListener(new DefaultResultListener()
+				{
+					public void resultAvailable(Object result)
+					{
+						IComponentManagementService ces = (IComponentManagementService)result;
+						ces.getComponentDescriptions().addResultListener(new DefaultResultListener()
+						{
+							public void resultAvailable(Object result)
+							{
+								IComponentDescription[] res = (IComponentDescription[])result;
+								for(int i=0; i<res.length; i++)
+									componentAdded(res[i]);
+							}
+						});
+						ces.addComponentListener(null, StarterServicePanel.this);
+					}
+				});
+				return null;
+			}
+		});
+		
+		this.add(csplit, BorderLayout.CENTER);
+	}
+	
+	/**
+	 *  Called when an component has died.
+	 *  @param ad The component description.
+	 */
+	public void componentRemoved(final IComponentDescription ad, Map results)
+	{
+		// Update components on awt thread.
+		SwingUtilities.invokeLater(new Runnable()
+		{
+			public void run()
+			{
+				if(ad.getName().equals(spanel.parent))
+					spanel.setParent(null);
+			}
+		});
+	}
+
+	/**
+	 *  Called when an component is born.
+	 *  @param ad the component description.
+	 */
+	public void componentAdded(final IComponentDescription ad)
+	{
+	}
+	
+	/**
+	 *  Called when an component changed.
+	 *  @param ad the component description.
+	 */
+	public void componentChanged(final IComponentDescription ad)
+	{
+	}
+	
+	/**
+	 *  Load a model.
+	 *  @param model The model name.
+	 */
+	protected void loadModel(final String model)
+	{
+		csplit.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+		spanel.loadModel(model);
+		csplit.setCursor(Cursor.getDefaultCursor());
 	}
 }

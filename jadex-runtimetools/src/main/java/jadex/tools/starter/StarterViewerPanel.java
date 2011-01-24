@@ -27,14 +27,14 @@ public class StarterViewerPanel extends AbstractServiceViewerPanel
 	 *  @param jcc	The jcc.
 	 * 	@param component The component.
 	 */
-	public IFuture init(IControlCenter jcc, final IService service)
+	public IFuture init(final IControlCenter jcc, final IService service)
 	{
 		final Future ret = new Future();
 		super.init(jcc, service).addResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
-				panel = new StarterServicePanel();
+				panel = new StarterServicePanel(jcc);
 				ret.setResult(result);
 			}
 			

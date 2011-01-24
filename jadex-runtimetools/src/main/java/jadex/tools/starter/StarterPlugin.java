@@ -349,7 +349,7 @@ public class StarterPlugin extends AbstractJCCPlugin	implements ICMSComponentLis
 		lsplit.setDividerLocation(300);
 
 		csplit.add(lsplit);
-		spanel = new StarterPanel(this);
+		spanel = new StarterPanel(getJCC());
 		csplit.add(spanel);
 		csplit.setDividerLocation(180);
             			
