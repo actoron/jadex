@@ -13,6 +13,8 @@ import jadex.bridge.IMessageAdapter;
 import jadex.bridge.IMessageListener;
 import jadex.bridge.IMessageService;
 import jadex.bridge.MessageType;
+import jadex.commons.Future;
+import jadex.commons.IFuture;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SGUI;
@@ -547,18 +549,21 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 				});
 				cms.addComponentListener(null, new ICMSComponentListener()
 				{
-					public void componentRemoved(IComponentDescription desc, Map results)
+					public IFuture componentRemoved(IComponentDescription desc, Map results)
 					{
 						agentDied(desc);
+						return new Future(null);
 					}
 					
-					public void componentAdded(IComponentDescription desc)
+					public IFuture componentAdded(IComponentDescription desc)
 					{
 						agentBorn(desc);
+						return new Future(null);
 					}
 
-					public void componentChanged(IComponentDescription desc)
+					public IFuture componentChanged(IComponentDescription desc)
 					{
+						return new Future(null);
 					}
 				});
 			}
@@ -580,7 +585,6 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 		
 		SServiceProvider.getService(getJCC().getExternalAccess().getServiceProvider(), IMessageService.class).addResultListener(new DefaultResultListener()
 		{
-			
 			public void resultAvailable(Object result)
 			{
 				IMessageService ms = (IMessageService)result;

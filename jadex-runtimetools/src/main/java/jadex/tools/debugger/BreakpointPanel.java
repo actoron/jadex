@@ -1,11 +1,13 @@
 package jadex.tools.debugger;
 
-import jadex.bridge.IComponentDescription;
 import jadex.bridge.ICMSComponentListener;
+import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentManagementService;
 import jadex.commons.ChangeEvent;
+import jadex.commons.Future;
 import jadex.commons.IBreakpointPanel;
 import jadex.commons.IChangeListener;
+import jadex.commons.IFuture;
 import jadex.commons.SGUI;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.SwingDefaultResultListener;
@@ -88,18 +90,21 @@ public class BreakpointPanel extends JPanel	implements IBreakpointPanel
 				IComponentManagementService	cms	= (IComponentManagementService)result;
 				cms.addComponentListener(description.getName(), new ICMSComponentListener()
 				{
-					public void componentRemoved(IComponentDescription desc, Map results)
+					public IFuture componentRemoved(IComponentDescription desc, Map results)
 					{
+						return new Future(null);
 					}
 					
-					public void componentChanged(IComponentDescription desc)
+					public IFuture componentChanged(IComponentDescription desc)
 					{
 						BreakpointPanel.this.description	= desc;
 						// Todo: update gui?
+						return new Future(null);
 					}
 					
-					public void componentAdded(IComponentDescription desc)
+					public IFuture componentAdded(IComponentDescription desc)
 					{
+						return new Future(null);
 					}
 				});
 				

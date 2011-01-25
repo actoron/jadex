@@ -416,6 +416,8 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 								// Hack!!! Manual encoding for using custom class loader at receiver side.
 //								msg.put(SFipa.CONTENT, JavaWriter.objectToXML(content, ls.getClassLoader()));
 								
+//								System.out.println("sent: "+callid);
+								
 								msg.put(SFipa.CONTENT, Writer.objectToXML(getWriter(), content, ls.getClassLoader(), receiver));
 								
 								IMessageService ms = (IMessageService)result;

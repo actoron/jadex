@@ -276,10 +276,17 @@ public class Writer
 				String content = wi.getContent();
 				if(content!=null)
 				{
-					if(content.indexOf("<")!=-1 || content.indexOf(">")!=-1 || content.indexOf("&")!=-1)
+					// Uses cdata when contains <, > or &
+					// Must not use cdata when content is already cdata (nested cdata are not allowed)
+					if((content.indexOf("<")!=-1 || content.indexOf(">")!=-1 || content.indexOf("&")!=-1)
+						&& content.indexOf("<![CDATA[")==-1)
+					{
 						writer.writeCData(content);
+					}
 					else
+					{
 						writer.writeCharacters(content);
+					}
 				}
 			}
 			
@@ -432,14 +439,6 @@ public class Writer
 		writer.writeCharacters(lf);
 	}
 		
-	/**
-	 *  Write content.
-	 */
-	public void writeContent(PrintWriter writer, String value)
-	{
-		writer.write(value);
-	}
-	
 	/**
 	 *  Write the indentation.
 	 */

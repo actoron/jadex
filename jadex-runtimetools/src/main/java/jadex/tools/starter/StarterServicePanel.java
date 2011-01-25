@@ -253,7 +253,7 @@ public class StarterServicePanel extends JPanel implements ICMSComponentListener
 	 *  Called when an component has died.
 	 *  @param ad The component description.
 	 */
-	public void componentRemoved(final IComponentDescription ad, Map results)
+	public IFuture componentRemoved(final IComponentDescription ad, Map results)
 	{
 		// Update components on awt thread.
 		SwingUtilities.invokeLater(new Runnable()
@@ -264,22 +264,25 @@ public class StarterServicePanel extends JPanel implements ICMSComponentListener
 					spanel.setParent(null);
 			}
 		});
+		return new Future(null);
 	}
 
 	/**
 	 *  Called when an component is born.
 	 *  @param ad the component description.
 	 */
-	public void componentAdded(final IComponentDescription ad)
+	public IFuture componentAdded(final IComponentDescription ad)
 	{
+		return new Future(null);
 	}
 	
 	/**
 	 *  Called when an component changed.
 	 *  @param ad the component description.
 	 */
-	public void componentChanged(final IComponentDescription ad)
+	public IFuture componentChanged(final IComponentDescription ad)
 	{
+		return new Future(null);
 	}
 	
 	/**

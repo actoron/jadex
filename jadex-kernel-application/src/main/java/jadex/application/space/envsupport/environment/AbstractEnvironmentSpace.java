@@ -25,6 +25,7 @@ import jadex.bridge.ICMSComponentListener;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
+import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.IPropertyObject;
 import jadex.commons.ThreadSuspendable;
@@ -569,18 +570,21 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 					{
 						((IComponentManagementService)result).addComponentListener(context.getComponentIdentifier(), new ICMSComponentListener()
 						{
-							public void componentRemoved(IComponentDescription desc, Map results)
+							public IFuture componentRemoved(IComponentDescription desc, Map results)
 							{
 								((IComponentManagementService)result).removeComponentListener(context.getComponentIdentifier(), this);
 								oc.dispose();
+								return new Future(null);
 							}
 							
-							public void componentChanged(IComponentDescription desc)
+							public IFuture componentChanged(IComponentDescription desc)
 							{
+								return new Future(null);
 							}
 							
-							public void componentAdded(IComponentDescription desc)
+							public IFuture componentAdded(IComponentDescription desc)
 							{
+								return new Future(null);
 							}
 						});
 					}

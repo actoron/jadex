@@ -103,6 +103,8 @@ public class RemoteServiceManagementAgent extends MicroAgent
 					final ILibraryService ls = (ILibraryService)result;
 					Object	content	= msg.get(SFipa.CONTENT);
 					
+//					System.out.println("received: "+msg.get(SFipa.CONVERSATION_ID));
+					
 //					if(content.toString().indexOf("calc")!=-1)
 //					{
 //						System.out.println("com: "+content);

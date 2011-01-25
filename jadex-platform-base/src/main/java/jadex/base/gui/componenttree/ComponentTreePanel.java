@@ -10,6 +10,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IRemoteServiceManagementService;
 import jadex.commons.Future;
+import jadex.commons.IFuture;
 import jadex.commons.SGUI;
 import jadex.commons.SUtil;
 import jadex.commons.TreeExpansionHandler;
@@ -126,7 +127,7 @@ public class ComponentTreePanel extends JSplitPane
 	protected final Action removeservice;
 
 	/** The component listener. */
-	protected final ICMSComponentListener	listener;
+	protected final ICMSComponentListener listener;
 	
 	/** The properties panel. */
 	protected final JScrollPane	proppanel;
@@ -160,7 +161,7 @@ public class ComponentTreePanel extends JSplitPane
 		tree.addMouseListener(new ComponentTreePopupListener());
 		tree.setShowsRootHandles(true);
 		tree.setToggleClickCount(0);
-		final ComponentIconCache	cic	= new ComponentIconCache(access.getServiceProvider(), tree);
+		final ComponentIconCache	cic	= new ComponentIconCache(access, tree);
 		JScrollPane	scroll	= new JScrollPane(tree);
 		this.add(scroll);
 		
@@ -172,9 +173,10 @@ public class ComponentTreePanel extends JSplitPane
 				
 		listener	= new ICMSComponentListener()
 		{
-			public void componentRemoved(final IComponentDescription desc, Map results)
+			public IFuture componentRemoved(final IComponentDescription desc, Map results)
 			{
-				final IComponentTreeNode	node	= model.getNodeOrAddZombie(desc.getName());
+				final Future ret = new Future();
+				final IComponentTreeNode node = model.getNodeOrAddZombie(desc.getName());
 				if(node!=null)
 				{
 					SwingUtilities.invokeLater(new Runnable()
@@ -188,9 +190,10 @@ public class ComponentTreePanel extends JSplitPane
 						}
 					});
 				}
+				return new Future(null);
 			}
 			
-			public void componentChanged(final IComponentDescription desc)
+			public IFuture componentChanged(final IComponentDescription desc)
 			{
 				SwingUtilities.invokeLater(new Runnable()
 				{
@@ -204,9 +207,10 @@ public class ComponentTreePanel extends JSplitPane
 						}
 					}
 				});
+				return new Future(null);
 			}
 			
-			public void componentAdded(final IComponentDescription desc)
+			public IFuture componentAdded(final IComponentDescription desc)
 			{
 //				System.err.println(""+model.hashCode()+" Panel->addChild queued: "+desc.getName()+", "+desc.getParent());
 				SwingUtilities.invokeLater(new Runnable()
@@ -247,6 +251,8 @@ public class ComponentTreePanel extends JSplitPane
 						}
 					}
 				});
+				
+				return new Future(null);
 			}
 		};
 

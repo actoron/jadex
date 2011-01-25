@@ -2,6 +2,7 @@ package jadex.bridge;
 
 import jadex.commons.Future;
 import jadex.commons.service.IService;
+import jadex.commons.service.annotation.Excluded;
 
 import java.util.Map;
 
@@ -22,6 +23,7 @@ public interface IComponentFactory extends IService
 	 *  @param The imports (if any).
 	 *  @return The loaded model.
 	 */
+	@Excluded
 	public IModelInfo loadModel(String model, String[] imports, ClassLoader classloader);
 
 	/**
@@ -30,6 +32,7 @@ public interface IComponentFactory extends IService
 	 *  @param The imports (if any).
 	 *  @return True, if model can be loaded.
 	 */
+	@Excluded
 	public boolean isLoadable(String model, String[] imports, ClassLoader classloader);
 	
 	/**
@@ -38,6 +41,7 @@ public interface IComponentFactory extends IService
 	 *  @param The imports (if any).
 	 *  @return True, if startable (and loadable).
 	 */
+	@Excluded
 	public boolean isStartable(String model, String[] imports, ClassLoader classloader);
 
 	/**
@@ -45,16 +49,19 @@ public interface IComponentFactory extends IService
 	 *  @param model The model (e.g. file name).
 	 *  @param The imports (if any).
 	 */
+	@Excluded
 	public String getComponentType(String model, String[] imports, ClassLoader classloader);
 
 	/**
 	 *  Get the names of component types supported by this factory.
 	 */
+	@Excluded
 	public String[] getComponentTypes();
 
 	/**
 	 *  Get a default icon for a component type.
 	 */
+	@Excluded
 	public Icon getComponentTypeIcon(String type);
 	
 	/**
@@ -66,6 +73,7 @@ public interface IComponentFactory extends IService
 	 * @param parent The parent component (if any).
 	 * @return An instance of a component and the corresponding adapter.
 	 */
+	@Excluded
 	public Object[] createComponentInstance(IComponentDescription desc, IComponentAdapterFactory factory, IModelInfo model, 
 		String config, Map arguments, IExternalAccess parent, Future ret);
 
@@ -76,5 +84,6 @@ public interface IComponentFactory extends IService
 	 *  @param type	The component type. 
 	 *  @return The properties or null, if the component type is not supported by this factory.
 	 */
+	@Excluded
 	public Map	getProperties(String type);
 }

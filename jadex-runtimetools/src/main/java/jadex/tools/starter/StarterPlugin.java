@@ -24,7 +24,6 @@ import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.commons.gui.IMenuItemConstructor;
 import jadex.commons.gui.PopupBuilder;
-import jadex.commons.service.SServiceProvider;
 import jadex.tools.common.modeltree.FileNode;
 import jadex.tools.common.modeltree.IExplorerTreeNode;
 import jadex.tools.common.modeltree.ModelExplorer;
@@ -596,7 +595,7 @@ public class StarterPlugin extends AbstractJCCPlugin	implements ICMSComponentLis
 	 *  Called when an component has died.
 	 *  @param ad The component description.
 	 */
-	public void componentRemoved(final IComponentDescription ad, Map results)
+	public IFuture componentRemoved(final IComponentDescription ad, Map results)
 	{
 		// Update components on awt thread.
 		SwingUtilities.invokeLater(new Runnable()
@@ -607,22 +606,25 @@ public class StarterPlugin extends AbstractJCCPlugin	implements ICMSComponentLis
 					spanel.setParent(null);
 			}
 		});
+		return new Future(null);
 	}
 
 	/**
 	 *  Called when an component is born.
 	 *  @param ad the component description.
 	 */
-	public void componentAdded(final IComponentDescription ad)
+	public IFuture componentAdded(final IComponentDescription ad)
 	{
+		return new Future(null);
 	}
 	
 	/**
 	 *  Called when an component changed.
 	 *  @param ad the component description.
 	 */
-	public void componentChanged(final IComponentDescription ad)
+	public IFuture componentChanged(final IComponentDescription ad)
 	{
+		return new Future(null);
 	}
 
 	/** 

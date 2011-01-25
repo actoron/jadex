@@ -7,6 +7,7 @@ import jadex.bridge.ICMSComponentListener;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
+import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.SReflect;
 import jadex.commons.concurrent.IResultListener;
@@ -293,15 +294,18 @@ public class DebuggerMainPanel extends JSplitPane
 
 				ces.addComponentListener(desc.getName(), new ICMSComponentListener()
 				{			
-					public void componentChanged(IComponentDescription desc)
+					public IFuture componentChanged(IComponentDescription desc)
 					{
 						updatePanel(desc);
+						return new Future(null);
 					}
-					public void componentRemoved(IComponentDescription desc, Map results)
+					public IFuture componentRemoved(IComponentDescription desc, Map results)
 					{
+						return new Future(null);
 					}			
-					public void componentAdded(IComponentDescription desc)
+					public IFuture componentAdded(IComponentDescription desc)
 					{
+						return new Future(null);
 					}
 				});		
 			}

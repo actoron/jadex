@@ -124,6 +124,7 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 			// Call remote method using invocation command.	
 			final IComponentIdentifier compid = rsms.getRMSComponentIdentifier();
 			final String callid = SUtil.createUniqueId(compid.getLocalName());
+//			System.out.println("call: "+callid+" "+method);
 //			if("getServices".equals(method.getName()))
 //				debugcallid	= callid;
 			final RemoteMethodInvocationCommand content = new RemoteMethodInvocationCommand(

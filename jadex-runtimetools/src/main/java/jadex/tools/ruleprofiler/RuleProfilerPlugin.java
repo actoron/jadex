@@ -6,9 +6,11 @@ import jadex.base.gui.componenttree.IComponentTreeNode;
 import jadex.base.gui.componenttree.INodeHandler;
 import jadex.base.gui.plugin.AbstractJCCPlugin;
 import jadex.bdi.BDIAgentFactory;
-import jadex.bridge.IComponentDescription;
 import jadex.bridge.ICMSComponentListener;
+import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentManagementService;
+import jadex.commons.Future;
+import jadex.commons.IFuture;
 import jadex.commons.SGUI;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.commons.gui.CombiIcon;
@@ -296,7 +298,7 @@ public class RuleProfilerPlugin extends AbstractJCCPlugin	implements ICMSCompone
 	 *  Called when an component has died.
 	 *  @param ad The component description.
 	 */
-	public void componentRemoved(final IComponentDescription ad, Map results)
+	public IFuture componentRemoved(final IComponentDescription ad, Map results)
 	{
 		// Update components on awt thread.
 		SwingUtilities.invokeLater(new Runnable()
@@ -312,22 +314,25 @@ public class RuleProfilerPlugin extends AbstractJCCPlugin	implements ICMSCompone
 				}
 			}
 		});
+		return new Future(null);
 	}
 
 	/**
 	 *  Called when an component is born.
 	 *  @param ad the component description.
 	 */
-	public void componentAdded(final IComponentDescription ad)
+	public IFuture componentAdded(final IComponentDescription ad)
 	{
+		return new Future(null);
 	}
 	
 	/**
 	 *  Called when an component changed.
 	 *  @param ad the component description.
 	 */
-	public void componentChanged(final IComponentDescription ad)
+	public IFuture componentChanged(final IComponentDescription ad)
 	{
+		return new Future(null);
 	}
 	
 	final AbstractAction	START_PROFILER	= new AbstractAction("Profile Agent", icons.getIcon("profile_agent"))

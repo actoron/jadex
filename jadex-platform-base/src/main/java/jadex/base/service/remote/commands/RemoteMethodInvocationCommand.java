@@ -53,6 +53,7 @@ public class RemoteMethodInvocationCommand implements IRemoteCommand
 		this.parametertypes = parametertypes;
 		this.parametervalues = parametervalues;
 		this.callid = callid;
+//		System.out.println("rmi on client: "+callid+" "+methodname);
 	}
 	
 	//-------- methods --------
@@ -276,6 +277,7 @@ public class RemoteMethodInvocationCommand implements IRemoteCommand
 	 */
 	public void setCallId(String callid)
 	{
+//		System.out.println("rmi on server: "+callid);
 		this.callid = callid;
 	}
 

@@ -208,6 +208,7 @@ public class ComponentTreeNode	extends AbstractComponentTreeNode implements IAct
 			}
 			public void customExceptionOccurred(Exception exception)
 			{
+				System.out.println("here1: "+exception);
 				// ignore
 			}
 		});
@@ -276,6 +277,7 @@ public class ComponentTreeNode	extends AbstractComponentTreeNode implements IAct
 
 			public void customExceptionOccurred(Exception exception)
 			{
+				System.out.println("here2: "+exception);
 				// May happen, when components already removed.
 			}
 		});

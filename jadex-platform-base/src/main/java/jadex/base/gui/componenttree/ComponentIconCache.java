@@ -2,8 +2,15 @@ package jadex.base.gui.componenttree;
 
 import jadex.bridge.ComponentFactorySelector;
 import jadex.bridge.IComponentFactory;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
+import jadex.commons.Future;
+import jadex.commons.concurrent.DelegationResultListener;
+import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.commons.service.IServiceProvider;
+import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
 
 import java.util.HashMap;
@@ -25,7 +32,7 @@ public class ComponentIconCache
 	private final Map	icons;
 	
 	/** The service provider. */
-	private final IServiceProvider	provider;
+	private final IExternalAccess exta;
 	
 	/** The tree. */
 	private final JTree	tree;
@@ -35,10 +42,10 @@ public class ComponentIconCache
 	/**
 	 *  Create an icon cache.
 	 */
-	public ComponentIconCache(IServiceProvider provider, JTree tree)
+	public ComponentIconCache(IExternalAccess exta, JTree tree)
 	{
 		this.icons	= new HashMap();
-		this.provider	= provider;
+		this.exta	= exta;
 		this.tree	= tree;
 	}
 	
@@ -59,25 +66,38 @@ public class ComponentIconCache
 		{
 			// Todo: remember ongoing searches for efficiency?
 //			System.out.println("getIcon: "+type);
-			SServiceProvider.getService(provider, new ComponentFactorySelector(type)).addResultListener(new SwingDefaultResultListener()
+			
+			exta.scheduleStep(new IComponentStep()
+			{
+				public Object execute(IInternalAccess ia)
+				{
+					final Future ret = new Future();
+					SServiceProvider.getService(ia.getServiceProvider(), new ComponentFactorySelector(type))
+						.addResultListener(new DelegationResultListener(ret));
+					return ret;
+				}
+			}).addResultListener(new SwingDefaultResultListener()
 			{
 				public void customResultAvailable(Object result)
 				{
-					IComponentFactory	fac	= (IComponentFactory)result;
-					icons.put(type, fac.getComponentTypeIcon(type));
-					TreeModel	model	= tree.getModel();
-					if(model instanceof ComponentTreeModel)
+					try
 					{
-						((ComponentTreeModel)model).fireNodeChanged(node);
+						IComponentFactory	fac	= (IComponentFactory)result;
+						icons.put(type, fac.getComponentTypeIcon(type));
+						TreeModel	model	= tree.getModel();
+						if(model instanceof ComponentTreeModel)
+						{
+							((ComponentTreeModel)model).fireNodeChanged(node);
+						}
+						else
+						{
+							tree.repaint();
+						}
 					}
-					else
+					catch(Exception e)
 					{
-						tree.repaint();
+						// could be UnsupportedOpEx in case of remote factory
 					}
-				}
-				public void customExceptionOccurred(Exception exception)
-				{
-					// ignore
 				}
 			});
 		}

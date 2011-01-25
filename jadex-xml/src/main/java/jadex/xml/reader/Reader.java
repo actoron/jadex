@@ -683,8 +683,8 @@ public class Reader
 		}
 		catch(Throwable t)
 		{
-//			t.printStackTrace();
-//			System.out.println("problem: "+new String(val));
+			t.printStackTrace();
+			System.out.println("problem: "+new String(val));
 			throw new RuntimeException(t);
 		}
 	}
