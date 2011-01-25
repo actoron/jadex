@@ -191,6 +191,9 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 				String pck = tag.getNamespaceURI().substring(SXML.PROTOCOL_TYPEINFO.length());
 				String clazzname = pck.length()>0? pck+"."+tag.getLocalPart().replace("-", "$"): tag.getLocalPart().replace("-", "$");
 //				System.out.println("Clazzname: "+clazzname);
+	
+//				if(clazzname.indexOf("ProxyComponentTreeNode")!=-1)
+//					System.out.println("hererer");
 				
 				// Special case array
 				int idx = clazzname.indexOf("__");

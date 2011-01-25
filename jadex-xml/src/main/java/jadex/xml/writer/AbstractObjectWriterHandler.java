@@ -323,7 +323,7 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 				{
 					doneprops.add(propname);
 					Object value = getValue(object, property, context, null);
-	
+					
 					if(value!=null)
 					{
 						// Make to an attribute when

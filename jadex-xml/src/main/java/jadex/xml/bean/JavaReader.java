@@ -20,6 +20,7 @@ import jadex.xml.reader.Reader;
 import java.awt.Color;
 import java.net.InetAddress;
 import java.net.URL;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -109,6 +110,42 @@ public class JavaReader extends Reader
 				new BeanAccessInfo(Set.class.getMethod("add", new Class[]{Object.class}), null)))
 			}));
 			typeinfos.add(ti_set);
+			
+			// java.util.EmptySet
+			TypeInfo ti_emptyset = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.util", "Collections-EmptySet")}),
+				new ObjectInfo(new IBeanObjectCreator()
+				{
+					public Object createObject(IContext context, Map rawattributes) throws Exception
+					{
+						return Collections.EMPTY_SET;
+					}
+				}
+			));
+			typeinfos.add(ti_emptyset);
+			
+			// java.util.EmptyList
+			TypeInfo ti_emptylist = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.util", "Collections-EmptyList")}),
+				new ObjectInfo(new IBeanObjectCreator()
+				{
+					public Object createObject(IContext context, Map rawattributes) throws Exception
+					{
+						return Collections.EMPTY_LIST;
+					}
+				}
+			));
+			typeinfos.add(ti_emptylist);
+			
+			// java.util.EmptyMap
+			TypeInfo ti_emptymap = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.util", "Collections-EmptyMap")}),
+				new ObjectInfo(new IBeanObjectCreator()
+				{
+					public Object createObject(IContext context, Map rawattributes) throws Exception
+					{
+						return Collections.EMPTY_MAP;
+					}
+				}
+			));
+			typeinfos.add(ti_emptymap);
 			
 			// java.util.Color
 			IStringObjectConverter coconv = new IStringObjectConverter()

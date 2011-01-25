@@ -9,6 +9,7 @@ import java.net.InetAddress;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -50,26 +51,29 @@ public class Test //extends TestCase
 			for(int i=0; i<cnt; i++)
 //			while(true)
 			{
-				t.testSpecialCharacter();
-				t.testBean();
-				t.testEmptyArray();
-				t.testArrayOrder();
-				t.testMultiArray();
-				t.testMultiArrayAttribute();
-				t.testVectorModel();
-				t.testClass();
-				t.testDate();
-				t.testColor();
-				t.testArray();
-				t.testList();
-				t.testSet();
-				t.testMap();
-				t.testInnerClass();
-				t.testURL();
-				t.testLoggingLevel();
-				t.testInetAddress();
-				t.testBeanWithPublicFields();
-				t.testAnonymousInnerClass();
+				t.testEmptySet();
+				t.testEmptyList();
+				t.testEmptyMap();
+//				t.testSpecialCharacter();
+//				t.testBean();
+//				t.testEmptyArray();
+//				t.testArrayOrder();
+//				t.testMultiArray();
+//				t.testMultiArrayAttribute();
+//				t.testVectorModel();
+//				t.testClass();
+//				t.testDate();
+//				t.testColor();
+//				t.testArray();
+//				t.testList();
+//				t.testSet();
+//				t.testMap();
+//				t.testInnerClass();
+//				t.testURL();
+//				t.testLoggingLevel();
+//				t.testInetAddress();
+//				t.testBeanWithPublicFields();
+//				t.testAnonymousInnerClass();
 			}
 			long dur = System.currentTimeMillis()-start;
 			
@@ -110,6 +114,30 @@ public class Test //extends TestCase
 				+wo.getClass()+" \n"+ro.getClass()+" \n"+xml);
 		
 //		assertEquals("Written and read objects should be equal:", wo, ro);
+	}
+	
+	/**
+	 *  Test if empty set constant works.
+	 */
+	public void testEmptySet() throws Exception
+	{
+		doWriteAndRead(Collections.EMPTY_SET);
+	}
+	
+	/**
+	 *  Test if empty list constant works.
+	 */
+	public void testEmptyList() throws Exception
+	{
+		doWriteAndRead(Collections.EMPTY_LIST);
+	}
+	
+	/**
+	 *  Test if empty map constant works.
+	 */
+	public void testEmptyMap() throws Exception
+	{
+		doWriteAndRead(Collections.EMPTY_MAP);
 	}
 	
 	/**

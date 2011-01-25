@@ -64,8 +64,6 @@ public class ComponentTreeNode	extends AbstractComponentTreeNode implements IAct
 	 */
 	public Object	getId()
 	{
-		if(desc==null)
-			System.out.println("driss");
 		return desc.getName();
 	}
 

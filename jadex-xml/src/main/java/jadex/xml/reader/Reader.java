@@ -323,11 +323,11 @@ public class Reader
 					
 					try
 					{
-						object = handler.createObject(ti, readcontext.getStack().isEmpty(), 
-								readcontext, rawattrs);
+						object = handler.createObject(ti, readcontext.getStack().isEmpty(), readcontext, rawattrs);
 					}
 					catch(Exception e)
 					{
+						e.printStackTrace();
 						readcontext.getReporter().report(e.toString(), "creation error", readcontext, parser.getLocation());
 					}
 					
