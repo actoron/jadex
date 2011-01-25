@@ -1026,8 +1026,18 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 					else
 					{
 						if((prop.getField().getModifiers()&Field.PUBLIC)==0)
-							prop.getField().setAccessible(true);
-						prop.getField().set(object, arg);
+						{
+							if(SXML.XML_CLASSNAME.equals(prop.getName()))
+							{
+								set = true;
+							}
+							else
+							{
+								prop.getField().setAccessible(true);
+							}
+						}
+						if(!set)
+							prop.getField().set(object, arg);
 					}
 					set = true;
 				}

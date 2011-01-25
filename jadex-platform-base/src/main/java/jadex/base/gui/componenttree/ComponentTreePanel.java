@@ -9,11 +9,16 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IRemoteServiceManagementService;
+import jadex.commons.Future;
 import jadex.commons.SGUI;
 import jadex.commons.SUtil;
 import jadex.commons.TreeExpansionHandler;
+import jadex.commons.concurrent.DefaultResultListener;
+import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.commons.gui.CombiIcon;
+import jadex.commons.service.RequiredServiceInfo;
+import jadex.commons.service.SServiceProvider;
 
 import java.awt.Component;
 import java.awt.Dimension;
@@ -79,55 +84,55 @@ public class ComponentTreePanel extends JSplitPane
 	//-------- attributes --------
 	
 	/** The external access. */
-	private final IExternalAccess	access;
+	protected final IExternalAccess	access;
 	
 	/** The component tree model. */
-	private final ComponentTreeModel	model;
+	protected final ComponentTreeModel	model;
 	
 	/** The component tree. */
-	private final JTree	tree;
+	protected final JTree	tree;
 	
 	/** The component management service. */
-	private IComponentManagementService	cms;
+	protected IComponentManagementService	cms;
 	
 	/** The action for killing selected components. */
-	private final Action	kill;
+	protected final Action	kill;
 	
 	/** The action for killing selected proxy component. */
-	private final Action	proxykill;
+	protected final Action	proxykill;
 	
 	/** The action for suspending selected components. */
-	private final Action	suspend;
+	protected final Action	suspend;
 	
 	/** The action for resuming selected components. */
-	private final Action	resume;
+	protected final Action	resume;
 	
 	/** The action for stepping selected components. */
-	private final Action	step;
+	protected final Action	step;
 	
 	/** The action for refreshing selected components. */
-	private final Action	refresh;
+	protected final Action	refresh;
 	
 	/** The action for recursively refreshing selected components. */
-	private final Action	refreshtree;
+	protected final Action	refreshtree;
 	
 	/** The action for showing properties of the selected node. */
-	private final Action	showprops;
+	protected final Action	showprops;
 	
 	/** The action for showing object details of the selected node. */
-	private final Action showobject;
+	protected final Action showobject;
 	
 	/** The action for removing a service. */
-	private final Action removeservice;
+	protected final Action removeservice;
 
 	/** The component listener. */
-	private final ICMSComponentListener	listener;
+	protected final ICMSComponentListener	listener;
 	
 	/** The properties panel. */
-	private final JScrollPane	proppanel;
+	protected final JScrollPane	proppanel;
 	
 //	/** The object panel. */
-//	private final JScrollPane	objectpanel;
+//	protected final JScrollPane	objectpanel;
 
 	
 	//-------- constructors --------
@@ -305,7 +310,8 @@ public class ComponentTreePanel extends JSplitPane
 									public static final String XML_CLASSNAME = "proxykill";
 									public Object	execute(IInternalAccess ia)
 									{
-										ia.getRequiredService("rms")
+										SServiceProvider.getService(ia.getServiceProvider(), IRemoteServiceManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//										ia.getRequiredService("rms")
 											.addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
 										{
 											public void customResultAvailable(Object result)
@@ -742,42 +748,45 @@ public class ComponentTreePanel extends JSplitPane
 			public static final String XML_CLASSNAME = "init";
 			public Object execute(IInternalAccess ia)
 			{
-				ia.getRequiredService("cms").addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
+				final Future ret = new Future();
+				SServiceProvider.getService(ia.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//				ia.getRequiredService("cms")
+					.addResultListener(new DelegationResultListener(ret));
+				return ret;
+			}
+		}).addResultListener(new DefaultResultListener()
+		{
+			public void resultAvailable(Object result)
+			{
+				cms	= (IComponentManagementService)result;
+				
+				// Hack!!! How to find root node?
+				cms.getComponentDescriptions().addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
 				{
 					public void customResultAvailable(Object result)
 					{
-						cms	= (IComponentManagementService)result;
-						
-						// Hack!!! How to find root node?
-						cms.getComponentDescriptions().addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
+						IComponentDescription[]	descriptions	= (IComponentDescription[])result;
+						if(descriptions.length!=0)
 						{
-							public void customResultAvailable(Object result)
+							IComponentDescription	root	= null;
+							for(int i=0; root==null && i<descriptions.length; i++)
 							{
-								IComponentDescription[]	descriptions	= (IComponentDescription[])result;
-								if(descriptions.length!=0)
+								if(descriptions[i].getParent()==null)
 								{
-									IComponentDescription	root	= null;
-									for(int i=0; root==null && i<descriptions.length; i++)
-									{
-										if(descriptions[i].getParent()==null)
-										{
-											root	= descriptions[i];
-										}
-									}
-									if(root==null)
-										throw new RuntimeException("No root node found: "+SUtil.arrayToString(descriptions));
-									model.setRoot(new ComponentTreeNode(null, model, tree, root, cms, cic));
-									// Expand root node.
-									TreeExpansionHandler	teh	= new TreeExpansionHandler(tree);
-									teh.treeExpanded(new TreeExpansionEvent(tree, new TreePath(model.getRoot())));
+									root	= descriptions[i];
 								}
 							}
-						});
-						
-						cms.addComponentListener(null, listener);				
+							if(root==null)
+								throw new RuntimeException("No root node found: "+SUtil.arrayToString(descriptions));
+							model.setRoot(new ComponentTreeNode(null, model, tree, root, cms, cic));
+							// Expand root node.
+							TreeExpansionHandler	teh	= new TreeExpansionHandler(tree);
+							teh.treeExpanded(new TreeExpansionEvent(tree, new TreePath(model.getRoot())));
+						}
 					}
 				});
-				return null;
+				
+				cms.addComponentListener(null, listener);		
 			}
 		});
 		
@@ -895,7 +904,8 @@ public class ComponentTreePanel extends JSplitPane
 			public static final String XML_CLASSNAME = "dispose";
 			public Object execute(IInternalAccess ia)
 			{
-				ia.getRequiredService("cms")
+				SServiceProvider.getService(ia.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//				ia.getRequiredService("cms")
 					.addResultListener(new SwingDefaultResultListener()
 				{
 					public void customResultAvailable(Object result)

@@ -382,7 +382,7 @@ public class Reader
 	
 	//							System.out.println("here: "+attrname);
 								
-								if(!SXML.ID.equals(attrname.getLocalPart()) && !SXML.XML_CLASSNAME.equals(attrname.getLocalPart()))
+								if(!SXML.ID.equals(attrname.getLocalPart()))// && !SXML.XML_CLASSNAME.equals(attrname.getLocalPart()))
 								{	
 									String attrval = parser.getAttributeValue(i);
 									attrs.remove(attrname);

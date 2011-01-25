@@ -56,7 +56,7 @@ public class AdministrationService extends BasicService implements IAdministrati
 				{
 					Map.Entry entry = (Map.Entry) it.next();
 					ILogListener listener = (ILogListener) entry.getValue();
-					//IAAAService as = (IAAAService) SServiceProvider.getService(provider, IAAAService.class).get(new ThreadSuspendable());
+					//IAAAService as = (IAAAService)SServiceProvider.getService(provider, IAAAService.class).get(new ThreadSuspendable());
 					LogEvent evt = new LogEvent(String.valueOf(record.getMessage()));
 					//if (as.accessEvent((IClient) entry.getKey(), evt))
 					listener.logMessage(evt);

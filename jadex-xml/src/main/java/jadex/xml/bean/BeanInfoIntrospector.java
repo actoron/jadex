@@ -102,6 +102,8 @@ public class BeanInfoIntrospector implements IBeanIntrospector
 			            		ret.put(property_java_name, new BeanProperty(property_java_name, fields[i]));
 			            	}
 		            	}
+		            	// Must include property when writing to be able to create correct class on other side.
+		            	// Must not try to write this constant.
 		            	else if(SXML.XML_CLASSNAME.equals(property_java_name))
 		            	{
 		            		ret.put(property_java_name, new BeanProperty(property_java_name, fields[i]));
