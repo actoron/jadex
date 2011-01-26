@@ -194,6 +194,7 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 					{
 						Future ret = new Future();
 						ProxyAgent pa = (ProxyAgent)ia;
+						// todo:!!!
 						pa.getVirtualChildren(cid, false).addResultListener(new DelegationResultListener(ret));					
 						return ret;
 					}

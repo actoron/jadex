@@ -8,7 +8,9 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.Future;
+import jadex.commons.IFuture;
 import jadex.commons.concurrent.DelegationResultListener;
+import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.micro.IMicroExternalAccess;
 
@@ -96,29 +98,32 @@ public class VirtualComponentTreeNode extends AbstractComponentTreeNode implemen
 			public void customResultAvailable(Object result)
 			{
 				final IMicroExternalAccess exta = (IMicroExternalAccess)result;
+				// Must be done as static var, otherise desc is not availbel at remote site.
+				final IComponentIdentifier cid = desc.getName();
 				exta.scheduleStep(new IComponentStep()
 				{
 					public static final String XML_CLASSNAME = "changed"; 
 					public Object execute(IInternalAccess ia)
 					{
 						ProxyAgent pa = (ProxyAgent)ia;
-						pa.getRemoteComponentDescription(desc.getName())
-							.addResultListener(new SwingDefaultResultListener()
-						{
-							public void customResultAvailable(Object result)
-							{
-								setDescription((IComponentDescription)result);
-								getModel().fireNodeChanged(VirtualComponentTreeNode.this);
+						Future ret = new Future();
+						pa.getRemoteComponentDescription(cid)
+							.addResultListener(new DelegationResultListener(ret));
+						return ret;
+					}
+				}).addResultListener(new SwingDefaultResultListener()
+				{
+					public void customResultAvailable(Object result)
+					{
+						setDescription((IComponentDescription)result);
+						getModel().fireNodeChanged(VirtualComponentTreeNode.this);
 //								System.out.println("refreshed: "+desc);
-							}
-							
-							public void customExceptionOccurred(Exception exception)
-							{
-								AbstractComponentTreeNode parent = (AbstractComponentTreeNode)getParent();
-								parent.removeChild(VirtualComponentTreeNode.this);
-							}
-						});
-						return null;
+					}
+					
+					public void customExceptionOccurred(Exception exception)
+					{
+						AbstractComponentTreeNode parent = (AbstractComponentTreeNode)getParent();
+						parent.removeChild(VirtualComponentTreeNode.this);
 					}
 				});
 			}
