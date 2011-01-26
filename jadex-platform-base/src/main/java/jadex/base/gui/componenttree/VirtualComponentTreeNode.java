@@ -52,6 +52,7 @@ public class VirtualComponentTreeNode extends AbstractComponentTreeNode implemen
 		IComponentManagementService cms, ComponentIconCache iconcache)
 	{
 		super(parent, model, tree);
+//		System.out.println("virt node for: "+desc.getName());
 		this.desc = desc;
 		this.cms = cms;
 		this.iconcache = iconcache;
@@ -66,16 +67,19 @@ public class VirtualComponentTreeNode extends AbstractComponentTreeNode implemen
 	protected void	searchChildren(boolean force)
 	{
 		final Future	future	= new Future();
+//		System.out.println("virt children called: "+desc.getName());
 		ProxyComponentTreeNode.searchChildren(cms, this, desc, desc.getName(), iconcache, future, force)
 			.addResultListener(new SwingDefaultResultListener()
 		{
 			public void customResultAvailable(Object result)
 			{
+//				System.out.println("virt children: "+desc.getName()+" "+result);
 				setChildren((List)result).addResultListener(new DelegationResultListener(future));
 			}
 			
 			public void customExceptionOccurred(Exception exception)
 			{
+//				System.out.println("virt children error: "+exception);
 				setChildren(Collections.EMPTY_LIST);
 			}
 		});
