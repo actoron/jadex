@@ -62,6 +62,7 @@ public class NotNode extends AbstractBetaNode
 				tcs[j].addTuple(left, state, mem, agenda);
 		}
 
+		checkConsistency(mem);
 		state.getProfiler().stop(IProfiler.TYPE_NODEEVENT, IProfiler.NODEEVENT_TUPLEADDED);
 		state.getProfiler().stop(IProfiler.TYPE_NODE, this);
 	}
@@ -104,6 +105,7 @@ public class NotNode extends AbstractBetaNode
 			nomem.removeMappings(left);
 		}
 
+		checkConsistency(mem);
 		state.getProfiler().stop(IProfiler.TYPE_NODEEVENT, IProfiler.NODEEVENT_TUPLEREMOVED);
 		state.getProfiler().stop(IProfiler.TYPE_NODE, this);
 	}
@@ -172,6 +174,7 @@ public class NotNode extends AbstractBetaNode
 				tcs[j].modifyTuple(left, tupleindex, type, oldvalue, newvalue, state, mem, agenda);
 		}
 
+		checkConsistency(mem);
 		state.getProfiler().stop(IProfiler.TYPE_NODEEVENT, IProfiler.NODEEVENT_TUPLEMODIFIED);
 		state.getProfiler().stop(IProfiler.TYPE_NODE, this);
 	}
@@ -223,6 +226,7 @@ public class NotNode extends AbstractBetaNode
 				}
 			}
 		}
+		checkConsistency(mem);
 	}
 
 	//-------- template methods --------

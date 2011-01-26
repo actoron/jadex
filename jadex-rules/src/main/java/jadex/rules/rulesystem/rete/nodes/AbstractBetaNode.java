@@ -347,7 +347,7 @@ public abstract class AbstractBetaNode extends AbstractNode implements IObjectCo
 //		System.out.println("Add object called: "+this+" "+right);
 		state.getProfiler().start(IProfiler.TYPE_NODE, this);
 		state.getProfiler().start(IProfiler.TYPE_NODEEVENT, IProfiler.NODEEVENT_OBJECTADDED);
-
+		
 		// Update the indexed memories
 		if(indexers!=null)
 		{
@@ -373,6 +373,8 @@ public abstract class AbstractBetaNode extends AbstractNode implements IObjectCo
 			}
 		}
 				
+		if(this instanceof NotNode)
+			checkConsistency(mem);
 		state.getProfiler().stop(IProfiler.TYPE_NODEEVENT, IProfiler.NODEEVENT_OBJECTADDED);
 		state.getProfiler().stop(IProfiler.TYPE_NODE, this);
 	}
@@ -410,6 +412,8 @@ public abstract class AbstractBetaNode extends AbstractNode implements IObjectCo
 			}			
 		}
 		
+		if(this instanceof NotNode)
+			checkConsistency(mem);
 		state.getProfiler().stop(IProfiler.TYPE_NODEEVENT, IProfiler.NODEEVENT_OBJECTREMOVED);
 		state.getProfiler().stop(IProfiler.TYPE_NODE, this);
 	}
@@ -501,6 +505,8 @@ public abstract class AbstractBetaNode extends AbstractNode implements IObjectCo
 		// else
 		// propagation of unaffected nodes is handled by subtypes.
 
+		if(this instanceof NotNode)
+			checkConsistency(mem);
 		state.getProfiler().stop(IProfiler.TYPE_NODEEVENT, IProfiler.NODEEVENT_OBJECTMODIFIED);
 		state.getProfiler().stop(IProfiler.TYPE_NODE, this);
 	}
@@ -869,4 +875,27 @@ public abstract class AbstractBetaNode extends AbstractNode implements IObjectCo
 	 *  Check if a match is contained.
 	 */
 	protected abstract boolean isMatchContained(IOAVState state, Tuple left, Object right, ReteMemory mem);
+	
+	
+	/**
+	 *  Test if there is left input and no right input, but no value propagated
+	 */
+	protected void	checkConsistency(ReteMemory mem)
+	{
+		Collection	left	= tsource.getNodeMemory(mem);
+		if(left!=null && !left.isEmpty())
+		{
+			Collection right	= osource.getNodeMemory(mem);
+			if(right==null || right.isEmpty())
+			{
+				Collection	own	= getNodeMemory(mem);
+				if(own==null || own.isEmpty())
+				{
+					Thread.dumpStack();
+					System.exit(0);
+				}
+			}
+		}
+	}
+
 }
