@@ -174,6 +174,8 @@ public class RemoteMethodInvocationCommand implements IRemoteCommand
 			// fetch method on service and invoke method
 			Method m = target.getClass().getMethod(methodname, parametertypes);
 			
+//			System.out.println("invoke: "+m);
+			
 			// Necessary due to Java inner class bug 4071957
 			if(SReflect.isAnonymousInnerClass(target.getClass()))
 				m.setAccessible(true);

@@ -14,6 +14,7 @@ import jadex.commons.service.IService;
 import jadex.commons.service.IServiceContainer;
 import jadex.commons.service.SServiceProvider;
 
+import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -217,92 +218,23 @@ public class ComponentTreeNode	extends AbstractComponentTreeNode implements IAct
 		});
 		
 		
-		// Search services and only add container node when services are found.
-		cms.getExternalAccess(desc.getName())
-			.addResultListener(new SwingDefaultResultListener()
-		{
-			public void customResultAvailable(Object result)
-			{
-				final IExternalAccess ea = (IExternalAccess)result;
-				ea.scheduleStep(new IComponentStep()
-				{
-					public Object execute(IInternalAccess ia)
-					{
-						Future ret = new Future();
-						SServiceProvider.getDeclaredServices(ia.getServiceProvider())
-							.addResultListener(new DelegationResultListener(ret));
-						return ret;
-					}
-				}).addResultListener(new SwingDefaultResultListener()
-				{
-					public void customResultAvailable(Object result)
-					{
-						List	services	= (List)result;
-						if(services!=null && !services.isEmpty())
-						{
-							ServiceContainerNode	scn	= (ServiceContainerNode)getModel().getNode(desc.getName().getName()+"ServiceContainer");
-							if(scn==null)
-								scn	= new ServiceContainerNode(ComponentTreeNode.this, getModel(), getTree(), (IServiceContainer)ea.getServiceProvider());
-//							System.err.println(getModel().hashCode()+", "+ready.hashCode()+" searchChildren.add "+scn);
-							children.add(0, scn);
-							
-							final List	subchildren	= new ArrayList();
-							for(int i=0; i<services.size(); i++)
-							{
-								IService service	= (IService)services.get(i);
-								ServiceNode	sn	= (ServiceNode)getModel().getNode(service.getServiceIdentifier());
-								if(sn==null)
-									sn	= new ServiceNode(scn, getModel(), getTree(), service);
-								subchildren.add(sn);
-							}
-							
-							final ServiceContainerNode	node	= scn;
-							future.addResultListener(new SwingDefaultResultListener()
-							{
-								public void customResultAvailable(Object result)
-								{
-									node.setChildren(subchildren);
-								}
-								public void customExceptionOccurred(Exception exception)
-								{
-									// Shouldn't happen???
-								}
-							});
-						}
-
-						ready[1]	= true;
-						if(ready[0] &&  ready[1])
-						{
-							setChildren(children).addResultListener(new DelegationResultListener(future));
-						}
-					}
-					public void customExceptionOccurred(Exception exception)
-					{
-						ready[1]	= true;
-						if(ready[0] &&  ready[1])
-						{
-							setChildren(children).addResultListener(new DelegationResultListener(future));
-						}
-					}
-				});
-			}
-
-			public void customExceptionOccurred(Exception exception)
-			{
-				System.out.println("here2: "+exception);
-				// May happen, when components already removed.
-			}
-		});
-		
 //		// Search services and only add container node when services are found.
 //		cms.getExternalAccess(desc.getName())
 //			.addResultListener(new SwingDefaultResultListener()
 //		{
 //			public void customResultAvailable(Object result)
 //			{
-//				final IExternalAccess	ea	= (IExternalAccess)result;
-//				SServiceProvider.getDeclaredServices(ea.getServiceProvider())
-//					.addResultListener(new SwingDefaultResultListener()
+//				final IExternalAccess ea = (IExternalAccess)result;
+//				ea.scheduleStep(new IComponentStep()
+//				{
+//					public Object execute(IInternalAccess ia)
+//					{
+//						Future ret = new Future();
+//						SServiceProvider.getDeclaredServices(ia.getServiceProvider())
+//							.addResultListener(new DelegationResultListener(ret));
+//						return ret;
+//					}
+//				}).addResultListener(new SwingDefaultResultListener()
 //				{
 //					public void customResultAvailable(Object result)
 //					{
@@ -362,6 +294,76 @@ public class ComponentTreeNode	extends AbstractComponentTreeNode implements IAct
 //				// May happen, when components already removed.
 //			}
 //		});
+		
+		// Search services and only add container node when services are found.
+		cms.getExternalAccess(desc.getName())
+			.addResultListener(new SwingDefaultResultListener()
+		{
+			public void customResultAvailable(Object result)
+			{
+				final IExternalAccess	ea	= (IExternalAccess)result;
+				
+				SServiceProvider.getDeclaredServices(ea.getServiceProvider())
+					.addResultListener(new SwingDefaultResultListener()
+				{
+					public void customResultAvailable(Object result)
+					{
+						List	services	= (List)result;
+						if(services!=null && !services.isEmpty())
+						{
+							ServiceContainerNode	scn	= (ServiceContainerNode)getModel().getNode(desc.getName().getName()+"ServiceContainer");
+							if(scn==null)
+								scn	= new ServiceContainerNode(ComponentTreeNode.this, getModel(), getTree(), (IServiceContainer)ea.getServiceProvider());
+//							System.err.println(getModel().hashCode()+", "+ready.hashCode()+" searchChildren.add "+scn);
+							children.add(0, scn);
+							
+							final List	subchildren	= new ArrayList();
+							for(int i=0; i<services.size(); i++)
+							{
+								IService service	= (IService)services.get(i);
+								ServiceNode	sn	= (ServiceNode)getModel().getNode(service.getServiceIdentifier());
+								if(sn==null)
+									sn	= new ServiceNode(scn, getModel(), getTree(), service);
+								subchildren.add(sn);
+							}
+							
+							final ServiceContainerNode	node	= scn;
+							future.addResultListener(new SwingDefaultResultListener()
+							{
+								public void customResultAvailable(Object result)
+								{
+									node.setChildren(subchildren);
+								}
+								public void customExceptionOccurred(Exception exception)
+								{
+									// Shouldn't happen???
+								}
+							});
+						}
+
+						ready[1]	= true;
+						if(ready[0] &&  ready[1])
+						{
+							setChildren(children).addResultListener(new DelegationResultListener(future));
+						}
+					}
+					public void customExceptionOccurred(Exception exception)
+					{
+						ready[1]	= true;
+						if(ready[0] &&  ready[1])
+						{
+							setChildren(children).addResultListener(new DelegationResultListener(future));
+						}
+					}
+				});
+			}
+
+			public void customExceptionOccurred(Exception exception)
+			{
+				System.out.println("here2: "+exception);
+				// May happen, when components already removed.
+			}
+		});
 
 	}
 	

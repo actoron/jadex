@@ -375,7 +375,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	}
 	
 //	protected static Map errors = Collections.synchronizedMap(new LRU(200));
-
+//	public Map interestingcalls = new HashMap();
 	/**
 	 *  Send the request message of a remote method invocation.
 	 *  (Can savely be called from any thread).
@@ -418,7 +418,13 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 								
 //								System.out.println("sent: "+callid);
 								
-								msg.put(SFipa.CONTENT, Writer.objectToXML(getWriter(), content, ls.getClassLoader(), receiver));
+								String cont = Writer.objectToXML(getWriter(), content, ls.getClassLoader(), receiver);
+								msg.put(SFipa.CONTENT, cont);
+								
+//								if(cont.indexOf("getServices")!=-1)
+//								{
+//									interestingcalls.put(callid, cont);
+//								}
 								
 								IMessageService ms = (IMessageService)result;
 								ms.sendMessage(msg, SFipa.FIPA_MESSAGE_TYPE, component.getComponentIdentifier(), ls.getClassLoader())

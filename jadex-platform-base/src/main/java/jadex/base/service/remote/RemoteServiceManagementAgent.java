@@ -16,6 +16,7 @@ import jadex.xml.reader.Reader;
 import jadex.xml.writer.Writer;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -101,21 +102,20 @@ public class RemoteServiceManagementAgent extends MicroAgent
 				{
 					// Hack!!! Manual decoding for using custom class loader.
 					final ILibraryService ls = (ILibraryService)result;
-					Object	content	= msg.get(SFipa.CONTENT);
+					Object content = msg.get(SFipa.CONTENT);
+					final String callid = (String)msg.get(SFipa.CONVERSATION_ID);
 					
-//					System.out.println("received: "+msg.get(SFipa.CONVERSATION_ID));
+//					System.out.println("received: "+callid);
 					
-//					if(content.toString().indexOf("calc")!=-1)
-//					{
-//						System.out.println("com: "+content);
-//					}
-
+					if(((String)content).indexOf("getServices")!=-1)
+						System.out.println("getS: "+callid);
+					
 					if(content instanceof String)
 					{
 						// Catch decode problems.
 						// Should be ignored or be a warning.
 						try
-						{
+						{	
 //							content = JavaReader.objectFromXML((String)content, ls.getClassLoader());
 							List	errors	= new ArrayList();
 							content = Reader.objectFromByteArray(rms.getReader(), ((String)content).getBytes(), ls.getClassLoader(), errors);
@@ -131,14 +131,16 @@ public class RemoteServiceManagementAgent extends MicroAgent
 								}
 								else
 								{
-									content	= null;
+//									content	= null;
+									content = new RemoteResultCommand(null, new RuntimeException("Errors during XML decoding: "+errors), callid);
 									getLogger().warning("Remote service management service could not decode message."+content);
 								}
 							}
 						}
 						catch(Exception e)
 						{
-							content	= null;
+//							content	= null;
+							content = new RemoteResultCommand(null, e, callid);
 							getLogger().warning("Remote service management service could not decode message."+content);
 						}
 					}
@@ -146,11 +148,6 @@ public class RemoteServiceManagementAgent extends MicroAgent
 					if(content instanceof IRemoteCommand)
 					{
 						final IRemoteCommand com = (IRemoteCommand)content;
-//						if(com instanceof RemoteMethodInvocationCommand
-//							&& ((RemoteMethodInvocationCommand)com).getMethodName().indexOf("calc")!=-1)
-//						{
-//							System.out.println("com: "+com);
-//						}
 						
 						com.execute((IMicroExternalAccess)getExternalAccess(), rms).addResultListener(createResultListener(new DefaultResultListener()
 						{
@@ -170,6 +167,7 @@ public class RemoteServiceManagementAgent extends MicroAgent
 											reply.put(SFipa.CONTENT, content);
 //											System.out.println("content: "+content);
 											
+//											System.out.println("reply: "+callid);
 											sendMessage(reply, mt);
 										}
 										public void exceptionOccurred(Exception exception)

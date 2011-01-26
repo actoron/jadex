@@ -7,6 +7,7 @@ import jadex.commons.IntermediateDelegationResultListener;
 import jadex.commons.IntermediateFuture;
 import jadex.commons.concurrent.DelegationResultListener;
 
+import java.lang.reflect.Proxy;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -455,6 +456,9 @@ public class SServiceProvider
 		
 		// Hack->remove
 //		IVisitDecider contdecider = new DefaultVisitDecider(false);
+		
+//		if(Proxy.isProxyClass(provider.getClass()))
+//			System.out.println("herere");
 		
 		provider.getServices(getSearchManager(false, RequiredServiceInfo.SCOPE_LOCAL), contdecider, contanyselector)
 			.addResultListener(new IntermediateDelegationResultListener(ret));

@@ -60,6 +60,10 @@ public class RemoteResultCommand implements IRemoteCommand
 		
 		Future future = (Future)rsms.getWaitingCall(callid);
 		
+//		Object call = rsms.interestingcalls.remove(callid);
+//		if(call!=null)
+//			System.out.println("here");
+		
 		if(future==null)
 		{
 			// NOP, ignore invocation results that arrive late.
