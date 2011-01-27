@@ -17,6 +17,9 @@ public class IntermediateFuture extends Future	implements	IIntermediateFuture
 	/** The intermediate results. */
 	protected Collection results;
 	
+	/** Flag indicating that addIntermediateResult()has been called. */
+	protected boolean intermediate;
+	
 	//-------- constructors--------
 	
 	/**
@@ -54,6 +57,8 @@ public class IntermediateFuture extends Future	implements	IIntermediateFuture
 	 */
 	public void	addIntermediateResult(Object result)
 	{
+		intermediate = true;
+		
 		List	ilisteners	= null;
 		synchronized(this)
 		{
@@ -230,7 +235,23 @@ public class IntermediateFuture extends Future	implements	IIntermediateFuture
 			{
 				if(listener instanceof IIntermediateResultListener)
 				{
-					((IIntermediateResultListener)listener).finished();
+					IIntermediateResultListener lis = (IIntermediateResultListener)listener;
+					Object[] inter = null;
+					synchronized(this)
+					{
+						if(!intermediate)
+						{
+							inter = results.toArray();
+						}
+					}
+					if(inter!=null)
+			    	{
+			    		for(int i=0; i<inter.length; i++)
+			    		{
+			    			lis.intermediateResultAvailable(inter[i]);
+			    		}
+			    	}
+					lis.finished();
 				}
 				else
 				{
