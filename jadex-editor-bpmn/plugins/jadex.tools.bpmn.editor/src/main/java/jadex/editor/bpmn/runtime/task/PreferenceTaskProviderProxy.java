@@ -11,9 +11,9 @@ import jadex.editor.bpmn.editor.preferences.JadexTaskProviderTypeListEditor;
 import java.io.InvalidObjectException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -35,7 +35,7 @@ public class PreferenceTaskProviderProxy implements IEditorTaskProvider
 	private static List<String> iTaskProviderCache;
 
 	/** Map for IRuntimeProvider access. className -> provider */
-	private Map<String, Object> providerMap;
+	private SortedMap<String, Object> providerMap;
 
 	/**
 	 * Default constructor
@@ -45,7 +45,7 @@ public class PreferenceTaskProviderProxy implements IEditorTaskProvider
 		super();
 
 		iTaskProviderCache = new UniqueEList<String>();
-		providerMap = new HashMap<String, Object>();
+		providerMap = new TreeMap<String, Object>();
 
 		// initialize map and cache
 		getAvailableTaskImplementations();
