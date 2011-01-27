@@ -132,6 +132,12 @@ public class MultiColumnTable
 	 */
 	public void add(int index, MultiColumnTableRow row)
 	{
+		// don't add empty unique values
+		if (row.columnValues[uniqueColumn].trim().isEmpty())
+		{
+			return;
+		}
+		
 		row.setTable(this);
 		String uniqueColumnValue = createUniqueValue(row.getColumnValues()[uniqueColumn]);
 		row.getColumnValues()[uniqueColumn] = uniqueColumnValue;
@@ -364,8 +370,16 @@ public class MultiColumnTable
 			// number of columns (tokens / 2 +1) is the index that will be used.
 			// This IS NEEDED due to we have to expect that count tokens without 
 			// delimiter may return one less than needed when the last element of
-			// a line is empty.
+			// a line is empty. 
 			int countColumnTokens = ((int)(parameterTokens.countTokens() / 2))+1;
+			
+			// If this is less than 2 but the string "parameterElement" contains 
+			// a delimiter, we have to use 2!
+			countColumnTokens = 
+				(countColumnTokens < 2 && parameterElement.contains(LIST_ELEMENT_ATTRIBUTE_DELIMITER)) 
+						? 2 
+						: countColumnTokens;
+			
 			// initialize array with empty strings because we 
 			// don't check the values
 			String[] attributes = new String[countColumnTokens];

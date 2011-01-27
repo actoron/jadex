@@ -13,7 +13,7 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
  * @author Claas
  * 
  */
-public class JadexPreferences extends FieldEditorPreferencePage implements
+public class JadexPreferencesPage extends FieldEditorPreferencePage implements
 		IWorkbenchPreferencePage
 {
 

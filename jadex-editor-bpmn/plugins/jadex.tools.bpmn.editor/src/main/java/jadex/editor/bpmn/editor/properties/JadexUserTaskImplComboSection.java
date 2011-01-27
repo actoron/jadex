@@ -3,8 +3,8 @@
  */
 package jadex.editor.bpmn.editor.properties;
 
+import jadex.editor.bpmn.editor.preferences.JadexBpmnClassLoaderPreferencePage;
 import jadex.editor.bpmn.editor.properties.template.AbstractComboPropertySection;
-import jadex.editor.bpmn.editor.properties.template.AbstractParameterTablePropertySection;
 import jadex.editor.bpmn.editor.properties.template.JadexBpmnPropertiesUtil;
 import jadex.editor.bpmn.runtime.task.IEditorParameterMetaInfo;
 import jadex.editor.bpmn.runtime.task.IEditorTaskMetaInfo;
@@ -17,8 +17,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.emf.ecore.xml.type.internal.RegEx.RegularExpression;
-import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.preference.PreferenceDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.SWT;
@@ -35,12 +35,16 @@ import org.eclipse.swt.events.VerifyListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Layout;
 import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.dialogs.PreferencesUtil;
+import org.eclipse.ui.forms.events.IHyperlinkListener;
+import org.eclipse.ui.forms.widgets.Hyperlink;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 
 /**
@@ -139,6 +143,8 @@ public class JadexUserTaskImplComboSection extends AbstractComboPropertySection
 
 		super.createControls(parent, tabbedPropertySheetPage);
 
+		
+		
 		if (rightButton != null)
 		{
 			Button oldButton = rightButton;
@@ -182,6 +188,9 @@ public class JadexUserTaskImplComboSection extends AbstractComboPropertySection
 
 		}
 
+		// add the task preference hint
+		addUserTaskPreferenceHint();
+		
 		// add the MetaInfo frame
 		addUserTaskMetaInfoText();
 
@@ -216,11 +225,11 @@ public class JadexUserTaskImplComboSection extends AbstractComboPropertySection
 					String newText = cCombo.getText();
 
 					// check if we have a valid class name
-					if (newText.endsWith(".class")) //$NON-NLS-1$
-					{
+					//if (newText.endsWith(".class")) //$NON-NLS-1$
+					//{
 						cCombo.add(newText);
 						cCombo.setSelection(new Point(0, newText.length()));
-					}
+					//}
 
 				}
 			}
@@ -273,17 +282,78 @@ public class JadexUserTaskImplComboSection extends AbstractComboPropertySection
 
 	// ---- methods ----
 
-	protected void addUserTaskMetaInfoText()
+	private void addUserTaskPreferenceHint()
+	{
+		String linkTooltip = "Open the preference page to change classloader search paths";
+		String linkString = "default search packages";
+		String hintString = "The listed tasks are generated from your imports and the";
+		
+		
+		Composite taskPreferenceHint = new Composite(sectionComposite, SWT.NONE);
+		addDisposable(taskPreferenceHint);
+		taskPreferenceHint.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_WHITE));
+		
+		Layout sectionLayout = sectionComposite.getLayout();
+		if (sectionLayout instanceof GridLayout)
+		{
+			GridData labelData = new GridData();
+			labelData.horizontalSpan = ((GridLayout) sectionLayout).numColumns;
+			labelData.horizontalAlignment = SWT.FILL;
+			
+			taskPreferenceHint.setLayoutData(labelData);	
+		}
+		
+		RowLayout hintLayout = new RowLayout(SWT.HORIZONTAL);
+		hintLayout.spacing = 0;
+		taskPreferenceHint.setLayout(hintLayout);
+		
+		StyledText preferenceText = new StyledText(taskPreferenceHint, SWT.READ_ONLY
+				| SWT.MULTI | SWT.NO_SCROLL | SWT.WRAP );
+		addDisposable(preferenceText);
+		preferenceText.setMargins(1, 1, 0, 1);
+		preferenceText.setText(hintString);
+		preferenceText.setBackground(taskPreferenceHint.getBackground());
+		
+		Hyperlink preferenceLink = new Hyperlink(taskPreferenceHint, SWT.WRAP );
+		addDisposable(preferenceLink);
+		preferenceLink.setText(linkString);
+		preferenceLink.setToolTipText(linkTooltip);
+		preferenceLink.setUnderlined(true);
+		preferenceLink.setBackground(taskPreferenceHint.getBackground());
+		preferenceLink.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_BLUE));
+		
+		preferenceLink.addHyperlinkListener(new IHyperlinkListener()
+		{
+			
+			@Override
+			public void linkExited(org.eclipse.ui.forms.events.HyperlinkEvent e)
+			{
+				// ignore
+			}
+			
+			@Override
+			public void linkEntered(org.eclipse.ui.forms.events.HyperlinkEvent e)
+			{
+				// ignore
+			}
+			
+			@Override
+			public void linkActivated(org.eclipse.ui.forms.events.HyperlinkEvent e)
+			{
+				showClassLoaderPreferencePage();
+			}
+		});
+		
+	}
+	
+	private void addUserTaskMetaInfoText()
 	{
 
 		sectionComposite = groupExistingControls(ACTIVITY_TASK_IMPLEMENTATION_GROUP);
-
 		Layout sectionLayout = sectionComposite.getLayout();
 
-		// taskMetaInfoText = getWidgetFactory().createText(sectionComposite,
-		// "", SWT.READ_ONLY | SWT.MULTI | SWT.V_SCROLL | SWT.WRAP );
 		taskMetaInfoText = new StyledText(sectionComposite, SWT.READ_ONLY
-				| SWT.MULTI | SWT.NO_SCROLL | SWT.WRAP );
+				| SWT.MULTI | SWT.V_SCROLL | SWT.WRAP );
 		addDisposable(taskMetaInfoText);
 		
 		taskMetaInfoParameter = new StyledText(sectionComposite, SWT.READ_ONLY
@@ -317,7 +387,7 @@ public class JadexUserTaskImplComboSection extends AbstractComboPropertySection
 
 	}
 
-	protected void updateTaskMetaInfo(String taskClassName)
+	private void updateTaskMetaInfo(String taskClassName)
 	{
 
 			createTaskMetaInfoStyledText(taskProvider
@@ -334,7 +404,7 @@ public class JadexUserTaskImplComboSection extends AbstractComboPropertySection
 	 * @param taskMetaInfo
 	 * @param textfield
 	 */
-	protected void createTaskMetaInfoStyledText(
+	private void createTaskMetaInfoStyledText(
 			IEditorTaskMetaInfo taskMetaInfo, StyledText textfield)
 	{		
 		
@@ -355,10 +425,28 @@ public class JadexUserTaskImplComboSection extends AbstractComboPropertySection
 		try {
 			textfield.setText(info.toString());
 			textfield.setStyleRanges(info.getStyleRanges());
+			
+			setScrollbarVisibility(textfield);
 		}
 		catch (IllegalArgumentException iae)
 		{
 			iae.printStackTrace();
+		}
+	}
+
+	/**
+	 * @param textfield
+	 */
+	private void setScrollbarVisibility(StyledText textfield)
+	{
+		int lineCount = textfield.getLineCount();
+		if (lineCount > 3)
+		{
+			textfield.getVerticalBar().setVisible(true);
+		}
+		else
+		{
+			textfield.getVerticalBar().setVisible(false);
 		}
 	}
 	
@@ -368,7 +456,7 @@ public class JadexUserTaskImplComboSection extends AbstractComboPropertySection
 	 * @param taskMetaInfo
 	 * @param textfield
 	 */
-	protected void createTaskMetaInfoStyledParameter(
+	private void createTaskMetaInfoStyledParameter(
 			IEditorTaskMetaInfo taskMetaInfo, StyledText textfield)
 	{		
 		
@@ -430,7 +518,7 @@ public class JadexUserTaskImplComboSection extends AbstractComboPropertySection
 	
 	
 
-	protected void updateTaskParameterTable(String taskClassName)
+	private void updateTaskParameterTable(String taskClassName)
 	{
 		IEditorTaskMetaInfo metaInfo = taskProvider
 				.getTaskMetaInfo(taskClassName);
@@ -481,7 +569,7 @@ public class JadexUserTaskImplComboSection extends AbstractComboPropertySection
 	 * @param parameterMetaInfo
 	 * @return
 	 */
-	protected MultiColumnTable createNewParameterTable(
+	private MultiColumnTable createNewParameterTable(
 			IEditorParameterMetaInfo[] parameterMetaInfo)
 	{
 		MultiColumnTable newTable = new MultiColumnTable(
@@ -502,49 +590,13 @@ public class JadexUserTaskImplComboSection extends AbstractComboPropertySection
 		return newTable;
 	}
 
-//	/**
-//	 * Update the table with meta info
-//	 * 
-//	 * @param table
-//	 * @param metaInfo
-//	 */
-//	protected MultiColumnTable updateTaskParamterTable(MultiColumnTable table,
-//			IEditorParameterMetaInfo[] metaInfo)
-//	{
-//		MultiColumnTable newTable = createNewParameterTable(metaInfo);
-//		int typeIndex = AbstractParameterTablePropertySection
-//				.getDefaultIndexForColumn(AbstractParameterTablePropertySection.TYPE_COLUMN);
-//		int valueIndex = AbstractParameterTablePropertySection
-//				.getDefaultIndexForColumn(AbstractParameterTablePropertySection.VALUE_COLUMN);
-//
-//		for (MultiColumnTableRow row : table.getRowList())
-//		{
-//			int rowIndex = newTable.indexOf(row);
-//			if (rowIndex > -1)
-//			{
-//				MultiColumnTableRow newRow = newTable.get(rowIndex);
-//
-//				if (newRow.getColumnValueAt(typeIndex).equals(
-//						row.getColumnValueAt(typeIndex)))
-//				{
-//					// types are equal (add the old value)
-//					newRow.setColumnValueAt(valueIndex,
-//							row.getColumnValueAt(valueIndex));
-//				}
-//
-//			}
-//		}
-//
-//		return newTable;
-//	}
-
 	/**
 	 * Update the table with meta info
 	 * 
 	 * @param table
 	 * @param metaInfo
 	 */
-	protected MultiColumnTable addTaskParamterTable(MultiColumnTable table,
+	private MultiColumnTable addTaskParamterTable(MultiColumnTable table,
 			IEditorParameterMetaInfo[] metaInfo)
 	{
 		boolean hasUniqueValueChanged = false;
@@ -590,6 +642,18 @@ public class JadexUserTaskImplComboSection extends AbstractComboPropertySection
 		});
 	}
 	
+	
+	private void showClassLoaderPreferencePage()
+	{
+		PreferenceDialog preferenceDialog = PreferencesUtil.createPreferenceDialogOn(
+				Display.getCurrent().getActiveShell(),
+				JadexBpmnClassLoaderPreferencePage.PREFERENCE_PAGE_ID, 
+				null,
+				null);
+		
+		preferenceDialog.open();
+	}
+
 	// ---- BUGFIX METHOD ----
 
 	

@@ -6,7 +6,7 @@ package jadex.editor.bpmn.runtime.task;
 import jadex.editor.bpmn.editor.JadexBpmnEditor;
 import jadex.editor.bpmn.editor.JadexBpmnEditorActivator;
 import jadex.editor.bpmn.editor.preferences.JadexPackageListEditor;
-import jadex.editor.bpmn.editor.preferences.JadexPreferences;
+import jadex.editor.bpmn.editor.preferences.JadexPreferencesPage;
 
 import java.util.List;
 
@@ -99,7 +99,7 @@ public class PackageBasedTaskProvider extends TaskProviderSupport
 								.getDefault()
 								.getPreferenceStore()
 								.getString(
-										JadexPreferences.PREFERENCE_TASKPROVIDER_SEARCH_PACKAGE_STRINGLIST));
+										JadexPreferencesPage.PREFERENCE_TASKPROVIDER_SEARCH_PACKAGE_STRINGLIST));
 
 	}
 	

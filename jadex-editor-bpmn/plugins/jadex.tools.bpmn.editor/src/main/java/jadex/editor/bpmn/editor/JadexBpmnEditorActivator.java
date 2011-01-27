@@ -1,6 +1,6 @@
 package jadex.editor.bpmn.editor;
 
-import jadex.editor.bpmn.editor.preferences.JadexPreferences;
+import jadex.editor.bpmn.editor.preferences.JadexPreferencesPage;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.stp.bpmn.diagram.part.BpmnDiagramEditor;
@@ -73,7 +73,7 @@ public class JadexBpmnEditorActivator extends AbstractUIPlugin {
 	{
 		if (getDefault()
 				.getPreferenceStore()
-				.getBoolean(JadexPreferences.PREFERENCE_EDITOR_REGISTER_AS_DEFAULT_BOOLEAN)) 
+				.getBoolean(JadexPreferencesPage.PREFERENCE_EDITOR_REGISTER_AS_DEFAULT_BOOLEAN)) 
 		{
 			// register jadex editor for bpmn_diagram as default
 			PlatformUI.getWorkbench().getEditorRegistry()

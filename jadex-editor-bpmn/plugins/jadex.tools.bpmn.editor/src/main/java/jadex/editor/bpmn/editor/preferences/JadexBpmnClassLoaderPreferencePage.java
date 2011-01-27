@@ -14,16 +14,18 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
  * @author claas
  * 
  */
-public class JadexBpmnPluginPreferencePage extends FieldEditorPreferencePage
+public class JadexBpmnClassLoaderPreferencePage extends FieldEditorPreferencePage
 		implements IWorkbenchPreferencePage
 {
+	
+	public static final String PREFERENCE_PAGE_ID = "jadex.editor.bpmn.editor.preferences.JadexBpmnClassLoaderPreferencePage";
 
 	/**
 	 * Default constructor
 	 */
-	public JadexBpmnPluginPreferencePage()
+	public JadexBpmnClassLoaderPreferencePage()
 	{
-		super("Jadex", GRID);
+		super(PREFERENCE_PAGE_ID, GRID);
 	}
 
 	// ---- IWorkbenchPreferencePage implementation ----
@@ -51,14 +53,14 @@ public class JadexBpmnPluginPreferencePage extends FieldEditorPreferencePage
 	protected void createFieldEditors()
 	{
 		
-		addField(new BooleanFieldEditor(JadexPreferences.PREFERENCE_EDITOR_REGISTER_AS_DEFAULT_BOOLEAN, "Register as default editor for *.bpmn", getFieldEditorParent()));
-		
-		addField(new JadexTaskProviderTypeListEditor(JadexPreferences.PREFERENCE_TASKPROVIDER_STRINGLIST,
+		addField(new JadexTaskProviderTypeListEditor(JadexPreferencesPage.PREFERENCE_TASKPROVIDER_STRINGLIST,
 				"BPMN-Task Provider", getFieldEditorParent()));
 		
-		addField(new JadexPackageListEditor(JadexPreferences.PREFERENCE_TASKPROVIDER_SEARCH_PACKAGE_STRINGLIST,
+		addField(new JadexPackageListEditor(JadexPreferencesPage.PREFERENCE_TASKPROVIDER_SEARCH_PACKAGE_STRINGLIST,
 				"Search packages for PackageBasedTaskProvider", getFieldEditorParent()));
 
 	}
+	
+	
 
 }

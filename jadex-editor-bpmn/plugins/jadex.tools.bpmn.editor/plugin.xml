@@ -26,15 +26,21 @@
    <extension
          point="org.eclipse.ui.preferencePages">
       <page
-            class="jadex.editor.bpmn.editor.preferences.JadexPreferences"
-            id="jadex.tools.editor.JadexPreferences"
+            class="jadex.editor.bpmn.editor.preferences.JadexPreferencesPage"
+            id="jadex.editor.bpmn.editor.preferences.JadexPreferencesPage"
             name="Jadex">
       </page>
       <page
-            class="jadex.editor.bpmn.editor.preferences.JadexBpmnPluginPreferencePage"
-            id="jadex.tools.bpmn.editor.preferences.JadexBpmnPluginPreferencePage"
-            name="BPMN Editor"
-            category="jadex.tools.editor.JadexPreferences">
+            category="jadex.editor.bpmn.editor.preferences.JadexPreferencesPage"
+            class="jadex.editor.bpmn.editor.preferences.JadexBpmnEditorPreferencePage"
+            id="jadex.editor.bpmn.editor.preferences.JadexBpmnEditorPreferencePage"
+            name="BPMN Editor">
+      </page>
+      <page
+      		category="jadex.editor.bpmn.editor.preferences.JadexBpmnEditorPreferencePage"
+            class="jadex.editor.bpmn.editor.preferences.JadexBpmnClassLoaderPreferencePage"
+            id="jadex.editor.bpmn.editor.preferences.JadexBpmnClassLoaderPreferencePage"
+            name="Task Classloader">
       </page>
    </extension>
    
