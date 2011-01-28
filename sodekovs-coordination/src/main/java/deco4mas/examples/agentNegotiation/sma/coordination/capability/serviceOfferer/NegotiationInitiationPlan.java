@@ -51,7 +51,7 @@ public class NegotiationInitiationPlan extends Plan
 			utilityFunction.addFactor("trust", trustWeight, 100.0, 0.0, true);
 
 			smaLogger.info("weight for utility " + costWeight + ", " + durationWeight + ", " + trustWeight);		
-			System.out.println("TTTTTTTTTTTTTTTTTTT" + costWeight + " - " + durationWeight + "  " + trustWeight);
+//			System.out.println("TTTTTTTTTTTTTTTTTTT" + costWeight + " - " + durationWeight + "  " + trustWeight);
 
 			// Selector
 			SimpleSelectionStrategy selector = new SimpleSelectionStrategy();
