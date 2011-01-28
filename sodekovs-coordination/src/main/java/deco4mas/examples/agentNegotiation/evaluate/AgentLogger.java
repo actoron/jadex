@@ -15,7 +15,7 @@ public class AgentLogger
 {
 	private static Map<String, Logger> loggers = new HashMap<String, Logger>();
 	private static List<String> saOrder = new LinkedList<String>();
-	private static boolean log = true;
+	private static boolean log = false;
 
 	public synchronized static Logger getTimeEvent(String name)
 	{

@@ -39,7 +39,7 @@ public class ComputeSingleResultPlan extends Plan {
 		// System.out.println("Map of Observed Events: ");
 		ConcurrentHashMap<Long, ArrayList<ObservedEvent>> observedEventsMap = (ConcurrentHashMap<Long, ArrayList<ObservedEvent>>) content.get(Constants.OBSERVED_EVENTS_MAP);
 
-		// if SimulationDataConsumer has bee specified
+		// if SimulationDataConsumer has been specified
 		if (observedEventsMap == null) {
 			observedEventsMap = new ConcurrentHashMap<Long, ArrayList<ObservedEvent>>();
 		}
@@ -58,19 +58,19 @@ public class ComputeSingleResultPlan extends Plan {
 		System.out.println("\n#Master#************************* Received message:\n " + experimentRes.toString() + "\n\n");
 
 		// Sorted output of results
-		for (Object key : sortedResultList) {
-			ArrayList<ObservedEvent> values = (ArrayList<ObservedEvent>) observedEventsMap.get(key);
+//		for (Object key : sortedResultList) {
+//			ArrayList<ObservedEvent> values = (ArrayList<ObservedEvent>) observedEventsMap.get(key);
 //			String tmp = "";
-
-			for (ObservedEvent event : values) {
+//
+//			for (ObservedEvent event : values) {
 //				tmp += " - " + event.toString();
-				
-				// Persist value
-				// XMLHandler.writeXML(event, "abcresult.xml",
-				// ObservedEvent.class);
-			}
+//				
+//				// Persist value
+//				// XMLHandler.writeXML(event, "abcresult.xml",
+//				// ObservedEvent.class);
+//			}
 //			System.out.println(key.toString() + " : " + tmp);
-		}
+//		}
 
 		String res = "ID: " + experimentRow + "." + expInRow + " - Total #" + totalRuns + " (Size of ObservedEvents: " + sortedResultList.size() + ") ***********************************";
 		System.out.println(res);

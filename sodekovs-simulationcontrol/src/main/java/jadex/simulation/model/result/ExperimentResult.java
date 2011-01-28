@@ -145,6 +145,21 @@ public class ExperimentResult extends IResult{
 			}
 		});
 	}
+	
+	/**
+	 * Returns the latest measured value for the DataName specified by the key
+	 * @param key
+	 * @return
+	 */
+	public String getLastValueFor(String key){
+		
+		for(ObservedEvent event: this.getEvents()){
+			if(event.getDataName().equalsIgnoreCase(key)){
+				return event.getValue();
+			}
+		}		
+		return "dataName not found";
+	}
 }
 
 

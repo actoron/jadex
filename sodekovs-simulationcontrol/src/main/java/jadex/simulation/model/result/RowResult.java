@@ -140,7 +140,11 @@ public class RowResult extends IResult {
 			buffer.append("\t");
 			buffer.append("Duration: ");
 			buffer.append(experiment.getDuraration());
+			//Hack for special application: agentNegotiation
+			buffer.append(";\t Executed Workflows: " + experiment.getLastValueFor("workflows"));
+			buffer.append(";\t Earned Money: " + experiment.getLastValueFor("money_amount"));
 			buffer.append("\n");
+
 			
 //			for (Iterator it = finalStatsMap.keySet().iterator(); it.hasNext();) {
 //				Object key = it.next();

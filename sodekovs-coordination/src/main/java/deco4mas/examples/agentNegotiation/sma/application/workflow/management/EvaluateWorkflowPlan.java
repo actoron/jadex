@@ -15,7 +15,7 @@ import deco4mas.examples.agentNegotiation.sma.coordination.negotiationStrategy.H
  */
 public class EvaluateWorkflowPlan extends Plan {
 	public void body() {
-		try {
+		try {			
 			Logger logger = (Logger) AgentLogger.getDataTable("Money_"
 					+ getComponentName(), true);
 			WorkflowData data = (WorkflowData) getBeliefbase().getBelief(
@@ -38,7 +38,7 @@ public class EvaluateWorkflowPlan extends Plan {
 				space.getSpaceObjectsByType("KIVSeval")[0].setProperty("executedWorkflows", counter+1);
 								
 				System.out.println("#########################################################################################################################################");
-				System.out.println(space.getSpaceObjectsByType("KIVSeval")[0].getProperty("moneyBankSMA") +  "  - " + space.getSpaceObjectsByType("KIVSeval")[0].getProperty("executedWorkflows"));
+				System.out.println("MoneyBank: " +  space.getSpaceObjectsByType("KIVSeval")[0].getProperty("moneyBankSMA") +  "  - Executed Workflows " + space.getSpaceObjectsByType("KIVSeval")[0].getProperty("executedWorkflows"));
 				System.out.println("#########################################################################################################################################");
 			}
 		} catch (Exception e) {
@@ -80,10 +80,10 @@ public class EvaluateWorkflowPlan extends Plan {
 	 * @param data
 	 */
 	private double commaSeparated(StringBuffer buf, WorkflowData data) {
+		
 		buf.append(data.getId() + ",");
 		Double money = (Double) getBeliefbase().getBelief("moneyBank")
 				.getFact();
-
 		Double profit = data.getProfit();
 		Double costs = data.getCosts();
 		buf.append(Math.round(costs) + ",");
@@ -93,6 +93,8 @@ public class EvaluateWorkflowPlan extends Plan {
 		Double pen = data.getContratPenalty();
 		buf.append(Math.round(pen) + ",");
 		Double workflowCosts = profit - costs - negCost - pen;
+		Double tmpCosts = costs + negCost + pen;
+		System.out.println("Detailed Info: Data total costs: " + tmpCosts+ "; costs: " + costs +"; NegCosts: " + negCost +"; penalty: " + pen+"; currentProfit: " + workflowCosts + "; OldmoneyBank: "  + money );
 		buf.append(Math.round(workflowCosts) + ",");
 		money += workflowCosts;
 		buf.append(Math.round(money));
