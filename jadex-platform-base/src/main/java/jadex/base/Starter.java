@@ -14,6 +14,7 @@ import jadex.commons.IFuture;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.DefaultResultListener;
+import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.javaparser.SJavaParser;
 
@@ -94,13 +95,14 @@ public class Starter
 	 */
 	public static IFuture createPlatform(String[] args)
 	{
+		final Future ret = new Future();
 		try
 		{
 			// Absolute start time (for testing and benchmarking).
 			final long starttime = System.currentTimeMillis();
 		
-			Map cmdargs = new HashMap();
-			Map compargs = new HashMap();
+			final Map cmdargs = new HashMap();
+			final Map compargs = new HashMap();
 			for(int i=0; args!=null && i<args.length; i+=2)
 			{
 				String key = args[i].substring(1);
@@ -121,111 +123,131 @@ public class Starter
 			}
 			
 			// Load the platform (component) model.
-			ClassLoader cl = Starter.class.getClassLoader();
-			String configfile = (String)cmdargs.get(CONFIGURATION_FILE)!=null? 
+			final ClassLoader cl = Starter.class.getClassLoader();
+			final String configfile = (String)cmdargs.get(CONFIGURATION_FILE)!=null? 
 				(String)cmdargs.get(CONFIGURATION_FILE): FALLBACK_PLATFORM_CONFIGURATION;
 			String cfclname = (String)cmdargs.get(COMPONENT_FACTORY)!=null? 
 				(String)cmdargs.get(COMPONENT_FACTORY): FALLBACK_COMPONENT_FACTORY;
 			Class cfclass = SReflect.findClass(cfclname, null, cl);
 			// The providerid for this service is not important as it will be thrown away 
 			// after loading the first component model.
-			IComponentFactory cfac = (IComponentFactory)cfclass.getConstructor(new Class[]{String.class})
+			final IComponentFactory cfac = (IComponentFactory)cfclass.getConstructor(new Class[]{String.class})
 				.newInstance(new Object[]{"rootid"});
-			IModelInfo model = cfac.loadModel(configfile, null, cl);
-	//		System.out.println("Model: "+model);
 			
-			if(model.getReport()!=null)
-				throw new RuntimeException("Error loading model:\n"+model.getReport().getErrorText());
-			
-			// Create an instance of the component.
-			String configname = (String)cmdargs.get("configname")!=null? (String)cmdargs.get("configname"): 
-				model.getConfigurations().length>0?  model.getConfigurations()[0]: null;
-			
-			String platformname = (String)cmdargs.get(PLATFORM_NAME);
-			if(platformname==null)
+			cfac.loadModel(configfile, null, cl).addResultListener(new DelegationResultListener(ret)
 			{
-				IArgument[] cargs = model.getArguments();
-				for(int i=0; i<cargs.length; i++)
+				public void customResultAvailable(Object result) 
 				{
-					Object argval = cargs[i].getDefaultValue(configname);
-//					if(!compargs.containsKey(cargs[i].getName()))
-//					{
-//						compargs.put(cargs[i].getName(), argval);
-//					}
-					if("platformname".equals(cargs[i].getName()))
+					final IModelInfo model = (IModelInfo)result;
+					
+					if(model.getReport()!=null)
+						throw new RuntimeException("Error loading model:\n"+model.getReport().getErrorText());
+					
+					// Create an instance of the component.
+					String configname = (String)cmdargs.get("configname")!=null? (String)cmdargs.get("configname"): 
+						model.getConfigurations().length>0?  model.getConfigurations()[0]: null;
+					
+					String platformname = (String)cmdargs.get(PLATFORM_NAME);
+					if(platformname==null)
 					{
-						platformname = (String)argval;
+						IArgument[] cargs = model.getArguments();
+						for(int i=0; i<cargs.length; i++)
+						{
+							Object argval = cargs[i].getDefaultValue(configname);
+//							if(!compargs.containsKey(cargs[i].getName()))
+//							{
+//								compargs.put(cargs[i].getName(), argval);
+//							}
+							if("platformname".equals(cargs[i].getName()))
+							{
+								platformname = (String)argval;
+							}
+						}
 					}
-				}
-			}
-			if(platformname==null)
-			{
-				try
-				{
-					platformname = SUtil.createUniqueId(InetAddress.getLocalHost().getHostName(), 3);
-				}
-				catch(UnknownHostException e)
-				{
-					platformname = SUtil.createUniqueId("platform", 3);
-				}
-			}
-			
-			final IComponentIdentifier cid = new ComponentIdentifier(platformname);
-			// Hack!!! Autoshutdown!?
-			final CMSComponentDescription desc = new CMSComponentDescription(cid, cfac.getComponentType(
-				configfile, null, cl), null, null, null, Boolean.TRUE, model.getFullName());
-			
-			String afclname = (String)cmdargs.get(ADAPTER_FACTORY)!=null? 
-				(String)cmdargs.get(ADAPTER_FACTORY): FALLBACK_ADAPTER_FACTORY;
-			Class afclass = SReflect.findClass(afclname, null, cl);
-			final IComponentAdapterFactory afac = (IComponentAdapterFactory)afclass.newInstance();
-			
-			Future future = new Future();
-			final Future ret = new Future();
-			future.addResultListener(new IResultListener()
-			{
-				public void resultAvailable(Object result)
-				{
-					Object[] root = (Object[])result;
-					IComponentInstance instance = (IComponentInstance)root[0];
-//					final IComponentAdapter adapter = (IComponentAdapter)root[1];
-//					System.out.println("Instance: "+instance);
+					if(platformname==null)
+					{
+						try
+						{
+							platformname = SUtil.createUniqueId(InetAddress.getLocalHost().getHostName(), 3);
+						}
+						catch(UnknownHostException e)
+						{
+							platformname = SUtil.createUniqueId("platform", 3);
+						}
+					}
 					
-					long startup = System.currentTimeMillis() - starttime;
-					System.out.println(desc.getName()+" platform startup time: " + startup + " ms.");
-			//		platform.logger.info("Platform startup time: " + startup + " ms.");
+					final IComponentIdentifier cid = new ComponentIdentifier(platformname);
+					// Hack!!! Autoshutdown!?
 					
-					ret.setResult(instance.getExternalAccess());
-				}
-				
-				public void exceptionOccurred(Exception exception)
-				{
-					ret.setException(exception);
+					cfac.getComponentType(configfile, null, cl).addResultListener(new DelegationResultListener(ret)
+					{
+						public void customResultAvailable(Object result) 
+						{
+							try
+							{
+								String ctype = (String)result;
+								final CMSComponentDescription desc = new CMSComponentDescription(cid, ctype, null, null, null, Boolean.TRUE, model.getFullName());
+								
+								String afclname = (String)cmdargs.get(ADAPTER_FACTORY)!=null? 
+									(String)cmdargs.get(ADAPTER_FACTORY): FALLBACK_ADAPTER_FACTORY;
+								Class afclass = SReflect.findClass(afclname, null, cl);
+								final IComponentAdapterFactory afac = (IComponentAdapterFactory)afclass.newInstance();
+								
+								Future future = new Future();
+								future.addResultListener(new IResultListener()
+								{
+									public void resultAvailable(Object result)
+									{
+										Object[] root = (Object[])result;
+										IComponentInstance instance = (IComponentInstance)root[0];
+			//							final IComponentAdapter adapter = (IComponentAdapter)root[1];
+			//							System.out.println("Instance: "+instance);
+										
+										long startup = System.currentTimeMillis() - starttime;
+										System.out.println(desc.getName()+" platform startup time: " + startup + " ms.");
+								//		platform.logger.info("Platform startup time: " + startup + " ms.");
+										
+										ret.setResult(instance.getExternalAccess());
+									}
+									
+									public void exceptionOccurred(Exception exception)
+									{
+										ret.setException(exception);
+									}
+								});
+								
+								Object[] root = cfac.createComponentInstance(desc, afac, model, (String)cmdargs.get(CONFIGURATION_NAME), compargs, null, future);
+								IComponentAdapter adapter = (IComponentAdapter)root[1];
+								
+								// Execute init steps of root component on main thread (i.e. platform).
+								boolean again = true;
+								while(again)
+								{
+			//						System.out.println("Execute step: "+cid);
+									again = afac.executeStep(adapter);
+								}
+			//					System.out.println("starting component execution");
+								
+								// Start normal execution of root component (i.e. platform).
+			//					adapter.wakeup();
+							}
+							catch(Exception e)
+							{
+								ret.setException(e);
+							}
+						};
+					});
 				}
 			});
-			
-			Object[] root = cfac.createComponentInstance(desc, afac, model, (String)cmdargs.get(CONFIGURATION_NAME), compargs, null, future);
-			IComponentAdapter adapter = (IComponentAdapter)root[1];
-			
-			// Execute init steps of root component on main thread (i.e. platform).
-			boolean again = true;
-			while(again)
-			{
-//				System.out.println("Execute step: "+cid);
-				again = afac.executeStep(adapter);
-			}
-//			System.out.println("starting component execution");
-			
-			// Start normal execution of root component (i.e. platform).
-//			adapter.wakeup();
-			
-			return ret;
+	//		System.out.println("Model: "+model);
 		}
 		catch(Exception e)
 		{
-			e.printStackTrace();
-			throw new RuntimeException(e);
+//			e.printStackTrace();
+			ret.setException(e);
 		}
+		
+		return ret;
 	}
 }
 

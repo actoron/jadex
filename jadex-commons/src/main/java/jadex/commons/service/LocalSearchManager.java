@@ -2,6 +2,7 @@ package jadex.commons.service;
 
 import jadex.commons.IIntermediateFuture;
 import jadex.commons.IntermediateFuture;
+import jadex.commons.concurrent.DelegationResultListener;
 
 import java.util.Collection;
 import java.util.Map;
@@ -45,25 +46,18 @@ public class LocalSearchManager implements ISearchManager
 	 */
 	public IIntermediateFuture	searchServices(IServiceProvider provider, IVisitDecider decider, IResultSelector selector, Map services)
 	{
-		Collection ret = null;
+		IntermediateFuture ret = new IntermediateFuture();
 			
 		// local search is always allowed?!
 		// problem: first gsm searches a node, then lsm searches the same node = double visit
 //		if(!selector.isFinished(results))// && decider.searchNode(null, provider, results))
-		{
-			try
-			{
-				ret = selector.selectServices(services);
-			}
-			catch(Exception e)
-			{
-				e.printStackTrace();
-			}
-		}
+		
+		selector.selectServices(services)
+			.addResultListener(new DelegationResultListener(ret));
+		
 //		if(selector instanceof TypeResultSelector && results.toString().indexOf("Add")!=-1)
 //			System.out.println("lsm: "+provider+" "+results);
-//		return new IntermediateFuture(selector.getResult(results));
-		return new IntermediateFuture(ret);
+		return ret;
 	}
 	
 	/**

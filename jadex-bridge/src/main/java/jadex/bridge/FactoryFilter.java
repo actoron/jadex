@@ -1,7 +1,10 @@
 package jadex.bridge;
 
-import jadex.commons.IFilter;
+import jadex.commons.Future;
+import jadex.commons.IFuture;
+import jadex.commons.IRemoteFilter;
 import jadex.commons.SUtil;
+import jadex.commons.concurrent.DelegationResultListener;
 
 import java.util.Arrays;
 
@@ -10,7 +13,7 @@ import java.util.Arrays;
  *  a) per model type (bdi, mirco, etc.)
  *  b) per model filename
  */
-public class FactoryFilter implements IFilter
+public class FactoryFilter implements IRemoteFilter
 {
 	//-------- attributes --------
 
@@ -56,9 +59,9 @@ public class FactoryFilter implements IFilter
 	 *  Test if an object passes the filter.
 	 *  @return True, if passes the filter.
 	 */
-	public boolean filter(Object obj)
+	public IFuture filter(Object obj)
 	{
-		boolean	match = false;
+		Future ret =  new Future();
 		
 		if(obj instanceof IComponentFactory)
 		{
@@ -66,14 +69,20 @@ public class FactoryFilter implements IFilter
 			
 			if(type!=null)
 			{
-				match	= Arrays.asList(fac.getComponentTypes()).contains(type);
+				ret.setResult(Arrays.asList(fac.getComponentTypes()).contains(type));
 			}
 			else
 			{
-				match	= fac.isLoadable(model, imports, classloader);
+				fac.isLoadable(model, imports, classloader)
+					.addResultListener(new DelegationResultListener(ret));
 			}
 		}
-		return match;
+		else
+		{
+			ret.setResult(Boolean.FALSE);
+		}
+		
+		return ret;
 	}
 
 	/**

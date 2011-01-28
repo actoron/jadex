@@ -131,22 +131,22 @@ public class BpmnFactory extends BasicService implements IComponentFactory
 	 *  @param The imports (if any).
 	 *  @return The loaded model.
 	 */
-	public IModelInfo loadModel(String model, String[] imports, ClassLoader classloader)
+	public IFuture loadModel(String model, String[] imports, ClassLoader classloader)
 	{
-		MBpmnModel ret = null;
+		Future ret = new Future();
 //		System.out.println("filename: "+filename);
 		try
 		{
-			ret = loader.loadBpmnModel(model, imports, classloader);
+			ret.setResult(loader.loadBpmnModel(model, imports, classloader));
 //			ClassLoader	cl = libservice.getClassLoader();
 //			ret.setClassloader(cl);
 		}
 		catch(Exception e)
 		{
-			throw new RuntimeException(e);
+			ret.setException(e);
 		}
 		
-		return ret.getModelInfo();
+		return ret;
 	}
 	
 	/**
@@ -155,9 +155,9 @@ public class BpmnFactory extends BasicService implements IComponentFactory
 	 *  @param The imports (if any).
 	 *  @return True, if model can be loaded.
 	 */
-	public boolean isLoadable(String model, String[] imports, ClassLoader classloader)
+	public IFuture isLoadable(String model, String[] imports, ClassLoader classloader)
 	{
-		return model.endsWith(".bpmn");
+		return new Future(model.endsWith(".bpmn"));
 	}
 
 	/**
@@ -166,9 +166,9 @@ public class BpmnFactory extends BasicService implements IComponentFactory
 	 *  @param The imports (if any).
 	 *  @return True, if startable (and loadable).
 	 */
-	public boolean isStartable(String model, String[] imports, ClassLoader classloader)
+	public IFuture isStartable(String model, String[] imports, ClassLoader classloader)
 	{
-		return model.endsWith(".bpmn");
+		return new Future(model.endsWith(".bpmn"));
 	}
 	
 	/**
@@ -182,9 +182,9 @@ public class BpmnFactory extends BasicService implements IComponentFactory
 	/**
 	 *  Get a default icon for a file type.
 	 */
-	public Icon getComponentTypeIcon(String type)
+	public IFuture getComponentTypeIcon(String type)
 	{
-		return type.equals(FILETYPE_BPMNPROCESS)? icons.getIcon("bpmn_process") : null;
+		return new Future(type.equals(FILETYPE_BPMNPROCESS)? icons.getIcon("bpmn_process") : null);
 	}
 
 	/**
@@ -192,9 +192,9 @@ public class BpmnFactory extends BasicService implements IComponentFactory
 	 *  @param model The model (e.g. file name).
 	 *  @param The imports (if any).
 	 */
-	public String getComponentType(String model, String[] imports, ClassLoader classloader)
+	public IFuture getComponentType(String model, String[] imports, ClassLoader classloader)
 	{
-		return model.toLowerCase().endsWith(".bpmn") ? FILETYPE_BPMNPROCESS: null;
+		return new Future(model.toLowerCase().endsWith(".bpmn") ? FILETYPE_BPMNPROCESS: null);
 	}
 	
 	/**

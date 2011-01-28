@@ -1,5 +1,7 @@
 package jadex.xml.bean;
 
+import jadex.commons.Base64;
+import jadex.commons.SUtil;
 import jadex.xml.AccessInfo;
 import jadex.xml.AttributeConverter;
 import jadex.xml.AttributeInfo;
@@ -13,16 +15,35 @@ import jadex.xml.XMLInfo;
 import jadex.xml.writer.Writer;
 
 import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Image;
+import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
+import java.awt.image.ImageObserver;
+import java.awt.image.RenderedImage;
+import java.awt.image.WritableRaster;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.URL;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 
+import javax.imageio.ImageIO;
+import javax.imageio.ImageTypeSpecifier;
+import javax.imageio.ImageWriter;
+import javax.imageio.spi.ImageWriterSpi;
+import javax.imageio.stream.ImageOutputStream;
 import javax.xml.namespace.QName;
+
+import sun.awt.datatransfer.DataTransferer;
+import sun.awt.image.ImageRepresentation;
+import sun.awt.image.ToolkitImage;
 
 /**
  * Java specific reader that supports collection classes and arrays.
@@ -33,6 +54,8 @@ public class JavaWriter extends Writer
 	
 	/** The static writer instance. */
 	protected static Writer writer;
+	
+	protected static final Color TRANSPARENT_WHITE = new Color( 255, 255, 255, 0); 
 	
 	//-------- constructors --------
 	
@@ -227,6 +250,34 @@ public class JavaWriter extends Writer
 				null
 			));
 			typeinfos.add(ti_inetaddr);
+			
+			
+			// java.awt.image.RenderedImage
+			IObjectStringConverter imgconv = new IObjectStringConverter()
+			{
+				public String convertObject(Object val, IContext context)
+				{
+					try
+					{
+						ByteArrayOutputStream baos = new ByteArrayOutputStream();
+						byte[] buf = SUtil.imageToStandardBytes((Image)val, "image/png");
+						return new String(Base64.encode(buf));						
+					}
+					catch(Exception e)
+					{
+						// todo: use context report
+						throw new RuntimeException(e);
+					}
+				}
+			};
+			TypeInfo ti_image = new TypeInfo(new XMLInfo(new QName("typeinfo:java.awt.image", "Image")), 
+				new ObjectInfo(Image.class), new MappingInfo(null, new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("imgdata", AccessInfo.THIS), new AttributeConverter(null, imgconv)),
+				new AttributeInfo(new AccessInfo("data", null, AccessInfo.IGNORE_READWRITE)),
+				new AttributeInfo(new AccessInfo("classname", null, null, null, new BeanAccessInfo(null, Object.class.getMethod("getClass", new Class[0]))))},
+				null
+			));
+			typeinfos.add(ti_image);
 		}
 		catch(Exception e)
 		{

@@ -1,6 +1,6 @@
 package jadex.commons.service;
 
-import jadex.commons.ConstantFilter;
+import jadex.commons.IRemoteFilter;
 import jadex.commons.Tuple;
 
 import java.util.Collection;
@@ -47,7 +47,7 @@ public class TypeResultSelector extends BasicResultSelector
 	 */
 	public TypeResultSelector(Class type, boolean oneresult, boolean remote)
 	{
-		super(new ConstantFilter(true), oneresult, remote);
+		super(IRemoteFilter.ALWAYS, oneresult, remote);
 		this.type = type;
 	}
 	

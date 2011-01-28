@@ -1,11 +1,18 @@
 package jadex.commons.service;
 
 import jadex.commons.ComposedFilter;
-import jadex.commons.IFilter;
+import jadex.commons.ComposedRemoteFilter;
+import jadex.commons.Future;
+import jadex.commons.IFuture;
+import jadex.commons.IIntermediateFuture;
+import jadex.commons.IRemoteFilter;
+import jadex.commons.IntermediateFuture;
 import jadex.commons.Tuple;
+import jadex.commons.concurrent.DelegationResultListener;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -17,7 +24,7 @@ public class BasicResultSelector implements IResultSelector
 	//-------- attributes --------
 	
 	/** The type. */
-	protected IFilter filter;
+	protected IRemoteFilter filter;
 	
 	/** The one result flag. */
 	protected boolean oneresult;
@@ -37,7 +44,7 @@ public class BasicResultSelector implements IResultSelector
 	/**
 	 *  Create a type result listener.
 	 */
-	public BasicResultSelector(IFilter filter)
+	public BasicResultSelector(IRemoteFilter filter)
 	{
 		this(filter, true);
 	}
@@ -45,7 +52,7 @@ public class BasicResultSelector implements IResultSelector
 	/**
 	 *  Create a type result listener.
 	 */
-	public BasicResultSelector(IFilter filter, boolean oneresult)
+	public BasicResultSelector(IRemoteFilter filter, boolean oneresult)
 	{
 		this(filter, oneresult, false);
 	}
@@ -53,7 +60,7 @@ public class BasicResultSelector implements IResultSelector
 	/**
 	 *  Create a type result listener.
 	 */
-	public BasicResultSelector(IFilter filter, boolean oneresult, boolean remote)
+	public BasicResultSelector(IRemoteFilter filter, boolean oneresult, boolean remote)
 	{
 		this.filter = filter;
 		this.oneresult = oneresult;
@@ -67,16 +74,16 @@ public class BasicResultSelector implements IResultSelector
 	 *  @param services	The provided services (class->list of services).
 	 *  @param results	The collection to which results should be added.
 	 */
-	public Collection selectServices(Map servicemap)
+	public IFuture selectServices(Map servicemap)
 	{
-		List results = new ArrayList();
+		final Future ret = new Future();
 		
-		IFilter fil = filter;
+		IRemoteFilter fil = filter;
 		if(!remote)
 		{
 			if(fil!=null)
 			{
-				fil = new ComposedFilter(new IFilter[]{filter, ProxyFilter.PROXYFILTER}, ComposedFilter.AND);
+				fil = new ComposedRemoteFilter(new IRemoteFilter[]{filter, ProxyFilter.PROXYFILTER}, ComposedFilter.AND);
 			}
 			else
 			{
@@ -86,38 +93,98 @@ public class BasicResultSelector implements IResultSelector
 		
 		IService[] services = generateServiceArray(servicemap);
 		
-		if(services!=null)
+		if(services!=null && services.length>0)
 		{
 //			if(services.length>0)
 //				System.out.println("adding: "+SUtil.arrayToString(services)+" "+this);
-			if(oneresult && services.length>0)
-			{				
-				for(int i=0; i<services.length; i++)
+			if(oneresult)
+			{		
+				getOneResult(fil, services, 0)
+					.addResultListener(new DelegationResultListener(ret)
 				{
-					if(fil.filter(services[i]))
+					public void customResultAvailable(Object result)
 					{
-						results.add(services[i]);
-						break;
+						List results = new ArrayList();
+						if(result!=null)
+							results.add(result);
+						ret.setResult(results);
 					}
-				}
+				});
 			}
 			else
 			{
 //				if(services.length>0)
 //					System.out.println("adding: "+SUtil.arrayToString(services)+" "+this);
-				for(int i=0; i<services.length; i++)
+				getAllResults(fil, services, 0)
+					.addResultListener(new DelegationResultListener(ret));
+			}
+		}
+		else
+		{
+			ret.setResult(Collections.EMPTY_LIST);
+		}
+		
+		return ret;//new Future(results);
+	}
+	
+	/**
+	 *  Get first result.
+	 */
+	protected IFuture getOneResult(final IRemoteFilter filter, final IService[] services, final int i)
+	{
+		final Future ret = new Future();
+		filter.filter(services[i]).addResultListener(new DelegationResultListener(ret)
+		{
+			public void customResultAvailable(Object result)
+			{
+				if(((Boolean)result).booleanValue())
 				{
-					if(fil.filter(services[i]) && !results.contains(services[i]))
+					ret.setResult(services[i]);
+				}
+				else
+				{
+					if(i+1<services.length)
 					{
-//						if(services[i].getClass().getName().indexOf("Shop")!=-1)
-//							System.out.println("add: "+services[i]+" to: "+results);
-						results.add(services[i]);
+						getOneResult(filter, services, i+1)
+							.addResultListener(new DelegationResultListener(ret));
+					}
+					else
+					{
+						ret.setResult(null);
 					}
 				}
 			}
-		}
-		
-		return results;
+		});
+		return ret;
+	}
+	
+	/**
+	 *  Get all results.
+	 */
+	protected IIntermediateFuture getAllResults(final IRemoteFilter filter, final IService[] services, final int i)
+	{
+		final IntermediateFuture ret = new IntermediateFuture();
+		filter.filter(services[i]).addResultListener(new DelegationResultListener(ret)
+		{
+			public void customResultAvailable(Object result)
+			{
+				if(((Boolean)result).booleanValue() && !ret.getIntermediateResults().contains(services[i]))
+				{
+					ret.addIntermediateResult(services[i]);
+				}
+				
+				if(i+1<services.length)
+				{
+					getAllResults(filter, services, i+1)
+						.addResultListener(new DelegationResultListener(ret));
+				}
+				else
+				{
+					ret.setFinished();
+				}
+			}
+		});
+		return ret;
 	}
 	
 	/**
@@ -189,7 +256,7 @@ public class BasicResultSelector implements IResultSelector
 	 *  Get the filter.
 	 *  @return the filter.
 	 */
-	public IFilter getFilter()
+	public IRemoteFilter getFilter()
 	{
 		return filter;
 	}
@@ -198,7 +265,7 @@ public class BasicResultSelector implements IResultSelector
 	 *  Set the filter.
 	 *  @param filter The filter to set.
 	 */
-	public void setFilter(IFilter filter)
+	public void setFilter(IRemoteFilter filter)
 	{
 		this.filter = filter;
 	}

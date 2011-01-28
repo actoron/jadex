@@ -25,7 +25,7 @@ public class HelloWorldAgent extends MicroAgent
 		System.out.println(getArgument("welcome text"));
 		waitFor(2000, new IComponentStep()
 		{			
-			public Object execute(IInternalAccess args)
+			public Object execute(IInternalAccess ia)
 			{
 				System.out.println("Good bye world.");
 				killAgent();

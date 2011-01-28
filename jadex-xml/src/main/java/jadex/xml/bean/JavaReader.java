@@ -1,5 +1,6 @@
 package jadex.xml.bean;
 
+import jadex.commons.Base64;
 import jadex.commons.SReflect;
 import jadex.xml.AccessInfo;
 import jadex.xml.AttributeConverter;
@@ -18,6 +19,9 @@ import jadex.xml.XMLInfo;
 import jadex.xml.reader.Reader;
 
 import java.awt.Color;
+import java.awt.Image;
+import java.awt.Toolkit;
+import java.io.ByteArrayInputStream;
 import java.net.InetAddress;
 import java.net.URL;
 import java.util.Collections;
@@ -27,6 +31,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 
+import javax.imageio.ImageIO;
 import javax.xml.namespace.QName;
 
 /**
@@ -356,6 +361,35 @@ public class JavaReader extends Reader
 				}
 			));
 			typeinfos.add(ti_inetaddr);
+			
+			TypeInfo ti_image = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.awt.image", "Image")}),
+				new ObjectInfo(new IBeanObjectCreator()
+				{
+					public Object createObject(IContext context, Map rawattributes) throws Exception
+					{
+						Image ret = null;
+						String encdata = (String)rawattributes.get("imgdata");
+						byte[] data = Base64.decode(encdata.getBytes());
+						
+						String classname = (String)rawattributes.get("classname");
+						if(classname.indexOf("Toolkit")!=-1)
+						{
+							Toolkit t = Toolkit.getDefaultToolkit();
+							ret = t.createImage(data);
+						}
+						else
+						{
+							ImageIO.read(new ByteArrayInputStream(data));
+						}
+						return ret;
+					}
+				}),
+				new MappingInfo(null, new AttributeInfo[]{
+					new AttributeInfo(new AccessInfo("imgdata", null, AccessInfo.IGNORE_READWRITE)),
+					new AttributeInfo(new AccessInfo("classname", null, AccessInfo.IGNORE_READWRITE))
+				}
+			));
+			typeinfos.add(ti_image);
 		}
 		catch(NoSuchMethodException e)
 		{

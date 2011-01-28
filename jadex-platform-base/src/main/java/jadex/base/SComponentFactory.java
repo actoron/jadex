@@ -49,7 +49,8 @@ public class SComponentFactory
 							public void customResultAvailable(Object result)
 							{
 								IComponentFactory fac = (IComponentFactory)result;
-								ret.setResult(fac.loadModel(model, null, ls.getClassLoader()));
+								fac.loadModel(model, null, ls.getClassLoader())
+									.addResultListener(new DelegationResultListener(ret));
 							}
 							
 							public void exceptionOccurred(Exception exception)
@@ -101,7 +102,8 @@ public class SComponentFactory
 							public void customResultAvailable(Object result)
 							{
 								IComponentFactory fac = (IComponentFactory)result;
-								ret.setResult(new Boolean(fac.isLoadable(model, null, ls.getClassLoader())));
+								fac.isLoadable(model, null, ls.getClassLoader())
+									.addResultListener(new DelegationResultListener(ret));
 							}
 							
 							public void exceptionOccurred(Exception exception)
@@ -147,7 +149,8 @@ public class SComponentFactory
 					public void customResultAvailable(Object result)
 					{
 						IComponentFactory fac = (IComponentFactory)result;
-						ret.setResult(new Boolean(fac.isStartable(model, null, ls.getClassLoader())));
+						fac.isStartable(model, null, ls.getClassLoader())
+							.addResultListener(new DelegationResultListener(ret));
 					}
 					
 					public void exceptionOccurred(Exception exception)
@@ -181,7 +184,7 @@ public class SComponentFactory
 			public void customResultAvailable(Object result)
 			{
 				IComponentFactory fac = (IComponentFactory)result;
-				ret.setResult(fac.getComponentTypeIcon(type));
+				fac.getComponentTypeIcon(type).addResultListener(new DelegationResultListener(ret));
 			}
 			
 			public void exceptionOccurred(Exception exception)
@@ -257,7 +260,8 @@ public class SComponentFactory
 							public void customResultAvailable(Object result)
 							{
 								IComponentFactory fac = (IComponentFactory)result;
-								ret.setResult(fac.getComponentType(model, null, ls.getClassLoader()));
+								fac.getComponentType(model, null, ls.getClassLoader())
+									.addResultListener(new DelegationResultListener(ret));
 							}
 							
 							public void exceptionOccurred(Exception exception)

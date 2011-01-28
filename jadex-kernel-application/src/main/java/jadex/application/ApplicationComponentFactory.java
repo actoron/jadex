@@ -158,24 +158,20 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 	 *  @param The imports (if any).
 	 *  @return The loaded model.
 	 */
-	public IModelInfo loadModel(String model, String[] imports, ClassLoader classloader)
+	public IFuture loadModel(String model, String[] imports, ClassLoader classloader)
 	{
-		MApplicationType ret = null;
+		Future ret = new Future();
 //		System.out.println("filename: "+filename);
 		try
 		{
-			ret = loader.loadApplicationModel(model, imports, classloader);
-		}
-		catch(RuntimeException e)
-		{
-			throw e;
+			ret.setResult(loader.loadApplicationModel(model, imports, classloader).getModelInfo());
 		}
 		catch(Exception e)
 		{
-			throw new RuntimeException(e);
+			ret.setException(e);
 		}
 		
-		return ret.getModelInfo();
+		return ret;
 	}
 	
 	/**
@@ -234,9 +230,9 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 	 *  @param The imports (if any).
 	 *  @return True, if model can be loaded.
 	 */
-	public boolean isLoadable(String model, String[] imports, ClassLoader classloader)
+	public IFuture isLoadable(String model, String[] imports, ClassLoader classloader)
 	{
-		return model.endsWith(ApplicationModelLoader.FILE_EXTENSION_APPLICATION);
+		return new Future(model.endsWith(ApplicationModelLoader.FILE_EXTENSION_APPLICATION));
 	}
 	
 	/**
@@ -245,9 +241,9 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 	 *  @param The imports (if any).
 	 *  @return True, if startable (and loadable).
 	 */
-	public boolean isStartable(String model, String[] imports, ClassLoader classloader)
+	public IFuture isStartable(String model, String[] imports, ClassLoader classloader)
 	{
-		return model.endsWith(ApplicationModelLoader.FILE_EXTENSION_APPLICATION);
+		return new Future(model.endsWith(ApplicationModelLoader.FILE_EXTENSION_APPLICATION));
 	}
 
 	/**
@@ -261,9 +257,9 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 	/**
 	 *  Get a default icon for a file type.
 	 */
-	public Icon getComponentTypeIcon(String type)
+	public IFuture getComponentTypeIcon(String type)
 	{
-		return type.equals(FILETYPE_APPLICATION)? icons.getIcon("application"): null;
+		return new Future(type.equals(FILETYPE_APPLICATION)? icons.getIcon("application"): null);
 	}
 
 	/**
@@ -271,9 +267,9 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 	 *  @param model The model (e.g. file name).
 	 *  @param The imports (if any).
 	 */
-	public String getComponentType(String model, String[] imports, ClassLoader classloader)
+	public IFuture getComponentType(String model, String[] imports, ClassLoader classloader)
 	{
-		return model.toLowerCase().endsWith(ApplicationModelLoader.FILE_EXTENSION_APPLICATION)? FILETYPE_APPLICATION: null;
+		return new Future(model.toLowerCase().endsWith(ApplicationModelLoader.FILE_EXTENSION_APPLICATION)? FILETYPE_APPLICATION: null);
 	}
 
 	/**

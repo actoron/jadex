@@ -80,16 +80,23 @@ public class ComponentIconCache
 					try
 					{
 						IComponentFactory	fac	= (IComponentFactory)result;
-						icons.put(type, fac.getComponentTypeIcon(type));
-						TreeModel	model	= tree.getModel();
-						if(model instanceof ComponentTreeModel)
+						fac.getComponentTypeIcon(type)
+							.addResultListener(new SwingDefaultResultListener()
 						{
-							((ComponentTreeModel)model).fireNodeChanged(node);
-						}
-						else
-						{
-							tree.repaint();
-						}
+							public void customResultAvailable(Object result)
+							{
+								icons.put(type, result);
+								TreeModel	model	= tree.getModel();
+								if(model instanceof ComponentTreeModel)
+								{
+									((ComponentTreeModel)model).fireNodeChanged(node);
+								}
+								else
+								{
+									tree.repaint();
+								}
+							}
+						});
 					}
 					catch(Exception e)
 					{

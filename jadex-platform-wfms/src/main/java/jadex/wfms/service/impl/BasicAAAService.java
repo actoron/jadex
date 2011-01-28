@@ -2,7 +2,9 @@ package jadex.wfms.service.impl;
 
 import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentManagementService;
-import jadex.commons.IFilter;
+import jadex.commons.Future;
+import jadex.commons.IFuture;
+import jadex.commons.IRemoteFilter;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.service.BasicResultSelector;
 import jadex.commons.service.BasicService;
@@ -38,14 +40,11 @@ public class BasicAAAService extends BasicService implements IAAAService
 	
 	public static IAAAService getTestService(final IServiceContainer provider)
 	{
-		SServiceProvider.getService(provider, new BasicResultSelector(new IFilter()
+		SServiceProvider.getService(provider, new BasicResultSelector(new IRemoteFilter()
 		{
-			
-			public boolean filter(Object obj)
+			public IFuture filter(Object obj)
 			{
-				if (obj instanceof GpmnFactory)
-					return true;
-				return false;
+				return new Future(obj instanceof GpmnFactory? Boolean.TRUE: Boolean.FALSE);
 			}
 		}, true)).addResultListener(new DefaultResultListener()
 		{

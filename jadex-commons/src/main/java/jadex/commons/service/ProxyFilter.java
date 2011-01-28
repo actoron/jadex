@@ -1,6 +1,8 @@
 package jadex.commons.service;
 
-import jadex.commons.IFilter;
+import jadex.commons.Future;
+import jadex.commons.IFuture;
+import jadex.commons.IRemoteFilter;
 
 import java.lang.reflect.Proxy;
 import java.rmi.server.RemoteObjectInvocationHandler;
@@ -8,22 +10,22 @@ import java.rmi.server.RemoteObjectInvocationHandler;
 /**
  *  Test if a class is a proxy.
  */
-public class ProxyFilter implements IFilter
+public class ProxyFilter implements IRemoteFilter
 {
 	//-------- attributes --------
 	
 	/** Static proxy filter instance. */
-	public static IFilter PROXYFILTER = new ProxyFilter();
+	public static IRemoteFilter PROXYFILTER = new ProxyFilter();
 
 	//-------- methods --------
 	
 	/**
 	 *  Test if service is a proxy.
 	 */
-	public boolean filter(Object obj)
+	public IFuture filter(Object obj)
 	{
-		return !Proxy.isProxyClass(obj.getClass()) || 
-			!(Proxy.getInvocationHandler(obj) instanceof RemoteObjectInvocationHandler);
+		return new Future(!Proxy.isProxyClass(obj.getClass()) || 
+			!(Proxy.getInvocationHandler(obj) instanceof RemoteObjectInvocationHandler));
 	}
 	
 	/**

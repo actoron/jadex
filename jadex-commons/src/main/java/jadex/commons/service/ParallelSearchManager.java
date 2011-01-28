@@ -160,6 +160,7 @@ public class ParallelSearchManager implements ISearchManager
 							Object next = it.next();
 							if(!endret.getIntermediateResults().contains(next))
 							{
+//								System.out.println("found: "+next);
 								endret.addIntermediateResult(next);
 							}
 						}

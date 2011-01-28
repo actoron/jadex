@@ -698,7 +698,15 @@ public class ModelExplorer extends JTree
 					String[] filetypes = fac.getComponentTypes();
 					for(int i=0; i<filetypes.length; i++)
 					{
-						JCheckBoxMenuItem ff = new JCheckBoxMenuItem(filetypes[i], (Icon)fac.getComponentTypeIcon(filetypes[i]), true);
+						final JCheckBoxMenuItem ff = new JCheckBoxMenuItem(filetypes[i], true);
+						fac.getComponentTypeIcon(filetypes[i]).addResultListener(new DefaultResultListener()
+						{
+							public void resultAvailable(Object result)
+							{
+								ff.setIcon((Icon)result);
+							}
+						});
+						
 						filtermenu.add(ff);
 						ff.addActionListener(new ActionListener()
 						{

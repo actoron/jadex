@@ -8,6 +8,7 @@ import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.ICMSComponentListener;
 import jadex.bridge.IComponentManagementService;
+import jadex.bridge.IExternalAccess;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.ThreadSuspendable;
@@ -39,7 +40,7 @@ public class ExecutionService extends BasicService implements IExecutionService
 	/** The WFMS */
 	protected IComponentIdentifier wfms;
 	
-	protected IServiceProvider provider;
+	protected IExternalAccess exta;
 	
 	/** Running process instances (id -> IProcess) */
 	protected Map processes;
@@ -52,14 +53,14 @@ public class ExecutionService extends BasicService implements IExecutionService
 	/**
 	 *  Create a new execution service.
 	 */
-	public ExecutionService(IComponentIdentifier wfms, IServiceProvider provider)
+	public ExecutionService(IComponentIdentifier wfms, IExternalAccess exta)
 	{
-		super(provider.getId(), IExecutionService.class, null);
+		super(exta.getServiceProvider().getId(), IExecutionService.class, null);
 		//super(BasicService.createServiceIdentifier(provider.getId(), ExecutionService.class));
 
 		this.processes = new HashMap();
 		this.wfms = wfms;
-		this.provider = provider;
+		this.exta = exta;
 		
 		//TODO: hack!
 		/*this.exeservices = new ArrayList();
@@ -81,7 +82,7 @@ public class ExecutionService extends BasicService implements IExecutionService
 	public IFuture loadModel(String filename, String[] imports)
 	{
 		//ILoadableComponentModel ret = null;
-		return SComponentFactory.loadModel(provider, filename);
+		return SComponentFactory.loadModel(exta, filename);
 		/*for(int i=0; ret==null && i<exeservices.size(); i++)
 		{
 			IExecutionService es = (IExecutionService)exeservices.get(i);
@@ -102,13 +103,13 @@ public class ExecutionService extends BasicService implements IExecutionService
 	public IFuture startProcess(String modelname, Object id, Map arguments)
 	{
 		final Future ret = new Future();
-		IComponentManagementService ces = (IComponentManagementService) SServiceProvider.getService(provider, IComponentManagementService.class).get(new ThreadSuspendable());
+		IComponentManagementService ces = (IComponentManagementService) SServiceProvider.getService(exta.getServiceProvider(), IComponentManagementService.class).get(new ThreadSuspendable());
 		ces.createComponent(null, modelname, new CreationInfo(null, arguments, wfms, true), null).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
 				final IComponentIdentifier id = ((IComponentIdentifier) result);
-				SServiceProvider.getService(provider, IComponentManagementService.class).addResultListener(new DelegationResultListener(ret)
+				SServiceProvider.getService(exta.getServiceProvider(), IComponentManagementService.class).addResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
@@ -119,14 +120,15 @@ public class ExecutionService extends BasicService implements IExecutionService
 							
 							private List activityHistory = new ArrayList();
 							
-							public void componentRemoved(IComponentDescription desc, Map results)
+							public IFuture componentRemoved(IComponentDescription desc, Map results)
 							{
 								Logger.getLogger("Wfms").log(Level.INFO, "Finished process " + id.toString());
 								Logger.getLogger("Wfms").log(Level.INFO, "History: " + Arrays.toString(activityHistory.toArray()));
-								((AdministrationService) SServiceProvider.getService(provider,IAdministrationService.class).get(new ThreadSuspendable())).fireProcessFinished(id);
+								((AdministrationService) SServiceProvider.getService(exta.getServiceProvider(),IAdministrationService.class).get(new ThreadSuspendable())).fireProcessFinished(id);
+								return new Future(null);
 							}
 							
-							public void componentChanged(IComponentDescription desc)
+							public IFuture componentChanged(IComponentDescription desc)
 							{
 								//System.out.println(desc.getName() + " " + desc.getState() + desc.getProcessingState() + " " + desc.getType());
 								if ("BPMN Process".equals(desc.getType()))
@@ -181,10 +183,12 @@ public class ExecutionService extends BasicService implements IExecutionService
 										}
 									});
 								}*/
+								return new Future(null);
 							}
 							
-							public void componentAdded(IComponentDescription desc)
+							public IFuture componentAdded(IComponentDescription desc)
 							{
+								return new Future(null);
 							}
 						});
 						
@@ -233,7 +237,7 @@ public class ExecutionService extends BasicService implements IExecutionService
 	 */
 	public IFuture isLoadable(String name)
 	{
-		return SComponentFactory.isLoadable(provider, name);
+		return SComponentFactory.isLoadable(exta, name);
 	}
 	
 	/**

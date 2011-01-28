@@ -1,5 +1,7 @@
 package jadex.commons.service;
 
+import jadex.commons.IFuture;
+
 import java.util.Collection;
 import java.util.Map;
 
@@ -13,7 +15,7 @@ public interface IResultSelector
 	 *  @param services	The provided services (class->list of services).
 	 *  @param results	The collection to which results should be added.
 	 */
-	public Collection selectServices(Map services);
+	public IFuture selectServices(Map services);
 	
 //	/**
 //	 *  Get the result.

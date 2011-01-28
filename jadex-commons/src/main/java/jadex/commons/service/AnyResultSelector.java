@@ -1,6 +1,6 @@
 package jadex.commons.service;
 
-import jadex.commons.ConstantFilter;
+import jadex.commons.IRemoteFilter;
 
 /**
  *  Select first service to be returned as result of service search.
@@ -29,6 +29,6 @@ public class AnyResultSelector extends BasicResultSelector
 	 */
 	public AnyResultSelector(boolean oneresult, boolean remote)
 	{
-		super(new ConstantFilter(true), oneresult, remote);
+		super(IRemoteFilter.ALWAYS, oneresult, remote);
 	}
 }

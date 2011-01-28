@@ -1,9 +1,17 @@
 package jadex.xml.benchmark;
 
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.xml.bean.JavaReader;
 import jadex.xml.bean.JavaWriter;
 
+import java.awt.Color;
+import java.awt.FlowLayout;
+import java.awt.Graphics;
+import java.awt.Image;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.lang.reflect.Field;
 import java.net.InetAddress;
 import java.net.URL;
@@ -16,6 +24,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
+
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
 
 /**
  *  Testcases for writer and reader.
@@ -51,9 +64,9 @@ public class Test //extends TestCase
 			for(int i=0; i<cnt; i++)
 //			while(true)
 			{
-				t.testEmptySet();
-				t.testEmptyList();
-				t.testEmptyMap();
+//				t.testEmptySet();
+//				t.testEmptyList();
+//				t.testEmptyMap();
 //				t.testSpecialCharacter();
 //				t.testBean();
 //				t.testEmptyArray();
@@ -74,6 +87,7 @@ public class Test //extends TestCase
 //				t.testInetAddress();
 //				t.testBeanWithPublicFields();
 //				t.testAnonymousInnerClass();
+				t.testImage();
 			}
 			long dur = System.currentTimeMillis()-start;
 			
@@ -114,6 +128,31 @@ public class Test //extends TestCase
 				+wo.getClass()+" \n"+ro.getClass()+" \n"+xml);
 		
 //		assertEquals("Written and read objects should be equal:", wo, ro);
+	}
+	
+	/**
+	 * 
+	 */
+	public void testImage() throws Exception
+	{
+		BufferedImage bi = new BufferedImage(70,70,BufferedImage.TYPE_INT_ARGB);
+		Graphics g = bi.getGraphics();
+		g.setColor(Color.BLUE);
+		g.draw3DRect(10, 10, 50, 50, true);
+
+//		JFrame test = new JFrame();
+//		test.setLayout(new FlowLayout());
+//		test.add(new JLabel(new ImageIcon(bi)));
+//		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+//		ImageIO.write(bi,"PNG", baos);
+//		byte[] buf = baos.toByteArray();
+//		Image img = ImageIO.read(new ByteArrayInputStream(buf));
+//		test.add(new JLabel(new ImageIcon(img)));
+//		test.pack();
+//		test.setVisible(true);
+//		System.out.println("buf: "+SUtil.arrayToString(buf));
+
+		doWriteAndRead(bi);
 	}
 	
 	/**

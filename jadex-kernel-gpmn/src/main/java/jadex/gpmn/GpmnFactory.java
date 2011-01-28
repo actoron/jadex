@@ -9,6 +9,7 @@ import jadex.bridge.IComponentFactory;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IModelInfo;
 import jadex.commons.Future;
+import jadex.commons.IFuture;
 import jadex.commons.ResourceInfo;
 import jadex.commons.SGUI;
 import jadex.commons.SUtil;
@@ -113,10 +114,10 @@ public class GpmnFactory extends BasicService implements IComponentFactory
 	 *  @param The imports (if any).
 	 *  @return The loaded model.
 	 */
-	public IModelInfo loadModel(String model, String[] imports, ClassLoader classloader)
+	public IFuture loadModel(String model, String[] imports, ClassLoader classloader)
 	{
 		// Todo: support imports for GPMN models (-> use abstract model loader). 
-		IModelInfo ret = null;
+		Future ret = new Future();
 		try
 		{
 //			ILibraryService libservice = (ILibraryService)container.getService(ILibraryService.class);
@@ -126,18 +127,17 @@ public class GpmnFactory extends BasicService implements IComponentFactory
 			br.readLine();
 			if(br.readLine().contains("version=\"2.0\""))
 			{
-				ret = GpmnXMLReader2.read(model, classloader, null).getModelInfo();
+				ret.setResult(GpmnXMLReader2.read(model, classloader, null).getModelInfo());
 			}
 			else
 			{
-				ret = GpmnXMLReader.read(model, classloader, null).getModelInfo();
+				ret.setResult(GpmnXMLReader.read(model, classloader, null).getModelInfo());
 			}
 			
 		}
 		catch(Exception e)
 		{
-			e.printStackTrace();
-			throw new RuntimeException(e);
+			ret.setException(e);
 		}
 		return ret;
 	}
@@ -148,9 +148,9 @@ public class GpmnFactory extends BasicService implements IComponentFactory
 	 *  @param The imports (if any).
 	 *  @return True, if model can be loaded.
 	 */
-	public boolean isLoadable(String model, String[] imports, ClassLoader classloader)
+	public IFuture isLoadable(String model, String[] imports, ClassLoader classloader)
 	{
-		return model.endsWith(".gpmn");
+		return new Future(model.endsWith(".gpmn"));
 	}
 	
 	/**
@@ -159,9 +159,9 @@ public class GpmnFactory extends BasicService implements IComponentFactory
 	 *  @param The imports (if any).
 	 *  @return True, if startable (and loadable).
 	 */
-	public boolean isStartable(String model, String[] imports, ClassLoader classloader)
+	public IFuture isStartable(String model, String[] imports, ClassLoader classloader)
 	{
-		return model.endsWith(".gpmn");
+		return new Future(model.endsWith(".gpmn"));
 	}
 	
 	/**
@@ -175,9 +175,9 @@ public class GpmnFactory extends BasicService implements IComponentFactory
 	/**
 	 *  Get a default icon for a file type.
 	 */
-	public Icon getComponentTypeIcon(String type)
+	public IFuture getComponentTypeIcon(String type)
 	{
-		return type.equals(FILETYPE_GPMNPROCESS) ? icons.getIcon("gpmn_process") : null;
+		return new Future(type.equals(FILETYPE_GPMNPROCESS) ? icons.getIcon("gpmn_process") : null);
 	}
 
 	/**
@@ -185,9 +185,9 @@ public class GpmnFactory extends BasicService implements IComponentFactory
 	 *  @param model The model (e.g. file name).
 	 *  @param The imports (if any).
 	 */
-	public String getComponentType(String model, String[] imports, ClassLoader classloader)
+	public IFuture getComponentType(String model, String[] imports, ClassLoader classloader)
 	{
-		return model.toLowerCase().endsWith(".gpmn") ? FILETYPE_GPMNPROCESS: null;
+		return new Future(model.toLowerCase().endsWith(".gpmn") ? FILETYPE_GPMNPROCESS: null);
 	}
 	
 	/**

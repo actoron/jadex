@@ -1,11 +1,13 @@
 package jadex.commons.service;
 
-import jadex.commons.IFilter;
+import jadex.commons.Future;
+import jadex.commons.IFuture;
+import jadex.commons.IRemoteFilter;
 
 /**
  *  Filter for service ids.
  */
-public class ServiceIdFilter implements IFilter
+public class ServiceIdFilter implements IRemoteFilter
 {
 	//-------- attributes --------
 	
@@ -52,9 +54,9 @@ public class ServiceIdFilter implements IFilter
 	/**
 	 *  Test if service is a proxy.
 	 */
-	public boolean filter(Object obj)
+	public IFuture filter(Object obj)
 	{
-		return obj instanceof IService && ((IService)obj).getServiceIdentifier().equals(sid);
+		return new Future(obj instanceof IService && ((IService)obj).getServiceIdentifier().equals(sid));
 	}
 	
 	/**

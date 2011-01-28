@@ -412,28 +412,35 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 				final IComponentFactory factory = (IComponentFactory)result;
 				if(factory!=null)
 				{
-					final IModelInfo lmodel = factory.loadModel(ct.getFilename(), model.getAllImports(), model.getModelInfo().getClassLoader());
-					ProvidedServiceInfo[] services = lmodel.getProvidedServices();
-					Set sers = new HashSet();
-					for(int i=0; i<services.length; i++)
+					factory.loadModel(ct.getFilename(), model.getAllImports(), model.getModelInfo().getClassLoader())
+						.addResultListener(createResultListener(new DelegationResultListener(ret)
 					{
-						sers.add(services[i].getType());
-					}
-					if(sers.contains(servicetype))
-					{
-						IInternalService service = CompositeServiceInvocationInterceptor.createServiceProxy(servicetype, ct.getName(), 
-							(IApplicationExternalAccess)getExternalAccess(), getModel().getClassLoader(), null);
-						getServiceContainer().addService(service);
-						ret.setResult(result);
-					}
-					else if(i+1<componenttypes.size())
-					{
-						findComponentType(i+1, componenttypes, servicetype, ret);
-					}
-					else
-					{
-						ret.setException(new RuntimeException("No component type offers service type: "+servicetype));
-					}
+						public void customResultAvailable(Object result)
+						{
+							IModelInfo lmodel = (IModelInfo)result;
+							ProvidedServiceInfo[] services = lmodel.getProvidedServices();
+							Set sers = new HashSet();
+							for(int i=0; i<services.length; i++)
+							{
+								sers.add(services[i].getType());
+							}
+							if(sers.contains(servicetype))
+							{
+								IInternalService service = CompositeServiceInvocationInterceptor.createServiceProxy(servicetype, ct.getName(), 
+									(IApplicationExternalAccess)getExternalAccess(), getModel().getClassLoader(), null);
+								getServiceContainer().addService(service);
+								ret.setResult(result);
+							}
+							else if(i+1<componenttypes.size())
+							{
+								findComponentType(i+1, componenttypes, servicetype, ret);
+							}
+							else
+							{
+								ret.setException(new RuntimeException("No component type offers service type: "+servicetype));
+							}
+						}
+					}));
 				}
 			}
 			

@@ -12,6 +12,7 @@ import jadex.bridge.ModelInfo;
 import jadex.bridge.ModelValueProvider;
 import jadex.commons.ByteClassLoader;
 import jadex.commons.Future;
+import jadex.commons.IFuture;
 import jadex.commons.SGUI;
 import jadex.commons.SReflect;
 import jadex.commons.service.BasicService;
@@ -140,7 +141,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	 *  @param The imports (if any).
 	 *  @return The loaded model.
 	 */
-	public IModelInfo loadModel(String model, String[] imports, ClassLoader classloader)
+	public IFuture loadModel(String model, String[] imports, ClassLoader classloader)
 	{
 //		System.out.println("loading micro: "+model);
 		String clname = model;
@@ -153,7 +154,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 		
 		Class cma = getMicroAgentClass(clname, imports, classloader);
 		
-		return loadModel(model, cma, classloader);
+		return new Future(loadModel(model, cma, classloader));
 	}
 	
 	/**
@@ -363,7 +364,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	 *  @param The imports (if any).
 	 *  @return True, if model can be loaded.
 	 */
-	public boolean isLoadable(String model, String[] imports, ClassLoader classloader)
+	public IFuture isLoadable(String model, String[] imports, ClassLoader classloader)
 	{
 		boolean ret = model.toLowerCase().endsWith("agent.class");
 //		if(model.toLowerCase().endsWith("Agent.class"))
@@ -374,7 +375,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 //			ret = cma!=null && cma.isAssignableFrom(IMicroAgent.class);
 //			System.out.println(clname+" "+cma+" "+ret);
 //		}
-		return ret;
+		return new Future(ret);
 	}
 	
 	/**
@@ -383,7 +384,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	 *  @param The imports (if any).
 	 *  @return True, if startable (and loadable).
 	 */
-	public boolean isStartable(String model, String[] imports, ClassLoader classloader)
+	public IFuture isStartable(String model, String[] imports, ClassLoader classloader)
 	{
 		return isLoadable(model, imports, classloader);
 	}
@@ -399,9 +400,9 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	/**
 	 *  Get a default icon for a file type.
 	 */
-	public Icon getComponentTypeIcon(String type)
+	public IFuture getComponentTypeIcon(String type)
 	{
-		return type.equals(FILETYPE_MICROAGENT) ? icons.getIcon("micro_agent") : null;
+		return new Future(type.equals(FILETYPE_MICROAGENT) ? icons.getIcon("micro_agent") : null);
 	}
 
 	/**
@@ -409,9 +410,9 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	 *  @param model The model (e.g. file name).
 	 *  @param The imports (if any).
 	 */
-	public String getComponentType(String model, String[] imports, ClassLoader classloader)
+	public IFuture getComponentType(String model, String[] imports, ClassLoader classloader)
 	{
-		return model.toLowerCase().endsWith("agent.class") ? FILETYPE_MICROAGENT: null;
+		return new Future(model.toLowerCase().endsWith("agent.class") ? FILETYPE_MICROAGENT: null);
 	}
 	
 	/**

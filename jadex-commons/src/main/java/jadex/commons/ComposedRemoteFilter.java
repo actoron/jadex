@@ -1,0 +1,264 @@
+package jadex.commons;
+
+import jadex.commons.concurrent.DelegationResultListener;
+
+import java.io.Serializable;
+import java.util.Arrays;
+
+/**
+ *  A filter checks if an object matches
+ *  the given subfilters.
+ */
+public class  ComposedRemoteFilter implements IRemoteFilter, Serializable
+{
+	//-------- constants --------
+
+	/** The AND operator. */
+	public static final int AND	= 1;
+
+	/** The OR operator. */
+	public static final int OR	= 2;
+
+	/** The NOT operator. */
+	public static final int NOT	= 3;
+	
+
+	//-------- attributes ---------
+
+	/** The filters */
+	protected IRemoteFilter[] filters;
+
+	/** The operator. */
+	protected int operator;
+
+	//-------- constructors --------
+
+	/**
+	 *  Create a composed filter.
+	 *  @param filters The filters.
+	 *  @param operator The operator.
+	 */
+	public ComposedRemoteFilter(IRemoteFilter[] filters)
+	{
+		this(filters, AND);
+	}
+	
+	/**
+	 *  Create a composed filter.
+	 *  @param filters The filters.
+	 *  @param operator The operator.
+	 */
+	public ComposedRemoteFilter(IRemoteFilter[] filters, int operator)
+	{
+		this.filters	= filters;
+		this.operator	= operator;
+	}
+
+	//-------- methods --------
+
+	/**
+	 *  Match an object against the filter.
+	 *  @param object The object.
+	 *  @return True, if the filter matches.
+	 * @throws Exception
+	 */
+	public IFuture filter(Object object)
+	{
+		final Future ret = new Future();
+		
+		if(operator==AND)
+		{
+			checkAndFilter(object, filters, 0)
+				.addResultListener(new DelegationResultListener(ret));
+		}
+		else if(operator==OR)
+		{
+			checkOrFilter(object, filters, 0)
+				.addResultListener(new DelegationResultListener(ret));
+		}
+		else if(operator==NOT)
+		{
+			filters[0].filter(object).addResultListener(new DelegationResultListener(ret)
+			{
+				public void customResultAvailable(Object result)
+				{
+					ret.setResult(!((Boolean)result).booleanValue());
+				}
+			});
+		}
+		return ret;
+	}
+
+	/**
+	 *  Check and filter.
+	 */
+	protected IFuture checkAndFilter(final Object object, final IRemoteFilter[] filter, final int i)
+	{
+		final Future ret = new Future();
+		filters[i].filter(object).addResultListener(new DelegationResultListener(ret)
+		{
+			public void customResultAvailable(Object result)
+			{
+				if(((Boolean)result).booleanValue())
+				{
+					if(i+1<filter.length)
+					{
+						checkAndFilter(object, filter, i+1)
+							.addResultListener(new DelegationResultListener(ret));
+					}
+					else
+					{
+						ret.setResult(Boolean.TRUE);
+					}
+				}
+				else
+				{
+					ret.setResult(Boolean.FALSE);
+				}
+			}
+		});
+		return ret;
+	}
+	
+	/**
+	 *  Check or filter.
+	 */
+	protected IFuture checkOrFilter(final Object object, final IRemoteFilter[] filter, final int i)
+	{
+		final Future ret = new Future();
+		filters[i].filter(object).addResultListener(new DelegationResultListener(ret)
+		{
+			public void customResultAvailable(Object result)
+			{
+				if(((Boolean)result).booleanValue())
+				{
+					ret.setResult(Boolean.TRUE);
+				}
+				else
+				{
+					if(i+1<filter.length)
+					{
+						checkOrFilter(object, filter, i+1)
+							.addResultListener(new DelegationResultListener(ret));
+					}
+					else
+					{
+						ret.setResult(Boolean.FALSE);
+					}
+				}
+			}
+		});
+		return ret;
+	}
+	
+	/**
+	 *  Get the filters.
+	 *  @return the filters.
+	 */
+	public IRemoteFilter[] getFilters()
+	{
+		return filters;
+	}
+
+	/**
+	 *  Set the filters.
+	 *  @param filters The filters to set.
+	 */
+	public void setFilters(IRemoteFilter[] filters)
+	{
+		this.filters = filters;
+	}
+	
+	/**
+	 *  Add a filter.
+	 *  @param filter The filter.
+	 */
+	public void addFilter(IRemoteFilter filter)
+	{
+		IRemoteFilter[] copy = new IRemoteFilter[filters==null? 1: filters.length+1];
+		if(filters!=null)
+			System.arraycopy(filter, 0, copy, 0, filters.length);
+		copy[copy.length-1] = filter;
+		this.filters = copy;
+	}
+
+	/**
+	 *  Get the operator.
+	 *  @return the operator.
+	 */
+	public int getOperator()
+	{
+		return operator;
+	}
+
+	/**
+	 *  Set the operator.
+	 *  @param operator The operator to set.
+	 */
+	public void setOperator(int operator)
+	{
+		this.operator = operator;
+	}
+
+	/**
+	 *  Get the hashcode.
+	 */
+	public int hashCode()
+	{
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + Arrays.hashCode(filters);
+		result = prime * result + operator;
+		return result;
+	}
+
+	/**
+	 *  Test if an object is equal to this.
+	 */
+	public boolean equals(Object obj)
+	{
+		boolean ret = false;
+		if(obj instanceof ComposedFilter)
+		{
+			ComposedFilter other = (ComposedFilter)obj;
+			ret = Arrays.equals(filters, other.filters) && operator == other.operator;
+		}
+		return ret;
+	}
+
+	/**
+	 *  Create a string representation of the operator.
+	 *  @return A string representing the operator.
+	 */
+	public static String	operatorToString(int operator)
+	{
+		switch(operator)
+		{
+			case AND:
+				return "AND";
+			case OR:
+				return "OR";
+			case NOT:
+				return "NOT";
+			default:
+				throw new RuntimeException("Unknown operator: "+operator);
+ 		}
+	}
+	
+	/**
+	 *  Create a string representation of this filter.
+	 *  @return A string representing this filter.
+	 */
+	public String	toString()
+	{
+		StringBuffer	sb	= new StringBuffer();
+		sb.append(SReflect.getInnerClassName(this.getClass()));
+		sb.append("(operator=");
+		sb.append(operatorToString(operator));
+		sb.append(", filters=");
+		sb.append(SUtil.arrayToString(filters));
+		sb.append(")");
+		return sb.toString();
+	}
+	
+}

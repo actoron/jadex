@@ -224,19 +224,22 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory
 	 *  @param The imports (if any).
 	 *  @return The loaded model.
 	 */
-	public IModelInfo loadModel(String filename, String[] imports, ClassLoader classloader)
+	public IFuture loadModel(String filename, String[] imports, ClassLoader classloader)
 	{
+		Future ret = new Future();
 		try
 		{
 //			System.out.println("loading bdi: "+filename);
 			OAVCapabilityModel loaded = (OAVCapabilityModel)loader.loadModel(filename, imports, classloader);
-			return loaded.getModelInfo();
+			ret.setResult(loaded.getModelInfo());
 		}
 		catch(Exception e)
 		{
+			ret.setException(e);
 //			System.err.println(filename);
-			throw e instanceof RuntimeException ? (RuntimeException)e : new RuntimeException(e);
+//			throw e instanceof RuntimeException ? (RuntimeException)e : new RuntimeException(e);
 		}
+		return ret;
 	}
 	
 	/**
@@ -245,11 +248,11 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory
 	 *  @param The imports (if any).
 	 *  @return True, if model can be loaded.
 	 */
-	public boolean isLoadable(String model, String[] imports, ClassLoader classloader)
+	public IFuture isLoadable(String model, String[] imports, ClassLoader classloader)
 	{
 //		init();
 
-		return model.toLowerCase().endsWith(".agent.xml") || model.toLowerCase().endsWith(".capability.xml");
+		return new Future(model.toLowerCase().endsWith(".agent.xml") || model.toLowerCase().endsWith(".capability.xml"));
 //		return loader.isLoadable(model, null);
 //		return model.toLowerCase().endsWith(".agent.xml") || model.toLowerCase().endsWith(".capability.xml");
 		
@@ -267,9 +270,9 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory
 	 *  @param The imports (if any).
 	 *  @return True, if startable (and loadable).
 	 */
-	public boolean isStartable(String model, String[] imports, ClassLoader classloader)
+	public IFuture isStartable(String model, String[] imports, ClassLoader classloader)
 	{
-		return model!=null && model.toLowerCase().endsWith(".agent.xml");
+		return new Future(model!=null && model.toLowerCase().endsWith(".agent.xml"));
 //		return SXML.isAgentFilename(model);
 	}
 
@@ -285,10 +288,10 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory
 	/**
 	 *  Get a default icon for a file type.
 	 */
-	public Icon getComponentTypeIcon(String type)
+	public IFuture getComponentTypeIcon(String type)
 	{
-		return type.equals(FILETYPE_BDIAGENT) ? icons.getIcon("bdi_agent")
-			: type.equals(FILETYPE_BDICAPABILITY) ? icons.getIcon("bdi_capability") : null;
+		return new Future(type.equals(FILETYPE_BDIAGENT) ? icons.getIcon("bdi_agent")
+			: type.equals(FILETYPE_BDICAPABILITY) ? icons.getIcon("bdi_capability") : null);
 	}
 
 	/**
@@ -296,11 +299,11 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory
 	 *  @param model The model (e.g. file name).
 	 *  @param The imports (if any).
 	 */
-	public String getComponentType(String model, String[] imports, ClassLoader classloader)
+	public IFuture getComponentType(String model, String[] imports, ClassLoader classloader)
 	{
-		return model.toLowerCase().endsWith(".agent.xml") ? FILETYPE_BDIAGENT
+		return new Future(model.toLowerCase().endsWith(".agent.xml") ? FILETYPE_BDIAGENT
 			: model.toLowerCase().endsWith(".capability.xml") ? FILETYPE_BDICAPABILITY
-			: null;
+			: null);
 	}
 	
 	/**
