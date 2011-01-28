@@ -1,6 +1,5 @@
 package jadex.micro.examples.chat;
 
-import jadex.commons.IChangeListener;
 import jadex.commons.IRemoteChangeListener;
 import jadex.commons.service.IService;
 

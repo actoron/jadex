@@ -10,8 +10,6 @@ import jadex.xml.TypeInfo;
 import jadex.xml.XMLInfo;
 import jadex.xml.bean.BeanObjectReaderHandler;
 import jadex.xml.bean.BeanObjectWriterHandler;
-import jadex.xml.bean.JavaReader;
-import jadex.xml.bean.JavaWriter;
 import jadex.xml.reader.Reader;
 import jadex.xml.writer.Writer;
 

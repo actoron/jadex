@@ -16,7 +16,6 @@ import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.commons.gui.CombiIcon;
 import jadex.commons.gui.ObjectCardLayout;
 import jadex.commons.service.SServiceProvider;
-import jadex.tools.help.SHelp;
 
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -50,13 +49,13 @@ public class RuleProfilerPlugin extends AbstractJCCPlugin	implements ICMSCompone
 	 * The image icons.
 	 */
 	protected static final UIDefaults	icons	= new UIDefaults(new Object[]{
-		"profiler", SGUI.makeIcon(SHelp.class, "/jadex/tools/common/images/ruleprofiler.png"),
-		"profiler_sel", SGUI.makeIcon(SHelp.class, "/jadex/tools/common/images/ruleprofiler_sel.png"),
-		"profile_agent", SGUI.makeIcon(SHelp.class, "/jadex/tools/common/images/new_introspector.png"),
-		"close_profiler", SGUI.makeIcon(SHelp.class, "/jadex/tools/common/images/close_introspector.png"),
-		"profiler_empty", SGUI.makeIcon(SHelp.class, "/jadex/tools/common/images/introspector_empty.png"),
-		"component_debugged", SGUI.makeIcon(SHelp.class, "/jadex/tools/common/images/overlay_introspected.png"),
-		"stop_debugger", SGUI.makeIcon(SHelp.class, "/jadex/tools/common/images/overlay_notintrospected.png")
+		"profiler", SGUI.makeIcon(AbstractJCCPlugin.class, "/jadex/tools/common/images/ruleprofiler.png"),
+		"profiler_sel", SGUI.makeIcon(AbstractJCCPlugin.class, "/jadex/tools/common/images/ruleprofiler_sel.png"),
+		"profile_agent", SGUI.makeIcon(AbstractJCCPlugin.class, "/jadex/tools/common/images/new_introspector.png"),
+		"close_profiler", SGUI.makeIcon(AbstractJCCPlugin.class, "/jadex/tools/common/images/close_introspector.png"),
+		"profiler_empty", SGUI.makeIcon(AbstractJCCPlugin.class, "/jadex/tools/common/images/introspector_empty.png"),
+		"component_debugged", SGUI.makeIcon(AbstractJCCPlugin.class, "/jadex/tools/common/images/overlay_introspected.png"),
+		"stop_debugger", SGUI.makeIcon(AbstractJCCPlugin.class, "/jadex/tools/common/images/overlay_notintrospected.png")
 	});
 
 	//-------- attributes --------

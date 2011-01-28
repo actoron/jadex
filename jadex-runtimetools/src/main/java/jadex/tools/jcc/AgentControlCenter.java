@@ -1,12 +1,11 @@
 package jadex.tools.jcc;
 
 import jadex.bdi.runtime.IBDIExternalAccess;
-import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.ChangeEvent;
-import jadex.commons.service.IServiceProvider;
+import jadex.xml.annotation.XMLClassname;
 
 import javax.swing.SwingUtilities;
 
@@ -33,7 +32,7 @@ public class AgentControlCenter extends ControlCenter
 
 		agent.scheduleStep(new IComponentStep()
 		{
-			public static final String XML_CLASSNAME = "kill"; 
+			@XMLClassname("kill")
 			public Object execute(IInternalAccess ia)
 			{
 				ia.addComponentListener(new IComponentListener()

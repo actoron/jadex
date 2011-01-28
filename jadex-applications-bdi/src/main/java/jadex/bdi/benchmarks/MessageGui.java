@@ -9,6 +9,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.ChangeEvent;
 import jadex.commons.SGUI;
+import jadex.xml.annotation.XMLClassname;
 
 import java.awt.GridLayout;
 
@@ -32,7 +33,7 @@ public class MessageGui extends JFrame
 		
 		agent.scheduleStep(new IComponentStep()
 		{
-			public static final String XML_CLASSNAME = "addListener"; 
+			@XMLClassname("addListener")
 			public Object execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;

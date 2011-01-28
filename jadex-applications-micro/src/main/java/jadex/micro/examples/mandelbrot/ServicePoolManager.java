@@ -1,11 +1,17 @@
 package jadex.micro.examples.mandelbrot;
 
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.IIntermediateFuture;
 import jadex.commons.IIntermediateResultListener;
 import jadex.commons.IntermediateFuture;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.service.IService;
+import jadex.commons.service.RequiredServiceInfo;
+import jadex.commons.service.SServiceProvider;
+import jadex.commons.service.clock.IClockService;
+import jadex.commons.service.clock.ITimedObject;
+import jadex.commons.service.clock.ITimer;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -43,6 +49,12 @@ public class ServicePoolManager
 	
 	/** Flag to indicate an ongoing search. */
 	protected boolean searching;
+	
+	/** Flag to indicate an ongoing creation. */
+	protected boolean creating;
+	
+	/** The search timeout timer. */
+	protected ITimer	timer;
 	
 	//-------- constructors --------
 	
@@ -137,6 +149,39 @@ public class ServicePoolManager
 		{
 //			System.out.println("searching services");			
 			searching	= true;
+			
+			// Start timer to be triggered when search is not finished after 1 second.
+			SServiceProvider.getService(component.getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				.addResultListener(component.createResultListener(new IResultListener()
+			{
+				public void resultAvailable(Object result)
+				{
+					IClockService	cs	= (IClockService)result;
+					assert	timer==null;
+					timer	= cs.createTimer(1000, new ITimedObject()
+					{
+						public void timeEventOccurred(long currenttime)
+						{
+							component.getExternalAccess().scheduleStep(new IComponentStep()
+							{
+								public Object execute(IInternalAccess ia)
+								{
+									timer	= null;
+									// Create new services when there are remaining tasks.
+									createServices();
+									return null;
+								}
+							});
+						}
+					});
+				}
+				
+				public void exceptionOccurred(Exception exception)
+				{
+					// No timeout supported; ignore
+				}
+			}));
+			
 			component.getRequiredServices(name).addResultListener(
 				component.createResultListener(new IIntermediateResultListener()
 			{
@@ -157,7 +202,13 @@ public class ServicePoolManager
 				 */
 				public void finished()
 				{
-					searching	= false;
+					searching	= false;					
+					if(timer!=null)
+					{
+						timer.cancel();
+						timer	= null;
+					}
+					
 					// Create new services when there are remaining tasks.
 					createServices();
 				}
@@ -167,7 +218,13 @@ public class ServicePoolManager
 				 */
 				public void exceptionOccurred(Exception exception)
 				{
-					searching	= false;
+					searching	= false;					
+					if(timer!=null)
+					{
+						timer.cancel();
+						timer	= null;
+					}
+					
 					// Shouldn't happen.
 					exception.printStackTrace();
 					
@@ -181,8 +238,6 @@ public class ServicePoolManager
 				}
 			}));
 		}
-		
-		// Todo: create further services already after timeout (if search takes long time due to remote platforms).
 	}
 	
 	/**
@@ -249,12 +304,14 @@ public class ServicePoolManager
 	 */
 	protected void	createServices()
 	{
-		if(!tasks.isEmpty() && (max==-1 || free.size()+busy.size()<max))
+		if(timer==null && !creating && !tasks.isEmpty() && (max==-1 || free.size()+busy.size()<max))
 		{
+			creating	= true;
 			handler.createService().addResultListener(component.createResultListener(new IResultListener()
 			{
 				public void resultAvailable(Object result)
 				{
+					creating	= false;
 //					System.out.println("created service: "+((IService)result).getServiceIdentifier());
 					
 					// Add if not already found by concurrent search.
@@ -267,6 +324,7 @@ public class ServicePoolManager
 				
 				public void exceptionOccurred(Exception exception)
 				{
+					creating	= false;
 					// Service creation not supported -> ignore.
 					exception.printStackTrace();
 				}

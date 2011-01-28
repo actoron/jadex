@@ -2,14 +2,10 @@ package jadex.micro.examples.chat;
 
 import jadex.base.gui.componentviewer.AbstractComponentViewerPanel;
 import jadex.base.gui.plugin.IControlCenter;
-import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.IInternalAccess;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
-import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
-import jadex.commons.service.SServiceProvider;
 
 import javax.swing.JComponent;
 import javax.swing.JPanel;

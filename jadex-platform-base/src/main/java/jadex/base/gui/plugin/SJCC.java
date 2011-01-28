@@ -7,6 +7,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.commons.Future;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
+import jadex.xml.annotation.XMLClassname;
 
 import java.awt.Component;
 
@@ -19,7 +20,7 @@ public class SJCC
 	{
 		jcc.getExternalAccess().scheduleStep(new IComponentStep()
 		{
-			public static final String XML_CLASSNAME = "kill-platform";
+			@XMLClassname("kill-platform")
 			public Object execute(IInternalAccess ia)
 			{
 				ia.getRequiredService("cms").addResultListener(new SwingDefaultResultListener(ui)

@@ -15,6 +15,8 @@ import jadex.commons.SGUI;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
+import jadex.xml.annotation.XMLClassname;
+
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -163,7 +165,7 @@ public class CustomerPanel extends JPanel
 		
 		agent.scheduleStep(new IComponentStep()
 		{
-			public static final String XML_CLASSNAME = "initialMoney"; 
+			@XMLClassname("initialMoney")
 			public Object execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
@@ -182,7 +184,7 @@ public class CustomerPanel extends JPanel
 		
 		agent.scheduleStep(new IComponentStep()
 		{
-			public static final String XML_CLASSNAME = "money"; 
+			@XMLClassname("money")
 			public Object execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
@@ -240,7 +242,7 @@ public class CustomerPanel extends JPanel
 
 		agent.scheduleStep(new IComponentStep()
 		{
-			public static final String XML_CLASSNAME = "inventory"; 
+			@XMLClassname("inventory")
 			public Object execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
@@ -307,7 +309,7 @@ public class CustomerPanel extends JPanel
 					final IShop shop = (IShop)shops.get(shopscombo.getSelectedItem());
 					agent.scheduleStep(new IComponentStep()
 					{
-						public static final String XML_CLASSNAME = "buy"; 
+						@XMLClassname("buy")
 						public Object execute(IInternalAccess ia)
 						{
 							IBDIInternalAccess bia = (IBDIInternalAccess)ia;

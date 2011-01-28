@@ -27,7 +27,7 @@ import javax.swing.SwingUtilities;
 @RequiredServices({
 	@RequiredService(name="clockservice", type=IClockService.class, scope=RequiredServiceInfo.SCOPE_PLATFORM),
 	@RequiredService(name="remotehelplineservices", type=IHelpline.class, multiple=true, scope=RequiredServiceInfo.SCOPE_GLOBAL),
-	@RequiredService(name="localhelplineservices", type=IHelpline.class, multiple=true, scope=RequiredServiceInfo.SCOPE_PLATFORM),
+	@RequiredService(name="localhelplineservices", type=IHelpline.class, multiple=true, scope=RequiredServiceInfo.SCOPE_PLATFORM)
 })
 @ProvidedServices(@ProvidedService(type=IHelpline.class, expression="new HelplineService($component)"))
 @GuiClass(HelplineViewerPanel.class)

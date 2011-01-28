@@ -13,6 +13,7 @@ import jadex.xml.ObjectInfo;
 import jadex.xml.SXML;
 import jadex.xml.SubobjectInfo;
 import jadex.xml.TypeInfo;
+import jadex.xml.annotation.XMLClassname;
 import jadex.xml.writer.AbstractObjectWriterHandler;
 import jadex.xml.writer.WriteContext;
 
@@ -259,6 +260,7 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 		
 		Method method = null;
 		Field field = null;
+		XMLClassname	xmlc	= null;
 		
 		AccessInfo ai = info instanceof AttributeInfo? ((AttributeInfo)info).getAccessInfo(): 
 			info instanceof SubobjectInfo? ((SubobjectInfo)info).getAccessInfo(): null;
@@ -295,6 +297,10 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 				}
 			}
 		}
+		else if(attr instanceof XMLClassname)
+		{
+			xmlc	= (XMLClassname)attr;
+		}
 //		else if(attr instanceof QName)
 //		{
 //			method = findGetMethod(object, ((QName)attr).getLocalPart(), new String[]{"get", "is"});
@@ -327,6 +333,10 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 			{
 				e.printStackTrace();
 			}
+		}
+		else if(xmlc!=null)
+		{
+			value = xmlc.value();
 		}
 		else
 		{
@@ -393,6 +403,8 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 			ret = (String)property;
 		else if(property instanceof QName)
 			ret = ((QName)property).getLocalPart();
+		else if(property instanceof XMLClassname)
+			ret = SXML.XML_CLASSNAME;
 		else
 			throw new RuntimeException("Unknown property type: "+property);
 		return ret;
@@ -467,9 +479,18 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 		boolean ret = true;
 		if(value!=null)
 		{
-			BeanProperty prop = (BeanProperty)property;
-			// Do not allow strings -> avoids strings being written as attributes by default.
-			ret = !(value instanceof String) && value.getClass().equals(SReflect.getWrappedType(prop.getSetterType()));
+			ret	= false;
+			if(property instanceof BeanProperty)
+			{
+				BeanProperty prop = (BeanProperty)property;
+				// Do not allow strings -> avoids strings being written as attributes by default.
+				ret = !(value instanceof String) && value.getClass().equals(SReflect.getWrappedType(prop.getSetterType()));
+			}
+			else if(property instanceof XMLClassname)
+			{
+				// Allow XML class name as attribute
+				ret	= true;
+			}
 		}
 		return ret;
 	}

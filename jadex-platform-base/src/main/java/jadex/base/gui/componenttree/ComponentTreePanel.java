@@ -20,6 +20,7 @@ import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.commons.gui.CombiIcon;
 import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
+import jadex.xml.annotation.XMLClassname;
 
 import java.awt.Component;
 import java.awt.Dimension;
@@ -175,7 +176,6 @@ public class ComponentTreePanel extends JSplitPane
 		{
 			public IFuture componentRemoved(final IComponentDescription desc, Map results)
 			{
-				final Future ret = new Future();
 				final IComponentTreeNode node = model.getNodeOrAddZombie(desc.getName());
 				if(node!=null)
 				{
@@ -313,7 +313,7 @@ public class ComponentTreePanel extends JSplitPane
 								
 								access.scheduleStep(new IComponentStep()
 								{
-									public static final String XML_CLASSNAME = "proxykill";
+									@XMLClassname("proxykill")
 									public Object	execute(IInternalAccess ia)
 									{
 										SServiceProvider.getService(ia.getServiceProvider(), IRemoteServiceManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
@@ -751,7 +751,7 @@ public class ComponentTreePanel extends JSplitPane
 
 		access.scheduleStep(new IComponentStep()
 		{
-			public static final String XML_CLASSNAME = "init";
+			@XMLClassname("init")
 			public Object execute(IInternalAccess ia)
 			{
 				final Future ret = new Future();
@@ -907,7 +907,7 @@ public class ComponentTreePanel extends JSplitPane
 	{
 		access.scheduleStep(new IComponentStep()
 		{
-			public static final String XML_CLASSNAME = "dispose";
+			@XMLClassname("dispose")
 			public Object execute(IInternalAccess ia)
 			{
 				SServiceProvider.getService(ia.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)

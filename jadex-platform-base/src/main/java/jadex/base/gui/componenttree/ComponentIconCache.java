@@ -7,10 +7,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.Future;
 import jadex.commons.concurrent.DelegationResultListener;
-import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
-import jadex.commons.service.IServiceProvider;
-import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
 
 import java.util.HashMap;

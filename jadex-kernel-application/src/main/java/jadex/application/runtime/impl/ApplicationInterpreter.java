@@ -39,7 +39,6 @@ import jadex.commons.IIntermediateFuture;
 import jadex.commons.IIntermediateResultListener;
 import jadex.commons.IntermediateFuture;
 import jadex.commons.SReflect;
-import jadex.commons.SUtil;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.concurrent.CollectionResultListener;
 import jadex.commons.concurrent.CounterResultListener;
@@ -55,6 +54,7 @@ import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.ServiceNotFoundException;
 import jadex.javaparser.IValueFetcher;
 import jadex.javaparser.SimpleValueFetcher;
+import jadex.xml.annotation.XMLClassname;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -193,7 +193,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 		// Schedule the futures (first) init step.
 		scheduleStep(new IComponentStep()
 		{
-			public static final String XML_CLASSNAME = "init"; 
+			@XMLClassname("init")
 			public Object execute(final IInternalAccess ia)
 			{
 				final List futures = new ArrayList();
@@ -649,7 +649,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 		// Checks if loaded model is defined in the application component types
 		return scheduleStep(new IComponentStep()
 		{
-			public static final String XML_CLASSNAME = "created"; 
+			@XMLClassname("created")
 			public Object execute(IInternalAccess ia)
 			{
 				IComponentIdentifier cid = desc.getName();
@@ -713,7 +713,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 	{
 		return scheduleStep(new IComponentStep()
 		{
-			public static final String XML_CLASSNAME = "destroyed"; 
+			@XMLClassname("destroyed")
 			public Object execute(IInternalAccess ia)
 			{
 		//		System.out.println("comp removed: "+desc.getName()+" "+this.getComponentIdentifier());
@@ -1321,7 +1321,7 @@ public class ApplicationInterpreter implements IApplication, IComponentInstance,
 //					{
 						scheduleStep(new IComponentStep()
 						{
-							public static final String XML_CLASSNAME = "createChild"; 
+							@XMLClassname("createChild")
 							public Object execute(IInternalAccess ia)
 							{
 								createComponent(components, ces, i+1, inited);

@@ -13,7 +13,6 @@ import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.commons.gui.EditableList;
 import jadex.commons.gui.EditableListEvent;
 import jadex.commons.service.IService;
-import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.library.ILibraryService;
 import jadex.commons.service.library.ILibraryServiceListener;
 

@@ -20,7 +20,6 @@ import jadex.commons.IFuture;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SGUI;
-import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.collection.SCollection;
@@ -35,6 +34,7 @@ import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.library.ILibraryService;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
+import jadex.xml.annotation.XMLClassname;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -286,7 +286,7 @@ public class StarterPanel extends JPanel
 				{
 					exta.scheduleStep(new IComponentStep()
 					{
-						public static final String XML_CLASSNAME = "start";
+						@XMLClassname("start")
 						public Object execute(IInternalAccess ia)
 						{
 							SServiceProvider.getService(ia.getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
@@ -995,7 +995,7 @@ public class StarterPanel extends JPanel
 	{
 		exta.scheduleStep(new IComponentStep()
 		{
-			public static final String XML_CLASSNAME = "create-arguments";
+			@XMLClassname("create-arguments")
 			public Object execute(IInternalAccess ia)
 			{
 				SServiceProvider.getService(ia.getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
@@ -1456,7 +1456,7 @@ public class StarterPanel extends JPanel
 		final Future ret = new Future(); 
 		exta.scheduleStep(new IComponentStep()
 		{
-			public static final String XML_CLASSNAME = "create-component";
+			@XMLClassname("create-component")
 			public Object execute(IInternalAccess ia)
 			{
 				SServiceProvider.getService(ia.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)

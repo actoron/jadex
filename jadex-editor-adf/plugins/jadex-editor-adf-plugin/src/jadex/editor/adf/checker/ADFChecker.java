@@ -18,6 +18,7 @@ import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jdt.core.JavaCore;
 
 /**
  *  Project builder that loads XML ADFs and adds the errors
@@ -139,8 +140,8 @@ public class ADFChecker extends IncrementalProjectBuilder
 	{
 		boolean	checked	= false;
 		
-		// Only check non-derived resources (i.e. not the copies of XMLs in the bin/classes folders).
-		if(!resource.isDerived() &&	resource instanceof IFile)
+		// Only check resources in source folders.
+		if(resource instanceof IFile && JavaCore.create(resource.getProject()).isOnClasspath(resource))
 		{
 			IFile file = (IFile)resource;
 			for(int i=0; i<factories.length; i+=2)

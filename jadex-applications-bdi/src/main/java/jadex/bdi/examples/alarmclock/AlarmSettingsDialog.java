@@ -10,6 +10,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.commons.SGUI;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.commons.service.clock.IClockService;
+import jadex.xml.annotation.XMLClassname;
 
 import java.awt.Dialog;
 import java.awt.Dimension;
@@ -182,7 +183,7 @@ public class AlarmSettingsDialog extends JDialog
 			{
 				agent.scheduleStep(new IComponentStep()
 				{
-					public static final String XML_CLASSNAME = "setTime"; 
+					@XMLClassname("setTime")
 					public Object execute(IInternalAccess ia)
 					{
 						IBDIInternalAccess bia = (IBDIInternalAccess)ia;
@@ -243,7 +244,7 @@ public class AlarmSettingsDialog extends JDialog
 						
 						agent.scheduleStep(new IComponentStep()
 						{
-							public static final String XML_CLASSNAME = "play"; 
+							@XMLClassname("play")
 							public Object execute(IInternalAccess ia)
 							{
 								IBDIInternalAccess bia = (IBDIInternalAccess)ia;

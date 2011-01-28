@@ -14,6 +14,7 @@ import jadex.commons.IFuture;
 import jadex.commons.SReflect;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
+import jadex.xml.annotation.XMLClassname;
 
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
@@ -194,7 +195,7 @@ public class UserInteractionTask implements ITask
 		                
 		                instance.scheduleStep(new IComponentStep()
 						{
-		                	public static final String XML_CLASSNAME = "rem"; 
+		                	@XMLClassname("rem")
 							public Object execute(IInternalAccess ia)
 							{
 								ia.removeComponentListener(lis);

@@ -7,15 +7,14 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.ChangeEvent;
 import jadex.commons.SGUI;
-import jadex.commons.service.ProvidedServiceInfo;
 import jadex.commons.service.RequiredServiceInfo;
 import jadex.micro.MicroAgent;
-import jadex.micro.MicroAgentMetaInfo;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
+import jadex.xml.annotation.XMLClassname;
 
 import java.awt.BorderLayout;
 import java.awt.event.WindowAdapter;
@@ -92,7 +91,7 @@ public class DisplayAgent extends MicroAgent
 				
 				access.scheduleStep(new IComponentStep()
 				{
-					public static final String XML_CLASSNAME = "dispose"; 
+					@XMLClassname("dispose")
 					public Object execute(IInternalAccess ia)
 					{
 						ia.addComponentListener(new IComponentListener()

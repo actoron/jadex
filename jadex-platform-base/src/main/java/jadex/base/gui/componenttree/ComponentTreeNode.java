@@ -3,9 +3,7 @@ package jadex.base.gui.componenttree;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
-import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.IInternalAccess;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.concurrent.DelegationResultListener;
@@ -14,7 +12,6 @@ import jadex.commons.service.IService;
 import jadex.commons.service.IServiceContainer;
 import jadex.commons.service.SServiceProvider;
 
-import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.List;
 

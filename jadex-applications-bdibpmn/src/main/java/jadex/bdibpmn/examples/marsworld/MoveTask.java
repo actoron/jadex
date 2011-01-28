@@ -11,6 +11,7 @@ import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.service.clock.IClockService;
+import jadex.xml.annotation.XMLClassname;
 
 import java.util.Iterator;
 import java.util.Set;
@@ -72,7 +73,7 @@ public class MoveTask extends AbstractTask
 				{
 					scope.scheduleStep(new IComponentStep()
 					{
-						public static final String XML_CLASSNAME = "addTarget"; 
+						@XMLClassname("addTarget")
 						public Object execute(IInternalAccess ia)
 						{
 							IBDIInternalAccess bia = (IBDIInternalAccess)ia;

@@ -20,6 +20,7 @@ import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.commons.service.SServiceProvider;
 import jadex.tools.jcc.AgentControlCenter;
 import jadex.tools.starter.StarterPlugin;
+import jadex.xml.annotation.XMLClassname;
 
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -217,7 +218,7 @@ public class ConversationPlugin extends AbstractJCCPlugin
 		
 		((AgentControlCenter)getJCC()).getAgent().scheduleStep(new IComponentStep()
 		{
-			public static final String XML_CLASSNAME = "fipamsg"; 
+			@XMLClassname("fipamsg")
 			public Object execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess	scope	= (IBDIInternalAccess)ia;
@@ -241,7 +242,7 @@ public class ConversationPlugin extends AbstractJCCPlugin
 	{
 		((AgentControlCenter)getJCC()).getAgent().scheduleStep(new IComponentStep()
 		{
-			public static final String XML_CLASSNAME = "process"; 
+			@XMLClassname("process")
 			public Object execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess	scope	= (IBDIInternalAccess)ia;

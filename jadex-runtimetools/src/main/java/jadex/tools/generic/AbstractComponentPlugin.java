@@ -10,6 +10,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.concurrent.SwingDefaultResultListener;
+import jadex.xml.annotation.XMLClassname;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -56,7 +57,8 @@ public abstract class AbstractComponentPlugin extends AbstractGenericPlugin
 	{
 		getJCC().getExternalAccess().scheduleStep(new IComponentStep()
 		{
-			public static final String XML_CLASSNAME = "refresh-combo";
+//			public static final String XML_CLASSNAME = "refresh-combo";
+			@XMLClassname("refresh-combo")
 			public Object execute(IInternalAccess ia)
 			{
 				ia.getRequiredService("cms")
@@ -113,9 +115,11 @@ public abstract class AbstractComponentPlugin extends AbstractGenericPlugin
 		final Future ret = new Future();
 		final IComponentIdentifier cid = (IComponentIdentifier)element;
 		
-		getJCC().getExternalAccess().scheduleStep(new IComponentStep()
+		getJCC().getExternalAccess().scheduleStep(
+			new IComponentStep()
 		{
-			public static final String XML_CLASSNAME = "create-panel";
+//			public static final String XML_CLASSNAME = "create-panel";
+			@XMLClassname("create-panel")
 			public Object execute(IInternalAccess ia)
 			{
 				ia.getRequiredService("cms").addResultListener(new SwingDefaultResultListener(centerp)

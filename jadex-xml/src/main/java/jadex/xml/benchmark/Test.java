@@ -155,7 +155,7 @@ public class Test //extends TestCase
 	/**
 	 * Test if the order of an array is preserved when (de-)serializing.
 	 */
-	private void testArrayOrder() throws Exception
+	public void testArrayOrder() throws Exception
 	{
 		Object[][] data = new Object[1][8];
 

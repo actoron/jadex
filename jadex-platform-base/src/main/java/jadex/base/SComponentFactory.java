@@ -1,10 +1,7 @@
 package jadex.base;
 
-import jadex.base.gui.plugin.IControlCenter;
 import jadex.bridge.ComponentFactorySelector;
 import jadex.bridge.IComponentFactory;
-import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;

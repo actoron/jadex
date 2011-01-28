@@ -8,6 +8,7 @@ import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.ChangeEvent;
+import jadex.xml.annotation.XMLClassname;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -111,7 +112,7 @@ public class ServerPlanG1 extends Plan	implements Runnable
 				final Socket	client	= server.accept();
 				getExternalAccess().scheduleStep(new IComponentStep()
 				{
-					public static final String XML_CLASSNAME = "translate"; 
+					@XMLClassname("translate")
 					public Object execute(IInternalAccess ia)
 					{
 						IBDIInternalAccess	scope	= (IBDIInternalAccess)ia;

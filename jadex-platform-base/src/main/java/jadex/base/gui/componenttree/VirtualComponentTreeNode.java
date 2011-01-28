@@ -8,11 +8,10 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.Future;
-import jadex.commons.IFuture;
 import jadex.commons.concurrent.DelegationResultListener;
-import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.micro.IMicroExternalAccess;
+import jadex.xml.annotation.XMLClassname;
 
 import java.util.Collections;
 import java.util.List;
@@ -106,7 +105,7 @@ public class VirtualComponentTreeNode extends AbstractComponentTreeNode implemen
 				final IComponentIdentifier cid = desc.getName();
 				exta.scheduleStep(new IComponentStep()
 				{
-					public static final String XML_CLASSNAME = "changed"; 
+					@XMLClassname("changed")
 					public Object execute(IInternalAccess ia)
 					{
 						ProxyAgent pa = (ProxyAgent)ia;

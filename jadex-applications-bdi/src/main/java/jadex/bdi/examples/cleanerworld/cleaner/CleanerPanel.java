@@ -12,6 +12,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.IFuture;
 import jadex.commons.concurrent.SwingDefaultResultListener;
+import jadex.xml.annotation.XMLClassname;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -60,7 +61,7 @@ class CleanerPanel extends JPanel
 			{
 				IFuture	fut	= agent.scheduleStep(new IComponentStep()
 				{
-					public static final String XML_CLASSNAME = "copy"; 
+					@XMLClassname("copy")
 					public Object execute(IInternalAccess ia)
 					{
 						IBDIInternalAccess bia = (IBDIInternalAccess)ia;

@@ -10,6 +10,7 @@ import jadex.commons.IIntermediateFuture;
 import jadex.commons.IntermediateFuture;
 import jadex.commons.SUtil;
 import jadex.commons.ThreadSuspendable;
+import jadex.xml.annotation.XMLClassname;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -107,7 +108,7 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 	//			System.out.println("Finalize called on: "+proxy);
 				rsms.component.scheduleStep(new IComponentStep()
 				{
-					public static final String XML_CLASSNAME = "fin"; 
+					@XMLClassname("fin")
 					public Object execute(IInternalAccess ia)
 					{
 						rsms.getRemoteReferenceModule().decProxyCount(pr.getRemoteReference());

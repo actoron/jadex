@@ -55,6 +55,7 @@ public class SimCenterPanel extends JPanel
 	{
 		super(new BorderLayout());
 		this.simcenter = simcenter;
+		this.timemode = 2;
 		
 		dateformat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss S");
 		

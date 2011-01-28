@@ -7,6 +7,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.ChangeEvent;
 import jadex.commons.SGUI;
+import jadex.xml.annotation.XMLClassname;
 
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -30,7 +31,7 @@ public class EnvironmentGui	extends JFrame
 		
 		agent.scheduleStep(new IComponentStep()
 		{
-			public static final String XML_CLASSNAME = "start"; 
+			@XMLClassname("start")
 			public Object execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
@@ -74,7 +75,7 @@ public class EnvironmentGui	extends JFrame
 		
 		agent.scheduleStep(new IComponentStep()
 		{
-			public static final String XML_CLASSNAME = "dispose"; 
+			@XMLClassname("dispose")
 			public Object execute(IInternalAccess ia)
 			{
 				ia.addComponentListener(new IComponentListener()

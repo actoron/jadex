@@ -262,21 +262,7 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 				{
 					public void timeEventOccurred(long currenttime)
 					{
-						interpreter.scheduleStep(new IComponentStep()
-						{
-							public static final String XML_CLASSNAME = "teo1"; 
-							public Object execute(IInternalAccess ia)
-							{
-								timers.remove(ts[0]);
-								run.execute(ia);
-								return null;
-							}
-							
-							public String toString()
-							{
-								return getComponentIdentifier().getLocalName()+".waitForDue("+time+")_#"+this.hashCode();
-							}
-						});
+						interpreter.scheduleStep(new ExecuteWaitForStep(ts, run));
 					}
 					
 					public String toString()
@@ -316,21 +302,7 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 				{
 					public void timeEventOccurred(final long currenttime)
 					{
-						interpreter.scheduleStep(new IComponentStep()
-						{
-							public static final String XML_CLASSNAME = "teo2"; 
-							public Object execute(IInternalAccess ia)
-							{
-								timers.remove(ts[0]);
-								run.execute(ia);
-								return null;
-							}
-							
-							public String toString()
-							{
-								return "microagent.waitForTickDue()_#"+this.hashCode();
-							}
-						});
+						interpreter.scheduleStep(new ExecuteWaitForStep(ts, run));
 					}
 				});
 				timers.add(ts[0]);
@@ -727,7 +699,6 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 		}
 	}
 
-	
 	//-------- helper classes --------
 	
 	/**
@@ -789,4 +760,31 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 		}
 	}
 
+	/**
+	 *  Step to execute a wait for entry.
+	 */
+	public static class ExecuteWaitForStep implements IComponentStep
+	{
+		private final ITimer[]			ts;
+
+		private final IComponentStep	run;
+
+		public ExecuteWaitForStep(ITimer[] ts, IComponentStep run)
+		{
+			this.ts = ts;
+			this.run = run;
+		}
+
+		public Object execute(IInternalAccess ia)
+		{
+			((MicroAgent)ia).timers.remove(ts[0]);
+			run.execute(ia);
+			return null;
+		}
+
+		public String toString()
+		{
+			return "microagent.waitFor_#"+this.hashCode();
+		}
+	}
 }

@@ -14,6 +14,7 @@ import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.service.IService;
 import jadex.commons.service.SServiceProvider;
+import jadex.xml.annotation.XMLClassname;
 
 import java.awt.BorderLayout;
 import java.util.ArrayList;
@@ -57,7 +58,9 @@ public class DefaultComponentServiceViewerPanel extends AbstractComponentViewerP
 		
 		component.scheduleStep(new IComponentStep()
 		{
-			public static final String XML_CLASSNAME = "Step"; 
+			@XMLClassname("Step")
+//			public static final String XML_CLASSNAME = "Step"; 
+			
 			public Object execute(final IInternalAccess ia)
 			{
 				final Future ret = new Future();

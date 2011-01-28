@@ -20,6 +20,7 @@ import jadex.commons.service.IInternalService;
 import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
 import jadex.component.runtime.IComponentExternalAccess;
+import jadex.xml.annotation.XMLClassname;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
@@ -75,7 +76,7 @@ public class CompositeServiceInvocationInterceptor implements IServiceInvocation
 		
 		ea.scheduleStep(new IComponentStep()
 		{
-			public static final String XML_CLASSNAME = "invoc"; 
+			@XMLClassname("invoc")
 			public Object execute(final IInternalAccess ia)
 			{
 				// A concrete component has been specified.

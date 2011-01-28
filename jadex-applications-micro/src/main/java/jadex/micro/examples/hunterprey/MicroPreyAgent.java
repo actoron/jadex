@@ -11,6 +11,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.concurrent.IResultListener;
 import jadex.micro.MicroAgent;
+import jadex.xml.annotation.XMLClassname;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -55,7 +56,7 @@ public class MicroPreyAgent extends MicroAgent
 				{
 					getExternalAccess().scheduleStep(new IComponentStep()
 					{
-						public static final String XML_CLASSNAME = "act"; 
+						@XMLClassname("act")
 						public Object execute(IInternalAccess agent)
 						{
 							// If move failed, forget about food and turn 90°.
@@ -91,7 +92,7 @@ public class MicroPreyAgent extends MicroAgent
 			{
 				getExternalAccess().scheduleStep(new IComponentStep()
 				{
-					public static final String XML_CLASSNAME = "act2"; 
+					@XMLClassname("act2")
 					public Object execute(IInternalAccess ia)
 					{
 						act();

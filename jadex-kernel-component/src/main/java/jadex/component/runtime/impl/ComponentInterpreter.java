@@ -28,7 +28,6 @@ import jadex.commons.IIntermediateFuture;
 import jadex.commons.IIntermediateResultListener;
 import jadex.commons.IntermediateFuture;
 import jadex.commons.SReflect;
-import jadex.commons.SUtil;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.concurrent.CollectionResultListener;
 import jadex.commons.concurrent.CounterResultListener;
@@ -43,16 +42,17 @@ import jadex.commons.service.RequiredServiceInfo;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.ServiceNotFoundException;
 import jadex.component.ComponentComponentFactory;
-import jadex.component.model.MConfiguration;
-import jadex.component.model.MComponentType;
 import jadex.component.model.MComponentInstance;
-import jadex.component.model.MSubcomponentType;
+import jadex.component.model.MComponentType;
+import jadex.component.model.MConfiguration;
 import jadex.component.model.MExpressionType;
 import jadex.component.model.MProvidedServiceType;
+import jadex.component.model.MSubcomponentType;
 import jadex.component.runtime.IComponent;
 import jadex.component.runtime.IComponentExternalAccess;
 import jadex.javaparser.IValueFetcher;
 import jadex.javaparser.SimpleValueFetcher;
+import jadex.xml.annotation.XMLClassname;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -190,7 +190,7 @@ public class ComponentInterpreter implements IComponent, IComponentInstance, IIn
 		// Schedule the futures (first) init step.
 		scheduleStep(new IComponentStep()
 		{
-			public static final String XML_CLASSNAME = "init"; 
+			@XMLClassname("init")
 			public Object execute(final IInternalAccess ia)
 			{
 				final List futures = new ArrayList();
@@ -1326,7 +1326,7 @@ public class ComponentInterpreter implements IComponent, IComponentInstance, IIn
 //					{
 						scheduleStep(new IComponentStep()
 						{
-							public static final String XML_CLASSNAME = "createChild"; 
+							@XMLClassname("createChild")
 							public Object execute(IInternalAccess ia)
 							{
 								createComponent(components, ces, i+1, inited);

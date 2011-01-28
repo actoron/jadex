@@ -1,9 +1,9 @@
 package jadex.xml.bean;
 
 
-import jadex.commons.SReflect;
 import jadex.commons.collection.LRU;
 import jadex.xml.SXML;
+import jadex.xml.annotation.XMLClassname;
 
 import java.beans.BeanInfo;
 import java.beans.Introspector;
@@ -87,8 +87,9 @@ public class BeanInfoIntrospector implements IBeanIntrospector
 		            }
 	            }
 	            
+	            
 	            // Get final values (val$xyz fields) for anonymous classes.
-	            if(SReflect.isAnonymousInnerClass(clazz))
+	            if(clazz.isAnonymousClass())
 	            {
 		            Field[] fields = clazz.getDeclaredFields();
 		            for(int i=0; i<fields.length; i++)
@@ -102,12 +103,21 @@ public class BeanInfoIntrospector implements IBeanIntrospector
 			            		ret.put(property_java_name, new BeanProperty(property_java_name, fields[i]));
 			            	}
 		            	}
-		            	// Must include property when writing to be able to create correct class on other side.
-		            	// Must not try to write this constant.
+		            	
+		            	// Add XML class name property if field present (hack!!!)
 		            	else if(SXML.XML_CLASSNAME.equals(property_java_name))
 		            	{
 		            		ret.put(property_java_name, new BeanProperty(property_java_name, fields[i]));
 		            	}
+		            }
+		            
+		            // Add value of xml class name annotation. (hack!!! shouldn't be property)
+		            if(!ret.containsKey(SXML.XML_CLASSNAME))
+		            {
+		            	XMLClassname xmlc = SXML.getXMLClassnameAnnotation(clazz);
+		            	
+		            	if(xmlc!=null)
+		            		ret.put(SXML.XML_CLASSNAME, xmlc);
 		            }
 	            }
 	            

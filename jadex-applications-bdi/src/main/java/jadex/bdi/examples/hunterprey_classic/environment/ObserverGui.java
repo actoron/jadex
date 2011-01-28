@@ -10,6 +10,7 @@ import jadex.bdi.runtime.IBeliefListener;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.SUtil;
+import jadex.xml.annotation.XMLClassname;
 import jadex.xml.bean.JavaReader;
 
 import java.awt.GridBagConstraints;
@@ -97,7 +98,7 @@ public class ObserverGui	extends EnvironmentGui
 	{
 		agent.scheduleStep(new IComponentStep()
 		{
-			public static final String XML_CLASSNAME = "highscore"; 
+			@XMLClassname("highscore")
 			public Object execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
@@ -188,7 +189,7 @@ public class ObserverGui	extends EnvironmentGui
 	{
 		agent.scheduleStep(new IComponentStep()
 		{
-			public static final String XML_CLASSNAME = "update"; 
+			@XMLClassname("update")
 			public Object execute(IInternalAccess ia)
 			{
 				final IBDIInternalAccess bia = (IBDIInternalAccess)ia;

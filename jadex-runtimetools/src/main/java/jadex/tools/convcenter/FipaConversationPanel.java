@@ -16,6 +16,7 @@ import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SGUI;
 import jadex.commons.SUtil;
+import jadex.xml.annotation.XMLClassname;
 import jadex.xml.bean.JavaReader;
 import jadex.xml.bean.JavaWriter;
 
@@ -281,7 +282,7 @@ public class FipaConversationPanel extends JSplitPane
 							{
 								agent.scheduleStep(new IComponentStep()
 								{
-									public static final String XML_CLASSNAME = "reply"; 
+									@XMLClassname("reply")
 									public Object execute(IInternalAccess ia)
 									{
 										IBDIInternalAccess	scope	= (IBDIInternalAccess)ia;
@@ -345,7 +346,7 @@ public class FipaConversationPanel extends JSplitPane
 				final IMessageEvent[]	msgs	= (IMessageEvent[])regmsgs.toArray(new IMessageEvent[regmsgs.size()]);
 				agent.scheduleStep(new IComponentStep()
 				{
-					public static final String XML_CLASSNAME = "deregister"; 
+					@XMLClassname("deregister")
 					public Object execute(IInternalAccess ia)
 					{
 						for(int i=0; i<msgs.length; i++)
@@ -652,7 +653,7 @@ public class FipaConversationPanel extends JSplitPane
 	{
 		agent.scheduleStep(new IComponentStep()
 		{
-			public static final String XML_CLASSNAME = "sendM"; 
+			@XMLClassname("sendM")
 			public Object execute(IInternalAccess ia)
 			{
 				final IBDIInternalAccess	scope	= (IBDIInternalAccess)ia;

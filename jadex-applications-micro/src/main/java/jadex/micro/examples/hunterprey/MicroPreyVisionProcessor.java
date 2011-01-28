@@ -14,6 +14,7 @@ import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.service.SServiceProvider;
 import jadex.micro.IMicroExternalAccess;
+import jadex.xml.annotation.XMLClassname;
 
 /**
  *  Dumb prey vision processer.
@@ -49,7 +50,7 @@ public class MicroPreyVisionProcessor	extends	SimplePropertyObject	implements IP
 						final IMicroExternalAccess	exta	= (IMicroExternalAccess)result;
 						exta.scheduleStep(new IComponentStep()
 						{
-							public static final String XML_CLASSNAME = "food"; 
+							@XMLClassname("food")
 							public Object execute(IInternalAccess ia)
 							{
 								MicroPreyAgent	mp	= (MicroPreyAgent)agent;

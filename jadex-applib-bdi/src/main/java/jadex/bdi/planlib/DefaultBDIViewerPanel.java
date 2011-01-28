@@ -14,6 +14,7 @@ import jadex.commons.IFuture;
 import jadex.commons.SReflect;
 import jadex.commons.concurrent.CollectionResultListener;
 import jadex.commons.concurrent.DelegationResultListener;
+import jadex.xml.annotation.XMLClassname;
 
 import java.awt.BorderLayout;
 import java.util.ArrayList;
@@ -61,7 +62,7 @@ public class DefaultBDIViewerPanel extends AbstractComponentViewerPanel
 		
 		component.scheduleStep(new IComponentStep()
 		{
-			public static final String XML_CLASSNAME = "createPanels"; 
+			@XMLClassname("createPanels")
 			public Object execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess	scope	= (IBDIInternalAccess)ia;

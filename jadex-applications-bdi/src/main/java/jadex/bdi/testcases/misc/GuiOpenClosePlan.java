@@ -9,6 +9,7 @@ import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.SGUI;
+import jadex.xml.annotation.XMLClassname;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -48,7 +49,7 @@ public class GuiOpenClosePlan extends Plan
 				{
 					getExternalAccess().scheduleStep(new IComponentStep()
 					{
-						public static final String XML_CLASSNAME = "closed"; 
+						@XMLClassname("closed")
 						public Object execute(IInternalAccess ia)
 						{
 							IBDIInternalAccess	scope	= (IBDIInternalAccess)ia;

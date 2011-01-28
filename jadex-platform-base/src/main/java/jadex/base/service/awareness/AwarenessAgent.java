@@ -17,6 +17,7 @@ import jadex.commons.service.clock.IClockService;
 import jadex.commons.service.threadpool.IThreadPoolService;
 import jadex.micro.MicroAgent;
 import jadex.micro.MicroAgentMetaInfo;
+import jadex.xml.annotation.XMLClassname;
 import jadex.xml.bean.JavaReader;
 import jadex.xml.bean.JavaWriter;
 
@@ -403,7 +404,7 @@ public class AwarenessAgent extends MicroAgent
 	{
 		scheduleStep(new IComponentStep()
 		{
-			public static final String XML_CLASSNAME = "rem"; 
+			@XMLClassname("rem")
 			public Object execute(IInternalAccess ia)
 			{
 				List todel = autodelete? new ArrayList(): null;
@@ -496,7 +497,7 @@ public class AwarenessAgent extends MicroAgent
 		
 		scheduleStep(new IComponentStep()
 		{
-			public static final String XML_CLASSNAME = "send"; 
+			@XMLClassname("send")
 			public Object execute(IInternalAccess ia)
 			{
 				if(sendid.equals(getSendId()))

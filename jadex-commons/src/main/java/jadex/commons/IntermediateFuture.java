@@ -204,7 +204,7 @@ public class IntermediateFuture extends Future	implements	IIntermediateFuture
     		listeners.add(listener);
     	}
     	
-    	if(inter!=null)
+    	if(intermediate && inter!=null)
     	{
     		IIntermediateResultListener lis =(IIntermediateResultListener)listener;
     		for(int i=0; i<inter.length; i++)

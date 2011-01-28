@@ -14,9 +14,9 @@ import jadex.commons.Property;
 import jadex.commons.SGUI;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.SwingDefaultResultListener;
-import jadex.commons.service.IServiceProvider;
 import jadex.commons.service.library.ILibraryService;
 import jadex.xml.PropertiesXMLHelper;
+import jadex.xml.annotation.XMLClassname;
 
 import java.awt.Cursor;
 import java.awt.Dimension;
@@ -100,7 +100,7 @@ public class ControlCenter implements IControlCenter
 
 		access.scheduleStep(new IComponentStep()
 		{
-			public static final String XML_CLASSNAME = "open-window"; 
+			@XMLClassname("open-window")
 			public Object execute(IInternalAccess ia)
 			{
 				ia.getRequiredService("libservice")			.addResultListener(new SwingDefaultResultListener(window)
@@ -418,7 +418,7 @@ public class ControlCenter implements IControlCenter
 			final Properties	props	= this.props;
 			access.scheduleStep(new IComponentStep()
 			{
-				public static final String XML_CLASSNAME = "svae-project";
+				@XMLClassname("save-project")
 				public Object execute(IInternalAccess ia)
 				{
 					ia.getRequiredService("libservice")

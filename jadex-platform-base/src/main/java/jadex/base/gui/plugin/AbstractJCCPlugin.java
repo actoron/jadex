@@ -11,6 +11,7 @@ import jadex.commons.IFuture;
 import jadex.commons.Properties;
 import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.service.library.ILibraryService;
+import jadex.xml.annotation.XMLClassname;
 
 import javax.swing.JComponent;
 import javax.swing.JMenu;
@@ -171,7 +172,7 @@ public abstract class AbstractJCCPlugin implements IControlCenterPlugin
 		{
 			jcc.getExternalAccess().scheduleStep(new IComponentStep()
 			{
-				public static final String XML_CLASSNAME = "get-classloader";
+				@XMLClassname("get-classloader")
 				public Object execute(IInternalAccess ia)
 				{
 					ia.getRequiredService("cms").addResultListener(new DelegationResultListener(ret)
@@ -199,7 +200,7 @@ public abstract class AbstractJCCPlugin implements IControlCenterPlugin
 		{
 			jcc.getExternalAccess().scheduleStep(new IComponentStep()
 			{
-				public static final String XML_CLASSNAME = "get-libraryservice";
+				@XMLClassname("get-libraryservice")
 				public Object execute(IInternalAccess ia)
 				{
 					ia.getRequiredService("libservice").addResultListener(new DelegationResultListener(ret)

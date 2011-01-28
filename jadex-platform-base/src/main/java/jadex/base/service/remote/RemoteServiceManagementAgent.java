@@ -1,7 +1,6 @@
 package jadex.base.service.remote;
 
 import jadex.base.fipa.SFipa;
-import jadex.base.service.remote.commands.RemoteMethodInvocationCommand;
 import jadex.base.service.remote.commands.RemoteResultCommand;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.MessageType;
@@ -16,7 +15,6 @@ import jadex.xml.reader.Reader;
 import jadex.xml.writer.Writer;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -112,6 +110,8 @@ public class RemoteServiceManagementAgent extends MicroAgent
 					
 					if(content instanceof String)
 					{
+						String	orig	= (String)content;
+						
 						// Catch decode problems.
 						// Should be ignored or be a warning.
 						try
@@ -133,7 +133,7 @@ public class RemoteServiceManagementAgent extends MicroAgent
 								{
 //									content	= null;
 									content = new RemoteResultCommand(null, new RuntimeException("Errors during XML decoding: "+errors), callid);
-									getLogger().warning("Remote service management service could not decode message."+content);
+									getLogger().warning("Remote service management service could not decode message."+orig);
 								}
 							}
 						}
@@ -141,7 +141,7 @@ public class RemoteServiceManagementAgent extends MicroAgent
 						{
 //							content	= null;
 							content = new RemoteResultCommand(null, e, callid);
-							getLogger().warning("Remote service management service could not decode message."+content);
+							getLogger().warning("Remote service management service could not decode message."+orig);
 						}
 					}
 					

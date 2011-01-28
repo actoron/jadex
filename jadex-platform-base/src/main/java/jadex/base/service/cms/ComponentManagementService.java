@@ -20,7 +20,6 @@ import jadex.bridge.IRemoteServiceManagementService;
 import jadex.bridge.ISearchConstraints;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
-import jadex.commons.SUtil;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.CollectionResultListener;
@@ -2356,8 +2355,6 @@ public abstract class ComponentManagementService extends BasicService implements
 	 */
 	protected void notifyListeners(IComponentIdentifier cid, IComponentDescription desc)
 	{
-		Thread.dumpStack();
-		
 		ICMSComponentListener[]	alisteners;
 		synchronized(listeners)
 		{

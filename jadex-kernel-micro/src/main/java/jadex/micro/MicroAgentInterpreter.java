@@ -325,41 +325,7 @@ public class MicroAgentInterpreter implements IComponentInstance
 	{
 //		System.out.println("msgrec: "+getAgentAdapter().getComponentIdentifier()+" "+message);
 //		IFuture ret = scheduleStep(new ICommand()
-		scheduleStep(new IComponentStep()
-		{
-			public static final String XML_CLASSNAME = "msg"; 
-			public Object execute(IInternalAccess ia)
-			{
-				boolean done = false;
-				if(messagehandlers!=null)
-				{
-					for(int i=0; i<messagehandlers.size(); i++)
-					{
-						IMessageHandler mh = (IMessageHandler)messagehandlers.get(i);
-						if(mh.getFilter().filter(message))
-						{
-							mh.handleMessage(message.getParameterMap(), message.getMessageType());
-							if(mh.isRemove())
-							{
-								messagehandlers.remove(i);
-							}
-							done = true;
-						}
-					}
-				}
-				
-				if(!done)
-				{
-					microagent.messageArrived(Collections.unmodifiableMap(message.getParameterMap()), message.getMessageType());
-				}
-				return null;
-			}
-			
-			public String toString()
-			{
-				return "microagent.messageArrived("+message+")_#"+this.hashCode();
-			}
-		});
+		scheduleStep(new HandleMessageStep(message));
 	}
 
 	/**
@@ -994,5 +960,55 @@ public class MicroAgentInterpreter implements IComponentInstance
 	{
 		if(messagehandlers!=null)
 			messagehandlers.remove(handler);
+	}
+	
+	/**
+	 *  Step to handle a message.
+	 */
+	public static class HandleMessageStep implements IComponentStep
+	{
+		private final IMessageAdapter	message;
+
+		public static final String XML_CLASSNAME = "msg";
+
+		public HandleMessageStep(IMessageAdapter message)
+		{
+			this.message = message;
+		}
+
+		public Object execute(IInternalAccess ia)
+		{
+			MicroAgent	microagent	= (MicroAgent)ia;
+			MicroAgentInterpreter	ip	= microagent.interpreter;
+			
+			boolean done = false;
+			if(ip.messagehandlers!=null)
+			{
+				for(int i=0; i<ip.messagehandlers.size(); i++)
+				{
+					IMessageHandler mh = (IMessageHandler)ip.messagehandlers.get(i);
+					if(mh.getFilter().filter(message))
+					{
+						mh.handleMessage(message.getParameterMap(), message.getMessageType());
+						if(mh.isRemove())
+						{
+							ip.messagehandlers.remove(i);
+						}
+						done = true;
+					}
+				}
+			}
+			
+			if(!done)
+			{
+				microagent.messageArrived(Collections.unmodifiableMap(message.getParameterMap()), message.getMessageType());
+			}
+			return null;
+		}
+
+		public String toString()
+		{
+			return "microagent.messageArrived("+message+")_#"+this.hashCode();
+		}
 	}
 }

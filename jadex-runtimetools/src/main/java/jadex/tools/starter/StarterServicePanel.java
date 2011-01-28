@@ -27,6 +27,7 @@ import jadex.commons.service.SServiceProvider;
 import jadex.tools.common.modeltree.FileNode;
 import jadex.tools.common.modeltree.IExplorerTreeNode;
 import jadex.tools.common.modeltree.ModelExplorer;
+import jadex.xml.annotation.XMLClassname;
 
 import java.awt.BorderLayout;
 import java.awt.Cursor;
@@ -220,7 +221,7 @@ public class StarterServicePanel extends JPanel implements ICMSComponentListener
 				
 				jcc.getExternalAccess().scheduleStep(new IComponentStep()
 				{
-					public static final String XML_CLASSNAME = "add-component-listener";
+					@XMLClassname("add-component-listener")
 					public Object execute(IInternalAccess ia)
 					{
 						ia.getRequiredService("cms").addResultListener(new DefaultResultListener()

@@ -26,6 +26,7 @@ import jadex.commons.service.annotation.Uncached;
 import jadex.commons.service.clock.IClockService;
 import jadex.commons.service.library.ILibraryService;
 import jadex.micro.ExternalAccess;
+import jadex.xml.annotation.XMLClassname;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
@@ -810,7 +811,7 @@ public class RemoteReferenceModule
 		
 		rsms.getComponent().scheduleStep(new IComponentStep()
 		{
-			public static final String XML_CLASSNAME = "startRenewal"; 
+			@XMLClassname("startRenewal")
 			public Object execute(IInternalAccess ia)
 			{
 				if(renewid == RemoteReferenceModule.this.renewid)
@@ -899,7 +900,7 @@ public class RemoteReferenceModule
 		
 		rsms.getComponent().scheduleStep(new IComponentStep()
 		{
-			public static final String XML_CLASSNAME = "startRemoval"; 
+			@XMLClassname("startRemoval")
 			public Object execute(IInternalAccess ia)
 			{
 				if(removeid == RemoteReferenceModule.this.removeid)

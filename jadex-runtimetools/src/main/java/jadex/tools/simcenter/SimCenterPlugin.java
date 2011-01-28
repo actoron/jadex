@@ -112,7 +112,8 @@ public class SimCenterPlugin extends AbstractJCCPlugin
 				scpanel.updateView();
 			}
 		});
-		time_long.setSelected(true);
+		if(scpanel.getTimeMode()==0)
+			time_long.setSelected(true);
 		group.add(time_long);
 		menu.add(time_long);
 		
@@ -124,6 +125,8 @@ public class SimCenterPlugin extends AbstractJCCPlugin
 				scpanel.updateView();
 			}
 		});
+		if(scpanel.getTimeMode()==1)
+			time_rel.setSelected(true);
 		group.add(time_rel);
 		menu.add(time_rel);
 		
@@ -135,6 +138,8 @@ public class SimCenterPlugin extends AbstractJCCPlugin
 				scpanel.updateView();
 			}
 		});
+		if(scpanel.getTimeMode()==2)
+			time_date.setSelected(true);
 		group.add(time_date);
 		menu.add(time_date);
 		

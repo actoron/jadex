@@ -16,6 +16,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.ChangeEvent;
 import jadex.commons.SGUI;
+import jadex.xml.annotation.XMLClassname;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -55,7 +56,7 @@ public class PotentialFrame extends JFrame
 		
 		agent.scheduleStep(new IComponentStep()
 		{
-			public static final String XML_CLASSNAME = "dispose"; 
+			@XMLClassname("dispose")
 			public Object execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;

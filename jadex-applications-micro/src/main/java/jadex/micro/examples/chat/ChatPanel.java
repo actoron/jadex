@@ -12,6 +12,7 @@ import jadex.commons.IRemoteChangeListener;
 import jadex.commons.SGUI;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.DelegationResultListener;
+import jadex.xml.annotation.XMLClassname;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
@@ -77,7 +78,7 @@ public class ChatPanel extends JPanel
 		
 		agent.scheduleStep(new IComponentStep()
 		{
-			public static final String XML_CLASSNAME = "addlistener"; 
+			@XMLClassname("addlistener")
 			public Object execute(IInternalAccess ia)
 			{
 				final Future ret = new Future();
@@ -136,7 +137,7 @@ public class ChatPanel extends JPanel
 		
 		agent.scheduleStep(new IComponentStep()
 		{
-			public static final String XML_CLASSNAME = "dispose"; 
+			@XMLClassname("dispose")
 			public Object execute(IInternalAccess ia)
 			{
 				ia.addComponentListener(new IComponentListener()

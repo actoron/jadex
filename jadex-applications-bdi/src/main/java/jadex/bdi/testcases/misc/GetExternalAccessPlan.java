@@ -14,6 +14,7 @@ import jadex.commons.IFuture;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.service.SServiceProvider;
+import jadex.xml.annotation.XMLClassname;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -54,7 +55,7 @@ public class GetExternalAccessPlan extends Plan
 				
 				exta.scheduleStep(new IComponentStep()
 				{
-					public static final String XML_CLASSNAME = "test"; 
+					@XMLClassname("test")
 					public Object execute(IInternalAccess ia)
 					{
 						IBDIInternalAccess bia = (IBDIInternalAccess)ia;

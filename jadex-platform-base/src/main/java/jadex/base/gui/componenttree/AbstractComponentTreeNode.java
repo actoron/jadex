@@ -2,6 +2,7 @@ package jadex.base.gui.componenttree;
 
 import jadex.commons.Future;
 import jadex.commons.IFuture;
+import jadex.commons.SUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -208,6 +209,7 @@ public abstract class AbstractComponentTreeNode	implements IComponentTreeNode
 //		{
 //			rte	= e;
 //		}
+//		assert false || checkChildren(children);
 		
 //		System.err.println(""+model.hashCode()+" setChildren queued: "+children);
 		SwingUtilities.invokeLater(new Runnable()
@@ -217,6 +219,7 @@ public abstract class AbstractComponentTreeNode	implements IComponentTreeNode
 				boolean	dorecurse	= recurse;
 				searching	= false;
 				recurse	= false;
+				
 				List	oldcs	= AbstractComponentTreeNode.this.children;
 				AbstractComponentTreeNode.this.children	= children;
 				List	added	= new ArrayList();
@@ -303,6 +306,29 @@ public abstract class AbstractComponentTreeNode	implements IComponentTreeNode
 		return ret;
 	}
 	
+	/**
+	 *  Check the children for validity.
+	 *  I.e. it is not allowed to have two equal childrens in the list.
+	 */
+	protected boolean checkChildren(List children)
+	{
+		// Called by assert so throw exception when called and invalid.
+		if(children!=null && children.size()>1)
+		{
+			for(int i=0; i<children.size()-1; i++)
+			{
+				for(int j=i+1; j<children.size(); j++)
+				{
+					if(SUtil.equals(children.get(i), children.get(j)))
+					{
+						throw new RuntimeException("Found equal children: "+children);
+					}
+				}
+			}
+		}
+		return true;
+	}
+
 	/**
 	 *  Get the model.
 	 */

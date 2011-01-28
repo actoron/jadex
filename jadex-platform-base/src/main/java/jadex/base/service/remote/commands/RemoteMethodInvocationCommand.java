@@ -5,7 +5,6 @@ import jadex.base.service.remote.RemoteReference;
 import jadex.base.service.remote.RemoteServiceManagementService;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
-import jadex.commons.SReflect;
 import jadex.commons.concurrent.IResultListener;
 import jadex.micro.IMicroExternalAccess;
 
@@ -177,7 +176,7 @@ public class RemoteMethodInvocationCommand implements IRemoteCommand
 //			System.out.println("invoke: "+m);
 			
 			// Necessary due to Java inner class bug 4071957
-			if(SReflect.isAnonymousInnerClass(target.getClass()))
+			if(target.getClass().isAnonymousClass())
 				m.setAccessible(true);
 			
 			Object res = m.invoke(target, parametervalues);

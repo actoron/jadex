@@ -9,7 +9,6 @@ import jadex.commons.IBreakpointPanel;
 import jadex.commons.SGUI;
 import jadex.rules.tools.reteviewer.RetePanel;
 import jadex.tools.debugger.IDebuggerPanel;
-import jadex.tools.help.SHelp;
 
 import javax.swing.Icon;
 import javax.swing.JComponent;
@@ -26,7 +25,7 @@ public class BDIAgentRuleEngineDebuggerPanel	implements IDebuggerPanel
 	 * The image icons.
 	 */
 	protected static final UIDefaults	icons	= new UIDefaults(new Object[]{
-		"show_rete", SGUI.makeIcon(SHelp.class, "/jadex/tools/common/images/bug_small.png")
+		"show_rete", SGUI.makeIcon(BDIAgentRuleEngineDebuggerPanel.class, "/jadex/tools/common/images/bug_small.png")
 	});
 
 	//-------- IDebuggerPanel methods --------

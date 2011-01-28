@@ -15,6 +15,7 @@ import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.commons.gui.CombiIcon;
 import jadex.commons.service.IService;
 import jadex.micro.IMicroExternalAccess;
+import jadex.xml.annotation.XMLClassname;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -189,7 +190,7 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 				final IMicroExternalAccess exta = (IMicroExternalAccess)result;
 				exta.scheduleStep(new IComponentStep()
 				{
-					public static final String XML_CLASSNAME = "update"; 
+					@XMLClassname("update")
 					public Object execute(IInternalAccess ia)
 					{
 						Future ret = new Future();
@@ -231,7 +232,7 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 				
 				exta.scheduleStep(new IComponentStep()
 				{
-					public static final String XML_CLASSNAME = "service"; 
+					@XMLClassname("service")
 					public Object execute(IInternalAccess ia)
 					{
 						Future ret = new Future();
@@ -330,7 +331,7 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 					final IMicroExternalAccess exta = (IMicroExternalAccess)result;
 					exta.scheduleStep(new IComponentStep()
 					{
-						public static final String XML_CLASSNAME = "rem"; 
+						@XMLClassname("rem")
 						public Object execute(IInternalAccess ia)
 						{
 							ProxyAgent pa = (ProxyAgent)ia;

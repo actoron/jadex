@@ -12,7 +12,7 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
 
 /**
- *  Invocvation interceptor for executing a call on 
+ *  Invocation interceptor for executing a call on 
  *  the underlying component thread. 
  */
 public class DecouplingServiceInvocationInterceptor implements IServiceInvocationInterceptor
@@ -96,39 +96,7 @@ public class DecouplingServiceInvocationInterceptor implements IServiceInvocatio
 //				});
 //			}
 			
-			IFuture resfut = ea.scheduleStep(new IComponentStep()
-			{
-				public static final String XML_CLASSNAME = "invoc"; 
-				public Object execute(IInternalAccess ia)
-				{					
-					final Future fut = new Future();
-					
-					try
-					{
-						Object res = sic.getMethod().invoke(service, sic.getArguments());
-						if(res instanceof IFuture)
-						{
-							((IFuture)res).addResultListener(new DelegationResultListener(fut));
-						}
-						else
-						{
-							// Not correct when not null but some other value.
-							fut.setResult(res);
-						}
-					}
-					catch(Exception e)
-					{
-						fut.setException(e);
-					}
-					
-					return fut;
-				}
-				
-				public String toString()
-				{
-					return "invokeMethod("+sic.getMethod()+")";
-				}
-			});
+			IFuture resfut = ea.scheduleStep(new InvokeMethodStep(sic, service));
 			
 			if(scheduleable)
 			{
@@ -201,5 +169,53 @@ public class DecouplingServiceInvocationInterceptor implements IServiceInvocatio
 		IServiceIdentifier sid = service.getServiceIdentifier();
 		return (IInternalService)Proxy.newProxyInstance(ea.getModel().getClassLoader(), new Class[]{IInternalService.class, sid.getServiceType()}, 
 			new BasicServiceInvocationHandler(sid, getInterceptors(), new DecouplingServiceInvocationInterceptor(ea, adapter, service)));
+	}
+	
+	//-------- helper classes --------
+	
+	/**
+	 *  Service invocation step.
+	 */
+	// Not anonymous class to avoid dependency to XML required for XMLClassname
+	public static class InvokeMethodStep implements IComponentStep
+	{
+		protected ServiceInvocationContext	sic;
+		protected Object	service;
+
+		public InvokeMethodStep(ServiceInvocationContext sic, Object service)
+		{
+			this.sic = sic;
+			this.service = service;
+		}
+
+		public Object execute(IInternalAccess ia)
+		{					
+			final Future fut = new Future();
+			
+			try
+			{
+				Object res = sic.getMethod().invoke(service, sic.getArguments());
+				if(res instanceof IFuture)
+				{
+					((IFuture)res).addResultListener(new DelegationResultListener(fut));
+				}
+				else
+				{
+					// Not correct when not null but some other value.
+					fut.setResult(res);
+				}
+			}
+			catch(Exception e)
+			{
+				fut.setException(e);
+			}
+			
+			return fut;
+		}
+
+		public String toString()
+		{
+			return "invokeMethod("+sic.getMethod()+")";
+		}
 	}
 }

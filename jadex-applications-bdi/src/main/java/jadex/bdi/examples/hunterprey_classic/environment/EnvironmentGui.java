@@ -12,6 +12,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.ChangeEvent;
 import jadex.commons.SGUI;
+import jadex.xml.annotation.XMLClassname;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -134,7 +135,7 @@ public class EnvironmentGui	extends JFrame
 				
 				agent.scheduleStep(new IComponentStep()
 				{
-					public static final String XML_CLASSNAME = "end"; 
+					@XMLClassname("end")
 					public Object execute(IInternalAccess ia)
 					{
 						IBDIInternalAccess bia = (IBDIInternalAccess)ia;
@@ -158,7 +159,7 @@ public class EnvironmentGui	extends JFrame
 		
 		agent.scheduleStep(new IComponentStep()
 		{
-			public static final String XML_CLASSNAME = "dispose"; 
+			@XMLClassname("dispose")
 			public Object execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
@@ -211,7 +212,7 @@ public class EnvironmentGui	extends JFrame
 
 		agent.scheduleStep(new IComponentStep()
 		{
-			public static final String XML_CLASSNAME = "env"; 
+			@XMLClassname("env")
 			public Object execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
@@ -238,7 +239,7 @@ public class EnvironmentGui	extends JFrame
 						final Long val = new Long(roundtimetf.getText());
 						agent.scheduleStep(new IComponentStep()
 						{
-							public static final String XML_CLASSNAME = "roundtime"; 
+							@XMLClassname("roundtime")
 							public Object execute(IInternalAccess ia)
 							{
 								IBDIInternalAccess bia = (IBDIInternalAccess)ia;
@@ -304,7 +305,7 @@ public class EnvironmentGui	extends JFrame
 		
 		agent.scheduleStep(new IComponentStep()
 		{
-			public static final String XML_CLASSNAME = "roundcnt"; 
+			@XMLClassname("roundcnt")
 			public Object execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
@@ -330,7 +331,7 @@ public class EnvironmentGui	extends JFrame
 						final Long val = new Long(roundtimetf.getText());
 						agent.scheduleStep(new IComponentStep()
 						{
-							public static final String XML_CLASSNAME = "rt"; 
+							@XMLClassname("rt")
 							public Object execute(IInternalAccess ia)
 							{
 								IBDIInternalAccess bia = (IBDIInternalAccess)ia;
@@ -479,7 +480,7 @@ public class EnvironmentGui	extends JFrame
 	{
 		agent.scheduleStep(new IComponentStep()
 		{
-			public static final String XML_CLASSNAME = "dummy"; 
+			@XMLClassname("dummy")
 			public Object execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;

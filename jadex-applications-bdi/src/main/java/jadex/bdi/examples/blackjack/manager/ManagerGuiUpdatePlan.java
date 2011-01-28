@@ -8,6 +8,7 @@ import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.ChangeEvent;
+import jadex.xml.annotation.XMLClassname;
 
 import java.awt.EventQueue;
 
@@ -75,7 +76,7 @@ public class ManagerGuiUpdatePlan extends Plan
 		
 		getExternalAccess().scheduleStep(new IComponentStep()
 		{
-			public static final String XML_CLASSNAME = "guidispose"; 
+			@XMLClassname("guidispose")
 			public Object execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;

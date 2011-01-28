@@ -15,6 +15,7 @@ import jadex.xml.SubobjectInfo;
 import jadex.xml.TypeInfo;
 import jadex.xml.TypeInfoPathManager;
 import jadex.xml.TypeInfoTypeManager;
+import jadex.xml.annotation.XMLClassname;
 import jadex.xml.reader.IObjectReaderHandler;
 import jadex.xml.reader.LinkData;
 import jadex.xml.reader.ReadContext;
@@ -220,7 +221,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 					}
 					else if(!BasicTypeConverter.isBuiltInType(clazz))
 					{
-						if(SReflect.isAnonymousInnerClass(clazz))
+						if(clazz.isAnonymousClass())
 						{
 							// Create anonymous class object by supplying null values
 //							System.out.println("Anonymous: "+clazz);
@@ -331,13 +332,22 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 				String clname = (String)f.get(null);
 				ret = rawclname.equals(clname);
 			}
-			catch(NoSuchFieldException e)
-			{
-				// no class field declared
-			}
+//			catch(NoSuchFieldException e)
+//			{
+//				// no class field declared
+//			}
 			catch(Exception e)
 			{
 				ret = false;
+			}
+			
+			if(!ret)
+			{
+            	XMLClassname xmlc = SXML.getXMLClassnameAnnotation(clazz);
+            	if(xmlc!=null)
+            	{
+    				ret = rawclname.equals(xmlc.value());	
+            	}
 			}
 		}
 		
@@ -1015,32 +1025,33 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 			// Try to find bean class information
 			
 			Map props = introspector.getBeanProperties(object.getClass(), true);
-			BeanProperty prop = (BeanProperty)props.get(accessinfo instanceof String? accessinfo: xmlname.getLocalPart());
-			if(prop!=null)
+			Object prop = props.get(accessinfo instanceof String? accessinfo: xmlname.getLocalPart());
+			if(prop instanceof BeanProperty)
 			{
-				Object arg = convertValue(val, prop.getSetterType(), converter, context, id);
+				BeanProperty	bprop	= (BeanProperty)prop;
+				Object arg = convertValue(val, bprop.getSetterType(), converter, context, id);
 
 				try
 				{
-					if(prop.getSetter()!=null)
+					if(bprop.getSetter()!=null)
 					{
-						prop.getSetter().invoke(object, new Object[]{arg});
+						bprop.getSetter().invoke(object, new Object[]{arg});
 					}
 					else
 					{
-						if((prop.getField().getModifiers()&Field.PUBLIC)==0)
+						if((bprop.getField().getModifiers()&Field.PUBLIC)==0)
 						{
-							if(SXML.XML_CLASSNAME.equals(prop.getName()))
+							if(SXML.XML_CLASSNAME.equals(bprop.getName()))
 							{
 								set = true;
 							}
 							else
 							{
-								prop.getField().setAccessible(true);
+								bprop.getField().setAccessible(true);
 							}
 						}
 						if(!set)
-							prop.getField().set(object, arg);
+							bprop.getField().set(object, arg);
 					}
 					set = true;
 				}
@@ -1056,6 +1067,11 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 //					context.getReporter().report("Failure setting attribute: "+e,
 //						"attribute error", context, context.getParser().getLocation());
 				}
+			}
+			else if(prop instanceof XMLClassname)
+			{
+				// Annotation needs not to be set.
+				set	= true;
 			}
 			
 			// Try to guess field or method.

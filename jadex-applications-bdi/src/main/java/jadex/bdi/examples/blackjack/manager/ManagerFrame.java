@@ -17,7 +17,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.commons.ChangeEvent;
 import jadex.commons.SGUI;
 import jadex.commons.concurrent.SwingDefaultResultListener;
-import jadex.commons.service.SServiceProvider;
+import jadex.xml.annotation.XMLClassname;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -125,7 +125,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 		dealerpan.setBackground(Color.WHITE);
 		access.scheduleStep(new IComponentStep()
 		{
-			public static final String XML_CLASSNAME = "dealerpan";
+			@XMLClassname("dealerpan")
 			public Object execute(IInternalAccess ia)
 			{
 				ia.getRequiredService("cms").addResultListener(new SwingDefaultResultListener(ManagerFrame.this)
@@ -148,7 +148,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 			{
 				access.scheduleStep(new IComponentStep()
 				{
-					public static final String XML_CLASSNAME = "dealertf";
+					@XMLClassname("dealertf")
 					public Object execute(IInternalAccess ia)
 					{
 						ia.getRequiredService("cms").addResultListener(new SwingDefaultResultListener(ManagerFrame.this)
@@ -198,7 +198,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 
 		agent.scheduleStep(new IComponentStep()
 		{
-			public static final String XML_CLASSNAME = "dispose"; 
+			@XMLClassname("dispose")
 			public Object execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
@@ -268,7 +268,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 		
 		agent.scheduleStep(new IComponentStep()
 		{
-			public static final String XML_CLASSNAME = "players"; 
+			@XMLClassname("players")
 			public Object execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
@@ -385,7 +385,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 			{
 				agent.scheduleStep(new IComponentStep()
 				{
-					public static final String XML_CLASSNAME = "close"; 
+					@XMLClassname("close")
 					public Object execute(IInternalAccess ia)
 					{
 						ia.getRequiredService("cms").addResultListener(new SwingDefaultResultListener(ManagerFrame.this)
@@ -484,7 +484,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 	{
 		agent.scheduleStep(new IComponentStep()
 		{
-			public static final String XML_CLASSNAME = "startDealer"; 
+			@XMLClassname("startDealer")
 			public Object execute(IInternalAccess ia)
 			{
 				final IBDIInternalAccess bia = (IBDIInternalAccess)ia;
@@ -587,7 +587,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 		
 		agent.scheduleStep(new IComponentStep()
 		{
-			public static final String XML_CLASSNAME = "destroy"; 
+			@XMLClassname("destroy")
 			public Object execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
@@ -800,7 +800,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 //			agent.getLogger().info("starting playerAgent: "+player.getName());
 			agent.scheduleStep(new IComponentStep()
 			{
-				public static final String XML_CLASSNAME = "start"; 
+				@XMLClassname("start")
 				public Object execute(IInternalAccess ia)
 				{
 					try
@@ -900,7 +900,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 		{
 			agent.scheduleStep(new IComponentStep()
 			{
-				public static final String XML_CLASSNAME = "stop"; 
+				@XMLClassname("stop")
 				public Object execute(IInternalAccess ia)
 				{
 					IBDIInternalAccess bia = (IBDIInternalAccess)ia;

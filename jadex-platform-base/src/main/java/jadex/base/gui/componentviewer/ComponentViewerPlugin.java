@@ -19,6 +19,7 @@ import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.commons.gui.CombiIcon;
 import jadex.commons.gui.ObjectCardLayout;
 import jadex.commons.service.IService;
+import jadex.xml.annotation.XMLClassname;
 
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -342,7 +343,8 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 											public void customResultAvailable(Object result)
 											{
 												Properties	sub	= props!=null ? props.getSubproperty(panel.getId()) : null;
-												panel.setProperties(sub);
+												if(sub!=null)
+													panel.setProperties(sub);
 												JComponent comp = panel.getComponent();
 												
 												// todo: help 
@@ -369,7 +371,7 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 						
 						getJCC().getExternalAccess().scheduleStep(new IComponentStep()
 						{
-							public static final String XML_CLASSNAME = "init";
+							@XMLClassname("init")
 							public Object execute(IInternalAccess ia)
 							{
 								ia.getRequiredService("cms").addResultListener(new SwingDefaultResultListener(comptree)
@@ -512,7 +514,7 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 					// Unknown -> start search to find out asynchronously
 					jcc.getExternalAccess().scheduleStep(new IComponentStep()
 					{
-						public static final String XML_CLASSNAME = "is-node-viewable"; 
+						@XMLClassname("is-node-viewable")
 						public Object execute(IInternalAccess ia)
 						{
 							ia.getRequiredService("cms").addResultListener(new SwingDefaultResultListener(comptree)

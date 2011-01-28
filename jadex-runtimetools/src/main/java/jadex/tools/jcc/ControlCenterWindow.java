@@ -10,6 +10,7 @@ import jadex.commons.BrowserLauncher;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.commons.service.library.ILibraryService;
+import jadex.xml.annotation.XMLClassname;
 
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
@@ -631,7 +632,7 @@ public class ControlCenterWindow extends JFrame
 			
 			controlcenter.access.scheduleStep(new IComponentStep()
 			{
-				public static final String XML_CLASSNAME = "open-project";
+				@XMLClassname("open-project")
 				public Object execute(IInternalAccess ia)
 				{
 					ia.getRequiredService("libservice")

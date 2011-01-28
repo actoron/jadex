@@ -15,6 +15,7 @@ import jadex.commons.service.clock.IClockService;
 import jadex.micro.IMicroExternalAccess;
 import jadex.micro.MicroAgent;
 import jadex.micro.MicroAgentMetaInfo;
+import jadex.xml.annotation.XMLClassname;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -175,7 +176,7 @@ public class AgentCreationAgent extends MicroAgent
 			{
 				exta.scheduleStep(new IComponentStep()
 				{
-					public static final String XML_CLASSNAME = "destroy1"; 
+					@XMLClassname("destroy1")
 					public Object execute(IInternalAccess ia)
 					{
 						IComponentManagementService cms = (IComponentManagementService)result;
@@ -186,7 +187,7 @@ public class AgentCreationAgent extends MicroAgent
 							{
 								exta.scheduleStep(new IComponentStep()
 								{
-									public static final String XML_CLASSNAME = "destroy2"; 
+									@XMLClassname("destroy2")
 									public Object execute(IInternalAccess ia)
 									{
 										System.out.println("Successfully destroyed peer: "+name);
@@ -233,7 +234,7 @@ public class AgentCreationAgent extends MicroAgent
 			{
 				exta.scheduleStep(new IComponentStep()
 				{
-					public static final String XML_CLASSNAME = "last"; 
+					@XMLClassname("last")
 					public Object execute(IInternalAccess ia)
 					{
 						IClockService cs = (IClockService)result;
@@ -259,7 +260,7 @@ public class AgentCreationAgent extends MicroAgent
 							{
 								exta.scheduleStep(new IComponentStep()
 								{
-									public static final String XML_CLASSNAME = "destroyMe"; 
+									@XMLClassname("destroyMe")
 									public Object execute(IInternalAccess ia)
 									{
 										IComponentManagementService cms = (IComponentManagementService)result;

@@ -10,6 +10,7 @@ import jadex.commons.IRemoteChangeListener;
 import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.service.BasicService;
 import jadex.micro.IMicroExternalAccess;
+import jadex.xml.annotation.XMLClassname;
 
 /**
  *  The daemon service.
@@ -44,7 +45,7 @@ public class DaemonService extends BasicService implements IDaemonService
 		
 		agent.scheduleStep(new IComponentStep()
 		{
-			public static final String XML_CLASSNAME = "startPlatform"; 
+			@XMLClassname("startPlatform")
 			public Object execute(IInternalAccess ia)
 			{
 				DaemonAgent agent = (DaemonAgent)ia;
@@ -66,7 +67,7 @@ public class DaemonService extends BasicService implements IDaemonService
 		
 		agent.scheduleStep(new IComponentStep()
 		{
-			public static final String XML_CLASSNAME = "shutdownPlatform"; 
+			@XMLClassname("shutdownPlatform")
 			public Object execute(IInternalAccess ia)
 			{
 				DaemonAgent agent = (DaemonAgent)ia;
@@ -88,7 +89,7 @@ public class DaemonService extends BasicService implements IDaemonService
 		
 		agent.scheduleStep(new IComponentStep()
 		{
-			public static final String XML_CLASSNAME = "getPlatforms"; 
+			@XMLClassname("getPlatforms")
 			public Object execute(IInternalAccess ia)
 			{
 				DaemonAgent agent = (DaemonAgent)ia;
@@ -108,7 +109,7 @@ public class DaemonService extends BasicService implements IDaemonService
 	{
 		agent.scheduleStep(new IComponentStep()
 		{
-			public static final String XML_CLASSNAME = "addChangeListener"; 
+			@XMLClassname("addChangeListener")
 			public Object execute(IInternalAccess ia)
 			{
 				DaemonAgent agent = (DaemonAgent)ia;
@@ -126,7 +127,7 @@ public class DaemonService extends BasicService implements IDaemonService
 	{
 		agent.scheduleStep(new IComponentStep()
 		{
-			public static final String XML_CLASSNAME = "removeChangeListener"; 
+			@XMLClassname("removeChangeListener")
 			public Object execute(IInternalAccess ia)
 			{
 				DaemonAgent agent = (DaemonAgent)ia;

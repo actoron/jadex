@@ -28,6 +28,7 @@ import jadex.tools.common.modeltree.FileNode;
 import jadex.tools.common.modeltree.IExplorerTreeNode;
 import jadex.tools.common.modeltree.ModelExplorer;
 import jadex.tools.common.modeltree.ModelExplorerTreeModel;
+import jadex.xml.annotation.XMLClassname;
 
 import java.awt.Component;
 import java.awt.Cursor;
@@ -370,7 +371,7 @@ public class StarterPlugin extends AbstractJCCPlugin	implements ICMSComponentLis
 		
 		jcc.getExternalAccess().scheduleStep(new IComponentStep()
 		{
-			public static final String XML_CLASSNAME = "add-component-listener";
+			@XMLClassname("add-component-listener")
 			public Object execute(IInternalAccess ia)
 			{
 				ia.getRequiredService("cms").addResultListener(new DefaultResultListener()
@@ -805,7 +806,7 @@ public class StarterPlugin extends AbstractJCCPlugin	implements ICMSComponentLis
 		final Future ret = new Future(); 
 		jcc.getExternalAccess().scheduleStep(new IComponentStep()
 		{
-			public static final String XML_CLASSNAME = "create-component";
+			@XMLClassname("create-component")
 			public Object execute(IInternalAccess ia)
 			{
 				ia.getRequiredService("cms").addResultListener(new SwingDefaultResultListener(spanel)

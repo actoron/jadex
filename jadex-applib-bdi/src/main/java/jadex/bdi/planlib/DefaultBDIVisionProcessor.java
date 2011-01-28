@@ -22,6 +22,7 @@ import jadex.commons.service.SServiceProvider;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.IValueFetcher;
 import jadex.javaparser.SimpleValueFetcher;
+import jadex.xml.annotation.XMLClassname;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -128,7 +129,7 @@ public class DefaultBDIVisionProcessor extends SimplePropertyObject implements I
 								{
 									exta.scheduleStep(new IComponentStep()
 									{
-										public static final String XML_CLASSNAME = "add"; 
+										@XMLClassname("add")
 										public Object execute(IInternalAccess ia)
 										{
 											IBDIInternalAccess	scope	= (IBDIInternalAccess)ia;
@@ -149,7 +150,7 @@ public class DefaultBDIVisionProcessor extends SimplePropertyObject implements I
 								{
 									exta.scheduleStep(new IComponentStep()
 									{
-										public static final String XML_CLASSNAME = "remove"; 
+										@XMLClassname("remove")
 										public Object execute(IInternalAccess ia)
 										{
 											IBDIInternalAccess	scope	= (IBDIInternalAccess)ia;
@@ -170,7 +171,7 @@ public class DefaultBDIVisionProcessor extends SimplePropertyObject implements I
 								{
 									exta.scheduleStep(new IComponentStep()
 									{
-										public static final String XML_CLASSNAME = "set"; 
+										@XMLClassname("set")
 										public Object execute(IInternalAccess ia)
 										{
 											IBDIInternalAccess	scope	= (IBDIInternalAccess)ia;
@@ -191,7 +192,7 @@ public class DefaultBDIVisionProcessor extends SimplePropertyObject implements I
 								{
 									exta.scheduleStep(new IComponentStep()
 									{
-										public static final String XML_CLASSNAME = "unset"; 
+										@XMLClassname("unset")
 										public Object execute(IInternalAccess ia)
 										{
 											IBDIInternalAccess	scope	= (IBDIInternalAccess)ia;
@@ -212,7 +213,7 @@ public class DefaultBDIVisionProcessor extends SimplePropertyObject implements I
 								{
 									exta.scheduleStep(new IComponentStep()
 									{
-										public static final String XML_CLASSNAME = "removeoutdated"; 
+										@XMLClassname("removeoutdated")
 										public Object execute(IInternalAccess ia)
 										{
 											IBDIInternalAccess	scope	= (IBDIInternalAccess)ia;

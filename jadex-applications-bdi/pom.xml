@@ -93,19 +93,19 @@
 		</resources>
 
 		<plugins>
-			<plugin>
+<!-- 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
         		<version>2.3.2</version>
 				<configuration>
 					<source>1.4</source>
 					<target>1.4</target>
-<!-- 					<excludes>
+<!- - 					<excludes>
 						<exclude>**/disastermanagement/</exclude>
-					</excludes> -->
+					</excludes> - ->
 				</configuration>
 			</plugin>
-
+ -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>

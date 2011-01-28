@@ -19,6 +19,7 @@ import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.service.SServiceProvider;
 import jadex.commons.service.clock.IClockService;
+import jadex.xml.annotation.XMLClassname;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -112,7 +113,7 @@ public class CreateCollectionTruckProcess extends SimplePropertyObject implement
 										IBDIExternalAccess ex = (IBDIExternalAccess)result;
 										ex.scheduleStep(new IComponentStep()
 										{
-											public static final String XML_CLASSNAME = "rem"; 
+											@XMLClassname("rem")
 											public Object execute(IInternalAccess ia)
 											{
 												IBDIInternalAccess bia = (IBDIInternalAccess)ia;

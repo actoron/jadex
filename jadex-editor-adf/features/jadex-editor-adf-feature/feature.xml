@@ -2,7 +2,7 @@
 <feature
       id="jadex.editor.adf.feature"
       label="Jadex ADF Checker"
-      version="1.0.0.qualifier"
+      version="1.0.1.qualifier"
       provider-name="jadex.sourceforge.net">
 
    <description url="http://jadex-agents.informatik.uni-hamburg.de">

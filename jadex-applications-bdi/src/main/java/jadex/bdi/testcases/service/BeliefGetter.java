@@ -8,6 +8,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.service.BasicService;
+import jadex.xml.annotation.XMLClassname;
 
 /**
  *  Simple service that fetches a belief value.
@@ -42,7 +43,7 @@ public class BeliefGetter extends BasicService implements IBeliefGetter
 		final Future ret = new Future();
 		agent.scheduleStep(new IComponentStep()
 		{
-			public static final String XML_CLASSNAME = "getter"; 
+			@XMLClassname("getter")
 			public Object execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;

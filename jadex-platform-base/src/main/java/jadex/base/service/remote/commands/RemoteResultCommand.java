@@ -2,7 +2,6 @@ package jadex.base.service.remote.commands;
 
 import jadex.base.service.remote.ExceptionInfo;
 import jadex.base.service.remote.IRemoteCommand;
-import jadex.base.service.remote.RemoteMethodInvocationHandler;
 import jadex.base.service.remote.RemoteServiceManagementService;
 import jadex.commons.Future;
 import jadex.commons.IFuture;

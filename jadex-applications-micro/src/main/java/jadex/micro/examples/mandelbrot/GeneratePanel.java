@@ -9,6 +9,8 @@ import jadex.commons.ChangeEvent;
 import jadex.commons.SGUI;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.gui.PropertiesPanel;
+import jadex.xml.annotation.XMLClassname;
+
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -170,7 +172,7 @@ public class GeneratePanel extends JPanel
 		
 		agent.scheduleStep(new IComponentStep()
 		{
-			public static final String XML_CLASSNAME = "dispose"; 
+			@XMLClassname("dispose")
 			public Object execute(IInternalAccess ia)
 			{
 				ia.addComponentListener(new IComponentListener()

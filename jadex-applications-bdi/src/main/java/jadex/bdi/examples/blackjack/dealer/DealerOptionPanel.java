@@ -9,6 +9,7 @@ import jadex.bdi.runtime.IInternalEvent;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.SGUI;
+import jadex.xml.annotation.XMLClassname;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -113,7 +114,7 @@ public class DealerOptionPanel	extends JPanel	//	implements ActionListener, Chan
 				}
 				agent.scheduleStep(new IComponentStep()
 				{
-					public static final String XML_CLASSNAME = "singleStep"; 
+					@XMLClassname("singleStep")
 					public Object execute(IInternalAccess ia)
 					{
 						IBDIInternalAccess bia = (IBDIInternalAccess)ia;
@@ -131,7 +132,7 @@ public class DealerOptionPanel	extends JPanel	//	implements ActionListener, Chan
 			{
 				agent.scheduleStep(new IComponentStep()
 				{
-					public static final String XML_CLASSNAME = "statistics"; 
+					@XMLClassname("statistics")
 					public Object execute(IInternalAccess ia)
 					{
 						IBDIInternalAccess bia = (IBDIInternalAccess)ia;
@@ -189,7 +190,7 @@ public class DealerOptionPanel	extends JPanel	//	implements ActionListener, Chan
 			{
 				agent.scheduleStep(new IComponentStep()
 				{
-					public static final String XML_CLASSNAME = "step"; 
+					@XMLClassname("step")
 					public Object execute(IInternalAccess ia)
 					{
 						IBDIInternalAccess bia = (IBDIInternalAccess)ia;
@@ -225,7 +226,7 @@ public class DealerOptionPanel	extends JPanel	//	implements ActionListener, Chan
 				
 				agent.scheduleStep(new IComponentStep()
 				{
-					public static final String XML_CLASSNAME = "stepDelay"; 
+					@XMLClassname("stepDelay")
 					public Object execute(IInternalAccess ia)
 					{
 						IBDIInternalAccess bia = (IBDIInternalAccess)ia;
@@ -248,7 +249,7 @@ public class DealerOptionPanel	extends JPanel	//	implements ActionListener, Chan
 				
 				agent.scheduleStep(new IComponentStep()
 				{
-					public static final String XML_CLASSNAME = "restartDelay"; 
+					@XMLClassname("restartDelay")
 					public Object execute(IInternalAccess ia)
 					{
 						IBDIInternalAccess bia = (IBDIInternalAccess)ia;
@@ -295,7 +296,7 @@ public class DealerOptionPanel	extends JPanel	//	implements ActionListener, Chan
 
 		agent.scheduleStep(new IComponentStep()
 		{
-			public static final String XML_CLASSNAME = "ref"; 
+			@XMLClassname("ref")
 			public Object execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;

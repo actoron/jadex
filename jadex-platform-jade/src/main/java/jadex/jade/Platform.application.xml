@@ -17,9 +17,7 @@
 		<import>jadex.commons.service.threadpool.*</import>
 		<import>jadex.commons.service.execution.*</import>
 		<import>jadex.commons.concurrent.*</import>
-		<import>jadex.application.*</import>
-		<import>jadex.application.space.envsupport.*</import>
-		<import>jadex.application.space.agr.*</import>
+		<import>jadex.component.*</import>
 		<import>jadex.bridge.*</import>
 		<import>jadex.base.fipa.*</import>
 		<import>jadex.base.service.remote.*</import>
@@ -49,14 +47,7 @@
 		</providedservice>
 		
 		<providedservice class="IComponentFactory" direct="true">
-			new ApplicationComponentFactory(
-				new Set[]
-				{
-					MEnvSpaceType.getXMLMapping(),
-					MAGRSpaceType.getXMLMapping()
-				}, 
-				$component.getServiceProvider()
-			)		
+			new ComponentComponentFactory($component.getServiceProvider())		
 		</providedservice>
 		
 		<providedservice class="IMessageService" direct="true">
@@ -87,6 +78,7 @@
 	<applications>
 		<application name="all kernels">
 			<components>
+				<component name="kernel_application" type="kernel_application" daemon="true"/>
 				<component name="kernel_micro" type="kernel_micro" daemon="true"/>
 				<!-- <component type="kernel_bdi" daemon="true"/> -->
 				<component name="kernel_bdibpmn" type="kernel_bdibpmn" daemon="true"/>

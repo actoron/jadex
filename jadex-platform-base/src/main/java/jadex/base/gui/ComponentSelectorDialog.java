@@ -11,7 +11,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.SGUI;
 import jadex.commons.concurrent.SwingDefaultResultListener;
-import jadex.commons.service.SServiceProvider;
+import jadex.xml.annotation.XMLClassname;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -238,7 +238,7 @@ public class ComponentSelectorDialog
 							// Use clone to keep original aid unchanged.
 							access.scheduleStep(new IComponentStep()
 							{
-								public static final String XML_CLASSNAME = "node-handler";
+								@XMLClassname("node-handler")
 								public Object execute(IInternalAccess ia)
 								{
 									ia.getRequiredService("cms")
@@ -373,7 +373,7 @@ public class ComponentSelectorDialog
 					{
 						access.scheduleStep(new IComponentStep()
 						{
-							public static final String XML_CLASSNAME = "select";
+							@XMLClassname("select")
 							public Object execute(IInternalAccess ia)
 							{
 								ia.getRequiredService("cms").addResultListener(new SwingDefaultResultListener(parent)
@@ -398,7 +398,7 @@ public class ComponentSelectorDialog
 			{
 				access.scheduleStep(new IComponentStep()
 				{
-					public static final String XML_CLASSNAME = "new-aid";
+					@XMLClassname("new-aid")
 					public Object execute(IInternalAccess ia)
 					{
 						ia.getRequiredService("cms").addResultListener(new SwingDefaultResultListener(parent)

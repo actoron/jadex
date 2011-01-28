@@ -9,7 +9,6 @@ import jadex.commons.IBreakpointPanel;
 import jadex.commons.SGUI;
 import jadex.rules.tools.stateviewer.OAVPanel;
 import jadex.tools.debugger.IDebuggerPanel;
-import jadex.tools.help.SHelp;
 
 import java.awt.BorderLayout;
 
@@ -30,7 +29,7 @@ public class BDIAgentInspectorDebuggerPanel	implements IDebuggerPanel
 	 * The image icons.
 	 */
 	protected static final UIDefaults	icons	= new UIDefaults(new Object[]{
-		"contents", SGUI.makeIcon(SHelp.class, "/jadex/tools/common/images/bug_small.png")
+		"contents", SGUI.makeIcon(BDIAgentInspectorDebuggerPanel.class, "/jadex/tools/common/images/bug_small.png")
 	});
 
 	//-------- IDebuggerPanel methods --------

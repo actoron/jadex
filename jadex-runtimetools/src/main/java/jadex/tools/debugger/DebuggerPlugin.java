@@ -11,7 +11,6 @@ import jadex.commons.Properties;
 import jadex.commons.SGUI;
 import jadex.commons.gui.CombiIcon;
 import jadex.commons.gui.ObjectCardLayout;
-import jadex.tools.help.SHelp;
 
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -45,13 +44,13 @@ public class DebuggerPlugin extends AbstractJCCPlugin
 	 * The image icons.
 	 */
 	protected static final UIDefaults	icons	= new UIDefaults(new Object[]{
-		"debugger", SGUI.makeIcon(SHelp.class, "/jadex/tools/common/images/new_introspector.png"),
-		"debugger_sel", SGUI.makeIcon(SHelp.class, "/jadex/tools/common/images/new_introspector_sel.png"),
-		"debug_component", SGUI.makeIcon(SHelp.class, "/jadex/tools/common/images/new_introspector.png"),
-		"close_debugger", SGUI.makeIcon(SHelp.class, "/jadex/tools/common/images/close_introspector.png"),
-		"component_debugged", SGUI.makeIcon(SHelp.class, "/jadex/tools/common/images/overlay_introspected.png"),
-		"stop_debugger", SGUI.makeIcon(SHelp.class, "/jadex/tools/common/images/overlay_notintrospected.png"),
-		"debugger_empty", SGUI.makeIcon(SHelp.class, "/jadex/tools/common/images/introspector_empty.png")
+		"debugger", SGUI.makeIcon(DebuggerPlugin.class, "/jadex/tools/common/images/new_introspector.png"),
+		"debugger_sel", SGUI.makeIcon(DebuggerPlugin.class, "/jadex/tools/common/images/new_introspector_sel.png"),
+		"debug_component", SGUI.makeIcon(DebuggerPlugin.class, "/jadex/tools/common/images/new_introspector.png"),
+		"close_debugger", SGUI.makeIcon(DebuggerPlugin.class, "/jadex/tools/common/images/close_introspector.png"),
+		"component_debugged", SGUI.makeIcon(DebuggerPlugin.class, "/jadex/tools/common/images/overlay_introspected.png"),
+		"stop_debugger", SGUI.makeIcon(DebuggerPlugin.class, "/jadex/tools/common/images/overlay_notintrospected.png"),
+		"debugger_empty", SGUI.makeIcon(DebuggerPlugin.class, "/jadex/tools/common/images/introspector_empty.png")
 	});
 	
 	//-------- attributes --------
